@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: sccpi.texi,v 1.1.2.1 2009-06-21 10:56:05 brian Exp $
+% @(#) $Id: sccpi.texi,v 1.1.2.2 2011-02-07 02:21:42 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:56:05 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:42 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* SCCPI: (sccpi).		Signalling Connection Control Part Interface
+* SCCPI: (sccpi).			Signalling Connection Control Part Interface
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -405,6 +405,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallformat
 @verbatim
 $Log: sccpi.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:42  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:56:05  brian
 - added files to new distro
 

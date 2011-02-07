@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: XNS.texi,v 1.1.2.1 2009-06-21 10:59:42 brian Exp $
+% @(#) $Id: XNS.texi,v 1.1.2.2 2011-02-07 02:21:50 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:59:42 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:50 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* XNS: (XNS).		    X/Open Network Services Protocol Suite
+* XNS: (XNS).				X/Open Network Services Protocol Suite
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -386,6 +386,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: XNS.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:50  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:59:42  brian
 - added files to new distro
 

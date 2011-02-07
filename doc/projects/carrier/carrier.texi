@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: carrier.texi,v 1.1.2.2 2010-02-22 14:48:41 brian Exp $
+% @(#) $Id: carrier.texi,v 1.1.2.3 2011-02-07 02:21:34 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2010-02-22 14:48:41 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* Carrier VoIP: (carrier).			OpenSS7 Carrier VoIP Switch
+* Carrier VoIP: (carrier).		OpenSS7 Carrier VoIP Switch
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -434,6 +434,9 @@ Project} website for a current version.
 @smallexample
 @verbatim
 $Log: carrier.texi,v $
+Revision 1.1.2.3  2011-02-07 02:21:34  brian
+- updated manuals
+
 Revision 1.1.2.2  2010-02-22 14:48:41  brian
 - added documentation files to build
 

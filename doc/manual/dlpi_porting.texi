@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id: dlpi_porting.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+% @(#) $Id: dlpi_porting.texi,v 1.1.2.2 2011-02-07 02:21:33 brian Exp $
 %
 % =========================================================================
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -93,7 +93,7 @@
 
 @dircategory STREAMS
 @direntry
-* DLPI Porting: (dlpi_porting).			A DLPI Porting Guide.
+* DLPI Porting: (dlpi_porting).		A DLPI Porting Guide.
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -408,6 +408,9 @@ A current version of this manual is normally distributed with the
 @smallexample
 @verbatim
 $Log: dlpi_porting.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:33  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:40:08  brian
 - added files to new distro
 

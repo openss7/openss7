@@ -2,11 +2,11 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: sdli.texi,v 1.1.2.1 2009-06-21 10:56:20 brian Exp $
+% @(#) $Id: sdli.texi,v 1.1.2.2 2011-02-07 02:21:43 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:56:20 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:43 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* SDLI: (sdli).			Signalling Data Link Interface
+* SDLI: (sdli).				Signalling Data Link Interface
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -194,7 +194,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -404,6 +404,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: sdli.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:43  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:56:20  brian
 - added files to new distro
 
@@ -698,8 +701,8 @@ management interface provides for two styles of LMS provider:
 @subsubheading Style 1 LMS Provider
 
 A @dfn{Style 1} LMS provider is a provider that associates a Stream with a PPA at the time of the
-first @manref{open(2)} call for the device, and disassociates a Stream from a PPA at the time of the
-last @manref{close(2)} call for the device.
+first @manref{open(2s)} call for the device, and disassociates a Stream from a PPA at the time of the
+last @manref{close(2s)} call for the device.
 
 Physical points of attachment (PPA) are assigned to major and minor device number combinations.
 When the major and minor device number combination is opened, the opened Stream is automatically
@@ -1603,7 +1606,7 @@ Indicates the PPA style of the LMS provider.  This value can be one of the follo
 @table @pval
 
 @item LMI_STYLE1
-PPA is implicitly attached by @manref{open(2)}.
+PPA is implicitly attached by @manref{open(2s)}.
 
 @item LMI_STYLE2
 PPA must be explicitly attached using @prim{LMI_ATTACH_REQ}.
@@ -3388,21 +3391,21 @@ members:
 @subsubheading @pioc{SDL_IOCGCONFIG}
 
 Gets the signalling data link configuration.  Upon success, the signalling data link configuration
-is written to the memory extent indicated by the pointer argument to the @manref{ioctl(2)} call.
+is written to the memory extent indicated by the pointer argument to the @manref{ioctl(2s)} call.
 
 @subsection Set Configuration
 @subsubheading @pioc{SDL_IOCSCONFIG}
 
 Sets the signalling data link configuration.  Upon success, the signalling data link configuration
-is read from the memory extent pointed to by the pointer argument to the @manref{ioctl(2)} call.
+is read from the memory extent pointed to by the pointer argument to the @manref{ioctl(2s)} call.
 
 @subsection Test Configuration
 @subsubheading @pioc{SDL_IOCTCONFIG}
 
 Test the signalling data link configuration.  Upon success, the signalling data link configuration
-is read from the memory extent specified by the pointer argument to the @manref{ioctl(2)} call,
+is read from the memory extent specified by the pointer argument to the @manref{ioctl(2s)} call,
 values adjusted according to the rules for configuration, and the resulting configuraiton written
-back to the memory extent specified by the pointer argumnet to the @manref{ioctl(2)} call.  Actual
+back to the memory extent specified by the pointer argumnet to the @manref{ioctl(2s)} call.  Actual
 configuration is not changed.
 
 @subsection Commit Configuration
@@ -3410,9 +3413,9 @@ configuration is not changed.
 
 Confirms the signalling data link configuration.  Upon success, the signalling data link
 configuration is read from the memory extent specified by the pointer argument to the
-@manref{ioctl(2)} call, values adjusted according to the rules for configuration, the configuration
+@manref{ioctl(2s)} call, values adjusted according to the rules for configuration, the configuration
 applied, and then the resulting configuration written back to the memory extent specified by the
-pointer argument to the @manref{ioctl(2)} call.
+pointer argument to the @manref{ioctl(2s)} call.
 
 Normally, the argument to the @pioc{SDL_IOCCCONFIG} call is the same as to an immediately preceding
 @pioc{SDL_IOCTCONFIG} call.

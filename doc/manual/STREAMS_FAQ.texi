@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id: STREAMS_FAQ.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+% @(#) $Id: STREAMS_FAQ.texi,v 1.1.2.2 2011-02-07 02:21:33 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -93,7 +93,7 @@
 
 @dircategory STREAMS
 @direntry
-* STREAMS FAQ: (STREAMS_FAQ).	STREAMS Frequently Asked Questions
+* STREAMS FAQ: (STREAMS_FAQ).		STREAMS Frequently Asked Questions
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -108,7 +108,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -157,7 +157,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -184,7 +184,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -460,6 +460,9 @@ package.
 @smallexample
 @verbatim
 $Log: STREAMS_FAQ.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:33  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:40:08  brian
 - added files to new distro
 
@@ -1544,7 +1547,7 @@ A direction of data flow going from a driver toward the @dfn{Stream head}.  Also
 @item read queue
 @cindex read queue
 A message queue in a module or driver containing messages moving @dfn{upstream}.  Associated with
-the @manref{read(2)} system call and input from a driver.
+the @manref{read(2s)} system call and input from a driver.
 
 @item remote mode
 @cindex remote mode
@@ -1651,7 +1654,7 @@ are reduced to the low-water mark value, the other queue is unblocked by @acrony
 @item write queue
 @cindex write queue
 A message queue in a module or driver containing messages moving downstream.  Associated with the
-@manref{write(2)} system call and output from a user process.
+@manref{write(2s)} system call and output from a user process.
 
 @item write-side
 @cindex write-side

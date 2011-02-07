@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: tree.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+@c @(#) $Id: tree.texi,v 1.1.2.2 2011-02-07 02:21:34 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -187,7 +187,7 @@ This kernel module has been rolled into the @file{streams} kernel module.
 
 This kernel module contains the @file{fifo} @acronym{STREAMS} driver.
 This is a standard @acronym{STREAMS} driver, but is also used by the conformance and validation test suite.
-See @manref{fifo(4)} for more information.
+See @manref{fifo(4s)} for more information.
 
 This kernel module has been rolled into the @file{streams} kernel module.
 
@@ -522,7 +522,8 @@ This kernel module has been rolled into the @file{streams} kernel module.
 This kernel module provides the @file{tirdwr} @acronym{STREAMS} module.
 This is a standard @acronym{STREAMS} module that is part of the @cite{X/Open Transport Interface (XTI)}
 library capability.
-When pushed on a @dfn{Stream} it provides the ability to @manpage{read(2)} from and @manpage{write(2)} to a
+When pushed on a @dfn{Stream} it provides the ability to @manpage{read(2s)} from and
+@manpage{write(2s)} to a
 @dfn{Stream} supporting the @dfn{Transport Provider Interface (TPI)}.
 See @manref{tirdwr(4)} for more information.
 

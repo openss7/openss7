@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id: libxnet.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+% @(#) $Id: libxnet.texi,v 1.1.2.2 2011-02-07 02:21:33 brian Exp $
 %
 % =========================================================================
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -93,7 +93,7 @@
 
 @dircategory GNU libraries
 @direntry
-* Libxnet: (libxnet).           An Open XTI/TLI library for STREAMS.
+* Libxnet: (libxnet).			An Open XTI/TLI library for STREAMS.
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -678,7 +678,7 @@ XTI/TLI[4], TPI[5], XPG5, XNS 5.2[6], SUSv2[7].
 Trademarks mentioned are the property of their owners.
 
 @subsubheading VERSIONS
-OpenSS7 XTI Library: $Name:  $($Revision: 1.1.2.1 $); $Date: 2009-06-21 10:40:08 $.
+OpenSS7 XTI Library: $Name:  $($Revision: 1.1.2.2 $); $Date: 2011-02-07 02:21:33 $.
 
 @subsubheading AUTHOR
 @format
@@ -841,7 +841,7 @@ Trademarks mentioned are the property of their owners.
 @subsubheading VERSIONS
 @format
 @flushleft
-Linux Fast-STREAMS: $Name:  $($Revision: 1.1.2.1 $); $Date: 2009-06-21 10:40:08 $.
+Linux Fast-STREAMS: $Name:  $($Revision: 1.1.2.2 $); $Date: 2011-02-07 02:21:33 $.
 @end flushleft
 @end format
 

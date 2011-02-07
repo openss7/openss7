@@ -1,11 +1,11 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id: SPG2.texi,v 1.1.2.1 2009-06-21 10:40:06 brian Exp $
+% @(#) $Id: SPG2.texi,v 1.1.2.2 2011-02-07 02:21:33 brian Exp $
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:40:06 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -93,7 +93,7 @@
 
 @dircategory STREAMS
 @direntry
-* SPG2: (SPG2).			STREAMS Programmer's Guide (Take 2)
+* SPG2: (SPG2).				STREAMS Programmer's Guide (Take 2)
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -108,7 +108,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -157,7 +157,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009  Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011  Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -184,7 +184,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -647,6 +647,9 @@ package.
 @smallexample
 @verbatim
 $Log: SPG2.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:33  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:40:06  brian
 - added files to new distro
 
@@ -747,11 +750,11 @@ A brief overview of @acronym{STREAMS}.
 @item @ref{Mechanism}
 A description of the @acronym{STREAMS} framework.  Describes the basic operations for constructing,
 using, and dismantling Streams.  These operations are performed using
-@manpage{open(2)},
-@manpage{close(2)},
-@manpage{read(2)},
-@manpage{write(2)}, and
-@manpage{ioctl(2)}.
+@manpage{open(2s)},
+@manpage{close(2s)},
+@manpage{read(2s)},
+@manpage{write(2s)}, and
+@manpage{ioctl(2s)}.
 @item @ref{Processing}
 Processing and procedures within the @acronym{STREAMS} framework.  Gives an overview of the
 @acronym{STREAMS} put and service routines.
@@ -890,7 +893,7 @@ This system conforms to @cite{UNIX System V Release 4.2} for @cite{Linux}.
 
 @subsection Copyright
 
-@copyright{} 1997-2009  Monavacon Limited.  All Rights Reserved.
+@copyright{} 1997-2011  Monavacon Limited.  All Rights Reserved.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -989,18 +992,18 @@ high performance network services and their components.  Because it is a message
 architecture, @acronym{STREAMS} does not impose a specific network architecture (as does the @dfn{BSD
 Sockets} kernel architecture.  The @acronym{STREAMS} user interface is uses the familiar @cite{UNIX}
 character special file input and output mechanisms
-@manpage{open(2)},
-@manpage{read(2)},
-@manpage{write(2)},
-@manpage{ioctl(2)},
-@manpage{close(2)}; and provides additional system calls,
-@manpage{poll(2)},
-@manpage{getmsg(2)},
+@manpage{open(2s)},
+@manpage{read(2s)},
+@manpage{write(2s)},
+@manpage{ioctl(2s)},
+@manpage{close(2s)}; and provides additional system calls,
+@manpage{poll(2s)},
+@manpage{getmsg(2s)},
 @manpage{getpmsg(2s)},
-@manpage{putmsg(2)},
+@manpage{putmsg(2s)},
 @manpage{putpmsg(2s)}, to assist in message passing between user-level applications and
 kernel-resident modules.  Also, @acronym{STREAMS} defines a standard set of input-output controls
-(@manpage{ioctl(2)}) for manipulation and configuration of @acronym{STREAMS} by a user-space
+(@manpage{ioctl(2s)}) for manipulation and configuration of @acronym{STREAMS} by a user-space
 application.
 
 As a message passing architecture, the @acronym{STREAMS} interface between the user process and kernel
@@ -1127,7 +1130,7 @@ use all of the same @acronym{STREAMS} and kernel utilities to perform its functi
 @dfn{Modules} from a @dfn{Stream} is referred to as @dfn{pushing} and @dfn{popping} a @dfn{Module}
 due to the fact that that modules are inserted or removed from just beneath the @dfn{Stream head} in
 a push-down stack fashion.  Pushing and popping of modules can be performed using standard
-@manpage{ioctl(2)} calls and can be performed by user space applications without any need for kernel
+@manpage{ioctl(2s)} calls and can be performed by user space applications without any need for kernel
 programming, assembly, or relinking.
 
 For more information on @acronym{STREAMS} modules, @pxref{Module Component}.
@@ -1196,13 +1199,13 @@ queue, for processing @dfn{downstream} messages.
 
 @acronym{STREAMS} messages are generated by the @dfn{Stream head} and passed @dfn{downstream} in
 response to
-@manpage{write(2)},
-@manpage{putmsg(2)}, and
+@manpage{write(2s)},
+@manpage{putmsg(2s)}, and
 @manpage{putpmsg(2s)} system calls; they are
 also consumed by the @dfn{Stream head} and converted to information passed to user space in response
 to
-@manpage{read(2)},
-@manpage{getmsg(2)}, and
+@manpage{read(2s)},
+@manpage{getmsg(2s)}, and
 @manpage{getpmsg(2s)} system calls.
 
 @acronym{STREAMS} messages are also generated by the @dfn{Driver} and passed @dfn{upstream} to
@@ -1226,13 +1229,13 @@ character device node in a similar fashion to a minor device instance for regula
 drivers.
 
 @acronym{STREAMS} devices are opened, as are character device drivers, with the
-@manpage{open(2)} system
+@manpage{open(2s)} system
 call.@footnote{An exception is @acronym{STREAMS}-based pipes, that are opened with the
-@manpage{pipe(2)}
+@manpage{pipe(2s)}
 system call.}  Opening a minor device node accesses a separate @dfn{Stream} instance between the
 user level process and the @acronym{STREAMS} device driver.  As with normal character devices, the file
 descriptor returned from the
-@manpage{open(2)} call, can be used to further access the @dfn{Stream}.
+@manpage{open(2s)} call, can be used to further access the @dfn{Stream}.
 
 Opening a minor device node for the first time results in the creation of a new instance of a
 @dfn{Stream} between the @dfn{Stream head} and the @dfn{driver}.  Subsequent opens of the same minor
@@ -1242,25 +1245,25 @@ minor device node will result in the creation of a new @dfn{Stream} instance.
 
 Once it has opened a @dfn{Stream}, the user level process can send and receive data to and from the
 @dfn{Stream} with the usual
-@manpage{read(2)} and
-@manpage{write(2)} system calls that are
+@manpage{read(2s)} and
+@manpage{write(2s)} system calls that are
 compatible with the existing character device interpretations of these system calls.  @acronym{STREAMS}
 also provides the additional system calls,
-@manpage{getmsg(2)} and
+@manpage{getmsg(2s)} and
 @manpage{getpmsg(2s)}, to read
 control and data information from the @dfn{Stream}, as well as
-@manpage{putmsg(2)} and
+@manpage{putmsg(2s)} and
 @manpage{putpmsg(2s)} to write control and data information.  These additional system calls provide a
 richer interface to the @dfn{Stream} than is provided by the traditional
-@manpage{read(2)} and
-@manpage{write(2)} calls.
+@manpage{read(2s)} and
+@manpage{write(2s)} calls.
 
 A @dfn{Stream} is closed using the
-@manpage{close(2)} system call (or a call that closes file
+@manpage{close(2s)} system call (or a call that closes file
 descriptors such as
 @manpage{exit(2)}).  If a number of processes have the @dfn{Stream} open, only
 the last
-@manpage{close(2)} of a @dfn{Stream} will result in the destruction of the @dfn{Stream}
+@manpage{close(2s)} of a @dfn{Stream} will result in the destruction of the @dfn{Stream}
 instance.
 
 @subsection Basic Operations Example
@@ -1313,24 +1316,24 @@ communicated over the channel to the remote process or host.  Data read from the
 by the remote process or host.
 
 In the example in @ref{Listing 1.1}, a simple @dfn{Stream} is opened using the
-@manpage{open(2)}
+@manpage{open(2s)}
 call.  @file{/dev/streams/comm/1} is the path to the character minor device node in the file system.
 When the device is opened, the character device node is recognized as a @acronym{STREAMS} special file,
 and the @acronym{STREAMS} subsystem creates a @dfn{Stream} (if one does not already exist for the minor
 device node) an associates it with the minor device node.  @figref{103} illustrates the state of the
 @dfn{Stream} at the point after the
-@manpage{open(2)} call returns.
+@manpage{open(2s)} call returns.
 
 @figuresized{SPG_fig03,103,Stream to Communications Driver,3in}
 
 The @command{while} loop in @ref{Listing 1.1} simply reads data from the device using the
-@manpage{read(2)} system call and then writes the data back to the device using the
-@manpage{write(2)} system call.
+@manpage{read(2s)} system call and then writes the data back to the device using the
+@manpage{write(2s)} system call.
 
 When a @dfn{Stream} is opened for blocking operation (i.e., neither @constant{O_NONBLOCK} nor
 @constant{O_NDLEAY} were set),
-@manpage{read(2)} will block until some data arrives.  The
-@manpage{read(2)} call might, however, return less that the requested @samp{1024} bytes.  When data
+@manpage{read(2s)} will block until some data arrives.  The
+@manpage{read(2s)} call might, however, return less that the requested @samp{1024} bytes.  When data
 is read, the routine simply writes the data back to the device.
 
 @acronym{STREAMS} implements flow control both in the upstream and downstream directions.  Flow control
@@ -1341,9 +1344,9 @@ flow control.
 
 When a @dfn{Stream} is opened for blocking operation (i.e., neither @constant{O_NONBLOCK} nor
 @constant{O_NDLEAY} were set),
-@manpage{write(2)} will block while waiting for flow control to
+@manpage{write(2s)} will block while waiting for flow control to
 subside.
-@manpage{write(2)} will always block awaiting the availability of @acronym{STREAMS} message
+@manpage{write(2s)} will always block awaiting the availability of @acronym{STREAMS} message
 blocks to satisfy the call, regardless of the setting of @constant{O_NONBLOCK} or
 @constant{O_NDELAY}.
 
@@ -1351,7 +1354,7 @@ In the example in @ref{Listing 1.1}, the
 @manpage{exit(2)} system call is used to exit the program;
 however, the
 @manpage{exit(2)} results in the equivalent of a call to
-@manpage{close(2)} for all
+@manpage{close(2s)} for all
 open file descriptors and the @dfn{Stream} is flushed and destroyed before the program is finally
 exited.
 
@@ -1399,7 +1402,7 @@ procedures (and possibly the optional @command{admin} procedure) are only associ
 Each queue in the pair has a pointer to a @command{put} procedure.  The @command{put} procedure is
 used by @acronym{STREAMS} to present a new message to an upstream or downstream queue.  At the ends of
 the @dfn{Stream}, the @dfn{Stream head} write-side, or @dfn{Stream end} read-side, queue
-@command{put} procedure is normally invoked using the @manref{put(9)} utility.  A module within the
+@command{put} procedure is normally invoked using the @manref{put(9s)} utility.  A module within the
 @dfn{Stream} typically has its @command{put} procedure invoked by an adjacent module, driver or
 @dfn{Stream head} that uses the @manref{putnext(9)} utility from its own @command{put} or
 @command{service} procedure to pass message to adjacent modules.  The @command{put} procedure of the
@@ -1454,7 +1457,7 @@ provide an instance of a reference to a data block and pointers into the data bu
 block structure is used to provide information about the data buffer, such as message type, separate
 from the data contained in the buffer.  Messages are normally passed between @acronym{STREAMS} modules,
 drivers and the @dfn{Stream head} using utilities that invoke the target module's @command{put}
-procedure, such as @manref{put(9)}, @manref{putnext(9)}, @manref{qreply(9)}.  Messages travel along
+procedure, such as @manref{put(9s)}, @manref{putnext(9)}, @manref{qreply(9)}.  Messages travel along
 a @dfn{Stream} with successive invocations of each driver, module and @dfn{Stream head}'s
 @command{put} procedure.
 
@@ -1475,9 +1478,9 @@ Most of the defined message types (@pxref{Message Type Overview}, and @ref{Messa
 solely for use within the @acronym{STREAMS} framework.  A more limited set of message types
 (@msg{M_PROTO}, @msg{M_PCPROTO} and @msg{M_DATA}) can be used to pass control and data information
 to and from the user process via the @dfn{Stream head}.  These message type can be generated and
-consumed using the @manref{read(2)}, @manref{write(2)}, @manref{getmsg(2)}, @manref{getpmsg(2s)},
-@manref{putmsg(2)}, @manref{putpmsg(2s)} system calls and some @manref{streamio(7)} @acronym{STREAMS}
-@manpage{ioctl(2)}.
+consumed using the @manref{read(2s)}, @manref{write(2s)}, @manref{getmsg(2s)}, @manref{getpmsg(2s)},
+@manref{putmsg(2s)}, @manref{putpmsg(2s)} system calls and some @manref{streamio(7)} @acronym{STREAMS}
+@manpage{ioctl(2s)}.
 
 Message types are described in detail in @ref{Message Type Overview} and @ref{Message Types}.
 
@@ -1491,7 +1494,7 @@ Messages blocks of differing types can be linked together into composite message
 Messages, once allocated, or when removed from a queue, exist standalone (i.e., they are not
 attached to any queue).  Messages normally exist standalone when they have been first allocated by
 an interrupt service routine, or by the @dfn{Stream head}.  They are placed into the @dfn{Stream} by
-the driver or @dfn{Stream head} at the @dfn{Stream end} by calling @manref{put(9)}.  After being
+the driver or @dfn{Stream head} at the @dfn{Stream end} by calling @manref{put(9s)}.  After being
 inserted into a @dfn{Stream}, message normally only exist standalone in a given queue's
 @command{put} or @command{service} procedures.  A queue's @command{put} or @command{service}
 procedure normally do one of the following:
@@ -1690,7 +1693,7 @@ interrupt service procedure that handles the external device specific actions, e
 transfer.  Messages are typically consumed at the @dfn{Stream end} in the driver's downstream
 @command{put} or @command{service} procedure and action take or data transferred to the hardware
 device.  Messages are typically generated at the @dfn{Stream end} in the driver's interrupt service
-procedure, and inserted upstream using the @manref{put(9)} @acronym{STREAMS} utility.
+procedure, and inserted upstream using the @manref{put(9s)} @acronym{STREAMS} utility.
 
 Software drivers (so-called @dfn{pseudo-device drivers}) are similar to a hardware device driver
 with the exception that they typically do not contain an interrupt service routine.  Pseudo-device
@@ -1708,12 +1711,12 @@ In contrast, an instance of a @dfn{module} is only connected within a single @df
 not support multiplexing at the module queue pair.
 
 @item An instance of a driver (queue pair) is created and destroyed using the
-@manpage{open(2)} and
-@manpage{close(2)} system calls.
+@manpage{open(2s)} and
+@manpage{close(2s)} system calls.
 
 In contrast, an instance of a @dfn{module} (queue pair) is created and destroyed using the
 @streamio{I_PUSH} and @streamio{I_POP} @acronym{STREAMS}
-@manpage{ioctl(2)} commands.
+@manpage{ioctl(2s)} commands.
 
 @end enumerate
 
@@ -1759,8 +1762,8 @@ FIFOs}, and @ref{Terminal Subsystem}.
 This subsection provides a brief overview of @dfn{Stream Multiplexing}.
 
 Basic @dfn{Streams} that can be created with the
-@manpage{open(2)} or
-@manpage{pipe(2)} system calls
+@manpage{open(2s)} or
+@manpage{pipe(2s)} system calls
 are linear arrangements from @dfn{Stream head} to @dfn{Driver} or @dfn{Stream head} to @dfn{Stream
 head}.  Although these linear arrangements satisfy the needs of a large class of @acronym{STREAMS}
 applications, there exits a class of application that are more naturally represented by
@@ -1796,7 +1799,7 @@ multiplexing driver and the device driver.
 
 As with normal @acronym{STREAMS} drivers, @dfn{multiplexing drivers} can have multiple @dfn{Streams}
 created on its @dfn{upper} side using the
-@manpage{open(2)} system call.  Unlike regular
+@manpage{open(2s)} system call.  Unlike regular
 @acronym{STREAMS} drivers, however, @dfn{multiplexing drivers} have the additional capability that other
 @dfn{Streams} can be linked to the @dfn{lower} side of the driver.  The linkage is performed by
 issuing specialized
@@ -1850,7 +1853,7 @@ messages between upper @dfn{Streams} supporting @cite{Permanent Virtual Circuits
 
 The ability to multiplex upper @dfn{Streams} to a driver is a characteristic supported by all
 @acronym{STREAMS} drivers: not just @dfn{multiplexing drivers}.  Each
-@manpage{open(2)} to a minor
+@manpage{open(2s)} to a minor
 device node results in another upper @dfn{Stream} that can be associated with the device driver.
 What the @dfn{multiplexing driver} permits over the normal @acronym{STREAMS} driver is the ability to
 link one or more lower @dfn{Streams} (possibly containing modules and another multiplexing driver)
@@ -2098,14 +2101,14 @@ character device system calls.
 
 @acronym{STREAMS} devices appears as character device nodes within the file system in the
 @dfn{GNU/Linux} system.
-The @manref{open(2)} system call recognizes that a character special file is a @acronym{STREAMS} device,
+The @manref{open(2s)} system call recognizes that a character special file is a @acronym{STREAMS} device,
 creates a @dfn{Stream} and associates it with a device in the same fashion as a character device.
 
 Once open, a user process can send and receive data to and from the @acronym{STREAMS} special file using
-the traditional @manref{write(2)} and @manref{read(2)} system calls in the same manner as is
+the traditional @manref{write(2s)} and @manref{read(2s)} system calls in the same manner as is
 performed on a traditional character device special file.
 
-Character device input-output controls using the @manref{ioctl(2)} system call can also be performed
+Character device input-output controls using the @manref{ioctl(2s)} system call can also be performed
 on a @acronym{STREAMS} special file.  @acronym{STREAMS} defines a set of standard input-output control
 commands (see @manref{ioctl(2p)} and @manref{streamio(7)}) specific to @acronym{STREAMS} special files.
 Input-output controls that a defined for a specific device are also supported as they are for
@@ -2119,39 +2122,39 @@ device driver to @acronym{STREAMS} and make possible the portability, migration,
 reuse benefits of the @acronym{STREAMS} framework.
 
 @acronym{STREAMS} provides @acronym{STREAMS}-specific system calls and
-@manpage{ioctl(2)} commands, in
+@manpage{ioctl(2s)} commands, in
 addition to support for the traditional character device I/O system calls and
-@manpage{ioctl(2)}
+@manpage{ioctl(2s)}
 commands.
 
-The @manref{poll(2)} system call@footnote{Although the
-@manpage{poll(2)} system call has been
+The @manref{poll(2s)} system call@footnote{Although the
+@manpage{poll(2s)} system call has been
 implemented in @cite{GNU/Linux}, it was historically provided only by @acronym{STREAMS}.  This is
 evident from the fact that
-@manpage{poll(2)} system can supports events like @constant{POLLRDBAND}
+@manpage{poll(2s)} system can supports events like @constant{POLLRDBAND}
 that have no meaning outside of the @acronym{STREAMS} framework.} provides the ability for the
 application to poll multiple @dfn{Streams} for a wide range of events.
 
-The @manref{putmsg(2)} and @manref{putpmsg(2s)} system calls provide the ability for applications
+The @manref{putmsg(2s)} and @manref{putpmsg(2s)} system calls provide the ability for applications
 programs to transfer both control and data information to the @dfn{Stream}.  The
-@manpage{write(2)}
+@manpage{write(2s)}
 system call only supports the transfer of data to the @dfn{Stream}, whereas,
-@manpage{putmsg(2)} and
+@manpage{putmsg(2s)} and
 @manpage{putpmsg(2s)} permit the transfer of prioritized control information in addition to data.
 
-The @manref{getmsg(2)} and @manref{getpmsg(2s)} system calls provide the ability for applications
+The @manref{getmsg(2s)} and @manref{getpmsg(2s)} system calls provide the ability for applications
 programs to receive both control and data information from the @dfn{Stream}.  The
-@manpage{read(2)}
+@manpage{read(2s)}
 system call can only support the transfer of data (and in some cases the inline control
 information), whereas,
-@manpage{getmsg(2)} and
+@manpage{getmsg(2s)} and
 @manpage{getpmsg(2s)} permit the transfer of
 prioritized control information in addition to data.
 
 Implementation of standardized service primitive interfaces is enabled through the use of the
-@manpage{putmsg(2)},
+@manpage{putmsg(2s)},
 @manpage{putpmsg(2s)},
-@manpage{getmsg(2)} and
+@manpage{getmsg(2s)} and
 @manpage{getpmsg(2s)} system
 calls.
 
@@ -2168,26 +2171,26 @@ driver writer as is the case for traditional character device I/O.
 The @acronym{STREAMS}-related system calls are:
 
 @multitable @columnfractions .20 .80
-@item @manpage{open(2)}
+@item @manpage{open(2s)}
 @tab Open a @acronym{STREAMS} special file and create a new (or access an existing) @dfn{Stream}.
-@item @manpage{close(2)}
+@item @manpage{close(2s)}
 @tab Close a @acronym{STREAMS} special file and possibly cause the destruction of a @dfn{Stream} (i.e.,
 on the last close of the @dfn{Stream}.
-@item @manpage{read(2)}
+@item @manpage{read(2s)}
 @tab Read data from an open @dfn{Stream}.
-@item @manpage{write(2)}
+@item @manpage{write(2s)}
 @tab Write data to an open @dfn{Stream}.
-@item @manpage{ioctl(2)}
+@item @manpage{ioctl(2s)}
 @tab Control an open @dfn{Stream}.
-@item @manpage{getmsg(2)},
+@item @manpage{getmsg(2s)},
 @manpage{getpmsg(2s)}
 @tab Receive a (prioritized) message at the @dfn{Stream head}.
-@item @manpage{putmsg(2)},
+@item @manpage{putmsg(2s)},
 @manpage{putpmsg(2s)}
 @tab Send a (prioritized) message from the @dfn{Stream head}.
-@item @manpage{poll(2)}
+@item @manpage{poll(2s)}
 @tab Receive notification when selected events occur on one or more @dfn{Streams}.
-@item @manpage{pipe(2)}
+@item @manpage{pipe(2s)}
 @tab Create a channel that provides a @acronym{STREAMS}-based bidirectional communication path between
 multiple processes.
 @end multitable
@@ -2305,12 +2308,12 @@ There are two ways for the user level process to construct a @dfn{Stream}:
 
 @enumerate
 
-@item Open a @acronym{STREAMS} device special file using the @manref{open(2)} system call.  Construction
-of a @dfn{Stream} with the @dfn{open(2)} system call is detailed in @ref{Opening a STREAMS Device
+@item Open a @acronym{STREAMS} device special file using the @manref{open(2s)} system call.  Construction
+of a @dfn{Stream} with the @dfn{open(2s)} system call is detailed in @ref{Opening a STREAMS Device
 File} and @ref{Opening a STREAMS-based FIFO} and illustrated in @figref{15}. 
 
-@item Create a @acronym{STREAMS}-based pipe using the @manref{pipe(2)} system call.  Construction of a
-@dfn{Stream} with the @dfn{pipe(2)} system call is detailed in @ref{Creating a STREAMS-based Pipe}
+@item Create a @acronym{STREAMS}-based pipe using the @manref{pipe(2s)} system call.  Construction of a
+@dfn{Stream} with the @dfn{pipe(2s)} system call is detailed in @ref{Creating a STREAMS-based Pipe}
 and illustrated in @figref{16}.
 
 @end enumerate
@@ -2319,7 +2322,7 @@ and illustrated in @figref{16}.
 @subsection Opening a STREAMS Device File
 
 A @dfn{Stream} is constructed when a @acronym{STREAMS}-based driver file is opened using the
-@manref{open(2)} system call.  A @dfn{Stream} constructed in this fashion is illustrated in
+@manref{open(2s)} system call.  A @dfn{Stream} constructed in this fashion is illustrated in
 @figref{15}.
 
 In the traditional @cite{UNIX} system, a @acronym{STREAMS}-based driver file is a character device
@@ -2407,7 +2410,7 @@ the @type{qinit} structure for the read-side @type{queue}) is called.
 
 @subsubsection Subsequent Open of a Stream
 
-When the @dfn{Stream} has already been created by a call to @manpage{open(2)} and has not yet been
+When the @dfn{Stream} has already been created by a call to @manpage{open(2s)} and has not yet been
 destroyed, that is, on a subsequent open of the @dfn{Stream}, and the @acronym{STREAMS} driver is not
 marked for clone open with the @constant{D_CLONE} flag in the @mantype{cdevsw(9)} structure, the
 only actions performed are to call the driver's @command{open} procedure and the @command{open}
@@ -2416,7 +2419,7 @@ procedures of all pushable modules present on the already existing @dfn{Stream}.
 @node Opening a STREAMS-based FIFO
 @subsection Opening a STREAMS-based FIFO
 
-A @acronym{STREAMS}-based FIFO @dfn{Stream} is also constructed with a call to @manpage{open(2)}. A
+A @acronym{STREAMS}-based FIFO @dfn{Stream} is also constructed with a call to @manpage{open(2s)}. A
 @dfn{Stream} constructed in this fashion is illustrated in @figref{15b}.
 
 A @acronym{STREAMS}-based FIFO appears as a FIFO special file within a @cite{GNU/Linux} file system, as
@@ -2437,7 +2440,7 @@ created.
 @figuresized{SPG_fig15b,15b,Opened @acronym{STREAMS}-based FIFO,5in}
 
 The sequence of events the cause the creation of a @dfn{Stream} when a @acronym{STREAMS}-based FIFO is
-opened using the @manref{open(2)} system call are the same as that for regular @acronym{STREAMS} device
+opened using the @manref{open(2s)} system call are the same as that for regular @acronym{STREAMS} device
 special files with the following differences:
 
 @enumerate
@@ -2468,29 +2471,29 @@ opening a regular @acronym{STREAMS} driver.  The similarity makes it possible to
 @subsection Creating a STREAMS-based Pipe
 
 A @dfn{Stream} is also constructed when a @acronym{STREAMS}-based pipe is created using the
-@manref{pipe(2)} system call.@footnote{Note that, by default, @cite{GNU/Linux} system pipes obtained
-with the @manref{pipe(2)} system call are @cite{SVR 3.2}-style unidirectional pipes.
-@cite{@value{PACKAGE_TITLE}} provides a @manpage{pipe(2)} library function in the @file{libstreams}
-library that can be used to override the normal @manref{pipe(2)} system call for some applications
+@manref{pipe(2s)} system call.@footnote{Note that, by default, @cite{GNU/Linux} system pipes obtained
+with the @manref{pipe(2s)} system call are @cite{SVR 3.2}-style unidirectional pipes.
+@cite{@value{PACKAGE_TITLE}} provides a @manpage{pipe(2s)} library function in the @file{libstreams}
+library that can be used to override the normal @manref{pipe(2s)} system call for some applications
 programs.  Also, @cite{@value{PACKAGE_TITLE}} provides the option of overriding all system pipes
-returned by the @manpage{pipe(2)} system call to be bidirectional @acronym{STREAMS}-based pipes.} A
+returned by the @manpage{pipe(2s)} system call to be bidirectional @acronym{STREAMS}-based pipes.} A
 @dfn{Stream} constructed in this fashion is illustrated in @figref{16}.
 
 @figuresized{SPG_fig16,16,Created @acronym{STREAMS}-based Pipe,5.5in}
 
 Pipes have no @type{inode} in an external @cite{GNU/Linux} file system that can be opened with the
-@manpage{open(2)} system call and, therefore, they must be created with a call to
-@manref{pipe(2)}.@footnote{Some @cite{UNIX} implementations, notably @cite{UnixWare}, provide the
+@manpage{open(2s)} system call and, therefore, they must be created with a call to
+@manref{pipe(2s)}.@footnote{Some @cite{UNIX} implementations, notably @cite{UnixWare}, provide the
 ability to open two character special files and associate them together into a @acronym{STREAMS}-based
 pipe (see @manref{sfx(4)}).  In that case, opening each end of a @acronym{STREAMS}-based pipe is no
-different than opening a regular @acronym{STREAMS} driver.} When the @manpage{pipe(2)} system call is
+different than opening a regular @acronym{STREAMS} driver.} When the @manpage{pipe(2s)} system call is
 executed, two @dfn{Streams} are are created.  The construction of each @dfn{Stream} is similar to
 that when a @acronym{STREAMS} driver is opened with the following differences:
 
 @itemize @bullet
 
 @item Instead of creating one process file table entry and one @type{file} pointer, as was the case
-for regular @acronym{STREAMS} drivers, @manpage{pipe(2)} creates two file table entries (file
+for regular @acronym{STREAMS} drivers, @manpage{pipe(2s)} creates two file table entries (file
 descriptors) and two @type{file} pointers, as shown in @figref{16}.
 
 @item Because a character special device is not being opened, there is no @type{inode} in an
@@ -2533,9 +2536,9 @@ When a module is pushed onto a @dfn{Stream}, the module's @command{open} procedu
 newly inserted queue pair.  When a module is popped from the @dfn{Stream}, the module's
 @command{close} procedure is called prior to deleting the queue pair from the @dfn{Stream}.
 
-Modules are pushed onto an open @dfn{Stream} by issuing the @ioctlref{I_PUSH} @manpage{ioctl(2)}
+Modules are pushed onto an open @dfn{Stream} by issuing the @ioctlref{I_PUSH} @manpage{ioctl(2s)}
 command on the file descriptor associated with the open @dfn{Stream}.  Modules are popped from a
-@dfn{Stream} with the @ioctlref{I_POP} @manpage{ioctl(2)} command on the file descriptor associated
+@dfn{Stream} with the @ioctlref{I_POP} @manpage{ioctl(2s)} command on the file descriptor associated
 with the open @dfn{Stream}.
 
 @streamio{I_PUSH} and @streamio{I_POP} allow a user level process to dynamically reconfigure the
@@ -2584,10 +2587,10 @@ queue pair.
 @subsection Closing the Stream
 
 Relinquishing the last reference to a @dfn{Stream} dismantles the @dfn{Stream} and deallocates its
-components.  Normally, the last direct or indirect call to @manref{close(2)} for a @dfn{Stream}
+components.  Normally, the last direct or indirect call to @manref{close(2s)} for a @dfn{Stream}
 results in the @dfn{Stream} being dismantled in this fashion.@footnote{Exceptions are when the
 @dfn{Stream} has been named with @manref{fattach(8)}, that is, it is still @dfn{mounted}, or when
-the @dfn{Stream} is still linked under a multiplexing driver.} Calls to @manpage{close(2)} before
+the @dfn{Stream} is still linked under a multiplexing driver.} Calls to @manpage{close(2s)} before
 the last close of a @dfn{Stream} will not result in the dismantling of the @dfn{Stream} and no
 module or driver @command{close} procedure will be called on closes prior to the last close of a
 @dfn{Stream}.
@@ -2704,7 +2707,7 @@ main()
 @end cartouche
 
 As in the previous example of @ref{Listing 1.1}, first a @dfn{Stream} is opened using the
-@manref{open(2)} system call.  In this example, the @acronym{STREAMS} device driver is
+@manref{open(2s)} system call.  In this example, the @acronym{STREAMS} device driver is
 @file{/dev/streams/comm/01}.
 
 @cartouche
@@ -2728,7 +2731,7 @@ As in the previous example of @ref{Listing 1.1}, first a @dfn{Stream} is opened 
 @end cartouche
 
 Next, the character conversion module (named @file{chconv}) is pushed onto the open @dfn{Stream}
-using the @ioctlref{I_PUSH} @manref{ioctl(2)} command.
+using the @ioctlref{I_PUSH} @manref{ioctl(2s)} command.
 
 @cartouche
 @iftex
@@ -2752,22 +2755,22 @@ using the @ioctlref{I_PUSH} @manref{ioctl(2)} command.
 
 The difference in creating an instance of a @acronym{STREAMS} driver and module are illustrated in
 @ref{Listing 3.2} and @ref{Listing 3.3}.  An instance of a driver is created with the
-@manref{open(2)} system call, and each driver requires at least one device node in a file system for
+@manref{open(2s)} system call, and each driver requires at least one device node in a file system for
 access.  Naming of device nodes follow device naming conventions.  On the other hand, an instance of
 a module is created with the @ioctlref{I_PUSH} @manref{ioct(2)} command.  No file system device node
 is required.  Naming of modules is separate from any file system considerations, and are chosen by
 the module writer.  The only restrictions on a module name is that it be less than
 @constant{FMNAMESZ} in length, and that it be unique.
 
-When successful, the @ioctlref{I_PUSH} @manref{ioctl(2)} call directs @acronym{STREAMS} to locate and
+When successful, the @ioctlref{I_PUSH} @manref{ioctl(2s)} call directs @acronym{STREAMS} to locate and
 insert the @acronym{STREAMS} module named @file{chconv} onto the @dfn{Stream}.  If the @file{chconv}
 module has not been loaded into the @cite{Linux} kernel, @cite{@value{PACKAGE_TITLE}} will attempt
 to demand load the kernel module named @file{streams-chconv}.  Once the @file{chconv} @acronym{STREAMS}
 module is loaded in the kernel, @acronym{STREAMS} will create a queue pair for the instance of the
 module, insert it into the @dfn{Stream} beneath the @dfn{Stream head}, and call the module's
 @command{open} procedure.  If the module's @command{open} procedure returns an error (typically only
-@errno{ENXIO}), that error will be returned to the @manref{ioctl(2)} call.  If the module's
-@command{open} procedure is successful, it (and the @manref{ioctl(2)} call), return @samp{0}.  The
+@errno{ENXIO}), that error will be returned to the @manref{ioctl(2s)} call.  If the module's
+@command{open} procedure is successful, it (and the @manref{ioctl(2s)} call), return @samp{0}.  The
 resulting @dfn{Stream} configuration is illustrated in @figref{17}.
 
 @figuresized{SPG_fig17,17,Case Converter Module,3in}
@@ -2783,7 +2786,7 @@ Converter} module.
 
 The next steps in this example are to pass control information to the module to tell it what command
 to execute on which string of characters.  A sequence that achieves this is shown in @ref{Listing
-3.4}.  The sequence makes use of the @ioctlref{I_STR} @manref{ioctl(2)} command for @acronym{STREAMS}
+3.4}.  The sequence makes use of the @ioctlref{I_STR} @manref{ioctl(2s)} command for @acronym{STREAMS}
 special files.
 
 @cartouche
@@ -2822,20 +2825,20 @@ if (ioctl(fd, I_STR, &strioctl) < 0) @{
 @end ifnottex
 @end cartouche
 
-There exist two methods for controlling modules and drivers using the @manref{ioctl(2)} system call:
+There exist two methods for controlling modules and drivers using the @manref{ioctl(2s)} system call:
 
 @table @dfn
 
 @item Transparent
 
-In a transparent @manpage{ioctl(2)} call, the @var{cmd} argument to the call is the command issued
+In a transparent @manpage{ioctl(2s)} call, the @var{cmd} argument to the call is the command issued
 to the module or device, and the @var{arg} argument is specific to the command and defined by the
 receiver of the command.  This is the traditional method of controlling character devices and can
 also be supported by a @acronym{STREAMS} module and driver.
 
 @item I_STR
 
-In an @streamio{I_STR} @manpage{ioctl(2)} call, the @var{cmd} argument to the call is
+In an @streamio{I_STR} @manpage{ioctl(2s)} call, the @var{cmd} argument to the call is
 @streamio{I_STR} and the @var{arg} argument of the call is a pointer to a @type{strioctl}
 structure (defined in @header{sys/stropts.h}) describing the particulars of the call.  This method
 is specific to @acronym{STREAMS} special files.
@@ -2884,7 +2887,7 @@ receiving this command, the example module will delete all occurrences of the ch
 and @samp{x} from data subsequently passing through the module.  @member{ic_timout} is set to zero
 to indicated that the default timeout (@samp{15} seconds) should be used if no response is received.
 
-Once issued, the @dfn{Stream head} takes an @streamio{I_STR} @manpage{ioctl(2)} command and packages
+Once issued, the @dfn{Stream head} takes an @streamio{I_STR} @manpage{ioctl(2s)} command and packages
 its contents into a @acronym{STREAMS} message consisting of an @msg{M_IOCTL} block and a @msg{M_DATA}
 block and passes it downstream to be considered by modules and drivers on the @dfn{Stream}.  The
 @member{ic_cmd} and @member{ic_len} values are stored in the @msg{M_IOCTL} block and the data
@@ -2893,15 +2896,15 @@ module, and ultimately the driver, examines the @member{ioc_cmd} filed in the @m
 to see if the command is known to it.  If the command is unknown to a module, it is passed
 downstream for consideration by other modules on the @dfn{Stream} or for consideration by the
 driver.  If the command is unknown to a driver, it is negatively acknowledged and a error is
-returned from the @manref{ioctl(2)} call.
+returned from the @manref{ioctl(2s)} call.
 
-The user level process calling @manref{ioctl(2)} with the @ioctlref{I_STR} command will block
+The user level process calling @manref{ioctl(2s)} with the @ioctlref{I_STR} command will block
 awaiting an acknowledgement.  The calling process will block up to @member{ic_timout} seconds
 waiting for a response.  If @member{ic_timout} is @samp{0}, it indicates that the default timeout
 value (typically @samp{15} seconds) should be used.  If @member{ic_timout} is @samp{-1}, it
-indicates that an infinite timeout should be used.  If the timeout occurs, the @manref{ioctl(2)}
+indicates that an infinite timeout should be used.  If the timeout occurs, the @manref{ioctl(2s)}
 command will fail with error @errno{ETIME}.  Only one process (thread) can be executing an
-@ioctlref{I_STR} @manref{ioctl(2)} call on a given @dfn{Stream} at time.  If an @streamio{I_STR} is
+@ioctlref{I_STR} @manref{ioctl(2s)} call on a given @dfn{Stream} at time.  If an @streamio{I_STR} is
 being executed when another process (or thread) issues an @streamio{I_STR} of its own, the process
 (or thread) will block until the previous @streamio{I_STR} operation completes.  However, the
 process (or thread) will not block indefinitely if @member{ic_timout} is set to a finite timeout
@@ -2950,7 +2953,7 @@ The @manref{exit(2)} system call in @ref{Listing 3.5} will results in the disman
 @dfn{Stream} is dismantled.
 
 Alternatively, it is possible to explicitly pop the module from the @dfn{Stream} using the
-@ioctlref{I_POP} @manref{ioctl(2)} command.  The @streamio{I_POP} command removes the module that
+@ioctlref{I_POP} @manref{ioctl(2s)} command.  The @streamio{I_POP} command removes the module that
 exists immediately below the @dfn{Stream head}.  It is not necessary to specify the module to be
 popped by name: whatever module exists just beneath the @dfn{Stream head} will be popped.
 
@@ -3023,7 +3026,7 @@ under an interrupt service routine or software interrupt when invoked from a @df
 @subsection Put Procedure
 
 The @command{put} procedure is invoked whenever a message is passed to a queue.  A message can be
-passed to a queue using the @manref{put(9)}, @manref{putnext(9)}, @manref{putctl(9)},
+passed to a queue using the @manref{put(9s)}, @manref{putnext(9)}, @manref{putctl(9)},
 @manref{putctl1(9)}, @manref{putctl2(9)}, @manref{putnextctl(9)}, @manref{putnextctl1(9)},
 @manref{putnextctl2(9)}, @manref{qreply(9)} @acronym{STREAMS} utilities.  The @dfn{Stream head}, modules
 and drivers use these utilities to deliver messages to a queue.@footnote{The @member{qi_putp}
@@ -3055,7 +3058,7 @@ queue's associated @mantype{qinit(9)} structure is invoked by @acronym{STREAMS} 
 
 When a number of modules are present in a @dfn{Stream}, as illustrated in @figref{18a}, each
 successive direct invocation of a @command{put} procedure is nested inside the others.  For example,
-if the @command{put} procedure on the read-side of the driver is invoked by calling @manref{put(9)}
+if the @command{put} procedure on the read-side of the driver is invoked by calling @manref{put(9s)}
 from the driver's interrupt service routine, and then each successive @command{put} procedure calls
 @manref{putnext(9)}, by the time that the message reaches the @dfn{Stream head}, the driver,
 @samp{ModA}, @samp{ModB}, @samp{ModC}, and the @dfn{Stream head} @command{put} procedures will be
@@ -3066,8 +3069,8 @@ immediately.  A disadvantage of this approach is that, if there are additional s
 in each @command{put} procedure, the interrupt service routine stack limits can be exceeded, causing
 a kernel crash.  This is also the case for normal (non-ISR) operation and the kernel stack limits
 might be exceeded if excessive nesting of @command{put} procedures occurs.@footnote{Because the
-@dfn{Interrupt Service Routine (ISR)} stack is particularly limited, @manref{put(9)} should not be
-called from @samp{in_irq()} context under @cite{Linux}, execution of @manref{put(9)} should be
+@dfn{Interrupt Service Routine (ISR)} stack is particularly limited, @manref{put(9s)} should not be
+called from @samp{in_irq()} context under @cite{Linux}, execution of @manref{put(9s)} should be
 deferred by the ISR, either with an immediate bottom half procedure (i.e., software interrupt), or
 by placing messages on the driver queue and processing from the queue's @command{service}
 proceedure: either of which run with a full kernel stack instead of an interrupt stack.}
@@ -3130,10 +3133,10 @@ on the queue.  As a result, higher priority messages will experience a shorter p
 that lower priority messages.
 
 In general, because drivers run at a software priority higher than the @acronym{STREAMS} scheduler,
-drivers calling @manref{put(9)} can cause multiple messages to be queued for service before the
+drivers calling @manref{put(9s)} can cause multiple messages to be queued for service before the
 @command{service} procedure runs.  On the other hand, because the @acronym{STREAMS} scheduler is always
 invoked before return to user level at the end of a system call, it is unlikely that the @dfn{Stream
-head} calling @manref{put(9)} will result in multiple messages being accumulated before the
+head} calling @manref{put(9s)} will result in multiple messages being accumulated before the
 corresponding @command{service} procedure runs.
 
 @subsection Put and Service Procedure Summary
@@ -3226,7 +3229,7 @@ In our example, read-side processing consists of driver processing, @constant{CH
 
 @subsubsection Driver Processing
 
-The user process has been blocked on the @manpage{getmsg(2)} system call while waiting for a message
+The user process has been blocked on the @manpage{getmsg(2s)} system call while waiting for a message
 to reach the @dfn{Stream head}, and the device driver independently waits for input of a character
 from the port hardware or for a message from upstream.  Upon receipt of an input character interrupt
 from the port, the driver places the associated character in an @msg{M_DATA} message, allocated
@@ -3278,20 +3281,20 @@ places it in the "line buffer" contained in another @msg{M_DATA} message it is c
 the message which contained the single character is returned to the buffer pool.  If the character
 received was not an @dfn{end-of-line}, @constant{CANONPROC} exits.  Otherwise, a complete line has been
 assembled and @constant{CANONPROC} sends the message upstream to the @dfn{Stream head} which unblocks the
-user process from the @manpage{getmsg(2)} call and passes it the contents of the message.
+user process from the @manpage{getmsg(2s)} call and passes it the contents of the message.
 
 @subsection Write-Side Processing
 
 The write-side of this Stream carries two kinds of messages from the user process: @command{ioctl}
 messages for @constant{CHARPROC}, and @msg{M_DATA} messages to be output to the terminal.
 
-@command{ioctl} messages are sent downstream as a result of an @manpage{ioctl(2)} system call.  When
+@command{ioctl} messages are sent downstream as a result of an @manpage{ioctl(2s)} system call.  When
 @constant{CHARPROC} receives an @command{ioctl} message type, it processes the message contents to modify
 internal flags and then uses a utility routine to send an acknowledgement message upstream to the
 @dfn{Stream head}.  The @dfn{Stream head} acts on the acknowledgement message by unblocking the user
 from the @command{ioctl}.
 
-For terminal output, it is presumed that @msg{M_DATA} messages, sent by @manpage{write(2)} system
+For terminal output, it is presumed that @msg{M_DATA} messages, sent by @manpage{write(2s)} system
 calls, contain multiple characters.  In general, @acronym{STREAMS} returns to the user process
 immediately after processing the @command{write} call so that the process may send additional
 messages.  Flow control will eventually block the sending process.  The messages can queue on the
@@ -3362,7 +3365,7 @@ instance of a reference to a data block and pointers into the data buffer.  The 
 is used to provide information about the data buffer, such as message type, separate from the data
 contained in the buffer.  Messages are normally passed between @acronym{STREAMS} modules, drivers and
 the @dfn{Stream head} using utilities that invoke the target module's @command{put} procedure, such
-as @manref{put(9)}, @manref{putnext(9)}, @manref{qreply(9)}.  Messages travel along a @dfn{Stream}
+as @manref{put(9s)}, @manref{putnext(9)}, @manref{qreply(9)}.  Messages travel along a @dfn{Stream}
 with successive invocations of each driver, module and @dfn{Stream head}'s
 @command{put} procedure.
 
@@ -3381,9 +3384,9 @@ and drivers.
 Most of the defined message types are solely for use within the @acronym{STREAMS} framework.  A more
 limited set of message types (@msg{M_PROTO}, @msg{M_PCPROTO} and @msg{M_DATA}) can be used to pass
 control and data information to and from the user process via the @dfn{Stream head}.  These message
-type can be generated and consumed using the @manref{read(2)}, @manref{write(2)},
-@manref{getmsg(2)}, @manref{getpmsg(2s)}, @manref{putmsg(2)}, @manref{putpmsg(2s)} system calls and
-some @manref{streamio(7)} @acronym{STREAMS} @manpage{ioctl(2)}.
+type can be generated and consumed using the @manref{read(2s)}, @manref{write(2s)},
+@manref{getmsg(2s)}, @manref{getpmsg(2s)}, @manref{putmsg(2s)}, @manref{putpmsg(2s)} system calls and
+some @manref{streamio(7)} @acronym{STREAMS} @manpage{ioctl(2s)}.
 
 Below the message types are classified by queueing priority, direction of normal travel (downstream
 or upstream), and briefly described:
@@ -3436,8 +3439,8 @@ Messages with an @samp{h} beside them are consumed and interpreted by the @dfn{S
 The following message types are defined by @cite{SVR 4.2}:
 
 @multitable @columnfractions .15 .05 .05 .08 .08 .59
-@item @msg{M_IOCACK} @tab - @tab U @tab ME @tab h @tab Positive @manpage{ioctl(2)} acknowledgement
-@item @msg{M_IOCNAK} @tab - @tab U @tab ME @tab h @tab Negative @manpage{ioctl(2)} acknowledgement
+@item @msg{M_IOCACK} @tab - @tab U @tab ME @tab h @tab Positive @manpage{ioctl(2s)} acknowledgement
+@item @msg{M_IOCNAK} @tab - @tab U @tab ME @tab h @tab Negative @manpage{ioctl(2s)} acknowledgement
 @item @msg{M_PCPROTO} @tab D @tab U @tab HME @tab hme @tab Protocol control information
 @item @msg{M_PCSIG} @tab - @tab U @tab ME @tab h @tab Signal sent from a module/driver to a user
 @item @msg{M_READ} @tab D @tab - @tab H @tab me @tab Read notification, sent downstream
@@ -3761,10 +3764,10 @@ by the module or driver write: an appropriate @acronym{STREAMS} message utility 
 @node Sending and Receiving Messages
 @subsection Sending and Receiving Messages
 @menu
-* putmsg(2)::			Message oriented write(2)-like system call.
-* getmsg(2)::			Message oriented read(2)-like system call.
-* putpmsg(2s)::			Priority message write(2)-like system call.
-* getpmsg(2s)::			Priority message read(2)-like system call.
+* putmsg(2s)::			Message oriented write(2s)-like system call.
+* getmsg(2s)::			Message oriented read(2s)-like system call.
+* putpmsg(2s)::			Priority message write(2s)-like system call.
+* getpmsg(2s)::			Priority message read(2s)-like system call.
 @end menu
 
 As shown in the message lists of @ref{Messages Overview}, a large subset of the available message
@@ -3784,50 +3787,50 @@ complete applications framework based on @acronym{STREAMS} and service interface
 communications framework}.
 
 In general, all system calls interact directly (by subroutine interface) with the @dfn{Stream head}.
-An exception is the @manref{open(2)} and @manref{close(2)} system calls which directly invoke a
+An exception is the @manref{open(2s)} and @manref{close(2s)} system calls which directly invoke a
 subroutine call to the module or driver @member{qi_qopen} and @member{qi_qclose} procedures.  All
 other system calls call subroutines provided by the @dfn{Stream header} that can result in the
 generation and transmission of a message on the @dfn{Stream} from the @dfn{Stream head}, or
 consumption of a message at the @dfn{Stream head}.
 
-The traditional @manref{write(2)} system call is capable of directly generating @msg{M_DATA}
-messages and having them passed downstream.  The traditional @manref{read(2)} system call can
+The traditional @manref{write(2s)} system call is capable of directly generating @msg{M_DATA}
+messages and having them passed downstream.  The traditional @manref{read(2s)} system call can
 collect @msg{M_DATA} messages (and in some read modes, @msg{M_PROTO} and @msg{M_PCPROTO} messages)
 that have arrived at the @dfn{Stream head}.  These system calls provide a backward compatible
 interface for character device drivers implemented under @acronym{STREAMS}.@footnote{One example of
 backwards compatibility to a character device driver implemented under @acronym{STREAMS} is the
 @dfn{STREAM} implementation of terminal and pseudo-terminal devices.}
 
-The @acronym{STREAMS}-specific @manref{putmsg(2)}, @manref{putpmsg(2s)} system calls provide the user
+The @acronym{STREAMS}-specific @manref{putmsg(2s)}, @manref{putpmsg(2s)} system calls provide the user
 level process with the ability to directly generate @msg{M_PROTO}, @msg{M_PCPROTO} or @msg{M_DATA}
 messages and have send downstream on the @dfn{Stream} from the @dfn{Stream head}.
-@manref{getmsg(2)}, @manref{getpmsg(2s)} system calls provide the ability to collect @msg{M_PROTO},
+@manref{getmsg(2s)}, @manref{getpmsg(2s)} system calls provide the ability to collect @msg{M_PROTO},
 @msg{M_PCPROTO} and @msg{M_DATA} messages from the @dfn{Stream head}.  These system calls are
-superior to the @manref{write(2)} and @manref{read(2)} system calls in that the provide a finer
+superior to the @manref{write(2s)} and @manref{read(2s)} system calls in that the provide a finer
 control over the composition of the generated message, and more information concerning the
-composition of a consumed message.  Whereas, @manref{write(2)} and @manref{read(2)} pass only one
-buffer from the user, @manref{putmsg(2)}, @manref{putpmsg(2s)}, @manref{getmsg(2)},
+composition of a consumed message.  Whereas, @manref{write(2s)} and @manref{read(2s)} pass only one
+buffer from the user, @manref{putmsg(2s)}, @manref{putpmsg(2s)}, @manref{getmsg(2s)},
 @manref{getpmsg(2s)} provide two buffers: one for the control part of the message to transfer
 @msg{M_PROTO} or @msg{M_PCPROTO} message blocks with preservation of boundaries; another for the
 data part, to transfer @msg{M_DATA} messages blocks -- all in a single call.  Also, data transfer
-with @manref{write(2)} and @manref{read(2)} are by nature byte-stream oriented, whereas, control and
-data transfer with @manref{putmsg(2)} and @manref{getmsg(2)} are by nature message oriented.
-@manref{write(2)} and @manref{read(2)} provide no mechanism for assigning priority to messages
+with @manref{write(2s)} and @manref{read(2s)} are by nature byte-stream oriented, whereas, control and
+data transfer with @manref{putmsg(2s)} and @manref{getmsg(2s)} are by nature message oriented.
+@manref{write(2s)} and @manref{read(2s)} provide no mechanism for assigning priority to messages
 generated or indicating the priority of messages to be received: @manref{putpmsg(2s)} and
 @manref{getpmsg(2s)} provide the ability to specify criteria for the band (@member{b_band}) of the
 generated or consumed message.
 
-@node putmsg(2)
-@subsubsection putmsg(2)
+@node putmsg(2s)
+@subsubsection putmsg(2s)
 
-@manref{putmsg(2)} provides the ability for a user level process to generate @msg{M_PROTO},
+@manref{putmsg(2s)} provides the ability for a user level process to generate @msg{M_PROTO},
 @msg{M_PCPROTO} and @msg{M_DATA} messages and have them send downstream on a @dfn{Stream}.  The user
 specifies a control part of the message that is used to fill the @msg{M_PROTO} or @msg{M_PCPROTO}
 message block in the resulting message, and a data part of the message that is used to fill the
 @msg{M_DATA} message block in the resulting message.
 
-The prototype for the @manref{putmsg(2)} system call is exposed by including the
-@header{sys/stropts.h} system header file.  The prototype for the @manref{putmsg(2)} system call is
+The prototype for the @manref{putmsg(2s)} system call is exposed by including the
+@header{sys/stropts.h} system header file.  The prototype for the @manref{putmsg(2s)} system call is
 as follows:
 
 @cartouche
@@ -3842,7 +3845,7 @@ Where the arguments are interpreted as follows:
 @table @var
 @item fildes
 specifies the @dfn{Stream} upon which to generate messages and is a file descriptor that was
-returned by the corresponding call to @manref{open(2)} or @manref{pipe(2)} that created the
+returned by the corresponding call to @manref{open(2s)} or @manref{pipe(2s)} that created the
 @dfn{Stream}.
 @item ctlptr
 is a pointer to a read-only @mantype{strbuf(5)} structure that is used to specify the control part
@@ -3870,11 +3873,11 @@ struct strbuf @{
 @end smallexample
 @end cartouche
 
-The members of the @mantype{strbuf(5)} structure are interpreted by @manref{putmsg(2)} as follows:
+The members of the @mantype{strbuf(5)} structure are interpreted by @manref{putmsg(2s)} as follows:
 
 @multitable @columnfractions .15 .85
 @item @member{maxlen} @tab specifies the maximum length of the buffer and is ignored by
-@manref{putmsg(2)};
+@manref{putmsg(2s)};
 @item @member{len} @tab specifies the length of the data for transfer in the control or data part of
 the message; and,
 @item @member{buf} @tab specifies the location of the data buffer containing the data for transfer
@@ -3889,19 +3892,19 @@ If @var{dataptr} is set to @samp{NULL} on call, or the @member{len} member of th
 @mantype{strbuf(5)} structure pointed to by @var{dataptr} is set to @samp{-1}, then no data part
 (@msg{M_DATA} message block) will be placed in the resulting message.
 
-For additional details, see the @manref{putmsg(2)} or @manref{putmsg(2p)} reference page.
+For additional details, see the @manref{putmsg(2s)} or @manref{putmsg(2p)} reference page.
 
-@node getmsg(2)
-@subsubsection getmsg(2)
+@node getmsg(2s)
+@subsubsection getmsg(2s)
 
-@manref{getmsg(2)} provides the ability for a user level process to retrieve @msg{M_PROTO},
+@manref{getmsg(2s)} provides the ability for a user level process to retrieve @msg{M_PROTO},
 @msg{M_PCPROTO} and @msg{M_DATA} messages that have arrived at the @dfn{Stream head}.  The user
 specifies an area into which to receive any control part of the message (from @msg{M_PROTO} or
 @msg{M_PCPROTO} message blocks in the message), and an area into which to receive any data part of
 the message (from @msg{M_DATA} message blocks in the message).
 
-The prototype for the @manref{getmsg(2)} system call is exposed by including the
-@header{sys/stropts.h} system header file.  The prototype for the @manref{getmsg(2)} system call is
+The prototype for the @manref{getmsg(2s)} system call is exposed by including the
+@header{sys/stropts.h} system header file.  The prototype for the @manref{getmsg(2s)} system call is
 as follows:
 
 @cartouche
@@ -3916,7 +3919,7 @@ Where the arguments are interpreted as follows:
 @table @var
 @item fildes
 specifies the @dfn{Stream} upon which to generate messages and is a file descriptor that was
-returned by the corresponding call to @manref{open(2)} or @manref{pipe(2)} that created the
+returned by the corresponding call to @manref{open(2s)} or @manref{pipe(2s)} that created the
 @dfn{Stream}.
 @item ctlptr
 is a pointer to an @mantype{strbuf(5)} structure that is used to specify the area to accept the
@@ -3938,27 +3941,27 @@ the message retrieved was an ordinary message (@msg{M_PROTO} or just @msg{M_DATA
 @samp{RS_HIPRI} to indicate that the message retrieved was of high priority (@msg{M_PCPROTO} or just
 @msg{M_HPDATA}).
 
-The members of the @mantype{strbuf(5)} structure are interpreted by @manref{getmsg(2)} as follows:
+The members of the @mantype{strbuf(5)} structure are interpreted by @manref{getmsg(2s)} as follows:
 
 @multitable @columnfractions .15 .85
 @item @member{maxlen} @tab specifies the maximum length of the buffer into which the message part is
 to be written;
-@item @member{len} @tab ignored by @manref{getmsg(2)} on call, but set on return to indicate the
-length of the data that was actually written to the buffer by @manref{getmsg(2)}; and,
+@item @member{len} @tab ignored by @manref{getmsg(2s)} on call, but set on return to indicate the
+length of the data that was actually written to the buffer by @manref{getmsg(2s)}; and,
 @item @member{buf} @tab specifies the location of the data buffer to contain the data retrieved for 
 the control or data part of the message.
 @end multitable
 
 If @var{ctlptr} or @var{dataptr} are @samp{NULL} on call, or the @member{maxlen} field of the
-corresponding @mantype{strbuf(5)} structure is set to @samp{-1}, then @manref{getmsg(2)} will not
+corresponding @mantype{strbuf(5)} structure is set to @samp{-1}, then @manref{getmsg(2s)} will not
 retrieve the corresponding control or data part of the message.
 
-For additional details, see the @manref{getmsg(2)} or @manref{getmsg(2p)} reference page.
+For additional details, see the @manref{getmsg(2s)} or @manref{getmsg(2p)} reference page.
 
 @node putpmsg(2s)
 @subsubsection putpmsg(2s)
 
-@manref{putpmsg(2s)} is similar to @manref{putmsg(2)}, but provides the additional ability to
+@manref{putpmsg(2s)} is similar to @manref{putmsg(2s)}, but provides the additional ability to
 specify the queue priority band (@member{b_band}) of the resulting message.  The prototype for the
 @manref{putpmsg(2s)} system call is exposed by including the @header{sys/stropts.h} system header
 file.  The prototype for the @manref{putpmsg(2s)} system call is as follows:
@@ -3970,8 +3973,8 @@ int @b{putpmsg}(int @i{fildes}, const struct strbuf *@i{ctlptr},
 @end example
 @end cartouche
 
-The arguments to @manref{putpmsg(2s)} are interpreted the same as those for @manref{putmsg(2)} as
-described in @ref{putmsg(2)} with the exception of the @var{band} and @var{flags} arguments.
+The arguments to @manref{putpmsg(2s)} are interpreted the same as those for @manref{putmsg(2s)} as
+described in @ref{putmsg(2s)} with the exception of the @var{band} and @var{flags} arguments.
 
 The @var{band} argument provides a band number to be placed in the @member{b_band} member of the
 first message block of the resulting message.  @var{band} can only be non-zero if the message to be
@@ -3979,10 +3982,10 @@ generated is a normal message.
 
 The @var{flags} argument is interpreted differently by @manref{putpmsg(2s)}: it can have values
 @samp{MSG_BAND} or @samp{MSG_HIPRI}, but these are equivalent to the @samp{0} and @samp{RS_HIPRI}
-flags for @manref{putmsg(2)}.
+flags for @manref{putmsg(2s)}.
 
 Under @cite{@value{PACKAGE_TITLE}},
-@manref{putmsg(2)} is implemented as a library call to @manref{putpmsg(2s)}.  This is possible
+@manref{putmsg(2s)} is implemented as a library call to @manref{putpmsg(2s)}.  This is possible
 because the call:
 
 @smallexample
@@ -4000,7 +4003,7 @@ For additional details, see the @manref{putpmsg(2s)} or @manref{putpmsg(2p)} ref
 @node getpmsg(2s)
 @subsubsection getpmsg(2s)
 
-@manref{getpmsg(2s)} is similar to @manref{getmsg(2)}, but provides the additional ability to
+@manref{getpmsg(2s)} is similar to @manref{getmsg(2s)}, but provides the additional ability to
 specify the queue priority band (@member{b_band}) of the retrieved message.  The prototype for the
 @manref{getpmsg(2s)} system call is exposed by including the @header{sys/stropts.h} system header
 file.  The prototype for the @manref{getpmsg(2s)} system call is as follows:
@@ -4012,8 +4015,8 @@ int @b{getpmsg}(int @i{fildes}, struct strbuf *@i{ctlptr}, struct strbuf *@i{dat
 @end example
 @end cartouche
 
-The arguments to @manref{getpmsg(2s)} are interpreted the same as those for @manref{getmsg(2)} as
-described in @ref{getmsg(2)}, with the exception of the @var{bandp} and @var{flags} arguments.
+The arguments to @manref{getpmsg(2s)} are interpreted the same as those for @manref{getmsg(2s)} as
+described in @ref{getmsg(2s)}, with the exception of the @var{bandp} and @var{flags} arguments.
 
 The @var{bandp} argument points to a band number on call that specifies a criteria for use with
 selecting the band of the retrieved message and returns the band number of the retrieved message
@@ -4037,7 +4040,7 @@ return, @var{bandp} indicates the band number (@member{b_band}) of the retrieved
 @samp{0} if the retrieved message was a high priority message.
 
 Under @cite{@value{PACKAGE_TITLE}},
-@manref{getmsg(2)} is implemented as a library call to @manref{getpmsg(2s)}.  This is possible
+@manref{getmsg(2s)} is implemented as a library call to @manref{getpmsg(2s)}.  This is possible
 because the calls:
 
 @smallexample
@@ -4083,14 +4086,14 @@ to the current discussion are the read and write options associated with the @df
 
 User level processes can also alter the read and write options associated with the @dfn{Stream
 head}.  User level processes use the @ioctlref{I_SRDOPT}, @ioctlref{I_GRDOPT}, @ioctlref{I_SWROPT}
-and @ioctlref{I_GWROPT} @manref{ioctl(2)} commands to achieve the same purpose as the
+and @ioctlref{I_GWROPT} @manref{ioctl(2s)} commands to achieve the same purpose as the
 @msg{M_SETOPTS} message used by modules and drivers.
 
 @node Read Options
 @subsubsection Read Options
 
 Read options are altered by a user level process using the @ioctlref{I_SRDOPT} and
-@ioctlref{I_GRDOPT} @manref{ioctl(2)} commands; or altered by a module or driver using the
+@ioctlref{I_GRDOPT} @manref{ioctl(2s)} commands; or altered by a module or driver using the
 @constant{SO_READOPT} flag and @member{so_readopt} member of the @mantype{stroptions(9)} data
 structure contained in an @msg{M_SETOPTS} message passed upstream.
 
@@ -4099,20 +4102,20 @@ are as follows:
 
 @subsubsection Read Mode
 
-The read mode affects how the @manref{read(2)} and @manref{readv(2)} system calls treat message
+The read mode affects how the @manref{read(2s)} and @manref{readv(2s)} system calls treat message
 boundaries.  One read mode can be selected from the following modes:
 
 @table @constant
 @item RNORM
 byte-stream mode.  This is the default read mode.  This is the normal byte-stream mode where message
-boundaries are ignored.  @manref{read(2)} and @manref{readv(2)} return data until the read count has
+boundaries are ignored.  @manref{read(2s)} and @manref{readv(2s)} return data until the read count has
 been satisfied or a zero length message is received.
 @item RMSGD
-message non-discard mode.  The @manref{read(2)} and @manref{readv(2)} system calls will return when
+message non-discard mode.  The @manref{read(2s)} and @manref{readv(2s)} system calls will return when
 either the count is satisfied, a zero length message is received, or a message boundary is
 encountered.  If there is any data left in a message after the read count has been satisfied, the
 message is placed back on the @dfn{Stream head} read queue.  The data will be read on a subsequent
-@manref{read(2)} or @manref{readv(2)} call.
+@manref{read(2s)} or @manref{readv(2s)} call.
 @item RMSGN
 message discard mode.  Similar to @constant{RMSGN} mode, above, but data that remains in a message
 after the read count has been satisfied is discarded.
@@ -4125,14 +4128,14 @@ cooperating module and @msg{M_READ} messages.@footnote{The @constant{RFILL} opti
 
 @subsubsection Read Protocol
 
-The read protocol affects hos @manref{read(2)} and @manref{readv(2)} system calls treat the control
+The read protocol affects hos @manref{read(2s)} and @manref{readv(2s)} system calls treat the control
 part of a message.  One read protocol can be selected from the following protocols:@footnote{Note
 that earlier releases, such as @cite{UNIX System V Release 3.0}, did not support read protocols.
 Under these earlier implementations, the read protocol was always @constant{RPROTNORM}.}
 
 @table @constant
 @item RPROTNORM
-fail read when control part present.  Fail @manref{read(2)} with @errno{EBADMSG} if a message
+fail read when control part present.  Fail @manref{read(2s)} with @errno{EBADMSG} if a message
 containing a control part is at the front of the @dfn{Stream head} read queue.  Otherwise, the
 message wi read as normal.  This is the default setting for new @dfn{Stream heads}.@footnote{This
 setting is used with the @manref{timod(4)} module requiring the use of the @manref{tirdwr(4)} module
@@ -4151,30 +4154,30 @@ but is defined by some implementations based on @cite{SVR 4.2}.}
 @end table
 
 Note that, although all modes terminate the read on a zero-length message, @cite{POSIX} requires
-that zero only be returned from @manref{read(2)} when the requested length is zero or an end of file
+that zero only be returned from @manref{read(2s)} when the requested length is zero or an end of file
 (@msg{M_HANGUP}) has occurred.  Therefore, @cite{@value{PACKAGE_TITLE}} only returns on a
 zero-length message if some data has been read already.
 
 @node Write Options
 @subsubsection Write Options
 
-No mechanism is provided to permit a @manref{write(2)} system call to generate either a
-@msg{M_PROTO} or @msg{M_PCPROTO} message.  The @manref{write(2)} system call will only generate one
+No mechanism is provided to permit a @manref{write(2s)} system call to generate either a
+@msg{M_PROTO} or @msg{M_PCPROTO} message.  The @manref{write(2s)} system call will only generate one
 or more @msg{M_DATA} messages.
 
 Write options are altered by a user level process using the @ioctlref{I_SWROPT} and
-@ioctlref{I_GWROPT} @manref{ioctl(2)} commands.  It is not possible for a module or driver to affect
+@ioctlref{I_GWROPT} @manref{ioctl(2s)} commands.  It is not possible for a module or driver to affect
 these options with the @msg{M_SETOPTS} message.
 
 @table @constant
 @item SNDZERO
-Permits the sending of a zero-length message downstream when a @manref{write(2)} of zero length is
-issued.  Without this option being set, @manref{write(2)} will succeed and return @samp{0} if a
-zero-lenth @manref{write(2)} is issued, but no zero-length message will be generated or sent.  This
+Permits the sending of a zero-length message downstream when a @manref{write(2s)} of zero length is
+issued.  Without this option being set, @manref{write(2s)} will succeed and return @samp{0} if a
+zero-lenth @manref{write(2s)} is issued, but no zero-length message will be generated or sent.  This
 option is the default for regular @dfn{Stream}, but is @emph{not} set by default for
 @acronym{STREAMS}-based pipes.
 @item SNDPIPE
-Issues a @signal{SIGPIPE} signal to caller of @manref{write(2)} if the caller attempts to write to a
+Issues a @signal{SIGPIPE} signal to caller of @manref{write(2s)} if the caller attempts to write to a
 @dfn{Stream} that has received a hangup (@msg{M_HANGUP}) or an error (@msg{M_ERROR}).  When not set,
 @signal{SIGPIPE} will not be signalled.  This option is the default for @dfn{STEAMS}-based pipes but
 is @emph{not} set by default for regular @dfn{Streams}.
@@ -4189,7 +4192,7 @@ This option is @emph{not} set by default for any @dfn{Stream}.
 @subsubsection Write Offset
 
 A write offset is provided as a option to allow for reservation of bytes at the beginning of the
-@msg{M_DATA} message resulting from a call to the @manref{write(2)} system call.
+@msg{M_DATA} message resulting from a call to the @manref{write(2s)} system call.
 
 The write offset can be altered by a module or driver using the @constant{SO_WROFF} flag and
 @member{so_wroff} member of the @mantype{stroptions(9)} data structure contained in an
@@ -4198,7 +4201,7 @@ write offset using any @manref{streamio(7)} command.
 
 The write offset associated with a @dfn{Stream head} determines the amount of space that the
 @dfn{Stream head} will attempt to reserve at the beginning of the initial @msg{M_DATA} message
-generated in response to the @manref{write(2)} system call.  The purpose of a write offset is to
+generated in response to the @manref{write(2s)} system call.  The purpose of a write offset is to
 permit modules and drivers to request that bytes at the beginning of a downstream messages be
 reserved to permit, for example, the addition of protocol headers to the message as it passes
 without the need to allocate additional message blocks and prepend them.
@@ -4437,15 +4440,15 @@ manual page.
 * I_SETSIG::
 @end menu
 
-Aside from the @manref{putpmsg(2)} and @manref{getpmsg(2)} system calls, a number of
+Aside from the @manref{putpmsg(2s)} and @manref{getpmsg(2s)} system calls, a number of
 @manref{streamio(7)} commands associated with queueing and priorities can be issued by a user level
-process using the @manref{ioctl(2)} system call.  The input output controls that accept a queue
+process using the @manref{ioctl(2s)} system call.  The input output controls that accept a queue
 band or indicate a queue band event are as follows:
 
 @table @ioctlref
 @item I_FLUSHBAND
 Flushes the @dfn{Stream} for a specified band.
-This @manref{ioctl(2)} command is equivalent to the @manref{flushq(9)} and @manref{flushband(9)}
+This @manref{ioctl(2s)} command is equivalent to the @manref{flushq(9)} and @manref{flushband(9)}
 utilities available to modules and drivers.  It is discussed under @ref{Flush Handling}.
 @item I_CKBAND
 Checks whether a message is available to be read from a specified queue band.
@@ -4455,10 +4458,10 @@ Gets the priority band associated with the next message on the @dfn{Stream head}
 It is discussed below.
 @item I_CANPUT
 Checks whether messages can be written to a specified queue band.
-This @manref{ioctl(2)} command is equivalent to the @manref{canput(9)} and @manref{bcanput(9)}
+This @manref{ioctl(2s)} command is equivalent to the @manref{canput(9)} and @manref{bcanput(9)}
 utilities available to modules and drivers.  It is discussed under @ref{Flow Control}.
 @item I_ATMARK
-This @manref{ioctl(2)} command supports @dfn{Transmission Control Protocol (TCP)} urgent data in a
+This @manref{ioctl(2s)} command supports @dfn{Transmission Control Protocol (TCP)} urgent data in a
 byte-stream.  It indicates when a marked message has arrived at the @dfn{Stream head}.
 It is discussed below.
 @item I_GETSIG
@@ -4466,7 +4469,7 @@ It is discussed below.
 Sets the mask of events for which the @dfn{Stream} head will send a calling process a
 @signal{SIGPOLL} or @signal{SIGURG} signal.  Events include @constant{S_RDBAND}, @constant{S_WRBAND}
 and @constant{S_BANDURG}.
-This @manref{ioctl(2)} command is discussed under @ref{Input and Output Polling}.
+This @manref{ioctl(2s)} command is discussed under @ref{Input and Output Polling}.
 @end table
 
 The @manref{streamio(7)} input output controls in the following sections are all of the form:
@@ -4481,7 +4484,7 @@ int @b{ioctl}(int @i{fildes}, int @i{cmd}, long @i{arg});
 @subsubsection @code{I_FLUSHBAND}
 
 Flushes the @dfn{Stream} for a specified band.
-This @manref{ioctl(2)} command is equivalent to the @manref{flushq(9)} and @manref{flushband(9)}
+This @manref{ioctl(2s)} command is equivalent to the @manref{flushq(9)} and @manref{flushband(9)}
 utilities available to modules and drivers.  It is discussed under @ref{Flush Handling}.
 
 @multitable @columnfractions .10 .90
@@ -4534,7 +4537,7 @@ Gets the priority band associated with the next message on the @dfn{Stream head}
 @node I_CANPUT
 @subsubsection @code{I_CANPUT}
 
-The @ioctlref{I_CANPUT} @manref{ioctl(2)} command has the following form:
+The @ioctlref{I_CANPUT} @manref{ioctl(2s)} command has the following form:
 
 @cartouche
 @example
@@ -4560,13 +4563,13 @@ When this value is specified, instead of testing a specified band, @ioctlref{I_C
 any (existing) band is writable.
 @end table
 
-Upon success, the @ioctlref{I_CANPUT} @manref{ioctl(2)} command returns zero (@samp{0}) or a
+Upon success, the @ioctlref{I_CANPUT} @manref{ioctl(2s)} command returns zero (@samp{0}) or a
 positive integer.  The @ioctlref{I_CANPUT} command returns false (@samp{0}) if the band cannot be
 written to (due to flow control), and returns true (@samp{1}) if the band is writable.  Upon
-failure, the @manref{ioctl(2)} call returns @samp{-1} and sets @manref{errno(3)} to an appropriate
+failure, the @manref{ioctl(2s)} call returns @samp{-1} and sets @manref{errno(3)} to an appropriate
 error number.
 
-When the @ioctlref{I_CANPUT} @manref{ioctl(2)} command fails, it returns @samp{-1} and sets
+When the @ioctlref{I_CANPUT} @manref{ioctl(2s)} command fails, it returns @samp{-1} and sets
 @manref{errno(3)} to one of the following errors:
 
 @table @errno
@@ -4585,7 +4588,7 @@ readers at the other end, or a read operation was attempted, the pipe is empty, 
 readers writers the other end.
 @item EINVAL
 @var{fildes} refers to a @dfn{Stream} that is linked under a multiplexing driver.  If a @dfn{Stream}
-is linked under a multiplexing driver, all @manref{ioctl(2)} commands other than
+is linked under a multiplexing driver, all @manref{ioctl(2s)} commands other than
 @ioctlref{I_UNLINK} or @ioctlref{I_PUNLINK} will return @errno{EINVAL}.
 @end table
 
@@ -4593,12 +4596,12 @@ Any error received in an @msg{M_ERROR} message indicating a persistent write err
 @dfn{Stream} will cause @ioctlref{I_CANPUT} to fail, and the write error will be returned in
 @manref{errno(3)}.
 
-Any error number returned in @manref{errno(3)} in response to a general @manref{ioctl(2)} failure
+Any error number returned in @manref{errno(3)} in response to a general @manref{ioctl(2s)} failure
 can also be returned in response to @ioctlref{I_ATMARK}.  See also @manref{ioctl(2p)}.
 
 @cite{@value{PACKAGE_TITLE}} implements the special flag, @constant{ANYBAND}, that can be used for
 an @var{arg} value instead of the band number to check whether any existing band is writable.  This
-is similar to the @constant{POLLWRBAND} flag to @manref{poll(2)}.  @constant{ANYBAND} uses the
+is similar to the @constant{POLLWRBAND} flag to @manref{poll(2s)}.  @constant{ANYBAND} uses the
 otherwise invalid band number @samp{-1}.  Portable @acronym{STREAMS} applications programs will not use
 the @constant{ANYBAND} flag and will not rely upon @ioctlref{I_CANPUT} to generate an error if
 passed @samp{-1} as an invalid argument.
@@ -4607,7 +4610,7 @@ passed @samp{-1} as an invalid argument.
 @node I_ATMARK
 @subsubsection @code{I_ATMARK}
 
-The @ioctlref{I_ATMARK} @manref{ioctl(2)} command has the following form:
+The @ioctlref{I_ATMARK} @manref{ioctl(2s)} command has the following form:
 
 @cartouche
 @example
@@ -4643,39 +4646,39 @@ permitted.
 @acronym{STREAMS} message blocks that have the @constant{MSGMARK} flag set in the @member{b_flag} member
 of the @mantype{msgb(9)} structure are marked messages.  @cite{Solaris} also provides the
 @constant{MSGMARKNET} and @constant{MSGNOTMARKNET} flags.  The use of these flags is not very clear,
-but @cite{@value{PACKAGE_TITLE}} could use them in the @manref{read(2)} logic to determine whether
+but @cite{@value{PACKAGE_TITLE}} could use them in the @manref{read(2s)} logic to determine whether
 the next message is marked without removing the message from the queue.
 
-When @manref{read(2)} encounters a marked message and data has already been read, the read
+When @manref{read(2s)} encounters a marked message and data has already been read, the read
 terminates with the amount of data read.  The resulting short read is an indication to the user that
 a marked message could exist on the read queue.  (Short reads can also result from zero-byte data,
 or from a delimited message: one with the @constant{MSGDELIM} flag set in @member{b_flag}).  When a
 short read occurs, the user should test for a marked message using the @constant{ANYMARK} flag to
-the @ioctlref{I_ATMARK} @manref{ioctl(2)} command.  A subsequent @manref{read(2)} will consume the
+the @ioctlref{I_ATMARK} @manref{ioctl(2s)} command.  A subsequent @manref{read(2s)} will consume the
 marked message following the marked message.  This can be checked by using the @constant{LASTMARK}
-flag to the @ioctlref{I_ATMARK} @manref{ioctl(2)} command.
+flag to the @ioctlref{I_ATMARK} @manref{ioctl(2s)} command.
 
 The @member{b_flag} member of the @mantype{msgb(9)} structure can have the flag, @constant{MSGMARK},
 set that allows a module or driver to mark a message sent to the @dfn{Stream head}.  This is used to
 support @manref{tcp(4)}'s ability to indicate the last bye of out-of-band data.  Once marked, a
 message sent to the @dfn{Stream head} causes the @dfn{Stream head} to remember the message.  A user
 may check to see if the message on the front of the @dfn{Stream head} read queue is marked, and
-whether it is the last marked message on the queue, with the @ioctlref{I_ATMARK} @manref{ioctl(2)}
+whether it is the last marked message on the queue, with the @ioctlref{I_ATMARK} @manref{ioctl(2s)}
 command.  If a user is reading data from the @dfn{Stream head} and there are multiple messages on
-the @dfn{Stream head} read queue, and one of those messages is marked, @manref{read(2)} terminates
+the @dfn{Stream head} read queue, and one of those messages is marked, @manref{read(2s)} terminates
 when it reaches the marked message and returns the data only up to that marked message.  The rest of
 the data may be obtained with successive reads.  @constant{ANYMARK} indicates that the user merely
 wants to check if the message at the head of the @dfn{Stream head} read queue is marked.
 @constant{LASTMARK} indicates that the user wants to see if the message is the only one marked on
 the queue.
 
-Upon success, the @ioctlref{I_ATMARK} @manref{ioctl(2)} command returns zero (@samp{0}) or a
+Upon success, the @ioctlref{I_ATMARK} @manref{ioctl(2s)} command returns zero (@samp{0}) or a
 positive integer.  The @ioctlref{I_ATMARK} operation returns a value of true (@samp{1}) if the
 marking criteria is met.  It returns false (@samp{0}) if the marking criteria is not met.  Upon
-failure, the @ioctlref{I_ATMARK} @manref{ioctl(2)} command returns @samp{-1} and sets
+failure, the @ioctlref{I_ATMARK} @manref{ioctl(2s)} command returns @samp{-1} and sets
 @manref{errno(3)} to an appropriate error number.
 
-When the @ioctlref{I_ATMARK} @manref{ioctl(2)} command fails, it returns @samp{-1} and sets
+When the @ioctlref{I_ATMARK} @manref{ioctl(2s)} command fails, it returns @samp{-1} and sets
 @manref{errno(3)} to one of the following errors:
 
 @table @errno
@@ -4684,11 +4687,11 @@ When the @ioctlref{I_ATMARK} @manref{ioctl(2)} command fails, it returns @samp{-
 two.
 @end table
 
-Any error number returned in @manref{errno(3)} in response to a general @manref{ioctl(2)} failure
+Any error number returned in @manref{errno(3)} in response to a general @manref{ioctl(2s)} failure
 can also be returned in response to @ioctlref{I_ATMARK}.  See also @manref{ioctl(2p)}.
 
 @ignore
-In general, any @manref{ioctl(2)} command can fail if:
+In general, any @manref{ioctl(2s)} command can fail if:
 
 @table @errno
 @item EFAULT
@@ -4707,7 +4710,7 @@ space.
 @item ENOTTY
 @var{fildes} does not refer to a @acronym{STREAMS} device that supports I/O controls.
 @item ENODEV
-@var{fildes} refers to a @acronym{STREAMS} device that does not support the @manref{ioctl(2)} system
+@var{fildes} refers to a @acronym{STREAMS} device that does not support the @manref{ioctl(2s)} system
 call.
 @item ENXIO
 @var{fildes} refers to a @dfn{Stream} that has received a hangup (@msg{M_HANGUP}).
@@ -4721,7 +4724,7 @@ readers at the other end, or a read operation was attempted, the pipe is empty, 
 readers at the other end.
 @item EINVAL
 @var{fildes} referes to a @dfn{Stream} that is linked under a multiplexing driver.  If a
-@dfn{Stream} is linked under a multiplexing driver, all @manref{ioctl(2)} commands other than
+@dfn{Stream} is linked under a multiplexing driver, all @manref{ioctl(2s)} commands other than
 @ioctlref{I_UNLINK} or @manref{I_PUNLINK} will return @errno{EINVAL}.
 @item ERESTARTSYS
 a signal was received before the operation could begin.
@@ -4747,9 +4750,9 @@ operations, the error number returned by the module or driver @command{open} or 
 procedure can also be returned in @manref{errno(3)}.
 
 Any error returned in an @msg{M_IOCNAK} message from the driver in response to a @ioctlref{I_STR}
-@manref{ioctl(2)} command can be returned in @manref{errno(3)}.
+@manref{ioctl(2s)} command can be returned in @manref{errno(3)}.
 
-Note that @acronym{STREAMS} @manref{ioctl(2)} calls are complex and there is much conflicting
+Note that @acronym{STREAMS} @manref{ioctl(2s)} calls are complex and there is much conflicting
 documentation in specific areas of behaviour.  Not all bugs are bugs and not all features are
 features.
 @end ignore
@@ -4760,7 +4763,7 @@ features.
 Sets the mask of events for which the @dfn{Stream} head will send a calling process a
 @signal{SIGPOLL} or @signal{SIGURG} signal.  Events include @constant{S_RDBAND}, @constant{S_WRBAND}
 and @constant{S_BANDURG}.
-This @manref{ioctl(2)} command is discussed under @ref{Input and Output Polling}.
+This @manref{ioctl(2s)} command is discussed under @ref{Input and Output Polling}.
 
 @multitable @columnfractions .10 .90
 @item fildes @tab the @dfn{Stream} for which the command is issued;
@@ -4785,7 +4788,7 @@ instead of @signal{SIGPOLL} in response to the event.
 Sets the mask of events for which the @dfn{Stream} head will send a calling process a
 @signal{SIGPOLL} or @signal{SIGURG} signal.  Events include @constant{S_RDBAND}, @constant{S_WRBAND}
 and @constant{S_BANDURG}.
-This @manref{ioctl(2)} command is discussed under @ref{Input and Output Polling}.
+This @manref{ioctl(2s)} command is discussed under @ref{Input and Output Polling}.
 
 @multitable @columnfractions .10 .90
 @item fildes @tab the @dfn{Stream} for which the command is issued;
@@ -5313,8 +5316,8 @@ That is, they were invoked using a @acronym{STREAMS} queue structure as an argum
 are as follows:
 
 @multitable @columnfractions .30 .70
-@item @manpage{put(9)} @tab --
-@item @manpage{srv(9)} @tab --
+@item @manpage{put(9s)} @tab --
+@item @manpage{srv(9s)} @tab --
 @item @manpage{qopen(9)} @tab --
 @item @manpage{qclose(9)} @tab --
 @item @manpage{qbufcall(9)} @tab --
@@ -5418,8 +5421,8 @@ perimeters.
 @cindex synchronization, none
 @emph{No synchronization.}
 Specifies that each queue can be accessed by more than one thread at a the same time.  The
-protection of internal data and of @manpage{put(9)}
-and @manpage{srv(9)}
+protection of internal data and of @manpage{put(9s)}
+and @manpage{srv(9s)}
 procedures against @manpage{timeout(9)}
 or @manpage{bufcall(9)}
 is done by the module or driver itself.  This synchronization level should be used essentially for
@@ -5436,13 +5439,13 @@ flag.
 will be synchronized according to the specified synchronization level.
 
 @table @manpage
-@item put(9)
+@item put(9s)
 @emph{Queue put procedure.}
 If the module has any synchronization level other than @constant{SQLVL_NOP},
 the put procedure will be exclusive.  Attempts to enter the put procedure while another thread is
 running within the synchronization level will result in the call being postponed until the thread
 currently in the synchronization level exits.
-@item srv(9)
+@item srv(9s)
 If the module has any synchronization level other than @constant{SQLVL_NOP},
 @emph{Queue service procedure.}
 the service procedure will be exclusive.  Attempts to enter the service procedure while another
@@ -5534,7 +5537,7 @@ modified by the system while a thread is actively executing within a synchronous
 within an asynchronous entry point.
 
 A @acronym{STREAMS} module or driver must not call another module's @command{put} or @command{service}
-procedure directly.  The @acronym{STREAMS} utilities @manref{putnext(9)}, @manref{put(9)} and others
+procedure directly.  The @acronym{STREAMS} utilities @manref{putnext(9)}, @manref{put(9s)} and others
 described in @ref{Utilities} must be used to pass messages to another queue.  Calling another
 @acronym{STREAMS} module or driver directly circumvents the @dfn{MP-STREAMS} framework.@footnote{The
 practise of calling a neighbouring module's put or service procedure directly using the
@@ -5657,10 +5660,10 @@ The @acronym{STREAMS} utilities @manref{qprocson(9)} and @manref{qprocsoff(9)} e
 @command{service} procedures are disabled.  Messages flow around the module as if it were not
 present in the @dfn{Stream}.
 
-@manref{qprocson(9)} must be called by the first @manref{open(2)} of a module, but only after
+@manref{qprocson(9)} must be called by the first @manref{open(2s)} of a module, but only after
 allocation and initialization of any module resources or private data structures upon which the
 @command{put} and @command{service} procedures depend.  @manref{qprocsoff(9)} must be called by the
-@manref{close(2)} routine of a module before deallocating any resources on which the @command{put}
+@manref{close(2s)} routine of a module before deallocating any resources on which the @command{put}
 and @command{service} procedures depend.
 
 For example, it is typical for a module's @member{qi_qopen} procedure to allocate a private data
@@ -6015,7 +6018,7 @@ functions (e.g, @samp{canputnext(q)} instead of @samp{canput(q->q_next)}).
 @item @manpage{canputnext(9)} @tab test flow control on a message queue
 @item @manpage{canputnext(9)} @tab test flow control on a message queue
 @item @manpage{freezestr(9)} @tab freeze the state of a stream queue
-@item @manpage{put(9)} @tab invoke the put procedure for a @acronym{STREAMS} module or driver with a @acronym{STREAMS} message
+@item @manpage{put(9s)} @tab invoke the put procedure for a @acronym{STREAMS} module or driver with a @acronym{STREAMS} message
 @item @manpage{putnext(9)} @tab put a message on the downstream @acronym{STREAMS} message queue
 @item @manpage{putnextctl1(9)} @tab put a 1 byte control message on the downstream @acronym{STREAMS} message queue
 @item @manpage{putnextctl(9)} @tab put a control message on the downstream @acronym{STREAMS} message queue
@@ -6429,7 +6432,7 @@ This priority level exists in all kernels.
 @subsubsection Core Extensions
 
 @multitable @columnfractions .30 .70
-@item @manpage{streams_put(9)} @tab Invoke the put procedure for a @acronym{STREAMS} module or driver with a @acronym{STREAMS} message.  @manpage{streams_put(9)} is implemented using @manpage{put(9)}.  @manpage{put(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{streams_put(9)} @tab Invoke the put procedure for a @acronym{STREAMS} module or driver with a @acronym{STREAMS} message.  @manpage{streams_put(9)} is implemented using @manpage{put(9s)}.  @manpage{put(9s)} is a @dfn{@value{PACKAGE_TITLE}} core function.
 @item @manpage{putctl2(9)} @tab Put a 2 byte control message on a @acronym{STREAMS} message queue.  @manpage{putctl2(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
 @item @manpage{putnextctl2(9)} @tab Put a 2 byte control message on the downstream @acronym{STREAMS} message queue.  @manpage{putnextctl2(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
 @item @manpage{unweldq(9)} @tab Unweld two pairs of streams queues.  @manpage{unweldq(9)} is a @dfn{@value{PACKAGE_TITLE}} core function.
@@ -6495,7 +6498,7 @@ This priority level exists in all kernels.
 
 @multitable @columnfractions .30 .70
 @item @manpage{lbolt(9)} @tab Time in ticks since reboot @manpage{lbolt(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
-@item @manpage{puthere(9)} @tab Invoke the put procedure for a @acronym{STREAMS} module or driver with a @acronym{STREAMS} message.  @manpage{puthere(9)} is implemented using @manpage{put(9)}.  @manpage{put(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
+@item @manpage{puthere(9)} @tab Invoke the put procedure for a @acronym{STREAMS} module or driver with a @acronym{STREAMS} message.  @manpage{puthere(9)} is implemented using @manpage{put(9s)}.  @manpage{put(9s)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
 @item @manpage{weldq(9)} @tab Weld together two pairs of streams queues.  @manpage{weldq(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
 @item @manpage{unweldq(9)} @tab Unweld two pairs of streams queues.  @manpage{unweldq(9)} is a  @dfn{@value{PACKAGE_TITLE}} core function.
 @end multitable
@@ -7360,7 +7363,7 @@ A direction of data flow going from a driver toward the @dfn{Stream head}.  Also
 @item read queue
 @cindex read queue
 A message queue in a module or driver containing messages moving @dfn{upstream}.  Associated with
-the @manref{read(2)} system call and input from a driver.
+the @manref{read(2s)} system call and input from a driver.
 
 @item remote mode
 @cindex remote mode
@@ -7467,7 +7470,7 @@ are reduced to the low-water mark value, the other queue is unblocked by @acrony
 @item write queue
 @cindex write queue
 A message queue in a module or driver containing messages moving downstream.  Associated with the
-@manref{write(2)} system call and output from a user process.
+@manref{write(2s)} system call and output from a user process.
 
 @item write-side
 @cindex write-side

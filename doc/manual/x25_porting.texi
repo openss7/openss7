@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id: x25_porting.texi,v 1.1.2.1 2009-06-21 10:40:08 brian Exp $
+% @(#) $Id: x25_porting.texi,v 1.1.2.2 2011-02-07 02:21:34 brian Exp $
 %
 % =========================================================================
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:40:08 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -93,7 +93,7 @@
 
 @dircategory STREAMS
 @direntry
-* X.25 Porting: (x25_porting).			An X.25 Porting Guide.
+* X.25 Porting: (x25_porting).		An X.25 Porting Guide.
 @end direntry
 
 @include ../../scripts/texi/args.texi
@@ -393,6 +393,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: x25_porting.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:34  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:40:08  brian
 - added files to new distro
 

@@ -1,11 +1,11 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: todo.texi,v 1.1.2.2 2011-01-12 03:37:37 brian Exp $
+@c @(#) $Id: todo.texi,v 1.1.2.3 2011-02-07 02:21:34 brian Exp $
 @c
 @c =========================================================================
 @c
-@c Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+@c Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 @c Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 @c Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-01-12 03:37:37 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -1386,7 +1386,7 @@ protocols, not for the purposes of supporting TI-RPC, but a way of providing com
 Fortunately, most of the definitions are part of the transport provider implementation.
 
 Provide a mechanism for implementations of transport protocols to add their definitions into the
-@manref{netconfig(5)} database files.
+@manref{netconfig(5s)} database files.
 
 @emph{*done*}
 @end ignore

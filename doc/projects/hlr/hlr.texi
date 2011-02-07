@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: hlr.texi,v 1.1.2.1 2009-06-21 10:46:24 brian Exp $
+% @(#) $Id: hlr.texi,v 1.1.2.2 2011-02-07 02:21:35 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:46:24 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:35 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* HLR: (hlr).			3GPP GSM/UMTS Home Location Register
+* HLR: (hlr).				3GPP GSM/UMTS Home Location Register
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -440,6 +440,9 @@ Project} website for a current version.
 @smallexample
 @verbatim
 $Log: hlr.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:35  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:46:24  brian
 - added files to new distro
 

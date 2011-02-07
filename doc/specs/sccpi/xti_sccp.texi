@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: xti_sccp.texi,v 1.1.2.1 2009-06-21 10:56:06 brian Exp $
+% @(#) $Id: xti_sccp.texi,v 1.1.2.2 2011-02-07 02:21:42 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2009-06-21 10:56:06 $ by $Author: brian $
+% Last Modified $Date: 2011-02-07 02:21:42 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -95,7 +95,7 @@
 
 @dircategory OpenSS7
 @direntry
-* XTI-SCCP: (xti_sccp).		XTI Corrigendum for SCCP
+* XTI-SCCP: (xti_sccp).			XTI Corrigendum for SCCP
 @end direntry
 
 @include ../../../scripts/texi/args.texi
@@ -396,6 +396,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: xti_sccp.texi,v $
+Revision 1.1.2.2  2011-02-07 02:21:42  brian
+- updated manuals
+
 Revision 1.1.2.1  2009-06-21 10:56:06  brian
 - added files to new distro
 

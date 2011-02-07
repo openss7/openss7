@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.4 2011-01-18 17:06:46 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.5 2011-02-07 02:21:33 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-01-18 17:06:46 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -120,15 +120,17 @@ The @value{PACKAGE_TITLE} package release can be accessed from the repositories 
 @uref{http://www.openss7.org/repos, The OpenSS7 Project}.  For @manpage{rpm(1)} based systems, the
 package is available in a @manpage{yum(8)} repository based on @file{repomd} XML and may also be
 accessed using @manpage{up2date(8)}, @manpage{zypper(8)} or @manpage{yast(8)}.  For
-@manpage{dpkg(1)} based systems, the package is available in an @manpage{apt(8)} repository.
+@manpage{yast(8)} based systems, the package is also available as a @manpage{yast(8)} installation
+source.  For @manpage{dpkg(1)} based systems, the package is available in an @manpage{apt(8)}
+repository.
 
 By far the easiest (most repeatable and manageable) form for installing and using the
-@value{PACKAGE_TITLE} package is to install from the @manpage{yum(8)} or @manpage{apt(8)}
-repositories.  If your distribution does not support @manpage{yum(8)}, @manpage{zypper(8)},
-@manpage{up2date(8)}, @manpage{yast(8)} or @manpage{apt(8)}, then it is still possible to install
-the RPMs or DEBs from the repositories using @manpage{rpm(1)}, @manpage{dpkg(1)}; or by using
-@manpage{wget(1)} and then installing them from RPM or DEB using @manpage{rpm(1)} or
-@manpage{dpkg(1)} locally.
+@value{PACKAGE_TITLE} package is to install from the @manpage{yum(8)}, @manpage{yast(8)} or
+@manpage{apt(8)} repositories.  If your distribution does not support @manpage{yum(8)},
+@manpage{zypper(8)}, @manpage{up2date(8)}, @manpage{yast(8)} or @manpage{apt(8)}, then it is still
+possible to install the RPMs or DEBs from the repositories using @manpage{rpm(1)},
+@manpage{dpkg(1)}; or by using @manpage{wget(1)} and then installing them from RPM or DEB using
+@manpage{rpm(1)} or @manpage{dpkg(1)} locally.
 
 If binaries are not available for your distribution or specific kernel, but your distribution
 supports @manref{rpm(1)} or @manref{dpkg(1)}, the next best method for installing and using
@@ -143,17 +145,44 @@ to download, configure, build and install from the tarball.
 
 @menu
 Repositories for YUM::			the @manpage{yum(8)} repository
+Repositories for YAST::			the @manpage{yast(8)} repository
 Repositories for APT::			the @manpage{apt(8)} repository
+REPO-MD Repositories::
+APTITUDE Repositories::			
 @end menu
+
+Repositories are located under @uref{http://www.openss7.org/repos}.  The path from there to the
+specific repository consists of the following components:
+
+@table @var
+@item packaging
+For @manpage{yum(8)} and @manpage{yast(8)} repositories, this is always @file{rpms}.  For
+@manpage{apt(1)} repositories, this is always @file{debs}.  For @manpage{tar(1)} repositories, this
+is @file{tarballs}.
+@item distro
+The identifier of the distrbution.  Example, @file{centos}, @file{debian}.
+@item release
+The release of the distribution.  Example, @file{5.5}, @file{squeeze}.
+@item arch
+The architecture of the release.  Example , @file{x86_64}.
+@end table
+
+So, for example, the @cite{CentOS 5.5} distribution for @file{x86_64} is located under
+@uref{http://www.openss7.org/repos/rpms/centos/5.5/x86_64/}; the @cite{Debian Squeeze} distribution
+for @file{i686} is located under @uref{http://www.openss7.org/repos/debs/debian/squeeze/i686/}; the
+tarball distribution is located under @uref{http://www.openss7.org/repos/tarballs}.
 
 @node Repositories for YUM
 @subsection Repositories for YUM
 @cindex repositories, yum
 @cindex yum
 
-To install or upgrade from the @cite{OpenSS7} @file{repomd} repositories, you will need a file in
-your @file{/etc/yum.repo.d/} directory.  This file can be obtained directly from the @cite{OpenSS7}
-@uref{http://www.openss7.org/repos, repository}, like so:
+@subsubsection Setting up YUM
+@cindex yum
+
+To install or upgrade from the @cite{OpenSS7} @file{repomd} repositories using @manpage{yum(8)}, you
+will need a file in your @file{/etc/yum.repo.d/} directory.  This file can be obtained directly from
+the @cite{OpenSS7} @uref{http://www.openss7.org/repos, repository}, like so:
 
 @smallexample
 $> REPOS="http://www.openss7.org/repos/rpms"
@@ -165,7 +194,7 @@ $> sudo yum makecache
 
 This example assumes the the distribution is @samp{centos} and the distribution release is
 @samp{5.5} and the architecture requires is @samp{x86_64}.  Another example would be
-@file{$REPOS/suse/11.0/i686/repodata/openss7.repo}, for using @manpage{yum(8)} or
+@file{$REPOS/suse/11/i686/repodata/openss7.repo}, for using @manpage{yum(8)} or
 @manpage{zypper(8)} with SUSE.
 
 If you have the @file{yum-tmprepo} plugin, you can use the @cite{OpenSS7} repository as a temporary
@@ -206,16 +235,49 @@ or
 $> sudo yum remove @value{PACKAGE}
 @end smallexample
 
+@subsubsection Setting up ZYPPER
+@cindex zypper
+
+@smallexample
+$> REPOS="http://www.openss7.org/repos/rpms"
+$> REPOFILE="$REPOS/suse/11/x86_64/repodata/openss7.repo"
+$> wget $REPOFILE
+$> sudo zypper addrepo --refresh --repo openss7.repo
+$> rm -f openss7.repo
+@end smallexample
+
+@manpage{zypper(8)} does not do a very good job of importing GPG signatures.  If @command{zypper} is
+reporting that there are no keys for the RPMs being installed, the key can be imported directly into
+RPM as follows:
+
+@smallexample
+$> wget http://www.openss7.org/pubkey.asc
+$> sudo rpm --import pubkey.asc
+$> rm -f pubkey.asc
+@end smallexample
+
+@subsubsection General REPO-MD Repository
+@cindex repositories, repo-md
+
+To avoid having to change the @file{openss7.repo} file contents if they should change on the
+archive, place the following into the @file{openss7.repo} and place it into your
+@file{/etc/yum.repo.d/} directory:
+
+@smallexample
+-| include=http://www.openss7.org/repos/rpms/centos/$releasever/$arch/repodata/openss7.repo
+@end smallexample
+
 If you have difficulty downloading the @file{openss7.repo} file, edit the following information into
 the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 
 @smallexample
 -| [openss7]
--| enabled = 1
 -| name = OpenSS7 Repository
--| baseurl = http://www.openss7.org/repos/rpms/centos/5.5/x86_64
+-| baseurl = http://www.openss7.org/repos/rpms/centos/$releasever/$arch
+-| gpgkey = http://www.openss7.org/repos/tarballs/OPENSS7-GPG-KEY
+-| repo_gpgcheck = 1
 -| gpgcheck = 1
--| gpgkey = http://www.openss7.org/pubkey.asc
+-| enabled = 1
 @end smallexample
 
 Note that it is also possible to point to these repositories as an additional installation source
@@ -328,6 +390,29 @@ Note that the version @samp{@value{_kversion}} is just an example.  Use the vers
 @end table
 
 For assistance with specific RPMs, see @ref{Downloading the Binary RPM}.
+
+@node Repositories for YAST
+@subsection Repositories for YAST
+@cindex repositories, yast
+@cindex yast
+
+For distributions that support @cite{YaST}, such as @cite{SUSE Linux Enterprise Server}, and
+@cite{OpenSUSE}, @cite{YaST} repositories are build coexistent with @cite{repo-md} repositories.
+Setting up the installation source as a @cite{YaST} installation source instead of @cite{repo-md}
+can provide the additional features associated with @cite{YaST} install sources.
+
+@subsubsection Setting up ZYPPER
+@cindex setup, zypper
+@cindex zypper
+
+@smallexample
+$> REPODIR="http://www.openss7.org/repos/rpms/suse/11/x86_64"
+$> sudo zypper addrepo --type yast2 $REPODIR openss7
+@end smallexample
+
+@subsubsection Setting up YAST
+@cindex setup, yast
+@cindex yast
 
 @node Repositories for APT
 @subsection Repositories for APT
