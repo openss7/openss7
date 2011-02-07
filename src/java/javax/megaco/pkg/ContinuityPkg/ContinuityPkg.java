@@ -1,6 +1,6 @@
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
 /*
- @(#) $RCSfile: ContinuityPkg.java,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:35:44 $ <p>
+ @(#) $RCSfile: ContinuityPkg.java,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 07:27:22 $ <p>
  
  Copyright &copy; 2008-2009  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -41,7 +41,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2009-06-21 11:35:44 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 07:27:22 $ by $Author: brian $
  */
 
 // vim: sw=4 et tw=72 com=srO\:/**,mb\:*,ex\:*/,srO\:/*,mb\:*,ex\:*/,b\:TRANS,\://,b\:#,\:%,\:XCOMM,n\:>,fb\:-
@@ -137,7 +137,7 @@ public final int[] getExtendedPkgIds()
    METHOD
      _________________________________________________________________
 
-                  Copyright © 2001 Hughes Software Systems
+                  Copyright (C) 2001 Hughes Software Systems
        HUGHES SOFTWARE SYSTEMS and JAIN JSPA SIGNATORIES PROPRIETARY
         This document contains proprietary information that shall be
      distributed, routed or made available only within Hughes Software

@@ -201,7 +201,7 @@ interface ASRConstants extends ResourceConstants {
      * that support the Java Speech Grammar Format.
      * Otherwise, this is a vendor-defined symbol that is used by the
      * vendor to distinguish between specific data formats used
-     * internally by the vendor’s Resource.
+     * internally by the vendor's Resource.
      */
     Symbol a_ContextType	= ESymbol.ASR_ContextType;
 

@@ -1,5 +1,5 @@
-OpenSS7 -- history of user visible changes.  2011-01-15
-$Id: NEWS,v 1.1.2.14 2011-01-18 16:49:35 brian Exp $
+OpenSS7 -- history of user visible changes.  2011-01-23
+$Id: NEWS,v 1.1.2.15 2011-02-07 04:56:18 brian Exp $
 Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
@@ -173,7 +173,7 @@ This package is publicly released strictly under the `GNU Affero
 General Public License Version 3'; however, commercial licensing is
 available.  The release is available as an `autoconf(1)' tarball, SRPM,
 DSC, and a set of binary RPMs and DEBs for popular distributions.  See
-the package page (http://www.openss.org/openss7_pkg.html) for the
+the package page (http://www.openss7.org/openss7_pkg.html) for the
 `autoconf(1)' tarballs, SRPMs, DSCs and binary RPMs and DEBs.  See the
 repository page (http://www.openss7.org/repos.html) for information
 concerning network installation and update sources.
