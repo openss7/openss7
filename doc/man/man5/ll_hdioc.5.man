@@ -1,0 +1,394 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: ll_hdioc.5.man,v 1.1.2.1 2011-02-07 02:14:40 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:40 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ll_hdioc.5.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:40  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.ad b
+.hy 1
+.\"
+.\"
+.TH LL_HDIOC 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B ll_hdioc
+\- LAPB or LLC2 plain input-output control structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP
+.B #include <sys/snet/ll_control.h>
+.PP
+.nf
+\f(CW\s-1\
+struct ll_hdioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+};\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The members of the
+.B ll_hdioc
+structure include:
+.TP \w'\ lli_spare\(em'u
+.I lli_type
+The type of LLI structure: always \fB\)LI_PLAIN\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment.
+.TP
+.I lli_snid
+The subnetwork (link) identifier.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B ll_hdioc
+structure is used to provider subnetwork (link) identifier and related
+information for use with the
+.BR L_TRACEON "(7), " L_TRACEOFF "(7), " L_LINKENABLE "(7), " L_LINKDISABLE (7)
+input-output contol commands from the
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7).
+.PP
+The
+.B ll_hdioc
+structure, and the corresponding input-output controls, are used primarily by
+the
+.BR linkstart "(8) and " linkstop (8)
+utilities,
+but may be used directly by user-space programs.
+.PP
+There is one shared structure that is used for MLP, LAP/LAPB and LLC1/LLC2.
+.PP
+The members of the
+.B ll_hdioc
+structure are described as follows:
+.TP
+.I lli_type
+Specifies the type of the structure.  For the
+.B ll_hdioc
+structure, this member is always set to
+.BR LI_PLAIN .
+.TP
+.I lli_spare
+Spare bytes for alignment.  These bytes are coded zero (0) by the initiator
+and ignored by the responder.
+.TP
+.I lli_snid
+The subnetwork (link) ID.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/snet/ll_proto.h
+Defines the link classes.
+.TP
+.B @includedir@/snet/ll_control.h
+Defines the
+.B ll_hdioc
+structure.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR linkadd (8),
+.BR linkdel (8),
+.BR linklist (8),
+.BR L_SETSNID (7),
+.BR L_GETSNID (7),
+.BR lli (7).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B ll_hdioc
+structure has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B ll_hdioc
+structure is compatible with
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+and implementations based on
+.IR "SpiderX25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.B @PACKAGE_TITLE@
+is not directly compatible with
+.IR "Solstice 9.2" ,
+.[
+solx25dg
+.]
+in that this data structure is described as:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+struct ll_hdioc {
+    uint8_t lli_type;      /* Table type = LI_PLAIN */
+    uint8_t lli_class[3];  /* spare bytes for alignment */
+    uint32_t lli_ppa;      /* PPA/Subnetwork ID character */
+};
+\s+1\fP
+.fi
+.TP
+.I lli_type
+The table type.  This should always be \fB\)LI_PLAIN\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment.
+.TP
+.I lli_ppa
+The PPA identifier.
+.PD
+.PP
+Of course, the member \fI\)lli_snid\fP is always called \fI\)lli_ppa\fP.
+This does not directly cause source compatibility issues, just binary
+compatibility issues.
+.RE
+.IP \(em
+.IR "Solstice 9.2" ,
+.[
+solx25dg
+.]
+specifies that the
+.B ll_hdioc
+structure is used for the
+.BR L_ZEROSTATS (7)
+input-output control.  Note that
+.IR "Solstice 9.2"
+.[
+solx25dg
+.]
+does not specify the
+.BR L_TRACEON "(7), " L_TRACEOFF "(7), " L_LINKENABLE "(7) nor " L_LINKDISABLE (7)
+input-output control commands.
+.PP
+For additional compatibility information see,
+.BR lapb (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7),
+structures are not standardized; however,
+.B @PACKAGE_TITLE@
+conforms to
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B ll_hdioc
+structure first appeared in
+.IR "Spider X.25" .
+.[
+spiderx25
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

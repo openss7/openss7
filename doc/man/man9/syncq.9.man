@@ -1,0 +1,377 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: syncq.9.man,v 1.1.2.1 2011-02-07 02:14:52 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:52 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: syncq.9.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:52  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH SYNQ 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B syncq
+\- \fISTREAMS\fP Stream head structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\fC\s-1
+.B #include <sys/stream.h>
+.B #include <sys/strsubr.h>
+
+typedef struct syncq {
+    spinlock_t sq_lock;                 /* spin lock for this structure */
+    int sq_count;                       /* no of threads inside (negative for exclusive) */
+    struct task_struct *sq_owner;       /* exclusive owner */
+    wait_queue_head_t sq_waitq;         /* qopen/qclose waiters */
+    struct strevent *sq_ehead;          /* head of event queue */
+    struct strevent **sq_etail;         /* tail of event queue */
+    queue_t *sq_qhead;                  /* head of service queue */
+    queue_t **sq_qtail;                 /* tail of service queue */
+    mblk_t *sq_mhead;                   /* head of put queue */
+    mblk_t **sq_mtail;                  /* tail of put queue */
+    struct syncq *sq_outer;             /* synch queue outside this one (if any) */
+    unsigned int sq_flag;               /* synch queue flags */
+    unsigned int sq_level;              /* synch queue level */
+    struct syncq *sq_link;              /* synch queue schedule list */
+    char sq_info[FMNAMESZ + 1];         /* synch queue info */
+    atomic_t sq_refs;                   /* structure references */
+    struct syncq *sq_next;              /* list of all elsewhere structures */
+    struct syncq **sq_prev;             /* list of all elsewhere structures */
+} syncq_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+.TP \w'\ sq_mhead\ 'u
+.I sq_lock
+Spin lock for this structure.
+.PD 0
+.TP
+.I sq_count
+Number of threads inside the exclusion barrier (negative for exclusive).
+.TP
+.I sq_owner
+The current exclusive owner (if any).
+.TP
+.I sq_waitq
+Processing waiting on
+.BR qopen "(9) or " qclose (9).
+.TP
+.I sq_ehead
+Head of event queue.
+.TP
+.I sq_etail
+Tail of event queue.
+.TP
+.I sq_qhead
+Head of service queue.
+.TP
+.I sq_qtail
+Tail of service queue.
+.TP
+.I sq_mhead
+Head of put queue.
+.TP
+.I sq_mtail
+Tail of put queue.
+.TP
+.I sq_outer
+Synchronization queue outside this one (if any).
+.PD
+.TP
+.I sq_flag
+Synchronization queue flags.
+.RS
+.TP \w'\ SQ_WAITERS\ 'u
+.B SQ_OUTER
+This is an outer barrier (for
+.IR Solaris \(rg
+compatiblity).
+.PD 0
+.TP
+.B SQ_INNER
+This is an inner barrier.
+.TP
+.B SQ_EXCLUS
+.BR qopen "(9) and " qclose (9)
+are exclusive at the outer barrier.
+.TP
+.B SQ_SHARED
+.BR put (9)
+is shared at the inner barrier.
+.TP
+.B SQ_WAITERS
+This synchronization queue has waiters.
+.TP
+.B SQ_BACKLOG
+This synchronization queue has a backlog left by non-waiters.
+.TP
+.B SQ_SCHED
+This synchronization queue is scheduled for backlog clearing.
+.PD
+.RE
+.TP
+.I sq_level
+Synchronization queue level.
+.PD 0
+.TP
+.I sq_link
+Synchronization queue schedule list.
+.TP
+.I sq_info
+Synchronization queue info.
+.TP
+.I sq_refs
+Structure references.
+.TP
+.I sq_next
+List of all elsewhere structures.
+.TP
+.I sq_prev
+List of all elsewhere structures.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B syncq
+structure is the structure that is used in Linux Fast-STREAMS to provide
+synchronization for a Stream.  The structure is named the same and has
+equivalent members to that used in
+.IR Solaris \(rg.
+.[
+solspg
+.]
+Additional members have been provided for with other SVR 4.2 MP based STREAMS
+releases and specific Linux Fast-STREAMS features.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B syncq
+structure should never be access directly by drivers or modules: the normal
+.I STREAMS
+DDI/DKI functions hould be used instead.
+.\"
+.\"
+.SH CONTEXT
+.PP
+The
+.B syncq
+structure can be access from any context where the corresponding utility
+function is permitted; however, accessing the structure directly from any
+context outside the
+.I STREAMS
+executive is strongly discouraged.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+The
+.B syncq
+structure is MP-safe when accessed using the appropriate utility functions
+and from the appropriate context.
+.\"
+.\"
+.SH NOTICES
+.PP
+Members of the
+.B syncq
+structure should not be accessed directly by
+.I STREAMS
+drivers or modules.  Portable
+.I STREAMS
+drivers and modules should, where possible, use the facilities provided for
+implementation and architectural independence.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR M_ERROR (9),
+.BR M_READ (9),
+.BR M_SIG (9),
+.BR fifo (4s),
+.BR pipe (4),
+.BR fattach (2),
+.BR msgb (9),
+.BR poll (2s),
+.BR read "(2s), " getmsg "(2s), " getpmsg "(2s), " I_RECVFD (7),
+.BR write "(2s), " putmsg "(2s), " putpmsg "(2s), " I_SENDFD (7),
+.BR ioctl (2s),
+.BR open (2s),
+.BR I_LINK (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B syncq
+structure is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The flags defined for the
+.I sd_flag
+member of the
+.B syncq
+structure are not necessarily binary compatible with any given
+implementation.
+.IP \(em
+Members with the same name as other STREAMS implementation structure members
+are not necessarily completely compatible with those implementations.
+.IP \(em
+Drivers and modules should never directly access members (anyway).
+.IP \(em
+Binary compatibility is not attempted: some degree of source compatibility is
+provided.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 EFT MP" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B syncq
+structure was introduced in
+.IR "SVR 4.2 MP" .
+.[
+svr42
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

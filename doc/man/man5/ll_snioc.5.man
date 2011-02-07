@@ -1,0 +1,475 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: ll_snioc.5.man,v 1.1.2.1 2011-02-07 02:14:40 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:40 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ll_snioc.5.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:40  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.ad b
+.hy 1
+.\"
+.\"
+.TH LL_SNIOC 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B ll_snioc
+\- LAPB or LLC2 subnetwork ID input-output control structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Logical Link Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <sys/snet/ll_control.h>
+.PP
+.nf
+\f(CW\s-1\
+struct ll_snioc {
+    uint8_t lli_type;
+    uint8_t lli_class;
+    uint8_t lli_spare[2];
+    uint32_t lli_snid;
+    uint32_t lli_index;
+    uint32_t lli_slp_snid;
+    uint32_t lli_slp_pri;
+};
+
+#define LC_LLC1          15
+#define LC_LLC2          16
+#define LC_LAPBDTE       17
+#define LC_LAPBXDTE      18
+#define LC_LAPBDCE       19
+#define LC_LAPBXDCE      20
+#define LC_LAPDTE        21
+#define LC_LAPDCE        22
+#define LC_HDLC          27
+#define LC_HDLCX         28
+
+#ifdef _SUN_SOURCE
+#define LI_SPPA         LI_SNID
+#define lli_ppa         lli_snid
+#endif
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The members of the
+.B ll_snioc
+structure include:
+.TP \w'\ lli_slp_snid\(em'u
+.I lli_type
+The type of LLI structure: always \fB\)LI_SNID\fP.
+.PD 0
+.TP
+.I lli_class
+The class of the link.
+.TP
+.I lli_spare
+Spare bytes for alignment.
+.TP
+.I lli_snid
+The subnetwork (link) identifier.
+.TP
+.I lli_index
+The multiplexing driver link index.
+.TP
+.I lli_slp_snid
+The SLP subnetwork identifier for MLP.
+.TP
+.I lli_slp_pri
+The SLP priority for MLP.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B ll_snioc
+structure is used to provide subnetwork (link) identifier and related
+information for use with the
+.BR L_GETSNID "(7) and " L_SETSNID (7)
+input-output control commands from the
+.IR "Logical Link Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7).
+.PP
+The
+.B ll_snioc
+structure, and the corresponding input-output controls, are used primarily by
+the
+.BR linkadd "(8) and " linklist (8)
+utilities,
+but may be used directly by user-space programs.
+.PP
+There is one shared structure that is used for MLP, LAP/LAPB and LLC1/LLC2.
+.PP
+The members of the
+.B ll_snioc
+structure are described as follows:
+.TP
+.I lli_type
+Specifies the type of the structure.  For the
+.B ll_snioc
+structure, this member is always set to
+.BR LI_SNID .
+.TP
+.I lli_class
+Specifies or indicates the class of the link or subnetwork connection.  This
+member can have one of the following values:
+.RS
+.TP
+.B LC_LLC1
+Logical Link Control Type 1 (LLC1 \(em connectionless).
+.TP
+.B LC_LLC2
+Logical Link Control Type 2 (LLC2 \(em connection oriented).
+.TP
+.B LC_LAPBDTE
+Link Access Protocol Balanced (LAPB) Data Terminal Equipment (DTE).
+.TP
+.B LC_LAPBXDTE
+Link Access Protocol Balanced (LAPB) Data Terminal Equipment (DTE), extended.
+.TP
+.B LC_LAPBDCE
+Link Access Protocol Balanced (LAPB) Data Control Equipment (DCE).
+.TP
+.B LC_LAPBXDCE
+Link Access Protocol Balanced (LAPB) Data Control Equipment (DCE), extended.
+.TP
+.B LC_LAPDTE
+Link Access Protocol (LAP) Data Terminal Equipment (DTE).
+.TP
+.B LC_LAPDCE
+Link Access Protocol (LAP) Data Control Equipment (DCE).
+.TP
+.B LC_HDLC
+High-Level Data Link Control (HDLC).
+.TP
+.B LC_HDLCX
+High-Level Data Link Control (HDLC), extended.
+.RE
+.TP
+.I lli_spare
+Spare bytes for alignment.  These bytes are coded zero (0) by the initiator
+and ignored by the responder.
+.TP
+.I lli_snid
+The subnetwork (link) ID.
+.TP
+.I lli_index
+The index of the link under a multiplexing driver.  This is the value that
+was returned by the
+.BR I_LINK "(7) or " I_PLINK (7)
+input-output control when the link was linked under a multiplexing driver.
+.TP
+.I lli_slp_snid
+When the link is an MLP link, this is the subnetwork (link) identifier of the
+SLP link being referenced.
+.TP
+.I lli_slp_pri
+When the link is an MLP link, this is the priority of the SLP link within the
+MLP multi-link.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/snet/ll_proto.h
+Defines the link classes.
+.TP
+.B @includedir@/snet/ll_control.h
+Defines the
+.B ll_snioc
+structure.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR linkadd (8),
+.BR linkdel (8),
+.BR linklist (8),
+.BR L_SETSNID (7),
+.BR L_GETSNID (7),
+.BR lli (7).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B ll_snioc
+structure has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B ll_snioc
+structure is compatible with
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+and implementations based on
+.IR "SpiderX25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.B @PACKAGE_TITLE@
+is not directly compatible with
+.IR "Solstice 9.2" ,
+.[
+solx25dg
+.]
+in that this data structure is described as:
+.RS
+.PP
+.nf
+\f(CW\s-1\
+struct ll_snioc {
+    uint8_t lli_type;      /* Table type = LI_SPPA */
+    uint8_t lli_class;     /* DTE/DCE/extended */
+    uint16_t lli_slp_pri;  /* SLP priority */
+    uint32_t lli_ppa;      /* PPA/Subnetwork ID character */
+    uint32_t lli_index;    /* Link index */
+};
+\s+1\fP
+.fi
+.TP
+.I lli_type
+The table type.  This should always be \fB\)LI_SPPA\fP.
+.PD 0
+.TP
+.I lli_class
+This indicates the type of link.  \fB\)LC_LLC2\fP must be used for LLC2;
+\fB\)LC_LAPBDTE\fP or \fB\)LC_LAPBDCE\fP must be used for LAPB.  The file
+.B @includedir@/snet/ll_proto.h
+contains a complete list of values.
+.TP
+.I lli_slp_pri
+This determines the priority of SLP when MLP is used.
+.TP
+.I lli_ppa
+The PPA identifier.
+.TP
+.I lli_index
+The link index.  This must be set with the
+.I muxid
+value returned by the
+.BR I_LINK (7)
+input-output control when LAPB is placed over a serial driver.
+.PD
+.PP
+Of course, the member \fI\)lli_slp_snid\fP is not provided and the member
+\fI\)lli_snid\fP is always called \fI\)lli_ppa\fP.  This does not directly
+cause source compatibility issues, just binary compatibility issues.
+.RE
+.PP
+For additional compatibility information see,
+.BR lapb (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7),
+structures are not standardized; however,
+.B @PACKAGE_TITLE@
+conforms to
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B ll_snioc
+structure first appeared in
+.IR "Spider X.25" .
+.[
+spiderx25
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

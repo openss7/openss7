@@ -1,0 +1,546 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: rmsf.8.man,v 1.1.2.1 2011-02-07 02:14:43 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:43 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: rmsf.8.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:43  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH RMSF 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B rmsf
+\- remove a special (device) file
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fBrmsf\fP\ 'u
+\fBrmsf \fR[\fB-a\fR|\fB-k\fR] [\fB-D\0\fIdirectory\fR] [\fB-q\fR|\fB-v\fR] \fIspecial_file\fR\0\fI...\fR
+.PD 0
+.HP
+\fBrmsf \fR[\fB-C\0\fIclass\fR|\fB-d\0\fIdriver\fR] [\fB-D\0\fIdirectory\fR] \fB-H\0\fIhw_path\fR [\fB-k\fR] [\fB-q\fR|\fB-v\fR]
+.HP
+\fBrmsf\fR {\fB-h\fR|\fB--help\fR}
+.HP
+\fBrmsf\fR {\fB-V\fR|\fB--version\fR}
+.HP
+\fBrmsf\fR {\fB-C\fR|\fB--copying\fR}
+.PD
+.ad b
+.hy 1
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B rmsf
+command removes one or more special files from the
+.B /dev
+directory and potentially removes information about the associated device or
+devices with hardware type
+.I \(lqDEVICE\(rq
+(see
+.BR ioscan (8))
+from the system.
+.PP
+When no options are specified,
+.B rmsf
+removes only the special files,
+.IR special_files ,
+specified on the command line.
+.PP
+The
+.B -k
+option causes
+.B rmsf
+to remove the definition of the device from the system without removing any
+special files.
+.PP
+The
+.B -a
+option causes
+.B rmsf
+to remove the device definition, and all special files that map to it from
+the
+.B /dev
+directory (or the directory specified with the
+.B -D
+option).
+Note that if special file,
+.IR special_file ,
+belongs to a node for which the hardware type is not
+.IR \(lqDEVICE\(rq ,
+the device definition will not be removed from the system and the special
+file,
+.IR special_file ,
+will be removed if it is a leaf node.
+.PP
+If a
+.BI -H " hw_path
+is specified, special files are removed as follows:
+.IP \(bu \w'\(bu\(em'u
+If hardware path,
+.IR hw_path ,
+belongs to a node with hardware type
+.IR \(lqDEVICE\(rq ,
+all special files mapping to devices at that hardware path and the system
+definition of those devices are removed.
+.IP \(bu
+If hardware path,
+.IR hw_path ,
+belongs to a node for which hardware type is not
+.IR \(lqDEVICE\(rq ,
+then, a special file is removed as follows:
+.RS
+.IP \(em \w'\(em\(em'u
+When it is a leaf node, only special files for that node will be removed.
+.IP \(em
+When the node has children, a warning message will be issued and system
+definition of all the child devices and their special files are removed.
+.RE
+.PP
+The
+.BR -C " and " -d
+options remove only those special files that are associated with the given
+device driver or that belong to the given device class, respectively.  This
+useful when there is more than one type of special file mapped to a single
+hardware path.
+.PP
+If the
+.B -k
+option is specified, the defintion of all devices at that hardware path
+are removed from the system, again without removing any special files.
+.PP
+Normally,
+.B rmsf
+displays a message as the special files are deleted for each driver.  The
+.B -q
+(quiet) option suppresses the deletion message.
+The
+.B -v
+(verbose) option displays the deletion message and the name of each special
+file as it is deleted.
+.PP
+Note that most drivers do not support the ability to be removed from the
+system.
+.PP
+When the device being removed from the system uses a dynamically assigned
+major number, that number will be freed up for future allocation.
+.\"
+.\"
+.SH OPTIONS
+.PP
+.B rmsf
+recognizes the following options:
+.TP
+.BR -a ", " --all
+Remove the definition of the device from the system along with all special
+files that refer to the device.  This option cannot be used with
+.BR -k .
+.TP
+.BR -C ", " --class " \fI\)class\fP
+Match devices that belong to a given device class, class.  Device classes can
+be listed with the
+.BR lsdev (8)
+command).  They are defined in files in the directory
+.BR /usr/conf/master.d .
+This option cannot be used with
+.BR -d .
+.TP
+.BR -d ", " --driver " \fI\)driver\fP
+Matches devices that are controlled by the specified device driver,
+.IR driver .
+Device drivers can be listed with the
+.BR lsdev (8)
+command.  They are defined in files in the directory
+.BR /usr/conf/master.d .
+This option cannot be used with
+.BR -c .
+.TP
+.BR -D ", " --directory " \fI\)directory\fP
+Override the default device installation directory,
+.BR /dev ,
+and remove the special files from the directory,
+.IR directory ,
+instead.  The directory,
+.IR directory ,
+must exist; otherwise,
+.B rmsf
+displays an error message and exits.  See
+.RI \(lq WARNINGS \(rq.
+.TP
+.BR -H ", " --hwpath " \fI\)hw_path\fP
+Match devices at a given hardware path,
+.IR hw_path .
+Hardware paths can be listed with the
+.BR ioscan (8)
+command.  A hardware path specifies the addresses of the hardware components
+leading to a device.  It consists of a string of numbers separated by periods
+.RB ( . ),
+such as 52 (a card), 52.3 (a target address), and 52.3.0 (a device).  If a
+hardware component is a bus converter, the following period, if any, is
+replaced by a slash
+.RB ( / )
+as in 2, 2/3, and 2/3.0.
+.TP
+.BR -k ", " --keep
+Remove the definition of the device from the system, but not any special
+files.  This option cannot be used with
+.BR -a .
+.TP
+.BR -q ", " --quiet
+Quiet option.  Normally,
+.B rmsf
+displays a message as each driver is removed.  This option supresses the
+driver message, but not error messages.  See the
+.B -v
+option.
+.TP
+.BR -v ", " --verbose
+Verbose option.  In addition to the normal processing message, display the
+name of each special file as it is removed.  See the
+.B -q
+option.  Print the names of the files as
+.B rmsf
+is removing them.
+.TP
+.BR -h ", " --help
+When this option is encountered,
+.B rmsf
+displays usage information on
+.I stdout
+and exits.  No further processing of options or arguments is performed and no
+actions are taken.
+.TP
+.BR -V ", " --version
+When this option is encountered,
+.B rmsf
+displays version information on
+.I stdout
+and exits.  No further processing of options or arguments is performed and no
+actions are taken.
+.TP
+.BR -c ", " --copying
+When this option is encountered,
+.B rmsf
+displays copying and copyright information on
+.I stdout
+and exits.  No further processing of options or arguments is performed and no
+actions are taken.
+.\"
+.\"
+.SH EXIT STATUS
+.PP
+.B rmsf
+exits with one of the following values:
+.TP
+.B 0
+Successful completion, including warning diagnostics.
+.TP
+.B 1
+Failure.  An error occurred.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+Most of the diagnostic messages from
+.B rmsf
+are self-explanatory.  Listed below are some messages deserving further
+clarification.  Errors cause
+.B rmsf
+to halt immediately.  Warnings allow the program to continue.
+.\"
+.SS Errors
+.TP
+No such device in the system
+No device in the system matched the options specified.  Use
+.BR ioscan (8)
+to list the devices in the system.
+.TP
+.IR special_file " is not a special file
+The file is not associated with an I/O device.
+.\"
+.SS Warnings
+.TP
+WARNING: The specified hardware path is BUS_NEXUS/INTERFACE type.
+.PD 0
+.TP
+This will remove all devices connected to it.
+.PD
+The H/W type of the node specified by the hardware path,
+.IR hw_path ,
+is BUS_NEXUS/INTERFACE.  All the devices under this path will be removed.
+.TP
+.RI "Cannot remove driver at " hw_path
+The defintion of the device located at the hardware path,
+.IR hw_path ,
+and controlled by driver,
+.IR driver ,
+cannot be removed from the kernel.  That is, driver,
+.IR driver ,
+does not support the unbind function.
+.TP
+.RI "No device associated with " special_file
+The special file,
+.IR special_file ,
+does not map to a device in the system; the file is removed unless the
+.B -k
+option was specified.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B rmsf
+is compatible only with
+.I Linux Fast-STREAMS
+devices.
+The command will not function with regular
+.B Linux
+devices.
+.PP
+Most commands and sybsystems assume their device files are in
+.BR /dev ,
+therefore the use of the
+.B -D
+option is discouraged.
+.PP
+Most device drivers do not support the unbind operation necessary to remove
+the device from the system.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Remove the special file
+.B mux0
+from the current directory:
+.sp
+.nf
+\fC\s-1\
+rmsf ./mux0
+\s+1\fP
+.fi
+.PP
+Remove the system definition of the device associated with
+.B /dev/lp0
+along with all special files that refer to the device:
+.sp
+.nf
+\fC\s-1\
+rmsf -a /dev/lp0
+\s+1\fP
+.fi
+.PP
+Remove the system definitions for all devices associated with hardware path
+.BR 52.6.0 :
+.sp
+.nf
+\fC\s-1\
+rmsf -k -H 52.6.0
+\s+1\fP
+.fi
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /sbin/rmsf
+contains the
+.B rmsf
+command.
+.TP
+.B /dev/config
+I/O system special file
+.TP
+.B /dev/ioconfig
+I/O system configuration database
+.TP
+.B /usr/conf/master.d/*
+device configuration files
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR rm (1),
+.BR insf (8),
+.BR ioscan (8),
+.BR lsdev (8),
+.BR lssf (8),
+.BR mksf (8),
+.BR ioconfig (4).
+.\"
+.\"
+.SH BUGS
+.PP
+.B rmsf
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B rmsf
+command is provided for compatibility with the
+.IR HP-UX \(rg
+command of the same name,
+.[
+hpuxdoc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B rmsf
+is provided only for compatibility with
+.IR HP-UX \(rg
+for
+.I Linux Fast-STREAMS
+devices.
+The command will not function with regular
+.B Linux
+devices.
+.IP \(em
+Options
+.BR -h ", " -V " and " -c ,
+all long options, are specific to this
+.I @PACKAGE_TITLE@
+implementation of
+.B rmsf
+and should not be used by portable applications.
+.IP \(em
+No other implementation documents the
+.BR -h ", " -V " or -c
+options.  They should not be used by portable applications.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR HP-UX \(rg
+documentation.
+.[
+hpuxdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B rmsf
+was developed by HP.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

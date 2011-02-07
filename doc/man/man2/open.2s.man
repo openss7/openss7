@@ -1,0 +1,773 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: open.2s.man,v 1.1.2.1 2011-02-07 02:14:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:39 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: open.2s.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:39  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH OPEN 2S "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System Calls"
+.\"
+.\"
+.SH NAME
+.B open
+\- open a file
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <sys/stat.h>
+.BR
+.B #include <fcntl.h>
+.HP 8
+.BI "int open(const char *" path ", int " oflag ", ... );
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+.TP
+.I path
+the filesystem path to the file to open.
+.PD 0
+.TP
+.I oflag
+open flags.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.BR open ()
+function shall establish the connection between a file and a file descriptor.
+It shall create an open file description that refers to a file and a file
+descriptor that refers to that open file description.  The file descriptor is
+used by other I/O functions to refer to that file.  The
+.I path
+argument points to a pathname naming the file.
+.PP
+The
+.BR open ()
+function shall return a file descriptor for the named file that is the lowest
+file descriptor not currently open for that process.  The open file
+description is new, and therefore the file descriptor shall not share it with
+any other process in the system.  The
+.B FD_CLOEXEC
+file descriptor flag associated with the new file descriptor shall be cleared.
+.PP
+The file offset used to mark the current position of the open file
+description shall be set according to then value of
+.IR oflag .
+.\"
+.\"
+.SS FLAGS
+.PP
+Values for
+.I oflag
+are constructed by a bitwise-inclusive OR of flags from the following list,
+defined in
+.BR <fcntl.h> .
+Applications shall specify exactly one of the first three values (file access
+modes) below in the value of
+.IR oflag :
+.TP \w'[O_NONBLOCK]\(em'u
+.B O_RDONLY
+Open for reading only.
+.TP
+.B O_WRONLY
+Open for writing only.
+.TP
+.B O_RDWR
+Open for reading and writing.  The result is undefined if this flag is
+applied to a FIFO.
+.PP
+Any combination of the following may be used:
+.TP \w'[O_NONBLOCK]\(em'u
+.B O_APPEND
+When set, the file offset shall be set to the end of the file prior to each
+write.
+.TP
+.B O_ASYNC
+Enable signal-driven I/O: generate a signal
+.RI ({ SIGIO }
+by default, but this can be changed with
+.BR fcntl (2))
+when input or output becomes possible on this file descriptor.  This feature
+is only available for terminals, pseudo-terminals, sockets, and (since Linux
+2.6) pipes, FIFOs and
+.IR STREAMS .
+See
+.BR fcntl (2)
+for further details.
+.TP
+.B O_CLOEXEC
+(Since Linux 2.6.23) Enable the close-on-exec flag for the new file
+descriptor.  Specifying this flag permits a program to avoid an additional
+.BR fcntl (2)
+.B F_SETFD
+operation to set the
+.B FD_CLOEXEC
+flag.  Additionally, use of this flag is essential in some multithreaded
+programs since using a separate
+.BR fcntl (2)
+.B F_SETFD
+operation to set the
+.B FD_CLOEXEC
+flag does not suffice to avoid race conditions where one thread opens a file
+descriptor at the same time as another thread does a
+.BR fork (2)
+plus
+.BR execve (2).
+.TP
+.B O_CREAT
+When the file exists, this flag has no effect as noted under
+.B O_EXCL
+below.  Otherwise, the file shall be created; the user ID of the file shall
+be set to the effective user ID of the process; the group ID of the file
+shall be set to the group ID of the file's parent directory or to the
+effective group ID of the process; and the access permission bits (see
+.BR <sys/stat.h> )
+of the file mode shall be set to the value of the third argument taken as
+type
+.B mode_t
+modified as follows: a bitwise AND is performed on the file-mode bits and the
+corresponding bits in the complement of the process' file mode creation mask.
+Thus, all bits in the file mode whose corresponding bit in the file mode
+creation mask is set are cleared.  When bits other than the file permission
+bits are set, the effect is unspecified.  The third argument does not affect
+whether the file is open for reading, writing, or for both.  Implementations
+shall provide a way to initialize the file's group ID to the group ID of the
+parent directory.  Implementations may, but need not, provide an
+implementation-defined way to initialize the file's group ID to the effective
+group ID of the calling process.
+.TP
+.B O_DIRECT
+(Since Linux 2.4.10)
+Try to minimize cache effects of the I/O to and from this file.  In general
+this will degrade performance, but it is useful in special situations, such
+as when applications do their own caching.  File I/O is done directly to and
+from user space buffers.  The I/O is synchronous, that is, at the completion
+of a
+.BR read (2s)
+or
+.BR write (2s),
+data is guaranteed to have been transferred.
+.TP
+.B O_DIRECTORY
+When
+.I path
+is not a directory, cause the open to fail.  This flag is Linux-specific, and
+was added in kernel version 2.1.126 to avoid denial-of-service problems when
+.BR opendir (3)
+is called on a FIFO or tape device, but should not be used outside of the
+implementation of
+.BR opendir (3).
+.TP
+.B O_DSYNC
+Write I/O operations on the file descriptor shall complete as defined by
+synchronized I/O data integrity completion.
+.TP
+.B O_EXCL
+When
+.BR O_CREAT " and " O_EXCL
+are set,
+.BR open ()
+shall fail if the file exists.  The check for the existence of the file and
+the creation of the file if it does not exist shall be atomic with respect to
+other threads executing
+.BR open ()
+naming the same filename in the same directory with
+.BR O_EXCL " and " O_CREAT
+set.  When
+.BR O_EXCL " and " O_CREAT
+are set, and
+.I path
+names a symbolic link,
+.BR open ()
+shall fail and set
+.IR errno (3)
+to
+.RB [ EEXIST ],
+regardless of the contents of the symbolic link.  When
+.B O_EXCL
+is set and
+.B O_CREAT
+is not set, the result is undefined.
+.TP
+.B O_LARGEFILE
+Allow files whose sizes cannot be represented by an
+.B off_t
+(but can be represented by
+.BR off64_t )
+to be opened.  The
+.B _LARGEFILE64_SOURCE
+macro must be defined to obtain this definition.  Setting the
+.B _FILE_OFFSET_BITS
+feature test macro to 64 (rather than using
+.BR O_LARGEFILE )
+is the preferred method of accessing large files on 32-bit systems (see
+.BR feature_test_macros (7)).
+.TP
+.B O_NOATIME
+(Since Linux 2.6.8)
+Do not update the file last access time
+.RI ( st_atime
+in the inode) when this file processes
+.BR read (2s).
+This flag is intended for use by indexing or backup programs, where it use
+can significantly reduce the amount of disk activity.  This flag may not be
+effective on all file systems.  One example is NFS, where the server
+maintains the access time.
+.TP
+.B O_NOCTTY
+When set and
+.I path
+identifies a terminal device,
+.BR open ()
+shall not cause the terminal device to become the controlling terminal for
+the process.
+.TP
+.B O_NOFOLLOW
+When
+.I path
+is a symbolic link, then the open fails.  This is a FreeBSD extension, which
+was added to Linux in version 2.1.126.  Symbolic links in earlier components
+of the pathname will still be followed.
+.TP
+.BR O_NONBLOCK " or " O_NDELAY
+When opening a
+.BR fifo "(4s) with " O_RDONLY " or " O_WRONLY
+set:
+.RS
+.IP \(em \w'\(em\(em'u
+When
+.B O_NONBLOCK
+is set, an
+.BR open ()
+for reading-only shall return without delay.  An
+.BR open ()
+for writing-only shall return an error when no process currently has the file
+open for reading.
+.IP \(em
+When
+.B O_NONBLOCK
+is clear, an
+.BR open ()
+for reading-only shall block the calling thread until a thread opens the file
+for writing.  An
+.BR open ()
+for writing-only shall block the calling thread until a thread opens the file
+for reading.
+.RE
+.IP
+When opening a block special or character special file that supports
+non-blocking opens:
+.RS
+.IP \(em \w'\(em\(em'u
+When
+.B O_NONBLOCK
+is set, the
+.BR open ()
+function shall return without blocking for the device to be ready or
+available.  Subsequent behaviour of the device is device-specific.
+.IP \(em
+When
+.B O_NONBLOCK
+is clear, the
+.BR open ()
+function shall block the calling thread until the device is ready or
+available before returning.
+.RE
+.IP
+Otherwise, the behaviour of
+.B O_NONBLOCK
+is unspecified.
+.TP
+.B O_RSYNC
+Read I/O operations on the file descriptor shall complete at the same level
+of integrity as specified by the
+.BR O_DSYNC " and " O_SYNC
+flags.  When both
+.BR O_DSYNC " and " O_RSYNC
+are set in
+.IR oflag ,
+all I/O operations on the file descriptor shall complete as defined by
+synchronized I/O data integrity completion.  When both
+.BR O_SYNC " and " O_RSYNC
+are set in
+.IR oflag ,
+all I/O operations on the file descriptor shall complete as defined by
+synchronized I/O file integrity completion.
+.TP
+.B O_SYNC
+Write I/O operations on the file descriptor shall complete as defined by
+synchronized I/O file integrity completion.
+.TP
+.B O_TRUNC
+When the file exists and is a regular file, and the file is successfully
+opened for
+.BR O_RDWR " or " O_WRONLY ,
+its length shall be truncated to zero
+.RB ( 0 ),
+and the mode and owner shall be unchanged.  It shall have no effect on
+.BR fifo (4s)
+special files or terminal device files.  Its effect on other file types is
+implementation-defined.  The result of using
+.BR O_TRUNC " with " O_RDONLY
+is undefined.
+.PP
+When
+.B O_CREAT
+is set and the file did not previously exist, upon successful completion,
+.BR open ()
+shall mark for update the
+.IR st_ctime " and " st_mtime
+fields of the file.
+.PP
+When
+.B O_TRUNC
+is set and the file did previously exist, upon successful completion,
+.BR open ()
+shall mark for update the
+.IR st_ctime " and " st_mtime
+fields of the file.
+.PP
+When both
+.BR O_SYNC " and " O_DSYNC
+flags are set, the effect is as if only the
+.B O_SYNC
+flag was set.
+.PP
+When
+.I path
+refers to a
+.I STREAMS
+file,
+.I oflag
+may be constructed from
+.B O_NONBLOCK
+OR'ed with either
+.BR O_RDONLY ", " O_WRONLY " or " O_RDWR .
+Other flag values are not applicable to
+.I STREAMS
+devices and shall have no effect on them.  The value
+.B O_NONBLOCK
+affects the operation of
+.I STREAMS
+drivers and certain functions applied to file descriptors associated with
+.I STREAMS
+files.  For
+.I STREAMS
+drivers, the implementation of
+.B O_NONBLOCK
+is device-specific.
+.PP
+When
+.I path
+names the master side of a pseudo-terminal device, then it is unspecified
+whether
+.BR open ()
+locks the slave side so that it cannot be opened.  Conforming applications
+shall call
+.BR unlockpt ()
+before opening the slave side.
+.PP
+The largest value that can be represented correctly in an object of type
+.B off_t
+shall be established as the offset maximum in the open file description.
+.\"
+.\"
+.SH "RETURN VALUE"
+.PP
+Upon successful completion, the function shall open the file and return a
+non-negative integer representing the lowest numbered unused file descriptor.
+Otherwise, minus one
+.RB ( -1 )
+shall be returned an
+.IR errno (3)
+shall be set to indicate the error.  No files shall be created or modified
+when the function returns minus one
+.RB ( -1 ).
+.\"
+.\"
+.SH ERRORS
+.PP
+The
+.BR open ()
+function shall fail when:
+.TP \w'[ENAMETOOLONG]\(em'u
+.RB [ EACCES ]
+Search permission is denied on a component of the path prefix, or the file
+exists and the permissions specified by
+.I oflag
+are denied, or the file does not exist and write permission is denied for the
+parent directory of the file to be crated, or
+.B O_TRUNC
+is specified and write permission is denied.
+.TP
+.RB [ EEXIST ]
+.BR O_CREAT " and " O_EXCL
+are set, and the named file exists.
+.TP
+.RB [ EINTR ]
+A signal was caught during
+.BR open ().
+.TP
+.RB [ EINVAL ]
+The implementation does not support synchronized I/O for this file.
+.TP
+.RB [ EIO ]
+The path argument names a
+.I STREAMS
+file and a hangup or error occurred during the
+.BR open ().
+.TP
+.RB [ EISDIR ]
+The named file is a directory and
+.I oflag
+includes
+.BR O_WRONLY " or " O_RDWR .
+.TP
+.RB [ ELOOP ]
+A loop exists in symbolic links encountered during resolution of the
+.I path
+argument.
+.TP
+.RB [ EMFILE ]
+.RI { OPEN_MAX }
+file descriptors are currently open in the calling process.
+.TP
+.RB [ ENAMETOOLONG ]
+The length of the path argument exceeds
+.RI { PATH_MAX }
+or a pathname component is longer than
+.RI { NAME_MAX }.
+.TP
+.RB [ ENFILE ]
+The maximum allowable number of files is currently open in the system.
+.TP
+.RB [ ENOENT ]
+.B O_CREAT
+is not set and the named file does not exist; or
+.B O_CREAT
+is set and either the
+.I path
+prefix does not exist or the
+.I path
+argument points to an empty string.
+.TP
+.RB [ ENOSR ]
+The
+.I path
+argument names a
+.IR STREAMS -based
+file and the system is unable to allocate a Stream.
+.TP
+.RB [ ENOSPC ]
+The directory or file system that would contain the new file cannot be
+expanded, the file does not exist, and
+.B O_CREAT
+is specified.
+.TP
+.RB [ ENOTDIR ]
+A component of the path prefix is not a directory.
+.TP
+.RB [ ENXIO ]
+.B O_NONBLOCK
+is set, the named file is a
+.BR fifo (4s),
+.B O_WRONLY
+is set, and no process has the file open for reading.
+.TP
+.RB [ ENXIO ]
+The named file is a character special or block special file, and the device
+associated with this special file does not exist.
+.TP
+.RB [ EOVERFLOW ]
+The named file is a regular file and the size of the file cannot be
+represented correctly in an object of type
+.BR off_t .
+.TP
+.RB [ EROFS ]
+The named file resides on a read-only file system and either
+.BR O_WRONLY ", " O_RDWR ", " O_CREAT
+(when the file does not exist), or
+.B O_TRUNC
+is set in the
+.I oflag
+argument.
+.PP
+The
+.BR open ()
+function may fail when:
+.TP \w'[ENAMETOOLONG]\(em'u
+.RB [ EAGAIN ]
+The
+.I path
+argument names the slave side of a pseudo-terminal device that is locked.
+.TP
+.RB [ EINVAL ]
+The value of the
+.I oflag
+argument is not valid.
+.TP
+.RB [ ELOOP ]
+More than
+.RI { SYMLOOP_MAX }
+symbolic links were encountered during resolution of the
+.I path
+argument.
+.TP
+.RB [ ENAMETOOLONG ]
+As a result of encountering a symbolic link in resolution of the
+.I path
+argument, the length of the substituted pathname string exceeded
+.RI { PATH_MAX }.
+.TP
+.RB [ ENOMEM ]
+The path argument names a
+.I STREAMS
+file and the system is unable to allocate resources.
+.TP
+.RB [ ETXTBSY ]
+The file is a pure procedure (shared text) file that is being executed and
+.I oflag
+is
+.BR O_WRONLY " or " O_RDWR .
+.\"
+.\"
+.SH MT-LEVEL
+.PP
+.BR open ()
+is MT-safe.
+.\"
+.\"
+.SH NOTICES
+.PP
+Features for
+.I STREAMS
+is only supported by
+.B @PACKAGE_TITLE@\c
+.
+.[
+@PACKAGE@-@VERSION@
+.]
+.\"
+.\"
+.SH BUGS
+.PP
+.BR open ()
+has no known bugs.
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR chmod (2),
+.BR close (2s),
+.BR creat (2),
+.BR dup (2),
+.BR fcntl (2),
+.BR lseek (2),
+.BR read (2s),
+.BR umask (2),
+.BR unlockpt (3),
+.BR write (2s),
+.BR fork (2),
+.BR execve (2).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR open ()
+is compatible with SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX,
+.IR Solaris \(rg
+and
+.IR UnixWare \(rg
+with the following exceptions:
+.IP \(em \w'\(em\(em'u
+.BR O_ASYNC ", " O_CLOEXEC ", " O_DIRECT ", " O_DIRECTORY ", " O_LARGEFILE ", "
+.BR O_NOATIME ", " O_NOFOLLOW
+are Linux-specific flags and will not be used by conforming applications.
+.IP \(em
+.BR O_RSYNC " and " O_DSYNC
+are not supported by Linux.
+.IP \(em
+.B @PACKAGE_TITLE@
+also supports the
+.B O_ASYNC
+flag for
+.IR STREAMS .
+.PP
+.B Linux Fast-STREAMS
+only affects the use of
+.BR open ()
+on
+.I STREAMS
+special files.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+SVID,
+.[
+svid
+.]
+XID,
+.[
+xbd5
+.]
+SUSv2,
+.[
+susv2
+.]
+SUSv3,
+.[
+susv3
+.]
+POSIX.
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manpage was written for
+.B Linux Fast-STREAMS\c
+.
+.[
+@PACKAGE@-@VERSION@
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.BR open ()
+first appeared in SVR 3.
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

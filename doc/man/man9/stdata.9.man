@@ -1,0 +1,581 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: stdata.9.man,v 1.1.2.1 2011-02-07 02:14:52 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:52 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: stdata.9.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:52  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH STDATA 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.\"
+.\"
+.SH NAME
+.B stdata
+\- \fISTREAMS\fP Stream head structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\fC\s-1
+.B #include <sys/stream.h>
+.B #include <sys/strsubr.h>
+
+struct stdata {
+    volatile unsigned long sd_flag;     /* stream head state */
+    queue_t *sd_rq;                     /* rd queue for stream head */
+    queue_t *sd_wq;                     /* wr queue for stream head */
+    dev_t sd_dev;                       /* device number of driver */
+    mblk_t *sd_iocblk;                  /* message to return for ioctl */
+    struct stdata *sd_other;            /* other stream head for pipes */
+    struct inode *sd_inode;             /* back pointer to inode */
+    rwlock_t sd_lock;                   /* structure lock for this stream */
+    rwlock_t sd_plumb;                  /* plumbing and procedure lock for this stream */
+    rwlock_t sd_freeze;                 /* lock for freezing streams */
+    struct task_struct *sd_freezer;     /* thread holding freeze lock */
+    int sd_rdopt;                       /* read options */
+    int sd_wropt;                       /* write options */
+    int sd_eropt;                       /* error options */
+    int sd_iocid;                       /* sequence id for active ioctl */
+    pid_t sd_session;                   /* controlling session id */
+    pid_t sd_pgrp;                      /* foreground process group */
+    ushort sd_wroff;                    /* write offset */
+    ushort sd_wrpad;                    /* write padding */
+    ssize_t sd_minpsz;                  /* cached sd_wq->q_next->q_minpsz */
+    ssize_t sd_maxpsz;                  /* cached sd_wq->q_next->q_maxpsz */
+    ssize_t sd_strmsgsz;                /* cached sysctl_str_strmsgsz */
+    ssize_t sd_strctlsz;                /* cached sysctl_str_strctlsz */
+    int sd_rerror;                      /* read error */
+    int sd_werror;                      /* write error */
+    int sd_opens;                       /* number of successful opens */
+    int sd_readers;                     /* number of streampipe readers */
+    int sd_writers;                     /* number of streampipe writers */
+    int sd_nstrpush;                    /* cached sysctl_str_nstrpush */
+    int sd_pushcnt;                     /* number of modules pushed */
+    int sd_nanchor;                     /* number of modules anchored */
+    unsigned long sd_sigflags;          /* signal flags */
+    struct strevent *sd_siglist;        /* list of procs for SIGPOLL */
+    struct fasync_struct *sd_fasync;    /* list of procs for SIGIO */
+    wait_queue_head_t sd_polllist;      /* waiters on poll */
+    wait_queue_head_t sd_rwaitq;        /* waiters on read/getmsg/getpmsg/I_RECVFD */
+    wait_queue_head_t sd_wwaitq;        /* waiters on write/putmsg/putpmsg/I_SENDFD */
+    wait_queue_head_t sd_hwaitq;        /* waiters on hlist bit */
+    wait_queue_head_t sd_iwaitq;        /* waiters on ioctl */
+    wait_queue_head_t sd_owaitq;        /* waiters on open bit */
+    ulong sd_closetime;                 /* queue drain wait time on close */
+    ulong sd_ioctime;                   /* time to wait for ioctl() acknowledgement */
+    struct cdevsw *sd_cdevsw;           /* device entry */
+    struct list_head sd_list;           /* list against device */
+    struct stdata *sd_clone;            /* clone streams */
+    struct stdata *sd_links;            /* linked streams */
+    struct stdata *sd_link_next;        /* next linked stream */
+    struct linkblk *sd_linkblk;         /* link block for this stream */
+    struct wantio *sd_directio;         /* direct io for this stream head */
+};
+
+typedef struct stdata stdata_t;
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The following members correspond to
+.I SVR 4.2 EFT
+members:
+.TP \w'\ sd_closetime\ 'u
+.I sd_flag
+Stream head state flags.
+.RS
+.TP \w'\ STRCRC32C\ 'u
+.B IOCWAIT
+Input-output control command in progress.
+.PD 0
+.TP
+.B RSLEEP
+Process sleeping on read.
+.TP
+.B WSLEEP
+Process sleeping on write.
+.TP
+.B STRPRI
+Priority message waiting.
+.TP
+.B STRHUP
+Stream is hung up.
+.TP
+.B STWOPEN
+Stream head open in progress.
+.TP
+.B STPLEX
+Stream is linked under a multiplexing driver.
+.TP
+.B STRISTTY
+The Stream is a terminal.
+.TP
+.B STRRDERR
+.BR M_ERROR (9)
+received for read.
+.TP
+.B STWRERR
+.BR M_ERROR (9)
+received for write.
+.TP
+.B STRCLOSE
+Waiting for strclose() to complete.
+.TP
+.B STRMREAD
+Send
+.BR M_READ (9)
+message when read issued.
+.TP
+.B STRHOLD
+Coallese written messages.
+.TP
+.B STRNDEL
+Non-STREAMS tty semantics for
+.BR O_NDELAY .
+.TP
+.B STRMSIG
+.BR M_SIG (9)
+message at head of read queue.
+.TP
+.B STRDELIM
+Generate delimited messages.
+.TP
+.B STRTOSTOP
+Stop timeout.
+.TP
+.B STRISFIFO
+Stream is a
+.BR fifo (4s).
+.TP
+.B STRISPIPE
+Stream is a
+.I STREAMS
+.BR pipe (4).
+.TP
+.B STRISSOCK
+Stream is a
+.I STREAMS
+socket.
+.TP
+.B STRMOUNT
+Stream head is attached with
+.BR fattach (2).
+.TP
+.B STRCSUM
+Checksum on copyin for write (UDP/TCP).
+.TP
+.B STRCRC32C
+Checksum on copyin for write (CRC32C).
+.TP
+.B STRSKBUFF
+Allocat sk_buffs for data at Stream head.
+.PD
+.RE
+.TP
+.I sd_rq
+Read queue of Stream head queue pair.
+.PD 0
+.TP
+.I sd_wq
+Write queue of Stream head queue pair.
+.TP
+.I sd_other
+Other Stream head (for a
+.BR pipe (4)).
+.TP
+.I sd_inode
+Inode for this Stream.
+.TP
+.I sd_rdopt
+Read options flags.
+.TP
+.I sd_wropt
+Write options flags.
+.TP
+.I sd_session
+Session id of session leader for signals.
+.TP
+.I sd_pgrp
+Process group id for signals.
+.TP
+.I sd_wroff
+Write offset for each created
+.BR msgb (9).
+.TP
+.I sd_minpsz
+Minimum packet size accepted.
+.TP
+.I sd_maxpsz
+Maximum packet size accepted.
+.TP
+.I sd_strmsgsz
+Maximum data block message size.
+.TP
+.I sd_strctlsz
+Maximum control block message size.
+.TP
+.I sd_readers
+The number of readers (Streams open for read).
+.TP
+.I sd_writers
+The number of writers (Streams open for write).
+.TP
+.I sd_nstrpush
+Maximum number of pushable modules.
+.TP
+.I sd_pushcnt
+Current number of pushable modules.
+.TP
+.I sd_sigflags
+Signal flags.
+.TP
+.I sd_closetime
+Amount of time to linger on close.
+.TP
+.I sd_ioctime
+Amount of time to await a response to an input-output control command.
+.PD
+.PP
+The following members correspond to
+.IR Solaris \(rg
+members:
+.TP \w'\ sd_closetime\ 'u
+.I sd_lock
+Structure lock for this Stream.
+.PD 0
+.TP
+.I sd_plumb
+Plumbing and procedure lock for this Stream.
+.TP
+.I sd_freeze
+Lock for freezing Streams.
+.TP
+.I sd_freezer
+Thread currently holding freeze lock.
+.TP
+.I sd_eropt
+Error options.
+.TP
+.I sd_nanchor
+Cardinal position of the pushable module anchor.
+.PD
+.PP
+The following members are
+.B @PACKAGE_TITLE@
+specific members:
+.TP \w'\ sd_closetime\ 'u
+.I sd_dev
+Device number of the driver.
+.PD 0
+.TP
+.I sd_iocblk
+Message to return for input-output control.
+.TP
+.I sd_iocid
+Sequence ID for active input-output control.
+.TP
+.I sd_wrpad
+Write padding (similar to write offset but at the tail of the message block).
+.TP
+.I sd_sigflags
+Signal flags.
+.TP
+.I sd_siglist
+List of processes to receive
+.BR SIGPOLL .
+.TP
+.I sd_fasync
+List of processes to receive
+.BR SIGIO .
+.TP
+.I sd_polllist
+Processes waiting on
+.BR poll (2s).
+.TP
+.I sd_rwaitq
+Processes waiting on
+.BR read "(2s), " getmsg "(2s), " getpmsg "(2s), " I_RECVFD (7).
+.TP
+.I sd_wwaitq
+Processes waiting on
+.BR write "(2s), " putmsg "(2s), " putpmsg "(2s), " I_SENDFD (7).
+.TP
+.I sd_hwaitq
+Processes waiting on hlist bit.
+.TP
+.I sd_iwaitq
+Processes waiting on
+.BR ioctl (2s).
+.TP
+.I sd_owaitq
+Processes waiting on
+.BR open (2s).
+.TP
+.I sd_cdevsw
+Device of STREAMS device driver.
+.TP
+.I sd_clone
+List of clone streams for this device number.
+.TP
+.I sd_links
+List of linked streams (streams
+.BR I_LINK (7)'ed
+under this driver's multiplex for this control stream).
+.TP
+.I sd_link_next
+Next linked stream in the list (when linked).
+.TP
+.I sd_linkblk
+Link block for this stream (when linked).
+.TP
+.I sd_directio
+Direct input-output procedures for this Stream head.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS .
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B stdata
+structure is the structure that is used in Linux Fast-STREAMS to represent
+the Stream head.  This structure is named the same and has equivalent members
+to that used in
+.IR "SVR 4.2 EFT MP" .
+.[
+svr42
+.]
+Additional members have been provided for compatibility with
+.IR Solaris \(rg
+.[
+solspg
+.]
+and for compatibility with other SVR 4 based STREAMS releases and specific
+Linux Fast-STREAMS features.
+.\"
+.\"
+.SH USAGE
+.PP
+The
+.B stdata
+structure should never be access directly by drivers or modules: the normal
+.I STREAMS
+DDI/DKI functions hould be used instead.
+.\"
+.\"
+.SH CONTEXT
+.PP
+The
+.B stdata
+structure can be access from any context where the corresponding utility
+function is permitted; however, accessing the structure directly from any
+context outside the
+.I STREAMS
+executive is strongly discouraged.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+The
+.B stdata
+structure is MP-safe when accessed using the appropriate utility functions
+and from the appropriate context.
+.\"
+.\"
+.SH NOTICES
+.PP
+Members of the
+.B stdata
+structure should not be accessed directly by
+.I STREAMS
+drivers or modules.  Portable
+.I STREAMS
+drivers and modules should, where possible, use the facilities provided for
+implementation and architectural independence.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR M_ERROR (9),
+.BR M_READ (9),
+.BR M_SIG (9),
+.BR fifo (4s),
+.BR pipe (4),
+.BR fattach (2),
+.BR msgb (9),
+.BR poll (2s),
+.BR read "(2s), " getmsg "(2s), " getpmsg "(2s), " I_RECVFD (7),
+.BR write "(2s), " putmsg "(2s), " putpmsg "(2s), " I_SENDFD (7),
+.BR ioctl (2s),
+.BR open (2s),
+.BR I_LINK (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B stdata
+structure is compatible with
+.IR "SVR 4.2 MP DDI/DKI" ,
+.[
+usldk
+.]
+and systems based on
+.IR "SVR 4.2" ,
+.[
+svr42
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The flags defined for the
+.I sd_flag
+member of the
+.B stdata
+structure are not necessarily binary compatible with any given
+implementation.
+.IP \(em
+Members with the same name as other STREAMS implementation structure members
+are not necessarily completely compatible with those implementations.
+.IP \(em
+Drivers and modules should never directly access members (anyway).
+.IP \(em
+Binary compatibility is not attempted: some degree of source compatibility is
+provided.
+.PP
+See
+.BR STREAMS (9)
+for additional compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR "SVR 4.2 EFT MP" .
+.[
+svr42
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B stdata
+structure was introduced in
+.IR "SVR 3" .
+.[
+svr3
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
