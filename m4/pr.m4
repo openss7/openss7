@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:05 $
+# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:05 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +58,9 @@
 # -----------------------------------------------------------------------------
 AC_DEFUN([_AUTOPR], [dnl
     AC_REQUIRE([_DISTRO])
+    AC_MSG_NOTICE([+---------------------------+])
+    AC_MSG_NOTICE([| Problem Report Generation |])
+    AC_MSG_NOTICE([+---------------------------+])
     _AUTOPR_SETUP
     _AUTOPR_OUTPUT
 ])# _AUTOPR
@@ -134,6 +138,9 @@ AC_DEFUN([_AUTOPR_], [dnl
 # =============================================================================
 #
 # $Log: pr.m4,v $
+# Revision 1.1.2.2  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.1  2009-06-21 11:06:05  brian
 # - added files to new distro
 #
@@ -157,6 +164,7 @@ AC_DEFUN([_AUTOPR_], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

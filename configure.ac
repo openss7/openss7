@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2010-11-28 13:35:22 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-07 04:48:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:35:22 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,7 +58,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.68)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 1.1.2.9 $) $Date: 2010-11-28 13:35:22 $])
+AC_REVISION([$Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-07 04:48:31 $])
 
 AC_LANG_DEFINES_PROVIDED
 
@@ -72,7 +72,13 @@ AC_CONFIG_MACRO_DIR([m4])
 
 AC_CANONICAL_TARGET
 
+AB_INIT
+
 _DISTRO
+
+AC_MSG_NOTICE([+-------------------------+])
+AC_MSG_NOTICE([| General Autoconf Checks |])
+AC_MSG_NOTICE([+-------------------------+])
 
 AM_INIT_AUTOMAKE([gnits 1.11 dist-bzip2 no-dist-gzip std-options -Wall color-tests silent-rules tar-pax])
 AM_MAINTAINER_MODE
@@ -89,8 +95,6 @@ fi
 AM_SILENT_RULES
 
 AC_USE_SYSTEM_EXTENSIONS
-
-AB_INIT
 
 USER_CPPFLAGS="$CPPFLAGS"; unset CPPFLAGS
 USER_CFLAGS="$CFLAGS";     unset CFLAGS
@@ -288,6 +292,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.2.10  2011-02-07 04:48:31  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.9  2010-11-28 13:35:22  brian
 # - build updates and manual page corrections
 #

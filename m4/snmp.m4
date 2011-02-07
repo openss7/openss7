@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: snmp.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -130,9 +131,6 @@ AC_DEFUN([_SNMP_HEADERS], [dnl
     AC_ARG_WITH([snmp],
 	[AS_HELP_STRING([--with-snmp=HEADERS],
 	    [SNMP header directory @<:@default=$INCLUDEDIR/ucd-snmp@:>@])])
-    AC_MSG_NOTICE([+-----------------------------+])
-    AC_MSG_NOTICE([| SNMP UCD header file checks |])
-    AC_MSG_NOTICE([+-----------------------------+])
     AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [], [dnl
 	_SNMP_MSG_WARN([ucd-snmp/ucd-snmp-config.h]) ])
     AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-includes.h], [], [dnl
@@ -298,6 +296,9 @@ int deny_severity = 0;
 # =============================================================================
 #
 # $Log: snmp.m4,v $
+# Revision 1.1.2.5  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.4  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -336,6 +337,7 @@ int deny_severity = 0;
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

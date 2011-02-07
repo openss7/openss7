@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: jar.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:33 $
+# @(#) $RCSfile: jar.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-04 03:51:33 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +57,9 @@
 # _JAR
 # -----------------------------------------------------------------------------
 AC_DEFUN([_JAR], [dnl
+    AC_MSG_NOTICE([+----------------------------+])
+    AC_MSG_NOTICE([| Java JAR Generation Checks |])
+    AC_MSG_NOTICE([+----------------------------+])
     _JAR_OPTIONS
     _JAR_SETUP
     _JAR_OUTPUT
@@ -82,18 +85,12 @@ AC_DEFUN([_JAR_SETUP], [dnl
     jar_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([JAR],
 	[Java archive command. @<:@default=fastjar,jar@:>@])
-    AC_PATH_PROGS([JAR], [fastjar jar], [],
+    _BLD_PATH_PROGS([JAR], [fastjar jar], [${am_missing4_run}jar],
 	[$jar_tmp])
-    if test :"${JAR:-no}" = :no ; then
-	JAR="${am_missing4_run}jar"
-    fi
     AC_ARG_VAR([ZIP],
 	[Zip archive command. @<:@default=zip@:>@])
-    AC_PATH_PROGS([ZIP], [zip], [],
+    _BLD_PATH_PROGS([ZIP], [zip], [${am_missing4_run}zip],
 	[$jar_tmp])
-    if test :"${ZIP:-no}" = :no ; then
-	ZIP="${am_missing4_run}zip"
-    fi
 ])# _JAR_SETUP
 # =============================================================================
 
@@ -115,6 +112,9 @@ AC_DEFUN([_JAR_XXX], [dnl
 # =============================================================================
 #
 # $Log: jar.m4,v $
+# Revision 1.1.2.4  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.3  2009-07-04 03:51:33  brian
 # - updates for release
 #
@@ -126,7 +126,7 @@ AC_DEFUN([_JAR_XXX], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

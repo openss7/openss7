@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-01-18 17:11:41 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-02-07 04:48:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-18 17:11:41 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -336,19 +336,69 @@ endif
 
 noinst_LIBRARIES		+= libOS7modules.a
 
-EXTRA_libOS7modules_a_SOURCES	= src/modules/mx_sdl.c \
-				  src/modules/ch_x400p.c \
-				  src/modules/mx_x400p.c \
+# these are modules not yet strapped into this build (yes, there are lots of them)
+EXTRA_libOS7modules_a_SOURCES	= src/modules/apmod.c \
 				  src/modules/cd.c src/modules/cd.h \
 				  src/modules/cd_daed.c \
 				  src/modules/cd_hdlc.c \
-				  src/modules/hdlc.c \
-				  src/modules/m2tp.c \
 				  src/modules/cdi_mod.c \
-				  src/modules/sscop.c \
+				  src/modules/ch.c \
+				  src/modules/chmod.c \
+				  src/modules/ch_x400p.c \
+				  src/modules/dl_sl.c \
+				  src/modules/hdlc.c \
+				  src/modules/iax.c \
+				  src/modules/ip_strm_mod.c \
+				  src/modules/isos.c \
+				  src/modules/itos.c \
+				  src/modules/lapb.c \
+				  src/modules/lapd.c \
+				  src/modules/lapf.c \
+				  src/modules/m2pa_dl.c \
+				  src/modules/m2tp.c \
+				  src/modules/map_mod.c \
+				  src/modules/mapmod.c \
+				  src/modules/momod.c \
+				  src/modules/mtp3b.c \
+				  src/modules/mtp_mod.c \
+				  src/modules/mx_sdl.c \
+				  src/modules/mx_x400p.c \
+				  src/modules/npi.c \
+				  src/modules/perf.c \
+				  src/modules/rtp_ch.c \
+				  src/modules/rtp_test.c \
+				  src/modules/sccp_npi.c \
+				  src/modules/sccp_tpi.c \
+				  src/modules/s_cdi.c \
+				  src/modules/sctpstr.c \
+				  src/modules/sdl_cd.c \
+				  src/modules/sdt_cd.c \
+				  src/modules/sl_dl.c \
+				  src/modules/s_lli.c \
+				  src/modules/s_llic.c \
+				  src/modules/s_nli.c \
+				  src/modules/s_nlic.c \
 				  src/modules/sscop2.c \
-				  src/modules/m2tp.c
-libOS7modules_a_SOURCES		= src/modules/mstr.c \
+				  src/modules/sscop-mod.c \
+				  src/modules/sua_as.c \
+				  src/modules/s_wan.c \
+				  src/modules/s_wanc.c \
+				  src/modules/tab.c \
+				  src/modules/tcmod.c \
+				  src/modules/tdm_ip.c \
+				  src/modules/testboth.c \
+				  src/modules/testmod_mps.c \
+				  src/modules/tp0.c \
+				  src/modules/trmod.c \
+				  src/modules/tstmod.c \
+				  src/modules/tua_as.c \
+				  src/modules/vtoip.c \
+				  src/modules/xos.c \
+				  src/modules/xx25.c \
+				  src/modules/zaptel.c \
+				  src/modules/zaptel-mod.c
+libOS7modules_a_SOURCES		= \
+				  src/modules/mstr.c \
 				  src/modules/pckt.c \
 				  src/modules/ptem.c \
 				  src/modules/ttcompat.c \
@@ -394,7 +444,11 @@ libOS7modules_a_SOURCES		= src/modules/mstr.c \
 				  src/modules/sdl_sctp.c \
 				  src/modules/sdt_sctp.c \
 				  src/modules/sdt_tpi.c \
-				  src/modules/sl_tpi.c
+				  src/modules/sl_tpi.c \
+				  src/modules/cdi_conv.c \
+				  src/modules/dlpi_conv.c \
+				  src/modules/npi_conv.c \
+				  src/modules/tpi_conv.c
 libOS7modules_a_CPPFLAGS	= -I$(top_builddir)/src/modules -I$(top_srcdir)/src/modules \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_EXPSYMTAB)
@@ -462,50 +516,51 @@ endif
 
 noinst_LIBRARIES		+= libOS7drivers.a
 
-EXTRA_libOS7drivers_a_SOURCES	= src/drivers/cd.c \
+# these are drivers not yet strapped into this build (yes, there are lots of them)
+EXTRA_libOS7drivers_a_SOURCES	= src/drivers/cd.c src/drivers/cd.h \
+				  src/drivers/cddev.c \
+				  src/drivers/cdi.c \
+				  src/drivers/cd-llc.c \
+				  src/drivers/ch.c \
+				  src/drivers/chmux.c \
+				  src/drivers/clns-ip.c \
+				  src/drivers/clns-udp.c \
+				  src/drivers/cons.c \
+				  src/drivers/crc.c \
+				  src/drivers/dl2.c \
 				  src/drivers/dl.c src/drivers/dl.h \
-				  src/drivers/dl_ip.c \
-				  src/drivers/dlp.c \
-				  src/drivers/ip.c \
-				  src/drivers/nf.c \
-				  src/drivers/np.c src/drivers/np.h \
-				  src/drivers/tc.c \
-				  src/drivers/tr.c \
-				  src/drivers/isdn.c \
-				  src/drivers/lm.c src/drivers/lm.h \
-				  src/drivers/m2ua.c \
-				  src/drivers/mg.c \
-				  src/drivers/sl_x400p.c \
-				  src/drivers/sl_x100p.c \
-				  src/drivers/sdt_x400p.c \
-				  src/drivers/sdl_x400p.c \
-				  src/drivers/x400p_mx.c \
-				  src/drivers/cd.c src/drivers/cd.h \
-				  src/drivers/dl.c \
+				  src/drivers/dld_drv.c \
+				  src/drivers/dld_proto.c \
+				  src/drivers/dld_str.c \
 				  src/drivers/dl_dua.c \
 				  src/drivers/dl_gr303.c \
 				  src/drivers/dl_gr303ua.c \
 				  src/drivers/dl_gsma.c \
 				  src/drivers/dl_h225.c \
+				  src/drivers/dl_ip.c \
 				  src/drivers/dl_iua.c \
 				  src/drivers/dl_lapb.c \
 				  src/drivers/dl_lapd.c \
 				  src/drivers/dl_lapf.c \
+				  src/drivers/dl-llc.c \
+				  src/drivers/dl_master.c \
+				  src/drivers/dlp.c \
+				  src/drivers/dlpi.c \
 				  src/drivers/dl_v52.c \
 				  src/drivers/dl_v5ua.c \
-				  src/drivers/hdlc.c \
-				  src/drivers/sdl_acb56.c \
-				  src/drivers/sdt_acb56.c \
-				  src/drivers/sl_acb56.c \
 				  src/drivers/h225.c \
-				  src/drivers/cdi.c \
-				  src/drivers/sdtmux.c \
-				  src/drivers/slm.c \
-				  src/drivers/sscop.c \
-				  src/drivers/isua_as.c \
+				  src/drivers/hdlc.c \
+				  src/drivers/ifr.c \
+				  src/drivers/ip.c \
+				  src/drivers/isdn.c \
+				  src/drivers/ixe.c \
+				  src/drivers/lcd.c \
+				  src/drivers/ldl2.c \
+				  src/drivers/llc1.c src/drivers/llc1.h \
+				  src/drivers/llc2.c \
+				  src/drivers/llc.c \
+				  src/drivers/lm.c src/drivers/lm.h \
 				  src/drivers/m2ua.c \
-				  src/drivers/m2ua_as.c \
-				  src/drivers/m3ua_as.c \
 				  src/drivers/m3ua_asp.c src/drivers/m3ua_asp.h \
 				  src/drivers/m3ua.c src/drivers/m3ua_data.h src/drivers/m3ua.h \
 				  src/drivers/m3ua_lm.c src/drivers/m3ua_lm.h \
@@ -520,7 +575,54 @@ EXTRA_libOS7drivers_a_SOURCES	= src/drivers/cd.c \
 				  src/drivers/m3ua_spp.c \
 				  src/drivers/m3ua_ss7.c \
 				  src/drivers/m3ua_tsp.c src/drivers/m3ua_tsp.h \
-				  src/drivers/sua_as.c \
+				  src/drivers/map.c \
+				  src/drivers/matrix.c \
+				  src/drivers/mcmux.c \
+				  src/drivers/mfe.c \
+				  src/drivers/mg.c \
+				  src/drivers/mlp.c \
+				  src/drivers/mtp_mux.c \
+				  src/drivers/mtp_sm.c \
+				  src/drivers/mx.c \
+				  src/drivers/mx_mux.c \
+				  src/drivers/mxmux.c \
+				  src/drivers/nf.c \
+				  src/drivers/np.c src/drivers/np.h \
+				  src/drivers/npi.c \
+				  src/drivers/np_mtp.c \
+				  src/drivers/np_rtp.c \
+				  src/drivers/otk6.c \
+				  src/drivers/rmux.c src/drivers/rmux.h \
+				  src/drivers/rsw.c \
+				  src/drivers/rtp.c \
+				  src/drivers/sccp2.c \
+				  src/drivers/sctp_namespace.h \
+				  src/drivers/sdl_acb56.c \
+				  src/drivers/sdl_x400p.c \
+				  src/drivers/sdt_acb56.c \
+				  src/drivers/sdt_ch.c \
+				  src/drivers/sdtmux.c \
+				  src/drivers/sdt_x400p.c \
+				  src/drivers/sl_acb56.c \
+				  src/drivers/slm.c \
+				  src/drivers/sl-mux.c \
+				  src/drivers/slmux.c \
+				  src/drivers/sl_v400p.c \
+				  src/drivers/sscop.c src/drivers/sscop.h src/drivers/sscop_msgs.h \
+				  src/drivers/sscop_ip.c \
+				  src/drivers/sscop_n2.c \
+				  src/drivers/sscop_n.c \
+				  src/drivers/sscop_n_prov.h \
+				  src/drivers/sscop_n_user.c \
+				  src/drivers/sscop_prov.h \
+				  src/drivers/sscop_recv.c \
+				  src/drivers/sscop_send.h \
+				  src/drivers/sscop_t.c \
+				  src/drivers/sscop_time.c src/drivers/sscop_time.h \
+				  src/drivers/sscop_t_prov.h \
+				  src/drivers/sscop_t_user.c \
+				  src/drivers/sscop_udp.c \
+				  src/drivers/sscop_user.h \
 				  src/drivers/sua_asp.c src/drivers/sua_asp.h \
 				  src/drivers/sua.c src/drivers/sua_ctrl.h src/drivers/sua_data.h src/drivers/sua.h \
 				  src/drivers/sua_lm.c src/drivers/sua_lm.h \
@@ -534,20 +636,43 @@ EXTRA_libOS7drivers_a_SOURCES	= src/drivers/cd.c \
 				  src/drivers/sua_spp.c \
 				  src/drivers/sua_ss7.c \
 				  src/drivers/sua_tsp.c src/drivers/sua_tsp.h \
-				  src/drivers/tali.c src/drivers/tali_data.h src/drivers/tali.h \
+				  src/drivers/tali.c src/drivers/tali.h src/drivers/tali_data.h \
 				  src/drivers/tali_isup.c \
 				  src/drivers/tali_lm.c \
 				  src/drivers/tali_msgs.h \
 				  src/drivers/tali_mtp.c \
 				  src/drivers/tali_sccp.c \
-				  src/drivers/tua_as.c \
+				  src/drivers/tc.c \
+				  src/drivers/testdrv_mps.c \
+				  src/drivers/tl.c \
+				  src/drivers/tp.c \
+				  src/drivers/tr.c \
+				  src/drivers/trmux.c \
+				  src/drivers/tstdrv.c src/drivers/tstdrv.h \
 				  src/drivers/tua_asp.c src/drivers/tua_asp.h \
-				  src/drivers/tua.c src/drivers/tua_data.h src/drivers/tua.h \
-				  src/drivers/tua_msg.h \
+				  src/drivers/tua.c src/drivers/tua.h src/drivers/tua_data.h src/drivers/tua_msg.h \
 				  src/drivers/tua_sgp.c \
 				  src/drivers/tua_spp.c \
 				  src/drivers/tua_ss7.c \
-				  src/drivers/ua_msg.h
+				  src/drivers/ua.c \
+				  src/drivers/ua_dlpi.h \
+				  src/drivers/ua_msg.h \
+				  src/drivers/ua_mtp.h \
+				  src/drivers/ua_npi.h \
+				  src/drivers/ua_sl.h \
+				  src/drivers/ua_tci.h \
+				  src/drivers/ua_tpi.h \
+				  src/drivers/ua_tri.h \
+				  src/drivers/v401p.c \
+				  src/drivers/vf.c \
+				  src/drivers/wan.c \
+				  src/drivers/x100p.c \
+				  src/drivers/x25-llc.c \
+				  src/drivers/x400p.c \
+				  src/drivers/x400p_mx.c src/drivers/x400pfw.h \
+				  src/drivers/zap.c \
+				  src/drivers/zapmux.c \
+				  src/drivers/zaptel.c src/drivers/zaptel.h
 libOS7drivers_a_SOURCES		= src/drivers/pty.c \
 				  src/drivers/debug.h \
 				  src/drivers/ip_to_dlpi.c \
@@ -669,51 +794,24 @@ endif
 
 noinst_LIBRARIES		+= libOS7sctp.a
 
-EXTRA_libOS7sctp_a_SOURCES	= src/drivers/sctp.c \
-				  src/drivers/sctp_cache.c \
-				  src/drivers/sctp_cookie.c \
-				  src/drivers/sctp_hash.c \
-				  src/drivers/sctp_input.c \
-				  src/drivers/sctp_msg.c \
-				  src/drivers/sctp_n.c \
-				  src/drivers/sctp_output.c \
-				  src/drivers/sctp_route.c \
-				  src/drivers/sctp_t.c \
-				  src/drivers/sctp_md5.c \
-				  src/drivers/sctp_hmac_md5.c \
-				  src/drivers/sctp_sha1.c \
-				  src/drivers/sctp_hmac_sha1.c \
-				  src/drivers/sctp_crc32c.c \
-				  src/drivers/sctp_md5.h \
-				  src/drivers/sctp_hmac_md5.h \
-				  src/drivers/sctp_sha1.h \
-				  src/drivers/sctp_hmac_sha1.h \
-				  src/drivers/sctp_crc32c.h \
-				  src/drivers/sctp_cache.h \
-				  src/drivers/sctp_cookie.h \
-				  src/drivers/sctp_defs.h \
-				  src/drivers/sctp.h \
-				  src/drivers/sctp_hash.h \
-				  src/drivers/sctp_input.h \
-				  src/drivers/sctp_msg.h \
-				  src/drivers/sctp_n.h \
-				  src/drivers/sctp_output.h \
-				  src/drivers/sctp_route.h \
-				  src/drivers/sctp_t.h
-libOS7sctp_a_SOURCES		= src/drivers/sctp2.c \
-				  src/drivers/sctp_compat.h \
-				  src/drivers/sctp_md5.c \
-				  src/drivers/sctp_md5.h \
-				  src/drivers/sctp_hmac_md5.c \
-				  src/drivers/sctp_hmac_md5.h \
-				  src/drivers/sctp_sha1.c \
-				  src/drivers/sctp_sha1.h \
-				  src/drivers/sctp_hmac_sha1.c \
-				  src/drivers/sctp_hmac_sha1.h \
-				  src/drivers/sctp_adler32.c \
-				  src/drivers/sctp_adler32.h \
-				  src/drivers/sctp_crc32c.c \
-				  src/drivers/sctp_crc32c.h
+EXTRA_libOS7sctp_a_SOURCES	= src/drivers/sctp.c src/drivers/sctp.h \
+				  src/drivers/sctp_cache.c src/drivers/sctp_cache.h \
+				  src/drivers/sctp_cookie.c src/drivers/sctp_cookie.h \
+				  src/drivers/sctp_hash.c src/drivers/sctp_hash.h \
+				  src/drivers/sctp_input.c src/drivers/sctp_input.h \
+				  src/drivers/sctp_msg.c src/drivers/sctp_msg.h \
+				  src/drivers/sctp_n.c src/drivers/sctp_n.h \
+				  src/drivers/sctp_output.c src/drivers/sctp_output.h \
+				  src/drivers/sctp_route.c src/drivers/sctp_route.h \
+				  src/drivers/sctp_t.c src/drivers/sctp_t.h \
+				  src/drivers/sctp_defs.h
+libOS7sctp_a_SOURCES		= src/drivers/sctp2.c src/drivers/sctp_compat.h \
+				  src/drivers/sctp_md5.c src/drivers/sctp_md5.h \
+				  src/drivers/sctp_hmac_md5.c src/drivers/sctp_hmac_md5.h \
+				  src/drivers/sctp_sha1.c src/drivers/sctp_sha1.h \
+				  src/drivers/sctp_hmac_sha1.c src/drivers/sctp_hmac_sha1.h \
+				  src/drivers/sctp_adler32.c src/drivers/sctp_adler32.h \
+				  src/drivers/sctp_crc32c.c src/drivers/sctp_crc32c.h
 libOS7sctp_a_CPPFLAGS		= -I$(top_builddir)/src/drivers -I$(top_srcdir)/src/drivers \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
@@ -1364,15 +1462,15 @@ sbin_PROGRAMS			+= strvf
 
 ## =====================================================================
 
-dist_bin_SCRIPTS		+= src/gdmo/gdmocheck
+dist_noinst_SCRIPTS		+= src/gdmo/gdmocheck
 
 ## =====================================================================
 
-dist_bin_SCRIPTS		+= src/gdmo/snmpcheck
+dist_noinst_SCRIPTS		+= src/gdmo/snmpcheck
 
 ## =====================================================================
 
-dist_bin_SCRIPTS		+= src/gdmo/asn1check
+dist_noinst_SCRIPTS		+= src/gdmo/asn1check
 
 ## =====================================================================
 
@@ -2900,6 +2998,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.12  2011-02-07 04:48:31  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.11  2011-01-18 17:11:41  brian
 # - add files back to the build
 #

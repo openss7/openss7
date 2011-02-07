@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: papers.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: papers.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -66,6 +66,9 @@
 # _PAPERS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PAPERS], [dnl
+    AC_MSG_NOTICE([+-------------------------------+])
+    AC_MSG_NOTICE([| Latex Paper Generation Checks |])
+    AC_MSG_NOTICE([+-------------------------------+])
     _PAPERS_ARGS
     _PAPERS_SETUP
     _PAPERS_OPTIONS
@@ -138,12 +141,10 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
     disable_papers_print=
     disable_papers_html=
     tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
-    AC_PATH_PROGS([GNUPLOT], [gnuplot plot], [], [$tmp_path])
-    if test :"${GNUPLOT:-no}" = :no ; then
-	GNUPLOT="${am_missing2_run}gnuplot"
+    _BLD_PATH_PROGS([GNUPLOT], [gnuplot plot], [${am_missing2_run}gnuplot], [$tmp_path], [dnl
 	if test :$enable_papers != :no ; then
 	    disable_papers=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([GNUPLOT], [
 *** 
 *** Configure cannot find a suitable 'gnuplot' program.  Generating
 *** graphs for papers requires the 'gnuplot' program from the 'gnuplot'
@@ -152,27 +153,24 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'gnuplot' package has been available for many years and is avalable
 *** from any GNU archive site.  Use the following commands to obtain
 *** 'gnuplot':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install gnuplot-nox'
 *** Ubuntu 8.04: 'apt-get install gnuplot-nox'
 *** Fedora 7:    'yum install gnuplot'
 *** Fedora 9:    'yum install gnuplot'
 *** CentOS 5.x:  'yum install gnuplot'
 *** openSUSE 11: 'zypper install gnuplot'
-*** SLES 10:     'zypper install gnuplot'
+*** SLES 10:     'zypper install gnuplot'], [
 ***
 *** To get rid of this warning, load the 'gnuplot' package, specify the
 *** appropriate program with the GNUPLOT environment variable to
 *** 'configure', or specify the --disable-papers option to 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([FIG2DEV], [fig2dev], [], [$tmp_path])
-    if test :"${FIG2DEV:-no}" = :no ; then
-	FIG2DEV="${am_missing2_run}fig2dev"
+	fi])
+    _BLD_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev], [$tmp_path], [dnl
 	if test :$enable_papers != :no ; then
 	    disable_papers=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([FIG2DEV], [
 ***
 *** Configure cannot find a suitable 'fig2dev' program.  Generating
 *** figures for papers requires the 'fig2dev' program from the
@@ -181,27 +179,24 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** The 'transfig' package has been available for many years and is
 *** available from many web sources.  Use the following commands to
 *** obtain 'fig2dev':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install transfig'
 *** Ubuntu 8.04: 'apt-get install transfig'
 *** Fedora 7:    'yum install transfig'
 *** Fedora 9:    'yum install transfig'
 *** CentOS 5.x:  'yum install transfig'
 *** openSUSE 11: 'zypper install transfig'
-*** SLES 10:     'configure --disable-papers'
+*** SLES 10:     'configure --disable-papers'], [
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
 *** appropriate program with the FIG2DEV environment variable to
 *** 'configure', or specify the --disable-papers option to 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([BIBTEX], [bibtex], [], [$tmp_path])
-    if test :"${BIBTEX:-no}" = :no ; then
-	BIBTEX="${am_missing2_run}bibtex"
+	fi])
+    _BLD_PATH_PROG([BIBTEX], [bibtex], [${am_missing2_run}bibtex], [$tmp_path], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([BIBTEX], [
 *** 
 *** Configure cannot find a suitable 'bibtex' program.  Generating
 *** papers requires the 'bibtex' program from the 'tex' package.  You
@@ -209,25 +204,22 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** distributions and all current version are acceptable.  The 'tex'
 *** package has been available for many years and is available from any
 *** CTAN site.  Use the following command to obtain 'bibtex':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install texlive-base-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** CentOS 5.x:  'yum install tetex'
-*** SLES 10:     'configure --disable-papers-print'
+*** SLES 10:     'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'tetex' package, specify the
 *** appropriate program with the BIBTEX environment variable to
 *** 'configure', or specify the --disable-papers-print option to
 *** 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([LATEX], [latex], [], [$tmp_path])
-    if test :"${LATEX:-no}" = :no ; then
-	LATEX="${am_missing2_run}latex"
+	fi])
+    _BLD_PATH_PROG([LATEX], [latex], [${am_missing2_run}latex], [$tmp_path], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([LATEX], [
 *** 
 *** Configure cannot find a suitable 'latex' program.  Generating print
 *** papers requires the 'latex' program from the 'latex' package.  You
@@ -235,28 +227,25 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** and all current versions are acceptable.  The 'latex' package has
 *** been available for many years and is available from any CTAN site.
 *** Use the following command to obtain 'latex':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install texlive-latex-base'
 *** Ubuntu 8.04: 'apt-get install texlive-latex-base'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-latex'
 *** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-papers-print'
+*** SLES 10:     'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'latex' package, specify the
 *** appropriate program with the LATEX environment variable to
 *** 'configure', or specify the --disable-papers-print option to
 *** 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([PSLATEX], [pslatex], [], [$tmp_path])
-    if test :"${PSLATEX:-no}" = :no ; then
-	PSLATEX="${am_missing2_run}pslatex"
+	fi])
+    _BLD_PATH_PROG([PSLATEX], [pslatex], [${am_missing2_run}pslatex], [$tmp_path], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([PSLATEX], [
 *** 
 *** Configure cannot find a suitable 'pslatex' program.  Generating
 *** print papers requires the 'pslatex' program from the 'latex'
@@ -264,28 +253,25 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** distributions and all current versions are acceptable.  The 'latex'
 *** package has been available for many years and is available from any
 *** CTAN site.  Use the following command to obtain 'latex':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install texlive-base-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-latex-base'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-latex'
 *** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-papers-print'
+*** SLES 10:     'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'latex' package, specify the
 *** appropriate program with the PSLATEX environment variable to
 *** 'configure', or specify the --disable-papers-print option to
 *** 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([PDFLATEX], [pdflatex], [], [$tmp_path])
-    if test :"${PDFLATEX:-no}" = :no ; then
-	PDFLATEX="${am_missing2_run}pdflatex"
+	fi])
+    _BLD_PATH_PROG([PDFLATEX], [pdflatex], [${am_missing2_run}pdflatex], [$tmp_path], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([PDFLATEX], [
 *** 
 *** Configure cannot find a suitable 'pdflatex' program.  Generating
 *** print papers requires the 'pdflatex' program from the 'latex'
@@ -293,28 +279,25 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** distributions and all current versions are acceptable.  The 'latex'
 *** package has been available for many years and is available from any
 *** CTAN site.  Use the following commands to obtain 'latex':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install texlive-latex-base'
 *** Ubuntu 8.04: 'apt-get install texlive-latex-base'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-latex'
 *** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-papers-print'
+*** SLES 10:     'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'latex' package, specify the
 *** appropriate program with the PDFLATEX environment variable to
 *** 'configure', or specify the --disable-papers-print option to
 *** 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([LATEX2HTML], [latex2html], [], [$tmp_path])
-    if test :"${LATEX2HTML:-no}" = :no ; then
-	LATEX2HTML="${am_missing2_run}latex2html"
+	fi])
+    _BLD_PATH_PROG([LATEX2HTML], [latex2html], [${am_missing2_run}latex2html], [$tmp_path], [dnl
 	if test :$enable_papers_html != :no ; then
 	    disable_papers_html=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([LATEX2HTML], [
 *** 
 *** Configure cannot find a suitable 'latex2html' program.  Generating
 *** HTML papers requires the 'latex2html' program from the 'latex2html'
@@ -323,28 +306,25 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** 'latex2html' package has been available for many years and is
 *** available from any CTAN site.  Use the following commands to obtain
 *** 'latex2html':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install latex2html'
 *** Ubuntu 8.04: 'apt-get install latex2html'
 *** Fedora 7:    'yum install latex2html'
 *** Fedora 9:    'yum install latex2html'
 *** CentOS 5.x:  'yum install latex2html'
 *** openSUSE 11: 'zypper install latex2html'
-*** SLES 10:     'configure --disable-papers-html'
+*** SLES 10:     'configure --disable-papers-html'], [
 ***
 *** To get rid of this warning, load the 'latex2html' package, specify
 *** the appropriate program with the LATEX2HTML environment variable to
 *** 'configure', or specify the --disable-papers-html option to
 *** 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([CONVERT], [convert], [], [$tmp_path])
-    if test :"${CONVERT:-no}" = :no ; then
-	CONVERT="${am_missing2_run}convert"
+	fi])
+    _BLD_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert], [$tmp_path], [dnl
 	if test :$enable_papers != :no ; then
 	    disable_papers=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([CONVERT], [
 *** 
 *** Configure cannot find a suitable 'convert' program.  Generating
 *** images for papers requires the 'convert' program from the
@@ -353,48 +333,39 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** acceptable.  The 'ImageMagick' package has been available for many
 *** years and is available on the web from many sources.  Use the
 *** following commands to obtain 'ImageMagick':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install imagemagick'
 *** Ubuntu 8.04: 'apt-get install imagemagick'
 *** Fedora 7:    'yum install ImageMagick'
 *** Fedora 9:    'yum install ImageMagick'
 *** CentOS 5.x:  'yum install ImageMagick'
 *** openSUSE 11: 'zypper install ImageMagick'
-*** SLES 10:     'configure --disable-papers'
+*** SLES 10:     'configure --disable-papers'], [
 ***
 *** To get rid of this warning, load the 'latex2html' package, specify
 *** the appropriate program with the CONVERT environment variable to
 *** 'configure', or specify the --disable-papers-print option to
 *** 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([PS2EPSI], [ps2epsi], [], [$tmp_path])
-    if test :"${PS2EPSI:-no}" = :no ; then
-	PS2EPSI="${am_missing2_run}ps2epsi"
+	fi])
+    _BLD_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi], [$tmp_path], [dnl
 	if test :$enable_papers_print != :no ; then
 	    # disable_papers_print=yes
 	    : # ok for now as we fall back to convert
-	fi
-    fi
-    AC_PATH_PROG([EPSTOPDF], [epstopdf], [], [$tmp_path])
-    if test :"${EPSTOPDF:-no}" = :no ; then
-	EPSTOPDF="${am_missing2_run}epstopdf"
+	fi])
+    _BLD_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf], [$tmp_path], [dnl
 	if test :$enable_papers_print != :no ; then
 	    # disable_papers_print=yes
 	    : # ok for now as we fall back to convert
-	fi
-    fi
+	fi])
 dnl
 dnl We use DVI2PS instead of DVIPS here because automake already defines the
 dnl DVIPS make variable and complains if we try to redefine it.
 dnl
-    AC_PATH_PROG([DVI2PS], [dvips], [], [$tmp_path])
-    if test :"${DVI2PS:-no}" = :no ; then
-	DVI2PS="${am_missing2_run}dvips"
+    _BLD_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips], [$tmp_path], [dnl
 	if test :$enable_papers_print != :no ; then
 	    disable_papers_print=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([DVI2PS], [
 ***
 *** Configure cannot find a suitable 'dvips' program.  Generating PS
 *** formatted papers requires the 'dvips' program from the 'tex'
@@ -402,22 +373,21 @@ dnl
 *** distributions and all current versions are acceptable.  The 'tex'
 *** package has been available for may years and is available form any
 *** CTAN site.  Use the following command to obtain 'tex':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install texlive-base-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-dvips'
 *** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-papers-print'
+*** SLES 10:     'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the DVI2PS environment variable to
 *** 'configure', or specify the --disable-papers-print option to
 *** 'configure'.
 *** ])
-	fi
-    fi
+	fi])
     if test :$disable_papers_print = :yes -a :$disable_papers_html = :yes ; then
 	disable_papers=yes
     fi
@@ -479,6 +449,9 @@ AC_DEFUN([_PAPERS_XXX], [dnl
 # =============================================================================
 #
 # $Log: papers.m4,v $
+# Revision 1.1.2.6  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.5  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -496,7 +469,7 @@ AC_DEFUN([_PAPERS_XXX], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

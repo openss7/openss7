@@ -3,12 +3,12 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2010-11-28 13:25:01 $
+# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2009-2010  Monavacon Limited <http://www.monavacon.com/>
-# Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:25:01 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -141,28 +141,26 @@ CONFIG_BLDREQ="$CONFIG_BLDREQ"
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_BUILD_CHECK], [dnl
     AC_REQUIRE([_BLD])dnl
-    set dummy $1
-    case $$1 in
+    case "${$1}" in
 	([[\\/]]* | ?:[[\\/]]*)
-	    tmp_cmd="$$1"
+	    tmp_cmd="${$1}"
 	    ;;
 	(*)
 	    # the command is expected just to be in the configure path
-	    tmp_cmd=`which $$1 2>/dev/null`
+	    tmp_cmd=`which ${$1} 2>/dev/null`
 	    ;;
     esac
-    AC_CACHE_CHECK([for bld package providing $1 program ],
-		   [bld_cv_pkg_name_$1], [dnl
 	tmp_result=
 	if test -n "$tmp_cmd" ; then
 	    case "$dist_cv_build_flavor" in
 dnl	These use rpm
 		(centos|lineox|whitebox|fedora|suse|opensuse|redhat|mandrake|mandriva)
-		    tmp_result=`rpm -q --qf "%{NAME}" --whatprovides $tmp_cmd 2>/dev/null`
+		    tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
+		    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		    ;;
 dnl	These use dpkg
 		(debian|ubuntu|mint)
-		    tmp_result=`dpkg -S $tmp_cmd | tail -1 2>/dev/null`
+		    tmp_result=`dpkg -S $tmp_cmd 2>/dev/null | tail -1`
 		    tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
 		    tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
 		    ;;
@@ -172,15 +170,14 @@ dnl	These use dpkg
 	    bld_cv_pkg_name_$1="$tmp_result"
 	else
 	    unset bld_cv_pkg_name_$1
-	fi])
-    AC_CACHE_CHECK([for bld package version providing $1 program ],
-		   [bld_cv_pkg_ver_$1], [dnl
+	fi
 	tmp_result=
 	if test -n "$tmp_cmd" ; then
 	    case "$dist_cv_build_flavor" in
 dnl	These use rpm
 		(centos|lineox|whitebox|fedora|suse|opensuse|redhat|mandrake|mandriva)
-		    tmp_result=`rpm -q --qf "%{VERSION}" --whatprovides $tmp_cmd 2>/dev/null`
+		    tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
+		    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		    ;;
 dnl	These use dpkg
 		(debian|ubuntu|mint)
@@ -194,25 +191,14 @@ dnl	These use dpkg
 	    bld_cv_pkg_ver_$1="$tmp_result"
 	else
 	    unset bld_cv_pkg_ver_$1
-	fi])
-    AC_CACHE_CHECK([for bld package program providing $1 program ],
-		   [bld_cv_pkg_prog_$1], [dnl
+	fi
 	tmp_result=`echo "$tmp_cmd" | sed -e 's|.*/||;s| .*||'`
 	if test -n "$tmp_result" ; then
 	    bld_cv_pkg_prog_$1="$tmp_result"
 	else
 	    unset bld_cv_pkg_prog_$1
-	fi])
-    AC_CACHE_CHECK([for bld package command to install $1 program ],
-		   [bld_cv_pkg_cmd_$1], [dnl
+	fi
 	tmp_result="$bld_cv_pkg_name_$1"
-	if test -z "$tmp_result" ; then
-dnl	    guess that the package name is the same as the command
-	    tmp_result="$bld_cv_pkg_prog_$1"
-	fi
-	if test -z "$tmp_result" ; then
-	    tmp_result=`echo "$1" | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
-	fi
 	if test -n "$tmp_result" ; then
 	    case "$dist_cv_build_flavor" in
 		(centos|lineox|whitebox|fedora)
@@ -236,7 +222,7 @@ dnl	    guess that the package name is the same as the command
 	    esac
 	else
 	    unset bld_cv_pkg_cmd_$1
-	fi])
+	fi
     ])
 ])# _BLD_BUILD_CHECK
 # =============================================================================
@@ -263,6 +249,160 @@ AC_DEFUN([_BLD_VAR_PATH_PROG], [dnl
 # =============================================================================
 
 # =============================================================================
+# _BLD_PATH_PROG (VARIABLE, PROG-TO-CHECK-FOR, [VALUE-IF-NOT-FOUND],
+#		  [PATH = `$PATH'], [IF-NOT-FOUND], [IF-FOUND])
+# Like `AC_PATH_PROG', but also provides an action to take if not found.  Also,
+# when the program is found, the package containing the message is cached.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_PATH_PROG], [dnl
+    AC_REQUIRE([_BLD])dnl
+    AC_PATH_PROG([$1], [$2], [], [$4])
+    if test :"${$1:-no}" = :no ; then
+	$1="$3"
+	m4_if([$5], [], [AC_MSG_WARN([Cannot find $2 in PATH.])], [$5])
+    else
+	_BLD_BUILD_CHECK([$1])
+	m4_if([$6], [], [:], [$6])
+    fi
+])# _BLD_PATH_PROG
+# =============================================================================
+
+# =============================================================================
+# _BLD_PATH_PROGS (VARIABLE, PROGS-TO-CHECK-FOR, [VALUE-IF-NOT-FOUND],
+#		   [PATH = `$PATH'], [IF-NOT-FOUND], [IF-FOUND])
+# Like `AC_PATH_PROGS', but also provides an action to take if not found.  Also,
+# when the program is found, the package containing the message is cached.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_PATH_PROGS], [dnl
+    AC_REQUIRE([_BLD])dnl
+    AC_PATH_PROGS([$1], [$2], [], [$4])
+    if test :"${$1:-no}" = :no ; then
+	$1="$3"
+	m4_if([$5], [], [AC_MSG_WARN([Cannot find $2 in PATH.])], [$5])
+    else
+	_BLD_BUILD_CHECK([$1])
+	m4_if([$6], [], [:], [$6])
+    fi
+])# _BLD_PATH_PROGS
+# =============================================================================
+
+# =============================================================================
+# _BLD_INSTALL_WARN (VARIABLE, MESSAGE-LEAD, GENERIC-INSTALL-MESSAGE,
+#		     MESSAGE-TAIL)
+# To be used in the IF-NOT-FOUND portion of _BLD_PATH_PROG or _BLD_PATH_PROGS.
+# If there is a cached way to install the program specified by VARIABLE, warn
+# with the MESSAGE-LEAD, the specific installation message, and the
+# MESSAGE-TAIL; otherwise warn with the MESSAGE-LEAD, the
+# GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_INSTALL_WARN], [dnl
+    if test -n "$bld_cv_pkg_cmd_$1" ; then
+	tmp_msg="
+*** $dist_cv_build_flavor: $bld_cv_pkg_cmd_$1"
+    else
+	tmp_msg="$3"
+    fi
+    AC_MSG_WARN([$2$tmp_msg$4])
+])# _BLD_INSTALL_WARN
+# =============================================================================
+
+# =============================================================================
+# _BLD_INSTALL_ERROR (VARIABLE, MESSAGE-LEAD, GENERIC-INSTALL-MESSAGE,
+#		      MESSAGE-TAIL)
+# To be used in the IF-NOT-FOUND portion of _BLD_PATH_PROG or _BLD_PATH_PROGS.
+# If there is a cached way to install the program specified by VARIABLE, error
+# with the MESSAGE-LEAD, the specific installation message, and the
+# MESSAGE-TAIL; otherwise error with the MESSAGE-LEAD, the
+# GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
+    if test -n "$bld_cv_pkg_cmd_$1" ; then
+	tmp_msg="
+*** $dist_cv_build_flavor: $bld_cv_pkg_cmd_$1"
+    else
+	tmp_msg="$3"
+    fi
+    AC_MSG_ERROR([$2$tmp_msg$4])
+])# _BLD_INSTALL_ERROR
+# =============================================================================
+
+# =============================================================================
+# _BLD_HEADER_CHECK (HEADER)
+# -----------------------------------------------------------------------------
+# Tests to see which distro package and distro package version provides the
+# header file specified in variable HEADER.  Saves the package name in cache
+# variable bld_cv_pkg_name_[HEADER] and the package version in cache variable
+# bld_cv_pkg_ver_[HEADER].
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_HEADER_CHECK], [dnl
+])# _BLD_HEADER_CHECK
+# =============================================================================
+
+# =============================================================================
+# _BLD_CHECK_HEADER (HEADER, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND],
+#		     [INCLUDES])
+# Like `AC_CHECK_HEADER', but when the header is found, the package providing
+# the header is cached.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_CHECK_HEADER], [dnl
+])# _BLD_CHECK_HEADER
+# =============================================================================
+
+# =============================================================================
+# _BLD_CHECK_HEADERS (HEADER..., [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND],
+#		      [INCLUDES])
+# Like `AC_CHECK_HEADERS', but when each header is found, the package providing
+# the header is cached.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_CHECK_HEADERS], [dnl
+])# _BLD_CHECK_HEADERS
+# =============================================================================
+
+# =============================================================================
+# _BLD_HEADER_WARN (HEADER, MESSAGE-LEAD, GENERIC-INSTALL-MESSAGE, MESSAGE-TAIL)
+# To be used in the IF-NOT-FOUND portion of _BLD_CHECK_HEADER or
+# _BLD_CHECK_HEADERS.  If there is a cached way to install the header specified
+# by HEADER, warn with the MESSAGE-LEAD, the specific installation message, and
+# the MESSAGE-TAIL; otherwise, warn with the MESSAGE-LEAD, the
+# GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_HEADER_WARN], [dnl
+    [AS_VAR_PUSHDEF([bld_Header], [bld_cv_pkg_header_$1])]dnl
+    [AS_VAR_IF([bld_Header], [], [dnl
+	    tmp_msg="$3"
+	], [
+	    tmp_msg=AS_VAR_GET([bld_Header])
+	    tmp_msg="
+*** $dist_cv_build_flavor: $tmp_msg"
+	])]
+    [AS_VAR_POPDEF([bld_Header])]dnl
+    AC_MSG_WARN([$2$tmp_msg$4])
+])# _BLD_HEADER_WARN
+# =============================================================================
+
+# =============================================================================
+# _BLD_HEADER_ERROR (HEADER, MESSAGE-LEAD, GENERIC-INSTALL-MESSAGE, MESSAGE-TAIL)
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_HEADER_ERROR], [dnl
+# To be used in the IF-NOT-FOUND portion of _BLD_CHECK_HEADER or
+# _BLD_CHECK_HEADERS.  If there is a cached way to install the header specified
+# by HEADER, error with the MESSAGE-LEAD, the specific installation message, and
+# the MESSAGE-TAIL; otherwise, error with the MESSAGE-LEAD, the
+# GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
+    [AS_VAR_PUSHDEF([bld_Header], [bld_cv_pkg_header_$1])]dnl
+    [AS_VAR_IF([bld_Header], [], [dnl
+	    tmp_msg="$3"
+	], [
+	    tmp_msg=AS_VAR_GET([bld_Header])
+	    tmp_msg="
+*** $dist_cv_build_flavor: $tmp_msg"
+	])]
+    [AS_VAR_POPDEF([bld_Header])]dnl
+    AC_MSG_ERROR([$2$tmp_msg$4])
+])# _BLD_HEADER_ERROR
+# =============================================================================
+
+# =============================================================================
 # _BLD_
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_], [dnl
@@ -272,14 +412,17 @@ AC_DEFUN([_BLD_], [dnl
 # =============================================================================
 #
 # $Log: bld.m4,v $
+# Revision 1.1.2.2  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.1  2010-11-28 13:25:01  brian
 # - added new build files, removed redundant files
 #
 #
 # =============================================================================
 # 
-# Copyright (c) 2009-2010  Monavacon Limited <http://www.monavacon.com/>
-# Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================

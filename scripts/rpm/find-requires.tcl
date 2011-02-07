@@ -5,6 +5,21 @@
 
 BEGIN {
     print "D: Executing: " ARGV[0] " -f find-requires.tcl" > "/dev/stderr"
+    RPM_BUILD_DIR = ENVIRON[RPM_BUILD_DIR]
+    RPM_PACKAGE_NAME = ENVIRON[RPM_PACKAGE_NAME]
+    RPM_PACKAGE_VERSION = ENVIRON[RPM_PACKAGE_VERSION]
+    RPM_PACKAGE_RELEASE = ENVIRON[RPM_PACKAGE_RELEASE]
+    dir = RPM_BUILD_DIR "/" RPM_PACKAGE_NAME "-" RPM_PACKAGE_VERSION
+    if (ARGC > 1 && ARGV[1]) {
+	dir = ARGV[1]
+	delete ARGV[1]
+    }
+    RPM_BUILD_ROOT = ENVIRON[RPM_BUILD_ROOT]
+    if (ARGC > 2 && ARGV[2]) {
+	RPM_BUILD_ROOT = ARGV[2]
+	delete ARGV[2]
+    }
+    sub(/\/+$/, "", RPM_BUILD_ROOT)
 }
 {
     file = $0
@@ -45,7 +60,7 @@ END {
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires.tcl,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-07-24 13:49:45 $
+# @(#) $RCSfile: find-requires.tcl,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 04:48:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -91,11 +106,14 @@ END {
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-24 13:49:45 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:33 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-requires.tcl,v $
+# Revision 1.1.2.2  2011-02-07 04:48:33  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.1  2009-07-24 13:49:45  brian
 # - updates for release build
 #

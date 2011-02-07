@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 03:49:24 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-12 03:49:24 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,6 +58,9 @@
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KERNEL], [dnl
     AC_REQUIRE([AC_CANONICAL_TARGET])dnl
+    AC_MSG_NOTICE([+---------------+])
+    AC_MSG_NOTICE([| Kernel Checks |])
+    AC_MSG_NOTICE([+---------------+])
     _LINUX_KERNEL_OPTIONS
     _LINUX_KERNEL_ENV_BARE([dnl
 	CPPFLAGS=
@@ -393,36 +396,24 @@ dnl fi
 AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
     AC_ARG_VAR([DEPMOD],
 	       [Build kernel module dependencies command. @<:@default=depmod@:>@])
-    AC_PATH_PROG([DEPMOD], [depmod], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test "${DEPMOD:-no}" = :no ; then
-	AC_MSG_WARN([Could not find depmod program in PATH.])
-	DEPMOD=/sbin/depmod
-    fi
+    _BLD_PATH_PROG([DEPMOD], [depmod], [/sbin/depmod],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+	AC_MSG_WARN([Could not find depmod program in PATH.])])
     AC_ARG_VAR([MODPROBE],
 	       [Probe kernel module dependencies command. @<:@default=modprobe@:>@])
-    AC_PATH_PROG([MODPROBE], [modprobe], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test "${MODPROBE:-no}" = :no ; then
-	AC_MSG_WARN([Could not find depmod program in PATH.])
-	MODPROBE=/sbin/modprobe
-    fi
+    _BLD_PATH_PROG([MODPROBE], [modprobe], [/sbin/modprobe],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+	AC_MSG_WARN([Could not find depmod program in PATH.])])
     AC_ARG_VAR([LSMOD],
 	       [List kernel modules command. @<:@default=lsmod@:>@])
-    AC_PATH_PROG([LSMOD], [lsmod], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test "${LSMOD:-no}" = :no ; then
-	AC_MSG_WARN([Could not find lsmod program in PATH.])
-	LSMOD=/sbin/lsmod
-    fi
+    _BLD_PATH_PROG([LSMOD], [lsmod], [/sbin/lsmod],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+	AC_MSG_WARN([Could not find lsmod program in PATH.])])
     AC_ARG_VAR([LSOF],
 	       [List open files command. @<:@default=lsof@:>@])
-    AC_PATH_PROG([LSOF], [lsof], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test "${LSOF:-no}" = :no ; then
-	AC_MSG_WARN([Could not find lsof program in PATH.])
-	LSOF=/sbin/lsof
-    fi
+    _BLD_PATH_PROG([LSOF], [lsof], [/sbin/lsof],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+	AC_MSG_WARN([Could not find lsof program in PATH.])])
 ])# _LINUX_CHECK_KERNEL_TOOLS
 # =========================================================================
 
@@ -3066,6 +3057,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.6  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.5  2011-01-12 03:49:24  brian
 # - support for RHEL 6 kernel
 #

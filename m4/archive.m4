@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: archive.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: archive.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +57,9 @@
 # _ARCHIVE
 # -----------------------------------------------------------------------------
 AC_DEFUN([_ARCHIVE], [dnl
+    AC_MSG_NOTICE([+---------------------------+])
+    AC_MSG_NOTICE([| Archive Capability Checks |])
+    AC_MSG_NOTICE([+---------------------------+])
     _ARCHIVE_ARGS
     _ARCHIVE_SETUP
     _ARCHIVE_OPTIONS
@@ -106,113 +109,77 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
     tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin:$am_aux_dir"
     test -n "$GZIP" || GZIP='-f9v'
     AC_ARG_VAR([GZIP],      [Gzip default compression options @<:@default=-f9v@:>@])
-    _BLD_VAR_PATH_PROG([GZIP_CMD], [gzip], [$tmp_path], [Gzip compression command @<:@default=gzip@:>@],
-[	GZIP_CMD=
-	if test -n "$bld_cv_pkg_cmd_GZIP_CMD" ; then
-	    tmp_msg="*** 
-*** $dist_cv_build_flavor: $bld_cv_pkg_cmd_GZIP_CMD
-"
-	else
-	    tmp_msg="*** 
-*** Debian:  'apt-get install gzip'
-*** SuSE:    'zypper install gzip'
-*** CentOS:  'yum install gzip'
-"
-	fi
-	AC_MSG_ERROR([
+    AC_ARG_VAR([GZIP_CMD],  [Gzip compression command @<:@default=gzip@:>@])
+    _BLD_PATH_PROG([GZIP_CMD], [gzip], [], [$tmp_path], [dnl
+	_BLD_INSTALL_ERROR([GZIP_CMD], [
 ***
 *** Configure cannot find a suitable 'gzip' program.  Creating gzip
 *** archives requires the 'gzip' program from the 'gzip' package on the
 *** build host.  The 'gzip' package has been available for many years on
 *** all distributions and is available from any GNU archive site.  Try:
-$tmp_msg
+*** ], [
+*** Debian:   'apt-get install gzip'
+*** SuSE:     'zypper install gzip'
+*** CentOS:   'yum install gzip'], [
 ***
 *** To get rid of this error, load the 'gzip' package, or specify the
 *** location with the GZIP_CMD environment variable to 'configure'.
 *** ])])
-dnl	    AC_ARG_VAR([GZIP_CMD],  [Gzip compression command @<:@default=gzip@:>@])
-dnl	    AC_PATH_PROG([GZIP_CMD], [gzip], [], [$tmp_path])
-dnl	    if test :"${GZIP_CMD:-no}" = :no ; then
-dnl		GZIP_CMD=
-dnl		AC_MSG_ERROR([
-dnl	***
-dnl	*** Configure cannot find a suitable 'gzip' program.  Creating gzip
-dnl	*** archives requires the 'gzip' program from the 'gzip' package on the
-dnl	*** build host.  The 'gzip' package has been available for many years on
-dnl	*** all distributions and is available from any GNU archive site.  Try:
-dnl	***
-dnl	*** Debian:  'apt-get install gzip'
-dnl	*** SuSE:    'zypper install gzip'
-dnl	*** CentOS:  'yum install gzip'
-dnl	***
-dnl	*** To get rid of this error, load the 'gzip' package, or specify the
-dnl	*** location with the GZIP_CMD environment variable to 'configure'.
-dnl	*** ])
-dnl	    fi
     test -n "$BZIP2" || BZIP2='-f9v'
     AC_ARG_VAR([BZIP2],     [Bzip2 default compression options @<:@default=-f9v@:>@])
     AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
-    AC_PATH_PROG([BZIP2_CMD], [bzip2], [], [$tmp_path])
-    if test :"${BZIP2_CMD:-no}" = :no ; then
-	BZIP_CMD=
-	AC_MSG_ERROR([
+    _BLD_PATH_PROG([BZIP2_CMD], [bzip2], [], [$tmp_path], [dnl
+	_BLD_INSTALL_ERROR([BZIP2_CMD], [
 ***
 *** Configure cannot find a suitable 'bzip2' program.  Creating bzip2
 *** archives requires the 'bzip2' program from the 'bzip2' package on
 *** the build host.  The 'bzip2' package has been available for many
 *** years on all distributions.  Try:
-***
+*** ], [
 *** Debian:  'apt-get install bzip2'
 *** SuSE:    'zypper install bzip2'
-*** CentOS:  'yum install bzip2'
+*** CentOS:  'yum install bzip2'], [
 ***
 *** To get rid of this error, load the 'bzip2' package, or specify the
 *** location with the BZIP2_CMD environment variable to 'configure'.
-*** ])
-    fi
+*** ])])
     test -n "$LZMA" || LZMA='-f9v'
     AC_ARG_VAR([LZMA],      [Lzma default compression options @<:@default=-f9v@:>@])
     AC_ARG_VAR([LZMA_CMD],  [Lzma compression command @<:@default=lzma@:>@])
-    AC_PATH_PROG([LZMA_CMD], [lzma], [], [$tmp_path])
-    if test :"${LZMA_CMD:-no}" = :no ; then
-	LZMZ_CMD=
+    _BLD_PATH_PROG([LZMA_CMD], [lzma], [], [$tmp_path], [dnl
 	if test :"${disable_bestzip:-yes}" != :yes -a :"$enable_bestzip" = :lzma
 	then
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([LZMA_CMD], [
 ***
 *** Configure cannot find the 'lzma' program, which is sometimes present
 *** on recent systems.  Try:
-***
+*** ], [
 *** Debian:  'apt-get install lzma'
 *** SuSE:    'zypper install lzma'
-*** CentOS:  'yum install lzma'
+*** CentOS:  'yum install lzma'], [
 ***
 *** To get rid of this warning, load the 'lzma' package, or specify the
 *** full path to the utility in the LZMA_CMD environment variable, or
 *** simply do not specify --enable-bestzip='lzma' to configure.
 *** ])
-	fi
-    else
+	fi], [dnl
 	if test :"${disable_bestzip:-yes}" != :yes ; then
 	    case "${enable_bestzip:-lzma}" in
 		(bzip2) ;;
 		(*) BESTZIP=lzma ;;
 	    esac
-	fi
-    fi
+	fi])
     test -n "$XZ" || XZ='-f9v'
     AC_ARG_VAR([XZ],        [Xz default compression options @<:@default=-f9v@:>@])
     AC_ARG_VAR([XZ_CMD],    [Xz compression command @<:@default=xz@:>@])
-    AC_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path])
-    if test :"${XZ_CMD:-no}" = :no ; then
-	XZ_CMD=
+    _BLD_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path], [dnl
 	if test :"${disable_bestzip:-yes}" != :yes -a :"$enable_bestzip" = :xz
 	then
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([XZ_CMD], [
 ***
 *** Configure cannot find the 'xz' program, which is sometimes present
 *** on recent systems.  Try:
-***
+*** ], [
 ***   #> wget http://tukaani.org/xz/xz-4.999.8beta.tar.gz
 ***   #> tar xzf xz-4.999.8beta.tar.gz
 ***   #> cd xz-4.999.8beta
@@ -220,30 +187,27 @@ dnl	    fi
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian Squeeze:  'apt-get install xz-utils'
+*** Debian Squeeze:  'apt-get install xz-utils'], [
 ***
 *** To get rid of this warning, load the 'xz' package, or specify the
 *** full path to the utility in the XZ_CMD environment variable, or
 *** simply do not specify --enable-bestzip='xz' to configure.
 *** ])
-	fi
-    else
+	fi], [dnl
 	if test :"${disable_bestzip:-yes}" != :yes ; then
 	    case "${enable_bestzip:-xz}" in
 		(bzip2|lzma) ;;
 		(*) BESTZIP=xz ;;
 	    esac
-	fi
-    fi
+	fi])
     enable_bestzip="$BESTZIP"
     disable_repo_tar=
     AC_ARG_VAR([MD5SUM],    [MD5 sum command @<:@default=md5sum@:>@])
-    AC_PATH_PROG([MD5SUM], [md5sum], [], [$tmp_path])
-    if test :"${MD5SUM:-no}" = :no ; then
-	MD5SUM="${am_missing3_run}md5sum"
+    _BLD_PATH_PROG([MD5SUM], [md5sum], [${am_missing3_run}md5sum],
+		   [$tmp_path], [dnl
 	if test :$enable_repo_tar = :yes ; then
 	    disable_repo_tar=yes
-	    AC_MSG_ERROR([
+	    _BLD_INSTALL_ERROR([MD5SUM], [
 *** 
 *** Configure could not find a suitable 'md5sum' program.  Installing
 *** tarball repositories requires the 'md5sum' program from the
@@ -252,7 +216,7 @@ dnl	    fi
 *** likely that your distribution has failed to install the 'md5sum'
 *** program.  You can get the 'coreutils' pcakage from any GNU archive
 *** site.  For example:
-***
+*** ], [
 ***   #> wget http://ftp.gnu.org/gnu/coreutils/coreutils-7.4.tar.gz
 ***   #> tar xzf coreutils-7.4.tar.gz
 ***   #> cd coreutils-7.4
@@ -260,22 +224,20 @@ dnl	    fi
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian:  'apt-get install coreutils'
+*** Debian:  'apt-get install coreutils'], [
 ***
 *** To get rid of this warning, load the 'md5sum' program from the
 *** 'coreutils' package, specify the appropriate program with the MD5SUM
 *** environment variable to 'configure', or specify --disable-repo-tar
 *** to 'configure'.
 *** ])
-	fi
-    fi
+	fi])
     AC_ARG_VAR([SHA1SUM],   [SHA1 sum command @<:@default=sha1sum@:>@])
-    AC_PATH_PROG([SHA1SUM], [sha1sum], [], [$tmp_path])
-    if test :"${SHA1SUM:-no}" = :no ; then
-	SHA1SUM="${am_missing3_run}sha1sum"
+    _BLD_PATH_PROG([SHA1SUM], [sha1sum], [${am_missing3_run}sha1sum],
+		   [$tmp_path], [dnl
 	if test :$enable_repo_tar = :yes ; then
 	    disable_repo_tar=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([SHA1SUM], [
 *** 
 *** Configure could not find a suitable 'sha1sum' program.  Installing
 *** tarball repositories requires the 'sha1sum' program from the
@@ -284,7 +246,7 @@ dnl	    fi
 *** likely that your distribution has failed to install the 'sha1sum'
 *** program.  You can get the 'coreutils' package from any GNU archive
 *** site.  For example:
-***
+*** ], [
 ***   #> wget http://ftp.gnu.org/gnu/coreutils/coreutils-7.4.tar.gz
 ***   #> tar xzf coreutils-7.4.tar.gz
 ***   #> cd coreutils-7.4
@@ -292,22 +254,20 @@ dnl	    fi
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian:  'apt-get install coreutils'
+*** Debian:  'apt-get install coreutils'], [
 ***
 *** To get rid of this warning, load the 'sha1sum' program from the
 *** 'coreutils' package, specify the appropriate program with the
 *** SHA1SUM environment variable to 'configure', or specify
 *** --disable-repo-tar to 'configure'.
 *** ])
-	fi
-    fi
+	fi])
     AC_ARG_VAR([SHA256SUM], [SHA256 sum command @<:@default=sha256sum@:>@])
-    AC_PATH_PROG([SHA256SUM], [sha256sum], [], [$tmp_path])
-    if test :"${SHA256SUM:-no}" = :no ; then
-	SHA256SUM="${am_missing3_run}sha256sum"
+    _BLD_PATH_PROG([SHA256SUM], [sha256sum], [${am_missing3_run}sha256sum],
+		   [$tmp_path], [dnl
 	if test :$enable_repo_tar = :yes ; then
 	    disable_repo_tar=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([SHA256SUM], [
 *** 
 *** Configure could not find a suitable 'sha256sum' program.  Installing
 *** tarball repositories requires the 'sha256sum' program from the
@@ -316,7 +276,7 @@ dnl	    fi
 *** likely that your distribution has failed to install the 'sha256sum'
 *** program.  You can get the 'coreutils' package from any GNU archive
 *** site.  For example:
-***
+*** ], [
 ***   #> wget http://ftp.gnu.org/gnu/coreutils/coreutils-7.4.tar.gz
 ***   #> tar xzf coreutils-7.4.tar.gz
 ***   #> cd coreutils-7.4
@@ -324,15 +284,14 @@ dnl	    fi
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian:  'apt-get install coreutils'
+*** Debian:  'apt-get install coreutils'], [
 ***
 *** To get rid of this warning, load the 'sha256sum' program from the
 *** 'coreutils' package, specify the appropriate program with the
 *** SHA1SUM environment variable to 'configure', or specify
 *** --disable-repo-tar to 'configure'.
 *** ])
-	fi
-    fi
+	fi])
 ])# _ARCHIVE_SETUP
 # =============================================================================
 
@@ -375,6 +334,9 @@ AC_DEFUN([_ARCHIVE_XXX], [dnl
 # =============================================================================
 #
 # $Log: archive.m4,v $
+# Revision 1.1.2.6  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.5  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -392,7 +354,7 @@ AC_DEFUN([_ARCHIVE_XXX], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

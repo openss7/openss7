@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 03:49:24 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-12 03:49:24 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +57,9 @@
 # _DISTRO
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DISTRO], [dnl
+    AC_MSG_NOTICE([+---------------------+])
+    AC_MSG_NOTICE([| Distribution Checks |])
+    AC_MSG_NOTICE([+---------------------+])
 dnl _DISTRO_CHECK_OS
 dnl _DISTRO_OPTIONS
     _DISTRO_SETUP
@@ -786,6 +789,9 @@ AC_DEFUN([_DISTRO_], [dnl
 # =============================================================================
 #
 # $Log: dist.m4,v $
+# Revision 1.1.2.5  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.4  2011-01-12 03:49:24  brian
 # - support for RHEL 6 kernel
 #

@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:12 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +57,9 @@
 # _DEB_DPKG_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_OPTIONS], [dnl
+    AC_MSG_NOTICE([+-----------------------+])
+    AC_MSG_NOTICE([| Debian Archive Checks |])
+    AC_MSG_NOTICE([+-----------------------+])
     _DEB_OPTIONS_DEB_EPOCH
     _DEB_OPTIONS_DEB_RELEASE
 ])# _DEB_DPKG_OPTIONS
@@ -288,40 +292,31 @@ dnl
 	[], [enable_dscs=yes])
     AC_ARG_VAR([DPKG],
 	       [dpkg command. @<:@default=dpkg@:>@])
-    AC_PATH_PROG([DPKG], [dpkg], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${DPKG:-no}" = :no; then
+    _BLD_PATH_PROG([DPKG], [dpkg], [${am_missing3_run}dpkg],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu)
 		AC_MSG_WARN([Could not find dpkg program in PATH.]) ;;
 	    (*) enable_debs=no; enable_dscs=no ;;
-	esac
-	DPKG="${am_missing3_run}dpkg"
-    fi
+	esac])
     AC_ARG_VAR([DPKG_SOURCE],
 	       [dpkg-source command. @<:@default=dpkg-source@:>@])
-    AC_PATH_PROG([DPKG_SOURCE], [dpkg-source], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${DPKG_SOURCE:-no}" = :no; then
+    _BLD_PATH_PROG([DPKG_SOURCE], [dpkg-source], [${am_missing3_run}dpkg-source],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu)
 		AC_MSG_WARN([Could not find dpkg-source program in PATH.]) ;;
 	    (*) enable_dscs=no ;;
-	esac
-	DPKG_SOURCE="${am_missing3_run}dpkg-source"
-    fi
+	esac])
     AC_ARG_VAR([DPKG_BUILDPACKAGE],
 	       [dpkg-buildpackage command. @<:@default=dpkg-buildpackage@:>@])
-    AC_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${DPKG_BUILDPACKAGE:-no}" = :no; then
+    _BLD_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [${am_missing3_run}dpkg-buildpackage],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu)
 		AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.]) ;;
 	    (*) enable_debs=no ;;
-	esac
-	DPKG_BUILDPACKAGE="${am_missing3_run}dpkg-buildpackage"
-    fi
+	esac])
     AC_CACHE_CHECK([for deb building of debs], [deb_cv_debs], [dnl
 	deb_cv_debs=${enable_debs:-no}
     ])
@@ -338,44 +333,32 @@ dnl
 	[], [enable_repo_apt=yes])
     AC_ARG_VAR([APT_FTPARCHIVE],
 	       [apt-ftparchive command. @<:@default=apt-ftparchive@:>@])
-    AC_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${APT_FTPARCHIVE:-no}" = :no; then
+    _BLD_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [${am_missing3_run}apt-ftparchive],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	if test ":$deb_cv_debs" = :yes; then
 	    AC_MSG_WARN([Could not find apt-ftparchive program in PATH.])
-	else enable_repo_apt=no; fi
-	APT_FTPARCHIVE="${am_missing3_run}apt-ftparchive"
-    fi
+	else enable_repo_apt=no; fi])
     AC_ARG_VAR([DPKG_SCANSOURCES],
 	       [dpkg-scansources command. @<:@default=dpkg-scansources@:>@])
-    AC_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${DPKG_SCANSOURCES:-no}" = :no; then
+    _BLD_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [${am_missing3_run}dpkg-scansources],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	if test ":$deb_cv_debs" = :yes; then
 	    AC_MSG_WARN([Could not find dpkg-scansources program in PATH.])
-	else enable_repo_apt=no; fi
-	DPKG_SCANSOURCES="${am_missing3_run}dpkg-scansources"
-    fi
+	else enable_repo_apt=no; fi])
     AC_ARG_VAR([DPKG_SCANPACKAGES],
 	       [dpkg-scanpackages command. @<:@default=dpkg-scanpackages@:>@])
-    AC_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${DPKG_SCANPACKAGES:-no}" = :no; then
+    _BLD_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [${am_missing3_run}dpkg-scanpackages],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	if test ":$deb_cv_debs" = :yes; then
 	    AC_MSG_WARN([Could not find dpkg-scanpackages program in PATH.])
-	else enable_repo_apt=no; fi
-	DPKG_SCANPACKAGES="${am_missing3_run}dpkg-scanpackages"
-    fi
+	else enable_repo_apt=no; fi])
     AC_ARG_VAR([DPKG_DEB],
 	       [dpkg-deb command. @<:@default=dpkg-deb@:>@])
-    AC_PATH_PROG([DPKG_DEB], [dpkg-deb], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${DPKG_DEB:-no}" = :no; then
+    _BLD_PATH_PROG([DPKG_DEB], [dpkg-deb], [${am_missing3_run}dpkg-deb],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	if test ":$deb_cv_debs" = :yes; then
 	    AC_MSG_WARN([Could not find dpkg-deb program in PATH.])
-	else enable_repo_apt=no; fi
-	DPK_DEB="${am_missing3_run}dpkg-deb"
-    fi
+	else enable_repo_apt=no; fi])
     AC_CACHE_CHECK([for deb apt repo constructtion], [deb_cv_repo_apt], [dnl
 	deb_cv_repo_apt=${enable_repo_apt:-no}
     ])
@@ -434,6 +417,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 1.1.2.5  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.4  2009-07-21 11:06:12  brian
 # - changes from release build
 #
@@ -484,8 +470,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL

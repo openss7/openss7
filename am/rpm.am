@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-24 13:49:44 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:48:31 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-24 13:49:44 $ by $Author: brian $
+## Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -815,6 +815,8 @@ repomd_files		= $(repodir)/repomd.xml \
 			  $(repodir)/filelists.xml.gz \
 			  $(repodir)/other.xml.gz
 
+repomd_signs		= $(repodir)/repomd.xml.asc
+
 repomd_group		= $(repodir)/comps.xml
 
 #!
@@ -842,16 +844,37 @@ $(repodir)/openss7.repo: $(repodir)
 		echo 'enabled = 1'; \
 		echo 'name = OpenSS7 Repository'; \
 		echo 'baseurl = http://www.openss7.org/repos/rpms/$(PACKAGE_RPMSUBDIR)'; \
+		echo 'gpgkey = http://www.openss7.org/repos/tarballs/OPENSS7-GPG-KEY'; \
+		echo 'repo_gpgcheck = 1'; \
 		echo 'gpgcheck = 1'; \
-		echo 'gpgkey = http://www.openss7.org/pubkey.asc'; \
 		echo ''; \
 		echo '[openss7-local]'; \
 		echo 'enabled = 0'; \
 		echo 'name = OpenSS7 Local Repository'; \
 		echo 'baseurl = file://$(topdir)'; \
-		echo 'gpgcheck = 1'; \
 		echo 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
+		echo 'repo_gpgcheck = 1'; \
+		echo 'gpgcheck = 1'; \
 	) > $@
+
+$(repodir)/repomd.xml:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test ! -f $@; then \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) repo-yum"; \
+		$(MAKE) $(AM_MAKEFLAGS) repo-yum; \
+	fi
+
+$(repodir)/repomd.xml.asc:: \
+$(repodir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
+	else touch "$@"; fi
 
 #! repo-yum:
 #!     Create (or recreate) the meta data files for a yum (repomd) repository in
@@ -868,6 +891,10 @@ repo-yum: $(repodir) $(repodir)/openss7.repo
 	$(ECHO) "$(CREATEREPO) -p $(REPOFLAGS) $$g $(topdir)"; \
 	$(CREATEREPO) -p $(REPOFLAGS) $$g $(topdir) || :
 
+#! repo-sign-yum:
+#! 	Sign the repomd.xml file and export the signing key.
+repo-sign-yum: $(repomd_signs)
+
 #! repo-clean-yum:
 #!     Cleans the meta data files for a yum (repomd) repository from the package
 #!     distribution directory, @repodir@/.
@@ -877,14 +904,14 @@ repo-clean-yum:
 REPO			+= repo-yum
 REPO_SIGN		+= repo-sign-yum
 REPO_CLEAN		+= repo-clean-yum
-REPOCLEANFILES		+= $(repomd_files) $(repomd_group) $(repodir)/openss7.repo
+REPOCLEANFILES		+= $(repomd_files) $(repomd_signs) $(repomd_group) $(repodir)/openss7.repo
 
 MY_PHONY		+= repo-yum repo-clean-yum
 
 RELEASE			+= repo-yum
 RELEASE_SIGN		+= repo-sign-yum
 RELEASE_CLEAN_LOCAL	+= repo-clean-yum
-RELEASECLEANFILES	+= $(repomd_files) $(repomd_group) $(repodir)/openss7.repo
+RELEASECLEANFILES	+= $(repomd_files) $(repomd_signs) $(repomd_group) $(repodir)/openss7.repo
 
 UPDATE			+= repo-yum
 UPDATE_SIGN		+= repo-sign-yum
@@ -899,6 +926,10 @@ if BUILD_REPO_YAST
 ##
 ## The following builds yast repositories.
 ##
+
+RELEASE_DIRECTORIES	+= $(yastdir) \
+			   $(yastdir)/media.1 \
+			   $(yastdir)/setup/descr
 
 #!
 #! YaST Build Targets:
@@ -952,35 +983,45 @@ $(yastdir)/content.key:
 	$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@
 
 yast_meta_files		= $(yastdir)/media.1/media \
-			  $(yastdir)/content \
-			  $(yastdir)/content.asc \
+			  $(yastdir)/content
+
+yast_sign_files		= $(yastdir)/content.asc \
 			  $(yastdir)/content.key
 
-yast_desc_files		= $(yastdir)/setup/descr/packages
+yast_desc_files		= $(yastdir)/setup/descr/packages \
+			  $(yastdir)/setup/descr/packages.*
 
 ##
 # Each directory needs a directory.yast file so that YaST can determine the (visible) contents of
 # the directory when using http or where the directory cannot be listed otherwise.
 ##
 
-am__yast_skipfiles = (^|/)(\.[^/]*|directory.yast|INDEX.gz|ARCHIVE.gz|ls-lR.gz|MD5SUMS(.meta)?|SHA1SUMS(.meta)?|md5sum.txt)
+am__yast_skipfiles = (^|/)(\.[^/][^/]*|directory\.yast|INDEX\.gz|ARCHIVE\.gz|ls-lR\.gz|MD5SUMS(\.meta)?|SHA1SUMS(\.meta)?|md5sum\.txt)
 
 repo-yast-listings:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	( $(ECHO) "$(yastdir)"; find . -follow -type d ) | while read d; do \
+	@dir=`(cd $(yastdir); pwd)`; \
+	find $$dir -follow -type d | while read d; do \
 		p=`$(ECHO) "$$d" | sed 's,.*/,,'`; \
 		case "$$p" in (RCS|CVS|.*) continue;; esac; \
-		( cd -- "$$d"; \
-			ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' > directory.yast; \
-			ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | gzip -c > ls-lR.gz; \
-			ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | gzip -c > INDEX.gz; \
+		( $(ECHO_V) "cd -- \"$$d\""; \
+		  cd -- "$$d"; \
+			$(ECHO_V) "ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast"; \
+			ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast; \
+			$(ECHO_V) "ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | gzip -c >ls-lR.gz"; \
+			ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | gzip -c >ls-lR.gz; \
+			$(ECHO_V) "ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | gzip -c >INDEX.gz"; \
+			ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | gzip -c >INDEX.gz; \
 		); \
 	done
 
 repo-yast-listings-clean:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test -n '$(yastdir)' || exit 1; \
-	find $(yastdir) -follow -name 'directory.yast' | $(am__list_remove)
+	find $(yastdir) -follow \
+		-name 'directory.yast' -o \
+		-name 'ls-lR.gz' -o \
+		-name 'INDEX.gz' | $(am__base_remove)
 
 #! repo-yast:
 #! 	Create (or recreate) the meta data files for a YaST2 repository in the
@@ -990,8 +1031,15 @@ repo-yast-listings-clean:
 #!
 repo-yast: $(yast_meta_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	( cd $(yastdir); create_package_descr -d RPMS/ )
+	( cd $(yastdir); $(CREATE_PACKAGE_DESCR) -Z -V -C -K -F -B -d RPMS/ )
 	$(MAKE) $(AM_MAKEFLAGS) repo-yast-listings
+
+#! repo-sign-yast:
+#! 	Sign the content file and export the signing key to content.key.
+#! 	This target then performs all of the actions of the repo-yast
+#! 	target to rebuild the directory listings.
+#!
+repo-sign-yast: $(yast_sign_files) repo-yast
 
 #! repo-clean-yast:
 #!     Cleans the meta data files for a YaST2 repository from the package
@@ -1001,15 +1049,15 @@ repo-clean-yast:
 
 REPO			+= repo-yast
 REPO_SIGN		+= repo-sign-yast
-REPO_CLEAN		+= repo-clean-yast
-REPOCLEANFILES		+= $(yast_meta_files) $(yast_desc_files)
+REPO_CLEAN		+= repo-clean-yast repo-yast-listings-clean
+REPOCLEANFILES		+= $(yast_meta_files) $(yast_desc_files) $(yast_sign_files)
 
 MY_PHONY		+= repo-yast repo-yast-listings repo-clean-yast
 
 RELEASE			+= repo-yast
 RELEASE_SIGN		+= repo-sign-yast
-RELEASE_CLEAN_LOCAL	+= repo-clean-yast
-RELEASECLEANFILES	+= $(yast_meta_files) $(yast_desc_files)
+RELEASE_CLEAN_LOCAL	+= repo-clean-yast repo-yast-listings-clean
+RELEASECLEANFILES	+= $(yast_meta_files) $(yast_desc_files) $(yast_sign_files)
 
 UPDATE			+= repo-yast
 UPDATE_SIGN		+= repo-sign-yast
@@ -1080,6 +1128,9 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.6  2011-02-07 04:48:31  brian
+## - updated configure and build scripts
+##
 ## Revision 1.1.2.5  2009-07-24 13:49:44  brian
 ## - updates for release build
 ##

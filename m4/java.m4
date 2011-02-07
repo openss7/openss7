@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: java.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: java.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +57,9 @@
 # AC_PROG_JAVA
 # -----------------------------------------------------------------------------
 m4_define([AC_PROG_JAVA], [dnl
+    AC_MSG_NOTICE([+-----------------------------+])
+    AC_MSG_NOTICE([| Java Code Generation Checks |])
+    AC_MSG_NOTICE([+-----------------------------+])
     _JAVA_OPTIONS
     _JAVA_SETUP
     _JAVA_USER
@@ -113,11 +116,9 @@ dnl
 dnl On older systems with both gcj and gcj3 use jar3 over jar.
 dnl fastjar is a later incarnation.
 dnl
-    AC_PATH_PROGS([JAR], [fastjar jar3 jar], [],
-	[$jar_tmp])
-    if test :"${JAR:-no}" = :no ; then
-	JAR="${am_missing4_run}jar"
-	AC_MSG_WARN([
+    _BLD_PATH_PROGS([JAR], [fastjar jar3 jar], [${am_missing4_run}jar],
+	[$jar_tmp], [dnl
+	_BLD_INSTALL_WARN([JAR], [
 ***
 *** Configure cannot find a suitable 'jar' program.  Generating Java
 *** archives requires the 'jar' program.  You can normally get 'jar' as
@@ -126,35 +127,44 @@ dnl
 *** many years.  'fastjar' is part of the GNU Compiler Collection.  You
 *** can also get 'jar' as part of any JDK.  Use the following command to
 *** obtain 'fastjar':
-***
+*** ], [
 *** Debian 5.0:	 'apt-get install fastjar'
 *** Ubuntu 8.04: 'apt-get install fastjar'
 *** CentOS 5.x:	 'yum install libgcj'
 *** SLES 10:	 'zypper install fastjar'
-*** RH 7.3:	 'rpm -i libgcj3'
+*** RH 7.3:	 'rpm -i libgcj3'], [
 ***
 *** To get rid of this warning, load the 'fastjar' package or specify
 *** the appropriate program with the JAR environment variable to
 *** 'configure'.
-*** ])
-    fi
+*** ])])
     AC_ARG_VAR([ZIP],
 	[Zip archive command. @<:@default=zip@:>@])
-    AC_PATH_PROGS([ZIP], [zip], [],
-	[$jar_tmp])
-    if test :"${ZIP:-no}" = :no ; then
-	ZIP="${am_missing4_run}zip"
-	AC_MSG_WARN([
+    _BLD_PATH_PROG([ZIP], [zip], [${am_missing4_run}zip],
+	[$jar_tmp], [dnl
+	_BLD_INSTALL_WARN([ZIP], [
 ***
-*** Configure cannot find a suitable 'zip' program.
+*** Configure cannot find a suitable 'zip' program.  Try:
+*** ], [
+*** Debian 5.0:	 'apt-get install zip'
+*** Ubuntu 8.04: 'apt-get install zip'
+*** CentOS 5.x:	 'yum install zip'
+*** SLES 10:	 'zypper install zip'
+*** RH 7.3:	 'rpm -i zip'], [
 ***
 *** To get rid of this warning, load the 'zip' program or specify the
 *** appropriate program with the ZIP enviornment variable to
 *** 'configure'.
-*** ])
-    fi
-    AC_PATH_PROGS([JARSIGNER], [gjarsigner jarsigner], [${am_missing4_run}jarsigner], [$jar_tmp])
-    AC_PATH_PROGS([KEYTOOL], [gkeytool keytool], [${am_missing4_run}keytool], [$jar_tmp])
+*** ])])
+dnl
+dnl Note that SLES 11.1 fails to provide proper symbolic links from gjarsigner
+dnl to gjarsigner-4.3 as well as from gkeytool to gkeytool-4.3.  This is the
+dnl reason for explicitly placing gjarsigner-4.3 and gkeytool-4.3 in the lists.
+dnl
+    _BLD_PATH_PROGS([JARSIGNER], [gjarsigner jarsigner gjarsigner-4.3],
+		    [${am_missing4_run}jarsigner], [$jar_tmp])
+    _BLD_PATH_PROGS([KEYTOOL], [gkeytool keytool gkeytool-4.3],
+		    [${am_missing4_run}keytool], [$jar_tmp])
 ])# _JAVA_SETUP_JAR
 # =============================================================================
 
@@ -191,6 +201,9 @@ AC_DEFUN([_JAVA_XXX], [dnl
 # =============================================================================
 #
 # $Log: java.m4,v $
+# Revision 1.1.2.7  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.6  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -211,7 +224,7 @@ AC_DEFUN([_JAVA_XXX], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-01-12 03:49:24 $
+# @(#) $RCSfile: gcj.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-12 03:49:24 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -452,23 +452,21 @@ dnl
 	[Java class compiler. @<:@default=[$]GCJ@:>@])
     AC_ARG_VAR([JAVACFLAGS],
 	[Java class compiler flags. @<:@default=auto@:>@])
-    AC_PATH_PROGS([JAVAC], [$GCJ javac], [],
-	[$gcj_tmp])
-    if test -z "$JAVAC"; then
-	AC_MSG_ERROR([
+    _BLD_PATH_PROGS([JAVAC], [$GCJ javac], [],
+	[$gcj_tmp], [dnl
+	_BLD_INSTALL_ERROR([JAVAC], [
 ***
 *** Configure could not find the Java class compiler program 'javac'
 *** (nor 'gcj').  This program is part of the GNU Compiler Collection,
 *** but is not always loaded on recent distributions.  It is also part
 *** of most Java SDKs.
-***
+*** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
-*** On DEB based distributions, try 'apt-get install gcj'.
+*** On DEB based distributions, try 'apt-get install gcj'.], [
 ***
 *** Alternatively, you can specify an equivalent command with the JAVAC
 *** environment variable when rerunning configure.
-***])
-    fi
+***])])
 
 dnl
 dnl We need the gcj-dbtool so that we can create classmap databses and add
@@ -481,13 +479,11 @@ dnl classmap databases.
 dnl
     AC_ARG_VAR([GCJDBTOOL],
 	[GCJ database tool. @<:@default=gcj-dbtool@:>@])
-    AC_PATH_PROGS([GCJDBTOOL], [gcj-dbtool], [],
-	[$gcj_tmp])
-    if test -z "$GCJDBTOOL"; then
-	GCJDBTOOL="${am_missing4_run}gcj-dbtool"
+    _BLD_PATH_PROGS([GCJDBTOOL], [gcj-dbtool], [${am_missing4_run}gcj-dbtool],
+	[$gcj_tmp], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([GCJDBTOOL], [
 ***
 *** Configure could not find a suitable GCJ database tool program,
 *** 'gcj-dbtool'.  This program is part of the GNU Compiler Collection,
@@ -495,21 +491,20 @@ dnl
 *** versions of libgcj, such as that distributed with GCC version 2 and
 *** early version 3, do not have this tool.  The first clue to this is
 *** that GCJ does not support the -indirect-dispatch flag.
-***
+*** ], [
 *** On RPM based distributions, try 'yum install libgcj'.
 *** On DEB based distributions, try 'apt-get install gij'.
 *** On SuSE distributions, try 'zypper install libgcj'.
 ***
-*** Alternatively, you can specify an equivalent command with the
-*** GCJDBTOOL environment variable when running configure.
-***
 *** Debian 5.0:  'apt-get install gij'
 *** Ubuntu 8.04: 'apt-get install gij'
 *** CentOS 5.x:  'yum install libgcj'
-*** SLES 10:     'zypper install libgcj'
+*** SLES 10:     'zypper install libgcj'], [
+***
+*** Alternatively, you can specify an equivalent command with the
+*** GCJDBTOOL environment variable when running configure.
 ***])
-	fi
-    fi
+	fi])
     AM_CONDITIONAL([WITH_GCJDBTOOL], [test :"${ac_cv_path_GCJDBTOOL:-no}" != :no])dnl
 dnl
 dnl Note that we distribute the CNI header files.  Therefore, this tool should
@@ -523,33 +518,30 @@ dnl
 	[Java CNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([GCJHFLAGS],
 	[Java CNI header command flags. @<:@default=auto@:>@])
-    AC_PATH_PROGS([GCJH], [gcjh3 gcjh], [],
-	[$gcj_tmp])
-    if test :"${GCJH:-no}" = :no ; then
-	GCJH="${am_missing4_run}gcjh"
+    _BLD_PATH_PROGS([GCJH], [gcjh3 gcjh], [${am_missing4_run}gcjh],
+	[$gcj_tmp], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([GCJH], [
 ***
 *** Configure could not find the GNU Java Compiler CNI header generation
 *** command, 'gcjh'.  This program is part of the GNU Compiler
 *** Collection, but is not always loaded on recent distributions.
-***
+*** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
 *** On SUSE distributions, try 'zypper install gcc-java'.
-***
-*** Alternatively, you can specify an equivalent command with the GCJH
-*** environment variable when running configure.
 ***
 *** Debian 5.0:	 'apt-get install gcj'
 *** Ubuntu 8.04: 'apt-get install gcj'
 *** CentOS 5.x:	 'yum install gcc-java'
 *** SLES 10:	 'zypper install gcc-java'
-*** RH 7.3:	 'rpm -i gcc-java'
+*** RH 7.3:	 'rpm -i gcc-java'], [
+***
+*** Alternatively, you can specify an equivalent command with the GCJH
+*** environment variable when running configure.
 ***])
-	fi
-    fi
+	fi])
 
 dnl
 dnl Note that we distribute the JNI header files.  Therefore, this tool should
@@ -563,34 +555,31 @@ dnl
 	[Java JNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([JAVAHFLAGS],
 	[Java JNI header command flags. @<:@default=auto@:>@])
-    AC_PATH_PROGS([JAVAH], [gcjh3 gcjh javah], [],
-	[$gcj_tmp])
-    if test :"${JAVAH:-no}" = :no ; then
-	JAVAH="${am_missing4_run}gcjh"
+    _BLD_PATH_PROGS([JAVAH], [gcjh3 gcjh javah], [${am_missing4_run}gcjh],
+	[$gcj_tmp], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([JAVAH], [
 ***
 *** Configure could not find the Java JNI header generation program
 *** 'javah' (nor 'gcjh').  This program is part of the GNU Compiler
 *** Collection, but is not always loaded on recent distributions.  It is
 *** also part of most Java SDKs.
-***
+*** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
 *** On SUSE distributions, try 'zypper install gcc-java'.
-***
-*** Alternatively, you can specify an equivalent command with the JAVAH
-*** environment variable when running configure.
 ***
 *** Debian 5.0:	 'apt-get install gcj'
 *** Ubuntu 8.04: 'apt-get install gcj'
 *** CentOS 5.x:	 'yum install gcc-java'
 *** SLES 10:	 'zypper install gcc-java'
-*** RH 7.3:	 'rpm -i gcc-java'
+*** RH 7.3:	 'rpm -i gcc-java'], [
+***
+*** Alternatively, you can specify an equivalent command with the JAVAH
+*** environment variable when running configure.
 ***])
-	fi
-    fi
+	fi])
 
 dnl
 dnl Note that we now distribute the prebuilt javadoc documentation.  This is
@@ -603,34 +592,31 @@ dnl
 	[Java documentation doclet. @<:@default=gjdoc@:>@])
     AC_ARG_VAR([JAVADOCFLAGS],
 	[Java documentation flags. @<:@default=auto@:>@])
-    AC_PATH_PROGS([JAVADOC], [gjdoc javadoc], [],
-	[$gcj_tmp])
-    if test :"${JAVADOC:-no}" = :no ; then
-	JAVADOC="${am_missing4_run}gjdoc"
+    _BLD_PATH_PROGS([JAVADOC], [gjdoc javadoc], [${am_missing4_run}gjdoc],
+	[$gcj_tmp], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([JAVADOC], [
 ***
 *** Configure could not find the Java documentation program 'javadoc'
 *** (nor 'gjdoc').  This program is part of the GNU Compiler Colleciton,
 *** but is not always loaded on recent distributions.  It is also part
 *** of most Java SDKs.
-***
+*** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
 *** On DEB based distributions, try 'apt-get install gcj'.
 *** On SUSE, try 'zypper install jdk-1_5_0-ibm-devel'.
-***
-*** Alternatively, you can specify an equivalent command with the
-*** JAVADOC environment variable when running configure.
 ***
 *** Debian 5.0:	 'apt-get install gjdoc'
 *** Ubuntu 8.04: 'apt-get install gjdoc'
 *** CentOS 5.x:	 'yum install gjdoc'
 *** SLES 10:	 'zypper install java-1_5_0-ibm-devel'
-*** RH 7.3:	 'rpm -i kaffe'
+*** RH 7.3:	 'rpm -i kaffe'], [
+***
+*** Alternatively, you can specify an equivalent command with the
+*** JAVADOC environment variable when running configure.
 ***])
-	fi
-    fi
+	fi])
     AC_CACHE_CHECK([for libgcj javadoc directory], [ac_cv_libgcj_doc], [dnl
 	eval "gcj_search_path=\"
 	    ${DESTDIR}${rootdir}${javadocdir}
@@ -801,6 +787,9 @@ AC_DEFUN([_GCJ_XXX], [dnl
 # =============================================================================
 #
 # $Log: gcj.m4,v $
+# Revision 1.1.2.9  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.8  2011-01-12 03:49:24  brian
 # - support for RHEL 6 kernel
 #

@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: swig.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: swig.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -65,12 +65,9 @@
 m4_define([AC_PROG_SWIG], [dnl
     AC_ARG_VAR([SWIG],
 	[Swig command. @<@default=swig@:>@])
-    AC_PATH_PROG([SWIG], [swig], [],
-	[$PATH:/usr/local/bin:/usr/bin:/bin])
-    if test :"${SWIG:-no}" = :no ; then
-	SWIG="${am_missing4_run}swig"
-	AC_MSG_WARN([Could not find swig program in PATH.])
-    fi
+    _BLD_PATH_PROG([SWIG], [swig], [${am_missing4_run}swig],
+	[$PATH:/usr/local/bin:/usr/bin:/bin], [dnl
+	AC_MSG_WARN([Could not find swig program in PATH.])])
 ])# AC_PROG_SWIG
 # =============================================================================
 
@@ -84,6 +81,9 @@ AC_DEFUN([_SWIG_XXX], [dnl
 # =============================================================================
 #
 # $Log: swig.m4,v $
+# Revision 1.1.2.6  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.5  2009-07-21 11:06:13  brian
 # - changes from release build
 #
@@ -101,7 +101,7 @@ AC_DEFUN([_SWIG_XXX], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

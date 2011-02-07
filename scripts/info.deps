@@ -38,6 +38,7 @@ BEGIN {
     suffixes["html"] = ".png"; depends["html"] = ".texi"
     suffixes["txt" ] = ".txt"; depends["txt" ] = ".texi"
     suffixes["info"] = ".txt"; depends["info"] = ".texi"
+    suffixes["deps"] = ".txt"; depends["deps"] = ".texi"
 }
 {
     f = $0
@@ -49,6 +50,7 @@ BEGIN {
     line["html"] = t ".html: " "\\\n\t" t depends["html"]
     line["txt" ] = t ".txt: "  "\\\n\t" t depends["txt" ]
     line["info"] = srcdir "/" t ".info: " "\\\n\t" t depends["info"]
+    line["deps"] = ".deps/info.Pd: " "\\\n\t" t depends["deps"]
     for (p in figures) {
 	for (v in line ) {
 	    f0 = p suffixes[v]

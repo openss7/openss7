@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: man.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +57,9 @@
 # _MAN_CONVERSION
 # -------------------------------------------------------------------------
 AC_DEFUN([_MAN_CONVERSION], [dnl
+    AC_MSG_NOTICE([+------------------------+])
+    AC_MSG_NOTICE([| Manual Page Generation |])
+    AC_MSG_NOTICE([+------------------------+])
     _MAN_CONVERSION_ARGS
     _MAN_CONVERSION_SETUP
     _MAN_CONVERSION_OPTIONS
@@ -101,12 +105,11 @@ AC_DEFUN([_MAN_CONVERSION_ARGS], [dnl
 AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
     AC_ARG_VAR([SOELIM], [Roff source elimination command. @<:@default=gsoelim,soelim@:>@])
-    AC_PATH_PROGS([SOELIM], [gsoelim soelim],
-		  [/bin/cat], [$tmp_path])
-    if test :"$SOELIM" = :/bin/cat ; then
+    _BLD_PATH_PROGS([SOELIM], [gsoelim soelim],
+		  [/bin/cat], [$tmp_path], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    without_cooked_manpages=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([SOELIM], [
 ***
 *** Configure cannot find a suitable 'soelim' program.  Generating
 *** cooked manual pages requires the 'soelim' program from the 'groff'
@@ -115,26 +118,24 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** 'groff' package has been available for many years and is available
 *** on the web from any GNU archive site.  Use the following commands to
 *** obtain 'groff':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'
+*** SLES 10:     'zypper install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify an
 *** appropriate program with the SOELIM environment variable to
 *** 'configure', or specify the --without-cooked-manpages option to
 *** 'configure'.
 *** ])
-	fi
-    fi
+	fi])
     AC_ARG_VAR([REFER], [Roff references command. @<:@default=grefer,refer@:>@])
-    AC_PATH_PROGS([REFER], [grefer refer],
-		  [/bin/cat], [$tmp_path])
-    if test :"$REFER" = :/bin/cat ; then
+    _BLD_PATH_PROGS([REFER], [grefer refer],
+		  [/bin/cat], [$tmp_path], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    without_cooked_manpages=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([REFER], [
 ***
 *** Configure cannot find a suitable 'refer' program.  Generating cooked
 *** manual pages requires the 'refer' program from the 'groff' package.
@@ -143,35 +144,31 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** package has been available for many years and is available on the
 *** web from any GNU archive site.  Use the following commands to obtain
 *** 'groff':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install groff'
 *** Ubuntu 8.04: 'apt-get install groff_ext'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'
+*** SLES 10:     'zypper install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify an
 *** appropriate program with the REFER environment variable to
 *** 'configure', or specify the --without-cooked-manpages option to
 *** 'configure'.
 *** ])
-	fi
-    fi
+	fi])
     AC_ARG_VAR([PIC], [Roff picture command. @<:@default=gpic,pic@:>@])
-    AC_PATH_PROGS([PIC], [gpic pic],
-		  [/bin/cat], [$tmp_path])
-    if test :"$PIC" = :/bin/cat ; then
+    _BLD_PATH_PROGS([PIC], [gpic pic],
+		  [/bin/cat], [$tmp_path], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    # without_cooked_manpages=yes
 	    : # do not need pic to cook manpages
-	fi
-    fi
+	fi])
     AC_ARG_VAR([TBL], [Roff table command. @<:@default=gtbl,tbl@:>@])
-    AC_PATH_PROGS([TBL], [gtbl tbl],
-		  [/bin/cat], [$tmp_path])
-    if test :"$TBL" = :/bin/cat ; then
+    _BLD_PATH_PROGS([TBL], [gtbl tbl],
+		  [/bin/cat], [$tmp_path], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    without_cooked_manpages=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([TBL], [
 ***
 *** Configure cannot find a suitable 'tbl' program.  Generating cooked
 *** manual pages requires the 'tbl' program from the 'groff' package.
@@ -180,24 +177,22 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** package has been available for many years and is available on the
 *** web from any GNU archive site.  Use the following commands to obtain
 *** 'groff':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'
+*** SLES 10:     'zypper install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify an
 *** appropriate program with the TBL environment variable to
 *** 'configure', or specify the --without-cooked-manpages option to
 *** 'configure'.
 *** ])
-	fi
-    fi
+	fi])
     AC_ARG_VAR([MAKEWHATIS], [Makewhatis command. @<:@default=makewhatis,mandb@:>@])
-    AC_PATH_PROG([MAKEWHATIS], [makewhatis mandb],
-		 [], [$tmp_path])
-    if test :"$MAKEWHATIS" = : ; then
-	AC_MSG_WARN([
+    _BLD_PATH_PROGS([MAKEWHATIS], [makewhatis mandb],
+		 [], [$tmp_path], [dnl
+	_BLD_INSTALL_WARN([MAKEWHATIS], [
 ***
 *** Configure cannot find a suitable 'makewhatis' program.  Installing
 *** manual pages requires the 'makewhatis' program from the 'man'
@@ -206,19 +201,18 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** package has been available for many years and is available on the
 *** web from the Linux Documentation Project.  Use the following
 *** commands to obtain 'man':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install man-db'
 *** Ubuntu 8.04: 'apt-get install man'
 *** Fedora 9:    'yum install man'
 *** CentOS 5.x:  'yum install man'
 *** openSUSE 11: 'zypper install man'
-*** SLES 10:     'zypper isntall man'
+*** SLES 10:     'zypper isntall man'], [
 ***
 *** To get rid of this warning, load the 'man' package, specify an
 *** appropriate program with the MAKEWHATIS environment variable to
 *** 'configure'.
-*** ])
-    else
+*** ])], [dnl
 	tmp_program=`echo "$MAKEWHATIS" | sed 's,.*[^ ][^$-],,;s,.*/,,;s, *$,,'`
 	if test :"$tmp_program" = :mandb ; then
 	    MANDBFLAGS='-u'
@@ -226,95 +220,82 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	    MANDBFLAGS='-v -u -w'
 	else
 	    MANDBFLAGS=
-	fi
-    fi
+	fi])
     AC_ARG_VAR([GZIP], [Gzip default compression options @<:@default=-f9v@:>@])
     test -n "$GZIP" || GZIP='-f9v'
     AC_ARG_VAR([GZIP_CMD], [Gzip compression command @<:@default=gzip@:>@])
-    AC_PATH_PROG([GZIP_CMD], [gzip], [], [$tmp_path])
-    if test :"${GZIP_CMD:-no}" = :no ; then
-	GZIP_CMD=
-	AC_MSG_WARN([
+    _BLD_PATH_PROG([GZIP_CMD], [gzip], [], [$tmp_path], [dnl
+	_BLD_INSTALL_WARN([GZIP_CMD], [
 ***
 *** Configure cannot find a suitable 'gzip' program.  Compressing manual
 *** pages may require the 'gzip' program from the 'gzip' package on the
 *** build host.  The 'gzip' package has been available for many years on
 *** all distributions and is available from any GNU archive site.  Try:
-***
+*** ], [
 *** Debian:  'apt-get install gzip'
 *** SuSE:    'zypper install gzip'
-*** CentOS:  'yum install gzip'
+*** CentOS:  'yum install gzip'], [
 ***
 *** To get rid of this warning, load the 'gzip' package, or specify the
 *** location with the GZIP_CMD environment variable to 'configure'.
-*** ])
-    fi
+*** ])])
     AC_ARG_VAR([BZIP2], [Bzip2 default compression options @<:@default=-f9v@:>@])
     test -n "$BZIP2" || BZIP2='-f9v'
     AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
-    AC_PATH_PROG([BZIP2_CMD], [bzip2], [], [$tmp_path])
-    if test :"${BZIP2_CMD:-no}" = :no ; then
-	BZIP2_CMD=
-	AC_MSG_WARN([
+    _BLD_PATH_PROG([BZIP2_CMD], [bzip2], [], [$tmp_path], [dnl
+	_BLD_INSTALL_WARN([BZIP2_CMD], [
 ***
 *** Configure cannot find a suitable 'bzip2' program.  Compressing
 *** manual pages may require the 'bzip2' program from the 'bzip2'
 *** package on the build host.  The 'bzip2' package has been available
 *** for many years on all distributions and is available from various
 *** web sources.  Try:
-***
+*** ], [
 *** Debian:  'apt-get install bzip2'
 *** SuSE:    'zypper install bzip2'
-*** CentOS:  'yum install bzip2'
+*** CentOS:  'yum install bzip2'], [
 ***
 *** To get rid of this warning, load the 'bzip2' package, or specify the
 *** location with the BZIP2_CMD environment variable to 'configure'.
-*** ])
-    fi
+*** ])])
     AC_ARG_VAR([LZMA], [Lzma default compression options @<:@default=-f9v@:>@])
     test -n "$LZMA" || LZMA='-f9v'
     AC_ARG_VAR([LZMA_CMD], [Lzma compression command @<:@default=lzma@:>@])
-    AC_PATH_PROG([LZMA_CMD], [lzma], [], [$tmp_path])
-    if test :"${LZMA_CMD:-no}" = :no ; then
-	LZMA_CMD=
-	AC_MSG_WARN([
+    _BLD_PATH_PROG([LZMA_CMD], [lzma], [], [$tmp_path], [dnl
+	_BLD_INSTALL_WARN([LZMA_CMD], [
 ***
 *** Configure cannot find a suitable 'lzma' program.  Compressing
 *** archives may require the 'lzma' program from the 'lzam' package on
 *** the build host.  The 'lzma' package has been available for a number
 *** of years on recent distributions and is available from various web
 *** sources for others.  Try:
-***
+*** ], [
 *** Debian 5.0:  'apt-get install lzma'
 *** SuSE:        'zypper install lmza'
-*** CentOS:      'yum install lzma'
+*** CentOS:      'yum install lzma'], [
 ***
 *** To get rid of this warning, load the 'lzma' package or specify the
 *** location with the LZMA_CMD environment variable to 'configure'.
-*** ])
-    fi
+*** ])])
     AC_ARG_VAR([XZ], [Xz default compression options @<:@default=-c@:>@])
     test -n "$XZ" || XZ='-c'
     AC_ARG_VAR([XZ_CMD], [Xz compression command @<:@default=xz@:>@])
-    AC_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path])
-    if test :"${XZ_CMD:-no}" = :no ; then
-	XZ_CMD=
-	AC_MSG_WARN([
+    _BLD_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path], [dnl
+	_BLD_INSTALL_WARN([XZ_CMD], [
 *** 
 *** Configurat cannot find a suitable 'xz' program.  Compressing
 *** archives may require the 'xz' program from the 'xz' package on the
 *** build host.  The 'xz' package has been available for a number
 *** of years on recent distributions and is available from various web
 *** sources for others.  Try:
-***
+*** ], [
 *** Debian Squeeze: 'apt-get install xz'
 *** SuSE:           'zypper install xz'
-*** CentOS:         'yum install xz'
+*** CentOS:         'yum install xz'], [
 ***
 *** To get rid of this warning, load the 'xz' package or specify the
 *** location with the XZ_CMD environment variable to 'configure'.
-*** ])
-    fi
+*** ])])
 ])# _MAN_CONVERSION_SETUP
 # =========================================================================
 
@@ -353,6 +334,9 @@ AC_DEFUN([_MAN_CONVERSION_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: man.m4,v $
+# Revision 1.1.2.5  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.4  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -385,8 +369,9 @@ AC_DEFUN([_MAN_CONVERSION_OUTPUT], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL

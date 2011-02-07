@@ -4,72 +4,70 @@ Priority: optional
 Maintainer: Brian F. G. Bidulock <bidulock@openss7.org>
 Standards-Version: 3.5.6.1
 
-Package: @PACKAGE_LCNAME@-lis-core
+Package: @PACKAGE_LCNAME@-core
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-lis-core, @PACKAGE_LCNAME@-lis-core-@kversion@, @PACKAGE_LCNAME@-lis-core-@kversion@-@krelease@
-Conflicts: streams-core, @PACKAGE_LCNAME@-streams-core
+Provides: @PACKAGE_LCNAME@-core, @PACKAGE_LCNAME@-core-@kversion@, @PACKAGE_LCNAME@-core-@kversion@-@krelease@
 Description: Core Linux Fast-STREAMS kernel modules for @PACKAGE_TITLE@
  Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for Linux
  Fast-STREAMS.  Includes assorted Linux Fast-STREAMS drivers and modules for
  @PACKAGE_TITLE@.  These binaries are heavily tied to the kernel
- for which they were compiled: applies to kernel version @kversion@ and requires
+ for which they were compiled: applies to kernel version @kversion@ and provides
  a Linux Fast-STREAMS package compiled for the same kernel.
 
-Package: @PACKAGE_LCNAME@-streams-core
-Architecture: any
+Package: @PACKAGE_LCNAME@-base
+Architecture: all
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-streams-core, @PACKAGE_LCNAME@-streams-core-@kversion@, @PACKAGE_LCNAME@-streams-core-@kversion@-@krelease@
-Conflicts: LiS-core, @PACKAGE_LCNAME@-lis-core
-Description: Core STREAMS kernel modules for @PACKAGE_TITLE@
- Kernel modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ for STREAMS.
- Includes assorted STREAMS drivers and modules for @PACKAGE_TITLE@.
- These binaries are heavily tied to the kernel for which they were compiled:
- applies to kernel version @kversion@ and requires an STREAMS package
- compiled for the same kernel.
+Provides: @PACKAGE_LCNAME@-base
+Description: Init scripts, test scripts, maintenance scripts and base system
+ configuration files necessary for the operation of the protocol suites
+ contained in the @PACKAGE_SHORTTITLE@ package.  It contains user and
+ administration documentation in INFO, PDF and HTML formats as well as
+ sections 1, 4, 5 and 8 of the manual pages.  This binary package is required
+ for any installation of the @PACKAGE_SHORTTITLE@ package.
 
-Package: @PACKAGE_LCNAME@-lis-lib
+Package: @PACKAGE_LCNAME@-doc
+Architecture: all
+Section: devel
+Priority: optional
+Provides: @PACKAGE_LCNAME@-doc
+Description: Documentation used in the development of applications and
+ programs that use the package.  It contains developer and programmer manuals
+ in INFO, PDF and HTML formats as well as sections 2, 3, 7 and 9 of the manual
+ pages and Javadoc HTML documentation.  Install this package if you are
+ interested in developing STREAMS drivers or modules or applications programs
+ for the protocol suites contained in the @PACKAGE_SHORTTITLE@ package.  This
+ package is massive and is not normally necessary except on a development
+ system.
+
+Package: @PACKAGE_LCNAME@-lib
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-lib, @PACKAGE_LCNAME@-lis-lib
+Provides: @PACKAGE_LCNAME@-lib
 Description: Shared libraries for @PACKAGE_TITLE@ for
  Linux Fast-STREAMS Run-time shared libraries necessary to run applications
  programs and utilities developed for @PACKAGE_SHORTTITLE@ for Linux
  Fast-STREAMS.
 
-Package: @PACKAGE_LCNAME@-streams-lib
+Package: @PACKAGE_LCNAME@-util
 Architecture: any
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-lib, @PACKAGE_LCNAME@-streams-lib
-Description: Shared libraries for @PACKAGE_TITLE@ for STREAMS
- Run-time shared libraries necessary to run applications programs and utilities
- developed for @PACKAGE_SHORTTITLE@ for STREAMS.
+Provides: @PACKAGE_LCNAME@-util
+Description: Utility and test programs for @PACKAGE_TITLE@
+ and Linux Fast-STREAMS Administration and configuration test utilities and
+ commands for @PACKAGE_TITLE@ for Linux Fast-STREAMS.
 
-Package: @PACKAGE_LCNAME@-lis-util
-Architecture: any
+Package: @PACKAGE_LCNAME@-init
+Architecture: all
 Section: base
 Priority: optional
-Provides: @PACKAGE_LCNAME@-util, @PACKAGE_LCNAME@-lis-util
-Conflicts: @PACKAGE_LCNAME@-streams-util
-Description: Utitlity and test programs for @PACKAGE_TITLE@
- and Linux Fast-STREAMS Adminstration and configuration test utilities and
- commands for @PACKAGE_TITLE@ for Linux Fast-STREAMS;
- also init scripts and configuration files.
-
-Package: @PACKAGE_LCNAME@-streams-util
-Architecture: any
-Section: base
-Priority: optional
-Provides: @PACKAGE_LCNAME@-util, @PACKAGE_LCNAME@-streams-util
-Conflicts: @PACKAGE_LCNAME@-lis-util
-Description: Utitlity and test programs for @PACKAGE_TITLE@
- and STREAMS Adminstration and configuration test utilities and commands for
- @PACKAGE_TITLE@ for STREAMS; also init scripts
- and configuration files.
+Provides: @PACKAGE_LCNAME@-init
+Description: Init scripts and config files for @PACKAGE_TITLE@
+ and Linux Fast-STREAMS.
 
 Package: @PACKAGE_LCNAME@-devel
 Architecture: any

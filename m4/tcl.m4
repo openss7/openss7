@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: tcl.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: tcl.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -62,6 +62,9 @@
 # directories.  If we cannot find them, assume that TCL interfaces cannot build.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_TCL_EXTENSIONS], [dnl
+    AC_MSG_NOTICE([+-----------------------+])
+    AC_MSG_NOTICE([| TCL Extension Support |])
+    AC_MSG_NOTICE([+-----------------------+])
     AC_CACHE_CHECK([for tcl include directory], [tcl_cv_includedir], [dnl
 	AC_ARG_WITH([tcl],
 	    [AS_HELP_STRING([--with-tcl=HEADERS],
@@ -151,6 +154,9 @@ AC_DEFUN([_TCL_EXTENSIONS], [dnl
 # =============================================================================
 #
 # $Log: tcl.m4,v $
+# Revision 1.1.2.4  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.3  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
