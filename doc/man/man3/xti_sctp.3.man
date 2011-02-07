@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: xti_sctp.3.man,v 1.1.2.1 2009-06-21 10:34:27 brian Exp $
+.\" @(#) $Id: xti_sctp.3.man,v 1.1.2.2 2011-02-07 02:18:07 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:27 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:07 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: xti_sctp.3.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:34:27  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:18:07  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -646,13 +646,13 @@ that contains the type of service value.
 This option is used with
 .BR t_optmgmt (3).
 The current value that is set will be used on all packets went with
-.BR t_snd "(3), " t_sndv "(3), " write "(2) or " writev (2).
+.BR t_snd "(3), " t_sndv "(3), " write "(2s) or " writev (2s).
 .I T_IP_RECVTOS
 is set, the current value, when read, using
 .BR t_optmgmt (3),
 will return the value that was contained in the last IP packet read (or
 partially read) with
-.BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2).
+.BR t_rcv "(3), " t_rcvv "(3), " read "(2s) or " readv (2s).
 See
 .BR xti_ip (3)
 for additional information.
@@ -668,13 +668,13 @@ that contains the time to live value.
 This option is used with
 .BR t_optmgmt (3).
 The current value that is set will be used on all packets went with
-.BR t_snd "(3), " t_sndv "(3), " write "(2) or " writev (2).
+.BR t_snd "(3), " t_sndv "(3), " write "(2s) or " writev (2s).
 .I T_IP_RECVTOS
 is set, the current value, when read, using
 .BR t_optmgmt (3),
 will return the value that was contained in the last IP packet read (or
 partially read) with
-.BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2).
+.BR t_rcv "(3), " t_rcvv "(3), " read "(2s) or " readv (2s).
 See
 .BR xti_ip (3)
 for additional information.
@@ -817,13 +817,13 @@ that contains the numeric value of the SCTP Stream Identifier.  This options
 is used with
 .BR t_optmgmt (3).
 The current value that is set will be used on all packets sent with
-.BR t_snd "(3), " t_sndv "(3), " write "(2) or " writev (2).
+.BR t_snd "(3), " t_sndv "(3), " write "(2s) or " writev (2s).
 When option
 .I T_SCTP_RECVSID
 is set, the current value, when read, using
 .BR t_optmgmt (3),
 will return the value that was contained in the last packet read with
-.BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2).
+.BR t_rcv "(3), " t_rcvv "(3), " read "(2s) or " readv (2s).
 See
 .IR T_SCTP_RECVSID .
 .\"
@@ -837,13 +837,13 @@ that contains the numeric value of the SCTP Payload Protocol Identifier.  This
 option is used with
 .BR t_optmgmt (3).
 The current value that is set will be used on all packets sent with
-.BR t_snd "(3), " t_sndv "(3), " write "(2) or " writev (2).
+.BR t_snd "(3), " t_sndv "(3), " write "(2s) or " writev (2s).
 When option
 .I T_SCTP_RECVPPI
 is set, the current value, when read, using
 .BR t_optmgmt (3),
 will return the value that was contained in the last packet read with
-.BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2).
+.BR t_rcv "(3), " t_rcvv "(3), " read "(2s) or " readv (2s).
 See
 .IR T_SCTP_RECVPPI .
 .\"
@@ -1329,11 +1329,11 @@ that contains the numeric value of the SCTP Stream Sequence Number.  This option
 is used with
 .BR t_optmgmt (3).
 The SCTP transport provider determines which values will be used on all packets sent with
-.BR t_snd "(3), " t_sndv "(3), " write "(2) or " writev (2).
+.BR t_snd "(3), " t_sndv "(3), " write "(2s) or " writev (2s).
 The current value, when read, using
 .BR t_optmgmt (3),
 will return the value that was contained in the last packet read with
-.BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2).
+.BR t_rcv "(3), " t_rcvv "(3), " read "(2s) or " readv (2s).
 .\"
 .\"
 .TP
@@ -1370,9 +1370,9 @@ current transport connection.
 .TP
 .B T_SCTP_ALI
 This option determines the adaptation layer information
-(described in draft-ietf-tsvwg-addip-sctp-08.txt)
+(described in RFC 5061)
 .[
-draft-ietf-tsvwg-addip-sctp-08.txt
+rfc5061
 .]
 to be used in the INIT
 or INIT-ACK on all passive or active connection attempts on the transport
@@ -1397,9 +1397,9 @@ adaptation layer information was present during the connection, or returns
 the adaptation layer information bits if provided by the peer.
 .sp
 This option supports the adaptation layer information features described in
-draft-ietf-tsvwg-addip-sctp-08.txt.
+RFC 5061.
 .[
-draft-ietf-tsvwg-addip-sctp-08.txt
+rfc5061
 .]
 .\"
 .\"
@@ -1592,9 +1592,9 @@ that contains the lifetime (in milliseconds).
 This option determines whether the transport endpoint will support the add IP
 extension
 .RB ( ADD-IP " and " DEL-IP )
-described in draft-ietf-tsvwg-addip-sctp-08.txt.
+described in RFC 5061.
 .[
-draft-ietf-tsvwg-addip-sctp-08.txt
+rfc5061
 .]
 The option value is formatted as a
 .B t_scalar_t
@@ -1672,9 +1672,9 @@ or equivalent commands.
 This option determines whether the transport endpoint will support the add IP
 extensions
 .RB ( SET-PRIMARY )
-described in draft-ietf-tsvwg-addip-sctp-08.txt.
+described in RFC 5061.
 .[
-draft-ietf-tsvwg-addip-sctp-08.txt
+rfc5061
 .]
 The option value is formatted as a
 .B t_scalar_t
@@ -1786,11 +1786,11 @@ that contains the numeric value of the SCTP Transmit Sequence Number.
 This options is used with
 .BR t_optmgmt (3).
 The SCTP transport provider determines which values will be used on all packets sent with
-.BR t_snd "(3), " t_sndv "(3), " write "(2) or " writev (2).
+.BR t_snd "(3), " t_sndv "(3), " write "(2s) or " writev (2s).
 The current value, when read, using
 .BR t_optmgmt (3),
 will return the value that was contained in the last packet read with
-.BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2).
+.BR t_rcv "(3), " t_rcvv "(3), " read "(2s) or " readv (2s).
 .\"
 .\"
 .TP
@@ -2112,11 +2112,11 @@ without modification.
 The
 .BR t_close (3)
 call will result in a
-.BR close (2)
+.BR close (2s)
 call on the descriptor of this XTI/TLI communication endpoint.  If there are no
 other descriptors in this process which reference the communications endpoint,
 the
-.BR close (2)
+.BR close (2s)
 call will perform an orderly connection termination according to the rules of
 a TCP CLOSE call on this transport endpoint as specified in the standards
 .I RFC 793
@@ -2134,7 +2134,7 @@ option is supported and is used to enable the linger option, the linger time
 will affect the time an implementation lingers in the execution of
 .BR t_close (3)
 or
-.BR close (2).
+.BR close (2s).
 A linger time of zero (0) specified with the
 .B XTI_LINGER
 option may cause an abortive release of a TCP connection, resulting in lost
@@ -2361,10 +2361,10 @@ for this field.
 .sp
 (Note that there is no way in TPI
 .[
-tpi revision 2.0.0
+tpi revision 2.0.0 draft 2
 .]
 to send a
-.BR T_CONNECT_REQ (7)
+.BR T_CONN_REQ (7)
 indicated expedited data.  Therefore, it is only possible to send a TSDU with
 .BR t_connect (3)
 in
@@ -2583,6 +2583,10 @@ structure.  The following should be the values returned by the call to
 and
 .BR t_getinfo (3)
 with the SCTP transport provider.
+.bp
+.if \n(cR \{\
+.pl \n(nl+25
+.\}
 .PP
 .TS
 center tab(:);
@@ -2790,7 +2794,7 @@ When data is received using these XTI/TLI library calls, the
 parameter will have the
 .B T_MORE
 bit set if a subsequent
-.BR t_rcv "(3), " t_rcvv "(3), " read "(2) or " readv (2)
+.BR t_rcv "(3), " t_rcvv "(3), " read "(2s) or " readv (2s)
 operation will read additional data belonging to the same [E]TSDU.
 The
 .I flags
@@ -2798,11 +2802,11 @@ parameter will have the
 .B T_EXPEDITED
 bit set if the data was sent unordered.
 Because of this, reads using
-.BR read "(2) or " readv (2)
+.BR read "(2s) or " readv (2s)
 must be complete TSDU reads of normal (ordered) data.
 .PP
 Data received with these XTI/TLI library calls, or using
-.BR read "(2) or " readv (2),
+.BR read "(2s) or " readv (2s),
 will set the
 .IR T_SCTP_SID ", " T_SCTP_PPI ", " T_SCTP_SSN " and " T_SCTP_TSN
 to the option values associated with the read data if the
@@ -2901,18 +2905,18 @@ When data is sent using these XTI/TLI library calls, the
 parameter will have the
 .B T_MORE
 bit set if a subsequent
-.BR t_snd "(3), " t_sndv "(3), " write "(2) or " writev (2)
+.BR t_snd "(3), " t_sndv "(3), " write "(2s) or " writev (2s)
 operation will write additional data belonging to the same [E]TSDU.  The
 .I flags
 parameter will have the
 .B T_EXPEDITED
 bit set if the data is to be sent unordered.
 Because of this, writes using
-.BR write "(2) or " writev (2)
+.BR write "(2s) or " writev (2s)
 must be complete TSDU writes of normal (ordered) data.
 .PP
 When data is sent using these XTI/TLI library calls, or using
-.BR write "(2) or " writev (2),
+.BR write "(2s) or " writev (2s),
 the values previously set with the
 .IR T_SCTP_SID " and " T_SCTP_PPI
 options will be assigned to the data for transmission.  These option values
@@ -3066,8 +3070,8 @@ header file.
 .SH "SEE ALSO"
 .PP
 .BR sctp (4),
-.BR read (2),
-.BR readv (2),
+.BR read (2s),
+.BR readv (2s),
 .BR sctp_t (4),
 .BR sctp (7),
 .BR sockets (3),
@@ -3083,8 +3087,8 @@ header file.
 .BR t_optmgmt (3),
 .BR t_rcvconnect (3),
 .BR t_snddis (3),
-.BR write (2),
-.BR writev (2),
+.BR write (2s),
+.BR writev (2s),
 .BR xnet (3),
 .BR xti (3),
 .BR xti_ip (3),
@@ -3151,7 +3155,7 @@ validation test suite.
 The
 .I Transport Provider Interface (TPI)
 .[
-tpi revision 2.0.0
+tpi revision 2.0.0 draft 2
 .]
 was first created by AT&T as the
 .I Transport Layer Interface (TLI)

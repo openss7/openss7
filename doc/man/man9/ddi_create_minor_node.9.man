@@ -2,7 +2,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: ddi_create_minor_node.9.man,v 1.1.2.1 2009-06-21 10:38:35 brian Exp $
+.\" @(#) $Id: ddi_create_minor_node.9.man,v 1.1.2.2 2011-02-07 02:18:38 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:35 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:38 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: ddi_create_minor_node.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:38  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:35  brian
 .\" - added files to new distro
 .\"
@@ -138,7 +141,7 @@ Block minor device.
 (Block devices are not supported by
 .BR "@PACKAGE_TITLE@" .)
 .[
-@PACKAGE@
+@PACKAGE@-@VERSION@
 .]
 .RE
 .TP
@@ -151,7 +154,7 @@ A string that uniquely identifies the type of node.  (Only
 devices are supported by
 .BR "@PACKAGE_TITLE@" .)
 .[
-@PACKAGE@
+@PACKAGE@-@VERSION@
 .]
 .RS
 .TP \w'S_IFCHR\(em'u
@@ -358,7 +361,7 @@ drivers to
 Because internal structures and definitions for
 .B @PACKAGE_TITLE@
 .[
-@PACKAGE@
+@PACKAGE@-@VERSION@
 .]
 differ from that of
 .IR Solaris \(rg,

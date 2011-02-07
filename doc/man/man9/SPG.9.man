@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: SPG.9.man,v 1.1.2.1 2009-06-21 10:38:30 brian Exp $
+.\" @(#) $Id: SPG.9.man,v 1.1.2.2 2011-02-07 02:18:35 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:30 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:35 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: SPG.9.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:38:30  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:18:35  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -189,42 +189,42 @@ subsystem.
 .\"
 .SS "System Calls"
 .PP
-.IP \fBclose\fR(2) \w'\fBisastream\fR(2)\(en'u
+.IP \fBclose\fR(2) \w'\fBisastream\fR(2s)\(en'u
 \(en\ 
 .PD 0
 .IP \fBfattach\fR(3)
 \(en\ 
 .IP \fBfdetach\fR(3)
 \(en\ 
-.IP \fBgetmsg\fR(2)
+.IP \fBgetmsg\fR(2s)
 \(en\ get next message from a \fISTREAMS\fR character device
-.IP \fBgetpmsg\fR(2)
+.IP \fBgetpmsg\fR(2s)
 \(en\ get next message from a \fISTREAMS\fR character device
-.IP \fBioctl\fR(2)
+.IP \fBioctl\fR(2s)
 \(en\ 
-.IP \fBisastream\fR(2)
+.IP \fBisastream\fR(2s)
 \(en\ 
 .IP \fBopen\fR(2)
 \(en\ 
-.IP \fBpipe\fR(2)
+.IP \fBpipe\fR(2s)
 \(en\ 
-.IP \fBpoll\fR(2)
+.IP \fBpoll\fR(2s)
 \(en\ wait for some event on a \fISTREAMS\fR character device
-.IP \fBputmsg\fR(2)
+.IP \fBputmsg\fR(2s)
 \(en\ put a message to a \fISTREAMS\fR character device
-.IP \fBputpmsg\fR(2)
+.IP \fBputpmsg\fR(2s)
 \(en\ put a message to a \fISTREAMS\fR character device
-.IP \fBread\fR(2)
+.IP \fBread\fR(2s)
 \(en\ 
-.IP \fBreadv\fR(2)
+.IP \fBreadv\fR(2s)
 \(en\ 
 .IP \fBstreamio\fR(7)
 \(en\ 
-.IP \fBtermios\fR(7)
+.IP \fBtermios\fR(3)
 \(en\ 
-.IP \fBwrite\fR(2)
+.IP \fBwrite\fR(2s)
 \(en\ 
-.IP \fBwritev\fR(2)
+.IP \fBwritev\fR(2s)
 \(en\ 
 .PD
 
@@ -233,41 +233,37 @@ subsystem.
 .PD 0
 .IP \fBfcntl\fR(2)
 \(en\ 
-.IP \fBfcntl\fR(2s)
-\(en\ 
-.IP \fBgetmsg\fR(2)
+.IP \fBgetmsg\fR(2s)
 \(en\ 
 .IP \fBgetpmsg\fR(2s)
 \(en\ 
 .IP \fBioctl\fR(2s)
 \(en\ 
-.IP \fBpipe\fR(2)
+.IP \fBpipe\fR(2s)
 \(en\ 
 .IP \fBpipe\fR(2s)
 \(en\ 
-.IP \fBpoll\fR(2)
+.IP \fBpoll\fR(2s)
 \(en\ 
 .IP \fBpoll\fR(2s)
 \(en\ 
-.IP \fBputmsg\fR(2)
+.IP \fBputmsg\fR(2s)
 \(en\ 
 .IP \fBputpmsg\fR(2s)
 \(en\ 
-.IP \fBread\fR(2)
+.IP \fBread\fR(2s)
 \(en\ 
 .IP \fBread\fR(2s)
 \(en\ 
-.IP \fBreadv\fR(2)
+.IP \fBreadv\fR(2s)
 \(en\ 
 .IP \fBreadv\fR(2s)
 \(en\ 
-.IP \fBsoon\fR(2)
-\(en\ 
-.IP \fBwrite\fR(2)
+.IP \fBwrite\fR(2s)
 \(en\ 
 .IP \fBwrite\fR(2s)
 \(en\ 
-.IP \fBwritev\fR(2)
+.IP \fBwritev\fR(2s)
 \(en\ 
 .IP \fBwritev\fR(2s)
 \(en\ 
@@ -279,9 +275,9 @@ subsystem.
 .IP \fBfattach\fR(2) \w'\fBgetpmsg\fR(2s)\(en'u
 \(en\ 
 .PD 0
-.IP \fBfcntl\fR(2s)
+.IP \fBfcntl\fR(2)
 \(en\ 
-.IP \fBgetmsg\fR(2)
+.IP \fBgetmsg\fR(2s)
 \(en\ 
 .IP \fBgetpmsg\fR(2s)
 \(en\ 
@@ -289,7 +285,7 @@ subsystem.
 \(en\ 
 .IP \fBpoll\fR(2s)
 \(en\ 
-.IP \fBputmsg\fR(2)
+.IP \fBputmsg\fR(2s)
 \(en\ 
 .IP \fBputpmsg\fR(2s)
 \(en\ 
@@ -369,7 +365,7 @@ subsystem.
 \(en\ 
 .IP \fBsad\fR(4)
 \(en\ 
-.IP \fBs_fifo\fR(4)
+.IP \fBs_fifo\fR(4s)
 \(en\ 
 .IP \fBsfx\fR(4)
 \(en\ 
@@ -470,7 +466,7 @@ subsystem.
 .PP
 .B ADMINISTRATIVE UTILITIES
 .PP
-.IP \fBstrchg\fR(1) \w'\fBstreams_mknod\fR(8)\(en'u
+.IP \fBstrchg\fR(1) \w'\fBstreams_mkdev\fR(8)\(en'u
 \(en\ 
 .PD 0
 .IP \fBstrconf\fR(1)
@@ -501,7 +497,7 @@ subsystem.
 \(en\ 
 .IP \fBstrclean\fR(8)
 \(en\ 
-.IP \fBstreams_mknod\fR(8)
+.IP \fBstreams_mkdev\fR(8)
 \(en\ 
 .IP \fBstrerr\fR(8)
 \(en\ 
@@ -779,13 +775,11 @@ subsystem.
 \(en\ 
 .IP \fBclose\fR(9s)
 \(en\ 
-.IP \fBputp\fR(9)
+.IP \fBput\fR(9)
 \(en\ 
 .IP \fBservice\fR(9s)
 \(en\ 
 .IP \fBsrv\fR(9s)
-\(en\ 
-.IP \fBsrvp\fR(9)
 \(en\ 
 .IP \fBgetadmin\fR(9)
 \(en\ 
@@ -1268,8 +1262,6 @@ subsystem.
 \(en\ 
 .IP \fBpipe\fR(9)
 \(en\ 
-.IP \fBqueinfo\fR(9)
-\(en\ 
 .IP \fBsd_get\fR(9)
 \(en\ 
 .IP \fBsd_put\fR(9)
@@ -1400,7 +1392,7 @@ subsystem.
 .TP
 .BR freezestr (9)
 .TP
-.BR put (9)
+.BR put (9s)
 .TP
 .BR putnext (9)
 .TP

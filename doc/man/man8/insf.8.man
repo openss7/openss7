@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: insf.8.man,v 1.1.2.1 2009-06-21 10:37:46 brian Exp $
+.\" @(#) $Id: insf.8.man,v 1.1.2.2 2011-02-07 02:18:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:37:46 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: insf.8.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:37:46  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:18:30  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -117,19 +117,23 @@ search-ignore T
 .\"
 .SH SYNOPSIS
 .PP
-.HP 12
-\fBinsf \fR[\fB-C \fIclass\fR|\fB-d \fIdriver\fR] [\fB-D \fIdirectory\fR]\fP
-\fR[\fB-e\fR] [\fB-H \fIhw-path\fR] [\fB-I \fIinstance\fR] [\fB-n \fInpty\fR]\fP
-\fR[\fB-q\fR|\fB-v\fR] [\fB-s \fInstrpty\fR] [\fB-p\fP
-\fIfirst-optical-disk:last-optical-disk\fR]\fP
+.ad l
+.nh
+.HP \w'\fBinsf\ 'u
+\fBinsf \fR[\fB-C\0\fIclass\fR|\fB-d\0\fIdriver\fR] [\fB-D\0\fIdirectory\fR]\fP
+\fR[\fB-e\fR] [\fB-H\0\fIhw-path\fR] [\fB-I\0\fIinstance\fR] [\fB-n\0\fInpty\fR]\fP
+\fR[\fB-q\fR|\fB-v\fR] [\fB-s\0\fInstrpty\fR]
+[\fB-p\fP\0\fIfirst-optical-disk:last-optical-disk\fR]\fP
 .PD 0
-.HP 12
+.HP
 \fBinsf\fR {\fB-h\fR|\fB--help\fR}
-.HP 12
+.HP
 \fBinsf\fR {\fB-V\fR|\fB--version\fR}
-.HP 12
+.HP
 \fBinsf\fR {\fB-C\fR|\fB--copying\fR}
 .PD
+.ad b
+.hy 1
 .\"
 .\"
 .SH DESCRIPTION
@@ -174,11 +178,11 @@ option displays the installation message and the name of each special file as it
 .B insf
 recognizes the following options:
 .TP
-.BI -C " class
+.BR -C ", " --class " \fI\)class\fP
 Match devices that belong to a given device class,
 .IR class .
 Device classes can be listed with the
-.BR lsdev (1)
+.BR lsdev (8)
 command.
 They are defined in the files in the directory
 .BR /usr/conf/master.d .
@@ -187,18 +191,18 @@ The special class
 includes all pseduo-drivers.  This option cannot be used with
 .BR -d .
 .TP
-.BI -d " driver
+.BR -d ", " --driver " \fI\)driver\fP
 Match devices that are controlled by the specified device driver,
 .IR driver .
 Device drivers can be listed with the
-.BR lsdev (1)
+.BR lsdev (8)
 comand.
 They are defined in the files in the directory
 .BR /usr/conf/master.d .
 This option cannot be used with
 .BR -C .
 .TP
-.BI -D " directory
+.BR -D ", " --directory " \fI\)directory\fP
 Override the default device installation directory
 .B /dev
 and install the special files in
@@ -210,15 +214,15 @@ must exist; otherwise,
 displays an error message and exits.  See
 .RI \(lq WARNINGS \(rq.
 .TP
-.B -e
+.BR -e ", " --existing
 Reinstall the special files for pseudo-drivers and existing devices.  This is useful for restoring
 special files if one or more have been removed.
 .TP
-.BI -H " hw-path
+.BR -H ", " --hwpath " \fI\)hw-path\fP
 Match devices at a given hardware path,
 .IR hw-path .
 Hardware paths can be listed with the
-.BR ioscan (1)
+.BR ioscan (8)
 command.  A hardware path specifies the addresses of the hardware components leading to a device.
 It consists of a stream of numbers separated by periods (.), such as
 .B 52
@@ -242,11 +246,11 @@ then special files are made for the devices at addresses
 .BR 56 . 2 ,
 etc.
 .TP
-.BI -I " instance
+.BR -I ", " --instance " \fI\)instance\fP
 Match a device with the specified instance number.  Instances can be listed with the
 .B -f
 option of the
-.BR ioscan (1)
+.BR ioscan (8)
 comand.
 This option is effective only if the
 .B -e
@@ -256,7 +260,7 @@ or
 .B -d
 option.
 .TP
-.BI -n " npty
+.BR -n ", " --npty " \fI\)npty\fP
 Install
 .I npty
 special files for each specified
@@ -300,7 +304,7 @@ and
 drivers.  If it is omitted, the 64 special files for both sides of 32 optical disks (1a through 32b)
 will be installed.
 .TP
-.B -q
+.BR -q ", " --quiet
 Quiet option.  Normally,
 .B insf
 displays a message as each driver is processed.  This option suppresses the driver message, but not
@@ -308,7 +312,7 @@ error messages.  See the
 .B -v
 option.
 .TP
-.BI -s " nstrpty
+.BR -s ", " --nstrpty " \fI\)nstrpty\fP
 Install
 .I nstrpty
 slave-side stream special files for the
@@ -329,11 +333,35 @@ If this option is omitted,
 .I nstrpty
 defaults to 60.
 .TP
-.B -v
+.BR -v ", " --verbose
 Verbose option.  In addition to the normal processing message, display the name of each special file
 as it is created.  See
 .B -q
 option.
+.TP
+.BR -h ", " --help
+When this option is encountered,
+.B insf
+displays usage information on
+.I stdout
+and exits.  No further processing of options or arguments is performed and no
+actions are taken.
+.TP
+.BR -V ", " --version
+When this option is encountered,
+.B insf
+displays version information on
+.I stdout
+and exits.  No further processing of options or arguments is performed and no
+actions are taken.
+.TP
+.BR -c ", " --copying
+When this option is encountered,
+.B insf
+displays copying and copyright information on
+.I stdout
+and exits.  No further processing of options or arguments is performed and no
+actions are taken.
 .\"
 .\"
 .SS Naming Conventions
@@ -344,7 +372,7 @@ naming convention.  These variables have the following meaning whenever they are
 .TP
 .I card
 The unique interface card identifier number from
-.BR ioscan (1).
+.BR ioscan (8).
 It is represented as a decimal number with a typical range of
 .BR 0 " to " 255 .
 .TP
@@ -372,7 +400,7 @@ option.
 .B insf
 sets the file permissions and the owner and group IDs.  They are shown here in a format similar to
 that of the
-.BR ll (1)
+.BR ls (1)
 command:
 
 .TS
@@ -406,7 +434,7 @@ asio0
 For the built-in serial port, the following special files are installed for each card instance:
 ttycardp0:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Direct connect
 T}
 .TP
@@ -418,27 +446,27 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardp0:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 local console port (direct connect)
 T}
 ttycardp1:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 remote session port (direct connect)
 T}
 sassy:rw-------:root:sys:T{
 .ad l
-.hy 0
+.nh
 internal console port (direct connect)
-}T
+T}
 ttycard+1p0:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 UPS port (direct connect)
 T}
 ttycard+1p1:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 local session port (direct connect)
 T}
 .TE
@@ -461,87 +489,87 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 audio_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Default audio device
 T}
 audioCtl_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Audio control device
 T}
 audioBA_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 All outputs, A-law format
 T}
 audioBL_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 All outputs, 16-bit linear format
 T}
 audioBU_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 All outputs, Mu-law format
 T}
 audioEA_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 External output, A-law format
 T}
 audioEL_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 External output, 16-bit linear format
 T}
 audioEU_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 External output, Mu-law format
 T}
 audioIA_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Internal speaker output, A-law format
 T}
 audioIL_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Internal speaker output, 16-bit linear format
 T}
 audioIU_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Internal speaker output, Mu-law format
 T}
 audioLA_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Line output, A-law format
 T}
 audioLL_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Line output, 16 bit linear format
 T}
 audioLU_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Line output, Mu-law format
 T}
 audioNA_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 No output, A-law format
 T}
 audioNL_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 No output, 16 bit linear format
 T}
 audioNU_card:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 No output, Mu-law format
 T}
 .TE
@@ -559,17 +587,17 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ac/ccardttargetddevice_surface:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Block entry
 T}
 rac/ccardttargetddevice_surface:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Character entry
 T}
 rac/ccardttargetddevice:rw-------:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Character entry
 T}
 .TE
@@ -591,7 +619,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ccardttargetddevice_lp:rw-rw-rw-:lp:bin:T{
 .ad l
-.hy 0
+.nh
 Handshake mode 2, character entry
 T}
 .TE
@@ -604,7 +632,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardp0:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Direct connect
 T}
 .TE
@@ -666,12 +694,12 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 dsk/ccardttargetddevice:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Block entry
 T}
 rdsk/ccardttargetddevice:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Character entry
 T}
 .TE
@@ -683,12 +711,12 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 floppy/ccardttargetddevice:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Block entry
 T}
 rfloppy/ccardttargetddevice:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Character entry
 T}
 .TE
@@ -700,12 +728,12 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 dsk/ccardttargetddevicespartition:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Block entry
 T}
 rdsk/ccardttargetddevicespartition:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Character entry
 T}
 .TE
@@ -751,7 +779,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardport_moduleport:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 letter: a to p, port module name port: 1 to 16, direct connect
 T}
 muxcard:rw-------:bin:bin
@@ -780,22 +808,26 @@ ocrtdevice_number:rw-rw-rw-:bin:bin
 .TE
 
 .I device_number
-is  0 indexed and is assigned in the order in which the devices appear in [26]ioscan(1M) output.
+is  0 indexed and is assigned in the order in which the devices appear in
+.BR ioscan (8)
+output.
 
-If the console device is a graphics device, the files crt and ocrt are created  as  the  console
-device.  If  the  console is not a graphics device, crt and ocrt are identical to crt0 and ocrt0.
+If the console device is a graphics device, the files crt and ocrt are
+created  as  the  console device.  If  the  console is not a graphics device,
+crt and ocrt are identical to crt0 and ocrt0.
 .TP
 hil
-For each device, the following special files are installed. Note the underscore (_) before card in
-each special file name.  For card 0, the device files are linked to files named hiladdr for the link
-addresses 1 to 7; hilkbd for the cooked keyboard device; and rhil for the hil controller device.
+For each device, the following special files are installed. Note the
+underscore (_) before card in each special file name.  For card 0, the device
+files are linked to files named hiladdr for the link addresses 1 to 7; hilkbd
+for the cooked keyboard device; and rhil for the hil controller device.
 
 .TS
 tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 hil_card.addr:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 addr: link addresses 1 to 7
 T}
 hilkbd_card:rw-rw-rw-:bin:bin
@@ -866,12 +898,12 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 lanttycard:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Normal access
 T}
 diag/lanttycard:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Exclusive access
 T}
 .TE
@@ -894,17 +926,17 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 mem:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Minor 0
 T}
 kmem:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Minor 1
 T}
 null:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Minor 2
 T}
 .TE
@@ -917,7 +949,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardpport:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 port: 0 to 5, direct connect
 T}
 muxcard:rw-------:bin:bin
@@ -931,7 +963,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardpport:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 port: 0 to 15, direct connect
 T}
 muxcard:rw-------:bin:bin
@@ -946,7 +978,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardpport:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 port: 0 to 15, direct connect
 T}
 muxcard:rw-------:bin:bin
@@ -960,7 +992,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardpport:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 port: 0 to 7, direct connect
 T}
 muxcard:rw-------:bin:bin
@@ -974,7 +1006,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardpport:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 port: 0, 1, and 7, direct connect
 T}
 muxcard:rw-------:bin:bin
@@ -989,7 +1021,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardpport:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 port: 0 and 1, direct connect
 T}
 .TE
@@ -1022,7 +1054,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ttycardport_moduleport:rw--w--w-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 port_module: a to p, port module name port: 1 to 16, port number
 T}
 muxcard:rw-------:bin:bin
@@ -1039,12 +1071,12 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 floppy/ccardttargetddevice:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Block entry
 T}
 rfloppy/ccardttargetddevice:rw-r-----:bin:sys:T{
 .ad l
-.hy 0
+.nh
 Character entry
 T}
 .TE
@@ -1057,22 +1089,22 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ps2kbd:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Autosearch for first ps2 keyboard
 T}
 ps2mouse:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Autosearch for first ps2 mouse
 T}
 ps2_0:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 ps2 port 0
 T}
 ps2_1:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 ps2 port 1
 T}
 .TE
@@ -1094,15 +1126,15 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 pts/number:rw-rw-rw-:root:sys:T{
 .ad l
-.hy 0
+.nh
 number: 0 to 59
 T}
 .TE
 .TP
 pty
-Specifying this driver tells insf to install the special files for  both the master and slave pty
-drivers, ptym and ptys. The command insf -d pty is equivalent to the two commands insf -d ptym and
-insf -d ptys.
+Specifying this driver tells insf to install the special files for  both the
+master and slave pty drivers, ptym and ptys. The command insf -d pty is
+equivalent to the two commands insf -d ptym and insf -d ptys.
 .TP
 ptym
 The following special files are installed:
@@ -1113,7 +1145,7 @@ lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ptym/clone:rw-r--r--:root:other
 ptym/ptyindexnumber:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 index: p to z, a to c, e to o; number: 0 to f (hexadecimal)
 T}
 .TE
@@ -1125,12 +1157,12 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 ptym/ptyindexnumber:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 index: p to z, a to c, e to o; number: 00 to 99
 T}
 ptym/ptyindexnumber:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 index: p to z, a to c, e to o; number: 000 to 999
 T}
 .TE
@@ -1144,7 +1176,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 pty/ttyindexnumber:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 index: p to z, a to c, e to o; number: 0 to f (hexadecimal)
 T}
 .TE
@@ -1156,12 +1188,12 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 pty/ttyindexnumber:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 index: p to z, a to c, e to o; number: 00 to 99
 T}
 pty/ttyindexnumber:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 index: p to z, a to c, e to o; number: 000 to 999
 T}
 .TE
@@ -1215,37 +1247,39 @@ sflop
 See pflop.
 .TP
 stape tape2
-For each driver instance, different special files are installed  depending on the number of
-characters allowed in the target directory.  There  are  two  lists  below,  one  for  long  file
-name directories  and  one  for  short file name directories (14 characters maximum). Short file
-names are used for files installed on an NFS file system.
+For each driver instance, different special files are installed  depending on
+the number of characters allowed in the target directory.  There  are  two
+lists  below,  one  for  long  file name directories  and  one  for  short
+file name directories (14 characters maximum). Short file names are used for
+files installed on an NFS file system.
 
-Note  that  the  first four special files in each list for tape driver instances  0-9  are  also
-linked  to  rmt/instancem,  rmt/instancemb, rmt/instancemn, and rmt/instancemnb, respectively.
+Note  that  the  first four special files in each list for tape driver
+instances  0-9  are  also linked  to  rmt/instancem,  rmt/instancemb,
+rmt/instancemn, and rmt/instancemnb, respectively.
 
 For installation in a long file name directory:
 
 .TS
 tab(:);
-lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1ls.
 rmt/ccardttargetddeviceBEST:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 AT&T-style, best available density, character entry
 T}
 rmt/ccardttargetddeviceBESTb:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Berkeley-style, best available density, character entry
 T}
 rmt/ccardttargetddeviceBESTn:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 AT&T-style, no rewind, best available density, character entry
 T}
 rmt/ccardttargetddeviceBESTnb:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Berkeley-style, no rewind, best available density, character entry
 T}
 .TE
@@ -1257,39 +1291,40 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 rmt/ccardttargetddevicef0:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 AT&T-style, best available density, character entry
 T}
 rmt/ccardttargetddevicef0b:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Berkeley-style, best available density, character entry
 T}
 rmt/ccardttargetddevicef0n:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 AT&T-style, no rewind, best available density, character entry
 T}
 rmt/ccardttargetddevicef0nb:rw-rw-rw-:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Berkeley-style, no rewind, best available density, character entry
 T}
 .TE
 
-For   both  long  and  short  file  name  directories,  the  following additional files are created.
+For both long and short file name directories, the following additional files
+are created.
 
 .TS
 tab(:);
-lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
+lw(18n)1lw(9n)1lw(4n)1lw(4n)1ls.
 rmt/driver_name_config:rw-r--r--:bin:bin:T{
 .ad l
-.hy 0
+.nh
 Tape configuration, character entry
 T}
 diag/rmt/ccardttargetddevice:rw-------:bin:bin:T{
 .ad l
-.hy 0
+.nh
 For tape2 only, diagnostic access, character entry
 T}
 .TE
@@ -1351,7 +1386,7 @@ tab(:);
 lw(18n)1lw(9n)1lw(4n)1lw(4n)1lss.
 pts/tnumber:rw-rw-rw-:root:sys:T{
 .ad l
-.hy 0
+.nh
 number: 0 to 59
 T}
 .TE
@@ -1436,36 +1471,46 @@ Failure.
 .PP
 Most diagnostic messages from
 .B insf
-are self-explanatory.  Listed below are some messages deserving further clarification.
+are self-explanatory.  Listed below are some messages deserving further
+clarification.
 .\"
 .SS Warnings 
 .TP
 Device driver name is not in the kernel
 .TP
 Device class name is not in the kernel
-The indicated device driver or device class is not present in the kernel. A device driver and/or
-device class can be added to the kernel using
+The indicated device driver or device class is not present in the kernel. A
+device driver and/or device class can be added to the kernel using
 .BR config (8).
 .TP 
 No instance number available for device class name list item
-All of the instance numbers available for the device class are already assigned. Use the rmsf
-command to remove any unneeded devices from the system (see
+All of the instance numbers available for the device class are already
+assigned. Use the rmsf command to remove any unneeded devices from the system
+(see
 .BR rmsf(8)).
 .TP
 Don't know how to handle driver name - no special files created for path list item
 .B insf
-does not know how to create special files for the specified device driver. Use mknod to create
-special files for the device (see
+does not know how to create special files for the specified device driver.
+Use mknod to create special files for the device (see
 .BR mknod (1)).
 .\"
 .\"
 .SH NOTICES
 .PP
 .B insf
-should only be run in single-user mode.  It can change the mode, owner, or group of an existing
-special file, or unlink and recreate one; special files that are currently open may be left in an
-indeterminate state.
-
+is compatible only with
+.I Linux Fast-STREAMS
+devices.
+The command will not function with regular
+.B Linux
+devices.
+.PP
+.B insf
+should only be run in single-user mode.  It can change the mode, owner, or
+group of an existing special file, or unlink and recreate one; special files
+that are currently open may be left in an indeterminate state.
+.PP
 Many commands and subsystems assume their device files are in
 .BR /dev ,
 therefore the use of the
@@ -1510,17 +1555,20 @@ I/O system special file
 .TP
 .B /etc/ioconfig
 I/O system configuration database
+.TP
+.B /usr/conf/master.d/*
+device configuration files
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR config (1M),
-.BR ioscan (1M),
-.BR lsdev (1M),
-.BR lssf (1M),
-.BR mknod (1M),
-.BR mksf (1M),
-.BR rmsf (1M).
+.BR config (8),
+.BR ioscan (8),
+.BR lsdev (8),
+.BR lssf (8),
+.BR mknod (1),
+.BR mksf (8),
+.BR rmsf (8).
 .\"
 .\"
 .SH BUGS
@@ -1531,10 +1579,37 @@ has no known bugs.
 .\"
 .SH COMPATIBILITY
 .PP
-This is for compatibility with the
+The
+.B insf
+command is provided for compatibility with the
 .IR HP-UX \(rg
-command,
+command of the same name,
+.[
+hpuxdoc
+.]
 with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B insf
+is provided only for compatibility with
+.IR HP-UX \(rg
+for
+.I Linux Fast-STREAMS
+devices.
+The command will not function with regular
+.B Linux
+devices.
+.IP \(em
+Options
+.BR -h ", " -V " and " -c ,
+all long options, are specific to this
+.I @PACKAGE_TITLE@
+implementation of
+.B insf
+and should not be used by portable applications.
+.IP \(em
+No other implementation documents the
+.BR -h ", " -V " or -c
+options.  They should not be used by portable applications.
 .IP \(em
 Options
 .BR --help " and " --version
@@ -1547,6 +1622,9 @@ OpenSS7 coding standards.
 .PP
 .IR HP-UX \(rg
 documentation.
+.[
+hpuxdoc
+.]
 .\"
 .\"
 .SH HISTORY

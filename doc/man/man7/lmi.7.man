@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: lmi.7.man,v 1.1.2.1 2009-06-21 10:36:21 brian Exp $
+.\" @(#) $Id: lmi.7.man,v 1.1.2.2 2011-02-07 02:18:28 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:36:21 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:28 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: lmi.7.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:36:21  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:18:28  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -126,7 +126,7 @@ configure SS7 modules and drivers conforming to the \fIOpenSS7\fR Local
 Management Interface (LMI) specification.
 .PP
 LMI is the common interface to \fIOpenSS7\fR modules and drivers configured by
-the SS7 Configuration Daemon \fBss7d\fR(8) using \fBstreamio\fR(2)
+the SS7 Configuration Daemon \fBss7d\fR(8) using \fBstreamio\fR(7)
 \fBI_PUSH\fR and \fBI_LINK\fR ioctls.  This interface is also available for
 the development of special purposes management entities (e.g. SNMP, TMN) for
 management of the \fIOpenSS7\fR stack.  All SS7 drivers, modules and
@@ -137,7 +137,7 @@ The LMI consists of two subcomponents:
 .I "LOCAL MANAGEMENT INTERFACE"
 LMI provides a local management interface which utilizes \fBM_PROTO\fR and
 \fBM_PCPROTO\fR messages which can be exchanged with the interface using
-\fBputmsg\fR(2) and \fBgetmsg\fR(2) system calls on the stream head once the
+\fBputmsg\fR(2s) and \fBgetmsg\fR(2s) system calls on the stream head once the
 interface is opened.  The local management interface controls local management
 (STREAMS configuration functions) which are normally used by the SS7
 Configuration Daemon \fBss7d\fR(8) on the driver interface or the control
@@ -147,8 +147,8 @@ in detail in the the section "LOCAL MANAGEMENT INTERFACE".
 .TP
 .I "PROTOCOL MANAGEMENT INTERFACE"
 LMI provides a protocol management interface which utilizes \fBM_PROTO\fR and
-\fBM_PCPROTO\fR messages which can be exchanged with \fBputmsg\fR(2) and
-\fBgetmsg\fR(2) system calls on the stream head or control stream once the
+\fBM_PCPROTO\fR messages which can be exchanged with \fBputmsg\fR(2s) and
+\fBgetmsg\fR(2s) system calls on the stream head or control stream once the
 interface is opened, or \fBM_CTL\fR messages between modules.  The protoocl
 management interface supports general and layer-specific configuration, state
 inquiry, event and statistics control (SNMP functions) which are normally used
@@ -157,8 +157,8 @@ multiplexor control channel before or after the SS7 protocol stack has been
 configured.
 .TP
 .I "INPUT OUTPUT CONTROL INTERFACE"
-LMI provides a control interface which utilizes \fBioctl\fR(2) transparent
-calls, pass-through calls, or \fBI_STR\fR ioctl calls using \fBstreamio\fR(2)
+LMI provides a control interface which utilizes \fBioctl\fR(2s) transparent
+calls, pass-through calls, or \fBI_STR\fR ioctl calls using \fBstreamio\fR(7)
 from a stream head or a multiplexor control stream.  The control interface
 provides for the control of layer-specific and device-specific aspects which
 are outside the scope of the SS7 protocol proper, such as interface
@@ -267,11 +267,11 @@ a pending state is provided.
 .SS "LOCAL MANAGEMENT PRIMITIVES"
 .PP
 Local management primitives can be exchanged with the device driver as
-\fBM_PROTO\fR or \fBM_PCPROTO\fR primitives using the \fBputmsg\fR(2) or
-\fBgetmsg\fR(2) system calls on the stream head after opening the device.
+\fBM_PROTO\fR or \fBM_PCPROTO\fR primitives using the \fBputmsg\fR(2s) or
+\fBgetmsg\fR(2s) system calls on the stream head after opening the device.
 This interface is normally used only by the SS7 Configuration Daemon
 \fBss7d\fR(8) during STREAMS configuration, or by the upstream protocol
-modules during \fBstreamio\fR(2) \fBI_PUSH\fR and \fBI_POP\fR operations.  It
+modules during \fBstreamio\fR(7) \fBI_PUSH\fR and \fBI_POP\fR operations.  It
 is possible, however, for a user-level program to use this interface directly
 on an open driver or module stream head for special purposes and testing.
 .PP
@@ -846,7 +846,7 @@ q751-2
 q752
 .]
 .[
-t1.116
+t1.116.1
 .]
 .[
 $LIST$

@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: qi_putp.9.man,v 1.1.2.1 2009-06-21 10:38:52 brian Exp $
+.\" @(#) $Id: qi_putp.9.man,v 1.1.2.2 2011-02-07 02:18:44 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:52 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:44 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: qi_putp.9.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:38:52  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:18:44  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -175,7 +175,7 @@ whenever a message is passed from a neighbouring queue procedure with
 .BR putnext (9),
 or whenever a message is passed to the Stream head write queue or Stream end (driver) read queue
 using
-.BR put (9).
+.BR put (9s).
 The
 .IR qi_putp ()
 procedure is the primary mechanism for passing
@@ -188,14 +188,14 @@ is defined to return a value, any returned value is ignored by
 and is not available to the caller of
 .BR putnext (9)
 nor
-.BR put (9),
+.BR put (9s),
 which return
 .BR void .
 .PP
 The arguments passed to the
 .IR qi_putp ()
 procedure are of the same type passed to
-.BR put (9)
+.BR put (9s)
 and
 .BR putnext (9);
 as follows:
@@ -217,7 +217,7 @@ and associated data buffer, that is to be passed to the queue,
 invokes a queue
 .IR qi_putp ()
 procedure as messages are passed to, or along, a Stream with
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9).
 .PP
@@ -225,15 +225,15 @@ The
 .IR qi_putp ()
 procedure is called in the following circumstances:
 .IP (1) \w'(0)\(em'u
-.BR put (9)
+.BR put (9s)
 was called from the Stream head to place a message on the write queue of the driver or module on the
 top of the module stack for the Stream.
 .IP (2)
-.BR put (9)
+.BR put (9s)
 was called from a device driver routine (possibly an interrupt service routine, or soft interrupt
 bottom half or tasklet), to place a message on the read queue of the driver.
 .IP (3)
-.BR put (9)
+.BR put (9s)
 was called from a driver or module
 .IR qi_qopen (9)
 or
@@ -253,13 +253,13 @@ When the
 procedure is invoked for a queue by
 .IR STREAMS ,
 (as a result of proper invocation of
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9)
 from a driver or module), the following conditions prevail:
 .IP (1) \w'(0)\(em'u
 When invoked using
-.BR put (9),
+.BR put (9s),
 the call will be invoked with a Stream head plumbing read lock for the Stream to which
 .I q
 belongs, guaranteeing the validity of any
@@ -328,7 +328,7 @@ a neighbouring queue.
 procedures are responsible for the disposition of the message reference,
 .IR mp ,
 and all references held by the caller of
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9)
 are invalidated by the call.
@@ -344,7 +344,7 @@ or
 .BR freemsg (9);
 .IP (2)
 pass the message (or part of the message) to another queue using
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9);
 or,
@@ -428,7 +428,7 @@ or
 .I STREAMS
 utilities.
 It must only call
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9)
 for the neighbouring queue to pass messages.
@@ -465,7 +465,7 @@ function, (i.e., without nesting too many subroutine calls), and must be congnis
 the operational stack may be limited.
 .IP ""
 Each call to
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9)
 from within a
@@ -476,7 +476,7 @@ procedure.  If many function calls are nested while processing
 .IR qi_putp ()
 procedures along a Stream in this fashion, the kernel or interrupt stack could be overflowed.
 Calls to
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9)
 from a driver or module
@@ -634,7 +634,7 @@ The read side
 processing is normally different and is described in the points that follow:
 .IP \(bu \w'\(bu\(em'u
 Messages must be placed on the read side queue from an ISR or bottom-half using the
-.BR put (9)
+.BR put (9s)
 utility and not the
 .BR putnext (9)
 utility.
@@ -642,7 +642,7 @@ utility.
 defers
 .IR qi_putp ()
 processing when
-.BR put (9)
+.BR put (9s)
 is invoked at hard interrupt.  Messages are placed in a separate event queue to be processed later
 by the
 .I STREAMS
@@ -693,7 +693,7 @@ or
 procedure.  It is easier to place queue specialized messages (such as
 .BR M_CTL (9))
 to the read side message queue with
-.BR put (9)
+.BR put (9s)
 and let
 .B mp-streams (9)
 synchronization do the work.
@@ -723,7 +723,7 @@ Although the
 procedure is capable of returning an error code, the returned value is always ignored by
 .I STREAMS
 and cannot be passed back to the caller of
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9),
 because these functions return
@@ -747,7 +747,7 @@ There is no general portable way for a
 .IR qi_put ()
 procedure to determine the context in which it was called.
 The non-portable
-.BR current_context (9)
+.BR current_context ()
 utility can be used under
 .B @PACKAGE_TITLE@
 to determine the current context.
@@ -774,7 +774,7 @@ procedure is invoked without synchronization.
 is called by
 .I STREAMS
 in the context in which the
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9)
 utility was invoked.  Regardless of the context, when properly invoked,
@@ -782,7 +782,7 @@ utility was invoked.  Regardless of the context, when properly invoked,
 is aware of which queue is being processed on a per-processor basis.
 .PP
 When invoked by
-.BR put (9),
+.BR put (9s),
 .I STREAMS
 acquires and holds a Stream head plumbing read lock, for the Stream within which the queue resides,
 across the call to the
@@ -843,16 +843,16 @@ Once a
 is executing, any call to
 .BR qprocsoff (9)
 for the queue pair will spin until the
-.BR put (9)
+.BR put (9s)
 call exits and releases the Stream head plumbing read lock.
 If
-.BR put (9)
+.BR put (9s)
 has been called, but procedures are then turned off for the queue pair with
 .BR qprocsoff (9)
 before the call has a chance to complete, when it is time to call the
 .IR qi_putp ()
 procedure,
-.BR put (9)
+.BR put (9s)
 will effectively perform a
 .BR putnext (9)
 if the queue belongs to a module, or
@@ -866,9 +866,9 @@ procedure concurrently for the same queue (but different messages).
 Also, other threads may be executing the
 .IR qi_srvp (9),
 .IR qi_qopen (9),
-.IR q_qclose (9),
+.IR qi_qclose (9),
 or
-.IR q_qadmin (9),
+.IR qi_qadmin (9),
 procedures and routines concurrently.  It is the responsible of the writer of the
 .IR qi_putp ()
 procedure to acquire and hold the necessary locks to provide exclusive access to data structures
@@ -885,7 +885,7 @@ procedure is an internal
 .I STREAMS
 entry point to the driver or module, that is not intended to be called directly by the module or
 driver writer.  See
-.BR put (9)
+.BR put (9s)
 and
 .BR putnext (9)
 for accepted methods of invoking this procedure.
@@ -1123,7 +1123,7 @@ distribution for more working examples of driver put procedures.
 .IR qi_srvp (9),
 .BR qinit (9),
 .BR streamtab (9),
-.BR put (9),
+.BR put (9s),
 .BR putnext (9),
 .BR freezestr (9),
 .BR unfreezestr (9),
@@ -1143,7 +1143,6 @@ distribution for more working examples of driver put procedures.
 .BR bcanputnext (9),
 .BR M_FLUSH (9),
 .BR M_CTL (9),
-.BR current_context (9),
 .BR bufmod (4),
 .BR mux (4),
 .BR STREAMS (9).
@@ -1208,13 +1207,13 @@ solspg
 always defers calling the
 .IR qi_putp ()
 procedure when
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9)
 is called to avoid overflowing the kernel stack.
 .B @PACKAGE_TITLE@
 only defers when
-.BR put (9)
+.BR put (9s)
 is called from hard interrupt context.
 .IP ""
 Portable
@@ -1222,7 +1221,7 @@ Portable
 drivers will not be designed so as to expect a
 .IR qi_putp ()
 procedure to be invoked as a direct function call nested within a
-.BR put (9)
+.BR put (9s)
 or
 .BR putnext (9)
 call.
@@ -1248,7 +1247,7 @@ drivers will restrict the use of
 utilities called from outside the
 .I STREAMS
 environment to
-.BR put (9),
+.BR put (9s),
 .BR canput (9),
 and
 .BR bcanput (9),
@@ -1261,7 +1260,7 @@ Portable
 drivers will restrict the
 .I STREAMS
 utilities used to operate on a different Stream to
-.BR put (9),
+.BR put (9s),
 .BR canput (9),
 and
 .BR bcanput (9).

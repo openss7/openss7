@@ -1,1 +1,1 @@
-.so man2/fdetach.2.man
+.so man2/fdetach.2s.man

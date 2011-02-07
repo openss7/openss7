@@ -2,7 +2,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: mpnotify.9.man,v 1.1.2.1 2009-06-21 10:38:49 brian Exp $
+.\" @(#) $Id: mpnotify.9.man,v 1.1.2.2 2011-02-07 02:18:43 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:49 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:43 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: mpnotify.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:43  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:49  brian
 .\" - added files to new distro
 .\"
@@ -245,7 +248,7 @@ drivers to
 Because internal structures and definitions for
 .B @PACKAGE_TITLE@
 .[
-@PACKAGE@
+@PACKAGE@-@VERSION@
 .]
 differ from that of
 .IR MacOT \(rg,

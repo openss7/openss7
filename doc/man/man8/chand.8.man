@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: chand.8.man,v 1.1.2.2 2009-07-23 16:37:46 brian Exp $
+.\" @(#) $Id: chand.8.man,v 1.1.2.3 2011-02-07 02:18:30 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,16 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-07-23 16:37:46 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:30 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: chand.8.man,v $
-.\" Revision 1.1.2.2  2009-07-23 16:37:46  brian
-.\" - updates for release
-.\"
-.\" Revision 1.1.2.1  2009-06-21 10:37:46  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.3  2011-02-07 02:18:30  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -105,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -121,20 +118,18 @@ search-ignore T
 .SH SYNOPSIS
 .PP
 .RS 0
-.hy 0
-.HP
+.ad l
+.nh
+.HP \w'\fBchand\fP\ 'u
 \fBexport PATH="/usr/sbin:$PATH"\fP
 .HP
 \fBchand\fP [\fIGENERAL\-OPTIONS\fP] [\fIOPTIONS\fP] [\fIARGUMENTS\fP]
-.ad l
 .HP
 \fBchand\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
 [{\fB\-d\fP|\fB\-\-debug\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
 [{\fB\-V\fP|\fB\-\-verbose\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
 .br
 [\fIOPTIONS\fP]\ [\fIARGUMENTS\fP]
-.ad b
-.ad l
 .HP
 \fBchand\fP\ [{\fB\-q\fP|\fB\-\-quiet\fP|\fB\-\-quick\fP}]
 [{\fB\-d\fP|\fB\-\-debug\fP[\fB=\fP]}[\ ][\fILEVEL\fP]]
@@ -164,7 +159,6 @@ search-ignore T
 [{\fB\-t\fP|\fB\-\-agent\-alarms\fP}]
 .br
 [\fIARGUMENT\fP[\ \fIARGUMENT\fP]*]
-.ad b
 .HP
 \fBchand\fP\ {\fB\-H\fP|\fB\-\-help\-directives\fP}\ [\fI...\fP]
 .PD 0
@@ -175,6 +169,8 @@ search-ignore T
 .HP
 \fBchand\fP\ {\fB\-y\fP|\fB\-\-copying\fP}\ [\fI...\fP]
 .PD
+.ad b
+.hy 1
 .RE
 .\"
 .\"
@@ -185,8 +181,7 @@ The options recognized by
 are summarized, alphabetically sorted by short option, as follows (see
 .RI \(lq DESCRIPTION ,\(rq
 below, for more detailed option descriptions):
-.\".TP \w'\fB-I\fP,\ \fB--initialize\fP\ [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]\(em'u
-.TP
+.TP \w'\fB-I\fP,\ \fB--initialize\fP\ [\fB-\fP][\fIMODULE\fP[\fB,\fP\fIMODULE\fP]*]\(em'u
 \fB-a\fP, \fB--log-addresses\fP
 Log addresses connecting to agent.
 .PD 0
@@ -386,7 +381,8 @@ and, runs as an AgentX sub-agent.
 .SS UCD-SNMP and NET-SNMP Subagent Options
 .PP
 The following options are compatible with NET-SNMP automatically generated
-subagents.  Long options are CHAND specific.
+subagents.  Long options are
+.BR chand -specific.
 .\"
 .TP
 \fB-D\fP, \fB--debug-tokens\fP [\fITOKEN\fP[\fB,\fP\fITOKEN\fP]*]
@@ -660,7 +656,7 @@ is the full path to the file to which the daemon process id is written.  This
 assists System V initscripts by helping them locate running daemons to
 terminate when shutting down subsystems.   The default pidfile, unless
 overridden by this option, is
-.BR /var/run/streams.pid .
+.BR /var/run/chand.pid .
 This
 .B -P
 option is provided for compatibility with the UCD-SNMP master agent,
@@ -794,14 +790,16 @@ option is provided for compatibility with UCD-SNMP and NET-SNMP master agent,
 .\"
 .SS CHAND Subagent Options
 .PP
-The following options are specific to the CHAND sub-agent.
+The following options are specific to the
+.B chand
+sub-agent.
 .\"
 .TP
 \fB-k\fP, \fB--keep-open\fP
 By default,
 .B chand
 will close open files and Streams between requests, causing them to be
-reopened on then next request.  This is less intrusive on the Channel
+reopened on then next request.  This is less intrusive on the STREAMS
 subsystem, but is also less efficient if many closely spaced requests are
 issued.  This option causes
 .B chand
@@ -827,7 +825,7 @@ option.
 The default is the system default system
 control configuration
 file,
-.BR "/etc/streams.conf" .
+.BR "/etc/@PACKAGE_LCNAME@.conf" .
 .\"
 .TP
 \fB-t\fP, \fB--agent-alarms\fP
@@ -865,9 +863,9 @@ for more information.
 .\"\fB-d\fP, \fB--directory\fP \fIDIRECTORY\fP
 .\"Specifies a directory to contain output and error logs.  The default is to
 .\"serach for
-.\".RB \(lq /var/adm/streams \(rq
+.\".RB \(lq /var/adm/@PACKAGE_LCNAME@ \(rq
 .\"and then
-.\".RB \(lq /var/log/streams .\(rq
+.\".RB \(lq /var/log/@PACKAGE_LCNAME@ .\(rq
 .\"
 .\".TP
 .\"\fB-b\fP, \fB--basename\fP \fIBASENAME\fP
@@ -1191,7 +1189,7 @@ for more information.
 .PP
 .B chand
 is normally invoked from the
-.B /etc/init.d/streams
+.B /etc/init.d/@PACKAGE_LCNAME@
 init script when the presence of an SNMP master agent providing an AgentX interface
 on
 .IR /var/agentx/master ,
@@ -1247,7 +1245,7 @@ uses the
 .BR sc (4)
 driver to provide information on loaded modules and drivers as well as
 configuration information and statistics for drivers and modules as well as
-the overall Channel subsystem.
+the overall STREAMS subsystem.
 .\"
 .\"
 .SH FILES
@@ -1267,7 +1265,7 @@ Common configuration file for the agent and applications.  See
 .BR snmp.conf (5)
 for more information.
 .TP
-.BR /etc/snmp/chand.conf ", " /etc/snmp/chand.local.conf
+.BR /etc/snmp/mxMIB.conf ", " /etc/snmp/mxMIB.local.conf
 Provides the
 .B chand
 agent-specific configuration.  See
@@ -1305,6 +1303,8 @@ management information base.
 .PP
 .B chand
 has no known bugs.  All bugs are unknown and have yet to be discovered.
+.PP
+THIS MANUAL PAGE NEEDS TO BE UPDATED.
 .\"
 .\"
 .SH COMPATIBILITY
@@ -1324,7 +1324,7 @@ and
 are
 .B OpenSS7
 project specific MIBs, but are suitably generic to provide SNMP management of
-most Channel subsystems and implementations.
+most STREAMS subsystems and implementations.
 .PP
 The
 .B chand
@@ -1475,4 +1475,3 @@ package.
 $LIST$
 .]
 .TI
-

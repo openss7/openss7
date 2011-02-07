@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: sli.7.man,v 1.1.2.1 2009-06-21 10:36:23 brian Exp $
+.\" @(#) $Id: sli.7.man,v 1.1.2.2 2011-02-07 02:18:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:36:23 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: sli.7.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:36:23  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:18:29  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -128,7 +128,7 @@ conforming to the \fIOpenSS7\fR Signalling Link Interface (SLI) specification.
 .SS "LOCAL MANAGEMENT INTERFACE"
 .PP
 .PP
-SLI drivers are normally linked using \fBstreamio\fR(2) \fBI_LINK\fR ioctl
+SLI drivers are normally linked using \fBstreamio\fR(7) \fBI_LINK\fR ioctl
 commands under a Signalling Link Set (SLS) STREAMS multiplexor conforming to
 the Signalling Link Set Interface (SLSI) specification \fBslsi\fR(7) such as
 \fBsls\fR(4), by the SS7 Configuration Daemon \fBss7d\fR(8).  Yet, this
@@ -142,7 +142,7 @@ be written to the \fBslsi\fR(7) and even \fBmtpi\fR(7) interfaces.
 .PP
 SLI provides a local management interface which utilizes \fBM_PROTO\fR and
 \fBM_PCPROTO\fR messages which can be exchanged with the interface using
-\fBputmsg\fR(2) and \fBgetmsg\fR(2) system calls on the stream head once the
+\fBputmsg\fR(2s) and \fBgetmsg\fR(2s) system calls on the stream head once the
 interface is opened.  The local management interfae controls local management
 (STREAMS configuration functions) which are normally used by the SS7
 Configuration Daemon \fBss7d\fR(8) on the driver interface before linking
@@ -153,8 +153,8 @@ and modules and is described in detail in \fBlmi\fR(7).
 .SS "DEVICE CONTROL INTERFACE"
 .PP
 .PP
-SLI provides a device control interface which utilizes \fBioctl\fR(2)
-transparent calls or an \fBI_STR\fR ioctl under \fBstreamio\fR(2) from a
+SLI provides a device control interface which utilizes \fBioctl\fR(2s)
+transparent calls or an \fBI_STR\fR ioctl under \fBstreamio\fR(7) from a
 stream head or multiplexor control channel to the driver.  The device control
 interface controls aspects of the SL driver device which are outside the scope
 of the SS7 protocol.  These controls are normally issued by the SS7
@@ -168,7 +168,7 @@ modules and is described in detail in \fBdevi\fR(7).
 .PP
 SLI provides a protocol service interface which uses \fBM_DATA\fR,
 \fBM_PROTO\fR and \fBM_PCPROTO\fR STREAMS messages which can be exchanged with
-\fBwrite\fR(2), \fBread\fR(2), \fBputmsg\fR(2) or \fBgetmsg\fR(2) system calls
+\fBwrite\fR(2s), \fBread\fR(2s), \fBputmsg\fR(2s) or \fBgetmsg\fR(2s) system calls
 on the stream head, or which can be exchanged with the driver by upstream
 pushed or linked modules.  The protocol service interface exchanges SS7
 protocol service primitives between the Signalling Link (SL) and the
@@ -197,7 +197,7 @@ The protocol service interface for SLI is described in detail in section
 .PP
 .PP
 Protocol service interface commands are from the stream head to the SL driver
-using \fBputmsg\fR(2) and \fBgetmsg\fR(2) commands as follows:
+using \fBputmsg\fR(2s) and \fBgetmsg\fR(2s) commands as follows:
 
 .RS 4
 .nf
@@ -207,8 +207,8 @@ using \fBputmsg\fR(2) and \fBgetmsg\fR(2) commands as follows:
 .fi
 .RE
 .PP
-Downstream messages are sent from the stream head using \fBputmsg\fR(2);
-upstream messages are received at the stream head using \fBgetmsg\fR(2).
+Downstream messages are sent from the stream head using \fBputmsg\fR(2s);
+upstream messages are received at the stream head using \fBgetmsg\fR(2s).
 .PP
 \fIflags\fR is either \fBRS_HIPRI\fR or not indicating a \fBM_PCPROTO\fR
 or an \fBM_PROTO\fR message respectively.  \fIctlptr\fR and \fIdataptr\fR are
@@ -230,7 +230,7 @@ of the following primitives and structures:
 .PP
 .PP
 Downstream primitives are sent from the stream head to the protocol state
-machines using \fBputmsg\fR(2) system calls as described above.
+machines using \fBputmsg\fR(2s) system calls as described above.
 Except where otherwise noted, \fIbuf\fR contains only the \fBsl_primitive\fR
 field which is set to the value of the primitive.
 
@@ -238,7 +238,7 @@ field which is set to the value of the primitive.
 .BR SL_PDU_REQ (7)
 Transmit a Protocol Data Unit (PDU).  This primitive must be sent with an
 accompanying \fBM_DATA\fR block which is pointed to by the \fIdataptr\fR in a
-\fBputmsg\fR(2) or is the buffer which is the argument of a \fBwrite\fR(2) on
+\fBputmsg\fR(2s) or is the buffer which is the argument of a \fBwrite\fR(2s) on
 the stream file descriptor.
 .TP
 .BR SL_EMERGENCY_REQ (7)
@@ -256,7 +256,7 @@ Stop the signalling link.
 .BR SL_RETRIEVE_BSNT_REQ (7)
 Retreive the BSNT value for buffer updating.
 .TP
-.BR SL_RETREIVAL_REQUEST_AND_FSNC_REQ (7)
+.BR SL_RETRIEVAL_REQUEST_AND_FSNC_REQ (7)
 Retreive the buffers from the TB/RTB up to and including FSNC.  This
 primitive uses a \fBsl_retrieval_request_and_fsnc_t\fB structure which
 includes the \fIsl_fsnc\fR value in addition to the \fIsl_primitive\fR as
@@ -272,7 +272,7 @@ typedef struct {
 .TP 14
 .I sl_primitive
 Contains the primitive
-.BR SL_RETRIEVAL_REQ_AND_FSNC_REQ (7).
+.BR SL_RETRIEVAL_REQUEST_AND_FSNC_REQ (7).
 .TP
 .I sl_fsnc
 Contains the last Forward Sequence Number (FSNC) which was successfully
@@ -305,7 +305,7 @@ Power on the signalling link.
 .SS Upstream Primitives
 .PP
 Upstream primitives are collected at the stream head from the protocol state
-machines using \fBgetmsg\fR(2) system calls as described above.  Except where
+machines using \fBgetmsg\fR(2s) system calls as described above.  Except where
 otherwise noted, \fIbuf\fR contains only the \fBsl_primitive\fR field which
 is set to the value of the primitive.
 
@@ -313,7 +313,7 @@ is set to the value of the primitive.
 .BR SL_PDU_IND (7)
 Receive a Protocol Data Unit (PDU).  This primitive is received with an
 accompanying \fBM_DATA\fR block which is pointed to by the \fBdataptr\fR in a
-\fBgetmsg\fR(2) or is the buffer which is returned from a \fBread\fR(2) on the
+\fBgetmsg\fR(2s) or is the buffer which is returned from a \fBread\fR(2s) on the
 stream file descriptor.
 .TP
 .BR SL_LINK_CONGESTED_IND (7)
@@ -375,10 +375,10 @@ Contains the current congestion status for this link.
 Contains the current discard status for this link.
 .RE
 .TP
-.BR SL_RETREIVED_MESSAGE_IND (7)
+.BR SL_RETRIEVED_MESSAGE_IND (7)
 Indicates one retreived message during buffer retreival.
 .TP
-.BR SL_RETREIVAL_COMPLETE_IND (7)
+.BR SL_RETRIEVAL_COMPLETE_IND (7)
 Indicates that buffer retrieval is complete and not to expect further
 retrieved messages.
 .TP
@@ -387,7 +387,7 @@ Indicates that the Receive Buffer (RB) has been cleared.
 .TP
 .BR SL_BSNT_IND (7)
 Indicates the value of BSNT which was requested by a
-.BR SL_RETRIEV_BSNT_REQ (7).
+.BR SL_RETRIEVE_BSNT_REQ (7).
 This primitive indicates additional information in the \fBsl_bsnt_ind_t\fR
 structure as follows:
 .sp
@@ -512,7 +512,7 @@ Indicates that the Re-Transmission Buffer (RTB) has been cleared.
 .PP
 .PP
 Protocol management interface comands are from the stream head to the SL
-driver using \fBstreamio\fR(2) \fBI_STR\fR commands as follows:
+driver using \fBstreamio\fR(7) \fBI_STR\fR commands as follows:
 
 .RS 4
 .nf
@@ -1068,17 +1068,17 @@ SL_EVT_CONGEST_DISCD_IND:Q.752 Table 3.11 1st&D
 .PP
 .PP
 .BR devi (7),
-.BR getmsg (2),
-.BR ioctl (2),
+.BR getmsg (2s),
+.BR ioctl (2s),
 .BR lmi (7),
 .BR mtpi (7),
-.BR putmsg (2),
-.BR read (2),
+.BR putmsg (2s),
+.BR read (2s),
 .BR sls (4),
 .BR slsi (7),
 .BR ss7d (8),
-.BR streamio (2),
-.BR write (2)
+.BR streamio (7),
+.BR write (2s)
 
 
 .SH "BUGS"
