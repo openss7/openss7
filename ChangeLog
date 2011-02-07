@@ -1,5 +1,13 @@
 2011-02-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* centos-5.5-x86_64-config.cache: added cache file
+	* debian-squeeze-i386-config.cache: added cache file
+	* redhat-6.0-x86_64-config.cache: added cache file
+	* suse-11-x86_64-config.cache: added cache file
+	* debian-lenny-i386-config.cache: added cache file
+
+2011-02-07  Brian Bidulock  <bidulock@openss7.org>
+
 	* Makefile.am: update build and config scripts
 	* acinclude.m4: update build and config scripts
 	* configure.ac: update build and config scripts
