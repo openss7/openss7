@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:06:04 $
+# @(#) $RCSfile: libraries.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:06:04 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +58,9 @@
 # _LDCONFIG
 # -------------------------------------------------------------------------
 AC_DEFUN([_LDCONFIG], [dnl
+    AC_MSG_NOTICE([+------------------------+])
+    AC_MSG_NOTICE([| Shared Library Support |])
+    AC_MSG_NOTICE([+------------------------+])
     _LDCONFIG_SPEC_OPTIONS
     _LDCONFIG_SPEC_SETUP
     _LDCONFIG_SPEC_OUTPUT
@@ -76,12 +80,9 @@ AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [dnl
 AC_DEFUN([_LDCONFIG_SPEC_SETUP], [dnl
     AC_ARG_VAR([LDCONFIG],
 	       [Configure loader command. @<:@default=ldconfig@:>@])
-    AC_PATH_PROG([LDCONFIG], [ldconfig], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${LDCONFIG:-no}" = :no ; then
-	AC_MSG_WARN([Could not find ldconfig program in PATH.])
-	LDCONFIG=/sbin/ldconfig
-    fi
+    _BLD_PATH_PROG([LDCONFIG], [ldconfig], [/sbin/ldconfig],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+	AC_MSG_WARN([Could not find ldconfig program in PATH.])])
 ])# _LDCONFIG_SPEC_SETUP
 # =========================================================================
 
@@ -99,6 +100,9 @@ AC_DEFUN([_LDCONFIG_SPEC_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: libraries.m4,v $
+# Revision 1.1.2.2  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.1  2009-06-21 11:06:04  brian
 # - added files to new distro
 #
@@ -116,8 +120,9 @@ AC_DEFUN([_LDCONFIG_SPEC_OUTPUT], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL

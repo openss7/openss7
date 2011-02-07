@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +58,9 @@
 # -----------------------------------------------------------------------------
 AC_DEFUN([_GENKSYMS], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
+    AC_MSG_NOTICE([+---------------------------------+])
+    AC_MSG_NOTICE([| Kernel Symbol Generation Checks |])
+    AC_MSG_NOTICE([+---------------------------------+])
     _KSYMS_OPTIONS
     _LINUX_KERNEL_ENV([_KSYMS_SETUP])
     _KSYMS_OUTPUT
@@ -91,15 +95,13 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
     fi
     AC_ARG_VAR([GENKSYMS],
 	       [Generate kernel symbols command. @<:@default=genksyms@:>@])
-    AC_PATH_PROG([GENKSYMS], [genksyms], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${GENKSYMS:-no}" = :no ; then
+    _BLD_PATH_PROG([GENKSYMS], [genksyms], [/sbin/genksyms],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin],
+		 [dnl
 	if test :"$linux_cv_k_ko_modules" != :yes
 	then
 	    AC_MSG_WARN([Could not find genksyms program in PATH.])
-	fi
-	GENKSYMS=/sbin/genksyms
-    fi
+	fi])
     AC_ARG_VAR([KGENKSYMS],
 	       [Generate kernel symbols command. @<:@default=auto@:>@])
     eval "ksyms_dirs=\"$kbuilddir $ksrcdir\""
@@ -107,23 +109,17 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
     for ksyms_tmp in $ksyms_dirs ; do
 	ksyms_path="${ksyms_path:+$ksyms_path:}${ksyms_tmp}/scripts/genksyms"
     done
-    AC_PATH_PROG([KGENKSYMS], [genksyms], [],
-		 [$ksyms_path])
-    if test :"${KGENKSYMS:-no}" = :no ; then
+    _BLD_PATH_PROG([KGENKSYMS], [genksyms], [\${kbuilddir}/scripts/genksyms/genksyms],
+		 [$ksyms_path], [dnl
 	if test :"$linux_cv_k_ko_modules" = :yes
 	then
 	    AC_MSG_WARN([Could not find executable kernel genksyms program in $ksyms_path.])
-	fi
-	KGENKSYMS='${kbuilddir}/scripts/genksyms/genksyms'
-    fi
+	fi])
 dnl AC_ARG_VAR([MODPOST],
 dnl	       [Kernel module post processing command. @<:@default=modpost@:>@])
-dnl AC_PATH_PROG([MODPOST], [modpost], [],
-dnl	         [${kbuilddir}/scripts:${kbuilddir}/scripts/mod])
-dnl if test :"${MODPOST:-no}" = :no ; then
-dnl	AC_MSG_WARN([Could not find executable kernel modpost program in $kbuilddir/scripts.])
-dnl	MODPOST='${kbuilddir}/scripts/mod/modpost'
-dnl fi
+dnl _BLD_PATH_PROG([MODPOST], [modpost], [\${kbuilddir}/scripts/mod/modpost],
+dnl	         [${kbuilddir}/scripts:${kbuilddir}/scripts/mod], [dnl
+dnl	AC_MSG_WARN([Could not find executable kernel modpost program in $kbuilddir/scripts.])])
 dnl
 dnl This is a weird place to put these I know, but genksyms.am needs it
 dnl
@@ -345,6 +341,9 @@ AC_DEFUN([_KSYMS_], [dnl
 # =============================================================================
 #
 # $Log: genksyms.m4,v $
+# Revision 1.1.2.6  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.5  2009-07-21 11:06:13  brian
 # - changes from release build
 #
@@ -374,8 +373,9 @@ AC_DEFUN([_KSYMS_], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL

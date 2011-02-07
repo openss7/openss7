@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -582,11 +583,8 @@ AC_DEFUN([_OPENSS7_OPTIONS_GPG], [dnl
 	GPG=/usr/bin/gpg
 	AC_MSG_WARN([could not find 'gpg' program in PATH.])])
 dnl AC_ARG_VAR([GPG], [GPG signature command. @<:@default=gpg@:>@])
-dnl AC_PATH_PROG([GPG], [gpg pgp], [], [$os7_tmp])
-dnl if test :"${GPG:-no}" = :no ; then
-dnl	AC_MSG_WARN([Could not find gpg program in PATH.])
-dnl	GPG=/usr/bin/gpg
-dnl fi
+dnl _BLD_PATH_PROG([GPG], [gpg pgp], [/usr/bin/gpg], [$os7_tmp], [dnl
+dnl	AC_MSG_WARN([Could not find gpg program in PATH.])])
 dnl ---------------------------------------------------------
     AC_MSG_CHECKING([for gpg user])
     AC_ARG_VAR([GNUPGUSER], [GPG user name. @<:@default=auto@:>@])
@@ -1227,6 +1225,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 1.1.2.9  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.8  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -1403,8 +1404,9 @@ AC_DEFUN([_OPENSS7], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL

@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: info.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: info.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -69,6 +69,9 @@
 # _INFO
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INFO], [dnl
+    AC_MSG_NOTICE([+-----------------------------+])
+    AC_MSG_NOTICE([| Info File Generation Checks |])
+    AC_MSG_NOTICE([+-----------------------------+])
     _INFO_ARGS
     _INFO_SETUP
     _INFO_OPTIONS
@@ -137,12 +140,10 @@ AC_DEFUN([_INFO_SETUP], [dnl
     disable_texinfo=
     disable_texinfo_html=
     disable_texinfo_print=
-    AC_PATH_PROGS([TEX], [etex tex], [], [$tmp_path])
-    if test :"${TEX:-no}" = :no ; then
-	TEX="${am_missing2_run}tex"
+    _BLD_PATH_PROGS([TEX], [etex tex], [${am_missing2_run}tex], [$tmp_path], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([TEX], [
 *** 
 *** Configure cannot find a suitable 'tex' program.  Generating DVI, PS
 *** and PDF formatted manuals and texinfo documents requires the 'tex'
@@ -150,28 +151,26 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** of many popular Linux distributions and all current versions are
 *** acceptable.  The 'tex' package has been available for many years and
 *** is available from any CTAN site.  Use the following to obtain 'tex':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install texlive-base-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-latex'
 *** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-texinfo-print'
+*** SLES 10:     'configure --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the TEX environment variable to
 *** 'configure', or specify the --disable-texinfo-print option to
 *** 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROGS([PDFTEX], [pdfetex pdftex], [], [$tmp_path])
-    if test :"${PDFTEX:-no}" = :no ; then
-	PDFTEX="${am_missing2_run}pdftex"
+	fi])
+    _BLD_PATH_PROGS([PDFTEX], [pdfetex pdftex], [${am_missing2_run}pdftex],
+		    [$tmp_path], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([PDFTEX], [
 *** 
 *** Configure cannot find a suitable 'pdftex' program.  Generating PDF
 *** formatted manuals and texinfo documents requires the 'pdftex'
@@ -179,27 +178,25 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** of many popular Linux distributions and all current versions are
 *** acceptable.  The 'tex' package has been available for many years and
 *** is available from any CTAN site.  Use the following to obtain 'tex':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install texlive-base-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-latex'
 *** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-texinfo-print'
+*** SLES 10:     'configure --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the PDFTEX environment variable to
 *** 'configure', or specify the --disable-texinfo-print option to
 *** 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$tmp_path])
-    if test :"$TBL" = :/bin/cat ; then
+	fi])
+    _BLD_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$tmp_path], [dnl
 	if test :$enable_texinfo != :no ; then
 	    disable_texinfo=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([TBL], [
 *** 
 *** Configure cannot find a suitable 'tbl' program.  Generating INFO,
 *** TXT, PS, DVI and PDF formatted texinfo documents requires the 'tbl'
@@ -208,31 +205,25 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** are acceptable.  The 'groff' package has been available for many
 *** years and is available on the web from any GNU archive site.  Use
 *** the following commands to obtain 'groff':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff-base'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'
+*** SLES 10:     'zypper install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the TBL environment variable to
 *** 'configure', or specify the --disable-texinfo option to 'configure'.
 *** ])
-	fi
-    fi
-dnl    AC_PATH_PROG([NROFF], [nroff], [], [$tmp_path])
-dnl    if test :"${NROFF:-no}" = :no ; then
-dnl	NROFF="${am_missing4_run}nroff"
+	fi])
+dnl    _BLD_PATH_PROG([NROFF], [nroff], [${am_missing4_run}nroff], [$tmp_path], [dnl
 dnl	if test :$enable_texinfo != :no ; then
 dnl	    : # will attempt to emulate with groff
-dnl	fi
-dnl    fi
-    AC_PATH_PROG([GROFF], [groff], [], [$tmp_path])
-    if test :"${GROFF:-no}" = :no ; then
-	GROFF="${am_missing4_run}groff"
+dnl	fi])
+    _BLD_PATH_PROG([GROFF], [groff], [${am_missing4_run}groff], [$tmp_path], [dnl
 	if test :$enable_texinfo != :no ; then
 	    disable_texinfo=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([GROFF], [
 ***
 *** Configure cannot find a suitable 'groff' program.  Generating INFO,
 *** TXT, DVI, PS and PDF formatted texinfo documents requires the
@@ -241,21 +232,18 @@ dnl    fi
 *** versions are acceptable.  The 'groff' package has been available for
 *** many years and is available on the web from any GNU archive site.
 *** Use the following commands to obtain 'groff':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff-base'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'
+*** SLES 10:     'zypper install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the GROFF environment variable to
 *** 'configure', or specify the --disable-texinfo option to 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([FIG2DEV], [fig2dev], [], [$tmp_path])
-    if test :"${FIG2DEV:-no}" = :no ; then
-	FIG2DEV="${am_missing2_run}fig2dev"
+	fi])
+    _BLD_PATH_PROG([FIG2DEV], [fig2dev], [${am_missing2_run}fig2dev], [$tmp_path], [dnl
 	if test :$enable_texinfo_html != :no -o :$enable_texinfo_print != :no ; then
 	    if test :$enable_texinfo_html != :no ; then
 		disable_texinfo_html=yes
@@ -263,7 +251,7 @@ dnl    fi
 	    if test :$enable_texinfo_print != :no ; then
 		disable_texinfo_print=yes
 	    fi
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([FIG2DEV], [
 *** 
 *** Configure cannot find a suitable 'fig2dev' program.  Generating
 *** figures for texinfo documents requires the 'fig2dev' program from
@@ -272,25 +260,22 @@ dnl    fi
 *** acceptable.  The 'transfig' package has been available for many
 *** years and is available from many web sources.  Use the following
 *** commands to obtain 'fig2dev':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install transfig'
 *** Ubuntu 8.04: 'apt-get install transfig'
 *** Fedora 7:    'yum install transfig'
 *** Fedora 9:    'yum install transfig'
 *** CentOS 5.x:  'yum install transfig'
 *** openSUSE 11: 'zypper install transfig'
-*** SLES 10:     'configure --disable-texinfo-html --disable-texinfo-print'
+*** SLES 10:     'configure --disable-texinfo-html --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
 *** appropriate program with the FIG2DEV environment variable to
 *** 'configure', or specify the --disable-texinfo-html and
 *** --disable-texinfo-print options to 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([CONVERT], [convert], [], [$tmp_path])
-    if test :"${CONVERT:-no}" = :no ; then
-	CONVERT="${am_missing2_run}convert"
+	fi])
+    _BLD_PATH_PROG([CONVERT], [convert], [${am_missing2_run}convert], [$tmp_path], [dnl
 	if test :$enable_texinfo_html != :no -o :$enable_texinfo_print != :no ; then
 	    if test :$enable_texinfo_html != :no ; then
 		disable_texinfo_html=yes
@@ -298,7 +283,7 @@ dnl    fi
 	    if test :$enable_texinfo_print != :no ; then
 		disable_texinfo_print=yes
 	    fi
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([CONVERT], [
 *** 
 *** Configure cannot find a suitable 'convert' program.  Generating
 *** images for texinfo documents requires the 'convert' program from the
@@ -307,48 +292,39 @@ dnl    fi
 *** acceptable.  The 'ImageMagick' package has been available for many
 *** years and is available on the web from many sources.  Use the
 *** following commands to obtain 'ImageMagick':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install imagemagick'
 *** Ubuntu 8.04: 'apt-get install imagemagick'
 *** Fedora 7:    'yum install ImageMagick'
 *** Fedora 9:    'yum install ImageMagick'
 *** CentOS 5.x:  'yum install ImageMagick'
 *** openSUSE 11: 'zypper install ImageMagick'
-*** SLES 10:     'configure --disable-texinfo-html --disable-texinfo-print'
+*** SLES 10:     'configure --disable-texinfo-html --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'latex2html' package, specify
 *** the appropriate program with the CONVERT environment variable to
 *** 'configure', or specify the --disable-texinfo-html and
 *** --disable-texinfo-print options to 'configure'.
 *** ])
-	fi
-    fi
-    AC_PATH_PROG([PS2EPSI], [ps2epsi], [], [$tmp_path])
-    if test :"${PS2EPSI:-no}" = :no ; then
-	PS2EPSI="${am_missing2_run}ps2epsi"
+	fi])
+    _BLD_PATH_PROG([PS2EPSI], [ps2epsi], [${am_missing2_run}ps2epsi], [$tmp_path], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    # disable_texinfo_print=yes
 	    : # ok for now as we fall back to convert
-	fi
-    fi
-    AC_PATH_PROG([EPSTOPDF], [epstopdf], [], [$tmp_path])
-    if test :"${EPSTOPDF:-no}" = :no ; then
-	EPSTOPDF="${am_missing2_run}epstopdf"
+	fi])
+    _BLD_PATH_PROG([EPSTOPDF], [epstopdf], [${am_missing2_run}epstopdf], [$tmp_path], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    # disable_texinfo_print=yes
 	    : # ok for now as we fall back to convert
-	fi
-    fi
+	fi])
 dnl
 dnl We use DVI2PS instead of DVIPS here because automake already defines the
 dnl DVIPS make variable and complains if we try to redefine it.
 dnl
-    AC_PATH_PROG([DVI2PS], [dvips], [], [$tmp_path])
-    if test :"${DVI2PS:-no}" = :no ; then
-	DVI2PS="${am_missing2_run}dvips"
+    _BLD_PATH_PROG([DVI2PS], [dvips], [${am_missing2_run}dvips], [$tmp_path], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
-	    AC_MSG_WARN([
+	    _BLD_INSTALL_WARN([DVI2PS], [
 ***
 *** Configure cannot find a suitable 'dvips' program.  Generating PS
 *** formatted texinfo documents requires the 'dvips' program from the
@@ -356,22 +332,21 @@ dnl
 *** Linux distributions and all current versions are acceptable.  The
 *** 'tex' package has been available for may years and is available form
 *** any CTAN site.  Use the following command to obtain 'tex':
-***
+*** ], [
 *** Debian 5.0:  'apt-get install texlive-base-bin'
 *** Ubuntu 8.04: 'apt-get install texlive-base-bin'
 *** Fedora 7:    'yum install tetex-latex'
 *** Fedora 9:    'yum install texlive-latex'
 *** CentOS 5.x:  'yum install texex-latex'
 *** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-texinfo-print'
+*** SLES 10:     'configure --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the DVI2PS environment variable to
 *** 'configure', or specify the --disable-texinfo-print option to
 *** 'configure'.
 *** ])
-	fi
-    fi
+	fi])
     if test :$disable_texinfo = :yes ; then
 	disable_texinfo_html=
 	disable_texinfo_print=
@@ -431,6 +406,9 @@ AC_DEFUN([_INFO_XXX], [dnl
 # =============================================================================
 #
 # $Log: info.m4,v $
+# Revision 1.1.2.6  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.5  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -448,7 +426,7 @@ AC_DEFUN([_INFO_XXX], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

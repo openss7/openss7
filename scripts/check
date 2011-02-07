@@ -280,9 +280,29 @@ function check_runnable(runnable,    SHELL, result) {
     check_supports(SHELL runnable, "--version")
     check_supports(SHELL runnable, "--copying")
 }
-
+function check_manual(command,	    found, myline)
+{
+    found = 0
+    while ((command | getline myline) == 1) {
+	if (sub("^" mandir "/", "", myline) != 0) {
+	    found = 1
+	    break
+	}
+    }
+    close(command)
+    return found
+}
+function check_wrongsect(base,	    command) {
+    command = "LANG= man -aw " base " 2>/dev/null"
+    return check_manual(command)
+}
+function check_section(base, sect,  command) {
+    command = "LANG= man -aw " sect " " base " 2>/dev/null"
+    return check_manual(command)
+}
 BEGIN {
 #   LINT = "yes"
+    ENVIRON["LANG"] = ""
     success = 0
     warnings = 0
     errors = 0
@@ -835,6 +855,13 @@ BEGIN {
 	count = n["unused"]
 	show_complete("indexed", "unused manpages")
 
+	show_starting("indexing", "missing manpages")
+	MISSING = ENVIRON["MANS_MISSING"]
+	n["missing"] = split(MISSING, missing)
+	for (i = 1; i <= n["missing"]; i++) { missing[missing[i]] = 1; print_d("missing: " missing[i] ); delete missing[i] }
+	count = n["missing"]
+	show_complete("indexed", "missing manpages")
+
 	show_starting("indexing", "exempt manpages")
 	EXEMPT = ENVIRON["MANS_EXEMPT"]
 	n["exempt"] = split(EXEMPT, exempt)
@@ -846,12 +873,12 @@ BEGIN {
 	for (page in mans) {
 	    if (page in used) {
 		if (page in unused)
-		    print_e(page " is not necesary in MANS_UNUSED")
+		    print_e(page " is not necessary in MANS_UNUSED")
 		print_s(page " is used")
 	    }
 	    else if (page in xrefed) {
 		if (page in unused)
-		    print_e(page " is not necesary in MANS_UNUSED")
+		    print_e(page " is not necessary in MANS_UNUSED")
 		print_s(page " is cross-referenced")
 	    }
 	    else if (page in unused)
@@ -882,9 +909,26 @@ BEGIN {
 		show_starting("checking", "manual page conflicts")
 		for (page in mans) {
 		    file = mandir "/" page
-		    if ((getline < file) == 1)
+		    ok = 1
+		    if (ok == 1) {
+			if ((getline < file) == 1)
+			    ok = 0
+			close(file)
+		    }
+		    if (ok == 1) {
+			filegz = file ".gz"
+			if ((getline < filegz) == 1)
+			    ok = 0
+			close(filegz)
+		    }
+		    if (ok == 1) {
+			filebz2 = file ".bz2"
+			if ((getline < filebz2) == 1)
+			    ok = 0
+			close(filebz2)
+		    }
+		    if (ok == 0)
 			print_e(page " conflicts with " file)
-		    close(file)
 		    show_progress("checked", "manual page conflicts", 1000)
 		}
 		show_complete("checked", "manual page conflicts")
@@ -915,34 +959,38 @@ BEGIN {
 		if (ENVIRON["mandir"])
 		    MANPATH = MANPATH ":" ENVIRON["mandir"]
 	    }
+	    get_manpages("12345789")
 	    show_starting("checking", "manual page formats")
 	    for (page in mans) {
 		root = page; sub(/.*\//, "", root); sub(/\.[1-9][^\.]*/, "", root)
-		sect = page; sub(/.*\./, "", sect); sub(/[[:alpha:]]*$/, "", sect)
+		sect = page; sub(/.*\./, "", sect);
+		numb = sect; sub(/[[:alpha:]]*$/, "", numb)
+		fullpage = ENVIRON["srcdir"] "/" page ".man"
 		command = "man -M " MANPATH " " sect " " root " >" outfile " 2>" errfile
 		ok = 1
 		print_d(command)
 		if (system(command) != 0) ok = 0
-#		if (ok) {
-#		    while ((getline < errfile) == 1) {
+		if (ok) {
+		    while ((getline < errfile) == 1) {
 #			if (/character above first line discarded/) continue
-#			if (/Reformatting.*please wait/) continue
+			if (/Reformatting.*please wait/) continue
 #			if (/multiple matches for/) continue
 #			if (/can't break line/) continue
 #			if (/cannot adjust line/) continue
 #			if (/numeric expression expected/) continue
 #			if (/can't find special character/) continue
-#			ok = 0
-#			break
-#		    }
-#		    close(errfile)
-#		}
+			if (/will not fit on one page/) continue
+			ok = 0
+			break
+		    }
+		    close(errfile)
+		}
 		if (ok) {
 		    if ((getline < outfile) != 1) ok = 0
 		    close(outfile)
 		}
 		if (!ok) {
-		    print_e("error formatting manual page " page)
+		    print_e("error formatting manual page " fullpage)
 		    print_d("stderr was:")
 		    while ((getline < errfile) == 1) { gsub(/.[[:cntrl:]]/, ""); print_d($0); } close(errfile)
 		    print_d("stdout was:")
@@ -952,32 +1000,119 @@ BEGIN {
 		if (page in xref)
 		    continue
 		# check for missing autoconf substitutions
-		if (sect in required)
-		    split(required[sect], require, "\n")
+		if (numb in required)
+		    split(required[numb], require, "\n")
 		else for (r in require) delete require[r]
-		if (sect in recommended)
-		    split(recommended[sect], recommend, "\n")
+		if (numb in recommended)
+		    split(recommended[numb], recommend, "\n")
 		else for (r in recommend) delete recommend[r]
-		if (sect in options)
-		    split(options[sect], option, "\n")
+		if (numb in options)
+		    split(options[numb], option, "\n")
 		else for (r in option) delete option[r]
 		for (h in hdrs) delete hdrs[h]
 		empty = ""
+		frag = ""
+		inbrace = 0
 		while ((getline < outfile) == 1) {
 		    gsub(/.[[:cntrl:]]/, "")
 		    if (/^$/) continue
 		    if (/@[[:alnum:]_]+@/) {
 			for (k = 1; k <= NF; k++)
 			    if ($k ~ /@[[:alnum:]_]+@/)
-				print_e(page " has missing substitutions " $k)
+				print_e(fullpage " has missing substitutions " $k)
 			continue
+		    }
+		    if (/^[[:space:]]/) {
+			for (k = 1; k <= NF; k++) {
+			    if ($k~/\{/)
+				inbrace = inbrace + 1
+			    if ($k~/\}/) {
+				inbrace = inbrace - 1
+				if (inbrace <= 0)
+				    inbrace = 0
+				continue
+			    }
+			    if (inbrace > 0)
+				continue
+			    if ($k ~ /([a-zA-Z0-9._]+[-]+)*[a-zA-Z0-9._]+\([1-9][a-z]?\)/) {
+				if (k == 1 && $k ~ /^[^a-zA-Z0-9._]/)
+				    frag = ""
+				suffix = $k
+				fragstate = 0
+				if (k != 1 || frag == "")
+				    fragstate = 3
+				while (1) {
+				    if (fragstate == 0) { cross = suffix } else
+				    if (fragstate == 1) { cross = frag suffix } else
+				    if (fragstate == 2) { cross = frag; sub(/-$/, "", cross); cross = cross suffix } else
+				    if (fragstate == 3) { cross = suffix } else break
+				    sub(/^[^a-zA-Z0-9._]*/, "", cross)
+				    sub(/\).*$/, ")", cross)
+				    base = cross
+				    sub(/\([1-9][a-z]?\)$/, "", base)
+				    sect = cross
+				    sub(/^[-a-zA-Z0-9._]+\(/, "", sect)
+				    sub(/\)$/, "", sect)
+				    numb = substr(sect, 1, 1)
+				    if ((numb,base) in manpages) {
+					print_d("xref: " cross " in " fullpage " xref " manpages[numb,base])
+					break
+				    } else if (substr(sect, 2, 1) == "s") {
+					if (fragstate < 2 && (fragstate != 1 || (fragstate == 1 && frag ~ /-$/))) {
+					    fragstate = fragstate + 1
+					    continue
+					}
+					print_e("xref: " cross " in " fullpage " xref bad STREAMS page")
+					break
+				    } else if ((numb,base) in srcpages) {
+					if (fragstate < 2 && (fragstate != 1 || (fragstate == 1 && frag ~ /-$/))) {
+					    fragstate = fragstate + 1
+					    continue
+					}
+					print_e("xref: " cross " in " fullpage " xref " srcpages[numb,base])
+					break
+				    } else {
+					if (check_section(base, sect) == 1) {
+					    file = mandir "/man" numb "/" base "." sect
+					    print_d("xref: " cross " in " fullpage " xref external page " file)
+					    break
+					} else {
+					    file = "man" numb "/" base "." sect
+					    if (file in missing) {
+						print_d("xref: " cross " in " fullpage " xref missing")
+						break
+					    } else if (fragstate < 2 && (fragstate != 1 || (fragstate == 1 && frag ~ /-$/))) {
+						fragstate = fragstate + 1
+						continue
+					    } else {
+						if (check_wrongsect(base) == 1) {
+						    print_e("xref: " cross " in " fullpage " xref wrong section")
+						} else {
+						    print_e("xref: " cross " in " fullpage " xref missing")
+						}
+						break
+					    }
+					}
+				    }
+				}
+			    }
+			}
+		    }
+		    if (/^[[:space:]].*[a-zA-Z0-9._]-$/) {
+			frag = $NF
+			gsub(/^[^-a-zA-Z0-9._]*/, "", frag)
+		    } else {
+			frag = ""
+		    }
+		    if (/^[[:space:]]+[[][1-9][0-9]*[]][[:space:]]*$/) {
+			print_e(fullpage " has empty reference " $1)
 		    }
 		    if (/^[A-Z]+([[:space:]][A-Z]+)?[A-Z]+$/) {
 			if (empty)
-			    print_e(page " has empty section " empty)
+			    print_e(fullpage " has empty section " empty)
 			empty = $0
 			if ($0 in hdrs)
-			    print_e(page " has multiple " $0 " sections")
+			    print_e(fullpage " has multiple " $0 " sections")
 			hdrs[$0] = 1
 			for (r in require) {
 			    pattern = "^(" require[r] ")$"
@@ -1003,16 +1138,16 @@ BEGIN {
 		    if (!(r in grequire)) {
 			$0 = require[r]; gsub(/[[][[]:space:[]][]]/, " "); gsub(/\|/, ", ")
 			if (page in exempt)
-			    print_w(page " has missing required section " $0)
+			    print_w(fullpage " has missing required section " $0)
 			else
-			    print_e(page " has missing required section " $0)
+			    print_e(fullpage " has missing required section " $0)
 		    } else
 			delete grequire[r]
 		}
 		for (r in recommend) {
 		    if (!(r in grecommend)) {
 			$0 = recommend[r]; gsub(/[[][[]:space:[]][]]/, " "); gsub(/\|/, ", ")
-			print_w(page " has missing recommended section " $0)
+			print_w(fullpage " has missing recommended section " $0)
 		    } else
 			delete grecommend[r]
 		}
@@ -1020,9 +1155,9 @@ BEGIN {
 		    if (!(r in goption)) {
 			$0 = option[r]; gsub(/[[][[]:space:[]][]]/, " "); gsub(/\|/, ", ")
 			if (page in exempt)
-			    print_w(page " has missing required option " $0)
+			    print_w(fullpage " has missing required option " $0)
 			else
-			    print_e(page " has missing required option " $0)
+			    print_e(fullpage " has missing required option " $0)
 		    } else
 			delete goption[r]
 		}

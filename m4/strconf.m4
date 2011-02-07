@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-23 16:37:50 $
+# @(#) $RCSfile: strconf.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-23 16:37:50 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -545,6 +546,9 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 # =============================================================================
 #
 # $Log: strconf.m4,v $
+# Revision 1.1.2.4  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.3  2009-07-23 16:37:50  brian
 # - updates for release
 #
@@ -568,6 +572,7 @@ AC_DEFUN([_STRCONF_OUTPUT], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: doxy.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,6 +61,9 @@
 # so that we can strip out the include paths.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY_OPTIONS], [dnl
+    AC_MSG_NOTICE([+----------------+])
+    AC_MSG_NOTICE([| Doxygen Checks |])
+    AC_MSG_NOTICE([+----------------+])
     _DOXY_CONFIG_STRIP_FROM_INC_PATH
     _DOXY_CONFIG_INPUT
 ])# _DOXY_OPTIONS
@@ -137,12 +141,9 @@ dnl	AC_MSG_RESULT([yes])
 AC_DEFUN([_DOXY_SETUP], [dnl
     AC_ARG_VAR([DOXYGEN],
 	       [doxygen command. @<:@default=doxygen@:>@])
-    AC_PATH_PROG([DOXYGEN], [doxygen], [],
-		 [$PATH:/usr/local/bin:/usr/bin])
-    if test :"${DOXYGEN:-no}" = :no ; then
-	DOXYGEN="${am_missing2_run}doxygen"
-	AC_MSG_WARN([Could not find doxygen program in PATH.])
-    fi
+    _BLD_PATH_PROG([DOXYGEN], [doxygen], [${am_missing2_run}doxygen],
+		 [$PATH:/usr/local/bin:/usr/bin], [dnl
+	AC_MSG_WARN([Could not find doxygen program in PATH.])])
     AM_CONDITIONAL([HAVE_DOXYGEN], [test ":${ac_cv_path_DOXYGEN:-no}" != :no])dnl
 ])# _DOXY_SETUP
 # =============================================================================
@@ -195,6 +196,9 @@ AC_DEFUN([_DOXY_], [dnl
 # =============================================================================
 #
 # $Log: doxy.m4,v $
+# Revision 1.1.2.5  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.4  2009-07-21 11:06:13  brian
 # - changes from release build
 #
@@ -224,8 +228,9 @@ AC_DEFUN([_DOXY_], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL

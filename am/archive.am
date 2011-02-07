@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-18 17:08:41 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:31 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-01-18 17:08:41 $ by $Author: brian $
+## Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -246,8 +246,12 @@ $(tardir)/$(PACKAGE)-$(VERSION).tar.xz
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
 	else touch "$@"; fi
 
-$(tardir)/OPENSS7-GPG-KEY:: scripts/OPENSS7-GPG-KEY
-	cat $< > $@
+$(tardir)/OPENSS7-GPG-KEY:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@"; \
+	$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@
 
 #! release-sign-archives:
 #!     This target is like `release-archives', except that it also signs the
@@ -537,14 +541,16 @@ endif
 ## MAINTAINER_MODE
 endif
 
-EXTRA_DIST		+= scripts/OPENSS7-GPG-KEY \
-			   .pkgpatchlevel \
+EXTRA_DIST		+= .pkgpatchlevel \
 			   .pkgrelease \
 			   .pkgepoch
 
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 1.1.2.5  2011-02-07 04:48:31  brian
+## - updated configure and build scripts
+##
 ## Revision 1.1.2.4  2011-01-18 17:08:41  brian
 ## - sign xz archives
 ##

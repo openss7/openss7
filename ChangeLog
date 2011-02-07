@@ -1,5 +1,52 @@
 2011-02-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: update build and config scripts
+	* acinclude.m4: update build and config scripts
+	* configure.ac: update build and config scripts
+	* openss7.spec.in: update build and config scripts
+	* am/archive.am: update build and config scripts
+	* am/kernel.am: update build and config scripts
+	* am/man.am: update build and config scripts
+	* am/rpm.am: update build and config scripts
+	* am/strconf.am: update build and config scripts
+	* debian/control.in: update build and config scripts
+	* m4/agent.m4: update build and config scripts
+	* m4/archive.m4: update build and config scripts
+	* m4/autotest.m4: update build and config scripts
+	* m4/bld.m4: update build and config scripts
+	* m4/deb.m4: update build and config scripts
+	* m4/devfs.m4: update build and config scripts
+	* m4/dist.m4: update build and config scripts
+	* m4/doxy.m4: update build and config scripts
+	* m4/drafts.m4: update build and config scripts
+	* m4/gcj.m4: update build and config scripts
+	* m4/genksyms.m4: update build and config scripts
+	* m4/info.m4: update build and config scripts
+	* m4/init.m4: update build and config scripts
+	* m4/jar.m4: update build and config scripts
+	* m4/java.m4: update build and config scripts
+	* m4/kernel.m4: update build and config scripts
+	* m4/libraries.m4: update build and config scripts
+	* m4/man.m4: update build and config scripts
+	* m4/openss7.m4: update build and config scripts
+	* m4/papers.m4: update build and config scripts
+	* m4/perl.m4: update build and config scripts
+	* m4/pr.m4: update build and config scripts
+	* m4/public.m4: update build and config scripts
+	* m4/rpm.m4: update build and config scripts
+	* m4/snmp.m4: update build and config scripts
+	* m4/strconf.m4: update build and config scripts
+	* m4/swig.m4: update build and config scripts
+	* m4/tcl.m4: update build and config scripts
+	* scripts/check: update build and config scripts
+	* scripts/info.deps: update build and config scripts
+	* scripts/rpm/find-requires: update build and config scripts
+	* scripts/rpm/find-requires.kmod: update build and config scripts
+	* scripts/rpm/find-requires.ksyms: update build and config scripts
+	* scripts/rpm/find-requires.tcl: update build and config scripts
+
+2011-02-07  Brian Bidulock  <bidulock@openss7.org>
+
 	* src/util/init/openss7: updated init scripts
 	* src/util/init/specfs: updated init scripts
 	* src/util/init/specfs.sh: updated init scripts

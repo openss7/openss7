@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:12 $
+# @(#) $RCSfile: devfs.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -61,6 +62,9 @@
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_DEVFS], [dnl
     AC_REQUIRE([_LINUX_KERNEL])
+    AC_MSG_NOTICE([+--------------------------+])
+    AC_MSG_NOTICE([| Device Filesystem Checks |])
+    AC_MSG_NOTICE([+--------------------------+])
     _LINUX_CHECK_KERNEL_CONFIG([], [CONFIG_DEVFS_FS])
     _LINUX_CHECK_KERNEL_CONFIG([], [CONFIG_DEVFS_MOUNT])
     AC_ARG_ENABLE([devfs],
@@ -141,6 +145,9 @@ dnl	ac_configure_args="$ac_configure_args --enable-devfs"
 # =============================================================================
 #
 # $Log: devfs.m4,v $
+# Revision 1.1.2.3  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.2  2009-07-21 11:06:12  brian
 # - changes from release build
 #
@@ -155,6 +162,7 @@ dnl	ac_configure_args="$ac_configure_args --enable-devfs"
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

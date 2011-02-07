@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2009-09-01 09:09:46 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-07 04:48:31 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-09-01 09:09:46 $ by $Author: brian $
+## Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -62,13 +62,13 @@ endif
 
 am__strconf_inputs = --package=$(STRCONF_PACKAGE) -B$(STRCONF_MINORSZ) -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
 
-$(STRCONF_CONFIG): FORCE # $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+$(STRCONF_CONFIG): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
 	$(AM_V_GEN)$(STRCONF) --hconfig=$@ $(am__strconf_inputs)
 
-$(STRCONF_MODCONF): FORCE # $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+$(STRCONF_MODCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
 	$(AM_V_GEN)$(STRCONF) --modconf=$@ $(am__strconf_inputs)
 
-$(STRCONF_MKNODES): FORCE # $(STRCONF_INPUT) $(STRCONF_SCRIPT)
+$(STRCONF_MKNODES): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
 	$(AM_V_GEN)$(STRCONF) --makenodes=$@ $(am__strconf_inputs)
 
 $(STRCONF_DRVCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
@@ -200,6 +200,9 @@ EXTRA_DIST		+= $(STRCONF_CONFIGS)
 ## =============================================================================
 ##
 ## $Log: strconf.am,v $
+## Revision 1.1.2.7  2011-02-07 04:48:31  brian
+## - updated configure and build scripts
+##
 ## Revision 1.1.2.6  2009-09-01 09:09:46  brian
 ## - added text image files
 ##

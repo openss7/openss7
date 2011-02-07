@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2010-11-28 13:35:22 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-07 04:48:31 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2010-11-28 13:35:22 $ by $Author: brian $
+## Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -205,12 +205,16 @@ stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 ## !AMDEP
 endif
 
-clean-kernel:
+clean-kernel: mostlyclean-kernel
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
-	objs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.o |g'` ; \
+	list="stamp-modpost stamp-mobjects stamp-kobjects $$srcs" ; $(am__list_remove)
+
+mostlyclean-kernel:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@objs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.o |g'` ; \
 	mods=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.ko |g'` ; \
-	list="stamp-modpost stamp-mobjects stamp-kobjects $$srcs $$objs $$mods" ; $(am__list_remove)
+	list="$$objs $$mods" ; $(am__list_remove)
 
 all-kernel: stamp-kobjects Modules.map
 
@@ -221,6 +225,7 @@ KERNEL_AUX_FILES	=
 
 ALL_LOCAL 		+= all-kernel
 CLEAN_LOCAL 		+= clean-kernel
+MOSTLYCLEAN_LOCAL	+= mostlyclean-kernel
 DISTCLEANFILES		+= modpost.cache
 
 ## WITH_KO_MODULES
@@ -770,6 +775,9 @@ EXTRA_SCRIPTS		+= scripts/cflagcheck
 ## =============================================================================
 ##
 ## $Log: kernel.am,v $
+## Revision 1.1.2.7  2011-02-07 04:48:31  brian
+## - updated configure and build scripts
+##
 ## Revision 1.1.2.6  2010-11-28 13:35:22  brian
 ## - build updates and manual page corrections
 ##

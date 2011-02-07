@@ -3,11 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:12 $
+# @(#) $RCSfile: autotest.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:12 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +57,9 @@
 # _AUTOTEST
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST], [dnl
+    AC_MSG_NOTICE([+-----------------+])
+    AC_MSG_NOTICE([| Autotest Checks |])
+    AC_MSG_NOTICE([+-----------------+])
     _AUTOTEST_OPTIONS
     _AUTOTEST_SETUP
     _AUTOTEST_OUTPUT
@@ -97,11 +100,8 @@ AC_DEFUN([_AUTOTEST_SETUP], [dnl
 AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
     AC_ARG_VAR([AUTOM4TE],
 	       [Autom4te command. @<:@default=autom4te@:>@])
-    AC_PATH_PROG([AUTOM4TE], [autom4te], [],
+    _BLD_PATH_PROG([AUTOM4TE], [autom4te], [${am_missing_run}autom4te],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test :"${AUTOM4TE:-no}" = :no ; then
-	AUTOM4TE="${am_missing_run}autom4te"
-    fi
 ])# _AUTOTEST_SETUP_AUTOM4TE
 # ===========================================================================
 
@@ -111,7 +111,7 @@ AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
 AC_DEFUN([_AUTOTEST_SETUP_AUTOTEST], [dnl
     AC_ARG_VAR([AUTOTEST],
 	       [Autotest macro build command. @<:@default=autotest@:>@])
-    AC_PATH_PROG([AUTOTEST], [autotest], [$AUTOM4TE --language=autotest],
+    _BLD_PATH_PROG([AUTOTEST], [autotest], [$AUTOM4TE --language=autotest],
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
 ])# _AUTOTEST_SETUP_AUTOTEST
 # ===========================================================================
@@ -205,6 +205,9 @@ ac_target="$ac_cv_target"
 # =============================================================================
 #
 # $Log: autotest.m4,v $
+# Revision 1.1.2.5  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.4  2009-07-21 11:06:12  brian
 # - changes from release build
 #
@@ -240,8 +243,9 @@ ac_target="$ac_cv_target"
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL

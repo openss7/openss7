@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: agent.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -73,6 +74,9 @@ dnl
 dnl Building SNMP agents requires the presence of snmp libraries.
 dnl
     AC_REQUIRE([_SNMP])
+    AC_MSG_NOTICE([+-------------------+])
+    AC_MSG_NOTICE([| SNMP Agent Checks |])
+    AC_MSG_NOTICE([+-------------------+])
     _AGENT_EXTENSIONS
 ])# _AGENT
 # =============================================================================
@@ -126,9 +130,6 @@ AC_DEFUN([_AGENT_EXTENSIONS], [dnl
 	[AS_HELP_STRING([--without-snmp-agent],
 	    [suppress SNMP agents @<:@default=enabled@:>@])])
     AM_CONDITIONAL([WITH_SNMP_AGENT], [test :"${with_snmp_agent:-yes}" != :no])dnl
-    AC_MSG_NOTICE([+-----------------------------------+])
-    AC_MSG_NOTICE([| SNMP agent UCD header file checks |])
-    AC_MSG_NOTICE([+-----------------------------------+])
     AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [],
 	[_AGENT_MSG_WARN([ucd-snmp/ucd-snmp-config.h])])
     AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-includes.h], [],
@@ -185,6 +186,9 @@ AC_DEFUN([_AGENT_EXTENSIONS], [dnl
 # =============================================================================
 #
 # $Log: agent.m4,v $
+# Revision 1.1.2.4  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.3  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -208,6 +212,7 @@ AC_DEFUN([_AGENT_EXTENSIONS], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

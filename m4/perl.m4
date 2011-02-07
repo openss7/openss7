@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 13:55:51 $
+# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:55:51 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -77,6 +78,9 @@ AC_DEFUN([_PERL], [dnl
 # build.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PERL_EXTENSIONS], [dnl
+    AC_MSG_NOTICE([+------------------------+])
+    AC_MSG_NOTICE([| Perl Extension Support |])
+    AC_MSG_NOTICE([+------------------------+])
     AC_CACHE_CHECK([for perl headers], [perl_cv_includedir], [dnl
 	AC_ARG_WITH([perl],
 	    [AS_HELP_STRING([--with-perl=@<:@HEADERS@:>@],
@@ -299,6 +303,9 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
 # =============================================================================
 #
 # $Log: perl.m4,v $
+# Revision 1.1.2.5  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.4  2010-11-28 13:55:51  brian
 # - update build requirements, proper autoconf functions, build updates
 #
@@ -334,6 +341,7 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

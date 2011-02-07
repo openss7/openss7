@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: init.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,6 +57,9 @@
 # _INIT_SCRIPTS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_INIT_SCRIPTS], [dnl
+    AC_MSG_NOTICE([+-------------------------+])
+    AC_MSG_NOTICE([| SYSV Init Script Checks |])
+    AC_MSG_NOTICE([+-------------------------+])
     _INIT_SCRIPTS_OPTIONS
     _INIT_SCRIPTS_SETUP
     _INIT_SCRIPTS_OUTPUT
@@ -214,20 +218,14 @@ dnl I suppose we really don't care about these.
 dnl
     AC_ARG_VAR([CHKCONFIG],
 	       [Chkconfig command. @<:@default=chkconfig@:>@])
-    AC_PATH_PROG([CHKCONFIG], [chkconfig], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${CHKCONFIG:-no}" = :no ; then
-	AC_MSG_WARN([Could not find chkconfig program in PATH.])
-	CHKCONFIG=''
-    fi
+    _BLD_PATH_PROG([CHKCONFIG], [chkconfig], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+	AC_MSG_WARN([Could not find chkconfig program in PATH.])])
     AC_ARG_VAR([INSSERV],
 	       [Insserv command. @<:@default=inserv@:>@])
-    AC_PATH_PROG([INSSERV], [insserv], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test "${INSSERV:-no}" = :no ; then
-	AC_MSG_WARN([Could not find insserv program in PATH.])
-	INSSERV=''
-    fi
+    _BLD_PATH_PROG([INSSERV], [insserv], [],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+	AC_MSG_WARN([Could not find insserv program in PATH.])])
 dnl
 dnl initrddir is where we are going to put init scripts
 dnl
@@ -330,6 +328,9 @@ AC_DEFUN([_INIT_], [dnl
 # =============================================================================
 #
 # $Log: init.m4,v $
+# Revision 1.1.2.3  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.2  2009-07-21 11:06:13  brian
 # - changes from release build
 #
@@ -350,8 +351,9 @@ AC_DEFUN([_INIT_], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL

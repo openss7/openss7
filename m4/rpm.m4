@@ -3,10 +3,11 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:13 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -48,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-21 11:06:13 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -59,6 +60,9 @@
 # RPM.spec.in file.  This also includes stuff for converting the LSM file.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC], [dnl
+    AC_MSG_NOTICE([+------------------------+])
+    AC_MSG_NOTICE([| RPM Repository Support |])
+    AC_MSG_NOTICE([+------------------------+])
     _RPM_SPEC_OPTIONS
     _RPM_SPEC_SETUP
     _RPM_SPEC_OUTPUT
@@ -148,58 +152,51 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		rpm_cv_dist_extra=
 		;;
 	    (:auto)
+		rpm_tmp=`echo "$dist_cv_host_release" | sed -e 's|\..*||g'`
 		case "$dist_cv_host_flavor" in
 		    (centos)
 			case $dist_cv_host_release in
-			    (3|3.?)	rpm_cv_dist_extra=".centos3"	;;
-			    (4|4.?)	rpm_cv_dist_extra=".centos4"	;;
-			    (5|5.?)	rpm_cv_dist_extra=".centos5"	;;
-			    (*)		rpm_cv_dist_extra=".centos${dist_cv_host_release}" ;;
+			    (3|3.?|4|4.?|5|5.?)
+					rpm_cv_dist_extra=".centos${rpm_tmp}"		    ;;
+			    (*)		rpm_cv_dist_extra=".centos${dist_cv_host_release}"  ;;
 			esac
 			;;
 		    (lineox)
 			case $dist_cv_host_release in
-			    (3|3.?)	rpm_cv_dist_extra=".lel3"	;;
-			    (4|4.?)	rpm_cv_dist_extra=".lel4"	;;
-			    (5|5.?)	rpm_cv_dist_extra=".lel5"	;;
-			    (*)		rpm_cv_dist_extra=".lel${dist_cv_host_release}" ;;
+			    (3|3.?|4|4.?|5|5.?)
+					rpm_cv_dist_extra=".lel${rpm_tmp}"		    ;;
+			    (*)		rpm_cv_dist_extra=".lel${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (whitebox)
 			case $dist_cv_host_release in
-			    (3|3.?)	rpm_cv_dist_extra=".WB3"	;;
-			    (4|4.?)	rpm_cv_dist_extra=".WB4"	;;
-			    (5|5.?)	rpm_cv_dist_extra=".WB5"	;;
-			    (*)		rpm_cv_dist_extra=".WB${dist_cv_host_release}" ;;
+			    (3|3.?|4|4.?|5|5.?)
+					rpm_cv_dist_extra=".WB${rpm_tmp}"		    ;;
+			    (*)		rpm_cv_dist_extra=".WB${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (fedora)
 			case $dist_cv_host_release in
-			    (1)		rpm_cv_dist_extra=".FC1"	;;
-			    (2)		rpm_cv_dist_extra=".FC2"	;;
-			    (3)		rpm_cv_dist_extra=".FC3"	;;
-			    (4)		rpm_cv_dist_extra=".FC4"	;;
-			    (5)		rpm_cv_dist_extra=".FC5"	;;
-			    (6)		rpm_cv_dist_extra=".FC6"	;;
-			    (7)		rpm_cv_dist_extra=".fc7"	;;
-			    (8)		rpm_cv_dist_extra=".fc8"	;;
-			    (9)		rpm_cv_dist_extra=".fc9"	;;
-			    (*)		rpm_cv_dist_extra=".fc${dist_cv_host_release}" ;;
+			    ([1-6])	rpm_cv_dist_extra=".FC${rpm_tmp}"		    ;;
+			    ([7-9]|[1-9][0-9])
+			    		rpm_cv_dist_extra=".fc${rpm_tmp}"		    ;;
+			    (*)		rpm_cv_dist_extra=".fc${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (redhat)
 			case $dist_cv_host_release in
-			    (7.0)	rpm_cv_dist_extra=".7.0"	;;
-			    (7.1)	rpm_cv_dist_extra=".7.1"	;;
-			    (7.2)	rpm_cv_dist_extra=".7.2"	;;
-			    (7.3)	rpm_cv_dist_extra=".7.3"	;;
-			    (8.0)	rpm_cv_dist_extra=".8.0"	;;
-			    (9)		rpm_cv_dist_extra=".9"		;;
-			    (2|2.?)	rpm_cv_dist_extra=".EL"		;;
-			    (3|3.?)	rpm_cv_dist_extra=".E3"		;;
-			    (4|4.?)	rpm_cv_dist_extra=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra=".el5"	;;
-			    (*)		rpm_cv_dist_extra2=".el${dist_cv_host_release}" ;;
+			    (7.0)	rpm_cv_dist_extra=".7.0"			    ;;
+			    (7.1)	rpm_cv_dist_extra=".7.1"			    ;;
+			    (7.2)	rpm_cv_dist_extra=".7.2"			    ;;
+			    (7.3)	rpm_cv_dist_extra=".7.3"			    ;;
+			    (8.0)	rpm_cv_dist_extra=".8.0"			    ;;
+			    (9)		rpm_cv_dist_extra=".9"				    ;;
+			    (2|2.?)	rpm_cv_dist_extra=".EL"				    ;;
+			    (3|3.?)	rpm_cv_dist_extra=".E3"				    ;;
+			    (4|4.?)	rpm_cv_dist_extra=".EL4"			    ;;
+			    (5|5.?|6|6.?)
+					rpm_cv_dist_extra=".el${rpm_tmp}"		    ;;
+			    (*)		rpm_cv_dist_extra2=".el${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (mandrake)
@@ -210,7 +207,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			case $dist_cv_host_release in
 			    (6.2|7.[[0-3]]|8.[[0-3]]|9.[[0-3]])
 					rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}" ;;
-			    (8|9|10)	rpm_cv_dist_extra=".${dist_cv_host_release:-SLES}" ;;
+			    (8|9|10|11)	rpm_cv_dist_extra=".${dist_cv_host_release:-SLES}" ;;
 			    (*)		rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}" ;;
 			esac
 			;;
@@ -233,55 +230,44 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		rpm_cv_dist_extra2=
 		;;
 	    (:auto)
+		rpm_tmp=`echo "$dist_cv_host_release" | sed -e 's|\..*||g'`
 		case "$dist_cv_host_flavor" in
 		    (centos)
 			case $dist_cv_host_release in
-			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
-			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra2=".el5"	;;
-			    (*)		rpm_cv_dist_extra2=".COS${dist_cv_host_release}" ;;
+			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)		  rpm_cv_dist_extra2=".COS${dist_cv_host_release}"  ;;
 			esac
 			;;
 		    (lineox)
 			case $dist_cv_host_release in
-			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
-			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra2=".el5"	;;
-			    (*)		rpm_cv_dist_extra2=".LEL${dist_cv_host_release}" ;;
+			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)		  rpm_cv_dist_extra2=".LEL${dist_cv_host_release}"  ;;
 			esac
 			;;
 		    (whitebox)
 			case $dist_cv_host_release in
-			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
-			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra2=".el5"	;;
-			    (*)		rpm_cv_dist_extra2=".WB${dist_cv_host_release}" ;;
+			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)		  rpm_cv_dist_extra2=".WB${dist_cv_host_release}"   ;;
 			esac
 			;;
 		    (fedora)
 			case $dist_cv_host_release in
-			    (1)		rpm_cv_dist_extra2=".FC1"	;;
-			    (2)		rpm_cv_dist_extra2=".FC2"	;;
-			    (3)		rpm_cv_dist_extra2=".FC3"	;;
-			    (4)		rpm_cv_dist_extra2=".FC4"	;;
-			    (5)		rpm_cv_dist_extra2=".FC5"	;;
-			    (6)		rpm_cv_dist_extra2=".FC6"	;;
-			    (7)		rpm_cv_dist_extra2=".fc7"	;;
-			    (8)		rpm_cv_dist_extra2=".fc8"	;;
-			    (9)		rpm_cv_dist_extra2=".fc9"	;;
-			    (*)		rpm_cv_dist_extra2=".fc${dist_cv_host_release}" ;;
+			    ([1-6])	rpm_cv_dist_extra2=".FC${dist_cv_host_release}"	    ;;
+			    (*)		rpm_cv_dist_extra2=".fc${dist_cv_host_release}"	    ;;
 			esac
 			;;
 		    (redhat)
 			case $dist_cv_host_release in
-			    (7.[[0-3]])	rpm_cv_dist_extra2=".7.x"	;;
-			    (8.0)	rpm_cv_dist_extra2=".8"		;;
-			    (9)		rpm_cv_dist_extra2=".9"		;;
-			    (2|2.?)	rpm_cv_dist_extra2=".EL"	;;
-			    (3|3.?)	rpm_cv_dist_extra2=".EL3"	;;
-			    (4|4.?)	rpm_cv_dist_extra2=".EL4"	;;
-			    (5|5.?)	rpm_cv_dist_extra2=".el5"	;;
-			    (*)		rpm_cv_dist_extra2=".rh${dist_cv_host_release}" ;;
+			    (7.[[0-3]])	  rpm_cv_dist_extra2=".7.x"			    ;;
+			    (8.0)	  rpm_cv_dist_extra2=".8"			    ;;
+			    (9)		  rpm_cv_dist_extra2=".9"			    ;;
+			    (2|2.?)	  rpm_cv_dist_extra2=".EL"			    ;;
+			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)		  rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
 			esac
 			;;
 		    (mandrake)
@@ -557,30 +543,24 @@ dnl
 	[], [enable_srpms=yes])
     AC_ARG_VAR([RPM],
 	       [Rpm command. @<:@default=rpm@:>@])
-    AC_PATH_PROG([RPM], [rpm], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${RPM:-no}" = :no; then
+    _BLD_PATH_PROG([RPM], [rpm], [${am_missing3_run}rpm],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
 		(centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|suse)
 		    AC_MSG_WARN([Could not find rpm program in PATH.]) ;;
 		(*) enable_rpms=no ;;
 	    esac
-	fi
-	RPM="${am_missing3_run}rpm"
-    fi
+	fi])
     AC_ARG_VAR([RPMBUILD],
 	       [Rpm build command. @<:@default=rpmbuild@:>@])
-    AC_PATH_PROG([RPMBUILD], [rpmbuild], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${RPMBUILD:-no}" = :no; then
+    _BLD_PATH_PROG([RPMBUILD], [rpmbuild], [${am_missing3_run}rpmbuild],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    RPMBUILD="$RPM"
 	else
-	    RPMBUILD="${am_missing3_run}rpmbuild";
 	    enable_srpms=no;
-	fi
-    fi
+	fi])
 dnl
 dnl I add a test for the existence of /var/lib/rpm because debian has rpm commands
 dnl but no rpm database and therefore cannot build rpm packages.  But it can build
@@ -606,15 +586,12 @@ dnl
 	[], [enable_repo_yum=yes])
     AC_ARG_VAR([CREATEREPO],
 	       [Create repomd repository command. @<:@default=createrepo@:>@])
-    AC_PATH_PROG([CREATEREPO], [createrepo], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${CREATEREPO:-no}" = :no; then
+    _BLD_PATH_PROG([CREATEREPO], [createrepo], [${am_missing3_run}createrepo],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	if test ":$rpm_cv_rpms" = :yes; then
 	    AC_MSG_WARN([Could not find createrepo program in PATH.])
 	fi
-	enable_repo_yum=no
-	CREATEREPO="${am_missing3_run}createrepo"
-    fi
+	enable_repo_yum=no])
     AC_CACHE_CHECK([for rpm yum repo construction], [rpm_cv_repo_yum], [dnl
 	rpm_cv_repo_yum=${enable_repo_yum:-no}
     ])
@@ -631,17 +608,14 @@ dnl
 	[], [enable_repo_yast=yes])
     AC_ARG_VAR([CREATE_PACKAGE_DESCR],
 	       [Create YaST package descriptions command.  @<:@default=create_package_descr@:>@])
-    AC_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
-    if test ":${CREATE_PACKAGE_DESCR:-no}" = :no; then
+    _BLD_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [${am_missing3_run}create_package_descr],
+		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	if test ":$rpm_cv_rpms" = :yes; then
 	    if test ":$target_vendor" = :suse; then
 		AC_MSG_WARN([Could not find create_package_descr program in PATH.])
 	    fi
 	fi
-	enable_repo_yast=no
-	CREATE_PACKAGE_DESCR="${am_missing3_run}create_package_descr"
-    fi
+	enable_repo_yast=no])
     AC_CACHE_CHECK([for rpm yast repo construction], [rpm_cv_repo_yast], [dnl
 	rpm_cv_repo_yast=${enable_repo_yast:-no}
     ])
@@ -680,6 +654,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.5  2011-02-07 04:48:32  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.4  2009-07-21 11:06:13  brian
 # - changes from release build
 #
@@ -763,8 +740,9 @@ AC_DEFUN([_RPM_], [dnl
 #
 # =============================================================================
 # 
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # 
 # =============================================================================
 # ENDING OF SEPARATE COPYRIGHT MATERIAL

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-01-13 16:19:07 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-02-07 04:48:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-13 16:19:07 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -178,6 +178,9 @@ dnl	    PKG_INCLUDES="${PKG_INCLUDES}${PKG_INCLUDES:+ }"'-I${top_builddir}/inclu
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_OPTIONS], [dnl
 dnl--------------------------------------------------------------------------
+    AC_MSG_NOTICE([+-------------------------------+])
+    AC_MSG_NOTICE([| Package Configuration Options |])
+    AC_MSG_NOTICE([+-------------------------------+])
     AC_ARG_ENABLE([streams-irq],
 	[AS_HELP_STRING([--disable-streams-irq],
 	    [STREAMS irq suppression @<:@default=yes@:>@])])
@@ -658,6 +661,9 @@ dnl--------------------------------------------------------------------------
 # _OS7_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_SETUP], [dnl
+    AC_MSG_NOTICE([+----------------------+])
+    AC_MSG_NOTICE([| Kernel Configuration |])
+    AC_MSG_NOTICE([+----------------------+])
     _OS7_SETUP_MODULE
     _OS7_CONFIG_KERNEL
     _OS7_CONFIG_SCTP
@@ -2568,6 +2574,11 @@ dnl----------------------------------------------------------------------------
 # _OS7_CONFIG_SCTP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OS7_CONFIG_SCTP], [dnl
+dnl--------------------------------------------------------------------------
+    AC_MSG_NOTICE([+-------------------------------+])
+    AC_MSG_NOTICE([| Checks for SCTP Configuration |])
+    AC_MSG_NOTICE([+-------------------------------+])
+dnl--------------------------------------------------------------------------
     linux_cv_other_sctp='no'
     linux_cv_lksctp_sctp='no'
     _LINUX_CHECK_KERNEL_CONFIG([for kernel with lksctp compiled in], [CONFIG_IP_SCTP])
@@ -2629,10 +2640,6 @@ dnl fi
     if test :"${with_sctp:-no}" = :yes -o :"${with_sctp2:-no}" = :yes ; then
 	_LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_update_pmtu], [with_sctp='no'; with_sctp2='no'])
     fi
-dnl--------------------------------------------------------------------------
-    AC_MSG_NOTICE([+-------------------------------+])
-    AC_MSG_NOTICE([| Checks for SCTP Configuration |])
-    AC_MSG_NOTICE([+-------------------------------+])
 dnl--------------------------------------------------------------------------
 # SCTP_CONFIG_SLOW_VERIFICATION
     AC_MSG_CHECKING([for sctp slow verification])
@@ -3779,9 +3786,10 @@ AC_DEFUN([_OS7_STRCONF], [dnl
     AC_CACHE_CHECK([for strconf module id base], [os7_cv_midbase], [dnl
 	os7_cv_midbase=5001
     ])
-    os7_cv_sconfig='src/include/sys/config.h'
+    os7_cv_sconfig="src/include/sys/config.h"
     os7_cv_mknodes="src/util/${PACKAGE_TARNAME}_mknod.c"
     os7_cv_modconf="src/include/sys/modconf.h"
+    os7_cv_mkdevices="streams_mkdev"
     _STRCONF
 ])# _OS7_STRCONF
 # =============================================================================
@@ -3796,6 +3804,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.9  2011-02-07 04:48:31  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.8  2011-01-13 16:19:07  brian
 # - changes for SLES 11 support
 #

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-01-18 17:12:50 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-02-07 04:48:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-18 17:12:50 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1542,14 +1542,14 @@ BuildRequires:    @BZIP2_CMD@
 
 # This is a virtual package that we want to pull in all the necessary
 # packages for a full run-time system.
-%if %{NEED_base}
-Requires:       %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+%if %{NEED_kmod}
+Requires:       %{name}-kernel  = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_lib}
 Requires:       %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
 %endif
-%if %{NEED_kmod}
-Requires:       %{name}-kernel  = %{epoch}:%{version}-%{fullrelease}
+%if %{NEED_base}
+Requires:       %{name}-base    = %{epoch}:%{version}-%{fullrelease}
 %endif
 
 Provides:       %{name} = %{epoch}:%{version}-%{fullrelease}
@@ -1973,12 +1973,12 @@ package_source
 
 %if %{HAVE_manrefs}
 # stupid mandrake spec-helper will compress our macros files otherwise
-#EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{base}.refs"
+#EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{manrefs}"
 #export EXCLUDE_FROM_COMPRESS
 %endif
 %if %{HAVE_manmacros}
 # stupid mandrake spec-helper will compress our macros files otherwise
-#EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{base}.macros"
+#EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{manmacros}"
 #export EXCLUDE_FROM_COMPRESS
 %endif
 
@@ -2015,68 +2015,72 @@ package_source
 # documentation.
 # ---------------------------------------------------------------------------
 
-Summary:        %{title} base support package.
-Group:          System Environment/Kernel
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        true
-Autoprov:       true
+Summary:            %{title} base support package.
+Group:              System Environment/Kernel
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_configfiles}
-Prefix:         %{_sysconfdir}
+Prefix:             %{_sysconfdir}
 %endif
 %if %{FILES_mibfiles}
-Prefix:         %{_snmpmibdir}
+Prefix:             %{_snmpmibdir}
 %endif
 %if %{FILES_initscripts}
-Prefix:         %{_configdir}
-Prefix:         %{_initrddir}
+Prefix:             %{_configdir}
+Prefix:             %{_initrddir}
 %endif
 %if %{FILES_devscripts}
-Prefix:         %{_sbindir}
+Prefix:             %{_sbindir}
 %endif
 %if %{FILES_netconfig}
-Prefix:         %{_sysconfdir}/netconfig.d
+Prefix:             %{_sysconfdir}/netconfig.d
 %endif
 %if %{FILES_sock2path}
-Prefix:         %{_sysconfdir}/sock2path.d
+Prefix:             %{_sysconfdir}/sock2path.d
 %endif
 %if %{FILES_snmpconf}
-Prefix:         %{_snmpconfdir}
+Prefix:             %{_snmpconfdir}
 %endif
 %if %{FILES_oldmods}
-Prefix:         %{_modutildir}
+Prefix:             %{_modutildir}
 %endif
 %if %{FILES_testscripts}
-Prefix:         %{_pkglibexecdir}
+Prefix:             %{_pkglibexecdir}
 %endif
 %if %{FILES_sendpr}
-Prefix:         %{_pkglibexecdir}
+Prefix:             %{_pkglibexecdir}
 %endif
 #if %{FILES_infofiles}
-#refix:         %{_infodir}
+#refix:             %{_infodir}
 #endif
 %if %{FILES_manpages}
-Prefix:         %{_mandir}
+Prefix:             %{_mandir}
 %endif
 
-Conflicts:      texinfo < 3.11
+Conflicts:          texinfo < 3.11
 
 %if %{USE_makedev}
-Requires:       dev >= 3.3
-%endif
-%if %{NEED_lib}
-Requires:       %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
+Requires:           dev >= 3.3
 %endif
 %if %{NEED_kmod}
-Requires:       %{name}-kernel  = %{epoch}:%{version}-%{fullrelease}
+Requires:           %{name}-kernel  = %{epoch}:%{version}-%{fullrelease}
+%endif
+%if %{NEED_lib}
+Requires:           %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
+%endif
+%if %{NEED_virt}
+Requires:           %{name}         = %{epoch}:%{version}-%{fullrelease}
+Requires(pre):      %{name}         = %{epoch}:%{version}-%{fullrelease}
 %endif
 
-Provides:       %{name}-base = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-base = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-base = %{epoch}:%{version}-%{rpmrelease}
+Provides:           %{name}-base = %{epoch}:%{version}-%{fullrelease}
+Provides:           %{name}-base = %{epoch}:%{version}-%{fullrelease2}
+Provides:           %{name}-base = %{epoch}:%{version}-%{rpmrelease}
 
-Release:        %{fullrelease}
+Release:            %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description base
@@ -2237,14 +2241,14 @@ fi
 %post base
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
-#%if %{USE_mknods}
-#    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-#    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-#    # generated in the build to create devices.
-#    if [ -x "%{mknods}" ] ; then
-#        %{mknods}
-#    fi
-#%endif
+%if %{USE_mknods}
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
+    # because they have no %%dev macro, so in that case we just run the makenodes program that was
+    # generated in the build to create devices.
+    if [ -x "%{mknods}" ] ; then
+        %{mknods} --create
+    fi
+%endif
 %if %{HAVE_oldmods}
     # At the end of a fresh install we need to add our lines to the modules.conf file if it exists,
     # and it is necessary to use a modconf file (2.4 and pre 2.5.48 kernel), an even if the line is
@@ -2349,18 +2353,21 @@ if [ $1 = 1 ] ; then : # fresh install
         [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue || :
     done
 %endif
-%if %{FILES_manpages}
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -u %{_mandir} || :
-    fi
-%endif
+#if %{FILES_manpages}
+#   if type -p makewhatis >/dev/null 2>&1 ; then
+#       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+#   fi
+#   if type -p mandb >/dev/null 2>&1 ; then
+#       LANGUAGE= LANG= mandb -p %{_mandir} || :
+#   fi
+#endif
 %if %{FILES_manrefs}
-    [ ! -f %{_mandir}/%{base}.refs.gz    ] || gunzip  %{_mandir}/%{base}.refs.gz
-    [ ! -f %{_mandir}/%{base}.refs.bz2   ] || bunzip2 %{_mandir}/%{base}.refs.bz2
+    [ ! -f %{_mandir}/%{manrefs}.gz    ] || gunzip  %{_mandir}/%{manrefs}.gz
+    [ ! -f %{_mandir}/%{manrefs}.bz2   ] || bunzip2 %{_mandir}/%{manrefs}.bz2
 %endif
 %if %{FILES_manmacros}
-    [ ! -f %{_mandir}/%{base}.macros.gz  ] || gunzip  %{_mandir}/%{base}.macros.gz
-    [ ! -f %{_mandir}/%{base}.macros.bz2 ] || bunzip2 %{_mandir}/%{base}.macros.bz2
+    [ ! -f %{_mandir}/%{manmacros}.gz  ] || gunzip  %{_mandir}/%{manmacros}.gz
+    [ ! -f %{_mandir}/%{manmacros}.bz2 ] || bunzip2 %{_mandir}/%{manmacros}.bz2
 %endif
 fi
 if [ $1 = 2 ] ; then : # upgrade
@@ -2468,14 +2475,14 @@ fi
 %preun base
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then : # final removal
-#%if %{USE_rmnods}
-#    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-#    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-#    # generated in the build to create devices.
-#    if [ -x "%{mknods}" ] ; then
-#        %{rmnods}
-#    fi
-#%endif
+%if %{USE_rmnods}
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
+    # because they have no %%dev macro, so in that case we just run the makenodes program that was
+    # generated in the build to create devices.
+    if [ -x "%{mknods}" ] ; then
+        %{rmnods}
+    fi
+%endif
 %if %{HAVE_oldmods}
     # When we are going away altogether we want to remove any lines whatsoever from the modules.conf
     # file.
@@ -2575,8 +2582,6 @@ if [ $1 = 0 ] ; then : # final removal
     done
     for i in $reverse ; do
         if [ -f %_initrddir/$i ] ; then
-            # rpm is not too good about the order of removal
-            /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
             # Find the best working init script removal tool
             [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
             [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
@@ -2585,10 +2590,10 @@ if [ $1 = 0 ] ; then : # final removal
     done
 %endif
 %if %{FILES_manrefs}
-    rm -f -- %{_mandir}/%{base}.refs
+    rm -f -- %{_mandir}/%{manrefs}
 %endif
 %if %{FILES_manmacros}
-    rm -f -- %{_mandir}/%{base}.macros
+    rm -f -- %{_mandir}/%{manmacros}
 %endif
 fi
 if [ $1 = 1 ] ; then : # upgrade
@@ -2704,21 +2709,24 @@ b loop' $prel_new > $prel_tmp
     done
 %endif
 %if %{FILES_manrefs}
-    rm -f -- %{_mandir}/%{base}.refs
+    rm -f -- %{_mandir}/%{manrefs}
 %endif
 %if %{FILES_manmacros}
-    rm -f -- %{_mandir}/%{base}.macros
+    rm -f -- %{_mandir}/%{manmacros}
 %endif
 fi
 
 %postun base
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-%if %{FILES_manpages}
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -u %{_mandir} || :
-    fi
-%endif
+#if %{FILES_manpages}
+#   if type -p makewhatis >/dev/null 2>&1 ; then
+#       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+#   fi
+#   if type -p mandb >/dev/null 2>&1 ; then
+#       LANGUAGE= LANG= mandb -p %{_mandir} || :
+#   fi
+#endif
 fi
 
 %if %{PACKAGE_base}
@@ -2739,8 +2747,8 @@ fi
 %{?files_testscripts:%{_pkglibexecdir}/testsuite*}
 %{?files_sendpr:%{_pkglibexecdir}/send-pr}
 %{?files_sendpr:%{_pkglibexecdir}/send-pr.config}
-%{?files_manrefs:%{_mandir}/%{base}.refs*}
-%{?files_manmacros:%{_mandir}/%{base}.macros*}
+%{?files_manrefs:%{_mandir}/%{manrefs}*}
+%{?files_manmacros:%{_mandir}/%{manmacros}*}
 %{?files_manpages:%{_mandir}/man[1458]*/*}
 %endif
 
@@ -2752,57 +2760,59 @@ fi
 # as sections 2 3 7 and 9 of the manual pages.
 # ---------------------------------------------------------------------------
 
-Summary:        %{title} developer and programmer documentation.
-Group:          Development/System
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        true
-Autoprov:       true
+Summary:            %{title} developer and programmer documentation.
+Group:              Development/System
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_infofiles}
-Prefix:         %{_infodir}
+Prefix:             %{_infodir}
 %endif
 %if %{FILES_txtfiles}
-Prefix:         %{_docdir}/@PACKAGE@-@VERSION@
+Prefix:             %{_docdir}/@PACKAGE@-@VERSION@
 %endif
 %if %{FILES_dvifiles}
-Prefix:         %{_dvidir}/@PACKAGE@-@VERSION@
+Prefix:             %{_dvidir}/@PACKAGE@-@VERSION@
 %endif
 %if %{FILES_psfiles}
-Prefix:         %{_psdir}/@PACKAGE@-@VERSION@
+Prefix:             %{_psdir}/@PACKAGE@-@VERSION@
 %endif
 %if %{FILES_pdffiles}
-Prefix:         %{_pdfdir}/@PACKAGE@-@VERSION@
+Prefix:             %{_pdfdir}/@PACKAGE@-@VERSION@
 %endif
 %if %{FILES_htmlfiles}
-Prefix:         %{_htmldir}/@PACKAGE@-@VERSION@
+Prefix:             %{_htmldir}/@PACKAGE@-@VERSION@
 %endif
 %if %{FILES_manpages}
-Prefix:         %{_mandir}
+Prefix:             %{_mandir}
 %endif
 
 %if %{FILES_infofiles}
+Requires(pre):      /sbin/install-info
 Requires(post):     /sbin/install-info
 Requires(preun):    /sbin/install-info
 %endif
-%if %{FILES_manpages}
-Requires(post):     /usr/sbin/makewhatis
-Requires(postun):   /usr/sbin/makewhatis
-%endif
+#if %{FILES_manpages}
+#equires(pre):      /usr/sbin/makewhatis
+#equires(post):     /usr/sbin/makewhatis
+#equires(postun):   /usr/sbin/makewhatis
+#endif
 
-Conflicts:      texinfo < 3.11
+Conflicts:          texinfo < 3.11
 
 # The %{name}-base package contains the man page references and macros
 # and is required.  Other packages are unnecessary.
 %if %{NEED_base}
-Requires:       %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+Requires:           %{name}-base    = %{epoch}:%{version}-%{fullrelease}
 %endif
 
-Provides:       %{name}-doc     = %{epoch}:%{version}-%{fullrelease}
-Provides:       %{name}-doc     = %{epoch}:%{version}-%{fullrelease2}
-Provides:       %{name}-doc     = %{epoch}:%{version}-%{rpmrelease}
+Provides:           %{name}-doc     = %{epoch}:%{version}-%{fullrelease}
+Provides:           %{name}-doc     = %{epoch}:%{version}-%{fullrelease2}
+Provides:           %{name}-doc     = %{epoch}:%{version}-%{rpmrelease}
 
-Release:        %{fullrelease}
+Release:            %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description doc
@@ -2834,11 +2844,14 @@ if [ $1 = 1 ] ; then : # fresh install
         done
     fi
 %endif
-%if %{FILES_manpages}
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -u %{_mandir} || :
-    fi
-%endif
+#if %{FILES_manpages}
+#   if type -p makewhatis >/dev/null 2>&1 ; then
+#       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+#   fi
+#   if type -p mandb >/dev/null 2>&1 ; then
+#       LANGUAGE= LANG= mandb -p %{_mandir} || :
+#   fi
+#endif
 fi
 
 %preun doc
@@ -2879,11 +2892,14 @@ fi
 %postun doc
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-%if %{FILES_manpages}
-    if [ -x /usr/sbin/makewhatis ] ; then
-        LANGUAGE= LANG= /usr/sbin/makewhatis -u %{_mandir} || :
-    fi
-%endif
+#if %{FILES_manpages}
+#   if type -p makewhatis >/dev/null 2>&1 ; then
+#       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+#   fi
+#   if type -p mandb >/dev/null 2>&1 ; then
+#       LANGUAGE= LANG= mandb %{_mandir} || :
+#   fi
+#endif
 fi
 
 %if %{PACKAGE_doc}
@@ -2897,8 +2913,8 @@ fi
 %{?files_pngfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.png}
 %{?files_cssfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.css}
 %{?files_infofiles:%{_infodir}/*.info*}
-%{?files_manrefs:%{_mandir}/%{base}.refs*}
-%{?files_manmacros:%{_mandir}/%{base}.macros*}
+#{?files_manrefs:%{_mandir}/%{manrefs}*}
+#{?files_manmacros:%{_mandir}/%{manmacros}*}
 %{?files_manpages:%{_mandir}/man[2379]*/*}
 %endif
 
@@ -2955,8 +2971,16 @@ Prefix:         %{_localedir}
 Requires:       /sbin/ldconfig
 Requires:       /usr/bin/tclsh
 
+%if %{NEED_kmod}
+Requires:       %{name}-kernel  = %{epoch}:%{version}-%{fullrelease}
+%endif
 %if %{NEED_base}
 Requires:       %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+Requires(pre):  %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+%endif
+%if %{NEED_virt}
+Requires:           %{name}         = %{epoch}:%{version}-%{fullrelease}
+Requires(pre):      %{name}         = %{epoch}:%{version}-%{fullrelease}
 %endif
 
 Provides:       %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
@@ -3046,6 +3070,9 @@ fi
 %{?files_perlmods:%dir %{_perldir}/auto/*}
 %{?files_perlmods:%{_perldir}/auto/*}
 %{?files_tcllibs:%dir %{_pkgtcllibdir}}
+%{?files_tcllibs:%dir %{_pkgtcllibdir}/xti}
+%{?files_tcllibs:%dir %{_pkgtcllibdir}/tcap}
+%{?files_tcllibs:%dir %{_pkgtcllibdir}/streams}
 %{?files_tcllibs:%{_pkgtcllibdir}/pkgIndex.tcl}
 %{?files_tcllibs:%{_pkgtcllibdir}/*/*.tcl}
 %{?files_tcllibs:%{_pkgtcllibdir}/*/*.so}
@@ -3175,7 +3202,11 @@ Requires(preun):    lsof
 Requires(postun):   lsof
 
 # this is enough for the following
-Requires:       modutils
+Requires:           modutils
+Requires(pre):      modutils
+Requires(post):     modutils
+Requires(preun):    modutils
+Requires(postun):   modutils
 
 #Requires(pre):      @MODPROBE@
 #Requires(pre):      @LSMOD@
@@ -3191,10 +3222,19 @@ Requires:       modutils
 #Requires(postun):   @DEPMOD@
 #Requires(postun):   @INSMOD@
 
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n")
 
+%if %{NEED_lib}
+Requires:           %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
+Requires(pre):      %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
+%endif
 %if %{NEED_base}
-Requires:       %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+Requires:           %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+Requires(pre):      %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+%endif
+%if %{NEED_virt}
+Requires:           %{name}         = %{epoch}:%{version}-%{fullrelease}
+Requires(pre):      %{name}         = %{epoch}:%{version}-%{fullrelease}
 %endif
 
 Provides:       kernel-modules = %{_kversion}
@@ -3346,11 +3386,20 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # This is a running kernel, do a depmod on the modules directory for the running
         # kernel.
-        depmod -ae 2>&1 || :
-        # Running kernels do need init scripts run.
+        if [ -r /boot/System.map-%{kernel_version} ] ; then
+            depmod -ae -F /boot/System.map-%{kernel_version} 2>&1 || :
+        else
+            depmod -ae 2>&1 || :
+        fi
+        # Running kernels do need init scripts run, but only when normally
+        # started in the current runlevel.
+        r=`runlevel | sed -e 's|.*[[:space:]]||'`
         list="%{initfiles}" ; for i in $list ; do
             if [ -f %_initrddir/$i ] ; then
-                /sbin/service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
+                if [ -L %_initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
+                     -L %_initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
+                    /sbin/service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
+                fi
             fi
         done
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
@@ -3366,51 +3415,55 @@ fi
 %if %{FILES_modules}
 %preun -n %{name}-%{_kversion}
 # ---------------------------------------------------------------------------
+remove_depends() {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+        remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+        modprobe -r $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # We are about to uninstall for good on a running kernel then we have to worry about which
         # modules are running
-        # First lets try shutting down using any init script first in reverse order
-        reverse=
-        list="%{initfiles}" ; for i in $list ; do
-            reverse="$i${reverse:+ $reverse}"
-        done
-        for i in $reverse ; do
-            if [ -f %_initrddir/$i ] ; then
-                /sbin/service $i stop 2>&1 || %_initrddir/$i stop 2>&1 || :
+        reboot='no'
+        if [ -x /var/run/strace.pid ] ; then
+            kill -TERM `cat /var/run/strace.pid` || :
+        fi
+        if [ -x /var/run/strerr.pid ] ; then
+            kill -TERM `cat /var/run/strerr.pid` || :
+        fi
+        umount -a -t specfs || reboot='yes'
+%if %{USE_rmnods}
+        if [ -x "%{mknods}" ] ; then
+            %{rmnods}
+        fi
+%endif
+        if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+            if [ -x /usr/sbin/fdetach ] ; then
+                /usr/sbin/fdetach -a 2>/dev/null || :
             fi
-        done
-        mods="%{modules}" ; for m in $mods ; do
-            if ( lsmod | grep -q "^$m" ) ; then
-                # modules running, kick the stack
-                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                if ( lsmod | grep -q "^$m" ) ; then
-                    if [ -x /usr/sbin/fdetach ] ; then
-                        /usr/sbin/fdetach -a 2>/dev/null
-                    fi
-                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                    if ( lsmod | grep -q "^$m" ) ; then
-                        lsof | while read -a tokens; do
-                            if [ :"${tokens[4]}" = :"CHR" ]; then
-                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
-                                # FIXME: this test is insufficient
-                                if [ $major -eq %{majbase} ]; then
-                                    eval "kill -KILL ${tokens[1]}"
-                                fi
-                            fi
-                        done
-                        if [ -x /bin/sleep ] ; then
-                            /bin/sleep 5 # wait for processes to die and close streams
-                        fi
-                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                        if ( lsmod | grep -q "^$m" ) ; then
-                            echo "Cannot uninstall with $m module running." >&2
-                            exit 1
-                        fi
-                    fi
+            for signal in TERM KILL ; do
+                if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+                    lsof | grep '\<STR\>' | \
+                    while read -a fields ; do
+                        if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
+                        if [ ":${fields[7]}" != ':STR' ] ; then continue; fi
+                        kill -$signal ${fields[1]} >/dev/null 2>&1 || :
+                    done
+                    sleep 5
                 fi
-            fi
-        done
+            done
+        fi
+        lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
+        remove_depends streams || reboot='yes'
+        remove_depends specfs  || reboot='yes'
+        [ ":$reboot" != ':yes' ] || echo "Reboot required." >&2
     fi
 fi
 %endif
@@ -3418,10 +3471,26 @@ fi
 %if %{FILES_modules}
 %postun -n %{name}-%{_kversion}
 # ---------------------------------------------------------------------------
+remove_depends() {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+        remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+        modprobe -r $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
         # This is a running kernel, do a depmod on the modules directory for.
-        depmod -ae 2>&1 || :
+        if [ -r /boot/System.map-%{kernel_version} ] ; then
+            depmod -ae -F /boot/System.map-%{kernel_version} 2>&1 || :
+        else
+            depmod -ae 2>&1 || :
+        fi
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
         # Non-running kernels a depmod will be performed on boot but depmod anyway.
         UNAME_MACHINE=%{_target_cpu} \
@@ -3431,49 +3500,38 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         # One more kick at killing any loaded modules on uninstall, last stage of the upgrade on a
         # running kernel for upgrade.
         reboot='no'
-        mods="%{modules}" ; for m in $mods ; do
-            if ( lsmod | grep -q "^$m" ) ; then
-                # Modules running, kick the stack.
-                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                if ( lsmod | grep -q "^$m" ) ; then
-                    if [ -x /usr/sbin/fdetach ] ; then
-                        /usr/sbin/fdetach -a 2>/dev/null
-                    fi
-                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                    if ( lsmod | grep -q "^$m" ) ; then
-                        insmod -ar "$m"
-                        lsof | while read -a tokens; do
-                            if [ :"${tokens[4]}" = :"CHR" ]; then
-                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
-                                # FIXME: this test is insufficient
-                                if [ $major -eq %{majbase} ]; then
-                                    if [ $1 = 0 ] ; then
-                                        # Extreme prejudice for removal.
-                                        eval "kill -KILL ${tokens[1]}"
-                                    else
-                                        # Try to get them to reload for upgrade.
-                                        eval "kill -HUP ${tokens[1]}"
-                                    fi
-                                fi
-                            fi
-                        done
-                        if [ -x /bin/sleep ] ; then
-                            /bin/sleep 5 # wait for processes to die and close streams
-                        fi
-                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                        if ( lsmod | grep -q "^$m" ) ; then
-                            echo "Error: modules may be still loaded" >&2
-                            lsmod | grep "^$m" >&2
-                            reboot='yes'
-                        fi
-                    fi
-                fi
-            fi
-        done
-        if [ "$reboot" = 'yes' ]; then
-            echo "you may have to reboot" >&2
-            exit 1
+        if [ -x /var/run/strace.pid ] ; then
+            kill -TERM `cat /var/run/strace.pid` || :
         fi
+        if [ -x /var/run/strerr.pid ] ; then
+            kill -TERM `cat /var/run/strerr.pid` || :
+        fi
+        umount -a -t specfs || reboot='yes'
+%if %{USE_rmnods}
+        if [ -x "%{mknods}" ] ; then
+            %{rmnods}
+        fi
+%endif
+        if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+            if [ -x /usr/sbin/fdetach ] ; then
+                /usr/sbin/fdetach -a 2>/dev/null || :
+            fi
+            for signal in TERM KILL ; do
+                if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+                    lsof | grep '\<STR\>' | \
+                    while read -a fields ; do
+                        if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
+                        if [ ":${fields[7]}" != ':STR' ] ; then continue; fi
+                        kill -$signal ${fields[1]} >/dev/null 2>&1 || :
+                    done
+                    sleep 5
+                fi
+            done
+        fi
+        lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
+        remove_depends streams || reboot='yes'
+        remove_depends specfs  || reboot='yes'
+        [ ":$reboot" != ':yes' ] || echo "Reboot required." >&2
     fi
 fi
 %endif
@@ -3518,7 +3576,7 @@ Obsoletes:      kmod%{kernel_flavor}-devel
 Obsoletes:      kernel-module-%{name}-devel%{kernel_flavor}
 Obsoletes:      %{name}-devel-kmod%{kernel_flavor}
 
-Requires:       %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{NAME} = %{VERSION}-%{RELEASE}\\n")
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n")
 
 %if %{NEED_devel}
 Requires:       %{name}-devel   = %{epoch}:%{version}-%{fullrelease}
@@ -3820,6 +3878,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.11  2011-02-07 04:48:31  brian
+# - updated configure and build scripts
+#
 # Revision 1.1.2.10  2011-01-18 17:12:50  brian
 # - rpm build updates
 #
