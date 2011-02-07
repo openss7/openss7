@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
+# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 04:44:28 $
 # Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -271,17 +271,17 @@ build_options() {
 start() {
     [ -d "$STRERR_DIRECTORY" -o -z "$STRERR_DIRECTORY" ] || \
 	action $"Creating $STRERR_DIRECTORY: " \
-	    mkdir -p "$STRERR_DIRECTORY"
+	    mkdir -p -- "$STRERR_DIRECTORY" \
+	    || RETVAL=$?
     build_options
-    daemon_start $execfile $STRERR_OPTIONS
-    RETVAL=$?
+    daemon_start $execfile $STRERR_OPTIONS \
+	|| RETVAL=$?
     [ $RETVAL -eq 0 ] && touch $lockfile
     return $RETVAL
 }
 
 stop() {
-    daemon_stop $execfile
-    RETVAL=$?
+    daemon_stop $execfile || RETVAL=$?
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     return $RETVAL
 }
@@ -353,7 +353,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
+# @(#) $RCSfile: strerr,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 04:44:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -399,11 +399,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:47:58 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:44:28 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strerr,v $
+# Revision 1.1.2.2  2011-02-07 04:44:28  brian
+# - updated init scripts
+#
 # Revision 1.1.2.1  2009-06-21 11:47:58  brian
 # - added files to new distro
 #

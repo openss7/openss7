@@ -2,19 +2,38 @@
 # This is an inital configuration file for the SPECFS STREAMS filesystem.
 #
 
+# Mount specfs file system?
+SPECFS_MOUNTSPECFS='no'
+# Unmount specfs file system?
+SPECFS_UMOUNTSPECFS='no'
 # The mount point (default /dev/streams), null for no mount
-SPECFS_MOUNTPOINT="/dev/streams"
+SPECFS_MOUNTPOINT='/dev/streams'
 # Mount options are as follows:
 # user id to assign to device and module directories
-SPECFS_UID="0"
+SPECFS_UID='0'
 # group id to assign to device and modules directories
-SPECFS_GID="0"
+SPECFS_GID='0'
 # mode to assign to device and module directories
-SPECFS_MODE="0777"
+SPECFS_MODE='0777'
+
+# Kernel modules to preload before system configuration.
+SPECFS_PRELOAD=
+# Kernel modules for STREAMS drivers to remove.
+SPECFS_DRIVERS=
+# Kernel modules for STREAMS modules to remove.
+SPECFS_MODULES=
+
+# Make real character devices before intializing subsystem?
+SPECFS_MAKEDEVICES='yes'
+# Remove devices when removing subsystem?
+SPECFS_REMOVEDEVICES='yes'
+# Force removal of kernel modules when shutting down.
+SPECFS_FORCEREMOVE='yes'
+
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:48:00 $
+# @(#) $RCSfile: specfs,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 04:44:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -59,11 +78,14 @@ SPECFS_MODE="0777"
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:48:00 $ by $Author: brian $
+# Last Modified $Date: 2011-02-07 04:44:28 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: specfs,v $
+# Revision 1.1.2.2  2011-02-07 04:44:28  brian
+# - updated init scripts
+#
 # Revision 1.1.2.1  2009-06-21 11:48:00  brian
 # - added files to new distro
 #
@@ -75,4 +97,4 @@ SPECFS_MODE="0777"
 #
 # =============================================================================
 
-# vim ft=conf
+# vim ft=conf sw=4 tw=80
