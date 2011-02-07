@@ -1,0 +1,688 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: mksf.8.man,v 1.1.2.1 2011-02-07 02:14:43 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:43 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: mksf.8.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:43  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH MKSF 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B mksf
+\- make a special (device) file
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fBmksf\fR\ 'u
+\fBmksf\fP
+[\fB-C\fP\0\fIclass\fP|\fB-d\fP\0\fIdriver\fP]
+[\fB-D\fP\0\fIdirectory\fP]
+[\fB-H\fP\0\fIhw_path\fP]
+[\fB-I\fP\0\fIinstance\fP]
+[\fB-q\fP|\fB-v\fP]
+[\fIdriver_options\fP]
+[\fIspecial_file\fP]
+.PD 0
+.HP
+\fBmksf\fP
+[\fB-C\fP\0\fIclass\fP|\fB-d\fP\0\fIdriver\fP]
+[\fB-D\fP\0\fIdirectory\fP]
+[\fB-H\fP\0\fIhw_path\fP]
+\fB-m\fP\0\fIminor\fP
+[\fB-q\fP|\fB-v\fP]
+[\fB-r\fP]
+\fIspecial_file\fP
+.HP
+\fBmksf\fP {\fB-h\fP|\fB--help\fP}
+.HP
+\fBmksf\fP {\fB-V\fP|\fB--version\fP}
+.HP
+\fBmksf\fP {\fB-c\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 1
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B mksf
+command makes a special file in the devices directory, normally
+.BR /dev ,
+for an existing device, a device that has already been assigned an instance
+number by the system.  The device is specified by supplying some combinations
+of the
+.BR -C ", " -d ", " -H ", and " -I
+options.  When the options specified match a unique device in the system,
+.B mksf
+creates a special file for that devices; otherwise,
+.B mksf
+prints an error message and exits.  When required,
+.B mksf
+creates any subdirectories relative to the device installation directory
+that are defined for the resulting special file.
+.PP
+For most drivers,
+.B mksf
+has a set of built-in driver options,
+.IR driver_options ,
+and special file,
+.IR special_file ,
+naming conventions.  By supplying some subset of the driver options, as in
+the first form above, the user can create a special file with a particular
+set of characteristics.  When a special file name,
+.IR special_file ,
+is specified,
+.B mksf
+creates the special file with that special file name; otherwise, the default
+naming convention for the driver is used.
+.PP
+In the second form, the minor number,
+.IR minor ,
+and special file name,
+.IR special_file ,
+are explicitly specified.  This form is used to make a special file for a
+driver without using the built-in driver options in
+.BR mksf .
+The
+.B -r
+option specifies that
+.B mksf
+should make a character (raw) device file instead of the default block device
+file for drivers that support both.
+.\"
+.\"
+.SH OPTIONS
+.PP
+The
+.B mksf
+command recognizes the following options:
+.TP
+.BR -C ", " --class " \fI\)class\fP
+Match a device that belongs to a given device class,
+.IR class .
+Device classes can be listed with the
+.B lsdev (8)
+command.  They are defined in the files in the directory
+.BR /usr/conf/master.d .
+This option is not valid for pseudo devices.  This option cannot be used with
+.BR -d .
+.TP
+.BR -d ", " --driver " \fI\)driver\fP
+Match a device that is controlled by the specified device driver,
+.IR driver .
+Device drivers can be listed with the
+.BR lsdev (8)
+command.
+They are defined in the files in directory
+.BR /usr/conf/master.d .
+This option cannot be used with
+.BR -C .
+.TP
+.BR -D ", " --directory " \fI\)directory\fP
+Override the default device installation directory,
+.BR /dev ,
+and install the special files in the directory,
+.IR directory ,
+instead.  The directory,
+.IR directory ,
+must exist; otherwise,
+.B mksf
+displays an error message and exits.  See
+.RI \(lq WARNINGS \(rq.
+.TP
+.BR -H ", " --hwpath " \fI\)hw_path\fP
+Match a device at a given hardware path,
+.IR hw_path .
+Hardware paths can be listed with the
+.BR ioscan (8)
+command.  A hardware path specifies the addresses of the hardware components
+leading to a device.  It consists of a string of numbers separated by periods
+.RB ( . ),
+such as 52 (a card), 52.3 (a target address), and 52.3.0 (a device).  If a
+hardware component is a bus converter, the following period, if any, is
+replaced by a slash
+.RB ( / )
+as in 2, 2/3, and 2/3.0.  This option is not valid for pseudo devices.
+.TP
+.BR -I ", " --instance " \fI\)instance\fP
+Match a device with the specified instance number.  Instances can be listed
+with the
+.B -f
+option of the
+.BR ioscan (8)
+command.  This option is not valid for pseudo devices.
+.TP
+.BR -m ", " --minor " \fI\)minor\fP
+Create the special file with the specified minor device number,
+.IR minor .
+The format of
+.I minor
+is the same as that given in
+.BR mknod (1).
+.TP
+.BR -q ", " --quiet
+Quiet option.  Normally,
+.B mksf
+displays a message as each driver is processed.  This option suppresses the
+driver message, but not error messages.  See the
+.B -v
+option.
+.TP
+.BR -r ", " --raw
+Create a character (raw) special file instead of a block special file.
+.TP
+.BR -v ", " --verbose
+Verbose option.  In addition to the normal processing message, display the
+name of each special file as it is created.  See the
+.B -q
+option.
+.\"
+.SS Naming Conventions
+.PP
+Many special files are named using the
+.BI c card t target d device
+naming convention.  These variables have the following meaning whenever they
+are used:
+.TP
+.I card
+The unique interface card identifier number from
+.BR ioscan (8).
+It is represented as a decimal number with a typical range of 0 to 255.
+.TP
+.I target
+The device target number, for example, the address on a HP-FL or SCSI bus.
+It is represented as a decimal number with a typical range of 0 to 15.
+.TP
+.I device
+An address unit within a device, for example, the unit in a HP-FL device or
+the LUN in a SCSI device.  It is represented as a decimal number with a
+typical range of 0 to 15.
+.\"
+.SS Special Files
+.PP
+The driver-specific options
+.RI ( driver_options )
+and default special file names
+.RI ( special_file )
+are listed below:
+.TP
+.B asio0
+.RS
+.TP
+.BI -a " access_mode
+Port access mode (0-2).  The default access mode is 0 (Direct connect). The
+.I access_mode
+meanings are:
+.RS
+.TS
+box tab(:);
+lb|lb
+n|l.
+Port:Operation
+_
+0:Direct connect
+1:Dial out modem
+2:Dial in modem
+.TE
+.RE
+.TP
+.B -c
+CCITT.
+.TP
+.B -f
+Hardware flow control (RTS/CTS).
+.TP
+.B -i
+Modem dialer.  Cannot be used with
+.BR -l .
+.TP
+.B -l
+Line printer.  Cannot be used with
+.BR -i .
+.TP
+.B -p \fI\)port\fP
+Multiplexer port number (0 for built-in serial port; 0-1 for SAS console
+ports).  The default port number is 0.
+.TP
+.B -r \fI\)fifo_trigger\fP
+.I fifo_trigger
+should have a value between 0 and 3.  The following table shows the
+corresponding FIFO trigger level for a given \fI\)fifo_trigger\fP value.
+.RS
+.TS
+box tab(:);
+li|lb
+n|n.
+fifo_trigger:Receive FIFO Trigger Level
+_
+0:1
+1:4
+2:8
+3:14
+.TE
+.sp
+.RE
+.TP
+.B -t
+Transport mode (normally used by diagnostics).
+.TP
+.B -x \fI\)xmit_limit\fP
+.I xmit_limit
+should have a value between 0 and 3.  The following table shows the
+corresponding transmit limit for a given
+.I xmit_limit
+value.
+.RS
+.TS
+box tab(:);
+li|lb
+n|n.
+xmit_limit:Transmit Limit
+_
+0:1
+1:4
+2:8
+3:12
+.TE
+.sp
+.RE
+.TP
+.I special_file
+The default special file name depends on the
+.I access_mode
+and whether the
+.B -i " and " -l
+options are used.
+.RS
+.TS
+box tab(:);
+li|lb|lb|lb
+n|c|c|l.
+access_mode:-i:-l:Special File Name
+_
+\(em:no:yes:\fBc\fIcard\fBp0_lp\fR
+2:no:no:\fBttyd\fIcard\fBp0\fR
+1:no:no:\fBcul\fIcard\fBp0\fR
+0:yes:no:\fBcua\fIcard\fBp0\fR
+0:no:no:\fBtty\fIcard\fBp0\fR
+.TE
+.sp
+.RE
+.RE
+.TP
+.B audio
+.RS
+.TP
+.B -f \fIformat\fP
+Audio format (0-3).  The format meanings are:
+.RS
+.TS
+box tab(:);
+li|lb|li
+n|l|c.
+format:Audio Format:format-mod
+_
+0:No change in audio format:
+1:8-bit Mu-law:U
+2:8-bit A-law:A
+3:16-bit linear:L
+.TE
+.sp
+.RE
+.TP
+.B -o \fIoutput_dest\fP
+Output destination (0-4).  The
+.I output_dest
+should have a value between 0 and 4.  The following table shows the
+corresponding output destinations for a given
+.I output_dest
+value:
+.RS
+.TS
+box tab(:);
+li|lb|li
+n|l|c.
+output_dest:Output Destinations:output-mod
+_
+0:All outputs:B
+1:Headphone:E
+2:Internal Speaker:I
+3:No output:N
+4:Line output:L
+.TE
+.sp
+.RE
+.TP
+.B -r
+Raw, control access.  This option cannot be used with either the
+.BR -f " or " -o
+options.
+.TP
+.I special_file
+The default special file name depends on the options specified.
+.RS
+.TS
+box tab(:);
+lb:lb
+l:l.
+Options:Special File Name
+_
+\fB-r\fP:\fBaudioCtl_\fIcard\fR
+\fB-f\fP 0:\fBaudio_\fIcard\fR
+all others:\fBaudio\fI<output-mod><format-mod>\fR_\fIcard\fR
+.TE
+.PP
+The optional
+.I output-mod
+and
+.I format-mod
+values are given in the tables above.  Note the underscore
+.RB ( _ )
+before
+.I card
+in each special file name.  Also note that for
+.IR "card 0" ,
+each file will be linked to a simply name without the trailing
+\fB_\fIcard\fR.
+.RE
+.RE
+.\"
+.\"
+.SH EXIT STATUS
+.PP
+.B mksf
+exits with one of the following values:
+.TP
+.B 0
+Successful completion.
+.TP
+.B 1
+Failure.  An error occurred.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+Most of the diagnostic messages from
+.B mksf
+are self-explanatory.  Listed below are some messages deserving further
+clarification.  Errors cause
+.B mksf
+to abort immediately.
+.\"
+.SS Errors
+.PP
+.TP
+Ambiguous device specification
+Matched more than one device in the system.  Use some combinations of the
+.BR -d ", " -C ", " -H ", and " -I
+options to specify a unique device.
+.TP
+No such device in the system
+No device in the system matched the options specified.  use
+.BR ioscan (8)
+to list the devices int the system.
+.TP
+Device driver name is not in the kernel
+.PD 0
+.TP
+Device class name is not in the kernel
+.PD
+The indicated device driver or device class is not present in the kernel.
+Add the appropriate device driver and/or device class to the config input
+file and generate a new kernel (see
+.BR config (8)).
+.TP
+Device has no instance number
+The specified device has not been assigned an instance number.  Use
+.BR ioscan (8)
+to assign an instance to the device.
+.TP
+Directory \fIdirectory\fP doesn't exist
+The directory argument of the
+.B -D
+option doesn't exist.  Use
+.B mkdir (1)
+to create the directory.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B mksf
+is compatible only with
+.I Linux Fast-STREAMS
+devices.
+The command will not function with regular
+.B Linux
+devices.
+.PP
+Many commands and subsystems assume their device files are in the
+.B /dev
+directory; therefore, the use of the
+.B -D
+option is discouraged.
+.\"
+.\"
+.SH EXAMPLES
+.PP
+Make a special file named
+.B /dev/printer
+for the line printer device associated with instance number 2.
+.sp
+.nf
+\fC\s+1\
+mksf -C print -I 2 /dev/printer
+\s-1\fP
+.fi
+.PP
+Make a special file, using the default naming convention, for the tape device
+at hardware path 8.4.1.  The driver-specific options specify 1600 bits per
+inch and no rewind on close.
+.sp
+.nf
+\fC\s+1\
+mksf -C tape -H 8.4.1 -b D1600 -n
+\s-1\fP
+.fi
+.\"
+.\"
+.\".SH DEVICES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B /dev/config
+I/O system special file
+.TP
+.B /dev/mtconfig
+Tape driver property table database
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR mkdir (1),
+.BR config (8),
+.BR insf (8),
+.BR ioscan (8),
+.BR lsdev (8),
+.BR mknod (1),
+.BR rmsf (8),
+.BR mknod (2),
+.BR ioconfig (4).
+.BR mt (1).
+.\"
+.\"
+.SH BUGS
+.PP
+.B mksf
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B mksf
+command is provided for compatibility with the
+.IR HP-UX \(rg
+command of the same name,
+.[
+hpuxdoc
+.]
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+.B mksf
+is provided only for compatibility with
+.IR HP-UX \(rg
+for
+.I Linux Fast-STREAMS
+devices.
+The command will not function with regular
+.B Linux
+devices.
+.IP \(em
+Options
+.BR -h ", " -V " and " -c ,
+all long options, are specific to this
+.I @PACKAGE_TITLE@
+implementation of
+.B mksf
+and should not be used by portable applications.
+.IP \(em
+No other implementation documents the
+.BR -h ", " -V " or -c
+options.  They should not be used by portable applications.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibility with GNU coding standards;
+.BR --copying ,
+OpenSS7 coding standards.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.IR HP-UX \(rg
+documentation.
+.[
+hpuxdoc
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B mksf
+was developed by HP.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

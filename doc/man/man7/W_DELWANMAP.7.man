@@ -1,0 +1,1 @@
+.so man7/W_GETWANMAP.7.man

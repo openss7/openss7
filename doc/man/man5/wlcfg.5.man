@@ -1,0 +1,1102 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: wlcfg.5.man,v 1.1.2.1 2011-02-07 02:14:41 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:41 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: wlcfg.5.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:41  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.TH WLCFG 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Data Structures"
+.SH NAME
+.B wlcfg
+\- X.25 Configuration Structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Network Layer Interface (NLI)" ,
+.IR STREAMS .
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.nf
+\f(CW\s-1\
+.B #include <snet/x25_control.h>
+
+#define MAXPVCLCNSSIZE 36
+
+struct wlcfg {
+    uint32_t U_SN_ID;
+    uchar NET_MODE;
+    uchar X25_VSN;
+    uchar L3PLPMODE;
+    short LPC;            /* LCI - 12 bits significant */
+    short HPC;            /* LCI - 12 bits significant */
+    short LIC;            /* LCI - 12 bits significant */
+    short HIC;            /* LCI - 12 bits significant */
+    short LTC;            /* LCI - 12 bits significant */
+    short HTC;            /* LCI - 12 bits significant */
+    short LOC;            /* LCI - 12 bits significant */
+    short HOC;            /* LCI - 12 bits significant */
+    short NPCchannels;    /* number of PVC channels */
+    short NICchannels;    /* number or incoming channels */
+    short NTCchannels;    /* number of two-way channels */
+    short NOCchannels;    /* number of outgoing channels */
+    short Nochnls;        /* number of channels */
+    uchar THISGFI;
+    uchar LOCMAXPKTSIZE;  /* 7 to 12 (1<<7 == 128 to 1<<12 == 4096) */
+    uchar REMMAXPKTSIZE;  /* 7 to 12 (1<<7 == 128 to 1<<12 == 4096) */
+    uchar LOCDEFPKTSIZE;  /* 7 to 12 (1<<7 == 128 to 1<<12 == 4096) */
+    uchar REMDEFPKTSIZE;  /* 7 to 12 (1<<7 == 128 to 1<<12 == 4096) */
+    uchar LOCMAXWSIZE;    /* 1 to (Modulo-1) */
+    uchar REMMAXWSIZE;    /* 1 to (Modulo-1) */
+    uchar LOCDEFWSIZE;    /* 1 to (Modulo-1) */
+    uchar REMDEFWSIZE;    /* 1 to (Modulo-1) */
+    ushort MAXNSDULEN;
+    short ACKDELAY;
+    short T20value;
+    short T21value;
+    short T22value;
+    short T23value;
+    short T24value;
+    short T25value;
+    short T26value;
+    short T28value;
+    short idlevalue;
+    short connectvalue;
+    uchar R20value;
+    uchar R22value;
+    uchar R23value;
+    uchar R28value;
+    ushort localdelay;
+    ushort accessdelay;
+    uchar locmaxthclass;
+    uchar remmaxthclass;
+    uchar locdefthclass;
+    uchar remdefthclass;
+    uchar locminthclass;
+    uchar remminthclass;
+    uchar CUG_CONTROL;
+    ushort SUB_MODES;
+    struct {
+        ushort SNMODES;
+        uchar intl_addr_recogn;
+        uchar intl_prioritised;
+        uchar dnic1;
+        uchar dnic2;
+        uchar prty_encode_control;
+        uchar prty_pkt_forced_value;
+        uchar src_addr_control;
+        uchar dbit_control;
+        uchar thrclass_neg_to_def;
+        uchar thclass_type;
+        uchar thclass_wmap[16];
+        uchar thclass_pmap[16];
+    } psdn_local;
+    struct lsapformat local_address;
+    uchar pvclcns[MAXPVCLCNSSIZE];
+};
+\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The members of the
+.B wlcfg
+structure include:
+.TP \w'\fBLOCDEFPKTSIZE\fP\(em\ 'u
+.I U_SN_ID
+Subnetwork (link) identifier.
+.PD 0
+.TP
+.I NET_MODE
+Network mode.
+.TP
+.I X25_VSN
+X.25 Version.
+.TP
+.I L3PLPMODE
+DTE/DCE/DXE mode.
+.TP
+.IR LPC ", " HPC
+Lowest and highest PCV LCI.
+.TP
+.IR LIC ", " HIC
+Lowest and highest incoming LCI.
+.TP
+.IR LTC ", " HTC
+Lowest and highest two-way LCI.
+.TP
+.IR LOC ", " HOC
+Lowest and highest outgoing LCI.
+.TP
+.I NPCchannels
+Number of PVC channels.
+.TP
+.I NICchannels
+Number of Incoming Channels.
+.TP
+.I NTCchannels
+Number of Two-Way Channels.
+.TP
+.I NOCchannels
+Number of Outgoing Channels.
+.TP
+.I Nochnls
+Total Number of Channels.
+.TP
+.I THISGFI
+Sequencing (Modulo).
+.TP
+.I LOCMAXPKTSIZE
+Local maximum packet size.
+.TP
+.I REMMAXPKTSIZE
+Remote maximum packet size.
+.TP
+.I LOCDEFPKTSIZE
+Local default packet size.
+.TP
+.I REMDEFPKTSIZE
+Remote default packet size.
+.TP
+.I LOCMAXWSIZE
+Local maximum window size.
+.TP
+.I REMMAXWSIZE
+Remote maximum window size.
+.TP
+.I LOCDEFWSIZE
+Local default window size.
+.TP
+.I REMDEFWSIZE
+Remote default window size.
+.TP
+.I MAXNSDULEN
+Maximum NSDU length.
+.TP
+.I ACKDELAY
+Acknowledgement delay.
+.TP
+.I T20value
+T20 timeout value.
+.TP
+.I T21value
+T21 timeout value.
+.TP
+.I T22value
+T22 timeout value.
+.TP
+.I T23value
+T23 timeout value.
+.TP
+.I T24value
+T24 timeout value.
+.TP
+.I T25value
+T25 timeout value.
+.TP
+.I T26value
+T26 timeout value.
+.TP
+.I T28value
+T28 timeout value.
+.TP
+.I idlevalue
+Idle timeout value.
+.TP
+.I connectvalue
+Connect timeout value.
+.TP
+.I R20value
+R20 counter value.
+.TP
+.I R22value
+R22 counter value.
+.TP
+.I R23value
+R23 counter value.
+.TP
+.I R28value
+R28 counter value.
+.TP
+.I localdelay
+Local delay.
+.TP
+.I accessdelay
+Access delay.
+.TP
+.I locmaxthclass
+Local maximum throughput class.
+.TP
+.I remmaxthclass
+Remote maximum throughput class.
+.TP
+.I locdefthclass
+Local default throughput class.
+.TP
+.I remdefthclass
+Remote default throughput class.
+.TP
+.I locminthclass
+Local minimum throughput class.
+.TP
+.I remminthclass
+Remote minimum throughput class.
+.TP
+.I CUG_CONTROL
+Closed User Group control.
+.TP
+.I SUB_MODES
+Subscription modes.
+.TP
+.I psdn_local
+Local PSDN information:
+.RS
+.TP \w'\fBprty_pkt_forced_value\fP\(em\ 'u
+.I ushort SNMODES
+Subnetwork modes.
+.TP
+.I intl_addr_recogn
+International address region.
+.TP
+.I intl_prioritised
+International prioritized.
+.TP
+.I dnic1
+DNIC number 1.
+.TP
+.I dnic2
+DNIC number 2.
+.TP
+.I prty_encode_control
+Priority encode control.
+.TP
+.I prty_pkt_forced_value
+Priority packet forced value.
+.TP
+.I src_addr_control
+Source address control.
+.TP
+.I dbit_control
+D-bit control.
+.TP
+.I thrclass_neg_to_def
+Throughput class negative to default.
+.TP
+.I thclass_type
+Throughput class type.
+.TP
+.I thclass_wmap[16]
+Throughput class window size mapping.
+.TP
+.I thclass_pmap[16]
+Throughput class packet size mapping.
+.RE
+.TP
+.I local_address
+Local address.
+.TP
+.I pvclcns
+PVC logical channel numbers.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B wlcfg
+structure is used to provide X.25 configuration and tuning parameters for use
+with the
+.BR N_snconfig "(7) and " N_snread (7)
+input-output control commands from the
+.BR "Network Layer Interface (NLI)" ,
+.BR nli (7).
+.[
+nli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.PP
+The
+.B wlcfg
+structure, and the corresponding input-output controls, are used primarily by
+the
+.BR x25tune (8)
+utility,
+but may be used directly by user-space programs.
+.\"
+.PP
+The members of the
+.B wlcfg
+structure are described as follows:
+.TP
+.I U_SN_ID
+Specifies the subnetwork (link) identifier of the link that was configured or
+is to be configured.
+.TP
+.I NET_MODE
+Specifies the various characteristics of the network protocol.  Valid values
+are integers, as epcified below, that refer to the networks listed:
+.RS
+.PP
+.bp
+.if \n(cR \{\
+.pl \n(nl+100
+.\}
+.TS
+box tab(:);
+lb|cb|lb
+lb|n|l.
+Symbol:Number:Description
+_
+X25_LLC:1:ISO/IEC 8881
+X25_88:2:ISO/IEC 8208 (1988)
+X25_84:3:ISO/IEC 8208 (1984)
+X25_80:4:ISO/IEC 8208 (1980)
+PSS:5:UK
+AUSTPAC:6:Australia
+DATAPAC:7:Canada
+DDN:8:DoD
+TELENET:9:USA
+TRANSPAC:10:France
+TYMNET:11:USA
+DATEX_P:12:West Germany
+DDX_P:13:Japan
+VENUS_P:14:Japan
+ACCUNET:15:USA
+ITAPAC:16:Italy
+DATAPAK:17:Sweden
+DATANET:18:Holland
+DCS:19:Belgium
+TELEPAC:20:Switzerland
+F_DATAPAC:21:Finland
+FINPAC:22:Finland
+PACNET:23:New Zealand
+LUXPAC:24:Luxembourgh
+X25_CIRCUIT:25:circuit switched
+.TE
+.sp
+.RE
+.TP
+.I X25_VSN
+Specifies the version of the X.25 protocol that is being used over the
+network.  Valid values are integers, as specified below.  Note that a
+.I NET_MODE
+of
+.B X25_LLC
+will override any value in this field to 1984 (or later).
+.RS
+.PP
+.bp
+.if \n(cR \{\
+.pl \n(nl+100
+.\}
+.TS
+box tab(:);
+lb|lb
+n|l.
+Number:Description
+_
+80:indicates 1980
+84:indicates 1984
+88:indicates 1988
+1980:indicates 1980
+1984:indicates 1984
+1988:indicates 1988
+1992:indicates 1992
+1996:indicates 1996
+2000:indicates 2000
+2004:indicates 2004
+\fIYYYY\fP:indicates \fIYYYY\fP
+.TE
+.sp
+.RE
+.TP
+.I L3PLPMODE
+Specifies the DTE/DCE nature of the link.  Value values are integers, as
+specified below.  Note that DXE operation is per ISO 8208.
+.[
+iso8208
+.]
+.RS
+.PP
+.bp
+.if \n(cR \{\
+.pl \n(nl+100
+.\}
+.TS
+box tab(:);
+lb|lb
+n|l.
+Number:Description
+_
+0:indicates DCE
+1:indicates DTE
+2:indicates DXE
+.TE
+.sp
+.RE
+.TP
+.IR LPC ", " HPC
+Specifies the lowest and highest LCI for Permanent Virtual Circuits (PVC).
+.BR LPC " and " HPC
+define the range of LCI that are assigned to PVC.
+This range cannot overlap with other defined ranges.
+Setting this value to zero and
+.B HPC
+to zero specifies that there are no PVC.
+Valid values are from 0 to 4096,
+but
+.B LPC
+must be less than or equal to
+.BR HPC .
+.TP
+.IR LIC ", " HIC
+Specifies the lowest and highest LCI for incoming (IC) VC.
+.BR LIC " and " HIC
+define the range of LCI that are assigned to incoming call circuits.
+This range cannot overlap with other defined ranges.
+.BR LIC " and " HIC
+zero means no IC VC.
+Valid values are from 0 to 4096,
+but
+.B LIC
+must be less than or equal to
+.BR HIC .
+.TP
+.IR LTC ", " HTC
+Specifies the lowest and highest LCI for two-way (TW) VC.
+.BR LTC " and " HTC
+define the LCI that are assigned to two-way call circuits.
+This range cannot overlap with other defined ranges.
+.BR LTC " and " HTC
+zero means no TW VC.
+Valid values are from 0 to 4096,
+but
+.B LTC
+must be less than or equal to
+.BR HTC .
+.TP
+.IR LOC ", " HOC
+Specifies the lowest and highest LCI for outgoing (OG) VC.
+.BR LOC " and " HOC
+define the LCI that are assigned to outgoing call circuits.
+This range cannot overlap with other defined ranges.
+.BR LOC " and " HOC
+zero means no OG VC.
+Valid values are from 0 to 4096,
+but
+.B LOC
+must be less than or equal to
+.BR HOC.
+.TP
+.I NPCchannels
+Specifies the number of PVC channels.
+.TP
+.I NICchannels
+Specifies the number of incoming channels.
+.TP
+.I NTCchannels
+Specifies the number of two-way channels.
+.TP
+.I NOCchannels
+Specifies the number of outgoing channels.
+.TP
+.I Nochnls
+Specifies the total number of channels.
+.TP
+.I THISGFI
+Specifies which Modulo operates on the network.  It can have on of four
+integer values.
+.RS
+.PP
+.bp
+.if \n(cR \{\
+.pl \n(nl+100
+.\}
+.TS
+box tab(:);
+lb|lb|lb|lb|lb
+lb|n|l|n|l.
+Symbol:Value:Modulo:Bits:Sequencing
+_
+G_8:8:Modulo 8:3 bits:normal
+G_128:128:Modulo 128:7 bits:extended
+G_32768:32768:Modulo 32768:15 bits:super extended
+G_2147483648:2147483648:Modulo 2147483648:31 bits:super duper extended
+.TE
+.sp
+.RE
+.TP
+.I LOCMAXPKTSIZE
+Specifies the maximum acceptable packet size for sent packets.
+The value is the logarithm, base two, of the packet size.  Valid values are
+in the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The default value is 7 (or 128 octets).
+The local maximum packet size and remote maximum packet size should be the
+same.
+The value should be less than the maximum LAPB I-frame size, N2, see
+.BR lapbtune (5).
+.TP
+.I REMMAXPKTSIZE
+Specifies the maximum acceptable packet size for received packets.
+The value is the logarithm, base two, of the packet size.  Valid values are
+in the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The default value is 7 (or 128 octets).
+The local maximum packet size and remote maximum packet size should be the
+same.
+The value should be less than the maximum LAPB I-frame size, N2, see
+.BR lapbtune (5).
+.TP
+.I LOCDEFPKTSIZE
+Specifies the default packet size for sent packets.
+The value is the logarithm, base two, of the packet size.  Valid values are
+in the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The local default packet size and remote maximum packet size should be the
+same.
+The default value is 7 (or 128 octets).
+When specified as 7 (128 octets), negotiation of the non-standard default
+packet size facility will neither be initiated nor rejected.
+.TP
+.I REMDEFPKTSIZE
+Specifies the default packet size for received packets.
+The value is the logarithm, base two, of the packet size.  Valid values are
+in the range from 7 to 12, signifying a size of 128 to 4096 in powers of two.
+The local default packet size and remote maximum packet size should be the
+same.
+The default value is 7 (or 128 octets).
+When specified as 7 (128 octets), negotiation of the non-standard default
+packet size facility will neither be initiated nor rejected.
+.TP
+.I LOCMAXWSIZE
+Specifies the local maximum window size.
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+.TP
+.I REMMAXWSIZE
+Specifies the remote maximum window size.
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128; and 128 for Modulo 32768.
+.TP
+.I LOCDEFWSIZE
+Specifies the local default window size.
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128, or 128 for Modulo 32768,
+the non-standard default window size facility will neither be initiated nor
+rejected.
+.TP
+.I REMDEFWSIZE
+Specifies the remote default window size.
+The value must be greater than one and less than the modulus value.
+The default value is 2 for Modulo 8 or Modulo 128, or 128 for Modulo 32768,
+the non-standard default window size facility will neither be initiated nor
+rejected.
+.TP
+.I MAXNSDULEN
+Specifies the maximum NSDU length in octets.
+.TP
+.I ACKDELAY
+Specifies the maximum acknowledgement delay in deciseconds (0.1 seconds).
+.TP
+.I T20value
+(Restart Request Response Time)
+Specifies the time period that the DTE will await a restart confirmation or
+restart indication following issuing a restart request.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.TP
+.I T21value
+(Call Request Response Timer)
+Specifies the time period that the DTE will await a call connected or clear
+indication having issued a call request.
+The timeout value should not be less than 200 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+200 seconds is specified as 2000 (deciseconds).
+.TP
+.I T22value
+(Reset Request Response Timer)
+Specifies the time period that the DTE will await a reset confirmation or reset
+indication having issued a reset request.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.TP
+.I T23value
+(Clear Request Response Timer)
+Specifies the time period that the DTE will await a clear confirmation or clear
+indication having issued a clear request.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.TP
+.I T24value
+(Window Status Transmission Timer)
+Specifies the time period that the DTE will wait without sending a window status
+packet (a packet with a P(R): RR, RNR, DATA or REJECT).
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.TP
+.I T25value
+(Window Rotation Timer)
+Specifies the time period that the DTE will await acknowledgement of all
+outstanding data packets having transmitted the last available data packet or
+the window is rotated.
+The timeout value should not be less than 200 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+200 seconds is specified as 2000 (deciseconds).
+.TP
+.I T26value
+(Interrupt Response Timer)
+Specifies the time period that the DTE will await an interrupt confirmation
+having issued an interrupt.
+The timeout value should not be less than 180 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+180 seconds is specified as 1800 (deciseconds).
+.TP
+.I T28value
+(Registration Request Response Timer)
+Specifies the time period that the DTE will await a registration confirmation
+or diagnostic packet having issued a registration request.
+The timeout value should not be less than 300 seconds.
+The value is in integral units of deciseconds (0.1 seconds), so an interval of
+300 seconds is specified as 3000 (deciseconds).
+.TP
+.I idlevalue
+.TP
+.I connectvalue
+.TP
+.I R20value
+(Restart Request Retransmission Count)
+Specifies the number of times that a restart request will be re-issued, and
+T20 restarted, upon expiry of timer T20.  This value has a default of 1 and a
+minimum of 1.
+.TP
+.I R22value
+(Reset Request Retransmission Count)
+Specifies the number of times that a reset request will be re-issued, and T22
+restarted, upon expiry of timer T22.  This value has a default of 1 and a
+minimum of 1.
+.TP
+.I R23value
+(Clear Request Retransmission Count)
+Specifies the number of times that a clear request will be re-issued, and T23
+retstarted, upon expiry of timer T23.  This value has a default of 1 and a
+minimum of 1.
+.TP
+.I R28value
+(Registration Request Retransmission Count)
+Specifies the number of times a registration request will be reissued, and
+T28 restarted, upon expiry of T28.  This value has a default of 1.  A value
+of zero (0) conveys that no reissuing will be performed.
+.RS
+.PP
+Note that R28 is only needed if the associated procedure (ISO/IEC 8208:2000
+Section 13.1) is used.
+.RE
+.TP
+.I localdelay
+.TP
+.I accessdelay
+.TP
+.I locmaxthclass
+Specifies the local maximum throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.TP
+.I remmaxthclass
+Specifies the remote maximum throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.TP
+.I locdefthclass
+Specifies the local default throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.TP
+.I remdefthclass
+Specifies the remote default throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.TP
+.I locminthclass
+Specifies the local minimum throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.TP
+.I remminthclass
+Specifies the remote minimum throughput class.
+The value is an integer number from 3 to 44.
+.RS
+.PP
+Basic ISO 8208 throughput classes can have a value from 3 to 16, corresponding
+to throughputs between 75 and 192,000 bits/s, listed in Table 20a of ISO/IEC
+8208:2000, or Extended ISO 8208 throughput classes can have a value from 3
+through 44, corresponding to throughputs between 75 and 2,048,000 bits/s,
+listed in Table 20b of ISO/EIC 8208:2000.
+.[
+iso8208
+.]
+.RE
+.TP
+.I CUG_CONTROL
+.TP
+.I SUB_MODES
+
+.TP
+.I psdn_local
+.RS
+.TP
+.I SNMODES
+.TP
+.I intl_addr_recogn
+.TP
+.I intl_prioritised
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.TP
+.I dnic1
+The value is 4 hexadecimal digits.
+.TP
+.I dnic2
+The value is 4 hexadecimal digits.
+.TP
+.I prty_encode_control
+The value is an integer decimal number.
+.TP
+.I prty_pkt_forced_value
+The value is an integer decimal number.
+.TP
+.I src_addr_control
+The value is an integer decimal number.
+.TP
+.I dbit_control
+Specifies the action to be taken when the local user sends a data packet with
+the D-bit set, but the remote party has not indicated D-bit support.  It can
+have one of the following values:
+.RS
+.PP
+.bp
+.if \n(cR \{\
+.pl \n(nl+100
+.\}
+.TS
+box tab(:);
+lb|lb
+n|l.
+Value:Description
+_
+0:leave the D-bit set and pass the packet on
+1:zero the D-bit and pass the packet on
+2:reset the call
+.TE
+.sp
+.RE
+.TP
+.I thrclass_neg_to_def
+The value is \*(lq\fBY\fP\*(rq for use and \*(lq\fBN\fP\*(rq for non-use.
+.TP
+.I thclass_type
+The value is an integer decimal number.
+.TP
+.I thclass_wmap[16]
+The value is 16 decimal numbers, 0 to 255, separated by \*(lq\fB.\fP\*(rq.
+.TP
+.I thclass_pmap[16]
+The value is 16 decimal numbers, 0 to 255, separated by \*(lq\fB.\fP\*(rq.
+.RE
+.TP
+.I struct lsapformat local_address
+.TP
+.I pvclcns[MAXPVCLCNSSIZE]
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/snet/x25_control.h
+Defines the
+.B wlcfg
+structure.
+.TP
+.B @configdir@/@PACKAGE@/template/
+directory containing
+.BR x25template (5)
+files following the form of the
+.BR wlcfg
+structure.
+See
+.BR x25template (5).
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR x25template (5),
+.BR x25tune (8),
+.BR plp (4),
+.BR N_snconfig (7),
+.BR N_snread (7),
+.BR nli (7).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B wlcfg
+structure has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B wlcfg
+structure is compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.PP
+For additional compatibility information see,
+.BR plp (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.IR "Network Layer Interface (NLI)" ,
+.[
+nli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR nli (7),
+structures are not standardized; however,
+.B @PACKAGE_TITLE@
+conforms to
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B wlcfg
+structure first appeared in
+.IR "Spider X.25" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

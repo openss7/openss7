@@ -1,0 +1,546 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: wantune.5.man,v 1.1.2.1 2011-02-07 02:14:41 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:41 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: wantune.5.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:41  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH WANTUNE 5 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ System File Formats"
+.\"
+.\"
+.SH NAME
+.B wantune
+\- WAN tuning structure
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR "Wide Area Network (WAN)" ,
+.[
+wan revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR wan (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH SYNOPSIS
+.HP
+.B #include <sys/snet/wan_control.h>
+.PP
+.nf
+\f(CW\s-1\
+typedef struct wantune {
+    uint16_t WAN_options;
+    struct WAN_hddef WAN_hd;
+} wantune_t;
+
+#define WAN_DTE         0
+#define WAN_DCE         1
+
+struct WAN_hddef {
+    uint16_t WAN_maxframe;         /* WAN maximum frame size. */
+    uint32_t WAN_baud;             /* WAN baud rate. */
+    uint16_t WAN_interface;        /* WAN physical interface. */
+    union {
+        uint16_t WAN_cptype;       /* significant when WAN_NONE */
+        struct WAN_x21 WAN_x21def; /* significant when WAN_X21P */
+        struct WAN_v25 WAN_v25def; /* significant when WAN_V25bis */
+    } WAN_cpdef;                   /* call procedure definitions */
+};
+
+struct WAN_x21 {
+    uint16_t WAN_cptype;           /* Always WAN_X21P. */
+    uint16_t T1;                   /* X.21 T1 */
+    uint16_t T2;                   /* X.21 T2 */
+    uint16_t T3A;                  /* X.21 T3A */
+    uint16_t T4B;                  /* X.21 T4B */
+    uint16_t T5;                   /* X.21 T5 */
+    uint16_t T6;                   /* X.21 T6 */
+};
+
+struct WAN_v25 {
+    uint16_t WAN_cptype;           /* Always WAN_V25bis. */
+    uint16_t callreq;              /* V.25 bis T1 */
+};\s+1\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The members of the
+.B wantune
+structure include:
+.TP \w'\ \fIWAN_interface\fR\(em'u
+.I WAN_options
+WAN options.
+.PD 0
+.TP
+.I WAN_hd
+WAN hardware definitions.
+.PD
+.PP
+The members of the
+.B WAN_hddef
+structure include:
+.TP \w'\ \fIWAN_interface\fR\(em'u
+.I WAN_maxframe
+WAN maximum frame size (octets).
+.PD 0
+.TP
+.I WAN_baud
+WAN baud rate.
+.TP
+.I WAN_interface
+WAN physical interface.
+.TP
+.I WAN_cptype
+WAN call procedures for \fB\)WAN_NONE\fP.
+.TP
+.I WAN_x21def
+WAN call procedures for \fB\)WAN_X21P\fP.
+.[
+x21
+.]
+.TP
+.I WAN_v25def
+WAN call procedures for \fB\)WAN_V25bis\fP.
+.[
+v25bis
+.]
+.PD
+.PP
+The members of the
+.B WAN_x21
+structure include:
+.TP \w'\ \fIWAN_interface\fR\(em'u
+.I WAN_cptype
+Always \fB\)WAN_X21P\fP.
+.PD 0
+.TP
+.I T1
+X.21 T1.
+.TP
+.I T2
+X.21 T2.
+.TP
+.I T3A
+X.21 T3A.
+.TP
+.I T4B
+X.21 T4B.
+.TP
+.I T5
+X.21 T5.
+.TP
+.I T6
+X.21 T6.
+.PD
+.PP
+The members of the
+.B WAN_v25
+structure include:
+.TP \w'\ \fIWAN_interface\fR\(em'u
+.I WAN_cptype
+Always \fB\)WAN_V25bis\fP.
+.PD 0
+.TP
+.I callreq
+V.25 bis T1.
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B wantune
+structure is used to provide WAN configuration and tuning parameters for use
+with the
+.BR W_GETTUNE "(7) and " W_SETTUNE (7)
+input-output control commands from the
+.IR "Wide Area Network (WAN)" ,
+.BR wan (7).
+.[
+wan revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.PP
+The
+.B wantune
+structure, and the corresponding input-output controls, are used primarily by
+the
+.BR wantune (8)
+utility,
+but may be used directly by user-space programs.callreq
+.\"
+.PP
+The members of the
+.B wantune
+structure are described as follows:
+.TP
+.I WAN_options
+WAN options.
+.TP
+.I WAN_hd
+Wan hardware definitions.  This member is a structure of type
+.BR WAN_hddef .
+.PP
+The members of the
+.B WAN_hddef
+structure are described as follows:
+.TP
+.I WAN_maxframe
+WAN maximum frame size in octets.
+.TP
+.I WAN_baud
+WAN baud rate.
+.TP
+.I WAN_interface
+WAN physical interface.
+.TP
+.I WAN_cptype
+WAN call procedures for \fB\)WAN_NONE\fP.  This member, then, contains no other
+information.
+.TP
+.I WAN_x21def
+WAN call procedures for \fB\)WAN_X21P\fP.  This member, then, contains a
+.BR WAN_x21
+structure.
+.TP
+.I WAN_v25def
+WAN call procedures for \fB\)WAN_V25bis\fP.  This member, then, contains a
+.BR WAN_v25
+structure.
+.PP
+The members of the
+.B WAN_x21
+structure are described as follows:
+.TP
+.I WAN_cptype
+Specifies the type of the call procedural definitions.
+Always \fB\)WAN_X21P\fP.
+.[
+x21
+.]
+.TP
+.I T1
+X.21 T1: call-request to proceed-to-select timer.
+The timeout for the call request state in deciseconds.
+.[
+x21
+.]
+.TP
+.I T2
+X.21 T2: end-of-selection to ready-for-data timer.
+The timeout for the EOS to data transfer in deciseconds.
+.[
+x21
+.]
+.TP
+.I T3A
+X.21 T3A: additional call prog or DCE provided info timer.
+The timeout for call progress signals in deciseconds.
+.[
+x21
+.]
+.TP
+.I T4B
+X.21 T4B: call-accept to ready-for-data timer.
+The timeout for DCE provided information in deciseconds.
+.[
+x21
+.]
+.TP
+.I T5
+X.21 T5: DTE clear-request to DCE ready timer.
+The timeout for DTE clear request in deciseconds.
+.[
+x21
+.]
+.TP
+.I T6
+X.21 T6: DTE clear-confirmation to DCE ready timer.
+The timeout for DTE clear confirm state in deciseconds.
+.[
+x21
+.]
+.PP
+The members of the
+.B WAN_v25
+structure are described as follows:
+.TP
+.I WAN_cptype
+Specifies the type of the call procedural definitions.
+Always \fB\)WAN_V25bis\fP.
+.[
+v25bis
+.]
+.TP
+.I callreq
+V.25 bis T1: call initialization to call establishment timer.
+Contains the abort time (in deciseconds) for the call request command if the
+network does not support CFI.
+.[
+v25bis
+.]
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/snet/wan_control.h
+Defines the
+.B wantune
+structure.
+.TP
+.B @configdir@/@PACKAGE@/template/
+directory containing
+.BR wantemplate (5)
+files following the form of the
+.BR wantune
+structure.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR wantemplate (5),
+.BR wantune (5),
+.BR wan (4),
+.BR W_SETTUNE (7),
+.BR W_GETTUNE (7),
+.BR wan (7).
+.\"
+.\"
+.SH BUGS
+.PP
+The
+.B wantune
+structure has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.B wantune
+structure is compatible with
+.IR "Spider X.25" ,
+and implementations based on
+.IR "Spider X.25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+Most implementations doe not define the \fB\)IGN_DM_ERROR\fP flag nor the
+\fI\)sabm_in_x32\fP field.
+.IP \(em
+Some implementations, such as
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+document the \fI\)sabm_in_x32\fP member,  but not the \fB\)IGN_DM_ERROR\fP
+flag.
+.IP \(em
+.IR "Solstice X.25" ,
+.[
+solx25dg
+.]
+and
+.IR "IRIS X.25" ,
+.[
+sx25
+.]
+do not document either the \fB\)IGN_DM_ERROR\fP flag nor the
+\fI\)sabm_in_x32\fP member.
+.PP
+For additional compatibility information see,
+.BR wan (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.IR "Wide Area Network (WAN)" ,
+.[
+wan revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR wan (7),
+structures are not standardized; however,
+.B @PACKAGE_TITLE@
+conforms to
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B wantune
+structure first appeared in
+.IR "Spider X.25" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

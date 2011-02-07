@@ -1,0 +1,2000 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: LLI.7.man,v 1.1.2.1 2011-02-07 02:14:41 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:41 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: LLI.7.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:41  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH LLI 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "Wide Area Network (WAN)"
+.SH NAME
+.B LLI, lli
+\- Logical Link Interface (LLI)
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.B #include <errno.h>
+.br
+.B #include <sys/types.h>
+.br
+.B #include <sys/stropts.h>
+.br
+.B #include <stdint.h>
+.br
+.B #include <sys/dlpi.h>
+.br
+.B #include <netx25/ll_control.h>
+.br
+.B #include <sys/snet/ll_control.h>
+.br
+.B #include <sys/snet/mlp_control.h>
+.br
+.B #include <sys/snet/x32_control.h>
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The Logical Link Interface (LLI) is a service primitive interface to the X.25
+Link Access Procedure - Balanced (LAPB) protocol developed by Spider Systems,
+Ltd. (now part of Emmerson Power) for use by applications in controlling LLC
+drivers, interface hardware and protocol software.  The service primitive
+interface was widely used on VxWorks, other embedded RTOS,
+AIXlink/X.25,
+.[
+aixlink
+.]
+HP-UX X.25,
+.[
+hpuxdoc
+.]
+IRIS SX.25,
+.[
+sx25
+.]
+Sun Microsystems SunLink starting with version 8.0 and Solstice X.25,
+.[
+solx25pg
+.]
+PT X.25,
+.[
+ptx25
+.]
+SBE X.25,
+.[
+sbex25
+.]
+RadiSys WAN,
+.[
+radwan
+.]
+and other mainstream UNIX operating systems and embedded systems for
+communications.
+.PP
+The interface is not provided as a programming library, as is XTI, but as
+defined service primitives to be exchanged with the LLI driver using standard
+STREAMS
+.BR getpmsg (2s)
+and
+.BR putpmsg (2s)
+system calls.  Although a user level library could be easily constructed from
+these service primitives, in the same way that XTI was built from TPI, it does
+not seem to have happened and applications appear to have wound up using the
+LLI interface directly.
+.PP
+.B @PACKAGE_TITLE@
+and other \fBOpenSS7\fP applications, drivers and modules provide primarily a
+Data Link Provider Interface (DLPI),
+.[
+dlpi revision 2.0.0 draft 2
+.]
+.BR dlpi (7),
+for devices at this level; however, a compatibility module,
+.BR s_wan (4),
+is provided to convert between DLPI and the SpiderX25 interface for the
+purposes of porting SpiderX25 compatible applications, drivers and modules to
+\fBLinux\fP.
+.\"
+.\"
+.\".SH ADDRESSES
+.\".PP
+.\"
+.\"
+.SH PRIMITIVES
+.PP
+The primitives used by the Logical Link Interface are the same as those used
+by the Data Link Provider Interface (DLPI),
+.BR dlpi (7),
+as follows:
+.PP
+.TS
+tab(:);
+lll
+lblbl.
+Prim./Manpage:Structure:Description
+_
+DL_ATTACH_REQ\fR(7):dl_attach_req_t:T{
+.ad l
+.nh
+Attach request.
+T}
+DL_BIND_ACK\fR(7):dl_bind_ack_t:T{
+.ad l
+.nh
+Bind acknowledgment.
+T}
+DL_BIND_REQ\fR(7):dl_bind_req_t:T{
+.ad l
+.nh
+Bind request.
+T}
+DL_CAPABILITY_ACK\fR(7):dl_capability_ack_t:T{
+.ad l
+.nh
+Capability acknowledgment.
+T}
+DL_CAPABILITY_REQ\fR(7):dl_capability_req_t:T{
+.ad l
+.nh
+Capability request.
+T}
+DL_CONNECT_CON\fR(7):dl_connect_con_t:T{
+.ad l
+.nh
+Connection confirmation.
+T}
+DL_CONNECT_IND\fR(7):dl_connect_ind_t:T{
+.ad l
+.nh
+Connection indication.
+T}
+DL_CONNECT_REQ\fR(7):dl_connect_req_t:T{
+.ad l
+.nh
+Connection request.
+T}
+DL_CONNECT_RES\fR(7):dl_connect_res_t:T{
+.ad l
+.nh
+Connection response.
+T}
+DL_DATA_ACK_IND\fR(7):dl_data_ack_ind_t:T{
+.ad l
+.nh
+Data acknowledgment indication.
+T}
+DL_DATA_ACK_REQ\fR(7):dl_data_ack_req_t:T{
+.ad l
+.nh
+Data acknowledgment response.
+T}
+DL_DATA_ACK_STATUS_IND\fR(7):dl_data_ack_status_ind_t:T{
+.ad l
+.nh
+Data ack status indication.
+T}
+DL_DATA_IND\fR(7):dl_data_ind_t:T{
+.ad l
+.nh
+Data indication.
+T}
+DL_DATA_REQ\fR(7):dl_data_req_t:T{
+.ad l
+.nh
+Data request.
+T}
+DL_DETACH_REQ\fR(7):dl_detach_req_t:T{
+.ad l
+.nh
+Detach request.
+T}
+DL_DISABMULTI_REQ\fR(7):dl_disabmulti_req_t:T{
+.ad l
+.nh
+Disable multicast request.
+T}
+DL_DISCONNECT_IND\fR(7):dl_disconnect_ind_t:T{
+.ad l
+.nh
+Disconnect indication.
+T}
+DL_DISCONNECT_REQ\fR(7):dl_disconnect_req_t:T{
+.ad l
+.nh
+Disconnect request.
+T}
+DL_ENABMULTI_REQ\fR(7):dl_enabmulti_req_t:T{
+.ad l
+.nh
+Enable multicast request.
+T}
+DL_ERROR_ACK\fR(7):dl_error_ack_t:T{
+.ad l
+.nh
+Error acknowledgment.
+T}
+DL_GET_STATISTICS_ACK\fR(7):dl_get_statistics_ack_t:T{
+.ad l
+.nh
+Get statistics acknowledgment.
+T}
+DL_GET_STATISTICS_REQ\fR(7):dl_get_statistics_req_t:T{
+.ad l
+.nh
+Get statistics request.
+T}
+DL_INFO_ACK\fR(7):dl_info_ack_t:T{
+.ad l
+.nh
+Information acknowledgment.
+T}
+DL_INFO_REQ\fR(7):dl_info_req_t:T{
+.ad l
+.nh
+Information request.
+T}
+DL_OK_ACK\fR(7):dl_ok_ack_t:T{
+.ad l
+.nh
+Positive acknowledgment.
+T}
+DL_PHYS_ADDR_ACK\fR(7):dl_phys_addr_ack_t:T{
+.ad l
+.nh
+Physical address acknowledgment.
+T}
+DL_PHYS_ADDR_REQ\fR(7):dl_phys_addr_req_t:T{
+.ad l
+.nh
+Physical address request.
+T}
+DL_PROMISCOFF_REQ\fR(7):dl_promiscoff_req_t:T{
+.ad l
+.nh
+Promiscuous mode off request.
+T}
+DL_PROMISCON_REQ\fR(7):dl_promiscon_req_t:T{
+.ad l
+.nh
+Promiscuous mode on request.
+T}
+DL_REPLY_IND\fR(7):dl_reply_ind_t:T{
+.ad l
+.nh
+Reply indication.
+T}
+DL_REPLY_REQ\fR(7):dl_reply_req_t:T{
+.ad l
+.nh
+Reply request.
+T}
+DL_REPLY_STATUS_IND\fR(7):dl_reply_status_ind_t:T{
+.ad l
+.nh
+Reply status indication.
+T}
+DL_REPLY_UPDATE_REQ\fR(7):dl_reply_update_req_t:T{
+.ad l
+.nh
+Reply update request.
+T}
+DL_REPLY_UPDATE_STATUS_IND\fR(7):dl_reply_update_status_ind_t:T{
+.ad l
+.nh
+Reply update status indication.
+T}
+DL_RESET_CON\fR(7):dl_reset_con_t:T{
+.ad l
+.nh
+Reset confirmation.
+T}
+DL_RESET_IND\fR(7):dl_reset_ind_t:T{
+.ad l
+.nh
+Reset Indication.
+T}
+DL_RESET_REQ\fR(7):dl_reset_req_t:T{
+.ad l
+.nh
+Reset request.
+T}
+DL_RESET_RES\fR(7):dl_reset_res_t:T{
+.ad l
+.nh
+Reset response.
+T}
+DL_SET_PHYS_ADDR_REQ\fR(7):dl_set_phys_addr_req_t:T{
+.ad l
+.nh
+Set physical address request.
+T}
+DL_SUBS_BIND_ACK\fR(7):dl_subs_bind_ack_t:T{
+.ad l
+.nh
+Subsequent bind acknowledgment.
+T}
+DL_SUBS_BIND_REQ\fR(7):dl_subs_bind_req_t:T{
+.ad l
+.nh
+Subsequent bind request.
+T}
+DL_SUBS_UNBIND_REQ\fR(7):dl_subs_unbind_req_t:T{
+.ad l
+.nh
+Subsequent unbind request.
+T}
+DL_TEST_CON\fR(7):dl_test_con_t:T{
+.ad l
+.nh
+Test confirmation.
+T}
+DL_TEST_IND\fR(7):dl_test_ind_t:T{
+.ad l
+.nh
+Test indication.
+T}
+DL_TEST_REQ\fR(7):dl_test_req_t:T{
+.ad l
+.nh
+Test request.
+T}
+DL_TEST_RES\fR(7):dl_test_res_t:T{
+.ad l
+.nh
+Test response.
+T}
+DL_TOKEN_ACK\fR(7):dl_token_ack_t:T{
+.ad l
+.nh
+Token acknowledgment.
+T}
+DL_TOKEN_REQ\fR(7):dl_token_req_t:T{
+.ad l
+.nh
+Token request.
+T}
+DL_UDERROR_IND\fR(7):dl_uderror_ind_t:T{
+.ad l
+.nh
+Unitdata error indication.
+T}
+DL_UDQOS_REQ\fR(7):dl_udqos_req_t:T{
+.ad l
+.nh
+Unitdata QoS request.
+T}
+DL_UNBIND_REQ\fR(7):dl_unbind_req_t:T{
+.ad l
+.nh
+Unbind request.
+T}
+DL_UNITDATA_IND\fR(7):dl_unitdata_ind_t:T{
+.ad l
+.nh
+Unitdata indication.
+T}
+DL_UNITDATA_REQ\fR(7):dl_unitdata_req_t:T{
+.ad l
+.nh
+Unitdata request.
+T}
+DL_XID_CON\fR(7):dl_xid_con_t:T{
+.ad l
+.nh
+X-ray ID confirmation.
+T}
+DL_XID_IND\fR(7):dl_xid_ind_t:T{
+.ad l
+.nh
+X-ray ID indication.
+T}
+DL_XID_REQ\fR(7):dl_xid_req_t:T{
+.ad l
+.nh
+X-ray ID request.
+T}
+DL_XID_RES\fR(7):dl_xid_res_t:T{
+.ad l
+.nh
+X-ray ID response.
+T}
+_
+.TE
+.PP
+Each primitive is documented in its own manual page.
+.\"
+.\"
+.SH "DATA STRUCTURES"
+.PP
+The input-output controls provided by the Logical Link Interface are as
+follows:
+
+The \fB@includedir@/@PACKAGE@/sys/ll_control.h\fP header file defines a
+number of input-output controls, as follows:
+.TP \w'\ LI_LLC2TUNE\ 'u
+.B LI_PLAIN
+An \fB\)ll_hdioc\fP structure that identifies the subnetwork (link).
+.PD 0
+.TP
+.B LI_SNID
+An \fB\)ll_snioc\fP(5) structure that identifies the subnetwork (link).
+.TP
+.B LI_STATUS
+An \fB\)ll_stnioc\fP structure that identifies the subnetwork (link).
+.TP
+.B LI_STATS
+An \fB\)ll_stioc\fP or \fB\)mlp_stioc\fP structure that identifies the
+subnetwork (link).
+.TP
+.B LI_GSTATS
+An \fB\)ll_gstioc\fP or \fB\)mlp_gstioc\fP structure that identifies the
+subnetwork (link).
+.TP
+.B LI_LAPBTUNE
+An \fB\)lapb_tnioc\fP structure that identifies the subnetwork (link).
+.TP
+.B LI_LLC2TUNE
+An \fB\)llc2_tnioc\fP structure that identifies the subnetwork (link).
+.TP
+.B LI_MLPTUNE
+An \fB\)mlp_tnioc\fP structure that identifies the subnetwork (link).
+.PD
+
+.\"
+.SS LI_PLAIN \(em Plain Data Structures
+.PP
+The plain data structures are used to identify a subnetwork (link).
+.PP
+The \fB\)ll_hdioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ll_hdioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint8_t lli_snid;
+};
+\s+1\fP
+.fi
+.PP
+The \fB\)ll_hdioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_PLAIN\fP.
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.i lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+.\"
+.SS LI_SNID \(em Subnetwork Identifier Data Structures
+.PP
+The subnetwork identifier data structures are used to identify a subnetwork
+(link) and lower multiplex index of an SLP link within (possibly) an MLP
+link.
+.PP
+The \fB\)ll_snioc\fP(5) structure is used in the \fB\)L_SETSNID\fP,
+\fB\)L_GETSNID\fP, \fB\)M_SETSNID\fP and \fB\)M_GETSNID\fP input-output
+controls.  The \fB\)ll_snioc\fP(5) structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ll_snioc {
+    uint8_t lli_type;
+    uint8_t lli_class;
+    uint8_t lli_spare[2];
+    uint32_t lli_snid;
+    uint32_t lli_index;
+    uint32_t lli_slp_snid;
+    uint32_t lli_slp_pri;
+};
+\s+1\fP
+.fi
+.PP
+The \fB\)ll_snioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_SNID\fP.
+.TP
+.I lli_class
+Specifies the class of the link being registered.  This field can be one of
+the following values:
+.RS
+.TP \w'\ LC_MLAPBXDCE\ 'u
+.B LC_LLC1
+LLC Type 1 link.
+.PD 0
+.TP
+.B LC_LLC2
+LLC Type 2 link.
+.TP
+.B LC_LAPBDTE
+LAPB DTE.
+.TP
+.B LC_LAPBXDTE
+LAPB DTE with extended addressing.
+.TP
+.B LC_LAPBDCE
+LAPB DCE.
+.TP
+.B LC_LAPBXDCE
+LAPB DCE with extended addressing.
+.TP
+.B LC_LAPDTE
+LAP DTE.
+.TP
+.B LC_LAPDCE
+LAP DCE.
+.TP
+.B LC_HDLC
+HDLC.
+.TP
+.B LC_HDLCX
+HDLC with extended addressing.
+.TP
+.B LC_MLAPBDTE
+LAPB DTE multilink.
+.TP
+.B LC_MLAPBXDTE
+LAPB DTE multilink with extended addressing.
+.TP
+.B LC_MLAPBDCE
+LAPB DCE multilink.
+.TP
+.B LC_MLAPBXDCE
+LAPB DCE multilink with extended addressing.
+.TP
+.B LC_MLP
+MLP link.
+.PD
+.RE
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+.TP
+.I lli_index
+Specifies the lower multiplex identifier of the Stream linked under a
+multiplexing driver as returned from
+.BR I_LINK (7).
+.TP
+.I lli_slp_snid
+Specifies the subnetwork (link) identifier for an SLP link within an MLP
+link.
+.TP
+.I lli_slp_pri
+Specifies the subnetwork (link) priority within an MLP link.
+.\"
+.SS LI_STATUS \(em Status Data Structures
+.PP
+The status data structures are used to identify the status of a subnetwork
+(link).
+.PP
+The \fB\)ll_stnioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct ll_stnioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+};
+\s+1\fP
+.fi
+.PP
+The \fB\)ll_stnioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_STATUS\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+.PD
+.\"
+.SS LI_STATS \(em Statistics Data Structures
+.PP
+The statistics data structures are used to obtain the statistics for a
+specific subnetwork (link).
+.PP
+The \fB\)lapb_stioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct lapb_stioc {
+    uint8_t lli_type;
+    uint8_t state;
+    uint16_t lli_spare;
+    uint32_t lli_snid;
+    lapbstats_t lli_state;
+};
+\s+1\fP
+.fi
+.PP
+The \fB\)lapb_stioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_STATS\fP.
+.PD 0
+.TP
+.I state
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by provider.
+.TP
+.I lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+.TP
+.I lli_stats
+Contains the \fB\)lapbstats_t\fP structure.
+.PD
+.PP
+.B LAPB Structures
+.PP
+The \fB\)lapbstats_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct lapb_stats {
+    uint32_t lapbmonarray[49];
+} lapbstats_t;
+\s+1\fP
+.fi
+.PP
+The \fB\)lapbstats_t\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lapbmonarray
+Provides an array of 32-bit unsigned integers containing statistics.  The
+indexes of the elements of the array are as follows:
+.RS
+.TP \w'\ 00\(emSABME_tx_rsp\ 'u
+.B 0\(em\)tx_ign
+Transmitted frames ignored.
+.PD 0
+.TP
+.B 1\(em\)rx_badlen
+Received frames with a bad length.
+.TP
+.B 2\(em\)rx_unknown
+Unknown frames received.
+.TP
+.B 3\(em\)t1_exp
+T1 timer expiries.
+.TP
+.B 4\(em\)t4_exp
+T4 timer expiries.
+.TP
+.B 5\(em\)t4_n2_exp
+T4 timer expiries with N2.
+.TP
+.B 6\(em\)RR_rx_cmd
+RR command frames received.
+.TP
+.B 7\(em\)RR_rx_rsp
+RR response frames received.
+.TP
+.B 8\(em\)RR_tx_cmd
+RR command frames transmitted.
+.TP
+.B 9\(em\)RR_tx_rsp
+RR response frames transmitted.
+.TP
+.B 10\(em\)RR_tx_cmd_p
+RR command frames transmitted with poll bit set.
+.TP
+.B 11\(em\)RNR_rx_cmd
+RNR command frames received.
+.TP
+.B 12\(em\)RNR_rx_rsp
+RNR response frames received.
+.TP
+.B 13\(em\)RNR_tx_cmd
+RNR command frames transmitted.
+.TP
+.B 14\(em\)RNR_tx_rsp
+RNR response frames transmitted.
+.TP
+.B 15\(em\)RNR_tx_cmd_p
+RNR command frames transmitted with poll bit set.
+.TP
+.B 16\(em\)REJ_rx_cmd
+REJ command frames received.
+.TP
+.B 17\(em\)REJ_rx_rsp
+REJ response frames received.
+.TP
+.B 18\(em\)REJ_tx_cmd
+REJ command frames transmitted.
+.TP
+.B 19\(em\)REJ_tx_rsp
+REJ response frames transmitted.
+.TP
+.B 20\(em\)REJ_tx_cmd_p
+REJ command frames transmitted with poll bit set.
+.TP
+.B 21\(em\)SABME_rx_cmd
+SABME command frames received.
+.TP
+.B 22\(em\)SABME_tx_cmd
+SABME command frames transmitted.
+.TP
+.B 23\(em\)DISC_rx_cmd
+DISC command frames received.
+.TP
+.B 24\(em\)DISC_tx_cmd
+DISC command frames transmitted.
+.TP
+.B 25\(em\)UA_rx_rsp
+UA response frames received.
+.TP
+.B 26\(em\)UA_tx_rsp
+UA response frames transmitted.
+.TP
+.B 27\(em\)DM_rx_rsp
+DM response frames received.
+.TP
+.B 28\(em\)DM_tx_rsp
+DM response frames transmitted.
+.TP
+.B 29\(em\)I_rx_cmd
+I command frames received.
+.TP
+.B 30\(em\)I_tx_cmd
+I command frames transmitted.
+.TP
+.B 31\(em\)FRMR_rx_rsp
+FRMR response frames received.
+.TP
+.B 32\(em\)FRMR_tx_rsp
+FRMR response frames transmitted.
+.TP
+.B 33\(em\)tx_rtr
+Retransmissions.
+.TP
+.B 34\(em\)rx_bad
+Corrupted frames received.
+.TP
+.B 35\(em\)rx_dud
+Invalid received frames.
+.TP
+.B 36\(em\)rx_ign
+Received frames ignored.
+.TP
+.B 37\(em\)XID_rx_cmd
+XID command frames received.
+.TP
+.B 38\(em\)XID_rx_rsp
+XID response frames received.
+.TP
+.B 39\(em\)XID_tx_cmd
+XID command frames transmitted.
+.TP
+.B 40\(em\)XID_tx_rsp
+XID response frames transmitted.
+.TP
+.B 41\(em\)TEST_rx_cmd
+TEST command frames received.
+.TP
+.B 42\(em\)TEST_rx_rsp
+TEST response frames received.
+.TP
+.B 43\(em\)TEST_tx_cmd
+TEST command frames transmitted.
+.TP
+.B 44\(em\)TEST_tx_rsp
+TEST response frames transmitted.
+.TP
+.B 45\(em\)SABM_rx_cmd
+SABM command frames received.
+.TP
+.B 46\(em\)SABM_tx_cmd
+SABM command frames transmitted.
+.TP
+.B 47\(em\)SARM_rx_cmd
+SARM command frames received.
+.TP
+.B 48\(em\)SARM_tx_cmd
+SARM command frames transmitted.
+.PD
+.RE
+.PP
+.B LLC2 Structures
+.PP
+The \fB\)llc2_stioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct llc2_stioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+    llc2stats_t lli_stats;
+};
+\s+1\fP
+.fi
+.PP
+The \fB\)llc2_stioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_STATS\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+.TP
+.I lli_stats
+Contains the \fB\)llc2stats_t\fP structure containing the statistics.
+.PD
+.PP
+The \fB\)llc2stats_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct llc2_stats {
+    uint32_t llc2monarray[49];
+} llc2stats_t;
+\s+1\fP
+.fi
+.PP
+The \fB\)llc2stats_t\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I llc2monarray
+Provides an array of 32-bit unsigned integers containing the statistics.  The
+indexes of the individual elements are as follows:
+.RS
+.TP \w'\ 00\(emSABME_tx_rsp\ 'u
+.B 0\(em\)tx_ign
+Transmitted frames ignored.
+.PD 0
+.TP
+.B 1\(em\)rx_badlen
+Received frames with a bad length.
+.TP
+.B 2\(em\)rx_unknown
+Unknown frames received.
+.TP
+.B 3\(em\)t1_exp
+T1 timer expiries.
+.TP
+.B 4\(em\)t4_exp
+T4 timer expiries.
+.TP
+.B 5\(em\)t4_n2_exp
+T4 timer expiries with N2.
+.TP
+.B 6\(em\)RR_rx_cmd
+RR command frames received.
+.TP
+.B 7\(em\)RR_rx_rsp
+RR response frames received.
+.TP
+.B 8\(em\)RR_tx_cmd
+RR command frames transmitted.
+.TP
+.B 9\(em\)RR_tx_rsp
+RR response frames transmitted.
+.TP
+.B 10\(em\)RR_tx_cmd_p
+RR command frames transmitted with poll bit set.
+.TP
+.B 11\(em\)RNR_rx_cmd
+RNR command frames received.
+.TP
+.B 12\(em\)RNR_rx_rsp
+RNR response frames received.
+.TP
+.B 13\(em\)RNR_tx_cmd
+RNR command frames transmitted.
+.TP
+.B 14\(em\)RNR_tx_rsp
+RNR response frames transmitted.
+.TP
+.B 15\(em\)RNR_tx_cmd_p
+RNR command frames transmitted with poll bit set.
+.TP
+.B 16\(em\)REJ_rx_cmd
+REJ command frames received.
+.TP
+.B 17\(em\)REJ_rx_rsp
+REJ response frames received.
+.TP
+.B 18\(em\)REJ_tx_cmd
+REJ command frames transmitted.
+.TP
+.B 19\(em\)REJ_tx_rsp
+REJ response frames transmitted.
+.TP
+.B 20\(em\)REJ_tx_cmd_p
+REJ command frames transmitted with poll bit set.
+.TP
+.B 21\(em\)SABME_rx_cmd
+SABME command frames received.
+.TP
+.B 22\(em\)SABME_tx_cmd
+SABME command frames transmitted.
+.TP
+.B 23\(em\)DISC_rx_cmd
+DISC command frames received.
+.TP
+.B 24\(em\)DISC_tx_cmd
+DISC command frames transmitted.
+.TP
+.B 25\(em\)UA_rx_rsp
+UA response frames received.
+.TP
+.B 26\(em\)UA_tx_rsp
+UA response frames transmitted.
+.TP
+.B 27\(em\)DM_rx_rsp
+DM response frames received.
+.TP
+.B 28\(em\)DM_tx_rsp
+DM response frames transmitted.
+.TP
+.B 29\(em\)I_rx_cmd
+I command frames received.
+.TP
+.B 30\(em\)I_tx_cmd
+I command frames transmitted.
+.TP
+.B 31\(em\)FRMR_rx_rsp
+FRMR response frames received.
+.TP
+.B 32\(em\)FRMR_tx_rsp
+FRMR response frames transmitted.
+.TP
+.B 33\(em\)tx_rtr
+Retransmissions.
+.TP
+.B 34\(em\)rx_bad
+Corrupted frames received.
+.TP
+.B 35\(em\)rx_dud
+Invalid received frames.
+.TP
+.B 36\(em\)rx_ign
+Received frames ignored.
+.TP
+.B 37\(em\)XID_rx_cmd
+XID command frames received.
+.TP
+.B 38\(em\)XID_rx_rsp
+XID response frames received.
+.TP
+.B 39\(em\)XID_tx_cmd
+XID command frames transmitted.
+.TP
+.B 40\(em\)XID_tx_rsp
+XID response frames transmitted.
+.TP
+.B 41\(em\)TEST_rx_cmd
+TEST command frames received.
+.TP
+.B 42\(em\)TEST_rx_rsp
+TEST response frames received.
+.TP
+.B 43\(em\)TEST_tx_cmd
+TEST command frames transmitted.
+.TP
+.B 44\(em\)TEST_tx_rsp
+TEST response frames transmitted.
+.TP
+.B 45\(em\)I_rx_rsp
+I response frames received.
+.TP
+.B 46\(em\)I_tx_rsp
+I response frames transmitted.
+.TP
+.B 47\(em\)UI_rx_cmd
+UI command frames received.
+.TP
+.B 48\(em\)UI_tx_cmd
+UI command frames transmitted.
+.PD
+.RE
+.PP
+.B MLP Structures
+.PP
+The \fB\)mlp_stioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct mlp_stioc {
+    uint8_t lli_type;
+    uint8_t state;
+    uint16_t lli_spare;
+    uint32_t lli_snid;
+    mlpstats_t lli_stats;
+};
+\s+1\fP
+.fi
+.PP
+The \fB\)mlp_stioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_STATS\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+.TP
+.I lli_stats
+Contains the \fB\)mlpstats_t\fP structure containing the statistics.
+.PD
+.PP
+The \fB\)mlpstats_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct mlp_stats {
+    uint32_t mlpmonarray[12];
+} mlpstats_t;
+\s+1\fP
+.fi
+.PP
+The \fB\)mlpstats_t\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I mlpmonarray
+Provides an array of 32-bit unsigned integers containing the statistics.  The
+indexes of the individual elements are as follows:
+.RS
+.TP \w'\ 00\(emSABME_tx_rsp\ 'u
+.B 0\(em\)MLP_frames_tx
+MLP frames transmitted.
+.PD 0
+.TP
+.B 1\(em\)MLP_frames_rx
+MLP frames received.
+.TP
+.B 2\(em\)MLP_reset_tx
+MLP reset frames transmitted.
+.TP
+.B 3\(em\)MLP_reset_rx
+MLP reset frames received.
+.TP
+.B 4\(em\)MLP_confs_tx
+MLP confirmation frames transmitted
+.TP
+.B 5\(em\)MLP_confs_rx
+MLP confirmation frames received.
+.TP
+.B 6\(em\)MLP_slps
+MLP SLP components.
+.TP
+.B 7\(em\)MLP_num_slps
+MLP SLP maximum number of SLP components.
+.TP
+.B 8\(em\)MLP_mt1_exp
+MLP T1 expiries.
+.TP
+.B 9\(em\)MLP_mt2_exp
+MLP T2 expiries.
+.TP
+.B 10\(em\)MLP_mt3_exp
+MLP T3 expiries.
+.TP
+.B 11\(em\)MLP_mn1_exp
+MLP N1 expiries.
+.PD
+.RE
+.\"
+.SS LI_GSTATS \(em Global Statistics Data Structures
+.PP
+The global statistics data structures are used to collect the statistics for
+a class of subnetwork (link).
+.PP
+.B LAPB Structure
+.PP
+The \fB\)lapb_gstioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct lapb_gstioc {
+    uint8_t lli_type
+    uint8_t lli_spare[3];
+    uint32_t lapbgstats[6];
+};
+\s+1\fP
+.fi
+.PP
+The \fB\)lapb_gstioc\fP structure has the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_GSTATS\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I lapbgstats
+Contains an array of 32-bit unsigned integers containing the statistics.  The
+indexes of the individual elements of the array are as follows:
+.PD
+.RS
+.TP \w'\ 0\(em\)frames_tx\ 'u
+.B 0\(em\)frames_tx
+Frames transmitted.
+.PD 0
+.TP
+.B 1\(em\)frames_rx
+Frames received.
+.TP
+.B 2\(em\)sabm_tx
+SABM/SABME frames transmitted.
+.TP
+.B 3\(em\)sabm_rx
+SABM/SABME frames received.
+.TP
+.B 4\(em\)bytes_tx
+Bytes transmitted.
+.TP
+.B 5\(em\)bytes_rx
+Bytes received.
+.PD
+.RE
+.PP
+.B LLC2 Structure
+.PP
+The \fB\)llc2_gstioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct llc2_gstioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t llc2gstats[6];
+};
+\s+1\fP
+.fi
+.PP
+The \fB\)llc2_gstioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_GSTATS\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I llc2gstats
+Contains an array of 32-bit unsigned integers containing the statistics.  The
+indexes of the individual elements of the array are as follows:
+.PD
+.RS
+.TP \w'\ 0\(em\)frames_tx\ 'u
+.B 0\(em\)frames_tx
+Frames transmitted.
+.PD 0
+.TP
+.B 1\(em\)frames_rx
+Frames received.
+.TP
+.B 2\(em\)sabm_tx
+SABM/SABME frames transmitted.
+.TP
+.B 3\(em\)sabm_rx
+SABM/SABME frames received.
+.TP
+.B 4\(em\)bytes_tx
+Bytes transmitted.
+.TP
+.B 5\(em\)bytes_rx
+Bytes received.
+.PD
+.RE
+.PP
+.B MLP Structure
+.PP
+The \fB\)mlp_gstioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct mlp_gstioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t mlpgstats[10];
+};
+\s+1\fP
+.PP
+The \fB\)mlp_gstioc\fP structure has the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_GSTATS\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I mlpgstats
+Contains an array of 32-bit unsigned integers containing the statistics.  The
+indexes of the individual elements of the array are as follows:
+.PD
+.RS
+.TP \w'\ 0\(em\)MLP_frames_tx\ 'u
+.B 0\(em\)MLP_frames_tx
+MLP frames transmitted.
+.PD 0
+.TP
+.B 1\(em\)MLP_frames_rx
+MLP frames received.
+.TP
+.B 2\(em\)MLP_reset_tx
+MLP reset frames transmitted.
+.TP
+.B 3\(em\)MLP_reset_rx
+MLP reset frames received.
+.TP
+.B 4\(em\)MLP_confs_tx
+MLP confirmation frames transmitted.
+.TP
+.B 5\(em\)MLP_confs_rx
+MLP confirmation frames received.
+.TP
+.B 6\(em\)MLP_slps
+MLP SLP components.
+.TP
+.B 7\(em\)MLP_num_slps
+MLP SLP maximum components.
+.TP
+.B 8\(em\)MLP_bytes_tx
+MLP bytes transmitted.
+.TP
+.B 9\(em\)MLP_bytes_rx
+MLP bytes received.
+.PD
+.RE
+.\"
+.SS LI_LAPBTUNE \(em LAPB Tuning Data Structures
+.PP
+The LAPB tuning data structures are used to exchange the parameters
+associated with a specific LAPB subnetwork (link).
+.PP
+The \fB\)lapb_tnioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct lapb_tnioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+    lapbtune_t lapb_tune;
+};
+\s+1\fP
+.PP
+The \fB\)lapb_tnioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_LAPBTUNE\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+.TP
+.I lapb_tune
+Containes the \fB\)lapbtune_t\fP(5) tuning structure containing tuning
+parameters.
+.PD
+.PP
+The \fB\)lapbtune_t\fP(5) structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct lapbtune {
+    uint16_t N2;
+    uint16_t T1;
+    uint16_t Tpf;
+    uint16_t Trej;
+    uint16_t Tbusy;
+    uint16_t Tidle;
+    uint16_t ack_delay;
+    uint16_t notack_max;
+    uint16_t tx_window;
+    uint16_t tx_probe;
+    uint16_t max_I_len;
+    uint16_t llconform;
+    uint16_t sabm_in_x32;
+} lapbtune_t;
+\s+1\fP
+.fi
+.PP
+The \fB\)lapbtune_t\fP(5) structure contains the following members:
+.TP \w'\ sabm_in_x32\ 'u
+.I N2
+.PD 0
+.TP
+.I T1
+.TP
+.I Tpf
+.TP
+.I Trej
+.TP
+.I Tbusy
+.TP
+.I Tidle
+.TP
+.I ack_delay
+.TP
+.I notack_max
+.TP
+.I tx_window
+.TP
+.I tx_probe
+.TP
+.I max_I_len
+.TP
+.I llconform
+.TP
+.I sabm_in_x32
+.PD
+.\"
+.SS LI_LLC2TUNE \(em LLC2 Tuning Data Structures
+.PP
+The LLC2 tuning data structures are used to exchange the parameters
+associated with a specific LLC2 subnetwork (link).
+.PP
+The \fB\)llc2_tnioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct llc2_tnioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+    llc2tune_t llc2_tune;
+};
+\s+1\fP
+.PP
+The \fB\)llc2_tnioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_LLC2TUNE\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+.TP
+.I llc2_tune
+Containes the \fB\)llc2tune_t\fP(5) tuning structure containing tuning
+parameters.
+.PD
+.PP
+The \fB\)llc2tune_t\fP(5) structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct llc2tune {
+    uint16_t N2;
+    uint16_t T1;
+    uint16_t Tpf;
+    uint16_t Trej;
+    uint16_t Tbusy;
+    uint16_t Tidle;
+    uint16_t ack_delay;
+    uint16_t notack_max;
+    uint16_t tx_window;
+    uint16_t tx_probe;
+    uint16_t max_I_len;
+    uint16_t xid_window;
+    uint16_t xid_Ndup;
+    uint16_t xid_Tdup;
+} llc2tune_t;
+\s+1\fP
+.fi
+.PP
+The \fB\)llc2tune_t\fP(5) structure contains the following members:
+.TP \w'\ sabm_in_x32\ 'u
+.I N2
+ISO/IEC 7776 parameter N2 (the maximum number of attempts that shall be made
+to complete the successful transmission of a frame).
+.PD 0
+.TP
+.I T1
+ISO/IEC 7776 parameter T1.
+.TP
+.I Tpf
+.TP
+.I Trej
+.TP
+.I Tbusy
+.TP
+.I Tidle
+.TP
+.I ack_delay
+.TP
+.I notack_max
+.TP
+.I tx_window
+.TP
+.I tx_probe
+.TP
+.I max_I_len
+.TP
+.I xid_window
+.TP
+.I xid_Ndup
+.TP
+.I xid_Tdup
+.PD
+.\"
+.SS LI_MLPTUNE \(em MLP Tuning Data Structures
+.PP
+The MLP tuning data structures are used to exchange the parameters associated
+with a specific MLP subnetwork (link).
+.PP
+The \fB\)mlp_tnioc\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+struct mlp_tnioc {
+    uint8_t lli_type;
+    uint8_t lli_spare[3];
+    uint32_t lli_snid;
+    mlptune_t mlp_tune;
+};
+\s+1\fP
+.PP
+The \fB\)mlp_tnioc\fP structure contains the following members:
+.TP \w'\ lli_slp_snid\ 'u
+.I lli_type
+Always \fB\)LLI_MLPTUNE\fP.
+.PD 0
+.TP
+.I lli_spare
+Spare bytes for alignment: set to zero by issuer and ignored by responder.
+.TP
+.I lli_snid
+Specifies the subnetwork identifier (link identifier) for the operation.
+.TP
+.I mlp_tune
+Containes the \fB\)mlptune_t\fP tuning structure containing tuning
+parameters.
+.PD
+.PP
+The \fB\)mlptune_t\fP structure is formatted as follows:
+.PP
+.nf
+\f(CW\s-1\
+typedef struct mlptune {
+    uint16_t mw;
+    uint16_t mx;
+    uint16_t mt1;
+    uint16_t mt2;
+    uint16_t mt3;
+    uint16_t mn1;
+} mlptune_t;
+\s+1\fP
+.fi
+.PP
+The \fB\)mlptune_t\fP structure contains the following members:
+.TP \w'\ mn1\ 'u
+.I mw
+Size of the MLP window.
+.PD 0
+.TP
+.I mx
+Size of the MLP guard region.
+.TP
+.I mt1
+Time interval to wait for MN(S) == MV(R) in deciseconds.
+.TP
+.I mt2
+Time interval to wait for unblock in deciseconds.
+.TP
+.I mt3
+Time interval to wait for reset confirmation.
+.TP
+.I mn1
+The number of SLP transmission retries.
+.PD
+.\"
+.\"
+.SH IOCTLS
+.PP
+The LLI provides the following SLP input-output controls:
+.TP \w'\ L_LINKDISABLE\ 'u
+.B L_SETSNID
+Set subnetwork (link) identifier. (Also \fB\)L_SETPPA\fP.)
+.PD 0
+.TP
+.B L_GETSNID
+Get subnetwork (link) identifier. (Also \fB\)L_GETPPA\fP.)
+.TP
+.B L_SETTUNE
+Set common tuning parameters.
+.TP
+.B L_GETTUNE
+Get common tuning parameters.
+.TP
+.B L_GETSTATS
+Get subnetwork statistics.
+.TP
+.B L_ZEROSTATS
+Zero subnetwork statistics.
+.TP
+.B L_TRACEON
+Turn message tracing on.
+.TP
+.B L_TRACEOFF
+Turn message tracing off.
+.TP
+.B L_GETGSTATS
+Get global statistics.
+.TP
+.B L_ZEROGSTATS
+Zero global statistics.
+.TP
+.B L_LINKDISABLE
+Disable link (subnetwork identifier).
+.TP
+.B L_LINKENABLE
+Enable link (subnetwork identifier).
+.TP
+.B L_PUTX32MAP
+Put X.32 table mapping.
+.TP
+.B L_GETX32MAP
+Get X.32 table mapping.
+.PD
+.PP
+The LLI provides the following MLP input-output controls:
+.TP \w'\ L_LINKDISABLE\ 'u
+.B M_SETSNID
+Set subnetwork identifier.
+.PD 0
+.TP
+.B M_GETSNID
+Get subnetwork identifier.
+.TP
+.B M_GETTUNE
+Get common tuning parameters.
+.TP
+.B M_SETTUNE
+Set common tuning parameters.
+.TP
+.B M_GETSTATS
+Get subnetwork statistics.
+.TP
+.B M_ZEROSTATS
+Zero subnetwork statistics.
+.TP
+.B M_TRACEON
+Turn message tracing on.
+.TP
+.B M_TRACEOFF
+Turn message tracing off.
+.TP
+.B M_GETGSTATS
+Get global statistics.
+.TP
+.B M_ZEROGSTATS
+Zero global statistics.
+.PD
+.\"
+.\"
+.\"
+.SS L_SETSNID, L_SETPPA
+.PP
+Set the LAPB or LLC2 subnetwork identifier (SLP link identifier) associated
+with a link linked under the network multiplexing driver.
+The argument of the input-output control is a pointer to an
+\fB\)ll_snioc\fP(5) structure.
+.\"
+.SS L_GETSNID, L_GETPPA
+.PP
+Get the LAPB or LLC2 subnetwork identifier (SLP link identifier) associated
+with a link linked under the network multiplexing driver.
+The argument of the input-output control is a pointer to an
+\fB\)ll_snioc\fP(5) structure.
+.\"
+.SS L_SETTUNE
+.PP
+Set the LAPB or LLC2 tuning parameters associated with a subnetwork (SLP link).
+The argument of the input-output control is a pointer to a
+\fB\)lapb_tnioc\fP or \fB\)llc2_tnioc\fP
+structure.
+.\"
+.SS L_GETTUNE
+.PP
+Get the LAPB or LLC2 tuning parameters associated with a subnetwork (SLP link).
+The argument of the input-output control is a pointer to a
+\fB\)lapb_tnioc\fP or \fB\)llc2_tnioc\fP
+structure.
+.\"
+.SS L_GETSTATS
+.PP
+Get the LAPB or LLC2 statistic associated with a subnetwork (SLP link).
+The argument of the input-output control is a pointer to a
+\fB\)lapb_stioc\fP or \fB\)llc2_stioc\fP
+structure.
+.\"
+.SS L_ZEROSTATS
+.PP
+Zero the LAPB or LLC2 statistic associated with a subnetwork (SLP link).
+The argument of the input-output control is a pointer to a
+\fB\)lapb_stioc\fP or \fB\)llc2_stioc\fP
+structure.
+.\"
+.SS L_TRACEON
+.PP
+Set message tracing on for the LAPB or LLC2 subnetwork (SLP link).
+The argument of the input-output control is a pointer to a \fB\)ll_hdioc\fP
+structure.
+.\"
+.SS L_TRACEOFF
+.PP
+Set message tracing off for the LAPB or LLC2 subnetwork (SLP link).
+The argument of the input-output control is a pointer to a \fB\)ll_hdioc\fP
+structure.
+.\"
+.SS L_GETGSTATS
+.PP
+Get LAPB or LLC2 global statistics.
+The argument of the input-output control is a pointer to a
+\fB\)lapb_gstioc\fP or \fB\)llc2_gstioc\fP
+structure.
+.\"
+.SS L_ZEROGSTATS
+.PP
+Zero LAPB or LLC2 global statistics.
+The argument of the input-output control is a pointer to a
+\fB\)lapb_gstioc\fP or \fB\)llc2_gstioc\fP
+structure.
+.\"
+.SS L_LINKDISABLE
+.PP
+Disable a LAPB or LLC2 subnetwork (SLP link).
+The argument of the input-output control is a pointer to a \fB\)ll_hdioc\fP
+structure.
+.\"
+.SS L_LINKENABLE
+.PP
+Enable a LAPB or LLC2 subnetwork (SLP link).
+The argument of the input-output control is a pointer to a \fB\)ll_hdioc\fP
+structure.
+.\"
+.SS L_PUTX32MAP
+.PP
+.\"
+.SS L_GETX32MAP
+.PP
+.\"
+.SS M_SETSNID
+.PP
+Set the MLP subnetwork identifier (MLP link identifier) associated with an
+MLP link linked under the network multiplexing driver.
+The argument of the input-output control is a pointer to a
+\fB\)ll_snioc\fP(5) structure.
+.\"
+.SS M_GETSNID
+.PP
+Get the MLP subnetwork identifier (MLP link identifier) associated with an
+MLP link linked under the network multiplexing driver.
+The argument of the input-output control is a pointer to a
+\fB\)ll_snioc\fP(5) structure.
+.\"
+.SS M_GETTUNE
+.PP
+Set the MLP tuning parameters associated with a subnetwork (MLP link).
+The argument of the input-output control is a pointer to a
+\fB\)mlp_snioc\fP
+structure.
+.\"
+.SS M_SETTUNE
+.PP
+Get the MLP tuning parameters associated with a subnetwork (MLP link).
+The argument of the input-output control is a pointer to a
+\fB\)mlp_snioc\fP
+structure.
+.\"
+.SS M_GETSTATS
+.PP
+Get the MLP statitics associated with a subnetwork (MLP link).
+The argument of the input-output control is a pointer to a
+\fB\)mlp_stioc\fP
+structure.
+.\"
+.SS M_ZEROSTATS
+.PP
+Zero the MLP statitics associated with a subnetwork (MLP link).
+The argument of the input-output control is a pointer to a
+\fB\)mlp_stioc\fP
+structure.
+.\"
+.SS M_TRACEON
+.PP
+Set message tracing on for the MLP subnetwork (MLP link).
+The argument of the input-output control is a pointer to a \fB\)ll_hdioc\fP
+structure.
+.\"
+.SS M_TRACEOFF
+.PP
+Set message tracing off for the MLP subnetwork (MLP link).
+The argument of the input-output control is a pointer to a \fB\)ll_hdioc\fP
+structure.
+.\"
+.SS M_GETGSTATS
+.PP
+Get MLP global statistics.
+The argument of the input-output control is a pointer to a
+\fB\)mlp_gstioc\fP
+structure.
+.\"
+.SS M_ZEROGSTATS
+.PP
+Zero MLP global statistics.
+The argument of the input-output control is a pointer to a
+\fB\)mlp_gstioc\fP
+structure.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+is not standardized, but are used by a wide range of X.25 implementations
+based on
+.IR "SpiderX25" .
+.[
+spiderx25
+.]
+Use of this interface should be avoided by portable programs.
+.\"
+.\"
+.\".SH IMPLEMENTATION
+.\".PP
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ioctl (2s),
+.BR nli (7),
+.IR STREAMS (9).
+.\"
+.\"
+.\".SH BUGS
+.\".PP
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The
+.IR "Link Layer Interface (LLI)"
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+is compatible with
+.IR "SpiderX25" ,
+.[
+spiderx25
+.]
+and implementations based on
+.IR "SpiderX25" ,
+such as
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+with the following compatibility considerations:
+.IP \(em \w'\(em\(em'u
+.IP \(em
+.IP \(em
+.PP
+For additional compatibility information see,
+.BR lapb (4),
+.BR llc2 (4),
+and
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.IR "Link Layer Interface (LLI)" ,
+.[
+lli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR lli (7),
+interface was never standardized.  However,
+.B @PACKAGE_TITLE@
+conforms to
+.IR SpiderX25 ,
+.[
+spiderx25
+.]
+.IR "AIXlink/X.25" ,
+.[
+aixx25
+.]
+.IR "HP-UX X.25" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25ag
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+and
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+.I LLI
+first appeared in
+.IR SpiderX25 .
+.[
+spiderx25
+.]
+
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

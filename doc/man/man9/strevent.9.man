@@ -1,0 +1,416 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: strevent.9.man,v 1.1.2.1 2011-02-07 02:14:52 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:52 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: strevent.9.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:52  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.TH STREVENT 9 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ DDI/DKI"
+.SH NAME
+.B strevent
+\- STREAMS event structure
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+The
+.B strevent
+structure is formatted as follows:
+.nf
+\fC\s-2\
+struct strevent {
+    union {
+        struct {
+            struct task_struct *procp;
+            long events;
+            int fd;
+        } e;                      /* stream event */
+        struct {
+            queue_t *queue;
+            struct module *kmod;
+            void streamscall (*func) (long);
+            long arg;
+            size_t size;
+        } b;                      /* bufcall event */
+        struct {
+            queue_t *queue;
+            struct module *kmod;
+            void streamscall (*func) (caddr_t);
+            caddr_t arg;
+            int pl;
+            int cpu;
+            struct timer_list timer;
+        } t;                      /* timeout event */
+        struct {
+            queue_t *queue;
+            struct module *kmod;
+            void streamscall (*func) (void *);
+            void *arg;
+            queue_t *q1, *q2, *q3, *q4;
+        } w;                      /* weld request */
+    } x;
+    struct strevent *se_next;     /* hash, cancel, frozen or free list */
+    struct strevent **se_prev;    /* quick delete for hash, cancel, frozen or free list */
+    struct strevent *se_link;     /* scheduler lists only */
+    long se_id;                   /* identifier for this event structure */
+    struct task_struct *se_task;  /* task running callback */
+    volatile int se_state;        /* state of the event */
+};
+
+#define se_procp    x.e.procp
+#define se_events   x.e.events
+#define se_fd       x.e.fd
+
+#define se_func     x.b.func
+#define se_arg      x.b.arg
+#define se_size     x.b.size
+
+#define SE_IDLE       0  /* event idle */
+#define SE_ARMED      1  /* event armed awaiting activation or cancellation */
+#define SE_TRIGGERED  2  /* event trigger awaiting processing or cancellation */
+#define SE_ACTIVE     3  /* event callback executing */
+#define SE_CANCELLED  4  /* event cancelled, awaiting processing */
+#define SE_HOLDING    5  /* event cancelling holding awaiting callback completion */
+#define SE_FROZEN     6  /* event frozen awaiting cancellation termination */
+\s+2\fP
+.fi
+.\"
+.\"
+.SH MEMBERS
+.PP
+The
+.B strevent
+structure contains the following members:
+.TP \w'\ se_state\(em'u
+.I x
+A union of specialized structures used for different purposes.
+.PD 0
+.TP
+.IR se_next ", " se_prev ", " se_link
+List pointers for placing the structure on an internal list.
+.TP
+.I se_id
+The identifier for this event structure.
+.TP
+.I se_task
+A pointer to the process that is running a callback for the event.
+.TP
+.I se_state
+The state of the STREAMS event.
+.PD
+.PP
+The
+.B x
+union contains the following members:
+.TP
+.I e
+The STREAMS event specialization of the union.
+.PD 0
+.TP
+.I b
+The bufcall event specialization of the union.
+.TP
+.I t
+The timeout event specialization of the union.
+.TP
+.I w
+The weldq event specialization of the union.
+.PD
+.PP
+The
+.B e
+structure has the following members:
+.TP
+.I procp
+.PD 0
+The process to which to deliver STREAMS signals.
+.TP
+.I events
+The events for which the process has subscribed to STREAMS signals.
+.TP
+.I fd
+The file descriptor subscribe to STREAMS signals.
+.PD
+.PP
+The
+.B b
+structure has the following members:
+.TP
+.I queue
+The queue to use for synchronization.
+.PD 0
+.TP
+.I kmod
+The kernel module that contains the callback function.
+.TP
+.I func
+The callback function.
+.TP
+.I arg
+The argument to pass to the callback function.
+.TP
+.I size
+The size of the buffer requested.
+.PD
+.PP
+The
+.B t
+structure has the following members:
+.TP
+.I queue
+The queue to use for synchronization.
+.PD 0
+.TP
+.I kmod
+The kernel module containing the callback function.
+.TP
+.I func
+The callback function.
+.TP
+.I arg
+The argument to pass to the callback function.
+.TP
+.I pl
+The prority level of the callback.
+.TP
+.I cpu
+The cpu upon which the timeout was scheduled.
+.TP
+.I timer
+The internal Linux timer used to implement the timeout.
+.PD
+.PP
+The
+.B w
+structure has the following members:
+.TP
+.I queue
+The queue to use for synchronization.
+.PD 0
+.TP
+.I kmod
+The kernel module containing the callback function.
+.TP
+.I func
+The callback function.
+.TP
+.I arg
+The argument to pass to the callback function.
+.TP
+.IR q1 ", " q2 ", " q3 ", " q4
+The queues to weld or unweld.
+.PD
+.\"
+.\"
+.SH INTERFACE
+.PP
+.IR STREAMS ,
+internal,
+implementation specific.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B strevent
+structure is a structure used internal to the
+.I STREAMS
+scheduler and by the Stream head,
+.BR sth (4),
+to store information about STREAMS events that are scheduled and whose
+callbacks are being processed within the
+.I STREAMS
+executive.
+.\"
+.\"
+.SH CONTEXT
+.PP
+.I STREAMS
+kernel threads run at process context within the kernel.
+.\"
+.\"
+.SH MP-STREAMS
+.PP
+The
+.B strevent
+structure is global to all CPUs and requires protection.  This is an internal
+scheduler structure and should not be manipulated directly.
+.\"
+.\"
+.SH NOTICES
+.PP
+.B strevent
+structures are not intended to be used directly by portable
+.I STREAMS
+drivers or modules.  It is only intended to be used directly by the
+.I STREAMS
+executive and, in particular, the
+.I STREAMS
+scheduler.  Manipulating
+.B strevent
+structures without using
+.I STREAMS
+utility functions intended to do so, will likely cause panics and crash the
+system.  Use proper
+.I STREAMS
+utility functions instead.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR sealloc (9),
+.BR sefree (9),
+.BR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B strevent
+structure contain information that was allocated dynamically within the
+kernel in accordance with the descriptions for
+.IR "SVR 4"
+.[
+svr4spg
+.]
+in the MG.
+.[
+magic
+.]
+.PP
+See
+.BR STREAMS (9)
+for additional compatibiltiy considerations.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+The
+.B strevent
+structure is consistent with the description of the structure associated with
+the
+.I STREAMS
+scheduler functions of
+.IR "SVR 4"
+.[
+magic
+.]
+.[
+svr4spg
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The
+.B strevent
+structure first appears in
+.IR "SVR 4" .
+.[
+svr4spg
+.]
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

@@ -1,0 +1,525 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: cerrno.3.man,v 1.1.2.1 2011-02-07 02:14:39 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:39 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: cerrno.3.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:39  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH CERRNO 3 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "OpenSS7 CDI API Library"
+.\" =========================================================================
+.SH NAME
+.B cerrno, _cerrno
+\- error code for the CDI library
+.\"
+.\"
+.SH INTERFACE
+.PP
+.BR libcdiapi (3),
+the
+.IR GCOM -specific,
+CDI
+.[
+cdi revision @PACKAGE_VERSION@
+.]
+API Library.
+.[
+cdiapi
+.]
+.\"
+.\"
+.SH SYNOPSIS
+.ad l
+.nh
+.PP
+.B #include <sys/cdi.h>
+.br
+.B #include <cdiapi.h>
+.HP
+\fBint\ *_cerrno\fP(\fBvoid\fP);
+.PD 0
+.HP
+\fB#define cerrno (*_cerrno())\fP
+.PD
+.ad b
+.hy 6
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+None.
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+.B cerrno
+is a CDI API Library
+.[
+cdiapi
+.]
+macro that emulates an integer error numer.  This macro dereferences the
+integer point returned by
+.BR _cerrno ().
+.BR _cerrno ()
+returns a pointer into thread-specific data at which point the calling
+thread's private integer
+.B cerrno
+value resides.
+.\"
+.\"
+.SH USAGE
+.PP
+To use the
+.B cerrno
+function, include
+.RB < sys/cdi.h >
+and
+.RB < cdiapi.h >
+header files in C language programs.
+Add the
+.RB ` -lcdiapi '
+flag to the linker command when linking C language programs that use the
+.B cerrno
+integer or include the
+.B @libdir@/libcdiapi.a
+static library object as a target of the linking.
+.\"
+.\"
+.SH MT CONTEXT
+.PP
+.B cerrno
+is fully thread-safe.
+What is described as global variables are in fact thread-specific data when
+linked with
+.BR libpthread .
+.\"
+.\"
+.SH RETURN
+.PP
+.BR _cerrno ()
+returns a pointer to an integer containing the last CDI library error code.
+.BR _cerrno ()
+is always successful.
+.PP
+The CDI error number is in
+.IR cerrno (3)
+and, when
+.IR cerrno (3)
+is
+.BR CD_SYSERR ,
+.IR errno (3)
+holds the \fBLinux\fP system error number.
+.\"
+.\"
+.SH ERRORS
+.PP
+When a CDI library function fails,
+it places an error code in the integer at location
+.BR _cerrno ()
+describing the error.
+.PP
+CDI Library
+errors and their corresponding 'C' language locale text strings are as
+follows:
+.TP \w'[\fB\)CD_READTIMEOUT\fP]\(em'u
+.RB [ CD_BADADDRESS ]
+\(em
+.RI \(lq "Address was invalid." \(rq
+.TP
+.RB [ CD_BADADDRTYPE ]
+\(em
+.RI \(lq "Invalid address type." \(rq
+.TP
+.RB [ CD_BADDIAL ]
+\(em
+.RI \(lq "Dial information was invalid." \(rq
+.TP
+.RB [ CD_BADDIALTYPE ]
+\(em
+.RI \(lq "Invalid dial information type." \(rq
+.TP
+.RB [ CD_BADDISPOSAL ]
+\(em
+.RI \(lq "Invalid disposal parameter." \(rq
+.TP
+.RB [ CD_BADFRAME ]
+\(em
+.RI \(lq "Defective SDU received." \(rq
+.TP
+.RB [ CD_BADPPA ]
+\(em
+.RI \(lq "Invalid PPA identifier." \(rq
+.TP
+.RB [ CD_BADPRIM ]
+\(em
+.RI \(lq "Unrecognized primitive." \(rq
+.TP
+.RB [ CD_DISC ]
+\(em
+.RI \(lq "Disconnected." \(rq
+.TP
+.RB [ CD_EVENT ]
+\(em
+.RI \(lq "Protocol-specific event occurred." \(rq
+.TP
+.RB [ CD_FATALERR ]
+\(em
+.RI \(lq "Device has become unusable." \(rq
+.TP
+.RB [ CD_INITFAILED ]
+\(em
+.RI \(lq "Line initialization failed." \(rq
+.TP
+.RB [ CD_NOTSUPP ]
+\(em
+.RI \(lq "Primitive not supported by this device." \(rq
+.TP
+.RB [ CD_OUTSTATE ]
+\(em
+.RI \(lq "Primitive was issued from an invalid state." \(rq
+.TP
+.RB [ CD_PROTOSHORT ]
+\(em
+.RI \(lq "M_PROTO block too short." \(rq
+.TP
+.RB [ CD_READTIMEOUT ]
+\(em
+.RI \(lq "Read request timed out before data arrived." \(rq
+.TP
+.RB [ CD_SYSERR ]
+\(em
+.RI \(lq "UNIX system error." \(rq
+.TP
+.RB [ CD_WRITEFAIL ]
+\(em
+.RI \(lq "Unitdata request failed." \(rq
+
+.TP \w'[\fB\)CD_PROTOSHORT\fP]\(em'u
+.RB [ CD_BADDIAL ]
+dial information was invalid.
+.TP
+.RB [ CD_BADDIALTYPE ]
+invalid dial information type.
+.TP
+.RB [ CD_BADPRIM ]
+unrecognized primitive.
+.TP
+.RB [ CD_EVENT ]
+protocol-specific event occurred.
+.TP
+.RB [ CD_FATALERR ]
+device has become unusable.
+.TP
+.RB [ CD_INITFAILED ]
+line initialization failed.
+.TP
+.RB [ CD_NOTSUPP ]
+primitive not supported by this device.
+.TP
+.RB [ CD_OUTSTATE ]
+primitive was issued from an invalid state.
+.TP
+.RB [ CD_PROTOSHORT ]
+.BR M_PROTO (9)
+block too short.
+.TP
+.RB [ CD_SYSERR ]
+A \fBLinux\fP system error occurred and the \fBLinux\fP system error code is
+contained in the \fIerrno\fP(3) global variable.
+.PP
+A \fBLinux\fP system error occurs:
+.TP \w'[\fB\)CD_PROTOSHORT\fP]\(em'u
+.RB [ ELIBACC ]
+The CDI API library was not initialized.  See \fBcdi_init\fP(3).
+.TP
+.RB [ EBADF ]
+the file descriptor, \fIfd\fP, supplied does not correspond to a valid CDI
+Stream open for reading and writing.
+.TP
+.RB [ EINVAL ]
+one or more of the arguments are invalid.
+.TP
+.RB [ ETIMEDOUT ]
+the call timed out awaiting a \fB\)CD_ENABLE_CON\fP(7) or
+\fB\)CD_ERROR_ACK\fP(7) primitive.  The default time for which these primitives
+are awaited is \fB15000\fP milliseconds (15 seconds).
+.TP
+.RB [ EINTR ]
+the call was interrupted by a signal before it could complete.
+.TP
+.RB [ ERESTART ]
+the call was interrupted by a signal before it could begin.
+.TP
+.RB [ ERESTARTSYS ]
+See [\fBERESTART\fP].
+.TP
+.RB [ EAGAIN ]
+the call was non-blocking and a message was not immediately available or
+flow control was in effect.
+.TP
+.RB [ EBADMSG ]
+a message of the incorrect type was waiting on the Stream.
+.PP
+In addition, any of the error number returned by
+.BR cdi_put_proto (3)
+or
+.BR cdi_wait_ack (3)
+can be returned in
+.BR cerrno .
+.\"
+.\"
+.SH NOTICES
+.PP
+.BR _cerrno ()
+is a
+.IR GCOM -specific
+function.  It may be necessary to define the C preprocessor symbol,
+.BR _GCOM_SOURCE ,
+before including the
+.RB < sys/cdi.h >
+header file,
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+It may also be necessary to include the
+.RB < cdiapi.h >
+header file
+to expose this symbolic constants, data structures and declarations necessary
+for the use of this function.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B @includedir@/@PACKAGE@/sys/cdi.h
+The CDI header file.
+.TP
+.B @includedir@/@PACKAGE@/cdiapi.h
+The CDI API Library header file.
+.TP
+.B @libdir@/libcdiapi.a
+The static library containing the
+.BR cerrno
+function.
+.TP
+.B @libdir@/libcdiapi.so
+The shared object library containing the
+.BR cerrno
+function.
+.\"
+.\"
+.SH BUGS
+.PP
+.B cerrno
+has no known bugs.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR cdi_put_enable_req (3),
+.BR cdi_wait_ack (3),
+.BR CD_ENABLE_REQ (7),
+.BR CD_ENABLE_CON (7),
+.BR CD_ERROR_ACK (7),
+.BR cdi (7),
+.BR cdiapi (3),
+.BR cdi_init (3),
+.IR cerrno (3),
+.IR errno (3),
+.BR poll (2s),
+.IR STREAMS (9).
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.BR _cerrno ()
+is compatible with the
+.I GCOM
+CDI API Library,
+.[
+cdiapi
+.]
+and system providing an interface equivalent to the
+.I GCOM
+CDI API Library,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+The earlier versions of the CDI API library were unable to dial a modem.  For
+support in later version, see
+.BR cdi_dial_req (3)
+and
+.BR cdi_put_dial_req (3)
+for library calls that accept dial strings.
+.IP \(em
+.B cerrno
+blocks awaiting a response regardless of the blocking or non-blocking flag
+settings associated with the open file descriptor.  That is, the function
+internally uses
+.BR poll (2s).
+.IP \(em
+.B CDI API Library
+functions are
+.IR GCOM -specific,
+and are provided only for porting
+.IR GCOM
+software to
+.BR Linux .
+They are inherently non-portable.  These functions will be avoided by portable
+CDI programs.
+.IP \(em
+Binary compatibility is not attempted, only source compatibility: any binary
+compatibility experienced is coincidental and may change on a future release.
+It may be necessary to recompile all \fISTREAMS\fP drivers and modules that
+share definitions with the CDI API library using
+.B @PACKAGE_TITLE@
+supplied header files.
+.PP
+For further compatibility information, see
+.BR cdiapi (3),
+.BR cdi (7),
+.IR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+CDI,
+.[
+cdi revision @PACKAGE_VERSION@
+.]
+and
+.I GCOM
+CDI API documentation.
+.[
+cdiapi
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+The Communications Device Interface (CDI),
+.[
+cdi revision @PACKAGE_VERSION@
+.]
+.BR cdi (7),
+was developed by NCR Comten.
+.B cerrno
+first appeared in the
+.I GCOM
+CDI API.
+.[
+cdiapi
+.]
+.\"
+.\"
+.SH VERSIONS
+.PP
+This manual page was written for the
+.B @PACKAGE_TITLE@
+implementation of the
+.IR "CDI API Library" .
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI

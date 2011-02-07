@@ -1,0 +1,1 @@
+.so man7/L_GETGSTATS.7.man

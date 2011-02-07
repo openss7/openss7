@@ -1,0 +1,402 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: ap_osic.1.man,v 1.1.2.1 2011-02-07 02:14:38 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-02-07 02:14:38 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: ap_osic.1.man,v $
+.\" Revision 1.1.2.1  2011-02-07 02:14:38  brian
+.\" - added manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH AP_OSIC 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ User Commands"
+.\"
+.\"
+.SH NAME
+.B ap_osic
+\- XAP Library OSI information compiler
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.ad l
+.nh
+.HP \w'\fBap_osic\fP\ 'u
+\fBap_osic\fP [\fB-o\fP\0\fIoutfile\fP] [\fB-v\fP] \fIfile\fP \fI...\fP
+.PD 0
+.HP
+\fBap_osic\fP {\fB-h\fP|\fB--help\fP}
+.HP
+\fBap_osic\fP {\fB-V\fP|\fB--version\fP}
+.HP
+\fBap_osic\fP {\fB-C\fP|\fB--copying\fP}
+.PD
+.ad b
+.hy 1
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B ap_osic
+command processes
+.BR ap_env_file (5)
+files to generate an environment initialization file that can be used by the
+.BR ap_init_env (3)
+function to initialize the XAP Library environment.  The
+.B ap_osic
+command is optional; implementations required to be portable cannot rely on
+it being available on all platforms.
+.PP
+The format of the
+.BR ap_env_file (5)
+can be named on the command line.  The
+.B ap_osic
+command parses these files, checks them for errors, and writes the combined
+initialization information for a file named
+.BR ap_osi.env .
+.\"
+.\"
+.SH OPTIONS
+.PP
+The following options are interpreted by
+.BR ap_osi :
+.TP
+.BR -o ", " --output " \fI\)outfile\fP
+Write output to
+.I outfile
+instead of
+.BR ap_osi.env .
+.TP
+.BR -v ", " --values
+By default, the attributes named in each
+.B ap_env_file
+file are assigned values in a specific order regardless of the order that
+they appear in that file.  This is to prevent the case where attribute
+.B A
+is assigned a value before attribute
+.B B
+when the value of
+.B B
+may affect the allowable values for
+.BR A .
+The user may override this default ordering by specifying the
+.B -v
+option.  If this option is used, environment attributes will be assigned
+values in the same order that they apprear in the
+.B ap_env_file
+file or files.
+.RS
+.PP
+The default attribute assignment order used in the absence of the
+.B -v
+option is:
+.PP
+\fC\s-1\
+AP_LIB_SEL,
+AP_ACSE_SEL,
+AP_ROLE_ALLOWED,
+AP_CNTX_NAME,
+AP_SESS_SEL,
+AP_BIND_PADDR,
+AP_CLD_AEID,
+AP_CLD_AEQ,
+AP_CLD_APID,
+AP_CLD_PAT,
+AP_CLG_AEID,
+AP_CLG_AEQ,
+AP_CLG_APID,
+AP_CLG_APT,
+AP_DPCN,
+AP_MODE_SEL,
+AP_PCDL,
+AP_PFU_SEL,
+AP_PRES_SEL,
+AP_REM_PADDR,
+AP_RSP_AEID,
+AP_RSP_AEQ,
+AP_RSP_APID,
+AP_RSP_APT,
+AP_INIT_SYNC_PT,
+AP_SFU_SEL,
+AP_INIT_TOKENS,
+AP_FLAGS,
+AP_CLG_CONN_ID,
+AP_CLD_CONN_ID,
+AP_OLD_CONN_ID,
+AP_AFU_SEL,
+AP_COPYENV,
+AP_DPCR,
+AP_QLEN,
+AP_QOS\s+1\fP
+.RE
+.TP
+.BR -h ", " --help
+When this option is encountered,
+.B ap_osic
+displays usage information on
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are taken.
+.TP
+.BR -V ", " --version
+When this option is encountered,
+.B ap_osic
+displays version information on
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are taken.
+.TP
+.BR -C ", " --copying
+When this option is encountered,
+.B ap_osic
+displays copying and copyright information on
+.I stdout
+and exits.
+No further processing of options or arguments is performed and no actions are taken.
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+.B ap_osi.env
+default output file.
+.\"
+.\"
+.SH NOTICES
+.PP
+The output from the
+.B ap_osic
+command of one XAP implementation is not necessarily readable by the
+.BR ap_init_env (3)
+function of another XAP implementation, as the format of the intermediate
+file is not defined.  Environment initialization files are therefore only
+guaranteed to be portable in the
+.B ap_env_file
+form.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+Most diagnostic messages produced by
+.B ap_osic
+begin with the line number and name of the file in which the error is
+detected.  If one of these conditions is detected, no output is written to
+the output file.  The following error messages may occur:
+.TP
+Cannot open file
+One of the specified input files cannot be opened for reading.
+.TP
+Syntax error
+There is a syntax error in the
+.B ap_env_file
+file.  Refer to the
+.BR ap_env_file (5)
+manual page for a description of proper syntax.
+.TP
+Illegal attribute
+An illegal attribute name was specified in the
+.B ap_env_file
+file.
+.TP
+Illegal value
+An illegal value was assigned to an attributed in the
+.B ap_env_file
+file.  In addition to these errors, the
+.B ap_osic
+command produces a warning (below) if multiple assignments to a single
+attribute are encountered.  In this case, only the first assignment is used
+and a warning is written to
+.I stderr
+for each additional initialization value encountered for that attribute.  If
+no errors are detected, output will be written to the output file.
+.TP
+Duplicate attribute ignored
+MOre than one assignment was encountered for a single attribute.  The first
+value is used.
+.\"
+.\"
+.SH SEE ALSO
+.PP
+.BR ap_init_env (3),
+.BR ap_env_file (5),
+.BR ap_bind (3).
+.\"
+.\"
+.SH "BUGS"
+.PP
+.B ap_osic
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+.B ap_osic
+is compatible with APLI
+.[
+apli unix international
+.]
+and XAP,
+.[
+xap c303
+.]
+and implementations based on APLI or XAP, such as
+.IR "USL ONP" \(rg,
+.IR "Solaris Solstice OSI" \(rg,
+.IR "HP-UX OTS/9000" \(rg,
+.IR "AIX OSI/6000" \(rg,
+.IR "Digital DECnet/OSI" \(rg,
+with the following portability considerations:
+.IP \(em \w'\(em\(em'u
+Only source compatibility is attempted.
+Binary compatibility is not
+attempted: any exhibited binary compatibility is coincidental and is scheduled
+to be removed on the next release.
+.IP \(em
+Options
+.BR -h ", " -V ", " -C ,
+and all long options, are specific to this
+.B @PACKAGE_TITLE@
+implementation of
+.B ap_osic
+and will not be used by portable command scripts.
+.IP \(em
+No other implementation documents the
+.BR -h ", " -V " and " -C options.  They will not be used by portable command
+scripts.
+.IP \(em
+Options
+.BR --help " and " --version
+are provided for compatibilty with GNU coding standards (GNITS);
+.BR --copying ,
+OpenSS7 coding standards.
+.PP
+See \fBAPLI\fP(3), \fBXAP\fP(3) and \fISTREAMS\fP(4) for additional
+compatibility information.
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+XAP.
+.[
+xap c303
+.]
+.\"
+.\"
+.SH HISTORY
+.PP
+.B ap_osic
+first appeared in
+.IR XAP .
+.[
+xap c303
+.]
+.\"
+.\"
+.SH VERSION
+.PP
+This manual page was written for the OpenSS7 XAP Library.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
