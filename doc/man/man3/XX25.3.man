@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: XX25.3.man,v 1.1.2.1 2009-06-21 10:34:07 brian Exp $
+.\" @(#) $Id: XX25.3.man,v 1.1.2.2 2011-02-07 02:17:59 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:07 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:17:59 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: XX25.3.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:34:07  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:17:59  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -147,9 +147,13 @@ header file possibly included by the former.
 This manual section describes the protocol-specific information that is
 relevant for X.25 transport providers.  This section also describes the
 protocol-specific information that is relevant when X.25 services are provided
-over an IP network using XOT
+over an IP network using XOT,
 .[
 rfc1613
+.]
+XOS,
+.[
+xos
 .]
 or an ISO-TP0 bridge.
 .[
@@ -176,7 +180,7 @@ also) for addresses.
 .PP
 The socket address, defined in
 .RB < sys/socket.h >,
-is structures as follows:
+is structured as follows:
 .sp
 .RS
 .nf
@@ -361,8 +365,11 @@ Each option is formatted according to the structurer
 .BR t_opthdr ,
 possibly followed by the option value. In the structure
 .BR t_opthdr ,
-the name field specifies the mnemonic of the option. The level field specifies
-the protocol affected (here
+the
+.I name
+field specifies the mnemonic of the option. The
+.I level
+field specifies the protocol affected (here
 .BR T_X25_NP
 for all options of the XX25 API). The
 .I len
@@ -371,13 +378,15 @@ option header
 .B t_opthdr
 plus the length of the option value, without the possible alignment
 characters).
-The status field of the returned options contains information about the
-success or failure of a negotiation. The structure
+The
+.I status
+field of the returned options contains information about the success or
+failure of a negotiation. The structure
 .B t_opthdr
 is followed by the option value. The XX25 user has to ensure that each option
 starts at a long-word boundary.
 .PP
-A detailed description of the X.25 facilities can be found in ISO/IEC 8202
+A detailed description of the X.25 facilities can be found in ISO/IEC 8208
 .[
 iso8208
 .]
@@ -1291,7 +1300,7 @@ No special consideration.
 .\"
 .SS t_bind\fR(3)
 .PP
-The address filed of the
+The address field of the
 .BR t_bind (3)
 structure contains the matching requirements for routing incoming calls to the
 endpoint.  This may include (but is not limited to) representation of one or
@@ -1313,7 +1322,7 @@ a PVC number.
 .PD
 .RE
 .PP
-Where an incoming call cal be routed to multiple endpoints on the basis of
+Where an incoming call can be routed to multiple endpoints on the basis of
 their matching requirements, the actual endpoint selected will be
 implementation dependent.
 .PP
@@ -1346,7 +1355,7 @@ data starts with a particular pattern.
 .PP
 The
 .I sndcall->addr
-is used to select either an SVR or a PVC.
+is used to select either an SVC or a PVC.
 .PP
 For an SVC the
 .I sndcall->addr
@@ -1399,6 +1408,10 @@ The parameters of the
 .BR t_getinfo (3)
 function for the different versions of the X.25 protocol (X.25-1980, X.25-1984,
 X.25-1988, X.25-1993, and so on) are presented in the table below:
+.bp
+.if \n(cR \{\
+.pl \n(nl+100
+.\}
 .TS
 box center tab(:);
 cb|cb|cbs.
@@ -1415,30 +1428,38 @@ li|c|c|c.
 fd:x:/:/
 info->addr:/:x:x
 info->options:/:x:x
-info->tsdu:/:x (1):x (1)
-info->etsdu:/:-2/ 32 (2):-2/ 1 (2)
-info->connect:/:16/128 (4):16/128 (4)
-info->discon:/:0/128 (5):0/128 (5)
-info->servtype:/:T_COTS:T_COTS
-info->flags:/:T_SENDZERO:T_SENDZERO
-.TE
-.RS
-.IP (1) \w'(0)\(em'u
+info->tsdu:/:x\fB<1>\fP:x\fB<1>\fP
+info->etsdu:/:-2/ 32\fB<2>\fP:-2/  1\fB<3>\fP
+info->connect:/:16/128\fB<4>\fP:16/128\fB<4>\fP
+info->discon:/:0/128\fB<5>\fP:0/128\fB<5>\fP
+info->servtype:/:\fB\)T_COTS:\fB\)T_COTS
+info->flags:/:\fB\)T_SENDZERO:\fB\)T_SENDZERO
+_
+.T&
+lsss.
+T{
+.ad l
+.nh
+.nr an-margin 1n
+.PD 0
+.IP \fB<1>\fP \w'\fB<0>\fP\(em'u
 Minus one (-1) or an integral number greater than zero.
-.IP (2)
+.IP \fB<2>\fP
 Minus two (-2) if no expedited data transfer can be exchanged, and 32 otherwise.
-.IP (3)
+.IP \fB<3>\fP
 Minus two (-2) if no expedited data transfer can be exchanged, and 1
 otherwise.
-.IP (4)
+.IP \fB<4>\fP
 16 in basic format or 128 in extended format (if the X.25 facility
 .I Fast Select
 has been negotiated).
-.IP (5)
+.IP \fB<5>\fP
 0 in basic format or 128 in extended format (if the X.25 facility
 .I Fast Select
 has been negotiated).
-.RE
+.PD
+T}
+.TE
 .\"
 .SS t_look\fR(3)
 .PP
@@ -1463,6 +1484,10 @@ The parameters of the
 .BR t_open (3)
 function, for the different version of the X.25 protocol (X.25-1980,
 X.25-1984, X.24-1988, X.25-1993, and so on) are presented in the table below.
+.bp
+.if \n(cR \{\
+.pl \n(nl+100
+.\}
 .TS
 box center tab(:);
 cb|cb|cbs.
@@ -1479,23 +1504,31 @@ li|c|c|c.
 fd:x:/:/
 info->addr::x:x
 info->optoins::x:x
-info->tsdu::x (1):x (1)
-info->etsdu::32:1
+info->tsdu::x\fB<1>\fP:x\fB<1>\fP
+info->etsdu:: 32:  1
 info->connect::128:128
 info->discon::128:128
 info->servtype::T_COTS:T_COTS
 info->flags::T_SENDZERO:T_SENDZERO
-.TE
-.RS
-.IP (1) \w'(0)\(em'u
+_
+.T&
+lsss.
+T{
+.ad l
+.nh
+.nr an-margin 1n
+.PD 0
+.IP \fB<1>\fP \w'\fB<0>\fP\(em'u
 Minus one (-1) or an integral number greater than zero.
-.RE
+.PD
+T}
+.TE
 .\"
 .SS t_optmgmt\fR(3)
 .PP
 The function,
 .BR t_optmgmt (3),
-uses specific options to support the X.25 zervice.  The options are described
+uses specific options to support the X.25 service.  The options are described
 above under
 .RI \*(lq OPTIONS .\*(rq
 .\"
@@ -1526,7 +1559,7 @@ Only after the full ETSDU has been received (the
 flag not set), the remainder of the TSDU is made available to the user.
 .PP
 Also, flags additional to the
-.B T_EXPEDITED " and " T_MORE
+.BR T_EXPEDITED " and " T_MORE
 flags can be set in the argument
 .IR flags :
 .IP \(bu \w'\(bu\(em'u
@@ -1542,7 +1575,7 @@ On return from the call, if
 .B T_X25_DACK
 is set in
 .IR flags ,
-the previously send expedited data has been acknowledged.
+the previously sent expedited data has been acknowledged.
 .RS
 .TP \w'\fBNote:\fR\(em'u
 .B Note:
@@ -1553,7 +1586,7 @@ is set in
 then no other flags are set and no user data is returned to the user.
 .RE
 .IP \(bu
-On return from the call, fi
+On return from the call, if
 .B T_X25_Q
 is set in
 .IR flags ,
@@ -1569,7 +1602,7 @@ When
 .B T_X25_RST
 is returned, the argument
 .I buf
-contains the cause and diagnostic of the reset.  Each one is coded int one
+contains the cause and diagnostic of the reset.  Each one is coded in one
 octet.  The cause is encoded in the first octet, and the diagnostic in the
 second octet.  If the user's buffer is less than two bytes long then the
 diagnostic value is disregarded, and if the length is zero the cause is also
@@ -1589,7 +1622,7 @@ contains the X.25 cause and diagnostic of the connection release.  The cause
 and the diagnostic are both encoded in an octet and can be retrieved by using
 respectively the
 .BR T_X25_GET_CAUSE ()
-and macro and the
+macro and the
 .BR T_X25_GET_DIAG ()
 macro.
 .PP
@@ -1598,7 +1631,7 @@ This function allows operations in accordance with XTI,
 XTI Revision 1
 .]
 but cannot be used to retrieve charging information or the address of the user
-that released the connection.  For these purposes, the use has to call the
+that released the connection.  For these purposes, the user has to call the
 function
 .BR t_optmgmt (3)
 and retrieve the meaningful options.
@@ -1639,7 +1672,7 @@ code is returned.
 .RS
 .TP \w'\fBNote:\fR\(em'u
 .B Note:
-As a D-bit send requires end-to-end acknowledgement, it can considerable delay
+As a D-bit send requires end-to-end acknowledgement, it can considerably delay
 the transmission of further packets.
 .RE
 .IP \(bu
@@ -1660,7 +1693,7 @@ The
 .BR t_snd (3)
 function returns immediately.  If further
 .BR t_snd (3)
-calls are accepted while the reset request is being performed the send data
+calls are accepted while the reset request is being performed the sent data
 will remain pending until the X.25 provider receives the confirmation of
 reset.  This confirmation of reset is not returned to the user.  The normal
 flow control mechanisms may result in a subsequent
@@ -1727,14 +1760,15 @@ dissociates the user from the PVC and normally resets the PVC.
 .\"
 .SH COMPATIBILITY
 .PP
-The OpenSS7 standard XX25 implementation
-is compatible with XX25,
+The
+.B @PACKAGE_TITLE@
+standard XX25 implementation is compatible with XX25,
 .[
 xx25
 .]
 and implementations based on XX25 with the following portability
 considerations:
-.IP \(em w'\(em\(em'u
+.IP \(em \w'\(em\(em'u
 .PP
 See
 .BR SX25 (3)

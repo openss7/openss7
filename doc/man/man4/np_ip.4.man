@@ -2,22 +2,22 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: np_ip.4.man,v 1.1.2.2 2010-12-02 22:22:43 brian Exp $
+.\" @(#) $Id: np_ip.4.man,v 1.1.2.3 2011-02-07 02:18:10 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,16 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2010-12-02 22:22:43 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:10 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: np_ip.4.man,v $
-.\" Revision 1.1.2.2  2010-12-02 22:22:43  brian
-.\" - regression fix and np_udp driver
-.\"
-.\" Revision 1.1.2.1  2009-06-21 10:34:53  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.3  2011-02-07 02:18:10  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -105,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -267,7 +264,7 @@ as well as multi-homing.
 .SH USAGE
 .PP
 The following entries in
-.B /etc/protosw
+.B /etc/sock2path
 provides the information necessary for
 .BR socksys (4)
 to use these devices:
@@ -282,20 +279,22 @@ PF_INET     SOCK_RAW      IPPROTO_IP    /dev/np_ip   npi   clts
 For additional information, see
 .BR socksys (4)
 and
-.BR protosw (5).
+.BR sock2path (5).
 .\"
 .\"
 .SH IOCTLS
 .PP
 All interfaces support a set of management IO controls using
-.BR ioctl (2)
+.BR ioctl (2s)
 and
 .BR streamio (7)
 .I I_STR
 system calls on the
 .IR ip_stream ", " ip_xtistr " or " ip_socket .
 These management controls are described in
-.BR ip_ioctl (4).
+.BR timod (4)
+and
+.BR socksys (4).
 .\"
 .\"
 .SH NOTICES
@@ -355,13 +354,12 @@ and inflexible.
 .\"
 .SH "SEE ALSO"
 .PP
-.BR ioctl (2),
+.BR ioctl (2s),
 .BR npi (7),
 .BR npi_ip (7),
-.BR protosw (5),
+.BR sock2path (5),
 .BR ip (7),
 .BR ip (8),
-.BR ip_ioctl (4),
 .BR socket (7),
 .BR sockets (3),
 .BR socksys (4),
@@ -389,7 +387,7 @@ The
 .I /dev/rawip
 device providing a Transport Provider Interface
 .[
-TPI Revision 2.0.0
+tpi revision 2.0.0 draft 2
 .]
 is roughly compatible with the raw ip TPI streams provided by
 .IR Solaris \(rg
@@ -423,7 +421,7 @@ package.  A more flexible direct implementation was performed using a separate
 driver that hooked directly into the Linux IP subsystem, but initially only
 provided the user-based Transport Provider Interface (TPI),
 .[
-TPI Revision 2.0.0
+tpi revision 2.0.0 draft 2
 .]
 .BR tpi (7),
 interface.  This

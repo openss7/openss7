@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: npi_x25.7.man,v 1.1.2.1 2009-06-21 10:36:22 brian Exp $
+.\" @(#) $Id: npi_x25.7.man,v 1.1.2.2 2011-02-07 02:18:29 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:36:22 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:29 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: npi_x25.7.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:36:22  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:18:29  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .TH NPI-X25 7 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "NPI Correigendum for X.25"
@@ -111,13 +111,15 @@ search-ignore T
 \- Network Provider Interface (NPI) \(em Corrigendum for X.25 Conformance
 .\"
 .\"
+.ad b
+.hy
 .SH SYNOPSIS
 .PP
 .B #include <sys/npi.h>
 .br
 .B #include <sys/npi_x25.h>
 .HP
-.BI int " x25_stream " = open(" \(lq/dev/x25-npi\(rq ", " oflags ");
+.BI int " x25_stream " =\ open(" \(lq/dev/x25-npi\(rq ", " oflags ");
 .\"
 .\"
 .SH DESCRIPTION
@@ -125,7 +127,7 @@ search-ignore T
 .B NPI-X25
 provides a Stream support the Network Provider Interface (NPI),
 .[
-npi revision 2.0.0
+npi revision 2.0.0 draft 2
 .]
 .BR npi (7),
 to the X.25 Packet Layer Protocol (X25-PLP),
@@ -143,7 +145,7 @@ driver,
 This
 .IR STREAMS (4)
 interface provides the
-.BR x25 (4)
+.BR x25-plp (4)
 protocol service interface using the N-primitves of the
 .BR npi (7).
 THis interface is intended solely for use by user programs or protocol modules
@@ -152,7 +154,7 @@ requiring the common
 service interface.  In particular, the
 .BR npi (7)
 interface to
-.BR x25 (4)
+.BR x25-plp (4)
 is often used by CONS
 .[
 x223
@@ -234,57 +236,604 @@ typedef union N_qos_x25 {
 .PP
 NPI defines the following standard CONS Quality of Service parameter formats
 that are also applicable to X.25:
+.\"
 .SS N_QOS_CO_RANGE
 .PP
-Used with \fBN_CONN_REQ\fP(7) and \fBN_CONN_IND\fP(7), the structure indicates
-the range of Quality of Service parameters from which the NS User is permitted
-to select.
-.SS N_QOS_CO_SEL
-.PP
-Used with \fBN_CONN_RES\fP(7) and \fBN_CONN_CON\fP(7), the structure indicates
-the Quality of Service parameters selected by the peer NS User and NS
-Provider.
-.SS N_QOS_CO_OPT_RANGE
-.PP
-Used with \fBN_OPTMGMT_REQ\fP(7) and \fBN_INFO_ACK\fP, specifies the range of
-Quality of Service parameters acceptable to the NS User.
-.SS N_QOS_CO_OPT_SEL
-.PP
-Used with \fBN_OPTMGMT_REQ\fP(7) and \fBN_INFO_ACK\fP, specifies the Quality
-of Service parameters selected for the connection.
-.PP
-NPI defines the following X.25 and non-X.25 Quality of Service and Facilities
-parameter formats that are applicable to X.25:
-.SS N_QOS_X25_RANGE
-.PP
-Used with \fBN_CONN_REQ\fP(7) and \fBN_CONN_IND\fP(7), the structure indicates
+Used with \fB\)N_CONN_REQ\fP(7) and \fB\)N_CONN_IND\fP(7), the structure indicates
 the range of Quality of Service parameters from which the NS User is permitted
 to select.
 .PP
 .nf
 \f(CW\s-1\
 typedef struct {
-	np_ulong n_qos_type; /* always N_QOS_X25_RANGE */
+    np_ulong n_qos_type;                /* always N_QOS_CO_RANGE */
+    thru_values_t src_throughput_range; /* source throughput range */
+    thru_values_t dest_throughput_range; /* destination throughput range */
+    td_values_t transit_delay_range;    /* transit delay range */
+    protection_values_t protection_range; /* protection range */
+    priority_values_t priority_range;   /* priority range */
+} N_qos_co_range_t;
+\s+1\fP
+.fi
+.TP \w'\ \fI\)dest_throughput_range\fR\(em'u
+.I n_qos_type
+The quality-of-service parameter structure type.  Always
+.BR N_QOS_CO_RANGE .
+.PD 0
+.TP
+.I src_throughput_range
+Specifies the source throughput range.
+.TP
+.I dest_throughput_range
+Specifies the destination throughput range.
+.TP
+.I transit_delay_range
+Specifies the transit delay range.
+.TP
+.I protection_range
+Specifies the network connection protection range.
+.TP
+.I priority_range
+Specifies the network connection priority range.
+.PD
+.\"
+.SS N_QOS_CO_SEL
+.PP
+Used with \fB\)N_CONN_RES\fP(7) and \fB\)N_CONN_CON\fP(7), the structure indicates
+the Quality of Service parameters selected by the peer NS User and NS
+Provider.
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    np_ulong n_qos_type;         /* always N_QOS_CO_SEL */
+    np_long src_throughput_sel;  /* source throughput selected */
+    np_long dest_throughput_sel; /* destination throughput selected */
+    np_long transit_delay_sel;   /* transit delay selected */
+    np_long protection_sel;      /* NC protection selected */
+    np_long priority_sel;        /* NC priority selected */
+} N_qos_co_sel_t;
+\s+1\fP
+.fi
+.TP \w'\ \fI\)dest_throughput_sel\fR\(em'u
+.I n_qos_type
+The quality-of-service parameter structure type.  Always
+.BR N_QOS_CO_SEL .
+.PD 0
+.TP
+.I src_throughput_sel
+Specifies the source throughput selection.
+.TP
+.I dest_throughput_sel
+Specifies the destination throughput selection.
+.TP
+.I transit_delay_sel
+Specifies the transit delay selection.
+.TP
+.I protection_sel
+Specifies the network connection protection selection.
+.TP
+.I priority_sel
+Specifies the network connection priority selection.
+.PD
+.\"
+.SS N_QOS_CO_OPT_RANGE
+.PP
+Used with \fB\)N_OPTMGMT_REQ\fP(7) and \fB\)N_INFO_ACK\fP, specifies the range of
+Quality of Service parameters acceptable to the NS User.
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    np_ulong n_qos_type;                /* always N_QOS_CO_OPT_RANGE */
+    thru_values_t src_throughput;       /* source throughput values */
+    thru_values_t dest_throughput;      /* dest throughput values */
+    td_values_t transit_delay_t;        /* transit delay values */
+    np_long nc_estab_delay;             /* NC establishment delay */
+    np_ulong nc_estab_fail_prob;        /* NC estab failure probability */
+    np_ulong residual_error_rate;       /* residual error rate */
+    np_ulong xfer_fail_prob;            /* transfer failure probability */
+    np_ulong nc_resilience;             /* NC resilience */
+    np_long nc_rel_delay;               /* NC release delay */
+    np_ulong nc_rel_fail_prob;          /* NC release failure probability */
+    protection_values_t protection_range; /* protection range */
+    priority_values_t priority_range;   /* priority range */
+    np_long max_accept_cost;            /* maximum acceptable cost */
+} N_qos_co_opt_range_t;
+\s+1\fP
+.fi
+.TP \w'\ \fI\)residual_error_rate\fR\(em'u
+.I n_qos_type
+The quality-of-service parameter structure type.  Always
+.BR N_QOS_CO_OPT_RANGE .
+.PD 0
+.TP
+.I src_throughput
+Specifies the source throughput range.
+.TP
+.I dest_throughput
+Specifies the destination throughput range.
+.TP
+.I transit_delay_t
+Specifies the transit delay value.
+.TP
+.I nc_estab_delay
+Specifies the network connection establishment delay.
+.TP
+.I nc_estab_fail_prob
+Specifies the probability of network connection establishment failure.
+.TP
+.I residual_error_rate
+Specifies the residual error rate.
+.TP
+.I xfer_fail_prob
+Specifies the transfer failure probability.
+.TP
+.I nc_resilience
+Specifies the network connection resilience.
+.TP
+.I nc_rel_delay
+Specifies the network connection release delay.
+.TP
+.I nc_rel_fail_prob
+Specifies the network connection release failure probability.
+.TP
+.I protection_range
+Specifies the network connection protection range.
+.TP
+.I priority_range
+Specifies the network connection priority range.
+.TP
+.I max_accept_cost
+Specifies the maximum acceptable cost.
+.PD
+.\"
+.SS N_QOS_CO_OPT_SEL
+.PP
+Used with \fB\)N_OPTMGMT_REQ\fP(7) and \fB\)N_INFO_ACK\fP, specifies the Quality
+of Service parameters selected for the connection.
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    np_ulong n_qos_type;           /* always N_QOS_CO_OPT_SEL */
+    thru_values_t src_throughput;  /* source throughput values */
+    thru_values_t dest_throughput; /* dest throughput values */
+    td_values_t transit_delay_t;   /* transit delay values */
+    np_long nc_estab_delay;        /* NC establishment delay */
+    np_ulong nc_estab_fail_prob;   /* NC estab failure probability */
+    np_ulong residual_error_rate;  /* residual error rate */
+    np_ulong xfer_fail_prob;       /* transfer failure probability */
+    np_ulong nc_resilience;        /* NC resilience */
+    np_long nc_rel_delay;          /* NC release delay */
+    np_ulong nc_rel_fail_prob;     /* NC release failure probability */
+    np_long protection_sel;        /* protection selected */
+    np_long priority_sel;          /* priority selected */
+    np_long max_accept_cost;       /* maximum acceptable cost */
+} N_qos_co_opt_sel_t;
+\s+1\fP
+.fi
+.TP \w'\ \fI\)residual_error_rate\fR\(em'u
+.I n_qos_type
+The quality-of-service parameter structure type.  Always
+.BR N_QOS_CO_OPT_SEL .
+.PD 0
+.TP
+.I src_throughput
+Specifies the source throughput range.
+.TP
+.I dest_throughput
+Specifies the destination throughput range.
+.TP
+.I transit_delay_t
+Specifies the transit delay value.
+.TP
+.I nc_estab_delay
+Specifies the network connection establishment delay.
+.TP
+.I nc_estab_fail_prob
+Specifies the probability of network connection establishment failure.
+.TP
+.I residual_error_rate
+Specifies the residual error rate.
+.TP
+.I xfer_fail_prob
+Specifies the transfer failure probability.
+.TP
+.I nc_resilience
+Specifies the network connection resilience.
+.TP
+.I nc_rel_delay
+Specifies the network connection release delay.
+.TP
+.I nc_rel_fail_prob
+Specifies the network connection release failure probability.
+.TP
+.I protection_sel
+Specifies the network connection protection selection.
+.TP
+.I priority_sel
+Specifies the network connection priority selection.
+.TP
+.I max_accept_cost
+Specifies the maximum acceptable cost.
+.PD
+.\"
+.PP
+NPI defines the following X.25 and non-X.25 Quality of Service and Facilities
+parameter formats that are applicable to X.25:
+.\"
+.SS N_QOS_X25_RANGE
+.PP
+Used with \fB\)N_CONN_REQ\fP(7) and \fB\)N_CONN_IND\fP(7), the structure indicates
+the range of Quality of Service parameters from which the NS User is permitted
+to select.
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    np_ulong n_qos_type;                /* always N_QOS_X25_RANGE */
+    thru_values_t src_throughput_range; /* source throughput range */
+    thru_values_t dest_throughput_range; /* destination throughput range */
+    td_values_t transit_delay_range;    /* transit delay range */
+    protection_values_t protection_range; /* protection range */
+    priority_values_t priority_range;   /* priority range */
+    fac_values_t packet_size;           /* packet size range */
+    fac_values_t window_size;           /* window size range */
+    np_long nsdulimit;                  /* NSDU limit */
 } N_qos_x25_range_t;
 \s+1\fP
 .fi
+.PP
+The
+.B N_qos_x25_range_t
+structure has the following members that are in common with the
+.B N_qos_co_range_t
+structure:
+.TP \w'\ \fI\)dest_throughput_range\fR\(em'u
+.I n_qos_type
+The quality-of-service parameter structure type.  Always
+.BR N_QOS_X25_RANGE .
+.PD 0
+.TP
+.I src_throughput_range
+Specifies the source throughput range.
+.TP
+.I dest_throughput_range
+Specifies the destination throughput range.
+.TP
+.I transit_delay_range
+Specifies the transit delay range.
+.TP
+.I protection_range
+Specifies the network connection protection range.
+.TP
+.I priority_range
+Specifies the network connection priority range.
+.PD
+.PP
+The
+.B N_qos_x25_range_t
+structure has the following additional members:
+.TP \w'\ \fI\)dest_throughput_range\fR\(em'u
+.I packet_size
+Specifies the packet size range.
+.PD 0
+.TP
+.I window_size
+Specifies the window size range.
+.TP
+.I nsdulimit
+Specifies the NSDU limit range.
+.PD
+.\"
 .SS N_QOS_X25_SEL
 .PP
-Used with \fBN_CONN_RES\fP(7) and \fBN_CONN_CON\fP(7), the structure indicates
+Used with \fB\)N_CONN_RES\fP(7) and \fB\)N_CONN_CON\fP(7), the structure indicates
 the Quality of Service parameters selected by the peer NS User and NS
 Provider.
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    np_ulong n_qos_type;          /* always N_QOS_X25_SEL */
+    np_long src_throughput_sel;   /* source throughput selected */
+    np_long dest_throughput_sel;  /* destination throughput selected */
+    np_long transit_delay_sel;    /* transit delay selected */
+    np_long protection_sel;       /* NC protection selected */
+    np_long priority_sel;         /* NC priority selected */
+    np_long packet_size;          /* packet size */
+    np_long window_size;          /* window size */
+    np_long nsdulimit;            /* NSDU limit */
+} N_qos_x25_sel_t;
+\s+1\fP
+.fi
+.PP
+The
+.B N_qos_x25_sel_t
+structure has the following members that are in common with the
+.B N_qos_co_sel_t
+structure:
+.TP \w'\ \fI\)dest_throughput_sel\fR\(em'u
+.I n_qos_type
+The quality-of-service parameter structure type.  Always
+.BR N_QOS_X25_SEL .
+.PD 0
+.TP
+.I src_throughput_sel
+Specifies the source throughput selection.
+.TP
+.I dest_throughput_sel
+Specifies the destination throughput selection.
+.TP
+.I transit_delay_sel
+Specifies the transit delay selection.
+.TP
+.I protection_sel
+Specifies the network connection protection selection.
+.TP
+.I priority_sel
+Specifies the network connection priority selection.
+.PD
+.PP
+The
+.B N_qos_x25_sel_t
+structure has the following additional members:
+.TP \w'\ \fI\)dest_throughput_sel\fR\(em'u
+.I packet_size
+Specifies the packet size.
+.PD 0
+.TP
+.I window_size
+Specifies the window size.
+.TP
+.I nsdulimit
+Specifies the NSDU limit.
+.PD
+.\"
 .SS N_QOS_X25_OPT_RANGE
 .PP
-Used with \fBN_OPTMGMT_REQ\fP(7) and \fBN_INFO_ACK\fP, specifies the range of
+Used with \fB\)N_OPTMGMT_REQ\fP(7) and \fB\)N_INFO_ACK\fP, specifies the range of
 Quality of Service parameters acceptable to the NS User.
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    np_ulong n_qos_type;                /* always N_QOS_X25_OPT_RANGE */
+    thru_values_t src_throughput;       /* source throughput values */
+    thru_values_t dest_throughput;      /* destination throughput values */
+    td_values_t transit_delay_t;        /* transit delay values */
+    np_long nc_estab_delay;             /* NC establishment delay */
+    np_ulong nc_estab_fail_prob;        /* NC establishment failure probability */
+    np_ulong residual_error_rate;       /* residual error rate */
+    np_ulong xfer_fail_prob;            /* transfer failure probability */
+    np_ulong nc_resilience;             /* NC resilience */
+    np_long nc_rel_delay;               /* NC release delay */
+    np_ulong nc_rel_fail_prob;          /* NC release failure probability */
+    protection_values_t protection_range; /* protection range */
+    priority_values_t priority_range;   /* priority range */
+    np_long max_accept_cost;            /* maximum acceptable cost */
+    np_long packet_size;                /* packet size range */
+    np_long window_size;                /* window size range */
+    np_long nsdulimit;                  /* NSDU limit */
+    np_ulong nui_range;
+    np_ulong rpoa_range;
+    np_ulong cug_range;
+    np_ulong chg_cd_range;
+    np_ulong chg_sc_range;
+    np_ulong chg_mu_range;
+} N_qos_x25_opt_range_t;
+\s+1\fP
+.fi
+.PP
+The
+.B N_qos_x25_opt_range_t
+structure has the following members that are in common with the
+.B N_qos_co_opt_range_t
+structure:
+.TP \w'\ \fI\)residual_error_rate\fR\(em'u
+.I n_qos_type
+The quality-of-service parameter structure type.  Always
+.BR N_QOS_X25_OPT_RANGE .
+.PD 0
+.TP
+.I src_throughput
+Specifies the source throughput range.
+.TP
+.I dest_throughput
+Specifies the destination throughput range.
+.TP
+.I transit_delay_t
+Specifies the transit delay value.
+.TP
+.I nc_estab_delay
+Specifies the network connection establishment delay.
+.TP
+.I nc_estab_fail_prob
+Specifies the probability of network connection establishment failure.
+.TP
+.I residual_error_rate
+Specifies the residual error rate.
+.TP
+.I xfer_fail_prob
+Specifies the transfer failure probability.
+.TP
+.I nc_resilience
+Specifies the network connection resilience.
+.TP
+.I nc_rel_delay
+Specifies the network connection release delay.
+.TP
+.I nc_rel_fail_prob
+Specifies the network connection release failure probability.
+.TP
+.I protection_range
+Specifies the network connection protection range.
+.TP
+.I priority_range
+Specifies the network connection priority range.
+.TP
+.I max_accept_cost
+Specifies the maximum acceptable cost.
+.PD
+.PP
+The
+.B N_qos_x25_opt_range_t
+structure has the following additional members:
+.TP \w'\ \fI\)residual_error_rate\fR\(em'u
+.I packet_size
+Specifies the packet size.
+.PD 0
+.TP
+.I window_size
+Specifies the window size.
+.TP
+.I nsdulimit
+Specifies the NSDU limit.
+.TP
+.I nui_range
+.TP
+.I rpoa_range
+.TP
+.I cug_range
+.TP
+.I chg_cd_range
+.TP
+.I chg_sc_range
+.TP
+.I chg_mu_range
+.PD
+.\"
 .SS N_QOS_X25_OPT_SEL
 .PP
-Used with \fBN_OPTMGMT_REQ\fP(7) and \fBN_INFO_ACK\fP, specifies the Quality
+Used with \fB\)N_OPTMGMT_REQ\fP(7) and \fB\)N_INFO_ACK\fP, specifies the Quality
 of Service parameters selected for the connection.
-
-
+.PP
+.nf
+\f(CW\s-1\
+typedef struct {
+    np_ulong n_qos_type;            /* always N_QOS_X25_OPT_SEL */
+    thru_values_t src_throughput;   /* source throughput values */
+    thru_values_t dest_throughput;  /* destination throughput values */
+    td_values_t transit_delay_t;    /* transit delay values */
+    np_long nc_estab_delay;         /* NC establishment delay */
+    np_ulong nc_estab_fail_prob;    /* NC establishment failure probability */
+    np_ulong residual_error_rate;   /* residual error rate */
+    np_ulong xfer_fail_prob;        /* trhansfer failure probability */
+    np_ulong nc_resilience;         /* NC resilience */
+    np_long nc_rel_delay;           /* NC release delay */
+    np_ulong nc_rel_fail_prob;      /* NC release failure probability */
+    np_long protection_sel;         /* protection selected */
+    np_long priority_sel;           /* priority selected */
+    np_long max_accept_cost;        /* maximum acceptable cost */
+    fac_values_t packet_size;       /* packet size */
+    fac_values_t window_size;       /* window size */
+    np_long nsdulimit;              /* NSDU limit */
+    nui_string_t nui;
+    rpoa_string_t rpoa;
+    cug_string_t cug;
+    chg_cd_string_t chd_cd;
+    chg_sc_string_t chg_sc;
+    chg_mu_string_t chg_mu;
+    fac_string_t facilites;         /* raw non-X.25 facilities */
+} N_qos_x25_opt_sel_t;
+\s+1\fP
+.fi
+.PP
+The
+.B N_qos_x25_opt_sel_t
+structure has the following members that are in common with the
+.B N_qos_co_opt_sel_t
+structure:
+.TP \w'\ \fI\)residual_error_rate\fR\(em'u
+.I n_qos_type
+The quality-of-service parameter structure type.  Always
+.BR N_QOS_X25_OPT_SEL .
+.PD 0
+.TP
+.I src_throughput
+Specifies the source throughput range.
+.TP
+.I dest_throughput
+Specifies the destination throughput range.
+.TP
+.I transit_delay_t
+Specifies the transit delay value.
+.TP
+.I nc_estab_delay
+Specifies the network connection establishment delay.
+.TP
+.I nc_estab_fail_prob
+Specifies the probability of network connection establishment failure.
+.TP
+.I residual_error_rate
+Specifies the residual error rate.
+.TP
+.I xfer_fail_prob
+Specifies the transfer failure probability.
+.TP
+.I nc_resilience
+Specifies the network connection resilience.
+.TP
+.I nc_rel_delay
+Specifies the network connection release delay.
+.TP
+.I nc_rel_fail_prob
+Specifies the network connection release failure probability.
+.TP
+.I protection_sel
+Specifies the network connection protection selection.
+.TP
+.I priority_sel
+Specifies the network connection priority selection.
+.TP
+.I max_accept_cost
+Specifies the maximum acceptable cost.
+.PD
+.PP
+The
+.B N_qos_x25_opt_sel_t
+structure has the following additional members:
+.TP \w'\ \fI\)residual_error_rate\fR\(em'u
+.I packet_size
+Specifies the packet size range.
+.PD 0
+.TP
+.I window_size
+Specifies the window size range.
+.TP
+.I nsdulimit
+Specifies the NSDU limit range.
+.TP
+.I nui
+.TP
+.I rpoa
+.TP
+.I cug
+.TP
+.I chd_cd
+.TP
+.I chg_sc
+.TP
+.I chg_mu
+.TP
+.I facilites
+Specifies raw, non-X.25 facilities.
+.PD
+.\"
 .SS N_BIND_REQ\fR(7)
 .PP
+.TP
+.I BIND_flags
+Specifies the bind flags.
+.I SpiderX25
+.[
+spiderx25
+.]
+provides the additional flag,
+.BR X25_EXT_REQUEST ,
+to request that these X.25 extensions to the NPI be provided by the NS
+provider on the bound Stream.
 .TP
 .I ADDR_length ", " ADDR_offset
 Specifies the length and offset from the beginning of the
@@ -292,6 +841,148 @@ Specifies the length and offset from the beginning of the
 message block of the network address to be bound to the Stream.
 .TP
 .I PROTOID_length ", " PROTOID_offset
+.\"
+.\"
+.SH COMPATIBILITY
+.PP
+The X.25 extensions to the Network Provider Interface (NPI),
+.[
+npi revision 2.0.0 draft 2
+.]
+.BR npi (7),
+are compatible with
+.IR SpiderX25 ,
+.[
+spiderx25
+.]
+and implementations based on SpiderX25, such as
+.IR "AIXlink/X.25" ,
+.[
+aixlink
+.]
+.IR "HP-UX X.25" ,
+.[
+hpuxdoc
+.]
+.IR "IRIS SX.25" ,
+.[
+sx25
+.]
+.IR "Solstice X.25" ,
+.[
+solx25pg
+.]
+.IR "PT X.25" ,
+.[
+ptx25
+.]
+.IR "SBE X.25" ,
+.[
+sbex25
+.]
+.IR "RadiSys WAN" ,
+.[
+radwan
+.]
+and other implementations based on NPI and SpiderX25, with the following
+portability considerations:
+.IP \(em \w'\(em\(em'u
+Not all implementations provide the same extensions in the same ways.
+.IP \(em
+\fI\)SpiderX25\fP uses the \fB\)N_QUAL_FLAG\fP to indicate that the Q-bit
+should be set on data frames; \fI\)AIXlink/X.25\fP uses the \fB\)N_Q_FLAG\fP.
+\fB\)@PACKAGE_TITLE@\fP recognizes both or either of these two flags.
+.IP \(em
+\fI\)SpiderX25\fP uses a flag to the
+.BR N_BIND_REQ (7)
+primitive, \fB\)X25_EXT_REQUEST\fP, to request that the additional X.25
+extension capabilities be provided.  Drivers and modules unable to support
+these extensions should respond with a
+.BR N_ERROR_ACK (7)
+with a \fB\)N_BADFLAG\fP error to indicate that they are unable to support
+these X.25 extensions.
+.IP \(em
+In general there is no widely accepted way of providing an X.25 address.
+Implementations based closely on
+.I SpiderX25
+use that address format;
+.I AIXlink/X.25
+uses yet another format.
+.B @PACKAGE_TITLE@
+prefers to use
+.B sockaddr
+formatted addresses for all protocol modules.
+.IP \(em
+.IP \(em
+An attempt is made for source compatibility with as many implementations as
+possible.  Binary compatibility is not guaranteed.  In many instances, some
+implementations used different constant values for some symbols that other
+implementations.  Where possible, source flags, such as \fB\)_SUN_SOURCE\fP,
+are used to select the appropriate extensions.
+.PP
+For additional compatibility considerations, see
+.BR plp (4),
+.BR s_nli3 (4),
+.BR s_npi (4),
+.BR npi (7),
+.BR STREAMS (9).
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+This interface conforms in its core features to the NPI as document in
+AIXlink/X.25,
+.[
+aixlink
+.]
+HP-UX X.25,
+.[
+hpuxdoc
+.]
+IRIS SX.25,
+.[
+sx25
+.]
+Solstice X.25,
+.[
+solx25pg
+.]
+PT X.25,
+.[
+ptx25
+.]
+SBE X.25,
+.[
+sbex25
+.]
+RadiSys WAN,
+.[
+radwan
+.]
+documentation.
+.\"
+.\"
+.SH HISTORY
+.PP
+The Network Provider Interface first appeared in SVR 4.
+.[
+svr4
+.]
+Prior to the
+.IR "Network Provider Interface (NPI)" ,
+.[
+npi revision 2.0.0 draft 2
+.]
+.BR npi (7),
+the most widely used interface was the
+.IR "Network Layer Interface (NLI)" ,
+.[
+nli revision @PACKAGE_VERSION@ draft @PACKAGE_RELEASE@
+.]
+.BR nli (7),
+specified by Spider Systems Ltd.
+.\"
+.\"
 .[
 $LIST$
 .]

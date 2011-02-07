@@ -2,7 +2,7 @@
 '\" rtp
 .\" -*- nroff -*- vim: ft=nroff nocin nosi
 .\"
-.\" @(#) $Id: strwput.9.man,v 1.1.2.1 2009-06-21 10:38:57 brian Exp $
+.\" @(#) $Id: strwput.9.man,v 1.1.2.2 2011-02-07 02:18:46 brian Exp $
 .\"
 .\" =========================================================================
 .\"
@@ -54,11 +54,14 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:38:57 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:46 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: strwput.9.man,v $
+.\" Revision 1.1.2.2  2011-02-07 02:18:46  brian
+.\" - updated manual pages
+.\"
 .\" Revision 1.1.2.1  2009-06-21 10:38:57  brian
 .\" - added files to new distro
 .\"
@@ -174,7 +177,7 @@ nor
 procedure should be called directly.
 .BR strwput ()
 should be invoked by calling
-.BR put (9)
+.BR put (9s)
 instead.
 .BR strwsrv ()
 should be invoked by calling

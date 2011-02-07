@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: OpenSS7.4.man,v 1.1.2.1 2009-06-21 10:34:45 brian Exp $
+.\" @(#) $Id: OpenSS7.4.man,v 1.1.2.2 2011-02-07 02:18:08 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:34:45 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:08 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: OpenSS7.4.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:34:45  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:18:08  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,9 +102,11 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
+.ad b
+.hy 6
 .\"
 .\"
 .TH OpenSS7 4 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Devices"
@@ -129,8 +131,7 @@ device and module groupings and some of the members within each grouping.
 .SS Drivers and Modules
 .PP
 The OpenSS7 stacks provides the following major driver and module groupings:
-.TP
-.BR SS7 (4)
+.SS SS7\fR(4)
 The
 .B OpenSS7
 SS7
@@ -140,11 +141,9 @@ q700
 stack consists of the following components (see
 .BR SS7 (4)
 for more information):
-.sp
-.TS
-tab(:);
-lbl.
-isup\fR(4):ISDN User Part (ISUP)
+.TP \w'\ \fB\)pca200e\fR(4)\(em'u
+.BR isup (4)
+ISDN User Part (ISUP)
 .[
 q761
 .]
@@ -154,21 +153,29 @@ t1.113
 .[
 isupv4
 .]
-bicc\fR(4):Bearer Independent Call Control (BICC)
+.PD 0
+.TP
+.BR bicc (4)
+Bearer Independent Call Control (BICC)
 .[
 q1902
 .]
 .[
 t1bicc
 .]
-tcap\fR(4):Transaction Capabilities Application Part (TCAP)
+.TP
+.BR tcap (4)
+Transaction Capabilities Application Part (TCAP)
 .[
 q771
 .]
 .[
 t1.114
 .]
-sccp\fR(4):Signalling Connection Control Part (SCCP)
+T}
+.TP
+.BR sccp (4)
+Signalling Connection Control Part (SCCP)
 .[
 q711
 .]
@@ -181,7 +188,9 @@ sccpv2
 .[
 jtq711
 .]
-mtp\fR(4):Message Transfer Part Level 3 (MTP3)
+.TP
+.BR mtp (4)
+Message Transfer Part Level 3 (MTP3)
 .[
 q704
 .]
@@ -197,7 +206,10 @@ jtq704
 .[
 q2210
 .]
-sl\fR(4):Message Trasnfer Part Level 2 (MTP2), or Signalling Link (SL)
+.TP
+.BR sl (4)
+Message Transfer Part Level 2 (MTP2),
+or Signalling Link (SL)
 .[
 q703
 .]
@@ -210,46 +222,60 @@ t1.111
 .[
 mtpv1
 .]
-sdt\fR(4):Signalling Terminal (SDT)
-.[
-q702
-.]
-.[
-t1.111
-.]
-.[
-mtpv1
-.]
-sdl\fR(4):Signalling Data Link (SDL)
-.[
-q702
-.]
-.[
-t1.111
-.]
-.[
-mtpv1
-.]
-acb56\fR(4):V.35 driver for the SeaLevel ACB56 card
-x100p\fR(4):Single E1 or T1 driver for the T100P-SS7 or E100P-SS7 card
-x400p\fR(4):Quad E1 or T1 driver for the T400P-SS7 or E400P-SS7 card
-pca200e\fR(4):STS-3 driver for the PCA-200E card
-cpc388\fR(4):H.110 driver for the CPC-388 card
-.TE
 .TP
-.BR INET (4)
+.BR sdt (4)
+Signalling Terminal (SDT)
+.[
+q702
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+.TP
+.BR sdl (4)
+Signalling Data Link (SDL)
+.[
+q702
+.]
+.[
+t1.111
+.]
+.[
+mtpv1
+.]
+.TP
+.BR acb56 (4)
+V.35 driver for the SeaLevel ACB56 card
+.TP
+.BR x100p (4)
+Single E1 or T1 driver for the T100P-SS7 or E100P-SS7 card
+.TP
+.BR x400p (4)
+Quad E1 or T1 driver for the T400P-SS7 or E400P-SS7 card
+.TP
+.BR pca200e (4)
+STS-3 driver for the PCA-200E card
+.TP
+.BR cpc388 (4)
+H.110 driver for the CPC-388 card
+.PD
+.SS INET\fR(4)
 The
 .B OpenSS7 (4)
 INET
 stack consists of the following components (see
 .BR INET (4)
 for more information):
-.sp
-.TS
-tab(:);
-lbl.
-socksys\fR(4):Socket System
-sctp\fR(4):Stream Control Transmission Protocol (SCTP)
+.TP \w'\ \fB\)pca200e\fR(4)\(em'u
+.BR socksys (4)
+Socket System
+.PD 0
+.TP
+.BR sctp (4)
+Stream Control Transmission Protocol (SCTP)
 .[
 rfc2960
 .]
@@ -262,15 +288,29 @@ rfc3758
 .[
 draft-stewart-tsvwg-addip-07.txt
 .]
-sscop\fR(4):Service Specific Connection Oriented Protocol (SSCOP)
-tcp\fR(4):Transmission Control Protocol (TCP)
-udp\fR(4):User Datagram Protocol (UDP)
-ip\fR(4):Internet Protocol (IP)
-timod\fR(4):Transport Interface Module (TIMOD)
-sockmod\fR(4):Socket Module (SOCKMOD)
-ldl\fR(4):Linux DL (LDL)
-.TE
-.sp
+.TP
+.BR sscop (4)
+Service Specific Connection Oriented Protocol (SSCOP)
+.TP
+.BR tcp (4)
+Transmission Control Protocol (TCP)
+.TP
+.BR udp (4)
+User Datagram Protocol (UDP)
+.TP
+.BR ip (4)
+Internet Protocol (IP)
+.TP
+.BR timod (4)
+Transport Interface Module (TIMOD)
+.TP
+.BR sockmod (4)
+Socket Module (SOCKMOD)
+.TP
+.BR ldl (4)
+Linux DL (LDL)
+.PD
+.PP
 Note that
 .B OpenSS7
 also provides a Linux NET4 native kernel socket implementation of Stream
@@ -288,7 +328,7 @@ for more information on this
 implementation.
 The sockets implementation can also be used with TPI
 .[
-TPI Revision 2.0.0
+tpi revision 2.0.0 draft 2
 .]
 and XTI
 .[
@@ -304,84 +344,159 @@ package as is used for
 See
 .BR sctp (4)
 for more information.
-.TP
+.SS SIGTRAN\fR(4)
+The
+.BR OpenSS7 (4)
+SIGTRAN stack consists of the following components (see
 .BR SIGTRAN (4)
-.sp
-.TS
-tab(:);
-lbl.
-bua\fR(4):BICC-User Adaptation Layer (BUA)
-isua\fR(4):ISUP-User Adaptation Layer (ISUA)
-tua\fR(4):TCAP-User Adaptation Layer (TUA)
-sua\fR(4):SCCP-User Adaptation Layer (SUA)
-m3ua\fR(4):MTP3-User Adaptation Layer (M3UA)
-m2ua\fR(4):MTP2-User Adaptation Layer (M2UA)
-m2pa\fR(4):MTP2-User Peer-to-Peer Adaptation Layer (M2PA)
-iua\fR(4):ISDN-Q.921 Adaptation Layer (IUA)
-dua\fR(4):DPNSS/DASS 2 Adaptation Layer (DUA)
-v5ua\fR(4):V5.2 Adaptation Layer (V5UA)
-gr303ua\fR(4):GR-303 Adaptation Layer (GR303UA)
-.TE
+for more information):
+.TP \w'\ \fB\)pca200e\fR(4)\(em'u
+.BR bua (4)
+BICC-User Adaptation Layer (BUA)
+.PD 0
 .TP
-.BR ISDN (4)
-.sp
-.TS
-tab(:);
-lbl.
-isdn\fR(4):Integrated Service Digital Network (ISDN) Q.931
-capi\fR(4):Common-ISDN API (CAPI)
-v5\fR(4):V5.2
-gr303\fR(4):GR-303
-dl\fR(4):Data Link (DL)
-hdlc\fR(4):High-Level Data Link Control (HDLC)
-x100p\fR(4):Single E1 or T1 driver for the T100P-SS7 or E100P-SS7 card
-x400p\fR(4):Quad E1 or T1 driver for the T400P-SS7 or E400P-SS7 card
-pca200e\fR(4):STS-3 driver for the PCA-200E card
-cpc388\fR(4):H.110 driver for the CPC-388 card
-.TE
+.BR isua (4)
+ISUP-User Adaptation Layer (ISUA)
 .TP
-.BR VOIP (4)
-.sp
-.TS
-tab(:);
-lbl.
-h225\fR(4):
-sipt\fR(4):Session Initiation Protocol (SIP) for Telephones (SIP-T)
-bicc\fR(4):Bearer Independent Call Control (BICC)
-.TE
+.BR tua (4)
+TCAP-User Adaptation Layer (TUA)
 .TP
-.BR MG (4)
-.sp
-.TS
-tab(:);
-lbl.
-mgc\fR(4):Media Gateway Controller (MGC)
-mg\fR(4):Media Gateway (MG)
-mgcp\fR(4):Media Gateway Control Protocol (MGCP)
-h248\fR(4):Gateway Control Protocol (MEGACO)
-mx\fR(4):Multiplex (MX)
-rt\fR(4):Real-Time Transport Protocol (RTP)
-x100p\fR(4):Single E1 or T1 driver for the T100P-SS7 or E100P-SS7 card
-x400p\fR(4):Quad E1 or T1 driver for the T400P-SS7 or E400P-SS7 card
-pca200e\fR(4):STS-3 driver for the PCA-200E card
-cpc388\fR(4):H.110 driver for the CPC-388 card
-.TE
+.BR sua (4)
+SCCP-User Adaptation Layer (SUA)
 .TP
-.BR STREAMS (4)
-.sp
-.TS
-tab(:);
-lbl.
-fifo\fR(4):
-clone\fR(4):
-sad\fR(4):
-ldl\fR(4):
-inet\fR(4):
-pipemod\fR(4):
-timod\fR(4):
-sockmod\fR(4):
-socksys\fR(4):
-.TE
+.BR m3ua (4)
+MTP3-User Adaptation Layer (M3UA)
+.TP
+.BR m2ua (4)
+MTP2-User Adaptation Layer (M2UA)
+.TP
+.BR m2pa (4)
+MTP2-User Peer-to-Peer Adaptation Layer (M2PA)
+.TP
+.BR iua (4)
+ISDN-Q.921 Adaptation Layer (IUA)
+.TP
+.BR dua (4)
+DPNSS/DASS 2 Adaptation Layer (DUA)
+.TP
+.BR v5ua (4)
+V5.2 Adaptation Layer (V5UA)
+.TP
+.BR gr303ua (4)
+GR-303 Adaptation Layer (GR303UA)
+.PD
+.SS ISDN\fR(4)
+.PP
+.TP \w'\ \fB\)pca200e\fR(4)\(em'u
+.BR isdn (4)
+Integrated Service Digital Network (ISDN) Q.931.
+.PD 0
+.TP
+.BR capi (4)
+Common-ISDN API (CAPI).
+.TP
+.BR v5 (4)
+V5.2.
+.TP
+.BR gr303 (4)
+GR-303.
+.TP
+.BR dl (4)
+Data Link (DL).
+.TP
+.BR hdlc (4)
+High-Level Data Link Control (HDLC).
+.TP
+.BR x100p (4)
+One E1/T1 driver for the T100P/E100P-SS7 card.
+.TP
+.BR x400p (4)
+Quad E1/T1 driver for the T400P/E400P-SS7 card.
+.TP
+.BR pca200e (4)
+STS-3 driver for the PCA 200E card.
+.TP
+.BR cpc388 (4)
+H.110 driver for the CPC 388 card.
+.PD
+.SS VOIP\fR(4)
+.PP
+.TP \w'\ \fB\)pca200e\fR(4)\(em'u
+.BR h225 (4)
+H.225.
+.PD 0
+.TP
+.BR sipt (4)
+Session Initiation Protocol (SIP) for Telephones (SIP-T)
+.TP
+.BR bicc (4)
+Bearer Independent Call Control (BICC)
+.PD
+.SS MG\fR(4)
+.PP
+.TP \w'\ \fB\)pca200e\fR(4)\(em'u
+.BR mgc (4)
+Media Gateway Controller (MGC)
+.PD 0
+.TP
+.BR mg (4)
+Media Gateway (MG)
+.TP
+.BR mgcp (4)
+Media Gateway Control Protocol (MGCP)
+.TP
+.BR h248 (4)
+Gateway Control Protocol (MEGACO)
+.TP
+.BR mx (4)
+Multiplex (MX)
+.TP
+.BR rtp (4)
+Real-Time Transport Protocol (RTP)
+.TP
+.BR x100p (4)
+Single E1 or T1 driver for the T100P-SS7 or E100P-SS7 card
+.TP
+.BR x400p (4)
+Quad E1 or T1 driver for the T400P-SS7 or E400P-SS7 card
+.TP
+.BR pca200e (4)
+STS-3 driver for the PCA-200E card
+.TP
+.BR cpc388 (4)
+H.110 driver for the CPC-388 card
+.PD
+.SS STREAMS\fR(4)
+.PP
+.TP \w'\ \fB\)pca200e\fR(4)\(em'u
+.BR fifo (4s)
+First In First Out
+.PD 0
+.TP
+.BR clone (4)
+Clone Driver.
+.TP
+.BR sad (4)
+STREAMS Administrative Driver.
+.TP
+.BR ldl (4)
+Linux Data Link Driver.
+.TP
+.BR inet (4)
+Internet Protocol Driver.
+.TP
+.BR pipemod (4)
+Pipe module.
+.TP
+.BR timod (4)
+TPI IOCTL module.
+.TP
+.BR sockmod (4)
+Socket module.
+.TP
+.BR socksys (4)
+Socket system driver.
+.PD
 .\"
 .\"
 .SS Libraries
@@ -389,12 +504,14 @@ socksys\fR(4):
 The OpenSS7 stacks provide the following libraries:
 .TP
 .BR xti "(3), " xnet (3)
+.PD 0
 .TP
 .BR sockets (3)
 .TP
 .BR cframe (3)
 .TP
 .BR OpenSwitch (3)
+.PD
 .\"
 .\"
 .SH NOTICES
@@ -471,13 +588,13 @@ Need to list these.
 .BR mgcp (4),
 .BR h248 (4),
 .BR mx (4),
-.BR rt (4),
+.BR rtp (4),
 .BR x100p (4),
 .BR x400p (4),
 .BR pca200e (4),
 .BR cpc388 (4),
 .BR STREAMS (4),
-.BR fifo (4),
+.BR fifo (4s),
 .BR clone (4),
 .BR sad (4),
 .BR ldl (4),

@@ -2,28 +2,28 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: NLI.7.man,v 1.1.2.1 2009-06-21 10:36:04 brian Exp $
+.\" @(#) $Id: NLI.7.man,v 1.1.2.2 2011-02-07 02:18:20 brian Exp $
 .\"
 .\" =========================================================================
 .\"
-.\" Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 .\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 .\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual
-.\" under the terms of the GNU Free Documentation License, Version 1.3 or
-.\" any later version published by the Free Software Foundation; with no
-.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
-.\" copy of the license is included in the section entitled "GNU Free
-.\" Documentation License".
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaning to distribution of this documentation
+.\" advertising or publicity pertaining to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
-.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this
-.\" manual page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from
-.\" the use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
-.\" on behalf of the U.S. Government ("Government"), the following
-.\" provisions apply to you.  If the Software is supplied by the Department
-.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
-.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
-.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
-.\" Government is acquiring only the license rights granted herein (the
-.\" license rights customarily provided to non-Government users).  If the
-.\" Software is supplied to any unit or agency of the Government other than
-.\" DoD, it is classified as "Restricted Computer Software" and the
-.\" Government's rights in the Software are defined in paragraph 52.227-19
-.\" of the Federal Acquisition Regulations ("FAR") (or any successor
-.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
-.\" NASA Supplement to the FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,13 +81,13 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2009-06-21 10:36:04 $ by $Author: brian $
+.\" Last Modified $Date: 2011-02-07 02:18:20 $ by $Author: brian $
 .\"
 .\" -------------------------------------------------------------------------
 .\"
 .\" $Log: NLI.7.man,v $
-.\" Revision 1.1.2.1  2009-06-21 10:36:04  brian
-.\" - added files to new distro
+.\" Revision 1.1.2.2  2011-02-07 02:18:20  brian
+.\" - updated manual pages
 .\"
 .\" =========================================================================
 .R1
@@ -102,7 +102,7 @@ et-al " et al" 2 3
 abbreviate-label-ranges ".."
 sort-adjacent-labels
 search-truncate 40
-search-ignore T
+search-ignore CGIQOSTU
 .R2
 .so openss7.macros
 .\"
@@ -137,7 +137,11 @@ search-ignore T
 The Network Layer Interface (NLI) is a service primitive interface to the X.25
 Packet Layer Protocol (X25-PLP) developed by Spider Systems, Ltd. (now part of
 Emmerson Power) for use by applications in controlling X.25 Packet Layer
-Protocol software.  The service primitive interface was widely used on
+Protocol software.
+.[
+spiderx25
+.]
+The service primitive interface was widely used on
 VxWorks, other embedded RTOS,
 AIXlink/X.25,
 .[
@@ -185,13 +189,18 @@ NLI directly.
 and other \fBOpenSS7\fP applications, drivers and modules provide primarily a
 Network Provider Interface (NPI),
 .[
-npi revision 2.0.0
+npi revision 2.0.0 draft 2
 .]
 .BR npi (7),
 for devices at this level; however, a compatibility module,
-.BR s_nli (4),
-is provided to convert between NPI and SpiderX.25 NLI interface for the purposes
-of porting SpiderX.25 compatible applications, drivers and modules to
+.BR s_nli3 (4),
+is provided to convert between NPI and SpiderX25 NLI interface for the purposes
+of porting
+.I SpiderX25
+.[
+spiderx25
+.]
+compatible applications, drivers and modules to
 \fBLinux\fP.
 .\"
 .\"
@@ -262,13 +271,33 @@ Specifies the options required (or used) by the subnetwork to encode and
 interpret addresses.  It may have one of the following values:
 .RS
 .PP
+.bp
+.if \n(cR \{\
+.pl \n(nl+200
+.\}
 .TS
 tab(:);
 lbnls.
-NSAP_ADDR:0x00:\fINSAP\fP is OSI-encoded NSAP address.
-EXT_ADDR:0x01:\fINSAP\fP is non-OSI-encoded extended address.
-PVC_LCI:0x02:\fINSAP\fP is a PVC number.
-PVC_LCI:0x02:\fIDTE_MAC\fP is the LCI of a PVC.
+NSAP_ADDR:0x00:T{
+.ad l
+.nh
+\fINSAP\fP is OSI-encoded NSAP address.
+T}
+EXT_ADDR:0x01:T{
+.ad l
+.nh
+\fINSAP\fP is non-OSI-encoded extended address.
+T}
+PVC_LCI:0x02:T{
+.ad l
+.nh
+\fINSAP\fP is a PVC number.
+T}
+PVC_LCI:0x02:T{
+.ad l
+.nh
+\fIDTE_MAC\fP is the LCI of a PVC.
+T}
 .TE
 .PP
 When the \fINSAP\fP field is empty, \fIaflags\fP takes the value zero
@@ -278,7 +307,7 @@ See
 .BR stox25 (3),
 .BR x25tos (3),
 and
-.BR gexhostent (3),
+.BR getxhostent (3),
 manual pages for details about the X.25 address format.
 .RE
 .TP
@@ -403,29 +432,97 @@ The X.25 quality of service structure used in NLI primitives is described in
 .PP
 The primtives provided by the Network Layer Interface are as follows:
 .PP
+.bp
+.if \n(cR \{\
+.pl \n(nl+200
+.\}
 .TS
 tab(:);
 llls
 lblbls.
 Prim./Manpage:Structure:Description
 _
-N_CI\fR(7):xcallf:Connect Request/Indication.
-N_CC\fR(7):xccnff:Connect Response/Confirmation.
-N_Data\fR(7):xdataf:Data.
-N_DAck\fR(7):xdatacf:Data Acknowledgement.
-N_EData\fR(7):xeadataf:Expedited Data.
-N_EAck\fR(7):xedatacf:Expedited Data Acknowledgement.
+N_CI\fR(7):xcallf:T{
+.ad l
+.nh
+Connect Request/Indication.
+T}
+N_CC\fR(7):xccnff:T{
+.ad l
+.nh
+Connect Response/Confirmation.
+T}
+N_Data\fR(7):xdataf:T{
+.ad l
+.nh
+Data.
+T}
+N_DAck\fR(7):xdatacf:T{
+.ad l
+.nh
+Data Acknowledgement.
+T}
+N_EData\fR(7):xeadataf:T{
+.ad l
+.nh
+Expedited Data.
+T}
+N_EAck\fR(7):xedatacf:T{
+.ad l
+.nh
+Expedited Data Acknowledgement.
+T}
 .\"DTflow\fR(7)::
-N_RI\fR(7):xrstf:Reset Request/Indication.
-N_RC\fR(7):xrscf:Reset Response/Confirmation.
-N_DI\fR(7):xdiscf:Disconnect Request/Indication.
-N_DC\fR(7):xdcnff:Disconnect Confirmation.
-N_Abort\fR(7):xabortf:Abort Indication.
-N_Xlisten\fR(7):xlistenf:Listen Request/Response.
-N_Xelisten\fR(7):xlistenf:Extended Listen Request/Response.
-N_Xcanlis\fR(7):xcanlisf:Listen Cancel Request/Response.
-N_PVC_ATTACH\fR(7):pvcattf:PVC Attach.
-N_PVC_DETACH\fR(7):pvcdetf:PVC Detach.
+N_RI\fR(7):xrstf:T{
+.ad l
+.nh
+Reset Request/Indication.
+T}
+N_RC\fR(7):xrscf:T{
+.ad l
+.nh
+Reset Response/Confirmation.
+T}
+N_DI\fR(7):xdiscf:T{
+.ad l
+.nh
+Disconnect Request/Indication.
+T}
+N_DC\fR(7):xdcnff:T{
+.ad l
+.nh
+Disconnect Confirmation.
+T}
+N_Abort\fR(7):xabortf:T{
+.ad l
+.nh
+Abort Indication.
+T}
+N_Xlisten\fR(7):xlistenf:T{
+.ad l
+.nh
+Listen Request/Response.
+T}
+N_Xelisten\fR(7):xlistenf:T{
+.ad l
+.nh
+Extended Listen Request/Response.
+T}
+N_Xcanlis\fR(7):xcanlisf:T{
+.ad l
+.nh
+Listen Cancel Request/Response.
+T}
+N_PVC_ATTACH\fR(7):pvcattf:T{
+.ad l
+.nh
+PVC Attach.
+T}
+N_PVC_DETACH\fR(7):pvcdetf:T{
+.ad l
+.nh
+PVC Detach.
+T}
 .\"M_CParmReref\fR(7)::
 .\"M_CParmUnref\fR(7)::
 .\"M_CircuitId\fR(7)::
@@ -440,37 +537,141 @@ Each primitive is documented in its own manual page.
 The input-output controls provided by the Network Layer Interface are as
 follows:
 .PP
+.bp
+.if \n(cR \{\
+.pl \n(nl+200
+.\}
 .TS
 tab(:);
 llls
 llbls.
 Ioctl/Manpage:Structure:Description
 _
-\fBN_snident\fP(7):xll_reg:Identify subnetwork.
-\fBN_snmode\fP(7):snoptformat:Adjust subscription mode.
-\fBN_snconfig\fP(7):wlcfg:Configure data link.
-\fBN_snread\fP(7):wlcfg:Read data link configuration.
-\fBN_getstats\fP(7):(array):Get global stats.
-\fBN_zerostats\fP(7):(array):Zero global stats.
-\fBN_putpvcmap\fP(7):pvcmapf:Put a PVC map.
-\fBN_getpvcmap\fP(7):pvcmapf:Get a PVC map.
-\fBN_getVCstatus\fP(7):vcstatusf:Get VC stats.
-\fBN_getnliversion\fP(7):nliformat:Get NLI version.
-\fBN_traceon\fP(7)::Turn tracing on.
-\fBN_traceoff\fP(7)::Turn tracing off.
-\fBN_nuimsg\fP(7)::Network user info message.
-\fBN_nuiput\fP(7):nui_put:Put ntwk user info.
-\fBN_nuidel\fP(7):nui_del:Delete ntwk user info.
-\fBN_nuiget\fP(7):nui_get:Get ntwk user info.
-\fBN_nuimget\fP(7):nui_mget:Multiple get ntwk user info.
-\fBN_nuireset\fP(7):nui_reset:Reset ntwk user info.
-\fBN_zeroVCstats\fP(7):vcstatusf:Zero
-\fBN_putx32map\fP(7)::Put X.32 map.
-\fBN_getx32map\fP(7)::Get X.32 map.
-\fBN_getSNIDstats\fP(7):persnidstats:Get per-subnet stats.
-\fBN_zeroSNIDstats\fP(7):persnidstats:Zero per-subnet stats.
-\fBN_setQOSDATPRI\fP(7):qosdatpri:Set QoS data priority.
-\fBN_resetQOSDATPRI\fP(7)::Reset QoS data priority.
+\fBN_snident\fP(7):xll_reg:T{
+.ad l
+.nh
+Identify subnetwork.
+T}
+\fBN_snmode\fP(7):snoptformat:T{
+.ad l
+.nh
+Adjust subscription mode.
+T}
+\fBN_snconfig\fP(7):wlcfg:T{
+.ad l
+.nh
+Configure data link.
+T}
+\fBN_snread\fP(7):wlcfg:T{
+.ad l
+.nh
+Read data link configuration.
+T}
+\fBN_getstats\fP(7):(array):T{
+.ad l
+.nh
+Get global stats.
+T}
+\fBN_zerostats\fP(7):(array):T{
+.ad l
+.nh
+Zero global stats.
+T}
+\fBN_putpvcmap\fP(7):pvcmapf:T{
+.ad l
+.nh
+Put a PVC map.
+T}
+\fBN_getpvcmap\fP(7):pvcmapf:T{
+.ad l
+.nh
+Get a PVC map.
+T}
+\fBN_getVCstatus\fP(7):vcstatusf:T{
+.ad l
+.nh
+Get VC stats.
+T}
+\fBN_getnliversion\fP(7):nliformat:T{
+.ad l
+.nh
+Get NLI version.
+T}
+\fBN_traceon\fP(7)::T{
+.ad l
+.nh
+Turn tracing on.
+T}
+\fBN_traceoff\fP(7)::T{
+.ad l
+.nh
+Turn tracing off.
+T}
+\fBN_nuimsg\fP(7)::T{
+.ad l
+.nh
+Network user info message.
+T}
+\fBN_nuiput\fP(7):nui_put:T{
+.ad l
+.nh
+Put ntwk user info.
+T}
+\fBN_nuidel\fP(7):nui_del:T{
+.ad l
+.nh
+Delete ntwk user info.
+T}
+\fBN_nuiget\fP(7):nui_get:T{
+.ad l
+.nh
+Get ntwk user info.
+T}
+\fBN_nuimget\fP(7):nui_mget:T{
+.ad l
+.nh
+Multiple get ntwk user info.
+T}
+\fBN_nuireset\fP(7):nui_reset:T{
+.ad l
+.nh
+Reset ntwk user info.
+T}
+\fBN_zeroVCstats\fP(7):vcstatusf:T{
+.ad l
+.nh
+Zero
+T}
+\fBN_putx32map\fP(7)::T{
+.ad l
+.nh
+Put X.32 map.
+T}
+\fBN_getx32map\fP(7)::T{
+.ad l
+.nh
+Get X.32 map.
+T}
+\fBN_getSNIDstats\fP(7):persnidstats:T{
+.ad l
+.nh
+Get per-subnet stats.
+T}
+\fBN_zeroSNIDstats\fP(7):persnidstats:T{
+.ad l
+.nh
+Zero per-subnet stats.
+T}
+\fBN_setQOSDATPRI\fP(7):qosdatpri:T{
+.ad l
+.nh
+Set QoS data priority.
+T}
+\fBN_resetQOSDATPRI\fP(7)::T{
+.ad l
+.nh
+Reset QoS data priority.
+T}
 _
 .TE
 .PP
@@ -483,7 +684,7 @@ The Spider Network Layer Interface (NLI) is a proprietary interface without
 a \fIformal\fP standard (although its widespread use makes it an \fIipso
 facto\fP standard).  The Network Provider Interface (NPI),
 .[
-npi revision 2.0.0
+npi revision 2.0.0 draft 2
 .]
 .BR npi (7),
 should be used in its stead.
@@ -500,7 +701,7 @@ implementation of the NLI has no known bugs.
 .PP
 .BR getpmsg (2s),
 .BR putpmsg (2s),
-.BR x25 (4),
+.BR plp (4),
 .BR s_npi (4),
 .BR npi (7),
 .BR STREAMS (9).
@@ -510,33 +711,37 @@ implementation of the NLI has no known bugs.
 .PP
 The
 .B NLI
-interface is compatible with SpiderX25,
+interface is compatible with
+.IR SpiderX25 ,
+.[
+spiderx25
+.]
 and implementations based on SpiderX25, such as
-AIXlink/X.25,
+.IR "AIXlink/X.25" ,
 .[
 aixlink
 .]
-HP-UX X.25,
+.IR "HP-UX X.25" ,
 .[
 hpuxdoc
 .]
-IRIS SX.25,
+.IR "IRIS SX.25" ,
 .[
 sx25
 .]
-Solstice X.25,
+.IR "Solstice X.25" ,
 .[
 solx25pg
 .]
-PT X.25,
+.IR "PT X.25" ,
 .[
 ptx25
 .]
-SBE X.25,
+.IR "SBE X.25" ,
 .[
 sbex25
 .]
-RadiSys WAN,
+.IR "RadiSys WAN" ,
 .[
 radwan
 .]
@@ -569,15 +774,15 @@ broken in a subsequent release.
 .PP
 New applications should use the Network Provider Interface (NPI),
 .[
-npi revision 2.0.0
+npi revision 2.0.0 draft 2
 .]
 .BR npi (7),
 instead.
 .RE
 .PP
 For additional compatibility considerations, see
-.BR x25 (4),
-.BR s_nli (4),
+.BR plp (4),
+.BR s_nli3 (4),
 .BR s_npi (4),
 .BR npi (7),
 .BR STREAMS (9).
