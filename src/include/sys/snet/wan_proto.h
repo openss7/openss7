@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: wan_proto.h,v 1.1.2.2 2010-11-28 14:21:53 brian Exp $
+ @(#) $Id: wan_proto.h,v 1.1.2.3 2011-02-07 04:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:53 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wan_proto.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:53  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,6 +66,17 @@
 #ifndef __SYS_SNET_WAN_PROTO_H__
 #define __SYS_SNET_WAN_PROTO_H__
 
+/*
+ * This file contains a basic SpiderWAN like interface.  Source compatibility is
+ * attempted.  Binary compatibility is not attempted (but may result, YMMV).
+ * Portable applications programs, STREAMS drivers and modules, should use the
+ * CDI interface instead.
+ */
+
+/*
+ * Primitive types: These constant values are used in the wan_type field of the
+ * various primitives.
+ */
 #define WAN_SID		1	/* Set subnetwork identifier */
 #define WAN_REG		2	/* Register subnetwork identifier */
 #define WAN_CTL		3	/* control connection */
@@ -75,11 +89,10 @@
  * This primitive assigns a subnetwork identifier to the Stream upon which it
  * issued.  It is equivalent to an ATTACH.
  */
-
 struct wan_sid {
 	uint8_t wan_type;		/* always WAN_SID */
 	uint8_t wan_spare[3];		/* spare for alignment */
-	uint32_t wan_snid;		/* subnetwork identifier */
+	uint32_t wan_snid;		/* subnetwork ID */
 };
 
 /*
@@ -89,42 +102,52 @@ struct wan_sid {
  * identifier does not need to match the Stream upon which the primitive is
  * issued.
  */
-
 struct wan_reg {
 	uint8_t wan_type;		/* always WAN_REG */
 	uint8_t wan_spare[3];		/* spare for alignment */
-	uint32_t wan_snid;		/* subnetwork identifier */
+	uint32_t wan_snid;		/* subnetwork ID */
 };
 
 /*
- * WAN_CTL Primtiives - one M_PROTO message block
+ * WAN_CTL Primitives - one M_PROTO message block
  *
  * These primitives come in eight forms: WC_CONNECT, WC_CONCNF, WC_DISC and
  * WC_DISCCNF, each issued in either direction, to or from the WAN driver.
  */
+/*
+ * WAN_CTL command types: These constant values are used in the wan_command
+ * field of the WAN_CTL primitive.
+ */
+#define WC_CONNECT	1       /* connect */
+#define WC_CONCNF	2       /* connect confirm */
+#define WC_DISC		3       /* disconnect */
+#define WC_DISCCNF	4       /* disconnect confirm */
 
-/* definitions for wan_command field of WAN_CTL */
-#define WC_CONNECT	1
-#define WC_CONCNF	2
-#define WC_DISC		3
-#define WC_DISCCNF	4
-
-/* definitions for wan_remtype field */
+/*
+ * Address types: These constant values are used in the wan_remtype field of the
+ * WAN_CTL primitive.
+ */
 #define WAN_TYPE_ASC	1	/* digits are ASCII digits, length is octets */
 #define WAN_TYPE_BCD	2	/* digits are BCD digits, length is nibbles */
 
-/* definitions for wan_status field */
-#define WAN_FAIL	0	/* command failed */
-#define WAN_SUCCESS	1	/* command succeeded */
+/*
+ * Status values: These constant values are used in the wan_status field of the
+ * WAN_CTL primitive.
+ */
+#define WAN_FAIL	0	/* operation failed */
+#define WAN_SUCCESS	1	/* operation successful */
 
+/*
+ * WAN_CTL primitive, consists of one M_PROTO message block.
+ */
 struct wan_ctl {
 	uint8_t wan_type;		/* always WAN_CTL */
-	uint8_t wan_command;		/* command */
-	uint8_t wan_remtype;		/* ASCII or BCD encoded digits */
-	uint8_t wan_remsize;		/* remote address size (digits) */
-	uint8_t wan_remaddr[20];	/* remote address */
-	uint8_t wan_status;		/* status */
-	uint8_t wan_diag;		/* diagnostic */
+	uint8_t wan_command;		/* command: WC_CONNECT, WC_CONCNF, WC_DISC, WC_DISCCNF */
+	uint8_t wan_remtype;		/* remote address type: WAN_TYPE_ASC or WAN_TYPE_BCD */
+	uint8_t wan_remsize;		/* size of remote address in octets or semi-octets */
+	uint8_t wan_remaddr[20];	/* the remote address */
+	uint8_t wan_status;		/* status: WAN_SUCCESS or WAN_FAIL */
+	uint8_t wan_diag;		/* diagnostic when failed */
 };
 
 /*
@@ -134,20 +157,22 @@ struct wan_ctl {
  * the WAN driver, and WC_TX are issued to the WAN driver.  Any addresses must
  * be implicit or included in the data.
  */
+#define WC_TX		1	/* data for transmission */
+#define WC_RX		2	/* received data */
 
-/* definitions for wan_command field of WAN_DAT */
-#define WC_TX		1
-#define WC_RX		2
-
+/*
+ * WAN_MSG primitive, consists of one M_PROTO message block followed by one or
+ * more M_DATA message blocks.
+ */
 struct wan_msg {
-	uint8_t wan_type;		/* always WAN_DAT */
-	uint8_t wan_command;		/* command */
+	uint8_t wan_type;		/* always WAN_MSG */
+	uint8_t wan_command;		/* WC_TX or WC_RX */
 };
 
 /*
  * WAN_NTY Primitive - one M_PROTO message block
  *
- * When the WAN_NTY primtiive is sent to the WAN driver, the WAN driver marks
+ * When the WAN_NTY primitive is sent to the WAN driver, the WAN driver marks
  * the bits that are masked and generates notifications for those events that
  * have a 1 in the corresponding bit location.  When the event occurs, the WAN
  * driver will issue a WAN_NTY primitive upstream.  By default, and for

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:41 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 1.1.2.4  2011-02-07 04:54:41  brian
+ - code updates for new distro support
+
  Revision 1.1.2.3  2011-01-12 04:10:29  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $";
+static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:41 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -103,7 +106,7 @@ static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #define STRLOGDA	7	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:41 $"
 #define MTP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -15271,7 +15274,7 @@ m_optmgmt_req(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
 	const struct MTP_optmgmt_req *p = (typeof(p)) mp->b_rptr;
-	struct mtp_opts opts;
+	struct mtp_opts opts = {};
 	int err;
 
 	if (mtp_get_state(mtp) == MTPS_IDLE)
@@ -15641,7 +15644,7 @@ static int
 t_bind_req(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
-	int err;
+	int err = 0;
 	const struct T_bind_req *p = (typeof(p)) mp->b_rptr;
 
 	if (mtp_get_state(mtp) != TS_UNBND)
@@ -16315,7 +16318,7 @@ static int
 n_bind_req(queue_t *q, mblk_t *mp)
 {
 	struct mtp *mtp = MTP_PRIV(q);
-	int err;
+	int err = 0;
 	const N_bind_req_t *p = (typeof(p)) mp->b_rptr;
 	struct mtp_addr src;
 	struct sp *loc;

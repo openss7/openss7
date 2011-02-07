@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: wan_control.h,v 1.1.2.2 2010-11-28 14:21:53 brian Exp $
+ @(#) $Id: wan_control.h,v 1.1.2.3 2011-02-07 04:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:53 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wan_control.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:53  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,12 +66,19 @@
 #ifndef __SYS_SNET_WAN_CONTROL_H__
 #define __SYS_SNET_WAN_CONTROL_H__
 
+/*
+ * This file contains a basic SpiderWAN like input-output control interface.
+ * Source compatibility is attempted.  Binary compatibility is not attempted
+ * (but may result, YMMV).  Portable applications programs, STREAMS drivers
+ * and modules, should use the CDI interface instead.
+ */
+
 /* values for w_type field */
-#define WAN_STATS	1	/* wan_stioc structure */
-#define WAN_TUNE	2	/* wan_tnioc structure */
-#define WAN_MAP		3	/* wan_mpioc union */
-#define WAN_PLAIN	4	/* wan_hdioc structure */
-#define WAN_SETSIG	5	/* wan_setsigf structure */
+#define WAN_STATS	1	/* 0x34 wan_stioc structure */
+#define WAN_TUNE	2	/* 0x35 wan_tnioc structure */
+#define WAN_MAP		3	/* 0x36 wan_mpioc union */
+#define WAN_PLAIN	4	/* 0x37 wan_hdioc structure */
+#define WAN_SETSIG	5	/* 0x38 wan_setsigf structure */
 
 /* WAN_STATS structures */
 
@@ -86,11 +96,11 @@ typedef struct hstats {
 } hdlcstats_t;
 
 /* values for w_state field */
-#define HDLC_IDLE	0
-#define HDLC_ESTB	1
-#define HDLC_DISABLED	2
-#define HDLC_CONN	3
-#define HDLC_DISC	4
+#define HDLC_IDLE	0	/*  0 */
+#define HDLC_ESTB	1	/* 30 */
+#define HDLC_DISABLED	2	/* 31 */
+#define HDLC_CONN	3	/* 40 */
+#define HDLC_DISC	4	/* 41 */
 
 struct wan_stioc {
 	uint8_t w_type;			/* always WAN_STATS */
@@ -120,13 +130,13 @@ struct WAN_x21 {
 
 /* default values for the WAN_x21 structure */
 const struct WAN_x21 WAN_x21_defaults = {
-	.WAN_cptype = WAN_X21P,		/* Always WAN_X21P */
-	.T1 = 30,			/* 3.0 seconds */
-	.T2 = 200,			/* 20.0 seconds */
-	.T3A = 60,			/* 6.0 seconds */
-	.T4B = 60,			/* 6.0 seconds */
-	.T5 = 20,			/* 2.0 seconds */
-	.T6 = 20,			/* 2.0 seconds */
+	.WAN_cptype = WAN_X21P,	/* Always WAN_X21P */
+	.T1 = 30,		/* 3.0 seconds */
+	.T2 = 200,		/* 20.0 seconds */
+	.T3A = 60,		/* 6.0 seconds */
+	.T4B = 60,		/* 6.0 seconds */
+	.T5 = 20,		/* 2.0 seconds */
+	.T6 = 20,		/* 2.0 seconds */
 };
 
 /* for a description of timers and defaults, see V.25 bis Clause 5.2 */
@@ -138,7 +148,7 @@ struct WAN_v25 {
 /* default values for the WAN_v25 structure */
 const struct WAN_v25 WAN_v25_defaults = {
 	.WAN_cptype = WAN_V25bis,	/* Always WAN_X21P */
-	.callreq = 6000,		/* 600.0 seconds, 5 minutes */
+	.callreq = 6000,	/* 600.0 seconds, 5 minutes */
 };
 
 /* values for WAN_interface field */
@@ -254,18 +264,18 @@ struct wan_setsigf {
 	wan_setsig_t wan_setsig;	/* signals and leads set */
 };
 
-#define W_ZEROSTATS	(('L'<<8)|000)	/* zero statistics */
-#define W_GETSTATS	(('L'<<8)|001)	/* get statistics */
-#define W_SETTUNE	(('L'<<8)|002)	/* set tunables */
-#define W_GETTUNE	(('L'<<8)|003)	/* get tunables */
-#define W_PUTWANMAP	(('L'<<8)|004)	/* put address mapping */
-#define W_GETWANMAP	(('L'<<8)|005)	/* get address mappings */
-#define W_DELWANMAP	(('L'<<8)|006)	/* del address mappings */
-#define W_STATUS	(('L'<<8)|007)	/* get interface status */
-#define W_ENABLE	(('L'<<8)|010)	/* enable interface */
-#define W_DISABLE	(('L'<<8)|011)	/* disable interface */
-#define W_SETSIG	(('L'<<8)|012)	/* set signals and leads */
-#define W_GETSIG	(('L'<<8)|013)	/* get signals and leads */
-#define W_POLLSIG	(('L'<<8)|014)	/* poll signals and leads */
+#define W_ZEROSTATS	(('W'<<8)|000)	/* zero statistics */
+#define W_GETSTATS	(('W'<<8)|001)	/* get statistics */
+#define W_SETTUNE	(('W'<<8)|002)	/* set tunables */
+#define W_GETTUNE	(('W'<<8)|003)	/* get tunables */
+#define W_PUTWANMAP	(('W'<<8)|004)	/* put address mapping */
+#define W_GETWANMAP	(('W'<<8)|005)	/* get address mappings */
+#define W_DELWANMAP	(('W'<<8)|006)	/* del address mappings */
+#define W_STATUS	(('W'<<8)|007)	/* get interface status */
+#define W_ENABLE	(('W'<<8)|010)	/* enable interface */
+#define W_DISABLE	(('W'<<8)|011)	/* disable interface */
+#define W_SETSIG	(('W'<<8)|012)	/* set signals and leads */
+#define W_GETSIG	(('W'<<8)|013)	/* get signals and leads */
+#define W_POLLSIG	(('W'<<8)|014)	/* poll signals and leads */
 
 #endif				/* __SYS_SNET_WAN_CONTROL_H__ */

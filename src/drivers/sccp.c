@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:42 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:42 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 1.1.2.4  2011-02-07 04:54:42  brian
+ - code updates for new distro support
+
  Revision 1.1.2.3  2011-01-12 04:10:30  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $";
+static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:42 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -99,7 +102,7 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:42 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -13244,14 +13247,18 @@ mtp_addr_ack(struct mt *mt, queue_t *q, mblk_t *mp)
 	     sr = sr->next) ;
 	if (!sr)
 		goto notfound;
+#ifndef _OPTIMIZE_SPEED
 	unless(sr->mt || sp->mt, goto ebusy);
+#endif					/* _OPTIMIZE_SPEED */
 	sr->mt = mtp_get(mt);
 	unless(mt->sr, goto efault);	/* FIXME */
 	mt->sr = sr_get(sr);	/* FIXME */
 	fixme(("Set proper state for SR and SP\n"));
 	return (QR_DONE);
       noremote:
+#ifndef _OPTIMIZE_SPEED
 	unless(sp->mt, goto ebusy);
+#endif					/* _OPTIMIZE_SPEED */
 	sp->mt = mtp_get(mt);
 	unless(mt->sp, goto efault);	/* FIXME */
 	mt->sp = sp_get(sp);	/* FIXME */
@@ -13344,14 +13351,18 @@ mtp_info_ack(struct mt *mt, queue_t *q, mblk_t *mp)
 	     sr = sr->next) ;
 	if (!sr)
 		goto notfound;
+#ifndef _OPTIMIZE_SPEED
 	unless(sr->mt || sp->mt, goto ebusy);
+#endif					/* _OPTIMIZE_SPEED */
 	unless(mt->sr, goto efault);	/* FIXME */
 	sr->mt = mtp_get(mt);
 	mt->sr = sr_get(sr);	/* FIXME */
 	fixme(("Set proper state for SR and SP\n"));
 	return (QR_DONE);
       noremote:
+#ifndef _OPTIMIZE_SPEED
 	unless(sp->mt, goto ebusy);
+#endif					/* _OPTIMIZE_SPEED */
 	unless(mt->sp, goto efault);	/* FIXME */
 	sp->mt = mtp_get(mt);
 	mt->sp = sp_get(sp);	/* FIXME */

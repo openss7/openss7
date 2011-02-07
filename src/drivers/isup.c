@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:29 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:41 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 1.1.2.6  2011-02-07 04:54:41  brian
+ - code updates for new distro support
+
  Revision 1.1.2.5  2011-01-12 04:10:29  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:29 $";
+static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:41 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -96,7 +99,7 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.5 $
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:29 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:41 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -18637,14 +18640,18 @@ mtp_addr_ack(queue_t *q, mblk_t *mp)
 	     sr = sr->next) ;
 	if (!sr)
 		goto notfound;
+#ifndef _OPTIMIZE_SPEED
 	unless(sr->mtp || sp->mtp, goto ebusy);
+#endif					/* _OPTIMIZE_SPEED */
 	sr->mtp = mtp_get(mtp);
 	unless(mtp->sr, goto efault);
 	mtp->sr = sr_get(sr);
 	fixme(("Set proper state for SR and SP\n"));
 	return (QR_DONE);
       noremote:
+#ifndef _OPTIMIZE_SPEED
 	unless(sp->mtp, goto ebusy);
+#endif					/* _OPTIMIZE_SPEED */
 	sp->mtp = mtp_get(mtp);
 	unless(mtp->sp, goto efault);
 	mtp->sp = sp_get(sp);
@@ -18738,14 +18745,18 @@ mtp_info_ack(queue_t *q, mblk_t *mp)
 	     sr = sr->next) ;
 	if (!sr)
 		goto notfound;
+#ifndef _OPTIMIZE_SPEED
 	unless(sr->mtp || sp->mtp, goto ebusy);
+#endif					/* _OPTIMIZE_SPEED */
 	unless(mtp->sr, goto efault);
 	sr->mtp = mtp_get(mtp);
 	mtp->sr = sr_get(sr);
 	fixme(("Set proper state for SR and SP\n"));
 	return (QR_DONE);
       noremote:
+#ifndef _OPTIMIZE_SPEED
 	unless(sp->mtp, goto ebusy);
+#endif					/* _OPTIMIZE_SPEED */
 	unless(mtp->sp, goto efault);
 	sp->mtp = mtp_get(mtp);
 	mtp->sp = sp_get(sp);
@@ -19776,7 +19787,9 @@ cc_setup_req(queue_t *q, mblk_t *mp)
 	default:
 		goto outstate;
 	}
+#ifndef _OPTIMIZE_SPEED
 	ensure(cc->bind.u.ct, goto null_bind);
+#endif					/* _OPTIMIZE_SPEED */
 	if (!add_len) {
 		switch (cc->bind.type) {
 		case ISUP_BIND_SR:

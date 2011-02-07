@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: npi_x25.h,v 1.1.2.2 2010-11-28 14:21:49 brian Exp $
+ @(#) $Id: npi_x25.h,v 1.1.2.3 2011-02-07 04:54:43 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:49 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_x25.h,v $
+ Revision 1.1.2.3  2011-02-07 04:54:43  brian
+ - code updates for new distro support
+
  Revision 1.1.2.2  2010-11-28 14:21:49  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -65,10 +68,24 @@
 
 /* Additional definitions for NPI for use with X.25. */
 
+#define NPI_STID	207
+
+/*
+ *  Address length on a 4 byte boundary
+ *  x25_proto.h is included at the top of this file.
+ */
+#define snpi_addrsz(a)	((sizeof(struct xaddrf) + 4) & ~3)
+
 /*
    NPI Q-bit flag for use with DATA_xfer_flags field of N_DATA_REQ and N_DATA_IND.
  */
 #define N_Q_FLAG		0x00010000L	/* Indicates qualified data. */
+#define N_QUAL_FLAG		0x00000004L	/* SpiderX25 Q-bit flag. */
+
+/*
+    BIND_flags; (used with N_bind_req primitive)
+ */
+#define X25_EXT_REQUEST		0x00000100L	/* SpiderX25 req to use X.25 extensions */
 
 /*
    Additional N_ERROR_ACK error return code values.
@@ -80,6 +97,13 @@
 					   sequence must complete before another one may be
 					   requested by the same user. */
 #define NODDCUD			33	/* Indicates an odd-length call user data string. */
+
+/*
+    NPI Disconnect reasons when operating over a PVC
+ */
+#define N_PVC_LINKDOWN		0x0700
+#define N_PVC_RTMERROR		0x0701
+#define N_PVC_USRERROR		0x0702
 
 /*
    X.25 Facilities

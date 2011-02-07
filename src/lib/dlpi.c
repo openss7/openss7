@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $
+ @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:44 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:33 $ by $Author: brian $
+ Last Modified $Date: 2011-02-07 04:54:44 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.c,v $
+ Revision 1.1.2.4  2011-02-07 04:54:44  brian
+ - code updates for new distro support
+
  Revision 1.1.2.3  2011-01-12 04:10:33  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -85,7 +88,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $";
+    "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:44 $";
 
 /* This file can be processed by doxygen(1). */
 
@@ -246,7 +249,7 @@ __dlpi_dlerrno(void)
 /** @fn int *_dlerrno(void)
   * @version DLPI_1.1
   * @par Alias:
-  * This symbol is a strong alias of __dlpi__dlerrno().
+  * This symbol is a strong alias of __dlpi_dlerrno().
   *
   * This function provides the location of the integer that contains the DLPI
   * error number returned by the last DLPI function that failed.  This is
@@ -256,7 +259,7 @@ __dlpi_dlerrno(void)
   * #define dlerrno (*(_dlerrno()))
   * @endcode
   */
-__asm__(".symver __dlpi__dlerrno,_dlerrno@@DLPI_1.1");
+__asm__(".symver __dlpi_dlerrno,_dlerrno@@DLPI_1.1");
 
 #ifndef dlerrno
 #define dlerrno (*(_dlerrno()))

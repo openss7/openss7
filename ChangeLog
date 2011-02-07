@@ -1,5 +1,51 @@
 2011-02-07  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/drivers/inet.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/drivers/isup.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/drivers/mtp.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/drivers/sccp.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/dl_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/dl_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/ixe_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/ixe_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/ll_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/ll_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/mlp_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/mlp_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/wan_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/wan_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/x25_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/x25_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/snet/x32_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/dlpi.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/npi_x25.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/sockio.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/openss7/stream.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/dl_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/dl_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/ixe_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/ixe_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/ll_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/ll_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/mlp_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/mlp_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/wan_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/wan_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/x25_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/x25_proto.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/include/sys/snet/x32_control.h: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/kernel/strsched.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/lib/dlpi.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/modules/Config.in: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/modules/cdi_conv.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/modules/dlpi_conv.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/modules/m3ua_as.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/modules/npi_conv.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/modules/sockmod.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+	* src/modules/tpi_conv.c: CentOS 5.5, RHEL 6.0, SuSE 11 SP1 support
+
+2011-02-07  Brian Bidulock  <bidulock@openss7.org>
+
 	* centos-5.5-x86_64-config.cache: added cache file
 	* debian-squeeze-i386-config.cache: added cache file
 	* redhat-6.0-x86_64-config.cache: added cache file
