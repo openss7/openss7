@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 04:48:32 $
+# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-08 23:39:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
+# Last Modified $Date: 2011-02-08 23:39:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -141,15 +141,17 @@ CONFIG_BLDREQ="$CONFIG_BLDREQ"
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_BUILD_CHECK], [dnl
     AC_REQUIRE([_BLD])dnl
-    case "${$1}" in
-	([[\\/]]* | ?:[[\\/]]*)
-	    tmp_cmd="${$1}"
-	    ;;
-	(*)
-	    # the command is expected just to be in the configure path
-	    tmp_cmd=`which ${$1} 2>/dev/null`
-	    ;;
-    esac
+    eval "tmp_cmd=\"\$bld_cv_pkg_name_$1\""
+    if test ":$tmp_cmd" = : ; then
+	case "${$1}" in
+	    ([[\\/]]* | ?:[[\\/]]*)
+		tmp_cmd="${$1}"
+		;;
+	    (*)
+		# the command is expected just to be in the configure path
+		tmp_cmd=`which ${$1} 2>/dev/null`
+		;;
+	esac
 	tmp_result=
 	if test -n "$tmp_cmd" ; then
 	    case "$dist_cv_build_flavor" in
@@ -223,7 +225,7 @@ dnl	These use dpkg
 	else
 	    unset bld_cv_pkg_cmd_$1
 	fi
-    ])
+    fi])
 ])# _BLD_BUILD_CHECK
 # =============================================================================
 
@@ -412,6 +414,9 @@ AC_DEFUN([_BLD_], [dnl
 # =============================================================================
 #
 # $Log: bld.m4,v $
+# Revision 1.1.2.3  2011-02-08 23:39:02  brian
+# - last minute release updates
+#
 # Revision 1.1.2.2  2011-02-07 04:48:32  brian
 # - updated configure and build scripts
 #

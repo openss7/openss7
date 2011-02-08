@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:44:28 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-08 23:39:03 $
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -592,7 +592,7 @@ stop_modules() {
 		    lsof | grep '\<STR\>' | \
 		    while read -a fields ; do
 			if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
-			if [ ":${fields[7]}" != ':STR' ] ; then continue; fi
+			if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
 			echo $"Killing ${fields[0]}(${fields[1]}) for device ${fields[8]}"
 			eval "kill -$signal ${fields[1]}"
 		    done
@@ -707,7 +707,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:44:28 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-08 23:39:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -753,11 +753,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:44:28 $ by $Author: brian $
+# Last Modified $Date: 2011-02-08 23:39:03 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: specfs.sh,v $
+# Revision 1.1.2.4  2011-02-08 23:39:03  brian
+# - last minute release updates
+#
 # Revision 1.1.2.3  2011-02-07 04:44:28  brian
 # - updated init scripts
 #

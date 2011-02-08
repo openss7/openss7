@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-07 04:42:15 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-02-08 23:39:02 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-07 04:42:15 $ by $Author: brian $
+## Last Modified $Date: 2011-02-08 23:39:02 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -4143,7 +4143,7 @@ unimpl_man_MANS = \
 	man3/unlockpt.3tty \
 	man4/ptmx.4tty \
 	man8/ioscan.8 \
-	man8/lsdev.8 \
+	man8/lsdev.8s \
 	man8/lssf.8 \
 	man8/mksf.8 \
 	man8/rmsf.8 \
@@ -8511,7 +8511,7 @@ unimpl_dist_noinst_MANS = \
 	man3/unlockpt.3tty.man \
 	man4/ptmx.4tty.man \
 	man8/ioscan.8.man \
-	man8/lsdev.8.man \
+	man8/lsdev.8s.man \
 	man8/lssf.8.man \
 	man8/mksf.8.man \
 	man8/rmsf.8.man \
@@ -8845,7 +8845,7 @@ old_subpackage_pages = \
 	man5/strvoip.5.man
 
 dist_noinst_MANS = \
-	$(openss7_dist_noinst_MANS)
+	$(openss7_dist_noinst_MANS) \
 	$(unimpl_dist_noinst_MANS)
 
 ##
@@ -9906,6 +9906,9 @@ include ../../am/man.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.11  2011-02-08 23:39:02  brian
+## - last minute release updates
+##
 ## Revision 1.1.2.10  2011-02-07 04:42:15  brian
 ## - updated manual pages
 ##

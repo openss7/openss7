@@ -293,16 +293,17 @@ function check_manual(command,	    found, myline)
     return found
 }
 function check_wrongsect(base,	    command) {
-    command = "LANG= man -aw " base " 2>/dev/null"
+    command = "man -aw " base " 2>/dev/null"
     return check_manual(command)
 }
 function check_section(base, sect,  command) {
-    command = "LANG= man -aw " sect " " base " 2>/dev/null"
+    command = "man -aw " sect " " base " 2>/dev/null"
     return check_manual(command)
 }
 BEGIN {
 #   LINT = "yes"
-    ENVIRON["LANG"] = ""
+    if ("LANG" in ENVIRON)
+	ENVIRON["LANG"] = ""
     success = 0
     warnings = 0
     errors = 0

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:48:32 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-08 23:39:02 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
+# Last Modified $Date: 2011-02-08 23:39:02 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -219,6 +219,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_DOT_CONFIG
     _LINUX_CHECK_KERNEL_FILES
     _LINUX_SETUP_KERNEL_CFLAGS
+    _LINUX_SETUP_KERNEL_BUILDID
     _LINUX_SETUP_KERNEL_DEBUG
     _LINUX_CHECK_KERNEL_SMP
     _LINUX_CHECK_KERNEL_PREEMPT
@@ -250,6 +251,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_RELEASE], [dnl
     linux_cv_k_running='no'
     if test :"${with_k_release:-no}" != :no ; then
 	linux_cv_k_release="$with_k_release"
+	if test :"${cross_compiling:-no}" = :no
+	then
+	    if test "$linux_cv_k_release" = "`uname -r`"
+	    then
+		linux_cv_k_running='yes'
+	    fi
+	fi
     else
 	if test :"${cross_compiling:-no}" = :no
 	then
@@ -2361,6 +2369,23 @@ dnl
 # =========================================================================
 
 # =========================================================================
+# _LINUX_SETUP_KERNEL_BUILDID
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_SETUP_KERNEL_BUILDID], [dnl
+    AC_CACHE_CHECK([for kernel build id], [linux_cv_k_buildid], [dnl
+	if ${LD-ld} --build-id 2>&1 | grep 'unrecognized' >/dev/null 2>&1
+	then
+	    linux_cv_k_buildid=
+	else
+	    linux_cv_k_buildid='--build-id '
+	fi
+    ])
+    KERNEL_BUILDID="$linux_cv_k_buildid"
+    AC_SUBST([KERNEL_BUILDID])
+])# _LINUX_SETUP_KERNEL_BUILDID
+# =========================================================================
+
+# =========================================================================
 # _LINUX_SETUP_KERNEL_DEBUG
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_SETUP_KERNEL_DEBUG], [dnl
@@ -3057,6 +3082,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.7  2011-02-08 23:39:02  brian
+# - last minute release updates
+#
 # Revision 1.1.2.6  2011-02-07 04:48:32  brian
 # - updated configure and build scripts
 #
