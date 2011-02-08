@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-07 04:48:31 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-02-08 23:39:02 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
+## Last Modified $Date: 2011-02-08 23:39:02 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -167,13 +167,13 @@ if AMDEP
 ## AMDEP
 .o.ko:
 	$(AM_V_CCLD)m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; b=`basename $$m` ; \
-	if $(LD) -r -o $@ $$m.o $$m.mod.o ; then $(ECHO) "$@: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi
+	if $(LD) $(KERNEL_BUILDID)-r -o $@ $$m.o $$m.mod.o ; then $(ECHO) "$@: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi
 ## AMDEP
 else
 ## !AMDEP
 .o.ko:
 	$(AM_V_CCLD)m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; \
-	$(LD) -r -o $@ $$m.o $$m.mod.o
+	$(LD) $(KERNEL_BUILDID)-r -o $@ $$m.o $$m.mod.o
 ## !AMDEP
 endif
 
@@ -186,8 +186,8 @@ stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 	for m in $$mods ; do b=`basename $$m` ; \
 		test :$$m != :stamp-mobjects || continue ; \
 		$(ECHO_Q) "  CCLD  " $$m.ko ; \
-		$(ECHO_V) "if $(LD) -r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) \"$$m.ko: $$m.o $$m.mod.o\" > $(DEPDIR)/$$b.Pko ; fi" ; \
-		if $(LD) -r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) "$$m.ko: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi ; \
+		$(ECHO_V) "if $(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) \"$$m.ko: $$m.o $$m.mod.o\" > $(DEPDIR)/$$b.Pko ; fi" ; \
+		if $(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) "$$m.ko: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi ; \
 	done ; \
 	touch stamp-kobjects
 ## AMDEP
@@ -198,8 +198,8 @@ stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 	for m in $$mods ; do \
 		test :$$m != :stamp-mobjects || continue ; \
 		$(ECHO_Q) "  CCLD  " $$m.ko ; \
-		$(ECHO_V) "$(LD) -r -o $$m.ko $$m.o $$m.mod.o" ; \
-		$(LD) -r -o $$m.ko $$m.o $$m.mod.o ; \
+		$(ECHO_V) "$(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o" ; \
+		$(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o ; \
 	done ; \
 	touch stamp-kobjects
 ## !AMDEP
@@ -775,6 +775,9 @@ EXTRA_SCRIPTS		+= scripts/cflagcheck
 ## =============================================================================
 ##
 ## $Log: kernel.am,v $
+## Revision 1.1.2.8  2011-02-08 23:39:02  brian
+## - last minute release updates
+##
 ## Revision 1.1.2.7  2011-02-07 04:48:31  brian
 ## - updated configure and build scripts
 ##

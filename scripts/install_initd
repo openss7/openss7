@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 #
-# @(#) $RCSfile: install_initd,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $
+# @(#) $RCSfile: install_initd,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-08 23:39:03 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 12:41:53 $ by $Author: brian $
+# Last Modified $Date: 2011-02-08 23:39:03 $ by $Author: brian $
 #
 # =============================================================================
 
-ident='@(#) $RCSfile: install_initd,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-21 12:41:53 $'
+ident='@(#) $RCSfile: install_initd,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-08 23:39:03 $'
 
 ECHO='echo'
 SHELL='/bin/bash'
@@ -530,6 +530,8 @@ elif [ -d $sysconfdir/rc.d/rc0.d ] ; then
     rcdir="${sysconfdir}/rc.d"
     basedir="init.d"
     flavor="chkconfig"
+elif [ ":$RPM_BUILD_ROOT" != : ] ; then
+    exit 0
 else
     $ECHO "warning: $program cannot grok SysV init for $initname" >&2
     exit 1
@@ -635,6 +637,9 @@ exit 1
 # =============================================================================
 #
 # $Log: install_initd,v $
+# Revision 1.1.2.3  2011-02-08 23:39:03  brian
+# - last minute release updates
+#
 # Revision 1.1.2.2  2009-06-21 12:41:53  brian
 # - updated headers
 #

@@ -1,3 +1,28 @@
+2011-02-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* README: update release files
+	* THANKS: update release files
+	* openss7.spec.in: pass LD command
+	  SUSE doesn't set default attributes to root (RH does)
+	  correct remove_depends in pre script
+	  SUSE lsof includes an extra field
+	  build-id settled, so include entire debug directory
+	* am/kernel.am: add KERNEL_BUILDID to load command
+	* doc/man/Makefile.am: move lsdev.8 to lsdev.8s
+	* doc/man/man8/lsdev.8s.man: move lsdev.8 to lsdev.8s
+	* m4/bld.m4: skip checking when cache variables exist
+	* m4/kernel.m4: set running kernel when versions match
+	  add build-id checks for proper build ids on kernel modules
+	* po/de.po: update release files
+	* scripts/check: adjust LANG environment variable handling
+	* scripts/install_initd: skip warning when rpm building
+	* src/util/init/openss7: SUSE lsof includes an extra field
+	* src/util/init/specfs: SUSE lsof includes an extra field
+	* src/util/init/specfs.sh: SUSE lsof includes an extra field
+	* src/util/init/streams: SUSE lsof includes an extra field
+
 2011-02-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/java/jain/protocol/ip/mgcp/message/DeleteConnection.java: replace illegal characters

@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-02-07 04:48:31 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-02-08 23:39:01 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
+# Last Modified $Date: 2011-02-08 23:39:01 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1657,6 +1657,7 @@ fi
 ./configure \
     ${CC+CC="${CC}"} \
     CFLAGS="${CFLAGS:-$preferred_cflags}" \
+    ${LD+LD="${LD}"} \
     ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
     ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
     ${CPP+CPP="${CPP}"} \
@@ -2732,6 +2733,7 @@ fi
 %if %{PACKAGE_base}
 %files base %{?devicesfile:%{devicesfile}}
 # ---------------------------------------------------------------------------
+%defattr(-,root,root)
 %{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
 %{?files_configfiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
 #{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
@@ -2905,6 +2907,7 @@ fi
 %if %{PACKAGE_doc}
 %files doc
 # ---------------------------------------------------------------------------
+%defattr(-,root,root)
 %{?files_txtfiles:%{_docdir}/@PACKAGE@-@VERSION@/*.txt}
 %{?files_dvifiles:%{_dvidir}/@PACKAGE@-@VERSION@/*.dvi}
 %{?files_psfiles:%{_psdir}/@PACKAGE@-@VERSION@/*.ps}
@@ -3067,8 +3070,8 @@ fi
 %{?files_libraries:%{_libdir}/*.la}
 %{?files_lib32compat:%{_lib32dir}/*.so*}
 %{?files_lib32compat:%{_lib32dir}/*.la}
-%{?files_perlmods:%dir %{_perldir}/auto/*}
-%{?files_perlmods:%{_perldir}/auto/*}
+%{?files_perlmods:%dir %{_perldir}/auto/Xti}
+%{?files_perlmods:%{_perldir}/auto/Xti/*}
 %{?files_tcllibs:%dir %{_pkgtcllibdir}}
 %{?files_tcllibs:%dir %{_pkgtcllibdir}/xti}
 %{?files_tcllibs:%dir %{_pkgtcllibdir}/tcap}
@@ -3290,6 +3293,18 @@ remove_depmods () {
         eval "remove_depmods \$$prereq"
     done
 }
+remove_depends() {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+        remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+        rmmod $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
 if [ $arg = 1 ] ; then : # fresh install
     # This is a fresh install of this version of kernel module.  Make sure that there are no non-rpm
     # installed kernel modules hanging around for this kernel version.
@@ -3344,37 +3359,26 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
         # If we are upgrading and the upgrade is for the running kernel, or we are installing new on
         # the running kernel, we have to worry about previous loaded modules for the old version or
         # a non-rpm version.
-        mods="%{modules}" ; for m in $mods ; do
-            if ( lsmod | grep -q "^$m" ) ; then
-                # Module running, kick the stack.
-                modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                if ( lsmod | grep -q "^$m" ) ; then
-                    if [ -x /usr/sbin/fdetach ] ; then
-                        /usr/sbin/fdetach -a 2>/dev/null
-                    fi
-                    modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                    if ( lsmod | grep -q "^$m" ) ; then
-                        lsof | while read -a tokens; do
-                            if [ :"${tokens[4]}" = :"CHR" ]; then
-                                major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
-                                # FIXME: this test is insufficient
-                                if [ $major -eq %{majbase} ]; then
-                                    eval "kill -HUP ${tokens[1]}"
-                                fi
-                            fi
-                        done
-                        if [ -x /bin/sleep ] ; then
-                            /bin/sleep 5 # wait for processes to die and close streams
-                        fi
-                        modprobe -r `lsmod | grep "^$m" | cut -f1 '-d '`
-                        if ( lsmod | grep -q "^$m" ) ; then
-                            echo "Cannot install or upgrade with $m module running." >&2
-                            exit 1
-                        fi
-                    fi
-                fi
+        if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+            if [ -x /usr/sbin/fdetach ] ; then
+                /usr/sbin/fdetach -a 2>/dev/null || :
             fi
-        done
+            for signal in TERM KILL ; do
+                if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+                    lsof | grep '\<STR\>' | \
+                    while read -a fields ; do
+                        if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
+                        if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
+                        kill -$signal ${fields[1]} >/dev/null 2>&1 || :
+                    done
+                    sleep 5
+                fi
+            done
+        fi
+        lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
+        remove_depends streams || reboot='yes'
+        remove_depends specfs  || reboot='yes'
+        [ ":$reboot" != ':yes' ] || echo "Reboot required." >&2
     fi
 fi
 %endif
@@ -3423,7 +3427,7 @@ remove_depends() {
         remove_depends $depend || return $?
     done
     if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
-        modprobe -r $1 >/dev/null 2>&1 || return $?
+        rmmod $1 >/dev/null 2>&1 || return $?
     fi
     return 0
 }
@@ -3453,7 +3457,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                     lsof | grep '\<STR\>' | \
                     while read -a fields ; do
                         if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
-                        if [ ":${fields[7]}" != ':STR' ] ; then continue; fi
+                        if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
                         kill -$signal ${fields[1]} >/dev/null 2>&1 || :
                     done
                     sleep 5
@@ -3479,7 +3483,7 @@ remove_depends() {
         remove_depends $depend || return $?
     done
     if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
-        modprobe -r $1 >/dev/null 2>&1 || return $?
+        rmmod $1 >/dev/null 2>&1 || return $?
     fi
     return 0
 }
@@ -3521,7 +3525,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                     lsof | grep '\<STR\>' | \
                     while read -a fields ; do
                         if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
-                        if [ ":${fields[7]}" != ':STR' ] ; then continue; fi
+                        if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
                         kill -$signal ${fields[1]} >/dev/null 2>&1 || :
                     done
                     sleep 5
@@ -3626,8 +3630,8 @@ this package or when debugging kernel modules contained in the package.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
-%{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug/lib/modules/%{kernel_version}}}}
-%{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug/lib/modules/%{kernel_version}}}}
+%{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug}}}
+%{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug}}}
 %{?files_oldmods:%dir %{_includedir}/%{name}/%{kernel_version}}
 %{?files_oldmods:%{_includedir}/%{name}/%{kernel_version}/*}
 #{?files_modules:%{_kmoduledir}/%{base}/Module*}
@@ -3688,6 +3692,7 @@ package.
 %if %{PACKAGE_ksrc}
 %files -n %{name}-source-%{_kversion}
 # -----------------------------------------------------------------------------
+%defattr(-,root,root)
 %{?files_sourcefiles:%dir %{_usrsrc}/%{name}-%{version}-%{fullrelease}}
 %{?files_sourcefiles:%{_usrsrc}/%{name}}
 %{?files_sourcefiles:%{_usrsrc}/%{name}-%{version}-%{fullrelease}/*}
@@ -3870,6 +3875,7 @@ not normally required on other than a development system.
 %if %{PACKAGE_jdoc}
 %files javadoc
 # -----------------------------------------------------------------------------
+%defattr(-,root,root)
 %{?files_javadoc:%dir %{_pkgjavadocdir}}
 %{?files_javadoc:%{_pkgjavadocdir}/*}
 %endif
@@ -3878,6 +3884,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.12  2011-02-08 23:39:01  brian
+# - last minute release updates
+#
 # Revision 1.1.2.11  2011-02-07 04:48:31  brian
 # - updated configure and build scripts
 #
