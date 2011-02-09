@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-02-07 04:48:31 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-02-09 17:59:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
+# Last Modified $Date: 2011-02-09 17:59:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2981,6 +2981,16 @@ include am/snmp.am
 EXTRA_DIST			+= debian/README.Debian \
 				   debian/TODO.Debian
 
+##
+## Build cache files for intelligent warnings.
+##
+EXTRA_DIST			+= centos-5.5-x86_64-config.cache \
+				   debian-lenny-i386-config.cache \
+				   debian-squeeze-i386-config.cache \
+				   redhat-6.0-x86_64-config.cache \
+				   redhat-7.2-i686-config.cache \
+				   suse-11-x86_64-config.cache
+
 MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 				   $(top_srcdir)/config.h.in \
 				   $(top_srcdir)/configure \
@@ -2998,6 +3008,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.13  2011-02-09 17:59:27  brian
+# - repository and rpm updates for suse
+#
 # Revision 1.1.2.12  2011-02-07 04:48:31  brian
 # - updated configure and build scripts
 #

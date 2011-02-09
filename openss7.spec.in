@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-02-08 23:39:01 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-02-09 17:59:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-08 23:39:01 $ by $Author: brian $
+# Last Modified $Date: 2011-02-09 17:59:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2097,99 +2097,10 @@ binary package is required for any installation of the %{name} package.
 %pre base
 # ---------------------------------------------------------------------------
 arg="$1"
-%if %{HAVE_modules}
-remove_depmods () {
-    local t
-    [ $# -gt 0 ] || return 0
-    echo "$*"
-    for t in $@ ; do
-        prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-        eval "remove_depmods \$$prereq"
-    done
-}
-%endif
-# This is an initial installation of the init subpackage.  We need to check for non-rpm
+# This is an initial installation of the base subpackage.  We need to check for non-rpm
 # installations on the host and remove any entries that might later conflict with our entries.  We
 # treat every fresh installation like an upgrade from non-deb/rpm install.
 if [ $arg = 1 ] ; then : # fresh install
-%if %{HAVE_modules}
-    # When performing a fresh install we want to go looking for non-rpm installations of LiS or
-    # STREAMS or supplementary packages and perform what would otherwise have been the preun or
-    # postun actions.
-    list="%{modules}" ; modl_mods=
-    for dir in %{_kmoduledir}/../* ; do
-        [ -d $dir ] || continue
-        for m in `find $dir \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
-                b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
-                case " $list " in (*" $b "*) ;; (*) continue ;; esac
-                echo "$m"
-                modl_mods="${modl_mods:+$modl_mods }$m"
-        done
-        if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
-            # First we can build a dependency tree from every dependency expression that can be
-            # found in the modules.dep file.
-            xtrace=`shopt -p -o | grep xtrace` ; set +x
-            dep= ; while read line ; do
-                case $line in
-                    (*\\)   line="`echo $line | sed -e 's|\\$||'`"
-                            dep="${dep:+$dep }$line" ; continue ;;
-                    (*)     dep="${dep:+$dep }$line" ;;
-                esac
-                [ -n "$dep" ] || continue;
-                set dummy $dep
-                if [ "${3+set}" = "set" ] ; then
-                    t=`echo $2 | sed -e 's|:$||'`
-                    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                    shift 2
-                    for p in $@ ; do
-                        prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                        eval "$prereq=\"\${$prereq:+\$$prereq }$t\""
-                        eval "$target=\"\${$target:+\$$target }$p\""
-                    done
-                fi
-                dep=
-            done < $dir/modules.dep
-            eval "$xtrace"
-        fi
-        conf_old=%_sysconfdir/modules.conf
-        if [ -f $conf_old ] ; then
-            conf_new=%_tmppath/modules.conf.new.$$
-            conf_tmp=%_tmppath/modules.conf.tmp.$$
-            cp -f -- $conf_old $conf_new
-            # Unfortunately davem starting copying our install procedure, so we need to root out all
-            # kinds of things from the modules.conf file, all prune statements, any if include
-            # statements
-            for suffix in %name %{nonrpmmods} ; do
-                # This the old style /BEGIN LiS/,/END LiS/ enclosure in the modules.conf file.
-                if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null ; then
-                    sed -e '\|BEGIN '$suffix'|,\|END '$suffix'|d'            $conf_new > $conf_tmp
-                    mv -f -- $conf_tmp $conf_new
-                fi
-                # This is my newer technique with a prune and an if statement in the modules.conf
-                # file that was also used by davem in LiS-2.18.0.
-                if [ -f $dir/modules.$suffix ] ; then
-                    rm -f -- $dir/modules.$suffix
-                    sed -e '\|^prune[[:space:]].*modules.'$suffix'|d'        $conf_new > $conf_tmp
-                    sed -e '\|^if[[:space:]].*modules.'$suffix'|,\|^endif|d' $conf_tmp > $conf_new
-                    sed -e '\|^include[[:space:]].*modules.'$suffix'|d'      $conf_new > $conf_tmp
-                    mv -f -- $conf_tmp $conf_new
-                fi
-                # This is my newer latest technique with only an include statement in modules.conf
-                # and a modules.conf fragment in the debian update-modules directory _modutildir
-                # that includes the prune and if statements.  That works both for RH-style and
-                # Debian-style modules.conf.
-                if [ -f %_modutildir/$suffix ] ; then
-                    rm -f -- %_modutildir/$suffix
-                    sed -e '\|^include[[:space:]].*%_modutildir/'$suffix'|d' $conf_new > $conf_tmp
-                    mv -f -- $conf_tmp $conf_new
-                fi
-            done
-            chmod --reference=$conf_old -- $conf_new
-            cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-            rm -f -- $conf_new
-        fi
-    done
-%endif
 %if %{FILES_oldprel}
     # old-style preload file
     prel_old=%_sysconfdir/modules
@@ -2220,18 +2131,6 @@ if [ $arg = 1 ] ; then : # fresh install
             [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
         fi
     done
-%endif
-%if %{HAVE_modules}
-    # remove conflicting and dependent modules
-    if [ -n "$modl_mods" ] ; then
-        rm -f -- $modl_mods
-        for m in $list ; do
-            prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-            eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
-            [ -n "$modl_deps" ] || continue
-            rm -f -- $modl_deps
-        done
-    fi
 %endif
 fi
 if [ $arg = 2 ] ; then : # upgrade
@@ -3884,6 +3783,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.13  2011-02-09 17:59:27  brian
+# - repository and rpm updates for suse
+#
 # Revision 1.1.2.12  2011-02-08 23:39:01  brian
 # - last minute release updates
 #

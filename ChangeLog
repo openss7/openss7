@@ -1,3 +1,13 @@
+2011-02-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* Makefile.am: distribute build caches
+	* openss7.spec.in: rpm and zypper are very poor on their ordering of files, so we
+	  cannot remove modules in base %pre, because it may remove all of the modules we
+	  just installed.
+	* am/rpm.am: create susedata.xml.gz too
+	* m4/rpm.m4: find modifyrepo command
+	* scripts/missing3: handle missing modifyrepo command
+
 2011-02-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: update release files

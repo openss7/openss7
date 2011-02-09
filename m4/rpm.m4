@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-09 17:59:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
+# Last Modified $Date: 2011-02-09 17:59:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -592,6 +592,13 @@ dnl
 	    AC_MSG_WARN([Could not find createrepo program in PATH.])
 	fi
 	enable_repo_yum=no])
+    AC_ARG_VAR([MODIFYREPO],
+	       [Modify repomd repository command. @<:@default=modifyrepo@:>@])
+    _BLD_PATH_PROG([MODIFYREPO], [modifyrepo], [${am_missing3_run}modifyrepo],
+		   [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+	if test ":$rpm_cv_rpms" = :yes; then
+	    AC_MSG_WARN([Could not find modifyrepo program in PATH.])
+	fi])
     AC_CACHE_CHECK([for rpm yum repo construction], [rpm_cv_repo_yum], [dnl
 	rpm_cv_repo_yum=${enable_repo_yum:-no}
     ])
@@ -654,6 +661,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.6  2011-02-09 17:59:27  brian
+# - repository and rpm updates for suse
+#
 # Revision 1.1.2.5  2011-02-07 04:48:32  brian
 # - updated configure and build scripts
 #
