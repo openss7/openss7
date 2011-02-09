@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:48:31 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-09 17:59:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
+## Last Modified $Date: 2011-02-09 17:59:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -813,7 +813,8 @@ RELEASE_DIRECTORIES	+= $(repodir)
 repomd_files		= $(repodir)/repomd.xml \
 			  $(repodir)/primary.xml.gz \
 			  $(repodir)/filelists.xml.gz \
-			  $(repodir)/other.xml.gz
+			  $(repodir)/other.xml.gz \
+			  $(repodir)/susedata.xml.gz
 
 repomd_signs		= $(repodir)/repomd.xml.asc
 
@@ -840,22 +841,60 @@ $(repomd_group)::
 
 $(repodir)/openss7.repo: $(repodir)
 	( \
-		echo '[openss7]'; \
-		echo 'enabled = 1'; \
-		echo 'name = OpenSS7 Repository'; \
-		echo 'baseurl = http://www.openss7.org/repos/rpms/$(PACKAGE_RPMSUBDIR)'; \
-		echo 'gpgkey = http://www.openss7.org/repos/tarballs/OPENSS7-GPG-KEY'; \
-		echo 'repo_gpgcheck = 1'; \
-		echo 'gpgcheck = 1'; \
-		echo ''; \
-		echo '[openss7-local]'; \
-		echo 'enabled = 0'; \
-		echo 'name = OpenSS7 Local Repository'; \
-		echo 'baseurl = file://$(topdir)'; \
-		echo 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
-		echo 'repo_gpgcheck = 1'; \
-		echo 'gpgcheck = 1'; \
+		$(ECHO) '[openss7]'; \
+		$(ECHO) 'enabled = 1'; \
+		$(ECHO) 'name = OpenSS7 Repository'; \
+		$(ECHO) 'baseurl = http://www.openss7.org/repos/rpms/$(PACKAGE_RPMSUBDIR)'; \
+		$(ECHO) 'gpgkey = http://www.openss7.org/repos/tarballs/OPENSS7-GPG-KEY'; \
+		$(ECHO) 'repo_gpgcheck = 1'; \
+		$(ECHO) 'gpgcheck = 1'; \
+		$(ECHO) ''; \
+		$(ECHO) '[openss7-local]'; \
+		$(ECHO) 'enabled = 0'; \
+		$(ECHO) 'name = OpenSS7 Local Repository'; \
+		$(ECHO) 'baseurl = file://$(topdir)'; \
+		$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
+		$(ECHO) 'repo_gpgcheck = 1'; \
+		$(ECHO) 'gpgcheck = 1'; \
 	) > $@
+
+$(repodir)/susedata.xml.gz:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test ! -f $@; then \
+		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) repo-suse"; \
+		$(MAKE) $(AM_MAKEFLAGS) repo-suse; \
+	fi
+
+#! repo-suse:
+#! 	Create (or recreate) the meta data files for a suse (repomd) repository
+#! 	in the package distribution directory, @repodir@/.  This target is
+#! 	primarily for generating the susedata.xml file.
+#!
+repo-suse: $(repodir) $(repodir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
+	numb=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null | wc -l`; \
+	( \
+		$(ECHO) "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ; \
+		$(ECHO) "<susedata packages=\"$$numb\">" ; \
+		for f in $$rpms; do \
+			$(ECHO) $(ECHO_N) "  <package " ; \
+				$(ECHO) $(ECHO_N) "pkgid=\"`sha1sum $$f | awk '{print $$1}'`\" " ; \
+				$(ECHO) $(ECHO_N) "name=\"`rpm -q --qf '%{NAME}' -p $$f`\" " ; \
+				$(ECHO) $(ECHO_N) "arch=\"`rpm -q --qf '%{ARCH}' -p $$f`\"" ; \
+				$(ECHO) ">" ; \
+			$(ECHO) $(ECHO_N) "    <version " ; \
+				$(ECHO) $(ECHO_N) "epoch=\"`rpm -q --qf '%{EPOCH}' -p $$f`\" " ; \
+				$(ECHO) $(ECHO_N) "ver=\"`rpm -q --qf '%{VERSION}' -p $$f`\" " ; \
+				$(ECHO) $(ECHO_N) "rel=\"`rpm -q --qf '%{RELEASE}' -p $$f`\" " ; \
+				$(ECHO) "/>" ; \
+			$(ECHO) "    <keyword>support_l3</keyword>" ; \
+			$(ECHO) "  </package>" ; \
+		done ; \
+		$(ECHO) "</susedata>" ; \
+	) >susedata.xml
+	$(MODIFYREPO) susedata.xml $(repodir)
+	rm -f susedata.xml
 
 $(repodir)/repomd.xml:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -901,21 +940,21 @@ repo-sign-yum: $(repomd_signs)
 #!
 repo-clean-yum:
 
-REPO			+= repo-yum
+REPO			+= repo-yum repo-suse
 REPO_SIGN		+= repo-sign-yum
 REPO_CLEAN		+= repo-clean-yum
 REPOCLEANFILES		+= $(repomd_files) $(repomd_signs) $(repomd_group) $(repodir)/openss7.repo
 
-MY_PHONY		+= repo-yum repo-clean-yum
+MY_PHONY		+= repo-yum repo-suse repo-clean-yum
 
-RELEASE			+= repo-yum
+RELEASE			+= repo-yum repo-suse
 RELEASE_SIGN		+= repo-sign-yum
 RELEASE_CLEAN_LOCAL	+= repo-clean-yum
 RELEASECLEANFILES	+= $(repomd_files) $(repomd_signs) $(repomd_group) $(repodir)/openss7.repo
 
-UPDATE			+= repo-yum
+UPDATE			+= repo-yum repo-suse
 UPDATE_SIGN		+= repo-sign-yum
-UPDATE_CLEAN_LOCAL	+= repo-yum repo-sign-yum
+UPDATE_CLEAN_LOCAL	+= repo-clean-yum
 UPDATECLEANFILES	+=
 
 endif
@@ -952,9 +991,12 @@ $(yastdir)/content:
 	if test -z "$$v"; then v='Unknown'; fi; \
 	( \
 		$(ECHO) "PRODUCT $(PACKAGE_TITLE)"; \
-		$(ECHO) "VERSION $(PACAKGE_VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)"; \
+		$(ECHO) "VERSION $(PACAKGE_VERSION)"; \
+		$(ECHO) "RELEASE $(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)"; \
 		$(ECHO) "VENDOR $$v"; \
-		$(ECHO) "LABEL $(PACKAGE_RPMDIST) ($(PACKAGE_STITLE))"; \
+		$(ECHO) "LABEL $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))"; \
+		$(ECHO) "NAME $(PACKAGE_NAME)"; \
+		$(ECHO) "RELNOTESURL http://www.openss7.org/sources/$(PACKAGE_VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)/NEWS"; \
 		$(ECHO) "ARCH.i686 i686 i586 i486 i386 noarch"; \
 		$(ECHO) "ARCH.i586 i586 i486 i386 noarch"; \
 		$(ECHO) "ARCH.x86_64 x86_64 noarch"; \
@@ -1128,6 +1170,9 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.7  2011-02-09 17:59:27  brian
+## - repository and rpm updates for suse
+##
 ## Revision 1.1.2.6  2011-02-07 04:48:31  brian
 ## - updated configure and build scripts
 ##
