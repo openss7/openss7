@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.5 2011-02-07 02:21:33 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.6 2011-02-10 17:29:45 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-10 17:29:45 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -168,9 +168,10 @@ The architecture of the release.  Example , @file{x86_64}.
 @end table
 
 So, for example, the @cite{CentOS 5.5} distribution for @file{x86_64} is located under
-@uref{http://www.openss7.org/repos/rpms/centos/5.5/x86_64/}; the @cite{Debian Squeeze} distribution
-for @file{i686} is located under @uref{http://www.openss7.org/repos/debs/debian/squeeze/i686/}; the
-tarball distribution is located under @uref{http://www.openss7.org/repos/tarballs}.
+@uref{http://@-www.@-openss7.@-org/@-repos/@-rpms/@-centos/@-5.5/@-x86_64/}; the @cite{Debian
+Squeeze} distribution for @file{i686} is located under
+@uref{http://@-www.@-openss7.@-org/@-repos/@-debs/@-debian/@-squeeze/@-i686/}; the tarball
+distribution is located under @uref{http://@-www.@-openss7.@-org/@-repos/@-tarballs}.
 
 @node Repositories for YUM
 @subsection Repositories for YUM
@@ -186,7 +187,7 @@ the @cite{OpenSS7} @uref{http://www.openss7.org/repos, repository}, like so:
 
 @smallexample
 $> REPOS="http://www.openss7.org/repos/rpms"
-$> REPOFILE="$REPOS/centos/5.5/x86_64/repodata/openss7.repo"
+$> REPOFILE="$REPOS/@value{PACKAGE_RPMSUBDIR}/repodata/openss7.repo"
 $> wget $REPOFILE
 $> sudo cp -f openss7.repo /etc/yum.repo.d/
 $> sudo yum makecache
@@ -203,44 +204,37 @@ like so:
 
 @smallexample
 $> REPOS="http://www.openss7.org/repos/rpms"
-$> REPOFILE="$REPOS/centos/5.5/x86_64/repodata/openss7.repo"
+$> REPOFILE="$REPOS/@value{PACKAGE_RPMSUBDIR}/repodata/openss7.repo"
 $> yum --temprepo=$REPOFILE grouplist
 @end smallexample
 
 Once the repository is set up, @cite{OpenSS7} includes a number of virtual package and package group
 definitions that ease the installation and removal of kernel modules, libraries and utilities.
-Downloading, configuring, building and installation for a single-kernel distribution is as easy as:
+Downloading, configuring, building and installation for a single-kernel distribution is as easy as
+(one of):
 
 @smallexample
 $> sudo yum groupinstall @value{PACKAGE}
-@end smallexample
-
-@noindent
-or
-
-@smallexample
 $> sudo yum install @value{PACKAGE}
 @end smallexample
 
-Removing the package is as easy as:
+Removing the package is as easy as (one of):
 
 @smallexample
-$> sudo yum groupremove @value{PACKAGE_TITLE}
-@end smallexample
-
-@noindent
-or
-
-@smallexample
+$> sudo yum groupremove @value{PACKAGE}
 $> sudo yum remove @value{PACKAGE}
 @end smallexample
 
 @subsubsection Setting up ZYPPER
 @cindex zypper
 
+To install or upgrade from the @cite{OpenSS7} @file{repomd} repositories using @manpage{zypper(8)},
+you will need a file to add to your @command{zypper} repositories.  This file can be obtained
+directly from the @cite{OpenSS7} @uref{http://www.openss7.org/repos, repository}, like so:
+
 @smallexample
 $> REPOS="http://www.openss7.org/repos/rpms"
-$> REPOFILE="$REPOS/suse/11/x86_64/repodata/openss7.repo"
+$> REPOFILE="$REPOS/@value{PACKAGE_RPMSUBDIR}/repodata/openss7.repo"
 $> wget $REPOFILE
 $> sudo zypper addrepo --refresh --repo openss7.repo
 $> rm -f openss7.repo
@@ -254,6 +248,23 @@ RPM as follows:
 $> wget http://www.openss7.org/pubkey.asc
 $> sudo rpm --import pubkey.asc
 $> rm -f pubkey.asc
+@end smallexample
+
+Once the repository is set up, @cite{OpenSS7} includes a number of virtual package and package group
+(pattern) definitions that ease the installation and removal of kernel modules, libraries and
+utilities.  Downloading, configuring, building and installation for a single-kernel distribution is
+a easy as (one of):
+
+@smallexample
+$> sudo zypper install -t pattern @value{PACKAGE}
+$> sudo zypper install @value{PACKAGE}
+@end smallexample
+
+Removing the package is as easy as:@footnote{Note that @manpage{zypper(8)} does not yet support
+removal by pattern.}
+
+@smallexample
+$> sudo zypper remove @value{PACKAGE}
 @end smallexample
 
 @subsubsection General REPO-MD Repository
@@ -285,107 +296,58 @@ when installing CentOS, RedHat, Fedora, or others.  You will have an additional 
 category from which to choose installation packages.
 
 The category that is provided is as follows:
-@table @asis
-@item @samp{@value{PACKAGE}-components} -- OpenSS7 STREAMS and Protocol Suite Components.
 
-The groups that are provided in this category are as follows:
+@samp{@value{PACKAGE}-components} -- OpenSS7 STREAMS and Protocol Suite Components.
+
+The groups (patterns) that are provided in this category are as follows:
 @table @asis
 @item @samp{@value{PACKAGE}} --- OpenSS7 STREAMS and Protocol Suites.
+This group (pattern) installs packages required for the @cite{Linux Fast-STREAMS} and @cite{OpenSS7
+Protocol Suites} runtime libraries, commands, utilities, init scripts and kernel modules.  Also
+included are section 1, 4, 5 and 8 manual pages for the commands, module and drivers, configuration
+file formats and administrative utilities.
 
-The packages that are provided in this group are as follows:
-@table @asis
-@item @samp{@value{PACKAGE}}
-@item @samp{@value{PACKAGE}-base}
-The @samp{@value{PACKAGE}-base} binary package contains init scripts, test scripts, maintenance
-scripts and the base system configuration files necessary for the operation of STREAMS and the
-protocol suites contained in the @samp{@value{PACKAGE}} package.  It contains user and
-administrative documentation in @file{info}, @file{pdf} and @file{html} formats as well as sections
-1, 4, 5 and 8 of the manual pages.  This binary package is required for any installation of the
-@samp{@value{PACKAGE}} package.  It is a @var{mandatory} component of the
-@samp{@value{PACKAGE}-base} group.
-@item @samp{@value{PACKAGE}-lib}
-@item @samp{@value{PACKAGE}-kernel}
-@item @samp{@value{PACKAGE}-java}
-@item @samp{@value{PACKAGE}-doc}
-@item @samp{@value{PACKAGE}-javadoc}
-@item @samp{@value{PACKAGE}-devel}
-@item @samp{@value{PACKAGE}-devel-kernel}
-@item @samp{@value{PACKAGE}-source-kernel}
-@end table
+Install this group (pattern) if you need the @cite{Linux Fast-STREAMS} and @cite{OpenSS7 Protocol
+Suties} core runtime.
+
+The mandatory (required) packages in this group (pattern) are
+@samp{@value{PACKAGE}},
+@samp{@value{PACKAGE}-@-base},
+@samp{@value{PACKAGE}-@-lib} and
+@samp{@value{PACKAGE}-@-kernel}.
+The default (recommended) packages in this group (pattern) are
+@samp{@value{PACKAGE}-@-java}.
+The optional (suggested) packages in this group (pattern) are
+@samp{@value{PACKAGE}-@-devel},
+@samp{@value{PACKAGE}-@-devel-@-kernel},
+@samp{@value{PACKAGE}-@-doc},
+@samp{@value{PACKAGE}-@-javadoc} and
+@samp{@value{PACKAGE}-@-source-@-kernel}.
 
 @item @samp{@value{PACKAGE}-java} --- OpenSS7 STREAMS and Protocol Suite Java Components.
+This group (pattern) installs packages required for the @cite{Linux Fast-STREAMS} and @cite{OpenSS7
+JAIN} Java components.
 
-The packages that are provided in this group are as follows:
-@table @asis
-@item @samp{@value{PACKAGE}-java}
-@item @samp{@value{PACKAGE}-javadoc}
-@end table
+The mandatory (required) packages in this group (pattern) are
+@samp{@value{PACKAGE}-@-java}.
+The optional (suggested) packages in this group (pattern) are
+@samp{@value{PACKAGE}-@-javadoc}.
 
-@item @samp{@value{PACKAGE}-devel} --- OpenSS7 STREAMS and Protocol Suite Development.
+@item @samp{@value{PACKAGE}-@-devel} --- OpenSS7 STREAMS and Protocol Suite Development.
 
-The packages that are provided in this group are as follows:
-@table @asis
-@item @samp{@value{PACKAGE}-devel}
-@item @samp{@value{PACKAGE}-devel-kernel}
-@item @samp{@value{PACKAGE}-doc}
-@item @samp{@value{PACKAGE}-javadoc}
-@item @samp{@value{PACKAGE}-source-kernel}
-@end table
+The mandatory (required) packages in this group (pattern) are
+@samp{@value{PACKAGE}-@-devel} and
+@samp{@value{PACKAGE}-@-devel-@-kernel}.
+The optional (suggested) packages in this group (pattern) are
+@samp{@value{PACKAGE}-@-doc},
+@samp{@value{PACKAGE}-@-javadoc} and
+@samp{@value{PACKAGE}-@-source-@-kernel}.
 
 @item @samp{@value{PACKAGE}-doc} --- OpenSS7 STREAMS and Protocol Suite Documentation.
 
-The packages that are provided in this group are as follows:
-@table @asis
-@item @samp{@value{PACKAGE}-doc}
-@item @samp{@value{PACKAGE}-javadoc}
-@end table
-
-@end table
-
-@end table
-
-
-Some additional installation real or virtual package names and the installations they accomplish are
-as follows:
-
-@table @samp
-@item @value{PACKAGE}
-
-This package can be used to install or remove the entire @value{PACKAGE_TITLE} package.  When
-installing, kernel modules will be installed automatically for the highest version kernel on your
-system.  When removing, all corresponding kernel modules will also be removed.
-
-@item @value{PACKAGE}-base
-
-@item @value{PACKAGE}-kernel
-@itemx @value{PACKAGE}-@value{_kversion}
-
-This package can be used to install or remove the package for a specific kernel version.  When
-installing, the @samp{@value{PACKAGE}} package will also be installed if necessary.  When removing
-the last kernel module package, the @samp{@value{PACKAGE}} package will also be removed.
-
-Note that the version @samp{@value{_kversion}} is just an example.  Use the version returned by
-@samp{$(uname -r)} for the kernel for which you wish to install or remove the packages.
-
-@item @value{PACKAGE}-java
-
-@item @value{PACKAGE}-devel
-
-This package can be used to install or remove the development components of the
-@value{PACKAGE_TITLE} package.  When installing, @samp{@value{PACKAGE}} and appropriate kernel
-module and kernel module development and debug packages will also be installed.  When removing, the
-development package and all kernel module development and debug packages will also be removed.
-
-@item @value{PACKAGE}-kernel-devel
-@itemx @value{PACKAGE}-@value{_kversion}-devel
-
-This package can be used to install or remove the development and debug packages for a specific
-kernel version.  When installing, the @samp{@value{PACKAGE}} and @samp{@value{PACKAGE}-devel}
-packages will also be installed if necessary.  When removing the development and debug for kernel
-modules for the last kernel, the @samp{@value{PACKAGE}-devel} package will also be removed.
-
-Note that the version @samp{@value{_kversion}} is just an example.  Use the version returned by
-@samp{$(uname -r)} for the kernel for which you wish to install or remove the packages.
+The mandatory (required) packages in this group (pattern) are
+@samp{@value{PACKAGE}-@-doc} and
+@samp{@value{PACKAGE}-@-javadoc}.
 
 @end table
 
@@ -397,7 +359,7 @@ For assistance with specific RPMs, see @ref{Downloading the Binary RPM}.
 @cindex yast
 
 For distributions that support @cite{YaST}, such as @cite{SUSE Linux Enterprise Server}, and
-@cite{OpenSUSE}, @cite{YaST} repositories are build coexistent with @cite{repo-md} repositories.
+@cite{OpenSUSE}, @cite{YaST} repositories are built coexistent with @cite{repo-md} repositories.
 Setting up the installation source as a @cite{YaST} installation source instead of @cite{repo-md}
 can provide the additional features associated with @cite{YaST} install sources.
 
@@ -445,8 +407,9 @@ download, configure, build and install from tarball.  In this later case, the ea
 install the package from tarball.
 
 @menu
-* Downloading with YUM::		the easiest YUM based system approach
-* Downloading with APT::		the easiest APT based system approach
+* Downloading with YUM:			the easiest approach for YUM based systems
+* Downloading with ZYPPER:		the easiest approach for ZYPPER based systems
+* Downloading with APT:			the easiest approach for APT based systems
 * Downloading the Binary RPM::		the easiest approach
 * Downloading the Debian DEB::		the easiest approach for Debian
 * Downloading the Source RPM::		the next best approach
@@ -462,178 +425,20 @@ install the package from tarball.
 @cindex downloading, yum
 @cindex yum
 
-@cite{OpenSS7} repositories support @manref{yum(8)} and @manref{zypper(8)} in repomd XML format as
-well as YaST and YaST2 formats.  The repository includes virtual packages that ease the installation
-and removal of kernel modules, libraries and utilities.  Downloading, configuration, building and
-installation for a single-kernel distribution installation is as easy as:
+With @manpage{yum(8)}, downloading is automatic.  See @pxrefman{Installing with YUM} for
+instructions.
+See @manref{yum(8)} for more information on downloading without installing.
 
-@smallexample
-% sudo yum groupinstall @value{PACKAGE}
-@end smallexample
+@c ----------------------------------------------------------------------------
 
-This and additional packages for installation are detailed as follows:
+@node Downloading with ZYPPER
+@subsection Downloading with ZYPPER
+@cindex downloading, zypper
+@cindex zypper
 
-@table @file
-@item @value{PACKAGE}
-Install this package if you need the runtime @file{@value{PACKAGE}} package.
-
-@smallexample
-% sudo yum install @value{PACKAGE}
-@end smallexample
-
-This will install the
-@file{@value{PACKAGE}},
-@file{@value{PACKAGE}-base} and
-@file{@value{PACKAGE}-lib} and
-@file{@value{PACKAGE}-kernel} RPMs, where @samp{kernel} is the highest version number kernel on
-your system.
-
-Remove this package if you need to remove all vestiges of the @file{@value{PACKAGE}} package.
-
-@smallexample
-% sudo yum remove @value{PACKAGE}
-@end smallexample
-
-This will remove the
-@file{@value{PACKAGE}},
-@file{@value{PACKAGE}-base},
-@file{@value{PACKAGE}-lib},
-@file{@value{PACKAGE}-devel},
-@file{@value{PACKAGE}-kernel} and
-@file{@value{PACKAGE}-devel-kernel} RPMs for all kernels on your system.
-
-@item @value{PACKAGE}-devel
-Install this package if you need the development @file{@value{PACKAGE}} package.
-
-@smallexample
-% sudo yum install @value{PACKAGE}-devel
-@end smallexample
-
-This will install the
-@file{@value{PACKAGE}},
-@file{@value{PACKAGE}-base},
-@file{@value{PACKAGE}-lib},
-@file{@value{PACKAGE}-devel},
-@file{@value{PACKAGE}-kernel} and
-@file{@value{PACKAGE}-devel-kernel} RPMs, where @samp{kernel} is the highest version number
-kernel on your system.
-
-Remove this package if you do not need development capabilities for the @file{@value{PACKAGE}}
-package for any kernel.
-
-@smallexample
-% sudo yum remove @value{PACKAGE}-devel
-@end smallexample
-
-This will remove the @file{@value{PACKAGE}-devel} and @file{@value{PACKAGE}-devel-kernel}
-RPMs for all kernels on your system.
-
-@item @value{PACKAGE}-@value{_kversion}
-Install this package if you need the runtime @file{@value{PACKAGE}} for kernel version
-@samp{@value{_kversion}}.  The value @samp{@value{_kversion}} is just an example.  For the running
-kernel, you can install the runtime @file{@value{PACKAGE}} components with:
-
-@smallexample
-% sudo yum install @value{PACKAGE}-$(uname -r)
-@end smallexample
-
-This will install the
-@file{@value{PACKAGE}},
-@file{@value{PACKAGE}-base},
-@file{@value{PACKAGE}-lib} and
-@file{@value{PACKAGE}-@value{_kversion}} RPMs, where @samp{@value{_kversion}} is the kernel version
-specified.
-
-Remove this package if you no longer need the runtime @file{@value{PACKAGE}} for kernel version
-@samp{@value{_kversion}}.  The value @samp{@value{_kversion}} is just an example.  For the running
-kernel, you can remove the runtime @file{@value{PACKAGE}} components with:
-
-@smallexample
-% sudo yum remove @value{PACKAGE}-$(uname -r)
-@end smallexample
-
-This will remove the @file{@value{PACKAGE}-@value{_kversion}} and
-@file{@value{PACKAGE}-devel-@value{_kversion}} RPMs, where @samp{@value{_kversion}} is the kernel
-version specified.  Also, if this is the last kernel for which @file{@value{PACKAGE}} was installed,
-the
-@file{@value{PACKAGE}},
-@file{@value{PACKAGE}-base},
-@file{@value{PACKAGE}-lib} and
-@file{@value{PACKAGE}-devel} RPMs will also be removed.
-
-Note that this is a virtual package name: the actual RPMs installed or removed from the system is a
-kernel module package whose precise name will depend upon the system being used.
-
-@item @value{PACKAGE}-devel-@value{_kversion}
-Install this package if you need the development @file{@value{PACKAGE}} package for kernel version
-@samp{@value{_kversion}}.  The value @samp{@value{_kversion}} is just an example.  For the running
-kernel, you can install the kernel development @file{@value{PACKAGE}} components with:
-
-@smallexample
-% sudo yum install @value{PACKAGE}-devel-$(uname -r)
-@end smallexample
-
-This will install the
-@file{@value{PACKAGE}},
-@file{@value{PACKAGE}-base},
-@file{@value{PACKAGE}-lib},
-@file{@value{PACKAGE}-devel},
-@file{@value{PACKAGE}-@value{_kversion}} and
-@file{@value{PACKAGE}-devel-@value{_kversion}} RPMs, where @samp{@value{_kversion}} is the kernel
-version specified.
-
-Remove this package if you no longer need the development capabilities for the
-@file{@value{PACKAGE}} package for kernel version @samp{@value{_kversion}}.  The value
-@samp{@value{_kversion}} is just an example.  For the running kernel, you can remove the kernel
-development @file{@value{PACKAGE}} components with:
-
-@smallexample
-% sudo yum remove @value{PACKAGE}-devel-$(uname -r)
-@end smallexample
-
-This will remove the @file{@value{PACKAGE}-devel-@value{_kversion}} RPMs, where
-@samp{@value{_kversion}} is the kernel version specified.  Also, if this is the last kernel for
-which @file{@value{PACKAGE}} was installed, the @file{@value{PACKAGE}-devel} RPMs will also be
-removed.
-
-Note that this is a virtual package name: the actual RPMs installed or removed from the system is a
-kernel module package whose precise name will depend upon the system being used.
-
-@item @value{PACKAGE}-base
-@itemx @value{PACKAGE}-lib
-These packages are auxilliary package that should be removed and inserted automatically by
-@manref{yum(8)}.  In rare instances you might need to remove or install one of these package
-explicitly.
-
-@item @value{PACKAGE}-doc
-@itemx @value{PACKAGE}-javadoc
-These packages contain documentation and are independent of the other @value{PACKAGE_TITLE}
-packages.  They can be installed and removed separately.  They can also be installed and removed as
-a pair with the @file{@value{PACKAGE}-doc} group.  These files are massive in size.
-
-To add these package as a pair, use:
-@smallexample
-% sudo yum install @value{PACKAGE}-doc @value{PACKAGE}-javadoc
-@end smallexample
-or
-@smallexample
-% sudo yum groupinstall @value{PACKAGE}-doc
-@end smallexample
-
-To remove these packages, use:
-@smallexample
-% sudo yum remove @value{PACKAGE}-doc @value{PACKAGE}-javadoc
-@end smallexample
-or
-@smallexample
-% sudo yum groupremove @value{PACKAGE}-doc
-@end smallexample
-
-@item @value{PACKAGE}-source
-This package is deprecated.  Use the source RPM or download the tarball if you really need to
-compile from source.  The tarball will also build RPMs and regenerate the source RPM.
- 
-@end table
+With @manpage{zypper(8)}, downloading is automatic.  See @pxrefman{Installing with ZYPPER} for
+instructions.
+See @manref{zypper(8)} for more information on downloading without installing.
 
 @c ----------------------------------------------------------------------------
 
@@ -642,7 +447,9 @@ compile from source.  The tarball will also build RPMs and regenerate the source
 @cindex downloading, apt
 @cindex apt
 
-OpenSS7 repositories support @manref{apt(8)} repository digests and signatures.
+With @manpage{apt(8)}, downloading is automatic.  See @pxrefman{Installing with APT} for
+instructions.
+See @manref{apt(8)} for more information on downloading without installing.
 
 @c ----------------------------------------------------------------------------
 
@@ -660,12 +467,12 @@ To install from Binary RPM, you will need all of the following kernel
 independent packages for your architecture, and one of the kernel-dependent
 packages from the next section.
 
-@subsubheading Independent RPM
+@subsubsection Independent RPM
 Independent RPM are
 not dependent on the Linux kernel version.
 For example, the
 source package
-@samp{@value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm},
+@samp{@value{PACKAGE}-@-source-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm},
 is not dependent on
 kernel.
 
@@ -677,10 +484,48 @@ can build binary RPM from the source RPM (see @pxrefman{Building from the Source
 RPM}).
 
 @subsubheading Architecture Independent
-@table @asis
+
+Architecture independent RPMs are not dependent upon the processor architecture.  That is, they are
+@samp{noarch} RPMs.  The architecture independent RPMs in the @cite{@value{PACKAGE_TITLE}}
+components are as follows:
+
+@table @file
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+
+This package can be used to install or remove the entire @value{PACKAGE_TITLE} package.  When
+installing, kernel modules will be installed automatically for the highest version kernel on your
+system.  When removing, all corresponding kernel modules will also be removed.
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-base-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-base-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+
+The @file{@value{PACKAGE}-base} binary package contains the init scripts, test scripts, maintenance
+scripts and base system configuration files necessary for the operation of Linux Fast-STREAMS and
+the protocol suites contained in the OpenSS7 package.  It contains user and administrative
+documentation in @file{.info}, @file{.pdf} and @file{.html} formats as well as sections 1, 4, 5 and
+8 of the manual pages.  This binary package is required for any installation of the OpenSS7 package
+and is not architecture specific (@samp{noarch}).
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+
+The @file{@value{PACKAGE}-doc} binary package contains the documentation used in the development of
+applications and programs that use the package.  It contains developer and programmer manuals in
+@file{.info}, @file{.pdf} and @file{.html} formats as well as sections 2, 3, 7 and 9 of the manual
+pages and Javadoc HTML documentation.  Install this binary package if you are interested in
+developing Linux Fast-STREAMS drivers or modules or application programs for the protocol suites
+contained in the OpenSS7 package.  This package is massive and is not normally necessary except on a
+development system.  The package is not architecture specific (@samp{noarch}).
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-javadoc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-javadoc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+
+The @file{@value{PACKAGE}-javadoc} binary package contains Javadoc documentation for the OpenSS7
+package.  Install this binary package if you are interested in developing JAIN applications or
+resource adaptors.  This package is not normally required on other than a development system.  The
+package is not architecture specific (@samp{noarch}).
+
 @ignore
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
-The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-dev-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}-@-dev} package contains the device definitions necessary
 to run applications programs developed for @value{PACKAGE_TITLE}.@footnote{Not
 all distributions support the @samp{%dev} RPM macro: a case in point is the SuSE
 8.0 distribution which uses an older version of @manpage{rpm(1)}.  Distributions
@@ -689,88 +534,154 @@ operation.  Note also that not all release packages contain devices.  Only
 packages that provide @acronym{STREAMS} character device drivers need devices, and then
 only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
-The @file{@value{PACKAGE}@--doc} package contains this manual in plain text,
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}-@-doc} package contains this manual in plain text,
 postscript, @file{pdf} and @file{html} forms, along with the meta-information from the
 @file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
 necessary for developing @value{PACKAGE_TITLE} applications and
 @value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--init@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
-The @file{@value{PACKAGE}@--init} package contains the @command{init} scripts and provides
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-init-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}-@-init} package contains the @command{init} scripts and provides
 the @samp{postinst} scripts necessary to create kernel module preloads and modules
 definitions for all kernel module @samp{core} subpackages.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
-The @file{@value{PACKAGE}@--source} package contains the source code necessary for
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-source-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+The @file{@value{PACKAGE}-@-source} package contains the source code necessary for
 building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
 configuration utilities necessary to create and distribute tarballs, @file{rpm} and
 @file{deb}/@file{dsc}.
-@end ignore
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}} package contains this manual in plain texit, postscript, @samp{pdf}, and
 @samp{html} forms, along with the meta-information from the package.  It also contains the @file{init}
 scripts and provides @command{postinst} scriptlets necessary to create kernel module preloads and
 modules definintions for all kernel module subpackages.  It also includes @acronym{SNMP MIB} files and
 @acronym{TMN GDMO} files.
+@end ignore
 @end table
 
 @subsubheading Architecture Dependent
-@table @asis
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
-The @file{@value{PACKAGE}@--devel} package contains library archives for static
-compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
-This also includes the header files and static libraries required to compile
-@value{PACKAGE_TITLE} applications programs.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
-The @file{@value{PACKAGE}@--lib} package contains the run-time shared libraries
-necessary to run application programs and utilities developed for the
-@file{@value{PACKAGE_NAME}} package.
+Architecture dependent RPMs are dependent upon the processor architecture (but not on the specific
+kernel version).  That is, they are @samp{@value{_target_cpu}} RPMs.  The architecture dependent
+RPMs in the @cite{@value{PACKAGE_TITLE}} components are as follows:
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-util-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
-The @file{@value{PACKAGE}@--util} package provides administrative and
-configuration test utilities and commands associated with the
-@value{PACKAGE_TITLE} package.
+@table @file
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-lib-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
+The @file{@value{PACKAGE}-lib} binary package contains the runtime (shared object) libraries
+necessary to run applications programs and utilities developed for @cite{Linux Fast-STREAMS} and the
+protocol suites contained in the @cite{OpenSS7} package.  Also included are the libtool @file{.la}
+files describing the shared object libraries.  The binary package also provides administrative and
+configuration test utilities and commands associated with the OpenSS7 package.  Note that these
+utilities are needed for running the validation test suites contained in the
+@file{@value{PACKAGE}-base} binary package.
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-java-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-java-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
+The @file{@value{PACKAGE}-java} binary package contains JAIN implementations for OpenSS7 Linux
+Fast-STREAMS and the associated protocol suites.  It includes jar files, JNI and CNI libraries, and
+gcj native compiled libraries.  It also includes SWIG implementations of Java interfaces for
+OpenSS7 API libraries.
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-devel-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
+The @file{@value{PACKAGE}-devel} binary package contains library archives for static compilation,
+and header files to develop Linux Fast-STREAMS modules and drivers.  This also includes header files
+and static libraries required to compile Linux Fast-STREAMS and OpenSS7 protocol suite applications
+programs.  This package also provides debug information for the OpenSS7 packages.  Debug information
+is useful when developing applications that use the OpenSS7 package or when debugging the OpenSS7
+package.
+
+This binary package does not contain developer nor programmer documentation nor manual pages.  To
+obtain the developer and programmer documentation, load the @file{@value{PACKAGE}-doc} binary
+package.  This package is architecture-specific but not kernel-specific.
+
+This package can be used to install or remove the development components of the
+@value{PACKAGE_TITLE} package.  When installing, @samp{@value{PACKAGE}} and appropriate kernel
+module and kernel module development and debug packages will also be installed.  When removing, the
+development package and all kernel module development and debug packages will also be removed.
+
 @end table
 
-@subsubheading Kernel-Dependent RPM
-Kernel-Dependent RPM are dependent on specific Linux Kernel Binary RPM releases.
-Packages are provided for popular released @cite{RedHat} kernels.  Packages
-dependent upon @cite{RedHat} or other kernel RPM will have the @samp{_kversion}
-kernel package version in the package name.
+@subsubsection Kernel-Dependent RPM
 
-One of the following Kernel-Dependent packages is required for your architecture
-and kernel version.  If your architecture or kernel version is not on the list,
-you can build binary RPM from the source RPM (see @pxrefman{Building from the
-Source RPM}).@footnote{Note that on @cite{Mandrakelinux}, unlike other RPM
-kernel distributions, kernel packages for the ix86 architectures are always
-placed in i586 architecture packages regardless of the true processor
-architecture of the kernel package.  @file{configure} detects this and builds
-the appropriate packages.}
+Kernel-Dependent RPM are dependent on specific Linux Kernel Binary RPM releases.  Packages are
+provided for popular distribution production kernels.  Packages dependent upon a kernel RPM will
+have the @samp{_kversion} kernel package version in the package name.
 
-@table @asis
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-core-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
-The @file{@value{PACKAGE}@--core} package contains the loadable kernel modules
-that depend only on the kernel.  This package is heavily tied to the kernel for
-which it was compiled.  This particular package applies to kernel version
-@samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
-@samp{@value{_kversion}} is only an example.  Note also that only release
-packages that contain kernel modules will contain a @file{core} subpackage.}
+One of the following Kernel-Dependent packages is required for your architecture and kernel version.
+If your architecture or kernel version is not available, you can build binary RPM from the source
+RPM (see @pxrefman{Building from the Source RPM}).@footnote{Note that on @cite{Mandrakelinux},
+unlike other RPM kernel distributions, kernel packages for the ix86 architectures are always placed
+in i586 architecture packages regardless of the true processor architecture of the kernel package.
+@file{configure} detects this and builds the appropriate packages.}
 
-@item @uref{http://www.openss7.org/rpms/RPMS/i686/@value{PACKAGE}-info-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.i686.rpm,, @value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm}
-The @file{@value{PACKAGE}@--info} package@footnote{Note that only release packages
-that contain kernel modules and that export versioned symbols will contain a
-@file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
-kernels and is not necessary and not built for 2.6 series kernels.} contains the
-module symbol version information for the @file{core} subpackage, above.  It is
-possible to load this subpackage and compile modules that use the exported
-symbols without loading the actual kernel modules (from the @file{core}
-subpackage above).  This package is heavily tied to the kernel for which it was
-compiled.  This particular package applies to kernel version
-@samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
-@samp{@value{_kversion}} is only an example.}
+@table @file
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
+The @file{@value{PACKAGE}-kernel} binary package contains the kernel modules that provide the Linux
+kernel Linux Fast-STREAMS drivers and modules.  This includes assorted drivers and modules for Linux
+Fast-STREAMS and additional OpenSS7 protocol suite components.  This binary package also includes
+modprobe configuration files for the associated kernel modules.  This package is heavily tied to the
+kernel for which it and dependent components were compiled.  This package applies to kernel version
+@value{_kversion} and requires components compiled for the same kernel.  If you cannot find a binary
+package that matches your kernel, rebuild for your kernel from the OpenSS7 package source rpm.
+
+This package can be used to install or remove the package for a specific kernel version.  When
+installing, the @samp{@value{PACKAGE}} package will also be installed if necessary.  When removing
+the last kernel module package, the @samp{@value{PACKAGE}} package will also be removed.
+
+Note that the version @samp{@value{_kversion}} is just an example.  Use the version returned by
+@samp{$(uname -r)} for the kernel for which you wish to install or remove the packages.
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-devel-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-devel-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
+The @file{@value{PACKAGE}-devel-@value{_kversion}} binary package contains the kernel modules symbol
+information for development of additional Linux Fast-STREAMS kernel modules against the core kernel
+modules included in the @samp{@value{PACKAGE}-@value{_kversion}} binary package.  This package is
+heavily tied to the core kernel modules and kernel for which it was compiled.  This package applies
+to core kernel modules @samp{@value{_kversion}} for kernel version @samp{@value{_kversion}}.  This
+package provides kernel debug information for the OpenSS7 package.  Kernel debug information is
+useful when developing kernel modules that use this package or when debugging kernel modules
+contained in the package.
+
+This package can be used to install or remove the development and debug packages for a specific
+kernel version.  When installing, the @samp{@value{PACKAGE}} and @samp{@value{PACKAGE}-devel}
+packages will also be installed if necessary.  When removing the development and debug for kernel
+modules for the last kernel, the @samp{@value{PACKAGE}-devel} package will also be removed.
+
+Note that the version @samp{@value{_kversion}} is just an example.  Use the version returned by
+@samp{$(uname -r)} for the kernel for which you wish to install or remove the packages.
+
+The @file{@value{PACKAGE}-@-devel-@-@value{_kversion}} package contains the module symbol version
+information for the @file{kernel} package, above.  It is possible to load this package and compile
+modules that use the exported symbols without loading the actual kernel modules (from the
+@file{kernel} package above).  This package is heavily tied to the kernel for which it was compiled.
+This particular package applies to kernel version @samp{@value{_kversion}}.@footnote{Note that the
+@samp{_kversion} of @samp{@value{_kversion}} is only an example.}
+
+@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-source-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-source-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
+The @file{@value{PACKAGE}-@-source-@-@value{_kversion}} package contains the configured source for
+a specific kernel.  This package contains source that is configured to the kernel for which it was
+configured.  This particular package contains configured source for kernel version
+@samp{@value{_kversion}}@footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only
+an example.}
+The @file{@value{PACKAGE}-@-source} package contains the source code necessary for
+building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
+configuration utilities necessary to create and distribute tarballs, @file{rpm} and
+@file{deb}/@file{dsc}.
+
+The @file{@value{PACKAGE}-source-@value{_kversion}} binary package contains the source code
+necessary for building the OpenSS7 release for the kernel version @samp{@value{_kversion}}.  It also
+includes the @manpage{autoconf(1)} configuration utilities necessary to create and distribute this
+rpm.  However, to develop on the package, it would be better to use the tarball release.  Load this
+package if you need some files from the build that are not present in the
+@file{@value{PACKAGE}-devel-@value{_kversion}} package.
 
 @end table
 
@@ -797,7 +708,7 @@ and one of the kernel-dependent packages from the next section.
 @subsubheading Independent DEB
 Independent DEB are not dependent on the Linux kernel version.  For
 example, the source package
-@samp{@value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}, is not
+@samp{@value{PACKAGE}-@-source_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}, is not
 dependent on kernel.
 
 @noindent
@@ -809,25 +720,25 @@ downloads site.  If your architecture is not available, you can build binary DEB
 
 @subsubheading Architecture Independent
 @table @asis
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--dev_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}@--dev} package contains the device definitions necessary to run
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-dev_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}-@-dev} package contains the device definitions necessary to run
 applications programs developed for @value{PACKAGE_TITLE}.  @footnote{Note that not all release
 packages contain devices.  Only packages that provide @acronym{STREAMS} character device drivers need
 devices, and then only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--doc_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}@--doc} package contains this manual in plain text, postscript, @file{pdf} and @file{html}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-doc_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}-@-doc} package contains this manual in plain text, postscript, @file{pdf} and @file{html}
 forms, along with the meta-information from the @file{@value{PACKAGE_NAME}} package.  It also
 contains all of the manual pages necessary for developing @value{PACKAGE_TITLE} applications and
 @value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--init_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}@--init} package contains the @command{init} scripts and provides the @command{postinst}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-init_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}-@-init} package contains the @command{init} scripts and provides the @command{postinst}
 scripts necessary to create kernel module preloads and modules definitions for all kernel module
 @samp{core} subpackages.
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}@--source_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}@--source} package contains the source code necessary for
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-source_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
+The @file{@value{PACKAGE}-@-source} package contains the source code necessary for
 building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
 configuration utilities necessary to create and distribute tarballs, rpms and
 deb/dscs.
@@ -835,20 +746,20 @@ deb/dscs.
 
 @subsubheading Architecture Dependent
 @table @asis
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-devel_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--devel_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
-The @file{@value{PACKAGE}@--devel} package contains library archives for static
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-devel_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-devel_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}-@-devel} package contains library archives for static
 compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
 This also includes the header files and static libraries required to compile
 @value{PACKAGE_TITLE} applications programs.
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-lib_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--lib_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
-The @file{@value{PACKAGE}@--lib} package contains the run-time shared libraries
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-lib_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-lib_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}-@-lib} package contains the runtime shared libraries
 necessary to run application programs and utilities developed for the
 @file{@value{PACKAGE_NAME}} package.
 
 @ignore
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--util_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
-The @file{@value{PACKAGE}@--util} package provides administrative and
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-util_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}-@-util} package provides administrative and
 configuration test utilities and commands associated with the
 @value{PACKAGE_TITLE} package.
 @end ignore
@@ -870,16 +781,16 @@ architecture of the kernel package.  @file{configure} detects this and builds
 the appropriate packages.}
 
 @table @asis
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--core@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
-The @file{@value{PACKAGE}@--core} package contains the loadable kernel modules
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-core-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-core-@-@value{_kversion}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}-@-core} package contains the loadable kernel modules
 that depend only on the kernel.  This package is heavily tied to the kernel for
 which it was compiled.  This particular package applies to kernel version
 @samp{@value{_kversion}}.@footnote{Note that the @samp{_kversion} of
 @samp{@value{_kversion}} is only an example.  Note also that only release
 packages that contain kernel modules will contain a @file{core} subpackage.}
 
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}@--info@--@value{_kversion}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}_i386@-.deb}
-The @file{@value{PACKAGE}@--info} package@footnote{Note that only release packages
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-info-@value{_kversion}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-info-@-@value{_kversion}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+The @file{@value{PACKAGE}-@-info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
 kernels and is not necessary and not built for 2.6 series kernels.} contains the
@@ -908,7 +819,7 @@ If you cannot obtain a binary RPM for your architecture, or would like to roll y
 download the following source RPM.
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm,, @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
+@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
 This is the source RPM for the package.  From this source RPM it is possible to build binary RPM for
 any supported architecture and for any 2.4 or 2.6 kernel.
 @end table
@@ -927,8 +838,8 @@ If you cannot obtain a binary DEB for your architecture, or would like to roll y
 download the following Debian DSC.
 
 @table @asis
-@item @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc,, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc}
-@itemx @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz,, @value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz}
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc,, @value{PACKAGE}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}@-.dsc}
+@itemx @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz,, @value{PACKAGE}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}@-.tar@-.gz}
 This is the Debian DSC for the package.  From this Debian DSC it is possible to build binary DEB for
 any supported architecture and for any 2.4 or 2.6 kernel.
 @end table
@@ -947,8 +858,8 @@ For non-@manpage{rpm(1)} and non-@manpage{dpkg(1)} architectures,
 download the tarball as follows:
 
 @table @asis
-@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.bz2}
-@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.xz,, @value{PACKAGE}@--@value{VERSION}@-.tar@-.xz}
+@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2,, @value{PACKAGE}-@-@value{VERSION}@-.tar@-.bz2}
+@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.xz,, @value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz}
 These are the @manpage{tar(1)} balls for the release.  These @manpage{tar(1)} balls contain the
 @manpage{autoconf(1)} distribution which includes all the source necessary for building and
 installing the package.  These tarballs will even build Source RPM and Binary RPM on
@@ -1214,8 +1125,8 @@ possible to relocate some of the installation directories.  This allows some deg
 customization.  Relocations that are available on the binary RPM are as follows:
 
 @table @file
-@item @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
-@cindex @value{PACKAGE}@--core@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@item @value{PACKAGE}-@-core-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}-@-core-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}/lib/@-modules/@-@value{_kversion}}
 This relocatable directory contains the kernel modules that provide the
@@ -1223,8 +1134,8 @@ This relocatable directory contains the kernel modules that provide the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 @end table
 
-@item @value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
-@cindex @value{PACKAGE}@--info@--@value{_kversion}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@item @value{PACKAGE}-@-info-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}-@-info-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}/usr/@-include/@-@value{PACKAGE}/@-@value{_kversion}}
 This relocatable directory contains the kernel module exported symbol
@@ -1234,12 +1145,12 @@ of @samp{@value{_kversion}} is only an example.  Also, note that the @samp{info}
 subpackage is only applicable to the 2.4 kernel series.}
 @end table
 
-@item @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
-@cindex @value{PACKAGE}@--dev@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@item @value{PACKAGE}-@-dev-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}-@-dev-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 (not relocatable)
 
-@item @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
-@cindex @value{PACKAGE}@--devel@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@item @value{PACKAGE}-@-devel-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}-@-devel-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
 This relocatable directory contains @value{PACKAGE} libraries.
@@ -1247,13 +1158,13 @@ This relocatable directory contains @value{PACKAGE} libraries.
 This relocatable directory contains @value{PACKAGE} header files.
 @end table
 
-@item @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
-@cindex @value{PACKAGE}@--doc@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@item @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_datadir}/@-doc}
 This relocatable directory contains all package specific documentation
 (including this manual).  The subdirectory in this directory is the
-@file{@value{PACKAGE}@--@value{VERSION}} directory.
+@file{@value{PACKAGE}-@-@value{VERSION}} directory.
 @item @file{@value{_rootdir}@value{_infodir}}
 This relocatable directory contains info files (including the info version of
 this manual).
@@ -1261,26 +1172,26 @@ this manual).
 This relocatable directory contains manual pages.
 @end table
 
-@item @value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
-@cindex @value{PACKAGE}@--lib@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@item @value{PACKAGE}-@-lib-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}-@-lib-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
-This relocatable directory contains the run-time shared libraries necessary to
+This relocatable directory contains the runtime shared libraries necessary to
 run applications programs and utilities developed for @value{PACKAGE_TITLE}.
 @item @file{@value{_rootdir}@value{_datadir}/@-locale}
 This relocatable directory contains the locale information for shared library
 files.
 @end table
 
-@item @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
-@cindex @value{PACKAGE}@--source@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@item @value{PACKAGE}-@-source-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}-@-source-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_prefix}/@-src}
 This relocatable directory contains the source code.
 @end table
 
-@item @value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
-@cindex @value{PACKAGE}@--util@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@item @value{PACKAGE}-@-util-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
+@cindex @value{PACKAGE}-@-util-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_bindir}}
 This relocatable directory contains binary programs and utilities.
@@ -1655,14 +1566,14 @@ modules.  Use with care.
 
 @item --enable-k-safe
 @opindex k-safe
-Enable kernel module run-time safety checks.  Specifies whether kernel safety is to be performed.
+Enable kernel module runtime safety checks.  Specifies whether kernel safety is to be performed.
 This option is mutually exclusive with @option{--enable-k-test}, @option{--enable-k-debug} and
 @option{--enable-k-none} below.  This has the effect of invoking some more pedantic assertion macros
 in the code.  The default is to apply kernel safety.
 
 @item --enable-k-test
 @opindex k-test
-Enable kernel module run-time testing.  Specifies whether kernel testing is to be performed.  This
+Enable kernel module runtime testing.  Specifies whether kernel testing is to be performed.  This
 option is mutually exclusive with @option{--enable-k-safe} above and @option{--enable-k-debug} and
 @option{--enable-k-none} below.  This has the effect of removing @code{static} and @code{inline}
 attributes from functions and invoking most non-performance affecting debugging macros in the code.
@@ -1670,7 +1581,7 @@ The default is not to perform kernel testing.
 
 @item --enable-k-debug
 @opindex k-debug
-Enable kernel module run-time debugging.  Specifies whether kernel debugging is to be performed.
+Enable kernel module runtime debugging.  Specifies whether kernel debugging is to be performed.
 This option is mutually exclusive with @option{--enable-k-safe} and @option{--enable-k-test} above,
 and @option{--enable-k-none} below.  This has the effect of removing @code{static} and @code{inline}
 attributes from functions and invoking all debugging macros in the code (including
@@ -1678,7 +1589,7 @@ performance-affecting debug macros).  The default is to not perform kernel debug
 
 @item --enable-k-none
 @opindex none
-Enable no kenrel module run-time checks.  Specifies whether kernel run-time checks are to be
+Enable no kenrel module runtime checks.  Specifies whether kernel runtime checks are to be
 performed.  THis option is mutually exclusive with @option{--enable-k-safe},
 @option{--enable-k-test} and @option{--enable-k-debug}.  This has the effect of removing all
 assertion macros from the code.  The default is to not to remove all assertion macros.
@@ -1842,7 +1753,7 @@ The default is to build loadable kernel modules.
 @opindex k-modules
 Specify the @samp{K-MODULES-DIR} directory to which kernel modules will be installed.  The default
 is based on the option @option{--with-k-release}, @option{--with-k-prefix} and
-@option{--with-k-rootdir}.  The default is @file{DESTDIR}/@-@file{K@--MODULES@--DIR} which is
+@option{--with-k-rootdir}.  The default is @file{DESTDIR}/@-@file{K-@-MODULES-@-DIR} which is
 typically @file{@var{DESTDIR}/@-lib/@-modules/@-@var{PACKAGE_KRELEASE}/@-}.  This directory is
 normally located by the @file{configure} script and need only be provided for special cross-build
 environments or when requested by a @file{configure} script error message.
@@ -1850,28 +1761,28 @@ environments or when requested by a @file{configure} script error message.
 @item --with-k-build=K-BUILD-DIR
 @opindex k-build
 Specify the @samp{K-BUILD-DIR} base kernel build directory in which configured kernel source
-resides.  The default is @file{@var{DESTDIR}/@-@var{K@--MODULES@--DIR}/@-build}.  This directory is
+resides.  The default is @file{@var{DESTDIR}/@-@var{K-@-MODULES-@-DIR}/@-build}.  This directory is
 normally located by the @file{configure} script and need only be provided for special cross-build
 environments or when requested by a @file{configure} script error message.
 
 @item --with-k-source=K-SOURCE-DIR
 @opindex k-build
 Specify the @samp{K-SOURCE-DIR} base kernel build directory in which configured kernel source
-resides.  The default is @file{@var{DESTDIR}/@-@var{K@--MODULES@--DIR}/@-source}.  This directory is
+resides.  The default is @file{@var{DESTDIR}/@-@var{K-@-MODULES-@-DIR}/@-source}.  This directory is
 normally located by the @file{configure} script and need only be provided for special cross-build
 environments or when requested by a @file{configure} script error message.
 
 @item --with-k-modver=K-MODVER-FILE
 @opindex k-sysmap
 Specify the @samp{K-MODVER-FILE} kernel module versions file.  The default is
-@file{@var{K@--BUILD@--DIR}/@-Module.symvers}.  This file is normally located by the
+@file{@var{K-@-BUILD-@-DIR}/@-Module.symvers}.  This file is normally located by the
 @file{configure} script and need only be provided for special cross-build environments or when
 requested by a @file{configure} script error message.
 
 @item --with-k-sysmap=K-SYSMAP-FILE
 @opindex k-sysmap
 Specify the @samp{K-SYSMAP-FILE} kernel system map file.  The default is
-@file{@var{K@--BUILD@--DIR}/@-System.map}.  This file is normally located by the @file{configure}
+@file{@var{K-@-BUILD-@-DIR}/@-System.map}.  This file is normally located by the @file{configure}
 script and need only be provided for special cross-build environments or when requested by a
 @file{configure} script error message.
 
@@ -1879,7 +1790,7 @@ script and need only be provided for special cross-build environments or when re
 @item --with-k-includes=K-INCLUDES-DIR
 @opindex k-includes
 Specify the @samp{K-INCLUDES-DIR} include directory of the kernel for which the build is targeted.
-The default is @file{@var{DESTDIR}/@-@var{K@--BUILD@--DIR}/@-include}.  This directory is normally
+The default is @file{@var{DESTDIR}/@-@var{K-@-BUILD-@-DIR}/@-include}.  This directory is normally
 located by the @file{configure} script and need only be provided for special cross-build
 environments or when requested by a @file{configure} script error message.
 @end ignore
@@ -1887,21 +1798,21 @@ environments or when requested by a @file{configure} script error message.
 @item --with-k-archdir=K-ARCHDIR
 @opindex k-archdir
 Specify the @samp{K-ARCHDIR} kernel source architecture specific directory.  The default is
-@file{@var{DESTDIR}/@-@var{K@--SOURCE@--DIR}/@-arch}.  This directory is normally located by the
+@file{@var{DESTDIR}/@-@var{K-@-SOURCE-@-DIR}/@-arch}.  This directory is normally located by the
 @file{configure} script and need only be provided for special cross-build environments or when
 requested by a @file{configure} script error message.
 
 @item --with-k-machdir=K-MACHDIR
 @opindex k-machdir
 Specify the @samp{K-MACHDIR} kernel source machine specific directory.  The default is
-@file{@var{DESTDIR}/@-@var{K@--SOURCE@--DIR}/@-@var{target_cpu}}.  This directory is normally
+@file{@var{DESTDIR}/@-@var{K-@-SOURCE-@-DIR}/@-@var{target_cpu}}.  This directory is normally
 located by the @file{configure} script and need only be provided for special cross-build
 environments or when requested by a @file{configure} script error message.
 
 @item --with-k-config=K-CONFIG
 @opindex k-config
 Specify the @samp{K-CONFIG} kernel configuration file.  The default is
-@file{@var{BOOT}/@-config@--@var{K@--RELEASE}}.  This configuration file is normally located by the
+@file{@var{BOOT}/@-config-@-@var{K-@-RELEASE}}.  This configuration file is normally located by the
 @file{configure} script and need only be provided for special cross-build environments or when
 requested by a @file{configure} script error message.
 
@@ -2401,7 +2312,7 @@ The source RPM is rebuilt to binary RPMs as follows:
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-rpms/@-SRPMS/@-@value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
+% wget http://www.openss7.org/@-rpms/@-SRPMS/@-@value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
 % rpmbuild --rebuild -vv @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
 @end smallexample
 @end cartouche
@@ -2415,7 +2326,7 @@ command line.  For example:
 @smallexample
 % rpmbuild --rebuild -vv --target athlon-redhat-linux \ 
   --define "_kversion @value{_kversion}" \ 
-  -- @value{PACKAGE}@--@value{VERSION}@--@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
+  -- @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
 @end smallexample
 @end cartouche
 
@@ -2445,8 +2356,8 @@ The Debian DSC is rebuilt to binary DEBs as follows:
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.dsc
-% wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}@--@value{PACKAGE_DEBRELEASE}@-.tar@-.gz
+% wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}@-.dsc
+% wget http://www.openss7.org/@-debian/@-@value{PACKAGE}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}@-.tar@-.gz
 % dpkg-buildpackage -v @value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc
 @end smallexample
 @end cartouche
@@ -2494,7 +2405,7 @@ Following is an example of a native build against the running kernel:
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.xz
+% wget http://www.openss7.org/@-@value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz
 % tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
 % pushd @value{PACKAGE}-@value{VERSION}
 % ./configure
@@ -2511,14 +2422,14 @@ is unlikely to be the kernel version of the target machine, except by coincidenc
 cross-building, specify the root for the build with environment variable @var{DESTDIR}.  The
 cross-compile host must also be specified if different from the build host.  Either the compiler and
 other tools must be in the usual places where GNU @manpage{autoconf(1)} can find them, or they must
-be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc@--linux/@-gcc} on the
+be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc-@-linux/@-gcc} on the
 @file{configure} command line.
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}@--@value{VERSION}@-.tar@-.xz
-% tar -xJvf @value{PACKAGE}@--@value{VERSION}@-.tar@-.xz
-% pushd @value{PACKAGE}@--@value{VERSION}
+% wget http://www.openss7.org/@-@value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz
+% tar -xJvf @value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz
+% pushd @value{PACKAGE}-@-@value{VERSION}
 % ./configure DESTDIR="/some/@-other/@-root" \ 
 	--with-k-release=2.4.18 --host sparc-linux
 % make
@@ -2534,10 +2445,192 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc@--linux/@-gcc} 
 @cindex installing
 
 @menu
+* Installing with YUM::			the easiest YUM based system approach
+* Installing with ZYPPER::		the easiest ZYPPER based system approach
+* Installing with APT::			the easiest APT based system approach
 * Installing the Binary RPM::		the easiest approach
 * Installing the Debian DEB::		the easiest approach for Debian
 * Installing the Tar Ball::		last resort
 @end menu
+
+@c ----------------------------------------------------------------------------
+
+@node Installing with YUM
+@subsection Installing with YUM
+@cindex installing, yum
+@cindex yum
+
+If you have set up the necessary repository definitions (@pxrefman{Repositories for YUM}), then the
+following instructions will install the RPMs on your system.@footnote{For additional information on
+@manpage{yum(8)}, see @manref{yum(8)}.}
+The repository includes groups (patterns) and virtual packages that ease the installation and
+removal of kernel modules, libraries and utilities.
+
+To install the @cite{@value{PACKAGE_TITLE}} runtime components for a single-kernel distribution
+installation, use (one of):
+
+@cartouche
+@smallexample
+% sudo yum groupinstall @value{PACKAGE}
+% sudo yum install @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+@noindent
+To include the @cite{@value{PACKAGE_TITLE} JAIN} Java components, use (one of):
+
+@cartouche
+@smallexample
+% sudo yum groupinstall @value{PACKAGE}-java
+% sudo yum install @value{PACKAGE}-java
+@end smallexample
+@end cartouche
+
+@noindent
+To add an additional @cite{@value{PACKAGE_TITLE}} kernel runtime component to the installation, 
+use (one of):
+
+@cartouche
+@smallexample
+% sudo yum install @value{PACKAGE}-$(uname -r)
+% sudo yum install @value{PACKAGE}-@value{_kversion}
+@end smallexample
+@end cartouche
+
+@noindent
+Here, @samp{$(uname -r)} is simply a way of specifying the running kernel.  The value
+@samp{@value{_kversion}} is just an example.  Use the specific kernel version that you want to add
+to the installation.
+
+To install the @cite{@value{PACKAGE_TITLE}} development components for a single-kernel distribution,
+use (one of):
+
+@cartouche
+@smallexample
+% sudo yum groupinstall @value{PACKAGE}-devel
+% sudo yum install @value{PACKAGE}-devel
+@end smallexample
+@end cartouche
+
+@noindent
+To add an additional @cite{@value{PACKAGE_TITLE}} kernel development component to the installation,
+use (one of):
+
+@cartouche
+@smallexample
+% sudo yum install @value{PACKAGE}-devel-$(uname -r)
+% sudo yum install @value{PACKAGE}-devel-@value{_kversion}
+@end smallexample
+@end cartouche
+
+@noindent
+Here, @samp{$(uname -r)} is simply a way of specifying the running kernel.  The value
+@samp{@value{_kversion}} is just an example.  Use the specific kernel version that you want to add
+to the installation.
+
+To add @cite{@value{PACKAGE_TITLE}} development documentation, use (one of):
+
+@cartouche
+@smallexample
+% sudo yum groupinstall @value{PACKAGE}-doc
+% sudo yum install @value{PACKAGE}-doc @value{PACKAGE}-javadoc
+@end smallexample
+@end cartouche
+
+@c ----------------------------------------------------------------------------
+
+@node Installing with ZYPPER
+@subsection Installing with ZYPPER
+@cindex installing, zypper
+@cindex zypper
+
+If you have set up the necessary repository definitions (@pxrefman{Repositories for YAST}), then
+the following instructions will install the RPMs on your system.@footnote{For additional information
+on @manpage{zypper(8)}, see @manref{zypper(8)}.}
+The repository includes groups (patterns) and virtual packages that ease the installation and
+removal of kernel modules, libraries and utilities.
+
+To install the @cite{@value{PACKAGE_TITLE}} runtime components for a single-kernel distribution
+installation, use (one of):
+
+@cartouche
+@smallexample
+% sudo zypper install -t pattern @value{PACKAGE}
+% sudo zypper install @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+@noindent
+To include the @cite{@value{PACKAGE_TITLE} JAIN} Java components, use (one of):
+
+@cartouche
+@smallexample
+% sudo zypper install -t pattern @value{PACKAGE}-java
+% sudo zypper install @value{PACKAGE}-java
+@end smallexample
+@end cartouche
+
+@noindent
+To add an additional @cite{@value{PACKAGE_TITLE}} kernel runtime component to the installation, 
+use (one of):
+
+@cartouche
+@smallexample
+% sudo zypper install @value{PACKAGE}-$(uname -r)
+% sudo zypper install @value{PACKAGE}-@value{_kversion}
+@end smallexample
+@end cartouche
+
+@noindent
+Here, @samp{$(uname -r)} is simply a way of specifying the running kernel.  The value
+@samp{@value{_kversion}} is just an example.  Use the specific kernel version that you want to add
+to the installation.
+
+To install the @cite{@value{PACKAGE_TITLE}} development components for a single-kernel distribution,
+use (one of):
+
+@cartouche
+@smallexample
+% sudo zypper install -t pattern @value{PACKAGE}-devel
+% sudo zypper install @value{PACKAGE}-devel
+@end smallexample
+@end cartouche
+
+@noindent
+To add an additional @cite{@value{PACKAGE_TITLE}} kernel development component to the installation,
+use (one of):
+
+@cartouche
+@smallexample
+% sudo zypper install @value{PACKAGE}-devel-$(uname -r)
+% sudo zypper install @value{PACKAGE}-devel-@value{_kversion}
+@end smallexample
+@end cartouche
+
+@noindent
+Here, @samp{$(uname -r)} is simply a way of specifying the running kernel.  The value
+@samp{@value{_kversion}} is just an example.  Use the specific kernel version that you want to add
+to the installation.
+
+To add @cite{@value{PACKAGE_TITLE}} development documentation, use (one of):
+
+@cartouche
+@smallexample
+% sudo zypper install -t pattern @value{PACKAGE}-doc
+% sudo zypper install @value{PACKAGE}-doc @value{PACKAGE}-javadoc
+@end smallexample
+@end cartouche
+
+@c ----------------------------------------------------------------------------
+
+@node Installing with APT
+@subsection Installing with APT
+@cindex installing, apt
+@cindex apt
+
+If you have set up the necessary repository definitions (@pxrefman{Repositories for APT}), then the
+following instructions will install the DEBs on your system.@footnote{For additional information on
+@manpage{apt(8)}, see @manref{apt(8)}.}
 
 @c ----------------------------------------------------------------------------
 
@@ -2548,8 +2641,8 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc@--linux/@-gcc} 
 
 If you have downloaded the necessary binary RPMs (@pxrefman{Downloading the Binary RPM}), or have
 rebuilt binary RPMs using the source RPM (@pxrefman{Building from the Source RPM}), then the following
-instructions will install the RPMs on your system. For additional information on @manpage{rpm(1)}, see
-@manref{rpm(8)}.
+instructions will install the RPMs on your system.  For additional information on @manpage{rpm(1)},
+see @manref{rpm(1)}.
 
 @cartouche
 @smallexample
@@ -2632,12 +2725,178 @@ privilege is required to successfully invoke this target.
 @cindex removing
 
 @menu
+* Removing with YUM::			the easiest YUM based system approach
+* Removing with ZYPPER::		the easiest ZYPPER based system approach
+* Removing with APT::			the easiest APT based system approach
 * Removing the Binary RPM::		the easiest approach
 * Removing the Debian DEB::		the easiest approach for Debian
 * Removing the Source RPM::		the next best approach
 * Removing the Debian DSC::		the next best approach for Debian
 * Removing the Tar Ball::		last resort
 @end menu
+
+@c ----------------------------------------------------------------------------
+
+@node Removing with YUM
+@subsection Removing with YUM
+@cindex removing, yum
+@cindex yum
+
+@cite{@value{PACKAGE_TITLE}} repositories support @manref{yum(8)} in repomd XML format.  The
+repository includes virtual packages that ease the removal of kernel modules, libraries and
+utilities.
+
+To remove all @cite{@value{PACKAGE_TITLE}} components, use (one of):
+
+@cartouche
+@smallexample
+$> sudo yum groupremove @value{PACKAGE}
+$> sudo yum remove @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+@noindent
+To remove just the @cite{@value{PACKAGE_TITLE} JAIN} Jave component, use (one of):
+
+@cartouche
+@smallexample
+$> sudo yum groupremove @value{PACKAGE}-java
+$> sudo yum remove @value{PACKAGE}-java
+@end smallexample
+@end cartouche
+
+@noindent
+To remove the @cite{@value{PACKAGE_TITLE}} runtime components for a specific kernel, use (one of):
+
+@cartouche
+@smallexample
+$> sudo yum remove @value{PACKAGE}-$(uname -r)
+$> sudo yum remove @value{PACKAGE}-@value{_kversion}
+@end smallexample
+@end cartouche
+
+@noindent
+Where, @samp{$(uname -r)} will remove for the running kernel.  @samp{@value{_kversion}} is just an
+example.  When the kernel runtime being removed is the last kernel runtime, the remainder of the
+@cite{@value{PACKAGE_TITLE}} components will also be removed.
+
+To remove all @cite{@value{PACKAGE_TITLE}} development components, use (one of):
+
+@cartouche
+@smallexample
+$> sudo yum groupremove @value{PACKAGE}-develop
+$> sudo yum remove @value{PACKAGE}-develop
+@end smallexample
+@end cartouche
+
+@noindent
+To remove the @cite{@value{PACKAGE_TITLE}} development components for a specific kernel, use (one
+of):
+
+@cartouche
+@smallexample
+$> sudo yum remove @value{PACKAGE}-develop-$(uname -r)
+$> sudo yum remove @value{PACKAGE}-develop-@value{_kversion}
+@end smallexample
+@end cartouche
+
+@noindent
+Where, @samp{$(uname -r)} will remove for the running kernel.  @samp{@value{_kversion}} is just an
+example.  When the kernel development component being removed is the last kernel development
+component, the remainder of the @cite{@value{PACKAGE_TITLE}} development components will also be
+removed.
+
+To remove just documentation components, use (one of):
+
+@cartouche
+@smallexample
+$> sudo yum groupremove @value{PACKAGE}-doc
+$> sudo yum remove @value{PACKAGE}-doc @value{PACKAGE}-javadoc
+@end smallexample
+@end cartouche
+
+@c ----------------------------------------------------------------------------
+
+@node Removing with ZYPPER
+@subsection Removing with ZYPPER
+@cindex removing, zypper
+@cindex zypper
+
+@cite{@value{PACKAGE_TITLE}} repositories support @manref{zypper(8)} in SUSE repomd XML format.  The
+repository includes virtual packages that ease the removal of kernel modules, libraries and
+utilities.
+
+To remove all @cite{@value{PACKAGE_TITLE}} components, use (one of):
+
+@cartouche
+@smallexample
+$> sudo zypper remove @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+@noindent
+To remove just the @cite{@value{PACKAGE_TITLE} JAIN} Jave component, use (one of):
+
+@cartouche
+@smallexample
+$> sudo zypper remove @value{PACKAGE}-java
+@end smallexample
+@end cartouche
+
+@noindent
+To remove the @cite{@value{PACKAGE_TITLE}} runtime components for a specific kernel, use (one of):
+
+@cartouche
+@smallexample
+$> sudo zypper remove @value{PACKAGE}-$(uname -r)
+$> sudo zypper remove @value{PACKAGE}-@value{_kversion}
+@end smallexample
+@end cartouche
+
+@noindent
+Where, @samp{$(uname -r)} will remove for the running kernel.  @samp{@value{_kversion}} is just an
+example.  When the kernel runtime being removed is the last kernel runtime, the remainder of the
+@cite{@value{PACKAGE_TITLE}} components will also be removed.
+
+To remove all @cite{@value{PACKAGE_TITLE}} development components, use (one of):
+
+@cartouche
+@smallexample
+$> sudo zypper remove @value{PACKAGE}-develop
+@end smallexample
+@end cartouche
+
+@noindent
+To remove the @cite{@value{PACKAGE_TITLE}} development components for a specific kernel, use (one
+of):
+
+@cartouche
+@smallexample
+$> sudo zypper remove @value{PACKAGE}-develop-$(uname -r)
+$> sudo zypper remove @value{PACKAGE}-develop-@value{_kversion}
+@end smallexample
+@end cartouche
+
+@noindent
+Where, @samp{$(uname -r)} will remove for the running kernel.  @samp{@value{_kversion}} is just an
+example.  When the kernel development component being removed is the last kernel development
+component, the remainder of the @cite{@value{PACKAGE_TITLE}} development components will also be
+removed.
+
+To remove just documentation components, use (one of):
+
+@cartouche
+@smallexample
+$> sudo zypper remove @value{PACKAGE}-doc @value{PACKAGE}-javadoc
+@end smallexample
+@end cartouche
+
+@c ----------------------------------------------------------------------------
+
+@node Removing with APT
+@subsection Removing with APT
+@cindex removing, apt
+@cindex apt
 
 @c ----------------------------------------------------------------------------
 
@@ -2651,13 +2910,16 @@ releases, or whether created by the source RPM), execute the following command:
 
 @cartouche
 @smallexample
-% rpm -evv `rpm -qa | grep '^@value{PACKAGE}-'`
+% rpm -evv `rpm -qa | grep '^@value{PACKAGE}'` 2>&1 | tee erase.log
 @end smallexample
 @end cartouche
 
 @noindent
-should uninstall all installed @file{@value{PACKAGE_NAME}} RPMs from your system.@footnote{Depending
-on the release, you should be able to issue @samp{make uninstall-rpms} from the build directory.}
+This should uninstall all installed @file{@value{PACKAGE_NAME}} RPMs from your
+system.@footnote{Depending on the release, you should be able to issue @samp{make uninstall-rpms}
+from the build directory.}
+Note that is may also be used for any system based on @manref{rpm(1)} regardless of whether the RPMs
+where installed using @manref{rpm(1)}, @manref{yum(8)} or @manref{zypper(8)}.
 
 For more information see @manref{rpm(1)}.
 
@@ -2673,13 +2935,14 @@ releases, or whether created by the Debian DSC), execute the following command:
 
 @cartouche
 @smallexample
-% dpkg -ev `dpkg -l | grep '^@value{PACKAGE}-'`
+% dpkg -ev `dpkg -l | grep '^@value{PACKAGE}'` 2>&1 | tee erase.log
 @end smallexample
 @end cartouche
 
 @noindent
-should uninstall all installed @file{@value{PACKAGE_NAME}} DEBs from your system.@footnote{Depending
-on the release, you should be able to issue @samp{make uninstall-debs} from the build directory.}
+This should uninstall all installed @file{@value{PACKAGE_NAME}} DEBs from your
+system.@footnote{Depending on the release, you should be able to issue @samp{make uninstall-debs}
+from the build directory.}
 
 For more information see @manref{dpkg(8)}.
 
@@ -2700,7 +2963,7 @@ Then simply remove the binary RPM package files and source RPM file.  A command 
 @end cartouche
 
 @noindent
-should remove all @file{@value{PACKAGE_NAME}} RPMs from your system.@footnote{Depending on the
+This should remove all @file{@value{PACKAGE_NAME}} RPMs from your system.@footnote{Depending on the
 release, you might be able to issue @samp{make remove-rpms} from the build directory.}
 
 @c ----------------------------------------------------------------------------
@@ -2723,7 +2986,7 @@ Then simply remove the binary DEB package files and Debian DSC file.  A command 
 @end cartouche
 
 @noindent
-should remove all @file{@value{PACKAGE_NAME}} DEBs, DSCs and TARs from your
+This should remove all @file{@value{PACKAGE_NAME}} DEBs, DSCs and TARs from your
 system.@footnote{Depending on the release, you might be able to issue @samp{make remove-debs} from
 the build directory.}
 

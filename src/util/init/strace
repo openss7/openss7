@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:44:28 $
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-10 17:29:46 $
 # Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -34,7 +34,7 @@
 # Required-Stop: streams
 # Should-Start: strerr
 # Should-Stop: strerr
-# Default-Start: 
+# Default-Start: 4
 # Default-Stop: 0 1 2 3 4 5 6
 # X-UnitedLinux-Default-Enabled: no
 # Short-Description: start and stop strace
@@ -355,7 +355,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:44:28 $
+# @(#) $RCSfile: strace,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-10 17:29:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -401,11 +401,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:44:28 $ by $Author: brian $
+# Last Modified $Date: 2011-02-10 17:29:46 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strace,v $
+# Revision 1.1.2.4  2011-02-10 17:29:46  brian
+# - repo updates
+#
 # Revision 1.1.2.3  2011-02-07 04:44:28  brian
 # - updated init scripts
 #

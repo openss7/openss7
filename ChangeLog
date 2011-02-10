@@ -1,3 +1,20 @@
+2011-02-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* centos-5.5-x86_64-config.cache: updated for modifyrepo
+	* debian-lenny-i386-config.cache: updated for modifyrepo
+	* debian-squeeze-i386-config.cache: updated for modifyrepo
+	* suse-11-x86_64-config.cache: updated for modifyrepo
+	* openss7.spec.in: always stop init scripts
+	* am/rpm.am: find modifyrepo, add patterns and products
+	* doc/manual/install.texi: repo documentation updates
+	* doc/manual/openss7.texi: repo documentation updates
+	* m4/rpm.m4: added patterns.xml and products.xml
+	* scripts/comps.xml: make documentation optional
+	* scripts/patterns.xml.in: added SUSE patterns file
+	* scripts/products.xml.in: added SUSE products file
+	* scripts/texi/args.texi.in: more substitutions
+	* src/util/init/strace: default start correction for SUSE
+
 2011-02-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: distribute build caches

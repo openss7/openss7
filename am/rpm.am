@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-09 17:59:27 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-02-10 17:29:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-09 17:59:27 $ by $Author: brian $
+## Last Modified $Date: 2011-02-10 17:29:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -814,7 +814,9 @@ repomd_files		= $(repodir)/repomd.xml \
 			  $(repodir)/primary.xml.gz \
 			  $(repodir)/filelists.xml.gz \
 			  $(repodir)/other.xml.gz \
-			  $(repodir)/susedata.xml.gz
+			  $(repodir)/susedata.xml.gz \
+			  $(repodir)/patterns.xml.gz \
+			  $(repodir)/products.xml.gz
 
 repomd_signs		= $(repodir)/repomd.xml.asc
 
@@ -865,12 +867,18 @@ $(repodir)/susedata.xml.gz:
 		$(MAKE) $(AM_MAKEFLAGS) repo-suse; \
 	fi
 
+$(repodir)/products.xml.gz: $(repodir)/repomd.xml scripts/products.xml
+	$(MODIFYREPO) $< $(repodir)
+
+$(repodir)/patterns.xml.gz: $(repodir)/repomd.xml scripts/patterns.xml
+	$(MODIFYREPO) $< $(repodir)
+
 #! repo-suse:
 #! 	Create (or recreate) the meta data files for a suse (repomd) repository
 #! 	in the package distribution directory, @repodir@/.  This target is
 #! 	primarily for generating the susedata.xml file.
 #!
-repo-suse: $(repodir) $(repodir)/repomd.xml
+repo-suse: $(repodir) $(repodir)/repomd.xml scripts/products.xml scripts/patterns.xml
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null`; \
 	numb=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' 2>/dev/null | wc -l`; \
@@ -888,13 +896,15 @@ repo-suse: $(repodir) $(repodir)/repomd.xml
 				$(ECHO) $(ECHO_N) "ver=\"`rpm -q --qf '%{VERSION}' -p $$f`\" " ; \
 				$(ECHO) $(ECHO_N) "rel=\"`rpm -q --qf '%{RELEASE}' -p $$f`\" " ; \
 				$(ECHO) "/>" ; \
-			$(ECHO) "    <keyword>support_l3</keyword>" ; \
+			$(ECHO) "    <keyword>support_acc</keyword>" ; \
 			$(ECHO) "  </package>" ; \
 		done ; \
 		$(ECHO) "</susedata>" ; \
 	) >susedata.xml
 	$(MODIFYREPO) susedata.xml $(repodir)
 	rm -f susedata.xml
+	$(MODIFYREPO) scripts/products.xml $(repodir)
+	$(MODIFYREPO) scripts/patterns.xml $(repodir)
 
 $(repodir)/repomd.xml:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -1170,6 +1180,9 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.8  2011-02-10 17:29:45  brian
+## - repo updates
+##
 ## Revision 1.1.2.7  2011-02-09 17:59:27  brian
 ## - repository and rpm updates for suse
 ##

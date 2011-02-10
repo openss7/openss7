@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-09 17:59:27 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-10 17:29:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-09 17:59:27 $ by $Author: brian $
+# Last Modified $Date: 2011-02-10 17:29:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -636,7 +636,9 @@ dnl
 # _RPM_SPEC_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
-    AC_CONFIG_FILES([scripts/speccommon])
+    AC_CONFIG_FILES([scripts/speccommon
+		     scripts/patterns.xml
+		     scripts/products.xml])
     speccommon="scripts/speccommon"
     AC_SUBST_FILE([speccommon])
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
@@ -661,6 +663,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.7  2011-02-10 17:29:45  brian
+# - repo updates
+#
 # Revision 1.1.2.6  2011-02-09 17:59:27  brian
 # - repository and rpm updates for suse
 #
