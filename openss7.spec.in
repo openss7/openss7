@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-02-09 17:59:27 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2011-02-10 17:29:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-09 17:59:27 $ by $Author: brian $
+# Last Modified $Date: 2011-02-10 17:29:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2074,7 +2074,6 @@ Requires:           %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_virt}
 Requires:           %{name}         = %{epoch}:%{version}-%{fullrelease}
-Requires(pre):      %{name}         = %{epoch}:%{version}-%{fullrelease}
 %endif
 
 Provides:           %{name}-base = %{epoch}:%{version}-%{fullrelease}
@@ -2096,11 +2095,10 @@ binary package is required for any installation of the %{name} package.
 
 %pre base
 # ---------------------------------------------------------------------------
-arg="$1"
 # This is an initial installation of the base subpackage.  We need to check for non-rpm
 # installations on the host and remove any entries that might later conflict with our entries.  We
 # treat every fresh installation like an upgrade from non-deb/rpm install.
-if [ $arg = 1 ] ; then : # fresh install
+if [ $1 = 1 ] ; then : # fresh install
 %if %{FILES_oldprel}
     # old-style preload file
     prel_old=%_sysconfdir/modules
@@ -2133,7 +2131,7 @@ if [ $arg = 1 ] ; then : # fresh install
     done
 %endif
 fi
-if [ $arg = 2 ] ; then : # upgrade
+if [ $1 = 2 ] ; then : # upgrade
     # Because we are doing an upgrade, the preun and postun scriplets for the old rpm are going to
     # be called.  Hopefully the old rpm can handle removal correctly.
 fi
@@ -2375,6 +2373,7 @@ fi
 %preun base
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then : # final removal
+    :
 %if %{USE_rmnods}
     # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
     # because they have no %%dev macro, so in that case we just run the makenodes program that was
@@ -2482,6 +2481,8 @@ if [ $1 = 0 ] ; then : # final removal
     done
     for i in $reverse ; do
         if [ -f %_initrddir/$i ] ; then
+            # Try to stop them first.
+            /sbin/service $i stop >/dev/null 2>&1 || %_initrddir/$i stop >/dev/null 2>&1 || :
             # Find the best working init script removal tool
             [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
             [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
@@ -2497,6 +2498,7 @@ if [ $1 = 0 ] ; then : # final removal
 %endif
 fi
 if [ $1 = 1 ] ; then : # upgrade
+    :
 %if %{HAVE_oldmods}
     # At the end of the upgrade (when _this_package_ is upgraded from) we remove our lines from the
     # modules.conf file that we placed in them in the post scriptlet.  We only adjust our line and
@@ -2605,6 +2607,23 @@ b loop' $prel_new > $prel_tmp
                 (*.rpmsave|*.rpmnew) ;;
                 (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
             esac
+        fi
+    done
+%endif
+%if %{FILES_initscripts}
+    # Upgrading, remove our init scripts if we can
+    reverse=
+    list="%{initfiles}" ; for i in $list ; do
+        reverse="$i${reverse:+ $reverse}"
+    done
+    for i in $reverse ; do
+        if [ -f %_initrddir/$i ] ; then
+            # Try to stop them first.
+            /sbin/service $i stop >/dev/null 2>&1 || %_initrddir/$i stop >/dev/null 2>&1 || :
+            # Find the best working init script removal tool
+            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
+            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
+            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
         fi
     done
 %endif
@@ -2878,11 +2897,9 @@ Requires:       %{name}-kernel  = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_base}
 Requires:       %{name}-base    = %{epoch}:%{version}-%{fullrelease}
-Requires(pre):  %{name}-base    = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_virt}
-Requires:           %{name}         = %{epoch}:%{version}-%{fullrelease}
-Requires(pre):      %{name}         = %{epoch}:%{version}-%{fullrelease}
+Requires:       %{name}         = %{epoch}:%{version}-%{fullrelease}
 %endif
 
 Provides:       %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
@@ -2907,6 +2924,7 @@ package.
 %pre lib
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
+    :
 %if %{FILES_libraries}
     # See if there are any libraries hanging around from a non-rpm install.  If there are, just
     # delete them.
@@ -2935,9 +2953,75 @@ if [ $1 = 1 ] ; then : # fresh install
 %endif
 fi
 
+%preun lib
+# ---------------------------------------------------------------------------
+remove_depends() {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+        remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+        rmmod $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
+if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
+%if %{HAVE_initscripts}
+    # Stop init scripts when they are still hanging around.
+    reverse=
+    list="%{initfiles}" ; for i in $list ; do
+        reverse="$i${reverse:+ $reverse}"
+    done
+    for i in $reverse ; do
+        if [ -f %_initrddir/$i ] ; then
+            /sbin/service $i stop >/dev/null 2>&1 || %_initrddir/$i stop >/dev/null 2>&1 || :
+        fi
+    done
+%endif
+    # do it with extreme prejudice in case init scripts have been removed
+    reboot='no'
+    if [ -x /var/run/strace.pid ] ; then
+        kill -TERM `cat /var/run/strace.pid` || :
+        rm -f /var/run/strace.pid
+    fi
+    if [ -x /var/run/strerr.pid ] ; then
+        kill -TERM `cat /var/run/strerr.pid` || :
+        rm -f /var/run/strerr.pid
+    fi
+    umount -a -t specfs || reboot='yes'
+%if %{USE_rmnods}
+    if [ -x "%{mknods}" ] ; then
+        %{rmnods}
+    fi
+%endif
+    if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+        if [ -x /usr/sbin/fdetach ] ; then
+            /usr/sbin/fdetach -a 2>/dev/null || :
+        fi
+        for signal in TERM KILL ; do
+            if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+                lsof | grep '\<STR\>' | \
+                while read -a fields ; do
+                    if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
+                    if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
+                    kill -$signal ${fields[1]} >/dev/null 2>&1 || :
+                done
+                sleep 5
+            fi
+        done
+    fi
+    lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
+    remove_depends streams || reboot='yes'
+    remove_depends specfs  || reboot='yes'
+    [ ":$reboot" != ':yes' ] || echo "Reboot required." >&2
+fi
+
 %post lib
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
+    :
 %if %{FILES_libraries}
     # After a fresh install or upgrade, do a load config.
     /sbin/ldconfig
@@ -2946,6 +3030,18 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     # After a fresh install, create package index files
     for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
         echo -e "pkg_mkIndex $d\\nexit" | tclsh
+    done
+%endif
+%if %{HAVE_initscripts}
+    # Start init scripts when they have already been installed.
+    r=`runlevel | sed -e 's|.*[[:space:]]||'`
+    list="%{initfiles}" ; for i in $list ; do
+        if [ -f %_initrddir/$i ] ; then
+            if [ -L %_initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
+                 -L %_initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
+                 /sbin/service $i start >/dev/null 2>&1 || %_initrddir/$i start >/dev/null 2>&1 || :
+            fi
+        fi
     done
 %endif
 fi
@@ -3129,14 +3225,19 @@ Requires(postun):   modutils
 %if %{NEED_lib}
 Requires:           %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
 Requires(pre):      %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
+Requires(post):     %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
+Requires(preun):    %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
+Requires(postun):   %{name}-lib     = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_base}
 Requires:           %{name}-base    = %{epoch}:%{version}-%{fullrelease}
 Requires(pre):      %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+Requires(post):     %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+Requires(preun):    %{name}-base    = %{epoch}:%{version}-%{fullrelease}
+Requires(postun):   %{name}-base    = %{epoch}:%{version}-%{fullrelease}
 %endif
 %if %{NEED_virt}
 Requires:           %{name}         = %{epoch}:%{version}-%{fullrelease}
-Requires(pre):      %{name}         = %{epoch}:%{version}-%{fullrelease}
 %endif
 
 Provides:       kernel-modules = %{_kversion}
@@ -3294,6 +3395,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         else
             depmod -ae 2>&1 || :
         fi
+%if %{HAVE_initscripts}
         # Running kernels do need init scripts run, but only when normally
         # started in the current runlevel.
         r=`runlevel | sed -e 's|.*[[:space:]]||'`
@@ -3301,10 +3403,11 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
             if [ -f %_initrddir/$i ] ; then
                 if [ -L %_initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
                      -L %_initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
-                    /sbin/service $i start 2>&1 || %_initrddir/$i start 2>&1 || :
+                    /sbin/service $i start >/dev/null 2>&1 || %_initrddir/$i start >/dev/null 2>&1 || :
                 fi
             fi
         done
+%endif
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
         # Non-running kernels a depmod will be performed on boot by depmod anyway, but
         # try one now.
@@ -3334,12 +3437,27 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # We are about to uninstall for good on a running kernel then we have to worry about which
         # modules are running
+%if %{HAVE_initscripts}
+        # Try using init scripts to shutdown if they exist.
+        reverse=
+        list="%{initfiles}" ; for i in $list ; do
+            reverse="$i${reverse:+ $reverse}"
+        done
+        for i in $reverse ; do
+            if [ -f %_initrddir/$i ] ; then
+                /sbin/service $i stop >/dev/null 2>&1 || %_initrddir/$i stop >/dev/null 2>&1 || :
+            fi
+        done
+%endif
+        # do it with extreme prejudice in case init scripts have been removed
         reboot='no'
         if [ -x /var/run/strace.pid ] ; then
             kill -TERM `cat /var/run/strace.pid` || :
+            rm -f /var/run/strace.pid
         fi
         if [ -x /var/run/strerr.pid ] ; then
             kill -TERM `cat /var/run/strerr.pid` || :
+            rm -f /var/run/strerr.pid
         fi
         umount -a -t specfs || reboot='yes'
 %if %{USE_rmnods}
@@ -3783,6 +3901,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.14  2011-02-10 17:29:45  brian
+# - repo updates
+#
 # Revision 1.1.2.13  2011-02-09 17:59:27  brian
 # - repository and rpm updates for suse
 #

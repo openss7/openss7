@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: args.texi.in,v 1.1.2.1 2009-06-21 11:12:08 brian Exp $
+@c @(#) $Id: args.texi.in,v 1.1.2.2 2011-02-10 17:29:46 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2009-06-21 11:12:08 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-10 17:29:46 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -81,6 +81,7 @@
 @set PACKAGE_RPMEXTRA @PACKAGE_RPMEXTRA@
 @set PACKAGE_RPMOPTIONS @PACKAGE_RPMOPTIONS@
 @set PACKAGE_RPMRELEASE @PACKAGE_RPMRELEASE@
+@set PACKAGE_RPMSUBDIR @PACKAGE_RPMSUBDIR@
 @set PACKAGE_SHORTTITLE @PACKAGE_SHORTTITLE@
 @set PACKAGE_STRING @PACKAGE_STRING@
 @set PACKAGE_TARNAME @PACKAGE_TARNAME@
@@ -107,6 +108,14 @@
 @set _sharedstatedir @prefix@/com
 @set _sysconfdir /etc
 @set _configdir @configdir@
+
+@set _repodir @repodir@
+@set _topdir @topdir@
+@set _sourcedir @sourcedir@
+@set _builddir @rpmbuilddir@
+@set _rpmdir @rpmdir@
+@set _srcrpmdir @srcrpmdir@
+@set _specdir @specdir@
 
 @set _build @build@
 @set _build_alias @build_alias@

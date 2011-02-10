@@ -29,6 +29,7 @@ bld_cv_pkg_cmd_LDCONFIG=${bld_cv_pkg_cmd_LDCONFIG='zypper install glibc'}
 bld_cv_pkg_cmd_LSMOD=${bld_cv_pkg_cmd_LSMOD='zypper install module-init-tools'}
 bld_cv_pkg_cmd_LSOF=${bld_cv_pkg_cmd_LSOF='zypper install lsof'}
 bld_cv_pkg_cmd_MD5SUM=${bld_cv_pkg_cmd_MD5SUM='zypper install coreutils'}
+bld_cv_pkg_cmd_MODIFYREPO=${bld_cv_pkg_cmd_MODIFYREPO='zypper install createrepo'}
 bld_cv_pkg_cmd_MODPROBE=${bld_cv_pkg_cmd_MODPROBE='zypper install module-init-tools'}
 bld_cv_pkg_cmd_PDFLATEX=${bld_cv_pkg_cmd_PDFLATEX='zypper install texlive-latex'}
 bld_cv_pkg_cmd_PDFTEX=${bld_cv_pkg_cmd_PDFTEX='zypper install texlive'}
@@ -76,6 +77,7 @@ bld_cv_pkg_name_LDCONFIG=${bld_cv_pkg_name_LDCONFIG=glibc}
 bld_cv_pkg_name_LSMOD=${bld_cv_pkg_name_LSMOD=module-init-tools}
 bld_cv_pkg_name_LSOF=${bld_cv_pkg_name_LSOF=lsof}
 bld_cv_pkg_name_MD5SUM=${bld_cv_pkg_name_MD5SUM=coreutils}
+bld_cv_pkg_name_MODIFYREPO=${bld_cv_pkg_name_MODIFYREPO=createrepo}
 bld_cv_pkg_name_MODPROBE=${bld_cv_pkg_name_MODPROBE=module-init-tools}
 bld_cv_pkg_name_PDFLATEX=${bld_cv_pkg_name_PDFLATEX=texlive-latex}
 bld_cv_pkg_name_PDFTEX=${bld_cv_pkg_name_PDFTEX=texlive}
@@ -126,6 +128,7 @@ bld_cv_pkg_prog_LSOF=${bld_cv_pkg_prog_LSOF=lsof}
 bld_cv_pkg_prog_LZMA_CMD=${bld_cv_pkg_prog_LZMA_CMD=lzma}
 bld_cv_pkg_prog_MAKEWHATIS=${bld_cv_pkg_prog_MAKEWHATIS=makewhatis}
 bld_cv_pkg_prog_MD5SUM=${bld_cv_pkg_prog_MD5SUM=md5sum}
+bld_cv_pkg_prog_MODIFYREPO=${bld_cv_pkg_prog_MODIFYREPO=modifyrepo}
 bld_cv_pkg_prog_MODPROBE=${bld_cv_pkg_prog_MODPROBE=modprobe}
 bld_cv_pkg_prog_PDFLATEX=${bld_cv_pkg_prog_PDFLATEX=pdflatex}
 bld_cv_pkg_prog_PDFTEX=${bld_cv_pkg_prog_PDFTEX=pdfetex}
@@ -175,6 +178,7 @@ bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.11.1}
 bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.11.1}
 bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.80}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=6.12}
+bld_cv_pkg_ver_MODIFYREPO=${bld_cv_pkg_ver_MODIFYREPO=0.4.11}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.11.1}
 bld_cv_pkg_ver_PDFLATEX=${bld_cv_pkg_ver_PDFLATEX=2007}
 bld_cv_pkg_ver_PDFTEX=${bld_cv_pkg_ver_PDFTEX=2007}

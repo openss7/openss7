@@ -34,6 +34,7 @@ bld_cv_pkg_cmd_LSMOD=${bld_cv_pkg_cmd_LSMOD='apt-get install module-init-tools'}
 bld_cv_pkg_cmd_LSOF=${bld_cv_pkg_cmd_LSOF='apt-get install lsof'}
 bld_cv_pkg_cmd_LZMA_CMD=${bld_cv_pkg_cmd_LZMA_CMD='apt-get install lzma'}
 bld_cv_pkg_cmd_MD5SUM=${bld_cv_pkg_cmd_MD5SUM='apt-get install coreutils'}
+bld_cv_pkg_cmd_MODIFYREPO=${bld_cv_pkg_cmd_MODIFYREPO='apt-get install createrepo'}
 bld_cv_pkg_cmd_MODPROBE=${bld_cv_pkg_cmd_MODPROBE='apt-get install module-init-tools'}
 bld_cv_pkg_cmd_PDFLATEX=${bld_cv_pkg_cmd_PDFLATEX='apt-get install texlive-latex-base'}
 bld_cv_pkg_cmd_PDFTEX=${bld_cv_pkg_cmd_PDFTEX='apt-get install texlive-binaries'}
@@ -87,6 +88,7 @@ bld_cv_pkg_name_LSMOD=${bld_cv_pkg_name_LSMOD=module-init-tools}
 bld_cv_pkg_name_LSOF=${bld_cv_pkg_name_LSOF=lsof}
 bld_cv_pkg_name_LZMA_CMD=${bld_cv_pkg_name_LZMA_CMD=lzma}
 bld_cv_pkg_name_MD5SUM=${bld_cv_pkg_name_MD5SUM=coreutils}
+bld_cv_pkg_name_MODIFYREPO=${bld_cv_pkg_name_MODIFYREPO=createrepo}
 bld_cv_pkg_name_MODPROBE=${bld_cv_pkg_name_MODPROBE=module-init-tools}
 bld_cv_pkg_name_PDFLATEX=${bld_cv_pkg_name_PDFLATEX=texlive-latex-base}
 bld_cv_pkg_name_PDFTEX=${bld_cv_pkg_name_PDFTEX=texlive-binaries}
@@ -144,6 +146,7 @@ bld_cv_pkg_prog_LSOF=${bld_cv_pkg_prog_LSOF=lsof}
 bld_cv_pkg_prog_LZMA_CMD=${bld_cv_pkg_prog_LZMA_CMD=lzma}
 bld_cv_pkg_prog_MAKEWHATIS=${bld_cv_pkg_prog_MAKEWHATIS=makewhatis}
 bld_cv_pkg_prog_MD5SUM=${bld_cv_pkg_prog_MD5SUM=md5sum}
+bld_cv_pkg_prog_MODIFYREPO=${bld_cv_pkg_prog_MODIFYREPO=modifyrepo}
 bld_cv_pkg_prog_MODPROBE=${bld_cv_pkg_prog_MODPROBE=modprobe}
 bld_cv_pkg_prog_PDFLATEX=${bld_cv_pkg_prog_PDFLATEX=pdflatex}
 bld_cv_pkg_prog_PDFTEX=${bld_cv_pkg_prog_PDFTEX=pdfetex}
@@ -198,6 +201,7 @@ bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.12-1}
 bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.81.dfsg.1-1}
 bld_cv_pkg_ver_LZMA_CMD=${bld_cv_pkg_ver_LZMA_CMD=4.43-14}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=8.5-1}
+bld_cv_pkg_ver_MODIFYREPO=${bld_cv_pkg_ver_MODIFYREPO=0.4.11-1}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.12-1}
 bld_cv_pkg_ver_PDFLATEX=${bld_cv_pkg_ver_PDFLATEX=2009-11}
 bld_cv_pkg_ver_PDFTEX=${bld_cv_pkg_ver_PDFTEX=2009-8}

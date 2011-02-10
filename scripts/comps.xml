@@ -13,10 +13,10 @@
       <packagereq type="mandatory">openss7-lib</packagereq>
       <packagereq type="mandatory">openss7-kernel</packagereq>
       <packagereq type="default">openss7-java</packagereq>
-      <packagereq type="default">openss7-doc</packagereq>
-      <packagereq type="default">openss7-javadoc</packagereq>
       <packagereq type="optional">openss7-devel</packagereq>
       <packagereq type="optional">openss7-devel-kernel</packagereq>
+      <packagereq type="optional">openss7-doc</packagereq>
+      <packagereq type="optional">openss7-javadoc</packagereq>
       <packagereq type="optional">openss7-source-kernel</packagereq>
     </packagelist>
   </group>
