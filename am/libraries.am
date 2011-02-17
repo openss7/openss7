@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:11 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-17 18:34:10 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
+## Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -105,10 +105,10 @@ PRE_INSTALL_AM		+= pre-libraries
 ##
 post-libraries:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
+	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(DESTDIR)$(rootdir)$(sysconfdir)/ld.so.conf -a -r $(DESTDIR)$(rootdir)$(sysconfdir)/ld.so.cache ; then \
 		$(ECHO_Q) "LDCONFIG" ld.so.cache ; \
 		$(ECHO_V) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
-		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
+		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) || : ; \
 	fi
 
 ##
@@ -126,9 +126,9 @@ POST_INSTALL_AM		+= post-libraries
 ##
 postun-libraries:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(sysconfdir)/ld.so.conf -a -r $(sysconfdir)/ld.so.cache ; then \
+	@if test -n "$(LDCONFIG)" -a -x "$(LDCONFIG)" -a -r $(DESTDIR)$(rootdir)$(sysconfdir)/ld.so.conf -a -r $(DESTDIR)$(rootdir)$(sysconfdir)/ld.so.cache ; then \
 		$(ECHO) "$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir)" ; \
-		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) ; \
+		$(LDCONFIG) -n -r $(DESTDIR)$(rootdir)/ -f $(sysconfdir)/ld.so.conf -C $(sysconfdir)/ld.so.cache $(libdir) || : ; \
 	fi
 
 ##
@@ -161,6 +161,9 @@ EXTRA_DIST		+= $(LIBRARY_VERSION_FILES)
 ## =============================================================================
 ##
 ## $Log: libraries.am,v $
+## Revision 1.1.2.5  2011-02-17 18:34:10  brian
+## - repository and rpm build updates
+##
 ## Revision 1.1.2.4  2009-07-21 11:06:11  brian
 ## - changes from release build
 ##

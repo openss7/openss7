@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: macros.texi,v 1.1.2.2 2010-02-22 14:48:41 brian Exp $
+@c @(#) $Id: macros.texi,v 1.1.2.3 2011-02-17 18:34:11 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2010-02-22 14:48:41 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-17 18:34:11 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -499,15 +499,15 @@
 
 @ifplaintext
 @macro refman{arg1}
-@cite{\arg1\},in the manual
+@cite{\arg1\}, in the manual
 @end macro
 
 @macro xrefman{arg1}
-see @cite{\arg1\},in the manual
+see @cite{\arg1\}, in the manual
 @end macro
 
 @macro pxrefman{arg1}
-see @cite{\arg1\},in the manual
+see @cite{\arg1\}, in the manual
 @end macro
 @end ifplaintext
 

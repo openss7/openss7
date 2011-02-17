@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-02-09 17:59:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2011-02-17 18:34:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-09 17:59:27 $ by $Author: brian $
+# Last Modified $Date: 2011-02-17 18:34:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2961,6 +2961,11 @@ include am/rpm.am
 include am/deb.am
 
 ##
+## Rules for repo install sources
+##
+include am/repo.am
+
+##
 ## Rules for making release files
 ##
 MANUAL_FILE			= doc/manual/$(PACKAGE).txt
@@ -3008,6 +3013,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.14  2011-02-17 18:34:09  brian
+# - repository and rpm build updates
+#
 # Revision 1.1.2.13  2011-02-09 17:59:27  brian
 # - repository and rpm updates for suse
 #

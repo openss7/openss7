@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 1.1.2.3 2011-02-10 17:29:45 brian Exp $
+% @(#) $Id: openss7.texi,v 1.1.2.4 2011-02-17 18:34:10 brian Exp $
 %
 % =========================================================================
 %
@@ -81,7 +81,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2011-02-10 17:29:45 $ by $Author: brian $
+% Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -475,6 +475,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: openss7.texi,v $
+Revision 1.1.2.4  2011-02-17 18:34:10  brian
+- repository and rpm build updates
+
 Revision 1.1.2.3  2011-02-10 17:29:45  brian
 - repo updates
 
@@ -1061,9 +1064,76 @@ Contains the @manpage{mtp3b(4)} module.
 @section Libraries
 @cindex libraries
 
+@subsection Shared Object Libraries
+@cindex shared object libraries
+@cindex libraries, shared object
+
 The @cite{@value{PACKAGE_TITLE}} package provides the following shared object and static libraries:
 
-The @cite{@value{PACKAGE_TITLE}} package does not currently provide any libraries.
+@table @asis
+@item @file{libcdiapi.so.0}
+Provides the @manpage{cdiapi(3)} library.
+
+@item @file{libdlpi.so.0}
+Provides the @manpage{dlpi(3)} library.
+
+@item @file{libdlpiapi.so.0}
+Provides the @manpage{dlpiapi(3)} library.
+
+@item @file{libnpiapi.so.0}
+Provides the @manpage{npiapi(3)} library.
+
+@item @file{libsockpath.so.0}
+Provides the @manpage{sockpath(3)} library.
+
+@item @file{libstreams.so.0}
+Provides the @manpage{streams(3)} library.  This is the primary @cite{STREAMS} library that provides
+the SVR 4.2 MP interface to @cite{STREAMS} devices.
+
+@item @file{libx25.so.0}
+Provides the @manpage{x25(3)} library.
+
+@item @file{libxnet.so.0}
+Provides the @manpage{xnet(3)} library.
+
+@item @file{libxnsl.so.0}
+Provides the @manpage{xnsl(3)} library.
+
+@end table
+
+@subsection Dynamic Loadable Modules
+
+The @cite{@value{PACKAGE_TITLE}} package provides the following dynamic loadable modules:
+
+@table @asis
+@item @file{inetaddr.so.0}
+
+@end table
+
+@subsection SNMP Modules
+
+The @cite{@value{PACKAGE_TITLE}} package provides the following dynamic loadable modules for SNMP:
+
+@table @asis
+@item @file{mxMIB-1.1.1.20110111.so}
+Provides the @manpage{mxMIB(8)} MIBs and SNMP agents.
+
+@item @file{ss7MIB-1.1.1.20110111.so}
+Provides the @manpage{ss7MIB(8)} MIBs and SNMP agents.
+
+@item @file{strMIB-1.1.1.20110111.so}
+Provides the @manpage{strMIB(8)} MIBs and SNMP agents.
+
+@item @file{streams-1.1.1.20110111.so}
+Provides the @manpage{streams(8)} MIBs and SNMP agents.
+
+@item @file{tcap-1.1.1.20110111.so}
+Provides the @manpage{tcap(8)} MIBs and SNMP agents.
+
+@item @file{xti-1.1.1.20110111.so}
+Provides the @manpage{xti(8)} MIBs and SNMP agents.
+
+@end table
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -1075,8 +1145,45 @@ The @cite{@value{PACKAGE_TITLE}} package does not currently provide any librarie
 @subsection Init Scripts
 
 Following are System V Init Scripts that are installed by the package:
+(System V Init Scripts are contained in the @file{openss7-base} binary package.)
 
 @table @asis
+
+@item @manpage{specfs(8)} (@file{/etc/init.d/specfs})
+@pgindex specfs
+@pgindex /etc/init.d/specfs
+@itemx @manpage{specfs.sh(8)} (@file{/etc/init.d/specfs.sh})
+@pgindex specfs.sh
+@pgindex /etc/init.d/specfs.sh
+
+System V Init Script for the @cite{Special Shadown File System}.
+The @manpage{specfs(8)} init script provides the ability to initialize, configure and mount the
+@cite{Shadow Special File System}, @manpage{specfs(5)}.
+The @manpage{specfs(8)} script provides the RedHat-style init script, whereas the
+@manpage{specfs.sh(8)} script provides the Debian-style init script.
+
+The primary purpose of this init script is to mount and unmount the @cite{Special Shadow File
+System}, @manpage{specfs(5)}.  When @manref{specfs(5)} is mounted, loading of kernel modules for
+@cite{STREAMS} drivers and modules is automatic.
+
+@item @manpage{streams(8)} (@file{/etc/init.d/streams})
+@pgindex streams
+@pgindex /etc/init.d/streams
+@itemx @manpage{streams.sh(8)} (@file{/etc/init.d/streams.sh})
+@pgindex streams.sh
+@pgindex /etc/init.d/streams.sh
+
+System V Init Script for the @cite{Linux Fast-STREAMS} subsystem.
+The @manpage{streams(8)} init script provides the ability to initialize, configure and start the
+@cite{Linux Fast-STREAMS} subsystem, @manpage{STREAMS(9)}.
+The @manpage{streams(8)} script provides the RedHat-style init script, whereas the
+@manpage{streams.sh(8)} script provides the Debian-style init script.
+
+The primary purpose of this init script is to load @cite{Linux Fast-STREAMS} Stream head and clone
+driver and to apply system control configuration settings against those kernel modules after
+loading.  The configuration of @cite{STREAMS} is not persistent in the kernel module and the kernel
+modules load with compiled-in defaults.  When system controls alter these values, they must be
+applied each time the kernel modules load.
 
 @item @manpage{@value{PACKAGE}(8)} (@file{/etc/init.d/@value{PACKAGE}})
 @pgindex @value{PACKAGE}
@@ -1092,6 +1199,32 @@ The @manpage{@value{PACKAGE}(8)} script provides the RedHat-style init script, w
 @manpage{@value{PACKAGE}.sh(8)} script provides the Debian-style init script.
 
 See @manref{@value{PACKAGE}(8)} for more information.
+
+@item @manpage{strerr(8)} (@file{/etc/init.d/strerr})
+@pgindex strerr
+@pgindex /etc/init.d/strerr
+@itemx @manpage{strerr.sh(8)} (@file{/etc/init.d/strerr.sh})
+@pgindex strerr.sh
+@pgindex /etc/init.d/strerr.sh
+
+System V Init Script for the @cite{STREAMS Error Logger}.
+The @manpage{strerr(8)} init script provides the ability to initialize, configure and start the
+@cite{STREAMS Error Logger}, @manpage{strerr(8)}.
+The @manpage{strerr(8)} script provides the RedHat-style init script, whereas the
+@manpage{strerr.sh(8)} script provides the Debian-style init script.
+
+@item @manpage{strace(8)} (@file{/etc/init.d/strace})
+@pgindex strace
+@pgindex /etc/init.d/strace
+@itemx @manpage{strace.sh(8)} (@file{/etc/init.d/strace.sh})
+@pgindex strace.sh
+@pgindex /etc/init.d/strace.sh
+
+System V Init Script for the @cite{STREAMS Trace Logger}.
+The @manpage{strace(8)} init script provides the ability to initialize, configure and start the
+@cite{STREAMS Trace Logger}, @manpage{strace(8)}.
+The @manpage{strace(8)} script provides the RedHat-style init script, whereas the
+@manpage{strace.sh(8)} script provides the Debian-style init script.
 
 @end table
 
@@ -1123,6 +1256,119 @@ This is a @cite{Debian}-style System V init script that is installed and used to
 script, but in the @cite{Debian} style.  This init script is normally installed in the
 @file{/etc/rc.d/init.d} directory.
 
+@item /usr/bin/gdmo
+@item /usr/bin/mibbrowser
+@item /usr/bin/streams-manager
+
+@item /usr/bin/strchg
+Provides the @manpage{strchg(1)} command.
+@item /usr/bin/strconf
+Provides the @manpage{strconf(1)} command.
+@item /usr/bin/strlog
+Provides the @manpage{strlog(8)} command.
+@item /usr/bin/strreset
+Provides the @manpage{strreset(1)} command.
+
+@item /usr/sbin/autopush
+Provides the @manpage{autopush(8)} command.
+@item /usr/sbin/fattach
+Provides the @manpage{fattach(1)} command.
+@item /usr/sbin/fdetach
+Provides the @manpage{fdetach(1)} command.
+
+@item /usr/sbin/chand
+
+@item /usr/sbin/ifrdlci
+Provides the @manpage{ifrdlci(8)} command.
+@item /usr/sbin/ifrstat
+Provides the @manpage{ifrstat(8)} command.
+@item /usr/sbin/ifrtune
+Provides the @manpage{ifrtune(8)} command.
+
+@item /usr/sbin/insf
+Provides the @manpage{insf(8)} command.
+
+@item /usr/sbin/initsock
+
+@item /usr/sbin/ixemap
+Provides the @manpage{ixemap(8)} command.
+@item /usr/sbin/ixetune
+Provides the @manpage{ixetune(8)} command.
+
+@item /usr/sbin/ldlconfig
+
+@item /usr/sbin/linkadd
+Provides the @manpage{linkadd(8)} command.
+@item /usr/sbin/linkdel
+Provides the @manpage{linkdel(8)} command.
+@item /usr/sbin/linklist
+Provides the @manpage{linklist(8)} command.
+@item /usr/sbin/linkreset
+Provides the @manpage{linkreset(8)} command.
+@item /usr/sbin/linkstart
+Provides the @manpage{linkstart(8)} command.
+@item /usr/sbin/linkstate
+Provides the @manpage{linkstate(8)} command.
+@item /usr/sbin/linkstop
+Provides the @manpage{linkstop(8)} command.
+
+@item /usr/sbin/m2paconfig
+
+@item /usr/sbin/mlptune
+Provides the @manpage{mlptune(8)} command.
+@item /usr/sbin/mtpconfig
+Provides the @manpage{mlpconfig(8)} command.
+@item /usr/sbin/nuimap
+Provides the @manpage{nuimap(8)} command.
+
+@item /usr/sbin/openss7_mknod
+
+@item /usr/sbin/pvcmap
+Provides the @manpage{pvcmap(8)} command.
+@item /usr/sbin/scls
+Provides the @manpage{scls(8)} command.
+
+@item /usr/sbin/sdlconfig
+@item /usr/sbin/slconfd
+@item /usr/sbin/slconfig
+@item /usr/sbin/slmon
+@item /usr/sbin/soconfig
+Provides the @manpage{soconfig(8)} command.
+@item /usr/sbin/ss7capd
+@item /usr/sbin/ss7statsd
+@item /usr/sbin/strace
+Provides the @manpage{strace(8)} command.
+@item /usr/sbin/strclean
+Provides the @manpage{strclean(8)} command.
+@item /usr/sbin/streamsd
+@item /usr/sbin/strerr
+Provides the @manpage{strerr(8)} command.
+@item /usr/sbin/strsetup
+Provides the @manpage{strsetup(8)} command.
+@item /usr/sbin/strvf
+Provides the @manpage{strvf(8)} command.
+@item /usr/sbin/vcstat
+Provides the @manpage{vcstat(8)} command.
+@item /usr/sbin/wantune
+Provides the @manpage{wantune(8)} command.
+@item /usr/sbin/x25diags
+Provides the @manpage{x25diags(8)} command.
+@item /usr/sbin/x25file
+Provides the @manpage{x25file(8)} command.
+@item /usr/sbin/x25info
+Provides the @manpage{x25info(8)} command.
+@item /usr/sbin/x25netd
+Provides the @manpage{x25netd(8)} command.
+@item /usr/sbin/x25route
+Provides the @manpage{x25route(8)} command.
+@item /usr/sbin/x25stat
+Provides the @manpage{x25stat(8)} command.
+@item /usr/sbin/x25trace
+Provides the @manpage{x25trace(8)} command.
+@item /usr/sbin/x32map
+Provides the @manpage{x32map(8)} command.
+@item /usr/sbin/x400config
+
 @end table
 
 @subsection Performance Test Programs
@@ -1137,12 +1383,159 @@ package.
 
 Following are conformance and validation test programs included in the package:
 
+@table @asis
+@item @file{/usr/libexec/openss7/atlocal}
+Provides configuration for the @manpage{testsuite(8)} conformance test suite.
+@item @file{/usr/libexec/openss7/send-pr}
+Provides the @manpage{send-pr(8)} command.
+@item @file{/usr/libexec/openss7/send-pr.config}
+Provides configuration for the @manpage{send-pr(8)} command.
+@item @file{/usr/libexec/openss7/testsuite}
+Provides the conformance test suite, @manpage{testsuite(8)}, for the @cite{@value{PACKAGE_TITLE}}
+package.
+@end table
+
 
 The @cite{@value{PACKAGE_TITLE}} package
 builds and installs the following test programs:
 
 @table @command
 
+@item /usr/libexec/openss7/perftest
+@item /usr/libexec/openss7/perftestn
+@item /usr/libexec/openss7/test-atm
+Provides the @manpage{test-atm(8)} conformance test program.
+@item /usr/libexec/openss7/test-chan
+Provides the @manpage{test-chan(8)} conformance test program.
+@item /usr/libexec/openss7/test-clone
+Provides the @manpage{test-clone(8)} conformance test program.
+@item /usr/libexec/openss7/test-connld
+Provides the @manpage{test-connld(8)} conformance test program.
+@item /usr/libexec/openss7/test-echo
+Provides the @manpage{test-echo(8)} conformance test program.
+@item /usr/libexec/openss7/test-etsi_n
+Provides the @manpage{test-etsi_n(8)} conformance test program.
+@item /usr/libexec/openss7/test-etsi_t
+Provides the @manpage{test-etsi_t(8)} conformance test program.
+@item /usr/libexec/openss7/test-fifo
+Provides the @manpage{test-fifo(8)} conformance test program.
+@item /usr/libexec/openss7/test-inet_raw
+Provides the @manpage{test-inet_raw(8)} conformance test program.
+@item /usr/libexec/openss7/test-inet_sctp
+Provides the @manpage{test-inet_sctp(8)} conformance test program.
+@item /usr/libexec/openss7/test-inet_tcp
+Provides the @manpage{test-inet_tcp(8)} conformance test program.
+@item /usr/libexec/openss7/test-inet_udp
+Provides the @manpage{test-inet_udp(8)} conformance test program.
+@item /usr/libexec/openss7/test-interop
+Provides the @manpage{test-interop(8)} conformance test program.
+@item /usr/libexec/openss7/test-ip
+Provides the @manpage{test-ip(8)} conformance test program.
+@item /usr/libexec/openss7/test-isdn
+Provides the @manpage{test-isdn(8)} conformance test program.
+@item /usr/libexec/openss7/test-log
+Provides the @manpage{test-log(8)} conformance test program.
+@item /usr/libexec/openss7/test-loop
+Provides the @manpage{test-loop(8)} conformance test program.
+@item /usr/libexec/openss7/test-m2pa
+Provides the @manpage{test-m2pa(8)} conformance test program.
+@item /usr/libexec/openss7/test-m2ua_as
+Provides the @manpage{test-m2ua_as(8)} conformance test program.
+@item /usr/libexec/openss7/test-m3ua-raw
+Provides the @manpage{test-m3ua-raw(8)} conformance test program.
+@item /usr/libexec/openss7/test-mux
+Provides the @manpage{test-mux(8)} conformance test program.
+@item /usr/libexec/openss7/test-np_ip
+Provides the @manpage{test-np_ip(8)} conformance test program.
+@item /usr/libexec/openss7/test-nsdev
+Provides the @manpage{test-nsdev(8)} conformance test program.
+@item /usr/libexec/openss7/test-nuls
+Provides the @manpage{test-nuls(8)} conformance test program.
+@item /usr/libexec/openss7/test-pipe
+Provides the @manpage{test-pipe(8)} conformance test program.
+@item /usr/libexec/openss7/test-pipemod
+Provides the @manpage{test-pipemod(8)} conformance test program.
+@item /usr/libexec/openss7/test-q781
+Provides the @manpage{test-q781(8)} conformance test program.
+@item /usr/libexec/openss7/test-q781-pipe
+Provides the @manpage{test-q781-pipe(8)} conformance test program.
+@item /usr/libexec/openss7/test-sad
+Provides the @manpage{test-sad(8)} conformance test program.
+@item /usr/libexec/openss7/test-sc
+Provides the @manpage{test-sc(8)} conformance test program.
+@item /usr/libexec/openss7/test-sctp
+Provides the @manpage{test-sctp(8)} conformance test program.
+@item /usr/libexec/openss7/test-sctp_n
+Provides the @manpage{test-sctp_n(8)} conformance test program.
+@item /usr/libexec/openss7/test-sctp_n2
+Provides the @manpage{test-sctp_n2(8)} conformance test program.
+@item /usr/libexec/openss7/test-sctp_nc
+Provides the @manpage{test-sctp_nc(8)} conformance test program.
+@item /usr/libexec/openss7/test-sctp_ns
+Provides the @manpage{test-sctp_ns(8)} conformance test program.
+@item /usr/libexec/openss7/test-sctp_t
+Provides the @manpage{test-sctp_t(8)} conformance test program.
+@item /usr/libexec/openss7/test-sigtran
+Provides the @manpage{test-sigtran(8)} conformance test program.
+@item /usr/libexec/openss7/test-sl
+Provides the @manpage{test-sl(8)} conformance test program.
+@item /usr/libexec/openss7/test-socket
+Provides the @manpage{test-socket(8)} conformance test program.
+@item /usr/libexec/openss7/test-socklib
+Provides the @manpage{test-socklib(8)} conformance test program.
+@item /usr/libexec/openss7/test-sockmod
+Provides the @manpage{test-sockmod(8)} conformance test program.
+@item /usr/libexec/openss7/test-socksys
+Provides the @manpage{test-socksys(8)} conformance test program.
+@item /usr/libexec/openss7/test-streams
+Provides the @manpage{test-streams(8)} conformance test program.
+@item /usr/libexec/openss7/test-tcpc
+Provides the @manpage{test-tcpc(8)} conformance test program.
+@item /usr/libexec/openss7/test-tcps
+Provides the @manpage{test-tcps(8)} conformance test program.
+@item /usr/libexec/openss7/test-timod
+Provides the @manpage{test-timod(8)} conformance test program.
+@item /usr/libexec/openss7/test-tirdwr
+Provides the @manpage{test-tirdwr(8)} conformance test program.
+@item /usr/libexec/openss7/test-tty
+Provides the @manpage{test-tty(8)} conformance test program.
+@item /usr/libexec/openss7/test-udpc
+Provides the @manpage{test-udpc(8)} conformance test program.
+@item /usr/libexec/openss7/test-udps
+Provides the @manpage{test-udps(8)} conformance test program.
+@item /usr/libexec/openss7/test-usage
+Provides the @manpage{test-usage(8)} conformance test program.
+@item /usr/libexec/openss7/test-voip
+Provides the @manpage{test-voip(8)} conformance test program.
+@item /usr/libexec/openss7/test-x100p
+Provides the @manpage{test-x100p(8)} conformance test program.
+@item /usr/libexec/openss7/test-x400p
+Provides the @manpage{test-x400p(8)} conformance test program.
+@item /usr/libexec/openss7/test-x400p-cap
+Provides the @manpage{test-x400p-cap(8)} conformance test program.
+@item /usr/libexec/openss7/test-x400p-cap2
+Provides the @manpage{test-x400p-cap2(8)} conformance test program.
+@item /usr/libexec/openss7/test-x400p-hsl
+Provides the @manpage{test-x400p-hsl(8)} conformance test program.
+@item /usr/libexec/openss7/test-x400p-perf
+Provides the @manpage{test-x400p-perf(8)} conformance test program.
+@item /usr/libexec/openss7/test-x400p-sdl
+Provides the @manpage{test-x400p-sdl(8)} conformance test program.
+@item /usr/libexec/openss7/test-x400p-sdt
+Provides the @manpage{test-x400p-sdt(8)} conformance test program.
+@item /usr/libexec/openss7/test-x400p-sdt2
+Provides the @manpage{test-x400p-sdt2(8)} conformance test program.
+@item /usr/libexec/openss7/test-x400p-sl
+Provides the @manpage{test-x400p-sl(8)} conformance test program.
+@item /usr/libexec/openss7/test-xnet
+Provides the @manpage{test-xnet(8)} conformance test program.
+@item /usr/libexec/openss7/test-xnet_thr
+Provides the @manpage{test-xnet_thr(8)} conformance test program.
+@item /usr/libexec/openss7/test-xnsl
+Provides the @manpage{test-xnsl(8)} conformance test program.
+@item /usr/libexec/openss7/test-xnsl_thr
+Provides the @manpage{test-xnsl_thr(8)} conformance test program.
+@item /usr/libexec/openss7/testlog
 
 @end table
 
@@ -1625,6 +2018,8 @@ The static version of the library,
 
 @menu
 * Using Kbuild::
+* Kernel Module Updates::
+* Kernel Module Packages::
 @end menu
 
 Developing Linux Fast-STREAMS kernel modules is similar to user space programs with regard to header
@@ -1665,15 +2060,17 @@ Support is provided for the development of Linux Fast-STREAMS kernel modules usi
 @float Example,example:kbuild
 @caption{@emph{Example Kbuild Makefile}}
 @smallexample
+MDIR := $(PWD)
 KDIR := /lib/modules/$(shell uname -r)/build
 obj-m := streams_example.o
 streams_example-objs := example.o
-moduledir = /lib/modules/$(shell uname -r)/openss7/
+moduledir = /lib/modules/$(shell uname -r)/extras/
 
 all: modules
 modules:
-        cp /usr/src/openss7/$(shell uname -r)/Module.symvers  Module.symvers
-        $(MAKE) -C $(KDIR) M=$(PWD) modules MODFLAGS='-DMODULE -I/usr/include/openss7'
+	rm -f -- Module.symvers
+        ln -s /usr/src/openss7/$(shell uname -r)/Module.symvers .
+        $(MAKE) -C $(KDIR) M=$(MDIR) modules MODFLAGS='-DMODULE -I/usr/include/openss7'
 
 clean-modules:
         rm -f -- example.o
@@ -1690,6 +2087,7 @@ clean-modules:
         rm -rf -- .tmp_versions
 
 install-modules:
+	mkdir -p $(moduledir)
         cp streams_example.ko $(moduledir)/streams_example.ko
         depmod -ae
         
@@ -1702,6 +2100,99 @@ remove-modules:
 Note that the necessary header files are contained in the @file{@value{PACKAGE}-devel} binary
 package, and the needed @file{Module.symvers} file is contained in the
 @file{@value{PACKAGE}-devel-$(uname -r)} package.
+
+@node Kernel Module Updates
+@subsection Kernel Module Updates
+@cindex kernel module updates
+
+Kernel modules can be built and installed so that they are automatically updated when kernels are
+updated (primarily for security updates), without having to be recompiled or reinstalled.
+
+@subsubsection RedHat Systems
+
+On recent @cite{RedHat} distributions and clones (e.g., @cite{Fedora}, @cite{RHEL}, @cite{CentOS}),
+this can be accomplished without building an RPM, by simply installing the kernel modules into
+@file{/lib/modules/$(uname -r)/extras}, where @file{$(uname -r)} is the name of the kernel for which
+the modules were compiled.  When the kernel is updated, the script @file{/sbin/weak-modules} will be
+run and will examine modules contained int he @file{extras} sub-directory for other kernel versions
+and determine whether the new kernel (and compatible modules) provides the same symbols as the old
+kernel (and compatible modules).  When the new kernel supports the older module, a symbolic link is
+added to the @file{/lib/modules/@i{newversion}/weak-updates} sub-directory that link to the module
+in the older kernel's @file{/lib/modules/@i{oldversion}/extras} sub-directory.
+
+On @cite{RedHat} systems it is also possible to provide weak updates by creating kernel module
+packages.  @xref{Kernel Module Packages}.
+
+@subsubsection SuSE Systems
+
+On recent @cite{SUSE} distributiones (e.g., @cite{SLES}, @cite{SLED}, @cite{OpenSUSE}), weak updates
+cannot be accomplished without building a kernel module package (KMP) RPM.  @xref{Kernel Module
+Packages}.
+
+@node Kernel Module Packages
+@subsection Kernel Module Packages
+@cindex kernel module packages
+@cindex KMP
+
+On recent distributions, it is possible to create a kernel module package (KMP) RPM for STREAMS
+modules or drivers in a very easy and straight-forward way.
+
+@cartouche
+@float Example,example:kmp
+@caption{@emph{Example Kernel Module Package}}
+@smallexample
+@verbatim
+# norootforbuild
+
+Name: STREAMS module example
+BuildRequires: %kernel_module_package_buildreqs
+License: GPL
+Group: System/Kernel
+Summary: Sample STREAMS module Kernel Module Package
+Version: 1.0
+Release: 0
+Source0: %{name}-%{version}.tar.bz2
+BuildRoot: %{_tmppath}/%{name}-%{version}-build
+
+%kernel_module_package -x debug -x trace
+
+%description
+This package contains the streams_example.ko module.
+
+%prep
+%setup
+set -- *
+mkdir source
+mv "$@" source/
+mkdir obj
+
+%build
+for flavor in %flavors_to_build; do
+    rm -rf obj/$flavor
+    cp -r source obj/$flavor
+    make -C obj/$flavor
+done
+
+%install
+export INSTALL_MOD_PATH=$RPM_BUILD_ROOT
+export ISNTALL_MOD_DIR=updates
+for flavor in %flavors_to_build; do
+    make -C obj/$flavor install-modules
+done
+
+%changelog
+*  Tue Feb 15 2011 - bidulock@openss7.org
+- Initial package.
+@end verbatim
+@end smallexample
+@end float
+@end cartouche
+
+@noindent
+The example uses several macros that are now commonly provided by both @cite{RedHat} and @cite{SUSE}
+systems (although they are implemented different ways).  Kernel module packages that are build in
+this way will have @command{weak-module} or @command{weak-module2} updates applied when installed
+and when a kernel is installed.
 
 @node Manual Pages
 @section Manual Pages

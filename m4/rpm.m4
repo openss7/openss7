@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-10 17:29:45 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-02-17 18:34:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-10 17:29:45 $ by $Author: brian $
+# Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -438,6 +438,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     ])
     rpmbuilddir="$rpm_cv_builddir"
     AC_SUBST([rpmbuilddir])dnl
+    AC_CACHE_CHECK([for rpm BUILDROOT directory], [rpm_cv_buildrootdir], [dnl
+	# rmpbuildrootdir needs to be absolute: always install in the top
+	# build directory on the local machine
+	rpm_cv_buildrootdir=`pwd`/BUILDROOT
+    ])
+    rpmbuildrootdir="$rpm_cv_buildrootdir"
+    AC_SUBST([rpmbuildrootdir])dnl
     AC_CACHE_CHECK([for rpm RPMS directory], [rpm_cv_rpmdir], [dnl
 	rpm_cv_rpmdir='$(topdir)/RPMS'
     ])
@@ -663,6 +670,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.8  2011-02-17 18:34:10  brian
+# - repository and rpm build updates
+#
 # Revision 1.1.2.7  2011-02-10 17:29:45  brian
 # - repo updates
 #

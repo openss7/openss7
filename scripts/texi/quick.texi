@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: quick.texi,v 1.1.2.2 2011-01-18 17:01:06 brian Exp $
+@c @(#) $Id: quick.texi,v 1.1.2.3 2011-02-17 18:34:11 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-01-18 17:01:06 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-17 18:34:11 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -102,11 +102,11 @@ $> wget http://www.openss7.org/tarballs/@value{PACKAGE}-@value{VERSION}.tar.xz
 @end example
 
 The release is available as an @manpage{autoconf(1)} tarball, @file{src.rpm} or @file{dsc}, as a
-set of binary @file{rpm}s or @file{deb}s, or as a @manpage{yum(8)} or @manpage{apt(8)} repository.
-See the @uref{http://www.openss7.org/download.html, download page} for the @manpage{autoconf(1)}
-tarballs, @file{src.rpm}s, @file{dsc}s, or repository access instructions.  See the
-@uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @command{@value{PACKAGE}} package page} for
-tarballs, source and binary packages.
+set of binary @file{rpm}s or @file{deb}s, or as a @manpage{yum(8)}, @manpage{zypper(8)} or
+@manpage{apt(8)} repository.  See the @uref{http://www.openss7.org/download.html, download page} for
+the @manpage{autoconf(1)} tarballs, @file{src.rpm}s, @file{dsc}s, or repository access instructions.
+See the @uref{http://www.openss7.org/@value{PACKAGE}_pkg.html, @command{@value{PACKAGE}} package
+page} for tarballs, source and binary packages.
 
 Please see the
 @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/NEWS,, @file{NEWS}}
@@ -144,7 +144,64 @@ See
 @uref{http://www.openss7.org/codefiles/@value{PACKAGE}-@value{VERSION}/README-alpha,, @file{README-alpha}}
 (if it exists) for alpha release information.
 
-@unnumberedsubsec Prerequisites
+@unnumberedsubsec Repository Installation
+
+The simplest way of installing the package is to use the @cite{OpenSS7} @file{repomd} repositories
+instead of attempting to build from tarball.  When you already have a the repository set up, the
+package can be udpated simply with (one of):
+
+@example
+Fedora:   $> sudo yum update openss7
+CentOS:   $> sudo yum update openss7
+RHEL:     $> sudo yum update openss7
+OpenSUSE: $> sudo zypper update openss7
+SLES:     $> sudo zypper update openss7
+Ubuntu:   $> sudo apt-get update openss7
+Debian:   $> sudo apt-get update openss7
+@end example
+
+If you have not yet set up an installation source for the @cite{OpenSS7} repositories, one of the
+following commands will establish repository access for RPM-based systems:
+
+@example
+          $> REPOS=http://www.openss7.org/repos/
+Fedora:   $> SUBDIR=rpms/fedora/14/$(uname -m)/RPMS/noarch
+CentOS:   $> SUBDIR=rpms/centos/5.5/$(uname -m)/RPMS/noarch
+RHEL:     $> SUBDIR=rpms/redhat/6.0/$(uname -m)/RPMS/noarch
+OpenSUSE: $> SUBDIR=rpms/opensuse/11.3/$(uname -m)/RPMS/noarch
+SUSE:     $> SUBDIR=suse/11.1/$(uname -m)/RPMS/noarch
+          $> sudo rpm -Uhv $REPOS/$SUBDIR/openss7-repo.noarch.rpm
+@end example
+
+@noindent
+For @manpage{zypper(8)} based systems it may be first necessary to perform:
+
+@example
+OpenSUSE: $> sudo rpm --import http://www.openss7.org/pubkey.asc
+SLES:     $> sudo rpm --import http://www.openss7.org/pubkey.asc
+@end example
+
+Once the repository is set up in this fashion, it should be possible to install using (one of):
+
+@example
+Fedora:   $> sudo yum install openss7
+CentOS:   $> sudo yum install openss7
+RHEL:     $> sudo yum install openss7
+OpenSUSE: $> sudo zypper install openss7
+SLES:     $> sudo zypper install openss7
+@end example
+
+The entire process can be undone with:
+
+@example
+Fedora:   $> sudo yum remove openss7 openss7-repo
+CentOS:   $> sudo yum remove openss7 openss7-repo
+RHEL:     $> sudo yum remove openss7 openss7-repo
+OpenSUSE: $> sudo zypper remove openss7 openss7-repo
+SLES:     $> sudo zypper remove openss7 openss7-repo
+@end example
+
+@unnumberedsubsec Build Prerequisites
 
 @include prerequisites.texi
 
@@ -177,14 +234,14 @@ necessary to have the net-snmp development packages installed.  For the followin
 the following commands:
 
 @example
-Ubuntu:  $> apt-get install libsnmp libsnmp-perl snmp snmpd lm-sensors
-         $> apt-get install libsnmp-dev libsnmp9-dev libsensors-dev
-Debian:  $> apt-get install libsnmp libsnmp-perl snmp snmpd lm-sensors
-         $> apt-get install libsnmp-dev libsnmp9-dev libsensors-dev
-Fedora:  $> yum install net-snmp net-snmp-perl net-snmp-utils lm_sensors
-         $> yum install net-snmp-devel lm_sensors-devel
-CentOS:  $> yum install net-snmp net-snmp-perl net-snmp-utils lm_sensors
-         $> yum install net-snmp-devel lm_sensors-devel
+Ubuntu:  $> apt-get install libsnmp libsnmp-perl snmp snmpd \
+                lm-sensors libsnmp-dev libsnmp9-dev libsensors-dev
+Debian:  $> apt-get install libsnmp libsnmp-perl snmp snmpd \
+                lm-sensors libsnmp-dev libsnmp9-dev libsensors-dev
+Fedora:  $> yum install net-snmp net-snmp-perl net-snmp-utils \
+                lm_sensors net-snmp-devel lm_sensors-devel
+CentOS:  $> yum install net-snmp net-snmp-perl net-snmp-utils \
+                lm_sensors net-snmp-devel lm_sensors-devel
 @end example
 
 The package builds and installs Java archives and compiled Java.  When configuring and building the

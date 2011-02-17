@@ -1,0 +1,286 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile: repo.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-02-17 18:34:10 $
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+##
+## =============================================================================
+
+if PKG_BUILD_INDEP
+
+if WITH_YUM_SOURCE
+
+$(PACKAGE).yum.repo: Makefile
+	( \
+		$(ECHO) '[@PACKAGE@]'; \
+		$(ECHO) 'enabled = 1'; \
+		$(ECHO) 'name = @PACKAGE_TITLE@ Repository'; \
+		$(ECHO) 'baseurl = http://www.openss7.org/repos/rpms/$(PACKAGE_RPMSUBDIR)'; \
+		$(ECHO) 'gpgkey = http://www.openss7.org/repos/tarballs/OPENSS7-GPG-KEY'; \
+		$(ECHO) 'repo_gpgcheck = 1'; \
+		$(ECHO) 'gpgcheck = 1'; \
+	) >$@
+
+INSTALL_YUM_REPOS = $(PACKAGE).yum.repo
+
+if MAINTAINER_MODE
+
+$(PACKAGE)-local.yum.repo: Makefile
+	( \
+		$(ECHO) '[@PACKAGE@-local]'; \
+		$(ECHO) 'enabled = 1'; \
+		$(ECHO) 'name = @PACKAGE_TITLE@ Local Repository'; \
+		$(ECHO) 'baseurl = file://$(topdir)'; \
+		$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
+		$(ECHO) 'repo_gpgcheck = 1'; \
+		$(ECHO) 'gpgcheck = 1'; \
+	) >$@
+
+INSTALL_YUM_REPOS += $(PACKAGE)-local.yum.repo
+
+## MAINTAINER_MODE
+endif
+
+install-yum: $(INSTALL_YUM_REPOS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(yumrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(yumrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(yumrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).yum.repo '$(DESTDIR)$(yumrepodir)/$(PACKAGE).repo'" ; \
+		$(INSTALL_DATA) $(PACKAGE).yum.repo "$(DESTDIR)$(yumrepodir)/$(PACKAGE).repo" ; \
+	fi
+	@if test -n "$(rpmgpgdir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(rpmgpgdir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(rpmgpgdir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$(DESTDIR)$(rpmgpgdir)/RPM-GPG-KEY-$(PACKAGE)'" ; \
+		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$(DESTDIR)$(rpmgpgdir)/RPM-GPG-KEY-$(PACKAGE)" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(yumrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(yumrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(yumrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.yum.repo '$(DESTDIR)$(yumrepodir)/$(PACKAGE)-local.repo'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.yum.repo "$(DESTDIR)$(yumrepodir)/$(PACKAGE)-local.repo" ; \
+	fi
+endif
+
+uninstall-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(yumrepodir)/$(PACKAGE).repo
+	rm -f -- $(DESTDIR)$(rpmgpgpdir)/RPM-GPG-KEY-$(PACKAGE)
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(yumrepodir)/$(PACKAGE)-local.repo
+endif
+
+##
+# When the stuff is installed go looking for the configuration file for the yum-kmod or
+# yum-fedorakmod plugin and change the 'pinkernels' and 'installforallkernels' options.
+##
+post-yum:
+	if test -n "$(yumkmodconf)" -a -f "$(DESTDIR)/$(yumkmodconf)" ; then \
+		sed -r -e 's/^[[:space:]]*pinkernels.*$$/pinkernels = 1/;s/^[[:space:]]*installforallkernels.*$$/installforallkernels = 1/' \
+			"$(DESTDIR)/$(yumkmodconf)" ; \
+		yum makecache ; \
+	fi
+
+ALL_LOCAL			+= $(PACKAGE).yum.repo
+INSTALL_DATA_LOCAL		+= install-yum
+UNINSTALL_LOCAL			+= uninstall-yum
+CLEANFILES			+= $(PACKAGE).yum.repo
+POST_INSTALL_AM			+= post-yum
+
+MY_PHONY			+= install-yum uninstall-yum post-zypp
+
+## WITH_YUM_SOURCE
+endif
+
+if WITH_ZYPP_SOURCE
+
+$(PACKAGE).zypp.repo: Makefile
+	( \
+		$(ECHO) '[@PACKAGE@]'; \
+		$(ECHO) 'name=@PACKAGE_TITLE@ Repository'; \
+		$(ECHO) 'enabled=1'; \
+		$(ECHO) 'autorefresh=1'; \
+		$(ECHO) 'baseurl=http://www.openss7.org/repos/rpms/$(PACKAGE_RPMSUBDIR)'; \
+		$(ECHO) 'type=rpm-md'; \
+		$(ECHO) 'gpgcheck=1'; \
+		$(ECHO) 'gpgkey=http://www.openss7.org/pubkey.asc'; \
+		$(ECHO) 'keeppackages=0'; \
+	) >$@
+
+INSTALL_ZYPP_REPOS = $(PACKAGE).zypp.repo
+
+if MAINTAINER_MODE
+
+$(PACKAGE)-local.zypp.repo: Makefile
+	( \
+		$(ECHO) '[@PACKAGE@-local]'; \
+		$(ECHO) 'name=@PACKAGE_TITLE@ Local Repository'; \
+		$(ECHO) 'enabled=1'; \
+		$(ECHO) 'autorefresh=0'; \
+		$(ECHO) 'baseurl=file:$(topdir)'; \
+		$(ECHO) 'gpgcheck=1'; \
+		$(ECHO) 'gpgkey=file:$(tardir)/OPENSS7-GPG-KEY'; \
+		$(ECHO) 'keeppackages=0'; \
+	) >$@
+
+INSTALL_ZYPP_REPOS += $(PACKAGE)-local.zypp.repo
+
+## MAINTAINER_MODE
+endif
+
+install-zypp: $(INSTALL_ZYPP_REPOS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(zypprepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(zypprepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(zypprepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).zypp.repo '$(DESTDIR)$(zypprepodir)/$(PACKAGE).repo'" ; \
+		$(INSTALL_DATA) $(PACKAGE).zypp.repo "$(DESTDIR)$(zypprepodir)/$(PACKAGE).repo" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(zypprepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(zypprepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(zypprepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.zypp.repo '$(DESTDIR)$(zypprepodir)/$(PACKAGE)-local.repo'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.zypp.repo "$(DESTDIR)$(zypprepodir)/$(PACKAGE)-local.repo" ; \
+	fi
+endif
+
+uninstall-zypp:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(zypprepodir)/$(PACKAGE).repo
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(zypprepodir)/$(PACKAGE)-local.repo
+endif
+
+##
+# When multiversion is set in the zypp.conf file, we need to make sure that it is set to
+# multiversion = provides:multiversion(kernel).
+##
+post-zypp:
+	if test -n "$(zyppconfig)" - a -f "$(DESTDIR)/$(zyppconfig)" ; then \
+		sed -r -e 's/^[[:space:]]*multiversion.*$$/mulversion = provides:multiversion(kernel)/' \
+			"$(DESTDIR)/$(zyppconfig)" ; \
+		zypper refresh ; \
+	fi
+
+
+ALL_LOCAL			+= $(PACKAGE).zypp.repo
+INSTALL_DATA_LOCAL		+= install-zypp
+UNINSTALL_LOCAL			+= uninstall-zypp
+CLEANFILES			+= $(PACKAGE).zypp.repo
+POST_INSTALL_AM			+= post-zypp
+
+MY_PHONY			+= install-zypp uninstall-zypp post-zypp
+
+## WITH_ZYPP_SOURCE
+endif
+
+if WITH_APT_SOURCE
+
+$(PACKAGE).sources.list: Makefile
+	( \
+		$(ECHO) "deb ..."; \
+		$(ECHO) "deb-src ..."; \
+	) >$@
+
+install-apt: $(PACKAGE).sources.list
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
+		$(INSTALL_DATA) $(PACKAGE).sources.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
+	fi
+	@if test -n "$(aptgpgdir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptgpgdir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptgpgdir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc'" ; \
+		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc" ; \
+	fi
+
+uninstall-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE).list
+	rm -f -- $(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc
+
+post-apt:
+	aptitude refresh
+
+ALL_LOCAL			+= $(PACKAGE).sources.list
+INSTALL_DATA_LOCAL		+= install-apt
+UNINSTALL_LOCAL			+= uninstall-apt
+CLEANFILES			+= $(PACKAGE).sources.list
+POST_INSTALL_AM			+= post-apt
+
+MY_PHONY			+= install-apt uninstall-apt post-apt
+
+## WITH_APT_SOURCE
+endif
+
+## PKG_BUILD_INDEP
+endif
+
+EXTRA_DIST += scripts/OPENSS7-GPG-KEY
+
+## =============================================================================
+##
+## $Log: repo.am,v $
+## Revision 1.1.2.1  2011-02-17 18:34:10  brian
+## - repository and rpm build updates
+##
+## =============================================================================
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

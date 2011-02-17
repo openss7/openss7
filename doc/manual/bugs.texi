@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: bugs.texi,v 1.1.2.7 2011-02-07 02:21:33 brian Exp $
+@c @(#) $Id: bugs.texi,v 1.1.2.8 2011-02-17 18:34:10 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -93,7 +93,7 @@ complete and for the most part bugs are currently available.
 Found a bug in msgpullup(9) that caused it to always fail.  Strange enough, msgpullup(9) only
 attempted after pullupmsg(9) failed in all OpenSS7 drivers and modules.
 
-@emph{*fixed*} in @command{openss7-1.2.3}
+@emph{*fixed*} in @command{openss7-1.1.1.20110111}
 
 @item openss7 008.  2010-08-09T17:41:46+0000
 The @manpage{t_alloc(3)} function was incorrectly returning a @var{TLOOK} error when called when an
@@ -101,13 +101,13 @@ outstanding event was pending.  Thanks to John Hodgkinson at Boldon James for re
 similar bug was found by inspection for @manpage{t_bind(3)}, @manpage{t_getinfo(3)},
 @manpage{t_getprotaddr(3)}.
 
-@emph{*fixed*} in @command{openss7-1.2.3}
+@emph{*fixed*} in @command{openss7-1.1.1.20110111}
 
 @item openss7 007.  2010-06-09T12:13:41+0000
 The @manpage{t_rcv(3)} function was not reseting data when the amount of data to be read was exactly
 the amount of data available.  Thanks to John Hodgkinson at Boldon James for reporting this bug.
 
-@emph{*fixed*} in @command{openss7-1.2.3}
+@emph{*fixed*} in @command{openss7-1.1.1.20111011}
 
 @item openss7 006.  2009-08-31T04:04:52+0000
 A number of functions in @file{strlookup.c} were moving the found item in the hash collision list to
@@ -118,7 +118,7 @@ to the head of the collision list has dubious performance advantages (as the has
 cached).  Therefore, the practice has been removed (actually suppressed).  Thanks to Tony Abo at
 HiTech for the report leading to this bug.
 
-@emph{*fixed*} in @command{openss7-1.2.2}
+@emph{*fixed*} in @command{openss7-1.1.1.20090908}
 
 @item openss7 005.  2009-06-13T03:47:32+0000
 There was an @manpage{qput(9)}/@manpage{qget(9)} reference counting imbalance in the
@@ -129,7 +129,7 @@ There was an @manpage{qput(9)}/@manpage{qget(9)} reference counting imbalance in
 reference imbalance resulted in leaking the module queue pair, stream head and stream head queue
 pair on driver close.
 
-@emph{*fixed*} in @command{openss7-1.2.2}
+@emph{*fixed*} in @command{openss7-1.1.1.20090908}
 
 @item openss7 004.  2009-06-12T08:16:08+0000
 @manref{qattach(9)} was taking a reference on a synchronization queue without the reference being
@@ -137,7 +137,7 @@ released in @manref{qdelete(9)}.  @manref{qdelete(9)} was fixed to release the r
 @manref{setsq(9)} in @manref{qattach(9)}.  Thanks to Tony Abo at HiTech for identifying and
 reporting this bug.
 
-@emph{*fixed*} in @command{openss7-1.2.2}
+@emph{*fixed*} in @command{openss7-1.1.1.20090908}
 
 @item openss7 003.  2009-04-17T11:56:06+0000
 
@@ -145,7 +145,7 @@ The strace, strerr daemons and the pstrlog call in the streams library were not 
 before the call to @manpage{ctime_r(3)} resulting in an epoch timestamp (Jan 1, 1970).  Thanks to
 Pierre Crepieux for identifying and reporting this bug.
 
-@emph{*fixed*} in @command{openss7-1.2.2}
+@emph{*fixed*} in @command{openss7-1.1.1.20090908}
 
 @item openss7 002.  2009-03-26T07:56:40+0000
 
@@ -159,7 +159,7 @@ Also, additional timer problems were encountered.  Cancelling timers from within
 sufficient list protection (irq suppression) potentially resulting in list corruption or queue
 reference counting problem.
 
-@emph{*fixed*} in @command{openss7-1.2.2}
+@emph{*fixed*} in @command{openss7-1.1.1.20090908}
 
 @item openss7 001.  2008-12-16T08:17:47+0000
 
@@ -173,7 +173,7 @@ also a minor possibility of a strevent structure identifier overlap after an ext
 of intensive operation, and that has been fixed as well.  Thanks to Angel Diaz for reporting this
 bug.
 
-@emph{*fixed*} in @command{openss7-1.2.2}
+@emph{*fixed*} in @command{openss7-1.1.1.20090908}
 
 @item strinet 004.  2008-10-24T08:04:16+0000
 UDP and RAWIP drivers cannot receive zero-length messages in accordances with UNIX '98 and XNS 5.2.

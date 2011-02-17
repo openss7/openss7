@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: prerequisites.texi,v 1.1.2.2 2011-01-12 03:37:37 brian Exp $
+@c @(#) $Id: prerequisites.texi,v 1.1.2.3 2011-02-17 18:34:10 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,14 +80,17 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-01-12 03:37:37 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
 @c
 @c =========================================================================
 
-The quickest and easiest way to ensure that all prerequisites are met is to download and install the
-@cite{OpenSS7 Master Package}, @command{openss7-@value{VERSION_OPENSS7}}.
+When building from source RPM or DSC, the prerequisites for building must be met.  Most RPM or DEB
+build prerequisites are automatic; however, some prerequisites must still be met manually.  When
+building from tarball, most prerequisites must be met manually.  The @command{configure} script will
+inform you of most missing prerequisites and the actions that must be performed to meet those
+prerequisites.
 
-Prerequisites for the @value{PACKAGE_TITLE} package are as follows:
+Prerequisites for building @value{PACKAGE_TITLE} package are as follows:
 
 @enumerate 1
 @item
@@ -124,3 +127,37 @@ swig (for Java, Tcl, Perl and Ruby interfaces).
 @end multitable
 @end enumerate
 
+@noindent
+The following will meet most additional prerequisites for a CentOS/RHEL 5.5 build host:
+
+@example
+#> yum install bzip2 chkconfig coreutils createrepo doxygen \
+        gcc-java ghostscript gjdoc glibc gnupg gnuplot \
+        groff gzip ImageMagick kernel-devel latex2html \
+        libgcj lsof module-init-tools rpm rpm-build tetex \
+        tetex-dvips tetex-latex transfig xz xz-lzma-compat \
+        zip
+@end example
+
+@noindent
+The following will meet most additional prerequisites for a SuSE Linux Enterprise 11 build host:
+
+@example
+#> zypper install aaa_base bzip2 coreutils createrepo doxygen \
+        fastjar gcc43-gij gcc-java ghostscript-library gjdoc \
+        glibc gnuplot gpg2 groff gzip ImageMagick inst-source-utils \
+        kernel-default-devel latex2html lsof module-init-tools \
+        rpm texlive texlive-latex transfig zip
+@end example
+
+@noindent
+The following will meet most additional prerequisites for a Debian 6.0 build host:
+
+@example
+#> apt-get install apt-utils bzip2 coreutils createrepo doxygen \
+        dpkg dpkg-dev fastjar gcj-jdk gcj-jre-headless ghostscript \
+        gnupg gnuplot-nox gnuplot-x11 groff groff-base gzip \
+        imagemagick insserv latex2html libc-bin lsof lzma \
+        module-init-tools rpm texlive-binaries texlive-font-utils \
+        texlive-latex-base transfig xz-utils zip
+@end example
