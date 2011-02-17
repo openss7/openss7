@@ -1,3 +1,34 @@
+2011-02-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* .pkgpatchlevel: boosted patchlevel to 20010217
+	* AUTHORS: update release files
+	* Makefile.am: added repository install source
+	* NEWS: update release files
+	* README: update release files
+	* THANKS: update release files
+	* acinclude.m4: added respository install source
+	* openss7.spec.in: tweaked dependencies and added openss7-repo install
+	  source sub-package
+	* NOTES.kmod: added kmod notes
+	* NOTES.repo: added repo notes
+	* am/archive.am: skip hidden files in lists
+	* am/libraries.am: only perform ldconfig when target files exist
+	* am/rpm.am: specify build root for NFS builds
+	* am/repo.am: new repo install source makefile fragment
+	* doc/manual/bugs.texi: proper release numbers
+	* doc/manual/configure.texi: spelling
+	* doc/manual/install.texi: document repositories
+	* doc/manual/openss7.texi: document prerequisites
+	* doc/manual/prerequisites.texi: document prerequisites
+	* m4/bld.m4: more build dependency macros
+	* m4/perl.m4: visual defect repair
+	* m4/rpm.m4: add build root for NFS builds
+	* m4/repo.m4: new repo install source macros
+	* scripts/rpm/find-requires: remove more unprovided dependencies
+	* scripts/texi/install.texi: document repositories
+	* scripts/texi/macros.texi: space after comma
+	* scripts/texi/quick.texi: add repository quick start
+
 2011-02-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* centos-5.5-x86_64-config.cache: updated for modifyrepo

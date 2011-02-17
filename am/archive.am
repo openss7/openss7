@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:31 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-17 18:34:10 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
+## Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -406,7 +406,7 @@ $(tardir)/MD5SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
 		( cd $(tardir); find . -maxdepth 1 -type f | LANG= sort | \
 		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 		  sed 's,^\./,,' | while read f; do \
-		  	case $$f in (*MD5SUMS*|*SHA1SUMS*) continue ;; esac ; \
+		  	case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
 		  	$(MD5SUM) $$f; \
 		  done ) > $@; \
 	else touch $@; fi
@@ -421,7 +421,7 @@ $(tardir)/SHA1SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
 		( cd $(tardir); find . -maxdepth 1 -type f | LANG= sort | \
 		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 		  sed 's,^\./,,' | while read f; do \
-		  	case $$f in (*MD5SUMS*|*SHA1SUMS*) continue ;; esac ; \
+		  	case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
 			$(SHA1SUM) $$f; \
 		  done ) > $@; \
 	else touch $@; fi
@@ -548,6 +548,9 @@ EXTRA_DIST		+= .pkgpatchlevel \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 1.1.2.6  2011-02-17 18:34:10  brian
+## - repository and rpm build updates
+##
 ## Revision 1.1.2.5  2011-02-07 04:48:31  brian
 ## - updated configure and build scripts
 ##

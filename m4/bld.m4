@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-08 23:39:02 $
+# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-17 18:34:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-08 23:39:02 $ by $Author: brian $
+# Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -253,6 +253,7 @@ AC_DEFUN([_BLD_VAR_PATH_PROG], [dnl
 # =============================================================================
 # _BLD_PATH_PROG (VARIABLE, PROG-TO-CHECK-FOR, [VALUE-IF-NOT-FOUND],
 #		  [PATH = `$PATH'], [IF-NOT-FOUND], [IF-FOUND])
+# -----------------------------------------------------------------------------
 # Like `AC_PATH_PROG', but also provides an action to take if not found.  Also,
 # when the program is found, the package containing the message is cached.
 # -----------------------------------------------------------------------------
@@ -272,6 +273,7 @@ AC_DEFUN([_BLD_PATH_PROG], [dnl
 # =============================================================================
 # _BLD_PATH_PROGS (VARIABLE, PROGS-TO-CHECK-FOR, [VALUE-IF-NOT-FOUND],
 #		   [PATH = `$PATH'], [IF-NOT-FOUND], [IF-FOUND])
+# -----------------------------------------------------------------------------
 # Like `AC_PATH_PROGS', but also provides an action to take if not found.  Also,
 # when the program is found, the package containing the message is cached.
 # -----------------------------------------------------------------------------
@@ -291,11 +293,12 @@ AC_DEFUN([_BLD_PATH_PROGS], [dnl
 # =============================================================================
 # _BLD_INSTALL_WARN (VARIABLE, MESSAGE-LEAD, GENERIC-INSTALL-MESSAGE,
 #		     MESSAGE-TAIL)
-# To be used in the IF-NOT-FOUND portion of _BLD_PATH_PROG or _BLD_PATH_PROGS.
-# If there is a cached way to install the program specified by VARIABLE, warn
-# with the MESSAGE-LEAD, the specific installation message, and the
-# MESSAGE-TAIL; otherwise warn with the MESSAGE-LEAD, the
-# GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
+# -----------------------------------------------------------------------------
+# To be used in the IF-NOT-FOUND portion of _BLD_PATH_PROG, _BLD_PATH_PROGS,
+# _BLD_CHECK_HEADER or _BLD_CHECK_HEADERS.  If there is a cached way to install
+# the program or header specified by VARIABLE, warn with the MESSAGE-LEAD, the
+# specific installation message, and the MESSAGE-TAIL; otherwise warn with the
+# MESSAGE-LEAD, the GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_INSTALL_WARN], [dnl
     if test -n "$bld_cv_pkg_cmd_$1" ; then
@@ -311,11 +314,12 @@ AC_DEFUN([_BLD_INSTALL_WARN], [dnl
 # =============================================================================
 # _BLD_INSTALL_ERROR (VARIABLE, MESSAGE-LEAD, GENERIC-INSTALL-MESSAGE,
 #		      MESSAGE-TAIL)
-# To be used in the IF-NOT-FOUND portion of _BLD_PATH_PROG or _BLD_PATH_PROGS.
-# If there is a cached way to install the program specified by VARIABLE, error
-# with the MESSAGE-LEAD, the specific installation message, and the
-# MESSAGE-TAIL; otherwise error with the MESSAGE-LEAD, the
-# GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
+# -----------------------------------------------------------------------------
+# To be used in the IF-NOT-FOUND portion of _BLD_PATH_PROG, _BLD_PATH_PROGS,
+# _BLD_CHECK_HEADER or _BLD_CHECK_HEADERS.  If there is a cached way to install
+# the program specified by VARIABLE, error with the MESSAGE-LEAD, the specific
+# installation message, and the MESSAGE-TAIL; otherwise error with the
+# MESSAGE-LEAD, the GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
     if test -n "$bld_cv_pkg_cmd_$1" ; then
@@ -343,6 +347,7 @@ AC_DEFUN([_BLD_HEADER_CHECK], [dnl
 # =============================================================================
 # _BLD_CHECK_HEADER (HEADER, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND],
 #		     [INCLUDES])
+# -----------------------------------------------------------------------------
 # Like `AC_CHECK_HEADER', but when the header is found, the package providing
 # the header is cached.
 # -----------------------------------------------------------------------------
@@ -353,55 +358,12 @@ AC_DEFUN([_BLD_CHECK_HEADER], [dnl
 # =============================================================================
 # _BLD_CHECK_HEADERS (HEADER..., [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND],
 #		      [INCLUDES])
+# -----------------------------------------------------------------------------
 # Like `AC_CHECK_HEADERS', but when each header is found, the package providing
 # the header is cached.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_CHECK_HEADERS], [dnl
 ])# _BLD_CHECK_HEADERS
-# =============================================================================
-
-# =============================================================================
-# _BLD_HEADER_WARN (HEADER, MESSAGE-LEAD, GENERIC-INSTALL-MESSAGE, MESSAGE-TAIL)
-# To be used in the IF-NOT-FOUND portion of _BLD_CHECK_HEADER or
-# _BLD_CHECK_HEADERS.  If there is a cached way to install the header specified
-# by HEADER, warn with the MESSAGE-LEAD, the specific installation message, and
-# the MESSAGE-TAIL; otherwise, warn with the MESSAGE-LEAD, the
-# GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_BLD_HEADER_WARN], [dnl
-    [AS_VAR_PUSHDEF([bld_Header], [bld_cv_pkg_header_$1])]dnl
-    [AS_VAR_IF([bld_Header], [], [dnl
-	    tmp_msg="$3"
-	], [
-	    tmp_msg=AS_VAR_GET([bld_Header])
-	    tmp_msg="
-*** $dist_cv_build_flavor: $tmp_msg"
-	])]
-    [AS_VAR_POPDEF([bld_Header])]dnl
-    AC_MSG_WARN([$2$tmp_msg$4])
-])# _BLD_HEADER_WARN
-# =============================================================================
-
-# =============================================================================
-# _BLD_HEADER_ERROR (HEADER, MESSAGE-LEAD, GENERIC-INSTALL-MESSAGE, MESSAGE-TAIL)
-# -----------------------------------------------------------------------------
-AC_DEFUN([_BLD_HEADER_ERROR], [dnl
-# To be used in the IF-NOT-FOUND portion of _BLD_CHECK_HEADER or
-# _BLD_CHECK_HEADERS.  If there is a cached way to install the header specified
-# by HEADER, error with the MESSAGE-LEAD, the specific installation message, and
-# the MESSAGE-TAIL; otherwise, error with the MESSAGE-LEAD, the
-# GENERIC-INSTALL-MESSAGE and the MESSAGE-TAIL.
-    [AS_VAR_PUSHDEF([bld_Header], [bld_cv_pkg_header_$1])]dnl
-    [AS_VAR_IF([bld_Header], [], [dnl
-	    tmp_msg="$3"
-	], [
-	    tmp_msg=AS_VAR_GET([bld_Header])
-	    tmp_msg="
-*** $dist_cv_build_flavor: $tmp_msg"
-	])]
-    [AS_VAR_POPDEF([bld_Header])]dnl
-    AC_MSG_ERROR([$2$tmp_msg$4])
-])# _BLD_HEADER_ERROR
 # =============================================================================
 
 # =============================================================================
@@ -414,6 +376,9 @@ AC_DEFUN([_BLD_], [dnl
 # =============================================================================
 #
 # $Log: bld.m4,v $
+# Revision 1.1.2.4  2011-02-17 18:34:10  brian
+# - repository and rpm build updates
+#
 # Revision 1.1.2.3  2011-02-08 23:39:02  brian
 # - last minute release updates
 #

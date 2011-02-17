@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.6 2011-02-10 17:29:45 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.7 2011-02-17 18:34:10 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-02-10 17:29:45 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -125,23 +125,23 @@ source.  For @manpage{dpkg(1)} based systems, the package is available in an @ma
 repository.
 
 By far the easiest (most repeatable and manageable) form for installing and using the
-@value{PACKAGE_TITLE} package is to install from the @manpage{yum(8)}, @manpage{yast(8)} or
-@manpage{apt(8)} repositories.  If your distribution does not support @manpage{yum(8)},
-@manpage{zypper(8)}, @manpage{up2date(8)}, @manpage{yast(8)} or @manpage{apt(8)}, then it is still
-possible to install the RPMs or DEBs from the repositories using @manpage{rpm(1)},
+@cite{@value{PACKAGE_TITLE}} packages is to install packages from the @manpage{yum(8)},
+@manpage{yast(8)} or @manpage{apt(8)} repositories.  If your distribution does not support
+@manpage{yum(8)}, @manpage{zypper(8)}, @manpage{up2date(8)}, @manpage{yast(8)} or @manpage{apt(8)},
+then it is still possible to install the RPMs or DEBs from the repositories using @manpage{rpm(1)},
 @manpage{dpkg(1)}; or by using @manpage{wget(1)} and then installing them from RPM or DEB using
 @manpage{rpm(1)} or @manpage{dpkg(1)} locally.
 
 If binaries are not available for your distribution or specific kernel, but your distribution
 supports @manref{rpm(1)} or @manref{dpkg(1)}, the next best method for installing and using
-@value{PACKAGE_TITLE} package is to download and rebuild the source RPMs or DSCs from the
+@cite{@value{PACKAGE_TITLE}} packages is to download and rebuild the source RPMs or DSCs from the
 repository.  This can also be performed with @manpage{yum(8)}, @manpage{zypper(8)},
 @manpage{yast(8)}, @manpage{apt(8)}; or directly using @manpage{wget(1)}, @manpage{rpm(1)} or
 @manpage{dpkg(1)}.
 
 If your architecture does not support @manpage{rpm(1)} or @manpage{dpkg(1)} at all, or you have
-special needs (such as cross-compiling for embedded targets or for development), the last method is
-to download, configure, build and install from the tarball.
+special needs (such as cross-compiling for embedded targets or for development), the final resort
+method is to download, configure, build and install from the tarball.
 
 @menu
 Repositories for YUM::			the @manpage{yum(8)} repository
@@ -182,90 +182,161 @@ distribution is located under @uref{http://@-www.@-openss7.@-org/@-repos/@-tarba
 @cindex yum
 
 To install or upgrade from the @cite{OpenSS7} @file{repomd} repositories using @manpage{yum(8)}, you
-will need a file in your @file{/etc/yum.repo.d/} directory.  This file can be obtained directly from
-the @cite{OpenSS7} @uref{http://www.openss7.org/repos, repository}, like so:
+will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as follows:
 
+@cartouche
 @smallexample
-$> REPOS="http://www.openss7.org/repos/rpms"
-$> REPOFILE="$REPOS/@value{PACKAGE_RPMSUBDIR}/repodata/openss7.repo"
-$> wget $REPOFILE
-$> sudo cp -f openss7.repo /etc/yum.repo.d/
-$> sudo yum makecache
+$> REPOS="http://user@@www.openss7.org/repos/rpms"
+$> REPONOARCH="$REPOS/fedora/14/x86_64/RPMS/noarch"
+$> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
+$> sudo rpm -Uhv $REPORPM
+$> Password: *******
 @end smallexample
+@end cartouche
 
-This example assumes the the distribution is @samp{centos} and the distribution release is
-@samp{5.5} and the architecture requires is @samp{x86_64}.  Another example would be
-@file{$REPOS/suse/11/i686/repodata/openss7.repo}, for using @manpage{yum(8)} or
-@manpage{zypper(8)} with SUSE.
+The example, above, assumes that the distribution is @samp{fedora} and the distribution release is
+@samp{14} and the required architecture is @samp{x86_64}.  Another example would be
+@file{$REPOS/redhat/6.0/x86_64/RPMS/noarch}, for using @manpage{yum(8)} with RHEL.
 
-If you have the @file{yum-tmprepo} plugin, you can use the @cite{OpenSS7} repository as a temporary
-repository in any @manpage{yum(8)} command (such as those provided in the examples that follow),
-like so:
+You can test whether the @manpage{yum(8)} repository is properly set up by refreshing the repository
+and by listing the packages:
 
+@cartouche
 @smallexample
-$> REPOS="http://www.openss7.org/repos/rpms"
-$> REPOFILE="$REPOS/@value{PACKAGE_RPMSUBDIR}/repodata/openss7.repo"
-$> yum --temprepo=$REPOFILE grouplist
+$> sudo yum makecache openss7
+$> sudo yum search openss7
+$> sudo yum info openss7
 @end smallexample
+@end cartouche
+
+@subsubsection Using the YUM Repository
+@cindex yum
 
 Once the repository is set up, @cite{OpenSS7} includes a number of virtual package and package group
 definitions that ease the installation and removal of kernel modules, libraries and utilities.
 Downloading, configuring, building and installation for a single-kernel distribution is as easy as
 (one of):
 
+@cartouche
 @smallexample
 $> sudo yum groupinstall @value{PACKAGE}
 $> sudo yum install @value{PACKAGE}
 @end smallexample
+@end cartouche
 
 Removing the package is as easy as (one of):
 
+@cartouche
 @smallexample
 $> sudo yum groupremove @value{PACKAGE}
 $> sudo yum remove @value{PACKAGE}
 @end smallexample
+@end cartouche
+
+To install the development packages for developing STREAMS modules and drivers, or applications that
+use the @cite{OpenSS7 Protocol Suites}, install the development packages using (one of):
+
+@cartouche
+@smallexample
+$> sudo yum groupinstall @value{PACKAGE}-devel
+$> sudo yum install @value{PACKAGE}-devel
+@end smallexample
+@end cartouche
+
+@subsubsection YUM Kernel Updates
+@cindex yum
+@cindex kernel updates
+
+The @cite{OpenSS7} @manpage{yum(8)} repository definitions support the automatic updating of kernel
+modules when kernels are updated.  When the system is updated, using @samp{yum update}, openss7
+packages that are available for an updated kernel will be installed automatically.  The repository
+setup also ensures that kernels will not be updated until kernel modules are available for the
+updated kernel.
 
 @subsubsection Setting up ZYPPER
 @cindex zypper
 
 To install or upgrade from the @cite{OpenSS7} @file{repomd} repositories using @manpage{zypper(8)},
-you will need a file to add to your @command{zypper} repositories.  This file can be obtained
-directly from the @cite{OpenSS7} @uref{http://www.openss7.org/repos, repository}, like so:
+you will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as follows:
 
+@cartouche
 @smallexample
-$> REPOS="http://www.openss7.org/repos/rpms"
-$> REPOFILE="$REPOS/@value{PACKAGE_RPMSUBDIR}/repodata/openss7.repo"
-$> wget $REPOFILE
-$> sudo zypper addrepo --refresh --repo openss7.repo
-$> rm -f openss7.repo
+$> REPOS="http://user@@www.openss7.org/repos/rpms"
+$> REPONOARCH="$REPOS/opensuse/11/x86_64/RPMS/noarch"
+$> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
+$> sudo rpm -Uhv $REPORPM
+$> Password: *******
 @end smallexample
+@end cartouche
 
-@manpage{zypper(8)} does not do a very good job of importing GPG signatures.  If @command{zypper} is
-reporting that there are no keys for the RPMs being installed, the key can be imported directly into
-RPM as follows:
+The example assumes that the distribution is @samp{opensuse} and the distribution release is
+@samp{11} and the architecture requiresd is @samp{x86_64}.  Another example would be
+@file{$REPOS/suse/11/x86_64/RPMS/noarch}, for using @manpage{zypper(8)} with SLES.
 
+@manpage{zypper(8)} does not do a very good job of importing GPG signatures.  When @command{zypper}
+is reporting that there are no kens for the RPMs being installed, the key can be imported directly
+into RPM as follows:
+
+@cartouche
 @smallexample
-$> wget http://www.openss7.org/pubkey.asc
-$> sudo rpm --import pubkey.asc
-$> rm -f pubkey.asc
+$> sudo rpm --import http://www.openss7.org/pubkey.asc
 @end smallexample
+@end cartouche
+
+You can test whether the @manpage{zypper(8)} repository is properly set up by refreshing the
+repository and by listing the packages:
+
+@cartouche
+@smallexample
+$> sudo zypper refresh openss7
+$> sudo zypper search -t package openss7
+$> sudo zypper info -t package openss7
+@end smallexample
+@end cartouche
+
+@subsubsection Using the ZYPPER Repository
+@cindex zypper
 
 Once the repository is set up, @cite{OpenSS7} includes a number of virtual package and package group
 (pattern) definitions that ease the installation and removal of kernel modules, libraries and
 utilities.  Downloading, configuring, building and installation for a single-kernel distribution is
 a easy as (one of):
 
+@cartouche
 @smallexample
 $> sudo zypper install -t pattern @value{PACKAGE}
 $> sudo zypper install @value{PACKAGE}
 @end smallexample
+@end cartouche
 
 Removing the package is as easy as:@footnote{Note that @manpage{zypper(8)} does not yet support
 removal by pattern.}
 
+@cartouche
 @smallexample
 $> sudo zypper remove @value{PACKAGE}
 @end smallexample
+@end cartouche
+
+To install the development packages for developing STREAMS modules and drivers, or applications that
+use the @cite{OpenSS7 Protocol Suites}, install the development packages using (one of):
+
+@cartouche
+@smallexample
+$> sudo zypper install -t pattern @value{PACKAGE}-devel
+$> sudo zypper install @value{PACKAGE}-devel
+@end smallexample
+@end cartouche
+
+@subsubsection ZYPPER Kernel Updates
+@cindex zypper
+@cindex kernel updates
+
+The @cite{OpenSS7} @manpage{zypper(8)} repository definitions support the automatic updating of
+kernel modules when kernels are updated.  When the system is updated, using @samp{zypper update},
+openss7 packages that are available for an updated kernel will be installed automatically.  The
+repository setup also ensure that kernels will not be updated util kernel modules are available for
+the updated kernel.
 
 @subsubsection General REPO-MD Repository
 @cindex repositories, repo-md
@@ -274,13 +345,16 @@ To avoid having to change the @file{openss7.repo} file contents if they should c
 archive, place the following into the @file{openss7.repo} and place it into your
 @file{/etc/yum.repo.d/} directory:
 
+@cartouche
 @smallexample
 -| include=http://www.openss7.org/repos/rpms/centos/$releasever/$arch/repodata/openss7.repo
 @end smallexample
+@end cartouche
 
 If you have difficulty downloading the @file{openss7.repo} file, edit the following information into
 the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 
+@cartouche
 @smallexample
 -| [openss7]
 -| name = OpenSS7 Repository
@@ -290,6 +364,7 @@ the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 -| gpgcheck = 1
 -| enabled = 1
 @end smallexample
+@end cartouche
 
 Note that it is also possible to point to these repositories as an additional installation source
 when installing CentOS, RedHat, Fedora, or others.  You will have an additional @acronym{STREAMS}
@@ -303,12 +378,12 @@ The groups (patterns) that are provided in this category are as follows:
 @table @asis
 @item @samp{@value{PACKAGE}} --- OpenSS7 STREAMS and Protocol Suites.
 This group (pattern) installs packages required for the @cite{Linux Fast-STREAMS} and @cite{OpenSS7
-Protocol Suites} runtime libraries, commands, utilities, init scripts and kernel modules.  Also
+Protocol Suites} run-time libraries, commands, utilities, init scripts and kernel modules.  Also
 included are section 1, 4, 5 and 8 manual pages for the commands, module and drivers, configuration
 file formats and administrative utilities.
 
 Install this group (pattern) if you need the @cite{Linux Fast-STREAMS} and @cite{OpenSS7 Protocol
-Suties} core runtime.
+Suties} core run-time.
 
 The mandatory (required) packages in this group (pattern) are
 @samp{@value{PACKAGE}},
@@ -363,18 +438,16 @@ For distributions that support @cite{YaST}, such as @cite{SUSE Linux Enterprise 
 Setting up the installation source as a @cite{YaST} installation source instead of @cite{repo-md}
 can provide the additional features associated with @cite{YaST} install sources.
 
-@subsubsection Setting up ZYPPER
-@cindex setup, zypper
-@cindex zypper
+@subsubsection Setting up YAST
+@cindex setup, yast
+@cindex yast
 
+@cartouche
 @smallexample
 $> REPODIR="http://www.openss7.org/repos/rpms/suse/11/x86_64"
 $> sudo zypper addrepo --type yast2 $REPODIR openss7
 @end smallexample
-
-@subsubsection Setting up YAST
-@cindex setup, yast
-@cindex yast
+@end cartouche
 
 @node Repositories for APT
 @subsection Repositories for APT
@@ -390,21 +463,23 @@ For assistance with specific DEBs, see @ref{Downloading the Debian DEB}.
 @section Downloading
 @cindex downloading
 
-Package releases can be downloaded from the downloads page of
-@uref{http://www.openss7.org/download.html, The OpenSS7 Project}.  The package is available as a
-binary RPM (for popular architectures) a source RPM, Debian binary DEB and source DSC, or as a tar
-ball.  If you are using a browsable viewer, you can obtain the release from the links in the sections
-that follow.
+The @cite{@value{PACKAGE_TITLE}} package releases can be downloaded from the downloads page of
+@uref{http://www.openss7.org/download.html, The OpenSS7 Project}.
+The package is available as a binary RPM (for popular architectures) a source RPM, Debian binary DEB
+and source DSC, or as a tar ball.
+If you are using a browsable viewer, you can obtain the @cite{OpenSS7} release of
+@command{@value{PACKAGE_NAME}} from the links in the sections that follow.
 
-By far the easiest (most repeatable and manageable) form for installing and using the package is to
-download and install it from binary RPM or DEB.  If binary RPMs or DEBs are not available for your
-distribution, but your distribution supports @manref{rpm(1)} or @manref{dpkg(1)}, the next best method
-for installing and using the package is to download and rebuild the source RPMs or DSCs.
+By far the easiest (most repeatable and manageable) form for installing and using @cite{OpenSS7}
+packages is to download and install individual packages from binary RPM or DEB.  If binary RPMs or
+DEBs are not available for your distribution, but your distribution supports @manref{rpm(1)} or
+@manref{dpkg(1)}, the next best method for installing and using @cite{OpenSS7} packages is to
+download and rebuild the source RPMs or DSCs.
 
 If your architecture does not support @manpage{rpm(1)} or @manpage{dpkg(1)} at all, or you have
-special needs (such as cross-compiling for embedded targets or for development), the last method is to
-download, configure, build and install from tarball.  In this later case, the easiest way to build and
-install the package from tarball.
+special needs (such as cross-compiling for embedded targets or for development), the final resort
+method is to download, configure, build and install from tarball.  In this later case, the easiest
+way to build and install @cite{OpenSS7} packages from tarball.
 
 @menu
 * Downloading with YUM:			the easiest approach for YUM based systems
@@ -467,7 +542,7 @@ To install from Binary RPM, you will need all of the following kernel
 independent packages for your architecture, and one of the kernel-dependent
 packages from the next section.
 
-@subsubsection Independent RPM
+@subsubheading Independent RPM
 Independent RPM are
 not dependent on the Linux kernel version.
 For example, the
@@ -571,7 +646,7 @@ RPMs in the @cite{@value{PACKAGE_TITLE}} components are as follows:
 
 @item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-lib-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
-The @file{@value{PACKAGE}-lib} binary package contains the runtime (shared object) libraries
+The @file{@value{PACKAGE}-lib} binary package contains the run-time (shared object) libraries
 necessary to run applications programs and utilities developed for @cite{Linux Fast-STREAMS} and the
 protocol suites contained in the @cite{OpenSS7} package.  Also included are the libtool @file{.la}
 files describing the shared object libraries.  The binary package also provides administrative and
@@ -753,7 +828,7 @@ This also includes the header files and static libraries required to compile
 @value{PACKAGE_TITLE} applications programs.
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-lib_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-lib_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
-The @file{@value{PACKAGE}-@-lib} package contains the runtime shared libraries
+The @file{@value{PACKAGE}-@-lib} package contains the run-time shared libraries
 necessary to run application programs and utilities developed for the
 @file{@value{PACKAGE_NAME}} package.
 
@@ -1068,7 +1143,7 @@ where, @file{@value{PACKAGE_CVSMODULE}} is the name of the directory to where th
 checked out under the previous step.  This command generates the @file{configure} script and
 other missing pieces that are normally distributed with the release Tar Balls, SRPMs and DSCs.
 
-Make sure that @samp{autoreconf --version} returns @samp{2.63}.  Otherwise, you may need to perform
+Make sure that @samp{autoreconf --version} returns @samp{2.68}.  Otherwise, you may need to perform
 something like the following:
 
 @cartouche
@@ -1176,7 +1251,7 @@ This relocatable directory contains manual pages.
 @cindex @value{PACKAGE}-@-lib-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
-This relocatable directory contains the runtime shared libraries necessary to
+This relocatable directory contains the run-time shared libraries necessary to
 run applications programs and utilities developed for @value{PACKAGE_TITLE}.
 @item @file{@value{_rootdir}@value{_datadir}/@-locale}
 This relocatable directory contains the locale information for shared library
@@ -1280,6 +1355,9 @@ do:
 --define "_with_someparm --with-someparm=somearg"
 @end smallexample
 
+This is a generic description of common @manpage{rpmbuild(1)} options.  Not all @manpage{rpmbuild(1)}
+options are applicable to all SRPMs.
+
 @table @code
 @item --define "_kversion $PACKAGE_KVERSION"
 @vindex PACKAGE_KVERSION
@@ -1329,7 +1407,8 @@ smaller that way.
 @item --with public
 @itemx --without public
 @opindex public
-Release public packages or private packages.  The default is to release public packages.
+Release public packages or private packages.
+The default is to release public packages.
 
 @item --with k-debug
 @itemx --without k-debug
@@ -1381,14 +1460,14 @@ target kernel.  The @samp{rebuild} target uses this option to signal to the RPM 
 Specifies whether to build development environment packages such as those that include header files,
 static libraries, manual pages and @manpage{texinfo(1)} documentation.  The default is to build development
 environment packages.  This option can be useful when building for an embedded target where only the
-runtime components are desired.
+run-time components are desired.
 
 @item --with docs
 @itemx --without docs
 @opindex docs
 Specifies whether to build and install major documentation such manual pages and
 @manpage{texinfo(1)} documentation.  The default is to build and install documentation.  This option
-can be useful when building for an embedded target where only the runtime and static compile
+can be useful when building for an embedded target where only the run-time and static compile
 components are desired, but not major documentation.  This option does not override the setting of
 @code{--without devel}.
 
@@ -1455,6 +1534,9 @@ described below.
 @subsubsection Configure Options
 @cindex configure options
 
+This is a generic description of common @file{configure} options that are in addition to those
+provided by @manpage{autoconf(1)}, @manpage{automake(1)}, @manpage{libtool(1)} and @manpage{gettext(1)}.
+
 Following are the additional @file{configure} options, their meaning and use:
 
 @table @command
@@ -1517,17 +1599,26 @@ where only native shared libraries and binaries are desired.
 Disables the installation of development environment components such as header files, static
 libraries, manual pages and @manpage{texinfo(1)} documentation.  The default is to install development
 environment components.  This option can be useful when configuring for an embedded target where
-only the runtime components are desired, or when performing a edit-compile-test cycle.
+only the run-time components are desired, or when performing a edit-compile-test cycle.
 
 @item --disable-docs
 @opindex docs
 Disables the build and installation of major documentation such manual pages and
 @manpage{texinfo(1)} documentation.  The default is to build and install documentation.  This option
-can be useful when building for an embedded target where only the runtime and static compile
+can be useful when building for an embedded target where only the run-time and static compile
 components are desired, but not major documentation.  This option does not override the setting of
 @option{--disable-devel}.
 
-@item --enable-tools
+@item --enable-distribute-docs
+@opindex distribute-docs
+Enables the distribution of pre-built documentation.
+Distribution of pre-built documentation in the distribution tarball causes the tarball size to
+increase dramatically.  To avoid this, the distribution of pre-built documentation was suppressed,
+by default, to reduce the size of the distribution tarball.  Enabling this feature causes pre-built
+documentation to be included in the distribution tarball.
+The default is to disable the distribution of pre-built documentation.
+
+@item --disable-tools
 @opindex tools
 Specifies whether user space programs and libraries are to be built and installed.  The default is
 to build and install user space programs and libraries.  This option can be useful when rebuilding
@@ -1536,7 +1627,7 @@ for multiple architectures and target kernels, particularly under @manpage{rpm(1
 RPMs for all available architectures and kernels, to rebuild user packages once per architecture
 instead of once per kernel.
 
-@item --enable-modules
+@item --disable-modules
 @opindex modules
 Specifies whether kernel modules are to be built and installed.  The default is to build and install
 kernel modules.  This option can be useful when rebuilding for multiple architectures and target
@@ -1544,14 +1635,14 @@ kernels, particularly under @manpage{rpm(1)} or @manpage{dpkg(1)}.  The @samp{re
 @manpage{automake(1)} target uses this feature to rebuild for all available architectures and
 kernels.
 
-@item --enable-arch
+@item --disable-arch
 @opindex arch
 Specifies whether architectural dependent package components are to be built and installed.  This
 option can be useful when rebuilding for multiple architectures and target kernels, particularly
 under @manpage{dpkg(1)}.  The default is to configure, build and install architecture dependent
 package components.
 
-@item --enable-indep
+@item --disable-indep
 @opindex indep
 Specifies whether architecture independent package components are to be built and installed.  This
 option can be useful when rebuilding for multiple architectures and target kernels, particularly
@@ -1566,14 +1657,15 @@ modules.  Use with care.
 
 @item --enable-k-safe
 @opindex k-safe
-Enable kernel module runtime safety checks.  Specifies whether kernel safety is to be performed.
+Enable kernel module run-time safety checks.  Specifies whether kernel safety is to be performed.
 This option is mutually exclusive with @option{--enable-k-test}, @option{--enable-k-debug} and
-@option{--enable-k-none} below.  This has the effect of invoking some more pedantic assertion macros
-in the code.  The default is to apply kernel safety.
+@option{--enable-k-none} below.
+This has the effect of invoking some more pedantic assertion macros in the code.  The default is not
+to apply kernel safety.
 
 @item --enable-k-test
 @opindex k-test
-Enable kernel module runtime testing.  Specifies whether kernel testing is to be performed.  This
+Enable kernel module run-time testing.  Specifies whether kernel testing is to be performed.  This
 option is mutually exclusive with @option{--enable-k-safe} above and @option{--enable-k-debug} and
 @option{--enable-k-none} below.  This has the effect of removing @code{static} and @code{inline}
 attributes from functions and invoking most non-performance affecting debugging macros in the code.
@@ -1581,16 +1673,17 @@ The default is not to perform kernel testing.
 
 @item --enable-k-debug
 @opindex k-debug
-Enable kernel module runtime debugging.  Specifies whether kernel debugging is to be performed.
+Enable kernel module run-time debugging.  Specifies whether kernel debugging is to be performed.
 This option is mutually exclusive with @option{--enable-k-safe} and @option{--enable-k-test} above,
-and @option{--enable-k-none} below.  This has the effect of removing @code{static} and @code{inline}
-attributes from functions and invoking all debugging macros in the code (including
-performance-affecting debug macros).  The default is to not perform kernel debugging.
+and @option{--enable-k-none} below.
+This has the effect of removing @code{static} and @code{inline} attributes from functions and
+invoking all debugging macros in the code (including performance-affecting debug macros).  The
+default is to not perform kernel debugging.
 
 @item --enable-k-none
-@opindex none
-Enable no kenrel module runtime checks.  Specifies whether kernel runtime checks are to be
-performed.  THis option is mutually exclusive with @option{--enable-k-safe},
+@opindex k-none
+Enable no kernel module run-time checks.  Specifies whether kernel run-time checks are to be
+performed.  This option is mutually exclusive with @option{--enable-k-safe},
 @option{--enable-k-test} and @option{--enable-k-debug}.  This has the effect of removing all
 assertion macros from the code.  The default is to not to remove all assertion macros.
 
@@ -1646,7 +1739,7 @@ number.
 
 @item --with-pkg-patchlevel=PATCHLEVEL
 @opindex pkg-patchlevel
-Specifies the patch level for the package.  This is neither used fro @manpage{rpm(1)} nor
+Specifies the patch level for the package.  This is neither used for @manpage{rpm(1)} nor
 @manpage{dpkg(1)} packages, it applies to the tarball release as a whole.  The default is the
 contents of the @file{.pkgpatchlevel} file in the @value{pkgtype} package source directory or, if
 that file does not exist, the null string.  This is an additional suffix after the package release
@@ -1795,10 +1888,24 @@ located by the @file{configure} script and need only be provided for special cro
 environments or when requested by a @file{configure} script error message.
 @end ignore
 
+@item --with-k-hdrdir=K-HEADER-DIR
+@opindex k-hdrdir
+Specify the @samp{K-INCLUDES-DIR} include directory of the kernel for which the build is targeted.
+resides.  The default is @file{@var{DESTDIR}/@-@var{K-@-BUILD-@-DIR}/@-include}.  This directory is
+normally located by the @file{Configure} script and need only be provided for special cross-build
+environments or when requested by a @file{configure} script error message.
+
 @item --with-k-archdir=K-ARCHDIR
 @opindex k-archdir
 Specify the @samp{K-ARCHDIR} kernel source architecture specific directory.  The default is
 @file{@var{DESTDIR}/@-@var{K-@-SOURCE-@-DIR}/@-arch}.  This directory is normally located by the
+@file{configure} script and need only be provided for special cross-build environments or when
+requested by a @file{configure} script error message.
+
+@item --with-k-asm=K-ASMDIR
+@opindex k-asm
+Specifiy the @samp{K-ASMDIR} kernel source architecture specific directory.  The default is
+@file{@var{DESTDIR}/@-@var{K-@-HEADER-@-DIR}/@-asm}.  This directory is normally located by the
 @file{configure} script and need only be provided for special cross-build environments or when
 requested by a @file{configure} script error message.
 
@@ -1823,7 +1930,7 @@ Specify @samp{HOW} optimization, @var{normal}, @var{size}, @var{speed} or @var{q
 compiles kernel modules @code{-Os}, @var{speed} compiles kernel modules @code{-O3}, and @var{quick}
 compiles kernel modules @code{-O0}.  The default is @var{normal}.  Use with care.  The most common
 use of this option is to specify @option{--with-k-optimize=speed --disable-k-safe} to compile for
-maximum performance.  Nevertheless, even these setting are @dfn{ricing} and the resulting kernel
+maximum performance.  Nevertheless, even these settings are @dfn{ricing} and the resulting kernel
 modules will only be about 5% faster.
 
 @item --with-optimize=HOW
@@ -1835,6 +1942,88 @@ compiles user programs @code{-O0}.  The default is @var{normal}.  Use with care.
 use of this option is to specify @option{--with-optimize=speed} to compile for maximum performance.
 Nevertheless, even these setting are @dfn{ricing} and the resulting user programs will only be about
 5% faster.
+
+@item --disable-texinfo
+@opindex texinfo
+Disable INFO-formatted texinfo documents.
+Normally @command{configure} can find the tools necessary to build INFO documents from texinfo and
+will provide missing substitutions instead.  This option need only be provided when requested by
+@command{configure} script error messages.
+This option can otherwise be used to suppress the creation of texinfo INFO-formatted documents.
+The default is to enable INFO-formatted texinfo documents.
+
+@item --disable-texinfo-html
+@opindex texinfo-html
+Disable HTML-formatted texinfo documents.
+Normally @command{configure} can find the tools necessary to build HTML documents from texinfo and
+will provide missing substitutions instead.  This option need only be provided when requested by
+@command{configure} script error messages.
+This option can otherwise be used to suppress the creation of texinfo HTML-formatted documents.
+The default is to enable HTML-formatted texinfo documents.
+
+@item --disable-texinfo-print
+@opindex texinfo-print
+Disable PS- and PDF-formatted texinfo documents.
+Normally @command{configure} can find the tools necessary to build PS and PDF documents from texinfo
+and will provide missing substitutions instead.  This option need only be provided when requested by
+@command{configure} script error messages.
+This option can otherwise be used to suppress the creation of texinfo PS- and PDF-formatted documents.
+The default is to enable PS and PDF-formatted texinfo documents.
+
+@item --disable-papers
+@opindex papers
+Disable build and install of latex papers.
+Normally @command{configure} can find the tools necessary to build TXT documents from latex and will
+provide missing substitutions instead.  This option need only be provided when requested by
+@command{configure} script error messages.
+This option can otherwise be used to suppress the creation of latex TXT-formatted documents.
+The default is to automatically determine whether to build and install of latex papers.
+
+@item --disable-papers-html
+@opindex papers-html
+Disable HTML-formatted latex papers.
+Normally @command{configure} can find the tools necessary to build HTML documents from latex and
+will provide missing substitutions instead.  This option need only be provided when requested by
+@command{configure} script error messages.
+This option can otherwise be used to suppress the creation of latex HTML-formatted documents.
+The default is to automatically determine whether to enable HTML-formatted latex papers.
+
+@item --disable-papers-print
+@opindex papers-print
+Disable PS- and PDF-formatted latex papers.
+Normally @command{configure} can find the tools necessary to build PS and PDF documents from latex
+and will provide missing substitutions instead.  This option need only be provided when requested by
+@command{configure} script error messages.
+This option can otherwise be used to suppress the creation of PS- and PDF-formatted documents.
+The default is to automatically determine whether to enable print-formatted latex papers.
+
+@item --disable-drafts
+@opindex drafts
+Disable build and install of TXT-formatted internet drafts.
+Normally @command{configure} can find the tools necessary to build TXT documents from groff ME and
+will provide missing substitutions instead.  This option need only be provided when requested by
+@command{configure} script error messages.
+This option can otherwise be used to suppress the creation of TXT-formatted documents.
+The default is to automatically determine whether to enable build and install of TXT-formatted
+internet drafts.
+
+@item --disable-drafts-html
+@opindex drafts-html
+Disable HTML-formatted internet drafts.
+Normally @command{configure} can find the tools necessary to build HTML documents from groff ME and
+will provide missing substitutions instead.  This option need only be provided when requested by
+@command{configure} script error messages.
+This option can otherwise be used to suppress the creation of HTML-formatted documents.
+The default is to automatically determine whether to enable HTML-formatted internet drafts.
+
+@item --disable-drafts-print
+@opindex drafts-print
+Disable PS- and PDF-formatted internet drafts.
+Normally @command{configure} can find the tools necessary to build PS and PDF documents from groff
+ME and will provide missing substitutions instead.  This option need only be provided when requested
+by @command{configure} script error messages.
+This option can otherwise be used to suppress the creation of PS- and PDF-formatted documents.
+The default is to automatically determine whether to enable PS- and PDF-formatted internet drafts.
 
 @item --with-strconf-master=STRCONF_CONFIG
 @opindex strconf-master
@@ -1848,24 +2037,30 @@ device number systems, and @samp{2000} on 32-bit device number systems.
 
 @item --with-base-modid=STRCONF_MODBASE
 @opindex base-modid
-Start numbering for module indentifiers at @samp{STRCONF_MODBASE}.  The default is @samp{5000}.
+Start numbering for module identifiers at @samp{STRCONF_MODBASE}.  The default is @samp{5000}.
 
-@item --with-strconf-pkgdir=DIRECTORY
+@item --with-strconf-pkgdir=PKG-DIRECTORY
 @opindex strconf-pkgdir
 Specifies the relative or absolute path to the binary package configuration directory in which to
-look for binary packages.  The default is the @file{pkg} subdirectory in the build or source
-directory.
+look for binary packages, @samp{PKG-DIRECTORY}.  The default is the @file{pkg} subdirectory in the
+build or source directory.
 
-@item --with-strconf-pkgrules=FILENAME
+@item --with-strconf-pkgrules=PKG-FILENAME
 @opindex strconf-pkgrules
-Specifies the relative or absolute file name to which package rules are written.  The default is the
-@file{pkgrules} file in the build directory.
+Specifies the relative or absolute file name to which package rules are written,
+@samp{PKG-FILENAME}.  The default is the @file{pkgrules} file in the build directory.
 
-@item --without-snmp-agent
+@item --with-snmp-agent=SNMP-AGENT-HEADERS
+@itemx --without-snmp-agent
 @opindex snmp-agent
 Normally SNMP agents are included in the build.  By specifying @samp{--without-snmp-agent}, the SNMP
 argents are not included in the build.  This option is only for exceptional circumstances where SNMP
-support cannot be included in the runtime.
+support cannot be included in the run-time.
+
+Otherwise, specifies the SNMP agent header file directory, @samp{SNMP-AGENT-HEADERS}.  The default
+is @file{@i{$INCLUDEDIR}} and the @command{configure} script will search for this directory.
+The directory is normally located by the @command{configure} script and need only be provided for
+special cross-build environments or when requested by a @command{configure} script error message.
 
 @item --with-perl-headers HEADERS
 @opindex perl-headers
@@ -1873,53 +2068,141 @@ Normally @command{configure} can find the perl headers necessary for generating 
 NET-SNMP.  This option may be used to direct @command{configure} to the location of the perl headers.
 The default is @samp{$INCLUDEDIR/perl}.
 
-@item --with-snmp HEADERS
+@item --with-snmp=SNMP-HEADERS
+@itemx --without-snmp
 @opindex snmp
 Normally @command{configure} can find the NET-SNMP headers necessary for generating SNMP argents
 based on NET-SNMP.  This option may be used to direct @command{configure} to the location of the
-NET-SNMP headers.  The default is @samp{$INCLUDEDIR/ucd-snmp}.
+NET-SNMP headers, @samp{SNMP-HEADERS}.  The default is @samp{$INCLUDEDIR/ucd-snmp}.
+The directory is normally located by the @command{configure} script and need only be provided for
+special cross-build environments or when requested by a @command{configure} script error message.
 
-@item --enable-lzma
+@item --disable-java
+@opindex java
+Disable JAVA modules.
+The package contains JAVA modules that can only be built the the appropriate tool chain.  The
+@command{configure} script can normally detect and recommend missing JAVA components that are needed
+to generate JAVA modules and documentation.  This option should only be used on a system that does
+not support JAVA or when directed by a @command{configure} script error message.
+The default is to enable JAVA modules.
+
+@item --with-tcl=TCL-HEADERS
+@itemx --without-tcl
+@opindex tcl
+Specifies the TCL header file directory, @samp{TCL-HEADERS}.  The default is to search for the
+appropriate headers in a number of locations.  The directory is normally located by the
+@command{configure} script and need only be provided for special cross-build environments or when
+requested by a @command{configure} script error message.  This option has no effect on
+@value{pkgtype} packages that do not contain TCL interfaces.
+
+@item --with-perl=PERL-HEADERS
+@itemx --without-perl
+@opindex perl
+Specifies the PERL header file directory, @samp{PERL-HEADERS}.  The default is to search for the
+appropriate headers in a number of locations.  The directory is normally located by the
+@command{configure} script and need only be provided for special cross-build environments or when
+requested by a @command{configure} script error message.  This option has no effect on
+@value{pkgtype} packages that do not contain PERL interfaces.
+
+@item --disable-bestzip
+@itemx --enable-bestzip
+@opindex bestzip
+Disable best compression of archives.
+The @command{configure} script normally detects the available tools and determines what the best
+compression (highest compression ratio) is to compress @manpage{tar(1)} archives.  It will typically
+use @file{.bz2} and @file{.xz} formats on current distributions but may fall back to @file{.gz} and
+@file{.bz2} compression on older distributions.
+The default is to enable the best compression of archives.
+
+@item --with-lzma=LZMA_CMD
+@itemx --without-lzma
 @opindex lzma
+Specifies the creation of @file{lzma} archives.  @samp{LZMA_CMD} specifies the compression command
+to use (typically @command{lzma}).
+The typical use of is command is to specify @option{--without-lzma} to suppress the rather slow
+@file{lzma} compression for test compilations.
+The default is to create @file{lzma} archives when a suitable command can be found or was specified
+and no @file{xz} archive capability is provided.
+
 Unfortunately, @manpage{automake(1)} does not detect the presence of the necessary tools to build
 @file{lzma} archives, breaking distribution on systems that do not have @file{lzma} tools.  This
 option tells @command{configure} to configure distribution to include @file{lzma} archives.  As the
 generation of @file{lzma} takes a significant amount of time, generation of @file{lzma} archives is
 disabled by default.
 
+@item --with-xz=XZ_CMD
+@itemx --without-xz
+@opindex xz
+Specifies the creation of @file{xz} archives.  @samp{XZ_CMD} specifies the compression command to
+use (typically @command{xz}).
+The typical use of is command is to specify @option{--without-xz} to suppress the rather slow
+@file{lzma} compression for test compilations.
+The default is to create @file{xz} archives when a suitable command can be found or was specified.
+
+Unfortunately, @manpage{automake(1)} does not detect the presence of the necessary tools to build
+@file{xz} archives, breaking distribution on systems that do not have @file{xz} tools.  This
+option tells @command{configure} to configure distribution to include @file{xz} archives.  As the
+generation of @file{xz} takes a significant amount of time, generation of @file{xz} archives is
+disabled by default.
+
 @item --disable-repo-tar
 @itemx --enable-repo-tar
 @opindex repo-tar
-Disable tar repository construction.  Normally in maintainer mode, tarball repositories will be
-constructed.  This optoin disables construction of the tarball repository.
+Disable building of @manpage{tar(1)} repositories.  Normally @command{configure} can determine
+whether there are sufficient tools to create @manpage{tar(1)} repositories.
+This option explicitly disables or enables generation of @manpage{tar(1)} repositories.
+Normally in maintainer mode, @manpage{tar(1)} repositories will be constructed.  This option is
+normally used to disable the construction of @manpage{tar(1)} repositories.
 
 @item --disable-rpms
 @itemx --enable-rpms
 @opindex rpms
 Disable building of RPMs.  Normally @command{configure} can determine whether it is possible to
 build RPMs on the current system and automatically determines whether to build RPMs as part of the
-@samp{release} makefile target.  This option explicitly disables or enable building of RPMs.
+@samp{release} makefile target.  This option explicitly disables or enables building of RPMs.
+The default is to auotmatically determine whether RPMs should be built.
+This option is only enabled automatically when a suitable @manpage{rpm(8)} command can be located.
+A typical use of this option is to disable rpms with @option{--disable-rpms} on a @cite{Debian}
+system that yet provides the @manpage{rpm(8)} commands.
 
 @item --disable-srpms
 @itemx --enable-srpms
 @opindex srpms
 Disable building of SRPMs.  Normally @command{configure} can determine whether it is possible to
 build SRPMs on the current system and automatically determines whether to build SRPMs as part of the
-@samp{release} makefile target.  This option explicitly disables or enable building of SRPMs.
+@samp{release} makefile target.  This option explicitly disables or enables building of SRPMs.
+The default is to automatically determine whether SRPMs should be built.
+This option is only enabled automatically when a suitable @manpage{rpm(8)} command can be located.
+A typical use of this option is to disable rpms with @option{--disable-srpms} on a @cite{Debian}
+system that yet provides the @manpage{rpm(8)} commands.
 
 @item --disable-repo-yum
 @itemx --enable-repo-yum
 @opindex repo-yum
-Disable building of @manpage{yum(1)} repositories.  Normally @command{configure} can determine
-whether there are sufficient tools to create @manpage{yum(1)} repositories.  This option explicitly
-disables or enables generation of @manpage{yum(1)} repositories.
+Disable building of @manpage{yum(8)} repositories.  Normally @command{configure} can determine
+whether there are sufficient tools to create @manpage{yum(8)} repositories.  This option explicitly
+disables or enables generation of @manpage{yum(8)} repositories.
+
+@item --with-install-source-yum=REPODIR
+@itemx --without-install-source-yum
+@opindex install-source-yum
+Specifies the @manpage{yum(8)} repository directory, @samp{REPODIR}.
+Creates and installs an installation source for the @manpage{yum(8)} package management tool.
+The default is to search for the appropriate directory.
 
 @item --disable-repo-yast
 @itemx --enable-repo-yast
 @opindex repo-yast
-Disable building of @manpage{yast(1)} repositories.  Normally @command{configure} can determine
-whether there are sufficient tools to create @manpage{yast(1)} repositories.  This option explicitly
-disables or enables generation of @manpage{yast(1)} repositories.
+Disable building of @manpage{yast(8)} repositories.  Normally @command{configure} can determine
+whether there are sufficient tools to create @manpage{yast(8)} repositories.  This option explicitly
+disables or enables generation of @manpage{yast(8)} repositories.
+
+@item --with-install-source-zypp=REPODIR
+@itemx --without-install-source-zypp
+@opindex install-source-zypp
+Specifies the @manpage{zypper(8)} repository directory, @samp{REPODIR}.
+Creates and installs an installation source for the @manpage{zypper(8)} package management tool.
+The default is to search for the appropriate directory.
 
 @item --disable-debs
 @itemx --enable-debs
@@ -1941,6 +2224,13 @@ build DSCs on the current system and automatically determines whether to build D
 Disable building of @manpage{apt-get(1)} repositories.  Normally @command{configure} can determine
 whether there are sufficient tools to create @manpage{apt-get(1)} repositories.  This option explicitly
 disables or enables generation of @manpage{apt-get(1)} repositories.
+
+@item --with-install-source-apt=SOURCESDIR
+@itemx --without-install-source-apt
+@opindex install-source-apt
+Specifies the @manpage{apt(1)} sources directory, @samp{SOURCESDIR}.
+Creates and installs an installation source for the @manpage{aptitude(8)} package management tool.
+The default is to search for the appropriate directory.
 
 @end table
 
@@ -1998,6 +2288,9 @@ The list of arguments that will be passed by default to @samp{$YACC}.  This scri
 @samp{YFLAGS} to the empty string to avoid a default value of @option{-d} given by some make
 applications.
 
+@item SWIG
+Swig command.  Defaults to @command{swig}.
+
 @item GCJ
 Java compiler command.  Defaults to @command{gcj}.
 
@@ -2024,6 +2317,9 @@ Java class compiler.  Defaults to @command{gcj}.
 
 @item JAVACFLAGS
 Java class compiler flags.  Defaults to an automatically determined set of flags.
+
+@item CLASSPATH
+Java CLASSPATH variable.  Defaults to @var{auto}.
 
 @item JAVADOC
 Java documentation doclet.  Defaults to @command{gjdoc}.
@@ -2085,10 +2381,16 @@ find the proper @manpage{bzip2(1)} command.  By default, @file{configure} will s
 tool.
 
 @item LZMA
-Default compression options given to @command{LZMA_CMD}. is @samp{--best}.
+Default compression options given to @command{LZMA_CMD} is @samp{--best}.
 
 @item LZMA_CMD
 Lzma compression command.  Defaults to @command{lzma}.
+
+@item XZ
+Default compression options given to @command{XZ_CMD} is @samp{-f9v}.
+
+@item XZ_CMD
+Xz compression command.  Defaults to @command{xz}.
 
 @item MAKEWHATIS
 Manpages apropros database rebuild command, @manref{makewhatis(8)}.  By default, @file{configure}
@@ -2118,11 +2420,16 @@ Build RPM command, @manref{rpmbuild(1)}.  This is only necessary for RPM builds.
 @manpage{rpmbuild(1)} only if @manpage{rpmbuild(1)} cannot be found.
 
 @item CREATEREPO
-Create repomd repository command.  This command is used when building @manpage{yum(1)} repositories.
+Create repomd repository command.  This command is used when building @manpage{yum(8)} repositories.
 By default, @command{configure} will search for this tool.
 
-@item CREATE_PACKGE_DESC
-Create YaST package descriptions command.  This command is used when building @manpage{yast(1)}
+@item MODIFYREPO
+Modify repomd respository command.  This command is used when building @manpage{yum(8)}
+repositories.
+By default, @command{configure} will search for this tool.
+
+@item CREATE_PACKGE_DESCR
+Create YaST package descriptions command.  This command is used when building @manpage{yast(8)}
 repositories.  By default, @command{configure} will search for this tool.
 
 @item DPKG
@@ -2152,7 +2459,7 @@ packages file when building Debian apt repositories.  By default, @command{confi
 for this tool.
 
 @item DPKG_DEB
-Dpkg-deb command, @manpage{dpkg-deb(1)}.  THis command is used when building Debian apt
+Dpkg-deb command, @manpage{dpkg-deb(1)}.  This command is used when building Debian apt
 repositories.  By default, @command{configure} will search for this tool.
 
 @item LDCONFIG
@@ -2216,6 +2523,18 @@ pre- and post-installation checks.  By default, @file{configure} will search for
 Doxygen command, @manref{doxygen(1)}.  This command is used when building Doxygen documentation.  By
 default, @command{configure} will search for this tool.
 
+@item TEX
+Tex command for PS.  Defaults to @command{tex}, @command{etex}.
+By default, @command{configure} will search for this tool.
+
+@item PDFTEX
+Tex command for PDF.  Defaults to @command{pdftex}, @command{pdfetex}.
+By default, @command{configure} will search for this tool.
+
+@item BIBTEX
+BibTeX command.  Defaults to @command{bibtex}.
+By default, @command{configure} will search for this tool.
+
 @item LATEX
 Latex command.  Defaults to @command{latex}.
 By default, @command{configure} will search for this tool.
@@ -2240,8 +2559,16 @@ By default, @command{configure} will search for this tool.
 DVI to PDF conversion command.  Defatuls to @command{dvipdf}.
 By default, @command{configure} will search for this tool.
 
+@item PS2PDF
+PS to PDF conversion command.  Defaults to @command{ps2pdf}.
+By default, @command{configure} will search for this tool.
+
 @item GNUPLOT
 GNU plot command.  Defaults to @command{gnuplot}.
+By default, @command{configure} will search for this tool.
+
+@item GROFF
+Roff formatting command.  Default @command{groff}.
 By default, @command{configure} will search for this tool.
 
 @item FIG2DEV
@@ -2277,6 +2604,46 @@ SHA256 sum command, @manref{sha256sum(1)}.
 This command is used to checksum tarballs when creating FTP archive respositories.
 By default, @command{configure} will search for this tool.
 It normally defaults to @command{sha256sum}.
+
+@item DEB_BUILD_ARCH
+Debian build architecture.
+This variable is used for building Debian packages.
+The default is the @command{autoconf} build architecture.
+
+@item DEB_BUILD_GNU_CPU
+Debian build cpu.
+This variable is used for building Debian packages.
+The default is the @command{autoconf} build cpu.
+
+@item DEB_BUILD_GNU_SYSTEM
+Debian build os.
+This variable is used for building Debian packages.
+The default is the @command{autoconf} build os.
+
+@item DEB_BUILD_GNU_TYPE
+Debian build alias.
+This variable is used for building Debian packages.
+The default is the @command{autoconf} build alias.
+
+@item DEB_HOST_ARCH
+Debian host architecture.
+This variable is used for building Debian packages.
+The default is the @command{autoconf} host architecture.
+
+@item DEB_HOST_GNU_CPU
+Debian host cpu.
+This variable is used for building Debian packages.
+The default is the @command{autoconf} host cpu.
+
+@item DEB_HOST_GNU_SYSTEM
+Debian host os.
+This variable is used for building Debian packages.
+The default is the @command{autoconf} host os.
+
+@item DEB_HOST_GNU_TYPE
+Debian host alias.
+This variable is used for building Debian packages.
+The default is the @command{autoconf} host alias.
 
 @end vtable
 
@@ -2466,7 +2833,7 @@ following instructions will install the RPMs on your system.@footnote{For additi
 The repository includes groups (patterns) and virtual packages that ease the installation and
 removal of kernel modules, libraries and utilities.
 
-To install the @cite{@value{PACKAGE_TITLE}} runtime components for a single-kernel distribution
+To install the @cite{@value{PACKAGE_TITLE}} run-time components for a single-kernel distribution
 installation, use (one of):
 
 @cartouche
@@ -2487,7 +2854,7 @@ To include the @cite{@value{PACKAGE_TITLE} JAIN} Java components, use (one of):
 @end cartouche
 
 @noindent
-To add an additional @cite{@value{PACKAGE_TITLE}} kernel runtime component to the installation, 
+To add an additional @cite{@value{PACKAGE_TITLE}} kernel run-time component to the installation, 
 use (one of):
 
 @cartouche
@@ -2550,7 +2917,7 @@ on @manpage{zypper(8)}, see @manref{zypper(8)}.}
 The repository includes groups (patterns) and virtual packages that ease the installation and
 removal of kernel modules, libraries and utilities.
 
-To install the @cite{@value{PACKAGE_TITLE}} runtime components for a single-kernel distribution
+To install the @cite{@value{PACKAGE_TITLE}} run-time components for a single-kernel distribution
 installation, use (one of):
 
 @cartouche
@@ -2571,7 +2938,7 @@ To include the @cite{@value{PACKAGE_TITLE} JAIN} Java components, use (one of):
 @end cartouche
 
 @noindent
-To add an additional @cite{@value{PACKAGE_TITLE}} kernel runtime component to the installation, 
+To add an additional @cite{@value{PACKAGE_TITLE}} kernel run-time component to the installation, 
 use (one of):
 
 @cartouche
@@ -2766,7 +3133,7 @@ $> sudo yum remove @value{PACKAGE}-java
 @end cartouche
 
 @noindent
-To remove the @cite{@value{PACKAGE_TITLE}} runtime components for a specific kernel, use (one of):
+To remove the @cite{@value{PACKAGE_TITLE}} run-time components for a specific kernel, use (one of):
 
 @cartouche
 @smallexample
@@ -2777,7 +3144,7 @@ $> sudo yum remove @value{PACKAGE}-@value{_kversion}
 
 @noindent
 Where, @samp{$(uname -r)} will remove for the running kernel.  @samp{@value{_kversion}} is just an
-example.  When the kernel runtime being removed is the last kernel runtime, the remainder of the
+example.  When the kernel run-time being removed is the last kernel run-time, the remainder of the
 @cite{@value{PACKAGE_TITLE}} components will also be removed.
 
 To remove all @cite{@value{PACKAGE_TITLE}} development components, use (one of):
@@ -2844,7 +3211,7 @@ $> sudo zypper remove @value{PACKAGE}-java
 @end cartouche
 
 @noindent
-To remove the @cite{@value{PACKAGE_TITLE}} runtime components for a specific kernel, use (one of):
+To remove the @cite{@value{PACKAGE_TITLE}} run-time components for a specific kernel, use (one of):
 
 @cartouche
 @smallexample
@@ -2855,7 +3222,7 @@ $> sudo zypper remove @value{PACKAGE}-@value{_kversion}
 
 @noindent
 Where, @samp{$(uname -r)} will remove for the running kernel.  @samp{@value{_kversion}} is just an
-example.  When the kernel runtime being removed is the last kernel runtime, the remainder of the
+example.  When the kernel run-time being removed is the last kernel run-time, the remainder of the
 @cite{@value{PACKAGE_TITLE}} components will also be removed.
 
 To remove all @cite{@value{PACKAGE_TITLE}} development components, use (one of):

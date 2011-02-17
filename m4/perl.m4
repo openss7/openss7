@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
+# @(#) $RCSfile: perl.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-17 18:34:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
+# Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -89,7 +89,7 @@ AC_DEFUN([_PERL_EXTENSIONS], [dnl
 	case "${with_perl:-search}" in
 	    (no) perl_cv_includedir=no ;;
 	    (yes|search) ;;
-	    (*) if test -f "$with_perl/EXTERN.h" ; then perl_cv_includedir ; fi ;;
+	    (*) if test -f "$with_perl/EXTERN.h" ; then perl_cv_includedir="$with_perl" ; fi ;;
 	esac
 	if test -z "$perl_cv_includedir" ; then
 	    eval "perl_search_path=\"
@@ -123,8 +123,8 @@ AC_DEFUN([_PERL_EXTENSIONS], [dnl
 		AC_MSG_RESULT([no])
 	    done
 	    test -n "$perl_cv_includedir" || perl_cv_includedir=no
+	    AC_MSG_CHECKING([for perl headers])
 	fi
-	AC_MSG_CHECKING([for perl headers])
     ])
     if test :"${perl_cv_includedir:-no}" = :no ; then
 	if test :"${with_perl:-search}" != :no ; then
@@ -303,6 +303,9 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
 # =============================================================================
 #
 # $Log: perl.m4,v $
+# Revision 1.1.2.6  2011-02-17 18:34:10  brian
+# - repository and rpm build updates
+#
 # Revision 1.1.2.5  2011-02-07 04:48:32  brian
 # - updated configure and build scripts
 #

@@ -1,5 +1,5 @@
-OpenSS7 -- read me first file.  2011-02-08
-$Id: README,v 1.1.2.16 2011-02-08 23:39:01 brian Exp $
+OpenSS7 -- read me first file.  2011-02-16
+$Id: README,v 1.1.2.17 2011-02-17 18:34:09 brian Exp $
 Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
  OpenSS7
 ========
 
-Package openss7-1.1.1.20110111 was released under AGPLv3 2011-02-08.
+Package openss7-1.1.1.20110111 was released under AGPLv3 2011-02-16.
 
 This is the `OpenSS7' package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
@@ -50,7 +50,7 @@ should build and install for other architectures as well.
  Release
 --------
 
-This is the `openss7-1.1.1.20110111' package, released 2011-02-08.  This
+This is the `openss7-1.1.1.20110111' package, released 2011-02-16.  This
 `1.1.1.20110111' release, and the latest version, can be obtained from
 the download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -58,8 +58,8 @@ Project website using a command such as:
      $> wget http://www.openss7.org/tarballs/openss7-1.1.1.20110111.tar.xz
 
 The release is available as an `autoconf(1)' tarball, `src.rpm' or
-`dsc', as a set of binary `rpm's or `deb's, or as a `yum(8)' or
-`apt(8)' repository.  See the download page
+`dsc', as a set of binary `rpm's or `deb's, or as a `yum(8)',
+`zypper(8)' or `apt(8)' repository.  See the download page
 (http://www.openss7.org/download.html) for the `autoconf(1)' tarballs,
 `src.rpm's, `dsc's, or repository access instructions.  See the
 `openss7' package page (http://www.openss7.org/openss7_pkg.html) for
@@ -71,10 +71,10 @@ more detailed history of implementation changes.  The `TODO' file lists
 features not yet implemented and other outstanding items.
 
 Please see the `INSTALL', `INSTALL-openss7' and `README-make', files (or
-see `Installation',in the manual) for installation instructions.
+see `Installation', in the manual) for installation instructions.
 
 When working from `cvs(1)' or `git(1)', please see the `README-cvs',
-file (or see `Downloading from CVS',in the manual).  An abbreviated
+file (or see `Downloading from CVS', in the manual).  An abbreviated
 installation procedure that works for most applications appears below.
 
 This release of the package is published strictly under Version 3 of
@@ -86,21 +86,74 @@ copyright holder, or OpenSS7 Corporation <sales@openss7.com>.
 
 See `README-alpha' (if it exists) for alpha release information.
 
- Prerequisites
---------------
+ Repository Installation
+------------------------
 
-The quickest and easiest way to ensure that all prerequisites are met
-is to download and install the `OpenSS7 Master Package',
-`openss7-1.1.20110111'.
+The simplest way of installing the package is to use the `OpenSS7'
+`repomd' repositories instead of attempting to build from tarball.
+When you already have a the repository set up, the package can be
+udpated simply with (one of):
 
-Prerequisites for the OpenSS7 package are as follows:
+     Fedora:   $> sudo yum update openss7
+     CentOS:   $> sudo yum update openss7
+     RHEL:     $> sudo yum update openss7
+     OpenSUSE: $> sudo zypper update openss7
+     SLES:     $> sudo zypper update openss7
+     Ubuntu:   $> sudo apt-get update openss7
+     Debian:   $> sudo apt-get update openss7
+
+If you have not yet set up an installation source for the `OpenSS7'
+repositories, one of the following commands will establish repository
+access for RPM-based systems:
+
+               $> REPOS=http://www.openss7.org/repos/
+     Fedora:   $> SUBDIR=rpms/fedora/14/$(uname -m)/RPMS/noarch
+     CentOS:   $> SUBDIR=rpms/centos/5.5/$(uname -m)/RPMS/noarch
+     RHEL:     $> SUBDIR=rpms/redhat/6.0/$(uname -m)/RPMS/noarch
+     OpenSUSE: $> SUBDIR=rpms/opensuse/11.3/$(uname -m)/RPMS/noarch
+     SUSE:     $> SUBDIR=suse/11.1/$(uname -m)/RPMS/noarch
+               $> sudo rpm -Uhv $REPOS/$SUBDIR/openss7-repo.noarch.rpm
+
+For `zypper(8)' based systems it may be first necessary to perform:
+
+     OpenSUSE: $> sudo rpm --import http://www.openss7.org/pubkey.asc
+     SLES:     $> sudo rpm --import http://www.openss7.org/pubkey.asc
+
+Once the repository is set up in this fashion, it should be possible to
+install using (one of):
+
+     Fedora:   $> sudo yum install openss7
+     CentOS:   $> sudo yum install openss7
+     RHEL:     $> sudo yum install openss7
+     OpenSUSE: $> sudo zypper install openss7
+     SLES:     $> sudo zypper install openss7
+
+The entire process can be undone with:
+
+     Fedora:   $> sudo yum remove openss7 openss7-repo
+     CentOS:   $> sudo yum remove openss7 openss7-repo
+     RHEL:     $> sudo yum remove openss7 openss7-repo
+     OpenSUSE: $> sudo zypper remove openss7 openss7-repo
+     SLES:     $> sudo zypper remove openss7 openss7-repo
+
+ Build Prerequisites
+--------------------
+
+When building from source RPM or DSC, the prerequisites for building
+must be met.  Most RPM or DEB build prerequisites are automatic;
+however, some prerequisites must still be met manually.  When building
+from tarball, most prerequisites must be met manually.  The `configure'
+script will inform you of most missing prerequisites and the actions
+that must be performed to meet those prerequisites.
+
+Prerequisites for building OpenSS7 package are as follows:
 
   1. `Linux' distribution, somewhat `Linux Standards Base' compliant,
      with a 2.4 or 2.6 kernel and the appropriate tool chain for
      compiling out-of-tree kernel modules.  Most recent `Linux'
      distributions are usable out of the box, but some development
      packages must be installed.  For more information, see
-     `Compatibility',in the manual.
+     `Compatibility', in the manual.
 
          - A fairly LSB compliant GNU/Linux distribution.(2)
          - Linux 2.4 kernel (2.4.10 - 2.4.27), or
@@ -112,6 +165,35 @@ Prerequisites for the OpenSS7 package are as follows:
          - net-snmp (for SNMP agents).(4)
          - GNU gcj and classpath (for Java modules).
          - swig (for Java, Tcl, Perl and Ruby interfaces).
+
+The following will meet most additional prerequisites for a CentOS/RHEL
+5.5 build host:
+
+     #> yum install bzip2 chkconfig coreutils createrepo doxygen \
+             gcc-java ghostscript gjdoc glibc gnupg gnuplot \
+             groff gzip ImageMagick kernel-devel latex2html \
+             libgcj lsof module-init-tools rpm rpm-build tetex \
+             tetex-dvips tetex-latex transfig xz xz-lzma-compat \
+             zip
+
+The following will meet most additional prerequisites for a SuSE Linux
+Enterprise 11 build host:
+
+     #> zypper install aaa_base bzip2 coreutils createrepo doxygen \
+             fastjar gcc43-gij gcc-java ghostscript-library gjdoc \
+             glibc gnuplot gpg2 groff gzip ImageMagick inst-source-utils \
+             kernel-default-devel latex2html lsof module-init-tools \
+             rpm texlive texlive-latex transfig zip
+
+The following will meet most additional prerequisites for a Debian 6.0
+build host:
+
+     #> apt-get install apt-utils bzip2 coreutils createrepo doxygen \
+             dpkg dpkg-dev fastjar gcj-jdk gcj-jre-headless ghostscript \
+             gnupg gnuplot-nox gnuplot-x11 groff groff-base gzip \
+             imagemagick insserv latex2html libc-bin lsof lzma \
+             module-init-tools rpm texlive-binaries texlive-font-utils \
+             texlive-latex-base transfig xz-utils zip
 
 The package builds and installs kernel modules.  When configuring and
 building the package, it is necessary to have the kernel development
@@ -134,14 +216,14 @@ building the package, it is necessary to have the net-snmp development
 packages installed.  For the following distributions, use the following
 commands:
 
-     Ubuntu:  $> apt-get install libsnmp libsnmp-perl snmp snmpd lm-sensors
-              $> apt-get install libsnmp-dev libsnmp9-dev libsensors-dev
-     Debian:  $> apt-get install libsnmp libsnmp-perl snmp snmpd lm-sensors
-              $> apt-get install libsnmp-dev libsnmp9-dev libsensors-dev
-     Fedora:  $> yum install net-snmp net-snmp-perl net-snmp-utils lm_sensors
-              $> yum install net-snmp-devel lm_sensors-devel
-     CentOS:  $> yum install net-snmp net-snmp-perl net-snmp-utils lm_sensors
-              $> yum install net-snmp-devel lm_sensors-devel
+     Ubuntu:  $> apt-get install libsnmp libsnmp-perl snmp snmpd \
+                     lm-sensors libsnmp-dev libsnmp9-dev libsensors-dev
+     Debian:  $> apt-get install libsnmp libsnmp-perl snmp snmpd \
+                     lm-sensors libsnmp-dev libsnmp9-dev libsensors-dev
+     Fedora:  $> yum install net-snmp net-snmp-perl net-snmp-utils \
+                     lm_sensors net-snmp-devel lm_sensors-devel
+     CentOS:  $> yum install net-snmp net-snmp-perl net-snmp-utils \
+                     lm_sensors net-snmp-devel lm_sensors-devel
 
 The package builds and installs Java archives and compiled Java.  When
 configuring and building the package, it is necessary to have the GNU
@@ -198,9 +280,9 @@ proceed as follows:
 See `README-make' for additional specialized make targets.
 
 For custom applications, see the `INSTALL' and `INSTALL-openss7' files
-or the see `Installation',in the manual, as listed below.  If you
-encounter troubles, see `Troubleshooting',in the manual, before issuing
-a bug report.
+or the see `Installation', in the manual, as listed below.  If you
+encounter troubles, see `Troubleshooting', in the manual, before
+issuing a bug report.
 
  Brief Installation Instructions
 --------------------------------
@@ -290,7 +372,7 @@ Then the build directory and tarball can be simply removed:
 -----------------------------------
 
 More detailed installation instructions can be found in the
-`Installation',in the manual, contained in the distribution in `text',
+`Installation', in the manual, contained in the distribution in `text',
 `info', `html' and `pdf' formats:
 
      $> cd ../openss7-1.1.1.20110111
@@ -312,7 +394,7 @@ Project' website at:
 (1) With the exception of Linux Native Sockets SCTP, these packages can
 be obtained from the projects or companites that originated them.
 
-(2) See `GNU/Linux Distributions',in the manual, for more information.
+(2) See `GNU/Linux Distributions', in the manual, for more information.
 
 (3) If you are using a Debian release, please make sure to install the
 groff extension package (`groff_ext'), as it contains the `refer' or
@@ -322,7 +404,7 @@ pages.
 (4) A wide range of net-snmp releases are supported, from UCD-SNMP
 4.2.5 through net-snmp 5.4.
 
-(5) Please see `Problem Reports',in the manual, or the file `PROBLEMS'
+(5) Please see `Problem Reports', in the manual, or the file `PROBLEMS'
 in the release directory for more information on filing a proper
 "Problem Report".
 
@@ -330,7 +412,7 @@ in the release directory for more information on filing a proper
 
 =========================================================================
 
- Copyright (c) 2008-2009  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
 

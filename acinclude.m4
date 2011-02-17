@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-02-07 04:48:31 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-17 18:34:09 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
+# Last Modified $Date: 2011-02-17 18:34:09 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -63,6 +63,7 @@ m4_include([m4/public.m4])
 m4_include([m4/archive.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
+m4_include([m4/repo.m4])
 
 m4_include([m4/man.m4])
 m4_include([m4/info.m4])
@@ -97,6 +98,7 @@ AC_DEFUN([AC_OPENSS7], [dnl
     _ARCHIVE
     _RPM_SPEC
     _DEB_DPKG
+    _REPO
     _MAN_CONVERSION
     _INFO
     _PAPERS
@@ -3804,6 +3806,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.10  2011-02-17 18:34:09  brian
+# - repository and rpm build updates
+#
 # Revision 1.1.2.9  2011-02-07 04:48:31  brian
 # - updated configure and build scripts
 #
