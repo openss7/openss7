@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2011-02-17 18:34:09 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.16 $) $Date: 2011-02-28 19:51:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-17 18:34:09 $ by $Author: brian $
+# Last Modified $Date: 2011-02-28 19:51:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -226,6 +226,8 @@
 
 %global HAVE_yumrepo        %(if (rpm -q --whatprovides yum >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 %global HAVE_zypprepo       %(if (rpm -q --whatprovides zypper >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+# when _rpmsubdir is not defined we cannot build a repo package
+%{!?_rpmsubdir:             %{expand: %%global HAVE_yumrepo 0}}
 
 %if %{HAVE_newmods}
 %global USE_makedev         0
@@ -235,6 +237,32 @@
 %global USE_mknods          0
 %global USE_rmnods          0
 %global devicesfile         -f %{makedev}
+%endif
+
+%global HAVE_binaries       0
+%if %{HAVE_binfiles}
+%global HAVE_binaries       1
+%endif
+%if %{HAVE_sbinfiles}
+%global HAVE_binaries       1
+%endif
+%if %{HAVE_libraries}
+%global HAVE_binaries       1
+%endif
+%if %{HAVE_lib32compat}
+%global HAVE_binaries       1
+%endif
+%if %{HAVE_testfiles}
+%global HAVE_binaries       1
+%endif
+%if %{HAVE_test32files}
+%global HAVE_binaries       1
+%endif
+%if %{HAVE_snmpmods}
+%global HAVE_binaries       1
+%endif
+%if %{HAVE_snmp32mods}
+%global HAVE_binaries       1
 %endif
 
 %global FILES_binfiles      %{HAVE_binfiles}
@@ -284,6 +312,13 @@
 %global FILES_mkvars        %{HAVE_mkvars}
 %global FILES_yumrepo       %{HAVE_yumrepo}
 %global FILES_zypprepo      %{HAVE_zypprepo}
+%global FILES_repo          0
+%if %{FILES_yumrepo}
+%global FILES_repo          1
+%endif
+%if %{FILES_zypprepo}
+%global FILES_repo          1
+%endif
 
 # Try to reduce the side of the -doc package: skip txt, dvi and ps.
 %global FILES_infofiles     %{HAVE_manuals}
@@ -305,14 +340,14 @@
 
 # These are the defaults for the WITH_zzz macros.  These
 # defaults can be changed by passing --with-zzz or --without-zzz
-# to the rpmbuild command.  The default is to build everything
-# for LFS but source.
+# to the rpmbuild command.  The default is to build almost
+# everything.
 %global WITH_modules        1
 %global WITH_devel          1
 %global WITH_tools          1
 %global WITH_noarch         1
 %global WITH_arch           1
-%global WITH_source         0
+%global WITH_source         1
 %global WITH_snmp           1
 %global WITH_java           1
 %global WITH_mibs           1
@@ -485,7 +520,13 @@
 %{!?_perldir:           %{expand: %%global _perldir         %(eval "`perl -V:installvendorarch`"; echo $installvendorarch | sed -e 's,//*$,,')}}
 %{!?_yumrepodir:        %{expand: %%global _yumrepodir      %%{_sysconfdir}/yum.repos.d}}
 %{!?_zypprepodir:       %{expand: %%global _zypprepodir     %%{_sysconfdir}/zypp/repos.d}}
+%{!?_zyppcreddir:       %{expand: %%global _zyppcreddir     %%{_sysconfdir}/zypp/credentials.d}}
+%{!?_zyppservdir:       %{expand: %%global _zyppservdir     %%{_sysconfdir}/zypp/services.d}}
 %{!?_rpmgpgdir:         %{expand: %%global _rpmgpgdir       %%{_sysconfdir}/pki/rpm-gpg}}
+
+%{!?_repobase:          %{expand: %%global _repobase        @repobase@}}
+%{!?_reporoot:          %{expand: %%global _reporoot        @reporoot@}}
+%{!?_reposerv:          %{expand: %%global _reposerv        @reposerv@}}
 
 # ---------------------------------------------------------------------------
 # Calculate which files were not built (and are not included)
@@ -500,7 +541,9 @@
 %{!?VIRT_doc:   %{expand: %%global VIRT_doc        0}}
 %{!?VIRT_lib:   %{expand: %%global VIRT_lib        0}}
 %{!?VIRT_devel: %{expand: %%global VIRT_devel      0}}
+%{!?VIRT_debug: %{expand: %%global VIRT_debug      0}}
 %{!?VIRT_kmod:  %{expand: %%global VIRT_kmod       0}}
+%{!?VIRT_kdev:  %{expand: %%global VIRT_kdev       0}}
 %{!?VIRT_kbug:  %{expand: %%global VIRT_kbug       0}}
 %{!?VIRT_ksrc:  %{expand: %%global VIRT_ksrc       0}}
 %{!?VIRT_java:  %{expand: %%global VIRT_java       0}}
@@ -508,8 +551,6 @@
 
 %if %{BUILD_modules}
 %else
-%global VIRT_kmod           0
-%global VIRT_kbug           0
 %global VIRT_ksrc           0
 %global kernel_fedora       0
 %global kernel_others       0
@@ -522,7 +563,6 @@
 
 %if %{BUILD_devel}
 %else
-%global VIRT_devel          0
 %global FILES_includes      0
 %global FILES_libstatic     0
 %global FILES_lib32static   0
@@ -545,8 +585,6 @@
 
 %if %{BUILD_tools}
 %else
-%global VIRT_lib            0
-%global VIRT_devel          0
 %global FILES_binfiles      0
 %global FILES_sbinfiles     0
 %global FILES_includes      0
@@ -598,15 +636,11 @@
 %global FILES_manpages      0
 %global FILES_yumrepo       0
 %global FILES_zypprepo      0
+%global FILES_repo          0
 %endif
 
 %if %{BUILD_arch}
 %else
-%global VIRT_lib            0
-%global VIRT_devel          0
-%global VIRT_kmod           0
-%global VIRT_kbug           0
-%global VIRT_java           0
 %global FILES_binfiles      0
 %global FILES_sbinfiles     0
 %global FILES_modules       0
@@ -684,31 +718,44 @@
 %global FILES_kdebugfiles   0
 %endif
 
-# ---------------------------------------------------------------------------
-# Calculate whether we want to build debugging information.
-# ---------------------------------------------------------------------------
-
-%global WANT_debug          0
-
-%if %{HAVE_debugfiles}
-%global WANT_debug          1
-%endif
-%if %{HAVE_kdebugfiles}
-%global WANT_debug          1
-%endif
-
-%if %{FILES_debugfiles}
-%global WANT_debug          1
-%endif
-%if %{FILES_kdebugfiles}
-%global WANT_debug          1
-%endif
-
-%if %{WANT_debug}
-%global __debug_package     1
-%endif
-
 %global debug_package       %{nil}
+
+# ---------------------------------------------------------------------------
+# Determine whether we are building binaries.
+# ---------------------------------------------------------------------------
+
+%global FILES_binaries      0
+
+%if %{FILES_binfiles}
+%global FILES_binaries      1
+%endif
+%if %{FILES_sbinfiles}
+%global FILES_binaries      1
+%endif
+%if %{FILES_libraries}
+%global FILES_binaries      1
+%endif
+%if %{FILES_libstatic}
+%global FILES_binaries      1
+%endif
+%if %{FILES_lib32compat}
+%global FILES_binaries      1
+%endif
+%if %{FILES_lib32static}
+%global FILES_binaries      1
+%endif
+%if %{FILES_testfiles}
+%global FILES_binaries      1
+%endif
+%if %{FILES_test32files}
+%global FILES_binaries      1
+%endif
+%if %{FILES_snmpmods}
+%global FILES_binaries      1
+%endif
+%if %{FILES_snmp32mods}
+%global FILES_binaries      1
+%endif
 
 # ---------------------------------------------------------------------------
 # Calculate which packages we want (and don't want).
@@ -1068,6 +1115,30 @@
 
 # -----------------------
 
+%if %{VIRT_debug}
+%global WANT_debug      1
+%global NEED_debug      1
+%else
+%global WANT_debug      0
+%global NEED_debug      0
+%endif
+
+%if %{HAVE_binaries}
+%global NEED_debug      %{HAVE_debugfiles}
+%endif
+
+%if %{FILES_binaries}
+%global WANT_debug      %{FILES_debugfiles}
+%endif
+
+%if %{WANT_debug}
+%global PACKAGE_debug   1
+%else
+%global PACKAGE_debug   0
+%endif
+
+# -----------------------
+
 %if %{VIRT_kmod}
 %global WANT_kmod       1
 %global NEED_kmod       1
@@ -1092,6 +1163,30 @@
 
 # -----------------------
 
+%if %{VIRT_kdev}
+%global WANT_kdev       1
+%global NEED_kdev       1
+%else
+%global WANT_kdev       0
+%global NEED_kdev       0
+%endif
+
+%if %{HAVE_modules}
+%global NEED_kdev       1
+%endif
+
+%if %{FILES_modules}
+%global WANT_kdev       1
+%endif
+
+%if %{WANT_kdev}
+%global PACKAGE_kdev    1
+%else
+%global PACKAGE_kdev    0
+%endif
+
+# -----------------------
+
 %if %{VIRT_kbug}
 %global WANT_kbug       1
 %global NEED_kbug       1
@@ -1101,11 +1196,11 @@
 %endif
 
 %if %{HAVE_modules}
-%global NEED_kbug       1
+%global NEED_kbug       %{HAVE_kdebugfiles}
 %endif
 
 %if %{FILES_modules}
-%global WANT_kbug       1
+%global WANT_kbug       %{FILES_kdebugfiles}
 %endif
 
 %if %{WANT_kbug}
@@ -1230,19 +1325,20 @@
 %global need_kmod           %{nil}
 %endif
 
-%if %{NEED_kbug}
-%global need_kbug           %{nil}
+%if %{NEED_kdev}
+%global need_kdev           %{nil}
 %endif
 
 # ---------------------------------------------------------------------------
 
+%if %{FILES_binaries}
+%global files_binaries      %{nil}
+%endif
 %if %{FILES_binfiles}
 %global files_binfiles      %{nil}
-%global files_binaries      %{nil}
 %endif
 %if %{FILES_sbinfiles}
 %global files_sbinfiles     %{nil}
-%global files_binaries      %{nil}
 %endif
 %if %{FILES_preloads}
 %global files_preloads      %{nil}
@@ -1258,19 +1354,15 @@
 %endif
 %if %{FILES_libraries}
 %global files_libraries     %{nil}
-%global files_binaries      %{nil}
 %endif
 %if %{FILES_libstatic}
 %global files_libstatic     %{nil}
-%global files_binaries      %{nil}
 %endif
 %if %{FILES_lib32compat}
 %global files_lib32compat   %{nil}
-%global files_binaries      %{nil}
 %endif
 %if %{FILES_lib32static}
 %global files_lib32static   %{nil}
-%global files_binaries      %{nil}
 %endif
 %if %{FILES_perlmods}
 %global files_perlmods      %{nil}
@@ -1402,6 +1494,9 @@
 %endif
 %if %{FILES_zypprepo}
 %global files_zypprepo      %{nil}
+%endif
+%if %{FILES_repo}
+%global files_repo          %{nil}
 %endif
 
 # ---------------------------------------------------------------------------
@@ -1620,32 +1715,64 @@ validated for ix86, x86_64, ppc and ppc64 architectures, but should
 build and install well for other architectures.  This package includes
 the following binary packages:
 
+%if %{NEED_virt}
  - %{name}
    -- copyright info, change logs, virtual base package.
+%endif
 %if %{NEED_repo}
  - %{name}-repo
-   -- yum or zypper repository source definitions
+   -- yum or zypper repository source definitions.
 %endif
+%if %{NEED_base}
  - %{name}-base
    -- admin and user docs, man pages, manual, info files, devices, init
       scripts, configs, mibs, test utils.
+%endif
+%if %{NEED_doc}
  - %{name}-doc
    -- developer and programmer docs, man pages, papers, projects,
       manuals, info files, javadoc.
+%endif
+%if %{NEED_lib}
  - %{name}-lib
    -- shared libraries and utilities.
+%endif
+%if %{NEED_devel}
  - %{name}-devel
-   -- headers, static libraries, debuginfo.
+   -- headers, static libraries.
+%endif
+%if %{NEED_debug}
+ - %{name}-debuginfo
+   -- binary application and library debug info.
+ - %{name}-debugsource
+   -- binary application and library debug source.
+%endif
+%if %{NEED_kmod}
  - %{name}-kernel
    -- kernel modules for a specific kernel.
+%endif
+%if %{NEED_kdev}
  - %{name}-devel-kernel
-   -- kernel module info and debug info for a specific kernel.
+   -- kernel module info for a specific kernel.
+%endif
+%if %{NEED_kbug}
+ - %{name}-debuginfo-kernel
+   -- kernel module debug info for a specific kernel.
+ - %{name}-debugsource-kernel
+   -- kernel module debug source for a specific kernel.
+%endif
+%if %{NEED_ksrc}
  - %{name}-source-kernel
    -- source configured for a specific kernel.
+%endif
+%if %{NEED_java}
  - %{name}-java
    -- JAIN java modules, JNI/CNI libraries, and native Java modules.
+%endif
+%if %{NEED_jdoc}
  - %{name}-javadoc
    -- Javadoc documentation for JAIN APIs and implementation.
+%endif
 
 The %{name} binary package provides documentation, device definitions,
 Sys V init scripts and configuration files, SNMP MIB definitions, and
@@ -2082,12 +2209,26 @@ Autoprov:           true
 Prefix:             %{_yumrepodir}
 Prefix:             %{_rpmgpgdir}
 %endif
-%if %{FILES_zypprepo}
-Prefix:             %{_zypprepodir}
-%endif
 
 %if %{FILES_yumrepo}
-Requires:           yum-kmod
+Requires:           yum
+Requires(pre):      yum
+Requires(preun):    yum
+Requires(post):     yum
+Requires(postun):   yum
+Requires(post):     yum-kmod
+%endif
+
+%if %{FILES_zypprepo}
+Requires:           zypper
+Requires(pre):      zypper
+Requires(preun):    zypper
+Requires(post):     zypper
+Requires(postun):   zypper
+%endif
+
+%if %{FILES_repo}
+Requires(pre):      /usr/bin/wget
 %endif
 
 Provides:       %{name}-repo    = %{epoch}:%{baseversion}-%{fullrelease}
@@ -2104,29 +2245,159 @@ OpenSS7 repository definitions for installing the other packages
 in the set.
 %{descriptail}
 
+%pre repo
+# ---------------------------------------------------------------------------
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
+%if %{FILES_yumrepo}
+    (
+        cd '%{_yumrepodir}'
+        un=; pw=
+        for s in '' '.rpmsave' '.rpmnew' ; do
+            file="@PACKAGE@.repo$s"
+            if test -e $file ; then
+                un=`sed -r 's,^baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $file`
+                pw=`sed -r 's,^baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $file`
+                [ -n "$un" -a -n "$pw" ] || continue
+                break
+            fi
+        done
+        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=$un}${pw:+&pw=$pw}"
+        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/rpms/%{_rpmsubdir}/repodata/'"$file$ext"
+        rm -f -- $file
+        if ! echo "$url" | wget -i - >/dev/null 2>&1 ; then
+            if echo "$url" | wget -i - 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
+                echo 'Authorization required for repository access.' >/dev/tty
+                u=; p=
+                read -e  -p 'Username: ' u </dev/tty >/dev/tty
+                read -es -p 'Password: ' p </dev/tty >/dev/tty
+                echo '' >/dev/tty
+                url='%{_reposerv}://'"${u:+$u${p:+:$p}@}"'%{_repobase}/%{_reporoot}/rpms/%{_rpmsubdir}/repodata/'"$file$ext"
+                rm -f -- $file
+                if ! echo "$url" | wget -i - >/dev/null 2>&1 ; then
+                    exit 1
+                fi
+            fi
+        fi
+    )
+    yum makecache
+%endif
+%if %{FILES_zypprepo}
+    (
+        cd '%{_zyppcreddir}'
+        un=; pw=
+        for s in '@PACKAGE_UCNAME@' 'NCC' ; do
+            file="${s}credentials"
+            if test -e $file ; then
+                un=`sed -r 's,^username=([^[:space]]*)$,\1,;t;d' $file`
+                pw=`sed -r 's,^password=([^[:space]]*)$,\1,;t;d' $file`
+                break
+            fi
+        done
+        file='@PACKAGE_UCNAME@credentials'
+        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=$un}${pw:+&pw=$pw}"
+        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
+        rm -f -- $file
+        if ! echo "$url" | wget -i - >/dev/null 2>&1 ; then
+            if echo "$url" | wget -i - 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
+                echo 'Authorization required for repository access.' >/dev/tty
+                u=; p=
+                read -e  -p 'Username: ' u </dev/tty >/dev/tty
+                read -es -p 'Password: ' p </dev/tty >/dev/tty
+                echo '' >/dev/tty
+                url='%{_reposerv}://'"${u:+$u${p:+:$p}@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
+                rm -f -- $file
+                if ! echo "$url" | wget -i - >/dev/null 2>&1 ; then
+                    exit 1
+                fi
+            fi
+        fi
+    )
+    zypper addservice -t ris -n '@PACKAGE_UCNAME@-service' \
+        '%{_reposerv}://%{_repobase}/?credentials=@PACKAGE_UCNAME@credentials' \
+        '@PACKAGE_UCNAME@-service'
+    zypper modifyservice -r -i -e '@PACKAGE_UCNAME@-service'
+    zypper refresh
+%endif
+fi
+
 %post repo
 # ---------------------------------------------------------------------------
-# After we install the this repository package, we need to adjust whatever
+# After we install this repository package, we need to adjust whatever
 # definitions are required in either the /etc/yum/yum-plugins.d/kmod.conf or
 # /etc/zypp/zypp.conf files.
-if [ $1 = 1 ] ; then # fresh install
-    :
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
 %if %{FILES_yumrepo}
     d="%{_sysconfdir}/yum/pluginconf.d"
-    for f in kmod.conf fedorakmod.conf ; do
-        if [ -f "$d/$f" ] ; then
-            cp -f -- "$d/$f" "$d/$f.rpmsave"
-            sed -r -e 's/^pinkernels.*$/pinkernels = 1/' "$d/$f"
-            sed -r -e 's/^installforallkernels.*$/installforallkernels = 1/' "$d/$f"
+    for f in kmod.conf fedorakmod.conf ; do f="$d/$f"
+        if [ -f $f ] ; then
+            mv -f -- $f $f.rpmsave
+            sed -r -e 's,^pinkernels.*$,pinkernels = 1,;s,^installforallkernels.*$,installforallkernels = 1,' $f.rpmsave >$f
+            if diff $f.rpmsave $f >/dev/null 2>&1 ; then
+                mv -f -- $f.rpmsave $f
+            fi
         fi
     done
 %endif
 %if %{FILES_zypprepo}
-    f="%{_sysconfdir}/zypp/zypp.conf"
-    if [ -f "$f" ] ; then
-        cp -f -- "$f" "$f.rpmsave"
-        sed -r -e 's/^multiversion.*$/multiversion = provides:multiversion(kernel)/' "$f"
+    d="%{_sysconfdir}/zypp"
+    for f in zypp.conf ; do f="$d/$f"
+        if [ -f $f ] ; then
+            mv -f -- $f $f.rpmsave
+            sed -r -e 's,^multiversion.*$,multiversion = provides:multiversion(kernel),' $f.rpmsave >$f
+            if diff $f.rpmsave $f >/dev/null 2>&1 ; then
+                mv -f -- $f.rpmsave $f
+            fi
+        fi
+    done
+%endif
+fi
+
+%preun repo
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+%if %{FILES_zypprepo}
+    f='%{_yumrepodir}/@PACKAGE@.repo'
+    if [ -e $f ] ; then
+        sed 's,^enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$,enabled = 0,' $f >$f.rpmsave
+        rm -f -- $f
+        yum makecache || :
     fi
+%endif
+%if %{FILES_zypprepo}
+    zypper removeservice --loose-auth --loose-query '@PACKAGE_UCNAME@-service'
+    zypper removeservice --loose-auth --loose-query '@PACKAGE_UCNAME@-local-service'
+    zypper refresh || :
+%endif
+fi
+
+%postun repo
+# ---------------------------------------------------------------------------
+# After we remove this repository package, we need to adjust whatever
+# definitions are required in configuration files.  When we changed them on
+# installation, we save an original copy in $f.rpmsave.  Therefore, if
+# $f.rpmsave exists, copy it back.
+if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+%if %{FILES_yumrepo}
+    d="%{_sysconfdir}/yum/pluginconf.d"
+    for f in kmod.conf fedorakmod.conf ; do f="$d/$f"
+        if [ -f $f -a -f $f.rpmsave ] ; then
+            if ! diff $f $f.rpmsave >/dev/null 2>&1 ; then
+                mv -f -- $f.rpmsave $f
+            fi
+        fi
+        rm -f -- $f.rpmsave
+    done
+%endif
+%if %{FILES_zypprepo}
+    d="%{_sysconfdir}/zypp"
+    for f in zypp.conf ; do f="$d/$f"
+        if [ -f $f -a -f $f.rpmsave ] ; then
+            if ! diff $f $f.rpmsave >/dev/null 2>&1 ; then
+                mv -f -- $f.rpmsave $f
+            fi
+        fi
+        rm -f -- $f.rpmsave
+    done
 %endif
 fi
 
@@ -2134,9 +2405,9 @@ fi
 %files repo
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_yumrepo:%config(noreplace) %{_yumrepodir}/*}
-%{?files_yumrepo:%{_rpmgpgdir}/*}
-%{?files_zypprepo:%config(noreplace) %{_zypprepodir}/*}
+#{?files_yumrepo:%config(noreplace) %{_yumrepodir}/*}
+#{?files_yumrepo:%{_rpmgpgdir}/*}
+#{?files_zypprepo:%config(noreplace) %{_zypprepodir}/*}
 %endif
 
 # ===========================================================================
@@ -2399,8 +2670,7 @@ if [ $1 = 1 ] ; then : # fresh install
     [ ! -f %{_mandir}/%{manmacros}.gz  ] || gunzip  %{_mandir}/%{manmacros}.gz
     [ ! -f %{_mandir}/%{manmacros}.bz2 ] || bunzip2 %{_mandir}/%{manmacros}.bz2
 %endif
-fi
-if [ $1 = 2 ] ; then : # upgrade
+elif [ $1 = 2 ] ; then : # upgrade
 %if %{HAVE_oldmods}
     # At the end of an upgrade we place our new lines in the modules.conf file.
     conf_old=%_sysconfdir/modules.conf
@@ -2505,7 +2775,6 @@ fi
 %preun base
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then : # final removal
-    :
 %if %{USE_rmnods}
     # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
     # because they have no %%dev macro, so in that case we just run the makenodes program that was
@@ -2630,7 +2899,6 @@ if [ $1 = 0 ] ; then : # final removal
 %endif
 fi
 if [ $1 = 1 ] ; then : # upgrade
-    :
 %if %{HAVE_oldmods}
     # At the end of the upgrade (when _this_package_ is upgraded from) we remove our lines from the
     # modules.conf file that we placed in them in the post scriptlet.  We only adjust our line and
@@ -3056,7 +3324,6 @@ package.
 %pre lib
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
-    :
 %if %{FILES_libraries}
     # See if there are any libraries hanging around from a non-rpm install.  If there are, just
     # delete them.
@@ -3153,7 +3420,6 @@ fi
 %post lib
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
-    :
 %if %{FILES_libraries}
     # After a fresh install or upgrade, do a load config.
     /sbin/ldconfig
@@ -3233,11 +3499,11 @@ Prefix:         %{_libdir}
 %if %{FILES_lib32static}
 Prefix:         %{_lib32dir}
 %endif
-%if %{FILES_debugfiles}
-%{?files_binaries:Prefix:               %{_usrsrc}/debug}
-%{?files_binaries:%{?_lib32dir:Prefix:  %{_lib32dir}/debug}}
-%{?files_binaries:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
-%endif
+#if %{FILES_debugfiles}
+#{?files_binaries:Prefix:               %{_usrsrc}/debug}
+#{?files_binaries:%{?_lib32dir:Prefix:  %{_lib32dir}/debug}}
+#{?files_binaries:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
+#endif
 
 #Requires:         /sbin/install-info
 
@@ -3246,7 +3512,7 @@ Conflicts:      texinfo < 3.11
 %if %{NEED_lib}
 Requires:       %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
-%if %{NEED_kbug}
+%if %{NEED_kdev}
 Requires:       %{name}-devel-kernel = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
@@ -3285,9 +3551,85 @@ documentation, load the %{name}-doc package.
 %{?files_includes:%{_includedir}/%{name}/*}
 %{?files_libstatic:%{_libdir}/*.a}
 %{?files_lib32static:%{_lib32dir}/*.a}
-%{?files_debugfiles:%{?files_binaries: %{_usrsrc}/debug}}
+#{?files_debugfiles:%{?files_binaries: %{_usrsrc}/debug}}
+#{?files_debugfiles:%{?files_binaries: %{?_lib32dir:%{_lib32dir}/debug}}}
+#{?files_debugfiles:%{?files_binaries: %{!?_lib32dir:%{_libdir}/debug}}}
+%endif
+
+# ===========================================================================
+%package debuginfo
+
+Summary:        %{title} debugging symbols.
+Group:          Development/System
+%{?_xpm:Icon:   %_xpm}
+%{?_gif:Icon:   %_gif}
+Autoreq:        true
+Autoprov:       true
+
+%if %{FILES_debugfiles}
+%{?files_binaries:%{?_lib32dir:Prefix:  %{_lib32dir}/debug}}
+%{?files_binaries:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
+%endif
+%if %{NEED_kbug}
+Requires:       %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+
+Provides:       %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:       %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:       %{name}-debuginfo = %{epoch}:%{baseversion}-%{rpmrelease}
+
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description debuginfo
+%{descripline}
+The %{name}-debuginfo binary package contains debugging symbols for
+libraries and applications programs.  This package provides debug
+information for package %{name}-lib.  Debug information is useful when
+developing applications that use this package or when debugging this
+package.
+
+%if %{PACKAGE_debug}
+%files debuginfo
 %{?files_debugfiles:%{?files_binaries: %{?_lib32dir:%{_lib32dir}/debug}}}
 %{?files_debugfiles:%{?files_binaries: %{!?_lib32dir:%{_libdir}/debug}}}
+%endif
+
+# ===========================================================================
+%package debugsource
+
+Summary:        %{title} debugging source.
+Group:          Development/System
+%{?_xpm:Icon:   %_xpm}
+%{?_gif:Icon:   %_gif}
+Autoreq:        true
+Autoprov:       true
+
+%if %{FILES_debugfiles}
+%{?files_binaries:Prefix:               %{_usrsrc}/debug}
+%endif
+%if %{NEED_kbug}
+Requires:       %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+
+Provides:       %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:       %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:       %{name}-debugsource = %{epoch}:%{baseversion}-%{rpmrelease}
+
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description debugsource
+%{descripline}
+The %{name}-debugsource binary package contains source code for
+debugging libraries and applications programs.  This package provides
+debug information for package %{name}-lib.  Debug information is useful
+when developing applications that use this package or when debugging
+this package.
+
+%if %{PACKAGE_debug}
+%files debugsource
+%{?files_debugfiles:%{?files_binaries: %{_usrsrc}/debug}}
 %endif
 
 # ===========================================================================
@@ -3773,6 +4115,11 @@ Prefix:         %{_kmoduledir}
 %if %{FILES_oldmods}
 Prefix:         %{_includedir}/%{name}/%{kernel_version}
 %endif
+#if %{FILES_kdebugfiles}
+#{?files_modules:Prefix:               %{_usrsrc}/debug}
+#{?files_modules:%{?_lib32dir:Prefix:  %{_lib32dir}/debug}}
+#{?files_modules:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
+#endif
 
 Obsoletes:      %{name}-devel-kernel
 Obsoletes:      %{name}-kmp%{kernel_flavor}-devel
@@ -3857,13 +4204,13 @@ debug information is useful when developing kernel modules that use
 this package or when debugging kernel modules contained in the package.
 %{descriptail}
 
-%if %{PACKAGE_kbug}
+%if %{PACKAGE_kdev}
 %files devel-kernel%{kernel_flavor}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
-%{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug}}}
-%{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug}}}
+#{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
+#{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug}}}
+#{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug}}}
 %{?files_oldmods:%dir %{_includedir}/%{name}/%{kernel_version}}
 %{?files_oldmods:%{_includedir}/%{name}/%{kernel_version}/*}
 #{?files_modules:%{_kmoduledir}/%{base}/Module*}
@@ -3874,6 +4221,126 @@ this package or when debugging kernel modules contained in the package.
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Module.symvers}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Modules.map}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/%{mpost_file}}
+%endif
+
+# =============================================================================
+%package debuginfo-kernel%{kernel_flavor}
+
+Summary:        %{title} kernel module debugging information.
+Group:          Development/Kernel
+%{?_xpm:Icon:   %_xpm}
+%{?_gif:Icon:   %_gif}
+Autoreq:        true
+Autoprov:       true
+
+%if %{FILES_kdebugfiles}
+%{?files_modules:%{?_lib32dir:Prefix:  %{_lib32dir}/debug}}
+%{?files_modules:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
+%endif
+
+%if %{NEED_debug}
+Requires:       %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+%if %{NEED_kmod}
+Requires:       %{name}-kernel%{kernel_flavor} = %{epoch}:%{baseversion}_%{kernel_string}-%{fullrelease}
+%endif
+
+%if %{HAVE_yumrepo}
+# This is a signal to yum that rpm packages are to be installed rather than
+# updated.  It is also a signal to yum-kmod that this package provides kernel
+# modules.
+Provides:       kernel-modules = %{_kversion}
+%endif
+
+%if %{HAVE_zypprepo}
+# This is a signal to zypp that when multiple kernel versions are permitted,
+# that this package also supports multiple versions being installed on the
+# system at the same time.  This is similar to the above for yum.
+Provides:       multiversion(kernel)
+%endif
+
+Provides:       %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:       %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:       %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:       %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:       %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:       %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+
+Version:        %{baseversion}_%{kernel_string}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description debuginfo-kernel%{kernel_flavor}
+%{descripline}
+The %{name}-debuginfo-kernel%{kernel_flavor} binary package contains
+debugging symbols for kernel modules.  This package provides debug
+information for package %{name}-kernel%{kernel_flavor}.  Debug
+information is useful when developing kernel modules that use this
+package or when debugging this package.
+
+%if %{PACKAGE_kbug}
+%files debuginfo-kernel%{kernel_flavor}
+%{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug}}}
+%{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug}}}
+%endif
+
+# =============================================================================
+%package debugsource-kernel%{kernel_flavor}
+
+Summary:        %{title} kernel module debugging source.
+Group:          Development/Kernel
+%{?_xpm:Icon:   %_xpm}
+%{?_gif:Icon:   %_gif}
+Autoreq:        true
+Autoprov:       true
+
+%if %{FILES_kdebugfiles}
+%{?files_modules:Prefix:               %{_usrsrc}/debug}
+%endif
+
+%if %{NEED_debug}
+Requires:       %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+%if %{NEED_kmod}
+Requires:       %{name}-kernel%{kernel_flavor} = %{epoch}:%{baseversion}_%{kernel_string}-%{fullrelease}
+%endif
+
+%if %{HAVE_yumrepo}
+# This is a signal to yum that rpm packages are to be installed rather than
+# updated.  It is also a signal to yum-kmod that this package provides kernel
+# modules.
+Provides:       kernel-modules = %{_kversion}
+%endif
+
+%if %{HAVE_zypprepo}
+# This is a signal to zypp that when multiple kernel versions are permitted,
+# that this package also supports multiple versions being installed on the
+# system at the same time.  This is similar to the above for yum.
+Provides:       multiversion(kernel)
+%endif
+
+Provides:       %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:       %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:       %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:       %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:       %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:       %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+
+Version:        %{baseversion}_%{kernel_string}
+Release:        %{fullrelease}
+
+# ---------------------------------------------------------------------------
+%description debugsource-kernel%{kernel_flavor}
+%{descripline}
+The %{name}-debugsource-kernel%{kernel_flavor} binary package contains
+source code for debugging kernel modules.  This package provides debug
+information for package %{name}-kernel%{kernel_flavor}.  Debug
+information is useful when developing kernel modules that use this
+package or when debugging this package.
+
+%if %{PACKAGE_kbug}
+%files debugsource-kernel%{kernel_flavor}
+%{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
 %endif
 
 # =============================================================================
@@ -4142,24 +4609,34 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 1.1.2.15  2011-02-17 18:34:09  brian
-# - repository and rpm build updates
+# Revision 1.1.2.16  2011-02-28 19:51:28  brian
+# - better repository build
 #
-# Revision 1.1.2.14  2011-02-10 17:29:45  brian
-# - repo updates
-#
-# Revision 1.1.2.13  2011-02-09 17:59:27  brian
-# - repository and rpm updates for suse
-#
-# Revision 1.1.2.12  2011-02-08 23:39:01  brian
-# - last minute release updates
-#
-# Revision 1.1.2.11  2011-02-07 04:48:31  brian
-# - updated configure and build scripts
-#
-# Revision 1.1.2.10  2011-01-18 17:12:50  brian
-# - rpm build updates
-#
+
+* Thu Feb 17 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.15  2011-02-17 18:34:09  brian
+- repository and rpm build updates
+
+* Thu Feb 10 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.14  2011-02-10 17:29:45  brian
+- repo updates
+
+* Wed Feb  9 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.13  2011-02-09 17:59:27  brian
+- repository and rpm updates for suse
+
+* Tue Feb  8 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.12  2011-02-08 23:39:01  brian
+- last minute release updates
+
+* Mon Feb  7 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.11  2011-02-07 04:48:31  brian
+- updated configure and build scripts
+
+* Tue Jan 18 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.10  2011-01-18 17:12:50  brian
+- rpm build updates
+
 * Tue Sep  1 2009 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.9  2009-09-01 09:09:45  brian
 - added text image files

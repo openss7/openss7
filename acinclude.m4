@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-17 18:34:09 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-02-28 19:51:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-17 18:34:09 $ by $Author: brian $
+# Last Modified $Date: 2011-02-28 19:51:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -95,10 +95,10 @@ AC_DEFUN([AC_OPENSS7], [dnl
     PKGINCL="src/include/sys/${PACKAGE_LCNAME}"
     _AUTOPR
     _PUBLIC_RELEASE
+    _REPO
     _ARCHIVE
     _RPM_SPEC
     _DEB_DPKG
-    _REPO
     _MAN_CONVERSION
     _INFO
     _PAPERS
@@ -3806,6 +3806,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.11  2011-02-28 19:51:28  brian
+# - better repository build
+#
 # Revision 1.1.2.10  2011-02-17 18:34:09  brian
 # - repository and rpm build updates
 #

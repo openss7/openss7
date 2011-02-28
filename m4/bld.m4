@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-17 18:34:10 $
+# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-28 19:51:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+# Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -87,19 +87,10 @@ AC_DEFUN([_BLD_BUILD_REQ], [dnl
     # if build requirements file is not specified, check for one in the source
     # directory or one in the build directory
     if test -z "$CONFIG_BLDREQ" ; then
-	case "$dist_cv_build_flavor" in
-	    (centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|suse)
-		bld_req="${dist_cv_build_flavor}-${dist_cv_build_release}-${dist_cv_build_cpu}" ;;
-	    (debian|ubuntu|*)
-		bld_req="${dist_cv_build_flavor}-${dist_cv_build_codename}-${dist_cv_build_cpu}" ;;
-	esac
-	if test -n "$bld_req"; then
-	    bld_req=`echo "$bld_req" | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
-	fi
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
-	    CONFIG_BLDREQ="${srcdir}/${bld_req}-config.cache"
+	    CONFIG_BLDREQ="${srcdir}/${build_distos}-config.cache"
 	else
-	    CONFIG_BLDREQ="${bld_req}-config.cache"
+	    CONFIG_BLDREQ="${build_distos}-config.cache"
 	fi
     fi
     AC_SUBST([CONFIG_BLDREQ])dnl
@@ -154,9 +145,9 @@ AC_DEFUN([_BLD_BUILD_CHECK], [dnl
 	esac
 	tmp_result=
 	if test -n "$tmp_cmd" ; then
-	    case "$dist_cv_build_flavor" in
+	    case "$build_distro" in
 dnl	These use rpm
-		(centos|lineox|whitebox|fedora|suse|opensuse|redhat|mandrake|mandriva)
+		(centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva)
 		    tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
 		    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		    ;;
@@ -175,9 +166,9 @@ dnl	These use dpkg
 	fi
 	tmp_result=
 	if test -n "$tmp_cmd" ; then
-	    case "$dist_cv_build_flavor" in
+	    case "$build_distro" in
 dnl	These use rpm
-		(centos|lineox|whitebox|fedora|suse|opensuse|redhat|mandrake|mandriva)
+		(centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva)
 		    tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
 		    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		    ;;
@@ -202,11 +193,11 @@ dnl	These use dpkg
 	fi
 	tmp_result="$bld_cv_pkg_name_$1"
 	if test -n "$tmp_result" ; then
-	    case "$dist_cv_build_flavor" in
-		(centos|lineox|whitebox|fedora)
+	    case "$build_distro" in
+		(centos|lineox|whitebox|fedora|rhel)
 		    bld_cv_pkg_cmd_$1="yum install $tmp_result"
 		    ;;
-		(suse|opensuse)
+		(suse|sle)
 		    bld_cv_pkg_cmd_$1="zypper install $tmp_result"
 		    ;;
 		(redhat)
@@ -303,7 +294,7 @@ AC_DEFUN([_BLD_PATH_PROGS], [dnl
 AC_DEFUN([_BLD_INSTALL_WARN], [dnl
     if test -n "$bld_cv_pkg_cmd_$1" ; then
 	tmp_msg="
-*** $dist_cv_build_flavor: $bld_cv_pkg_cmd_$1"
+*** $build_distro: $bld_cv_pkg_cmd_$1"
     else
 	tmp_msg="$3"
     fi
@@ -324,7 +315,7 @@ AC_DEFUN([_BLD_INSTALL_WARN], [dnl
 AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
     if test -n "$bld_cv_pkg_cmd_$1" ; then
 	tmp_msg="
-*** $dist_cv_build_flavor: $bld_cv_pkg_cmd_$1"
+*** $build_distro: $bld_cv_pkg_cmd_$1"
     else
 	tmp_msg="$3"
     fi
@@ -376,6 +367,9 @@ AC_DEFUN([_BLD_], [dnl
 # =============================================================================
 #
 # $Log: bld.m4,v $
+# Revision 1.1.2.5  2011-02-28 19:51:29  brian
+# - better repository build
+#
 # Revision 1.1.2.4  2011-02-17 18:34:10  brian
 # - repository and rpm build updates
 #

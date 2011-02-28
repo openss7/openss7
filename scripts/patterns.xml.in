@@ -3,7 +3,7 @@
 <pattern xmlns="http://novell.com/package/metadata/suse/pattern" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
   <name>openss7</name>
   <version epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
-  <arch>@target_cpu@</arch>
+  <arch>@host_cpu@</arch>
   <icon>pattern-openss7</icon>
   <vendor>OpenSS7 Corporation</vendor>
   <summary>OpenSS7 STREAMS and Protocol Suites.</summary>
@@ -24,13 +24,15 @@ Fast-STREAMS and associated protocol suites.
   <rpm:suggests>
     <rpm:entry name="pattern:openss7-java" />
     <rpm:entry name="pattern:openss7-devel" />
+    <rpm:entry name="pattern:openss7-debug" />
+    <rpm:entry name="pattern:openss7-source" />
     <rpm:entry name="pattern:openss7-doc" />
   </rpm:suggests>
 </pattern>
 <pattern xmlns="http://novell.com/package/metadata/suse/pattern" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
   <name>openss7-java</name>
   <version epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
-  <arch>@target_cpu@</arch>
+  <arch>@host_cpu@</arch>
   <icon>pattern-openss7</icon>
   <vendor>OpenSS7 Corporation</vendor>
   <summary>OpenSS7 STREAMS and Protocol Suite Java Components</summary>
@@ -53,7 +55,7 @@ Fast-STREAMS and associated protocol suites.
 <pattern xmlns="http://novell.com/package/metadata/suse/pattern" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
   <name>openss7-devel</name>
   <version epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
-  <arch>@target_cpu@</arch>
+  <arch>@host_cpu@</arch>
   <icon>pattern-openss7</icon>
   <vendor>OpenSS7 Corporation</vendor>
   <summary>OpenSS7 STREAMS and Protocol Suite Development</summary>
@@ -72,11 +74,65 @@ protocol suites.
   </rpm:requires>
   <rpm:recommends>
     <rpm:entry name="pattern:openss7" />
+    <rpm:entry name="pattern:openss7-debug" />
     <rpm:entry name="pattern:openss7-doc" />
   </rpm:recommends>
   <rpm:suggests>
-    <rpm:entry name="openss7-source-kernel" />
+    <rpm:entry name="pattern:openss7-source" />
   </rpm:suggests>
+</pattern>
+<pattern xmlns="http://novell.com/package/metadata/suse/pattern" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
+  <name>openss7-debug</name>
+  <version = epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
+  <arch>@host_cpu@</arch>
+  <icon>pattern-openss7</icon>
+  <vendor>OpenSS7 Corporation</vendor>
+  <summary>OpenSS7 STREAMS and Protocol Suite Debugging</summary>
+  <description>Provides the environment for debugging Linux Fast-STREAMS
+modules and drivers and applications for OpenSS7 protocol
+suites.
+</description>
+  <category>OpenSS7 Components</category>
+  <uservisible/>
+  <rpm:provides>
+    <rpm:entry name="pattern:openss7-debug" />
+  </rpm:provides>
+  <rpm:requires>
+    <rpm:entry name="openss7-debuginfo" />
+    <rpm:entry name="openss7-debuginfo-kernel" />
+  </rpm:requires>
+  <rpm:recommends>
+    <rpm:entry name="pattern:openss7-doc" />
+  </rpm:recommends>
+  <rpm:suggests>
+    <rpm:entry name="pattern:openss7-source" />
+  </rpm:suggests>
+</pattern>
+<pattern xmlns="http://novell.com/package/metadata/suse/pattern" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
+  <name>openss7-source</name>
+  <version = epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
+  <arch>@host_cpu@</arch>
+  <icon>pattern-openss7</icon>
+  <vendor>OpenSS7 Corporation</vendor>
+  <summary>OpenSS7 STREAMS and Protocol Suite Source</summary>
+  <description>Provides the environment for debugging Linux Fast-STREAMS
+modules and drivers and applications for OpenSS7 protocol
+suites debugging source, as well as configured source for
+a given kernel.
+</description>
+  <category>OpenSS7 Components</category>
+  <uservisible/>
+  <rpm:provides>
+    <rpm:entry name="pattern:openss7-source" />
+  </rpm:provides>
+  <rpm:requires>
+    <rpm:entry name="openss7-debugsource" />
+    <rpm:entry name="openss7-debugsource-kernel" />
+  </rpm:requires>
+  <rpm:recommends>
+    <rpm:entry name="openss7-source-kernel" />
+    <rpm:entry name="pattern:openss7-doc" />
+  </rpm:recommends>
 </pattern>
 <pattern xmlns="http://novell.com/package/metadata/suse/pattern" xmlns:rpm="http://linux.duke.edu/metadata/rpm">
   <name>openss7-doc</name>

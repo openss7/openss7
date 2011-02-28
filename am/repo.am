@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: repo.am,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-02-17 18:34:10 $
+# @(#) $RCSfile: repo.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-28 19:51:29 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+## Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -57,35 +57,65 @@ if PKG_BUILD_INDEP
 if WITH_YUM_SOURCE
 
 $(PACKAGE).yum.repo: Makefile
-	( \
-		$(ECHO) '[@PACKAGE@]'; \
-		$(ECHO) 'enabled = 1'; \
-		$(ECHO) 'name = @PACKAGE_TITLE@ Repository'; \
-		$(ECHO) 'baseurl = http://www.openss7.org/repos/rpms/$(PACKAGE_RPMSUBDIR)'; \
-		$(ECHO) 'gpgkey = http://www.openss7.org/repos/tarballs/OPENSS7-GPG-KEY'; \
-		$(ECHO) 'repo_gpgcheck = 1'; \
-		$(ECHO) 'gpgcheck = 1'; \
-	) >$@
+	rb=`echo '$(repobranch)' | sed 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	for branch in $$rlist ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			$(ECHO) 'baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'gpgkey = $(reposerv)://$(repobase)/$(reporoot)/tarballs/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
 
 INSTALL_YUM_REPOS = $(PACKAGE).yum.repo
 
 if MAINTAINER_MODE
 
 $(PACKAGE)-local.yum.repo: Makefile
-	( \
-		$(ECHO) '[@PACKAGE@-local]'; \
-		$(ECHO) 'enabled = 1'; \
-		$(ECHO) 'name = @PACKAGE_TITLE@ Local Repository'; \
-		$(ECHO) 'baseurl = file://$(topdir)'; \
-		$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
-		$(ECHO) 'repo_gpgcheck = 1'; \
-		$(ECHO) 'gpgcheck = 1'; \
-	) >$@
+	rb=`echo '$(repobranch)' | sed 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
+			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+		for repo in '' 'Main' 'Debug' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)-local'$${b:+-$$b}$${r:+-$$r}']' ; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
+				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE) Local'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			$(ECHO) 'baseurl = file://$(rpmdistdir)'$${s:+/$$s}$${d:+/$$d}; \
+			$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
 
 INSTALL_YUM_REPOS += $(PACKAGE)-local.yum.repo
 
 ## MAINTAINER_MODE
 endif
+
+##
+## Before installing yum, check whether there is an existing remote repo file.
+## If there is an existing file, just use it.  Otherwise, we need to create the
+## remote repo file.  This is accomplished by downloading it from the install
+## source.
+##
+pre-yum:
+	if test ! -d '$(DESTDIR)$(yumrepodir)' -o \
+		! -e '$(DESTDIR)$(yumrepodir)/$(PACKAGE).repo' ; then \
+		$(MKDIR_P) '$(DESTDIR)$(yumrepodir)' ; \
+	fi
+
 
 install-yum: $(INSTALL_YUM_REPOS)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -121,8 +151,9 @@ if MAINTAINER_MODE
 endif
 
 ##
-# When the stuff is installed go looking for the configuration file for the yum-kmod or
-# yum-fedorakmod plugin and change the 'pinkernels' and 'installforallkernels' options.
+# When the stuff is installed go looking for the configuration file for the
+# yum-kmod or yum-fedorakmod plugin and change the 'pinkernels' and
+# 'installforallkernels' options.
 ##
 post-yum:
 	if test -n "$(yumkmodconf)" -a -f "$(DESTDIR)/$(yumkmodconf)" ; then \
@@ -131,47 +162,189 @@ post-yum:
 		yum makecache ; \
 	fi
 
-ALL_LOCAL			+= $(PACKAGE).yum.repo
-INSTALL_DATA_LOCAL		+= install-yum
-UNINSTALL_LOCAL			+= uninstall-yum
-CLEANFILES			+= $(PACKAGE).yum.repo
-POST_INSTALL_AM			+= post-yum
+#ALL_LOCAL			+= $(PACKAGE).yum.repo
+#INSTALL_DATA_LOCAL		+= install-yum
+#UNINSTALL_LOCAL			+= uninstall-yum
+#CLEANFILES			+= $(PACKAGE).yum.repo
+#POST_INSTALL_AM			+= post-yum
 
 MY_PHONY			+= install-yum uninstall-yum post-zypp
+
+##
+# Install a yum installation source for both remote and local repositories.  This involves
+# downloading the @PACKAGE@.repo file, installing the @PACKAGE@-local.repo file, and performing yum
+# makecache.
+##
+repo-install-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test ! -d '$(DESTDIR)$(yumrepodir)' ; then \
+		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(yumrepodir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(yumrepodir) ; \
+	fi
+	( \
+		cd $(DESTDIR)$(yumrepodir) ; \
+		un=; pw=; \
+		for s in '' '.rpmsave' '.rpmnew' ; do \
+			f='$(PACKAGE).repo'$$s ; \
+			if test -f $$f ; then \
+				un=`sed -r 's,^baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $$f` ; \
+				pw=`sed -r 's,^baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $$f` ; \
+				test -n "$$un" -a -n "$$pw" || continue ; \
+				break ; \
+			fi ; \
+		done ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
+		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/rpms/$(target_distro)/$(target_edition)/$(target_cpu)/repodata/'"$$f$$ext" ; \
+		rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
+			if echo "$$url" | wget -i - 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				echo 'Authorization required for repository access.' >/dev/tty ; \
+				u=; p=; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty ; \
+				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
+				echo '' >/dev/tty ; \
+				url='$(reposerv)://'"$${u:+$$u$${p:+:$$p}@}"'$(repobase)/$(reporoot)/rpms/$(target_distro)/$(target_edition)/$(target_cpu)/repodata/'"$$f$$ext" ; \
+				rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+		( \
+			$(ECHO) '[$(PACKAGE)]-local]' ; \
+			$(ECHO) 'enabled = 1' ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE) Local Repository' ; \
+			$(ECHO) 'baseurl = file://$(rpmdistdir)' ; \
+			$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY' ; \
+			$(ECHO) 'gpgcheck = 1' ; \
+			$(ECHO) 'repo_gpgcheck = 0' \
+		) >$(PACKAGE)-local.repo \
+	)
+	@f='$(DESTDIR)$(yumkmodconf)' ; \
+	if test -f $$f ; then \
+		$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+		mv -f -- $$f $$f.rpmsave ; \
+		$(ECHO) "sed -r 's,^pinkernels.*$$,pinkernels = 1,;s,^installforallkernels.*$$,installforallkernels = 1,' $$f.rpmsave >$$f" ; \
+		sed -r 's,^pinkernels.*$$,pinkernels = 1,;s,^installforallkernels.*$$,installforallkernels = 1,' $$f.rpmsave >$$f ; \
+		if diff $$f.rpmsave $$f >/dev/null 2>&1 ; then \
+			$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+			mv -f -- $$f.rpmsave $$f ; \
+		fi ; \
+	fi
+	yum makecache
+
+##
+## To remove a yum install source, first remove any changes that were made to the (fedora)kmod.conf
+## file.  The original (fedora)kmod.conf file is saved before changes in (fedora)kmod.conf.rpmsave
+## (when changes were actually made).  Restore (fedora)kmod.conf.rpmsave to (fedora)kmod.conf.
+## Disable and copy the @PACKAGE@.repo file to @PACKAGE@.repo.rpmsave so that the credentials will
+## be maintained even when the repository has been removed.  Next remove the @PACKAGE@.repo and
+## @PACKAGE@-local.repo repositories and rebuild the yum cache.
+##
+repo-uninstall-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(DESTDIR)$(yumkmodconf)' ; \
+	if test -f $$f.rpmsave ; then \
+		if test -f $$f ; then \
+			if ! diff $$f $$f.rpmsave >/dev/null 2.&1 ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+		fi ; \
+		$(ECHO) "rm -f -- $$f.rpmsave" ; \
+		rm -f -- $$f.rpmsave ; \
+	fi
+	@f='$(DESTDIR)$(yumrepodir)/$(PACKAGE).repo' ; \
+	if test -f $$f ; then \
+		$(ECHO) "sed 's,^enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$$,enabled = 0,' $$f >$$f.rpmsave" ; \
+		sed 's,^enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$$,enabled = 0,' $$f >$$f.rpmsave ; \
+	fi
+	@for s in '' '-local' ; do \
+		f='$(DESTDIR)$(yumrepodir)/$(PACKAGE)'$$s'.repo' ; \
+		if test -f $$f ; then \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
+	@$(ECHO) "yum makecache" ; \
+	yum makecache || :
+
+REPO_INSTALL			+= repo-install-yum
+REPO_UNINSTALL			+= repo-uninstall-yum
 
 ## WITH_YUM_SOURCE
 endif
 
 if WITH_ZYPP_SOURCE
 
-$(PACKAGE).zypp.repo: Makefile
+$(PACKAGE_UCNAME).zypp.credentials: Makefile
 	( \
-		$(ECHO) '[@PACKAGE@]'; \
-		$(ECHO) 'name=@PACKAGE_TITLE@ Repository'; \
-		$(ECHO) 'enabled=1'; \
-		$(ECHO) 'autorefresh=1'; \
-		$(ECHO) 'baseurl=http://www.openss7.org/repos/rpms/$(PACKAGE_RPMSUBDIR)'; \
-		$(ECHO) 'type=rpm-md'; \
-		$(ECHO) 'gpgcheck=1'; \
-		$(ECHO) 'gpgkey=http://www.openss7.org/pubkey.asc'; \
-		$(ECHO) 'keeppackages=0'; \
+	: ) >$@
+
+$(PACKAGE).zypp.service: Makefile
+	( \
+		$(ECHO) '[$(PACKAGE)]' ; \
+		$(ECHO) 'name=$(PACKAGE)' ; \
+		$(ECHO) 'enabled=1' ; \
+		$(ECHO) 'autorefresh=1' ; \
+		$(ECHO) 'url = $(reposerv)://$(repobase)/?credentials=$(PACKAGE_UCNAME)credentials' ; \
+		$(ECHO) 'type = ris' ; \
 	) >$@
+
+$(PACKAGE).zypp.repo: Makefile
+	rb=`echo '$(repobranch)' | sed 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	for branch in $$rlist ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
+			$(ECHO) 'name=$(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+				$(ECHO) 'enabled=1'; else $(ECHO) 'enabled=0'; fi ; \
+			$(ECHO) 'autorefresh=1'; \
+			$(ECHO) 'baseurl=$(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'type=rpm-md'; \
+			$(ECHO) 'gpgcheck=1'; \
+			$(ECHO) 'gpgkey=$(reposerv)://$(repobase)/pubkey.asc'; \
+			$(ECHO) 'keeppackages=0'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
 
 INSTALL_ZYPP_REPOS = $(PACKAGE).zypp.repo
 
 if MAINTAINER_MODE
 
+##
+## The only purpose for making this file in the build directory before installing it is for
+## debugging.  This data really needs to be split into 3 files for them to be installed directly
+## into /etc/zypp/repos.d/.  Otherwise, they really need to be formatted identical to a yum .repo
+## file so that zypper can be used to import them.
+##
 $(PACKAGE)-local.zypp.repo: Makefile
-	( \
-		$(ECHO) '[@PACKAGE@-local]'; \
-		$(ECHO) 'name=@PACKAGE_TITLE@ Local Repository'; \
-		$(ECHO) 'enabled=1'; \
-		$(ECHO) 'autorefresh=0'; \
-		$(ECHO) 'baseurl=file:$(topdir)'; \
-		$(ECHO) 'gpgcheck=1'; \
-		$(ECHO) 'gpgkey=file:$(tardir)/OPENSS7-GPG-KEY'; \
-		$(ECHO) 'keeppackages=0'; \
-	) >$@
+	rb=`echo '$(repobranch)' | sed 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
+			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+		test -d '$(rpmdistdir}'"$${s:+/$$s}" || continue ; \
+		for repo in '' 'Main' 'Debug' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,' ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,SRPMS,' ; \
+			$(ECHO) '[$(PACKAGE)-local'$${b:+-$$b}$${r:+-$$r}']' ; \
+			$(ECHO) 'name=$(PACKAGE_TITLE) Local'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
+				$(ECHO) 'enabled=1'; else $(ECHO) 'enabled=0'; fi ; \
+			$(ECHO) 'autorefresh=0'; \
+			$(ECHO) 'baseurl=file://$(rpmdistdir)'$${s:+/$$s}$${d:+/$$d}; \
+			$(ECHO) 'gpgcheck=1'; \
+			$(ECHO) 'gpgkey=file://$(tardir)/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'keeppackages=0'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
 
 INSTALL_ZYPP_REPOS += $(PACKAGE)-local.zypp.repo
 
@@ -216,13 +389,107 @@ post-zypp:
 	fi
 
 
-ALL_LOCAL			+= $(PACKAGE).zypp.repo
-INSTALL_DATA_LOCAL		+= install-zypp
-UNINSTALL_LOCAL			+= uninstall-zypp
-CLEANFILES			+= $(PACKAGE).zypp.repo
-POST_INSTALL_AM			+= post-zypp
+#ALL_LOCAL			+= $(PACKAGE).zypp.repo
+#INSTALL_DATA_LOCAL		+= install-zypp
+#UNINSTALL_LOCAL		+= uninstall-zypp
+#CLEANFILES			+= $(PACKAGE).zypp.repo
+#POST_INSTALL_AM		+= post-zypp
 
 MY_PHONY			+= install-zypp uninstall-zypp post-zypp
+
+##
+## Install zypp installation sources for both remote and local repositories.
+## Install a zypp installation source for both remote and local repositories.
+## This involves downloading the @PACKAGE_UCNAME@credentials file, activating the
+## @PACKAGE@ service, and creating the @PACKAGE@-local.repo file.  Aside from the
+## credentials file, this can be accomplished with zypper commands alone.
+##
+repo-install-zypp:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test ! -d '$(DESTDIR)$(zyppcreddir)' ; then \
+		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(zyppcreddir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(zyppcreddir) ; \
+	fi
+	( \
+		cd $(DESTDIR)$(zyppcreddir) ; \
+		un=; pw=; \
+		for p in '$(PACKAGE_UCNAME)' 'NCC' ; do \
+			for s in '' '.rpmsave' '.rpmnew' ; do \
+				f="$${p}credentials$${s}" ; \
+				if test -e $$f ; then \
+					un=`sed -r 's,^username=([^[:space:]]*)$$,\1,;t;d' $$f` ; \
+					pw=`sed -r 's,^password=([^[:space:]]*)$$,\1,;t;d' $$f` ; \
+					break ; \
+				fi ; \
+			done ; \
+		done ; \
+		f='$(PACKAGE_UCNAME)credentials' ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
+		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+		rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
+			if echo "$$url" | wget -i - 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				echo 'Authorization required for repository access.' >/dev/tty ; \
+				u=; p=; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty ; \
+				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
+				echo '' >/dev/tty ; 
+				url='$(reposerv)://'"$${u:+$$u$${p:+:$$p}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+				rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+	)
+	f='$(DESTDIR)$(zyppconfig)' ; \
+	if test -f $$f ; then \
+		mv -f -- $$f $$f.rpmsave ; \
+		sed -r 's,^multiversion.*$$,multiversion = provides:multiversion(kernel),' $$f.rpmsave >$$f ; \
+		if diff $$f.rpmsave $$f >/dev/null 2>&1 ; then \
+			mv -f -- $$f.rpmsave $$f ; \
+		fi ; \
+	fi
+	zypper addservice -t ris -n '$(PACKAGE_UCNAME)-service' \
+		'$(reposerv)://$(repobase)/?credentials=$(PACKAGE_UCNAME)credentials' \
+		'$(PACKAGE_UCNAME)-service'
+	zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-service'
+	if test :$$(basename '$(DISTDIR)') = ':repo' ; then \
+		zypper addservice -t ris -n '$(PACKAGE_UCNAME)-local-service' \
+			"file://`dirname '$(DISTDIR)'`" \
+			'$(PACKAGE_UCNAME)-local-service' ; \
+		zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-local-service' ; \
+	fi
+	zypper refresh
+
+##
+## To remove a zypper install source, first remove any changes that we made to the zypp.conf file.
+## The original zypp.conf file is saved before making changes in zypp.conf.rpmsave (when changes
+## were actually made).  Restore zypp.conf.rpmsave to zypp.conf.  Copy the
+## @PACKAGE_UCNAME@credentials file to @PACKAGE_UCNAME@credentials.rpmsave so that the credentials
+## will be maintained even when the services have been removed.  Next remove the
+## @PACKAGE_UCNAME@-service and @PACKAGE_UCNAME@-local-service services and refresh zypper.
+##
+repo-uninstall-zypp:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(DESTDIR)$(zyppconfig)' ; \
+	if test -f $$f.rpmsave ; then \
+		if test -f $$f ; then \
+			if ! diff $$f $$f.rpmsave >/dev/null 2>&1 ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+		fi ; \
+		$(ECHO) "rm -f -- $$f.rpmsave" ; \
+		rm -f -- $$f.rpmsave ; \
+	fi
+	zypper removeservice --loose-auth --loose-query '$(PACKAGE_UCNAME)-service'
+	zypper removeservice --loose-auth --loose-query '$(PACKAGE_UCNAME)-local-service'
+	@$(ECHO) "zypper refresh" ; \
+	zypper refresh || :
+
+REPO_INSTALL			+= repo-install-zypp
+REPO_UNINSTALL			+= repo-uninstall-zypp
 
 ## WITH_ZYPP_SOURCE
 endif
@@ -260,11 +527,11 @@ uninstall-apt:
 post-apt:
 	aptitude refresh
 
-ALL_LOCAL			+= $(PACKAGE).sources.list
-INSTALL_DATA_LOCAL		+= install-apt
-UNINSTALL_LOCAL			+= uninstall-apt
-CLEANFILES			+= $(PACKAGE).sources.list
-POST_INSTALL_AM			+= post-apt
+#ALL_LOCAL			+= $(PACKAGE).sources.list
+#INSTALL_DATA_LOCAL		+= install-apt
+#UNINSTALL_LOCAL		+= uninstall-apt
+#CLEANFILES			+= $(PACKAGE).sources.list
+#POST_INSTALL_AM		+= post-apt
 
 MY_PHONY			+= install-apt uninstall-apt post-apt
 
@@ -279,6 +546,9 @@ EXTRA_DIST += scripts/OPENSS7-GPG-KEY
 ## =============================================================================
 ##
 ## $Log: repo.am,v $
+## Revision 1.1.2.2  2011-02-28 19:51:29  brian
+## - better repository build
+##
 ## Revision 1.1.2.1  2011-02-17 18:34:10  brian
 ## - repository and rpm build updates
 ##

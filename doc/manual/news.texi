@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 1.1.2.5 2011-02-07 02:21:34 brian Exp $
+@c @(#) $Id: news.texi,v 1.1.2.6 2011-02-28 19:51:29 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-02-07 02:21:34 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -91,6 +91,7 @@ The sections that follow provide information on OpenSS7 releases of the
 @ifnothtml
 @menu
 * Release @value{PACKAGE}-@value{VERSION}::	Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}
+* Release @value{PACKAGE}-1.1.1.20110111::	Release 1.20110111
 * Release @value{PACKAGE}-1.1.1.20090908::	Release 1.20090908
 * Release @value{PACKAGE}-1.1.1.20090901::	Release 1.20090901
 * Release @value{PACKAGE}-1.1.1.20090622::	Release 1.20090622
@@ -114,6 +115,22 @@ The sections that follow provide information on OpenSS7 releases of the
 @node Release @value{PACKAGE}-@value{VERSION}
 @unnumberedsubsec Major changes for release @value{PACKAGE}-@value{VERSION}
 @cindex release @value{PACKAGE}-@value{VERSION}
+
+This is the fifth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
+release.  All existing validation test suites run clean on supported distributions, production
+kernels and architectures.
+
+Major features since the last release are as follows:
+
+@itemize -
+@item
+Support for @file{repomd} repository.
+
+@end itemize
+
+@node Release @value{PACKAGE}-1.1.1.20110111
+@unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.1.20110111
+@cindex release @value{PACKAGE}-1.1.1.20110111
 
 This is the fourth release of the @cite{@value{PACKAGE_TITLE}} package.  This is a production grade
 release.  All existing validation test suites run clean on supported distributions, production
@@ -143,7 +160,6 @@ Support for Debian Squeeze on a 2.6.32-5 kernel.
 Preparatory support for Debian Wheezy.
 
 @end itemize
-
 
 @node Release @value{PACKAGE}-1.1.1.20090908
 @unnumberedsubsec Major changes for release @value{PACKAGE}-1.1.1.20090908

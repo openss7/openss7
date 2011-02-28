@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2011-02-17 18:34:09 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2011-02-28 19:51:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-17 18:34:09 $ by $Author: brian $
+# Last Modified $Date: 2011-02-28 19:51:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2994,7 +2994,7 @@ EXTRA_DIST			+= centos-5.5-x86_64-config.cache \
 				   debian-squeeze-i386-config.cache \
 				   redhat-6.0-x86_64-config.cache \
 				   redhat-7.2-i686-config.cache \
-				   suse-11-x86_64-config.cache
+				   sle-11-x86_64-config.cache
 
 MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 				   $(top_srcdir)/config.h.in \
@@ -3013,6 +3013,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.15  2011-02-28 19:51:27  brian
+# - better repository build
+#
 # Revision 1.1.2.14  2011-02-17 18:34:09  brian
 # - repository and rpm build updates
 #

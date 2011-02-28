@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo
 @c =========================================================================
 @c
-@c @(#) $Id: args.texi.in,v 1.1.2.2 2011-02-10 17:29:46 brian Exp $
+@c @(#) $Id: args.texi.in,v 1.1.2.3 2011-02-28 19:51:30 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -54,7 +54,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-02-10 17:29:46 $ by $Author: brian $
+@c Last Modified $Date: 2011-02-28 19:51:30 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -67,7 +67,6 @@
 @set PACKAGE_DEBOPTIONS @PACKAGE_DEBOPTIONS@
 @set PACKAGE_DEBRELEASE @PACKAGE_DEBRELEASE@
 @set PACKAGE_DEBTOPDIR @PACKAGE_DEBTOPDIR@
-@set PACKAGE_DISTDIR @PACKAGE_DISTDIR@
 @set PACKAGE_EPOCH @PACKAGE_EPOCH@
 @set PACKAGE_KNUMBER @PACKAGE_KNUMBER@
 @set PACKAGE_KVERSION @PACKAGE_KVERSION@

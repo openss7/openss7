@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: repo.m4,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-02-17 18:34:10 $
+# @(#) $RCSfile: repo.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-28 19:51:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+# Last Modified $Date: 2011-02-28 19:51:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,6 +57,7 @@
 # _REPO
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO], [dnl
+    AC_REQUIRE([_DISTRO])dnl
     AC_MSG_NOTICE([+--------------------+])
     AC_MSG_NOTICE([| Repository Sources |])
     AC_MSG_NOTICE([+--------------------+])
@@ -82,6 +83,22 @@ AC_DEFUN([_REPO_OPTIONS], [dnl
 	[AS_HELP_STRING([--with-install-source-apt=@<:@SOURCESDIR@:>@],
 	    [APT sources directory @<:@default=search@:>@])],
 	[], [with_install_source_apt=search])
+    AC_ARG_WITH([repo-root],
+	[AS_HELP_STRING([--with-repo-root=@<:@REPOROOT@:>@],
+	    [repository root path @<:@default=repo@:>@])],
+	[], [with_repo_root='repo'])
+    AC_ARG_WITH([repo-base],
+	[AS_HELP_STRING([--with-repo-base=@<:@REPOBASE@:>@],
+	    [repository base path @<:@default=www.openss7.org@:>@])],
+	[], [with_repo_base='www.openss7.org'])
+    AC_ARG_WITH([repo-branch],
+	[AS_HELP_STRING([--with-repo-branch=@<:@REPOBRANCH@:>@],
+	    [repository branch path @<:@default=main@:>@])],
+	[], [with_repo_branch=])
+    AC_ARG_WITH([repo-service],
+	[AS_HELP_STRING([--with-repo-service=@<:@REPOSERVICE@:>@])],
+	    [repository service @<:@default=https@:>@],
+	[], [with_repo_service='https'])
 ])# _REPO_OPTIONS
 # =============================================================================
 
@@ -89,6 +106,21 @@ AC_DEFUN([_REPO_OPTIONS], [dnl
 # _REPO_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP], [dnl
+    AC_MSG_CHECKING([for repo root])
+    repo_cv_reporoot="${with_repo_root:-repo}"
+    AC_MSG_RESULT(["$repo_cv_reporoot"])
+    AC_MSG_CHECKING([for repo base])
+    repo_cv_repobase="${with_repo_base:-www.openss7.org}"
+    AC_MSG_RESULT(["$repo_cv_repobase"])
+    AC_MSG_CHECKING([for repo branch])
+    repo_cv_repobranch="${with_repo_branch}"
+    AC_MSG_RESULT(["$repo_cv_repobranch"])
+    AC_MSG_CHECKING([for repo service])
+    repo_cv_reposervice="${with_repo_service:-https}"
+    AC_MSG_RESULT(["$repo_cv_reposervice"])
+    AC_MSG_CHECKING([for repo subdirectory])
+    repo_cv_dist_subdir="${host_distro}/${host_edition}/${host_cpu}"
+    AC_MSG_RESULT(["$repo_cv_dist_subdir"])
     AC_CACHE_CHECK([for yum repo directory], [repo_cv_yum_repodir], [dnl
 	case "${with_install_source_yum:-search}" in
 	    (no) repo_cv_yum_repodir=no ;;
@@ -165,6 +197,66 @@ AC_DEFUN([_REPO_SETUP], [dnl
 	test -n "$repo_cv_rpm_gpgdir" || repo_cv_rpm_gpgdir=no
 	AC_MSG_CHECKING([for rpm gpg directory])
     ])
+    AC_CACHE_CHECK([for zypp cred directory], [repo_cv_zypp_creddir], [dnl
+	case "${with_credentials_zypp:-search}" in
+	    (no) repo_cv_zypp_creddir=no ;;
+	    (yes|search) ;;
+	    (*) if test -d "$with_credentials_zypp" ; then
+		repo_cv_zypp_creddir="$with_credentials_zypp"
+		fi ;;
+	esac
+	if test -z "$repo_cv_zypp_creddir" ; then
+	    eval "repo_search_path=\"
+		${DESTDIR}${rootdir}${sysconfdir}/zypp/credentials.d
+		${DESTDIR}${rootdir}/etc/zypp/credentials.d
+		${DESTDIR}${sysconfdir}/zypp/credentials.d
+		${DESTDIR}/etc/zypp/credentials.d\""
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    AC_MSG_RESULT([searching])
+	    for repo_dir in $repo_search_path ; do
+		AC_MSG_CHECKING([for zypp cred directory... $repo_dir])
+		if test -d "$repo_dir" ; then
+		    repo_cv_zypp_creddir="$repo_dir"
+		    AC_MSG_RESULT([yes])
+		    break
+		else
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    test -n "$repo_cv_zypp_creddir" || repo_cv_zypp_creddir=no
+	    AC_MSG_CHECKING([for zypp cred directory])
+	fi
+    ])
+    AC_CACHE_CHECK([for zypp serv directory], [repo_cv_zypp_servdir], [dnl
+	case "${with_services_zypp:-search}" in
+	    (no) repo_cv_zypp_servdir=no ;;
+	    (yes|search) ;;
+	    (*) if test -d "$with_services_zypp" ; then
+		repo_cv_zypp_servdir="$with_services_zypp"
+		fi ;;
+	esac
+	if test -z "$repo_cv_zypp_servdir" ; then
+	    eval "repo_search_path=\"
+		${DESTDIR}${rootdir}${sysconfdir}/zypp/services.d
+		${DESTDIR}${rootdir}/etc/zypp/services.d
+		${DESTDIR}${sysconfdir}/zypp/services.d
+		${DESTDIR}/etc/zypp/services.d\""
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    AC_MSG_RESULT([searching])
+	    for repo_dir in $repo_search_path ; do
+		AC_MSG_CHECKING([for zypp serv directory... $repo_dir])
+		if test -d "$repo_dir" ; then
+		    repo_cv_zypp_servdir="$repo_dir"
+		    AC_MSG_RESULT([yes])
+		    break
+		else
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    test -n "$repo_cv_zypp_servdir" || repo_cv_zypp_servdir=no
+	    AC_MSG_CHECKING([for zypp serv directory])
+	fi
+    ])
     AC_CACHE_CHECK([for zypp repo directory], [repo_cv_zypp_repodir], [dnl
 	case "${with_install_source_zypp:-search}" in
 	    (no) repo_cv_zypp_repodir=no ;;
@@ -195,7 +287,7 @@ AC_DEFUN([_REPO_SETUP], [dnl
 	    AC_MSG_CHECKING([for zypp repo directory])
 	fi
     ])
-    AC_CACHE_CHECK([for zypp config file], [rpm_cv_zypp_config], [dnl
+    AC_CACHE_CHECK([for zypp config file], [repo_cv_zypp_config], [dnl
 	eval "repo_search_path=\"
 	    ${DESTDIR}${rootdir}${sysconfdir}/zypp/zypp.conf
 	    ${DESTDIR}${rootdir}/etc/zypp/zypp.conf
@@ -274,6 +366,31 @@ AC_DEFUN([_REPO_SETUP], [dnl
 # _REPO_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_OUTPUT], [dnl
+    reporoot='repo'
+    if test :"${repo_cv_reporoot:-no}" != :no ; then
+	reporoot="$repo_cv_reporoot"
+    fi
+    AC_SUBST([reporoot])dnl
+    repobase='www.openss7.org'
+    if test :"${repo_cv_repobase:-no}" != :no ; then
+	repobase="$repo_cv_repobase"
+    fi
+    AC_SUBST([repobase])dnl
+    repobranch=
+    if test :"${repo_cv_branch:-no}" != :no ; then
+	repobranch="$repo_cv_repobranch"
+    fi
+    AC_SUBST([repobranch])dnl
+    reposerv='https'
+    if test :"${repo_cv_reposervice:-no}" != :no ; then
+	reposerv="$repo_cv_reposervice"
+    fi
+    AC_SUBST([reposerv])dnl
+    reposubdir=
+    if test :"${repo_cv_dist_subdir:-no}" != :no ; then
+	reposubdir="$repo_cv_dist_subdir"
+    fi
+    AC_SUBST([reposubdir])dnl
     yumrepodir=
     if test :"${repo_cv_yum_repodir:-no}" != :no ; then
 	yumrepodir="$repo_cv_yum_repodir"
@@ -290,6 +407,16 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	rpmgpgdir="$repo_cv_rpm_gpgdir"
     fi
     AC_SUBST([rpmgpgdir])dnl
+    zyppcreddir=
+    if test :"${repo_cv_zypp_creddir:-no}" != :no ; then
+	zyppcreddir="$repo_cv_zypp_creddir"
+    fi
+    AC_SUBST([zyppcreddir])dnl
+    zyppservdir=
+    if test :"${repo_cv_zypp_servdir:-no}" != :no ; then
+	zyppservdir="$repo_cv_zypp_servdir"
+    fi
+    AC_SUBST([zyppservdir])dnl
     zypprepodir=
     if test :"${repo_cv_zypp_repodir:-no}" != :no ; then
 	zypprepodir="$repo_cv_zypp_repodir"
@@ -325,6 +452,9 @@ AC_DEFUN([_REPO_], [dnl
 # =============================================================================
 #
 # $Log: repo.m4,v $
+# Revision 1.1.2.2  2011-02-28 19:51:30  brian
+# - better repository build
+#
 # Revision 1.1.2.1  2011-02-17 18:34:10  brian
 # - repository and rpm build updates
 #
