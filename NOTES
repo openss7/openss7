@@ -1,6 +1,6 @@
 OpenSS7 -- notes.  2009-05-14
 $Id$
-Copyright (c) 2008-2009  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
@@ -21,7 +21,7 @@ How to go about doing a release number update:
 
 =========================================================================
 
- Copyright (c) 2008-2009  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
 
