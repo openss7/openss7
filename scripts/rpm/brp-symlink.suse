@@ -93,7 +93,9 @@ do
 	     echo " skip the files from packaging)"
 	     exit 1
 	     ;;
-	*,/opt/kde3/share/doc/HTML/*/common) # white listed for not existant
+	*,/opt/kde3/share/doc*/HTML/*/common) # white listed for not existant
+	     ;;
+	*,usr/share/doc/kde/HTML/*/common) # white listed for not existant
 	     ;;
 	*,/proc/*) # links pointing into /proc file system
 	     ;;
