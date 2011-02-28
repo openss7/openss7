@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-07 04:48:32 $
+# @(#) $RCSfile: pr.m4,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-28 19:51:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
+# Last Modified $Date: 2011-02-28 19:51:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,21 +72,30 @@ AC_DEFUN([_AUTOPR], [dnl
 AC_DEFUN([_AUTOPR_SETUP], [dnl
     AC_CACHE_CHECK([for send-pr distribution], [ap_cv_distribution], [dnl
 	case "$dist_cv_host_flavor" in
-	    (centos)	ap_cv_distribtuion="COS$dist_cv_host_release"	;;
-	    (lineox)	ap_cv_distribution="LEL$dist_cv_host_release"	;;
-	    (whitebox)	ap_cv_distribution="WBEL$dist_cv_host_release"	;;
-	    (fedora)	ap_cv_distribution="FC$dist_cv_host_release"	;;
+	    (centos)	 ap_cv_distribution="COS$dist_cv_host_release"	    ;;
+	    (lineox)	 ap_cv_distribution="LEL$dist_cv_host_release"	    ;;
+	    (whitebox)	 ap_cv_distribution="WBEL$dist_cv_host_release"	    ;;
+	    (fedora)	 ap_cv_distribution="FC$dist_cv_host_release"	    ;;
 	    (redhat)
 		case $dist_cv_host_release in
 		    (6.2|7.[[0-3]]|8.0|9)
 				ap_cv_distribution="RH$dist_cv_host_release" ;;
 		    (2|2.?)	ap_cv_distribution="RHAS2" ;;
-		    (3|3.0)	ap_cv_distribution="RHEL3" ;;
-		    (4|4.0)	ap_cv_distribution="RHEL4" ;;
-		    (5|5.0)	ap_cv_distribution="RHEL5" ;;
+		    (3|3.?)	ap_cv_distribution="RHEL3" ;;
+		    (4|4.?)	ap_cv_distribution="RHEL4" ;;
+		    (5|5.?)	ap_cv_distribution="RHEL5" ;;
 		    (*)		ap_cv_distribution="RH$dist_cv_host_release" ;;
 		esac ;;
-	    (mandrake)	ap_cv_distribution="MDK$dist_cv_host_release"	;;
+	    (rhel)
+		case $dist_cv_host_release in
+		    (2|2.?)	ap_cv_distribution="RHAS2" ;;
+		    (3|3.?)	ap_cv_distribution="RHEL3" ;;
+		    (4|4.?)	ap_cv_distribution="RHEL4" ;;
+		    (5|5.?)	ap_cv_distribution="RHEL5" ;;
+		    (6|6.?)	ap_cv_distribution="RHEL6" ;;
+		    (*)		ap_cv_distribution="RHEL$dist_cv_host_release" ;;
+	        esac ;;
+	    (mandrake)	 ap_cv_distribution="MDK$dist_cv_host_release"	    ;;
 	    (suse)
 	        case $dist_cv_host_release in
 		    (6.2|7.[[0-3]]|8.[[0-3]]|9.[[0-3]])
@@ -94,13 +103,16 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 		    (8|9|10)	ap_cv_distribution="SLES$dist_cv_host_release"	;;
 		    (*)		ap_cv_distribution="SuSE$dist_cv_host_release"	;;
 		esac ;;
-	    (debian)	ap_cv_distribution="Debian$dist_cv_host_release" ;;
-	    (ubuntu)	ap_cv_distribution="Ubuntu$dist_cv_host_release" ;;
-	    (montavista) ap_cv_distribtuion="MontaVista"		;;
-	    (bluecat)	ap_cv_distribution="BlueCat"			;;
-	    (yellowdog)	ap_cv_distribution="YellowDog"			;;
-	    (denx)	ap_cv_distribution="ELDK"			;;
-	    (*)		ap_cv_distribution='other'			;;
+	    (sles)	 ap_cv_distribution="SLES$dist_cv_host_release"	    ;;
+	    (sled)	 ap_cv_distribution="SLED$dist_cv_host_release"	    ;;
+	    (sle)	 ap_cv_distribution="SLE$dist_cv_host_release"	    ;;
+	    (debian)	 ap_cv_distribution="Debian$dist_cv_host_release"   ;;
+	    (ubuntu)	 ap_cv_distribution="Ubuntu$dist_cv_host_release"   ;;
+	    (montavista) ap_cv_distribution="MontaVista"		    ;;
+	    (bluecat)	 ap_cv_distribution="BlueCat"			    ;;
+	    (yellowdog)	 ap_cv_distribution="YellowDog"			    ;;
+	    (denx)	 ap_cv_distribution="ELDK"			    ;;
+	    (*)		 ap_cv_distribution='other'			    ;;
 	esac
 	])
     AP_DISTRIBUTION="$ap_cv_distribution"
@@ -138,6 +150,9 @@ AC_DEFUN([_AUTOPR_], [dnl
 # =============================================================================
 #
 # $Log: pr.m4,v $
+# Revision 1.1.2.3  2011-02-28 19:51:30  brian
+# - better repository build
+#
 # Revision 1.1.2.2  2011-02-07 04:48:32  brian
 # - updated configure and build scripts
 #

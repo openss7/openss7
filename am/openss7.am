@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-01-18 17:11:41 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-02-28 19:51:29 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-01-18 17:11:41 $ by $Author: brian $
+## Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -185,6 +185,7 @@ RELEASE_FILES		=
 
 RELEASE			=
 RELEASE_SIGN		=
+RELEASE_LINKS		=
 RELEASE_DIRECTORIES	=
 
 UPDATE			=
@@ -195,6 +196,8 @@ REPO			=
 REPO_SIGN		=
 REPO_CLEAN		=
 REPO_DIRECTORIES	=
+REPO_INSTALL		=
+REPO_UNINSTALL		=
 
 FORCED_TARGETS		=
 FORCE			=
@@ -897,6 +900,26 @@ repo-clean: $(REPO_CLEAN)
 
 MY_PHONY		+= repo-clean $(REPO_CLEAN)
 
+#! repo-install:
+#! 	Installs the repository definitions necessary for an install source on
+#! 	the build machine.  This may include installing APT, YUM, ZYPPER or YaST
+#! 	repository definitions.  This is primarily for testing repository
+#! 	definitions and installation procedures.  Must be executed as root.
+#!
+repo-install: $(REPO_INSTALL)
+
+MY_PHONY		+= repo-install $(REPO_INSTALL)
+
+#! repo-uninstall:
+#! 	Removes the repository definitions necessary for an install source on
+#! 	the build machine.  This may include removing APT, YUM, ZYPPER or YaST
+#! 	repository definitions.  This is primarily for testing repository
+#! 	definitions and removal procedures.  Must be exectued as root.
+#!
+repo-uninstall: $(REPO_UNINSTALL)
+
+MY_PHONY		+= repo-uninstall $(REPO_UNINSTALL)
+
 $(RELEASE_DIRECTORIES)::
 	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
 
@@ -921,9 +944,9 @@ $(RELEASE_DIRECTORIES)::
 #!     The release target will not regenerate any files that already exist in
 #!     the package distribution directory.  This forced target will.
 #!
-release: $(RELEASE_DIRECTORIES) $(RELEASE)
+release: $(RELEASE_DIRECTORIES) $(RELEASE_LINKS) $(RELEASE)
 
-MY_PHONY		+= release $(RELEASE)
+MY_PHONY		+= release $(RELEASE_LINKS) $(RELEASE)
 FORCED_TARGETS		+= forced-release
 
 #! release-files:
@@ -944,9 +967,9 @@ MY_PHONY		+= release-files-am release-files
 #!     The release-sign target will not regenerate any files that already exist
 #!     in the package distribution directory.  This forced target will.
 #!
-release-sign: $(RELEASE_DIRECTORIES) $(RELEASE_SIGN)
+release-sign: $(RELEASE_DIRECTORIES) $(RELEASE_LINKS) $(RELEASE_SIGN)
 
-MY_PHONY		+= release-sign $(RELEASE_SIGN)
+MY_PHONY		+= release-sign $(RELEASE_LINKS) $(RELEASE_SIGN)
 FORCED_TARGETS		+= forced-release-sign
 
 #! release-clean:
@@ -1140,6 +1163,9 @@ DISTCLEANFILES		+= $(CONFIG_BLDREQ)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 1.1.2.8  2011-02-28 19:51:29  brian
+## - better repository build
+##
 ## Revision 1.1.2.7  2011-01-18 17:11:41  brian
 ## - add files back to the build
 ##

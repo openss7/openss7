@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-02-07 04:48:32 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-28 19:51:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
+# Last Modified $Date: 2011-02-28 19:51:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -733,26 +733,19 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_PATCHLEVEL], [dnl
 # _OPENSS7_OPTIONS_PKG_DISTDIR
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_DISTDIR], [dnl
-    pkg_tmp=`(cd . ; pwd)`
     AC_ARG_WITH([pkg-distdir],
 	[AS_HELP_STRING([--with-pkg-distdir=DIR],
 	    [package distribution directory @<:@default=.@:>@])],
-	[], [with_pkg_distdir="$pkg_tmp"])
-    AC_CACHE_CHECK([for pkg distdir], [pkg_cv_distdir], [dnl
-	case :"${with_pkg_distdir:-default}" in
-	    (:no|:NO)
-		pkg_cv_distdir="$pkg_tmp"
-		;;
-	    (:yes|:YES|:default|:DEFAULT)
-		pkg_cv_distdir="/usr/src"
-		;;
-	    (*)
-		pkg_cv_distdir="$with_pkg_distdir"
-		;;
+	[], [with_pkg_distdir=`pwd`/repo])
+    AC_MSG_CHECKING([for pkg distdir])
+    if test ":${DISTDIR+set}" != :set ; then
+	case :"${with_pkg_distdir:-no}" in
+	    (:no|:yes) DISTDIR=`pwd`/repo ;;
+	    (*)        DISTDIR="$with_pkg_distdir" ;;
 	esac
-    ])
-    PACKAGE_DISTDIR="$pkg_cv_distdir"
-    AC_SUBST([PACKAGE_DISTDIR])dnl
+    fi
+    AC_MSG_RESULT([$DISTDIR])
+    AC_SUBST([DISTDIR])dnl
 ])# _OPENSS7_OPTIONS_PKG_DISTDIR
 # =============================================================================
 
@@ -764,29 +757,18 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_DISTDIR], [dnl
 # subdirectory name (tarballs).
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_TARDIR], [dnl
-    if test :"$PACKAGE_DISTDIR" = :`pwd` ; then
-	pkg_tmp='$(PACKAGE_DISTDIR)'
-    else
-	pkg_tmp='$(PACKAGE_DISTDIR)/tarballs'
-    fi
     AC_ARG_WITH([pkg-tardir],
 	[AS_HELP_STRING([--with-pkg-tardir=DIR],
 	    [tarball directory @<:@default=PKG-DISTDIR/tarballs@:>@])],
-	[], [with_pkg_tardir="$pkg_tmp"])
-    AC_CACHE_CHECK([for pkg tardir], [pkg_cv_tardir], [dnl
-	case :"${with_pkg_tardir:-default}" in
-	    (:no|:NO)
-		pkg_cv_tardir="$pkg_tmp"
-		;;
-	    (:yes|:YES|:default|:DEFAULT)
-		pkg_cv_tardir="$pkg_cv_distdir"
-		;;
-	    (*)
-		pkg_cv_tardir="$with_pkg_tardir"
-		;;
+	[], [with_pkg_tardir='$(DISTDIR)/tarballs'])
+    AC_MSG_CHECKING([for pkg tardir])
+    if test ":${tardir+set}" != :set ; then
+	case :"${with_pkg_tardir:-no}" in
+	    (:no|:yes)	tardir='$(DISTDIR)/tarballs'	;;
+	    (*)		tardir="$with_pkg_tardir"	;;
 	esac
-    ])
-    tardir="$pkg_cv_tardir"
+    fi
+    AC_MSG_RESULT([$tardir])
     AC_SUBST([tardir])dnl
 ])# _OPENSS7_OPTIONS_PKG_TARDIR
 # =============================================================================
@@ -1225,6 +1207,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 1.1.2.10  2011-02-28 19:51:30  brian
+# - better repository build
+#
 # Revision 1.1.2.9  2011-02-07 04:48:32  brian
 # - updated configure and build scripts
 #

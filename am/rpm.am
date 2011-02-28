@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-02-17 18:34:10 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-28 19:51:29 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+## Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -87,7 +87,8 @@ RPMOPTS			= $(PACKAGE_RPMOPTIONS) \
 			  --define "_rpmdir $(rpmdir)" \
 			  --define "_srcrpmdir $(srcrpmdir)" \
 			  --define "_specdir $(specdir)" \
-			  --define "_buildrootdir $(rpmbuildrootdir)"
+			  --define "_buildrootdir $(rpmbuildrootdir)" \
+			  --define "_rpmsubdir $(reposubdir)"
 
 ##
 # Note that we created the usual rpm directories as well.  This is because rpm sometimes complains
@@ -813,28 +814,52 @@ if BUILD_REPO_YUM
 ## The following builds repomd repositories.
 ##
 
-RELEASE_DIRECTORIES	+= $(repodir)
+RELEASE_DIRECTORIES	+= $(repodir) $(repomaindir) $(repodebgdir) $(reposrcsdir)
 
-repomd_files		= $(repodir)/repomd.xml \
-			  $(repodir)/primary.xml.gz \
-			  $(repodir)/filelists.xml.gz \
-			  $(repodir)/other.xml.gz \
-			  $(repodir)/susedata.xml.gz \
-			  $(repodir)/patterns.xml.gz \
-			  $(repodir)/products.xml.gz
+repomd_heads		= $(repodir)/repomd.xml \
+			  $(repomaindir)/repomd.xml \
+			  $(repodebgdir)/repomd.xml \
+			  $(reposrcsdir)/repomd.xml
 
-repomd_signs		= $(repodir)/repomd.xml.asc
+repomd_signs		= $(repodir)/repomd.xml.asc \
+			  $(repomaindir)/repomd.xml.asc \
+			  $(repodebgdir)/repomd.xml.asc \
+			  $(reposrcsdir)/repomd.xml.asc
 
-repomd_group		= $(repodir)/comps.xml
+repomd_group		= $(repodir)/comps.xml \
+			  $(repomaindir)/comps.xml \
+			  $(repodebgdir)/comps.xml \
+			  $(reposrcsdir)/comps.xml
 
-#!
-#! YUM Build Targets:
-#! ------------------
-#!
-#! On rpm systems, or systems supporting rpm packaging tools and repomd
-#! repository metadata creation tools, the following targets are used to
-#! manage repomd source repository meta data files.
-#!
+repomd_repos		= $(repodir)/$(PACKAGE).repo \
+			  $(repodir)/$(PACKAGE)-local.repo
+
+repomd_files		= $(repomd_heads) $(repomd_signs) $(repomd_group) $(repomd_repos) \
+			  $(repodir)/*primary.xml.gz $(repodir)/*filelists.xml.gz \
+			  $(repodir)/*other.xml.gz $(repodir)/*susedata.xml.gz \
+			  $(repodir)/*patterns.xml.gz $(repodir)/*products.xml.gz \
+			  $(repodir)/*product.xml.gz \
+			  $(repomaindir)/*primary.xml.gz $(repomaindir)/*filelists.xml.gz \
+			  $(repomaindir)/*other.xml.gz $(repomaindir)/*susedata.xml.gz \
+			  $(repomaindir)/*patterns.xml.gz $(repomaindir)/*products.xml.gz \
+			  $(repomaindir)/*product.xml.gz \
+			  $(repodebgdir)/*primary.xml.gz $(repodebgdir)/*filelists.xml.gz \
+			  $(repodebgdir)/*other.xml.gz $(repodebgdir)/*susedata.xml.gz \
+			  $(repodebgdir)/*patterns.xml.gz $(repodebgdir)/*products.xml.gz \
+			  $(repodebgdir)/*product.xml.gz \
+			  $(reposrcsdir)/*primary.xml.gz $(reposrcsdir)/*filelists.xml.gz \
+			  $(reposrcsdir)/*other.xml.gz $(reposrcsdir)/*susedata.xml.gz \
+			  $(reposrcsdir)/*patterns.xml.gz $(reposrcsdir)/*products.xml.gz \
+			  $(reposrcsdir)/*product.xml.gz
+
+repo-link-yum: $(RELEASE_DIRECTORIES)
+	( cd $(repodir)/../RPMS ; rm -f -- src   ; ln -sf ../SRPMS src )
+	( cd $(repomaindir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
+	( cd $(repodebgdir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
+	( cd $(reposrcsdir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
+
+RELEASE_LINKS		+= repo-link-yum
+
 $(repomd_group)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed 's|^.*/||'`; \
@@ -846,55 +871,70 @@ $(repomd_group)::
 		$(ECHO) "cp -f -- $$d$$f $@"; \
 		cp -f -- $$d$$f $@; }
 
-$(repodir)/openss7.repo: $(repodir)
+$(repodir)/$(PACKAGE).repo: $(repodir)
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	for branch in '' 'Updates' 'Extras' 'Testing' $$rb ; do \
+		b=`echo "$$branch" | sed 's,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
+			if test \( -z "$$branch" -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			$(ECHO) 'baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'gpgkey = $(reposerv)://$(repobase)/pubkey.asc'; \
+			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
+
+$(repodir)/$(PACKAGE)-local.repo: $(repodir)
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	for branch in '' 'Updates' 'Extras' 'Testing' $$rb ; do \
+		b=`echo "$$branch" | sed 's,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
+			test "$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+		for repo in '' 'Main' 'Debug' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
+			if test \( -z "$$branch" -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o -n '$(repobranch)' \) ; then \
+				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			$(ECHO) 'baseurl = file://$(rpmdistdir)'$${s:+/$$s}$${d:+/$$d}; \
+			$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
+
+$(repodir)/primary.xml.gz:
+	$(MAKE) $(AM_MAKEFLAGS) $$(dirname $@)/repomd.xml
+
+$(repomaindir)/primary.xml.gz:
+	$(MAKE) $(AM_MAKEFLAGS) $$(dirname $@)/repomd.xml
+
+$(repodebgdir)/primary.xml.gz:
+	$(MAKE) $(AM_MAKEFLAGS) $$(dirname $@)/repomd.xml
+
+$(reposrcsdir)/primary.xml.gz:
+	$(MAKE) $(AM_MAKEFLAGS) $$(dirname $@)/repomd.xml
+
+GENERATESUSEDATA = \
 	( \
-		$(ECHO) '[openss7]'; \
-		$(ECHO) 'enabled = 1'; \
-		$(ECHO) 'name = OpenSS7 Repository'; \
-		$(ECHO) 'baseurl = http://www.openss7.org/repos/rpms/$(PACKAGE_RPMSUBDIR)'; \
-		$(ECHO) 'gpgkey = http://www.openss7.org/repos/tarballs/OPENSS7-GPG-KEY'; \
-		$(ECHO) 'repo_gpgcheck = 1'; \
-		$(ECHO) 'gpgcheck = 1'; \
-		$(ECHO) ''; \
-		$(ECHO) '[openss7-local]'; \
-		$(ECHO) 'enabled = 0'; \
-		$(ECHO) 'name = OpenSS7 Local Repository'; \
-		$(ECHO) 'baseurl = file://$(topdir)'; \
-		$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
-		$(ECHO) 'repo_gpgcheck = 1'; \
-		$(ECHO) 'gpgcheck = 1'; \
-	) > $@
-
-$(repodir)/susedata.xml.gz:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test ! -f $@; then \
-		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) repo-suse"; \
-		$(MAKE) $(AM_MAKEFLAGS) repo-suse; \
-	fi
-
-$(repodir)/products.xml.gz: $(repodir)/repomd.xml scripts/products.xml
-	$(MODIFYREPO) $< $(repodir)
-
-$(repodir)/patterns.xml.gz: $(repodir)/repomd.xml scripts/patterns.xml
-	$(MODIFYREPO) $< $(repodir)
-
-#! repo-suse:
-#! 	Create (or recreate) the meta data files for a suse (repomd) repository
-#! 	in the package distribution directory, @repodir@/.  This target is
-#! 	primarily for generating the susedata.xml file.
-#!
-repo-suse: $(repodir) $(repodir)/repomd.xml scripts/products.xml scripts/patterns.xml
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' 2>/dev/null`; \
-	numb=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' 2>/dev/null | wc -l`; \
-	( \
-		$(ECHO) "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" ; \
-		$(ECHO) "<susedata packages=\"$$numb\">" ; \
-		for f in $$rpms; do \
+		$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
+		$(ECHO) "<susedata packages=\"$$numb\">"; \
+		for f in $$rpms ; do \
 			$(ECHO) $(ECHO_N) "  <package " ; \
 				$(ECHO) $(ECHO_N) "pkgid=\"`sha1sum $$f | awk '{print $$1}'`\" " ; \
 				$(ECHO) $(ECHO_N) "name=\"`rpm -q --qf '%{NAME}' -p $$f`\" " ; \
-				$(ECHO) $(ECHO_N) "arch=\"`rpm -q --qf '%{ARCH}' -p $$f`\"" ; \
+				case "$$(basename $$f)" in \
+				(*.src.rpm) $(ECHO) $(ECHO_N) "arch=\"src\"" ;; \
+				(*)         $(ECHO) $(ECHO_N) "arch=\"`rpm -q --qf '%{ARCH}' -p $$f`\"" ;; \
+				esac ; \
 				$(ECHO) ">" ; \
 			$(ECHO) $(ECHO_N) "    <version " ; \
 				$(ECHO) $(ECHO_N) "epoch=\"`rpm -q --qf '%{EPOCH}' -p $$f`\" " ; \
@@ -904,68 +944,206 @@ repo-suse: $(repodir) $(repodir)/repomd.xml scripts/products.xml scripts/pattern
 			$(ECHO) "    <keyword>support_l3</keyword>" ; \
 			$(ECHO) "  </package>" ; \
 		done ; \
-		$(ECHO) "</susedata>" ; \
-	) >susedata.xml
-	$(MODIFYREPO) susedata.xml $(repodir)
-	rm -f susedata.xml
-	$(MODIFYREPO) scripts/products.xml $(repodir)
-	$(MODIFYREPO) scripts/patterns.xml $(repodir)
+		$(ECHO) '</susedata>' \
+	) >susedata.xml ; \
+	rm -f -- $@ ; $(MODIFYREPO) susedata.xml `dirname $@` ; \
+	( cd `dirname $@` ; ls -t '*-'`basename $@` 2>/dev/null | head -1 | if read f ; then ln -sf $$f `basename $@` ; fi ) ; \
+	rm -f -- susedata.xml
 
+$(repodir)/susedata.xml.gz: $(repodir)/primary.xml.gz
+	@$(AM_V_GEN)\
+	rpms=`find $$(dirname $(repodir))/RPMS -follow -name '*.rpm' | sort -u` ; \
+	numb=`find $$(dirname $(repodir))/RPMS -follow -name '*.rpm' | wc -l` ; \
+	$(GENERATESUSEDATA)
+
+$(repomaindir)/susedata.xml.gz: $(repomaindir)/primary.xml.gz
+	@$(AM_V_GEN)\
+	rpms=`find $$(dirname $(repomaindir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | sort -u` ; \
+	numb=`find $$(dirname $(repomaindir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | wc -l` ; \
+	$(GENERATESUSEDATA)
+
+$(repodebgdir)/susedata.xml.gz: $(repodebgdir)/primary.xml.gz
+	@$(AM_V_GEN)\
+	rpms=`find $$(dirname $(repodebgdir))/RPMS -follow -name '*.rpm' | grep -v -- '\(source-\|\.src\.rpm$$\)' | grep -- '-debug' | sort -u` ; \
+	numb=`find $$(dirname $(repodebgdir))/RPMS -follow -name '*.rpm' | grep -v -- '\(source-\|\.src\.rpm$$\)' | grep -- '-debug' | wc -l` ; \
+	$(GENERATESUSEDATA)
+
+$(reposrcsdir)/susedata.xml.gz: $(reposrcsdir)/primary.xml.gz
+	@$(AM_V_GEN)\
+	rpms=`find $$(dirname $(reposrcsdir))/RPMS -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' | sort -u` ; \
+	numb=`find $$(dirname $(reposrcsdir))/RPMS -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' | wc -l` ; \
+	$(GENERATESUSEDATA)
+
+
+product.xml: Makefile
+	v=`$(RPM) --showrc | grep '\<vendor\>' | sed -r 's,^.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+	test -n "$$v" || v='Unknown' ; \
+	( \
+		$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
+		$(ECHO) '<product type="add-on">' ; \
+		$(ECHO) "  <vendor>$$v</vendor>" ; \
+		$(ECHO) '  <name>$(PACKAGE_UCNAME)</name>' ; \
+		$(ECHO) '  <arch>$(host_cpu)</arch>' ; \
+    		$(ECHO) '  <version epoch="$(PACKAGE_RPMEPOCH)" ver="$(VERSION)" rel="$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)" />' ; \
+		$(ECHO) '  <displayname>$(PACKAGE_TITLE)</displayname>' ; \
+		$(ECHO) '  <shortname>$(PACKAGE_SHORTTITLE)</shortname>' ; \
+		$(ECHO) '  <distribution-name>$(host_distro)</distribution-name>' ; \
+		$(ECHO) '  <distribution-edition>$(host_edition)</distribution-edition>' ; \
+		$(ECHO) '  <description>$(PACKAGE_TITLE) includes kernel modules, STREAMS drivers, modules,' ; \
+		$(ECHO) 'libraries, utilities, test programs, daemons, and development' ; \
+		$(ECHO) 'environment for the development and execution of Linux' ; \
+		$(ECHO) 'Fast-STREAMS drivers, components and applications for the' ; \
+		$(ECHO) 'STREAMS environment.' ; \
+		$(ECHO) '</description>' ; \
+		$(ECHO) '  <release-notes-url>$(reposerv)://$(repobase)/codefiles/$(PACKAGE)-$(VERSION)/NEWS</release-notes-url>' ; \
+		$(ECHO) '</product>' ; \
+	) >$@
+
+products.xml: Makefile
+	v=`$(RPM) --showrc | grep '\<vendor\>' | sed -r 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+	test -n "$$v" || v='Unknown' ; \
+	( \
+		$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
+		$(ECHO) '<products>' ; \
+		$(ECHO) '  <product schemeversion="0">' ; \
+		$(ECHO) '    <name>$(PACKAGE_UCNAME)</name>' ; \
+    		$(ECHO) '    <version epoch="$(PACKAGE_RPMEPOCH)" ver="$(VERSION)" rel="$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)" />' ; \
+		$(ECHO) '    <arch>$(host_cpu)</arch>' ; \
+		$(ECHO) "    <vendor>$$v</vendor>" ; \
+		$(ECHO) '    <summary>$(PACKAGE_TITLE)</summary>' ; \
+		$(ECHO) '    <description>$(PACKAGE_TITLE) includes kernel modules, STREAMS drivers, modules,' ; \
+		$(ECHO) 'libraries, utilities, test programs, daemons, and development' ; \
+		$(ECHO) 'environment for the development and execution of Linux' ; \
+		$(ECHO) 'Fast-STREAMS drivers, components and applications for the' ; \
+		$(ECHO) 'STREAMS environment.' ; \
+		$(ECHO) '</description>' ; \
+		$(ECHO) '  </product>' ; \
+		$(ECHO) '</products>' ; \
+	) >$@
+
+$(repodir)/product.xml.gz: scripts/product.xml
+	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
+
+$(repodir)/products.xml.gz: scripts/products.xml
+	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
+
+$(repodir)/patterns.xml.gz: scripts/patterns.xml
+	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
+
+$(repomaindir)/product.xml.gz: scripts/product.xml
+	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
+
+$(repomaindir)/products.xml.gz: scripts/products.xml
+	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
+
+$(repomaindir)/patterns.xml.gz: scripts/patterns.xml
+	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
+
+repo-suse: \
+$(repodir)     $(repodir)/repomd.xml     $(repodir)/susedata.xml.gz \
+$(repomaindir) $(repomaindir)/repomd.xml $(repomaindir)/susedata.xml.gz \
+$(repodebgdir) $(repodebgdir)/repomd.xml $(repodebgdir)/susedata.xml.gz \
+$(reposrcsdir) $(reposrcsdir)/repomd.xml $(reposrcsdir)/susedata.xml.gz
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(MAKE) $(AM_MAKEFLAGS) $(repodir)/patterns.xml.gz
+	@$(MAKE) $(AM_MAKEFLAGS) $(repodir)/products.xml.gz
+	@$(MAKE) $(AM_MAKEFLAGS) $(repodir)/product.xml.gz
+	@$(MAKE) $(AM_MAKEFLAGS) $(repomaindir)/patterns.xml.gz
+	@$(MAKE) $(AM_MAKEFLAGS) $(repomaindir)/products.xml.gz
+	@$(MAKE) $(AM_MAKEFLAGS) $(repomaindir)/product.xml.gz
+
+## Note: only put the groups file (comp.xml) in the base and main sub-repo.
 $(repodir)/repomd.xml:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test ! -f $@; then \
-		$(ECHO_V) "$(MAKE) $(AM_MAKEFLAGS) repo-yum"; \
-		$(MAKE) $(AM_MAKEFLAGS) repo-yum; \
-	fi
+	$(AM_V_GEN)f='comps.xml' ; \
+	d=`pwd`/scripts/; test -f $$d$$f || d=`(cd $(srcdir); pwd)`/scripts/ ; \
+	g=; test ! -f $$d$$f || g="-g $$d$$f" ; \
+	( \
+		cd $(repodir)/.. ; \
+		find ./RPMS -follow -name '*.rpm' \
+		| sort -u | sed 's,^\./,,' | \
+		$(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . \
+	)
 
-$(repodir)/repomd.xml.asc:: \
-$(repodir)/repomd.xml
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+$(repomaindir)/repomd.xml:
+	$(AM_V_GEN)f='comps.xml' ; \
+	d=`pwd`/scripts/; test -f $$d$$f || d=`(cd $(srcdir); pwd)`/scripts/ ; \
+	g=; test ! -f $$d$$f || g="-g $$d$$f" ; \
+	( \
+		cd $(repomaindir)/.. ; \
+		find ./RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' \
+		| sort -u | sed 's,^\./,,' | \
+		$(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . \
+	)
+
+$(repodebgdir)/repomd.xml:
+	$(AM_V_GEN)\
+	( \
+		cd $(repodebgdir)/.. ; \
+		find ./RPMS -follow -name '*.rpm' | grep -v -- '\(source-\|\.src\.rpm$$\)' | grep -- '-debug' \
+		| sort -u | sed 's,^\./,,' | \
+		$(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) . \
+	)
+
+$(reposrcsdir)/repomd.xml:
+	$(AM_V_GEN)\
+	( \
+		cd $(reposrcsdir)/.. ; \
+		find ./RPMS -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' \
+		| sort -u | sed 's,^\./,,' | \
+		$(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) . \
+	)
+
+GPGVERIFYSIGN = \
+	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
 	else touch "$@"; fi
 
-#! repo-yum:
-#!     Create (or recreate) the meta data files for a yum (repomd) repository in
-#!     the package distribution directory, @repodir@/.
-#!     When executed with root privilege, it will also place a local
-#!     installation source (@PACKAGE_LCNAME@-media) in the /etc/yum.repo.d/
-#!     directory on the target machine in the @PACKAGE_LCNAME@.repo file.
-#!
-repo-yum: $(repodir) $(repodir)/openss7.repo
+$(repodir)/repomd.xml.asc:: \
+$(repodir)/repomd.xml
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@f=`$(ECHO) $(repomd_group) | sed 's|^.*/||'`; \
-	d=`pwd`/scripts/; test -f $$d$$f || d=`(cd $(srcdir); pwd)`/scripts/; \
-	g=; test ! -f $$d$$f || g="-g $$d$$f"; \
-	$(ECHO) "$(CREATEREPO) -p $(REPOFLAGS) $$g $(topdir)"; \
-	$(CREATEREPO) -p $(REPOFLAGS) $$g $(topdir) || :
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
 
-#! repo-sign-yum:
-#! 	Sign the repomd.xml file and export the signing key.
+$(repomaindir)/repomd.xml.asc:: \
+$(repomaindir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
+
+$(repodebgdir)/repomd.xml.asc:: \
+$(repodebgdir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
+
+$(reposrcsdir)/repomd.xml.asc:: \
+$(reposrcsdir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
+
+repo-yum: $(repodir) $(repomd_repos) $(repomd_heads)
+
 repo-sign-yum: $(repomd_signs)
 
-#! repo-clean-yum:
-#!     Cleans the meta data files for a yum (repomd) repository from the package
-#!     distribution directory, @repodir@/.
-#!
 repo-clean-yum:
 
 REPO			+= repo-yum repo-suse
 REPO_SIGN		+= repo-sign-yum
 REPO_CLEAN		+= repo-clean-yum
-REPOCLEANFILES		+= $(repomd_files) $(repomd_signs) $(repomd_group) $(repodir)/openss7.repo
-
-MY_PHONY		+= repo-yum repo-suse repo-clean-yum
+REPOCLEANFILES		+= $(repomd_files)
 
 RELEASE			+= repo-yum repo-suse
 RELEASE_SIGN		+= repo-sign-yum
 RELEASE_CLEAN_LOCAL	+= repo-clean-yum
-RELEASECLEANFILES	+= $(repomd_files) $(repomd_signs) $(repomd_group) $(repodir)/openss7.repo
+RELEASECLEANFILES	+= $(repomd_files)
 
 UPDATE			+= repo-yum repo-suse
 UPDATE_SIGN		+= repo-sign-yum
@@ -985,14 +1163,6 @@ RELEASE_DIRECTORIES	+= $(yastdir) \
 			   $(yastdir)/media.1 \
 			   $(yastdir)/setup/descr
 
-#!
-#! YaST Build Targets:
-#! -------------------
-#!
-#! On rpm systems, or systems supporting rpm packaging tools and YaST install
-#! source repository creation tools, the following targets are used to manage
-#! YaST install source repository meta data files.
-#!
 $(yastdir)/media.1/media:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@p=`$(RPM) --showrc | grep '\<packager\>' | sed 's,.*\<packager\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
@@ -1002,42 +1172,35 @@ $(yastdir)/media.1/media:
 
 $(yastdir)/content:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@v=`$(RPM) --showrc | grep '\<vendor\>' | sed 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
-	if test -z "$$v"; then v='Unknown'; fi; \
+	@v=`$(RPM) --showrc | grep '\<vendor\>' | sed -r 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+	test -n "$$v" || v='Unknown' ; \
 	( \
-		$(ECHO) "PRODUCT $(PACKAGE_TITLE)"; \
-		$(ECHO) "VERSION $(VERSION)"; \
-		$(ECHO) "RELEASE $(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)"; \
+		$(ECHO) 'PRODUCT $(PACKAGE_TITLE)'; \
+		$(ECHO) 'VERSION $(VERSION)'; \
+		$(ECHO) 'RELEASE $(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)'; \
 		$(ECHO) "VENDOR $$v"; \
-		$(ECHO) "LABEL $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))"; \
-		$(ECHO) "NAME $(PACKAGE_NAME)"; \
-		$(ECHO) "RELNOTESURL http://www.openss7.org/codefiles/$(PACKAGE)-$(VERSION)/NEWS"; \
-		$(ECHO) "ARCH.i686 i686 i586 i486 i386 noarch"; \
-		$(ECHO) "ARCH.i586 i586 i486 i386 noarch"; \
-		$(ECHO) "ARCH.x86_64 x86_64 noarch"; \
-		$(ECHO) "DEFAULTBASE i586"; \
-		$(ECHO) "DESCRDIR setup/descr"; \
-		$(ECHO) "DATADIR RPMS"; \
+		$(ECHO) 'LABEL $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))'; \
+		$(ECHO) 'NAME $(PACKAGE_NAME)'; \
+		$(ECHO) 'RELNOTESURL $(reposerv)://$(repobase)/codefiles/$(PACKAGE)-$(VERSION)/NEWS'; \
+		$(ECHO) 'ARCH.i686 i686 i586 i486 i386 noarch'; \
+		$(ECHO) 'ARCH.i586 i586 i486 i386 noarch'; \
+		$(ECHO) 'ARCH.x86_64 x86_64 noarch'; \
+		$(ECHO) 'DEFAULTBASE i586'; \
+		$(ECHO) 'DESCRDIR setup/descr'; \
+		$(ECHO) 'DATADIR RPMS'; \
 	) >>$@
 
 $(yastdir)/content.asc:: \
 $(yastdir)/content
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-	else touch "$@"; fi
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
 
 $(yastdir)/content.key:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@"; \
-	$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@
+	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >>$@"; \
+	$(GPG) -a$$user$$home --export $(GNUPGUSER) >>$@
 
 yast_meta_files		= $(yastdir)/media.1/media \
 			  $(yastdir)/content
@@ -1080,36 +1243,19 @@ repo-yast-listings-clean:
 		-name 'ls-lR.gz' -o \
 		-name 'INDEX.gz' | $(am__base_remove)
 
-#! repo-yast:
-#! 	Create (or recreate) the meta data files for a YaST2 repository in the
-#! 	package distribution directory, @topdir@/.
-#! 	When executed with root privilege, it will also place a local
-#! 	installation source for use by YaST on the build system.
-#!
 repo-yast: $(yast_meta_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	( cd $(yastdir); $(CREATE_PACKAGE_DESCR) -Z -V -C -K -F -B -d RPMS/ )
 	$(MAKE) $(AM_MAKEFLAGS) repo-yast-listings
 
-#! repo-sign-yast:
-#! 	Sign the content file and export the signing key to content.key.
-#! 	This target then performs all of the actions of the repo-yast
-#! 	target to rebuild the directory listings.
-#!
 repo-sign-yast: $(yast_sign_files) repo-yast
 
-#! repo-clean-yast:
-#!     Cleans the meta data files for a YaST2 repository from the package
-#!     distribution directory, @topdir@/.
-#!
 repo-clean-yast:
 
 REPO			+= repo-yast
 REPO_SIGN		+= repo-sign-yast
 REPO_CLEAN		+= repo-clean-yast repo-yast-listings-clean
 REPOCLEANFILES		+= $(yast_meta_files) $(yast_desc_files) $(yast_sign_files)
-
-MY_PHONY		+= repo-yast repo-yast-listings repo-clean-yast
 
 RELEASE			+= repo-yast
 RELEASE_SIGN		+= repo-sign-yast
@@ -1123,6 +1269,60 @@ UPDATECLEANFILES	+=
 
 endif
 ## BUILD_REPO_YAST
+
+##
+## RIS Build Targets:
+##
+reporis_files		= $(DISTDIR)/repoindex.xml
+reporis_signs		= $(DISTDIR)/repoindex.xml.asc
+
+$(DISTDIR)/repoindex.xml:
+	( \
+		$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
+		$(ECHO) '<repoindex>' ; \
+		find '$(DISTDIR)' -follow -type f -name 'repomd.xml' | sort -u | while read f ; do \
+			path=`echo $$f | sed 's,^$(DISTDIR)/,,;s,/repomd.xml$$,,;s,/repodata$$,,'` ; \
+			targ=`echo $$path | sed 's,rpms/,,;y,/,-,;s,\.[0-9][0-9]*,,'` ; \
+			subd=`echo $$targ | sed -r 's,^([^-]*-[^-]*-[^-]*)-(.*)$$,\2,;t;s,.*,,'` ; \
+			targ=`echo $$targ | sed -r 's,^([^-]*-[^-]*-[^-]*)-(.*)$$,\1,'` ; \
+			repo=`echo $$subd | sed -r 'y,-, ,;s,\<main\>,Main,;s,\<debug\>,Debug,;s,\<source\>,Source,;s,\<udates\>,Updates,;s,\<extras\>,Extras,;s,\<testing\>,Testing,'` ; \
+			name="$(PACKAGE_UCNAME)$${subd:+-$$subd}$${targ:+-$$targ}" ; \
+			desc="$(PACKAGE_TITLE)$${repo:+ $$repo}$${targ:+ ($$targ)}" ; \
+			$(ECHO) "  <repo name=\"$$name\"" ; \
+			$(ECHO) "        description=\"$$desc\"" ; \
+			$(ECHO) "        distro_target=\"$$targ\"" ; \
+			$(ECHO) "        path=\"$$path\"" ; \
+			$(ECHO) "        priority=\"0\"" ; \
+			$(ECHO) "        pub=\"0\" />" ; \
+		done ; \
+		$(ECHO) '</repoindex>' ; \
+	: ) >$@
+
+$(DISTDIR)/repoindex.xml.asc:: \
+$(DISTDIR)/repoindex.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
+
+repo-ris: $(DISTDIR) $(reporis_files)
+
+repo-sign-ris: $(reporis_signs)
+
+repo-clean-ris:
+
+REPO			+= repo-ris
+REPO_SIGN		+= repo-sign-ris
+REPO_CLEAN		+= repo-clean-ris
+REPOCLEANFILES		+= $(reporis_files) $(reporis_signs)
+
+RELEASE			+= repo-ris
+RELEASE_SIGN		+= repo-sign-ris
+RELEASE_CLEAN_LOCAL	+= repo-clean-ris
+RELEASECLEANFILES	+= $(reporis_files) $(reporis_signs)
+
+UPDATE			+= repo-ris
+UPDATE_SIGN		+= repo-sign-ris
+UPDATE_CLEAN_LOCAL	+= repo-clean-ris
+UPDATECLEANFILES	+= 
 
 endif
 ## BUILD_RPMS
@@ -1185,6 +1385,9 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.10  2011-02-28 19:51:29  brian
+## - better repository build
+##
 ## Revision 1.1.2.9  2011-02-17 18:34:10  brian
 ## - repository and rpm build updates
 ##

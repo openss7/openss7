@@ -1,3 +1,33 @@
+2011-02-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated release file
+	* Makefile.am: change suse-11-x86_64-config.cache to sle-11-...
+	* NEWS: updated release file
+	* NOTES.repo: documented repository layout
+	* README: updated release file
+	* THANKS: updated release file
+	* acinclude.m4: put _REPO before _RPM or _DEB
+	* openss7.spec.in: split out debuginfo and debugsource
+	* sle-11-x86_64-config.cache: added build cache
+	* am/archive.am: rename PACKAGE_DISTDIR -> DISTDIR
+	* am/openss7.am: add repo-install, -uninstall RELEASE_LINKS targets
+	* am/repo.am: set up repositories
+	* am/rpm.am: build new repositories
+	* doc/manual/news.texi: update release file
+	* m4/bld.m4: adjust build distro
+	* m4/deb.m4: use new deb build directory variables
+	* m4/dist.m4: build distribution target_distos
+	* m4/openss7.m4: PACKAGE_DISTDIR -> DISTDIR
+	* m4/pr.m4: handle SLE/SLED/SLES better
+	* m4/repo.m4: support installation of install sources
+	* m4/rpm.m4: set up directories better
+	* po/de.po: automatic update
+	* scripts/patterns.xml.in: enhanced pattern for debuginfo and source
+	* scripts/products.xml.in: products definition
+	* scripts/strconf.awk: typo
+	* scripts/product.xml.in: added product file template
+	* scripts/texi/args.texi.in: remove PACKAGE_DISTDIR
+
 2011-02-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* .pkgpatchlevel: boosted patchlevel to 20010217

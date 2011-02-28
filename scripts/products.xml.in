@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <products>
-  <product>
-    <name>OPENSS7</name>
-    <version ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" epoch="@PACKAGE_RPMEPOCH@" />
-    <arch>@target_cpu@</arch>
+  <product schemeversion="0">
+    <name>@PACKAGE_UCNAME@</name>
+    <version epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
+    <arch>@host_cpu@</arch>
     <vendor>OpenSS7 Corporation</vendor>
     <summary>OpenSS7 STREAMS and Protocol Suites</summary>
-    <description>OpenSS7 includes kernel modules, STREAMS drivers, modules,
+    <description>@PACKAGE_TITLE@ includes kernel modules, STREAMS drivers, modules,
 libraries, utilities, test programs, daemons, and development
 environment for the development and execution of Linux
 Fast-STREAMS drivers, components and applications for the

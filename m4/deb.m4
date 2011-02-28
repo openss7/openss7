@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:48:32 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-28 19:51:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:32 $ by $Author: brian $
+# Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -113,7 +113,7 @@ AC_DEFUN([_DEB_OPTIONS_DEB_RELEASE], [dnl
 # _DEB_DPKG_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP], [dnl
-    _DEB_DPKG_SETUP_DIST
+dnl _DEB_DPKG_SETUP_DIST
 dnl _DEB_DPKG_SETUP_ARCH
 dnl _DEB_DPKG_SETUP_INDEP
     _DEB_DPKG_SETUP_TOPDIR
@@ -126,17 +126,6 @@ dnl _DEB_DPKG_SETUP_INDEP
 # _DEB_DPKG_SETUP_DIST
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP_DIST], [dnl
-    AC_CACHE_CHECK([for deb distribution subdirectory], [deb_cv_dist_subdir], [dnl
-	case "$dist_cv_host_flavor" in
-	    (centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|suse)
-		deb_cv_dist_subdir="$dist_cv_host_flavor/$dist_cv_host_release/$dist_cv_host_cpu" ;;
-	    (debian|ubuntu|*)
-		deb_cv_dist_subdir="$dist_cv_host_flavor/$dist_cv_host_codename/$dist_cv_host_cpu" ;;
-	esac
-	if test -n "$deb_cv_dist_subdir"; then
-	    deb_cv_dist_subdir=`echo "$deb_cv_dist_subdir" | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
-	fi
-    ])
 ])# _DEB_DPKG_SETUP_DIST
 # =============================================================================
 
@@ -182,38 +171,39 @@ AC_DEFUN([_DEB_DPKG_SETUP_INDEP], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
-    if test ":$PACKAGE_DISTDIR" = :`pwd` ; then
-	deb_tmp='$(PACKAGE_DISTDIR)/debian'
-    else
-	deb_tmp='$(PACKAGE_DISTDIR)/debs/'"${deb_cv_dist_subdir}"
+    AC_ARG_WITH([deb-distdir],
+	[AS_HELP_STRING([--with-deb-distdir=DIR],
+	    [deb dist directory @<:@default=PKG-DISTDIR/debs/PKG-SUBDIR@:>@])],
+	[], [with_deb_distdir='$(DISTDIR)/debs/$(reposubdir)'])
+    AC_MSG_CHECKING([for deb distribution directory])
+    if test ":${debdistdir+set}" != :set ; then
+	case ":${with_deb_distdir:-no}" in
+	    (:no|:yes)	debdistdir='$(DISTDIR)/debs/$(reposubdir)' ;;
+	    (*)		debdistdir="$with_deb_distdir" ;;
+	esac
     fi
+    AC_MSG_RESULT([$debdistdir])
+    AC_SUBST([debdistdir])dnl
     AC_ARG_WITH([deb-topdir],
 	[AS_HELP_STRING([--with-deb-topdir=DIR],
-	    [deb top directory @<:@default=PKG-DISTDIR/debian@:>@])],
-	[], [with_deb_topdir="$deb_tmp"])
-    AC_CACHE_CHECK([for deb top build directory], [deb_cv_topdir], [dnl
-	case ":$with_deb_topdir" in
-	    (:no | :NO)
-		deb_cv_topdir="$deb_tmp"
-		;;
-	    (:yes | :YES | :default | :DEFAULT)
-		deb_cv_topdir="/usr/src/debian"
-		;;
-	    (*)
-		deb_cv_topdir="$with_deb_topdir"
-		;;
+	    [deb top directory @<:@default=DEB-DISTDIR/BRANCH@:>@])],
+	[], [with_deb_topdir='$(debdistdir)/$(repobranch)'])
+    AC_MSG_CHECKING([for deb top build directory])
+    if test ":${debdir+set}" != :set ; then
+	case ":${with_deb_topdir:-no}" in
+	    (:no|:yes)	debdir='$(debdistdir)/$(repobranch)' ;;
+	    (*)		debdir="$with_deb_topdir" ;;
 	esac
-    ])
-    PACKAGE_DEBTOPDIR="$deb_cv_topdir"
-    AC_SUBST([PACKAGE_DEBTOPDIR])dnl
-    debdir='$(PACKAGE_DEBTOPDIR)'
+    fi
+    AC_MSG_RESULT([$debdir])
     AC_SUBST([debdir])dnl
-    AC_CACHE_CHECK([for deb BUILD directory], [deb_cv_builddir], [dnl
+    AC_MSG_CHECKING([for deb BUILD directory])
+    if test ":${debbuilddir+set}" != :set ; then
 	# debbuilddir needs to be absolute: always build in the top build
 	# directory on the local machine
-	deb_cv_builddir=`pwd`/debian
-    ])
-    debbuilddir="$deb_cv_builddir"
+	debbuilddir=`pwd`/debian
+    fi
+    AC_MSG_RESULT([debbuilddir])
     AC_SUBST([debbuilddir])dnl
 ])# _DEB_DPKG_SETUP_TOPDIR
 # =============================================================================
@@ -363,7 +353,7 @@ dnl
 	deb_cv_repo_apt=${enable_repo_apt:-no}
     ])
     AM_CONDITIONAL([BUILD_REPO_APT], [test ":$deb_cv_repo_apt" = :yes])
-    aptdir='$(PACKAGE_DEBTOPDIR)'
+    aptdir='$(debdir)'
     AC_SUBST([aptdir])dnl
 ])# _DEB_DPKG_SETUP_BUILD
 # =============================================================================
@@ -417,6 +407,9 @@ AC_DEFUN([_DEB_DPKG], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 1.1.2.6  2011-02-28 19:51:29  brian
+# - better repository build
+#
 # Revision 1.1.2.5  2011-02-07 04:48:32  brian
 # - updated configure and build scripts
 #

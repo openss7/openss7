@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-02-17 18:34:10 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-02-28 19:51:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+# Last Modified $Date: 2011-02-28 19:51:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -60,6 +60,9 @@
 # RPM.spec.in file.  This also includes stuff for converting the LSM file.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC], [dnl
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
+    AC_REQUIRE([_DISTRO])dnl
+    AC_REQUIRE([_REPO])dnl
     AC_MSG_NOTICE([+------------------------+])
     AC_MSG_NOTICE([| RPM Repository Support |])
     AC_MSG_NOTICE([+------------------------+])
@@ -137,7 +140,6 @@ AC_DEFUN([_RPM_SPEC_SETUP], [dnl
 # _RPM_SPEC_SETUP_DIST
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
-    AC_REQUIRE([_DISTRO])
     AC_ARG_WITH([rpm-extra],
 	[AS_HELP_STRING([--with-rpm-extra=EXTRA],
 	    [EXTRA release string for RPMS @<:@default=auto@:>@])], [], [dnl
@@ -152,7 +154,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		rpm_cv_dist_extra=
 		;;
 	    (:auto)
-		rpm_tmp=`echo "$dist_cv_host_release" | sed -e 's|\..*||g'`
+		rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\..*||g'`
 		case "$dist_cv_host_flavor" in
 		    (centos)
 			case $dist_cv_host_release in
@@ -199,17 +201,31 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		rpm_cv_dist_extra2=".el${dist_cv_host_release}"	    ;;
 			esac
 			;;
+		    (rhel)
+			case $dist_cv_host_release in
+			    (2|2.?)	rpm_cv_dist_extra=".EL"				    ;;
+			    (3|3.?)	rpm_cv_dist_extra=".E3"				    ;;
+			    (4|4.?)	rpm_cv_dist_extra=".EL4"			    ;;
+			    (5|5.?|6|6.?)
+					rpm_cv_dist_extra=".el${rpm_tmp}"		    ;;
+			    (*)		rpm_cv_dist_extra=".el${dist_cv_host_release}"	    ;;
+			esac
+			;;
 		    (mandrake)
-			rpm_tmp=`echo "$dist_cv_host_release" | sed -e 's|\.||g'`
+			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
 			rpm_cv_dist_extra=".${rpm_tmp}mdk"
 			;;
 		    (suse)
-			case $dist_cv_host_release in
-			    (6.2|7.[[0-3]]|8.[[0-3]]|9.[[0-3]])
-					rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}" ;;
-			    (8|9|10|11)	rpm_cv_dist_extra=".${dist_cv_host_release:-SLES}" ;;
-			    (*)		rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}" ;;
-			esac
+			rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}"
+			;;
+		    (sle)
+			rpm_cv_dist_extra=".${dist_cv_host_release:-SLE}"
+			;;
+		    (sles)
+			rpm_cv_dist_extra=".${dist_cv_host_release:-SLES}"
+			;;
+		    (sled)
+			rpm_cv_dist_extra=".${dist_cv_host_release:-SLED}"
 			;;
 		    (debian)
 			rpm_cv_dist_extra=".deb${dist_cv_host_release}"
@@ -230,7 +246,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		rpm_cv_dist_extra2=
 		;;
 	    (:auto)
-		rpm_tmp=`echo "$dist_cv_host_release" | sed -e 's|\..*||g'`
+		rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\..*||g'`
 		case "$dist_cv_host_flavor" in
 		    (centos)
 			case $dist_cv_host_release in
@@ -270,17 +286,29 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		  rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
 			esac
 			;;
+		    (rhel)
+			case $dist_cv_host_release in
+			    (2|2.?)	  rpm_cv_dist_extra2=".EL"			    ;;
+			    (3|3.?|4|4.?) rpm_cv_dist_extra2=".EL${rpm_tmp}"		    ;;
+			    (5|5.?|6|6.?) rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			    (*)		  rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
+			esac
+			;;
 		    (mandrake)
-			rpm_tmp=`echo "$dist_cv_host_release" | sed -e 's|\.||g'`
+			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
 			rpm_cv_dist_extra2=".${rpm_tmp}mdk"
 			;;
 		    (suse)
-			case $dist_cv_host_release in
-			    (6.2|7.[[0-3]]|8.[[0-3]]|9.[[0-3]])
-					rpm_cv_dist_extra2=".${dist_cv_host_release:-SuSE}" ;;
-			    (8|9|10)	rpm_cv_dist_extra2=".${dist_cv_host_release:-SLES}" ;;
-			    (*)		rpm_cv_dist_extra2=".${dist_cv_host_release:-SuSE}" ;;
-			esac
+			rpm_cv_dist_extra2=".${dist_cv_host_release:-SuSE}"
+			;;
+		    (sle)
+			rpm_cv_dist_extra2=".${dist_cv_host_release:-SLE}"
+			;;
+		    (sles)
+			rpm_cv_dist_extra2=".${dist_cv_host_release:-SLES}"
+			;;
+		    (sled)
+			rpm_cv_dist_extra2=".${dist_cv_host_release:-SLED}"
 			;;
 		    (debian)
 			rpm_cv_dist_extra2=".deb${dist_cv_host_release}"
@@ -296,34 +324,21 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	esac
     ])
     AC_CACHE_CHECK([for rpm distribution default topdir], [rpm_cv_dist_topdir], [dnl
-	case "$dist_cv_host_flavor" in
-	    (centos)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
-	    (lineox)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
-	    (whitebox)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
-	    (fedora)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
-	    (mandrake)	rpm_cv_dist_topdir='/usr/src/RPM'    ;;
-	    (redhat)	rpm_cv_dist_topdir='/usr/src/redhat' ;;
-	    (suse)	rpm_cv_dist_topdir='/usr/src/SuSE'   ;;
-	    (debian)	rpm_cv_dist_topdir='/usr/src/rpm'    ;;
-	    (ubuntu)	rpm_cv_dist_topdir='/usr/src/rpm'    ;;
-	    (*)		rpm_cv_dist_topdir="$ac_abs_top_buiddir" ;;
+	case "$dist_cv_host_distro" in
+	    (centos|lineox|whitebox|fedora|redhat|rhel)
+		rpm_cv_dist_topdir='/usr/src/redhat'	;;
+	    (suse)
+		rpm_cv_dist_topdir='/usr/src/SuSE'	;;
+	    (sle)
+		rpm_cv_dist_topdir='/usr/src/packages'	;;
+	    (mandrake)
+		rpm_cv_dist_topdir='/usr/src/RPM'	;;
+	    (debian|ubuntu)
+		rpm_cv_dist_topdir='/usr/src/rpm'	;;
+	    (*)
+		rpm_cv_dist_topdir="$ac_abs_top_buiddir" ;;
 	esac
     ])
-    AC_CACHE_CHECK([for rpm distribution subdirectory], [rpm_cv_dist_subdir], [dnl
-	case "$dist_cv_host_flavor" in
-	    (centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|suse)
-		rpm_cv_dist_subdir="$dist_cv_host_flavor/$dist_cv_host_release/$dist_cv_host_cpu" ;;
-	    (debian|ubuntu|*)
-		rpm_cv_dist_subdir="$dist_cv_host_flavor/$dist_cv_host_codename/$dist_cv_host_cpu" ;;
-	esac
-	if test -n "$rpm_cv_dist_subdir"; then
-	    rpm_cv_dist_subdir=`echo "$rpm_cv_dist_subdir" | sed -e 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
-	fi
-    ])
-    PACKAGE_RPMSUBDIR="${rpm_cv_dist_subdir}"
-    AC_SUBST([PACKAGE_RPMSUBDIR])dnl
-    AC_DEFINE_UNQUOTED([PACKAGE_RPMSUBDIR], ["$PACKAGE_RPMSUBDIR"], [The RPM Distribution
-	subdirectory.  This defaults to automatic detection.])
     PACKAGE_RPMDIST="${dist_cv_host_distrib:-Unknown Linux} ${dist_cv_host_release:-Unknown}${dist_cv_host_codename:+ ($dist_cv_host_codename)}"
     AC_SUBST([PACKAGE_RPMDIST])dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMDIST], ["$PACKAGE_RPMDIST"], [The RPM Distribution.  This
@@ -387,78 +402,83 @@ AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
 # and SPECS directories.  Because topdir is on an NFS mount when we build, but
 # we want to speed builds as much as possible, we override the BUILD directory
 # to be in our autoconf build directory which should be on a local filesystem.
-# The remaining two, RPMS and SRPMS are left in the distribution directory under
-# topdir.  The am/rpm.am makefile fragment will override rpm macros with these
-# values.  Note that the names stay nicely out of the way of autoconf directory
-# names, but all nicely end in dir so we will define them in the same way.
-# (Yes, autoconf defines `builddir' even though it is always `.'.
+# The same is true of the BUILDROOT directory (where files are temporarily
+# installed.) The remaining two, RPMS and SRPMS are left in the distribution
+# directory under topdir.  The am/rpm.am makefile fragment will override rpm
+# macros with these values.  Note that the names stay nicely out of the way of
+# autoconf directory names, but all nicely end in dir so we will define them
+# in the same way.  (Yes, autoconf defines `builddir' even though it is always
+# `.').
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
-    # when building in place the default is simply rpms whereas when releasing
-    # to another directory, the default is based on the repo subdirectory name
-    if test :"$PACKAGE_DISTDIR" = :`pwd` ; then
-	rpm_tmp='$(PACKAGE_DISTDIR)/rpms'
-    else
-	rpm_tmp='$(PACKAGE_DISTDIR)/rpms/'"${rpm_cv_dist_subdir}"
+    AC_ARG_WITH([rpm-distdir],
+	[AS_HELP_STRING([--with-rpm-distdir=DIR],
+	    [rpm dist directory @<:@default=PKG-DISTDIR/rpms/PKG-SUBDIR@:>@])],
+	[], [with_rpm_distdir='$(DISTDIR)/rpms/$(reposubdir)'])
+    AC_MSG_CHECKING([for rpm distribution directory])
+    if test ":${rpmdistdir+set}" != :set ; then
+	case ":${with_rpm_distdir:-no}" in
+	    (:no|:yes)	rpmdistdir='$(DISTDIR)/rpms/$(reposubdir)' ;;
+	    (*)		rpmdistdir="$with_rpm_distdir" ;;
+	esac
     fi
+    AC_MSG_RESULT([$rpmdistdir])
+    AC_SUBST([rpmdistdir])dnl
     AC_ARG_WITH([rpm-topdir],
 	[AS_HELP_STRING([--with-rpm-topdir=DIR],
-	    [rpm top directory @<:@default=PKG-DISTDIR/rpms@:>@])],
-	[], [with_rpm_topdir="$rpm_tmp"])
-    AC_CACHE_CHECK([for rpm top build directory], [rpm_cv_topdir], [dnl
-	case ":${with_rpm_topdir:-default}" in
-	    (:no | :NO)
-		rpm_cv_topdir="$rpm_tmp"
-		;;
-	    (:yes | :YES | :default | :DEFAULT)
-		rpm_cv_topdir="$rpm_cv_dist_topdir"
-		;;
-	    (*)
-		rpm_cv_topdir="$with_rpm_topdir"
-		;;
+	    [rpm top directory @<:@default=RPM-DISTDIR/BRANCH@:>@])],
+	[], [with_rpm_topdir='$(rpmdistdir)/$(repobranch)'])
+    AC_MSG_CHECKING([for rpm top build directory])
+    if test ":${topdir+set}" != :set ; then
+	case ":${with_rpm_topdir:-no}" in
+	    (:no|:yes)	topdir='$(rpmdistdir)/$(repobranch)' ;;
+	    (*)		topdir="$with_rpm_topdir" ;;
 	esac
-    ])
-    topdir="$rpm_cv_topdir"
+    fi
+    AC_MSG_RESULT([$topdir])
     AC_SUBST([topdir])dnl
     # set defaults for the rest
-    AC_CACHE_CHECK([for rpm SOURCES directory], [rpm_cv_sourcedir], [dnl
-	if test :"$PACKAGE_DISTDIR" = :`pwd` ; then
-	    rpm_cv_sourcedir='$(PACKAGE_DISTDIR)'
-	else
-	    rpm_cv_sourcedir='$(PACKAGE_DISTDIR)/tarballs'
-	fi
-    ])
-    sourcedir="$rpm_cv_sourcedir"
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_TARDIR])
+    AC_MSG_CHECKING([for rpm SOURCES directory])
+    if test ":${sourcedir+set}" != :set ; then
+	sourcedir='$(tardir)'
+    fi
+    AC_MSG_RESULT([$sourcedir])
     AC_SUBST([sourcedir])dnl
-    AC_CACHE_CHECK([for rpm BUILD directory], [rpm_cv_builddir], [dnl
+    AC_MSG_CHECKING([for rpm BUILD directory])
+    if test ":${rpmbuilddir+set}" != :set ; then
 	# rpmbuilddir needs to be absolute: always build in the top build
 	# directory on the local machine
-	rpm_cv_builddir=`pwd`/BUILD
-    ])
-    rpmbuilddir="$rpm_cv_builddir"
+	rpmbuilddir=`pwd`/BUILD
+    fi
+    AC_MSG_RESULT([$rpmbuilddir])
     AC_SUBST([rpmbuilddir])dnl
-    AC_CACHE_CHECK([for rpm BUILDROOT directory], [rpm_cv_buildrootdir], [dnl
+    AC_MSG_CHECKING([for rpm BUILDROOT directory])
+    if test ":${rpmbuildrootdir+set}" != :set ; then
 	# rmpbuildrootdir needs to be absolute: always install in the top
 	# build directory on the local machine
-	rpm_cv_buildrootdir=`pwd`/BUILDROOT
-    ])
-    rpmbuildrootdir="$rpm_cv_buildrootdir"
+	rpmbuildrootdir=`pwd`/BUILDROOT
+    fi
+    AC_MSG_RESULT([$repbuildrootdir])
     AC_SUBST([rpmbuildrootdir])dnl
-    AC_CACHE_CHECK([for rpm RPMS directory], [rpm_cv_rpmdir], [dnl
-	rpm_cv_rpmdir='$(topdir)/RPMS'
-    ])
-    rpmdir="$rpm_cv_rpmdir"
+    AC_MSG_CHECKING([for rpm RPMS directory])
+    if test ":${rpmdir+set}" != :set ; then
+	rpmdir='$(topdir)/RPMS'
+    fi
+    AC_MSG_RESULT([$rpmdir])
     AC_SUBST([rpmdir])dnl
-    AC_CACHE_CHECK([for rpm SRPMS directory], [rpm_cv_srcrpmdir], [dnl
-	rpm_cv_srcrpmdir='$(PACKAGE_DISTDIR)/rpms/SRPMS'
-    ])
-    srcrpmdir="$rpm_cv_srcrpmdir"
+    AC_MSG_CHECKING([for rpm SRPMS directory])
+    if test ":${srcrpmdir+set}" != :set ; then
+	srcrpmdir='$(DISTDIR)/rpms/SRPMS'
+    fi
+    AC_MSG_RESULT([$srcrpmdir])
     AC_SUBST([srcrpmdir])dnl
-    AC_CACHE_CHECK([for rpm SPECS directory], [rpm_cv_specdir], [dnl
-	rpm_cv_specdir='$(PACKAGE_DISTDIR)/rpms/SPECS'
-    ])
-    specdir="$rpm_cv_specdir"
+    AC_MSG_CHECKING([for rpm SPECS directory])
+    if test ":${specdir+set}" != :set ; then
+	specdir='$(DISTDIR)/rpms/SPECS'
+    fi
+    AC_MSG_RESULT([$specdir])
     AC_SUBST([specdir])dnl
 ])# _RPM_SPEC_SETUP_TOPDIR
 # =============================================================================
@@ -488,7 +508,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
 		eval "arg=$arg"
 		AC_MSG_CHECKING([for rpm argument '$arg'])
 		if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
-		    nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
+		    nam=`echo $arg | sed 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
 		    arg="--define \"${nam} ${arg}\""
 		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }$arg"
 		    AC_MSG_RESULT([yes])
@@ -506,7 +526,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
 	eval "arg=$arg"
 	AC_MSG_CHECKING([for rpm argument '$arg'])
 	if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
-	    nam=`echo $arg | sed -e 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
+	    nam=`echo $arg | sed 's|[[= ]].*$||;s|--enable|--with|;s|--disable|--without|;s|-|_|g;s|^__|_|'`
 	    arg="--define \"${nam} ${arg}\""
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS}${PACKAGE_RPMOPTIONS:+ }$arg"
 	    AC_MSG_RESULT([yes])
@@ -610,8 +630,14 @@ dnl
 	rpm_cv_repo_yum=${enable_repo_yum:-no}
     ])
     AM_CONDITIONAL([BUILD_REPO_YUM], [test ":$rpm_cv_repo_yum" = :yes])dnl
-    repodir="$topdir/repodata"
+    repodir='$(topdir)/repodata'
     AC_SUBST([repodir])dnl
+    repomaindir='$(topdir)/main/repodata'
+    AC_SUBST([repomaindir])dnl
+    repodebgdir='$(topdir)/debug/repodata'
+    AC_SUBST([repodebgdir])dnl
+    reposrcsdir='$(topdir)/source/repodata'
+    AC_SUBST([reposrcsdir])dnl
 
 dnl
 dnl These commands can be used to create YaST repositories.
@@ -645,7 +671,8 @@ dnl
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
     AC_CONFIG_FILES([scripts/speccommon
 		     scripts/patterns.xml
-		     scripts/products.xml])
+		     scripts/products.xml
+		     scripts/product.xml])
     speccommon="scripts/speccommon"
     AC_SUBST_FILE([speccommon])
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
@@ -670,6 +697,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.9  2011-02-28 19:51:30  brian
+# - better repository build
+#
 # Revision 1.1.2.8  2011-02-17 18:34:10  brian
 # - repository and rpm build updates
 #

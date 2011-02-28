@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-17 18:34:10 $
+# @(#) $RCSfile: archive.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-28 19:51:29 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+## Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -59,7 +59,7 @@
 #! The following targets are used to generate and clean distribution archive and
 #! signature files.  Whereas the `dist' target affects archives in the top build
 #! directory, the release-archive targets affects archives in the package
-#! distribution directory, `@PACKAGE_DISTDIR@'.
+#! distribution directory, `@DISTDIR@'.
 #!
 #! You can change the directory to which packages are distributed by using the
 #! --with-pkg-distdir=DIR option to 'configure'.  The default directory is the
@@ -146,7 +146,7 @@ archive_signs		+= $(tardir)/OPENSS7-GPG-KEY
 ##
 # creates the package directory
 ##
-RELEASE_DIRECTORIES	+= $(PACKAGE_DISTDIR) $(tardir)
+RELEASE_DIRECTORIES	+= $(DISTDIR) $(tardir)
 
 ##
 # Note that sometimes the package distribution directory is the current build directory.  This is
@@ -548,6 +548,9 @@ EXTRA_DIST		+= .pkgpatchlevel \
 ## =============================================================================
 ##
 ## $Log: archive.am,v $
+## Revision 1.1.2.7  2011-02-28 19:51:29  brian
+## - better repository build
+##
 ## Revision 1.1.2.6  2011-02-17 18:34:10  brian
 ## - repository and rpm build updates
 ##
