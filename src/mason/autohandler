@@ -1,0 +1,1048 @@
+% # vim: ft=mason sw=4 fo+=tcqlorn
+<%init>
+    use DB_File;
+    use MIME::Base64;
+    use Storable qw(nfreeze thaw);
+    my $self = $m->base_comp;
+    my $page = $self->name;
+</%init>
+<%args>
+    $hn	    => undef
+    $ip	    => undef
+    $un	    => undef
+    $pw	    => undef
+</%args>
+<%perl>
+    my ($dir,$url,$path,$status,$access,$format,$distro,$relver,$osarch,$branch,$subrep,@tokens);
+    my ($username,$userpass,$usergrps,$usercred,$userrole,$userdata,$userinfo,$userauth,$useraccs,$date);
+    my ($hostname,$hostpass,$hostgrps,$hostcred,$hostrole,$hostdata,$hostinfo,$hostauth,$hostaccs);
+    if ( $self->name eq 'OPENSS7credentials' or
+	 $self->name eq 'openss7.repo' or
+	 $self->name eq 'mirrorlist' or
+	 $self->name eq 'repoindex.xml' )
+    {
+	$date = `date -Iseconds`; chomp $date;
+
+	#
+	#  The following is doing a little work, possibly too early, but it makes the statement
+	#  structure easier and simplicity is more secure than complexity.
+	#
+
+	$dir = $ENV{'DOCUMENT_ROOT'}.$self->dir_path;
+	$dir =~ s,^.*/repo/,repo/,;
+	$dir =~ s,//+,/,g; $dir =~ s,^/,,; $dir =~ s,/$,,;
+	@tokens = split(/\//,$dir);
+
+	$access = 'main,debug,base,extras';
+	$status = 'unverified';
+
+	$format = 'rpms';
+	$distro = 'centos';
+	$relver = '5';
+	$osarch = 'x86_64';
+	$branch = '';
+	$subrep = '';
+
+	#
+	#  When the file is accessed as /repo/$format/$distro/$relver/$osarch/$branch/$subrep/$self->name
+	#  this section will override the defaults provided above.  Note that we at least need
+	#  /repo/rpms/$distro to apply this rule.  The only targets that used this method are the
+	#  openss7.repo files, but we now prefer the POST or PUT approach to both OPENSS7credentials
+	#  and openss7.repo.
+	#
+	if ( $tokens[0] eq 'repo' and $tokens[1] eq 'rpms' and $#tokens >= 2 )
+	{
+	    $format = $tokens[1] if ($#tokens >= 1);
+	    $distro = $tokens[2] if ($#tokens >= 2);
+	    $relver = $tokens[3] if ($#tokens >= 3);
+	    $osarch = $tokens[4] if ($#tokens >= 4);
+	    $branch = $tokens[5] if ($#tokens >= 5);
+	    $subrep = $tokens[6] if ($#tokens >= 6);
+	    if ( $#tokens == 5 ) {
+		$subrep = $branch;
+		$branch = '';
+	    }
+	}
+
+	#
+	#  Note that os target parameters provided as POST or PUT override the same parameters that
+	#  form part of the path of the url.  Mason handles the differences between POST and PUT for
+	#  us here.  This is for accessing the urls using:
+	#
+	#  https://username:password@www.openss7.org/repo/$self->name?distro=$distro&relver=$relver\
+	#          &osarch=$osarch&branch=$branch&subrep=$subrep
+	#
+	#  This is the case for both OPENSS7credentials and openss7.repo.  Note that the POST or PUT
+	#  parameters are not needed when "refreshing" a username and password, because the
+	#  appropriate repo parameters are saved in the host user record.
+	#
+	$distro = $ARGS{'distro'} if ( exists $ARGS{'distro'} );
+	$relver = $ARGS{'relver'} if ( exists $ARGS{'relver'} );
+	$osarch = $ARGS{'osarch'} if ( exists $ARGS{'osarch'} );
+	$branch = $ARGS{'branch'} if ( exists $ARGS{'branch'} );
+	$subrep = $ARGS{'subrep'} if ( exists $ARGS{'subrep'} );
+
+	unless ( exists $ENV{'HTTPS'} and $ENV{'HTTPS'} eq 'on' ) {
+	    # No plaintext passwords in the clear, please
+	    $m->abort(403);
+	}
+	$username = $ENV{'REMOTE_USER'};
+	unless ( $username ) {
+	    #r->auth_name('repo');
+	    #r->auth_type('Basic');
+	    $r->note_basic_auth_failure;
+	    $m->abort(401);
+	}
+	my $ret; ($ret, $userpass) = $r->get_basic_auth_pw;
+
+	#
+	#  Check the username/password ourselves regardless of what Apache does.
+	#
+	{
+	    my %users; tie %users, 'DB_File', '/var/www/mason/repousers', O_CREAT|O_RDWR, 0640 or die $!;
+	    unless ( exists $users{'$username'} ) {
+		#r->auth_name('repo');
+		#r->auth_type('Basic');
+		$r->note_basic_auth_failure;
+		$m->abort(401);
+	    }
+	    ($usercred,$usergrps,$userdata) = split(/:/,$users{"$username"},3);
+	    my $testcred = `htpasswd -nbm $username $userpass`; chomp $testcred; $testcred =~ s/^[^:]*://;
+	    #
+	    #  Note that users with a null password are considered unauthenticated.  This is the
+	    #  case for the 'anonymous' username.
+	    #
+	    if ( $testcred ne $usercred or $userpass eq '' )
+	    {
+		#
+		#  Unauthenticated users are only allowed when first establishing machine
+		#  credentials.
+		#
+		if ( $self->name ne 'OPENSS7credentials' and
+		     $self->name ne 'openss7.repo' )
+		{
+		    #r->auth_name('repo');
+		    #r->auth_type('Basic');
+		    $r->note_basic_auth_failure;
+		    $m->abort(401);
+		}
+		$userauth = 'invalid';
+	    } else {
+		if ( $self->name eq 'mirrorlist' or
+		     $self->name eq 'repoindex.xml' )
+		{
+		    #
+		    #  Only machines are allowed to access the mirrorlist or repoindex.xml files.
+		    #
+		    if ( ",$usergrps," !~ /,hosts,/ ) {
+			#r->auth_name('repo');
+			#r->auth_type('Basic');
+			$r->note_basic_auth_failure;
+			$m->abort(401);
+		    }
+		}
+		$userauth = 'valid';
+	    }
+	    $userinfo;
+	    if ($userdata) {
+		$userinfo = thaw(decode_base64($userdata));
+	    } else {
+		if ( $userauth eq 'valid' ) {
+		    $userinfo = {
+			AUTH_TYPE		  => $ENV{'AUTH_TYPE'},
+			HTTPS			  => $ENV{'HTTPS'},
+			HTTP_DATE		  => $date,
+			HTTP_HOST		  => $ENV{'HTTP_HOST'},
+			HTTP_USER_AGENT		  => $ENV{'HTTP_USER_AGENT'},
+			QUERY_STRING		  => $ENV{'QUERY_STRING'},
+			REMOTE_ADDR		  => $ENV{'REMOTE_ADDR'},
+			REMOTE_HOST		  => $ENV{'REMOTE_HOST'},
+			REMOTE_PASS		  => $userpass,
+			REMOTE_USER		  => $ENV{'REMOTE_USER'},
+			REPO_FORMAT		  => $format,
+			REPO_DISTRO		  => $distro,
+			REPO_RELVER		  => $relver,
+			REPO_OSARCH		  => $osarch,
+			REPO_BRANCH		  => $branch,
+			REPO_SUBREP		  => $subrep,
+			REPO_ACCESS_STATUS	  => 'unaccessed',
+			REPO_AUTH_STATUS	  => $userauth,
+			REPO_LAST_COUNT		  => 0,
+			REPO_LAST_ACCESS	  => $date,
+			REPO_LAST_ACCFILE	  => $self->name,
+			REPO_LAST_HTTP_HOST	  => $ENV{'HTTP_HOST'},
+			REPO_LAST_HTTP_USER_AGENT => $ENV{'HTTP_USER_AGENT'},
+			REPO_LAST_REMOTE_ADDR	  => $ENV{'REMOTE_ADDR'},
+			REPO_LAST_REMOTE_HOST	  => $ENV{'REMOTE_HOST'},
+			REQUESTED_PASS		  => $pw,
+			REQUESTED_USER		  => $un,
+			REQUEST_URI		  => $ENV{'REQUEST_URI'},
+			SCRIPT_URI		  => $ENV{'SCRIPT_URI'},
+			SCRIPT_URL		  => $ENV{'SCRIPT_URL'},
+			SERVER_ADDR		  => $ENV{'SERVER_ADDR'},
+			SERVER_NAME		  => $ENV{'SERVER_NAME'},
+		    };
+		} else {
+		    $userinfo = {};
+		}
+		if ( $userauth eq 'valid' ) {
+		    if ( exists $userinfo->{'REPO_ACCESS'} ) {
+			$useraccs = $userinfo->{'REPO_ACCESS'};
+		    } else {
+			$useraccs = 'main,debug,base,extras';
+			if ( ",$usergrps," =~ /,guest,/ ) {
+			    $useraccs = 'main,debug,base,extras';
+			}
+			if ( ",$usergrps," =~ /,subs,/ ) {
+			    $useraccs = 'main,debug,devel,base,extras,updates,testing,enterprise,servers';
+			}
+			if ( ",$usergrps," =~ /,owners,/ ) {
+			    $useraccs = 'main,debug,devel,source,full,base,extras,updates,testing,enterprise,servers';
+			}
+		    }
+		    if ( exists $userinfo->{'REPO_STATUS'} ) {
+			$userstat = $userinfo->{'REPO_STATUS'};
+		    } else {
+			$userstat = 'unverified';
+			$userinfo->{'REPO_STATUS'} = $userstat;
+		    }
+		}
+	    }
+	    #
+	    #  When the user has a specified repository, regardless of whether this is a restricted
+	    #  user or a restricted host, set the repository path parameters to the restricted
+	    #  values.  Hosts are automatically restricted to the repository that they were created
+	    #  to access; users must be restricted when they are set up by an administrator.
+	    #
+	    $format = $userinfo->{'REPO_FORMAT'} if ( exists $userinfo->{'REPO_FORMAT'} );
+	    $distro = $userinfo->{'REPO_DISTRO'} if ( exists $userinfo->{'REPO_DISTRO'} );
+	    $relver = $userinfo->{'REPO_RELVER'} if ( exists $userinfo->{'REPO_RELVER'} );
+	    $osarcn = $userinfo->{'REPO_OSARCH'} if ( exists $userinfo->{'REPO_OSARCH'} );
+	    $branch = $userinfo->{'REPO_BRANCH'} if ( exists $userinfo->{'REPO_BRANCH'} );
+	    $subrep = $userinfo->{'REPO_SUBREP'} if ( exists $userinfo->{'REPO_SUBREP'} );
+
+	    $userdata = encode_base64(nfreeze($userinfo));
+	    $users{"$username"} = "$usercred:$usergrps:$userdata";
+
+	    if ( ",$usergrps," =~ /,hosts,/ ) {
+		#  
+		#  When this is host, shift user data variables to host data variables and also look
+		#  up the user data.
+		#
+		$hostauth = $userauth;
+		$hostaccs = $useraccs;
+		$hoststat = $userstat;
+		$hostname = $username;
+		$hostpass = $userpass;
+		$hostcred = $usercred;
+		$hostgrps = $usergrps;
+		$hostdata = $userdata;
+		$hostinfo = $userinfo;
+
+		$username = $hostinfo->{'REMOTE_USER'} if ( exists $hostinfo->{'REMOTE_USER'} );
+		unless ( $username and exists $users{"$username"} ) {
+		    $m->abort(403);
+		}
+		$userauth = 'invalid';
+		($usercred,$usergrps,$userdata) = split(/:/,$users{"$username"},3);
+		if ( $userdata ) {
+		    $userinfo = thaw(decode_base64($userdata));
+		} else {
+		    $userinfo = {};
+		}
+		$userpass = $userinfo->{'REMOTE_PASS'} if ( exists $userinfo->{'REMOTE_PASS'} );
+	    } else {
+		$hostauth = undef;
+		$hostaccs = undef;
+		$hoststat = undef;
+		$hostname = undef;
+		$hostpass = undef;
+		$hostcred = undef;
+		$hostgrps = undef;
+		$hostdata = undef;
+		$hostinfo = undef;
+		$userinfo->{'REMOTE_PASS'} = $userpass if ( $userauth eq 'valid' );
+	    }
+	    #
+	    #  Update user information.
+	    #
+	    if ( exists $userinfo->{'REPO_ACCESS'} ) {
+		$useraccs = $userinfo->{'REPO_ACCESS'};
+	    } else {
+		$useraccs = 'main,debug,base,extras';
+		if ( ",$usergrps," =~ /,guest,/ ) {
+		    $useraccs = 'main,debug,base,extras';
+		}
+		if ( ",$usergrps," =~ /,subs,/ ) {
+		    $useraccs = 'main,debug,devel,base,extras,updates,testing';
+		}
+		if ( ",$usergrps," =~ /,owners,/ ) {
+		    $useraccs = 'main,debug,devel,source,full,base,extras,updates,testing';
+		}
+		$userinfo->{'REPO_ACCESS'} = $useraccs;
+	    }
+	    if ( exists $userinfo->{'REPO_STATUS'} ) {
+		$userstat = $userinfo->{'REPO_STATUS'};
+	    } else {
+		$userstat = 'unverified';
+		$userinfo->{'REPO_STATUS'} = $userstat;
+	    }
+
+	    my $count = 0;
+	    $count = $userinfo->{'REPO_LAST_COUNT'} if ( exists $userinfo->{'REPO_LAST_COUNT'} );
+	    $count = $count + 1;
+	    $userinfo->{'REPO_LAST_COUNT'}	     = $count;
+	    $userinfo->{'REPO_LAST_ACCESS'}	     = $date;
+	    $userinfo->{'REPO_LAST_ACCFILE'}	     = $self->name;
+	    $userinfo->{'REPO_LAST_HTTP_HOST'}	     = $ENV{'HTTP_HOST'};
+	    $userinfo->{'REPO_LAST_HTTP_USER_AGENT'} = $ENV{'HTTP_USER_AGENT'};
+	    $userinfo->{'REPO_LAST_REMOTE_ADDR'}     = $ENV{'REMOTE_ADDR'};
+	    $userinfo->{'REPO_LAST_REMOTE_HOST'}     = $ENV{'REMOTE_HOST'};
+	    $userinfo->{'REPO_ACCESS_STATUS'}	     = 'accessed';
+
+	    $userdata = encode_base64(nfreeze($userinfo));
+	    $users{"$username"} = "$usercred:$usergrps:$userdata";
+
+	    untie %users;
+	    #
+	    #  Note that hostinfo and userinfo is pretty much read only from here...
+	    #
+	}
+
+#	if ( $tokens[0] eq 'repo' and $tokens[1] =~ m/(rpms|debs)/ and $#tokens >= 4 )
+#	{
+#	    $tokens[0] = 'repo';
+#	    $tokens[1] = $format;
+#	    $tokens[2] = $distro;
+#	    $tokens[3] = $relver;
+#	    $tokens[4] = $osarch;
+#	    $tokens[5] = $branch;
+#	    $tokens[6] = $subrep;
+#	}
+#
+#	$path = join('/',@tokens);
+#	$path =~ s,//+,/,g; $path =~ s,^/,,; $path =~ s,/$,,;
+#	$url = 'repo/'."$format/$distro".'/$releasever/$basearch/'."$branch/$subrep";
+#	$url =~ s,//+,/,g; $path =~ s,^/,,; $path =~ s,/$,,;
+
+    }
+    if ( $self->name eq 'OPENSS7credentials' or $self->name eq 'openss7.repo' ) {
+	if ( $self->name eq 'openss7.repo' and $distro =~ /^(sle|sles|sled|opensuse|suse)$/ ) {
+	    $m->abort(403); # SuSE must use OPENSS7credentials and services approach
+	}
+	$m->abort(403) unless ( $hn ); # always require a hostname, even for refresh
+	if ( defined $hostname ) {
+	    #
+	    #  When a host is simply refreshing, the requested username and password must be the
+	    #  same as was assigned previously or we simply override them.
+	    #
+	    $un = $hostname;
+	    $pw = $hostpass;
+	} else {
+	    #
+	    #  The stupid urlgrabber that goes with yum cannot handle usernames and passwords of
+	    #  over 26 characters each (due to base64 encoding bug).  So, we truncate to 24
+	    #  characters.
+	    #
+	    if ( $un ) { $hostname = $un; } else {
+		$hostname = `uuidgen`;
+		chomp $hostname;
+		$hostname =~ s/-//g;
+	    }
+	    $hostname = substr($hostname,0,24) if ( $self->name eq 'openss7.repo' );
+
+	    #
+	    #  Once more into the fray dear friend...
+	    #
+	    my %users; tie %users, 'DB_File', '/var/www/mason/repousers', O_CREAT|O_RDWR, 0640 or die $!;
+
+	    if ( exists $users{"$hostname"} )
+	    {
+		($hostcred,$hostgrps,$hostdata) = split(/:/,$users{"$hostname"},3);
+		#
+		#  Only existing host usernames and passwords can be requested.
+		#
+		if ( ",$hostgrps," !~ /,hosts,/ ) {
+		    #r->auth_name('repo');
+		    #r->auth_type('Basic');
+		    $r->note_basic_auth_failure;
+		    $m->abort(401)  # don't return 403 (gives too much information)
+		}
+		#
+		#  A user cannot request a host username that belongs to some other user.
+		#
+		if ( ",$hostgrps," !~ /,$username-hosts,/ ) {
+		    #r->auth_name('repo');
+		    #r->auth_type('Basic');
+		    $r->note_basic_auth_failure;
+		    $m->abort(401)  # don't return 403 (gives too much information)
+		}
+		if ($hostdata) {
+		    $hostinfo = thaw(decode_base64($hostdata));
+		} else {
+		    $hostinfo = {
+			AUTH_TYPE		    => $ENV{'AUTH_TYPE'},
+			HTTPS			    => $ENV{'HTTPS'},
+			HTTP_DATE		    => $date,
+			HTTP_HOST		    => $ENV{'HTTP_HOST'},
+			HTTP_USER_AGENT		    => $ENV{'HTTP_USER_AGENT'},
+			QUERY_STRING		    => $ENV{'QUERY_STRING'},
+			REMOTE_ADDR		    => $ENV{'REMOTE_ADDR'},
+			REMOTE_HOST		    => $ENV{'REMOTE_HOST'},
+			REMOTE_PASS		    => $hostpass,
+			REMOTE_USER		    => $ENV{'REMOTE_USER'},
+			REPO_FORMAT		    => $format,
+			REPO_DISTRO		    => $distro,
+			REPO_RELVER		    => $relver,
+			REPO_OSARCH		    => $osarch,
+			REPO_BRANCH		    => $branch,
+			REPO_SUBREP		    => $subrep,
+			REPO_ACCESS_STATUS	    => 'unaccessed',
+			REPO_AUTH_STATUS	    => $userauth,
+			REPO_LAST_COUNT		    => 0,
+			REPO_LAST_ACCESS	    => $date,
+			REPO_LAST_ACCFILE	    => $self->name,
+			REPO_LAST_HTTP_HOST	    => $ENV{'HTTP_HOST'},
+			REPO_LAST_HTTP_USER_AGENT   => $ENV{'HTTP_USER_AGENT'},
+			REPO_LAST_REMOTE_ADDR	    => $ENV{'REMOTE_ADDR'},
+			REPO_LAST_REMOTE_HOST	    => $ENV{'REMOTE_HOST'},
+			REQUESTED_PASS		    => $pw,
+			REQUESTED_USER		    => $un,
+			REQUEST_URI		    => $ENV{'REQUEST_URI'},
+			SCRIPT_URI		    => $ENV{'SCRIPT_URI'},
+			SCRIPT_URL		    => $ENV{'SCRIPT_URL'},
+			SERVER_ADDR		    => $ENV{'SERVER_ADDR'},
+			SERVER_NAME		    => $ENV{'SERVER_NAME'},
+		    };
+		}
+		#
+		#  Update host information.
+		#
+		my $count = 0;
+		$count = $hostinfo->{'REPO_LAST_COUNT'} if ( exists $hostinfo->{'REPO_LAST_COUNT'} );
+		$count = $count + 1;
+		$hostinfo->{'REPO_LAST_COUNT'}		 = $count;
+		$hostinfo->{'REPO_LAST_ACCESS'}		 = $date;
+		$hostinfo->{'REPO_LAST_ACCFILE'}	 = $self->name;
+		$hostinfo->{'REPO_LAST_HTTP_HOST'}	 = $ENV{'HTTP_HOST'};
+		$hostinfo->{'REPO_LAST_HTTP_USER_AGENT'} = $ENV{'HTTP_USER_AGENT'};
+		$hostinfo->{'REPO_LAST_REMOTE_ADDR'}	 = $ENV{'REMOTE_ADDR'};
+		$hostinfo->{'REPO_LAST_REMOTE_HOST'}	 = $ENV{'REMOTE_HOST'};
+
+		#
+		#  Users and hosts can only change passwords and parameters when the user access was
+		#  fully authenticated.
+		#
+		if ( $userauth eq 'valid' ) {
+		    if ( $pw ) { $hostpass = $pw } else {
+			$hostpass = $hostinfo->{'REMOTE_PASS'};
+		    }
+		    $hostpass = substr($hostpass,0,24) if ( $self->name eq 'openss7.repo' );
+		    $hostcred = `htpasswd -nbm $hostname $hostpass`; chomp $hostcred;
+		    $hostcred =~ s/^[^:]*://;
+		    $hostauth = $userauth;
+		    my %access = {};
+		    $hostaccs = $useraccs;
+		    foreach my $a ( split(',',$hostaccs) ) {
+			$acces{"$a"} = 1;
+		    }
+		    delete $access{'full'};
+		    delete $access{'source'};
+		    delete $access{'testing'};
+
+		    my @hostgrps = ( 'hosts' );
+		    foreach my $k ( keys %access ) {
+			push $hostgrps, 'hosts-'.$k;
+		    }
+		    foreach my $g ( split(/,/,$usergrps) ) {
+			push @hostgrps, $g.'-hosts';
+		    }
+		    push @hostgrps, $username.'-hosts';
+		    if ( $self->name eq 'OPENSS7credentials' ) {
+			push @hostgrps, 'zypp-hosts';
+		    }
+		    if ( $self->name eq 'openss7.repo' ) {
+			push @hostgrps, 'yum-hosts';
+		    }
+		    $hostgrps = join(',',@hostgrps);
+		    $hostinfo->{'REPO_FORMAT'} = $format;
+		    $hostinfo->{'REPO_DISTRO'} = $distro;
+		    $hostinfo->{'REPO_RELVER'} = $relver;
+		    $hostinfo->{'REPO_OSARCH'} = $osarch;
+		    $hostinfo->{'REPO_BRANCH'} = $branch;
+		    $hostinfo->{'REPO_SUBREP'} = $subrep;
+		} else {
+		    $hostpass = $hostinfo->{'REMOTE_PASS'};
+
+		    $format = $hostinfo->{'REPO_FORMAT'} if ( exists $hostinfo->{'REPO_FORMAT'} );
+		    $distro = $hostinfo->{'REPO_DISTRO'} if ( exists $hostinfo->{'REPO_DISTRO'} );
+		    $relver = $hostinfo->{'REPO_RELVER'} if ( exists $hostinfo->{'REPO_RELVER'} );
+		    $osarch = $hostinfo->{'REPO_OSARCH'} if ( exists $hostinfo->{'REPO_OSARCH'} );
+		    $branch = $hostinfo->{'REPO_BRANCH'} if ( exists $hostinfo->{'REPO_BRANCH'} );
+		    $subrep = $hostinfo->{'REPO_SUBREP'} if ( exists $hostinfo->{'REPO_SUBREP'} );
+		}
+	    } else {
+		#
+		#  The stupid urlgrabber that goes with yum cannot handle usernames and passwords of
+		#  over 26 characters each (due to base64 encoding bug).  So, we truncate to 24
+		#  characters.
+		#
+		if ( $pw ) { $hostpass = $pw; } else {
+		    $hostpass = `uuidgen`;
+		    chomp $hostpass;
+		    $hostpass =~ s/-//g;
+		}
+		$hostpass = substr($hostpass,0,24) if ( $self->name eq 'openss7.repo' );
+
+		$hostcred = `htpasswd -nbm $hostname $hostpass`; chomp $hostcred;
+		$hostcred =~ s/^[^:]*://;
+
+		$hostauth = $userauth;
+
+		my %access = {};
+		$hostaccs = $useraccs;
+		foreach my $a ( split(/,/,$hostaccs) ) {
+		    $access{"$a"} = 1;
+		}
+		delete $access{'full'};
+		delete $access{'source'};
+		delete $access{'testing'};
+		if ( $hostauth ne 'valid' ) {
+		    delete $access{'devel'};
+		    delete $access{'updates'};
+		    delete $access{'testing'};
+		}
+
+		my @hostgrps = ( 'hosts' );
+		foreach my $k ( keys %access ) {
+		    push @hostgrps, 'hosts-'.$k;
+		}
+		foreach my $g ( split(/,/,$usergrps ) {
+		    push @hostgrps, $g.'-hosts';
+		}
+		push @hostgrps, $username.'-hosts';
+		if ( $self->name eq 'OPENSS7credentials' ) {
+		    push @hostgrps, 'zypp-hosts';
+		} elsif ( $self->name eq 'openss7.repo' ) {
+		    push @hostgrps, 'yum-hosts';
+		}
+		$hostgrps = join(',',@hostgrps);
+
+		$hostinfo = {
+		    AUTH_TYPE			=> $ENV{'AUTH_TYPE'},
+		    HTTPS			=> $ENV{'HTTPS'},
+		    HTTP_DATE			=> $date,
+		    HTTP_HOST			=> $ENV{'HTTP_HOST'},
+		    HTTP_USER_AGENT		=> $ENV{'HTTP_USER_AGENT'},
+		    QUERY_STRING		=> $ENV{'QUERY_STRING'},
+		    REMOTE_ADDR			=> $ENV{'REMOTE_ADDR'},
+		    REMOTE_HOST			=> $ENV{'REMOTE_HOST'},
+		    REMOTE_PASS			=> $hostpass,
+		    REMOTE_USER			=> $ENV{'REMOTE_USER'},
+		    REPO_ACCESS			=> $hostaccs,
+		    REPO_STATUS			=> 'unverified',
+		    REPO_FORMAT			=> $format,
+		    REPO_DISTRO			=> $distro,
+		    REPO_RELVER			=> $relver,
+		    REPO_OSARCH			=> $osarch,
+		    REPO_BRANCH			=> $branch,
+		    REPO_SUBREP			=> $subrep,
+		    REPO_ACCESS_STATUS		=> 'unaccessed',
+		    REPO_AUTH_STATUS		=> $hostauth,
+		    REPO_LAST_COUNT		=> 1,
+		    REPO_LAST_ACCESS		=> $date,
+		    REPO_LAST_ACCFILE		=> $self->name,
+		    REPO_LAST_HTTP_HOST		=> $ENV{'HTTP_HOST'},
+		    REPO_LAST_HTTP_USER_AGENT	=> $ENV{'HTTP_USER_AGENT'},
+		    REPO_LAST_REMOTE_ADDR	=> $ENV{'REMOTE_ADDR'},
+		    REPO_LAST_REMOTE_HOST	=> $ENV{'REMOTE_HOST'},
+		    REQUESTED_PASS		=> $pw,
+		    REQUESTED_USER		=> $un,
+		    REQUEST_URI			=> $ENV{'REQUEST_URI'},
+		    SCRIPT_URI			=> $ENV{'SCRIPT_URI'},
+		    SCRIPT_URL			=> $ENV{'SCRIPT_URL'},
+		    SERVER_ADDR			=> $ENV{'SERVER_ADDR'},
+		    SERVER_NAME			=> $ENV{'SERVER_NAME'},
+		};
+		$hostdata = encode_base64(nfreeze($hostinfo));
+	    }
+	    $users{"$hostname"} = "$hostcred:$hostgrps:$hostdata";
+	    untie %users;
+	}
+	if ( $self->name eq 'OPENSS7credentials' ) {
+	    $r->content_type('text/plain');
+</%perl>
+username=<% $hostname %>
+password=<% $hostpass %>
+<%perl>
+	} else {
+	    my @brarepos = ( 'base', 'extras', 'updates', 'testing' );
+	    my @subrepos = ( 'full', 'main', 'debug', 'devel', 'source' );
+	    my %enterprise = { sle  => 1, sles => 1, sled => 1, rhel => 1, centos => 1, };
+	    my %nonserver = { i386 => 1, i486 => 1, i586 => 1, i686 => 1, };
+	    my ($bdesc,$sdesc,$desc,$name,$benabled,$senabled,$enable,$ballow,$sallow,$allow);
+	    my ($pre,$target,$repostr,@fields,$msg);
+
+	    my %access = {};
+	    foreach my $a ( split(/,/,$hostaccs) ) {
+		$access{"$a"} = 1;
+	    }
+	    @brarepos = ( $branch ) if ( $branch );
+	    @subrepos = ( $subrep ) if ( $subrep );
+	    for $branch ( @brarepos ) {
+		if ( $access{"$branch"} ) { $ballow = 1; } else { $ballow = 0; }
+		$benabled = 1;
+		$benabled = 0 unless ( $ballow );
+		$benabled = 0 unless ( $branch ne 'testing' );
+		$branch = '' if ( $branch eq 'base' );
+		($bdesc = $branch) =~ s/^([a-z])(.*)$/\U$1\E$2/;
+		for $subrep ( @subrepos ) {
+		    if ( $access{"$subrep"} ) { $sallow = 1; } else { $sallow = 0; }
+		    $senabled = 1;
+		    $senabled = 0 unless ( $sallow );
+		    $senabled = 0 unless ( $subrep eq 'main' or $subrep eq 'full' or $branch eq 'extras' ); 
+		    $subrep = '' if ( $subrep eq 'full' );
+		    ($sdesc = $subrep) =~ s/^([a-z])(.*)$/\U$1\E$2/;
+		    $target = $distro.'-'.$relver.'-'.$osarch;
+		    $name = 'openss7';
+		    $name .= '-'.$branch if ($branch);
+		    $name .= '-'.$subrep if ($subrep);
+		    $desc = 'OpenSS7';
+		    $desc .= ' '.$bdesc if ($bdesc);
+		    $desc .= ' '.$sdesc if ($sdesc);
+		    $desc .= '('.$target.')';
+		    if ( $sallow == 1 and $ballow == 1 ) { $allow = 1; } else { $allow = 0; }
+		    if ( $allow ) { $pre = ''; $msg = ''; } else {
+			$pre = '#';
+			$msg = '# authorization required for access';
+		    }
+		    if ( $senabled == 1 and $benabled == 1 ) { $enabled = 1; } else { $enabled = 0; }
+		    $repostr = '';
+		    $repostr .= '&branch='.$branch if ($branch);
+		    $repostr .= '^subrep='.$subrep if ($subrep);
+		    @fields = ( 'repo', 'rpms', $distro, '$releasever', '$basearch', $branch, $subrep );
+		    $url = join('/',@fields);
+		    $url =~ s,//+,/,g;
+		    $url =~ s,^/,,;
+		    $url =~ s,/$,,;
+</%perl>
+<% $pre %>[<% $name %>]
+<% $pre %>enabled = <% $enabled %>
+<% $pre %>name = <% $desc %>
+<% $pre %>#baseurl = https://<% $hostname %>:<% $hostpass %>@www.openss7.org/<% $url %>/
+<% $pre %>mirrorlist = https://<% $hostname %>:<% $hostpass %>@www.openss7.org/repo/mirrorlist?branch=<% $branch %>&subrep=<% $subrep %>
+<% $pre %>gpgkey = https://www.openss7.org/pubkey.asc
+<% $pre %>         https://www.openss7.org/repo/tarballs/OPENSS7-GPG-KEY
+<% $pre %>gpgcheck = 1
+<% $pre %>repo_gpgcheck = 0
+<%perl>
+		}
+	    }
+	}
+    } elsif ( $self->name eq 'OPENSS7credentials' or $self->name eq 'openss7.repo' ) {
+	$m->abort(403) unless ($hn);
+	my $username = 'anonymous'; $username = $ENV{'REMOTE_USER'} if ( exists $ENV{'REMOTE_USER'} );
+	unless ( $un ) {
+	    $un = $username if ( length($username) >= 24 );
+	}
+	my ($hostname,$hostpass,$hostgrps);
+#
+# There is no reason to assign a username and password to the openss7.repo file in a
+# suse repository because it should only be accessed via the 'services' approach.
+#
+	unless ( $self->path =~ m,/(sle|sles|sled|opensuse|suse)/, ) {
+	    my %users; tie %users, 'DB_File', '/var/www/mason/repousers', O_CREAT|O_RDWR, 0640 or die $!;
+	    if ( $un ) { $hostname = $un; } else {
+		$hostname = `uuidgen`;
+		chomp $hostname;
+		$hostname =~ s/-//g;
+	    }
+	    $hostname = substr($hostname,0,24) if ( $self->name eq 'openss7.repo' );
+	    if ( exists $users{"$hostname"} ) {
+		($hostcred,$hostgrps,$hostdata) = split(/:/,$users{"$hostname"},3);
+		if ($hostdata) {
+		    $hostinfo = thaw(decode_base64($hostdata));
+		    $hostpass = $hostinfo->{'REMOTE_PASS'};
+		}
+		# only existing host usernames and passwords can be requested.
+		unless ( $hostgrps =~ /\<hosts\>/ ) {
+		    $r->note_basic_auth_failure;
+		    $m->abort(401)
+		}
+	    } else {
+		# hosts cannot request credentials for another host
+		if ( $usergrps =~ /\<hosts\>/ ) {
+		    $r->note_basic_auth_failure;
+		    $m->abort(401)
+		}
+		if ( $pw ) { $hostpass = $pw; } else {
+		    $hostpass = `uuidgen`;
+		    chomp $hostpass;
+		    $hostpass =~ s/-//g;
+		}
+		$hostpass = substr($hostpass,0,24) if ( $self->name eq 'openss7.repo' );
+		$hostcred = `htpasswd -nbm $hostname $hostpass`; chomp $hostcred;
+		$hostcred =~ s/^[^:]*://;
+		my @groups = split(/,/,$usergrps);
+		my @hostgrps = ( 'hosts' );
+		while ( my $g = shift @groups ) {
+		    push @hostgrps, $g.'-hosts';
+		}
+		push @hostgrps, $username.'-hosts';
+		if ( $self->name eq 'OPENSS7credentials' ) {
+		    push @hostgrps, 'zypp-hosts';
+		}
+		if ( $self->name eq 'openss7.repo' ) {
+		    push @hostgrps, 'yum-hosts';
+		}
+		$hostgrps = join(',',@hostgrps);
+		my $date = `date -Iseconds`; chomp $date;
+		$hostinfo = {
+		    AUTH_TYPE		=> $ENV{'AUTH_TYPE'},
+		    HTTPS		=> $ENV{'HTTPS'},
+		    HTTP_DATE		=> $date,
+		    HTTP_HOST		=> $ENV{'HTTP_HOST'},
+		    HTTP_USER_AGENT	=> $ENV{'HTTP_USER_AGENT'},
+		    QUERY_STRING	=> $ENV{'QUERY_STRING'},
+		    REMOTE_ADDR		=> $ENV{'REMOTE_ADDR'},
+		    REMOTE_HOST		=> $ENV{'REMOTE_HOST'},
+		    REMOTE_PASS		=> $hostpass,
+		    REMOTE_USER		=> $ENV{'REMOTE_USER'},
+		    REQUESTED_PASS	=> $pw,
+		    REQUESTED_USER	=> $un,
+		    REQUEST_URI		=> $ENV{'REQUEST_URI'},
+		    SCRIPT_URI		=> $ENV{'SCRIPT_URI'},
+		    SCRIPT_URL		=> $ENV{'SCRIPT_URL'},
+		    SERVER_ADDR		=> $ENV{'SERVER_ADDR'},
+		    SERVER_NAME		=> $ENV{'SERVER_NAME'},
+		};
+		$hostdata = encode_base64(nfreeze($hostinfo));
+	    }
+	    $users{"$hostname"} = "$hostcred:$hostgrps:$hostdata";
+	    untie %users;
+	}
+	if ( $self->name eq 'OPENSS7credentials' ) {
+	    $r->content_type('text/plain');
+</%perl>
+username=<% $hostname %>
+password=<% $hostpass %>
+<%perl>
+	} else {
+	    $r->content_type('text/plain');
+	    my $location = $ENV{'DOCUMENT_ROOT'}.$self->dir_path;
+	    $location =~ s,//+,/,g;
+	    $location =~ s,/[^/]*$,,; # trim the /repodata
+	    my @files = `find $location -follow -name 'repomd.xml' 2>/dev/null | sort -u`;
+	    my %repos = {};
+
+	    if ( $hostgrps =~ /guest/ ) {
+		foreach my $file (@files) {
+		    # filter out anything with /sle/, /sles/, /sled/, /opensuse/, /suse/
+		    if ( $file =~ m,/(sle|sles|sled|opensuse|suse)/, ) {
+			next;
+		    }
+		    # filter out anything with /sle/, /rhel/ or /centos/
+		    if ( $file =~ m,/(sle|rhel|centos)/, ) {
+			next;
+		    }
+		    # filter out /extras/main/, /extras/debug/, /extras/devel, /extras/source/
+		    if ( $file =~ m,/extras/(main|debug|devel|source)/, ) {
+			next;
+		    }
+		    #  and leave /extras/
+		    if ( $file =~ m,/extras/, ) {
+			$repos{"$file"} = 1;
+			next;
+		    }
+		    # filter out /updates/ and /testing/ repos
+		    if ( $file =~ m,/(updates|testing)/, ) {
+			next;
+		    }
+		    # filter out all /devel/ and /source/ repos
+		    if ( $file =~ m,/(devel|source)/, ) {
+			next;
+		    }
+		    # permit all other /main and /debug repositories
+		    if ( $file =~ m,/(main|debug)/, ) {
+			$repos{"$file"} = 1;
+			next;
+		    }
+		    # skip anything else
+		}
+	    } else {
+		foreach my $file (@files) {
+		    # filter out anything with /sle/, /sles/, /sled/, /opensuse/, /suse/
+		    if ( $file =~ m,/(sle|sles|sled|opensuse|suse)/, ) {
+			next;
+		    }
+		    # skip all /main /debug /devel and /source repos and just keep primary repositories
+		    if ( $file =~ m,/(main|debug|devel|source)/, ) {
+			next;
+		    }
+		    $repos{"$file"} = 1;
+		}
+	    }
+	    foreach my $file (@files) {
+		my $url = $file;
+		chomp $url;
+		$url =~ s,/repodata/repomd.xml,,;
+		$url =~ s,^.*/repo/,repo/,;
+		my @fields = split(/\//,$url);
+		my $distro = $fields[2];
+		my $relver = $fields[3]; $fields[3] = '$releasever';
+		my $osarch = $fields[4]; $fields[4] = '$basearch';
+		my $branch = $fields[5];
+		my $subrep = $fields[6];
+		$url = join('/',@fields);
+		unless ($subrep) {
+		    $subrep = $branch;
+		    $branch = '';
+		}
+		my $target = $distro . '-' . $relver . '-' . $osarch;
+		my $name = 'openss7';
+		$name .= '-' . $branch if ($branch);
+		$name .= '-' . $subrep if ($subrep);
+		my ($bdesc,$sdesc);
+		($bdesc = $branch) =~ s/^([a-z])(.*)$/\U$1\E$2/;
+		($sdesc = $subrep) =~ s/^([a-z])(.*)$/\U$1\E$2/;
+		my $desc = 'OpenSS7';
+		$desc .= ' ' . $bdesc if ($bdesc);
+		$desc .= ' ' . $sdesc if ($sdesc);
+		$desc .= ' (' . $target . ')';
+		my $enabled = 0;
+		if ( $bdesc =~ /^(|Updates|Extras)$/ ) {
+		    unless ( $sdesc =~ /^(Debug|Devel|Source)$/ ) {
+			$enabled = 1;
+		    }
+		}
+		my $repostr = '';
+		$repostr .= '&branch='.$branch if ($branch);
+		$repostr .= '&subrep='.$subrep if ($subrep);
+		my $pre;
+		if ( exists $repos{"$file"} ) {
+		    $pre = '';
+		} else {
+		    $pre = '#';
+		    $enabled = 0;
+		}
+</%perl>
+<% $pre %>[<% $name %>]
+<% $pre %>enabled = <% $enabled %>
+<% $pre %>name = <% $desc %>
+<% $pre %>#baseurl = https://<% $hostname %>:<% $hostpass %>@www.openss7.org/<% $url %>/
+<% $pre %>mirrorlist = https://<% $hostname %>:<% $hostpass %>@www.openss7.org/repo/mirrorlist?distro=<% $distro %>&relver=$releasever&osarch=$basearch<% $repostr %>
+<% $pre %>gpgkey = https://www.openss7.org/pubkey.asc
+<% $pre %>gpgcheck = 1
+<% $pre %>repo_gpgcheck = 0
+
+<%perl>
+	    }
+	}
+    } elsif ( $self->name eq 'repoindex.xml' ) {
+	my $username = 'anonymous'; $username = $ENV{'REMOTE_USER'} if ( exists $ENV{'REMOTE_USER'} );
+	my %users; tie %users, 'DB_File', '/var/www/mason/repousers', O_CREAT|O_RDWR, 0640 or die $!;
+	if ( exists $users{"$username"} ) {
+	    ($usercred,$usergrps,$userdata) = split(/:/,$users{"$username"},3);
+	    if ($userdata) {
+		$userinfo = thaw(decode_base64($userdata));
+	    } else {
+		$userinfo = {};
+	    }
+	    my $count = 0;
+	    $count = $userinfo->{'REPO_LAST_COUNT'} if ( exists $userinfo->{'REPO_LAST_COUNT'} );
+	    $count = $count + 1;
+	    my $date = `date -Iseconds`; chomp $date;
+	    $userinfo->{'REPO_LAST_COUNT'}	     = $count;
+	    $userinfo->{'REPO_LAST_ACCESS'}	     = $date;
+	    $userinfo->{'REPO_LAST_ACCFILE'}	     = $self->name;
+	    $userinfo->{'REPO_ACCESS_STATUS'}	     = 'accessed';
+	    $userinfo->{'REPO_LAST_HTTP_HOST'}	     = $ENV{'HTTP_HOST'};
+	    $userinfo->{'REPO_LAST_HTTP_USER_AGENT'} = $ENV{'HTTP_USER_AGENT'};
+	    $userinfo->{'REPO_LAST_REMOTE_ADDR'}     = $ENV{'REMOTE_ADDR'};
+	    $userinfo->{'REPO_LAST_REMOTE_HOST'}     = $ENV{'REMOTE_HOST'};
+	    $userdata = encode_base64(nfreeze($userinfo));
+	    $users{"$username"} = "$usercred:$usergrps:$userdata";
+	    untie %users;
+	} else {
+	    untie %users;
+	    $m->abort(403);
+	}
+
+	my $location = $ENV{'DOCUMENT_ROOT'}.$self->dir_path;
+	$location =~ s,//+,/,g;
+	my @files = `find $location -follow -name 'repomd.xml' 2>/dev/null | sort -u`;
+	my %repos = {};
+
+	if ( $usergrps =~ /guest/ ) {
+	    foreach my $file (@files) {
+	        # filter out anything with /sle/, /rhel/ or /centos/
+		if ( $file =~ m,/(sle|rhel|centos)/, ) {
+		    next;
+		}
+		# filter out /extras/main/, /extras/debug/, /extras/devel, /extras/source/
+		if ( $file =~ m,/extras/(main|debug|devel|source)/, ) {
+		    next;
+		}
+		#  and leave /extras/
+		if ( $file =~ m,/extras/, ) {
+		    $repos{"$file"} = 1;
+		    next;
+		}
+		# filter out /updates/ and /testing/ repos
+		if ( $file =~ m,/(updates|testing)/, ) {
+		    next;
+		}
+		# filter out all /devel/ and /source/ repos
+		if ( $file =~ m,/(devel|source)/, ) {
+		    next;
+		}
+		# permit all other /main and /debug repositories
+		if ( $file =~ m,/(main|debug)/, ) {
+		    $repos{"$file"} = 1;
+		    next;
+		}
+		# skip anything else
+	    }
+	} else {
+	    foreach my $file (@files) {
+		# skip all /main /debug and /source repos and just keep
+		# primary repositories
+		if ( $file =~ m,/(main|debug|devel|source)/, ) {
+		    next;
+		}
+		$repos{"$file"} = 1;
+	    }
+	}
+</%perl>
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- generated for machine: <% $username %> -->
+<repoindex>
+<%perl>
+	foreach my $file (@files) {
+	    my $url = $file;
+	    chomp $url;
+	    $url =~ s,/repodata/repomd.xml,,;
+	    $url =~ s,^.*/rpms/,rpms/,;
+	    my @fields = split(/\//,$url);
+	    my $distro = $fields[1];
+	    my $relver = $fields[2]; # $fields[2] = '$releasever';
+	    my $osarch = $fields[3]; # $fields[3] = '$basearch';
+	    my $branch = $fields[4];
+	    my $subrep = $fields[5];
+	    $url = join('/',@fields);
+	    unless ($subrep) {
+		$subrep = $branch;
+		$branch = '';
+	    }
+	    my $target = $distro . '-' . $relver . '-' . $osarch;
+	    my $name = 'OPENSS7';
+	    $name .= '-' . $branch if ($branch);
+	    $name .= '-' . $subrep if ($subrep);
+	    $name .= '-' . $target;
+	    my ($bdesc,$sdesc);
+	    ($bdesc = $branch) =~ s/^([a-z])(.*)$/\U$1\E$2/;
+	    ($sdesc = $subrep) =~ s/^([a-z])(.*)$/\U$1\E$2/;
+	    my $desc = 'OpenSS7';
+	    $desc .= ' ' . $bdesc if ($bdesc);
+	    $desc .= ' ' . $sdesc if ($sdesc);
+	    $desc .= ' (' . $target . ')';
+	    my ($pre,$suf);
+	    if ( exists $repos{"$file"} ) {
+		$pre = '';
+		$suf = '';
+</%perl>
+  <% $pre %><repo name="<% $name %>"
+	alias="<% $name %>"
+	description="<% $desc %>"
+	distro_target="<% $target %>"
+	path="<% $url %>"
+	priority="0"
+	pub="0" /><% $suf %>
+<%perl>
+	    } else {
+		$pre = '<!-- ';
+		$suf = ' -->';
+	    }
+	}
+</%perl>
+</repoindex>
+<%perl>
+    } elsif ( $self->name eq 'mirrorlist' ) {
+	my ($grps,$userpass);
+	my $username = 'anonymous'; $username = $ENV{'REMOTE_USER'} if ( exists $ENV{'REMOTE_USER'} );
+	my %users; tie %users, 'DB_File', '/var/www/mason/repousers', O_CREAT|O_RDWR, 0640 or die $!;
+	if ( exists $users{"$username"} ) {
+	    ($usercred,$usergrps,$userdata) = split(/:/,$users{"$username"},3);
+	    if ($userdata) {
+		$userinfo = thaw(decode_base64($userdata));
+		$userpass = $userinfo->{'REMOTE_PASS'};
+	    } else {
+		$userinfo = {};
+	    }
+	    my $count = 0;
+	    $count = $userinfo->{'REPO_LAST_COUNT'} if ( exists $userinfo->{'REPO_LAST_COUNT'} );
+	    $count = $count + 1;
+	    my $date = `date -Iseconds`; chomp $date;
+	    $userinfo->{'REPO_LAST_COUNT'}	     = $count;
+	    $userinfo->{'REPO_LAST_ACCESS'}	     = $date;
+	    $userinfo->{'REPO_LAST_ACCFILE'}	     = $self->name;
+	    $userinfo->{'REPO_ACCESS_STATUS'}	     = 'accessed';
+	    $userinfo->{'REPO_LAST_HTTP_HOST'}	     = $ENV{'HTTP_HOST'};
+	    $userinfo->{'REPO_LAST_HTTP_USER_AGENT'} = $ENV{'HTTP_USER_AGENT'};
+	    $userinfo->{'REPO_LAST_REMOTE_ADDR'}     = $ENV{'REMOTE_ADDR'};
+	    $userinfo->{'REPO_LAST_REMOTE_HOST'}     = $ENV{'REMOTE_HOST'};
+	    $userdata = encode_base64(nfreeze($userinfo));
+	    $users{"$username"} = "$usercred:$usergrps:$userdata";
+	    untie %users;
+	} else {
+	    untie %users;
+	    $m->abort(403);
+	}
+
+	my $location = $ENV{'DOCUMENT_ROOT'}.$self->path;
+	$location =~ s,//+,/,g;
+	$location =~ s,^.*/repo/,repo/,;
+	$location =~ s,/mirrorlist$,,;
+	my @fields = split(/\//,$location);
+
+	my $distro = 'centos';
+	my $relver = '5';
+	my $osarch = 'x86_64';
+	my $branch = '';
+	my $subrep = '';
+
+	$distro = $fields[2] if ($#fields >= 2);
+	$relver = $fields[3] if ($#fields >= 3);
+	$osarch = $fields[4] if ($#fields >= 4);
+	$branch = $fields[5] if ($#fields >= 5);
+	$subrep = $fields[6] if ($#fields >= 6);
+	if ($#fields == 5) {
+	    $subrep = $branch;
+	    $branch = '';
+	}
+
+	$distro = $ARGS{'distro'} if (exists $ARGS{'distro'});
+	$relver = $ARGS{'relver'} if (exists $ARGS{'relver'});
+	$osarch = $ARGS{'osarch'} if (exists $ARGS{'osarch'});
+	$branch = $ARGS{'branch'} if (exists $ARGS{'branch'});
+	$subrep = $ARGS{'subrep'} if (exists $ARGS{'subrep'});
+
+	my $url;
+	($url = '/repo/rpms/'."$distro/$relver/$osarch/$branch/$subrep") =~ s,//+,/,g;
+	my $repomd = $ENV{'DOCUMENT_ROOT'}.$url.'/repodata/repomd.xml';
+	$relver = '$releasever';
+	$osarch = '$basearch';
+	($url = '/repo/rpms/'."$distro/$relver/$osarch/$branch/$subrep") =~ s,//+,/,g;
+	my $pre;
+	if ( -e $repomd ) {
+	    $pre = '';
+	} else {
+	    $pre = '#';
+	}
+</%perl>
+<% $pre %>https://<% $username %>:<% $userpass %>@www.openss7.org<% $url %>
+<%perl>
+    } else {
+	$m->call_next;
+    }
+</%perl>
