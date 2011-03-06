@@ -20,8 +20,8 @@
 	    $page eq 'repoindex.xml' );
 
     my ($url,$distro,$relver,$osarch,$branch,$subrep);
-    my ($username,$userpass,$usergrps,$usergacc,$usercred,$userdata,$userinfo,$userauth,$useraccs,$userdflt,$date);
-    my ($hostname,$hostpass,$hostgrps,$hostgacc,$hostcred,$hostdata,$hostinfo,$hostauth,$hostaccs);
+    my ($username,$userpass,$usergrps,$useraccs,$usercred,$userdata,$userinfo,$userauth,$userdflt,$date);
+    my ($hostname,$hostpass,$hostgrps,$hostaccs,$hostcred,$hostdata,$hostinfo,$hostauth,$testpass);
 
     $date = `date -Iseconds`; chomp $date;
 
@@ -30,11 +30,11 @@
     if ( $page eq 'mirrorlist' ) {
 	$m->abort(403) unless ( $un );
 	$username = $un;
-	$userpass = '';
+	$testpass = '';
     } else {
 	$username = $ENV{'REMOTE_USER'};
 	unless ( $username ) { $r->note_basic_auth_failure; $m->abort(401); }
-	my $ret; ($ret, $userpass) = $r->get_basic_auth_pw;
+	my $ret; ($ret, $testpass) = $r->get_basic_auth_pw;
     }
 
     my %users; tie %users, 'DB_File', '/var/www/mason/repousers', O_CREAT|O_RDWR, 0640 or die $!;
@@ -42,24 +42,7 @@
     unless ( exists $users{$username} ) { $r->note_basic_auth_failure; $m->abort(401); }
 
     ($usercred,$usergrps,$userdata) = split(/:/,$users{$username},3);
-    $usergacc = ",$usergrps,";
-
-    my $testcred = `htpasswd -nbm $username $userpass`; chomp $testcred; $testcred =~ s/^[^:]*://;
-    if ( $testcred ne $usercred or $userpass eq '' ) {
-#	if ( $page eq 'repoindex.xml' ) {
-#	    $r->note_basic_auth_failure;
-#	    $m->abort(401);
-#	}
-	$userauth = 'invalid';
-    } else {
-	if ( $page eq 'mirrorlist' or $page eq 'repoindex.xml' ) {
-	    if ( $usergacc !~ /,hosts,/ ) {
-		$r->note_basic_auth_failure;
-		$m->abort(401);
-	    }
-	}
-	$userauth = 'valid';
-    }
+    $useraccs = ",$usergrps,";
 
     if ($userdata) {
 	$userinfo = thaw(decode_base64($userdata));
@@ -68,13 +51,29 @@
     }
     $userpass = $userinfo->{'REMOTE_PASS'} if ( exists $userinfo->{'REMOTE_PASS'} );
 
-    if ( $usergacc =~ /,hosts,/ ) {
+    if ( $testpass ne $userpass or $testpass eq '' ) {
+	if ( $page eq 'repoindex.xml' ) {
+	    $r->note_basic_auth_failure;
+	    $m->abort(401);
+	}
+	$userauth = 'invalid';
+    } else {
+	if ( $page eq 'mirrorlist' or $page eq 'repoindex.xml' ) {
+	    if ( $useraccs !~ /,hosts,/ ) {
+		$r->note_basic_auth_failure;
+		$m->abort(401);
+	    }
+	}
+	$userauth = 'valid';
+    }
+
+    if ( $useraccs =~ /,hosts,/ ) {
 	$hostauth = $userauth;
 	$hostname = $username; $username = undef;
 	$hostpass = $userpass; $userpass = undef;
 	$hostcred = $usercred; $usercred = undef;
 	$hostgrps = $usergrps; $usergrps = undef;
-	$hostgacc = $usergacc; $usergacc = undef;
+	$hostaccs = $useraccs; $useraccs = undef;
 	$hostdata = $userdata; $userdata = undef;
 	$hostinfo = $userinfo; $userinfo = undef;
 
@@ -83,7 +82,7 @@
 
 	$userauth = 'invalid';
 	($usercred,$usergrps,$userdata) = split(/:/,$users{$username},3);
-	$usergacc = ",$usergrps,";
+	$useraccs = ",$usergrps,";
 	if ( $userdata ) {
 	    $userinfo = thaw(decode_base64($userdata));
 	} else {
@@ -110,10 +109,10 @@
 	    if ( exists $users{$hostname} )
 	    {
 		($hostcred,$hostgrps,$hostdata) = split(/:/,$users{$hostname},3);
-		$hostgacc = ",$hostgrps,";
+		$hostaccs = ",$hostgrps,";
 
-		if ( $hostgacc !~ /,hosts,/           ) { $r->note_basic_auth_failure; $m->abort(401); }
-		if ( $hostgacc !~ /,$username-hosts,/ ) { $r->note_basic_auth_failure; $m->abort(401); }
+		if ( $hostaccs !~ /,hosts,/           ) { $r->note_basic_auth_failure; $m->abort(401); }
+		if ( $hostaccs !~ /,$username-hosts,/ ) { $r->note_basic_auth_failure; $m->abort(401); }
 
 		if ( $hostdata ) { $hostinfo = thaw(decode_base64($hostdata)); } else { $hostinfo = {}; }
 		$hostpass = $hostinfo->{'REMOTE_PASS'} if ( exists $hostinfo->{'REMOTE_PASS'} );
@@ -178,26 +177,26 @@
 
     if ( $username )
     {
-	$userinfo->{'AUTH_TYPE'}	  = $ENV{'AUTH_TYPE'}	    unless ( exists $userinfo->{'AUTH_TYPE'} );
-	$userinfo->{'HTTPS'}		  = $ENV{'HTTPS'}	    unless ( exists $userinfo->{'HTTPS'} );
-	$userinfo->{'HTTP_DATE'}	  = $date		    unless ( exists $userinfo->{'HTTP_HOST'} );
-	$userinfo->{'HTTP_HOST'}	  = $ENV{'HTTP_HOST'}	    unless ( exists $userinfo->{'HTTP_HOST'} );
-	$userinfo->{'HTTP_USER_AGENT'}	  = $ENV{'HTTP_USER_AGENT'} unless ( exists $userinfo->{'HTTP_USER_AGENT'} );
-	$userinfo->{'QUERY_STRING'}	  = $ENV{'QUERY_STRING'}    unless ( exists $userinfo->{'QUERY_STRING'} );
-	$userinfo->{'REMOTE_ADDR'}	  = $ENV{'REMOTE_ADDR'}	    unless ( exists $userinfo->{'REMOTE_ADDR'} );
-	$userinfo->{'REMOTE_HOST'}	  = $ENV{'REMOTE_HOST'}	    unless ( exists $userinfo->{'REMOTE_HOST'} );
-	$userinfo->{'REMOTE_PASS'}	  = $userpass		    unless ( exists $userinfo->{'REMOTE_PASS'} );
-	$userinfo->{'REMOTE_USER'}	  = $ENV{'REMOTE_USER'}	    unless ( exists $userinfo->{'REMOTE_USER'} );
-	$userinfo->{'REPO_STATUS'}	  = 'unverified'	    unless ( exists $userinfo->{'REPO_STATUS'} );
-	$userinfo->{'REPO_ACCESS_STATUS'} = 'accessed'		    unless ( exists $userinfo->{'REPO_ACCESS_STATUS'} );
-	$userinfo->{'REPO_AUTH_STATUS'}	  = $userauth		    unless ( exists $userinfo->{'REPO_AUTH_STATUS'} );
-	$userinfo->{'REQUESTED_PASS'}	  = $pw;
-	$userinfo->{'REQUESTED_USER'}	  = $un;
-	$userinfo->{'REQUEST_URI'}	  = $ENV{'REQUEST_URI'}	    unless ( exists $userinfo->{'REQUEST_URI'} );
-	$userinfo->{'SCRIPT_URI'}	  = $ENV{'SCRIPT_URI'}	    unless ( exists $userinfo->{'SCRIPT_URI'} );
-	$userinfo->{'SCRIPT_URL'}	  = $ENV{'SCRIPT_URL'}	    unless ( exists $userinfo->{'SCRIPT_URL'} );
-	$userinfo->{'SERVER_ADDR'}	  = $ENV{'SERVER_ADDR'}	    unless ( exists $userinfo->{'SERVER_ADDR'} );
-	$userinfo->{'SERVER_NAME'}	  = $ENV{'SERVER_NAME'}	    unless ( exists $userinfo->{'SERVER_NAME'} );
+#	$userinfo->{'AUTH_TYPE'}	  = $ENV{'AUTH_TYPE'}	    unless ( exists $userinfo->{'AUTH_TYPE'} );
+#	$userinfo->{'HTTPS'}		  = $ENV{'HTTPS'}	    unless ( exists $userinfo->{'HTTPS'} );
+#	$userinfo->{'HTTP_DATE'}	  = $date		    unless ( exists $userinfo->{'HTTP_HOST'} );
+#	$userinfo->{'HTTP_HOST'}	  = $ENV{'HTTP_HOST'}	    unless ( exists $userinfo->{'HTTP_HOST'} );
+#	$userinfo->{'HTTP_USER_AGENT'}	  = $ENV{'HTTP_USER_AGENT'} unless ( exists $userinfo->{'HTTP_USER_AGENT'} );
+#	$userinfo->{'QUERY_STRING'}	  = $ENV{'QUERY_STRING'}    unless ( exists $userinfo->{'QUERY_STRING'} );
+#	$userinfo->{'REMOTE_ADDR'}	  = $ENV{'REMOTE_ADDR'}	    unless ( exists $userinfo->{'REMOTE_ADDR'} );
+#	$userinfo->{'REMOTE_HOST'}	  = $ENV{'REMOTE_HOST'}	    unless ( exists $userinfo->{'REMOTE_HOST'} );
+#	$userinfo->{'REMOTE_PASS'}	  = $userpass		    unless ( exists $userinfo->{'REMOTE_PASS'} );
+#	$userinfo->{'REMOTE_USER'}	  = $ENV{'REMOTE_USER'}	    unless ( exists $userinfo->{'REMOTE_USER'} );
+#	$userinfo->{'REPO_STATUS'}	  = 'unverified'	    unless ( exists $userinfo->{'REPO_STATUS'} );
+#	$userinfo->{'REPO_ACCESS_STATUS'} = 'accessed'		    unless ( exists $userinfo->{'REPO_ACCESS_STATUS'} );
+#	$userinfo->{'REPO_AUTH_STATUS'}	  = $userauth		    unless ( exists $userinfo->{'REPO_AUTH_STATUS'} );
+#	$userinfo->{'REQUESTED_PASS'}	  = $pw;
+#	$userinfo->{'REQUESTED_USER'}	  = $un;
+#	$userinfo->{'REQUEST_URI'}	  = $ENV{'REQUEST_URI'}	    unless ( exists $userinfo->{'REQUEST_URI'} );
+#	$userinfo->{'SCRIPT_URI'}	  = $ENV{'SCRIPT_URI'}	    unless ( exists $userinfo->{'SCRIPT_URI'} );
+#	$userinfo->{'SCRIPT_URL'}	  = $ENV{'SCRIPT_URL'}	    unless ( exists $userinfo->{'SCRIPT_URL'} );
+#	$userinfo->{'SERVER_ADDR'}	  = $ENV{'SERVER_ADDR'}	    unless ( exists $userinfo->{'SERVER_ADDR'} );
+#	$userinfo->{'SERVER_NAME'}	  = $ENV{'SERVER_NAME'}	    unless ( exists $userinfo->{'SERVER_NAME'} );
 
 	my $count = 0;
 	$count = $userinfo->{'REPO_LAST_COUNT'} if ( exists $userinfo->{'REPO_LAST_COUNT'} );
@@ -211,23 +210,9 @@
 	$userinfo->{'REPO_LAST_REMOTE_ADDR'}	 = $ENV{'REMOTE_ADDR'};
 	$userinfo->{'REPO_LAST_REMOTE_HOST'}	 = $ENV{'REMOTE_HOST'};
 
-	if ( exists $userinfo->{'REPO_ACCESS'} ) { $useraccs = $userinfo->{'REPO_ACCESS'}; } else {
-	    $useraccs = 'main,debug,base,extras';
-	    if ( $usergacc =~ /,guests,/  ) { $useraccs = 'main,debug,base,extras'; }
-	    if ( $usergacc =~ /,subs,/    ) { $useraccs = 'main,debug,devel,base,extras,updates,testing,enterprise,server'; }
-	    if ( $usergacc =~ /,owners,/  ) { $useraccs = 'main,debug,devel,source,full,base,extras,updates,testing,enterprise,server'; }
-	    $userinfo->{'REPO_ACCESS'} = $useraccs;
-	}
-	if ( exists $userinfo->{'REPO_ACCESS_DEFAULT'} ) { $userdflt = $userinfo->{'REPO_ACCESS_DEFAULT'}; } else {
-	    $userdflt = 'main,debug,base,extras';
-	    if ( $usergacc =~ /,guests,/  ) { $userdflt = 'main,debug,base,extras'; }
-	    if ( $usergacc =~ /,subs,/    ) { $userdflt = 'main,debug,base,extras,updates,enterprise,server'; }
-	    if ( $usergacc =~ /,owners,/  ) { $userdflt = 'main,debug,devel,source,full,base,extras,updates,testing,enterprise,server'; }
-	    $userinfo->{'REPO_ACCESS_DEFAULT'} = $userdflt;
-	}
-
 	$userdata = encode_base64(nfreeze($userinfo));
 	$users{$username} = "$usercred:$usergrps:$userdata";
+	$useraccs = ",$usergrps,";
     }
     if ( $hostname )
     {
@@ -264,11 +249,6 @@
 	$hostinfo->{'REPO_LAST_REMOTE_ADDR'}	 = $ENV{'REMOTE_ADDR'};
 	$hostinfo->{'REPO_LAST_REMOTE_HOST'}	 = $ENV{'REMOTE_HOST'};
 
-	if ( exists $hostinfo->{'REPO_ACCESS'} ) { $hostaccs = $hostinfo->{'REPO_ACCESS'}; } else {
-	    $hostaccs = $userinfo->{'REPO_ACCESS_DEFAULT'};
-	    $hostinfo->{'REPO_ACCESS'} = $hostaccs;
-	}
-
 	unless ( $hostgrps ) 
 	{
 	    my @hostgrps = ( 'hosts' );
@@ -278,15 +258,13 @@
 	    foreach my $g ( split(/,/,$usergrps) ) {
 		push @hostgrps, $g.'-hosts';
 	    }
-	    foreach my $a ( split(/,/,$hostaccs) ) {
-		push @hostgrps, 'hosts-'.$a;
-	    }
 	    $hostgrps = join(',',@hostgrps);
-	    $hostgacc = ",$hostgrps,";
+	    $hostaccs = ",$hostgrps,";
 	}
 
 	$hostdata = encode_base64(nfreeze($hostinfo));
 	$users{$hostname} = "$hostcred:$hostgrps:$hostdata";
+	$hostaccs = ",$hostgrps,";
     }
 
     untie %users;
@@ -304,71 +282,64 @@ password=<% $hostpass %>
     }
     elsif ( $page eq 'openss7.repo' )
     {
-	my $access = ",$hostaccs,";
-
 	my @brarepos = ( 'base', 'extras', 'updates', 'testing' );
 	my @subrepos = ( 'full', 'main', 'debug', 'devel', 'source' );
 
-	@brarepos = ( $branch ) if ( $branch );
-	@subrepos = ( $subrep ) if ( $subrep );
+	@brarepos = ( $branch ) if ( $branch and $branch ne 'base' );
+	@subrepos = ( $subrep ) if ( $subrep and $subrep ne 'full' );
 
 	my $emptyrepo = 'no';
 	$emptyrepo = 'yes' if ( -e $ENV{'DOCUMENT_ROOT'}.'/repo/rpms/repodata/repomd.xml' );
 
 	for $branch ( @brarepos )
 	{
-	    $branch = '' if ( $branch eq 'base' );
-
 	    for $subrep ( @subrepos )
 	    {
-		$subrep = '' if ( $subrep eq 'full' );
-
 		my $offer = 'yes';
-		$offer = 'no' if ( $distro =~ /^(sle|sles|sled|rhel|centos)$/ and $access !~ /,enterprise,/ );
-		$offer = 'no' if ( $osarch !~ /^(i386|i486|i586|i686)$/       and $access !~ /,server,/     );
-		$offer = 'no' if ( $branch eq '' and $access !~ /,base,/       );
-		$offer = 'no' if ( $branch ne '' and $access !~ /,$branch,/    );
-		$offer = 'no' if ( $subrep eq '' and $access !~ /,full,/       );
-		$offer = 'no' if ( $subrep ne '' and $access !~ /,$subrep,/    );
+		$offer = 'no' if ( $distro =~ /^(sle|sles|sled|rhel|centos)$/ and $hostaccs !~ /,enterprise-hosts,/ );
+		$offer = 'no' if ( $osarch !~ /^(i386|i486|i586|i686)$/       and $hostaccs !~ /,server-hosts,/     );
+		$offer = 'no' if ( $hostaccs !~ /,$branch-$subrep-hosts,/ );
 
 		my $enabled = 1;
 		if ( $emptyrepo ne 'yes' ) {
 		    $enabled = 0 if ( $offer eq 'no' );
-		    $enabled = 0 if ( $subrep =~ /^(debug|devel|source)$/ );
+		    $enabled = 0 if ( $subrep =~ /^(debug|devel|source|full)$/ );
 		    $enabled = 0 if ( $branch eq 'testing' );
-		    $enabled = 0 if ( $branch eq 'extras' and $subrep ne 'full' );
 		}
 
 		my ($desc,$bdesc,$sdesc);
 		($sdesc = $subrep) =~ s/^([a-z])(.*)$/\U$1\E$2/;
 		my $target = $distro.'-'.$relver.'-'.$osarch;
 		$page = 'openss7';
-		$page .= '-'.$branch if ($branch);
-		$page .= '-'.$subrep if ($subrep);
+		$page .= '-'.$branch if ($branch ne 'base');
+		$page .= '-'.$subrep if ($subrep ne 'full');
 		$desc = 'OpenSS7';
-		$desc .= ' '.$bdesc if ($bdesc);
-		$desc .= ' '.$sdesc if ($sdesc);
+		$desc .= ' '.$bdesc if ($bdesc ne 'Base');
+		$desc .= ' '.$sdesc if ($sdesc ne 'Full');
 		$desc .= ' ('.$target.')';
 
 		my $rcreds = $hostname.':'.$hostpass.'@';
 
 		my $repostr = '?un='.$hostname;
-		if ($distro) { $repostr .= '&distro='.$distro; }
-		               $repostr .= '&relver='.'$releasever';
-		               $repostr .= '&osarch='.'$basearch';
-		if ($branch) { $repostr .= '&branch='.$branch; }
-		if ($subrep) { $repostr .= '&subrep='.$subrep; }
-		
-		$url = 'repo/rpms/'.$distro.'/$releasever/$basearch/'.$branch.'/'.$subrep;
-		$url =~ s,//+,/,g; $url =~ s,^/,,; $url =~ s,/$,,;
+		$repostr .= '&distro='.$distro if ($distro);
+		$repostr .= '&relver='.'$releasever';
+		$repostr .= '&osarch='.'$basearch';
+		$repostr .= '&branch='.$branch if ($branch ne 'base');
+		$repostr .= '&subrep='.$subrep if ($subrep ne 'full');
 
+		$url = '/repo/rpms';
+		$url .= "/$distro" if ($distro);
+		$url .= '/$releasever';
+		$url .= '/$basearch';
+		$url .= "/$branch" if ($branch ne 'base');
+		$url .= "/$subrep" if ($subrep ne 'full');
+		
 		my $pre = '';
 
 		# do not even advertize 'testing' or 'source' repos
-		if ( $branch eq 'extras' and $subrep ne ''   ) { next; }
-		if ( $branch ne 'extras' and $subrep eq ''   ) { next; }
 		if ( $branch eq 'testing' and $offer eq 'no' ) { next; }
 		if ( $subrep eq 'source'  and $offer eq 'no' ) { next; }
+		if ( $subrep eq 'full'    and $offer eq 'no' ) { next; }
 		if ( $subrep eq 'devel'   and $offer eq 'no' ) {
 		    $pre = '#' if ( $emptyrepo ne 'yes' );
 		}
@@ -376,7 +347,7 @@ password=<% $hostpass %>
 <% $pre %>[<% $page %>]
 <% $pre %>enabled = <% $enabled %>
 <% $pre %>name = <% $desc %>
-<% $pre %>#baseurl = https://<% $rcreds %>www.openss7.org/<% $url %>/
+<% $pre %>#baseurl = https://<% $rcreds %>www.openss7.org<% $url %>/
 <% $pre %>mirrorlist = https://www.openss7.org/repo/mirrorlist<% $repostr %>
 <% $pre %>gpgkey = https://www.openss7.org/pubkey.asc
 <% $pre %>         https://www.openss7.org/repo/tarballs/OPENSS7-GPG-KEY
@@ -389,8 +360,6 @@ password=<% $hostpass %>
     }
     elsif ( $page eq 'repoindex.xml' )
     {
-	my $access = ",$hostaccs,";
-
 	my $location = $ENV{'DOCUMENT_ROOT'}.$self->dir_path;
 	$location =~ s,//+,/,g;
 	my @files = `find $location -follow -name 'repomd.xml' 2>/dev/null | sort -u`;
@@ -417,28 +386,27 @@ password=<% $hostpass %>
 		    $branch = '';
 		}
 	    }
+	    $branch = 'base' if ($branch eq '');
+	    $subrep = 'full' if ($subrep eq '');
 
 	    my $offer = 'yes';
-	    $offer = 'no' if ( $distro =~ /^(sle|sles|sled|rhel|centos)$/ and $access !~ /,enterprise,/ );
-	    $offer = 'no' if ( $osarch !~ /^(i386|i486|i586|i686)$/       and $access !~ /,server,/     );
-	    $offer = 'no' if ( $branch eq '' and $access !~ /,base,/       );
-	    $offer = 'no' if ( $branch ne '' and $access !~ /,$branch,/    );
-	    $offer = 'no' if ( $subrep eq '' and $access !~ /,full,/       );
-	    $offer = 'no' if ( $subrep ne '' and $access !~ /,$subrep,/    );
+	    $offer = 'no' if ( $distro =~ /^(sle|sles|sled|rhel|centos)$/ and $hostaccs !~ /,enterprise-hosts,/ );
+	    $offer = 'no' if ( $osarch !~ /^(i386|i486|i586|i686)$/       and $hostaccs !~ /,server-hosts,/     );
+	    $offer = 'no' if ( $hostaccs !~ /,$branch-$subrep-hosts,/ );
 
 	    next unless ( $offer eq 'yes' );
 
 	    my $target = $distro . '-' . $relver . '-' . $osarch;
 	    my $page = 'OPENSS7';
-	    $page .= '-' . $branch if ($branch);
-	    $page .= '-' . $subrep if ($subrep);
+	    $page .= '-' . $branch if ($branch ne 'base');
+	    $page .= '-' . $subrep if ($subrep ne 'full');
 	    $page .= '-' . $target;
 	    my ($bdesc,$sdesc);
 	    ($bdesc = $branch) =~ s/^([a-z])(.*)$/\U$1\E$2/;
 	    ($sdesc = $subrep) =~ s/^([a-z])(.*)$/\U$1\E$2/;
 	    my $desc = 'OpenSS7';
-	    $desc .= ' ' . $bdesc if ($bdesc);
-	    $desc .= ' ' . $sdesc if ($sdesc);
+	    $desc .= ' ' . $bdesc if ($bdesc ne 'Base');
+	    $desc .= ' ' . $sdesc if ($sdesc ne 'Full');
 	    $desc .= ' (' . $target . ')';
 
 	    my ($pre,$suf);
@@ -465,30 +433,34 @@ password=<% $hostpass %>
     }
     elsif ( $page eq 'mirrorlist' )
     {
+	$branch = 'base' if ($branch eq '');
+	$subrep = 'full' if ($subrep eq '');
+
 	my $offer = 'yes';
 	{
-	    my $access = ",$hostaccs,";
-	    $offer = 'no' if ( $distro =~ /^(sle|sles|sled|rhel|centos)$/ and $access !~ /,enterprise,/ );
-	    $offer = 'no' if ( $osarch !~ /^(i386|i486|i586|i686)$/       and $access !~ /,server,/     );
-	    $offer = 'no' if ( $branch eq '' and $access !~ /,base,/       );
-	    $offer = 'no' if ( $branch ne '' and $access !~ /,$branch,/    );
-	    $offer = 'no' if ( $subrep eq '' and $access !~ /,full,/       );
-	    $offer = 'no' if ( $subrep ne '' and $access !~ /,$subrep,/    );
+	    $offer = 'no' if ( $distro =~ /^(sle|sles|sled|rhel|centos)$/ and $hostaccs !~ /,enterprise-hosts,/ );
+	    $offer = 'no' if ( $osarch !~ /^(i386|i486|i586|i686)$/       and $hostaccs !~ /,server-hosts,/     );
+	    $offer = 'no' if ( $hostaccs !~ /,$branch-$subrep-hosts,/ );
 	}
 
-	($url = '/repo/rpms/'."$distro/$relver/$osarch/$branch/$subrep") =~ s,//+,/,g;
+	$url = 'repo/rpms';
+	$url .= "/$distro" if ($distro);
+	$url .= "/$relver";
+	$url .= "/$osarch";
+	$url .= "/$branch" if ($branch ne 'base');
+	$url .= "/$subrep" if ($subrep ne 'full');
+		
 	$offer = 'no' unless ( -e $ENV{'DOCUMENT_ROOT'}.$url.'/repodata/repomd.xml' );
 
-	my $rcreds;
+	my $rcreds = $hostname.':'.$hostpass.'@';
 
+	$url = '/repo/rpms'; # the empty repository
 	if ( $offer eq 'yes' ) {
-	    $rcreds = $hostname.':'.$hostpass.'@';
-	    $relver = '$releasever';
-	    $osarch = '$basearch';
-	    ($url = '/repo/rpms/'."$distro/$relver/$osarch/$branch/$subrep") =~ s,//+,/,g;
-	} else {
-	    $rcreds = '';
-	    $url = '/repo/rpms'; # the empty repository
+	    $url .= "/$distro" if ($distro);
+	    $url .= '/$releasever';
+	    $url .= '/$basearch';
+	    $url .= "/$branch" if ($branch ne 'base');
+	    $url .= "/$subrep" if ($subrep ne 'full');
 	}
 </%perl>
 https://<% $rcreds %>www.openss7.org<% $url %>
