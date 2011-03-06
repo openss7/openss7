@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?> <product type="add-on">
+<?xml version="1.0" encoding="UTF-8"?>
+<product type="add-on">
   <vendor>OpenSS7 Corporation</vendor>
   <name>@PACKAGE_UCNAME@</name>
   <arch>@host_cpu@</arch>
@@ -14,4 +15,7 @@ Fast-STREAMS drivers, components and applications for the
 STREAMS environment.
 </description>
   <release-notes-url>@reposerv@://@repobase@/codefiles/@PACKAGE@-@VERSION@/NEWS/</release-notes-url>
+  <rpm:provides>
+    <rpm:entry name="product:openss7" />
+  </rpm:provides>
 </product>

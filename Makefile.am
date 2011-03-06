@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2011-02-28 19:51:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.16 $) $Date: 2011-03-06 08:57:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-28 19:51:27 $ by $Author: brian $
+# Last Modified $Date: 2011-03-06 08:57:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2989,10 +2989,10 @@ EXTRA_DIST			+= debian/README.Debian \
 ##
 ## Build cache files for intelligent warnings.
 ##
-EXTRA_DIST			+= centos-5.5-x86_64-config.cache \
+EXTRA_DIST			+= centos-5-x86_64-config.cache \
 				   debian-lenny-i386-config.cache \
 				   debian-squeeze-i386-config.cache \
-				   redhat-6.0-x86_64-config.cache \
+				   rhel-6-x86_64-config.cache \
 				   redhat-7.2-i686-config.cache \
 				   sle-11-x86_64-config.cache
 
@@ -3013,6 +3013,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.16  2011-03-06 08:57:19  brian
+# - repository updates
+#
 # Revision 1.1.2.15  2011-02-28 19:51:27  brian
 # - better repository build
 #

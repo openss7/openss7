@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-02-28 19:51:30 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-03-06 08:57:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-28 19:51:30 $ by $Author: brian $
+# Last Modified $Date: 2011-03-06 08:57:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -636,6 +636,8 @@ dnl
     AC_SUBST([repomaindir])dnl
     repodebgdir='$(topdir)/debug/repodata'
     AC_SUBST([repodebgdir])dnl
+    repodevldir='$(topdir)/devel/repodata'
+    AC_SUBST([repodevldir])dnl
     reposrcsdir='$(topdir)/source/repodata'
     AC_SUBST([reposrcsdir])dnl
 
@@ -670,9 +672,13 @@ dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
     AC_CONFIG_FILES([scripts/speccommon
-		     scripts/patterns.xml
+		     scripts/product.xml
+		     scripts/product-extras.xml
+		     scripts/product-updates.xml
 		     scripts/products.xml
-		     scripts/product.xml])
+		     scripts/products-extras.xml
+		     scripts/products-updates.xml
+		     scripts/patterns.xml])
     speccommon="scripts/speccommon"
     AC_SUBST_FILE([speccommon])
     AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
@@ -697,6 +703,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.10  2011-03-06 08:57:20  brian
+# - repository updates
+#
 # Revision 1.1.2.9  2011-02-28 19:51:30  brian
 # - better repository build
 #
