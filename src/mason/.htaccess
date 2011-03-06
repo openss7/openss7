@@ -1,0 +1,105 @@
+<FilesMatch "^(autohandler|dhandler|openss7-local.repo)$">
+	Order Deny,Allow
+	Deny from all
+</FilesMatch>
+<FilesMatch "(\.lsm$|\.asc$|SUMS|KEY)">
+	Order allow,deny
+	Allow from all
+	ForceType "text/plain"
+</FilesMatch>
+# All repo files are controlled by the autohandler
+<FilesMatch "^(OPENSS7credentials|openss7.repo)$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "Client OpenSS7 Repository Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group owners subs guests hosts
+	Satisfy all
+	ForceType "text/plain"
+	SetHandler perl-script
+	PerlHandler HTML::Mason::ApacheHandler
+</FilesMatch>
+<Files "mirrorlist">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+#AuthType Basic
+#AuthName "OpenSS7 Repository Host Access Credentials"
+#AuthDBUserFile /var/www/mason/repousers
+#AuthDBGroupFile /var/www/mason/repousers
+#Require group hosts
+#Satisfy all
+	ForceType "text/plain"
+	SetHandler perl-script
+	PerlHandler HTML::Mason::ApacheHandler
+</Files>
+# xml files must only be downloaded by machines (but any machine)
+<FilesMatch "\.xml(\.gz)?$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group owners-hosts subs-hosts guests-hosts
+	Satisfy any
+</FilesMatch>
+# repoindex.xml only downloaded by machines with correct credentials
+<Files "repoindex.xml">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group zypp-hosts
+	Satisfy all
+	ForceType "text/plain"
+	SetHandler perl-script
+	PerlHandler HTML::Mason::ApacheHandler
+</Files>
+# RPMs (other than openss7-repo) must only be downloaded by machines
+# RPMs must be overridden to allow guests-hosts in individual subdirectories
+<Files "openss7-*.rpm">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group owners-hosts subs-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
+</Files>
+# Anybody can download the repository RPMs
+<Files "openss7-repo*.rpm">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Subscriber Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group owners subs guests
+	Satisfy any
+	ForceType "application/x-rpm"
+</Files>
+# tarballs and spec files must only be downloaded by subscribers
+# must be overridden to allow guests
+<FilesMatch "^openss7-1\..*(\.tar\.(gz|bz2|xz|lzma)|\.spec)$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Subscriber Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group owners subs
+	Satisfy all
+</FilesMatch>
