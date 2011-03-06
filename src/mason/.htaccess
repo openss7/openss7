@@ -45,8 +45,8 @@
 	AuthName "OpenSS7 Repository Host Access Credentials"
 	AuthDBUserFile /var/www/mason/repousers
 	AuthDBGroupFile /var/www/mason/repousers
-	Require group owners-hosts subs-hosts guests-hosts
-	Satisfy any
+	Require group hosts
+	Satisfy all
 </FilesMatch>
 # repoindex.xml only downloaded by machines with correct credentials
 <Files "repoindex.xml">
@@ -73,7 +73,7 @@
 	AuthName "OpenSS7 Repository Host Access Credentials"
 	AuthDBUserFile /var/www/mason/repousers
 	AuthDBGroupFile /var/www/mason/repousers
-	Require group owners-hosts subs-hosts
+	Require group hosts
 	Satisfy all
 	ForceType "application/x-rpm"
 </Files>
@@ -102,4 +102,112 @@
 	AuthDBGroupFile /var/www/mason/repousers
 	Require group owners subs
 	Satisfy all
+</FilesMatch>
+<FilesMatch "^openss7(-(base|doc|javadoc))?-1\..*\.noarch\.rpm$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group base-main-hosts updates-main-hosts testing-main-hosts base-full-hosts updates-full-hosts testing-full-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
+</FilesMatch>
+<FilesMatch "^openss7-(lib|kernel|java)-1\..*\.rpm$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group server-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
+</FilesMatch>
+<FilesMatch "^openss7-(lib|kernel|java)-1\..*\.i[3456]86\.rpm$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group base-main-hosts updates-main-hosts testing-main-hosts base-full-hosts updates-full-hosts testing-full-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
+</FilesMatch>
+<FilesMatch "^openss7-(debuginfo|debuginfo-kernel)-1\..*\.rpm$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group server-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
+</FilesMatch>
+<FilesMatch "^openss7-(debuginfo|debuginfo-kernel)-1\..*\.i[3456]86\.rpm$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group base-debug-hosts updates-debug-hosts testing-debug-hosts base-full-hosts updates-full-hosts testing-full-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
+</FilesMatch>
+<FilesMatch "^openss7-(devel|devel-kernel)-1\..*\.rpm$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group server-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
+</FilesMatch>
+<FilesMatch "^openss7-(devel|devel-kernel)-1\..*\.i[3456]86\.rpm$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group base-devel-hosts updates-devel-hosts testing-devel-hosts base-full-hosts updates-full-hosts testing-full-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
+</FilesMatch>
+<FilesMatch "^openss7-(debugsource|debugsource-kernel|source-kernel)-1\..*\.rpm$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group owners-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
+</FilesMatch>
+<FilesMatch "^openss7-1\..*\.src\.rpm$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group owners-hosts
+	Satisfy all
+	ForceType "application/x-rpm"
 </FilesMatch>
