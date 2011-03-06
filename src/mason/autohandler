@@ -213,16 +213,16 @@
 
 	if ( exists $userinfo->{'REPO_ACCESS'} ) { $useraccs = $userinfo->{'REPO_ACCESS'}; } else {
 	    $useraccs = 'main,debug,base,extras';
-	    if ( $usergacc =~ /,guest,/  ) { $useraccs = 'main,debug,base,extras'; }
-	    if ( $usergacc =~ /,subs,/   ) { $useraccs = 'main,debug,devel,base,extras,updates,testing,enterprise,server'; }
-	    if ( $usergacc =~ /,owners,/ ) { $useraccs = 'main,debug,devel,source,full,base,extras,updates,testing,enterprise,server'; }
+	    if ( $usergacc =~ /,guests,/  ) { $useraccs = 'main,debug,base,extras'; }
+	    if ( $usergacc =~ /,subs,/    ) { $useraccs = 'main,debug,devel,base,extras,updates,testing,enterprise,server'; }
+	    if ( $usergacc =~ /,owners,/  ) { $useraccs = 'main,debug,devel,source,full,base,extras,updates,testing,enterprise,server'; }
 	    $userinfo->{'REPO_ACCESS'} = $useraccs;
 	}
 	if ( exists $userinfo->{'REPO_ACCESS_DEFAULT'} ) { $userdflt = $userinfo->{'REPO_ACCESS_DEFAULT'}; } else {
 	    $userdflt = 'main,debug,base,extras';
-	    if ( $usergacc =~ /,guest,/  ) { $userdflt = 'main,debug,base,extras'; }
-	    if ( $usergacc =~ /,subs,/   ) { $userdflt = 'main,debug,base,extras,updates,enterprise,server'; }
-	    if ( $usergacc =~ /,owners,/ ) { $userdflt = 'main,debug,devel,source,full,base,extras,updates,testing,enterprise,server'; }
+	    if ( $usergacc =~ /,guests,/  ) { $userdflt = 'main,debug,base,extras'; }
+	    if ( $usergacc =~ /,subs,/    ) { $userdflt = 'main,debug,base,extras,updates,enterprise,server'; }
+	    if ( $usergacc =~ /,owners,/  ) { $userdflt = 'main,debug,devel,source,full,base,extras,updates,testing,enterprise,server'; }
 	    $userinfo->{'REPO_ACCESS_DEFAULT'} = $userdflt;
 	}
 
