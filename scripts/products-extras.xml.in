@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<products>
+  <product schemeversion="0">
+    <name>@PACKAGE_UCNAME@-extras</name>
+    <version epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
+    <arch>@host_cpu@</arch>
+    <vendor>OpenSS7 Corporation</vendor>
+    <summary>OpenSS7 STREAMS and Protocol Suite Extras</summary>
+    <description>@PACKAGE_TITLE@ Extras is a product that provides additional
+opensource components for @PACKAGE_TITLE@ that are available
+from other sources, but which are tailored for @PACKAGE_TITLE@.
+</description>
+  </product>
+</products>

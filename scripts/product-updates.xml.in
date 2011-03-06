@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<product type="add-on">
+  <vendor>OpenSS7 Corporation</vendor>
+  <name>@PACKAGE_UCNAME@-updates</name>
+  <arch>@host_cpu@</arch>
+  <version epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
+  <displayname>@PACKAGE_TITLE@ Updates</displayname>
+  <shortname>@PACKAGE_SHORTTITLE@ Updates</shortname>
+  <distibution-name>@host_distro@</distribution-name>
+  <distibution-edition>@host_edition@</distribution-edition>
+  <description>@PACKAGE_TITLE@ Updates provides an update product for the
+@PACKAGE_TITLE@ product.
+</description>
+  <release-notes-url>@reposerv@://@repobase@/codefiles/@PACKAGE@-@VERSION@/NEWS/</release-notes-url>
+  <rpm:provides>
+    <rpm:entry name="product:openss7-updates" />
+  </rpm:provides>
+  <rpm:requires>
+    <rpm:entry name="product:openss7" flags="EQ" epoch="@PACKAGE_RPMEPOCH@" ver="@VERSION@" rel="@PACKAGE_RPMRELEASE@@PACKAGE_RPMEXTRA@" />
+  </rpm:requires>
+</product>
