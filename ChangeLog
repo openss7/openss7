@@ -1,3 +1,33 @@
+2011-03-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: updated release files
+	* Makefile.am: new cache file naming
+	* NEWS: updated release files
+	* README: updated release files
+	* THANKS: updated release files
+	* openss7.spec.in: better repo installation
+	* centos-5-x86_64-config.cache: new cache files
+	* rhel-6-x86_64-config.cache: new cache files
+	* am/repo.am: split off development repository
+	* am/rpm.am: split off development repository,
+	  also rename kernel modules for yum, add
+	  separate products for SUSE
+	* doc/manual/install.texi: updating for repository
+	  changes
+	* m4/dist.m4: exclude point release from edition 
+	* m4/rpm.m4: add products for extras and updates
+	* scripts/comps.xml: split out development and
+	  source collections
+	* scripts/patterns.xml.in: correct patterns
+	* scripts/product.xml.in: correct products
+	* scripts/product-extras.xml.in: correct products
+	* scripts/product-updates.xml.in: correct products
+	* scripts/products-extras.xml.in: correct products
+	* scripts/products-updates.xml.in: correct products
+	* src/mason/autohandler: mason autohandler
+	* src/python/yum-plugins/fedorakmod.conf: from upstream
+	* src/python/yum-plugins/fedorakmod.py: from upstream
+
 2011-02-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: updated release file

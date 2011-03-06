@@ -12,12 +12,16 @@
       <packagereq type="mandatory">openss7-base</packagereq>
       <packagereq type="mandatory">openss7-lib</packagereq>
       <packagereq type="mandatory">openss7-kernel</packagereq>
-      <packagereq type="default">openss7-java</packagereq>
+      <packagereq type="optional">openss7-java</packagereq>
       <packagereq type="optional">openss7-devel</packagereq>
       <packagereq type="optional">openss7-devel-kernel</packagereq>
+      <packagereq type="optional">openss7-debuginfo</packagereq>
+      <packagereq type="optional">openss7-debuginfo-kernel</packagereq>
+      <packagereq type="optional">openss7-debugsource</packagereq>
+      <packagereq type="optional">openss7-debugsource-kernel</packagereq>
+      <packagereq type="optional">openss7-source-kernel</packagereq>
       <packagereq type="optional">openss7-doc</packagereq>
       <packagereq type="optional">openss7-javadoc</packagereq>
-      <packagereq type="optional">openss7-source-kernel</packagereq>
     </packagelist>
   </group>
   <group>
@@ -46,9 +50,50 @@
     <packagelist>
       <packagereq type="mandatory">openss7-devel</packagereq>
       <packagereq type="mandatory">openss7-devel-kernel</packagereq>
+      <packagereq type="optional">openss7-debuginfo</packagereq>
+      <packagereq type="optional">openss7-debuginfo-kernel</packagereq>
+      <packagereq type="optional">openss7-debugsource</packagereq>
+      <packagereq type="optional">openss7-debugsource-kernel</packagereq>
+      <packagereq type="optional">openss7-source-kernel</packagereq>
       <packagereq type="optional">openss7-doc</packagereq>
       <packagereq type="optional">openss7-javadoc</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>openss7-debug</id>
+    <name>OpenSS7 Debugging</name>
+    <description>OpenSS7 STREAMS and Protocol Suite Debugging.</description>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <grouplist>
+      <groupreq>openss7</groupreq>
+    </grouplist>
+    <packagelist>
+      <packagereq type="mandatory">openss7-debuginfo</packagereq>
+      <packagereq type="mandatory">openss7-debuginfo-kernel</packagereq>
+      <packagereq type="optional">openss7-debugsource</packagereq>
+      <packagereq type="optional">openss7-debugsource-kernel</packagereq>
       <packagereq type="optional">openss7-source-kernel</packagereq>
+      <packagereq type="optional">openss7-doc</packagereq>
+      <packagereq type="optional">openss7-javadoc</packagereq>
+    </packagelist>
+  </group>
+  <group>
+    <id>openss7-source</id>
+    <name>OpenSS7 Source</name>
+    <description>OpenSS7 STREAMS and Protocol Suite Source.</description>
+    <default>false</default>
+    <uservisible>false</uservisible>
+    <grouplist>
+      <groupreq>openss7</groupreq>
+      <groupreq>openss7-debug</groupreq>
+    </grouplist>
+    <packagelist>
+      <packagereq type="mandatory">openss7-debugsource</packagereq>
+      <packagereq type="mandatory">openss7-debugsource-kernel</packagereq>
+      <packagereq type="default">openss7-source-kernel</packagereq>
+      <packagereq type="optional">openss7-doc</packagereq>
+      <packagereq type="optional">openss7-javadoc</packagereq>
     </packagelist>
   </group>
   <group>
@@ -71,6 +116,8 @@
       <groupid>openss7</groupid>
       <groupid>openss7-java</groupid>
       <groupid>openss7-devel</groupid>
+      <groupid>openss7-debug</groupid>
+      <groupid>openss7-source</groupid>
       <groupid>openss7-doc</groupid>
     </grouplist>
   </category>

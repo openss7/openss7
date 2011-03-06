@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.7 2011-02-17 18:34:10 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.8 2011-03-06 08:57:20 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+@c Last Modified $Date: 2011-03-06 08:57:20 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -117,7 +117,7 @@ dependencies between RPMs and DEBs.}
 @cindex repositories
 
 The @value{PACKAGE_TITLE} package release can be accessed from the repositories of
-@uref{http://www.openss7.org/repos, The OpenSS7 Project}.  For @manpage{rpm(1)} based systems, the
+@uref{http://www.openss7.org/, The OpenSS7 Project}.  For @manpage{rpm(1)} based systems, the
 package is available in a @manpage{yum(8)} repository based on @file{repomd} XML and may also be
 accessed using @manpage{up2date(8)}, @manpage{zypper(8)} or @manpage{yast(8)}.  For
 @manpage{yast(8)} based systems, the package is also available as a @manpage{yast(8)} installation
@@ -151,7 +151,7 @@ REPO-MD Repositories::
 APTITUDE Repositories::			
 @end menu
 
-Repositories are located under @uref{http://www.openss7.org/repos}.  The path from there to the
+Repositories are located under @uref{https://www.openss7.org/repo}.  The path from there to the
 specific repository consists of the following components:
 
 @table @var
@@ -168,10 +168,10 @@ The architecture of the release.  Example , @file{x86_64}.
 @end table
 
 So, for example, the @cite{CentOS 5.5} distribution for @file{x86_64} is located under
-@uref{http://@-www.@-openss7.@-org/@-repos/@-rpms/@-centos/@-5.5/@-x86_64/}; the @cite{Debian
+@uref{https://@-www.@-openss7.@-org/@-repo/@-rpms/@-centos/@-5.5/@-x86_64/}; the @cite{Debian
 Squeeze} distribution for @file{i686} is located under
-@uref{http://@-www.@-openss7.@-org/@-repos/@-debs/@-debian/@-squeeze/@-i686/}; the tarball
-distribution is located under @uref{http://@-www.@-openss7.@-org/@-repos/@-tarballs}.
+@uref{https://@-www.@-openss7.@-org/@-repo/@-debs/@-debian/@-squeeze/@-i686/}; the tarball
+distribution is located under @uref{https://@-www.@-openss7.@-org/@-repo/@-tarballs}.
 
 @node Repositories for YUM
 @subsection Repositories for YUM
@@ -186,7 +186,7 @@ will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as foll
 
 @cartouche
 @smallexample
-$> REPOS="http://user@@www.openss7.org/repos/rpms"
+$> REPOS="https://user@@www.openss7.org/repo/rpms"
 $> REPONOARCH="$REPOS/fedora/14/x86_64/RPMS/noarch"
 $> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
 $> sudo rpm -Uhv $REPORPM
@@ -261,7 +261,7 @@ you will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as 
 
 @cartouche
 @smallexample
-$> REPOS="http://user@@www.openss7.org/repos/rpms"
+$> REPOS="https://user@@www.openss7.org/repo/rpms"
 $> REPONOARCH="$REPOS/opensuse/11/x86_64/RPMS/noarch"
 $> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
 $> sudo rpm -Uhv $REPORPM
@@ -279,7 +279,7 @@ into RPM as follows:
 
 @cartouche
 @smallexample
-$> sudo rpm --import http://www.openss7.org/pubkey.asc
+$> sudo rpm --import https://www.openss7.org/pubkey.asc
 @end smallexample
 @end cartouche
 
@@ -347,7 +347,7 @@ archive, place the following into the @file{openss7.repo} and place it into your
 
 @cartouche
 @smallexample
--| include=http://www.openss7.org/repos/rpms/centos/$releasever/$arch/repodata/openss7.repo
+-| include=https://www.openss7.org/repo/rpms/centos/$releasever/$arch/repodata/openss7.repo
 @end smallexample
 @end cartouche
 
@@ -358,8 +358,8 @@ the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 @smallexample
 -| [openss7]
 -| name = OpenSS7 Repository
--| baseurl = http://www.openss7.org/repos/rpms/centos/$releasever/$arch
--| gpgkey = http://www.openss7.org/repos/tarballs/OPENSS7-GPG-KEY
+-| baseurl = https://www.openss7.org/repo/rpms/centos/$releasever/$arch
+-| gpgkey = https://www.openss7.org/repo/tarballs/OPENSS7-GPG-KEY
 -| repo_gpgcheck = 1
 -| gpgcheck = 1
 -| enabled = 1
@@ -444,7 +444,7 @@ can provide the additional features associated with @cite{YaST} install sources.
 
 @cartouche
 @smallexample
-$> REPODIR="http://www.openss7.org/repos/rpms/suse/11/x86_64"
+$> REPODIR="https://www.openss7.org/repo/rpms/suse/11/x86_64"
 $> sudo zypper addrepo --type yast2 $REPODIR openss7
 @end smallexample
 @end cartouche
@@ -566,13 +566,13 @@ components are as follows:
 
 @table @file
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 
 This package can be used to install or remove the entire @value{PACKAGE_TITLE} package.  When
 installing, kernel modules will be installed automatically for the highest version kernel on your
 system.  When removing, all corresponding kernel modules will also be removed.
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-base-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-base-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-base-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-base-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 
 The @file{@value{PACKAGE}-base} binary package contains the init scripts, test scripts, maintenance
 scripts and base system configuration files necessary for the operation of Linux Fast-STREAMS and
@@ -581,7 +581,7 @@ documentation in @file{.info}, @file{.pdf} and @file{.html} formats as well as s
 8 of the manual pages.  This binary package is required for any installation of the OpenSS7 package
 and is not architecture specific (@samp{noarch}).
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 
 The @file{@value{PACKAGE}-doc} binary package contains the documentation used in the development of
 applications and programs that use the package.  It contains developer and programmer manuals in
@@ -591,7 +591,7 @@ developing Linux Fast-STREAMS drivers or modules or application programs for the
 contained in the OpenSS7 package.  This package is massive and is not normally necessary except on a
 development system.  The package is not architecture specific (@samp{noarch}).
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-javadoc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-javadoc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-javadoc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-javadoc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 
 The @file{@value{PACKAGE}-javadoc} binary package contains Javadoc documentation for the OpenSS7
 package.  Install this binary package if you are interested in developing JAIN applications or
@@ -599,7 +599,7 @@ resource adaptors.  This package is not normally required on other than a develo
 package is not architecture specific (@samp{noarch}).
 
 @ignore
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-dev-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-dev-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}-@-dev} package contains the device definitions necessary
 to run applications programs developed for @value{PACKAGE_TITLE}.@footnote{Not
 all distributions support the @samp{%dev} RPM macro: a case in point is the SuSE
@@ -609,25 +609,25 @@ operation.  Note also that not all release packages contain devices.  Only
 packages that provide @acronym{STREAMS} character device drivers need devices, and then
 only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}-@-doc} package contains this manual in plain text,
 postscript, @file{pdf} and @file{html} forms, along with the meta-information from the
 @file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
 necessary for developing @value{PACKAGE_TITLE} applications and
 @value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-init-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-init-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}-@-init} package contains the @command{init} scripts and provides
 the @samp{postinst} scripts necessary to create kernel module preloads and modules
 definitions for all kernel module @samp{core} subpackages.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-source-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-source-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}-@-source} package contains the source code necessary for
 building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
 configuration utilities necessary to create and distribute tarballs, @file{rpm} and
 @file{deb}/@file{dsc}.
 
-@item @uref{http://www.openss7.org/rpms/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}} package contains this manual in plain texit, postscript, @samp{pdf}, and
 @samp{html} forms, along with the meta-information from the package.  It also contains the @file{init}
 scripts and provides @command{postinst} scriptlets necessary to create kernel module preloads and
@@ -644,7 +644,7 @@ RPMs in the @cite{@value{PACKAGE_TITLE}} components are as follows:
 
 @table @file
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-lib-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-lib-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-lib-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
 The @file{@value{PACKAGE}-lib} binary package contains the run-time (shared object) libraries
 necessary to run applications programs and utilities developed for @cite{Linux Fast-STREAMS} and the
@@ -654,14 +654,14 @@ configuration test utilities and commands associated with the OpenSS7 package.  
 utilities are needed for running the validation test suites contained in the
 @file{@value{PACKAGE}-base} binary package.
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-java-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-java-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-java-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-java-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
 The @file{@value{PACKAGE}-java} binary package contains JAIN implementations for OpenSS7 Linux
 Fast-STREAMS and the associated protocol suites.  It includes jar files, JNI and CNI libraries, and
 gcj native compiled libraries.  It also includes SWIG implementations of Java interfaces for
 OpenSS7 API libraries.
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-devel-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-devel-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
 The @file{@value{PACKAGE}-devel} binary package contains library archives for static compilation,
 and header files to develop Linux Fast-STREAMS modules and drivers.  This also includes header files
@@ -696,7 +696,7 @@ in i586 architecture packages regardless of the true processor architecture of t
 
 @table @file
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
 The @file{@value{PACKAGE}-kernel} binary package contains the kernel modules that provide the Linux
 kernel Linux Fast-STREAMS drivers and modules.  This includes assorted drivers and modules for Linux
@@ -713,7 +713,7 @@ the last kernel module package, the @samp{@value{PACKAGE}} package will also be 
 Note that the version @samp{@value{_kversion}} is just an example.  Use the version returned by
 @samp{$(uname -r)} for the kernel for which you wish to install or remove the packages.
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-devel-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-devel-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-devel-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-devel-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
 The @file{@value{PACKAGE}-devel-@value{_kversion}} binary package contains the kernel modules symbol
 information for development of additional Linux Fast-STREAMS kernel modules against the core kernel
@@ -739,7 +739,7 @@ modules that use the exported symbols without loading the actual kernel modules 
 This particular package applies to kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
-@item @uref{http://www.openss7.org/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-source-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-source-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-source-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-source-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
 The @file{@value{PACKAGE}-@-source-@-@value{_kversion}} package contains the configured source for
 a specific kernel.  This package contains source that is configured to the kernel for which it was
@@ -894,7 +894,7 @@ If you cannot obtain a binary RPM for your architecture, or would like to roll y
 download the following source RPM.
 
 @table @asis
-@item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
+@item @uref{https://www.openss7.org/repo/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
 This is the source RPM for the package.  From this source RPM it is possible to build binary RPM for
 any supported architecture and for any 2.4 or 2.6 kernel.
 @end table
@@ -933,8 +933,8 @@ For non-@manpage{rpm(1)} and non-@manpage{dpkg(1)} architectures,
 download the tarball as follows:
 
 @table @asis
-@item @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.bz2,, @value{PACKAGE}-@-@value{VERSION}@-.tar@-.bz2}
-@itemx @uref{http://www.openss7.org/@value{PACKAGE}-@value{VERSION}.tar.xz,, @value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz}
+@item @uref{https://www.openss7.org/repo/tarballs/@value{PACKAGE}-@value{VERSION}.tar.bz2,, @value{PACKAGE}-@-@value{VERSION}@-.tar@-.bz2}
+@itemx @uref{https://www.openss7.org/repo/tarballs/@value{PACKAGE}-@value{VERSION}.tar.xz,, @value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz}
 These are the @manpage{tar(1)} balls for the release.  These @manpage{tar(1)} balls contain the
 @manpage{autoconf(1)} distribution which includes all the source necessary for building and
 installing the package.  These tarballs will even build Source RPM and Binary RPM on
@@ -945,7 +945,7 @@ The tar ball may be downloaded easily with @manpage{wget(1)} as follows:
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget https://www.openss7.org/repo/tarballs/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
 @end smallexample
 @end cartouche
 
@@ -954,7 +954,7 @@ or
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.xz
+% wget https://www.openss7.org/repo/tarballs/@-@value{PACKAGE}-@value{VERSION}.tar.xz
 @end smallexample
 @end cartouche
 
@@ -968,7 +968,7 @@ following commands:
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
+% wget https://www.openss7.org/repo/tarballs/@-@value{PACKAGE}-@value{VERSION}.tar.bz2
 % tar -xjvf @value{PACKAGE}-@value{VERSION}.tar.bz2
 @end smallexample
 @end cartouche
@@ -978,7 +978,7 @@ or
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}-@value{VERSION}.tar.xz
+% wget https://www.openss7.org/repo/tarballs/@-@value{PACKAGE}-@value{VERSION}.tar.xz
 % tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
 @end smallexample
 @end cartouche
@@ -2679,7 +2679,7 @@ The source RPM is rebuilt to binary RPMs as follows:
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-rpms/@-SRPMS/@-@value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
+% wget https://www.openss7.org/repo/@-rpms/@-SRPMS/@-@value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@-.src@-.rpm
 % rpmbuild --rebuild -vv @value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm
 @end smallexample
 @end cartouche
@@ -2772,7 +2772,7 @@ Following is an example of a native build against the running kernel:
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz
+% wget https://www.openss7.org/repo/tarballs/@-@value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz
 % tar -xJvf @value{PACKAGE}-@value{VERSION}.tar.xz
 % pushd @value{PACKAGE}-@value{VERSION}
 % ./configure
@@ -2794,7 +2794,7 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc-@-linux/@-gcc} 
 
 @cartouche
 @smallexample
-% wget http://www.openss7.org/@-@value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz
+% wget https://www.openss7.org/repo/tarballs/@-@value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz
 % tar -xJvf @value{PACKAGE}-@-@value{VERSION}@-.tar@-.xz
 % pushd @value{PACKAGE}-@-@value{VERSION}
 % ./configure DESTDIR="/some/@-other/@-root" \ 

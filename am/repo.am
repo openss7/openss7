@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: repo.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-02-28 19:51:29 $
+# @(#) $RCSfile: repo.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-03-06 08:57:19 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
+## Last Modified $Date: 2011-03-06 08:57:19 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -61,9 +61,9 @@ $(PACKAGE).yum.repo: Makefile
 	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
 	for branch in $$rlist ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
-		for repo in '' 'Main' 'Debug' 'Source' ; do \
-			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
-			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
 				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
@@ -85,9 +85,9 @@ $(PACKAGE)-local.yum.repo: Makefile
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
 		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
 			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
-		for repo in '' 'Main' 'Debug' 'Source' ; do \
-			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
-			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			$(ECHO) '[$(PACKAGE)-local'$${b:+-$$b}$${r:+-$$r}']' ; \
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
 				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
@@ -296,9 +296,9 @@ $(PACKAGE).zypp.repo: Makefile
 	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
 	for branch in $$rlist ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
-		for repo in '' 'Main' 'Debug' 'Source' ; do \
-			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
-			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
 			$(ECHO) 'name=$(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
@@ -330,9 +330,9 @@ $(PACKAGE)-local.zypp.repo: Makefile
 		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
 			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
 		test -d '$(rpmdistdir}'"$${s:+/$$s}" || continue ; \
-		for repo in '' 'Main' 'Debug' 'Source' ; do \
-			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,' ; \
-			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,SRPMS,' ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,' ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,SRPMS,' ; \
 			$(ECHO) '[$(PACKAGE)-local'$${b:+-$$b}$${r:+-$$r}']' ; \
 			$(ECHO) 'name=$(PACKAGE_TITLE) Local'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
@@ -546,6 +546,9 @@ EXTRA_DIST += scripts/OPENSS7-GPG-KEY
 ## =============================================================================
 ##
 ## $Log: repo.am,v $
+## Revision 1.1.2.3  2011-03-06 08:57:19  brian
+## - repository updates
+##
 ## Revision 1.1.2.2  2011-02-28 19:51:29  brian
 ## - better repository build
 ##

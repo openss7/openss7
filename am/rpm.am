@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-28 19:51:29 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-03-06 08:57:19 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
+## Last Modified $Date: 2011-03-06 08:57:19 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -179,13 +179,15 @@ rpm_module1_file	= kernel-module-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(P
 rpm_module2_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 rpm_module3_file	= openss7-$(PACKAGE)*-kmp-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 rpm_module4_file	= $(PACKAGE)-*-$(VERSION)_*-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+rpm_module5_file	= $(PACKAGE)-kernel*-$(VERSION)-$(PACKAGE_RPMRELEASE).*.rpm
 rpm_binary_files	= $(rpmdir)/*/$(rpm_base_file) \
 			  $(rpmdir)/*/$(rpm_binary_file) \
 			  $(rpmdir)/*/$(rpm_module0_file) \
 			  $(rpmdir)/*/$(rpm_module1_file) \
 			  $(rpmdir)/*/$(rpm_module2_file) \
 			  $(rpmdir)/*/$(rpm_module3_file) \
-			  $(rpmdir)/*/$(rpm_module4_file)
+			  $(rpmdir)/*/$(rpm_module4_file) \
+			  $(rpmdir)/*/$(rpm_module5_file)
 rpm_cache_files		= $(rpmbuilddir)/*config.cache \
 			  $(rpmbuilddir)/*config.site \
 			  $(rpmbuilddir)/*modpost.cache
@@ -408,12 +410,12 @@ rebuild:
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
 resign: sign
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' 2>/dev/null`; \
+	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' 2>/dev/null`; \
 	if test -z "$$rpms"; then \
 		$(ECHO) "D: $@: rebuild rebuild"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild; \
-		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' 2>/dev/null`; \
+		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' 2>/dev/null`; \
 		if test -z "$$rpms"; then exit 1; fi; \
 	fi; \
 	rpms_to_sign=; \
@@ -768,12 +770,12 @@ update-sign-srpm:
 ##
 update-sign-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' 2>/dev/null`; \
+	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' 2>/dev/null`; \
 	if test -z "$$rpms"; then \
 		$(ECHO) "D: $@: rebuild update-rpm"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-rpms"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-rpms; \
-		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' 2>/dev/null`; \
+		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' 2>/dev/null`; \
 	fi; if test -z "$$rpms"; then exit 0; fi; \
 	rpms_to_sign=; \
 	for f in $$rpms; do \
@@ -814,24 +816,29 @@ if BUILD_REPO_YUM
 ## The following builds repomd repositories.
 ##
 
-RELEASE_DIRECTORIES	+= $(repodir) $(repomaindir) $(repodebgdir) $(reposrcsdir)
+RELEASE_DIRECTORIES	+= $(rpmdistdir)/repodata $(repodir) $(repomaindir) $(repodebgdir) $(repodevldir) $(reposrcsdir)
 
 repomd_heads		= $(repodir)/repomd.xml \
 			  $(repomaindir)/repomd.xml \
 			  $(repodebgdir)/repomd.xml \
+			  $(repodevldir)/repomd.xml \
 			  $(reposrcsdir)/repomd.xml
 
 repomd_signs		= $(repodir)/repomd.xml.asc \
 			  $(repomaindir)/repomd.xml.asc \
 			  $(repodebgdir)/repomd.xml.asc \
+			  $(repodevldir)/repomd.xml.asc \
 			  $(reposrcsdir)/repomd.xml.asc
 
 repomd_group		= $(repodir)/comps.xml \
 			  $(repomaindir)/comps.xml \
 			  $(repodebgdir)/comps.xml \
+			  $(repodevldir)/comps.xml \
 			  $(reposrcsdir)/comps.xml
 
-repomd_repos		= $(repodir)/$(PACKAGE).repo \
+repomd_repos		= $(rpmdistdir)/repodata/$(PACKAGE).repo \
+			  $(rpmdistdir)/repodata/$(PACKAGE)-local.repo \
+			  $(repodir)/$(PACKAGE).repo \
 			  $(repodir)/$(PACKAGE)-local.repo
 
 repomd_files		= $(repomd_heads) $(repomd_signs) $(repomd_group) $(repomd_repos) \
@@ -847,6 +854,10 @@ repomd_files		= $(repomd_heads) $(repomd_signs) $(repomd_group) $(repomd_repos) 
 			  $(repodebgdir)/*other.xml.gz $(repodebgdir)/*susedata.xml.gz \
 			  $(repodebgdir)/*patterns.xml.gz $(repodebgdir)/*products.xml.gz \
 			  $(repodebgdir)/*product.xml.gz \
+			  $(repodevldir)/*primary.xml.gz $(repodevldir)/*filelists.xml.gz \
+			  $(repodevldir)/*other.xml.gz $(repodevldir)/*susedata.xml.gz \
+			  $(repodevldir)/*patterns.xml.gz $(repodevldir)/*products.xml.gz \
+			  $(repodevldir)/*product.xml.gz \
 			  $(reposrcsdir)/*primary.xml.gz $(reposrcsdir)/*filelists.xml.gz \
 			  $(reposrcsdir)/*other.xml.gz $(reposrcsdir)/*susedata.xml.gz \
 			  $(reposrcsdir)/*patterns.xml.gz $(reposrcsdir)/*products.xml.gz \
@@ -856,6 +867,7 @@ repo-link-yum: $(RELEASE_DIRECTORIES)
 	( cd $(repodir)/../RPMS ; rm -f -- src   ; ln -sf ../SRPMS src )
 	( cd $(repomaindir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
 	( cd $(repodebgdir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
+	( cd $(repodevldir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
 	( cd $(reposrcsdir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
 
 RELEASE_LINKS		+= repo-link-yum
@@ -871,14 +883,14 @@ $(repomd_group)::
 		$(ECHO) "cp -f -- $$d$$f $@"; \
 		cp -f -- $$d$$f $@; }
 
-$(repodir)/$(PACKAGE).repo: $(repodir)
+$(repodir)/$(PACKAGE).repo::
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
-	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
-	for branch in '' 'Updates' 'Extras' 'Testing' $$rb ; do \
-		b=`echo "$$branch" | sed 's,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
-		for repo in '' 'Main' 'Debug' 'Source' ; do \
-			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
-			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+	rb=`echo "$$rb" | sed 's,^$$,Base,;t;s,^updates$$,Updates,;t;s,^extras$$,Extras,;t;s,^testing$$,Testing,'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
 			if test \( -z "$$branch" -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
 				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
@@ -886,27 +898,68 @@ $(repodir)/$(PACKAGE).repo: $(repodir)
 			$(ECHO) 'baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}; \
 			$(ECHO) 'gpgkey = $(reposerv)://$(repobase)/pubkey.asc'; \
 			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) 'repo_gpgcheck = 0'; \
 			$(ECHO) ''; \
 		done ; \
 	done >$@
 
-$(repodir)/$(PACKAGE)-local.repo: $(repodir)
+$(repodir)/$(PACKAGE)-local.repo::
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
-	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
-	for branch in '' 'Updates' 'Extras' 'Testing' $$rb ; do \
-		b=`echo "$$branch" | sed 's,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
-		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
-			test "$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
-		for repo in '' 'Main' 'Debug' 'Source' ; do \
-			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
-			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Source,source,'` ; \
+	rb=`echo "$$rb" | sed 's,^$$,Base,;t;s,^updates$$,Updates,;t;s,^extras$$,Extras,;t;s,^testing$$,Testing,'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
 			if test \( -z "$$branch" -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o -n '$(repobranch)' \) ; then \
 				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
 			$(ECHO) 'name = $(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
-			$(ECHO) 'baseurl = file://$(rpmdistdir)'$${s:+/$$s}$${d:+/$$d}; \
+			$(ECHO) 'baseurl = file://$(rpmdistdir)'$${b:+/$$b}$${d:+/$$d}; \
 			$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
 			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) 'repo_gpgcheck = 0'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
+
+$(rpmdistdir)/repodata/$(PACKAGE).repo::
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	for branch in '' 'Updates' 'Extras' 'Testing' $$rb ; do \
+		b=`echo "$$branch" | sed 's,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
+			if test \( -z "$$branch" -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			$(ECHO) 'baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'gpgkey = $(reposerv)://$(repobase)/pubkey.asc'; \
+			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) 'repo_gpgcheck = 0'; \
+			$(ECHO) ''; \
+		done ; \
+	done >$@
+
+
+$(rpmdistdir)/repodata/$(PACKAGE)-local.repo::
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	for branch in '' 'Updates' 'Extras' 'Testing' $$rb ; do \
+		b=`echo "$$branch" | sed 's,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			$(ECHO) '[$(PACKAGE)'$${b:+-$$b}$${r:+-$$r}']' ; \
+			if test \( -z "$$branch" -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o -n '$(repobranch)' \) ; then \
+				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
+			$(ECHO) 'name = $(PACKAGE_TITLE)'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
+			$(ECHO) 'baseurl = file://$(rpmdistdir)'$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'gpgcheck = 1'; \
+			$(ECHO) 'repo_gpgcheck = 0'; \
 			$(ECHO) ''; \
 		done ; \
 	done >$@
@@ -918,6 +971,9 @@ $(repomaindir)/primary.xml.gz:
 	$(MAKE) $(AM_MAKEFLAGS) $$(dirname $@)/repomd.xml
 
 $(repodebgdir)/primary.xml.gz:
+	$(MAKE) $(AM_MAKEFLAGS) $$(dirname $@)/repomd.xml
+
+$(repodevldir)/primary.xml.gz:
 	$(MAKE) $(AM_MAKEFLAGS) $$(dirname $@)/repomd.xml
 
 $(reposrcsdir)/primary.xml.gz:
@@ -958,14 +1014,20 @@ $(repodir)/susedata.xml.gz: $(repodir)/primary.xml.gz
 
 $(repomaindir)/susedata.xml.gz: $(repomaindir)/primary.xml.gz
 	@$(AM_V_GEN)\
-	rpms=`find $$(dirname $(repomaindir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | sort -u` ; \
-	numb=`find $$(dirname $(repomaindir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | wc -l` ; \
+	rpms=`find $$(dirname $(repomaindir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' | sort -u` ; \
+	numb=`find $$(dirname $(repomaindir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' | wc -l` ; \
 	$(GENERATESUSEDATA)
 
 $(repodebgdir)/susedata.xml.gz: $(repodebgdir)/primary.xml.gz
 	@$(AM_V_GEN)\
-	rpms=`find $$(dirname $(repodebgdir))/RPMS -follow -name '*.rpm' | grep -v -- '\(source-\|\.src\.rpm$$\)' | grep -- '-debug' | sort -u` ; \
-	numb=`find $$(dirname $(repodebgdir))/RPMS -follow -name '*.rpm' | grep -v -- '\(source-\|\.src\.rpm$$\)' | grep -- '-debug' | wc -l` ; \
+	rpms=`find $$(dirname $(repodebgdir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' | sort -u` ; \
+	numb=`find $$(dirname $(repodebgdir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' | wc -l` ; \
+	$(GENERATESUSEDATA)
+
+$(repodevldir)/susedata.xml.gz: $(repodevldir)/primary.xml.gz
+	@$(AM_V_GEN)\
+	rpms=`find $$(dirname $(repodevldir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' | sort -u` ; \
+	numb=`find $$(dirname $(repodevldir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' | wc -l` ; \
 	$(GENERATESUSEDATA)
 
 $(reposrcsdir)/susedata.xml.gz: $(reposrcsdir)/primary.xml.gz
@@ -1021,24 +1083,56 @@ products.xml: Makefile
 		$(ECHO) '</products>' ; \
 	) >$@
 
-$(repodir)/product.xml.gz: scripts/product.xml
-	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+$(repodir)/product.xml.gz: scripts/product.xml scripts/product-extras.xml scripts/product-updates.xml
+	$(AM_V_GEN)\
+	if test -z '$(repobranch)' ; then cp -f -- scripts/product.xml product.xml ; else \
+		case '$(repobranch)' in \
+			(extras)   cp -f -- scripts/product-extras.xml  product.xml ;; \
+			(updates)  cp -f -- scripts/product-updates.xml product.xml ;; \
+			(*)  exit 0 ;; \
+		esac ; \
+	fi ; \
+	rm -f -- $@ ; $(MODIFYREPO) product.xml $$(dirname $@) ; rm -f -- product.xml ; \
 	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
 
-$(repodir)/products.xml.gz: scripts/products.xml
-	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+$(repodir)/products.xml.gz: scripts/products.xml scripts/products-extras.xml scripts/products-updates.xml
+	$(AM_V_GEN)\
+	if test -z '$(repobranch)' ; then cp -f -- scripts/products.xml products.xml ; else \
+		case '$(repobranch)' in \
+			(extras)   cp -f -- scripts/products-extras.xml  products.xml ;; \
+			(updates)  cp -f -- scripts/products-updates.xml products.xml ;; \
+			(*)  exit 0 ;; \
+		esac ; \
+	fi ; \
+	rm -f -- $@ ; $(MODIFYREPO) products.xml $$(dirname $@) ; rm -f -- products.xml ; \
 	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
 
 $(repodir)/patterns.xml.gz: scripts/patterns.xml
 	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
 	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
 
-$(repomaindir)/product.xml.gz: scripts/product.xml
-	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+$(repomaindir)/product.xml.gz: scripts/product.xml scripts/product-extras.xml scripts/product-updates.xml
+	$(AM_V_GEN)\
+	if test -z '$(repobranch)' ; then cp -f -- scripts/product.xml product.xml ; else \
+		case '$(repobranch)' in \
+			(extras)   cp -f -- scripts/product-extras.xml  product.xml ;; \
+			(updates)  cp -f -- scripts/product-updates.xml product.xml ;; \
+			(*)  exit 0 ;; \
+		esac ; \
+	fi ; \
+	rm -f -- $@ ; $(MODIFYREPO) product.xml $$(dirname $@) ; rm -f -- product.xml ; \
 	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
 
-$(repomaindir)/products.xml.gz: scripts/products.xml
-	$(AM_V_GEN)rm -f -- $@ ; $(MODIFYREPO) $< $$(dirname $@) ; \
+$(repomaindir)/products.xml.gz: scripts/products.xml scripts/products-extras.xml scripts/products-updates.xml
+	$(AM_V_GEN)\
+	if test -z '$(repobranch)' ; then cp -f -- scripts/products.xml products.xml ; else \
+		case '$(repobranch)' in \
+			(extras)   cp -f -- scripts/products-extras.xml  products.xml ;; \
+			(updates)  cp -f -- scripts/products-updates.xml products.xml ;; \
+			(*)  exit 0 ;; \
+		esac ; \
+	fi ; \
+	rm -f -- $@ ; $(MODIFYREPO) products.xml $$(dirname $@) ; rm -f -- products.xml ; \
 	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
 
 $(repomaindir)/patterns.xml.gz: scripts/patterns.xml
@@ -1046,17 +1140,20 @@ $(repomaindir)/patterns.xml.gz: scripts/patterns.xml
 	( cd $$(dirname $@) ; ls -t '*-'$$(basename $@) 2>/dev/null | head -1 | if read f ; then ln -sf $$f $$(basename $@) ; fi )
 
 repo-suse: \
-$(repodir)     $(repodir)/repomd.xml     $(repodir)/susedata.xml.gz \
+    $(repodir)     $(repodir)/repomd.xml     $(repodir)/susedata.xml.gz \
 $(repomaindir) $(repomaindir)/repomd.xml $(repomaindir)/susedata.xml.gz \
 $(repodebgdir) $(repodebgdir)/repomd.xml $(repodebgdir)/susedata.xml.gz \
+$(repodevldir) $(repodevldir)/repomd.xml $(repodevldir)/susedata.xml.gz \
 $(reposrcsdir) $(reposrcsdir)/repomd.xml $(reposrcsdir)/susedata.xml.gz
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@$(MAKE) $(AM_MAKEFLAGS) $(repodir)/patterns.xml.gz
-	@$(MAKE) $(AM_MAKEFLAGS) $(repodir)/products.xml.gz
 	@$(MAKE) $(AM_MAKEFLAGS) $(repodir)/product.xml.gz
-	@$(MAKE) $(AM_MAKEFLAGS) $(repomaindir)/patterns.xml.gz
-	@$(MAKE) $(AM_MAKEFLAGS) $(repomaindir)/products.xml.gz
 	@$(MAKE) $(AM_MAKEFLAGS) $(repomaindir)/product.xml.gz
+	@$(MAKE) $(AM_MAKEFLAGS) $(repodir)/products.xml.gz
+	@$(MAKE) $(AM_MAKEFLAGS) $(repomaindir)/products.xml.gz
+	@if test -z '$(repobranch)' ; then \
+		$(MAKE) $(AM_MAKEFLAGS) $(repodir)/patterns.xml.gz ; \
+		$(MAKE) $(AM_MAKEFLAGS) $(repomaindir)/patterns.xml.gz ; \
+	fi
 
 ## Note: only put the groups file (comp.xml) in the base and main sub-repo.
 $(repodir)/repomd.xml:
@@ -1076,7 +1173,7 @@ $(repomaindir)/repomd.xml:
 	g=; test ! -f $$d$$f || g="-g $$d$$f" ; \
 	( \
 		cd $(repomaindir)/.. ; \
-		find ./RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' \
+		find ./RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' \
 		| sort -u | sed 's,^\./,,' | \
 		$(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . \
 	)
@@ -1085,7 +1182,16 @@ $(repodebgdir)/repomd.xml:
 	$(AM_V_GEN)\
 	( \
 		cd $(repodebgdir)/.. ; \
-		find ./RPMS -follow -name '*.rpm' | grep -v -- '\(source-\|\.src\.rpm$$\)' | grep -- '-debug' \
+		find ./RPMS -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' \
+		| sort -u | sed 's,^\./,,' | \
+		$(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) . \
+	)
+
+$(repodevldir)/repomd.xml:
+	$(AM_V_GEN)\
+	( \
+		cd $(repodevldir)/.. ; \
+		find ./RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' \
 		| sort -u | sed 's,^\./,,' | \
 		$(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) . \
 	)
@@ -1124,12 +1230,17 @@ $(repodebgdir)/repomd.xml
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	$(AM_V_GEN)$(GPGVERIFYSIGN)
 
+$(repodevldir)/repomd.xml.asc:: \
+$(repodevldir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
+
 $(reposrcsdir)/repomd.xml.asc:: \
 $(reposrcsdir)/repomd.xml
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	$(AM_V_GEN)$(GPGVERIFYSIGN)
 
-repo-yum: $(repodir) $(repomd_repos) $(repomd_heads)
+repo-yum: $(RELEASE_DIRECTORIES) $(repomd_repos) $(repomd_heads)
 
 repo-sign-yum: $(repomd_signs)
 
@@ -1243,7 +1354,7 @@ repo-yast-listings-clean:
 		-name 'ls-lR.gz' -o \
 		-name 'INDEX.gz' | $(am__base_remove)
 
-repo-yast: $(yast_meta_files)
+repo-yast: $(RELEASE_DIRECTORIES) $(yast_meta_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	( cd $(yastdir); $(CREATE_PACKAGE_DESCR) -Z -V -C -K -F -B -d RPMS/ )
 	$(MAKE) $(AM_MAKEFLAGS) repo-yast-listings
@@ -1285,7 +1396,7 @@ $(DISTDIR)/repoindex.xml:
 			targ=`echo $$path | sed 's,rpms/,,;y,/,-,;s,\.[0-9][0-9]*,,'` ; \
 			subd=`echo $$targ | sed -r 's,^([^-]*-[^-]*-[^-]*)-(.*)$$,\2,;t;s,.*,,'` ; \
 			targ=`echo $$targ | sed -r 's,^([^-]*-[^-]*-[^-]*)-(.*)$$,\1,'` ; \
-			repo=`echo $$subd | sed -r 'y,-, ,;s,\<main\>,Main,;s,\<debug\>,Debug,;s,\<source\>,Source,;s,\<udates\>,Updates,;s,\<extras\>,Extras,;s,\<testing\>,Testing,'` ; \
+			repo=`echo $$subd | sed -r 'y,-, ,;s,\<main\>,Main,;s,\<debug\>,Debug,;s,\<devel\>,Devel,;s,\<source\>,Source,;s,\<udates\>,Updates,;s,\<extras\>,Extras,;s,\<testing\>,Testing,'` ; \
 			name="$(PACKAGE_UCNAME)$${subd:+-$$subd}$${targ:+-$$targ}" ; \
 			desc="$(PACKAGE_TITLE)$${repo:+ $$repo}$${targ:+ ($$targ)}" ; \
 			$(ECHO) "  <repo name=\"$$name\"" ; \
@@ -1385,6 +1496,9 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.11  2011-03-06 08:57:19  brian
+## - repository updates
+##
 ## Revision 1.1.2.10  2011-02-28 19:51:29  brian
 ## - better repository build
 ##

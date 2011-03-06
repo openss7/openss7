@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-28 19:51:29 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-06 08:57:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
+# Last Modified $Date: 2011-03-06 08:57:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -389,7 +389,11 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
     ])
     AC_CACHE_CHECK([for dist build edition], [dist_cv_build_edition], [dnl
 	case "$dist_cv_build_distro" in
-	    (centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|rhel|suse|sle)
+	    (suse)
+		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
+	    (centos|lineox|whitebox|rhel|sle)
+		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,\..*[$],,'` ;;
+	    (fedora|mandrake|mandriva|redhat)
 		dist_tmp="${dist_cv_build_release}" ;;
 	    (debian|ubuntu|*)
 		dist_tmp="${dist_cv_build_codename}" ;;
@@ -599,7 +603,11 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
     ])
     AC_CACHE_CHECK([for dist host edition], [dist_cv_host_edition], [dnl
 	case "$dist_cv_host_distro" in
-	    (centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|rhel|suse|sle)
+	    (suse)
+		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
+	    (centos|lineox|whitebox|rhel|sle)
+		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,\..*[$],,'` ;;
+	    (fedora|mandrake|mandriva|redhat)
 		dist_tmp="${dist_cv_host_release}" ;;
 	    (debian|ubuntu|*)
 		dist_tmp="${dist_cv_host_codename}" ;;
@@ -839,6 +847,9 @@ AC_DEFUN([_DISTRO_], [dnl
 # =============================================================================
 #
 # $Log: dist.m4,v $
+# Revision 1.1.2.7  2011-03-06 08:57:20  brian
+# - repository updates
+#
 # Revision 1.1.2.6  2011-02-28 19:51:29  brian
 # - better repository build
 #
