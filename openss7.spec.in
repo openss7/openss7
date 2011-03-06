@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.17 $) $Date: 2011-03-06 08:57:19 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2011-03-06 16:13:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-06 08:57:19 $ by $Author: brian $
+# Last Modified $Date: 2011-03-06 16:13:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2302,10 +2302,12 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
             if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
                 echo 'Authorization required for repository access.' >/dev/tty
                 u='anonymous'; p=
-                read -e  -p 'Username: ' u </dev/tty >/dev/tty
+                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-anonymous}
+                if [ "$u" != 'anonymous' ] ; then
                 read -es -p 'Password: ' p </dev/tty >/dev/tty
                 echo '' >/dev/tty
-                url='%{_reposerv}://'"${u:+$u${p:+:$p}@}"'%{_repobase}/%{_reporoot}/rpms/%{_rpmsubdir}/repodata/'"$file$ext"
+                fi
+                url='%{_reposerv}://'"${u:+$u:$p@}"'%{_repobase}/%{_reporoot}/rpms/%{_rpmsubdir}/repodata/'"$file$ext"
                 rm -f -- $file
                 if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
                     [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
@@ -2337,10 +2339,12 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
             if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
                 echo 'Authorization required for repository access.' >/dev/tty
                 u='anonymous'; p=
-                read -e  -p 'Username: ' u </dev/tty >/dev/tty
+                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-anonymous}
+                if [ "$u" != 'anonymous' ] ; then
                 read -es -p 'Password: ' p </dev/tty >/dev/tty
                 echo '' >/dev/tty
-                url='%{_reposerv}://'"${u:+$u${p:+:$p}@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
+                fi
+                url='%{_reposerv}://'"${u:+$u:$p@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
                 rm -f -- $file
                 if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
                     [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
@@ -2358,9 +2362,9 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         echo 'name=@PACKAGE_UCNAME@-service';
         echo 'enabled=1';
         echo 'autorefresh=1';
-        echo 'url = %{_reposerv}://%{_repobase}/?credentials=@PACAKGE_UCNAME@credentials';
+        echo 'url = %{_reposerv}://%{_repobase}/?credentials=@PACKAGE_UCNAME@credentials';
         echo 'type = ris';
-    ) >%{_zyppcreddir}/@PACKAGE_UCNAME@-service.service
+    ) >%{_zyppservdir}/@PACKAGE_UCNAME@-service.service
 %endif
 fi
 
@@ -2407,8 +2411,8 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     fi
 %endif
 %if %{FILES_zypprepo}
-    rm -f -- %{_sysconfdir}/zypp/services.d/@PACKAGE_UCNAME@-service.service
-    rm -f -- %{_sysconfdir}/zypp/repos.d/@PACKAGE_UCNAME@-service\:*.repo
+    rm -f -- %{_zyppservdir}/@PACKAGE_UCNAME@-service.service
+    rm -f -- %{_zypprepodir}/@PACKAGE_UCNAME@-service\:*.repo
     rm -rf -- %{_localstatedir}/cache/zypp/packages/@PACKAGE_UCNAME@-service\:*
     rm -rf -- %{_localstatedir}/cache/zypp/raw/@PACKAGE_UCNAME@-service\:*
     rm -rf -- %{_localstatedir}/cache/zypp/solv/@PACKAGE_UCNAME@-service\:*
@@ -4736,6 +4740,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.18  2011-03-06 16:13:46  brian
+# - better repo install handling
+#
 # Revision 1.1.2.17  2011-03-06 08:57:19  brian
 # - repository updates
 #
