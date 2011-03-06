@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.16 $) $Date: 2011-03-06 08:57:19 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.17 $) $Date: 2011-03-06 16:13:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-06 08:57:19 $ by $Author: brian $
+# Last Modified $Date: 2011-03-06 16:13:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2986,6 +2986,8 @@ include am/snmp.am
 EXTRA_DIST			+= debian/README.Debian \
 				   debian/TODO.Debian
 
+EXTRA_DIST			+= src/python/yum-plugins/fedorakmod.py \
+				   src/python/yum-plugins/fedorakmod.conf
 ##
 ## Build cache files for intelligent warnings.
 ##
@@ -3013,6 +3015,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.17  2011-03-06 16:13:45  brian
+# - better repo install handling
+#
 # Revision 1.1.2.16  2011-03-06 08:57:19  brian
 # - repository updates
 #

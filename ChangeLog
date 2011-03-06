@@ -1,5 +1,15 @@
 2011-03-06  Brian Bidulock  <bidulock@openss7.org>
 
+	* AUTHORS: update release files
+	* Makefile.am: distribute yum plugin
+	* NEWS: update release files
+	* README: update release files
+	* THANKS: update release files
+	* openss7.spec.in: better repo install handling
+	* debian-squeeze-i686-config.cache: add config file
+
+2011-03-06  Brian Bidulock  <bidulock@openss7.org>
+
 	* AUTHORS: updated release files
 	* Makefile.am: new cache file naming
 	* NEWS: updated release files
