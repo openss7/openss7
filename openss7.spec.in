@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2011-03-06 16:13:46 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2011-03-09 10:29:34 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-06 16:13:46 $ by $Author: brian $
+# Last Modified $Date: 2011-03-09 10:29:34 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -518,6 +518,7 @@
 %{!?_perldir:           %{expand: %%global _perldir         %(eval "`perl -V:installvendorarch`"; echo $installvendorarch | sed -e 's,//*$,,')}}
 %{!?_yumrepodir:        %{expand: %%global _yumrepodir      %%{_sysconfdir}/yum.repos.d}}
 %{!?_yumplugdir:        %{expand: %%global _yumplugdir      %%{_libdir}/yum-plugins}}
+%{!?_yumdir:            %{expand: %%global _yumdir          %%{_sysconfdir}/yum}}
 %{!?_yumconfdir:        %{expand: %%global _yumconfdir      %%{_sysconfdir}/yum/pluginconf.d}}
 %{!?_zypprepodir:       %{expand: %%global _zypprepodir     %%{_sysconfdir}/zypp/repos.d}}
 %{!?_zyppcreddir:       %{expand: %%global _zyppcreddir     %%{_sysconfdir}/zypp/credentials.d}}
@@ -2239,8 +2240,14 @@ Autoreq:            true
 Autoprov:           true
 
 %if %{FILES_yumrepo}
-Prefix:             %{_yumrepodir}
-Prefix:             %{_rpmgpgdir}
+#refix:             %{_yumrepodir}
+#refix:             %{_rpmgpgdir}
+Prefix:             %{_yumplugdir}
+Prefix:             %{_yumconfdir}
+%endif
+
+%if %{FILES_zypprepo}
+#refix:             %{_zypprepodir}
 %endif
 
 %if %{FILES_yumrepo}
@@ -2288,15 +2295,16 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         for s in '' '.rpmsave' '.rpmnew' ; do
             oldfile="$file$s"
             if test -e $oldfile ; then
-                un=`sed -r 's,^baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $oldfile | head -1`
-                pw=`sed -r 's,^baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $oldfile | head -1`
+                un=`sed -r 's,baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $oldfile | head -1`
+                pw=`sed -r 's,baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $oldfile | head -1`
                 [ -n "$un" -a -n "$pw" ] || continue
                 break
             fi
         done
         [ ":$oldfile" != ":$file" ] || mv -f -- $file $file.rpmsave
         ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=$un}${pw:+&pw=$pw}"
-        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/rpms/%{_rpmsubdir}/repodata/'"$file$ext"
+        ext="$ext"`echo '/%{_rpmsubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
+        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/rpms/repodata/'"$file$ext"
         rm -f -- $file
         if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
             if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
@@ -2307,7 +2315,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
                 read -es -p 'Password: ' p </dev/tty >/dev/tty
                 echo '' >/dev/tty
                 fi
-                url='%{_reposerv}://'"${u:+$u:$p@}"'%{_repobase}/%{_reporoot}/rpms/%{_rpmsubdir}/repodata/'"$file$ext"
+                url='%{_reposerv}://'"${u:+$u:$p@}"'%{_repobase}/%{_reporoot}/rpms/repodata/'"$file$ext"
                 rm -f -- $file
                 if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
                     [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
@@ -2315,6 +2323,10 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
                     exit 1
                 fi
             fi
+        fi
+        if [ -e $file ] ; then chmod go-rw $file; else
+            [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
+            exit 1
         fi
     ) || exit 1
 %endif
@@ -2333,6 +2345,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         done
         [ ":$oldfile" != ":$file" ] || mv -f -- $file $file.rpmsave
         ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=$un}${pw:+&pw=$pw}"
+        ext="$ext"`echo '/%{_rpmsubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
         url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
         rm -f -- $file
         if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
@@ -2352,6 +2365,10 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
                     exit 1
                 fi
             fi
+        fi
+        if [ -e $file ] ; then chmod go-rw $file; else
+            [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
+            exit 1
         fi
     ) || exit 1
     # Setting up a service is as easy as adding its definition file to the
@@ -4740,12 +4757,17 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 1.1.2.18  2011-03-06 16:13:46  brian
-# - better repo install handling
+# Revision 1.1.2.19  2011-03-09 10:29:34  brian
+# - better repo rpm
 #
-# Revision 1.1.2.17  2011-03-06 08:57:19  brian
-# - repository updates
-#
+
+* Sun Mar  6 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.18  2011-03-06 16:13:46  brian
+- better repo install handling
+
+* Sun Mar  6 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.17  2011-03-06 08:57:19  brian
+- repository updates
 
 * Mon Feb 28 2011 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.16  2011-02-28 19:51:28  brian

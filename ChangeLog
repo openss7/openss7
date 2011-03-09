@@ -1,3 +1,7 @@
+2011-03-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* openss7.spec.in: better repo rpm
+
 2011-03-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: update release files
