@@ -1,11 +1,11 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-03-06 08:57:19 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-03-09 10:27:08 $
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 ## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 ## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-03-06 08:57:19 $ by $Author: brian $
+## Last Modified $Date: 2011-03-09 10:27:08 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -1496,6 +1496,9 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.12  2011-03-09 10:27:08  brian
+## - update header
+##
 ## Revision 1.1.2.11  2011-03-06 08:57:19  brian
 ## - repository updates
 ##
