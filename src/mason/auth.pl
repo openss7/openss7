@@ -22,11 +22,11 @@ sub rpmauthenhandler {
     my $user = $r->connection->user;
 
     if ( $r->filename =~ m/\/openss7-repo.*\.rpm$/ ) {
-	#$r->warn("Anybody ($user) can download the repo defintion rpm ".$r->uri);
+	#$r->warn("Any host ($user) can download the repo defintion rpm ".$r->uri);
 	return OK;
     }
     if ( $r->filename =~ m,/repo/rpms/repodata/[^/]+\.xml(\.gz)?$, ) {
-	#$r->warn("Anybody ($user) can download the empty repository ".$r->uri);
+	#$r->warn("Any host ($user) can download the empty repository ".$r->uri);
 	return OK;
     }
     if ( $r->filename !~ m/(\.xml(\.gz)?|\.rpm)$/ ) {
@@ -43,6 +43,13 @@ sub rpmauthenhandler {
     my $grps = check_host($r,$user);
     return $grps if ($grps == FORBIDDEN or $grps == AUTH_REQUIRED);
 
+    if ( $r->filename =~ m,/repo/repoindex\.xml$, ) {
+	if ( ",$grps," !~ ',zypp-hosts,' ) {
+	    $r->log_reason("Host $user not in group 'zypp-hosts'",$r->filename);
+	    return FORBIDDEN;
+	}
+	return OK;
+    }
     if ( $r->filename !~ m/\/repo\/rpms\/(([^\/].*)\/)?(repodata|RPMS|SRPMS)\/(.*)$/ ) {
 	$r->log_reason("file is out of place", $r->filename);
 	return FORBIDDEN;
@@ -195,4 +202,3 @@ sub rpmauthzhandler {
 }
 
 1;
-

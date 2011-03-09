@@ -219,28 +219,25 @@
 	}
     }
 
-    if ( $page eq 'openss7.repo' or $page eq 'mirrorlist' or $page eq 'OPENSS7credentials')
-    {
-	if ( $distro and exists $hostinfo->{'REPO_DISTRO'} and $distro ne $hostinfo->{'REPO_DISTRO'} ) {
-	    $r->log_reason("distro cannot change to $distro from ".$hostinfo->{'REPO_DISTRO'}, $r->uri.'?'.scalar($r->args));
-	    $m->abort(403);
-	} else {
-	    $distro = $hostinfo->{'REPO_DISTRO'} if ( exists $hostinfo->{'REPO_DISTRO'} );
-	    $hostinfo->{'REPO_DISTRO'} = $distro;
-		}
-	if ( $relver and exists $hostinfo->{'REPO_RELVER'} and $relver ne $hostinfo->{'REPO_RELVER'} ) {
-	    $hostinfo->{'REPO_RELVER'} = $relver;
-	} else {
-	    $relver = $hostinfo->{'REPO_RELVER'} if ( exists $hostinfo->{'REPO_RELVER'} );
-	    $hostinfo->{'REPO_RELVER'} = $relver;
+    if ( $distro and exists $hostinfo->{'REPO_DISTRO'} and $distro ne $hostinfo->{'REPO_DISTRO'} ) {
+	$r->log_reason("distro cannot change to $distro from ".$hostinfo->{'REPO_DISTRO'}, $r->uri.'?'.scalar($r->args));
+	$m->abort(403);
+    } else {
+	$distro = $hostinfo->{'REPO_DISTRO'} if ( exists $hostinfo->{'REPO_DISTRO'} );
+	$hostinfo->{'REPO_DISTRO'} = $distro;
 	    }
-	if ( $osarch and exists $hostinfo->{'REPO_OSARCH'} and $osarch ne $hostinfo->{'REPO_OSARCH'} ) {
-	    $r->log_reason("osarch cannot change to $osarch from ".$hostinfo->{'REPO_OSARCH'}, $r->uri.'?'.scalar($r->args));
-	    $m->abort(403);
-	} else {
-	    $osarch = $hostinfo->{'REPO_OSARCH'} if ( exists $hostinfo->{'REPO_OSARCH'} );
-	    $hostinfo->{'REPO_OSARCH'} = $osarch;
+    if ( $relver and exists $hostinfo->{'REPO_RELVER'} and $relver ne $hostinfo->{'REPO_RELVER'} ) {
+	$hostinfo->{'REPO_RELVER'} = $relver;
+    } else {
+	$relver = $hostinfo->{'REPO_RELVER'} if ( exists $hostinfo->{'REPO_RELVER'} );
+	$hostinfo->{'REPO_RELVER'} = $relver;
 	}
+    if ( $osarch and exists $hostinfo->{'REPO_OSARCH'} and $osarch ne $hostinfo->{'REPO_OSARCH'} ) {
+	$r->log_reason("osarch cannot change to $osarch from ".$hostinfo->{'REPO_OSARCH'}, $r->uri.'?'.scalar($r->args));
+	$m->abort(403);
+    } else {
+	$osarch = $hostinfo->{'REPO_OSARCH'} if ( exists $hostinfo->{'REPO_OSARCH'} );
+	$hostinfo->{'REPO_OSARCH'} = $osarch;
     }
 
     if ( $username )
@@ -472,44 +469,45 @@ password=<% $hostpass %>
 
 </%perl>
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- generated for machine: <% $hostname %> -->
+
 <repoindex>
 <%perl>
 	foreach my $file (@files) {
 	    $url = $file; chomp $url;
 	    next unless ( $url =~ m,.*/repo/rpms/((.*)/)?repodata/repomd.xml$, );
 	    $url = $2;
-	    {
-		my @fields = split(/\//,$url);
-		next if ($#fields < 2 or $#fields > 4);
-		if ($#fields == 2) {
+	    next unless ( $url );
+	    my @fields = split(/\//,$url);
+	    next if ($#fields < 2 or $#fields > 4);
+	    if ($#fields == 2) {
+		$fields[3] = 'base';
+		$fields[4] = 'full';
+	    }
+	    if ($#fields == 3) {
+		if ($fields[3] =~ m/^(main|debug|devel|source)$/) {
+		    $fields[4] = $fields[3];
 		    $fields[3] = 'base';
+		} else {
 		    $fields[4] = 'full';
 		}
-		if ($#fields == 3) {
-		    if ($fields[3] =~ m/^(main|debug|devel|source)$/) {
-			$fields[4] = $fields[3];
-			$fields[3] = 'base';
-		    } else {
-			$fields[4] = 'full';
-		}
 	    }
-		$fields[3] = 'base' unless ($fields[3]);
-		$fields[4] = 'full' unless ($fields[4]);
+	    $fields[3] = 'base' unless ($fields[3]);
+	    $fields[4] = 'full' unless ($fields[4]);
 
-		next unless ($distro eq $fields[0]);
-		next unless ($osarch eq $fields[2]);
+	    next unless ($distro eq $fields[0]);
+	    next unless ($osarch eq $fields[2]);
 
-		($distro,$relver,$osarch,$branch,$subrep) = @fields;
-	    }
+	    ($distro,$relver,$osarch,$branch,$subrep) = @fields;
 
 	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
 	    my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ ) ? 'enterprise' : 'community';
 	    my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
+	    my $reason = '';
 	    my $offer = 'yes';
 	    if ($offer eq 'yes') {
 		$offer = 'no'  if ($hostaccs !~ /,$manage-hosts,/);
+		if ($offer eq 'no') { $reason = "Host $hostname not in group '$manage-hosts'"; }
 	    }
 	    if ($offer eq 'yes') {
 		$offer = 'no';
@@ -521,20 +519,21 @@ password=<% $hostpass %>
 		$offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
 		$offer = 'yes' if ($hostaccs =~ /,$enterp-$server-hosts,/);
 		$offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		if ($offer eq 'no') { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
 	    }
 	    if ($offer eq 'yes') {
 		$offer = 'no';
 		$offer = 'yes' if ($hostaccs =~ /,$branch-$subrep-hosts,/);
 		$offer = 'yes' if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
+		if ($offer eq 'no') { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'"; }
 	    }
 
 	    next unless ( $offer eq 'yes' );
 
 	    my $target = $distro . '-' . $relver . '-' . $osarch;
-	    my $page = 'OPENSS7';
+	    my $page = 'openss7';
 	    $page .= '-' . $branch if ($branch ne 'base');
 	    $page .= '-' . $subrep if ($subrep ne 'full');
-	    $page .= '-' . $target;
 	    my ($bdesc,$sdesc);
 	    ($bdesc = $branch) =~ s/^([a-z])(.*)$/\U$1\E$2/;
 	    ($sdesc = $subrep) =~ s/^([a-z])(.*)$/\U$1\E$2/;
@@ -550,15 +549,14 @@ password=<% $hostpass %>
 	    } else {
 		$pre = '<!-- ';
 		$suf = ' -->';
+</%perl>
+<% $pre %>This repository is currently not authorized to host <% $hostname %>.<% $suf %>
+<% $pre %><% $reason %>.<% $suf %>
+<% $pre %>To activate this repository, contact &lt;sales&amp;openss7.com&gt;.<% $suf %>
+<%perl>
 	    }
 </%perl>
-  <% $pre %><repo name="<% $page %>"
-	alias="<% $page %>"
-	description="<% $desc %>"
-	distro_target="<% $target %>"
-	path="<% $url %>"
-	priority="0"
-	pub="0" /><% $suf %>
+<% $pre %><repo name="<% $page %>" alias="<% $page %>" description="<% $desc %>" distro_target="<% $target %>" priority="0" pub="0" path="rpms/<% $url %>" /><% $suf %>
 <%perl>
 	}
 </%perl>

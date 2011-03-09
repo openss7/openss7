@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2011-03-09 10:29:34 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2011-03-09 23:06:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-09 10:29:34 $ by $Author: brian $
+# Last Modified $Date: 2011-03-09 23:06:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -2295,8 +2295,8 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         for s in '' '.rpmsave' '.rpmnew' ; do
             oldfile="$file$s"
             if test -e $oldfile ; then
-                un=`sed -r 's,baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $oldfile | head -1`
-                pw=`sed -r 's,baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $oldfile | head -1`
+                un=`sed -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $oldfile | head -1`
+                pw=`sed -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $oldfile | head -1`
                 [ -n "$un" -a -n "$pw" ] || continue
                 break
             fi
@@ -2324,7 +2324,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
                 fi
             fi
         fi
-        if [ -e $file ] ; then chmod go-rw $file; else
+        if [ ! -e $file ] ; then
             [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
             exit 1
         fi
@@ -2375,13 +2375,20 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     # services.d directory.  It will be refreshed the next time that zypper
     # runds.
     (
-        echo '[@PACKAGE_UCNAME@-service]';
-        echo 'name=@PACKAGE_UCNAME@-service';
-        echo 'enabled=1';
-        echo 'autorefresh=1';
-        echo 'url = %{_reposerv}://%{_repobase}/?credentials=@PACKAGE_UCNAME@credentials';
-        echo 'type = ris';
-    ) >%{_zyppservdir}/@PACKAGE_UCNAME@-service.service
+        echo '[@PACKAGE_UCNAME@]'
+        echo 'name=%{stitle} Repository Service'
+        echo 'enabled=1'
+        echo 'autorefresh=1'
+        echo 'url = %{_reposerv}://%{_repobase}/?credentials=@PACKAGE_UCNAME@credentials'
+        echo 'type = ris'
+        echo -n 'repostoenable ='
+        for b in '' '-extras' '-updates' '-testing' ; do
+            for s in '-main' '-debug' '-devel' ; do
+                echo -n " @PACKAGE_UCNAME@:@PACKAGE@$b$s"
+            done
+        done
+        echo ''
+    ) >%{_zyppservdir}/@PACKAGE_UCNAME@.service
 %endif
 fi
 
@@ -2428,11 +2435,11 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     fi
 %endif
 %if %{FILES_zypprepo}
-    rm -f -- %{_zyppservdir}/@PACKAGE_UCNAME@-service.service
-    rm -f -- %{_zypprepodir}/@PACKAGE_UCNAME@-service\:*.repo
-    rm -rf -- %{_localstatedir}/cache/zypp/packages/@PACKAGE_UCNAME@-service\:*
-    rm -rf -- %{_localstatedir}/cache/zypp/raw/@PACKAGE_UCNAME@-service\:*
-    rm -rf -- %{_localstatedir}/cache/zypp/solv/@PACKAGE_UCNAME@-service\:*
+    rm -f -- %{_zyppservdir}/@PACKAGE_UCNAME@.service
+    rm -f -- %{_zypprepodir}/@PACKAGE_UCNAME@\:@PACKAGE@*.repo
+    rm -rf -- %{_localstatedir}/cache/zypp/packages/@PACKAGE_UCNAME@\:@PACKAGE@*
+    rm -rf -- %{_localstatedir}/cache/zypp/raw/@PACKAGE_UCNAME@\:@PACKAGE@*
+    rm -rf -- %{_localstatedir}/cache/zypp/solv/@PACKAGE_UCNAME@\:@PACKAGE@*
 %endif
 fi
 
@@ -4757,6 +4764,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.20  2011-03-09 23:06:05  brian
+# - more repo workup
+#
 # Revision 1.1.2.19  2011-03-09 10:29:34  brian
 # - better repo rpm
 #

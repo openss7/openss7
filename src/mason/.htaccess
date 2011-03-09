@@ -60,7 +60,7 @@
 </Files>
 # RPMs (other than openss7-repo) must only be downloaded by machines
 # RPMs must be overridden to allow guests-hosts in individual subdirectories
-<Files "openss7-*.rpm">
+<FilesMatch "^openss7-[^r].*\.rpm$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
@@ -71,20 +71,20 @@
 	PerlRequire /var/www/mason/perl/auth.pl
 	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
 	Require group hosts
-</Files>
+</FilesMatch>
 # Anybody can download the repository RPMs
-<Files "openss7-repo*.rpm">
+<FilesMatch "^openss7-repo.*\.rpm$">
 	Order allow,deny
 	Allow from all
-	SSLRequireSSL
-	AuthType Basic
-	AuthName "OpenSS7 Repository Subscriber Access Credentials"
-	AuthDBUserFile /var/www/mason/repousers
-	AuthDBGroupFile /var/www/mason/repousers
-	PerlRequire /var/www/mason/perl/auth.pl
-	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
-	Require valid-user
-</Files>
+#SSLRequireSSL
+#AuthType Basic
+#AuthName "OpenSS7 Repository Subscriber Access Credentials"
+#AuthDBUserFile /var/www/mason/repousers
+#AuthDBGroupFile /var/www/mason/repousers
+#PerlRequire /var/www/mason/perl/auth.pl
+#PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
+#Require valid-user
+</FilesMatch>
 # tarballs and spec files must only be downloaded by subscribers
 # must be overridden to allow guests
 <FilesMatch "^openss7-1\..*(\.tar\.(gz|bz2|xz|lzma)|\.spec)$">
