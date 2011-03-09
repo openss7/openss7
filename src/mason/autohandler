@@ -1,8 +1,10 @@
 % # vim: ft=mason sw=4 fo+=tcqlorn
 <%init>
+    use Fcntl qw(:DEFAULT :flock);
     use DB_File;
     use MIME::Base64;
     use Storable qw(nfreeze thaw);
+    use Apache::Constants qw(:common);
     my $self = $m->base_comp;
     my $page = $self->name;
 </%init>
@@ -19,16 +21,68 @@
 	    $page eq 'mirrorlist'         or
 	    $page eq 'repoindex.xml' );
 
-    my ($url,$distro,$relver,$osarch,$branch,$subrep);
+    my ($fd,$url,$distro,$relver,$osarch,$branch,$subrep);
     my ($username,$userpass,$usergrps,$useraccs,$usercred,$userdata,$userinfo,$userauth,$userdflt,$date);
     my ($hostname,$hostpass,$hostgrps,$hostaccs,$hostcred,$hostdata,$hostinfo,$hostauth,$testpass);
 
     $date = `date -Iseconds`; chomp $date;
 
-    $m->abort(403) unless ( exists $ENV{'HTTPS'} and $ENV{'HTTPS'} eq 'on' );
+    unless ( exists $ENV{'HTTPS'} and $ENV{'HTTPS'} eq 'on' ) {
+	$r->log_reason("https access required", $r->uri);
+	$m->abort(403)
+    }
+
+    if ( $page eq 'openss7.repo' or $page eq 'mirrorlist' or $page eq 'OPENSS7credentials' )
+    {
+	$distro = $ARGS{'distro'};
+	$relver = $ARGS{'relver'};
+	$osarch = $ARGS{'osarch'};
+
+	if ( $page eq 'openss7.repo' and (!$distro or !$relver or !$osarch))
+	{
+	    if ( $r->uri !~ m,/repo/rpms/(([^/].*)/)?repodata/(.*)$, ) {
+		$r->log_reason("file is out of place", $r->filename);
+		$m->abort(404);
+	    }
+	    $url = $2;
+
+	    if ($url) {
+		my @fields = split(/\//,$url);
+
+		if ($#fields < 2 or $#fields > 4) {
+		    $r->log_reason("incorrect data in path", $r->uri);
+		    $m->abort(404);
+		}
+		if ($#fields == 2) {
+		    $fields[3] = 'base';
+		    $fields[4] = 'full';
+		}
+		if ($#fields == 3) {
+		    if ($fields[3] =~ m/^(main|debug|devel|source)$/) {
+			$fields[4] = $fields[3];
+			$fields[3] = 'base';
+		    } else {
+			$fields[4] = 'full';
+		    }
+		}
+		$fields[3] = 'base' unless ($fields[5]);
+		$fields[4] = 'full' unless ($fields[6]);
+
+		($distro,$relver,$osarch,$branch,$subrep) = @fields;
+	    }
+	}
+	if ( $page eq 'mirrorlist' )
+	{
+	    $branch = $ARGS{'branch'}; $branch = 'base' unless ($branch);
+	    $subrep = $ARGS{'subrep'}; $subrep = 'full' unless ($subrep);
+	}
+    }
 
     if ( $page eq 'mirrorlist' ) {
-	$m->abort(403) unless ( $un );
+	unless ($un) {
+	    $r->log_reason("un argument required", $r->uri.'?'.scalar($r->args));
+	    $m->abort(403);
+	}
 	$username = $un;
 	$testpass = '';
     } else {
@@ -37,9 +91,15 @@
 	my $ret; ($ret, $testpass) = $r->get_basic_auth_pw;
     }
 
-    my %users; tie %users, 'DB_File', '/var/www/mason/repousers', O_CREAT|O_RDWR, 0640 or die $!;
+    open($fd, ">", '/var/www/mason/repousers.LOCK') or die $!;
+    flock($fd, LOCK_EX);
+    tie my %users, 'DB_File', '/var/www/mason/repousers', O_CREAT|O_RDWR, 0640 or die $!;
 
-    unless ( exists $users{$username} ) { $r->note_basic_auth_failure; $m->abort(401); }
+    unless ( exists $users{$username} ) {
+	$r->note_basic_auth_failure;
+	$r->log_reason("user $username not in database", $r->uri);
+	$m->abort(401);
+    }
 
     ($usercred,$usergrps,$userdata) = split(/:/,$users{$username},3);
     $useraccs = ",$usergrps,";
@@ -54,6 +114,7 @@
     if ( $testpass ne $userpass or $testpass eq '' ) {
 	if ( $page eq 'repoindex.xml' ) {
 	    $r->note_basic_auth_failure;
+	    $r->log_reason("user $username password mismatch", $r->uri);
 	    $m->abort(401);
 	}
 	$userauth = 'invalid';
@@ -61,6 +122,7 @@
 	if ( $page eq 'mirrorlist' or $page eq 'repoindex.xml' ) {
 	    if ( $useraccs !~ /,hosts,/ ) {
 		$r->note_basic_auth_failure;
+		$r->log_reason("user $username not in group 'hosts'", $r->uri);
 		$m->abort(401);
 	    }
 	}
@@ -78,7 +140,10 @@
 	$hostinfo = $userinfo; $userinfo = undef;
 
 	$username = $hostinfo->{'REMOTE_USER'} if ( exists $hostinfo->{'REMOTE_USER'} );
-	$m->abort(403) unless ( $username and exists $users{$username} );
+	unless ( $username and exists $users{$username} ) {
+	    $r->log_reason("user $username for host $hostname not in database", $r->uri);
+	    $m->abort(403);
+	}
 
 	$userauth = 'invalid';
 	($usercred,$usergrps,$userdata) = split(/:/,$users{$username},3);
@@ -92,11 +157,26 @@
     }
 
     if ( $page eq 'OPENSS7credentials' or $page eq 'openss7.repo' ) {
-	$m->abort(403) unless ( $hn );
+	unless ($hn) {
+	    $r->log_reason("hn argument required", $r->uri.'?'.scalar($r->args));
+	    $m->abort(403);
+	}
 	if ( $hostname ) {
 	    $un = $hostname;
 	    $pw = $hostpass;
 	} else {
+	    unless ($distro) {
+		$r->log_reason("distro required", $r->uri.'?'.scalar($r->args));
+		$m->abort(403);
+	    }
+	    unless ($relver) {
+		$r->log_reason("relver required", $r->uri.'?'.scalar($r->args));
+		$m->abort(403);
+	    }
+	    unless ($osarch) {
+		$r->log_reason("osarch required", $r->uri.'?'.scalar($r->args));
+		$m->abort(403);
+	    }
 	    if ( $un ) { $hostname = $un; } else {
 		$hostname = `uuidgen`;
 		chomp $hostname;
@@ -111,8 +191,14 @@
 		($hostcred,$hostgrps,$hostdata) = split(/:/,$users{$hostname},3);
 		$hostaccs = ",$hostgrps,";
 
-		if ( $hostaccs !~ /,hosts,/           ) { $r->note_basic_auth_failure; $m->abort(401); }
-		if ( $hostaccs !~ /,$username-hosts,/ ) { $r->note_basic_auth_failure; $m->abort(401); }
+		if ( $hostaccs !~ /,hosts,/           ) {
+		    $r->log_reason("host $hostname not in group 'hosts'", $r->uri);
+		    $m->abort(403);
+		}
+		if ( $hostaccs !~ /,$username-hosts,/ ) {
+		    $r->log_reason("host $hostname not in group '$username-hosts'", $r->uri);
+		    $m->abort(403);
+		}
 
 		if ( $hostdata ) { $hostinfo = thaw(decode_base64($hostdata)); } else { $hostinfo = {}; }
 		$hostpass = $hostinfo->{'REMOTE_PASS'} if ( exists $hostinfo->{'REMOTE_PASS'} );
@@ -133,46 +219,28 @@
 	}
     }
 
-    if ( $page eq 'openss7.repo' or $page eq 'mirrorlist' )
+    if ( $page eq 'openss7.repo' or $page eq 'mirrorlist' or $page eq 'OPENSS7credentials')
     {
-	$distro = 'centos';
-	$relver = '5';
-	$osarch = 'x86_64';
-	$branch = '';
-	$subrep = 'main';
-
-	if ( $page eq 'openss7.repo' )
-	{
-	    $url = $self->dir_path; $url =~ s,\/repodata$,,;
-	    $url =~ s,//+,/,g; $url =~ s,^/,,; $url =~ s,/$,,;
-
-	    my @fields = split(/\//,$url);
-
-	    if ( $#fields >= 2 and $fields[0] eq 'repo' and $fields[1] eq 'rpms' ) {
-		$distro = $fields[2];
-		$relver = $fields[3];
-		$osarch = $fields[4];
-		$branch = $fields[5];
-		$subrep = $fields[6];
-		unless ( $subrep ) {
-		    $subrep = $branch;
-		    $branch = '';
+	if ( $distro and exists $hostinfo->{'REPO_DISTRO'} and $distro ne $hostinfo->{'REPO_DISTRO'} ) {
+	    $r->log_reason("distro cannot change to $distro from ".$hostinfo->{'REPO_DISTRO'}, $r->uri.'?'.scalar($r->args));
+	    $m->abort(403);
+	} else {
+	    $distro = $hostinfo->{'REPO_DISTRO'} if ( exists $hostinfo->{'REPO_DISTRO'} );
+	    $hostinfo->{'REPO_DISTRO'} = $distro;
 		}
+	if ( $relver and exists $hostinfo->{'REPO_RELVER'} and $relver ne $hostinfo->{'REPO_RELVER'} ) {
+	    $hostinfo->{'REPO_RELVER'} = $relver;
+	} else {
+	    $relver = $hostinfo->{'REPO_RELVER'} if ( exists $hostinfo->{'REPO_RELVER'} );
+	    $hostinfo->{'REPO_RELVER'} = $relver;
 	    }
+	if ( $osarch and exists $hostinfo->{'REPO_OSARCH'} and $osarch ne $hostinfo->{'REPO_OSARCH'} ) {
+	    $r->log_reason("osarch cannot change to $osarch from ".$hostinfo->{'REPO_OSARCH'}, $r->uri.'?'.scalar($r->args));
+	    $m->abort(403);
+	} else {
+	    $osarch = $hostinfo->{'REPO_OSARCH'} if ( exists $hostinfo->{'REPO_OSARCH'} );
+	    $hostinfo->{'REPO_OSARCH'} = $osarch;
 	}
-
-	if ( $page eq 'mirrorlist' )
-	{
-	    $distro = $ARGS{'distro'} if ( exists $ARGS{'distro'} );
-	    $relver = $ARGS{'relver'} if ( exists $ARGS{'relver'} );
-	    $osarch = $ARGS{'osarch'} if ( exists $ARGS{'osarch'} );
-	    $branch = $ARGS{'branch'} if ( exists $ARGS{'branch'} );
-	    $subrep = $ARGS{'subrep'} if ( exists $ARGS{'subrep'} );
-	}
-
-	$distro = $hostinfo->{'REPO_DISTRO'} if ( exists $hostinfo->{'REPO_DISTRO'} ); $hostinfo->{'REPO_DISTRO'} = $distro;
-	$relver = $hostinfo->{'REPO_RELVER'} if ( exists $hostinfo->{'REPO_RELVER'} ); $hostinfo->{'REPO_RELVER'} = $relver;
-	$osarch = $hostinfo->{'REPO_OSARCH'} if ( exists $hostinfo->{'REPO_OSARCH'} ); $hostinfo->{'REPO_OSARCH'} = $osarch;
     }
 
     if ( $username )
@@ -253,6 +321,7 @@
 	{
 	    my @hostgrps = ( 'hosts' );
 	    push @hostgrps, $username.'-hosts';
+	    push @hostgrps, $distro.'-'.$osarch.'-host';  # note 'host' instead of 'hosts'
 	    push @hostgrps, 'zypp-hosts' if ( $page eq 'OPENSS7credentials' );
 	    push @hostgrps, 'yum-hosts'  if ( $page eq 'openss7.repo' );
 	    foreach my $g ( split(/,/,$usergrps) ) {
@@ -268,6 +337,9 @@
     }
 
     untie %users;
+    flock($fd, LOCK_UN);
+    close($fd);
+
     #
     #  Note that hostinfo and userinfo is pretty much read only from here...
     #
@@ -295,10 +367,34 @@ password=<% $hostpass %>
 	{
 	    for $subrep ( @subrepos )
 	    {
+		my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
+		my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ ) ? 'enterprise' : 'community';
+		my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
+
 		my $offer = 'yes';
-		$offer = 'no' if ( $distro =~ /^(sle|sles|sled|rhel|centos)$/ and $hostaccs !~ /,enterprise-hosts,/ );
-		$offer = 'no' if ( $osarch !~ /^(i386|i486|i586|i686)$/       and $hostaccs !~ /,server-hosts,/     );
-		$offer = 'no' if ( $hostaccs !~ /,$branch-$subrep-hosts,/ );
+		my $reason = '';
+		if ($offer eq 'yes') {
+		    $offer = 'no'  if ($hostaccs !~ /,$manage-hosts,/);
+		    if ($offer eq 'no') { $reason = "Host $hostname not in group '$manage-hosts'"; }
+		}
+		if ($offer eq 'yes') {
+		    $offer = 'no';
+		    $offer = 'yes' if ($hostaccs =~ /,$distro-$osarch-hosts,/);
+		    $offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		    $offer = 'yes' if ($hostaccs =~ /,$distro-$server-hosts,/);
+		    $offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		    $offer = 'yes' if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
+		    $offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		    $offer = 'yes' if ($hostaccs =~ /,$enterp-$server-hosts,/);
+		    $offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		    if ($offer eq 'no') { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
+		}
+		if ($offer eq 'yes') {
+		    $offer = 'no';
+		    $offer = 'yes' if ($hostaccs =~ /,$branch-$subrep-hosts,/);
+		    $offer = 'yes' if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
+		    if ($offer eq 'no') { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'"; }
+		}
 
 		my $enabled = 1;
 		if ( $emptyrepo ne 'yes' ) {
@@ -308,6 +404,7 @@ password=<% $hostpass %>
 		}
 
 		my ($desc,$bdesc,$sdesc);
+		($bdesc = $branch) =~ s/^([a-z])(.*)$/\U$1\E$2/;
 		($sdesc = $subrep) =~ s/^([a-z])(.*)$/\U$1\E$2/;
 		my $target = $distro.'-'.$relver.'-'.$osarch;
 		$page = 'openss7';
@@ -343,6 +440,15 @@ password=<% $hostpass %>
 		if ( $subrep eq 'devel'   and $offer eq 'no' ) {
 		    $pre = '#' if ( $emptyrepo ne 'yes' );
 		}
+		if ( $offer ne 'yes' ) {
+		    $pre = '#' if ( $emptyrepo ne 'yes' );
+		    $enabled = 0;
+</%perl>
+<% $pre %># This repository is currently not authorized to host <% $hostname %>.
+<% $pre %># <% $reason %>.
+<% $pre %># To activate this repository, contact <sales@openss7.com>.
+<%perl>
+		}
 </%perl>
 <% $pre %>[<% $page %>]
 <% $pre %>enabled = <% $enabled %>
@@ -371,28 +477,56 @@ password=<% $hostpass %>
 <%perl>
 	foreach my $file (@files) {
 	    $url = $file; chomp $url;
-	    $url =~ s,/repodata/repomd.xml,,; $url =~ s,^.*/rpms/,rpms/,;
-
+	    next unless ( $url =~ m,.*/repo/rpms/((.*)/)?repodata/repomd.xml$, );
+	    $url = $2;
 	    {
 		my @fields = split(/\//,$url);
-		$distro = $fields[1];
-		$relver = $fields[2]; # $fields[2] = '$releasever';
-		$osarch = $fields[3]; # $fields[3] = '$basearch';
-		$branch = $fields[4];
-		$subrep = $fields[5];
-		$url = join('/',@fields);
-		unless ($subrep) {
-		    $subrep = $branch;
-		    $branch = '';
+		next if ($#fields < 2 or $#fields > 4);
+		if ($#fields == 2) {
+		    $fields[3] = 'base';
+		    $fields[4] = 'full';
+		}
+		if ($#fields == 3) {
+		    if ($fields[3] =~ m/^(main|debug|devel|source)$/) {
+			$fields[4] = $fields[3];
+			$fields[3] = 'base';
+		    } else {
+			$fields[4] = 'full';
 		}
 	    }
-	    $branch = 'base' if ($branch eq '');
-	    $subrep = 'full' if ($subrep eq '');
+		$fields[3] = 'base' unless ($fields[3]);
+		$fields[4] = 'full' unless ($fields[4]);
+
+		next unless ($distro eq $fields[0]);
+		next unless ($osarch eq $fields[2]);
+
+		($distro,$relver,$osarch,$branch,$subrep) = @fields;
+	    }
+
+	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
+	    my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ ) ? 'enterprise' : 'community';
+	    my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
 	    my $offer = 'yes';
-	    $offer = 'no' if ( $distro =~ /^(sle|sles|sled|rhel|centos)$/ and $hostaccs !~ /,enterprise-hosts,/ );
-	    $offer = 'no' if ( $osarch !~ /^(i386|i486|i586|i686)$/       and $hostaccs !~ /,server-hosts,/     );
-	    $offer = 'no' if ( $hostaccs !~ /,$branch-$subrep-hosts,/ );
+	    if ($offer eq 'yes') {
+		$offer = 'no'  if ($hostaccs !~ /,$manage-hosts,/);
+	    }
+	    if ($offer eq 'yes') {
+		$offer = 'no';
+		$offer = 'yes' if ($hostaccs =~ /,$distro-$osarch-hosts,/);
+		$offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		$offer = 'yes' if ($hostaccs =~ /,$distro-$server-hosts,/);
+		$offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		$offer = 'yes' if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
+		$offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		$offer = 'yes' if ($hostaccs =~ /,$enterp-$server-hosts,/);
+		$offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+	    }
+	    if ($offer eq 'yes') {
+		$offer = 'no';
+		$offer = 'yes' if ($hostaccs =~ /,$branch-$subrep-hosts,/);
+		$offer = 'yes' if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
+	    }
 
 	    next unless ( $offer eq 'yes' );
 
@@ -436,11 +570,29 @@ password=<% $hostpass %>
 	$branch = 'base' if ($branch eq '');
 	$subrep = 'full' if ($subrep eq '');
 
+	my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
+	my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ ) ? 'enterprise' : 'community';
+	my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
+
 	my $offer = 'yes';
-	{
-	    $offer = 'no' if ( $distro =~ /^(sle|sles|sled|rhel|centos)$/ and $hostaccs !~ /,enterprise-hosts,/ );
-	    $offer = 'no' if ( $osarch !~ /^(i386|i486|i586|i686)$/       and $hostaccs !~ /,server-hosts,/     );
-	    $offer = 'no' if ( $hostaccs !~ /,$branch-$subrep-hosts,/ );
+	if ($offer eq 'yes') {
+	    $offer = 'no'  if ($hostaccs !~ /,$manage-hosts,/);
+	}
+	if ($offer eq 'yes') {
+	    $offer = 'no';
+	    $offer = 'yes' if ($hostaccs =~ /,$distro-$osarch-hosts,/);
+	    $offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+	    $offer = 'yes' if ($hostaccs =~ /,$distro-$server-hosts,/);
+	    $offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+	    $offer = 'yes' if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
+	    $offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+	    $offer = 'yes' if ($hostaccs =~ /,$enterp-$server-hosts,/);
+	    $offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+	}
+	if ($offer eq 'yes') {
+	    $offer = 'no';
+	    $offer = 'yes' if ($hostaccs =~ /,$branch-$subrep-hosts,/);
+	    $offer = 'yes' if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
 	}
 
 	$url = 'repo/rpms';
