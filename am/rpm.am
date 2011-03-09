@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-03-09 10:27:08 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-03-09 23:06:06 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-03-09 10:27:08 $ by $Author: brian $
+## Last Modified $Date: 2011-03-09 23:06:06 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -830,6 +830,12 @@ repomd_signs		= $(repodir)/repomd.xml.asc \
 			  $(repodevldir)/repomd.xml.asc \
 			  $(reposrcsdir)/repomd.xml.asc
 
+repomd_keys		= $(repodir)/repomd.xml.key \
+			  $(repomaindir)/repomd.xml.key \
+			  $(repodebgdir)/repomd.xml.key \
+			  $(repodevldir)/repomd.xml.key \
+			  $(reposrcsdir)/repomd.xml.key
+
 repomd_group		= $(repodir)/comps.xml \
 			  $(repomaindir)/comps.xml \
 			  $(repodebgdir)/comps.xml \
@@ -841,7 +847,8 @@ repomd_repos		= $(rpmdistdir)/repodata/$(PACKAGE).repo \
 			  $(repodir)/$(PACKAGE).repo \
 			  $(repodir)/$(PACKAGE)-local.repo
 
-repomd_files		= $(repomd_heads) $(repomd_signs) $(repomd_group) $(repomd_repos) \
+repomd_files		= $(repomd_heads) $(repomd_signs) $(repomd_keys) \
+			  $(repomd_group) $(repomd_repos) \
 			  $(repodir)/*primary.xml.gz $(repodir)/*filelists.xml.gz \
 			  $(repodir)/*other.xml.gz $(repodir)/*susedata.xml.gz \
 			  $(repodir)/*patterns.xml.gz $(repodir)/*products.xml.gz \
@@ -1240,9 +1247,40 @@ $(reposrcsdir)/repomd.xml
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	$(AM_V_GEN)$(GPGVERIFYSIGN)
 
+GPGEXPORTKEY = \
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
+	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+
+$(repodir)/repomd.xml.key:: \
+$(repodir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGEXPORTKEY)
+
+$(repomaindir)/repomd.xml.key:: \
+$(repomaindir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGEXPORTKEY)
+
+$(repodebgdir)/repomd.xml.key:: \
+$(repodebgdir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGEXPORTKEY)
+
+$(repodevldir)/repomd.xml.key:: \
+$(repodevldir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGEXPORTKEY)
+
+$(reposrcsdir)/repomd.xml.key:: \
+$(reposrcsdir)/repomd.xml
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGEXPORTKEY)
+
 repo-yum: $(RELEASE_DIRECTORIES) $(repomd_repos) $(repomd_heads)
 
-repo-sign-yum: $(repomd_signs)
+repo-sign-yum: $(repomd_signs) $(repomd_keys)
 
 repo-clean-yum:
 
@@ -1308,10 +1346,7 @@ $(yastdir)/content
 
 $(yastdir)/content.key:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >>$@"; \
-	$(GPG) -a$$user$$home --export $(GNUPGUSER) >>$@
+	$(AM_V_GEN)$(GPGEXPORTKEY)
 
 yast_meta_files		= $(yastdir)/media.1/media \
 			  $(yastdir)/content
@@ -1496,6 +1531,9 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.13  2011-03-09 23:06:06  brian
+## - more repo workup
+##
 ## Revision 1.1.2.12  2011-03-09 10:27:08  brian
 ## - update header
 ##
