@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-03-06 08:57:20 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-03-17 07:01:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-06 08:57:20 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -128,8 +128,6 @@ AC_DEFUN([_RPM_OPTIONS_RPM_RELEASE], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC_SETUP], [dnl
     _RPM_SPEC_SETUP_DIST
-    _RPM_SPEC_SETUP_TOOLS
-    _RPM_SPEC_SETUP_MODULES
     _RPM_SPEC_SETUP_TOPDIR
     _RPM_SPEC_SETUP_OPTIONS
     _RPM_SPEC_SETUP_BUILD
@@ -352,44 +350,6 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
     AC_DEFINE_UNQUOTED([PACKAGE_RPMEXTRA2], ["$PACKAGE_RPMEXTRA2"], [The RPM Extra Release string.
 	This defaults to automatic detection.])
 ])# _RPM_SPEC_SETUP_DIST
-# =============================================================================
-
-# =============================================================================
-# _RPM_SPEC_SETUP_TOOLS
-# -----------------------------------------------------------------------------
-# The RPM spec file is set up for either building kernel dependent packages
-# or kernel independent packages.  This option specifies whether kernel
-# independent (user space) packages are to be built.  This option can also
-# be used for general kernel independent builds.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_RPM_SPEC_SETUP_TOOLS], [dnl
-    AC_MSG_CHECKING([for rpm build/install of user packages])
-    AC_ARG_ENABLE([tools],
-	[AS_HELP_STRING([--disable-tools],
-	    [user components @<:@default=enabled@:>@])],
-	[], [enable_tools=yes])
-    AC_MSG_RESULT([${enable_tools:-yes}])
-    AM_CONDITIONAL([RPM_BUILD_USER], [test ":${enable_tools:-yes}" = :yes])dnl
-])# _RPM_SPEC_SETUP_TOOLS
-# =============================================================================
-
-# =============================================================================
-# _RPM_SPEC_SETUP_MODULES
-# -----------------------------------------------------------------------------
-# The RPM spec file is set up for either building kernel dependent packages
-# or kernel independent packages.  This option specifies whether kernel
-# dependent (kernel module) packages are to be built.  This option can also
-# be used for general kernel dependent builds.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_RPM_SPEC_SETUP_MODULES], [dnl
-    AC_MSG_CHECKING([for rpm build/install of kernel packages])
-    AC_ARG_ENABLE([modules],
-	[AS_HELP_STRING([--disable-modules],
-	    [kernel components @<:@default=enabled@:>@])],
-	[], [enable_modules=yes])
-    AC_MSG_RESULT([${enable_modules:-yes}])
-    AM_CONDITIONAL([RPM_BUILD_KERNEL], [test ":${enable_modules:-yes}" = :yes])dnl
-])# _RPM_SPEC_SETUP_MODULES
 # =============================================================================
 
 # =============================================================================
@@ -703,6 +663,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.11  2011-03-17 07:01:28  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.10  2011-03-06 08:57:20  brian
 # - repository updates
 #

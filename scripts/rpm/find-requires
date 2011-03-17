@@ -287,7 +287,7 @@ if [ -n "$kmodlist" ] ; then
     if [ -n "$tool" -a -x "$tool" ] ; then
 	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${kmodlist[@]}" | \
-	$tool "${args[@]}" | remove_unprovided
+	$tool "${args[@]}"
     else
 	tool=$(which_tool "find-requires.ksyms")
 	if [ -n "$tool" -a -x "$tool" ] ; then
@@ -313,7 +313,7 @@ exit 0
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-17 18:34:11 $
+# @(#) $RCSfile: find-requires,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-17 07:01:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -359,11 +359,14 @@ exit 0
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-17 18:34:11 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-requires,v $
+# Revision 1.1.2.8  2011-03-17 07:01:29  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.7  2011-02-17 18:34:11  brian
 # - repository and rpm build updates
 #

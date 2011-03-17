@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: bcm.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:11 $
+# @(#) $RCSfile: bcm.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-17 07:01:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
+## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -59,8 +59,8 @@
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
-if RPM_BUILD_KERNEL
-## RPM_BUILD_KERNEL
+if PKG_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 
 if AMDEP
 ## AMDEP
@@ -165,7 +165,7 @@ clean-pkgobjs:
 
 CLEAN_LOCAL		+= clean-pkgobjs
 
-## RPM_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 endif
 ## PKG_BUILD_ARCH
 endif
@@ -173,6 +173,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: bcm.am,v $
+## Revision 1.1.2.5  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
 ## Revision 1.1.2.4  2009-07-21 11:06:11  brian
 ## - changes from release build
 ##

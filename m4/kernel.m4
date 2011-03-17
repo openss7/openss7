@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-08 23:39:02 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-17 07:01:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-08 23:39:02 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -227,6 +227,8 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_VERSIONS
     _LINUX_CHECK_KERNEL_MODVERSIONS
     _LINUX_CHECK_KERNEL_MODVER
+    _LINUX_CHECK_KERNEL_SYMVERS
+    _LINUX_CHECK_KERNEL_SYMSETS
     _LINUX_CHECK_KERNEL_UPDATE_MODULES
     _LINUX_CHECK_KERNEL_MODULE_PRELOAD
     PACKAGE_KNUMBER="${knumber}"
@@ -1156,7 +1158,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
-			    (mandrake)
+			    (mandrake|mandriva)
 				;;
 			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
 				AC_MSG_WARN([
@@ -1332,6 +1334,183 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KALLSYMS], [dnl
     fi
     AC_SUBST([kallsyms])dnl
 ])# _LINUX_CHECK_KERNEL_KALLSYMS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_SYMVERS
+# -------------------------------------------------------------------------
+# The linux kernel symvers file is used during non-rpm install to tell
+# where to add our symbol versions.  This is so that weak-updates can be
+# performed properly.
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
+    AC_CACHE_CHECK([for kernel symvers], [linux_cv_k_symvers], [dnl
+	AC_MSG_RESULT([searching...])
+	AC_ARG_WITH([k-symvers],
+	    [AS_HELP_STRING([--with-k-symvers=SYMVERS],
+		[kernel symbol versions @<:@default=/boot/symvers-KVERSION.gz@:>@])])
+	if test :"${with_k_symvers:-no}" != :no
+	then
+	    linux_cv_k_symvers="$with_k_symvers"
+	else
+	    eval "k_symvers_search_path=\"
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/symvers-${kversion}.gz
+		${kbuildir}/symvers-${kversion}.gz
+		${DESTDIR}${rootdir}/boot/symvers-${kversion}.gz
+		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/symvers-${kversion}.gz
+		${DESTDIR}/usr/src/kernels/${kversion}/symvers-${kversion}.gz
+		${DESTDIR}/boot/symvers-${kversion}.gz\""
+	    k_symvers_search_path=`echo "$k_symvers_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    linux_cv_k_symvers=
+	    for linux_file in $k_symvers_search_path ; do
+		AC_MSG_CHECKING([for kernel symvers... $linux_file])
+		if test -r $linux_file
+		then
+		    linux_cv_k_symvers="$linux_file"
+		    AC_MSG_RESULT([yes])
+		    break
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	fi
+	if test :"${linux_cv_k_symvers:-no}" = :no
+	then
+	    if test :"${linux_cv_k_ko_modules:-no}" != :no
+	    then
+		if test :"${linux_cv_k_versions}" != :no -a :"${linux_cv_k_modversions}" != :no
+		then
+		    AC_MSG_WARN([
+*** 
+*** Configure could not find the symbol versions file for kernel version
+*** "$kversion".  The locations searched were:
+***	    "$with_k_symvers"
+***	    "$k_symvers_search_path"
+***
+*** This can cause problems later.  Please specify the absolute location
+*** of your kernel symbol versions file with option --with-k-symvers
+*** before repeating.
+*** ])
+		fi
+	    fi
+	else
+	    if test :"$linux_cv_k_running" != :yes
+	    then
+		case "$linux_cv_k_symvers" in
+		    (*/usr/src/kernels/*)
+			;;
+		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
+			case "$target_vendor" in
+			    (mandrake|mandriva)
+				;;
+			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
+				AC_MSG_WARN([
+*** 
+*** Configuration information is being read from an unreliable source:
+***
+***	"$linux_cv_k_symvers"
+***
+*** This may cause problems later if you have mismatches between the
+*** target kernel and the kernel symbols contained in that file.
+*** ])
+				;;
+			esac
+			;;
+		esac
+	    fi
+	fi
+	AC_MSG_CHECKING([for kernel symvers]) ])
+    ksymvers="$linux_cv_k_symvers"
+    AC_SUBST([ksymvers])dnl
+])# _LINUX_CHECK_KERNEL_SYMVERS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_SYMSETS
+# -------------------------------------------------------------------------
+# The linux kernel symsets file is used during non-rpm install to tell
+# where to add our symbol sets.  This is so that kbuilds can be performed
+# properly.
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
+    AC_CACHE_CHECK([for kernel symsets], [linux_cv_k_symsets], [dnl
+	AC_MSG_RESULT([searching...])
+	AC_ARG_WITH([k-symsets],
+	    [AS_HELP_STRING([--with-k-symsets=SYMVERS],
+		[kernel symbol versions @<:@default=/boot/symsets-KVERSION.tar.gz@:>@])])
+	if test :"${with_k_symsets:-no}" != :no
+	then
+	    linux_cv_k_symsets="$with_k_symsets"
+	else
+	    eval "k_symsets_search_path=\"
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/symsets-${kversion}.tar.gz
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/symsets-${kversion}.tar.gz
+		${kbuildir}/symsets-${kversion}.tar.gz
+		${DESTDIR}${rootdir}/boot/symsets-${kversion}.tar.gz
+		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/symsets-${kversion}.tar.gz
+		${DESTDIR}/usr/src/kernels/${kversion}/symsets-${kversion}.tar.gz
+		${DESTDIR}/boot/symsets-${kversion}.tar.gz\""
+	    k_symsets_search_path=`echo "$k_symsets_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    linux_cv_k_symsets=
+	    for linux_file in $k_symsets_search_path ; do
+		AC_MSG_CHECKING([for kernel symsets... $linux_file])
+		if test -r $linux_file
+		then
+		    linux_cv_k_symsets="$linux_file"
+		    AC_MSG_RESULT([yes])
+		    break
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	fi
+	if test :"${linux_cv_k_symsets:-no}" = :no
+	then
+	    if test :"${linux_cv_k_ko_modules:-no}" != :no
+	    then
+		if test :"${linux_cv_k_versions}" != :no -a :"${linux_cv_k_modversions}" != :no
+		then
+		    AC_MSG_WARN([
+*** 
+*** Configure could not find the symbol versions file for kernel version
+*** "$kversion".  The locations searched were:
+***	    "$with_k_symsets"
+***	    "$k_symsets_search_path"
+***
+*** This can cause problems later.  Please specify the absolute location
+*** of your kernel symbol versions file with option --with-k-symsets
+*** before repeating.
+*** ])
+		fi
+	    fi
+	else
+	    if test :"$linux_cv_k_running" != :yes
+	    then
+		case "$linux_cv_k_symsets" in
+		    (*/usr/src/kernels/*)
+			;;
+		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
+			case "$target_vendor" in
+			    (mandrake|mandriva)
+				;;
+			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
+				AC_MSG_WARN([
+*** 
+*** Configuration information is being read from an unreliable source:
+***
+***	"$linux_cv_k_symsets"
+***
+*** This may cause problems later if you have mismatches between the
+*** target kernel and the kernel symbols contained in that file.
+*** ])
+				;;
+			esac
+			;;
+		esac
+	    fi
+	fi
+	AC_MSG_CHECKING([for kernel symsets]) ])
+    ksymsets="$linux_cv_k_symsets"
+    AC_SUBST([ksymsets])dnl
+])# _LINUX_CHECK_KERNEL_SYMSETS
 # =========================================================================
 
 # =========================================================================
@@ -3082,6 +3261,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.8  2011-03-17 07:01:28  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.7  2011-02-08 23:39:02  brian
 # - last minute release updates
 #

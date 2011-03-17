@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-02-08 23:39:02 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-03-17 07:01:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,14 +48,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-08 23:39:02 $ by $Author: brian $
+## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
-if RPM_BUILD_KERNEL
-## RPM_BUILD_KERNEL
+if PKG_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 
 Modules.map: $(KERNEL_MODULES)
 	$(AM_V_GEN)cat /dev/null > $@
@@ -108,21 +108,32 @@ DISTCLEAN_LOCAL += distclean-modules_Pk
 ## AMDEP
 endif
 
-stamp-modpost: stamp-verobjs $(KERNEL_MODULES)
-	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
-	$(ECHO_Q) "  GEN   " $(MODPOST_MODVER) ; \
-	$(ECHO_V) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list" ; \
-	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST)`$(ECHO_V) ' -vv'` $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list ; \
-	touch stamp-modpost
+$(MODPOST_SYSVER): $(top_builddir)/config.status $(MODPOST_KMODVER)
+	cd $(top_builddir) && $(SHELL) ./config.status modpost
 
-CLEANFILES		+= System.symvers Module.symvers
+CLEANFILES		+= $(MODPOST_SYSVER)
+
+$(MODPOST_MODVER): $(MODPOST_SYSVER) stamp-verobjs $(KERNEL_MODULES)
+	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list" ; \
+	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST)`$(ECHO_V) ' -vv'` $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list
+
+CLEANFILES		+= $(MODPOST_MODVER)
+
+$(MODPOST_SYMSETS): $(MODPOST_MODVER)
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "$(SYMSETS) -vv $(SYMSETS_OPTIONS) -I $(MODPOST_MODVER) -o $@" ; \
+	$(SYMSETS)`$(ECHO_V) ' -vv'` $(SYMSETS_OPTIONS) -I $(MODPOST_MODVER) -o $@
+
+CLEANFILES		+= $(MODPOST_SYMSETS)
 
 if am__fastdepCC
 ## am__fastdepCC
-stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
+stamp-mobjects: $(MODPOST_MODVER) $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do b=`basename $$m` ; \
-		test :$$m != :stamp-modpost || continue ; \
+		test :$$m != :$(MODPOST_MODVER) || continue ; \
 		$(ECHO_Q) "  CC    " $$m.mod.o ; \
 		$(ECHO_V) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
 		then $(am__mv) $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi" ; \
@@ -135,10 +146,10 @@ else
 ## !am__fastdepCC
 if AMDEP
 ## AMDEP
-stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
+stamp-mobjects: $(MODPOST_MODVER) $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do \
-		test :$$m != :stamp-modpost || continue ; \
+		test :$$m != :$(MODPOST_MODVER) || continue ; \
 		$(ECHO_Q) "  CC    " $$m.mod.o ; \
 		$(ECHO_V) "source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
@@ -149,10 +160,10 @@ stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 ## AMDEP
 else
 ## !AMDEP
-stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
+stamp-mobjects: $(MODPOST_MODVER) $(KERNEL_MODULES)
 	@mods=`$(ECHO) " $? " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
 	for m in $$mods ; do \
-		test :$$m != :stamp-modpost || continue ; \
+		test :$$m != :$(MODPOST_MODVER) || continue ; \
 		$(ECHO_Q) "  CC    " $$m.mod.o ; \
 		$(ECHO_V) "$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
@@ -208,7 +219,7 @@ endif
 clean-kernel: mostlyclean-kernel
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
-	list="stamp-modpost stamp-mobjects stamp-kobjects $$srcs" ; $(am__list_remove)
+	list="stamp-mobjects stamp-kobjects $$srcs" ; $(am__list_remove)
 
 mostlyclean-kernel:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -216,12 +227,9 @@ mostlyclean-kernel:
 	mods=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.ko |g'` ; \
 	list="$$objs $$mods" ; $(am__list_remove)
 
-all-kernel: stamp-kobjects Modules.map
+KERNEL_AUX_FILES	= Module.mkvars Modules.map $(MODPOST_SYSVER) $(MODPOST_MODVER) $(MODPOST_SYMSETS)
 
-Module.symvers:
-
-KERNEL_AUX_FILES	=
-#KERNEL_AUX_FILES	= Module.mkvars Modules.map Module.symvers
+all-kernel: stamp-kobjects $(KERNEL_AUX_FILES)
 
 ALL_LOCAL 		+= all-kernel
 CLEAN_LOCAL 		+= clean-kernel
@@ -234,9 +242,9 @@ else
 ###################################################################################################
 ## !WITH_KO_MODULES
 
-all-kernel: stamp-verobjs Modules.map
+KERNEL_AUX_FILES	= Module.mkvars Modules.map
 
-KERNEL_AUX_FILES	=
+all-kernel: stamp-verobjs $(KERNEL_AUX_FILES)
 
 ALL_LOCAL 		+= all-kernel
 
@@ -259,6 +267,7 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)
 	some=no ; \
 	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| $(kpre)|g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext) |g'` ; for p in $$list ; do \
 		if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
@@ -280,8 +289,8 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 		list='$(KERNEL_AUX_FILES)' ; for f in $$list ; do \
 			if test -f $$f ; then \
 				b=`basename $$f` ; \
-				$(ECHO) "$(INSTALL) -m 644 $$f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$b" ; \
-				$(INSTALL) -m 644 $$f $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$b ; \
+				$(ECHO) "$(INSTALL) -m 644 $$f $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)/$$b" ; \
+				$(INSTALL) -m 644 $$f $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)/$$b ; \
 			fi ; \
 		done ; \
 	fi
@@ -608,9 +617,11 @@ uninstall-modules:
 		$(LIBTOOL) --mode=uninstall rm -f -- "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 	done
 	@list='$(KERNEL_AUX_FILES)' ; for f in $$list ; do \
-		echo "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$f" ; \
+		b=`basename $$f` ; \
+		echo "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)/$$b" ; \
 	done | $(am__base_remove)
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)" || :
+	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)" || : 
 
 uninstall-modconf:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -762,19 +773,23 @@ endif
 
 ## PKG_BUILD_ARCH
 endif
-## RPM_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 endif
 
 DISTCLEANFILES		+= $(CONFIG_KERNEL)
 
 dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/modpost.awk
 dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/modpost.sh
+dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/symsets.awk
 dist_noinst_SCRIPTS	+= scripts/cflagcheck
 EXTRA_SCRIPTS		+= scripts/cflagcheck
 
 ## =============================================================================
 ##
 ## $Log: kernel.am,v $
+## Revision 1.1.2.9  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
 ## Revision 1.1.2.8  2011-02-08 23:39:02  brian
 ## - last minute release updates
 ##

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-28 19:51:30 $
+# @(#) $RCSfile: openss7.m4,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-03-17 07:01:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-28 19:51:30 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -539,6 +539,8 @@ AC_DEFUN([_OPENSS7_OPTIONS], [dnl
     _OPENSS7_OPTIONS_PKG_TARDIR
     _OPENSS7_OPTIONS_PKG_ARCH
     _OPENSS7_OPTIONS_PKG_INDEP
+    _OPENSS7_OPTIONS_PKG_TOOLS
+    _OPENSS7_OPTIONS_PKG_MODULES
 ])# _OPENSS7_OPTIONS
 # =============================================================================
 
@@ -781,7 +783,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_TARDIR], [dnl
 # dependent packages are to be built and installed.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_ARCH], [dnl
-    AC_MSG_CHECKING([for deb build/install of arch packages])
+    AC_MSG_CHECKING([for pkg build/install of arch packages])
     AC_ARG_ENABLE([arch],
 	[AS_HELP_STRING([--disable-arch],
 	    [arch packages @<:@default=enabled@:>@])])
@@ -799,13 +801,51 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_ARCH], [dnl
 # independent packages are to be built and installed.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_PKG_INDEP], [dnl
-    AC_MSG_CHECKING([for deb build/install of indep packages])
+    AC_MSG_CHECKING([for pkg build/install of indep packages])
     AC_ARG_ENABLE([indep],
 	[AS_HELP_STRING([--disable-indep],
 	    [indep packages @<:@default=enabled@:>@])])
     AC_MSG_RESULT([${enable_indep:-yes}])
     AM_CONDITIONAL([PKG_BUILD_INDEP], [test :"${enable_indep:-yes}" = :yes])dnl
 ])# _OPENSS7_OPTIONS_PKG_INDEP
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_PKG_TOOLS
+# -----------------------------------------------------------------------------
+# The RPM spec file is set up for either building kernel dependent packages
+# or kernel independent packages.  This option specifies whether kernel
+# independent (user space) packages are to be built.  This option can also
+# be used for general kernel independent builds.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_PKG_TOOLS], [dnl
+    AC_MSG_CHECKING([for pkg build/install of user packages])
+    AC_ARG_ENABLE([tools],
+	[AS_HELP_STRING([--disable-tools],
+	    [user packages @<:@default=enabled@:>@])],
+	[], [enable_tools=yes])
+    AC_MSG_RESULT([${enable_tools:-yes}])
+    AM_CONDITIONAL([PKG_BUILD_USER], [test ":${enable_tools:-yes}" = :yes])dnl
+])# _OPENSS7_OPTIONS_PKG_TOOLS
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_PKG_MODULES
+# -----------------------------------------------------------------------------
+# The RPM spec file is set up for either building kernel dependent packages
+# or kernel independent packages.  This option specifies whether kernel
+# dependent (kernel module) packages are to be built.  This option can also
+# be used for general kernel dependent builds.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_PKG_MODULES], [dnl
+    AC_MSG_CHECKING([for pkg build/install of kernel packages])
+    AC_ARG_ENABLE([modules],
+	[AS_HELP_STRING([--disable-modules],
+	    [kernel packages @<:@default=enabled@:>@])],
+	[], [enable_modules=yes])
+    AC_MSG_RESULT([${enable_modules:-yes}])
+    AM_CONDITIONAL([PKG_BUILD_KERNEL], [test ":${enable_modules:-yes}" = :yes])dnl
+])# _OPENSS7_OPTIONS_PKG_MODULES
 # =============================================================================
 
 # =============================================================================
@@ -1207,6 +1247,9 @@ AC_DEFUN([_OPENSS7], [dnl
 # =============================================================================
 #
 # $Log: openss7.m4,v $
+# Revision 1.1.2.11  2011-03-17 07:01:28  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.10  2011-02-28 19:51:30  brian
 # - better repository build
 #

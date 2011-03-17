@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-13 07:13:27 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-17 07:01:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-13 07:13:27 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:28 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -67,8 +67,8 @@ pkglibexec32_PROGRAMS		=
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 
 MACHINE_FLAGS			= -m32
 
@@ -836,7 +836,7 @@ libsx25_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 
 ## =====================================================================
 
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 
 ## PKG_BUILD_ARCH
@@ -850,6 +850,9 @@ include ../am/libraries.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.4  2011-03-17 07:01:28  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.3  2009-07-13 07:13:27  brian
 # - changes for multiple distro build
 #

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: swig.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-21 11:06:11 $
+# @(#) $RCSfile: swig.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-17 07:01:28 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
+## Last Modified $Date: 2011-03-17 07:01:28 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -97,8 +97,8 @@ perl_c_WRAPPERS		= $(perl_c_MODULES:%.i=%_wrap.c)
 perl_cxx_WRAPPERS	= $(perl_cxx_MODULES:%.i=%_wrap.c)
 perl_WRAPPERS		= $(perl_c_WRAPPERS) $(perl_cxx_WRAPPERS)
 
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
@@ -137,7 +137,7 @@ $(perl_cxx_WRAPPERS): %_wrap.cxx: %.i
 
 ## PKG_BUILD_ARCH
 endif
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 
 ## -----------------------------------------------------------------------------
@@ -155,8 +155,8 @@ java_c_WRAPPERS		= $(java_c_MODULES:%.i=%_wrap.c)
 java_cxx_WRAPPERS	= $(java_cxx_MODULES:%.i=%_wrap.cxx)
 java_WRAPPERS		= $(java_c_WRAPPERS) $(java_cxx_WRAPPERS)
 
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
@@ -194,7 +194,7 @@ $(java_cxx_WRAPPERS): %_wrap.cxx : %.i
 
 ## PKG_BUILD_ARCH
 endif
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 
 ## -----------------------------------------------------------------------------
@@ -211,8 +211,8 @@ tcl_c_WRAPPERS		= $(tcl_c_MODULES:%.i=%_wrap.c)
 tcl_cxx_WRAPPERS	= $(tcl_cxx_MODULES:%.i=%_wrap.cxx)
 tcl_WRAPPERS		= $(tcl_c_WRAPPERS) $(tcl_cxx_WRAPPERS)
 
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
@@ -286,7 +286,7 @@ ALL_LOCAL		+= $(tcl_pkg_INDEX)
 
 ## PKG_BUILD_ARCH
 endif
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 
 swig_MODULES		= $(java_MODULES) $(tcl_MODULES) $(perl_MODULES)
@@ -334,6 +334,9 @@ DISTCLEANFILES		+= $(swig_PERLMODS)
 ## =============================================================================
 ##
 ## $Log: swig.am,v $
+## Revision 1.1.2.4  2011-03-17 07:01:28  brian
+## - build and repo system improvements
+##
 ## Revision 1.1.2.3  2009-07-21 11:06:11  brian
 ## - changes from release build
 ##

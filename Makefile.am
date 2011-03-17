@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.17 $) $Date: 2011-03-06 16:13:45 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2011-03-17 07:01:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-06 16:13:45 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -83,8 +83,8 @@ dist_sbin_SCRIPTS		=
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 
 ##
 ## These are for ptys and should be part of the strutil or strio package.
@@ -106,14 +106,42 @@ lib32_LTLIBRARIES		=
 
 snmpdlmod_LTLIBRARIES		=
 
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 
-if RPM_BUILD_KERNEL
-## RPM_BUILD_KERNEL
+if PKG_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 
 noinst_LIBRARIES		=
 
+KERNEL_OBJECTS			=
+KERNEL_MODULES			=
+
+## =====================================================================
+if CONFIG_STREAMS_WRAPPER_MODULE
+## CONFIG_STREAMS_WRAPPER_MODULE
+
+noinst_LIBRARIES		+= libOS7wrapper.a
+
+EXTRA_libOS7wrapper_a_SOURCES	= src/kernel/wrapper.c
+libOS7wrapper_a_SOURCES		= src/kernel/wrapper.c
+libOS7wrapper_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
+				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
+libOS7wrapper_a_CFLAGS		= $(KERNEL_CFLAGS)
+
+$(libOS7wrapper_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
+
+KERNEL_OBJECTS			+= $(libOS7wrapper_a_OBJECTS)
+KERNEL_MODULES			+= wrapper.o
+
+wrapper.o: stamp-verobjs
+	@list=`$(ECHO) " $(libOS7wrapper_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
+	$(ECHO_Q) "  CCLD  " $@ ; \
+	$(ECHO_V) "$(LD) -r -o $@ $$list" ; \
+	$(LD) -r -o $@ $$list
+
+## CONFIG_STREAMS_WRAPPER_MODULE
+endif
 ## =====================================================================
 
 noinst_LIBRARIES		+= libOS7specfs.a
@@ -134,6 +162,9 @@ libOS7specfs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS)
 libOS7specfs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOS7specfs_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
+
+KERNEL_OBJECTS			+= $(libOS7specfs_a_OBJECTS)
+KERNEL_MODULES			+= specfs.o
 
 specfs.o: stamp-verobjs
 	@list=`$(ECHO) " $(libOS7specfs_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
@@ -168,6 +199,9 @@ libOS7streams_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOS7streams_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
+KERNEL_OBJECTS			+= $(libOS7streams_a_OBJECTS)
+KERNEL_MODULES			+= streams.o
+
 streams.o: stamp-verobjs
 	@list=`$(ECHO) " $(libOS7streams_a_OBJECTS) " | sed -e 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
 	$(ECHO_Q) "  CCLD  " $@ ; \
@@ -192,6 +226,9 @@ libOS7kernel_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS)
 libOS7kernel_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOS7kernel_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
+
+KERNEL_OBJECTS			+= $(libOS7kernel_a_OBJECTS)
+KERNEL_MODULES			+= $(libOS7kernel_a_OBJECTS)
 
 if CONFIG_STREAMS_COMPAT_OS7_MODULE
 libOS7kernel_a_SOURCES	       += src/kernel/os7compat.c \
@@ -456,6 +493,9 @@ libOS7modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOS7modules_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
+KERNEL_OBJECTS			+= $(libOS7modules_a_OBJECTS)
+KERNEL_MODULES			+= $(libOS7modules_a_OBJECTS)
+
 if CONFIG_STREAMS_STH_MODULE
 libOS7modules_a_SOURCES	       += src/modules/sth.c src/modules/sth.h
 endif
@@ -717,6 +757,9 @@ libOS7drivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOS7drivers_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
+KERNEL_OBJECTS			+= $(libOS7drivers_a_OBJECTS)
+KERNEL_MODULES			+= $(libOS7drivers_a_OBJECTS)
+
 if CONFIG_STREAMS_CLONE_MODULE
 libOS7drivers_a_SOURCES	       += src/drivers/clone.c src/drivers/clone.h
 endif
@@ -819,10 +862,13 @@ libOS7sctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 
 $(libOS7sctp_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
+KERNEL_OBJECTS			+= $(libOS7sctp_a_OBJECTS)
+KERNEL_MODULES			+= $(kpre)sctp.o
+
 $(kpre)sctp.o: $(libOS7sctp_a_OBJECTS)
 	$(AM_V_CCLD)$(LD) -r -o $@ $^
 
-## RPM_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 endif
 ## PKG_BUILD_ARCH
 endif
@@ -920,18 +966,6 @@ EXTRA_SCRIPTS			+= scripts/missing2 scripts/missing3 scripts/missing4
 ##
 ## Rules for building kernel objects
 ##
-KERNEL_OBJECTS			= $(libOS7specfs_a_OBJECTS) \
-				  $(libOS7streams_a_OBJECTS) \
-				  $(libOS7kernel_a_OBJECTS) \
-				  $(libOS7modules_a_OBJECTS) \
-				  $(libOS7drivers_a_OBJECTS) \
-				  $(libOS7sctp_a_OBJECTS)
-KERNEL_MODULES			= specfs.o \
-				  streams.o \
-				  $(libOS7kernel_a_OBJECTS) \
-				  $(libOS7modules_a_OBJECTS) \
-				  $(libOS7drivers_a_OBJECTS) \
-				  $(kpre)sctp.o
 KERNEL_PRELOADS			=
 KERNEL_MODCONF			= $(STRCONF_CONFMOD)
 KERNEL_SUBDIR			= $(PACKAGE_LCNAME)
@@ -951,7 +985,7 @@ include am/kernel.am
 if WITH_KO_MODULES
 else
 if PKG_BUILD_INDEP
-if RPM_BUILD_USER
+if PKG_BUILD_USER
 nodist_modutil_DATA		= src/util/modutils/@PACKAGE_LCNAME@
 endif
 endif
@@ -989,8 +1023,8 @@ include am/libraries.am
 ## ##
 ## include am/tcl.am
 
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -2569,7 +2603,7 @@ pkglibexec_PROGRAMS		+= test-voip
 
 ## PKG_BUILD_ARCH
 endif
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 
 EXPORT_SRCFILES			=
@@ -2681,8 +2715,8 @@ include am/strconf.am
 #AM_INSTALLCHECK_STD_OPTIONS_EXEMPT += $(INET_MKDEV) $(INET_RMDEV)
 #EXTRA_SCRIPTS += $(INET_MKDEV) $(INET_RMDEV)
 #
-#if RPM_BUILD_KERNEL
-### RPM_BUILD_KERNEL
+#if PKG_BUILD_KERNEL
+### PKG_BUILD_KERNEL
 #
 #install-inet-devices: $(INET_MKDEV)
 #	@if test -r $(DESTDIR)$(rootdir)/etc/modules.conf ; then \
@@ -2696,15 +2730,15 @@ include am/strconf.am
 #		DESTDIR=$(DESTDIR) $(srcdir)/$(INET_RMDEV) ; \
 #	fi
 #
-### RPM_BUILD_KERNEL
+### PKG_BUILD_KERNEL
 #else
-### ! RPM_BUILD_KERNEL
+### ! PKG_BUILD_KERNEL
 #
 #install-inet-devices:
 #
 #uninstall-inet-devices:
 #
-### ! RPM_BUILD_KERNEL
+### ! PKG_BUILD_KERNEL
 #endif
 #
 #INSTALL_EXEC_HOOK += install-inet-devices
@@ -2713,8 +2747,8 @@ include am/strconf.am
 #
 #.PHONY: install-inet-devices uninstall-inet-devices
 
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 
 SUBDIRS = src
 
@@ -2920,7 +2954,7 @@ endif
 ## PKG_BUILD_INDEP
 endif
 
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 
 ##
@@ -3015,6 +3049,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.18  2011-03-17 07:01:26  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.17  2011-03-06 16:13:45  brian
 # - better repo install handling
 #

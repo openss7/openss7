@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-02-28 19:51:28 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-03-17 07:01:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-28 19:51:28 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -273,6 +273,17 @@ dnl--------------------------------------------------------------------------
     fi
     AC_MSG_RESULT([${enable_big_compile:-yes}])
     AM_CONDITIONAL([CONFIG_STREAMS_SEPARATE_COMPILE], [test :"${enable_big_compile:-yes}" != :yes])
+dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([wrapper-module],
+	[AS_HELP_STRING([--enable-wrapper-module],
+	    [compile separate wrapper module @<:@default=no@:>@])])
+    AC_MSG_CHECKING([for separate wrapper module])
+    if test :"${enable_wrapper_module:-no}" = :yes ; then
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_WRAPPER_MODULE], [1], [When defined,]
+	    AC_PACKAGE_TITLE [will compile a separate wrapper module.])
+    fi
+    AC_MSG_RESULT([${enable_wrapper_mdoule:-no}])
+    AM_CONDITIONAL([CONFIG_STREAMS_WRAPPER_MODULE], [test :"${enable_wrapper_module:-no}" = :yes])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([streams-fifos],
 	[AS_HELP_STRING([--enable-streams-fifos],
@@ -3806,6 +3817,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.12  2011-03-17 07:01:26  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.11  2011-02-28 19:51:28  brian
 # - better repository build
 #

@@ -1,6 +1,6 @@
 # =============================================================================
 #
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-24 13:49:46 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-17 07:01:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -46,13 +46,13 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-24 13:49:46 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:30 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
-if RPM_BUILD_USER
+if PKG_BUILD_USER
 if PKG_BUILD_ARCH
 dist_bin_SCRIPTS	= mibbrowser streams-manager
 endif
@@ -71,7 +71,7 @@ Xti_la_CFLAGS		= $(USER_CFLAGS) -Wno-unused -Wno-cast-qual -fno-strict-aliasing
 Xti_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
 Xti_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared
 
-if RPM_BUILD_USER
+if PKG_BUILD_USER
 if PKG_BUILD_ARCH
 xtiperl_DATA		= xti/Xti.pm mibbrowser streams-manager
 xtiperl_LTLIBRARIES	= Xti.la
@@ -83,6 +83,9 @@ include ../../am/swig.am
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.4  2011-03-17 07:01:30  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.3  2009-07-24 13:49:46  brian
 # - updates for release build
 #
