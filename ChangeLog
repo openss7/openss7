@@ -1,3 +1,57 @@
+2011-03-17  Brian Bidulock  <bidulock@openss7.org>
+
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* NOTES.kmod: update release files
+	* README: update release files
+	* THANKS: update release files
+
+	* am/bcm.am (PKG_BUILD_KERNEL): rename conditional
+	* am/genksyms.am (PKG_BUILD_KERNEL): rename conditional
+		  depend also on (PKG_LDS and PKG_API)
+	* am/info.am (MY_SECONDARY): remove secondaries (fixed
+		  info.dep script instead)
+	* am/init.am (PKG_BUILD_USER): rename conditional
+	* am/kernel.am: also build and install symsets, install
+		kernel auxilliary files in /usr/src
+	* am/libraries.am (PKG_BUILD_USER): rename conditional
+	* am/netconfig.am (PKG_BUILD_USER): rename conditional
+	* am/packages.am (PKG_BUILD_USER): rename conditional
+	* am/rpm.am: better kernel package updates
+	* am/sctp.am (PKG_BUILD_KERNEL): rename conditional
+	* am/snmp.am (PKG_BUILD_USER): rename conditional
+	* am/sock2path.am (PKG_BUILD_USER): rename conditional
+	* am/strconf.am (PKG_BUILD_KERNEL): rename conditional
+	* am/swig.am (PKG_BUILD_USER): rename conditional
+	* am/tcl.am (PKG_BUILD_USER): rename conditional
+
+	* Makefile.am (PKG_BUILD_KERNEL): rename build conditionals
+	  (CONFIG_STREAMS_WRAPPER_MODULE): introduce separate wrapper module option
+	* lib32/Makefile.am (PKG_BUILD_USER): rename build conditionals
+	* src/perl/Makefile.am (PKG_BUILD_USER): rename build conditionals
+	* src/tcl/Makefile.am (PKG_BUILD_USER): rename build conditionals
+
+	* acinclude.m4: add wrapper-module enable option
+	* m4/genksyms.m4: checks for building symvers and symsets
+	* m4/kernel.m4: find symvers and symsets when walking directories
+	* m4/openss7.m4: rename build conditionals
+	* m4/rpm.m4: rename build conditionals
+	* scripts/info.deps: script corrections (was always building txt files
+	* scripts/modpost.awk: corrections and updates accross awk scripts
+	* scripts/strconf.awk: corrections and updates accross awk scripts
+	* scripts/symsets.awk: new symsets scripts
+
+	* openss7.spec.in: preliminary support for separate wrapper package
+	* scripts/rpm/find-provides.kmod: corrections and enahvments for symsets
+	* scripts/rpm/find-requires: do not remove unprovided ksyms
+	* scripts/rpm/find-requires.kmod: corrections and enhancements for symsets
+
+	* src/kernel/specfs.c: separate wrapper module support
+	* src/kernel/wrapper.c: separate wrapper module support
+
+	* src/mason/.htaccess: checkin final updates
+	* src/mason/autohandler: checkin final updates
+
 2011-03-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: update release files

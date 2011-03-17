@@ -19,7 +19,8 @@
 	    $page eq 'OPENSS7credentials' or
 	    $page eq 'openss7.repo'       or
 	    $page eq 'mirrorlist'         or
-	    $page eq 'repoindex.xml' );
+	    $page eq 'repoindex.xml'	  or
+	    $page eq 'OPENSS7.service' );
 
     my ($fd,$url,$distro,$relver,$osarch,$branch,$subrep);
     my ($username,$userpass,$usergrps,$useraccs,$usercred,$userdata,$userinfo,$userauth,$userdflt,$date);
@@ -87,7 +88,11 @@
 	$testpass = '';
     } else {
 	$username = $ENV{'REMOTE_USER'};
-	unless ( $username ) { $r->note_basic_auth_failure; $m->abort(401); }
+	unless ( $username ) {
+	    $r->note_basic_auth_failure;
+	    $r->log_reason("require user name", $r->url);
+	    $m->abort(401);
+	}
 	my $ret; ($ret, $testpass) = $r->get_basic_auth_pw;
     }
 
@@ -119,7 +124,7 @@
 	}
 	$userauth = 'invalid';
     } else {
-	if ( $page eq 'mirrorlist' or $page eq 'repoindex.xml' ) {
+	if ( $page eq 'mirrorlist' or $page eq 'repoindex.xml' or $page eq 'OPENSS7.service') {
 	    if ( $useraccs !~ /,hosts,/ ) {
 		$r->note_basic_auth_failure;
 		$r->log_reason("user $username not in group 'hosts'", $r->uri);
@@ -349,7 +354,7 @@ username=<% $hostname %>
 password=<% $hostpass %>
 <%perl>
     }
-    elsif ( $page eq 'openss7.repo' )
+    elsif ( $page eq 'openss7.repo' or $page eq 'OPENSS7.service' )
     {
 	my @brarepos = ( 'base', 'extras', 'updates', 'testing' );
 	my @subrepos = ( 'full', 'main', 'debug', 'devel', 'source' );
@@ -357,8 +362,9 @@ password=<% $hostpass %>
 	@brarepos = ( $branch ) if ( $branch and $branch ne 'base' );
 	@subrepos = ( $subrep ) if ( $subrep and $subrep ne 'full' );
 
-	my $emptyrepo = 'no';
-	$emptyrepo = 'yes' if ( -e $ENV{'DOCUMENT_ROOT'}.'/repo/rpms/repodata/repomd.xml' );
+	my $emptyrepo = ( -e $ENV{'DOCUMENT_ROOT'}.'/repo/rpms/repodata/repomd.xml' ) ? 1 : 0;
+
+	my $toenable;
 
 	for $branch ( @brarepos )
 	{
@@ -368,45 +374,70 @@ password=<% $hostpass %>
 		my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ ) ? 'enterprise' : 'community';
 		my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
-		my $offer = 'yes';
 		my $reason = '';
-		if ($offer eq 'yes') {
-		    $offer = 'no'  if ($hostaccs !~ /,$manage-hosts,/);
-		    if ($offer eq 'no') { $reason = "Host $hostname not in group '$manage-hosts'"; }
+
+		my $offerred = 1;
+		if ($offerred) {
+		    $offerred = 0 if ($hostaccs !~ /,(opt-)?$manage-hosts,/);
+		    unless ($offerred) { $reason = "Host $hostname not in group '(opt-)?$manage-hosts'"; }
 		}
-		if ($offer eq 'yes') {
-		    $offer = 'no';
-		    $offer = 'yes' if ($hostaccs =~ /,$distro-$osarch-hosts,/);
-		    $offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
-		    $offer = 'yes' if ($hostaccs =~ /,$distro-$server-hosts,/);
-		    $offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
-		    $offer = 'yes' if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
-		    $offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
-		    $offer = 'yes' if ($hostaccs =~ /,$enterp-$server-hosts,/);
-		    $offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
-		    if ($offer eq 'no') { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
+		if ($offerred) {
+		    $offerred = 0;
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-$osarch-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-hosts,/ and $hostaccs =~ /,(opt-)?$osarch-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-$server-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-hosts,/ and $hostaccs =~ /,(opt-)?$server-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-$osarch-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-hosts,/ and $hostaccs =~ /,(opt-)?$osarch-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-$server-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-hosts,/ and $hostaccs =~ /,(opt-)?$server-hosts,/);
+		    unless ($offerred) { $reason = "Host $hostname not in groups '(opt-)?$enterp-hosts', '(opt-)?$server-hosts', '(opt-)?$distro-hosts' or '(opt-)?$osarch-hosts'"; }
 		}
-		if ($offer eq 'yes') {
-		    $offer = 'no';
-		    $offer = 'yes' if ($hostaccs =~ /,$branch-$subrep-hosts,/);
-		    $offer = 'yes' if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
-		    if ($offer eq 'no') { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'"; }
+		if ($offerred) {
+		    $offerred = 0;
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$branch-$subrep-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$branch-hosts,/ and $hostaccs =~ /,(opt-)?$subrep-hosts,/);
+		    unless ($offerred) { $reason = "Host $hostname not in groups '(opt-)?$branch-hosts', '(opt-)?$subrep-hosts'"; }
+		}
+
+		my $allowed = 1;
+		if ($allowed) {
+		    $allowed = 0 if ($hostaccs !~ /,$manage-hosts,/);
+		    unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'"; }
+		}
+		if ($allowed) {
+		    $allowed = 0;
+		    $allowed = 1 if ($hostaccs =~ /,$distro-$osarch-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$distro-$server-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$enterp-$server-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		    unless ($allowed) { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
+		}
+		if ($allowed) {
+		    $allowed = 0;
+		    $allowed = 1 if ($hostaccs =~ /,$branch-$subrep-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
+		    unless ($allowed) { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'"; }
 		}
 
 		my $enabled = 1;
-		if ( $emptyrepo ne 'yes' ) {
-		    $enabled = 0 if ( $offer eq 'no' );
-		    $enabled = 0 if ( $subrep =~ /^(debug|devel|source|full)$/ );
-		    $enabled = 0 if ( $branch eq 'testing' );
-		}
+		$enabled = 0 if ( !$allowed and !$emptyrepo );
+		$enabled = 0 if ( $subrep =~ /^(devel|source|full)$/ );
+		$enabled = 0 if ( $branch =~ /^(extras|testing)$/ );
 
-		my ($desc,$bdesc,$sdesc);
+		my ($name,$desc,$bdesc,$sdesc);
 		($bdesc = $branch) =~ s/^([a-z])(.*)$/\U$1\E$2/;
 		($sdesc = $subrep) =~ s/^([a-z])(.*)$/\U$1\E$2/;
 		my $target = $distro.'-'.$relver.'-'.$osarch;
-		$page = 'openss7';
-		$page .= '-'.$branch if ($branch ne 'base');
-		$page .= '-'.$subrep if ($subrep ne 'full');
+		$name = 'openss7';
+		$name .= '-'.$branch if ($branch ne 'base');
+		$name .= '-'.$subrep if ($subrep ne 'full');
+		if ( $page eq 'openss7.repo' )
+		{
 		$desc = 'OpenSS7';
 		$desc .= ' '.$bdesc if ($bdesc ne 'Base');
 		$desc .= ' '.$sdesc if ($sdesc ne 'Full');
@@ -428,26 +459,33 @@ password=<% $hostpass %>
 		$url .= "/$branch" if ($branch ne 'base');
 		$url .= "/$subrep" if ($subrep ne 'full');
 		
+		    next if ( !$offerred );
+
+		    # do not even advertize 'testing', 'extras' or 'source'-containing repos
+		    next if ( !$allowed and $branch eq 'testing' );
+		    next if ( !$allowed and $subrep eq 'full'    );
+		    next if ( !$allowed and $subrep eq 'source'  );
+		    
 		my $pre = '';
 
-		# do not even advertize 'testing' or 'source' repos
-		if ( $branch eq 'testing' and $offer eq 'no' ) { next; }
-		if ( $subrep eq 'source'  and $offer eq 'no' ) { next; }
-		if ( $subrep eq 'full'    and $offer eq 'no' ) { next; }
-		if ( $subrep eq 'devel'   and $offer eq 'no' ) {
-		    $pre = '#' if ( $emptyrepo ne 'yes' );
-		}
-		if ( $offer ne 'yes' ) {
-		    $pre = '#' if ( $emptyrepo ne 'yes' );
+		    if ( !$allowed ) {
 		    $enabled = 0;
+			$pre = '#' unless ( $emptyrepo );
+			if ( $hostaccs =~ /,guests-hosts,/ ) {
+</%perl>
+<% $pre %># This repository is not authorized by default.
+<% $pre %># To activate this repository, contact <sales@openss7.com>.
+<%perl>
+			} else {
 </%perl>
 <% $pre %># This repository is currently not authorized to host <% $hostname %>.
 <% $pre %># <% $reason %>.
-<% $pre %># To activate this repository, contact <sales@openss7.com>.
+<% $pre %># To activate this repository, contact your software provider [<% $username %>].
 <%perl>
 		}
+		    }
 </%perl>
-<% $pre %>[<% $page %>]
+<% $pre %>[<% $name %>]
 <% $pre %>enabled = <% $enabled %>
 <% $pre %>name = <% $desc %>
 <% $pre %>#baseurl = https://<% $rcreds %>www.openss7.org<% $url %>/
@@ -455,10 +493,25 @@ password=<% $hostpass %>
 <% $pre %>gpgkey = https://www.openss7.org/pubkey.asc
 <% $pre %>         https://www.openss7.org/repo/tarballs/OPENSS7-GPG-KEY
 <% $pre %>gpgcheck = 1
-<% $pre %>repo_gpgcheck = 0
 
 <%perl>
 	    }
+		elsif ( $page eq 'OPENSS7.service' )
+		{
+		    $toenable = "$toenable OPENSS7:$name" if ($enabled);
+		}
+	    }
+	}
+	if ( $page eq 'OPENSS7.service' ) {
+</%perl>
+[OPENSS7]
+name=OpenSS7 Repository Service
+enabled=1
+autorefresh=1
+url = https://www.openss7.org/?credentials=OPENSS7credentials
+type = ris
+repostoenable =<% $toenable %>
+<%perl>
 	}
     }
     elsif ( $page eq 'repoindex.xml' )
@@ -504,31 +557,31 @@ password=<% $hostpass %>
 	    my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
 	    my $reason = '';
-	    my $offer = 'yes';
-	    if ($offer eq 'yes') {
-		$offer = 'no'  if ($hostaccs !~ /,$manage-hosts,/);
-		if ($offer eq 'no') { $reason = "Host $hostname not in group '$manage-hosts'"; }
+	    my $allowed = 1;
+	    if ($allowed) {
+		$allowed = 0  if ($hostaccs !~ /,$manage-hosts,/);
+		unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'"; }
 	    }
-	    if ($offer eq 'yes') {
-		$offer = 'no';
-		$offer = 'yes' if ($hostaccs =~ /,$distro-$osarch-hosts,/);
-		$offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
-		$offer = 'yes' if ($hostaccs =~ /,$distro-$server-hosts,/);
-		$offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
-		$offer = 'yes' if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
-		$offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
-		$offer = 'yes' if ($hostaccs =~ /,$enterp-$server-hosts,/);
-		$offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
-		if ($offer eq 'no') { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
+	    if ($allowed) {
+		$allowed = 0;
+		$allowed = 1 if ($hostaccs =~ /,$distro-$osarch-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$distro-$server-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$enterp-$server-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		unless ($allowed) { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
 	    }
-	    if ($offer eq 'yes') {
-		$offer = 'no';
-		$offer = 'yes' if ($hostaccs =~ /,$branch-$subrep-hosts,/);
-		$offer = 'yes' if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
-		if ($offer eq 'no') { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'"; }
+	    if ($allowed) {
+		$allowed = 0;
+		$allowed = 1 if ($hostaccs =~ /,$branch-$subrep-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
+		unless ($allowed) { $reason = "Host $hostname not in groups '$branch-hosts', '$subrep-hosts'"; }
 	    }
 
-	    next unless ( $offer eq 'yes' );
+	    next unless ( $allowed );
 
 	    my $target = $distro . '-' . $relver . '-' . $osarch;
 	    my $page = 'openss7';
@@ -543,7 +596,7 @@ password=<% $hostpass %>
 	    $desc .= ' (' . $target . ')';
 
 	    my ($pre,$suf);
-	    if ( $offer eq 'yes' ) {
+	    if ( $allowed ) {
 		$pre = '';
 		$suf = '';
 	    } else {
@@ -572,25 +625,25 @@ password=<% $hostpass %>
 	my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ ) ? 'enterprise' : 'community';
 	my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
-	my $offer = 'yes';
-	if ($offer eq 'yes') {
-	    $offer = 'no'  if ($hostaccs !~ /,$manage-hosts,/);
+	my $allowed = 1;
+	if ($allowed) {
+	    $allowed = 0  if ($hostaccs !~ /,$manage-hosts,/);
 	}
-	if ($offer eq 'yes') {
-	    $offer = 'no';
-	    $offer = 'yes' if ($hostaccs =~ /,$distro-$osarch-hosts,/);
-	    $offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
-	    $offer = 'yes' if ($hostaccs =~ /,$distro-$server-hosts,/);
-	    $offer = 'yes' if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
-	    $offer = 'yes' if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
-	    $offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
-	    $offer = 'yes' if ($hostaccs =~ /,$enterp-$server-hosts,/);
-	    $offer = 'yes' if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+	if ($allowed) {
+	    $allowed = 0;
+	    $allowed = 1 if ($hostaccs =~ /,$distro-$osarch-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$distro-$server-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$enterp-$server-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
 	}
-	if ($offer eq 'yes') {
-	    $offer = 'no';
-	    $offer = 'yes' if ($hostaccs =~ /,$branch-$subrep-hosts,/);
-	    $offer = 'yes' if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
+	if ($allowed) {
+	    $allowed = 0;
+	    $allowed = 1 if ($hostaccs =~ /,$branch-$subrep-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
 	}
 
 	$url = 'repo/rpms';
@@ -600,12 +653,12 @@ password=<% $hostpass %>
 	$url .= "/$branch" if ($branch ne 'base');
 	$url .= "/$subrep" if ($subrep ne 'full');
 		
-	$offer = 'no' unless ( -e $ENV{'DOCUMENT_ROOT'}.$url.'/repodata/repomd.xml' );
+	$allowed = 0 unless ( -e $ENV{'DOCUMENT_ROOT'}.$url.'/repodata/repomd.xml' );
 
 	my $rcreds = $hostname.':'.$hostpass.'@';
 
 	$url = '/repo/rpms'; # the empty repository
-	if ( $offer eq 'yes' ) {
+	if ( $allowed) {
 	    $url .= "/$distro" if ($distro);
 	    $url .= '/$releasever';
 	    $url .= '/$basearch';

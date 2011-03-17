@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-17 18:34:10 $
+# @(#) $RCSfile: libraries.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-17 07:01:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,14 +48,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 
 ##
 # Before installing libraries we need to go looking for conflicting libraries in other locations.
@@ -151,7 +151,7 @@ DISTCLEANFILES		+= *.err *.out
 ## PERFORM_CHECKS
 endif
 
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 ## PKG_BUILD_ARCH
 endif
@@ -161,6 +161,9 @@ EXTRA_DIST		+= $(LIBRARY_VERSION_FILES)
 ## =============================================================================
 ##
 ## $Log: libraries.am,v $
+## Revision 1.1.2.6  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
 ## Revision 1.1.2.5  2011-02-17 18:34:10  brian
 ## - repository and rpm build updates
 ##

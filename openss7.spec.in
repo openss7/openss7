@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2011-03-09 23:06:05 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.21 $) $Date: 2011-03-17 07:01:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-09 23:06:05 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -70,6 +70,7 @@
 
 %global binfiles    %{nil}
 %global sbinfiles   %{nil}
+%global wrapper     wrapper
 %global modules     specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat
 %global nonrpmmods  LiS lis streams STREAMS strbcm strcompat strutil strtty strchan strxns strxnet strnsl strsock strinet strsctp strisdn strvoip strss7 sigtran stratm
 %global preloads    specfs streams
@@ -121,6 +122,7 @@
 %global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,')
 %global kernel_number %(echo %{_kversion} | sed -e 's,-.*$,,')
 %global kernel_flavor %(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*,,')
+%global kernel_trigger %(LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" 2>/dev/null | tail -1 || :)
 
 %global HAVE_devices        %{?majbase:     1}%{!?majbase:     0}
 %global HAVE_makedev        %{?makedev:     1}%{!?makedev:     0}
@@ -130,6 +132,7 @@
 %global HAVE_binfiles       %{?binfiles:    1}%{!?binfiles:    0}
 %global HAVE_sbinfiles      %{?sbinfiles:   1}%{!?sbinfiles:   0}
 %global HAVE_preloads       %{?preloads:    1}%{!?preloads:    0}
+%global HAVE_wrapper        %{?wrapper:     1}%{!?wrapper:     0}
 %global HAVE_modules        %{?modules:     1}%{!?modules:     0}
 %global HAVE_libraries      %{?libraries:   1}%{!?libraries:   0}
 %global HAVE_perlmods       %{?perlmods:    1}%{!?perlmods:    0}
@@ -164,6 +167,13 @@
 %global HAVE_docfiles       1
 %global HAVE_includes       %{?includes:    1}%{!?includes:    0}
 %global HAVE_mkvars         1
+
+%if %{?_with_wrapper_module:1}0
+%global HAVE_wrapper        %{?wrapper:     1}%{!?wrapper:     0}
+%else
+%global HAVE_wrapper        0
+%endif
+
 
 %global HAVE_yumrepo        %(if (rpm -q --whatprovides yum >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 %global HAVE_zypprepo       %(if (rpm -q --whatprovides zypper >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
@@ -220,11 +230,23 @@
 %global HAVE_oldprel        %{HAVE_preloads}
 %global HAVE_newmods        0
 %global HAVE_newprel        0
+%global HAVE_symvers        0
+%global HAVE_weakmods       0
 %else
 %global HAVE_oldmods        0
 %global HAVE_oldprel        0
 %global HAVE_newmods        %{HAVE_modules}
 %global HAVE_newprel        %{HAVE_preloads}
+%global HAVE_symvers        %{HAVE_modules}
+%global HAVE_weakmods       %{HAVE_modules}
+%endif
+
+%if %(if test -x /sbin/weak-modules -o -x /usr/lib/module-init-tools/weak-modules -o -x /usr/lib/module-init-tools/weak-modules2; then echo 0; else echo 1; fi)
+%global HAVE_weakmods       0
+%endif
+
+%if %(if (rpm -q --whatprovides /boot/symvers-%{_kversion}.gz >/dev/null 2>&1) ; then echo 0; else echo 1; fi)
+%global HAVE_weakmods       0
 %endif
 
 %if %{HAVE_newmods}
@@ -268,6 +290,7 @@
 %global FILES_preloads      %{HAVE_preloads}
 %global FILES_oldprel       %{HAVE_oldprel}
 %global FILES_newprel       %{HAVE_newprel}
+%global FILES_wrapper       %{HAVE_wrapper}
 %global FILES_modules       %{HAVE_modules}
 %global FILES_oldmods       %{HAVE_oldmods}
 %global FILES_newmods       %{HAVE_newmods}
@@ -306,7 +329,8 @@
 %global FILES_sourcefiles   %{HAVE_sourcefiles}
 %global FILES_docfiles      %{HAVE_docfiles}
 %global FILES_includes      %{HAVE_includes}
-%global FILES_symvers       %{HAVE_newmods}
+%global FILES_symvers       %{HAVE_symvers}
+%global FILES_weakmods      %{HAVE_weakmods}
 %global FILES_mkvars        %{HAVE_mkvars}
 %global FILES_yumrepo       %{HAVE_yumrepo}
 %global FILES_zypprepo      %{HAVE_zypprepo}
@@ -368,6 +392,8 @@
 # each architecture and kernel vesion, we accept --with[out]-zzz
 # options "modules" and "tools".  There are number of other
 # options as well.
+%{?_without_wrapper_module:  %{expand: %%global WITH_wrapper        0}}
+%{?_with_wrapper_module:     %{expand: %%global WITH_wrapper        1}}
 %{?_without_modules:         %{expand: %%global WITH_modules        0}}
 %{?_with_modules:            %{expand: %%global WITH_modules        1}}
 %{?_without_devel:           %{expand: %%global WITH_devel          0}}
@@ -543,6 +569,7 @@
 %{!?VIRT_lib:   %{expand: %%global VIRT_lib        0}}
 %{!?VIRT_devel: %{expand: %%global VIRT_devel      0}}
 %{!?VIRT_debug: %{expand: %%global VIRT_debug      0}}
+%{!?VIRT_wrap:  %{expand: %%gloabl VIRT_wrap       0}}
 %{!?VIRT_kmod:  %{expand: %%global VIRT_kmod       0}}
 %{!?VIRT_kdev:  %{expand: %%global VIRT_kdev       0}}
 %{!?VIRT_kbug:  %{expand: %%global VIRT_kbug       0}}
@@ -555,9 +582,11 @@
 %global VIRT_ksrc           0
 %global kernel_fedora       0
 %global kernel_others       0
+%global FILES_wrapper       0
 %global FILES_modules       0
 %global FILES_kdebugfiles   0
 %global FILES_symvers       0
+%global FILES_weakmods      0
 %global FILES_mkvars        0
 %global FILES_sourcefiles   0
 %endif
@@ -644,6 +673,7 @@
 %else
 %global FILES_binfiles      0
 %global FILES_sbinfiles     0
+%global FILES_wrapper       0
 %global FILES_modules       0
 %global FILES_includes      0
 %global FILES_libraries     0
@@ -666,6 +696,7 @@
 %global FILES_debugfiles    0
 %global FILES_kdebugfiles   0
 %global FILES_symvers       0
+%global FILES_weakmods      0
 %global FILES_mkvars        0
 %global FILES_sourcefiles   0
 %endif
@@ -1140,6 +1171,30 @@
 
 # -----------------------
 
+%if %{VIRT_wrap}
+%global WANT_wrap       1
+%global NEED_wrap       1
+%else
+%global WANT_wrap       0
+%global NEED_wrap       0
+%endif
+
+%if %{HAVE_wrapper}
+%global NEED_wrap       1
+%endif
+
+%if %{FILES_wrapper}
+%global WANT_wrap       1
+%endif
+
+%if %{WANT_wrap}
+%global PACKAGE_wrap    1
+%else
+%global PACKAGE_wrap    0
+%endif
+
+# -----------------------
+
 %if %{VIRT_kmod}
 %global WANT_kmod       1
 %global NEED_kmod       1
@@ -1172,10 +1227,16 @@
 %global NEED_kdev       0
 %endif
 
+%if %{HAVE_wrapper}
+%global NEED_kdev       1
+%endif
 %if %{HAVE_modules}
 %global NEED_kdev       1
 %endif
 
+%if %{FILES_wrapper}
+%global WANT_kdev       1
+%endif
 %if %{FILES_modules}
 %global WANT_kdev       1
 %endif
@@ -1196,10 +1257,16 @@
 %global NEED_kbug       0
 %endif
 
+%if %{HAVE_wrapper}
+%global NEED_kbug       %{HAVE_kdebugfiles}
+%endif
 %if %{HAVE_modules}
 %global NEED_kbug       %{HAVE_kdebugfiles}
 %endif
 
+%if %{FILES_wrapper}
+%global WANT_kbug       %{FILES_kdebugfiles}
+%endif
 %if %{FILES_modules}
 %global WANT_kbug       %{FILES_kdebugfiles}
 %endif
@@ -1330,6 +1397,10 @@
 %global need_debug          %{nil}
 %endif
 
+%if %{NEED_wrap}
+%global need_wrap           %{nil}
+%endif
+
 %if %{NEED_kmod}
 %global need_kmod           %{nil}
 %endif
@@ -1367,6 +1438,9 @@
 %endif
 %if %{FILES_preloads}
 %global files_preloads      %{nil}
+%endif
+%if %{FILES_wrapper}
+%global files_wrapper       %{nil}
 %endif
 %if %{FILES_modules}
 %global files_modules       %{nil}
@@ -1510,6 +1584,9 @@
 %global files_symvers       %{nil}
 %global files_kinfo         %{nil}
 %endif
+%if %{FILES_weakmods}
+%global files_weakmods      %{nil}
+%endif
 %if %{FILES_mkvars}
 %global files_mkvars        %{nil}
 %global files_kinfo         %{nil}
@@ -1533,8 +1610,8 @@
 
 %global baseversion @VERSION@
 
-%global __find_provides %{_builddir}/%{name}-%{baseversion}/scripts/rpm/find-provides %{_builddir}/%{name}-%{baseversion} %{buildroot}
-%global __find_requires %{_builddir}/%{name}-%{baseversion}/scripts/rpm/find-requires %{_builddir}/%{name}-%{baseversion} %{buildroot}
+%global __find_provides %{_builddir}/%{name}-%{baseversion}/scripts/rpm/find-provides %{_builddir}/%{name}-%{baseversion} %{buildroot} %{_kversion}
+%global __find_requires %{_builddir}/%{name}-%{baseversion}/scripts/rpm/find-requires %{_builddir}/%{name}-%{baseversion} %{buildroot} %{_kversion}
 %global __check_files   %{_builddir}/%{name}-%{baseversion}/scripts/rpm/check-files %{buildroot}
 
 %global kernel_string %{nil}
@@ -1735,21 +1812,22 @@ BuildRequires:    @BZIP2_CMD@
 # This is a virtual package that we want to pull in all the necessary
 # packages for a full run-time system.
 %if %{NEED_kmod}
-Requires:       %{name}-kernel  = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_lib}
-Requires:       %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_base}
-Requires:       %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_repo}
-Requires:       %{name}-repo    = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-repo    = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-repo    = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
-Provides:       %{name} = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name} = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name} = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name} = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name} = %{epoch}:%{baseversion}-%{rpmrelease}
 
 # ---------------------------------------------------------------------------
 %description
@@ -1781,8 +1859,12 @@ the following binary packages:
 %{?need_debug:   -- binary application and library debug info.}
 %{?need_debug: - %{name}-debugsource}
 %{?need_debug:   -- binary application and library debug source.}
-%{?need_kmod: - %{name}-kernel}
-%{?need_kmod:   -- kernel modules for a specific kernel.}
+%{?need_wrap: - %{name}-wrapper}
+%{?need_wrap:   -- kernel modules for a specific kernel.}
+%{?need_wrap: - %{name}-kernel}
+%{?need_wrap:   -- kernel modules for a range of kernels.}
+%{!?need_wrap:%{?need_kmod: - %{name}-kernel}}
+%{!?need_wrap:%{?need_kmod:   -- kernel modules for a specific kernel.}}
 %{?need_kdev: - %{name}-devel-kernel}
 %{?need_kdev:   -- kernel module info for a specific kernel.}
 %{?need_kbug: - %{name}-debuginfo-kernel}
@@ -1995,6 +2077,8 @@ fi
     %{?_without_streams_utils:              '%disable %_without_streams_utils'} \
     %{?_with_big_compile:                   '%enable %_with_big_compile'} \
     %{?_without_big_compile:                '%disable %_without_big_compile'} \
+    %{?_with_wrapper_module:                '%enable %_with_wrapper_module'} \
+    %{?_without_wrapper_module:             '%disable %_without_wrapper_module'} \
     %{?_with_module_sth:                    '%enable %_with_module_sth'} \
     %{?_without_module_sth:                 '%disable %_without_module_sth'} \
     %{?_with_module_bufmod:                 '%enable %_with_module_bufmod'} \
@@ -2145,6 +2229,7 @@ package_source () {
     ( cd %{buildroot}%{_usrsrc} ; ln -sf %{name}-%{baseversion}-%{fullrelease} %{name} )
 }
 
+# should not be necessary except for the cache files
 package_mkvars () {
     d=%{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}
 # create kernel-specific info directory
@@ -2156,13 +2241,19 @@ package_mkvars () {
     cp -p %{_builddir}/%{cache_file} $d
 }
 
+# should not be necessary except for the cache files
 package_symvers () {
     d=%{buildroot}%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}
 # create kernel-specific info directory
     mkdir -p $d
 # copy in symbol versions file
+    cp -p System.symvers $d
     cp -p Module.symvers $d
     cp -p Modules.map $d
+# create symbol versions file
+    cat System.symvers Module.symvers | gzip > $d/symvers-%{_kversion}.gz
+# copy in symbol sets file
+    cp -p symsets-%{_kversion}.tar.gz $d
 # copy in modpost cache file for reference
     cp -p %{_builddir}/%{mpost_file} $d
 }
@@ -2252,6 +2343,7 @@ Prefix:             %{_yumconfdir}
 
 %if %{FILES_yumrepo}
 Requires:           yum
+Requires(prereq):   yum
 #equires(pre):      yum
 #equires(preun):    yum
 #equires(post):     yum
@@ -2261,6 +2353,7 @@ Requires:           yum
 
 %if %{FILES_zypprepo}
 Requires:           zypper
+Requires(prereq):   zypper
 #equires(pre):      zypper
 #equires(preun):    zypper
 #equires(post):     zypper
@@ -2268,7 +2361,10 @@ Requires:           zypper
 %endif
 
 %if %{FILES_repo}
-Requires(pre):      /usr/bin/wget
+Requires(prereq):   wget
+Requires(pre):      %(type -p wget)
+Requires(pre):      %(type -p sed)
+Requires(pre):      %(type -p awk)
 %endif
 
 Provides:       %{name}-repo    = %{epoch}:%{baseversion}-%{fullrelease}
@@ -2295,8 +2391,8 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         for s in '' '.rpmsave' '.rpmnew' ; do
             oldfile="$file$s"
             if test -e $oldfile ; then
-                un=`sed -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $oldfile | head -1`
-                pw=`sed -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $oldfile | head -1`
+                un=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $oldfile`
+                pw=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $oldfile`
                 [ -n "$un" -a -n "$pw" ] || continue
                 break
             fi
@@ -2336,9 +2432,9 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         un=; pw=; oldfile=; file='@PACKAGE_UCNAME@credentials'
         for s in '@PACKAGE_UCNAME@' 'NCC' ; do
             oldfile="${s}credentials"
-            if test -e $oldfile ; then
-                un=`sed -r 's,^username[[:space:]]*=[[:space:]]*([^[:space:]]*)$,\1,;t;d' $oldfile | head -1`
-                pw=`sed -r 's,^password[[:space:]]*=[[:space:]]*([^[:space:]]*)$,\1,;t;d' $oldfile | head -1`
+            if [ -e $oldfile ] ; then
+                un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $file`
+                pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $file`
                 [ -n "$un" -a -n "$pw" ] || continue
                 break
             fi
@@ -2371,24 +2467,28 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
             exit 1
         fi
     ) || exit 1
-    # Setting up a service is as easy as adding its definition file to the
-    # services.d directory.  It will be refreshed the next time that zypper
-    # runds.
     (
-        echo '[@PACKAGE_UCNAME@]'
-        echo 'name=%{stitle} Repository Service'
-        echo 'enabled=1'
-        echo 'autorefresh=1'
-        echo 'url = %{_reposerv}://%{_repobase}/?credentials=@PACKAGE_UCNAME@credentials'
-        echo 'type = ris'
-        echo -n 'repostoenable ='
-        for b in '' '-extras' '-updates' '-testing' ; do
-            for s in '-main' '-debug' '-devel' ; do
-                echo -n " @PACKAGE_UCNAME@:@PACKAGE@$b$s"
-            done
-        done
-        echo ''
-    ) >%{_zyppservdir}/@PACKAGE_UCNAME@.service
+        cd '%{_zyppcreddir}'
+        un=; pw=; file='@PACKAGE_UCNAME@credentials'
+        if [ -e $file ] ; then
+            un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $file`
+            pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $file`
+        fi
+        [ -n "$un" -a -n "$pw" ] || exit 1
+        cd '%{_zyppservdir}'
+        file='OPENSS7.service';
+        [ ! -e $file ] || mv -f -- $file $file.rpmsave
+        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file"
+        rm -f -- $file
+        if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
+            [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
+            exit 1
+        fi
+        if [ ! -e $file ] ; then
+            [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
+            exit 1
+        fi
+    ) || exit 1
 %endif
 fi
 
@@ -2544,13 +2644,20 @@ Conflicts:          texinfo < 3.11
 %if %{USE_makedev}
 Requires:           dev >= 3.3
 %endif
+#if %{FILES_manpages}
+#equires(post):     /usr/sbin/makewhatis
+#equires(postun):   /usr/sbin/makewhatis
+#endif
+
 %if %{NEED_kmod}
 Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_lib}
+Requires(prereq):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
 Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
@@ -3185,12 +3292,10 @@ Prefix:             %{_mandir}
 %endif
 
 %if %{FILES_infofiles}
-Requires(pre):      /sbin/install-info
 Requires(post):     /sbin/install-info
 Requires(preun):    /sbin/install-info
 %endif
 #if %{FILES_manpages}
-#equires(pre):      /usr/sbin/makewhatis
 #equires(post):     /usr/sbin/makewhatis
 #equires(postun):   /usr/sbin/makewhatis
 #endif
@@ -3201,6 +3306,10 @@ Conflicts:          texinfo < 3.11
 # and is required.  Other packages are unnecessary.
 %if %{NEED_base}
 Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+%if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{fullrelease}
@@ -3323,65 +3432,68 @@ fi
 # include the Java JAIN components: those are in a separate java package.
 # ---------------------------------------------------------------------------
 
-Summary:        %{title} run-time libraries and utilities.
-Group:          System Environment/Libraries
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        true
-Autoprov:       true
+Summary:            %{title} run-time libraries and utilities.
+Group:              System Environment/Libraries
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_binfiles}
-Prefix:         %{_bindir}
+Prefix:             %{_bindir}
 %endif
 %if %{FILES_sbinfiles}
-Prefix:         %{_sbindir}
+Prefix:             %{_sbindir}
 %endif
 %if %{FILES_libraries}
-Prefix:         %{_libdir}
+Prefix:             %{_libdir}
 %endif
 %if %{FILES_lib32compat}
-Prefix:         %{_lib32dir}
+Prefix:             %{_lib32dir}
 %endif
 %if %{FILES_perlmods}
-Prefix:         %{_perldir}
+Prefix:             %{_perldir}
 %endif
 %if %{FILES_tcllibs}
-Prefix:         %{_pkgtcllibdir}
+Prefix:             %{_pkgtcllibdir}
 %endif
 %if %{FILES_testfiles}
-Prefix:         %{_pkglibexecdir}
+Prefix:             %{_pkglibexecdir}
 %endif
 %if %{FILES_test32files}
-Prefix:         %{_pkglibexec32dir}
+Prefix:             %{_pkglibexec32dir}
 %endif
 %if %{FILES_snmpmods}
-Prefix:         %{_snmpdlmoddir}
+Prefix:             %{_snmpdlmoddir}
 %endif
 %if %{FILES_snmp32mods}
-Prefix:         %{_snmpdlmod32dir}
+Prefix:             %{_snmpdlmod32dir}
 %endif
 %if %{FILES_locales}
-Prefix:         %{_localedir}
+Prefix:             %{_localedir}
 %endif
 
-Requires:       /sbin/ldconfig
-Requires:       /usr/bin/tclsh
+Requires(pre):      /sbin/ldconfig
+Requires(post):     /sbin/ldconfig
+Requires(postun):   /sbin/ldconfig
+Requires(post):     %(type -p tclsh)
 
 %if %{NEED_kmod}
-Requires:       %{name}-kernel  = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_base}
-Requires:       %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_virt}
-Requires:       %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
-Provides:       %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-lib     = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{rpmrelease}
 
-Release:        %{fullrelease}
+Release:            %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description lib
@@ -3558,21 +3670,21 @@ fi
 # ===========================================================================
 %package devel
 
-Summary:        %{title} configured headers, static libraries and debug info.
-Group:          Development/System
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        true
-Autoprov:       true
+Summary:            %{title} configured headers, static libraries and debug info.
+Group:              Development/System
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_includes}
-Prefix:         %{_includedir}/%{name}
+Prefix:             %{_includedir}/%{name}
 %endif
 %if %{FILES_libstatic}
-Prefix:         %{_libdir}
+Prefix:             %{_libdir}
 %endif
 %if %{FILES_lib32static}
-Prefix:         %{_lib32dir}
+Prefix:             %{_lib32dir}
 %endif
 #if %{FILES_debugfiles}
 #{?files_binaries:Prefix:               %{_usrsrc}/debug}
@@ -3582,20 +3694,25 @@ Prefix:         %{_lib32dir}
 
 #Requires:         /sbin/install-info
 
-Conflicts:      texinfo < 3.11
+Conflicts:          texinfo < 3.11
 
 %if %{NEED_lib}
-Requires:       %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_kdev}
-Requires:       %{name}-devel-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+%if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
-Provides:       %{name}-devel = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-devel = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-devel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{rpmrelease}
 
-Release:        %{fullrelease}
+Release:            %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description devel
@@ -3634,26 +3751,34 @@ documentation, load the %{name}-doc package.
 # ===========================================================================
 %package debuginfo
 
-Summary:        %{title} debugging symbols.
-Group:          Development/System
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        true
-Autoprov:       true
+Summary:            %{title} debugging symbols.
+Group:              Development/System
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_debugfiles}
 %{?files_binaries:%{?_lib32dir:Prefix:  %{_lib32dir}/debug}}
 %{?files_binaries:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 %endif
+
+%if %{NEED_lib}
+Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
 %if %{NEED_kbug}
-Requires:       %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+%if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
-Provides:       %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-debuginfo = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{rpmrelease}
 
-Release:        %{fullrelease}
+Release:            %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description debuginfo
@@ -3673,25 +3798,31 @@ package.
 # ===========================================================================
 %package debugsource
 
-Summary:        %{title} debugging source.
-Group:          Development/System
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        true
-Autoprov:       true
+Summary:            %{title} debugging source.
+Group:              Development/System
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_debugfiles}
 %{?files_binaries:Prefix:               %{_usrsrc}/debug}
 %endif
+
+Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
 %if %{NEED_kbug}
-Requires:       %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+%if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
-Provides:       %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-debugsource = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{rpmrelease}
 
-Release:        %{fullrelease}
+Release:            %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description debugsource
@@ -3743,22 +3874,22 @@ this package.
 #   Enchances keyword, but has to be done.)
 #
 
-Summary:        %{title} kernel modules.
-Group:          System Environment/Kernel
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        false
-Autoprov:       true
+Summary:            %{title} kernel modules.
+Group:              System Environment/Kernel
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_modules}
-Prefix:         %{_kmoduledir}
+Prefix:             %{_kmoduledir}
 %endif
 
-Obsoletes:      %{name}-kernel
-Obsoletes:      %{name}-kmp%{kernel_flavor}
-Obsoletes:      kmod%{kernel_flavor}
-Obsoletes:      kernel-module-%{name}%{kernel_flavor}
-Obsoletes:      %{name}-kmod%{kernel_flavor}
+Obsoletes:          %{name}-kernel
+Obsoletes:          %{name}-kmp%{kernel_flavor}
+Obsoletes:          kmod%{kernel_flavor}
+Obsoletes:          kernel-module-%{name}%{kernel_flavor}
+Obsoletes:          %{name}-kmod%{kernel_flavor}
 
 # SuSE puts lsof in /usr/bin
 Requires(pre):      lsof
@@ -3796,6 +3927,7 @@ Requires(postun):   modutils
 
 %if %{NEED_lib}
 Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(pre):      %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(post):     %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(preun):    %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
@@ -3803,12 +3935,14 @@ Requires(postun):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_base}
 Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(pre):      %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(post):     %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(preun):    %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(postun):   %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
@@ -4152,6 +4286,60 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 fi
 %endif
 
+%if %{FILES_weakmods}
+%triggerin -n %{name}-kernel%{kernel_flavor} -- %{kernel_trigger}
+# ---------------------------------------------------------------------------
+d=%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}
+if [ -f $d/System.symvers -a -f $d/Module.symvers ] ; then
+    cat $d/System.symvers $d/Module.symvers | gzip > /boot/symvers-%{_kversion}.gz
+fi
+for wm in /sbin/weak-modules /usr/lib/module-init-tools/weak-modules /usr/lib/module-init-tools/weak-modules2 ; do
+    if [ -x $wm ] ; then /bin/bash -${-/e/} $wm --add-kernel %{_kversion} || :; fi
+done
+%endif
+
+%if %{FILES_weakmods}
+%triggerun -n %{name}-kernel%{kernel_flavor} -- %{kernel_trigger}
+# ---------------------------------------------------------------------------
+if [ $2 = 0 ] ; then : # kernel being removed
+    for wm in /sbin/weak-modules /usr/lib/module-init-tools/weak-modules ; do
+        if [ -x $wm ] ; then /bin/bash -${-/e/} $wm --remove-kernel %{_kversion} || :; fi
+    done
+    d=%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}
+    if [ -f $d/System.symvers ] ; then
+        cat $d/System.symvers | gzip > /boot/symvers-%{_kversion}.gz
+    fi
+elif [ $1 = 0 ] ; then : # openss7-kernel being removed
+    for wm in /sbin/weak-modules /usr/lib/module-init-tools/weak-modules ; do
+        if [ -x $wm ] ; then /bin/bash -${-/e/} $wm --remove-kernel %{_kversion} || :; fi
+    done
+    d=%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}
+    if [ -f $d/System.symvers ] ; then
+        cat $d/System.symvers | gzip > /boot/symvers-%{_kversion}.gz
+    fi
+    for wm in /sbin/weak-modules /usr/lib/module-init-tools/weak-modules ; do
+        if [ -x $wm ] ; then /bin/bash -${-/e/} $wm --add-kernel %{_kversion} || :; fi
+    done
+fi
+%endif
+
+%if %{FILES_weakmods}
+%triggerpostun -n %{name}-kernel%{kernel_flavor} -- %{kernel_trigger}
+# ---------------------------------------------------------------------------
+if [ $2 = 0 ] ; then : # kernel being removed
+    for wm in /usr/lib/module-init-tools/weak-modules2 ; do
+        if [ -x $wm ] ; then /bin/bash -${-/e/} $wm --remove-kernel %{_kversion} || :; fi
+    done
+elif [ $1 = 0 ] ; then : # openss7-kernel being removed
+    for wm in /usr/lib/module-init-tools/weak-modules2 ; do
+        if [ -x $wm ] ; then
+            /bin/bash -${-/e/} $wm --remove-kernel %{_kversion} || :
+            /bin/bash -${-/e/} $wm --add-kernel %{_kversion} || :
+        fi
+    done
+fi
+%endif
+
 %if %{PACKAGE_kmod}
 %files kernel%{kernel_flavor}
 # ---------------------------------------------------------------------------
@@ -4160,6 +4348,8 @@ fi
 %{?files_oldmods:%attr(644,root,root) %{_kmoduledir}/modules.%{base}}
 %{?files_oldmods:%{_kmoduledir}/%{base}/*.o*}
 %{?files_newmods:%{_kmoduledir}/%{base}/*.ko*}
+%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/System.symvers}
+%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Module.symvers}
 %endif
 
 # ===========================================================================
@@ -4172,18 +4362,18 @@ fi
 # these various packages, but virtual package names don't seem to cut it.
 # ---------------------------------------------------------------------------
 
-Summary:        %{title} kernel module symbol versions and debug info.
-Group:          Development/Kernel
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        false
-Autoprov:       true
+Summary:            %{title} kernel module symbol versions and debug info.
+Group:              Development/Kernel
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_modules}
-Prefix:         %{_kmoduledir}
+Prefix:             %{_kmoduledir}
 %endif
 %if %{FILES_oldmods}
-Prefix:         %{_includedir}/%{name}/%{kernel_version}
+Prefix:             %{_includedir}/%{name}/%{kernel_version}
 %endif
 #if %{FILES_kdebugfiles}
 #{?files_modules:Prefix:               %{_usrsrc}/debug}
@@ -4191,11 +4381,11 @@ Prefix:         %{_includedir}/%{name}/%{kernel_version}
 #{?files_modules:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 #endif
 
-Obsoletes:      %{name}-devel-kernel
-Obsoletes:      %{name}-kmp%{kernel_flavor}-devel
-Obsoletes:      kmod%{kernel_flavor}-devel
-Obsoletes:      kernel-module-%{name}-devel%{kernel_flavor}
-Obsoletes:      %{name}-devel-kmod%{kernel_flavor}
+Obsoletes:          %{name}-devel-kernel
+Obsoletes:          %{name}-kmp%{kernel_flavor}-devel
+Obsoletes:          kmod%{kernel_flavor}-devel
+Obsoletes:          kernel-module-%{name}-devel%{kernel_flavor}
+Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
 %if %{HAVE_yumrepo}
@@ -4207,58 +4397,64 @@ Obsoletes:      %{name}-devel-kmod%{kernel_flavor}
 %(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
 
 %if %{NEED_devel}
-Requires:       %{name}-devel   = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-devel   = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-devel   = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_kmod}
-Requires:       %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Requires(prereq):   %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Requires:           %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+%endif
+%if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
 # This is a signal to yum that rpm packages are to be installed rather than
 # updated.  It is also a signal to yum-kmod that this package provides kernel
 # modules.
-Provides:       kernel-modules = %{_kversion}
+Provides:           kernel-modules = %{_kversion}
 %endif
 
 %if %{HAVE_zypprepo}
 # This is a signal to zypp that when multiple kernel versions are permitted,
 # that this package also supports multiple versions being installed on the
 # system at the same time.  This is similar to the above for yum.
-Provides:       multiversion(kernel)
+Provides:           multiversion(kernel)
 %endif
 
-Provides:       %{name}-devel-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides:       %{name}-devel-kernel = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-devel-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-devel-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
-Provides:       %{name}-devel-%{_kversion} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides:       %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-devel-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
 
 %if %{HAVE_zypprepo}
 # The following is normally what the kernel module package would have been
 # named on SUSE-based systems.  This name cannot, however, be used or the
 # kernel will attempt to weak-update our modules with weak-modules2.
-Provides:       %{name}-devel-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-devel-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
 # It appears that SUSE might use these definitions in the same way as RH uses
 # the %{name}-kmod ones.
-Provides:       %{name}-devel-kmp = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-devel-kmp = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
 # The following is normally what the kernel modules package would have  been
 # named on RH-based systems.  It appears, however, that this is only a
 # convention and is not required by yum nor yum-kmod.
-Provides:       kmod-%{name}-devel = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           kmod-%{name}-devel = %{epoch}:%{kbaseversion}-%{kfullrelease}
 # These definitions are the only thing triggering kernel pinning: only
 # packages that provide 'kernel-modules', provide a name ending in -kmod, and
 # require kernel-%{arch} will be considered for automatic kernel updates.
-Provides:       %{name}-devel-kmod = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-devel-kmod = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 
-Version:        %{kbaseversion}
-Release:        %{kfullrelease}
+Version:            %{kbaseversion}
+Release:            %{kfullrelease}
 
 # ---------------------------------------------------------------------------
 %description devel-kernel%{kernel_flavor}
@@ -4288,7 +4484,9 @@ this package or when debugging kernel modules contained in the package.
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Module.mkvars}
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/%{csite_file}}
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/%{cache_file}}
-%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Module.symvers}
+#{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/System.symvers}
+#{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Module.symvers}
+%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/symsets-%{_kversion}.tar.gz}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Modules.map}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/%{mpost_file}}
 %endif
@@ -4296,12 +4494,12 @@ this package or when debugging kernel modules contained in the package.
 # =============================================================================
 %package debuginfo-kernel%{kernel_flavor}
 
-Summary:        %{title} kernel module debugging information.
-Group:          Development/Kernel
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        false
-Autoprov:       true
+Summary:            %{title} kernel module debugging information.
+Group:              Development/Kernel
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_kdebugfiles}
 %{?files_modules:%{?_lib32dir:Prefix:  %{_lib32dir}/debug}}
@@ -4317,58 +4515,64 @@ Autoprov:       true
 %endif
 
 %if %{NEED_debug}
-Requires:       %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_kmod}
-Requires:       %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Requires(prereq):   %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Requires:           %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+%endif
+%if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
 # This is a signal to yum that rpm packages are to be installed rather than
 # updated.  It is also a signal to yum-kmod that this package provides kernel
 # modules.
-Provides:       kernel-modules = %{_kversion}
+Provides:           kernel-modules = %{_kversion}
 %endif
 
 %if %{HAVE_zypprepo}
 # This is a signal to zypp that when multiple kernel versions are permitted,
 # that this package also supports multiple versions being installed on the
 # system at the same time.  This is similar to the above for yum.
-Provides:       multiversion(kernel)
+Provides:           multiversion(kernel)
 %endif
 
-Provides:       %{name}-debuginfo-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides:       %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
-Provides:       %{name}-debuginfo-%{_kversion} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides:       %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debuginfo-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
 
 %if %{HAVE_zypprepo}
 # The following is normally what the kernel module package would have been
 # named on SUSE-based systems.  This name cannot, however, be used or the
 # kernel will attempt to weak-update our modules with weak-modules2.
-Provides:       %{name}-debuginfo-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-debuginfo-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
 # It appears that SUSE might use these definitions in the same way as RH uses
 # the %{name}-kmod ones.
-Provides:       %{name}-debuginfo-kmp = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-debuginfo-kmp = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
 # The following is normally what the kernel modules package would have  been
 # named on RH-based systems.  It appears, however, that this is only a
 # convention and is not required by yum nor yum-kmod.
-Provides:       kmod-%{name}-debuginfo = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           kmod-%{name}-debuginfo = %{epoch}:%{kbaseversion}-%{kfullrelease}
 # These definitions are the only thing triggering kernel pinning: only
 # packages that provide 'kernel-modules', provide a name ending in -kmod, and
 # require kernel-%{arch} will be considered for automatic kernel updates.
-Provides:       %{name}-debuginfo-kmod = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-debuginfo-kmod = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 
-Version:        %{kbaseversion}
-Release:        %{kfullrelease}
+Version:            %{kbaseversion}
+Release:            %{kfullrelease}
 
 # ---------------------------------------------------------------------------
 %description debuginfo-kernel%{kernel_flavor}
@@ -4388,12 +4592,12 @@ package or when debugging this package.
 # =============================================================================
 %package debugsource-kernel%{kernel_flavor}
 
-Summary:        %{title} kernel module debugging source.
-Group:          Development/Kernel
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        false
-Autoprov:       true
+Summary:            %{title} kernel module debugging source.
+Group:              Development/Kernel
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_kdebugfiles}
 %{?files_modules:Prefix:               %{_usrsrc}/debug}
@@ -4408,34 +4612,44 @@ Autoprov:       true
 %endif
 
 %if %{NEED_debug}
-Requires:       %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+%if %{NEED_kbug}
+Requires(prereq):   %{name}-debuginfo-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Requires:           %{name}-debuginfo-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 %if %{NEED_kmod}
-Requires:       %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Requires(prereq):   %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Requires:           %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+%endif
+%if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
 # This is a signal to yum that rpm packages are to be installed rather than
 # updated.  It is also a signal to yum-kmod that this package provides kernel
 # modules.
-Provides:       kernel-modules = %{_kversion}
+Provides:           kernel-modules = %{_kversion}
 %endif
 
 %if %{HAVE_zypprepo}
 # This is a signal to zypp that when multiple kernel versions are permitted,
 # that this package also supports multiple versions being installed on the
 # system at the same time.  This is similar to the above for yum.
-Provides:       multiversion(kernel)
+Provides:           multiversion(kernel)
 %endif
 
-Provides:       %{name}-debugsource-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides:       %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
-Provides:       %{name}-debugsource-%{_kversion} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides:       %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debugsource-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
 
 %if %{HAVE_zypprepo}
 # The following is normally what the kernel module package would have been
@@ -4480,23 +4694,23 @@ package or when debugging this package.
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
-Summary:        %{title} source configured for kernel.
-Group:          Development/Kernel
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        true
-Autoprov:       false
+Summary:            %{title} source configured for kernel.
+Group:              Development/Kernel
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           false
 
 %if %{FILES_sourcefiles}
-Prefix:         %{_usrsrc}/%{name}
-Prefix:         %{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}
+Prefix:             %{_usrsrc}/%{name}
+Prefix:             %{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}
 %endif
 
-Obsoletes:      %{name}-source-kernel
-Obsoletes:      %{name}-kmp%{kernel_flavor}-source
-Obsoletes:      kmod%{kernel_flavor}-source
-Obsoletes:      kernel-module-%{name}-source%{kernel_flavor}
-Obsoletes:      %{name}-source-kmod%{kernel_flavor}
+Obsoletes:          %{name}-source-kernel
+Obsoletes:          %{name}-kmp%{kernel_flavor}-source
+Obsoletes:          kmod%{kernel_flavor}-source
+Obsoletes:          kernel-module-%{name}-source%{kernel_flavor}
+Obsoletes:          %{name}-source-kmod%{kernel_flavor}
 
 # We require that the corresponding kernel be installed, otherwise, the source
 # will not be usable for more than inspection.
@@ -4514,48 +4728,48 @@ Obsoletes:      %{name}-source-kmod%{kernel_flavor}
 # This is a signal to yum that rpm packages are to be installed rather than
 # updated.  It is also a signal to yum-kmod that this package provides kernel
 # modules.
-Provides:       kernel-modules = %{_kversion}
+Provides:           kernel-modules = %{_kversion}
 %endif
 
 %if %{HAVE_zypprepo}
 # This is a signal to zypp that when multiple kernel versions are permitted,
 # that this package also supports multiple versions being installed on the
 # system at the same time.  This is similar to the above for yum.
-Provides:       multiversion(kernel)
+Provides:           multiversion(kernel)
 %endif
 
-Provides:       %{name}-source-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides:       %{name}-source-kernel = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-source-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-source-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
-Provides:       %{name}-source-%{_kversion} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides:       %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
-Provides:       %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
-Provides:       %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-source-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-source-kernel = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-source-kernel = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-source-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-source-%{_kversion} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{fullrelease2}
+Provides:           %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
 
 %if %{HAVE_zypprepo}
 # The following is normally what the kernel module package would have been
 # named on SUSE-based systems.  This name cannot, however, be used or the
 # kernel will attempt to weak-update our modules with weak-modules2.
-Provides:       %{name}-source-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-source-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
 # It appears that SUSE might use these definitions in the same way as RH uses
 # the %{name}-kmod ones.
-Provides:       %{name}-source-kmp = %{epoch}:%{kbaseversion}-%{kfullrelease}
+Provides:           %{name}-source-kmp = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
 # The following is normally what the kernel modules package would have  been
 # named on RH-based systems.  It appears, however, that this is only a
 # convention and is not required by yum nor yum-kmod.
-Provides:       kmod-%{name}-source = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           kmod-%{name}-source = %{epoch}:%{baseversion}-%{fullrelease}
 # These definitions are the only thing triggering kernel pinning: only
 # packages that provide 'kernel-modules', provide a name ending in -kmod, and
 # require kernel-%{arch} will be considered for automatic kernel updates.
-Provides:       %{name}-source-kmod = %{epoch}:%{baseversion}-%{fullrelease}
+Provides:           %{name}-source-kmod = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
-Version:        %{kbaseversion}
-Release:        %{kfullrelease}
+Version:            %{kbaseversion}
+Release:            %{kfullrelease}
 
 # -----------------------------------------------------------------------------
 %description source-kernel%{kernel_flavor}
@@ -4582,34 +4796,46 @@ that are not present in the %{name}-devel-kernel package.
 # =============================================================================
 %package java
 
-Summary:        %{title} Java modules and native libraries.
-Group:          System Environment/Libraries
-%{?_xpm:Icon:   %_xpm}
-%{?_gif:Icon:   %_gif}
-Autoreq:        true
-Autoprov:       true
+Summary:            %{title} Java modules and native libraries.
+Group:              System Environment/Libraries
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
 
 %if %{FILES_jnilibs}
-Prefix:         %{_jnidir}
+Prefix:             %{_jnidir}
 %endif
 %if %{FILES_gcjlibs}
-Prefix:         %{_pkggcjdir}
+Prefix:             %{_pkggcjdir}
 %endif
 %if %{FILES_gcjmaps}
-Prefix:         %{_pkggcjdir}
+Prefix:             %{_pkggcjdir}
 %endif
 %if %{FILES_jarfiles}
-Prefix:         %{_javadir}
+Prefix:             %{_javadir}
 %endif
 
 %if %{FILES_jnilibs}
-Requires:       /sbin/ldconfig
+Requires:           /sbin/ldconfig
 %endif
 %if %{FILES_gcjmaps}
-Requires:       /usr/bin/gcj-dbtool
+Requires(post):     /usr/bin/gcj-dbtool
+Requires(post):     /usr/bin/rebuild-gcj-db
+Requires(postun):   /usr/bin/gcj-dbtool
+Requires(postun):   /usr/bin/rebuild-gcj-db
 %endif
 
-Release:        %{fullrelease}
+%if %{NEED_lib}
+Requires(prereq):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+%if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+
+Release:            %{fullrelease}
 
 # ---------------------------------------------------------------------------
 %description java
@@ -4741,6 +4967,11 @@ Autoprov:       true
 Prefix:         %{_pkgjavadocdir}
 %endif
 
+%if %{NEED_virt}
+Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+%endif
+
 Release:        %{fullrelease}
 
 # ---------------------------------------------------------------------------
@@ -4764,12 +4995,17 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 1.1.2.20  2011-03-09 23:06:05  brian
-# - more repo workup
+# Revision 1.1.2.21  2011-03-17 07:01:27  brian
+# - build and repo system improvements
 #
-# Revision 1.1.2.19  2011-03-09 10:29:34  brian
-# - better repo rpm
-#
+
+* Wed Mar  9 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.20  2011-03-09 23:06:05  brian
+- more repo workup
+
+* Wed Mar  9 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.19  2011-03-09 10:29:34  brian
+- better repo rpm
 
 * Sun Mar  6 2011 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.18  2011-03-06 16:13:46  brian

@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-28 19:51:28 $
+# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-17 07:01:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,30 +47,31 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-28 19:51:28 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $
 #
 # =============================================================================
 
 # Streams configuration ala awk
 
+function getline_command(cmd)
+{
+    cmd | getline; close(cmd); return $0
+}
 function date(format) {
     if (format) {
-	("date +\"" format "\"") | getline
-	close("date +\"" format "\"")
+	return getline_command("date +\"" format "\"")
     } else {
-	"date" | getline
-	close("date")
+	return getline_command("date -uIseconds")
     }
-    return $0
 }
 function year()
 {
     return date("%Y")
 }
-function allyears(    year, this, last, sep, result)
+function allyears(    this, last, sep, result)
 {
-    last = year()
-    for (this = 2011; this <= last; this++) {
+    last = year(); sep = ""; result = ""
+    for (this = 2009; this <= last; this++) {
 	result = result sep this
 	sep = ", "
     }
@@ -78,22 +79,29 @@ function allyears(    year, this, last, sep, result)
 }
 function print_info(string)
 {
-    if (values["quiet"] == 0)
-	print "strconf.awk: I: " string > "/dev/stderr"
+    if (values["quiet"] == 0 && values["verbose"] > 0) {
+	print blu me ": I: " string std > stderr
+	written[stderr] = 1
+    }
 }
 function print_debug(string)
 {
-    if (values["debug"] > 0)
-	print "strconf.awk: D: " string > "/dev/stderr"
+    if (values["debug"] > 0) {
+	print mag me ": D: " string std > stderr
+	written[stderr] = 1
+    }
 }
 function print_error(string)
 {
-    print "strconf.awk: E: " string > "/dev/stderr"
+    print red me ": E: " string std > stderr
+    written[stderr] = 1
 }
 function print_warn(string)
 {
-    if (values["verbose"] > 0 || values["debug"] > 0)
-	print "strconf.awk: W: " string > "/dev/stderr"
+    if (values["quiet"] == 0 || values["verbose"] > 0 || values["debug"] > 0) {
+	print org me ": W: " string std > stderr
+	written[stderr] = 1
+    }
 }
 function usage(output)
 {
@@ -101,13 +109,14 @@ function usage(output)
 	return
     print "\
 strconf:\n\
-  $Id: strconf.awk,v 1.1.2.6 2011-02-28 19:51:28 brian Exp $\n\
+  $Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
 Usage:\n\
-  strconf [options] CONFIGFILE[ CONFIGFILE]...\n\
+  strconf [options] [INPUT ...]\n\
   strconf -H\n\
   strconf -V\n\
   strconf -C\
-">> output
+" > output
+    written[output] = 1
 }
 function help(output)
 {
@@ -115,9 +124,13 @@ function help(output)
 	return
     usage(output)
     print "\
+Arguments:\n\
+  INPUT ...\n\
+      input configuration files\n\
+      [default: " defaults["inputs"] "] {" environs["inputs"] "}\n\
 Options:\n\
   -I, --inputs='FILE[ FILE]*'\n\
-      input files\n\
+      input configuration files\n\
       [default: " defaults["inputs"] "] {" environs["inputs"] "}\n\
   -b, --basemajor=MAJOR\n\
       major number to act as base for STREAMS drivers and devices\n\
@@ -169,10 +182,10 @@ Options:\n\
       [default: " defaults["pkgobject"] "]\n\
   -d, --packagedir=[PACKAGEDIR]\n\
       full path or vpath to binary package directory\n\
-      [default: " defaults["packagedir"] "] {" environs["packagedir"] "}\n\
+      [default: (none)] {" environs["packagedir"] "}\n\
   -R, --pkgrules=[PKGRULES]\n\
       full path and filename of the pkgrules make rules file\n\
-      [default: " defaults["pkgrules"] "] {" environs["pkgrules"] "}\n\
+      [default: (none)] {" environs["pkgrules"] "}\n\
   -n, --dryrun, --dry-run\n\
       don't perform the actions, just check them\n\
   -q, --quiet, --silent\n\
@@ -189,7 +202,8 @@ Options:\n\
       display script version and exit\n\
   -C, --copying\n\
       display copying permissions and exit\n\
-" >> output
+" > output
+    written[output] = 1
 }
 function version(output)
 {
@@ -197,7 +211,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: strconf.awk,v 1.1.2.6 2011-02-28 19:51:28 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -210,8 +224,9 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
-See strconf.awk -- --copying' for copying permissions.\
-" >> output
+See " me " -- --copying' for copying permissions.\
+" > output
+    written[output] = 1
 }
 function copying(output)
 {
@@ -219,7 +234,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: strconf.awk,v 1.1.2.6 2011-02-28 19:51:28 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -256,19 +271,20 @@ regulations).\n\
 Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
 Corporation at a fee.  See http://www.openss7.com/\n\
 --------------------------------------------------------------------------------\
-" >> output
+" > output
+    written[output] = 1
 }
 function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg, wantarg)
 {
-    option = ""; optval = ""; optarg = ""
+    option = ""; optval = ""; optarg = ""; pos = 0; needarg = 0; wantarg = 0
     if (optind == 0) { optind = 1; more = "" }
-    while ((optind < argc) || (more)) {
+    while ((optind < argc) || (more != "")) {
 	if (more) { arg = "-" more; more = "" }
 	else { arg = argv[optind]; optind++ }
 	if (arg ~ /^--?[a-zA-Z0-9]/) {
 	    if (needarg) {
 		print_error("option -" optval " requires an argument")
-		usage("/dev/stderr")
+		usage(stderr)
 		exit 2
 	    }
 	    if (wantarg) {
@@ -280,12 +296,12 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 		optarg = arg; sub(/^--([a-zA-Z0-9][-_a-zA-Z0-9]*)=/, "", optarg)
 		if (!(option in longopts)) {
 		    print_error("option --" option " not recognized")
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
 		if (longopts[option] !~ /:/) {
 		    print_error("option --" option " does not take an argument")
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
 		optval = substr(longopts[option], 1, 1)
@@ -295,7 +311,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 		option = arg; sub(/^--/, "", option)
 		if (!(option in longopts)) {
 		    print_error("option --" option " not recognized")
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
 		if (longopts[option] ~ /::/) { wantarg = 1 } else
@@ -310,17 +326,19 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	    }
 	    if (arg ~ /^-[a-zA-Z0-9]/) {
 		optval = substr(arg, 2, 1)
-		if ((pos = index(optstring, optval)) == 0) {
+		pos = index(optstring, optval)
+		if (pos == 0) {
 		    print_error("option -" optval " not recognized")
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
 		if (substr(optstring, pos+1, 1) == ":") {
 		    if (length(arg) > 2) {
 			if (substr(optstring, pos+2, 1) == ":") {
-			    if ((more = substr(arg, 3)) && more !~ /^[a-zA-Z0-9]/) {
+			    more = substr(arg, 3)
+			    if (more && more !~ /^[a-zA-Z0-9]/) {
 				print_error("bad option sequence " arg)
-				usage("/dev/stderr")
+				usage(stderr)
 				exit 2
 			    }
 			} else
@@ -337,9 +355,10 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 			    break
 		    continue
 		}
-		if ((more = substr(arg, 3)) && more !~ /^[a-zA-Z0-9]/) {
+		if (length(arg) > 2) { more = substr(arg, 3) } else { more = "" }
+		if (more && more !~ /^[a-zA-Z0-9]/) {
 		    print_error("bad option sequence " arg)
-		    usage("/dev/stderr")
+		    usage(stderr)
 		    exit 2
 		}
 		for (option in longopts)
@@ -357,6 +376,11 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	optind--
 	return -1
     }
+    return -1
+}
+function system_command(cmd)
+{
+    print_debug(cmd); return system(cmd)
 }
 function file_compare(tmpfile,    file) {
     file = tmpfile
@@ -366,7 +390,7 @@ function file_compare(tmpfile,    file) {
 	system("mv -f " tmpfile " " file)
     } else {
 	system("rm -f " tmpfile)
-	print file " is unchanged"
+	print_warn(file " is unchanged")
     }
 }
 function already(what, object, where) {
@@ -394,6 +418,11 @@ function read_inputs(inputs) {
     imajor = values["basemajor"]
     idnumber = values["basemodid"]
     # process all of the input files
+    indices["driver_names"] = 0
+    indices["module_names"] = 0
+    indices["drv_objnames"] = 0
+    indices["mod_objnames"] = 0
+    indices["node_names"  ] = 0
     for (k in inputs) {
 	input = inputs[k]
 	print_debug("reading input " input)
@@ -415,14 +444,14 @@ function read_inputs(inputs) {
 	    } else
 	    if ($1 == "driver") {
 		if (NF < 3) { missing("driver", 3); continue }
-		if (NF > 6) { garbage("driver", 6) } NF = 6
+		if (NF > 6) { garbage("driver", 6); NF = 6 }
 		assigned = 0
 		if ($2 in drivers) { already("driver", $2, drivers[$2]); continue }
-		if ($4 ~ /^[-*]?$/) { $4 = imajor; assigned = 1 }
-		if ($5 ~ /^[-*]?$/) { $5 = 1  } else
-		if ($5 !~ /^[0-9]+$/) { print_error(fnlp "bad nminors field `" $5 "'"); continue }
-		if ($6 ~ /^[-*]?$/) { $6 = nmajors($5) } else
-		if ($6 !~ /^[0-9]+$/) { print_error(fnlp "bad nmajors field `" $6 "'"); continue }
+		if (NF < 4 || $4 ~ /^[-*]?$/) { $4 = imajor; assigned = 1 }
+		if (NF < 5 || $5 ~ /^[-*]?$/) { $5 = 1  } else
+		if (NF < 5 || $5 !~ /^[0-9]+$/) { print_error(fnlp "bad nminors field `" $5 "'"); continue }
+		if (NF < 6 || $6 ~ /^[-*]?$/) { $6 = nmajors($5) } else
+		if (NF < 6 || $6 !~ /^[0-9]+$/) { print_error(fnlp "bad nmajors field `" $6 "'"); continue }
 		drivers[$2] = fnl
 		driver_prefix[$2] = $3
 		driver_major[$2] = $4
@@ -542,12 +571,13 @@ function read_inputs(inputs) {
 		print_warn(fnlp "unknown command name `" $1 "'")
 		continue }
 	}
+	close(input)
     }
     print_debug("reading inputs...  ...done.")
 }
 
 function write_driverconf(file,    i, object, loads, links) {
-    print_debug("writing driverconf `" file "'")
+    print_debug("writing driverconf `" file "'"); loads = ""; links = ""
     for (i = 1; i <= indices["drv_objnames"]; i++) {
 	object = drv_objnames[i]
 	if (object in loadables)
@@ -609,7 +639,7 @@ function write_driverconf(file,    i, object, loads, links) {
 # =============================================================================\n\
 \n\
 #\n\
-# GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
+# GENERATED BY strconf.awk (" date("") ") FROM " values["inputs"] "\n\
 # Edits to this file will be lost: edit strconf.awk instead.\n\
 #\n\
 \n\
@@ -621,6 +651,7 @@ MODCONF_LOADS =" loads "\n\
 # --------------------------------\n\
 # vim: ft=make\
 " > file
+    close(file)
 }
 function write_hconfig(file,    name, prefix) {
     print_debug("writing hconfig `" file "'")
@@ -628,7 +659,7 @@ function write_hconfig(file,    name, prefix) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.6 2011-02-28 19:51:28 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -675,7 +706,7 @@ function write_hconfig(file,    name, prefix) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2011-02-28 19:51:28 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -683,7 +714,7 @@ function write_hconfig(file,    name, prefix) {
 #define __SYS_" toupper(values["package"]) "_CONFIG_H__\n\
 \n\
 /*\n\
- * GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
+ * GENERATED BY strconf.awk (" date("") ") FROM " values["inputs"] "\n\
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
@@ -728,6 +759,7 @@ function write_hconfig(file,    name, prefix) {
  * vim: ft=c\n\
  */\
 " > file
+    close(file)
     file_compare(file)
 }
 function write_modconf(file) {
@@ -736,7 +768,7 @@ function write_modconf(file) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.6 2011-02-28 19:51:28 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -783,7 +815,7 @@ function write_modconf(file) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2011-02-28 19:51:28 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -791,7 +823,7 @@ function write_modconf(file) {
 #define __SYS_" toupper(values["package"]) "__MODCONF_INC__\n\
 \n\
 /*\n\
- * GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
+ * GENERATED BY strconf.awk (" date("") ") FROM " values["inputs"] "\n\
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
@@ -884,6 +916,7 @@ function write_modconf(file) {
  * vim: ft=c\n\
  */\
 " > file
+    close(file)
     file_compare(file)
 }
 function write_makenodes(file) {
@@ -936,11 +969,11 @@ function write_makenodes(file) {
  *****************************************************************************/\n\
 \n\
 /*\n\
- * GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
+ * GENERATED BY strconf.awk (" date("") ") FROM " values["inputs"] "\n\
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-28 19:51:28 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-17 07:01:29 $\";\n\
 \n\
 #if defined(LINUX)\n\
 #	include <sys/types.h>\n\
@@ -1174,10 +1207,11 @@ int main(int argc, char *argv[])\n\
  * vim: ft=c\n\
  */\
 " > file
+    close(file)
     file_compare(file)
 }
 function write_mkdevices(file,    i, name, majname, majnumb, minname, minnumb, dir, dirs, create, remove) {
-    print_debug("writing mkdevices `" file "'")
+    print_debug("writing mkdevices `" file "'"); create = ""; remove = ""
     for (i = 1; i <= indices["node_names"]; i++) {
 	name = node_names[i]
 	majname = node_majname[name]
@@ -1271,8 +1305,8 @@ EOF\n\
 	;;\n\
 esac\n\
 " > file
-    system("chmod 0755 " file)
     close(file)
+    system("chmod 0755 " file)
 }
 function write_strmknods(file) {
     print_debug("writing strmknods `" file "'")
@@ -1291,6 +1325,7 @@ function write_strmknods(file) {
 	else { print_error("invalid minor name `" minname "'"); continue }
 	print "%attr(" node_devperm[name] ", root, root) %dev(c, " majnumb ", " minnumb ") " name > file
     }
+    close(file)
 }
 function write_strsetup(file) {
     print_debug("writing strsetup `" file "'")
@@ -1341,7 +1376,7 @@ function write_strsetup(file) {
 # =============================================================================\n\
 \n\
 #\n\
-# GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
+# GENERATED BY strconf.awk (" date("") ") FROM " values["inputs"] "\n\
 # Edits to this file will be lost: edit strconf.awk instead.\n\
 #\n\
 # --------------------------------\n\
@@ -1373,6 +1408,7 @@ function write_strsetup(file) {
 # --------------------------------\n\
 # vim: ft=conf\
 " > file
+    close(file)
 }
 function write_strload(file) {
     print_debug("writing strload `" file "'")
@@ -1423,7 +1459,7 @@ function write_strload(file) {
 # =============================================================================\n\
 \n\
 #\n\
-# GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
+# GENERATED BY strconf.awk (" date("") ") FROM " values["inputs"] "\n\
 # Edits to this file will be lost: edit strconf.awk instead.\n\
 #\n\
 # --------------------------------\n\
@@ -1471,6 +1507,7 @@ function write_strload(file) {
 # --------------------------------\n\
 # vim: ft=conf\
 " > file
+    close(file)
 }
 function write_confmodules(file) {
     print_debug("writing confmodules `" file "'")
@@ -1521,7 +1558,7 @@ function write_confmodules(file) {
 # =============================================================================\n\
 \n\
 #\n\
-# GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
+# GENERATED BY strconf.awk (" date("") ") FROM " values["inputs"] "\n\
 # Edits to this file will be lost: edit strconf.awk instead.\n\
 #\n\
 # --------------------------------\n\
@@ -1575,10 +1612,10 @@ function write_confmodules(file) {
 	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
 	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
 	else { print_error("invalid minor name `" minname "'"); continue }
-	if (minname) { modname = minname } else { modname = majname }
-	object = module_objname[modname]
-	if (object in loadables) {
-	    driver = module_objects[object]
+	if (minname) { drvname = minname } else { drvname = majname }
+	#object = driver_objname[drvname]
+	if (drvname in driver_objname && driver_objname[drvname] in loadables) {
+	    driver = driver_objects[driver_objname[drvname]]
 	    print "alias\tchar-major-" majnumb "-" minnumb "\tstreams-" driver "\t# driver " name > file
 	} else {
 	    print "alias\tchar-major-" majnumb "-" minnumb "\tstreams\t\t# driver " name > file
@@ -1597,10 +1634,10 @@ function write_confmodules(file) {
 	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
 	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
 	else { print_error("invalid minor name `" minname "'"); continue }
-	if (minname) { modname = minname } else { modname = majname }
-	object = module_objname[modname]
-	if (object in loadables) {
-	    driver = module_objects[object]
+	if (minname) { drvname = minname } else { drvname = majname }
+	#object = driver_objname[drvname]
+	if (drvname in driver_objname && driver_objname[drvname] in loadables) {
+	    driver = driver_objects[driver_objname[drvname]]
 	    print "alias\tchar-major-" name "\tstreams-" driver "\t# driver " name > file
 	} else {
 	    print "alias\tchar-major-" name "\tstreams\t\t# driver " name > file
@@ -1610,6 +1647,7 @@ function write_confmodules(file) {
 # --------------------------------\n\
 # vim: ft=conf\
 " > file
+    close(file)
 }
 function write_pkgobject(pkgobject,    file, object, name, prefix, count, first, last, initfunc, exitfunc) {
     object = pkgobject
@@ -1669,11 +1707,11 @@ function write_pkgobject(pkgobject,    file, object, name, prefix, count, first,
  *****************************************************************************/\n\
 \n\
 /*\n\
- * GENERATED BY strconf.awk (" date() ") FROM " values["inputs"] "\n\
+ * GENERATED BY strconf.awk (" date("") ") FROM " values["inputs"] "\n\
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-28 19:51:28 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-17 07:01:29 $\";\n\
 \n\
 #include <linux/config.h>\n\
 #include <linux/version.h>\n\
@@ -1828,6 +1866,7 @@ _xx_init(void)\n\
 module_init(_xx_init);\n\
 module_exit(_xx_exit);\
 " > file
+    close(file)
     file_compare(file)
 }
 function write_packagedir(directory) {
@@ -1835,7 +1874,34 @@ function write_packagedir(directory) {
 }
 
 BEGIN {
-    print_debug("executing " ARGV[0])
+    LINT = "yes"
+    me = "strconf.awk"
+    if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"
+    if (ENVIRON["TERM"] == "dumb" || system("test -t 1 -a -t 2") != 0) {
+	stdout = "/dev/stderr"; written[stdout] = 0
+	stderr = "/dev/stderr"; written[stderr] = 0
+	cr = ""; lf = "\n"
+	blk = ""; hblk = ""
+	red = ""; hred = ""
+	grn = ""; hgrn = ""
+	org = ""; horg = ""
+	blu = ""; hblu = ""
+	mag = ""; hmag = ""
+	cyn = ""; hcyn = ""
+	std = ""
+    } else {
+	stdout = "/dev/stdout"; written[stdout] = 0
+	stderr = "/dev/stderr"; written[stderr] = 0
+	cr = "\r"; lf = ""
+	blk = "\033[0;30m"; hblk = "\033[1;30m"
+	red = "\033[0;31m"; hred = "\033[1;31m"
+	grn = "\033[0;32m"; hgrn = "\033[1;32m"
+	org = "\033[0;33m"; horg = "\033[1;33m"
+	blu = "\033[0;34m"; hblu = "\033[1;34m"
+	mag = "\033[0;35m"; hmag = "\033[1;35m"
+	cyn = "\033[0;36m"; hcyn = "\033[1;36m"
+	std = "\033[m"
+    }
     longopts["inputs"      ] = "I:" ; environs["inputs"      ] = "STRCONF_INPUT"  ; defaults["inputs"      ] = "Config.master"
     longopts["basemajor"   ] = "b:" ; environs["basemajor"   ] = "STRCONF_MAJBASE"; defaults["basemajor"   ] = 231
     longopts["basemodid"   ] = "i:" ; environs["basemodid"   ] = "STRCONF_MIDBASE"; defaults["basemodid"   ] = 1
@@ -1852,19 +1918,18 @@ BEGIN {
     longopts["strsetup"    ] = "S::"; environs["strsetup"    ] = "STRCONF_STSETUP"; defaults["strsetup"    ] = "strsetup.conf"
     longopts["strload"     ] = "O::"; environs["strload"     ] = "STRCONF_STRLOAD"; defaults["strload"     ] = "strload.conf"
     longopts["package"     ] = "k::"; environs["package"     ] = "STRCONF_PACKAGE"; defaults["package"     ] = "LfS"
-    longopts["pkgobject"   ] = "g::"                                              ; defaults["pkgobject"   ] = "clone.o"
+    longopts["pkgobject"   ] = "g::";                                               defaults["pkgobject"   ] = "clone.o"
     longopts["packagedir"  ] = "d::"; environs["packagedir"  ] = "STRCONF_BPKGDIR"
     longopts["pkgrules"    ] = "R::"; environs["pkgrules"    ] = "STRCONF_PKGRULE"
-    longopts["debug"       ] = "D"                                                ; defaults["debug"       ] = 0
-    longopts["verbose"     ] = "v"                                                ; defaults["verbose"     ] = 1
-    longopts["dryrun"      ] = "n"
-    longopts["dry-run"     ] = "n"
-    longopts["quiet"       ] = "q"                                                ; defaults["quiet"       ] = 0
-    longopts["silent"      ] = "q"                                                ; defaults["silent"      ] = 0
-    longopts["help"        ] = "H"
-    longopts["version"     ] = "V"
-    longopts["copying"     ] = "C"
-    optstring = "I:b:i:B:h::o::m::M::p:l::L::r:s::S::O::k::g::d::R::DvnqHVC"
+    longopts["dryrun"      ] = "n"  ;
+    longopts["dry-run"     ] = "n"  ;
+    longopts["quiet"       ] = "q"  ;                                               defaults["quiet"       ] = 0
+    longopts["silent"      ] = "q"  ;                                               defaults["silent"      ] = 0
+    longopts["debug"       ] = "D::";                                               defaults["debug"       ] = 0
+    longopts["verbose"     ] = "v::";                                               defaults["verbose"     ] = 0
+    longopts["help"        ] = "H"  ;
+    longopts["version"     ] = "V"  ;
+    longopts["copying"     ] = "C"  ;
     # set mandatory defaults
     values["basemajor" ] = defaults["basemajor" ]
     values["basemodid" ] = defaults["basemodid" ]
@@ -1874,27 +1939,34 @@ BEGIN {
     values["debug"     ] = defaults["debug"     ]
     values["verbose"   ] = defaults["verbose"   ]
     values["quiet"     ] = defaults["quiet"     ]
-    while ((c = getopt_long(ARGC, ARGV, optstring, longopts))) {
+    if ("V" in ENVIRON && ENVIRON["V"] == 1) {
+	values["quiet"  ] = 0
+	values["verbose"] = 2
+    }
+    optstring = "I:b:i:B:h::o::m::M::p:l::L::r:s::S::O::k::g::d::R::nqD::v::HVC"
+    optind = 0
+    while (1) {
+	c = getopt_long(ARGC, ARGV, optstring, longopts)
 	if (c == -1) break
 	else if (c ~ /[IbiBhomMplLrsSOkgdR]/) { values[option] = optarg }
-	else if (c ~ /[nq]/) { values[object] = 1 }
+	else if (c ~ /[nq]/) { values[option] = 1 }
 	else if (c == "D") { if (optarg) { values["debug"  ] = optarg } else { values["debug"  ]++ } }
 	else if (c == "v") { if (optarg) { values["verbose"] = optarg } else { values["verbose"]++ } }
-	else if (c == "H") { help("/dev/stdout"); exit 0 }
-	else if (c == "V") { version("/dev/stdout"); exit 0 }
-	else if (c == "C") { copying("/dev/stdout"); exit 0 }
-	else { usage("/dev/stderr"); exit 2 }
+	else if (c == "H") { help(   stdout); exit 0 }
+	else if (c == "V") { version(stdout); exit 0 }
+	else if (c == "C") { copying(stdout); exit 0 }
+	else               { usage(  stderr); exit 2 }
     }
-    # accumulate non-option arguments
     if (optind < ARGC) {
 	values["inputs"] = ARGV[optind]; optind++
 	while (optind < ARGC) {
-	    values["inputs"] = values["inputs"] " " ARGV[optind]; optind++
+	    values["inputs"] = values["inputs"] " " ARGV[optind]
+	    optind++
 	}
     }
-    # assign environment or defaults as required
+    for (i=1;ARGC>i;i++) { delete ARGV[i] }
     for (value in values) {
-	if (!values[value] && (value in environs) && ENVIRON[environs[value]]) {
+	if (!values[value] && (value in environs) && (environs[value] in ENVIRON) && ENVIRON[environs[value]]) {
 	    print_debug("assigning value for " value " from environment " environs[value])
 	    values[value] = ENVIRON[environs[value]]
 	}
@@ -1903,10 +1975,9 @@ BEGIN {
 	    values[value] = defaults[value]
 	}
     }
-    # if there are no inputs, or the input file name is '-' then process standard input
     if (!values["inputs"] || values["inputs"] == "-") {
-	print_debug("no inputs, using /dev/stdin")
-	values["inputs"] = "/dev/stdin"
+	print_debug("no inputs, using " stdin)
+	values["inputs"] = stdin
     }
     split(values["inputs"], inputs)
     read_inputs(inputs)
@@ -1934,10 +2005,23 @@ BEGIN {
 	write_packagedir(values["packagedir"])
     exit 0
 }
+END {
+    if (written[stdout]) {
+	close(stdout)
+	written[stdout] = 0
+    }
+    if (written[stderr]) {
+	close(stderr)
+	written[stderr] = 0
+    }
+}
 
 # =============================================================================
 #
 # $Log: strconf.awk,v $
+# Revision 1.1.2.7  2011-03-17 07:01:29  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.6  2011-02-28 19:51:28  brian
 # - better repository build
 #

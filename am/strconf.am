@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-02-07 04:48:31 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-17 07:01:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
+## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -137,8 +137,8 @@ dist_sbin_SCRIPTS	+= $(STRCONF_DEVICES)
 ## PKG_BUILD_INDEP
 endif
 
-if RPM_BUILD_KERNEL
-## RPM_BUILD_KERNEL
+if PKG_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 
 ## Invoke creation of any installed devices if the installation directory is configured.
 
@@ -156,15 +156,15 @@ uninstall-devices: $(STRCONF_DEVICES)
 		./$(STRCONF_DEVICES) --remove ; \
 	fi
 
-## RPM_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 else
-## RPM_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 
 install-devices:
 
 uninstall-devices:
 
-## RPM_BUILD_KERNEL
+## PKG_BUILD_KERNEL
 endif
 
 INSTALL_EXEC_HOOK	+= install-devices
@@ -200,6 +200,9 @@ EXTRA_DIST		+= $(STRCONF_CONFIGS)
 ## =============================================================================
 ##
 ## $Log: strconf.am,v $
+## Revision 1.1.2.8  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
 ## Revision 1.1.2.7  2011-02-07 04:48:31  brian
 ## - updated configure and build scripts
 ##

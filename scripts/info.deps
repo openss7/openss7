@@ -28,6 +28,7 @@ function scanincludes(file)
 }
 
 BEGIN {
+    LINT = "yes"
     if ("srcdir" in ENVIRON)
 	srcdir = EINVRON["srcdir"]
     if ("top_srcdir" in ENVIRON)
@@ -53,6 +54,7 @@ BEGIN {
     line["deps"] = ".deps/info.Pd: " "\\\n\t" t depends["deps"]
     for (p in figures) {
 	for (v in line ) {
+	    if (v == "deps") continue
 	    f0 = p suffixes[v]
 	    f1 = srcdir "/" f0
 	    f2 = top_srcdir "/scripts/" f0
@@ -81,12 +83,13 @@ BEGIN {
 	} else {
 	    pd = f0
 	}
-	for (v in line)
+	for (v in line) {
+	    if (v == "deps" && p!~/\.texi$/) continue
 	    line[v] = line[v] " \\\n\t" pd
+	}
     }
     for (v in line) {
 	print line[v]
-	delete line[v]
     }
 }
 

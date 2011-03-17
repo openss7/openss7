@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: snmp.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-21 11:06:11 $
+# @(#) $RCSfile: snmp.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-17 07:01:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,14 +48,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-21 11:06:11 $ by $Author: brian $
+## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 
 ##
 # These targets are responsible for installing the default net-snmp agent configuration information
@@ -216,7 +216,7 @@ endif
 ## INSTALL_INITSCRIPTS
 endif
 
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 ## PKG_BUILD_INDEP
 endif
@@ -246,6 +246,9 @@ uninstall-agents: uninstall-snmp
 ## =============================================================================
 ##
 ## $Log: snmp.am,v $
+## Revision 1.1.2.5  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
 ## Revision 1.1.2.4  2009-07-21 11:06:11  brian
 ## - changes from release build
 ##

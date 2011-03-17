@@ -1,5 +1,5 @@
 OpenSS7 -- kernel module notes.  2011-02-12
-$Id: NOTES.kmod,v 1.1.2.1 2011-02-17 18:35:26 brian Exp $
+$Id: NOTES.kmod,v 1.1.2.2 2011-03-17 07:01:26 brian Exp $
 Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
@@ -16,13 +16,13 @@ On recent distributions, kernel modules can be updated automatically
 using the kABI method.  This method is applicable to all RPM-based
 distributions.  The method uses kernel symbol and symset 'Requires' and
 'Provides' capabilities to determine the compatability of kernel modules
-with an upgraded kernel (typically security updates).  The script
+with an upgraded kernel (typically security updates).  The scripts
 
   /sbin/weak-modules (on redhat)
-  /usr/lib/module-init-tools/weak-modules  (on SUSE)
-  /usr/lib/module-init-tools/weak-modules2 (on SUSE)
+  /usr/lib/module-init-tools/weak-modules  (on SuSE)
+  /usr/lib/module-init-tools/weak-modules2 (on SuSE)
 
-is used.  OpenSS7 kernel modules cannot have weak-updates applied.  This
+are used.  OpenSS7 kernel modules cannot have weak-updates applied.  This
 is because, unbeknownst to the kABI approach, our kernel modules may be
 accessing kernel symbols inside the kernel by address (particularly the
 specfs.ko module).  Therefore, the weak update will update exported
@@ -31,23 +31,130 @@ kernel symbols but will break non-exported ones.
 RedHat Approach:
 
 The fedora/redhat form (weak-modules) only performs weak updates for
-kernel modules that are in /lib/modules/$(uname -r)/extras.  Because we
-do not install our kernel moduels in extras, the fedora/redhat form will
-not attempt to perform weak-updates on our modules.
+kernel modules that are in /lib/modules/$(uname -r)/extra.  Because we
+do not install our kernel modules in extra, the fedora/redhat form will
+not attempt to perform weak-updates on our (openss7) modules.
 
-SUSE Approach:
+The fedora/redhat form (weak-modules) will, however, attempt to perform
+weak updates on kernel modules (whether under RPM or not) that exist in
+the /lib/modules/$(uname -r)/extra subdirectory.  However, to resolve
+whether a given kernel supports the weak update, the symbols from
+/boot/symvers-$(uname r).gz (i.e. provided "by the kernel and mainline
+modules") are checked against the symbols from the kernel module
+acquired using /sbin/modprobe with the --dump-modversions flag.  The
+issue here is that the /boot/symvers-$(uname -r).gz is simply a
+compressed form of the Module.symvers file generated when the kernel and
+its associated modules are built.  Therefore, if this file is not
+supplemented with STREAMS symbols, modules that depend on STREAMS
+symbols will simply not be updated.  Fedora/redhat provide the symvers
+file in the kernel package, so it should always be available when weak
+updates are performed.  (Weak updates are normally performed in the
+%postin script in the kernel rpm package.)
 
-The SUSE form (weak-modules2) is somewhat different in that it uses an
-rpm search on "*-kmp-$flavor" to determine the install kernel modules
-that are suitable for weak-updates.  To keep the SUSE version from
-performing weak-updates on our kernel module sub-package, simply do not
-name it in accordance with the SUSE KMP conventions.
+Therefore, to ensure that the weak-modules process is begin performed
+correctly, it is necessary that we slip STREAMS symbols into the
+/boot/symvers-$(uname -r).gz file.  This can be accomplished by using a
+%triggerin and %triggerun trigger script.  When a kernel is installed,
+the openss7-kernel package triggerin script is triggerred after the
+kernel files have been installed and any %post script run for the
+kernel.  This %post kernel script will include running weak-modules that
+will fail for STREAMS modules.  When the openss7-kernel %triggerin
+script is run, we strap our Module.symvers symbols into
+/boot/symvers-$(uname -r).gz and rerun weak-modules to peform a weak
+module update on any STREAMS modules.  If /boot/symvers-$(uname -r).gz
+does not exist, we can create it by concatenating our System.symvers and
+Module.symvers files from the openss7-kernel package.  We used to place
+these files in the openss7-devel-kernel package, but they need to now be
+moved to the openss7-kernel package.
+
+SuSE Approach:
+
+The SuSE Code 11 KMP form (weak-modules2) is somewhat different in that
+it uses an rpm search on "*-kmp-$flavor" to determine the install kernel
+modules that are suitable for weak-updates.  To keep the SuSE version
+from performing weak-updates on our kernel module sub-package, simply do
+not name it in accordance with the SuSE KMP conventions.
+
+The SuSE Code 10 form (weak-modules) is similary to that of the RedHat
+approach.  It performs weak updates for kernel modules that are in
+/lib/modules/$(uname -r)/{extra,updates}.  Because we do not install or
+kernel modules in {extra,updates}, the SuSE Code 10 form will not
+attempt to perform weak-updates on our (openss7) modules.
+
+The SuSE Code 11 KMP form (weak-modules2) will, however, attempt to
+perform weak updates on kernel modules that follow the SuSE KMP
+specification.  This includes special naming and only updates modules
+that are installed under RPM and have a name of the form
+'*-kmp-$flavor'.  It does not matter, however, whether the kernel
+modules themselves are installed in the 'extra' or 'updates' module
+subdirectory.  To check whether modules are suitable for weak update,
+/sbin/depmod is used with the special SuSE '-E' flag which is fed the
+/boot/symvers-$(uname -r).gz file, or, in the absence of that file, the
+'-F' flag is used with the /boot/System.map-$(uname -r) file.  Now, of
+course, the System.map file only contains the kernel exported by the the
+kernel proper and none of the associated modules.  This is only a
+problem when a KMP uses symbols from modules of the kernel instead of
+the kernel proper.
+
+Therefore, to ensure that the weak modules process is being performed
+correctly, it is necessary that we slip STREAMS symbols into the
+/boot/symvers-$(uname -r).gz file.  This can eb accomplished by using a
+%triggerin and %triggerun trigger script.  When a kernel or kernel-devel
+package is installed, the openss7-kernel or openss7-kernel-devel package
+triggerin script is triggered after the kernel files have been installed
+and any %post script run for the kernel.  This %post kernel script will
+include any running weak-modules2 that will ignore STREAMS modules
+(unless they are also KMP modules).  When the openss7-kernel %triggerin
+script is run, create the /boot/symvers-$(uname -r).gz file using the
+System.symvers and Modules.symvers files from the openss7-kernel
+package and run the Code 11 weak-updates2 again so that any KMP modules
+depending on STREAMS will be weak updated.  Also, when the
+openss7-kernel-devel %triggerin script is run, recreate the
+/boot/symvers-$(uname -r).gz file, because our version will be
+overwritten by the installation of the kernel-devel package.
+
+The SuSE Code 10 form (weak-modules) will, however, attempt to perform
+weak updates on kernel modules (whether under RPM or not) that exist in
+the /lib/modules/$(uname -r)/extra subdirectory.  However, to resolve
+whether a given kernel modules supports the weak update, the symbols
+from /boot/symvers-$(uname -r).gz (i.e. provided "by the kernel and
+mainline modules") are checked against the symbols from the kernel
+module acquired using /sbin/modeprobe with the --dump-modversions flag.
+The issue here is that the /boot/symvers-$(uname -r).gz is simply a
+compressed form of the Module.symvers file generated when the kernel and
+its associated modules are built.  Therefore, if this file is not
+supplemented with STREAMS symbols, modules that depend on STREAMS
+symbols will simply not be updated.  A wrinkle is that SuSE Code 11 has
+the /boot/symvers-$(uname -r).gz file provided by the kernel-devel
+package instead of the kernel package.  Without the symvers file
+present, weak-updates will simply not be performed in this way.
+
+Therefore, to ensure that the weak modules process is begin performed
+correctly, it is necessary that we slip STREAMS symbols into the
+/boot/symvers-$(uname -r).gz file.  This can be accomplished by using a
+%triggerin and %triggerun trigger script.  When a kernel is installed,
+the openss7-kernel package triggerin script is triggerred after the
+kernel files have been installed and any %post script run for the
+kernel.  This %post kernel script will include running weak-modules2
+that will ignore STREAMS modules (unless they are also KMP modules, see
+above).  When the openss7-kernel %triggerin script is run, we strap our
+Module.symvers symbols into /boot/symvers-$(uname -r).gz and run the
+Code 10 weak-modules to peform a weak module update on any STREAMS
+modules.  We must also rerun weak-modules2 to weak-update any KMP
+modules that exist in the /lib/modules/$(uname -r)/extra subdirectory,
+as the SuSE weak-modules script only considers the 'updates'
+subdirectory.  If /boot/symvers-$(uname -r).gz does not exist (because
+the kernel-devel package is not loaded), we can create it by
+concatenating our System.symvers and Module.symvers files from the
+openss7-kernel package.  (We used to place these files in the
+openss7-devel-kernel package, but they need to now be moved to the
+openss7-kernel package.)
 
 Kernel Updates:
 ---------------
 
 There are two fundamental ways of signalling updates to kernel modules
-when kernels are updated: the Fedora way and the SUSE way.
+when kernels are updated: the Fedora way and the SuSE way.
 
 RedHat Approach:
 
@@ -103,15 +210,15 @@ The wrinkles with the fedora kmod approach are as follows:
 - another possible approach is providing our own YUM plugin in the
   openss7-repo package.
 
-SUSE Approach:
+SuSE Approach:
 
-For Code 9, SUSE used the kernel-update-tool behind YaST2 to perform a
+For Code 9, SuSE used the kernel-update-tool behind YaST2 to perform a
 similary approach.  For Code 10 and 11, this was integrated into
 libzypp.
 
-The SUSE approach appears to use the same upgrade resolution approach as
+The SuSE approach appears to use the same upgrade resolution approach as
 RedHat, which is embedding the kernel version in the version string for
-the modules rpm package.  However, the SUSE approach does not use
+the modules rpm package.  However, the SuSE approach does not use
 'kernel-modules'.  Some notes:
 
 - recent code version put 'Provides: multiversion(kernel)' in KMP
@@ -124,9 +231,9 @@ the modules rpm package.  However, the SUSE approach does not use
   package, whether it uses weak-updates or not.  Therefore, we always
   define 'Provides: multiversion(kernel)'.
 
-  Note that, by default, SUSE does not load more that one kernel
+  Note that, by default, SuSE does not load more that one kernel
   version at a time.  There are several flavors for each version of
-  kernel, but SUSE does not normally load more than one version.
+  kernel, but SuSE does not normally load more than one version.
   Setting the multiversion = kernel, then more than one version of
   kernel will be loaded, but that does not handle KMP or other kernel
   modules.  So, when set to other than the default, multiversion should
@@ -137,7 +244,7 @@ the modules rpm package.  However, the SUSE approach does not use
 
 - older code versions put 'Requires: kernel%{kernel_flavor}' and newer
   code versions put 'Enhances: kernel%{kernel_flavor}', where the
-  'Enhances' keyword is new only to the SUSE rpm program.
+  'Enhances' keyword is new only to the SuSE rpm program.
 
 - all code versions include 'Provides: %{name}-kmp%{kernel_flavor}' and
   'Provides: %{name}-kmp'.
@@ -227,7 +334,7 @@ Tricks:
 -------
 
 Tricks for keeping OpenSS7 kernel modules from not being weak-updated
-using RH weak-modules or SUSE weak-modules2 from module-init-tools:
+using RH weak-modules or SuSE weak-modules2 from module-init-tools:
 
 -----
 

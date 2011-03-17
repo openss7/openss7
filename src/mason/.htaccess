@@ -22,6 +22,20 @@
 	SetHandler perl-script
 	PerlHandler HTML::Mason::ApacheHandler
 </FilesMatch>
+<Files "OPENSS7.service">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "Client OpenSS7 Repository Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	Require group hosts
+	Satisfy all
+	ForceType "text/plain"
+	SetHandler perl-script
+	PerlHandler HTML::Mason::ApacheHandler
+</Files>
 <Files "mirrorlist">
 	Order allow,deny
 	Allow from all

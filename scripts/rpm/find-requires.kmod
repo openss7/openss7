@@ -2,23 +2,42 @@
 
 BEGIN {
     print "D: Executing: " ARGV[0] " -f find-requires.kmod" >"/dev/stderr"
-    RPM_BUILD_DIR = ENVIRON[RPM_BUILD_DIR]
-    RPM_PACKAGE_NAME = ENVIRON[RPM_PACKAGE_NAME]
-    RPM_PACKAGE_VERSION = ENVIRON[RPM_PACKAGE_VERSION]
-    RPM_PACKAGE_RELEASE = ENVIRON[RPM_PACKAGE_RELEASE]
-    dir = RPM_BUILD_DIR "/" RPM_PACKAGE_NAME "-" RPM_PACKAGE_VERSION
+    dir = "."
+    if ("RPM_BUILD_DIR" in ENVIRON && "RPM_PACKAGE_NAME" in ENVIRON && "RPM_PACKAGE_VERSION" in ENVIRON) {
+	RPM_BUILD_DIR       = ENVIRON["RPM_BUILD_DIR"]
+	RPM_PACKAGE_NAME    = ENVIRON["RPM_PACKAGE_NAME"]
+	RPM_PACKAGE_VERSION = ENVIRON["RPM_PACKAGE_VERSION"]
+	dir = RPM_BUILD_DIR "/" RPM_PACKAGE_NAME "-" RPM_PACKAGE_VERSION
+    }
     if (ARGC > 1 && ARGV[1]) {
 	dir = ARGV[1]
 	delete ARGV[1]
     }
-    RPM_BUILD_ROOT = ENVIRON[RPM_BUILD_ROOT]
+    root = "."
+    if ("RPM_BUILD_ROOT" in ENVIRON) {
+	RPM_BUILD_ROOT = ENVIRON["RPM_BUILD_ROOT"]
+	root = RPM_BUILD_ROOT
+    }
     if (ARGC > 2 && ARGV[2]) {
-	RPM_BUILD_ROOT = ARGV[2]
+	root = ARGV[2]
 	delete ARGV[2]
     }
-    sub(/\/+$/, "", RPM_BUILD_ROOT)
-    find = "find /boot /usr/src/kernels -type f -name 'symsets-*.tar.gz' 2>/dev/null"
+    sub(/\/+$/, "", root)
+    kversion = "*"
+    if ("RPM_KVERSION" in ENVIRON) {
+	RPM_KVERSION = ENVIRON["RPM_KVERSION"]
+	kversion = RPM_KVERSION
+    }
+    if (ARGC > 3 && ARGV[3]) {
+	kversion = ARGV[3]
+	delete ARGV[3]
+    }
+    for (i=4;ARGC>i;i++) {
+	delete ARGV[i]
+    }
+    find = "find /boot /usr/src/kernels " dir " -type f -name 'symsets-" kversion ".tar.gz' 2>/dev/null"
     while ((find | getline file)) {
+	print "D: Unpacking: " file >"/dev/stderr"
 	tar = "tar -tzf " file
 	while ((tar | getline set)) {
 	    if (set~/\/$/)
@@ -36,8 +55,9 @@ BEGIN {
 	    }
 	    class = set
 	    sub(/^.*\//, "", class)
-	    sub(/\..*/, "", class)
+	    sub(/\..*$/, "", class)
 	    hash = set
+	    sub(/^.*\//, "", hash)
 	    sub(/^.*\./, "", hash)
 	    list = "tar -xzOf " file " " set
 	    while ((list | getline)) {
@@ -229,6 +249,7 @@ END {
 	    continue
 	}
 	indices[j] = ind[2]
+	versions[ind[2]] = ind[1]
 	j++
     }
     for (s in requiredsets) {
@@ -236,15 +257,33 @@ END {
 	indices[j] = ind[2]
 	j++
     }
+    needskernel = 0
     n = asort(indices)
-    for (i = 1; i <= n; i++)
-	if (!havesymsets || indices[i]!~/ksym\(/)
+    for (i = 1; i <= n; i++) {
+	if (!havesymsets || indices[i]!~/^ksym\(/) {
 	    print indices[i]
+	} else {
+	    print "D: Skipping requires: (" versions[indices[i]] ") " indices[i] >"/dev/stderr"
+	    kernels[versions[indices[i]]] = 1
+	    needskernel = 1
+	}
+    }
+    if (needskernel) print "D: Kernel required due to use of non-kABI symbols" >"/dev/stderr"
+    for (kernel in kernels) {
+	flavor = kernel
+	gsub(".*-", "", flavor)
+	if (flavor~/^(default|xen|ec2|trace)$/) {
+	    flavor = "-" flavor
+	} else {
+	    flavor = ""
+	}
+	print "kernel" flavor " = " kernel
+    }
 }
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires.kmod,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:48:33 $
+# @(#) $RCSfile: find-requires.kmod,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-17 07:01:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -290,11 +329,14 @@ END {
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:33 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-requires.kmod,v $
+# Revision 1.1.2.4  2011-03-17 07:01:29  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.3  2011-02-07 04:48:33  brian
 # - updated configure and build scripts
 #

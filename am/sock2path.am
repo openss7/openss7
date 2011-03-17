@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: sock2path.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2009-07-04 03:51:32 $
+# @(#) $RCSfile: sock2path.am,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-17 07:01:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,14 +48,14 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2009-07-04 03:51:32 $ by $Author: brian $
+## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
-if RPM_BUILD_USER
-## RPM_BUILD_USER
+if PKG_BUILD_USER
+## PKG_BUILD_USER
 
 ##
 # These targets are responsible for installing the sock2path configuration
@@ -101,7 +101,7 @@ UNINSTALL_LOCAL		+= uninstall-sock2path
 
 POST_UNINSTALL_MA	+= post-sock2path
 
-## RPM_BUILD_USER
+## PKG_BUILD_USER
 endif
 ## PKG_BUILD_INDEP
 endif
@@ -111,6 +111,9 @@ EXTRA_DIST		+= src/util/sysconfig/sock2path
 ## =============================================================================
 ##
 ## $Log: sock2path.am,v $
+## Revision 1.1.2.4  2011-03-17 07:01:27  brian
+## - build and repo system improvements
+##
 ## Revision 1.1.2.3  2009-07-04 03:51:32  brian
 ## - updates for release
 ##

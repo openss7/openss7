@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-01-12 03:44:13 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-17 07:01:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-12 03:44:13 $ by $Author: brian $
+# Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -56,33 +56,41 @@
 # consists of the sysmap file, the modules directory, specific modpost input
 # files, and a sysver file.
 
+function getline_command(cmd)
+{
+    cmd | getline; close(cmd); return $0
+}
 function date(format) {
     if (format) {
-	("date +\"" format "\"") | getline
-	close("date +\"" format "\"")
+	return getline_command("date +\"" format "\"")
     } else {
-	"date" | getline
-	close("date")
+	return getline_command("date -uIseconds")
     }
-    return $0
 }
 function year()
 {
     return date("%Y")
 }
-function allyears(    year, this, last, sep, result)
+function allyears(    this, last, sep, result)
 {
-    last = year()
-    for (this = 2011; this <= last; this++) {
+    last = year(); sep = ""; result = ""
+    for (this = 2009; this <= last; this++) {
 	result = result sep this
 	sep = ", "
     }
     return result
 }
+function print_info(string)
+{
+    if (values["quiet"] == 0 && values["verbose"] > 0) {
+	print blu me ": I: " string std > stderr
+	written[stderr] = 1
+    }
+}
 function print_debug(string)
 {
     if (values["debug"] > 0) {
-	print me ": D: " string > stderr
+	print mag me ": D: " string std > stderr
 	written[stderr] = 1
     }
 }
@@ -93,8 +101,8 @@ function print_error(string)
 }
 function print_warn(string)
 {
-    if (values["verbose"] > 0 || values["debug"] > 0) {
-	print blu me ": W: " string std > stderr
+    if (values["quiet"] == 0 || values["verbose"] > 0 || values["debug"] > 0) {
+	print org me ": W: " string std > stderr
 	written[stderr] = 1
     }
 }
@@ -104,7 +112,7 @@ function usage(output)
 	return
     print "\
 modpost:\n\
-  $Id: modpost.awk,v 1.1.2.6 2011-01-12 03:44:13 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
 Usage:\n\
   modpost [options] [MODULE ...]\n\
   modpost -h\n\
@@ -164,18 +172,18 @@ Options:\n\
       don't perform the actions, just check them\n\
   -q, --quiet, --silent\n\
       suppress normal output\n\
-  -D, --debug [LEVEL]\n\
-      increase or set debugging verbsosity\n\
+  -D, --debug[=LEVEL]\n\
+      increase or set debug level\n\
       [default: " defaults["debug"] "]\n\
-  -v, --verbose [LEVEL]\n\
-      increase or set output verbosity\n\
+  -v, --verbose[=LEVEL]\n\
+      increase or set verbosity level\n\
       [default: " defaults["verbose"] "]\n\
   -h, --help\n\
-      prints this usage information and exist\n\
+      display this usage information and exit\n\
   -V, --version\n\
-      prints the version and exit\n\
+      display script version and exit\n\
   -C, --copying\n\
-      prints copying permissions and exist\
+      display copying permissions and exit\n\
 " > output
     written[output] = 1
 }
@@ -185,7 +193,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.6 2011-01-12 03:44:13 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -208,7 +216,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.6 2011-01-12 03:44:13 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -251,11 +259,9 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg, wantarg)
 {
     option = ""; optval = ""; optarg = ""; pos = 0; needarg = 0; wantarg = 0
-    if (optind == 0) {
-	optind = 1; more = "" }
+    if (optind == 0) { optind = 1; more = "" }
     while ((optind < argc) || (more != "")) {
-	if (more) {
-	    arg = "-" more; more = "" }
+	if (more) { arg = "-" more; more = "" }
 	else { arg = argv[optind]; optind++ }
 	if (arg ~ /^--?[a-zA-Z0-9]/) {
 	    if (needarg) {
@@ -290,10 +296,8 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 		    usage(stderr)
 		    exit 2
 		}
-		if (longopts[option] ~ /::/) {
-		    wantarg = 1 } else
-		if (longopts[option] ~ /:/ ) {
-		    needarg = 1 }
+		if (longopts[option] ~ /::/) { wantarg = 1 } else
+		if (longopts[option] ~ /:/ ) { needarg = 1 }
 		optval = substr(longopts[option], 1, 1)
 		for (option in longopts)
 		    if (substr(longopts[option], 1, 1) == optval)
@@ -326,10 +330,8 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 				break
 			return optval
 		    }
-		    if (substr(optstring, pos+2, 1) == ":") {
-			wantarg = 1 } else
-		    if (substr(optstring, pos+1, 1) == ":") {
-			needarg = 1 }
+		    if (substr(optstring, pos+2, 1) == ":") { wantarg = 1 } else
+		    if (substr(optstring, pos+1, 1) == ":") { needarg = 1 }
 		    for (option in longopts)
 			if (substr(longopts[option], 1, 1) == optval)
 			    break
@@ -357,6 +359,10 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	return -1
     }
     return -1
+}
+function system_command(cmd)
+{
+    print_debug(cmd); return system(cmd)
 }
 function show_junk(line, position)
 {
@@ -920,21 +926,35 @@ function write_mymodules(modules,    i, basename, file, modname)
 BEGIN {
 #   LINT = "yes"
     me = "modpost.awk"
-    "uname -r" | getline uname; close("uname -r")
-    "pwd"      | getline pwd  ; close("pwd")
     if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"
     if (ENVIRON["TERM"] == "dumb" || system("test -t 1 -a -t 2") != 0) {
 	stdout = "/dev/stderr"; written[stdout] = 0
 	stderr = "/dev/stderr"; written[stderr] = 0
 	cr = ""; lf = "\n"
-	red = ""; grn = ""; lgn = ""; blu = ""; std = ""
+	blk = ""; hblk = ""
+	red = ""; hred = ""
+	grn = ""; hgrn = ""
+	org = ""; horg = ""
+	blu = ""; hblu = ""
+	mag = ""; hmag = ""
+	cyn = ""; hcyn = ""
+	std = ""
     } else {
 	stdout = "/dev/stdout"; written[stdout] = 0
 	stderr = "/dev/stderr"; written[stderr] = 0
 	cr = "\r"; lf = ""
-	red = "\033[0;31m"; grn = "\033[0;32m"; lgn = "\033[1;32m"; blu = "\033[1;34m"; std = "\033[m"
+	blk = "\033[0;30m"; hblk = "\033[1;30m"
+	red = "\033[0;31m"; hred = "\033[1;31m"
+	grn = "\033[0;32m"; hgrn = "\033[1;32m"
+	org = "\033[0;33m"; horg = "\033[1;33m"
+	blu = "\033[0;34m"; hblu = "\033[1;34m"
+	mag = "\033[0;35m"; hmag = "\033[1;35m"
+	cyn = "\033[0;36m"; hcyn = "\033[1;36m"
+	std = "\033[m"
     }
-    longopts["modules"      ] = "M:"                                                             ; defaults["modules"      ] = ""
+    if ("kversion" in ENVIRON) { uname = ENVIRON["kversion"] }
+    else                       { uname = getline_command("uname -r") }
+    longopts["modules"      ] = "M:" ;                                                             defaults["modules"      ] = ""
     longopts["cachefile"    ] = "c:" ; environs["cachefile"    ] = "MODPOST_CACHE"               ; defaults["cachefile"    ] = "modpost.cache"
     longopts["moddir"       ] = "d:" ; environs["moddir"       ] = "MODPOST_MODDIR"              ; defaults["moddir"       ] = "/lib/modules/" uname
     longopts["filename"     ] = "F:" ; environs["filename"     ] = "MODPOST_SYSMAP"              ; defaults["filename"     ] = "/boot/System.map-" uname
@@ -944,14 +964,14 @@ BEGIN {
     longopts["unload"       ] = "u"  ; environs["unload"       ] = "CONFIG_MODULE_UNLOAD"        ; defaults["unload"       ] = 0
     longopts["modversions"  ] = "m"  ; environs["modversions"  ] = "CONFIG_MODVERSIONS"          ; defaults["modversions"  ] = 0
     longopts["allsrcversion"] = "a"  ; environs["allsrcversion"] = "CONFIG_MODULE_SRCVERSION_ALL"; defaults["allsrcversion"] = 0
-    longopts["exportsyms"   ] = "x"                                                              ; defaults["exportsyms"   ] = 0
+    longopts["exportsyms"   ] = "x"  ;                                                             defaults["exportsyms"   ] = 0
     longopts["pkgdirectory" ] = "p:" ; environs["pkgdirectory" ] = "PACKAGE_LCNAME"              ; defaults["pkgdirectory" ] = "openss7"
-    longopts["dryrun"       ] = "n"                                                              ; defaults["dryrun"       ] = 0
-    longopts["dry-run"      ] = "n"                                                              ; defaults["dry-run"      ] = 0
-    longopts["quiet"        ] = "q"                                                              ; defaults["quiet"        ] = 0
-    longopts["silent"       ] = "q"                                                              ; defaults["silent"       ] = 0
-    longopts["debug"        ] = "D::"                                                            ; defaults["debug"        ] = 0
-    longopts["verbose"      ] = "v::"                                                            ; defaults["verbose"      ] = 1
+    longopts["dryrun"       ] = "n"  ;                                                             defaults["dryrun"       ] = 0
+    longopts["dry-run"      ] = "n"  ;                                                             defaults["dry-run"      ] = 0
+    longopts["quiet"        ] = "q"  ;                                                             defaults["quiet"        ] = 0
+    longopts["silent"       ] = "q"  ;                                                             defaults["silent"       ] = 0
+    longopts["debug"        ] = "D::";                                                             defaults["debug"        ] = 0
+    longopts["verbose"      ] = "v::";                                                             defaults["verbose"      ] = 0
     longopts["help"         ] = "h"  ;
     longopts["version"      ] = "V"  ;
     longopts["copying"      ] = "C"  ;
@@ -966,12 +986,9 @@ BEGIN {
     values["debug"        ] = defaults["debug"        ]
     values["verbose"      ] = defaults["verbose"      ]
     values["quiet"        ] = defaults["quiet"        ]
-    if ("V" in ENVIRON) {
-	if (ENVIRON["V"] == 1) {
-	    values["debug"        ] = 2
-	    values["verbose"      ] = 2
-	    values["quiet"        ] = 0
-	}
+    if ("V" in ENVIRON && ENVIRON["V"] == 1) {
+	values["quiet"  ] = 0
+	values["verbose"] = 2
     }
     optstring = "M:c:d:F:i:o:s:umaxp:nqD::v::hVC"
     optind = 0
@@ -988,18 +1005,22 @@ BEGIN {
 	else               { usage(  stderr); exit 2 }
     }
     if (optind < ARGC) {
-	values["modules"] = ARGV[optind]
-	optind++
+	values["modules"] = ARGV[optind]; optind++
 	while (optind < ARGC) {
 	    values["modules"] = values["modules"] " " ARGV[optind]
 	    optind++
 	}
     }
+    for (i=1;ARGC>i;i++) { delete ARGV[i] }
     for (value in values) {
-	if (!values[value] && (value in environs) && (environs[value] in ENVIRON) && ENVIRON[environs[value]])
+	if (!values[value] && (value in environs) && (environs[value] in ENVIRON) && ENVIRON[environs[value]]) {
+	    print_debug("assigning value for " value " from environment " environs[value])
 	    values[value] = ENVIRON[environs[value]]
-	if (!values[value] && (value in defaults) && defaults[value])
+	}
+	if (!values[value] && (value in defaults) && defaults[value]) {
+	    print_debug("assigning value for " value " from default " defaults[value])
 	    values[value] = defaults[value]
+	}
     }
     cache_dirty = 1
     if (("cachefile" in values) && values["cachefile"] && (read_cachefile(values["cachefile"]) != -1))
@@ -1026,6 +1047,9 @@ BEGIN {
 	    write_modsymver(values["outfile"])
 	write_mymodules(modules)
     }
+    exit 0
+}
+END {
     if (written[stdout]) {
 	close(stdout)
 	written[stdout] = 0
@@ -1034,12 +1058,14 @@ BEGIN {
 	close(stderr)
 	written[stderr] = 0
     }
-    exit 0
 }
 
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.7  2011-03-17 07:01:29  brian
+# - build and repo system improvements
+#
 # Revision 1.1.2.6  2011-01-12 03:44:13  brian
 # - update awk scripts and work around gawk close bug
 #
@@ -1059,4 +1085,4 @@ BEGIN {
 # - new awk scripts for release check
 #
 # =============================================================================
-# vim: sw=4 fo+=tcqlorn
+# vim: ft=awk sw=4 nocin nosi fo+=tcqlorn
