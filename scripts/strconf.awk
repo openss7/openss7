@@ -57,7 +57,8 @@ function getline_command(cmd)
 {
     cmd | getline; close(cmd); return $0
 }
-function date(format) {
+function date(format)
+{
     if (format) {
 	return getline_command("date +\"" format "\"")
     } else {
@@ -77,17 +78,33 @@ function allyears(    this, last, sep, result)
     }
     return result
 }
-function print_info(string)
+function print_vinfo(level, string)
 {
-    if (values["quiet"] == 0 && values["verbose"] > 0) {
-	print blu me ": I: " string std > stderr
+    if ((values["quiet"] == 0) && (values["verbose"] >= level)) {
+	print blu me ": I: " string std > stdout
+	written[stdout] = 1
+    }
+}
+function print_vmore(level, string)
+{
+    if ((values["quiet"] == 0) && (values["verbose"] >= level)) {
+	printf "%s", blu me ": I: " string std cr lf > stdout
+	fflush(stdout)
+	written[stdout] = 1
+    }
+}
+function print_debug(level, string)
+{
+    if (values["debug"] >= level) {
+	print mag me ": D: " string std > stderr
 	written[stderr] = 1
     }
 }
-function print_debug(string)
+function print_dmore(level, string)
 {
-    if (values["debug"] > 0) {
-	print mag me ": D: " string std > stderr
+    if (values["debug"] >= level) {
+	printf "%s", mag me ": D: " string std cr lf > stderr
+	fflush(stderr)
 	written[stderr] = 1
     }
 }
@@ -95,28 +112,115 @@ function print_error(string)
 {
     print red me ": E: " string std > stderr
     written[stderr] = 1
+    count_errs++
 }
 function print_warn(string)
 {
-    if (values["quiet"] == 0 || values["verbose"] > 0 || values["debug"] > 0) {
+    if ((values["quiet"] == 0) || (values["verbose"] > 0) || (values["debug"] > 0)) {
 	print org me ": W: " string std > stderr
 	written[stderr] = 1
     }
+    count_warn++
 }
 function usage(output)
 {
     if (values["quiet"])
 	return
     print "\
-strconf:\n\
+" me ":\n\
   $Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
 Usage:\n\
-  strconf [options] [INPUT ...]\n\
-  strconf -H\n\
-  strconf -V\n\
-  strconf -C\
+  awk -f " me " -- [options] [INPUT ...]\n\
+  awk -f " me " -- -" longopts["help"] "\n\
+  awk -f " me " -- -" longopts["version"] "\n\
+  awk -f " me " -- -" longopts["copying"] "\
 " > output
     written[output] = 1
+}
+function help_usage(name,  line,sep,dflt,env)
+{
+    line = ""; sep = ""; dflt = ""; env = ""
+    if (name in defaults) {
+	if (longopts[name]~/:/) {
+	    dflt = defaults[name]
+	} else {
+	    if (defaults[name]) { dflt = "yes" } else { dflt = "no" }
+	}
+	if (dflt) {
+	    line = line sep "[default: " dflt "]"; sep = " "
+	}
+    }
+    if (name in environs) {
+	if (longopts[name]!~/:/) env = "?"
+	if (environs[name])
+	    line = line sep "{" env environs[name] "}"; sep = " "
+    }
+    return line
+}
+function help_opttags(name,  line,char,opt,oth)
+{
+    line = ""
+    if (name in longopts) {
+	opt = longopts[name]
+	if (opt~/[[:alnum:]]/) {
+	    char = opt
+	    gsub(/:/,"",char)
+	    line = "-" char ", --" name
+	} else {
+	    line = "--" name
+	}
+	if (opt~/::$/) { line = line " [" toupper(name) "]" } else
+	if (opt~/:$/)  { line = line " " toupper(name) }
+	if (opt~/[[:alnum:]]/) {
+	    for (oth in longopts) {
+		if (opt != longopts[oth]) continue
+		if (oth == name) continue
+		if (opt~/::$/) { line = line ", --" oth " [" toupper(oth) "]" } else
+		if (opt~/:$/)  { line = line ", --" oth " " toupper(oth) } else
+			       { line = line ", --" oth }
+	    }
+	}
+    }
+    return line
+}
+function help_option(output, name)
+{
+    printf "  %s\n", help_opttags(name) > output
+    if (name in descrips && descrips[name])
+    printf "      %s\n", descrips[name] > output
+    if ((name in defaults || name in environs) && help_usage(name))
+    printf "      %s\n", help_usage(name) > output
+}
+function help_options(output,		opt,char,pos,long,n,sorted,i)
+{
+    if (!optstring) return
+    print "Options:" > output; written[output] = 1
+    # index all of the long options
+    for (opt in longopts) {
+	char = substr(longopts[opt],1,1)
+	if (char && char != ":") {
+	    if (char in optchars) {
+		if (char == substr(opt,1,1))
+		    optchars[char] = opt
+	    } else
+		optchars[char] = opt
+	}
+    }
+    for (pos=1;pos<=length(optstring);pos++) {
+	char = substr(optstring,pos,1)
+	if (char == "*") {
+	    # document any long-only options
+	    n = asorti(longopts,sorted)
+	    for (i=1;i<=n;i++) {
+		long = sorted[i]
+		if (longopts[long]~/^[[:alnum:]]/) continue
+		help_option(output, long)
+	    }
+	}
+	if (char!~/[[:alnum:]]/) continue
+	if (!(char in optchars)) continue
+	help_option(output, optchars[char])
+    }
 }
 function help(output)
 {
@@ -126,83 +230,10 @@ function help(output)
     print "\
 Arguments:\n\
   INPUT ...\n\
-      input configuration files\n\
-      [default: " defaults["inputs"] "] {" environs["inputs"] "}\n\
-Options:\n\
-  -I, --inputs='FILE[ FILE]*'\n\
-      input configuration files\n\
-      [default: " defaults["inputs"] "] {" environs["inputs"] "}\n\
-  -b, --basemajor=MAJOR\n\
-      major number to act as base for STREAMS drivers and devices\n\
-      [default: " defaults["basemajor"] "] {" environs["basemajor"] "}\n\
-  -i, --basemodid=MODID\n\
-      module id number to act as base for STREAMS modules\n\
-      [default: " defaults["basemodid"] "] {" environs["basemodid"] "}\n\
-  -B, --minorbits=MINORBITS\n\
-      number of bits in a minor devices number\n\
-      [default: " defaults["minorbits"] "] {" environs["minorbits"] "}\n\
-  -h, --hconfig=[HCONFIG]\n\
-      full path and filename of the STREAMS configuration header file\n\
-      [default: " defaults["hconfig"] "] {" environs["hconfig"] "}\n\
-  -o, --modconf=[MODCONFINC]\n\
-      full path and filename of the module configuration include file\n\
-      [default: " defaults["modconf"] "] {" environs["modconf"] "}\n\
-  -m, --makenodes=[MAKENODES]\n\
-      full path and filename of the makenodes file\n\
-      [default: " defaults["makenodes"] "] {" environs["makenodes"] "}\n\
-  -M, --mkdevices=[MKDEVICES]\n\
-      full path and filename of the mkdevices file\n\
-      [default: " defaults["mkdevices"] "] {" environs["mkdevices"] "}\n\
-  -p, --permission=PERM\n\
-      permissions to assign to created files\n\
-      [default: " defaults["permission"] "]\n\
-  -l, --driverconf=[DRIVERCONF]\n\
-      full path and filename of the driver configuration makefile\n\
-      [default: " defaults["driverconf"] "] {" environs["driverconf"] "}\n\
-  -L, --confmodules=[CONFMODULES]\n\
-      full path and filename of the modules configuration file\n\
-      [default: " defaults["confmodules"] "] {" environs["confmodules"] "}\n\
-  -r, --functioname=FUNCNAME\n\
-      function name of the function in makenodes\n\
-      [default: " defaults["functionname"] "]\n\
-  -s, --strmknods=[MAKEDEVICES]\n\
-      full path and filename of the makedevices script\n\
-      [default: " defaults["strmknods"] "] {" environs["strmknods"] "}\n\
-  -S, --strsetup=[STRSETUP]\n\
-      full path and filename of the strsetup configuration file\n\
-      [default: " defaults["strsetup"] "] {" environs["strsetup"] "}\n\
-  -O, --strload=[STRLOAD]\n\
-      full path and filename of the strload configuration file\n\
-      [default: " defaults["strload"] "] {" environs["strload"] "}\n\
-  -k, --package=[PACKAGE]\n\
-      name of STREAMS package: LiS or LfS\n\
-      [default: " defaults["package"] "] {" environs["package"] "}\n\
-  -g, --pkgobject=[PKGOBJECT]\n\
-      full path and filename of object file to package\n\
-      [default: " defaults["pkgobject"] "]\n\
-  -d, --packagedir=[PACKAGEDIR]\n\
-      full path or vpath to binary package directory\n\
-      [default: (none)] {" environs["packagedir"] "}\n\
-  -R, --pkgrules=[PKGRULES]\n\
-      full path and filename of the pkgrules make rules file\n\
-      [default: (none)] {" environs["pkgrules"] "}\n\
-  -n, --dryrun, --dry-run\n\
-      don't perform the actions, just check them\n\
-  -q, --quiet, --silent\n\
-      suppress normal output\n\
-  -D, --debug[=LEVEL]\n\
-      increase or set debug level\n\
-      [default: " defaults["debug"] "]\n\
-  -v, --verbose[=LEVEL]\n\
-      increase or set verbosity level\n\
-      [default: " defaults["verbose"] "]\n\
-  -H, --help\n\
-      display this usage information and exit\n\
-  -V, --version\n\
-      display script version and exit\n\
-  -C, --copying\n\
-      display copying permissions and exit\n\
+      " descrips["inputs"] "\n\
+      [default: " defaults["inputs"] "] {" environs["inputs"] "}\
 " > output
+    help_options(output)
     written[output] = 1
 }
 function version(output)
@@ -327,7 +358,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	    if (arg ~ /^-[a-zA-Z0-9]/) {
 		optval = substr(arg, 2, 1)
 		pos = index(optstring, optval)
-		if (pos == 0) {
+		if (pos == 0 || substr(optstring, pos, 1) == "*") {
 		    print_error("option -" optval " not recognized")
 		    usage(stderr)
 		    exit 2
@@ -380,7 +411,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 }
 function system_command(cmd)
 {
-    print_debug(cmd); return system(cmd)
+    print_debug(3,cmd); return system(cmd)
 }
 function file_compare(tmpfile,    file) {
     file = tmpfile
@@ -390,7 +421,7 @@ function file_compare(tmpfile,    file) {
 	system("mv -f " tmpfile " " file)
     } else {
 	system("rm -f " tmpfile)
-	print_warn(file " is unchanged")
+	print_vinfo(1,file " is unchanged")
     }
 }
 function already(what, object, where) {
@@ -414,7 +445,7 @@ function nmajors(nminors,    exponents, size, result) {
 }
 
 function read_inputs(inputs) {
-    print_debug("reading inputs...")
+    print_debug(1,"reading inputs...")
     imajor = values["basemajor"]
     idnumber = values["basemodid"]
     # process all of the input files
@@ -425,7 +456,7 @@ function read_inputs(inputs) {
     indices["node_names"  ] = 0
     for (k in inputs) {
 	input = inputs[k]
-	print_debug("reading input " input)
+	print_debug(1,"reading input " input)
 	filename = input
 	lineno = 0
 	while ((getline < input) == 1) {
@@ -573,11 +604,11 @@ function read_inputs(inputs) {
 	}
 	close(input)
     }
-    print_debug("reading inputs...  ...done.")
+    print_debug(1,"reading inputs...  ...done.")
 }
 
 function write_driverconf(file,    i, object, loads, links) {
-    print_debug("writing driverconf `" file "'"); loads = ""; links = ""
+    print_debug(1,"writing driverconf `" file "'"); loads = ""; links = ""
     for (i = 1; i <= indices["drv_objnames"]; i++) {
 	object = drv_objnames[i]
 	if (object in loadables)
@@ -654,7 +685,7 @@ MODCONF_LOADS =" loads "\n\
     close(file)
 }
 function write_hconfig(file,    name, prefix) {
-    print_debug("writing hconfig `" file "'")
+    print_debug(1,"writing hconfig `" file "'")
     file = file ".tmp"
     print "\
 /******************************************************************* vim: ft=c\n\
@@ -763,7 +794,7 @@ function write_hconfig(file,    name, prefix) {
     file_compare(file)
 }
 function write_modconf(file) {
-    print_debug("writing modconf `" file "'")
+    print_debug(1,"writing modconf `" file "'")
     file = file ".tmp"
     print "\
 /******************************************************************* vim: ft=c\n\
@@ -920,7 +951,7 @@ function write_modconf(file) {
     file_compare(file)
 }
 function write_makenodes(file) {
-    print_debug("writing makenodes `" file "'")
+    print_debug(1,"writing makenodes `" file "'")
     file = file ".tmp"
     print "\
 /******************************************************************* vim: ft=c\n\
@@ -1211,7 +1242,7 @@ int main(int argc, char *argv[])\n\
     file_compare(file)
 }
 function write_mkdevices(file,    i, name, majname, majnumb, minname, minnumb, dir, dirs, create, remove) {
-    print_debug("writing mkdevices `" file "'"); create = ""; remove = ""
+    print_debug(1,"writing mkdevices `" file "'"); create = ""; remove = ""
     for (i = 1; i <= indices["node_names"]; i++) {
 	name = node_names[i]
 	majname = node_majname[name]
@@ -1309,7 +1340,7 @@ esac\n\
     system("chmod 0755 " file)
 }
 function write_strmknods(file) {
-    print_debug("writing strmknods `" file "'")
+    print_debug(1,"writing strmknods `" file "'")
     print "%defattr(-,root,root)" > file
     for (i = 1; i <= indices["node_names"]; i++) {
 	name = node_names[i]
@@ -1328,7 +1359,7 @@ function write_strmknods(file) {
     close(file)
 }
 function write_strsetup(file) {
-    print_debug("writing strsetup `" file "'")
+    print_debug(1,"writing strsetup `" file "'")
     print "\
 # vim: ft=conf\n\
 # =============================================================================\n\
@@ -1411,7 +1442,7 @@ function write_strsetup(file) {
     close(file)
 }
 function write_strload(file) {
-    print_debug("writing strload `" file "'")
+    print_debug(1,"writing strload `" file "'")
     print "\
 # vim: ft=conf\n\
 # =============================================================================\n\
@@ -1510,7 +1541,7 @@ function write_strload(file) {
     close(file)
 }
 function write_confmodules(file) {
-    print_debug("writing confmodules `" file "'")
+    print_debug(1,"writing confmodules `" file "'")
     print "\
 # vim: ft=conf\n\
 # =============================================================================\n\
@@ -1655,7 +1686,7 @@ function write_pkgobject(pkgobject,    file, object, name, prefix, count, first,
     sub(/\.o$/, "", object)
     file = object "_wrapper.c"
     file = file ".tmp"
-    print_debug("writing pkgobject for `" pkgobject "' to `" file "'")
+    print_debug(1,"writing pkgobject for `" pkgobject "' to `" file "'")
     if (!(object in driver_objects) && !(object in module_objects)) {
 	print_error("cannot find object " object)
 	return
@@ -1870,16 +1901,16 @@ module_exit(_xx_exit);\
     file_compare(file)
 }
 function write_packagedir(directory) {
-    print_debug("writing packagedir `" directory "'")
+    print_debug(1,"writing packagedir `" directory "'")
 }
 
 BEGIN {
     LINT = "yes"
-    me = "strconf.awk"
+    me = "strconf.awk"; count_errs = 0; count_warn = 0
     if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"
     if (ENVIRON["TERM"] == "dumb" || system("test -t 1 -a -t 2") != 0) {
-	stdout = "/dev/stderr"; written[stdout] = 0
-	stderr = "/dev/stderr"; written[stderr] = 0
+	stdout = "/dev/stderr"
+	stderr = "/dev/stderr"
 	cr = ""; lf = "\n"
 	blk = ""; hblk = ""
 	red = ""; hred = ""
@@ -1890,8 +1921,8 @@ BEGIN {
 	cyn = ""; hcyn = ""
 	std = ""
     } else {
-	stdout = "/dev/stdout"; written[stdout] = 0
-	stderr = "/dev/stderr"; written[stderr] = 0
+	stdout = "/dev/stdout"
+	stderr = "/dev/stderr"
 	cr = "\r"; lf = ""
 	blk = "\033[0;30m"; hblk = "\033[1;30m"
 	red = "\033[0;31m"; hred = "\033[1;31m"
@@ -1902,34 +1933,34 @@ BEGIN {
 	cyn = "\033[0;36m"; hcyn = "\033[1;36m"
 	std = "\033[m"
     }
-    longopts["inputs"      ] = "I:" ; environs["inputs"      ] = "STRCONF_INPUT"  ; defaults["inputs"      ] = "Config.master"
-    longopts["basemajor"   ] = "b:" ; environs["basemajor"   ] = "STRCONF_MAJBASE"; defaults["basemajor"   ] = 231
-    longopts["basemodid"   ] = "i:" ; environs["basemodid"   ] = "STRCONF_MIDBASE"; defaults["basemodid"   ] = 1
-    longopts["minorbits"   ] = "B:" ; environs["minorbits"   ] = "STRCONF_MINORSZ"; defaults["minorbits"   ] = 8
-    longopts["hconfig"     ] = "h::"; environs["hconfig"     ] = "STRCONF_CONFIG" ; defaults["hconfig"     ] = "config.h"
-    longopts["modconf"     ] = "o::"; environs["modconf"     ] = "STRCONF_MODCONF"; defaults["modconf"     ] = "modconf.inc"
-    longopts["makenodes"   ] = "m::"; environs["makenodes"   ] = "STRCONF_MKNODES"; defaults["makenodes"   ] = "makenodes.c"
-    longopts["mkdevices"   ] = "M::"; environs["mkdevices"   ] = "STRCONF_DEVICES"; defaults["mkdevices"   ] = "mkdevices"
-    longopts["permission"  ] = "p:" ;                                               defaults["permission"  ] = "0666"
-    longopts["driverconf"  ] = "l::"; environs["driverconf"  ] = "STRCONF_DRVCONF"; defaults["driverconf"  ] = "drvrconf.mk"
-    longopts["confmodules" ] = "L::"; environs["confmodules" ] = "STRCONF_CONFMOD"; defaults["confmodules" ] = "conf.modules"
-    longopts["functionname"] = "r:" ;                                               defaults["functionname"] = "main"
-    longopts["strmknods"   ] = "s::"; environs["strmknods"   ] = "STRCONF_MAKEDEV"; defaults["strmknods"   ] = "makedev.lst"
-    longopts["strsetup"    ] = "S::"; environs["strsetup"    ] = "STRCONF_STSETUP"; defaults["strsetup"    ] = "strsetup.conf"
-    longopts["strload"     ] = "O::"; environs["strload"     ] = "STRCONF_STRLOAD"; defaults["strload"     ] = "strload.conf"
-    longopts["package"     ] = "k::"; environs["package"     ] = "STRCONF_PACKAGE"; defaults["package"     ] = "LfS"
-    longopts["pkgobject"   ] = "g::";                                               defaults["pkgobject"   ] = "clone.o"
-    longopts["packagedir"  ] = "d::"; environs["packagedir"  ] = "STRCONF_BPKGDIR"
-    longopts["pkgrules"    ] = "R::"; environs["pkgrules"    ] = "STRCONF_PKGRULE"
-    longopts["dryrun"      ] = "n"  ;
-    longopts["dry-run"     ] = "n"  ;
-    longopts["quiet"       ] = "q"  ;                                               defaults["quiet"       ] = 0
-    longopts["silent"      ] = "q"  ;                                               defaults["silent"      ] = 0
-    longopts["debug"       ] = "D::";                                               defaults["debug"       ] = 0
-    longopts["verbose"     ] = "v::";                                               defaults["verbose"     ] = 0
-    longopts["help"        ] = "H"  ;
-    longopts["version"     ] = "V"  ;
-    longopts["copying"     ] = "C"  ;
+    longopts["inputs"      ] = "I:" ; environs["inputs"      ] = "STRCONF_INPUT"  ; defaults["inputs"      ] = "Config.master"	; descrips["inputs"      ] = "input configuration files (space separated list)"
+    longopts["basemajor"   ] = "b:" ; environs["basemajor"   ] = "STRCONF_MAJBASE"; defaults["basemajor"   ] = 231		; descrips["basemajor"   ] = "major number to act as base for STREAMS drivers and devices"
+    longopts["basemodid"   ] = "i:" ; environs["basemodid"   ] = "STRCONF_MIDBASE"; defaults["basemodid"   ] = 1		; descrips["basemodid"   ] = "module id number to act as base for STREAMS modules"
+    longopts["minorbits"   ] = "B:" ; environs["minorbits"   ] = "STRCONF_MINORSZ"; defaults["minorbits"   ] = 8		; descrips["minorbits"   ] = "number of bits in a minor device number"
+    longopts["hconfig"     ] = "h::"; environs["hconfig"     ] = "STRCONF_CONFIG" ; defaults["hconfig"     ] = "config.h"	; descrips["hconfig"     ] = "full path and filename of the STREAMS configuration header file"
+    longopts["modconf"     ] = "o::"; environs["modconf"     ] = "STRCONF_MODCONF"; defaults["modconf"     ] = "modconf.inc"	; descrips["modconf"     ] = "full path and filename of the module configuration include file"
+    longopts["makenodes"   ] = "m::"; environs["makenodes"   ] = "STRCONF_MKNODES"; defaults["makenodes"   ] = "makenodes.c"	; descrips["makenodes"   ] = "full path and filename of the makenodes file"
+    longopts["mkdevices"   ] = "M::"; environs["mkdevices"   ] = "STRCONF_DEVICES"; defaults["mkdevices"   ] = "mkdevices"	; descrips["mkdevices"   ] = "full path and filename of the mkdevices file"
+    longopts["permission"  ] = "p:" ;                                               defaults["permission"  ] = "0666"		; descrips["permission"  ] = "permissions to assign to created files"
+    longopts["driverconf"  ] = "l::"; environs["driverconf"  ] = "STRCONF_DRVCONF"; defaults["driverconf"  ] = "drvrconf.mk"	; descrips["driverconf"  ] = "full path and filename of the driver configuration makefile"
+    longopts["confmodules" ] = "L::"; environs["confmodules" ] = "STRCONF_CONFMOD"; defaults["confmodules" ] = "conf.modules"	; descrips["confmodules" ] = "full path and filename of the modules configuration file"
+    longopts["functionname"] = "r:" ;                                               defaults["functionname"] = "main"		; descrips["functionname"] = "function name of the function in makenodes"
+    longopts["strmknods"   ] = "s::"; environs["strmknods"   ] = "STRCONF_MAKEDEV"; defaults["strmknods"   ] = "makedev.lst"	; descrips["strmknods"   ] = "full path and filename of the makedevices script"
+    longopts["strsetup"    ] = "S::"; environs["strsetup"    ] = "STRCONF_STSETUP"; defaults["strsetup"    ] = "strsetup.conf"	; descrips["strsetup"    ] = "full path and filename of the strsetup configuration file"
+    longopts["strload"     ] = "O::"; environs["strload"     ] = "STRCONF_STRLOAD"; defaults["strload"     ] = "strload.conf"	; descrips["strload"     ] = "full path and filename of the strload configuration file"
+    longopts["package"     ] = "k::"; environs["package"     ] = "STRCONF_PACKAGE"; defaults["package"     ] = "LfS"		; descrips["package"     ] = "name of STREAMS package: LiS of LfS"
+    longopts["pkgobject"   ] = "g::";                                               defaults["pkgobject"   ] = "clone.o"	; descrips["pkgobject"   ] = "full path and filename of object file to package"
+    longopts["packagedir"  ] = "d::"; environs["packagedir"  ] = "STRCONF_BPKGDIR";						  descrips["packagedir"  ] = "full path or vpath to binary package directory"
+    longopts["pkgrules"    ] = "R::"; environs["pkgrules"    ] = "STRCONF_PKGRULE";						  descrips["pkgrules"    ] = "full path and filename of the pkgrules make rules file"
+    longopts["dryrun"      ] = "n"  ;												  descrips["dryrun"      ] = "don't perform the actions, just check them"
+    longopts["dry-run"     ] = "n"  ;												  descrips["dry-run"     ] = "don't perform the actions, just check them"
+    longopts["quiet"       ] = "q"  ;						    defaults["quiet"       ] = 0		; descrips["quiet"       ] = "suppress normal output"
+    longopts["silent"      ] = "q"  ;						    defaults["silent"      ] = 0		; descrips["silent"      ] = "suppress normal output"
+    longopts["debug"       ] = "D::";						    defaults["debug"       ] = 0		; descrips["debug"       ] = "increase or set debug level DEBUG"
+    longopts["verbose"     ] = "v::";						    defaults["verbose"     ] = 0		; descrips["verbose"     ] = "increase or set verbosity level VERBOSITY"
+    longopts["help"        ] = "H"  ;												  descrips["help"        ] = "display this usage information and exit"
+    longopts["version"     ] = "V"  ;												  descrips["version"     ] = "display script version and exit"
+    longopts["copying"     ] = "C"  ;												  descrips["copying"     ] = "display copying permissions and exit"
     # set mandatory defaults
     values["basemajor" ] = defaults["basemajor" ]
     values["basemodid" ] = defaults["basemodid" ]
@@ -1939,10 +1970,6 @@ BEGIN {
     values["debug"     ] = defaults["debug"     ]
     values["verbose"   ] = defaults["verbose"   ]
     values["quiet"     ] = defaults["quiet"     ]
-    if ("V" in ENVIRON && ENVIRON["V"] == 1) {
-	values["quiet"  ] = 0
-	values["verbose"] = 2
-    }
     optstring = "I:b:i:B:h::o::m::M::p:l::L::r:s::S::O::k::g::d::R::nqD::v::HVC"
     optind = 0
     while (1) {
@@ -1950,13 +1977,30 @@ BEGIN {
 	if (c == -1) break
 	else if (c ~ /[IbiBhomMplLrsSOkgdR]/) { values[option] = optarg }
 	else if (c ~ /[nq]/) { values[option] = 1 }
-	else if (c == "D") { if (optarg) { values["debug"  ] = optarg } else { values["debug"  ]++ } }
-	else if (c == "v") { if (optarg) { values["verbose"] = optarg } else { values["verbose"]++ } }
+	else if (c~/[Dv]/) { if (optarg) { values[option] = optarg } else { values[option]++ } }
 	else if (c == "H") { help(   stdout); exit 0 }
 	else if (c == "V") { version(stdout); exit 0 }
 	else if (c == "C") { copying(stdout); exit 0 }
 	else               { usage(  stderr); exit 2 }
     }
+    if (values["quiet"  ] == defaults["quiet"  ] &&
+	values["debug"  ] == defaults["debug"  ] &&
+	values["verbose"] == defaults["verbose"]) {
+	if ("V" in ENVIRON) {
+	    if (ENVIRON["V"] == "0") {
+		values["quiet"  ] = 1
+		values["debug"  ] = 0
+		values["verbose"] = 0
+	    } else
+	    if (ENVIRON["V"] == "1") {
+		values["quiet"  ] = 0
+		values["debug"  ] = 0
+		values["verbose"] = 2
+	    }
+	}
+    }
+    if (values["verbose"] >=3 && values["debug"] == defaults["debug"])
+	values["debug"] = values["verbose"] - 2
     if (optind < ARGC) {
 	values["inputs"] = ARGV[optind]; optind++
 	while (optind < ARGC) {
@@ -1967,16 +2011,16 @@ BEGIN {
     for (i=1;ARGC>i;i++) { delete ARGV[i] }
     for (value in values) {
 	if (!values[value] && (value in environs) && (environs[value] in ENVIRON) && ENVIRON[environs[value]]) {
-	    print_debug("assigning value for " value " from environment " environs[value])
+	    print_debug(1,"o: assigning value for " value " from environment " environs[value])
 	    values[value] = ENVIRON[environs[value]]
 	}
 	if (!values[value] && (value in defaults) && defaults[value]) {
-	    print_debug("assigning value for " value " from default " defaults[value])
+	    print_debug(1,"o: assigning value for " value " from default " defaults[value])
 	    values[value] = defaults[value]
 	}
     }
     if (!values["inputs"] || values["inputs"] == "-") {
-	print_debug("no inputs, using " stdin)
+	print_debug(1,"o: no inputs, using " stdin)
 	values["inputs"] = stdin
     }
     split(values["inputs"], inputs)
@@ -2006,14 +2050,10 @@ BEGIN {
     exit 0
 }
 END {
-    if (written[stdout]) {
-	close(stdout)
-	written[stdout] = 0
-    }
-    if (written[stderr]) {
-	close(stderr)
-	written[stderr] = 0
-    }
+    if (count_errs) print_error("errs = " count_errs)
+    if (count_warn)  print_warn("warn = " count_warn)
+    for (file in written)
+	close(file)
 }
 
 # =============================================================================

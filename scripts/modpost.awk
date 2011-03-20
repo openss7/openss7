@@ -81,31 +81,31 @@ function allyears(    this, last, sep, result)
     }
     return result
 }
-function print_info(string)
+function print_vinfo(level, string)
 {
-    if (values["quiet"] == 0 && values["verbose"] > 0) {
-	print blu me ": I: " string std > stderr
-	written[stderr] = 1
+    if ((values["quiet"] == 0) && (values["verbose"] >= level)) {
+	print blu me ": I: " string std > stdout
+	written[stdout] = 1
     }
 }
-function print_more(string)
+function print_vmore(level, string)
 {
-    if (values["quiet"] == 0 && values["verbose"] > 0) {
-	printf "%s", blu me ": I: " string std cr lf > stderr
-	fflush(stderr)
-	written[stderr] = 1
+    if ((values["quiet"] == 0) && (values["verbose"] >= level)) {
+	printf "%s", blu me ": I: " string std cr lf > stdout
+	fflush(stdout)
+	written[stdout] = 1
     }
 }
-function print_debug(string)
+function print_debug(level, string)
 {
-    if (values["debug"] > 0) {
+    if (values["debug"] >= level) {
 	print mag me ": D: " string std > stderr
 	written[stderr] = 1
     }
 }
-function print_dmore(string)
+function print_dmore(level, string)
 {
-    if (values["debug"] > 0) {
+    if (values["debug"] >= level) {
 	printf "%s", mag me ": D: " string std cr lf > stderr
 	fflush(stderr)
 	written[stderr] = 1
@@ -115,13 +115,15 @@ function print_error(string)
 {
     print red me ": E: " string std > stderr
     written[stderr] = 1
+    count_errs++
 }
 function print_warn(string)
 {
-    if (values["quiet"] == 0 || values["verbose"] > 0 || values["debug"] > 0) {
+    if ((values["quiet"] == 0) || (values["verbose"] > 0) || (values["debug"] > 0)) {
 	print org me ": W: " string std > stderr
 	written[stderr] = 1
     }
+    count_warn++
 }
 function usage(output)
 {
@@ -142,12 +144,14 @@ function help_usage(name,  line,sep,dflt,env)
 {
     line = ""; sep = ""; dflt = ""; env = ""
     if (name in defaults) {
-	if (longopts[name]~/:/)
+	if (longopts[name]~/:/) {
 	    dflt = defaults[name]
-	else
+	} else {
 	    if (defaults[name]) { dflt = "yes" } else { dflt = "no" }
-	if (dflt)
+	}
+	if (dflt) {
 	    line = line sep "[default: " dflt "]"; sep = " "
+	}
     }
     if (name in environs) {
 	if (longopts[name]!~/:/) env = "?"
@@ -165,29 +169,39 @@ function help_opttags(name,  line,char,opt,oth)
 	    char = opt
 	    gsub(/:/,"",char)
 	    line = "-" char ", --" name
-	    if (opt~/::$/) { line = line " [" toupper(name) "]" } else
-	    if (opt~/:$/)  { line = line " " toupper(name) }
 	} else {
 	    line = "--" name
 	}
-	for (oth in longopts) {
-	    if (opt != longopts[oth]) continue
-	    if (oth == name) continue
-	    if (opt~/::$/) { line = line ", --" oth " [" toupper(oth) "]" } else
-	    if (opt~/:$/)  { line = line ", --" oth " " toupper(oth) } else
-			   { line = line ", --" oth }
+	if (opt~/::$/) { line = line " [" toupper(name) "]" } else
+	if (opt~/:$/)  { line = line " " toupper(name) }
+	if (opt~/[[:alnum:]]/) {
+	    for (oth in longopts) {
+		if (opt != longopts[oth]) continue
+		if (oth == name) continue
+		if (opt~/::$/) { line = line ", --" oth " [" toupper(oth) "]" } else
+		if (opt~/:$/)  { line = line ", --" oth " " toupper(oth) } else
+			       { line = line ", --" oth }
+	    }
 	}
     }
     return line
 }
-function help_options(output)
+function help_option(output, name)
+{
+    printf "  %s\n", help_opttags(name) > output
+    if (name in descrips && descrips[name])
+    printf "      %s\n", descrips[name] > output
+    if ((name in defaults || name in environs) && help_usage(name))
+    printf "      %s\n", help_usage(name) > output
+}
+function help_options(output,		opt,char,pos,long,n,sorted,i)
 {
     if (!optstring) return
     print "Options:" > output; written[output] = 1
     # index all of the long options
     for (opt in longopts) {
 	char = substr(longopts[opt],1,1)
-	if (char) {
+	if (char && char != ":") {
 	    if (char in optchars) {
 		if (char == substr(opt,1,1))
 		    optchars[char] = opt
@@ -197,14 +211,18 @@ function help_options(output)
     }
     for (pos=1;pos<=length(optstring);pos++) {
 	char = substr(optstring,pos,1)
+	if (char == "*") {
+	    # document any long-only options
+	    n = asorti(longopts,sorted)
+	    for (i=1;i<=n;i++) {
+		long = sorted[i]
+		if (longopts[long]~/^[[:alnum:]]/) continue
+		help_option(output, long)
+	    }
+	}
 	if (char!~/[[:alnum:]]/) continue
 	if (!(char in optchars)) continue
-	name = optchars[char]
-	printf "  %s\n", help_opttags(name) > output
-	if (name in descrips)
-	printf "      %s\n", descrips[name] > output
-	if (name in defaults || name in environs)
-	printf "      %s\n", help_usage(name) > output
+	help_option(output, optchars[char])
     }
 }
 function help(output)
@@ -215,7 +233,7 @@ function help(output)
     print "\
 Arguments:\n\
   MODULE ...\n\
-      modules for which to generate symbols\
+      " descrips["modules"] "\
 " > output
     help_options(output)
     written[output] = 1
@@ -342,7 +360,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	    if (arg ~ /^-[a-zA-Z0-9]/) {
 		optval = substr(arg, 2, 1)
 		pos = index(optstring, optval)
-		if (pos == 0) {
+		if (pos == 0 || substr(optstring, pos, 1) == "*") {
 		    print_error("option -" optval " not recognized")
 		    usage(stderr)
 		    exit 2
@@ -395,7 +413,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 }
 function system_command(cmd)
 {
-    print_debug(cmd); return system(cmd)
+    print_debug(3,cmd); return system(cmd)
 }
 function missing(fnlp, expected)
 {
@@ -428,16 +446,18 @@ function cat_command(files,    command)
 	command = "xzcat " files
     return command
 }
-function set_symbol(sym, mod, crc, expt, set, pos, own)
+function set_symbol(sym, mod, crc, expt, set, pos, own, src)
 {
     if (!(sym in syms)) count_syms++
     if (sym in mods && mods[sym] != mod) {
-	if (mod == "vmlinux") {
-	    print_error("symbol " sym " in module " mods[sym] " conflicts with kernel")
-	} else if (mods[sym] == "vmlinux") {
-	    print_error("symbol " sym " in module " mod       " conflicts with kernel")
+	if (mod~/(vmlinux|built-in.o)/ && mods[sym]!~/(vmlinux|built-in.o)/) {
+	    print_error("symbol " sym " in module " mods[sym] " conflicts with kernel " mod)
+	} else 
+	if (mod!~/(vmlinux|built-in.o)/ && mods[sym]~/(vmlinux|built-in.o)/) {
+	    print_error("symbol " sym " in module " mod " conflicts with kernel " mods[sym])
 	    mod = mods[sym]
-	} else {
+	} else
+	if (mod!~/(vmlinux|built-in.o)/ && mods[sym]!~/(vmlinux|built-in.o)/) {
 	    base1 = mod;       sub(/.*\//, "", base1)
 	    base2 = mods[sym]; sub(/.*\//, "", base2)
 	    if (base1 != base2)
@@ -450,76 +470,80 @@ function set_symbol(sym, mod, crc, expt, set, pos, own)
     syms[sym] = 1
     if (crc) {
 	sub(/0x00000000/, "0x", crc)
-	if (sym in crcs && crcs[sym] != crc)
-	    print_warn("crc for " mod ":" sym " changed from " crcs[sym] " to " crc)
+	if (sym in crcs) {
+	    if (crcs[sym] != crc) {
+		print_warn("crc for " mod ":" sym " changed from " crcs[sym] " to " crc)
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
 	mod_crcs[mod,sym] = crc
 	crcs[sym] = crc
     } else if (sym in crcs) { crc = crcs[sym] }
     if (expt) {
-	if (sym in exps && exps[sym] != expt)
-	    print_warn("exp for " mod ":" sym " changed from " exps[sym] " to " expt)
+	if (sym in exps) {
+	    if (exps[sym] != expt) {
+		print_warn("exp for " mod ":" sym " changed from " exps[sym] " to " expt)
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
 	mod_exps[mod,sym] = expt
 	exps[sym] = expt
     } else if (sym in exps) { expt = exps[sym] }
     if (set) {
-	if (sym in sets && sets[sym] != set) {
-	    print_warn("set for " mod ":" sym " changed from " sets[sym] " to " set)
-	    if ((sets[sym],sym) in set_syms) delete set_syms[sets[sym],sym]
-	    if (sym in posn && (sets[sym],posn[sym]) in set_posn)
-		delete set_posn[sets[sym],posn[sym]]
-	}
+	if (sym in sets) {
+	    if (sets[sym] != set) {
+		print_warn("set for " mod ":" sym " changed from " sets[sym] " to " set)
+		if ((sets[sym],sym) in set_syms) delete set_syms[sets[sym],sym]
+		if (sym in posn && (sets[sym],posn[sym]) in set_posn)
+		    delete set_posn[sets[sym],posn[sym]]
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
 	if (sym in posn) { set_syms[set,sym] = posn[sym]; set_posn[set,posn[sym]] = sym }
 	sets[sym] = set
     } else if (sym in sets) { set = sets[sym] }
     if (pos) {
-	if (sym in posn && posn[sym] != pos) {
-	    print_warn("pos for " mod ":" sym " changed from " posn[sym] " to " pos)
-	    if (sym in sets && (sets[sym],posn[sym]) in set_posn)
-		delete set_posn[sets[sym],posn[sym]]
-	}
+	if (sym in posn) {
+	    if (posn[sym] != pos) {
+		print_warn("pos for " mod ":" sym " changed from " posn[sym] " to " pos)
+		if (sym in sets && (sets[sym],posn[sym]) in set_posn)
+		    delete set_posn[sets[sym],posn[sym]]
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
 	if (sym in sets) { set_syms[sets[sym],sym] = pos; set_posn[sets[sym],pos] = sym }
 	posn[sym] = pos
     } else if (sym in posn) { pos = posn[sym] }
+    if (!own && mod~/(vmlinux|built-in.o)/) { own = "kernel" }
     if (own) {
-	if (sym in ownr && ownr[sym] != own)
-	    print_warn("own for " mod ":" sym " changed from " ownr[sym] " to " own)
+	if (sym in ownr) {
+	    if (ownr[sym] != own) {
+		if (ownr[sym] != "kernel" || own != "kabi")
+		    print_warn("own for " mod ":" sym " changed from " ownr[sym] " to " own)
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
 	ownr[sym] = own
     } else if (sym in ownr) { own = ownr[sym] }
-}
-function set_symset(set, hash, numb, own)
-{
-    if (set in setsets)
-	print_warn("set " set " already exists!")
-    else {
-	setsets[set] = 1
-	count_sets++
-    }
-    if (hash) {
-	if (set in sethash && sethash[set] != hash)
-	    print_warn("hash for " set " changed from " sethash[set] " to " hash)
-	sethash[set] = hash
-    }
-    if (numb) {
-	if (set in setnumb && setnumb[set] != numb)
-	    print_warn("numb for " set " changed from " setnumb[set] " to " numb)
-	setnumb[set] = numb
-    }
-    if (own) {
-	if (set in setownr && setownr[set] != own)
-	    print_warn("own for " set " changed from " setownr[set] " to " own)
-	setownr[set] = own
-    }
+    if (src) {
+	if (sym in srcs)
+	    src = srcs[sym] "," src
+	srcs[sym] = src
+	cache_dirty = 1
+    } else if (sym in srcs) { src = srcs[sym] }
 }
 function set_mod(sym, mod)
 {
     if (sym in mods) {
 	if (mod == mods[sym]) return
-	if (mod == "vmlinux") {
-	    print_error("sym " sym " in module " mods[sym] " conflicts with kernel")
-	} else if (mods[sym] == "vmlinux") {
-	    print_error("sym " sym " in module " mod       " conflicts with kernel")
+	if (mod~/(vmlinux|built-in.o)/ && mods[sym]!~/(vmlinux|built-in.o)/) {
+	    print_error("symbol " sym " in module " mods[sym] " conflicts with kernel " mod)
+	} else 
+	if (mod!~/(vmlinux|built-in.o)/ && mods[sym]~/(vmlinux|built-in.o)/) {
+	    print_error("symbol " sym " in module " mod " conflicts with kernel " mods[sym])
 	    mod = mods[sym]
-	} else {
+	} else
+	if (mod!~/(vmlinux|built-in.o)/ && mods[sym]!~/(vmlinux|built-in.o)/) {
 	    base1 = mod;       sub(/.*\//, "", base1)
 	    base2 = mods[sym]; sub(/.*\//, "", base2)
 	    if (base1 != base2)
@@ -527,7 +551,7 @@ function set_mod(sym, mod)
 	}
 	if (mod = mods[sym]) return
 	print_warn("sym " sym " mod changed from " mods[sym] " to " mod)
-    } else count_mods++
+    }
     mod_syms[mod,sym] = 1
     mod_mods[mod] = 1
     mods[sym] = mod
@@ -597,6 +621,76 @@ function set_own(sym, own)
     syms[sym] = 1
     cache_dirty = 1
 }
+function set_src(sym, src)
+{
+    if (sym in srcs)
+	src = srcs[sym] "," src
+    srcs[sym] = src
+    if (!(sym in syms)) count_syms++
+    syms[sym] = 1
+    cache_dirty = 1
+}
+function set_symset(set, hash, numb, ssym, scrc, own, src)
+{
+    if (set in setsets)
+	print_warn("set " set " already exists!")
+    else {
+	setsets[set] = 1
+	count_sets++
+	cache_dirty = 1
+    }
+    if (hash) {
+	if (set in sethash) {
+	    if (sethash[set] != hash) {
+		print_warn("hash for " set " changed from " sethash[set] " to " hash)
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
+	sethash[set] = hash
+    }
+    if (numb) {
+	if (set in setnumb) {
+	    if (setnumb[set] != numb) {
+		print_warn("numb for " set " changed from " setnumb[set] " to " numb)
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
+	setnumb[set] = numb
+    }
+    if (ssym) { gsub(/"/,"",ssym)
+	if (set in setsyms) {
+	    if (setsyms[set] != ssym) {
+		print_warn("syms for " set " changed from " setsyms[set] " to " ssym)
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
+	setsyms[set] = ssym
+    }
+    if (scrc) { gsub(/"/,"",scrc)
+	if (set in setcrcs) {
+	    if (setcrcs[set] != scrc) {
+		print_warn("crcs for " set " changed from " setcrcs[set] " to " scrc)
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
+	setcrcs[set] = scrc
+    }
+    if (own) {
+	if (set in setownr) {
+	    if (setownr[set] != own) {
+		print_warn("own for " set " changed from " setownr[set] " to " own)
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
+	setownr[set] = own
+    }
+    if (src) {
+	if (set in setsrcs)
+	    src = setsrcs[set] "," src
+	setsrcs[set] = src
+	cache_dirty = 1
+    }
+}
 function set_hash(set, hash)
 {
     if (set in sethash) {
@@ -619,6 +713,30 @@ function set_numb(set, numb)
     setsets[set] = 1
     cache_dirty = 1
 }
+function set_ssym(set, ssym)
+{
+    gsub(/"/,"",ssym)
+    if (set in setsyms) {
+	if (ssym == setsyms[set]) return
+	print_warn("set " set " syms changed from " setsyms[set] " to " ssym)
+    }
+    setsyms[set] = ssym
+    if (!(set in setsets)) count_sets++
+    setsets[set] = 1
+    cache_dirty = 1
+}
+function set_scrc(set, scrc)
+{
+    gsub(/"/,"",scrc)
+    if (set in setcrcs) {
+	if (scrc == setcrcs[set]) return
+	print_warn("set " set " crcs changed from " setcrcs[set] " to " scrc)
+    }
+    setcrcs[set] = scrc
+    if (!(set in setsets)) count_sets++
+    setsets[set] = 1
+    cache_dirty = 1
+}
 function set_ownr(set, own)
 {
     if (set in setownr) {
@@ -630,49 +748,104 @@ function set_ownr(set, own)
     setsets[set] = 1
     cache_dirty = 1
 }
+function set_ssrc(set, ssrc)
+{
+    gsub(/"/,"",ssrc)
+    if (set in setsrcs)
+	ssrc = setsrcs[set] "," ssrc
+    setsrcs[set] = ssrc
+    if (!(set in setsets)) count_sets++
+    setsets[set] = 1
+    cache_dirty = 1
+}
+function get_syms(set,		ssym,sep,i,sym)
+{
+    if (set in setsyms) { ssym = setsyms[set] } else {
+	ssym = ""; sep = ""
+	for (i=1;i<=setnumb[set];i++) {
+	    if ((set,i) in set_posn) {
+		ssym = ssym sep set_posn[set,i]
+		sep = ","
+	    } else {
+		print_error("set " set " has no sym in position " i "!")
+		ssym = ""
+		break
+	    }
+	}
+	if (ssym) setsyms[set] = ssym
+    }
+    return ssym
+}
+function get_crcs(set,		scrc,sep,i,sym)
+{
+    if (set in setcrcs) { scrc = setcrcs[set] } else {
+	scrc = ""; sep = ""
+	for (i=1;i<=setnumb[set];i++) {
+	    if ((set,i) in set_posn) {
+		sym = set_posn[set,i]
+		if (sym in crcs) {
+		    scrc = scrc sep crcs[sym]
+		    sep = ","
+		} else {
+		    print_error("sym " sym " has no crc!")
+		    scrc = ""
+		    break
+		}
+	    } else {
+		print_error("set " set " has no sym in position " i "!")
+		scrc = ""
+		break
+	    }
+	}
+	if (scrc) setcrcs[set] = scrc
+    }
+    return scrc
+}
 #
 # Read in an objdump -t listing.  This must be from objdump -t run on a kernel
 # object.  This will add EXPORT_SYMBOL or EXPORT_SYMBOL_GPL for use in the
 # Module.symvers file.
 #
-function read_modobject(command, own)
+function read_modobject(command, dir, own, src,	    files,progress,HEADER,mod,count_syms,count_unds)
 {
+    print_vinfo(1,"r: ko object, subdirectory = \"" dir "\"")
     files = 0
     progress = 0
     HEADER = 1
-    modname = ""
+    mod = ""
     while ((command | getline) == 1) {
 	if (HEADER) {
 	    if (/^$/)
 		continue
 	    if (/:.*file format/) {
 		sub(/:.*$/, "")
+		print_debug(1,"r: ko object, module = " $0)
 		sub(/(\.mod)?\.(k)?o(\.gz)?$/, "")
-		if (own) {
+		if (own == values["pkgdirectory"]) {
 		    sub(/.*\//, "")
 		    $0 = values["pkgdirectory"] "/" $0
 		} else {
 		    sub(values["moddir"] "/", "")
 		    sub(/kernel\//, "")
 		}
-		modname = $0
-		if (own) {
+		mod = $0
+		if (own == values["pkgdirectory"]) {
 		    if (("vmlinux","struct_module") in mod_syms) {
-			mod_unds[modname,"struct_module"] = 1
+			mod_unds[mod,"struct_module"] = 1
 		    } else if (("vmlinux","module_layout") in mod_syms) {
-			mod_unds[modname,"module_layout"] = 1
+			mod_unds[mod,"module_layout"] = 1
 		    } else {
-			mod_unds[modname,"struct_module"] = 1
+			mod_unds[mod,"struct_module"] = 1
 		    }
 		}
 		continue
 	    }
 	    if (/SYMBOL TABLE:/) {
 		count_syms = 0; count_unds = 0
-		mod_mods[modname] = 1
+		mod_mods[mod] = 1
 		HEADER = 0
 		if (progress >= 200) {
-		    print_dmore("r: ko object, " files " kernel modules...")
+		    print_dmore(1,"r: ko object, " files " kernel modules...")
 		    progress = 0
 		}
 		files++
@@ -683,8 +856,8 @@ function read_modobject(command, own)
 	if (/^$/ && !HEADER) {
 	    HEADER = 1
 	    if (count_syms || count_unds) {
-		print_debug("r: ko object, " modname)
-		print_debug("r: ko object, syms " count_syms ", unds " count_unds)
+		print_debug(1,"r: ko object, " mod)
+		print_debug(1,"r: ko object, syms " count_syms ", unds " count_unds)
 	    }
 	    continue
 	}
@@ -692,14 +865,14 @@ function read_modobject(command, own)
 	    if ((NF >= 6) && ($3 == "O")) {
 		if ($4 == ".modinfo") {
 		    if ($6 ~ /^_?__mod_version[0-9]*$/)
-			mod_vers[modname] = 1
+			mod_vers[mod] = 1
 		    continue
 		}
 		if ($4 ~ /^_?__ksymtab/) {
 		    sub(/^_?__ksymtab/, "", $4)
 		    if ($6 ~ /^_?__ksymtab_/) {
 			sub(/^_?__ksymtab_/, "", $6)
-			set_symbol($6, modname, "", "EXPORT_SYMBOL" toupper($4), "", 0, own)
+			set_symbol($6, mod, "", "EXPORT_SYMBOL" toupper($4), "", 0, own, "")
 		    }
 		}
 	    }
@@ -707,16 +880,21 @@ function read_modobject(command, own)
 	}
 	if ($2 == "g") {
 	    if ($3 == "*ABS*") {
-		if ((NF >= 5) && ($5 ~ /^_?__crc_/)) {
+		if (NF >= 5) {
 		    if ($5 ~ /^_?__crc_/) {
 			sub(/^_?__crc_/, "", $5)
-			set_symbol($5, modname, "0x" $1, "", "", 0, own)
-		    }
+			set_symbol($5, mod, "0x" $1, "", "", 0, own, src)
+		    } else
+			mod_abss[mod,$5] = 1
 		}
+		continue
+	    } else
+	    if (($3 == "F" || $3 == "O") && $4 == "*ABS*" && NF >= 6) {
+		mod_abss[mod,$6] = 1
 		continue
 	    }
 	}
-	if (!own)
+	if (own != values["pkgdirectory"])
 	    continue
 	undef = ""
 	if (($2 == "w") && ($3 == "*UND*") && (NF == 5))
@@ -725,51 +903,51 @@ function read_modobject(command, own)
 	    undef = $4
 	if (undef != "") {
 	    if (undef ~ /^_?__this_module$/) {
-		if (modname in mod_this)
-		    delete mod_this[modname]
+		if (mod in mod_this)
+		    delete mod_this[mod]
 		continue
 	    }
-	    if (!((modname,undef) in mod_unds)) {
-		mod_unds[modname,undef] = 1
+	    if (!((mod,undef) in mod_unds)) {
+		mod_unds[mod,undef] = 1
 		count_unds++
 	    }
 	    continue
 	}
 	if ($NF ~ /^_?init_module$/) {
-	    mod_init[modname] = 1
-	    print_debug("r: module " modname " has init_module")
+	    mod_init[mod] = 1
+	    print_debug(2,"r: module " mod " has init_module")
 	    continue
 	}
 	if ($NF ~ /^_?cleanup_module$/) {
-	    mod_exit[modname] = 1
-	    print_debug("r: module " modname " has cleanup_module")
+	    mod_exit[mod] = 1
+	    print_debug(2,"r: module " mod " has cleanup_module")
 	    continue
 	}
 	if ($NF ~ /^_?__this_module$/) {
-	    mod_this[modname] = 1
-	    print_debug("r: module " modname " has this_module")
+	    mod_this[mod] = 1
+	    print_debug(2,"r: module " mod " has this_module")
 	    continue
 	}
 	if ($NF ~ /^_?__mod_version[0-9]*$/) {
-	    mod_vers[modname] = 1
-	    print_debug("r: module " modname " has mod_version")
+	    mod_vers[mod] = 1
+	    print_debug(2,"r: module " mod " has mod_version")
 	    continue
 	}
     }
     close(command)
-    print_debug("r: ko object, " files " kernel modules   ")
+    print_vinfo(1,"r: ko object, " files " kernel modules   ")
 }
 #
 # Read in any nm -Bs listing.  This can be a System.map file, a Modules.map
 # file or nm -Bz run an a kernel object.
 #
-function read_systemmap(command, modname, own)
+function read_systemmap(command, mod, own, src,		count_syms,count_unds)
 {
-    #print_debug("r: systemmap, command = \"" command "\"")
+    print_vinfo(1,"r: systemmap, command = \"" command "\"")
     count_syms = 0; count_unds = 0
-    sub(/^[[]/, "", modname)
-    sub(/[]]$/, "", modname)
-    mod_mods[modname] = 1
+    sub(/^[[]/, "", mod)
+    sub(/[]]$/, "", mod)
+    mod_mods[mod] = 1
     while ((command | getline) == 1) {
 	if (NF > 4) {
 	    show_junk($0, 5)
@@ -778,8 +956,9 @@ function read_systemmap(command, modname, own)
 	if ($2 ~ /^[Awat]$/) {
 	    if ($3 ~ /^_?__crc_/) {
 		sub(/^_?__crc_/, "", $3)
-		#print_debug("r: systemmap, symbol: " $3)
-		set_symbol($3, modname, "0x" $1, "", "", 0, own)
+		print_debug(3,"r: systemmap, symbol: " $3)
+		set_symbol($3, mod, "0x" $1, "", "", 0, own, src)
+		count_syms++
 	    } else {
 		#print_warn("wrong symbol " $3)
 	    }
@@ -789,63 +968,69 @@ function read_systemmap(command, modname, own)
 	    continue
 	if ($1 ~ /^[Uw]$/) {
 	    if ($2 ~ /^_?__this_module$/) {
-		delete mod_this[modname]
+		delete mod_this[mod]
 		continue
 	    }
-	    if (!((modname,$2) in mod_unds)) {
-		mod_unds[modname,$2] = 1
+	    if (!((mod,$2) in mod_unds)) {
+		mod_unds[mod,$2] = 1
 		count_unds++
 	    }
 	    continue
 	}
 	if ($3 ~ /^_?init_module$/) {
-	    mod_init[modname] = 1
-	    print_debug("r: module " modname " has init_module")
+	    mod_init[mod] = 1
+	    print_debug(2,"r: module " mod " has init_module")
 	    continue
 	}
 	if ($3 ~ /^_?cleanup_module$/) {
-	    mod_exit[modname] = 1
-	    print_debug("r: module " modname " has cleanup_module")
+	    mod_exit[mod] = 1
+	    print_debug(2,"r: module " mod " has cleanup_module")
 	    continue
 	}
 	if ($3 ~ /^_?__this_module$/) {
-	    mod_this[modname] = 1
-	    print_debug("r: module " modname " has this_module")
+	    mod_this[mod] = 1
+	    print_debug(2,"r: module " mod " has this_module")
 	    continue
 	}
 	if ($3 ~ /^_?__mod_version[0-9]*$/) {
-	    mod_vers[modname] = 1
-	    print_debug("r: module " modname " has mod_version")
+	    mod_vers[mod] = 1
+	    print_debug(2,"r: module " mod " has mod_version")
 	    continue
 	}
     }
     close(command)
-    if (count_syms || count_unds)
-	print_debug("r: systemmap, syms " count_syms ", unds " count_unds)
+    print_vinfo(1,"r: systemmap, syms " count_syms ", unds " count_unds)
 }
 # read modpost cache file
 function read_cachefile(file,    i,result)
 {
-    print_debug("r: cachefile, file = \"" file "\"")
+    if ("PWD" in ENVIRON) sub("^" ENVIRON["PWD"] "/", "", file)
+    print_vinfo(1,"r: cachefile, file = \"" file "\"")
     count_syms = 0; count_sets = 0
     while ((result = (getline < file)) == 1) {
 	if (/:/) {
 	    # new style cache file format
 	    gsub(/:/, " ")
+	    if ($1 == "format") {
+		values["format"] = $2
+	    } else
 	    if ($1 == "sym") {
 		if (NF<3) { print_error("syntax error in cachefile: line = \"" $0 "\""); continue }
-		for (i=8;i>NF;i--) { $i = "" }; NF = 8
-		set_symbol($2,$3,$4,$5,$6,$7,$8)
+		for (i=9;i>NF;i--) { $i = "" }; NF = 9
+		set_symbol($2,$3,$4,$5,$6,$7,$8,$9)
 	    } else
 	    if ($1 == "set") {
-		if (NF<2) { print_error("syntax error in cachefile: line = \"" $0 "\""); continue }
-		for (i=5;i>NF;i--) { $i = "" }; NF = 5
-		set_symset($2,$3,$4,$5)
+		if (NF<3) { print_error("syntax error in cachefile: line = \"" $0 "\""); continue }
+		for (i=8;i>NF;i--) { $i = "" }; NF = 8
+		set_symset($2,$3,$4,$5,$6,$7,$8)
 	    }
 	} else
 	if (/=/) {
 	    # old style cache file format
 	    sub(/=/, " ")
+	    if ($1 == "format") {
+		values["format"] = $2
+	    } else
 	    if ($1 ~ /^sym_/) {
 		sub(/^sym_/, "", $1)
 		if ($1 ~ /_name$/ ) { sub(/_name$/, "",$1); set_mod($1,$2) } else
@@ -853,28 +1038,36 @@ function read_cachefile(file,    i,result)
 		if ($1 ~ /_exp$/  ) { sub(/_exp$/,  "",$1); set_exp($1,$2) } else
 		if ($1 ~ /_set$/  ) { sub(/_set$/,  "",$1); set_set($1,$2) } else
 		if ($1 ~ /_pos$/  ) { sub(/_pos$/,  "",$1); set_pos($1,$2) } else
-		if ($1 ~ /_owner$/) { sub(/_owner$/,"",$1); set_own($1,$2) }
+		if ($1 ~ /_owner$/) { sub(/_owner$/,"",$1); set_own($1,$2) } else
+		if ($1 ~ /_src$/  ) { sub(/_src$/,  "",$1); set_src($1,$2) }
 	    } else
 	    if ($1 ~ /^set_/) {
 		sub(/^set_/, "", $1)
 		if ($1 ~ /_hash$/ ) { sub(/_hash$/, "",$1); set_hash($1,$2) } else
 		if ($1 ~ /_numb$/ ) { sub(/_numb$/, "",$1); set_numb($1,$2) } else
-		if ($1 ~ /_owner$/) { sub(/_owner$/,"",$1); set_ownr($1,$2) }
+		if ($1 ~ /_syms$/ ) { sub(/_syms$/, "",$1); set_ssym($1,$2) } else
+		if ($1 ~ /_crcs$/ ) { sub(/_crcs$/, "",$1); set_scrc($1,$2) } else
+		if ($1 ~ /_owner$/) { sub(/_owner$/,"",$1); set_ownr($1,$2) } else
+		if ($1 ~ /_srcs$/ ) { sub(/_srcs$/, "",$1); set_ssrc($1,$2) }
 	    }
 	}
     }
-    if (result != -1)
-	close(file)
-    #print_debug("result = " result)
-    print_debug("r: cachefile, syms " count_syms ", sets " count_sets)
+    close(file)
+    print_debug(3,"result = " result)
+    if (result == -1)
+	print_vinfo(1,"r: cachefile, file not found")
+    else
+	print_vinfo(1,"r: cachefile, syms " count_syms ", sets " count_sets)
     return result
 }
-function write_cachefile(file,	    sym,set,line,count_syms,count_sets,written)
+function write_cachefile(file,	    sym,set,line,count_syms,count_sets)
 {
-    count_syms = 0; count_sets = 0; written = 0
-    print_debug("w: cachefile, file = \"" file "\"")
+    count_syms = 0; count_sets = 0
+    if ("PWD" in ENVIRON) sub("^" ENVIRON["PWD"] "/", "", file)
+    print_vinfo(1,"w: cachefile, file = \"" file "\"")
     if (1) {
 	# new style cache file format
+	print "format:" values["format"] > file
 	for (sym in syms) {
 	    line = "sym:" sym
 	    line = line ":"; if (sym in mods) { line = line mods[sym] }
@@ -883,32 +1076,41 @@ function write_cachefile(file,	    sym,set,line,count_syms,count_sets,written)
 	    line = line ":"; if (sym in sets) { line = line sets[sym] }
 	    line = line ":"; if (sym in posn) { line = line posn[sym] }
 	    line = line ":"; if (sym in ownr) { line = line ownr[sym] }
-	    print line > file; count_syms++; written++
+	    line = line ":"; if (sym in srcs) { line = line srcs[sym] }
+	    print line > file; count_syms++
 	}
 	for (set in setsets) {
 	    line = "set:" set
 	    line = line ":"; if (set in sethash) { line = line sethash[set] }
 	    line = line ":"; if (set in setnumb) { line = line setnumb[set] }
+	    line = line ":"; if (set in setsyms) { line = line setsyms[set] }
+	    line = line ":"; if (set in setcrcs) { line = line setcrcs[set] }
 	    line = line ":"; if (set in setownr) { line = line setownr[set] }
-	    print line > file; count_sets++; written++
+	    line = line ":"; if (set in setsrcs) { line = line setsrcs[set] }
+	    print line > file; count_sets++
 	}
     } else {
 	# old style cache file format
-	for (sym in mods   ) { count_syms++; written++; print "sym_" sym "_name="  mods[sym]    > file }
-	for (sym in crcs   ) {               written++; print "sym_" sym "_crc="   crcs[sym]    > file }
-	for (sym in exps   ) {               written++; print "sym_" sym "_exp="   exps[sym]    > file }
-	for (sym in sets   ) {               written++; print "sym_" sym "_set="   sets[sym]    > file }
-	for (sym in posn   ) {               written++; print "sym_" sym "_pos="   posn[sym]    > file }
-	for (sym in ownr   ) {               written++; print "sym_" sym "_owner=" ownr[sym]    > file }
-	for (set in sethash) { count_sets++; written++; print "set_" set "_hash="  sethash[set] > file }
-	for (set in setnumb) {               written++; print "set_" set "_numb="  setnumb[set] > file }
-	for (set in setownr) {               written++; print "set_" set "_owner=" setownr[set] > file }
+	print "format=" values["format"] > file
+	for (sym in mods   ) { count_syms++; print "sym_" sym "_name="   mods[sym]    > file }
+	for (sym in crcs   ) {               print "sym_" sym "_crc="    crcs[sym]    > file }
+	for (sym in exps   ) {               print "sym_" sym "_exp="    exps[sym]    > file }
+	for (sym in sets   ) {               print "sym_" sym "_set="    sets[sym]    > file }
+	for (sym in posn   ) {               print "sym_" sym "_pos="    posn[sym]    > file }
+	for (sym in ownr   ) {               print "sym_" sym "_owner="  ownr[sym]    > file }
+	for (sym in srcs   ) {               print "sym_" sym "_src="    srcs[sym]    > file }
+	for (set in sethash) { count_sets++; print "set_" set "_hash="   sethash[set] > file }
+	for (set in setnumb) {               print "set_" set "_numb="   setnumb[set] > file }
+	for (set in setsyms) {               print "set_" set "_syms=\"" setsyms[set] "\"" > file }
+	for (set in setcrcs) {               print "set_" set "_crcs=\"" setcrcs[set] "\"" > file }
+	for (set in setownr) {               print "set_" set "_owner="  setownr[set] > file }
+	for (set in setsrcs) {               print "set_" set "_srcs=\"" setsrcs[set] "\"" > file }
     }
-    if (written) close(file)
-    print_debug("w: cachefile, syms " count_syms ", sets " count_sets)
+    close(file)
+    print_vinfo(1,"w: cachefile, syms " count_syms ", sets " count_sets)
     cache_dirty = 0
 }
-function read_dumpfiles_line()
+function read_dumpfiles_line(own, src)
 {
     if (NF < 2) {
 	print_error("oops NF = " NF)
@@ -920,38 +1122,81 @@ function read_dumpfiles_line()
     }
     if (NF < 3) $3 = "vmlinux"
     if (NF < 4) $4 = ""
-    set_symbol($2, $3, $1, $4, "", 0, "")
+    set_symbol($2, $3, $1, $4, "", 0, own, src)
 }
-function read_dumpfiles(command)
+function read_dumpfiles(command, own, src)
 {
-    print_debug("r: dumpfiles, command = \"" command "\"")
+    print_vinfo(1,"r: dumpfiles, command = \"" command "\"")
     count_syms = 0; count_unds = 0
     while ((command | getline) == 1)
-	read_dumpfiles_line()
+	read_dumpfiles_line(own, src)
     close(command)
-    print_debug("r: dumpfiles, syms " count_syms ", unds " count_unds)
+    print_vinfo(1,"r: dumpfiles, syms " count_syms ", unds " count_unds)
 }
-function read_moduledir(directory)
+# read and process package Module.symvers file
+function read_modsymver(file,	    lineno,fnl,fnlp,set,pos,count_syms,count_sets)
 {
-    print_debug("r: moduledir, directory = \"" directory "\"")
-    command = "find " directory " -type f -name '*.ko' | xargs objdump -t"
-    read_modobject(command, "")
+    print_vinfo(1,"r: modsymver, file = \"" file "\"")
+    lineno = 0; count_syms = 0; count_sets = 0
+    while ((result = (getline < file)) == 1) {
+	lineno++; fnl = file ":" lineno; fnlp = fnl ": "
+	if (NF < 4) { missing(fnlp, 4); continue }
+	if (NF > 4) { garbage(fnlp, 4); NF = 4 }
+	if (NF < 4) { $4 = ""; NF = 4 }
+	if ($1~/^0x/) {
+	    if ($2 in sets) {
+		set_symbol($2, $3, $1, $4, sets[$2], posn[$2], ownr[$2], "modsymver")
+		continue
+	    }
+	    # make a new set
+	    set = $3; gsub(/\//, "_", set)
+	    if (set in setsets || !(set in setnumb)) {
+		pos = 1; count_sets++
+		set_symset(set, "", pos, $2, $1, values["pkgdirectory"], "modsymver")
+	    } else {
+		setnumb[set]++; pos = setnumb[set]
+		setsyms[set] = setsyms[set] "," $2
+		setcrcs[set] = setcrcs[set] "," $1
+	    }
+	    count_syms++
+	    set_symbol($2, $3, $1, $4, set, pos, values["pkgdirectory"], "modsymver")
+	} else { unrecog(fnlp, $0); continue }
+    }
+    print_vinfo(1,"r: modsymver, syms " count_syms ", sets" count_sets)
+    if (result == -1) return 0
+    close(file)
+    return 1
 }
-function read_mymodules(modules,    i, pair, ind, name, sym) {
-    print_debug("r: mymodules")
+function read_moduledir(directory, src,	    dir,command)
+{
+    print_vinfo(1,"r: moduledir, directory = \"" directory "\"")
+    dir = "kernel"
+    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t"
+    read_modobject(command, dir, "kernel", src)
+    dir = values["pkgdirectory"]
+    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t"
+    read_modobject(command, dir, values["pkgdirectory"], "pkgdirectory")
+}
+function read_mymodules(modules, src,    i, pair, ind, name, sym) {
+    print_vinfo(1,"r: mymodules")
     for (i = 1; i in modules; i++)
 	print modules[i] > "modvers.list"
     close("modvers.list")
     command = "cat modvers.list | xargs objdump -t "
-    read_modobject(command, "own")
+    read_modobject(command, ".", values["pkgdirectory"], src)
     system("rm -f modvers.list")
     # double check
     for (pair in mod_unds) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
-	if (sym in mods)
+	if (sym in mods) {
 	    mod_deps[name,mods[sym]] = 1
+	    if ((mods[sym],sym) in mod_used)
+		mod_used[mods[sym],sym] = mod_used[mods[sym],sym] "," name
+	    else
+		mod_used[mods[sym],sym] = name
+	}
 	if (!(sym in syms)) {
-	    print_error("unresolved symbol " sym " in module " name);
+	    print_error("unresolved symbol " sym " in module " name)
 	    continue
 	}
 	if (!(sym in crcs)) {
@@ -959,57 +1204,67 @@ function read_mymodules(modules,    i, pair, ind, name, sym) {
 	    continue
 	}
     }
+    for (pair in mod_abss) {
+	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	if (!(sym in crcs))
+	    print_warn("Ripped intern sym " name ":" sym)
+	else
+	    print_vinfo(1,"Ripped export sym " name ":" sym)
+    }
+    for (pair in mod_syms) {
+	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	if (!(sym in ownr)) continue
+	if (ownr[sym] != values["pkgdirectory"]) continue
+	if (!((name,sym) in mod_used)) {
+	    if ((name,sym) in mod_abss) {
+		if (sym in crcs)
+		    print_warn("Unused ripped export sym " name ":" sym)
+		else
+		    print_warn("Unused ripped intern sym " name ":" sym)
+	    } else
+		    print_vinfo(1,"Unused normal export sym " name ":" sym)
+	}
+    }
 }
-# read in system defined symsets
-function path_symsets(path,	find,sep,file,files,n,i)
+# read and process symsets-kversion.tar.gz file
+function read_symsets(file, own, src,	tar,fname,name,hash,list,n,symbols,ssym,scrc,sep)
 {
-    if (!path) {
-	# build a search path
-	find = "find /boot /usr/src/kernels -type f -name 'symsets-" kversion ".tar.gz' 2>/dev/null"
-	path = ""; sep = ""
-	while ((find | getline file)) {
-	    path = path sep file
-	    sep = " "
+    count_syms = 0; count_sets = 0
+    print_vinfo(1,"r: syssymset, file = \"" file "\"")
+    if (system("test -r " file) == 0) {
+	tar = "tar -tzf " file
+	while ((tar | getline fname)) {
+	    print_debug(2,"r: syssymset, fname = \"" fname "\"")
+	    if (fname~/\/$/) continue # skip directory
+	    set  = fname; sub(/^.*\//,"",set)
+	    hash = set;   sub(/^.*\./,"",hash)
+	                  sub(/\..*$/,"",set)
+	    print_debug(3,"r: syssymset,     set = \"" set "\"")
+	    print_debug(3,"r: syssymset,     hash = \"" hash "\"")
+	    pos = 0; lineno = 0
+	    ssym = ""; scrc = ""; sep = ""
+	    list = "tar -xzOf " file " " fname
+	    while ((list | getline)) {
+		lineno++; fnl = file ":" lineno; fnlp = fnl ": "
+		if (NF < 3) { missing(fnlp, 3); continue }
+		if (NF > 4) { garbage(fnlp, 4); NF = 4 }
+		if (NF < 4) { $4 = ""; NF = 4; values["format"] = "redhat" }
+		if ($1~/^0x/) {
+		    print_debug(3,"r: syssymset,     sym = \"" $2 "\"")
+		    print_debug(3,"r: syssymset,         crc = \"" $1 "\"")
+		    print_debug(3,"r: syssymset,         mod = \"" $3 "\"")
+		    pos++
+		    set_symbol($2, $3, $1, $4, set, pos, own, src)
+		    ssym = ssym sep $2
+		    scrc = scrc sep $1
+		    sep = ","
+		} else { unrecog(fnlp, $0); continue }
+	    }
+	    close(list)
+	    set_symset(set, hash, pos, ssym, scrc, own, src)
 	}
-	close(find)
     }
-    n = split(path,files)
-    file = ""
-    for (i=1;i<=n;i++) {
-	if (system("test -r " files[i]) != 0) {
-	    file = files[i]
-	    break;
-	}
-    }
-    return file
-}
-function read_symsets(path,	file,tar,fname,name,hash,list,n,symbols)
-{
-    file = path_symsets(path)
-    if (!file) {
-	print_warn("no symsets found in path")
-	return 0
-    }
-    print_debug("unpacking " file)
-    tar = "tar -tzf " file
-    while ((tar | getline fname)) {
-	if (fname~/\/$/) continue # skip directory
-	set  = fname; sub(/\..*$/,"",set )
-	hash = fname; sub(/^.*\./,"",hash);
-	pos = 0; lineno = 0
-	list = "tar -xzOf " file " " fname
-	while ((list | getline)) {
-	    lineno++; fnl = file ":" lineno; fnlp = fnl ": "
-	    if (NF < 4) { missing(fnlp, 4); continue }
-	    if (NF > 4) { garbage(fnlp, 4); NF = 4 }
-	    if (NF < 4) { $4 = ""; NF = 4 }
-	    if ($1~/^0x/) {
-		pos++
-		set_symbol($2, $3, $1, $4, set, pos, 0)
-	    } else { unrecog(fnlp, $0); continue }
-	}
-	set_symset(set, hash, pos, "kabi")
-    }
+    print_vinfo(1,"r: sysymset, syms " count_syms ", sets " count_sets)
     close(tar)
     return 1
 }
@@ -1042,7 +1297,8 @@ function read_symvers(path,	result,file,fnl,lineno,fnlp)
 	return 0
     }
     count_syms = 0
-    print_debug("r: syssymver, file = \"" file "\"")
+    if ("PWD" in ENVIRON) sub("^" ENVIRON["PWD"] "/", "", file)
+    print_vinfo(1,"r: syssymver, file = \"" file "\"")
     while ((result = (getline < file)) == 1) {
 	lineno++; fnl = file ":" lineno; fnlp = fnl ": "
 	if (NF < 4) { missing(fnlp, 4); continue }
@@ -1051,33 +1307,42 @@ function read_symvers(path,	result,file,fnl,lineno,fnlp)
 	# try to find a symbol set that contains the symbol
 	if ($1~/^0x/) {
 	    if ($2 in sets) {
-		set_symbol($2, $3, $1, $4, sets[$2], posn[$2], ownr[$2])
+		set_symbol($2, $3, $1, $4, sets[$2], posn[$2], ownr[$2], "syssymver")
 		continue
 	    }
 	    # make a new set
 	    set = "kernel/" $3; gsub(/\//, "_", set)
-	    pos = 0; if (set in setnumb) { pos = setnumb[set] }; pos++
-	    set_symbol($2, $3, $1, $4, set, pos, "kernel")
-	    setnumb[set] = pos
+	    if (set in setsets || !(set in setnumb)) {
+		pos = 1
+		set_symset(set, "", pos, $2, $1, "kernel", "syssymver")
+	    } else {
+		setnumb[set]++; pos = setnumb[set]
+		setsyms[set] = setsyms[set] "," $2
+		setcrcs[set] = setcrcs[set] "," $1
+	    }
+	    set_symbol($2, $3, $1, $4, set, pos, "kernel", "syssymver")
 	} else { unrecog(fnlp, $0); continue }
     }
-    print_debug("w: syssymver, syms " count_syms)
+    print_vinfo(1,"r: syssymver, syms " count_syms)
     if (result == -1) return 0
     close(file)
     return 1
 }
-function write_syssymver(file,    sym,line,count_syms)
+function write_syssymver(file,    sym,line,count_syms,mod)
 {
-    print_debug("w: syssymver, file = \"" file "\"")
+    if ("PWD" in ENVIRON) sub("^" ENVIRON["PWD"] "/", "", file)
+    print_vinfo(1,"w: syssymver, file = \"" file "\"")
     count_syms = 0
     for (sym in syms) {
-	if (sym in ownr && ownr[sym])
+	if (sym in ownr && ownr[sym] == values["pkgdirectory"])
 	    continue
 	if (!(sym in crcs)) {
 	    print_error("no crc for symbol: " sym)
 	    continue
 	}
-	line = crcs[sym] "\t" sym "\t" mods[sym]
+	mod = mods[sym]
+	sub(/^.*\/built-in\.o$/,"vmlinux",mod)
+	line = crcs[sym] "\t" sym "\t" mod
 	if (values["exportsyms"]) {
 	    if (!(sym in exps)) {
 		print_error("no export for symbol: " sym)
@@ -1090,14 +1355,14 @@ function write_syssymver(file,    sym,line,count_syms)
     }
     if (count_syms)
 	close(file)
-    print_debug("w: syssymver, syms " count_syms)
+    print_vinfo(1,"w: syssymver, syms " count_syms)
 }
 function write_modsymver(file,    sym, line, count_syms)
 {
-    print_debug("w: modsymver, file = \"" file "\"")
+    print_vinfo(1,"w: modsymver, file = \"" file "\"")
     count_syms = 0
     for (sym in ownr) {
-	if (!ownr[sym]) continue
+	if (ownr[sym] != values["pkgdirectory"]) continue
 	if (!(sym in crcs)) {
 	    print_warn("no crc for symbol: " sym)
 	    continue
@@ -1115,9 +1380,81 @@ function write_modsymver(file,    sym, line, count_syms)
     }
     if (count_syms)
 	close(file)
-    print_debug("w: modsymver, syms " count_syms)
+    print_vinfo(1,"w: modsymver, syms " count_syms)
 }
-function write_header(file, modname, basename)
+function write_symsets(file,		directory,tarball,dirname,basename,chngdir,set,hash,setfile,n,sym,scrc)
+{
+    directory = file
+    sub(/\.tar\.gz/, "", directory)
+    tarball = directory ".tar.gz"
+    dirname  = getline_command("dirname "  directory)
+    basename = getline_command("basename " directory)
+    if (dirname == ".") { chngdir = "" } else { chngdir = " -C " dirname }
+    system_command("mkdir -p " directory)
+    if (system("test -f " tarball) == 0) {
+	print_debug(1,"r: unpacking tarball " tarball)
+	system_command("tar -xzf " tarball chngdir)
+    }
+
+    print_debug(3,"processing symbols")
+    for (set in symsets) {
+	print_debug(3,"processing symbol set " set)
+	if (values["format"] == "redhat") {
+	    # note that RedHat does not protect the symbol name,
+	    # the location of the symbol within the kernel, nor
+	    # the export type in the kABI, whereas SuSE does.
+	    scrc = get_crcs(set)
+	    if (!scrc) {
+		print_error("set " set " could not create crcs list!")
+		continue
+	    }
+	    gsub(/,/,"",scrc)
+	    $0 = getline_command("echo '" scrc "' | sha1sum")
+	    hash = $1
+	    if ((set in sethash) && (hash != sethash[set])) {
+		print_error("set " set " hash NOT CHANGED from " sethash[set] " to " hash)
+		hash = sethash[set]
+	    }
+	    print_debug(3,"hash is: '" hash "'")
+	} else {
+	    hash = "tmp"
+	}
+	print_debug(3,"removing " directory "/" set ".*")
+	system_command("rm -f -- " directory "/" set ".*")
+	setfile = directory "/" set "." hash
+	print_debug(3,"creating " setfile)
+	delete set_temp
+	for (sym in set_syms) { set_temp[set_syms[sym]] = sym }
+	for (sym in set_temp) {
+	    if (values["format"] != "redhat")
+		print crcs[sym] "\t" sym "\t" mods[sym] "\t" exps[sym] > setfile
+	    else
+		print crcs[sym] "\t" sym "\t" mods[sym] > setfile
+	    written[setfile] = 1
+	}
+	if (setfile in written) {
+	    close(setfile)
+	    delete written[setfile]
+	}
+	if (hash == "tmp") {
+	    hash = getline_command("md5sum " setfile)
+	    hash = substr(hash, 1, 16)
+	    if ((set in sethash) && (hash != sethash[set])) {
+		print_warn("set " set " hash NOT CHANGED from " sethash[set] " to " hash)
+		hash = sethash[set]
+	    }
+	    print_debug(3,"hash is: '" hash "'")
+	    print_debug(3,"moving " setfile " to " directory "/" set "." hash)
+	    system_command("mv -f -- " setfile " " directory "/" set "." hash)
+	}
+    }
+    print_debug(3,"done processing symbols")
+    print_debug(3,"creating " tarball)
+    system_command("tar -czf " tarball chngdir " " basename)
+    print_debug(3,"removing working directory " directory)
+    system_command("rm -fr -- " directory)
+}
+function write_header(file, mod, base)
 {
     print "\
 #include <linux/module.h>\n\
@@ -1136,20 +1473,20 @@ MODULE_INFO(supported, \"yes\");\n\
 #endif\n\
 \n\
 #undef KBUILD_MODNAME\n\
-#define KBUILD_MODNAME " basename "\n\
+#define KBUILD_MODNAME " base "\n\
 \n\
 #ifdef KBUILD_MODNAME\n\
 struct module __this_module\n\
 __attribute__((section(\".gnu.linkonce.this_module\"))) = {\n\
 	.name = __stringify(KBUILD_MODNAME),\
 " > file
-	if (modname in mod_init)
+	if (mod in mod_init)
 	    print "\t.init = init_module," > file
-	if (modname in mod_exit)
+	if (mod in mod_exit)
 	    print "#ifdef CONFIG_MODULE_UNLOAD\n\t.exit = cleanup_module,\n#endif" > file
 	print "};\n#endif" > file
 }
-function write_modversions(file, modname, basename,	count, pair, ind, name, sym)
+function write_modversions(file, mod, base,	count, pair, ind, name, sym)
 {
     count = 0
     print "\n\
@@ -1160,25 +1497,25 @@ __attribute__((section(\"__versions\"))) = {\
 " > file
     for (pair in mod_unds) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
-	if (name != modname) continue
+	if (name != mod) continue
 	if (!(sym in crcs)) continue
 	print "\t{ " crcs[sym] ", \"" sym "\" }," > file
 	count ++
     }
     print "};\n#endif" > file
-    if (count) print_debug("wrote " count " symbol versions")
+    if (count) print_debug(1,"wrote " count " symbol versions")
 }
-function write_dependencies(file, modname, basename,	count, deps, sep, pair, ind, name, dep) {
+function write_dependencies(file, mod, base,	count, deps, sep, pair, ind, name, dep) {
     count = 0; deps = ""; sep = ""
     for (pair in mod_deps) {
 	split(pair, ind, SUBSEP); name = ind[1]; dep = ind[2]
-	if (name != modname) continue
+	if (name != mod) continue
 	sub(/.*\//, "", dep)
-	if (dep == "vmlinux" || dep == "") continue
+	if (dep == "vmlinux" || dep == "built-in.o" || dep == "") continue
 	deps = deps sep dep; sep = ","; count++
     }
     if (deps) {
-	print_debug("wrote " count " dependencies")
+	print_debug(1,"wrote " count " dependencies")
 	print "\n\
 static const char __module_depends[]\n\
 __attribute_used__\n\
@@ -1187,19 +1524,19 @@ __attribute__((section(\".modinfo\"))) =\n\
 " > file
     }
 }
-function write_srcversion(file, modname, basename,	srcversion)
+function write_srcversion(file, mod, base,	srcversion)
 {
     srcversion = "42e8e4e40dfa7590147e23a5b9a3105d"
     # first step, see if there are any __mod_version symbols
     reason = ""
-    if (modname in mod_vers)
+    if (mod in mod_vers)
 	reason = "version"
     else if (values["allsrcversion"])
 	reason = "all"
     else return
     # the tricky way to find sources is to use the dependencies; however,
     # this means that we must enable dependency tracking when building rpms
-    srcbase = basename
+    srcbase = base
     sub(/^streams[-_]/, "", srcbase)
     command = "find .deps -name 'lib*" srcbase "_a-*.Po' -o -name 'lib*_a-*" srcbase ".Po' | xargs egrep -h ':$' | sort -u | cut -f1 -d: | egrep -v '(/lib/modules|/usr/lib)' | xargs -r cat | md5sum" # openssl md4 | cut -f2 '-d '"
     result = (command | getline)
@@ -1213,33 +1550,34 @@ function write_srcversion(file, modname, basename,	srcversion)
     else
 	print "\nMODULE_INFO(srcversion, \"" srcversion "\");\n" > file
 }
-function write_mymodules(modules,    i, basename, file, modname)
+function write_mymodules(modules,    i, base, file, mod)
 {
     files = 0
-    print_debug("w: mymodules")
+    print_vinfo(1,"w: mymodules")
     for (i = 1; i in modules; i++) {
-	basename = modules[i]
-	sub(/(\.mod)?\.(k)?o(\.gz)?$/, "", basename)
-	#sub(/^.*\//, "", basename)
-	file = basename ".mod.c"
-	sub(/^.*\//, "", basename)
-	modname = values["pkgdirectory"] "/" basename
+	base = modules[i]
+	sub(/(\.mod)?\.(k)?o(\.gz)?$/, "", base)
+	#sub(/^.*\//, "", base)
+	file = base ".mod.c"
+	sub(/^.*\//, "", base)
+	mod = values["pkgdirectory"] "/" base
 	files++
-	if (values["verbose"] == 1 && values["debug"] == 0)
-	    print "  GEN    " basename ".mod.c"
-	print_debug("writing " file)
-	write_header(file, modname, basename)
+	if (!("V" in ENVIRON) || (ENVIRON["V"] != 1))
+	    print "  GEN    " base ".mod.c"
+	else
+	    print_vinfo(1,"w: mymodules, file = " file)
+	write_header(file, mod, base)
 	if (values["modversions"])
-	    write_modversions(file, modname, basename)
-	write_dependencies(file, modname, basename)
-	write_srcversion(file, modname, basename)
+	    write_modversions(file, mod, base)
+	write_dependencies(file, mod, base)
+	write_srcversion(file, mod, base)
 	close(file)
     }
-    print_debug("w: mymodules, " files " files written")
+    print_vinfo(1,"w: mymodules, " files " files written")
 }
 BEGIN {
     LINT = "yes"
-    me = "modpost.awk"
+    me = "modpost.awk"; count_errs = 0; count_warn = 0
     if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"
     if (ENVIRON["TERM"] == "dumb" || system("test -t 1 -a -t 2") != 0) {
 	stdout = "/dev/stderr"
@@ -1271,7 +1609,7 @@ BEGIN {
     # MODPOST_SYSVER  contains all the system  defined symbol versions
     # MODPOST_MODVER  contains all the package defined symbol versions
     # MODPOST_SYMSETS contains the new symbol sets
-    longopts["modules"      ] = "M:" ;																		  descrips["modules"      ] = "modules for which to generate symbols"
+    longopts["modules"      ] = "M:" ;																		  descrips["modules"      ] = "modules for which to generate symbols (space separated list)"
     longopts["cachefile"    ] = "c:" ; environs["cachefile"    ] = "MODPOST_CACHE"		 ; defaults["cachefile"    ] = "modpost.cache"					; descrips["cachefile"    ] = "where to cache system smybol versions"
     longopts["kversion"     ] = "k:" ; environs["kversion"     ] = "kversion"			 ; defaults["kversion"     ] = kversion						; descrips["kversion"     ] = "kernel version KVERSION"
     longopts["moddir"       ] = "d:" ; environs["moddir"       ] = "MODPOST_MODDIR"		 ; defaults["moddir"       ] = "/lib/modules/" kversion				; descrips["moddir"       ] = "directory containing modules for which to generate symbols"
@@ -1279,6 +1617,13 @@ BEGIN {
     longopts["infile"       ] = "i:" ; environs["infile"       ] = "MODPOST_INPUTS"		 ; defaults["infile"       ] = "/lib/modules/" kversion "/build/Module.symvers"	; descrips["infile"       ] = "input file (space separated)"
     longopts["outfile"      ] = "o:" ; environs["outfile"      ] = "MODPOST_MODVER"		 ; defaults["outfile"      ] = "Module.symvers"					; descrips["outfile"      ] = "output file for module symbols"
     longopts["sysfile"      ] = "s:" ; environs["sysfile"      ] = "MODPOST_SYSVER"		 ; defaults["sysfile"      ] = "System.symvers"					; descrips["sysfile"      ] = "output file for system symbols"
+    longopts["ksysvers"     ] = ":"  ; environs["ksysvers"     ] = "MODPOST_KSYSVERS"		 ; defaults["ksysvers"     ] = "/boot/sysvers-" kversion ".gz"			; descrips["ksysvers"     ] = "input file for system sysvers"
+    longopts["sysvers"      ] = ":"  ; environs["sysvers"      ] = "MODPOST_SYSVERS"		 ; defaults["sysvers"      ] = "sysvers-" kversion ".gz"			; descrips["sysvers"      ] = "output file for combined sysvers"
+    longopts["pkgabi"       ] = "P:" ; environs["pkgabi"       ] = "MODPOST_PKGABI"		 ; defaults["pkgabi"       ] = "package.abi"					; descrips["pkgabi"       ] = "input file containing package ABI definitions"
+    longopts["symsets"      ] = "S:" ; environs["symsets"      ] = "MODPOST_SYMSETS"		 ; defaults["symsets"      ] = "symsets-" kversion ".tar.gz"			; descrips["symsets"      ] = "output file for symsets"
+    longopts["ksymsets"     ] = "K:" ; environs["ksymsets"     ] = "MODPOST_KSYMSETS"		 ; defaults["ksymsets"     ] = "/boot/symsets-" kversion ".tar.gz"		; descrips["ksymsets"     ] = "input system symsets file"
+    longopts["missing"      ] = "g"  ;								   defaults["missing"      ] = 0						; descrips["missing"      ] = "create missing system symsets (ksyms missing from kabi)"
+    longopts["format"       ] = "f:" ;								   defaults["format"       ] = "auto"						; descrips["format"       ] = "symsets file format (suse,redhat,auto)"
     longopts["unload"       ] = "u"  ; environs["unload"       ] = "CONFIG_MODULE_UNLOAD"	 ; defaults["unload"       ] = 0						; descrips["unload"       ] = "module unloading is supported"
     longopts["modversions"  ] = "m"  ; environs["modversions"  ] = "CONFIG_MODVERSIONS"		 ; defaults["modversions"  ] = 0						; descrips["modversions"  ] = "module versions are supported"
     longopts["allsrcversion"] = "a"  ; environs["allsrcversion"] = "CONFIG_MODULE_SRCVERSION_ALL"; defaults["allsrcversion"] = 0						; descrips["allsrcversion"] = "source version all modules"
@@ -1288,40 +1633,55 @@ BEGIN {
     longopts["dry-run"      ] = "n"  ;								   defaults["dry-run"      ] = 0						; descrips["dry-run"      ] = "don't perform actions, just check them"
     longopts["quiet"        ] = "q"  ;								   defaults["quiet"        ] = 0						; descrips["quiet"        ] = "suppress normal output"
     longopts["silent"       ] = "q"  ;								   defaults["silent"       ] = 0						; descrips["silent"       ] = "suppress normal output"
-    longopts["debug"        ] = "D::";								   defaults["debug"        ] = 1						; descrips["debug"        ] = "increase or set debug level DEBUG"
-    longopts["verbose"      ] = "v::";								   defaults["verbose"      ] = 1						; descrips["verbose"      ] = "increase or set verbosity level VERBOSITY"
+    longopts["debug"        ] = "D::";								   defaults["debug"        ] = 0						; descrips["debug"        ] = "increase or set debug level DEBUG"
+    longopts["verbose"      ] = "v::";								   defaults["verbose"      ] = 0						; descrips["verbose"      ] = "increase or set verbosity level VERBOSITY"
     longopts["help"         ] = "h"  ;																		  descrips["help"         ] = "display this usage information and exit"
     longopts["version"      ] = "V"  ;																		  descrips["version"      ] = "display script version and exit"
     longopts["copying"      ] = "C"  ;																		  descrips["copying"      ] = "display coding permissions and exit"
     # mark options that must default to environment or default setting
     values["cachefile"    ] = ""
     # set mandatory defaults
-    values["pkgdirectory" ] = defaults["pkgdirectory" ]
+    values["missing"      ] = defaults["missing"      ]
+    values["format"       ] = defaults["format"       ]
     values["unload"       ] = defaults["unload"       ]
     values["modversions"  ] = defaults["modversions"  ]
     values["allsrcversion"] = defaults["allsrcversion"]
     values["exportsyms"   ] = defaults["exportsyms"   ]
+    values["pkgdirectory" ] = defaults["pkgdirectory" ]
     values["debug"        ] = defaults["debug"        ]
     values["verbose"      ] = defaults["verbose"      ]
     values["quiet"        ] = defaults["quiet"        ]
-    if ("V" in ENVIRON && ENVIRON["V"] == 1) {
-	values["quiet"  ] = 0
-	values["verbose"] = 2
-    }
-    optstring = "M:c:k:d:F:i:o:s:umaxp:nqD::v::hVC"
+    optstring = "M:c:k:d:F:i:o:s:*P:K:S:gf:umaxp:nqD::v::hVC"
     optind = 0
     while (1) {
 	c = getopt_long(ARGC, ARGV, optstring, longopts)
 	if (c == -1) break
-	else if (c ~ /[MckdFiosp]/) { values[option] = optarg }
-	else if (c ~ /[umaxnq]/)    { values[option] = 1 }
-	else if (c == "D") { if (optarg) { values["debug"  ] = optarg } else { values["debug"  ]++ } }
-	else if (c == "v") { if (optarg) { values["verbose"] = optarg } else { values["verbose"]++ } }
+	else if (c ~ /[MckdFiosPKSfp]/) { values[option] = optarg }
+	else if (c ~ /[gumaxnq]/) { values[option] = 1 }
+	else if (c~/[Dv]/) { if (optarg) { values[option] = optarg } else { values[option]++ } }
 	else if (c == "h") { help(   stdout); exit 0 }
 	else if (c == "V") { version(stdout); exit 0 }
 	else if (c == "C") { copying(stdout); exit 0 }
 	else               { usage(  stderr); exit 2 }
     }
+    if (values["quiet"  ] == defaults["quiet"  ] &&
+	values["debug"  ] == defaults["debug"  ] &&
+	values["verbose"] == defaults["verbose"]) {
+	if ("V" in ENVIRON) {
+	    if (ENVIRON["V"] == "0") {
+		values["quiet"  ] = 1
+		values["debug"  ] = 0
+		values["verbose"] = 0
+	    } else
+	    if (ENVIRON["V"] == "1") {
+		values["quiet"  ] = 0
+		values["debug"  ] = 0
+		values["verbose"] = 2
+	    }
+	}
+    }
+    if (values["verbose"] >=3 && values["debug"] == defaults["debug"])
+	values["debug"] = values["verbose"] - 2
     if (optind < ARGC) {
 	values["modules"] = ARGV[optind]; optind++
 	while (optind < ARGC) {
@@ -1332,11 +1692,11 @@ BEGIN {
     for (i=1;ARGC>i;i++) { delete ARGV[i] }
     for (value in values) {
 	if (!values[value] && (value in environs) && (environs[value] in ENVIRON) && ENVIRON[environs[value]]) {
-	    print_debug("o: assigning value for " value " from environment " environs[value])
+	    print_debug(1,"o: assigning value for " value " from environment " environs[value])
 	    values[value] = ENVIRON[environs[value]]
 	}
 	if (!values[value] && (value in defaults) && defaults[value]) {
-	    print_debug("o: assigning value for " value " from default " defaults[value])
+	    print_debug(1,"o: assigning value for " value " from default " defaults[value])
 	    values[value] = defaults[value]
 	}
     }
@@ -1345,15 +1705,17 @@ BEGIN {
 	cache_dirty = 0
     else {
 	if (("filename" in values) && values["filename"])
-	    read_systemmap(cat_command(values["filename"]), "vmlinux", "")
+	    read_systemmap(cat_command(values["filename"]), "vmlinux", "kernel", "filename")
 	if (("infile" in values) && values["infile"])
-	    read_dumpfiles(cat_command(values["infile"]))
+	    read_dumpfiles(cat_command(values["infile"]), "kernel", "infile")
 	if (("moddir" in values) && values["moddir"])
-	    read_moduledir(values["moddir"])
+	    read_moduledir(values["moddir"], "moddir")
+	if (("ksymsets" in values) && values["ksymsets"])
+	    read_symsets(values["ksymsets"], "kabi", "ksymsets")
     }
     if (("modules" in values) && values["modules"]) {
 	split(values["modules"], modules)
-	read_mymodules(modules)
+	read_mymodules(modules, "modules")
     }
     # write out cache file
     if (("cachefile" in values) && values["cachefile"] && cache_dirty)
@@ -1368,6 +1730,8 @@ BEGIN {
     exit 0
 }
 END {
+    if (count_errs) print_error("errs = " count_errs)
+    if (count_warn)  print_warn("warn = " count_warn)
     for (file in written)
 	close(file)
 }
