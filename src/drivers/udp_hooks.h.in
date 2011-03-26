@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: udp_hooks.h.in,v 1.1.2.4 2011-01-12 04:10:30 brian Exp $
+ @(#) $Id: udp_hooks.h.in,v 1.1.2.5 2011-03-26 04:28:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp_hooks.h.in,v $
+ Revision 1.1.2.5  2011-03-26 04:28:48  brian
+ - updates to build process
+
  Revision 1.1.2.4  2011-01-12 04:10:30  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -123,29 +126,70 @@ struct sockaddr_storage {
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
-#undef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
-#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
+extern struct icmp_err icmp_err_convert[];
+
+extern struct icmp_mib icmp_statistic[];
+
+#undef HAVE_IP_ROUTE_OUTPUT_FLOW_USABLE
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_USABLE
 int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
 #endif
 
+#undef HAVE_IP_RT_MIN_PMTU_USABLE
+#ifdef HAVE_IP_RT_MIN_PMTU_USABLE
 extern int ip_rt_min_pmtu;
+#else
+#define ip_rt_min_pmtu 552
+#endif
 
+#undef HAVE_IP_RT_MTU_EXPIRES_USABLE
+#ifdef HAVE_IP_RT_MTU_EXPIRES_USABLE
 extern int ip_rt_mtu_expires;
+#endif
 
-#undef HAVE_IP_RT_UPDATE_PMTU_ADDR
-#ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
+#undef HAVE_IP_RT_UPDATE_PMTU_USABLE
+#ifdef HAVE_IP_RT_UPDATE_PMTU_USABLE
 void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
 #endif
 
+#undef HAVE_SYSCTL_IP_DYNADDR_USABLE
+#ifndef sysctl_ip_dynaddr
+#ifdef HAVE_SYSCTL_IP_DYNADDR_USABLE
 extern int sysctl_ip_dynaddr;
+#else
+#define sysctl_ip_dynaddr 0
+#endif
+#endif
 
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_USABLE
+#ifndef sysctl_ip_nonlocal_bind
+#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_USABLE
 extern int sysctl_ip_nonlocal_bind;
+#else
+#define sysctl_ip_nonlocal_bind 0
+#endif
+#endif
 
+#ifndef IPDEFTTL
+#define IPDEFTTL 64
+#endif
+
+#undef HAVE_SYSCTL_IP_DEFAULT_TTL_USABLE
+#ifndef sysctl_ip_default_ttl
+#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_USABLE
 extern int sysctl_ip_default_ttl;
+#else
+#define sysctl_ip_default_ttl IPDEFTTL
+#endif
+#endif
 
-#undef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
-#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
-int __ip_route_output_key(struct rtable **rp, const struct flowi *flp)
+#ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
+extern int sysctl_local_port_range[2];
+#endif				/* HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL */
+
+#undef HAVE___IP_ROUTE_OUTPUT_KEY_USABLE
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_USABLE
+int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
 #endif
 
 #undef HAVE_KFUNC_DST_MTU
@@ -203,13 +247,13 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 }
 #endif
 
-#undef HAVE___XFRM_POLICY_CHECK_ADDR
-#ifdef HAVE___XFRM_POLICY_CHECK_ADDR
+#undef HAVE___XFRM_POLICY_CHECK_USABLE
+#ifdef HAVE___XFRM_POLICY_CHECK_USABLE
 int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned short family);
 #endif
 
-#undef HAVE_XFRM_POLICY_DELETE_ADDR
-#ifdef HAVE_XFRM_POLICY_DELETE_ADDR
+#undef HAVE_XFRM_POLICY_DELETE_USABLE
+#ifdef HAVE_XFRM_POLICY_DELETE_USABLE
 #ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
 int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #else
@@ -217,8 +261,8 @@ void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #endif
 #endif
 
-#undef HAVE_SNMP_GET_INFO_ADDR
-#ifdef HAVE_SNMP_GET_INFO_ADDR
+#undef HAVE_SNMP_GET_INFO_USABLE
+#ifdef HAVE_SNMP_GET_INFO_USABLE
 int snmp_get_info(char *buffer, char **start, off_t offset, int length);
 #endif
 
@@ -234,6 +278,18 @@ extern int ip_frag_nqueues;
 #endif
 #endif
 
+#undef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
+#ifdef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
+int ip_frag_mem(struct net *net);
+#else
+#undef HAVE_KFUNC_IP_FRAG_MEM_0_ARGS
+#ifdef HAVE_KFUNC_IP_FRAG_MEM_0_ARGS
+int ip_frag_mem(void);
+#else
+extern atomic_t ip_frag_mem;
+#endif
+#endif
+
 #ifndef SK_WMEM_MAX
 #define SK_WMEM_MAX 65535
 #endif
@@ -241,40 +297,40 @@ extern int ip_frag_nqueues;
 #define SK_RMEM_MAX 65535
 #endif
 
-#undef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
+#undef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
 #ifndef sysctl_rmem_default
-#ifndef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
+#ifdef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
+extern __u32 sysctl_rmem_default;
+#else
 #define sysctl_rmem_default SK_RMEM_MAX
 #endif
-#else
-extern __u32 sysctl_rmem_default;
 #endif
 
-#undef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
+#undef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
 #ifndef sysctl_wmem_default
-#ifndef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
+#ifdef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
+extern __u32 sysctl_wmem_default;
+#else
 #define sysctl_wmem_default SK_WMEM_MAX
 #endif
-#else
-extern __u32 sysctl_wmem_default;
 #endif
 
-#undef HAVE_SYSCTL_RMEM_MAX_ADDR
+#undef HAVE_SYSCTL_RMEM_MAX_SUPPORT
 #ifndef sysctl_rmem_max
-#ifndef HAVE_SYSCTL_RMEM_MAX_ADDR
+#ifdef HAVE_SYSCTL_RMEM_MAX_SUPPORT
+extern __u32 sysctl_rmem_max;
+#else
 #define sysctl_rmem_max SK_RMEM_MAX
 #endif
-#else
-extern __u32 sysctl_rmem_max;
 #endif
 
-#undef HAVE_SYSCTL_WMEM_MAX_ADDR
+#undef HAVE_SYSCTL_WMEM_MAX_SUPPORT
 #ifndef sysctl_wmem_max
-#ifndef HAVE_SYSCTL_WMEM_MAX_ADDR
+#ifdef HAVE_SYSCTL_WMEM_MAX_SUPPORT
+extern __u32 sysctl_wmem_max;
+#else
 #define sysctl_wmem_max SK_WMEM_MAX
 #endif
-#else
-extern __u32 sysctl_wmem_max;
 #endif
 
 #ifndef socklen_t

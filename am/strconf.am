@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-17 07:01:27 $
+# @(#) $RCSfile: strconf.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-03-26 04:28:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
+## Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -63,35 +63,35 @@ endif
 am__strconf_inputs = --package=$(STRCONF_PACKAGE) -B$(STRCONF_MINORSZ) -b$(STRCONF_MAJBASE) -i$(STRCONF_MIDBASE) $(STRCONF_INPUT)
 
 $(STRCONF_CONFIG): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --hconfig=$@ $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --hconfig=$@ $(am__strconf_inputs) || exit $$?
 
 $(STRCONF_MODCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --modconf=$@ $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --modconf=$@ $(am__strconf_inputs) || exit $$?
 
 $(STRCONF_MKNODES): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --makenodes=$@ $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --makenodes=$@ $(am__strconf_inputs) || exit $$?
 
 $(STRCONF_DRVCONF): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --driverconf=$@ $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --driverconf=$@ $(am__strconf_inputs) || exit $$?
 
 $(STRCONF_CONFMOD): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --confmodules=$@ $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --confmodules=$@ $(am__strconf_inputs) || exit $$?
 
 $(STRCONF_MAKEDEV): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --strmknods=$@ $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --strmknods=$@ $(am__strconf_inputs) || exit $$?
 
 $(STRCONF_STSETUP): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --strsetup=$@ $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --strsetup=$@ $(am__strconf_inputs) || exit $$?
 
 $(STRCONF_STRLOAD): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --strload=$@ $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --strload=$@ $(am__strconf_inputs) || exit $$?
 
 $(STRCONF_DEVICES): $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --mkdevices=$@ $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --mkdevices=$@ $(am__strconf_inputs) || exit $$?
 
 if WITH_PACKAGES
 $(STRCONF_PKGRULE).in: $(STRCONF_INPUT) $(STRCONF_SCRIPT)
-	$(AM_V_GEN)$(STRCONF) --pkgrules=$(STRCONF_PKGRULE).in --packagedir=$(STRCONF_BPKGDIR) $(am__strconf_inputs)
+	$(AM_V_GEN)$(STRCONF) --pkgrules=$(STRCONF_PKGRULE).in --packagedir=$(STRCONF_BPKGDIR) $(am__strconf_inputs) || exit $$?
 endif
 
 ALL_LOCAL += \
@@ -200,6 +200,9 @@ EXTRA_DIST		+= $(STRCONF_CONFIGS)
 ## =============================================================================
 ##
 ## $Log: strconf.am,v $
+## Revision 1.1.2.9  2011-03-26 04:28:45  brian
+## - updates to build process
+##
 ## Revision 1.1.2.8  2011-03-17 07:01:27  brian
 ## - build and repo system improvements
 ##

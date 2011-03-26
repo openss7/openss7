@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-17 07:01:29 $
+# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:46 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $
+# Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -111,10 +111,17 @@ function print_dmore(level, string)
 function print_error(string)
 {
     print red me ": E: " string std > stderr
+    if (count_errs) errors = errors "\n"
+    errors = errors red me ": E: " string std;
     written[stderr] = 1
     count_errs++
 }
-function print_warn(string)
+function print_emore(string)
+{
+    print red me ": E: " string std > stderr
+    written[stderr] = 1
+}
+function print_warns(string)
 {
     if ((values["quiet"] == 0) || (values["verbose"] > 0) || (values["debug"] > 0)) {
 	print org me ": W: " string std > stderr
@@ -122,13 +129,20 @@ function print_warn(string)
     }
     count_warn++
 }
+function print_wmore(string)
+{
+    if ((values["quiet"] == 0) || (values["verbose"] > 0) || (values["debug"] > 0)) {
+	print org me ": W: " string std > stderr
+	written[stderr] = 1
+    }
+}
 function usage(output)
 {
     if (values["quiet"])
 	return
     print "\
 " me ":\n\
-  $Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
+  $Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
 Usage:\n\
   awk -f " me " -- [options] [INPUT ...]\n\
   awk -f " me " -- -" longopts["help"] "\n\
@@ -170,14 +184,16 @@ function help_opttags(name,  line,char,opt,oth)
 	    line = "--" name
 	}
 	if (opt~/::$/) { line = line " [" toupper(name) "]" } else
-	if (opt~/:$/)  { line = line " " toupper(name) }
+	if (opt~/:$/)  { line = line " " toupper(name) } else
+	if (name !~ /^(help|version|copying)$/)
+	               { line = line ", --no-" name }
 	if (opt~/[[:alnum:]]/) {
 	    for (oth in longopts) {
 		if (opt != longopts[oth]) continue
 		if (oth == name) continue
 		if (opt~/::$/) { line = line ", --" oth " [" toupper(oth) "]" } else
 		if (opt~/:$/)  { line = line ", --" oth " " toupper(oth) } else
-			       { line = line ", --" oth }
+			       { line = line ", --" oth ", --no-" oth }
 	    }
 	}
     }
@@ -242,7 +258,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -265,7 +281,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -307,7 +323,7 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 }
 function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg, wantarg)
 {
-    option = ""; optval = ""; optarg = ""; pos = 0; needarg = 0; wantarg = 0
+    option = ""; optval = ""; optarg = ""; optset = ""; pos = 0; needarg = 0; wantarg = 0
     if (optind == 0) { optind = 1; more = "" }
     while ((optind < argc) || (more != "")) {
 	if (more) { arg = "-" more; more = "" }
@@ -340,13 +356,23 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	    }
 	    if (arg ~ /^--[a-zA-Z0-9][-_a-zA-Z0-9]*$/) {
 		option = arg; sub(/^--/, "", option)
+		optset = 1
+		if (!(option in longopts)) {
+		    optset = 0
+		    sub(/^no-/,"",option)
 		if (!(option in longopts)) {
 		    print_error("option --" option " not recognized")
 		    usage(stderr)
 		    exit 2
 		}
+		}
 		if (longopts[option] ~ /::/) { wantarg = 1 } else
 		if (longopts[option] ~ /:/ ) { needarg = 1 }
+		if ((wantarg || needarg) && !optset) {
+		    print_error("option --no-" option " not recognized")
+		    usage(stderr)
+		    exit 2
+		}
 		optval = substr(longopts[option], 1, 1)
 		for (option in longopts)
 		    if (substr(longopts[option], 1, 1) == optval)
@@ -431,7 +457,7 @@ function missing(what, expected) {
     print_error(fnlp what " definition missing " (expected - NF) " fields")
 }
 function garbage(what, maximum) {
-    print_warn(fnlp what " definition with " (NF - maximum) " garbage fields")
+    print_warns(fnlp what " definition with " (NF - maximum) " garbage fields")
 }
 function nmajors(nminors,    exponents, size, result) {
     exponents[0] = 1
@@ -445,7 +471,7 @@ function nmajors(nminors,    exponents, size, result) {
 }
 
 function read_inputs(inputs) {
-    print_debug(1,"reading inputs...")
+    print_debug(1,"r: inputs")
     imajor = values["basemajor"]
     idnumber = values["basemodid"]
     # process all of the input files
@@ -456,7 +482,7 @@ function read_inputs(inputs) {
     indices["node_names"  ] = 0
     for (k in inputs) {
 	input = inputs[k]
-	print_debug(1,"reading input " input)
+	print_debug(1,"r: inputs, input " input)
 	filename = input
 	lineno = 0
 	while ((getline < input) == 1) {
@@ -480,9 +506,9 @@ function read_inputs(inputs) {
 		if ($2 in drivers) { already("driver", $2, drivers[$2]); continue }
 		if (NF < 4 || $4 ~ /^[-*]?$/) { $4 = imajor; assigned = 1 }
 		if (NF < 5 || $5 ~ /^[-*]?$/) { $5 = 1  } else
-		if (NF < 5 || $5 !~ /^[0-9]+$/) { print_error(fnlp "bad nminors field `" $5 "'"); continue }
+		if (NF < 5 || $5 !~ /^[0-9]+$/) { print_error("r: inputs, " fnlp "bad nminors field `" $5 "'"); continue }
 		if (NF < 6 || $6 ~ /^[-*]?$/) { $6 = nmajors($5) } else
-		if (NF < 6 || $6 !~ /^[0-9]+$/) { print_error(fnlp "bad nmajors field `" $6 "'"); continue }
+		if (NF < 6 || $6 !~ /^[0-9]+$/) { print_error("r: inputs, " fnlp "bad nmajors field `" $6 "'"); continue }
 		drivers[$2] = fnl
 		driver_prefix[$2] = $3
 		driver_major[$2] = $4
@@ -523,7 +549,7 @@ function read_inputs(inputs) {
 		    indices["mod_objnames"]++
 		    mod_objnames[indices["mod_objnames"]] = $4
 		} else {
-		    print_error(fnlp "unknown object name type `" $2 "'")
+		    print_error("r: inputs, " fnlp "unknown object name type `" $2 "'")
 		    continue }
 	    } else
 	    if ($1 == "autopush") {
@@ -595,20 +621,21 @@ function read_inputs(inputs) {
 		    qlocks_module[$3] = fnl
 		    qlock_type[$3] = $4
 		} else {
-		    print_error(fnlp "unrecognized qlock type `" $2 "'")
+		    print_error("r: inputs, " fnlp "unrecognized qlock type `" $2 "'")
 		    continue
 		}
 	    } else {
-		print_warn(fnlp "unknown command name `" $1 "'")
+		print_warns("r: inputs, " fnlp "unknown command name `" $1 "'")
 		continue }
 	}
 	close(input)
+	print_debug(1,"r: inputs, input " input " done.")
     }
-    print_debug(1,"reading inputs...  ...done.")
+    print_debug(1,"r: inputs, done.")
 }
 
 function write_driverconf(file,    i, object, loads, links) {
-    print_debug(1,"writing driverconf `" file "'"); loads = ""; links = ""
+    print_debug(1,"w: driverconf, file = `" file "'"); loads = ""; links = ""
     for (i = 1; i <= indices["drv_objnames"]; i++) {
 	object = drv_objnames[i]
 	if (object in loadables)
@@ -685,12 +712,12 @@ MODCONF_LOADS =" loads "\n\
     close(file)
 }
 function write_hconfig(file,    name, prefix) {
-    print_debug(1,"writing hconfig `" file "'")
+    print_debug(1,"w: hconfig, file = `" file "'")
     file = file ".tmp"
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -737,7 +764,7 @@ function write_hconfig(file,    name, prefix) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -794,12 +821,12 @@ function write_hconfig(file,    name, prefix) {
     file_compare(file)
 }
 function write_modconf(file) {
-    print_debug(1,"writing modconf `" file "'")
+    print_debug(1,"w: modconf, file = `" file "'")
     file = file ".tmp"
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.7 2011-03-17 07:01:29 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -846,7 +873,7 @@ function write_modconf(file) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -951,7 +978,7 @@ function write_modconf(file) {
     file_compare(file)
 }
 function write_makenodes(file) {
-    print_debug(1,"writing makenodes `" file "'")
+    print_debug(1,"w: makenodes, file = `" file "'")
     file = file ".tmp"
     print "\
 /******************************************************************* vim: ft=c\n\
@@ -1004,7 +1031,7 @@ function write_makenodes(file) {
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-17 07:01:29 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:46 $\";\n\
 \n\
 #if defined(LINUX)\n\
 #	include <sys/types.h>\n\
@@ -1207,12 +1234,12 @@ int main(int argc, char *argv[])\n\
 	majnumb = 230
 	if (majname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { majnumb = driver_major[majname] }
 	else if (majname ~ /^[0-9]+$/) { majnumb = majname }
-	else { print_error("invalid major name `" majname "'"); continue }
+	else { print_error("w: makenodes, invalid major name `" majname "'"); continue }
 	minname = node_minname[name]
 	minnumb = 0
 	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
 	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
-	else { print_error("invalid minor name `" minname "'"); continue }
+	else { print_error("w: makenodes, invalid minor name `" minname "'"); continue }
 	print "\
 #if !defined(USER)\n\
 	(void) unlink(\"" name "\");\n\
@@ -1242,19 +1269,19 @@ int main(int argc, char *argv[])\n\
     file_compare(file)
 }
 function write_mkdevices(file,    i, name, majname, majnumb, minname, minnumb, dir, dirs, create, remove) {
-    print_debug(1,"writing mkdevices `" file "'"); create = ""; remove = ""
+    print_debug(1,"w: mkdevices, file = `" file "'"); create = ""; remove = ""
     for (i = 1; i <= indices["node_names"]; i++) {
 	name = node_names[i]
 	majname = node_majname[name]
 	majnumb = 230
 	if (majname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { majnumb = driver_major[majname] }
 	else if (majname ~ /^[0-9]+$/) { majnumb = majname }
-	else { print_error("invalid major name `" majname "'"); continue }
+	else { print_error("w: mkdevices, invalid major name `" majname "'"); continue }
 	minname = node_minname[name]
 	minnumb = 0
 	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
 	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
-	else { print_error("invalid minor name `" minname "'"); continue }
+	else { print_error("w: mkdevices, invalid minor name `" minname "'"); continue }
 	if (majnumb == 230) majname = "clone"
 	dir = name; sub(/\/[^\/]*$/, "", dir); dirs[dir] = 1
 	remove = remove "\n\trm -f -- $DESTDIR" name
@@ -1340,7 +1367,7 @@ esac\n\
     system("chmod 0755 " file)
 }
 function write_strmknods(file) {
-    print_debug(1,"writing strmknods `" file "'")
+    print_debug(1,"w: strmknods, file = `" file "'")
     print "%defattr(-,root,root)" > file
     for (i = 1; i <= indices["node_names"]; i++) {
 	name = node_names[i]
@@ -1348,18 +1375,18 @@ function write_strmknods(file) {
 	majnumb = 230
 	if (majname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { majnumb = driver_major[majname] }
 	else if (majname ~ /^[0-9]+$/) { majnumb = majname }
-	else { print_error("invalid major name `" majname "'"); continue }
+	else { print_error("w: strmknods, invalid major name `" majname "'"); continue }
 	minname = node_minname[name]
 	minnumb = 0
 	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
 	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
-	else { print_error("invalid minor name `" minname "'"); continue }
+	else { print_error("w: strmknods, invalid minor name `" minname "'"); continue }
 	print "%attr(" node_devperm[name] ", root, root) %dev(c, " majnumb ", " minnumb ") " name > file
     }
     close(file)
 }
 function write_strsetup(file) {
-    print_debug(1,"writing strsetup `" file "'")
+    print_debug(1,"w: strsetup, file = `" file "'")
     print "\
 # vim: ft=conf\n\
 # =============================================================================\n\
@@ -1422,12 +1449,12 @@ function write_strsetup(file) {
 	majnumb = 230
 	if (majname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { majnumb = driver_major[majname] }
 	else if (majname ~ /^[0-9]+$/) { majnumb = majname }
-	else { print_error("invalid major name `" majname "'"); continue }
+	else { print_error("w: strsetup, invalid major name `" majname "'"); continue }
 	minname = node_minname[name]
 	minnumb = 0
 	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
 	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
-	else { print_error("invalid minor name `" minname "'"); continue }
+	else { print_error("w: strsetup, invalid minor name `" minname "'"); continue }
 	minor = minnumb
 	if (majname == "clone" && minnumb != 0) {
 	    majname = minname
@@ -1442,7 +1469,7 @@ function write_strsetup(file) {
     close(file)
 }
 function write_strload(file) {
-    print_debug(1,"writing strload `" file "'")
+    print_debug(1,"w: strload, file = `" file "'")
     print "\
 # vim: ft=conf\n\
 # =============================================================================\n\
@@ -1507,12 +1534,12 @@ function write_strload(file) {
 	majnumb = 230
 	if (majname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { majnumb = driver_major[majname] }
 	else if (majname ~ /^[0-9]+$/) { majnumb = majname }
-	else { print_error("invalid major name `" majname "'"); continue }
+	else { print_error("w: strload, invalid major name `" majname "'"); continue }
 	minname = node_minname[name]
 	minnumb = 0
 	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
 	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
-	else { print_error("invalid minor name `" minname "'"); continue }
+	else { print_error("w: strload, invalid minor name `" minname "'"); continue }
 	cloneflag = "s"
 	minor = minnumb
 	if (majname == "clone" && minnumb != 0) {
@@ -1541,7 +1568,7 @@ function write_strload(file) {
     close(file)
 }
 function write_confmodules(file) {
-    print_debug(1,"writing confmodules `" file "'")
+    print_debug(1,"w: confmodules, file = `" file "'")
     print "\
 # vim: ft=conf\n\
 # =============================================================================\n\
@@ -1637,12 +1664,12 @@ function write_confmodules(file) {
 	majnumb = 230
 	if (majname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { majnumb = driver_major[majname] }
 	else if (majname ~ /^[0-9]+$/) { majnumb = majname }
-	else { print_error("invalid major name `" majname "'"); continue }
+	else { print_error("w: confmodules, invalid major name `" majname "'"); continue }
 	minname = node_minname[name]
 	minnumb = "*"
 	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
 	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
-	else { print_error("invalid minor name `" minname "'"); continue }
+	else { print_error("w: confmodules, invalid minor name `" minname "'"); continue }
 	if (minname) { drvname = minname } else { drvname = majname }
 	#object = driver_objname[drvname]
 	if (drvname in driver_objname && driver_objname[drvname] in loadables) {
@@ -1659,12 +1686,12 @@ function write_confmodules(file) {
 	majnumb = 230
 	if (majname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { majnumb = driver_major[majname] }
 	else if (majname ~ /^[0-9]+$/) { majnumb = majname }
-	else { print_error("invalid major name `" majname "'"); continue }
+	else { print_error("w: confmodules, invalid major name `" majname "'"); continue }
 	minname = node_minname[name]
 	minnumb = "*"
 	if (minname ~ /^[a-zA-Z][-_a-zA-Z0-9]*$/) { minnumb = driver_major[minname] }
 	else if (minname ~ /^[0-9]+$/) { minnumb = minname }
-	else { print_error("invalid minor name `" minname "'"); continue }
+	else { print_error("w: confmodules, invalid minor name `" minname "'"); continue }
 	if (minname) { drvname = minname } else { drvname = majname }
 	#object = driver_objname[drvname]
 	if (drvname in driver_objname && driver_objname[drvname] in loadables) {
@@ -1686,9 +1713,9 @@ function write_pkgobject(pkgobject,    file, object, name, prefix, count, first,
     sub(/\.o$/, "", object)
     file = object "_wrapper.c"
     file = file ".tmp"
-    print_debug(1,"writing pkgobject for `" pkgobject "' to `" file "'")
+    print_debug(1,"w: pkgobject, for `" pkgobject "' to `" file "'")
     if (!(object in driver_objects) && !(object in module_objects)) {
-	print_error("cannot find object " object)
+	print_error("w: pkgobject, cannot find object " object)
 	return
     }
     print "\
@@ -1742,7 +1769,7 @@ function write_pkgobject(pkgobject,    file, object, name, prefix, count, first,
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-17 07:01:29 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:46 $\";\n\
 \n\
 #include <linux/config.h>\n\
 #include <linux/version.h>\n\
@@ -1901,12 +1928,12 @@ module_exit(_xx_exit);\
     file_compare(file)
 }
 function write_packagedir(directory) {
-    print_debug(1,"writing packagedir `" directory "'")
+    print_debug(1,"w: packagedir, directory = `" directory "'")
 }
-
 BEGIN {
     LINT = "yes"
-    me = "strconf.awk"; count_errs = 0; count_warn = 0
+    me = "strconf.awk"
+    count_errs = 0; count_warn = 0; errors = ""
     if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"
     if (ENVIRON["TERM"] == "dumb" || system("test -t 1 -a -t 2") != 0) {
 	stdout = "/dev/stderr"
@@ -1933,51 +1960,53 @@ BEGIN {
 	cyn = "\033[0;36m"; hcyn = "\033[1;36m"
 	std = "\033[m"
     }
-    longopts["inputs"      ] = "I:" ; environs["inputs"      ] = "STRCONF_INPUT"  ; defaults["inputs"      ] = "Config.master"	; descrips["inputs"      ] = "input configuration files (space separated list)"
-    longopts["basemajor"   ] = "b:" ; environs["basemajor"   ] = "STRCONF_MAJBASE"; defaults["basemajor"   ] = 231		; descrips["basemajor"   ] = "major number to act as base for STREAMS drivers and devices"
-    longopts["basemodid"   ] = "i:" ; environs["basemodid"   ] = "STRCONF_MIDBASE"; defaults["basemodid"   ] = 1		; descrips["basemodid"   ] = "module id number to act as base for STREAMS modules"
-    longopts["minorbits"   ] = "B:" ; environs["minorbits"   ] = "STRCONF_MINORSZ"; defaults["minorbits"   ] = 8		; descrips["minorbits"   ] = "number of bits in a minor device number"
-    longopts["hconfig"     ] = "h::"; environs["hconfig"     ] = "STRCONF_CONFIG" ; defaults["hconfig"     ] = "config.h"	; descrips["hconfig"     ] = "full path and filename of the STREAMS configuration header file"
-    longopts["modconf"     ] = "o::"; environs["modconf"     ] = "STRCONF_MODCONF"; defaults["modconf"     ] = "modconf.inc"	; descrips["modconf"     ] = "full path and filename of the module configuration include file"
-    longopts["makenodes"   ] = "m::"; environs["makenodes"   ] = "STRCONF_MKNODES"; defaults["makenodes"   ] = "makenodes.c"	; descrips["makenodes"   ] = "full path and filename of the makenodes file"
-    longopts["mkdevices"   ] = "M::"; environs["mkdevices"   ] = "STRCONF_DEVICES"; defaults["mkdevices"   ] = "mkdevices"	; descrips["mkdevices"   ] = "full path and filename of the mkdevices file"
-    longopts["permission"  ] = "p:" ;                                               defaults["permission"  ] = "0666"		; descrips["permission"  ] = "permissions to assign to created files"
-    longopts["driverconf"  ] = "l::"; environs["driverconf"  ] = "STRCONF_DRVCONF"; defaults["driverconf"  ] = "drvrconf.mk"	; descrips["driverconf"  ] = "full path and filename of the driver configuration makefile"
-    longopts["confmodules" ] = "L::"; environs["confmodules" ] = "STRCONF_CONFMOD"; defaults["confmodules" ] = "conf.modules"	; descrips["confmodules" ] = "full path and filename of the modules configuration file"
-    longopts["functionname"] = "r:" ;                                               defaults["functionname"] = "main"		; descrips["functionname"] = "function name of the function in makenodes"
-    longopts["strmknods"   ] = "s::"; environs["strmknods"   ] = "STRCONF_MAKEDEV"; defaults["strmknods"   ] = "makedev.lst"	; descrips["strmknods"   ] = "full path and filename of the makedevices script"
-    longopts["strsetup"    ] = "S::"; environs["strsetup"    ] = "STRCONF_STSETUP"; defaults["strsetup"    ] = "strsetup.conf"	; descrips["strsetup"    ] = "full path and filename of the strsetup configuration file"
-    longopts["strload"     ] = "O::"; environs["strload"     ] = "STRCONF_STRLOAD"; defaults["strload"     ] = "strload.conf"	; descrips["strload"     ] = "full path and filename of the strload configuration file"
-    longopts["package"     ] = "k::"; environs["package"     ] = "STRCONF_PACKAGE"; defaults["package"     ] = "LfS"		; descrips["package"     ] = "name of STREAMS package: LiS of LfS"
-    longopts["pkgobject"   ] = "g::";                                               defaults["pkgobject"   ] = "clone.o"	; descrips["pkgobject"   ] = "full path and filename of object file to package"
-    longopts["packagedir"  ] = "d::"; environs["packagedir"  ] = "STRCONF_BPKGDIR";						  descrips["packagedir"  ] = "full path or vpath to binary package directory"
-    longopts["pkgrules"    ] = "R::"; environs["pkgrules"    ] = "STRCONF_PKGRULE";						  descrips["pkgrules"    ] = "full path and filename of the pkgrules make rules file"
-    longopts["dryrun"      ] = "n"  ;												  descrips["dryrun"      ] = "don't perform the actions, just check them"
-    longopts["dry-run"     ] = "n"  ;												  descrips["dry-run"     ] = "don't perform the actions, just check them"
-    longopts["quiet"       ] = "q"  ;						    defaults["quiet"       ] = 0		; descrips["quiet"       ] = "suppress normal output"
-    longopts["silent"      ] = "q"  ;						    defaults["silent"      ] = 0		; descrips["silent"      ] = "suppress normal output"
-    longopts["debug"       ] = "D::";						    defaults["debug"       ] = 0		; descrips["debug"       ] = "increase or set debug level DEBUG"
-    longopts["verbose"     ] = "v::";						    defaults["verbose"     ] = 0		; descrips["verbose"     ] = "increase or set verbosity level VERBOSITY"
-    longopts["help"        ] = "H"  ;												  descrips["help"        ] = "display this usage information and exit"
-    longopts["version"     ] = "V"  ;												  descrips["version"     ] = "display script version and exit"
-    longopts["copying"     ] = "C"  ;												  descrips["copying"     ] = "display copying permissions and exit"
+    longopts["inputs"       ] = "I:" ; environs["inputs"       ] = "STRCONF_INPUT"	; defaults["inputs"       ] = "Config.master"	; descrips["inputs"       ] = "input configuration files (space separated list)"
+    longopts["basemajor"    ] = "b:" ; environs["basemajor"    ] = "STRCONF_MAJBASE"	; defaults["basemajor"    ] = 231		; descrips["basemajor"    ] = "major number to act as base for STREAMS drivers and devices"
+    longopts["basemodid"    ] = "i:" ; environs["basemodid"    ] = "STRCONF_MIDBASE"	; defaults["basemodid"    ] = 1			; descrips["basemodid"    ] = "module id number to act as base for STREAMS modules"
+    longopts["minorbits"    ] = "B:" ; environs["minorbits"    ] = "STRCONF_MINORSZ"	; defaults["minorbits"    ] = 8			; descrips["minorbits"    ] = "number of bits in a minor device number"
+    longopts["hconfig"      ] = "h::"; environs["hconfig"      ] = "STRCONF_CONFIG"	; defaults["hconfig"      ] = "config.h"	; descrips["hconfig"      ] = "full path and filename of the STREAMS configuration header file"
+    longopts["modconf"      ] = "o::"; environs["modconf"      ] = "STRCONF_MODCONF"	; defaults["modconf"      ] = "modconf.inc"	; descrips["modconf"      ] = "full path and filename of the module configuration include file"
+    longopts["makenodes"    ] = "m::"; environs["makenodes"    ] = "STRCONF_MKNODES"	; defaults["makenodes"    ] = "makenodes.c"	; descrips["makenodes"    ] = "full path and filename of the makenodes file"
+    longopts["mkdevices"    ] = "M::"; environs["mkdevices"    ] = "STRCONF_DEVICES"	; defaults["mkdevices"    ] = "mkdevices"	; descrips["mkdevices"    ] = "full path and filename of the mkdevices file"
+    longopts["permission"   ] = "p:" ;							  defaults["permission"   ] = "0666"		; descrips["permission"   ] = "permissions to assign to created files"
+    longopts["driverconf"   ] = "l::"; environs["driverconf"   ] = "STRCONF_DRVCONF"	; defaults["driverconf"   ] = "drvrconf.mk"	; descrips["driverconf"   ] = "full path and filename of the driver configuration makefile"
+    longopts["confmodules"  ] = "L::"; environs["confmodules"  ] = "STRCONF_CONFMOD"	; defaults["confmodules"  ] = "conf.modules"	; descrips["confmodules"  ] = "full path and filename of the modules configuration file"
+    longopts["functionname" ] = "r:" ;							  defaults["functionname" ] = "main"		; descrips["functionname" ] = "function name of the function in makenodes"
+    longopts["strmknods"    ] = "s::"; environs["strmknods"    ] = "STRCONF_MAKEDEV"	; defaults["strmknods"    ] = "makedev.lst"	; descrips["strmknods"    ] = "full path and filename of the makedevices script"
+    longopts["strsetup"     ] = "S::"; environs["strsetup"     ] = "STRCONF_STSETUP"	; defaults["strsetup"     ] = "strsetup.conf"	; descrips["strsetup"     ] = "full path and filename of the strsetup configuration file"
+    longopts["strload"      ] = "O::"; environs["strload"      ] = "STRCONF_STRLOAD"	; defaults["strload"      ] = "strload.conf"	; descrips["strload"      ] = "full path and filename of the strload configuration file"
+    longopts["package"      ] = "k::"; environs["package"      ] = "STRCONF_PACKAGE"	; defaults["package"      ] = "LfS"		; descrips["package"      ] = "name of STREAMS package: LiS of LfS"
+    longopts["pkgobject"    ] = "g::";							  defaults["pkgobject"    ] = "clone.o"		; descrips["pkgobject"    ] = "full path and filename of object file to package"
+    longopts["packagedir"   ] = "d::"; environs["packagedir"   ] = "STRCONF_BPKGDIR"	;						  descrips["packagedir"   ] = "full path or vpath to binary package directory"
+    longopts["pkgrules"     ] = "R::"; environs["pkgrules"     ] = "STRCONF_PKGRULE"	;						  descrips["pkgrules"     ] = "full path and filename of the pkgrules make rules file"
+    longopts["exit-on-error"] = "e"  ;							  defaults["exit-on-error"] = 1			; descrips["exit-on-error"] = "exit with error status on program errors"
+    longopts["dryrun"       ] = "n"  ;							  defaults["dryrun"       ] = 0			; descrips["dryrun"       ] = "don't perform actions, just check them"
+    longopts["dry-run"      ] = "n"  ;							  defaults["dry-run"      ] = 0			; descrips["dry-run"      ] = "don't perform actions, just check them"
+    longopts["quiet"        ] = "q"  ;							  defaults["quiet"        ] = 0			; descrips["quiet"        ] = "suppress normal output"
+    longopts["silent"       ] = "q"  ;							  defaults["silent"       ] = 0			; descrips["silent"       ] = "suppress normal output"
+    longopts["debug"        ] = "D::"; environs["debug"        ] = "STRCONF_DEBUG"	; defaults["debug"        ] = 0			; descrips["debug"        ] = "increase or set debug level DEBUG"
+    longopts["verbose"      ] = "v::"; environs["verbose"      ] = "STRCONF_VERBOSE"	; defaults["verbose"      ] = 0			; descrips["verbose"      ] = "increase or set verbosity level VERBOSITY"
+    longopts["help"         ] = "H"  ;													  descrips["help"         ] = "display this usage information and exit"
+    longopts["version"      ] = "V"  ;													  descrips["version"      ] = "display script version and exit"
+    longopts["copying"      ] = "C"  ;													  descrips["copying"      ] = "display copying permissions and exit"
     # set mandatory defaults
-    values["basemajor" ] = defaults["basemajor" ]
-    values["basemodid" ] = defaults["basemodid" ]
-    values["minorbits" ] = defaults["minorbits" ]
-    values["permission"] = defaults["permission"]
-    values["package"   ] = defaults["package"   ]
-    values["debug"     ] = defaults["debug"     ]
-    values["verbose"   ] = defaults["verbose"   ]
-    values["quiet"     ] = defaults["quiet"     ]
-    optstring = "I:b:i:B:h::o::m::M::p:l::L::r:s::S::O::k::g::d::R::nqD::v::HVC"
+    values["basemajor"    ] = defaults["basemajor"    ]
+    values["basemodid"    ] = defaults["basemodid"    ]
+    values["minorbits"    ] = defaults["minorbits"    ]
+    values["permission"   ] = defaults["permission"   ]
+    values["package"      ] = defaults["package"      ]
+    values["exit-on-error"] = defaults["exit-on-error"]
+    values["debug"        ] = defaults["debug"        ]
+    values["verbose"      ] = defaults["verbose"      ]
+    values["quiet"        ] = defaults["quiet"        ]
+    optstring = "I:b:i:B:h::o::m::M::p:l::L::r:s::S::O::k::g::d::R::enqD::v::HVC"
     optind = 0
     while (1) {
 	c = getopt_long(ARGC, ARGV, optstring, longopts)
 	if (c == -1) break
 	else if (c ~ /[IbiBhomMplLrsSOkgdR]/) { values[option] = optarg }
-	else if (c ~ /[nq]/) { values[option] = 1 }
-	else if (c~/[Dv]/) { if (optarg) { values[option] = optarg } else { values[option]++ } }
+	else if (c ~ /[enq]/)                 { values[option] = optset }
+	else if (c~/[Dv]/) { if (optarg) { values[option] = optarg } else { if (optset) { values[option]++ } else { values[option] = optset } } }
 	else if (c == "H") { help(   stdout); exit 0 }
 	else if (c == "V") { version(stdout); exit 0 }
 	else if (c == "C") { copying(stdout); exit 0 }
@@ -2047,11 +2076,14 @@ BEGIN {
 	write_pkgobject(values["pkgobject"])
     if ("packagedir" in values)
 	write_packagedir(values["packagedir"])
+    if (count_errs && ("exit-on-error" in values) && values["exit-on-error"])
+	exit 1
     exit 0
 }
 END {
-    if (count_errs) print_error("errs = " count_errs)
-    if (count_warn)  print_warn("warn = " count_warn)
+    if (errors) { print errors > stderr; written[stderr] = 1 }
+    if (count_errs) print_emore("errs = " count_errs)
+    if (count_warn) print_wmore("warn = " count_warn)
     for (file in written)
 	close(file)
 }
@@ -2059,6 +2091,9 @@ END {
 # =============================================================================
 #
 # $Log: strconf.awk,v $
+# Revision 1.1.2.8  2011-03-26 04:28:46  brian
+# - updates to build process
+#
 # Revision 1.1.2.7  2011-03-17 07:01:29  brian
 # - build and repo system improvements
 #

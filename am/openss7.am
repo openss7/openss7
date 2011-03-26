@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-02-28 19:51:29 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-03-26 04:28:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
+## Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -771,8 +771,10 @@ DISTCLEANFILES		+= cscope.files cscope.out cscope.in.out cscope.po.out
 ##
 # A rule to generate an ifnames.log file
 ##
-ifnames:
-	ifnames `find $(srcdir) $(builddir) -name "*.h" -o -name "*.c"` > ifnames.log
+ifnames.log:
+	ifnames `find $(srcdir) $(builddir) -name "*.h" -o -name "*.c" -o -name "*hooks.h.in"` > $@
+
+ifnames: ifnames.log
 
 MY_PHONY		+= ifnames
 
@@ -1163,6 +1165,9 @@ DISTCLEANFILES		+= $(CONFIG_BLDREQ)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 1.1.2.9  2011-03-26 04:28:45  brian
+## - updates to build process
+##
 ## Revision 1.1.2.8  2011-02-28 19:51:29  brian
 ## - better repository build
 ##

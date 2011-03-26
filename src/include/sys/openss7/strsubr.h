@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 1.1.2.4 2011-01-12 04:10:31 brian Exp $
+ @(#) $Id: strsubr.h,v 1.1.2.5 2011-03-26 04:28:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:31 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 1.1.2.5  2011-03-26 04:28:48  brian
+ - updates to build process
+
  Revision 1.1.2.4  2011-01-12 04:10:31  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -120,9 +123,20 @@ struct termsw {
 struct strevent {
 	union {
 		struct {
-			struct task_struct *procp;
+#ifdef HAVE_KFUNC_PID_NR
+			struct pid *pid;
+			struct pid *tgid;
+#else
+			pid_t pid;
+			pid_t tgid;
+#endif
 			long events;
 			int fd;
+#if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || HAVE_KILL_PID_INFO_AS_UID_SYMBOL
+			uid_t uid;
+			uid_t euid;
+			uint32_t secid;
+#endif
 		} e;			/* stream event */
 		struct {
 			queue_t *queue;
@@ -156,9 +170,13 @@ struct strevent {
 	volatile int se_state;		/* state of the event */
 };
 
-#define se_procp    x.e.procp
+#define se_pid	    x.e.pid
+#define se_tgid	    x.e.tgid
 #define se_events   x.e.events
 #define se_fd	    x.e.fd
+#define se_uid	    x.e.uid
+#define se_euid	    x.e.euid
+#define se_secid    x.e.secid
 
 #define se_func	    x.b.func
 #define se_arg	    x.b.arg
@@ -243,8 +261,13 @@ struct stdata {
 	int sd_eropt;			/* error options */
 	int sd_iocid;			/* sequence id for active ioctl */
 //      ushort sd_iocwait;              /* number of procs awaiting ioctl */
+#ifdef HAVE_KFUNC_PID_NR
+	struct pid *sd_session;		/* controlling session id */
+	struct pid *sd_pgrp;		/* foreground process group */
+#else
 	pid_t sd_session;		/* controlling session id */
 	pid_t sd_pgrp;			/* foreground process group */
+#endif
 	ushort sd_wroff;		/* write offset */
 	ushort sd_wrpad;		/* write padding */
 //      unsigned char sd_band;          /* highest blocked band */

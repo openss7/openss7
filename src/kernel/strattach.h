@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strattach.h,v 1.1.2.2 2010-11-28 14:21:56 brian Exp $
+ @(#) $Id: strattach.h,v 1.1.2.3 2011-03-26 04:28:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:56 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strattach.h,v $
+ Revision 1.1.2.3  2011-03-26 04:28:48  brian
+ - updates to build process
+
  Revision 1.1.2.2  2010-11-28 14:21:56  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,12 @@
 #ifndef __LOCAL_STRATTACH_H__
 #define __LOCAL_STRATTACH_H__
 
-#ifdef HAVE_KERNEL_FATTACH_SUPPORT
+#if defined HAVE_KERNEL_FATTACH_SUPPORT && \
+    (!defined CONFIG_KERNEL_WEAK_MODULES || ( \
+     ((!defined HAVE_NAMESPACE_SEM_SYMBOL && \
+       (!defined HAVE_MOUNT_SEM_SYMBOL || defined HAVE_MOUNT_SEM_EXPORT) ) || \
+      defined HAVE_NAMESPACE_SEM_SYMBOL) && \
+     defined HAVE_CLONE_MNT_EXPORT && defined HAVE_GRAFT_TREE_EXPORT && defined HAVE_DO_UMOUNT_EXPORT))
 streams_fastcall long do_fattach(const struct file *file, const char *file_name);
 streams_fastcall long do_fdetach(const char *file_name);
 #endif

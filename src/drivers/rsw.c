@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 04:10:29 $
+ @(#) $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-03-26 04:28:47 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rsw.c,v $
+ Revision 1.1.2.3  2011-03-26 04:28:47  brian
+ - updates to build process
+
  Revision 1.1.2.2  2011-01-12 04:10:29  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 04:10:29 $";
+static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-03-26 04:28:47 $";
 
 /*
  * This is the RTP-SW multiplexing driver.  It s purpose is to allo a single
@@ -244,7 +247,7 @@ static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 #include <linux/netfilter_ipv4.h>
 #endif				/* LINUX */
 
-#include "udp_hooks.h"
+#include "ip_hooks.h"
 
 #include <sys/npi.h>
 #include <sys/npi_ip.h>
@@ -263,7 +266,7 @@ static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 #define RSW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RSW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RSW_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define RSW_REVISION	"OpenSS7 $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 04:10:29 $"
+#define RSW_REVISION	"OpenSS7 $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-03-26 04:28:47 $"
 #define RSW_DEVICE	"SVR 4.2 MP STREAMS RTP Switch Driver"
 #define RSW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RSW_LICENSE	"GPL"

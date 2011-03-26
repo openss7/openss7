@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:24 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 1.1.2.5  2011-03-26 04:28:46  brian
+ - updates to build process
+
  Revision 1.1.2.4  2010-11-28 14:32:24  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $";
+static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -100,12 +103,14 @@ static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.4 $) 
 
 #include <sys/npi.h>
 
+#include "module_hooks.h"
+
 #include "np.h"
 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $"
+#define NP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -2537,65 +2542,6 @@ np_ip_v4_err_next(struct sk_buff *skb, __u32 info)
 }
 
 extern spinlock_t inet_proto_lock;
-
-#ifdef HAVE___MODULE_ADDRESS_EXPORT
-static struct module *module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
-    defined HAVE_MODULES_SYMBOL
-static struct module *
-__module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	list_for_each_entry_rcu(mod, &modules, list) {
-		if (((void *)addr >= (void *)mod->module_init &&
-		     (void *)addr <  (void *)mod->module_init + mod->init_size)
-		    || ((void *)addr >= (void *)mod->module_core &&
-			(void *)addr <  (void *)mod->module_core + mod->core_size)) {
-			return mod;
-		}
-	}
-	return NULL;
-}
-static struct module_address(unsigned long addr )
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
-static struct module_address(unsigned long addr)
-{
-	return module_text_address(addr);
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
-static struct module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_text_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#else
-#undef HAVE_MODULE_ADDRESS_SYMBOL
-#endif
 
 /**
  * np_ip_init_proto - initialize interception of IP protocol packets

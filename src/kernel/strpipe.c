@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:08 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:48 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-13 16:19:08 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strpipe.c,v $
+ Revision 1.1.2.5  2011-03-26 04:28:48  brian
+ - updates to build process
+
  Revision 1.1.2.4  2011-01-13 16:19:08  brian
  - changes for SLES 11 support
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:08 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:48 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -109,7 +112,11 @@ static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.
 #include "strspecfs.h"		/* for struct spec_sb_info */
 #include "strpipe.h"		/* header verification */
 
-#if defined HAVE_KERNEL_PIPE_SUPPORT
+#if 0
+/* not used anymore anway */
+#if defined HAVE_KERNEL_PIPE_SUPPORT && \
+    (!defined CONFIG_KERNEL_WEAK_MODULES || \
+     (defined HAVE_FILE_KILL_EXPORT && defined HAVE_PUT_FILP_EXPORT))
 
 #ifndef O_CLONE
 #define O_CLONE (O_CREAT|O_EXCL)
@@ -269,25 +276,6 @@ do_spipe(int *fds)
 	int fdr, fdw, err;
 	struct file *fr, *fw;
 	const struct file_operations *f_op;
-#ifdef HAVE_FILE_MOVE_ADDR
-	void (*my_file_move)(struct file *, struct list_head*)
-		= (typeof(my_file_move)) HAVE_FILE_MOVE_ADDR;
-#undef file_move
-#define file_move my_file_move
-#endif
-#ifdef HAVE_FILE_KILL_ADDR
-	void (*my_file_kill)(struct file *)
-		= (typeof(my_file_kill)) HAVE_FILE_KILL_ADDR;
-#undef file_kill
-#define file_kill my_file_kill
-#endif
-#ifdef HAVE_PUT_FILP_ADDR
-        void (*my_put_filp)(struct file *)
-		= (typeof(my_put_filp)) HAVE_PUT_FILP_ADDR;
-#undef put_filp
-#define put_filp my_put_filp
-#endif
-
 
 	err = -ENFILE;
 	if (!(fr = get_empty_filp())) {
@@ -473,3 +461,4 @@ do_spipe(int *fds)
 EXPORT_SYMBOL_GPL(do_spipe);
 
 #endif				/* defined HAVE_KERNEL_PIPE_SUPPORT */
+#endif

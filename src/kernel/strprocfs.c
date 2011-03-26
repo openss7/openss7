@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:32 $
+ @(#) $RCSfile: strprocfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:48 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strprocfs.c,v $
+ Revision 1.1.2.4  2011-03-26 04:28:48  brian
+ - updates to build process
+
  Revision 1.1.2.3  2011-01-12 04:10:32  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:32 $";
+static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:48 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -729,8 +732,13 @@ get_streams_stdata(char *page, int maxlen, struct stdata *sd)
 	len += snprintf(page + len, maxlen - len, ", %#08x", sd->sd_eropt);
 	len += snprintf(page + len, maxlen - len, ", %u", sd->sd_iocid);
 //      len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_iocwait);
+#if defined HAVE_KTYPE_STRUCT_PID
+	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_session);
+	len += snprintf(page + len, maxlen - len, ", %p", sd->sd_pgrp);
+#else
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_session);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_pgrp);
+#endif
 	len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_wroff);
 	len += snprintf(page + len, maxlen - len, ", %hu", sd->sd_wrpad);
 	len += snprintf(page + len, maxlen - len, ", %d", sd->sd_rerror);

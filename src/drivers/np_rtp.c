@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-01-12 00:12:08 $
+ @(#) $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-03-26 04:28:47 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 00:12:08 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_rtp.c,v $
+ Revision 1.1.2.2  2011-03-26 04:28:47  brian
+ - updates to build process
+
  Revision 1.1.2.1  2011-01-12 00:12:08  brian
  - added RTP drivers
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-01-12 00:12:08 $";
+static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-03-26 04:28:47 $";
 
 /*
  *  This driver is similar to the NPI-UDP driver in that it provides NPI access to UDP; however, it
@@ -132,7 +135,7 @@ static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.1
 #include <linux/netfilter_ipv4.h>
 #endif				/* LINUX */
 
-#include "ip_hooks.h"
+#include "net_hooks.h"
 
 #include <sys/npi.h>
 #include <sys/npi_ip.h>
@@ -140,8 +143,8 @@ static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.1
 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
-#define NP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-01-12 00:12:08 $"
+#define NP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define NP_REVISION	"OpenSS7 $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-03-26 04:28:47 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_RTP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -1755,82 +1758,6 @@ extern spinlock_t inet_proto_lock;
 struct mynet_protocol **inet_protosp = (void *) &inet_protos;
 #endif
 
-/*
- *  The following are hooks for module_address().  We need the module_address() function so that we
- *  can determine whether a loadable module own a structure.  If the structure is owned by a
- *  loadable module, we will hold a reference on the loadable module so that it cannot remove itself
- *  from the protocol hooks until we are removed, or our hook is removed.
- */
-
-#ifdef HAVE___MODULE_ADDRESS_EXPORT
-static struct module *
-module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_address(addr);
-	preempt_enable();
-	return mod;
-}
-
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
-    defined HAVE_MODULES_SYMBOL
-extern struct list_head modules;
-static struct module *
-__module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	list_for_each_entry_rcu(mod, &modules, list) {
-		if (((void *) addr >= (void *) mod->module_init &&
-		     (void *) addr < (void *) mod->module_init + mod->init_size)
-		    || ((void *) addr >= (void *) mod->module_core &&
-			(void *) addr < (void *) mod->module_core + mod->core_size)) {
-			return mod;
-		}
-	}
-	return NULL;
-}
-
-static struct module *
-module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_address(addr);
-	preempt_enable();
-	return mod;
-}
-
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
-static struct module *
-module_address(unsigned long addr)
-{
-	return module_text_address(addr);
-}
-
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
-static struct module *
-module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_text_address(addr);
-	preempt_enable();
-	return mod;
-}
-
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#else
-#undef HAVE_MODULE_ADDRESS_SYMBOL
-#endif
-
 /** np_init_nproto - initialize network protocol override
   * @proto: the protocol to register or override
   *
@@ -2259,6 +2186,7 @@ np_alloc_skb_slow(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	return (skb);
 }
 
+#ifdef HAVE_SKBUFF_HEAD_CACHE_USABLE
 extern kmem_cachep_t skbuff_head_cache;
 
 /** np_alloc_skb_old - allocate a socket buffer from a message block
@@ -2380,6 +2308,7 @@ np_alloc_skb_old(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
       go_slow:
 	return np_alloc_skb_slow(np, mp, headroom, gfp);
 }
+#endif
 
 STATIC INLINE fastcall __hot_out struct sk_buff *
 np_alloc_skb(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
@@ -2398,7 +2327,9 @@ np_alloc_skb(struct np *np, mblk_t *mp, unsigned int headroom, int gfp)
 	freemsg(mp);
 	return (skb);
       old_way:
+#ifdef HAVE_SKBUFF_HEAD_CACHE_USABLE
 	return np_alloc_skb_old(np, mp, headroom, gfp);
+#endif
       go_slow:
 	return np_alloc_skb_slow(np, mp, headroom, gfp);
 }

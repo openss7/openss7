@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-12-02 22:22:45 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:47 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-12-02 22:22:45 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 1.1.2.6  2011-03-26 04:28:47  brian
+ - updates to build process
+
  Revision 1.1.2.5  2010-12-02 22:22:45  brian
  - regression fix and np_udp driver
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-12-02 22:22:45 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:47 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -129,7 +132,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 #include <linux/netfilter_ipv4.h>
 #endif				/* LINUX */
 
-#include "udp_hooks.h"
+#include "net_hooks.h"
 
 #include <sys/npi.h>
 #include <sys/npi_ip.h>
@@ -147,8 +150,8 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2010-12-02 22:22:45 $"
+#define TCP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:47 $"
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -4071,66 +4074,6 @@ tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 
 extern spinlock_t inet_proto_lock;
 
-#ifdef HAVE___MODULE_ADDRESS_EXPORT
-static struct module *module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
-    defined HAVE_MODULES_SYMBOL
-extern struct list_head modules;
-static struct module *
-__module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	list_for_each_entry_rcu(mod, &modules, list) {
-		if (((void *)addr >= (void *)mod->module_init &&
-		     (void *)addr <  (void *)mod->module_init + mod->init_size)
-		    || ((void *)addr >= (void *)mod->module_core &&
-			(void *)addr <  (void *)mod->module_core + mod->core_size)) {
-			return mod;
-		}
-	}
-	return NULL;
-}
-static struct module *module_address(unsigned long addr )
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
-static struct module *module_address(unsigned long addr)
-{
-	return module_text_address(addr);
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
-static struct module *module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_text_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#else
-#undef HAVE_MODULE_ADDRESS_SYMBOL
-#endif
-
 /**
  * tpi_init_nproto - initialize network protocol override
  *
@@ -4151,6 +4094,7 @@ tpi_init_nproto(unsigned char proto)
 	/* reduces to inet_add_protocol() if no protocol registered */
 	spin_lock_bh(&inet_proto_lock);
 	if ((ip->next = (struct net_protocol *)inet_protos[hash]) != NULL) {
+#ifdef HAVE_MODULE_ADDRESS_SYMBOL
 		if ((ip->kmod = module_address((ulong) ip->next))
 		    && ip->kmod != THIS_MODULE) {
 			if (!try_module_get(ip->kmod)) {
@@ -4158,6 +4102,7 @@ tpi_init_nproto(unsigned char proto)
 				return (-EAGAIN);
 			}
 		}
+#endif					/* HAVE_MODULE_ADDRESS_SYMBOL */
 	}
 	inet_protos[hash] = &ip->proto;
 	spin_unlock_bh(&inet_proto_lock);

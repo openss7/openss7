@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 1.1.2.3 2010-11-28 14:21:51 brian Exp $
+ @(#) $Id: config.h.in,v 1.1.2.4 2011-03-26 04:28:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:51 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: config.h.in,v $
+ Revision 1.1.2.4  2011-03-26 04:28:48  brian
+ - updates to build process
+
  Revision 1.1.2.3  2010-11-28 14:21:51  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -414,5 +417,20 @@
    symbol kmem_zalloc is exported by your kernel so that kernel modules can be
    supported properly. */
 #undef HAVE_KMEM_ZALLOC_EXPORT
+
+/* The symbol kill_pid_info_as_uid is not exported by some kernels. Define
+   this if the symbol kill_pid_info_as_uid is either exported by your kernel,
+   or can be stripped from the symbol map, so that kernel modules can be
+   supported properly. */
+#undef HAVE_KILL_PID_INFO_AS_UID_SYMBOL
+
+/* The symbol kill_proc_info_as_uid is not exported by some kernels. Define
+   this if the symbol kill_proc_info_as_uid is either exported by your kernel,
+   or can be stripped from the symbol map, so that kernel modules can be
+   supported properly. */
+#undef HAVE_KILL_PROC_INFO_AS_UID_SYMBOL
+
+/* Define to 1 if kernel function pid_nr() exists. */
+#undef HAVE_KFUNC_PID_NR
 
 #endif				/* __SYS_OPENSS7_CONFIG_H__ */

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-03-17 07:01:26 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-03-26 04:28:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-17 07:01:26 $ by $Author: brian $
+# Last Modified $Date: 2011-03-26 04:28:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -127,8 +127,9 @@ AC_DEFUN([AC_OPENSS7], [dnl
 		     src/include/sys/openss7/version.h
 		     Module.mkvars])
     AC_CONFIG_HEADERS([src/drivers/ip_hooks.h
+		       src/drivers/net_hooks.h
 		       src/drivers/sctp_hooks.h
-		       src/drivers/udp_hooks.h])
+		       src/drivers/module_hooks.h])
     _LDCONFIG
     _TCL_EXTENSIONS
     _PERL_EXTENSIONS
@@ -282,8 +283,19 @@ dnl--------------------------------------------------------------------------
 	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_WRAPPER_MODULE], [1], [When defined,]
 	    AC_PACKAGE_TITLE [will compile a separate wrapper module.])
     fi
-    AC_MSG_RESULT([${enable_wrapper_mdoule:-no}])
+    AC_MSG_RESULT([${enable_wrapper_module:-no}])
     AM_CONDITIONAL([CONFIG_STREAMS_WRAPPER_MODULE], [test :"${enable_wrapper_module:-no}" = :yes])
+dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([weak-modules],
+	[AS_HELP_STRING([--enable-weak-modules],
+	    [use only exported kernel symbols @<:@default-no@:>@])])
+    AC_MSG_CHECKING([for weak module support])
+    if test :"${enable_weak_modules:-no}" = :yes ; then
+	AC_DEFINE_UNQUOTED([CONFIG_STREAMS_WEAK_MODULES], [1], [When defined,]
+	    AC_PACKAGE_TITLE [will not used ripped kernel symbols.])
+    fi
+    AC_MSG_RESULT([${enable_weak_modules:-no}])
+    AM_CONDITIONAL([CONFIG_STREAMS_WEAK_MODULES], [test :"${enable_weak_modules:-no}" = :yes])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([streams-fifos],
 	[AS_HELP_STRING([--enable-streams-fifos],
@@ -772,14 +784,21 @@ dnl----------------------------------------------------------------------------
     AC_SUBST([EXPOSED_SYMBOLS])dnl
 dnl----------------------------------------------------------------------------
     _LINUX_CHECK_FUNCS([ \
+	MOD_DEC_USE_COUNT \
+	MOD_INC_USE_COUNT \
+	__in_dev_get_rcu \
+	__ip_select_ident \
+	__symbol_get \
+	__symbol_put \
 	access_ok \
 	atomic_add_return \
 	check_region \
 	cli \
 	compat_ptr \
-	cpumask_scnprintf \
 	cpu_raise_softirq \
+	cpumask_scnprintf \
 	create_proc_info_entry \
+	dev_init_buffers \
 	dst_mtu \
 	dst_output \
 	find_pid \
@@ -788,33 +807,21 @@ dnl----------------------------------------------------------------------------
 	force_delete \
 	free_dma \
 	generic_delete_inode \
+	get_pid \
 	iget_locked \
-	__in_dev_get_rcu \
+	in_atomic \
 	inet_csk \
 	inet_get_local_port_range \
 	interruptible_sleep_on \
 	ip_dst_output \
+	ip_route_output_flow \
 	ip_route_output_key \
 	kern_umount \
-	kill_pid \
-	kill_pid_info \
 	kill_proc \
-	MOD_DEC_USE_COUNT \
-	MOD_INC_USE_COUNT \
 	module_put \
 	nf_reset \
 	num_online_cpus \
 	path_lookup \
-	pcibios_find_class \
-	pcibios_find_device \
-	pcibios_init \
-	pcibios_present \
-	pcibios_read_config_byte \
-	pcibios_read_config_dword \
-	pcibios_read_config_word \
-	pcibios_write_config_byte \
-	pcibios_write_config_dword \
-	pcibios_write_config_word \
 	pci_dac_dma_supported \
 	pci_dac_dma_sync_single \
 	pci_dac_dma_sync_single_for_cpu \
@@ -827,14 +834,28 @@ dnl----------------------------------------------------------------------------
 	pci_dma_sync_single \
 	pci_find_class \
 	pci_module_init \
+	pcibios_find_class \
+	pcibios_find_device \
+	pcibios_init \
+	pcibios_present \
+	pcibios_read_config_byte \
+	pcibios_read_config_dword \
+	pcibios_read_config_word \
+	pcibios_write_config_byte \
+	pcibios_write_config_dword \
+	pcibios_write_config_word \
+	pid_nr \
+	pid_vnr \
 	prepare_to_wait \
 	prepare_to_wait_exclusive \
 	process_group \
 	process_session \
+	put_pid \
 	rcu_read_lock \
 	read_trylock \
 	register_ioctl32_conversion \
 	request_dma \
+	session_of_pgrp \
 	set_cpus_allowed \
 	set_user_nice \
 	simple_statfs \
@@ -845,13 +866,22 @@ dnl----------------------------------------------------------------------------
 	sleep_on \
 	sleep_on_timeout \
 	sti \
-	__symbol_get \
-	__symbol_put \
 	synchronize_net \
+	task_pgrp \
 	task_pgrp_nr \
 	task_pgrp_nr_ns \
+	task_pgrp_vnr \
+	task_pid \
+	task_pid_nr \
+	task_pid_vnr \
+	task_session \
 	task_session_nr \
 	task_session_nr_ns \
+	task_session_vnr \
+	task_tgid \
+	task_tgid_nr \
+	task_tgid_vnr \
+	tcp_set_skb_tso_segs_sock \
 	to_kdev_t \
 	try_module_get \
 	unregister_ioctl32_conversion \
@@ -1011,6 +1041,7 @@ dnl----------------------------------------------------------------------------
 	uintptr_t,
 	intptr_t,
 	uchar,
+	struct pid,
 	pm_message_t,
 	struct sockaddr_storage,
 	struct inet_protocol,
@@ -1110,6 +1141,8 @@ dnl----------------------------------------------------------------------------
 	struct task_struct.namespace.sem,
 	struct task_struct.pgrp,
 	struct task_struct.session,
+	struct task_struct.sig,
+	struct task_struct.sighand,
 	struct task_struct.signal,
 	struct vfsmount.mnt_namespace,
 	struct vfsmount.mnt_ns,
@@ -1195,119 +1228,182 @@ dnl----------------------------------------------------------------------------
 	kmem_free,
 	kmem_zalloc])
 dnl----------------------------------------------------------------------------
+    AC_REQUIRE_SHELL_FN([symbol_warning],
+	[AS_FUNCTION_DESCRIBE([symbol_warning],
+	    [LINENO SYMBOL],
+	    [Display a symbol export warning.])],
+[AS_LINENO_PUSH([$[]1])
+    AC_MSG_WARN([
+**** 
+**** Linux kernel symbol ']${2}[' should be exported but it
+**** is not.  This could cause problems later.
+**** ])
+AS_LINENO_POP])dnl
     _LINUX_KERNEL_EXPORTS([
+	___pskb_trim,
+	__get_free_pages,
+	__get_user_4,
+	__ip_route_output_key,
+	__ip_select_ident,
+	__kfree_skb,
+	__module_address,
+	__module_text_address,
+	__setscheduler,
+	__tcp_push_pending_frames,
+	__wake_up,
+	__wake_up_sync,
+	__xfrm_policy_check,
+	_def_fifo_ops,
 	add_wait_queue,
 	add_wait_queue_exclusive,
+	afinet_get_info,
+	clone_mnt,
 	create_proc_entry,
 	del_timer,
 	dev_base,
 	dev_base_lock,
+	do_exit,
 	do_softirq,
+	do_umount,
+	file_kill,
 	free_pages,
-	__get_free_pages,
-	__get_user_4,
+	graft_tree,
+	group_send_sig_info,
+	icmp_err_convert,
+	icmp_statistics,
 	inet_accept,
 	inet_add_protocol,
 	inet_addr_type,
+	inet_bind,
 	inet_del_protocol,
+	inet_getname,
+	inet_ioctl,
+	inet_multi_getname,
 	inet_register_protosw,
 	inet_release,
 	inet_sendmsg,
 	inet_shutdown,
 	inet_stream_connect,
 	inet_unregister_protosw,
+	ioctl32_hash_table,
+	ioctl32_sem,
 	ip_cmsg_recv,
+	ip_cmsg_send,
+	ip_frag_mem,
+	ip_frag_nqueues,
 	ip_fragment,
+	ip_route_output_flow,
 	ip_route_output_key,
-	__ip_select_ident,
+	ip_rt_mtu_expires,
+	ip_rt_update_pmtu,
 	ip_send_check,
 	jiffies,
 	kfree,
-	__kfree_skb,
 	kill_pg,
+	kill_pid_info,
 	kill_proc,
+	kill_sl,
 	kmem_cache_alloc,
 	kmem_cache_create,
 	kmem_cache_destroy,
 	kmem_cache_free,
 	kmem_find_general_cachep,
+	kthread_bind,
+	kthread_create,
+	kthread_should_stop,
+	kthread_stop,
 	mod_timer,
 	net_statistics,
-	nf_hooks,
 	nf_hook_slow,
+	nf_hooks,
 	num_physpages,
+	open_softirq,
 	panic,
+	path_lookup,
 	printk,
 	proc_dointvec,
 	proc_dointvec_jiffies,
 	proc_dointvec_minmax,
 	proc_doulongvec_ms_jiffies_minmax,
 	proc_net,
-	___pskb_trim,
 	put_cmsg,
+	put_filp,
+	raise_softirq,
+	raise_softirq_irqoff,
+	raw_prot,
 	register_sysctl_table,
 	remove_proc_entry,
 	remove_wait_queue,
+	sched_setscheduler,
 	schedule_timeout,
+	send_group_sig_info,
 	send_sig,
 	sk_alloc,
+	sk_free,
+	sk_run_filter,
 	skb_clone,
 	skb_copy_datagram_iovec,
 	skb_over_panic,
 	skb_realloc_headroom,
 	skb_under_panic,
-	sk_free,
-	sk_run_filter,
+	skbuff_head_cache,
+	snmp_get_info,
+	sock_alloc,
 	sock_no_mmap,
 	sock_no_sendpage,
 	sock_no_socketpair,
 	sock_wake_async,
 	sock_wfree,
+	socket_get_info,
 	sprintf,
 	sysctl_intvec,
 	sysctl_jiffies,
 	sysctl_local_port_range,
+	task_rq_lock,
+	tasklist_lock,
+	tcp___push_pending_frames,
+	tcp_current_mss,
+	tcp_cwnd_application_limited,
+	tcp_memory_allocated,
+	tcp_openreq_cachep,
+	tcp_orphan_count,
+	tcp_prot,
+	tcp_push_pending_frames,
+	tcp_set_skb_tso_factor,
+	tcp_set_skb_tso_segs,
+	tcp_sockets_allocated,
+	tcp_sync_mss,
+	tcp_tw_count,
+	tcp_write_xmit,
+	udp_prot,
 	unregister_sysctl_table,
-	__wake_up], [], [dnl
-	    AC_MSG_WARN([
-**** 
-**** Linux kernel symbol ']LK_Export[' should be exported but it
-**** is not.  This could cause problems later.
-**** ])])
+	xfrm_policy_delete], [],
+	[symbol_warning "$LINENO" "LK_Export"])
 dnl----------------------------------------------------------------------------
-dnl----------------------------------------------------------------------------
-dnl----------------------------------------------------------------------------
-    _LINUX_KERNEL_SYMBOL_EXPORT([cdev_put])
-    _LINUX_KERNEL_SYMBOL_EXPORT([def_fifo_fops])
-    _LINUX_KERNEL_SYMBOL_EXPORT([do_exit])
-    _LINUX_KERNEL_SYMBOL_EXPORT([file_kill])
-    _LINUX_KERNEL_SYMBOL_EXPORT([file_move])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([icmp_statistics])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_min_pmtu])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([ip_rt_mtu_expires])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([pcibios_init])
-    _LINUX_KERNEL_SYMBOL_EXPORT([put_filp])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([secure_tcp_sequence_number])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sock_readv_writev])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_default_ttl])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_dynaddr])
-dnl _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_ip_nonlocal_bind])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_rmem_default])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_wmem_default])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_rmem_max])
-    _LINUX_KERNEL_SYMBOL_EXPORT([sysctl_wmem_max])
-    _LINUX_KERNEL_SYMBOL_EXPORT([__wake_up_sync])
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_SYMBOLS([
+	__ip_route_output_key,
+	__module_address,
+	__module_text_address,
+	__setscheduler,
+	__tcp_push_pending_frames,
+	__wake_up_sync,
+	__xfrm_policy_check,
+	__xfrm_sk_clone_policy,
+	_def_fifo_ops,
 	afinet_get_info,
 	cd_forget,
+	cdev_put,
 	check_mnt,
 	compat_ptr,
-	_def_fifo_ops,
+	def_fifo_fops,
 	dev_base_head,
+	do_exit,
+	file_kill,
+	file_move,
 	group_send_sig_info,
-	group_send_sig_info,
+	half_md4_transform,
 	icmp_err_convert,
 	icmp_statistics,
 	inet_bind,
@@ -1324,56 +1420,70 @@ dnl----------------------------------------------------------------------------
 	ip_frag_nqueues,
 	ip_getsockopt,
 	ip_route_output_flow,
-	__ip_route_output_key,
 	ip_rt_min_pmtu,
 	ip_rt_mtu_expires,
 	ip_rt_update_pmtu,
-	ipsec_sk_policy,
 	ip_setsockopt,
+	ipsec_sk_policy,
 	is_current_pgrp_orphaned,
 	is_ignored,
 	is_orphaned_pgrp,
+	kill_pg,
+	kill_pg_info,
 	kill_pgrp,
+	kill_pgrp_info,
+	kill_pid,
 	kill_pid_info,
+	kill_pid_info_as_uid,
+	kill_proc,
 	kill_proc_info,
+	kill_proc_info_as_uid,
 	kill_sl,
+	kill_sl_info,
+	ksize,
 	kthread_bind,
 	kthread_create,
 	kthread_should_stop,
 	kthread_stop,
-	__module_address,
 	module_address,
-	modules,
-	__module_text_address,
 	module_text_address,
+	modules,
 	mount_sem,
 	namespace_sem,
+	put_filp,
 	raw_prot,
 	sched_setscheduler,
+	secure_dccp_sequence_number,
 	secure_tcp_sequence_number,
 	send_group_sig_info,
+	send_sig,
+	send_sig_info,
 	session_of_pgrp,
-	__setscheduler,
 	skbuff_head_cache,
+	sned_sig_info,
 	snmp_get_info,
 	sock_alloc,
+	sock_readv_writev,
 	socket_get_info,
 	sysctl_check_table,
 	sysctl_ip_default_ttl,
 	sysctl_ip_dynaddr,
 	sysctl_ip_nonlocal_bind,
 	sysctl_local_port_range,
+	sysctl_rmem_default,
+	sysctl_rmem_max,
 	sysctl_tcp_fin_timeout,
-	tasklist_lock,
+	sysctl_wmem_default,
+	sysctl_wmem_max,
 	task_rq_lock,
 	task_rq_unlock,
+	tasklist_lock,
 	tcp_current_mss,
 	tcp_cwnd_application_limited,
 	tcp_memory_allocated,
 	tcp_openreq_cachep,
 	tcp_orphan_count,
 	tcp_prot,
-	__tcp_push_pending_frames,
 	tcp_set_keepalive,
 	tcp_set_skb_tso_factor,
 	tcp_set_skb_tso_segs,
@@ -1382,9 +1492,122 @@ dnl----------------------------------------------------------------------------
 	tcp_tw_count,
 	tcp_write_xmit,
 	udp_prot,
+	xfrm_policy_delete]) # _LINUX_KERNEL_SYMBOLS
+dnl----------------------------------------------------------------------------
+dnl----------------------------------------------------------------------------
+dnl----------------------------------------------------------------------------
+    _LINUX_KERNEL_ABI_SYMBOLS([
+	__ip_route_output_key,
+	__ip_select_ident,
+	__module_address,
+	__module_text_address,
+	__setscheduler,
+	__tcp_push_pending_frames,
+	__wake_up_sync,
 	__xfrm_policy_check,
-	xfrm_policy_delete,
-	__xfrm_sk_clone_policy]) # _LINUX_KERNEL_SYMBOLS
+	__xfrm_sk_clone_policy,
+	_def_fifo_ops,
+	afinet_get_info,
+	cd_forget,
+	cdev_put,
+	check_mnt,
+	compat_ptr,
+	def_fifo_fops,
+	dev_base_head,
+	do_exit,
+	file_kill,
+	file_move,
+	group_send_sig_info,
+	half_md4_transform,
+	icmp_err_convert,
+	icmp_statistics,
+	inet_bind,
+	inet_getname,
+	inet_ioctl,
+	inet_multi_getname,
+	inet_proto_lock,
+	inet_protos,
+	ioctl32_hash_table,
+	ioctl32_sem,
+	ip_cmsg_recv,
+	ip_cmsg_send,
+	ip_frag_mem,
+	ip_frag_nqueues,
+	ip_getsockopt,
+	ip_route_output_flow,
+	ip_rt_min_pmtu,
+	ip_rt_mtu_expires,
+	ip_rt_update_pmtu,
+	ip_setsockopt,
+	ipsec_sk_policy,
+	is_current_pgrp_orphaned,
+	is_ignored,
+	is_orphaned_pgrp,
+	kill_pg,
+	kill_pg_info,
+	kill_pgrp,
+	kill_pgrp_info,
+	kill_pid,
+	kill_pid_info,
+	kill_pid_info_as_uid,
+	kill_proc,
+	kill_proc_info,
+	kill_proc_info_as_uid,
+	kill_sl,
+	kill_sl_info,
+	ksize,
+	kthread_bind,
+	kthread_create,
+	kthread_should_stop,
+	kthread_stop,
+	module_address,
+	module_text_address,
+	modules,
+	mount_sem,
+	namespace_sem,
+	put_filp,
+	raw_prot,
+	sched_setscheduler,
+	secure_dccp_sequence_number,
+	secure_tcp_sequence_number,
+	send_group_sig_info,
+	send_sig,
+	send_sig_info,
+	session_of_pgrp,
+	skbuff_head_cache,
+	sned_sig_info,
+	snmp_get_info,
+	sock_alloc,
+	sock_readv_writev,
+	socket_get_info,
+	sysctl_check_table,
+	sysctl_ip_default_ttl,
+	sysctl_ip_dynaddr,
+	sysctl_ip_nonlocal_bind,
+	sysctl_local_port_range,
+	sysctl_rmem_default,
+	sysctl_rmem_max,
+	sysctl_tcp_fin_timeout,
+	sysctl_wmem_default,
+	sysctl_wmem_max,
+	task_rq_lock,
+	task_rq_unlock,
+	tasklist_lock,
+	tcp_current_mss,
+	tcp_cwnd_application_limited,
+	tcp_memory_allocated,
+	tcp_openreq_cachep,
+	tcp_orphan_count,
+	tcp_prot,
+	tcp_set_keepalive,
+	tcp_set_skb_tso_factor,
+	tcp_set_skb_tso_segs,
+	tcp_sockets_allocated,
+	tcp_sync_mss,
+	tcp_tw_count,
+	tcp_write_xmit,
+	udp_prot,
+	xfrm_policy_delete]) # _LINUX_KERNEL_ABI_SYMBOLS
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
@@ -1869,6 +2092,8 @@ dnl----------------------------------------------------------------------------
 		    function xfrm_policy_delete returns int.])
 	    fi
 	fi
+	if test :${linux_cv_func___ip_select_ident} = :yes
+	then
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -1927,6 +2152,7 @@ dnl *** Configure cannot determine whether your __ip_select_ident function takes
 dnl *** 2 arguments or whether it takes 3 arguments.
 dnl *** ])
 dnl 	fi
+	fi
 	AC_CACHE_CHECK([for kernel skb_linearize with 1 argument], [linux_cv_have_skb_linearize_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
@@ -2310,7 +2536,7 @@ dnl----------------------------------------------------------------------------
 	])
 	if test :$linux_cv_ip_route_output_key_3_args = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS], [1], [Define if
-		function inet_addr_type() takes 3 arguments.])
+		function ip_route_output_key() takes 3 arguments.])
 	fi
     ])
 dnl----------------------------------------------------------------------------
@@ -2461,6 +2687,64 @@ dnl----------------------------------------------------------------------------
 	fi
     ])
 dnl----------------------------------------------------------------------------
+    if test :${linux_cv_func_ip_route_output_flow} = :yes
+    then
+    _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel ip_route_output_flow with 4 arguments], [linux_cv_have_ip_route_output_flow_4_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		[[int (*my_autoconf_function_pointer)(struct rtable **, struct flowi *, struct sock *, int) = &ip_route_output_flow;]]) ],
+		[linux_cv_have_ip_route_output_flow_4_args='yes'],
+		[linux_cv_have_ip_route_output_flow_4_args='no'])
+	])
+	if test :$linux_cv_have_ip_route_output_flow_4_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_4_ARGS], [1], [Define if
+		function ip_route_output_flow takes 4 arguments which was normally
+		the case up to 2.6.20.])
+	fi
+	AC_CACHE_CHECK([for kernel ip_route_output_flow with 5 arguments], [linux_cv_have_ip_route_output_flow_5_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		[[int (*my_autoconf_function_pointer)(struct net *, struct rtable **, struct flowi *, struct sock *, int) = &ip_route_output_flow;]]) ],
+		[linux_cv_have_ip_route_output_flow_5_args='yes'],
+		[linux_cv_have_ip_route_output_flow_5_args='no'])
+	])
+	if test :$linux_cv_have_ip_route_output_flow_5_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_FLOW_5_ARGS], [1], [Define if
+		function ip_route_output_flow takes 5 arguments which is the case
+		from 2.6.21.])
+	fi
+    ])
+    fi
+dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel session_of_pgrp with struct arg], [linux_cv_have_session_of_pgrp_with_struct_arg], [dnl
 	    AC_COMPILE_IFELSE([
@@ -2531,20 +2815,29 @@ dnl----------------------------------------------------------------------------
 	sctp_exdata_ind \
 	sctp_exdata_req"
 dnl----------------------------------------------------------------------------
-    lfs_pipe=yes
-    lfs_fattach=yes
-    _LINUX_KERNEL_SYMBOL_EXPORT([clone_mnt], [lfs_fattach=no; lfs_pipe=no])
-    _LINUX_KERNEL_SYMBOL_EXPORT([graft_tree], [lfs_fattach=no; lfs_pipe=no])
-    _LINUX_KERNEL_SYMBOL_EXPORT([do_umount], [lfs_fattach=no; lfs_pipe=no])
     AC_CACHE_CHECK([for kernel symbol support for fattach/fdetach], [os7_cv_fattach], [dnl
-	os7_cv_fattach="$lfs_fattach" ])
+	AC_MSG_RESULT([testing...])
+	os7_cv_fattach=yes
+dnl	_LINUX_KERNEL_SYMBOL_EXPORT([check_mnt],     [os7_cv_fattach=no])
+dnl	_LINUX_KERNEL_SYMBOL_EXPORT([namespace_sem], [os7_cv_fattach=no])
+dnl	_LINUX_KERNEL_SYMBOL_EXPORT([mount_sem],     [os7_cv_fattach=no])
+	_LINUX_KERNEL_SYMBOL_EXPORT([clone_mnt],     [os7_cv_fattach=no])
+	_LINUX_KERNEL_SYMBOL_EXPORT([graft_tree],    [os7_cv_fattach=no])
+	_LINUX_KERNEL_SYMBOL_EXPORT([do_umount],     [os7_cv_fattach=no])
+	AC_MSG_CHECKING([for kernel symbol support for fattach/fdetach])
+    ])
     if test :"${os7_cv_fattach:-no}" != :no ; then
 	AC_DEFINE([HAVE_KERNEL_FATTACH_SUPPORT], [1], [If the addresses for the
 	    necessary symbols above are defined, then define this to include
 	    fattach/fdetach support.])
     fi
     AC_CACHE_CHECK([for kernel symbol support for pipe], [os7_cv_pipe], [dnl
-	os7_cv_pipe="$lfs_pipe" ])
+	AC_MSG_RESULT([testing...])
+	os7_cv_pipe=yes
+	_LINUX_KERNEL_SYMBOL_EXPORT([file_kill], [os7_cv_pipe=no])
+	_LINUX_KERNEL_SYMBOL_EXPORT([put_filp],  [os7_cv_pipe=no])
+	AC_MSG_CHECKING([for kernel symbol support for pipe])
+    ])
     if test :${os7_cv_pipe:-no} != :no ; then
 	AC_DEFINE([HAVE_KERNEL_PIPE_SUPPORT], [1], [If the addresses for the
 	    necessary symbols above are defined, then define this to include
@@ -3817,6 +4110,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.13  2011-03-26 04:28:44  brian
+# - updates to build process
+#
 # Revision 1.1.2.12  2011-03-17 07:01:26  brian
 # - build and repo system improvements
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $
+ @(#) $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:31 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl-llc.c,v $
+ Revision 1.1.2.4  2011-03-26 04:28:46  brian
+ - updates to build process
+
  Revision 1.1.2.3  2010-11-28 14:21:31  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $";
+static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:46 $";
 
 /*
  * This is a DLPI interface LLC driver for Linux.  What it does is provides DLPI access to the Linux
@@ -105,7 +108,7 @@ static char const ident[] = "$RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.3
 #define LLC_DESCRIP	"UNIX SVR 4.2 LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define LLC_REVISION	"OpenSS7 $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $"
+#define LLC_REVISION	"OpenSS7 $RCSfile: dl-llc.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:46 $"
 #define LLC_DEVICE	"SVR 4.2MP IEEE 802.2 LLC Driver (LLC)"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC_LICENSE	"GPL"
@@ -629,6 +632,9 @@ llc_alloc_skb_slow(struct llcdev *dev, mblk_t *mp, uint headroom, int gfp)
 	return (skb);
 }
 
+#ifdef HAVE_SKBUFF_HEAD_CACHE_USABLE
+extern kmem_cachep_t skbuff_head_cache;
+
 static fastcall noinline __unlikely struct sk_buff *
 llc_alloc_skb_old(struct llcdev *dev, mblk_t *mp, uint headroom, int gfp)
 {
@@ -689,6 +695,7 @@ llc_alloc_skb_old(struct llcdev *dev, mblk_t *mp, uint headroom, int gfp)
       go_slow:
 	return llc_alloc_skb_slow(dev, mp, headroom, gfp);
 }
+#endif
 
 static inline fastcall __hot_out struct sk_buff *
 llc_alloc_skb(struct llcdev *dev, mblk_t *mp, uint headroom, int gfp)
@@ -709,7 +716,9 @@ llc_alloc_skb(struct llcdev *dev, mblk_t *mp, uint headroom, int gfp)
 	freemsg(mp);
 	return (skb);
       old_way:
+#ifdef HAVE_SKBUFF_HEAD_CACHE_USABLE
 	return llc_alloc_skb_old(dev, mp, headroom, gfp);
+#endif
       go_slow:
 	return llc_alloc_skb_slow(dev, mp, headroom, gfp);
 }

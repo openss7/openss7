@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: ip_hooks.h.in,v 1.1.2.4 2011-01-12 04:10:29 brian Exp $
+ @(#) $Id: ip_hooks.h.in,v 1.1.2.5 2011-03-26 04:28:46 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip_hooks.h.in,v $
+ Revision 1.1.2.5  2011-03-26 04:28:46  brian
+ - updates to build process
+
  Revision 1.1.2.4  2011-01-12 04:10:29  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -118,37 +121,78 @@ extern struct icmp_err icmp_err_convert[];
 
 extern struct icmp_mib icmp_statistic[];
 
-#undef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
-#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
-int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
+#undef HAVE_IP_ROUTE_OUTPUT_FLOW_USABLE
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_USABLE
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_4_ARGS
+extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
+#endif
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_5_ARGS
+extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
+#endif
 #endif
 
+#undef HAVE_IP_RT_MIN_PMTU_USABLE
+#ifdef HAVE_IP_RT_MIN_PMTU_USABLE
 extern int ip_rt_min_pmtu;
+#else
+#define ip_rt_min_pmtu 552
+#endif
 
+#undef HAVE_IP_RT_MTU_EXPIRES_USABLE
+#ifdef HAVE_IP_RT_MTU_EXPIRES_USABLE
 extern int ip_rt_mtu_expires;
+#endif
 
-#undef HAVE_IP_RT_UPDATE_PMTU_ADDR
-#ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
+#undef HAVE_IP_RT_UPDATE_PMTU_USABLE
+#ifdef HAVE_IP_RT_UPDATE_PMTU_USABLE
 void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
 #endif
 
+#undef HAVE_SYSCTL_IP_DYNADDR_USABLE
+#ifndef sysctl_ip_dynaddr
+#ifdef HAVE_SYSCTL_IP_DYNADDR_USABLE
 extern int sysctl_ip_dynaddr;
-
-extern int sysctl_ip_nonlocal_bind;
-
-extern int sysctl_ip_default_ttl;
-
-#undef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
-#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
-int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
+#else
+#define sysctl_ip_dynaddr 0
+#endif
 #endif
 
-#undef HAVE_KFUNC_DST_MTU
-#ifdef HAVE_KFUNC_DST_MTU
-/* Why do stupid people rename things like this? */
-#undef dst_pmtu
-#define dst_pmtu dst_mtu
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_USABLE
+#ifndef sysctl_ip_nonlocal_bind
+#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_USABLE
+extern int sysctl_ip_nonlocal_bind;
 #else
+#define sysctl_ip_nonlocal_bind 0
+#endif
+#endif
+
+#ifndef IPDEFTTL
+#define IPDEFTTL 64
+#endif
+
+#undef HAVE_SYSCTL_IP_DEFAULT_TTL_USABLE
+#ifndef sysctl_ip_default_ttl
+#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_USABLE
+extern int sysctl_ip_default_ttl;
+#else
+#define sysctl_ip_default_ttl IPDEFTTL
+#endif
+#endif
+
+#ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
+extern int sysctl_local_port_range[2];
+#endif				/* HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL */
+
+#undef HAVE___IP_ROUTE_OUTPUT_KEY_USABLE
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_USABLE
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_2_ARGS
+extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
+#endif
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_3_ARGS
+extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp);
+#endif
+#endif
+
 #undef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
 #ifdef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
 /* dst_pmtu should be already defined */
@@ -158,20 +202,25 @@ dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 	if (dst->ops->update_pmtu)
 		dst->ops->update_pmtu(dst, mtu);
 }
-#else
-#ifndef dst_pmtu
+#elif !defined dst_pmtu
 static __inline__ u32
 dst_pmtu(struct dst_entry *dst)
 {
 	return (dst->pmtu);
 }
-#endif
+#else
 static __inline__ void
 dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 {
 	dst->pmtu = mtu;
 }
 #endif
+
+#undef HAVE_KFUNC_DST_MTU
+#ifdef HAVE_KFUNC_DST_MTU
+/* Why do stupid people rename things like this? */
+#	undef dst_pmtu
+#	define dst_pmtu dst_mtu
 #endif
 
 #undef HAVE_KMEMB_STRUCT_NET_DEV_BASE_HEAD
@@ -198,13 +247,13 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 }
 #endif
 
-#undef HAVE___XFRM_POLICY_CHECK_ADDR
-#ifdef HAVE___XFRM_POLICY_CHECK_ADDR
+#undef HAVE___XFRM_POLICY_CHECK_USABLE
+#ifdef HAVE___XFRM_POLICY_CHECK_USABLE
 int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned short family);
 #endif
 
-#undef HAVE_XFRM_POLICY_DELETE_ADDR
-#ifdef HAVE_XFRM_POLICY_DELETE_ADDR
+#undef HAVE_XFRM_POLICY_DELETE_USABLE
+#ifdef HAVE_XFRM_POLICY_DELETE_USABLE
 #ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
 int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #else
@@ -212,8 +261,8 @@ void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #endif
 #endif
 
-#undef HAVE_SNMP_GET_INFO_ADDR
-#ifdef HAVE_SNMP_GET_INFO_ADDR
+#undef HAVE_SNMP_GET_INFO_USABLE
+#ifdef HAVE_SNMP_GET_INFO_USABLE
 int snmp_get_info(char *buffer, char **start, off_t offset, int length);
 #endif
 
@@ -248,40 +297,76 @@ extern atomic_t ip_frag_mem;
 #define SK_RMEM_MAX 65535
 #endif
 
-#undef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
+#undef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
 #ifndef sysctl_rmem_default
-#ifndef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
+#ifdef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
+extern __u32 sysctl_rmem_default;
+#elif defined HAVE_SYSCTL_RMEM_DEFAULT_USABLE && defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_rmem_default __attribute__((weak));
+__u32
+sysctl_rmem_default_(void) {
+	if (&sysctl_rmem_default != 0)
+		return sysctl_rmem_default;
+	return SK_RMEM_MAX;
+}
+#define sysctl_rmem_default sysctl_rmem_default_()
+#else
 #define sysctl_rmem_default SK_RMEM_MAX
 #endif
-#else
-extern __u32 sysctl_rmem_default;
 #endif
 
-#undef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
+#undef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
 #ifndef sysctl_wmem_default
-#ifndef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
+#ifdef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
+extern __u32 sysctl_wmem_default;
+#elif defined HAVE_SYSCTL_WMEM_DEFAULT_USABLE && defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_wmem_default __attribute__((weak));
+__u32
+sysctl_wmem_default_(void) {
+	if (&sysctl_wmem_default != 0)
+		return sysctl_wmem_default;
+	return SK_WMEM_MAX;
+}
+#define sysctl_wmem_default sysctl_wmem_default_()
+#else
 #define sysctl_wmem_default SK_WMEM_MAX
 #endif
-#else
-extern __u32 sysctl_wmem_default;
 #endif
 
-#undef HAVE_SYSCTL_RMEM_MAX_ADDR
+#undef HAVE_SYSCTL_RMEM_MAX_SUPPORT
 #ifndef sysctl_rmem_max
-#ifndef HAVE_SYSCTL_RMEM_MAX_ADDR
+#ifdef HAVE_SYSCTL_RMEM_MAX_SUPPORT
+extern __u32 sysctl_rmem_max;
+#elif defined HAVE_SYSCTL_RMEM_MAX_USABLE && defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_rmem_max __attribute__((weak));
+__u32
+sysctl_rmem_max_(void) {
+	if (&sysctl_rmem_max != 0)
+		return sysctl_rmem_max;
+	return SK_RMEM_MAX;
+}
+#define sysctl_rmem_max sysctl_rmem_max_()
+#else
 #define sysctl_rmem_max SK_RMEM_MAX
 #endif
-#else
-extern __u32 sysctl_rmem_max;
 #endif
 
-#undef HAVE_SYSCTL_WMEM_MAX_ADDR
+#undef HAVE_SYSCTL_WMEM_MAX_SUPPORT
 #ifndef sysctl_wmem_max
-#ifndef HAVE_SYSCTL_WMEM_MAX_ADDR
+#ifdef HAVE_SYSCTL_WMEM_MAX_SUPPORT
+extern __u32 sysctl_wmem_max;
+#elif defined HAVE_SYSCTL_WMEM_MAX_USABLE && defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_wmem_max __attribute__((weak));
+__u32
+sysctl_wmem_max_(void) {
+	if (&sysctl_wmem_max != 0)
+		return sysctl_wmem_max;
+	return SK_WMEM_MAX;
+}
+#define sysctl_wmem_max sysctl_wmem_max_()
+#else
 #define sysctl_wmem_max SK_WMEM_MAX
 #endif
-#else
-extern __u32 sysctl_wmem_max;
 #endif
 
 #ifndef socklen_t
@@ -315,6 +400,61 @@ skb_rtable(struct sk_buff *skb)
 {
     return (struct rtable *)skb->dst;
 }
+#endif
+
+#undef HAVE___IP_SELECT_IDENT_SYMBOL
+#undef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+#undef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#undef HAVE___IP_SELECT_IDENT_SUPPORT
+#undef HAVE___IP_SELECT_IDENT_USABLE
+
+#if   defined HAVE___IP_SELECT_IDENT_SYMBOL
+#   if !defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS && !defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#       error Need a way of selecting an ID for an IP packet.
+#   endif
+#   if   defined HAVE___IP_SELECT_IDENT_SUPPORT
+#       if   defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst);	/* 2.4 */
+
+#		define __ip_select_ident(a,b,c) __ip_select_ident(a,b)
+#       elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst, int more);	/* 2.6 */
+
+#		define __ip_select_ident(a,b,c) __ip_select_ident(a,b,c)
+#       endif
+#   elif defined HAVE___IP_SELECT_IDENT_USABLE && defined CONFIG_KERNEL_WEAK_SYMBOLS
+/* This code is identical from 2.4.33 to 2.6.32, yet for some reason it is not
+ * worth supporting in RedHat's kABI? */
+#       if   defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst)
+    __attribute__ ((weak));
+#       elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst, int more)
+    __attribute__ ((weak));
+#	endif
+STATIC streams_fastcall streams_inline void
+__ip_select_ident_(struct iphdr *iph, struct dst_entry *dst, int more)
+{
+	struct rtable *rt;
+
+	if (__ip_select_ident != 0)
+#if   defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+		return __ip_select_ident(iph, dst);
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+		return __ip_select_ident(iph, dst, more);
+#endif
+	rt = (struct rtable *) dst;
+	if (rt->peer) {
+		iph->id = htons(inet_getid(rt->peer, more));	/* inline */
+		return;
+	}
+	iph->id = (iph->daddr ^ jiffies);
+	return;
+}
+#define __ip_select_ident(a,b,c) __ip_select_ident_(a,b,c)
+#   else
+#       error Need a way of selecting an ID for an IP packet.
+#   endif
 #endif
 
 #endif				/* __LOCAL_IP_HOOKS_H__ */

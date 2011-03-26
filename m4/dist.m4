@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-06 08:57:20 $
+# @(#) $RCSfile: dist.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-06 08:57:20 $ by $Author: brian $
+# Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -348,7 +348,7 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 		    ;;
 		(:SuSE-release)
 		    # SuSE never really had a codename, but now they put OSS on or openSUSE OpenSuSE
-		    dist_cv_build_codename=`head -1 $dist_cv_build_rel_file | sed 's,^.*\<OSS\>.*,OSS,;t;s,^.*\<openSUSE\>.*,openSUSE,';t;s,.*,,`
+		    dist_cv_build_codename=`head -1 $dist_cv_build_rel_file | sed 's,^.*\<OSS\>.*,OSS,;t;s,^.*\<openSUSE\>.*,openSUSE,;t;s,.*,,'`
 		    ;;
 		(:*)
 		    dist_cv_build_codename=$(dist_get_codename "$(cat $dist_cv_build_rel_file)")
@@ -562,7 +562,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 		    ;;
 		(:SuSE-release)
 		    # SuSE never really had a codename, but now they put OSS on or openSUSE OpenSuSE
-		    dist_cv_host_codename=`head -1 $dist_cv_host_rel_file | sed 's,^.*\<OSS\>.*,OSS,;t;s,^.*\<openSUSE\>.*,openSUSE,';t;s,.*,,`
+		    dist_cv_host_codename=`head -1 $dist_cv_host_rel_file | sed 's,^.*\<OSS\>.*,OSS,;t;s,^.*\<openSUSE\>.*,openSUSE,;t;s,.*,,'`
 		    ;;
 		(:*)
 		    dist_cv_host_codename=$(dist_get_codename "$(cat $dist_cv_host_rel_file)")
@@ -847,6 +847,9 @@ AC_DEFUN([_DISTRO_], [dnl
 # =============================================================================
 #
 # $Log: dist.m4,v $
+# Revision 1.1.2.8  2011-03-26 04:28:45  brian
+# - updates to build process
+#
 # Revision 1.1.2.7  2011-03-06 08:57:20  brian
 # - repository updates
 #

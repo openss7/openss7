@@ -1,3 +1,51 @@
+2011-03-26  Brian Bidulock  <bidulock@openss7.org>
+
+	* src/drivers/module_hooks.h.in: added new hook files
+	* src/drivers/net_hooks.h.in: added new hook files
+	* Makefile.am: weak module approach
+	* acinclude.am: more checks
+	* openss7.spec.in: sp.
+	* am/genksyms.am: write date into timestamp files
+	* am/kernel.am: enhancment of kernel module build system
+	* am/openss7.am: dependency for ifnames.log
+	* am/strconf.am: awk does not pass exit value on
+	* m4/dist.m4: mis-quote corrected
+	* m4/genksyms.m4: additional modpost options
+	* m4/kernel.m4: use functions where possible, additional options for
+	  weak modules and symbols
+	* scripts/info.deps: test whether file opened successfully
+	* scripts/modpost.awk: significant script updates
+	* scripts/strconf.awk: better debug and option handling
+	* scripts/symsets.awk: not used anymore
+	* src/drivers/dl-llc.c: better exported symbol handling
+	* src/drivers/fifo.c: better exported symbol handling
+	* src/drivers/inet.c: better exported symbol handling
+	* src/drivers/ip.c: better exported symbol handling
+	* src/drivers/ip_hooks.h.in: better exported symbol handling
+	* src/drivers/np.c: better exported symbol handling
+	* src/drivers/np_ip.c: better exported symbol handling
+	* src/drivers/np_rtp.c: better exported symbol handling
+	* src/drivers/np_udp.c: better exported symbol handling
+	* src/drivers/otk6.c: better exported symbol handling
+	* src/drivers/rawip.c: better exported symbol handling
+	* src/drivers/rsw.c: better exported symbol handling
+	* src/drivers/sctp2.c: better exported symbol handling
+	* src/drivers/sctp_hooks.h.in: better exported symbol handling
+	* src/drivers/tcp.c: better exported symbol handling
+	* src/drivers/udp.c: better exported symbol handling
+	* src/drivers/udp_hooks.h.in: not used anymore
+	* src/include/sys/openss7/config.h.in: better exported symbol handling
+	* src/include/sys/openss7/strsubr.h: better exported symbol handling
+	* src/kernel/strattach.c: better exported symbol handling
+	* src/kernel/strattach.h: better exported symbol handling
+	* src/kernel/strpipe.c: better exported symbol handling
+	* src/kernel/strprocfs.c: better exported symbol handling
+	* src/kernel/strsched.c: better exported symbol handling
+	* src/kernel/strspecfs.c: better exported symbol handling
+	* src/kernel/strutil.c: better exported symbol handling
+	* src/kernel/wrapper.c: better exported symbol handling
+	* src/modules/sth.c: better exported symbol handling
+
 2011-03-17  Brian Bidulock  <bidulock@openss7.org>
 
 	* AUTHORS: update release files
