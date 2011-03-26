@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-17 07:01:28 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-17 07:01:28 $ by $Author: brian $
+# Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -242,6 +242,12 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
 	ksyms_cv_modpost_moddir="$kmoddir"])
     MODPOST_MODDIR="$ksyms_cv_modpost_moddir"
     AC_SUBST([MODPOST_MODDIR])dnl
+    AC_CACHE_CHECK([for modpost ksymsets file], [ksyms_cv_modpost_ksymsets], [dnl
+	ksyms_cv_modpost_ksymsets="$ksymsets"])
+    MODPOST_KSYMSETS="$ksyms_cv_modpost_ksymsets"
+    AC_SUBST([MODPOST_KSYMSETS])dnl
+    MODPOST_SYMSETS="symsets-${PACKAGE_LCNAME}-${kversion}.tar.gz"
+    AC_SUBST([MODPOST_SYMSETS])dnl
 dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
     test :"$MODPOST_CACHE" != : && unset ksyms_cv_modpost_cache
     AC_CACHE_CHECK([for modpost cache file], [ksyms_cv_modpost_cache], [dnl
@@ -281,6 +287,15 @@ dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
 		ksyms_cv_modpost_options="${ksyms_cv_modpost_options:+$ksyms_cv_modpost_options }-x"
 	    fi
 	fi
+	if test :${linux_cv_k_weak_modules:-yes} = :no ; then
+	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options:+$ksyms_cv_modpost_options }-r"
+	fi
+	if test :${linux_cv_k_abi_support:-yes} = :no ; then
+	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options:+$ksyms_cv_modpost_options }-U"
+	fi
+	if test :${linux_cv_k_weak_symbols:-yes} = :yes ; then
+	    ksyms_cv_modpost_options="${ksyms_cv_modpost_options:+$ksyms_cv_modpost_options }-w"
+	fi
     ])
     MODPOST_OPTIONS="$ksyms_cv_modpost_options"
     AC_SUBST([MODPOST_OPTIONS])dnl
@@ -288,7 +303,7 @@ dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
     AC_SUBST([MODPOST_INPUTS])dnl
     AC_CONFIG_COMMANDS([modpost], [dnl
 	AC_MSG_NOTICE([creating $MODPOST_SYSVER from $MODPOST_SYSMAP, $MODPOST_MODDIR and $MODPOST_KMODVER])
-	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST -vv${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR}${MODPOST_KMODVER:+ -i '$MODPOST_KMODVER'} -s $MODPOST_SYSVER" 2>&1 | \
+	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR}${MODPOST_KMODVER:+ -i $MODPOST_KMODVER}${MODPOST_KSYMSETS:+ -K $MODPOST_KSYMSETS} -s $MODPOST_SYSVER" 2>&1 | \
 	while read line ; do
 	    echo "$as_me:$LINENO: $line" >&5
 	    echo "$as_me: $line" >&2
@@ -307,6 +322,7 @@ MODPOST_MODDIR="$MODPOST_MODDIR"
 MODPOST_CACHE="$MODPOST_CACHE"
 MODPOST_OPTIONS="$MODPOST_OPTIONS"
 MODPOST_INPUTS="$MODPOST_INPUTS"
+MODPOST_KSYMSETS="$MODPOST_KSYMSETS"
     ])
 ])# _KSYMS_OUTPUT_MODPOST_CONFIG
 # =============================================================================
@@ -358,7 +374,7 @@ AC_DEFUN([_KSYMS_OUTPUT], [dnl
 dnl _KSYMS_OUTPUT_MODSYMS_CONFIG
     if test :${linux_cv_k_ko_modules:-no} = :yes ; then
 	_KSYMS_OUTPUT_MODPOST_CONFIG
-	_KSYMS_OUTPUT_SYMSETS_CONFIG
+dnl	_KSYMS_OUTPUT_SYMSETS_CONFIG
     else
 	MODVERSIONS_H="${PKGINCL}/modversions.h"
 	_KSYMS_OUTPUT_MODVER_CONFIG
@@ -377,6 +393,9 @@ AC_DEFUN([_KSYMS_], [dnl
 # =============================================================================
 #
 # $Log: genksyms.m4,v $
+# Revision 1.1.2.8  2011-03-26 04:28:45  brian
+# - updates to build process
+#
 # Revision 1.1.2.7  2011-03-17 07:01:28  brian
 # - build and repo system improvements
 #

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-03-17 07:01:27 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-03-26 04:28:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
+## Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -83,6 +83,8 @@ $(DEPDIR)/modules.Pk: Makefile
 		$(ECHO) "stamp-mobjects: $$srcs" ; $(ECHO) "" ; \
 		objs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.o |g'` ; \
 		$(ECHO) "stamp-kobjects: $$objs" ; $(ECHO) "" ; \
+		mobs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.o |g'` ; \
+		$(ECHO) "stamp-kobjects: $$mobs" ; $(ECHO) "" ; \
 		mods=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g'` ; \
 		for m in $$mods ; do b=`basename $$m` ; \
 			$(ECHO) "sinclude $(DEPDIR)/$$b.mod.Po" ; \
@@ -108,67 +110,84 @@ DISTCLEAN_LOCAL += distclean-modules_Pk
 ## AMDEP
 endif
 
-$(MODPOST_SYSVER): $(top_builddir)/config.status $(MODPOST_KMODVER)
+$(MODPOST_CACHE): $(MODPOST_SCRIPT) $(top_builddir)/config.status
 	cd $(top_builddir) && $(SHELL) ./config.status modpost
 
-CLEANFILES		+= $(MODPOST_SYSVER)
-
-$(MODPOST_MODVER): $(MODPOST_SYSVER) stamp-verobjs $(KERNEL_MODULES)
-	@list=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g'` ; \
-	$(ECHO_Q) "  GEN   " `basename $@` ; \
-	$(ECHO_V) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list" ; \
-	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST)`$(ECHO_V) ' -vv'` $(MODPOST_OPTIONS) -i '$(MODPOST_INPUTS)' -o $(MODPOST_MODVER) $$list
-
-CLEANFILES		+= $(MODPOST_MODVER)
-
-$(MODPOST_SYMSETS): $(MODPOST_MODVER)
+$(MODPOST_SYSVER): $(MODPOST_CACHE)
 	@$(ECHO_Q) "  GEN   " `basename $@` ; \
-	$(ECHO_V) "$(SYMSETS) -vv $(SYMSETS_OPTIONS) -I $(MODPOST_MODVER) -o $@" ; \
-	$(SYMSETS)`$(ECHO_V) ' -vv'` $(SYMSETS_OPTIONS) -I $(MODPOST_MODVER) -o $@
+	$(ECHO_V) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -k $(kversion) -s $(MODPOST_SYSVER)" ; \
+	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST)`$(ECHO_V)' -vv'` $(MODPOST_OPTIONS) -k $(kversion) -s $(MODPOST_SYSVER) || exit $$?
 
-CLEANFILES		+= $(MODPOST_SYMSETS)
+stamp-modpost: stamp-verobjs $(KERNEL_MODULES)
+	@list=`printf '%s\n' $? | sed -rn 's,^lib.*_a-,$(kpre),;s,^([^\.]*)(\.mod\.[co]|\.k?o)$$,\1.o,p' | awk '{if(!($$0 in dups)){dups[$$0]=1;print}}'` ; \
+	if test -n "$$list" ; then \
+		$(ECHO_V) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -k $(kversion) $$list" ; \
+		MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST)`$(ECHO_V) ' -vv'` $(MODPOST_OPTIONS) -k $(kversion) $$list || exit $$? ; \
+	fi ; \
+	date -uIseconds > $@
+
+$(MODPOST_MODVER): stamp-modpost
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -k $(kversion) -o $(MODPOST_MODVER)" ; \
+	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST)`$(ECHO_V) ' -vv'` $(MODPOST_OPTIONS) -k $(kversion) -o $(MODPOST_MODVER) || exit $$?
+
+$(MODPOST_SYMSETS): stamp-modpost
+	@$(ECHO_Q) "  GEN   " `basename $@` ; \
+	$(ECHO_V) "MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST) -vv $(MODPOST_OPTIONS) -k $(kversion) -S $(MODPOST_SYMSETS)" ; \
+	MODPOST_CACHE=$(MODPOST_CACHE) $(MODPOST)`$(ECHO_V) ' -vv'` $(MODPOST_OPTIONS) -k $(kversion) -S $(MODPOST_SYMSETS) || exit $$?
+
+modobj = %.mod.o
+modsrc = %.mod.c
 
 if am__fastdepCC
 ## am__fastdepCC
-stamp-mobjects: $(MODPOST_MODVER) $(KERNEL_MODULES)
-	@mods=`$(ECHO) " $? " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
+$(modobj): $(modsrc) stamp-modpost
+	$(AM_V_CC)if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $@ -MMD -MP -MF $(DEPDIR)/$$(basename $@ .mod.o).mod.Tpo -c -o $@ $< ; \
+	then $(am__mv) $(DEPDIR)/$$(basename $@ .mod.o).mod.Tpo $(DEPDIR)/$$(basename $@ .mod.o).mod.Po ; else rm -f $(DEPDIR)/$$(basename $@ .mod.o).mod.Tpo ; exit 1 ; fi
+
+stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
+	@mods=`printf '%s\n' $? | sed -rn 's,^lib.*_a-,$(kpre),;s,^([^\.]*)(\.mod\.[co]|\.k?o)$$,\1,p' | awk '{if(!($$0 in dups)){dups[$$0]=1;print}}'` ; \
 	for m in $$mods ; do b=`basename $$m` ; \
-		test :$$m != :$(MODPOST_MODVER) || continue ; \
 		$(ECHO_Q) "  CC    " $$m.mod.o ; \
 		$(ECHO_V) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
 		then $(am__mv) $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi" ; \
 		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
 		then $(am__mv) $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi ; \
 	done ; \
-	touch stamp-mobjects
+	date -uIseconds > $@
 ## am__fastdepCC
 else
 ## !am__fastdepCC
 if AMDEP
 ## AMDEP
-stamp-mobjects: $(MODPOST_MODVER) $(KERNEL_MODULES)
-	@mods=`$(ECHO) " $? " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
+$(modobj): $(modsrc) stamp-modpost
+	$(AM_V_CC)source=$< object=$@ libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
+	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $<
+
+stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
+	@mods=`printf '%s\n' $? | sed -rn 's,^lib.*_a-,$(kpre),;s,^([^\.]*)(\.mod\.[co]|\.k?o)$$,\1,p' | awk '{if(!($$0 in dups)){dups[$$0]=1;print}}'` ; \
 	for m in $$mods ; do \
-		test :$$m != :$(MODPOST_MODVER) || continue ; \
 		$(ECHO_Q) "  CC    " $$m.mod.o ; \
 		$(ECHO_V) "source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
 		source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
 	done ; \
-	touch stamp-mobjects
+	date -uIseconds > $@
 ## AMDEP
 else
 ## !AMDEP
-stamp-mobjects: $(MODPOST_MODVER) $(KERNEL_MODULES)
-	@mods=`$(ECHO) " $? " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o | |g;s|\.mod\.c | |g'` ; \
+$(modobj): $(modsrc) stamp-modpost
+	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $<
+
+stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
+	@mods=`printf '%s\n' $? | sed -rn 's,^lib.*_a-,$(kpre),;s,^([^\.]*)(\.mod\.[co]|\.k?o)$$,\1,p' | awk '{if(!($$0 in dups)){dups[$$0]=1;print}}'` ; \
 	for m in $$mods ; do \
-		test :$$m != :$(MODPOST_MODVER) || continue ; \
 		$(ECHO_Q) "  CC    " $$m.mod.o ; \
 		$(ECHO_V) "$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
 		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
 	done ; \
-	touch stamp-mobjects
+	date -uIseconds > $@
 ## !AMDEP
 endif
 ## !am__fastdepCC
@@ -177,14 +196,14 @@ endif
 if AMDEP
 ## AMDEP
 .o.ko:
-	$(AM_V_CCLD)m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; b=`basename $$m` ; \
-	if $(LD) $(KERNEL_BUILDID)-r -o $@ $$m.o $$m.mod.o ; then $(ECHO) "$@: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi
+	$(AM_V_CCLD)m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; b=`basename $$m` ; lds="$$m.lds"; test -r $$lds || lds= ; \
+	if $(LD) $(KERNEL_BUILDID)-r -o $@ $$m.o $$m.mod.o $$lds; then $(ECHO) "$@: $$m.o $$m.mod.o $$lds" > $(DEPDIR)/$$b.Pko ; fi
 ## AMDEP
 else
 ## !AMDEP
 .o.ko:
-	$(AM_V_CCLD)m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; \
-	$(LD) $(KERNEL_BUILDID)-r -o $@ $$m.o $$m.mod.o
+	$(AM_V_CCLD)m=`$(ECHO) "$<" | sed -r -e 's|(\.mod)?\.o$$||'` ; lds="$$m.lds"; test -r $$lds || lds= ; \
+	$(LD) $(KERNEL_BUILDID)-r -o $@ $$m.o $$m.mod.o $$lds
 ## !AMDEP
 endif
 
@@ -193,39 +212,42 @@ MY_SUFFIXES		+= .ko .o
 if AMDEP
 ## AMDEP
 stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
-	@mods=`$(ECHO) " $? " | sed -r -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|(\.mod)?\.o | |g'` ; \
+	@mods=`printf '%s\n' $? | sed -rn 's,^lib.*_a-,$(kpre),;s,^([^\.]*)(\.mod\.[co]|\.k?o)$$,\1,p' | awk '{if(!($$0 in dups)){dups[$$0]=1;print}}'` ; \
 	for m in $$mods ; do b=`basename $$m` ; \
-		test :$$m != :stamp-mobjects || continue ; \
+		lds="$$m.lds"; test -r $$lds || lds= ; \
 		$(ECHO_Q) "  CCLD  " $$m.ko ; \
-		$(ECHO_V) "if $(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) \"$$m.ko: $$m.o $$m.mod.o\" > $(DEPDIR)/$$b.Pko ; fi" ; \
-		if $(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o ; then $(ECHO) "$$m.ko: $$m.o $$m.mod.o" > $(DEPDIR)/$$b.Pko ; fi ; \
+		$(ECHO_V) "if $(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o $$lds; then $(ECHO) \"$$m.ko: $$m.o $$m.mod.o $$lds\" > $(DEPDIR)/$$b.Pko ; fi" ; \
+		if $(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o $$lds; then $(ECHO) "$$m.ko: $$m.o $$m.mod.o $$lds" > $(DEPDIR)/$$b.Pko ; fi ; \
 	done ; \
-	touch stamp-kobjects
+	date -uIseconds > $@
 ## AMDEP
 else
 ## !AMDEP
 stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
-	@mods=`$(ECHO) " $? " | sed -r -e 's| lib[^[:space:]]*_a-| $(kpre)|g;s|(\.mod)?\.o | |g'` ; \
+	@mods=`printf '%s\n' $? | sed -rn 's,^lib.*_a-,$(kpre),;s,^([^\.]*)(\.mod\.[co]|\.k?o)$$,\1,p' | awk '{if(!($$0 in dups)){dups[$$0]=1;print}}'` ; \
 	for m in $$mods ; do \
-		test :$$m != :stamp-mobjects || continue ; \
+		lds="$$m.lds"; test -r $$lds || lds= ; \
 		$(ECHO_Q) "  CCLD  " $$m.ko ; \
-		$(ECHO_V) "$(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o" ; \
-		$(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o ; \
+		$(ECHO_V) "$(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o $$lds" ; \
+		$(LD) $(KERNEL_BUILDID)-r -o $$m.ko $$m.o $$m.mod.o $$lds ; \
 	done ; \
-	touch stamp-kobjects
+	date -uIseconds > $@
 ## !AMDEP
 endif
 
-clean-kernel: mostlyclean-kernel
+clean-kernel: mostlyclean-kernel clean-verfiles
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
-	list="stamp-mobjects stamp-kobjects $$srcs" ; $(am__list_remove)
+	ldss=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.lds |g'` ; \
+	list="$(KERNEL_AUX_FILES) stamp-modpost stamp-mobjects stamp-kobjects $$ldss $$srcs" ; \
+	$(am__list_remove)
 
-mostlyclean-kernel:
+mostlyclean-kernel: clean-verobjs
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@objs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.o |g'` ; \
+	@mobs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.o |g'` ; \
 	mods=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.ko |g'` ; \
-	list="$$objs $$mods" ; $(am__list_remove)
+	objs=`$(ECHO) " $(KERNEL_OBJECTS) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.o |g'` ; \
+	list="$$mobs $$mods $$objs $(KERNEL_MODULES) $(KERNEL_OBJECTS)" ; $(am__list_remove)
 
 KERNEL_AUX_FILES	= Module.mkvars Modules.map $(MODPOST_SYSVER) $(MODPOST_MODVER) $(MODPOST_SYMSETS)
 
@@ -784,9 +806,39 @@ dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/symsets.awk
 dist_noinst_SCRIPTS	+= scripts/cflagcheck
 EXTRA_SCRIPTS		+= scripts/cflagcheck
 
+kfunc-list.log: ifnames.log
+	cat $< | cut -f1 '-d ' | grep '^HAVE_KFUNC_' | egrep -v '(_ARGS?|_NEW)$$' | sed 's,^HAVE_KFUNC_,,;y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,' | sort -u > $@
+
+ksupp-list.log: ifnames.log
+	cat $< | cut -f1 '-d ' | grep '^HAVE_.*_SUPPORT$$' | sed 's,^HAVE_,,;s,_SUPPORT$$,,;y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,' | sort -u > $@
+
+kused-list.log: ifnames.log
+	cat $< | cut -f1 '-d ' | grep '^HAVE_.*_USABLE$$' | sed 's,^HAVE_,,;s,_USABLE$$,,;y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,' | sort -u > $@
+
+ksymb-list.log: ifnames.log
+	cat $< | cut -f1 '-d ' | grep '^HAVE_.*_SYMBOL$$' | sed 's,^HAVE_,,;s,_SYMBOL$$,,;y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,' | sort -u > $@
+
+kexpt-list.log: ifnames.log ksymb-list.log
+	cat $< | cut -f1 '-d ' | egrep '^HAVE_.*_EXPORT$$' | sed -r 's,^HAVE_,,;s,_EXPORT$$,,;y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,' | sort -u | \
+	join -j 1 -v 1 - ksymb-list.log > kexpt-list.log
+
+kaddr-list.log: ifnames.log ksymb-list.log
+	cat $< | cut -f1 '-d ' | egrep '^HAVE_.*_ADDR$$' | sed -r 's,^HAVE_,,;s,_ADDR$$,,;y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,' | sort -u | \
+	join -j 1 -v 1 - ksymb-list.log > kexpt-list.log
+
+kernel-lists: kfunc-list.log ksupp-list.log kused-list.log ksymb-list.log kexpt-list.log kaddr-list.log
+
+clean-kernel-lists:
+	rm -f k*-list.log
+
+MY_PHONY		+= kernel-lists clean-kernel-lists
+
 ## =============================================================================
 ##
 ## $Log: kernel.am,v $
+## Revision 1.1.2.10  2011-03-26 04:28:45  brian
+## - updates to build process
+##
 ## Revision 1.1.2.9  2011-03-17 07:01:27  brian
 ## - build and repo system improvements
 ##

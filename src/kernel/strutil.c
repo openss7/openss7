@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:32 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 1.1.2.6  2011-03-26 04:28:49  brian
+ - updates to build process
+
  Revision 1.1.2.5  2011-01-12 04:10:32  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:32 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -511,6 +514,7 @@ allocb_fast(const size_t size, uint priority)
 	return (NULL);
 }
 
+#ifndef HAVE_KSIZE_USABLE
 /* Linux memory allocators always round up to the next power of 2.  We can use the slop. */
 STATIC streams_inline streams_fastcall uint
 nextpower(uint y)
@@ -543,6 +547,7 @@ nextpower(uint y)
 	}
 	return (1 << r);
 }
+#endif
 
 /* Note that db_size is always the size that was requested.  db_lim represents the size that was
  * acrually allocated and is usable. */
@@ -571,7 +576,12 @@ allocb_kmem(const size_t size, uint priority)
 			/* set up data block */
 			// _ensure(db->db_frtnp == NULL, db->db_frtnp = NULL);
 			db->db_base = base;
+#ifdef HAVE_KSIZE_USABLE
+			/* newer kernels can tell us how big a memory object truly is */
+			db->db_lim = base + ksize(base);
+#else
 			db->db_lim = base + nextpower(size);
+#endif
 			// _ensure(db->db_ref == 1, db->db_ref = 1);
 			// _ensure(db->db_type == M_DATA, db->db_type = M_DATA);
 			db->db_size = size;
@@ -1002,7 +1012,12 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	dp = &md->datablk.d_dblock;
 	// _ensure(dp->db_frtnp == NULL, dp->db_frtnp = NULL);
 	dp->db_base = base;
-	dp->db_lim = base + nextpower(size);
+#ifdef HAVE_KSIZE_USABLE
+	/* newer kernels can tell us how big a memory object truly is */
+	dp->db_lim = base + ksize(base);
+#else
+	db->db_lim = base + nextpower(size);
+#endif
 	// _ensure(dp->db_ref == 1, dp->db_ref = 1);
 	dp->db_type = db->db_type;
 	dp->db_size = size;

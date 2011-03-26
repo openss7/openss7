@@ -1,18 +1,18 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:54:41 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:46 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
- This program is free software: you can redistribute it and/or modify it under
+ This program is free software; you can redistribute it and/or modify it under
  the terms of the GNU Affero General Public License as published by the Free
- Software Foundation, version 3 of the license.
+ Software Foundation; version 3 of the License.
 
  This program is distributed in the hope that it will be useful, but WITHOUT
  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-02-07 04:54:41 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 1.1.2.6  2011-03-26 04:28:46  brian
+ - updates to build process
+
  Revision 1.1.2.5  2011-02-07 04:54:41  brian
  - code updates for new distro support
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:54:41 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:46 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -359,44 +362,37 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.5 $
 #endif
 #endif
 
-#ifndef SK_WMEM_MAX
-#define SK_WMEM_MAX 65535
-#endif
-#ifndef SK_RMEM_MAX
-#define SK_RMEM_MAX 65535
-#endif
-
 #if !defined HAVE_OPENSS7_SCTP
 #undef sctp_addr
 #endif
 
 #ifndef tcp_openreq_cachep
-#ifdef HAVE_TCP_OPENREQ_CACHEP_ADDR
+#ifdef HAVE_TCP_OPENREQ_CACHEP_USABLE
 #include <linux/slab.h>
 extern kmem_cachep_t *const _tcp_openreq_cachep_location;
 #endif
 #endif
 
 #ifndef tcp_set_keepalive
-#ifdef HAVE_TCP_SET_KEEPALIVE_ADDR
+#ifdef HAVE_TCP_SET_KEEPALIVE_USABLE
 void tcp_set_keepalive(struct sock *sk, int val);
 #endif
 #endif
 
 #ifndef tcp_sync_mss
-#ifdef HAVE_TCP_SYNC_MSS_ADDR
-int tcp_sync_mss(struct sock *sk, u32 pmtu);
+#ifdef HAVE_TCP_SYNC_MSS_USABLE
+unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu);
 #endif
 #endif
 
 #ifndef tcp_write_xmit
-#ifdef HAVE_TCP_WRITE_XMIT_ADDR
+#ifdef HAVE_TCP_WRITE_XMIT_USABLE
 int tcp_write_xmit(struct sock *sk, int nonagle);
 #endif
 #endif
 
 #ifndef tcp_cwnd_application_limited
-#ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR
+#ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_USABLE
 void tcp_cwnd_application_limited(struct sock *sk);
 #endif
 #endif
@@ -409,46 +405,54 @@ typeof(ip_tos2prio)
     ip_tos2prio_t;
 	ip_tos2prio_t ip_tos2prio = { 0, 1, 0, 0, 2, 2, 2, 2, 6, 6, 6, 6, 4, 4, 4, 4 };
 
+#ifndef SK_WMEM_MAX
+#define SK_WMEM_MAX 65535
+#endif
+#ifndef SK_RMEM_MAX
+#define SK_RMEM_MAX 65535
+#endif
+
 #ifndef sysctl_rmem_default
-#ifndef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
+#ifdef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
+extern __u32 sysctl_rmem_default;
+#else
 #define sysctl_rmem_default SK_RMEM_MAX
 #endif
-#else
-extern __u32 sysctl_rmem_default;
 #endif
 
 #ifndef sysctl_wmem_default
-#ifndef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
+#ifdef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
+extern __u32 sysctl_wmem_default;
+#else
 #define sysctl_wmem_default SK_WMEM_MAX
 #endif
-#else
-extern __u32 sysctl_wmem_default;
 #endif
 
 #ifndef sysctl_rmem_max
-#ifndef HAVE_SYSCTL_RMEM_MAX_ADDR
+#ifdef HAVE_SYSCTL_RMEM_MAX_SUPPORT
+extern __u32 sysctl_rmem_max;
+#else
 #define sysctl_rmem_max SK_RMEM_MAX
 #endif
-#else
-extern __u32 sysctl_rmem_max;
 #endif
 
 #ifndef sysctl_wmem_max
-#ifndef HAVE_SYSCTL_WMEM_MAX_ADDR
+#ifdef HAVE_SYSCTL_WMEM_MAX_SUPPORT
+extern __u32 sysctl_wmem_max;
+#else
 #define sysctl_wmem_max SK_WMEM_MAX
 #endif
-#else
-extern __u32 sysctl_wmem_max;
 #endif
 
 #ifndef sysctl_tcp_fin_timeout
-#ifndef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
+#ifndef HAVE_SYSCTL_TCP_FIN_TIMEOUT_USABLE
 #define sysctl_tcp_fin_timeout TCP_FIN_TIMEOUT
 #endif
 #endif
 
+/* Used by tcp_push_pending_frames inline in some kernels. */
 #ifndef tcp_current_mss
-#ifdef HAVE_TCP_CURRENT_MSS_ADDR
+#ifdef HAVE_TCP_CURRENT_MSS_USABLE
 #ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
 unsigned int tcp_current_mss(struct sock *sk);
 #else
@@ -458,25 +462,35 @@ unsigned int tcp_current_mss(struct sock *sk, int large);
 #endif
 
 #ifndef sysctl_ip_dynaddr
-#ifdef HAVE_SYSCTL_IP_DYNADDR_ADDR
+#ifndef HAVE_SYSCTL_IP_DYNADDR_USABLE
+#define sysctl_ip_dynaddr 0
+#else
 extern int sysctl_ip_dynaddr;
 #endif
 #endif
 
 #ifndef sysctl_ip_nonlocal_bind
-#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
+#ifndef HAVE_SYSCTL_IP_NONLOCAL_BIND_USABLE
+#define sysctl_ip_nonlocal_bind 0
+#else
 extern int sysctl_ip_nonlocal_bind;
 #endif
 #endif
 
+#ifndef IPDEFTTL
+#define IPDEFTTL 64
+#endif
+
 #ifndef sysctl_ip_default_ttl
-#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
+#ifndef HAVE_SYSCTL_IP_DEFAULT_TTL_USABLE
+#define sysctl_ip_default_ttl IPDEFTTL
+#else
 extern int sysctl_ip_default_ttl;
 #endif
 #endif
 
 #ifndef tcp_set_skb_tso_segs
-#ifdef HAVE_TCP_SET_SKB_TSO_SEGS_ADDR
+#ifdef HAVE_TCP_SET_SKB_TSO_SEGS_USABLE
 #ifdef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
 void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb);
 #else
@@ -487,7 +501,7 @@ void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std);
 
 /* older 2.6.8 name for the same function */
 #ifndef tcp_set_skb_tso_factor
-#ifdef HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR
+#ifdef HAVE_TCP_SET_SKB_TSO_FACTOR_USABLE
 void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #endif
 #endif
@@ -509,7 +523,7 @@ void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-02-07 04:54:41 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:46 $"
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"
@@ -2738,7 +2752,7 @@ t_set_options(ss_t *ss)
 				}
 				if (valp->kp_onoff == T_YES)
 					tp->keepalive_time = valp->kp_timeout * 60 * HZ;
-#if defined HAVE_TCP_SET_KEEPALIVE_ADDR
+#ifdef HAVE_TCP_SET_KEEPALIVE_USABLE
 				tcp_set_keepalive(sk, valp->kp_onoff == T_YES ? 1 : 0);
 #endif				/* defined HAVE_TCP_SET_KEEPALIVE_ADDR */
 				if (valp->kp_onoff == T_YES)
@@ -3486,7 +3500,7 @@ t_parse_conn_opts(ss_t *ss, const unsigned char *ip, size_t ilen, int request)
 					}
 					if (valp->kp_onoff == T_YES)
 						tp->keepalive_time = valp->kp_timeout * 60 * HZ;
-#if defined HAVE_TCP_SET_KEEPALIVE_ADDR
+#ifdef HAVE_TCP_SET_KEEPALIVE_USABLE
 					tcp_set_keepalive(sk, valp->kp_onoff == T_YES ? 1 : 0);
 #endif				/* defined HAVE_TCP_SET_KEEPALIVE_ADDR */
 					if (valp->kp_onoff == T_YES)
@@ -10732,6 +10746,8 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 								goto einval;
 						}
 						t->options.tcp.nodelay = *valp;
+#if !defined CONFIG_KERNEL_WEAK_MODULES || defined HAVE_TCP_PUSH_PENDING_FRAMES_EXPORT || \
+    ( defined HAVE_TCP_CURRENT_MSS_EXPORT && defined HAVE_TCP___PUSH_PENDING_FRAMES_EXPORT)
 #if !defined HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG
 						if ((tp->nonagle = (*valp == T_YES) ? 1 : 0))
 							tcp_push_pending_frames(sk, tp);
@@ -10739,6 +10755,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						if ((tp->nonagle = (*valp == T_YES) ? 1 : 0))
 							tcp_push_pending_frames(sk);
 #endif				/* !defined HAVE_KFUNC_TCP_PUSH_PENDING_FRAMES_1_ARG */
+#endif
 					}
 					if (ih->name != T_ALLOPT)
 						continue;
@@ -10828,7 +10845,7 @@ t_build_negotiate_options(ss_t *t, const unsigned char *ip, size_t ilen, unsigne
 						if (valp->kp_onoff)
 							tp->keepalive_time =
 							    valp->kp_timeout * 60 * HZ;
-#if defined HAVE_TCP_SET_KEEPALIVE_ADDR
+#ifdef HAVE_TCP_SET_KEEPALIVE_USABLE
 						tcp_set_keepalive(sk,
 								  (valp->kp_onoff ==
 								   T_YES) ? 1 : 0);

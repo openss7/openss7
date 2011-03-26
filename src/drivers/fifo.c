@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:21:32 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:32 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fifo.c,v $
+ Revision 1.1.2.5  2011-03-26 04:28:46  brian
+ - updates to build process
+
  Revision 1.1.2.4  2010-11-28 14:21:32  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:21:32 $";
+static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -91,7 +94,7 @@ static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:21:32 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $"
 #define FIFO_DEVICE	"SVR 4.2 MP STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"
@@ -285,7 +288,8 @@ STATIC struct file_operations fifo_f_ops ____cacheline_aligned = {
  *  -------------------------------------------------------------------------
  */
 
-#ifdef CONFIG_STREAMS_FIFO_OVERRIDE
+#ifdef CONFIG_STREAMS_OVERRIDE_FIFOS
+#ifdef HAVE__DEF_FIFO_OPS_USABLE
 static struct file_operations fifo_tmp_ops;
 
 STATIC void
@@ -301,6 +305,7 @@ unregister_fifo(void)
 	_def_fifo_ops->open = fifo_tmp_ops.open;
 	_def_fifo_ops->owner = fifo_tmp_ops.owner;
 }
+#endif
 #endif
 
 /* 
@@ -327,8 +332,10 @@ fifoinit(void)
 	fifo_minfo.mi_idnum = modid;
 	if ((err = register_cmajor(&fifo_cdev, major, &fifo_f_ops)) < 0)
 		return (err);
-#ifdef CONFIG_STREAMS_FIFO_OVERRIDE
+#ifdef CONFIG_STREAMS_OVERRIDE_FIFOS
+#ifdef HAVE__DEF_FIFO_OPS_USABLE
 	register_fifo();	/* This is safe */
+#endif
 #endif
 	if (major == 0 && err > 0)
 		major = err;
@@ -341,8 +348,10 @@ static
 void __exit
 fifoexit(void)
 {
-#ifdef CONFIG_STREAMS_FIFO_OVERRIDE
+#ifdef CONFIG_STREAMS_OVERRIDE_FIFOS
+#ifdef HAVE__DEF_FIFO_OPS_USABLE
 	unregister_fifo();	/* This is not safe... */
+#endif
 #endif
 	unregister_cmajor(&fifo_cdev, major);
 };

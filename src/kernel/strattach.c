@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:07 $
+ @(#) $RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:48 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-13 16:19:07 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strattach.c,v $
+ Revision 1.1.2.5  2011-03-26 04:28:48  brian
+ - updates to build process
+
  Revision 1.1.2.4  2011-01-13 16:19:07  brian
  - changes for SLES 11 support
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-13 16:19:07 $";
+static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:48 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -109,9 +112,14 @@ static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.
 #include "sys/config.h"
 #include "strattach.h"		/* header verification */
 
-#if defined HAVE_KERNEL_FATTACH_SUPPORT
+#if defined HAVE_KERNEL_FATTACH_SUPPORT && \
+    (!defined CONFIG_KERNEL_WEAK_MODULES || ( \
+     ((!defined HAVE_NAMESPACE_SEM_SYMBOL && \
+       (!defined HAVE_MOUNT_SEM_SYMBOL || defined HAVE_MOUNT_SEM_EXPORT) ) || \
+      defined HAVE_NAMESPACE_SEM_SYMBOL) && \
+     defined HAVE_CLONE_MNT_EXPORT && defined HAVE_GRAFT_TREE_EXPORT && defined HAVE_DO_UMOUNT_EXPORT))
 
-#ifdef HAVE_CHECK_MNT_ADDR
+#ifdef HAVE_CHECK_MNT_SYMBOL
 int check_mnt(struct vfsmount *mnt);
 #else
 STATIC int
@@ -166,23 +174,6 @@ do_fattach(const struct file *file, const char *file_name)
 #else
 	const unsigned int flags = LOOKUP_FOLLOW;
 #endif
-#ifdef HAVE_CLONE_MNT_ADDR
-	struct vfsmount *(*my_clone_mnt)(struct vfsmount *, struct dentry *)
-		= (typeof(my_clone_mnt)) HAVE_CLONE_MNT_ADDR;
-#undef clone_mnt
-#define clone_mnt my_clone_mnt
-#endif
-#ifdef HAVE_GRAFT_TREE_ADDR
-#ifdef HAVE_KINC_LINUX_PATH_H
-	int (*my_graft_tree)(struct vfsmount *mnt, struct path *nd)
-		= (typeof(my_graft_tree)) HAVE_GRAFT_TREE_ADDR;
-#else
-	int (*my_graft_tree)(struct vfsmount *mnt, struct nameidata *nd)
-		= (typeof(my_graft_tree)) HAVE_GRAFT_TREE_ADDR;
-#endif
-#undef graft_tree
-#define graft_tree my_graft_tree
-#endif
 
 	err = -EINVAL;
 	if (file->f_dentry->d_sb->s_magic != SPECFS_MAGIC)
@@ -209,10 +200,10 @@ do_fattach(const struct file *file, const char *file_name)
 	if (!mnt)
 		goto release;
 
-#ifdef HAVE_NAMESPACE_SEM_ADDR
+#ifdef HAVE_NAMESPACE_SEM_SYMBOL
 	down_write(&namespace_sem);
 #else
-#ifdef HAVE_MOUNT_SEM_ADDR
+#ifdef HAVE_MOUNT_SEM_SYMBOL
 	down(&mount_sem);
 #else
 	down_write(&current->namespace->sem);
@@ -239,10 +230,10 @@ do_fattach(const struct file *file, const char *file_name)
 	err = graft_tree(mnt, &nd);
 
       unlock:
-#ifdef HAVE_NAMESPACE_SEM_ADDR
+#ifdef HAVE_NAMESPACE_SEM_SYMBOL
 	up_write(&namespace_sem);
 #else
-#ifdef HAVE_MOUNT_SEM_ADDR
+#ifdef HAVE_MOUNT_SEM_SYMBOL
 	up(&mount_sem);
 #else
 	up_write(&current->namespace->sem);
@@ -275,12 +266,6 @@ do_fdetach(const char *file_name)
 	unsigned int flags = LOOKUP_FOLLOW | LOOKUP_POSITIVE;
 #else
 	unsigned int flags = LOOKUP_FOLLOW;
-#endif
-#ifdef HAVE_DO_UMOUNT_ADDR
-	int (*my_do_umount)(struct vfsmount *, int)
-		= (typeof(my_do_umount)) HAVE_DO_UMOUNT_ADDR;
-#undef do_umount
-#define do_umount my_do_umount
 #endif
 
 	err = -ENOENT;

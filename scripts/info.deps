@@ -1,11 +1,11 @@
 #!/usr/bin/awk -f
 
-function scanincludes(file)
+function scanincludes(file,	    result)
 {
     if(system("test -f " srcdir "/" file) == 0) {
 	file = srcdir "/" file
     }
-    while((getline < file) == 1) {
+    while((result = (getline < file)) == 1) {
 	if (/^@c[[:space:]]/)
 	    continue
 	if (/@(include|verbatiminclude)[[:space:]]+/) {

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $
+ @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:34 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: otk6.c,v $
+ Revision 1.1.2.4  2011-03-26 04:28:47  brian
+ - updates to build process
+
  Revision 1.1.2.3  2010-11-28 14:21:34  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $";
+static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $";
 
 /*
  * This file provides a multiplexing driver for RFC 1006 (RFC 2126) OSI Transport over TCP.  The
@@ -99,6 +102,150 @@ static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.3 $
 
 #include <sys/os7/compat.h>
 
+#if !defined HAVE_OPENSS7_SCTP
+#undef sctp_addr
+#endif
+
+#ifndef tcp_openreq_cachep
+#ifdef HAVE_TCP_OPENREQ_CACHEP_USABLE
+#include <linux/slab.h>
+extern kmem_cachep_t *const _tcp_openreq_cachep_location;
+#endif
+#endif
+
+#ifndef tcp_set_keepalive
+#ifdef HAVE_TCP_SET_KEEPALIVE_USABLE
+void tcp_set_keepalive(struct sock *sk, int val);
+#endif
+#endif
+
+#ifndef tcp_sync_mss
+#ifdef HAVE_TCP_SYNC_MSS_USABLE
+int tcp_sync_mss(struct sock *sk, u32 pmtu);
+#endif
+#endif
+
+#ifndef tcp_write_xmit
+#ifdef HAVE_TCP_WRITE_XMIT_USABLE
+int tcp_write_xmit(struct sock *sk, int nonagle);
+#endif
+#endif
+
+#ifndef tcp_cwnd_application_limited
+#ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_USABLE
+void tcp_cwnd_application_limited(struct sock *sk);
+#endif
+#endif
+
+/*
+   recreate this structure because it is used by an inline 
+ */
+typedef
+typeof(ip_tos2prio)
+    ip_tos2prio_t;
+	ip_tos2prio_t ip_tos2prio = { 0, 1, 0, 0, 2, 2, 2, 2, 6, 6, 6, 6, 4, 4, 4, 4 };
+
+#ifndef SK_WMEM_MAX
+#define SK_WMEM_MAX 65535
+#endif
+#ifndef SK_RMEM_MAX
+#define SK_RMEM_MAX 65535
+#endif
+
+#ifndef sysctl_rmem_default
+#ifndef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
+#define sysctl_rmem_default SK_RMEM_MAX
+#endif
+#else
+extern __u32 sysctl_rmem_default;
+#endif
+
+#ifndef sysctl_wmem_default
+#ifndef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
+#define sysctl_wmem_default SK_WMEM_MAX
+#endif
+#else
+extern __u32 sysctl_wmem_default;
+#endif
+
+#ifndef sysctl_rmem_max
+#ifndef HAVE_SYSCTL_RMEM_MAX_SUPPORT
+#define sysctl_rmem_max SK_RMEM_MAX
+#endif
+#else
+extern __u32 sysctl_rmem_max;
+#endif
+
+#ifndef sysctl_wmem_max
+#ifndef HAVE_SYSCTL_WMEM_MAX_SUPPORT
+#define sysctl_wmem_max SK_WMEM_MAX
+#endif
+#else
+extern __u32 sysctl_wmem_max;
+#endif
+
+#ifndef sysctl_tcp_fin_timeout
+#ifndef HAVE_SYSCTL_TCP_FIN_TIMEOUT_USABLE
+#define sysctl_tcp_fin_timeout TCP_FIN_TIMEOUT
+#endif
+#endif
+
+/* Used by tcp_push_pending_frames inline in some kernels. */
+#ifndef tcp_current_mss
+#ifdef HAVE_TCP_CURRENT_MSS_USABLE
+#ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
+unsigned int tcp_current_mss(struct sock *sk);
+#else
+unsigned int tcp_current_mss(struct sock *sk, int large);
+#endif
+#endif
+#endif
+
+#ifndef sysctl_ip_dynaddr
+#ifndef HAVE_SYSCTL_IP_DYNADDR_USABLE
+#define sysctl_ip_dynaddr 0
+#else
+extern int sysctl_ip_dynaddr;
+#endif
+#endif
+
+#ifndef sysctl_ip_nonlocal_bind
+#ifndef HAVE_SYSCTL_IP_NONLOCAL_BIND_USABLE
+#define sysctl_ip_nonlocal_bind 0
+#else
+extern int sysctl_ip_nonlocal_bind;
+#endif
+#endif
+
+#ifndef IPDEFTTL
+#define IPDEFTTL 64
+#endif
+
+#ifndef sysctl_ip_default_ttl
+#ifndef HAVE_SYSCTL_IP_DEFAULT_TTL_USABLE
+#define sysctl_ip_default_ttl IPDEFTTL
+#else
+extern int sysctl_ip_default_ttl;
+#endif
+#endif
+
+#ifndef tcp_set_skb_tso_segs
+#ifdef HAVE_TCP_SET_SKB_TSO_SEGS_USABLE
+#ifdef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
+void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb);
+#else
+void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std);
+#endif
+#endif
+#endif
+
+/* older 2.6.8 name for the same function */
+#ifndef tcp_set_skb_tso_factor
+#ifdef HAVE_TCP_SET_SKB_TSO_FACTOR_USABLE
+void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
+#endif
+#endif
+
 #ifdef LINUX
 #undef ASSERT
 
@@ -123,7 +270,7 @@ static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #define OTK6_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OTK6_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define OTK6_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $"
+#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $"
 #define OTK6_DEVICE	"SVR 4.2 MP STREAMS RFC1006 TPI OSI Transport Provider Driver"
 #define OTK6_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define OTK6_LICENSE	"GPL"

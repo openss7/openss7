@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-17 07:01:27 $
+# @(#) $RCSfile: genksyms.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-26 04:28:45 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
+## Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -148,7 +148,7 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF \"$(DEPDIR)/$$r.Pver\" $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ -MT $$r.ver -MMD -MP -MF "$(DEPDIR)/$$r.Pver" $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
-	touch stamp-verfiles
+	date -uIseconds > $@
 ## am__fastdepCC
 else
 ## !am__fastdepCC
@@ -164,7 +164,7 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 		source="$$s" object="$$r.ver" libtool=no DEPDIR='$(DEPDIR)' depfile="$(DEPDIR)/$$r.Pver" tmpdepfile="$(DEPDIR)/$$r.TPver" $(CCDEPMODE) $(depcomp)  \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
-	touch stamp-verfiles
+	date -uIseconds > $@
 ## AMDEP
 else
 ## !AMDEP
@@ -176,7 +176,7 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 		$(ECHO_V) "$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver" ; \
 		$(CPP) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(GENKSYMS_CPPFLAGS) -D__GENKSYMS__ $$d$$s | $(KGENKSYMS) > $$r.ver ; \
 	done ; \
-	touch stamp-verfiles
+	date -uIseconds > $@
 ## !AMDEP
 endif
 ## !am__fastdepCC
@@ -194,7 +194,7 @@ stamp-verfiles: $(EXPORT_SRCFILES)
 		$(ECHO_V) "echo '/* dummy load script */' > \"$$r.ver\"" ; \
 		echo '/* dummy load script */' > "$$r.ver" ; \
 	done ; \
-	touch stamp-verfiles
+	date -uIseconds > $@
 
 ## ! KERNEL_VERSIONS
 endif
@@ -225,7 +225,7 @@ stamp-verobjs: stamp-verfiles $(KERNEL_OBJECTS) $(PKG_LDS) $(PKG_ABI)
 			$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
 		fi ; \
 	done ; \
-	touch stamp-verobjs
+	date -uIseconds > $@
 
 ALL_LOCAL		+= stamp-verobjs
 
@@ -406,7 +406,7 @@ stamp-verobjs: $(KERNEL_OBJECTS) $(PKG_LDS) $(PKG_ABI)
 		$(ECHO_V) "$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a" ; \
 		$(LD) -r $$pkg_abi -o a.$$$$.out $$pkg_lds $$obj && $(am__mv) -- a.$$$$.out $$a ; \
 	done ; \
-	touch stamp-verobjs
+	date -uIseconds > $@
 
 ALL_LOCAL		+= stamp-verobjs
 
@@ -504,6 +504,9 @@ endif
 ## =============================================================================
 ##
 ## $Log: genksyms.am,v $
+## Revision 1.1.2.7  2011-03-26 04:28:45  brian
+## - updates to build process
+##
 ## Revision 1.1.2.6  2011-03-17 07:01:27  brian
 ## - build and repo system improvements
 ##

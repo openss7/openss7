@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-17 07:01:28 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-03-26 04:28:45 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-17 07:01:28 $ by $Author: brian $
+# Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -72,7 +72,7 @@ AC_DEFUN([_LINUX_KERNEL], [dnl
 	AC_SUBST([KERNEL_LDFLAGS])dnl
 	KERNEL_CPPFLAGS="$CPPFLAGS"
 	KERNEL_CFLAGS="$CFLAGS"
-	KERNEL_LDFLAGS="$LDFLAGS"])dnl
+	KERNEL_LDFLAGS="$LDFLAGS"])
 ])# _LINUX_KERNEL
 # =============================================================================
 
@@ -95,14 +95,14 @@ AC_REQUIRE_SHELL_FN([linux_flags_push],
     eval "linux_${linux_flag_nest}_cppflags=\"\$CPPFLAGS\""
     eval "linux_${linux_flag_nest}_cflags=\"\$CFLAGS\""
     eval "linux_${linux_flag_nest}_ldflags=\"\$LDFLAGS\""
-    ((linux_flag_nest++))])
+    ((linux_flag_nest++))])dnl
 AC_REQUIRE_SHELL_FN([linux_flags_pop],
     [AS_FUNCTION_DESCRIBE([linux_flags_pop], [], [Restore the previous
      compilation flags that were pushed and saved.])], [dnl
     ((linux_flag_nest--))
     eval "CPPFLAGS=\"\$linux_${linux_flag_nest}_cppflags\""
     eval "CFLAGS=\"\$linux_${linux_flag_nest}_cflags\""
-    eval "LDFLAGS=\"\$linux_${linux_flag_nest}_ldflags\""])
+    eval "LDFLAGS=\"\$linux_${linux_flag_nest}_ldflags\""])dnl
 AC_REQUIRE_SHELL_FN([linux_kernel_env_push],
     [AS_FUNCTION_DESCRIBE([linux_kernel_env_push], [], [Save the current
      compilation flags and the modify them so that they can be used for kernel
@@ -135,7 +135,7 @@ dnl careful about -Wno warnings which we must keep, so put them back one at a ti
 	    (-Wno-*)
 		LDFLAGS="$LDFLAGS $i" ;;
 	esac
-    done])
+    done])dnl
 linux_kernel_env_push
 $1
 linux_flags_pop
@@ -190,6 +190,62 @@ dnl     [], [enable_k_install=yes])
 	    [kernel source package @<:@default=disabled@:>@])],
 	[], [enable_k_package=no])
     AM_CONDITIONAL([WITH_K_PACKAGE], [test :"${enable_k_package:-no}" != :no])
+    AC_CACHE_CHECK([for kernel weak modules], [linux_cv_k_weak_modules], [dnl
+    AC_ARG_ENABLE([k-weak-modules],
+	[AS_HELP_STRING([--disable-k-weak-modules],
+	    [disable use of only exported kernel symbols @<:@default=enabled@:>@])],
+	[], [enable_k_weak_modules=yes])
+    if test :"${enable_k_weak_modules:-yes}" = :yes ; then
+	linux_cv_k_weak_modules='yes'
+    else
+	linux_cv_k_weak_modules='no'
+    fi])
+    if test :"${linux_cv_k_weak_modules:-yes}" = :yes ; then :;
+	AC_DEFINE([CONFIG_KERNEL_WEAK_MODULES], [1], [When linking a kernel
+	module, symbols addresses can be ripped from the system map an resolved
+	when packaging the kernel module.  This provides a dependency between
+	the kernel module and a specific kernel that is hidden to the module
+	loader and is unsuitable for kernel weak updating modules.  When
+	defined, ripped kernel symbols will not be used.])
+    fi
+    AM_CONDITIONAL([WITH_K_WEAK_MODULES], [test x"${enable_k_weak_modules:-yes}" = xyes])
+    AC_CACHE_CHECK([for kernel weak symbols], [linux_cv_k_weak_symbols], [dnl
+    AC_ARG_ENABLE([k-weak-symbols],
+	[AS_HELP_STRING([--disable-weak-symbols],
+	    [disable the use of weak symbols in the kernel @<:@default=enabled@:>@])],
+	[], [enable_k_weak_symbols=yes])
+    if test :"${enable_k_weak_symbols:-yes}" = :yes ; then
+	linux_cv_k_weak_symbols='yes'
+    else
+	linux_cv_k_weak_symbols='no'
+    fi])
+    if test :"${linux_cv_k_weak_symbols:-yes}" = :yes ; then :;
+	AC_DEFINE([CONFIG_KERNEL_WEAK_SYMBOLS], [1], [Undefined weak symbols can
+	be used where the availability of a specific version of a symbol is not
+	guaranteed but can be compensated for at run-time.  A typical use is to
+	link a symbol that is not supported by a kernel ABI.  When defined,
+	undefined weak symbols will be used wherever possible.])
+    fi
+    AC_CACHE_CHECK([for kernel abi support], [linux_cv_k_abi_support], [dnl
+    AC_ARG_ENABLE([k-abi-support],
+	[AS_HELP_STRING([--disable-k-abi-support],
+	    [disable the requirement for kabi supported symbols @<:@default=enabled@:>@])],
+	[], [enable_k_abi_support=yes])
+    if test :"${enable_k_abi_support:-yes}" = :yes ; then
+	linux_cv_k_abi_support='yes'
+	linux_cv_k_weak_modules='yes'
+    else
+	linux_cv_k_abi_support='no'
+    fi])
+    if test :"${linux_cv_k_abi_support:-yes}" = :yes ; then :;
+	AC_DEFINE([CONFIG_KERNEL_ABI_SUPPORT], [1], [Not all exported kernel
+	symbols are supported by the distributor kernel ABI.  Use of unsupported
+	symbols provides a dependency between a series of kernels and a module
+	that is hidden to the RPM packaging system, and is unsuitable for kernel
+	weak updating modules.  When defined, unsupported kernel symbols will
+	not be used.])
+    fi
+    AC_MSG_RESULT([$linux_cv_k_abi_support])
 ])# _LINUX_KERNEL_OPTIONS
 # =============================================================================
 
@@ -228,6 +284,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_MODVERSIONS
     _LINUX_CHECK_KERNEL_MODVER
     _LINUX_CHECK_KERNEL_SYMVERS
+    _LINUX_CHECK_KERNEL_MODABI
     _LINUX_CHECK_KERNEL_SYMSETS
     _LINUX_CHECK_KERNEL_UPDATE_MODULES
     _LINUX_CHECK_KERNEL_MODULE_PRELOAD
@@ -1422,6 +1479,98 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
     ksymvers="$linux_cv_k_symvers"
     AC_SUBST([ksymvers])dnl
 ])# _LINUX_CHECK_KERNEL_SYMVERS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_MODABI
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
+    AC_CACHE_CHECK([for kernel module abi], [linux_cv_k_modabi], [dnl
+	AC_MSG_RESULT([searching...])
+	AC_ARG_WITH([k-modabi],
+	    [AS_HELP_STRING([--with-k-modabi=MAP],
+		[kernel module symbols in kabi @<:@default=K-BUILD-DIR/Module.kabi@:>@])])
+	if test :"${with_k_modabi:-no}" != :no
+	then
+	    linux_cv_k_modabi="$with_k_modabi"
+	else
+	    eval "k_modabi_search_path=\"
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/Module.kabi
+		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/Module.kabi
+		${kbuilddir}/Module.kabi-${kversion}
+		${kbuilddir}/Module.kabi
+		${DESTDIR}${rootdir}/boot/Module.kabi-${kversion}
+		${DESTDIR}${rootdir}/boot/Module.kabi
+		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/Module.kabi
+		${DESTDIR}/usr/src/kernels/${kversion}/Module.kabi
+		${DESTDIR}/boot/Module.kabi-${kversion}
+		${DESTDIR}/boot/Module.kabi\""
+	    k_modabi_search_path=`echo "$k_modabi_search_path" | sed -e 's|\<NONE\>||g;s|/\./|/|g;s|//|/|g'`
+	    linux_cv_k_modabi=
+	    for linux_file in $k_modabi_search_path ; do
+		AC_MSG_CHECKING([for kernel module ver... $linux_file])
+		if test -r $linux_file
+		then
+		    linux_cv_k_modabi="$linux_file"
+		    AC_MSG_RESULT([yes])
+		    break
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	fi
+	if test :"${linux_cv_k_modabi:-no}" = :no
+	then
+	    if test :"${linux_cv_k_ko_modules:-no}" != :no
+	    then
+		if test :"${linux_cv_k_version}" != :no -a ":${linux_cv_k_modversion}" != :no
+		then
+		    case "$target_vendor" in
+			(redhat|centos|whitebox)
+			    AC_MSG_WARN([
+*** 
+*** Configure could not find the module kABI file for kernel version
+*** "$kversion".  The locations searched were:
+***	    "$with_k_modabi"
+***	    "$k_modabi_search_path"
+***
+*** This can cause problems later.  Please specify the absolute location
+*** of your kernel module kABI file with option --with-k-modabi
+*** before repeating.
+*** ])
+			    ;;
+		    esac
+		fi
+	    fi
+	else
+	    if test :"$linux_cv_k_running" != :yes
+	    then
+		case "$linux_cv_k_modabi" in
+		    (*/usr/src/kernels/*)
+			;;
+		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
+			case "$target_vendor" in
+			    (mandrake|mandriva)
+				;;
+			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
+				AC_MSG_WARN([
+*** 
+*** Configuration information is being read from an unreliable source:
+*** 
+***	"$linux_cv_k_modabi"
+*** 
+*** This may cause problems later if you have mismatches between the
+*** target kernel and the kernel symbols contained in that file.
+*** ])
+				;;
+			esac
+			;;
+		esac
+	    fi
+	fi
+	AC_MSG_CHECKING([for kernel module abi]) ])
+    kmodabi="$linux_cv_k_modabi"
+    AC_SUBST([kmodabi])dnl
+])# _LINUX_CHECK_KERNEL_MODABI
 # =========================================================================
 
 # =========================================================================
@@ -2654,7 +2803,7 @@ AC_DEFUN([_LINUX_CHECK_MEMBER_internal],
     return 0;])],
 		    [AS_VAR_SET(linux_Member, yes)],
 		    [AS_VAR_SET(linux_Member, no)])])])
-    AS_IF([test AS_VAR_GET(linux_Member) = yes], [$2], [$3])dnl
+    AS_VAR_IF([linux_Member], [yes], [$2], [$3])
     AS_VAR_POPDEF([linux_Member])dnl
 ])# _LINUX_CHECK_MEMBER_internal
 # =============================================================================
@@ -2664,15 +2813,12 @@ AC_DEFUN([_LINUX_CHECK_MEMBER_internal],
 # -----------------------------------------------------------------------------
 # Kernel environment equivalent of AC_CHECK_MEMBERS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_CHECK_MEMBERS_internal],
-    [m4_foreach([LK_Member], [$1],
+AC_DEFUN([_LINUX_CHECK_MEMBERS_internal], [dnl
+    m4_foreach([LK_Member], [$1],
 	[AH_TEMPLATE(AS_TR_CPP(HAVE_KMEMB_[]LK_Member),
-		[Define to 1 if `]m4_bpatsubst(LK_Member, [^[^.]*\.])[' is member of `]m4_bpatsubst(LK_Member, [\..*])['.])
+		[Define to 1 if ']m4_bpatsubst(LK_Member, [^[^.]*\.])[' is member of ']m4_bpatsubst(LK_Member, [\..*])['.])
 	 _LINUX_CHECK_MEMBER_internal(LK_Member,
-	    [AC_DEFINE(AS_TR_CPP(HAVE_KMEMB_[]LK_Member), 1)
-$2],
-	    [$3],
-	    [$4])])
+	    [AC_DEFINE(AS_TR_CPP(HAVE_KMEMB_[]LK_Member), 1) $2], [$3], [$4])])
 ])# _LINUX_CHECK_MEMBERS_internal
 # =============================================================================
 
@@ -2705,19 +2851,26 @@ AC_DEFUN([_LINUX_CHECK_MEMBERS], [dnl
 # -----------------------------------------------------------------------------
 # Kernel environment equivalent of AC_CHECK_FUNC for macros
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_CHECK_MACRO_internal],
-    [AS_VAR_PUSHDEF([linux_Macro], [linux_cv_macro_$1])dnl
-    AC_CACHE_CHECK([for kernel macro $1], linux_Macro,
-	[AC_EGREP_CPP([\<yes_we_have_$1_defined\>], [
-[$4]
-
-#ifdef $1
-    yes_we_have_$1_defined
-#endif
-	],
-	[AS_VAR_SET(linux_Macro, yes)],
-	[AS_VAR_SET(linux_Macro, no)])])
-    AS_IF([test :AS_VAR_GET(linux_Macro) = :yes], [$2], [$3])dnl
+m4_define([_LINUX_CHECK_MACRO_internal_BODY],
+[AS_LINENO_PUSH([$[]1])
+AC_CACHE_CHECK([for kernel macro $[]2], [linux_cv_macro_$[]{2}],
+    [AC_EGREP_CPP([\<yes_we_have_${2}_defined\>],
+[${3}
+#ifdef ${2}
+    yes_we_have_${2}_defined
+#endif],
+	[AS_VAR_SET([linux_cv_macro_$[]{2}], yes)],
+	[AS_VAR_SET([linux_cv_macro_$[]{2}], no)])])
+AS_LINENO_POP])
+AC_DEFUN([_LINUX_CHECK_MACRO_internal], [dnl
+    AC_REQUIRE_SHELL_FN([linux_check_macro_function],
+	[AS_FUNCTION_DESCRIBE([linux_check_macro_function],
+	    [LINENO MACRO HEADERS],
+	    [Test whether MACRO exists as a kernel macro.])],
+	[$0_BODY])dnl
+    AS_VAR_PUSHDEF([linux_Macro], [linux_cv_macro_$1])dnl
+    linux_check_macro_function "$LINENO" "$1" "$4"
+    AS_VAR_IF([linux_Macro],[yes],[$2],[$3])
     AS_VAR_POPDEF([linux_Macro])dnl
 ])# _LINUX_CHECK_MACRO_internal
 # =============================================================================
@@ -2736,7 +2889,7 @@ do
 	[AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_KMACRO_$lk_macro]), 1)
 $2],
 	[$3],
-	[$4])dnl
+	[$4])
 done
 ])# _LINUX_CHECK_MACROS_internal
 # =============================================================================
@@ -2778,7 +2931,7 @@ void (*my_autoconf_function_pointer)(void) = (typeof(my_autoconf_function_pointe
 	 ])],
 	[AS_VAR_SET(linux_Function, yes)],
 	[AS_VAR_SET(linux_Function, no)])])
-    AS_IF([test :AS_VAR_GET(linux_Function) = :yes], [$2], [$3])dnl
+    AS_VAR_IF([linux_Function], [yes], [$2], [$3])
     AS_VAR_POPDEF([linux_Function])dnl
 ])# _LINUX_CHECK_FUNC_internal
 # =============================================================================
@@ -2797,7 +2950,7 @@ do
 	[AC_DEFINE_UNQUOTED(AS_TR_CPP([HAVE_KFUNC_$lk_func]), 1)
 $2],
 	[$3],
-	[$4])dnl
+	[$4])
 done
 ])# _LINUX_CHECK_FUNCS_internal
 # =============================================================================
@@ -2829,17 +2982,26 @@ AC_DEFUN([_LINUX_CHECK_FUNCS], [dnl
 # =============================================================================
 # _LINUX_CHECK_TYPE_internal
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_CHECK_TYPE_internal], [dnl
-    AS_VAR_PUSHDEF([linux_Type], [linux_cv_type_$1])dnl
-    AC_CACHE_CHECK([for kernel type $1], linux_Type,
-	[AC_COMPILE_IFELSE([AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT([$4])],
-[if (($1 *) 0)
+m4_define([_LINUX_CHECK_TYPE_internal_BODY],
+[AS_LINENO_PUSH([$[]1])
+AC_CACHE_CHECK([for kernel type $[]2], [$[]3],
+    [AC_COMPILE_IFELSE([AC_LANG_PROGRAM([AC_INCLUDES_DEFAULT([$[]4])],
+[if ((${2} *) 0)
     return 0;
-if (sizeof ($1))
+if (sizeof (${2}))
     return 0;])],
-	[AS_VAR_SET(linux_Type, yes)],
-	[AS_VAR_SET(linux_Type, no)])])
-    AS_IF([test AS_VAR_GET(linux_Type) = yes], [$2], [$3])dnl
+	[AS_VAR_SET([$[]3], yes)],
+	[AS_VAR_SET([$[]3], no)])])
+AS_LINENO_POP])
+AC_DEFUN([_LINUX_CHECK_TYPE_internal], [dnl
+    AC_REQUIRE_SHELL_FN([linux_check_type_function],
+	[AS_FUNCTION_DESCRIBE([linux_check_type_function],
+	    [LINENO TYPE VAR HEADERS],
+	    [Test whether TYPE exists.])],
+	[$0_BODY])dnl
+    AS_VAR_PUSHDEF([linux_Type], [linux_cv_type_$1])dnl
+    linux_check_type_function "$LINENO" "$1" "linux_Type" "$linux_type_HEADERS"
+    AS_VAR_IF([linux_Type], [yes], [$2], [$3])
     AS_VAR_POPDEF([linux_Type])dnl
 ])# _LINUX_CHECK_TYPE_internal
 # =============================================================================
@@ -2850,14 +3012,12 @@ if (sizeof ($1))
 #       [INCLUDES = DEFAULT-INCLUDES])
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_TYPES_internal], [dnl
+    linux_type_HEADERS="$4"
     m4_foreach([LK_Type], [$1],
 	[AH_TEMPLATE(AS_TR_CPP(HAVE_KTYPE_[]LK_Type),
 		[Define to 1 if the system has the type ']LK_Type['.])
 	 _LINUX_CHECK_TYPE_internal(LK_Type,
-	    [AC_DEFINE(AS_TR_CPP(HAVE_KTYPE_[]LK_Type), 1)
-$2],
-	    [$3],
-	    [$4])])
+	    [AC_DEFINE(AS_TR_CPP(HAVE_KTYPE_[]LK_Type), 1) $2], [$3])])
 ])# _LINUX_CHECK_TYPES_internal
 # =============================================================================
 
@@ -2866,8 +3026,9 @@ $2],
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_TYPE], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
+    linux_type_HEADERS="$4"
     _LINUX_KERNEL_ENV([dnl
-	_LINUX_CHECK_TYPE_internal([$1], [$2], [$3], [$4])])
+	_LINUX_CHECK_TYPE_internal([$1], [$2], [$3])])
 ])# _LINUX_CHECK_TYPE
 # =============================================================================
 
@@ -2891,7 +3052,7 @@ AC_DEFUN([_LINUX_CHECK_HEADER_internal], [dnl
 @%:@include <$1>])],
 	[AS_VAR_SET(linux_Header, yes)],
 	[AS_VAR_SET(linux_Header, no)])])
-    AS_IF([test AS_VAR_GET(linux_Header) = yes], [$2], [$3])dnl
+    AS_VAR_IF([linux_Header], [yes], [$2], [$3])
     AS_VAR_POPDEF([linux_Header])dnl
 ])# _LINUX_CHECK_HEADER_internal
 # =============================================================================
@@ -2908,7 +3069,7 @@ do
 	[AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_KINC_$lk_header), 1)
 $2],
 	[$3],
-	[$4])dnl
+	[$4])
 done
 ])# _LINUX_CHECK_HEADERS_internal
 # =============================================================================
@@ -2947,12 +3108,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG_internal], [dnl
     yes_we_have_$2_defined
 #endif
 	], [AS_VAR_SET([linux_config], ['yes'])], [AS_VAR_SET([linux_config], ['no'])]) ])
-    linux_tmp=AS_VAR_GET([linux_config])
-    if test :"${linux_tmp:-no}" = :yes ; then :;
-$3
-    else :;
-$4
-    fi
+    AS_VAR_IF([linux_config], [yes], [$3], [$4])
     AS_VAR_POPDEF([linux_config])dnl
 ])# _LINUX_CHECK_KERNEL_CONFIG_internal
 # =========================================================================
@@ -3049,38 +3205,45 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULE_PRELOAD], [dnl
 # to re-export the ripped symbols they will be treated specially by the symbol
 # export check procedures.
 # -----------------------------------------------------------------------------
+m4_define([_LINUX_KERNEL_SYMBOL_ADDR_BODY],
+[AS_LINENO_PUSH([$[]1])
+AC_CACHE_CHECK([for kernel symbol $[]2 address], [linux_cv_$[]{2}_addr], [dnl
+    linux_tmp=
+    if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"; then
+	linux_tmp="`($EGREP '\<'${2}'\>' $ksyms | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"; fi
+    if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
+	linux_tmp="`($EGREP '\<'${2}'\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"; fi
+    if test -z "$linux_tmp" -a -n "$ksysmap" -a -r "$ksysmap"; then
+	linux_tmp="`($EGREP '\<'${2}'\>' $ksysmap | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"; fi
+    linux_tmp="${linux_tmp:+0x}$linux_tmp"
+    AS_VAR_SET([linux_cv_$[]{2}_addr], ["${linux_tmp:-no}"]) ])
+    AS_VAR_IF([linux_cv_$[]{2}_addr],[no],[],[dnl
+	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}[]_SYMBOL), [1])dnl
+	AS_VAR_SET([linux_cv_$[]{2}_symbol], ['yes'])
+	if test :${linux_cv_k_weak_modules:-yes} = :no; then
+	    AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_USABLE), [1])dnl
+	    AS_VAR_SET([linux_cv_$[]{2}_usable], [yes])
+	else
+	    AS_VAR_SET([linux_cv_$[]{2}_usable], [no])
+	fi
+	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_ADDR), AS_VAR_GET([linux_cv_$[]{2}_addr]))dnl
+	KERNEL_WRAPPER="${KERNEL_WRAPPER:+$KERNEL_WRAPPER }$[]2"
+	AC_SUBST([KERNEL_WRAPPER])])
+AS_LINENO_POP])
 AC_DEFUN([_LINUX_KERNEL_SYMBOL_ADDR], [dnl
     AC_REQUIRE([_LINUX_KERNEL])dnl
-    AS_VAR_PUSHDEF([linux_symbol_addr], [linux_cv_$1_addr])dnl
-    AC_CACHE_CHECK([for kernel symbol $1 address], linux_symbol_addr, [dnl
-	linux_tmp=
-	if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"
-	then
-	    linux_tmp="`($EGREP '\<$1\>' $ksyms | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
-	fi
-	if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"
-	then
-	    linux_tmp="`($EGREP '\<$1\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
-	fi
-	if test -z "$linux_tmp" -a -n "$ksysmap" -a -r "$ksysmap" 
-	then
-	    linux_tmp="`($EGREP '\<$1\>' $ksysmap | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
-	fi
-	linux_tmp="${linux_tmp:+0x}$linux_tmp"
-	AS_VAR_SET([linux_symbol_addr], ["${linux_tmp:-no}"]) ])
-    linux_tmp=AS_VAR_GET([linux_symbol_addr])
-    if test :"${linux_tmp:-no}" != :no 
-    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_ADDR), AS_VAR_GET([linux_symbol_addr]),
-	    [The symbol $1 is not exported by some kernels.  Define this to
-	    the address of $1 in the kernel system map so that kernel modules
-	    can be properly supported.])
-    KERNEL_WRAPPER="${KERNEL_WRAPPER:+$KERNEL_WRAPPER } $1"
-    AC_SUBST([KERNEL_WRAPPER])dnl
-$3
-    else :;
-$2
-    fi
+    AC_REQUIRE_SHELL_FN([linux_kernel_symbol_addr],
+	[AS_FUNCTION_DESCRIBE([linux_kernel_symbol_addr],
+	    [LINENO SYMBOL],
+	    [Test whether SYMBOL can be ripped from the system maps.])],
+	[$0_BODY])dnl
+    AS_VAR_PUSHDEF([linux_symbol_addr],   [linux_cv_$1_addr])dnl
+    linux_kernel_symbol_addr "$LINENO" "$1"
+    AS_VAR_IF([linux_symbol_addr],[no],[$2],[$3])
     AS_VAR_POPDEF([linux_symbol_addr])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_SYMBOL), [Symbol $1 is available.])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_USABLE), [Symbol $1 is usable.])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_ADDR),   [Symbol $1 is exported.])dnl
 ])# _LINUX_KERNEL_SYMBOL_ADDR
 # =============================================================================
 
@@ -3093,67 +3256,58 @@ $2
 # contains exported symbols and is used.  Otherwise, if a system map was located
 # it will be used.  Otherwise, header files will be checked.
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])dnl
-    AS_VAR_PUSHDEF([linux_symbol_export], [linux_cv_$1_export])dnl
-    AC_CACHE_CHECK([for kernel symbol $1 export], linux_symbol_export, [dnl
-	linux_tmp=
-	if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"
-	then
-	    if ( $EGREP -q  '(\<$1_R(smp_)?........\>|\<$1\>)' $ksyms 2>/dev/null )
-	    then
-		linux_tmp="yes ($ksyms)"
-	    fi
-	fi
-	if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"
-	then
-	    if ( $EGREP -q '\<__ksymtab_$1\>' $kallsyms 2>/dev/null )
-	    then
-		linux_tmp="yes ($kallsyms)"
-	    fi
-	fi
-	if test -z "$linux_tmp" -a -n "$ksysmap" -a -r "$ksysmap" 
-	then
-	    if ( $EGREP -q '\<__ksymtab_$1\>' $ksysmap 2>/dev/null )
-	    then
-		linux_tmp="yes ($ksysmap)"
-	    fi
-	fi
-dnl
-dnl Should really be a separate modules check.  This is just for XFS module
-dnl symbols.
-dnl
-	if test -z "$linux_tmp" -a -n "$kmodver" -a -r "$kmodver"
-	then
-	    if ( $EGREP -q '\<$1\>' $kmodver 2>/dev/null )
-	    then
-		linux_tmp="yes ($kmodver)"
-	    fi
-	fi
-	if test -z "$linux_tmp" -a ":$linux_cv_k_ko_modules" != :yes
-	then
-	    _LINUX_KERNEL_ENV([dnl
-		AC_EGREP_CPP([\<yes_symbol_$1_is_exported\>], [
-#include <linux/autoconf.h>
+m4_define([_LINUX_KERNEL_EXPORT_ONLY_BODY],
+[AS_LINENO_PUSH([$[]1])
+AC_CACHE_CHECK([for kernel symbol $[]2 export], [linux_cv_$[]{2}_export],
+    [linux_tmp=
+    if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"; then
+	if ( $EGREP -q  '(\<'${2}'_R(smp_)?........\>|\<'${2}'\>)' $ksyms 2>/dev/null ); then
+	    linux_tmp="yes ($ksyms)"; fi; fi
+    if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
+	if ( $EGREP -q '\<__ksymtab_'${2}'\>' $kallsyms 2>/dev/null ); then
+	    linux_tmp="yes ($kallsyms)"; fi; fi
+    if test -z "$linux_tmp" -a -n "$ksysmap" -a -r "$ksysmap"; then
+	if ( $EGREP -q '\<__ksymtab_'${2}'\>' $ksysmap 2>/dev/null ); then
+	    linux_tmp="yes ($ksysmap)"; fi; fi
+    if test -z "$linux_tmp" -a -n "$kmodver" -a -r "$kmodver"; then
+	if ( $EGREP -q '\<'${2}'\>' $kmodver 2>/dev/null ); then
+	    linux_tmp="yes ($kmodver)"; fi; fi
+    if test -z "$linux_tmp" -a -n "$ksymvers" -a -r "$ksymvers"; then
+	if ( zcat $ksymvers | $EGREP -q '\<'${2}'\>' 2>/dev/null ); then
+	    linux_tmp="yes ($ksymvers)"; fi; fi
+    if test -z "$linux_tmp" -a ":$linux_cv_k_ko_modules" != :yes; then
+	AC_EGREP_CPP([\<yes_symbol_${2}_is_exported\>],
+[#include <linux/autoconf.h>
 #include <linux/version.h>
 #include <linux/module.h>
-#ifdef $1
-	yes_symbol_$1_is_exported
-#endif
-		], [linux_tmp='yes (linux/modversions.h)']) ])
-	fi
-	AS_VAR_SET([linux_symbol_export], ["${linux_tmp:-no}"]) ])
-    linux_tmp=AS_VAR_GET([linux_symbol_export])
-    if test :"${linux_tmp:-no}" != :no 
-    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_EXPORT), [1], [The symbol $1
-	    is not exported by some kernels.  Define this if the symbol $1
-	    is exported by your kernel so that kernel modules can be supported
-	    properly.])
-$3
-    else :;
-$2
+#ifdef $[]2
+	yes_symbol_${2}_is_exported
+#endif], [linux_tmp='yes (linux/modversions.h)'])
     fi
+    AS_VAR_SET([linux_cv_$[]{2}_export],["${linux_tmp:-no}"])])
+    AS_VAR_IF([linux_cv_$[]{2}_export],[no],[],[dnl
+	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_SYMBOL), [1])dnl
+	AS_VAR_SET([linux_cv_$[]{2}_symbol], [yes])
+	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_USABLE), [1])dnl
+	AS_VAR_SET([linux_cv_$[]{2}_usable], [yes])
+	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_EXPORT), [1])dnl
+	KERNEL_EXPORTS="${KERNEL_EXPORTS:+$KERNEL_EXPORTS }$[]2"
+	AC_SUBST([KERNEL_EXPORTS]) ])
+AS_LINENO_POP])
+AC_DEFUN([_LINUX_KERNEL_EXPORT_ONLY], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    AC_REQUIRE_SHELL_FN([linux_kernel_symbol_export],
+	[AS_FUNCTION_DESCRIBE([linux_kernel_symbol_export],
+	[LINENO SYMBOL],
+	[Test whether SYMBOL is exported from the kernel.])],
+	[$0_BODY])dnl
+    AS_VAR_PUSHDEF([linux_symbol_export], [linux_cv_$1_export])dnl
+    _LINUX_KERNEL_ENV([linux_kernel_symbol_export "$LINENO" "$1"])
+    AS_VAR_IF([linux_symbol_export],[no],[$2],[$3])
     AS_VAR_POPDEF([linux_symbol_export])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_SYMBOL), [Symbol $1 is available.])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_USABLE), [Symbol $1 is usable.])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_EXPORT), [Symbol $1 is exported.])dnl
 ])# _LINUX_KERNEL_EXPORT_ONLY
 # =============================================================================
 
@@ -3180,22 +3334,9 @@ AC_DEFUN([_LINUX_KERNEL_EXPORTS], [dnl
 # =============================================================================
 # _LINUX_KERNEL_SYMBOL(SYMBOL, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
 # -----------------------------------------------------------------------------
-AC_DEFUN([_LINUX_KERNEL_SYMBOL], [dnl
-    AC_REQUIRE([_LINUX_KERNEL])
-    AS_VAR_PUSHDEF([linux_symbol], [linux_cv_$1[]_symbol])dnl
-    _LINUX_KERNEL_SYMBOL_EXPORT([$1], [dnl
-	AS_VAR_SET([linux_symbol], ['no'])], [dnl
-	AS_VAR_SET([linux_symbol], ['yes'])])
-    if test :AS_VAR_GET([linux_symbol]) = :yes
-    then :; AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$1[]_SYMBOL), [1], [The symbol $1
-	    is not exported by some kernels.  Define this if the symbol $1 is
-	    either exported by your kernel, or can be stripped from the symbol
-	    map, so that kernel modules can be supported properly.])
-$2
-    else :;
-$3
-    fi
-    AS_VAR_POPDEF([linux_symbol])dnl
+AC_DEFUN([_LINUX_KERNEL_SYMBOL],
+    [AC_REQUIRE([_LINUX_KERNEL])
+    _LINUX_KERNEL_SYMBOL_EXPORT([$1], [$2], [$3])
 ])# _LINUX_KERNEL_SYMBOL
 # =============================================================================
 
@@ -3206,6 +3347,78 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOLS], [dnl
     m4_foreach([LK_Symbol], [$1], [dnl
 	_LINUX_KERNEL_SYMBOL(LK_Symbol, [$2], [$3])])
 ])# _LINUX_KERNEL_SYMBOLS
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_SUPPORT_ONLY(SYMBOLNAME, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -----------------------------------------------------------------------------
+# This checks for kABI supported symbols.
+m4_define([_LINUX_KERNEL_SUPPORT_ONLY_BODY],
+[AS_LINENO_PUSH([$[]1])
+AC_CACHE_CHECK([for kernel symbol $[]2 support], [linux_cv_$[]{2}_support], [dnl
+    linux_tmp=
+    if test -z "$linux_tmp" -a -n "$kmodabi" -a -r "$kmodabi"; then
+	if ( $EGREP -q '\<'${2}'\>' $kmodabi 2>/dev/null ); then
+	    linux_tmp="yes ($kmodabi)"; fi; fi
+    if test -z "$linux_tmp" -a -n "$ksymsets" -a -r "$ksymsets"; then
+	if ( tar -xzOf $ksymsets | $EGREP -q '\<'${2}'\>' 2>/dev/null ); then
+	    linux_tmp="yes ($ksymsets)"; fi; fi
+    if test -z "$linux_tmp" -a -z "$kmodabi" -a -z "$ksymsets"; then
+	if test -z "$linux_tmp" -a -n "$kmodver" -a -r "$kmodver"; then
+	    if ( $EGREP -q '\<'${2}'\>' $kmodver 2>/dev/null ); then
+		linux_tmp="yes ($kmodver)"; fi; fi
+	if test -z "$linux_tmp" -a -n "$ksymvers" -a -r "$ksymvers"; then
+	    if ( zcat $ksymvers | $EGREP -q '\<'${2}'\>' 2>/dev/null ); then
+		linux_tmp="yes ($ksymvers)"; fi; fi
+    fi
+    AS_VAR_SET([linux_cv_$[]{2}_support], ["${linux_tmp:-no}"]) ])
+    AS_VAR_IF([linux_cv_$[]{2}_support],[no],[],[dnl
+	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_EXPORT), [1])dnl
+	AS_VAR_SET([linux_cv_$[]{2}_export], ["$linux_tmp"])
+	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_SYMBOL), [1])dnl
+	AS_VAR_SET([linux_cv_$[]{2}_symbol], ['yes'])
+	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_USABLE), [1])dnl
+	AS_VAR_SET([linux_cv_$[]{2}_usable], ['yes'])
+	AC_DEFINE_UNQUOTED(AS_TR_CPP(HAVE_$[]{2}_SUPPORT),[1])dnl
+	KERNEL_SUPPORT="${KERNEL_SUPPORT:+$KERNEL_SUPPORT }$1"
+	AC_SUBST([KERNEL_SUPPORT])])
+AS_LINENO_POP])
+AC_DEFUN([_LINUX_KERNEL_SUPPORT_ONLY], [dnl
+    AC_REQUIRE([_LINUX_KERNEL])dnl
+    AC_REQUIRE_SHELL_FN([linux_kernel_symbol_support],
+	[AS_FUNCTION_DESCRIBE([linux_kernel_symbol_support],
+	    [LINENO SYMBOL],
+	    [Test whether SYMBOL is supported by the kABI.])],
+	[$0_BODY])dnl
+    AS_VAR_PUSHDEF([linux_symbol_support], [linux_cv_$1_support])dnl
+    linux_kernel_symbol_support "$LINENO" "$1"
+    AS_VAR_IF([linux_symbol_support],[no],[$2],[$3])
+    AS_VAR_POPDEF([linux_symbol_support])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_EXPORT), [Symbol $1 is exported.])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_SYMBOL), [Symbol $1 is available.])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_USABLE), [Symbol $1 is usable.])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_SUPPORT),[Symbol $1 is supported.])dnl
+])# _LINUX_KERNEL_SUPPORT_ONLY
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_SYMBOL_SUPPORT(SYMBOLNAME, [ACTION-IF-NOT-FOUND], [ACTION-IF-FOUND])
+# -----------------------------------------------------------------------------
+# If the symbol is not supported, an attempt will be made to determine whether
+# it is exported or rip it from the system maps.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_SYMBOL_SUPPORT],
+    [_LINUX_KERNEL_SUPPORT_ONLY([$1], [$2], [$3])
+])# _LINUX_KERNEL_SYMBOL_SUPPORT
+# =============================================================================
+
+# =============================================================================
+# _LINUX_KERNEL_ABI_SYMBOLS(SYMBOLS, [ACTION-IF-FOUND], [ACTION-IF-NOT-FOUND])
+# -----------------------------------------------------------------------------
+AC_DEFUN([_LINUX_KERNEL_ABI_SYMBOLS],
+    [m4_foreach([LK_Export], [$1],
+		[_LINUX_KERNEL_SYMBOL_SUPPORT(LK_Export, [$3], [$2])])
+])# _LINUX_KERNEL_ABI_SYMBOLS
 # =============================================================================
 
 # =============================================================================
@@ -3261,6 +3474,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.9  2011-03-26 04:28:45  brian
+# - updates to build process
+#
 # Revision 1.1.2.8  2011-03-17 07:01:28  brian
 # - build and repo system improvements
 #

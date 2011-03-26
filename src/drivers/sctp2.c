@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 1.1.2.4  2011-03-26 04:28:47  brian
+ - updates to build process
+
  Revision 1.1.2.3  2011-01-12 04:10:30  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $";
+static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $";
 
 #define _SVR4_SOURCE
 #define _SUN_SOURCE
@@ -80,7 +83,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.3 
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:30 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -4736,7 +4739,75 @@ sctp_lookup(struct sctphdr *sh, uint32_t daddr, uint32_t saddr)
  *
  *  =========================================================================
  */
+#if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT
 extern uint32_t secure_tcp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t);
+#elif defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
+extern uint32_t secure_tcp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t) __attribute__((weak));
+#endif
+#if   defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_SUPPORT
+extern uint64_t secure_dccp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t);
+#elif defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
+extern uint64_t secure_dccp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t) __attribute__((weak));
+#endif
+#if   defined HAVE_HALF_MD4_TRANSFORM_SUPPORT
+extern uint32_t half_md4_transform(uint32_t buf[4], uint32_t const in[8]);
+#elif defined HAVE_HALF_MD4_TRANSFORM_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
+extern uint32_t half_md4_transform(uint32_t buf[4], uint32_t const in[8]) __attribute__((weak));
+#endif
+
+STATIC uint32_t
+secure_sctp_sequence_number(uint32_t daddr, uint32_t saddr, uint16_t dport, uint16_t sport)
+{
+#if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT
+	{
+		return secure_tcp_sequence_number(daddr, saddr, dport, sport);
+	}
+#elif defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
+	if (secure_tcp_sequence_number != 0) {
+		return secure_tcp_sequence_number(daddr, saddr, dport, sport);
+	}
+#endif
+#if   defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_SUPPORT
+	{
+		uint64_t result = secure_dccp_sequence_number(daddr, saddr, dport, sport);
+
+		return (uint32_t) ((result >> 32) ^ result);
+	}
+#elif defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
+	if (secure_dccp_sequence_number != 0) {
+		uint64_t result = secure_dccp_sequence_number(daddr, saddr, dport, sport);
+
+		return (uint32_t) ((result >> 32) ^ result);
+	}
+#endif
+#if   defined HAVE_HALF_MD4_TRANSFORM_SUPPORT
+	{
+		uint32_t hash[4];
+
+		hash[0] = saddr;
+		hash[1] = daddr;
+		hash[2] = (sport << 16) | dport;
+		hash[3] = jiffies;
+		return half_md4_transform(hash, (uint32_t *) &secure_sctp_sequence_number);
+	}
+#elif defined HAVE_HALF_MD4_TRANSFORM_USABLE && CONFIG_KERNEL_WEAK_MODULES
+	if (half_md4_transform != 0) {
+		uint32_t hash[4];
+
+		hash[0] = saddr;
+		hash[1] = daddr;
+		hash[2] = (sport << 16) | dport;
+		hash[3] = jiffies;
+		return half_md4_transform(hash, (uint32_t *) &secure_sctp_sequence_number);
+	}
+#else
+	{
+		return (daddr ^ saddr ^ ((sport << 16) | dport) ^ jiffies);
+	}
+#endif
+}
+
+
 STATIC uint32_t
 sctp_get_vtag(uint32_t daddr, uint32_t saddr, uint16_t dport, uint16_t sport)
 {
@@ -4746,7 +4817,7 @@ sctp_get_vtag(uint32_t daddr, uint32_t saddr, uint16_t dport, uint16_t sport)
 	for (;;) {
 		struct sctp *sp;
 
-		if (!(ret = secure_tcp_sequence_number(daddr, saddr, dport, sport)))
+		if (!(ret = secure_sctp_sequence_number(daddr, saddr, dport, sport)))
 			continue;
 		if ((sp = sctp_lookup_vtag(ret, sport, dport, saddr, daddr))) {
 			sctp_put(sp);
@@ -4799,7 +4870,6 @@ struct sctp_key {
 #define NUM_KEYS 4
 STATIC struct sctp_key sctp_keys[NUM_KEYS];
 STATIC int sctp_current_key = 0;
-extern uint32_t secure_tcp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t);
 
 /*
  *  TODO:  This rekeying is too predicatable.  There are several things bad about it: (1) the key
@@ -4814,7 +4884,7 @@ sctp_rekey(int k)
 
 	sctp_keys[k].last = n;
 	seq = &sctp_keys[k].u.seq[n];
-	*seq = secure_tcp_sequence_number(*(seq + 1), *(seq + 2), *(seq + 3), *(seq + 4));
+	*seq = secure_sctp_sequence_number(*(seq + 1), *(seq + 2), *(seq + 3), *(seq + 4));
 }
 STATIC int
 sctp_get_key(sctp_t * sp)
@@ -13093,14 +13163,18 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 			if (sd && sd->dst_cache) {
 				size_t mtu = ntohs(icmph->un.frag.mtu);
 
+#ifdef HAVE_IP_RT_UPDATE_PMTU_USABLE
 				ip_rt_update_pmtu(sd->dst_cache, mtu);
+#endif                          /* HAVE_IP_RT_UPDATE_PMTU_USABLE */
 				if (dst_pmtu(sd->dst_cache) > mtu && mtu && mtu >= 68
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 				    && !(sd->dst_cache->mxlock & (1 << RTAX_MTU))
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL */
 				    ) {
 					dst_update_pmtu(sd->dst_cache, mtu);
+#ifdef HAVE_IP_RT_MTU_EXPIRES_USABLE
 					dst_set_expires(sd->dst_cache, ip_rt_mtu_expires);
+#endif                          /* HAVE_IP_RT_MTU_EXPIRES_USABLE */
 				}
 			}
 		}
@@ -14320,9 +14394,6 @@ sctp_init_struct(struct sctp *sp)
  *
  *  --------------------------------------------------------------------------
  */
-#ifndef ip_rt_min_pmtu
-#define ip_rt_min_pmtu 552
-#endif
 struct sctp *
 sctp_alloc_priv(queue_t *q, struct sctp **spp, int cmajor, int cminor, struct sctp_ifops *ops,
 		cred_t *crp)
@@ -18270,7 +18341,7 @@ t_parse_conn_opts(struct sctp *sp, const unsigned char *ip, size_t ilen, int req
 				}
 				if (valp->kp_onoff == T_YES)
 					tp->keepalive_time = valp->kp_timeout * 60 * HZ;
-#if defined HAVE_TCP_SET_KEEPALIVE_ADDR
+#ifdef HAVE_TCP_SET_KEEPALIVE_USABLE
 				tcp_set_keepalive(sk, valp->kp_onoff == T_YES ? 1 : 0);
 #endif				/* defined HAVE_TCP_SET_KEEPALIVE_ADDR */
 				if (valp->kp_onoff == T_YES)
@@ -25377,9 +25448,9 @@ t_build_negotiate_options(struct sctp *t, const unsigned char *ip, size_t ilen, 
 					t->options.tcp.keepalive = *valp;
 					if (valp->kp_onoff)
 						tp->keepalive_time = valp->kp_timeout * 60 * HZ;
-#if defined HAVE_TCP_SET_KEEPALIVE_ADDR
+#ifdef HAVE_TCP_SET_KEEPALIVE_USABLE
 					tcp_set_keepalive(sk, (valp->kp_onoff == T_YES) ? 1 : 0);
-#endif				/* defined HAVE_TCP_SET_KEEPALIVE_ADDR */
+#endif				/* defined HAVE_TCP_SET_KEEPALIVE_USABLE */
 					if (valp->kp_onoff == T_YES)
 						sock_set_keepopen(sk);
 					else

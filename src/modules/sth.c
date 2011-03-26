@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:34 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:34 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:49 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 1.1.2.6  2011-03-26 04:28:49  brian
+ - updates to build process
+
  Revision 1.1.2.5  2011-01-12 04:10:34  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:34 $";
+static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -106,6 +109,8 @@ static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 #include <net/checksum.h>	/* for various checksums */
 
 #include <asm/uaccess.h>
+
+#include <linux/security.h>
 
 #ifndef __user
 #define __user
@@ -165,16 +170,16 @@ compat_ptr(compat_uptr_t uptr)
 #include "sys/config.h"
 #include "src/kernel/strsched.h"	/* for allocstr */
 #include "src/kernel/strlookup.h"	/* for cmin_get() */
-#include "sth.h"		/* extern verification */
+#include "sth.h"			/* extern verification */
 #include "src/kernel/strsysctl.h"	/* for sysctls */
-#include "src/kernel/strsad.h"	/* for autopush */
-#include "src/kernel/strutil.h"	/* for q locking and puts and gets */
+#include "src/kernel/strsad.h"		/* for autopush */
+#include "src/kernel/strutil.h"		/* for q locking and puts and gets */
 #include "src/kernel/strattach.h"	/* for do_fattach/do_fdetach */
-#include "src/drivers/clone.h"	/* for (un)register_clone() */
+#include "src/drivers/clone.h"		/* for (un)register_clone() */
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-01-12 04:10:34 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $"
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -714,7 +719,7 @@ strschedule_write(void)
 /**
  * strschedule_read - before blocking on read
  *
- * NOTE:- Better performance is acheived on (true) SMP machines by not attempting to run the STREAMS
+ * NOTE:- Better performance is achieved on (true) SMP machines by not attempting to run the STREAMS
  * scheduler in process context here.  The reason is that if we avoid scheduling, the current
  * process is blocked off other processors while it is running the STREAMS scheduler.  If we do the
  * task switch, the process can run concurrently on another processor.  This does have a negative
@@ -748,7 +753,7 @@ streams_noinline streams_fastcall int straccess_noinline(struct stdata *sd, int 
 /**
  * strfailure_write - failure to write immediately
  *
- * This function is called when a failure to write immediately has occured and the calling process
+ * This function is called when a failure to write immediately has occurred and the calling process
  * is about to return EAGAIN or block.  It executes the STREAMS scheduler in the calling process'
  * context if there is work scheduled.  This is a good policy.  The reason is that the STREAMS
  * scheduler runs at a low priority and executing now effectively raises the priority of the STREAMS
@@ -758,7 +763,7 @@ streams_noinline streams_fastcall int straccess_noinline(struct stdata *sd, int 
  * anyway.
  *
  * Consider that a typical write performs a number of write operations and some intermediate queue
- * fills, resulting in flow controls being exherted on the Stream, which cause the writing process
+ * fills, resulting in flow controls being exerted on the Stream, which cause the writing process
  * to eventually fail and call this function.  Because there is no other process with higher
  * priority (otherwise it would be executing), it is expedient to run the scheduler now and see if
  * the write process becomes unblocked and can continue.
@@ -791,8 +796,8 @@ strfailure_write(struct stdata *sd)
 /**
  * strfailure_read - failure to read immediately
  *
- * This function is called when a failure to read immediately has occured and the calling process is
- * about to return EAGAIN or block.  It executes the STREAMS scheduler in the calling process'
+ * This function is called when a failure to read immediately has occurred and the calling process
+ * is about to return EAGAIN or block.  It executes the STREAMS scheduler in the calling process'
  * context if there is work scheduled.  This is a good policy.  The reason is that the STREAMS
  * scheduler runs at low priority and executing now effectively raises the priority of the STREAMS
  * scheduler running on the current processor to the priority of the process that failed to read
@@ -863,39 +868,143 @@ strcopyin(const void __user *from, void *to, size_t len)
  *  -------------------------------------------------------------------------
  */
 
-STATIC streams_fastcall pid_t
-str_task_session(struct task_struct *t)
-{
-#if defined HAVE_KFUNC_TASK_SESSION_NR
-	return (task_session_nr(t));
-#elif defined HAVE_KFUNC_TASK_SESSION_NR_NS
-        return (task_session_nr_ns(t, &init_pid_ns));
-#elif defined HAVE_KFUNC_PROCESS_SESSION
-	return (process_session(t));
-#elif !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
-	return (t->signal->session);
+/* How to find the current thread group pid number: just use current_group(). */
+#if   defined HAVE_KFUNC_TASK_TGID_VNR
+#define current_group() task_tgid_vnr(current)
+#elif defined HAVE_KFUNC_TASK_TGID_NR
+#define current_group() task_tgid_nr(current)
 #else
-	return (t->session);
+#define current_group() (current->tgid)
 #endif
-}
 
-STATIC streams_fastcall pid_t
-str_task_pgrp(struct task_struct *t)
-{
-#if defined HAVE_KFUNC_TASK_PGRP_NR
-	return (task_pgrp_nr(t));
+/* How to find the current thread group pid: just use current_tgid(). */
+#ifdef HAVE_KFUNC_PID_NR
+#if defined HAVE_KFUNC_TASK_TGID
+#define current_tgid() task_tgid(current)
 #else
-#if defined HAVE_KFUNC_PROCESS_GROUP
-	return (process_group(t));
+#error Need a way to get the thread group of the current task.
+#undef current_tgid
+#endif
 #else
-#if !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
-	return (t->signal->pgrp);
+#define current_tgid() current_group()
+#endif
+
+/* How to find the current process pid number: just use current_proc(). */
+#if   defined HAVE_KFUNC_TASK_PID_VNR
+#define current_proc() task_pid_vnr(current)
+#elif defined HAVE_KFUNC_TASK_PID_NR
+#define current_proc() task_pid_nr(current)
 #else
-	return (t->pgrp);
+#define current_proc() (current->pid)
 #endif
+
+/* How to find the current process pid: just use current_pid(). */
+#ifdef HAVE_KFUNC_PID_NR
+#if defined HAVE_KFUNC_TASK_PID
+#define current_pid() task_pid(current)
+#else
+#error Need a way to get the process id of the curent task.
+#undef current_pid
 #endif
+#else
+#define current_pid() current_proc()
 #endif
-}
+
+/* How to find the session leader pid number for the current task.  Just use current_session(). */
+#if   defined HAVE_KFUNC_TASK_SESSION_VNR
+/* kernels with pid namespaces */
+#define current_session() task_session_vnr(current)
+#elif defined HAVE_KFUNC_TASK_SESSION_NR
+/* kernels without pid namespaces */
+#define current_session() task_session_nr(current)
+#elif defined HAVE_KFUNC_PROCESS_SESSION
+#define current_session() process_session(current)
+#elif !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SESSION
+#define current_session() (current->signal->session)
+#else
+#define current_session() (current->session)
+#endif
+
+/* How to find the session leader pid for the current task.  Just use current_sid(). */
+#ifdef HAVE_KFUNC_PID_NR
+#if defined HAVE_KFUNC_TASK_SESSION
+#define current_sid() task_session(current)
+#else
+#error Need a way to get the session leader of the current task.
+#undef current_sid
+#endif
+#else
+#define current_sid() current_session()
+#endif
+
+/* How to find the current process group pid number: just use current_pgrp(). */
+#if   defined HAVE_KFUNC_TASK_PGRP_VNR
+#define current_pgrp() task_pgrp_vnr(current)
+#elif defined HAVE_KFUNC_TASK_PGRP_NR
+#define current_pgrp() task_pgrp_nr(current)
+#elif defined HAVE_KFUNC_PROCESS_GROUP
+#define current_pgrp() process_group(current)
+#elif !defined HAVE_KMEMB_STRUCT_TASK_STRUCT_PGRP
+#define current_pgrp() (current->signal->pgrp)
+#else
+#define current_pgrp() (current->pgrp)
+#endif
+
+/* How to find the current process group pid: just use current_pgid(). */
+#ifdef HAVE_KFUNC_PID_NR
+#if defined HAVE_KFUNC_TASK_PGRP
+#define current_pgid() task_pgrp(current)
+#else
+#error Need a way to get the process group of the current task.
+#undef current_pgid
+#endif
+#else
+#define current_pgid() current_pgrp()
+#endif
+
+/* How to find a pid from a pid number. */
+#if defined HAVE_KFUNC_PID_NR
+#if defined HAVE_KFUNC_FIND_VPID
+#define find_pid(_x_) find_vpid(_x_)
+#elif defined HAVE_KFUNC_FIND_PID
+#define find_pid(_x_) find_pid(_x_)
+#else
+#define find_pid(_x_) _x_
+#endif
+#else
+#define find_pid(_x_) _x_
+#endif
+
+/* How to take a reference to a pid. */
+#if defined HAVE_KFUNC_PID_NR
+#if defined HAVE_KFUNC_GET_PID
+#define get_pid(_x_) get_pid(_x_)
+#else
+#define get_pid(_x_) _x_
+#endif
+#else
+#define get_pid(_x_) _x_
+#endif
+
+/* How to release a reference to a pid. */
+#if defined HAVE_KFUNC_PID_NR
+#if defined HAVE_KFUNC_PUT_PID
+#define put_pid(_x_) put_pid(_x_)
+#else
+#define put_pid(_x_) do { } while(0)
+#endif
+#else
+#define put_pid(_x_) do { } while(0)
+#endif
+
+/* How to get the pid number from a pid. */
+#if defined HAVE_KFUNC_PID_VNR
+#define pid_nr(_x_) pid_vnr(_x_)
+#elif defined HAVE_KFUNC_PID_NR
+#define pid_nr(_x_) pid_nr(_x_)
+#else
+#define pid_nr(_x_) _x_
+#endif
 
 extern rwlock_t tasklist_lock;
 
@@ -907,12 +1016,7 @@ pid_t session_of_pgrp(pid_t);
 #endif
 #endif
 
-#ifdef HAVE_KFUNC_FIND_PID
-#define find_pid(_x_) find_pid(_x_)
-#elif HAVE_KFUNC_FIND_VPID
-#define find_pid(_x_) find_vpid(_x_)
-#endif
-
+#ifdef HAVE_SESSION_OF_PGRP_USABLE
 STATIC streams_fastcall __unlikely pid_t
 pgrp_session(pid_t pgrp)
 {
@@ -927,17 +1031,213 @@ pgrp_session(pid_t pgrp)
 	return (session_of_pgrp(pgrp));
 #endif
 }
-
-int is_ignored(int sig);
-int is_orphaned_pgrp(int pgrp);
-int is_current_pgrp_orphaned(void);
-int kill_proc_info(int sig, struct siginfo *sip, pid_t pid);
-int kill_sl_func(pid_t, int, int);
-#ifdef HAVE_SEND_GROUP_SIG_INFO_SYMBOL
-int send_group_sig_info(int, struct siginfo *, struct task_struct *);
 #endif
-#ifdef HAVE_GROUP_SEND_SIG_INFO_SYMBOL
-int group_send_sig_info(int, struct siginfo *, struct task_struct *);
+
+/* How to test for an ignored signal. */
+#ifdef HAVE_IS_IGNORED_SYMBOL
+#ifndef HAVE_IS_IGNORED_USABLE
+int is_ignored(int sig)
+{
+#if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIG
+	return (sigismember(&current->blocked, sig) ||
+			current->sig->action[sig-1].sa.sa_handler == SIG_IGN);
+#define is_ignored(_x_) is_ignored(_x_)
+#elif defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIGHAND
+	return (sigismember(&current->blocked, sig) ||
+			current->sighand->action[sig-1].sa.sa_handler == SIG_IGN);
+#define is_ignored(_x_) is_ignored(_x_)
+#else
+#error Need a way to check for an ignored signal.
+#undef is_ignored
+#endif
+}
+#else
+int is_ignored(int sig);
+#define is_ignored(_x_) is_ignored(_x_)
+#endif
+#else
+#error Need a way to check for an ignored signal.
+#endif
+
+/* How to test if the current process group is orphaned (background process group).  Just used
+ * is_current_pgrp_orphaned(0) in the code. */
+#ifdef HAVE_IS_ORPHANED_PGRP_SYMBOL
+#ifdef HAVE_IS_ORPHANED_PGRP_USABLE
+int is_orphaned_pgrp(int pgrp);
+#define is_current_pgrp_orphaned() is_orphaned_pgrp(current_pgrp())
+#else
+#define is_current_pgrp_orphaned() 0
+#endif
+#elif defined HAVE_IS_CURRENT_PGRP_ORPHANED_SYMBOL
+#if   defined HAVE_IS_CURRENT_PGRP_ORPHANED_USABLE
+int is_current_pgrp_orphaned();
+#else
+#define is_current_pgrp_orphaned() 0
+#endif
+#else
+#error Need a way to check if process group is orphaned.
+#endif
+
+/* How to send a signal to a process group: just use kill_pg(3) in the code. */
+
+#if defined HAVE_KILL_PGRP_SYMBOL
+/* 2.6.32 kernel approach. */
+#ifdef HAVE_KILL_PGRP_USABLE
+int kill_pgrp(struct pid *pid, int sig, int priv);
+#define kill_pg(_x_,_y_,_z_) kill_pgrp(_x_,_y_,_z_)
+#else
+#error kill_pgrp() symbol is not exported!
+#undef kill_pg
+#endif
+#elif defined HAVE_KILL_PG_SYMBOL
+/* 2.4.33 and 2.6.18 kernel approach. */
+#if   defined HAVE_KILL_PG_USABLE
+int kill_pg(pid_t pgrp, int sig, int priv);
+#define kill_pg(_x_,_y_,_z_) kill_pg(_x_,_y_,_z_)
+#else
+#error kill_pg() symbol is not exported!
+#undef kill_pg
+#endif
+#else
+#error Need a way to signal a process group.
+#undef kill_pg
+#endif
+
+/* How to send a signal to a session leader: just use kill_sl(3) in the code. */
+#if defined HAVE_KILL_SL_SYMBOL
+/* 2.4.33 kernel approach. */
+#if defined HAVE_KILL_SL_USABLE
+int kill_sl(pid_t sess, int sig, int priv);
+#define kill_sl(_x_,_y_,_z_) kill_sl(_x_,_y_,_z_)
+#else
+#undef kill_sl() symbol is not exported!
+#endif
+#elif defined HAVE_KILL_PID_SYMBOL
+/* 2.6.32 kernel approach */
+#if   defined HAVE_KILL_PID_USABLE
+int kill_pid(struct pid *pid, int sig, int priv);
+#define kill_sl(_x_,_y_,_z_) kill_pid(_x_,_y_,_z_)
+#else
+#error kill_pid() symbol is not exported!
+#undef kill_sl
+#endif
+#elif defined HAVE_KILL_PROC_SYMBOL
+/* 2.6.18 kernel approach */
+#if   defined HAVE_KILL_PROC_USABLE
+int kill_proc(pid_t sess, int sig, int priv);
+#define kill_sl(_x_,_y_,_z_) kill_proc(_x_,_y_,_z_)
+#else
+#error kill_proc() symbol is not exported!
+#undef kill_sl
+#endif
+#else
+#error Need a way to signal a session leader.
+#undef kill_sl
+#endif
+
+/* How to send a signal with information to a process: just use kill_proc_info(6) in the code */
+#if   defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL
+/* 2.6.32 kernel approach: */
+#if   defined HAVE_KILL_PID_INFO_AS_UID_SUPPORT
+int kill_pid_info_as_uid(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid);
+#define kill_proc_info(a,b,c,d,e,f) kill_pid_info_as_uid(a,b,c,d,e,f)
+#elif defined HAVE_KILL_PID_INFO_AS_UID_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
+int kill_pid_info_as_uid(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid)
+	__attribute__((weak));
+int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid)
+{
+	if (kill_pid_info_as_uid)
+		return kill_pid_info_as_uid(sig, info, pid, uid, euid, secid);
+	return kill_pid(sig, pid, 1);
+}
+#define kill_proc_info(a,b,c,d,e,f) kill_proc_info_(a,b,c,d,e,f)
+#else
+#error kill_pid_info_as_uid() is not exported!
+#undef kill_proc_info
+#endif
+#elif defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL
+/* 2.6.18 kernel approach: */
+#if   defined HAVE_KILL_PROC_INFO_AS_UID_SUPPORT
+int kill_proc_info_as_uid(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid);
+#define kill_proc_info(a,b,c,d,e,f) kill_proc_info_as_uid(a,b,c,d,e,f)
+#elif defined HAVE_KILL_PROC_INFO_AS_UID_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
+int kill_proc_info_as_uid(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid)
+	__attribute__((weak));
+int kill_proc_info_(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid)
+{
+	if (kill_proc_info_as_uid)
+		return kill_proc_info_as_uid(sig, info, pid, uid, euid, secid);
+	return kill_proc(sig, pid, 1);
+}
+#define kill_proc_info(a,b,c,d,e,f) kill_proc_info_(a,b,c,d,e,f)
+#else
+#error kill_proc_info_as_uid() is not exported!
+#undef kill_proc_info
+#endif
+#elif defined HAVE_KILL_PROC_INFO_SYMBOL
+/* 2.4.33 kernel approach: */
+#if   defined HAVE_KILL_PROC_INFO_USABLE
+int kill_proc_info(int sig, struct siginfo *info, pid_t pid);
+#define kill_proc_info(a,b,c,d,e,f) kill_proc_info(a,b,c)
+#else
+#error kill_proc_info() is not exported!
+#undef kill_proc_info
+#endif
+#else
+#error Need a way to signal with info to a process.
+#undef kill_proc_info
+#endif
+
+/* How to send a signal without information to a process. */
+#if   defined HAVE_KILL_PID_SYMBOL
+/* 2.6.32 kernel approach. */
+#if   defined HAVE_KILL_PID_USABLE
+int kill_pid(struct pid *pid, int sig, int priv);
+#define kill_pid(a,b,c) kill_pid(a,b,c)
+#else
+#error kill_pid() symbol is not exported!
+#undef kill_pid
+#endif
+#elif defined HAVE_KILL_PROC_SYMBOL
+/* 2.4.33 and 2.6.18 kernel approach. */
+#if   defined HAVE_KILL_PROC_USABLE
+int kill_proc(pid_t pid, int sig, int priv);
+#define kill_pid(a,b,c) kill_proc(a,b,c)
+#else
+#error kill_proc() symbol is not exported.
+#undef kill_pid
+#endif
+#else
+#error Need a way to signal a process without info.
+#undef kill_pid
+#endif
+
+/* How to send a signal without information to a specific task (thread). */
+#if   defined HAVE_SEND_SIG_SYMBOL
+#if   defined HAVE_SEND_SIG_USABLE
+int send_sig(int sig, struct task_struct *p, int priv);
+#define send_sig(a,b,c) send_sig(a,b,c)
+#else
+#error send_sig() symbol is not exported!
+#undef send_sig
+#endif
+#else
+#error Need a way to send a signal to a task.
+#undef send_sig
+#endif
+
+/* How to send a signal with information to a specific task (thread). */
+#if   defined HAVE_SEND_SIG_INFO_SYMBOL
+#if   defined HAVE_SEND_SIG_INFO_USABLE
+int send_sig_info(int sig, struct siginfo *info, struct task_struct *p);
+#define send_sig_info(a,b,c) send_sig_info(a,b,c)
+#else
+#error send_sig_info() symbol is not exported!
+#undef send_sig_info
+#endif
+#else
+#error Need a way to send a signal with info to a task.
+#undef send_sig_info
 #endif
 
 /**
@@ -1008,46 +1308,24 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 		return (0);
 	if (likely((access & (FREAD | FWRITE | FEXCL)) != 0)) {	/* PROFILED */
 		/* POSIX semantics for controlling terminals */
-		pid_t pgrp = str_task_pgrp(current);
-
-		if (likely(pgrp == sd->sd_pgrp))
+		if (likely(pid_nr(sd->sd_pgrp) == current_pgrp()))
 			return (0);
-		/* not in forground process group */
+		/* not in foreground process group */
 		if (access & FREAD) {
 			if (is_ignored(SIGTTIN))
 				return (-EIO);
-#ifdef HAVE_IS_ORPHANED_PGRP_SYMBOL
-			if (is_orphaned_pgrp(pgrp))
-				return (-EIO);
-#endif
-#ifdef HAVE_IS_CURRENT_PGRP_ORPHANED_SYMBOL
 			if (is_current_pgrp_orphaned())
 				return (-EIO);
-#endif
-#ifdef HAVE_KILL_PGRP_SYMBOL
-			kill_pgrp(task_pgrp(current), SIGTTIN, 1);
-#else
-			kill_pg(pgrp, SIGTTIN, 1);
-#endif
+			kill_pg(current_pgid(), SIGTTIN, 1);
 			return (-ERESTARTSYS);
 		}
 		if ((access & (FWRITE | FEXCL))
 		    && ((access & FEXCL) || (flags & STRTOSTOP))) {
 			if (is_ignored(SIGTTOU))
 				return (0);
-#ifdef HAVE_IS_ORPHANED_PGRP_SYMBOL
-			if (is_orphaned_pgrp(pgrp))
-				return (-EIO);
-#endif
-#ifdef HAVE_IS_CURRENT_PGRP_ORPHANED_SYMBOL
 			if (is_current_pgrp_orphaned())
 				return (-EIO);
-#endif
-#ifdef HAVE_KILL_PGRP_SYMBOL
-			kill_pgrp(task_pgrp(current), SIGTTOU, 1);
-#else
-			kill_pg(pgrp, SIGTTOU, 1);
-#endif
+			kill_pg(current_pgid(), SIGTTOU, 1);
 			return (-ERESTARTSYS);
 		}
 	}
@@ -1081,7 +1359,7 @@ straccess_slow(struct stdata *sd, const register int access, const register int 
 			if ((access & FCREAT) != 0) {
 				if ((flags & STRISPIPE))
 					return (-EIO);
-				if ((flags & STRISTTY) != 0 && sd->sd_session != current->pid)
+				if ((flags & STRISTTY) != 0 && pid_nr(sd->sd_session) != current_session())
 					return (-EIO);
 			}
 			/* There was a little problem above: the SVR4 SPG says: "When a Stream head 
@@ -1265,7 +1543,7 @@ allocb_buf(struct stdata *sd, size_t size, uint priority)
  *  @dlen: M_DATA size
  *  @dbuf: user data pointer
  *
- *  Allocates a data message block of the specified size and returns it.  The b_rptr o fthe block
+ *  Allocates a data message block of the specified size and returns it.  The b_rptr of the block
  *  points to the start of the data range and the b_wptr points to the byte past the last byte in
  *  the data range.  M_DATA blocks are offset with the stream head sd_wroff write offset and padded
  *  with the stream head sd_wrpad write padding.  If the size of the block is set to a negative
@@ -1390,6 +1668,7 @@ alloc_proto(struct stdata *sd, const struct strbuf *ctlp, const struct strbuf *d
 #define thread_group_leader(p) (p->pid == p->tgid)
 #endif
 
+#if !defined CONFIG_KERNEL_WEAK_MODULES
 /**
  *  str_find_thread_group_leader: - given a thread find the thread group leader
  *  @procp:	the process
@@ -1419,6 +1698,7 @@ str_find_thread_group_leader(struct task_struct *procp)
 	}
 	return ((struct task_struct *) p);
 }
+#endif
 
 /**
  *  str_find_file_descriptor: - find a file descriptor given a file pointer
@@ -1469,10 +1749,10 @@ str_find_file_descriptor(const struct task_struct *procp, const struct file *fil
 STATIC streams_fastcall __unlikely struct strevent *
 __strevent_find(const struct stdata *sd)
 {
-	struct task_struct *p, *c = current;
 	struct strevent *se;
 
-	for (se = sd->sd_siglist; se && ((p = se->se_procp) != c) && (p->tgid != c->tgid); se = se->se_next) ;
+	for (se = sd->sd_siglist; se && pid_nr(se->se_tgid) != current_group();
+	     se = se->se_next) ;
 	return (se);
 }
 
@@ -1495,12 +1775,12 @@ __strevent_find(const struct stdata *sd)
 STATIC streams_fastcall __unlikely int
 __strevent_register(const struct file *file, struct stdata *sd, const unsigned long events)
 {
-	struct task_struct *p, *c = current;
 	struct strevent *se, **sep;
 	int err = 0;
 
 	_printd(("%s: registering streams events %lu\n", __FUNCTION__, events));
-	for (sep = &sd->sd_siglist; (se = *sep) && ((p = se->se_procp) != c) && (p->tgid != c->tgid); sep = &se->se_next) ;
+	for (sep = &sd->sd_siglist; (se = *sep) && pid_nr(se->se_tgid) != current_group();
+	     sep = &se->se_next) ;
 	if (se) {
 		_printd(("%s: found existing registration se = %p\n", __FUNCTION__, se));
 		if (events) {
@@ -1510,6 +1790,8 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 		} else {
 			/* delete */
 			_printd(("%s: deleting events se = %p\n", __FUNCTION__, se));
+			put_pid(se->se_pid);  se->se_pid  = (typeof(se->se_pid )) 0;
+			put_pid(se->se_tgid); se->se_tgid = (typeof(se->se_tgid)) 0;
 			*sep = se->se_next;
 			sefree(se);
 		}
@@ -1530,18 +1812,29 @@ __strevent_register(const struct file *file, struct stdata *sd, const unsigned l
 		_ptrace(("Error path taken!\n"));
 		err = -EAGAIN;	/* POSIX says EAGAIN not ENOSR */
 	} else {
-		struct task_struct *procp;
 		int fd;
 
+
 		/* create */
+		struct task_struct *procp;
+#if !defined CONFIG_KERNEL_WEAK_MODULES
 		/* we only reference thread group leaders because they cannot unhash in our faces,
 		   but will just zombie if they exit before the others in the thread group. */
 		procp = str_find_thread_group_leader(c);
+#else
+		procp = current;
+#endif
 		/* siginfo wants a file descriptor */
 		fd = str_find_file_descriptor(procp, file);
-		se->se_procp = procp;
+		se->se_pid = get_pid(current_pid());
+		se->se_tgid = get_pid(current_tgid());
 		se->se_events = events;
 		se->se_fd = fd;
+#if defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL || defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL
+		se->se_uid = current_creds->cr_ruid;
+		se->se_euid = current_creds->cr_uid;
+		security_task_getsecid(procp, &se->se_secid);
+#endif
 		_printd(("%s: creating siglist events %lu, proc %p, fd %d\n", __FUNCTION__, events, procp, fd));
 		/* calc sig flags */
 		sd->sd_sigflags |= events;
@@ -1586,7 +1879,6 @@ strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 	struct strevent *se;
 	struct siginfo si;
 	int bits, sig;
-	pid_t pid;
 
 	for (se = sd->sd_siglist; se; se = se->se_next) {
 		if (likely((bits = (se->se_events & events)) == 0))
@@ -1602,16 +1894,10 @@ strsiglist(struct stdata *sd, const int events, unsigned char band, int code)
 			si.si_code = SI_KERNEL;
 		}
 
-		pid = se->se_procp->pid;
-
-		/* kill_proc_info will do the right thing visa vi thread groups */
-		if (likely(kill_proc_info(sig, &si, pid) == 0))
+		if (likely(kill_proc_info(sig, &si, se->se_pid, se->se_uid, se->se_euid,
+					  se->se_secid) == 0))
 			continue;
-#if defined HAVE_KFUNC_KILL_PROC
-		kill_proc(pid, sig, 1);	/* force */
-#elif defined HAVE_KFUNC_KILL_PID_INFO
-                kill_pid_info(sig, SEND_SIG_PRIV, find_pid(pid));
-#endif
+		kill_pid(se->se_pid, sig, 1);
 	}
 }
 
@@ -1697,12 +1983,12 @@ strevent(struct stdata *sd, const int events, const unsigned char band)
  *
  *  SVR 4 SPG:-
  *  "STREAMS allows modules and drivers to cause a signal to be sent to user process(es) through an
- *   %M_SIG or %M_PCSIG message.  The first bye of the message specifies the signal for the Stream
+ *   %M_SIG or %M_PCSIG message.  The first byte of the message specifies the signal for the Stream
  *   head to generate.  If the signal is not %SIGPOLL, the signal is sent to the process group
  *   associated with the Stream.  If the signal is %SIGPOLL, the signal is only sent to processes
  *   that have registered for the signal by using the %I_SETSIG ioctl(2).
  *
- *   An %M_SIG message can be used by modules or drivers that wish to insert an explicit inband
+ *   An %M_SIG message can be used by modules or drivers that wish to insert an explicit in-band
  *   signal into a message stream.  For example, this message can be sent to the user process
  *   immediately before a particular service interface message to gain the immediate attention of
  *   the user process.  When the %M_SIG message reaches the head of the Stream head read queue, a
@@ -1738,13 +2024,9 @@ strsignal(struct stdata *sd, mblk_t *mp)
 
 	if (sig == SIGPOLL)
 		strevent(sd, S_MSG, band);
-	else if (test_bit(STRISTTY_BIT, &sd->sd_flag) || sd->sd_pgrp > 0)
+	else if (test_bit(STRISTTY_BIT, &sd->sd_flag) || sd->sd_pgrp)
 		/* Note: to send SIGHUP to the session leader, use M_HANGUP. */
-#ifdef HAVE_KILL_PGRP_SYMBOL
-		kill_pgrp(task_pgrp(current), sig, 1);
-#else
 		kill_pg(sd->sd_pgrp, sig, 1);
-#endif
 	freemsg(mp);
 }
 
@@ -3402,75 +3684,6 @@ strunlink(struct stdata *stp)
 	}
 }
 
-#if !defined HAVE_KILL_SL_EXPORT
-#if !defined HAVE_KILL_SL_ADDR
-STATIC __unlikely int
-__kill_sl_info(int sig, struct siginfo *info, pid_t sess)
-{
-	struct task_struct *p;
-	int retval = -ESRCH;
-
-#ifdef HAVE_KMACRO_DO_EACH_PID_TASK
-	struct pid *pid;
-
-	if ((pid = find_pid(sess))) {
-		do_each_pid_task(pid, PIDTYPE_SID, p) {
-			int err;
-
-			if (!p->signal->leader)
-				continue;
-#if defined(HAVE_GROUP_SEND_SIG_INFO_SYMBOL)
-			err = group_send_sig_info(sig, info, p);
-#elif defined(HAVE_SEND_GROUP_SIG_INFO_SYMBOL)
-			err = send_group_sig_info(sig, info, p);
-#else
-#error Need a way of sending a signal to a group.
-#endif
-			if (retval)
-				retval = err;
-		}
-		while_each_pid_task(pid, PIDTYPE_SID, p);
-	}
-#else
-	do_each_task_pid(sess, PIDTYPE_SID, p) {
-		int err;
-
-		if (!p->signal->leader)
-			continue;
-#if defined(HAVE_GROUP_SEND_SIG_INFO_SYMBOL)
-		err = group_send_sig_info(sig, info, p);
-#elif defined(HAVE_SEND_GROUP_SIG_INFO_SYMBOL)
-		err = send_group_sig_info(sig, info, p);
-#else
-#error Need a way of sending a signal to a group.
-#endif
-		if (retval)
-			retval = err;
-	}
-	while_each_task_pid(sess, PIDTYPE_SID, p);
-#endif
-	return (retval);
-}
-
-__unlikely int
-kill_sl_info(int sig, struct siginfo *info, pid_t sess)
-{
-	int error;
-
-	read_lock(&tasklist_lock);
-	error = __kill_sl_info(sig, info, sess);
-	read_unlock(&tasklist_lock);
-	return (error);
-}
-
-__unlikely int
-kill_sl(pid_t sess, int sig, int priv)
-{
-	return kill_sl_info(sig, (void *) (long) (priv != 0), sess);
-}
-#endif
-#endif
-
 /**
  *  strinccounts:   - increment open counts
  *  @sd:	STREAM head
@@ -4349,10 +4562,10 @@ strfasync(int fd, struct file *file, int on)
 		if (likely((err = straccess_rlock(sd, FNDELAY)) == 0)) {
 			if ((err = fasync_helper(fd, file, on, &sd->sd_fasync)) >= 0 && on) {
 #ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
-				f_setown(file, sd->sd_pgrp, 0);
+				f_setown(file, -pid_nr(sd->sd_pgrp), 0);
 #else				/* HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE */
 				if (file->f_owner.pid == 0) {
-					file->f_owner.pid = (-sd->sd_pgrp) ? : current->pid;
+					file->f_owner.pid = (-pid_nr(sd->sd_pgrp)) ? : current->pid;
 					file->f_owner.uid = current->uid;
 					file->f_owner.euid = current->euid;
 				}
@@ -4542,8 +4755,8 @@ strwaithlist(struct stdata *sd, queue_t *q, const int f_flags)
  *  stream head and sent downstream for a read(2) system call if no messages are waiting to be read
  *  at the stream head and if read notification has been enabled.  Read notification is enabled with
  *  SO_MREADON flag of M_SETOPTS message and disabled by use of the SO_MREADOFF flag.   The message
- *  content is set to the value of the nbyte paramter (the number of bytes to be read) in the
- *  read(2) call.  M_READ is intended to notify modules and drivers of the occurence of a read.  It
+ *  content is set to the value of the nbyte parameter (the number of bytes to be read) in the
+ *  read(2) call.  M_READ is intended to notify modules and drivers of the occurrence of a read.  It
  *  is also intended to support communication between streams that reside in separate processors.
  *  The use of the M_READ message is developer dependent.  Modules may take specific action and pass
  *  on or free the M_READ message.  Modules that do not recognize this message must pass it on.  All
@@ -4811,7 +5024,7 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
  *  data on the stream.  A subsequent read reads the marked data.  Whether a message on the stream
  *  head is marked can be determined by the user with the %I_ATMARK ioctl(2) command.
  *
- *  In addition, read() shall fail if the STREAM head had processing an asyncrhonous error before
+ *  In addition, read() shall fail if the STREAM head had processing an asynchronous error before
  *  the call.  In this case, the value of errno(3) shall not reflect the result of read(), but
  *  reflect the prior error.  If a hangup occurs on the STREAM being read, read() shall continue to
  *  operate normally until the STREAM head read queue is empty.  Thereafter, it shall return 0.
@@ -4829,7 +5042,7 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
  *	The read operation was terminated due to the receipt of a signal, and no data was
  *	transferred.
  *  [%EINVAL]
- *	The STREAM or multiplexer referenced by @file is linked (direclty or indirectly) downstream
+ *	The STREAM or multiplexer referenced by @file is linked (directly or indirectly) downstream
  *	from a multiplexer.
  *  [%EIO]
  *	The process is a member of a background process attempting to read from its controlling
@@ -4854,11 +5067,11 @@ strwaitgetq(struct stdata *sd, queue_t *q, const int f_flags, const int flags, c
  *  %RFILL (AIX only)
  *	Read mode.  This mode prevents completion of any read(2) request until one of three
  *	conditions occurs: 1) the entire user buffer is filled; 2) An end of file occurs; or, 3) the
- *	stream head receits an M_MI_READ_END message.
+ *	stream head receipts an M_MI_READ_END message.
  *
  *	Several control messages support the %RFILL mode.  They are used by modules to manipulate
- *	data being placed in user buffers at the stream head.  These messages are muliplexed under a
- *	single M_MI message type.  THe message subtype, pointed to by the b_rptr member is one of
+ *	data being placed in user buffers at the stream head.  These messages are multiplexed under
+ *	a single M_MI message type.  THe message subtype, pointed to by the b_rptr member is one of
  *	the following:
  *
  *	%M_MI_READ_SEEK
@@ -5123,20 +5336,20 @@ _strread(struct file *file, char __user *buf, size_t len, loff_t *ppos)
  *  @buf: user buffer
  *  @nbytes: total bytes
  *
- *  DESCRIPTION:  Performs the message coallescing feature of SVR 4.  If we can fit the write into
+ *  DESCRIPTION:  Performs the message coalescing feature of SVR 4.  If we can fit the write into
  *  an existing buffer on sd_wq, then add it to the end and let it go.  If there is one there and we
  *  can't fit our write into it, we still have to let it go (but that will by done by strwput()
  *  later).
  *
  *  A little variation on a theme: more like Nagle.  Do not wait for downstream congestion first.
- *  If, after coallescing the writes, we are downstream flow controlled, there is no reason not to
- *  coallesce another write into the same block.  That is, the block can be released out of the
+ *  If, after coalescing the writes, we are downstream flow controlled, there is no reason not to
+ *  coalesce another write into the same block.  That is, the block can be released out of the
  *  write service procedure as normal (that is, if we had a normal write service procedure).  The
  *  write service procedure will be invoked when the scanqhead timer goes off (via qenable()) or
  *  the write queue is backenabled due to downstream flow control subsiding (via qbackenable()).
  *
  *  RETURN: Returns a (negative) error number, zero (0) when there was nothing written, otherwise a
- *  postive integer indicated the amount of data written (which should always be nbytes).
+ *  positive integer indicated the amount of data written (which should always be nbytes).
  *
  *  LOCKING: Called with a Stream head read lock.  Release it before sleeping.
  */
@@ -6057,7 +6270,12 @@ _strgetpmsg(struct file *file, struct strbuf __user *ctlp, struct strbuf __user 
 STATIC streams_fastcall __unlikely int
 strfattach(struct file *file, const char *path)
 {
-#if defined HAVE_KERNEL_FATTACH_SUPPORT
+#if defined HAVE_KERNEL_FATTACH_SUPPORT && \
+    (!defined CONFIG_KERNEL_WEAK_MODULES || ( \
+     ((!defined HAVE_NAMESPACE_SEM_SYMBOL && \
+       (!defined HAVE_MOUNT_SEM_SYMBOL || defined HAVE_MOUNT_SEM_EXPORT) ) || \
+      defined HAVE_NAMESPACE_SEM_SYMBOL) && \
+     defined HAVE_CLONE_MNT_EXPORT && defined HAVE_GRAFT_TREE_EXPORT && defined HAVE_DO_UMOUNT_EXPORT))
 	return do_fattach(file, path);	/* see strattach.c */
 #else
 	return (-ENOSYS);
@@ -6071,7 +6289,12 @@ strfattach(struct file *file, const char *path)
 STATIC streams_fastcall __unlikely int
 strfdetach(const char *path)
 {
-#if defined HAVE_KERNEL_FATTACH_SUPPORT
+#if defined HAVE_KERNEL_FATTACH_SUPPORT && \
+    (!defined CONFIG_KERNEL_WEAK_MODULES || ( \
+     ((!defined HAVE_NAMESPACE_SEM_SYMBOL && \
+       (!defined HAVE_MOUNT_SEM_SYMBOL || defined HAVE_MOUNT_SEM_EXPORT) ) || \
+      defined HAVE_NAMESPACE_SEM_SYMBOL) && \
+     defined HAVE_CLONE_MNT_EXPORT && defined HAVE_GRAFT_TREE_EXPORT && defined HAVE_DO_UMOUNT_EXPORT))
 	return do_fdetach(path);	/* see strattach.c */
 #else
 	return (-ENOSYS);
@@ -6091,7 +6314,7 @@ strfdetach(const char *path)
  *  -------------------------------------------------------------------------
  *  Some TTY IO controls can be handled directly by the STREAM head.  Others that are known to the
  *  STREAM head are converted into %I_STR %M_IOCTL and passed downstream.  Others that are unknown to
- *  the STREAM head are convered to %TRANSPARENT %M_IOCTL and passed downstream.
+ *  the STREAM head are converted to %TRANSPARENT %M_IOCTL and passed downstream.
  */
 
 /**
@@ -6102,9 +6325,9 @@ tty_tiocgsid(const struct file *file, struct stdata *sd, unsigned long arg)
 {
 	if (!test_bit(STRISTTY_BIT, &sd->sd_flag))
 		return (-ENOTTY);
-	if (sd->sd_session <= 0)
+	if (pid_nr(sd->sd_session) <= 0)
 		return (-ENOTTY);
-	return put_user(sd->sd_session, (pid_t *) arg);
+	return put_user(pid_nr(sd->sd_session), (pid_t *) arg);
 }
 
 #ifdef WITH_32BIT_CONVERSION
@@ -6132,12 +6355,11 @@ tty_tiocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 #endif
 	/* Don't error on a hung up Stream. */
 	if ((err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0) {
-		pid_t pgrp;
+		pid_t pgrp = pid_nr(sd->sd_pgrp);
 
-		pgrp = sd->sd_pgrp;
 		srunlock(sd);
 
-		err = put_user(sd->sd_pgrp, (pid_t *) arg);
+		err = put_user(pgrp, (pid_t *) arg);
 	}
 	return (err);
 }
@@ -6165,18 +6387,21 @@ tty_tiocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 	/* processes can set this on a non-controlling tty */
 	if (!test_bit(STRISTTY_BIT, &sd->sd_flag))
 		return (-ENOTTY);
-	if (sd->sd_session != str_task_session(current))
+	if (pid_nr(sd->sd_session) != current_session())
 		return (-ENOTTY);
 #endif
 	if (get_user(pgrp, (pid_t *) arg))
 		return (-EFAULT);
 	if (pgrp < 0)
 		return (-EINVAL);
+#ifdef HAVE_SESSION_OF_PGRP_USABLE
 	/* signals cannot be sent to other process groups */
-	if (pgrp_session(pgrp) != str_task_session(current))
+	if (pgrp_session(pgrp) != current_session())
 		return (-EPERM);
+#endif
 	if ((err = straccess_wlock(sd, FEXCL)) == 0) {
-		sd->sd_pgrp = pgrp;
+		put_pid(sd->sd_pgrp);
+		sd->sd_pgrp = get_pid(find_pid(pgrp));
 		swunlock(sd);
 	}
 	return (err);
@@ -6230,9 +6455,8 @@ sock_siocgpgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 		return (-ENOTSOCK);
 	/* Don't error on a hung up Stream. */
 	if ((err = straccess_rlock(sd, (FREAD | FNDELAY))) == 0) {
-		pid_t pgrp;
+		pid_t pgrp = pid_nr(sd->sd_pgrp);
 
-		pgrp = sd->sd_pgrp;
 		srunlock(sd);
 
 		err = put_user(pgrp, (pid_t *) arg);
@@ -6261,11 +6485,14 @@ sock_siocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 		return (-EFAULT);
 	if (pgrp < 0)
 		return (-EINVAL);
+#ifdef HAVE_SESSION_OF_PGRP_USABLE
 	/* signals cannot be sent to other process groups */
-	if (pgrp_session(pgrp) != str_task_session(current))
+	if (pgrp_session(pgrp) != current_session())
 		return (-EPERM);
+#endif
 	if ((err = straccess_wlock(sd, FEXCL)) == 0) {
-		sd->sd_pgrp = pgrp;
+		put_pid(sd->sd_pgrp);
+		sd->sd_pgrp = get_pid(find_pid(pgrp));
 		swunlock(sd);
 	}
 	return (err);
@@ -6336,7 +6563,8 @@ file_fiosetown(struct file *file, struct stdata *sd, unsigned long arg)
 		if (get_user(owner, (pid_t *) arg))
 			return (-EFAULT);
 		if ((err = straccess_wlock(sd, FEXCL))) {
-			sd->sd_pgrp = (owner < 0) ? -owner : 0;
+			put_pid(sd->sd_pgrp);
+			sd->sd_pgrp = get_pid(find_pid((owner < 0) ? -owner : 0));
 			swunlock(sd);
 #ifdef HAVE_KMEMB_STRUCT_FOWN_STRUCT_PID_TYPE
 			f_setown(file, owner, 1);
@@ -6480,7 +6708,7 @@ str_i_atmark(const struct file *file, struct stdata *sd, unsigned long arg)
  *
  *  Any of the errors returned by putpmsg(2s) may be returned in errno(3).  Any error recieved in an
  *  %M_ERROR message indicating a write side error for the stream will be returned in errno(3).  See
- *  straccess() for additional errrors.
+ *  straccess() for additional errors.
  *
  *  LOCKING: str_i_canput() must be called with the stream head read or write lock held across the
  *  call to protect the stream head structure and queues as well as the q->q_next pointers along the
@@ -7356,7 +7584,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
  *  on success and a negative error number on failure.
  *
  *  This command uses an implementation-defined default timeout interval.  The
- *  implementation-defined timeout interval for STREAMShas historically been 15 seconds.
+ *  implementation-defined timeout interval for STREAMS has historically been 15 seconds.
  *
  *  str_i_link() shall fail if:
  *
@@ -7381,7 +7609,7 @@ str_i_xlink(const struct file *file, struct stdata *mux, unsigned long arg, cons
  *  An %I_LINK operation can also fail while waiting for the multiplexing driver to acknowledge the
  *  request, if a message indicating an error or a hangup is received at the STREAM head of @file.
  *  In addition, an error code can be returned in the positive or negative acknowledgement message.
- *  For these cases, %I_LINK failes with errno(3) set tot he value in the message.
+ *  For these cases, %I_LINK fails with errno(3) set to the value in the message.
  */
 STATIC streams_fastcall int
 str_i_link(const struct file *file, struct stdata *sd, unsigned long arg)
@@ -7414,7 +7642,7 @@ str_i_link32(const struct file *file, struct stdata *sd, unsigned long arg)
  *  failure.
  *
  *  This command uses an implementation-defined default timeout interval.  The
- *  implementation-defined timeout interval for STREAMShas historically been 15 seconds.
+ *  implementation-defined timeout interval for STREAMS has historically been 15 seconds.
  *
  *  str_i_plink() shall fail if:
  *
@@ -7564,7 +7792,7 @@ str_i_xunlink(struct file *file, struct stdata *mux, unsigned long index, const 
  *  be disconnected.  As in %I_LINK, this command requires acknowledgement.
  *
  *  This command uses an implementation-defined default timeout interval.  The
- *  implementation-defined timeout interval for STREAMShas historically been 15 seconds.
+ *  implementation-defined timeout interval for STREAMS has historically been 15 seconds.
  *
  *  The ioctl() function with the %I_UNLINK command shall fail if:
  *
@@ -7603,7 +7831,7 @@ str_i_unlink32(struct file *file, struct stdata *sd, unsigned long arg)
  *  @arg: ioctl argument
  *
  *  This command uses an implementation-defined default timeout interval.  The
- *  implementation-defined timeout interval for STREAMShas historically been 15 seconds.
+ *  implementation-defined timeout interval for STREAMS has historically been 15 seconds.
  */
 STATIC streams_fastcall int
 str_i_punlink(struct file *file, struct stdata *sd, unsigned long arg)
@@ -8006,8 +8234,10 @@ str_i_push(struct file *file, struct stdata *sd, unsigned long arg)
 						   O_NOCTTY was set in oflag on open. */
 						/* This is also where sd_session and sd_pgrp
 						   members are initialized to appropriate values */
-						sd->sd_session = str_task_session(current);
-						sd->sd_pgrp = str_task_pgrp(current);
+						put_pid(sd->sd_session);
+						sd->sd_session = get_pid(current_sid());
+						put_pid(sd->sd_pgrp);
+						sd->sd_pgrp = get_pid(current_pgid());
 					}
 				} else {
 					/* POSIX says ENXIO on module open function failure. (And
@@ -8186,7 +8416,7 @@ str_i_sendfd(const struct file *file, struct stdata *sd, unsigned long arg)
 		mp->b_datap->db_type = M_PASSFP;
 		mp->b_rptr = mp->b_wptr = (unsigned char *) &mp->b_datap->db_frtnp->free_arg;
 		mp->b_wptr += sizeof(caddr_t);
-		/* XXX: put with locks held gernally is a bad idea */
+		/* XXX: put with locks held generally is a bad idea */
 		/* XXX: but this places the M_PASSFP on the other Stream head's read queue */
 		put(s2->sd_rq, mp);
 		err = 0;
@@ -8235,14 +8465,14 @@ __str_i_recvfd(const struct file *file, struct stdata *sd, struct strrecvfd *sr)
 #if defined HAVE_KMEMB_STRUCT_FILE_F_UID
 			sr->uid = f2->f_uid;
 #elif defined HAVE_KMEMB_STRUCT_FILE_F_CRED
-                        sr->uid = f2->f_cred->uid;
+			sr->uid = f2->f_cred->uid;
 #else
 #error Do not know how to get file uid.
 #endif
 #if defined HAVE_KMEMB_STRUCT_FILE_F_GID
 			sr->gid = f2->f_gid;
 #elif defined HAVE_KMEMB_STRUCT_FILE_F_CRED
-                        sr->gid = f2->f_cred->gid;
+			sr->gid = f2->f_cred->gid;
 #else
 #error Do not know how to get file gid.
 #endif
@@ -9531,7 +9761,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
 /**
  *  strioctl: - ioctl file operation for a stream
  *  @inode: shadow special filsystem device inode
- *  @file: shadown special filesystem file pointer
+ *  @file: shadow special filesystem file pointer
  *  @cmd: ioctl command
  *  @arg: ioctl arg
  *
@@ -9547,7 +9777,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
  *  When taking a reference to the stream head, it is acquired from the specfs filesystem inode.
  *  Because it is (vaguely) possible that the stream head has been detached while a reference to the
  *  inode still exists, we take a reference to the stream head.  This ensures that the stream head
- *  is not deallocted until we release our reference.
+ *  is not deallocated until we release our reference.
  *
  *  When processing any system call, we must decide first off if we need to change anything in the
  *  stdata structure, change sd_wq or sd_rq pointers, or change any q->q_next pointer in the entire
@@ -9557,7 +9787,7 @@ strioctl_compat(struct file *file, unsigned int cmd, unsigned long arg)
  *  After acquiring either lock, we need to check the sd->sd_wq->q_next pointer if we intend to put
  *  any messages to the stream.  For the sd->sd_wq->q_next pointer we can alternately check the
  *  %STRHUP flag, which is set whenever the driver has detached.  (The stream head write lock is
- *  aquired before setting this flag.)  This flag also protects the sd->sd_other pointer that is
+ *  acquired before setting this flag.)  This flag also protects the sd->sd_other pointer that is
  *  used to point to the stream head at the other end of a pipe (i.e., when %STRISPIPE is
  *  set).
  */
@@ -10544,8 +10774,8 @@ strwput(queue_t *q, mblk_t *mp)
 				   only putq() here when getq() above fails, if we enableok() the
 				   write service procedure, this would schedule the service
 				   procedure to run.  Then if another write occurs before the
-				   service procedure runs, it will be coallesced.  Many fast small
-				   writes will be coallesced without delaying. If the qscan() is
+				   service procedure runs, it will be coalesced.  Many fast small
+				   writes will be coalesced without delaying. If the qscan() is
 				   activated, the QENAB bit will be held and putq() below will not
 				   schedule the service procedure, and the service procedure will
 				   wait for the timer to expire. */
@@ -10679,13 +10909,13 @@ str_m_pcproto(struct stdata *sd, queue_t *q, mblk_t *mp)
  *  set, indicating than an M_PCPROTO message is already present, the new message is discarded.  The
  *  relevant processes are then woken up or signalled.
  *
- *  Note that it is always possible to coallesce messages on the read queue (similar to the STRHOLD
+ *  Note that it is always possible to coalesce messages on the read queue (similar to the STRHOLD
  *  feature on the write queue).  If there is an existing, non-zero length M_DATA message without
  *  MSGDELIM set on the read queue at the back of the same queue band, that has room left in it to
  *  hold the entire incoming message, copy the contents to the existing message, adjust counts and
  *  release the message block.  If we are in read fill mode, we want all data blocks linked to the
  *  same message and so add the M_DATA on the b_cont (instead of the b_next) for read fill mode. We
- *  break out a special version of putq() here that performs this coallescing function.
+ *  break out a special version of putq() here that performs this coalescing function.
  *
  *  STREAMS events for M_DATA and M_PROTO messages are issued when the message is placed on the
  *  queue not when the message arrives at the head of the read queue.  In contrast, we only wake
@@ -11183,7 +11413,7 @@ str_m_other(struct stdata *sd, queue_t *q, mblk_t *mp)
  *  queues, meaning that put calls are never deferred.
  *
  *  NOTICES: Note that there is no read service procedure, even though we put to the queue.  This is
- *  ok because we are at the end of the stream, so our QFULL and QBFULL flags will still be checked
+ *  OK because we are at the end of the stream, so our QFULL and QBFULL flags will still be checked
  *  and failure returned to (and QWANTW and QBWANTW flags set by) canput() and bcanput() in the
  *  proper circumstances, meaning the back-enabling will occur when getq() and rmvq() are called.
  *

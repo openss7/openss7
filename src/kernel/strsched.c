@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:43 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-26 04:28:48 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-02-07 04:54:43 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 1.1.2.7  2011-03-26 04:28:48  brian
+ - updates to build process
+
  Revision 1.1.2.6  2011-02-07 04:54:43  brian
  - code updates for new distro support
 
@@ -72,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:43 $";
+static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-26 04:28:48 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -4636,6 +4639,41 @@ EXPORT_SYMBOL(kmem_alloc);	/* include/sys/openss7/kmem.h */
 #undef kmem_alloc
 #endif
 
+#ifndef HAVE_KSIZE_USABLE
+/* Linux memory allocators always round up to the next power of 2.  We can use the slop. */
+STATIC streams_inline streams_fastcall uint
+kmem_zalloc_nextpower(uint y)
+{
+	uint r = 32;
+	uint x = y;
+
+	if (!(x & 0xffff0000)) {
+		x <<= 16;
+		r -= 16;
+	}
+	if (!(x & 0xff000000)) {
+		x <<= 8;
+		r -= 8;
+	}
+	if (!(x & 0xf0000000)) {
+		x <<= 4;
+		r -= 4;
+	}
+	if (!(x & 0xc0000000)) {
+		x <<= 2;
+		r -= 2;
+	}
+	if (!(x & 0x80000000)) {
+		x <<= 1;
+		r -= 1;
+	}
+	if (!(x & 0x7fffffff)) {
+		r -= 1;
+	}
+	return (1 << r);
+}
+#endif
+
 #ifdef HAVE_KMEM_ZALLOC_EXPORT
 #undef kmem_zalloc
 #define kmem_zalloc kmem_zalloc_
@@ -4651,11 +4689,11 @@ kmem_zalloc(size_t size, int flags)
 	void *mem;
 
 	if ((mem = kmem_alloc(size, flags)))
-#if defined HAVE_KFUNC_KSIZE
+#ifdef HAVE_KSIZE_USABLE
 		/* newer kernels can tell us how big a memory object truly is */
 		memset(mem, 0, ksize(mem));
 #else
-		memset(mem, 0, size);
+		memset(mem, 0, kmem_zalloc_nextpower(size));
 #endif
 	return (mem);
 }
@@ -5721,21 +5759,6 @@ kstreamd(void *__bind_cpu)
 {
 	struct strthread *t = this_thread;
 
-#ifndef HAVE_KTHREAD_SHOULD_STOP_EXPORT
-#ifdef HAVE_KTHREAD_SHOULD_STOP_ADDR
-#if 0
-	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
-	static const typeof(&kthread_should_stop) kthread_should_stop_funcp =
-	    (void *) HAVE_KTHREAD_SHOULD_STOP_ADDR;
-
-#define kthread_should_stop (*kthread_should_stop_funcp)
-#else
-__asm__(".equ " __stringify(kthread_should_stop) "," __stringify(HAVE_KTHREAD_SHOULD_STOP_ADDR));
-__asm__(".type " __stringify(kthread_should_stop) ",@function");
-#endif
-#endif
-#endif
-
 #ifdef PF_NOFREEZE
 	current->flags |= PF_NOFREEZE;
 #endif
@@ -5893,49 +5916,6 @@ str_cpu_callback(struct notifier_block *nfb, unsigned long action, void *hcpu)
 	struct strthread *t = &strthreads[cpu];
 	struct task_struct *p = t->proc;
 
-#ifndef HAVE_KTHREAD_CREATE_EXPORT
-#ifdef HAVE_KTHREAD_CREATE_ADDR
-#if 0
-	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
-	static const typeof(&kthread_create) kthread_create_funcp =
-	    (void *) HAVE_KTHREAD_CREATE_ADDR;
-
-#define kthread_create(w, x, y, z) (*kthread_create_funcp)(w, x, y, z)
-#else
-__asm__(".equ " __stringify(kthread_create) "," __stringify(HAVE_KTHREAD_CREATE_ADDR));
-__asm__(".type " __stringify(kthread_create) ",@function");
-#endif
-#endif
-#endif
-#ifndef HAVE_KTHREAD_BIND_EXPORT
-#ifdef HAVE_KTHREAD_BIND_ADDR
-#if 0
-	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
-	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
-
-#define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
-#else
-__asm__(".equ " __stringify(kthread_bind) "," __stringify(HAVE_KTHREAD_BIND_ADDR));
-__asm__(".type " __stringify(kthread_bind) ",@function");
-#endif
-#endif
-#endif
-#if defined CONFIG_HOTPLUG_CPU
-#ifndef HAVE_KTHREAD_STOP_EXPORT
-#ifdef HAVE_KTHREAD_STOP_ADDR
-#if 0
-	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
-	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
-
-#define kthread_stop(x) (*kthread_stop_funcp)(x)
-#else
-__asm__(".equ " __stringify(kthread_stop) "," __stringify(HAVE_KTHREAD_STOP_ADDR));
-__asm__(".type " __stringify(kthread_stop) ",@function");
-#endif
-#endif
-#endif
-#endif
-
 	switch (action) {
 	case CPU_UP_PREPARE:
 		if (IS_ERR(p = kthread_create(kstreamd, hcpu, "kstreamd/%d", cpu))) {
@@ -6025,35 +6005,6 @@ STATIC __unlikely void
 kill_kstreamd(void)
 {
 	int cpu;
-
-#if 0
-#ifndef HAVE_KTHREAD_BIND_EXPORT
-#ifdef HAVE_KTHREAD_BIND_ADDR
-#if 0
-	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
-	static const typeof(&kthread_bind) kthread_bind_funcp = (void *) HAVE_KTHREAD_BIND_ADDR;
-
-#define kthread_bind(x, y) (*kthread_bind_funcp)(x, y)
-#else
-__asm__(".equ " __stringify(kthread_bind) "," __stringify(HAVE_KTHREAD_BIND_ADDR));
-__asm__(".type " __stringify(kthread_bind) ",@function");
-#endif
-#endif
-#endif
-#endif
-#ifndef HAVE_KTHREAD_STOP_EXPORT
-#ifdef HAVE_KTHREAD_STOP_ADDR
-#if 0
-	/* SLES 2.6.5 takes the prize for kernel developer stupidity! */
-	static const typeof(&kthread_stop) kthread_stop_funcp = (void *) HAVE_KTHREAD_STOP_ADDR;
-
-#define kthread_stop(x) (*kthread_stop_funcp)(x)
-#else
-__asm__(".equ " __stringify(kthread_stop) "," __stringify(HAVE_KTHREAD_STOP_ADDR));
-__asm__(".type " __stringify(kthread_stop) ",@function");
-#endif
-#endif
-#endif
 
 	for (cpu = 0; cpu < NR_CPUS; cpu++) {
 		struct strthread *t = &strthreads[cpu];

@@ -1,6 +1,6 @@
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2011-03-17 07:01:26 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2011-03-26 04:28:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-17 07:01:26 $ by $Author: brian $
+# Last Modified $Date: 2011-03-26 04:28:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -118,6 +118,9 @@ KERNEL_OBJECTS			=
 KERNEL_MODULES			=
 
 ## =====================================================================
+if CONFIG_STREAMS_WEAK_MODULES
+else
+## !CONFIG_STREAMS_WEAK_MODULES
 if CONFIG_STREAMS_WRAPPER_MODULE
 ## CONFIG_STREAMS_WRAPPER_MODULE
 
@@ -141,6 +144,8 @@ wrapper.o: stamp-verobjs
 	$(LD) -r -o $@ $$list
 
 ## CONFIG_STREAMS_WRAPPER_MODULE
+endif
+## !CONFIG_STREAMS_WEAK_MODULES
 endif
 ## =====================================================================
 
@@ -3049,6 +3054,9 @@ MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.19  2011-03-26 04:28:44  brian
+# - updates to build process
+#
 # Revision 1.1.2.18  2011-03-17 07:01:26  brian
 # - build and repo system improvements
 #

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-01-12 04:10:30 $
+ @(#) $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:47 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
+ Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp.c,v $
+ Revision 1.1.2.8  2011-03-26 04:28:47  brian
+ - updates to build process
+
  Revision 1.1.2.7  2011-01-12 04:10:30  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -75,7 +78,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-01-12 04:10:30 $";
+static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:47 $";
 
 /*
  *  This driver provides a somewhat different approach to UDP that the inet
@@ -137,7 +140,7 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.7 $)
 #include <linux/netfilter_ipv4.h>
 #endif				/* LINUX */
 
-#include "udp_hooks.h"
+#include "net_hooks.h"
 
 #include <sys/npi.h>
 #include <sys/npi_ip.h>
@@ -155,8 +158,8 @@ static char const ident[] = "$RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.7 $)
 
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-01-12 04:10:30 $"
+#define TP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
+#define TP_REVISION	"OpenSS7 $RCSfile: udp.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:47 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS UDP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"
@@ -3667,83 +3670,6 @@ tp_v4_err_next(struct sk_buff *skb, __u32 info)
 	return;
 }
 
-#ifndef CONFIG_SMP
-#define net_protocol_lock() local_bh_disable()
-#define net_protocol_unlock() local_bh_enable()
-#else				/* CONFIG_SMP */
-#ifdef HAVE_INET_PROTO_LOCK_SYMBOL
-extern spinlock_t inet_proto_lock;
-#define net_protocol_lock() spin_lock_bh(&inet_proto_lock)
-#define net_protocol_unlock() spin_unlock_bh(&inet_proto_lock)
-#else
-#define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
-#define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
-#endif
-#endif				/* CONFIG_SMP */
-#ifdef HAVE_INET_PROTOS_SYMBOL
-STATIC struct mynet_protocol **inet_protosp = (void *)&inet_protos;
-#endif
-
-#ifdef HAVE___MODULE_ADDRESS_EXPORT
-static struct module *module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
-    defined HAVE_MODULES_SYMBOL
-extern struct list_head modules;
-static struct module *
-__module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	list_for_each_entry_rcu(mod, &modules, list) {
-		if (((void *)addr >= (void *)mod->module_init &&
-		     (void *)addr <  (void *)mod->module_init + mod->init_size)
-		    || ((void *)addr >= (void *)mod->module_core &&
-			(void *)addr <  (void *)mod->module_core + mod->core_size)) {
-			return mod;
-		}
-	}
-	return NULL;
-}
-static struct module *module_address(unsigned long addr )
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
-static struct module *module_address(unsigned long addr)
-{
-	return module_text_address(addr);
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
-static struct module *module_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_text_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-#else
-#undef HAVE_MODULE_ADDRESS_SYMBOL
-#endif
-
 /**
  * tp_init_nproto - initialize network protocol override
  * @proto: the protocol to register or override
@@ -4242,6 +4168,7 @@ tp_alloc_skb_slow(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	return (skb);
 }
 
+#ifdef HAVE_SKBUFF_HEAD_CACHE_USABLE
 extern kmem_cachep_t skbuff_head_cache;
 
 /**
@@ -4439,6 +4366,7 @@ tp_alloc_skb_old(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
       go_slow:
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }
+#endif
 
 STATIC INLINE fastcall __hot_out struct sk_buff *
 tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
@@ -4468,7 +4396,9 @@ tp_alloc_skb(struct tp *tp, mblk_t *mp, unsigned int headroom, int gfp)
 	freemsg(mp);
 	return (skb);
       old_way:
+#ifdef HAVE_SKBUFF_HEAD_CACHE_USABLE
 	return tp_alloc_skb_old(tp, mp, headroom, gfp);
+#endif
       go_slow:
 	return tp_alloc_skb_slow(tp, mp, headroom, gfp);
 }

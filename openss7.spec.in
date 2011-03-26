@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.21 $) $Date: 2011-03-17 07:01:27 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.22 $) $Date: 2011-03-26 04:28:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
+# Last Modified $Date: 2011-03-26 04:28:44 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -569,7 +569,7 @@
 %{!?VIRT_lib:   %{expand: %%global VIRT_lib        0}}
 %{!?VIRT_devel: %{expand: %%global VIRT_devel      0}}
 %{!?VIRT_debug: %{expand: %%global VIRT_debug      0}}
-%{!?VIRT_wrap:  %{expand: %%gloabl VIRT_wrap       0}}
+%{!?VIRT_wrap:  %{expand: %%global VIRT_wrap       0}}
 %{!?VIRT_kmod:  %{expand: %%global VIRT_kmod       0}}
 %{!?VIRT_kdev:  %{expand: %%global VIRT_kdev       0}}
 %{!?VIRT_kbug:  %{expand: %%global VIRT_kbug       0}}
@@ -4995,6 +4995,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.22  2011-03-26 04:28:44  brian
+# - updates to build process
+#
 # Revision 1.1.2.21  2011-03-17 07:01:27  brian
 # - build and repo system improvements
 #
