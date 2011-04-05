@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $
+ @(#) $RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-05 16:35:12 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np.c,v $
+ Revision 1.1.2.6  2011-04-05 16:35:12  brian
+ - weak module design
+
  Revision 1.1.2.5  2011-03-26 04:28:46  brian
  - updates to build process
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $";
+static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-05 16:35:12 $";
 
 /*
  *  This multiplexing driver is a master device driver for Network Provider streams presenting a
@@ -103,14 +106,12 @@ static char const ident[] = "$RCSfile: np.c,v $ $Name:  $($Revision: 1.1.2.5 $) 
 
 #include <sys/npi.h>
 
-#include "module_hooks.h"
-
 #include "np.h"
 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np.c,v $ $Name:  $ ($Revision: 1.1.2.6 $) $Date: 2011-04-05 16:35:12 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -2571,7 +2572,7 @@ np_ip_init_proto(unsigned char proto)
 	/* reduces to inet_add_protocol() if no protocol registered */
 	spin_lock_bh(inet_proto_lockp);
 	if ((ip->next = inet_protosp[hash]) != NULL) {
-		if ((ip->kmod = module_address(ip->next))
+		if ((ip->kmod = streams_module_address(ip->next))
 		    && ip->kmod != THIS_MODULE) {
 			if (!try_to_get_module(ip->kmod)) {
 				spin_unlock_bh(inet_proto_lockp);

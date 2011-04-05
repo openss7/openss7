@@ -1,5 +1,5 @@
 OpenSS7 -- kernel module notes.  2011-02-12
-$Id: NOTES.kmod,v 1.1.2.2 2011-03-17 07:01:26 brian Exp $
+$Id: NOTES.kmod,v 1.1.2.3 2011-04-05 16:35:10 brian Exp $
 Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
@@ -22,52 +22,268 @@ with an upgraded kernel (typically security updates).  The scripts
   /usr/lib/module-init-tools/weak-modules  (on SuSE)
   /usr/lib/module-init-tools/weak-modules2 (on SuSE)
 
-are used.  OpenSS7 kernel modules cannot have weak-updates applied.  This
-is because, unbeknownst to the kABI approach, our kernel modules may be
-accessing kernel symbols inside the kernel by address (particularly the
-specfs.ko module).  Therefore, the weak update will update exported
-kernel symbols but will break non-exported ones.
+are used.
+OpenSS7 kernel module can have weak-updates applied; however, relinking
+of the ripped kernel symbols is required.  This is because, unbeknownst
+to the kABI approach, our kernel modules may be accessing kernel symbols
+inside the kernel by address (particularly the specfs.ko module).
+Therefore, the weak update will update exported kernel symbols but will
+break non-exported ones unless relinking is performed.
 
 RedHat Approach:
 
-The fedora/redhat form (weak-modules) only performs weak updates for
-kernel modules that are in /lib/modules/$(uname -r)/extra.  Because we
-do not install our kernel modules in extra, the fedora/redhat form will
-not attempt to perform weak-updates on our (openss7) modules.
+--add-kernel
 
-The fedora/redhat form (weak-modules) will, however, attempt to perform
-weak updates on kernel modules (whether under RPM or not) that exist in
-the /lib/modules/$(uname -r)/extra subdirectory.  However, to resolve
-whether a given kernel supports the weak update, the symbols from
-/boot/symvers-$(uname r).gz (i.e. provided "by the kernel and mainline
-modules") are checked against the symbols from the kernel module
-acquired using /sbin/modprobe with the --dump-modversions flag.  The
-issue here is that the /boot/symvers-$(uname -r).gz is simply a
-compressed form of the Module.symvers file generated when the kernel and
-its associated modules are built.  Therefore, if this file is not
-supplemented with STREAMS symbols, modules that depend on STREAMS
-symbols will simply not be updated.  Fedora/redhat provide the symvers
-file in the kernel package, so it should always be available when weak
-updates are performed.  (Weak updates are normally performed in the
-%postin script in the kernel rpm package.)
+  The --add-kernel argument to /sbin/weak-modules is used whenever a
+  kernel is added and runs from the %post scriptlet for the kernel
+  package.  This process relies on the existence of /boot/symvers-
+  $add_krel.gz.  For every other kernel, $krel, that has a
+  /lib/modules/$krel/extra directory, for each module in the
+  /lib/modules/$krel/extra directory, the script attempts to create a
+  /lib/modules/$add_krel/weak-updates/$subpath symbolic link to
+  /lib/modules/$krel/extra/$subpath if the kernel module is compatible.
 
-Therefore, to ensure that the weak-modules process is begin performed
-correctly, it is necessary that we slip STREAMS symbols into the
-/boot/symvers-$(uname -r).gz file.  This can be accomplished by using a
-%triggerin and %triggerun trigger script.  When a kernel is installed,
-the openss7-kernel package triggerin script is triggerred after the
-kernel files have been installed and any %post script run for the
-kernel.  This %post kernel script will include running weak-modules that
-will fail for STREAMS modules.  When the openss7-kernel %triggerin
-script is run, we strap our Module.symvers symbols into
-/boot/symvers-$(uname -r).gz and rerun weak-modules to peform a weak
-module update on any STREAMS modules.  If /boot/symvers-$(uname -r).gz
-does not exist, we can create it by concatenating our System.symvers and
-Module.symvers files from the openss7-kernel package.  We used to place
-these files in the openss7-devel-kernel package, but they need to now be
-moved to the openss7-kernel package.
+  The kernel module is considered compatible when it uses symbols only
+  from /boot/symvers-$add_krel.gz or exported by kernel modules in the
+  /lib/modules/$module_krel/extra directory (which is the
+  /lib/modules/$krel/extra directory in which the module resides when
+  properly installed.  Note that this pretty much assumes that
+  weak-updates will be successful on all of the kernel modules provided
+  in that /extra directory.
+
+  Note that kernels are processed in reverse rpmsort order.  That is,
+  the newest kernels are processed first.  Once the symbolic link has
+  been created, subsequent kernel consideration will not alter it.
+  Therfore, a non-idempotent quirk of the script is that when older
+  kernels are added, weak-updates of kernel modules from kernels newer
+  than the kernel will be preferred over kernel modules of older
+  kernels.
+
+  Note also, that a symbolic link in weak-updates will be created
+  regardless of whether the kernel modules exist in extra.  This relies
+  on modprobe's preference to use a module from extra over the same
+  module in weak-updates.
+
+--remove-kernel
+
+  The --remove-kernel argument to /sbin/weak-modules is used whenever a
+  kernel is removed and runs from the %postun scriptlet for the kernel.
+  This simply removes the weak-updates subdirectory and all of the
+  symbolic links contained within it.
+
+--add-modules
+
+  The --add-modules argument to /sbin/weak-modules is used whenever a
+  kmod package is added and runs from the %post scriptlet for the kmod
+  package.  The script is fed the list of installed kernel modules and
+  contains the full path to each kernel module.  For each kernel module
+  added, the module's kernel release is computed (/sbin/modinfo -F
+  vermagic) as the kernel for which the module was compiled when the
+  file exists, or the /lib/modules/$module_krel/ component of the path.
+  The subpath for the module is formed by stripping 4 directories from
+  its pathname (or null if the module is not installed under
+  /lib/modules/$module_krel).  (This is really just a quirk of the
+  script, because if the modules do not exist in the /extra subdirectory
+  of the kernel for which they are built, the add-kernel and
+  remove-modules operations peformed by the script will fail, even
+  though the add-modules portion will succeed.)
+
+  For each of the kernels other than the kernel for which the module was
+  built, an attempt is made to form a symbolic link between the kernel
+  module and /lib/modules/$krel/weak-updates/$subpath.  Should the
+  symbolic link already exist, and should the kernel for which the
+  existing linked module was built be newer that that of the kernel
+  module being installed, the existing (newer) module is kept.
+  Otherwise, if the module is compatible with the kernel in question,
+  the symbolic link is created (overwritten).
+
+--remove-modules --delete-modules
+
+  The --remove-modules argument to /sbin/weak-modules is used whenever a
+  kmod package is removed and runs from the %post scriptlet for the kmod
+  package.  The script is fed the list of installed kernel modules and
+  contains the full path to each kernel module.   These names are
+  expected to be in the /lib/modules/$module_krel/extra subdirectory.
+  For each of the symbolic links added in the weak-modules directory of
+  each kernel (in reverse version order), the symbolic link is removed
+  when it links to the removed kernel module.  When the --delete-modules
+  argument is not given, the script also attempts to replace the
+  symbolic links with links to older kernel modules belonging to older
+  kernels of the same name.  It also attempts to prune any resulting
+  empty directories.
+  
+OpenSS7 Kernel Modules under RedHat weak-updates:
+
+  Under the current approach, we install our kernel modules under the
+  /extra subdirectory when weak-updates are available on recent
+  redhat-based systems.  We invoke the /sbin/weak-moduels script with
+  --add-modules from %post and --remove-modules from %postun.  We have a
+  trigger script that runs post of a kernel package installation.
+
+  A separate step is required for the kmod package %post, %postun and
+  %triggerpost (on kernel package).  This separate step must walk all of
+  the weak-updates symbolic links that link to openss7 modules and
+  relink any of those that have ripped kernel module symbol references.
+  Any that have kernel references are relinked with the weak-updated
+  kernel's symbols and then moved over the symbolic link.  This ensures
+  that the properly linked kernel module is in place.  It is also
+  possible to perform (check or reperform) this linking from the init
+  scripts when a kernel boots.
+
+  A separate step is also required in the %preun when removing the
+  kernel module package.  This is because the --remove-modules option to
+  /sbin/weak-modules assumes that the entry in weak-modules is a
+  symbolic link to the removed module.  If we do not want to replace (as
+  in --delete-modules option), the files can simply be removed.
+  Otherwise, the original symbolic link must be restored (this is
+  dangerous when performed on the running kernel unless the STREAMS
+  system has been shut down from the init script).
+
+  Because we want to still support non-RPM installs, the specfs init
+  script should check whether relinking is required before inserting the
+  specfs kernel module on boot.  This can also be a backstop in case the
+  non-indempotent weak-modules script misbehaves.
+
+  Also, there is an issue when the openss7 package is installed for
+  other than the running kernel and there does not exist a package for
+  the running kernel.  There is a point it time where the weak-updates
+  links might be to an incompatible kernel module for the running
+  kernel.
+
+Client Kernel Modules under RedHat weak-updates:
+
+  When a client kernel module is installed as an RPM package, all is
+  well provided that the client kernel module RPM is packaged as a kmod
+  package for weak updates.
+
+  The issues arrise when the client kernel modules are simply installed
+  in the /extra subdirectory.  In this case, the interaction with adding
+  and removing kernels and adding and removing openss7 modules are as
+  follows:  (Assume that the client kernel module is installed for a
+  kernel version for which an openss7 package is (or was) installed.)
+
+  1) When a kernel is added, weak updates will be performed on the
+     openss7 modules as well as the client modules.  Once the openss7
+     modules are relinked, there should be no problems.
+
+  2) When the openss7 modules are removed, only the openss7 symbolic
+     links are adjusted.  Therefore, an unloadable client kernel module
+     and its symbolic weak update links will remain.
+
+  3) When the openss7 modules are added, only the openss7 symbolic links
+     are adjusted.  Therefore, any client modules are not added to
+     compatible kernels (because they depended on symbols not present
+     before the openss7 package was added).  To update the links for the
+     client module will either required running --add-modules on those
+     kernel modules.  Note that client modules can only be updated with
+     --add-modules if they reside in the same kernel directory as that
+     for which the openss7 modules are installed (because the script
+     only adds symbols from kernel modules in the /extra subdirectory of
+     the kernel version for which the client module was compiled).
+
+  4) When the openss7 modules are upgraded, only the openss7 symbolic
+     links are affected.  Should the client module not be compatible
+     with the upgraded openss7 modules, it will simply fail to load.
 
 SuSE Approach:
+
+SuSE Code 10 Approach
+
+  The SuSE Code 10 approach uses the /lib/module-init-tools/weak-modules
+  script that is fashioned after the RedHat one.  The differences are as
+  follows:
+
+  - The SuSE Code 10 version uses the /updates kernel module
+    subdirectory instead of the /extra kernel module subdirectory.
+
+  - The SuSE Code 10 version does not have the --delete-modules option
+    and always behaves as though it was not provided.
+
+  - The SuSE Code 10 version appears to have fixed a bug that still
+    remains in the RedHat version of the script when replacing kernel
+    module weak updates during module removal.  The RedHat version
+    checks whether the module is compatible with the kernel for which it
+    was installed instead of the kernel for which it will be updated.
+
+  - The SuSE Code 10 version appears to have introduced the quirk that
+    if the kernel module that is being removed still exists, it will be
+    weak-updated again after the symbolic links for it have been
+    removed.
+
+SuSE Code 11 Approach
+
+  The Code 11 approach uses the /usr/lib/module-init-tools/weak-modules2
+  script.  This script takes the following primary options:
+
+  --add-kernel
+
+    Simply performs the kernel_changed() operation on the added kernel
+    version.
+
+  --remove-kernel
+
+    This simply removes the /lib/modules/$krel/weak-updates
+    subdirectory.
+
+  --add-kernel-modules
+
+    Simply performs the kernel_changed() operation on the kernel to
+    which modules are being added.
+
+  --remove-kernel-modules
+
+    Simply performs the kernel_changed() operation on the kernel from
+    which modules are being removed.
+
+  --add-kmp
+
+    Checks whether there is any old version of the kmp and performs
+    remove_kmp_modules() on the old kmp (if any) and add_kmp_modules()
+    on the new kmp, for each kernel version present.
+
+  --remove-kmp
+
+    Checks whether there is any old version of the kmp and performs
+    remove_kmp_modules() on the removed version and add_kmp_modules() on
+    the older version (if they can_replace_kmp()).
+
+  The result is similar in that all kernel modules contained in kmp
+  packages are updated with symbolic links in the /weak-updates
+  subdirectories of installed kernels.  The approach for relinking
+  kernel modules that have symbolic links in /weak-updates is
+  the same.  A peculiarity is that modules in both /extra and /updates
+  subdirectories are updated.  Also, the symbolic links formed in
+  weak-updates are formed as /extra/$subpath or /updates/$subpath
+  depending on where the modules were originally installed.  Note that
+  the depmod order is /updates /extra /built-in /weak-updates.
+
+OpenSS7 Kernel Modules under SuSE Code 11 weak-updates2:
+
+  Under the current approach we install our kernel modules under the
+  /updates subdirectory (when we want weak-modules to see them) or the
+  /extra subdirectory (when we don't want weak-modules to see them).  We
+  must perform the same secondary actions as with the redhat approach;
+  however, we must look in /weak-updates/updates/openss7 and
+  /weak-updates/extra/openss7 directories instead of
+  /weak-updates/openss7 directories as in the weak-modules script
+  approach.
+
+Client Kernel Modules under SuSE Code 11 weak-updates2:
+
+  There are issues with SuSE Code 11 weak-updates2 for client modules:
+  When client modules are installed as simple kernel modules (non-RPM),
+  they will not automatically update from weak-updates2.  However, if
+  openss7 modules are kmp installed in /updates, it is possible to run
+  the Code 10 weak-update script with --add-modules fed the module names
+  of any kernel modules in /updates that depend on STREAMS and are not
+  owned by a kmp package.  Again, --add-modules to the old weak-modules
+  script will only update client kernel modules for which openss7
+  modules are also installed in /updates for the same kernel.
+
+  Another possiblity is to perform an action similiar to the
+  --add-modules of the old weak-updates package ourselves, relieving the
+  restriction that the client kernel modules need to be in the same
+  kernel as the openss7 package.
 
 The SuSE Code 11 KMP form (weak-modules2) is somewhat different in that
 it uses an rpm search on "*-kmp-$flavor" to determine the install kernel
@@ -91,7 +307,7 @@ subdirectory.  To check whether modules are suitable for weak update,
 /sbin/depmod is used with the special SuSE '-E' flag which is fed the
 /boot/symvers-$(uname -r).gz file, or, in the absence of that file, the
 '-F' flag is used with the /boot/System.map-$(uname -r) file.  Now, of
-course, the System.map file only contains the kernel exported by the the
+course, the System.map file only contains the kernel exported by the
 kernel proper and none of the associated modules.  This is only a
 problem when a KMP uses symbols from modules of the kernel instead of
 the kernel proper.
@@ -115,7 +331,7 @@ overwritten by the installation of the kernel-devel package.
 
 The SuSE Code 10 form (weak-modules) will, however, attempt to perform
 weak updates on kernel modules (whether under RPM or not) that exist in
-the /lib/modules/$(uname -r)/extra subdirectory.  However, to resolve
+the /lib/modules/$(uname -r)/updates subdirectory.  However, to resolve
 whether a given kernel modules supports the weak update, the symbols
 from /boot/symvers-$(uname -r).gz (i.e. provided "by the kernel and
 mainline modules") are checked against the symbols from the kernel

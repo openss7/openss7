@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:47 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:13 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 1.1.2.7  2011-04-05 16:35:13  brian
+ - weak module design
+
  Revision 1.1.2.6  2011-03-26 04:28:47  brian
  - updates to build process
 
@@ -72,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:47 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:13 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -151,7 +154,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.6 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:47 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:13 $"
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"
@@ -4094,15 +4097,13 @@ tpi_init_nproto(unsigned char proto)
 	/* reduces to inet_add_protocol() if no protocol registered */
 	spin_lock_bh(&inet_proto_lock);
 	if ((ip->next = (struct net_protocol *)inet_protos[hash]) != NULL) {
-#ifdef HAVE_MODULE_ADDRESS_SYMBOL
-		if ((ip->kmod = module_address((ulong) ip->next))
+		if ((ip->kmod = streams_module_address((ulong) ip->next))
 		    && ip->kmod != THIS_MODULE) {
 			if (!try_module_get(ip->kmod)) {
 				spin_unlock_bh(&inet_proto_lock);
 				return (-EAGAIN);
 			}
 		}
-#endif					/* HAVE_MODULE_ADDRESS_SYMBOL */
 	}
 	inet_protos[hash] = &ip->proto;
 	spin_unlock_bh(&inet_proto_lock);

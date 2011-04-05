@@ -171,7 +171,7 @@ bld_cv_pkg_ver_JAVAC=${bld_cv_pkg_ver_JAVAC=4.3}
 bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=0.7.9}
 bld_cv_pkg_ver_JAVAH=${bld_cv_pkg_ver_JAVAH=4.3}
 bld_cv_pkg_ver_KEYTOOL=${bld_cv_pkg_ver_KEYTOOL=4.3.4_20091019}
-bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=2.6.32.27}
+bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=2.6.32.24}
 bld_cv_pkg_ver_LATEX2HTML=${bld_cv_pkg_ver_LATEX2HTML=2002.2.1}
 bld_cv_pkg_ver_LATEX=${bld_cv_pkg_ver_LATEX=2007}
 bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.11.1}

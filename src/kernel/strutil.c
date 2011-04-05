@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:49 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 1.1.2.7  2011-04-05 16:35:14  brian
+ - weak module design
+
  Revision 1.1.2.6  2011-03-26 04:28:49  brian
  - updates to build process
 
@@ -72,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -321,23 +324,6 @@ freeb_skb(caddr_t arg)
 	kfree_skb(skb);
 }
 
-#ifndef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-struct module* module_text_address(unsigned long addr);
-#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
-static struct module *module_text_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_text_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_TEXT_ADDRESS_SYMBOL 1
-#endif
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
-
 /**
  *  skballoc:	- allocate a message block with a socket buffer
  *  @skb:	socket buffer
@@ -355,9 +341,9 @@ skballoc(struct sk_buff *skb, uint priority)
 
 		frtnp->free_func = &freeb_skb;
 		frtnp->free_arg = (caddr_t) skb;
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
+#if 0
 		*(struct module **) (frtnp + 1) = NULL;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+#endif
 		/* set up message block */
 		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
 		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
@@ -418,19 +404,10 @@ esballoc(unsigned char *base, size_t size, uint priority, frtn_t *freeinfo)
 		struct mdbblock *md = mb_to_mdb(mp);
 		dblk_t *db = &md->datablk.d_dblock;
 		struct free_rtn *frtnp = (struct free_rtn *) md->databuf;
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-		struct module *kmod;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 
 		frtnp->free_func = freeinfo->free_func;
 		frtnp->free_arg = freeinfo->free_arg;
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-		*(struct module **) (frtnp + 1) = NULL;
-		if ((kmod = module_text_address((ulong) frtnp->free_func)))
-			if (kmod != THIS_MODULE)
-				if (try_module_get(kmod))
-					*(struct module **) (frtnp + 1) = kmod;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+
 		/* set up message block */
 		// _ensure(mp->b_next == NULL, mp->b_next = NULL);
 		// _ensure(mp->b_prev == NULL, mp->b_prev = NULL);
@@ -514,39 +491,62 @@ allocb_fast(const size_t size, uint priority)
 	return (NULL);
 }
 
-#ifndef HAVE_KSIZE_USABLE
+#ifndef nextpower
+#if !defined HAVE_KSIZE_SYMBOL || (!defined HAVE_KSIZE_SUPPORT && defined CONFIG_KERNEL_WEAK_SYMBOLS)
 /* Linux memory allocators always round up to the next power of 2.  We can use the slop. */
-STATIC streams_inline streams_fastcall uint
-nextpower(uint y)
+static inline uint
+nextpower(uint s)
 {
 	uint r = 32;
-	uint x = y;
 
-	if (!(x & 0xffff0000)) {
-		x <<= 16;
+	if (!(s & 0xffff0000)) {
+		s <<= 16;
 		r -= 16;
 	}
-	if (!(x & 0xff000000)) {
-		x <<= 8;
+	if (!(s & 0xff000000)) {
+		s <<= 8;
 		r -= 8;
 	}
-	if (!(x & 0xf0000000)) {
-		x <<= 4;
+	if (!(s & 0xf0000000)) {
+		s <<= 4;
 		r -= 4;
 	}
-	if (!(x & 0xc0000000)) {
-		x <<= 2;
+	if (!(s & 0xc0000000)) {
+		s <<= 2;
 		r -= 2;
 	}
-	if (!(x & 0x80000000)) {
-		x <<= 1;
+	if (!(s & 0x80000000)) {
+		s <<= 1;
 		r -= 1;
 	}
-	if (!(x & 0x7fffffff)) {
+	if (!(s & 0x7fffffff)) {
 		r -= 1;
 	}
 	return (1 << r);
 }
+#define nextpower(s) nextpower(s)
+#endif
+#endif
+
+#ifndef ktruesize
+#ifdef HAVE_KSIZE_SYMBOL
+#if defined HAVE_KSIZE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern unsigned int ksize(const void *);
+#define ktruesize(obj,size) ksize(obj)
+#else
+extern unsigned int ksize(const void *) __attribute__ ((__weak__));
+static inline unsigned int
+ktruesize(const void *obj, uint size)
+{
+	if (ksize)
+		return ksize(obj);
+	return nextpower(size);
+}
+#define ktruesize(obj,size) ktruesize(obj,size)
+#endif
+#else
+#define ktruesize(obj,size) nextpower(size)
+#endif
 #endif
 
 /* Note that db_size is always the size that was requested.  db_lim represents the size that was
@@ -576,12 +576,7 @@ allocb_kmem(const size_t size, uint priority)
 			/* set up data block */
 			// _ensure(db->db_frtnp == NULL, db->db_frtnp = NULL);
 			db->db_base = base;
-#ifdef HAVE_KSIZE_USABLE
-			/* newer kernels can tell us how big a memory object truly is */
-			db->db_lim = base + ksize(base);
-#else
-			db->db_lim = base + nextpower(size);
-#endif
+			db->db_lim = base + ktruesize(base, size);
 			// _ensure(db->db_ref == 1, db->db_ref = 1);
 			// _ensure(db->db_type == M_DATA, db->db_type = M_DATA);
 			db->db_size = size;
@@ -754,14 +749,7 @@ freedb(dblk_t *db)
 				register void streamscall (*free_func) (caddr_t);
 
 				if (likely((free_func = frtnp->free_func) != NULL)) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-					struct module *kmod;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 					free_func(frtnp->free_arg);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-					if ((kmod = *(struct module **) (frtnp + 1)))
-						module_put(kmod);
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 				}
 			} else
 				kmem_free(db->db_base, db->db_size);
@@ -1012,12 +1000,7 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	dp = &md->datablk.d_dblock;
 	// _ensure(dp->db_frtnp == NULL, dp->db_frtnp = NULL);
 	dp->db_base = base;
-#ifdef HAVE_KSIZE_USABLE
-	/* newer kernels can tell us how big a memory object truly is */
-	dp->db_lim = base + ksize(base);
-#else
-	db->db_lim = base + nextpower(size);
-#endif
+	dp->db_lim = base + ktruesize(base,size);
 	// _ensure(dp->db_ref == 1, dp->db_ref = 1);
 	dp->db_type = db->db_type;
 	dp->db_size = size;

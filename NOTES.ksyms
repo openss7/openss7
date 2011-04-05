@@ -1,0 +1,462 @@
+OpenSS7 -- kernel symbol notes.  2011-03-27
+$Id: NOTES.ksyms,v 1.1.2.1 2011-04-05 16:35:10 brian Exp $
+Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+
+Kernel Symbols
+==============
+
+Symbol Stragegies
+-----------------
+
+Supported Symbols:
+
+  Under this strategy, only symbols that are exported and supported by
+  the kernel ABI are used.  The difficulty with this stategy is that
+  both unsupported and ripped symbols are necessary for any STREAMS
+  kernel modules to be usable (specfs requires the ripped symbol
+  file_move()).
+
+Weak Unsupported Symbols:
+
+  Under this strategy, only symbols that are exported and supported by
+  the kernel ABI are used as strong symbols.  Exported symbols not
+  supported by the kernel ABI are used as weak symbols with run-time
+  alternatives.  The difficulty with this approach is that ripped
+  symbols are necessary for any STREAMS kernel modules to be usable
+  (specfs requires the ripped symbol file_move()).
+
+Exported Symbols:
+
+  Under this strategy, only symbols that are exported are used, whether
+  ABI supported or not.  The difficulty with this approach is that
+  ripped symbols are necessary for any STREAMS kernel modules to be
+  usable (specfs requires the ripped symbol file_move()).
+
+Link-Time Symbol Ripping:
+
+  Under this strategy, any ripped symbols are resolved at link time.
+  Ripped symbols must be defined as strong and must be given absolute
+  addresses.  The issue with this strategy is that the resulting kernel
+  modules are not capable of being weak updated.
+
+Load-Time Symbol Ripping:
+
+  Under this stragegy, ripped symbols are resolved at load time.  A
+  procedure is used to resolve the symbols at module load time.  Ripped
+  symbols must be defined as weak so that the kernel module loader will
+  ignore them.  The advantage of this approach is that the resulting
+  kernel modules can still be weak updated.  Unsupported exported
+  symbols can be weak or not.  They can also either have crcs generated
+  or not.  The issue with this approach is that the procedures in the
+  kernel necessary for load-time linkage must be available.  Which they
+  are not.
+
+Relinked Symbol Ripping:
+
+  Under this strategy, any ripped symbols are relinked into kernel
+  modules after they are weak-updated.  Relinking uses a load script
+  that can be generated from the System.map (or /proc/kallsyms) and the
+  linker loader (ld).  Note that the linker-loader (ld) is available on
+  all systems.
+
+  This is the only approach that meets all requirements and is also
+  compatible with Debian and much older RPM systems.
+
+Symbol Types
+------------
+
+Usable Symbols:
+
+  Kernel symbols are considered usable when the strategy supports their
+  use.  For a supported-only strategy, these are kernel ABI supported
+  symbols.  For a weak-unsupported or exported strategy, these are any
+  exported symbols.  For a link-time, load-time or relink symbol ripping
+  strategy, these are any exported or rippable symbols.
+
+Supported Symbols:
+
+  Kernel symbols are considered supported when they follow any provided
+  kernel ABI.  When no kernel ABI is provided, any exported symbol is
+  considered a supported symbol.  They have a define of HAVE_*_SUPPORT
+  and will also have a define of HAVE_*_EXPORT.
+
+  Kernel symbols supported by the kernel ABI are always emitted as
+  strong symbols with crcs generated.
+
+Unsupported Symbols:
+
+  Kernel symbols are considered unsupported when they are exported by
+  the kernel but are not supported by the kernel ABI (if any).  These
+  symbols will have the define HAVE_*_EXPORT but will not have the
+  defined HAVE_*_SUPPORT.
+
+  The difficulty with unsupported symbols is that they are unknown to
+  the RPM packaging system as they cannot be placed in a ksyms()
+  "Requires" statement (because kernel ABI kernels only "Provides"
+  kernel ABI symbols).  However, they are seen by the /sbin/weak-modules
+  scripts and weak-updates of the modules can fail if the proper kernel
+  symbols are not indeed provided by the kernel.
+
+  One way to avoid this might appear to be to make the kernel symbols
+  weak and yet emit crcs for them and provide symbol missing
+  alternatives in the code when they are not linked.  However, modprobe
+  --dump-modversions is used to get the module versions when running
+  /sbin/weak-modules and modprobe --dump-modversions does not consider
+  weak modules, it simply dumps whatever crcs are added to the kernel
+  module.  Therefore, although the module could successfully be loaded
+  by the kernel module loader, /sbin/weak-modules will refuse to weak
+  update it whenever the exact crc on the weak symbol is not provided by
+  the kernel in question.  If crcs are not emitted for these weak
+  symbols, the kernel module loader will not link them (ever).
+
+  Another possibility is to place the symbol and crc in a new
+  __weak_versions section for these symbols and conditionally link them
+  ourselves when the module loads, or when the module is relinked.
+
+  The code should always check whether exported weak symbols were
+  resolved and always have alternatives if they weren't.
+
+  Another issue with using unsupported symbols is that they may appear
+  or disappear from one kernel to another, or change their version crcs
+  at whim.  RedHat will not support them so they can change.
+
+Available Symbols:
+
+  Available symbols are symbols that are either exported or can be
+  ripped from the system maps.  The have a define of HAVE_*_SYMBOL and
+  will also have a define of HAVE_*_EXPORT or HAVE_*_ADDR.
+
+Exported Symbols:
+
+  Exported symbols are symbols that are exported by the kernel.  They
+  have a define of HAVE_*_EXPORT.  When they also have a defined of
+  HAVE_*_SUPPORT, they are also a supported symbol; otherwise, they are
+  an unsupported exported symbol.
+
+Address Symbols:
+
+  Address symbols are symbols that can (and need to be) ripped from the
+  kernel system maps.  They have a define of HAVE_*_ADDR.
+
+  Address symbols can be emitted as weak or strong undefined symbols.
+  When a link-resolution strategy is performed, these symbols are
+  resolved when the kernel module is final linked (modpost) whether they
+  are weak or strong.  When emitted as weak symbols, resolution can be
+  deferred until load time.  The kernel module loader will skip these
+  symbols and not resolve them (they have no crcs emitted).  We can
+  resolve them ourselves after the module has loaded, or refuse to load
+  the module when they cannot be resolved.  When resolving at load time,
+  these weak symbols can be diffentiated from supported or unsupported
+  weak symbols by checking whether a crc is available (either in the
+  __versions section or the __weak_versions section) is available for
+  the symbols.
+
+Relinking Symbol Resolution
+---------------------------
+
+During the final kernel module linking stage, unresolved rippable
+symbols are defined using a simple load script that matches kernel
+addresses taken from the System.map or /proc/kallsyms with the symbol
+names.
+
+Symbol Types:
+-------------
+
+There are several classes of symbols as follows:
+
+Supported symbols:
+
+  Kernel symbols are considered support when they following any provided
+  kernel ABI.  When no kernel ABI is provided, any exported symbol is
+  considered a supported symbol.  They have a defined of HAVE_*_SUPPORT
+  and will also have a defined of HAVE_*_EXPORT.
+
+  Kernel symbols supported by the kernel ABI are always emitted as
+  strong symbols with crcs generated and included in the __versions
+  section.
+
+Unsupported symbols:
+
+  Kernel symbosl are considered unsuported when they are exported by
+  the kernel but are not supported by the kernel ABI (if any).  These
+  symbols will have the defined HAVE_*_EXPORT but will not have the
+  define HAVE_*_SUPPORT.
+
+  Unsupported symbols will always be emitted as weak symbols with crcs
+  generated, but the generated crcs will be included in the
+  __weak_versions section.  The code must test the address of these
+  symbols at run time to determine whether they have been made
+  available.
+
+Available symbols:
+
+  Available symbols are symbols that are either exported or can be
+  ripped from the system maps.  They have a define of HAVE_*_SYMBOL and
+  will also have a define of HAVE_*_EXPORT or HAVE_*_ADDR.  That is,
+  they are either an exported symbol or an address symbol.
+
+Exported symbols:
+
+  Exported symbols are symbols that are exported by the kernel.  They
+  have a define of HAVE_*_EXPORT.  When they also have a define of
+  HAVE_*_SUPPORT, they are also a supported symbol; otherwise, they are
+  an unsupported symbol.  When they are a supported symbol, they are
+  emitted as strong undefined symbols with crcs generated and placed in
+  the __versions section.  When they are unsupported symbols, they are
+  emitted as weak undefined symbols with crcs generated and placed in
+  the __weak_versions section.  The code must test the address of weak
+  symbols at run time to determine whether they have been made
+  available.
+
+Address symbols:
+
+  Address symbols are symbols that must be ripped from the system maps.
+  They have a defined of HAVE_*_ADDR.  Address symbols may be emitted
+  either as weak undefined symbols or strong undefined symbols.  When
+  emitted as weak undefeind symbols the code must test the address of
+  the symbol at run time to determine whether they have been made
+  available.
+
+Link-time Symbol Treatment
+--------------------------
+
+During modpost, when the .ko module is linked prior to installation, the
+various symbol types are treated as follows:
+
+Supported symbols:
+
+  Supported symbols are emitted as strong undefined symbols and have
+  crcs generated and placed in the __versions section of the final
+  module.
+
+Unsupported symbols:
+
+  Unsupported symbols are emitted as weak undefined symbols and have
+  crcs generated and placed in the __weak_versions section of the final
+  module.
+
+Available symbols:
+
+  Available symbols are treated as exported symbols or address symbols
+  depending upon their availability in the kernel against which the
+  module are compiled.
+
+Exported symbols:
+
+  Exported symbols are treated as supported or unsupported symbols
+  depending on their availability in the ABI of the kernel against which
+  they are compiled.
+
+Address symbols:
+
+  Address symbols are emitted either as weak or strong undefined symbols
+  and no crcs are generated nor included for these symbols.
+
+Update-time Symbol Treatment
+----------------------------
+
+During .ko module weak updates (using the openss7-updates script), the
+various symbol types are treated as follows:
+
+Supported symbols:
+
+  Supported symbols are examined for availability in the kernel against
+  which the weak-update is peformed.
+  
+  When they are not available (not exported) for a given kernel, the
+  kernel module is not weak-updated for that kernel.  Otherwise, these
+  symbols are left to the kernel module loader.
+
+Unsupported symbols:
+
+  Unsupported symbols are examined for availability in the kernel
+  against which the weak-update is peformed.
+
+  When they are available (exported and mapped) and the exported version
+  is the same as the version in __weak_updates, the symbols are hard
+  linked against the available address.  Hard linking consists of using
+  the linker-loader to assign an absolute address to the weak undefined
+  symbol so that the kernel module loader will not examine it.
+
+  When they are available (exported and mapped) and the exported version
+  does not match the version in __weak_updates, the symbol are left
+  untouched.  The kernel module loader will not assign an address to
+  these symbols and the code must therefore do a run-time check of the
+  symbol address before using them.
+
+  When they are rippable (unexported but mapped), the symbols are hard
+  linked against the available address.  The presumption here is that
+  the unsupported symbol has been removed from export without
+  significantly changing the symbol.
+
+Available symbols:
+
+  Available symbols are examined and considered as one of the other
+  symbol types.
+
+Exported symbols:
+
+  Exported symbols are examined and considered as either supported
+  symbols or unsupported symbols.
+
+Address symbols:
+
+  Address symbols are examined for availability in the kernel against
+  which the weak-update is performed.
+
+  When they are available (mapped) and the address in the module being
+  updated is the same as the address in the kernel for which updates are
+  being performed, the symbol is not relinked.
+
+  When they are available (mapped) and the address in the module being
+  updated is different than the address in the kernel for which updates
+  are being performed, the symbol is hard linked to the new address in
+  the updated module.
+
+  When they are unavailable (not mapped) for a given kernel, the kernel
+  module is not weak-updated for that kernel.
+
+Ramifications on use:
+---------------------
+
+Supported symbols:
+------------------
+
+  Supported symbols can be used with impunity.  There are many supported
+  symbols that are used by the openss7 kernel modules.  Kernel module
+  RPMs will have a kernel ABI "requires" statement that double checks
+  that they are not installed for completely incompatible kernels.
+
+Unsupported symbols:
+--------------------
+
+  Unsupported symbols must be used with care.  Difficulties can arise
+  when these symbols are both removed from the export list of a kernel
+  and changed in a way that makes them incompatible with the original.
+  These symbols should always be emitted weak and have checks made at
+  run-time for their availability.  When they are required for a module,
+  the module should run-time check their availability and refuse to load
+  the module when they are not available.
+
+  Typically openss7 kernel modules only use unsupported symbols under
+  the same criteria as that for address symbols.  Unsupported symbols
+  used by openss7 kernel modules are typically for functions that have
+  remained consistent across a wide range of kernels, but just happen to
+  not be supported by some kernel ABIs (i.e, RedHat).
+
+  OpenSS7 kernel modules only require a small handful of unsuported
+  symbols, even on the most stringent of APIs.
+
+Address symbols:
+----------------
+
+  There is no way to check the versioning of address symbols.
+  Therefore, they must be used with care.  Address symbols used by
+  openss7 kernel modules are typically for functions that have remained
+  consistent across a wide range of kernels (even consistent between 2.4
+  and 2.6 kernel series), but just happen to not be exported.
+
+Appearance in .ko modules before update:
+----------------------------------------
+
+  Strong undefined exported symbols will be *UND* and have a crc that is
+  contained in the __versions section.
+
+  Weak undefined exported symbols can be weak *UND* or *ABS* depending
+  upon whether they were available for the kernel for which the module
+  was compiled.  They always have a crc in the __weak_versions section.
+  The __weak_versions section is openss7-specific.
+
+  Strong ripped symbols will be *ABS* and will not have any crc.
+
+  Weak ripped symbols will be weak *UND* or *ABS* depending upon whether
+  they were available for the kernel for which the module was compiled.
+  They will have an address (the original address for the kernel for
+  which they were compiled, or zero if not available) in the
+  __weak_absolute section.  The __weak_absolute section is openss7-
+  specific and is used to detect weak absolute symbols that have already
+  been linked (*ABS* symbols cannot also be weak).
+
+Apperance in .ko modules after update:
+--------------------------------------
+
+  Strong undefined exported symbols will be *UND* and have a crc that is
+  contained in the __versions section that matches the crc in the kernel
+  export for which the update was performed.
+
+  Weak undefined symbols will be weak *UND* or *ABS* zero when not
+  supported (exported with same crc or mapped) by the kernel for which
+  the update was performed.  They will be weak *UND* when also not
+  supported by the kernel against which the modules were compiled, or
+  *ABS* zero otherwise.  They will be *ABS* non-zero when supported
+  (exported with same crc or not exported but mapped) by the kernel for
+  which the update was performed.
+
+  Strong ripped symbols will be *ABS* non-zero.
+
+  Weak ripped symbols will be weak *UND* or *ABS* zero when not
+  supported (not mapped) by the kernel for which the udpate was
+  performed.  They will be weak *UND* when also not supported by the
+  kernel against which the modules were compiled, or *ABS* zero when
+  they were supported by the kernel against which the modules were
+  compiled.  They will be *ABS* non-zero when supported (mapped) by the
+  kernel for which the update was performed.
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

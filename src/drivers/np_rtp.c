@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-03-26 04:28:47 $
+ @(#) $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:12 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_rtp.c,v $
+ Revision 1.1.2.3  2011-04-05 16:35:12  brian
+ - weak module design
+
  Revision 1.1.2.2  2011-03-26 04:28:47  brian
  - updates to build process
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-03-26 04:28:47 $";
+static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:12 $";
 
 /*
  *  This driver is similar to the NPI-UDP driver in that it provides NPI access to UDP; however, it
@@ -144,7 +147,7 @@ static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.2
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-03-26 04:28:47 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:12 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_RTP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"
@@ -1740,24 +1743,6 @@ np_v4_err_next(struct sk_buff *skb, __u32 info)
 	return;
 }
 
-#ifndef CONFIG_SMP
-#define net_protocol_lock() local_bh_disable()
-#define net_protocol_unlock() local_bh_enable()
-#else				/* CONFIG_SMP */
-#ifdef HAVE_INET_PROTO_LOCK_SYMBOL
-extern spinlock_t inet_proto_lock;
-
-#define net_protocol_lock() spin_lock_bh(&inet_proto_lock)
-#define net_protocol_unlock() spin_unlock_bh(&inet_proto_lock)
-#else
-#define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
-#define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
-#endif
-#endif				/* CONFIG_SMP */
-#ifdef HAVE_INET_PROTOS_SYMBOL
-struct mynet_protocol **inet_protosp = (void *) &inet_protos;
-#endif
-
 /** np_init_nproto - initialize network protocol override
   * @proto: the protocol to register or override
   *
@@ -1840,8 +1825,7 @@ np_init_nproto(unsigned char proto, unsigned int type)
 					return (NULL);
 				}
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
-#ifdef HAVE_MODULE_ADDRESS_SYMBOL
-				if ((pp->kmod = module_address((ulong) *ppp))
+				if ((pp->kmod = streams_module_address((ulong) *ppp))
 				    && pp->kmod != THIS_MODULE) {
 					if (!try_module_get(pp->kmod)) {
 						__ptrace(("Cannot acquire module\n"));
@@ -1851,7 +1835,6 @@ np_init_nproto(unsigned char proto, unsigned int type)
 						return (NULL);
 					}
 				}
-#endif				/* HAVE_MODULE_ADDRESS_SYMBOL */
 #if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
 				pp->proto.next = (*ppp)->next;
 #endif
@@ -1916,10 +1899,8 @@ np_term_nproto(unsigned char proto, unsigned int type)
 				*ppp = pp->next;
 				net_protocol_unlock();
 			}
-#ifdef HAVE_MODULE_ADDRESS_SYMBOL
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
-#endif				/* HAVE_MODULE_ADDRESS_SYMBOL */
 			/* unlink from hash slot */
 			nc_prots[proto] = NULL;
 

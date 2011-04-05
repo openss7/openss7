@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $
+ @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:12 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: otk6.c,v $
+ Revision 1.1.2.5  2011-04-05 16:35:12  brian
+ - weak module design
+
  Revision 1.1.2.4  2011-03-26 04:28:47  brian
  - updates to build process
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $";
+static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:12 $";
 
 /*
  * This file provides a multiplexing driver for RFC 1006 (RFC 2126) OSI Transport over TCP.  The
@@ -107,33 +110,54 @@ static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.4 $
 #endif
 
 #ifndef tcp_openreq_cachep
-#ifdef HAVE_TCP_OPENREQ_CACHEP_USABLE
+#ifdef HAVE_TCP_OPENREQ_CACHEP_SYMBOL
 #include <linux/slab.h>
+#if defined HAVE_TCP_OPENREQ_CACHEP_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern kmem_cachep_t *const _tcp_openreq_cachep_location;
+#else
+extern kmem_cachep_t *const _tcp_openreq_cachep_location __attribute__((__weak__));
+#endif
 #endif
 #endif
 
+
 #ifndef tcp_set_keepalive
-#ifdef HAVE_TCP_SET_KEEPALIVE_USABLE
-void tcp_set_keepalive(struct sock *sk, int val);
+#ifdef HAVE_TCP_SET_KEEPALIVE_SYMBOL
+#if defined HAVE_TCP_SET_KEEPALIVE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern void tcp_set_keepalive(struct sock *sk, int val);
+#else
+extern void tcp_set_keepalive(struct sock *sk, int val) __attribute__((__weak__));
+#endif
 #endif
 #endif
 
 #ifndef tcp_sync_mss
-#ifdef HAVE_TCP_SYNC_MSS_USABLE
-int tcp_sync_mss(struct sock *sk, u32 pmtu);
+#ifdef HAVE_TCP_SYNC_MSS_SYMBOL
+#if defined HAVE_TCP_SYNC_MSS_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu);
+#else
+extern unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu) __attribute__((__weak__));
+#endif
 #endif
 #endif
 
 #ifndef tcp_write_xmit
-#ifdef HAVE_TCP_WRITE_XMIT_USABLE
-int tcp_write_xmit(struct sock *sk, int nonagle);
+#ifdef HAVE_TCP_WRITE_XMIT_SYMBOL
+#if defined HAVE_TCP_WRITE_XMIT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int tcp_write_xmit(struct sock *sk, int nonagle);
+#else
+extern int tcp_write_xmit(struct sock *sk, int nonagle) __attribute__((__weak__));
+#endif
 #endif
 #endif
 
 #ifndef tcp_cwnd_application_limited
-#ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_USABLE
-void tcp_cwnd_application_limited(struct sock *sk);
+#ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_SYMBOL
+#if defined HAVE_TCP_CWND_APPLICATION_LIMITED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern void tcp_cwnd_application_limited(struct sock *sk);
+#else
+extern void tcp_cwnd_application_limited(struct sock *sk) __attribute__((__weak__));
+#endif
 #endif
 #endif
 
@@ -153,67 +177,167 @@ typeof(ip_tos2prio)
 #endif
 
 #ifndef sysctl_rmem_default
-#ifndef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
-#define sysctl_rmem_default SK_RMEM_MAX
+#if defined HAVE_SYSCTL_RMEM_DEFAULT_SYMBOL
+#if defined HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_rmem_default;
+#define sysctl_rmem_default sysctl_rmem_default
+#else
+extern __u32 sysctl_rmem_default __attribute__((__weak__));
+static inline __u32 sysctl_rmem_default_(void)
+{
+	if (&sysctl_rmem_default)
+		return sysctl_rmem_default;
+	return SK_RMEM_MAX;
+}
+#define sysctl_rmem_default sysctl_rmem_default_()
 #endif
 #else
-extern __u32 sysctl_rmem_default;
+#define sysctl_rmem_default SK_RMEM_MAX
+#endif
 #endif
 
 #ifndef sysctl_wmem_default
-#ifndef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
-#define sysctl_wmem_default SK_WMEM_MAX
+#if defined HAVE_SYSCTL_WMEM_DEFAULT_SYMBOL
+#if defined HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_wmem_default;
+#define sysctl_wmem_default sysctl_wmem_default
+#else
+extern __u32 sysctl_wmem_default __attribute__((__weak__));
+static inline __u32 sysctl_wmem_default_(void)
+{
+	if (&sysctl_wmem_default)
+		return sysctl_wmem_default;
+	return SK_WMEM_MAX;
+}
+#define sysctl_wmem_default sysctl_wmem_default_()
 #endif
 #else
-extern __u32 sysctl_wmem_default;
+#define sysctl_wmem_default SK_WMEM_MAX
+#endif
 #endif
 
 #ifndef sysctl_rmem_max
-#ifndef HAVE_SYSCTL_RMEM_MAX_SUPPORT
-#define sysctl_rmem_max SK_RMEM_MAX
+#if defined HAVE_SYSCTL_RMEM_MAX_SYMBOL
+#if defined HAVE_SYSCTL_RMEM_MAX_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_rmem_max;
+#else
+extern __u32 sysctl_rmem_max __attribute__((__weak__));
+static inline __u32 sysctl_rmem_max_(void)
+{
+	if (&sysctl_rmem_max)
+		return sysctl_rmem_max;
+	return SK_RMEM_MAX;
+}
+#define sysctl_rmem_max sysctl_rmem_max_()
 #endif
 #else
-extern __u32 sysctl_rmem_max;
+#define sysctl_rmem_max SK_RMEM_MAX
+#endif
 #endif
 
 #ifndef sysctl_wmem_max
-#ifndef HAVE_SYSCTL_WMEM_MAX_SUPPORT
-#define sysctl_wmem_max SK_WMEM_MAX
+#if defined HAVE_SYSCTL_WMEM_MAX_SYMBOL
+#if defined HAVE_SYSCTL_WMEM_MAX_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern __u32 sysctl_wmem_max;
+#define sysctl_wmem_max sysctl_wmem_max
+#else
+extern __u32 sysctl_wmem_max __attribute__((__weak__));
+static inline __u32 sysctl_wmem_max_(void)
+{
+	if (&sysctl_wmem_max)
+		return sysctl_wmem_max;
+	return SK_WMEM_MAX;
+}
+#define sysctl_wmem_max sysctl_wmem_max_()
 #endif
 #else
-extern __u32 sysctl_wmem_max;
+#define sysctl_wmem_max SK_WMEM_MAX
+#endif
 #endif
 
 #ifndef sysctl_tcp_fin_timeout
-#ifndef HAVE_SYSCTL_TCP_FIN_TIMEOUT_USABLE
+#ifndef HAVE_SYSCTL_TCP_FIN_TIMEOUT_SYMBOL
+#if defined HAVE_SYSCTL_TCP_FIN_TIMEOUT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern inet sysctl_tcp_fin_timeout;
+#define sysctl_tcp_fin_timeout sysctl_tcp_fin_timeout
+#else
+extern inet sysctl_tcp_fin_timeout __attribute__((__weak__));
+static inlint int
+sysctl_tcp_fin_timeout_(void)
+{
+	if (&sysctl_tcp_fin_timeout)
+		return sysctl_tcp_fin_timeout;
+	return TCP_FIN_TIMEOUT;
+}
+#define sysctl_tcp_fin_timeout sysctl_tcp_fin_timeout_()
+#endif
+#else
 #define sysctl_tcp_fin_timeout TCP_FIN_TIMEOUT
 #endif
 #endif
 
+
 /* Used by tcp_push_pending_frames inline in some kernels. */
 #ifndef tcp_current_mss
-#ifdef HAVE_TCP_CURRENT_MSS_USABLE
+#ifdef HAVE_TCP_CURRENT_MSS_SYMBOL
+#if defined HAVE_TCP_CURRENT_MSS_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 #ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
 unsigned int tcp_current_mss(struct sock *sk);
 #else
 unsigned int tcp_current_mss(struct sock *sk, int large);
 #endif
+#else
+#ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
+unsigned int tcp_current_mss(struct sock *sk) __attribute__ ((__weak__));
+#else
+unsigned int tcp_current_mss(struct sock *sk, int large) __attribute__ ((__weak__));
+#endif
+#endif
 #endif
 #endif
 
 #ifndef sysctl_ip_dynaddr
-#ifndef HAVE_SYSCTL_IP_DYNADDR_USABLE
-#define sysctl_ip_dynaddr 0
-#else
+#ifdef HAVE_SYSCTL_IP_DYNADDR_SYMBOL
+#if defined HAVE_SYSCTL_IP_DYNADDR_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_ip_dynaddr;
+#define sysctl_ip_dynaddr sysctl_ip_dynaddr
+#else
+extern int sysctl_ip_dynaddr __attribute__ ((__weak__));
+static inline
+sysctl_ip_dynaddr_(void)
+{
+	if (&sysctl_ip_dynaddr)
+		return sysctl_ip_dynaddr;
+	return 0;
+}
+#define sysctl_ip_dynaddr sysctl_ip_dynaddr_()
 #endif
+#else
+#define sysctl_ip_dynaddr 0
 #endif
 
 #ifndef sysctl_ip_nonlocal_bind
-#ifndef HAVE_SYSCTL_IP_NONLOCAL_BIND_USABLE
-#define sysctl_ip_nonlocal_bind 0
-#else
+/* Symbol sysctl_ip_nonlocal_bind is available. */
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
+#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
+/* Symbol sysctl_ip_nonlocal_bind is supported. */
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_SUPPORT
+#if defined HAVE_SYSCTL_IP_NONLOCAL_BIND_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_ip_nonlocal_bind;
+#define sysctl_ip_nonlocal_bind sysctl_ip_nonlocal_bind
+#else
+extern int sysctl_ip_nonlocal_bind __attribute__ ((__weak__));
+static inline int
+sysctl_ip_nonlocal_bind_(void)
+{
+	if (&sysctl_ip_nonlocal_bind)
+		return sysctl_ip_nonlocal_bind;
+	return 0;
+}
+#define sysctl_ip_nonlocal_bind sysctl_ip_nonlocal_bind_()
+#endif
+#else
+#define sysctl_ip_nonlocal_bind 0
 #endif
 #endif
 
@@ -222,27 +346,53 @@ extern int sysctl_ip_nonlocal_bind;
 #endif
 
 #ifndef sysctl_ip_default_ttl
-#ifndef HAVE_SYSCTL_IP_DEFAULT_TTL_USABLE
-#define sysctl_ip_default_ttl IPDEFTTL
-#else
+#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_SYMBOL
+#if defined HAVE_SYSCTL_IP_DEFAULT_TTL_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_ip_default_ttl;
+#define sysctl_ip_default_ttl sysctl_ip_default_ttl
+#else
+extern int sysctl_ip_default_ttl __attribute__ ((__weak__));
+static inline int
+sysctl_ip_default_ttl_(void)
+{
+	if (&sysctl_ip_default_ttl)
+		return sysctl_ip_default_ttl;
+	return IPDEFTTL;
+}
+#define sysctl_ip_default_ttl sysctl_ip_default_ttl_()
 #endif
+#else
+#define sysctl_ip_default_ttl IPDEFTTL
 #endif
 
 #ifndef tcp_set_skb_tso_segs
-#ifdef HAVE_TCP_SET_SKB_TSO_SEGS_USABLE
+#ifdef HAVE_TCP_SET_SKB_TSO_SEGS_SYMBOL
+#if defined HAVE_TCP_SET_SKB_TSO_SEGS_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 #ifdef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
-void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb);
+extern void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb);
 #else
-void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std);
+extern void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std);
+#endif
+#else
+#ifdef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
+extern void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb) __attribute__ ((__weak__));
+#else
+extern void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
+    __attribute__ ((__weak__));
+#endif
 #endif
 #endif
 #endif
 
 /* older 2.6.8 name for the same function */
 #ifndef tcp_set_skb_tso_factor
-#ifdef HAVE_TCP_SET_SKB_TSO_FACTOR_USABLE
-void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
+#ifdef HAVE_TCP_SET_SKB_TSO_FACTOR_SYMBOL
+#if defined HAVE_TCP_SET_SKB_TSO_FACTOR_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
+#else
+extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
+    __attribute__ ((__weak__));
+#endif
 #endif
 #endif
 
@@ -270,7 +420,7 @@ void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #define OTK6_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OTK6_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define OTK6_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $"
+#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:12 $"
 #define OTK6_DEVICE	"SVR 4.2 MP STREAMS RFC1006 TPI OSI Transport Provider Driver"
 #define OTK6_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define OTK6_LICENSE	"GPL"
