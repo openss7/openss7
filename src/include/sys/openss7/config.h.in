@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: config.h.in,v 1.1.2.4 2011-03-26 04:28:48 brian Exp $
+ @(#) $Id: config.h.in,v 1.1.2.6 2011-04-05 16:45:48 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,17 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:45:48 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: config.h.in,v $
+ Revision 1.1.2.6  2011-04-05 16:45:48  brian
+ - minor tweaks
+
+ Revision 1.1.2.5  2011-04-05 16:35:13  brian
+ - weak module design
+
  Revision 1.1.2.4  2011-03-26 04:28:48  brian
  - updates to build process
 
@@ -79,54 +85,6 @@
  *
  * #include "sys/openss7/config.h".
  */
-
-/* Use this macro like fastcall. It is set to an attribute with the number of
-   parameters passed in registers to STREAMS callouts (qi_putp, qi_srvp,
-   qi_qopen, qi_qclose, qi_admin). In binary compatibility mode, this sets the
-   number of parameters passed in registers to zero. Otherwise, it defaults to
-   the CONFIG_REPARM setting for the kernel. */
-#if defined __i386__ || defined __x86_64__ || defined __k8__
-#undef streamscall
-#else
-#define streamscall
-#endif
-
-/* Use this macro like FASTCALL(). It is set to an attribute with the number
-   of parameters passed in registers to STREAMS callouts (qi_putp, qi_srvp,
-   qi_qopen, qi_qclose, qi_admin). In binary compatibility mode, this sets the
-   number of parameters passed in registers to zero. Otherwise, it defaults to
-   the CONFIG_REPARM setting for the kernel. */
-#if defined __i386__ || defined __x86_64__ || defined __k8__
-#undef STREAMSCALL
-#else
-#define STREAMSCALL(__x) __x
-#endif
-
-/* Define to perform internal structure tracking within the STREAMS executive
-   as well as to provide additional /proc filesystem files for examining
-   internal structures. */
-#undef CONFIG_STREAMS_DEBUG
-
-/* Defined when Linux Fast-STREAMS was compiled for LiS Binary Compatibility.
-   */
-#undef CONFIG_STREAMS_LIS_BCM
-
-/* When defined Linux Fast-STREAMS will include support for synchronization
-   queues and levels. */
-#undef CONFIG_STREAMS_SYNCQS
-
-/* This kmem_cache_t is deprecated in recent 2.6.20 kernels. When it is
-   deprecated, define this to struct kmem_cache *. */
-#undef kmem_cachep_t
-
-/* Define to 1 if the system has the type 'intptr_t'. */
-#undef HAVE_KTYPE_INTPTR_T
-
-/* Define to 1 if the system has the type 'uchar'. */
-#undef HAVE_KTYPE_UCHAR
-
-/* Define to 1 if the system has the type 'uintptr_t'. */
-#undef HAVE_KTYPE_UINTPTR_T
 
 /* When defined, Linux Fast STREAMS will attempt to be as compatible as
    possible (without replicating any bugs) with the AIX(R) 5L Version 5.1
@@ -181,39 +139,6 @@
    whether compatibility will be compiled as a loadable module to Linux
    Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_IRIX_MODULE
- 
-/* When defined, Linux STREAMS will attempt to be as compatible as possible
-   (without replicating any bugs) with the LfS release so that STREAMS drivers
-   and modules written for LfS will compile with Linux STREAMS. When
-   undefined, STREAMS drivers and modules written for LfS will require porting
-   in more respects. This symbol determines whether compatibility will be
-   compiled and linkable with Linux STREAMS. */
-#undef CONFIG_STREAMS_COMPAT_LFS
- 
-/* When defined, Linux STREAMS will attempt to be as compatible as possible
-   (without replicating any bugs) with the LfS release so that STREAMS drivers
-   and modules written for LfS will compile with Linux STREAMS. When
-   undefined, STREAMS drivers and modules written for LfS will require porting
-   in more respects. This symbol determines whether compatibility will be
-   compiled as a loadable module to Linux STREAMS. */
-#undef CONFIG_STREAMS_COMPAT_LFS_MODULE
- 
-/* When defined, Linux Fast STREAMS will attempt to be as compatible as
-   possible (without replicating any bugs) with the LiS release so that
-   STREAMS drivers and modules written for LiS will compile with Linux Fast
-   STREAMS. When undefined, STREAMS drivers and modules written for LiS will
-   require porting in more respects. This symbol determines whether
-   compatibility will be compiled and linkable with Linux Fast-STREAMS. */
-#undef CONFIG_STREAMS_COMPAT_LIS
- 
-/* When defined, Linux Fast STREAMS will attempt to be as compatible as
-   possible (without replicating any bugs) with the LiS release so that
-   STREAMS drivers and modules written for LiS will compile with Linux Fast
-   STREAMS. When undefined, STREAMS drivers and modules written for LiS will
-   require porting in more respects. This symbol determines whether
-   compatibility will be compiled as a loadable module to Linux Fast-STREAMS.
-   */
-#undef CONFIG_STREAMS_COMPAT_LIS_MODULE
  
 /* When defined, Linux Fast STREAMS will attempt to be as compatible as
    possible (without replicating any bugs) with the MacOT(R) release so that
@@ -359,78 +284,97 @@
    symbol determines whether compatibility will be compiled as a loadable
    module to Linux Fast-STREAMS. */
 #undef CONFIG_STREAMS_COMPAT_UW7_MODULE
- 
-/* Define to 1 if kernel function pci_dac_dma_sync_single() exists. */
-#undef HAVE_KFUNC_PCI_DAC_DMA_SYNC_SINGLE
- 
-/* Define to 1 if kernel function to_kdev_t() exists. */
-#undef HAVE_KFUNC_TO_KDEV_T
- 
-/* Define to 1 if you have the <linux/hardirq.h> header file. */
-#undef HAVE_KINC_LINUX_HARDIRQ_H
- 
-/* Define to 1 if you have the <linux/security.h> header file. */
-#undef HAVE_KINC_LINUX_SECURITY_H
- 
-/* Define to 1 if you have the <linux/utsrelease.h> header file. */
-#undef HAVE_KINC_LINUX_UTSRELEASE_H
 
-/* Define to 1 if you have the <linux/cred.h> header file. */
-#undef HAVE_KINC_LINUX_CRED_H
+/* Define to perform internal structure tracking within the STREAMS executive
+   as well as to provide additional /proc filesystem files for examining
+   internal structures. */
+#undef CONFIG_STREAMS_DEBUG
  
-/* Define to 1 if kernel macro MOD_DEC_USE_COUNT() exists. */
-#undef HAVE_KTYPE_BOOL
+/* When defined OpenSS7 will include support for synchronization queues and
+   levels. */
+#undef CONFIG_STREAMS_SYNCQS
  
-/* Define to 1 if the system has the type 'irqreturn_t'. */
-#undef HAVE_KTYPE_IRQRETURN_T
- 
-/* Define to 1 if the system has the type 'irq_handler_t'. */
-#undef HAVE_KTYPE_IRQ_HANDLER_T
- 
-/* Define to 1 if the system has the type 'paddr_t'. */
-#undef HAVE_KTYPE_PADDR_T
- 
-/* Define if do_settimeofday takes struct timespec and returns int. */
-#undef HAVE_TIMESPEC_DO_SETTIMEOFDAY
-
-/* The symbol cmn_err is not exported by some kernels. Define this if the
-   symbol cmn_err is exported by your kernel so that kernel modules can be
-   supported properly. */
+/* Symbol cmn_err is exported. */
 #undef HAVE_CMN_ERR_EXPORT
 
-/* The symbol icmn_err is not exported by some kernels. Define this if the
-   symbol icmn_err is exported by your kernel so that kernel modules can be
-   supported properly. */
+/* Symbol icmn_err is exported. */
 #undef HAVE_ICMN_ERR_EXPORT
 
-/* The symbol kmem_alloc is not exported by some kernels. Define this if the
-   symbol kmem_alloc is exported by your kernel so that kernel modules can be
-   supported properly. */
-#undef HAVE_KMEM_ALLOC_EXPORT
-
-/* The symbol kmem_free is not exported by some kernels. Define this if the
-   symbol kmem_free is exported by your kernel so that kernel modules can be
-   supported properly. */
-#undef HAVE_KMEM_FREE_EXPORT
-
-/* The symbol kmem_zalloc is not exported by some kernels. Define this if the
-   symbol kmem_zalloc is exported by your kernel so that kernel modules can be
-   supported properly. */
-#undef HAVE_KMEM_ZALLOC_EXPORT
-
-/* The symbol kill_pid_info_as_uid is not exported by some kernels. Define
-   this if the symbol kill_pid_info_as_uid is either exported by your kernel,
-   or can be stripped from the symbol map, so that kernel modules can be
-   supported properly. */
-#undef HAVE_KILL_PID_INFO_AS_UID_SYMBOL
-
-/* The symbol kill_proc_info_as_uid is not exported by some kernels. Define
-   this if the symbol kill_proc_info_as_uid is either exported by your kernel,
-   or can be stripped from the symbol map, so that kernel modules can be
-   supported properly. */
-#undef HAVE_KILL_PROC_INFO_AS_UID_SYMBOL
+/* Define to 1 if you have the <inttypes.h> header file. */
+#undef HAVE_INTTYPES_H
 
 /* Define to 1 if kernel function pid_nr() exists. */
 #undef HAVE_KFUNC_PID_NR
+
+/* Define to 1 if kernel function to_kdev_t() exists. */
+#undef HAVE_KFUNC_TO_KDEV_T
+
+/* Symbol kill_pid_info_as_uid is available. */
+#undef HAVE_KILL_PID_INFO_AS_UID_SYMBOL
+
+/* Symbol kill_proc_info_as_uid is available. */
+#undef HAVE_KILL_PROC_INFO_AS_UID_SYMBOL
+
+/* Define to 1 if you have the <linux/cred.h> header file. */
+#undef HAVE_KINC_LINUX_CRED_H
+
+/* Define to 1 if you have the <linux/security.h> header file. */
+#undef HAVE_KINC_LINUX_SECURITY_H
+
+/* Define to 1 if you have the <linux/utsrelease.h> header file. */
+#undef HAVE_KINC_LINUX_UTSRELEASE_H
+
+/* Symbol kmem_alloc is exported. */
+#undef HAVE_KMEM_ALLOC_EXPORT
+
+/* Symbol kmem_free is exported. */
+#undef HAVE_KMEM_FREE_EXPORT
+
+/* Symbol kmem_zalloc is exported. */
+#undef HAVE_KMEM_ZALLOC_EXPORT
+
+/* Define to 1 if the system has the type 'bool'. */
+#undef HAVE_KTYPE_BOOL
+
+/* Define to 1 if the system has the type 'intptr_t'. */
+#undef HAVE_KTYPE_INTPTR_T
+
+/* Define to 1 if the system has the type 'irqreturn_t'. */
+#undef HAVE_KTYPE_IRQRETURN_T
+
+/* Define to 1 if the system has the type 'paddr_t'. */
+#undef HAVE_KTYPE_PADDR_T
+
+/* Define to 1 if the system has the type 'uchar'. */
+#undef HAVE_KTYPE_UCHAR
+
+/* Define to 1 if the system has the type 'uintptr_t'. */
+#undef HAVE_KTYPE_UINTPTR_T
+
+/* This kmem_cache_t is deprecated in recent 2.6.20 kernels. When it is
+   deprecated, define this to struct kmem_cache *. */
+#undef kmem_cachep_t
+
+/* Use this macro like FASTCALL(). It is set to an attribute with the number
+   of parameters passed in registers to STREAMS callouts (qi_putp, qi_srvp,
+   qi_qopen, qi_qclose, qi_admin). In binary compatibility mode, this sets the
+   number of parameters passed in registers to zero. Otherwise, it defaults to
+   the CONFIG_REPARM setting for the kernel. */
+#if defined __i386__ || defined __x86_64__ || defined __k8__
+#undef STREAMSCALL
+#else
+#define STREAMSCALL(__x) __x
+#endif
+
+/* Use this macro like fastcall. It is set to an attribute with the number of
+   parameters passed in registers to STREAMS callouts (qi_putp, qi_srvp,
+   qi_qopen, qi_qclose, qi_admin). In binary compatibility mode, this sets the
+   number of parameters passed in registers to zero. Otherwise, it defaults to
+   the CONFIG_REPARM setting for the kernel. */
+#if defined __i386__ || defined __x86_64__ || defined __k8__
+#undef streamscall
+#else
+#define streamscall
+#endif
 
 #endif				/* __SYS_OPENSS7_CONFIG_H__ */
