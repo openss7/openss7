@@ -1,3 +1,49 @@
+2011-04-05  Brian Bidulock  <bidulock@openss7.org>
+
+	* NOTES.ksyms: notes on kysms
+	* scripts/openss7-modules: new weak-update script
+	* scripts/package.kabi: package KABI definition
+
+	* NOTES.kmod: updated notes
+	* acinclude.m4: check for a few more kernel things for SuSE 11
+	* sle-11-x86_64-config.cache: updates
+	* am/openss7.am: better ifnames target
+	* m4/kernel.m4: configure for weak symbols
+	* scripts/modpost.awk: general awk updates and better symbol handling
+	* scripts/strconf.awk: general awk updates
+	* src/drivers/inet.c: make unsupported exports weak
+	* src/drivers/ip.c: make unsupported exports weak
+	* src/drivers/ip_hooks.h.in: make unsupported exports weak
+	* src/drivers/module_hooks.h.in: make unsupported exports weak
+	* src/drivers/net_hooks.h.in: make unsupported exports weak
+	* src/drivers/np.c: make unsupported exports weak
+	* src/drivers/np_ip.c: make unsupported exports weak
+	* src/drivers/np_rtp.c: make unsupported exports weak
+	* src/drivers/np_udp.c: make unsupported exports weak
+	* src/drivers/otk6.c: make unsupported exports weak
+	* src/drivers/rawip.c: make unsupported exports weak
+	* src/drivers/sctp2.c: make unsupported exports weak
+	* src/drivers/sctp_hash.c: make unsupported exports weak
+	* src/drivers/sctp_hooks.h.in: make unsupported exports weak
+	* src/drivers/sscop_n.c: make unsupported exports weak
+	* src/drivers/sscop_t_user.c: make unsupported exports weak
+	* src/drivers/tcp.c: make unsupported exports weak
+	* src/drivers/udp.c: make unsupported exports weak
+	* src/drivers/udp_hooks.h.in: make unsupported exports weak
+	* src/include/sys/irix/ddi.h: avoid weakrefs
+	* src/include/sys/openss7/cmn_err.h: avoid weakrefs
+	* src/include/sys/openss7/config.h.in: reorganize symbols
+	* src/include/sys/openss7/kmem.h: avoid weakrefs
+	* src/include/sys/openss7/strsubr.h: make unsupported exports weak
+	* src/include/sys/openss7/wrapper.h.in: general formatting
+	* src/kernel/strlookup.c: module address handling
+	* src/kernel/strsched.c: module address handling
+	* src/kernel/strspecfs.c: make unsupported exports weak
+	* src/kernel/strutil.c: module address handling
+	* src/kernel/svr4compat.c: address __wake_up_sync
+	* src/kernel/wrapper.c: dont export unused
+	* src/modules/sth.c: make unsupported exports weak
+
 2011-03-26  Brian Bidulock  <bidulock@openss7.org>
 
 	* src/drivers/module_hooks.h.in: added new hook files

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $
+ @(#) $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:12 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp2.c,v $
+ Revision 1.1.2.5  2011-04-05 16:35:12  brian
+ - weak module design
+
  Revision 1.1.2.4  2011-03-26 04:28:47  brian
  - updates to build process
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $";
+static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:12 $";
 
 #define _SVR4_SOURCE
 #define _SUN_SOURCE
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER."
 #define SCTP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:47 $"
+#define SCTP_REVISION	"OpenSS7 $RCSfile: sctp2.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:12 $"
 #define SCTP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports Linux Fast-STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -3477,7 +3480,12 @@ __sctp_saddr_alloc(sctp_t * sp, uint32_t saddr, int *errp)
 		return (NULL);
 	}
 #ifdef sysctl_ip_nonlocal_bind
-	if (!sysctl_ip_nonlocal_bind && inet_addr_type(saddr) != RTN_LOCAL) {
+#ifndef HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS
+	if (!sysctl_ip_nonlocal_bind && inet_addr_type(saddr) != RTN_LOCAL)
+#else
+	if (!sysctl_ip_nonlocal_bind && inet_addr_type(&init_net, saddr) != RTN_LOCAL)
+#endif
+	{
 		*errp = -EADDRNOTAVAIL;
 		LOGIO(sp, "skipping non-local %d.%d.%d.%d",
 			  (saddr >> 0) & 0xff, (saddr >> 8) & 0xff, (saddr >> 16) & 0xff,
@@ -4739,59 +4747,63 @@ sctp_lookup(struct sctphdr *sh, uint32_t daddr, uint32_t saddr)
  *
  *  =========================================================================
  */
-#if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT
+
+#if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SYMBOL
+#if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern uint32_t secure_tcp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t);
-#elif defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
-extern uint32_t secure_tcp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t) __attribute__((weak));
+#else
+extern uint32_t secure_tcp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t) __attribute__((__weak__));
 #endif
-#if   defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_SUPPORT
+#endif
+
+#if   defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_SYMBOL
+#if   defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern uint64_t secure_dccp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t);
-#elif defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
-extern uint64_t secure_dccp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t) __attribute__((weak));
+#else
+extern uint64_t secure_dccp_sequence_number(uint32_t, uint32_t, uint16_t, uint16_t) __attribute__((__weak__));
 #endif
-#if   defined HAVE_HALF_MD4_TRANSFORM_SUPPORT
+#endif
+
+#if   defined HAVE_HALF_MD4_TRANSFORM_SYMBOL
+#if   defined HAVE_HALF_MD4_TRANSFORM_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern uint32_t half_md4_transform(uint32_t buf[4], uint32_t const in[8]);
-#elif defined HAVE_HALF_MD4_TRANSFORM_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
-extern uint32_t half_md4_transform(uint32_t buf[4], uint32_t const in[8]) __attribute__((weak));
+#else
+extern uint32_t half_md4_transform(uint32_t buf[4], uint32_t const in[8]) __attribute__((__weak__));
+#endif
 #endif
 
 STATIC uint32_t
 secure_sctp_sequence_number(uint32_t daddr, uint32_t saddr, uint16_t dport, uint16_t sport)
 {
-#if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT
+#if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SYMBOL
+#if   defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 	{
 		return secure_tcp_sequence_number(daddr, saddr, dport, sport);
 	}
-#elif defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
+#else
 	if (secure_tcp_sequence_number != 0) {
 		return secure_tcp_sequence_number(daddr, saddr, dport, sport);
 	}
 #endif
-#if   defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_SUPPORT
+#endif
+#if   defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_SYMBOL
+#if   defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 	{
 		uint64_t result = secure_dccp_sequence_number(daddr, saddr, dport, sport);
 
 		return (uint32_t) ((result >> 32) ^ result);
 	}
-#elif defined HAVE_SECURE_DCCP_SEQUENCE_NUMBER_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
+#else
 	if (secure_dccp_sequence_number != 0) {
 		uint64_t result = secure_dccp_sequence_number(daddr, saddr, dport, sport);
 
 		return (uint32_t) ((result >> 32) ^ result);
 	}
 #endif
-#if   defined HAVE_HALF_MD4_TRANSFORM_SUPPORT
+#endif
+#if   defined HAVE_HALF_MD4_TRANSFORM_SYMBOL
+#if   defined HAVE_HALF_MD4_TRANSFORM_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 	{
-		uint32_t hash[4];
-
-		hash[0] = saddr;
-		hash[1] = daddr;
-		hash[2] = (sport << 16) | dport;
-		hash[3] = jiffies;
-		return half_md4_transform(hash, (uint32_t *) &secure_sctp_sequence_number);
-	}
-#elif defined HAVE_HALF_MD4_TRANSFORM_USABLE && CONFIG_KERNEL_WEAK_MODULES
-	if (half_md4_transform != 0) {
 		uint32_t hash[4];
 
 		hash[0] = saddr;
@@ -4801,10 +4813,20 @@ secure_sctp_sequence_number(uint32_t daddr, uint32_t saddr, uint16_t dport, uint
 		return half_md4_transform(hash, (uint32_t *) &secure_sctp_sequence_number);
 	}
 #else
+	if (half_md4_transform != 0) {
+		uint32_t hash[4];
+
+		hash[0] = saddr;
+		hash[1] = daddr;
+		hash[2] = (sport << 16) | dport;
+		hash[3] = jiffies;
+		return half_md4_transform(hash, (uint32_t *) &secure_sctp_sequence_number);
+	}
+#endif
+#endif
 	{
 		return (daddr ^ saddr ^ ((sport << 16) | dport) ^ jiffies);
 	}
-#endif
 }
 
 
@@ -13163,18 +13185,18 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 			if (sd && sd->dst_cache) {
 				size_t mtu = ntohs(icmph->un.frag.mtu);
 
-#ifdef HAVE_IP_RT_UPDATE_PMTU_USABLE
+#ifdef HAVE_IP_RT_UPDATE_PMTU_SYMBOL
 				ip_rt_update_pmtu(sd->dst_cache, mtu);
-#endif                          /* HAVE_IP_RT_UPDATE_PMTU_USABLE */
+#endif                          /* HAVE_IP_RT_UPDATE_PMTU_SYMBOL */
 				if (dst_pmtu(sd->dst_cache) > mtu && mtu && mtu >= 68
 #ifdef HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL
 				    && !(sd->dst_cache->mxlock & (1 << RTAX_MTU))
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_PROTOCOL */
 				    ) {
 					dst_update_pmtu(sd->dst_cache, mtu);
-#ifdef HAVE_IP_RT_MTU_EXPIRES_USABLE
+#ifdef HAVE_IP_RT_MTU_EXPIRES_SYMBOL
 					dst_set_expires(sd->dst_cache, ip_rt_mtu_expires);
-#endif                          /* HAVE_IP_RT_MTU_EXPIRES_USABLE */
+#endif                          /* HAVE_IP_RT_MTU_EXPIRES_SYMBOL */
 				}
 			}
 		}
@@ -14029,6 +14051,35 @@ sctp_bind_conflict(struct sctp *sp, struct sctp_bind_bucket *sb)
 	}
 	return (sp2 != NULL);
 }
+
+#if   defined HAVE_INET_GET_LOCAL_PORT_RANGE_SYMBOL
+#if   defined HAVE_INET_GET_LOCAL_PORT_RANGE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern void inet_get_local_port_range(int *low, int *high);
+#else
+extern void inet_get_local_port_range(int *low, int *high) __attribute__ ((__weak__));
+#endif
+#elif defined HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
+#if   defined HAVE_SYSCTL_LOCAL_PORT_RANGE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int sysctl_local_port_range[2];
+#else
+extern int sysctl_local_port_range[2] __attribute__ ((__weak__));
+#endif
+static inline void
+inet_get_local_port_range(int *low, int *high)
+{
+	*low = sysctl_local_port_range[0];
+	*high = sysctl_local_port_range[0];
+}
+#else
+static int sysctl_local_port_range[2] = { 1024, 4999 };
+static inline void
+inet_get_local_port_range(int *low, int *high)
+{
+	*low = sysctl_local_port_range[0];
+	*high = sysctl_local_port_range[0];
+}
+#endif
+
 STATIC int
 sctp_get_port(struct sctp *sp, uint16_t port)
 {
@@ -14040,12 +14091,7 @@ sctp_get_port(struct sctp *sp, uint16_t port)
 		   for TCP IPv4. We use the same port ranges.  */
 		static spinlock_t sctp_portalloc_lock = SPIN_LOCK_UNLOCKED;
                 int low, high, rem, rover;
-#ifdef HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE
                 inet_get_local_port_range(&low, &high);
-#else
-		low = sysctl_local_port_range[0];
-		high = sysctl_local_port_range[1];
-#endif
 		rem = (high - low) + 1;
 
 		/* find a fresh, completely unused port number (that way we are guaranteed not to

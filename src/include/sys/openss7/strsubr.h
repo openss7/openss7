@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: strsubr.h,v 1.1.2.5 2011-03-26 04:28:48 brian Exp $
+ @(#) $Id: strsubr.h,v 1.1.2.6 2011-04-05 16:35:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsubr.h,v $
+ Revision 1.1.2.6  2011-04-05 16:35:13  brian
+ - weak module design
+
  Revision 1.1.2.5  2011-03-26 04:28:48  brian
  - updates to build process
 
@@ -723,6 +726,8 @@ __STREAMS_EXTERN int cmin_ini(struct devnode *cmin, struct cdevsw *cdev, minor_t
 __STREAMS_EXTERN int cmin_add(struct devnode *cmin, struct cdevsw *cdev);
 __STREAMS_EXTERN void cmin_del(struct devnode *cmin, struct cdevsw *cdev);
 __STREAMS_EXTERN void cmin_rel(struct devnode *cmin);
+
+__STREAMS_EXTERN struct module *streams_module_address(unsigned long addr);
 
 #if 0
 __STREAMS_EXTERN rwlock_t cminsw_lock;

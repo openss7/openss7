@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:25 $
+ @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:13 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:32:25 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n.c,v $
+ Revision 1.1.2.3  2011-04-05 16:35:13  brian
+ - weak module design
+
  Revision 1.1.2.2  2010-11-28 14:32:25  brian
  - updates to support debian squeeze 2.6.32 kernel
 
@@ -60,12 +63,12 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:25 $";
+static char const ident[] = "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:13 $";
 
 #include <sys/os7/compat.h>
 
 #define SSCOP_NPI_DESCRIP	"SSCOP/IP STREAMS DRIVER."
-#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:32:25 $"
+#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:13 $"
 #define SSCOP_NPI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SSCOP_NPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -694,6 +697,35 @@ t_optmgmt_req(queue_t *q, mblk_t *pdu)
 	qreply(q, t_error_ack(T_OPTMGMT_REQ, err));
 	return (0);
 }
+
+#if   defined HAVE_INET_GET_LOCAL_PORT_RANGE_SYMBOL
+#if   defined HAVE_INET_GET_LOCAL_PORT_RANGE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern void inet_get_local_port_range(int *low, int *high);
+#else
+extern void inet_get_local_port_range(int *low, int *high) __attribute__ ((__weak__));
+#endif
+#elif defined HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
+#if   defined HAVE_SYSCTL_LOCAL_PORT_RANGE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int sysctl_local_port_range[2];
+#else
+extern int sysctl_local_port_range[2] __attribute__ ((__weak__));
+#endif
+static inline void
+inet_get_local_port_range(int *low, int *high)
+{
+	*low = sysctl_local_port_range[0];
+	*high = sysctl_local_port_range[0];
+}
+#else
+static int sysctl_local_port_range[2] = { 1024, 4999 };
+static inline void
+inet_get_local_port_range(int *low, int *high)
+{
+	*low = sysctl_local_port_range[0];
+	*high = sysctl_local_port_range[0];
+}
+#endif
+
 STATIC int
 t_bind_req(queue_t *q, mblk_t *pdu)
 {
@@ -750,12 +782,7 @@ t_bind_req(queue_t *q, mblk_t *pdu)
 			 */
                         int low, high, rem;
 
-#ifdef HAVE_KFUNC_INET_GET_LOCAL_PORT_RANGE
                         inet_get_local_port_range(&low, &high);
-#else
-			low = sysctl_local_port_range[0];
-			high = sysctl_local_port_range[1];
-#endif
 			rem = (high - low) + 1;
 
 			bport = sscop_port_rover;

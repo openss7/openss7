@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-26 04:28:48 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:14 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 1.1.2.8  2011-04-05 16:35:14  brian
+ - weak module design
+
  Revision 1.1.2.7  2011-03-26 04:28:48  brian
  - updates to build process
 
@@ -75,7 +78,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-26 04:28:48 $";
+static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:14 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -2057,23 +2060,6 @@ defer_stream_event(queue_t *q, struct task_struct *procp, long events)
 }
 #endif
 
-#ifndef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-#ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-struct module* module_text_address(unsigned long addr);
-#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
-static struct module *module_text_address(unsigned long addr)
-{
-	struct module *mod;
-
-	preempt_disable();
-	mod = __module_text_address(addr);
-	preempt_enable();
-	return mod;
-}
-#define HAVE_MODULE_TEXT_ADDRESS_SYMBOL 1
-#endif
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
-
 STATIC streams_fastcall long
 defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*func) (long),
 		    long arg)
@@ -2082,15 +2068,6 @@ defer_bufcall_event(queue_t *q, unsigned size, int priority, void streamscall (*
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_BUFCALL, q))) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-		struct module *kmod;
-
-		if ((kmod = module_text_address((ulong) func))
-		    && kmod != THIS_MODULE && try_module_get(kmod))
-			se->x.b.kmod = kmod;
-		else
-			se->x.b.kmod = NULL;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		se->se_state = SE_ARMED;
 		se->x.b.queue = q ? qget(q) : NULL;
 		se->x.b.func = func;
@@ -2108,15 +2085,6 @@ defer_timeout_event(queue_t *q, timo_fcn_t *func, caddr_t arg, long ticks, unsig
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_TIMEOUT, q))) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-		struct module *kmod;
-
-		if ((kmod = module_text_address((ulong) func))
-		    && kmod != THIS_MODULE && try_module_get(kmod))
-			se->x.t.kmod = kmod;
-		else
-			se->x.t.kmod = NULL;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		se->x.t.queue = q ? qget(q) : NULL;
 		se->x.t.func = func;
 		se->x.t.arg = arg;
@@ -2136,15 +2104,6 @@ defer_weldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn_t
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_WELDQ, q))) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-		struct module *kmod;
-
-		if ((kmod = module_text_address((ulong) func))
-		    && kmod != THIS_MODULE && try_module_get(kmod))
-			se->x.w.kmod = kmod;
-		else
-			se->x.w.kmod = NULL;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		se->x.w.queue = q ? qget(q) : NULL;
 		se->x.w.func = func;
 		se->x.w.arg = arg;
@@ -2164,15 +2123,6 @@ defer_unweldq_event(queue_t *q1, queue_t *q2, queue_t *q3, queue_t *q4, weld_fcn
 	struct strevent *se;
 
 	if ((se = event_alloc(SE_UNWELDQ, q))) {
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-		struct module *kmod;
-
-		if ((kmod = module_text_address((ulong) func))
-		    && kmod != THIS_MODULE && try_module_get(kmod))
-			se->x.w.kmod = kmod;
-		else
-			se->x.w.kmod = NULL;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 		se->x.w.queue = q ? qget(q) : NULL;
 		se->x.w.func = func;
 		se->x.w.arg = arg;
@@ -2247,9 +2197,6 @@ unbufcall(register bcid_t bcid)
 	unsigned long flags;
 	int state;
 	queue_t *q;
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-	struct module *kmod;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
 
 	if (unlikely(bcid == 0))
 		return;
@@ -2261,16 +2208,16 @@ unbufcall(register bcid_t bcid)
 			/* cancellation before processing could begin */
 			se->se_state = SE_CANCELLED;
 			q = XCHG(&se->x.b.queue, NULL);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
+#if 0
 			kmod = XCHG(&se->x.b.kmod, NULL);
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+#endif
 			spin_unlock_irqrestore(&event_hash_lock, flags);
 			/* we can release the module and queue at this point, it is not necessary
 			   to wait until the STREAMS scheduler frees the event. */
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
+#if 0
 			if (likely(kmod != NULL))
 				module_put(kmod);
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+#endif
 			if (unlikely(!!q))
 				qput(&q);
 			return;
@@ -2359,9 +2306,9 @@ untimeout(toid_t toid)
 	int state;
 	queue_t *q;
 	clock_t rem;
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
+#if 0
 	struct module *kmod;
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+#endif
 
 	if (unlikely(toid == 0))
 		return (-1);
@@ -2375,16 +2322,16 @@ untimeout(toid_t toid)
 			/* cancellation before processing could begin */
 			se->se_state = SE_CANCELLED;
 			q = XCHG(&se->x.t.queue, NULL);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
+#if 0
 			kmod = XCHG(&se->x.t.kmod, NULL);
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+#endif
 			spin_unlock_irqrestore(&event_hash_lock, flags);
 			/* We can release the module and queue at this point, it is not necessary
 			   to wait until the STREAMS scheduler frees the event. */
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
+#if 0
 			if (likely(kmod != NULL))
 				module_put(kmod);
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+#endif
 			if (unlikely(!!q))
 				qput(&q);
 			if (likely(del_timer(&se->x.t.timer))) {
@@ -4032,7 +3979,7 @@ do_bufcall_synced(struct strevent *se)
 				qput(&q);
 			} else
 				(*func) (se->x.b.arg);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
+#if 0
 			{
 				struct module *kmod;
 
@@ -4041,7 +3988,7 @@ do_bufcall_synced(struct strevent *se)
 					se->x.b.kmod = NULL;
 				}
 			}
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+#endif
 		}
 		spin_lock_irqsave(&event_hash_lock, flags);
 		se->se_task = NULL;
@@ -4160,7 +4107,7 @@ do_timeout_synced(struct strevent *se)
 				if (unlikely(safe))
 					streams_local_restore(pl);
 			}
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
+#if 0
 			{
 				struct module *kmod;
 
@@ -4169,7 +4116,7 @@ do_timeout_synced(struct strevent *se)
 					se->x.t.kmod = NULL;
 				}
 			}
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+#endif
 		}
 		spin_lock_irqsave(&event_hash_lock, flags);
 		se->se_task = NULL;
@@ -4373,7 +4320,7 @@ do_weldq_synced(struct strevent *se)
 					qput(&q);
 				} else
 					(*func) (se->x.w.arg);
-#ifdef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
+#if 0
 				{
 					struct module *kmod;
 
@@ -4382,7 +4329,7 @@ do_weldq_synced(struct strevent *se)
 						se->x.w.kmod = NULL;
 					}
 				}
-#endif					/* HAVE_MODULE_TEXT_ADDRESS_SYMBOL */
+#endif
 			}
 			spin_lock_irqsave(&event_hash_lock, flags);
 			se->se_task = NULL;
@@ -4639,40 +4586,72 @@ EXPORT_SYMBOL(kmem_alloc);	/* include/sys/openss7/kmem.h */
 #undef kmem_alloc
 #endif
 
-#ifndef HAVE_KSIZE_USABLE
+#ifndef nextpower
+#if !defined HAVE_KSIZE_SYMBOL || (!defined HAVE_KSIZE_SUPPORT && defined CONFIG_KERNEL_WEAK_SYMBOLS)
 /* Linux memory allocators always round up to the next power of 2.  We can use the slop. */
-STATIC streams_inline streams_fastcall uint
-kmem_zalloc_nextpower(uint y)
+static inline unsigned int
+nextpower(unsigned int s)
 {
-	uint r = 32;
-	uint x = y;
+	unsigned int r = 32;
 
-	if (!(x & 0xffff0000)) {
-		x <<= 16;
+	if (!(s & 0xffff0000)) {
+		s <<= 16;
 		r -= 16;
 	}
-	if (!(x & 0xff000000)) {
-		x <<= 8;
+	if (!(s & 0xff000000)) {
+		s <<= 8;
 		r -= 8;
 	}
-	if (!(x & 0xf0000000)) {
-		x <<= 4;
+	if (!(s & 0xf0000000)) {
+		s <<= 4;
 		r -= 4;
 	}
-	if (!(x & 0xc0000000)) {
-		x <<= 2;
+	if (!(s & 0xc0000000)) {
+		s <<= 2;
 		r -= 2;
 	}
-	if (!(x & 0x80000000)) {
-		x <<= 1;
+	if (!(s & 0x80000000)) {
+		s <<= 1;
 		r -= 1;
 	}
-	if (!(x & 0x7fffffff)) {
+	if (!(s & 0x7fffffff)) {
 		r -= 1;
 	}
 	return (1 << r);
 }
+#define nextpower(s) nextpower(s)
 #endif
+#endif
+
+#ifndef ktruesize
+#ifdef HAVE_KSIZE_SYMBOL
+#if defined HAVE_KSIZE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if defined HAVE_KFUNC_KSIZE_RETURNS_SIZE_T
+extern size_t ksize(const void *);
+#else
+extern unsigned int ksize(const void *);
+#endif
+#define ktruesize(obj,size) ksize(obj)
+#else
+#if defined HAVE_KFUNC_KSIZE_RETURNS_SIZE_T
+extern size_t ksize(const void *) __attribute__ ((__weak__));
+#else
+extern unsigned int ksize(const void *) __attribute__ ((__weak__));
+#endif
+static inline unsigned int
+ktruesize(const void *obj, unsigned int size)
+{
+	if (ksize)
+		return ksize(obj);
+	return nextpower(size);
+}
+#define ktruesize(obj,size) ktruesize(obj,size)
+#endif
+#else
+#define ktruesize(obj,size) nextpower(size)
+#endif
+#endif
+
 
 #ifdef HAVE_KMEM_ZALLOC_EXPORT
 #undef kmem_zalloc
@@ -4689,12 +4668,7 @@ kmem_zalloc(size_t size, int flags)
 	void *mem;
 
 	if ((mem = kmem_alloc(size, flags)))
-#ifdef HAVE_KSIZE_USABLE
-		/* newer kernels can tell us how big a memory object truly is */
-		memset(mem, 0, ksize(mem));
-#else
-		memset(mem, 0, kmem_zalloc_nextpower(size));
-#endif
+		memset(mem, 0, ktruesize(mem,size));
 	return (mem);
 }
 

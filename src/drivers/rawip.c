@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-26 04:28:47 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:12 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 1.1.2.8  2011-04-05 16:35:12  brian
+ - weak module design
+
  Revision 1.1.2.7  2011-03-26 04:28:47  brian
  - updates to build process
 
@@ -75,7 +78,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-26 04:28:47 $";
+static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:12 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -155,7 +158,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.7 
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-03-26 04:28:47 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:12 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS RAW IP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"
@@ -3509,8 +3512,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 					return (NULL);
 				}
 #endif				/* HAVE_KMEMB_STRUCT_INET_PROTOCOL_COPY */
-#ifdef HAVE_MODULE_ADDRESS_SYMBOL
-				if ((pp->kmod = module_address((ulong) *ppp))
+				if ((pp->kmod = streams_module_address((ulong) *ppp))
 				    && pp->kmod != THIS_MODULE) {
 					if (!try_module_get(pp->kmod)) {
 						__ptrace(("Cannot acquire module\n"));
@@ -3520,7 +3522,6 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 						return (NULL);
 					}
 				}
-#endif					/* HAVE_MODULE_ADDRESS_SYMBOL */
 #if defined HAVE_KMEMB_STRUCT_NET_PROTOCOL_NEXT || defined HAVE_KMEMB_STRUCT_INET_PROTOCOL_NEXT
 				pp->proto.next = (*ppp)->next;
 #endif
@@ -3587,10 +3588,8 @@ tp_term_nproto(unsigned char proto, unsigned int type)
 				*ppp = pp->next;
 				net_protocol_unlock();
 			}
-#ifdef HAVE_MODULE_ADDRESS_SYMBOL
 			if (pp->next != NULL && pp->kmod != NULL && pp->kmod != THIS_MODULE)
 				module_put(pp->kmod);
-#endif					/* HAVE_MODULE_ADDRESS_SYMBOL */
 			/* unlink from hash slot */
 			tp_prots[proto] = NULL;
 

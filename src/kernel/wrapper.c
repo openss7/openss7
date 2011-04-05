@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $
+ @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:49 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wrapper.c,v $
+ Revision 1.1.2.7  2011-04-05 16:35:14  brian
+ - weak module design
+
  Revision 1.1.2.6  2011-03-26 04:28:49  brian
  - updates to build process
 
@@ -73,7 +76,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $";
+    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -113,7 +116,7 @@ static char const ident[] =
 
 #define WRAPPER_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $"
+#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $"
 #define WRAPPER_DEVICE		"SVR 4.2 Wrappers (WRAPPER)"
 #define WRAPPER_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define WRAPPER_LICENSE		"GPL"
@@ -136,7 +139,7 @@ MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_REL
 #ifndef CONFIG_KERNEL_WEAK_MODULES
 
 #undef UNUSED
-#define UNUSED 1
+#define UNUSED 0
 
 #ifdef HAVE_SESSION_OF_PGRP_ADDR
 //pid_t session_of_pgrp(pid_t);
@@ -959,4 +962,4 @@ __asm__(".global " __stringify(__tcp_push_pending_frames));
 EXPORT_SYMBOL_GPL(__tcp_push_pending_frames);
 #endif				/* defined HAVE___TCP_PUSH_PENDING_FRAMES_ADDR */
 
-#endif                          /* CONFIG_KERNEL_WEAK_MODULES */
+#endif				/* CONFIG_KERNEL_WEAK_MODULES */

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:48 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 1.1.2.7  2011-04-05 16:35:14  brian
+ - weak module design
+
  Revision 1.1.2.6  2011-03-26 04:28:48  brian
  - updates to build process
 
@@ -72,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:48 $";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -123,7 +126,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:48 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"
@@ -298,19 +301,15 @@ MODULE_ALIAS("/dev/streams/*");
 #undef makedevice
 #define makedevice(__maj,__min) ((((__maj)<<16)&0xffff0000)|(((__min)<<0)&0x0000ffff))
 
-#ifdef HAVE_FILE_MOVE_USABLE
-void file_move(struct file *file, struct list_head *list);
+#if   defined HAVE_FILE_MOVE_SYMBOL
+#if   defined HAVE_FILE_MOVE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern void file_move(struct file *file, struct list_head *list);
 #else
-void file_move(struct file *file, struct list_head *list)
-{
-    if (!list)
-            return;
-    file_list_lock();
-    list_move(&file->f_u. fu_list, list);
-    file_list_unlock()
-}
+extern void file_move(struct file *file, struct list_head *list) __attribute__((__weak__));
 #endif
-
+#else
+#error Need a way to move a file pointer.
+#endif
 
 STATIC struct vfsmount *specfs_mnt = NULL;
 

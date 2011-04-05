@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-03-26 04:28:45 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-05 16:35:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
+## Last Modified $Date: 2011-04-05 16:35:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -772,7 +772,7 @@ DISTCLEANFILES		+= cscope.files cscope.out cscope.in.out cscope.po.out
 # A rule to generate an ifnames.log file
 ##
 ifnames.log:
-	ifnames `find $(srcdir) $(builddir) -name "*.h" -o -name "*.c" -o -name "*hooks.h.in"` > $@
+	find $(abs_srcdir) $(abs_builddir) -name "*.h" -o -name "*.c" -o -name "*.h.in" | egrep -v '/(config.h.in|config.h)$$' | xargs ifnames > $@
 
 ifnames: ifnames.log
 
@@ -1165,6 +1165,9 @@ DISTCLEANFILES		+= $(CONFIG_BLDREQ)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 1.1.2.10  2011-04-05 16:35:11  brian
+## - weak module design
+##
 ## Revision 1.1.2.9  2011-03-26 04:28:45  brian
 ## - updates to build process
 ##

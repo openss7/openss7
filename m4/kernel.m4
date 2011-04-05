@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-03-26 04:28:45 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-05 16:35:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
+# Last Modified $Date: 2011-04-05 16:35:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -219,12 +219,21 @@ dnl     [], [enable_k_install=yes])
     else
 	linux_cv_k_weak_symbols='no'
     fi])
+    AH_VERBATIM([CONFIG_KERNEL_WEAK_SYMBOLS], m4_text_wrap([Undefined weak
+	symbols can be used where the availability of a specific version of a
+	symbol is not guaranteed but can be compensated for at run-time.  A
+	typical use is to link a symbol that is not supported by a kernel ABI,
+	or when undefined symbols must be resolved at load time.  When defined,
+	undefined weak symbols will be used wherever possible. */], [   ],
+	[/* ])[
+#undef CONFIG_KERNEL_WEAK_SYMBOLS
+#ifdef CONFIG_KERNEL_WEAK_SYMBOLS
+#define streams_weak __attribute__((weak))
+#else
+#define streams_weak
+#endif])
     if test :"${linux_cv_k_weak_symbols:-yes}" = :yes ; then :;
-	AC_DEFINE([CONFIG_KERNEL_WEAK_SYMBOLS], [1], [Undefined weak symbols can
-	be used where the availability of a specific version of a symbol is not
-	guaranteed but can be compensated for at run-time.  A typical use is to
-	link a symbol that is not supported by a kernel ABI.  When defined,
-	undefined weak symbols will be used wherever possible.])
+	AC_DEFINE([CONFIG_KERNEL_WEAK_SYMBOLS], [1])
     fi
     AC_CACHE_CHECK([for kernel abi support], [linux_cv_k_abi_support], [dnl
     AC_ARG_ENABLE([k-abi-support],
@@ -3243,7 +3252,7 @@ AC_DEFUN([_LINUX_KERNEL_SYMBOL_ADDR], [dnl
     AS_VAR_POPDEF([linux_symbol_addr])dnl
     AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_SYMBOL), [Symbol $1 is available.])dnl
     AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_USABLE), [Symbol $1 is usable.])dnl
-    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_ADDR),   [Symbol $1 is exported.])dnl
+    AH_TEMPLATE(AS_TR_CPP(HAVE_$1[]_ADDR),   [Symbol $1 has an address.])dnl
 ])# _LINUX_KERNEL_SYMBOL_ADDR
 # =============================================================================
 
@@ -3474,6 +3483,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.10  2011-04-05 16:35:11  brian
+# - weak module design
+#
 # Revision 1.1.2.9  2011-03-26 04:28:45  brian
 # - updates to build process
 #

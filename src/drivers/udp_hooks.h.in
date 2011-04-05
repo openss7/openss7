@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: udp_hooks.h.in,v 1.1.2.5 2011-03-26 04:28:48 brian Exp $
+ @(#) $Id: udp_hooks.h.in,v 1.1.2.6 2011-04-05 16:35:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp_hooks.h.in,v $
+ Revision 1.1.2.6  2011-04-05 16:35:13  brian
+ - weak module design
+
  Revision 1.1.2.5  2011-03-26 04:28:48  brian
  - updates to build process
 
@@ -116,6 +119,7 @@
 #define IPPROTO_SCTP 132
 #endif
 
+/* Define to 1 if the system has the type 'struct sockaddr_storage'. */
 #undef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
 #ifndef HAVE_KTYPE_STRUCT_SOCKADDR_STORAGE
 #define _SS_MAXSIZE 128
@@ -126,45 +130,149 @@ struct sockaddr_storage {
 } __attribute__ ((aligned(_SS_ALIGNSIZE)));
 #endif
 
+/* Symbol icmp_err_convert is available. */
+#undef HAVE_ICMP_ERR_CONVERT_SYMBOL
+#ifdef HAVE_ICMP_ERR_CONVERT_SYMBOL
+/* Symbol icmp_err_convert is supported. */
+#undef HAVE_ICMP_ERR_CONVERT_SUPPORT
+#if defined HAVE_ICMP_ERR_CONVERT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern struct icmp_err icmp_err_convert[];
-
-extern struct icmp_mib icmp_statistic[];
-
-#undef HAVE_IP_ROUTE_OUTPUT_FLOW_USABLE
-#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_USABLE
-int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
+#else
+extern struct icmp_err icmp_err_convert[] __attribute__((__weak__));
+#endif
 #endif
 
-#undef HAVE_IP_RT_MIN_PMTU_USABLE
-#ifdef HAVE_IP_RT_MIN_PMTU_USABLE
+/* Symbol icmp_statistics is available. */
+#undef HAVE_ICMP_STATISTICS_SYMBOL
+#ifdef HAVE_ICMP_STATISTICS_SYMBOL
+/* Symbol icmp_statistics is supported. */
+#undef HAVE_ICMP_STATISTICS_SUPPORT
+#if defined HAVE_ICMP_STATISTICS_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern struct icmp_mib *icmp_statistics[];
+#else
+extern struct icmp_mib *icmp_statistics[] __attribute__((__weak__));
+#endif
+#endif
+
+/* Symbol ip_route_output_flow is available. */
+#undef HAVE_IP_ROUTE_OUTPUT_FLOW_SYMBOL
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_SYMBOL
+/* Symbol ip_route_output_flow is supported. */
+#undef HAVE_IP_ROUTE_OUTPUT_FLOW_SUPPORT
+#if defined HAVE_IP_ROUTE_OUTPUT_FLOW_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_4_ARGS
+extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
+#endif
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_5_ARGS
+extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *flp,
+				struct sock *sk, int flags);
+#endif
+#else
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_4_ARGS
+extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags)
+    __attribute__ ((__weak__));
+#endif
+#ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_5_ARGS
+extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *flp,
+				struct sock *sk, int flags) __attribute__ ((__weak__));
+#endif
+#endif
+#endif
+
+#ifndef ip_rt_min_pmtu
+/* Symbol ip_rt_min_pmtu is available. */
+#undef HAVE_IP_RT_MIN_PMTU_SYMBOL
+#ifdef HAVE_IP_RT_MIN_PMTU_SYMBOL
+/* Symbol ip_rt_min_pmtu is supported. */
+#undef HAVE_IP_RT_MIN_PMTU_SUPPORT
+#if defined HAVE_IP_RT_MIN_PMTU_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int ip_rt_min_pmtu;
+#define ip_rt_min_pmtu ip_rt_min_pmtu
+#else
+extern int ip_rt_min_pmtu __attribute__ ((__weak__));
+static inline int
+ip_rt_min_pmtu_(void)
+{
+	if (&ip_rt_min_pmtu)
+		return ip_rt_min_pmtu;
+	return 552;
+}
+#define ip_rt_min_pmtu ip_rt_min_pmtu_()
+#endif
 #else
 #define ip_rt_min_pmtu 552
 #endif
+#endif
 
-#undef HAVE_IP_RT_MTU_EXPIRES_USABLE
-#ifdef HAVE_IP_RT_MTU_EXPIRES_USABLE
+/* Symbol ip_rt_mtu_expires is available. */
+#undef HAVE_IP_RT_MTU_EXPIRES_SYMBOL
+#ifdef HAVE_IP_RT_MTU_EXPIRES_SYMBOL
+/* Symbol ip_rt_mtu_expires is supported. */
+#undef HAVE_IP_RT_MTU_EXPIRES_SUPPORT
+#if defined HAVE_IP_RT_MTU_EXPIRES_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int ip_rt_mtu_expires;
+#else
+extern int ip_rt_mtu_expires __attribute__((__weak__));
+#endif
 #endif
 
-#undef HAVE_IP_RT_UPDATE_PMTU_USABLE
-#ifdef HAVE_IP_RT_UPDATE_PMTU_USABLE
-void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
+/* Symbol ip_rt_update_pmtu is available. */
+#undef HAVE_IP_RT_UPDATE_PMTU_SYMBOL
+#ifdef HAVE_IP_RT_UPDATE_PMTU_SYMBOL
+/* Symbol ip_rt_update_pmtu is supported. */
+#undef HAVE_IP_RT_UPDATE_PMTU_SUPPORT
+#if defined HAVE_IP_RT_UPDATE_PMTU_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
+#else
+extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu) __attribute__ ((__weak__));
+#endif
 #endif
 
-#undef HAVE_SYSCTL_IP_DYNADDR_USABLE
 #ifndef sysctl_ip_dynaddr
-#ifdef HAVE_SYSCTL_IP_DYNADDR_USABLE
+/* Symbol sysctl_ip_dynaddr is available. */
+#undef HAVE_SYSCTL_IP_DYNADDR_SYMBOL
+#ifdef HAVE_SYSCTL_IP_DYNADDR_SYMBOL
+/* Symbol sysctl_ip_dynaddr is supported. */
+#undef HAVE_SYSCTL_IP_DYNADDR_SUPPORT
+#if defined HAVE_SYSCTL_IP_DYNADDR_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_ip_dynaddr;
+#define sysctl_ip_dynaddr sysctl_ip_dynaddr
+#else
+extern int sysctl_ip_dynaddr __attribute__ ((__weak__));
+static inline int
+sysctl_ip_dynaddr_(void)
+{
+	if (&sysctl_ip_dynaddr)
+		return sysctl_ip_dynaddr;
+	return 0;
+}
+#define sysctl_ip_dynaddr sysctl_ip_dynaddr_()
+#endif
 #else
 #define sysctl_ip_dynaddr 0
 #endif
 #endif
 
-#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_USABLE
 #ifndef sysctl_ip_nonlocal_bind
-#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_USABLE
+/* Symbol sysctl_ip_nonlocal_bind is available. */
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
+#ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_SYMBOL
+/* Symbol sysctl_ip_nonlocal_bind is supported. */
+#undef HAVE_SYSCTL_IP_NONLOCAL_BIND_SUPPORT
+#if defined HAVE_SYSCTL_IP_NONLOCAL_BIND_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_ip_nonlocal_bind;
+#define sysctl_ip_nonlocal_bind sysctl_ip_nonlocal_bind
+#else
+extern int sysctl_ip_nonlocal_bind __attribute__ ((__weak__));
+static inline int
+sysctl_ip_nonlocal_bind_(void)
+{
+	if (&sysctl_ip_nonlocal_bind)
+		return sysctl_ip_nonlocal_bind;
+	return 0;
+}
+#define sysctl_ip_nonlocal_bind sysctl_ip_nonlocal_bind_()
+#endif
 #else
 #define sysctl_ip_nonlocal_bind 0
 #endif
@@ -174,10 +282,26 @@ extern int sysctl_ip_nonlocal_bind;
 #define IPDEFTTL 64
 #endif
 
-#undef HAVE_SYSCTL_IP_DEFAULT_TTL_USABLE
 #ifndef sysctl_ip_default_ttl
-#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_USABLE
+/* Symbol sysctl_ip_default_ttl is available. */
+#undef HAVE_SYSCTL_IP_DEFAULT_TTL_SYMBOL
+#ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_SYMBOL
+/* Symbol sysctl_ip_default_ttl is supported. */
+#undef HAVE_SYSCTL_IP_DEFAULT_TTL_SUPPORT
+#if defined HAVE_SYSCTL_IP_DEFAULT_TTL_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_ip_default_ttl;
+#define sysctl_ip_default_ttl sysctl_ip_default_ttl
+#else
+extern int sysctl_ip_default_ttl __attribute__ ((__weak__));
+static inline int
+sysctl_ip_default_ttl_(void)
+{
+	if (&sysctl_ip_default_ttl)
+		return sysctl_ip_default_ttl;
+	return IPDEFTTL;
+}
+#define sysctl_ip_default_ttl sysctl_ip_default_ttl_()
+#endif
 #else
 #define sysctl_ip_default_ttl IPDEFTTL
 #endif
@@ -187,17 +311,38 @@ extern int sysctl_ip_default_ttl;
 extern int sysctl_local_port_range[2];
 #endif				/* HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL */
 
-#undef HAVE___IP_ROUTE_OUTPUT_KEY_USABLE
-#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_USABLE
-int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
+
+/* Symbol __ip_route_output_key is available. */
+#undef HAVE___IP_ROUTE_OUTPUT_KEY_SYMBOL
+#ifdef HAVE___IP_ROUTE_OUTPUT_KEY_SYMBOL
+/* Define if function ip_route_output_key() takes 2 arguments. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
+/* Define if function ip_route_output_key() takes 3 arguments. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+#if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS && \
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+#error Do no know how many arguments ip_route_output_key() takes.
+#endif
+/* Symbol __ip_route_output_key is supported. */
+#undef HAVE___IP_ROUTE_OUTPUT_KEY_SUPPORT
+#if defined HAVE___IP_ROUTE_OUTPUT_KEY_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
+extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp);
+#endif
+#else
+#if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
+extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp)
+    __attribute__ ((__weak__));
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp)
+    __attribute__ ((__weak__));
+#endif
+#endif
 #endif
 
-#undef HAVE_KFUNC_DST_MTU
-#ifdef HAVE_KFUNC_DST_MTU
-/* Why do stupid people rename things like this? */
-#undef dst_pmtu
-#define dst_pmtu dst_mtu
-#else
+/* Define to 1 if 'path' is member of 'struct dst_entry'. */
 #undef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
 #ifdef HAVE_KMEMB_STRUCT_DST_ENTRY_PATH
 /* dst_pmtu should be already defined */
@@ -207,24 +352,32 @@ dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 	if (dst->ops->update_pmtu)
 		dst->ops->update_pmtu(dst, mtu);
 }
-#else
-#ifndef dst_pmtu
+#elif !defined dst_pmtu
 static __inline__ u32
 dst_pmtu(struct dst_entry *dst)
 {
 	return (dst->pmtu);
 }
-#endif
+#else
 static __inline__ void
 dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 {
 	dst->pmtu = mtu;
 }
 #endif
+
+/* Define to 1 if kernel function dst_mtu() exists. */
+#undef HAVE_KFUNC_DST_MTU
+#ifdef HAVE_KFUNC_DST_MTU
+/* Why do stupid people rename things like this? */
+#	undef dst_pmtu
+#	define dst_pmtu dst_mtu
 #endif
 
+/* Define to 1 if 'dev_base_head' is member of 'struct net'. */
 #undef HAVE_KMEMB_STRUCT_NET_DEV_BASE_HEAD
 
+/* Define if you have the explicit version of ip_route_output. */
 #undef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
 #ifndef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
 static __inline__ int
@@ -238,6 +391,7 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 		.uli_u = {.ports = {.sport = 0,.dport = 0}}
 	};
 
+/* Define if function ip_route_output_key() takes 3 arguments. */
 #undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 #ifdef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 	return ip_route_output_key(&init_net, rp, &fl);
@@ -247,44 +401,78 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 }
 #endif
 
-#undef HAVE___XFRM_POLICY_CHECK_USABLE
-#ifdef HAVE___XFRM_POLICY_CHECK_USABLE
-int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned short family);
-#endif
-
-#undef HAVE_XFRM_POLICY_DELETE_USABLE
-#ifdef HAVE_XFRM_POLICY_DELETE_USABLE
-#ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
-int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+/* Symbol __xfrm_policy_check is available. */
+#undef HAVE___XFRM_POLICY_CHECK_SYMBOL
+#ifdef HAVE___XFRM_POLICY_CHECK_SYMBOL
+/* Symbol __xfrm_policy_check is supported. */
+#undef HAVE___XFRM_POLICY_CHECK_SUPPORT
+#if defined HAVE___XFRM_POLICY_CHECK_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
+			       unsigned short family);
 #else
-void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+extern int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
+			       unsigned short family) __attribute__ ((__weak__));
 #endif
 #endif
 
-#undef HAVE_SNMP_GET_INFO_USABLE
-#ifdef HAVE_SNMP_GET_INFO_USABLE
-int snmp_get_info(char *buffer, char **start, off_t offset, int length);
+/* Symbol xfrm_policy_delete is available. */
+#undef HAVE_XFRM_POLICY_DELETE_SYMBOL
+#ifdef HAVE_XFRM_POLICY_DELETE_SYMBOL
+/* Define if function xfrm_policy_delete returns int. */
+#undef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
+/* Symbol xfrm_policy_delete is supported. */
+#undef HAVE_XFRM_POLICY_DELETE_SUPPORT
+#if defined HAVE_XFRM_POLICY_DELETE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
+extern int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+#else
+extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
+#endif
+#else
+#ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
+extern int xfrm_policy_delete(struct xfrm_policy *pol, int dir) __attribute__ ((__weak__));
+#else
+extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir) __attribute__ ((__weak__));
+#endif
+#endif
 #endif
 
+/* Symbol snmp_get_info is available. */
+#undef HAVE_SNMP_GET_INFO_SYMBOL
+#ifdef HAVE_SNMP_GET_INFO_SYMBOL
+/* Symbol snmp_get_info is supported. */
+#undef HAVE_SNMP_GET_INFO_SUPPORT
+#if defined HAVE_SNMP_GET_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int snmp_get_info(char *buffer, char **start, off_t offset, int length);
+#else
+extern int snmp_get_info(char *buffer, char **start, off_t offset, int length)
+    __attribute__ ((__weak__));
+#endif
+#endif
+
+/* Define if function ip_frag_nqueues() takes 1 argument. */
 #undef HAVE_KFUNC_IP_FRAG_NQUEUES_1_ARG
 #ifdef HAVE_KFUNC_IP_FRAG_NQUEUES_1_ARG
-int ip_frag_nqueues(struct net *net);
+extern int ip_frag_nqueues(struct net *net);
 #else
+/* Define if function ip_frag_nqueues() takes 0 arguments. */
 #undef HAVE_KFUNC_IP_FRAG_NQUEUES_0_ARGS
 #ifdef HAVE_KFUNC_IP_FRAG_NQUEUES_0_ARGS
-int ip_frag_nqueues(void);
+extern int ip_frag_nqueues(void);
 #else
 extern int ip_frag_nqueues;
 #endif
 #endif
 
+/* Define if function ip_frag_mem() takes 1 argument. */
 #undef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
 #ifdef HAVE_KFUNC_IP_FRAG_MEM_1_ARG
-int ip_frag_mem(struct net *net);
+extern int ip_frag_mem(struct net *net);
 #else
+/* Define if function ip_frag_mem() takes 0 arguments. */
 #undef HAVE_KFUNC_IP_FRAG_MEM_0_ARGS
 #ifdef HAVE_KFUNC_IP_FRAG_MEM_0_ARGS
-int ip_frag_mem(void);
+extern int ip_frag_mem(void);
 #else
 extern atomic_t ip_frag_mem;
 #endif
@@ -297,37 +485,96 @@ extern atomic_t ip_frag_mem;
 #define SK_RMEM_MAX 65535
 #endif
 
-#undef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
 #ifndef sysctl_rmem_default
-#ifdef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
+/* Symbol sysctl_rmem_default is available. */
+#undef HAVE_SYSCTL_RMEM_DEFAULT_SYMBOL
+#ifdef HAVE_SYSCTL_RMEM_DEFAULT_SYMBOL
+/* Symbol sysctl_rmem_default is supported. */
+#undef HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT
+#if defined HAVE_SYSCTL_RMEM_DEFAULT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern __u32 sysctl_rmem_default;
+#define sysctl_rmem_default sysctl_rmem_default
+#else
+extern __u32 sysctl_rmem_default __attribute__((__weak__));
+static inline __u32 sysctl_rmem_default_(void)
+{
+	if (&sysctl_rmem_default)
+		return sysctl_rmem_default;
+	return SK_RMEM_MAX;
+}
+#define sysctl_rmem_default sysctl_rmem_default_()
+#endif
 #else
 #define sysctl_rmem_default SK_RMEM_MAX
 #endif
 #endif
 
-#undef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
 #ifndef sysctl_wmem_default
-#ifdef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
+/* Symbol sysctl_wmem_default is available. */
+#undef HAVE_SYSCTL_WMEM_DEFAULT_SYMBOL
+#ifdef HAVE_SYSCTL_WMEM_DEFAULT_SYMBOL
+/* Symbol sysctl_wmem_default is supported. */
+#undef HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT
+#if defined HAVE_SYSCTL_WMEM_DEFAULT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern __u32 sysctl_wmem_default;
+#define sysctl_wmem_default sysctl_wmem_default
+#else
+extern __u32 sysctl_wmem_default __attribute__((__weak__));
+static inline __u32 sysctl_wmem_default_(void) {
+	if (&sysctl_wmem_default)
+		return sysctl_wmem_default;
+	return SK_WMEM_MAX;
+}
+#define sysctl_wmem_default sysctl_wmem_default_()
+#endif
 #else
 #define sysctl_wmem_default SK_WMEM_MAX
 #endif
 #endif
 
-#undef HAVE_SYSCTL_RMEM_MAX_SUPPORT
 #ifndef sysctl_rmem_max
-#ifdef HAVE_SYSCTL_RMEM_MAX_SUPPORT
+/* Symbol sysctl_rmem_max is available. */
+#undef HAVE_SYSCTL_RMEM_MAX_SYMBOL
+#ifdef HAVE_SYSCTL_RMEM_MAX_SYMBOL
+/* Symbol sysctl_rmem_max is supported. */
+#undef HAVE_SYSCTL_RMEM_MAX_SUPPORT
+#if defined HAVE_SYSCTL_RMEM_MAX_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern __u32 sysctl_rmem_max;
+#define sysctl_rmem_max sysctl_rmem_max
+#else
+extern __u32 sysctl_rmem_max __attribute__((weak));
+static inline __u32 sysctl_rmem_max_(void)
+{
+	if (&sysctl_rmem_max)
+		return sysctl_rmem_max;
+	return SK_RMEM_MAX;
+}
+#define sysctl_rmem_max sysctl_rmem_max_()
+#endif
 #else
 #define sysctl_rmem_max SK_RMEM_MAX
 #endif
 #endif
 
-#undef HAVE_SYSCTL_WMEM_MAX_SUPPORT
 #ifndef sysctl_wmem_max
-#ifdef HAVE_SYSCTL_WMEM_MAX_SUPPORT
+/* Symbol sysctl_wmem_max is available. */
+#undef HAVE_SYSCTL_WMEM_MAX_SYMBOL
+#ifdef HAVE_SYSCTL_WMEM_MAX_SYMBOL
+/* Symbol sysctl_wmem_max is supported. */
+#undef HAVE_SYSCTL_WMEM_MAX_SUPPORT
+#if defined HAVE_SYSCTL_WMEM_MAX_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern __u32 sysctl_wmem_max;
+#define sysctl_wmem_max sysctl_wmem_max
+#else
+extern __u32 sysctl_wmem_max __attribute__((weak));
+static inline __u32 sysctl_wmem_max_(void)
+{
+	if (&sysctl_wmem_max)
+		return sysctl_wmem_max;
+	return SK_WMEM_MAX;
+}
+#define sysctl_wmem_max sysctl_wmem_max_()
+#endif
 #else
 #define sysctl_wmem_max SK_WMEM_MAX
 #endif
@@ -339,6 +586,7 @@ typedef int socklen_t;
 #define socklen_t socklen_t
 #endif
 
+/* Define to 1 if kernel function skb_dst() exists. */
 #undef HAVE_KFUNC_SKB_DST
 #ifndef HAVE_KFUNC_SKB_DST
 static __inline__ struct dst_entry*
@@ -348,6 +596,7 @@ skb_dst(struct sk_buff *skb)
 }
 #endif
 
+/* Define to 1 if kernel function skb_dst_set() exists. */
 #undef HAVE_KFUNC_SKB_DST_SET
 #ifndef HAVE_KFUNC_SKB_DST_SET
 static __inline__ void
@@ -357,6 +606,7 @@ skb_dst_set(struct sk_buff *skb, struct dst_entry *dst)
 }
 #endif
 
+/* Define to 1 if kernel function skb_rtable() exists. */
 #undef HAVE_KFUNC_SKB_RTABLE
 #ifndef HAVE_KFUNC_SKB_RTABLE
 static __inline__ struct rtable*
@@ -366,4 +616,50 @@ skb_rtable(struct sk_buff *skb)
 }
 #endif
 
-#endif				/* __LOCAL_UDP_HOOKS_H__ */
+/* Symbol __ip_select_ident is available. */
+#undef HAVE___IP_SELECT_IDENT_SYMBOL
+#ifdef HAVE___IP_SELECT_IDENT_SYMBOL
+#if !defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS && !defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+#error Cannot tell how many arguments function __ip_select_ident() takes.
+#endif
+/* Symbol __ip_select_ident is supported. */
+#undef HAVE___IP_SELECT_IDENT_SUPPORT
+#if defined HAVE___IP_SELECT_IDENT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst);
+#define __ip_select_ident(a,b,c) __ip_select_ident(a,b)
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst, int more);
+#define __ip_select_ident(a,b,c) __ip_select_ident(a,b,c)
+#endif
+#else
+#if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst)
+    __attribute__((__weak__));
+static inline void __ip_select_ident_(struct iphdr *iph, struct dst_entry *dst)
+{
+	if (__ip_select_ident)
+		return __ip_select_ident(iph, dst);
+	iph->id = (iph->daddr ^ -jiffies);
+	return;
+}
+#define __ip_select_ident(a,b,c) __ip_select_ident_(a,b)
+#elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
+extern void __ip_select_ident(struct iphdr *iph, struct dst_entry *dst, int more)
+    __attribute__((__weak__));
+static inline void __ip_select_ident_(struct iphdr *iph, struct dst_entry *dst, int more)
+{
+	if (__ip_select_ident)
+		return __ip_select_ident(iph, dst, more);
+	iph->id = (iph->daddr ^ -jiffies);
+	return;
+}
+#define __ip_select_ident(a,b,c) __ip_select_ident_(a,b,c)
+#endif
+#endif
+#else
+#error Need a way of selecting an IP segmentation identifier.
+#endif
+
+
+#endif				/* __LOCAL_IP_HOOKS_H__ */

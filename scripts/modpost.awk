@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:46 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-05 16:35:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
+# Last Modified $Date: 2011-04-05 16:35:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -90,7 +90,7 @@ function print_vinfo(level, string)
 }
 function print_vmore(level, string)
 {
-    if ((values["quiet"] == 0) && (values["verbose"] >= level)) {
+    if (prog == "yes" && (values["quiet"] == 0) && (values["verbose"] >= level)) {
 	printf "%s", blu me ": I: " string std cr lf > stdout
 	fflush(stdout)
 	written[stdout] = 1
@@ -105,7 +105,7 @@ function print_debug(level, string)
 }
 function print_dmore(level, string)
 {
-    if (values["debug"] >= level) {
+    if (prog == "yes" && values["debug"] >= level) {
 	printf "%s", mag me ": D: " string std cr lf > stderr
 	fflush(stderr)
 	written[stderr] = 1
@@ -115,13 +115,15 @@ function print_error(string)
 {
     print red me ": E: " string std > stderr
     if (count_errs) errors = errors "\n"
-    errors = errors red me ": E: " string std;
+    errors = errors red me ": E: " string std
     written[stderr] = 1
     count_errs++
 }
 function print_emore(string)
 {
     print red me ": E: " string std > stderr
+    if (count_errs) errors = errors "\n"
+    errors = errors red me ": E: " string std
     written[stderr] = 1
 }
 function print_warns(string)
@@ -145,32 +147,41 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: modpost.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
 Usage:\n\
-  awk -f " me " -- [options] [MODULE ...]\n\
-  awk -f " me " -- -" longopts["help"] "\n\
-  awk -f " me " -- -" longopts["version"] "\n\
-  awk -f " me " -- -" longopts["copying"] "\
+  [awk -f ]" me " -- [options] [MODULE ...]\n\
+  [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
+  [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["version"]) ", --version\n\
+  [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["copying"]) ", --copying\
 " > output
     written[output] = 1
 }
-function help_usage(name,  line,sep,dflt,env)
+function help_usage(name,  line,sep,dflt,env,valu)
 {
     line = ""; sep = ""; dflt = ""; env = ""
-    if (name in defaults) {
+    if (name in defaults && longopts[name] !~ /!/) {
 	if (longopts[name]~/:/) {
 	    dflt = defaults[name]
 	} else {
 	    if (defaults[name]) { dflt = "yes" } else { dflt = "no" }
 	}
-	if (dflt) {
-	    line = line sep "[default: " dflt "]"; sep = " "
-	}
+	#if (dflt) {
+	    line = line sep "[default: '" dflt "']"; sep = " "
+	#}
     }
-    if (name in environs) {
+    if (name in environs && longopts[name] !~ /!/) {
 	if (longopts[name]!~/:/) env = "?"
 	if (environs[name])
 	    line = line sep "{" env environs[name] "}"; sep = " "
+    }
+    if (name in values && longopts[name] !~ /!/) {
+	if (longopts[name]~/:/) {
+	    valu = values[name]
+	} else {
+	    if (values[name]) { valu = "yes" } else { valu = "no" }
+	}
+	if (line) sep = "\n      "
+	line = line sep "(current: '" valu "')"; sep = " "
     }
     return line
 }
@@ -181,32 +192,35 @@ function help_opttags(name,  line,char,opt,oth)
 	opt = longopts[name]
 	if (opt~/[[:alnum:]]/) {
 	    char = opt
-	    gsub(/:/,"",char)
+	    gsub(/[:!]/,"",char)
 	    line = "-" char ", --" name
 	} else {
 	    line = "--" name
 	}
+	if (name in longargs) { line = line " " longargs[name] } else
 	if (opt~/::$/) { line = line " [" toupper(name) "]" } else
 	if (opt~/:$/)  { line = line " " toupper(name) } else
-	if (name !~ /^(help|version|copying)$/)
-	               { line = line ", --no-" name }
+	if (opt!~/!$/) { line = line ", --no-" name }
 	if (opt~/[[:alnum:]]/) {
 	    for (oth in longopts) {
 		if (opt != longopts[oth]) continue
 		if (oth == name) continue
-		if (opt~/::$/) { line = line ", --" oth " [" toupper(oth) "]" } else
-		if (opt~/:$/)  { line = line ", --" oth " " toupper(oth) } else
-			       { line = line ", --" oth ", --no-" oth }
+		line = line ", --" oth
+		if (oth in longargs) { line = line " " longargs[oth] } else
+		if (opt~/::$/) { line = line " [" toupper(oth) "]" } else
+		if (opt~/:$/)  { line = line " " toupper(oth) } else
+		if (opt!~/!$/) { line = line ", --no-" oth }
 	    }
 	}
     }
     return line
 }
-function help_option(output, name)
+function help_option(output, name,
+		     desc)
 {
     printf "  %s\n", help_opttags(name) > output
     if (name in descrips && descrips[name])
-    printf "      %s\n", descrips[name] > output
+	printf "      %s\n", gensub(/\n/, "\n      ", "g", descrips[name]) > output
     if ((name in defaults || name in environs) && help_usage(name))
     printf "      %s\n", help_usage(name) > output
 }
@@ -248,7 +262,7 @@ function help(output)
     usage(output)
     print "\
 Arguments:\n\
-  MODULE ...\n\
+  " longargs["modules"] "\n\
       " descrips["modules"] "\
 " > output
     help_options(output)
@@ -260,7 +274,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -283,7 +297,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -323,7 +337,8 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 " > output
     written[output] = 1
 }
-function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg, wantarg)
+function getopt_long(argc, argv, optstring, longopts, longindex,
+		     pos, needarg, wantarg, modearg)
 {
     option = ""; optval = ""; optarg = ""; optset = ""; pos = 0; needarg = 0; wantarg = 0
     if (optind == 0) { optind = 1; more = "" }
@@ -331,18 +346,21 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	if (more) { arg = "-" more; more = "" }
 	else { arg = argv[optind]; optind++ }
 	if (arg ~ /^--?[a-zA-Z0-9]/) {
+	    if (wantarg) {
+		more = substr(arg, 2)
+		if (option in defaults)
+		    optarg = defaults[option]
+		return optval
+	    }
 	    if (needarg) {
 		print_error("option -" optval " requires an argument")
 		usage(stderr)
 		exit 2
 	    }
-	    if (wantarg) {
-		more = substr(arg, 2)
-		return optval
-	    }
 	    if (arg ~ /^--[a-zA-Z0-9][-_a-zA-Z0-9]*=.*$/) {
 		option = arg; sub(/^--/, "", option); sub(/=.*$/, "", option)
 		optarg = arg; sub(/^--([a-zA-Z0-9][-_a-zA-Z0-9]*)=/, "", optarg)
+		optset = 1
 		if (!(option in longopts)) {
 		    print_error("option --" option " not recognized")
 		    usage(stderr)
@@ -369,8 +387,9 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 		    }
 		}
 		if (longopts[option] ~ /::/) { wantarg = 1 } else
-		if (longopts[option] ~ /:/ ) { needarg = 1 }
-		if ((wantarg || needarg) && !optset) {
+		if (longopts[option] ~ /:/ ) { needarg = 1 } else
+		if (longopts[option] ~ /!/ ) { modearg = 1 }
+		if ((wantarg || needarg || modearg) && !optset) {
 		    print_error("option --no-" option " not recognized")
 		    usage(stderr)
 		    exit 2
@@ -386,6 +405,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	    if (arg ~ /^-[a-zA-Z0-9]/) {
 		optval = substr(arg, 2, 1)
 		pos = index(optstring, optval)
+		optset = 1
 		if (pos == 0 || substr(optstring, pos, 1) == "*") {
 		    print_error("option -" optval " not recognized")
 		    usage(stderr)
@@ -413,7 +433,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 			if (substr(longopts[option], 1, 1) == optval)
 			    break
 		    continue
-		}
+		} else optset = 1
 		if (length(arg) > 2) { more = substr(arg, 3) } else { more = "" }
 		if (more && more !~ /^[a-zA-Z0-9]/) {
 		    print_error("bad option sequence " arg)
@@ -426,8 +446,15 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 		return optval
 	    }
 	}
-	if (arg == "--")
+	if (arg == "--") {
+	    if (wantarg) {
+		if (option in defaults)
+		    optarg = defaults[option]
+		optind--
+		return optval
+	    }
 	    return -1
+	}
 	if (needarg || wantarg) {
 	    optarg = arg
 	    return optval
@@ -435,11 +462,28 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	optind--
 	return -1
     }
+    if (wantarg) {
+	if (option in defaults)
+	    optarg = defaults[option]
+	return optval
+    }
+    if (needarg) {
+	print_error("option -" optval " requires an argument")
+	usage(stderr)
+	exit 2
+    }
     return -1
 }
 function system_command(cmd)
 {
-    print_debug(3,cmd); return system(cmd)
+    print_debug(3, "x: " cmd); return system(cmd)
+}
+function doit(cmd)
+{
+    if (values["dry-run"] == 0)
+	return system_command(cmd)
+    print_vinfo(2, "x: execute,   " cmd)
+    return 0
 }
 function missing(fnlp, expected)
 {
@@ -932,7 +976,7 @@ function read_systemmap(command, mod, own, src,		result,val,flag,sym,count_syms,
 	}
     }
     if (result != -1) close(command)
-    print_vinfo(1,"r: systemmap, syms " count_syms ", unds " count_unds, ", weak " count_weak)
+    print_vinfo(1,"r: systemmap, syms " count_syms " unds " count_unds ", weak " count_weak)
 }
 # read modpost cache file
 function read_cachefile(file,    i,result,line,n,fields)
@@ -1047,7 +1091,8 @@ function read_moduledir(directory, src,	    dir,command)
     command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t"
     read_modobject(command, dir, values["pkgdirectory"], "pkgdirectory")
 }
-function read_mymodules(modules, src,    i, pair, ind, name, sym) {
+function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
+    fmt = "r: mymodules, %-20s: %14s; %-30s"
     print_vinfo(1,"r: mymodules")
     for (i = 1; i in modules; i++)
 	print modules[i] > "modvers.list"
@@ -1057,7 +1102,7 @@ function read_mymodules(modules, src,    i, pair, ind, name, sym) {
     system("rm -f modvers.list")
     # double check
     for (pair in mod_unds) {
-	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]; base = name; gsub(/^.*\//, "", base)
 	if (sym in mods) {
 	    mod_deps[name,mods[sym]] = 1
 	    if ((mods[sym],sym) in mod_used)
@@ -1067,21 +1112,21 @@ function read_mymodules(modules, src,    i, pair, ind, name, sym) {
 	}
 	if (!(sym in syms)) { # symbol not exported
 	    if (!(sym in mapsyms)) { # symbol not rippable
-		print_error("r: mymodules, unresolved " sym " [" name "]")
+		print_error(sprintf(fmt, base, "unresolved", sym))
 	    } else {
 		if (values["rip-symbols"])
-		    print_warns("r: mymodules, unexported " sym " [" name "]")
+		    print_warns(sprintf(fmt, base, "unexported", sym))
 		else
-		    print_error("r: mymodules, unexported " sym " [" name "]")
+		    print_error(sprintf(fmt, base, "unexported", sym))
 	    }
 	    continue
 	}
 	if (!(sym in kabi)) {
 	    if (ownr[sym] != values["pkgdirectory"])
 		if (values["unsupported"])
-		    print_warns("r: mymodules, unsupportd strong " sym " [" name "]")
+		    print_warns(sprintf(fmt, base, "unsupportd", sym))
 		else
-		    print_error("r: mymodules, unsupportd strong " sym " [" name "]")
+		    print_error(sprintf(fmt, base, "unsupportd", sym))
 	}
 	if (!(sym in crcs)) {
 	    print_error("r: mymodules, symbol " sym " defined in module " mods[sym] " has no version")
@@ -1089,7 +1134,7 @@ function read_mymodules(modules, src,    i, pair, ind, name, sym) {
 	}
     }
     for (pair in mod_weak) {
-	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]; base = name; gsub(/^.*\//, "", base)
 	if (sym in mods) {
 	    mod_wdep[name,mods[sym]] = 1
 	    if ((mods[sym],sym) in mod_used)
@@ -1099,51 +1144,58 @@ function read_mymodules(modules, src,    i, pair, ind, name, sym) {
 	}
 	if (!(sym in syms)) { # symbol not exported
 	    if (!(sym in mapsyms)) { # symbol not rippable
-		print_warns("r: mymodules, unresolved " sym " [" name "]")
+		print_warns(sprintf(fmt, base, "weak unres", sym))
 	    } else {
-		if (values["rip-weak"])
-		    print_warns("r: mymodules, unexported " sym " [" name "]")
+		if (values["rip-weak"] || values["unres-weak"])
+		    print_vinfo(1,sprintf(fmt, base, "weak unexp", sym))
 		else
-		    print_error("r: mymodules, unexported " sym " [" name "]")
+		    print_error(sprintf(fmt, base, "weak unexp", sym))
 	    }
 	    continue
 	}
 	if (!(sym in kabi)) {
 	    if (ownr[sym] != values["pkgdirectory"]) {
-		    print_warns("r: mymodules, unsupportd  weak  " sym " [" name "]")
+		if (values["unres-weak"])
+		    print_vinfo(1,sprintf(fmt, base, "weak unsup", sym))
+		else
+		    print_warns(sprintf(fmt, base, "weak unsup", sym))
 	    }
 	}
 	if (!(sym in crcs)) {
-	    print_warns("r: mymodules, symbol " sym " defined in module " mods[sym] " has no version")
+	    print_warns(sprintf(fmt " in %-20s", base, "no version", sym, mods[sym]))
 	    continue
 	}
     }
     for (pair in mod_abss) {
-	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]; base = name; gsub(/^.*\//, "", base)
 	if (!(sym in crcs))
-	    print_warns("r: mymodules, ripped intern sym " name ":" sym)
+	    print_warns(sprintf(fmt, base, "rip intern", sym))
 	else
-	    print_vinfo(1,"r: mymodules, ripped export sym " name ":" sym)
+	    print_vinfo(1,sprintf(fmt, base, "rip export", sym))
     }
     for (pair in mod_weak) {
-	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
-	if (!(sym in crcs))
-	    print_warns("r: mymodules, weak unexported sym " name ":" sym)
-	else
-	    print_vinfo(1, "r: mymodules, weak unsupported sym " name ":" sym)
+	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]; base = name; gsub(/^.*\//, "", base)
+	if (!(sym in crcs)) {
+	    if (values["unres-weak"])
+		print_vinfo(1,sprintf(fmt, base, "weak unexp", sym))
+	    else
+		print_warns(sprintf(fmt, base, "weak unexp", sym))
+	} else {
+	    print_vinfo(1,sprintf(fmt, base, "weak unsup", sym))
+	}
     }
     for (pair in mod_syms) {
-	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]; base = name; gsub(/^.*\//, "", base)
 	if (!(sym in ownr)) continue
 	if (ownr[sym] != values["pkgdirectory"]) continue
 	if (!((name,sym) in mod_used)) {
 	    if ((name,sym) in mod_abss) {
 		if (sym in crcs)
-		    print_warns("r: mymodules, unused ripped export sym " name ":" sym)
+		    print_warns(sprintf(fmt, base, "ripe unuse", sym))
 		else
-		    print_warns("r: mymodules, unused ripped intern sym " name ":" sym)
+		    print_warns(sprintf(fmt, base, "ripi unuse", sym))
 	    } else
-		    print_vinfo(1,"r: mymodules, unused normal export sym " name ":" sym)
+		    print_vinfo(1,sprintf(fmt, base, "norm unuse", sym))
 	}
     }
     if (count_errs) {
@@ -1445,39 +1497,96 @@ __attribute__((section(\".gnu.linkonce.this_module\"))) = {\n\
 	    print "#ifdef CONFIG_MODULE_UNLOAD\n\t.exit = cleanup_module,\n#endif" > file
 	print "};\n#endif" > file
 }
-function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,sym)
+function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,sym,fmt)
 {
+    fmt = "w: mymodules, %-20s: %14s; %-30s"
     count_unds = 0; count_weak = 0
-    print "\n\
-#ifdef CONFIG_MODVERSIONS\n\
-static const struct modversion_info ____versions[]\n\
-__attribute_used__\n\
-__attribute__((section(\"__versions\"))) = {\
-" > file
+    text = ""
     for (pair in mod_unds) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	if (name != mod) continue
 	if (!(sym in crcs)) {
-	    print_error("w: mymodules, unversionable symbol " sym);
+	    print_error(sprintf(fmt, base, "no version", sym));
 	    continue
 	}
-	print "\t{ " crcs[sym] ", \"" sym "\" }," > file
+	print_debug(3,sprintf(fmt, base, crcs[sym], sym))
+	text = text "\n\t{ " crcs[sym] ", \"" sym "\" },"
 	count_unds++
     }
     if (values["weak-versions"]) {
 	for (pair in mod_weak) {
 	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	    if (name != mod) continue
+	    if ((!(sym in ownr) || ownr[sym] != values["pkgdirectory"]) && values["weak-hidden"])
+		continue
 	    if (!(sym in crcs)) {
-		print_warns("w: mymodules, unversionable weak symbol " sym);
+		if (values["unres-weak"])
+		    print_vinfo(1,sprintf(fmt, base, "weak novers", sym));
+		else
+		    print_warns(sprintf(fmt, base, "weak novers", sym));
 		continue
 	    }
-	    print "\t{ " crcs[sym] ", \"" sym "\" }," > file
+	    print_debug(3,sprintf(fmt, base, crcs[sym], sym))
+	    text = text "\n\t{ " crcs[sym] ", \"" sym "\" },"
 	    count_weak++
 	}
     }
-    print "};\n#endif" > file
-    print_debug(1, "w: mymodules, unds " count_unds ", weak " count_weak)
+    if (text) {
+	print "\n\
+#ifdef CONFIG_MODVERSIONS\n\
+static const struct modversion_info ____versions[]\n\
+__attribute_used__\n\
+__attribute__((section(\"__versions\"))) = {\
+" text "\n};\n#endif" > file
+    }
+    if (values["weak-versions"] && values["weak-hidden"]) {
+	text = ""
+	for (pair in mod_weak) {
+	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	    if (name != mod) continue
+	    if ((sym in ownr) && ownr[sym] == values["pkgdirectory"])
+		continue
+	    if (!(sym in crcs)) {
+		if (values["unres-weak"])
+		    print_vinfo(1,sprintf(fmt, base, "weak novers", sym));
+		else
+		    print_warns(sprintf(fmt, base, "weak novers", sym));
+		continue
+	    }
+	    print_debug(3,sprintf(fmt, base, crcs[sym], sym))
+	    text = text "\n\t{ " crcs[sym] ", \"" sym "\" },"
+	    count_weak++
+	}
+	if (text) {
+	    print "\n\
+#ifdef CONFIG_MODVERSIONS\n\
+static const struct modversion_info ____weak_versions[]\n\
+__attribute_used__\n\
+__attribute__((section(\"__weak_versions\"))) = {\
+" text "\n};\n#endif" > file
+	}
+    }
+    if (values["rip-weak"]) {
+	text = ""
+	for (pair in mod_weak) {
+	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	    if (name != mod) continue
+	    if (sym in crcs) {
+		continue
+	    }
+	    print_debug(3,sprintf(fmt, base, "0x00000000", sym))
+	    text = text "\n\t{ " "0x00000000" ", \"" sym "\" },"
+	    count_weak++
+	}
+	if (text) {
+	    print "\n\
+static const struct modversion_info ____weak_absolute[]\n\
+__attribute_used__\n\
+__attribute__((section(\"__weak_absolute\"))) = {\
+" text "\n};" > file
+	}
+    }
+    print_debug(1, "w: mymodules, " base ": unds " count_unds ", weak " count_weak)
 }
 function write_dependencies(file, mod, base,	count, deps, sep, pair, ind, name, dep) {
     count = 0; deps = ""; sep = ""
@@ -1486,14 +1595,16 @@ function write_dependencies(file, mod, base,	count, deps, sep, pair, ind, name, 
 	if (name != mod) continue
 	sub(/.*\//, "", dep)
 	if (dep == "vmlinux" || dep == "built-in" || dep == "built-in.o" || dep == "") continue
+	print_debug(3,"w: mymodules, " base ": depends on " dep)
 	deps = deps sep dep; sep = ","; count++
     }
-    if (values["weak-versions"]) {
+    if (values["weak-versions"] && !values["weak-hidden"]) {
 	for (pair in mod_wdep) {
 	    split(pair, ind, SUBSEP); name = ind[1]; dep = ind[2]
 	    if (name != mod) continue
 	    sub(/.*\//, "", dep)
 	    if (dep == "vmlinux" || dep == "built-in" || dep == "built-in.o" || dep == "") continue
+	    print_debug(3,"w: mymodules, " base ": depends on " dep)
 	    deps = deps sep dep; sep = ","; count++
 	}
     }
@@ -1533,8 +1644,9 @@ function write_srcversion(file, mod, base,	srcversion)
     else
 	print "\nMODULE_INFO(srcversion, \"" srcversion "\");\n" > file
 }
-function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name,sym,grep,result,defs)
+function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name,sym,grep,result,defs,fmt)
 {
+    fmt = "w: mymodules, %-20s: %14s; %-30s"
     fname = file; sub(/\.mod\.c$/,".lds",fname)
     count_unds = 0; count_weak = 0; defs = ""
     for (pair in mod_unds) {
@@ -1542,32 +1654,32 @@ function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name
 	if (name != mod) continue
 	if (sym in crcs) continue
 	if (!(sym in mapsyms)) {
-	    print_error("w: mymodules, cannot resolve " sym)
+	    print_error(sprintf(fmt, base, "norm no res", sym))
 	    continue
 	}
 	if (!(sym in maptypes)) {
-	    print_error("w: mymodules, no type for " sym)
+	    print_error(sprintf(fmt, base, "norm no typ", sym))
 	    continue
 	}
 	if (!(sym in mapaddrs)) {
-	    print_error("w: mymodules, no addr for " sym)
+	    print_error(sprintf(fmt, base, "norm no add", sym))
 	    continue
 	}
 	if (mapaddrs[sym]~/,/) {
-	    print_error("w: mymodules, conflicting addr for " sym)
+	    print_error(sprintf(fmt, base, "norm addr??", sym))
 	    continue
 	}
 	if (maptypes[sym]!~/[sSgGCbBdDtTwWvV]/) {
-	    print_warns("w: mymodules, unrecognized symbol type \"" maptypes[sym] "\"")
+	    print_warns(sprintf(fmt " map = %s", base, "norm type??", sym, maptypes[sym]))
 	    continue
 	}
 	if (values["rip-symbols"]) {
-	    print_vinfo(1, "w: mymodules, creating def for " mod ":" sym)
+	    print_vinfo(1, sprintf(fmt, base, "norm newdef", sym))
 	    if (count_unds || count_weak) defs = defs "\n"
 	    defs = defs "        " sym " = 0x" mapaddrs[sym] ";"
 	    count_unds++
 	} else {
-	    print_error("w: mymodules, cannot create def for " mod ":" sym)
+	    print_error(sprintf(fmt, base, "norm no def", sym))
 	}
     }
     for (pair in mod_weak) {
@@ -1575,43 +1687,46 @@ function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name
 	if (name != mod) continue
 	if (sym in crcs) continue
 	if (!(sym in mapsyms)) {
-	    print_warns("w: mymodules, cannot resolve weak symbol " sym)
+	    print_warns(sprintf(fmt, base, "weak no res", sym))
 	    continue
 	}
 	if (!(sym in maptypes)) {
-	    print_error("w: mymodules, no type for " sym)
+	    print_error(sprintf(fmt, base, "weak no typ", sym))
 	    continue
 	}
 	if (!(sym in mapaddrs)) {
-	    print_warns("w: mymodules, no addr for " sym)
+	    print_warns(sprintf(fmt, base, "weak no add", sym))
 	    continue
 	}
 	if (mapaddrs[sym]~/,/) {
-	    print_warns("w: mymodules, conflicting addr for " sym)
+	    print_warns(sprintf(fmt, base, "weak addr??", sym))
 	    continue
 	}
 	if (maptypes[sym]!~/[sSgGCbBdDtTwWvV]/) {
-	    print_warns("w: mymodules, unrecognized symbol type \"" maptypes[sym] "\"")
+	    print_warns(sprintf(fmt " map = %s", base, "weak type??", sym, maptypes[sym]))
 	    continue
 	}
 	if (values["rip-weak"]) {
-	    print_vinfo(1,"w: mymodules, creating def for " mod ":" sym)
+	    print_vinfo(1,sprintf(fmt, base, "weak newdef", sym))
 	    if (count_unds || count_weak) defs = defs "\n"
 	    defs = defs "        " sym " = 0x" mapaddrs[sym] ";"
 	    count_weak++
 	} else {
-	    print_error("w: mymodules, cannot create weak def for " mod ":" sym)
+	    if (values["unres-weak"])
+		print_warns(sprintf(fmt, base, "weak no def", sym))
+	    else
+		print_error(sprintf(fmt, base, "weak no def", sym))
 	}
     }
     if (count_unds || count_weak) {
 	if (!("V" in ENVIRON) || (ENVIRON["V"] != 1))
 	    print "  GEN    " base ".lds"
 	else
-	    print_vinfo(1,"w: mymodules, file = " fname)
-	print "SECTIONS\n{" defs "}" > fname
+	    print_vinfo(1,"w: mymodules, " base ": file = " fname)
+	print "SECTIONS\n{" defs "\n}" > fname
 	close(fname)
     }
-    print_debug(1,"w: mymodules, unds " count_unds ", weak " count_weak)
+    print_debug(1,"w: mymodules, " base ": unds " count_unds ", weak " count_weak)
 }
 function write_mymodules(modules,    i, base, file, mod)
 {
@@ -1628,7 +1743,7 @@ function write_mymodules(modules,    i, base, file, mod)
 	if (!("V" in ENVIRON) || (ENVIRON["V"] != 1))
 	    print "  GEN    " base ".mod.c"
 	else
-	    print_vinfo(1,"w: mymodules, file = " file)
+	    print_vinfo(1,"w: mymodules, " base ": file = " file)
 	write_header(file, mod, base)
 	if (values["modversions"])
 	    write_modversions(file, mod, base)
@@ -1655,7 +1770,7 @@ BEGIN {
 	blu = ""; hblu = ""
 	mag = ""; hmag = ""
 	cyn = ""; hcyn = ""
-	std = ""
+	std = ""; prog = "no"
     } else {
 	stdout = "/dev/stdout"
 	stderr = "/dev/stderr"
@@ -1667,14 +1782,14 @@ BEGIN {
 	blu = "\033[0;34m"; hblu = "\033[1;34m"
 	mag = "\033[0;35m"; hmag = "\033[1;35m"
 	cyn = "\033[0;36m"; hcyn = "\033[1;36m"
-	std = "\033[m"
+	std = "\033[m"; prog = "yes"
     }
     if ("kversion" in ENVIRON) { kversion = ENVIRON["kversion"] }
     else                       { kversion = getline_command("uname -r") }
     # MODPOST_SYSVER  contains all the system  defined symbol versions
     # MODPOST_MODVER  contains all the package defined symbol versions
     # MODPOST_SYMSETS contains the new symbol sets
-    longopts["modules"      ] = "M:" ;																		  descrips["modules"      ] = "modules for which to generate symbols (space separated list)"
+    longopts["modules"      ] = "M:" ;																		  descrips["modules"      ] = "modules for which to generate symbols (space separated list)"			; longargs["modules"] = "MODULE ..."
     longopts["cachefile"    ] = "c:" ; environs["cachefile"    ] = "MODPOST_CACHE"		 ; defaults["cachefile"    ] = "modpost.cache"					; descrips["cachefile"    ] = "where to cache system smybol versions"
     longopts["kversion"     ] = "k:" ; environs["kversion"     ] = "kversion"			 ; defaults["kversion"     ] = kversion						; descrips["kversion"     ] = "kernel version KVERSION"
     longopts["moddir"       ] = "d:" ; environs["moddir"       ] = "MODPOST_MODDIR"		 ; defaults["moddir"       ] = "/lib/modules/" kversion				; descrips["moddir"       ] = "directory containing modules for which to generate symbols"
@@ -1688,36 +1803,40 @@ BEGIN {
     longopts["symsets"      ] = "S:" ; environs["symsets"      ] = "MODPOST_SYMSETS"		 ; defaults["symsets"      ] = "symsets-openss7-" kversion ".tar.gz"		; descrips["symsets"      ] = "output file for symsets"
     longopts["ksymsets"     ] = "K:" ; environs["ksymsets"     ] = "MODPOST_KSYMSETS"		 ; defaults["ksymsets"     ] = "/boot/symsets-" kversion ".tar.gz"		; descrips["ksymsets"     ] = "input system symsets file"
     longopts["missing"      ] = "g"  ;								   defaults["missing"      ] = 0						; descrips["missing"      ] = "create missing system symsets (ksyms missing from kabi)"
-    longopts["rip-symbols"  ] = "r"  ;								   defaults["rip-symbols"  ] = 0						; descrips["rip-symbols"  ] = "attempt to rip undefined symbols from system map (requires -F, implies -U)"
-    longopts["rip-weak"     ] = "R"  ;								   defaults["rip-weak"     ] = 0						; descrips["rip-weak"     ] = "attempt to rip weak undefined symbols from system map (requires -F, implies -U)"
-    longopts["unsupported"  ] = "U"  ;								   defaults["unsupported"  ] = 0						; descrips["unsupported"  ] = "permit use of (strong) unsupported (non-ABI) kernel exports"
+    longopts["rip-symbols"  ] = "r"  ;								   defaults["rip-symbols"  ] = 1						; descrips["rip-symbols"  ] = "attempt to rip undefined symbols from system map (requires -F, implies -U)"
+    longopts["rip-weak"     ] = "R"  ;								   defaults["rip-weak"     ] = 1						; descrips["rip-weak"     ] = "attempt to rip weak undefined symbols from system map (requires -F, implies -U)"
+    longopts["unres-weak"   ] = "b"  ;								   defaults["unres-weak"   ] = 0						; descrips["unres-weak"   ] = "allow unresolved weak symbols"
+    longopts["unsupported"  ] = "U"  ;								   defaults["unsupported"  ] = 1						; descrips["unsupported"  ] = "permit use of (strong) unsupported (non-ABI) kernel exports"
     longopts["weak-symbols" ] = "w"  ;								   defaults["weak-symbols" ] = 1						; descrips["weak-symbols" ] = "resolve weak symbols (useful with -r and -U)"
-    longopts["weak-versions"] = "W"  ;								   defaults["weak-versions"] = 1						; descrips["weak-versions"] = "version weak sumbols (useful with -W)"
+    longopts["weak-versions"] = "W"  ;								   defaults["weak-versions"] = 1						; descrips["weak-versions"] = "version weak symbols (useful with -w)"
+    longopts["weak-hidden"  ] = "H"  ;								   defaults["weak-hidden"  ] = 1						; descrips["weak-hidden"  ] = "weak symbol versions are hidden (used with -W)"
     longopts["format"       ] = "f:" ;								   defaults["format"       ] = "auto"						; descrips["format"       ] = "symsets file format (suse,redhat,auto)"
     longopts["unload"       ] = "u"  ; environs["unload"       ] = "CONFIG_MODULE_UNLOAD"	 ; defaults["unload"       ] = 0						; descrips["unload"       ] = "module unloading is supported"
     longopts["modversions"  ] = "m"  ; environs["modversions"  ] = "CONFIG_MODVERSIONS"		 ; defaults["modversions"  ] = 0						; descrips["modversions"  ] = "module versions are supported"
     longopts["allsrcversion"] = "a"  ; environs["allsrcversion"] = "CONFIG_MODULE_SRCVERSION_ALL"; defaults["allsrcversion"] = 0						; descrips["allsrcversion"] = "source version all modules"
     longopts["exportsyms"   ] = "x"  ;								   defaults["exportsyms"   ] = 0						; descrips["exportsyms"   ] = "place export symbols in versions files"
     longopts["pkgdirectory" ] = "p:" ; environs["pkgdirectory" ] = "PACKAGE_LCNAME"		 ; defaults["pkgdirectory" ] = "openss7"					; descrips["pkgdirectory" ] = "subdirectory for module"
-    longopts["exit-on-error"] = "e"  ;								   defaults["exit-on-error"] = 1						; descrips["exit-on-error"] = "exit with error status on program errors"
+    longopts["exit-on-error"] = "e"  ;								   defaults["exit-on-error"] = 0						; descrips["exit-on-error"] = "exit with error status on program errors"
     longopts["dryrun"       ] = "n"  ;								   defaults["dryrun"       ] = 0						; descrips["dryrun"       ] = "don't perform actions, just check them"
     longopts["dry-run"      ] = "n"  ;								   defaults["dry-run"      ] = 0						; descrips["dry-run"      ] = "don't perform actions, just check them"
     longopts["quiet"        ] = "q"  ;								   defaults["quiet"        ] = 0						; descrips["quiet"        ] = "suppress normal output"
     longopts["silent"       ] = "q"  ;								   defaults["silent"       ] = 0						; descrips["silent"       ] = "suppress normal output"
     longopts["debug"        ] = "D::"; environs["debug"        ] = "MODPOST_DEBUG"		 ; defaults["debug"        ] = 0						; descrips["debug"        ] = "increase or set debug level DEBUG"
     longopts["verbose"      ] = "v::"; environs["verbose"      ] = "MODPOST_VERBOSE"		 ; defaults["verbose"      ] = 0						; descrips["verbose"      ] = "increase or set verbosity level VERBOSITY"
-    longopts["help"         ] = "h"  ;																		  descrips["help"         ] = "display this usage information and exit"
-    longopts["version"      ] = "V"  ;																		  descrips["version"      ] = "display script version and exit"
-    longopts["copying"      ] = "C"  ;																		  descrips["copying"      ] = "display coding permissions and exit"
+    longopts["help"         ] = "h!" ;																		  descrips["help"         ] = "display this usage information and exit"
+    longopts["version"      ] = "V!" ;																		  descrips["version"      ] = "display script version and exit"
+    longopts["copying"      ] = "C!" ;																		  descrips["copying"      ] = "display coding permissions and exit"
     # mark options that must default to environment or default setting
     values["cachefile"    ] = ""
     # set mandatory defaults
     values["missing"      ] = defaults["missing"      ]
     values["rip-symbols"  ] = defaults["rip-symbols"  ]
     values["rip-weak"     ] = defaults["rip-weak"     ]
+    values["unres-weak"   ] = defaults["unres-weak"   ]
     values["unsupported"  ] = defaults["unsupported"  ]
     values["weak-symbols" ] = defaults["weak-symbols" ]
     values["weak-versions"] = defaults["weak-versions"]
+    values["weak-hidden"  ] = defaults["weak-hidden"  ]
     values["format"       ] = defaults["format"       ]
     values["unload"       ] = defaults["unload"       ]
     values["modversions"  ] = defaults["modversions"  ]
@@ -1725,21 +1844,26 @@ BEGIN {
     values["exportsyms"   ] = defaults["exportsyms"   ]
     values["pkgdirectory" ] = defaults["pkgdirectory" ]
     values["exit-on-error"] = defaults["exit-on-error"]
+    values["dryrun"       ] = defaults["dryrun"       ]
+    values["dry-run"      ] = defaults["dry-run"      ]
+    values["quiet"        ] = defaults["quiet"        ]
+    values["silent"       ] = defaults["silent"       ]
     values["debug"        ] = defaults["debug"        ]
     values["verbose"      ] = defaults["verbose"      ]
-    values["quiet"        ] = defaults["quiet"        ]
-    optstring = "M:c:k:d:F:i:o:s:*P:K:S:grRUwWf:umaxp:enqD::v::hVC"
+    optstring = "M:c:k:d:F:i:o:s:*P:K:S:grRbUwWHf:umaxp:enqD::v::hVC"
     optind = 0
+    #opts = ""; for (i=1;i<ARGC;i++) { if (i == 1) { opts = ARGV[i] } else { opts = opts " " ARGV[i] } }
+    #print me ": D: o: command line: " opts > stderr; written[stderr] = 1
+    command = ""
     while (1) {
 	c = getopt_long(ARGC, ARGV, optstring, longopts)
+	#if (c != -1) { print me ": D: o: option -" c ", longopt --" option ", optset = " optset ", optarg = " optarg > stderr; written[stderr] = 1 }
 	if (c == -1) break
-	else if (c ~ /[MckdFiosPKSfp]/)    { values[option] = optarg }
-	else if (c ~ /[grRUwWumaxenq]/)    { values[option] = optset }
-	else if (c~/[Dv]/) { if (optarg) { values[option] = optarg } else { if (optset)  { values[option]++ } else { values[option] = optset } } }
-	else if (c == "h") { help(   stdout); exit 0 }
-	else if (c == "V") { version(stdout); exit 0 }
-	else if (c == "C") { copying(stdout); exit 0 }
-	else               { usage(  stderr); exit 2 }
+	else if (c ~ /[MckdFiosPKSfp]/)			{ values[option] = optarg }
+	else if (c ~ /[grRbUwWHumaxenq]/)		{ values[option] = optset }
+	else if (c~/[Dv]/) { if (optarg != "")		{ values[option] = optarg } else { if (optset)  { values[option]++ } else { values[option] = optset } } }
+	else if (c~/[hVC]/)	{ command = option }
+	else			{ usage(  stderr); exit 2 }
     }
     if (values["quiet"  ] == defaults["quiet"  ] &&
 	values["debug"  ] == defaults["debug"  ] &&
@@ -1759,12 +1883,11 @@ BEGIN {
     }
     if (values["verbose"] >=3 && values["debug"] == defaults["debug"])
 	values["debug"] = values["verbose"] - 2
-    if (optind < ARGC) {
-	values["modules"] = ARGV[optind]; optind++
-	while (optind < ARGC) {
-	    values["modules"] = values["modules"] " " ARGV[optind]
+    while (optind < ARGC) {
+	if ("modules" in values)
+	{ values["modules"] = values["modules"] " " ARGV[optind] } else
+	{ values["modules"] = ARGV[optind] }
 	    optind++
-	}
     }
     for (i=1;ARGC>i;i++) { delete ARGV[i] }
     for (value in values) {
@@ -1777,6 +1900,12 @@ BEGIN {
 	    values[value] = defaults[value]
 	}
     }
+    for (value in values) {
+	print_debug(1, "o: \"" value "\" = " values[value])
+    }
+    if (command == "help"          ) { help(   stdout); exit 0 }
+    if (command == "version"       ) { version(stdout); exit 0 }
+    if (command == "copying"       ) { copying(stdout); exit 0 }
     count_syms = 0; count_sets = 0; count_maps = 0
     cache_dirty = 1
     if (("cachefile" in values) && values["cachefile"] && (read_cachefile(values["cachefile"]) != -1))
@@ -1849,7 +1978,7 @@ BEGIN {
 	write_modsymver(values["outfile"])
     if (("symsets" in values) && values["symsets"])
 	write_symsets(values["symsets"])
-    if (count_errs && ("exit-on-error" in values) && values["exit-on-error"])
+    if (count_errs && ("exit-on-error" in values) && (values["exit-on-error"] != 0))
 	exit 1
     exit 0
 }
@@ -1864,6 +1993,9 @@ END {
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.9  2011-04-05 16:35:10  brian
+# - weak module design
+#
 # Revision 1.1.2.8  2011-03-26 04:28:46  brian
 # - updates to build process
 #

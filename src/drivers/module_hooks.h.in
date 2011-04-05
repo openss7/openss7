@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: module_hooks.h.in,v 1.1.2.1 2011-03-26 04:28:40 brian Exp $
+ @(#) $Id: module_hooks.h.in,v 1.1.2.2 2011-04-05 16:35:12 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,21 +47,24 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:40 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: module_hooks.h.in,v $
+ Revision 1.1.2.2  2011-04-05 16:35:12  brian
+ - weak module design
+
  Revision 1.1.2.1  2011-03-26 04:28:40  brian
  - added new hook files
 
  *****************************************************************************/
 
 /*
- * This header file is responsible for determining what kinds of module address
- * tools are supported or not supported and providing a wrapper access to them.
- * It is used primarily by pseudo-device drivers wanting to hook into Linux ip
- * protocols.
+ *  This header file is responsible for determining what kinds of module address
+ *  tools are supported or not supported and providing a wrapper access to them.
+ *  It is used primarily by pseudo-device drivers wanting to hook into Linux ip
+ *  protocols.
  */
 
 #ifndef __LOCAL_MODULE_HOOKS_H__
@@ -75,22 +78,52 @@
  *  until we are removed, or our hook is removed.
  */
 
-#undef HAVE_MODULES_SYMBOL
+#undef CONFIG_KERNEL_WEAK_SYMBOLS
+
 #undef HAVE_MODULE_ADDRESS_SYMBOL
-#undef HAVE_MODULE_TEXT_ADDRESS_ADDR
-#undef HAVE_MODULE_TEXT_ADDRESS_EXPORT
-#undef HAVE_MODULE_TEXT_ADDRESS_SYMBOL
-#undef HAVE___MODULE_ADDRESS_EXPORT
-#undef HAVE___MODULE_TEXT_ADDRESS_EXPORT
+#undef HAVE_MODULE_ADDRESS_SUPPORT
+#undef HAVE_MODULE_ADDRESS_USABLE
+#undef HAVE___MODULE_ADDRESS_SYMBOL
+#undef HAVE___MODULE_ADDRESS_SUPPORT
+#undef HAVE___MODULE_ADDRESS_USABLE
+#undef HAVE___MODULE_TEXT_ADDRESS_SYMBOL
+#undef HAVE___MODULES_SUPPORT
+#undef HAVE___MODULES_USABLE
 
-/* The 2.6.32 approach: */
-#if defined HAVE___MODULE_ADDRESS_EXPORT
-/* both of these must be called with preempt disabled or module mutex held */
-extern struct mutex module_mutex;
-struct module *__module_address(unsigned long addr);
-struct module *__module_text_address(unsigned long addr);
+#if   defined HAVE_MODULE_ADDRESS_SYMBOL
 
-static struct module *module_address(unsigned long addr)
+#if   defined HAVE_MODULE_ADDRESS_SUPPORT
+/* module_address() is supported directly */
+extern struct module *module_address(unsigned long addr);
+
+#define module_address(_x_) module_address(_x_)
+
+#elif defined HAVE_MODULE_ADDRESS_SYMBOL && defined CONFIG_KERNEL_WEAK_SYMBOLS
+/* module_address() is supported indirectly */
+extern struct module *module_address(unsigned long addr) __attribute__ ((__weak__));
+struct module *
+module_address_(unsigned long addr)
+{
+	if (module_address != 0)
+		return module_addres(addr);
+	return NULL;
+}
+
+#define module_address(_x_) module_address_(_x_)
+
+#else
+
+#warning Need a way to find a module from one of its data addresses.
+#undef module_address
+
+#endif
+
+#elif defined HAVE___MODULE_ADDRESS_SYMBOL
+
+#if   defined HAVE___MODULE_ADDRESS_SUPPORT
+extern struct module *__module_address(unsigned long addr);
+struct module *
+module_address_(unsigned long addr)
 {
 	struct module *mod;
 
@@ -99,29 +132,55 @@ static struct module *module_address(unsigned long addr)
 	preempt_enable();
 	return mod;
 }
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
 
+#define module_address(_x_) module_address_(_x_)
 
+#elif defined HAVE___MODULE_ADDRESS_SYMBOL && defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern struct module *__module_address(unsigned long addr) __attribute__ ((__weak__));
+struct module *
+module_address_(unsigned long addr)
+{
+	struct module *mod = NULL;
 
-#elif (defined HAVE_MODULE_TEXT_ADDRESS_ADDR || defined HAVE___MODULE_TEXT_ADDRESS_EXPORT) && \
-    defined HAVE_MODULES_SYMBOL
+	if (__module_address != 0) {
+		preempt_disable();
+		mod = __module_address(addr);
+		preempt_enable();
+	}
+	return mod;
+}
+
+#define module_address(_x_) module_address_(_x_)
+
+#else
+
+#warning Need a way to find a module from one of its data addresses.
+#undef module_address
+
+#endif
+
+#elif defined HAVE___MODULE_TEXT_ADDRESS_SYMBOL && defined HAVE_MODULES_SYMBOL
+
+#if   defined HAVE___MODULES_SUPPORT
+
 extern struct list_head modules;
-static struct module *
+struct module *
 __module_address(unsigned long addr)
 {
 	struct module *mod;
 
 	list_for_each_entry_rcu(mod, &modules, list) {
-		if (((void *)addr >= (void *)mod->module_init &&
-		     (void *)addr <  (void *)mod->module_init + mod->init_size)
-		    || ((void *)addr >= (void *)mod->module_core &&
-			(void *)addr <  (void *)mod->module_core + mod->core_size)) {
+		if (((void *) addr >= (void *) mod->module_init &&
+		     (void *) addr < (void *) mod->module_init + mod->init_size)
+		    || ((void *) addr >= (void *) mod->module_core &&
+			(void *) addr < (void *) mod->module_core + mod->core_size)) {
 			return mod;
 		}
 	}
 	return NULL;
 }
-static struct module *module_address(unsigned long addr)
+struct module *
+module_address_(unsigned long addr)
 {
 	struct module *mod;
 
@@ -130,36 +189,56 @@ static struct module *module_address(unsigned long addr)
 	preempt_enable();
 	return mod;
 }
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
 
+#define module_address(_x_) module_address_(_x_)
 
+#elif defined HAVE___MODULES_SYMBOL && defined CONFIG_KERNEL_WEAK_SYMBOLS
 
-#elif defined HAVE_MODULE_TEXT_ADDRESS_ADDR
-static struct module *module_address(unsigned long addr)
+extern struct list_head modules __attribute__ ((__weak__));
+struct module *
+__module_address(unsigned long addr)
 {
-	return module_text_address(addr);
+	if (modules != 0) {
+		struct module *mod;
+
+		list_for_each_entry_rcu(mod, &modules, list) {
+			if (((void *) addr >= (void *) mod->module_init &&
+			     (void *) addr < (void *) mod->module_init + mod->init_size)
+			    || ((void *) addr >= (void *) mod->module_core &&
+				(void *) addr < (void *) mod->module_core + mod->core_size)) {
+				return mod;
+			}
+		}
+	}
+	return NULL;
 }
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
-
-
-
-#elif defined HAVE___MODULE_TEXT_ADDRESS_EXPORT
-static struct module *module_address(unsigned long addr)
+struct module *
+module_address_(unsigned long addr)
 {
-	struct module *mod;
+	struct module *mod = NULL;
 
-	preempt_disable();
-	mod = __module_text_address(addr);
-	preempt_enable();
+	if (modules != 0) {
+		preempt_disable();
+		mod = __module_address(addr);
+		preempt_enable();
+	}
 	return mod;
 }
-#define HAVE_MODULE_ADDRESS_SYMBOL 1
 
-
+#define module_address(_x_) module_address_(_x_)
 
 #else
-#undef HAVE_MODULE_ADDRESS_SYMBOL
+
+#warning Need a way to find a module from one of its data addresses.
+#undef module_address
+
+#endif
+
+#else
+
+#warning Need a way to find a module from one of its data addresses.
+#undef module_address
+
 #endif
 
 #endif				/* __LOCAL_MODULE_HOOKS_H__ */
-

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:15 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:49 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 1.1.2.7  2011-04-05 16:35:15  brian
+ - weak module design
+
  Revision 1.1.2.6  2011-03-26 04:28:49  brian
  - updates to build process
 
@@ -72,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $";
+static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:15 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -179,7 +182,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-26 04:28:49 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:15 $"
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1016,7 +1019,7 @@ pid_t session_of_pgrp(pid_t);
 #endif
 #endif
 
-#ifdef HAVE_SESSION_OF_PGRP_USABLE
+#ifdef HAVE_SESSION_OF_PGRP_SYMBOL
 STATIC streams_fastcall __unlikely pid_t
 pgrp_session(pid_t pgrp)
 {
@@ -1035,7 +1038,21 @@ pgrp_session(pid_t pgrp)
 
 /* How to test for an ignored signal. */
 #ifdef HAVE_IS_IGNORED_SYMBOL
-#ifndef HAVE_IS_IGNORED_USABLE
+#if defined HAVE_IS_IGNORED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int is_ignored(int sig);
+#define is_ignored(_x_) is_ignored(_x_)
+#else
+extern int is_ignored(int sig) __attribute__((__weak__));
+static inline int
+is_ignored_(int sig)
+{
+	if (is_ignored)
+		return is_ignored(sig);
+	return 0;
+}
+#define is_ignored(_x_) is_ignored_(_x_)
+#endif
+#else
 int is_ignored(int sig)
 {
 #if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIG
@@ -1051,52 +1068,77 @@ int is_ignored(int sig)
 #undef is_ignored
 #endif
 }
-#else
-int is_ignored(int sig);
-#define is_ignored(_x_) is_ignored(_x_)
-#endif
-#else
-#error Need a way to check for an ignored signal.
 #endif
 
 /* How to test if the current process group is orphaned (background process group).  Just used
  * is_current_pgrp_orphaned(0) in the code. */
 #ifdef HAVE_IS_ORPHANED_PGRP_SYMBOL
-#ifdef HAVE_IS_ORPHANED_PGRP_USABLE
+#if defined HAVE_IS_ORPHANED_PGRP_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int is_orphaned_pgrp(int pgrp);
 #define is_current_pgrp_orphaned() is_orphaned_pgrp(current_pgrp())
 #else
-#define is_current_pgrp_orphaned() 0
+int is_orphaned_pgrp(int pgrp) __attribute__((__weak__));
+static inline int
+is_orphaned_pgrp_(int pgrp)
+{
+	if (is_orphaned_pgrp)
+		return is_orphaned_pgrp(pgrp);
+	return 0;
+}
+#define is_current_pgrp_orphaned() is_orphaned_pgrp_(current_pgrp())
 #endif
 #elif defined HAVE_IS_CURRENT_PGRP_ORPHANED_SYMBOL
-#if   defined HAVE_IS_CURRENT_PGRP_ORPHANED_USABLE
+#if   defined HAVE_IS_CURRENT_PGRP_ORPHANED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int is_current_pgrp_orphaned();
+#define is_current_pgrp_orphaned() is_current_pgrp_orphaned()
 #else
-#define is_current_pgrp_orphaned() 0
+int is_current_pgrp_orphaned(void)__attribute__((__weak__));
+static inline int
+is_current_pgrp_orphaned_(void)
+{
+	if (is_current_pgrp_orphaned)
+		return is_current_pgrp_orphaned();
+	return 0;
+}
+#define is_current_pgrp_orphaned() is_current_pgrp_orphaned_()
 #endif
 #else
 #error Need a way to check if process group is orphaned.
 #endif
 
 /* How to send a signal to a process group: just use kill_pg(3) in the code. */
-
 #if defined HAVE_KILL_PGRP_SYMBOL
 /* 2.6.32 kernel approach. */
-#ifdef HAVE_KILL_PGRP_USABLE
+#if defined HAVE_KILL_PGRP_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int kill_pgrp(struct pid *pid, int sig, int priv);
 #define kill_pg(_x_,_y_,_z_) kill_pgrp(_x_,_y_,_z_)
 #else
-#error kill_pgrp() symbol is not exported!
-#undef kill_pg
+int kill_pgrp(struct pid *pid, int sig, int priv) __attribute__ ((__weak__));
+static inline int
+kill_pgrp_(struct pid *pid, int sig, int priv)
+{
+	if (kill_pgrp)
+		return kill_pgrp(pid, sig, priv);
+	return (-ENOSYS);
+}
+#define kill_pg(_x_,_y_,_z_) kill_pgrp_(_x_,_y_,_z_)
 #endif
 #elif defined HAVE_KILL_PG_SYMBOL
 /* 2.4.33 and 2.6.18 kernel approach. */
-#if   defined HAVE_KILL_PG_USABLE
+#if   defined HAVE_KILL_PG_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int kill_pg(pid_t pgrp, int sig, int priv);
 #define kill_pg(_x_,_y_,_z_) kill_pg(_x_,_y_,_z_)
 #else
-#error kill_pg() symbol is not exported!
-#undef kill_pg
+int kill_pg(pid_t pgrp, int sig, int priv) __attribute__ ((__weak__));
+static inline int
+kill_pg_(pid_t pgrp, int sig, int priv)
+{
+	if (kill_pg)
+		return kill_pg(pgrp, sig, priv);
+	return (-ENOSYS);
+}
+
+#define kill_pg(_x_,_y_,_z_) kill_pg_(_x_,_y_,_z_)
 #endif
 #else
 #error Need a way to signal a process group.
@@ -1106,29 +1148,51 @@ int kill_pg(pid_t pgrp, int sig, int priv);
 /* How to send a signal to a session leader: just use kill_sl(3) in the code. */
 #if defined HAVE_KILL_SL_SYMBOL
 /* 2.4.33 kernel approach. */
-#if defined HAVE_KILL_SL_USABLE
+#if defined HAVE_KILL_SL_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int kill_sl(pid_t sess, int sig, int priv);
 #define kill_sl(_x_,_y_,_z_) kill_sl(_x_,_y_,_z_)
 #else
-#undef kill_sl() symbol is not exported!
+int kill_sl(pid_t sess, int sig, int priv) __attribute__((__weak__));
+static inline int
+kill_sl_(pid_t sess, int sig, int priv)
+{
+	if (kill_sl)
+		return kill_sl(sess, sig, priv);
+	return (-ENOSYS);
+}
+#define kill_sl(_x_,_y_,_z_) kill_sl_(_x_,_y_,_z_)
 #endif
 #elif defined HAVE_KILL_PID_SYMBOL
 /* 2.6.32 kernel approach */
-#if   defined HAVE_KILL_PID_USABLE
+#if   defined HAVE_KILL_PID_SUPPORT
 int kill_pid(struct pid *pid, int sig, int priv);
 #define kill_sl(_x_,_y_,_z_) kill_pid(_x_,_y_,_z_)
 #else
-#error kill_pid() symbol is not exported!
-#undef kill_sl
+int kill_pid(struct pid *pid, int sig, int priv) __attribute__((__weak__));
+static inline int
+kill_pid_(struct pid *pid, int sig, int priv)
+{
+	if (kill_pid)
+		return kill_pid(pid, sig, priv);
+	return (-ENOSYS);
+}
+#define kill_sl(_x_,_y_,_z_) kill_pid_(_x_,_y_,_z_)
 #endif
 #elif defined HAVE_KILL_PROC_SYMBOL
 /* 2.6.18 kernel approach */
-#if   defined HAVE_KILL_PROC_USABLE
+#if   defined HAVE_KILL_PROC_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int kill_proc(pid_t sess, int sig, int priv);
 #define kill_sl(_x_,_y_,_z_) kill_proc(_x_,_y_,_z_)
 #else
-#error kill_proc() symbol is not exported!
-#undef kill_sl
+int kill_proc(pid_t sess, int sig, int priv) __attribute__((__weak__));
+static inline int
+kill_proc_(pid_t sess, int sig, int priv)
+{
+	if (kill_proc)
+		return kill_proc(sess, sig, priv);
+	return (-ENOSYS);
+}
+#define kill_sl(_x_,_y_,_z_) kill_proc_(_x_,_y_,_z_)
 #endif
 #else
 #error Need a way to signal a session leader.
@@ -1138,12 +1202,12 @@ int kill_proc(pid_t sess, int sig, int priv);
 /* How to send a signal with information to a process: just use kill_proc_info(6) in the code */
 #if   defined HAVE_KILL_PID_INFO_AS_UID_SYMBOL
 /* 2.6.32 kernel approach: */
-#if   defined HAVE_KILL_PID_INFO_AS_UID_SUPPORT
-int kill_pid_info_as_uid(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid);
+#if   defined HAVE_KILL_PID_INFO_AS_UID_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int kill_pid_info_as_uid(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid);
 #define kill_proc_info(a,b,c,d,e,f) kill_pid_info_as_uid(a,b,c,d,e,f)
-#elif defined HAVE_KILL_PID_INFO_AS_UID_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
-int kill_pid_info_as_uid(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid)
-	__attribute__((weak));
+#else
+extern int kill_pid_info_as_uid(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid)
+	__attribute__((__weak__));
 int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, uid_t euid, u32 secid)
 {
 	if (kill_pid_info_as_uid)
@@ -1151,18 +1215,15 @@ int kill_pid_info_(int sig, struct siginfo *info, struct pid *pid, uid_t uid, ui
 	return kill_pid(sig, pid, 1);
 }
 #define kill_proc_info(a,b,c,d,e,f) kill_proc_info_(a,b,c,d,e,f)
-#else
-#error kill_pid_info_as_uid() is not exported!
-#undef kill_proc_info
 #endif
 #elif defined HAVE_KILL_PROC_INFO_AS_UID_SYMBOL
 /* 2.6.18 kernel approach: */
-#if   defined HAVE_KILL_PROC_INFO_AS_UID_SUPPORT
-int kill_proc_info_as_uid(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid);
+#if   defined HAVE_KILL_PROC_INFO_AS_UID_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int kill_proc_info_as_uid(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid);
 #define kill_proc_info(a,b,c,d,e,f) kill_proc_info_as_uid(a,b,c,d,e,f)
-#elif defined HAVE_KILL_PROC_INFO_AS_UID_USABLE && CONFIG_KERNEL_WEAK_SYMBOLS
-int kill_proc_info_as_uid(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid)
-	__attribute__((weak));
+#else
+extern int kill_proc_info_as_uid(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid)
+	__attribute__((__weak__));
 int kill_proc_info_(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid)
 {
 	if (kill_proc_info_as_uid)
@@ -1170,18 +1231,21 @@ int kill_proc_info_(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t e
 	return kill_proc(sig, pid, 1);
 }
 #define kill_proc_info(a,b,c,d,e,f) kill_proc_info_(a,b,c,d,e,f)
-#else
-#error kill_proc_info_as_uid() is not exported!
-#undef kill_proc_info
 #endif
 #elif defined HAVE_KILL_PROC_INFO_SYMBOL
 /* 2.4.33 kernel approach: */
-#if   defined HAVE_KILL_PROC_INFO_USABLE
-int kill_proc_info(int sig, struct siginfo *info, pid_t pid);
+#if   defined HAVE_KILL_PROC_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int kill_proc_info(int sig, struct siginfo *info, pid_t pid);
 #define kill_proc_info(a,b,c,d,e,f) kill_proc_info(a,b,c)
 #else
-#error kill_proc_info() is not exported!
-#undef kill_proc_info
+extern int kill_proc_info(int sig, struct siginfo *info, pid_t pid) __attribute__((__weak__));
+int kill_proc_info_(int sig, struct siginfo *info, pid_t pid, uid_t uid, uid_t euid, u32 secid)
+{
+	if (kill_proc_info)
+		return kill_proc_info(sig, info, pid);
+	return (-ENOSYS);
+}
+#define kill_proc_info(a,b,c,d,e,f) kill_proc_info_(a,b,c,d,e,f)
 #endif
 #else
 #error Need a way to signal with info to a process.
@@ -1191,21 +1255,34 @@ int kill_proc_info(int sig, struct siginfo *info, pid_t pid);
 /* How to send a signal without information to a process. */
 #if   defined HAVE_KILL_PID_SYMBOL
 /* 2.6.32 kernel approach. */
-#if   defined HAVE_KILL_PID_USABLE
-int kill_pid(struct pid *pid, int sig, int priv);
+#if   defined HAVE_KILL_PID_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int kill_pid(struct pid *pid, int sig, int priv);
 #define kill_pid(a,b,c) kill_pid(a,b,c)
 #else
-#error kill_pid() symbol is not exported!
-#undef kill_pid
+extern int kill_pid(struct pid *pid, int sig, int priv) __attribute__((__weak__));
+int kill_pid_(struct pid *pid, int sig, int priv)
+{
+	if (kill_pid)
+		return kill_pid(pid, sig, priv);
+	return (-ENOSYS);
+}
+#define kill_pid(a,b,c) kill_pid_(a,b,c)
 #endif
 #elif defined HAVE_KILL_PROC_SYMBOL
 /* 2.4.33 and 2.6.18 kernel approach. */
-#if   defined HAVE_KILL_PROC_USABLE
+#if   defined HAVE_KILL_PROC_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int kill_proc(pid_t pid, int sig, int priv);
 #define kill_pid(a,b,c) kill_proc(a,b,c)
 #else
-#error kill_proc() symbol is not exported.
-#undef kill_pid
+int kill_proc(pid_t pid, int sig, int priv) __attribute__((__weak__));
+static inline int
+kill_proc_(pid_t pid, int sig, int priv)
+{
+	if (kill_proc)
+		return kill_proc(pid, sig, priv);
+	return (-ENOSYS);
+}
+#define kill_pid(a,b,c) kill_proc_(a,b,c)
 #endif
 #else
 #error Need a way to signal a process without info.
@@ -1214,12 +1291,17 @@ int kill_proc(pid_t pid, int sig, int priv);
 
 /* How to send a signal without information to a specific task (thread). */
 #if   defined HAVE_SEND_SIG_SYMBOL
-#if   defined HAVE_SEND_SIG_USABLE
-int send_sig(int sig, struct task_struct *p, int priv);
+#if   defined HAVE_SEND_SIG_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int send_sig(int sig, struct task_struct *p, int priv);
 #define send_sig(a,b,c) send_sig(a,b,c)
 #else
-#error send_sig() symbol is not exported!
-#undef send_sig
+extern int send_sig(int sig, struct task_struct *p, int priv) __attribute__((__weak__));
+int send_sig_(int sig, struct task_struct *p, int priv)
+{
+	if (send_sig)
+		return send_sig(sig, p, priv);
+	return (-ENOSYS);
+}
 #endif
 #else
 #error Need a way to send a signal to a task.
@@ -1228,12 +1310,19 @@ int send_sig(int sig, struct task_struct *p, int priv);
 
 /* How to send a signal with information to a specific task (thread). */
 #if   defined HAVE_SEND_SIG_INFO_SYMBOL
-#if   defined HAVE_SEND_SIG_INFO_USABLE
-int send_sig_info(int sig, struct siginfo *info, struct task_struct *p);
+#if   defined HAVE_SEND_SIG_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern int send_sig_info(int sig, struct siginfo *info, struct task_struct *p);
 #define send_sig_info(a,b,c) send_sig_info(a,b,c)
 #else
-#error send_sig_info() symbol is not exported!
-#undef send_sig_info
+extern int send_sig_info(int sig, struct siginfo *info, struct task_struct *p)
+	__attribute__((__weak__));
+int send_sig_info_(int sig, struct siginfo *info, struct task_struct *p)
+{
+	if (send_sig_info)
+		return send_sig_info(sig, info, p);
+	return (-ENOSYS);
+}
+#define send_sig_info(a,b,c) send_sig_info_(a,b,c)
 #endif
 #else
 #error Need a way to send a signal with info to a task.
@@ -6394,7 +6483,7 @@ tty_tiocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 		return (-EFAULT);
 	if (pgrp < 0)
 		return (-EINVAL);
-#ifdef HAVE_SESSION_OF_PGRP_USABLE
+#ifdef HAVE_SESSION_OF_PGRP_SYMBOL
 	/* signals cannot be sent to other process groups */
 	if (pgrp_session(pgrp) != current_session())
 		return (-EPERM);
@@ -6485,7 +6574,7 @@ sock_siocspgrp(const struct file *file, struct stdata *sd, unsigned long arg)
 		return (-EFAULT);
 	if (pgrp < 0)
 		return (-EINVAL);
-#ifdef HAVE_SESSION_OF_PGRP_USABLE
+#ifdef HAVE_SESSION_OF_PGRP_SYMBOL
 	/* signals cannot be sent to other process groups */
 	if (pgrp_session(pgrp) != current_session())
 		return (-EPERM);

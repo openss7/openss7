@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-05 16:35:12 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 1.1.2.6  2011-04-05 16:35:12  brian
+ - weak module design
+
  Revision 1.1.2.5  2011-03-26 04:28:46  brian
  - updates to build process
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $";
+static char const ident[] = "$RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-05 16:35:12 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -122,7 +125,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:46 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-05 16:35:12 $"
 #define IP_DEVICE	"SVR 4.2 MP STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -645,7 +648,7 @@ npi_v4_err_next(struct sk_buff *skb, __u32 info)
 
 #ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
 extern spinlock_t inet_proto_lock;
-extern struct net_protocol *inet_protos[];
+extern struct net_protocol *inet_protos[] __attribute__((__weak__));
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 
 /**
@@ -706,7 +709,7 @@ npi_init_nproto(unsigned char proto, unsigned int type)
 		pp->kmod = NULL;
 		spin_lock_bh(inet_proto_lockp);
 		if ((pp->next = inet_protosp[hash]) != NULL) {
-			if ((pp->kmod = module_address((ulong) pp->next))
+			if ((pp->kmod = streams_module_address((ulong) pp->next))
 			    && pp->kmod != THIS_MODULE) {
 				if (!try_module_get(pp->kmod)) {
 					spin_unlock_bh(inet_proto_lockp);

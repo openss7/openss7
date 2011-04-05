@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:46 $
+# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-05 16:35:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $
+# Last Modified $Date: 2011-04-05 16:35:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -87,7 +87,7 @@ function print_vinfo(level, string)
 }
 function print_vmore(level, string)
 {
-    if ((values["quiet"] == 0) && (values["verbose"] >= level)) {
+    if (prog == "yes" && (values["quiet"] == 0) && (values["verbose"] >= level)) {
 	printf "%s", blu me ": I: " string std cr lf > stdout
 	fflush(stdout)
 	written[stdout] = 1
@@ -102,7 +102,7 @@ function print_debug(level, string)
 }
 function print_dmore(level, string)
 {
-    if (values["debug"] >= level) {
+    if (prog == "yes" && values["debug"] >= level) {
 	printf "%s", mag me ": D: " string std cr lf > stderr
 	fflush(stderr)
 	written[stderr] = 1
@@ -112,13 +112,15 @@ function print_error(string)
 {
     print red me ": E: " string std > stderr
     if (count_errs) errors = errors "\n"
-    errors = errors red me ": E: " string std;
+    errors = errors red me ": E: " string std
     written[stderr] = 1
     count_errs++
 }
 function print_emore(string)
 {
     print red me ": E: " string std > stderr
+    if (count_errs) errors = errors "\n"
+    errors = errors red me ": E: " string std
     written[stderr] = 1
 }
 function print_warns(string)
@@ -142,32 +144,41 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
+  $Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
 Usage:\n\
-  awk -f " me " -- [options] [INPUT ...]\n\
-  awk -f " me " -- -" longopts["help"] "\n\
-  awk -f " me " -- -" longopts["version"] "\n\
-  awk -f " me " -- -" longopts["copying"] "\
+  [awk -f ]" me " -- [options] [INPUT ...]\n\
+  [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
+  [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["version"]) ", --version\n\
+  [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["copying"]) ", --copying\
 " > output
     written[output] = 1
 }
-function help_usage(name,  line,sep,dflt,env)
+function help_usage(name,  line,sep,dflt,env,valu)
 {
     line = ""; sep = ""; dflt = ""; env = ""
-    if (name in defaults) {
+    if (name in defaults && longopts[name] !~ /!/) {
 	if (longopts[name]~/:/) {
 	    dflt = defaults[name]
 	} else {
 	    if (defaults[name]) { dflt = "yes" } else { dflt = "no" }
 	}
-	if (dflt) {
-	    line = line sep "[default: " dflt "]"; sep = " "
-	}
+	#if (dflt) {
+	    line = line sep "[default: '" dflt "']"; sep = " "
+	#}
     }
-    if (name in environs) {
+    if (name in environs && longopts[name] !~ /!/) {
 	if (longopts[name]!~/:/) env = "?"
 	if (environs[name])
 	    line = line sep "{" env environs[name] "}"; sep = " "
+    }
+    if (name in values && longopts[name] !~ /!/) {
+	if (longopts[name]~/:/) {
+	    valu = values[name]
+	} else {
+	    if (values[name]) { valu = "yes" } else { valu = "no" }
+	}
+	if (line) sep = "\n      "
+	line = line sep "(current: '" valu "')"; sep = " "
     }
     return line
 }
@@ -178,32 +189,35 @@ function help_opttags(name,  line,char,opt,oth)
 	opt = longopts[name]
 	if (opt~/[[:alnum:]]/) {
 	    char = opt
-	    gsub(/:/,"",char)
+	    gsub(/[:!]/,"",char)
 	    line = "-" char ", --" name
 	} else {
 	    line = "--" name
 	}
+	if (name in longargs) { line = line " " longargs[name] } else
 	if (opt~/::$/) { line = line " [" toupper(name) "]" } else
 	if (opt~/:$/)  { line = line " " toupper(name) } else
-	if (name !~ /^(help|version|copying)$/)
-	               { line = line ", --no-" name }
+	if (opt!~/!$/) { line = line ", --no-" name }
 	if (opt~/[[:alnum:]]/) {
 	    for (oth in longopts) {
 		if (opt != longopts[oth]) continue
 		if (oth == name) continue
-		if (opt~/::$/) { line = line ", --" oth " [" toupper(oth) "]" } else
-		if (opt~/:$/)  { line = line ", --" oth " " toupper(oth) } else
-			       { line = line ", --" oth ", --no-" oth }
+		line = line ", --" oth
+		if (oth in longargs) { line = line " " longargs[oth] } else
+		if (opt~/::$/) { line = line " [" toupper(oth) "]" } else
+		if (opt~/:$/)  { line = line " " toupper(oth) } else
+		if (opt!~/!$/) { line = line ", --no-" oth }
 	    }
 	}
     }
     return line
 }
-function help_option(output, name)
+function help_option(output, name,
+		     desc)
 {
     printf "  %s\n", help_opttags(name) > output
     if (name in descrips && descrips[name])
-    printf "      %s\n", descrips[name] > output
+	printf "      %s\n", gensub(/\n/, "\n      ", "g", descrips[name]) > output
     if ((name in defaults || name in environs) && help_usage(name))
     printf "      %s\n", help_usage(name) > output
 }
@@ -245,7 +259,7 @@ function help(output)
     usage(output)
     print "\
 Arguments:\n\
-  INPUT ...\n\
+  " longargs["inputs"] "\n\
       " descrips["inputs"] "\n\
       [default: " defaults["inputs"] "] {" environs["inputs"] "}\
 " > output
@@ -258,7 +272,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -281,7 +295,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -321,7 +335,8 @@ Corporation at a fee.  See http://www.openss7.com/\n\
 " > output
     written[output] = 1
 }
-function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg, wantarg)
+function getopt_long(argc, argv, optstring, longopts, longindex,
+		     pos, needarg, wantarg, modearg)
 {
     option = ""; optval = ""; optarg = ""; optset = ""; pos = 0; needarg = 0; wantarg = 0
     if (optind == 0) { optind = 1; more = "" }
@@ -329,18 +344,21 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	if (more) { arg = "-" more; more = "" }
 	else { arg = argv[optind]; optind++ }
 	if (arg ~ /^--?[a-zA-Z0-9]/) {
+	    if (wantarg) {
+		more = substr(arg, 2)
+		if (option in defaults)
+		    optarg = defaults[option]
+		return optval
+	    }
 	    if (needarg) {
 		print_error("option -" optval " requires an argument")
 		usage(stderr)
 		exit 2
 	    }
-	    if (wantarg) {
-		more = substr(arg, 2)
-		return optval
-	    }
 	    if (arg ~ /^--[a-zA-Z0-9][-_a-zA-Z0-9]*=.*$/) {
 		option = arg; sub(/^--/, "", option); sub(/=.*$/, "", option)
 		optarg = arg; sub(/^--([a-zA-Z0-9][-_a-zA-Z0-9]*)=/, "", optarg)
+		optset = 1
 		if (!(option in longopts)) {
 		    print_error("option --" option " not recognized")
 		    usage(stderr)
@@ -367,8 +385,9 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 		}
 		}
 		if (longopts[option] ~ /::/) { wantarg = 1 } else
-		if (longopts[option] ~ /:/ ) { needarg = 1 }
-		if ((wantarg || needarg) && !optset) {
+		if (longopts[option] ~ /:/ ) { needarg = 1 } else
+		if (longopts[option] ~ /!/ ) { modearg = 1 }
+		if ((wantarg || needarg || modearg) && !optset) {
 		    print_error("option --no-" option " not recognized")
 		    usage(stderr)
 		    exit 2
@@ -384,6 +403,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	    if (arg ~ /^-[a-zA-Z0-9]/) {
 		optval = substr(arg, 2, 1)
 		pos = index(optstring, optval)
+		optset = 1
 		if (pos == 0 || substr(optstring, pos, 1) == "*") {
 		    print_error("option -" optval " not recognized")
 		    usage(stderr)
@@ -411,7 +431,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 			if (substr(longopts[option], 1, 1) == optval)
 			    break
 		    continue
-		}
+		} else optset = 1
 		if (length(arg) > 2) { more = substr(arg, 3) } else { more = "" }
 		if (more && more !~ /^[a-zA-Z0-9]/) {
 		    print_error("bad option sequence " arg)
@@ -424,8 +444,15 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 		return optval
 	    }
 	}
-	if (arg == "--")
+	if (arg == "--") {
+	    if (wantarg) {
+		if (option in defaults)
+		    optarg = defaults[option]
+		optind--
+		return optval
+	    }
 	    return -1
+	}
 	if (needarg || wantarg) {
 	    optarg = arg
 	    return optval
@@ -433,11 +460,28 @@ function getopt_long(argc, argv, optstring, longopts, longindex,    pos, needarg
 	optind--
 	return -1
     }
+    if (wantarg) {
+	if (option in defaults)
+	    optarg = defaults[option]
+	return optval
+    }
+    if (needarg) {
+	print_error("option -" optval " requires an argument")
+	usage(stderr)
+	exit 2
+    }
     return -1
 }
 function system_command(cmd)
 {
-    print_debug(3,cmd); return system(cmd)
+    print_debug(3, "x: " cmd); return system(cmd)
+}
+function doit(cmd)
+{
+    if (values["dry-run"] == 0)
+	return system_command(cmd)
+    print_vinfo(2, "x: execute,   " cmd)
+    return 0
 }
 function file_compare(tmpfile,    file) {
     file = tmpfile
@@ -717,7 +761,7 @@ function write_hconfig(file,    name, prefix) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -764,7 +808,7 @@ function write_hconfig(file,    name, prefix) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-04-05 16:35:10 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -826,7 +870,7 @@ function write_modconf(file) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.8 2011-03-26 04:28:46 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -873,7 +917,7 @@ function write_modconf(file) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2011-03-26 04:28:46 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-04-05 16:35:10 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -1031,7 +1075,7 @@ function write_makenodes(file) {
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:46 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-05 16:35:10 $\";\n\
 \n\
 #if defined(LINUX)\n\
 #	include <sys/types.h>\n\
@@ -1769,7 +1813,7 @@ function write_pkgobject(pkgobject,    file, object, name, prefix, count, first,
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-03-26 04:28:46 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-05 16:35:10 $\";\n\
 \n\
 #include <linux/config.h>\n\
 #include <linux/version.h>\n\
@@ -1946,7 +1990,7 @@ BEGIN {
 	blu = ""; hblu = ""
 	mag = ""; hmag = ""
 	cyn = ""; hcyn = ""
-	std = ""
+	std = ""; prog = "no"
     } else {
 	stdout = "/dev/stdout"
 	stderr = "/dev/stderr"
@@ -1958,9 +2002,9 @@ BEGIN {
 	blu = "\033[0;34m"; hblu = "\033[1;34m"
 	mag = "\033[0;35m"; hmag = "\033[1;35m"
 	cyn = "\033[0;36m"; hcyn = "\033[1;36m"
-	std = "\033[m"
+	std = "\033[m"; prog = "yes"
     }
-    longopts["inputs"       ] = "I:" ; environs["inputs"       ] = "STRCONF_INPUT"	; defaults["inputs"       ] = "Config.master"	; descrips["inputs"       ] = "input configuration files (space separated list)"
+    longopts["inputs"       ] = "I:" ; environs["inputs"       ] = "STRCONF_INPUT"	; defaults["inputs"       ] = "Config.master"	; descrips["inputs"       ] = "input configuration files (space separated list)"		; longargs["inputs"      ] = "INPUT ..."
     longopts["basemajor"    ] = "b:" ; environs["basemajor"    ] = "STRCONF_MAJBASE"	; defaults["basemajor"    ] = 231		; descrips["basemajor"    ] = "major number to act as base for STREAMS drivers and devices"
     longopts["basemodid"    ] = "i:" ; environs["basemodid"    ] = "STRCONF_MIDBASE"	; defaults["basemodid"    ] = 1			; descrips["basemodid"    ] = "module id number to act as base for STREAMS modules"
     longopts["minorbits"    ] = "B:" ; environs["minorbits"    ] = "STRCONF_MINORSZ"	; defaults["minorbits"    ] = 8			; descrips["minorbits"    ] = "number of bits in a minor device number"
@@ -1986,9 +2030,9 @@ BEGIN {
     longopts["silent"       ] = "q"  ;							  defaults["silent"       ] = 0			; descrips["silent"       ] = "suppress normal output"
     longopts["debug"        ] = "D::"; environs["debug"        ] = "STRCONF_DEBUG"	; defaults["debug"        ] = 0			; descrips["debug"        ] = "increase or set debug level DEBUG"
     longopts["verbose"      ] = "v::"; environs["verbose"      ] = "STRCONF_VERBOSE"	; defaults["verbose"      ] = 0			; descrips["verbose"      ] = "increase or set verbosity level VERBOSITY"
-    longopts["help"         ] = "H"  ;													  descrips["help"         ] = "display this usage information and exit"
-    longopts["version"      ] = "V"  ;													  descrips["version"      ] = "display script version and exit"
-    longopts["copying"      ] = "C"  ;													  descrips["copying"      ] = "display copying permissions and exit"
+    longopts["help"         ] = "H!"  ;													  descrips["help"         ] = "display this usage information and exit"
+    longopts["version"      ] = "V!"  ;													  descrips["version"      ] = "display script version and exit"
+    longopts["copying"      ] = "C!"  ;													  descrips["copying"      ] = "display copying permissions and exit"
     # set mandatory defaults
     values["basemajor"    ] = defaults["basemajor"    ]
     values["basemodid"    ] = defaults["basemodid"    ]
@@ -1996,21 +2040,26 @@ BEGIN {
     values["permission"   ] = defaults["permission"   ]
     values["package"      ] = defaults["package"      ]
     values["exit-on-error"] = defaults["exit-on-error"]
+    values["dryrun"       ] = defaults["dryrun"       ]
+    values["dry-run"      ] = defaults["dry-run"      ]
+    values["quiet"        ] = defaults["quiet"        ]
+    values["silent"       ] = defaults["silent"       ]
     values["debug"        ] = defaults["debug"        ]
     values["verbose"      ] = defaults["verbose"      ]
-    values["quiet"        ] = defaults["quiet"        ]
     optstring = "I:b:i:B:h::o::m::M::p:l::L::r:s::S::O::k::g::d::R::enqD::v::HVC"
     optind = 0
+    #opts = ""; for (i=1;i<ARGC;i++) { if (i == 1) { opts = ARGV[i] } else { opts = opts " " ARGV[i] } }
+    #print me ": D: o: command line: " opts > stderr; written[stderr] = 1
+    command = ""
     while (1) {
 	c = getopt_long(ARGC, ARGV, optstring, longopts)
+	#if (c != -1) { print me ": D: o: option -" c ", longopt --" option ", optset = " optset ", optarg = " optarg > stderr; written[stderr] = 1 }
 	if (c == -1) break
-	else if (c ~ /[IbiBhomMplLrsSOkgdR]/) { values[option] = optarg }
-	else if (c ~ /[enq]/)                 { values[option] = optset }
-	else if (c~/[Dv]/) { if (optarg) { values[option] = optarg } else { if (optset) { values[option]++ } else { values[option] = optset } } }
-	else if (c == "H") { help(   stdout); exit 0 }
-	else if (c == "V") { version(stdout); exit 0 }
-	else if (c == "C") { copying(stdout); exit 0 }
-	else               { usage(  stderr); exit 2 }
+	else if (c ~ /[IbiBhomMplLrsSOkgdR]/)		{ values[option] = optarg }
+	else if (c ~ /[enq]/)				{ values[option] = optset }
+	else if (c~/[Dv]/) { if (optarg != "")		{ values[option] = optarg } else { if (optset) { values[option]++ } else { values[option] = optset } } }
+	else if (c~/[HVC]/)	{ command = option }
+	else			{ usage(  stderr); exit 2 }
     }
     if (values["quiet"  ] == defaults["quiet"  ] &&
 	values["debug"  ] == defaults["debug"  ] &&
@@ -2030,12 +2079,11 @@ BEGIN {
     }
     if (values["verbose"] >=3 && values["debug"] == defaults["debug"])
 	values["debug"] = values["verbose"] - 2
-    if (optind < ARGC) {
-	values["inputs"] = ARGV[optind]; optind++
-	while (optind < ARGC) {
-	    values["inputs"] = values["inputs"] " " ARGV[optind]
+    while (optind < ARGC) {
+	if ("inputs" in values)
+	{ values["inputs"] = values["inputs"] " " ARGV[optind] } else
+	{ values["inputs"] = ARGV[optind] }
 	    optind++
-	}
     }
     for (i=1;ARGC>i;i++) { delete ARGV[i] }
     for (value in values) {
@@ -2048,6 +2096,12 @@ BEGIN {
 	    values[value] = defaults[value]
 	}
     }
+    for (value in values) {
+	print_debug(1, "o: \"" value "\" = " values[value])
+    }
+    if (command == "help"          ) { help(   stdout); exit 0 }
+    if (command == "version"       ) { version(stdout); exit 0 }
+    if (command == "copying"       ) { copying(stdout); exit 0 }
     if (!values["inputs"] || values["inputs"] == "-") {
 	print_debug(1,"o: no inputs, using " stdin)
 	values["inputs"] = stdin
@@ -2076,7 +2130,7 @@ BEGIN {
 	write_pkgobject(values["pkgobject"])
     if ("packagedir" in values)
 	write_packagedir(values["packagedir"])
-    if (count_errs && ("exit-on-error" in values) && values["exit-on-error"])
+    if (count_errs && ("exit-on-error" in values) && (values["exit-on-error"] != 0))
 	exit 1
     exit 0
 }
@@ -2091,6 +2145,9 @@ END {
 # =============================================================================
 #
 # $Log: strconf.awk,v $
+# Revision 1.1.2.9  2011-04-05 16:35:10  brian
+# - weak module design
+#
 # Revision 1.1.2.8  2011-03-26 04:28:46  brian
 # - updates to build process
 #

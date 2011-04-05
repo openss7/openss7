@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 1.1.2.3 2010-11-28 14:21:50 brian Exp $
+ @(#) $Id: ddi.h,v 1.1.2.4 2011-04-05 16:35:13 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:50 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 1.1.2.4  2011-04-05 16:35:13  brian
+ - weak module design
+
  Revision 1.1.2.3  2010-11-28 14:21:50  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -104,8 +107,8 @@ icmn_err(int err_lvl, const char *fmt, va_list args)
 }
 #ifdef HAVE_ICMN_ERR_EXPORT
 #undef icmn_err
-__IRIX_EXTERN void icmn_err(int err_lvl, const char *fmt, va_list args);
-__asm__(".weakref icmn_err,icmn_err_");
+__IRIX_EXTERN void icmn_err(int err_lvl, const char *fmt, va_list args)
+	__attribute__((alias("icmn_err_")));
 #endif
 
 /* gcc 3.4.3 can't handle inlining with variable argument list */

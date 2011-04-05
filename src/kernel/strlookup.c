@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:14 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:32 $ by $Author: brian $
+ Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlookup.c,v $
+ Revision 1.1.2.5  2011-04-05 16:35:14  brian
+ - weak module design
+
  Revision 1.1.2.4  2011-01-12 04:10:32  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -66,7 +69,8 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:32 $";
+static char const ident[] =
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:14 $";
 
 #include <linux/compiler.h>
 #include <linux/autoconf.h>
@@ -535,8 +539,7 @@ cdev_lookup(major_t major, int load)
 	read_lock(&cdevsw_lock);
 	cdev = __cdev_lookup(major);
 	read_unlock(&cdevsw_lock);
-#endif				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#endif				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	return (cdev);
 }
 
@@ -578,8 +581,7 @@ cdrv_lookup(modID_t modid, int load)
 	read_lock(&fmodsw_lock);
 	cdev = __cdrv_lookup(modid);
 	read_unlock(&fmodsw_lock);
-#endif				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#endif				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	return (cdev);
 }
 
@@ -621,8 +623,7 @@ fmod_lookup(modID_t modid, int load)
 	read_lock(&fmodsw_lock);
 	fmod = __fmod_lookup(modid);
 	read_unlock(&fmodsw_lock);
-#endif				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#endif				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	return (fmod);
 }
 
@@ -736,11 +737,9 @@ cdev_search(const char *name, int load)
 			}
 		cdev = NULL;
 	}
-#else				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#else				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	cdev = __cdev_search(name);
-#endif				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#endif				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	read_unlock(&cdevsw_lock);
 	return (cdev);
 }
@@ -786,11 +785,9 @@ fmod_search(const char *name, int load)
 			}
 		fmod = NULL;
 	}
-#else				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#else				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	fmod = __fmod_search(name);
-#endif				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#endif				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	read_unlock(&fmodsw_lock);
 	return (fmod);
 }
@@ -817,8 +814,7 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 
 #if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	int reload;
-#endif				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#endif				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	read_lock(&cdevsw_lock);
 #if defined(CONFIG_KMOD) || defined(CONFIG_MODULES)
 	for (reload = load ? 0 : 1; reload < 2; reload++) {
@@ -862,11 +858,9 @@ cmin_search(struct cdevsw *cdev, const char *name, int load)
 #endif				/* CONFIG_DEVFS */
 		} while (0);
 	}
-#else				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#else				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	cmin = __cmin_search(cdev, name);
-#endif				/* defined(CONFIG_KMOD) ||
-                                   defined(CONFIG_MODULES) */
+#endif				/* defined(CONFIG_KMOD) || defined(CONFIG_MODULES) */
 	read_unlock(&cdevsw_lock);
 	return (cmin);
 }
@@ -1157,8 +1151,8 @@ EXPORT_SYMBOL_GPL(cdev_minor);
 streams_fastcall void
 fmod_add(struct fmodsw *fmod, modID_t modid)
 {
-	/* These are statically allocated and therefore need to be initialized, however, the module
-	   must not already be on a list. */
+	/* These are statically allocated and therefore need to be initialized, however,
+	   the module must not already be on a list. */
 
 	assert(!fmod->f_list.next || list_empty(&fmod->f_list));
 	INIT_LIST_HEAD(&fmod->f_list);
@@ -1196,8 +1190,8 @@ sdev_ini(struct cdevsw *cdev, modID_t modid)
 	struct inode *inode;
 	dev_t dev;
 
-	/* These are statically allocated and therefore need to be initialized, however, the module
-	   must not already be on a list. */
+	/* These are statically allocated and therefore need to be initialized, however,
+	   the module must not already be on a list. */
 
 	assert(!cdev->d_list.next || list_empty(&cdev->d_list));
 	INIT_LIST_HEAD(&cdev->d_list);
@@ -1384,6 +1378,339 @@ cmin_rel(struct devnode *cmin)
 }
 
 EXPORT_SYMBOL_GPL(cmin_rel);
+
+static inline int
+is_module_name(const char *name)
+{
+	int i;
+	unsigned char c;
+
+	for (i = 0, c = (unsigned char) name[i];
+	     i < MODULE_NAME_LEN && c != '\0';
+	     i++, c = (unsigned char) name[i])
+	{
+		/* valid characters are [a-zA-Z0-9_] */
+		if (('a' <= c && c <= 'z') || ('A' <= c && c <= 'Z') || ('0' <= c && c <= '9')
+		    || ('_' == c))
+			continue;
+		return 0;
+	}
+	if ((c != '\0') || (i >= MODULE_NAME_LEN) || (i < 2))
+		return 0;
+	return 1;
+}
+
+/* The next 500-odd lines are just for figuring out a usable way of determining which module owns an
+ * address (or text address).  Note that streams_module_address is only used when installing IP
+ * hooks, which is normally during module initialization time. */
+
+#ifdef HAVE_KMEMB_STRUCT_MODULE_NEXT
+/* 2.4.33 kernel approach */
+/* The issues here are that module->next is used to link modules together from module_list; however,
+ * modules are pushed onto the list, so modules loaded after specfs are "earlier" on the list and we
+ * will not be able to find them.  Guess what though, module kernel_module is first to be pushed on
+ * the list, which means that it is last on the list from us.  Also, 'module_list' happens to be
+ * defined immediately after the kernel module structure, so we can find the head of the list
+ * afterall.  Also, we can verify when our module is loaded that this is true. */
+static struct module **module_list_pointer = NULL;
+static void
+find_module_list(void)
+{
+	struct module *mod = THIS_MODULE, **modp;
+
+	for (; mod->next != NULL; mod = mod->next) ;
+	/* mod now points to kernel_module */
+	struct {
+		struct module;
+		struct module *module_list_p;
+	} *kmod = (typeof(kmod)) mod;
+
+	modp = &kmod->module_list_p;
+	/* we should be first on the list when our init is run */
+	if (*modp == THIS_MODULE)
+		module_list_pointer = modp;
+}
+
+struct module *
+__streams_module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	if (module_list_pointer != NULL) {
+		for (mod = *module_list_pointer; mod != NULL; mod = mod->next) {
+			if (mod->next == NULL)
+				continue;
+			if ((unsigned long) mod <= addr && addr <= (unsigned long) mod + mod->size)
+				return mod;
+		}
+	}
+	return NULL;
+}
+
+#if   defined HAVE_MODLIST_LOCK_SUPPORT
+extern spinlock_t modlist_lock;
+struct module *
+streams_module_address(unsigned long addr)
+{
+	struct module *mod;
+	unsigned long flags;
+
+	spin_lock_irqsave(&modlist_lock, flags);
+	mod = __streams_module_address(addr);
+	spin_unlock_irqrestore(&modlist_lock, flags);
+	return mod;
+}
+
+EXPORT_SYMBOL(streams_module_address);
+#elif defined HAVE_MODLIST_LOCK_USABLE && CONFIG_KERNEL_WEAK_MODULES
+extern spinlock_t modlist_lock __attribute__ ((__weak__));
+struct module *
+streams_module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	if (&modlist_lock != 0) {
+		unsigned long flags;
+
+		spin_lock_irqsave(&modlist_lock, flags);
+		mod = __streams_module_address(addr);
+		spin_unlock_irqrestore(&modlist_lock, flags);
+	} else {
+		/* probably safe without locks because only called during module
+		 * init procedures */
+		mod = __streams_module_address(addr);
+	}
+	return mod;
+}
+
+EXPORT_SYMBOL(streams_module_address);
+struct module *
+#else
+struct module *
+streams_module_address(unsigned long addr)
+{
+	/* probably safe without locks because only called during module init
+	 * procedures */
+	return __streams_module_address(addr);
+}
+
+EXPORT_SYMBOL(streams_module_address);
+struct module *
+#endif
+#else				/* HAVE_KMEMB_STRUCT_MODULE_NEXT */
+/* 2.6.18+ kernel approach */
+#ifdef HAVE_MODLIST_LOCK_SYMBOL
+/* ------------------------------------------------------------------------- */
+/* 2.6.18+ approach -------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+/* The unforunate problem here is that we cannot get access to the module list
+ * lock without ripping kernel symbols.  Therefore, we have to be a little more
+ * creative.  Also, when a module list lock was used, none of the search symbols
+ * were exported, so its brute force. */
+struct module *
+__streams_module_address(unsigned long addr)
+{
+	struct module *mod, *mod_prev = NULL;
+	struct list_head *head = &__this_module.list;
+
+	list_for_each_entry(mod, head, list) {
+		/* extra list sanity check */
+		if (mod->list.prev != head && mod->list.prev != &mod_prev->list)
+			return NULL;
+		/* extra list sanity check */
+		if (mod->list.next == NULL || mod->list.next == &mod->list)
+			return NULL;
+		mod_prev = mod;
+		switch (mod->state) {
+		case MODULE_STATE_LIVE:
+		case MODULE_STATE_COMING:
+		case MODULE_STATE_GOING:
+			break;
+		default:
+			return NULL;
+		}
+		if (!is_module_name(mod->name))
+			return NULL;
+		if ((unsigned long) mod->module_init <= addr && addr < (unsigned long) mod->module_init + mod->init_size)
+			return mod;
+		if ((unsigned long) mod->module_core <= addr && addr < (unsigned long) mod->module_core + mod->core_size)
+			return mod;
+	}
+	return NULL;
+}
+
+#if   defined HAVE_MODLIST_LOCK_SUPPORT
+extern spinlock_t modlist_lock;
+struct module *
+streams_module_address(unsigned long addr)
+{
+	struct module *mod;
+	unsigned long flags;
+
+	spin_lock_irqsave(&modlist_lock, flags);
+	mod = __streams_module_address(addr);
+	spin_unlock_irqrestore(&modlist_lock, flags);
+	return mod;
+}
+
+EXPORT_SYMBOL(streams_module_address);
+
+#elif defined HAVE_MODLIST_LOCK_SYMBOL && defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern spinlock_t modlist_lock __attribute__ ((__weak__));
+struct module *
+streams_module_address(unsigned long addr)
+{
+	struct module *mod = NULL;
+
+	if (&modlist_lock != 0) {
+		unsigned long flags;
+
+		spin_lock_irqsave(&modlist_lock, flags);
+		mod = __streams_module_address(addr);
+		spin_unlock_irqrestore(&modlist_lock, flags);
+	}
+	return mod;
+}
+
+EXPORT_SYMBOL(streams_module_address);
+
+#else
+struct module *
+streams_module_address(unsigned long addr)
+{
+#if 1
+	struct module *mod;
+
+	/* is it too dangerous to walk the list without locks? */
+	/* Probably not for this version, because it is only to be called from module init
+	 * procedures. */
+	preempt_disable();
+	mod = __streams_module_address(addr);
+	preempt_enable();
+	return mod;
+#else
+	return NULL;
+#endif
+}
+
+EXPORT_SYMBOL(streams_module_address);
+
+#endif
+
+#else				/* HAVE_MODLIST_LOCK_SYMBOL */
+/* ------------------------------------------------------------------------- */
+/* 2.6.21+ approach -------------------------------------------------------- */
+/* ------------------------------------------------------------------------- */
+struct module *
+__streams_module_address(unsigned long addr)
+{
+	struct module *mod;
+	struct list_head *head = &__this_module.list;
+
+	list_for_each_entry(mod, head, list) {
+		switch (mod->state) {
+		case MODULE_STATE_LIVE:
+		case MODULE_STATE_COMING:
+		case MODULE_STATE_GOING:
+			break;
+		default:
+			return NULL;
+		}
+		if (!is_module_name(mod->name))
+			return NULL;
+		if ((unsigned long) mod->module_init <= addr && addr < (unsigned long) mod->module_init + mod->init_size)
+			return mod;
+		if ((unsigned long) mod->module_core <= addr && addr < (unsigned long) mod->module_core + mod->core_size)
+			return mod;
+	}
+	return NULL;
+}
+
+#if   defined HAVE_MODULE_ADDRESS_SUPPORT
+extern struct module *module_address(unsigned long addr);
+struct module *
+streams_module_address(unsigned long addr)
+{
+	return module_address(addr);
+}
+
+EXPORT_SYMBOL(streams_module_address);
+
+#elif defined HAVE___MODULE_ADDRESS_SUPPORT
+extern struct module *__module_address(unsigned long addr);
+struct module *
+streams_module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __module_address(addr);
+	preempt_enable();
+	return mod;
+}
+
+EXPORT_SYMBOL(streams_module_address);
+
+#elif defined HAVE_MODULE_ADDRESS_SYMBOL && defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern struct module *module_address(unsigned long addr) __attribute__ ((__weak__));
+struct module *
+streams_module_address(unsigned long addr)
+{
+	if (module_address != 0) {
+		return module_address(addr);
+	} else {
+		struct module *mod;
+
+		preempt_disable();
+		mod = __streams_module_address(addr);
+		preempt_enable();
+		return mod;
+	}
+}
+
+EXPORT_SYMBOL(streams_module_address);
+
+#elif defined HAVE___MODULE_ADDRESS_SYMBOL && defined CONFIG_KERNEL_WEAK_SYMBOLS
+extern struct module *__module_address(unsigned long addr) __attribute__ ((__weak__));
+struct module *
+streams_module_address(unsigned long addr)
+{
+	if (__module_address != 0) {
+		struct module *mod;
+
+		preempt_disable();
+		mod = __module_address(addr);
+		preempt_enable();
+		return mod;
+	} else {
+		struct module *mod;
+
+		preempt_disable();
+		mod = __streams_module_address(addr);
+		preempt_enable();
+		return mod;
+	}
+}
+
+EXPORT_SYMBOL(streams_module_address);
+
+#else
+struct module *
+streams_module_address(unsigned long addr)
+{
+	struct module *mod;
+
+	preempt_disable();
+	mod = __streams_module_address(addr);
+	preempt_enable();
+	return mod;
+}
+
+EXPORT_SYMBOL(streams_module_address);
+#endif
+
+#endif				/* HAVE_MODLIST_LOCK_SYMBOL */
+#endif				/* HAVE_KMEMB_STRUCT_MODULE_NEXT */
 
 BIG_STATIC int
 strlookup_init(void)

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-03-26 04:28:44 $
+# @(#) $RCSfile: acinclude.m4,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2011-04-05 16:35:10 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-26 04:28:44 $ by $Author: brian $
+# Last Modified $Date: 2011-04-05 16:35:10 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -818,6 +818,7 @@ dnl----------------------------------------------------------------------------
 	ip_route_output_key \
 	kern_umount \
 	kill_proc \
+	ksize \
 	module_put \
 	nf_reset \
 	num_online_cpus \
@@ -1115,6 +1116,7 @@ dnl----------------------------------------------------------------------------
 	struct inode.i_private,
 	struct kobject.kref,
 	struct kstatfs.f_type,
+	struct module.next,
 	struct net.dev_base_head,
 	struct net_device.hard_header,
 	struct net_device.rebuild_header,
@@ -1276,6 +1278,7 @@ AS_LINENO_POP])dnl
 	inet_addr_type,
 	inet_bind,
 	inet_del_protocol,
+	inet_get_local_port_range,
 	inet_getname,
 	inet_ioctl,
 	inet_multi_getname,
@@ -1313,6 +1316,7 @@ AS_LINENO_POP])dnl
 	kthread_should_stop,
 	kthread_stop,
 	mod_timer,
+	module_text_address,
 	net_statistics,
 	nf_hook_slow,
 	nf_hooks,
@@ -1338,6 +1342,7 @@ AS_LINENO_POP])dnl
 	schedule_timeout,
 	send_group_sig_info,
 	send_sig,
+	session_of_pgrp,
 	sk_alloc,
 	sk_free,
 	sk_run_filter,
@@ -1359,6 +1364,7 @@ AS_LINENO_POP])dnl
 	sysctl_intvec,
 	sysctl_jiffies,
 	sysctl_local_port_range,
+	sysctl_tcp_fin_timeout,
 	task_rq_lock,
 	tasklist_lock,
 	tcp___push_pending_frames,
@@ -1369,6 +1375,7 @@ AS_LINENO_POP])dnl
 	tcp_orphan_count,
 	tcp_prot,
 	tcp_push_pending_frames,
+	tcp_set_keepalive,
 	tcp_set_skb_tso_factor,
 	tcp_set_skb_tso_segs,
 	tcp_sockets_allocated,
@@ -1384,8 +1391,10 @@ dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_SYMBOLS([
 	__ip_route_output_key,
+	__ip_select_ident,
 	__module_address,
 	__module_text_address,
+	__modules,
 	__setscheduler,
 	__tcp_push_pending_frames,
 	__wake_up_sync,
@@ -1407,6 +1416,7 @@ dnl----------------------------------------------------------------------------
 	icmp_err_convert,
 	icmp_statistics,
 	inet_bind,
+	inet_get_local_port_range,
 	inet_getname,
 	inet_ioctl,
 	inet_multi_getname,
@@ -1445,6 +1455,7 @@ dnl----------------------------------------------------------------------------
 	kthread_create,
 	kthread_should_stop,
 	kthread_stop,
+	modlist_lock,
 	module_address,
 	module_text_address,
 	modules,
@@ -1492,6 +1503,7 @@ dnl----------------------------------------------------------------------------
 	tcp_tw_count,
 	tcp_write_xmit,
 	udp_prot,
+	xfrm_policy_delete,
 	xfrm_policy_delete]) # _LINUX_KERNEL_SYMBOLS
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
@@ -1501,6 +1513,7 @@ dnl----------------------------------------------------------------------------
 	__ip_select_ident,
 	__module_address,
 	__module_text_address,
+	__modules,
 	__setscheduler,
 	__tcp_push_pending_frames,
 	__wake_up_sync,
@@ -1522,6 +1535,7 @@ dnl----------------------------------------------------------------------------
 	icmp_err_convert,
 	icmp_statistics,
 	inet_bind,
+	inet_get_local_port_range,
 	inet_getname,
 	inet_ioctl,
 	inet_multi_getname,
@@ -1560,6 +1574,7 @@ dnl----------------------------------------------------------------------------
 	kthread_create,
 	kthread_should_stop,
 	kthread_stop,
+	modlist_lock,
 	module_address,
 	module_text_address,
 	modules,
@@ -1607,6 +1622,7 @@ dnl----------------------------------------------------------------------------
 	tcp_tw_count,
 	tcp_write_xmit,
 	udp_prot,
+	xfrm_policy_delete,
 	xfrm_policy_delete]) # _LINUX_KERNEL_ABI_SYMBOLS
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
@@ -1935,6 +1951,55 @@ retval = do_settimeofday(&ts);]]) ],
 	])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel ksize returns size_t], [linux_cv_ksize_returns_size_t], [dnl
+	    if test :"${linux_cv_func_ksize:-no}" = :yes ; then
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/compiler.h>
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/module.h>
+#include <linux/types.h>
+#include <linux/init.h>
+#ifdef HAVE_KINC_LINUX_LOCKS_H
+#include <linux/locks.h>
+#endif
+#ifdef HAVE_KINC_LINUX_SLAB_H
+#include <linux/slab.h>
+#endif
+#include <linux/fs.h>
+#include <linux/sched.h>
+#include <linux/wait.h>
+#ifdef HAVE_KINC_LINUX_KDEV_T_H
+#include <linux/kdev_t.h>
+#endif
+#ifdef HAVE_KINC_LINUX_STATFS_H
+#include <linux/statfs.h>
+#endif
+#ifdef HAVE_KINC_LINUX_NAMESPACE_H
+#include <linux/namespace.h>
+#endif
+#include <linux/interrupt.h>	/* for irqreturn_t */ 
+#ifdef HAVE_KINC_LINUX_HARDIRQ_H
+#include <linux/hardirq.h>	/* for in_interrupt */
+#endif
+#ifdef HAVE_KINC_LINUX_KTHREAD_H
+#include <linux/kthread.h>
+#endif
+#include <linux/time.h>		/* for struct timespec */]],
+		    [[size_t (*my_autoconf_function_pointer)
+			(const void *) = &ksize;]]) ],
+		[linux_cv_ksize_returns_size_t='yes'],
+		[linux_cv_ksize_returns_size_t='no'])
+	    else
+		linux_cv_ksize_returns_size_t="no"
+	    fi
+	])
+	if test :$linux_cv_ksize_returns_size_t = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_KSIZE_RETURNS_SIZE_T], [1], [Define if
+		function ksize returns size_t.])
+	fi
 	AC_CACHE_CHECK([for kernel irq_handler_t has 2 arguments], [linux_cv_type_irq_handler_t_2args], [dnl
 	    if test :$linux_cv_type_irq_handler_t = :yes ; then
 		AC_COMPILE_IFELSE([
@@ -2061,6 +2126,35 @@ ICMP_INC_STATS_BH(&my_autoconf_net, ICMP_MIB_INERRORS);]]) ],
     fi
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
+	if test :$linux_cv_inet_protos_symbol = :yes ; then
+	    AC_CACHE_CHECK([for kernel const inet_protos], [linux_cv_inet_protos_is_const], [dnl
+		AC_COMPILE_IFELSE([
+		    AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <net/snmp.h>
+#include <net/udp.h>
+#ifdef HAVE_KINC_NET_DST_H
+#include <net/dst.h>
+#endif
+#include <net/protocol.h>]],
+			[[struct net_protocol **my_autoconf_pointer = inet_protos;]]) ],
+			[linux_cv_inet_protos_is_const='no'],
+			[linux_cv_inet_protos_is_const='yes'])
+	    ])
+	    if test :$linux_cv_inet_protos_is_const = :yes ; then
+		AC_DEFINE([HAVE_INET_PROTOS_IS_CONST], [1], [Define if the array
+			   inet_protos contains const pointers.])
+	    fi
+	fi
 	if test :$linux_cv_xfrm_policy_delete_symbol = :yes ; then
 	    AC_CACHE_CHECK([for kernel xfrm_policy_delete_symbol returns int],
 			   [linux_cv_xfrm_policy_delete_returns_int], [dnl
@@ -2246,14 +2340,9 @@ dnl 	fi
 		[linux_cv_have_tcp_current_mss_1_arg='yes'],
 		[linux_cv_have_tcp_current_mss_1_arg='no'])
 	])
-	AH_VERBATIM([HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG], m4_text_wrap([Define if function
-		     tcp_current_mss takes 1 argument. */], [   ], [/* ])[
-#undef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
-#ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
-unsigned int tcp_current_mss(struct sock *sk);
-#endif /* HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG */])
 	if test :"${linux_cv_have_tcp_current_mss_1_arg:-no}" = :yes ; then
-	    AC_DEFINE([HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG], [1])
+	    AC_DEFINE([HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG], [1], [Define if
+		furnction tcp_current_mss() takes 1 argument.])
 	fi
 	AC_CACHE_CHECK([for kernel tcp_current_mss with 2 arguments], [linux_cv_have_tcp_current_mss_2_args], [dnl
 	    AC_COMPILE_IFELSE([
@@ -2278,14 +2367,9 @@ unsigned int tcp_current_mss(struct sock *sk);
 		[linux_cv_have_tcp_current_mss_2_args='yes'],
 		[linux_cv_have_tcp_current_mss_2_args='no'])
 	])
-	AH_VERBATIM([HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS], m4_text_wrap([Define if function
-		     tcp_current_mss takes 2 arguments. */], [   ], [/* ])[
-#undef HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS
-#ifdef HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS
-unsigned int tcp_current_mss(struct sock *sk, int large);
-#endif /* HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS */])
 	if test :"${linux_cv_have_tcp_current_mss_2_args:-no}" = :yes ; then
-	    AC_DEFINE([HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS], [1])
+	    AC_DEFINE([HAVE_KFUNC_TCP_CURRENT_MSS_2_ARGS], [1], [Define if
+		function tcp_current_mss() takes 2 arguments.])
 	fi
     ])
 dnl----------------------------------------------------------------------------
@@ -2514,6 +2598,29 @@ dnl----------------------------------------------------------------------------
 	if test :$linux_cv_inet_addr_type_2_args = :yes ; then
 	    AC_DEFINE([HAVE_KFUNC_INET_ADDR_TYPE_2_ARGS], [1], [Define if
 		function inet_addr_type() takes 2 arguments.])
+	fi
+	AC_CACHE_CHECK([for kernel ip_route_output_key with 2 args],
+		       [linux_cv_ip_route_output_key_2_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#include <linux/autoconf.h>
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+		    [[int (*my_autoconf_function_pointer)(struct rtable **,
+		     struct flowi *) = &ip_route_output_key;]])
+		],
+		[linux_cv_ip_route_output_key_2_args='yes'],
+		[linux_cv_ip_route_output_key_2_args='no'])
+	])
+	if test :$linux_cv_ip_route_output_key_2_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS], [1], [Define if
+		function ip_route_output_key() takes 2 arguments.])
 	fi
 	AC_CACHE_CHECK([for kernel ip_route_output_key with 3 args],
 		       [linux_cv_ip_route_output_key_3_args], [dnl
@@ -4110,6 +4217,9 @@ AC_DEFUN([_OS7_], [dnl
 # =============================================================================
 #
 # $Log: acinclude.m4,v $
+# Revision 1.1.2.14  2011-04-05 16:35:10  brian
+# - weak module design
+#
 # Revision 1.1.2.13  2011-03-26 04:28:44  brian
 # - updates to build process
 #
