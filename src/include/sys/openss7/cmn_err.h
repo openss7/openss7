@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 1.1.2.4 2011-04-05 16:35:13 brian Exp $
+ @(#) $Id: cmn_err.h,v 1.1.2.5 2011-04-06 21:33:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
+ Last Modified $Date: 2011-04-06 21:33:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cmn_err.h,v $
+ Revision 1.1.2.5  2011-04-06 21:33:05  brian
+ - corrections
+
  Revision 1.1.2.4  2011-04-05 16:35:13  brian
  - weak module design
 
@@ -94,22 +97,12 @@
 #define CE_ALERT    5		/* IRIX 6.5 */
 
 __STREAMS_EXTERN void vcmn_err(int err_lvl, const char *fmt, va_list args);
-#ifndef HAVE_CMN_ERR_EXPORT
+
 __STREAMS_EXTERN void cmn_err(int err_lvl, const char *fmt, ...)
     __attribute__ ((__format__(__printf__, 2, 3)));
-#else
-__inline__ void cmn_err__(int err_lvl, const char *fmt, ...)
-{
-	va_list args;
-
-	va_start(args, fmt);
-	vcmn_err(err_lvl, fmt, args);
-	va_end(args);
-	return;
-}
-__STREAMS_EXTERN void cmn_err(int err_lvl, const char *fmt, ...)
-    __attribute__ ((__format__(__printf__, 2, 3)))
-    __attribute__ ((alias("cmn_err__")));
+#ifdef HAVE_CMN_ERR_EXPORT
+#undef cmn_err
+__asm__(".weakref cmn_err,cmn_err_");
 #endif
 
 #endif				/* __SYS_OPENSS7_CMN_ERR_H__ */

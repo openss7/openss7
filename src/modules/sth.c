@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:15 $
+ @(#) $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-06 21:33:06 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:15 $ by $Author: brian $
+ Last Modified $Date: 2011-04-06 21:33:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sth.c,v $
+ Revision 1.1.2.8  2011-04-06 21:33:06  brian
+ - corrections
+
  Revision 1.1.2.7  2011-04-05 16:35:15  brian
  - weak module design
 
@@ -75,7 +78,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:15 $";
+static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-06 21:33:06 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool type, true and false */
@@ -182,7 +185,7 @@ compat_ptr(compat_uptr_t uptr)
 
 #define STH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STH_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:15 $"
+#define STH_REVISION	"LfS $RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-06 21:33:06 $"
 #define STH_DEVICE	"SVR 4.2 MP STREAMS STH Module"
 #define STH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define STH_LICENSE	"GPL"
@@ -1058,16 +1061,14 @@ int is_ignored(int sig)
 #if defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIG
 	return (sigismember(&current->blocked, sig) ||
 			current->sig->action[sig-1].sa.sa_handler == SIG_IGN);
-#define is_ignored(_x_) is_ignored(_x_)
 #elif defined HAVE_KMEMB_STRUCT_TASK_STRUCT_SIGHAND
 	return (sigismember(&current->blocked, sig) ||
 			current->sighand->action[sig-1].sa.sa_handler == SIG_IGN);
-#define is_ignored(_x_) is_ignored(_x_)
 #else
 #error Need a way to check for an ignored signal.
-#undef is_ignored
 #endif
 }
+#define is_ignored(_x_) is_ignored(_x_)
 #endif
 
 /* How to test if the current process group is orphaned (background process group).  Just used
@@ -1075,17 +1076,22 @@ int is_ignored(int sig)
 #ifdef HAVE_IS_ORPHANED_PGRP_SYMBOL
 #if defined HAVE_IS_ORPHANED_PGRP_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 int is_orphaned_pgrp(int pgrp);
-#define is_current_pgrp_orphaned() is_orphaned_pgrp(current_pgrp())
+static inline int
+is_current_pgrp_orphaned_(void)
+{
+	return is_orphaned_pgrp(current_pgrp());
+}
+#define is_current_pgrp_orphaned() is_current_pgrp_orphaned_()
 #else
 int is_orphaned_pgrp(int pgrp) __attribute__((__weak__));
 static inline int
-is_orphaned_pgrp_(int pgrp)
+is_current_pgrp_orphaned_(void)
 {
 	if (is_orphaned_pgrp)
-		return is_orphaned_pgrp(pgrp);
+		return is_orphaned_pgrp(current_pgrp());
 	return 0;
 }
-#define is_current_pgrp_orphaned() is_orphaned_pgrp_(current_pgrp())
+#define is_current_pgrp_orphaned() is_current_pgrp_orphaned_()
 #endif
 #elif defined HAVE_IS_CURRENT_PGRP_ORPHANED_SYMBOL
 #if   defined HAVE_IS_CURRENT_PGRP_ORPHANED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS

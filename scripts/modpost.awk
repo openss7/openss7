@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-05 16:35:10 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-06 21:33:05 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-04-05 16:35:10 $ by $Author: brian $
+# Last Modified $Date: 2011-04-06 21:33:05 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,7 +147,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: modpost.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.10 2011-04-06 21:33:05 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [MODULE ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -274,7 +274,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.10 2011-04-06 21:33:05 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -297,7 +297,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.10 2011-04-06 21:33:05 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -1105,6 +1105,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]; base = name; gsub(/^.*\//, "", base)
 	if (sym in mods) {
 	    mod_deps[name,mods[sym]] = 1
+	    print_debug(3,"r: mymodules, dependency: " base " depends on " mods[sym] " for symbol " sym)
 	    if ((mods[sym],sym) in mod_used)
 		mod_used[mods[sym],sym] = mod_used[mods[sym],sym] "," name
 	    else
@@ -1497,7 +1498,7 @@ __attribute__((section(\".gnu.linkonce.this_module\"))) = {\n\
 	    print "#ifdef CONFIG_MODULE_UNLOAD\n\t.exit = cleanup_module,\n#endif" > file
 	print "};\n#endif" > file
 }
-function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,sym,fmt)
+function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,sym,add,fmt)
 {
     fmt = "w: mymodules, %-20s: %14s; %-30s"
     count_unds = 0; count_weak = 0
@@ -1505,10 +1506,7 @@ function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,
     for (pair in mod_unds) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	if (name != mod) continue
-	if (!(sym in crcs)) {
-	    print_error(sprintf(fmt, base, "no version", sym));
-	    continue
-	}
+	if (!(sym in crcs)) continue
 	print_debug(3,sprintf(fmt, base, crcs[sym], sym))
 	text = text "\n\t{ " crcs[sym] ", \"" sym "\" },"
 	count_unds++
@@ -1519,13 +1517,7 @@ function write_modversions(file, mod, base,	count_unds,count_weak,pair,ind,name,
 	    if (name != mod) continue
 	    if ((!(sym in ownr) || ownr[sym] != values["pkgdirectory"]) && values["weak-hidden"])
 		continue
-	    if (!(sym in crcs)) {
-		if (values["unres-weak"])
-		    print_vinfo(1,sprintf(fmt, base, "weak novers", sym));
-		else
-		    print_warns(sprintf(fmt, base, "weak novers", sym));
-		continue
-	    }
+	    if (!(sym in crcs)) continue
 	    print_debug(3,sprintf(fmt, base, crcs[sym], sym))
 	    text = text "\n\t{ " crcs[sym] ", \"" sym "\" },"
 	    count_weak++
@@ -1544,15 +1536,8 @@ __attribute__((section(\"__versions\"))) = {\
 	for (pair in mod_weak) {
 	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	    if (name != mod) continue
-	    if ((sym in ownr) && ownr[sym] == values["pkgdirectory"])
-		continue
-	    if (!(sym in crcs)) {
-		if (values["unres-weak"])
-		    print_vinfo(1,sprintf(fmt, base, "weak novers", sym));
-		else
-		    print_warns(sprintf(fmt, base, "weak novers", sym));
-		continue
-	    }
+	    if ((sym in ownr) && ownr[sym] == values["pkgdirectory"]) continue
+	    if (!(sym in crcs)) continue
 	    print_debug(3,sprintf(fmt, base, crcs[sym], sym))
 	    text = text "\n\t{ " crcs[sym] ", \"" sym "\" },"
 	    count_weak++
@@ -1566,16 +1551,34 @@ __attribute__((section(\"__weak_versions\"))) = {\
 " text "\n};\n#endif" > file
 	}
     }
+    if (values["rip-symbols"]) {
+	text = ""
+	for (pair in mod_unds) {
+	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	    if (name != mod) continue
+	    if (sym in crcs) continue
+	    if (sym in mapaddrs) { add = mapaddrs[sym] } else { add = "00000000" }
+	    print_debug(3,sprintf(fmt, base, "0x" add, sym))
+	    text = text "\n\t{ " "0x" add ", \"" sym "\" },"
+	    count_unds++
+	}
+	if (text) {
+	    print "\n\
+static const struct modversion_info ____absolute[]\n\
+__attribute_used__\n\
+__attribute__((section(\"__absolute\"))) = {\
+" text "\n};" > file
+	}
+    }
     if (values["rip-weak"]) {
 	text = ""
 	for (pair in mod_weak) {
 	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	    if (name != mod) continue
-	    if (sym in crcs) {
-		continue
-	    }
-	    print_debug(3,sprintf(fmt, base, "0x00000000", sym))
-	    text = text "\n\t{ " "0x00000000" ", \"" sym "\" },"
+	    if (sym in crcs) continue
+	    if (sym in mapaddrs) { add = mapaddrs[sym] } else { add = "00000000" }
+	    print_debug(3,sprintf(fmt, base, "0x" add, sym))
+	    text = text "\n\t{ " "0x" add ", \"" sym "\" },"
 	    count_weak++
 	}
 	if (text) {
@@ -1682,40 +1685,42 @@ function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name
 	    print_error(sprintf(fmt, base, "norm no def", sym))
 	}
     }
-    for (pair in mod_weak) {
-	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
-	if (name != mod) continue
-	if (sym in crcs) continue
-	if (!(sym in mapsyms)) {
-	    print_warns(sprintf(fmt, base, "weak no res", sym))
-	    continue
-	}
-	if (!(sym in maptypes)) {
-	    print_error(sprintf(fmt, base, "weak no typ", sym))
-	    continue
-	}
-	if (!(sym in mapaddrs)) {
-	    print_warns(sprintf(fmt, base, "weak no add", sym))
-	    continue
-	}
-	if (mapaddrs[sym]~/,/) {
-	    print_warns(sprintf(fmt, base, "weak addr??", sym))
-	    continue
-	}
-	if (maptypes[sym]!~/[sSgGCbBdDtTwWvV]/) {
-	    print_warns(sprintf(fmt " map = %s", base, "weak type??", sym, maptypes[sym]))
-	    continue
-	}
-	if (values["rip-weak"]) {
-	    print_vinfo(1,sprintf(fmt, base, "weak newdef", sym))
-	    if (count_unds || count_weak) defs = defs "\n"
-	    defs = defs "        " sym " = 0x" mapaddrs[sym] ";"
-	    count_weak++
-	} else {
-	    if (values["unres-weak"])
-		print_warns(sprintf(fmt, base, "weak no def", sym))
-	    else
-		print_error(sprintf(fmt, base, "weak no def", sym))
+    if (values["weak-symbols"]) {
+	for (pair in mod_weak) {
+	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
+	    if (name != mod) continue
+	    #if (sym in crcs) continue
+	    if (!(sym in mapsyms)) {
+		print_warns(sprintf(fmt, base, "weak no res", sym))
+		continue
+	    }
+	    if (!(sym in maptypes)) {
+		print_error(sprintf(fmt, base, "weak no typ", sym))
+		continue
+	    }
+	    if (!(sym in mapaddrs)) {
+		print_warns(sprintf(fmt, base, "weak no add", sym))
+		continue
+	    }
+	    if (mapaddrs[sym]~/,/) {
+		print_warns(sprintf(fmt, base, "weak addr??", sym))
+		continue
+	    }
+	    if (maptypes[sym]!~/[sSgGCbBdDtTwWvV]/) {
+		print_warns(sprintf(fmt " map = %s", base, "weak type??", sym, maptypes[sym]))
+		continue
+	    }
+	    if (values["rip-weak"]) {
+		print_vinfo(1,sprintf(fmt, base, "weak newdef", sym))
+		if (count_unds || count_weak) defs = defs "\n"
+		defs = defs "        " sym " = 0x" mapaddrs[sym] ";"
+		count_weak++
+	    } else {
+		if (values["unres-weak"])
+		    print_warns(sprintf(fmt, base, "weak no def", sym))
+		else
+		    print_error(sprintf(fmt, base, "weak no def", sym))
+	    }
 	}
     }
     if (count_unds || count_weak) {
@@ -1993,6 +1998,9 @@ END {
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.10  2011-04-06 21:33:05  brian
+# - corrections
+#
 # Revision 1.1.2.9  2011-04-05 16:35:10  brian
 # - weak module design
 #
