@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: wrapper.h.in,v 1.1.2.3 2011-04-05 16:35:13 brian Exp $
+ @(#) $Id: wrapper.h.in,v 1.1.2.4 2011-04-06 21:33:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
+ Last Modified $Date: 2011-04-06 21:33:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wrapper.h.in,v $
+ Revision 1.1.2.4  2011-04-06 21:33:05  brian
+ - corrections
+
  Revision 1.1.2.3  2011-04-05 16:35:13  brian
  - weak module design
 
@@ -86,63 +89,61 @@
 /* Symbol session_of_pgrp has an address. */
 #undef HAVE_SESSION_OF_PGRP_ADDR
 #ifdef HAVE_SESSION_OF_PGRP_ADDR
-extern pid_t session_of_pgrp(pid_t) __weak;
+streams_weak extern pid_t session_of_pgrp(pid_t);
 #endif				/* defined HAVE_SESSION_OF_PGRP_ADDR */
 
 /* Symbol is_ignored has an address. */
 #undef HAVE_IS_IGNORED_ADDR
 #ifdef HAVE_IS_IGNORED_ADDR
-extern int is_ignored(int sig) __weak;
+streams_weak extern int is_ignored(int sig);
 #endif				/* HAVE_IS_IGNORED_ADDR */
 
 /* Symbol is_orphaned_pgrp has an address. */
 #undef HAVE_IS_ORPHANED_PGRP_ADDR
 #ifdef HAVE_IS_ORPHANED_PGRP_ADDR
-extern int is_orphaned_pgrp(int pgrp) __weak;
+streams_weak extern int is_orphaned_pgrp(int pgrp);
 #endif				/* HAVE_IS_ORPHANED_PGRP_ADDR */
 
 /* Symbol is_current_pgrp_orphaned has an address. */
 #undef HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR
 #ifdef HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR
-extern int is_current_pgrp_orphaned(void) __weak;
+streams_weak extern int is_current_pgrp_orphaned(void);
 #endif				/* HAVE_IS_CURRENT_PGRP_ORPHANED_ADDR */
 
 /* Symbol tasklist_lock has an address. */
 #undef HAVE_TASKLIST_LOCK_ADDR
 #ifdef HAVE_TASKLIST_LOCK_ADDR
-extern rwlock_t tasklist_lock __weak;
+streams_weak extern rwlock_t tasklist_lock;
 #endif				/* HAVE_TASKLIST_LOCK_ADDR */
 
 /* Symbol kill_pid_info has an address. */
 #undef HAVE_KILL_PID_INFO_ADDR
 #ifdef HAVE_KILL_PID_INFO_ADDR
-extern int kill_pid_info(int sig, struct siginfo *info, struct pid *pid) __weak;
+streams_weak extern int kill_pid_info(int sig, struct siginfo *info, struct pid *pid);
 #endif				/* HAVE_KILL_PID_INFO_ADDR */
 
 /* Symbol kill_proc_info has an address. */
 #undef HAVE_KILL_PROC_INFO_ADDR
 #ifdef HAVE_KILL_PROC_INFO_ADDR
-extern int kill_proc_info(int sig, struct siginfo *sip, pid_t pid) __weak;
+streams_weak extern int kill_proc_info(int sig, struct siginfo *sip, pid_t pid);
 #endif				/* HAVE_KILL_PROC_INFO_ADDR */
 
 /* Symbol kill_sl has an address. */
 #undef HAVE_KILL_SL_ADDR
 #ifdef HAVE_KILL_SL_ADDR
-extern int kill_sl_func(pid_t, int, int) __weak;
+streams_weak extern int kill_sl_func(pid_t, int, int);
 #endif				/* HAVE_KILL_SL_ADDR */
 
 /* Symbol send_group_sig_info has an address. */
 #undef HAVE_SEND_GROUP_SIG_INFO_ADDR
 #ifdef HAVE_SEND_GROUP_SIG_INFO_ADDR
-extern int send_group_sig_info(int, struct siginfo *, struct task_struct *)
-    __weak;
+streams_weak extern int send_group_sig_info(int, struct siginfo *, struct task_struct *);
 #endif				/* HAVE_SEND_GROUP_SIG_INFO_ADDR */
 
 /* Symbol group_send_sig_info has an address. */
 #undef HAVE_GROUP_SEND_SIG_INFO_ADDR
 #ifdef HAVE_GROUP_SEND_SIG_INFO_ADDR
-extern int group_send_sig_info(int, struct siginfo *, struct task_struct *)
-    __weak;
+streams_weak extern int group_send_sig_info(int, struct siginfo *, struct task_struct *);
 #endif				/* HAVE_GROUP_SEND_SIG_INFO_ADDR */
 
 /* Symbol __wake_up_sync has an address. */
@@ -153,155 +154,154 @@ extern int group_send_sig_info(int, struct siginfo *, struct task_struct *)
 /* Symbol modules has an address. */
 #undef HAVE_MODULES_ADDR
 #ifdef HAVE_MODULES_ADDR
-extern struct list_head modules __weak;
+streams_weak extern struct list_head modules;
 #endif				/* HAVE_MODULES_ADDR */
 
 /* Symbol module_text_address has an address. */
 #undef HAVE_MODULE_TEXT_ADDRESS_ADDR
 #ifdef HAVE_MODULE_TEXT_ADDRESS_ADDR
-extern struct module *module_text_address(unsigned long addr) __weak;
+streams_weak extern struct module *module_text_address(unsigned long addr);
 #endif				/* HAVE_MODULE_TEXT_ADDRESS_ADDR */
 
 /* Symbol __module_text_address has an address. */
 #undef HAVE___MODULE_TEXT_ADDRESS_ADDR
 #ifdef HAVE___MODULE_TEXT_ADDRESS_ADDR
-extern struct module *__module_text_address(unsigned long addr) __weak;
+streams_weak extern struct module *__module_text_address(unsigned long addr);
 #endif				/* HAVE___MODULE_TEXT_ADDRESS_ADDR */
 /* Symbol __module_address has an address. */
 #undef HAVE___MODULE_ADDRESS_ADDR
 #ifdef HAVE___MODULE_ADDRESS_ADDR
-extern struct module *module_address(unsigned long addr) __weak;
+streams_weak extern struct module *module_address(unsigned long addr);
 #endif				/* HAVE___MODULE_ADDRESS_ADDR */
 
 /* Symbol file_move has an address. */
 #undef HAVE_FILE_MOVE_ADDR
 #ifdef HAVE_FILE_MOVE_ADDR
-extern void file_move(struct file *f, struct list_head *list) __weak;
+streams_weak extern void file_move(struct file *f, struct list_head *list);
 #endif				/* HAVE_FILE_MOVE_ADDR */
 
 /* Symbol file_kill has an address. */
 #undef HAVE_FILE_KILL_ADDR
 #ifdef HAVE_FILE_KILL_ADDR
-extern void file_kill(struct file *file) __weak;
+streams_weak extern void file_kill(struct file *file);
 #endif				/* HAVE_FILE_KILL_ADDR */
 
 /* Symbol put_filp has an address. */
 #undef HAVE_PUT_FILP_ADDR
 #ifdef HAVE_PUT_FILP_ADDR
-extern void put_filp(struct file *file) __weak;
+streams_weak extern void put_filp(struct file *file);
 #endif				/* HAVE_PUT_FILP_ADDR */
 
 /* Symbol kthread_should_stop has an address. */
 #undef HAVE_KTHREAD_SHOULD_STOP_ADDR
 #ifdef HAVE_KTHREAD_SHOULD_STOP_ADDR
-extern int kthread_should_stop(void) __weak;
+streams_weak extern int kthread_should_stop(void);
 #endif				/* HAVE_KTHREAD_SHOULD_STOP_ADDR */
 
 /* Symbol kthread_create has an address. */
 #undef HAVE_KTHREAD_CREATE_ADDR
 #ifdef HAVE_KTHREAD_CREATE_ADDR
-extern struct task_struct *kthread_create(int (*threadfn) (void *data), void *data,
-					  const char namefmt[],..)
-    __attribute__ ((format(printf, 3, 4))) __weak;
+streams_weak extern struct task_struct *kthread_create(int (*threadfn) (void *data), void *data,
+						       const char namefmt[],..)
+    __attribute__ ((format(printf, 3, 4)));
 #endif				/* HAVE_KTHREAD_CREATE_ADDR */
 
 /* Symbol kthread_bind has an address. */
 #undef HAVE_KTHREAD_BIND_ADDR
 #ifdef HAVE_KTHREAD_BIND_ADDR
-extern void kthread_bind(struct task_struct *k, unsigned int cpu) __weak;
+streams_weak extern void kthread_bind(struct task_struct *k, unsigned int cpu);
 #endif				/* HAVE_KTHREAD_BIND_ADDR */
 
 /* Symbol kthread_stop has an address. */
 #undef HAVE_KTHREAD_STOP_ADDR
 #ifdef HAVE_KTHREAD_STOP_ADDR
-extern int kthread_stop(struct task_struct *k) __weak;
+streams_weak extern int kthread_stop(struct task_struct *k);
 #endif				/* HAVE_KTHREAD_STOP_ADDR */
 
 /* Symbol inet_proto_lock has an address. */
 #undef HAVE_INET_PROTO_LOCK_ADDR
 #ifdef HAVE_INET_PROTO_LOCK_ADDR
-extern spinlock_t inet_proto_lock __weak;
+streams_weak extern spinlock_t inet_proto_lock;
 #endif				/* HAVE_INET_PROTO_LOCK_ADDR */
 
 /* Symbol inet_protos has an address. */
 #undef HAVE_INET_PROTOS_ADDR
 #ifdef HAVE_INET_PROTOS_ADDR
-extern const struct net_protocol *inet_protos[] __weak;
+streams_weak extern const struct net_protocol *inet_protos[];
 #endif				/* HAVE_INET_PROTOS_ADDR */
 
 /* Symbol skbuff_head_cache has an address. */
 #undef HAVE_SKBUFF_HEAD_CACHE_ADDR
 #ifdef HAVE_SKBUFF_HEAD_CACHE_ADDR
-extern kmem_cachep_t skbuff_head_cache __weak;
+streams_weak extern kmem_cachep_t skbuff_head_cache;
 #endif				/* HAVE_SKBUFF_HEAD_CACHE_ADDR */
 
 /* Symbol icmp_err_convert has an address. */
 #undef HAVE_ICMP_ERR_CONVERT_ADDR
 #ifdef HAVE_ICMP_ERR_CONVERT_ADDR
-extern struct icmp_err icmp_err_convert[] __weak;
+streams_weak extern struct icmp_err icmp_err_convert[];
 #endif				/* HAVE_ICMP_ERR_CONVERT_ADDR */
 
 /* Symbol icmp_statistics has an address. */
 #undef HAVE_ICMP_STATISTICS_ADDR
 #ifdef HAVE_ICMP_STATISTICS_ADDR
-extern struct icmp_mib icmp_statistic[] __weak;
+streams_weak extern struct icmp_mib icmp_statistic[];
 #endif				/* HAVE_ICMP_STATISTICS_ADDR */
 
 /* Symbol ip_route_output_flow has an address. */
 #undef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
 #ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR
-extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags)
-    __weak;
+streams_weak extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk,
+					     int flags);
 #endif				/* HAVE_IP_ROUTE_OUTPUT_FLOW_ADDR */
 
 /* Symbol ip_rt_min_pmtu has an address. */
 #undef HAVE_IP_RT_MIN_PMTU_ADDR
 #ifdef HAVE_IP_RT_MIN_PMTU_ADDR
-extern int ip_rt_min_pmtu __weak;
+streams_weak extern int ip_rt_min_pmtu;
 #endif				/* HAVE_IP_RT_MIN_PMTU_ADDR */
 
 /* Symbol ip_rt_mtu_expires has an address. */
 #undef HAVE_IP_RT_MTU_EXPIRES_ADDR
 #ifdef HAVE_IP_RT_MTU_EXPIRES_ADDR
-extern int ip_rt_mtu_expires __weak;
+streams_weak extern int ip_rt_mtu_expires;
 #endif				/* HAVE_IP_RT_MTU_EXPIRES_ADDR */
 
 /* Symbol ip_rt_update_pmtu has an address. */
 #undef HAVE_IP_RT_UPDATE_PMTU_ADDR
 #ifdef HAVE_IP_RT_UPDATE_PMTU_ADDR
-extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu) __weak;
+streams_weak extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
 #endif				/* HAVE_IP_RT_UPDATE_PMTU_ADDR */
 
 /* Symbol sysctl_ip_dynaddr has an address. */
 #undef HAVE_SYSCTL_IP_DYNADDR_ADDR
 #ifdef HAVE_SYSCTL_IP_DYNADDR_ADDR
-extern int sysctl_ip_dynaddr __weak;
+streams_weak extern int sysctl_ip_dynaddr;
 #endif				/* HAVE_SYSCTL_IP_DYNADDR_ADDR */
 
 /* Symbol sysctl_ip_nonlocal_bind has an address. */
 #undef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
 #ifdef HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR
-extern int sysctl_ip_nonlocal_bind __weak;
+streams_weak extern int sysctl_ip_nonlocal_bind;
 #endif				/* HAVE_SYSCTL_IP_NONLOCAL_BIND_ADDR */
 
 /* Symbol sysctl_ip_default_ttl has an address. */
 #undef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
 #ifdef HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR
-extern int sysctl_ip_default_ttl __weak;
+streams_weak extern int sysctl_ip_default_ttl;
 #endif				/* HAVE_SYSCTL_IP_DEFAULT_TTL_ADDR */
 
 /* Symbol __ip_route_output_key has an address. */
 #undef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
 #ifdef HAVE___IP_ROUTE_OUTPUT_KEY_ADDR
-extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp)
-    __weak;
+streams_weak extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
 #endif				/* HAVE___IP_ROUTE_OUTPUT_KEY_ADDR */
 
 /* Symbol __xfrm_policy_check has an address. */
 #undef HAVE___XFRM_POLICY_CHECK_ADDR
 #ifdef HAVE___XFRM_POLICY_CHECK_ADDR
-extern int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, unsigned short family)
-    __weak;
+streams_weak extern int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
+					    unsigned short family);
 #endif				/* HAVE___XFRM_POLICY_CHECK_ADDR */
 
 /* Symbol xfrm_policy_delete has an address. */
@@ -310,89 +310,88 @@ extern int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb, un
 /* Define if function xfrm_policy_delete returns int. */
 #undef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
 #ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
-extern int xfrm_policy_delete(struct xfrm_policy *pol, int dir) __weak;
+streams_weak extern int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #else
-extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir) __weak;
+streams_weak extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #endif
 #endif				/* HAVE_XFRM_POLICY_DELETE_ADDR */
 
 /* Symbol snmp_get_info has an address. */
 #undef HAVE_SNMP_GET_INFO_ADDR
 #ifdef HAVE_SNMP_GET_INFO_ADDR
-extern int snmp_get_info(char *buffer, char **start, off_t offset, int length)
-    __weak;
+streams_weak extern int snmp_get_info(char *buffer, char **start, off_t offset, int length);
 #endif				/* HAVE_SNMP_GET_INFO_ADDR */
 
 /* Symbol ip_frag_nqueues has an address. */
 #undef HAVE_IP_FRAG_NQUEUES_ADDR
 #ifdef HAVE_IP_FRAG_NQUEUES_ADDR
-extern int ip_frag_nqueues(struct net *net) __weak;
+streams_weak extern int ip_frag_nqueues(struct net *net);
 #endif				/* HAVE_IP_FRAG_NQUEUES_ADDR */
 
 /* Symbol ip_frag_mem has an address. */
 #undef HAVE_IP_FRAG_MEM_ADDR
 #ifdef HAVE_IP_FRAG_MEM_ADDR
-extern int ip_frag_mem(struct net *net) __weak;
+streams_weak extern int ip_frag_mem(struct net *net);
 #endif				/* HAVE_IP_FRAG_MEM_ADDR */
 
 /* Symbol sysctl_rmem_default has an address. */
 #undef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
 #ifdef HAVE_SYSCTL_RMEM_DEFAULT_ADDR
-extern __u32 sysctl_rmem_default __weak;
+streams_weak extern __u32 sysctl_rmem_default;
 #endif				/* HAVE_SYSCTL_RMEM_DEFAULT_ADDR */
 
 /* Symbol sysctl_wmem_default has an address. */
 #undef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
 #ifdef HAVE_SYSCTL_WMEM_DEFAULT_ADDR
-extern __u32 sysctl_wmem_default __weak;
+streams_weak extern __u32 sysctl_wmem_default;
 #endif				/* HAVE_SYSCTL_WMEM_DEFAULT_ADDR */
 
 /* Symbol sysctl_rmem_max has an address. */
 #undef HAVE_SYSCTL_RMEM_MAX_ADDR
 #ifdef HAVE_SYSCTL_RMEM_MAX_ADDR
-extern __u32 sysctl_rmem_max __weak;
+streams_weak extern __u32 sysctl_rmem_max;
 #endif				/* HAVE_SYSCTL_RMEM_MAX_ADDR */
 
 /* Symbol sysctl_wmem_max has an address. */
 #undef HAVE_SYSCTL_WMEM_MAX_ADDR
 #ifdef HAVE_SYSCTL_WMEM_MAX_ADDR
-extern __u32 sysctl_wmem_max __weak;
+streams_weak extern __u32 sysctl_wmem_max;
 #endif				/* HAVE_SYSCTL_WMEM_MAX_ADDR */
 
 /* Symbol tcp_openreq_cachep has an address. */
 #undef HAVE_TCP_OPENREQ_CACHEP_ADDR
 #ifdef HAVE_TCP_OPENREQ_CACHEP_ADDR
-extern kmem_cachep_t tcp_openreq_cachep __weak;
+streams_weak extern kmem_cachep_t tcp_openreq_cachep;
 #endif				/* HAVE_TCP_OPENREQ_CACHEP_ADDR */
 
 /* Symbol tcp_set_keepalive has an address. */
 #undef HAVE_TCP_SET_KEEPALIVE_ADDR
 #ifdef HAVE_TCP_SET_KEEPALIVE_ADDR
-extern void tcp_set_keepalive(struct sock *sk, int val) __weak;
+streams_weak extern void tcp_set_keepalive(struct sock *sk, int val);
 #endif				/* HAVE_TCP_SET_KEEPALIVE_ADDR */
 
 /* Symbol tcp_sync_mss has an address. */
 #undef HAVE_TCP_SYNC_MSS_ADDR
 #ifdef HAVE_TCP_SYNC_MSS_ADDR
-extern int tcp_sync_mss(struct sock *sk, u32 pmtu) __weak;
+streams_weak extern int tcp_sync_mss(struct sock *sk, u32 pmtu);
 #endif				/* HAVE_TCP_SYNC_MSS_ADDR */
 
 /* Symbol tcp_write_xmit has an address. */
 #undef HAVE_TCP_WRITE_XMIT_ADDR
 #ifdef HAVE_TCP_WRITE_XMIT_ADDR
-extern int tcp_write_xmit(struct sock *sk, int nonagle) __weak;
+streams_weak extern int tcp_write_xmit(struct sock *sk, int nonagle);
 #endif				/* HAVE_TCP_WRITE_XMIT_ADDR */
 
 /* Symbol tcp_cwnd_application_limited has an address. */
 #undef HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR
 #ifdef HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR
-extern void tcp_cwnd_application_limited(struct sock *sk) __weak;
+streams_weak extern void tcp_cwnd_application_limited(struct sock *sk);
 #endif				/* HAVE_TCP_CWND_APPLICATION_LIMITED_ADDR */
 
 /* Symbol sysctl_tcp_fin_timeout has an address. */
 #undef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
 #ifdef HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR
-extern int sysctl_tcp_fin_timeout __weak;
+streams_weak extern int sysctl_tcp_fin_timeout;
 #endif				/* HAVE_SYSCTL_TCP_FIN_TIMEOUT_ADDR */
 
 /* Symbol tcp_current_mss has an address. */
@@ -401,9 +400,9 @@ extern int sysctl_tcp_fin_timeout __weak;
 /* Define if function tcp_current_mss takes 1 argument. */
 #undef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
 #ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
-extern unsigned int tcp_current_mss(struct sock *sk) __weak;
+streams_weak extern unsigned int tcp_current_mss(struct sock *sk);
 #else
-extern unsigned int tcp_current_mss(struct sock *sk, int large) __weak;
+streams_weak extern unsigned int tcp_current_mss(struct sock *sk, int large);
 #endif
 #endif				/* HAVE_TCP_CURRENT_MSS_ADDR */
 
@@ -414,10 +413,9 @@ extern unsigned int tcp_current_mss(struct sock *sk, int large) __weak;
    sk_buff *) argument list. */
 #undef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
 #ifdef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
-extern void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb) __weak;
+streams_weak extern void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb);
 #else
-extern void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
-    __weak;
+streams_weak extern void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std);
 #endif
 #endif				/* HAVE_TCP_SET_SKB_TSO_SEGS_ADDR */
 
@@ -425,135 +423,130 @@ extern void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 #undef HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR
 #ifdef HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR
 /* older 2.6.8 name for the same function */
-extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
-    __weak;
+streams_weak extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #endif				/* HAVE_TCP_SET_SKB_TSO_FACTOR_ADDR */
 
 /* Symbol sock_alloc has an address. */
 #undef HAVE_SOCK_ALLOC_ADDR
 #ifdef HAVE_SOCK_ALLOC_ADDR
-extern struct socket *sock_alloc(void) __weak;
+streams_weak extern struct socket *sock_alloc(void);
 #endif				/* HAVE_SOCK_ALLOC_ADDR */
 
 /* Symbol sysctl_local_port_range has an address. */
 #undef HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR
 #ifdef HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR
-extern int sysctl_local_port_range[2] __weak;
+streams_weak extern int sysctl_local_port_range[2];
 #endif				/* HAVE_SYSCTL_LOCAL_PORT_RANGE_ADDR */
 
 /* Symbol tcp_memory_allocated has an address. */
 #undef HAVE_TCP_MEMORY_ALLOCATED_ADDR
 #ifdef HAVE_TCP_MEMORY_ALLOCATED_ADDR
-extern atomic_t tcp_memory_allocated __weak;
+streams_weak extern atomic_t tcp_memory_allocated;
 #endif				/* HAVE_TCP_MEMORY_ALLOCATED_ADDR */
 
 /* Symbol tcp_sockets_allocated has an address. */
 #undef HAVE_TCP_SOCKETS_ALLOCATED_ADDR
 #ifdef HAVE_TCP_SOCKETS_ALLOCATED_ADDR
-extern atomic_t tcp_sockets_allocated __weak;
+streams_weak extern atomic_t tcp_sockets_allocated;
 #endif				/* HAVE_TCP_SOCKETS_ALLOCATED_ADDR */
 
 /* Symbol tcp_orphan_count has an address. */
 #undef HAVE_TCP_ORPHAN_COUNT_ADDR
 #ifdef HAVE_TCP_ORPHAN_COUNT_ADDR
-extern atomic_t tcp_orphan_count __weak;
+streams_weak extern atomic_t tcp_orphan_count;
 #endif				/* HAVE_TCP_ORPHAN_COUNT_ADDR */
 
 /* Symbol tcp_tw_count has an address. */
 #undef HAVE_TCP_TW_COUNT_ADDR
 #ifdef HAVE_TCP_TW_COUNT_ADDR
-extern int tcp_tw_count __weak;
+streams_weak extern int tcp_tw_count;
 #endif				/* HAVE_TCP_TW_COUNT_ADDR */
 
 /* Symbol ip_cmsg_recv has an address. */
 #undef HAVE_IP_CMSG_RECV_ADDR
 #ifdef HAVE_IP_CMSG_RECV_ADDR
-extern void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb) __weak;
+streams_weak extern void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
 #endif				/* HAVE_IP_CMSG_RECV_ADDR */
 
 /* Symbol ip_cmsg_send has an address. */
 #undef HAVE_IP_CMSG_SEND_ADDR
 #ifdef HAVE_IP_CMSG_SEND_ADDR
-extern int ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc) __weak;
+streams_weak extern int ip_cmsg_send(struct msghdr *msg, struct ipcm_cookie *ipc);
 #endif				/* HAVE_IP_CMSG_SEND_ADDR */
 
 /* Symbol inet_bind has an address. */
 #undef HAVE_INET_BIND_ADDR
 #ifdef HAVE_INET_BIND_ADDR
-extern int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len)
-    __weak;
+streams_weak extern int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len);
 #endif				/* HAVE_INET_BIND_ADDR */
 
 /* Symbol inet_ioctl has an address. */
 #undef HAVE_INET_IOCTL_ADDR
 #ifdef HAVE_INET_IOCTL_ADDR
-extern int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg)
-    __weak;
+streams_weak extern int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
 #endif				/* HAVE_INET_IOCTL_ADDR */
 
 /* Symbol inet_getname has an address. */
 #undef HAVE_INET_GETNAME_ADDR
 #ifdef HAVE_INET_GETNAME_ADDR
-extern int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer)
-    __weak;
+streams_weak extern int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len,
+				     int peer);
 #endif				/* HAVE_INET_GETNAME_ADDR */
 
 /* Symbol inet_multi_getname has an address. */
 #undef HAVE_INET_MULTI_GETNAME_ADDR
 #ifdef HAVE_INET_MULTI_GETNAME_ADDR
-extern int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer)
-    __weak;
+streams_weak extern int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr,
+					   int *uaddr_len, int peer);
 #endif				/* HAVE_INET_MULTI_GETNAME_ADDR */
 
 /* Symbol socket_get_info has an address. */
 #undef HAVE_SOCKET_GET_INFO_ADDR
 #ifdef HAVE_SOCKET_GET_INFO_ADDR
-extern int socket_get_info(char *buffer, char **start, off_t offset, int length)
-    __weak;
+streams_weak extern int socket_get_info(char *buffer, char **start, off_t offset, int length);
 #endif				/* HAVE_SOCKET_GET_INFO_ADDR */
 
 /* Symbol afinet_get_info has an address. */
 #undef HAVE_AFINET_GET_INFO_ADDR
 #ifdef HAVE_AFINET_GET_INFO_ADDR
-extern int afinet_get_info(char *buffer, char **start, off_t offset, int length)
-    __weak;
+streams_weak extern int afinet_get_info(char *buffer, char **start, off_t offset, int length);
 #endif				/* HAVE_AFINET_GET_INFO_ADDR */
 
 /* Symbol tcp_prot has an address. */
 #undef HAVE_TCP_PROT_ADDR
 #ifdef HAVE_TCP_PROT_ADDR
-extern struct proto tcp_prot __weak;
+streams_weak extern struct proto tcp_prot;
 #endif				/* HAVE_TCP_PROT_ADDR */
 
 /* Symbol udp_prot has an address. */
 #undef HAVE_UDP_PROT_ADDR
 #ifdef HAVE_UDP_PROT_ADDR
-extern struct proto udp_prot __weak;
+streams_weak extern struct proto udp_prot;
 #endif				/* HAVE_UDP_PROT_ADDR */
 
 /* Symbol raw_prot has an address. */
 #undef HAVE_RAW_PROT_ADDR
 #ifdef HAVE_RAW_PROT_ADDR
-extern struct proto raw_prot __weak;
+streams_weak extern struct proto raw_prot;
 #endif				/* HAVE_RAW_PROT_ADDR */
 
 /* Symbol secure_tcp_sequence_number has an address. */
 #undef HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR
 #ifdef HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR
-extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport)
-    __weak;
+streams_weak extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport,
+						     __u16 dport);
 #endif				/* HAVE_SECURE_TCP_SEQUENCE_NUMBER_ADDR */
 
 /* Symbol ioctl32_hash_table has an address. */
 #undef HAVE_IOCTL32_HASH_TABLE_ADDR
 #ifdef HAVE_IOCTL32_HASH_TABLE_ADDR
-extern struct ioctl_trans *ioctl32_hash_table[] __weak;
+streams_weak extern struct ioctl_trans *ioctl32_hash_table[];
 #endif				/* HAVE_IOCTL32_HASH_TABLE_ADDR */
 
 /* Symbol ioctl32_sem has an address. */
 #undef HAVE_IOCTL32_SEM_ADDR
 #ifdef HAVE_IOCTL32_SEM_ADDR
-extern struct rw_semaphore ioctl32_sem __weak;
+streams_weak extern struct rw_semaphore ioctl32_sem;
 #endif				/* HAVE_IOCTL32_SEM_ADDR */
 
 /* Symbol mount_sem has an address. */
@@ -564,20 +557,19 @@ extern struct rw_semaphore ioctl32_sem __weak;
 /* Symbol namespace_sem has an address. */
 #undef HAVE_NAMESPACE_SEM_ADDR
 #ifdef HAVE_NAMESPACE_SEM_ADDR
-extern struct rw_semaphore namespace_sem __weak;
+streams_weak extern struct rw_semaphore namespace_sem;
 #endif				/* HAVE_NAMESPACE_SEM_ADDR */
 
 /* Symbol clone_mnt has an address. */
 #undef HAVE_CLONE_MNT_ADDR
 #ifdef HAVE_CLONE_MNT_ADDR
-extern struct vfsmount *clone_mnt(struct vfsmount *old, struct dentry *root)
-    __weak;
+streams_weak extern struct vfsmount *clone_mnt(struct vfsmount *old, struct dentry *root);
 #endif				/* defined HAVE_CLONE_MNT_ADDR */
 
 /* Symbol check_mnt has an address. */
 #undef HAVE_CHECK_MNT_ADDR
 #ifdef HAVE_CHECK_MNT_ADDR
-extern int check_mnt(struct vfsmount *mnt) __weak;
+streams_weak extern int check_mnt(struct vfsmount *mnt);
 #endif				/* HAVE_CHECK_MNT_ADDR */
 
 /* Symbol graft_tree has an address. */
@@ -586,22 +578,22 @@ extern int check_mnt(struct vfsmount *mnt) __weak;
 /* Define to 1 if you have the <linux/path.h> header file. */
 #undef HAVE_KINC_LINUX_PATH_H
 #ifdef HAVE_KINC_LINUX_PATH_H
-extern int graft_tree(struct vfsmount *mnt, struct path *nd) __weak;
+streams_weak extern int graft_tree(struct vfsmount *mnt, struct path *nd);
 #else
-extern int graft_tree(struct vfsmount *mnt, struct nameidata *nd) __weak;
+streams_weak extern int graft_tree(struct vfsmount *mnt, struct nameidata *nd);
 #endif
 #endif				/* HAVE_GRAFT_TREE_ADDR */
 
 /* Symbol do_umount has an address. */
 #undef HAVE_DO_UMOUNT_ADDR
 #ifdef HAVE_DO_UMOUNT_ADDR
-extern int do_umount(struct vfsmount *mnt, int flags) __weak;
+streams_weak extern int do_umount(struct vfsmount *mnt, int flags);
 #endif				/* HAVE_DO_UMOUNT_ADDR */
 
 /* Symbol _def_fifo_ops has an address. */
 #undef HAVE__DEF_FIFO_OPS_ADDR
 #ifdef HAVE__DEF_FIFO_OPS_ADDR
-extern const struct file_operations *_def_fifo_ops __weak;
+streams_weak extern const struct file_operations *_def_fifo_ops;
 #endif				/* HAVE__DEF_FIFO_OPS_ADDR */
 
 /* Symbol __tcp_push_pending_frames has an address. */
@@ -611,17 +603,17 @@ extern const struct file_operations *_def_fifo_ops __weak;
    leave undefined for the new Linux 2.6 struct sock. */
 #undef HAVE_OLD_SOCK_STRUCTURE
 #ifdef HAVE_OLD_SOCK_STRUCTURE
-extern void __tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp, unsigned int cur_mss,
-				      int nonagle) __weak;
+streams_weak extern void __tcp_push_pending_frames(struct sock *sk, struct tcp_opt *tp,
+						   unsigned int cur_mss, int nonagle);
 #else				/* defined HAVE_OLD_SOCK_STRUCTURE */
 /* Define if function __tcp_push_pending_frames takes 3 arguments. */
 #undef HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS
 #ifndef HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS
-extern void __tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp, unsigned int cur_mss,
-				      int nonagle) __weak;
+streams_weak extern void __tcp_push_pending_frames(struct sock *sk, struct tcp_sock *tp,
+						   unsigned int cur_mss, int nonagle);
 #else				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
-extern void __tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss, int nonagle)
-    __weak;
+streams_weak extern void __tcp_push_pending_frames(struct sock *sk, unsigned int cur_mss,
+						   int nonagle);
 #endif				/* !defined HAVE_KFUNC___TCP_PUSH_PENDING_FRAMES_3_ARGS */
 #endif				/* defined HAVE_OLD_SOCK_STRUCTURE */
 #endif				/* defined HAVE___TCP_PUSH_PENDING_FRAMES_ADDR */

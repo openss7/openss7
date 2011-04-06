@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 1.1.2.4 2011-04-05 16:35:13 brian Exp $
+ @(#) $Id: kmem.h,v 1.1.2.5 2011-04-06 21:33:05 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
+ Last Modified $Date: 2011-04-06 21:33:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: kmem.h,v $
+ Revision 1.1.2.5  2011-04-06 21:33:05  brian
+ - corrections
+
  Revision 1.1.2.4  2011-04-05 16:35:13  brian
  - weak module design
 
@@ -106,38 +109,22 @@
 /* typedef unsigned short cnodeid_t; */
 typedef int cnodeid_t;
 
-#ifndef HAVE_KMEM_ALLOC_EXPORT
 __STREAMS_EXTERN void *kmem_alloc(size_t size, int flags);
-#else
-__STREAMS_EXTERN void *kmem_alloc_(size_t size, int flags);
-__inline__ void *kmem_alloc__(size_t size, int flags)
-{
-	return kmem_alloc_(size, flags);
-}
-__STREAMS_EXTERN void *kmem_alloc(size_t size, int flags)
-	__attribute__((alias("kmem_alloc__")));
+#ifdef HAVE_KMEM_ALLOC_EXPORT
+#undef kmem_alloc
+__asm__(".weakref kmem_alloc,kmem_alloc_");
 #endif
-#ifndef HAVE_KMEM_ZALLOC_EXPORT
+
 __STREAMS_EXTERN void *kmem_zalloc(size_t size, int flags);
-#else
-__STREAMS_EXTERN void *kmem_zalloc_(size_t size, int flags);
-__inline__ void *kmem_zalloc__(size_t size, int flags)
-{
-	return kmem_zalloc_(size,flags);
-}
-__STREAMS_EXTERN void *kmem_zalloc(size_t size, int flags)
-	__attribute__((alias("kmem_zalloc__")));
+#ifdef HAVE_KMEM_ZALLOC_EXPORT
+#undef kmem_zalloc
+__asm__(".weakref kmem_zalloc,kmem_zalloc_");
 #endif
-#ifndef HAVE_KMEM_FREE_EXPORT
+
 __STREAMS_EXTERN void kmem_free(void *ptr, size_t size);
-#else
-__STREAMS_EXTERN void kmem_free_(void *ptr, size_t size);
-__inline__ void kmem_free__(void *ptr, size_t size)
-{
-	return kmem_free_(ptr,size);
-}
-__STREAMS_EXTERN void kmem_free(void *ptr, size_t size)
-	__attribute__((alias("kmem_free__")));
+#ifdef HAVE_KMEM_FREE_EXPORT
+#undef kmem_free
+__asm__(".weakref kmem_free,kmem_free_");
 #endif
 
 #if 0

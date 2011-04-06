@@ -1,3 +1,12 @@
+2011-04-06  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/modpost.awk: resolve weak exports
+	* src/include/sys/irix/ddi.h: revert to .weakref
+	* src/include/sys/openss7/cmn_err.h: revert to .weakref
+	* src/include/sys/openss7/kmem.h: revert to .weakref
+	* src/include/sys/openss7/wrapper.h.in: __weak -> streams_weak
+	* src/modules/sth.c: minor adjustments
+
 2011-04-05  Brian Bidulock  <bidulock@openss7.org>
 
 	* NOTES.ksyms: notes on kysms
