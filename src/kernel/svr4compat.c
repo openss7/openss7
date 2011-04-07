@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-05 16:35:14 $
+ @(#) $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-07 15:24:04 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: svr4compat.c,v $
+ Revision 1.1.2.5  2011-04-07 15:24:04  brian
+ - weak reference corrections
+
  Revision 1.1.2.4  2011-04-05 16:35:14  brian
  - weak module design
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-05 16:35:14 $";
+static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-07 15:24:04 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1
 
 #define SVR4COMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SVR4COMP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-05 16:35:14 $"
+#define SVR4COMP_REVISION	"LfS $RCSfile: svr4compat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-07 15:24:04 $"
 #define SVR4COMP_DEVICE		"UNIX(R) SVR 4.2 MP Compatibility"
 #define SVR4COMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SVR4COMP_LICENSE	"GPL"
@@ -542,11 +545,7 @@ __SVR4_EXTERN_INLINE void SV_DEALLOC(sv_t * svp);
 
 EXPORT_SYMBOL(SV_DEALLOC);	/* svr4/ddi.h */
 #if   defined HAVE___WAKE_UP_SYNC_SYMBOL
-#if   defined HAVE___WAKE_UP_SYNC_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern void FASTCALL(__wake_up_sync(wait_queue_head_t *q, unsigned int mode, int nr));
-#else
-extern void FASTCALL(__wake_up_sync(wait_queue_head_t *q, unsigned int mode, int nr)) __attribute__((__weak__));
-#endif
 #define __wake_up_sync(a,b,c) __wake_up_sync(a,b,c)
 #else
 #undef	__wake_up_sync

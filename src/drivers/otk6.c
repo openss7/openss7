@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:12 $
+ @(#) $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-07 15:24:02 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: otk6.c,v $
+ Revision 1.1.2.6  2011-04-07 15:24:02  brian
+ - weak reference corrections
+
  Revision 1.1.2.5  2011-04-05 16:35:12  brian
  - weak module design
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:12 $";
+static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-07 15:24:02 $";
 
 /*
  * This file provides a multiplexing driver for RFC 1006 (RFC 2126) OSI Transport over TCP.  The
@@ -115,7 +118,7 @@ static char const ident[] = "$RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.5 $
 #if defined HAVE_TCP_OPENREQ_CACHEP_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern kmem_cachep_t *const _tcp_openreq_cachep_location;
 #else
-extern kmem_cachep_t *const _tcp_openreq_cachep_location __attribute__((__weak__));
+extern kmem_cachep_t *const _tcp_openreq_cachep_location;
 #endif
 #endif
 #endif
@@ -126,7 +129,7 @@ extern kmem_cachep_t *const _tcp_openreq_cachep_location __attribute__((__weak__
 #if defined HAVE_TCP_SET_KEEPALIVE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern void tcp_set_keepalive(struct sock *sk, int val);
 #else
-extern void tcp_set_keepalive(struct sock *sk, int val) __attribute__((__weak__));
+extern void tcp_set_keepalive(struct sock *sk, int val);
 #endif
 #endif
 #endif
@@ -136,7 +139,7 @@ extern void tcp_set_keepalive(struct sock *sk, int val) __attribute__((__weak__)
 #if defined HAVE_TCP_SYNC_MSS_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu);
 #else
-extern unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu) __attribute__((__weak__));
+extern unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu);
 #endif
 #endif
 #endif
@@ -146,7 +149,7 @@ extern unsigned int tcp_sync_mss(struct sock *sk, u32 pmtu) __attribute__((__wea
 #if defined HAVE_TCP_WRITE_XMIT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int tcp_write_xmit(struct sock *sk, int nonagle);
 #else
-extern int tcp_write_xmit(struct sock *sk, int nonagle) __attribute__((__weak__));
+extern int tcp_write_xmit(struct sock *sk, int nonagle);
 #endif
 #endif
 #endif
@@ -156,7 +159,7 @@ extern int tcp_write_xmit(struct sock *sk, int nonagle) __attribute__((__weak__)
 #if defined HAVE_TCP_CWND_APPLICATION_LIMITED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern void tcp_cwnd_application_limited(struct sock *sk);
 #else
-extern void tcp_cwnd_application_limited(struct sock *sk) __attribute__((__weak__));
+extern void tcp_cwnd_application_limited(struct sock *sk);
 #endif
 #endif
 #endif
@@ -288,9 +291,9 @@ unsigned int tcp_current_mss(struct sock *sk, int large);
 #endif
 #else
 #ifdef HAVE_KFUNC_TCP_CURRENT_MSS_1_ARG
-unsigned int tcp_current_mss(struct sock *sk) __attribute__ ((__weak__));
+unsigned int tcp_current_mss(struct sock *sk);
 #else
-unsigned int tcp_current_mss(struct sock *sk, int large) __attribute__ ((__weak__));
+unsigned int tcp_current_mss(struct sock *sk, int large);
 #endif
 #endif
 #endif
@@ -375,10 +378,9 @@ extern void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std);
 #endif
 #else
 #ifdef HAVE_KFUNC_TCP_SET_SKB_TSO_SEGS_SOCK
-extern void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb) __attribute__ ((__weak__));
+extern void tcp_set_skb_tso_segs(struct sock *sk, struct sk_buff *skb);
 #else
-extern void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
-    __attribute__ ((__weak__));
+extern void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std);
 #endif
 #endif
 #endif
@@ -390,8 +392,7 @@ extern void tcp_set_skb_tso_segs(struct sk_buff *skb, unsigned int mss_std)
 #if defined HAVE_TCP_SET_SKB_TSO_FACTOR_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #else
-extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
-    __attribute__ ((__weak__));
+extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #endif
 #endif
 #endif
@@ -420,7 +421,7 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std)
 #define OTK6_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OTK6_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define OTK6_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
-#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:12 $"
+#define OTK6_REVISION	"OpenSS7 $RCSfile: otk6.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-07 15:24:02 $"
 #define OTK6_DEVICE	"SVR 4.2 MP STREAMS RFC1006 TPI OSI Transport Provider Driver"
 #define OTK6_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define OTK6_LICENSE	"GPL"

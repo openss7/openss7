@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: kmem.h,v 1.1.2.5 2011-04-06 21:33:05 brian Exp $
+ @(#) $Id: kmem.h,v 1.1.2.6 2011-04-07 15:24:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-06 21:33:05 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: kmem.h,v $
+ Revision 1.1.2.6  2011-04-07 15:24:03  brian
+ - weak reference corrections
+
  Revision 1.1.2.5  2011-04-06 21:33:05  brian
  - corrections
 
@@ -109,22 +112,31 @@
 /* typedef unsigned short cnodeid_t; */
 typedef int cnodeid_t;
 
+#ifndef HAVE_KMEM_ALLOC_EXPORT
 __STREAMS_EXTERN void *kmem_alloc(size_t size, int flags);
-#ifdef HAVE_KMEM_ALLOC_EXPORT
+#else
+__STREAMS_EXTERN void *kmem_alloc_(size_t size, int flags);
+
 #undef kmem_alloc
-__asm__(".weakref kmem_alloc,kmem_alloc_");
+#define kmem_alloc(size,flags) kmem_alloc_(size,flags)
 #endif
 
+#ifndef HAVE_KMEM_ZALLOC_EXPORT
 __STREAMS_EXTERN void *kmem_zalloc(size_t size, int flags);
-#ifdef HAVE_KMEM_ZALLOC_EXPORT
+#else
+__STREAMS_EXTERN void *kmem_zalloc_(size_t size, int flags);
+
 #undef kmem_zalloc
-__asm__(".weakref kmem_zalloc,kmem_zalloc_");
+#define kmem_zalloc(size,flags) kmem_zalloc_(size,flags)
 #endif
 
+#ifndef HAVE_KMEM_FREE_EXPORT
 __STREAMS_EXTERN void kmem_free(void *ptr, size_t size);
-#ifdef HAVE_KMEM_FREE_EXPORT
+#else
+__STREAMS_EXTERN void kmem_free_(void *ptr, size_t size);
+
 #undef kmem_free
-__asm__(".weakref kmem_free,kmem_free_");
+#define kmem_free(ptr,size) kmem_free_(ptr,size)
 #endif
 
 #if 0

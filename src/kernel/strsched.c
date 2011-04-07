@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:14 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-07 15:24:03 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 1.1.2.9  2011-04-07 15:24:03  brian
+ - weak reference corrections
+
  Revision 1.1.2.8  2011-04-05 16:35:14  brian
  - weak module design
 
@@ -78,7 +81,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:14 $";
+static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-07 15:24:03 $";
 
 #include <linux/autoconf.h>
 #include <linux/version.h>
@@ -4584,6 +4587,7 @@ kmem_alloc(size_t size, int flags)
 EXPORT_SYMBOL(kmem_alloc);	/* include/sys/openss7/kmem.h */
 #ifdef HAVE_KMEM_ALLOC_EXPORT
 #undef kmem_alloc
+#define kmem_alloc(size,flags) kmem_alloc_(size,flags)
 #endif
 
 #ifndef nextpower
@@ -4675,6 +4679,7 @@ kmem_zalloc(size_t size, int flags)
 EXPORT_SYMBOL(kmem_zalloc);	/* include/sys/openss7/kmem.h */
 #ifdef HAVE_KMEM_ZALLOC_EXPORT
 #undef kmem_zalloc
+#define kmem_zalloc(size,flags) kmem_zalloc_(size,flags)
 #endif
 
 #ifdef HAVE_KMEM_FREE_EXPORT
@@ -4701,6 +4706,7 @@ kmem_free(void *addr, size_t size)
 EXPORT_SYMBOL(kmem_free);	/* include/sys/openss7/kmem.h */
 #ifdef HAVE_KMEM_FREE_EXPORT
 #undef kmem_free
+#define kmem_free(ptr,size) kmem_free_(ptr,size)
 #endif
 
 /**

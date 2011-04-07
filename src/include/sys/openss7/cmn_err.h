@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: cmn_err.h,v 1.1.2.5 2011-04-06 21:33:05 brian Exp $
+ @(#) $Id: cmn_err.h,v 1.1.2.6 2011-04-07 15:24:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-06 21:33:05 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cmn_err.h,v $
+ Revision 1.1.2.6  2011-04-07 15:24:03  brian
+ - weak reference corrections
+
  Revision 1.1.2.5  2011-04-06 21:33:05  brian
  - corrections
 
@@ -98,11 +101,14 @@
 
 __STREAMS_EXTERN void vcmn_err(int err_lvl, const char *fmt, va_list args);
 
+#ifndef HAVE_CMN_ERR_EXPORT
 __STREAMS_EXTERN void cmn_err(int err_lvl, const char *fmt, ...)
     __attribute__ ((__format__(__printf__, 2, 3)));
-#ifdef HAVE_CMN_ERR_EXPORT
+#else
+__STREAMS_EXTERN void cmn_err_(int err_lvl, const char *fmt, ...)
+    __attribute__ ((__format__(__printf__, 2, 3)));
 #undef cmn_err
-__asm__(".weakref cmn_err,cmn_err_");
+#define cmn_err(err_lvl,fmt,...) cmn_err_(err_lvl,fmt,__VA_ARGS__)
 #endif
 
 #endif				/* __SYS_OPENSS7_CMN_ERR_H__ */

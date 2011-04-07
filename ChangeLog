@@ -1,3 +1,26 @@
+2011-04-07  Brian Bidulock  <bidulock@openss7.org>
+
+	* scripts/modshow.awk: added module show script
+	* scripts/openss7-modules: help correction
+	* src/drivers/inet.c: remove weak from unchecked symbols
+	* src/drivers/ip.c: remove weak from unchecked symbols
+	* src/drivers/ip_hooks.h.in: remove weak from unchecked symbols
+	* src/drivers/net_hooks.h.in: remove weak from unchecked symbols
+	* src/drivers/otk6.c: remove weak from unchecked symbols
+	* src/drivers/sctp_hash.c: remove weak from unchecked symbols
+	* src/drivers/sctp_hooks.h.in: remove weak from unchecked symbols
+	* src/drivers/sscop_n.c: remove weak from unchecked symbols
+	* src/drivers/sscop_t_user.c: remove weak from unchecked symbols
+	* src/drivers/udp_hooks.h.in: remove weak from unchecked symbols
+	* src/include/sys/irix/ddi.h: used macro instead of .weakref
+	* src/include/sys/openss7/cmn_err.h: used macro instead of .weakref
+	* src/include/sys/openss7/kmem.h: used macro instead of .weakref
+	* src/kernel/irixcompat.c: used macro instead of .weakref
+	* src/kernel/strsched.c: used macro instead of .weakref
+	* src/kernel/strspecfs.c: used macro instead of .weakref
+	* src/kernel/strutil.c: used macro instead of .weakref
+	* src/kernel/svr4compat.c: remove weak from unchecked symbols
+
 2011-04-06  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/modpost.awk: resolve weak exports

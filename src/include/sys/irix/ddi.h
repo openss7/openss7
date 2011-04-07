@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ddi.h,v 1.1.2.5 2011-04-06 21:33:05 brian Exp $
+ @(#) $Id: ddi.h,v 1.1.2.6 2011-04-07 15:24:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-06 21:33:05 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ddi.h,v $
+ Revision 1.1.2.6  2011-04-07 15:24:03  brian
+ - weak reference corrections
+
  Revision 1.1.2.5  2011-04-06 21:33:05  brian
  - corrections
 
@@ -108,9 +111,10 @@ icmn_err(int err_lvl, const char *fmt, va_list args)
 {
 	return vcmn_err(err_lvl, fmt, args);
 }
+
 #ifdef HAVE_ICMN_ERR_EXPORT
 #undef icmn_err
-__asm__(".weakref icmn_err,icmn_err_");
+#define icmn_err(err_lvl,fmt,args) icmn_err_(err_lvl,fmt,args)
 #endif
 
 /* gcc 3.4.3 can't handle inlining with variable argument list */

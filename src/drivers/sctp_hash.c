@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:13 $
+ @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:02 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_hash.c,v $
+ Revision 1.1.2.4  2011-04-07 15:24:02  brian
+ - weak reference corrections
+
  Revision 1.1.2.3  2011-04-05 16:35:13  brian
  - weak module design
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:13 $";
+static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:02 $";
 
 #define __NO_VERSION__
 
@@ -427,13 +430,13 @@ STATIC int sctp_port_rover = 0;
 #if   defined HAVE_INET_GET_LOCAL_PORT_RANGE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern void inet_get_local_port_range(int *low, int *high);
 #else
-extern void inet_get_local_port_range(int *low, int *high) __attribute__ ((__weak__));
+extern void inet_get_local_port_range(int *low, int *high);
 #endif
 #elif defined HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
 #if   defined HAVE_SYSCTL_LOCAL_PORT_RANGE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_local_port_range[2];
 #else
-extern int sysctl_local_port_range[2] __attribute__ ((__weak__));
+extern int sysctl_local_port_range[2];
 #endif
 static inline void
 inet_get_local_port_range(int *low, int *high)

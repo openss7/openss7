@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-05 16:35:12 $
+ @(#) $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-07 15:24:02 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ip.c,v $
+ Revision 1.1.2.7  2011-04-07 15:24:02  brian
+ - weak reference corrections
+
  Revision 1.1.2.6  2011-04-05 16:35:12  brian
  - weak module design
 
@@ -72,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-05 16:35:12 $";
+static char const ident[] = "$RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-07 15:24:02 $";
 
 /*
    This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -125,7 +128,7 @@ typedef unsigned int socklen_t;
 #define IP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define IP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-04-05 16:35:12 $"
+#define IP_REVISION	"OpenSS7 $RCSfile: ip.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-07 15:24:02 $"
 #define IP_DEVICE	"SVR 4.2 MP STREAMS NPI IP Driver"
 #define IP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IP_LICENSE	"GPL"
@@ -645,11 +648,6 @@ npi_v4_err_next(struct sk_buff *skb, __u32 info)
 #endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 	return;
 }
-
-#ifdef HAVE_KTYPE_STRUCT_NET_PROTOCOL
-extern spinlock_t inet_proto_lock;
-extern struct net_protocol *inet_protos[] __attribute__((__weak__));
-#endif				/* HAVE_KTYPE_STRUCT_NET_PROTOCOL */
 
 /**
  * npi_init_nproto - initialize network protocol override
