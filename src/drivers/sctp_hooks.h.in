@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: sctp_hooks.h.in,v 1.1.2.6 2011-04-05 16:35:13 brian Exp $
+ @(#) $Id: sctp_hooks.h.in,v 1.1.2.7 2011-04-07 15:24:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_hooks.h.in,v $
+ Revision 1.1.2.7  2011-04-07 15:24:03  brian
+ - weak reference corrections
+
  Revision 1.1.2.6  2011-04-05 16:35:13  brian
  - weak module design
 
@@ -102,7 +105,7 @@
 #if defined HAVE_TCP_MEMORY_ALLOCATED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern atomic_t tcp_memory_allocated;
 #else
-extern atomic_t tcp_memory_allocated __attribute__((__weak__));
+extern atomic_t tcp_memory_allocated;
 #endif
 #endif
 #endif
@@ -114,7 +117,7 @@ extern atomic_t tcp_memory_allocated __attribute__((__weak__));
 #if defined HAVE_TCP_SOCKETS_ALLOCATED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SUPPORT
 extern atomic_t tcp_sockets_allocated;
 #else
-extern atomic_t tcp_sockets_allocated __attribute__((__weak__));
+extern atomic_t tcp_sockets_allocated;
 #endif
 #endif
 #endif
@@ -126,7 +129,7 @@ extern atomic_t tcp_sockets_allocated __attribute__((__weak__));
 #if defined HAVE_TCP_SOCKETS_ALLOCATED_SUPPORT || !defined CONFIG_KERNEL_WEAK_SUPPORT
 extern atomic_t tcp_orphan_count;
 #else
-extern atomic_t tcp_orphan_count __attribute__((__weak__));
+extern atomic_t tcp_orphan_count;
 #endif
 #endif
 #endif
@@ -138,7 +141,7 @@ extern atomic_t tcp_orphan_count __attribute__((__weak__));
 #if defined HAVE_TCP_TW_COUNT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SUPPORT
 extern int tcp_tw_count;
 #else
-extern int tcp_tw_count __attribute__((__weak__));
+extern int tcp_tw_count;
 #endif
 #endif
 #endif
@@ -150,7 +153,7 @@ extern int tcp_tw_count __attribute__((__weak__));
 #if defined HAVE_IP_CMSG_RECV_SUPPORT || !defined CONFIG_KERNEL_WEAK_SUPPORT
 extern void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
 #else
-extern void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb) __attribute__((__weak__));
+extern void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb);
 #endif
 #endif
 #endif
@@ -162,7 +165,7 @@ extern void ip_cmsg_recv(struct msghdr *msg, struct sk_buff *skb) __attribute__(
 #if defined HAVE_INET_BIND_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len);
 #else
-extern int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len) __attribute__((__weak__));
+extern int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len);
 #endif
 #endif
 #endif
@@ -174,7 +177,7 @@ extern int inet_bind(struct socket *sock, struct sockaddr *uaddr, int addr_len) 
 #if defined HAVE_INET_IOCTL_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
 #else
-extern int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg) __attribute__((__weak__));
+extern int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg);
 #endif
 #endif
 #endif
@@ -186,7 +189,7 @@ extern int inet_ioctl(struct socket *sock, unsigned int cmd, unsigned long arg) 
 #if defined HAVE_INET_GETNAME_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
 #else
-extern int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer) __attribute__((__weak__));
+extern int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
 #endif
 #endif
 #endif
@@ -198,7 +201,7 @@ extern int inet_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_
 #if defined HAVE_INET_MULTI_GETNAME_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
 #else
-extern int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer) __attribute__((__weak__));
+extern int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *uaddr_len, int peer);
 #endif
 #endif
 #endif
@@ -210,7 +213,7 @@ extern int inet_multi_getname(struct socket *sock, struct sockaddr *uaddr, int *
 #if defined HAVE_SOCKET_GET_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int socket_get_info(char *buffer, char **start, off_t offset, int length);
 #else
-extern int socket_get_info(char *buffer, char **start, off_t offset, int length) __attribute__((__weak__));
+extern int socket_get_info(char *buffer, char **start, off_t offset, int length);
 #endif
 #endif
 #endif
@@ -222,7 +225,7 @@ extern int socket_get_info(char *buffer, char **start, off_t offset, int length)
 #if defined HAVE_AFINET_GET_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int afinet_get_info(char *buffer, char **start, off_t offset, int length);
 #else
-extern int afinet_get_info(char *buffer, char **start, off_t offset, int length) __attribute__((__weak__));
+extern int afinet_get_info(char *buffer, char **start, off_t offset, int length);
 #endif
 #endif
 #endif
@@ -234,7 +237,7 @@ extern int afinet_get_info(char *buffer, char **start, off_t offset, int length)
 #if defined HAVE_TCP_PROT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern struct proto tcp_prot;
 #else
-extern struct proto tcp_prot __attribute__((__weak__));
+extern struct proto tcp_prot;
 #endif
 #endif
 #endif
@@ -246,7 +249,7 @@ extern struct proto tcp_prot __attribute__((__weak__));
 #if defined HAVE_UDP_PROT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern struct proto udp_prot;
 #else
-extern struct proto udp_prot __attribute__((__weak__));
+extern struct proto udp_prot;
 #endif
 #endif
 #endif
@@ -258,7 +261,7 @@ extern struct proto udp_prot __attribute__((__weak__));
 #if defined HAVE_RAW_PROT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern struct proto raw_prot;
 #else
-extern struct proto raw_prot __attribute__((__weak__));
+extern struct proto raw_prot;
 #endif
 #endif
 #endif
@@ -269,7 +272,7 @@ extern struct proto raw_prot __attribute__((__weak__));
 #if defined HAVE_SECURE_TCP_SEQUENCE_NUMBER_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport);
 #else
-extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport) __attribute__((__weak__));
+extern __u32 secure_tcp_sequence_number(__u32 saddr, __u32 daddr, __u16 sport, __u16 dport);
 #endif
 #else
 #error Need a way to get a secure tcp sequence number.

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: udp_hooks.h.in,v 1.1.2.6 2011-04-05 16:35:13 brian Exp $
+ @(#) $Id: udp_hooks.h.in,v 1.1.2.7 2011-04-07 15:24:03 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: udp_hooks.h.in,v $
+ Revision 1.1.2.7  2011-04-07 15:24:03  brian
+ - weak reference corrections
+
  Revision 1.1.2.6  2011-04-05 16:35:13  brian
  - weak module design
 
@@ -138,7 +141,7 @@ struct sockaddr_storage {
 #if defined HAVE_ICMP_ERR_CONVERT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern struct icmp_err icmp_err_convert[];
 #else
-extern struct icmp_err icmp_err_convert[] __attribute__((__weak__));
+extern struct icmp_err icmp_err_convert[];
 #endif
 #endif
 
@@ -150,7 +153,7 @@ extern struct icmp_err icmp_err_convert[] __attribute__((__weak__));
 #if defined HAVE_ICMP_STATISTICS_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern struct icmp_mib *icmp_statistics[];
 #else
-extern struct icmp_mib *icmp_statistics[] __attribute__((__weak__));
+extern struct icmp_mib *icmp_statistics[];
 #endif
 #endif
 
@@ -169,12 +172,11 @@ extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *
 #endif
 #else
 #ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_4_ARGS
-extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags)
-    __attribute__ ((__weak__));
+extern int ip_route_output_flow(struct rtable **rp, struct flowi *flp, struct sock *sk, int flags);
 #endif
 #ifdef HAVE_IP_ROUTE_OUTPUT_FLOW_5_ARGS
 extern int ip_route_output_flow(struct net *, struct rtable **rp, struct flowi *flp,
-				struct sock *sk, int flags) __attribute__ ((__weak__));
+				struct sock *sk, int flags);
 #endif
 #endif
 #endif
@@ -212,7 +214,7 @@ ip_rt_min_pmtu_(void)
 #if defined HAVE_IP_RT_MTU_EXPIRES_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int ip_rt_mtu_expires;
 #else
-extern int ip_rt_mtu_expires __attribute__((__weak__));
+extern int ip_rt_mtu_expires:
 #endif
 #endif
 
@@ -224,7 +226,7 @@ extern int ip_rt_mtu_expires __attribute__((__weak__));
 #if defined HAVE_IP_RT_UPDATE_PMTU_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
 #else
-extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu) __attribute__ ((__weak__));
+extern void ip_rt_update_pmtu(struct dst_entry *dst, unsigned mtu);
 #endif
 #endif
 
@@ -333,11 +335,9 @@ extern int __ip_route_output_key(struct net *, struct rtable **, const struct fl
 #endif
 #else
 #if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
-extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp)
-    __attribute__ ((__weak__));
+extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
 #elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
-extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp)
-    __attribute__ ((__weak__));
+extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp);
 #endif
 #endif
 #endif
@@ -411,7 +411,7 @@ extern int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
 			       unsigned short family);
 #else
 extern int __xfrm_policy_check(struct sock *sk, int dir, struct sk_buff *skb,
-			       unsigned short family) __attribute__ ((__weak__));
+			       unsigned short family);
 #endif
 #endif
 
@@ -430,9 +430,9 @@ extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #endif
 #else
 #ifdef HAVE_XFRM_POLICY_DELETE_RETURNS_INT
-extern int xfrm_policy_delete(struct xfrm_policy *pol, int dir) __attribute__ ((__weak__));
+extern int xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #else
-extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir) __attribute__ ((__weak__));
+extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir);
 #endif
 #endif
 #endif
@@ -445,8 +445,7 @@ extern void xfrm_policy_delete(struct xfrm_policy *pol, int dir) __attribute__ (
 #if defined HAVE_SNMP_GET_INFO_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int snmp_get_info(char *buffer, char **start, off_t offset, int length);
 #else
-extern int snmp_get_info(char *buffer, char **start, off_t offset, int length)
-    __attribute__ ((__weak__));
+extern int snmp_get_info(char *buffer, char **start, off_t offset, int length);
 #endif
 #endif
 

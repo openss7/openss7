@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: net_hooks.h.in,v 1.1.2.2 2011-04-05 16:35:12 brian Exp $
+ @(#) $Id: net_hooks.h.in,v 1.1.2.3 2011-04-07 15:24:02 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:02 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: net_hooks.h.in,v $
+ Revision 1.1.2.3  2011-04-07 15:24:02  brian
+ - weak reference corrections
+
  Revision 1.1.2.2  2011-04-05 16:35:12  brian
  - weak module design
 
@@ -81,12 +84,7 @@
 #else				/* CONFIG_SMP */
 #undef HAVE_INET_PROTO_LOCK_SYMBOL
 #ifdef HAVE_INET_PROTO_LOCK_SYMBOL
-#undef HAVE_INET_PROTO_LOCK_SUPPORT
-#if defined HAVE_INET_PROTO_LOCK_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern spinlock_t inet_proto_lock;
-#else
-extern spinlock_t inet_proto_lock __attribute__((__weak__));
-#endif
 #define net_protocol_lock() spin_lock_bh(&inet_proto_lock)
 #define net_protocol_unlock() spin_unlock_bh(&inet_proto_lock)
 #else
@@ -97,19 +95,10 @@ extern spinlock_t inet_proto_lock __attribute__((__weak__));
 
 #undef HAVE_INET_PROTOS_SYMBOL
 #ifdef HAVE_INET_PROTOS_SYMBOL
-#undef HAVE_INET_PROTOS_SUPPORT
-#if defined HAVE_INET_PROTOS_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 #ifdef HAVE_INET_PROTOS_IS_CONST
 extern const struct net_protocol *inet_protos[];
 #else
 extern struct net_protocol *inet_protos[];
-#endif
-#else
-#ifdef HAVE_INET_PROTOS_IS_CONST
-extern const struct net_protocol *inet_protos[] __attribute__((__weak__));
-#else
-extern struct net_protocol *inet_protos[] __attribute__((__weak__));
-#endif
 #endif
 struct mynet_protocol **inet_protosp = (void *)&inet_protos;
 #endif

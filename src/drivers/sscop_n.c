@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:13 $
+ @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:13 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n.c,v $
+ Revision 1.1.2.4  2011-04-07 15:24:03  brian
+ - weak reference corrections
+
  Revision 1.1.2.3  2011-04-05 16:35:13  brian
  - weak module design
 
@@ -63,12 +66,12 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:13 $";
+static char const ident[] = "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $";
 
 #include <sys/os7/compat.h>
 
 #define SSCOP_NPI_DESCRIP	"SSCOP/IP STREAMS DRIVER."
-#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:13 $"
+#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $"
 #define SSCOP_NPI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
 #define SSCOP_NPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -702,13 +705,13 @@ t_optmgmt_req(queue_t *q, mblk_t *pdu)
 #if   defined HAVE_INET_GET_LOCAL_PORT_RANGE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern void inet_get_local_port_range(int *low, int *high);
 #else
-extern void inet_get_local_port_range(int *low, int *high) __attribute__ ((__weak__));
+extern void inet_get_local_port_range(int *low, int *high);
 #endif
 #elif defined HAVE_SYSCTL_LOCAL_PORT_RANGE_SYMBOL
 #if   defined HAVE_SYSCTL_LOCAL_PORT_RANGE_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
 extern int sysctl_local_port_range[2];
 #else
-extern int sysctl_local_port_range[2] __attribute__ ((__weak__));
+extern int sysctl_local_port_range[2];
 #endif
 static inline void
 inet_get_local_port_range(int *low, int *high)

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-07 15:24:04 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
+ Last Modified $Date: 2011-04-07 15:24:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 1.1.2.8  2011-04-07 15:24:04  brian
+ - weak reference corrections
+
  Revision 1.1.2.7  2011-04-05 16:35:14  brian
  - weak module design
 
@@ -75,7 +78,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-07 15:24:04 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */
@@ -4344,6 +4347,7 @@ cmn_err(int err_lvl, const char *fmt, ...)
 EXPORT_SYMBOL(cmn_err);
 #ifdef HAVE_CMN_ERR_EXPORT
 #undef cmn_err
+#define cmn_err(err_lvl,fmt,...) cmn_err_(err_lvl,fmt,__VA_ARGS__)
 #endif
 
 __STRUTIL_EXTERN_INLINE int copyin(const void *from, void *to, size_t len);
