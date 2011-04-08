@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-02-08 23:39:02 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-04-08 12:35:42 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-02-08 23:39:02 $ by $Author: brian $
+## Last Modified $Date: 2011-04-08 12:35:42 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -2914,6 +2914,8 @@ openss7_man_MANS = \
 	man8/nuimap.8 \
 	man8/openss7.8 \
 	man8/openss7_mknod.8 \
+	man8/openss7-modules.8 \
+	man8/openss7-update.8 \
 	man8/osinetd.8 \
 	man8/perftest.8 \
 	man8/perftestn.8 \
@@ -7283,6 +7285,8 @@ openss7_dist_noinst_MANS = \
 	man8/nuimap.8.man \
 	man8/openss7.8.man \
 	man8/openss7_mknod.8.man \
+	man8/openss7-modules.8.man \
+	man8/openss7-update.8.man \
 	man8/osinetd.8.man \
 	man8/perftest.8.man \
 	man8/perftestn.8.man \
@@ -9906,6 +9910,9 @@ include ../../am/man.am
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.12  2011-04-08 12:35:42  brian
+## - documented openss7-modules script
+##
 ## Revision 1.1.2.11  2011-02-08 23:39:02  brian
 ## - last minute release updates
 ##

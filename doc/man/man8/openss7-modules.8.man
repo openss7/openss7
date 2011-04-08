@@ -1,0 +1,1243 @@
+'\" rtp
+.\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
+.\" =========================================================================
+.\"
+.\" @(#) $Id: openss7-modules.8.man,v 1.1.2.1 2011-04-08 12:35:41 brian Exp $
+.\"
+.\" =========================================================================
+.\"
+.\" Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+.\" Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+.\" Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+.\"
+.\" All Rights Reserved.
+.\"
+.\" Permission is granted to copy, distribute and/or modify this manual under
+.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
+.\" version published by the Free Software Foundation; with no Invariant
+.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
+.\" license is included in the section entitled "GNU Free Documentation
+.\" License".
+.\"
+.\" Permission to use, copy and distribute this manual without modification,
+.\" for any purpose and without fee or royalty is hereby granted, provided
+.\" that both the above copyright notice and this permission notice appears
+.\" in all copies and that the name of OpenSS7 Corporation not be used in
+.\" advertising or publicity pertaining to distribution of this documentation
+.\" or its contents without specific, written prior permission.  OpenSS7
+.\" Corporation makes no representation about the suitability of this manual
+.\" for any purpose.  It is provided "as is" without express or implied
+.\" warranty.
+.\"
+.\" Permission is granted to process this file through groff and print the
+.\" results, provided the printed document carries a copying permission
+.\" notice identical to this one except for the removal of this paragraph
+.\" (this paragraph not being relevant to the printed manual).
+.\"
+.\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
+.\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
+.\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
+.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
+.\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
+.\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
+.\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
+.\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
+.\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
+.\" 
+.\" Since the Linux kernel and libraries are constantly changing, this manual
+.\" page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from the
+.\" use of the information contained herein.  The author(s) may not have
+.\" taken the same level of care in the production of this manual, which is
+.\" licensed free of charge, as they might when working professionally.  The
+.\" author(s) will take no responsibility in it.
+.\" 
+.\" Formatted or processed versions of this manual, if unaccompanied by the
+.\" source, must acknowledge the copyright and authors of this work.
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+.\" behalf of the U.S. Government ("Government"), the following provisions
+.\" apply to you.  If the Software is supplied by the Department of Defense
+.\" ("DoD"), it is classified as "Commercial Computer Software" under
+.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+.\" Regulations ("DFARS") (or any successor regulations) and the Government
+.\" is acquiring only the license rights granted herein (the license rights
+.\" customarily provided to non-Government users).  If the Software is
+.\" supplied to any unit or agency of the Government other than DoD, it is
+.\" classified as "Restricted Computer Software" and the Government's rights
+.\" in the Software are defined in paragraph 52.227-19 of the Federal
+.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
+.\" FAR (or any successor regulations).
+.\"
+.\" =========================================================================
+.\" 
+.\" Commercial licensing and support of this software is available from
+.\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+.\" 
+.\" =========================================================================
+.\"
+.\" Last Modified $Date: 2011-04-08 12:35:41 $ by $Author: brian $
+.\"
+.\" -------------------------------------------------------------------------
+.\"
+.\" $Log: openss7-modules.8.man,v $
+.\" Revision 1.1.2.1  2011-04-08 12:35:41  brian
+.\" - documented openss7-modules script
+.\"
+.\" Revision 1.1.2.2  2011-02-07 02:18:31  brian
+.\" - updated manual pages
+.\"
+.\" =========================================================================
+.R1
+bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
+no-default-database
+database openss7.refs
+accumulate
+move-punctuation
+abbreviate A
+join-authors ", " ", " " and "
+et-al " et al" 2 3
+abbreviate-label-ranges ".."
+sort-adjacent-labels
+search-truncate 40
+search-ignore CGIQOSTU
+.R2
+.so openss7.macros
+.\"
+.\"
+.TH OPENSS7-MODULES 8 "@PACKAGE_DATE@" "@PACKAGE@-@VERSION@" "@PACKAGE_TITLE@ Administration"
+.\"
+.\"
+.SH NAME
+.B openss7-modules, openss7-update
+\- update openss7 kernel modules
+.\"
+.\"
+.SH SYNOPSIS
+.PP
+.HP 12
+[\fBawk -f \fR]\fBopenss7-modules -- \fR[\fBoptions\fR] [\fBcommand-options\fR] [\fIKERNEL ...\fR]
+.PD 0
+.HP
+[\fBawk -f \fR]\fBopenss7-modules -- \fR{\fB-h\fR|\fB--help\fR}
+.HP
+[\fBawk -f \fR]\fBopenss7-modules -- \fR{\fB-V\fR|\fB--version\fR}
+.HP
+[\fBawk -f \fR]\fBopenss7-modules -- \fR{\fB-C\fR|\fB--copying\fR}
+.PD
+.\"
+.\"
+.SH DESCRIPTION
+.PP
+The
+.B openss7-modules
+command is an
+.BR awk (1)
+script that performs in a weak-update of kernel modules in the spirit of the
+.BR weak-modules (8)
+or
+.BR weak-modules2 (8)
+scripts provided by
+.IR RedHat " or " SuSE .
+.PP
+For each kernel version considered, the script determines the most recent and
+compatible kernel modules available in the system and adds or removes symbolic
+links and relinked modules in the
+\fB/lib/modules/\fP\fI$KVERSION\fP\fB/weak-updates\fP directory, in a manner
+similar to the
+.IR RedHat " and " SuSE
+.BR weak-modules (8),
+and
+.I SuSE
+.BR weak-modules2 (8),
+scripts.  The differences are as follows:
+.\"
+.IP \(bu \w'\(bu\(em'u
+.B openss7-modules
+will consider for compatibility and relink any kernel modules that depend (or
+rely) upon an absolute symbol address in a given kernel.  Neither the
+.IR RedHat/Fedora ", " "SuSE Code 10" ,
+.BR weak-modules (8)
+scripts, nor the
+.I SuSE Code 11
+.BR weak-modules2 (8)
+scripts know about absolute symbols, so both can weak-update kernel modules that
+are incompatible with a given kernel (due to unsatisfied absolute symbol
+dependencies).  Only a run of the
+.B openss7-modules
+script after any of these weak-modules scripts will correct this.
+.\"
+.IP \(bu
+.B openss7-modules
+understands weak symbols (both exported and absolute), and will relink or allow
+the kernel module loader to conditionally link any weak symbols that are
+compatible with the updated module.  Both the
+.IR RedHat/Fedora " and " "SuSE Code 10/11"
+.BR weak-modules (8)
+scripts use
+.BR modprobe (8)
+with the
+.B --dump-modversions
+option to determine which kernel modules are compatible with which kernels.
+However, this does not consider versions for weak symbols and will fail to
+update a kernel module that has a weak symbol that is not satisfied by the
+kernel under consideration.  The
+.I SuSE Code 11
+.BR weak-modules2 (8)
+script does not have this problem because it uses
+.BR depmod (8)
+to determine module compatibility and
+.BR depmod (8)
+understands and properly handles versions for weak symbols
+.\"
+.IP \(bu
+.B openss7-modules
+considers all installed modules, regardless of whether they are installed using
+a kernel module
+.BR rpm (8)
+package, or whether they are installed manually; and, regardless of which kernel
+module subdirectory in which they reside (other than the
+.B kernel
+subdirectory).
+.sp
+The default search order for
+.BR depmod (8)
+(e.g. for Debian and others) is \(lq\fBupdates, built-in\fP.\(rq  The search
+order specified for
+.I RedHat/Fedora
+is \(lq\fBupdates, extra, built-in,
+weak-updates\fP.\(rq  The search order specified for
+.I SuSE Code 10/11
+is \(lq\fBupdates, extra, weak-updates, built-in\fP.\(rq  The only consistent
+arrangement is that \(lq\fBupdates\fP\(rq is loaded before
+\(lq\fBbuilt-in\fP\(rq.
+.sp
+The
+.I RedHat/Fedora
+.BR weak-modules (8)
+script only considers weak updates from the \(lq\fBextra\fP\(rq directory to the
+\(lq\fBweak-updates\fP\(rq directory.  The
+.I SuSE Code 10
+.BR weak-modules (8)
+script only considers weak updates from the \(lq\fBupdates\fP\(rq directory to
+the \(lq\fBweak-updates\fP\(rq directory.  The
+.I SuSE Code 11
+.BR weak-modules2 (8)
+script considers weak updates from the \(lq\fBupdates\fP\(rq and
+\(lq\fBextra\fP\(rq directories to the \(lq\fBweak-updates/updates\fP\(rq and
+\(lq\fBweak-updates/extra\fP\(rq directories.
+.sp
+While the
+.IR RedHat/Fedora " and " "SuSE Code 10"
+.BR weak-modules (8)
+scripts update kernel module regardless of whether they belong to
+.BR rpm (8)
+packages
+or not, the
+.I SuSE Code 11
+.BR weak-modules2 (8)
+script will only update kernel modules that belong to properly formatted
+.I SuSE Code 11
+kernel module
+.BR rpm (8)
+packages.
+.\"
+.IP \(bu
+.B openss7-modules
+will weak-update kernel modules from older kernels with kernel modules from
+newer kernels in a given kernel.  (The other weak-update scripts only consider
+symbol sets from a single other kernel version.)
+.\"
+.IP \(bu
+.B openss7-modules
+can be run at boot time to ensure that kernel modules are appropriately updated
+before they are loaded.
+.\"
+.IP \(bu
+.B openss7-modules
+does not create nor update initial ramdisk nor ramfs images.
+.\"
+.\"
+.SH USAGE
+.PP
+The script is normally invoked from post-install or post-removal
+.BR rpm (8)
+scripts or trigger scripts as follows:
+.TP
+.B Kernel post-install trigger scripts:
+When a new kernel is installed, the program is typically invoked with the
+.B --add-kernel
+command option and a
+.I KERNEL
+argument specifying the version of the kernel newly installed, to update
+symbolic links and relink kernel modules for the newly installed kernel.
+.TP
+.B Kernel post-removal trigger scripts:
+When a kernel is removed, the program is typically invoked with the
+.B --remove-kernel
+command option and a
+.I KERNEL
+argument specifying the version of the kernel newly removed, to remove
+symbolic links and relinked kernel modules for the newly removed kernel.
+.TP
+.B Kernel module post-install scripts:
+When kernel modules are installed, the program is typically invoked with the
+.B --add-modules
+command option and a
+.I KERNEL
+argument specifying the version of the kernel for which modules have been
+newly installed, to update symbolic links and relink kernel modules for all
+installed kernels.
+.TP
+.B kernel module post-removal scripts:
+When kernel modules are removed, the program is typically invoked with the
+.B --remove-modules
+command option and a
+.I KERNEL
+argument specifying the version of the kernel for which modules have been
+newly removed, to update symbolic links and relink kernel modules for all
+installed kernels.
+.\"
+.\"
+.SH ARGUMENTS
+.PP
+The
+.B openss7-modules
+command accepts the following non-option arguments:
+.TP
+[\fIKERNEL ...\fP]
+Specifies the kernel versions for which to perform operations.  The number
+and type of kernel versions is dependent upon the command option specified.
+See
+.RI \(lq "Command Options," \(rq
+below.
+.PP
+Note that non-option arguments placed before the first
+.RB ' -- '
+will be interpreted as arguments to
+.BR awk (1).
+.\"
+.\"
+.SH OPTIONS
+.PP
+Options are in two categories: \fIcommand-options\fP, that specify the major
+mode of the program; and, general and command-specific \fIoptions\fP, that
+specify options according to the command mode.
+.PP
+Note that options and option arguments placed before the first
+.RB ' -- '
+will be interpreted as options to
+.BR awk (1).
+.\"
+.SS Commmand Options
+.PP
+One and only one of the following command options is required.  When no
+command option is present, a brief usage message is displayed.
+.TP
+\fB-A\fP, \fB--add-kernel\fP
+This command option is used to specify that a kernel is being added and
+weak-update of kernel modules should be performed for the newly installed
+kernel.  The kernel versions specified as arguments are used to determine for
+which kernels to perform weak-updates.
+When no kernel version is specified in arguments, the current (running)
+kernel is used.
+Although the option supports multiple kernel versions, no more than one
+kernel version should be specified.
+.sp
+This command is normally invoked from kernel post-install trigger scripts.
+The command is also normally invoked (without arguments) from the
+.B specfs
+init script to ensure that a booted kernel is properly prepared before the
+.IR STREAMS (4)
+system is loaded.
+.TP
+\fB-L\fP, \fB--link-kernel\fP
+This command option is used to specify that a kernel is being added and
+relinking of the necessary kernel modules should be performed for the newly
+installed kernel.  The kernel versions specified as arguments are used to
+determine for which kernels to perform relinking.
+When no kernel version is specified in arguments, the current (running)
+kernel is used.
+Although the option supports multiple kernel versions, no more than one
+kernel version should be specified.
+.sp
+Note that the
+.B --add-kernel
+option also performs relinking and this command option is not normally
+performed separately.
+.TP
+\fB-R\fP, \fB--remove-kernel\fP
+This command options is used to specify the a kernel is being removed and
+removal of symbolic links and relinked kernel modules should be performed for
+the to-be-removed kernel.  The kernel versions specified as arguments are
+used to determine for which kernels to perform removal.
+When no kernel is specified in arguments, the current (running) kernel is
+used.
+Although the option supports multiple kernel versions, no more than one
+kernel version should be specified.
+.sp
+This command is normally invoked from kernel pre-uninstall trigger scripts.
+.TP
+\fB-a\fP, \fB--add-modules\fP
+This command option is used to specify that package kernel modules have been
+installed and weak-update of the installed kernel modules should be performed
+for all installed kernels.  The kernel version specified as an argument is
+used to determine the kernel for which the modules were installed.
+When no kernel version is specified in arguments, the current (running)
+kernel is used.
+.sp
+For compatibility with other tools, this option accepts (and ignores) a list
+of kernel modules on standard input.
+This command is normally invoked from post-install scripts for the kernel
+modules sub-package.
+Note that this option is roughly equivalent to
+.BR "--add-modules $(ls /lib/modules)" .
+.TP
+\fB-l\fP, \fB--link-modules\fP
+This command option is used to specify that package kernel modules have been
+installed and relinking of necessary kernel modules should be performed for
+all installed kernels.  The kernel version specified as an argument is used
+to determine the kernel for which the modules were installed.  When no kernel
+version is specified in arguments, the current (running) kernel is used.
+.sp
+For compatibility with other tools, this option accepts (and ignores) a list
+of kernel modules on standard input.
+Note that the
+.B --add-modules
+option also performs relinking and this command option is not normally
+performed separately.
+Note that this option is roughly equivalent to
+.BR "--link-modules $(ls /lib/modules)" .
+.TP
+\fB-r\fP, \fB--remove-modules\fP
+This command option is used to specify that package kernel modules have been
+removed and removal of symbolic links and relinked kernel modules should be
+performed for all installed kernels.  The kernel version specified as an
+argument is used to determine the kernel for which the modules were removed.
+When no kernel version is specified, the current (running) kernel is used.
+.sp
+For compatibility with other tools, this option accepts (and ignores) a list
+of kernel modules on standard input.
+This command is normally invoked from post-uninstall scripts for the kernel
+modules sub-package.
+Note that this option is roughly equivalent to
+.BR "--remove-modules $(ls /lib/modules)" .
+.TP
+\fB-h\fP, \fB--help\fP
+When this options is encountered,
+print usage information to
+.I stdout
+and exit.
+Note that all non-command options and environment variables specified are
+considered and the resulting output considers the values of options
+specified.
+.TP
+\fB-V\fP, \fB--version\fP
+When this option is encountered,
+print version information to
+.I stdout
+and exit.
+Note that all non-command options and environment variables specified are
+considered and the resulting output considers the values of options
+specified.
+.TP
+\fB-C\fP, \fB--copying\fP
+When this option is encountered,
+print copying information to
+.I stdout
+and exit.
+Note that all non-command options and environment variables specified are
+considered and the resulting output considers the values of options
+specified.
+.\"
+.SS Command-Specific Options
+.PP
+The following general options can be combined with any of the command
+options:
+(Note that path and location option arguments that include
+.IR $KVERSION " or " $PACKAGE
+will be replaced with the settings of the
+.B --kversion
+and
+.B --package
+option arguments.)
+.TP
+\fB-k\fP, \fB--kversion\fP \fIKVERSION\fP
+Specifies the kernel version of the current (running) kernel.  When not
+specified, the value returned by (\fBuname -r\fP) is used.  This option is
+not normally required.
+.TP
+\fB-M\fP, \fB--modules\fP \fIMODULE ...\fP
+Specifies the modules for which to generate symbols and relinking.  When
+unspecified, the modules are searched.  This option is not normally required.
+.TP
+\fB-c\fP, \fB--rootdir\fP \fIROOTDIR\fP
+Specifies the root directory where kernel modules have been installed.  This
+is separate from the normal kernel modules directory on the build system and
+is used to install weak-updates separate from the root directory on the build
+system.  Only the default value should be used in normal circumstances.  The
+default value is the empty string,
+.RB ( '' ).
+.TP
+\fB-b\fP, \fB--basedir\fP \fIBASEDIR\fP
+Specifies the base directory where symbolic links and relinked kernel modules
+should be placed.  This is separate from the root directory and is used to
+install weak-updates separate from the root directory for the purpose of
+testing the configuration.  Only the default value should be used in normal
+circumstances.  The default value is the empty string,
+.RB ( '' ).
+.TP
+\fB-w\fP, \fB--weakdir\fP \fIWEAKDIR\fP
+Specifies where to place weak update symbolic links, either as an absolute
+directory path, or a path relative to
+\fB/lib/modules/\fP\fI$KVERSION\fP.  The default is
+.RB ( weak-updates ),
+which is relative to 
+\fB/lib/modules/\fP\fI$KVERSION\fP, or
+\fB/lib/modules/\fP\fI$KVERSION\fP\fB/weak-updates\fP.
+Only the default value should be used in normal circumstances.
+.TP
+\fB-F\fP, \fB--sysmap\fP \fISYSMAP\fP
+Specifies the location of the system map file.  When unspecified, a search
+will be performed.  The default location is
+\fB/boot/System.map-\fP\fI$KVERSION\fP.  Note that this file is used as input
+to the
+.B -F
+option to
+.BR depmod (8)
+when
+.BR depmod (8)
+does not support the
+.B -E
+option.
+The system map file must be available to perform kernel module weak updates.
+Any kernel that does not have a system map file will not be weak updated.
+.TP
+\fB-E\fP, \fB--sysver\fP \fISYSVER\fP
+Specifies the location of the decompressed system symbol version file.  When
+unspecified, a search will be performed.  The default location is
+\fB/lib/modules/\fP\fI$KVERSION\fP\fB/build/Module.symvers\fP.  Note that
+this file is used as input to the
+.B -E
+option to
+.BR depmod (8)
+when
+.BR depmod (8)
+supports the
+.B -E
+option.
+Either the compressed or decompressed system symbol version file must be
+available to perform kernel module weak updates.
+.TP
+\fB-S\fP, \fB--symver\fP \fISYMVER\fP
+Specifies the location of the compressed system symbol version file.  When
+unspecified, a search will be performed.  The default location is
+\fB/boot/symvers-\fP\fI$KVERSION\fP\fB.gz\fP.  Note that this file is
+decompressed and used as input to the
+.B -E
+option to
+.BR depmod (8)
+when
+.BR depmod (8)
+supports the
+.B -E
+option and a decompressed system symbol version file cannot be found (see the
+.BR -E " and " -x
+options).
+Either the compressed or decompressed system symbol version file must be
+available to perform kernel module weak updates.
+.TP
+\fB-P\fP, \fB--package\fP \fIPACKAGE\fP
+Specifies the package name (used to determine the subdirectory in which
+package kernel modules are installed).  The default when unspecified is
+.RB ( openss7 ).
+.TP
+\fB-s\fP, \fB--style\fP {\fIdebian\fP|\fIredhat\fP|\fIsuse10\fP|\fIsuse11\fP}
+Specifies the style of kernel module weak-update to perform.  The possibilities are:
+.RS
+.TP
+.B redhat
+When specified (or when the script
+.B /sbin/weak-modules
+exists), indicates that the kernel module weak-update style is that of
+.I RedHat/Fedora
+or derivatives.
+.TP
+.B suse10
+When specified (or when the script
+.B /usr/lib/module-init-tools/weak-modules
+exists), indicates that the kernel module weak-update style is that of
+.IR "SuSE Code 10" .
+.TP
+.B suse11
+When specified (or when the script
+.B /usr/lib/module-init-tools/weak-modules2
+exists), indicates that the kernel module weak-update style is that of
+.IR "SuSE Code 11" .
+.TP
+.B debian
+When specified (or when no weak-modules script exists), indicates that the
+kernel module weak-update style is that of Debian.
+.PP
+The default is to attempt to automatically determine the sytle of kernel
+module weak-update to perform.  This is done by detecting the presence of
+the several possible weak-update scripts.
+.RE
+.TP
+\fB-x\fP, \fB--depmodx\fP, \fB--no-depmodx\fP
+Specifies whether
+.BR depmod (8)
+supports the
+.B -E
+option.  When not specified, the script will attempt to determine
+automatically whether
+.BR depmod (8)
+supports the
+.B -E
+flag.
+.\"
+.SS General Options 
+.PP
+The following general options may be specified in combination with any other
+command or command-specific options:
+.TP
+\fB-e\fP, \fB--exit-on-error\fP, \fB--no-exit-on-error\fP
+Sets (or resets) the exit with error status flag.  When set, and errors occur
+during the execution of the script, the exit status will be set to
+.BR ( 1 )
+to indicate the error.  Otherwise, the script will always exit with error
+status
+.BR ( 0 ).
+The default is to no exit with error status.
+.TP
+\fB-n\fP, \fB--dry-run\fP, \fB--no-dry-run\fP, \fB--dryrun\fP, \fB--no-dryrun\fP
+Sets (or resets) the dry-run flag.  When set, actions will be printed rather
+than performed.  Otherwise, the default is to attempt to perform actions.
+.TP
+\fB-q\fP, \fB--quiet\fP, \fB--no-quiet\fP, \fB--silent\fP, \fB--no-silent\fP
+Specifies that the caller is interested only in the return code and error
+diagnostics and that normal output should be suppressed.
+The default verbosity level if this option is not specified is
+.RB ( 1 ).
+This option is equivalent to
+.BR --verbose=0
+.TP
+\fB-D\fP, \fB--debug\fP [\fIDEBUG\fP]
+Increases or sets the debug level.  When this option is given without the
+.I DEBUG
+argument, it specifies that the debug level should be increased by one.
+If the
+.I DEBUG
+argument is specified, the debug level is set to that integer value.
+This option can be repeated.
+The default debug level if this option is not specified is
+.RB ( 0 ).
+For example,
+.B -DDDD
+is equivalent to
+.BR --debug=4 .
+This option may also be set using the
+.RI { OS7UPDT_DEBUG }
+environment variable.
+.TP
+\fB-v\fP, \fB--verbose\fP [\fIVERBOSE\fP]
+Increases or sets the verbosity level.  When this option is given without the
+.I VERBOSE
+argument, it specifies that the verbosity level should be increased by one.
+If the
+.I VERBOSE
+argument is specified, the verbosity level is set to that integer value.
+This option can be repeated.
+The default verbosity level if this option is not specified is
+.RB ( 1 ).
+For example,
+.B -vvvv
+is equivalent to
+.BR --verbose=5 .
+This option may also be set using the
+.RI { OS7UPDT_VERBOSE }
+environment variable.
+.\"
+.\"
+.SH ENVIRONMENT
+.PP
+The following environment variables are significant:
+.TP
+.I V=1
+Specifies the debug and verbosity levels (equivalent to a
+.B --debug=1
+and
+.B --verbose=2
+option).  This environment variable does not override the explicit settings
+for the command-line
+.B --debug
+or
+.B --verbose
+options.
+This environment variable is set for compatibility with
+.BR automake (1)
+makefiles.
+.TP
+.I OS7UPDT_DEBUG
+Specifies the debug level (equivalent to a
+.B --debug=$OS7UPDT_DEBUG
+option).  This environment variable overrides the settings for the
+command-line
+.B --debug
+option.
+.TP
+.I OS7UPDT_VERBOSE
+Specifies the verbosity level (equivalent to a
+.B --verbose=$OS7UPDT_VERBOSE
+option).  This environment variable overrides the settings for the
+command-line
+.B --verbose
+option.
+.\"
+.\"
+.SH DIAGNOSTICS
+.PP
+When
+.B openss7-modules
+fails, it prints a diagnostic message to
+.I stderr
+and exits with a non-zero return code.
+The following return codes are generated under the following conditions:
+.IP 0 4
+Execution was successful.
+When
+.B --exit-on-error
+is not specified, and errors were encountered during the update process, the
+program will still return
+.RB ( 0 )
+indicating successful execution.
+Diagnostic warning or error messages for any errors encountered during the
+update process will be printed on standard error.
+.IP 1
+Execution failed, or errors were encountered ruing the update process and the
+.B --exit-on-error
+option was specified.
+Diagnostic warning or error messages for any errors encountered during the
+update process will be printed on standard error.
+.IP 2
+An invalid combination of options or arguments was specified.
+.\"
+.\"
+.SH NOTICES
+.PP
+The
+.B openss7-modules
+script is not normally invoked directly by users, but is invoked by package
+installation and removal scripts.
+.PP
+The
+.B openss7-modules
+script is only applicable to
+.B .ko
+kernel modules, that is, kernel versions 2.6.3 and greater.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+.\"
+.SS Kernel Symbols
+.PP
+There are four classes of kernel symbols used by
+.B @PACKAGE_TITLE@
+kernel modules, described below.  Lack of support in the existing
+module-init-tools for weak-updates for three of the four classes is the
+primary reason for using the
+.B openss7-modules
+script.
+.\"
+.IP 1) \w'0)\(em'u
+.B Exported:
+These are the traditional exported symbols used by kernel modules.  The symbol
+is emitted as an undefined symbol and a corresponding version is placed in the
+.B __versions
+section of the binary.  These symbols do not require linking nor relinking.
+.sp
+When the symbol is not available for the kernel under consideration, or is
+available with a different version, weak-updates are not performed for the
+module by
+.BR openss7-modules ,
+nor will it have been performed by either
+.BR weak-modules (8)
+nor
+.BR weak-modules2 (8)
+(because these scripts are aware of normal exported symbols).
+.sp
+Exports symbols are used predominantly and for the vast majority of kernel
+symbols used by
+.B @PACKAGE_TITLE@
+kernel modules.  These exported symbols are for the most part those that are
+supported by any provided kernel ABI.
+.\"
+.IP 2)
+.B Weak Exported:
+These are kernel module loader supported weak exported symbols used by kernel
+modules.  The symbol is emitted as a weak undefined symbol and a corresponding
+version is placed in the
+.B __versions
+section of the binary.
+The
+.BR weak-modules (8)
+script use
+.BR modprobe (8)
+with the
+.B --dump-modversions
+flag to determine the dependencies between modules; however, the
+.B --dump-modversions
+flag to
+.BR modprobe (8)
+simply dumps the entire
+.B __versions
+section without regard to whether the symbols are weak or not.
+The
+.I SuSE Code 11
+.BR weak-modules2 (8)
+script is not susceptible to this because it instead uses
+.BR depmod (8)
+to determine compatibility and
+.BR depmod (8)
+understands weak symbols.
+As the symbol version is placed in the
+.B __versions
+section, no linking or relinking is required.
+.sp
+When the kernel module is loaded, the kernel module loader will resolve any weak
+symbols that have appropriate versions.  When the symbol is exported by the
+kernel under consideration, but the versions do not match, or if the symbol does
+not exist in the system maps, the symbol is not linked (left at zero).
+.sp
+The code must check the address of these symbols against zero
+.RB ( 0 )
+at run-time to determine whether the symbol is available or not and respond
+appropriately.
+.sp
+Weak exported symbols are used sparingly and for a select few kernel symbols
+used by
+.B @PACKAGE_TITLE@
+kernel modules.  These weak exported symbols are  for the most part those that
+are not supported by any provided kernel ABI.  Each symbol has a work-around in
+the run-time code should a kernel not happen to provide the symbol.  Most of
+these symbols have to do with the internals of the IP stack, or terminal job
+control associated with the Stream head.
+.\"
+.IP 3)
+.B Absolute:
+These are traditional unexported symbols used by openss7 kernel modules.  The
+symbol is emitted as an undefined symbol and a corresponding address is
+placed in the
+.B __absolute
+section of the binary.  These symbols require linking and relinking.
+.sp
+Linking and relinking is performed when the symbol is available in the
+system maps of the kernel under consideration and the address of the symbol
+differs from that of the symbol in the system map.  When the symbol is not
+available in the system maps, weak-updates are not performed for the module
+by
+.BR openss7-modules ,
+but will have been performed by either
+.BR weak-modules (8)
+or
+.BR weak-modules2 (8)
+(because these scripts are not aware of absolute symbols).
+.sp
+Absolute symbols are used sparingly within the
+.B @PACKAGE_TITLE@
+kernel modules and are used only where no other symbol will do, and where it is
+impossible to even provide a work-around for the absence of the symbol.  There
+are only two or three instances of this in the
+.B @PACKAGE_TITLE@
+kernel modules.  These symbols normally are for functions deep within the
+file-system or terminal behaviour control that have been the same across the
+entire spread of 2.4 and 2.6 kernels, but simply are not exported in current
+production kernels.
+.\"
+.IP 4)
+.B Weak Absolute:
+These are traditional unexported weak symbols used by
+.B @PACKAGE_TITLE@
+kernel modules.  The symbol is emitted as a weak undefined symbol and a
+corresponding address is placed in the
+.B __weak_absolute
+section of the binary.  These symbols require conditional linking and
+relinking.
+.sp
+Linking and relinking is performed when the symbol is available in the
+system maps of the kernel under consideration and the address of the symbol
+differs from that of the symbol in the system map.  When the symbol is not
+available in the system map, the symbol is linked or relinked to zero
+.RB ( 0 ).
+.sp
+The code must check the address of these symbols against zero
+.RB ( 0 )
+at run-time to determine whether the symbol is available or not and respond
+appropriately.
+.\"
+.SS Kernel Modules
+.PP
+There are many mechanisms for packaging and installing kernel module
+packages.
+.\"
+.IP 1) \w'0)\(em'u
+.B Manual\ install:
+The
+.B openss7-modules
+script supports the manual (e.g., tarball) installation of kernel modules.
+After kernel modules are installed, the
+.B openss7-modules
+script is run with the
+.B --add-modules
+option to create the symbolic links necessary to provide weak-updates for all
+existing installed kernels (as well as any kernel modules dependent upon the
+modules being added).  Also, at boot time, the
+.B openss7-modules
+script is run from an init script (e.g.,
+.BR /etc/init.d/specfs ),
+to ensure that weak-updates have been performed for the kernel that is
+booting.
+.sp
+This approach works on all distributions.
+.\"
+.IP 2)
+.B Manual\ install\ on\ Debian:
+On Debian and derivative distributions (e.g. Ubuntu), it is possible to
+create a post-kernel installation script that is run after kernel are
+installed (this is what invokes DKMS), and cause it to run
+.B openss7-modules --add-kernel
+after a kernel is installed
+.RB ( /etc/kernel/postinst.d/openss7-update ),
+or
+.B openss7-modules --remove-kernel
+after a kernel is removed
+.RB ( /etc/kernel/postrm.d/openss7-update ).
+.sp
+The brief script installed in \fB/sbin/module-updates\fP is provided just for
+this purpose.  When invoked as \fB/etc/kernel/postinst.d/openss7-update\fP, the
+script will invoke \fB/sbin/openss7-modules\fP with the \fB--add-kernel\fP
+option; when as \fB/etc/kernel/postrm.d/openss7-update\fP, with the \fB--remove-kernel\fP
+option.
+.\"
+.IP 3)
+.B Fedora\ kmod:
+This is a kernel-specific module package approach which is largely deprecated.
+Kernel module packages were tied to a specific kernel, and
+.BR yum (8)
+plugins were used to pin a kernel to a set of modules.
+This method had the following requirements:
+.RS
+.IP \(bu \w'\(bu\(em'u
+Old kmod kernel modules must be packaged into
+.BR rpm (8)
+kmod packages.
+.IP \(bu
+Old kmod kernel module packages must require a specific kernel version and
+architecture.
+.IP \(bu
+Old kmod kernel module packages could install their kernel modules in any
+subdirectory of the \fB/lib/modules/\fP\fI$KVERSION\fP\fB/\fP directory.
+.IP \(bu
+Old kmod kernel module packages must provide \(lq\fBkernel_modules\fP\(rq and
+must provide \(lq\fIpackage\fP\fB-kmod\fP\(rq.  They are normally named
+\(lq\fBkmod-\fP\fIpackage\fP\(rq and are given a version of the normal package
+version number followed by an underscore and the kernel version for which the
+modules were built.
+.PP
+The
+.BR yum (8)
+plugin (\fBkmod.py\fP or \fBfedorakmod.py\fP) then detects these kernel module
+packages and performs updates for all kernels, pinning of kernels to kernel
+module packages, and kernel update suppression.
+.PP
+The
+.B openss7-modules
+script supports this approach by detecting versions of installed kernel
+modules and providing preference to modules for specific kernels.  Also, the
+.B @PACKAGE_TITLE@
+package includes a modified
+.B fedorakmod.py
+yum plugin that supports the approach.  This approach is not, however, widely
+usable and is only applicable to Fedora (the weak-updates approach is
+superior for
+.IR RHEL " and " CentOS ).
+.PP
+Nevertheless, this remains one of the only viable approaches for 2.4 kernels.
+.RE
+.\"
+.IP 4)
+.B Dynamic\ kernel\ module\ system:
+The dynamic kernel module system (DKMS) was developed by Dell and is a way that
+is somewhat popular on Debian-derived (primarily Ubuntu) systems as a way of
+regenerating kernel modules for newly installed kernels.  For
+.BR rpm (8)
+distributions, the system is invoked using an
+.BR rpm (8)
+kernel trigger script.  For
+.BR dpkg (8)
+distributions, the system is invoked using a \fB/etc/kernel/postinst.d\fP and
+\fB/etc/kernel/postrm.d\fP installed script.
+To use the DKMS, the following is required:
+.RS
+.IP \(bu \w'\(bu\(em'u
+Addition of a module configuration file to DKMS.
+.IP \(bu
+Addition of sources to the DKMS directory, or,
+addition of binaries to the DKMS directory.
+.IP \(bu
+For kernel modules to automatically update when new kernels are added, an entire
+kernel development system must be present as kernel modules are recompiled form
+source.
+.IP \(bu
+Kernel modules are installed as
+.BR rpm (8)
+or
+.BR dpkg (8)
+packages.
+.PP
+The
+.B openss7-update
+script is compatible with this approach; however, it is far superior to the DKMS
+approach for the following reasons:
+.IP \(bu \w'\(bu\(em'u
+The DKMS approach does not provide weak update capability.
+.IP \(bu
+The DKMS approach requires the availability of the GNU C compiler with which the
+kernel was compiled to be provided on the target system.  This requires that an
+entire kernel development system be installed.
+.B openss7-modules
+only requires the presence of the linker-loader (and awk), which are always
+present on the target system.
+.IP \(bu
+.B openss7-modules
+does not require the distribution of kernel module source code.
+.RE
+.\"
+.IP 5)
+.B RedHat/Fedora\ kmod\ module\ package:
+The newer
+.I RedHat/Fedora
+kmod kernel module package differs from the previous one
+in that it not only permits, but is tailored for, weak updates.  Strangely,
+however, the naming conventions for kernel module packages did not change, so it
+is only in the particulars of the
+.BR rpm (8)
+package that a distinction can be made between the older Fedora kmod approach
+and the newer
+.I RedHat/Fedora
+approach.  The differences are:
+.RS
+.IP \(bu \w'\(bu\(em'u
+New kmod packages are not necessarily
+.BR rpm (8)
+packages, and kernel modules can be installed in just about any fashion.
+.IP \(bu
+New kmod packages do not depend on a specific version of the kernel.
+.IP \(bu
+New kmod packages install their kernel modules in the \(lq\fBextra\fP\(rq
+subdirectory.
+.IP \(bu
+New kmod packages do not need to provide \(lq\fIpackage\fP\fB-kmod\fP;\(rq
+however, they still need to provide \(lq\fIkernel_modules\fP.\(rq
+.IP \(bu
+New kmod packages call
+.BR weak-modules (8)
+with the
+.B --add-modules
+flag in their
+.I %post
+scriptlets, and with the
+.B --remove-modules
+flag in their
+.I %preun
+scriptlets.
+.IP \(bu
+Weak updates are performed in the \(lq\fBweak-updates\fP\(rq directory with the
+same relative path as the module had under the \(lq\fBextra\fP\(rq directory.
+.PP
+The
+.B openss7-modules
+script is compatible with this approach.
+.RE
+.\"
+.IP 6)
+.B SuSE\ Code\ 10\ kmp:
+The old
+.I SuSE Code 9/10
+approach to kernel modules is similar to the new Fedora kmod approach.  In fact,
+it uses a similar
+.BR weak-updates (8)
+script.  The differences have more to do with differences between
+.BR yast (8)/ zypper (8)
+and
+.BR up2date (8)/ yum (8)
+rather than differences in approach.
+.RS
+.IP \(bu \w'\(bu\(em'u
+Old kmp packages are not necessarily
+.BR rpm (8)
+packages, and kernel modules can be installed in just about any fashion.
+.IP \(bu
+Old kmp packages do not depend on a specific version of the kernel.
+.IP \(bu
+Old kmp packages install their kernel modules in the \(lq\fBupdates\fP\(rq
+subdirectory.
+.IP \(bu
+Old kmp packages are not required to follow a specific package naming convention
+(unless it is desired that the old yast2 recognize them as such); however, they
+need to provide \(lq\fBmultiversion(kernel)\fP\(rq so that multiple versions can
+coexist with multiple kernel versions.
+.IP \(bu
+Old kmp packages call
+.BR weak-modules (8)
+with the
+.B --add-modules
+flag in their
+.I %post
+scriptlets, and with the
+.B --remove-modules
+flag in their
+.I %preun
+scriptlets.
+.IP \(bu
+Weak updates are performed in the \(lq\fBweak-updates/extra\fP\(rq or
+\(lq\fBweak-updates/updates\fP\(rq directories, depending upon whether the
+kernel modules being weak updated resided in the \(lq\fBextra\fP\(rq or
+\(lq\fBupdates\fP\(rq subdirectories.
+.PP
+The
+.B openss7-modules
+script is compatible with this approach.
+.RE
+.\"
+.IP 7)
+.B SuSE\ Code\ 11\ kmp:
+The new
+.I SuSE Code 11
+approach to kernel modules is a departure and yet a conglomeration of previous
+approaches.
+.RS
+.IP \(bu \w'\(bu\(em'u
+New kmp packages must be built as
+.BR rpm (8)
+packages.
+.IP \(bu
+New kmp packages do not depend on a specific version of the kernel.
+.IP \(bu
+New kmp packages install their kernel modules in either the \(lq\fBextra\fP\(rq
+or \(lq\fBupdates\fP\(rq subdirectory
+.IP \(bu
+New kmp packages are required to follow specific naming conventions
+(\(lq\fIpackage\fP\fB-kmp\fP\fIflavor\fP\fB-\fP\fIkversion\fP\(rq) so that they
+can be found by the update script.
+.IP \(bu
+New kmp packages call
+.BR weak-modules2 (8)
+with the
+.B --add-kmp
+flag in their
+.I %post
+scriptlets, and with the
+.B --remove-kmp
+flag in their
+.I %postun
+scriptlets.
+.PP
+The
+.B openss7-modules
+script is compatible with this approach.
+.RE
+.\"
+.\"
+.\".SH EXAMPLES
+.\".PP
+.\"
+.\"
+.SH FILES
+.PP
+.TP
+\fB/lib/modules/\fP\fI$KVERSION\fP\fB/weak-updates
+The location of the directory used for performing weak updates for kernel
+version
+.IR $KVERSION .
+.TP
+\fB/boot/System.map-\fP\fI$KVERSION\fP
+The location of the system map file for kernel version
+.IR $KVERSION .
+.TP
+\fB/lib/modules/\fP\fI$KVERSION\fP\fB/build/Module.symvers
+The location of the uncompressed system exported symbol versions file for
+kernel version
+.IR $KVERSION .
+.TP
+\fB/lib/modules/symvers-\fP\fI$KVERSION\fP\fB.gz
+The location of the compressed system exported symbol versions file for
+kernel version
+.IR $KVERSION .
+.TP
+\fB/etc/kernel/postinst.d/\fP\fIopenss7-update\fP
+The location of the kernel post-install script on Debian and derivative (e.g.
+Ubuntu) distributions.
+.TP
+\fB/etc/kernel/postrm.d/\fP\fIopenss7-update\fP
+The location of the kernel post-remove script on Debian and derivative (e.g.
+Ubuntu) distributions.
+.\"
+.\"
+.SH "SEE ALSO"
+.PP
+.BR awk (1),
+.BR weak-modules (8),
+.BR weak-modules2 (8),
+.BR rpm (8),
+.BR depmod (8),
+.BR automake (1),
+.BR STREAMS (4),
+.IR "@PACKAGE_TITLE@ Installation and Reference Manual" .
+.\"
+.\"
+.SH BUGS
+.PP
+.B openss7-modules
+has no known bugs.
+.\"
+.\"
+.SH COMPATIBLITY
+.PP
+The
+.B openss7-modules
+script is compatible with the
+.BR weak-modules (8)
+and
+.BR weak-modules2 (8)
+kernel module update scripts of
+.IR RedHat ", " "SuSE Code 10" " and " "Code 11" .
+.\"
+.\"
+.SH CONFORMANCE
+.PP
+.B openss7-modules
+conforms to the specifications for weak-update modules for
+.IR RedHat ", " "SuSE Code 10"
+and
+.IR "SuSE Code 11" .
+.\"
+.\"
+.SH HISTORY
+.PP
+.B openss7-modules
+is provided with the
+.I @PACKAGE_TITLE@
+package.
+.\"
+.\"
+.[
+$LIST$
+.]
+.TI
