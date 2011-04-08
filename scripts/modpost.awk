@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-06 21:33:05 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-04-08 12:35:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-04-06 21:33:05 $ by $Author: brian $
+# Last Modified $Date: 2011-04-08 12:35:42 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,7 +147,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: modpost.awk,v 1.1.2.10 2011-04-06 21:33:05 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.11 2011-04-08 12:35:42 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [MODULE ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -274,7 +274,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.10 2011-04-06 21:33:05 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.11 2011-04-08 12:35:42 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -297,7 +297,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.10 2011-04-06 21:33:05 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.11 2011-04-08 12:35:42 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -1601,16 +1601,17 @@ function write_dependencies(file, mod, base,	count, deps, sep, pair, ind, name, 
 	print_debug(3,"w: mymodules, " base ": depends on " dep)
 	deps = deps sep dep; sep = ","; count++
     }
-    if (values["weak-versions"] && !values["weak-hidden"]) {
-	for (pair in mod_wdep) {
-	    split(pair, ind, SUBSEP); name = ind[1]; dep = ind[2]
-	    if (name != mod) continue
-	    sub(/.*\//, "", dep)
-	    if (dep == "vmlinux" || dep == "built-in" || dep == "built-in.o" || dep == "") continue
-	    print_debug(3,"w: mymodules, " base ": depends on " dep)
-	    deps = deps sep dep; sep = ","; count++
-	}
-    }
+# dependencies are never based on weak symbols
+#    if (values["weak-versions"] && !values["weak-hidden"]) {
+#	for (pair in mod_wdep) {
+#	    split(pair, ind, SUBSEP); name = ind[1]; dep = ind[2]
+#	    if (name != mod) continue
+#	    sub(/.*\//, "", dep)
+#	    if (dep == "vmlinux" || dep == "built-in" || dep == "built-in.o" || dep == "") continue
+#	    print_debug(3,"w: mymodules, " base ": depends on " dep)
+#	    deps = deps sep dep; sep = ","; count++
+#	}
+#    }
     if (deps) {
 	print_debug(1,"wrote " count " dependencies")
 	print "\n\
@@ -1689,7 +1690,7 @@ function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name
 	for (pair in mod_weak) {
 	    split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	    if (name != mod) continue
-	    #if (sym in crcs) continue
+	    if (sym in crcs && !values["weak-hidden"]) continue
 	    if (!(sym in mapsyms)) {
 		print_warns(sprintf(fmt, base, "weak no res", sym))
 		continue
@@ -1814,7 +1815,7 @@ BEGIN {
     longopts["unsupported"  ] = "U"  ;								   defaults["unsupported"  ] = 1						; descrips["unsupported"  ] = "permit use of (strong) unsupported (non-ABI) kernel exports"
     longopts["weak-symbols" ] = "w"  ;								   defaults["weak-symbols" ] = 1						; descrips["weak-symbols" ] = "resolve weak symbols (useful with -r and -U)"
     longopts["weak-versions"] = "W"  ;								   defaults["weak-versions"] = 1						; descrips["weak-versions"] = "version weak symbols (useful with -w)"
-    longopts["weak-hidden"  ] = "H"  ;								   defaults["weak-hidden"  ] = 1						; descrips["weak-hidden"  ] = "weak symbol versions are hidden (used with -W)"
+    longopts["weak-hidden"  ] = "H"  ;								   defaults["weak-hidden"  ] = 0						; descrips["weak-hidden"  ] = "weak symbol versions are hidden (used with -W)"
     longopts["format"       ] = "f:" ;								   defaults["format"       ] = "auto"						; descrips["format"       ] = "symsets file format (suse,redhat,auto)"
     longopts["unload"       ] = "u"  ; environs["unload"       ] = "CONFIG_MODULE_UNLOAD"	 ; defaults["unload"       ] = 0						; descrips["unload"       ] = "module unloading is supported"
     longopts["modversions"  ] = "m"  ; environs["modversions"  ] = "CONFIG_MODVERSIONS"		 ; defaults["modversions"  ] = 0						; descrips["modversions"  ] = "module versions are supported"
@@ -1998,6 +1999,9 @@ END {
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.11  2011-04-08 12:35:42  brian
+# - documented openss7-modules script
+#
 # Revision 1.1.2.10  2011-04-06 21:33:05  brian
 # - corrections
 #

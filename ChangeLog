@@ -1,3 +1,10 @@
+2011-04-08  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/man/man8/openss7-modules.8.man: new manual page
+	* doc/man/man8/openss7-update.8.man: new manual page
+	* doc/man/Makefile.am: added new manual pages
+	* scripts/modpost.awk: changed default weak exports behaviour
+
 2011-04-07  Brian Bidulock  <bidulock@openss7.org>
 
 	* scripts/modshow.awk: added module show script
