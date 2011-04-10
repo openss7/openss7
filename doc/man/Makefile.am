@@ -4027,6 +4027,7 @@ openss7_man_MANS = \
 	man9/streams_close_comm.9 \
 	man9/streams_get_sleep_lock.9 \
 	man9/streams_interrupt.9 \
+	man9/streams_module_address.9 \
 	man9/streams_mpsleep.9 \
 	man9/streams_notify.9 \
 	man9/streams_open_comm.9 \
@@ -8398,6 +8399,7 @@ openss7_dist_noinst_MANS = \
 	man9/streams_close_comm.9.man \
 	man9/streams_get_sleep_lock.9.man \
 	man9/streams_interrupt.9.man \
+	man9/streams_module_address.9.man \
 	man9/streams_mpsleep.9.man \
 	man9/streams_notify.9.man \
 	man9/streams_open_comm.9.man \

@@ -105,6 +105,7 @@ release.}
 @item CentOS Enterprise Linux 5.3 (centos53)
 @item CentOS Enterprise Linux 5.4 (centos54)
 @item CentOS Enterprise Linux 5.5 (centos55)
+@item CentOS Enterprise Linux 5.6 (centos56)
 @item CentOS Enterprise Linux 6.0 (centos60)
 @item Debian 3.0r2 Woody (deb3.0) TBD
 @item Debian 3.1r0a Sarge (deb3.1) TBD
@@ -127,6 +128,7 @@ release.}
 @item Fedora 12 (FC12)
 @item Fedora 13 (FC13)
 @item Fedora 14 (FC14)
+@item Fedora 15 (FC15)
 @item Gentoo 2006.1 (untested) TBD
 @item Gentoo 2007.1 (untested) TBD
 @item Lineox 4.026 (LEL4) TBD
@@ -142,7 +144,7 @@ release.}
 @item RedHat Linux 8.0 (RH8) TBD
 @item RedHat Linux 9 (RH9) TBD
 @item RedHat Enterprise Linux 3.0 (EL3) TBD
-@item RedHat Enterprise Linux 4 (EL4)
+@item RedHat Enterprise Linux 4 (EL4) TBD
 @item RedHat Enterprise Linux 5 (EL5)
 @item RedHat Enterprise Linux 6 (EL6)
 @item SuSE 8.0 Professional (SuSE8.0) TBD
@@ -154,11 +156,17 @@ release.}
 @item SuSE 10.2 (SuSE10.2) TBD
 @item SuSE 10.3 (SuSE10.3) TBD
 @item SuSE 11.0 (SuSE11.0)
+@item SuSE 11.1 (SuSE11.1)
+@item SuSE 11.2 (SuSE11.2)
+@item SuSE 11.3 (SuSE11.3)
+@item SuSE 11.4 (SuSE11.4)
 @item SLES 9 (SLES9) TBD
 @item SLES 9 SP2 (SLES9) TBD
 @item SLES 9 SP3 (SLES9) TBD
 @item SLES 10 (SLES10)
+@item SLES 10 SP1 (SLES10)
 @item SLES 10 SP2 (SLES10)
+@item SLES 11 (SLES11)
 @item SLES 11 SP1 (SLES11)
 @item Ubuntu 5.10 (ubu5.10) TBD
 @item Ubuntu 6.03 LTS (ubu6.03) TBD
@@ -176,41 +184,57 @@ release.}
 @end itemize
 
 When installing from the tarball (@pxref{Installing the Tar Ball}), this distribution is probably
-compatible with a  much broader array of distributions than those listed above.  These are the
+compatible with a much broader array of distributions than those listed above.  These are the
 distributions against which the current maintainer creates and tests builds.
 
 @node Linux Kernel
 @subsection Kernel
 @cindex Kernel
 
-The @cite{@value{PACKAGE_TITLE}} package compiles as a @dfn{Linux} kernel module.  It is not
+The @cite{@value{PACKAGE_TITLE}} package compiles as @dfn{Linux} kernel modules.  It is not
 necessary to patch the @dfn{Linux} kernel to build or use the package.@footnote{At a later date, it
 is possible to move this package into the kernel, however, with continued resistance to STREAMS from
 within the @dfn{Linux} developer community, this is currently unlikely.} Nor do you have to
-recompile your kernel to build or use the package.  OpenSS7 packages use @command{autoconf} scripts
-to adapt the package source to your existing kernel.  The package builds and runs nicely against
-production kernels from the distributions listed above.  Rather than relying on kernel versions, the
-@command{autoconf} scripts interrogate the kernel for specific features and variants to better adapt
-to distribution production kernels that have had patches applied over the official
-@url{http://www.kernel.org/, kernel.org} sources.
+recompile your kernel to build or use the package.  OpenSS7 packages use @manpage{autoconf(1)}
+scripts to adapt the package source to your existing kernel.  The package builds and runs nicely
+against production kernels from the distributions listed above.  Rather than relying on kernel
+versions, the @manpage{autoconf(1)} scripts interrogate the kernel for specific features and
+variants to better adapt to distribution production kernels that have had patches applied over the
+official @url{http://www.kernel.org/, kernel.org} sources.
+
+@subsubsection Compatible Kernels
 
 The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
-been tested up to and including 2.4.27.  It has been tested from 2.6.3 up to and including 2.6.32
-(with Fedora 9, openSUSE 11.0 and Ubuntu 8.04 patchsets).  Please note that your mileage may vary if
-you use a kernel more recent than 2.6.32: it is difficult to anticipate changes that kernel
-developers will make in the future.  Many kernels in the 2.6 series now vary widely by release
-version and if you encounter problems, try a kernel within the supported series.
+been tested up to and including 2.4.33.  It has been tested from 2.6.3 up to and including 2.6.32
+(with @cite{RHEL 6.0}, @cite{SLES 11.1} and @cite{Debian  6.0} patch sets).  Please note that your
+mileage may vary if you use a kernel more recent than 2.6.32: it is difficult to anticipate changes
+that kernel developers will make in the future.  Many kernels in the 2.6 series now vary widely by
+release version and if you encounter problems, try a kernel within the supported series.
+
+@subsubheading SMP Kernels
 
 UP validation testing for kernels is performed on all supported architectures.  SMP validation
 testing was initially performed on UP machines, as well as on an Intel 3.0GHz Pentium IV 630 with
 HyperThreading enabled (2x).  Because HyperThreading is not as independent as multiple CPUs, SMP
 validation testing was limited.  Current releases have been tested on dual 1.8GHz Xeon HP servers
-(2x) as well as dual quad-core SunFire (8x) servers.
+(2x), 3.0GHz Pentium D (2x), dual quad-core SunFire (8x) servers and dual hex-core Xeon servers
+(12x).
+
+@subsubheading XEN Kernels
 
 It should be noted that, while the packages will configure, build and install against XEN kernels,
 that problems running validation test suites against XEN kernels has been reported.  @emph{XEN
 kernels are explicitly not supported.}  This may change at some point in the future if someone
 really requires running OpenSS7 under a XEN kernel.
+
+@subsubsection Linux Kernel Upgrades
+
+The @cite{@value{PACKAGE_TITLE}} package compiles as @dfn{Linux} kernel modules.  Previously, kernel
+modules for each and every installed kernel were required.  This is no longer the case.  The kernel
+modules installed by the @cite{@value{PACKAGE_TITLE}} package now support weak updates across a wide
+range of kernels in the series.  This means that it is normally only necessary to build and install
+the @cite{@value{PACKAGE_TITLE}} kernel modules for one kernel in a series.  This is true for all
+supported 2.6 kernel distributions (and likely for others as well).
 
 @node Linux Architectures
 @subsection Architectures

@@ -1,0 +1,672 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+
+# Determine which modules have been weak updated and relink those that can be
+# relinked and remove symbolic links to those that cannot.
+
+ECHO='echo'
+SHELL=${CONFIG_SHELL:-/bin/sh}
+SED='sed'
+
+# Check that we have a working $ECHO.
+if test "X$1" = X--no-reexec; then
+    # Discard the --no-reexec flag, and continue
+    shift
+elif test "X`($ECHO '\t') 2>/dev/null`" = 'X\t'; then
+    :
+else
+    exec $SHELL "$0" --no-reexec ${1+"$@"}
+fi
+
+if test "X$1" = X--fallback-echo ; then
+    shift
+    cat <<EOF
+$*
+EOF
+    exit 0
+fi
+
+program=`$ECHO "$0" | ${SED} -e 's%^.*/%%'`
+progname="$program"
+reexec="$SHELL $0"
+
+version="3.0.0"
+ident='$RCSfile: weak-modules.openss7,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-01-12 03:44:13 $'
+
+# Sed substitution that helps us do robust quoting.  It backslashifies
+# metacharacters that are still active within double-quoted strings.
+Xsed="${SED}"' -e 1s/^X//'
+sed_quote_subst='s/\([\\`\\"$\\\\]\)/\\\1/g'
+# test EBCDIC or ASCII
+case `$ECHO A|od -x` in
+ *[Cc]1*) # EBCDIC based system
+  SP2NL="tr '\100' '\n'"
+  NL2SP="tr '\r\n' '\100\100'"
+  ;;
+ *) # Assume ASCII based system
+  SP2NL="tr '\040' '\012'"
+  NL2SP="tr '\015\012' '\040\040'"
+  ;;
+esac
+
+# NLS nuisances.
+# Only set LANG and LC_ALL to C if already set.
+# These must not be set unconditionally because not all systems understand
+# e.g. LANG=C (notably SCO).
+# We save the old values to restore during execute mode.
+if test "${LC_ALL+set}" = set; then
+  save_LC_ALL="$LC_ALL"; LC_ALL=C; export LC_ALL
+fi
+if test "${LANG+set}" = set; then
+  save_LANG="$LANG"; LANG=C; export LANG
+fi
+
+# Make sure IFS has a sensible default
+: ${IFS=" 	"}
+
+rpmsort=`PATH=/usr/lib/rpm:/usr/lib/rpm/redhat type -p rpmsort` || rpmsort=rpmsort
+
+# defaults
+
+defaults="subdir kernel"
+
+default_subdir=openss7
+default_kernel=`uname -r`
+
+debug=0
+verbose=1
+
+version()
+{
+    if test X$show = Xno ; then
+	return
+    fi
+    cat <<EOF
+Version $version
+$ident
+Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved.
+Distributed under AGPL Version 3, included here by reference.
+See \`$program --copying' for copying permissions.
+EOF
+}
+
+usage()
+{
+    if test X$show = Xno ; then
+	return
+    fi
+    cat <<EOF
+$program:
+    $ident
+Usage:
+    $program [options] [MODULE ...]
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+EOF
+}
+
+help()
+{
+    if test X$show = Xno ; then
+	return
+    fi
+    usage
+    cat <<EOF
+Arguments:
+    MODULE ...
+        modules for which to generate symbols
+Options:
+    -s, --subdir SUBDIR
+        kernel subdirectory to update ['$default_subdir']
+    -k, --kernel KVERSION
+        kernel version to update ['$default_kernel']
+    --boot-kernel
+        check the running kernel modules
+    --add-modules [KVERSION]
+        add kernel modules (read from stdin) ['$default_kernel']
+    --relink-modules [KVERSION]
+        relink kernel modules ['$default_kernel']
+    --remove-modules [KVERSION]
+        remove kernel modules (read from stdin) ['$default_kernel']
+    --add-kernel [KVERSION]
+        add a kernel ['$default_kernel']
+    --remove-kernel [KVERSION]
+        remove a kernel ['$default_kernel']
+    --relink-module MODULE
+        relink specific kernel module
+    -n, --dryrun
+        don't perform the actions, just check them
+    -q, --quiet, --silent
+        suppress normal output
+    -D, --debug [LEVEL]
+        increase or set debugging verbosity
+    -v, --verbose [LEVEL]
+        increase or set output verbosity
+    -h, --help
+        prints this usage information and exits
+    -V, --version
+        prints the version and exits
+    -C, --copying
+        prints copying permissions and exits
+EOF
+}
+
+copying()
+{
+    if test X$show = Xno ; then
+	return
+    fi
+    cat <<EOF
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is free software; you can  redistribute  it and/or modify  it under
+the terms  of the  GNU  Affero General Public  License as published  by the Free
+Software Foundation; version 3 of the License.
+
+This program is distributed in the hope that it will  be useful, but WITHOUT ANY
+WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.
+
+You should have received a copy of the  GNU Affero General Public License  along
+with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the
+Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+}
+
+syntax_error()
+{
+    if test $verbose -gt 0 ; then
+	$ECHO "$progname: syntax error -- $1" >&2
+	( usage ) >&2
+    fi
+    exit 2
+}
+
+option_unrec()
+{
+    opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
+    syntax_error "\`$opt' unrecognized"
+}
+
+option_noarg()
+{
+    opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
+    syntax_error "\`$opt' does not accept an argument"
+}
+
+option_needarg()
+{
+    syntax_error "\`$1' requires an argument"
+}
+
+option_after()
+{
+    syntax_error "\`$1' cannot occur after \`$2'"
+}
+
+option_with()
+{
+    syntax_error "\`$1' cannot occur with \`$2'"
+}
+
+# Parse our command line options once, thoroughly.
+while test "$#" -gt 0 -o ":$more" != ":"
+do
+    if test :$more != : ; then arg="-$more" ; more= ; else arg="$1" ; shift ; fi
+    if test :$more_options = :no ; then nonopt="$arg" ; break; fi
+    # check for attached option argument
+    case $arg in
+        (--subdir=*|--kernel=*|--add-modules=*|--remove-modules=*|--add-kernel=*|--remove-kernel=*|--relink-module=*|--relink-modules=*)
+            optarg=`$ECHO "X$arg" | $Xsed -e 's,[-_a-zA-Z0-9]*=,,'` ;;
+        (--*=*)
+            option_noarg $arg ;;
+        (-[nqDvhVC])
+            optarg= ;;
+        (-[nqDvhVC]*)
+            optarg=
+            more=`$ECHO "X$arg" | $Xsed -e 's,-[nqDvhVC],,'`
+            eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's,$more,,'\`"
+            ;;
+        (-[sk]*)
+            optarg=`$ECHO "X$arg" | $Xsed -e 's,-[sk],,'` ;;
+        (*)
+            optarg= ;;
+    esac
+
+    # check for optional or required option argument
+    if test -n "$prev"; then
+        case $arg in
+            -*) # optional arguments not forthcoming
+                case $prev in
+                    (debug|verbose) eval "(($prev++))" ;;
+                    (kernel|module) eval "$prev=\"\${$prev:+\$$prev }\$default_$prev\"" ;;
+                    (subdir|relink-module) option_needarg $prevopt ;;
+                esac
+                prev= ; prevopt=
+                ;;
+            *) # If the previous option needs an argument, assign it.
+                case $prev in
+                    (kernel|module) eval $prev'="$'$prev'${'prev':+ }$arg"' ;;
+                    (*)             eval $prev'="$arg"' ;;
+                esac
+                prev= ; prevopt=
+                continue
+                ;;
+        esac
+    fi
+
+    # Have we seen a non-optional argument yet?
+    case $arg in
+        (--help|-H)             commands="${commands:+$commands }help" ;;
+        (--version|-V)          commands="${comamnds:+$commands }version" ;;
+        (--copying|-C)          commands="${comamnds:+$commands }copying" ;;
+        (--verbose)             prevopt="$arg"; prev=verbose ;;
+        (-v)                    ((verbose++)) ;;
+        (--verbose=*)           verbose="$optarg" ;;
+        (--debug)               prevopt="$arg"; prev=debug ;;
+        (-D)                    $ECHO "$progname: enabling shell trace mode" 1>&2; set -x ;;
+        (--debug=*)             debug="$optarg" ;;
+        (--dry-run|--dryrun|-n) dry_run=yes ;;
+        (--quiet|--silent|-q)   show=no; verbose=0; debug=0 ;;
+        (--subdir|-s)           prevopt="$arg" ; prev=subdir ;;
+        (--subdir=*|-s*)        subdir="$optarg" ;;
+        (--kernel|-k)           prevopt="$arg" ; prev=kernel ;;
+        (--kernel=*|-k*)        kernel="$optarg" ;;
+        (--boot-kernel)         commands="${comamnds:+$commands }boot_kernel" ;;
+        (--add-kernel)          commands="${comamnds:+$commands }add_kernel"     ; prevopt="$arg" ; prev=kernel         ;;
+        (--add-kernel=*)        commands="${comamnds:+$commands }add_kernel"     ; kernel="${kernel:+$kernel }$optarg"  ;;
+        (--remove-kernel)       commands="${comamnds:+$commands }remove_kernel"  ; prevopt="$arg" ; prev=kernel         ;;
+        (--remove-kernel=*)     commands="${comamnds:+$commands }remove_kernel"  ; kernel="${kernel:+$kernel }$optarg"  ;;
+        (--add-modules)         commands="${comamnds:+$commands }add_modules"    ; prevopt="$arg" ; prev=kernel         ;;
+        (--add-modules=*)       commands="${comamnds:+$commands }add_modules"    ; kernel="${kernel:+$kernel }$optarg"  ;;
+        (--remove-modules)      commands="${comamnds:+$commands }remove_modules" ; prevopt="$arg" ; prev=kernel         ;;
+        (--remove-modules=*)    commands="${comamnds:+$commands }remove_modules" ; kernel="${kernel:+$kernel }$optarg"  ;;
+        (--relink-modules)      commands="${commands:+$commands }relink_modules" ; prevopt="$arg" ; prev=kernel         ;;
+        (--relink-modules=*)    commands="${commands:+$commands }relink_modules" ; kernel="${kernel:+$kernel }$optarg"  ;;
+        (--relink-module)       commands="${commands:+$commands }relink_module"  ; prevopt="$arg" ; prev=module         ;;
+        (--relink-module=*)     commands="${commands:+$commands }relink_module"  ; module="${module:+$module }$optarg"  ;;
+        (--) # end of options
+            break ;;
+        (-*)
+            option_unrec $arg ;;
+        (*) # permute all non-options to the end
+            nonopt="${nonopt}${nonopt:+ }'$arg'" ;;
+    esac
+done
+
+# hit the end of the list wanting an argument
+case $prev in
+    (debug|verbose) eval "(($prev++))" ;;
+    (kernel|module) eval "$prev=\"\${$prev:+\$$prev }\$default_$prev\"" ;;
+    (subdir)        option_needarg $prevopt ;;
+esac
+
+if test x"$nonopt${1+$@}" != x ; then
+    eval "set $nonopt $@"
+    nonopt=$*
+fi
+
+# assign defaults to all unassigned variables
+for d in $defaults ; do
+    eval "test :\${$d+set} = :set || $d=\"\$default_$d\""
+done
+
+if test X$show_vers = Xyes ; then
+    $echo "$progname:"' Version $Name$($Revision$) $Date$'
+fi
+
+if test $debug -gt 1 -o $verbose -gt 1 ; then
+    exec 3>&2
+else
+    exec 3>/dev/null
+fi
+
+retval=0
+errors=0
+warnings=0
+
+command_error() {
+    $ECHO "$progname: E: ${1+$@}" >&3
+    ((errors++))
+    retval=1
+}
+
+command_warn() {
+    $ECHO "$progname: W: ${1+$@}" >&3
+    ((warnings++))
+}
+
+command_info() {
+    $ECHO "$progname: D: ${1+$@}" >&3
+}
+
+#=================================================================
+
+#!/bin/sh
+
+# rpmsort: The sort in coreutils can't sort the RPM list how we want it so we
+# instead transform the list into a form it will sort correctly, then sort.
+rpmsort() {
+	local IFS=' '
+	REVERSE=""
+	rpmlist=(`cat`)
+
+	if [ "-r" == "$1" ];
+	then
+		REVERSE="-r"
+	fi
+
+	echo ${rpmlist[@]} | \
+	sed -e 's/-/../g' | \
+	sort ${REVERSE} -n -t"." -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 -k7,7 \
+				 -k8,8 -k9,9 -k10,10 | \
+	sed -e 's/\.\./-/g'
+}
+
+# krel_of_module:
+# Compute the kernel release of a module.
+krel_of_module() {
+    declare module=$1
+    /sbin/modinfo -F vermagic "$module" | awk '{print $1}'
+}
+
+# doit:
+# A wrapper used whenever we're going to perform a real operation.
+doit() {
+    [ -n "$verbose" ] && command_info "$@"
+    [ -n "$dry_run" ] || "$@"
+}
+
+# krel_of_module:
+# Compute the kernel release of a module.
+krel_of_module() {
+    declare module=$1
+    /sbin/modinfo -F vermagic $module | awk '{print $1}'
+}
+
+# read_modules_list:
+# Read in a list of modules from standard input. Convert the filenames into
+# absolute paths and compute the kernel release for each module (either using
+# the modinfo section or through the absolute path.
+read_modules_list() {
+    local IFS=$'\n'
+    modules=($(cat))
+
+    for ((n = 0; n < ${#modules[@]}; n++)); do
+        if [ ${modules[n]:0:1} != '/' ]; then
+            modules[n]="$PWD/${modules[n]}"
+        fi
+        if [ -f "${modules[n]}" ]; then
+            module_krels[n]=$(krel_of_module ${modules[n]})
+        else
+            # Try to extract the kernel release from the path
+            set -- "${modules[n]#/lib/modules/}"
+            module_krels[n]=${1%%/*}
+        fi
+        command_info "$LINENO: module `basename ${modules[n]}` built for kernel ${module_krels[n]}"
+    done
+}
+
+relink_module() {
+    local mod=$1 krel=${2:-$default_kernel}
+    if test -z "$mod" ; then
+        command_error "$LINENO: $mod does not exist"
+        return
+    fi
+    if ! test -r $mod ; then
+        command_error "$LINENO: $mod not found"
+        return
+    fi
+    local file=/boot/System.map-$krel
+    if ! test -r $file ; then
+        if test $krel = $(uname -r) ; then
+            file=/proc/kallsyms
+            if ! test -r $file ; then
+                command_error "$LINENO: $file does not exist"
+                return
+            fi
+        else
+            command_error "$LINENO $file does not exist"
+            return
+        fi
+    fi
+    local -a symbls=(`objdump -t $mod | awk '{if(NF>=4&&$(NF-2)=="*ABS*"&&$NF!~/^__(weak_)?crc_/&&$0!~/\<df\>/){print$NF}}'`)
+    local -a values=(`objdump -t $mod | awk '{if(NF>=4&&$(NF-2)=="*ABS*"&&$NF!~/^__(weak_)?crc_/&&$0!~/\<df\>/){print"0x"$1}}'`)
+    if test -z "$symbls" ; then
+        command_warn "$LINENO: $mod has no symbols to link"
+        return
+    fi
+    local syms= vals= i= n=${#symbls[*]} zeros="`echo "${values[1]}" | sed -r 's,[[:xdigit:]],0,g'`"
+    for ((i=0;i<n;i++)); do
+        local sym=${symbls[$i]}
+        local val=`awk '{if($NF==symbol){print"0x"$1;exit}}' symbol=$sym $file`
+        if test -z "$val" ; then val="$zeros"; fi
+        if test "$val" != "${values[$i]}" ; then
+            command_info "$LINENO: $val != ${values[$i]}, $sym"
+            syms="${syms:+$syms }$sym"
+            vals="${vals:+$vals }$val"
+        else
+            command_info "$LINENO: $val == ${values[$i]}, $sym"
+        fi
+    done
+    if test -z "$syms" ; then
+        command_info "$LINENO: $mod does not need relinking"
+        return
+    fi
+    symbls=($syms)
+    values=($vals)
+    n=${#symbls[*]}
+    (
+        echo "SECTIONS"
+        echo "{"
+        for ((i=0;i<n;i++)); do
+            echo -e "\t${symbls[$i]} = ${values[$i]};"
+        done
+        echo "}"
+    ) >tmp.lds
+    if test -n "$verbose" ; then cat tmp.lds ; fi
+    doit ld -r -o tmp.ko $mod tmp.lds
+    doit mv -f tmp.ko $mod
+    rm -f tmp.lds
+}
+
+# relink_modules()
+# Read in a list of modules from stdin and process them for compatibility with installed kernels
+# under /lib/modules.  Any symbolic links that exist for other kernels that link to the specified
+# modules are relinked as required.
+relink_modules() {
+    local kver=${1:-$default_kernel}
+    command_info "$LINENO: running \`relink_modules()' for kernel version $kver"
+    read_modules_list || exit 1
+    if test ${#modules[@]} -gt 0 ; then
+        krels=($(ls /lib/modules/ | $rpmsort -r))
+        for krel in "${krels[@]}"; do
+            command_info "$LINENO: processing kernel $krel"
+            for ((n=0;n<${#modules[@]};n++)); do
+                module="${modules[n]}"
+                module_krel="${module_krels[n]}"
+                command_info "$LINENO: processing module `basename $module`"
+                for dir in updates${subdir:+/$subdir} extra${subdir:+/$subdir} $subdir; do
+                    weak_module=`echo $module | sed -r 's,^/lib/modules/[^/]*/[^/]*/(.*)$,/lib/modules/'$krel'/weak-updates/\1,;t;s,^(.*/)?([^/]*)$,/lib/modules/'$krel'/weak-updates/'$dir'/\2,'`
+                    if test -f $weak_module -o \( -L $weak_module -a "`readlink $weak_module`" = "$module" \); then
+                        relink_module $weak_module $krel
+                    else
+                        command_info "$LINENO: module $weak_module does not exist"
+                    fi
+                done
+            done
+        done
+    fi
+}
+
+boot_kernel() {
+    local kver=${1:-$default_kernel}
+    command_info "$LINENO: running \`boot_kernel()' for kernel version $kver"
+    if ! test -d /lib/modules/$kver ; then
+        command_info "$LINENO: /lib/modules/$kver does not exist!"
+        return
+    fi
+    if ! test -r /boot/System.map-$kver ; then
+        command_info "$LINENO: cannot find /boot/System.map-$kver"
+        return
+    fi
+    local dirs=
+    for d in updates${subdir:+/$subdir} extra${subdir:+/$subdir} $subdir; do
+        if test -d /lib/modules/$kver/weak-updates/$d/ ; then
+            dirs="$dirs${dirs:+ }$d"
+        else
+            command_info "$LINENO: /lib/modules/$kver/$d/ does not exist"
+        fi
+    done
+    if test -n "$dirs" ; then
+        local files=`find $dirs -name '*.ko'`
+        for f in $files ; do
+            if test -l $f ;then
+                :
+            else
+                command_info "$LINENO: $f is not a symbolic link"
+            fi
+        done
+    else
+        command_info "$LINENO: no files to process... ...done"
+    fi
+}
+
+# add_modules
+# Read in a list of modules from stdin and process them for compatibility with installed kernels
+# under /lib/modules
+add_modules() {
+    local kver=${1:-$default_kernel}
+    command_info "$LINENO: running \`add_modules()' for kernel version $kver"
+    kernels=`ls /lib/modules/ | xargs -r -n 1 basename | $rpmsort -r`
+    for k in $kernels; do
+        command_info "$LINENO: processing kernel: $k"
+        if test $k = $kver ; then
+            command_info "$LINENO: skipping   kernel: $k"
+            continue
+        fi
+    done
+}
+
+# remove_modules:
+# Read in a list of modules from stdinput and process them for removal.  Parameter is noreplace to
+# delete modules, otherwise link compat.
+remove_modules() {
+    local kver=${1:-$default_kernel}
+    command_info "$LINENO: running \`remove_modules()' for kernel version $kver"
+}
+
+add_kernel() {
+    local kver=${1:-$default_kernel}
+    command_info "$LINENO: running \`add_kernel()' for kernel version $kver"
+}
+
+remove_kernel() {
+    local kver=${1:-$default_kernel}
+    command_info "$LINENO: running \`remove_kernel()' for kernel version $kver"
+}
+
+
+#=================================================================
+
+if test -n "$commands" ; then
+    for command in $commands; do
+        case "$command" in
+            (help|copying|version|boot_kernel) eval "$command" ;;
+            (add_modules|remove_modules|add_kernel|remove_kernel|relink_modules)
+                set -- $kernel; kver=$1; shift; kernel="$@"
+                eval "$command $kver" ;;
+            (relink_module)
+                set -- $module; mod=$1; shift; module="$@"
+                eval "$command $mod" ;;
+            (*) ( usage ) >&2; exit 1 ;;
+        esac
+    done
+else
+    ( usage ) >&2
+    exit 1
+fi
+
+exit $retval
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 et nocin nosi

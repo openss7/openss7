@@ -122,7 +122,7 @@ search-ignore CGIQOSTU
 .B rmsetwant, rmwanted, rwnext, sccp_n_uderror_ind, sccp_n_unitdata_ind,
 .B sccp_n_unitdata_req, sctp_datack_ind, sctp_datack_req, sctp_data_ind,
 .B sctp_data_req, sctp_exdata_ind, sctp_exdata_req, sparc_ioremap, straln,
-.B strbcpy, stream_free, streams_interrupt, STREAMS_TIMEOUT, struioget,
+.B strbcpy, stream_free, streams_interrupt, streams_module_address, STREAMS_TIMEOUT, struioget,
 .B struioput, strwakeq, __timeout, udelay, vtop
 \- undocumented functions
 .\"

@@ -66,6 +66,7 @@ openss7_TEXINFOS	= \
 			bugs.texi \
 			configure.texi \
 			descrip.texi \
+			kmod.texi \
 			install.texi \
 			news.texi \
 			prerequisites.texi \

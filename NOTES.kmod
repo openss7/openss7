@@ -112,13 +112,13 @@ RedHat Approach:
   kernels of the same name.  It also attempts to prune any resulting
   empty directories.
   
-OpenSS7 Kernel Modules under RedHat weak-updates:
+OpenSS7 Kernel Modules under RedHat/Fedora weak-updates:
 
   Under the current approach, we install our kernel modules under the
   /extra subdirectory when weak-updates are available on recent
-  redhat-based systems.  We invoke the /sbin/weak-moduels script with
-  --add-modules from %post and --remove-modules from %postun.  We have a
-  trigger script that runs post of a kernel package installation.
+  RedHat/Fedora-based systems.  We invoke the /sbin/weak-moduels script
+  with --add-modules from %post and --remove-modules from %postun.  We
+  have a trigger script that runs post on a kernel package installation.
 
   A separate step is required for the kmod package %post, %postun and
   %triggerpost (on kernel package).  This separate step must walk all of
@@ -140,9 +140,9 @@ OpenSS7 Kernel Modules under RedHat weak-updates:
   system has been shut down from the init script).
 
   Because we want to still support non-RPM installs, the specfs init
-  script should check whether relinking is required before inserting the
-  specfs kernel module on boot.  This can also be a backstop in case the
-  non-indempotent weak-modules script misbehaves.
+  script should checks whether relinking is required before inserting
+  the specfs kernel module on boot.  This can also be a backstop in case
+  the non-indempotent weak-modules script misbehaves.
 
   Also, there is an issue when the openss7 package is installed for
   other than the running kernel and there does not exist a package for

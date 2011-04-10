@@ -250,6 +250,26 @@ remove_depends() {
 }
 
 #
+# start_update() checks that kernel modules have been appropriately modified for
+# the booting kernel before inserting the 'specfs' kernel module.
+#
+start_update() {
+    if [ -x /sbin/openss7-update ] ; then
+	if [ -r /lib/modules/`uname -r`/openss7/specfs.ko ] ; then
+	    return 0
+	elif [ -f /lib/modules/`uname -r`/weak-updates/openss7/specfs.ko || \
+	       -f /lib/modules/`uname -r`/weak-updates/extra/openss7/specfs.ko || \
+	       -f /lib/modules/`uname -r`/weak-updates/updates/openss7/specfs.ko ] ; then
+	    return 0
+	else
+	    action $"Updating kernel modules" \
+		gawk -f /sbin/openss7-modules -- -q --add-kernel $(uname -r) || \
+		return $?
+	fi
+    fi
+}
+
+#
 # start_specfs() inserts the 'specfs' kernel module.  This is done even when we
 # are not mounting the specfs filesystem: the specfs filesystem is kernel
 # mounted and can still be accessed through external character devices.
@@ -354,7 +374,7 @@ start_mount() {
 # ensure that a mount point and mount exists for all the specified mount points.
 #
 reload_mount() {
-    if [ ":$SPECFS_MOUNTSPECFS" = ':yes' ] ; then
+    if [ ":$SPECFS_MOUNTSPECFS" = ':yes' -a -f /etc/mtab ] ; then
 	while read -a fields ; do
 	    if [ ":${fields[2]}" = ':specfs' ] ; then
 		mountpoint=${fields[1]}
@@ -635,6 +655,7 @@ stop_modules() {
 }
 
 start() {
+    start_update	# check kernel module weak updates
     start_specfs	# start the specfs kernel module
     start_preload	# insert any STREAMS preloads
     start_params	# configure sysctl parameters

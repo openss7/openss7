@@ -1,0 +1,475 @@
+#!/bin/bash
+#
+# weak-modules - determine which modules are kABI compatible with installed
+#                kernels and set up the symlinks in /lib/*/weak-updates.
+#
+# Changelog:
+#
+# 2010/01/10 - Further updates for dracut use on Fedora/RHEL (jcm).
+# 2009/09/16 - Rebase and add a bunch of updates for dracut (jcm).
+
+unset LANG LC_ALL LC_COLLATE
+
+tmpdir=$(mktemp -td ${0##*/}.XXXXXX)
+trap "rm -rf $tmpdir" EXIT
+unset ${!changed_modules_*} ${!changed_initramfs_*}
+
+initramfs_prefix="/boot" # can customize here
+dracut="/sbin/dracut"
+
+if [ ! -x "$dracut" ]
+then
+        echo "weak-modules: this tool requires a dracut-enabled kernel"
+	exit 1
+fi
+
+# doit:
+# A wrapper used whenever we're going to perform a real operation.
+doit() {
+    [ -n "$verbose" ] && echo "$@"
+    [ -n "$dry_run" ] || "$@"
+}
+
+# rpmsort: The sort in coreutils can't sort the RPM list how we want it so we
+# instead transform the list into a form it will sort correctly, then sort.
+rpmsort() {
+	local IFS=$' '
+	REVERSE=""
+	rpmlist=($(cat))
+
+	if [ "-r" == "$1" ];
+	then
+		REVERSE="-r"
+	fi
+
+	echo ${rpmlist[@]} | \
+	sed -e 's/-/../g' | \
+	sort ${REVERSE} -n -t"." -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 -k7,7 \
+				 -k8,8 -k9,9 -k10,10 | \
+	sed -e 's/\.\./-/g'
+}
+
+# read_modules_list:
+# Read in a list of modules from standard input. Convert the filenames into
+# absolute paths and compute the kernel release for each module (either using
+# the modinfo section or through the absolute path.
+read_modules_list() {
+    local IFS=$'\n'
+    modules=($(cat))
+
+    for ((n = 0; n < ${#modules[@]}; n++)); do
+        if [ ${modules[n]:0:1} != '/' ]; then
+            modules[n]="$PWD/${modules[n]}"
+        fi
+        if [ -f "${modules[n]}" ]; then
+            module_krels[n]=$(krel_of_module ${modules[n]})
+        else
+            # Try to extract the kernel release from the path
+            set -- "${modules[n]#/lib/modules/}"
+            module_krels[n]=${1%%/*}
+        fi
+    done
+}
+
+# read_old_initramfs:
+compare_initramfs_modules() {
+    local old_initramfs=$1
+    local new_initramfs=$2
+
+    rm -rf "$tmpdir/old_initramfs"
+    rm -rf "$tmpdir/new_initramfs"
+    mkdir "$tmpdir/old_initramfs"
+    mkdir "$tmpdir/new_initramfs"
+
+    pushd "$tmpdir/old_initramfs" >/dev/null
+    zcat "$old_initramfs" | cpio -i 2>/dev/null
+    n=0; for i in `find . -iname \*.ko|sort`; do
+        old_initramfs_modules[n]="$i"
+        n=$((n+1))
+    done
+    popd >/dev/null
+
+    pushd "$tmpdir/new_initramfs" >/dev/null
+    zcat "$new_initramfs" | cpio -i 2>/dev/null
+    n=0; for i in `find . -iname \*.ko|sort`; do
+        new_initramfs_modules[n]="$i"
+        n=$((n+1))
+    done
+    popd >/dev/null
+
+    if [ "${#old_initramfs_modules[@]}" == "${#new_initramfs_modules[@]}" ];
+    then
+        for ((n = 0; n < ${#old_initramfs_modules[@]}; n++)); do
+            old_md5=`md5sum $tmpdir/old_initramfs/${old_initramfs_modules[n]}|sed -nre 's:(^\ )* .*:\1:p'`
+            new_md5=`md5sum $tmpdir/new_initramfs/${new_initramfs_modules[n]}|sed -nre 's:(^\ )* .*:\1:p'`
+            if [ ! "$old_md5" == "$new_md5" ];
+            then
+                return 1
+            fi
+        done
+    else
+        return 1
+    fi
+
+    return 0
+}
+
+# check_initramfs:
+# check and possibly also update the initramfs for changed kernels
+check_initramfs() {
+    local kernel=$1
+
+    # If there is no initramfs already we will not make one here.
+    if [ -e "$initramfs_prefix/initramfs-$kernel.img" ];
+    then
+        old_initramfs="$initramfs_prefix/initramfs-$kernel.img"
+        tmp_initramfs="$initramfs_prefix/initramfs-$kernel.tmp"
+        new_initramfs="$initramfs_prefix/initramfs-$kernel.img"
+
+        $dracut -f "$tmp_initramfs" "$kernel"
+
+        if ! $(compare_initramfs_modules "$old_initramfs" "$tmp_initramfs");
+        then
+            doit mv "$tmp_initramfs" "$new_initramfs"
+        else
+            rm -f "$tmp_initramfs"
+        fi
+    fi
+}
+
+# krel_of_module:
+# Compute the kernel release of a module.
+krel_of_module() {
+    declare module=$1
+    /sbin/modinfo -F vermagic "$module" | awk '{print $1}'
+}
+
+# module_is_compatible:
+# Determine if a module is compatible with a particular kernel release. Also
+# include any symbol deps that might be introduced by other external kmods.
+module_is_compatible() {
+    declare module=$1 krel=$2 module_krel=$(krel_of_module "$module")
+
+    if [ ! -e "$tmpdir/all-symvers-$krel-$module_krel" ]; then
+        # Symbols exported by the "new" kernel
+        if [ ! -e $tmpdir/symvers-$krel ]; then
+            if [ -e /boot/symvers-$krel.gz ]; then
+                zcat /boot/symvers-$krel.gz \
+                | sed -r -ne 's:^(0x[0]*[0-9a-f]{8}\t[0-9a-zA-Z_]+)\t.*:\1:p'
+            fi > $tmpdir/symvers-$krel
+        fi
+
+        # Symbols that other add-on modules of the "old" kernel export
+        # (and that this module may require)
+        if [ ! -e "$tmpdir/extra-symvers-$module_krel" ]; then
+            if [ -e /lib/modules/$module_krel/extra ] && \
+	       [ -n "`find /lib/modules/$module_krel/extra -type f`" ]; then
+                find /lib/modules/$module_krel/extra -name '*.ko' \
+                | xargs nm \
+                | sed -nre 's:^[0]*([0-9a-f]{8}) A __crc_(.*):0x\1 \2:p'
+            fi > $tmpdir/extra-symvers-$module_krel
+        fi
+
+        sort -u $tmpdir/symvers-$krel $tmpdir/extra-symvers-$module_krel \
+        > "$tmpdir/all-symvers-$krel-$module_krel"
+    fi
+
+    # If the module does not have modversions enabled, $tmpdir/modvers
+    # will be empty.
+    /sbin/modprobe --dump-modversions "$module" \
+    | sed -r -e 's:^(0x[0]*[0-9a-f]{8}\t.*):\1:' \
+    | sort -u \
+    > $tmpdir/modvers
+
+    # Only include lines of the second file in the output that don't
+    # match lines in the first file. (The default separator is
+    # <space>, so we are matching the whole line.)
+    join -j 1 -v 2 $tmpdir/all-symvers-$krel-$module_krel \
+                   $tmpdir/modvers > $tmpdir/join
+
+    if [ ! -s $tmpdir/modvers ]; then
+        echo "Warning: Module ${module##*/} from kernel $module_krel has no" \
+             "modversions, so it cannot be reused for kernel $krel" >&2
+    elif [ -s $tmpdir/join ]; then
+        [ -n "$verbose" ] &&
+        echo "Module ${module##*/} from kernel $module_krel is not compatible" \             "with kernel $krel in symbols:" $(sed -e 's:.* ::' $tmpdir/join)
+    else
+        [ -n "$verbose" ] &&
+        echo "Module ${module##*/} from kernel $module_krel is compatible" \
+             "with kernel $krel"
+        return 0
+    fi
+    return 1
+}
+
+usage() {
+    echo "Usage: ${0##*/} [options] {--add-modules|--remove-modules}"
+    echo "${0##*/} [options] {--add-kernel|--remove-kernel} {kernel-release}"
+    cat <<'EOF'
+--add-modules
+        Add a list of modules read from standard input. Create
+        symlinks in compatible kernel's weak-updates/ directory.
+        The list of modules is read from standard input.
+
+--remove-modules
+        Remove compatibility symlinks from weak-updates/ directories
+        for a list of modules.  The list of modules is read from
+        standard input. Optionally specify --delete-modules to
+        prevent weak-modules from attempting to locate any
+        compatible modules to replace those being removed.
+
+--add-kernel
+        Add compatibility symlinks for all compatible modules to the
+        specified or running kernel.
+
+--remove-kernel
+        Remove all compatibility symlinks for the specified or current
+        kernel.
+
+--no-initramfs
+	Do not generate an initramfs.
+
+--verbose
+        Print the commands executed.
+
+--dry-run
+        Do not create/remove any files.
+EOF
+    exit $1
+}
+
+# module_has_changed:
+# Mark if an actual change occured that we need to deal with later by calling
+# depmod or mkinitramfs against the affected kernel.
+module_has_changed() {
+
+    declare module=$1 krel=$2
+
+    module=${module%.ko}
+    module=${module##*/}
+
+    eval "changed_modules_${krel//[^a-zA-Z0-9]/_}=$krel"
+    eval "changed_initramfs_${krel//[^a-zA-Z0-9]/_}=$krel"
+
+}
+
+# add_modules:
+# Read in a list of modules from stdinput and process them for compatibility
+# with installed kernels under /lib/modules.
+add_modules() {
+    read_modules_list || exit 1
+    if [ ${#modules[@]} -gt 0 ]; then
+        for krel in $(ls /lib/modules/); do
+            [ -e "/boot/symvers-$krel.gz" ] || continue
+            for ((n = 0; n < ${#modules[@]}; n++)); do
+                module="${modules[n]}"
+                module_krel="${module_krels[n]}"
+                case "$module" in
+                /lib/modules/$krel/*)
+                    # Module was built against this kernel, update initramfs.
+                    module_has_changed $module $krel
+                    continue ;;
+                esac
+
+		# Module my also serve as a weak-update built against another
+		# kernel. We need to create symlinks for compatible kernels
+		# under /lib/modules and rerun depmod/dracut for those.
+
+		subpath=`echo $module | sed -nre "s:/lib/modules/$module_krel/([^/]*)/(.*):\2:p"`
+                weak_module="/lib/modules/$krel/weak-updates/${subpath#/}"
+                if [ -r "$weak_module" ]; then
+                    weak_krel=$(krel_of_module "$weak_module")
+                    if [ "$weak_krel" != "$module_krel" ] &&
+                       [ "$(printf "%s\n" "$weak_krel" "$module_krel" \
+                            | rpmsort | (read input; echo "$input"; \
+                                         while read input; do true; done))" = \
+                         "$module_krel" ]; then
+                        # Keep modules from more recent kernels.
+                        [ -n "$verbose" ] && echo \
+"Keeping module ${module##*/} from kernel $weak_krel for kernel $krel"
+                        continue
+                    fi
+                fi
+                if module_is_compatible $module $krel; then
+                    doit mkdir -p $(dirname $weak_module)
+                    doit ln -sf $module $weak_module
+                    # Module was built against another kernel, update initramfs.
+                    module_has_changed $module $krel
+                fi
+            done
+        done
+    fi
+}
+
+# remove_modules:
+# Read in a list of modules from stdinput and process them for removal.
+# Parameter is noreplace to delete modules, otherwise link compat.
+remove_modules() {
+    delete_modules=${1:-replace}
+
+    read_modules_list || exit 1
+    if [ ${#modules[@]} -gt 0 ]; then
+
+	# Hunt for all known users of this module in /lib/modules, remove them
+	# and create symlinks to other compatible modules (downgrade) if
+	# possible, update initramfs for each modified kernel too.
+
+        krels=($(ls /lib/modules/ | rpmsort -r))
+        for krel in "${krels[@]}"; do
+            [ -e "/boot/symvers-$krel.gz" ] || continue
+            for ((n = 0; n < ${#modules[@]}; n++)); do
+                module="${modules[n]}"
+                module_krel="${module_krels[n]}"
+
+		# Module is going to be removed, update initramfs.
+		module_has_changed $module $krel
+
+                subpath="${module#/lib/modules/$module_krel/extra}"
+                weak_module="/lib/modules/$krel/weak-updates/${subpath#/}"
+                if [ "$module" == "`readlink $weak_module`" ]; then
+                    [ -n "$verbose" ] && echo \
+"Removing compatible module ${module##*/} from kernel $krel"
+                    doit rm -f "$weak_module"
+                    if [ "replace" == "$delete_modules" ]; then
+                        for krel2 in "${krels[@]}"; do
+                            if [ $krel2 != $krel ]; then
+                                module="/lib/modules/$krel2/extra/${subpath#/}"
+                                [ -e "$module" ] || continue
+                                if module_is_compatible "$module" "$krel"; then
+                                    [ -n "$verbose" ] && echo \
+"Adding compatible module ${module##*/} from kernel $krel2 instead"
+                                    doit ln -s "$module" "$weak_module"
+			            module_has_changed $module $krel
+                                    break
+                                fi
+                            fi
+                        done
+                    fi
+                    doit rmdir --parents --ignore-fail-on-non-empty \
+                               "$(dirname "$weak_module")"
+                fi
+            done
+        done
+    fi
+}
+
+add_kernel() {
+    add_krel=${1:-$(uname -r)}
+    if [ ! -e "/boot/symvers-$add_krel.gz" ]; then
+        echo "Symvers dump file /boot/symvers-$add_krel.gz" \
+             "not found" >&2
+        exit 1
+    fi
+    for krel in $(ls /lib/modules/ | rpmsort -r); do
+        [ "$add_krel" = "$krel" ] && continue
+        [ -d /lib/modules/$krel/extra ] || continue
+        for module in $(find /lib/modules/$krel/extra -name '*.ko'); do
+            subpath="${module#/lib/modules/$krel/extra}"
+            weak_module="/lib/modules/$add_krel/weak-updates/${subpath#/}"
+            [ -e "$weak_module" ] && continue
+            if module_is_compatible $module $add_krel; then
+		module_has_changed $module $add_krel
+                doit mkdir -p $(dirname $weak_module)
+                doit ln -sf $module $weak_module
+            fi
+        done
+    done
+}
+
+remove_kernel() {
+    remove_krel=${1:-$(uname -r)}
+    weak_modules="/lib/modules/$remove_krel/weak-updates"
+    module_has_changed $weak_modules $remove_krel
+    doit rm -rf "$weak_modules"
+}
+
+################################################################################
+################################## MAIN GUTS ###################################
+################################################################################
+
+options=`getopt -o h --long help,add-modules,remove-modules \
+                     --long add-kernel,remove-kernel \
+                     --long dry-run,no-initramfs,verbose,delete-modules -- "$@"`
+
+[ $? -eq 0 ] || usage 1
+
+eval set -- "$options"
+
+while :; do
+    case "$1" in
+    --add-modules)
+        do_add_modules=1
+        ;;
+    --remove-modules)
+        do_remove_modules=1
+        ;;
+    --add-kernel)
+        do_add_kernel=1
+        ;;
+    --remove-kernel)
+        do_remove_kernel=1
+        ;;
+    --dry-run)
+        dry_run=1
+        ;;
+    --no-initramfs)
+        no_initramfs=1
+        ;;
+    --verbose)
+        verbose=1
+        ;;
+    --delete-modules)
+        do_delete_modules=1
+        ;;
+    -h|--help)
+        usage 0
+        ;;
+    --)
+        shift
+        break
+        ;;
+    esac
+    shift
+done
+
+if [ -n "$do_add_modules" ]; then
+	add_modules
+
+elif [ -n "$do_remove_modules" ]; then
+        if [ -n "$do_delete_modules" ]; then
+            remove_modules "noreplace"
+        else
+	    remove_modules
+        fi
+
+elif [ -n "$do_add_kernel" ]; then
+	kernel=${1:-$(uname -r)}
+	add_kernel $kernel
+
+elif [ -n "$do_remove_kernel" ]; then
+	kernel=${1:-$(uname -r)}
+	remove_kernel $kernel
+
+	exit 0
+else
+	usage 1
+fi
+
+################################################################################
+###################### CLEANUP POST ADD/REMOVE MODULE/KERNEL ###################
+################################################################################
+
+# run depmod and dracut as needed
+for krel in ${!changed_modules_*}; do
+    krel=${!krel}
+
+    doit /sbin/depmod -ae -F /boot/System.map-$krel $krel
+done
+
+for krel in ${!changed_initramfs_*}; do
+    krel=${!krel}
+
+    if [ ! -n "$no_initramfs" ]; then
+        check_initramfs $krel
+    fi
+done

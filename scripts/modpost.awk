@@ -979,43 +979,44 @@ function read_systemmap(command, mod, own, src,		result,val,flag,sym,count_syms,
     print_vinfo(1,"r: systemmap, syms " count_syms " unds " count_unds ", weak " count_weak)
 }
 # read modpost cache file
-function read_cachefile(file,    i,result,line,n,fields)
+function read_cachefile(file,    i,line,n,fields)
 {
     if ("PWD" in ENVIRON) sub("^" ENVIRON["PWD"] "/", "", file)
     print_vinfo(1,"r: cachefile, file = \"" file "\"")
     count_syms = 0; count_sets = 0
-    while ((result = (getline line < file)) == 1) {
-	if (line~/:/) {
-	    # new style cache file format
-	    n = split(line,fields,/:/)
-	    if (fields[1] == "format") {
-		values["format"] = fields[2]
+    if (system("test -r " file) == 0) {
+	while ((getline line < file) == 1) {
+	    if (line~/:/) {
+		# new style cache file format
+		n = split(line,fields,/:/)
+		if (fields[1] == "format") {
+		    values["format"] = fields[2]
+		} else
+		if (fields[1] == "sym") {
+		    if (n<3) { print_error("syntax error in cachefile: line = \"" line "\""); continue }
+		    for (i=9;i>n;i--) { fields[i] = "" }; n = 9
+		    set_symbol(fields[2],fields[3],fields[4],fields[5],fields[6],fields[7],fields[8],fields[9],"cachefile")
+		} else
+		if (fields[1] == "set") {
+		    if (n<3) { print_error("syntax error in cachefile: line = \"" line "\""); continue }
+		    for (i=8;i>n;i--) { fields[i] = "" }; n = 8
+		    set_symset(fields[2],fields[3],fields[4],fields[5],fields[6],fields[7],fields[8],"cachefile")
+		} else
+		if (fields[1] == "map") {
+		    if (n<4) { print_error("syntax error in cachefile: line = \"" line "\""); continue }
+		    for (i=5;i>n;i--) { fields[i] = "" }; n = 5
+		    set_symmap(fields[2],fields[3],fields[4],fields[5],"cachefile")
+		}
 	    } else
-	    if (fields[1] == "sym") {
-		if (n<3) { print_error("syntax error in cachefile: line = \"" line "\""); continue }
-		for (i=9;i>n;i--) { fields[i] = "" }; n = 9
-		set_symbol(fields[2],fields[3],fields[4],fields[5],fields[6],fields[7],fields[8],fields[9],"cachefile")
-	    } else
-	    if (fields[1] == "set") {
-		if (n<3) { print_error("syntax error in cachefile: line = \"" line "\""); continue }
-		for (i=8;i>n;i--) { fields[i] = "" }; n = 8
-		set_symset(fields[2],fields[3],fields[4],fields[5],fields[6],fields[7],fields[8],"cachefile")
-	    } else
-	    if (fields[1] == "map") {
-		if (n<4) { print_error("syntax error in cachefile: line = \"" line "\""); continue }
-		for (i=5;i>n;i--) { fields[i] = "" }; n = 5
-		set_symmap(fields[2],fields[3],fields[4],fields[5],"cachefile")
-	    }
-	} else
-	    print_error("r: cachefile, bad line = \"" line "\"")
-    }
-    close(file)
-    print_debug(3,"result = " result)
-    if (result == -1)
-	print_vinfo(1,"r: cachefile, file not found")
-    else
+		print_error("r: cachefile, bad line = \"" line "\"")
+	}
+	close(file)
 	print_vinfo(1,"r: cachefile, syms " count_syms ", sets " count_sets)
-    return result
+	return 0
+    } else {
+	print_vinfo(1,"r: cachefile, file not found")
+	return -1
+    }
 }
 function write_cachefile(file,	    sym,set,line,count_syms,count_sets,count_maps)
 {
@@ -1116,16 +1117,16 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		print_error(sprintf(fmt, base, "unresolved", sym))
 	    } else {
 		if (values["rip-symbols"])
-		    print_warns(sprintf(fmt, base, "unexported", sym))
+		    print_vinfo(1,sprintf(fmt, base, "unexported", sym))
 		else
 		    print_error(sprintf(fmt, base, "unexported", sym))
 	    }
 	    continue
 	}
-	if (!(sym in kabi)) {
+	if (!(sym in kabi) && havekabi) {
 	    if (ownr[sym] != values["pkgdirectory"])
 		if (values["unsupported"])
-		    print_warns(sprintf(fmt, base, "unsupportd", sym))
+		    print_vinfo(1,sprintf(fmt, base, "unsupportd", sym))
 		else
 		    print_error(sprintf(fmt, base, "unsupportd", sym))
 	}
@@ -1154,7 +1155,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 	    }
 	    continue
 	}
-	if (!(sym in kabi)) {
+	if (!(sym in kabi) && havekabi) {
 	    if (ownr[sym] != values["pkgdirectory"]) {
 		if (values["unres-weak"])
 		    print_vinfo(1,sprintf(fmt, base, "weak unsup", sym))
@@ -1766,7 +1767,7 @@ BEGIN {
     count_errs = 0; count_warn = 0; errors = ""
     if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"
     if (ENVIRON["TERM"] == "dumb" || system("test -t 1 -a -t 2") != 0) {
-	stdout = "/dev/stderr"
+	stdout = "/dev/stdout"
 	stderr = "/dev/stderr"
 	cr = ""; lf = "\n"
 	blk = ""; hblk = ""
@@ -1811,7 +1812,7 @@ BEGIN {
     longopts["missing"      ] = "g"  ;								   defaults["missing"      ] = 0						; descrips["missing"      ] = "create missing system symsets (ksyms missing from kabi)"
     longopts["rip-symbols"  ] = "r"  ;								   defaults["rip-symbols"  ] = 1						; descrips["rip-symbols"  ] = "attempt to rip undefined symbols from system map (requires -F, implies -U)"
     longopts["rip-weak"     ] = "R"  ;								   defaults["rip-weak"     ] = 1						; descrips["rip-weak"     ] = "attempt to rip weak undefined symbols from system map (requires -F, implies -U)"
-    longopts["unres-weak"   ] = "b"  ;								   defaults["unres-weak"   ] = 0						; descrips["unres-weak"   ] = "allow unresolved weak symbols"
+    longopts["unres-weak"   ] = "b"  ;								   defaults["unres-weak"   ] = 1						; descrips["unres-weak"   ] = "allow unresolved weak symbols"
     longopts["unsupported"  ] = "U"  ;								   defaults["unsupported"  ] = 1						; descrips["unsupported"  ] = "permit use of (strong) unsupported (non-ABI) kernel exports"
     longopts["weak-symbols" ] = "w"  ;								   defaults["weak-symbols" ] = 1						; descrips["weak-symbols" ] = "resolve weak symbols (useful with -r and -U)"
     longopts["weak-versions"] = "W"  ;								   defaults["weak-versions"] = 1						; descrips["weak-versions"] = "version weak symbols (useful with -w)"
@@ -1957,14 +1958,16 @@ BEGIN {
 	if (("ksymsets" in values) && values["ksymsets"])
 	    read_symsets(values["ksymsets"], "kabi", "syssymset")
 	else {
-	    command = "find /boot /usr/src/kernels -name 'symsets-" kversion ".tar.gz'"
-	    while ((result = (command | getline file)) == 1) {
-		if (system("test -r '" file "'") == 0) {
-		    read_symsets(file, "kabi", "syssymset")
-		    break
-		}
+	    havekabi = 0
+	    file = "symsets-" kversion ".tar.gz"
+	    if (system("test -r /boot/" file) == 0) {
+		read_symsets("/boot/" file, "kabi", "syssymset")
+		havekabi = 1
 	    }
-	    if (result != -1) close(command)
+	    if (system("test -r /lib/modules/" kversion "/build/" file) == 0) {
+		read_symsets("/lib/modules/" kversion "/build/" file, "kabi", "syssymset")
+		havekabi = 1
+	    }
 	}
     }
     if (("modules" in values) && values["modules"]) {

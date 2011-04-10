@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# The purpose of this script is to invoke the openss7-modules awk script with
+# the necessary arguments depending upon how it was called.
+
+if [ "$0" = "/sbin/openss7-update" ] ; then
+	gawk -f /sbin/openss7-modules -- $@ || exit $?
+elif [ "$0" = "/etc/kernel/postinst.d/openss7-update" ] ; then
+	gawk -f /sbin/openss7-modules -- -q -e --add-kernel "$1" || exit $?
+elif [ "$0" = "/etc/kernel/prerm.d/openss7-update" ] ; then
+	gawk -f /sbin/openss7-modules -- -q -e --remove-kernel "$1" || exit $?
+elif [ "$0" = "/etc/kernel/postrm.d/openss7-update" ] ; then
+	gawk -f /sbin/openss7-modules -- -q -e --remove-kernel "$1" || exit $?
+else
+	# this is an in-place call.
+	dir=`dirname $0`
+	gawk -f $dir/../../scripts/openss7-modules -- $@ || exit $?
+fi
+

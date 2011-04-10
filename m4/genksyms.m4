@@ -328,6 +328,70 @@ MODPOST_KSYMSETS="$MODPOST_KSYMSETS"
 # =============================================================================
 
 # =============================================================================
+# _KSYMS_OUTPUT_UPDATES_CONFIG
+# -----------------------------------------------------------------------------
+AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
+    AC_CACHE_CHECK([for updates script], [ksyms_cv_updates_script], [dnl
+	ksyms_dir="`(cd $ac_aux_dir; pwd)`"
+	ksyms_cv_updates_script="$ksyms_dir/openss7-modules"])
+    UPDATES_SCRIPT="$ksyms_cv_updates_script"
+    AC_SUBST([UPDATES_SCRIPT])dnl
+    AC_CACHE_CHECK([for updates command], [ksyms_cv_updates_command], [dnl
+	ksyms_cv_updates_command="${AWK:-gawk} -f $UPDATES_SCRIPT --"])
+    UPDATES="$ksyms_cv_updates_command"
+    AC_SUBST([UPDATES])dnl
+    AC_CACHE_CHECK([for updates options], [ksyms_cv_updates_options], [dnl
+	case "$target_vendor" in
+	    (centos|lineox|whitebox|redhat|fedora)
+		ksyms_cv_updates_options='--style=redhat' ;;
+	    (suse|opensuse|sles|sled)
+		ksyms_cv_updates_options='--style=suse11' ;;
+	    (debian|ubuntu|*)
+		ksyms_cv_updates_options='--style=debian' ;;
+	esac])
+    UPDATES_OPTIONS="${ksyms_cv_updates_options:+ $ksyms_cv_updates_options}"
+    AC_SUBST([UPDATES_OPTIONS])dnl
+    AC_CACHE_CHECK([for updates directory], [ksyms_cv_updates_directory], [dnl
+	AC_ARG_WITH([k-updates],
+	    [AS_HELP_STRING([--with-k-updates=DIR],
+		[kernel update script directory @<:@default=/etc/kernel@:>@])])
+	if test :"${with_k_updates:-no}" != :no
+	then
+	    ksyms_cv_updates_directory="$with_k_updates"
+	else
+	    eval "k_updatedir_search_path=\"
+		${DESTDIR}${rootdir}/etc/kernel
+		${DESTDIR}/etc/kernel\""
+	    k_updatedir_search_path=`echo "$k_updatedir_search_path" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+	    ksyms_cv_updates_directory=
+	    for ksyms_dir in $k_updatedir_search_path
+	    do
+		AC_MSG_CHECKING([for updates directory... $ksyms_dir])
+		if test -d "$ksyms_dir" -a \( -d "$ksyms_dir/postinst.d" -o -d "$ksyms_dir/postrm.d" \)
+		then
+		    ksyms_cv_updates_directory="$ksyms_dir"
+		    AC_MSG_RESULT([yes])
+		    break
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	fi
+	if test :"${ksyms_cv_updates_directory:-no}" = :no -o ! -d "$ksyms_cv_updates_directory"
+	then
+	    case "$target_vendor" in
+		(debian|unbuntu)
+		(*) ;;
+	    esac
+	fi
+	AC_MSG_CHECKING([for updates directory])
+    ])
+    kupdatedir="$ksyms_cv_updates_directory"
+    AC_SUBST([kupdatedir])dnl
+    AM_CONDITIONAL([KERNEL_UPDATES], [test :"${ksyms_cv_updates_directory:-no}" != :no])dnl
+])# _KSYMS_OUTPUT_UPDATES_CONFIG
+# =============================================================================
+
+# =============================================================================
 # _KSYMS_OUTPUT_SYMSETS_CONFIG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_KSYMS_OUTPUT_SYMSETS_CONFIG], [dnl
@@ -374,6 +438,7 @@ AC_DEFUN([_KSYMS_OUTPUT], [dnl
 dnl _KSYMS_OUTPUT_MODSYMS_CONFIG
     if test :${linux_cv_k_ko_modules:-no} = :yes ; then
 	_KSYMS_OUTPUT_MODPOST_CONFIG
+	_KSYMS_OUTPUT_UPDATES_CONFIG
 dnl	_KSYMS_OUTPUT_SYMSETS_CONFIG
     else
 	MODVERSIONS_H="${PKGINCL}/modversions.h"

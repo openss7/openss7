@@ -1635,17 +1635,45 @@
 %{?extrarelease2:  %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@%%{extrarelease2}}}
 %{!?extrarelease2: %{expand: %%global fullrelease2 @PACKAGE_RPMRELEASE@}}
 
+#global kernel_release %{fullrelease}
+#global kernel_package kmod-%{name}%{kernel_flavor}
+#global kernel_develop kmod-%{name}%{kernel_flavor}-devel
+#global kernel_buginfo kmod-%{name}%{kernel_flavor}-debuginfo
+#global kernel_bugsrce kmod-%{name}%{kernel_flavor}-debugsource
+#global kernel_sourcep kmod-%{name}%{kernel_flavor}-source
+
 %global kernel_release %(echo '.%{_kversion}' | sed -e 'y,-,.,')
+%global kernel_package %{name}-kmod%{kernel_flavor}
+%global kernel_develop %{name}-kmod%{kernel_flavor}-devel
+%global kernel_buginfo %{name}-kmod%{kernel_flavor}-debuginfo
+%global kernel_bugsrce %{name}-kmod%{kernel_flavor}-debugsource
+%global kernel_sourcep %{name}-kmod%{kernel_flavor}-source
 %global kfullrelease  %{rpmrelease}%{kernel_release}
 
 %if %{HAVE_zypprepo}
 %global kernel_release %{nil}
+%global kernel_package %{name}-kmp%{kernel_flavor}
+%global kernel_develop %{name}-kmp%{kernel_flavor}-devel
+%global kernel_buginfo %{name}-kmp%{kernel_flavor}-debuginfo
+%global kernel_bugsrce %{name}-kmp%{kernel_flavor}-debugsource
+%global kernel_sourcep %{name}-kmp%{kernel_flavor}-source
 %global kfullrelease  %{fullrelease}
 %endif
 %if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
 %global kernel_release %{nil}
+%global kernel_package %{name}-kmp%{kernel_flavor}
+%global kernel_develop %{name}-kmp%{kernel_flavor}-devel
+%global kernel_buginfo %{name}-kmp%{kernel_flavor}-debuginfo
+%global kernel_bugsrce %{name}-kmp%{kernel_flavor}-debugsource
+%global kernel_sourcep %{name}-kmp%{kernel_flavor}-source
 %global kfullrelease  %{fullrelease}
 %endif
+
+#global kernel_package %{name}-kernel%{kernel_flavor}
+#global kernel_develop %{name}-devel-kernel%{kernel_flavor}
+#global kernel_buginfo %{name}-debuginfo-kernel%{kernel_flavor}
+#global kernel_bugsrce %{name}-debugsource-kernel%{kernel_flavor}
+#global kernel_sourcep %{name}-source-kernel%{kernel_flavor}
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
@@ -1861,17 +1889,17 @@ the following binary packages:
 %{?need_debug:   -- binary application and library debug source.}
 %{?need_wrap: - %{name}-wrapper}
 %{?need_wrap:   -- kernel modules for a specific kernel.}
-%{?need_wrap: - %{name}-kernel}
+%{?need_wrap: - %{kernel_package}}
 %{?need_wrap:   -- kernel modules for a range of kernels.}
-%{!?need_wrap:%{?need_kmod: - %{name}-kernel}}
+%{!?need_wrap:%{?need_kmod: - %{kernel_package}}}
 %{!?need_wrap:%{?need_kmod:   -- kernel modules for a specific kernel.}}
-%{?need_kdev: - %{name}-devel-kernel}
+%{?need_kdev: - %{kernel_develop}}
 %{?need_kdev:   -- kernel module info for a specific kernel.}
-%{?need_kbug: - %{name}-debuginfo-kernel}
+%{?need_kbug: - %{kernel_buginfo}}
 %{?need_kbug:   -- kernel module debug info for a specific kernel.}
-%{?need_kbug: - %{name}-debugsource-kernel}
+%{?need_kbug: - %{kernel_bugsrce}}
 %{?need_kbug:   -- kernel module debug source for a specific kernel.}
-%{?need_ksrc: - %{name}-source-kernel}
+%{?need_ksrc: - %{kernel_sourcep}}
 %{?need_ksrc:   -- source configured for a specific kernel.}
 %{?need_java: - %{name}-java}
 %{?need_java:   -- JAIN java modules, JNI/CNI libraries, and native Java modules.}
@@ -2253,7 +2281,10 @@ package_symvers () {
 # create symbol versions file
     cat System.symvers Module.symvers | gzip > $d/symvers-%{_kversion}.gz
 # copy in symbol sets file
-    cp -p symsets-%{_kversion}.tar.gz $d
+    cp -p symsets-%{name}-%{_kversion}.tar.gz $d
+# copy in symbol sets file to boot directory as well
+    mkdir -p %{buildroot}/boot
+    cp -p symsets-%{name}-%{_kversion}.tar.gz %{buildroot}/boot
 # copy in modpost cache file for reference
     cp -p %{_builddir}/%{mpost_file} $d
 }
@@ -2362,9 +2393,9 @@ Requires(prereq):   zypper
 
 %if %{FILES_repo}
 Requires(prereq):   wget
-Requires(pre):      %(type -p wget)
-Requires(pre):      %(type -p sed)
-Requires(pre):      %(type -p awk)
+Requires(pre):      %(which wget)
+Requires(pre):      %(which sed)
+Requires(pre):      %(which awk)
 %endif
 
 Provides:       %{name}-repo    = %{epoch}:%{baseversion}-%{fullrelease}
@@ -2837,10 +2868,10 @@ if [ $1 = 1 ] ; then : # fresh install
     done
 %endif
 #if %{FILES_manpages}
-#   if type -p makewhatis >/dev/null 2>&1 ; then
+#   if which makewhatis >/dev/null 2>&1 ; then
 #       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
 #   fi
-#   if type -p mandb >/dev/null 2>&1 ; then
+#   if which mandb >/dev/null 2>&1 ; then
 #       LANGUAGE= LANG= mandb -p %{_mandir} || :
 #   fi
 #endif
@@ -3221,10 +3252,10 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 #if %{FILES_manpages}
-#   if type -p makewhatis >/dev/null 2>&1 ; then
+#   if which makewhatis >/dev/null 2>&1 ; then
 #       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
 #   fi
-#   if type -p mandb >/dev/null 2>&1 ; then
+#   if which mandb >/dev/null 2>&1 ; then
 #       LANGUAGE= LANG= mandb -p %{_mandir} || :
 #   fi
 #endif
@@ -3349,10 +3380,10 @@ if [ $1 = 1 ] ; then : # fresh install
     fi
 %endif
 #if %{FILES_manpages}
-#   if type -p makewhatis >/dev/null 2>&1 ; then
+#   if which makewhatis >/dev/null 2>&1 ; then
 #       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
 #   fi
-#   if type -p mandb >/dev/null 2>&1 ; then
+#   if which mandb >/dev/null 2>&1 ; then
 #       LANGUAGE= LANG= mandb -p %{_mandir} || :
 #   fi
 #endif
@@ -3397,10 +3428,10 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 #if %{FILES_manpages}
-#   if type -p makewhatis >/dev/null 2>&1 ; then
+#   if which makewhatis >/dev/null 2>&1 ; then
 #       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
 #   fi
-#   if type -p mandb >/dev/null 2>&1 ; then
+#   if which mandb >/dev/null 2>&1 ; then
 #       LANGUAGE= LANG= mandb %{_mandir} || :
 #   fi
 #endif
@@ -3476,7 +3507,7 @@ Prefix:             %{_localedir}
 Requires(pre):      /sbin/ldconfig
 Requires(post):     /sbin/ldconfig
 Requires(postun):   /sbin/ldconfig
-Requires(post):     %(type -p tclsh)
+Requires(post):     %(which tclsh)
 
 %if %{NEED_kmod}
 Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{fullrelease}
@@ -3839,7 +3870,7 @@ this package.
 %endif
 
 # ===========================================================================
-%package kernel%{kernel_flavor}
+%package -n %{kernel_package}
 # ---------------------------------------------------------------------------
 # Note that we should not call this just %{name}-%{_kversion}.  The package
 # should be named for proper automatic kernel module package loading under
@@ -3917,12 +3948,24 @@ Requires(postun):   modutils
 #Requires(postun):   @DEPMOD@
 #Requires(postun):   @INSMOD@
 
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%if %{HAVE_oldmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 %if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%endif
+
+%if %{HAVE_newmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%if %{HAVE_yumrepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%if %{HAVE_zypprepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
 %endif
 
 %if %{NEED_lib}
@@ -3994,9 +4037,9 @@ Version:        %{kbaseversion}
 Release:        %{kfullrelease}
 
 # ---------------------------------------------------------------------------
-%description kernel%{kernel_flavor}
+%description -n %{kernel_package}
 %{descripline}
-The %{name}-kernel%{kernel_flavor} binary package contains the kernel modules that
+The %{kernel_package} binary package contains the kernel modules that
 provide the Linux kernel %{stitle} drivers and modules.  This includes
 assorted drivers and modules for STREAMS and additional %{title}
 protocol suite components.  This binary package also includes modprobe
@@ -4009,7 +4052,7 @@ for your kernel from the %{name} package source rpm.
 %{descriptail}
 
 %if %{FILES_modules}
-%pre kernel%{kernel_flavor}
+%pre -n %{kernel_package}
 # ---------------------------------------------------------------------------
 arg="$1"
 remove_depmods () {
@@ -4112,7 +4155,7 @@ fi
 %endif
 
 %if %{FILES_modules}
-%post kernel%{kernel_flavor}
+%post -n %{kernel_package}
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
@@ -4147,7 +4190,7 @@ fi
 %endif
 
 %if %{FILES_modules}
-%preun kernel%{kernel_flavor}
+%preun -n %{kernel_package}
 # ---------------------------------------------------------------------------
 remove_depends() {
     local modrex depend depends
@@ -4219,7 +4262,7 @@ fi
 %endif
 
 %if %{FILES_modules}
-%postun kernel%{kernel_flavor}
+%postun -n %{kernel_package}
 # ---------------------------------------------------------------------------
 remove_depends() {
     local modrex depend depends
@@ -4287,7 +4330,7 @@ fi
 %endif
 
 %if %{FILES_weakmods}
-%triggerin -n %{name}-kernel%{kernel_flavor} -- %{kernel_trigger}
+%triggerin -n %{kernel_package} -- %{kernel_trigger}
 # ---------------------------------------------------------------------------
 d=%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}
 if [ -f $d/System.symvers -a -f $d/Module.symvers ] ; then
@@ -4299,7 +4342,7 @@ done
 %endif
 
 %if %{FILES_weakmods}
-%triggerun -n %{name}-kernel%{kernel_flavor} -- %{kernel_trigger}
+%triggerun -n %{kernel_package} -- %{kernel_trigger}
 # ---------------------------------------------------------------------------
 if [ $2 = 0 ] ; then : # kernel being removed
     for wm in /sbin/weak-modules /usr/lib/module-init-tools/weak-modules ; do
@@ -4324,7 +4367,7 @@ fi
 %endif
 
 %if %{FILES_weakmods}
-%triggerpostun -n %{name}-kernel%{kernel_flavor} -- %{kernel_trigger}
+%triggerpostun -n %{kernel_package} -- %{kernel_trigger}
 # ---------------------------------------------------------------------------
 if [ $2 = 0 ] ; then : # kernel being removed
     for wm in /usr/lib/module-init-tools/weak-modules2 ; do
@@ -4341,7 +4384,7 @@ fi
 %endif
 
 %if %{PACKAGE_kmod}
-%files kernel%{kernel_flavor}
+%files -n %{kernel_package}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_modules:%dir %{_kmoduledir}/%{base}}
@@ -4353,7 +4396,7 @@ fi
 %endif
 
 # ===========================================================================
-%package devel-kernel%{kernel_flavor}
+%package -n %{kernel_develop}
 # ---------------------------------------------------------------------------
 # Note that we should not call this just %{name}-devel-%{_kversion}.  The
 # package should be named for proper automatic kernel module package loading
@@ -4387,14 +4430,27 @@ Obsoletes:          kmod%{kernel_flavor}-devel
 Obsoletes:          kernel-module-%{name}-devel%{kernel_flavor}
 Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%if %{HAVE_oldmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 %if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
-%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+
+%if %{HAVE_newmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%if %{HAVE_yumrepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%if %{HAVE_zypprepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
 
 %if %{NEED_devel}
 Requires(prereq):   %{name}-devel   = %{epoch}:%{baseversion}-%{fullrelease}
@@ -4457,9 +4513,9 @@ Version:            %{kbaseversion}
 Release:            %{kfullrelease}
 
 # ---------------------------------------------------------------------------
-%description devel-kernel%{kernel_flavor}
+%description -n %{kernel_develop}
 %{descripline}
-The %{name}-devel-kernel%{kernel_flavor} binary package contains the kernel modules
+The %{kernel_develop} binary package contains the kernel modules
 symbol information for development of additional STREAMS kernel modules
 against the core kernel modules included in the %{_kversion} binary
 package.  This package is heavily tied to the core kernel modules and
@@ -4471,7 +4527,7 @@ this package or when debugging kernel modules contained in the package.
 %{descriptail}
 
 %if %{PACKAGE_kdev}
-%files devel-kernel%{kernel_flavor}
+%files -n %{kernel_develop}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
 #{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
@@ -4486,13 +4542,14 @@ this package or when debugging kernel modules contained in the package.
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/%{cache_file}}
 #{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/System.symvers}
 #{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Module.symvers}
-%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/symsets-%{_kversion}.tar.gz}
+%{?files_symvers:/boot/symsets-%{name}-%{_kversion}.tar.gz}
+%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/symsets-%{name}-%{_kversion}.tar.gz}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Modules.map}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/%{mpost_file}}
 %endif
 
 # =============================================================================
-%package debuginfo-kernel%{kernel_flavor}
+%package -n %{kernel_buginfo}
 
 Summary:            %{title} kernel module debugging information.
 Group:              Development/Kernel
@@ -4506,12 +4563,24 @@ Autoprov:           true
 %{?files_modules:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 %endif
 
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%if %{HAVE_oldmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 %if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%endif
+
+%if %{HAVE_newmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%if %{HAVE_yumrepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%if %{HAVE_zypprepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
 %endif
 
 %if %{NEED_debug}
@@ -4575,22 +4644,22 @@ Version:            %{kbaseversion}
 Release:            %{kfullrelease}
 
 # ---------------------------------------------------------------------------
-%description debuginfo-kernel%{kernel_flavor}
+%description -n %{kernel_buginfo}
 %{descripline}
-The %{name}-debuginfo-kernel%{kernel_flavor} binary package contains
+The %{kernel_buginfo} binary package contains
 debugging symbols for kernel modules.  This package provides debug
 information for package %{name}-kernel%{kernel_flavor}.  Debug
 information is useful when developing kernel modules that use this
 package or when debugging this package.
 
 %if %{PACKAGE_kbug}
-%files debuginfo-kernel%{kernel_flavor}
+%files -n %{kernel_buginfo}
 %{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug}}}
 %{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug}}}
 %endif
 
 # =============================================================================
-%package debugsource-kernel%{kernel_flavor}
+%package -n %{kernel_bugsrce}
 
 Summary:            %{title} kernel module debugging source.
 Group:              Development/Kernel
@@ -4603,12 +4672,24 @@ Autoprov:           true
 %{?files_modules:Prefix:               %{_usrsrc}/debug}
 %endif
 
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%if %{HAVE_oldmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 %if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%endif
+
+%if %{HAVE_newmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%if %{HAVE_yumrepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%if %{HAVE_zypprepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
 %endif
 
 %if %{NEED_debug}
@@ -4676,21 +4757,21 @@ Version:        %{kbaseversion}
 Release:        %{kfullrelease}
 
 # ---------------------------------------------------------------------------
-%description debugsource-kernel%{kernel_flavor}
+%description -n %{kernel_bugsrce}
 %{descripline}
-The %{name}-debugsource-kernel%{kernel_flavor} binary package contains
+The %{kernel_bugsrce} binary package contains
 source code for debugging kernel modules.  This package provides debug
 information for package %{name}-kernel%{kernel_flavor}.  Debug
 information is useful when developing kernel modules that use this
 package or when debugging this package.
 
 %if %{PACKAGE_kbug}
-%files debugsource-kernel%{kernel_flavor}
+%files -n %{kernel_bugsrce}
 %{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
 %endif
 
 # =============================================================================
-%package source-kernel%{kernel_flavor}
+%package -n %{kernel_sourcep}
 # -----------------------------------------------------------------------------
 # -----------------------------------------------------------------------------
 
@@ -4714,15 +4795,29 @@ Obsoletes:          %{name}-source-kmod%{kernel_flavor}
 
 # We require that the corresponding kernel be installed, otherwise, the source
 # will not be usable for more than inspection.
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%if %{HAVE_oldmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 %if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 # The configured source is not usable witnout the corresponding kernel development package.
-%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" 2>/dev/null || :)
+%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+
+%if %{HAVE_newmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%if %{HAVE_yumrepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%if %{HAVE_zypprepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+# The configured source is not usable witnout the corresponding kernel development package.
+%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
 
 %if %{HAVE_yumrepo}
 # This is a signal to yum that rpm packages are to be installed rather than
@@ -4772,9 +4867,9 @@ Version:            %{kbaseversion}
 Release:            %{kfullrelease}
 
 # -----------------------------------------------------------------------------
-%description source-kernel%{kernel_flavor}
+%description -n %{kernel_sourcep}
 %{descripline}
-The %{name}-source-kernel%{kernel_flavor} binary package contains the source code
+The %{kernel_sourcep} binary package contains the source code
 necessary for building the %{name} release for the kernel version
 %{_kversion}.  It also includes the autoconf configuration
 utilities necessary to create and distribute this rpm.  However,
@@ -4784,7 +4879,7 @@ that are not present in the %{name}-devel-kernel package.
 %{descriptail}
 
 %if %{PACKAGE_ksrc}
-%files source-kernel%{kernel_flavor}
+%files -n %{kernel_sourcep}
 # -----------------------------------------------------------------------------
 %defattr(-,root,root)
 %{?files_sourcefiles:%dir %{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}}
