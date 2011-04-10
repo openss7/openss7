@@ -976,6 +976,13 @@ Archival copies are no longer available from the OpenSS7 Project.
 @chapter Reference
 @cindex reference
 
+The @cite{@value{PACKAGE_TITLE}} package provides a wide range of components and their associated
+kernel modules implemented as @acronym{STREAMS} drivers and modules, associated user-space libraries
+and utilities, configuration files, SNMP agents, Java interfaces, and other associated pieces.  This
+chapter enumerates the contents of the package; however, this chapter is not often updated, so
+additional components may be available that are not listed here.  The protocol suite manuals, and
+package manual pages are a better source of information as they are updated regularly.
+
 @menu
 * Components::			Components included in the package
 * Files::			Files included in the package
@@ -994,9 +1001,67 @@ Archival copies are no longer available from the OpenSS7 Project.
 
 Following is a list of major components contained in the @dfn{@value{PACKAGE_TITLE}} package:
 
-@menu
-@end menu
+@table @var
+@item STREAMS
+This suite provides all of the facilities necessary to provide @cite{Linux Fast-STREAMS}.
 
+@item TTY
+This suite provides all of the facilities necessary to provide the core @acronym{STREAMS}
+drivers and modules written to the specifications of the @cite{SVR 4 Terminal Subsystem}.
+
+@item XNS
+This suite provides the capabiities first found in @cite{UNIX System V Release 4} that form part
+of the @dfn{X/Open Networking Services (XNS)} at the @dfn{CDI}, @dfn{DLPI} and @dfn{NPI} levels.
+
+@item XNET
+This suite provides the capabilities first found in @cite{UNIX System V Release 4} that form part of
+the @dfn{Transport Provider Interface (TPI)} networking capabilities.
+
+@item SOCK
+This suite provides the capabilities first found in @cite{UNIX System V Release 4} that form part of
+the @cite{POSIX Sockets} networking capabilities.
+
+@item INET
+This suite provides the capabilities for @dfn{XTIOS (XTI over Sockets)} as well as direct
+@acronym{STREAMS} implementations of Internet protocols.
+
+@item SCTP
+This suite provides the @acronym{STREAMS} implementation of the @dfn{Stream Control Transmission Protocol (SCTP)}.
+
+@item CHAN
+This suite provides the capabilities for @cite{Isochronous Channels}.
+
+@item X25
+This suite provides various protocol components in the @cite{International Standards Organization
+(ISO)} @cite{X.25} model, and a number of @cite{Internet Enginerring Task Force} related
+protocols.
+
+@item ISO
+This suite provides various protocol components in the @cite{International Standards Organization
+(ISO)} @cite{Open Systems Interconnect} model, and a number of @cite{Internet Enginerring Task
+Force} related protocols.
+
+@item ISDN
+This suite provides various protocol components in, or related to, the @cite{Integrated Services
+Digital Network}.
+
+@item ATM
+This suite provides various protocol components in, or related to, the @cite{Asynchronous Transfer
+Mode (ATM)}.
+
+@item SS7
+This suite provides various protocol components in, or related to, the @cite{Signalling System
+Number 7 (SS7)}.
+
+@item SIGTRAN
+This suite provides various protocol components of @cite{Signalling Transport (SIGTRAN)} and related
+SS7 over IP protocols.
+
+@item VOIP
+This suite provides various protocol components for @cite{Voice over IP} and related
+protocols.
+
+@end table
 
 @node Files
 @section Files
@@ -2016,183 +2081,10 @@ The static version of the library,
 @node Kernel Module Development
 @section Kernel Modules
 
-@menu
-* Using Kbuild::
-* Kernel Module Updates::
-* Kernel Module Packages::
-@end menu
+@include kmod.texi
 
-Developing Linux Fast-STREAMS kernel modules is similar to user space programs with regard to header
-files.  @file{/usr/include/openss7} should be placed as an include directory to search on the
-@command{gcc} command line.  The rules for compiling @cite{Linux} kernel modules and the rules for
-compiling @acronym{STREAMS} modules and drivers should be followed.  In particular, several
-important intricacies should be considered:
-
-@itemize @bullet
-
-@item The @command{gcc} compiler used to compile the kernel modules must be the same version of
-compiler that was used to compile the kernel and @acronym{STREAMS} base package.
-
-@item The @command{gcc} command line must have the same compile flags that were used to compile the
-kernel and @acronym{STREAMS} base package.  @command{kbuild} can be used to accomplish this.
-
-@item The @command{gcc} command line must define several important kernel defines including
-@samp{-DLINUX}, @samp{-D__KERNEL__}, as well as the base name of the module.  Again, @command{kbuild}
-can be used to accomplish this.
-
-@item The @command{gcc} command line must include several important files directly on the command
-line, such as, @samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-autoconf.h} and
-@samp{--include /@-lib/@-modules/@-@value{_kversion}/@-build/@-include/@-linux/@-modversions.h}.@footnote{The
-kernel version, @samp{@value{_kversion}}, is just an example.  For the running kernel, use the
-output of @samp{uname -r}.}
-
-@end itemize
-
-@node Using Kbuild
-@subsection Using Kbuild
-
-Support is provided for the development of Linux Fast-STREAMS kernel modules using @cite{Kbuild}.
-
-@ref{example:kbuild} provides an example listing of a @cite{Kbuild} makefile for building the
-@file{example} driver.
-
-@cartouche
-@float Example,example:kbuild
-@caption{@emph{Example Kbuild Makefile}}
-@smallexample
-MDIR := $(PWD)
-KDIR := /lib/modules/$(shell uname -r)/build
-obj-m := streams_example.o
-streams_example-objs := example.o
-moduledir = /lib/modules/$(shell uname -r)/extras/
-
-all: modules
-modules:
-	rm -f -- Module.symvers
-        ln -s /usr/src/openss7/$(shell uname -r)/Module.symvers .
-        $(MAKE) -C $(KDIR) M=$(MDIR) modules MODFLAGS='-DMODULE -I/usr/include/openss7'
-
-clean-modules:
-        rm -f -- example.o
-        rm -f -- .example.o.cmd
-        rm -f -- Module.markers
-        rm -f -- Module.symvers
-        rm -f -- streams_example.ko
-        rm -f -- .streams_example.ko.cmd
-        rm -f -- streams_example.mod.c
-        rm -f -- streams_example.mod.o
-        rm -f -- .streams_example.mod.o.cmd
-        rm -f -- streams_example.o
-        rm -f -- .streams_example.o.cmd
-        rm -rf -- .tmp_versions
-
-install-modules:
-	mkdir -p $(moduledir)
-        cp streams_example.ko $(moduledir)/streams_example.ko
-        depmod -ae
-        
-remove-modules:
-        rm -f -- $(moduledir)/streams_example.ko
-@end smallexample
-@end float
-@end cartouche
-
-Note that the necessary header files are contained in the @file{@value{PACKAGE}-devel} binary
-package, and the needed @file{Module.symvers} file is contained in the
-@file{@value{PACKAGE}-devel-$(uname -r)} package.
-
-@node Kernel Module Updates
-@subsection Kernel Module Updates
-@cindex kernel module updates
-
-Kernel modules can be built and installed so that they are automatically updated when kernels are
-updated (primarily for security updates), without having to be recompiled or reinstalled.
-
-@subsubsection RedHat Systems
-
-On recent @cite{RedHat} distributions and clones (e.g., @cite{Fedora}, @cite{RHEL}, @cite{CentOS}),
-this can be accomplished without building an RPM, by simply installing the kernel modules into
-@file{/lib/modules/$(uname -r)/extras}, where @file{$(uname -r)} is the name of the kernel for which
-the modules were compiled.  When the kernel is updated, the script @file{/sbin/weak-modules} will be
-run and will examine modules contained int he @file{extras} sub-directory for other kernel versions
-and determine whether the new kernel (and compatible modules) provides the same symbols as the old
-kernel (and compatible modules).  When the new kernel supports the older module, a symbolic link is
-added to the @file{/lib/modules/@i{newversion}/weak-updates} sub-directory that link to the module
-in the older kernel's @file{/lib/modules/@i{oldversion}/extras} sub-directory.
-
-On @cite{RedHat} systems it is also possible to provide weak updates by creating kernel module
-packages.  @xref{Kernel Module Packages}.
-
-@subsubsection SuSE Systems
-
-On recent @cite{SUSE} distributiones (e.g., @cite{SLES}, @cite{SLED}, @cite{OpenSUSE}), weak updates
-cannot be accomplished without building a kernel module package (KMP) RPM.  @xref{Kernel Module
-Packages}.
-
-@node Kernel Module Packages
-@subsection Kernel Module Packages
-@cindex kernel module packages
-@cindex KMP
-
-On recent distributions, it is possible to create a kernel module package (KMP) RPM for STREAMS
-modules or drivers in a very easy and straight-forward way.
-
-@cartouche
-@float Example,example:kmp
-@caption{@emph{Example Kernel Module Package}}
-@smallexample
-@verbatim
-# norootforbuild
-
-Name: STREAMS module example
-BuildRequires: %kernel_module_package_buildreqs
-License: GPL
-Group: System/Kernel
-Summary: Sample STREAMS module Kernel Module Package
-Version: 1.0
-Release: 0
-Source0: %{name}-%{version}.tar.bz2
-BuildRoot: %{_tmppath}/%{name}-%{version}-build
-
-%kernel_module_package -x debug -x trace
-
-%description
-This package contains the streams_example.ko module.
-
-%prep
-%setup
-set -- *
-mkdir source
-mv "$@" source/
-mkdir obj
-
-%build
-for flavor in %flavors_to_build; do
-    rm -rf obj/$flavor
-    cp -r source obj/$flavor
-    make -C obj/$flavor
-done
-
-%install
-export INSTALL_MOD_PATH=$RPM_BUILD_ROOT
-export ISNTALL_MOD_DIR=updates
-for flavor in %flavors_to_build; do
-    make -C obj/$flavor install-modules
-done
-
-%changelog
-*  Tue Feb 15 2011 - bidulock@openss7.org
-- Initial package.
-@end verbatim
-@end smallexample
-@end float
-@end cartouche
-
-@noindent
-The example uses several macros that are now commonly provided by both @cite{RedHat} and @cite{SUSE}
-systems (although they are implemented different ways).  Kernel module packages that are build in
-this way will have @command{weak-module} or @command{weak-module2} updates applied when installed
-and when a kernel is installed.
+@c ----------------------------------------------------------------------------
+@c ----------------------------------------------------------------------------
 
 @node Manual Pages
 @section Manual Pages

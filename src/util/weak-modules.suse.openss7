@@ -1,0 +1,325 @@
+#! /bin/bash
+
+# This script is only needed to uninstall old KMPs when updating
+# SLE10 to SLE11+. weak-modules2 is the script what should be used by new
+# packages
+
+unset LANG LC_ALL LC_COLLATE
+
+NM=
+if command -v nm >/dev/null; then
+    NM=nm
+elif command -v eu-nm >/dev/null; then
+    NM=eu-nm
+else
+    echo "ERROR: nm not found" >&2
+    exit 1
+fi
+
+# Check if MODULE is compatible with kernel release KREL.
+module_is_compatible() {
+    declare module=$1 krel=$2 module_krel=$(krel_of_module "$module")
+
+    if [ ! -e $tmpdir/all-symvers-$krel-$module_krel ]; then
+	# Symbols exported by the "new" kernel
+	if [ ! -e $tmpdir/symvers-$krel ]; then
+	    if [ -e /boot/symvers-$krel.gz ]; then
+		zcat /boot/symvers-$krel.gz \
+		| sed -r -ne 's:^0x0*([0-9a-f]+\t[0-9a-zA-Z_]+)\t.*:\1:p'
+	    fi > $tmpdir/symvers-$krel
+	fi
+
+	# Symbols that other add-on modules of the "old" kernel export
+	# (and that this module may require)
+	if [ ! -e $tmpdir/extra-symvers-$module_krel ]; then
+	    if [ -e /lib/modules/$module_krel/updates ]; then
+		find /lib/modules/$module_krel/updates -name '*.ko' \
+		| xargs $NM -B \
+		| sed -nre 's:^0*([0-9a-f]+) A __crc_(.*):\1 \2:p'
+	    fi > $tmpdir/extra-symvers-$module_krel
+	fi
+
+	sort -u $tmpdir/symvers-$krel $tmpdir/extra-symvers-$module_krel \
+	> $tmpdir/all-symvers-$krel-$module_krel
+    fi
+
+    # If the module does not have modversions enabled, $tmpdir/modvers
+    # will be empty.
+    /sbin/modprobe --dump-modversions "$module" \
+    | sed -r -e 's:^0x0*([0-9a-f]+\t.*):\1:' \
+    | sort -u \
+    > $tmpdir/modvers
+
+    # Only include lines of the second file in the output that don't
+    # match lines in the first file. (The default separator is
+    # <space>, so we are matching the whole line.)
+    join -j 1 -v 2 $tmpdir/all-symvers-$krel-$module_krel \
+		   $tmpdir/modvers > $tmpdir/join
+
+    if [ ! -s $tmpdir/modvers ]; then
+	echo "Warning: Module ${module##*/} from kernel $module_krel has no" \
+	     "modversions, so it cannot be reused for kernel $krel" >&2
+    elif [ -s $tmpdir/join ]; then
+	[ -n "$verbose" ] &&
+	echo "Module ${module##*/} from kernel $module_krel is not compatible" \
+	     "with kernel $krel in symbols:" $(sed -e 's:.* ::' $tmpdir/join)
+    elif [ "$krel" != "$module_krel" ]; then
+	[ -n "$verbose" ] &&
+	echo "Module ${module##*/} from kernel $module_krel is compatible" \
+	     "with kernel $krel"
+	return 0
+    fi
+    return 1
+}
+
+# Compute the kernel release of a module.
+krel_of_module() {
+    declare module=$1
+    set -- $(/sbin/modinfo -F vermagic "$module")
+    echo "$1"
+}
+
+# Read a list of modules from standard input, convert the filenames into
+# absolute names, and compute the kernel release of each module.
+read_modules_list() {
+    local saved_IFS=$IFS
+    IFS=$'\n'
+    modules=($(cat))
+    IFS=$saved_IFS
+
+    for ((n = 0; n < ${#modules[@]}; n++)); do
+	if [ ${modules[n]:0:1} != / ]; then
+	    modules[n]=$PWD/${modules[n]}
+	fi
+	if [ -f "${modules[n]}" ]; then
+	    module_krels[n]=$(krel_of_module "${modules[n]}")
+	else
+	    # Try to extract the kernel release from the path
+	    set -- "${modules[n]#/lib/modules/}"
+	    module_krels[n]=${1%%/*}
+	fi
+    done
+}
+
+doit() {
+    [ -n "$verbose" ] && echo "$@"
+    [ -n "$dry_run" ] || "$@"
+}
+
+usage() {
+    cat <<'EOF'
+Usage: ${0##*/} [options] {--add-modules|--remove-modules}
+       ${0##*/} [options] {--add-kernel|--remove-kernel} {kernel-release}
+
+--add-modules
+	Add a list of modules read from standard input. Create
+	symlinks in compatible kernel's weak-updates/ directory.
+	The list of modules is read from standard input.
+
+--remove-modules
+	Remove compatibility symlinks from weak-updates/ directories
+	for a list of modules.  The list of modules is read from
+	standard input.
+
+--add-kernel
+	Add compatibility symlinks for all compatible modules to the
+	specified or running kernel.
+
+--remove-kernel
+	Remove all compatibility symlinks for the specified or current
+	kernel.
+
+--verbose
+	Print the commands executed.
+
+-dry-run
+	Do not create/remove any files.
+EOF
+    exit $1
+}
+
+[ -e /etc/sysconfig/kernel ] && source /etc/sysconfig/kernel
+
+unset ${!changed_modules_*} ${!changed_initrd_*}
+
+module_has_changed() {
+    declare module=$1 krel=$2
+
+    module=${module%.ko}
+    module=${module##*/}
+
+    eval "changed_modules_${krel//[^a-zA-Z0-9]/_}=$krel"
+    case " $INITRD_MODULES " in
+    *" $module "*)
+	eval "changed_initrd_${krel//[^a-zA-Z0-9]/_}=$krel"
+	;;
+    esac
+}
+
+options=`getopt -o h --long help,add-modules,remove-modules \
+		     --long add-kernel,remove-kernel,dry-run,verbose -- "$@"`
+
+[ $? -eq 0 ] || usage 1
+
+eval set -- "$options"
+
+while :; do
+    case "$1" in
+    --add-modules)
+	add_modules=1
+	;;
+    --remove-modules)
+	remove_modules=1
+	;;
+    --add-kernel)
+	add_kernel=1
+	;;
+    --remove-kernel)
+	remove_kernel=1
+	;;
+    --dry-run)
+	dry_run=1
+	;;
+    --verbose)
+	verbose=1
+	;;
+    -h|--help)
+	usage 0
+	;;
+    --)
+	shift
+	break
+	;;
+    esac
+    shift
+done
+
+if [ "$add_modules$remove_modules$add_kernel$remove_kernel" != 1 ]; then
+    usage 1
+fi
+if [ -n "$add_kernel" -o -n "$remove_kernel" ]; then
+    [ $# -gt 1 ] && usage 1
+else
+    [ $# -ne 0 ] && usage 1
+fi
+
+tmpdir=$(mktemp -td ${0##*/}.XXXXXX)
+trap "rm -rf $tmpdir" EXIT
+
+if [ -n "$add_modules" ]; then
+    read_modules_list || exit 1
+    if [ ${#modules[@]} -gt 0 ]; then
+	for krel in $(ls /lib/modules/); do
+	    [ -e /boot/symvers-$krel.gz ] || continue
+	    for ((n = 0; n < ${#modules[@]}; n++)); do
+		module=${modules[n]}
+		module_krel=${module_krels[n]}
+		case "$module" in
+		/lib/modules/$krel/*)
+		    continue ;;
+		esac
+		subpath=${module#/lib/modules/$module_krel/updates}
+		weak_module=/lib/modules/$krel/weak-updates/${subpath#/}
+		if [ -r "$weak_module" ]; then
+		    weak_krel=$(krel_of_module "$weak_module")
+		    if [ "$weak_krel" != "$module_krel" ] &&
+		       [ "$(printf "%s\n" "$weak_krel" "$module_krel" \
+			    | /usr/lib/rpm/rpmsort | head -n 1)" = \
+			 "$module_krel" ]; then
+			# Keep modules from more recent kernels.
+			[ -n "$verbose" ] && echo \
+"Keeping module ${module##*/} from kernel $weak_krel for kernel $krel"
+			continue
+		    fi
+		fi
+		if module_is_compatible $module $krel; then
+		    doit mkdir -p $(dirname $weak_module)
+		    doit ln -sf $module $weak_module
+		    module_has_changed $module $krel
+		fi
+	    done
+	done
+    fi
+elif [ -n "$remove_modules" ]; then
+    read_modules_list || exit 1
+    if [ ${#modules[@]} -gt 0 ]; then
+	krels=($(ls /lib/modules/ | /usr/lib/rpm/rpmsort -r))
+	for krel in "${krels[@]}"; do
+	    [ -e /boot/symvers-$krel.gz ] || continue
+	    for ((n = 0; n < ${#modules[@]}; n++)); do
+		module=${modules[n]}
+		[ -e "$module" ] && continue
+		module_krel=${module_krels[n]}
+		subpath=${module#/lib/modules/$module_krel/updates}
+		weak_module=/lib/modules/$krel/weak-updates/${subpath#/}
+		if [ "$(readlink "$weak_module")" = "$module" ]; then
+		    [ -n "$verbose" ] && echo \
+"Removing compatible module ${subpath#/} from kernel $krel"
+		    doit rm -f "$weak_module"
+		    for krel2 in "${krels[@]}"; do
+			[ -e /boot/symvers-$krel2.gz ] || continue
+			module=/lib/modules/$krel2/updates/${subpath#/}
+			[ -e "$module" ] || continue
+			if module_is_compatible "$module" "$krel2"; then
+			    [ -n "$verbose" ] && echo \
+"Adding compatible module ${module##*/} from kernel $krel2 instead"
+			    doit ln -s "$module" "$weak_module"
+			    break
+			fi
+		    done
+		    doit rmdir --parents --ignore-fail-on-non-empty \
+			       "$(dirname "$weak_module")"
+		    module_has_changed $module $krel
+		fi
+	    done
+	done
+    fi
+elif [ -n "$add_kernel" ]; then
+    add_krel=${1:-$(uname -r)}
+    if [ ! -e /boot/symvers-$add_krel.gz ]; then
+	echo "Symvers dump file /boot/symvers-$add_krel.gz" \
+	     "not found" >&2
+	exit 1
+    fi
+    for krel in $(ls /lib/modules/ | /usr/lib/rpm/rpmsort -r); do
+	[ "$add_krel" = "$krel" ] && continue
+	[ -d /lib/modules/$krel/updates ] || continue
+	for module in $(find /lib/modules/$krel/updates -name '*.ko'); do
+	    subpath=${module#/lib/modules/$krel/updates}
+	    weak_module=/lib/modules/$add_krel/weak-updates/${subpath#/}
+	    [ -e "$weak_module" ] && continue
+	    if module_is_compatible $module $add_krel; then
+		doit mkdir -p $(dirname $weak_module)
+		doit ln -sf $module $weak_module
+	    fi
+	done
+    done
+elif [ -n "$remove_kernel" ]; then
+    remove_krel=${1:-$(uname -r)}
+    weak_modules=/lib/modules/$remove_krel/weak-updates
+    doit rm -rf "$weak_modules"
+fi
+
+for krel in ${!changed_modules_*}; do
+    krel=${!krel}
+    [ -e /boot/System.map-$krel ] || continue
+    /sbin/depmod -ae -F /boot/System.map-$krel $krel
+done
+
+for krel in ${!changed_initrd_*}; do
+    krel=${!krel}
+    [ -e /boot/System.map-$krel ] || continue
+
+    image=
+    for x in vmlinuz image vmlinux linux bzImage; do
+	if [ -f /boot/$x-$krel ]; then
+	    image=$x
+	    break
+	fi
+    done
+    if [ -n "$image" ]; then
+	/sbin/mkinitrd -k /boot/$image-$krel -i /boot/initrd-$krel
+    fi
+done
+
+# vim:shiftwidth=4 softtabstop=4

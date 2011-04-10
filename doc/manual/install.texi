@@ -101,12 +101,12 @@
 @end menu
 
 @quotation
-@emph{Please note that the installation instructions have changed.  Previously @cite{OpenSS7} releases
-consisted of a number of subpackages to a master package: this is no longer the case.  All
-@cite{OpenSS7} release software is now contained in a single package.  This change was necessary to
-reduce the maintenance burden cause by a growing number of subpackages.  The net benefit of this
-changes is that the resulting tarballs, RPMs and DEBs are far less error prone due to far fewer
-dependencies between RPMs and DEBs.}
+@emph{Please note that the installation instructions have changed.  Previously
+@cite{@value{PACKAGE_TITLE}} releases consisted of a number of subpackages to a master package: this
+is no longer the case.  All @cite{@value{PACKAGE_TITLE}} release software is now contained in a
+single package.  This change was necessary to reduce the maintenance burden cause by a growing
+number of subpackages.  The net benefit of this changes is that the resulting tarballs, RPMs and
+DEBs are far less error prone due to far fewer dependencies between RPMs and DEBs.}
 @end quotation
 
 @c ----------------------------------------------------------------------------
@@ -117,8 +117,8 @@ dependencies between RPMs and DEBs.}
 @cindex repositories
 
 The @value{PACKAGE_TITLE} package release can be accessed from the repositories of
-@uref{http://www.openss7.org/, The OpenSS7 Project}.  For @manpage{rpm(1)} based systems, the
-package is available in a @manpage{yum(8)} repository based on @file{repomd} XML and may also be
+@uref{http://www.openss7.org/, The OpenSS7 Project}.  For @manpage{rpm(8)} based systems, the
+package is available in a @manpage{yum(8)} repository based on @file{repo-md} XML and may also be
 accessed using @manpage{up2date(8)}, @manpage{zypper(8)} or @manpage{yast(8)}.  For
 @manpage{yast(8)} based systems, the package is also available as a @manpage{yast(8)} installation
 source.  For @manpage{dpkg(1)} based systems, the package is available in an @manpage{apt(8)}
@@ -128,28 +128,33 @@ By far the easiest (most repeatable and manageable) form for installing and usin
 @cite{@value{PACKAGE_TITLE}} packages is to install packages from the @manpage{yum(8)},
 @manpage{yast(8)} or @manpage{apt(8)} repositories.  If your distribution does not support
 @manpage{yum(8)}, @manpage{zypper(8)}, @manpage{up2date(8)}, @manpage{yast(8)} or @manpage{apt(8)},
-then it is still possible to install the RPMs or DEBs from the repositories using @manpage{rpm(1)},
+then it is still possible to install the RPMs or DEBs from the repositories using @manpage{rpm(8)},
 @manpage{dpkg(1)}; or by using @manpage{wget(1)} and then installing them from RPM or DEB using
-@manpage{rpm(1)} or @manpage{dpkg(1)} locally.
+@manpage{rpm(8)} or @manpage{dpkg(1)} locally.
 
 If binaries are not available for your distribution or specific kernel, but your distribution
-supports @manref{rpm(1)} or @manref{dpkg(1)}, the next best method for installing and using
+supports @manref{rpm(8)} or @manref{dpkg(1)}, the next best method for installing and using
 @cite{@value{PACKAGE_TITLE}} packages is to download and rebuild the source RPMs or DSCs from the
 repository.  This can also be performed with @manpage{yum(8)}, @manpage{zypper(8)},
-@manpage{yast(8)}, @manpage{apt(8)}; or directly using @manpage{wget(1)}, @manpage{rpm(1)} or
+@manpage{yast(8)}, @manpage{apt(8)}; or directly using @manpage{wget(1)}, @manpage{rpm(8)} or
 @manpage{dpkg(1)}.
 
-If your architecture does not support @manpage{rpm(1)} or @manpage{dpkg(1)} at all, or you have
+If your architecture does not support @manpage{rpm(8)} or @manpage{dpkg(1)} at all, or you have
 special needs (such as cross-compiling for embedded targets or for development), the final resort
 method is to download, configure, build and install from the tarball.
 
 @menu
+Repository Access::			access to the repositories
 Repositories for YUM::			the @manpage{yum(8)} repository
 Repositories for YAST::			the @manpage{yast(8)} repository
 Repositories for APT::			the @manpage{apt(8)} repository
 REPO-MD Repositories::
 APTITUDE Repositories::			
 @end menu
+
+@node Repository Access
+@subsection Repository Access
+@cindex repository access
 
 Repositories are located under @uref{https://www.openss7.org/repo}.  The path from there to the
 specific repository consists of the following components:
@@ -173,16 +178,90 @@ Squeeze} distribution for @file{i686} is located under
 @uref{https://@-www.@-openss7.@-org/@-repo/@-debs/@-debian/@-squeeze/@-i686/}; the tarball
 distribution is located under @uref{https://@-www.@-openss7.@-org/@-repo/@-tarballs}.
 
+Note that repository access is restricted.  You may download the @file{repo} packages without
+restriction, however, when installing the @file{repo} package you will be prompted for your
+registration username and repository password.  The RPMs or DEBs that you will be allowed access to
+will depend on your entitlement.
+
+For the following distributions, follow the instructions in the sections referenced:
+
+@multitable @columnfractions 0.3 0.13 0.57
+@item CentOS Enterprise Linux 4.92 @tab centos49 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 5.0  @tab centos5  @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 5.1  @tab centos51 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 5.2  @tab centos52 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 5.3  @tab centos53 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 5.4  @tab centos54 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 5.5  @tab centos55 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 5.6  @tab centos56 @tab @ref{Installing with YUM}
+@item CentOS Enterprise Linux 6.0  @tab centos60 @tab @ref{Installing with YUM}
+@item Debian 4.0 Etch              @tab deb4.0   @tab @ref{Installing with APT}
+@item Debian 4.0r1 Etch            @tab deb4.1   @tab @ref{Installing with APT}
+@item Debian 4.0r2 Etch            @tab deb4.2   @tab @ref{Installing with APT}
+@item Debian 4.0r3 Etch            @tab deb4.3   @tab @ref{Installing with APT}
+@item Debian 5.0 Lenny             @tab deb5.0   @tab @ref{Installing with APT}
+@item Debian 6.0 Squeeze           @tab deb6.0   @tab @ref{Installing with APT}
+@item Fedora 7 @tab FC7 @tab @ref{Installing with YUM}
+@item Fedora 8 @tab FC8 @tab @ref{Installing with YUM}
+@item Fedora 9 @tab FC9 @tab @ref{Installing with YUM}
+@item Fedora 10 @tab FC10 @tab @ref{Installing with YUM}
+@item Fedora 11 @tab FC11 @tab @ref{Installing with YUM}
+@item Fedora 12 @tab FC12 @tab @ref{Installing with YUM}
+@item Fedora 13 @tab FC13 @tab @ref{Installing with YUM}
+@item Fedora 14 @tab FC14 @tab @ref{Installing with YUM}
+@item Fedora 15 @tab FC15 @tab @ref{Installing with YUM}
+@item Gentoo 2006.1 @tab untested @tab @ref{Installing the Tar Ball}
+@item Gentoo 2007.1 @tab untested @tab @ref{Installing the Tar Ball}
+@item RedHat Enterprise Linux 4 @tab EL4 @tab @ref{Installing with YUM}
+@item RedHat Enterprise Linux 5 @tab EL5 @tab @ref{Installing with YUM}
+@item RedHat Enterprise Linux 6 @tab EL6 @tab @ref{Installing with YUM}
+@item SuSE 10.0 @tab SuSE10.0 @tab @ref{Installing with ZYPPER}
+@item SuSE 10.1 @tab SuSE10.1 @tab @ref{Installing with ZYPPER}
+@item SuSE 10.2 @tab SuSE10.2 @tab @ref{Installing with ZYPPER}
+@item SuSE 10.3 @tab SuSE10.3 @tab @ref{Installing with ZYPPER}
+@item SuSE 11.0 @tab SuSE11.0 @tab @ref{Installing with ZYPPER}
+@item SuSE 11.1 @tab SuSE11.1 @tab @ref{Installing with ZYPPER}
+@item SuSE 11.2 @tab SuSE11.2 @tab @ref{Installing with ZYPPER}
+@item SuSE 11.3 @tab SuSE11.3 @tab @ref{Installing with ZYPPER}
+@item SuSE 11.4 @tab SuSE11.4 @tab @ref{Installing with ZYPPER}
+@item SLES 9 SP3 @tab SLES9 @tab @ref{Installing with ZYPPER}
+@item SLES 10 @tab SLES10 @tab @ref{Installing with ZYPPER}
+@item SLES 10 SP1 @tab SLES10 @tab @ref{Installing with ZYPPER}
+@item SLES 10 SP2 @tab SLES10 @tab @ref{Installing with ZYPPER}
+@item SLES 11 @tab SLES11 @tab @ref{Installing with ZYPPER}
+@item SLES 11 SP1 @tab SLES11 @tab @ref{Installing with ZYPPER}
+@item Ubuntu 9.04 @tab ubu9.04 @tab @ref{Installing with APT}
+@item Ubuntu 9.10 @tab ubu9.10 @tab @ref{Installing with APT}
+@item Ubuntu 10.04 @tab ubu10.04 @tab @ref{Installing with APT}
+@item Ubuntu 10.10 @tab ubu10.10 @tab @ref{Installing with APT}
+@end multitable
+
 @node Repositories for YUM
 @subsection Repositories for YUM
 @cindex repositories, yum
 @cindex yum
 
+The @manpage{yum(8)} repositories are based on @file{repo-md} XML and are provided for all
+@cite{RedHat}/@cite{Fedora} architectures @cite{RHEL 4.8} and beyond, or @cite{FC 7} and beyond.
+This includes all current (supported) @cite{RHEL} systems.
+
+@menu
+Setting up YUM::			setting up repository access with YUM
+Using the YUM Repository::		using the repository with YUM
+YUM Kernel Updates::			updating kernels with YUM
+Setting up ZYPPER::			setting up repository access with ZYPPER
+Using the ZYPPER Repository::		using the repository with ZYPPER
+ZYPPER Kernel Updates::			updating kernels with ZYPPER
+General REPO-MD Repository::		setting up repository access for general use
+@end menu
+
+@node Setting up YUM
 @subsubsection Setting up YUM
 @cindex yum
 
-To install or upgrade from the @cite{OpenSS7} @file{repomd} repositories using @manpage{yum(8)}, you
-will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as follows:
+To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{repo-md} repositories using
+@manpage{yum(8)}, you will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as
+follows:
 
 @cartouche
 @smallexample
@@ -190,6 +269,7 @@ $> REPOS="https://user@@www.openss7.org/repo/rpms"
 $> REPONOARCH="$REPOS/fedora/14/x86_64/RPMS/noarch"
 $> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
 $> sudo rpm -Uhv $REPORPM
+$> Username: anonymous
 $> Password: *******
 @end smallexample
 @end cartouche
@@ -197,6 +277,12 @@ $> Password: *******
 The example, above, assumes that the distribution is @samp{fedora} and the distribution release is
 @samp{14} and the required architecture is @samp{x86_64}.  Another example would be
 @file{$REPOS/redhat/6.0/x86_64/RPMS/noarch}, for using @manpage{yum(8)} with RHEL.
+
+To obtain access to the repository at the level to which you are entitled, you will have to respond
+to the @samp{Username:} query with the user name with which you are registered with
+@uref{https://www.openss7.org/}, and to the @samp{Password:} query with your repository access
+password.@footnote{Note that your repository access password is separate from you web access
+password.}
 
 You can test whether the @manpage{yum(8)} repository is properly set up by refreshing the repository
 and by listing the packages:
@@ -206,21 +292,26 @@ and by listing the packages:
 $> sudo yum makecache openss7
 $> sudo yum search openss7
 $> sudo yum info openss7
+$> sudo yum info @@openss7
 @end smallexample
 @end cartouche
 
+Note that only the packages to which you are entitled will be listed.
+
+@node Using the YUM Repository
 @subsubsection Using the YUM Repository
 @cindex yum
 
-Once the repository is set up, @cite{OpenSS7} includes a number of virtual package and package group
-definitions that ease the installation and removal of kernel modules, libraries and utilities.
-Downloading, configuring, building and installation for a single-kernel distribution is as easy as
-(one of):
+Once the repository is set up, @cite{@value{PACKAGE_TITLE}} includes a number of virtual package and
+package group definitions that ease the installation and removal of kernel modules, libraries and
+utilities.  Downloading, configuring, building and installation for a single-kernel distribution is
+as easy as (one of):
 
 @cartouche
 @smallexample
-$> sudo yum groupinstall @value{PACKAGE}
 $> sudo yum install @value{PACKAGE}
+$> sudo yum install @@@value{PACKAGE}
+$> sudo yum groupinstall @value{PACKAGE}
 @end smallexample
 @end cartouche
 
@@ -228,36 +319,43 @@ Removing the package is as easy as (one of):
 
 @cartouche
 @smallexample
-$> sudo yum groupremove @value{PACKAGE}
 $> sudo yum remove @value{PACKAGE}
+$> sudo yum remove @@@value{PACKAGE}
+$> sudo yum groupremove @value{PACKAGE}
 @end smallexample
 @end cartouche
 
 To install the development packages for developing STREAMS modules and drivers, or applications that
-use the @cite{OpenSS7 Protocol Suites}, install the development packages using (one of):
+use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the development packages using (one
+of):
 
 @cartouche
 @smallexample
-$> sudo yum groupinstall @value{PACKAGE}-devel
 $> sudo yum install @value{PACKAGE}-devel
+$> sudo yum install @@@value{PACKAGE}-devel
+$> sudo yum groupinstall @value{PACKAGE}-devel
 @end smallexample
 @end cartouche
 
+@node YUM Kernel Updates
 @subsubsection YUM Kernel Updates
 @cindex yum
 @cindex kernel updates
 
-The @cite{OpenSS7} @manpage{yum(8)} repository definitions support the automatic updating of kernel
-modules when kernels are updated.  When the system is updated, using @samp{yum update}, openss7
-packages that are available for an updated kernel will be installed automatically.  The repository
-setup also ensures that kernels will not be updated until kernel modules are available for the
-updated kernel.
+The @cite{@value{PACKAGE_TITLE}} @manpage{yum(8)} repository definitions support the automatic
+updating of kernel modules when kernels are updated.  When the system is updated, using @samp{yum
+update}, openss7 packages that are available for an updated kernel will be installed automatically.
+@cite{@value{PACKAGE_TITLE}} kernel module packages also support weak updates and when kernels are
+updated to compatible kernels (e.g.  for security updates, or normally for any update within an
+Enterprise distribution), kernel modules are automatically applied against the updated kernel.
 
+@node Setting up ZYPPER
 @subsubsection Setting up ZYPPER
 @cindex zypper
 
-To install or upgrade from the @cite{OpenSS7} @file{repomd} repositories using @manpage{zypper(8)},
-you will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as follows:
+To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{repo-md} repositories using
+@manpage{zypper(8)}, you will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as
+follows:
 
 @cartouche
 @smallexample
@@ -265,6 +363,7 @@ $> REPOS="https://user@@www.openss7.org/repo/rpms"
 $> REPONOARCH="$REPOS/opensuse/11/x86_64/RPMS/noarch"
 $> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
 $> sudo rpm -Uhv $REPORPM
+$> Username: anonymous
 $> Password: *******
 @end smallexample
 @end cartouche
@@ -273,8 +372,14 @@ The example assumes that the distribution is @samp{opensuse} and the distributio
 @samp{11} and the architecture requiresd is @samp{x86_64}.  Another example would be
 @file{$REPOS/suse/11/x86_64/RPMS/noarch}, for using @manpage{zypper(8)} with SLES.
 
+To obtain access to the repository at the level to which you are entitled, you will have to respond
+to the @samp{Username:} query with the user name with which you are registered with
+@uref{https://www.openss7.org/}, and to the @samp{Password:} query with your repository access
+password.@footnote{Note that your repository access password is separate from you web access
+password.}
+
 @manpage{zypper(8)} does not do a very good job of importing GPG signatures.  When @command{zypper}
-is reporting that there are no kens for the RPMs being installed, the key can be imported directly
+is reporting that there are no keys for the RPMs being installed, the key can be imported directly
 into RPM as follows:
 
 @cartouche
@@ -294,13 +399,14 @@ $> sudo zypper info -t package openss7
 @end smallexample
 @end cartouche
 
+@node Using the ZYPPER Repository
 @subsubsection Using the ZYPPER Repository
 @cindex zypper
 
-Once the repository is set up, @cite{OpenSS7} includes a number of virtual package and package group
-(pattern) definitions that ease the installation and removal of kernel modules, libraries and
-utilities.  Downloading, configuring, building and installation for a single-kernel distribution is
-a easy as (one of):
+Once the repository is set up, @cite{@value{PACKAGE_TITLE}} includes a number of virtual package and
+package group (pattern) definitions that ease the installation and removal of kernel modules,
+libraries and utilities.  Downloading, configuring, building and installation for a single-kernel
+distribution is a easy as (one of):
 
 @cartouche
 @smallexample
@@ -319,7 +425,8 @@ $> sudo zypper remove @value{PACKAGE}
 @end cartouche
 
 To install the development packages for developing STREAMS modules and drivers, or applications that
-use the @cite{OpenSS7 Protocol Suites}, install the development packages using (one of):
+use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the development packages using (one
+of):
 
 @cartouche
 @smallexample
@@ -328,16 +435,19 @@ $> sudo zypper install @value{PACKAGE}-devel
 @end smallexample
 @end cartouche
 
+@node ZYPPER Kernel Updates
 @subsubsection ZYPPER Kernel Updates
 @cindex zypper
 @cindex kernel updates
 
-The @cite{OpenSS7} @manpage{zypper(8)} repository definitions support the automatic updating of
-kernel modules when kernels are updated.  When the system is updated, using @samp{zypper update},
-openss7 packages that are available for an updated kernel will be installed automatically.  The
-repository setup also ensure that kernels will not be updated util kernel modules are available for
-the updated kernel.
+The @cite{@value{PACKAGE_TITLE}} @manpage{zypper(8)} repository definitions support the automatic
+updating of kernel modules when kernels are updated.  When the system is updated, using @samp{zypper
+update}, openss7 packages that are available for an updated kernel will be installed automatically.
+@cite{@value{PACKAGE_TITLE}} kernel module packages also support weak updates and when kernels are
+updated to compatible kernels (e.g.  for security updates, or normally for any update within an
+Enterprise distribution), kernel modules are automatically applied against the updated kernel.
 
+@node General REPO-MD Repository
 @subsubsection General REPO-MD Repository
 @cindex repositories, repo-md
 
@@ -357,7 +467,7 @@ the file and place it into the @file{/etc/yum.repo.d/openss7.repo} file:
 @cartouche
 @smallexample
 -| [openss7]
--| name = OpenSS7 Repository
+-| name = @value{PACKAGE_TITLE} Repository
 -| baseurl = https://www.openss7.org/repo/rpms/centos/$releasever/$arch
 -| gpgkey = https://www.openss7.org/repo/tarballs/OPENSS7-GPG-KEY
 -| repo_gpgcheck = 1
@@ -372,18 +482,18 @@ category from which to choose installation packages.
 
 The category that is provided is as follows:
 
-@samp{@value{PACKAGE}-components} -- OpenSS7 STREAMS and Protocol Suite Components.
+@samp{@value{PACKAGE}-components} -- @value{PACKAGE_TITLE} STREAMS and Protocol Suite Components.
 
 The groups (patterns) that are provided in this category are as follows:
 @table @asis
-@item @samp{@value{PACKAGE}} --- OpenSS7 STREAMS and Protocol Suites.
-This group (pattern) installs packages required for the @cite{Linux Fast-STREAMS} and @cite{OpenSS7
-Protocol Suites} run-time libraries, commands, utilities, init scripts and kernel modules.  Also
-included are section 1, 4, 5 and 8 manual pages for the commands, module and drivers, configuration
-file formats and administrative utilities.
+@item @samp{@value{PACKAGE}} --- @value{PACKAGE_TITLE} STREAMS and Protocol Suites.  This group
+(pattern) installs packages required for the @cite{Linux Fast-STREAMS} and
+@cite{@value{PACKAGE_TITLE} Protocol Suites} run-time libraries, commands, utilities, init scripts
+and kernel modules.  Also included are section 1, 4, 5 and 8 manual pages for the commands, module
+and drivers, configuration file formats and administrative utilities.
 
-Install this group (pattern) if you need the @cite{Linux Fast-STREAMS} and @cite{OpenSS7 Protocol
-Suties} core run-time.
+Install this group (pattern) if you need the @cite{Linux Fast-STREAMS} and
+@cite{@value{PACKAGE_TITLE} Protocol Suties} core run-time.
 
 The mandatory (required) packages in this group (pattern) are
 @samp{@value{PACKAGE}},
@@ -399,16 +509,16 @@ The optional (suggested) packages in this group (pattern) are
 @samp{@value{PACKAGE}-@-javadoc} and
 @samp{@value{PACKAGE}-@-source-@-kernel}.
 
-@item @samp{@value{PACKAGE}-java} --- OpenSS7 STREAMS and Protocol Suite Java Components.
-This group (pattern) installs packages required for the @cite{Linux Fast-STREAMS} and @cite{OpenSS7
-JAIN} Java components.
+@item @samp{@value{PACKAGE}-java} --- @value{PACKAGE_TITLE} STREAMS and Protocol Suite Java Components.
+This group (pattern) installs packages required for the @cite{Linux Fast-STREAMS} and
+@cite{@value{PACKAGE_TITLE} JAIN} Java components.
 
 The mandatory (required) packages in this group (pattern) are
 @samp{@value{PACKAGE}-@-java}.
 The optional (suggested) packages in this group (pattern) are
 @samp{@value{PACKAGE}-@-javadoc}.
 
-@item @samp{@value{PACKAGE}-@-devel} --- OpenSS7 STREAMS and Protocol Suite Development.
+@item @samp{@value{PACKAGE}-@-devel} --- @value{PACKAGE_TITLE} STREAMS and Protocol Suite Development.
 
 The mandatory (required) packages in this group (pattern) are
 @samp{@value{PACKAGE}-@-devel} and
@@ -418,7 +528,7 @@ The optional (suggested) packages in this group (pattern) are
 @samp{@value{PACKAGE}-@-javadoc} and
 @samp{@value{PACKAGE}-@-source-@-kernel}.
 
-@item @samp{@value{PACKAGE}-doc} --- OpenSS7 STREAMS and Protocol Suite Documentation.
+@item @samp{@value{PACKAGE}-doc} --- @value{PACKAGE_TITLE} STREAMS and Protocol Suite Documentation.
 
 The mandatory (required) packages in this group (pattern) are
 @samp{@value{PACKAGE}-@-doc} and
@@ -438,6 +548,11 @@ For distributions that support @cite{YaST}, such as @cite{SUSE Linux Enterprise 
 Setting up the installation source as a @cite{YaST} installation source instead of @cite{repo-md}
 can provide the additional features associated with @cite{YaST} install sources.
 
+@menu
+Setting up YAST::			setting up repository access with YAST
+@end menu
+
+@node Setting up YAST
 @subsubsection Setting up YAST
 @cindex setup, yast
 @cindex yast
@@ -464,22 +579,28 @@ For assistance with specific DEBs, see @ref{Downloading the Debian DEB}.
 @cindex downloading
 
 The @cite{@value{PACKAGE_TITLE}} package releases can be downloaded from the downloads page of
-@uref{http://www.openss7.org/download.html, The OpenSS7 Project}.
-The package is available as a binary RPM (for popular architectures) a source RPM, Debian binary DEB
-and source DSC, or as a tar ball.
-If you are using a browsable viewer, you can obtain the @cite{OpenSS7} release of
-@command{@value{PACKAGE_NAME}} from the links in the sections that follow.
+@uref{http://www.openss7.org/download.html, The OpenSS7 Project}.  The package is available as a
+binary RPM (for popular architectures) a source RPM, Debian binary DEB and source DSC, or as a tar
+ball.  If you are using a browsable viewer, you can obtain the @cite{@value{PACKAGE_TITLE}} release
+of @command{@value{PACKAGE_NAME}} from the links in the sections that follow.
 
-By far the easiest (most repeatable and manageable) form for installing and using @cite{OpenSS7}
-packages is to download and install individual packages from binary RPM or DEB.  If binary RPMs or
-DEBs are not available for your distribution, but your distribution supports @manref{rpm(1)} or
-@manref{dpkg(1)}, the next best method for installing and using @cite{OpenSS7} packages is to
-download and rebuild the source RPMs or DSCs.
+By far the easiest (most repeatable and manageable) form for installing and using the
+@cite{@value{PACKAGE_TITLE}} packages is to download and install the repository definition and use
+the distribution's native packaging tools.  Another (still repeatable and manageable) form for
+installing and using @cite{@value{PACKAGE_TITLE}} packages is to download and install individual
+packages from binary RPM or DEB.
 
-If your architecture does not support @manpage{rpm(1)} or @manpage{dpkg(1)} at all, or you have
+If binary RPMs or DEBs are not available for your distribution, but your distribution supports
+@manref{rpm(8)} or @manref{dpkg(1)}, the next best method for installing and using
+@cite{@value{PACKAGE_TITLE}} packages is to download and rebuild the source RPMs or
+DSCs.@footnote{Note, however, that @cite{OpenSS7 Corporation} restricts access to source RPMs and
+DSCs.}
+
+If your architecture does not support @manpage{rpm(8)} or @manpage{dpkg(1)} at all, or you have
 special needs (such as cross-compiling for embedded targets or for development), the final resort
 method is to download, configure, build and install from tarball.  In this later case, the easiest
-way to build and install @cite{OpenSS7} packages from tarball.
+way to build and install @cite{@value{PACKAGE_TITLE}} packages is from tarball.@footnote{Note,
+however, that @cite{OpenSS7 Corporation} restricts access to tarballs.}
 
 @menu
 * Downloading with YUM:			the easiest approach for YUM based systems
@@ -500,9 +621,11 @@ way to build and install @cite{OpenSS7} packages from tarball.
 @cindex downloading, yum
 @cindex yum
 
-With @manpage{yum(8)}, downloading is automatic.  See @pxrefman{Installing with YUM} for
-instructions.
-See @manref{yum(8)} for more information on downloading without installing.
+Once the repository definitions have been established, downloading RPMs with @manref{yum(8)} is
+automatic.  See @refman{Setting up YUM}, for instructions on downloading the repository RPM and
+using it to set up for @manref{yum(8)}, and @refman{Installing with YUM}, for instructions on
+installing subsequent packages.  See @manref{yum(8)} for more information on downloading without
+installing.
 
 @c ----------------------------------------------------------------------------
 
@@ -511,9 +634,11 @@ See @manref{yum(8)} for more information on downloading without installing.
 @cindex downloading, zypper
 @cindex zypper
 
-With @manpage{zypper(8)}, downloading is automatic.  See @pxrefman{Installing with ZYPPER} for
-instructions.
-See @manref{zypper(8)} for more information on downloading without installing.
+Once the repository definitions have been established, downloading RPMs with @manref{zypper(8)} is
+automatic.  See @refman{Setting up ZYPPER}, for instructions on downloading the repository RPM and
+using it to set up for @manref{zypper(8)}, and @refman{Installing with ZYPPER}, for instructions on
+installing subsequent packages.  See @manref{zypper(8)} for more information on downloading without
+installing.
 
 @c ----------------------------------------------------------------------------
 
@@ -522,9 +647,10 @@ See @manref{zypper(8)} for more information on downloading without installing.
 @cindex downloading, apt
 @cindex apt
 
-With @manpage{apt(8)}, downloading is automatic.  See @pxrefman{Installing with APT} for
-instructions.
-See @manref{apt(8)} for more information on downloading without installing.
+Once the repository definitions have been established, downloading DEBs with @manref{apt(8)} is
+automatic.  See @refman{apt(8)}, for instructions on downloading the repository DEB and using it to
+set up for @manref{apt(8)}, and @refman{Installing with APT}, for instructions on installing
+subsequent packages.  See @manref{apt(8)} for more information on downloading without installing.
 
 @c ----------------------------------------------------------------------------
 
@@ -555,7 +681,7 @@ kernel.
 All of the following kernel independent RPM are required for your architecture.
 Binary RPMs listed here are for example only: additional binary RPMs are
 available from the downloads site.  If your architecture is not available, you
-can build binary RPM from the source RPM (see @pxrefman{Building from the Source
+can build binary RPM from the source RPM (@pxrefman{Building from the Source
 RPM}).
 
 @subsubheading Architecture Independent
@@ -576,10 +702,10 @@ system.  When removing, all corresponding kernel modules will also be removed.
 
 The @file{@value{PACKAGE}-base} binary package contains the init scripts, test scripts, maintenance
 scripts and base system configuration files necessary for the operation of Linux Fast-STREAMS and
-the protocol suites contained in the OpenSS7 package.  It contains user and administrative
-documentation in @file{.info}, @file{.pdf} and @file{.html} formats as well as sections 1, 4, 5 and
-8 of the manual pages.  This binary package is required for any installation of the OpenSS7 package
-and is not architecture specific (@samp{noarch}).
+the protocol suites contained in the @value{PACKAGE_TITLE} package.  It contains user and
+administrative documentation in @file{.info}, @file{.pdf} and @file{.html} formats as well as
+sections 1, 4, 5 and 8 of the manual pages.  This binary package is required for any installation of
+the @value{PACKAGE_TITLE} package and is not architecture specific (@samp{noarch}).
 
 @item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 
@@ -588,33 +714,31 @@ applications and programs that use the package.  It contains developer and progr
 @file{.info}, @file{.pdf} and @file{.html} formats as well as sections 2, 3, 7 and 9 of the manual
 pages and Javadoc HTML documentation.  Install this binary package if you are interested in
 developing Linux Fast-STREAMS drivers or modules or application programs for the protocol suites
-contained in the OpenSS7 package.  This package is massive and is not normally necessary except on a
-development system.  The package is not architecture specific (@samp{noarch}).
+contained in the @value{PACKAGE_TITLE} package.  This package is massive and is not normally
+necessary except on a development system.  The package is not architecture specific (@samp{noarch}).
 
 @item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-javadoc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-javadoc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 
-The @file{@value{PACKAGE}-javadoc} binary package contains Javadoc documentation for the OpenSS7
-package.  Install this binary package if you are interested in developing JAIN applications or
-resource adaptors.  This package is not normally required on other than a development system.  The
-package is not architecture specific (@samp{noarch}).
+The @file{@value{PACKAGE}-javadoc} binary package contains Javadoc documentation for the
+@value{PACKAGE_TITLE} package.  Install this binary package if you are interested in developing JAIN
+applications or resource adaptors.  This package is not normally required on other than a
+development system.  The package is not architecture specific (@samp{noarch}).
 
 @ignore
 @item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-dev-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-dev-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}-@-dev} package contains the device definitions necessary
-to run applications programs developed for @value{PACKAGE_TITLE}.@footnote{Not
-all distributions support the @samp{%dev} RPM macro: a case in point is the SuSE
-8.0 distribution which uses an older version of @manpage{rpm(1)}.  Distributions
-that do not support the @samp{%dev} macro will build devices as a @samp{%post}
-operation.  Note also that not all release packages contain devices.  Only
-packages that provide @acronym{STREAMS} character device drivers need devices, and then
-only when the @samp{specfs} or @samp{devfsd} is not being used.}
+to run applications programs developed for @value{PACKAGE_TITLE}.@footnote{Not all distributions
+support the @samp{%dev} RPM macro: a case in point is the SuSE 8.0 distribution which uses an older
+version of @manpage{rpm(8)}.  Distributions that do not support the @samp{%dev} macro will build
+devices as a @samp{%post} operation.  Note also that not all release packages contain devices.  Only
+packages that provide @acronym{STREAMS} character device drivers need devices, and then only when
+the @samp{specfs} or @samp{devfsd} is not being used.}
 
 @item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-doc-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-doc-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
-The @file{@value{PACKAGE}-@-doc} package contains this manual in plain text,
-postscript, @file{pdf} and @file{html} forms, along with the meta-information from the
-@file{@value{PACKAGE_NAME}} package.  It also contains all of the manual pages
-necessary for developing @value{PACKAGE_TITLE} applications and
-@value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
+The @file{@value{PACKAGE}-@-doc} package contains this manual in plain text, postscript, @file{pdf}
+and @file{html} forms, along with the meta-information from the @file{@value{PACKAGE_NAME}} package.
+It also contains all of the manual pages necessary for developing @value{PACKAGE_TITLE} applications
+and @value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
 
 @item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-init-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-init-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}-@-init} package contains the @command{init} scripts and provides
@@ -622,10 +746,9 @@ the @samp{postinst} scripts necessary to create kernel module preloads and modul
 definitions for all kernel module @samp{core} subpackages.
 
 @item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-source-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-source-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
-The @file{@value{PACKAGE}-@-source} package contains the source code necessary for
-building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
-configuration utilities necessary to create and distribute tarballs, @file{rpm} and
-@file{deb}/@file{dsc}.
+The @file{@value{PACKAGE}-@-source} package contains the source code necessary for building the
+@value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)} configuration utilities
+necessary to create and distribute tarballs, @file{rpm} and @file{deb}/@file{dsc}.
 
 @item @uref{https://www.openss7.org/repo/rpms/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 The @file{@value{PACKAGE}} package contains this manual in plain texit, postscript, @samp{pdf}, and
@@ -648,27 +771,27 @@ RPMs in the @cite{@value{PACKAGE_TITLE}} components are as follows:
 
 The @file{@value{PACKAGE}-lib} binary package contains the run-time (shared object) libraries
 necessary to run applications programs and utilities developed for @cite{Linux Fast-STREAMS} and the
-protocol suites contained in the @cite{OpenSS7} package.  Also included are the libtool @file{.la}
-files describing the shared object libraries.  The binary package also provides administrative and
-configuration test utilities and commands associated with the OpenSS7 package.  Note that these
-utilities are needed for running the validation test suites contained in the
-@file{@value{PACKAGE}-base} binary package.
+protocol suites contained in the @cite{@value{PACKAGE_TITLE}} package.  Also included are the
+libtool @file{.la} files describing the shared object libraries.  The binary package also provides
+administrative and configuration test utilities and commands associated with the
+@value{PACKAGE_TITLE} package.  Note that these utilities are needed for running the validation test
+suites contained in the @file{@value{PACKAGE}-base} binary package.
 
 @item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-java-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-java-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
-The @file{@value{PACKAGE}-java} binary package contains JAIN implementations for OpenSS7 Linux
-Fast-STREAMS and the associated protocol suites.  It includes jar files, JNI and CNI libraries, and
-gcj native compiled libraries.  It also includes SWIG implementations of Java interfaces for
-OpenSS7 API libraries.
+The @file{@value{PACKAGE}-java} binary package contains JAIN implementations for
+@value{PACKAGE_TITLE} Linux Fast-STREAMS and the associated protocol suites.  It includes jar files,
+JNI and CNI libraries, and gcj native compiled libraries.  It also includes SWIG implementations of
+Java interfaces for @value{PACKAGE_TITLE} API libraries.
 
 @item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-devel-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-devel-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
 The @file{@value{PACKAGE}-devel} binary package contains library archives for static compilation,
 and header files to develop Linux Fast-STREAMS modules and drivers.  This also includes header files
-and static libraries required to compile Linux Fast-STREAMS and OpenSS7 protocol suite applications
-programs.  This package also provides debug information for the OpenSS7 packages.  Debug information
-is useful when developing applications that use the OpenSS7 package or when debugging the OpenSS7
-package.
+and static libraries required to compile Linux Fast-STREAMS and @value{PACKAGE_TITLE} protocol suite
+applications programs.  This package also provides debug information for the @value{PACKAGE_TITLE}
+packages.  Debug information is useful when developing applications that use the
+@value{PACKAGE_TITLE} package or when debugging the @value{PACKAGE_TITLE} package.
 
 This binary package does not contain developer nor programmer documentation nor manual pages.  To
 obtain the developer and programmer documentation, load the @file{@value{PACKAGE}-doc} binary
@@ -700,11 +823,12 @@ in i586 architecture packages regardless of the true processor architecture of t
 
 The @file{@value{PACKAGE}-kernel} binary package contains the kernel modules that provide the Linux
 kernel Linux Fast-STREAMS drivers and modules.  This includes assorted drivers and modules for Linux
-Fast-STREAMS and additional OpenSS7 protocol suite components.  This binary package also includes
-modprobe configuration files for the associated kernel modules.  This package is heavily tied to the
-kernel for which it and dependent components were compiled.  This package applies to kernel version
-@value{_kversion} and requires components compiled for the same kernel.  If you cannot find a binary
-package that matches your kernel, rebuild for your kernel from the OpenSS7 package source rpm.
+Fast-STREAMS and additional @value{PACKAGE_TITLE} protocol suite components.  This binary package
+also includes modprobe configuration files for the associated kernel modules.  This package is
+heavily tied to the kernel for which it and dependent components were compiled.  This package
+applies to kernel version @value{_kversion} and requires components compiled for the same kernel.
+If you cannot find a binary package that matches your kernel, rebuild for your kernel from the
+@value{PACKAGE_TITLE} package source rpm.
 
 This package can be used to install or remove the package for a specific kernel version.  When
 installing, the @samp{@value{PACKAGE}} package will also be installed if necessary.  When removing
@@ -720,9 +844,9 @@ information for development of additional Linux Fast-STREAMS kernel modules agai
 modules included in the @samp{@value{PACKAGE}-@value{_kversion}} binary package.  This package is
 heavily tied to the core kernel modules and kernel for which it was compiled.  This package applies
 to core kernel modules @samp{@value{_kversion}} for kernel version @samp{@value{_kversion}}.  This
-package provides kernel debug information for the OpenSS7 package.  Kernel debug information is
-useful when developing kernel modules that use this package or when debugging kernel modules
-contained in the package.
+package provides kernel debug information for the @value{PACKAGE_TITLE} package.  Kernel debug
+information is useful when developing kernel modules that use this package or when debugging kernel
+modules contained in the package.
 
 This package can be used to install or remove the development and debug packages for a specific
 kernel version.  When installing, the @samp{@value{PACKAGE}} and @samp{@value{PACKAGE}-devel}
@@ -746,22 +870,21 @@ a specific kernel.  This package contains source that is configured to the kerne
 configured.  This particular package contains configured source for kernel version
 @samp{@value{_kversion}}@footnote{Note that the @samp{_kversion} of @samp{@value{_kversion}} is only
 an example.}
-The @file{@value{PACKAGE}-@-source} package contains the source code necessary for
-building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
-configuration utilities necessary to create and distribute tarballs, @file{rpm} and
-@file{deb}/@file{dsc}.
+The @file{@value{PACKAGE}-@-source} package contains the source code necessary for building the
+@value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)} configuration utilities
+necessary to create and distribute tarballs, @file{rpm} and @file{deb}/@file{dsc}.
 
 The @file{@value{PACKAGE}-source-@value{_kversion}} binary package contains the source code
-necessary for building the OpenSS7 release for the kernel version @samp{@value{_kversion}}.  It also
-includes the @manpage{autoconf(1)} configuration utilities necessary to create and distribute this
-rpm.  However, to develop on the package, it would be better to use the tarball release.  Load this
-package if you need some files from the build that are not present in the
-@file{@value{PACKAGE}-devel-@value{_kversion}} package.
+necessary for building the @value{PACKAGE_TITLE} release for the kernel version
+@samp{@value{_kversion}}.  It also includes the @manpage{autoconf(1)} configuration utilities
+necessary to create and distribute this rpm.  However, to develop on the package, it would be better
+to use the tarball release.  Load this package if you need some files from the build that are not
+present in the @file{@value{PACKAGE}-devel-@value{_kversion}} package.
 
 @end table
 
 @subsubheading Configuration and Installation
-To configure, build and install the binary RPM, @xrefman{Configuring the Binary
+To configure, build and install the binary RPM, @pxrefman{Configuring the Binary
 RPM}.
 
 @c ----------------------------------------------------------------------------
@@ -798,14 +921,14 @@ downloads site.  If your architecture is not available, you can build binary DEB
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-dev_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}-@-dev} package contains the device definitions necessary to run
 applications programs developed for @value{PACKAGE_TITLE}.  @footnote{Note that not all release
-packages contain devices.  Only packages that provide @acronym{STREAMS} character device drivers need
-devices, and then only when the @samp{specfs} or @samp{devfsd} is not being used.}
+packages contain devices.  Only packages that provide @acronym{STREAMS} character device drivers
+need devices, and then only when the @samp{specfs} or @samp{devfsd} is not being used.}
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-doc_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-doc_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}-@-doc} package contains this manual in plain text, postscript, @file{pdf} and @file{html}
-forms, along with the meta-information from the @file{@value{PACKAGE_NAME}} package.  It also
-contains all of the manual pages necessary for developing @value{PACKAGE_TITLE} applications and
-@value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
+The @file{@value{PACKAGE}-@-doc} package contains this manual in plain text, postscript, @file{pdf}
+and @file{html} forms, along with the meta-information from the @file{@value{PACKAGE_NAME}} package.
+It also contains all of the manual pages necessary for developing @value{PACKAGE_TITLE} applications
+and @value{PACKAGE_TITLE} @acronym{STREAMS} modules or drivers.
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-init_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-init_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}-@-init} package contains the @command{init} scripts and provides the @command{postinst}
@@ -813,19 +936,17 @@ scripts necessary to create kernel module preloads and modules definitions for a
 @samp{core} subpackages.
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-source_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-source_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
-The @file{@value{PACKAGE}-@-source} package contains the source code necessary for
-building the @value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)}
-configuration utilities necessary to create and distribute tarballs, rpms and
-deb/dscs.
+The @file{@value{PACKAGE}-@-source} package contains the source code necessary for building the
+@value{PACKAGE_TITLE} release.  It includes the @manpage{autoconf(1)} configuration utilities
+necessary to create and distribute tarballs, rpms and deb/dscs.
 @end table
 
 @subsubheading Architecture Dependent
 @table @asis
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-devel_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-devel_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
-The @file{@value{PACKAGE}-@-devel} package contains library archives for static
-compilation, header files to develop @value{PACKAGE_TITLE} modules and drivers.
-This also includes the header files and static libraries required to compile
-@value{PACKAGE_TITLE} applications programs.
+The @file{@value{PACKAGE}-@-devel} package contains library archives for static compilation, header
+files to develop @value{PACKAGE_TITLE} modules and drivers.  This also includes the header files and
+static libraries required to compile @value{PACKAGE_TITLE} applications programs.
 
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-lib_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-lib_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
 The @file{@value{PACKAGE}-@-lib} package contains the run-time shared libraries
@@ -834,9 +955,8 @@ necessary to run application programs and utilities developed for the
 
 @ignore
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-util_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-util_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
-The @file{@value{PACKAGE}-@-util} package provides administrative and
-configuration test utilities and commands associated with the
-@value{PACKAGE_TITLE} package.
+The @file{@value{PACKAGE}-@-util} package provides administrative and configuration test utilities
+and commands associated with the @value{PACKAGE_TITLE} package.
 @end ignore
 @end table
 
@@ -880,7 +1000,7 @@ compiled.  This particular package applies to kernel version
 @end table
 
 @subsubheading Configuration and Installation
-To configure, build and install the Debian DEB, @xrefman{Configuring the Debian
+To configure, build and install the Debian DEB, @pxrefman{Configuring the Debian
 DEB}.
 
 @c ----------------------------------------------------------------------------
@@ -900,7 +1020,7 @@ any supported architecture and for any 2.4 or 2.6 kernel.
 @end table
 
 @subsubheading Configuration
-To configure the source RPM, @xrefman{Configuring the Source RPM}.
+To configure the source RPM, @pxrefman{Configuring the Source RPM}.
 
 @c ----------------------------------------------------------------------------
 
@@ -920,7 +1040,7 @@ any supported architecture and for any 2.4 or 2.6 kernel.
 @end table
 
 @subsubheading Configuration
-To configure the source RPM, @xrefman{Configuring the Debian DSC}.
+To configure the source RPM, @pxrefman{Configuring the Debian DSC}.
 
 @c ----------------------------------------------------------------------------
 
@@ -929,7 +1049,7 @@ To configure the source RPM, @xrefman{Configuring the Debian DSC}.
 @cindex downloading, tar ball
 @cindex tar ball
 
-For non-@manpage{rpm(1)} and non-@manpage{dpkg(1)} architectures,
+For non-@manpage{rpm(8)} and non-@manpage{dpkg(1)} architectures,
 download the tarball as follows:
 
 @table @asis
@@ -938,7 +1058,7 @@ download the tarball as follows:
 These are the @manpage{tar(1)} balls for the release.  These @manpage{tar(1)} balls contain the
 @manpage{autoconf(1)} distribution which includes all the source necessary for building and
 installing the package.  These tarballs will even build Source RPM and Binary RPM on
-@manpage{rpm(1)} architectures and Debian DSC and DEB on @manpage{dpkg(1)} architectures.
+@manpage{rpm(8)} architectures and Debian DSC and DEB on @manpage{dpkg(1)} architectures.
 @end table
 
 The tar ball may be downloaded easily with @manpage{wget(1)} as follows:
@@ -991,7 +1111,7 @@ containing all of the files and subdirectories for the
 
 
 @subsubheading Configuration
-To configure and install the tar ball, @xrefman{Configuring the Tar Ball}.
+To configure and install the tar ball, @pxrefman{Configuring the Tar Ball}.
 
 @c ----------------------------------------------------------------------------
 
@@ -1005,7 +1125,7 @@ archive access privileges then you can download release, mid-release or release 
 of the @file{@value{PACKAGE_NAME}} package from the project CVS archive.
 
 The @value{PACKAGE_TITLE} package is located in the @file{@value{PACKAGE_CVSMODULE}} module of
-@file{/var/cvs}.  For release tag information, see @refman{Releases}.
+@file{/var/cvs}.  For release tag information, @pxrefman{Releases}.
 
 To access the archive from the project CVS pserver, use the following commands to check out a
 version from the archive:
@@ -1116,9 +1236,9 @@ On newer systems, simply:
 In addition, the build host requires a complete tool chain for compiling for the target host,
 including kernel tools such as @manref{genksyms(8)} and others.
 
-If you wish to package @file{rpms} on an @manpage{rpm(1)} system, or @file{debs} on a
+If you wish to package @file{rpms} on an @manpage{rpm(8)} system, or @file{debs} on a
 @manpage{dpkg(1)} system, you will need the appropriate tool chain.  Systems based on
-@manpage{rpm(1)}
+@manpage{rpm(8)}
 typically have the necessary tool chain available, however, @manpage{dpkg(1)} systems do not.  The
 following on a @cite{Debian} or @cite{Ubuntu} system will get what you need:
 
@@ -1251,11 +1371,10 @@ This relocatable directory contains manual pages.
 @cindex @value{PACKAGE}-@-lib-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
 @table @asis
 @item @file{@value{_rootdir}@value{_libdir}}
-This relocatable directory contains the run-time shared libraries necessary to
-run applications programs and utilities developed for @value{PACKAGE_TITLE}.
+This relocatable directory contains the run-time shared libraries necessary to run applications
+programs and utilities developed for @value{PACKAGE_TITLE}.
 @item @file{@value{_rootdir}@value{_datadir}/@-locale}
-This relocatable directory contains the locale information for shared library
-files.
+This relocatable directory contains the locale information for shared library files.
 @end table
 
 @item @value{PACKAGE}-@-source-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.i686@-.rpm
@@ -1281,7 +1400,7 @@ This relocatable directory contains @command{init} scripts and configuration inf
 @end table
 
 @subsubheading Installation
-To install the binary RPM, @xrefman{Installing the Binary RPM}.
+To install the binary RPM, @pxrefman{Installing the Binary RPM}.
 
 @c ----------------------------------------------------------------------------
 
@@ -1293,7 +1412,7 @@ To install the binary RPM, @xrefman{Installing the Binary RPM}.
 In general the binary DEB do not require any configuration.
 
 @subsubheading Installation
-To install the Debian DEB, @xrefman{Installing the Debian DEB}.
+To install the Debian DEB, @pxrefman{Installing the Debian DEB}.
 
 @c ----------------------------------------------------------------------------
 
@@ -1439,7 +1558,7 @@ Specifies whether kernel @code{inline} functions are to be placed inline.  This 
 adding the @option{-finline-functions} flag to @var{CFLAGS} for compiling kernel modules.  Linux 2.4
 kernels are normally compiled @option{-O2} which does not respect the @code{inline} directive.  This
 compiles kernel modules with @option{-finline-functions} to get closer to @option{-O3} optimization.
-For better optimization controls, @xrefman{Configuring the Tar Ball}.
+For better optimization controls, @pxrefman{Configuring the Tar Ball}.
 
 @item --with k-modversions
 @itemx --without k-modversions
@@ -1495,7 +1614,7 @@ In general, the default values of these options are sufficient for most purposes
 be provided when rebuilding the Source RPMs.
 
 @subsubheading Build
-To build from the source RPM, @xrefman{Building from the Source RPM}.
+To build from the source RPM, @pxrefman{Building from the Source RPM}.
 
 @c ----------------------------------------------------------------------------
 
@@ -1506,11 +1625,11 @@ To build from the source RPM, @xrefman{Building from the Source RPM}.
 
 The Debian DSC can be configured by passing options in the environment variable
 @var{BUILD_DEBOPTIONS}.  The options placed in this variable take the same form as those passed to
-the @file{configure} script, @xrefman{Configuring the Tar Ball}.  For an example, @xrefman{Building
+the @file{configure} script, @pxrefman{Configuring the Tar Ball}.  For an example, @pxrefman{Building
 from the Debian DSC}.
 
 @subsubheading Build
-To build from the Debian DSC, @xrefman{Building from the Debian DSC}.
+To build from the Debian DSC, @pxrefman{Building from the Debian DSC}.
 
 @c ----------------------------------------------------------------------------
 
@@ -1570,10 +1689,11 @@ the target installation directory (@option{--mandir}).  This disables automatic 
 @opindex public
 Disable public release.  This option is not usable on public releases and only has a usable effect
 on @value{PACKAGE_TITLE} when the package is acquired from CVS.  In particular, the @cite{STREAMS
-SS7/VoIP/ISDN/SIGTRAN Stacks} (@command{strss7-@value{VERSION_STRSS7}}) @value{pkgtype} package has a large
-number of non-public components.  Specifying this option will cause the package to build and install
-all private release components in addition to the public release components.  This option affects
-all @value{pkgtype} packages.  Most @value{pkgtype} packages do not have private release components.
+SS7/VoIP/ISDN/SIGTRAN Stacks} (@command{strss7-@value{VERSION_STRSS7}}) @value{pkgtype} package has
+a large number of non-public components.  Specifying this option will cause the package to build and
+install all private release components in addition to the public release components.  This option
+affects all @value{pkgtype} packages.  Most @value{pkgtype} packages do not have private release
+components.
 
 @item --disable-initscripts
 @opindex initscripts
@@ -1622,7 +1742,7 @@ The default is to disable the distribution of pre-built documentation.
 @opindex tools
 Specifies whether user space programs and libraries are to be built and installed.  The default is
 to build and install user space programs and libraries.  This option can be useful when rebuilding
-for multiple architectures and target kernels, particularly under @manpage{rpm(1)} or
+for multiple architectures and target kernels, particularly under @manpage{rpm(8)} or
 @manpage{dpkg(1)}.  The @samp{rebuild} @manpage{automake(1)} target uses this feature when rebuilding
 RPMs for all available architectures and kernels, to rebuild user packages once per architecture
 instead of once per kernel.
@@ -1631,7 +1751,7 @@ instead of once per kernel.
 @opindex modules
 Specifies whether kernel modules are to be built and installed.  The default is to build and install
 kernel modules.  This option can be useful when rebuilding for multiple architectures and target
-kernels, particularly under @manpage{rpm(1)} or @manpage{dpkg(1)}.  The @samp{rebuild}
+kernels, particularly under @manpage{rpm(8)} or @manpage{dpkg(1)}.  The @samp{rebuild}
 @manpage{automake(1)} target uses this feature to rebuild for all available architectures and
 kernels.
 
@@ -1697,7 +1817,7 @@ default is to provide kernel symbol versions on all exported symbols.
 @opindex k-package
 Enable generation of a kernel source package.  Specifies whether the source package: installation
 of configured source in @file{/usr/src/@value{PACKAGE_NAME}}, will be generated.  This also affects
-@manpage{rpm(1)} and @manpage{dpkg(1)} builds to include a source package.  Generation of source
+@manpage{rpm(8)} and @manpage{dpkg(1)} builds to include a source package.  Generation of source
 pacakges is disabled by default.
 
 @item --enable-devfs
@@ -1724,14 +1844,14 @@ this setting.
 
 @item --with-pkg-epoch=EPOCH
 @opindex pkg-epoch
-Specifies the epoch for the package.  This is neither used for @manpage{rpm(1)} nor
+Specifies the epoch for the package.  This is neither used for @manpage{rpm(8)} nor
 @manpage{dpkg(1)} packages, it applies to the tarball release as a whole.  The default is the
 contents of the @file{.pkgepoch} file in the @value{pkgtype} package source directory or, if that
 file does not exist, zero (0).
 
 @item --with-pkg-release=RELEASE
 @opindex pkg-release
-Specifies the release for the package.  This is neither used for @manpage{rpm(1)} nor
+Specifies the release for the package.  This is neither used for @manpage{rpm(8)} nor
 @manpage{dpkg(1)} packages, it applies to the tarball release as a whole.  The default is the
 contents of the @file{.pkgrelease} file in the @value{pkgtype} package source directory or, if that
 file does not exist, one (1).  This is the number after the last point in the package version
@@ -1739,7 +1859,7 @@ number.
 
 @item --with-pkg-patchlevel=PATCHLEVEL
 @opindex pkg-patchlevel
-Specifies the patch level for the package.  This is neither used for @manpage{rpm(1)} nor
+Specifies the patch level for the package.  This is neither used for @manpage{rpm(8)} nor
 @manpage{dpkg(1)} packages, it applies to the tarball release as a whole.  The default is the
 contents of the @file{.pkgpatchlevel} file in the @value{pkgtype} package source directory or, if
 that file does not exist, the null string.  This is an additional suffix after the package release
@@ -2411,20 +2531,20 @@ remove @command{init} scripts on both RPM and Debian systems.
 Insert service command.  Defautls to @command{insserv}.
 
 @item RPM
-Rpm command, @manref{rpm(1)}.  This is only necessary for RPM builds.  By default,
+Rpm command, @manref{rpm(8)}.  This is only necessary for RPM builds.  By default,
 @file{configure} will search for this tool.
 
 @item RPMBUILD
 Build RPM command, @manref{rpmbuild(1)}.  This is only necessary for RPM builds.  By default,
-@file{configure} will search for this tool.  @manpage{rpm(1)} will be used instead of
+@file{configure} will search for this tool.  @manpage{rpm(8)} will be used instead of
 @manpage{rpmbuild(1)} only if @manpage{rpmbuild(1)} cannot be found.
 
 @item CREATEREPO
-Create repomd repository command.  This command is used when building @manpage{yum(8)} repositories.
+Create @file{repo-md} repository command.  This command is used when building @manpage{yum(8)} repositories.
 By default, @command{configure} will search for this tool.
 
 @item MODIFYREPO
-Modify repomd respository command.  This command is used when building @manpage{yum(8)}
+Modify @file{repo-md} respository command.  This command is used when building @manpage{yum(8)}
 repositories.
 By default, @command{configure} will search for this tool.
 
@@ -2648,7 +2768,7 @@ The default is the @command{autoconf} host alias.
 @end vtable
 
 @subsubsection Build
-To build from the tar ball, @xrefman{Building from the Tar Ball}.
+To build from the tar ball, @pxrefman{Building from the Tar Ball}.
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
@@ -2656,6 +2776,12 @@ To build from the tar ball, @xrefman{Building from the Tar Ball}.
 @node Building
 @section Building
 @cindex building
+
+The @cite{@value{PACKAGE_TITLE}} can be built from source RPM, Debian DSC, or tarball.  Any of these
+approaches requires access to source code.  Note, however, that you must be entitled to receive
+source code to be able to build using any of these techniques.  @cite{OpenSS7} does not normally
+permit access to source code beginning with the 1.1.1 release.  Only sponsors of the @cite{OpenSS7
+Project} and some clients of @cite{OpenSS7 Corporation} are permitted access to source.
 
 @menu
 * Building from the Source RPM::	the next best approach
@@ -2686,7 +2812,7 @@ The source RPM is rebuilt to binary RPMs as follows:
 
 @noindent
 The rebuild process can also recognize a number of options that can be used to tweak the resulting
-binaries, @xrefman{Configuring the Source RPM}.  These options are provided on the @manpage{rpm(1)}
+binaries, @pxrefman{Configuring the Source RPM}.  These options are provided on the @manpage{rpm(8)}
 command line.  For example:
 
 @cartouche
@@ -2705,7 +2831,7 @@ for the @samp{athlon} architecture.
 
 @subsubheading Installation
 
-To install the resulting binary RPM, @xrefman{Installing the Binary RPM}.
+To install the resulting binary RPM, @pxrefman{Installing the Binary RPM}.
 
 @c ----------------------------------------------------------------------------
 
@@ -2731,9 +2857,9 @@ The Debian DSC is rebuilt to binary DEBs as follows:
 
 @noindent
 The rebuild process can also recognize a number of options that can be used to tweak the resulting
-binaries, @xrefman{Configuring the Debian DSC}.  These options are provided in the environment variable
+binaries, @pxrefman{Configuring the Debian DSC}.  These options are provided in the environment variable
 @var{BUILD_DPKGOPTIONS} and have the same form as the options to @file{configure},
-@xrefman{Configuring the Tar Ball}.  For example:
+@pxrefman{Configuring the Tar Ball}.  For example:
 
 @cartouche
 @smallexample
@@ -2753,7 +2879,7 @@ for the @samp{athlon} architecture.
 
 @subsubheading Installation
 
-To install the resulting binary DEB, @xrefman{Installing the Debian DEB}.
+To install the resulting binary DEB, @pxrefman{Installing the Debian DEB}.
 
 @c ----------------------------------------------------------------------------
 
@@ -2827,7 +2953,7 @@ be specified with declarations such as @samp{CC=/usr/@-lib/@-ppc-@-linux/@-gcc} 
 @cindex installing, yum
 @cindex yum
 
-If you have set up the necessary repository definitions (@pxrefman{Repositories for YUM}), then the
+If you have set up the necessary repository definitions (@pxrefman{Setting up YUM}), then the
 following instructions will install the RPMs on your system.@footnote{For additional information on
 @manpage{yum(8)}, see @manref{yum(8)}.}
 The repository includes groups (patterns) and virtual packages that ease the installation and
@@ -2838,8 +2964,9 @@ installation, use (one of):
 
 @cartouche
 @smallexample
-% sudo yum groupinstall @value{PACKAGE}
 % sudo yum install @value{PACKAGE}
+% sudo yum install @@@value{PACKAGE}
+% sudo yum groupinstall @value{PACKAGE}
 @end smallexample
 @end cartouche
 
@@ -2848,14 +2975,15 @@ To include the @cite{@value{PACKAGE_TITLE} JAIN} Java components, use (one of):
 
 @cartouche
 @smallexample
-% sudo yum groupinstall @value{PACKAGE}-java
 % sudo yum install @value{PACKAGE}-java
+% sudo yum install @@@value{PACKAGE}-java
+% sudo yum groupinstall @value{PACKAGE}-java
 @end smallexample
 @end cartouche
 
 @noindent
-To add an additional @cite{@value{PACKAGE_TITLE}} kernel run-time component to the installation, 
-use (one of):
+To add an additional @cite{@value{PACKAGE_TITLE}} kernel run-time component to the installation, use
+(one of):
 
 @cartouche
 @smallexample
@@ -2874,8 +3002,9 @@ use (one of):
 
 @cartouche
 @smallexample
-% sudo yum groupinstall @value{PACKAGE}-devel
 % sudo yum install @value{PACKAGE}-devel
+% sudo yum install @@@value{PACKAGE}-devel
+% sudo yum groupinstall @value{PACKAGE}-devel
 @end smallexample
 @end cartouche
 
@@ -2899,8 +3028,9 @@ To add @cite{@value{PACKAGE_TITLE}} development documentation, use (one of):
 
 @cartouche
 @smallexample
-% sudo yum groupinstall @value{PACKAGE}-doc
 % sudo yum install @value{PACKAGE}-doc @value{PACKAGE}-javadoc
+% sudo yum install @@@value{PACKAGE}-doc @value{PACKAGE}-javadoc
+% sudo yum groupinstall @value{PACKAGE}-doc
 @end smallexample
 @end cartouche
 
@@ -2911,9 +3041,9 @@ To add @cite{@value{PACKAGE_TITLE}} development documentation, use (one of):
 @cindex installing, zypper
 @cindex zypper
 
-If you have set up the necessary repository definitions (@pxrefman{Repositories for YAST}), then
-the following instructions will install the RPMs on your system.@footnote{For additional information
-on @manpage{zypper(8)}, see @manref{zypper(8)}.}
+If you have set up the necessary repository definitions (@pxrefman{Setting up ZYPPER}), then the
+following instructions will install the RPMs on your system.@footnote{For additional information on
+@manpage{zypper(8)}, see @manref{zypper(8)}.}
 The repository includes groups (patterns) and virtual packages that ease the installation and
 removal of kernel modules, libraries and utilities.
 
@@ -2922,8 +3052,8 @@ installation, use (one of):
 
 @cartouche
 @smallexample
-% sudo zypper install -t pattern @value{PACKAGE}
 % sudo zypper install @value{PACKAGE}
+% sudo zypper install -t pattern @value{PACKAGE}
 @end smallexample
 @end cartouche
 
@@ -2932,14 +3062,14 @@ To include the @cite{@value{PACKAGE_TITLE} JAIN} Java components, use (one of):
 
 @cartouche
 @smallexample
-% sudo zypper install -t pattern @value{PACKAGE}-java
 % sudo zypper install @value{PACKAGE}-java
+% sudo zypper install -t pattern @value{PACKAGE}-java
 @end smallexample
 @end cartouche
 
 @noindent
-To add an additional @cite{@value{PACKAGE_TITLE}} kernel run-time component to the installation, 
-use (one of):
+To add an additional @cite{@value{PACKAGE_TITLE}} kernel run-time component to the installation, use
+(one of):
 
 @cartouche
 @smallexample
@@ -2958,8 +3088,8 @@ use (one of):
 
 @cartouche
 @smallexample
-% sudo zypper install -t pattern @value{PACKAGE}-devel
 % sudo zypper install @value{PACKAGE}-devel
+% sudo zypper install -t pattern @value{PACKAGE}-devel
 @end smallexample
 @end cartouche
 
@@ -2983,8 +3113,8 @@ To add @cite{@value{PACKAGE_TITLE}} development documentation, use (one of):
 
 @cartouche
 @smallexample
-% sudo zypper install -t pattern @value{PACKAGE}-doc
 % sudo zypper install @value{PACKAGE}-doc @value{PACKAGE}-javadoc
+% sudo zypper install -t pattern @value{PACKAGE}-doc
 @end smallexample
 @end cartouche
 
@@ -3008,8 +3138,8 @@ following instructions will install the DEBs on your system.@footnote{For additi
 
 If you have downloaded the necessary binary RPMs (@pxrefman{Downloading the Binary RPM}), or have
 rebuilt binary RPMs using the source RPM (@pxrefman{Building from the Source RPM}), then the following
-instructions will install the RPMs on your system.  For additional information on @manpage{rpm(1)},
-see @manref{rpm(1)}.
+instructions will install the RPMs on your system.  For additional information on @manpage{rpm(8)},
+see @manref{rpm(8)}.
 
 @cartouche
 @smallexample
@@ -3022,7 +3152,7 @@ see @manref{rpm(1)}.
 You must have the correct binary RPMs downloaded or built for this to be successful.
 
 Some of the packages are relocatable and can have final installation directories altered with the
-@option{--relocate} option to @manpage{rpm(1)}, see @manref{rpm(8)}.
+@option{--relocate} option to @manpage{rpm(8)}, see @manref{rpm(8)}.
 For example, the following will relocate the documentation and info directories:
 
 @cartouche
@@ -3109,7 +3239,7 @@ privilege is required to successfully invoke this target.
 @cindex removing, yum
 @cindex yum
 
-@cite{@value{PACKAGE_TITLE}} repositories support @manref{yum(8)} in repomd XML format.  The
+@cite{@value{PACKAGE_TITLE}} repositories support @manref{yum(8)} in @file{repo-md} XML format.  The
 repository includes virtual packages that ease the removal of kernel modules, libraries and
 utilities.
 
@@ -3117,18 +3247,20 @@ To remove all @cite{@value{PACKAGE_TITLE}} components, use (one of):
 
 @cartouche
 @smallexample
-$> sudo yum groupremove @value{PACKAGE}
 $> sudo yum remove @value{PACKAGE}
+$> sudo yum remove @@@value{PACKAGE}
+$> sudo yum groupremove @value{PACKAGE}
 @end smallexample
 @end cartouche
 
 @noindent
-To remove just the @cite{@value{PACKAGE_TITLE} JAIN} Jave component, use (one of):
+To remove just the @cite{@value{PACKAGE_TITLE} JAIN} Java component, use (one of):
 
 @cartouche
 @smallexample
-$> sudo yum groupremove @value{PACKAGE}-java
 $> sudo yum remove @value{PACKAGE}-java
+$> sudo yum remove @@@value{PACKAGE}-java
+$> sudo yum groupremove @value{PACKAGE}-java
 @end smallexample
 @end cartouche
 
@@ -3144,15 +3276,18 @@ $> sudo yum remove @value{PACKAGE}-@value{_kversion}
 
 @noindent
 Where, @samp{$(uname -r)} will remove for the running kernel.  @samp{@value{_kversion}} is just an
-example.  When the kernel run-time being removed is the last kernel run-time, the remainder of the
-@cite{@value{PACKAGE_TITLE}} components will also be removed.
+example.  Note also that @cite{@value{PACKAGE_TITLE}} does not install a kernel package for each and
+every kernel version, nor is it normally necessary.  When the kernel run-time being removed is the
+last kernel run-time, the remainder of the @cite{@value{PACKAGE_TITLE}} components will also be
+removed.
 
 To remove all @cite{@value{PACKAGE_TITLE}} development components, use (one of):
 
 @cartouche
 @smallexample
-$> sudo yum groupremove @value{PACKAGE}-develop
 $> sudo yum remove @value{PACKAGE}-develop
+$> sudo yum remove @@@value{PACKAGE}-develop
+$> sudo yum groupremove @value{PACKAGE}-develop
 @end smallexample
 @end cartouche
 
@@ -3177,8 +3312,9 @@ To remove just documentation components, use (one of):
 
 @cartouche
 @smallexample
-$> sudo yum groupremove @value{PACKAGE}-doc
 $> sudo yum remove @value{PACKAGE}-doc @value{PACKAGE}-javadoc
+$> sudo yum remove @@@value{PACKAGE}-doc
+$> sudo yum groupremove @value{PACKAGE}-doc
 @end smallexample
 @end cartouche
 
@@ -3189,8 +3325,8 @@ $> sudo yum remove @value{PACKAGE}-doc @value{PACKAGE}-javadoc
 @cindex removing, zypper
 @cindex zypper
 
-@cite{@value{PACKAGE_TITLE}} repositories support @manref{zypper(8)} in SUSE repomd XML format.  The
-repository includes virtual packages that ease the removal of kernel modules, libraries and
+@cite{@value{PACKAGE_TITLE}} repositories support @manref{zypper(8)} in SUSE @file{repo-md} XML format.
+The repository includes virtual packages that ease the removal of kernel modules, libraries and
 utilities.
 
 To remove all @cite{@value{PACKAGE_TITLE}} components, use (one of):
@@ -3202,7 +3338,7 @@ $> sudo zypper remove @value{PACKAGE}
 @end cartouche
 
 @noindent
-To remove just the @cite{@value{PACKAGE_TITLE} JAIN} Jave component, use (one of):
+To remove just the @cite{@value{PACKAGE_TITLE} JAIN} Java component, use (one of):
 
 @cartouche
 @smallexample
@@ -3222,8 +3358,10 @@ $> sudo zypper remove @value{PACKAGE}-@value{_kversion}
 
 @noindent
 Where, @samp{$(uname -r)} will remove for the running kernel.  @samp{@value{_kversion}} is just an
-example.  When the kernel run-time being removed is the last kernel run-time, the remainder of the
-@cite{@value{PACKAGE_TITLE}} components will also be removed.
+example.  Note also that @cite{@value{PACKAGE_TITLE}} does not install a kernel package for each and
+every kernel version, nor is it normally necessary.  When the kernel run-time being removed is the
+last kernel run-time, the remainder of the @cite{@value{PACKAGE_TITLE}} components will also be
+removed.
 
 To remove all @cite{@value{PACKAGE_TITLE}} development components, use (one of):
 
@@ -3272,23 +3410,25 @@ $> sudo zypper remove @value{PACKAGE}-doc @value{PACKAGE}-javadoc
 @cindex removing, binary rpms
 @cindex binary rpms
 
-To remove an installed version of the binary RPMs (whether obtained from the OpenSS7 binary RPM
-releases, or whether created by the source RPM), execute the following command:
+To remove an installed version of the binary RPMs (whether obtained from the @value{PACKAGE_TITLE}
+binary RPM releases, or whether created by the source RPM), execute the following command:
 
 @cartouche
 @smallexample
-% rpm -evv `rpm -qa | grep '^@value{PACKAGE}'` 2>&1 | tee erase.log
+% rpm -evv $(rpm -qa '*@value{PACKAGE}*') 2>&1 | tee erase.log
 @end smallexample
 @end cartouche
 
 @noindent
 This should uninstall all installed @file{@value{PACKAGE_NAME}} RPMs from your
-system.@footnote{Depending on the release, you should be able to issue @samp{make uninstall-rpms}
-from the build directory.}
-Note that is may also be used for any system based on @manref{rpm(1)} regardless of whether the RPMs
-where installed using @manref{rpm(1)}, @manref{yum(8)} or @manref{zypper(8)}.
+system.@footnote{Depending on the release, and if you have used option
+@samp{--enable-maintainer-mode} to @command{configure} and have generated RPMs with @samp{make
+release}, you should be able to issue @samp{make uninstall-rpms} from the build directory to remove
+all installed binary rpms belonging to the build release.} Note that this command may also be used
+for any system based on @manref{rpm(8)} regardless of whether the RPMs where installed using
+@manref{rpm(8)}, @manref{yum(8)} or @manref{zypper(8)}.
 
-For more information see @manref{rpm(1)}.
+For more information see @manref{rpm(8)}.
 
 @c ----------------------------------------------------------------------------
 
@@ -3297,21 +3437,25 @@ For more information see @manref{rpm(1)}.
 @cindex removing, binary debs
 @cindex binary debs
 
-To remove and installed version of the Debian DEB (whether obtained from the OpenSS7 binary DEB
-releases, or whether created by the Debian DSC), execute the following command:
+To remove and installed version of the Debian DEB (whether obtained from the @value{PACKAGE_TITLE}
+binary DEB releases, or whether created by the Debian DSC), execute the following command:
 
 @cartouche
 @smallexample
-% dpkg -ev `dpkg -l | grep '^@value{PACKAGE}'` 2>&1 | tee erase.log
+% dpkg -ev $(dpkg -l | grep '^@value{PACKAGE}') 2>&1 | tee erase.log
 @end smallexample
 @end cartouche
 
 @noindent
 This should uninstall all installed @file{@value{PACKAGE_NAME}} DEBs from your
-system.@footnote{Depending on the release, you should be able to issue @samp{make uninstall-debs}
-from the build directory.}
+system.@footnote{Depending on the release, and if you have used option
+@samp{--enable-maintainer-mode} to @command{configure} and have generated DEBs with @samp{make
+release}, you should be able to issue @samp{make uninstall-debs} from the build directory to remove
+all installed Debian debs belonging to the build release.}  Note that this command may also be used
+for any system based on @manref{dpkg(1)} regardless of whether the DEBs were installed using
+@manref{dpkg(1)} or @manref{apt(8)}.
 
-For more information see @manref{dpkg(8)}.
+For more information see @manref{dpkg(1)}.
 
 @c ----------------------------------------------------------------------------
 
@@ -3429,15 +3573,15 @@ following added to your @file{@value{_rootdir}/@-etc/@-modules.conf} file:
 @cartouche
 @smallexample
 prune modules.@value{pkgexample}
-if -f /lib/modules/`uname -r`/modules.@value{pkgexample}
-include /lib/modules/`uname -r`/modules.@value{pkgexample}
+if -f /lib/modules/$(uname -r)/modules.@value{pkgexample}
+include /lib/modules/$(uname -r)/modules.@value{pkgexample}
 endif
 @end smallexample
 @end cartouche
 
 @noindent
 which will provide for demand loading of the modules if they have been built and installed for the
-running kernel.  The @file{/lib/@-modules/@-@command{`uname -r`}/@-modules.@value{pkgexample}} file
+running kernel.  The @file{/lib/@-modules/@-@command{$(uname -r)}/@-modules.@value{pkgexample}} file
 looks like this:
 
 @cartouche
@@ -3465,9 +3609,10 @@ Fast-STREAMS}, @xref{Top, About This Manual, , STREAMS, Linux Fast-STREAMS Refer
 @subsection Makefile Targets
 
 @manpage{automake(1)} has many targets, not all of which are obvious to the casual user.  In
-addition, @cite{OpenSS7} @manpage{automake(1)} files have additional rules added to make maintaining
-and releasing a package somewhat easier.  This list of targets provides some help with what targets
-can be invoked, what they do, and what they hope to achieve.  The available targets are as follows:
+addition, @cite{@value{PACKAGE_TITLE}} @manpage{automake(1)} files have additional rules added to
+make maintaining and releasing a package somewhat easier.  This list of targets provides some help
+with what targets can be invoked, what they do, and what they hope to achieve.  The available
+targets are as follows:
 
 @menu
 * User Targets::
@@ -3534,7 +3679,7 @@ privilege.
 @mkindex install-strip
 The @samp{install} target installs the package by installing each @value{pkgtype} package.  This
 target also performs some actions similar to the pre- and post-install scripts used by packaging
-tools such as @manpage{rpm(1)} or @manpage{dpkg(1)}.  The @samp{install-strip} target strips
+tools such as @manpage{rpm(8)} or @manpage{dpkg(1)}.  The @samp{install-strip} target strips
 unnecessary symbols from executables and kernel modules before installing.
 
 This is a standard @cite{GNU} @manpage{automake(1)} makefile target.  This target requires root
@@ -3720,7 +3865,7 @@ building from atop multiple packages, these targets also recurse down through ea
 @table @samp
 @item release
 @mkindex release
-Build all of the things necessary to generate a release.  On an @manpage{rpm(1)} system this is the
+Build all of the things necessary to generate a release.  On an @manpage{rpm(8)} system this is the
 distribution archives, the source rpm, and the architecture dependent and architecture independent
 binary rpms.  All items are placed in the package distribution directory that can be specified with
 the @option{--with-pkg-distdir=DIR} option to @file{configure}.
@@ -3971,8 +4116,8 @@ This target does not require root privilege.
 @node RPM Build Targets
 @subsubsection RPM Build Targets
 
-On @manpage{rpm(1)} systems, or systems sporting rpm packaging tools, the following targets are used to
-generate @manpage{rpm(1)} release packages.  The epoch and release number can be controlled by the
+On @manpage{rpm(8)} systems, or systems sporting rpm packaging tools, the following targets are used to
+generate @manpage{rpm(8)} release packages.  The epoch and release number can be controlled by the
 contents of the @file{.rpmepoch} and @file{.rpmrelease} files, or with the
 @option{--with-rpm-epoch=EPOCH} and @option{--with-rpm-release=RELEASE} options to @file{configure}.
 See @samp{configure --help} for more information on options.  We always use release number @samp{1}.

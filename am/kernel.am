@@ -57,18 +57,12 @@ if PKG_BUILD_ARCH
 if PKG_BUILD_KERNEL
 ## PKG_BUILD_KERNEL
 
-Modules.map: $(KERNEL_MODULES)
-	$(AM_V_GEN)cat /dev/null > $@
-	@modules="$(KERNEL_MODULES)" ; for module in $$modules ; do \
-		$(ECHO_V) "$(NM) -s $$module >> $@" ; \
-		$(NM) -s $$module >> $@ ; \
-	done
-
-CLEANFILES 		+= Modules.map
-
 if WITH_KO_MODULES
 ###################################################################################################
 ## WITH_KO_MODULES
+
+dist_sbin_SCRIPTS		+= scripts/openss7-modules
+dist_sbin_SCRIPTS		+= src/util/openss7-update
 
 if AMDEP
 ## AMDEP
@@ -235,6 +229,17 @@ stamp-kobjects: stamp-mobjects $(KERNEL_MODULES)
 ## !AMDEP
 endif
 
+Modules.map: stamp-kobjects $(KERNEL_MODULES)
+	$(AM_V_GEN)cat /dev/null > $@
+	@modules=`$(ECHO) " $(KERNEL_MODULES) " | sed 's, lib[^[:space:]]*_a-, $(kpre),g;s,\.o ,.ko ,g'` ; \
+	for module in $$modules ; do \
+		$(ECHO_V) "$(NM) -s $$module >> $@" ; \
+		$(NM) -s $$module >> $@ ; \
+	done
+
+CLEANFILES 		+= Modules.map
+
+
 clean-kernel: mostlyclean-kernel clean-verfiles
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@srcs=`$(ECHO) " $(KERNEL_MODULES) " | sed 's| lib[^[:space:]]*_a-| $(kpre)|g;s|\.o |.mod.c |g'` ; \
@@ -263,6 +268,16 @@ DISTCLEANFILES		+= modpost.cache
 else
 ###################################################################################################
 ## !WITH_KO_MODULES
+
+Modules.map: stamp-verobjs $(KERNEL_MODULES)
+	$(AM_V_GEN)cat /dev/null > $@
+	@modules=`$(ECHO) " $(KERNEL_MODULES) " | sed 's, lib[^[:space:]]*_a-, $(kpre),g'` ; \
+	for module in $$modules ; do \
+		$(ECHO_V) "$(NM) -s $$module >> $@" ; \
+		$(NM) -s $$module >> $@ ; \
+	done
+
+CLEANFILES 		+= Modules.map
 
 KERNEL_AUX_FILES	= Module.mkvars Modules.map
 
@@ -345,6 +360,25 @@ install-modconf:
 	$(ECHO) "$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)" ; \
 	$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)
 
+if KERNEL_UPDATES
+## KERNEL_UPDATES
+install-updates:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	$(mkdinstalldirs) $(DESTDIR)$(kupdatedir)/postinst.d
+	$(mkdinstalldirs) $(DESTDIR)$(kupdatedir)/postrm.d
+	@test -d "$(kupdatedir)" || exit 0; \
+	$(ECHO) "( cd $(DESTDIR)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
+	( cd $(DESTDIR)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .) ; \
+	$(ECHO) "( cd $(DESTDIR)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
+	( cd $(DESTDIR)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)
+## KERNEL_UPDATES
+else
+## !KERNEL_UPDATES
+install-updates:
+## !KERNEL_UPDATES
+endif
+
 ##
 # For 2.6 kernels, we don't need modules.conf entries, because we put the character device file
 # aliases directly into the kernel modules.  Preloads is another way around init scripts for things
@@ -360,7 +394,7 @@ PRE_INSTALL_AM		+= pre-modules
 endif
 if WITH_KO_MODULES
 PRE_INSTALL_AM		+= 
-INSTALL_EXEC_LOCAL	+= install-modules
+INSTALL_EXEC_LOCAL	+= install-modules install-updates
 else
 PRE_INSTALL_AM		+= pre-modconf
 INSTALL_EXEC_LOCAL	+= install-modules install-preloads install-modconf
@@ -557,6 +591,17 @@ post-preload:
 
 if WITH_KO_MODULES
 ##
+# If we have a usable weak-modules command and the modules.dep file already exists in the modules
+# directory, and the system map and system versions files are available, then perform the weak
+# update on the kernel modules.  Note that this also performs a depmod when required.
+##
+post-updates:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test -n "$(UPDATES)" -a -x "$(UPDATES_SCRIPT)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -r "$(DESTDIR)$(rootdir)$(ksysmap)" -a -r "$(DESTDIR)$(rootdir)$(ksymvers)" || exit 0 ; \
+	$(ECHO) "$(UPDATES) -v 2 $(UPDATES_OPTIONS) -c "$(DESTDIR)$(rootdir)" -b "$(DESTDIR)" -k "$(kversion)" --add-modules" ; \
+	$(UPDATES) -v 2 $(UPDATES_OPTIONS) -c "$(DESTDIR)$(rootdir)" -b "$(DESTDIR)" -k "$(kversion)" --add-modules
+
+##
 # If we have a usable depmod command and the modules.dep file already exists in the modules
 # directory, and the system map file is available, then perform the depmod on the modules.  We had
 # to change the -ae flag to -Ae for compatibility with 2.5.48+, but that should not cause a problem
@@ -611,7 +656,7 @@ post-deprecated:
 ## completed.
 ##
 if WITH_KO_MODULES
-POST_INSTALL_AM		+= post-depmod post-source
+POST_INSTALL_AM		+= post-updates post-source
 else
 POST_INSTALL_AM		+= post-modconf post-preload post-depmod post-source
 endif
@@ -650,8 +695,22 @@ uninstall-modconf:
 	@$(NORMAL_UNINSTALL)
 	rm -f -- "$(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)"
 
+if KERNEL_UPDATES
+## KERNEL_UPDATES
+uninstall-updates:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- "$(DESTDIR)$(kupdatedir)/postinst.d/openss7-update
+	rm -f -- "$(DESTDIR)$(kupdatedir)/postrm.d/openss7-update
+## KERNEL_UPDATES
+else
+## !KERNEL_UPDATES
+uninstall-updates:
+## !KERNEL_UPDATES
+endif
+
 if WITH_KO_MODULES
-UNINSTALL_LOCAL		+= uninstall-modules
+UNINSTALL_LOCAL		+= uinstall-updates uninstall-modules
 else
 UNINSTALL_LOCAL		+= uninstall-preload uninstall-modules uninstall-modconf
 endif
@@ -717,6 +776,17 @@ postun-preload:
 
 if WITH_KO_MODULES
 ##
+# It we have a usable weak-modules and the modules.dep file already exists in the modules directory,
+# and the system map and system versions files are available, the perform the removal of the kernel
+# modules.  Note that this also performs a depmod when required.
+##
+postun-updates:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test -n "$(UPDATES)" -a -x "$(UPDATES_SCRIPT)" -a -f "$(DESTDIR)$(kmoduledir)/modules.dep" -a -r "$(DESTDIR)$(rootdir)$(ksysmap)" -a -r "$(DESTDIR)$(rootdir)$(ksymvers)" || exit 0 ; \
+	$(ECHO) "$(UPDATES) -v 2 $(UPDATES_OPTIONS) -c "$(DESTDIR)$(rootdir)" -b "$(DESTDIR)" -k $(kversion)" --remove-modules ; \
+	$(UPDATES) -v 2 $(UPDATES_OPTIONS) -c "$(DESTDIR)$(rootdir)" -b "$(DESTDIR)" -k $(kversion) --remove-modules
+
+##
 # If we have a usable system map file and an executable depmod, we perform the depmod.
 ##
 # We run depmod -Ae instead of -ae on autoconf install because installed files have current
@@ -766,7 +836,7 @@ postun-deprecated:
 # runs after uninstall has completed.
 ##
 if WITH_KO_MODULES
-POST_UNINSTALL_MA	+= postun-depmod postun-source
+POST_UNINSTALL_MA	+= postun-updates postun-source
 else
 POST_UNINSTALL_MA	+= postun-modconf postun-preload postun-depmod postun-source
 endif

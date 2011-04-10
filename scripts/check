@@ -284,10 +284,10 @@ function check_manual(command,	    found, myline)
 {
     found = 0
     while ((command | getline myline) == 1) {
-	if (sub("^" mandir "/", "", myline) != 0) {
+	#if (sub("^" mandir "/", "", myline) != 0) {
 	    found = 1
-	    break
-	}
+	    #break
+	#}
     }
     close(command)
     return found
@@ -545,7 +545,7 @@ BEGIN {
 	    }
 	    if (types[type]) {
 		split(types[type], sections)
-		if (!search_one($1, sections)) {
+		if (!search_one(gensub(/__*$/, "", 1, $1), sections)) {
 		    string = "could not find " $2 " " $1
 		    if (onerror[type] == "S")
 			print_f_s(string, sections)
@@ -729,7 +729,7 @@ BEGIN {
 		if (symb in defined)
 		    print_s("module symbol " symb " is resolved")
 		else
-		    print_e("cannot resolve module symbol " symb)
+		    print_e("cannot resolve prelinked module symbol " symb)
 	    }
 	    show_progress("checked", "undefined module symbols", 1000)
 	}
@@ -967,20 +967,20 @@ BEGIN {
 		sect = page; sub(/.*\./, "", sect);
 		numb = sect; sub(/[[:alpha:]]*$/, "", numb)
 		fullpage = ENVIRON["srcdir"] "/" page ".man"
-		command = "man -M " MANPATH " " sect " " root " >" outfile " 2>" errfile
+		command = "man -M " MANPATH " " numb " " root " >" outfile " 2>" errfile
 		ok = 1
 		print_d(command)
 		if (system(command) != 0) ok = 0
 		if (ok) {
 		    while ((getline < errfile) == 1) {
-#			if (/character above first line discarded/) continue
-			if (/Reformatting.*please wait/) continue
-#			if (/multiple matches for/) continue
-#			if (/can't break line/) continue
-#			if (/cannot adjust line/) continue
-#			if (/numeric expression expected/) continue
-#			if (/can't find special character/) continue
-			if (/will not fit on one page/) continue
+			if (/Reformatting.*please wait/)	    { continue }
+			if (/character above first line discarded/) { ok = 2; continue }
+			if (/multiple matches for/)		    { ok = 2; continue }
+			if (/can't break line/)			    { ok = 2; continue }
+			if (/cannot adjust line/)		    { ok = 2; continue }
+			if (/numeric expression expected/)	    { ok = 2; continue }
+			if (/can't find special character/)	    { ok = 2; continue }
+			if (/will not fit on one page/)		    { ok = 2; continue }
 			ok = 0
 			break
 		    }
@@ -990,13 +990,14 @@ BEGIN {
 		    if ((getline < outfile) != 1) ok = 0
 		    close(outfile)
 		}
-		if (!ok) {
-		    print_e("error formatting manual page " fullpage)
+		if (ok != 1) {
+		    if (!ok) print_e("error formatting manual page " fullpage)
+		    else     print_w("warning formatting manual page " fullpage)
 		    print_d("stderr was:")
 		    while ((getline < errfile) == 1) { gsub(/.[[:cntrl:]]/, ""); print_d($0); } close(errfile)
 		    print_d("stdout was:")
 		    while ((getline < outfile) == 1) { gsub(/.[[:cntrl:]]/, ""); print_d($0); } close(outfile)
-		    continue
+		    if (!ok) continue
 		}
 		if (page in xref)
 		    continue
@@ -1087,9 +1088,9 @@ BEGIN {
 						continue
 					    } else {
 						if (check_wrongsect(base) == 1) {
-						    print_e("xref: " cross " in " fullpage " xref wrong section")
+						    print_w("xref: " cross " in " fullpage " xref wrong section")
 						} else {
-						    print_e("xref: " cross " in " fullpage " xref missing")
+						    print_w("xref: " cross " in " fullpage " xref missing")
 						}
 						break
 					    }

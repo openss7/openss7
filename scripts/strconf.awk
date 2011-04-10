@@ -1980,7 +1980,7 @@ BEGIN {
     count_errs = 0; count_warn = 0; errors = ""
     if (!("TERM" in ENVIRON)) ENVIRON["TERM"] = "dumb"
     if (ENVIRON["TERM"] == "dumb" || system("test -t 1 -a -t 2") != 0) {
-	stdout = "/dev/stderr"
+	stdout = "/dev/stdout"
 	stderr = "/dev/stderr"
 	cr = ""; lf = "\n"
 	blk = ""; hblk = ""

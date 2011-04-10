@@ -139,9 +139,9 @@ The
 command is an
 .BR awk (1)
 script that performs in a weak-update of kernel modules in the spirit of the
-.BR weak-modules (8)
+.B weak-modules
 or
-.BR weak-modules2 (8)
+.B weak-modules2
 scripts provided by
 .IR RedHat " or " SuSE .
 .PP
@@ -151,10 +151,10 @@ links and relinked modules in the
 \fB/lib/modules/\fP\fI$KVERSION\fP\fB/weak-updates\fP directory, in a manner
 similar to the
 .IR RedHat " and " SuSE
-.BR weak-modules (8),
+.BR weak-modules ,
 and
 .I SuSE
-.BR weak-modules2 (8),
+.BR weak-modules2 ,
 scripts.  The differences are as follows:
 .\"
 .IP \(bu \w'\(bu\(em'u
@@ -162,10 +162,10 @@ scripts.  The differences are as follows:
 will consider for compatibility and relink any kernel modules that depend (or
 rely) upon an absolute symbol address in a given kernel.  Neither the
 .IR RedHat/Fedora ", " "SuSE Code 10" ,
-.BR weak-modules (8)
+.B weak-modules
 scripts, nor the
 .I SuSE Code 11
-.BR weak-modules2 (8)
+.B weak-modules2
 scripts know about absolute symbols, so both can weak-update kernel modules that
 are incompatible with a given kernel (due to unsatisfied absolute symbol
 dependencies).  Only a run of the
@@ -178,7 +178,7 @@ understands weak symbols (both exported and absolute), and will relink or allow
 the kernel module loader to conditionally link any weak symbols that are
 compatible with the updated module.  Both the
 .IR RedHat/Fedora " and " "SuSE Code 10/11"
-.BR weak-modules (8)
+.B weak-modules
 scripts use
 .BR modprobe (8)
 with the
@@ -188,7 +188,7 @@ However, this does not consider versions for weak symbols and will fail to
 update a kernel module that has a weak symbol that is not satisfied by the
 kernel under consideration.  The
 .I SuSE Code 11
-.BR weak-modules2 (8)
+.B weak-modules2
 script does not have this problem because it uses
 .BR depmod (8)
 to determine module compatibility and
@@ -219,28 +219,28 @@ arrangement is that \(lq\fBupdates\fP\(rq is loaded before
 .sp
 The
 .I RedHat/Fedora
-.BR weak-modules (8)
+.B weak-modules
 script only considers weak updates from the \(lq\fBextra\fP\(rq directory to the
 \(lq\fBweak-updates\fP\(rq directory.  The
 .I SuSE Code 10
-.BR weak-modules (8)
+.B weak-modules
 script only considers weak updates from the \(lq\fBupdates\fP\(rq directory to
 the \(lq\fBweak-updates\fP\(rq directory.  The
 .I SuSE Code 11
-.BR weak-modules2 (8)
+.B weak-modules2
 script considers weak updates from the \(lq\fBupdates\fP\(rq and
 \(lq\fBextra\fP\(rq directories to the \(lq\fBweak-updates/updates\fP\(rq and
 \(lq\fBweak-updates/extra\fP\(rq directories.
 .sp
 While the
 .IR RedHat/Fedora " and " "SuSE Code 10"
-.BR weak-modules (8)
+.B weak-modules
 scripts update kernel module regardless of whether they belong to
 .BR rpm (8)
 packages
 or not, the
 .I SuSE Code 11
-.BR weak-modules2 (8)
+.B weak-modules2
 script will only update kernel modules that belong to properly formatted
 .I SuSE Code 11
 kernel module
@@ -767,9 +767,9 @@ available with a different version, weak-updates are not performed for the
 module by
 .BR openss7-modules ,
 nor will it have been performed by either
-.BR weak-modules (8)
+.B weak-modules
 nor
-.BR weak-modules2 (8)
+.B weak-modules2
 (because these scripts are aware of normal exported symbols).
 .sp
 Exports symbols are used predominantly and for the vast majority of kernel
@@ -786,7 +786,7 @@ version is placed in the
 .B __versions
 section of the binary.
 The
-.BR weak-modules (8)
+.B weak-modules
 script use
 .BR modprobe (8)
 with the
@@ -800,7 +800,7 @@ simply dumps the entire
 section without regard to whether the symbols are weak or not.
 The
 .I SuSE Code 11
-.BR weak-modules2 (8)
+.B weak-modules2
 script is not susceptible to this because it instead uses
 .BR depmod (8)
 to determine compatibility and
@@ -844,9 +844,9 @@ available in the system maps, weak-updates are not performed for the module
 by
 .BR openss7-modules ,
 but will have been performed by either
-.BR weak-modules (8)
+.B weak-modules
 or
-.BR weak-modules2 (8)
+.B weak-modules2
 (because these scripts are not aware of absolute symbols).
 .sp
 Absolute symbols are used sparingly within the
@@ -929,7 +929,7 @@ option.
 .B Fedora\ kmod:
 This is a kernel-specific module package approach which is largely deprecated.
 Kernel module packages were tied to a specific kernel, and
-.BR yum (8)
+.B yum
 plugins were used to pin a kernel to a set of modules.
 This method had the following requirements:
 .RS
@@ -951,7 +951,7 @@ version number followed by an underscore and the kernel version for which the
 modules were built.
 .PP
 The
-.BR yum (8)
+.B yum
 plugin (\fBkmod.py\fP or \fBfedorakmod.py\fP) then detects these kernel module
 packages and performs updates for all kernels, pinning of kernels to kernel
 module packages, and kernel update suppression.
@@ -963,7 +963,8 @@ modules and providing preference to modules for specific kernels.  Also, the
 .B @PACKAGE_TITLE@
 package includes a modified
 .B fedorakmod.py
-yum plugin that supports the approach.  This approach is not, however, widely
+.B yum
+plugin that supports the approach.  This approach is not, however, widely
 usable and is only applicable to Fedora (the weak-updates approach is
 superior for
 .IR RHEL " and " CentOS ).
@@ -980,7 +981,7 @@ regenerating kernel modules for newly installed kernels.  For
 distributions, the system is invoked using an
 .BR rpm (8)
 kernel trigger script.  For
-.BR dpkg (8)
+.B dpkg
 distributions, the system is invoked using a \fB/etc/kernel/postinst.d\fP and
 \fB/etc/kernel/postrm.d\fP installed script.
 To use the DKMS, the following is required:
@@ -998,7 +999,7 @@ source.
 Kernel modules are installed as
 .BR rpm (8)
 or
-.BR dpkg (8)
+.B dpkg
 packages.
 .PP
 The
@@ -1047,7 +1048,7 @@ New kmod packages do not need to provide \(lq\fIpackage\fP\fB-kmod\fP;\(rq
 however, they still need to provide \(lq\fIkernel_modules\fP.\(rq
 .IP \(bu
 New kmod packages call
-.BR weak-modules (8)
+.B weak-modules
 with the
 .B --add-modules
 flag in their
@@ -1072,11 +1073,11 @@ The old
 .I SuSE Code 9/10
 approach to kernel modules is similar to the new Fedora kmod approach.  In fact,
 it uses a similar
-.BR weak-updates (8)
+.B weak-modules
 script.  The differences have more to do with differences between
-.BR yast (8)/ zypper (8)
+.BR yast / zypper
 and
-.BR up2date (8)/ yum (8)
+.BR up2date / yum
 rather than differences in approach.
 .RS
 .IP \(bu \w'\(bu\(em'u
@@ -1090,12 +1091,14 @@ Old kmp packages install their kernel modules in the \(lq\fBupdates\fP\(rq
 subdirectory.
 .IP \(bu
 Old kmp packages are not required to follow a specific package naming convention
-(unless it is desired that the old yast2 recognize them as such); however, they
-need to provide \(lq\fBmultiversion(kernel)\fP\(rq so that multiple versions can
-coexist with multiple kernel versions.
+(unless it is desired that the old
+.B yast2
+recognize them as such); however, they need to provide
+\(lq\fBmultiversion(kernel)\fP\(rq so that multiple versions can coexist with
+multiple kernel versions.
 .IP \(bu
 Old kmp packages call
-.BR weak-modules (8)
+.B weak-modules
 with the
 .B --add-modules
 flag in their
@@ -1138,7 +1141,7 @@ New kmp packages are required to follow specific naming conventions
 can be found by the update script.
 .IP \(bu
 New kmp packages call
-.BR weak-modules2 (8)
+.B weak-modules2
 with the
 .B --add-kmp
 flag in their
@@ -1193,8 +1196,6 @@ Ubuntu) distributions.
 .SH "SEE ALSO"
 .PP
 .BR awk (1),
-.BR weak-modules (8),
-.BR weak-modules2 (8),
 .BR rpm (8),
 .BR depmod (8),
 .BR automake (1),
@@ -1213,9 +1214,9 @@ has no known bugs.
 The
 .B openss7-modules
 script is compatible with the
-.BR weak-modules (8)
+.B weak-modules
 and
-.BR weak-modules2 (8)
+.B weak-modules2
 kernel module update scripts of
 .IR RedHat ", " "SuSE Code 10" " and " "Code 11" .
 .\"

@@ -1,0 +1,82 @@
+#!/usr/bin/awk -f
+
+function rpmlessthan(ver1,ver2,	    seg1,seg2,n,n1,n2,i,num1,num2,m,m1,m2,j,s1,s2,x1,x2)
+{
+    n1 = split(ver1,seg1,/[-:]/)
+    n2 = split(ver2,seg2,/[-:]/)
+    if (n1>n2) { n = n1 } else { n = n2 }
+    for (i=1;i<=n;i++) {
+	if (!(i in seg1) && (i in seg2)) { return 1 }
+	if ((i in seg1) && !(i in seg2)) { return 0 }
+	m1 = split(seg1[i],num1,/[^[:alnum:]]/)
+	m2 = split(seg2[i],num2,/[^[:alnum:]]/)
+	if (m1>m2) { m = m1 } else { m = m2 }
+	for (j=1;j<=m;j++) {
+	    if (!(j in num1) && (j in num2)) { return 1 }
+	    if ((j in num1) && !(j in num2)) { return 0 }
+	    s1 = num1[j]
+	    s2 = num2[j]
+	    while (1) {
+		sub(/^[^[:alnum:]]+/, "", s1)
+		sub(/^[^[:alnum:]]+/, "", s2)
+		if (s1~/^[[:digit:]]/ || s2~/^[[:digit:]]/) {
+		    x1 = s1; sub(/^0*/, "", x1); sub(/[^[:digit:]].*$/, "", x1)
+		    x2 = s2; sub(/^0*/, "", x2); sub(/[^[:digit:]].*$/, "", x2)
+		    if (length(x1) < length(x2)) return 1
+		    if (length(x2) > length(x1)) return 0
+		    if (x1 < x2) return 1
+		    if (x2 < x1) return 0
+		    sub(/^0*[[:digit:]]*/, "", s1)
+		    sub(/^0*[[:digit:]]*/, "", s2)
+		} else {
+		    x1 = s1; sub(/[^[:alpha:]].*$/, "", x1)
+		    x2 = s2; sub(/[^[:alpha:]].*$/, "", x2)
+		    if (x1 == "" && x2 == "") break
+		    if (x1 < x2) return 1
+		    if (x2 < x1) return 0
+		    sub(/^([[:alpha:]]*)/, "", s1)
+		    sub(/^([[:alpha:]]*)/, "", s2)
+		}
+	    }
+	}
+    }
+    # dead equal
+    return 0
+}
+
+function rpmsort(versions, n,		swapped,i,version) {
+    do {
+	swapped = 0
+	for (i=1;i<n;i++) {
+	    #print "testing " versions[i] " and " versions[i+1] > "/dev/stderr"; written = 1
+	    if (rpmlessthan(versions[i+1],versions[i]) == 1) {
+		print "swapping " versions[i] " and " versions[i+1] > "/dev/stderr"; written = 1
+		version = versions[i+1]
+		versions[i+1] = versions[i]
+		versions[i] = version
+		swapped = 1
+	    }
+	}
+    } while (swapped)
+}
+
+
+BEGIN {
+    LINT = "yes"
+    number = 0
+    written = 0
+}
+
+{
+    number++
+    v[number] = $0
+}
+
+END {
+    rpmsort(v,number)
+    if (written) close("/dev/stderr")
+    for (i=1;i<=number;i++) {
+	print v[i]
+    }
+}
+# vim: ft=awk sw=4 nocin nosi fo+=tcqlorn

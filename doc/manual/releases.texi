@@ -128,29 +128,11 @@ This section discusses compatibility with major prerequisites.
 * GNU/Linux Distributions::	Compatibility to GNU/Linux Distributions
 * Linux Kernel::		Compatibility to Linux Kernels
 * Linux Architectures::		Compatibility to Linux Architectures
-* Linux Fast-STREAMS::		Compatibility to LfS
 @end menu
 
 @c ----------------------------------------------------------------------------
 
 @include texi/compat.texi
-
-@node Linux Fast-STREAMS
-@subsection Linux Fast-STREAMS
-@cindex Linux Fast-STREAMS
-
-The @cite{@value{PACKAGE_TITLE}} package is no longer receiving active development or support.  The
-@cite{@value{PACKAGE_TITLE}} package is so fraught with bugs that it is unusable as far as The
-OpenSS7 Project is concerned.  @cite{Linux Fast-STREAMS} is the preferred replacement for
-@cite{@value{PACKAGE_TITLE}}.
-
-The @cite{@value{PACKAGE_TITLE}} package is currently compatible with @cite{Linux Fast-STREAMS
-(LfS)}.
-The @cite{@value{PACKAGE_TITLE}} package is compatible with the OpenSS7
-@b{streams-@value{VERSION_STREAMS}} release
-that is available from the @url{http://www.openss7.org/download.html, The OpenSS7 Project Downloads
-Page}.
-
 
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------

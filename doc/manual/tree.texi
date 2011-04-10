@@ -91,33 +91,35 @@
 @node Kernel Modules
 @subsection Kernel Modules
 
-The @value{PACKAGE_TITLE} package does directly build or install any of its own kernel modules.  The
-kernel modules built and installed belong to subtending add-on packages.  The following sections
-describe some of the kernel modules installed by add-on packages in the @value{PACKAGE_TITLE}.
+The @cite{@value{PACKAGE_TITLE}} package directly builds and installs all of the kernel modules
+needed by the package.@footnote{Kernel modules used to be built and installed by subtending add-on
+packages, but this is no longer the case.}  The subsections that follow describe the kernel modules
+installed by the package.
 
 @menu
-* sctp Kernel Modules::
-* streams Kernel Modules::
-* strcompat Kernel Modules::
-* strutil Kernel Modules::
-* strbcm Kernel Modules::
-* strtty Kernel Modules::
-* strxns Kernel Modules::
-* strxnet Kernel Modules::
-* strsock Kernel Modules::
-* strinet Kernel Modules::
-* strsctp Kernel Modules::
-* strchan Kernel Modules::
-* strx25 Kernel Modules::
-* striso Kernel Modules::
-* strisdn Kernel Modules::
-* stratm Kernel Modules::
-* strss7 Kernel Modules::
-* sigtran Kernel Modules::
-* strvoip Kernel Modules::
-* osr61 Kernel Modules::
+@c * sctp Kernel Modules::
+* STREAMS Kernel Modules::
+@c * strcompat Kernel Modules::
+@c * strutil Kernel Modules::
+@c * strbcm Kernel Modules::
+* TTY Kernel Modules::
+* XNS Kernel Modules::
+* XNET Kernel Modules::
+* SOCK Kernel Modules::
+* INET Kernel Modules::
+* SCTP Kernel Modules::
+* CHAN Kernel Modules::
+* X25 Kernel Modules::
+* ISO Kernel Modules::
+* ISDN Kernel Modules::
+* ATM Kernel Modules::
+* SS7 Kernel Modules::
+* SIGTRAN Kernel Modules::
+* VOIP Kernel Modules::
+@c * osr61 Kernel Modules::
 @end menu
 
+@ignore
 @node sctp Kernel Modules
 @subsubsection sctp
 
@@ -134,15 +136,17 @@ This kernel module provides the Stream Control Transmission Protocol (SCTP) sock
 See @manref{sctp(7)} for more information.
 
 @end table
+@end ignore
 
-@node streams Kernel Modules
-@subsubsection streams
+@node STREAMS Kernel Modules
+@subsubsection STREAMS
 
-The @command{streams-@value{VERSION_STREAMS}} add-on package provides a number of kernel modules
-used to implement the @acronym{STREAMS} Shadow Special Filesystem, the @acronym{STREAMS} executive, and
-various base and standard @acronym{STREAMS} drivers and modules.
+The @cite{@value{PACKAGE_TITLE}} package provides a number of kernel modules used to implement the
+@acronym{STREAMS} Shadow Special Filesystem, the @acronym{STREAMS} executive, and various base and
+standard @acronym{STREAMS} drivers and modules.@footnote{These kernel modules were formerly
+contained in the @command{streams-@value{VERSION_STREAMS}} add-on package.}
 
-Kernel modules installed by @command{streams-@value{VERSION_STREAMS}} are as follows:
+@var{STREAMS} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -300,6 +304,7 @@ This kernel module has been rolled into the @file{streams} kernel module.
 
 @end table
 
+@ignore
 @node strcompat Kernel Modules
 @subsubsection strcompat
 
@@ -400,28 +405,33 @@ See @manref{uw7compat(9)} for more information.
 This kernel module has been rolled into the @file{streams} kernel module.
 
 @end table
+@end ignore
 
+@ignore
 @node strutil Kernel Modules
 @subsubsection strutil
 
 The @command{strutil-@value{VERSION_STRUTIL}} package is not currently contained in the release and
 the kernel modules it installs are, therefore, not listed here.
+@end ignore
 
+@ignore
 @node strbcm Kernel Modules
 @subsubsection strbcm
 
 The @command{strbcm-@value{VERSION_STRBCM}} package is not currently contained in the release and
 the kernel modules it installs are, therefore, not listed here.
+@end ignore
 
-@node strtty Kernel Modules
-@subsubsection strtty
+@node TTY Kernel Modules
+@subsubsection TTY
 
-The @command{strtty-@value{VERSION_STRTTY}} add-on package provides kernel modules for core
-@acronym{STREAMS} drivers and modules written to the specifications for the @cite{SVR 4 Terminal
-Subsystem}.  These @acronym{STREAMS} modules and drivers are provided as kernel modules by the add-on
-package.
+The @cite{@value{PACKAGE_TITLE}} package provides kernel modules for core @acronym{STREAMS} drivers
+and modules written to the specifications for the @cite{SVR 4 Terminal Subsystem}.@footnote{These
+kernel modules were formerly contained in the @command{strtty-@value{VERSION_STRTTY}} add-on
+package.}
 
-Kernel modules installed by @command{strtty-@value{VERSION_STRTTY}} are as follows:
+@var{TTY} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -475,14 +485,15 @@ This kernel module has been rolled into the @file{streams} kernel module.
 
 @end table
 
-@node strxns Kernel Modules
-@subsubsection strxns
+@node XNS Kernel Modules
+@subsubsection XNS
 
-The @command{strxns-@value{VERSION_STRXNS}} add-on packages provides kernel modules for sundry
-@acronym{STREAMS} drivers and modules written to the specifications for @cite{X/Open Networking
-Services} and the @dfn{CDI}, @dfn{DLPI} and @dfn{NPI} levels.
+The @cite{@value{PACKAGE_TITLE}} package provides kernel modules for sundry @acronym{STREAMS}
+drivers and modules written to the specifications for @cite{X/Open Networking Services} and the
+@dfn{CDI}, @dfn{DLPI} and @dfn{NPI} levels.@footnote{These kernel modules were formerly contained in
+the @command{strxns-@value{VERSION_STRXNS}} add-on package.}
 
-Kernel modules installed by @command{strxns-@value{VERSION_STRXNS}} are as follows:
+@var{XNS} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -494,15 +505,15 @@ This kernel module has been rolled into the @file{streams} kernel module.
 
 @end table
 
-@node strxnet Kernel Modules
-@subsubsection strxnet
+@node XNET Kernel Modules
+@subsubsection XNET
 
-The @command{strxnet-@value{VERSION_STRXNET}} add-on package provides several @acronym{STREAMS} modules
-that provide capabilities first found in @cite{UNIX System V Release 4} that form part of the
-@dfn{Transport Provider Interface (TPI)} networking capabilities.  These @acronym{STREAMS} modules are
-provided as kernel modules in the add-on package.
+The @cite{@value{PACKAGE_TITLE}} package provides several @acronym{STREAMS} modules that provide
+capabilities first found in @cite{UNIX System V Release 4} that form part of the @dfn{Transport
+Provider Interface (TPI)} networking capabilities.@footnote{These kernel modules were formerly
+contained in the @command{strxnet-@value{VERSION_STRXNET}} add-on package.}
 
-Kernel modules installed by @command{strxnet-@value{VERSION_STRXNET}} are as follows:
+@var{XNET} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -531,14 +542,16 @@ This kernel module has been rolled into the @file{streams} kernel module.
 
 @end table
 
-@node strsock Kernel Modules
-@subsubsection strsock
+@node SOCK Kernel Modules
+@subsubsection SOCK
 
-The @command{strsock-@value{VERSION_STRSOCK}} add-on package provides a number of @acronym{STREAMS}
-drivers and modules as kernel modules.  These drivers and modules provide capabilities first found
-in @cite{UNIX System V Release 4} the form part of the @cite{POSIX Sockets} networking capabilities.
+The @cite{@value{PACKAGE_TITLE}} package provides a number of @acronym{STREAMS} drivers and modules
+as kernel modules.  These drivers and modules provide capabilities first found in @cite{UNIX System
+V Release 4} the form part of the @cite{POSIX Sockets} networking capabilities.@footnote{These
+kernel modules were formerly contained in the @command{strsock-@value{VERSION_STRSOCK}} add-on
+package.}
 
-Kernel modules installed by @command{strsock-@value{VERSION_STRSOCK}} are as follows:
+@var{SOCK} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -564,15 +577,16 @@ This kernel module has been rolled into the @file{streams} kernel module.
 
 @end table
 
-@node strinet Kernel Modules
-@subsubsection strinet
+@node INET Kernel Modules
+@subsubsection INET
 
-The @command{strinet-@value{VERSION_STRINET}} add-on package provides a number of @acronym{STREAMS}
-drivers and kernel modules.  The original package provided only the @dfn{XTIOS (XTI over Sockets)}
-approach @file{inet} driver, however, the current package also provides implementations of these
-drivers written directly in @acronym{STREAMS}.
+The @cite{@value{PACKAGE_TITLE}} package provides a number of @acronym{STREAMS} drivers and kernel
+modules.  The original package provided only the @dfn{XTIOS (XTI over Sockets)} approach @file{inet}
+driver, however, the current package also provides implementations of these drivers written directly
+in @acronym{STREAMS}.@footnote{These kernel modules were formerly contained in the
+@command{strinet-@value{VERSION_STRINET}} add-on package.}
 
-Kernel modules installed by @command{strinet-@value{VERSION_STRINET}} are as follows:
+@var{INET} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -616,14 +630,15 @@ This kernel module has been rolled into the @file{streams} kernel module.
 
 @end table
 
-@node strsctp Kernel Modules
-@subsubsection strsctp
+@node SCTP Kernel Modules
+@subsubsection SCTP
 
-The @command{strsctp-@value{VERSION_STRSCTP}} add-on package provides a number of @acronym{STREAMS}
-drivers in kernel modules.  This is the @acronym{STREAMS} implementation of Stream Control Transmission
-Protocol (SCTP).
+The @cite{@value{PACKAGE_TITLE}} package provides a number of @acronym{STREAMS} drivers in kernel
+modules.  This is the @acronym{STREAMS} implementation of Stream Control Transmission Protocol
+(SCTP).@footnote{These kernel modules were formerly contained in the
+@command{strsctp-@value{VERSION_STRSCTP}} add-on package.}
 
-Kernel modules installed by @command{strsctp-@value{VERSION_STRSCTP}} are as follows:
+@var{SCTP} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -644,16 +659,17 @@ See @manref{tpiperf(4)} for more information.
 
 @end table
 
-@node strchan Kernel Modules
-@subsubsection strchan
+@node CHAN Kernel Modules
+@subsubsection CHAN
 
-The @command{strchan-@value{VERSION_STRCHAN}} add-on package provides a range of @acronym{STREAMS}
-drivers and modules as kernel modules.  The drivers and modules implement various protocol
-components for @cite{Isochronous Channels} and related devices.
-A number of these drivers and modules were formerly part of the commercial @command{strss7} package
-releases.
+The @cite{@value{PACKAGE_TITLE}} package provides a range of @acronym{STREAMS} drivers and modules
+as kernel modules.  The drivers and modules implement various protocol components for
+@cite{Isochronous Channels} and related devices.@footnote{These kernel modules were formerly
+contained in the @command{strchan-@value{VERSION_STRCHAN}} add-on package.  A number of these
+drivers and modules were originally part of the commercial @command{strss7} add-on package
+releases.}
 
-Kernel modules installed by @command{strchan-@value{VERSION_STRCHAN}} are as follows:
+@var{CHAN} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @asis
 
@@ -664,17 +680,17 @@ release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS
 
 @end table
 
-@node strx25 Kernel Modules
-@subsubsection strx25
+@node X25 Kernel Modules
+@subsubsection X25
 
-The @command{strx25-@value{VERSION_STRX25}} add-on package provides a range of @acronym{STREAMS} drivers
-and modules as kernel modules.  The drivers and modules implement various protocol components in the
-@cite{International Standards Organization (ISO)} @cite{X.25} model, and a
-number of @cite{Internet Enginerring Task Force} related protocols.
-A number of these drivers and modules were formerly part of the commercial @command{strss7} package
-releases.
+The @cite{@value{PACKAGE_TITLE}} package provides a range of @acronym{STREAMS} drivers and modules
+as kernel modules.  The drivers and modules implement various protocol components in the
+@cite{International Standards Organization (ISO)} @cite{X.25} model, and a number of @cite{Internet
+Enginerring Task Force} related protocols.@footnote{These kernel modules were formerly contained in
+the @command{strx25-@value{VERSION_STRX25}} add-on package.  A number of these drivers and modules
+were originally part of the commercial @command{strss7} package releases.}
 
-Kernel modules installed by @command{strx25-@value{VERSION_STRX25}} are as follows:
+@var{X25} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -706,17 +722,17 @@ For more information, see @manref{x25-plp(4)}.
 @end table
 
 
-@node striso Kernel Modules
-@subsubsection striso
+@node ISO Kernel Modules
+@subsubsection ISO
 
-The @command{striso-@value{VERSION_STRISO}} add-on package provides a range of @acronym{STREAMS} drivers
-and modules as kernel modules.  The drivers and modules implement various protocol components in the
+The @cite{@value{PACKAGE_TITLE}} package provides a range of @acronym{STREAMS} drivers and modules
+as kernel modules.  The drivers and modules implement various protocol components in the
 @cite{International Standards Organization (ISO)} @cite{Open Systems Interconnect} model, and a
-number of @cite{Internet Enginerring Task Force} related protocols.
-A number of these drivers and modules were formerly part of the commercial @command{strss7} package
-releases.
+number of @cite{Internet Enginerring Task Force} related protocols.@footnote{These kernel modules
+were formerly contained in the @command{striso-@value{VERSION_STRISO}} add-on package.  A number of
+these drivers and modules were originally part of the commercial @command{strss7} package releases.}
 
-Kernel modules installed by @command{striso-@value{VERSION_STRISO}} are as follows:
+@var{ISO} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -769,36 +785,16 @@ For more information, see @manref{clns(4)}.
 
 @end table
 
-@node strisdn Kernel Modules
-@subsubsection strisdn
+@node ISDN Kernel Modules
+@subsubsection ISDN
 
-The @command{strisdn-@value{VERSION_STRISDN}} add-on package provides a range of @acronym{STREAMS}
-drivers and modules as kernel modules.  The drivers and modules implement various protocol
-components in, or related to, the @cite{Integrated Services Digital Network}.
-A number of these drivers and modules were formerly part of the commercial @command{strss7} package
-releases.
+The @cite{@value{PACKAGE_TITLE}} package provides a range of @acronym{STREAMS} drivers and modules
+as kernel modules.  The drivers and modules implement various protocol components in, or related to,
+the @cite{Integrated Services Digital Network}.@footnote{These kernel modules were formerly
+contained in the @command{strisdn-@value{VERSION_STRISDN}} add-on package.  A number of these
+drivers and modules were originally part of the commercial @command{strss7} package releases.}
 
-Kernel modules installed by @command{strisdn-@value{VERSION_STRISDN}} are as follows:
-
-@table @asis
-
-@item 
-
-This add-on package currently installs no kernel modules.  Modules will be added from the commercial
-release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
-
-@end table
-
-@node stratm Kernel Modules
-@subsubsection stratm
-
-The @command{stratm-@value{VERSION_STRATM}} add-on package provides a range of @acronym{STREAMS}
-drivers and modules as kernel modules.  The drivers and modules implement various protocol
-components in, or related to, the @cite{Asynchronous Transfer Mode (ATM)}.
-A number of these drivers and modules were formerly part of the commercial @command{strss7} package
-releases.
-
-Kernel modules installed by @command{stratm-@value{VERSION_STRATM}} are as follows:
+@var{ISDN} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @asis
 
@@ -809,15 +805,36 @@ release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS
 
 @end table
 
-@node strss7 Kernel Modules
-@subsubsection strss7
+@node ATM Kernel Modules
+@subsubsection ATM
 
-The @command{strss7-@value{VERSION_STRSS7}} add-on package provides a wide range of @acronym{STREAMS}
-drivers and modules as kernel modules.  The package comes in public and subscriber versions.  The
-public version has far fewer modules than the subscriber version.  Listed below are only the current
-public modules.
+The @cite{@value{PACKAGE_TITLE}} package provides a range of @acronym{STREAMS} drivers and modules
+as kernel modules.  The drivers and modules implement various protocol components in, or related to,
+the @cite{Asynchronous Transfer Mode (ATM)}.@footnote{These kernel modules were formerly contained
+in the @command{stratm-@value{VERSION_STRATM}} add-on package.  A number of these drivers and
+modules were originally part of the commercial @command{strss7} package releases.}
 
-Kernel modules installed by @command{strss7-@value{VERSION_STRSS7}} are as follows:
+@var{ATM} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
+
+@table @asis
+
+@item 
+
+This add-on package currently installs no kernel modules.  Modules will be added from the commercial
+release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS}.
+
+@end table
+
+@node SS7 Kernel Modules
+@subsubsection SS7
+
+The @cite{@value{PACKAGE_TITLE}} package provides a wide range of @acronym{STREAMS} drivers and
+modules as kernel modules.@footnote{These kernel modules were formerly contained in the the
+@command{strss7-@value{VERSION_STRSS7}} add-on package.} The package comes in public and subscriber
+versions.  The public version has far fewer modules than the subscriber version.  Listed below are
+only the current public modules.
+
+@var{SS7} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -917,16 +934,17 @@ See @manref{x400p-ss7(4)} for more information.
 
 @end table
 
-@node sigtran Kernel Modules
-@subsubsection sigtran
+@node SIGTRAN Kernel Modules
+@subsubsection SIGTRAN
 
-The @command{sigtran-@value{VERSION_SIGTRAN}} add-on package provides a range of @acronym{STREAMS}
-drivers and modules as kernel modules.  The drivers and modules implement various protocol
-components of @cite{Signalling Transport (SIGTRAN)} and related SS7 over IP protocols.
-A number of these drivers and modules were formerly part of the commercial @command{strss7} package
-releases.
+The @cite{@value{PACKAGE_TITLE}} package provides a range of @acronym{STREAMS} drivers and modules
+as kernel modules.  The drivers and modules implement various protocol components of
+@cite{Signalling Transport (SIGTRAN)} and related SS7 over IP protocols.@footnote{These kernel
+modules were formerly contained in the @command{sigtran-@value{VERSION_SIGTRAN}} add-on package.  A
+number of these drivers and modules were originally part of the commercial @command{strss7} package
+releases.}
 
-Kernel modules installed by @command{sigtran-@value{VERSION_SIGTRAN}} are as follows:
+@var{SIGTRAN} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @file
 
@@ -978,16 +996,16 @@ See @manref{sl_tpi(4)} for more information.
 
 @end table
 
-@node strvoip Kernel Modules
-@subsubsection strvoip
+@node VOIP Kernel Modules
+@subsubsection VOIP
 
-The @command{strvoip-@value{VERSION_STRVOIP}} add-on package provides a range of @acronym{STREAMS}
-drivers and modules as kernel modules.  The drivers and modules implement various protocol
-components for @cite{Voice over IP} and related protocols.
-A number of these drivers and modules were formerly part of the commercial @command{strss7} package
-releases.
+The @cite{@value{PACKAGE_TITLE}} package provides a range of @acronym{STREAMS} drivers and modules
+as kernel modules.  The drivers and modules implement various protocol components for @cite{Voice
+over IP} and related protocols.@footnote{These kernel modules were formerly contained in the
+@command{strvoip-@value{VERSION_STRVOIP}} add-on package.  A number of these drivers and modules
+were originally part of the commercial @command{strss7} package releases.}
 
-Kernel modules installed by @command{strvoip-@value{VERSION_STRVOIP}} are as follows:
+@var{VOIP} kernel modules installed by @cite{@value{PACKAGE_TITLE}} are as follows:
 
 @table @asis
 
@@ -998,6 +1016,7 @@ release of @command{strss7} as they are re-validated on @cite{Linux Fast-STREAMS
 
 @end table
 
+@ignore
 @node osr61 Kernel Modules
 @subsubsection osr61
 
@@ -1060,4 +1079,5 @@ This kernel module supports the @manpage{pmacd(4)} driver.
 See @manref{ctimod(4)} for more information.
 
 @end table
+@end ignore
 
