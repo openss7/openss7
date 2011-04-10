@@ -267,6 +267,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_LINKAGE
     _LINUX_CHECK_KERNEL_TOOLS
     _LINUX_CHECK_KERNEL_MODULES
+    _LINUX_CHECK_KERNEL_SUBDIR
     _LINUX_CHECK_KERNEL_MARCH
     _LINUX_CHECK_KERNEL_BOOT
     _LINUX_CHECK_KERNEL_BUILDDIR
@@ -583,6 +584,53 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
     kmoduledir="${linux_cv_k_modules}"
     AC_SUBST([kmoduledir])dnl
 ])# _LINUX_CHECK_KERNEL_MODULES
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_SUBDIR
+# -------------------------------------------------------------------------
+# Check which kernel subdirectory to use.  For RedHat/Fedora and others
+# based on /sbin/weak-modules, use extra/openss7.  For SuSE Code 10, use
+# updates/openss7.  For SuSE Code 11, use extra/openss7.  For others, just
+# use openss7.
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_SUBDIR], [dnl
+    AC_CACHE_CHECK([for kernel modules install subdirectory], [linux_cv_k_subdir], [dnl
+	AC_ARG_WITH([k-subdir],
+	    [AS_HELP_STRING([--with-k-subdir=SUBDIR],
+		[kernel module install subdirectory @<:@default=auto@:>@])])
+	if test :"${with_k_modules:-no}" != :no
+	then
+	    linux_cv_k_subdir="$with_k_subdir"
+	else
+	    linux_cv_k_subdir=
+	    if test -z "$linux_cv_k_subdir" -a :"${linux_cv_k_ko_modules:-no}" = :no
+	    then
+		linux_cv_k_subdir="$PACKAGE_LCNAME"
+	    fi
+	    if test -z "$linux_cv_k_subdir" -a -x /usr/lib/module-init-tools/weak-modules2
+	    then
+		linux_cv_k_subdir="extra/$PACKAGE_LCNAME"
+	    fi
+	    if test -z "$linux_cv_k_subdir" -a -x /usr/lib/module-init-tools/weak-modules
+	    then
+		linux_cv_k_subdir="updates/$PACKAGE_LCNAME"
+	    fi
+	    if test -z "$linux_cv_k_subdir" -a -x /sbin/weak-modules
+	    then
+		linux_cv_k_subdir="extra/$PACKAGE_LCNAME"
+	    fi
+	    if test -z "$linux_cv_k_subdir"
+	    then
+		linux_cv_k_subdir="$PACKAGE_LCNAME"
+	    fi
+	fi
+    ])
+    ksubdir="$linux_cv_k_subdir"
+    AC_SUBST([ksubdir])
+    KERNEL_SUBDIR="$linux_cv_k_subdir"
+    AC_SUBST([KERNEL_SUBDIR])
+])# _LINUX_CHECK_KERNEL_SUBDIR
 # =========================================================================
 
 # =========================================================================
