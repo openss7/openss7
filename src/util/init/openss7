@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: openss7,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-08 23:39:03 $
+# @(#) $RCSfile: openss7,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-11 06:13:44 $
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -903,7 +903,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-08 23:39:03 $
+# @(#) $RCSfile: openss7,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-11 06:13:44 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -949,11 +949,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-08 23:39:03 $ by $Author: brian $
+# Last Modified $Date: 2011-04-11 06:13:44 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: openss7,v $
+# Revision 1.1.2.7  2011-04-11 06:13:44  brian
+# - working up weak updates
+#
 # Revision 1.1.2.6  2011-02-08 23:39:03  brian
 # - last minute release updates
 #

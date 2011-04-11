@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-03-26 04:28:45 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-04-11 06:13:41 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,9 +48,53 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-03-26 04:28:45 $ by $Author: brian $
+## Last Modified $Date: 2011-04-11 06:13:41 $ by $Author: brian $
 ##
 ## =============================================================================
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+if PKG_BUILD_USER
+## PKG_BUILD_USER
+
+dist_sbin_SCRIPTS		+= scripts/openss7-modules
+dist_sbin_SCRIPTS		+= src/util/openss7-update
+
+if WITH_KO_MODULES
+## WITH_KO_MODULES
+if KERNEL_UPDATES
+## KERNEL_UPDATES
+
+install-updates:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/postinst.d
+	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/postrm.d
+	@test -d "$(kupdatedir)" || exit 0; \
+	$(ECHO) "( cd $(DESTDIR)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
+	( cd $(DESTDIR)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .) ; \
+	$(ECHO) "( cd $(DESTDIR)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
+	( cd $(DESTDIR)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)
+
+INSTALL_EXEC_LOCAL	+= install-updates
+
+uninstall-updates:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- "$(DESTDIR)$(kupdatedir)/postinst.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(kupdatedir)/postrm.d/openss7-update"
+
+UNINSTALL_LOCAL		+= uninstall-updates
+
+## KERNEL_UPDATES
+endif
+## WITH_KO_MODULES
+endif
+
+## PKG_BUILD_USER
+endif
+## PKG_BUILD_INDEP
+endif
 
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
@@ -60,9 +104,6 @@ if PKG_BUILD_KERNEL
 if WITH_KO_MODULES
 ###################################################################################################
 ## WITH_KO_MODULES
-
-dist_sbin_SCRIPTS		+= scripts/openss7-modules
-dist_sbin_SCRIPTS		+= src/util/openss7-update
 
 if AMDEP
 ## AMDEP
@@ -360,25 +401,6 @@ install-modconf:
 	$(ECHO) "$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)" ; \
 	$(INSTALL) -m 600 $(KERNEL_MODCONF) $(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)
 
-if KERNEL_UPDATES
-## KERNEL_UPDATES
-install-updates:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@$(NORMAL_INSTALL)
-	$(mkdinstalldirs) $(DESTDIR)$(kupdatedir)/postinst.d
-	$(mkdinstalldirs) $(DESTDIR)$(kupdatedir)/postrm.d
-	@test -d "$(kupdatedir)" || exit 0; \
-	$(ECHO) "( cd $(DESTDIR)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
-	( cd $(DESTDIR)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .) ; \
-	$(ECHO) "( cd $(DESTDIR)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
-	( cd $(DESTDIR)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)
-## KERNEL_UPDATES
-else
-## !KERNEL_UPDATES
-install-updates:
-## !KERNEL_UPDATES
-endif
-
 ##
 # For 2.6 kernels, we don't need modules.conf entries, because we put the character device file
 # aliases directly into the kernel modules.  Preloads is another way around init scripts for things
@@ -394,7 +416,7 @@ PRE_INSTALL_AM		+= pre-modules
 endif
 if WITH_KO_MODULES
 PRE_INSTALL_AM		+= 
-INSTALL_EXEC_LOCAL	+= install-modules install-updates
+INSTALL_EXEC_LOCAL	+= install-modules
 else
 PRE_INSTALL_AM		+= pre-modconf
 INSTALL_EXEC_LOCAL	+= install-modules install-preloads install-modconf
@@ -695,22 +717,8 @@ uninstall-modconf:
 	@$(NORMAL_UNINSTALL)
 	rm -f -- "$(DESTDIR)$(kmoduledir)/modules.$(KMODCONF_EXT)"
 
-if KERNEL_UPDATES
-## KERNEL_UPDATES
-uninstall-updates:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@$(NORMAL_UNINSTALL)
-	rm -f -- "$(DESTDIR)$(kupdatedir)/postinst.d/openss7-update
-	rm -f -- "$(DESTDIR)$(kupdatedir)/postrm.d/openss7-update
-## KERNEL_UPDATES
-else
-## !KERNEL_UPDATES
-uninstall-updates:
-## !KERNEL_UPDATES
-endif
-
 if WITH_KO_MODULES
-UNINSTALL_LOCAL		+= uinstall-updates uninstall-modules
+UNINSTALL_LOCAL		+= uninstall-modules
 else
 UNINSTALL_LOCAL		+= uninstall-preload uninstall-modules uninstall-modconf
 endif
@@ -906,6 +914,9 @@ MY_PHONY		+= kernel-lists clean-kernel-lists
 ## =============================================================================
 ##
 ## $Log: kernel.am,v $
+## Revision 1.1.2.11  2011-04-11 06:13:41  brian
+## - working up weak updates
+##
 ## Revision 1.1.2.10  2011-03-26 04:28:45  brian
 ## - updates to build process
 ##

@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-04-08 12:35:42 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-04-11 06:13:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-04-08 12:35:42 $ by $Author: brian $
+# Last Modified $Date: 2011-04-11 06:13:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,7 +147,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: modpost.awk,v 1.1.2.11 2011-04-08 12:35:42 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.12 2011-04-11 06:13:43 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [MODULE ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -274,7 +274,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.11 2011-04-08 12:35:42 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.12 2011-04-11 06:13:43 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -297,7 +297,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.11 2011-04-08 12:35:42 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.12 2011-04-11 06:13:43 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -2002,6 +2002,9 @@ END {
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.12  2011-04-11 06:13:43  brian
+# - working up weak updates
+#
 # Revision 1.1.2.11  2011-04-08 12:35:42  brian
 # - documented openss7-modules script
 #
