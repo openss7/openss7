@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-05 16:35:10 $
+# @(#) $RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-11 06:13:43 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-04-05 16:35:10 $ by $Author: brian $
+# Last Modified $Date: 2011-04-11 06:13:43 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -144,7 +144,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
+  $Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [INPUT ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -272,7 +272,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -295,7 +295,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
+$Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -761,7 +761,7 @@ function write_hconfig(file,    name, prefix) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -808,7 +808,7 @@ function write_hconfig(file,    name, prefix) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2011-04-05 16:35:10 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-04-11 06:13:43 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -870,7 +870,7 @@ function write_modconf(file) {
     print "\
 /******************************************************************* vim: ft=c\n\
 \n\
- @(#) $Id: strconf.awk,v 1.1.2.9 2011-04-05 16:35:10 brian Exp $\n\
+ @(#) $Id: strconf.awk,v 1.1.2.10 2011-04-11 06:13:43 brian Exp $\n\
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
@@ -917,7 +917,7 @@ function write_modconf(file) {
 \n\
  -----------------------------------------------------------------------------\n\
 \n\
- Last Modified $Date: 2011-04-05 16:35:10 $ by $Author: brian $\n\
+ Last Modified $Date: 2011-04-11 06:13:43 $ by $Author: brian $\n\
 \n\
  *****************************************************************************/\n\
 \n\
@@ -1075,7 +1075,7 @@ function write_makenodes(file) {
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-05 16:35:10 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-11 06:13:43 $\";\n\
 \n\
 #if defined(LINUX)\n\
 #	include <sys/types.h>\n\
@@ -1813,7 +1813,7 @@ function write_pkgobject(pkgobject,    file, object, name, prefix, count, first,
  * EDITS TO THIS FILE WILL BE LOST: EDIT strconf.awk INSTEAD.\n\
  */\n\
 \n\
-static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-05 16:35:10 $\";\n\
+static char const ident[] = \"$RCSfile: strconf.awk,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-04-11 06:13:43 $\";\n\
 \n\
 #include <linux/config.h>\n\
 #include <linux/version.h>\n\
@@ -2145,6 +2145,9 @@ END {
 # =============================================================================
 #
 # $Log: strconf.awk,v $
+# Revision 1.1.2.10  2011-04-11 06:13:43  brian
+# - working up weak updates
+#
 # Revision 1.1.2.9  2011-04-05 16:35:10  brian
 # - weak module design
 #

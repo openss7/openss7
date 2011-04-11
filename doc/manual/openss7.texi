@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: openss7.texi,v 1.1.2.4 2011-02-17 18:34:10 brian Exp $
+% @(#) $Id: openss7.texi,v 1.1.2.5 2011-04-11 06:13:42 brian Exp $
 %
 % =========================================================================
 %
@@ -81,7 +81,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2011-02-17 18:34:10 $ by $Author: brian $
+% Last Modified $Date: 2011-04-11 06:13:42 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -475,6 +475,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: openss7.texi,v $
+Revision 1.1.2.5  2011-04-11 06:13:42  brian
+- working up weak updates
+
 Revision 1.1.2.4  2011-02-17 18:34:10  brian
 - repository and rpm build updates
 

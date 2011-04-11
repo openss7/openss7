@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.22 $) $Date: 2011-03-26 04:28:44 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.23 $) $Date: 2011-04-11 06:13:41 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-26 04:28:44 $ by $Author: brian $
+# Last Modified $Date: 2011-04-11 06:13:41 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -231,22 +231,30 @@
 %global HAVE_newmods        0
 %global HAVE_newprel        0
 %global HAVE_symvers        0
+%global NEED_symvers        0
 %global HAVE_weakmods       0
+%global _ksubdir            %{base}
 %else
 %global HAVE_oldmods        0
 %global HAVE_oldprel        0
 %global HAVE_newmods        %{HAVE_modules}
 %global HAVE_newprel        %{HAVE_preloads}
 %global HAVE_symvers        %{HAVE_modules}
+%global NEED_symvers        1
 %global HAVE_weakmods       %{HAVE_modules}
+%global _ksubdir            extra/%{base}
 %endif
 
 %if %(if test -x /sbin/weak-modules -o -x /usr/lib/module-init-tools/weak-modules -o -x /usr/lib/module-init-tools/weak-modules2; then echo 0; else echo 1; fi)
-%global HAVE_weakmods       0
+%global _ksubdir            %{base}
 %endif
 
-%if %(if (rpm -q --whatprovides /boot/symvers-%{_kversion}.gz >/dev/null 2>&1) ; then echo 0; else echo 1; fi)
-%global HAVE_weakmods       0
+%if %(if test -x /usr/lib/module-init-tools/weak-modules -a ! -x /usr/lib/module-init-tools/weak-modules2; then echo 1; else echo 0; fi)
+%global _ksubdir            updates/%{base}
+%endif
+
+%if %(if (rpm -q --whatprovides /boot/symvers-%{_kversion}.gz >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%global NEED_symvers        0
 %endif
 
 %if %{HAVE_newmods}
@@ -1889,10 +1897,8 @@ the following binary packages:
 %{?need_debug:   -- binary application and library debug source.}
 %{?need_wrap: - %{name}-wrapper}
 %{?need_wrap:   -- kernel modules for a specific kernel.}
-%{?need_wrap: - %{kernel_package}}
-%{?need_wrap:   -- kernel modules for a range of kernels.}
-%{!?need_wrap:%{?need_kmod: - %{kernel_package}}}
-%{!?need_wrap:%{?need_kmod:   -- kernel modules for a specific kernel.}}
+%{?need_wrap: - %{kernel_package}}%{!?need_wrap:%{?need_kmod: - %{kernel_package}}}
+%{?need_wrap:   -- kernel modules for a range of kernels.}%{!?need_wrap:%{?need_kmod:   -- kernel modules for a specific kernel.}}
 %{?need_kdev: - %{kernel_develop}}
 %{?need_kdev:   -- kernel module info for a specific kernel.}
 %{?need_kbug: - %{kernel_buginfo}}
@@ -2016,6 +2022,7 @@ fi
     --disable-maintainer-mode \
     --with-k-release=%{kernel_version} \
     --with-k-modules=%{_kmoduledir} \
+    --with-k-subdir=%{_ksubdir} \
     %{?_with_dependency_tracking            '%enable %_with_dependency_tracking'} \
     %{?_without_dependency_tracking         '%disable %_without_dependency_tracking'} \
     %{?_with_silent_rules                   '%enable %_with_silent_rules'} \
@@ -2669,6 +2676,10 @@ Prefix:             %{_pkglibexecdir}
 %if %{FILES_manpages}
 Prefix:             %{_mandir}
 %endif
+%if %{FILES_weakmods}
+Prefix:             %{_sysconfdir}/kernel/postinst.d
+Prefix:             %{_sysconfdir}/kernel/postrm.d
+%endif
 
 Conflicts:          texinfo < 3.11
 
@@ -3283,6 +3294,10 @@ fi
 %{?files_manrefs:%{_mandir}/%{manrefs}*}
 %{?files_manmacros:%{_mandir}/%{manmacros}*}
 %{?files_manpages:%{_mandir}/man[1458]*/*}
+%{?need_kmod:%{_sysconfdir}/kernel/postinst.d/%{name}-update}
+%{?need_kmod:%{_sysconfdir}/kernel/postrm.d/%{name}-update}
+%{?need_kmod:%{_sbindir}/%{name}-modules}
+%{?need_kmod:%{_sbindir}/%{name}-update}
 %endif
 
 # ===========================================================================
@@ -3913,7 +3928,7 @@ Autoreq:            true
 Autoprov:           true
 
 %if %{FILES_modules}
-Prefix:             %{_kmoduledir}
+Prefix:             %{_kmoduledir}/%{_ksubdir}
 %endif
 
 Obsoletes:          %{name}-kernel
@@ -4186,6 +4201,12 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} 2>&1 || :
         # Non-running kernels do not need init scripts run.
     fi
+%if %{NEED_symvers}
+    if [ ! -r /boot/symvers-%{kernel_version}.gz ] ; then
+        gzip -c %{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/System.symvers > \
+            /boot/symvers-%{kernel_version}.gz
+    fi
+%endif
 fi
 %endif
 
@@ -4387,10 +4408,10 @@ fi
 %files -n %{kernel_package}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_modules:%dir %{_kmoduledir}/%{base}}
+%{?files_modules:%dir %{_kmoduledir}/%{_ksubdir}}
 %{?files_oldmods:%attr(644,root,root) %{_kmoduledir}/modules.%{base}}
-%{?files_oldmods:%{_kmoduledir}/%{base}/*.o*}
-%{?files_newmods:%{_kmoduledir}/%{base}/*.ko*}
+%{?files_oldmods:%{_kmoduledir}/%{_ksubdir}/*.o*}
+%{?files_newmods:%{_kmoduledir}/%{_ksubdir}/*.ko*}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/System.symvers}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Module.symvers}
 %endif
@@ -4412,9 +4433,9 @@ Group:              Development/Kernel
 Autoreq:            true
 Autoprov:           true
 
-%if %{FILES_modules}
-Prefix:             %{_kmoduledir}
-%endif
+#if %{FILES_modules}
+#refix:             %{_kmoduledir}
+#endif
 %if %{FILES_oldmods}
 Prefix:             %{_includedir}/%{name}/%{kernel_version}
 %endif
@@ -5090,6 +5111,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.23  2011-04-11 06:13:41  brian
+# - working up weak updates
+#
 # Revision 1.1.2.22  2011-03-26 04:28:44  brian
 # - updates to build process
 #

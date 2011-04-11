@@ -1,3 +1,47 @@
+2011-04-11  Brian Bidulock  <bidulock@openss7.org>
+
+	* NOTES.kmp: (new) development notes file
+	* debian-squeeze-x86_64-config.cache: (new) build cache for squeeze
+	* doc/man/man9/streams_module_address.9.man: (new) missing symbol doc
+	* doc/manual/kmod.texi: (new) split out kbuild section of manual
+	* src/util/openss7-update: (new) little script for updates, invokes
+	  openss7-modules awk script
+
+	* AUTHORS: update release files
+	* Makefile.am: determine kernel module subdir from strategy
+	* NEWS: update release files
+	* NOTES.kmod: updated development notes
+	* README: update release files
+	* THANKS: update release files
+	* openss7.spec.in: working up proper weak modules updating
+	* am/kernel.am: install and uninstall updates in noarch-user build; use
+	  .ko files instead of .o files for Modules.map under 2.6.
+	* doc/man/Makefile.am: add missing manpage
+	* doc/man/man8/openss7-modules.8.man: do not reference undocumented
+	  commands.
+	* doc/man/man9/undoc.9.man: add undocumented streams_module_address
+	* doc/manual/Makefile.am: split out kmod.texi
+	* doc/manual/install.texi: update manual
+	* doc/manual/openss7.texi: update manual
+	* doc/manual/releases.texi: update manual
+	* doc/manual/tree.texi: update manual
+	* m4/genksyms.m4: update /etc/kernel/postinst.d and others when they
+	  exist.
+	* m4/kernel.m4: check for kernel subdirectory.  This should be
+	  'extra/openss7' on RedHat and SuSE 11, 'updates/openss7' on SuSE 10,
+	  and 'openss7' on others.
+	* scripts/check: warn about warnings
+	* scripts/info.deps: avoid file closing errors
+	* scripts/modpost.awk: avoid file closing errors
+	* scripts/openss7-modules: output to stdout
+	* scripts/strconf.awk: output to stdout
+	* scripts/texi/args.texi.in: remove missing substitution
+	* scripts/texi/compat.texi: update manula
+	* src/util/init/openss7: invoke openss7-modules on init
+	* src/util/init/specfs: invoke openss7-modules on init
+	* src/util/init/specfs.sh: invoke openss7-modules on init
+	* src/util/init/streams: invoke openss7-modules on init
+
 2011-04-08  Brian Bidulock  <bidulock@openss7.org>
 
 	* doc/man/man8/openss7-modules.8.man: new manual page
