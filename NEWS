@@ -1,5 +1,5 @@
-OpenSS7 -- history of user visible changes.  2011-04-08
-$Id: NEWS,v 1.1.2.23 2011-04-11 06:13:40 brian Exp $
+OpenSS7 -- history of user visible changes.  2011-04-11
+$Id: NEWS,v 1.1.2.24 2011-04-12 06:33:26 brian Exp $
 Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
 The sections that follow provide information on OpenSS7 releases of the
 `OpenSS7' package.
 
- Major changes for release openss7-1.1.1.20110217
+ Major changes for release openss7-1.1.1.20110411
 -------------------------------------------------
 
 This is the fifth release of the `OpenSS7' package.  This is a
@@ -190,8 +190,8 @@ the package page (http://www.openss7.org/openss7_pkg.html) for the
 repository page (http://www.openss7.org/repos.html) for information
 concerning network installation and update sources.
 
-See `http://www.openss7.org/codefiles/openss7-1.1.1.20110217/ChangeLog'
-and `http://www.openss7.org/codefiles/openss7-1.1.1.20110217/NEWS' in
+See `http://www.openss7.org/codefiles/openss7-1.1.1.20110411/ChangeLog'
+and `http://www.openss7.org/codefiles/openss7-1.1.1.20110411/NEWS' in
 the release for more information.  Also, see the `openss7.pdf' manual
 in the release (also in html
 (http://www.openss7.org/openss7_manual.html)).
@@ -294,8 +294,8 @@ SRPM, DSC, and set of binary RPMs and DEBs.  See the downloads page
 SRPMs and DSCs.  For tarballs, SRPMs, DSCs and binary RPMs and DEBs,
 see the openss7 package page (http://www.openss7.org/openss7_pkg.html).
 
-See `http://www.openss7.org/codefiles/openss7-1.1.1.20110217/ChangeLog'
-and `http://www.openss7.org/codefiles/openss7-1.1.1.20110217/NEWS' in
+See `http://www.openss7.org/codefiles/openss7-1.1.1.20110411/ChangeLog'
+and `http://www.openss7.org/codefiles/openss7-1.1.1.20110411/NEWS' in
 the release for more information.  Also, see the `openss7.pdf' manual
 in the release (also in html
 `http://www.openss7.org/openss7_manual.html').

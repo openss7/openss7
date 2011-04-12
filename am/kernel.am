@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-04-11 06:13:41 $
+# @(#) $RCSfile: kernel.am,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-04-12 06:33:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-04-11 06:13:41 $ by $Author: brian $
+## Last Modified $Date: 2011-04-12 06:33:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -68,21 +68,21 @@ if KERNEL_UPDATES
 install-updates:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
-	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/postinst.d
-	$(mkinstalldirs) $(DESTDIR)$(kupdatedir)/postrm.d
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d
 	@test -d "$(kupdatedir)" || exit 0; \
-	$(ECHO) "( cd $(DESTDIR)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
-	( cd $(DESTDIR)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .) ; \
-	$(ECHO) "( cd $(DESTDIR)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
-	( cd $(DESTDIR)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)
+	$(ECHO) "( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
+	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .) ; \
+	$(ECHO) "( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
+	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)
 
 INSTALL_EXEC_LOCAL	+= install-updates
 
 uninstall-updates:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	rm -f -- "$(DESTDIR)$(kupdatedir)/postinst.d/openss7-update"
-	rm -f -- "$(DESTDIR)$(kupdatedir)/postrm.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d/openss7-update"
 
 UNINSTALL_LOCAL		+= uninstall-updates
 
@@ -824,7 +824,9 @@ endif
 
 postun-source:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)"
+	@test -L $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME) || exit 0 ; \
+	$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)" ; \
+	rm -f -- $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)
 
 ##
 # If we moved the deprecated lksctp module on install, we move it back on uninstall.
@@ -914,6 +916,9 @@ MY_PHONY		+= kernel-lists clean-kernel-lists
 ## =============================================================================
 ##
 ## $Log: kernel.am,v $
+## Revision 1.1.2.12  2011-04-12 06:33:27  brian
+## - passes distcheck
+##
 ## Revision 1.1.2.11  2011-04-11 06:13:41  brian
 ## - working up weak updates
 ##

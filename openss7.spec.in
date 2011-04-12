@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.23 $) $Date: 2011-04-11 06:13:41 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.24 $) $Date: 2011-04-12 06:33:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-04-11 06:13:41 $ by $Author: brian $
+# Last Modified $Date: 2011-04-12 06:33:26 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -233,6 +233,8 @@
 %global HAVE_symvers        0
 %global NEED_symvers        0
 %global HAVE_weakmods       0
+%global HAVE_kupdate        0
+%global HAVE_wmscripts      0
 %global _ksubdir            %{base}
 %else
 %global HAVE_oldmods        0
@@ -242,7 +244,13 @@
 %global HAVE_symvers        %{HAVE_modules}
 %global NEED_symvers        1
 %global HAVE_weakmods       %{HAVE_modules}
+%global HAVE_kupdate        %{HAVE_modules}
+%global HAVE_wmscripts      %{HAVE_modules}
 %global _ksubdir            extra/%{base}
+%endif
+
+%if %(if test -d /etc/kernel ; then echo 0 ; else echo 1 ; fi)
+%global HAVE_kupdate        0
 %endif
 
 %if %(if test -x /sbin/weak-modules -o -x /usr/lib/module-init-tools/weak-modules -o -x /usr/lib/module-init-tools/weak-modules2; then echo 0; else echo 1; fi)
@@ -300,6 +308,8 @@
 %global FILES_newprel       %{HAVE_newprel}
 %global FILES_wrapper       %{HAVE_wrapper}
 %global FILES_modules       %{HAVE_modules}
+%global FILES_kupdate       %{HAVE_kupdate}
+%global FILES_wmscripts     %{HAVE_wmscripts}
 %global FILES_oldmods       %{HAVE_oldmods}
 %global FILES_newmods       %{HAVE_newmods}
 %global FILES_libraries     %{HAVE_libraries}
@@ -675,6 +685,8 @@
 %global FILES_yumrepo       0
 %global FILES_zypprepo      0
 %global FILES_repo          0
+%global FILES_kupdate       0
+%global FILES_wmscripts     0
 %endif
 
 %if %{BUILD_arch}
@@ -905,6 +917,12 @@
 %if %{HAVE_manpages}
 %global NEED_base       1
 %endif
+%if %{HAVE_kupdate}
+%global NEED_base       1
+%endif
+%if %{HAVE_wmscripts}
+%global NEED_base       1
+%endif
 
 %if %{FILES_snmpconf}
 %global WANT_base       1
@@ -943,6 +961,12 @@
 %global WANT_base       1
 %endif
 %if %{FILES_manpages}
+%global WANT_base       1
+%endif
+%if %{FILES_kupdate}
+%global WANT_base       1
+%endif
+%if %{FILES_wmscripts}
 %global WANT_base       1
 %endif
 
@@ -1594,6 +1618,12 @@
 %endif
 %if %{FILES_weakmods}
 %global files_weakmods      %{nil}
+%endif
+%if %{FILES_kupdate}
+%global files_kupdate       %{nil}
+%endif
+%if %{FILES_wmscripts}
+%global files_wmscripts     %{nil}
 %endif
 %if %{FILES_mkvars}
 %global files_mkvars        %{nil}
@@ -2676,7 +2706,7 @@ Prefix:             %{_pkglibexecdir}
 %if %{FILES_manpages}
 Prefix:             %{_mandir}
 %endif
-%if %{FILES_weakmods}
+%if %{FILES_kupdate}
 Prefix:             %{_sysconfdir}/kernel/postinst.d
 Prefix:             %{_sysconfdir}/kernel/postrm.d
 %endif
@@ -3294,10 +3324,10 @@ fi
 %{?files_manrefs:%{_mandir}/%{manrefs}*}
 %{?files_manmacros:%{_mandir}/%{manmacros}*}
 %{?files_manpages:%{_mandir}/man[1458]*/*}
-%{?need_kmod:%{_sysconfdir}/kernel/postinst.d/%{name}-update}
-%{?need_kmod:%{_sysconfdir}/kernel/postrm.d/%{name}-update}
-%{?need_kmod:%{_sbindir}/%{name}-modules}
-%{?need_kmod:%{_sbindir}/%{name}-update}
+%{?files_kupdate:%{_sysconfdir}/kernel/postinst.d/%{name}-update}
+%{?files_kupdate:%{_sysconfdir}/kernel/postrm.d/%{name}-update}
+%{?files_wmscripts:%{_sbindir}/%{name}-modules}
+%{?files_wmscripts:%{_sbindir}/%{name}-update}
 %endif
 
 # ===========================================================================
@@ -3456,16 +3486,23 @@ fi
 %files doc
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%{?files_txtfiles:%docdir %{_docdir}/@PACKAGE@-@VERSION@}
 %{?files_txtfiles:%{_docdir}/@PACKAGE@-@VERSION@/*.txt}
+%{?files_dvifiles:%docdir %{_dvidir}/@PACKAGE@-@VERSION@}
 %{?files_dvifiles:%{_dvidir}/@PACKAGE@-@VERSION@/*.dvi}
+%{?files_psfiles:%docdir %{_psdir}/@PACKAGE@-@VERSION@}
 %{?files_psfiles:%{_psdir}/@PACKAGE@-@VERSION@/*.ps}
+%{?files_pdffiles:%docdir %{_pdfdir}/@PACKAGE@-@VERSION@}
 %{?files_pdffiles:%{_pdfdir}/@PACKAGE@-@VERSION@/*.pdf}
+%{?files_htmlfiles:%docdir %{_htmldir}/@PACKAGE@-@VERSION@}
 %{?files_htmlfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.html}
 %{?files_pngfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.png}
 %{?files_cssfiles:%{_htmldir}/@PACKAGE@-@VERSION@/*.css}
+%{?files_infofiles:%docdir %{_infodir}}
 %{?files_infofiles:%{_infodir}/*.info*}
 #{?files_manrefs:%{_mandir}/%{manrefs}*}
 #{?files_manmacros:%{_mandir}/%{manmacros}*}
+%{?files_manpages:%docdir %{_mandir}}
 %{?files_manpages:%{_mandir}/man[2379]*/*}
 %endif
 
@@ -4059,9 +4096,9 @@ provide the Linux kernel %{stitle} drivers and modules.  This includes
 assorted drivers and modules for STREAMS and additional %{title}
 protocol suite components.  This binary package also includes modprobe
 configuration files for the associated kernel modules.  This package
-is heavily tied to the kernel for which it and dependent components
+is weakly tied to the kernel for which it and dependent components
 were compiled.  This package applies to kernel %{kernel_version}
-and requires dependent components compiled for the same kernel.  If
+and requires dependent components compiled for a similar kernel.  If
 you cannot find a binary package that matches your kernel, rebuild
 for your kernel from the %{name} package source rpm.
 %{descriptail}
@@ -4419,12 +4456,6 @@ fi
 # ===========================================================================
 %package -n %{kernel_develop}
 # ---------------------------------------------------------------------------
-# Note that we should not call this just %{name}-devel-%{_kversion}.  The
-# package should be named for proper automatic kernel module package loading
-# under various distros.  This varies fairly widely for Fedora, CentOS, RHEL,
-# SLES, and others.  The Provides tags follow the naming conventions used by
-# these various packages, but virtual package names don't seem to cut it.
-# ---------------------------------------------------------------------------
 
 Summary:            %{title} kernel module symbol versions and debug info.
 Group:              Development/Kernel
@@ -4451,7 +4482,9 @@ Obsoletes:          kmod%{kernel_flavor}-devel
 Obsoletes:          kernel-module-%{name}-devel%{kernel_flavor}
 Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 
-%if %{HAVE_oldmods}
+# The development package requires that the actual kernel be installed so that
+# /boot/System.map-%{_kversion} is available.  Also, the specific kernel
+# development package is also required.
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_yumrepo}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
@@ -4460,18 +4493,6 @@ Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 %(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-
-%if %{HAVE_newmods}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
 
 %if %{NEED_devel}
 Requires(prereq):   %{name}-devel   = %{epoch}:%{baseversion}-%{fullrelease}
@@ -4488,8 +4509,8 @@ Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 
 %if %{HAVE_yumrepo}
 # This is a signal to yum that rpm packages are to be installed rather than
-# updated.  It is also a signal to yum-kmod that this package provides kernel
-# modules.
+# updated.  It is also a signal to yum-kmod that this package might provide
+# kernel modules.
 Provides:           kernel-modules = %{_kversion}
 %endif
 
@@ -4539,7 +4560,7 @@ Release:            %{kfullrelease}
 The %{kernel_develop} binary package contains the kernel modules
 symbol information for development of additional STREAMS kernel modules
 against the core kernel modules included in the %{_kversion} binary
-package.  This package is heavily tied to the core kernel modules and
+package.  This package is weakly tied to the core kernel modules and
 kernel for which it was compiled.  This package applies to core kernel
 modules %{_kversion} for kernel version %{_kversion}.  This
 package provides kernel debug information for package %{name}.  Kernel
@@ -4613,8 +4634,8 @@ Requires(prereq):   %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{
 Requires:           %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 %if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name} = %{epoch}:%{baseversion}-%{fullrelease}
+Requires:           %{name} = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
@@ -5103,6 +5124,7 @@ not normally required on other than a development system.
 %files javadoc
 # -----------------------------------------------------------------------------
 %defattr(-,root,root)
+%{?files_javadoc:%docdir %{_pkgjavadocdir}}
 %{?files_javadoc:%dir %{_pkgjavadocdir}}
 %{?files_javadoc:%{_pkgjavadocdir}/*}
 %endif
@@ -5111,6 +5133,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.24  2011-04-12 06:33:26  brian
+# - passes distcheck
+#
 # Revision 1.1.2.23  2011-04-11 06:13:41  brian
 # - working up weak updates
 #

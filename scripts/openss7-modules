@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7-modules,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-11 06:13:43 $
+# @(#) $RCSfile: openss7-modules,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-12 06:33:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-04-11 06:13:43 $ by $Author: brian $
+# Last Modified $Date: 2011-04-12 06:33:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -142,7 +142,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: openss7-modules,v 1.1.2.3 2011-04-11 06:13:43 brian Exp $\n\
+  $Id: openss7-modules,v 1.1.2.4 2011-04-12 06:33:27 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [mode] [" longargs["kernels"] "]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -269,7 +269,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: openss7-modules,v 1.1.2.3 2011-04-11 06:13:43 brian Exp $\n\
+$Id: openss7-modules,v 1.1.2.4 2011-04-12 06:33:27 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -292,7 +292,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: openss7-modules,v 1.1.2.3 2011-04-11 06:13:43 brian Exp $\n\
+$Id: openss7-modules,v 1.1.2.4 2011-04-12 06:33:27 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -1682,33 +1682,48 @@ function add_kernels(kversion,
     }
 }
 function add_modules(kversion,
-		     pfx,kversions)
+		     pfx,kversions,command)
 {
     if (split(kversion,kversions) != 1) {
 	print_error("o: one and only one KVERSION permitted for --add-modules")
 	usage(stderr); exit 2 }
     kversion = kversions[1]
     print_debug(1,"p: addmodules, kversion = " kversion)
+    kversion = ""
+    command = "ls /lib/modules"
+    while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
+    close(command)
+    add_kernels(kversion)
 }
 
 function link_modules(kversion,
-		      pfx,kversions,v)
+		      pfx,kversions,v,command)
 {
     if (split(kversion,kversions) != 1) {
 	print_error("o: one and only one KVERSION permitted for --link-modules")
 	usage(stderr); exit 2 }
     kversion = kversions[1]
     print_debug(1,"p: lnkmodules, kversion = " kversion)
+    kversion = ""
+    command = "ls /lib/modules"
+    while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
+    close(command)
+    link_kernels(kversion)
 }
 
 function remove_modules(kversion,
-			pfx,kversions,v)
+			pfx,kversions,v,command)
 {
     if (split(kversion,kversions) != 1) {
 	print_error("o: one and only one KVERSION permitted for --remove-modules")
 	usage(stderr); exit 2 }
     kversion = kversions[1]
     print_debug(1,"p: rmvmodules, kversion = " kversion)
+    kversion = ""
+    command = "ls /lib/modules"
+    while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
+    close(command)
+    add_kernels(kversion)
 }
 BEGIN {
     LINT = "yes"
@@ -1883,6 +1898,9 @@ END {
 # =============================================================================
 #
 # $Log: openss7-modules,v $
+# Revision 1.1.2.4  2011-04-12 06:33:27  brian
+# - passes distcheck
+#
 # Revision 1.1.2.3  2011-04-11 06:13:43  brian
 # - working up weak updates
 #

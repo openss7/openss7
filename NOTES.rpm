@@ -1,0 +1,105 @@
+OpenSS7 -- rpm notes.  2011-04-10
+$Id: NOTES.rpm,v 1.1.2.1 2011-04-12 06:33:26 brian Exp $
+Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+
+RPM Scriptlets
+==============
+
++----------------+---------+---------+---------+
+| scriplet       | install | upgrade | remove  |
+================================================
+| %pretrans      | $1 == 0 | $1 == 0 |  (N/A)  |
++----------------+---------+---------+---------+
+| %pre           | $1 == 1 | $1 == 2 |  (N/A)  |
++----------------+---------+---------+---------+
+| %post          | $1 == 1 | $1 == 2 |  (N/A)  |
++----------------+---------+---------+---------+
+| %triggerin     | $1 == 1 | $1 == 2 |  (N/A)  |
+|                | $2 == 1 | $2 == 2 |  (N/A)  |
++----------------+---------+---------+---------+
+| %triggerun     |  (N/A)  | $1 == 1 | $1 == 0 |
+|                |  (N/A)  | $2 == 1 | $2 == 0 |
++----------------+---------+---------+---------+
+| %preun         |  (N/A)  | $1 == 1 | $1 == 0 |
++----------------+---------+---------+---------+
+| %postun        |  (N/A)  | $1 == 1 | $1 == 0 |
++----------------+---------+---------+---------+
+| %triggerpostun |  (N/A)  | $1 == 1 | $1 == 0 |
+|                |  (N/A)  | $2 == 1 | $2 == 0 |
++----------------+---------+---------+---------+
+| %posttrans     | $1 == 0 | $1 == 0 |  (N/A)  |
++----------------+---------+---------+---------+
+
+- %pretrans		of new package
+- %pre			of new package
+-			(package install)
+- %post			of new package
+- %triggerin		of other packages (set off by installing new package)
+- %triggerin		of new package (if any are true)
+- %triggerun		of old package (it it's set of by uninstalling the old package)
+- %triggerun		of other packages (set off by uninstalling old package)
+- %preun		of old package
+-			(removal of old package)
+- %postun		of old package
+- %triggerpostun	of old package (if it's set off by uninstalling the old package)
+  %triggerpostun	of other packages (if they're set off by uninstalliing the old package)
+  %posttran		of new package
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn

@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-03-17 07:01:27 $
+# @(#) $RCSfile: info.am,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-12 06:33:27 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-03-17 07:01:27 $ by $Author: brian $
+## Last Modified $Date: 2011-04-12 06:33:27 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -498,11 +498,14 @@ uninstall-html-ma:
 
 MY_PHONY		+= pngs-am
 
-#SECONDARY: $(MY_SECONDARY)
+$(SECONDARY): $(MY_SECONDARY)
 
 ## =============================================================================
 ##
 ## $Log: info.am,v $
+## Revision 1.1.2.7  2011-04-12 06:33:27  brian
+## - passes distcheck
+##
 ## Revision 1.1.2.6  2011-03-17 07:01:27  brian
 ## - build and repo system improvements
 ##

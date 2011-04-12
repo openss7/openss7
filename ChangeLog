@@ -1,3 +1,22 @@
+2011-04-12  Brian Bidulock  <bidulock@openss7.org>
+
+	- passes distcheck
+
+	* NOTES.rpm: added notes on rpm scriptlets
+	* .pkgpatchlevel: bumped patch level to 20110411
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* README: update release files
+	* THANKS: update release files
+	* openss7.spec.in: handle update scripts better
+	* am/info.am: tbl text needs to be INTERMEDIATE or SECONDARY
+	* am/kernel.am: link source directory properly, install update
+	  scripts in rootdir, not on host
+	* po/de.po: update release files
+	* scripts/modpost.awk: avoid undef variable warning
+	* scripts/openss7-modules: support add, link, remove modules
+	* scripts/rpm/find-provides.kmod: also check in root dir
+
 2011-04-11  Brian Bidulock  <bidulock@openss7.org>
 
 	* NOTES.kmp: (new) development notes file
