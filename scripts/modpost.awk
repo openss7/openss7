@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.12 $) $Date: 2011-04-11 06:13:43 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-04-12 06:33:27 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-04-11 06:13:43 $ by $Author: brian $
+# Last Modified $Date: 2011-04-12 06:33:27 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,7 +147,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: modpost.awk,v 1.1.2.12 2011-04-11 06:13:43 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.13 2011-04-12 06:33:27 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [MODULE ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -274,7 +274,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.12 2011-04-11 06:13:43 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.13 2011-04-12 06:33:27 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -297,7 +297,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.12 2011-04-11 06:13:43 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.13 2011-04-12 06:33:27 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -1206,10 +1206,11 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
     }
 }
 # read and process symsets-kversion.tar.gz file
-function read_symsets(file, own, src,	tar,fname,set,hash,pos,lineno,ssym,scrc,sep,list,fnl,fnlp)
+function read_symsets(file, own, src,	n,tar,fname,set,hash,pos,lineno,ssym,scrc,sep,list,fnl,fnlp)
 {
     count_syms = 0; count_sets = 0
     print_vinfo(1,"r: syssymset, file = \"" file "\"")
+    n = 0
     if (system("test -r " file) == 0) {
 	tar = "tar -tzf " file
 	while ((tar | getline fname)) {
@@ -1242,6 +1243,7 @@ function read_symsets(file, own, src,	tar,fname,set,hash,pos,lineno,ssym,scrc,se
 		    print_debug(4,"r: syssymset,         own = \"" own "\"")
 		    print_debug(5,"r: syssymset,         src = \"" src "\"")
 		    set_symbol($2, $3, $1, $4, set, pos, own, src, "syssymset")
+		    n++
 		} else { unrecog(fnlp, $0); continue }
 	    }
 	    close(list)
@@ -1251,7 +1253,7 @@ function read_symsets(file, own, src,	tar,fname,set,hash,pos,lineno,ssym,scrc,se
     }
     print_vinfo(1,"r: syssymset, syms " count_syms ", sets " count_sets)
     close(tar)
-    return 1
+    return n
 }
 function path_symvers(path,	n,files,file,i)
 {
@@ -1956,17 +1958,15 @@ BEGIN {
 		print_error("r: moduledir, directory not found")
 	}
 	if (("ksymsets" in values) && values["ksymsets"])
-	    read_symsets(values["ksymsets"], "kabi", "syssymset")
+	    havekabi = read_symsets(values["ksymsets"], "kabi", "syssymset")
 	else {
 	    havekabi = 0
 	    file = "symsets-" kversion ".tar.gz"
 	    if (system("test -r /boot/" file) == 0) {
-		read_symsets("/boot/" file, "kabi", "syssymset")
-		havekabi = 1
+		havekabi = havekabi + read_symsets("/boot/" file, "kabi", "syssymset")
 	    }
 	    if (system("test -r /lib/modules/" kversion "/build/" file) == 0) {
-		read_symsets("/lib/modules/" kversion "/build/" file, "kabi", "syssymset")
-		havekabi = 1
+		havekabi = havekabi + read_symsets("/lib/modules/" kversion "/build/" file, "kabi", "syssymset")
 	    }
 	}
     }
@@ -2002,6 +2002,9 @@ END {
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.13  2011-04-12 06:33:27  brian
+# - passes distcheck
+#
 # Revision 1.1.2.12  2011-04-11 06:13:43  brian
 # - working up weak updates
 #

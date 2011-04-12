@@ -35,7 +35,7 @@ BEGIN {
     for (i=4;ARGC>i;i++) {
 	delete ARGV[i]
     }
-    find = "find /boot /usr/src/kernels " dir " -type f -name 'symsets-" kversion ".tar.gz' 2>/dev/null"
+    find = "find " root " /boot /usr/src/kernels " dir " -type f -name 'symsets-*" kversion ".tar.gz' 2>/dev/null"
     while ((find | getline file)) {
 	print "D: Unpacking: " file >"/dev/stderr"
 	tar = "tar -tzf " file
@@ -258,7 +258,7 @@ END {
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-provides.kmod,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-03-17 07:01:29 $
+# @(#) $RCSfile: find-provides.kmod,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-12 06:33:28 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -304,11 +304,14 @@ END {
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-03-17 07:01:29 $ by $Author: brian $
+# Last Modified $Date: 2011-04-12 06:33:28 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-provides.kmod,v $
+# Revision 1.1.2.4  2011-04-12 06:33:28  brian
+# - passes distcheck
+#
 # Revision 1.1.2.3  2011-03-17 07:01:29  brian
 # - build and repo system improvements
 #
