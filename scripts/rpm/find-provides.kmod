@@ -43,11 +43,11 @@ BEGIN {
 	    if (set~/\/$/)
 		continue
 	    kernel = set
-	    sub("^symsets-", "", kernel)
+	    sub(/^symsets-/, "", kernel)
 	    sub(/\/.*/, "", kernel)
 	    # suse kernels need a 'flavor:' prefix in kernel() requires
 	    flavor = kernel
-	    gsub(".*-", "", flavor)
+	    gsub(/.*-/, "", flavor)
 	    if (flavor~/^(default|xen|ec2|trace)$/) {
 		flavor = flavor ":"
 	    } else {
@@ -124,7 +124,7 @@ BEGIN {
 	    if (lines[i]~/^vermagic/) {
 		vermagic = lines[i]
 		sub(/^vermagic=/, "", vermagic)
-		sub(/ .*/, "", vermagic)
+		sub(/ .*$/, "", vermagic)
 		continue
 	    }
 	}
@@ -176,8 +176,8 @@ BEGIN {
     nm = "objdump -t " $1 " 2>/dev/null"
     while ((nm | getline)) {
 	if (($3~/\*ABS\*/) && ($5~/^_?__crc_[^[:space:]]+/)) {
-	    sub("^0*", "", $1)
-	    sub("^_?__crc_", "", $5)
+	    sub(/^0*/, "", $1)
+	    sub(/^_?__crc_/, "", $5)
 	    ksym = "ksym(" $5 ") = " $1
 	    provides[vermagic, ksym] = 1
 	}
@@ -187,9 +187,9 @@ BEGIN {
 END {
     j = 1
     for (p in provides) {
+	split(p, ind, SUBSEP)
 	if (!provides[p])
 	    continue
-	split(p, ind, SUBSEP)
 	if (p in symsets) {
 	    providedsets[ind[1], symsets[p]] = 1
 	    continue

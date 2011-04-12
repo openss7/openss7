@@ -129,7 +129,13 @@ ALL_RECURSIVE_TARGETS	+= all-update-lsm
 ## MAINTAINER_MODE
 endif
 
-EXTRA_DIST		+= LSM $(PACKAGE)-$(VERSION).lsm
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+dist_doc_DATA		+= LSM $(PACKAGE)-$(VERSION).lsm
+
+## PKG_BUILD_INDEP
+endif
 
 ## =============================================================================
 ##

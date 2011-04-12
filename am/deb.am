@@ -58,8 +58,6 @@
 ## most packages.
 ##
 
-if MAINTAINER_MODE
-
 ##
 ## For better speed when building package binaries, we skip these rules to invoke package building.
 ## There is not (yet) a need to build packages when building packages...  We use maintainer mode to
@@ -67,6 +65,10 @@ if MAINTAINER_MODE
 ##
 
 if BUILD_DPKG
+## BUILD_DPKG
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
 
 ##
 ## Debian builds are a little different from rpm builds.  We use the same bootstrapping as we do for
@@ -596,14 +598,21 @@ UPDATE_SIGN		+= repo-sign-apt
 UPDATE_CLEAN_LOCAL	+= repo-apt repo-sign-apt
 UPDATECLEANFILES	+=
 
-endif
 ## BUILD_REPO_APT
-
 endif
-## BUILD_DPKG
 
-endif
 ## MAINTAINER_MODE
+endif
+
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+dist_doc_DATA		+= debian/README.Debian \
+			   debian/TODO.Debian
+## PKG_BUILD_INDEP
+endif
+
+## BUILD_DPKG
+endif
 
 EXTRA_DIST		+= debian/changelog \
 			   debian/control \

@@ -246,7 +246,7 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
 	ksyms_cv_modpost_ksymsets="$ksymsets"])
     MODPOST_KSYMSETS="$ksyms_cv_modpost_ksymsets"
     AC_SUBST([MODPOST_KSYMSETS])dnl
-    MODPOST_SYMSETS="symsets-${PACKAGE_LCNAME}-${kversion}.tar.gz"
+    MODPOST_SYMSETS="symsets-${kversion}.tar.gz"
     AC_SUBST([MODPOST_SYMSETS])dnl
 dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
     test :"$MODPOST_CACHE" != : && unset ksyms_cv_modpost_cache

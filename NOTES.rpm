@@ -49,6 +49,48 @@ RPM Scriptlets
   %triggerpostun	of other packages (if they're set off by uninstalliing the old package)
   %posttran		of new package
 
+
+Subpackage Dependencies:
+------------------------
+
+openss7-repo			-> (none)
+
+Runtime loops:
+openss7				=> openss7-repo
+openss7				-> openss7-kernel
+openss7-lib			=> openss7
+openss7-base			=> openss7-lib
+openss7-kernel			=> openss7-base
+
+Documentation loops:
+openss7-doc			=> openss7-base
+
+Java loops:
+openss7-java			=> openss7-base
+openss7-javadoc			=> (none)
+
+Development loops:
+openss7-devel			=> openss7-base
+openss7-devel			-> openss7-devel-kernel
+openss7-devel-kernel		=> openss7-devel
+openss7-devel-kernel		=> openss7-kernel
+
+Debug loops:
+openss7-debuginfo		=> openss7-base
+openss7-debuginfo		-> openss7-debuginfo-kernel
+openss7-debugsource		=> openss7-debuginfo
+openss7-debugsource		-> openss7-debugsource-kernel
+openss7-debuginfo-kernel	=> openss7-debuginfo
+openss7-debuginfo-kernel	=> openss7-kernel
+openss7-debugsource-kernel	=> openss7-debugsource
+openss7-debugsource-kernel	=> openss7-debuginfo-kernel
+
+openss7-source-kernel		=> openss7
+
+openss7-repo	<= openss7
+openss7		<= openss7-base
+openss7-lib	<= openss7-base
+
 -----
 
 =========================================================================

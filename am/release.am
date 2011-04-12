@@ -255,28 +255,34 @@ $(top_srcdir)/README-alpha: MANUAL $(top_srcdir)/AUTHORS
 RELEASE_FILES			+= $(top_srcdir)/AUTHORS \
 				   $(top_srcdir)/BUGS \
 				   $(top_srcdir)/LICENSES \
-				   $(top_srcdir)/PROBLEMS \
 				   $(top_srcdir)/NEWS \
-				   $(top_srcdir)/THANKS \
-				   $(top_srcdir)/TODO \
+				   $(top_srcdir)/PROBLEMS \
 				   $(top_srcdir)/README \
 				   $(top_srcdir)/README-alpha \
-				   $(top_srcdir)/README-cvs
+				   $(top_srcdir)/README-cvs \
+				   $(top_srcdir)/THANKS \
+				   $(top_srcdir)/TODO
 
 ## MAINTAINER_MODE
 endif
 
-EXTRA_DIST			+= AUTHORS \
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
+
+dist_doc_DATA			+= AUTHORS \
 				   BUGS \
 				   LICENSES \
-				   PROBLEMS \
 				   MANUAL \
 				   NEWS \
-				   THANKS \
-				   TODO \
+				   PROBLEMS \
 				   README \
 				   README-alpha \
-				   README-cvs
+				   README-cvs \
+				   THANKS \
+				   TODO
+
+## PKG_BUILD_INDEP
+endif
 
 ## =============================================================================
 ##

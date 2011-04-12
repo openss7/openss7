@@ -122,7 +122,7 @@
 %global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,')
 %global kernel_number %(echo %{_kversion} | sed -e 's,-.*$,,')
 %global kernel_flavor %(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*,,')
-%global kernel_trigger %(LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" 2>/dev/null | tail -1 || :)
+%global kernel_symsets symsets-%{_kversion}.tar.gz
 
 %global HAVE_devices        %{?majbase:     1}%{!?majbase:     0}
 %global HAVE_makedev        %{?makedev:     1}%{!?makedev:     0}
@@ -260,6 +260,14 @@
 %if %(if test -x /usr/lib/module-init-tools/weak-modules -a ! -x /usr/lib/module-init-tools/weak-modules2; then echo 1; else echo 0; fi)
 %global _ksubdir            updates/%{base}
 %endif
+
+%if %{HAVE_weakmods}
+%global target_kernel %(LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME}\\n" 2>/dev/null | tail -1 || :)
+%else
+%global target_kernel %(LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" 2>/dev/null | tail -1 || :)
+%endif
+%global target_kdevel %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{_kversion}/build --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" 2>/dev/null | tail -1 || :)
+
 
 %if %(if (rpm -q --whatprovides /boot/symvers-%{_kversion}.gz >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 %global NEED_symvers        0
@@ -1880,15 +1888,8 @@ BuildRequires:    @BZIP2_CMD@
 %if %{NEED_kmod}
 Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
-%if %{NEED_lib}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
-%if %{NEED_base}
-Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
 %if %{NEED_repo}
 Requires(prereq):   %{name}-repo    = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}-repo    = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 Provides:           %{name} = %{epoch}:%{baseversion}-%{fullrelease}
@@ -1925,18 +1926,16 @@ the following binary packages:
 %{?need_debug:   -- binary application and library debug info.}
 %{?need_debug: - %{name}-debugsource}
 %{?need_debug:   -- binary application and library debug source.}
-%{?need_wrap: - %{name}-wrapper}
-%{?need_wrap:   -- kernel modules for a specific kernel.}
-%{?need_wrap: - %{kernel_package}}%{!?need_wrap:%{?need_kmod: - %{kernel_package}}}
-%{?need_wrap:   -- kernel modules for a range of kernels.}%{!?need_wrap:%{?need_kmod:   -- kernel modules for a specific kernel.}}
+%{?need_kmod: - %{kernel_package}}
+%{?need_kmod:   -- kernel modules.}
 %{?need_kdev: - %{kernel_develop}}
-%{?need_kdev:   -- kernel module info for a specific kernel.}
+%{?need_kdev:   -- kernel module info.}
 %{?need_kbug: - %{kernel_buginfo}}
-%{?need_kbug:   -- kernel module debug info for a specific kernel.}
+%{?need_kbug:   -- kernel module debug info.}
 %{?need_kbug: - %{kernel_bugsrce}}
-%{?need_kbug:   -- kernel module debug source for a specific kernel.}
+%{?need_kbug:   -- kernel module debug source.}
 %{?need_ksrc: - %{kernel_sourcep}}
-%{?need_ksrc:   -- source configured for a specific kernel.}
+%{?need_ksrc:   -- configured source.}
 %{?need_java: - %{name}-java}
 %{?need_java:   -- JAIN java modules, JNI/CNI libraries, and native Java modules.}
 %{?need_jdoc: - %{name}-javadoc}
@@ -2318,10 +2317,10 @@ package_symvers () {
 # create symbol versions file
     cat System.symvers Module.symvers | gzip > $d/symvers-%{_kversion}.gz
 # copy in symbol sets file
-    cp -p symsets-%{name}-%{_kversion}.tar.gz $d
+    cp -p %{kernel_symsets} $d
 # copy in symbol sets file to boot directory as well
-    mkdir -p %{buildroot}/boot
-    cp -p symsets-%{name}-%{_kversion}.tar.gz %{buildroot}/boot
+#   mkdir -p %{buildroot}/boot
+#   cp -p %{kernel_symsets} %{buildroot}/boot
 # copy in modpost cache file for reference
     cp -p %{_builddir}/%{mpost_file} $d
 }
@@ -2377,10 +2376,34 @@ package_yumplugin
 # files section.
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-#{?files_docfiles:%{?files_locales:%doc ABOUT-NLS}}
-#{?files_docfiles:%doc AUTHORS BUGS ChangeLog COPYING INSTALL INSTALL-%{name} LICENSES LSM MANUAL NEWS PROBLEMS}
-#{?files_docfiles:%doc README README-alpha README-cvs README-make THANKS TODO}
-#{?files_docfiles:%doc %{name}-%{baseversion}.lsm}
+%{?files_docfiles:%docdir %{_docdir}}
+%{?files_docfiles:%{?locales:%{_docdir}/@PACKAGE@-@VERSION@/ABOUT-NLS}}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/AUTHORS}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/BUGS}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/COPYING}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/ChangeLog}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/INSTALL}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/INSTALL-%{name}}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/LICENSES}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/LSM}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/MANUAL}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/NEWS}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/NOTES}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/NOTES.cos53}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/NOTES.kmod}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/NOTES.kmp}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/NOTES.ksyms}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/NOTES.repo}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/NOTES.rpm}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/NOTES.sles}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/PROBLEMS}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/README}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/README-alpha}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/README-cvs}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/README-make}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/THANKS}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/TODO}
+%{?files_docfiles:%{_docdir}/@PACKAGE@-@VERSION@/%{name}-%{baseversion}.lsm}
 %endif
 
 # ===========================================================================
@@ -2721,16 +2744,8 @@ Requires:           dev >= 3.3
 #equires(postun):   /usr/sbin/makewhatis
 #endif
 
-%if %{NEED_kmod}
-Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
 %if %{NEED_lib}
 Requires(prereq):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
-%if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 Provides:           %{name}-base = %{epoch}:%{baseversion}-%{fullrelease}
@@ -3315,7 +3330,7 @@ fi
 #{?files_oldmods:%config(noreplace) %{_modutildir}/*}
 %{?files_initscripts:%config(noreplace) %{_configdir}/*}
 %{?files_initscripts:%{_initrddir}/*}
-%{?files_devscripts:%{_sbindir}/*}
+%{?files_devscripts:%{_sbindir}/@STRCONF_DEVICES@}
 %{?files_mibfiles:%{_snmpmibdir}/*}
 %{?files_testscripts:%{_pkglibexecdir}/atlocal}
 %{?files_testscripts:%{_pkglibexecdir}/testsuite*}
@@ -3381,11 +3396,7 @@ Conflicts:          texinfo < 3.11
 # The %{name}-base package contains the man page references and macros
 # and is required.  Other packages are unnecessary.
 %if %{NEED_base}
-Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
-%if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{fullrelease}
@@ -3561,15 +3572,8 @@ Requires(post):     /sbin/ldconfig
 Requires(postun):   /sbin/ldconfig
 Requires(post):     %(which tclsh)
 
-%if %{NEED_kmod}
-Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
-%if %{NEED_base}
-Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
 %if %{NEED_virt}
 Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
@@ -3779,16 +3783,11 @@ Prefix:             %{_lib32dir}
 
 Conflicts:          texinfo < 3.11
 
-%if %{NEED_lib}
-Requires(prereq):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
+%if %{NEED_base}
+Requires(prereq):   %{name}-base = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_kdev}
 Requires:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
-%if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{fullrelease}
@@ -3846,15 +3845,11 @@ Autoprov:           true
 %{?files_binaries:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 %endif
 
-%if %{NEED_lib}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
 %if %{NEED_kbug}
 Requires:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
-%if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+%if %{NEED_base}
+Requires(prereq):   %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
@@ -3892,13 +3887,9 @@ Autoprov:           true
 %{?files_binaries:Prefix:               %{_usrsrc}/debug}
 %endif
 
-Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
 %if %{NEED_kbug}
 Requires:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
-%if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
@@ -4000,7 +3991,15 @@ Requires(postun):   modutils
 #Requires(postun):   @DEPMOD@
 #Requires(postun):   @INSMOD@
 
-%if %{HAVE_oldmods}
+%if %{HAVE_weakmods}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%if %{HAVE_yumrepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%if %{HAVE_zypprepo}
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
+%else
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_yumrepo}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
@@ -4010,35 +4009,12 @@ Requires(postun):   modutils
 %endif
 %endif
 
-%if %{HAVE_newmods}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%endif
-
-%if %{NEED_lib}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-Requires(prereq):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-Requires(pre):      %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-Requires(post):     %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-Requires(preun):    %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-Requires(postun):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
 %if %{NEED_base}
-Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(prereq):   %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(pre):      %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(post):     %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(preun):    %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 Requires(postun):   %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
-%if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
@@ -4388,7 +4364,7 @@ fi
 %endif
 
 %if %{FILES_weakmods}
-%triggerin -n %{kernel_package} -- %{kernel_trigger}
+%triggerin -n %{kernel_package} -- %{target_kernel}
 # ---------------------------------------------------------------------------
 d=%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}
 if [ -f $d/System.symvers -a -f $d/Module.symvers ] ; then
@@ -4400,7 +4376,7 @@ done
 %endif
 
 %if %{FILES_weakmods}
-%triggerun -n %{kernel_package} -- %{kernel_trigger}
+%triggerun -n %{kernel_package} -- %{target_kernel}
 # ---------------------------------------------------------------------------
 if [ $2 = 0 ] ; then : # kernel being removed
     for wm in /sbin/weak-modules /usr/lib/module-init-tools/weak-modules ; do
@@ -4425,7 +4401,7 @@ fi
 %endif
 
 %if %{FILES_weakmods}
-%triggerpostun -n %{kernel_package} -- %{kernel_trigger}
+%triggerpostun -n %{kernel_package} -- %{target_kernel}
 # ---------------------------------------------------------------------------
 if [ $2 = 0 ] ; then : # kernel being removed
     for wm in /usr/lib/module-init-tools/weak-modules2 ; do
@@ -4496,15 +4472,9 @@ Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 
 %if %{NEED_devel}
 Requires(prereq):   %{name}-devel   = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}-devel   = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_kmod}
-Requires(prereq):   %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Requires:           %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-%endif
-%if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
@@ -4554,6 +4524,16 @@ Provides:           %{name}-devel-kmod = %{epoch}:%{kbaseversion}-%{kfullrelease
 Version:            %{kbaseversion}
 Release:            %{kfullrelease}
 
+%if %{FILES_symvers}
+%triggerin -n %{kernel_develop} -- %{target_kdevel}
+d1=%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}
+d2=/boot
+f=symsets-%{_kversion}.tar.gz
+if [ -r $d1/$f -a -r $d2/$f ] then
+    cp -f $d1/$f $d2/$f
+fi
+%endif
+
 # ---------------------------------------------------------------------------
 %description -n %{kernel_develop}
 %{descripline}
@@ -4584,8 +4564,8 @@ this package or when debugging kernel modules contained in the package.
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/%{cache_file}}
 #{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/System.symvers}
 #{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Module.symvers}
-%{?files_symvers:/boot/symsets-%{name}-%{_kversion}.tar.gz}
-%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/symsets-%{name}-%{_kversion}.tar.gz}
+#{?files_symvers:/boot/%{kernel_symsets}}
+%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/%{kernel_symsets}}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/Modules.map}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{fullrelease}/%{_kversion}/%{mpost_file}}
 %endif
@@ -4605,37 +4585,11 @@ Autoprov:           true
 %{?files_modules:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 %endif
 
-%if %{HAVE_oldmods}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%endif
-
-%if %{HAVE_newmods}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%endif
-
 %if %{NEED_debug}
 Requires(prereq):   %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_kmod}
-Requires(prereq):   %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Requires:           %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-%endif
-%if %{NEED_virt}
-Requires(prereq):   %{name} = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name} = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
@@ -4714,41 +4668,11 @@ Autoprov:           true
 %{?files_modules:Prefix:               %{_usrsrc}/debug}
 %endif
 
-%if %{HAVE_oldmods}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%endif
-
-%if %{HAVE_newmods}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%endif
-
 %if %{NEED_debug}
 Requires(prereq):   %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}-debugsource = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 %if %{NEED_kbug}
-Requires(prereq):   %{name}-debuginfo-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Requires:           %{name}-debuginfo-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-%endif
-%if %{NEED_kmod}
-Requires(prereq):   %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Requires:           %{name}-kernel%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-%endif
-%if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+Requires(prereq):   %{name}-debuginfo-kernel = %{epoch}:%{kbaseversion}-%{kfullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
@@ -4837,28 +4761,15 @@ Obsoletes:          %{name}-source-kmod%{kernel_flavor}
 
 # We require that the corresponding kernel be installed, otherwise, the source
 # will not be usable for more than inspection.
-%if %{HAVE_oldmods}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
 # The configured source is not usable witnout the corresponding kernel development package.
+%if %{HAVE_weakmods}
+%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%else
 %(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 
-%if %{HAVE_newmods}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-%if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
-# The configured source is not usable witnout the corresponding kernel development package.
-%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%if %{NEED_virt}
+Requires(prereq):   %{name} = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 %if %{HAVE_yumrepo}
@@ -4963,13 +4874,8 @@ Requires(postun):   /usr/bin/gcj-dbtool
 Requires(postun):   /usr/bin/rebuild-gcj-db
 %endif
 
-%if %{NEED_lib}
-Requires(prereq):   %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{fullrelease}
-%endif
-%if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
+%if %{NEED_base}
+Requires(prereq):   %{name}-base    = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 
 Release:            %{fullrelease}
@@ -5105,7 +5011,6 @@ Prefix:         %{_pkgjavadocdir}
 %endif
 
 %if %{NEED_virt}
-Requires(prereq):   %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 Requires:           %{name}         = %{epoch}:%{baseversion}-%{fullrelease}
 %endif
 

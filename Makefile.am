@@ -881,57 +881,22 @@ endif
 ##
 # These are from po/POTFILES.in
 ##
-EXTRA_DIST			+= \
-				src/lib/apli.c \
-				src/lib/cdiapi.c \
-				src/lib/dlpiapi.c \
-				src/lib/dlpi.c \
-				src/lib/netdir.c \
-				src/lib/netdir_inet.c \
-				src/lib/netselect.c \
-				src/lib/npiapi.c \
-				src/lib/osi.c \
-				src/lib/socket.c \
-				src/lib/socklib.c \
-				src/lib/sockpath.c \
-				src/lib/sun_libdlpi.c \
-				src/lib/xap.c \
-				src/lib/xnet.c \
-				src/lib/xnsl.c
-
-##EXTRA_DOCS			+= doc/drafts/isua/draft-bidulock-sigtran-isua-03.txt \
-##				   doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-ig-00.txt \
-##				   doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-mib-00.txt \
-##				   doc/drafts/m2pa/draft-bidulock-sigtran-m2pa-test-07.txt \
-##				   doc/drafts/m2pa/draft-george-sigtran-m2pa-interop-01.txt \
-##				   doc/drafts/m2ua/draft-bidulock-sigtran-m2ua-ss7test-02.txt \
-##				   doc/drafts/m3pa/draft-averson-sigtran-m3pa-00.txt \
-##				   doc/drafts/m3pa/draft-bidulock-sigtran-m3pa-01.txt \
-##				   doc/drafts/m3ua/draft-bidulock-sigtran-m3gw-00.txt \
-##				   doc/drafts/m3ua/draft-bidulock-sigtran-m3peer-01.txt \
-##				   doc/drafts/m3ua/draft-bidulock-sigtran-m3ua-test-00.txt \
-##				   doc/drafts/sctp/draft-bidulock-sigtran-gapalg-00.txt \
-##				   doc/drafts/sctp/draft-bidulock-sigtran-sctpcongestion-00.txt \
-##				   doc/drafts/sctp/draft-bidulock-sigtran-sctptli-00.txt \
-##				   doc/drafts/sctp/draft-bidulock-tsvwg-sctpnpi-00.txt \
-##				   doc/drafts/sctp/draft-bidulock-tsvwg-sctptpi-00.txt \
-##				   doc/drafts/sua/draft-bidulock-sigtran-suaco-00.txt \
-##				   doc/drafts/sua/draft-bidulock-sigtran-sua-test-00.txt \
-##				   doc/drafts/tua/draft-bidulock-sigtran-tua-04.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-as-00.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-aspcong-00.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-aspext-04.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-corid-04.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-datamodel-00.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-loadgrp-04.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-loadsel-04.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-multisg-04.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-mutilsg-00.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-regext-04.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-sessid-04.txt \
-##				   doc/drafts/ua/draft-bidulock-sigtran-sginfo-05.txt
-
-EXTRA_DIST			+= $(EXTRA_DOCS)
+EXTRA_DIST			+= src/lib/apli.c \
+				   src/lib/cdiapi.c \
+				   src/lib/dlpiapi.c \
+				   src/lib/dlpi.c \
+				   src/lib/netdir.c \
+				   src/lib/netdir_inet.c \
+				   src/lib/netselect.c \
+				   src/lib/npiapi.c \
+				   src/lib/osi.c \
+				   src/lib/socket.c \
+				   src/lib/socklib.c \
+				   src/lib/sockpath.c \
+				   src/lib/sun_libdlpi.c \
+				   src/lib/xap.c \
+				   src/lib/xnet.c \
+				   src/lib/xnsl.c
 
 EXTRA_TEX			+= scripts/texinfo.cnf \
 				   scripts/texi/agpl3.texi \
@@ -3021,11 +2986,30 @@ include am/doxy.am
 SNMPORDER			= 01
 include am/snmp.am
 
-EXTRA_DIST			+= debian/README.Debian \
-				   debian/TODO.Debian
-
 EXTRA_DIST			+= src/python/yum-plugins/fedorakmod.py \
 				   src/python/yum-plugins/fedorakmod.conf
+
+if PKG_BUILD_INDEP
+##
+## Some notes on things
+##
+dist_doc_DATA			+= NOTES \
+				   NOTES.cos53 \
+				   NOTES.kmod \
+				   NOTES.kmp \
+				   NOTES.ksyms \
+				   NOTES.repo \
+				   NOTES.rpm \
+				   NOTES.sles
+##
+## Some files that are part of a GNU distribution.
+##
+dist_doc_DATA			+= ABOUT-NLS \
+				   COPYING \
+				   ChangeLog \
+				   INSTALL
+endif
+
 ##
 ## Build cache files for intelligent warnings.
 ##

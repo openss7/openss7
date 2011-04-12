@@ -1356,6 +1356,10 @@ function create_missing_symsets(	progress,count,count_syms,count_sets,sym,set,se
 	    print_debug(1,"p: missedset, sym " sym " has no owner")
 	    continue
 	}
+	if (!values["missing"] && ownr[sym] != values["pkgdirectory"]) {
+	    print_debug(1,"p: missedset, sym " sym " owned by " ownr[sym])
+	    continue
+	}
 	print_debug(3,"p: missedset, sym " mods[sym] ":" sym)
 	set = mods[sym]; if (set!~"^" ownr[sym] "/") set = ownr[sym] "/" set
 	gsub(/\//,"_",set)
@@ -1431,7 +1435,7 @@ function write_symsets(file,		progress,count_sets,count_syms,directory,tarball,d
 	    progress = 0
 	}
 	progress++; count_sets++
-	if (!(set in setownr) || setownr[set] != values["pkgdirectory"]) continue
+	#if (!(set in setownr) || setownr[set] != values["pkgdirectory"]) continue
 	print_debug(1,"w: pkgsymset, set = " set)
 	print_debug(3,"w: pkgsymset, removing " directory "/" set ".*")
 	system_command("rm -f -- " directory "/" set ".*")
