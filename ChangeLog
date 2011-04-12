@@ -1,5 +1,22 @@
 2011-04-12  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: do basic doc files right
+	* NOTES.rpm: update notes on rpm
+	* am/deb.am: do basic doc files right
+	* am/help.am: do basic doc files right
+	* am/lsm.am: do basic doc files right
+	* am/openss7.am: do basic doc files right
+	* am/release.am: do basic doc files right
+	* m4/genksyms.m4: symsets cannot have prefix
+	* openss7.spec.in:
+	  - do basic doc files right
+	  - clean up dependencies
+	* scripts/modpost.awk: symsets cannot have prefix
+	* scripts/rpm/find-provides.kmod: get symsets working
+	* scripts/rpm/find-requires.kmod: get symsets working
+
+2011-04-12  Brian Bidulock  <bidulock@openss7.org>
+
 	- passes distcheck
 
 	* NOTES.rpm: added notes on rpm scriptlets

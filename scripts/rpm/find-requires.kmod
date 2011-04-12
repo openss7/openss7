@@ -265,19 +265,21 @@ END {
 	} else {
 	    print "D: Skipping requires: (" versions[indices[i]] ") " indices[i] >"/dev/stderr"
 	    kernels[versions[indices[i]]] = 1
-	    needskernel = 1
+	    #needskernel = 1
 	}
     }
-    if (needskernel) print "D: Kernel required due to use of non-kABI symbols" >"/dev/stderr"
-    for (kernel in kernels) {
-	flavor = kernel
-	gsub(".*-", "", flavor)
-	if (flavor~/^(default|xen|ec2|trace)$/) {
-	    flavor = "-" flavor
-	} else {
-	    flavor = ""
+    if (needskernel) {
+	print "D: Kernel required due to use of non-kABI symbols" >"/dev/stderr"
+	for (kernel in kernels) {
+	    flavor = kernel
+	    gsub(".*-", "", flavor)
+	    if (flavor~/^(default|xen|ec2|trace)$/) {
+		flavor = "-" flavor
+	    } else {
+		flavor = ""
+	    }
+	    print "kernel" flavor " = " kernel
 	}
-	print "kernel" flavor " = " kernel
     }
 }
 
