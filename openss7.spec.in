@@ -631,6 +631,7 @@
 %{!?VIRT_base:  %{expand: %%global VIRT_base       0}}
 %{!?VIRT_doc:   %{expand: %%global VIRT_doc        0}}
 %{!?VIRT_lib:   %{expand: %%global VIRT_lib        0}}
+%{!?VIRT_compat:%{expand: %%global VIRT_compat     0}}
 %{!?VIRT_devel: %{expand: %%global VIRT_devel      0}}
 %{!?VIRT_debug: %{expand: %%global VIRT_debug      0}}
 %{!?VIRT_wrap:  %{expand: %%global VIRT_wrap       0}}
