@@ -172,9 +172,21 @@ AC_DEFUN([_SNMP_LIB_WARN],
 *** [$]1 library.  Expect problems later.
 ***
 EOF])dnl
-    if test :"${with_snmp:-yes}" != :no ; then
-	ac_msg=`snmp_lib_warn $1`
-	AC_MSG_WARN([$ac_msg])
+    if test :"${with_snmp:-yes}" != :no
+    then
+	case $1 in
+	    (libpopt|librpmio|librpm|librpmdb)
+		if test ":$deb_cv_debs:$deb_cv_dscs" != :yes:yes
+		then
+		    ac_msg=`snmp_lib_warn $1`
+		    AC_MSG_WARN([$ac_msg])
+		fi
+		;;
+	    (*)
+		ac_msg=`snmp_lib_warn $1`
+		AC_MSG_WARN([$ac_msg])
+		;;
+	esac
     fi
 ])
 

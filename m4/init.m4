@@ -214,7 +214,9 @@ dnl
 	AC_MSG_CHECKING([for init SysV rcX.d directory])
     ])
 dnl
-dnl I suppose we really don't care about these.
+dnl I suppose we really don't care about these.  It is funny, though, that SuSE
+dnl used to use insserv (SuSE wrote it!), but now, SuSE uses service.  Debian
+dnl used to use update-rc.d, but now uses insserv!
 dnl
     AC_ARG_VAR([CHKCONFIG],
 	       [Chkconfig command. @<:@default=chkconfig@:>@])
