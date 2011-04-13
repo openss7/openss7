@@ -358,7 +358,7 @@ rpmsort = sed 's,-,..,' | sort -n '-t.' -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 -k7,
 #!     each of a set of architectures given in the AM_RPMTARGETS variable to
 #!     make.  This is a convenience target for building a group of rpms on a
 #!     given build machine.  This target will only rebuild packages for
-#!     architetures and kernels that do not already exist in the package
+#!     architectures and kernels that do not already exist in the package
 #!     distribution directory.
 #!
 rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
