@@ -1493,7 +1493,10 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 	    then
 		if test :"${linux_cv_k_versions}" != :no -a :"${linux_cv_k_modversions}" != :no
 		then
-		    AC_MSG_WARN([
+		    # debian based systems don't have this file
+		    if test ":$deb_cv_debs:$deb_cv_dscs" != :yes:yes
+		    then
+			AC_MSG_WARN([
 *** 
 *** Configure could not find the symbol versions file for kernel version
 *** "$kversion".  The locations searched were:
@@ -1504,6 +1507,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 *** of your kernel symbol versions file with option --with-k-symvers
 *** before repeating.
 *** ])
+		    fi
 		fi
 	    fi
 	else
@@ -1565,7 +1569,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
 	    k_modabi_search_path=`echo "$k_modabi_search_path" | sed -e 's|\<NONE\>||g;s|/\./|/|g;s|//|/|g'`
 	    linux_cv_k_modabi=
 	    for linux_file in $k_modabi_search_path ; do
-		AC_MSG_CHECKING([for kernel module ver... $linux_file])
+		AC_MSG_CHECKING([for kernel module abi... $linux_file])
 		if test -r $linux_file
 		then
 		    linux_cv_k_modabi="$linux_file"
@@ -1674,9 +1678,12 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 	    then
 		if test :"${linux_cv_k_versions}" != :no -a :"${linux_cv_k_modversions}" != :no
 		then
-		    AC_MSG_WARN([
+		    # debian based systems don't have this file
+		    if test ":$deb_cv_debs:$deb_cv_dscs" != :yes:yes
+		    then
+			AC_MSG_WARN([
 *** 
-*** Configure could not find the symbol versions file for kernel version
+*** Configure could not find the symbol sets file for kernel version
 *** "$kversion".  The locations searched were:
 ***	    "$with_k_symsets"
 ***	    "$k_symsets_search_path"
@@ -1685,6 +1692,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 *** of your kernel symbol versions file with option --with-k-symsets
 *** before repeating.
 *** ])
+		    fi
 		fi
 	    fi
 	else
@@ -2268,21 +2276,19 @@ dnl
 AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
     AC_CACHE_CHECK([for kernel package release], [linux_cv_k_version], [dnl
 	linux_cv_k_version=unknown
-	case "$target_vendor" in
-	    (debian|ubuntu)
-		linux_pkg=`dpkg -S $linux_cv_k_sysmap 2>/dev/null | cut -f1 -d:` || linux_pkg=
-		if test -n "$linux_pkg" ; then
-		    linux_ver=`dpkg -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
-		else
-		    linux_ver=
-		fi
-		linux_cv_k_version="${linux_ver:-unknown}"
-		;;
-	    (mandrake|redhat|centos|whitebox|suse|*)
-		linux_ver=`rpm -q --qf "%{VERSION}" --whatprovides $linux_cv_k_sysmap 2>/dev/null`
-		linux_cv_k_version="${linux_ver:-unknown}"
-		;;
-	esac
+	if test ":$deb_cv_debs:$deb_cv_dscs" = :yes:yes
+	then
+	    linux_pkg=`dpkg -S $linux_cv_k_sysmap 2>/dev/null | cut -f1 -d:` || linux_pkg=
+	    if test -n "$linux_pkg" ; then
+		linux_ver=`dpkg -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
+	    else
+		linux_ver=
+	    fi
+	    linux_cv_k_version="${linux_ver:-unknown}"
+	else
+	    linux_ver=`rpm -q --qf "%{VERSION}" --whatprovides $linux_cv_k_sysmap 2>/dev/null`
+	    linux_cv_k_version="${linux_ver:-unknown}"
+	fi
     ])
     if test :"${linux_cv_k_version:-unknown}" != :unknown
     then
