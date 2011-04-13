@@ -207,6 +207,46 @@
 %global HAVE_snmp32mods     0
 %endif
 
+%ifarch x86_64 ia64
+%global compatarch          i686
+%endif
+%ifarch s390x
+%global compatarch          s390
+%endif
+%ifarch sparc64
+%global compatarch          sparc
+%endif
+%ifarch ppc64
+%global compatarch          ppc
+%endif
+
+%global morecflags          %{optflags}
+%ifarch %ix86
+%global morecflags          %{optflags} -D__USE_STRING_INLINES -fstrict-aliasing
+%endif
+%ifarch sparc
+%global morecflags          %{optflags} -fcall-used-g7
+%endif
+%ifarch sparcv9
+%global morecflags          %{optflags} -fcall-used-g7
+%endif
+%ifarch sparc64
+%global morecflags          %{optflags} -mvis -fcall-used-g7
+%endif
+%global preferred_cflags    %{morecflags}
+%ifnarch ia64 s390 s390x ppc ppciseries ppc64
+%if %(if test "`gcc --version`" != '2.95.3' ; then echo "1" ; else echo "0" ; fi)
+%global preferred_cflags    %{morecflags} -freorder-blocks
+%endif
+%endif
+
+%ifarch noarch
+%global host_platform       %{nil}
+%else
+%global host_platform       --host=%{_target_platform}
+%endif
+%global target_platform     %{_target_platform}
+
 %if %{HAVE_devices}
 %global USE_makedev         %{HAVE_makedev}
 %global USE_mknods          %{HAVE_mknods}
@@ -553,7 +593,7 @@
 %{!?_snmpmibdir:        %{expand: %%global _snmpmibdir      %%{_datarootdir}/snmp/mibs}}
 %{!?_snmpdlmoddir:      %{expand: %%global _snmpdlmoddir    %%{_libdir}/snmp/dlmod}}
 %{!?_snmpconfdir:       %{expand: %%global _snmpconfdir     %%{_sysconfdir}/snmp}}
-%ifarch x86_64 ppc64 sparc64 ia64
+%ifarch x86_64 s390x ppc64 sparc64 ia64
 %{!?_lib32dir:          %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
 %{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
 %{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
@@ -593,6 +633,7 @@
 %{!?VIRT_base:  %{expand: %%global VIRT_base       0}}
 %{!?VIRT_doc:   %{expand: %%global VIRT_doc        0}}
 %{!?VIRT_lib:   %{expand: %%global VIRT_lib        0}}
+%{!?VIRT_compat:%{expand: %%global VIRT_compat     0}}
 %{!?VIRT_devel: %{expand: %%global VIRT_devel      0}}
 %{!?VIRT_debug: %{expand: %%global VIRT_debug      0}}
 %{!?VIRT_wrap:  %{expand: %%global VIRT_wrap       0}}
@@ -1075,9 +1116,9 @@
 %if %{HAVE_libraries}
 %global NEED_lib        1
 %endif
-%if %{HAVE_lib32compat}
-%global NEED_lib        1
-%endif
+#if %{HAVE_lib32compat}
+#global NEED_lib        1
+#endif
 %if %{HAVE_perlmods}
 %global NEED_lib        1
 %endif
@@ -1093,15 +1134,15 @@
 %if %{HAVE_testfiles}
 %global NEED_lib        1
 %endif
-%if %{HAVE_test32files}
-%global NEED_lib        1
-%endif
+#if %{HAVE_test32files}
+#global NEED_lib        1
+#endif
 %if %{HAVE_snmpmods}
 %global NEED_lib        1
 %endif
-%if %{HAVE_snmp32mods}
-%global NEED_lib        1
-%endif
+#if %{HAVE_snmp32mods}
+#global NEED_lib        1
+#endif
 
 %if %{FILES_binfiles}
 %global WANT_lib        1
@@ -1112,9 +1153,9 @@
 %if %{FILES_libraries}
 %global WANT_lib        1
 %endif
-%if %{FILES_lib32compat}
-%global WANT_lib        1
-%endif
+#if %{FILES_lib32compat}
+#global WANT_lib        1
+#endif
 %if %{FILES_perlmods}
 %global WANT_lib        1
 %endif
@@ -1130,20 +1171,56 @@
 %if %{FILES_testfiles}
 %global WANT_lib        1
 %endif
-%if %{FILES_test32files}
-%global WANT_lib        1
-%endif
+#if %{FILES_test32files}
+#global WANT_lib        1
+#endif
 %if %{FILES_snmpmods}
 %global WANT_lib        1
 %endif
-%if %{FILES_snmp32mods}
-%global WANT_lib        1
-%endif
+#if %{FILES_snmp32mods}
+#global WANT_lib        1
+#endif
 
 %if %{WANT_lib}
 %global PACKAGE_lib     1
 %else
 %global PACKAGE_lib     0
+%endif
+
+# -----------------------
+
+%if %{VIRT_compat}
+%global WANT_compat     1
+%global NEED_compat     1
+%else
+%global WANT_compat     0
+%global NEED_compat     0
+%endif
+
+%if %{HAVE_lib32compat}
+%global NEED_compat     1
+%endif
+%if %{HAVE_test32files}
+%global NEED_compat     1
+%endif
+%if %{HAVE_snmp32mods}
+%global NEED_compat     1
+%endif
+
+%if %{FILES_lib32compat}
+%global WANT_compat     1
+%endif
+%if %{FILES_test32files}
+%global WANT_compat     1
+%endif
+%if %{FILES_snmp32mods}
+%global WANT_compat     1
+%endif
+
+%if %{WANT_compat}
+%global PACKAGE_compat  1
+%else
+%global PACKAGE_compat  0
 %endif
 
 # -----------------------
@@ -1654,6 +1731,7 @@
 #global _missing_doc_files_terminate_build 0
 #global _use_internal_dependency_generator 0
 
+%global basearch    %{_arch}
 %global baseversion @VERSION@
 
 %global __find_provides %{_builddir}/%{name}-%{baseversion}/scripts/rpm/find-provides %{_builddir}/%{name}-%{baseversion} %{buildroot} %{_kversion}
@@ -1893,6 +1971,8 @@ Provides:           %{name} = %{epoch}:%{baseversion}-%{specrelease}
 Provides:           %{name} = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name} = %{epoch}:%{baseversion}-%{rpmrelease}
 
+BuildArch:          noarch
+
 # ---------------------------------------------------------------------------
 %description
 %{descripline}
@@ -1970,47 +2050,23 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
 %build
 # ---------------------------------------------------------------------------
 
-preferred_cflags="%{optflags}"
-
-%ifarch %ix86
-preferred_cflags="$preferred_cflags -D__USE_STRING_INLINES -fstrict-aliasing"
-%endif
-
-%ifarch sparc
-preferred_cflags="$preferred_cflags -fcall-used-g7"
-%endif
-
-%ifarch sparcv9
-preferred_cflags="$preferred_cflags -fcall-used-g7"
-%endif
-
-%ifarch sparc64
-preferred_cflags="$preferred_cflags -mvis -fcall-used-g7"
-%endif
-
-%ifnarch ia64 s390 s390x ppc ppciseries ppc64
-if test "`gcc --version`" != '2.95.3' ; then
-preferred_cflags="$preferred_cflags -freorder-blocks"
-fi
-%endif
-
-%define cache_file %{_target_platform}-%{kernel_version}-config.cache
-%define csite_file %{_target_platform}-config.site
-%define mpost_file %{_target_platform}-%{kernel_version}-modpost.cache
+%define cache_file %{target_platform}-%{kernel_version}-config.cache
+%define csite_file %{target_platform}-config.site
+%define mpost_file %{target_platform}-%{kernel_version}-modpost.cache
 
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')%{nil}
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')%{nil}
 
 ./configure \
     ${CC+CC="${CC}"} \
-    CFLAGS="${CFLAGS:-$preferred_cflags}" \
+    CFLAGS="${CFLAGS:-%{preferred_cflags}}" \
     ${LD+LD="${LD}"} \
     ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
     ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
     ${CPP+CPP="${CPP}"} \
     ${CXX+CXX="${CXX:-$CC}"} \
     ${CXX-${CC+CXX="$CC"}} \
-    CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
+    CXXFLAGS="${CXXFLAGS:-%{preferred_cflags}}" \
     ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
     ${CXXCPP-${CPP+CXXCPP="$CPP"}} \
     CONFIG_SITE="%{_builddir}/%{csite_file}" \
@@ -2022,9 +2078,7 @@ fi
     %{?_tcllibdir:tcllibdir=%{_tcllibdir}} \
     %{?_tclsrcdir:tclsrcdir=%{_tclsrcdir}} \
     --cache-file="%{_builddir}/%{cache_file}" \
-%ifnarch noarch
-    --host=%{_target_platform} \
-%endif
+    %{host_platform} \
     --prefix=%{_prefix} \
     --exec-prefix=%{_exec_prefix} \
     --bindir=%{_bindir} \
@@ -2455,11 +2509,12 @@ Requires(pre):      %(which sed)
 Requires(pre):      %(which awk)
 %endif
 
-Provides:       %{name}-repo    = %{epoch}:%{baseversion}-%{specrelease}
-Provides:       %{name}-repo    = %{epoch}:%{baseversion}-%{baserelease}
-Provides:       %{name}-repo    = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{specrelease}
+Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{baserelease}
+Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description repo
@@ -2750,6 +2805,7 @@ Provides:           %{name}-base = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-base = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description base
@@ -3319,6 +3375,16 @@ fi
 # ---------------------------------------------------------------------------
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     %{_sbindir}/%{name}-modules -- -v --update-modules || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
 else
     echo "WARNING: %triggerin base -- %{kernel_package} ($1,$2) no update script" >&2
 fi
@@ -3329,6 +3395,16 @@ fi
 # ---------------------------------------------------------------------------
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     %{_sbindir}/%{name}-modules -- -v --update-modules || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
 else
     echo "WARNING: %triggerpostun base -- %{kernel_package} ($1,$2) no update script" >&2
 fi
@@ -3422,6 +3498,7 @@ Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description doc
@@ -3560,9 +3637,9 @@ Prefix:             %{_sbindir}
 %if %{FILES_libraries}
 Prefix:             %{_libdir}
 %endif
-%if %{FILES_lib32compat}
-Prefix:             %{_lib32dir}
-%endif
+#if %{FILES_lib32compat}
+#refix:             %{_lib32dir}
+#endif
 %if %{FILES_perlmods}
 Prefix:             %{_perldir}
 %endif
@@ -3572,15 +3649,15 @@ Prefix:             %{_pkgtcllibdir}
 %if %{FILES_testfiles}
 Prefix:             %{_pkglibexecdir}
 %endif
-%if %{FILES_test32files}
-Prefix:             %{_pkglibexec32dir}
-%endif
+#if %{FILES_test32files}
+#refix:             %{_pkglibexec32dir}
+#endif
 %if %{FILES_snmpmods}
 Prefix:             %{_snmpdlmoddir}
 %endif
-%if %{FILES_snmp32mods}
-Prefix:             %{_snmpdlmod32dir}
-%endif
+#if %{FILES_snmp32mods}
+#refix:             %{_snmpdlmod32dir}
+#endif
 %if %{FILES_locales}
 Prefix:             %{_localedir}
 %endif
@@ -3599,6 +3676,7 @@ Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description lib
@@ -3753,8 +3831,8 @@ fi
 %{?files_sbinfiles:%{_sbindir}/*}
 %{?files_libraries:%{_libdir}/*.so*}
 %{?files_libraries:%{_libdir}/*.la}
-%{?files_lib32compat:%{_lib32dir}/*.so*}
-%{?files_lib32compat:%{_lib32dir}/*.la}
+#{?files_lib32compat:%{_lib32dir}/*.so*}
+#{?files_lib32compat:%{_lib32dir}/*.la}
 %{?files_perlmods:%dir %{_perldir}/auto/Xti}
 %{?files_perlmods:%{_perldir}/auto/Xti/*}
 %{?files_tcllibs:%dir %{_pkgtcllibdir}}
@@ -3768,8 +3846,83 @@ fi
 %{?files_locales:%{_localedir}/*}
 %{?files_gdmofiles:%{_pkglibexecdir}/gdmo}
 %{?files_testfiles:%{_pkglibexecdir}/%{testfiles}}
-%{?files_test32files:%{_pkglibexec32dir}/%{testfiles}}
+#{?files_test32files:%{_pkglibexec32dir}/%{testfiles}}
 %{?files_snmpmods:%{_snmpdlmoddir}/*}
+%endif
+
+# ===========================================================================
+%package compat
+# ---------------------------------------------------------------------------
+# This package contains the 32-bit compatability binaries.
+# ---------------------------------------------------------------------------
+
+Summary:            %{title} 32-bit run-time libraries and utilities.
+Group:              System Environment/Libraries
+%{?_xpm:Icon:       %_xpm}
+%{?_gif:Icon:       %_gif}
+Autoreq:            true
+Autoprov:           true
+
+%if %{FILES_lib32compat}
+Prefix:             %{_lib32dir}
+%endif
+%if %{FILES_test32files}
+Prefix:             %{_pkglibexec32dir}
+%endif
+%if %{FILES_snmp32mods}
+Prefix:             %{_snmpdlmod32dir}
+%endif
+
+Requires(pre):      /sbin/ldconfig
+Requires(post):     /sbin/ldconfig
+Requires(postun):   /sbin/ldconfig
+
+%if %{NEED_virt}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{specrelease}
+%endif
+
+Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{specrelease}
+Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{baserelease}
+Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{rpmrelease}
+
+Release:            %{specrelease}
+BuildArch:          %{compatarch}
+
+# ---------------------------------------------------------------------------
+%description compat
+%{descripline}
+The %{name}-compat binary package contains the 32-bit run-time (shared
+object) libraries necessary to run 32-bit applications programs and utilities
+developed for %{title}.  Also included are 32-bit test utilities for the
+%{title} package.  Note that these utilities are needed for running the
+32-bit validation test suites contained in the %{name} binary package.
+%{descriptail}
+
+%post compat
+# ---------------------------------------------------------------------------
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
+%if %{FILES_lib32compat}
+    # After a fresh install or upgrade, do a load config.
+    /sbin/ldconfig
+%endif
+fi
+
+%postun compat
+# ---------------------------------------------------------------------------
+%if %{FILES_lib32compat}
+if [ $1 = 0 -o $1 = 1 ] ; then
+    # Whether complete removal or upgrade, do a load config.
+    /sbin/ldconfig
+fi
+%endif
+
+%if %{PACKAGE_compat}
+%files compat
+# ---------------------------------------------------------------------------
+%defattr(-,root,root)
+%{?files_lib32compat:%{_lib32dir}/*.so*}
+%{?files_lib32compat:%{_lib32dir}/*.la}
+%{?files_test32files:%{_pkglibexec32dir}/%{testfiles}}
 %endif
 
 # ===========================================================================
@@ -3810,12 +3963,13 @@ Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description devel
 %{descripline}
 The %{name}-devel binary package contains library archives for static
-compilation, and headers files to develop %{title} applications, modules
+compilation, and header files to develop %{title} applications, modules
 and drivers.  This also includes the header files and static libraries
 required to compile %{title} applications programs.  This package
 provides debug information for package %{name}.  Debug information is
@@ -3869,6 +4023,7 @@ Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description debuginfo
@@ -3906,6 +4061,7 @@ Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description debugsource
@@ -4049,6 +4205,7 @@ Provides:           %{name}-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_package}
@@ -4355,6 +4512,16 @@ fi
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     kernels=`ls /lib/modules`
     %{_sbindir}/%{name}-modules -- -v --update-kernel $kernels || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
 else
     echo "WARNING: %triggerin -n %{kernel_package} -- %{target_kernel} ($1,$2) no update script" >&2
 fi
@@ -4366,6 +4533,16 @@ fi
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     kernels=`ls /lib/modules`
     %{_sbindir}/%{name}-modules -- -v --update-kernel $kernels || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
 else
     echo "WARNING: %triggerpostun -n %{kernel_package} -- %{target_kernel} ($1,$2) no update script" >&2
 fi
@@ -4454,6 +4631,7 @@ Provides:           %{name}-devel-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
 
 Version:            %{kspecversion}
 Release:            %{kspecrelease}
+BuildArch:          %{basearch}
 
 %if %{FILES_symvers}
 # ---------------------------------------------------------------------------
@@ -4570,13 +4748,14 @@ Provides:           %{name}-debuginfo-kmp = %{epoch}:%{kbaseversion}-%{kbaserele
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_buginfo}
 %{descripline}
 The %{kernel_buginfo} binary package contains
 debugging symbols for kernel modules.  This package provides debug
-information for package %{name}-kernel%{kernel_flavor}.  Debug
+information for package %{kernel_package}.  Debug
 information is useful when developing kernel modules that use this
 package or when debugging this package.
 
@@ -4630,13 +4809,14 @@ Provides:           %{name}-debugsource-kmp = %{epoch}:%{kbaseversion}-%{kbasere
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_bugsrce}
 %{descripline}
 The %{kernel_bugsrce} binary package contains
 source code for debugging kernel modules.  This package provides debug
-information for package %{name}-kernel%{kernel_flavor}.  Debug
+information for package %{kernel_package}.  Debug
 information is useful when developing kernel modules that use this
 package or when debugging this package.
 
@@ -4697,6 +4877,7 @@ Provides:           %{name}-source-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease
 
 Version:            %{kspecversion}
 Release:            %{kspecrelease}
+BuildArch:          %{basearch}
 
 # -----------------------------------------------------------------------------
 %description -n %{kernel_sourcep}
@@ -4758,6 +4939,7 @@ Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
 %endif
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description java
@@ -4894,6 +5076,7 @@ Requires:           %{name}         = %{epoch}:%{baseversion}-%{specrelease}
 %endif
 
 Release:        %{specrelease}
+BuildArch:      noarch
 
 # ---------------------------------------------------------------------------
 %description javadoc
