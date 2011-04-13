@@ -18,18 +18,27 @@ RPM Scriptlets
 +----------------+---------+---------+---------+
 | %post          | $1 == 1 | $1 == 2 |  (N/A)  |
 +----------------+---------+---------+---------+
+| %triggerin     | $1 == 1 | $1 >= 1 |  (N/A)  |
+| others (new)   | $2 >= 1 | $2 == 2 |  (N/A)  |
++----------------+---------+---------+---------+
 | %triggerin     | $1 == 1 | $1 == 2 |  (N/A)  |
-|                | $2 == 1 | $2 == 2 |  (N/A)  |
+| new package    | $2 >= 1 | $2 >= 1 |  (N/A)  |
 +----------------+---------+---------+---------+
 | %triggerun     |  (N/A)  | $1 == 1 | $1 == 0 |
-|                |  (N/A)  | $2 == 1 | $2 == 0 |
+| old package    |  (N/A)  | $2 >= 1 | $2 >= 1 |
++----------------+---------+---------+---------+
+| %triggerun     |  (N/A)  | $1 >= 1 | $1 >= 1 |
+| others (old)   |  (N/A)  | $2 == 1 | $2 == 0 |
 +----------------+---------+---------+---------+
 | %preun         |  (N/A)  | $1 == 1 | $1 == 0 |
 +----------------+---------+---------+---------+
 | %postun        |  (N/A)  | $1 == 1 | $1 == 0 |
 +----------------+---------+---------+---------+
-| %triggerpostun |  (N/A)  | $1 == 1 | $1 == 0 |
-|                |  (N/A)  | $2 == 1 | $2 == 0 |
+| %triggerpostun |  (N/A)  | $1 == 1 |  (N/A)  |
+| old package    |  (N/A)  | $2 >= 1 |  (N/A)  |
++----------------+---------+---------+---------+
+| %triggerpostun |  (N/A)  | $1 >= 1 | $1 >= 1 |
+| others (old)   |  (N/A)  | $2 == 1 | $2 == 0 |
 +----------------+---------+---------+---------+
 | %posttrans     | $1 == 0 | $1 == 0 |  (N/A)  |
 +----------------+---------+---------+---------+
@@ -49,6 +58,21 @@ RPM Scriptlets
   %triggerpostun	of other packages (if they're set off by uninstalliing the old package)
   %posttran		of new package
 
+When a kernel is installed while the kernel modules are already
+installed, %triggerin(>=1,>=1) will run.  When the kernel modules
+are installed while a kernel is already installed, %triggerin(>=1,>=1)
+will run.  It is largely impossible to distingish the two.
+
+When a kernel is removed while the kernel modules are installed,
+%triggerun(>=1,>=0) will be run (but in all practicality, $2 will never
+be zero, because a system requires a kernel).  When the kernel modules
+are removed while a kernel is already installed, %triggerun(>=0,>=1)
+will be run.  It is largely impossible to distinguish the two.
+
+When a kernel is removed while the kernel modules are installed,
+%triggerpostun(>=1,>=0) will be run (but in all practicality, $2 will
+never be zero, because a system needs a kernel).  %triggerpostun should
+never run when the modules are removed.
 
 Subpackage Dependencies:
 ------------------------
