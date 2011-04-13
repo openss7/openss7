@@ -1681,6 +1681,17 @@ function add_kernels(kversion,
 		    weakmods, weaklinks, weaknames) #global
     }
 }
+function update_kernels(kversion,
+			pfx,kversions,command)
+{
+    print_debug(1,"p: updkernels, kversion = " kversion)
+    if  (!kversion) {
+	command = "ls /lib/modules"
+	while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
+	close(command)
+    }
+    add_kernels(kversion)
+}
 function add_modules(kversion,
 		     pfx,kversions,command)
 {
@@ -1719,6 +1730,16 @@ function remove_modules(kversion,
 	usage(stderr); exit 2 }
     kversion = kversions[1]
     print_debug(1,"p: rmvmodules, kversion = " kversion)
+    kversion = ""
+    command = "ls /lib/modules"
+    while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
+    close(command)
+    add_kernels(kversion)
+}
+function update_modules(kversion,
+			pfx,kversions,command)
+{
+    print_debug(1,"p: updmodules, kversion = " kversion)
     kversion = ""
     command = "ls /lib/modules"
     while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
@@ -1769,9 +1790,11 @@ BEGIN {
     longopts["add-kernel"    ] = "A!" ;							  descrips["add-kernel"    ] = "mode: add kernels with versions"
     longopts["link-kernel"   ] = "L!" ;							  descrips["link-kernel"   ] = "mode: link kernels with versions"
     longopts["remove-kernel" ] = "R!" ;							  descrips["remove-kernel" ] = "mode: remove kernels with versions"
+    longopts["update-kernel" ] = "U!" ;							  descrips["update-kernel" ] = "mode: update kernels with versions"
     longopts["add-modules"   ] = "a!" ;							  descrips["add-modules"   ] = "mode: add kernel modules to kernel versions"
     longopts["link-modules"  ] = "l!" ;							  descrips["link-modules"  ] = "mode: link modules for kernel with versions"
     longopts["remove-modules"] = "r!" ; defaults["remove-modules"] = d["kversion"]	; descrips["remove-modules"] = "mode: remove kernel modules from kernel versions"
+    longopts["update-modules"] = "u!" ; defaults["update-modules"] = d["kversion"]	; descrips["update-kernels"] = "mode: update kernel modules from kernel versions"
     longopts["modules"       ] = "M:" ; defaults["modules"       ] = ""			; descrips["modules"       ] = "modules for which to generate symbols (search when unspec.)"				; longargs["modules"       ] = "MODULE ..."
     longopts["rootdir"       ] = "c:" ; defaults["rootdir"       ] = ""			; descrips["rootdir"       ] = "root of the kernels being installed"
     longopts["basedir"       ] = "b:" ; defaults["basedir"       ] = d["basedir" ]	; descrips["basedir"       ] = "use a base directory other than root, BASEDIR"
@@ -1807,7 +1830,7 @@ BEGIN {
     values["silent"       ] = defaults["silent"       ]
     values["debug"        ] = defaults["debug"        ]
     values["verbose"      ] = defaults["verbose"      ]
-    optstring = "k:ALRalrM:c:b:w:F:E:S:P:s:xenqD::v::hVC"
+    optstring = "k:ALRUalruM:c:b:w:F:E:S:P:s:xenqD::v::hVC"
     optind = 0
     #opts = ""; for (i=1;i<ARGC;i++) { if (i == 1) { opts = ARGV[i] } else { opts = opts " " ARGV[i] } }
     #print me ": D: o: command line: " opts > stderr; written[stderr] = 1
@@ -1819,7 +1842,7 @@ BEGIN {
 	else if (c~/[kMcbwFESPs]/)			{ values[option] = optarg }
 	else if (c~/[xenq]/)				{ values[option] = optset }
 	else if (c~/[Dv]/)	{ if (optarg  != "")	{ values[option] = optarg } else { if (optset)  { values[option]++ } else { values[option] = optset } } }
-	else if (c~/[ALRalr]/)				{ values[option] = optset; if (!optset && command == option)	{ command = "" } else
+	else if (c~/[ALRUalru]/)			{ values[option] = optset; if (!optset && command == option)	{ command = "" } else
 										   if (optset && !command)		{ command = option } else
 										   if (optset) {  print_error("option --" option " is incompatible with --" command); exit 2 } }
 	else if (c~/[hVC]/)	{ command = option }
@@ -1868,17 +1891,16 @@ BEGIN {
     if (command == "help"          ) { help(   stdout); exit 0 }
     if (command == "version"       ) { version(stdout); exit 0 }
     if (command == "copying"       ) { copying(stdout); exit 0 }
-    if (!("kernels" in values)) {
-	print_error("o: at least one KERNEL must be specified")
-	usage(stderr)
-	exit 2
-    }
+    if (!("kernels" in values)     ) { values["kernels"] = ""  }
     if (command == "add-kernel"    ) { add_kernels(    values["kernels"])} else
     if (command == "link-kernel"   ) { link_kernels(   values["kernels"])} else
     if (command == "remove-kernel" ) { remove_kernels( values["kernels"])} else
+    if (command == "update-kernel" ) { update_kernels( values["kernels"])} else
     if (command == "add-modules"   ) { add_modules(    values["kernels"])} else
     if (command == "link-modules"  ) { link_modules(   values["kernels"])} else
-    if (command == "remove-modules") { remove_modules( values["kernels"])} else {
+    if (command == "remove-modules") { remove_modules( values["kernels"])} else
+    if (command == "update-modules") { update_modules( values["kernels"])} else
+    {
 	print_error("o: nothing to do")
 	usage(stderr)
 	exit 2
