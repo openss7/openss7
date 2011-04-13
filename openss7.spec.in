@@ -220,22 +220,23 @@
 %global compatarch          ppc
 %endif
 
-%global preferred_cflags    %{optflags}
+%global morecflags          %{optflags}
 %ifarch %ix86
-%global preferred_cflags    %{preferred_cflags} -D__USE_STRING_INLINES -fstrict-aliasing
+%global morecflags          %{optflags} -D__USE_STRING_INLINES -fstrict-aliasing
 %endif
 %ifarch sparc
-%global preferred_cflags    %{preferred_cflags} -fcall-used-g7
+%global morecflags          %{optflags} -fcall-used-g7
 %endif
 %ifarch sparcv9
-%global preferred_cflags    %{preferred_cflags} -fcall-used-g7
+%global morecflags          %{optflags} -fcall-used-g7
 %endif
 %ifarch sparc64
-%global preferred_cflags    %{preferred_cflags} -mvis -fcall-used-g7
+%global morecflags          %{optflags} -mvis -fcall-used-g7
 %endif
+%global preferred_cflags    %{morecflags}
 %ifnarch ia64 s390 s390x ppc ppciseries ppc64
 %if %(if test "`gcc --version`" != '2.95.3' ; then echo "1" ; else echo "0" ; fi)
-%global preferred_cflags    %{preferred_cflags} -freorder-blocks
+%global preferred_cflags    %{morecflags} -freorder-blocks
 %endif
 %endif
 
@@ -244,6 +245,7 @@
 %else
 %global host_platform       --host=%{_target_platform}
 %endif
+%global target_platform     %{_target_platform}
 
 %if %{HAVE_devices}
 %global USE_makedev         %{HAVE_makedev}
@@ -2048,9 +2050,9 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
 %build
 # ---------------------------------------------------------------------------
 
-%define cache_file %{_target_platform}-%{kernel_version}-config.cache
-%define csite_file %{_target_platform}-config.site
-%define mpost_file %{_target_platform}-%{kernel_version}-modpost.cache
+%define cache_file %{target_platform}-%{kernel_version}-config.cache
+%define csite_file %{target_platform}-config.site
+%define mpost_file %{target_platform}-%{kernel_version}-modpost.cache
 
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')%{nil}
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')%{nil}
@@ -2064,7 +2066,7 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
     ${CPP+CPP="${CPP}"} \
     ${CXX+CXX="${CXX:-$CC}"} \
     ${CXX-${CC+CXX="$CC"}} \
-    CXXFLAGS="${CXXFLAGS:-$preferred_cflags}" \
+    CXXFLAGS="${CXXFLAGS:-%{preferred_cflags}}" \
     ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
     ${CXXCPP-${CPP+CXXCPP="$CPP"}} \
     CONFIG_SITE="%{_builddir}/%{csite_file}" \
