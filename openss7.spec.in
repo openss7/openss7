@@ -3815,7 +3815,7 @@ Release:            %{specrelease}
 %description devel
 %{descripline}
 The %{name}-devel binary package contains library archives for static
-compilation, and headers files to develop %{title} applications, modules
+compilation, and header files to develop %{title} applications, modules
 and drivers.  This also includes the header files and static libraries
 required to compile %{title} applications programs.  This package
 provides debug information for package %{name}.  Debug information is
@@ -4576,7 +4576,7 @@ Release:            %{kbaserelease}
 %{descripline}
 The %{kernel_buginfo} binary package contains
 debugging symbols for kernel modules.  This package provides debug
-information for package %{name}-kernel%{kernel_flavor}.  Debug
+information for package %{kernel_package}.  Debug
 information is useful when developing kernel modules that use this
 package or when debugging this package.
 
@@ -4636,7 +4636,7 @@ Release:            %{kbaserelease}
 %{descripline}
 The %{kernel_bugsrce} binary package contains
 source code for debugging kernel modules.  This package provides debug
-information for package %{name}-kernel%{kernel_flavor}.  Debug
+information for package %{kernel_package}.  Debug
 information is useful when developing kernel modules that use this
 package or when debugging this package.
 
