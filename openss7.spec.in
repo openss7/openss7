@@ -1673,14 +1673,14 @@
 %{!?extrarelease2: %{expand: %%global baserelease @PACKAGE_RPMRELEASE@}}
 
 %global HAVE_susekmps 0
-%global HAVE_rhatmods %{HAVE_weakmods}
+%global HAVE_rhatkmps %{HAVE_weakmods}
 %if %{HAVE_zypprepo}
 %global HAVE_susekmps %{HAVE_weakmods}
 %global HAVE_rhatkmps 0
 %endif
 %if %(test '%{_vendor}' = 'suse' && echo 1 || echo 0)
 %global HAVE_susekmps %{HAVE_weakmods}
-%global HAVE_rhatmods 0
+%global HAVE_rhatkmps 0
 %endif
 
 
@@ -1694,12 +1694,12 @@
 %global kspecrelease %{specrelease}
 %global kbaserelease %{specrelease}
 # RedHat adds a mogrified kernel version string to the kmp release (or commonly not at all).
-%if %{HAVE_rhatmods}
+%if %{HAVE_rhatkmps}
 %global kbaserelease %{rpmrelease}%(echo '.%{_kversion}' | sed -e 'y,-,.,')
 %endif
 
 %if %{HAVE_weakmods}
-%if %{HAVE_rhatmods}
+%if %{HAVE_rhatkmps}
 %global kernel_package %{name}-kmod%{kernel_flavor}
 %global kernel_buginfo %{name}-kmod%{kernel_flavor}-debuginfo
 %global kernel_bugsrce %{name}-kmod%{kernel_flavor}-debugsource
@@ -3999,10 +3999,10 @@ Requires(postun):   modutils
 
 %if %{HAVE_weakmods}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_yumrepo}
+%if %{HAVE_rhatkmps}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
-%if %{HAVE_zypprepo}
+%if %{HAVE_susekmps}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 %else
@@ -4032,13 +4032,13 @@ Provides:           %{name}-%{_kversion} = %{epoch}:%{baseversion}-%{specrelease
 Provides:           %{name}-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
 
-%if %{HAVE_yumrepo}
+%if %{HAVE_rhatkmps}
 Provides:           kernel-modules = %{_kversion}
 Provides:           kmod-%{name} = %{epoch}:%{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-kmod = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
 
-%if %{HAVE_zypprepo}
+%if %{HAVE_susekmps}
 Provides:           multiversion(kernel)
 Provides:           %{name}-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
@@ -4413,7 +4413,7 @@ Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 # /boot/System.map-%{_kversion} is available.  Also, the specific kernel
 # development package is also required.
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%if %{HAVE_rhatmods}
+%if %{HAVE_rhatkmps}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %endif
 %if %{HAVE_susekmps}
@@ -4437,7 +4437,7 @@ Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{specr
 Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
 
-%if %{HAVE_rhatmods}
+%if %{HAVE_rhatkmps}
 Provides:           kernel-devel = %{_kversion}
 Provides:           kmod-%{name}-devel = %{epoch}:%{kspecversion}-%{kspecrelease}
 Provides:           %{name}-devel-kmod = %{epoch}:%{kspecversion}-%{kspecrelease}
@@ -4553,13 +4553,13 @@ Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{s
 Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
 
-%if %{HAVE_rhatmods}
+%if %{HAVE_rhatkmps}
 Provides:           kernel-debug = %{_kversion}
 Provides:           kmod-%{name}-debuginfo = %{epoch}:%{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debuginfo-kmod = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
 
-%if %{HAVE_susemods}
+%if %{HAVE_susekmps}
 Provides:           multiversion(kernel)
 Provides:           %{name}-debuginfo-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debuginfo-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
@@ -4613,13 +4613,13 @@ Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%
 Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
 
-%if %{HAVE_rhatmods}
+%if %{HAVE_rhatkmps}
 Provides:           kernel-debug = %{_kversion}
 Provides:           kmod-%{name}-debugsource = %{epoch}:%{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debugsource-kmod = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
 
-%if %{HAVE_susemods}
+%if %{HAVE_susekmps}
 Provides:           multiversion(kernel)
 Provides:           %{name}-debugsource-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debugsource-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
@@ -4680,7 +4680,7 @@ Provides:           %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{spec
 Provides:           %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
 
-%if %{HAVE_rhatmods}
+%if %{HAVE_rhatkmps}
 Provides:           kernel-source = %{_kversion}
 Provides:           kmod-%{name}-source = %{epoch}:%{baseversion}-%{specrelease}
 Provides:           %{name}-source-kmod = %{epoch}:%{baseversion}-%{specrelease}
