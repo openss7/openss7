@@ -3899,8 +3899,7 @@ Autoprov:           true
 Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{specrelease}
 
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-debugsource =
-%{epoch}:%{baseversion}-%{baserelease}
+Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
