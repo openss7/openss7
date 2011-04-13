@@ -3896,7 +3896,7 @@ developed for %{title}.  Also included are 32-bit test utilities for the
 32-bit validation test suites contained in the %{name} binary package.
 %{descriptail}
 
-%post lib
+%post compat
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
 %if %{FILES_lib32compat}
@@ -3905,7 +3905,7 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
 %endif
 fi
 
-%postun lib
+%postun compat
 # ---------------------------------------------------------------------------
 %if %{FILES_lib32compat}
 if [ $1 = 0 -o $1 = 1 ] ; then
