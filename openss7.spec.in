@@ -1703,20 +1703,23 @@
 %global kernel_package %{name}-kmod%{kernel_flavor}
 %global kernel_buginfo %{name}-kmod%{kernel_flavor}-debuginfo
 %global kernel_bugsrce %{name}-kmod%{kernel_flavor}-debugsource
+%global kernel_develop %{name}-kmod%{kernel_flavor}-devel
+%global kernel_sourcep %{name}-kmod%{kernel_flavor}-source
 %endif
 %if %{HAVE_susekmps}
 %global kernel_package %{name}-kmp%{kernel_flavor}
 %global kernel_buginfo %{name}-kmp%{kernel_flavor}-debuginfo
 %global kernel_bugsrce %{name}-kmp%{kernel_flavor}-debugsource
+%global kernel_develop %{name}-kmp%{kernel_flavor}-devel
+%global kernel_sourcep %{name}-kmp%{kernel_flavor}-source
 %endif
 %else
 %global kernel_package %{name}-%{_kversion}
 %global kernel_buginfo %{name}-debuginfo-%{_kversion}
 %global kernel_bugsrce %{name}-debugsource-%{_kversion}
-%endif
-# develop and source packages are always kernel specific
-%global kernel_develop %{name}-develop-%{_kversion}
+%global kernel_develop %{name}-devel-%{_kversion}
 %global kernel_sourcep %{name}-source-%{_kversion}
+%endif
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
