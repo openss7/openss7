@@ -1654,6 +1654,7 @@
 #global _missing_doc_files_terminate_build 0
 #global _use_internal_dependency_generator 0
 
+%global basearch    %{_arch}
 %global baseversion @VERSION@
 
 %global __find_provides %{_builddir}/%{name}-%{baseversion}/scripts/rpm/find-provides %{_builddir}/%{name}-%{baseversion} %{buildroot} %{_kversion}
@@ -1892,6 +1893,8 @@ Requires:           %{name}-repo    = %{epoch}:%{baseversion}-%{specrelease}
 Provides:           %{name} = %{epoch}:%{baseversion}-%{specrelease}
 Provides:           %{name} = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name} = %{epoch}:%{baseversion}-%{rpmrelease}
+
+BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description
@@ -2455,11 +2458,12 @@ Requires(pre):      %(which sed)
 Requires(pre):      %(which awk)
 %endif
 
-Provides:       %{name}-repo    = %{epoch}:%{baseversion}-%{specrelease}
-Provides:       %{name}-repo    = %{epoch}:%{baseversion}-%{baserelease}
-Provides:       %{name}-repo    = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{specrelease}
+Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{baserelease}
+Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description repo
@@ -2750,6 +2754,7 @@ Provides:           %{name}-base = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-base = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description base
@@ -3319,6 +3324,16 @@ fi
 # ---------------------------------------------------------------------------
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     %{_sbindir}/%{name}-modules -- -v --update-modules || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
 else
     echo "WARNING: %triggerin base -- %{kernel_package} ($1,$2) no update script" >&2
 fi
@@ -3329,6 +3344,16 @@ fi
 # ---------------------------------------------------------------------------
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     %{_sbindir}/%{name}-modules -- -v --update-modules || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
 else
     echo "WARNING: %triggerpostun base -- %{kernel_package} ($1,$2) no update script" >&2
 fi
@@ -3422,6 +3447,7 @@ Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description doc
@@ -3599,6 +3625,7 @@ Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description lib
@@ -3810,12 +3837,13 @@ Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description devel
 %{descripline}
 The %{name}-devel binary package contains library archives for static
-compilation, and headers files to develop %{title} applications, modules
+compilation, and header files to develop %{title} applications, modules
 and drivers.  This also includes the header files and static libraries
 required to compile %{title} applications programs.  This package
 provides debug information for package %{name}.  Debug information is
@@ -3869,6 +3897,7 @@ Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description debuginfo
@@ -3906,6 +3935,7 @@ Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description debugsource
@@ -4049,6 +4079,7 @@ Provides:           %{name}-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_package}
@@ -4355,6 +4386,16 @@ fi
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     kernels=`ls /lib/modules`
     %{_sbindir}/%{name}-modules -- -v --update-kernel $kernels || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
 else
     echo "WARNING: %triggerin -n %{kernel_package} -- %{target_kernel} ($1,$2) no update script" >&2
 fi
@@ -4366,6 +4407,16 @@ fi
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     kernels=`ls /lib/modules`
     %{_sbindir}/%{name}-modules -- -v --update-kernel $kernels || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
 else
     echo "WARNING: %triggerpostun -n %{kernel_package} -- %{target_kernel} ($1,$2) no update script" >&2
 fi
@@ -4454,6 +4505,7 @@ Provides:           %{name}-devel-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
 
 Version:            %{kspecversion}
 Release:            %{kspecrelease}
+BuildArch:          %{basearch}
 
 %if %{FILES_symvers}
 # ---------------------------------------------------------------------------
@@ -4570,13 +4622,14 @@ Provides:           %{name}-debuginfo-kmp = %{epoch}:%{kbaseversion}-%{kbaserele
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_buginfo}
 %{descripline}
 The %{kernel_buginfo} binary package contains
 debugging symbols for kernel modules.  This package provides debug
-information for package %{name}-kernel%{kernel_flavor}.  Debug
+information for package %{kernel_package}.  Debug
 information is useful when developing kernel modules that use this
 package or when debugging this package.
 
@@ -4630,13 +4683,14 @@ Provides:           %{name}-debugsource-kmp = %{epoch}:%{kbaseversion}-%{kbasere
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_bugsrce}
 %{descripline}
 The %{kernel_bugsrce} binary package contains
 source code for debugging kernel modules.  This package provides debug
-information for package %{name}-kernel%{kernel_flavor}.  Debug
+information for package %{kernel_package}.  Debug
 information is useful when developing kernel modules that use this
 package or when debugging this package.
 
@@ -4697,6 +4751,7 @@ Provides:           %{name}-source-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease
 
 Version:            %{kspecversion}
 Release:            %{kspecrelease}
+BuildArch:          %{basearch}
 
 # -----------------------------------------------------------------------------
 %description -n %{kernel_sourcep}
@@ -4758,6 +4813,7 @@ Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
 %endif
 
 Release:            %{specrelease}
+BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description java
@@ -4894,6 +4950,7 @@ Requires:           %{name}         = %{epoch}:%{baseversion}-%{specrelease}
 %endif
 
 Release:        %{specrelease}
+BuildArch:      noarch
 
 # ---------------------------------------------------------------------------
 %description javadoc
