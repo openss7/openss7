@@ -132,85 +132,67 @@ makedev = @STRCONF_MAKEDEV@
 
 control =
 
-debian/$(PACKAGE_LCNAME)-core.preinst \
-debian/$(PACKAGE_LCNAME)-core.postinst \
-debian/$(PACKAGE_LCNAME)-core.prerm \
-debian/$(PACKAGE_LCNAME)-core.postrm:
-	$(MAKE) $@
+#debian/$(PACKAGE_LCNAME)-core.preinst \
+#debian/$(PACKAGE_LCNAME)-core.postinst \
+#debian/$(PACKAGE_LCNAME)-core.prerm \
+#debian/$(PACKAGE_LCNAME)-core.postrm:
+#	$(MAKE) $@
 
-debian/$(PACKAGE_LCNAME)-%-$(core_name).preinst \
-debian/$(PACKAGE_LCNAME)-%-$(core_name).postinst \
-debian/$(PACKAGE_LCNAME)-%-$(core_name).prerm \
-debian/$(PACKAGE_LCNAME)-%-$(core_name).postrm:
-	@f=`echo "$@" | sed -r -e 's,^.*/,,;s,-(lis|streams)-,-,;s,$(core_name),core,;s,$(info_name),info,'` ; \
-	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
-	test "$@" -ef "$$d$$f" && exit 0 ; \
-	test -f "$@" -a "$@" -nt "$$d$$f" || { \
-		echo "cp -f -- $$d$$f $@" ; \
-		cp -f -- $$d$$f $@ ; \
-	}
+#debian/$(PACKAGE_LCNAME)-$(core_name).preinst \
+#debian/$(PACKAGE_LCNAME)-$(core_name).postinst \
+#debian/$(PACKAGE_LCNAME)-$(core_name).prerm \
+#debian/$(PACKAGE_LCNAME)-$(core_name).postrm:
+#	@f=`echo "$@" | sed -e 's,^.*/,,;s,$(core_name),core,;s,$(info_name),info,'` ; \
+#	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
+#	test "$@" -ef "$$d$$f" && exit 0 ; \
+#	test -f "$@" -a "$@" -nt "$$d$$f" || { \
+#		echo "cp -f -- $$d$$f $@" ; \
+#		cp -f -- $$d$$f $@ ; \
+#	}
 
 #
 #   Core kernel modules:
 #
 
-control	+= debian/$(PACKAGE_LCNAME)-streams-$(core_name).preinst \
-	   debian/$(PACKAGE_LCNAME)-streams-$(core_name).postinst \
-	   debian/$(PACKAGE_LCNAME)-streams-$(core_name).prerm \
-	   debian/$(PACKAGE_LCNAME)-streams-$(core_name).postrm
-control	+= debian/$(PACKAGE_LCNAME)-lis-$(core_name).preinst \
-	   debian/$(PACKAGE_LCNAME)-lis-$(core_name).postinst \
-	   debian/$(PACKAGE_LCNAME)-lis-$(core_name).prerm \
-	   debian/$(PACKAGE_LCNAME)-lis-$(core_name).postrm
+control	+= debian/$(PACKAGE_LCNAME)-$(core_name).preinst \
+	   debian/$(PACKAGE_LCNAME)-$(core_name).postinst \
+	   debian/$(PACKAGE_LCNAME)-$(core_name).prerm \
+	   debian/$(PACKAGE_LCNAME)-$(core_name).postrm
 
-control	+= debian/$(PACKAGE_LCNAME)-streams-$(core_name).install
-control	+= debian/$(PACKAGE_LCNAME)-lis-$(core_name).install
+control	+= debian/$(PACKAGE_LCNAME)-$(core_name).install
 
-@WITH_KO_MODULES_FALSE@debian/$(PACKAGE_LCNAME)-%-$(core_name).install:
+@WITH_KO_MODULES_FALSE@debian/$(PACKAGE_LCNAME)-$(core_name).install:
 @WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(kmoduledir) ] || echo '$(debtmpdir)$(kmoduledir)/modules.$(base)' ; \
 @WITH_KO_MODULES_FALSE@	  [ ! -d $(debtmpdir)$(kmoduledir)/$(base) ] || echo '$(debtmpdir)$(kmoduledir)/$(base)/*.o' ) \
 @WITH_KO_MODULES_FALSE@	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
-@WITH_KO_MODULES_TRUE@debian/$(PACKAGE_LCNAME)-%-$(core_name).install:
+@WITH_KO_MODULES_TRUE@debian/$(PACKAGE_LCNAME)-$(core_name).install:
 @WITH_KO_MODULES_TRUE@	( [ ! -d $(debtmpdir)$(kmoduledir)/$(base) ] || echo '$(debtmpdir)$(kmoduledir)/$(base)/*.ko' ) \
 @WITH_KO_MODULES_TRUE@	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
-control	+= debian/$(PACKAGE_LCNAME)-streams-$(info_name).install
-control	+= debian/$(PACKAGE_LCNAME)-lis-$(info_name).install
+control	+= debian/$(PACKAGE_LCNAME)-$(info_name).install
 
-@WITH_KO_MODULES_FALSE@debian/$(PACKAGE_LCNAME)-%-$(info_name).install:
+@WITH_KO_MODULES_FALSE@debian/$(PACKAGE_LCNAME)-$(info_name).install:
 @WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(pkgincludedir)/$(kversion) ] || echo '$(debtmpdir)$(pkgincludedir)/$(kversion)/*' ; \
 @WITH_KO_MODULES_FALSE@	  [ ! -d $(debtmpdir)$(kmoduledir)/$(base) ] || echo '$(debtmpdir)$(kmoduledir)/$(base)/Module*' ) \
 @WITH_KO_MODULES_FALSE@	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
 
-@WITH_KO_MODULES_TRUE@debian/$(PACKAGE_LCNAME)-%-$(info_name).install:
+@WITH_KO_MODULES_TRUE@debian/$(PACKAGE_LCNAME)-$(info_name).install:
 @WITH_KO_MODULES_TRUE@	( [ ! -d $(debtmpdir)$(kmoduledir)/$(base) ] || echo '$(debtmpdir)$(kmoduledir)/$(base)/Module*' ) \
 @WITH_KO_MODULES_TRUE@	| sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,' > $@
-
 
 #
 #   Libraries:
 #
 
-debian/$(PACKAGE_LCNAME)-lib.preinst:
-	$(MAKE) $@
+control	+= debian/$(PACKAGE_LCNAME)-lib.preinst
 
-debian/$(PACKAGE_LCNAME)-%-lib.preinst:
-	@f=`echo "$@" | sed -r -e 's,^.*/,,;s,-(lis|streams)-,-,'` ; \
-	d=debian/ ; test -f $$d$$f || d='$(srcdir)/debian/' ; \
-	test "$@" -ef "$$d$$f" && exit 0 ; \
-	test -f "$@" -a "$@" -nt "$$d$$f" || { \
-		echo "cp -f -- $$d$$f $@" ; \
-		cp -f -- $$d$$f $@ ; \
-	}
 
-control	+= debian/$(PACKAGE_LCNAME)-streams-lib.preinst
-control	+= debian/$(PACKAGE_LCNAME)-lis-lib.preinst
+control	+= debian/$(PACKAGE_LCNAME)-lib.install
 
-control	+= debian/$(PACKAGE_LCNAME)-streams-lib.install
-control	+= debian/$(PACKAGE_LCNAME)-lis-lib.install
 
-debian/$(PACKAGE_LCNAME)-%-lib.install:
+
+debian/$(PACKAGE_LCNAME)-lib.install:
 	( [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
 	  [ ! -d $(debtmpdir)$(libdir) ] || echo '$(debtmpdir)$(libdir)/*.la' ; \
 	  [ ! -d $(debtmpdir)$(localedir) ] || \
@@ -285,10 +267,9 @@ debian/$(PACKAGE_LCNAME)-devel.install:
 debian/$(PACKAGE_LCNAME)-source.install:
 	echo './$(PACKAGE)-$(VERSION)/ usr/src' > $@;
 
-control	+= debian/$(PACKAGE_LCNAME)-streams-util.install
-control	+= debian/$(PACKAGE_LCNAME)-lis-util.install
+control	+= debian/$(PACKAGE_LCNAME)-util.install
 
-debian/$(PACKAGE_LCNAME)-%-util.install:
+debian/$(PACKAGE_LCNAME)-util.install:
 	( [ ! -d $(debtmpdir)$(bindir) ]	|| echo '$(debtmpdir)$(bindir)/*' ; \
 	  [ ! -d $(debtmpdir)$(sbindir) ]	|| echo '$(debtmpdir)$(sbindir)/*' ; \
 	  [ ! -d $(debtmpdir)$(pkglibexecdir) ]	|| echo '$(debtmpdir)$(pkglibexecdir)/*' ; \
@@ -311,16 +292,16 @@ debian/$(PACKAGE_LCNAME)-init.modules:
 	  echo 'include /lib/modules/`uname -r`/modules.$(PACKAGE_LCNAME)' ; \
 	  echo 'endif' ) > $@
 
-@INSTALL_INITSCRIPTS_TRUE@pkg_control_indep	+= debian/$(PACKAGE_LCNAME)-init.specfs.sh
-@INSTALL_INITSCRIPTS_TRUE@pkg_control_indep	+= debian/$(PACKAGE_LCNAME)-init.streams.sh
-@INSTALL_INITSCRIPTS_TRUE@pkg_control_indep	+= debian/$(PACKAGE_LCNAME)-init.strace.sh
-@INSTALL_INITSCRIPTS_TRUE@pkg_control_indep	+= debian/$(PACKAGE_LCNAME)-init.strerr.sh
+@INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.specfs.sh
+@INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.streams.sh
+@INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.strace.sh
+@INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.strerr.sh
 @INSTALL_INITSCRIPTS_TRUE@control	+= debian/$(PACKAGE_LCNAME)-init.$(PACKAGE_LCNAME).sh
 
 debian/$(PACKAGE_LCNAME)-init.%.sh:
 	[ ! -f src/util/init/$*.sh ] || cp -f -- src/util/init/$*.sh $@
 
-#control += debian/$(PACKAGE_LCNAME)-mibs.install
+control += debian/$(PACKAGE_LCNAME)-mibs.install
 
 debian/$(PACKAGE_LCNAME)-mibs.install:
 	( [ ! -d $(debtmpdir)$(snmpmibdir) ] || echo '$(debtmpdir)$(snmpmibdir)/*' ) \
@@ -431,25 +412,20 @@ binary-common:
 	dh_fixperms -v
 	dh_makeshlibs -v
 	dh_installdeb -v
-	dh_shlibdeps -v -X.ko -X.o -L $(PACKAGE_LCNAME)-lib -l `pwd`/debian/$(PACKAGE_LCNAME)-lib/usr/lib
+	dh_shlibdeps -v -X.ko -X.o -L streams-lib -l `pwd`/debian/streams-lib/usr/lib
 	dh_gencontrol -v
 	dh_md5sums -v
 	dh_builddeb -v
 
 binary-lis:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(core_name) binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-$(info_name) binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-util binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lis-lib binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
 
 binary-lfs:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(core_name) binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-$(info_name) binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-util binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-streams-lib binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$(core_name) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$(info_name) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-util binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lib binary-common
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
 
 binary-nos:
@@ -476,7 +452,6 @@ binary-indep: install
 binary-arch: DH_OPTIONS = -s
 binary-arch: install
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-#	$(MAKE) -f debian/rules DH_OPTIONS=-s binary-common
 	@case " $(BUILD_CFGOPTIONS) " in \
 		(*" --with-lfs "*)  targ=binary-lfs ;; \
 		(*" --with-lis "*)  targ=binary-lis ;; \

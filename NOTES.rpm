@@ -115,6 +115,45 @@ openss7-repo	<= openss7
 openss7		<= openss7-base
 openss7-lib	<= openss7-base
 
+Subpackage Dependencies (again):
+--------------------------------
+
+Here they are again with the loops reversed.
+
+Virtual loop:
+  openss7				-> openss7-repo
+  openss7				-> openss7-base
+
+Run-time loop:
+  openss7-base				-> openss7-lib
+  openss7-base				-> openss7-compat
+  openss7-lib				-> openss7-kernel
+  openss7-compat			-> openss7-lib
+  openss7-kernel		(prereq)-> openss7-base
+
+Docymentation:
+  openss7-doc				-> openss7
+
+Java:
+  openss7-java				-> openss7-lib
+  openss7-javadoc			-> openss7
+
+Development loop:
+  openss7-devel				-> openss7-kernel-devel
+  openss7-kernel-devel			-> openss7-kernel
+
+Debug loop:
+  openss7-debuginfo			-> openss7-kernel-debuginfo
+  openss7-kernel-debuginfo		-> openss7-kernel
+  openss7-debugsource			-> openss7-debuginfo
+  openss7-debugsource			-> openss7-kernel-debugsource
+  openss7-kernel-debugsource		-> openss7-kernel-debuginfo
+
+Source:
+openss7-source-kernel			-> openss7
+
+
+
 -----
 
 =========================================================================

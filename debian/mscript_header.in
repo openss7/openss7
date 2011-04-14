@@ -52,8 +52,8 @@ pkgincludedir="@includedir@/@PACKAGE@"
 pkglibexecdir="@libexecdir@/@PACKAGE@"
 
 KERNEL_MODCONF=@STRCONF_CONFMOD@
-KERNEL_MODULES=
-KERNEL_PRELOADS=
+KERNEL_MODULES="specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat"
+KERNEL_PRELOADS="specfs streams streams-sth streams-clone"
 KERNEL_SUBDIR=@PACKAGE_LCNAME@
 KMODCONF_EXT=@PACKAGE_LCNAME@
 kmodext=@PACKAGE_LCNAME@
@@ -66,8 +66,8 @@ STRCONF_MAJBASE=@STRCONF_MAJBASE@
 
 modules=`echo " ${KERNEL_MODULES} " | sed -r -e 's| [^[:space:]]*/| |g;s| streams-| '$kpre'|g;s| lib[^[:space:]]*_a-| '$kpre'|g;s|\.(k)?o(\.gz|\.bz2)? | |g'`
 preloads=`echo " ${KERNEL_PRELOADS} " | sed -r -e 's| [^[:space:]]*/| |g;s| streams-| '$kpre'|g;s| lib[^[:space:]]*_a-| '$kpre'|g;s|\.(k)?o(\.gz|\.bz2)? | |g'`
-libraries=
-tools=
+libraries="streams"
+tools="ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo"
 infofiles=
 initfiles=
 conffiles=
