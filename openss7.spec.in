@@ -207,46 +207,6 @@
 %global HAVE_snmp32mods     0
 %endif
 
-%ifarch x86_64 ia64
-%global compatarch          i686
-%endif
-%ifarch s390x
-%global compatarch          s390
-%endif
-%ifarch sparc64
-%global compatarch          sparc
-%endif
-%ifarch ppc64
-%global compatarch          ppc
-%endif
-
-%global morecflags          %{optflags}
-%ifarch %ix86
-%global morecflags          %{optflags} -D__USE_STRING_INLINES -fstrict-aliasing
-%endif
-%ifarch sparc
-%global morecflags          %{optflags} -fcall-used-g7
-%endif
-%ifarch sparcv9
-%global morecflags          %{optflags} -fcall-used-g7
-%endif
-%ifarch sparc64
-%global morecflags          %{optflags} -mvis -fcall-used-g7
-%endif
-%global preferred_cflags    %{morecflags}
-%ifnarch ia64 s390 s390x ppc ppciseries ppc64
-%if %(if test "`gcc --version`" != '2.95.3' ; then echo "1" ; else echo "0" ; fi)
-%global preferred_cflags    %{morecflags} -freorder-blocks
-%endif
-%endif
-
-%ifarch noarch
-%global host_platform       %{nil}
-%else
-%global host_platform       --host=%{_target_platform}
-%endif
-%global target_platform     %{_target_platform}
-
 %if %{HAVE_devices}
 %global USE_makedev         %{HAVE_makedev}
 %global USE_mknods          %{HAVE_mknods}
@@ -593,11 +553,9 @@
 %{!?_snmpmibdir:        %{expand: %%global _snmpmibdir      %%{_datarootdir}/snmp/mibs}}
 %{!?_snmpdlmoddir:      %{expand: %%global _snmpdlmoddir    %%{_libdir}/snmp/dlmod}}
 %{!?_snmpconfdir:       %{expand: %%global _snmpconfdir     %%{_sysconfdir}/snmp}}
-%ifarch x86_64 s390x ppc64 sparc64 ia64
 %{!?_lib32dir:          %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
 %{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
 %{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
-%endif
 %{!?_gcjdir:            %{expand: %%global _gcjdir          %%{_libdir}/gcj}}
 %{!?_pkggcjdir:         %{expand: %%global _pkggcjdir       %%{_gcjdir}/%%{name}}}
 %{!?_jnidir:            %{expand: %%global _jnidir          %%{_libdir}/java}}
@@ -1769,8 +1727,8 @@
 %global kbaseversion %{baseversion}%(echo '_%{kernel_source}' | sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
 %endif
 
-%global kspecrelease %{specrelease}
-%global kbaserelease %{specrelease}
+%global kspecrelease %{baserelease}
+%global kbaserelease %{baserelease}
 # RedHat adds a mogrified kernel version string to the kmp release (or commonly not at all).
 %if %{HAVE_rhatkmps}
 %global kbaserelease %{rpmrelease}%(echo '.%{_kversion}' | sed -e 'y,-,.,')
@@ -1836,8 +1794,9 @@ Autoprov:       true
 #BuildRequires:    @SED@
 #BuildRequires:    @AWK@
 
-%define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
+%global newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
 
+%ifnarch noarch
 %ifarch s390 s390x
 BuildRequires:    gcc >= 2.95.3
 %else
@@ -1855,6 +1814,7 @@ BuildRequires:    gcc = 2.95.3
 BuildRequires:    gcc >= 2.96
 %else
 BuildRequires:    gcc = 2.95.3
+%endif
 %endif
 
 # TODO: FC4 wants kernel-devel not kernel-source
@@ -1964,14 +1924,15 @@ BuildRequires:    @BZIP2_CMD@
 # This is a virtual package that we want to pull in all the necessary
 # packages for a full run-time system.
 %if %{NEED_repo}
-Requires:           %{name}-repo    = %{epoch}:%{baseversion}-%{specrelease}
+Requires:           %{name}-repo    = %{epoch}:%{baseversion}-%{baserelease}
+%endif
+%if %{NEED_base}
+Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name} = %{epoch}:%{baseversion}-%{specrelease}
 Provides:           %{name} = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name} = %{epoch}:%{baseversion}-%{rpmrelease}
-
-BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description
@@ -2050,23 +2011,23 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
 %build
 # ---------------------------------------------------------------------------
 
-%define cache_file %{target_platform}-%{kernel_version}-config.cache
-%define csite_file %{target_platform}-config.site
-%define mpost_file %{target_platform}-%{kernel_version}-modpost.cache
+%global cache_file %{_host}-%{kernel_version}-config.cache
+%global csite_file %{_host}-config.site
+%global mpost_file %{_host}-%{kernel_version}-modpost.cache
 
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')%{nil}
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')%{nil}
 
 ./configure \
     ${CC+CC="${CC}"} \
-    CFLAGS="${CFLAGS:-%{preferred_cflags}}" \
+    CFLAGS="${CFLAGS:-%{__global_cflags}}" \
     ${LD+LD="${LD}"} \
     ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
     ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
     ${CPP+CPP="${CPP}"} \
     ${CXX+CXX="${CXX:-$CC}"} \
     ${CXX-${CC+CXX="$CC"}} \
-    CXXFLAGS="${CXXFLAGS:-%{preferred_cflags}}" \
+    CXXFLAGS="${CXXFLAGS:-%{__global_cflags}}" \
     ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
     ${CXXCPP-${CPP+CXXCPP="$CPP"}} \
     CONFIG_SITE="%{_builddir}/%{csite_file}" \
@@ -2078,8 +2039,9 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
     %{?_tcllibdir:tcllibdir=%{_tcllibdir}} \
     %{?_tclsrcdir:tclsrcdir=%{_tclsrcdir}} \
     --cache-file="%{_builddir}/%{cache_file}" \
-    %{host_platform} \
     --prefix=%{_prefix} \
+    --build=%{_build} \
+    --host=%{_host} \
     --exec-prefix=%{_exec_prefix} \
     --bindir=%{_bindir} \
     --sbindir=%{_sbindir} \
@@ -2514,7 +2476,6 @@ Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description repo
@@ -2797,7 +2758,10 @@ Requires:           dev >= 3.3
 #endif
 
 %if %{NEED_lib}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{specrelease}
+Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
+%endif
+%if %{NEED_compat}
+Requires:           %{name}-compat  = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
@@ -2805,7 +2769,6 @@ Provides:           %{name}-base = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-base = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description base
@@ -3489,8 +3452,8 @@ Conflicts:          texinfo < 3.11
 
 # The %{name}-base package contains the man page references and macros
 # and is required.  Other packages are unnecessary.
-%if %{NEED_base}
-Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
+%if %{NEED_virt}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{specrelease}
@@ -3498,7 +3461,6 @@ Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description doc
@@ -3667,8 +3629,8 @@ Requires(post):     /sbin/ldconfig
 Requires(postun):   /sbin/ldconfig
 Requires(post):     %(which tclsh)
 
-%if %{NEED_virt}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{specrelease}
+%if %{NEED_kmod}
+Requires:           %{name}-kernel  = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
 
 Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{specrelease}
@@ -3676,7 +3638,6 @@ Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description lib
@@ -3877,8 +3838,8 @@ Requires(pre):      /sbin/ldconfig
 Requires(post):     /sbin/ldconfig
 Requires(postun):   /sbin/ldconfig
 
-%if %{NEED_virt}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{specrelease}
+%if %{NEED_lib}
+Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{specrelease}
@@ -3886,7 +3847,6 @@ Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{compatarch}
 
 # ---------------------------------------------------------------------------
 %description compat
@@ -3954,8 +3914,8 @@ Prefix:             %{_lib32dir}
 
 Conflicts:          texinfo < 3.11
 
-%if %{NEED_base}
-Requires:           %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+%if %{NEED_kdev}
+Requires:           %{name}-kernel-devel = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
 
 Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{specrelease}
@@ -3963,7 +3923,6 @@ Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description devel
@@ -4014,8 +3973,8 @@ Autoprov:           true
 %{?files_binaries:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 %endif
 
-%if %{NEED_base}
-Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
+%if %{NEED_kbug}
+Requires:           %{name}-kernel-debuginfo = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
 
 Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{specrelease}
@@ -4023,7 +3982,6 @@ Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description debuginfo
@@ -4054,14 +4012,16 @@ Autoprov:           true
 %{?files_binaries:Prefix:               %{_usrsrc}/debug}
 %endif
 
-Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{specrelease}
+Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
+%if %{NEED_kbug}
+Requires:           %{name}-kernel-debuginfo = %{epoch}:%{kbaseversion}-%{kbaserelease}
+%endif
 
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{specrelease}
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description debugsource
@@ -4157,29 +4117,33 @@ Requires(postun):   modutils
 #Requires(postun):   @INSMOD@
 
 %if %{HAVE_weakmods}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_rhatkmps}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
+%else
 %if %{HAVE_susekmps}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%else
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
 %endif
 %else
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_yumrepo}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
+%else
 %if %{HAVE_zypprepo}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%else
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
 %endif
 %endif
 
 %if %{NEED_base}
-Requires(prereq):   %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
-Requires(pre):      %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
-Requires(post):     %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
-Requires(preun):    %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
-Requires(postun):   %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
+Requires(prereq):   %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
+Requires(pre):      %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
+Requires(post):     %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
+Requires(preun):    %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
+Requires(postun):   %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
@@ -4205,7 +4169,6 @@ Provides:           %{name}-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_package}
@@ -4592,18 +4555,17 @@ Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 # The development package requires that the actual kernel be installed so that
 # /boot/System.map-%{_kversion} is available.  Also, the specific kernel
 # development package is also required.
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 %if %{HAVE_rhatkmps}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
-%endif
+%else
 %if %{HAVE_susekmps}
 %(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%else
+%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%endif
 %endif
 %(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 
-%if %{NEED_devel}
-Requires:           %{name}-devel   = %{epoch}:%{baseversion}-%{specrelease}
-%endif
 %if %{NEED_kmod}
 Requires:           %{name}-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
@@ -4631,7 +4593,6 @@ Provides:           %{name}-devel-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
 
 Version:            %{kspecversion}
 Release:            %{kspecrelease}
-BuildArch:          %{basearch}
 
 %if %{FILES_symvers}
 # ---------------------------------------------------------------------------
@@ -4718,9 +4679,6 @@ Autoprov:           true
 %{?files_modules:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 %endif
 
-%if %{NEED_debug}
-Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{specrelease}
-%endif
 %if %{NEED_kmod}
 Requires:           %{name}-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
@@ -4748,7 +4706,6 @@ Provides:           %{name}-debuginfo-kmp = %{epoch}:%{kbaseversion}-%{kbaserele
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_buginfo}
@@ -4779,9 +4736,6 @@ Autoprov:           true
 %{?files_modules:Prefix:               %{_usrsrc}/debug}
 %endif
 
-%if %{NEED_debug}
-Requires:           %{name}-debugsource = %{epoch}:%{baseversion}-%{specrelease}
-%endif
 %if %{NEED_kbug}
 Requires:           %{name}-debuginfo-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
@@ -4809,7 +4763,6 @@ Provides:           %{name}-debugsource-kmp = %{epoch}:%{kbaseversion}-%{kbasere
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_bugsrce}
@@ -4851,7 +4804,7 @@ Obsoletes:          %{name}-source-kmod%{kernel_flavor}
 %(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 
 %if %{NEED_virt}
-Requires:           %{name} = %{epoch}:%{baseversion}-%{specrelease}
+Requires:           %{name} = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-source-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
@@ -4877,7 +4830,6 @@ Provides:           %{name}-source-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease
 
 Version:            %{kspecversion}
 Release:            %{kspecrelease}
-BuildArch:          %{basearch}
 
 # -----------------------------------------------------------------------------
 %description -n %{kernel_sourcep}
@@ -4934,12 +4886,11 @@ Requires(postun):   /usr/bin/gcj-dbtool
 Requires(postun):   /usr/bin/rebuild-gcj-db
 %endif
 
-%if %{NEED_base}
-Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{specrelease}
+%if %{NEED_lib}
+Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description java
@@ -5072,11 +5023,10 @@ Prefix:         %{_pkgjavadocdir}
 %endif
 
 %if %{NEED_virt}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{specrelease}
+Requires:           %{name}         = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Release:        %{specrelease}
-BuildArch:      noarch
 
 # ---------------------------------------------------------------------------
 %description javadoc
