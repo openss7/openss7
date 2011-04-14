@@ -1719,20 +1719,26 @@
 %global HAVE_rhatkmps 0
 %endif
 
-%global kspecversion %{baseversion}
-# SuSE adds a mogrified kernel version string to the kmp version.
-%if %{HAVE_susekmps}
-%global kbaseversion %{baseversion}%(echo '_%{kernel_source}' | sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
-%else
-%global kbaseversion %{baseversion}
-%endif
 
 %global kspecrelease %{baserelease}
 # RedHat adds a mogrified kernel version string to the kmp release (or commonly not at all).
 %if %{HAVE_rhatkmps}
 %global kbaserelease %{rpmrelease}%(echo '.%{_kversion}' | sed -e 'y,-,.,')
+%global krelsrequire %{nil}
 %else
 %global kbaserelease %{baserelease}
+%global krelsrequire -%{baserelease}
+%endif
+
+# SuSE adds a mogrified kernel version string to the kmp version.
+%if %{HAVE_susekmps}
+%global kbaseversion %{baseversion}%(echo '_%{kernel_source}' | sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
+%global kspecversion %{baseversion}
+%global kversrequire %{nil}
+%else
+%global kbaseversion %{baseversion}
+%global kspecversion %{baseversion}
+%global kversrequire = %{epoch}:%{baseversion}%{krelsrequire}
 %endif
 
 %if %{HAVE_weakmods}
@@ -3336,7 +3342,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 fi
 
 %if %{HAVE_weakmods}
-%triggerin base -- %{kernel_package}
+%triggerin base -- %{kernel_package} %{kversrequire}
 # ---------------------------------------------------------------------------
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     %{_sbindir}/%{name}-modules -- -v --update-modules || :
@@ -3356,7 +3362,7 @@ fi
 %endif
 
 %if %{HAVE_weakmods}
-%triggerpostun base -- %{kernel_package}
+%triggerpostun base -- %{kernel_package} %{kversrequire}
 # ---------------------------------------------------------------------------
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     %{_sbindir}/%{name}-modules -- -v --update-modules || :
@@ -3632,7 +3638,7 @@ Requires(postun):   /sbin/ldconfig
 Requires(post):     %(which tclsh)
 
 %if %{NEED_kmod}
-Requires:           %{name}-kernel  = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{specrelease}
@@ -3917,7 +3923,7 @@ Prefix:             %{_lib32dir}
 Conflicts:          texinfo < 3.11
 
 %if %{NEED_kdev}
-Requires:           %{name}-kernel-devel = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Requires:           %{name}-kernel-devel = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{specrelease}
@@ -3976,7 +3982,7 @@ Autoprov:           true
 %endif
 
 %if %{NEED_kbug}
-Requires:           %{name}-kernel-debuginfo = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Requires:           %{name}-kernel-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{specrelease}
@@ -4016,7 +4022,7 @@ Autoprov:           true
 
 Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
 %if %{NEED_kbug}
-Requires:           %{name}-kernel-debuginfo = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Requires:           %{name}-kernel-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{specrelease}
