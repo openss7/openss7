@@ -148,6 +148,39 @@ Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.11.1
 Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.suse
 
 
+When to install and when to update:
+-----------------------------------
+
+There are two 'Provides' statements, one for RedHat/Fedora and one for
+SuSE:
+
+Provides: kernel-modules = %{_kversion}
+
+and
+
+Provides: multversion(kernel)
+
+These provides statements tell yum and zypper to always install and not
+to update these packages.  However, I think that this is "after" it has
+decided what to update in the first place.  Some kmod packages do not
+provide 'kernel-modules'.
+
+There are several scenarios:
+
+Updating the openss7 package suite:
+
+ - The openss7 package suite has reved.  kmp packages must be made to
+   depend precisely on the base package version.  In this way, when the
+   base package is updated, new kmp packages will be installed, and the
+   old packages will be removed.
+
+Adding a new kmp for a more recent kernel:
+
+ - A kernel incompatability exists and a kmp for a newer kernel is
+   released.  When the base package requires a kmp package and the older
+   kernels are removed as part of the update, the old kmp package will
+   be removed and the new one installed.
+
 -----
 
 =========================================================================
