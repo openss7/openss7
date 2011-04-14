@@ -19,7 +19,7 @@ BEGIN {
     sub(/\/+$/, "", RPM_BUILD_ROOT)
     mark64 = 1
     uname = "uname -m"
-    if ((uname | getline)) {
+    while ((uname | getline) == 1) {
 	if (/^alpha/) {
 	    mark64 = 0
 	}
