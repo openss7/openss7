@@ -552,6 +552,16 @@ Tricks:
 Tricks for keeping OpenSS7 kernel modules from not being weak-updated
 using RH weak-modules or SuSE weak-modules2 from module-init-tools:
 
+Respin
+======
+
+We now use the weak-updates approach with relinking.  This uses the awk
+script, `/sbin/openss7-modules', that performs weak-updates using
+symbolic links but also relinks kernel modules that need absolute
+symbols.
+
+
+
 -----
 
 =========================================================================
