@@ -102,6 +102,12 @@ USER_CXXFLAGS="$CXXFLAGS"; unset CXXFLAGS
 USER_GCJFLAGS="$GCJFLAGS"; unset GCJFLAGS
 USER_LDFLAGS="$LDFLAGS";   unset LDFLAGS
 
+dnl Pull in RPM optimization flags to bypass cached CFLAGS
+if test :${RPM_OPT_FLAGS:+set} = :set; then
+    USER_CFLAGS=${USER_CFLAGS:+$USER_CFLAGS }$RPM_OPT_FLAGS
+    USER_CXXFLAGS=${USER_CXXFLAGS:+$USER_CXXFLAGS }$RPM_OPT_FLAGS
+fi
+
 m4_include([m4/swig.m4])
 dnl
 dnl Checks for programs.
