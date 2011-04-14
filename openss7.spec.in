@@ -1719,19 +1719,20 @@
 %global HAVE_rhatkmps 0
 %endif
 
-
 %global kspecversion %{baseversion}
-%global kbaseversion %{baseversion}
 # SuSE adds a mogrified kernel version string to the kmp version.
 %if %{HAVE_susekmps}
 %global kbaseversion %{baseversion}%(echo '_%{kernel_source}' | sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
+%else
+%global kbaseversion %{baseversion}
 %endif
 
 %global kspecrelease %{baserelease}
-%global kbaserelease %{baserelease}
 # RedHat adds a mogrified kernel version string to the kmp release (or commonly not at all).
 %if %{HAVE_rhatkmps}
 %global kbaserelease %{rpmrelease}%(echo '.%{_kversion}' | sed -e 'y,-,.,')
+%else
+%global kbaserelease %{baserelease}
 %endif
 
 %if %{HAVE_weakmods}

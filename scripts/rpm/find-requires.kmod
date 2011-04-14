@@ -11,7 +11,6 @@ BEGIN {
     }
     if (ARGC > 1 && ARGV[1]) {
 	dir = ARGV[1]
-	delete ARGV[1]
     }
     root = "."
     if ("RPM_BUILD_ROOT" in ENVIRON) {
@@ -20,7 +19,6 @@ BEGIN {
     }
     if (ARGC > 2 && ARGV[2]) {
 	root = ARGV[2]
-	delete ARGV[2]
     }
     sub(/\/+$/, "", root)
     kversion = "*"
@@ -30,9 +28,8 @@ BEGIN {
     }
     if (ARGC > 3 && ARGV[3]) {
 	kversion = ARGV[3]
-	delete ARGV[3]
     }
-    for (i=4;ARGC>i;i++) {
+    for (i=1;ARGC>i;i++) {
 	delete ARGV[i]
     }
     find = "find /boot /usr/src/kernels " dir " -type f -name 'symsets-" kversion ".tar.gz' 2>/dev/null"
