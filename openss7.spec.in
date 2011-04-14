@@ -207,46 +207,6 @@
 %global HAVE_snmp32mods     0
 %endif
 
-%ifarch x86_64 ia64
-%global compatarch          i686
-%endif
-%ifarch s390x
-%global compatarch          s390
-%endif
-%ifarch sparc64
-%global compatarch          sparc
-%endif
-%ifarch ppc64
-%global compatarch          ppc
-%endif
-
-%global morecflags          %{optflags}
-%ifarch %ix86
-%global morecflags          %{optflags} -D__USE_STRING_INLINES -fstrict-aliasing
-%endif
-%ifarch sparc
-%global morecflags          %{optflags} -fcall-used-g7
-%endif
-%ifarch sparcv9
-%global morecflags          %{optflags} -fcall-used-g7
-%endif
-%ifarch sparc64
-%global morecflags          %{optflags} -mvis -fcall-used-g7
-%endif
-%global preferred_cflags    %{morecflags}
-%ifnarch ia64 s390 s390x ppc ppciseries ppc64
-%if %(if test "`gcc --version`" != '2.95.3' ; then echo "1" ; else echo "0" ; fi)
-%global preferred_cflags    %{morecflags} -freorder-blocks
-%endif
-%endif
-
-%ifarch noarch
-%global host_platform       %{nil}
-%else
-%global host_platform       --host=%{_target_platform}
-%endif
-%global target_platform     %{_target_platform}
-
 %if %{HAVE_devices}
 %global USE_makedev         %{HAVE_makedev}
 %global USE_mknods          %{HAVE_mknods}
@@ -593,11 +553,9 @@
 %{!?_snmpmibdir:        %{expand: %%global _snmpmibdir      %%{_datarootdir}/snmp/mibs}}
 %{!?_snmpdlmoddir:      %{expand: %%global _snmpdlmoddir    %%{_libdir}/snmp/dlmod}}
 %{!?_snmpconfdir:       %{expand: %%global _snmpconfdir     %%{_sysconfdir}/snmp}}
-%ifarch x86_64 s390x ppc64 sparc64 ia64
 %{!?_lib32dir:          %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
 %{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
 %{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
-%endif
 %{!?_gcjdir:            %{expand: %%global _gcjdir          %%{_libdir}/gcj}}
 %{!?_pkggcjdir:         %{expand: %%global _pkggcjdir       %%{_gcjdir}/%%{name}}}
 %{!?_jnidir:            %{expand: %%global _jnidir          %%{_libdir}/java}}
@@ -1836,8 +1794,9 @@ Autoprov:       true
 #BuildRequires:    @SED@
 #BuildRequires:    @AWK@
 
-%define newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
+%global newgcc %(if test `gcc -v 2>&1 | grep 'gcc version' | sed -e 's|gcc version ||;s| .*$||'` != '2.95.3' ; then echo 1 ; else echo 0 ; fi)
 
+%ifnarch noarch
 %ifarch s390 s390x
 BuildRequires:    gcc >= 2.95.3
 %else
@@ -1855,6 +1814,7 @@ BuildRequires:    gcc = 2.95.3
 BuildRequires:    gcc >= 2.96
 %else
 BuildRequires:    gcc = 2.95.3
+%endif
 %endif
 
 # TODO: FC4 wants kernel-devel not kernel-source
@@ -1974,8 +1934,6 @@ Provides:           %{name} = %{epoch}:%{baseversion}-%{specrelease}
 Provides:           %{name} = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name} = %{epoch}:%{baseversion}-%{rpmrelease}
 
-BuildArch:          noarch
-
 # ---------------------------------------------------------------------------
 %description
 %{descripline}
@@ -2053,23 +2011,23 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
 %build
 # ---------------------------------------------------------------------------
 
-%define cache_file %{target_platform}-%{kernel_version}-config.cache
-%define csite_file %{target_platform}-config.site
-%define mpost_file %{target_platform}-%{kernel_version}-modpost.cache
+%global cache_file %{_host}-%{kernel_version}-config.cache
+%global csite_file %{_host}-config.site
+%global mpost_file %{_host}-%{kernel_version}-modpost.cache
 
 %define enable()  %(echo "%1" | sed -e 's|^--with-|--enable-|')%{nil}
 %define disable() %(echo "%1" | sed -e 's|^--without-|--disable-|')%{nil}
 
 ./configure \
     ${CC+CC="${CC}"} \
-    CFLAGS="${CFLAGS:-%{preferred_cflags}}" \
+    CFLAGS="${CFLAGS:-%{__global_cflags}}" \
     ${LD+LD="${LD}"} \
     ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
     ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
     ${CPP+CPP="${CPP}"} \
     ${CXX+CXX="${CXX:-$CC}"} \
     ${CXX-${CC+CXX="$CC"}} \
-    CXXFLAGS="${CXXFLAGS:-%{preferred_cflags}}" \
+    CXXFLAGS="${CXXFLAGS:-%{__global_cflags}}" \
     ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
     ${CXXCPP-${CPP+CXXCPP="$CPP"}} \
     CONFIG_SITE="%{_builddir}/%{csite_file}" \
@@ -2081,8 +2039,12 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
     %{?_tcllibdir:tcllibdir=%{_tcllibdir}} \
     %{?_tclsrcdir:tclsrcdir=%{_tclsrcdir}} \
     --cache-file="%{_builddir}/%{cache_file}" \
-    %{host_platform} \
     --prefix=%{_prefix} \
+    --build=%{_build} \
+    --host=%{_host} \
+%ifnarch noarch
+    --target=%{_target_platform} \
+%endif
     --exec-prefix=%{_exec_prefix} \
     --bindir=%{_bindir} \
     --sbindir=%{_sbindir} \
@@ -2517,7 +2479,6 @@ Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description repo
@@ -2811,7 +2772,6 @@ Provides:           %{name}-base = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-base = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description base
@@ -3504,7 +3464,6 @@ Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          noarch
 
 # ---------------------------------------------------------------------------
 %description doc
@@ -3682,7 +3641,6 @@ Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description lib
@@ -3892,7 +3850,6 @@ Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{compatarch}
 
 # ---------------------------------------------------------------------------
 %description compat
@@ -3969,7 +3926,6 @@ Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description devel
@@ -4029,7 +3985,6 @@ Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description debuginfo
@@ -4070,7 +4025,6 @@ Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{baserelease}
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description debugsource
@@ -4218,7 +4172,6 @@ Provides:           %{name}-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_package}
@@ -4643,7 +4596,6 @@ Provides:           %{name}-devel-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
 
 Version:            %{kspecversion}
 Release:            %{kspecrelease}
-BuildArch:          %{basearch}
 
 %if %{FILES_symvers}
 # ---------------------------------------------------------------------------
@@ -4757,7 +4709,6 @@ Provides:           %{name}-debuginfo-kmp = %{epoch}:%{kbaseversion}-%{kbaserele
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_buginfo}
@@ -4815,7 +4766,6 @@ Provides:           %{name}-debugsource-kmp = %{epoch}:%{kbaseversion}-%{kbasere
 
 Version:            %{kbaseversion}
 Release:            %{kbaserelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description -n %{kernel_bugsrce}
@@ -4883,7 +4833,6 @@ Provides:           %{name}-source-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease
 
 Version:            %{kspecversion}
 Release:            %{kspecrelease}
-BuildArch:          %{basearch}
 
 # -----------------------------------------------------------------------------
 %description -n %{kernel_sourcep}
@@ -4945,7 +4894,6 @@ Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Release:            %{specrelease}
-BuildArch:          %{basearch}
 
 # ---------------------------------------------------------------------------
 %description java
@@ -5082,7 +5030,6 @@ Requires:           %{name}         = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Release:        %{specrelease}
-BuildArch:      noarch
 
 # ---------------------------------------------------------------------------
 %description javadoc
