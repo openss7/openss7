@@ -430,7 +430,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,
 		    if (substr(optstring, pos+2, 1) == ":") { wantarg = 1 } else
 		    if (substr(optstring, pos+1, 1) == ":") { needarg = 1 }
 		    for (option in longopts)
-			if (substr(longopts[option], 1, 1) == optval)
+			if (longopts[option] && substr(longopts[option], 1, 1) == optval)
 			    break
 		    continue
 		} else optset = 1
@@ -441,7 +441,7 @@ function getopt_long(argc, argv, optstring, longopts, longindex,
 		    exit 2
 		}
 		for (option in longopts)
-		    if (substr(longopts[option], 1, 1) == optval)
+		    if (longopts[option] && substr(longopts[option], 1, 1) == optval)
 			break
 		return optval
 	    }

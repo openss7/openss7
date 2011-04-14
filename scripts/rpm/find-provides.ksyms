@@ -12,14 +12,13 @@ BEGIN {
     dir = RPM_BUILD_DIR "/" RPM_PACKAGE_NAME "-" RPM_PACKAGE_VERSION
     if (ARGC > 1 && ARGV[1]) {
 	dir = ARGV[1]
-	delete ARGV[1]
     }
     RPM_BUILD_ROOT = ENVIRON[RPM_BUILD_ROOT]
     if (ARGC > 2 && ARGV[2]) {
 	RPM_BUILD_ROOT = ARGV[2]
-	delete ARGV[2]
     }
     sub(/\/+$/, "", RPM_BUILD_ROOT)
+    for (i=1;ARGC>i;i++) { delete ARGV[i] }
 }
 /\.ko$/ {
     command = "objdump -t " $1 " 2>/dev/null"

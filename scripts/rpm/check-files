@@ -4,11 +4,11 @@ BEGIN {
     RPM_BUILD_ROOT = ENVIRON[RPM_BUILD_ROOT]
     if (ARGC > 1 && ARGV[1]) {
 	RPM_BUILD_ROOT = ARGV[1]
-	delete ARGV[1]
     }
     sub(/\/+$/, "", RPM_BUILD_ROOT)
     if (!RPM_BUILD_ROOT)
 	exit 1
+    for (i=1;ARGC>i;i++) { delete ARGV[i] }
 }
 {
     packaged[substr($0, length(RPM_BUILD_ROOT) + 1)] = 1
