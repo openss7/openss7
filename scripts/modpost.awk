@@ -992,6 +992,9 @@ function read_cachefile(file,    i,line,n,fields)
 		if (fields[1] == "format") {
 		    values["format"] = fields[2]
 		} else
+		if (fields[1] == "kabi") {
+		    values["kabi"] = fields[2]
+		} else
 		if (fields[1] == "sym") {
 		    if (n<3) { print_error("syntax error in cachefile: line = \"" line "\""); continue }
 		    for (i=9;i>n;i--) { fields[i] = "" }; n = 9
@@ -1024,6 +1027,7 @@ function write_cachefile(file,	    sym,set,line,count_syms,count_sets,count_maps
     if ("PWD" in ENVIRON) sub("^" ENVIRON["PWD"] "/", "", file)
     print_vinfo(1,"w: cachefile, file = \"" file "\"")
     print "format:" values["format"] > file
+    print "kabi:" values["kabi"] > file
     for (sym in syms) {
 	line = "sym:" sym
 	line = line ":"; if (sym in mods) { line = line mods[sym] }
@@ -1123,7 +1127,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 	    }
 	    continue
 	}
-	if (!(sym in kabi) && havekabi) {
+	if (!(sym in kabi) && values["kabi"]) {
 	    if (ownr[sym] != values["pkgdirectory"])
 		if (values["unsupported"])
 		    print_vinfo(1,sprintf(fmt, base, "unsupportd", sym))
@@ -1155,7 +1159,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 	    }
 	    continue
 	}
-	if (!(sym in kabi) && havekabi) {
+	if (!(sym in kabi) && values["kabi"]) {
 	    if (ownr[sym] != values["pkgdirectory"]) {
 		if (values["unres-weak"])
 		    print_vinfo(1,sprintf(fmt, base, "weak unsup", sym))
@@ -1823,6 +1827,7 @@ BEGIN {
     longopts["weak-symbols" ] = "w"  ;								   defaults["weak-symbols" ] = 1						; descrips["weak-symbols" ] = "resolve weak symbols (useful with -r and -U)"
     longopts["weak-versions"] = "W"  ;								   defaults["weak-versions"] = 1						; descrips["weak-versions"] = "version weak symbols (useful with -w)"
     longopts["weak-hidden"  ] = "H"  ;								   defaults["weak-hidden"  ] = 0						; descrips["weak-hidden"  ] = "weak symbol versions are hidden (used with -W)"
+    longopts["kabi"         ] = ""   ;								   defaults["kabi"         ] = 0						; descrips["kabi"         ] = "distribution has a kABI"
     longopts["format"       ] = "f:" ;								   defaults["format"       ] = "auto"						; descrips["format"       ] = "symsets file format (suse,redhat,auto)"
     longopts["unload"       ] = "u"  ; environs["unload"       ] = "CONFIG_MODULE_UNLOAD"	 ; defaults["unload"       ] = 0						; descrips["unload"       ] = "module unloading is supported"
     longopts["modversions"  ] = "m"  ; environs["modversions"  ] = "CONFIG_MODVERSIONS"		 ; defaults["modversions"  ] = 0						; descrips["modversions"  ] = "module versions are supported"
@@ -1962,15 +1967,15 @@ BEGIN {
 		print_error("r: moduledir, directory not found")
 	}
 	if (("ksymsets" in values) && values["ksymsets"])
-	    havekabi = read_symsets(values["ksymsets"], "kabi", "syssymset")
+	    values["kabi"] = read_symsets(values["ksymsets"], "kabi", "syssymset")
 	else {
-	    havekabi = 0
+	    values["kabi"] = 0
 	    file = "symsets-" kversion ".tar.gz"
 	    if (system("test -r /boot/" file) == 0) {
-		havekabi = havekabi + read_symsets("/boot/" file, "kabi", "syssymset")
+		values["kabi"] = values["kabi"] + read_symsets("/boot/" file, "kabi", "syssymset")
 	    }
 	    if (system("test -r /lib/modules/" kversion "/build/" file) == 0) {
-		havekabi = havekabi + read_symsets("/lib/modules/" kversion "/build/" file, "kabi", "syssymset")
+		values["kabi"] = values["kabi"] + read_symsets("/lib/modules/" kversion "/build/" file, "kabi", "syssymset")
 	    }
 	}
     }
