@@ -2042,9 +2042,6 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
     --prefix=%{_prefix} \
     --build=%{_build} \
     --host=%{_host} \
-%ifnarch noarch
-    --target=%{_target_platform} \
-%endif
     --exec-prefix=%{_exec_prefix} \
     --bindir=%{_bindir} \
     --sbindir=%{_sbindir} \
