@@ -197,14 +197,34 @@
 %global HAVE_pngfiles       1
 %global HAVE_cssfiles       1
 
-%ifarch x86_64 s390x sparc64 ppc64 ia64
-%global HAVE_lib32compat    %{HAVE_libraries}
-%global HAVE_test32files    %{HAVE_testfiles}
-%global HAVE_snmp32mods     %{HAVE_snmpmods}
-%else
 %global HAVE_lib32compat    0
 %global HAVE_test32files    0
 %global HAVE_snmp32mods     0
+
+%if %(test "%{_build_arch}" = "x86_64" && echo 1 || echo 0)
+%global HAVE_lib32compat    %{HAVE_libraries}
+%global HAVE_test32files    %{HAVE_testfiles}
+%global HAVE_snmp32mods     %{HAVE_snmpmods}
+%endif
+%if %(test "%{_build_arch}" = "s390x" && echo 1 || echo 0)
+%global HAVE_lib32compat    %{HAVE_libraries}
+%global HAVE_test32files    %{HAVE_testfiles}
+%global HAVE_snmp32mods     %{HAVE_snmpmods}
+%endif
+%if %(test "%{_build_arch}" = "sparc64" && echo 1 || echo 0)
+%global HAVE_lib32compat    %{HAVE_libraries}
+%global HAVE_test32files    %{HAVE_testfiles}
+%global HAVE_snmp32mods     %{HAVE_snmpmods}
+%endif
+%if %(test "%{_build_arch}" = "ppc64" && echo 1 || echo 0)
+%global HAVE_lib32compat    %{HAVE_libraries}
+%global HAVE_test32files    %{HAVE_testfiles}
+%global HAVE_snmp32mods     %{HAVE_snmpmods}
+%endif
+%if %(test "%{_build_arch}" = "ia64" && echo 1 || echo 0)
+%global HAVE_lib32compat    %{HAVE_libraries}
+%global HAVE_test32files    %{HAVE_testfiles}
+%global HAVE_snmp32mods     %{HAVE_snmpmods}
 %endif
 
 %if %{HAVE_devices}
@@ -1719,20 +1739,26 @@
 %global HAVE_rhatkmps 0
 %endif
 
-%global kspecversion %{baseversion}
-# SuSE adds a mogrified kernel version string to the kmp version.
-%if %{HAVE_susekmps}
-%global kbaseversion %{baseversion}%(echo '_%{kernel_source}' | sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
-%else
-%global kbaseversion %{baseversion}
-%endif
 
 %global kspecrelease %{baserelease}
 # RedHat adds a mogrified kernel version string to the kmp release (or commonly not at all).
 %if %{HAVE_rhatkmps}
 %global kbaserelease %{rpmrelease}%(echo '.%{_kversion}' | sed -e 'y,-,.,')
+%global krelsrequire %{nil}
 %else
 %global kbaserelease %{baserelease}
+%global krelsrequire -%{baserelease}
+%endif
+
+# SuSE adds a mogrified kernel version string to the kmp version.
+%if %{HAVE_susekmps}
+%global kbaseversion %{baseversion}%(echo '_%{kernel_source}' | sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
+%global kspecversion %{baseversion}
+%global kversrequire %{nil}
+%else
+%global kbaseversion %{baseversion}
+%global kspecversion %{baseversion}
+%global kversrequire = %{epoch}:%{baseversion}%{krelsrequire}
 %endif
 
 %if %{HAVE_weakmods}
@@ -1925,10 +1951,10 @@ BuildRequires:    @BZIP2_CMD@
 # This is a virtual package that we want to pull in all the necessary
 # packages for a full run-time system.
 %if %{NEED_repo}
-Requires:           %{name}-repo    = %{epoch}:%{baseversion}-%{baserelease}
+Requires:           %{name}-repo
 %endif
 %if %{NEED_base}
-Requires:           %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
+Requires:           %{name}-base    = %{epoch}:%{baseversion}
 %endif
 
 Provides:           %{name} = %{epoch}:%{baseversion}-%{specrelease}
@@ -2759,12 +2785,18 @@ Requires:           dev >= 3.3
 #equires(postun):   /usr/sbin/makewhatis
 #endif
 
-%if %{NEED_lib}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
+%if %{HAVE_testfiles}
+Requires:           %{_pkglibexecdir}/test-streams
 %endif
-%if %{NEED_compat}
-Requires:           %{name}-compat  = %{epoch}:%{baseversion}-%{baserelease}
+#if %{NEED_lib}
+#equires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
+#endif
+%if %{HAVE_test32files}
+Requires:           %{_pkglibexec32dir}/test-streams
 %endif
+#if %{NEED_compat}
+#equires:           %{name}-compat  = %{epoch}:%{baseversion}-%{baserelease}
+#endif
 
 Provides:           %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
 Provides:           %{name}-base = %{epoch}:%{baseversion}-%{baserelease}
@@ -3336,7 +3368,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 fi
 
 %if %{HAVE_weakmods}
-%triggerin base -- %{kernel_package}
+%triggerin base -- %{kernel_package} %{kversrequire}
 # ---------------------------------------------------------------------------
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     %{_sbindir}/%{name}-modules -- -v --update-modules || :
@@ -3356,7 +3388,7 @@ fi
 %endif
 
 %if %{HAVE_weakmods}
-%triggerpostun base -- %{kernel_package}
+%triggerpostun base -- %{kernel_package} %{kversrequire}
 # ---------------------------------------------------------------------------
 if [ -x %{_sbindir}/%{name}-modules ] ; then
     %{_sbindir}/%{name}-modules -- -v --update-modules || :
@@ -3454,8 +3486,11 @@ Conflicts:          texinfo < 3.11
 
 # The %{name}-base package contains the man page references and macros
 # and is required.  Other packages are unnecessary.
-%if %{NEED_virt}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{baserelease}
+%if %{HAVE_manmacros}
+Requires:           %{_mandir}/%{manmacros}
+%endif
+%if %{HAVE_manrefs}
+Requires:           %{_mandir}/%{manrefs}
 %endif
 
 Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{specrelease}
@@ -3631,8 +3666,9 @@ Requires(post):     /sbin/ldconfig
 Requires(postun):   /sbin/ldconfig
 Requires(post):     %(which tclsh)
 
+# these libraries need some kernel modules to be useful
 %if %{NEED_kmod}
-Requires:           %{name}-kernel  = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{specrelease}
@@ -3840,8 +3876,9 @@ Requires(pre):      /sbin/ldconfig
 Requires(post):     /sbin/ldconfig
 Requires(postun):   /sbin/ldconfig
 
-%if %{NEED_lib}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
+# these libraries need some kernel modules to be useful
+%if %{NEED_kmod}
+Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{specrelease}
@@ -3916,8 +3953,9 @@ Prefix:             %{_lib32dir}
 
 Conflicts:          texinfo < 3.11
 
+# development info is somewhat useless without kernel module develoment info
 %if %{NEED_kdev}
-Requires:           %{name}-kernel-devel = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Requires:           %{name}-kernel-devel = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{specrelease}
@@ -3975,8 +4013,9 @@ Autoprov:           true
 %{?files_binaries:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 %endif
 
+# debugging info is somewhat useless without kernel module debugging info
 %if %{NEED_kbug}
-Requires:           %{name}-kernel-debuginfo = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Requires:           %{name}-kernel-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{specrelease}
@@ -4014,9 +4053,11 @@ Autoprov:           true
 %{?files_binaries:Prefix:               %{_usrsrc}/debug}
 %endif
 
+# debugging source is uesless without debugging info
 Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
+# debugging source is somewhat useless without kernel module debugging source
 %if %{NEED_kbug}
-Requires:           %{name}-kernel-debuginfo = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Requires:           %{name}-kernel-debugsource = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{specrelease}
@@ -4568,6 +4609,7 @@ Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 %endif
 %(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
 
+# kernel develoment needs the kernel (it defines the symbols necessary for development)
 %if %{NEED_kmod}
 Requires:           %{name}-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
@@ -4681,6 +4723,7 @@ Autoprov:           true
 %{?files_modules:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 %endif
 
+# kernel debug info is useless without the kernel modules it debugs
 %if %{NEED_kmod}
 Requires:           %{name}-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
 %endif
@@ -4738,9 +4781,8 @@ Autoprov:           true
 %{?files_modules:Prefix:               %{_usrsrc}/debug}
 %endif
 
-%if %{NEED_kbug}
+# kernel debug source is useless without the kernel debug info
 Requires:           %{name}-debuginfo-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-%endif
 
 Provides:           %{name}-debugsource-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{specrelease}
@@ -4888,9 +4930,10 @@ Requires(postun):   /usr/bin/gcj-dbtool
 Requires(postun):   /usr/bin/rebuild-gcj-db
 %endif
 
-%if %{NEED_lib}
-Requires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
-%endif
+# Requirements will be automatic.
+#if %{NEED_lib}
+#equires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
+#endif
 
 Release:            %{specrelease}
 
