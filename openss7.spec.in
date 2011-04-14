@@ -2629,6 +2629,7 @@ fi
 # After we install this repository package, we need to adjust whatever
 # definitions are required in either the /etc/yum/yum-plugins.d/kmod.conf or
 # /etc/zypp/zypp.conf files.
+# ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
 %if %{FILES_yumrepo}
     d="%{_sysconfdir}/yum/pluginconf.d"
@@ -2681,6 +2682,7 @@ fi
 # definitions are required in configuration files.  When we changed them on
 # installation, we save an original copy in $f.rpmsave.  Therefore, if
 # $f.rpmsave exists, copy it back.
+# ---------------------------------------------------------------------------
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 %if %{FILES_yumrepo}
     d="%{_sysconfdir}/yum/pluginconf.d"
@@ -2817,9 +2819,11 @@ binary package is required for any installation of the %{name} package.
 
 %pre base
 # ---------------------------------------------------------------------------
-# This is an initial installation of the base subpackage.  We need to check for non-rpm
-# installations on the host and remove any entries that might later conflict with our entries.  We
-# treat every fresh installation like an upgrade from non-deb/rpm install.
+# This is an initial installation of the base subpackage.  We need to check for
+# non-rpm installations on the host and remove any entries that might later
+# conflict with our entries.  We treat every fresh installation like an upgrade
+# from non-deb/rpm install.
+# ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
 %if %{FILES_oldprel}
     # old-style preload file
@@ -2854,25 +2858,28 @@ if [ $1 = 1 ] ; then : # fresh install
 %endif
 fi
 if [ $1 = 2 ] ; then : # upgrade
-    # Because we are doing an upgrade, the preun and postun scriplets for the old rpm are going to
-    # be called.  Hopefully the old rpm can handle removal correctly.
+    # Because we are doing an upgrade, the preun and postun scriplets for the
+    # old rpm are going to be called.  Hopefully the old rpm can handle removal
+    # correctly.
 fi
 
 %post base
 # ---------------------------------------------------------------------------
 if [ $1 = 1 ] ; then : # fresh install
 %if %{USE_mknods}
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-    # generated in the build to create devices.
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of
+    # doing rootless builds because they have no %%dev macro, so in that case we
+    # just run the makenodes program that was generated in the build to create
+    # devices.
     if [ -x "%{mknods}" ] ; then
         %{mknods} --create
     fi
 %endif
 %if %{HAVE_oldmods}
-    # At the end of a fresh install we need to add our lines to the modules.conf file if it exists,
-    # and it is necessary to use a modconf file (2.4 and pre 2.5.48 kernel), an even if the line is
-    # already there (in which case we remove the existing line).
+    # At the end of a fresh install we need to add our lines to the modules.conf
+    # file if it exists, and it is necessary to use a modconf file (2.4 and pre
+    # 2.5.48 kernel), an even if the line is already there (in which case we
+    # remove the existing line).
     conf_old=%_sysconfdir/modules.conf
     if [ -f $conf_old ] ; then
         conf_tmp=%_tmppath/modules.conf.tmp.$$
@@ -2895,9 +2902,9 @@ if [ $1 = 1 ] ; then : # fresh install
     prel_old=%_sysconfdir/modprobe.preload
 %endif
 %if %{FILES_preloads}
-    # At the end of a fresh install we need to add our preloads to the modules or modprobe.preload
-    # file, if it exists, and is necessary, and even if the lines are already there (in which case
-    # we remove the existing line.
+    # At the end of a fresh install we need to add our preloads to the modules
+    # or modprobe.preload file, if it exists, and is necessary, and even if the
+    # lines are already there (in which case we remove the existing line.
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
@@ -2913,8 +2920,8 @@ if [ $1 = 1 ] ; then : # fresh install
     fi
 %endif
 %if %{FILES_netconfig}
-    # At the end of a fresh install we need to rebuild the netconfig database, but only if the
-    # netconfig database was built by us or does not exist.
+    # At the end of a fresh install we need to rebuild the netconfig database,
+    # but only if the netconfig database was built by us or does not exist.
     t="%_sysconfdir/netconfig"
     a="${t}.xnsl"
     d="${t}.d"
@@ -3014,7 +3021,8 @@ elif [ $1 = 2 ] ; then : # upgrade
     prel_old=%_sysconfdir/modprobe.preload
 %endif
 %if %{FILES_preloads}
-    # At the end of an upgrade we place just our preloads in the modules or modprobe.preload file.
+    # At the end of an upgrade we place just our preloads in the modules or
+    # modprobe.preload file.
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
@@ -3029,8 +3037,8 @@ elif [ $1 = 2 ] ; then : # upgrade
     fi
 %endif
 %if %{FILES_netconfig}
-    # At the end of an upgrade we need to rebuild the netconfig database, but only if the netconfig
-    # database was built by us or does not exist.
+    # At the end of an upgrade we need to rebuild the netconfig database, but
+    # only if the netconfig database was built by us or does not exist.
     t="%_sysconfdir/netconfig"
     a="${t}.xnsl"
     d="${t}.d"
@@ -3095,16 +3103,17 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 0 ] ; then : # final removal
 %if %{USE_rmnods}
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of doing rootless builds
-    # because they have no %%dev macro, so in that case we just run the makenodes program that was
-    # generated in the build to create devices.
+    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of
+    # doing rootless builds because they have no %%dev macro, so in that case we
+    # just run the makenodes program that was generated in the build to create
+    # devices.
     if [ -x "%{mknods}" ] ; then
         %{rmnods}
     fi
 %endif
 %if %{HAVE_oldmods}
-    # When we are going away altogether we want to remove any lines whatsoever from the modules.conf
-    # file.
+    # When we are going away altogether we want to remove any lines whatsoever
+    # from the modules.conf file.
     conf_old=%_sysconfdir/modules.conf
     if [ -f $conf_old ] ; then
         conf_tmp=%_tmppath/modules.conf.tmp.$$
@@ -3126,8 +3135,8 @@ if [ $1 = 0 ] ; then : # final removal
     prel_old=%_sysconfdir/modprobe.preload
 %endif
 %if %{FILES_preloads}
-    # When we are going away altogether we want to remove any of our preloads whatsoever from the
-    # modules or modprobe.preload file.
+    # When we are going away altogether we want to remove any of our preloads
+    # whatsoever from the modules or modprobe.preload file.
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
@@ -3142,8 +3151,8 @@ if [ $1 = 0 ] ; then : # final removal
     fi
 %endif
 %if %{FILES_netconfig}
-    # After going away altogether, we want to rebuild the netconfig database, but only if the
-    # netconfig database was built by use or does not exist.
+    # After going away altogether, we want to rebuild the netconfig database,
+    # but only if the netconfig database was built by use or does not exist.
     t="%_sysconfdir/netconfig"
     a="${t}.xnsl"
     d="${t}.d"
@@ -3219,16 +3228,17 @@ if [ $1 = 0 ] ; then : # final removal
 fi
 if [ $1 = 1 ] ; then : # upgrade
 %if %{HAVE_oldmods}
-    # At the end of the upgrade (when _this_package_ is upgraded from) we remove our lines from the
-    # modules.conf file that we placed in them in the post scriptlet.  We only adjust our line and
-    # leave any lines added by the new package post scriptlet.
+    # At the end of the upgrade (when _this_package_ is upgraded from) we remove
+    # our lines from the modules.conf file that we placed in them in the post
+    # scriptlet.  We only adjust our line and leave any lines added by the new
+    # package post scriptlet.
     conf_old=%_sysconfdir/modules.conf
     if [ -f $conf_old ] ; then
         conf_tmp=%_tmppath/modules.conf.tmp.$$
         conf_new=%_tmppath/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
-        # This groovy sed script just pulls out the first matching line and leaves the rest
-        # untouched.
+        # This groovy sed script just pulls out the first matching line and
+        # leaves the rest untouched.
         sed -e '
 \|^include[[:space:]].*%_modutildir/%base|!b
 N
@@ -3252,16 +3262,17 @@ b loop' $conf_new > $conf_tmp
     prel_old=%_sysconfdir/modprobe.preload
 %endif
 %if %{FILES_preloads}
-    # At the end of the upgrade (when _this_package_ is upgraded from) we remove our lines from the
-    # modules or modprobe.preloads file that we placed in them in the post scriptlet.  We only
-    # adjust our lines and leave any lines added by the new package post scriptlet.
+    # At the end of the upgrade (when _this_package_ is upgraded from) we remove
+    # our lines from the modules or modprobe.preloads file that we placed in
+    # them in the post scriptlet.  We only adjust our lines and leave any lines
+    # added by the new package post scriptlet.
     if [ -f $prel_old ] ; then
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
         mods="%{preloads}" ; for m in $mods ; do
-            # This groovy sed script just pulls out the first matching line and leaves the rest
-            # untouched.
+            # This groovy sed script just pulls out the first matching line and
+            # leaves the rest untouched.
             sed -e '
 \|^[[:space:]].*'"$m"'[[:space:]]*$|!b
 N
@@ -3278,8 +3289,8 @@ b loop' $prel_new > $prel_tmp
     fi
 %endif
 %if %{FILES_netconfig}
-    # After going doing an upgrade we want to rebuild the netconfig database, but only if the
-    # netconfig database was built by us or does not exist.
+    # After going doing an upgrade we want to rebuild the netconfig database,
+    # but only if the netconfig database was built by us or does not exist.
     t="%_sysconfdir/netconfig"
     a="${t}.xnsl"
     d="${t}.d"
@@ -4254,8 +4265,9 @@ remove_depends() {
     return 0
 }
 if [ $arg = 1 ] ; then : # fresh install
-    # This is a fresh install of this version of kernel module.  Make sure that there are no non-rpm
-    # installed kernel modules hanging around for this kernel version.
+    # This is a fresh install of this version of kernel module.  Make sure that
+    # there are no non-rpm installed kernel modules hanging around for this
+    # kernel version.
     list="%{modules}" ; modl_mods=
     if [ -d %{_kmoduledir} ] ; then
         for m in `find %{_kmoduledir} \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
@@ -4265,8 +4277,8 @@ if [ $arg = 1 ] ; then : # fresh install
                 modl_mods="${modl_mods:+$modl_mods }$m"
         done
         if [ -n "$modl_mods" -a -f %{_kmoduledir}/modules.dep ] ; then
-            # First we can build a dependency tree from every dependency expression that can be
-            # found in the modules.dep file.
+            # First we can build a dependency tree from every dependency
+            # expression that can be found in the modules.dep file.
             xtrace=`shopt -p -o | grep xtrace` ; set +x
             dep= ; while read line ; do
                 case $line in
@@ -4304,9 +4316,9 @@ if [ $arg = 1 ] ; then : # fresh install
 fi
 if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-        # If we are upgrading and the upgrade is for the running kernel, or we are installing new on
-        # the running kernel, we have to worry about previous loaded modules for the old version or
-        # a non-rpm version.
+        # If we are upgrading and the upgrade is for the running kernel, or we
+        # are installing new on the running kernel, we have to worry about
+        # previous loaded modules for the old version or a non-rpm version.
         if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
             if [ -x /usr/sbin/fdetach ] ; then
                 /usr/sbin/fdetach -a 2>/dev/null || :
@@ -4336,8 +4348,8 @@ fi
 # ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-        # This is a running kernel, do a depmod on the modules directory for the running
-        # kernel.
+        # This is a running kernel, do a depmod on the modules directory for the
+        # running kernel.
         if [ -r /boot/System.map-%{kernel_version} ] ; then
             depmod -ae -F /boot/System.map-%{kernel_version} 2>&1 || :
         else
@@ -4357,8 +4369,8 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         done
 %endif
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
-        # Non-running kernels a depmod will be performed on boot by depmod anyway, but
-        # try one now.
+        # Non-running kernels a depmod will be performed on boot by depmod
+        # anyway, but try one now.
         UNAME_MACHINE=%{_target_cpu} \
         depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} 2>&1 || :
         # Non-running kernels do not need init scripts run.
@@ -4390,8 +4402,8 @@ remove_depends() {
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     # save a file list of our kernel modules
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-        # We are about to uninstall for good on a running kernel then we have to worry about which
-        # modules are running
+        # We are about to uninstall for good on a running kernel then we have to
+        # worry about which modules are running
 %if %{HAVE_initscripts}
         # Try using init scripts to shutdown if they exist.
         reverse=
@@ -4468,13 +4480,14 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
             depmod -ae 2>&1 || :
         fi
     elif [ -r /boot/System.map-%{kernel_version} ] ; then
-        # Non-running kernels a depmod will be performed on boot but depmod anyway.
+        # Non-running kernels a depmod will be performed on boot but depmod
+        # anyway.
         UNAME_MACHINE=%{_target_cpu} \
         depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} 2>&1 || :
     fi
     if [ :"%{kernel_version}" = :"`uname -r`" ] ; then
-        # One more kick at killing any loaded modules on uninstall, last stage of the upgrade on a
-        # running kernel for upgrade.
+        # One more kick at killing any loaded modules on uninstall, last stage
+        # of the upgrade on a running kernel for upgrade.
         reboot='no'
         if [ -x /var/run/strace.pid ] ; then
             kill -TERM `cat /var/run/strace.pid` || :
@@ -4653,18 +4666,17 @@ fi
 %endif
 
 %if %{FILES_symvers}
+%triggerin -n %{kernel_develop} -- %{target_kdevel}
 # ---------------------------------------------------------------------------
 # This trigger script runs after we are installed and there is already a
-# development kernel at the same version level, or after a development kernel
-# at the same version level is installed and we are already installed.
+# development kernel at the same version level, or after a development kernel at
+# the same version level is installed and we are already installed.
 # ---------------------------------------------------------------------------
 # SuSE and RedHat are different here.  SuSE places a symsets archive in /boot
 # and also has one in /lib/modules/%{_kversion}/build.  RedHat only has a
 # symsets archive in /lib/modules/%{_kversion}/build, but find-requires.ksyms
-# checks both /boot and /usr/src/kernels/* (where /lib/modules/*/build
-# points).
+# checks both /boot and /usr/src/kernels/* (where /lib/modules/*/build points).
 # ---------------------------------------------------------------------------
-%triggerin -n %{kernel_develop} -- %{target_kdevel}
 d=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}
 f=symsets-%{_kversion}.tar.gz
 if [ -r $d/$f ] then
@@ -4763,6 +4775,7 @@ package or when debugging this package.
 
 %if %{PACKAGE_kbug}
 %files -n %{kernel_buginfo}
+# ---------------------------------------------------------------------------
 %{?files_modules:%{?files_kdebugfiles:%{?_lib32dir:%{_lib32dir}/debug}}}
 %{?files_modules:%{?files_kdebugfiles:%{!?_lib32dir:%{_libdir}/debug}}}
 %endif
@@ -4819,6 +4832,7 @@ package or when debugging this package.
 
 %if %{PACKAGE_kbug}
 %files -n %{kernel_bugsrce}
+# ---------------------------------------------------------------------------
 %{?files_modules:%{?files_kdebugfiles:%{_usrsrc}/debug}}
 %endif
 
@@ -5095,18 +5109,22 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 1.1.2.24  2011-04-12 06:33:26  brian
-# - passes distcheck
-#
-# Revision 1.1.2.23  2011-04-11 06:13:41  brian
-# - working up weak updates
-#
-# Revision 1.1.2.22  2011-03-26 04:28:44  brian
-# - updates to build process
-#
-# Revision 1.1.2.21  2011-03-17 07:01:27  brian
-# - build and repo system improvements
-#
+
+* Tue Apr 12 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.24  2011-04-12 06:33:26  brian
+- passes distcheck
+
+* Mon Apr 11 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.23  2011-04-11 06:13:41  brian
+- working up weak updates
+
+* Sat Mar 26 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.22  2011-03-26 04:28:44  brian
+- updates to build process
+
+* Thu Mar 17 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.21  2011-03-17 07:01:27  brian
+- build and repo system improvements
 
 * Wed Mar  9 2011 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.20  2011-03-09 23:06:05  brian
