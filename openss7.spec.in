@@ -2020,14 +2020,15 @@ generating and submitting problem reports to @PACKAGE_BUGREPORT@.
 
 ./configure \
     ${CC+CC="${CC}"} \
-    CFLAGS="${CFLAGS:-%{__global_cflags}}" \
+    ${CFLAGS+CFLAGS="${CFLAGS}"} \
     ${LD+LD="${LD}"} \
     ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
     ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
     ${CPP+CPP="${CPP}"} \
     ${CXX+CXX="${CXX:-$CC}"} \
     ${CXX-${CC+CXX="$CC"}} \
-    CXXFLAGS="${CXXFLAGS:-%{__global_cflags}}" \
+    ${CXXFLAGS+CXXFLAGS="${CXXFLAGS}"} \
+    ${CXXFLAGS-${CFLAGS+CXXFLAGS="$CFLAGS"}} \
     ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
     ${CXXCPP-${CPP+CXXCPP="$CPP"}} \
     CONFIG_SITE="%{_builddir}/%{csite_file}" \
