@@ -282,11 +282,11 @@
 %endif
 
 %if %{HAVE_weakmods}
-%global target_kernel %(LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME}\\n" 2>/dev/null | tail -1 || :)
+%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
 %else
-%global target_kernel %(LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" 2>/dev/null | tail -1 || :)
+%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
 %endif
-%global target_kdevel %(LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{_kversion}/build --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" 2>/dev/null | tail -1 || :)
+%global target_kdevel %((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
 
 
 %if %(if (rpm -q --whatprovides /boot/symvers-%{_kversion}.gz >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
@@ -4161,22 +4161,22 @@ Requires(postun):   modutils
 
 %if %{HAVE_weakmods}
 %if %{HAVE_rhatkmps}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_susekmps}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
 %endif
 %endif
 %else
 %if %{HAVE_yumrepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_zypprepo}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %endif
 %endif
 %endif
@@ -4599,15 +4599,15 @@ Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 # /boot/System.map-%{_kversion} is available.  Also, the specific kernel
 # development package is also required.
 %if %{HAVE_rhatkmps}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_susekmps}
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
-%(LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %endif
 %endif
-%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 
 # kernel develoment needs the kernel (it defines the symbols necessary for development)
 %if %{NEED_kmod}
@@ -4845,7 +4845,7 @@ Obsoletes:          kmod%{kernel_flavor}-source
 Obsoletes:          kernel-module-%{name}-source%{kernel_flavor}
 Obsoletes:          %{name}-source-kmod%{kernel_flavor}
 
-%(LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned by any package' 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 
 %if %{NEED_virt}
 Requires:           %{name} = %{epoch}:%{baseversion}-%{baserelease}
