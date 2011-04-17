@@ -95,6 +95,9 @@ configure_preloads() { :
     fi
 }
 
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
 #
 # We are configuring the installed package.
 #
@@ -108,6 +111,9 @@ configure_init_postinst() { :
     #
     # Note that init scripts are handled by debhelper additions to this script.
     #
+}
+
+triggered_init_postinst() { :
 }
 
 subpkg=init

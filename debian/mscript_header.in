@@ -19,6 +19,10 @@ kversion="@kversion@"
 krelease="@krelease@"
 kmoduledir="@kmoduledir@"
 
+kmajor="@kmajor@"
+kminor="@kminor@"
+kpatch="@kpatch@"
+
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
 bindir="@bindir@"
@@ -73,6 +77,15 @@ initfiles=
 conffiles=
 mibfiles=
 snmpmods=
+nonrpminit="strms_up strms_dn"
+
+mknods="/usr/sbin/@STRCONF_DEVICES@"
+rmnods="/usr/sbin/@STRCONF_DEVICES@ --remove"
+
+manrefs=$base.refs
+manmacros=$base.macros
+
+target_cpu="@target_cpu@"
 
 # @configure_input@
 # =============================================================================

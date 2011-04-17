@@ -51,9 +51,17 @@
 # Last Modified $Date: 2008-04-28 11:46:32 $ by $Author: brian $
 #
 # =============================================================================
+
 @mscript_header@
 
-function configure_doc_postinst() { :
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+
+configure_doc_postinst() { :
+}
+
+triggered_doc_postinst() { :
 }
 
 subpkg=doc

@@ -3,17 +3,42 @@
 # The purpose of this script is to invoke the openss7-modules awk script with
 # the necessary arguments depending upon how it was called.
 
-if [ "$0" = "/sbin/openss7-update" ] ; then
-	gawk -f /sbin/openss7-modules -- $@ || exit $?
-elif [ "$0" = "/etc/kernel/postinst.d/openss7-update" ] ; then
-	gawk -f /sbin/openss7-modules -- -q -e --add-kernel "$1" || exit $?
-elif [ "$0" = "/etc/kernel/prerm.d/openss7-update" ] ; then
-	gawk -f /sbin/openss7-modules -- -q -e --remove-kernel "$1" || exit $?
-elif [ "$0" = "/etc/kernel/postrm.d/openss7-update" ] ; then
-	gawk -f /sbin/openss7-modules -- -q -e --remove-kernel "$1" || exit $?
+cwd=`/bin/pwd`
+command=`echo "$0" | sed -e 's,^\.,'"$cwd"','`
+
+if [ -x /usr/sbin/openss7-modules ]
+then
+	script=/usr/sbin/openss7-modules
+elif [ -x /sbin/openss7-modules ]
+then
+	script=/sbin/openss7-modules
+elif [ -x `dirname $0`/../../scripts/openss7-modules ]
+then
+	script=`dirname $0`/../../scripts/openss7-modules
 else
-	# this is an in-place call.
-	dir=`dirname $0`
-	gawk -f $dir/../../scripts/openss7-modules -- $@ || exit $?
+	exit 0
 fi
 
+if which gawk >/dev/null 2>&1
+then
+	awk=gawk
+elif which awk >/dev/null 2>&1
+then
+	awk=awk
+else
+	exit 0
+fi
+
+update="$awk -f $script --"
+
+case "$command" in
+	/sbin/openss7-update)			$update "$@" || exit $? ;;
+	/usr/sbin/openss7-update)		$update "$@" || exit $? ;;
+	/etc/kernel/preinst.d/openss7-update)	exit 0 ;;
+	/etc/kernel/postinst.d/openss7-update)	$update -q -e --add-kernel    "$1" || exit $? ;;
+	/etc/kernel/prerm.d/openss7-update)	$update -q -e --remove-kernel "$1" || exit $? ;;
+	/etc/kernel/postrm.d/openss7-update)	$update -q -e --remove-kernel "$1" || exit $? ;;
+	/etc/kernel/header_postinst.d)		exit 0 ;;
+	/etc/kernel/src_postinst.d)		exit 0 ;;
+	*)					$update "$@" || exit $? ;;
+esac

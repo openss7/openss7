@@ -571,7 +571,7 @@ function set_symmap(sym, type, addr, src, from)
 	} else cache_dirty = 1
     } else if (sym in mapsrcs) { src = mapsrcs[sym] }
 }
-function set_symbol(sym, mod, crc, expt, set, pos, own, src, from)
+function set_symbol(sym, mod, crc, expt, set, pos, own, src, use, from)
 {
     if (!(sym in syms)) {
 	syms[sym] = 1
@@ -671,6 +671,15 @@ function set_symbol(sym, mod, crc, expt, set, pos, own, src, from)
 	    }
 	} else cache_dirty = 1
     } else if (sym in srcs) { src = srcs[sym] }
+    if (use) {
+	if (sym in uses) {
+	    if (uses[sym] != use) {
+		uses[sym] = use
+		cache_dirty = 1
+	    }
+	} else cache_dirty = 1
+	uses[sym] = use
+    } else if (use in uses) { use = uses[sym] }
 }
 function set_symset(set, hash, numb, ssym, scrc, own, src, from,	n,i,symbols)
 {
@@ -747,26 +756,146 @@ function set_symset(set, hash, numb, ssym, scrc, own, src, from,	n,i,symbols)
 	cache_dirty = 1
     }
 }
-#
-# Read in an objdump -t listing.  This must be from objdump -t run on a kernel
-# object.  This will add EXPORT_SYMBOL or EXPORT_SYMBOL_GPL for use in the
-# Module.symvers file.
-#
-function read_modobject(command, dir, own, src,	    result,files,progress,HEADER,mod,flags,val,sec,ofs,sym,count_syms,count_unds,count_weak)
+function read_modobject(command, dir, own, src,
+			pfx,fmt,files,progress,SECTION,string,mod,count_syms,count_unds,
+			count_weak,count_vers,flags,val,sec,offset,sym,crc,char)
 {
-    print_vinfo(1,"r: ko object, subdirectory = \"" dir "\"")
+    pfx = "r: ko object, "
+    fmt = "%3d syms, %3d unds, %3d weak, %3d vers"
+    print_vinfo(1, pfx "subdirectory = \"" dir "\"")
     files = 0
     progress = 0
-    HEADER = 1
+    SECTION = ""
+    string = ""
     mod = ""
-    count_syms = 0; count_unds = 0; count_weak = 0
-    while ((result = (command | getline)) == 1) {
-	if (HEADER) {
+    count_syms = 0; count_unds = 0; count_weak = 0; count_vers = 0
+    # use objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -s 
+    while ((command | getline) == 1) {
+	if (SECTION) {
+	    if (/^$/) {
+		print_dmore(1,pfx sprintf(fmt, count_syms, count_unds, count_weak, count_vers))
+		if (SECTION) {
+		    print_debug(2,pfx "end of section " SECTION)
+		    if (count_syms||count_unds||count_weak||count_vers)
+			print_debug(2,pfx sprintf(fmt, count_syms, count_unds, count_weak, count_vers))
+		}
+		SECTION = ""
+		continue
+	    }
+	    if (SECTION == "SYMBOL TABLE") {
+		if (NF<4)
+		    continue
+		flags = substr($0, length($1)+2, 7)
+		val = $1; sec = $(NF-2); offset = $(NF-1); sym = $NF
+		if (substr(flags,1,1) == "l") {
+		    if (substr(flags,7,1) == "O") {
+			if (sec == ".modinfo") {
+			    if (sym ~ /^_?__mod_version[0-9]*$/)
+				mod_vers[mod] = 1
+			    continue
+			}
+			if (sub(/^_?__ksymtab/,"",sec)) {
+			    if (sub(/^_?__ksymtab_/,"",sym)) {
+				print_debug(3,pfx "symbol: " sym)
+				set_symbol(sym, mod, "", "EXPORT_SYMBOL" toupper(sec), "", 0, own, "", 0, "ko object")
+				count_syms++
+			    }
+			    continue
+			}
+		    }
+		    continue
+		}
+		if (sec == "*ABS*") {
+		    if (substr(flags,1,1) == "g") {
+			if (sub(/^_?__crc_/,"",sym)) {
+			    print_debug(3,pfx "symbol: " sym)
+			    set_symbol(sym, mod, "0x" val, "", "", 0, own, src, 0, "ko object")
+			    count_syms++
+			    continue
+			}
+		    }
+		    mod_abss[mod,sym] = 1
+		}
+		if (own != values["pkgdirectory"])
+		    continue
+		if (sec == "*UND*") {
+		    if (sym ~ /^_?__this_module$/) {
+			if (mod in mod_this)
+			    delete mod_this[mod]
+			continue
+		    }
+		    if (substr(flags,2,1) == " " && !((mod,sym) in mod_unds)) {
+			print_debug(3,pfx "undefined symbol: " sym)
+			mod_unds[mod,sym] = 1
+			count_unds++
+		    }
+		    if (substr(flags,2,1) == "w" && !((mod,sym) in mod_weak)) {
+			print_debug(3,pfx "weakundef symbol: " sym)
+			mod_weak[mod,sym] = 1
+			count_weak++
+		    }
+		    continue
+		}
+		if (sym ~ /^_?init_module$/) {
+		    mod_init[mod] = 1
+		    print_debug(2,pfx "module " mod " has init_module")
+		    continue
+		}
+		if (sym ~ /^_?cleanup_module$/) {
+		    mod_exit[mod] = 1
+		    print_debug(2,pfx "module " mod " has cleanup_module")
+		    continue
+		}
+		if (sym ~ /^_?__this_module$/) {
+		    mod_this[mod] = 1
+		    print_debug(2,pfx "module " mod " has this_module")
+		    continue
+		}
+		if (sym ~ /^_?__mod_version[0-9]*$/) {
+		    mod_vers[mod] = 1
+		    print_debug(2,pfx "module " mod " has mod_version")
+		    continue
+		}
+	    } else
+	    if (SECTION == "__versions") {
+		sub(/^ .... /, ""); sub(/  .*$/, ""); gsub(/ /, "")
+		string = string $0
+		if (length(string) < 128)
+		    continue
+		sub(/(00)+$/, "",string)
+		crc = "0x" substr(string,7,2) substr(string,5,2) substr(string,3,2) substr(string,1,2)
+		sub(/^......../, "", string)
+		if (crc == "0x00000000")
+		{ crc = "0x" substr(string,1,8); sub(/^......../,"",string) }
+		sub(/^00000000/, "", string)
+		sym = ""
+		while (string) {
+		    char = "0x" substr(string,1,2)
+		    sub(/^../, "", string)
+		    char = strtonum(char)
+		    if (32 <= char && char <= 126)
+			sym = sym sprintf("%c", char)
+		}
+		# really just want to mark symbol used and check crc
+		set_symbol(sym, "", crc, "", "", 0, "", src, 1, "ko object")
+		count_vers++
+	    }
+	    # skip __ksymtab and __ksymtab_gpl sections
+	} else {
 	    if (/^$/)
 		continue
-	    if (/:.*file format/) {
-		sub(/:.*$/, "")
-		print_debug(1,"r: ko object, module = " $0)
+	    if (sub(/:.*file format.*$/, "")) {
+		if (mod) {
+		    count_syms = 0; count_unds = 0; count_weak = 0; count_vers = 0
+		    mod_mods[mod] = 1
+		    if (progress >= 200) {
+			print_dmore(1,pfx files "kernel modules...")
+			progress = 0
+		    }
+		    files++
+		    progress++
+		}
+		print_debug(1,pfx "module = " $0)
 		sub(/(\.mod)?\.(k)?o(\.gz)?$/, "")
 		if (own == values["pkgdirectory"]) {
 		    sub(/.*\//, "")
@@ -779,6 +908,7 @@ function read_modobject(command, dir, own, src,	    result,files,progress,HEADER
 		    sub(/kernel\//, "")
 		}
 		mod = $0
+		print_debug(1,pfx mod)
 		if (own == values["pkgdirectory"]) {
 		    if (("vmlinux","struct_module") in mod_syms) {
 			mod_unds[mod,"struct_module"] = 1
@@ -791,104 +921,23 @@ function read_modobject(command, dir, own, src,	    result,files,progress,HEADER
 		continue
 	    }
 	    if (/SYMBOL TABLE:/) {
-		count_syms = 0; count_unds = 0; count_weak = 0
-		mod_mods[mod] = 1
-		HEADER = 0
-		if (progress >= 200) {
-		    print_dmore(1,"r: ko object, " files " kernel modules...")
-		    progress = 0
-		}
-		files++
-		progress++
+		SECTION = "SYMBOL TABLE"
+		continue
+	    }
+	    if (sub(/^Contents of section /,"")) {
+		sub(/:.*$/, "")
+		SECTION = $0
+		string = ""
 		continue
 	    }
 	}
-	if (/^$/ && !HEADER) {
-	    HEADER = 1
-	    if (count_syms || count_unds || count_weak) {
-		print_debug(1,"r: ko object, " mod)
-		print_debug(1,"r: ko object, syms " count_syms ", unds " count_unds ", weak " count_weak)
-	    }
-	    continue
-	}
-	# ok we have a listing line
-	# The flags are just after the first field and consist of 7 characters
-	# The last three fields always contain the same information
-	if (NF<4)
-	    continue
-	flags = substr($0, length($1)+2, 7); val = $1; sec = $(NF-2); ofs = $(NF-1); sym = $NF
-	if (substr(flags,1,1) == "l") {
-	    if (substr(flags,7,1) == "O") {
-		if (sec == ".modinfo") {
-		    if (sym ~ /^_?__mod_version[0-9]*$/)
-			mod_vers[mod] = 1
-		    continue
-		}
-		if (sub(/^_?__ksymtab/,"",sec)) {
-		    if (sub(/^_?__ksymtab_/,"",sym)) {
-			print_debug(3,"r: ko object, symbol: " sym)
-			set_symbol(sym, mod, "", "EXPORT_SYMBOL" toupper(sec), "", 0, own, "", "ko object")
-			count_syms++
-		    }
-		    continue
-		}
-	    }
-	    continue
-	}
-	if (sec == "*ABS*") {
-	    if (substr(flags,1,1) == "g") {
-		if (sub(/^_?__crc_/,"",sym)) {
-		    print_debug(3,"r: ko object, symbol: " sym)
-		    set_symbol(sym, mod, "0x" val, "", "", 0, own, src, "ko object")
-		    count_syms++
-		    continue
-		}
-	    }
-	    mod_abss[mod,sym] = 1
-	}
-	if (own != values["pkgdirectory"])
-	    continue
-	if (sec == "*UND*") {
-	    if (sym ~ /^_?__this_module$/) {
-		if (mod in mod_this)
-		    delete mod_this[mod]
-		continue
-	    }
-	    if (substr(flags,2,1) == " " && !((mod,sym) in mod_unds)) {
-		print_debug(3,"r: ko object, undefined symbol: " sym)
-		mod_unds[mod,sym] = 1
-		count_unds++
-	    }
-	    if (substr(flags,2,1) == "w" && !((mod,sym) in mod_weak)) {
-		print_debug(3,"r: ko object, weakundef symbol: " sym)
-		mod_weak[mod,sym] = 1
-		count_weak++
-	    }
-	    continue
-	}
-	if (sym ~ /^_?init_module$/) {
-	    mod_init[mod] = 1
-	    print_debug(2,"r: ko object, module " mod " has init_module")
-	    continue
-	}
-	if (sym ~ /^_?cleanup_module$/) {
-	    mod_exit[mod] = 1
-	    print_debug(2,"r: ko object, module " mod " has cleanup_module")
-	    continue
-	}
-	if (sym ~ /^_?__this_module$/) {
-	    mod_this[mod] = 1
-	    print_debug(2,"r: ko object, module " mod " has this_module")
-	    continue
-	}
-	if (sym ~ /^_?__mod_version[0-9]*$/) {
-	    mod_vers[mod] = 1
-	    print_debug(2,"r: ko object, module " mod " has mod_version")
-	    continue
-	}
+	# print stats
     }
-    if (result != -1) close(command)
-    print_vinfo(1,"r: ko object, " files " kernel modules   ")
+    close(command)
+    if (SECTION)
+	print_debug(1,pfx sprintf(fmt, count_syms, count_unds, count_weak, count_vers))
+    print_debug(1,pfx files "kernel modules   ")
+    # print end of run info
 }
 #
 # Read in any nm -Bs listing.  This can be a System.map file, a Modules.map
@@ -920,7 +969,7 @@ function read_systemmap(command, mod, own, src,		result,val,flag,sym,count_syms,
 	    }
 	    if (sub(/^_?__ksymtab_/,"",sym)) {
 		print_debug(3,"r: systemmap, symbol: " sym)
-		set_symbol(sym, mod, "", "", "", 0, own, "", "systemmap")
+		set_symbol(sym, mod, "", "", "", 0, own, "", 0, "systemmap")
 		count_syms++
 		continue
 	    }
@@ -928,7 +977,7 @@ function read_systemmap(command, mod, own, src,		result,val,flag,sym,count_syms,
 	if (flag ~ /[Aa]/) {
 	    if (sub(/^_?__crc_/,"",sym)) {
 		print_debug(3,"r: systemmap, symbol: " sym)
-		set_symbol(sym, mod, "0x" val, "", "", 0, own, src, "systemmap")
+		set_symbol(sym, mod, "0x" val, "", "", 0, own, src, 0, "systemmap")
 		count_syms++
 		continue
 	    }
@@ -997,8 +1046,8 @@ function read_cachefile(file,    i,line,n,fields)
 		} else
 		if (fields[1] == "sym") {
 		    if (n<3) { print_error("syntax error in cachefile: line = \"" line "\""); continue }
-		    for (i=9;i>n;i--) { fields[i] = "" }; n = 9
-		    set_symbol(fields[2],fields[3],fields[4],fields[5],fields[6],fields[7],fields[8],fields[9],"cachefile")
+		    for (i=10;i>n;i--) { fields[i] = "" }; n = 10
+		    set_symbol(fields[2],fields[3],fields[4],fields[5],fields[6],fields[7],fields[8],fields[9],fields[10],"cachefile")
 		} else
 		if (fields[1] == "set") {
 		    if (n<3) { print_error("syntax error in cachefile: line = \"" line "\""); continue }
@@ -1037,6 +1086,7 @@ function write_cachefile(file,	    sym,set,line,count_syms,count_sets,count_maps
 	line = line ":"; if (sym in posn) { line = line posn[sym] }
 	line = line ":"; if (sym in ownr) { line = line ownr[sym] }
 	line = line ":"; if (sym in srcs) { line = line srcs[sym] }
+	line = line ":"; if (sym in uses) { line = line uses[sym] }
 	print line > file; count_syms++; written[file] = 1
     }
     for (set in setsets) {
@@ -1075,7 +1125,7 @@ function read_dumpfiles_line(own, src)
     }
     if (NF < 3) $3 = "vmlinux"
     if (NF < 4) $4 = ""
-    set_symbol($2, $3, $1, $4, "", 0, own, src, "dumpfiles")
+    set_symbol($2, $3, $1, $4, "", 0, own, src, 0, "dumpfiles")
 }
 function read_dumpfiles(command, own, src)
 {
@@ -1090,10 +1140,10 @@ function read_moduledir(directory, src,	    dir,command)
 {
     print_vinfo(1,"r: moduledir, directory = \"" directory "\"")
     dir = "kernel"
-    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t"
+    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -s"
     read_modobject(command, dir, "kernel", src)
     dir = values["pkgdirectory"]
-    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t"
+    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -s"
     read_modobject(command, dir, values["pkgdirectory"], "pkgdirectory")
 }
 function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
@@ -1102,7 +1152,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
     for (i = 1; i in modules; i++)
 	print modules[i] > "modvers.list"
     close("modvers.list")
-    command = "cat modvers.list | xargs objdump -t "
+    command = "cat modvers.list | xargs objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -s"
     read_modobject(command, ".", values["pkgdirectory"], src)
     system("rm -f modvers.list")
     # double check
@@ -1127,12 +1177,21 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 	    }
 	    continue
 	}
+	if (!(sym in uses) || !uses[sym]) {
+	    if (ownr[sym] != values["pkgdirectory"]) {
+		if (values["unused"])
+		    print_warns(sprintf(fmt, base, "unused", sym))
+		else
+		    print_error(sprintf(fmt, base, "unused", sym))
+	    }
+	}
 	if (!(sym in kabi) && values["kabi"]) {
-	    if (ownr[sym] != values["pkgdirectory"])
+	    if (ownr[sym] != values["pkgdirectory"]) {
 		if (values["unsupported"])
 		    print_vinfo(1,sprintf(fmt, base, "unsupportd", sym))
 		else
 		    print_error(sprintf(fmt, base, "unsupportd", sym))
+	    }
 	}
 	if (!(sym in crcs)) {
 	    print_error("r: mymodules, symbol " sym " defined in module " mods[sym] " has no version")
@@ -1158,6 +1217,14 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		    print_error(sprintf(fmt, base, "weak unexp", sym))
 	    }
 	    continue
+	}
+	if (!(sym in uses) || !uses[sym]) {
+	    if (ownr[sym] != values["pkgdirectory"]) {
+		if (values["unused"])
+		    print_vinfo(1,sprintf(fmt, base, "weak unuse", sym))
+		else
+		    print_warns(sprintf(fmt, base, "weak unuse", sym))
+	    }
 	}
 	if (!(sym in kabi) && values["kabi"]) {
 	    if (ownr[sym] != values["pkgdirectory"]) {
@@ -1246,7 +1313,7 @@ function read_symsets(file, own, src,	n,tar,fname,set,hash,pos,lineno,ssym,scrc,
 		    print_debug(4,"r: syssymset,         pos = \"" pos "\"")
 		    print_debug(4,"r: syssymset,         own = \"" own "\"")
 		    print_debug(5,"r: syssymset,         src = \"" src "\"")
-		    set_symbol($2, $3, $1, $4, set, pos, own, src, "syssymset")
+		    set_symbol($2, $3, $1, $4, set, pos, own, src, 0, "syssymset")
 		    n++
 		} else { unrecog(fnlp, $0); continue }
 	    }
@@ -1408,7 +1475,7 @@ function create_missing_symsets(	progress,count,count_syms,count_sets,sym,set,se
 
 	for (pos=1;pos<=n;pos++) {
 	    sym = symbols[pos]
-	    set_symbol(sym, "", "", "", set "." hash, pos, "", "", "missedset")
+	    set_symbol(sym, "", "", "", set "." hash, pos, "", "", 0, "missedset")
 	    count_syms++
 	}
 	delete setnumb[set]
@@ -1824,6 +1891,7 @@ BEGIN {
     longopts["rip-weak"     ] = "R"  ;								   defaults["rip-weak"     ] = 1						; descrips["rip-weak"     ] = "attempt to rip weak undefined symbols from system map (requires -F, implies -U)"
     longopts["unres-weak"   ] = "b"  ;								   defaults["unres-weak"   ] = 1						; descrips["unres-weak"   ] = "allow unresolved weak symbols"
     longopts["unsupported"  ] = "U"  ;								   defaults["unsupported"  ] = 1						; descrips["unsupported"  ] = "permit use of (strong) unsupported (non-ABI) kernel exports"
+    longopts["unused"       ] = "y"  ;								   defaults["unused"       ] = 1						; descrips["unused"       ] = "permit use of (strong) unused kernel exports"
     longopts["weak-symbols" ] = "w"  ;								   defaults["weak-symbols" ] = 1						; descrips["weak-symbols" ] = "resolve weak symbols (useful with -r and -U)"
     longopts["weak-versions"] = "W"  ;								   defaults["weak-versions"] = 1						; descrips["weak-versions"] = "version weak symbols (useful with -w)"
     longopts["weak-hidden"  ] = "H"  ;								   defaults["weak-hidden"  ] = 0						; descrips["weak-hidden"  ] = "weak symbol versions are hidden (used with -W)"
@@ -1852,6 +1920,7 @@ BEGIN {
     values["rip-weak"     ] = defaults["rip-weak"     ]
     values["unres-weak"   ] = defaults["unres-weak"   ]
     values["unsupported"  ] = defaults["unsupported"  ]
+    values["unused"       ] = defaults["unused"       ]
     values["weak-symbols" ] = defaults["weak-symbols" ]
     values["weak-versions"] = defaults["weak-versions"]
     values["weak-hidden"  ] = defaults["weak-hidden"  ]
