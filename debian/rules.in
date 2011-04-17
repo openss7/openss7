@@ -417,27 +417,11 @@ binary-common:
 	dh_md5sums -v
 	dh_builddeb -v
 
-binary-lis:
-	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-
-binary-lfs:
-	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$(core_name) binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$(info_name) binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-util binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lib binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
-
-binary-nos:
-	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-
 #
 #  dkpg-buildpackage invoke this makefile in one of two ways: with the -b flag,
 #  the 'binary' target is invoked to build both arch and indep binary packages;
 #  with the -B flag, the 'binary-arch' target is invoked to build only the arch
-#  binary packages and not the indep binary packages.  We further distinguish
-#  arch packages as being for lis, for lfs, or we don't care based on the
-#  setting of the passed in BUILD_CFGOPTIONS environment variable.
+#  binary packages and not the indep binary packages.
 #
 binary-indep: DH_OPTIONS = -i
 binary-indep: install
@@ -452,13 +436,11 @@ binary-indep: install
 binary-arch: DH_OPTIONS = -s
 binary-arch: install
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	@case " $(BUILD_CFGOPTIONS) " in \
-		(*" --with-lfs "*)  targ=binary-lfs ;; \
-		(*" --with-lis "*)  targ=binary-lis ;; \
-		(*)		    targ=binary-nos ;; \
-	esac ; \
-	echo "$(MAKE) -f debian/rules $$targ" ; \
-	$(MAKE) -f debian/rules $$targ
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$(core_name) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$(info_name) binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-util binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-lib binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-devel binary-common
 
 binary: DH_OPTIONS = -i -s
 binary:
@@ -468,17 +450,15 @@ binary:
 	$(MAKE) -f debian/rules binary-arch
 
 #
-#   Another way that we can be invoked is with a specific package name.  Again,
-#   we distinguish between lis and lfs package names.
+#   Another way that we can be invoked is with a specific package name.
 #
-
 binary-$(PACKAGE_LCNAME)-%: DH_OPTIONS = -p$(PACKAGE_LCNAME)-$*
 binary-$(PACKAGE_LCNAME)-%: install
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	$(MAKE) -f debian/rules DH_OPTIONS=-p$(PACKAGE_LCNAME)-$* binary-common
 
 get-orig-source:
-	wget http://www.openss7.org/tarballs/$(PACKAGE)-$(VERSION).tar.bz2
+	wget https://www.openss7.org/repo/tarballs/$(PACKAGE)-$(VERSION).tar.bz2
 
 .PHONY: build clean \
 	binary-indep binary-arch binary binary-lis binary-lfs binary-indep \
