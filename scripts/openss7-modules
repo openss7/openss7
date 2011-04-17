@@ -1619,14 +1619,101 @@ function relinklinks(kversion, kver, name,
 	module = modnames[kver,name]
 	if ((kversion,name) in weaknames) {
 	    file = weaknames[kversion,name]  # note that createlinks created this entry
-	    # FIXME
-	    # FIXME
-	    # FIXME
-	    # FIXME
-	    # FIXME
-	    # FIXME
+	    if (file in weaklinks)
+		module = weaklinks[file]
 	} else {
 	    print_error(pfx, "no weakname for " kversion ":" name)
+	    return
+	}
+	if (module in linkedsyms) {
+	    split(linkedsyms[module],syms,/,/)
+	    for (s in syms) { sym = syms[s]
+		if (!((module,sym) in linked)) {
+		    print_error(pfx sprintf("%s in linksysm, but no (%s,%s) in linked!", sym, module, sym ))
+		    continue
+		}
+		add = linked[module,sym]
+		if ((kversion,sym) in sysmaps) {
+		    if (sysmaps[kversion,sym] == add) {
+			print_debug(2, pfx "correct address for " sym)
+			continue
+		    }
+		    old = add
+		    add = sysmaps[kversion,sym]
+		    print_debug(2, pfx sprintf("relink %-24s old = %-18s, %-40s", sym, old, module))
+		    print_debug(2, pfx sprintf("relink %-24s new = %-18s, %-40s", sym, add, ""))
+		} else {
+		    if ((module,sym) in weaken && weaken[module,sym]~/^00*$/) {
+			print_debug(2, pfx "correct address for " sym)
+			continue
+		    }
+		    print_error(pfx kversion " does not provide an address for " sym)
+		    add = "00000000"
+		}
+		n++
+		print_vmore(3, pfx sprintf("%-12s %03d relinked of %03d %-40s", "addresses", n, m, sym))
+		#linked[module,sym] = add
+		if (file in reloads)
+		{ reloads[file] = reloads[file] "\n\t" sym " = 0x" add ";" } else
+		{ reloads[file] = "\t" sym " = 0x" add ";" }
+	    }
+	}
+	if (module in wantedsyms) {
+	    split(wantedsyms[module],syms,/,/)
+	    for (s in syms) { sym = syms[s]
+		if (!((module,sym) in wanted)) {
+		    print_error(pfx sprintf("%s in linksysms, but no (%s,%s) in wanted!", sym, module,sym))
+		    continue
+		}
+		crc = wanted[module,sym]
+		if ((kversion,sym) in symvers) {
+		    if (symvers[kversion,sym] != crc) {
+			add = "00000000"
+			if (!((module,sym) in weaken) || weaken[module,sym]~/^00*$/) {
+			    print_debug(2, pfx "wrong crc + correct address (" add "), not relinking " sym)
+			    continue
+			}
+			print_debug(2, pfx "wrong crc + wrong address (" weaken[module,sym] "), relinking to (" add ") for " sym)
+		    } else
+		    if ((kversion,sym) in sysmaps) {
+			add = sysmaps[kversion,sym]
+			if ((module,sym) in weaken && sysmaps[kversion,sym] == weaken[module,sym]) {
+			    print_debug(2, pfx "correct crc + in maps + correct address (" weaken[module,sym] "), not relinking" sym)
+			    continue
+			}
+			print_debug(2, pfx "correct crc + in maps + wrong address (" weaken[module,sym] "), relinking to (" add ") for " sym)
+		    } else {
+			add = "00000000"
+			if (!((module,sym) in weaken) || weak[module,sym]~/^00*$/) {
+			    print_debug(2, pfx "correct crc + not in maps + correct address (" add "), not relinking " sym)
+			    continue
+			}
+			print_debug(2, pfx, "correct crc + not in maps + wrong address (" weaken[module,sym] "), relinking to (" add ") for " sym)
+		    }
+		} else {
+		    if ((kversion,sym) in sysmaps) {
+			add = sysmaps[kversion,sym]
+			if ((module,sym) in weaken && sysmaps[kversion,sym] == weaken[module,sym]) {
+			    print_debug(2, pfx "no crc + in maps + correct address (" weaken[module,sym] "), not relinking" sym)
+			    continue
+			}
+			print_debug(2, pfx "no crc + in maps + wrong address (" weaken[module,sym] "), relinking to (" add ") for " sym)
+		    } else {
+			add = "00000000"
+			if (!((module,sym) in weaken) || weaken[module,sym]~/^00*$/) {
+			    print_debug(2, pfx "no crc + not in maps + correct address (" add "), not relinking " sym)
+			    continue
+			}
+			print_debug(2, pfx "no crc + not in maps + wrong address (" weaken[module,sym] "), relinking to (" add ") for " sym)
+		    }
+		}
+		print_debug(2, pfx sprintf("relink %-24s add = %-18s, %-40s", sym, add, module))
+		n++
+		print_vmore(3, pfx sprintf("%-12s %03d prelinks of %03d %-40s", "addresses", n, m, sym))
+		if (file in reloads)
+		{ reloads[file] = reloads[file] "\n\t" sym " = 0x" add ";" } else
+		{ reloads[file] = "\t" sym " = 0x" add ";" }
+	    }
 	}
     } else {
 	print_error(pfx, "no modname for " kver ":" name)
@@ -1806,6 +1893,7 @@ function makesolution(kversion, kver, creates, unlinks, changes, relinks, remove
 		relinklinks(kversion, kver, name, modnames, weaknames, weaklinks)
 		l++
 		print_vmore(3, sprintf(fmt, c, r, a, l))
+	    }
 	}
     }
     print_vmore(2, sprintf(fmt, c, r, a, l))
