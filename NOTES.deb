@@ -1,0 +1,130 @@
+README -- deb notes.  2011-04-15
+$Id$
+Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+See the end for copying conditions (for this file).
+
+
+DEB Packaging
+=============
+
+Differences from RPM:
+---------------------
+
+Debian is somewhat different from RPM-based systems in a number of
+respects with regard to kernels.  Although dpkg now supports all kinds
+of triggers, the common way of running hook on debian kernels is to
+place a script in /etc/kernel/preinst.d/, /etc/kernel/postinst.d/,
+/etc/kernel/prerm.d/ or /etc/kernel/postrm.d/, that are exectued when a
+kernel is installed or removed.  Scripts in this directory are executed
+with two arugments: the kernel version ($version), and the full path and
+filename of the kernel image (e.g. /boot/vmlinuz-$version).
+
+For installing weak modules, the following is performed:
+
+preinst.d:
+    Nothing to do.
+
+postinst.d:
+    Add symbolic links to openss7 weak-updates directories.  This
+    consists of calling
+
+        openss7-modules -- -v --add-kernel $1
+
+    Note that this step is not completely necessary because it will be
+    run when the kernel boots (if ever).
+
+    Technically it is possible to query the user at this point for some
+    optional actions.  We can even abort the installation process for a
+    kernel using exit status because Debian is smart enough to execute
+    hooks before updating the boot-loader.
+
+prerm.d:
+    Remove symbolic links from openss7 weak-updates directories.  This
+    consists of calling
+
+                openss7-modules -- -v --remove-kernel $1
+
+    Note that this step is not completely necessary, some symbolic links
+    will just unnecessarily hang around if it is not performed.
+
+    Technically it is possible to query the user at this point for some
+    optional actions.  We can even abort the removal process for a
+    kernel using exit status because Debian is smart enough to execute
+    hooks before updating the boot-loader.
+
+postrm.d:
+    Nothing to do.
+
+header_postinst.d:
+    This is where we can make whatever modifications are required to the
+    build system.
+
+src_postinst.d:
+    Nothing to do.
+
+Running kernel issues:
+----------------------
+
+Practically, it is not possible to remove the running kernel.  All kinds
+of warning messages will be issued.  However, at one time it was thought
+practically possible to install kernel with the same version as the
+running kernel.  Perhaps by maintainers.  Code does not exist for this
+anymore.
+
+
+-----
+
+=========================================================================
+
+ Copyright (c) 2008-2011  Monavacon Limited  <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation  <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock  <bidulock@openss7.org>
+
+ All Rights Reserved.
+
+ Permission is granted to make and distribute verbatim copies of this
+ manual provided the copyright notice and this permission notice are
+ preserved on all copies.
+
+ Permission is granted to copy and distribute modified versions of this
+ manual under the conditions for verbatim copying, provided that the
+ entire resulting derived work is distributed under the terms of a
+ permission notice identical to this one
+
+ Since the Linux kernel and libraries are constantly changing, this
+ manual page may be incorrect or out-of-date.  The author(s) assume no
+ responsibility for errors or omissions, or for damages resulting from
+ the use of the information contained herein.  The author(s) may not
+ have taken the same level of care in the production of this manual,
+ which is licensed free of charge, as they might when working
+ professionally.
+
+ Formatted or processed versions of this manual, if unaccompanied by the
+ source, must acknowledge the copyright and authors of this work.
+
+-------------------------------------------------------------------------
+
+ U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+ on behalf of the U.S. Government ("Government"), the following
+ provisions apply to you.  If the Software is supplied by the Department
+ of Defense ("DoD"), it is classified as "Commercial Computer Software"
+ under paragraph 252.227-7014 of the DoD Supplement to the Federal
+ Acquisition Regulations ("DFARS") (or any successor regulations) and
+ the Government is acquiring only the license rights granted herein (the
+ license rights customarily provided to non-Government users).  If the
+ Software is supplied to any unit or agency of the Government other than
+ DoD, it is classified as "Restricted Computer Software" and the
+ Government's rights in the Software are defined in paragraph 52.227-19
+ of the Federal Acquisition Regulations ("FAR") (or any successor
+ regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+ NASA Supplement to the FAR (or any successor regulations).
+
+=========================================================================
+
+ Commercial licensing and support of this software is available from
+ OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+
+=========================================================================
+vim: ft=README tw=72 nocindent nosmartindent formatoptions+=tcqlorn
