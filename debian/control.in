@@ -2,6 +2,9 @@ Source: @PACKAGE_LCNAME@
 Section: devel
 Priority: optional
 Maintainer: Brian F. G. Bidulock <bidulock@openss7.org>
+Origin: @PACKAGE_TITLE@
+Bugs: gnats://bugs.openss7.org
+HomePage: http://www.openss7.org/
 Standards-Version: 3.5.6.1
 Build-Depends: kernel-source-2-4 | kernel-headers-2-4 | linux-source-2.6 | linux-headers-2.6,
  gcc (>= 2.95.3),
