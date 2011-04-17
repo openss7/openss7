@@ -53,12 +53,19 @@
 # =============================================================================
 @mscript_header@
 
-function configure_dev_postinst() { :
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+
+configure_dev_postinst() { :
     if test -x '/usr/sbin/@STRMAKENODES@' ; then
 	# ensure that devices are added
 	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): creating devices."
 	/usr/sbin/@STRMAKENODES@
     fi
+}
+
+triggered_dev_postinst() { :
 }
 
 subpkg=dev

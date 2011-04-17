@@ -126,6 +126,8 @@ Description: Source code for @PACKAGE_TITLE@
 
 Package: @PACKAGE_LCNAME@-mibs
 Architecture: all
+Try: http://www.google.com/search?q=m3ua+conformance+test+suite
+
 Section: devel
 Priority: optional
 Provides: STREAMS-mibs
@@ -241,7 +243,7 @@ Description: The @PACKAGE_LCNAME@-doc binary package contains the documentation 
 
 Package: @PACKAGE_LCNAME@-lib
 Architecture: any
-Section: base
+Section: libs
 Priority: optional
 Provides: @PACKAGE_LCNAME@-lib
 Description: The @PACKAGE_LCNAME@-lib binary package contains the run-time (shared object)
@@ -269,7 +271,7 @@ Description: The @PACKAGE_LCNAME@-devel binary package contains library archives
 Package: @PACKAGE_LCNAME@-debuginfo
 Architecture: any
 Section: debug
-Priority: optional
+Priority: extra
 Provides: @PACKAGE_LCNAME@-debuginfo
 Description: The @PACKAGE_LCNAME@-debuginfo binary package contains debugging symbols for
  libraries and applications programs.  This package provides debug
@@ -280,7 +282,7 @@ Description: The @PACKAGE_LCNAME@-debuginfo binary package contains debugging sy
 Package: @PACKAGE_LCNAME@-debugsource
 Architecture: any
 Section: debug
-Priority: optional
+Priority: extra
 Provides: @PACKAGE_LCNAME@-debugsource
 Description: The @PACKAGE_LCNAME@-debugsource binary package contains source code for
  debugging libraries and applications programs.  This package provides
@@ -319,7 +321,7 @@ Description: The @PACKAGE_LCNAME@-kernel-devel binary package contains the kerne
 Package: @PACKAGE_LCNAME@-kernel-debuginfo
 Architecture: any
 Section: debug
-Priority: optional
+Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-debuginfo, @PACKAGE_LCNAME@-debuginfo-@kversion@
 Description: The @PACKAGE_LCNAME@-kernel-debuginfo binary package contains
  debugging symbols for kernel modules.  This package provides debug
@@ -330,7 +332,7 @@ Description: The @PACKAGE_LCNAME@-kernel-debuginfo binary package contains
 Package: @PACKAGE_LCNAME@-kernel-debugsource
 Architecture: any
 Section: debug
-Priority: optional
+Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-debugsource, @PACKAGE_LCNAME@-debugsource-@kversion@
 Description: The @PACKAGE_LCNAME@-kernel-debugsource binary package contains
  source code for debugging kernel modules.  This package provides debug
@@ -341,7 +343,7 @@ Description: The @PACKAGE_LCNAME@-kernel-debugsource binary package contains
 Package: @PACKAGE_LCNAME@-kernel-source
 Architecture: any
 Section: devel
-Priority: optional
+Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-source, @PACKAGE_LCNAME@-source-@kversion@
 Description: The @PACKAGE_LCNAME@-kernel-source binary package contains the source code
  necessary for building the @PACKAGE_LCNAME@ release for the kernel version

@@ -2838,7 +2838,7 @@ if [ $1 = 1 ] ; then : # fresh install
         prel_tmp=%_tmppath/modprobe.preload.tmp.$$
         prel_new=%_tmppath/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
-        sed -e '\|^[[:space:]]*streams|d' $prel_new > $prel_tmp
+        sed -r -e '/^[[:space:]]*(specfs|streams)/d' $prel_new > $prel_tmp
         mv -f -- $prel_tmp $prel_new
         chmod --reference=$prel_old -- $prel_new
         cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
@@ -3206,7 +3206,7 @@ if [ $1 = 0 ] ; then : # final removal
     # Uninstalling for good, remove init scripts if we can
     reverse=
     list="%{initfiles}" ; for i in $list ; do
-        reverse="$i${reverse:+ $reverse}"
+        reverse="$i${reverse:+' '}$reverse"
     done
     for i in $reverse ; do
         if [ -f %_initrddir/$i ] ; then
@@ -3344,7 +3344,7 @@ b loop' $prel_new > $prel_tmp
     # Upgrading, remove our init scripts if we can
     reverse=
     list="%{initfiles}" ; for i in $list ; do
-        reverse="$i${reverse:+ $reverse}"
+        reverse="$i${reverse:+' '}$reverse"
     done
     for i in $reverse ; do
         if [ -f %_initrddir/$i ] ; then
@@ -3751,7 +3751,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
     # Stop init scripts when they are still hanging around.
     reverse=
     list="%{initfiles}" ; for i in $list ; do
-        reverse="$i${reverse:+ $reverse}"
+        reverse="$i${reverse:+' '}$reverse"
     done
     for i in $reverse ; do
         if [ -f %_initrddir/$i ] ; then
@@ -3782,10 +3782,13 @@ if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
         for signal in TERM KILL ; do
             if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                 lsof | grep '\<STR\>' | \
-                while read -a fields ; do
-                    if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
-                    if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
-                    kill -$signal ${fields[1]} >/dev/null 2>&1 || :
+                while read fields ; do
+                    set dummy $fields
+                    if [ ":$6" != ':CHR' ] ; then continue; fi
+                    ind=`expr $# - 1`
+                    eval "val=\"\${$ind}\""
+                    if [ ":$val" != ':STR' ] ; then continue; fi
+                    kill -$signal $3 >/dev/null 2>&1 || :
                 done
                 sleep 5
             fi
@@ -4274,17 +4277,18 @@ if [ $arg = 1 ] ; then : # fresh install
                 b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
                 case " $list " in (*" $b "*) ;; (*) continue ;; esac
                 echo "$m"
-                modl_mods="${modl_mods:+$modl_mods }$m"
+                modl_mods="$modl_mods${modl_mods:+' '}$m"
         done
         if [ -n "$modl_mods" -a -f %{_kmoduledir}/modules.dep ] ; then
             # First we can build a dependency tree from every dependency
             # expression that can be found in the modules.dep file.
-            xtrace=`shopt -p -o | grep xtrace` ; set +x
+	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+	    set +x
             dep= ; while read line ; do
                 case $line in
                     (*\\)   line="`echo $line | sed -e 's|\\$||'`"
-                            dep="${dep:+$dep }$line" ; continue ;;
-                    (*)     dep="${dep:+$dep }$line" ;;
+                            dep="$dep${dep:+' '}$line" ; continue ;;
+                    (*)     dep="$dep${dep:+' '}$line" ;;
                 esac
                 [ -n "$dep" ] || continue;
                 set dummy $dep
@@ -4294,8 +4298,8 @@ if [ $arg = 1 ] ; then : # fresh install
                     shift 2
                     for p in $@ ; do
                         prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                        eval "$prereq=\"\${$prereq:+\$$prereq }$t\""
-                        eval "$target=\"\${$target:+\$$target }$p\""
+                        eval "$prereq=\"\$$prereq\${$prereq:+' '}$t\""
+                        eval "$target=\"\$$target\${$target:+' '}$p\""
                     done
                 fi
                 dep=
@@ -4326,10 +4330,13 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
             for signal in TERM KILL ; do
                 if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                     lsof | grep '\<STR\>' | \
-                    while read -a fields ; do
-                        if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
-                        if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
-                        kill -$signal ${fields[1]} >/dev/null 2>&1 || :
+                    while read fields ; do
+                        set dummy $fields
+                        if [ ":$6" != ':CHR' ] ; then continue; fi
+                        ind=`expr $# - 1`
+                        eval "val=\"\${$ind}\""
+                        if [ ":$val" != ':STR' ] ; then continue; fi
+                        kill -$signal $3 >/dev/null 2>&1 || :
                     done
                     sleep 5
                 fi
@@ -4376,9 +4383,9 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
         # Non-running kernels do not need init scripts run.
     fi
 %if %{NEED_symvers}
-    if [ ! -r /boot/symvers-%{kernel_version}.gz ] ; then
-        gzip -c %{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers > \
-            /boot/symvers-%{kernel_version}.gz
+    f=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
+    if [ ! -r /boot/symvers-%{kernel_version}.gz -a -r $f ] ; then
+        gzip -c $f > /boot/symvers-%{kernel_version}.gz
     fi
 %endif
 fi
@@ -4408,7 +4415,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         # Try using init scripts to shutdown if they exist.
         reverse=
         list="%{initfiles}" ; for i in $list ; do
-            reverse="$i${reverse:+ $reverse}"
+            reverse="$i${reverse:+' '}$reverse"
         done
         for i in $reverse ; do
             if [ -f %_initrddir/$i ] ; then
@@ -4439,10 +4446,13 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
             for signal in TERM KILL ; do
                 if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                     lsof | grep '\<STR\>' | \
-                    while read -a fields ; do
-                        if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
-                        if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
-                        kill -$signal ${fields[1]} >/dev/null 2>&1 || :
+                    while read fields ; do
+                        set dummy $fields
+                        if [ ":$6" != ':CHR' ] ; then continue; fi
+                        ind=`expr $# - 1`
+                        eval "val=\"\${$ind}\""
+                        if [ ":$val" != ':STR' ] ; then continue; fi
+                        kill -$signal $3 >/dev/null 2>&1 || :
                     done
                     sleep 5
                 fi
@@ -4508,10 +4518,13 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
             for signal in TERM KILL ; do
                 if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                     lsof | grep '\<STR\>' | \
-                    while read -a fields ; do
-                        if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
-                        if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
-                        kill -$signal ${fields[1]} >/dev/null 2>&1 || :
+                    while read fields ; do
+                        set dummy $fields
+                        if [ ":$6" != ':CHR' ] ; then continue; fi
+                        ind=`expr $# - 1`
+                        eval "val=\"\${$ind}\""
+                        if [ ":$val" != ':STR' ] ; then continue; fi
+                        kill -$signal $3 >/dev/null 2>&1 || :
                     done
                     sleep 5
                 fi

@@ -1,40 +1,49 @@
-#!/bin/bash
-# =============================================================================
+#!/bin/sh
 # @configure_input@
+# =============================================================================
 # @(#) $RCSfile: mscript_postinst.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:51 $
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
 
-[ ":${subpkg+set}" = ":set" ] || subpkg=
+[ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
-echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+command="$1"
+function=`echo "$command${subpkg:+'_'}${subpkg}_postinst" | tr '-' '_'`
+shift 2
 
-case "$1" in
+echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+
+case "$command" in
 
     (configure) : # postinstallation configuration
 	# configure-postinst configure [most-recently-configured-version]
-	eval "configure_${subpkg}_postinst"
+	eval "$function \"$@\""
+	;;
+
+    (triggered) : # postinst triggered triggered-packages
+	eval "$function \"$@\""
 	;;
 
     (abort-upgrade) :
 	# old-prerm upgrade new-version ... failed
 	# new-prerm failed-upgrade new-version ... failed
 	# old-posinst abort-upgrade new-version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
+	echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $command: modules running." >&2
 	;;
 
     (abort-remove) :
 	# conflict-prerm remove in-favour package new-version ... failed
 	# conflict-postinst abort-remove in-favour package new-version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
+	echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $command: modules running." >&2
 	;;
 
     (abort-deconfigure) :
 	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version .. failed
 	# deconfigure-postinst abort-deconfigurein-favour package-being-installed-but-failed version removing conflicting-package version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: modules running." >&2
+	echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $command: modules running." >&2
 	;;
 
 esac

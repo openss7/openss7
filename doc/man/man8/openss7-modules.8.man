@@ -151,8 +151,10 @@ scripts provided by
 For each kernel version considered, the script determines the most recent and
 compatible kernel modules available in the system and adds or removes symbolic
 links and relinked modules in the
-\fB/lib/modules/\fP\fI$KVERSION\fP\fB/weak-updates\fP directory, in a manner
-similar to the
+\fB/lib/modules/\fP\fI$KVERSION\fP\fB/weak-updates\fP directory (or that
+specified with the
+.B --weakdir
+option), in a manner similar to the
 .IR RedHat " and " SuSE
 .BR weak-modules ,
 and
@@ -263,6 +265,11 @@ before they are loaded.
 .\"
 .IP \(bu
 .B openss7-modules
+understands that affecting the running kernel can be disastrous and provides
+options for determining whether an update for the running kernel is safe.
+.\"
+.IP \(bu
+.B openss7-modules
 does not create nor update initial ramdisk nor ramfs images.
 .\"
 .\"
@@ -353,11 +360,6 @@ Although the option supports multiple kernel versions, no more than one
 kernel version should be specified.
 .sp
 This command is normally invoked from kernel post-install trigger scripts.
-The command is also normally invoked (without arguments) from the
-.B specfs
-init script to ensure that a booted kernel is properly prepared before the
-.IR STREAMS (4)
-system is loaded.
 .TP
 \fB-L\fP, \fB--link-kernel\fP
 This command option is used to specify that a kernel is being added and
@@ -385,6 +387,29 @@ Although the option supports multiple kernel versions, no more than one
 kernel version should be specified.
 .sp
 This command is normally invoked from kernel pre-uninstall trigger scripts.
+.TP
+\fB-U\fP, \fB--update-kernel\fP
+This command is normally invoked from kernel pre-remove or post-install
+trigger scripts where the kernel version changed is not known.  This command
+has an equivalent effect to
+.B --add-kernel
+with all kernel versions as arguments.
+Although the option supports specifying a kernel version, any supplied
+kernel version is currently ignored.
+.TP
+\fB-B\fP, \fB--boot-kernel\fP
+This command is used to update the running kernel when booting and normally
+invoked from within an init script.  Specifying this command implies
+.BR --no-preserve ", " --overwrite " and " --no-initscripts .
+.sp
+This command is also normally invoked (without arguments) from the
+.B specfs
+init script, when a properly configured
+.B specfs
+module is not detected, to ensure that a booted kernel is properly prepared
+before the
+.IR STREAMS (4)
+system is loaded.
 .TP
 \fB-a\fP, \fB--add-modules\fP
 This command option is used to specify that package kernel modules have been
@@ -431,6 +456,14 @@ modules sub-package.
 Note that this option is roughly equivalent to
 .BR "--remove-modules $(ls /lib/modules)" .
 .TP
+\fB-u\fP, \fB--update-modules\fP
+This command option is used to specify that package kernel modules have
+changed and weak-update of the all kernel modules should be performed for all
+installed kernels.  It is not necessary to specify a kernel version, changes
+will be automatically detected.
+Although the option supports specifying a kernel version, any supplied kernel
+version is currently ignored.
+.TP
 \fB-h\fP, \fB--help\fP
 When this options is encountered,
 print usage information to
@@ -474,6 +507,18 @@ option arguments.)
 Specifies the kernel version of the current (running) kernel.  When not
 specified, the value returned by (\fBuname -r\fP) is used.  This option is
 not normally required.
+.TP
+\fB-p\fP, \fB--preserve\fP, \fB--no-preserve\fP
+Specifies whether existing configuration for the running kernel should be
+preserved or not.  When set and any of the kernel modules to be updated in
+the running kernel are loaded, the configuration will not be changed.  When
+unset, loaded kernel modules will not be examined.
+.TP
+\fB-o\fP, \fB--overwrite\fP, \fB--no-overwrite\fP
+Specifies whether existing configuration for the running kernel should be
+overwritten or not.  When unset, existing configuration (symbolic links) for
+the running kernel will not be overwritten.  When set, existing symbolic
+links will not be examined.
 .TP
 \fB-M\fP, \fB--modules\fP \fIMODULE ...\fP
 Specifies the modules for which to generate symbols and relinking.  When
@@ -536,6 +581,12 @@ supports the
 option.
 Either the compressed or decompressed system symbol version file must be
 available to perform kernel module weak updates.
+.sp
+(Note, however, that, because Debian systems do not provide either with the
+linux-image-2.6 package, the script attempts to obtain kernel symbol versions
+from the modules installed under the
+.B kernel
+subdirectory.)
 .TP
 \fB-S\fP, \fB--symver\fP \fISYMVER\fP
 Specifies the location of the compressed system symbol version file.  When
@@ -554,6 +605,12 @@ option and a decompressed system symbol version file cannot be found (see the
 options).
 Either the compressed or decompressed system symbol version file must be
 available to perform kernel module weak updates.
+.sp
+(Note, however, that, because Debian systems do not provide either with the
+linux-image-2.6 package, the script attempts to obtain kernel symbol versions
+from the modules installed under the
+.B kernel
+subdirectory.)
 .TP
 \fB-P\fP, \fB--package\fP \fIPACKAGE\fP
 Specifies the package name (used to determine the subdirectory in which
@@ -592,6 +649,20 @@ module weak-update to perform.  This is done by detecting the presence of
 the several possible weak-update scripts.
 .RE
 .TP
+\fB-i\fP, \fB--initscripts\fP [\fISCRIPT\fP[,\fISCRIPT\fP]...]
+Specifies a comma separated list of init script names to start and stop in
+response to configuration changes.  The order of the script names is the
+order in which they are to be started, that is, the reverse order in which
+they are to be stopped.  When unspecified, no init scripts will be stopped or
+started.  When specified, and a fresh configuration is added for the running
+kernel, the init scripts will be started in the order specified after the
+update is complete.  Before a configuration is removed for the running
+kernel, the init scripts will be stopped in the reverse order to that
+specified.  When a configuration is updated for the running kernel, the
+scripts will first be stopped, the configuration updated, and then the
+scripts started.  This option is useful in conjunction with
+.BR --no-preserve " and " --overwrite .
+.TP
 \fB-x\fP, \fB--depmodx\fP, \fB--no-depmodx\fP
 Specifies whether
 .BR depmod (8)
@@ -621,6 +692,10 @@ The default is to no exit with error status.
 \fB-n\fP, \fB--dry-run\fP, \fB--no-dry-run\fP, \fB--dryrun\fP, \fB--no-dryrun\fP
 Sets (or resets) the dry-run flag.  When set, actions will be printed rather
 than performed.  Otherwise, the default is to attempt to perform actions.
+Note that detected warnings and errors will still be reported and
+.B --exit-on-error
+is still observed.  This can be used to check whether an update will be
+successful.
 .TP
 \fB-q\fP, \fB--quiet\fP, \fB--no-quiet\fP, \fB--silent\fP, \fB--no-silent\fP
 Specifies that the caller is interested only in the return code and error

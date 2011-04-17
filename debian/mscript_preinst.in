@@ -1,38 +1,44 @@
-#!/bin/bash
+#!/bin/sh
 # @configure_input@
 # =============================================================================
 # @(#) $RCSfile: mscript_preinst.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:51 $
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
 
-[ ":${subpkg+set}" = ":set" ] || subpkg=
+[ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
-echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+command="$1"
+function=`echo "$command${subpkg:+'_'}${subpkg}_preinst" | tr '-' '_'`
+shift 2
 
-case "$1" in
+echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+
+case "$command" in
 
     (install) : # install fresh or some configuration
 	# new-preinst install [old-version]
-	if [ "${2+set}" = "set" ]
+	if [ "${2:+'set'}" = "set" ]
 	then : # install with some configuration
-	    eval "upgrade_${subpkg}_preinst"
+	    function=`echo "upgrade${subpkg:+'_'}${subpkg}_preinst" | tr '-' '_'`
+	    eval "$function \"$@\""
 	else : # install fresh
-	    eval "install_${subpkg}_preinst"
+	    eval "$function \"$@\""
 	fi
 	;;
 
     (upgrade) : # upgrade (step 2)
 	# new-preinst upgrade old-version
-	eval "upgrade_${subpkg}_preinst"
+	eval "$function \"$@\""
 	;;
 
     (abort-upgrade) :
 	# old-postrm upgrade new-version ... failed
 	# new-postrm failed-upgrade old-version ... failed
 	# old-preinst abort-upgrade new-version
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $1: library in use." >&2
+	echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $command: library in use." >&2
 	;;
 
 esac

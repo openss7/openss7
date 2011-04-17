@@ -54,12 +54,15 @@
 
 @mscript_header@
 
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
 #
 # Unfortunately recent non-autoconf/dpkg releases of LiS have chosen to install their kernel modules
 # in locations mimicing our releases, so this pre-installation scriptlet goes and finds any
 # offending modules (modules with the same name as ours) and simply removes them.
 #
-function install_core_preinst() {
+install_core_preinst() {
     for dir in '/' '/../preferred' '/../default' '/../boot' ; do
 	eval "d=\"$kmoduledir$dir\""
 	test -d $d || continue
@@ -76,7 +79,7 @@ function install_core_preinst() {
 # supposed to do.  This is not as extensive as the non-deb install since we do not have to check
 # that package files are removed and we don't have to check for things from non-deb versions.
 #
-function upgrade_core_preinst() {
+upgrade_core_preinst() {
     if [ ":$kversion" = ":`uname -r`" ] ; then
 	#
 	# If we are upgrading and the upgrade is for the running kernel, or we are installing new on
