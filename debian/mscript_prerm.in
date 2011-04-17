@@ -1,41 +1,47 @@
-#!/bin/bash
+#!/bin/sh
 # @configure_input@
 # =============================================================================
 # @(#) $RCSfile: mscript_prerm.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:51 $
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
 
-[ ":${subpkg+set}" = ":set" ] || subpkg=
+[ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
-echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+command="$1"
+function=`echo "$command${subpkg:+'_'}${subpkg}_prerm" | tr '-' '_'`
+shift 2
 
-case "$1" in
+echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
+
+case "$command" in
 
     (remove) :
-	if [ ":${3+set}" = ":set" ]
+	if [ ":${3:+'set'}" = ":set" ]
 	then : # conflict-prerm remove in-favour package new-version
-	    eval "conflict_${subpkg}_prerm"
+	    function=`echo "conflict${subpkg:+'_'}${subpkg}_prerm" | tr '-' '_'`
+	    eval "$function \"$@\""
 	else : # remove-prerm remove
-	    eval "remove_${subpkg}_prerm"
+	    eval "$function \"$@\""
 	fi
 	;;
 
     (upgrade) :
 	# old-prerm upgrade new-version
-	eval "upgrade_${subpkg}_prerm"
+	eval "$function \"$@\""
 	;;
 
     (failed-upgrade) :
 	# old-prerm upgrade new-version ... failed
 	# new-prerm failed-upgrade old-version
-	eval "failed_upgrade_${subpkg}_prerm"
+	eval "$function \"$@\""
 	;;
 
     (deconfigure) :
 	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version
-	eval "deconfigure_${subpkg}_prerm"
+	eval "$function \"$@\""
 	;;
 
 esac
