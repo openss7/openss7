@@ -576,8 +576,19 @@ function fileversion(module,			pfx,kversion)
     }
     return kversion
 }
-function getstructure(counts, kernels, modules, subdirs, modnames, names, weakmods, weaklinks, weaknames,
-		      pfx,dirs,dir,paths,path,command,h,l,u,k,file,module,subdir,name,kversion,kversions,cmd)
+#global counts["hard"] = hard counts
+#global counts["link"] = link counts
+#global counts["uniq"] = uniq counts
+#global counts["kern"] = kern counts
+#global modules[file] = kversion
+#global subdirs[file] = subpath
+#global kernels[i] = kversion (rpm sorted)
+#global modnames[kversion,name] = file
+#global names[name] = 1
+#global weakmods[file] = kversion
+#global weaklinks[file] = module
+#global weaknames[kversion,name] = file
+function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,file,module,subdir,name,kversion,kversions,cmd)
 {
     pfx = "r: structure, "
     if ("weakdir" in values)
@@ -700,9 +711,10 @@ function getstructure(counts, kernels, modules, subdirs, modnames, names, weakmo
     }
     return n
 }
+#global sysmaps[kversion,sym] = address
+#global counts["sysmap",kversion] = count
 function readsysmap(kversion, file,
-		    sysmaps, #global
-		    pfx,fmt,n,sym,c,bads,d,maps) # syms, sysmaps
+		    pfx,fmt,n,sym,c,bads,d,maps) # syms
 {
     # read the system map for kernel "kversion"
     pfx = "r: sysmap,    "
@@ -742,8 +754,9 @@ function readsysmap(kversion, file,
     }
     return n
 }
+#global symvers[kversion,sym] = crc
+#global counts["symver",kversion] = count
 function readsymabi(kversion, file,
-		    symvers, #global
 		    pfx,n,command,sym,crc)
 {
     pfx = "r: symabi,    "
@@ -772,13 +785,12 @@ function readsymabi(kversion, file,
 	}
 	close(command)
     } else {
-	print_warns(pfx "no symbol versins for kernel " kversion ", file " file)
+	print_warns(pfx "no symbol versions for kernel " kversion ", file " file)
     }
     print_debug(1, pfx "syms " n)
     return n
 }
 function readsymver(kversion, file,
-		    symvers, #global
 		    pfx,n,command,sym,crc)
 {
     pfx = "r: symver,    "
@@ -813,7 +825,6 @@ function readsymver(kversion, file,
     return n
 }
 function readkernel(kversion,
-		    sysmaps, symvers, #global
 		    pfx,fmt,n,m,s,find,command,module,HEADER,string,char,sym,crc)
 {
     pfx = "r: kernel,    "
@@ -883,14 +894,14 @@ function readkernel(kversion,
     if (m == 0) print_warns(pfx "no kernel  modules for kernel " kversion)
     return n
 }
-function getsysmap(kversion, sysmaps, sysmap,
+function getsysmap(kversion,
 		   pfx,n,file)
 {
     pfx = "r: sysmap,    "
     n = 0
     print_vinfo(2, pfx "version = " kversion)
-    if (kversion in sysmap) {
-	n = sysmap[kversion]
+    if (("sysmap",kversion) in counts) {
+	n = counts["sysmap",kversion]
     } else {
 	file = values["sysmap"]
 	gsub(/\$KVERSION/,kversion,file)
@@ -899,8 +910,8 @@ function getsysmap(kversion, sysmaps, sysmap,
 	    file = values["basedir"] file
 	else
 	    file = values["rootdir"] file
-	n = readsysmap(kversion, file, sysmaps)
-	sysmap[kversion] = n
+	n = readsysmap(kversion, file)
+	counts["sysmap",kversion] = n
     }
     print_vinfo(2, pfx "syms " n)
     return n
@@ -915,14 +926,13 @@ function getsysmap(kversion, sysmaps, sysmap,
 # series is correct.
 #
 function getsysver(kversion,
-		   sysmaps, symvers, symver, #global
 		   pfx,n,file)
 {
     pfx = "r: sysver,    "
     n = 0
     print_vinfo(2, pfx "version = " kversion)
-    if (kversion in symver) {
-	n = symver[kversion]
+    if (("symver",kversion) in counts) {
+	n = counts["symver",kversion]
     } else {
 	if (n == 0 && "sysver" in values) {
 	    file = values["sysver"]
@@ -932,7 +942,7 @@ function getsysver(kversion,
 		file = values["basedir"] file
 	    else
 		file = values["rootdir"] file
-	    n = readsymver(kversion, file, symvers)
+	    n = readsymver(kversion, file)
 	}
 	if (n == 0 && "symver" in values) {
 	    file = values["symver"]
@@ -942,7 +952,7 @@ function getsysver(kversion,
 		file = values["basedir"] file
 	    else
 		file = values["rootdir"] file
-	    n = readsymver(kversion, file, symvers)
+	    n = readsymver(kversion, file)
 	}
 	if (n == 0 && "symabi" in values) {
 	    file = values["symabi"]
@@ -952,31 +962,42 @@ function getsysver(kversion,
 		file = values["basedir"] file
 	    else
 		file = values["rootdir"] file
-	    n = readsymabi(kversion, file, symvers)
+	    n = readsymabi(kversion, file)
 	}
 	if (n == 0) {
-	    n = readkernel(kversion, sysmaps, symvers)
+	    n = readkernel(kversion)
 	}
-	symver[kversion] = n
+	counts["symver",kversion] = n
     }
     print_vinfo(2, pfx "syms " n)
     return n
 }
 function getsysinfo(kversion,
-		    sysmaps, symvers, sysmap, symver, #global
 		    pfx,n,e)
 {
     pfx = "r: sysinfo,   "
     n = 0; e = 0
     print_vmore(3, pfx sprintf("%04d addrs,  %04d expts", n, e))
-    n = getsysmap(kversion, sysmaps, sysmap)
+    n = getsysmap(kversion)
     if (n == 0) { return n }
     print_vmore(3, pfx sprintf("%04d addrs,  %04d expts", n, e))
-    e = getsysver(kversion, sysmaps, symvers, symver)
+    e = getsysver(kversion)
     print_vinfo(2, pfx sprintf("%04d addrs,  %04d expts", n, e))
     if (e == 0) { return e }
     return (n+e)
 }
+#global modinfo[module] = count of module information
+#global export[module,sym] = crc
+#global linked[module,sym] = add
+#global weaken[module,sym] = add
+#global wanted[module,sym] = crc
+#global needed[module,sym] = crc
+#
+#global exportsyms[module] = sym,...
+#global linkedsyms[module] = sym,...
+#global wantedsyms[module] = sym,...
+#global neededsyms[module] = sym,...
+#
 # getmodule()
 # Get the provided and required symbols for a module and other module information.  A check is made
 # to ensure that we have not already acquired the information.  There are four arrays: export
@@ -989,7 +1010,7 @@ function getsysinfo(kversion,
 # link[] - required ripped symbols
 # weak[] - required weak ripped symbols
 #
-function getmodule(module, export, linked, wanted, weaken, needed,
+function getmodule(module,
 		   pfx,fmt,n,h,r,w,l,a,command,have,link,need,want,sym,crc,SECTION,string,char,line)
 {
     pfx = "r: required,  "
@@ -1176,7 +1197,7 @@ function getmodule(module, export, linked, wanted, weaken, needed,
 }
 # getmodinfo()
 # Get the required symbols for each of the modules for a given kernel version.
-function getmodinfo(kversion, modules, subdirs, modnames, names, weakmods, weaknames, weaklinks, modinfo, export, linked, wanted, weaken, needed,
+function getmodinfo(kversion,
 		     pfx,n,w,i,m,name,module,pair,pairs,link)
 {
     pfx = "r: modinfo,   "
@@ -1188,7 +1209,7 @@ function getmodinfo(kversion, modules, subdirs, modnames, names, weakmods, weakn
 		module = modnames[kversion,name]
 		if (module in modinfo)
 		{ i = modinfo[module] } else
-		{ i = getmodule(module, export, linked, wanted, weaken, needed); modinfo[module] = i }
+		{ i = getmodule(module); modinfo[module] = i }
 		n = n + i
 		m++
 		print_vmore(3, pfx sprintf("%04d symbols, %04d modules, %04d weakmods", n, m, w))
@@ -1198,7 +1219,7 @@ function getmodinfo(kversion, modules, subdirs, modnames, names, weakmods, weakn
 		if (module in weaklinks) { module = weaklinks[module] }
 		if (module in modinfo)
 		{ i = modinfo[module] } else
-		{ i = getmodule(module, export, linked, wanted, weaken, needed); modinfo[module] = i }
+		{ i = getmodule(module); modinfo[module] = i }
 		n = n + i
 		w++
 		print_vmore(3, pfx sprintf("%04d symbols, %04d modules, %04d weakmods", n, m, w))
@@ -1236,8 +1257,8 @@ function getmodinfo(kversion, modules, subdirs, modnames, names, weakmods, weakn
     }
     return n
 }
-function getresolve(kversion, kver, sysmaps, symvers, modules, subdirs, modnames, weaknames,
-		    names, export, linked, needed, wanted, weaken, creates, unlinks, changes,
+function getresolve(kversion, kver,
+		    creates, unlinks, changes,
 		    relinks, removes, retains, inserts, unneeded,
 		    pfx,n,ksyms,pair,pairs,ver,name,module,sym,syms,s,add,crc,d,deleted,resolve,relink)
 {
@@ -1523,15 +1544,8 @@ function doit(cmd,
     }
     return system_command(cmd)
 }
-function removefromlist(what, array, place) {
-    if (what == array[place]) { delete array[place]; return 1 }
-    if (sub("^"what",",  "", array[place])) { return 1 }
-    if (sub(","what"$",  "", array[place])) { return 1 }
-    if (sub(","what",", ",", array[place])) { return 1 }
-    return 0
-}
+#global mkdirs[directory] = 1
 function createlinks(kversion, kver, name,
-		     modnames, weaknames, weaklinks, weakmods, subdirs, dirs, #global
 		     pfx,module,file,files,n,j)
 {
     pfx = "w: create,    "
@@ -1545,10 +1559,10 @@ function createlinks(kversion, kver, name,
 	gsub(/\$KVERSION/,kversion,file)
 	gsub(/\$PACKAGE/,values["package"],file)
 	file = file "/" subdirs[module]
-	if (!(file in dirs)) {
+	if (!(file in mkdirs)) {
 	    if (system_command("test -d " file) != 0)
 		doit("mkdir -p " file)
-	    dirs[file] = 1
+	    mkdirs[file] = 1
 	}
 	file = file "/" name
 	print_action("adding", module, " to ", kversion)
@@ -1565,7 +1579,6 @@ function createlinks(kversion, kver, name,
     }
 }
 function removelinks(kversion, name,
-		     weaknames, weaklinks, weakmods, #global
 		     pfx,file,module,files,j)
 {
     pfx = "w: unlink,    "
@@ -1587,7 +1600,6 @@ function removelinks(kversion, name,
     }
 }
 function changelinks(kversion, kver, name,
-		     modnames, weaknames, weaklinks, #global
 		     pfx,module,file)
 {
     pfx = "w: change,    "
@@ -1611,10 +1623,10 @@ function changelinks(kversion, kver, name,
     }
 }
 function relinklinks(kversion, kver, name,
-		     modnames, weaknames, weaklinks, #global
-		     pfx,module,file)
+		     pfx,n,m,module,file,syms,s,sym,add,old)
 {
     pfx = "w: relink,    "
+    n = 0; m = 0
     if ((kver,name) in modnames) {
 	module = modnames[kver,name]
 	if ((kversion,name) in weaknames) {
@@ -1740,8 +1752,8 @@ function modinfomatches(module1, module2,		result)
     if (!modinfomatch(module1, module2, "author"     )) { return 0 }
     return 1
 }
-function chcksolution(kversion, kver, creates, unlinks, changes, relinks, removes, retains, inserts, unneeded,
-		      modules, subdirs, modnames, weakmods, weaklinks, weaknames, #global
+function chcksolution(kversion, kver,
+		      creates, unlinks, changes, relinks, removes, retains, inserts, unneeded,
 		      pfx,fmt,loaded,n,labels,i,name,created,removed,changed,altered)
 {
     pfx = "w: checking,  "
@@ -1840,9 +1852,9 @@ function chcksolution(kversion, kver, creates, unlinks, changes, relinks, remove
     }
     return 1
 }
-function makesolution(kversion, kver, creates, unlinks, changes, relinks, removes, retains, inserts,
-		      modules, subdirs, modnames, weakmods, weaklinks, weaknames, #global
-		      pfx,fmt,c,r,a,l,labels,i,name,dirs,pair,pairs)
+function makesolution(kversion, kver,
+		      creates, unlinks, changes, relinks, removes, retains, inserts,
+		      pfx,fmt,c,r,a,l,labels,i,name,pair,pairs)
 {
     pfx = "w: solution,  "
     fmt = pfx "sym links: %04d created, %04d removed, %04d changed, %04d relinked"
@@ -1856,8 +1868,7 @@ function makesolution(kversion, kver, creates, unlinks, changes, relinks, remove
     if (kver && kver in creates) {
 	if (split(creates[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
-		createlinks(kversion, kver, name, modnames, weaknames, weaklinks, weakmods, subdirs,
-			    dirs)
+		createlinks(kversion, kver, name)
 		c++
 		print_vmore(3, sprintf(fmt, c, r, a, l))
 	    }
@@ -1868,7 +1879,7 @@ function makesolution(kversion, kver, creates, unlinks, changes, relinks, remove
     if (kver && kver in unlinks) {
 	if (split(unlinks[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
-		removelinks(kversion, name, weaknames, weaklinks, weakmods)
+		removelinks(kversion, name)
 		r++
 		print_vmore(3, sprintf(fmt, c, r, a, l))
 	    }
@@ -1879,7 +1890,7 @@ function makesolution(kversion, kver, creates, unlinks, changes, relinks, remove
     if (kver && kver in changes) {
 	if (split(changes[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
-		changelinks(kversion, kver, name, modnames, weaknames, weaklinks)
+		changelinks(kversion, kver, name)
 		a++
 		print_vmore(3, sprintf(fmt, c, r, a, l))
 	    }
@@ -1888,9 +1899,9 @@ function makesolution(kversion, kver, creates, unlinks, changes, relinks, remove
     print_vmore(2, sprintf(fmt, c, r, a, l))
     # relink modules
     if (kver && kver in relinks) {
-	if (split(changes[kver],labels,/,/)) {
+	if (split(relinks[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
-		relinklinks(kversion, kver, name, modnames, weaknames, weaklinks)
+		relinklinks(kversion, kver, name)
 		l++
 		print_vmore(3, sprintf(fmt, c, r, a, l))
 	    }
@@ -1905,14 +1916,14 @@ function makesolution(kversion, kver, creates, unlinks, changes, relinks, remove
 	if (kver && kver in creates && ","creates[kver]"," ~ ","name",") continue
 	if (kver && kver in unlinks && ","unlinks[kver]"," ~ ","name",") continue
 	if (kver && kver in changes && ","changes[kver]"," ~ ","name",") continue
-	removelinks(kversion, name, weaknames, weaklinks, weakmods)
+	removelinks(kversion, name)
 	r++
 	print_vmore(3, sprintf(fmt, c, r, a, l))
     }
     print_vinfo(2, sprintf(fmt, c, r, a, l))
     return (c+r+a)
 }
-function modlink(kversion,sysmaps, symvers, subdirs, modnames, names, weaknames, weaklinks, linked, wanted, weaken, reloads,
+function modlink(kversion, reloads,
 		  pfx,n,m,name,module,sym,syms,s,add,crc,old)
 {
     pfx = "w: modlink,   "
@@ -2051,7 +2062,7 @@ function modload(kversion, symbols, weakmod, module,
     }
     system_command("rm -f -- " script)
 }
-function testdepmod(			pfx,command,result)
+function testdepmod(		pfx,command,result)
 {
     pfx = "t: depmod,    "
     if (!("depmodx" in values)) {
@@ -2068,7 +2079,7 @@ function testdepmod(			pfx,command,result)
 	}
     }
 }
-function testwstyle(			pfx,command,result)
+function testwstyle(		pfx,command,result)
 {
     pfx = "t: wstyle,    "
     if (!("style" in values) || !values["style"]) {
@@ -2103,7 +2114,8 @@ function testwstyle(			pfx,command,result)
 	exit 2
     }
 }
-function dodepmod(kversion,		command,file) {
+function dodepmod(kversion,
+		  command,file) {
     command = "/sbin/depmod -a"
     if (values["basedir"]) {
 	command = command " -b " values["basedir"]
@@ -2133,7 +2145,8 @@ function dodepmod(kversion,		command,file) {
     command = command " " kversion
     doit(command)
 }
-function remove_kernel(kversion,	pfx,dir)
+function remove_kernel(kversion,
+		       pfx,dir)
 {
     pfx = "p: rmvkernel, "
     print_debug(1, pfx "kversion = " kversion)
@@ -2146,18 +2159,14 @@ function remove_kernel(kversion,	pfx,dir)
     doit("rm -fr -- " dir)
 }
 function link_kernel(kversion,
-		     counts, kernels, #global
-		     sysmaps, sysmap, symvers, symver, #global
-		     modules, subdirs, modnames, names, modinfo, export, linked, wanted, weaken, needed, #global
-		     weakmods, weaklinks, weaknames, #global
 		     pfx,n,name,weakmod,module,reloads)
 {
     pfx = "p: lnkkernel, "
     print_debug(1, pfx "kversion = " kversion)
-    if (getsysinfo(kversion, sysmaps, symvers, sysmap, symver) == 0)
+    if (getsysinfo(kversion) == 0)
 	return
-    getmodinfo(kversion, modules, subdirs, modnames, names, weakmods, weaknames, weaklinks, modinfo, export, linked, wanted, weaken, needed)
-    modlink(kversion, sysmaps, symvers, subdirs, modnames, names, weaknames, weaklinks, linked, wanted, weaken, reloads)
+    getmodinfo(kversion)
+    modlink(kversion, reloads)
     n = 0
     print_vmore(3,pfx "relinking...")
     for (name in names) {
@@ -2179,22 +2188,18 @@ function link_kernel(kversion,
 # previous kernels and relink any absolute kernel addresses.
 #
 function add_kernel(kversion,
-		    counts, kernels, #global
-		    sysmaps, sysmap, symvers, symver, #global
-		    modules, subdirs, modnames, names, modinfo, export, linked, wanted, weaken, needed, #global
-		    weakmods, weaklinks, weaknames, #global
 		    pfx,solution,score,s,k,kver,retn,creates,unlinks,changes,relinks,removes,retains,inserts,unneeded,command,file)
 {
     pfx = "p: addkernel, "
-    if (getsysinfo(kversion, sysmaps, symvers, sysmap, symver) == 0)
+    if (getsysinfo(kversion) == 0)
 	return
-    getmodinfo(kversion, modules, subdirs, modnames, names, weakmods, weaknames, weaklinks, modinfo, export, linked, wanted, weaken, needed)
+    getmodinfo(kversion)
     solution = ""; score = counts["uniq"]; s = 0
     print_vmore(3, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
     for (k=counts["kern"];k>0;k--) { kver = kernels[k]
-	getmodinfo(kver, modules, subdirs, modnames, names, weakmods, weaknames, weaklinks, modinfo, export, linked, wanted, weaken, needed)
-	retn = getresolve(kversion, kver, sysmaps, symvers, modules, subdirs, modnames, weaknames,
-			  names, export, linked, needed, wanted, weaken, creates, unlinks, changes,
+	getmodinfo(kver)
+	retn = getresolve(kversion, kver,
+			  creates, unlinks, changes,
 			  relinks, removes, retains, inserts, unneeded)
 	s++
 	print_vmore(3, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
@@ -2203,9 +2208,9 @@ function add_kernel(kversion,
     }
     print_vinfo(2, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
     if (chcksolution(kversion, kver, creates, unlinks, changes, relinks, removes, retains, inserts,
-		     unneeded, modules, subdirs, modnames, weakmods, weaklinks, weaknames)) {
+		     unneeded)) {
 	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, removes, retains,
-			 inserts, modules, subdirs, modnames, weakmods, weaklinks, weaknames)) {
+			 inserts)) {
 	    dodepmod(kversion)
 	}
     }
@@ -2219,46 +2224,26 @@ function remove_kernels(kversion,	pfx,kversions,v,dir)
     }
 }
 function link_kernels(kversion,
-		     pfx,kversions,v,
-		     counts,kernels, #global
-		     sysmaps,sysmap,symvers,symver, #global
-		     modules,subdirs,modnames,names,modinfo,export,linked,wanted,weaken,needed, #global
-		     weakmods,weaklinks,weaknames) #global
+		     pfx,kversions,v)
 {
     pfx = "p: lnkkerns,  "
     print_vinfo(2, pfx "kversions = " kversion)
-    getstructure(counts, kernels, modules, subdirs, modnames, names, weakmods, weaklinks, weaknames)
+    getstructure()
     v = split(kversion,kversions); rpmsort(kversions,v)
     for (;v in kversions;v--) {
-	link_kernel(kversions[v],
-		    counts, kernels, #global
-		    sysmaps, sysmap, symvers, symver, #global
-		    modules, subdirs, modnames, names, modinfo, export, linked, wanted, weaken, needed, #global
-		    weakmods, weaklinks, weaknames) #global
+	link_kernel(kversions[v])
     }
 }
 function add_kernels(kversion,
-		     pfx,kversions,v,olddry,
-		     counts,kernels, #global
-		     sysmaps,sysmap,symvers,symver, #global
-		     modules,subdirs,modnames,names,modinfo,export,linked,wanted,weaken,needed, #global
-		     weakmods,weaklinks,weaknames) #global
+		     pfx,kversions,v,olddry)
 {
     pfx = "p: addkerns,  "
     print_debug(1, pfx "kversions = " kversion)
-    getstructure(counts, kernels, modules, subdirs, modnames, names, weakmods, weaklinks, weaknames)
+    getstructure()
     v = split(kversion,kversions); rpmsort(kversions,v)
     for (;v in kversions;v--) {
-	add_kernel(kversions[v],
-		   counts, kernels, #global
-		   sysmaps, sysmap, symvers, symver, #global
-		   modules, subdirs, modnames, names, modinfo, export, linked, wanted, weaken, needed, #global
-		   weakmods, weaklinks, weaknames) #global
-	link_kernel(kversions[v],
-		    counts, kernels, #global
-		    sysmaps, sysmap, symvers, symver, #global
-		    modules, subdirs, modnames, names, modinfo, export, linked, wanted, weaken, needed, #global
-		    weakmods, weaklinks, weaknames) #global
+	add_kernel(kversions[v])
+	link_kernel(kversions[v])
     }
 }
 function update_kernels(kversion,
