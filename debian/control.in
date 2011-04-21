@@ -45,13 +45,13 @@ Description: virtual base package.
    -- binary application and library debug info.
  - @PACKAGE_LCNAME@-debugsource
    -- binary application and library debug source.
- - @PACKAGE_LCNAME@-kernel
+ - @PACKAGE_LCNAME@-@kversion@
    -- kernel modules.
- - @PACKAGE_LCNAME@-kernel-debuginfo
+ - @PACKAGE_LCNAME@-@kversion@-debuginfo
    -- kernel module debug info.
- - @PACKAGE_LCNAME@-kernel-debugsource
+ - @PACKAGE_LCNAME@-@kversion@-debugsource
    -- kernel module debug source.
- - @PACKAGE_LCNAME@-kernel-source
+ - @PACKAGE_LCNAME@-@kversion@-source
    -- configured source.
  - @PACKAGE_LCNAME@-java
    -- JAIN java modules, JNI/CNI libraries, and native Java modules.
@@ -173,13 +173,13 @@ Description: user library and program debugging source.
  information is useful when developing applications that use this
  package or when debugging this package.
 
-Package: @PACKAGE_LCNAME@-kernel
+Package: @PACKAGE_LCNAME@-@kversion@
 Architecture: any
 Section: kernel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-kernel, @PACKAGE_LCNAME@-@kversion@
 Description: kernel modules compiled for @kversion@.
- The @PACKAGE_LCNAME@-kernel binary package the kernel modules that
+ The @PACKAGE_LCNAME@-@kversion@ binary package the kernel modules that
  provide the Linux kernel @PACKAGE_SHORTTITLE@ drivers and modules.
  This includes assorted drivers and modules for STREAMS and additional
  @PACKAGE_TITLE@ protocol suite components.  This binary package also
@@ -190,56 +190,57 @@ Description: kernel modules compiled for @kversion@.
  kernel.  If you cannot find a binary package that matches your kernel,
  rebuild for your kernel from the @PACKAGE_LCNAME@ package source DSC.
 
-Package: @PACKAGE_LCNAME@-kernel-devel
+Package: @PACKAGE_LCNAME@-@kversion@-devel
 Architecture: any
 Section: devel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-kernel-devel, @PACKAGE_LCNAME@-devel-@kversion@
 Description: kernel module development support for @kversion@.
- The @PACKAGE_LCNAME@-kernel-devel binary package contains the kernel
- modules symbol information for development of additional STREAMS kernel
- modules against the core kernel modules included in the @kversion@
- binary package.  This package is weakly tied to the core kernel moduels
- and kernel for which it was compiled.  This package applies to core
- kernel modules @kversion@ for kernel version @kversion@.
+ The @PACKAGE_LCNAME@-@kversion@-devel binary package contains the
+ kernel modules symbol information for development of additional STREAMS
+ kernel modules against the core kernel modules included in the
+ @kversion@ binary package.  This package is weakly tied to the core
+ kernel moduels and kernel for which it was compiled.  This package
+ applies to core kernel modules @kversion@ for kernel version
+ @kversion@.
 
-Package: @PACKAGE_LCNAME@-kernel-debuginfo
+Package: @PACKAGE_LCNAME@-@kversion@-debuginfo
 Architecture: any
 Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-debuginfo, @PACKAGE_LCNAME@-debuginfo-@kversion@
 Description: kernel module debugging information for @kversion@.
- The @PACKAGE_LCNAME@-kernel-debuginfo binary package contains debugging
- symbols for kernel modules.  This package provides debug information
- for package @PACKAGE_LCNAME@-kernel.  Debug information is useful when
- developing kernel modules that use this package or when debugging this
- package.
+ The @PACKAGE_LCNAME@-@kversion@-debuginfo binary package contains
+ debugging symbols for kernel modules.  This package provides debug
+ information for package @PACKAGE_LCNAME@-@kversion@.  Debug information
+ is useful when developing kernel modules that use this package or when
+ debugging this package.
 
-Package: @PACKAGE_LCNAME@-kernel-debugsource
+Package: @PACKAGE_LCNAME@-@kversion@-debugsource
 Architecture: any
 Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-debugsource, @PACKAGE_LCNAME@-debugsource-@kversion@
 Description: kernel module debugging source for @kversion@.
- The @PACKAGE_LCNAME@-kernel-debugsource binary package contains source
- code for debugging kernel modules.  This package provides debug
- information for package @PACKAGE_LCNAME@-kernel.  Debug Information is
- useful when developing kernel modules that use this package or when
+ The @PACKAGE_LCNAME@-@kversion@-debugsource binary package contains
+ source code for debugging kernel modules.  This package provides debug
+ information for package @PACKAGE_LCNAME@-@kversion@.  Debug Information
+ is useful when developing kernel modules that use this package or when
  debugging this package.
 
-Package: @PACKAGE_LCNAME@-kernel-source
+Package: @PACKAGE_LCNAME@-@kversion@-source
 Architecture: any
 Section: devel
 Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-source, @PACKAGE_LCNAME@-source-@kversion@
 Description: configured kernel source for @kversion@.
- The @PACKAGE_LCNAME@-kernel-source binary package contains the source
- code necessary for building the @PACKAGE_LCNAME@ release for the kernel
- version @kversion@.  It also includes the autoconf configuration
+ The @PACKAGE_LCNAME@-@kversion@-source binary package contains the
+ source code necessary for building the @PACKAGE_LCNAME@ release for the
+ kernel version @kversion@.  It also includes the autoconf configuration
  utilities necessary to create and distribute this deb.  However, to
  develop on the package, it would be better to use the tarball release.
  Load this package if you need some files from the build that are not
- present in the @PACKAGE_LCNAME@-kernel-devel package.
+ present in the @PACKAGE_LCNAME@-@kversion@-devel package.
 
 Package: @PACKAGE_LCNAME@-java
 Architecture: any

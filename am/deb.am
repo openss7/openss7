@@ -115,7 +115,7 @@ UPDATE_DIRECTORIES	+= $(debdir)
 # subdirectories for a master build.  These options will contain the passed down options from the
 # environment in that case.  See the recursive build targets below.
 ##
-AM_DEBXOPTS	= -D
+AM_DEBXOPTS	= -d
 
 #!
 #! Debian Build Targets:
@@ -148,7 +148,7 @@ $(debian_dir_stamp): $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 ##
 $(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
 	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
-	( cd $(debian_dir); DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(AM_DEBXOPTS) )
+	( cd $(debian_dir); DH_COMPAT=8 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(AM_DEBXOPTS) )
 #	(cd "$(debbuilddir)"; $(DPKG_SOURCE) -b -sn $(debian_dir))
 
 $(debtop_dsc_file) $(debtop_tar_file)::
@@ -201,8 +201,8 @@ AM_BINARY_TARGET = binary-arch
 each-deb: $(debian_dir_stamp)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
-	( cd $(debian_dir); DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
-#	( cd $(debian_dir); dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
+	( cd $(debian_dir); DH_COMPAT=8 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
+#	( cd $(debian_dir); dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=8 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
 
 noa-deb: AM_DEBBOPTS = -A
 noa-deb: AM_DEBXOPTS = -d
