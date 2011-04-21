@@ -561,6 +561,92 @@ symbolic links but also relinks kernel modules that need absolute
 symbols.
 
 
+RHEL/CentOS:
+------------
+
+RHEL/CentOS names its kernels kernel-2.6.M-ABI[.REL.REV].DIST, where:
+
+ M	  = upstream kernel minor version number (which never changes
+	    for DIST)
+ ABI	  = ABI (which should never change for DIST)
+ REL	  = major patch level
+ REV	  = minor patch level
+ DIST	  = distribution (.e.g. el5)
+
+RHEL/CentOS uname -r returns 2.6.M-ABI[.REL.REV].DIST as well.
+
+Fedora:
+-------
+
+Fedora names its kernels kernel-2.6.M-ABI.REV[_.]DIST, where:
+
+ M	  = upstream kernel minor version number
+ ABI	  = ABI
+ REV	  = revision which is monotonically increasing regardless of
+	    M-ABI or DIST.
+ DIST	  = distribution (e.g. FC5, f13)
+
+Debian:
+-------
+
+Debian names its kernels linux-image-2.6.M.REL-ABI[-FEATURES]-FLAVOR,
+where:
+
+ M.REL	  = upstream kernel minor version numbers (the .REL component is
+	    not normally used).
+ ABI	  = ABI for M.REL
+ FEATURES = special features of kernel (e.g. xen, pae) (SUSE calls this
+	    flavor)
+ FLAVOR	  = architecture (e.g. 686)
+
+However, these kernel packages are versioned 2.6.M.REL-REV, where
+ M.REL	  = upstream kernel minor version numbers (the .REL component is
+	    not normally used).
+ REV	  = revision of the same M.REL
+
+So, Debian does not include the ABI number in the release string.
+
+On Debian, uname -r will return 2.6.M.REL-ABI[-FEATURES]-FLAVOR.
+
+This is important because when kernels are updated that do not change
+the kernel ABI, they will use the same /lib/modules/2.6.M.REL-
+ABI[-FEATURES]-FLAVOR subdirectory and kernel modules will be
+overwritten.  Note also that the /boot/abi-2.6.M.REL-ABI[-FEATURES]-
+FLAVOR file will always contain the same symbol versions.
+
+Ubuntu:
+-------
+
+Ubuntu names it kernels linux-image-2.6.M.REL-ABI[-FEATURES]-FLAVOR in
+the same manner as Debian, so:
+
+ M.REL	  = upstream kernel minor version numbers (the .REL component is
+	    not normally used).
+ ABI	  = ABI for M.REL
+ FEATURES = special features of kernel (e.g. xen, pae) (SUSE calls this
+	    flavor)
+ FLAVOR	  = architecture (e.g. 686)
+
+However, Ubuntu versions its kernels 2.6.M.REL-ABI.REV, where:
+
+ M.REL	  = upstream kernel minor version numbers (the .REL component is
+	    not normally used).
+ ABI	  = ABI for M.REL
+ REV	  = revision of the same M.REL-ABI,
+	    new ABI causes REV to bump
+	    new M.REL causes REV to reset to one
+
+So, Ubuntu includes the ABI number in the release string.
+
+On Ubuntu, uname -r will return 2.6.M.REL-ABI[-FEATURES]-FLAVOR, just as
+Debian.
+
+This is important because when kernels are updated that do not change
+the kernel ABI, they will use the same /lib/modules/2.6.M.REL-
+ABI[-FEATURES]-FLAVOR subdirectory and kernel modules will be
+overwritten.  Note also that the /boot/abi-2.6.M.REL-ABI[-FEATURES]-
+FLAVOR file will always contain the same symbol versions.
+
 
 -----
 
