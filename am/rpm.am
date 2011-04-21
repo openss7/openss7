@@ -58,6 +58,7 @@
 ##
 
 if MAINTAINER_MODE
+## MAINTAINER_MODE
 
 ##
 ## For better speed when building package binaries, we skip these rules to invoke package building.
@@ -445,6 +446,10 @@ resign: sign
 		$(ECHO) "D: $@: no sigs"; \
 	fi
 
+if BUILD_DPKG
+else
+## !BUILD_DPKG
+
 if BUILD_SRPMS
 ## BUILD_SRPMS
 
@@ -463,6 +468,9 @@ endif
 ## BUILD_SRPMS
 endif
 
+## !BUILD_DPKG
+endif
+
 ##
 # Because the build directory is in the autoconf top build directory on the local machine, it needs
 # to be cleaned when a distclean is performed.  We use rpm to do this for us, and rpm will complain
@@ -476,8 +484,15 @@ distclean-rpm:
 		$(RPMBUILD) $(SRPMFLAGS) --clean $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :; \
 	fi
 
+if BUILD_DPKG
+else
+## !BUILD_DPKG
+
 if BUILD_SRPMS
 DISTCLEAN_LOCAL		+= distclean-rpm
+endif
+
+## !BUILD_DPKG
 endif
 
 DISTCLEANFILES		+= $(rpm_cache_files) \
@@ -496,8 +511,15 @@ release-clean-rpm: distclean-rpm
 		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :; \
 	fi
 
+if BUILD_DPKG
+else
+## !BUILD_DPKG
+
 if BUILD_SRPMS
 RELEASE_CLEAN_LOCAL	+= release-clean-rpm
+endif
+
+## !BUILD_DPKG
 endif
 
 RELEASECLEANFILES	+= $(rpm_dir_stamp) \
@@ -543,14 +565,25 @@ update-clean-rpm:
 	done
 
 if BUILD_SRPMS
+## BUILD_SRPMS
+
 UPDATE			+= all-update-srpm
+
 if BUILD_RPMS
+## BUILD_RPMS
+
 UPDATE			+= update-all-rpms
+
+## BUILD_RPMS
 endif
+
 UPDATE_SIGN		+= all-update-sign-srpm all-update-sign-rpms
 UPDATE_DIRECTORIES	+=
 UPDATE_CLEAN_LOCAL	+= update-clean-rpm
+
+## BUILD_SRPMS
 endif
+
 UPDATECLEANFILES	+= $(rpm_dir_stamp)
 ##
 ## Provide updates to srpm packages.
@@ -815,10 +848,15 @@ update-sign-rpms:
 MY_PHONY		+= update-srpm update-rpms update-sign-srpm update-sign-rpms
 ALL_RECURSIVE_TARGETS	+= all-update-srpm all-update-rpms all-update-sign-srpm all-update-sign-rpms
 
+if BUILD_DPKG
+else
+## !BUILD_DPKG
 
 if BUILD_RPMS
+## BUILD_RPMS
 
 if BUILD_REPO_YUM
+## BUILD_REPO_YUM
 
 ##
 ## The following builds repomd repositories.
@@ -1307,10 +1345,11 @@ UPDATE_SIGN		+= repo-sign-yum
 UPDATE_CLEAN_LOCAL	+= repo-clean-yum
 UPDATECLEANFILES	+=
 
-endif
 ## BUILD_REPO_YUM
+endif
 
 if BUILD_REPO_YAST
+## BUILD_REPO_YAST
 
 ##
 ## The following builds yast repositories.
@@ -1421,8 +1460,8 @@ UPDATE_SIGN		+= repo-sign-yast
 UPDATE_CLEAN_LOCAL	+= repo-yast repo-sign-yast
 UPDATECLEANFILES	+=
 
-endif
 ## BUILD_REPO_YAST
+endif
 
 ##
 ## RIS Build Targets:
@@ -1478,11 +1517,14 @@ UPDATE_SIGN		+= repo-sign-ris
 UPDATE_CLEAN_LOCAL	+= repo-clean-ris
 UPDATECLEANFILES	+= 
 
-endif
 ## BUILD_RPMS
-
 endif
+
+## !BUILD_DPKG
+endif
+
 ## MAINTAINER_MODE
+endif
 
 EXTRA_DIST		+= $(PACKAGE_TARNAME).spec \
 			   $(PACKAGE_TARNAME).gif \

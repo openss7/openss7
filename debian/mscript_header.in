@@ -6,23 +6,17 @@
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
-
 set -e
-
 tmppath=/var/tmp
-
 base=@PACKAGE_LCNAME@
 name=@PACKAGE_LCNAME@
-
 rootdir="@rootdir@"
 kversion="@kversion@"
 krelease="@krelease@"
 kmoduledir="@kmoduledir@"
-
 kmajor="@kmajor@"
 kminor="@kminor@"
 kpatch="@kpatch@"
-
 prefix="@prefix@"
 exec_prefix="@exec_prefix@"
 bindir="@bindir@"
@@ -37,7 +31,6 @@ sharedstatedir="@sharedstatedir@"
 mandir="@mandir@"
 infodir="@infodir@"
 oldincludedir="@oldincludedir@"
-
 datarootdir="@datarootdir@"
 docdir="@docdir@"
 htmldir="@htmldir@"
@@ -45,16 +38,13 @@ dvidir="@dvidir@"
 pdfdir="@pdfdir@"
 psdir="@psdir@"
 localedir="@localedir@"
-
 configdir="@configdir@"
 initrddir="@initrddir@"
 modutildir="@modutildir@"
-
 pkgdatadir="@datadir@/@PACKAGE@"
 pkglibdir="@libdir@/@PACKAGE@"
 pkgincludedir="@includedir@/@PACKAGE@"
 pkglibexecdir="@libexecdir@/@PACKAGE@"
-
 KERNEL_MODCONF=@STRCONF_CONFMOD@
 KERNEL_MODULES="specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat"
 KERNEL_PRELOADS="specfs streams streams-sth streams-clone"
@@ -64,10 +54,8 @@ kmodext=@PACKAGE_LCNAME@
 ksubdir=@PACKAGE_LCNAME@
 @WITH_KO_MODULES_TRUE@kpre='streams_';
 @WITH_KO_MODULES_FALSE@kpre='streams-';
-
 STRCONF_CONFMOD=@STRCONF_CONFMOD@
 STRCONF_MAJBASE=@STRCONF_MAJBASE@
-
 modules=`echo " ${KERNEL_MODULES} " | sed -r -e 's| [^[:space:]]*/| |g;s| streams-| '$kpre'|g;s| lib[^[:space:]]*_a-| '$kpre'|g;s|\.(k)?o(\.gz|\.bz2)? | |g'`
 preloads=`echo " ${KERNEL_PRELOADS} " | sed -r -e 's| [^[:space:]]*/| |g;s| streams-| '$kpre'|g;s| lib[^[:space:]]*_a-| '$kpre'|g;s|\.(k)?o(\.gz|\.bz2)? | |g'`
 libraries="streams"
@@ -78,15 +66,11 @@ conffiles=
 mibfiles=
 snmpmods=
 nonrpminit="strms_up strms_dn"
-
 mknods="/usr/sbin/@STRCONF_DEVICES@"
 rmnods="/usr/sbin/@STRCONF_DEVICES@ --remove"
-
 manrefs=$base.refs
 manmacros=$base.macros
-
 target_cpu="@target_cpu@"
-
 # @configure_input@
 # =============================================================================
 # vim: ft=sh sw=4 noet
