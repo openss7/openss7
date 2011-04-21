@@ -358,18 +358,26 @@ debian/@PACKAGE@-debugsource.install:
 ## Kernel module package:
 ##
 
-control		+= debian/@PACKAGE@-kernel.postinst \
-		   debian/@PACKAGE@-kernel.postrm \
-		   debian/@PACKAGE@-kernel.preinst \
-		   debian/@PACKAGE@-kernel.prerm \
-		   debian/@PACKAGE@-kernel.triggers
+control		+= debian/@PACKAGE@-$(kversion).postinst \
+		   debian/@PACKAGE@-$(kversion).postrm \
+		   debian/@PACKAGE@-$(kversion).preinst \
+		   debian/@PACKAGE@-$(kversion).prerm \
+		   debian/@PACKAGE@-$(kversion).triggers
 
-control		+= debian/@PACKAGE@-kernel.install
+debian/@PACKAGE@-$(kversion).postinst \
+debian/@PACKAGE@-$(kversion).postrm \
+debian/@PACKAGE@-$(kversion).preinst \
+debian/@PACKAGE@-$(kversion).prerm \
+debian/@PACKAGE@-$(kversion).triggers: \
+debian/@PACKAGE@-$(kversion).%: debian/@PACKAGE@-kernel.%
+	cp -fv $< $@
+
+control		+= debian/@PACKAGE@-$(kversion).install
 
 kmoduledir	= @kmoduledir@
 ksubdir		= @ksubdir@
 
-@WITH_KO_MODULES_TRUE@debian/@PACKAGE@-kernel.install:
+@WITH_KO_MODULES_TRUE@debian/@PACKAGE@-$(kversion).install:
 @WITH_KO_MODULES_TRUE@	( [ ! d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.ko' ; \
 @WITH_KO_MODULES_TRUE@	  [ ! d $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers ] || \
 @WITH_KO_MODULES_TRUE@	  echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers' ; \
@@ -377,7 +385,7 @@ ksubdir		= @ksubdir@
 @WITH_KO_MODULES_TRUE@	  echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.symvers' ; \
 @WITH_KO_MODULES_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
-@WITH_KO_MODULES_FALSE@debian/@PACKAGE@-kernel.install:
+@WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion).install:
 @WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(kmoduledir) ] || echo '$(debtmpdir)$(kmoduledir)/modules.@PACKAGE@' ; \
 @WITH_KO_MODULES_FALSE@	  [ ! -d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.o' ; \
 @WITH_KO_MODULES_FALSE@	) $(am__debian_install_format) | sort -u > $@
@@ -386,15 +394,23 @@ ksubdir		= @ksubdir@
 ## Kernel development package:
 ##
 
-control		+= debian/@PACKAGE@-kernel-devel.postinst \
-		   debian/@PACKAGE@-kernel-devel.postrm \
-		   debian/@PACKAGE@-kernel-devel.preinst \
-		   debian/@PACKAGE@-kernel-devel.prerm \
-		   debian/@PACKAGE@-kernel-devel.triggers
+control		+= debian/@PACKAGE@-$(kversion)-devel.postinst \
+		   debian/@PACKAGE@-$(kversion)-devel.postrm \
+		   debian/@PACKAGE@-$(kversion)-devel.preinst \
+		   debian/@PACKAGE@-$(kversion)-devel.prerm \
+		   debian/@PACKAGE@-$(kversion)-devel.triggers
 
-control		+= debian/@PACKAGE@-kernel-devel.install
+debian/@PACKAGE@-$(kversion)-devel.postinst \
+debian/@PACKAGE@-$(kversion)-devel.postrm \
+debian/@PACKAGE@-$(kversion)-devel.preinst \
+debian/@PACKAGE@-$(kversion)-devel.prerm \
+debian/@PACKAGE@-$(kversion)-devel.triggers: \
+debian/@PACKAGE@-$(kversion)-devel.%: debian/@PACKAGE@-kernel-devel.%
+	cp -fv $< $@
 
-@WITH_KO_MODULES_TRUE@debian/@PACKAGE@-kernel-devel.install:
+control		+= debian/@PACKAGE@-$(kversion)-devel.install
+
+@WITH_KO_MODULES_TRUE@debian/@PACKAGE@-$(kversion)-devel.install:
 @WITH_KO_MODULES_TRUE@	( [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ] || \
 @WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ; \
 @WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache' ] || \
@@ -414,7 +430,7 @@ control		+= debian/@PACKAGE@-kernel-devel.install
 @WITH_KO_MODULES_TRUE@	  [ ! -d '$(debtmpdir)/boot' ] || echo '$(debtmpdir)/boot/*' ; \
 @WITH_KO_MODULES_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
-@WITH_KO_MODULES_FALSE@debian/@PACKAGE@-kernel-devel.install:
+@WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion)-devel.install:
 @WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(pkgincludedir)/$(kversion) ] || echo '$(debtmpdir)$(pkgincludedir)/$(kversion)/*' ; \
 @WITH_KO_MODULES_FALSE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ] || \
 @WITH_KO_MODULES_FALSE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ; \
@@ -428,18 +444,25 @@ control		+= debian/@PACKAGE@-kernel-devel.install
 ## Kernel debugging information package:
 ##
 
-control		+= debian/@PACKAGE@-kernel-debuginfo.postinst \
-		   debian/@PACKAGE@-kernel-debuginfo.postrm \
-		   debian/@PACKAGE@-kernel-debuginfo.preinst \
-		   debian/@PACKAGE@-kernel-debuginfo.prerm
+control		+= debian/@PACKAGE@-$(kversion)-debuginfo.postinst \
+		   debian/@PACKAGE@-$(kversion)-debuginfo.postrm \
+		   debian/@PACKAGE@-$(kversion)-debuginfo.preinst \
+		   debian/@PACKAGE@-$(kversion)-debuginfo.prerm
 
-control		+= debian/@PACKAGE@-kernel-debuginfo.postinst
+debian/@PACKAGE@-$(kversion)-debuginfo.postinst \
+debian/@PACKAGE@-$(kversion)-debuginfo.postrm \
+debian/@PACKAGE@-$(kversion)-debuginfo.preinst \
+debian/@PACKAGE@-$(kversion)-debuginfo.prerm: \
+debian/@PACKAGE@-$(kversion)-debuginfo.%: debian/@PACKAGE@-kernel-debuginfo.%
+	cp -fv $< $@
 
-@WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-kernel-debuginfo.install:
+control		+= debian/@PACKAGE@-$(kversion)-debuginfo.postinst
+
+@WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-$(kversion)-debuginfo.install:
 @WITH_32BIT_LIBS_TRUE@	( [ ! -d $(debtmpdir)$(lib32dir)/debug ] || echo '$(debtmpdir)$(lib32dir)/debug/*' ; \
 @WITH_32BIT_LIBS_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
-@WITH_32BIT_LIBS_FALSE@debian/@PACKAGE@-kernel-debuginfo.install:
+@WITH_32BIT_LIBS_FALSE@debian/@PACKAGE@-$(kversion)-debuginfo.install:
 @WITH_32BIT_LIBS_FALSE@	( [ ! -d $(debtmpdir)$(libdir)/debug ] || echo '$(debtmpdir)$(libdir)/debug/*' ; \
 @WITH_32BIT_LIBS_FALSE@	) $(am__debian_install_format) | sort -u > $@
 
@@ -447,14 +470,22 @@ control		+= debian/@PACKAGE@-kernel-debuginfo.postinst
 ## Kernel debugging source package:
 ##
 
-control		+= debian/@PACKAGE@-kernel-debugsource.postinst \
-		   debian/@PACKAGE@-kernel-debugsource.postrm \
-		   debian/@PACKAGE@-kernel-debugsource.preinst \
-		   debian/@PACKAGE@-kernel-debugsource.prerm
+control		+= debian/@PACKAGE@-$(kversion)-debugsource.postinst \
+		   debian/@PACKAGE@-$(kversion)-debugsource.postrm \
+		   debian/@PACKAGE@-$(kversion)-debugsource.preinst \
+		   debian/@PACKAGE@-$(kversion)-debugsource.prerm
 
-control		+= debian/@PACKAGE@-kernel-debugsource.install
+debian/@PACKAGE@-$(kversion)-debugsource.postinst \
+debian/@PACKAGE@-$(kversion)-debugsource.postrm \
+debian/@PACKAGE@-$(kversion)-debugsource.preinst \
+debian/@PACKAGE@-$(kversion)-debugsource.prerm: \
+debian/@PACKAGE@-$(kversion)-debugsource.%: debian/@PACKAGE@-kernel-debugsource.%
+	cp -fv $< $@
 
-debian/@PACKAGE@-kernel-debugsource.install:
+
+control		+= debian/@PACKAGE@-$(kversion)-debugsource.install
+
+debian/@PACKAGE@-$(kversion)-debugsource.install:
 	( [ ! -d $(debtmpdir)/usr/src/debug ] || echo '$(debtmpdir)/usr/src/debug/*' ; \
 	) $(am__debian_install_format) | sort -u > $@
 
@@ -462,14 +493,21 @@ debian/@PACKAGE@-kernel-debugsource.install:
 ## Kernel source package:
 ##
 
-control		+= debian/@PACKAGE@-kernel-source.postinst \
-		   debian/@PACKAGE@-kernel-source.postrm \
-		   debian/@PACKAGE@-kernel-source.preinst \
-		   debian/@PACKAGE@-kernel-source.prerm
+control		+= debian/@PACKAGE@-$(kversion)-source.postinst \
+		   debian/@PACKAGE@-$(kversion)-source.postrm \
+		   debian/@PACKAGE@-$(kversion)-source.preinst \
+		   debian/@PACKAGE@-$(kversion)-source.prerm
 
-control		+= debian/@PACKAGE@-kernel-source.install
+debian/@PACKAGE@-$(kversion)-source.postinst \
+debian/@PACKAGE@-$(kversion)-source.postrm \
+debian/@PACKAGE@-$(kversion)-source.preinst \
+debian/@PACKAGE@-$(kversion)-source.prerm: \
+debian/@PACKAGE@-$(kversion)-source.%: debian/@PACKAGE@-kernel-source.%
+	cp -fv $< $@
 
-debian/@PACKAGE@-kernel-source.install:
+control		+= debian/@PACKAGE@-$(kversion)-source.install
+
+debian/@PACKAGE@-$(kversion)-source.install:
 	echo './@PACKAGE@-@VERSION@/ usr/src' > $@
 
 ##
@@ -623,11 +661,11 @@ binary-common:
 binary-indep: DH_OPTIONS = -i
 binary-indep: install
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-repo		  binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@ 			  binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-base		  binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-doc		  binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-javadoc		  binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-repo			binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@ 				binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-base			binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-doc			binary-common
+	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-javadoc			binary-common
 
 binary-arch: DH_OPTIONS = -s
 binary-arch: install
@@ -635,25 +673,25 @@ binary-arch: install
 	case " $(BUILD_CFGOPTIONS) " in \
 	(*" --without-tools "*) ;; \
 	(*) \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-lib		  binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-compat		  binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-devel		  binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-debuginfo	  binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-debugsource	  binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-java		  binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-lib			binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-compat			binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-devel			binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-debuginfo		binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-debugsource		binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-java			binary-common ; \
 		;; \
 	esac
 	case " $(BUILD_CFGOPTIONS) " in \
 	(*" --without-modules "*) ;; \
 	(*) \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-kernel		  binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-kernel-devel	  binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-kernel-debuginfo	  binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-kernel-debugsource binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)		binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)-devel	binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)-debuginfo	binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)-debugsource	binary-common ; \
 		;; \
 	esac
 	if test -z '@WITH_K_PACKAGE_TRUE@' ; then \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-kernel-source	  binary-common ; \
+		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)-source	binary-common ; \
 	fi
 
 binary: DH_OPTIONS = -i -s
