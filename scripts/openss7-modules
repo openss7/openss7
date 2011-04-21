@@ -1383,7 +1383,7 @@ function getresolve(kversion, kver,
 	for (s in syms) { sym = syms[s]
 	    add = linked[module,sym]
 	    if ((kversion,sym) in sysmaps) {
-		if (sysmaps[kversion,sym] != add) {
+		if (sysmaps[kversion,sym] != add || values["relink"]) {
 		    add = sysmaps[kversion,sym]
 		    relink[name] = module
 		    if (name in reload)
@@ -1496,7 +1496,7 @@ function getresolve(kversion, kver,
 	    crc = wanted[module,sym]
 	    if ((sym,crc) in ksyms) {
 		add = "00000000"
-		if (ksyms[sym,crc] in deleted && (module,sym) in weaken && weaken[module,sym]!~/^00*$/) {
+		if (ksyms[sym,crc] in deleted && (module,sym) in weaken && (weaken[module,sym]!~/^00*$/ || values["relink"])) {
 		    relink[name] = module
 		    if (name in reload)
 		    { reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1508,7 +1508,7 @@ function getresolve(kversion, kver,
 		    if ((module,sym) in weaken) {
 			if ((kversion,sym) in sysmaps) {
 			    add = sysmaps[kversion,sym]
-			    if (weaken[module,sym] != add) {
+			    if (weaken[module,sym] != add || values["relink"]) {
 				relink[name] = module
 				if (name in reload)
 				{ reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1516,7 +1516,7 @@ function getresolve(kversion, kver,
 			    }
 			} else {
 			    add = "00000000"
-			    if (weaken[module,sym]!~/^00*$/) {
+			    if (weaken[module,sym]!~/^00*$/ || values["relink"]) {
 				relink[name] = module
 				if (name in reload)
 				{ reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1526,7 +1526,7 @@ function getresolve(kversion, kver,
 		    }
 		} else {
 		    add = "00000000"
-		    if ((module,sym) in weaken && weaken[module,sym]!~/^00*$/) {
+		    if ((module,sym) in weaken && (weaken[module,sym]!~/^00*$/ || values["relink"])) {
 			relink[name] = module
 			if (name in reload)
 			{ reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1537,7 +1537,7 @@ function getresolve(kversion, kver,
 		if ((module,sym) in weaken) {
 		    if ((kversion,sym) in sysmaps) {
 			add = sysmaps[kversion,sym]
-			if (weaken[module,sym] != add) {
+			if (weaken[module,sym] != add || values["relink"]) {
 			    relink[name] = module
 			    if (name in reload)
 			    { reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1545,7 +1545,7 @@ function getresolve(kversion, kver,
 			}
 		    } else {
 			add = "00000000"
-			if (weaken[module,sym]!~/^00*$/) {
+			if (weaken[module,sym]!~/^00*$/ || values["relink"]) {
 			    relink[name] = module
 			    if (name in reload)
 			    { reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -2162,31 +2162,41 @@ function testwstyle(		pfx,command,result)
     if (!("style" in values) || !values["style"]) {
 	if (system_command("test -r /usr/lib/module-init-tools/weak-modules2") == 0) {
 	    values["style"] = "suse11"
+	    if (!("relink" in values) || values["relink"] == defaults["relink"])
+	    { values["relink"] = 1 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "weak-updates" }
 	} else
 	if (system_command("test -r /usr/lib/module-init-tools/weak-modules") == 0) {
 	    values["style"] = "suse10"
+	    if (!("relink" in values) || values["relink"] == defaults["relink"])
+	    { values["relink"] = 1 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "weak-updates" }
 	} else
 	if (system_command("test -r /sbin/weak-modules") == 0) {
 	    values["style"] = "redhat"
+	    if (!("relink" in values) || values["relink"] == defaults["relink"])
+	    { values["relink"] = 0 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "weak-updates" }
 	} else
 	if (system_command("test -r /boot/abi-" krunning) == 0) {
 	    values["style"] = "ubuntu"
+	    if (!("relink" in values) || values["relink"] == defaults["relink"])
+	    { values["relink"] = 1 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "updates" }
 	} else {
 	    values["style"] = "debian"
+	    if (!("relink" in values) || values["relink"] == defaults["relink"])
+	    { values["relink"] = 1 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "updates" }
 	}
     } else
-    if (values["style"] !~ /^(debian|redhat|suse10|suse11)$/) {
-	print_error(pfx "style is '" values["style"] "' but must be one of {debian|redhat|suse10|suse11}")
+    if (values["style"] !~ /^(debian|ubuntu|redhat|suse10|suse11)$/) {
+	print_error(pfx "style is '" values["style"] "' but must be one of {debian|ubuntu|redhat|suse10|suse11}")
 	usage(stderr)
 	exit 2
     }
@@ -2451,6 +2461,7 @@ BEGIN {
     longopts["style"         ] = "s:" ; defaults["style"         ] = d["style"   ]	; descrips["style"         ] = "style of weak-updates (detect when unspec.)"						; longargs["style"         ] = "{debian|redhat|suse10|suse11|ubuntu}"
     longopts["initscripts"   ] = "i::"; defaults["initscripts"   ] = d["inits"   ]	; descrips["initscripts"   ] = "comma-separated list of init scripts to run"						; longargs["initscripts"   ] = "[SCRIPT[,SCRIPT]...]"
     longopts["depmodx"       ] = "x"  ; defaults["depmodx"       ] = 0			; descrips["depmodx"       ] = "depmod supports -E option (detect when unspec.)"
+    longopts["relink"        ] = "j"  ; defaults["relink"        ] = 0			; descrips["relink"        ] = "relink installed modules (detect when unspec.)"
     longopts["preserve"      ] = "p"  ; defaults["preserve"      ] = 1			; descrips["preserve"      ] = "preserve configuration for running kernel"
     longopts["overwrite"     ] = "o"  ; defaults["overwrite"     ] = 0			; descrips["overwrite"     ] = "overwrite configuration for running kernel"
     longopts["exit-on-error" ] = "e"  ; defaults["exit-on-error" ] = 0			; descrips["exit-on-error" ] = "exit with error status on program errors"
@@ -2472,6 +2483,7 @@ BEGIN {
     values["package"      ] = defaults["package"      ]
     values["rootdir"      ] = defaults["rootdir"      ]
     values["basedir"      ] = defaults["basedir"      ]
+    values["relink"       ] = defaults["relink"       ]
     values["preserve"     ] = defaults["preserve"     ]
     values["overwrite"    ] = defaults["overwrite"    ]
     values["exit-on-error"] = defaults["exit-on-error"]
@@ -2481,7 +2493,7 @@ BEGIN {
     values["silent"       ] = defaults["silent"       ]
     values["debug"        ] = defaults["debug"        ]
     values["verbose"      ] = defaults["verbose"      ]
-    optstring = "k:ALRUalruM:c:b:w:F:E:S:Y:P:s:i::poxenqD::v::hVC"
+    optstring = "k:ALRUalruM:c:b:w:F:E:S:Y:P:s:i::poxjenqD::v::hVC"
     optind = 0
     #opts = ""; for (i=1;i<ARGC;i++) { if (i == 1) { opts = ARGV[i] } else { opts = opts " " ARGV[i] } }
     #print me ": D: o: command line: " opts > stderr; written[stderr] = 1
@@ -2491,7 +2503,7 @@ BEGIN {
 	#if (c != -1) { print me ": D: o: option -" c ", longopt --" option ", optset = " optset ", optarg = " optarg > stderr; written[stderr] = 1 }
 	if (c == -1) break
 	else if (c~/[kMcbwFESPsi]/)			{ values[option] = optarg }
-	else if (c~/[poxenq]/)				{ values[option] = optset }
+	else if (c~/[poxjenq]/)				{ values[option] = optset }
 	else if (c~/[Dv]/)	{ if (optarg  != "")	{ values[option] = optarg } else { if (optset)  { values[option]++ } else { values[option] = optset } } }
 	else if (c~/[ALRUBalru]/)			{ values[option] = optset; if (!optset && command == option)	{ command = "" } else
 										   if (optset && !command)		{ command = option } else
