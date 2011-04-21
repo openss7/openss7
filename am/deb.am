@@ -529,6 +529,7 @@ MY_PHONY		+= update-dscs update-debs update-chgs update-csig update-sigs
 ALL_RECURSIVE_TARGETS	+= all-update-dscs all-update-debs all-update-chgs all-update-csig all-update-sigs
 
 if BUILD_REPO_APT
+## BUILD_REPO_APT
 
 ##
 ## The following builds apt repositories.
@@ -627,6 +628,7 @@ endif
 
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
+
 dist_doc_DATA		+= debian/README.Debian \
 			   debian/TODO.Debian
 ## PKG_BUILD_INDEP

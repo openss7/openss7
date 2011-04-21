@@ -71,7 +71,7 @@ datadir		= @datadir@
 localstatedir	= @localstatedir@
 
 export DEB_HOST_ARCH
-export DEB_HOST_ARCH_GNU
+export DEB_HOST_GNU_TYPE
 export DH_VERBOSE	= 1
 export DH_COMPAT	= 7
 export DH_OPTIONS	=
@@ -371,7 +371,7 @@ ksubdir		= @ksubdir@
 
 @WITH_KO_MODULES_TRUE@debian/@PACKAGE@-kernel.install:
 @WITH_KO_MODULES_TRUE@	( [ ! d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.ko' ; \
-@WITH_KO_MODULES_TRUE@	  [ ! f $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers ] || \
+@WITH_KO_MODULES_TRUE@	  [ ! d $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers ] || \
 @WITH_KO_MODULES_TRUE@	  echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers' ; \
 @WITH_KO_MODULES_TRUE@	  [ ! f $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.symvers ] || \
 @WITH_KO_MODULES_TRUE@	  echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.symvers' ; \
@@ -397,28 +397,31 @@ control		+= debian/@PACKAGE@-kernel-devel.install
 @WITH_KO_MODULES_TRUE@debian/@PACKAGE@-kernel-devel.install:
 @WITH_KO_MODULES_TRUE@	( [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ] || \
 @WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ; \
-@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-$(kversion)-config.cache' ] || \
-@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-$(kversion)-config.cache' ; \
-@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-config.site' ] || \
-@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-config.site' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-config.site' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-config.site' ; \
 @WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/abi-$(kversion)' ] || \
 @WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/abi-$(kversion)' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/symvers-$(kversion).gz' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/symvers-$(kversion).gz' ; \
 @WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/symsets-$(kversion).tar.gz' ] || \
 @WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/symsets-$(kversion).tar.gz' ; \
 @WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Modules.map' ] || \
 @WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Modules.map' ; \
-@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache' ] || \
-@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-modpost.cache' ] || \
+@WITH_KO_MODULES_TRUE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-modpost.cache' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -d '$(debtmpdir)/boot' ] || echo '$(debtmpdir)/boot/*' ; \
 @WITH_KO_MODULES_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
 @WITH_KO_MODULES_FALSE@debian/@PACKAGE@-kernel-devel.install:
 @WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(pkgincludedir)/$(kversion) ] || echo '$(debtmpdir)$(pkgincludedir)/$(kversion)/*' ; \
 @WITH_KO_MODULES_FALSE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ] || \
 @WITH_KO_MODULES_FALSE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ; \
-@WITH_KO_MODULES_FALSE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-$(kversion)-config.cache' ] || \
-@WITH_KO_MODULES_FALSE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-$(kversion)-config.cache' ; \
-@WITH_KO_MODULES_FALSE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-config.site' ] || \
-@WITH_KO_MODULES_FALSE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_ARCH)-config.site' ; \
+@WITH_KO_MODULES_FALSE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache' ] || \
+@WITH_KO_MODULES_FALSE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache' ; \
+@WITH_KO_MODULES_FALSE@	  [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-config.site' ] || \
+@WITH_KO_MODULES_FALSE@	    echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/$(DEB_HOST_GNU_TYPE)-config.site' ; \
 @WITH_KO_MODULES_FALSE@	) $(am__debian_install_format) | sort -u > $@
 
 ##
@@ -514,9 +517,9 @@ debian/@PACKAGE@-javadoc.docs:
 ## Building the package:
 ##
 
-cache_file	= $(debbuilddir)/$(DEB_HOST_ARCH)-$(kversion)-config.cache
-csite_file	= $(debbuilddir)/$(DEB_HOST_ARCH)-config.site
-mpost_file	= $(debbuilddir)/$(DEB_HOST_ARCH)-$(kversion)-modpost.cache
+cache_file	= $(debbuilddir)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache
+csite_file	= $(debbuilddir)/$(DEB_HOST_GNU_TYPE)-config.site
+mpost_file	= $(debbuilddir)/$(DEB_HOST_GNU_TYPE)-$(kversion)-modpost.cache
 
 build:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
@@ -565,9 +568,24 @@ install:
 	dh_installdirs -v
 	[ -d $(debtmpdir) ] || mkdir -p -- $(debtmpdir)
 	$(MAKE) DESTDIR=`pwd`/$(debtmpdir) install
+	d=$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion) ; \
+		mkdir -p $$d ; \
+		b=$(debtmpdir)/boot ; \
+		mkdir -p $$b ; \
+		cp -p Module.mkvars $$d ; \
+		cp -p $(csite_file) $$d ; \
+		cp -p $(cache_file) $$d ; \
+		cp -p System.symvers $$d ; \
+		cp -p Module.symvers $$d ; \
+		cat System.symvers Module.symvers | gzip > $$d/symvers-$(kversion).gz ; \
+		cp -p $$d/symvers-$(kversion).gz $$b ; \
+		cat System.symvers Module.symvers | awk '{print$4"\t"$3"\t"$1"\t"$2}' > $$d/abi-$(kversion) ; \
+		cp -p $$d/abi-$(kversion) $$b ; \
+		cp -p $(mpost_file) $$d ; \
+		cp -p symsets-$(kversion).tar.gz $$d ; \
+		cp -p symsets-$(kversion).tar.gz $$b
 	$(MAKE) -f debian/rules $(control)
-	dh_install -v
-#	dh_install -v --list-missing
+	dh_install -v --list-missing
 
 binary-common:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"

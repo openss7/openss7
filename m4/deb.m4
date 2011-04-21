@@ -367,16 +367,19 @@ dnl if test ":${DPKG_SOURCE:-no}" != :no -a ":${DPKG_BUILDPACKAGE:-no}" != :no ;
 	AC_CONFIG_FILES([debian/rules
 			 debian/control
 			 debian/changelog
+			 debian/mscript_debhelper
 			 debian/mscript_header
 			 debian/mscript_preinst
 			 debian/mscript_postinst
 			 debian/mscript_prerm
 			 debian/mscript_postrm])
+	mscript_debhelper="debian/mscript_debhelper"
 	mscript_header="debian/mscript_header"
 	mscript_preinst="debian/mscript_preinst"
 	mscript_postinst="debian/mscript_postinst"
 	mscript_prerm="debian/mscript_prerm"
 	mscript_postrm="debian/mscript_postrm"
+	AC_SUBST_FILE([mscript_debhelper])
 	AC_SUBST_FILE([mscript_header])
 	AC_SUBST_FILE([mscript_preinst])
 	AC_SUBST_FILE([mscript_postinst])
