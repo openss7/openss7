@@ -1383,7 +1383,7 @@ function getresolve(kversion, kver,
 	for (s in syms) { sym = syms[s]
 	    add = linked[module,sym]
 	    if ((kversion,sym) in sysmaps) {
-		if (sysmaps[kversion,sym] != add || values["relink"]) {
+		if (sysmaps[kversion,sym] != add) {
 		    add = sysmaps[kversion,sym]
 		    relink[name] = module
 		    if (name in reload)
@@ -1496,7 +1496,7 @@ function getresolve(kversion, kver,
 	    crc = wanted[module,sym]
 	    if ((sym,crc) in ksyms) {
 		add = "00000000"
-		if (ksyms[sym,crc] in deleted && (module,sym) in weaken && (weaken[module,sym]!~/^00*$/ || values["relink"])) {
+		if (ksyms[sym,crc] in deleted && (module,sym) in weaken && (weaken[module,sym]!~/^00*$/)) {
 		    relink[name] = module
 		    if (name in reload)
 		    { reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1508,7 +1508,7 @@ function getresolve(kversion, kver,
 		    if ((module,sym) in weaken) {
 			if ((kversion,sym) in sysmaps) {
 			    add = sysmaps[kversion,sym]
-			    if (weaken[module,sym] != add || values["relink"]) {
+			    if (weaken[module,sym] != add) {
 				relink[name] = module
 				if (name in reload)
 				{ reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1516,7 +1516,7 @@ function getresolve(kversion, kver,
 			    }
 			} else {
 			    add = "00000000"
-			    if (weaken[module,sym]!~/^00*$/ || values["relink"]) {
+			    if (weaken[module,sym]!~/^00*$/) {
 				relink[name] = module
 				if (name in reload)
 				{ reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1526,7 +1526,7 @@ function getresolve(kversion, kver,
 		    }
 		} else {
 		    add = "00000000"
-		    if ((module,sym) in weaken && (weaken[module,sym]!~/^00*$/ || values["relink"])) {
+		    if ((module,sym) in weaken && (weaken[module,sym]!~/^00*$/)) {
 			relink[name] = module
 			if (name in reload)
 			{ reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1537,7 +1537,7 @@ function getresolve(kversion, kver,
 		if ((module,sym) in weaken) {
 		    if ((kversion,sym) in sysmaps) {
 			add = sysmaps[kversion,sym]
-			if (weaken[module,sym] != add || values["relink"]) {
+			if (weaken[module,sym] != add) {
 			    relink[name] = module
 			    if (name in reload)
 			    { reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1545,7 +1545,7 @@ function getresolve(kversion, kver,
 			}
 		    } else {
 			add = "00000000"
-			if (weaken[module,sym]!~/^00*$/ || values["relink"]) {
+			if (weaken[module,sym]!~/^00*$/) {
 			    relink[name] = module
 			    if (name in reload)
 			    { reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
@@ -1564,6 +1564,16 @@ function getresolve(kversion, kver,
 	    if (kver in inserts)
 	    { inserts[kver] = inserts[kver] "," name } else
 	    { inserts[kver] = name }
+	    if (name in relink) {
+		# also relinking it
+		if (kver in relinks)
+		{ relinks[kver] = relinks[kver] "," name } else
+		{ relinks[kver] = name }
+		if ((kversion,name) in modnames) {
+		    file = modnames[kversion,name]
+		    reloads[file] = reload[name]
+		}
+	    }
 	} else
 	if (module in deleted) {
 	    if ((kversion,name) in weaknames) {
@@ -1698,14 +1708,14 @@ function getresolve(kversion, kver,
     return d
 }
 function readloaded(kversion,
-		    file,loaded)
+		    command,loaded)
 {
     loaded = ""
-    file = "/proc/modules"
-    while ((getline < file) == 1) {
+    command = "cat /proc/modules"
+    while ((command | getline) == 1) {
 	if (loaded) { loaded = $1 "," loaded } else { loaded = $1 }
     }
-    close(file)
+    close(command)
     return loaded
 }
 function print_action(action, file, prep, kversion,
@@ -1815,29 +1825,33 @@ function relinklinks(kversion, kver, name,
 	    file = weaknames[kversion,name]  # note that createlinks created this entry
 	    if (file in weaklinks)
 		module = weaklinks[file]
-	    if (file in reloads) {
-		script = me "." PROCINFO["pid"] ".lds"
-		text = "SECTIONS\n{\n" reloads[file] "\n}"
-		print text > script
-		print_debug(3,pfx gensub(/\n/, "\n" me ": D: " pfx, "g", text))
-		close(script)
-		kmod = file; sub(/\/[^\/]*$/, "/", kmod)
-		kmod = kmod me "." PROCINFO["pid"] ".ko"
-		print_action("relinking", module, " in ", kversion)
-		if (doit("ld -r -o " kmod " " file " " script) == 0) {
-		    doit("mv -f -- " kmod " " file)
-		} else {
-		    print_error(pfx "relinking failed for " weakmod)
-		    print_action("removing", module, "from", kversion)
-		    doit("rm -f -- " kmod " " file)
-		}
-		system_command("rm -f -- " script)
-	    }
+	} else
+	if ((kversion,name) in modnames) {
+	    file = modnames[kversion,name]
 	} else {
-	    print_error(pfx, "no weakname for " kversion ":" name)
+	    print_error(pfx "no weakname nor modname for " kversion ":" name)
+	    return
+	}
+	if (file in reloads) {
+	    script = me "." PROCINFO["pid"] ".lds"
+	    text = "SECTIONS\n{\n" reloads[file] "\n}"
+	    print text > script
+	    print_debug(3,pfx gensub(/\n/, "\n" me ": D: " pfx, "g", text))
+	    close(script)
+	    kmod = file; sub(/\/[^\/]*$/, "/", kmod)
+	    kmod = kmod me "." PROCINFO["pid"] ".ko"
+	    print_action("relinking", module, " in ", kversion)
+	    if (doit("ld -r -o " kmod " " file " " script) == 0) {
+		doit("mv -f -- " kmod " " file)
+	    } else {
+		print_error(pfx "relinking failed for " weakmod)
+		print_action("removing", module, "from", kversion)
+		doit("rm -f -- " kmod " " file)
+	    }
+	    system_command("rm -f -- " script)
 	}
     } else {
-	print_error(pfx, "no modname for " kver ":" name)
+	print_error(pfx "no modname for " kver ":" name)
     }
 }
 
@@ -1940,7 +1954,7 @@ function chcksolution(kversion, kver,
 		}
 	    }
 	}
-	if (!values[overwrite]) {
+	if (!values["overwrite"]) {
 	    # refuse to overwrite an existing link
 	    if (kver in changes) {
 		split(changes[kver],labels,/,/)
@@ -1952,8 +1966,17 @@ function chcksolution(kversion, kver,
 	    if (kver in relinks) {
 		split(relinks[kver],labels,/,/)
 		for (i in labels) { name = labels[i]
-		    print_warns(pfx "not overwritting link for module " name)
-		    altered = 1
+		    if (kver in creates && ","creates[kver]"," ~ ","name",") {
+			print_warns(pfx "not overwritting link for module " name)
+			altered = 1
+		    } else
+		    if (kver in inserts && ","inserts[kver]"," ~ ","name",") {
+			print_warns(pfx "not overwritting installed module " name)
+			altered = 1
+		    } else {
+			print_warns(pfx "not overwritting module " name)
+			altered = 1
+		    }
 		}
 	    }
 	}
@@ -2162,35 +2185,25 @@ function testwstyle(		pfx,command,result)
     if (!("style" in values) || !values["style"]) {
 	if (system_command("test -r /usr/lib/module-init-tools/weak-modules2") == 0) {
 	    values["style"] = "suse11"
-	    if (!("relink" in values) || values["relink"] == defaults["relink"])
-	    { values["relink"] = 1 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "weak-updates" }
 	} else
 	if (system_command("test -r /usr/lib/module-init-tools/weak-modules") == 0) {
 	    values["style"] = "suse10"
-	    if (!("relink" in values) || values["relink"] == defaults["relink"])
-	    { values["relink"] = 1 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "weak-updates" }
 	} else
 	if (system_command("test -r /sbin/weak-modules") == 0) {
 	    values["style"] = "redhat"
-	    if (!("relink" in values) || values["relink"] == defaults["relink"])
-	    { values["relink"] = 0 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "weak-updates" }
 	} else
 	if (system_command("test -r /boot/abi-" krunning) == 0) {
 	    values["style"] = "ubuntu"
-	    if (!("relink" in values) || values["relink"] == defaults["relink"])
-	    { values["relink"] = 1 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "updates" }
 	} else {
 	    values["style"] = "debian"
-	    if (!("relink" in values) || values["relink"] == defaults["relink"])
-	    { values["relink"] = 1 }
 	    if (!("weakdir" in values) || values["weakdir"] == defaults["weakdir"])
 	    { values["weakdir"] = "updates" }
 	}
@@ -2461,7 +2474,6 @@ BEGIN {
     longopts["style"         ] = "s:" ; defaults["style"         ] = d["style"   ]	; descrips["style"         ] = "style of weak-updates (detect when unspec.)"						; longargs["style"         ] = "{debian|redhat|suse10|suse11|ubuntu}"
     longopts["initscripts"   ] = "i::"; defaults["initscripts"   ] = d["inits"   ]	; descrips["initscripts"   ] = "comma-separated list of init scripts to run"						; longargs["initscripts"   ] = "[SCRIPT[,SCRIPT]...]"
     longopts["depmodx"       ] = "x"  ; defaults["depmodx"       ] = 0			; descrips["depmodx"       ] = "depmod supports -E option (detect when unspec.)"
-    longopts["relink"        ] = "j"  ; defaults["relink"        ] = 0			; descrips["relink"        ] = "relink installed modules (detect when unspec.)"
     longopts["preserve"      ] = "p"  ; defaults["preserve"      ] = 1			; descrips["preserve"      ] = "preserve configuration for running kernel"
     longopts["overwrite"     ] = "o"  ; defaults["overwrite"     ] = 0			; descrips["overwrite"     ] = "overwrite configuration for running kernel"
     longopts["exit-on-error" ] = "e"  ; defaults["exit-on-error" ] = 0			; descrips["exit-on-error" ] = "exit with error status on program errors"
@@ -2483,7 +2495,6 @@ BEGIN {
     values["package"      ] = defaults["package"      ]
     values["rootdir"      ] = defaults["rootdir"      ]
     values["basedir"      ] = defaults["basedir"      ]
-    values["relink"       ] = defaults["relink"       ]
     values["preserve"     ] = defaults["preserve"     ]
     values["overwrite"    ] = defaults["overwrite"    ]
     values["exit-on-error"] = defaults["exit-on-error"]
