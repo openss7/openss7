@@ -64,6 +64,41 @@ header_postinst.d:
 src_postinst.d:
     Nothing to do.
 
+Note that the environment variable DEB_MAINT_PARAMS has the parameters
+that were passed to the debian maintenance script for the appropriate
+hook.  These are:
+
+preinst:
+	install			[old-version]
+	upgrade			old-version
+	abort-upgrade		new-version
+
+postinst:
+	configure		[most-recently-configured-version]
+	triggered		triggered-packages
+	abort-upgrade		new-version
+	abort-remove		in-favour package new-version
+	abort-deconfigure	in-favour
+				package-being-installed-but-failed version
+				removing conflicting-package version
+
+prerm:
+	remove
+	remove			in-favour package new-version
+	upgrade			new-version
+	failed-upgrade		old-version
+	deconfigure		in-favour package-being-installed version
+				removing conflicting-package version
+
+postrm:
+	remove
+	purge
+	upgrade			new-version
+	failed-upgrade		old-version
+	abort-install		[old-version]
+	abort-upgrade		old-version
+	disappear		overwriter overwriter-version
+
 Running kernel issues:
 ----------------------
 
