@@ -12,146 +12,20 @@ Build-Depends: kernel-source-2-4 | kernel-headers-2-4 | linux-source-2.6 | linux
  texinfo (>= 4.0), tetex-base (>= 1.0), tetex-bin (>= 1.0),
  tetex-extra (>= 1.0), gs (>= 6.51) | gs-gpl (>= 6.51)
 
-Package: @PACKAGE_LCNAME@-core
-Architecture: any
-Section: base
-Priority: optional
-Provides: STREAMS-core, STREAMS-core-@kversion@, @PACKAGE_LCNAME@-core-@kversion@
-Conflicts: STREAMS-core, STREAMS-core-@kversion@
-Replaces: STREAMS-core, STREAMS-core-@kversion@
-Depends: @kernel_image@ (= @krelease@),
- @PACKAGE_LCNAME@-init (= @VERSION@-@PACKAGE_DEBRELEASE@)
-Pre-Depends: @kernel_image@ (= @krelease@)
-Description: Core kernel modules for @PACKAGE_TITLE@
- Kernel modules that provide the Linux kernel SVR 4.2 MP STREAMS
- facility.  Includes assorted Linux Fast-STREAMS drivers and modules for
- @PACKAGE_TITLE@.  These binaries are heavily tied to the kernel for
- which they were compiled: applies to kernel version @kversion@.
-
-Package: @PACKAGE_LCNAME@-info
-Architecture: any
-Section: base
-Priority: optional
-Provides: STREAMS-info, @PACKAGE_LCNAME@-info-@kversion@
-Depends: @kernel_image@ (= @krelease@)
-Description: Kernel module versions for @PACKAGE_TITLE@
- Kernel modules symbol information for development of kernel modules
- against the core kernel modules included in the @PACKAGE_LCNAME@-core package.
- Symbol information is tied to the core kernel modules and kernel for
- which they were compiled:  these apply to core kernel modules
- @PACKAGE_LCNAME@-core-@kversion@ for kernel version @kversion@.
-
-Package: @PACKAGE_LCNAME@-lib
-Architecture: any
-Section: base
-Priority: optional
-Provides: STREAMS-lib
-Conflicts: STREAMS-lib
-Replaces: STREAMS-lib
-Depends: ${shlibs:Depends}
-Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
-Description: Shared libraries for @PACKAGE_TITLE@
- Run-time shared libraries necessary to run applications programs and
- utilities developed for @PACKAGE_TITLE@.
-
-Package: @PACKAGE_LCNAME@-util
-Architecture: any
-Section: base
-Priority: optional
-Provides: STREAMS-util
-Conflicts: STREAMS-util
-Replaces: STREAMS-util
-Depends: @PACKAGE_LCNAME@-lib (= @VERSION@-@PACKAGE_DEBRELEASE@), ${shlibs:Depends}
-Suggests: @PACKAGE_LCNAME@-devel (= @VERSION@-@PACKAGE_DEBRELEASE@)
-Description: Utitlity and test programs for @PACKAGE_TITLE@
- Adminstration and configuration test utilities and commands for
- @PACKAGE_TITLE@.
-
-Package: @PACKAGE_LCNAME@-devel
-Architecture: any
-Section: devel
-Priority: optional
-Provides: STREAMS-devel
-Suggests: @PACKAGE_LCNAME@-doc (= @VERSION@-@PACKAGE_DEBRELEASE@)
-Description: C headers and static libraries for @PACKAGE_TITLE@
- Static libraries and kernel headers to develop @PACKAGE_TITLE@
- modules and drivers; user-space headers and static libraries required
- to compile @PACKAGE_TITLE@ applications programs.
-
-Package: @PACKAGE_LCNAME@-init
-Architecture: all
-Section: base
-Priority: optional
-Provides: STREAMS-init
-Conflicts: STREAMS-init
-Replaces: STREAMS-init
-Depends: @PACKAGE_LCNAME@-util(= @VERSION@-@PACKAGE_DEBRELEASE@), ${misc:Depends}
-Description: Init scripts and config files for @PACKAGE_TITLE@
- SysV init scripts and configuration files for @PACKAGE_TITLE@ for
- Linux Fast-STREAMS.
-
-Package: @PACKAGE_LCNAME@-dev
-Architecture: all
-Section: base
-Priority: optional
-Provides: STREAMS-dev
-Conflicts: STREAMS-dev
-Replaces: STREAMS-dev
-Description: Character devices for @PACKAGE_TITLE@
- Character special device definitions necessary to run applications
- programs and utilities developed for @PACKAGE_TITLE@.
-
-Package: @PACKAGE_LCNAME@-doc
-Architecture: all
-Section: doc
-Priority: optional
-Provides: STREAMS-doc
-Conflicts: STREAMS-doc
-Replaces: STREAMS-doc
-Description: Documentation and man pages for @PACKAGE_TITLE@
- Pdf and html documentation for installation and the development of
- @PACKAGE_TITLE@ applications, modules and drivers; and all
- @PACKAGE_TITLE@ manual pages and info files for both kernel and
- user-space functions.
-
-Package: @PACKAGE_LCNAME@-source
-Architecture: all
-Section: devel
-Priority: optional
-Provides: STREAMS-source
-Description: Source code for @PACKAGE_TITLE@
- Source code for building the @PACKAGE_TITLE@ release: autoconf
- configuration utilities necessary to create and distribute this dpkg --
- required for recompiling against recompiled kernel.
-
-Package: @PACKAGE_LCNAME@-mibs
-Architecture: all
-Try: http://www.google.com/search?q=m3ua+conformance+test+suite
-
-Section: devel
-Priority: optional
-Provides: STREAMS-mibs
-Conflicts: STREAMS-mibs
-Replaces: STREAMS-mibs
-Description: SNMP MIBs for @PACKAGE_TITLE@
- Simple Network Management Protocol (SNMP) Management Information Base
- (MIB) definitions for managing the @PACKAGE_TITLE@ package
- with external SNMP management tools.
-
 Package: @PACKAGE_LCNAME@
 Architecture: all
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@
-Description: The @PACKAGE_LCNAME@ package includes kernel modules, STREAMS drivers, modules,
- libraries, utilities, test programs, daemons, and development environment
- for the deveopment and exection of @PACKAGE_TITLE@ drivers,
- components and applications for the STREAMS environment.  This
- distribution is currently applicable to 2.6 kernels and is
- validated for ix86, x86_64, ppc and ppc64 architectures, but should
- build and install well for other architectures.  This package includes
- the following binary packages:
-
+Description: The @PACKAGE_LCNAME@ package includes kernel modules,
+ STREAMS drivers, modules, libraries, utilities, test programs, daemons,
+ and development environment for the deveopment and exection of
+ @PACKAGE_TITLE@ drivers, components and applications for the STREAMS
+ environment.  This distribution is currently applicable to 2.6 kernels
+ and is validated for ix86, x86_64, ppc and ppc64 architectures, but
+ should build and install well for other architectures.  This package
+ includes the following binary packages:
+ .
  - @PACKAGE_LCNAME@
    -- copyright info, change logs, virtual base package.
  - @PACKAGE_LCNAME@-repo
@@ -182,90 +56,92 @@ Description: The @PACKAGE_LCNAME@ package includes kernel modules, STREAMS drive
    -- JAIN java modules, JNI/CNI libraries, and native Java modules.
  - @PACKAGE_LCNAME@-javadoc
    -- Javadoc documentation for JAIN APIs and implementation.
-
- The @PACKAGE_LCNAME@ binary package provides documentation, device definitions,
- Sys V init scripts and configuration files, SNMP MIB definitions, and
- test suites.
-
+ .
+ The @PACKAGE_LCNAME@ binary package provides documentation, device
+ definitions, Sys V init scripts and configuration files, SNMP MIB
+ definitions, and test suites.
+ .
  Documentation includes text, html, info and pdf (texinfo) documentation
  and manual for the development of applications, modules and drivers, as
  well as the installation and reference manual.  Also included are
  extensive manual pages for the entire package, including manual pages
  for commands, administrative utilities, user interfaces, an kernel
  functions.
-
+ .
  Device definitions are necessary to run applications programs and
  utilities.  On older systems, this binary package includes the
  executable for creating devices from init scripts.  Init scripts load
  kernel modules, create devices, and apply system configuration
  customizations at boot.
-
+ .
  SNMP MIB definitions for managing the package with external SNMP
  management tools.  Autotest validation testsuites are used for
- validating and troubleshooting.  Also included is the send-pr script for
- generating and submitting problem reports to @PACKAGE_BUGREPORT@.
+ validating and troubleshooting.  Also included is the send-pr script
+ for generating and submitting problem reports to @PACKAGE_BUGREPORT@.
 
 Package: @PACKAGE_LCNAME@-repo
 Architecture: all
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-repo
-Description: The @PACKAGE_LCNAME@-repo binary package contains the repository source and
- package updater information necessary to properly establish the
- OpenSS7 repository definitions for installing the other packages
- in the set.
+Description: The @PACKAGE_LCNAME@-repo binary package contains the
+ repository source and package updater information necessary to properly
+ establish the OpenSS7 repository definitions for installing the other
+ packages in the set.
 
 Package: @PACKAGE_LCNAME@-base
 Architecture: all
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-base
-Description: The @PACKAGE_LCNAME@-base binary package contains the init scripts, test scripts,
- maintenance scripts and base system configuration files necessary for
- the operation of the protocol suites contained in the @PACKAGE_LCNAME@ package.
- It contains user and administration documentation in INFO, PDF and HTML
- formats as well as sections 1, 4, 5 and 8 of the manual pages.  This
- binary package is required for any installation of the @PACKAGE_LCNAME@ package.
+Description: The @PACKAGE_LCNAME@-base binary package contains the init
+ scripts, test scripts, maintenance scripts and base system
+ configuration files necessary for the operation of the protocol suites
+ contained in the @PACKAGE_LCNAME@ package.  It contains user and
+ administration documentation in INFO, PDF and HTML formats as well as
+ sections 1, 4, 5 and 8 of the manual pages.  This binary package is
+ required for any installation of the @PACKAGE_LCNAME@ package.
 
 Package: @PACKAGE_LCNAME@-doc
 Architecture: all
 Section: doc
 Priority: optional
 Provides: @PACKAGE_LCNAME@-doc
-Description: The @PACKAGE_LCNAME@-doc binary package contains the documentation used in the
- development of applications and programs that use the package.  It
- contains developer and programmer manuals in info, pdf and html formats
- as well as sections 2, 3, 7 and 9 of the manual pages.  Install this
- binary package if you are intersted in developing STREAMS drivers or
- modules or applications programs for the protocol suites contained in
- the @PACKAGE_LCNAME@ package.  This package is massive and is not normally
- necessary except on a development system.
+Description: The @PACKAGE_LCNAME@-doc binary package contains the
+ documentation used in the development of applications and programs that
+ use the package.  It contains developer and programmer manuals in info,
+ pdf and html formats as well as sections 2, 3, 7 and 9 of the manual
+ pages.  Install this binary package if you are intersted in developing
+ STREAMS drivers or modules or applications programs for the protocol
+ suites contained in the @PACKAGE_LCNAME@ package.  This package is
+ massive and is not normally necessary except on a development system.
 
 Package: @PACKAGE_LCNAME@-lib
 Architecture: any
 Section: libs
 Priority: optional
 Provides: @PACKAGE_LCNAME@-lib
-Description: The @PACKAGE_LCNAME@-lib binary package contains the run-time (shared object)
- libraries necessary to run applications programs and utilities developed
- for @PACKAGE_TITLE@.  Also included are the libtool .la files describing the
- shared object libraries.  The binary package also provides
- administrative and configuration test utilities and commands associated
- with the @PACKAGE_TITLE@ package.  Note that these utilities are needed for
- running the validation test suites contained in the @PACKAGE_LCNAME@ binary
- package.
+Description: The @PACKAGE_LCNAME@-lib binary package contains the
+ run-time (shared object) libraries necessary to run applications
+ programs and utilities developed for @PACKAGE_TITLE@.  Also included
+ are the libtool .la files describing the shared object libraries.  The
+ binary package also provides administrative and configuration test
+ utilities and commands associated with the @PACKAGE_TITLE@ package.
+ Note that these utilities are needed for running the validation test
+ suites contained in the @PACKAGE_LCNAME@ binary package.
 
 Package: @PACKAGE_LCNAME@-devel
 Architecture: any
 Section: devel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-devel
-Description: The @PACKAGE_LCNAME@-devel binary package contains library archives for static
- compilation, and header files to develop @PACKAGE_TITLE@ applications, module
- and drivers.  This also includes the header files and static libraries
- required to compile @PACKAGE_TITLE@ applications programs.  This package
- does not contain developer or programmer documentation nor manual pages.
- To obtain the developer and programmer documentation, load the @PACKAGE_LCNAME@-doc
+Description: The @PACKAGE_LCNAME@-devel binary package contains library
+ archives for static compilation, and header files to develop
+ @PACKAGE_TITLE@ applications, module and drivers.  This also includes
+ the header files and static libraries required to compile
+ @PACKAGE_TITLE@ applications programs.  This package does not contain
+ developer or programmer documentation nor manual pages.  To obtain the
+ developer and programmer documentation, load the @PACKAGE_LCNAME@-doc
  package.
 
 Package: @PACKAGE_LCNAME@-debuginfo
@@ -273,59 +149,61 @@ Architecture: any
 Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-debuginfo
-Description: The @PACKAGE_LCNAME@-debuginfo binary package contains debugging symbols for
- libraries and applications programs.  This package provides debug
- information for package @PACKAGE_LCNAME@-lib.  Debug informatino is useful when
- developing applications that use this package or when debugging this
- package.
+Description: The @PACKAGE_LCNAME@-debuginfo binary package contains
+ debugging symbols for libraries and applications programs.  This
+ package provides debug information for package @PACKAGE_LCNAME@-lib.
+ Debug informatino is useful when developing applications that use this
+ package or when debugging this package.
 
 Package: @PACKAGE_LCNAME@-debugsource
 Architecture: any
 Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-debugsource
-Description: The @PACKAGE_LCNAME@-debugsource binary package contains source code for
- debugging libraries and applications programs.  This package provides
- debug information for package @PACKAGE_LCNAME@-lib.  Debug information is useful
- when developing applications that use this package or when debugging
- this package.
+Description: The @PACKAGE_LCNAME@-debugsource binary package contains
+ source code for debugging libraries and applications programs.  This
+ package provides debug information for package @PACKAGE_LCNAME@-lib.
+ Debug information is useful when developing applications that use this
+ package or when debugging this package.
 
 Package: @PACKAGE_LCNAME@-kernel
 Architecture: any
 Section: kernel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-kernel, @PACKAGE_LCNAME@-@kversion@
-Description: The @PACKAGE_LCNAME@-kernel binary package the kernel modules that
- provide the Linux kernel @PACKAGE_SHORTTITLE@ drivers and modules.  This includes
- assorted drivers and modules for STREAMS and additional @PACKAGE_TITLE@
- protocol suite components.  This binary package also includes modprobe
- configuration files for the associated kernel modules.  This package
- is weaklyl tied to the kernel for which it and dependent components
- were compiled.  This package applies to kernel @kversion@
- and requires dependent components compiled for a similar kernel.  If
- you cannot find a binary package that matches your kernel, rebuild
- for your kernel from the @PACKAGE_LCNAME@ package source DSC.
+Description: The @PACKAGE_LCNAME@-kernel binary package the kernel
+ modules that provide the Linux kernel @PACKAGE_SHORTTITLE@ drivers and
+ modules.  This includes assorted drivers and modules for STREAMS and
+ additional @PACKAGE_TITLE@ protocol suite components.  This binary
+ package also includes modprobe configuration files for the associated
+ kernel modules.  This package is weaklyl tied to the kernel for which
+ it and dependent components were compiled.  This package applies to
+ kernel @kversion@ and requires dependent components compiled for a
+ similar kernel.  If you cannot find a binary package that matches your
+ kernel, rebuild for your kernel from the @PACKAGE_LCNAME@ package
+ source DSC.
 
 Package: @PACKAGE_LCNAME@-kernel-devel
 Architecture: any
 Section: devel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-kernel-devel, @PACKAGE_LCNAME@-devel-@kversion@
-Description: The @PACKAGE_LCNAME@-kernel-devel binary package contains the kernel modules
- symbol information for development of additional STREAMS kernel modules
- against the core kernel modules included in the @kversion@ binary
- package.  This package is weakly tied to the core kernel moduels and
- kernel for which it was compiled.  This package applies to core kernel
- modules @kversion@ for kernel version @kversion@.
+Description: The @PACKAGE_LCNAME@-kernel-devel binary package contains
+ the kernel modules symbol information for development of additional
+ STREAMS kernel modules against the core kernel modules included in the
+ @kversion@ binary package.  This package is weakly tied to the core
+ kernel moduels and kernel for which it was compiled.  This package
+ applies to core kernel modules @kversion@ for kernel version
+ @kversion@.
 
 Package: @PACKAGE_LCNAME@-kernel-debuginfo
 Architecture: any
 Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-debuginfo, @PACKAGE_LCNAME@-debuginfo-@kversion@
-Description: The @PACKAGE_LCNAME@-kernel-debuginfo binary package contains
- debugging symbols for kernel modules.  This package provides debug
- information for package @PACKAGE_LCNAME@-kernel.  Debug
+Description: The @PACKAGE_LCNAME@-kernel-debuginfo binary package
+ contains debugging symbols for kernel modules.  This package provides
+ debug information for package @PACKAGE_LCNAME@-kernel.  Debug
  information is useful when developing kernel modules that use this
  package or when debugging this package.
 
@@ -334,9 +212,9 @@ Architecture: any
 Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-debugsource, @PACKAGE_LCNAME@-debugsource-@kversion@
-Description: The @PACKAGE_LCNAME@-kernel-debugsource binary package contains
- source code for debugging kernel modules.  This package provides debug
- information for package @PACKAGE_LCNAME@-kernel.  Debug
+Description: The @PACKAGE_LCNAME@-kernel-debugsource binary package
+ contains source code for debugging kernel modules.  This package
+ provides debug information for package @PACKAGE_LCNAME@-kernel.  Debug
  Information is useful when developing kernel modules that use this
  package or when debugging this package.
 
@@ -345,31 +223,33 @@ Architecture: any
 Section: devel
 Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-source, @PACKAGE_LCNAME@-source-@kversion@
-Description: The @PACKAGE_LCNAME@-kernel-source binary package contains the source code
- necessary for building the @PACKAGE_LCNAME@ release for the kernel version
- @kversion@.  It also includes the autoconf configuration
- utilities necessary to create and distribute this deb.  However,
- to develop on the package, it would be better to use the tarball
- release.  Load this package if you need some files from the build
- that are not present in the @PACKAGE_LCNAME@-kernel-devel package.
+Description: The @PACKAGE_LCNAME@-kernel-source binary package contains
+ the source code necessary for building the @PACKAGE_LCNAME@ release for
+ the kernel version @kversion@.  It also includes the autoconf
+ configuration utilities necessary to create and distribute this deb.
+ However, to develop on the package, it would be better to use the
+ tarball release.  Load this package if you need some files from the
+ build that are not present in the @PACKAGE_LCNAME@-kernel-devel
+ package.
 
 Package: @PACKAGE_LCNAME@-java
 Architecture: any
 Section: java
 Priority: optional
 Provides: @PACKAGE_LCNAME@-java
-Description: The @PACKAGE_LCNAME@-java binary package contains JAIN implementations for
- @PACKAGE_TITLE@.  It includes jar files, JNI and CNI libraries, and gcj native
- compile libraries.  It also includes SWIG implementations of Java
- interfaces for @PACKAGE_TITLE@ API libraries.
+Description: The @PACKAGE_LCNAME@-java binary package contains JAIN
+ implementations for @PACKAGE_TITLE@.  It includes jar files, JNI and
+ CNI libraries, and gcj native compile libraries.  It also includes SWIG
+ implementations of Java interfaces for @PACKAGE_TITLE@ API libraries.
 
 Package: @PACKAGE_LCNAME@-javadoc
 Architecture: all
 Section: javadoc
 Priority: optional
 Provides: @PACKAGE_LCNAME@-javadoc
-Description: The @PACKAGE_LCNAME@-javadoc binary package contains Javadoc documentation for
- @PACKAGE_TITLE@.  Install this binary package if you are interested in
- developing JAIN applications or resource adapters.  This package is
- not normaly required on other than a development system.
+Description: The @PACKAGE_LCNAME@-javadoc binary package contains
+ Javadoc documentation for @PACKAGE_TITLE@.  Install this binary package
+ if you are interested in developing JAIN applications or resource
+ adapters.  This package is not normaly required on other than a
+ development system.
 

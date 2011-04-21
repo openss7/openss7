@@ -105,24 +105,70 @@ AC_DEFUN([AC_OPENSS7], [dnl
     _DRAFTS
     _OS7_OPTIONS
     _INIT_SCRIPTS
-    AC_CONFIG_FILES([debian/openss7-core.postinst
-		     debian/openss7-core.postrm
-		     debian/openss7-core.preinst
-		     debian/openss7-core.prerm
+    AC_CONFIG_FILES([debian/openss7-base.postinst
+		     debian/openss7-base.postrm
+		     debian/openss7-base.preinst
+		     debian/openss7-base.prerm
+		     debian/openss7-base.triggers
+		     debian/openss7-debuginfo.postinst
+		     debian/openss7-debuginfo.postrm
+		     debian/openss7-debuginfo.preinst
+		     debian/openss7-debuginfo.prerm
+		     debian/openss7-debugsource.postinst
+		     debian/openss7-debugsource.postrm
+		     debian/openss7-debugsource.preinst
+		     debian/openss7-debugsource.prerm
+		     debian/openss7-devel.postinst
+		     debian/openss7-devel.postrm
 		     debian/openss7-devel.preinst
-		     debian/openss7-dev.postinst
-		     debian/openss7-dev.preinst
-		     debian/openss7-dev.prerm
+		     debian/openss7-devel.prerm
+		     debian/openss7-devel.triggers
 		     debian/openss7-doc.postinst
+		     debian/openss7-doc.postrm
 		     debian/openss7-doc.preinst
 		     debian/openss7-doc.prerm
-		     debian/openss7-init.postinst
-		     debian/openss7-init.postrm
-		     debian/openss7-init.preinst
-		     debian/openss7-init.prerm
+		     debian/openss7-java.postinst
+		     debian/openss7-java.postrm
+		     debian/openss7-java.preinst
+		     debian/openss7-java.prerm
+		     debian/openss7-javadoc.postinst
+		     debian/openss7-javadoc.postrm
+		     debian/openss7-javadoc.preinst
+		     debian/openss7-javadoc.prerm
+		     debian/openss7-kernel-debuginfo.postinst
+		     debian/openss7-kernel-debuginfo.postrm
+		     debian/openss7-kernel-debuginfo.preinst
+		     debian/openss7-kernel-debuginfo.prerm
+		     debian/openss7-kernel-debugsource.postinst
+		     debian/openss7-kernel-debugsource.postrm
+		     debian/openss7-kernel-debugsource.preinst
+		     debian/openss7-kernel-debugsource.prerm
+		     debian/openss7-kernel-devel.postinst
+		     debian/openss7-kernel-devel.postrm
+		     debian/openss7-kernel-devel.preinst
+		     debian/openss7-kernel-devel.prerm
+		     debian/openss7-kernel-devel.triggers
+		     debian/openss7-kernel-source.postinst
+		     debian/openss7-kernel-source.postrm
+		     debian/openss7-kernel-source.preinst
+		     debian/openss7-kernel-source.prerm
+		     debian/openss7-kernel.postinst
+		     debian/openss7-kernel.postrm
+		     debian/openss7-kernel.preinst
+		     debian/openss7-kernel.prerm
+		     debian/openss7-kernel.triggers
+		     debian/openss7-lib.postinst
+		     debian/openss7-lib.postrm
 		     debian/openss7-lib.preinst
-		     debian/openss7-source.preinst
-		     debian/openss7-util.preinst
+		     debian/openss7-lib.prerm
+		     debian/openss7-repo.postinst
+		     debian/openss7-repo.postrm
+		     debian/openss7-repo.preinst
+		     debian/openss7-repo.prerm
+		     debian/openss7.postinst
+		     debian/openss7.postrm
+		     debian/openss7.preinst
+		     debian/openss7.prerm
 		     src/util/modutils/openss7
 		     src/include/sys/openss7/version.h
 		     Module.mkvars])

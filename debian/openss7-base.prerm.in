@@ -304,7 +304,7 @@ conflict_base_prerm() { :
 }
 
 upgrade_base_prerm() { :
-@WITH_KO_MOODULES_FALSE@   upgrade_base_prerm_modconf
+@WITH_KO_MODULES_FALSE@   upgrade_base_prerm_modconf
     # We are being removed because we are being replaced with a newer version.
     upgrade_base_prerm_preloads
     upgrade_base_prerm_netconfig

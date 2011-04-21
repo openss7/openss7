@@ -302,6 +302,9 @@ one-t-rpm: one-rpm
 one-k-rpm: AM_RPMXOPTS = --define "_without_tools --without-tools"
 one-k-rpm: one-rpm
 
+all-rpm: AM_RPMBOPTS =
+all-rpm: each-rpm
+
 #! rpms:
 #!     This target is responsible for generating all of the package binary rpms
 #!     for the architecture.  The binary rpms will be named:

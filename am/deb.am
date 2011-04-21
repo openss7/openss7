@@ -96,16 +96,16 @@ debian_dsc_file		= $(debbuilddir)/$(debianpkg).dsc
 debian_sig_file		= $(debbuilddir)/$(debianpkg).dsc.sig
 debian_source_files	= $(debian_tar_file) $(debian_dsc_file) $(debian_sig_file)
 debian_change_files	= $(debbuilddir)/$(debianpkg)_*.changes $(debbuilddir)/$(debianpkg)_*.changes.asc
-debian_binary_files	= $(debbuilddir)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
-			  $(debbuilddir)/$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_*[ud.]deb
+debian_binary_files	= $(debbuilddir)/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
+			  $(debbuilddir)/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb
 
 debtop_tar_file		= $(debdir)/$(debianpkg).tar.gz
 debtop_dsc_file		= $(debdir)/$(debianpkg).dsc
 debtop_sig_file		= $(debdir)/$(debianpkg).dsc.sig
 debtop_source_files	= $(debtop_tar_file) $(debtop_dsc_file) $(debtop_sig_file)
 debtop_change_files	= $(debdir)/$(debianpkg)_*.changes $(debdir)/$(debianpkg)_*.changes.asc
-debtop_binary_files	= $(debdir)/$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
-			  $(debdir)/$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_*[ud.]deb
+debtop_binary_files	= $(debdir)/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
+			  $(debdir)/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb
 
 RELEASE_DIRECTORIES	+= $(debdir)
 UPDATE_DIRECTORIES	+= $(debdir)
@@ -115,7 +115,7 @@ UPDATE_DIRECTORIES	+= $(debdir)
 # subdirectories for a master build.  These options will contain the passed down options from the
 # environment in that case.  See the recursive build targets below.
 ##
-DEBXOPTS	= -D
+AM_DEBXOPTS	= -D
 
 #!
 #! Debian Build Targets:
@@ -148,7 +148,7 @@ $(debian_dir_stamp): $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 ##
 $(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
 	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
-	( cd $(debian_dir); DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(DEBXOPTS) )
+	( cd $(debian_dir); DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(AM_DEBXOPTS) )
 #	(cd "$(debbuilddir)"; $(DPKG_SOURCE) -b -sn $(debian_dir))
 
 $(debtop_dsc_file) $(debtop_tar_file)::
@@ -201,14 +201,32 @@ AM_BINARY_TARGET = binary-arch
 each-deb: $(debian_dir_stamp)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
-	( cd $(debian_dir); DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(DEBBOPTS) -rfakeroot -uc $(DEBXOPTS) -nc )
+	( cd $(debian_dir); DH_COMPAT=4 DH_VERBOSE=1 BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
 #	( cd $(debian_dir); dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" DH_COMPAT=4 DH_VERBOSE=1 $(AM_BINARY_TARGET) )
 
-one-deb:
-	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-B' BUILD_CFGOPTIONS='--disable-indep' AM_BINARY_TARGET='binary-arch' each-deb
+noa-deb: AM_DEBBOPTS = -A
+noa-deb: AM_DEBXOPTS = -d
+noa-deb: BUILD_CFGOPTIONS = --disable-arch
+noa-deb: AM_BINARY_TARGET = binary-indep
+noa-deb: each-deb
 
-noa-deb:
-	$(MAKE) $(AM_MAKEFLAGS) -- DEBXOPTS='$(DEBXOPTS)' DEBBOPTS='-b' BUILD_CFGOPTIONS='--disable-arch' AM_BINARY_TARGET='binary-indep' each-deb
+one-deb: AM_DEBBOPTS = -B
+one-deb: AM_DEBXOPTS = -d
+one-deb: BUILD_CFGOPTIONS = --disable-indep
+one-deb: AM_BINARY_TARGET = binary-arch
+one-deb: each-deb
+
+one-t-deb: BUILD_MOREOPTIONS = --without-modules
+one-t-deb: one-deb
+
+one-k-deb: BUILD_MOREOPTIONS = --without-tools
+one-k-deb: one-deb
+
+all-deb: AM_DEBBOPTS = -b
+all-deb: AM_DEBXOPTS = -d
+all-deb: BUILD_CFGOPTIONS =
+all-deb: AM_BINARY_TARGET = binary
+all-deb: each-deb
 
 chg-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -227,19 +245,22 @@ chg-deb:
 #!     This target will build the debian binary package (.deb file) from the
 #!     .dsc created above.  (This target will also create the .dsc if it has not
 #!     been created already.)  The subpackage .deb files will be named:
-#!     @PACKAGE_LCNAME@-*_@VERSION@-@PACKAGE_DEBRELEASE@_*[ud.]deb, where the stars indicate the subpackage and
+#!     @PACKAGE_LCNAME@*_@VERSION@-@PACKAGE_DEBRELEASE@_*[ud.]deb, where the stars indicate the subpackage and
 #!     the architecture.
 #!
-debs: noa-deb one-deb chg-deb
+debs: all-deb chg-deb
 
 # Another sneaky trick
-all-one-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-noa-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-chg-deb: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-dsc:     ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-debs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-sigs:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
-all-csig:    ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+all-one-k-deb:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
+all-one-t-deb:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
+all-one-deb:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
+all-noa-deb:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
+all-all-deb:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
+all-chg-deb:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
+all-dsc:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
+all-debs:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
+all-sigs:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
+all-csig:	ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' BUILD_MOREOPTIONS='$(BUILD_MOREOPTIONS)'
 
 #! csig:
 #!     This target signs the .dsc file.  You will be prompted for a password,
@@ -271,14 +292,14 @@ csig:
 #!	to make.  This is a convenience target for building a group of debs on a
 #!	given build machine.
 #!
-reupload: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+reupload: ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 reupload:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@debs="`find $(debdir) -name '$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_all.*deb' 2>/dev/null`"; \
+	@debs="`find $(debdir) -name '$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_all.*deb' 2>/dev/null`"; \
 	if test -z "$$debs" -o -n '$(FORCE)'; then \
 		$(ECHO) "D: $@: rebuild noarch"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb"; \
-		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb || :; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb || :; \
 	else \
 		$(ECHO) "D: $@: skipped noarch"; \
 	fi; \
@@ -295,27 +316,27 @@ reupload:
 				fi; \
 			fi; \
 			ks=`echo $$k | sed 's,-,.,g;s,_,.,g'`; \
-			debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)-*-$(VERSION)_$(krelease)_$$a.*deb' 2>/dev/null`"; \
+			debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_$$a.*deb' 2>/dev/null`"; \
 			if test -z "$$debs" -o -n '$(FORCE)'; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
-				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" one-deb"; \
-				$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" one-deb || :; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" one-deb"; \
+				$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" one-deb || :; \
 			else \
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
 		done; \
-		debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)-*_$(VERSION)-$(PACKAGE_DEBRELEASE)_$$a.*deb' 2>/dev/null`"; \
+		debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_$$a.*deb' 2>/dev/null`"; \
 		if test -z "$$debs" -o -n '$(FORCE)'; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
-			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" one-deb"; \
-			$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" one-deb|| :; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" one-deb"; \
+			$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" one-deb|| :; \
 		else \
 			$(ECHO) "D: $@: skipped $$a"; \
 		fi; \
 	done; \
 	if test -z "$$debs" -o -n '$(FORCE)'; then \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb"; \
-		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb || :; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb || :; \
 	fi
 
 distclean-deb:
@@ -331,7 +352,7 @@ DISTCLEANFILES		+= $(debian_cache_files) \
 
 release-clean-deb: distclean-deb
 
-RELEASE			+= all-dsc all-noa-deb all-one-deb all-chg-deb
+RELEASE			+= all-dsc all-all-deb all-chg-deb
 RELEASE_SIGN		+= all-sigs all-csig
 RELEASE_DIRECTORIES	+= 
 RELEASE_CLEAN_LOCAL	+= release-clean-deb
@@ -343,8 +364,8 @@ RELEASECLEANFILES	+= $(debian_dir_stamp) \
 			   $(debtop_change_files) \
 			   $(debtop_binary_files)
 
-MY_PHONY		+= dsc debs each-deb one-deb noa-deb sigs csig reupload
-ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-deb all-noa-deb all-chg-deb all-sigs all-csig all-reupload
+MY_PHONY		+= dsc debs each-deb one-t-deb one-k-deb one-deb noa-deb all-deb sigs csig reupload
+ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-t-deb all-one-k-deb all-one-deb all-noa-deb all-all-deb all-chg-deb all-sigs all-csig all-reupload
 
 update-clean-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -389,7 +410,7 @@ update-dscs:
 ## exist, were created after the update stamp, and force is applied, recreate
 ## the DEB set.
 ##
-update-debs: ALL_EXPORT_OPTS = DEBXOPTS='$(DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
+update-debs: ALL_EXPORT_OPTS = AM_DEBXOPTS='$(AM_DEBXOPTS)' BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'
 update-debs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@rebuild=yes; rebuilt=no; \
@@ -402,8 +423,8 @@ update-debs:
 	done; \
 	if test ":$$rebuild" = :yes; then \
 		$(ECHO) "D: $@: rebuild noarch"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb"; \
-		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb || :; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"noarch\" noa-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="noarch" noa-deb || :; \
 		rebuilt=yes; \
 	else \
 		$(ECHO) "D: $@: skipped noarch"; \
@@ -432,8 +453,8 @@ update-debs:
 			done; \
 			if test ":$$rebuild" = :yes; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
-				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" one-deb"; \
-				$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" one-deb || :; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" one-deb"; \
+				$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" one-deb || :; \
 				rebuilt=yes; \
 			else \
 				$(ECHO) "D: $@: skipped $$k"; \
@@ -449,8 +470,8 @@ update-debs:
 		done; \
 		if test ":$$rebuild" = :yes; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
-			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" one-deb"; \
-			$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" one-deb|| :; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" one-deb"; \
+			$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" one-deb|| :; \
 			rebuilt=yes; \
 		else \
 			$(ECHO) "D: $@: skipped $$a"; \
@@ -458,8 +479,8 @@ update-debs:
 	done; \
 	if test ":$$rebuilt" = :yes; then \
 		$(ECHO) "D: $@: rebuild changes"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb"; \
-		$(MAKE) $(AM_MAKEFLAGS) DEBXOPTS='$(DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb || :; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' chg-deb || :; \
 	else \
 		$(ECHO) "D: $@: skipped changes"; \
 	fi
