@@ -67,85 +67,98 @@ Provides : %{name}-%{kernel_version} = %{epoch}:%{baseversion}-%{fullreleasew}
 RedHat/Fedora
 -------------
 
-Name     : %{kernel_package}
-Version  : %{kbaseversion}
-Release  : %{kfullrelease}
-Group    : System Environment/Kernel
-Requires : /bin/sh /sbin/depmod
-Requires : kernel >= %{minimum_kversion} (optional)
+    Name     : %{kernel_package}
+    Version  : %{kbaseversion}
+    Release  : %{kfullrelease}
+    Group    : System Environment/Kernel
+    Requires : /bin/sh /sbin/depmod
+    Requires : kernel >= %{minimum_kversion} (optional)
 
-Provides : kernel-modules = %{kernel_version}
-Provides : kmod-%{name}%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides : %{name}-kmod = %{epoch}:%{kbaseversion}-%{kfullrelease}
+    Provides : kernel-modules = %{kernel_version}
+    Provides : kmod-%{name}%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+    Provides : %{name}-kmod = %{epoch}:%{kbaseversion}-%{kfullrelease}
 
-Place modules in /lib/modules/%{kernel_version}/extra/openss7
+    Place modules in /lib/modules/%{kernel_version}/extra/openss7
 
-Requires : kernel%{kernel_flavor} = %{kernel_version} (only if weak-updates not supported)
+    Requires : kernel%{kernel_flavor} = %{kernel_version} (only if weak-updates not supported)
 
-For example, $(uname -r) = 2.6.18-194.32.1.el5 becomes
+    For example, $(uname -r) = 2.6.18-194.32.1.el5 becomes
 
-Name     : kmod-openss7
-Version  : 1.1.1
-Release  : 1.2.6.18.194.32.1.el5
-Group    : System Environment/Kernel
-Requires : /bin/sh /sbin/depmod
-Provides : kernel-modules = 2.6.18-194.32.1.el5
-Provides : kmod-openss7 = 0:1.1.1-1.2.6.18.194.32.1.el5
-Provides : openss7-kmod = 0:1.1.1-1.2.6.18.194.32.1.el5
+    Name     : kmod-openss7
+    Version  : 1.1.1
+    Release  : 1.2.6.18.194.32.1.el5
+    Group    : System Environment/Kernel
+    Requires : /bin/sh /sbin/depmod
+    Provides : kernel-modules = 2.6.18-194.32.1.el5
+    Provides : kmod-openss7 = 0:1.1.1-1.2.6.18.194.32.1.el5
+    Provides : openss7-kmod = 0:1.1.1-1.2.6.18.194.32.1.el5
 
-Provides : openss7-kernel = 0:1.1.1-1.2.6.18.194.32.1.el5
-Provides : openss7-kernel = 0:1.1.1-1
-Provides : openss7-kernel = 0:1.1.1-1.centos
-Provides : openss7-kernel = 0:1.1.1-1.el5
+    Provides : openss7-kernel = 0:1.1.1-1.2.6.18.194.32.1.el5
+    Provides : openss7-kernel = 0:1.1.1-1
+    Provides : openss7-kernel = 0:1.1.1-1.centos
+    Provides : openss7-kernel = 0:1.1.1-1.el5
 
-Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.2.6.18.194.32.1.el5
-Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1
-Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.centos
-Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.el5
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.2.6.18.194.32.1.el5
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.centos
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.el5
 
 SuSE Code 11
 ------------
 
-Name     : %{kernel_package}
-Version  : %{kbaseversion}
-Release  : %{kfullrelease}
-Group    : System Environment/Kernel
-Requires : coreutils grep
+    Name     : %{kernel_package}
+    Version  : %{kbaseversion}
+    Release  : %{kfullrelease}
+    Group    : System Environment/Kernel
+    Requires : coreutils grep
 
-Requries : kernel%{kernel_flavor}
-Enhances : kernel%{kernel_flavor}
+    Requries : kernel%{kernel_flavor}
+    Enhances : kernel%{kernel_flavor}
 
-Provides : multiversion(kernel)
-Provides : %{name}-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
-Provides : %{name}-kmp = %{epoch}:%{kbasversion}-%{kfullrelease}
+    Provides : multiversion(kernel)
+    Provides : %{name}-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kfullrelease}
+    Provides : %{name}-kmp = %{epoch}:%{kbasversion}-%{kfullrelease}
 
-Place modules in /lib/modules/%{kernel_version}/extra/openss7
-              or /lib/modules/%{kernel_version}/updates/openss7
+    Place modules in /lib/modules/%{kernel_version}/extra/openss7
+		  or /lib/modules/%{kernel_version}/updates/openss7
 
-For example, $(uname -r) = 2.6.32.24-0.2-default becomes
+    For example, $(uname -r) = 2.6.32.24-0.2-default becomes
 
-Name     : openss7-kmp-default
-Version  : 1.1.1_2.6.32_0.2
-Release  : 1.11.1
-Group    : System Environment/Kernel
-Requires : coreutils grep
+    Name     : openss7-kmp-default
+    Version  : 1.1.1_2.6.32_0.2
+    Release  : 1.11.1
+    Group    : System Environment/Kernel
+    Requires : coreutils grep
 
-Requires : kernel-default
-Enhances : kernel-default
+    Requires : kernel-default
+    Enhances : kernel-default
 
-Provides : multiversion(kernel)
-Provides : openss7-kmp-default = 0:1.1.1_2.6.32_0.2-1.11.1
-provides : openss7-kmp = 0:1.1.1_2.6.32_0.2-1.11.1
+    Provides : multiversion(kernel)
+    Provides : openss7-kmp-default = 0:1.1.1_2.6.32_0.2-1.11.1
+    provides : openss7-kmp = 0:1.1.1_2.6.32_0.2-1.11.1
 
-Provides : openss7-kernel = 0:1.1.1_2.6.32_0.2-1.11.1
-Provides : openss7-kernel = 0:1.1.1-1
-Provides : openss7-kernel = 0:1.1.1-1.11.1
-Provides : openss7-kernel = 0:1.1.1-1.suse
+    Provides : openss7-kernel = 0:1.1.1_2.6.32_0.2-1.11.1
+    Provides : openss7-kernel = 0:1.1.1-1
+    Provides : openss7-kernel = 0:1.1.1-1.11.1
+    Provides : openss7-kernel = 0:1.1.1-1.suse
 
-Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1_2.6.32_0.2-1.11.1
-Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1
-Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.11.1
-Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.suse
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1_2.6.32_0.2-1.11.1
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.11.1
+    Provides : openss7-2.6.18-194.32.1.el5 = 0:1.1.1-1.suse
+
+Debian:
+-------
+
+    Package      : openss7-@kernel_version@
+    Architecture : any
+    Section      : kernel
+    Priority     : optional
+    Provides     : openss7-kernel
+                 : openss7-@kernel_version@
+    Requires     : linux-image-2.6
+                 : linux-image-@kernel_version@ (only if tied to ABI)
+    Pre-Requires : openss7-base = @VERSION@
 
 
 When to install and when to update:
