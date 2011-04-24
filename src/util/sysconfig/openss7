@@ -2,6 +2,13 @@
 # This is an initial configuration file for the OPENSS7 subsystem.
 #
 
+# Update kernel modules at boot?
+OPENSS7_KUPDATE='no'
+# Load modules at boot?
+OPENSS7_BOOTLOAD='no'
+# Mount specfs file system at boot?
+OPENSS7_BOOTMOUNT='no'
+
 # Mount specfs file system?
 OPENSS7_MOUNTSPECFS='no'
 # Unmount specfs file system?

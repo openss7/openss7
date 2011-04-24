@@ -54,6 +54,13 @@ prerm.d:
     kernel using exit status because Debian is smart enough to execute
     hooks before updating the boot-loader.
 
+    When upgrading a kernel (to a newer kernel version with the same
+    linxu-image-2.6.M[.REV]-ABI-FLAVOR), the prerm script of the old
+    version is called first.  So, $1 will be the 2.6.M[.REV]-ABI-FLAVOR
+    being upgraded and DEB_MAINT_PARAMS will be 'upgrade' new-version.
+    The new-version is not useful information as it has no bearing on
+    the uname -r version of the kernel nor the ABI.
+
 postrm.d:
     Nothing to do.
 
@@ -108,6 +115,627 @@ practically possible to install kernel with the same version as the
 running kernel.  Perhaps by maintainers.  Code does not exist for this
 anymore.
 
+Kernel Installation:
+--------------------
+
+When a kernel is installed or upgraded and the kernel deviates from the
+ABI for a kernel supported by the installed openss7 modules, the user
+should be warned that the new kernel will not boot STREAMS and that its
+configuration should be aborted.  If this is done during the
+configuration stage, the kernel can be left unconfigured (and therefore
+left out of the boot loader).  When openss7 modules become available and
+are updated, a the kernel will be finally configured and added to the
+boot loader.
+
+The sequence of actions for kernel installation are:
+
+new-preinst install old-version
+*F* new-postrm abort-install old-version
+    *F* package in "Half-Installed" state
+    package in "Config-Files" state
+
+or
+
+new-preinst install
+*F* new-postrm abort-install
+    *F* package in "Half-Installed" state
+    package in "Not Installed" state
+
+then,
+
+files are unpacked.
+file list added.
+scripts added.
+package state is "Unpacked"
+
+new-postinst configure most-recently-configured-version
+*F* package in "Failed Config" state
+
+Kernel Upgrade:
+---------------
+
+Both Debian and Ubuntu upgrade a kernel when they ABI does not change.
+In this case, the kernel modules of the new version overwrite the kernel
+modules of the old version.  Handling kernel upgrades is the same as for
+installations for kernels that are not the running kernel.  However,
+when the running kernel is upgraded, there are significant issues.
+
+When there are either openss7 modules installed for the running kernel
+or there are weak-update links for the running kernel, the upgraded
+kernel is not the same as the running kernel.  While the kernel is
+running (i.e. until reboot), the kernel modules associated with the
+running kernel must remain linked to it.  Only when the system reboots
+on the new kernel must the openss7 modules be relinked.  That is, if
+relinking is required at all.  This can be checked after the new kernel
+has been unpacked (i.e. in kernel.postinst) and the user warned to
+reboot on the new kernel.  Note that the kernel installation routines
+already does this, so all that is necessary is that running kernels be
+skipped from weak-updates and relinking when kernels are updated.
+
+The sequence of actions for kernel upgrade are:
+
+ old-prerm upgrade new-version
+ *F* new-prerm failed-upgrade old-version
+     *F* old package "Half-Configured"
+
+ new-preinst upgrade old-version
+ *F* new-postrm abort-upgrade old-version
+     *F* old package "Half-Installed"
+     old package "Installed" or "Unpacked"
+
+ files are unpacked, backups of old files
+
+ old-postrm upgrade new-version
+ *F* new-postrm failed-upgrade old-version
+     *F* old-preinst abort-upgrade new-version
+         *F* old package "Half-Installed" state
+         old-postinst abort-upgrade new-version
+	 *F* old package "Unpacked" state
+     installation continues
+
+ old files not in new version are removed
+ new files list replace old
+ new scripts replace old
+ backup files are deleted
+
+ new package in "Unpacked" state
+
+ new-postinst configure most-recently-configured-version
+ *F* new version in "Failed Config" state
+
+
+Kernel Removal:
+---------------
+
+ prerm remove
+ *F* postinst abort-remove
+     *F* package in "Half-Configured" state
+     package in "Installed" state
+
+ package's files removed (except conffiles)
+
+ postrm remove
+ *F* package in "Half-Installed" state
+
+ all scripts except postrm removed
+
+ postrm purge
+ *F* package in "Config-Files" state.
+
+ file list is removed.
+
+Debian Policy Manual:
+---------------------
+
+The procedure on installation, upgrade, overwrite or disappear (i.e.,
+when running dpkg --unpack, or the unpack stage of dpkg --install) is as
+follows.  In each case, if a major error occurs (unless listed below)
+the action are, in general, run backwards - this means that the
+maintainer scripts are run with different arguments in reverse order.
+These are the "error unwind" calls listed below.
+
+1.
+    1.	If a version of the package is already installed, call
+
+	    old-prerm upgrade new-version
+
+		The package whose prerm is being called will be at least
+		"Half-Installed".  All package dependencies will at
+		least be "Half-Installed" and will have previously been
+		configured and not removed.  If there was no error, all
+		dependencies will at least be unpacked, but these
+		actions may be called in various error states where
+		dependencies are only "Half-Installed" due to a partial
+		upgrade.
+
+    2.  If the script runs but exits with a non-zero exit status, dpkg
+	will attempt:
+
+	    new-prerm failed-upgrade old-version
+
+		Called during error handling when 'prerm upgrade' fails.
+		The new package will not yet be unpacked, and all the
+		same constraints as for 'preinst upgrade' apply.
+
+	If this works, then the old-version is "Installed", if not, the
+	old version is in a "Half-Configured" state.
+
+2.  If a "conflicting" package is being removed at the same time, or if
+    any package will be broken (due to Breaks):
+
+    1.	If --auto-deconfigure is specified, call, for each package to be
+	deconfigured due to Breaks:
+
+	    dec-prerm deconfigure \
+		'in-favour' package-being-installed version
+
+		The package whose prerm is being called will be at least
+		"Half-Installed".  All package dependencies will at
+		least be "Half-Installed" and will have previously been
+		configured and not removed.  If there was no error, all
+		dependencies will at least be unpacked, but these
+		actions may be called in various error states where
+		dependencies are only "Half-Installed" due to a partial
+		upgrade.
+
+	Error unwind:
+
+	    dec-postinst abort-deconfigure \
+		'in-favour' package-being-installed version
+
+		The files contained in the package will be unpacked.
+		All package dependencies will at least be
+		"Half-Installed" and will have previously been
+		configured and not removed.  However, dependencies may
+		not be configured or even fully unpacked in some error
+		situations.  The 'postinst' should still attempt any
+		actions for which its dependencies are required, since
+		they will normally be available, but consider the
+		correct error handling approach if those actions fail.
+		Aborting the 'postinst' action if commands or facilities
+		from the package dependencies are not available is often
+		the best approach.
+
+	The deconfigured packages are marked as requiring configuration,
+	so that if --install is used they will be configured again if
+	possible.
+
+    2.	If any packages depend on a conflicting package being removed
+	and --auto-deconfigure is specified, call, for each such
+	package:
+
+	    dec-prerm deconfigure \
+		'in-favour' package-being-installed version \
+		'removing' conflicting-package version
+
+		The package whose prerm is being called will be at least
+		"Half-Installed".  All package dependencies will at
+		least be "Half-Installed" and will have previously been
+		configured and not removed.  If there was no error, all
+		dependencies will at least be unpacked, but these
+		actions may be called in various error states where
+		dependencies are only "Half-Installed" due to a partial
+		upgrade.
+
+	Error unwind:
+
+	    dec-postinst abort-deconfigure \
+		'in-favor' package-being-installed version \
+		'removing' conflicting-package version
+
+		The files contained in the package will be unpacked.
+		All package dependencies will at least be
+		"Half-Installed" and will have previously been
+		configured and not removed.  However, dependencies may
+		not be configured or even fully unpacked in some error
+		situations.  The 'postinst' should still attempt any
+		actions for which its dependencies are required, since
+		they will normally be available, but consider the
+		correct error handling approach if those actions fail.
+		Aborting the 'postinst' action if commands or facilities
+		from the package dependencies are not available is often
+		the best approach.
+
+	The deconfigured packages are marked as requiring configuration,
+	so that if --install is used they will be configured again if
+	possible.
+
+    3.	To prepare for removal of each conflicting package, call:
+
+	    con-prerm remove \
+		'in-favour' package new-version
+
+		The package whose prerm is being called will be at least
+		"Half-Installed".  All package dependencies will at
+		least be "Half-Installed" and will have previously been
+		configured and not removed.  If there was no error, all
+		dependencies will at least be unpacked, but these
+		actions may be called in various error states where
+		dependencies are only "Half-Installed" due to a partial
+		upgrade.
+
+	Error unwind:
+
+	    con-postinst abort-remove \
+		'in-favour' package new-version
+
+		The files contained in the package will be unpacked.
+		All package dependencies will at least be
+		"Half-Installed" and will have previously been
+		configured and not removed.  However, dependencies may
+		not be configured or even fully unpacked in some error
+		situations.  The 'postinst' should still attempt any
+		actions for which its dependencies are required, since
+		they will normally be available, but consider the
+		correct error handling approach if those actions fail.
+		Aborting the 'postinst' action if commands or facilities
+		from the package dependencies are not available is often
+		the best approach.
+
+3.
+    1.	If the package is being upgraded, call:
+
+	    new-preinst upgrade old-version
+
+		The package wil not yet be unpacked, so the preinst
+		script cannot reply on any files included in its
+		package.  Only essential packages and pre-dependencies
+		(Pre-Depends) may be assumed to be available.
+		Pre-dependencies will have been configured at least
+		once, but at the time the preinst is called, they may
+		only be in an unpacked or "Half-Configured" stat if a
+		previous version of the pre-dependency was completely
+		configured and has not been removed since then.
+
+	If this fails, we call:
+
+	    new-postrm abort-upgrade old-version
+
+		Called before unpacking the new package as part of the
+		error handling of of 'preinst' failures.  May assume the
+		same state as 'preinst' can assume.
+
+	1.  If that works, then
+
+		old-postinst abort-upgrade new-version
+
+		    The files contained in the package will be unpacked.
+		    All package dependencies will at least be "Half-
+		    Installed" and will have previously been configured
+		    and not removed.  However, dependencies may not be
+		    configured or even fully unpacked in some error
+		    situations.  The 'postinst' should still attempt any
+		    actions for which its dependencies are required,
+		    since they will normally be available, but consider
+		    the correct error handling approach if those actions
+		    fail.  Aborting the 'postinst' action if commands or
+		    facilities from the package dependencies are not
+		    available is often the best approach.
+
+	    is called.  If this works, then the old version is in a
+	    "Installed" state, or else it is left in an "Unpacked"
+	    state.
+
+	2.  If it fails, then the old version is left in a
+	    "Half-Installed" state.
+
+    2.	Otherwise, if the package had some configuration files from a
+	previous version installed (i.e., it is in the "configuration
+	files only" state):
+
+	    new-preinst install old-version
+
+		The package wil not yet be unpacked, so the preinst
+		script cannot reply on any files included in its
+		package.  Only essential packages and pre-dependencies
+		(Pre-Depends) may be assumed to be available.
+		Pre-dependencies will have been configured at least
+		once, but at the time the preinst is called, they may
+		only be in an unpacked or "Half-Configured" stat if a
+		previous version of the pre-dependency was completely
+		configured and has not been removed since then.
+
+	Error unwind:
+
+	    new-postrm abort-install old-version
+
+		Called before unpacking the new package as part of the
+		error handling of of 'preinst' failures.  May assume the
+		same state as 'preinst' can assume.
+
+	If this fails, the package is left in a "Half- Installed" state,
+	which requires a reinstall.  If it works, the package is left in
+	a "Config-Files" state.
+
+    3.	Otherwise (i.e., the package was completely purged):
+
+	    new-preinst install
+
+		The package wil not yet be unpacked, so the preinst
+		script cannot reply on any files included in its
+		package.  Only essential packages and pre-dependencies
+		(Pre-Depends) may be assumed to be available.
+		Pre-dependencies will have been configured at least
+		once, but at the time the preinst is called, they may
+		only be in an unpacked or "Half-Configured" stat if a
+		previous version of the pre-dependency was completely
+		configured and has not been removed since then.
+
+	Error unwind:
+
+	    new-postrm abort-install
+
+		Called before unpacking the new package as part of the
+		error handling of of 'preinst' failures.  May assume the
+		same state as 'preinst' can assume.
+
+	If the error-unwind fails, the package is in a "Half- Installed"
+	phase, and requires a reinstall.  If the error unwind works, the
+	package is in a not installed state.
+
+4.  The new package's files are unpacked, overwriting any that may be on
+    the system already, for example any from the old version of the same
+    package or from another package.  Backups of the old files are kept
+    temporarily, and if anything goes wrong the package management
+    system will attempt to put them back as part of the error unwind.
+
+    It is an error for a package to contain files which are on the
+    system in another package, unless Replaces is used.
+
+    It is a more serious error for a package to contain a plain file or
+    other kind of non-directory where another package has a directory
+    (again, unless Replaces is used).  This error can be overridden if
+    desired using --force-overwrite-dir, but this is not advisable.
+
+    Package that overwrite each other's files produce behavior which,
+    though deterministic, is hard for the system administrator to
+    understand.  It can easily lead to "missing" programs if, for
+    example, a package is unpacked which overwrites a file from another
+    package, and is then removed again.
+
+    A directory will never be replaced by a symbolic link to a directory
+    or visa versa; instead, the existing state (symlink or not) will be
+    left alone and dpkg will follow the symlink if there is one.
+
+5.  1.	If the package is being upgraded, call
+
+	    old-postrm upgrade new-version
+
+		The 'postrm' script is called after the package's files
+		have been removed or replaced.  The package whose
+		'postrm' is being called may have previously been
+		deconfigured and only be unpacked, at which point
+		subsequent package changes do not consider its
+		dependencies.  Therefore, all 'postrm' actions may only
+		rely on essential packages and must gracefully skip any
+		actions that require the package's dependencies if those
+		dependencies are unavailable.
+
+    2.	If this fails, dpkg will attempt:
+
+	    new-postrm failed-upgrade old-version
+
+		Called when the old 'postrm upgrade' action fails.  The
+		new package will be unpacked, but only essential
+		packages and pre-dependencies can be relied on.
+		Pre-dependencies will either be configured or will be
+		"Unpacked" or "Half- Configured" but previously had been
+		configured and was never removed.
+
+	If this works, installation continues.  If not, error unwind:
+
+	    old-preinst abort-upgrade new-version
+
+		Called during error handilng of an upgrade that failed
+		after unpacking the new package because the 'postrm
+		upgrade' action failed.  The unpacked files may be
+		partly from the new version or partly missing, so the
+		script cannot rely on files included in the package.
+		Package dependencies may not be available.
+		Pre-dependencies will be at least unpacked following the
+		same rules as above, except thay may be only
+		"Half-Installed" if an upgrade of the pre-dependency
+		fails.
+
+	If this fails, the old version is left in a "Half- Installed"
+	state.  If it works, dpkg now calls:
+
+	    old-postinst abort-upgrade new-version
+
+		The files contained in the package will be unpacked.
+		All package dependencies will at least be
+		"Half-Installed" and will have previously been
+		configured and not removed.  However, dependencies may
+		not be configured or even fully unpacked in some error
+		situations.  The 'postinst' should still attempt any
+		actions for which its dependencies are required, since
+		they will normally be available, but consider the
+		correct error handling approach if those actions fail.
+		Aborting the 'postinst' action if commands or facilities
+		from the package dependencies are not available is often
+		the best approach.
+
+	If this fails, the old version is in an "Unpacked" state.
+
+    This is the point of no return: if dpkg gets this far, it won't back
+    off past this point if an error occurs.  This will leave the package
+    in a fairly bad state, which will require a successful
+    re-installation to clear up, but is when dpkg starts doing things
+    that are irreversible.
+
+6.  Any files which were in the old version of the package but not in
+    the new are removed.
+
+7.  The new file list replaces the old.
+
+8.  The new maintainer scripts replace the old.
+
+9.  Any packages all of whose files have been overwritten during the
+    installation, and which aren't required for dependencies, are
+    considered to have been removed.  For each such package:
+
+    1.	dpkg calls:
+
+	    dis-postrm disappear overwriter overwriter-version
+
+		The 'postrm' script is called after the package's files
+		have been removed or replaced.  The package whose
+		'postrm' is being called may have previously been
+		deconfigured and only be unpacked, at which point
+		subsequent package changes do not consider its
+		dependencies.  Therefore, all 'postrm' actions may only
+		rely on essential packages and must gracefully skip any
+		actions that require the package's dependencies if those
+		dependencies are unavailable.
+
+    2.	The package's maingainer scripts are removed.
+
+    3.	It is noted in the status database as being in a sane state,
+	nameley not installed (any conffiles it may have are ignored,
+	rather then being removed by dpkg).  Note that disappearing
+	packages do not have their 'prerm' called, because dpkg doesn't
+	know in advance that the package is going to vanish.
+
+10. Any files in the package we're unpacking that are also listed in the
+    file lists of other packages are remove from those lists.  (This
+    will lobotomize the file list of the "conflicting" package if there
+    is one.)
+
+11. The backup files made during installation, above, are deleted.
+
+12. The new package's status is now sane, and recorded as "unpacked".
+
+    Here is another point of no return: if the conflicting package's
+    removal fails we do not unwind the rest of the installation; the
+    conflicting package is left in a half-removed limbo.
+
+13. If there was a conflicting package we go and do the removal actions
+    (described below), staring with the removal of the conflicting
+    package's files (any that are also in the package being unpacked
+    have already been removed from the conflicting package's file list,
+    and so do not get removed).
+
+When we configure package (this happens with dpkg --install and dpkg
+--configure), we first update any conffiles and then call:
+
+    postinst configure most-recently-configured-version
+
+	The files contained in the package will be unpacked.  All
+	package dependencies will at least be unpacked.  If there are no
+	circular dependencies involved, all package dependencies will be
+	configured.
+
+	If there is a circular dependency amoung packages being
+	installed, or removed, installation or removal order honoring
+	the dependency order is impossible, requiring the dependency
+	loop be broken at some point and the dependency requirements
+	violated for at least one package.  Packages involved in
+	circular dependencies may not be able to rely on their
+	dependencies being configured before they themselves are
+	configured, depending on which side of the break of the circular
+	dependency loop they happen to be on.  If one of the packages in
+	the loop has no 'postinst' script, then the cycle will be broken
+	at that package; this ensures that all 'postinst' scripts are
+	run with their dependencies properly configured if this is
+	possible.  Otherwise, the breaking point is arbitrary.  Packages
+	should therefore avoid circular dependencies where possible,
+	particularly if they have 'postinst' scripts.
+
+No attempt is made to unwind after errors during configuration.  If the
+configuration fails, the package is in a "Failed Config" state, and an
+error message is generated.
+
+If there is no most recently configured verison dpkg will pass a null
+argument.
+
+Details of removal and/or configuration purging:
+
+1.	prerm remove
+
+	    The package whose prerm is being called will be at least
+	    "Half-Installed".  All package dependencies will at least be
+	    "Half-Installed" and will have previously been configured
+	    and not removed.  If there was no error, all dependencies
+	    will at least be unpacked, but these actions may be called
+	    in various error states where dependencies are only
+	    "Half-Installed" due to a partial upgrade.
+
+    If prerm fails during replacement due to conflict:
+
+	con-postinst abort-remove \
+	    'in-favour' package new-version
+
+	    The files contained in the package will be unpacked.  All
+	    package dependencies will at least be "Half-Installed" and
+	    will have previously been configured and not removed.
+	    However, dependencies may not be configured or even fully
+	    unpacked in some error situations.  The 'postinst' should
+	    still attempt any actions for which its dependencies are
+	    required, since they will normally be available, but
+	    consider the correct error handling approach if those
+	    actions fail.  Aborting the 'postinst' action if commands or
+	    facilities from the package dependencies are not available
+	    is often the best approach.
+
+    Or else we call:
+
+	postinst abort-remove
+
+	    The files contained in the package will be unpacked.  All
+	    package dependencies will at least be "Half-Installed" and
+	    will have previously been configured and not removed.
+	    However, dependencies may not be configured or even fully
+	    unpacked in some error situations.  The 'postinst' should
+	    still attempt any actions for which its dependencies are
+	    required, since they will normally be available, but
+	    consider the correct error handling approach if those
+	    actions fail.  Aborting the 'postinst' action if commands or
+	    facilities from the package dependencies are not available
+	    is often the best approach.
+
+    If this fails, the package is in a "Half-Configured" state, or else
+    it remains "Installed".
+
+2.  The package's files are removed (except conffiles).
+
+3.	postrm remove
+
+	    The 'postrm' script is called after the package's files have
+	    been removed or replaced.  The package whose 'postrm' is
+	    being called may have previously been deconfigured and only
+	    be unpacked, at which point subsequent package changes do
+	    not consider its dependencies.  Therefore, all 'postrm'
+	    actions may only rely on essential packages and must
+	    gracefully skip any actions that require the package's
+	    dependencies if those dependencies are unavailable.
+
+    If it fails, there's no error unwind, and the package is in a
+    "Half-Installed" state.
+
+4.  All the maintainer scripts except the 'postrm' are removed.
+
+    If we aren't purging the package we stop here.  Note that packages
+    that have no 'postrm' and no conffiles are automatically purged when
+    removed, as there is no different except for the dpkg status.
+
+5.  The conffiles and any backup files (~-files, #*# files, %-files,
+    .dpkg-{old,new,tmp}, etc.) are removed.
+
+
+6.	postrm purge
+
+	    The 'postrm' script is called after the package's files have
+	    been removed or replaced.  The package whose 'postrm' is
+	    being called may have previously been deconfigured and only
+	    be unpacked, at which point subsequent package changes do
+	    not consider its dependencies.  Therefore, all 'postrm'
+	    actions may only rely on essential packages and must
+	    gracefully skip any actions that require the package's
+	    dependencies if those dependencies are unavailable.
+
+    If this fails, the package remains in a "Config-Files" state.
+
+7.  The package's file list is removed.
 
 -----
 

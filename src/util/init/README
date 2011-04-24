@@ -1,65 +1,46 @@
-OpenSS7 STREAMS XNS -- init script readme file.  2006-05-07
+OpenSS7 STREAMS -- init script readme file.  2011-04-22
 $Id: README,v 1.1.2.1 2009-06-21 11:47:56 brian Exp $
-Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
-Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
+Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 See the end for copying conditions (for this file).
 
 This directory contains init scripts as follows:
 
-  specfs	- initializes the specfs file system and /dev/streams mount point
-  streams	- brings up the STREAMS subsystem
-  strerr	- initializes the error logger
-  strace	- initializes the trace logger
-  strtty	- initializes terminals
-  strsock	- initializes sockets
-  strchan	- initializes channel devices
+The following are RH-style init scripts:
 
-  strcompat	- brings up the STREAMS Compatibility subsystem
+  specfs	    - initializes the specfs file system and
+		      /dev/streams mount point
+  streams	    - brings up the STREAMS subsystem
+  strerr	    - initializes the error logger
+  strace	    - initializes the trace logger
 
-  strxns	- brings up the STREAMS XNS subsystem
-  strxnet	- brings up the STREAMS XNET subsystem
-  strinet	- brings up the STREAMS INET subsystem
-  strsctp	- brings up the STREAMS SCTP subsystem
-  strx25	- brings up the STREAMS X.25 subsystem
-  striso	- brings up the STREAMS ISO subsystem
-  strisdn	- brings up the STREAMS ISDN subsystem
-  stratm	- brings up the STREAMS ATM subsystem
+  strtty	    - initializes terminals (not currently used)
+  strsock	    - initializes sockets (not currently used)
+  strchan	    - initializes channel devices (not currently used)
 
-  strss7	- brings up the STREAMS SS7 subsystem
-  sigtran	- brings up the STREAMS SIGTRAN subsystem
-  strvoip	- brings up the STREAMS VoIP subsystem
+  openss7	    - initializes all other STREAMS subsystems
 
-The above are the RH-style init scripts.  The following are the Debian-style
-init scripts.
+The following are the Debian-style init scripts:
 
-  specfs.sh	- initializes the specfs file system and /dev/streams mount point
-  streams.sh	- brings up the STREAMS subsystem
-  strerr.sh	- initializes the error logger
-  strace.sh	- initializes the trace logger
-  strtty.sh	- initializes terminals
-  strsock.sh	- initializes sockets
-  strchan.sh	- initializes channel devices
+  specfs.sh	    - initializes the specfs file system and
+		      /dev/streams mount point
+  streams.sh	    - brings up the STREAMS subsystem
+  strerr.sh	    - initializes the error logger
+  strace.sh	    - initializes the trace logger
 
-  strcompat.sh	- brings up the STREAMS Compatibility subsystem
+  strtty.sh	    - initializes terminals (not currently used)
+  strsock.sh	    - initializes sockets (not currently used)
+  strchan.sh	    - initializes channel devices (not currently used)
 
-  strxns.sh	- brings up the STREAMS XNS subsystem
-  strxnet.sh	- brings up the STREAMS XNET subsystem
-  strinet.sh	- brings up the STREAMS INET subsystem
-  strsctp.sh	- brings up the STREAMS SCTP subsystem
-  strx25.sh	- brings up the STREAMS X.25 subsystem
-  striso.sh	- brings up the STREAMS ISO subsystem
-  strisdn.sh	- brings up the STREAMS ISDN subsystem
-  stratm.sh	- brings up the STREAMS ATM subsystem
-
-  strss7.sh	- brings up the STREAMS SS7 subsystem
-  sigtran.sh	- brings up the STREAMS SIGTRAN subsystem
-  strvoip.sh	- brings up the STREAMS VoIP subsystem
+  openss7.sh	    - initializes all other STREAMS subsystems
 
 
 =========================================================================
 
- Copyright (c) 2001-2006  OpenSS7 Corporation. <http://www.openss7.com/>
- Copyright (c) 1997-2000  Brian Bidulock <bidulock@openss7.org>
+ Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
+ Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
+ Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
 
  All Rights Reserved.
 
