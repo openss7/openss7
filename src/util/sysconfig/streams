@@ -2,6 +2,13 @@
 # This is an initial configuration file for the STREAMS subsystem.
 #
 
+# Update kernel modules at boot?
+STREAMS_KUPDATE='no'
+# Load modules at boot?
+STREAMS_BOOTLOAD='yes'
+# Mount specfs file system at boot?
+STREAMS_BOOTMOUNT='no'
+
 # Mount specfs file system?
 STREAMS_MOUNTSPECFS='yes'
 # Unmount specfs file system?

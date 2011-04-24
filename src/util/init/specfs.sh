@@ -14,11 +14,12 @@
 # arguments to add and remove links after the the name argument:
 #
 # specfs:	mount and unmount specfs
-# update-rc.d:	start 35 S .
+# update-rc.d:	start 33 S .
+# lockfile:	/var/lock/subsys/specfs
 # config:	/etc/default/specfs
-# probe:	false
+# probe:	true
 # hide:		false
-# license:	GPL
+# license:	AGPL
 # description:	The SPECFS is a special shadow filesystem used for Linux \
 #		Fast-STREAMS.  The purpose of this init script is to detect \
 #		whether the specfs is supported for the running kernel, and if \
@@ -31,11 +32,13 @@
 # Provides: specfs
 # Required-Start: $local_fs
 # Required-Stop: $local_fs
-# Default-Start: 2 3 4 5
-# Default-Stop: 0 1 6
+# Default-Start: S
+# Default-Stop:
+# X-Start-Before: $syslog
+# X-Stop-After: $null
 # X-UnitedLinux-Default-Enabled: yes
 # Short-Description: install and remove specfs filesystem
-# License: GPL
+# License: AGPL
 # Description:	The SPECFS is a special shadow filesystem used for Linux
 #	Fast-STREAMS.  The purpose of this init script is to detect whether the
 #	specfs is supported for the running kernel, and if it is, to configure
@@ -49,13 +52,14 @@ init_mode="standalone"
   if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
 elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
 elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
+elif [ -r /sbin/start-stop-daemon ] ; then                             init_mode="debian"    ;
 fi
 
 case "$init_mode" in
     (chkconfig)
 	;;
     (insserv)
-	action() {
+	action () {
 	    echo -en "$1"
 	    shift 1
 	    ${1+"$@"} >/dev/null
@@ -66,7 +70,7 @@ case "$init_mode" in
 	}
 	;;
     (lsb)
-	action() {
+	action () {
 	    echo -en "$1"
 	    shift 1
 	    ${1+"$@"} >/dev/null
@@ -75,8 +79,18 @@ case "$init_mode" in
 	    return $RETVAL
 	}
 	;;
+    (debian)
+	action () {
+	    echo -en "$1"
+	    shift 1
+	    eval "\${1+\"\$@\"} $redir"
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || echo "(failed)"; echo "."
+	    return $RETVAL
+	}
+	;;
     (standalone|*)
-	action() {
+	action () {
 	    echo -en "$1"
 	    shift 1
 	    ${1+"$@"} >/dev/null
@@ -88,9 +102,10 @@ case "$init_mode" in
 esac
 
 name='specfs'
-ucname=$"SPECFS"
+script='specfs.sh'
+ucname="SPECFS"
 lockfile="/var/lock/subsys/$name"
-config="/etc/default/$name"
+config="/etc/sysconfig/$name /etc/default/$name"
 mkdev="${name}_mkdev"
 desc="the STREAMS special shadow filesystem"
 
@@ -98,6 +113,10 @@ if [ ! -e /proc/modules     ] ; then if [ "$1" = 'stop' ] ; then exit 0 ; else e
 if [ ! -e /proc/filesystems ] ; then if [ "$1" = 'stop' ] ; then exit 0 ; else exit 5 ; fi ; fi
 
 # Specify defaults
+
+[ -n "$SPECFS_KUPDATE"        ] || SPECFS_KUPDATE='yes'
+[ -n "$SPECFS_BOOTLOAD"       ] || SPECFS_BOOTLOAD='no'
+[ -n "$SPECFS_BOOTMOUNT"      ] || SPECFS_BOOTMOUNT='no'
 
 [ -n "$SPECFS_MOUNTSPECFS"    ] || SPECFS_MOUNTSPECFS='yes'
 [ -n "$SPECFS_UMOUNTSPECFS"   ] || SPECFS_UMOUNTSPECFS='yes'
@@ -121,7 +140,7 @@ done
 
 if [ -z "$SPECFS_MKDEV" -o ! -x "$SPECFS_MKDEV" ] ; then
     SPECFS_MKDEV=
-    for prog in ./${mkdev} /sbin/${mkdev} /usr/sbin/${mkdev} /bin/${mkdev} /usr/bin/${mkdev} ; do
+    for prog in ./${mkdev} /sbin/${mkdev} /usr/sbin/${mkdev} /bin/${mkdev} /usr/bin/${mkdev}; do
 	if [ -x $prog ] ; then
 	    SPECFS_MKDEV=$prog
 	    break
@@ -145,91 +164,94 @@ case ":$VERBOSE" in
 	;;
 esac
 
-build_options() {
+build_options () {
     # Build up the options string
+    SPECFS_OPTIONS=
     [ -n "$SPECFS_UID" ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}uid=${SPECFS_UID}"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:-'-o '}${SPECFS_OPTIONS:+','}uid=${SPECFS_UID}"
     [ -n "$SPECFS_GID" ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}gid=${SPECFS_GID}"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:-'-o '}${SPECFS_OPTIONS:+','}gid=${SPECFS_GID}"
     [ -n "$SPECFS_MODE" ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}mode=${SPECFS_MODE}"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:-'-o '}${SPECFS_OPTIONS:+','}mode=${SPECFS_MODE}"
     [ "$1" = remount ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}remount"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:-'-o '}${SPECFS_OPTIONS:+','}remount"
 }
 
-modprobe_name() {
+modprobe_name () {
     module=$1
     shift
     modname="kernel module $module"
     case $module in
     (specfs)
-	modname=$"Special Shadow Filesystem (specfs)"
+	modname="Special Shadow Filesystem (specfs)"
 	;;
     (streams)
-	modname=$"SVR 4.2MP Linux Fast-STREAMS"
+	modname="SVR 4.2MP Linux Fast-STREAMS"
 	;;
     (streams-sth)
-	modname=$"SVR 4.2MP Linux Fast-STREAMS Stream Head"
+	modname="SVR 4.2MP Linux Fast-STREAMS Stream Head"
 	;;
     (streams-clone)
-	modname=$"SVR 4.2MP Linux Fast-STREAMS Clone Driver"
+	modname="SVR 4.2MP Linux Fast-STREAMS Clone Driver"
 	;;
     (streams-log)
-	modname=$"SVR 4.2MP Linux Fast-STREAMS Log Driver"
+	modname="SVR 4.2MP Linux Fast-STREAMS Log Driver"
 	;;
     (streams-aixcompat)
-	modname=$"AIX(R) 5L Version 5.1 Portable STREAMS Environment"
+	modname="AIX(R) 5L Version 5.1 Portable STREAMS Environment"
 	;;
     (streams-hpuxcompat)
-	modname=$"HP-UX(R) 11.0i v2 STREAMS/UX"
+	modname="HP-UX(R) 11.0i v2 STREAMS/UX"
 	;;
     (streams-irixcompat)
-	modname=$"IRIX(R) 6.5.17"
+	modname="IRIX(R) 6.5.17"
 	;;
     (streams-liscompat)
-	modname=$"Linux(R) STREAMS 2.18.4"
+	modname="Linux(R) STREAMS 2.18.4"
 	;;
     (streams-maccompat)
-	modname=$"Mac(R) OS 9 Open Transport"
+	modname="Mac(R) OS 9 Open Transport"
 	;;
     (streams-mpscompat)
-	modname=$"MPS(R) Mentat Portable Streams"
+	modname="MPS(R) Mentat Portable Streams"
 	;;
     (streams-osfcompat)
-	modname=$"Digital(R) UNIX (OSF/1.2)"
+	modname="Digital(R) UNIX (OSF/1.2)"
 	;;
     (streams-suncompat)
-	modname=$"Solaris(R) 9/SunOS(R) 5.9"
+	modname="Solaris(R) 9/SunOS(R) 5.9"
 	;;
     (streams-svr3compat)
-	modname=$"UNIX(R) System V Release 3.2"
+	modname="UNIX(R) System V Release 3.2"
 	;;
     (streams-svr4compat)
-	modname=$"UNIX(R) System V Release 4.2"
+	modname="UNIX(R) System V Release 4.2"
 	;;
     (streams-uw7compat)
-	modname=$"UnixWare(R) 7.1.3"
+	modname="UnixWare(R) 7.1.3"
 	;;
     esac
     echo "$modname"
 }
 
-modprobe_action() {
+modprobe_action () {
     module=$1
     shift
     modname=`modprobe_name $module`
-    action $"Loading $modname:" \
+    action "Loading $modname:" \
 	modprobe -q -- $module
-    return $?
+    RETVAL=$?
+    return $RETVAL
 }
 
-modprobe_remove() {
+modprobe_remove () {
     module=$1
     shift
     modname=`modprobe_name $module`
-    action $"Unloading $modname:" \
+    action "Unloading $modname:" \
 	modprobe -q -r -- $module
-    return $?
+    RETVAL=$?
+    return $RETVAL
 }
 
 #
@@ -238,7 +260,7 @@ modprobe_remove() {
 # When any of the removals fail, the function escapes with a non-zero return
 # value.
 #
-remove_depends() {
+remove_depends () {
     local depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
     depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
@@ -251,22 +273,35 @@ remove_depends() {
 
 #
 # start_update() checks that kernel modules have been appropriately modified for
-# the booting kernel before inserting the 'specfs' kernel module.
+# the booting kernel before inserting the 'specfs' kernel module.  Note that
+# this must be run regardless of the presence or absence of any given kernel
+# module in the booting kernel.  The existing kernel modules may have to be
+# relinked to match a booting kernel with the same ABI as an overwritten kernel.
+# This is the case for Debian, Ubuntu, SuSE and OpenSuSE, but not, it seems,
+# RedHat or Fedora.  Note that this should really only be run once on kernel
+# boot, and not any time that the Special Filesystem is restarted, so the
+# 'runlevel' and 'previous' environment variables are consulted to ensure that
+# we are starting from boot (and not just switching run levels or manually
+# invoked).
 #
-start_update() {
-    if [ -x /sbin/openss7-update ] ; then
-	if [ -r /lib/modules/`uname -r`/openss7/specfs.ko ] ; then
-	    return 0
-	elif [ -f /lib/modules/`uname -r`/weak-updates/openss7/specfs.ko || \
-	       -f /lib/modules/`uname -r`/weak-updates/extra/openss7/specfs.ko || \
-	       -f /lib/modules/`uname -r`/weak-updates/updates/openss7/specfs.ko ] ; then
-	    return 0
-	else
-	    action $"Updating kernel modules" \
-		gawk -f /sbin/openss7-modules -- -q --add-kernel $(uname -r) || \
-		return $?
+start_update () {
+    RETVAL=0
+    if [ ":$previous" = 'N' -a ":$runlevel" != ':' ] ; then
+	if [ ":$SPECFS_KUPDATE" = ':yes' -o -e /.openss7_update ] ; then
+	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules ; do
+		if [ -x $command ] ; then
+		    action "Updating kernel modules" \
+			$command -- -q --boot-kernel
+		    RETVAL=$?
+		    if [ $RETVAL -eq 0 ] ; then
+			rm -f -- /.openss7_update
+		    fi
+		    break
+		fi
+	    done
 	fi
     fi
+    return $RETVAL
 }
 
 #
@@ -274,7 +309,7 @@ start_update() {
 # are not mounting the specfs filesystem: the specfs filesystem is kernel
 # mounted and can still be accessed through external character devices.
 #
-start_specfs() {
+start_specfs () {
     if ! grep '^specfs[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
 	modprobe_action 'specfs' || RETVAL=$?
     fi
@@ -285,9 +320,31 @@ start_specfs() {
 # reload_specfs() simply ensures that the 'specfs' kernel module is loaded, so
 # it simply call start_specfs().
 #
-reload_specfs() {
+reload_specfs () {
     start_specfs || RETVAL=$?
     return $RETVAL
+}
+
+probe_specfs () {
+    # check that specfs is loaded (and filesystem available)
+    if ! grep '^specfs[[:space:]]' /proc/modules >/dev/null 2>&1 ; then
+	# specfs is not loaded
+	if [ ! -f $lockfile ] ; then echo 'start'; else echo 'reload'; fi
+    else
+	if ! grep -qc '[[:space:]]specfs\>' /proc/filesystems >/dev/null 2>&1 ; then
+	    # filesystem is not present even though specfs module loaded
+	    if [ -f $lockfile ] ; then echo 'stop'; fi
+	fi
+    fi
+    return 0
+}
+
+status_specfs () {
+    local RESULT=0
+    if ! grep '^specfs[[:space:]]' /proc/modules 2>&1 ; then
+	RESULT=1
+    fi
+    return $RESULT
 }
 
 #
@@ -295,7 +352,7 @@ reload_specfs() {
 # successful when the specfs filesystem is unmounted.  This also attempts to
 # remove any dependent modules.
 #
-stop_specfs() {
+stop_specfs () {
     if [ ":$SPECFS_UMOUNTSPECFS" = ':yes' ] ; then
 	remove_depends 'specfs' || RETVAL=$?
     fi
@@ -307,11 +364,11 @@ stop_specfs() {
 # specified when the script is set to mount the specfs filesystem at those
 # points.
 #
-start_mountpoint() {
+start_mountpoint () {
     if [ ":$SPECFS_MOUNTSPECFS" = ':yes' ] ; then
 	for mountpoint in $SPECFS_MOUNTPOINT ; do
 	    if [ ! -d "$mountpoint" ] ; then
-		action $"Creating mount point $mountpoint: " \
+		action "Creating mount point $mountpoint: " \
 		    mkdir -p -- "$mountpoint" \
 		    || RETVAL=$?
 	    fi
@@ -325,9 +382,36 @@ start_mountpoint() {
 # exist when the script is configured to mount the specfs filesystem at those
 # points.  It simply calls start_mountpoint().
 #
-reload_mountpoint() {
+reload_mountpoint () {
     start_mountpoint || RETVAL=$?
     return $RETVAL
+}
+
+probe_mountpoint () {
+    # check that all the mount points exist
+    if [ ":$SPECFS_MOUNTSPECFS" = ':yes' ] ; then
+	for mountpoint in $SPECFS_MOUNTPOINT ; do
+	    if [ ! -d $mountpoint ] ; then
+		if [ ! -f $lockfile ] ; then echo 'start'; else echo 'reload'; fi
+		break
+	    fi
+	done
+    fi
+    return 0
+}
+
+status_mountpoint () {
+    local RESULT=0
+    if [ ":$SPECFS_MOUNTSPECFS" = ':yes' ] ; then
+	for mountpoint in $SPECFS_MOUNTPOINT ; do
+	    if [ -d $mountpoint ] ; then
+		ls -ld "$mountpoint"
+	    else
+		RESULT=1
+	    fi
+	done
+    fi
+    return $RESULT
 }
 
 #
@@ -335,11 +419,11 @@ reload_mountpoint() {
 # specified when the script is set to unmount the specfs filesystem from those
 # mount points.
 #
-stop_mountpoint() {
+stop_mountpoint () {
     if [ ":$SPECFS_UMOUNTSPECFS" = ':yes' ] ; then
 	for mountpoint in $SPECFS_MOUNTPOINT ; do
 	    if [ -d "$mountpoint" ] ; then
-		action $"Removing mount point $mountpoint: " \
+		action "Removing mount point $mountpoint: " \
 		rmdir -- "$mountpoint" \
 		|| RETVAL=$?
 	    fi
@@ -352,12 +436,12 @@ stop_mountpoint() {
 # start_mount() attempts to mount the specfs filesystem on all of the specified
 # mount points and with the specified options.
 #
-start_mount() {
+start_mount () {
     if [ ":$SPECFS_MOUNTSPECFS" = ':yes' ] ; then
+	build_options
 	for mountpoint in $SPECFS_MOUNTPOINT ; do
 	    if ! mount | grep " on $mountpoint type specfs" >/dev/null 2>&1 ; then
-		build_options
-		action $"Mounting SPECFS filesystem on $mountpoint: " \
+		action "Mounting SPECFS filesystem on $mountpoint: " \
 		    mount -t specfs ${SPECFS_OPTIONS} -- specfs "$mountpoint" \
 		    || RETVAL=$?
 	    fi
@@ -373,33 +457,69 @@ start_mount() {
 # mounted so that mount parameters are updated.  It then uses start_mount() to
 # ensure that a mount point and mount exists for all the specified mount points.
 #
-reload_mount() {
+reload_mount () {
+    local device mountpoint fstype options
     if [ ":$SPECFS_MOUNTSPECFS" = ':yes' -a -f /etc/mtab ] ; then
-	while read -a fields ; do
-	    if [ ":${fields[2]}" = ':specfs' ] ; then
-		mountpoint=${fields[1]}
-		if [ -n "$mountpoint" ] ; then
-		    case " $SPECFS_MOUNTPOINT " in
-		    (*" $mountpoint "*)
-			build_options remount
-			action $"Remounting SPECFS on $mountpoint: " \
-			    mount -t specfs ${SPECFS_OPTIONS} -- specfs "$mountpoint" \
-			    || RETVAL=$?
-			continue
-			;;
-		    esac
-		    action $"Unmounting SPECFS filesystem from $mountpoint: " \
-			umount -t specfs -- "$mountpoint" \
+	build_options remount
+	while read device mountpoint fstype options; do
+	    if [ ":$fstype" = ':specfs' ] ; then
+		case " $SPECFS_MOUNTPOINT " in
+		(*" $mountpoint "*)
+		    action "Remounting SPECFS on $mountpoint: " \
+			mount -t specfs ${SPECFS_OPTIONS} -- specfs "$mountpoint" \
 			|| RETVAL=$?
-		    action $"Removing mount point $mountpoint: " \
-			rmdir -- "$mountpoint" \
-			|| RETVAL=$?
-		fi
+		    continue
+		    ;;
+		esac
+		action "Unmounting SPECFS filesystem from $mountpoint: " \
+		    umount -t specfs -- "$mountpoint" \
+		    || RETVAL=$?
+		action "Removing mount point $mountpoint: " \
+		    rmdir -- "$mountpoint" \
+		    || RETVAL=$?
 	    fi
 	done </etc/mtab
     fi
     start_mount || RETVAL=$?
     return $RETVAL
+}
+
+probe_mount () {
+    local device mountpoint fstype options
+    # check that specfs is mounted in the right place
+    if [ ":$SPECFS_MOUNTSPECFS" = ':yes' ] ; then
+	for mountpoint in $SPECFS_MOUNTPOINT ; do
+	    if ! grep "^[^[:space:]]* $mountpoint specfs " /etc/mtab >/dev/null 2>&1 ; then
+		if [ -f $lockfile ] ; then echo 'reload'; else echo 'start'; fi
+		return 0
+	    fi
+	done
+    fi
+    # check that specfs is not mounted in the wrong place
+    if [ ":$SPECFS_MOUNTSPECFS" = ':yes' -a -f /etc/mtab ] ; then
+	while read device mountpoint fstype options; do
+	    if [ ":$fstype" = ':specfs' ] ; then
+		case " $SPECFS_MOUNTPOINT " in
+		    (*" $mountpoint "*) continue ;;
+		esac
+		if [ -f $lockfile ] ; then echo 'reload'; else echo 'restart'; fi
+		return 0
+	    fi
+	done </etc/mtab
+    fi
+    return 0
+}
+
+status_mount () {
+    local RESULT=0
+    if [ ":$SPECFS_MOUNTSPECFS" = ':yes' ] ; then
+	for mountpoint in $SPECFS_MOUNTPOINT ; do
+	    if ! grep "^[^[:space:]]* $mountpoint specfs " /etc/mtab 2>&1 ; then
+		RESULT=1
+	    fi
+	done
+    fi
+    return $RESULT
 }
 
 #
@@ -411,10 +531,10 @@ reload_mount() {
 # always unmount the filesystems when performing a forced remove so that killed
 # processes cannot reopen drivers.
 #
-stop_mount() {
+stop_mount () {
     if [ ":$SPECFS_UMOUNTSPECFS" = ':yes' -o ":$SPECFS_FORCEREMOVE" = ':yes' ] ; then
 	if grep '^[^[:space:]]* [^[:space:]]* specfs ' /etc/mtab >/dev/null 2>&1 ; then
-	    action $"Unmounting SPECFS filesystem: " \
+	    action "Unmounting SPECFS filesystem: " \
 		umount -a -t specfs \
 		|| RETVAL=$?
 	fi
@@ -430,11 +550,11 @@ stop_mount() {
 # On some systems it is possible to identify this module as a system preloaded
 # module, but on others the module is only loaded when the initscript is run.
 #
-start_preload() {
+start_preload () {
     # insert in forward order
     modules=
     for module in $SPECFS_PRELOAD ; do
-	modules="${modules:+$modules }$module"
+	modules="$modules${modules:+' '}$module"
     done
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
@@ -451,9 +571,33 @@ start_preload() {
 # preloaded modules are present to be reconfigured, so start_preload() is simply
 # called.
 #
-reload_preload() {
+reload_preload () {
     start_preload || RETVAL=$?
     return $RETVAL
+}
+
+probe_preload () {
+    # check that preloads are loaded
+    for module in $SPECFS_PRELOAD ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+	    # a preload is not loaded
+	    if [ ! -f $lockfile ] ; then echo 'start'; else echo 'reload'; fi
+	    break
+	fi
+    done
+    return 0
+}
+
+status_preload () {
+    local RESULT=0
+    for module in $SPECFS_PRELOAD ; do
+	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
+	if ! grep "^$modrex[[:space:]]" /proc/modules 2>&1 ; then
+	    RESULT=1
+	fi
+    done
+    return $RESULT
 }
 
 #
@@ -462,7 +606,7 @@ reload_preload() {
 # attempts to remove all dependent modules.  Note that for specfs the specfs
 # filesystem must be unmounted before attempting this or it wil fail.
 #
-stop_preload() {
+stop_preload () {
     # remove in reverse order
     modules=
     for module in $SPECFS_PRELOAD ; do
@@ -479,19 +623,19 @@ stop_preload() {
 # preloaded STREAMS modules and drivers, and, in particular the 'streams' kernel
 # module.
 #
-start_params() {
+start_params () {
     if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
-	action $"Reconfiguring kernel parameters: " \
+	action "Reconfiguring kernel parameters: " \
 	    sysctl -q -e -p /etc/sysctl.conf 2>/dev/null || :
     fi
     if [ -f /etc/${name}.conf ] ; then
-	action $"Configuring $ucname parameters: " \
+	action "Configuring $ucname parameters: " \
 	    sysctl -q -e -p /etc/${name}.conf 2>/dev/null || :
     fi
     return $RETVAL
 }
 
-reload_params() {
+reload_params () {
     local needconfig='no'
     if [ ! -f $lockfile ] ; then
 	needconfig='yes'
@@ -509,12 +653,30 @@ reload_params() {
     return $RETVAL
 }
 
+probe_params () {
+    # check update of config file
+    if [ -f $lockfile ] ; then
+	for file in $config /etc/sysctl.conf /etc/${name}.conf ; do
+	    if [ -f $file -a $file -nt $lockfile ] ; then
+		# config file update, need to reload
+		echo 'reload'
+		break;
+	    fi
+	done
+    fi
+    return 0
+}
+
+status_params () {
+    return 0
+}
+
 #
 # stop_params() is used to deconfigure sysctl parameters associated with
 # preloaded STREAMS modules and drivers, and, in particular the 'streams' kernel
 # module.  There are no actions required to deconfigure sysctl parameters.
 #
-stop_params() {
+stop_params () {
     return $RETVAL
 }
 
@@ -522,10 +684,10 @@ stop_params() {
 # start_devices() is used to configure devices associated with the STREAMS
 # subsystem.
 #
-start_devices() {
+start_devices () {
     if [ ":$SPECFS_MAKEDEVICES" = ':yes' ] ; then
 	if [ -n "$SPECFS_MKDEV" -a -x "$SPECFS_MKDEV" ] ; then
-	    action $"Making $ucname devices: " \
+	    action "Making $ucname devices: " \
 		$SPECFS_MKDEV --create \
 		|| RETVAL=$?
 	fi
@@ -533,16 +695,16 @@ start_devices() {
     return $RETVAL
 }
 
-reload_devices() {
+reload_devices () {
     if [ ":$SPECFS_MAKEDEVICES" = ':yes' ] ; then
 	if [ -n "$SPECFS_MKDEV" -a -x "$SPECFS_MKDEV" ] ; then
-	    action $"Making $ucname devices: " \
+	    action "Making $ucname devices: " \
 		$SPECFS_MKDEV --create \
 		|| RETVAL=$?
 	fi
     else
 	if [ -n "$SPECFS_MKDEV" -a -x "$SPECFS_MKDEV" ] ; then
-	    action $"Removing $ucname devices: " \
+	    action "Removing $ucname devices: " \
 		$SPECFS_MKDEV --remove \
 		|| RETVAL=$?
 	fi
@@ -550,14 +712,22 @@ reload_devices() {
     return $RETVAL
 }
 
+probe_devices () {
+    return 0
+}
+
+status_devices () {
+    return 0
+}
+
 #
 # stop_devices() is used to deconfigure devices associated with the STREAMS
 # susbsystem.
 #
-stop_devices() {
+stop_devices () {
     if [ ":$SPECFS_REMOVEDEVICES" = ':yes' ] ; then
 	if [ -n "$SPECFS_MKDEV" -a -x "$SPECFS_MKDEV" ] ; then
-	    action $"Removing $ucname devices: " \
+	    action "Removing $ucname devices: " \
 		$SPECFS_MKDEV --remove \
 		|| RETVAL=$?
 	fi
@@ -569,13 +739,21 @@ stop_devices() {
 # start_modules() is used to insert kernel modules at startup.  Because modules
 # are autoloaded as required, there is nothing to do here.
 #
-start_modules() {
+start_modules () {
     return $RETVAL
 }
 
-reload_modules() {
+reload_modules () {
     start_modules
     return $RETVAL
+}
+
+probe_modules () {
+    return 0
+}
+
+status_modules () {
+    return 0
 }
 
 #
@@ -586,7 +764,8 @@ reload_modules() {
 # any user processes that may attempt to reopen a stream will fail because there
 # are no devices available to open.
 #
-stop_modules() {
+stop_modules () {
+    local module more
     #
     # Typically we do not want to do a forced removal at this point.  This is
     # because terminating daemon processes might simply result in the reopening
@@ -607,17 +786,19 @@ stop_modules() {
 	    # kill any processes holding open a STREAMS device
 	    for signal in TERM KILL ; do
 		if ( lsof | grep '\<STR\>' ) >/dev/null 2>&1 ; then
-		    echo $"Sending STREAMS processes the $signal signal..."
+		    echo "Sending STREAMS processes the $signal signal..."
 		    # COMMAND PID USER FD TYPE DEVICE SIZE NODE NAME...
 		    lsof | grep '\<STR\>' | \
-		    while read -a fields ; do
-			if [ ":${fields[4]}" != ':CHR' ] ; then continue; fi
-			if [ ":${fields[${#fields[*]}-2]}" != ':STR' ] ; then continue; fi
-			echo $"Killing ${fields[0]}(${fields[1]}) for device ${fields[8]}"
-			eval "kill -$signal ${fields[1]}"
+		    while read fields ; do
+			set -- $fields
+			if [ ":$5" != ':CHR' ] ; then continue; fi
+			ind=`expr $# - 1`
+			if eval "[ \":\${$ind}\" != ':STR' ]" ; then continue; fi
+			echo "Killing $1($2) for device $9"
+			eval "kill -$signal $2"
 		    done
 		    # sleep 5 sec to allow killed process to complete
-		    echo $"Waiting for 5 seconds..."
+		    echo "Waiting for 5 seconds..."
 		    sleep 5
 		fi
 	    done
@@ -629,8 +810,7 @@ stop_modules() {
 	fi
     fi
     # try to remove modules that we know about in lsmod order
-    while read -a fields ; do
-	module=${fields[0]}
+    while read module more; do
 	if [ -n "$module" ] ; then
 	    modrex=`echo "$module" | sed -e 's,[-_],[-_],g'`
 	    case " $SPECFS_DRIVERS $SPECFS_MODULES " in
@@ -643,7 +823,7 @@ stop_modules() {
     # try to remove modules that we know about in reverse order
     modules=
     for module in $SPECFS_DRIVERS $SPECFS_MODULES ; do
-	modules="${module}${modules:+ $modules}"
+	modules="${module}${modules:+' '}$modules"
     done
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
@@ -654,7 +834,7 @@ stop_modules() {
     return $RETVAL
 }
 
-start() {
+start () {
     start_update	# check kernel module weak updates
     start_specfs	# start the specfs kernel module
     start_preload	# insert any STREAMS preloads
@@ -667,7 +847,7 @@ start() {
     return $RETVAL
 }
 
-stop() {
+stop () {
     stop_mount		# unmount the specfs filesystem
     stop_devices	# remove device files
     stop_modules	# kill processes and remove modules
@@ -679,13 +859,13 @@ stop() {
     return $RETVAL
 }
 
-restart() {
+restart () {
     stop  || RETVAL=$?
     start || RETVAL=$?
     return $RETVAL
 }
 
-reload() {
+reload () {
     reload_specfs
     reload_mountpoint
     reload_mount
@@ -697,14 +877,14 @@ reload() {
     return $RETVAL
 }
 
-show() {
-    echo "$0: show: not yet implemented." >&2
+show () {
+    echo "$script: show: not yet implemented." >&2
     RETVAL=1
     return $RETVAL
 }
 
-usage() {
-    echo "Usage: $0 (start|stop|restart|reload|force-reload|show)" >&2
+usage () {
+    echo "Usage: $script (start|stop|status|restart|try-restart|condrestart|force-reload|reload|probe|show)" >&2
     RETVAL=1
     return $RETVAL
 }
@@ -716,15 +896,49 @@ case "$1" in
     (force-reload)
 	reload || RETVAL=$?
 	;;
+    (status)
+	RESULT='running'
+	status_specfs     || RESULT='stopped'
+	status_mountpoint || RESULT='stopped'
+	status_mount      || RESULT='stopped'
+	status_preload    || RESULT='stopped'
+	status_params     || RESULT='stopped'
+	status_modules    || RESULT='stopped'
+	status_devices    || RESULT='stopped'
+	if [ ":$RESULT" = ':running' ] ; then
+	    if [ -f $lockfile ] ; then RETVAL=0; else RETVAL=1; fi
+	else
+	    if [ -f $lockfile ] ; then RETVAL=3; else RETVAL=2; fi
+	fi
+	case $RETVAL in
+	    (0) echo "$name is running" ;;
+	    (1) echo "$name is running but subsys unlocked" ;;
+	    (2) echo "$name is stopped" ;;
+	    (3) echo "$name is stopped by subsys locked" ;;
+	    (*) echo "$name status unknown" ;;
+	esac
+	;;
     (try-restart|condrestart)
 	[ -f $lockfile ] && restart || RETVAL=$?
+	;;
+    (probe)
+	RESULT=
+	[ -n "$RESULT" ] || RESULT=`probe_specfs`
+	[ -n "$RESULT" ] || RESULT=`probe_mountpoint`
+	[ -n "$RESULT" ] || RESULT=`probe_mount`
+	[ -n "$RESULT" ] || RESULT=`probe_preload`
+	[ -n "$RESULT" ] || RESULT=`probe_params`
+	[ -n "$RESULT" ] || RESULT=`probe_modules`
+	[ -n "$RESULT" ] || RESULT=`probe_devices`
+	[ -z "$RESULT" -a ! -f $lockfile ] && RESULT='start'
+	[ -n "$RESULT" ] && echo "$RESULT"
 	;;
     (*)
 	usage || RETVAL=$?
 	;;
 esac
 
-[ "${0##*/}" = "$name.sh" ] && exit $RETVAL
+[ "${0##*/}" = "$script" ] && exit $RETVAL
 
 # =============================================================================
 # 

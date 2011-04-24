@@ -31,14 +31,374 @@ fi
 
 update="$awk -f $script --"
 
+
+openss7_update () { :
+    return $update "$@"
+}
+
+# INSTALLING A KERNEL
+#
+#
+ou_preinst_install () { :
+}
+ou_postrm_abort_install () { :
+}
+
+# UPGRADING A KERNEL
+#
+ou_prerm_upgrade () { :
+}
+ou_prerm_failed_upgrade () { :
+}
+ou_preinst_upgrade () { :
+}
+ou_postrm_abort_upgrade () { :
+}
+ou_postrm_upgrade () { :
+}
+ou_postrm_failed_upgrade () { :
+}
+ou_preinst_abort_upgrade () { :
+}
+ou_postinst_abort_upgrade () { :
+}
+
+# REMOVING A KERNEL
+#
+ou_prerm_remove () { :
+}
+ou_postinst_abort_remove () { :
+}
+ou_postrm_remove () { :
+}
+
+# CONFIGURING A KERNEL
+#
+ou_postinst_configure () { :
+}
+
+
+# PURGING A KERNEL
+#
+ou_postrm_purge () { :
+}
+
+
+
+
+
+
+
+#
+# Note that for 'install' there is nothing really to do here.  On an 'upgrade'
+# we should preserve our relinked modules somewhere in case the upgrade is
+# aborted.  Also, for a running kernel we might want to remove the modules and
+# re-depmod with them removed so that the running kernel will not attempt to
+# load the new kernel modules being installed.  On an 'abort-upgrade' we can
+# restore the kernel modules from where we saved them.
+#
+
+# All parameters are for the linux-image-2.6.M[.REV]-ABI-FLAVOR package.
+
+# new-preinst install		[old-version]
+ou_preinst_install () { :
+    if [ "${2:+'set'}" != 'set' ]
+    then : # install fresh
+    else : # install with some configuration from old-version
+    fi
+    return 0
+}
+# new-preinst upgrade		old-version
+ou_preinst_upgrade () { :
+    # - old-prerm	upgrade new-version		...success
+    # - new-preinst	upgrade old-version		...success
+}
+# old-preinst abort-upgrade	new-version
+ou_preinst_abort_upgrade () { :
+    # The sequence here is:
+    # - old-prerm upgrade new-version		...failed
+    # - new-prerm failed-upgrade new-version	...failed
+    # * old-postinst abort-upgrade new-version
+}
+ou_preinst () { :
+    operation="$1"; shift
+    case "$operation" in
+	install)
+	    return ou_preinst_install		"$@" ;;
+	upgrade)
+	    return ou_preinst_upgrade		"$@" ;;
+	abort-upgrade)
+	    return ou_preinst_abort_upgrade		"$@" ;;
+	*)
+	    return 0 ;;
+    esac
+}
+
+#
+# Add symbolic links to the openss7 weak-updates directories.  This consists of
+# calling:
+#		openss7-modules -- -v --add-kernel $1
+#
+# Note that this step is not completely necessary because it will be run when
+# the kernel boots (if ever).
+#
+# Technically it is possible to query the user at this point for some optional
+# actions.  We can even abort the installation process for a kernel using exit
+# status because Debian is smart enough to execute hooks before updating the
+# boot-loader.
+#
+# If we are updating the running kernel and openss7 kernel modules requiring
+# relinking are installed in the running kernel's modules directory, we must
+# signal that an immediate reboot is required. --add-kernel will not relink
+# modules for the running kernel because the modules could mismatch the running
+# kernel.  It takes the --boot-kernel option to do that on reboot.
+#
+# If weak-updates for the kernel being installed are not possible (i.e. there is
+# no "solution" for the kernel being installed), then the user should be
+# prompted as to whether they want to complete configuring the kernel without
+# openss7 module support.
+#
+# If the kernel being updated uses a different ABI or a different M[.REV] and a
+# solution is possible, the user should be prompted (because weak-updates are
+# dangerous in this case).
+#
+# openss7-modules exit status codes can be used to determine this information.
+# Also, a dry-run can be performed just to get the return status.
+#
+
+# All parameters are for the linux-image-2.6.M[.REV]-ABI-FLAVOR package.
+
+# xxx-postinst configure	[most-recently-configured-version]
+ou_postinst_configure () { :
+}
+# xxx-triggered			triggering-packages ...
+ou_postinst_triggered () { :
+}
+# old-postinst abort-upgrade	new-version
+ou_postinst_abort_upgrade () { :
+}
+# con-postinst abort-remove	'in-favor' package new-version
+# xxx-postinst abort-remove
+ou_postinst_abort_remove () { :
+}
+# dec-postinst abort-deconfigure
+#				'in-favor' failed-install-package version
+#				['removing' conflicting-package version]
+ou_postinst_abort_deconfigure () { :
+}
+ou_postinst () { :
+    operation="$1"; shift
+    case "$operation" in
+	configure)
+	    return ou_postinst_configure		"$@" ;;
+	triggered)
+	    return ou_postinst_triggered		"$@" ;;
+	abort-upgrade)
+	    return ou_postinst_abort_upgrade		"$@" ;;
+	abort-remove)
+	    return ou_postinst_abort_remove		"$@" ;;
+	abort-deconfigure)
+	    return ou_postinst_abort_deconfigure	"$@" ;;
+	*)
+	    return 0 ;;
+    esac
+}
+
+# All parameters are for the linux-image-2.6.M[.REV]-ABI-FLAVOR package.
+
+# xxx-prerm remove
+# con-prerm remove		'in-favour' package new-version
+ou_prerm_remove () { :
+}
+# old-prerm upgrade		new-version
+ou_prerm_upgrade () { :
+}
+# new-prerm failed-upgrade	old-version
+ou_prerm_failed_upgrade () { :
+}
+# dec-prerm deconfigure		'in-favour' package-being-installed version
+#				['removing' conflicting-package version]
+ou_prerm_deconfigure () { :
+}
+ou_prerm () { :
+    operation="$1"; shift
+    case "$operation" in
+	remove)
+	    return ou_prerm_remove			"$@" ;;
+	upgrade)
+	    return ou_prerm_upgrade			"$@" ;;
+	failed-upgrade)
+	    return ou_prerm_failed_upgrade		"$@" ;;
+	deconfigure)
+	    return ou_prerm_deconfigure			"$@" ;;
+	*)
+	    return 0 ;;
+    esac
+}
+
+#
+# Remove symbolic links from the openss7 weak-updates directories.  This
+# consists of calling:
+#
+#	openss7-modules -- -v --remove-kernel $1
+#
+# Not that this step is not completely necessary, some symbolic links will just
+# unnecessarily hang around if it is not performed.
+#
+# Technically it is possible to query the user at this point for some optional
+# actions.  We can even abort the removal process for a kernel using exit status
+# because Debian is smart enough to execute hooks before updating the
+# boot-loader.
+#
+# For 'remove' and 'purge' removing symbolic links is fine.  However, for
+# 'upgrade', where the 'new-version' is the same as a version that is already
+# installed, and even for the running kernel, the situation is more complex.
+#
+# Another thing that can be performed here is that when a kernel is removed, if
+# no other kernels requiring a set of openss7 modules remain, we can mark the
+# corresponding openss7 package for autoclean.
+#
+
+# All parameters are for the linux-image-2.6.M[.REV]-ABI-FLAVOR package.
+
+# xxx-postrm remove
+ou_postrm_remove () { :
+}
+# xxx-postrm purge
+ou_postrm_purge () { :
+}
+# old-postrm upgrade		new-version
+ou_postrm_upgrade () { :
+}
+# new-postrm failed-upgrade	old-version
+ou_postrm_failed_upgrade () { :
+}
+# new-postrm abort-install	[old-version]
+ou_postrm_abort_install () { :
+}
+# new-postrm abort-upgrade	old-version
+ou_postrm_abort_upgrade () { :
+}
+# dis-postrm disappear		overwriter overwriter-version
+ou_postrm_disappear () { :
+}
+ou_postrm () { :
+    operation="$1"; shift
+    case "$operation" in
+	remove)
+	    return ou_postrm_remove			"$@" ;;
+	purge)
+	    return ou_postrm_purge			"$@" ;;
+	upgrade)
+	    return ou_postrm_upgrade			"$@" ;;
+	failed-upgrade)
+	    return ou_postrm_failed_upgrade		"$@" ;;
+	abort-install)
+	    return ou_postrm_abort_install		"$@" ;;
+	abort-upgrade)
+	    return ou_postrm_abort_upgrade		"$@" ;;
+	disappear)
+	    return ou_postrm_disappear			"$@" ;;
+	*)
+	    return 0 ;;
+    esac
+}
+
+#
+# All parameters are for the linux-headers-2.6.M[.REV]-ABI-FLAVOR package.
+#
+
+# xxx-postinst configure	[most-recently-configured-version]
+ou_hdr_postinst_configure () { :
+}
+# xxx-triggered			triggering-packages ...
+ou_hdr_postinst_triggered () { :
+}
+# old-postinst abort-upgrade	new-version
+ou_hdr_postinst_abort_upgrade () { :
+}
+# con-postinst abort-remove	'in-favor' package new-version
+# xxx-postinst abort-remove
+ou_hdr_postinst_abort_remove () { :
+}
+# dec-postinst abort-deconfigure
+#				'in-favor' failed-install-package version
+#				['removing' conflicting-package version]
+ou_hdr_postinst_abort_deconfigure () { :
+}
+ou_hdr_postinst () { :
+    operation="$1"; shift
+    case "$operation" in
+	configure)
+	    return ou_hdr_postinst_configure		"$@" ;;
+	triggered)
+	    return ou_hdr_postinst_triggered		"$@" ;;
+	abort-upgrade)
+	    return ou_hdr_postinst_abort_upgrade	"$@" ;;
+	abort-remove)
+	    return ou_hdr_postinst_abort_remove		"$@" ;;
+	abort-deconfigure)
+	    return ou_hdr_postinst_abort_deconfigure	"$@" ;;
+	*)
+	    return 0 ;;
+    esac
+}
+
+#
+# All parameters are for the linux-source-2.6.M[.REV] package.
+#
+
+# xxx-postinst configure	[most-recently-configured-version]
+ou_src_postinst_configure () { :
+}
+# xxx-triggered			triggering-packages ...
+ou_src_postinst_triggered () { :
+}
+# old-postinst abort-upgrade	new-version
+ou_src_postinst_abort_upgrade () { :
+}
+# con-postinst abort-remove	'in-favor' package new-version
+# xxx-postinst abort-remove
+ou_src_postinst_abort_remove () { :
+}
+# dec-postinst abort-deconfigure
+#				'in-favor' failed-install-package version
+#				['removing' conflicting-package version]
+ou_src_postinst_abort_deconfigure () { :
+}
+ou_src_postinst ()  { :
+    operation="$1"; shift
+    case "$operation" in
+	configure)
+	    return ou_src_postinst_configure		"$@" ;;
+	triggered)
+	    return ou_src_postinst_triggered		"$@" ;;
+	abort-upgrade)
+	    return ou_src_postinst_abort_upgrade	"$@" ;;
+	abort-remove)
+	    return ou_src_postinst_abort_remove		"$@" ;;
+	abort-deconfigure)
+	    return ou_src_postinst_abort_deconfigure	"$@" ;;
+	*)
+	    return 0 ;;
+    esac
+}
+
 case "$command" in
-	/sbin/openss7-update)			$update "$@" || exit $? ;;
-	/usr/sbin/openss7-update)		$update "$@" || exit $? ;;
-	/etc/kernel/preinst.d/openss7-update)	exit 0 ;;
-	/etc/kernel/postinst.d/openss7-update)	$update -q -e --add-kernel    "$1" || exit $? ;;
-	/etc/kernel/prerm.d/openss7-update)	$update -q -e --remove-kernel "$1" || exit $? ;;
-	/etc/kernel/postrm.d/openss7-update)	$update -q -e --remove-kernel "$1" || exit $? ;;
-	/etc/kernel/header_postinst.d)		exit 0 ;;
-	/etc/kernel/src_postinst.d)		exit 0 ;;
-	*)					$update "$@" || exit $? ;;
+    */etc/kernel/preinst.d/openss7-update)
+	return ou_preinst	$DEB_MAINT_PARAMS ;;
+    */etc/kernel/postinst.d/openss7-update)
+	return ou_postinst	$DEB_MAINT_PARAMS ;;
+    */etc/kernel/prerm.d/openss7-update)
+	return ou_prerm		$DEB_MAINT_PARAMS ;;
+    */etc/kernel/postrm.d/openss7-update)
+	return ou_postrm	$DEB_MAINT_PARAMS ;;
+    */etc/kernel/header_postinst.d/openss7-update)
+	return ou_hdr_postinst	$DEB_MAINT_PARAMS ;;
+    */etc/kernel/src_postinst.d/openss7-update)
+	return ou_src_postinst	$DEB_MAINT_PARAMS ;;
+    */sbin/openss7-update | */usr/sbin/openss7-update | *)
+	openss7_update || exit $? ;;
 esac
+
+# vim: tw=80 ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

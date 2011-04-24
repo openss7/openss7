@@ -2,6 +2,13 @@
 # This is an inital configuration file for the SPECFS STREAMS filesystem.
 #
 
+# Update kernel modules at boot?
+SPECFS_KUPDATE='yes'
+# Load modules at boot?
+SPECFS_BOOTLOAD='yes'
+# Mount specfs file system at boot?
+SPECFS_BOOTMOUNT='yes'
+
 # Mount specfs file system?
 SPECFS_MOUNTSPECFS='no'
 # Unmount specfs file system?
@@ -17,7 +24,7 @@ SPECFS_GID='0'
 SPECFS_MODE='0777'
 
 # Kernel modules to preload before system configuration.
-SPECFS_PRELOAD=
+SPECFS_PRELOAD="specfs"
 # Kernel modules for STREAMS drivers to remove.
 SPECFS_DRIVERS=
 # Kernel modules for STREAMS modules to remove.

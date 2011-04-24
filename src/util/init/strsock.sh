@@ -13,7 +13,7 @@
 # arguments to add and remove links after the the name argument:
 #
 # strsock:	start and stop strsock modules
-# update-rc.d:	start 33 S . stop 33 0 6 .
+# update-rc.d:	start 33 S .
 # config:	/etc/default/strsock
 # probe:	false
 # hide:		false
@@ -27,10 +27,12 @@
 #
 ### BEGIN INIT INFO
 # Provides: strsock
-# Required-Start: streams strcompat $network
-# Required-Stop: streams strcompat $network
-# Default-Start: 3 4 5
-# Default-Stop: 0 1 2 6
+# Required-Start: streams $network
+# Required-Stop: streams $network
+# Should-Start: strerr strace
+# Should-Stop: strerr strace
+# Default-Start: S
+# Default-Stop:
 # X-UnitedLinux-Default-Enabled: yes
 # Short-Description: start and stop STREAMS Binary Compatibility Modules
 # License: GPL

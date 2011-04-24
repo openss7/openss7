@@ -26,10 +26,12 @@
 #
 ### BEGIN INIT INFO
 # Provides: strtty
-# Required-Start: streams strcompat $network
-# Required-Stop: streams strcompat $network
-# Default-Start: 3 4 5
-# Default-Stop: 0 1 2 6
+# Required-Start: streams
+# Required-Stop: streams
+# Should-Start: strerr strace
+# Should-Stop: strerr strace
+# Default-Start: S
+# Default-Stop:
 # X-UnitedLinux-Default-Enabled: yes
 # Short-Description: start and stop STREAMS Binary Compatibility Modules
 # License: GPL

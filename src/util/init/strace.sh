@@ -1,9 +1,9 @@
 #!/bin/sh
 #
 # @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:57 $
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
 #
 # Distributed by OpenSS7 Corporation.  See the bottom of this script for copying
@@ -14,13 +14,14 @@
 # arguments to add and remove links after the the name argument:
 #
 # strace:	start and stop strace facility
-# update-rc.d:	stop 80 0 1 6 .
+# update-rc.d:	stop 35 S . stop 35 0 6 .
+# lockfile:	/var/lock/subsys/strace
 # config:	/etc/default/strace
 # processname:	strace
 # pidfile:	/var/run/strace.pid
-# probe:	false
+# probe:	true
 # hide:		false
-# license:	GPL
+# license:	AGPL
 # description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is \
 #		responsible for starting and stopping the STREAMS trace \
 #		logger.  The STREAMS trace logger should only be run under \
@@ -33,13 +34,13 @@
 # Provides: strace
 # Required-Start: streams
 # Required-Stop: streams
-# Should-Start: strerr
-# Should-Stop: strerr
-# Default-Start: 4
-# Default-Stop: 0 1 2 3 4 5 6
+# Should-Start: $syslog strerr
+# Should-Stop: $syslog strerr
+# Default-Start: S
+# Default-Stop:
 # X-UnitedLinux-Default-Enabled: no
 # Short-Description: start and stop strace
-# License: GPL
+# License: AGPL
 # Description:	This STREAMS init script is part of Linux Fast-STREAMS.  It is
 #	responsible for starting and stopping the STREAMS trace logger.  The
 #	STREAMS trace logger should only be run under exceptional circumstances
@@ -47,14 +48,288 @@
 ### END INIT INFO
 
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+
+# Source init script functions library.
+init_mode="standalone"
+  if [ -r /etc/init.d/functions   ] ; then . /etc/init.d/functions   ; init_mode="chkconfig" ;
+elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
+elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
+elif [ -r /sbin/start-stop-daemon ] ; then                             init_mode="debian"    ;
+fi
+
+case "$init_mode" in
+    (chkconfig)
+	# RedHat's LSB support is not so good, use native functions first.
+	daemon_start () {
+	    local force= nicelevel= base=
+	    while [ "$1" != "${1##[-+]}" ] ; do
+		case $1 in
+		    (-f) force="--force" ; shift 1 ;;
+		    (-n) nicelevel="$2"  ; shift 2 ;;
+		esac
+	    done
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    echo -en "Starting daemon $base: "
+	    daemon $force $nicelevel "$@"
+	    RETVAL=$?
+	    echo ""
+	    return $RETVAL
+	}
+	daemon_stop () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Stopping daemon $base: "
+	    killproc $base "$@"
+	    RETVAL=$?
+	    echo ""
+	    return $RETVAL
+	}
+	daemon_reload () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Reloading daemon $base: "
+	    killproc $base -HUP
+	    RETVAL=$?
+	    echo ""
+	    return $RETVAL
+	}
+	;;
+    (insserv)
+	# SuSE's LSB support is not so good, use native functions first.
+	daemon_start () {
+	    local force= nicelevel= base=
+	    while [ "$1" != "${1##[-+]}" ] ; do
+		case $1 in
+		    (-f) force="-f" ; shift 1 ;;
+		    (-n) nicelevel="-n $2"  ; shift 2 ;;
+		esac
+	    done
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    echo -en "Starting daemon $base: "
+	    startproc $force $nicelevel "$@"
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	daemon_stop () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Stopping daemon $base: "
+	    killproc $base "$@"
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	daemon_reload () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Reloading daemon $base: "
+	    killproc $base -HUP
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	action () {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || rc_failed $RETVAL
+	    rc_status -v
+	    return $RETVAL
+	}
+	;;
+    (lsb)
+	daemon_start () {
+	    local force= nicelevel= base=
+	    while [ "$1" != "${1##[-+]}" ] ; do
+		case $1 in
+		    (-f) force="-f" ; shift 1 ;;
+		    (-n) nicelevel="-n $2"  ; shift 2 ;;
+		esac
+	    done
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    echo -en "Starting daemon $base: "
+	    start_daemon $force $nicelevel "$@"
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $RETVAL
+	}
+	daemon_stop () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Stopping daemon $base: "
+	    killproc $base "$@"
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $RETVAL
+	}
+	daemon_reload () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Reloading daemon $base: "
+	    killproc $base -HUP
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $RETVAL
+	}
+	action () {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $RETVAL
+	}
+	;;
+    (debian)
+	# a resonably modern debian system will have LSB support
+	daemon_start () {
+	    local force= nicelevel= base=
+	    while [ "$1" != "${1##[+-]}" ] ; do
+		case $1 in
+		    (-f) force="" ; shift 1 ;;
+		    (-n) nicelevel="-N $2"  ; shift 2 ;;
+		esac
+	    done
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    echo -en "Starting daemon $base: "
+	    start-stop-daemon --start $force $nicelevel --quiet \
+		--pidfile $pidfile --exec $execfile -- "$@"
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || echo "(failed)"; echo "."
+	    return $RETVAL
+	}
+	daemon_stop () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Stopping daemon $base: "
+	    start-stop-daemon --stop --quiet --retry=1 --oknodo \
+		--pidfile $pidfile --exec $execfile
+	    RETVAL=$?
+	      if [ $RETVAL -eq   0 ] ; then echo "."
+	    elif [ $RETVAL -eq 255 ] ; then echo "(warning)."
+	    else                            echo "failed!"
+	    fi
+	    return $RETVAL
+	}
+	daemon_reload () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Reloading daemon $base: "
+	    killproc $base -HUP
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || echo "(failed)"; echo "."
+	    return $RETVAL
+	}
+	action () {
+	    echo -en "$1"
+	    shift 1
+	    eval "\${1+\"\$@\"} $redir"
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] || echo "(failed)"; echo "."
+	    return $RETVAL
+	}
+	;;
+    (standalone|*)
+	if [ -x /sbin/pidof ] ; then
+	    pidofproc () {
+		/sbin/pidof $@
+	    }
+	elif [ -x /sbin/pidofproc ] ; then
+	    pidofproc () {
+		/sbin/pidofproc $@
+	    }
+	else
+	    pidofproc () {
+		[ -r $pidfile ] && cat $pidfile
+	    }
+	fi
+	if [ -x /sbin/start-stop-daemon ] ; then
+	    killproc () {
+		local base execfile
+		base=$1
+		execfile=$2
+		shift 2
+		start-stop-daemon --stop --quiet --retry=1 --oknodo \
+		    --pidfile $pidfile \
+		    --exec $execfile
+	    }
+	elif [ -x /sbin/killproc ] ; then
+	    killproc () {
+		/sbin/killproc $@
+	    }
+	elif [ -x /usr/bin/killall ] ; then
+	    killproc () {
+		/usr/bin/killall $@
+	    }
+	else
+	    killproc () {
+		[ -r $pidfile ] && kill "$2" `cat $pidfile`
+	    }
+	fi
+	daemon_start () {
+	    local force= nicecmd= base=
+	    while [ "$1" != "${1##[-+]}" ] ; do
+		case $1 in
+		    (-f) force="--force"       ; shift 1 ;;
+		    (-n) nicecmd="nice -n $2"  ; shift 2 ;;
+		esac
+	    done
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    echo -en "Starting daemon $base: "
+	    eval "( $nicecmd \"\$@\" >/dev/null 2>&1 </dev/null & )"
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -en "\t...SUCCESS" || echo -en "\t....FAILED"
+	    return $RETVAL
+	}
+	daemon_stop () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Stopping daemon $base: "
+	    if pidofproc $base >/dev/null 2>&1 ; then
+		RETVAL=0
+	    else
+		killproc $base "$@"
+		RETVAL=$?
+	    fi
+	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    return $RETVAL
+	}
+	daemon_reload () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    echo -en "Reloading daemon $base: "
+	    killproc $base -HUP
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -en "\t...SUCCESS" || echo -en "\t....FAILED"
+	    return $RETVAL
+	}
+	action () {
+	    echo -en "$1"
+	    shift 1
+	    ${1+"$@"} >/dev/null
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] && echo -e "\t...SUCCESS" || echo -e "\t....FAILED"
+	    return $?
+	}
+	;;
+esac
+
 name='strace'
-config="/etc/default/$name"
+script='strace.sh'
+ucname="STRACE"
+lockfile="/var/lock/subsys/$name"
+config="/etc/sysconfig/$name /etc/default/$name"
 processname="$name"
 pidfile="/var/run/$processname.pid"
 execfile="/usr/sbin/$processname"
 desc="the STREAMS trace logger"
 
-[ -x $execfile ] || exit 0
+if [ ! -x $execfile ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
 
 # Specify defaults
 
@@ -67,7 +342,7 @@ STRACE_LOGDEVICE="/dev/streams/clone/log"
 STRACE_MODULES=
 STRACE_OPTIONS=
 
-# Source config file
+# Source redhat and/or debian config file
 for file in $config ; do
     [ -f $file ] && . $file
 done
@@ -76,7 +351,7 @@ RETVAL=0
 
 umask 077
 
-case :$VERBOSE in
+case ":$VERBOSE" in
     :no|:NO|:false|:FALSE|:0|:)
 	redir='>/dev/null 2>&1'
 	;;
@@ -85,80 +360,64 @@ case :$VERBOSE in
 	;;
 esac
 
-build_options() {
+build_options () {
     # Build up the options string
     STRACE_OPTIONS="-n -p $pidfile"
     [ -n "$STRACEOPTIONS" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }${STRACEOPTIONS}"
+	STRACE_OPTIONS="${STRACE_OPTIONS}${STRACE_OPTIONS:+' '}${STRACEOPTIONS}"
     [ -n "$STRACE_DIRECTORY" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-d ${STRACE_DIRECTORY}"
+	STRACE_OPTIONS="${STRACE_OPTIONS}${STRACE_OPTIONS:+' '}-d ${STRACE_DIRECTORY}"
     [ -n "$STRACE_BASENAME" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-b ${STRACE_BASENAME}"
+	STRACE_OPTIONS="${STRACE_OPTIONS}${STRACE_OPTIONS:+' '}-b ${STRACE_BASENAME}"
     [ -n "$STRACE_OUTFILE" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-o ${STRACE_OUTFILE}"
+	STRACE_OPTIONS="${STRACE_OPTIONS}${STRACE_OPTIONS:+' '}-o ${STRACE_OUTFILE}"
     [ -n "$STRACE_ERRFILE" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-e ${STRACE_ERRFILE}"
+	STRACE_OPTIONS="${STRACE_OPTIONS}${STRACE_OPTIONS:+' '}-e ${STRACE_ERRFILE}"
     [ -n "$STRACE_LOGDEVICE" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }-l ${STRACE_LOGDEVICE}"
+	STRACE_OPTIONS="${STRACE_OPTIONS}${STRACE_OPTIONS:+' '}-l ${STRACE_LOGDEVICE}"
     [ -n "$STRACE_MODULES" ] && \
-	STRACE_OPTIONS="${STRACE_OPTIONS:+$STRACE_OPTIONS }${STRACE_MODULES}"
+	STRACE_OPTIONS="${STRACE_OPTIONS}${STRACE_OPTIONS:+' '}${STRACE_MODULES}"
 }
 
-start() {
-    echo -n "Starting $desc: $name "
-    [ -d "$STRACE_DIRECTORY" -o -z "$STRACE_DIRECTORY" ] || mkdir -p "$STRACE_DIRECTORY"
+start () {
+    [ -d "$STRACE_DIRECTORY" -o -z "$STRACE_DIRECTORY" ] || \
+	action $"Creating $STRACE_DIRECTORY: " \
+	    mkdir -p -- "$STRACE_DIRECTORY" \
+	    || RETVAL=$?
     build_options
-    start-stop-daemon --start --quiet --pidfile $pidfile \
-	--exec $execfile -- $STRACE_OPTIONS
-    RETVAL=$?
-    if [ $RETVAL -eq 0 ] ; then
-	echo "."
-    else
-	echo "(failed.)"
-    fi
+    daemon_start $execfile $STRACE_OPTIONS \
+	|| RETVAL=$?
+    [ $RETVAL -eq 0 ] && touch $lockfile
     return $RETVAL
 }
 
-stop() {
-    echo -n "Stopping $desc: $name "
-    start-stop-daemon --stop --quiet --retry=1 --oknodo --pidfile $pidfile \
-	--exec $execfile
-    RETVAL=$?
-    if [ $RETVAL -eq 0 ] ; then
-	echo "."
-    else
-	echo "(failed.)"
-    fi
+stop () {
+    daemon_stop $execfile || RETVAL=$?
+    [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     return $RETVAL
 }
 
-restart() {
-    stop
-    start
-    return $?
-}
-
-reload() {
-    echo -n "Reloading $desc: $name "
-    start-stop-daemon --stop --quiet --signal=1 --pidfile $pidfile \
-	--exec $execfile
-    RETVAL=$?
-    if [ $RETVAL -eq 0 ] ; then
-	echo "."
-    else
-	echo "(failed.)"
-    fi
+restart () {
+    stop  || RETVAL=$?
+    start || RETVAL=$?
     return $RETVAL
 }
 
-show() {
-    echo "$name.sh: show: not yet implemented." >&2
-    return 1
+reload () {
+    daemon_reload $execfile || RETVAL=$?
+    return $RETVAL
 }
 
-usage() {
-    echo "Usage: /etc/init.d/$name.sh (start|stop|restart|reload|force-reload|show)" >&2
-    return 1
+show () {
+    echo "$script: show: not yet implemented." >&2
+    RETVAL=1
+    return $RETVAL
+}
+
+usage () {
+    echo "Usage: $script (start|stop|status|restart|try-restart|condrestart|force-reload|reload|probe|show)" >&2
+    RETVAL=1
+    return $RETVAL
 }
 
 case "$1" in
@@ -168,12 +427,53 @@ case "$1" in
     (force-reload)
 	reload || RETVAL=$?
 	;;
+    (status)
+	$1 $name || RETVAL=$?
+	;;
+    (try-restart|condrestart)
+	[ -f $lockfile ] && restart || RETVAL=$?
+	;;
+    (probe)
+	if pidofproc $processname >/dev/null 2>&1 ; then
+	    # running
+	    if [ "`pidofproc $processname`" -eq "`cat $pidfile`" ] ; then
+		# running with the right pid
+		if [ ! -f $lockfile ] ; then
+		    # running but subsystem unlocked, need to reload
+		    echo 'reload'
+		else
+		    # subsystem locked
+		    for file in $config ; do
+			if [ -f $file -a $file -nt $lockfile ] ; then
+			    # configuration file updated, need to reload
+			    echo 'reload'
+			    break
+			fi
+		    done
+		fi
+	    else
+		# running, but with the wrong pid, need to restart
+		echo 'restart'
+	    fi
+	else
+	    # not running
+	    if [ ! -f $lockfile ] ; then
+		# subsystem unlocked, need to start
+		echo 'start'
+	    else
+		# dead but subsystem locked, need to restart
+		echo 'restart'
+	    fi
+	fi
+	# do not need to do anything
+	RETVAL=$?
+	;;
     (*)
 	usage || RETVAL=$?
 	;;
 esac
 
-[ "${0##*/}" = "$name.sh" ] && exit $RETVAL
+[ "${0##*/}" = "$script" ] && exit $RETVAL
 
 # =============================================================================
 # 
@@ -181,9 +481,9 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -232,4 +532,5 @@ esac
 # - added files to new distro
 #
 # =============================================================================
+
 # vim: ft=sh sw=4 tw=80
