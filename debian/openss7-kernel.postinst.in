@@ -51,24 +51,24 @@
 #
 # =============================================================================
 
-configure_kernel_postinst_depmod() { :
+configure_kernel_postinst_depmod () { :
     if [ ":$kversion" = ":`uname -r`" ] ; then
-        # This is a running kernel, do a depmod on the modules directory for the
-        # running kernel.
-        if [ -r /boot/System.map-$kversion ] ; then
-            depmod -ae -F /boot/System.map-$kversion 2>&1 || :
-        else
-            depmod -ae 2>&1 || :
-        fi
+	# This is a running kernel, do a depmod on the modules directory for the
+	# running kernel.
+	if [ -r /boot/System.map-$kversion ] ; then
+	    depmod -ae -F /boot/System.map-$kversion 2>&1 || :
+	else
+	    depmod -ae 2>&1 || :
+	fi
     elif [ -r /boot/System.map-$kversion ] ; then
-        # Non-running kernels a depmod will be performed on boot by depmod
-        # anyway, but try one now.
-        UNAME_MACHINE=$target_cpu \
-        depmod -ae -F /boot/System.map-$kversion $kversion 2>&1 || :
+	# Non-running kernels a depmod will be performed on boot by depmod
+	# anyway, but try one now.
+	UNAME_MACHINE=$target_cpu \
+	depmod -ae -F /boot/System.map-$kversion $kversion 2>&1 || :
     fi
 }
 
-configure_kernel_postinst_initscripts() { :
+configure_kernel_postinst_initscripts () { :
     #
     # Note that initscripts are updated by debian helpers, however, debian
     # helpers do not start and stop init scripts.
@@ -77,21 +77,22 @@ configure_kernel_postinst_initscripts() { :
     # user.
     #
     if [ ":$kversion" = ":`uname -r`" ] ; then
-        # Running kernels do need init scripts run, but only when normally
-        # started in the current runlevel.
-        r=`runlevel | sed -e 's|.*[[:space:]]||'`
-        list="$initfiles" ; for i in $list ; do
-            if [ -f $initrddir/$i ] ; then
-                if [ -L $initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
-                     -L $initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
-                    /sbin/service $i start >/dev/null 2>&1 || $initrddir/$i start >/dev/null 2>&1 || :
-                fi
-            fi
-        done
+	# Running kernels do need init scripts run, but only when normally
+	# started in the current runlevel.
+	r=`runlevel | sed -e 's|.*[[:space:]]||'`
+	list="$initfiles" ; for i in $list ; do
+	    if [ -f $initrddir/$i ] ; then
+		if [ -L $initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
+		     -L $initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
+		    /sbin/service $i start >/dev/null 2>&1 || \
+		    $initrddir/$i    start >/dev/null 2>&1 || :
+		fi
+	    fi
+	done
     fi
 }
 
-configure_kernel_postinst_symvers() { :
+configure_kernel_postinst_symvers () { :
     # Debian kernels do no create symbol versions.  But this should not be done
     # here, because System.symvers
     local f
@@ -101,7 +102,7 @@ configure_kernel_postinst_symvers() { :
     fi
 }
 
-configure_kernel_postinst_updates() { :
+configure_kernel_postinst_updates () { :
     #
     # Note that, unlike rpm, we actually have a terminal here and can interact
     # with the user.
@@ -123,18 +124,35 @@ configure_kernel_postinst_updates() { :
     fi
 }
 
-# -----------------------------------------------------------------------------
-# Primary functions:
-# -----------------------------------------------------------------------------
-
-configure_kernel_postinst() { :
+kernel_postinst () { :
     configure_kernel_postinst_depmod
     configure_kernel_postinst_initscripts
     configure_kernel_postinst_symvers
     configure_kernel_postinst_updates
 }
 
-triggered_kernel_postinst() { :
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+
+configure_kernel_postinst () { :
+    kernel_postinst
+}
+
+triggered_kernel_postinst () { :
+    kernel_postinst
+}
+
+abort_upgrade_kernel_postinst () { :
+    kernel_postinst
+}
+
+abort_remove_kernel_postinst () { :
+    kernel_postinst
+}
+
+abort_deconfigure_kernel_postinst () { :
+    kernel_postinst
 }
 
 subpkg=kernel

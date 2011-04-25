@@ -74,6 +74,28 @@ remove_depends() {
 #
 # Two things have changed: it is not so simple to check whether the running
 # kernel will be affected.
+#
+# What we must tell the update script here is that we are about to
+# remove openss7 modules for the kernel @kversion@.  Therefore, the
+# openss7-modules script should determine which symbolic links point to
+# the openss7 modules being removed and whether to remove them.
+#
+# There are several cases that need to be dealt with separately:
+#
+# We are removing the last openss7 modules in the system:
+#
+#   We might want to interact with the user before removing openss7
+#   modules in this case, particularly when the running kernel is
+#   affected.  However, this can be handled by the openss7-base
+#   package's prerm script.
+#
+# We are removing only one kernel version of openss7 modules from the
+# system:
+#
+#   There are two situations in this case: 1) the running kernel is
+#   affected by the removal; 2) the running kernel is not affected.
+#
+#
 
 # -----------------------------------------------------------------------------
 # Primary functions:

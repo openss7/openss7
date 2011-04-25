@@ -10,53 +10,45 @@
 
 [ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
-command="$1"
-function=`echo "$command${subpkg:+'_'}${subpkg}_postrm" | tr '-' '_'`
-shift 2
+operation="$1"
+function=`echo "$operation${subpkg:+'_'}${subpkg}_postrm" | tr '-' '_'`
+shift
 
 echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
 
-case "$command" in
-
+case "$operation" in
     (remove) :
 	# remove-postrm remove
 	eval "$function \"$@\""
 	;;
-
     (purge) :
 	# remove-postrm purge
 	eval "$function \"$@\""
 	;;
-
     (upgrade) :
 	# old-postrm upgrade new-version
 	shift 2
 	eval "$function \"$@\""
 	;;
-
     (failed-upgrade) :
 	# old-postrm upgrade new-version ... failed
 	# new-postrm failed-upgrade old-version
 	eval "$function \"$@\""
 	;;
-
     (abort-install) :
 	# new-preinst install [old-version] ... failed
 	# new-postrm abort-install [old-version]
 	eval "$function \"$@\""
 	;;
-
     (abort-upgrade) :
 	# new-preinst upgrade old-version ... failed
 	# new-postrm abort-upgrade old-version
 	eval "$function \"$@\""
 	;;
-
     (disappear) :
 	# disappear-postrm disappear overwriter overwriter-version
 	eval "$function \"$@\""
 	;;
-
 esac
 
 @mscript_debhelper@

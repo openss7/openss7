@@ -10,16 +10,15 @@
 
 [ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
-command="$1"
-function=`echo "$command${subpkg:+'_'}${subpkg}_prerm" | tr '-' '_'`
-shift 2
+operation="$1"
+function=`echo "$operation${subpkg:+'_'}${subpkg}_prerm" | tr '-' '_'`
+shift
 
 echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
 
-case "$command" in
-
+case "$operation" in
     (remove) :
-	if [ ":${3:+'set'}" = ":set" ]
+	if [ $# -gt 0 -a  ":$1" = ':in-favour' ]
 	then : # conflict-prerm remove in-favour package new-version
 	    function=`echo "conflict${subpkg:+'_'}${subpkg}_prerm" | tr '-' '_'`
 	    eval "$function \"$@\""
@@ -27,23 +26,19 @@ case "$command" in
 	    eval "$function \"$@\""
 	fi
 	;;
-
     (upgrade) :
 	# old-prerm upgrade new-version
 	eval "$function \"$@\""
 	;;
-
     (failed-upgrade) :
 	# old-prerm upgrade new-version ... failed
 	# new-prerm failed-upgrade old-version
 	eval "$function \"$@\""
 	;;
-
     (deconfigure) :
 	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version
 	eval "$function \"$@\""
 	;;
-
 esac
 
 @mscript_debhelper@

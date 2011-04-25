@@ -36,59 +36,6 @@ openss7_update () { :
     return $update "$@"
 }
 
-# INSTALLING A KERNEL
-#
-#
-ou_preinst_install () { :
-}
-ou_postrm_abort_install () { :
-}
-
-# UPGRADING A KERNEL
-#
-ou_prerm_upgrade () { :
-}
-ou_prerm_failed_upgrade () { :
-}
-ou_preinst_upgrade () { :
-}
-ou_postrm_abort_upgrade () { :
-}
-ou_postrm_upgrade () { :
-}
-ou_postrm_failed_upgrade () { :
-}
-ou_preinst_abort_upgrade () { :
-}
-ou_postinst_abort_upgrade () { :
-}
-
-# REMOVING A KERNEL
-#
-ou_prerm_remove () { :
-}
-ou_postinst_abort_remove () { :
-}
-ou_postrm_remove () { :
-}
-
-# CONFIGURING A KERNEL
-#
-ou_postinst_configure () { :
-}
-
-
-# PURGING A KERNEL
-#
-ou_postrm_purge () { :
-}
-
-
-
-
-
-
-
 #
 # Note that for 'install' there is nothing really to do here.  On an 'upgrade'
 # we should preserve our relinked modules somewhere in case the upgrade is
@@ -102,36 +49,31 @@ ou_postrm_purge () { :
 
 # new-preinst install		[old-version]
 ou_preinst_install () { :
-    if [ "${2:+'set'}" != 'set' ]
-    then : # install fresh
-    else : # install with some configuration from old-version
-    fi
+    local old_version=
+    [ $# -lt 2 ] || old_version="$2"
     return 0
 }
 # new-preinst upgrade		old-version
 ou_preinst_upgrade () { :
-    # - old-prerm	upgrade new-version		...success
-    # - new-preinst	upgrade old-version		...success
+    return 0
 }
 # old-preinst abort-upgrade	new-version
 ou_preinst_abort_upgrade () { :
-    # The sequence here is:
-    # - old-prerm upgrade new-version		...failed
-    # - new-prerm failed-upgrade new-version	...failed
-    # * old-postinst abort-upgrade new-version
+    return 0
 }
 ou_preinst () { :
+    local retval=0
     operation="$1"; shift
     case "$operation" in
 	install)
-	    return ou_preinst_install		"$@" ;;
+	    ou_preinst_install		"$@" || retval=$? ;;
 	upgrade)
-	    return ou_preinst_upgrade		"$@" ;;
+	    ou_preinst_upgrade		"$@" || retval=$? ;;
 	abort-upgrade)
-	    return ou_preinst_abort_upgrade		"$@" ;;
-	*)
-	    return 0 ;;
+	    ou_preinst_abort_upgrade	"$@" || retval=$? ;;
+	*)  : ;;
     esac
+    return $retval
 }
 
 #
@@ -170,38 +112,74 @@ ou_preinst () { :
 
 # xxx-postinst configure	[most-recently-configured-version]
 ou_postinst_configure () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # xxx-triggered			triggering-packages ...
 ou_postinst_triggered () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # old-postinst abort-upgrade	new-version
 ou_postinst_abort_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # con-postinst abort-remove	'in-favor' package new-version
 # xxx-postinst abort-remove
 ou_postinst_abort_remove () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # dec-postinst abort-deconfigure
 #				'in-favor' failed-install-package version
 #				['removing' conflicting-package version]
 ou_postinst_abort_deconfigure () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 ou_postinst () { :
+    local retval=0
     operation="$1"; shift
     case "$operation" in
 	configure)
-	    return ou_postinst_configure		"$@" ;;
+	    ou_postinst_configure		"$@" || retval=$? ;;
 	triggered)
-	    return ou_postinst_triggered		"$@" ;;
+	    ou_postinst_triggered		"$@" || retval=$? ;;
 	abort-upgrade)
-	    return ou_postinst_abort_upgrade		"$@" ;;
+	    ou_postinst_abort_upgrade		"$@" || retval=$? ;;
 	abort-remove)
-	    return ou_postinst_abort_remove		"$@" ;;
+	    ou_postinst_abort_remove		"$@" || retval=$? ;;
 	abort-deconfigure)
-	    return ou_postinst_abort_deconfigure	"$@" ;;
-	*)
-	    return 0 ;;
+	    ou_postinst_abort_deconfigure	"$@" || retval=$? ;;
+	*)  : ;;
     esac
+    return $retval
 }
 
 # All parameters are for the linux-image-2.6.M[.REV]-ABI-FLAVOR package.
@@ -209,31 +187,36 @@ ou_postinst () { :
 # xxx-prerm remove
 # con-prerm remove		'in-favour' package new-version
 ou_prerm_remove () { :
+    return 0
 }
 # old-prerm upgrade		new-version
 ou_prerm_upgrade () { :
+    return 0
 }
 # new-prerm failed-upgrade	old-version
 ou_prerm_failed_upgrade () { :
+    return 0
 }
 # dec-prerm deconfigure		'in-favour' package-being-installed version
 #				['removing' conflicting-package version]
 ou_prerm_deconfigure () { :
+    return 0
 }
 ou_prerm () { :
+    local retval=0
     operation="$1"; shift
     case "$operation" in
 	remove)
-	    return ou_prerm_remove			"$@" ;;
+	    ou_prerm_remove			"$@" || retval=$? ;;
 	upgrade)
-	    return ou_prerm_upgrade			"$@" ;;
+	    ou_prerm_upgrade			"$@" || retval=$? ;;
 	failed-upgrade)
-	    return ou_prerm_failed_upgrade		"$@" ;;
+	    ou_prerm_failed_upgrade		"$@" || retval=$? ;;
 	deconfigure)
-	    return ou_prerm_deconfigure			"$@" ;;
-	*)
-	    return 0 ;;
+	    ou_prerm_deconfigure		"$@" || retval=$? ;;
+	*)  : ;;
     esac
+    return $retval
 }
 
 #
@@ -263,85 +246,173 @@ ou_prerm () { :
 
 # xxx-postrm remove
 ou_postrm_remove () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # xxx-postrm purge
 ou_postrm_purge () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # old-postrm upgrade		new-version
 ou_postrm_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # new-postrm failed-upgrade	old-version
 ou_postrm_failed_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # new-postrm abort-install	[old-version]
 ou_postrm_abort_install () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # new-postrm abort-upgrade	old-version
 ou_postrm_abort_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # dis-postrm disappear		overwriter overwriter-version
 ou_postrm_disappear () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 ou_postrm () { :
+    local retval=0
     operation="$1"; shift
     case "$operation" in
 	remove)
-	    return ou_postrm_remove			"$@" ;;
+	    ou_postrm_remove			"$@" || retval=$? ;;
 	purge)
-	    return ou_postrm_purge			"$@" ;;
+	    ou_postrm_purge			"$@" || retval=$? ;;
 	upgrade)
-	    return ou_postrm_upgrade			"$@" ;;
+	    ou_postrm_upgrade			"$@" || retval=$? ;;
 	failed-upgrade)
-	    return ou_postrm_failed_upgrade		"$@" ;;
+	    ou_postrm_failed_upgrade		"$@" || retval=$? ;;
 	abort-install)
-	    return ou_postrm_abort_install		"$@" ;;
+	    ou_postrm_abort_install		"$@" || retval=$? ;;
 	abort-upgrade)
-	    return ou_postrm_abort_upgrade		"$@" ;;
+	    ou_postrm_abort_upgrade		"$@" || retval=$? ;;
 	disappear)
-	    return ou_postrm_disappear			"$@" ;;
-	*)
-	    return 0 ;;
+	    ou_postrm_disappear			"$@" || retval=$? ;;
+	*)  : ;;
     esac
+    return $retval
 }
 
 #
 # All parameters are for the linux-headers-2.6.M[.REV]-ABI-FLAVOR package.
 #
+# openss7-modules -- -q -e --add-kernel ${kversion}
+#
 
 # xxx-postinst configure	[most-recently-configured-version]
 ou_hdr_postinst_configure () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # xxx-triggered			triggering-packages ...
 ou_hdr_postinst_triggered () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # old-postinst abort-upgrade	new-version
 ou_hdr_postinst_abort_upgrade () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # con-postinst abort-remove	'in-favor' package new-version
 # xxx-postinst abort-remove
 ou_hdr_postinst_abort_remove () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 # dec-postinst abort-deconfigure
 #				'in-favor' failed-install-package version
 #				['removing' conflicting-package version]
 ou_hdr_postinst_abort_deconfigure () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update || :
+    fi
+    return $retval
 }
 ou_hdr_postinst () { :
+    local retval=0
     operation="$1"; shift
     case "$operation" in
 	configure)
-	    return ou_hdr_postinst_configure		"$@" ;;
+	    ou_hdr_postinst_configure		"$@" || retval=$? ;;
 	triggered)
-	    return ou_hdr_postinst_triggered		"$@" ;;
+	    ou_hdr_postinst_triggered		"$@" || retval=$? ;;
 	abort-upgrade)
-	    return ou_hdr_postinst_abort_upgrade	"$@" ;;
+	    ou_hdr_postinst_abort_upgrade	"$@" || retval=$? ;;
 	abort-remove)
-	    return ou_hdr_postinst_abort_remove		"$@" ;;
+	    ou_hdr_postinst_abort_remove	"$@" || retval=$? ;;
 	abort-deconfigure)
-	    return ou_hdr_postinst_abort_deconfigure	"$@" ;;
-	*)
-	    return 0 ;;
+	    ou_hdr_postinst_abort_deconfigure	"$@" || retval=$? ;;
+	*)  : ;;
     esac
+    return $retval
 }
 
 #
@@ -350,55 +421,65 @@ ou_hdr_postinst () { :
 
 # xxx-postinst configure	[most-recently-configured-version]
 ou_src_postinst_configure () { :
+    return 0
 }
 # xxx-triggered			triggering-packages ...
 ou_src_postinst_triggered () { :
+    return 0
 }
 # old-postinst abort-upgrade	new-version
 ou_src_postinst_abort_upgrade () { :
+    return 0
 }
 # con-postinst abort-remove	'in-favor' package new-version
 # xxx-postinst abort-remove
 ou_src_postinst_abort_remove () { :
+    return 0
 }
 # dec-postinst abort-deconfigure
 #				'in-favor' failed-install-package version
 #				['removing' conflicting-package version]
 ou_src_postinst_abort_deconfigure () { :
+    return 0
 }
 ou_src_postinst ()  { :
+    local retval=0
     operation="$1"; shift
     case "$operation" in
 	configure)
-	    return ou_src_postinst_configure		"$@" ;;
+	    ou_src_postinst_configure		"$@" || retval=$? ;;
 	triggered)
-	    return ou_src_postinst_triggered		"$@" ;;
+	    ou_src_postinst_triggered		"$@" || retval=$? ;;
 	abort-upgrade)
-	    return ou_src_postinst_abort_upgrade	"$@" ;;
+	    ou_src_postinst_abort_upgrade	"$@" || retval=$? ;;
 	abort-remove)
-	    return ou_src_postinst_abort_remove		"$@" ;;
+	    ou_src_postinst_abort_remove	"$@" || retval=$? ;;
 	abort-deconfigure)
-	    return ou_src_postinst_abort_deconfigure	"$@" ;;
-	*)
-	    return 0 ;;
+	    ou_src_postinst_abort_deconfigure	"$@" || retval=$? ;;
+	*)  : ;;
     esac
+    return $retval
 }
+
+RETVAL=0
 
 case "$command" in
     */etc/kernel/preinst.d/openss7-update)
-	return ou_preinst	$DEB_MAINT_PARAMS ;;
+	kversion="$1"; ou_preinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
     */etc/kernel/postinst.d/openss7-update)
-	return ou_postinst	$DEB_MAINT_PARAMS ;;
+	kversion="$1"; ou_postinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
     */etc/kernel/prerm.d/openss7-update)
-	return ou_prerm		$DEB_MAINT_PARAMS ;;
+	kversion="$1"; ou_prerm		$DEB_MAINT_PARAMS || RETVAL=$? ;;
     */etc/kernel/postrm.d/openss7-update)
-	return ou_postrm	$DEB_MAINT_PARAMS ;;
+	kversion="$1"; ou_postrm	$DEB_MAINT_PARAMS || RETVAL=$? ;;
     */etc/kernel/header_postinst.d/openss7-update)
-	return ou_hdr_postinst	$DEB_MAINT_PARAMS ;;
+	kversion="$1"; ou_hdr_postinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
     */etc/kernel/src_postinst.d/openss7-update)
-	return ou_src_postinst	$DEB_MAINT_PARAMS ;;
+	kversion="$1"; ou_src_postinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
     */sbin/openss7-update | */usr/sbin/openss7-update | *)
-	openss7_update || exit $? ;;
+	openss7_update "$@" || RETVAL=$? ;;
 esac
+
+[ "${0##*/}" = "openss7-update" ] && exit $RETVAL
 
 # vim: tw=80 ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn
