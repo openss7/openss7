@@ -10,37 +10,33 @@
 
 [ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
-command="$1"
-function=`echo "$command${subpkg:+'_'}${subpkg}_preinst" | tr '-' '_'`
-shift 2
+operation="$1"
+function=`echo "$operation${subpkg:+'_'}${subpkg}_preinst" | tr '-' '_'`
+shift
 
 echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
 
-case "$command" in
-
+case "$operation" in
     (install) : # install fresh or some configuration
 	# new-preinst install [old-version]
-	if [ "${2:+'set'}" = "set" ]
+	if [ "${1:+'set'}" = "set" ]
 	then : # install with some configuration
-	    function=`echo "upgrade${subpkg:+'_'}${subpkg}_preinst" | tr '-' '_'`
+	    function=`echo "reinstall${subpkg:+'_'}${subpkg}_preinst" | tr '-' '_'`
 	    eval "$function \"$@\""
 	else : # install fresh
 	    eval "$function \"$@\""
 	fi
 	;;
-
     (upgrade) : # upgrade (step 2)
 	# new-preinst upgrade old-version
 	eval "$function \"$@\""
 	;;
-
     (abort-upgrade) :
 	# old-postrm upgrade new-version ... failed
 	# new-postrm failed-upgrade old-version ... failed
 	# old-preinst abort-upgrade new-version
-	echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $command: library in use." >&2
+	eval "$function \"$@\""
 	;;
-
 esac
 
 @mscript_debhelper@

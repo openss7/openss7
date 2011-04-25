@@ -56,18 +56,34 @@
 # Primary functions:
 # -----------------------------------------------------------------------------
 
+# xxx-postrm remove
 remove_kernel_postrm() { :
 }
 
+# xxx-postrm purge
 purge_kernel_postrm() { :
 }
 
+# old-postrm upgrade new-version
 upgrade_kernel_postrm() { :
 }
 
+# old-postrm upgrade new-version ...failed
+# new-postrm failed-upgrade old-version
 failed_upgrade_kernel_postrm() { :
 }
 
+# new-preinst install [old-version] ...failed
+# new-postrm abort-install [old-version]
+abort_install_kernel_postrm () { :
+}
+
+# new-preinst upgrade old-version ...failed
+# new-postrm abort-upgrade old-version
+abort_upgrade_kernel_postrm () { :
+}
+
+# con-postrm disappear overwriter overwriter-version
 disappear_kernel_postrm() { :
 }
 
