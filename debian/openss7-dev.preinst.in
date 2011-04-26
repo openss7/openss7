@@ -59,22 +59,22 @@
 # -----------------------------------------------------------------------------
 
 # new-preinst install
-install_dev_preinst () { :
+install_preinst () { :
 }
 
 # new-preinst install old-version
-reinstall_dev_preinst () { :
+reinstall_preinst () { :
 }
 
 # new-preinst upgrade old-version
-upgrade_dev_preinst () { :
+upgrade_preinst () { :
     preinst_dev
 }
 
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
-abort_upgrade_dev_preinst () { :
+abort_upgrade_preinst () { :
 }
 
 subpkg=dev

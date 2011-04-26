@@ -64,24 +64,24 @@ preinst_kernel () { :
 # -----------------------------------------------------------------------------
 
 # new-preinst install
-install_kernel_preinst () { :
+install_preinst () { :
     preinst_kernel
 }
 
 # new-preinst install old-version
-reinstall_kernel_preinst () { :
+reinstall_preinst () { :
     preinst_kernel_running
 }
 
 # new-preinst upgrade old-version
-upgrade_kernel_preinst () { :
+upgrade_preinst () { :
     preinst_kernel_running
 }
 
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
-abort_upgrade_kernel_preinst () { :
+abort_upgrade_preinst () { :
     preinst_kernel_running
 }
 

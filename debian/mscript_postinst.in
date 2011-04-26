@@ -11,7 +11,6 @@
 [ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
 operation="$1"
-function=`echo "$operation${subpkg:+'_'}${subpkg}_postinst" | tr '-' '_'`
 shift
 
 echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
@@ -21,30 +20,29 @@ case "$operation" in
 	# configure-postinst configure [most-recently-configured-version]
 	if [ $# -gt 0 ]
 	then
-	    function=`echo "reconfigure${subpkg:+'_'}${subpkg}_postinst" | tr '-' '_'`
-	    eval "$function \"$@\""
+	    reconfigure_postinst "$@"
 	else
-	    eval "$function \"$@\""
+	    configure_postinst "$@"
 	fi
 	;;
     (triggered) : # postinst triggered triggered-packages
-	eval "$function \"$@\""
+	triggered_postinst "$@"
 	;;
     (abort-upgrade) :
 	# old-prerm upgrade new-version ... failed
 	# new-prerm failed-upgrade new-version ... failed
 	# old-posinst abort-upgrade new-version
-	eval "$functions \"$@\""
+	abort_upgrade_postinst "$@"
 	;;
     (abort-remove) :
 	# conflict-prerm remove in-favour package new-version ... failed
 	# conflict-postinst abort-remove in-favour package new-version
-	eval "$functions \"$@\""
+	abort_remove_postinst "$@"
 	;;
     (abort-deconfigure) :
 	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version .. failed
 	# deconfigure-postinst abort-deconfigurein-favour package-being-installed-but-failed version removing conflicting-package version
-	eval "$functions \"$@\""
+	abort_deconfigure_postinst "$@"
 	;;
 esac
 

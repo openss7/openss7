@@ -59,22 +59,22 @@
 # -----------------------------------------------------------------------------
 
 # new-preinst install
-install_util_preinst () { :
+install_preinst () { :
     preinst_rmtools
 }
 
 # new-preinst install old-version
-reinstall_util_preinst () { :
+reinstall_preinst () { :
 }
 
 # new-preinst upgrade old-version
-upgrade_util_preinst () { :
+upgrade_preinst () { :
 }
 
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
-abort_upgrade_util_preinst () { :
+abort_upgrade_preinst () { :
 }
 
 subpkg=util

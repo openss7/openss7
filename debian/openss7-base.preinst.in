@@ -64,22 +64,22 @@ preinst_base () { :
 # -----------------------------------------------------------------------------
 
 # new-preinst install
-install_base_preinst () { :
+install_preinst () { :
     preinst_base
 }
 
 # new-preinst install old-version
-reinstall_base_preinst () { :
+reinstall_preinst () { :
 }
 
 # new-preinst upgrade old-version
-upgrade_base_preinst () { :
+upgrade_preinst () { :
 }
 
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
-abort_upgrade_base_preinst () { :
+abort_upgrade_preinst () { :
 }
 
 subpkg=base

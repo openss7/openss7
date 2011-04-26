@@ -11,7 +11,6 @@
 [ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
 operation="$1"
-function=`echo "$operation${subpkg:+'_'}${subpkg}_prerm" | tr '-' '_'`
 shift
 
 echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
@@ -20,24 +19,23 @@ case "$operation" in
     (remove) :
 	if [ $# -gt 0 -a  ":$1" = ':in-favour' ]
 	then : # conflict-prerm remove in-favour package new-version
-	    function=`echo "conflict${subpkg:+'_'}${subpkg}_prerm" | tr '-' '_'`
-	    eval "$function \"$@\""
+	    conflict_prerm "$@"
 	else : # remove-prerm remove
-	    eval "$function \"$@\""
+	    remove_prerm "$@"
 	fi
 	;;
     (upgrade) :
 	# old-prerm upgrade new-version
-	eval "$function \"$@\""
+	upgrade_prerm "$@"
 	;;
     (failed-upgrade) :
 	# old-prerm upgrade new-version ... failed
 	# new-prerm failed-upgrade old-version
-	eval "$function \"$@\""
+	failed_upgrade_prerm "$@"
 	;;
     (deconfigure) :
 	# deconfigure-prerm deconfigure in-favour package-being-installed version removing conflicting-package version
-	eval "$function \"$@\""
+	deconfigure_prerm "$@"
 	;;
 esac
 
