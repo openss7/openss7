@@ -1,4 +1,5 @@
 #!/bin/sh
+# @configure_input@
 # =============================================================================
 # 
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
@@ -50,25 +51,32 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-@mscript_header@
+
+@openss7_prerm@
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 
-remove_devel_prerm() { :
+# xxx-prerm remove
+remove_devel_prerm () { :
 }
 
-conflict_devel_prerm() { :
+# con-prerm remove 'in-favour' package new-version
+conflict_devel_prerm () { :
 }
 
-upgrade_devel_prerm() { :
+# old-prerm upgrade new-version
+upgrade_devel_prerm () { :
 }
 
-failed_upgrade_devel_prerm() { :
+# old-prerm upgrade new-version ***FAILED***
+# new-prerm failed-upgrade old-version
+failed_upgrade_devel_prerm () { :
 }
 
-deconfigure_devel_prerm() { :
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
+deconfigure_devel_prerm () { :
 }
 
 subpkg=devel

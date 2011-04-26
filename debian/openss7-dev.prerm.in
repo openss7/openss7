@@ -6,8 +6,9 @@
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -20,10 +21,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -51,46 +51,37 @@
 # Last Modified $Date: 2008-04-28 11:46:32 $ by $Author: brian $
 #
 # =============================================================================
-@mscript_header@
 
-function remove_dev_prerm() { :
-    if test -x '/usr/sbin/@STRMAKENODES@' ; then
-	# ensure that old devices are removed
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): removing old devices."
-	/usr/sbin/@STRMAKENODES@ --remove
-    fi
+@openss7_prerm@
+
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+
+# xxx-prerm remove
+remove_dev_prerm () { :
+    prerm_dev
 }
 
-function conflict_dev_prerm() { :
-    if test -x '/usr/sbin/@STRMAKENODES@' ; then
-	# ensure that devices are removed
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): removing devices."
-	/usr/sbin/@STRMAKENODES@ --remove
-    fi
+# con-prerm remove 'in-favour' package new-version
+conflict_dev_prerm () { :
+    prerm_dev
 }
 
-function upgrade_dev_prerm() { :
-    if test -x '/usr/sbin/@STRMAKENODES@' ; then
-	# ensure that old devices are removed
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): removing old devices."
-	/usr/sbin/@STRMAKENODES@ --remove
-    fi
+# old-prerm upgrade new-version
+upgrade_dev_prerm () { :
+    prerm_dev
 }
 
-function failed_upgrade_dev_prerm() { :
-    if test -x '/usr/sbin/@STRMAKENODES@' ; then
-	# ensure that old devices are put back
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): restoring old devices."
-	/usr/sbin/@STRMAKENODES@
-    fi
+# old-prerm upgrade new-version ***FAILED***
+# new-prerm failed-upgrade old-version
+failed_upgrade_dev_prerm () { :
+    prerm_dev_failed
 }
 
-function deconfigure_dev_prerm() { :
-    if test -x '/usr/sbin/@STRMAKENODES@' ; then
-	# ensure that devices are removed
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): removing devices."
-	/usr/sbin/@STRMAKENODES@ --remove
-    fi
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
+deconfigure_dev_prerm () { :
+    prerm_dev
 }
 
 subpkg=dev

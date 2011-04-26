@@ -6,8 +6,9 @@
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -20,10 +21,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -51,89 +51,42 @@
 # Last Modified $Date: 2008-05-04 16:16:42 $ by $Author: brian $
 #
 # =============================================================================
-@mscript_header@
 
-#
-# If we are upgrading and the upgrade is for the running kernel, or we are installing new on the
-# running kernel, we have to worry about previous loaded modules for the old version or a non-deb
-# version kicking around.  This scriplet kills any streams modules that are loaded and running.
-#
-function prerm_modules() {
-    if [ ":$kversion" = ":`uname -r`" ] ; then
-	for m in $modules
-	do
-	    if ( /sbin/lsmod | grep -q "^$m" ) ; then
-#		module running, kick the stack
-		/sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-		if ( /sbin/lsmod | grep -q "^$m" ) ; then
-		    fdetach -a 2>/dev/null
-		    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-		    if ( /sbin/lsmod | grep -q "^$m" ) ; then
-			/usr/sbin/lsof | while read -a tokens; do
-			    if [ :"${tokens[4]}" = :"CHR" ]; then
-				major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
-				if [ $major -eq $STRCONF_MAJBASE ]; then
-				    eval "kill -HUP ${tokens[1]}"
-				fi
-			    fi
-			done
-			/sbin/sleep 5 # wait for processes to die and close streams
-			/sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-			if ( /sbin/lsmod | grep -q "^$m" ) ; then
-			    echo "Cannot install or upgrade with $m module running." >&2
-			    exit 1
-			fi
-		    fi
-		fi
-	    fi
-	done
-    fi
-    return 0
-}
+@openss7_prerm@
 
-function prerm_oldmods() {
-    prerm_modules
-}
-
-function prerm_preload() {
-    prel_old="@preloads@"
-    if [ -f $prel_old ] ; then
-	prel_new="$tmppath/modprobe.preload.new.$$"
-	prel_tmp="$tmppath/modprobe.preload.tmp.$$"
-	cp -f -- $prel_old $prel_new
-	for m in $preloads ; do
-	    sed -e "/^[[:space:]]*$m>/d" $prel_new > $prel_tmp
-	    mv -f -- $prel_tmp $prel_new
-	done
-	chmod --reference=$prel_old -- $prel_new
-	cp -fb --suffix=.dpkg-save -- $prel_new $prel_old
-	rm -f -- $prel_new
-    fi
-}
-
-function remove_core_prerm() { :
+prerm_core () { :
     prerm_modules
     prerm_preload
 }
 
-function conflict_core_prerm() { :
-    prerm_modules
-    prerm_preload
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+
+# xxx-prerm remove
+remove_core_prerm () { :
+    prerm_core
 }
 
-function upgrade_core_prerm() { :
-    prerm_modules
-    prerm_preload
+# con-prerm remove 'in-favour' package new-version
+conflict_core_prerm () { :
+    prerm_core
 }
 
-function failed_upgrade_core_prerm() { :
-    prerm_oldmods
-    prerm_preload
+# old-prerm upgrade new-version
+upgrade_core_prerm () { :
+    prerm_core
 }
 
-function deconfigure_core_prerm() { :
-    prerm_modules
-    prerm_preload
+# old-prerm upgrade new-version ***FAILED***
+# new-prerm failed-upgrade old-version
+failed_upgrade_core_prerm () { :
+    prerm_core
+}
+
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
+deconfigure_core_prerm () { :
+    prerm_core
 }
 
 subpkg=core

@@ -1,0 +1,607 @@
+#!/bin/sh
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+
+@mscript_header@
+
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+
+preinst_rmtools () { :
+    #
+    # This is a fresh install, look for old non-rpm tools.
+    #
+    for tool in $tools ; do
+        location="`which $tool 2>/dev/null`"
+        while [ -n "$location" -a -x "$location" ] ; do
+            eval "rm -f $location"
+            location="`which $tool 2>/dev/null`"
+            while [ -n "$location" -a -x "$location" ] ; do
+                eval "rm -f $location"
+                location="`which $tool 2>/dev/null`"
+            done
+        done
+    done
+    #
+    # Old non-rpm distro puts some man pages in the wrong place, clean them out.
+    #
+    if [ -f /usr/man/man3/fattach.3 ] ; then
+        rm -f /usr/man/man3/fattach.3 2>/dev/null
+        rm -f /usr/man/man3/detach.3 2>/dev/null
+        rm -f /usr/man/man3/isastream.3 2>/dev/null
+        rmdir -p /usr/man/man3 2>/dev/null || :
+        rm -f /usr/man/man8/fattach.8 2>/dev/null
+        rm -f /usr/man/man8/fdetach.8 2>/dev/null
+        rmdir -p /usr/man/man8 2>/dev/null || :
+        rm -f /usr/man/man9/connld.9 2>/dev/null
+        rm -f /usr/man/man9/fifo.9 2>/dev/null
+        rm -f /usr/man/man9/pipemod.9 2>/dev/null
+        rmdir -p /usr/man/man9 2>/dev/null || :
+        rmdir -p /usr/man 2>/dev/null || :
+    fi
+}
+
+preinst_source () { :
+    #
+    # Look for old source trees and symbolic links hanging around.
+    #
+    local d
+    for d in /usr/src/@PACKAGE@-[0-9]*; do
+	if [ -d $d ] ; then
+	    echo "$0: warning: moving directory $d out of the way" >&2
+	    mv -f -- $d $d.dpkg-save
+	fi
+    done
+    local l
+    for l in /usr/src/@PACKAGE@*; do
+	if [ -L $l ] ; then
+	    echo "$0: warning: removing symbolic link $l" >&2
+	    rm -f -- $l
+	fi
+    done
+}
+
+preinst_rmlink () { :
+    #
+    # Make sure that symbolic link was removed.
+    #
+    local l
+    for l in /usr/src/@PACKAGE@ ; do
+	if [ -L $l ] ; then
+	    echo "$0: warning: removing symbolic link $l" >&2
+	    rm -f -- $l
+	fi
+    done
+}
+
+preinst_lib () { :
+    #
+    # Unfortunately, non-autoconf releases of LiS placed libraries all over the place.  On an
+    # initial installation, this checks for other libraries with the same name and deletes them.
+    #
+    for lib in $libraries ; do
+	old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
+	if [ -n "$old_libs" ] ; then
+#	    old libraries hanging around, delete them
+	    echo "warning: Deleting old non-rpm libraries $old_libs" >&2
+	    rm -f $old_libs
+	fi
+    done
+}
+
+#
+# A little recursive function to delete all modules dependent on an initial module set (in our case
+# "streams.o").  The function echos the list of modules to remove to stdout.
+#
+remove_depmods () {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+	prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	eval "remove_depmods \$$prereq"
+    done
+}
+remove_depends () {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+	remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+	rmmod $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
+
+preinst_kernel_modules () { :
+    local list m b modl_mods line dep
+    # This is a fresh install of this version of kernel module.  Make sure that
+    # there are no tarball installed kernel modules hanging around for this
+    # kernel version.
+    list="${modules}" ; modl_mods=
+    if [ -d ${kmoduledir} ] ; then
+	for m in `find ${kmoduledir} \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
+		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
+		case " $list " in (*" $b "*) ;; (*) continue ;; esac
+		echo "$m"
+		modl_mods="$modl_mods${modl_mods:+' '}$m"
+	done
+	if [ -n "$modl_mods" -a -f ${kmoduledir}/modules.dep ] ; then
+	    # First we can build a dependency tree from every dependency
+	    # expression that can be found in the modules.dep file.
+	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+	    set +x
+	    dep= ; while read line ; do
+		case $line in
+		    (*\\)   line="`echo $line | sed -e 's|\\$||'`"
+			    dep="$dep${dep:+' '}$line"; continue ;;
+		    (*)     dep="$dep${dep:+' '}$line" ;;
+		esac
+		[ -n "$dep" ] || continue;
+		set dummy $dep
+		if [ $# -gt 3 ] ; then
+		    t=`echo $2 | sed -e 's|:$||'`
+		    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+		    shift 2
+		    for p in $@ ; do
+			prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+			eval "$prereq=\"\$$prereq\${$prereq:+' '}$t\""
+			eval "$target=\"\$$target\${$target:+' '}$p\""
+		    done
+		fi
+		dep=
+	    done < ${kmoduledir}/modules.dep
+	    eval "$xtrace"
+	fi
+    fi
+    # remove conflicting and dependent modules
+    if [ -n "$modl_mods" ] ; then
+	rm -f -- $modl_mods
+	for m in $list ; do
+	    prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	    eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
+	    [ -n "$modl_deps" ] || continue
+	    rm -f -- $modl_deps
+	done
+    fi
+    :
+}
+
+#
+# FIXME: there is a way in debian to indicate that a reboot is required (use it)
+#
+preinst_kernel_running () {
+    local fields ind val signal reboot
+    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
+	# If we are upgrading and the upgrade is for the running kernel, or we
+	# are installing new on the running kernel, we have to worry about
+	# previous loaded modules for the old version or a non-rpm version.
+	if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+	    if [ -x /usr/sbin/fdetach ] ; then
+		/usr/sbin/fdetach -a 2>/dev/null || :
+	    fi
+	    for signal in TERM KILL ; do
+		if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+		    lsof | grep '\<STR\>' | \
+		    while read fields ; do
+			set dummy $fields
+			if [ ":$6" != ':CHR' ] ; then continue; fi
+			ind=`expr $# - 1`
+			eval "val=\"\${$ind}\""
+			if [ ":$val" != ':STR' ] ; then continue; fi
+			kill -$signal $3 >/dev/null 2>&1 || :
+		    done
+		    sleep 5
+		fi
+	    done
+	fi
+	lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
+	remove_depends streams || reboot='yes'
+	remove_depends specfs  || reboot='yes'
+	[ ":$reboot" != ':yes' ] || echo "Reboot required." >&2
+    fi
+    :
+}
+
+#
+# This is an initial installation of the init subpackage.  We need to check for non-deb
+# installations on the host and remove any entries that might later conflict with our entries.  We
+# treat every fresh installation like an upgrade from non-deb install.
+#
+preinst_init () { :
+    #
+    # When performing a fresh install we want to go looking for non-rpm installations of LiS or
+    # STREAMS or supplementary packages and perform what would otherwise have been the prerm or
+    # postrm actions.
+    #
+    for dir in /lib/modules/2.[456]\.* /lib/modules/preferred /lib/modules/default /lib/modules/boot ; do
+	[ -d $dir ] || continue
+	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+	    b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)? | |'`
+	    case " $modules " in (*" $b "*) modl_mods="${modl_mods:+$modl_mods }$m" ;; (*) continue ;; esac
+	done
+	if [ -f $dir/modules.dep ] ; then
+	    #
+	    # First we can build a dependency tree from every dependency expression that can be
+	    # found in each modules.dep file.
+	    #
+	    dep= ; while read line ; do
+		case $line in
+		    *\\) line="`echo $line | sed -e 's|\\$||'`"
+			dep="${dep:+$dep }$line" ; continue ;;
+		    *)  dep="${dep:+$dep }$line" ;;
+		esac
+		set dummy $dep
+		if [ "${3+set}" = "set" ] ; then
+		    t=`echo $2 | sed -e 's|:$||'`
+		    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+		    shift 2
+		    for p in $@ ; do
+			prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+			eval "$prereq=\"\${$prereq:+\$$prereq }$t\""
+			eval "$target=\"\${$target:+\$$target }$p\""
+		    done
+		fi
+		dep=
+		continue
+	    done < $dir/modules.dep
+	fi
+	conf_fil=$sysconfdir/modules.conf
+	if [ -f $conf_fil ] ; then
+	    conf_new=$tmppath/modules.conf.new.$$
+	    conf_tmp=$tmppath/modules.conf.tmp.$$
+	    cp -f -- $conf_fil $conf_new
+	    #
+	    # Unfortunately davem starting copying our install procedure, so we need to root out all
+	    # kinds of things from the modules.conf file, all prune statements, any if include
+	    # statements
+	    #
+	    for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61 ; do
+		#
+		# This the old style /BEGIN LiS/,/END LiS/ enclosure in the modules.conf file.
+		#
+		if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null ; then
+		    sed -e '\|BEGIN '$suffix'|,\|END '$suffix'|d'            $conf_new > $conf_tmp
+		    mv -f -- $conf_tmp $conf_new
+		fi
+		#
+		# This is my newer technique with a prune and an if statement in the modules.conf
+		# file that was also used by davem in LiS-2.18.0.
+		#
+		if [ -f $dir/modules.$suffix ] ; then
+		    rm -f -- $dir/modules.$suffix
+		    sed -e '\|^prune[[:space:]].*modules.'$suffix'|d'        $conf_new > $conf_tmp
+		    sed -e '\|^if[[:space:]].*modules.'$suffix'|,\|^endif|d' $conf_tmp > $conf_new
+		    sed -e '\|^include[[:space:]].*modules.'$suffix'|d'      $conf_new > $conf_tmp
+		    mv -f -- $conf_tmp $conf_new
+		fi
+	    done
+	    for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61 ; do
+		#
+		# This is my newer latest technique with only an include statement in modules.conf
+		# and a modules.conf fragment in the debian update-modules directory _modutildir
+		# that includes the prune and if statements.  That works both for RH-style and
+		# Debian-style modules.conf.
+		#
+		if [ -f $modutildir/$suffix ] ; then
+		    rm -f -- $modutildir/$suffix
+		    sed -e '\|^include[[:space:]].*'"$modutildir"'/'$suffix'|d' $conf_new > $conf_tmp
+		    mv -f -- $conf_tmp $conf_new
+		fi
+	    done
+	    chmod --reference=$conf_fil -- $conf_new
+	    cp -f -b --suffix=.rpmsave -- $conf_new $conf_fil
+	    rm -f -- $conf_new
+	fi
+    done
+    prel_fil="@preloads@"
+    if [ -f $prel_fil ] ; then
+	prel_tmp=$tmppath/modprobe.preload.tmp.$$
+	prel_new=$tmppath/modprobe.preload.new.$$
+	cp -f -- $prel_fil $prel_new
+	sed -e '\|^[[:space:]]*streams|d' $prel_new > $prel_tmp
+	mv -f -- $prel_tmp $prel_new
+	chmod --reference=$prel_fil -- $prel_new
+	cp -f -b --suffix=.rpmsave -- $prel_new $prel_fil
+	rm -f -- $prel_new
+    fi
+    #
+    # Fresh install, go looking for non-rpm initscripts and remove them.
+    #
+    if [ -x /sbin/chkconfig ] ; then
+	for i in specfs streams strerr strace strms_up strms_dn ; do
+	    if [ -f $initrddir/$i ] ; then
+		/sbin/chkconfig --del $i || :
+	    fi
+	done
+    fi
+    #
+    # Finally remove all conflicting modules and their dependents
+    #
+    if [ -n "$modl_mods" ] ; then
+	rm -f -- $modl_mods
+	for m in $modules ; do
+	    prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	    eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
+	    [ -n "$modl_deps" ] || continue
+	    rm -f -- $modl_deps
+	done
+    fi
+}
+
+#
+# This is an initial installation of the doc subpackage.  We need to check for non-deb installations
+# on the host and remove any info entries that might later conflict with our entries.  We treat
+# every fresh installation like an upgrade from non-deb install.
+#
+preinst_doc () { :
+    #
+    # Search for our documentation entry and remove it.  Fortunately, GCOM releases did not install
+    # texinfo documentation.  Also, search for our man macros and references and remove them as
+    # well.
+    #
+    rm -f -- $mandir/$base.macros $mandir/$base.refs
+}
+
+preinst_dev () { :
+    if test -x '/usr/sbin/@STRMAKENODES@' ; then
+	# ensure that devices were removed
+	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): removing old devices."
+	/usr/sbin/@STRMAKENODES@ --remove
+    fi
+}
+
+remove_warn_file () {
+    if [ -f "$1" ] ; then
+	echo "$0: warning: removing old file $1" >&2
+	rm -f -- $1
+    fi
+}
+remove_warn_files () {
+    local f
+    for f in $@ ; do
+	remove_warn_file $f
+    done
+}
+remove_warn_dir () {
+    if [ -d $1 -a "`(cd $1; pwd)`" != "/"  ] ; then
+	if [ -L $1 ] ; then
+	    echo "$0: warning: removing symbolic link $1" >&2
+	    rm -f -- $1
+	else
+	    echo "$0: warning: removing directory $1" >&2
+	    rm -rf -- $1
+	fi
+    fi
+}
+remove_warn_dirs () {
+    local d
+    for d in $@ ; do
+	remove_warn_dir $d
+    done
+}
+
+#
+# This is an initial installation of the doc subpackage.  We need to check for non-deb installations
+# on the host and remove any info entries that might later conflict with our entries.  We treat
+# every fresh installation like an upgrade from non-deb install.
+#
+remove_warn_old () { :
+    #
+    # Check for old non-deb install static libraries and header files.
+    #
+    # We are really the only distribution that has shipped static libraries for LiS, but we should
+    # go looking to clean them out in the usual places.
+    #
+    for d in /lib /usr/lib /usr/local/lib $libdir ; do
+	for subdir in / /LiS/ /lis/ /streams/ /strxnet/ ; do
+	    if [ -d $d${subdir} ] ; then
+		remove_warn_files \
+		    $d${subdir}libLiS.a \
+		    $d${subdir}libpLiS.a \
+		    $d${subdir}libstreams.a \
+		    $d${subdir}libxnet.a \
+		    $d${subdir}libxti.a
+	    fi
+	done
+    done
+    #
+    # There are a lot of places that we and other distributions have placed header files.  We go an
+    # clean out all of them.
+    #
+    for d in /include /usr/include /usr/local/include $includedir $oldincludedir ; do
+	remove_warn_dirs \
+	    $d/LiS \
+	    $d/streams \
+	    $d/strxns \
+	    $d/strinet \
+	    $d/strxnet \
+	    $d/strsctp \
+	    $d/strss7 \
+	    $d/xnet \
+	    $d/xti \
+	    $d/ss7 \
+	    $d/os7 \
+	    $d/sctp
+    done
+}
+
+preinst_preloads () {
+    case $kversion in
+	2.4.*) prel_old=$sysconfdir/modules ;;
+	2.6.*) prel_old=$sysconfdir/modprobe.preload ;;
+        *) return ;;
+    esac
+    if test -f $prel_old; then
+        prel_tmp=$tmppath/modprobe.preload.tmp.$$
+        prel_new=$tmppath/modprobe.preload.new.$$
+        cp -f -- $prel_old $prel_new
+	sed -r -e '/^[[:space:]]*(specfs|streams)/d' $prel_new > $prel_tmp
+        mv -f -- $prel_tmp $prel_new
+        chmod --reference=$prel_old -- $prel_new
+        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
+        rm -f -- $prel_new
+    fi
+}
+
+preinst_initscripts () {
+    # Fresh install, go looking for non-rpm initscripts and remove them.
+    list="$inifiles $nonrpminit"; for i in $list; do
+	if test -f $initrddir/$i ; then
+            # Find the best working init script removal tool
+            test -x /sbin/insserv             && /sbin/insserv -r          $i 2>&1 && continue || :
+            test -x /sbin/chkconfig           && /sbin/chkconfig --del     $i 2>&1 && continue || :
+            test -x /usr/lib/lsb/remove_initd && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
+	fi
+    done
+}
+
+#
+# Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen to install their
+# modconf files in a similar fashion to ours and in a similar location.  It even uses the prune
+# modules line that we normally use, however, on Debian their modules.conf edits will be lost
+# because the modules.conf file is generated from the modules/conf.d directory.
+#
+preinst_modconf () {
+    for ext in LiS lis STREAMS streams ; do
+	eval "d=\"$kmoduledir\""
+	test -f $d/modules.$ext || continue
+	rm -f -- $d/modules.$ext
+    done
+}
+
+#
+# Unfortunately recent non-autoconf/dpkg releases of LiS have chosen to install their kernel modules
+# in locations mimicing our releases, so this pre-installation scriptlet goes and finds any
+# offending modules (modules with the same name as ours) and simply removes them.
+#
+preinst_rmmod () { :
+    for dir in '/' '/../preferred' '/../default' '/../boot' ; do
+	eval "d=\"$kmoduledir$dir\""
+	test -d $d || continue
+	for m in `find $d \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
+	    b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?$||'`
+	    case " $modules " in (*" $b "*) rm -f -- $m ;; esac
+	done
+    done
+    return 0
+}
+
+#
+# This is our chance to check that an old-prerm upgrade scriplet did at least somewhat what it was
+# supposed to do.  This is not as extensive as the non-deb install since we do not have to check
+# that package files are removed and we don't have to check for things from non-deb versions.
+#
+preinst_shutdown () { :
+    if [ ":$kversion" = ":`uname -r`" ] ; then
+	#
+	# If we are upgrading and the upgrade is for the running kernel, or we are installing new on
+	# the running kernel, we have to worry about previous loaded modules for the old version or
+	# a non-deb version kicking around.  This scriplet kills any streams modules that are loaded
+	# and running.
+	#
+	for m in $modules
+	do
+	    if ( /sbin/lsmod | grep -q "^$m" ) ; then
+		#
+		# Module running, kick the stack.
+		#
+		/sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+		if ( /sbin/lsmod | grep -q "^$m" ) ; then
+		    fdetach -a 2>/dev/null
+		    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+		    if ( /sbin/lsmod | grep -q "^$m" ) ; then
+			/usr/sbin/lsof | while read -a tokens; do
+			    if [ :"${tokens[4]}" = :"CHR" ]; then
+				major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
+				if [ $major -eq $STRCONF_MAJBASE ]; then
+				    eval "kill -HUP ${tokens[1]}"
+				fi
+			    fi
+			done
+			/sbin/sleep 5 # wait for processes to die and close streams
+			/sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
+			if ( /sbin/lsmod | grep -q "^$m" ) ; then
+			    echo "Cannot install or upgrade with $m module running." >&2
+			    return 1
+			fi
+		    fi
+		fi
+	    fi
+	done
+    fi
+    return 0
+}
+
+preinst_kernel () { :
+    preinst_kernel_modules
+    preinst_kernel_running
+}
+
+# -----------------------------------------------------------------------------
+# Default functions:
+# -----------------------------------------------------------------------------
+
+install_preinst () { :; }
+reinstall_preinst () { :; }
+upgrade_preinst () { :; }
+abort_upgrade_preinst () { :; }
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

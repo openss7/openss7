@@ -51,15 +51,29 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-@mscript_header@
+
+@openss7_preinst@
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-install_debugsource_preinst() { :
+
+# new-preinst install
+install_debugsource_preinst () { :
 }
 
-upgrade_debugsource_preinst() { :
+# new-preinst install old-version
+reinstall_debugsource_preinst () { :
+}
+
+# new-preinst upgrade old-version
+upgrade_debugsource_preinst () { :
+}
+
+# old-postrm upgrade new-version ...FAILED
+# new-postrm failed-upgrade old-version ...FAILED
+# old-preinst abort-upgrade new-version
+abort_upgrade_debugsource_preinst () { :
 }
 
 subpkg=debugsource

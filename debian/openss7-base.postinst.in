@@ -1,11 +1,12 @@
 #!/bin/sh
+# @configure_input@
 # =============================================================================
 # 
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -51,168 +52,58 @@
 #
 # =============================================================================
 
-@mscript_header@
+@openss7_postinst@
 
-configure_base_postinst_mknods() { :
-    if test -x '/usr/sbin/@STRCONF_DEVICES@' ; then
-	# ensure that devices are added
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): creating devices."
-	/usr/sbin/@STRCONF_DEVICES@ --create
-    fi
-}
-
-configure_base_postinst_modconf() { :
-    # At the end of a fresh install we need to add our lines to the modules.conf
-    # file if it exists, and it is necessary to use a modconf file (2.4 and pre
-    # 2.5.48 kernel), and even if the line is already there (in which case we
-    # remove the existing line).
-    conf_old=@sysconfdir@/modules.conf
-    if [ -f $conf_old ] ; then
-	conf_tmp=$tmppath/modules.conf.tmp.$$
-	conf_new=$tmppath/modules.conf.new.$$
-	cp -f -- $conf_old $conf_new
-	( sed -e "/^include[[:space:]].*$modutildir\/$base/d" $conf_new
-	  echo "include $modutildir/$base" ) > $conf_tmp
-	mv -f -- $conf_tmp $conf_new
-	chmod --reference=$conf_old $conf_new
-	cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-	rm -f -- $conf_new
-    fi
-}
-
-configure_base_postinst_preloads() { :
-    case $kminor in
-	4) prel_old=@sysconfdir@/modules ;;
-	5)  if test $kpatch -lt 48; then
-		prel_old=@sysconfdir@/modules
-	    else
-		prel_old=@sysconfdir@/modprobe.preload
-	    fi ;;
-	6) prel_old=@sysconfdir@/modprobe.preload ;;
-	*) return ;;
-    esac
-    # At the end of a fresh install we need to add our preloads to the modules
-    # or modprobe.preload file, if it exists, and is necessary, and even if the
-    # lines are already there (in which case we remove the existing line.
-    if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="${preloads}" ; for m in $mods ; do
-            ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new
-              echo "$m" ) > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-}
-
-configure_base_postinst_netconfig() { :
-    # At the end of a fresh install we need to rebuild the netconfig database,
-    # but only if the netconfig database was built by us or does not exist.
-    t=@sysconfdir@/netconfig
-    a="${t}.xnsl"
-    d="${t}.d"
-    if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            t="${a}"
-        fi
-    fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-    found='no'
-    files="$d/*"
-    for f in $files ; do
-        if [ -f $f -a $f = "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    for f in $files ; do
-        if [ -f $f -a $f != "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    if [ $found = "no" ] ; then
-        rm -f $t $t.tmp
-    else
-        mv -f $t.tmp $t
-    fi
-    if [ "${t}" != "${a}" ] ; then
-        rm -f $a
-    fi
-}
-
-configure_base_postinst_sock2path() { :
-    # At the end of a fresh install we need to rebuild the sock2path database.
-    t=@sysconfdir@/sock2path
-    cp -f -b --suffix=.rpmsave -- /dev/null $t
-    for f in "${t}.d/*" ; do
-        if [ -f $f ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
-            esac
-        fi
-    done
-}
-
-configure_base_postinst_initscripts() { :
-    return
+postinst_base () { :
     #
-    # Note that init scripts are handled by debhelper additions to this script.
+    # At this point we want to ensure that our lines are added to the modules.conf (if necessary)
+    # and that our preloads are added to the modules or modprobe.preload file.
     #
-}
-configure_base_postinst_manpages() { :
-    return
-    #
-    # Note that manual pages are handled by debhelper additions to this script.
-    #
-    if which makewhatis >/dev/null 2>&1 ; then
-	LANGUAGE= LANG= makewhatis -u $mandir || :
-    fi
-    if which mandb >/dev/null 2>&1 ; then
-	LANGUAGE= LANG= mandb -p $mandir || :
-    fi
-}
-configure_base_postinst_manrefs() { :
-    # some policies compress manual pages which results in compression of our ref db
-    [ ! -f $mandir/$base.refs.gz    ] || gunzip  $mandir/$base.refs.gz
-    [ ! -f $mandir/$base.refs.bz2   ] || bunzip2 $mandir/$base.refs.bz2
-}
-configure_base_postinst_manmacros() { :
-    # some policies compress manual pages which results in compression of our macros
-    [ ! -f $mandir/$base.macros.gz  ] || gunzip  $mandir/$base.macros.gz
-    [ ! -f $mandir/$base.macros.bz2 ] || bunzip2 $mandir/$base.macros.bz2
+    postinst_mknods
+    @WITH_KO_MODULES_FALSE@postinst_modconf
+    postinst_preloads
+    postinst_initscripts
+    postinst_manpages
+    postinst_manrefs
+    postinst_manmacros
 }
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-#
-# We are configuring the installed package.
-#
-configure_base_postinst() {
-    #
-    # At this point we want to ensure that our lines are added to the modules.conf (if necessary)
-    # and that our preloads are added to the modules or modprobe.preload file.
-    #
-    configure_base_postinst_mknods
-    @WITH_KO_MODULES_FALSE@configure_base_postinst_modconf
-    configure_base_postinst_preloads
-    configure_base_postinst_initscripts
-    configure_base_postinst_manpages
-    configure_base_postinst_manrefs
-    configure_base_postinst_manmacros
+
+# xxx-postinst configure
+configure_base_postinst () { :
+    postinst_base
 }
 
-triggered_base_postinst() { :
+# xxx-postinst configure most-recently-configured-version
+reconfigure_base_postinst () { :
+    postinst_base
+}
+
+# xxx-postinst triggered triggered-packages
+triggered_base_postinst () { :
+    postinst_base
+}
+
+# old-prerm upgrade new-version ...FAILED
+# new-prerm failed-upgrade new-version ...FAILED
+# old-posinst abort-upgrade new-version
+abort_upgrade_base_postinst () { :
+    postinst_base
+}
+
+# con-prerm remove 'in-favour' package new-version ...FAILED
+# con-postinst abort-remove 'in-favour' package new-version
+abort_remove_base_postinst () { :
+    postinst_base
+}
+
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
+# dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
+abort_deconfigure_base_postinst ()  { :
+    postinst_base
 }
 
 subpkg=base

@@ -6,8 +6,9 @@
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -20,10 +21,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -51,21 +51,42 @@
 # Last Modified $Date: 2008-04-28 11:46:32 $ by $Author: brian $
 #
 # =============================================================================
-@mscript_header@
 
-function remove_init_postrm() { :
+@openss7_postrm@
+
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+
+# remove-postrm remove
+remove_init_postrm () { :
 }
 
-function purge_init_postrm() { :
+# remove-postrm purge
+purge_init_postrm () { :
 }
 
-function upgrade_init_postrm() { :
+# old-postrm upgrade new-version
+upgrade_init_postrm () { :
 }
 
-function failed_upgrade_init_postrm() { :
+# old-postrm upgrade new-version ...FAILED
+# new-postrm failed-upgrade old-version
+failed_upgrade_init_postrm () { :
 }
 
-function disappear_init_postrm() { :
+# new-preinst install [old-version] ...FAILED
+# new-postrm abort-install [old-version]
+abort_install_init_postrm () { :
+}
+
+# new-preinst upgrade old-version ...FAILED
+# new-postrm abort-upgrade old-version
+abort_upgrade_init_postrm () { :
+}
+
+# dis-postrm disappear overwriter overwriter-version
+disappear_init_postrm () { :
 }
 
 subpkg=init

@@ -52,16 +52,38 @@
 #
 # =============================================================================
 
-@mscript_header@
+@openss7_postinst@
 
 # -----------------------------------------------------------------------------
-# Primary functions
+# Primary functions:
 # -----------------------------------------------------------------------------
 
-configure_debugsource_postinst() { :
+# xxx-postinst configure
+configure_debugsource_postinst () { :
 }
 
-triggered_debugsource_postinst() { :
+# xxx-postinst configure most-recently-configured-version
+reconfigure_debugsource_postinst () { :
+}
+
+# xxx-postinst triggered triggered-packages
+triggered_debugsource_postinst () { :
+}
+
+# old-prerm upgrade new-version ...FAILED
+# new-prerm failed-upgrade new-version ...FAILED
+# old-posinst abort-upgrade new-version
+abort_upgrade_debugsource_postinst () { :
+}
+
+# con-prerm remove in-favour package new-version ...FAILED
+# con-postinst abort-remove in-favour package new-version
+abort_remove_debugsource_postinst () { :
+}
+
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
+# dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
+abort_deconfigure_debugsource_postinst () { :
 }
 
 subpkg=debugsource

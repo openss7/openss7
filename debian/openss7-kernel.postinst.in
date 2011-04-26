@@ -1,4 +1,5 @@
 #!/bin/sh
+# @configure_input@
 # =============================================================================
 # 
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
@@ -51,108 +52,48 @@
 #
 # =============================================================================
 
-configure_kernel_postinst_depmod () { :
-    if [ ":$kversion" = ":`uname -r`" ] ; then
-	# This is a running kernel, do a depmod on the modules directory for the
-	# running kernel.
-	if [ -r /boot/System.map-$kversion ] ; then
-	    depmod -ae -F /boot/System.map-$kversion 2>&1 || :
-	else
-	    depmod -ae 2>&1 || :
-	fi
-    elif [ -r /boot/System.map-$kversion ] ; then
-	# Non-running kernels a depmod will be performed on boot by depmod
-	# anyway, but try one now.
-	UNAME_MACHINE=$target_cpu \
-	depmod -ae -F /boot/System.map-$kversion $kversion 2>&1 || :
-    fi
-}
+@openss7_postinst@
 
-configure_kernel_postinst_initscripts () { :
-    #
-    # Note that initscripts are updated by debian helpers, however, debian
-    # helpers do not start and stop init scripts.
-    #
-    # Unlike rpm, we actually have a terminal here and can interact with the
-    # user.
-    #
-    if [ ":$kversion" = ":`uname -r`" ] ; then
-	# Running kernels do need init scripts run, but only when normally
-	# started in the current runlevel.
-	r=`runlevel | sed -e 's|.*[[:space:]]||'`
-	list="$initfiles" ; for i in $list ; do
-	    if [ -f $initrddir/$i ] ; then
-		if [ -L $initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
-		     -L $initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
-		    /sbin/service $i start >/dev/null 2>&1 || \
-		    $initrddir/$i    start >/dev/null 2>&1 || :
-		fi
-	    fi
-	done
-    fi
-}
-
-configure_kernel_postinst_symvers () { :
-    # Debian kernels do no create symbol versions.  But this should not be done
-    # here, because System.symvers
-    local f
-    f=/usr/src/$name-@VERSION@-@PACKAGE_DEBRELEASE@/$kversion/System.symver
-    if [ ! -r /boot/symvers-$kversion.gz -a -r $f ] ; then
-	gzip -c $f > /boot/symvers-$kversion.gz
-    fi
-}
-
-configure_kernel_postinst_updates () { :
-    #
-    # Note that, unlike rpm, we actually have a terminal here and can interact
-    # with the user.
-    #
-    if [ -x $sbindir/$name-modules ] ; then
-	kernels=`ls /lib/modules`
-	$sbindir/$name-modules -- -v --update-kernel $kernels || :
-	# It is necessary to check whether this operation altered the module
-	# links for the running kernel.  If it did, and any of the modules that
-	# were altered are resident in the kernel, a restart message should be
-	# given.  If modules were added that were not in the kernel before
-	# (particularly specfs and streams), consider starting the STREAMS
-	# subsystem if it is set to start on boot.  If modules were removed that
-	# are resident in the kernel (esp. specfs and streams), consider
-	# shutting down the STREAMS subsystem, or issuing a warning to that
-	# effect.  We can either have openss7-modules issue the appropriate
-	# warnings, or we can have it file some information in /var/run and then
-	# examine it after the run.
-    fi
-}
-
-kernel_postinst () { :
-    configure_kernel_postinst_depmod
-    configure_kernel_postinst_initscripts
-    configure_kernel_postinst_symvers
-    configure_kernel_postinst_updates
+postinst_kernel () { :
+    postinst_updates
 }
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 
+# xxx-postinst configure
 configure_kernel_postinst () { :
-    kernel_postinst
+    postinst_kernel
 }
 
+# xxx-postinst configure most-recently-configured-version
+reconfigure_kernel_postinst () { :
+    postinst_kernel
+}
+
+# xxx-postinst triggered triggered-packages
 triggered_kernel_postinst () { :
-    kernel_postinst
+    postinst_kernel
 }
 
+# old-prerm upgrade new-version ...FAILED
+# new-prerm failed-upgrade new-version ...FAILED
+# old-posinst abort-upgrade new-version
 abort_upgrade_kernel_postinst () { :
-    kernel_postinst
+    postinst_kernel
 }
 
+# con-prerm remove 'in-favour' package new-version ...FAILED
+# con-postinst abort-remove 'in-favour' package new-version
 abort_remove_kernel_postinst () { :
-    kernel_postinst
+    postinst_kernel
 }
 
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ..FAILED
+# dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_kernel_postinst () { :
-    kernel_postinst
+    postinst_kernel
 }
 
 subpkg=kernel

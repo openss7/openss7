@@ -1,11 +1,12 @@
 #!/bin/sh
+# @configure_input@
 # =============================================================================
 # 
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -51,69 +52,31 @@
 #
 # =============================================================================
 
-@mscript_header@
-
-remove_depends() {
-    local modrex depend depends
-    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
-    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
-    for depend in $depends ; do
-        remove_depends $depend || return $?
-    done
-    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
-        rmmod $1 >/dev/null 2>&1 || return $?
-    fi
-    return 0
-}
-
-#
-# What we used to do here was check whether the removal was for the running
-# kernel or not.  If it was for the running kernel we used to use initscripts
-# (when available) to shutdown and remove the STREAMS subsystem and kernel
-# modules; or manually when initscripts are not available.
-#
-# Two things have changed: it is not so simple to check whether the running
-# kernel will be affected.
-#
-# What we must tell the update script here is that we are about to
-# remove openss7 modules for the kernel @kversion@.  Therefore, the
-# openss7-modules script should determine which symbolic links point to
-# the openss7 modules being removed and whether to remove them.
-#
-# There are several cases that need to be dealt with separately:
-#
-# We are removing the last openss7 modules in the system:
-#
-#   We might want to interact with the user before removing openss7
-#   modules in this case, particularly when the running kernel is
-#   affected.  However, this can be handled by the openss7-base
-#   package's prerm script.
-#
-# We are removing only one kernel version of openss7 modules from the
-# system:
-#
-#   There are two situations in this case: 1) the running kernel is
-#   affected by the removal; 2) the running kernel is not affected.
-#
-#
+@openss7_prerm@
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 
-conflict_kernel_prerm() { :
+# xxx-prerm remove
+remove_kernel_prerm () { :
 }
 
-remove_kernel_prerm() { :
+# con-prerm remove 'in-favour' package new-version
+conflict_kernel_prerm () { :
 }
 
-upgrade_kernel_prerm() { :
+# old-prerm upgrade new-version
+upgrade_kernel_prerm () { :
 }
 
-failed_upgrade_kernel_prerm() { :
+# old-prerm upgrade new-version ***FAILED***
+# new-prerm failed-upgrade old-version
+failed_upgrade_kernel_prerm () { :
 }
 
-deconfigure_kernel_prerm() { :
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
+deconfigure_kernel_prerm () { :
 }
 
 subpkg=kernel
