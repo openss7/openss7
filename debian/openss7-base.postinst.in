@@ -73,36 +73,36 @@ postinst_base () { :
 # -----------------------------------------------------------------------------
 
 # xxx-postinst configure
-configure_base_postinst () { :
+configure_postinst () { :
     postinst_base
 }
 
 # xxx-postinst configure most-recently-configured-version
-reconfigure_base_postinst () { :
+reconfigure_postinst () { :
     postinst_base
 }
 
 # xxx-postinst triggered triggered-packages
-triggered_base_postinst () { :
+triggered_postinst () { :
     postinst_base
 }
 
 # old-prerm upgrade new-version ...FAILED
 # new-prerm failed-upgrade new-version ...FAILED
 # old-posinst abort-upgrade new-version
-abort_upgrade_base_postinst () { :
+abort_upgrade_postinst () { :
     postinst_base
 }
 
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
-abort_remove_base_postinst () { :
+abort_remove_postinst () { :
     postinst_base
 }
 
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
-abort_deconfigure_base_postinst ()  { :
+abort_deconfigure_postinst ()  { :
     postinst_base
 }
 

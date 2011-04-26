@@ -59,23 +59,23 @@
 # -----------------------------------------------------------------------------
 
 # new-preinst install
-install_source_preinst () { :
+install_preinst () { :
     preinst_source
 }
 
 # new-preinst install old-version
-reinstall_source_preinst () { :
+reinstall_preinst () { :
 }
 
 # new-preinst upgrade old-version
-upgrade_source_preinst () { :
+upgrade_preinst () { :
     preinst_rmlink
 }
 
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
-abort_upgrade_source_preinst () { :
+abort_upgrade_preinst () { :
 }
 
 subpkg=source

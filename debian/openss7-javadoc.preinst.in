@@ -59,21 +59,21 @@
 # -----------------------------------------------------------------------------
 
 # new-preinst install
-install_javadoc_preinst () { :
+install_preinst () { :
 }
 
 # new-preinst install old-version
-reinstall_javadoc_preinst () { :
+reinstall_preinst () { :
 }
 
 # new-preinst upgrade old-version
-upgrade_javadoc_preinst () { :
+upgrade_preinst () { :
 }
 
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
-abort_upgrade_javadoc_preinst () { :
+abort_upgrade_preinst () { :
 }
 
 subpkg=javadoc

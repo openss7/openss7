@@ -65,32 +65,32 @@ postinst_core () { :
 # -----------------------------------------------------------------------------
 
 # xxx-postinst configure
-configure_core_postinst () { :
+configure_postinst () { :
     postinst_core
 }
 
 # xxx-postinst configure most-recently-configured-version
-reconfigure_core_postinst () { :
+reconfigure_postinst () { :
 }
 
 # xxx-postinst triggered triggered-packages
-triggered_core_postinst () { :
+triggered_postinst () { :
 }
 
 # old-prerm upgrade new-version ...FAILED
 # new-prerm failed-upgrade new-version ...FAILED
 # old-posinst abort-upgrade new-version
-abort_upgrade_core_postinst () { :
+abort_upgrade_postinst () { :
 }
 
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
-abort_remove_core_postinst () { :
+abort_remove_postinst () { :
 }
 
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
-abort_deconfigure_core_postinst () { :
+abort_deconfigure_postinst () { :
 }
 
 subpkg=core

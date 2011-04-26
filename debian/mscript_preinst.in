@@ -11,7 +11,6 @@
 [ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
 operation="$1"
-function=`echo "$operation${subpkg:+'_'}${subpkg}_preinst" | tr '-' '_'`
 shift
 
 echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
@@ -19,23 +18,22 @@ echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
 case "$operation" in
     (install) : # install fresh or some configuration
 	# new-preinst install [old-version]
-	if [ "${1:+'set'}" = "set" ]
-	then : # install with some configuration
-	    function=`echo "reinstall${subpkg:+'_'}${subpkg}_preinst" | tr '-' '_'`
-	    eval "$function \"$@\""
-	else : # install fresh
-	    eval "$function \"$@\""
+	if [ $# -gt 0 ]
+	then : # new-preinst install old-version
+	    reinstall_preinst "$@"
+	else : # new-preinst install
+	    install_preinst "$@"
 	fi
 	;;
     (upgrade) : # upgrade (step 2)
 	# new-preinst upgrade old-version
-	eval "$function \"$@\""
+	upgrade_preinst "$@"
 	;;
     (abort-upgrade) :
 	# old-postrm upgrade new-version ... failed
 	# new-postrm failed-upgrade old-version ... failed
 	# old-preinst abort-upgrade new-version
-	eval "$function \"$@\""
+	abort_upgrade_preinst "$@"
 	;;
 esac
 

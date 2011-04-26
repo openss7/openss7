@@ -11,7 +11,6 @@
 [ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 
 operation="$1"
-function=`echo "$operation${subpkg:+'_'}${subpkg}_postrm" | tr '-' '_'`
 shift
 
 echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
@@ -19,35 +18,34 @@ echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
 case "$operation" in
     (remove) :
 	# remove-postrm remove
-	eval "$function \"$@\""
+	remove_postrm "$@"
 	;;
     (purge) :
 	# remove-postrm purge
-	eval "$function \"$@\""
+	purge_postrm "$@"
 	;;
     (upgrade) :
 	# old-postrm upgrade new-version
-	shift 2
-	eval "$function \"$@\""
+	upgrade_postrm "$@"
 	;;
     (failed-upgrade) :
 	# old-postrm upgrade new-version ... failed
 	# new-postrm failed-upgrade old-version
-	eval "$function \"$@\""
+	failed_upgrade_postrm "$@"
 	;;
     (abort-install) :
 	# new-preinst install [old-version] ... failed
 	# new-postrm abort-install [old-version]
-	eval "$function \"$@\""
+	abort_install_postrm "$@"
 	;;
     (abort-upgrade) :
 	# new-preinst upgrade old-version ... failed
 	# new-postrm abort-upgrade old-version
-	eval "$function \"$@\""
+	abort_upgrade_postrm "$@"
 	;;
     (disappear) :
 	# disappear-postrm disappear overwriter overwriter-version
-	eval "$function \"$@\""
+	disappear_postrm "$@"
 	;;
 esac
 

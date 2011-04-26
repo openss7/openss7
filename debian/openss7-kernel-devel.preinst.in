@@ -59,21 +59,21 @@
 # -----------------------------------------------------------------------------
 
 # new-preinst install
-install_kernel_devel_preinst () { :
+install_preinst () { :
 }
 
 # new-preinst install old-version
-reinstall_kernel_devel_preinst () { :
+reinstall_preinst () { :
 }
 
 # new-preinst upgrade old-version
-upgrade_kernel_devel_preinst () { :
+upgrade_preinst () { :
 }
 
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
-abort_upgrade_kernel_devel_preinst () { :
+abort_upgrade_preinst () { :
 }
 
 subpkg=kernel-devel
