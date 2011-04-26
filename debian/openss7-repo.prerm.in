@@ -1,4 +1,5 @@
 #!/bin/sh
+# @configure_input@
 # =============================================================================
 # 
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
@@ -50,25 +51,32 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-@mscript_header@
+
+@openss7_prerm@
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 
-remove_repo_prerm() { :
+# xxx-prerm remove
+remove_repo_prerm () { :
 }
 
-conflict_repo_prerm() { :
+# con-prerm remove 'in-favour' package new-version
+conflict_repo_prerm () { :
 }
 
-upgrade_repo_prerm() { :
+# old-prerm upgrade new-version
+upgrade_repo_prerm () { :
 }
 
-failed_upgrade_repo_prerm() { :
+# old-prerm upgrade new-version ***FAILED***
+# new-prerm failed-upgrade old-version
+failed_upgrade_repo_prerm () { :
 }
 
-deconfigure_repo_prerm() { :
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
+deconfigure_repo_prerm () { :
 }
 
 subpkg=repo

@@ -1,4 +1,5 @@
 #!/bin/sh
+# @configure_input@
 # =============================================================================
 # 
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
@@ -50,283 +51,55 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-@mscript_header@
 
-# -----------------------------------------------------------------------------
-# Auxiliary functions:
-# -----------------------------------------------------------------------------
+@openss7_prerm@
 
-remove_base_prerm_rmnods() { :
-    if [ -x /usr/sbin/@STRCONF_DEVICES@ ] ; then
-	/usr/sbin/@STRCONF_DEVICE@ --remove || :
-    fi
-    :
+prerm_base_install () { :
+    # We are being removed for good.
+    prerm_rmnods
+@WITH_KO_MODULES_FALSE@   prerm_modconf_remove
+    prerm_preloads_remove
 }
 
-remove_base_prerm_modconf() { :
-    # When we are going away altogether we want to remove any lines whatsoever
-    # from the modules.conf file.
-    conf_old=@sysconfdir@/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=$tmppath/modules.conf.tmp.$$
-        conf_new=$tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        sed -e '\|^include[[:space:]].*'"$modutildir/$base"'|d' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-        rm -f -- $conf_new
-    fi
-    :
+prerm_base_upgrade () { :
+@WITH_KO_MODULES_FALSE@   prerm_modconf_upgrade
+    # We are being removed because we are being replaced with a newer version.
+    prerm_preloads_upgrade
+    prerm_netconfig
+    prerm_sock2path
+    prerm_initscripts
+    prerm_manrefs
+    prerm_manmacros
 }
-
-remove_base_prerm_preloads() { :
-    case $kminor in
-	4) prel_old=@sysconfdir@/modules ;;
-	5)  if test $kpatch -lt 48
-		prel_old=@sysconfdir@/modules
-	    else
-		prel_old=@sysconfdir@/modprobe.preload
-	    fi ;;
-	6) prel_old=@sysconfdir@/modprobe.preload ;;
-	*) return ;;
-    esac
-    # When we are going away altogether we want to remove any of our preloads
-    # whatsoever from the modules or modprobe.preload file.
-    if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="${preloads}" ; for m in $mods ; do
-            sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $repl_new > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-    :
-}
-
-remove_base_prerm_netconfig() { :
-}
-
-remove_base_prerm_sock2path() { :
-}
-
-remove_base_prerm_initscripts() { :
-}
-
-remove_base_prerm_manrefs() { :
-}
-
-remove_base_prerm_manmacros() { :
-}
-
-
-upgrade_base_prerm_modconf() { :
-    # At the end of the upgrade (when _this_package_ is upgraded from) we remove
-    # our lines from the modules.conf file that we placed in them in the post
-    # scriptlet.  We only adjust our line and leave any lines added by the new
-    # package post scriptlet.
-    conf_old=@sysconfdir@/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=$tmppath/modules.conf.tmp.$$
-        conf_new=$tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        # This groovy sed script just pulls out the first matching line and
-        # leaves the rest untouched.
-        sed -e '
-\|^include[[:space:]].*'"$modutildir/$base"'|!b
-N
-s|^include[[:space:]].*'"$modutildir/$base"'.*\
-||
-: loop
-n
-b loop' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-        rm -f -- $conf_new
-    fi
-    :
-}
-
-upgrade_base_prerm_preloads() { :
-    case $kminor in
-	(4) prel_old=@sysconfdir@/modules ;;
-	(5) if test $kpatch -lt 48
-		prel_old=@sysconfdir@/modules ;;
-	    else
-		prel_old=@sysconfdir@/modprobe.preload ;;
-	    fi ;;
-	(6) prel_old=@sysconfdir@/modprobe.preload ;;
-    esac
-    # At the end of the upgrade (when _this_package_ is upgraded from) we remove
-    # our lines from the modules or modprobe.preloads file that we placed in
-    # them in the post scriptlet.  We only adjust our lines and leave any lines
-    # added by the new package post scriptlet.
-    if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="${preloads}" ; for m in $mods ; do
-            # This groovy sed script just pulls out the first matching line and
-            # leaves the rest untouched.
-            sed -e '
-\|^[[:space:]].*'"$m"'[[:space:]]*$|!b
-N
-s|^[[:space:]].*'"$m"'[[:space:]]*\
-||
-: loop
-n
-b loop' $prel_new > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-    :
-}
-
-upgrade_base_prerm_netconfig() { :
-    # After going doing an upgrade we want to rebuild the netconfig database,
-    # but only if the netconfig database was built by us or does not exist.
-    t=@sysconfdir@/netconfig
-    a="${t}.xnsl"
-    d="${t}.d"
-    if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            t="${a}"
-        fi
-    fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-    found='no'
-    files="$d/*"
-    for f in $files ; do
-        if [ -f $f -a $f = "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    for f in $files ; do
-        if [ -f $f -a $f != "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    if [ $found = "no" ] ; then
-        rm -f $t $t.tmp
-    else
-        mv -f $t.tmp $t
-    fi
-    if [ "${t}" != "${a}" ] ; then
-        rm -f $a
-    fi
-    :
-}
-
-upgrade_base_prerm_sock2path() { :
-    # After going doing an upgrade we want to rebuild the sock2path database.
-    t=@sysconfdir@/sock2path
-    cp -f -b --suffix=.rpmsave -- /dev/null $t
-    for f in "${t}.d/*" ; do
-        if [ -f $f ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
-            esac
-        fi
-    done
-}
-
-upgrade_base_prerm_initscripts() { :
-    return
-    # Upgrading, remove our init scripts if we can
-    reverse=
-    list="${initfiles}" ; for i in $list ; do
-	if test -z "$reverse" ; then reverse="$i $reverse"; else reverse="$1"; fi
-    done
-    for i in $reverse ; do
-        if [ -f $initrddir/$i ] ; then
-            # Try to stop them first.
-            /sbin/service $i stop >/dev/null 2>&1 || $initrddir/$i stop >/dev/null 2>&1 || :
-            # Find the best working init script removal tool
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
-        fi
-    done
-    :
-}
-
-upgrade_base_prerm_manrefs() { :
-    rm -f -- ${mandir}/${manrefs}
-}
-
-upgrade_base_prerm_manmacros() { :
-    rm -f -- ${mandir}/${manmacros}
-}
-
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 
-remove_base_prerm() { :
-    # We are being removed for good.
-    remove_base_prerm_rmnods
-@WITH_KO_MODULES_FALSE@   remove_base_prerm_modconf
-    remove_base_prerm_preloads
-    remove_base_prerm_netconfig
-    remove_base_prerm_sock2path
-    remove_base_prerm_initscripts
-    remove_base_prerm_manrefs
-    remove_base_prerm_manmacros
+# xxx-prerm remove
+remove_base_prerm () { :
+    prerm_base_install
 }
 
-conflict_base_prerm() { :
-    # We are being removed because we conflict with a package that is being
-    # installed.
-    remove_base_prerm_rmnods
-@WITH_KO_MODULES_FALSE@   remove_base_prerm_modconf
-    remove_base_prerm_preloads
-    remove_base_prerm_netconfig
-    remove_base_prerm_sock2path
-    remove_base_prerm_initscripts
-    remove_base_prerm_manrefs
-    remove_base_prerm_manmacros
+# con-prerm remove 'in-favour' package new-version
+conflict_base_prerm () { :
+    prerm_base_install
 }
 
-upgrade_base_prerm() { :
-@WITH_KO_MODULES_FALSE@   upgrade_base_prerm_modconf
-    # We are being removed because we are being replaced with a newer version.
-    upgrade_base_prerm_preloads
-    upgrade_base_prerm_netconfig
-    upgrade_base_prerm_sock2path
-    upgrade_base_prerm_initscripts
-    upgrade_base_prerm_manrefs
-    upgrade_base_prerm_manmacros
+# old-prerm upgrade new-version
+upgrade_base_prerm () { :
+    prerm_base_upgrade
 }
 
-failed_upgrade_base_prerm() { :
-    # We (the new version) are being removed because the prerm script for the
-    # old version failed.  This is effectively our chance to undo anything that
-    # we did or prepared for in the preinst script.
+# old-prerm upgrade new-version ***FAILED***
+# new-prerm failed-upgrade old-version
+failed_upgrade_base_prerm () { :
+    prerm_base_upgrade
 }
 
-deconfigure_base_prerm() { :
-    upgrade_base_prerm_preloads
-    upgrade_base_prerm_netconfig
-    upgrade_base_prerm_sock2path
-    upgrade_base_prerm_initscripts
-    upgrade_base_prerm_manrefs
-    upgrade_base_prerm_manmacros
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
+deconfigure_base_prerm () { :
+    prerm_base_upgrade
 }
 
 subpkg=base

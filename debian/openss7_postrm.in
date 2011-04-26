@@ -51,37 +51,93 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-
-@openss7_prerm@
+@mscript_header@
 
 # -----------------------------------------------------------------------------
-# Primary functions:
+# Auxiliary functions:
 # -----------------------------------------------------------------------------
 
-# xxx-prerm remove
-remove_java_prerm () { :
+postrm_modconf () {
+    local last_core_package='yes'
+    for file in /lib/modules/*/modules.$base ; do
+	if [ -f $file ] ; then
+	    last_core_package='no'
+	    break
+	fi
+    done
+    if [ ":$last_core_package" = ":no" ] ; then
+	return 0
+    fi
+    conf_old=$sysconfdir/modules.conf
+    if grep -q 'include[^#]*'$modutildir/$base $conf_old ; then
+	conf_tmp=$tmppath/modules.conf.tmp.$$
+	sed -e "/include[^#]*\/$base/d" $conf_old > $conf_tmp
+	chmod --reference=$conf_old $conf_tmp
+	cp -fb --suffix=.old $conf_tmp $conf_old
+	rm -f $conf_tmp
+    fi
+    rm -f -- "$modutildir/$base"
 }
 
-# con-prerm remove 'in-favour' package new-version
-conflict_java_prerm () { :
+postrm_preload () {
+    prel_old="@preloads@"
+    if [ -f $prel_old ] ; then
+	prel_new="$tmppath/modprobe.preload.new.$$"
+	prel_tmp="$tmppath/modprobe.preload.tmp.$$"
+	cp -f -- $prel_old $prel_new
+	for m in $preloads ; do
+	    sed -e "/^[[:space:]]*$m\>/d" $prel_new > $prel_tmp
+	    mv -f -- $prel_new $prel_tmp
+	done
+	chmod --reference=$prel_old -- $prel_new
+	cp -fb --suffix=.dpkg-save -- $prel_new $prel_old
+	rm -f -- $prel_new
+    fi
 }
 
-# old-prerm upgrade new-version
-upgrade_java_prerm () { :
+postrm_depmod () {
+    if [ ":$kversion" = ":`uname -r`" ] ; then
+#	this is a running kernel, do a /sbin/depmod on the modules directory for
+	/sbin/depmod -ae
+    elif [ -r /boot/System.map-$kversion ] ; then
+#	non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
+	UNAME_MACHINE=%{_target_cpu} \
+	/sbin/depmod -ae -F /boot/System.map-$kversion $kversion
+    fi
 }
 
-# old-prerm upgrade new-version ***FAILED***
-# new-prerm failed-upgrade old-version
-failed_upgrade_java_prerm () { :
+postrm_update () { :
+    local retval=0
+    for update in /sbin/openss7-modules /usr/sbin/openss7-modules; do
+	if [ -x $update ] ; then
+	    gawk -f $update -- -q -e --remove-modules ${kversion} || retval=$?
+	    break
+	fi
+    done
+    return $retval
 }
 
-# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
-deconfigure_java_prerm () { :
+postrm_kernel () { :
+    postrm_update
 }
 
-subpkg=java
+postrm_core () { :
+    @WITH_KO_MODULES_FALSE@postrm_modconf
+    postrm_preload
+    postrm_depmod
+}
 
-@mscript_prerm@
+# -----------------------------------------------------------------------------
+# Default functions:
+# -----------------------------------------------------------------------------
+
+remove_postrm () { :; }
+purge_postrm () { :; }
+upgrade_postrm () { :; }
+failed_upgrade_postrm () { :; }
+abort_install_postrm () { :; }
+abort_upgrade_postrm () { :; }
+disappear_postrm () { :; }
 
 # =============================================================================
 #

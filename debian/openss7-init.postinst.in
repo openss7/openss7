@@ -6,8 +6,9 @@
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -20,10 +21,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -51,69 +51,52 @@
 # Last Modified $Date: 2008-05-04 16:16:42 $ by $Author: brian $
 #
 # =============================================================================
-@mscript_header@
 
-configure_modconf() { :
-    #
-    # For modconf entries, we remove reference to our include from the modules.conf file and then
-    # add our include back to the file.
-    #
-    conf_old=$tmppath/modules.conf
-    if [ -f $conf_old ] ; then
-	conf_new=$tmppath/modules.conf.new.$$
-	conf_tmp=$tmppath/modules.conf.tmp.$$
-	cp -f -- $conf_old $conf_new
-	sed -e '\|^[[:space:]]*include[[:space:]][[:space:]]*'"$modutildir/$name"'[[:space:]]*$|d' $conf_new > $conf_tmp
-	mv -f -- $conf_tmp $conf_new
-	echo "include $modutildir/$name" >> $conf_new
-	chmod --reference=$conf_old -- $conf_new
-	cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
-	rm -f -- $conf_new
-    fi
-}
+@openss7_postinst@
 
-configure_preloads() { :
-    #
-    # For preloads we remove reference to any of our modules from the preloads file and then add
-    # only our preloadable modules back to the file.
-    #
-    prel_fil="@preloads@"
-    if [ -f $prel_fil ] ; then
-	prel_tmp=$tmppath/modprobe.preload.tmp.$$
-	prel_new=$tmppath/modprobe.preload.new.$$
-	cp -f -- $prel_fil $prel_new
-	for m in $modules ; do
-	    sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new > $prel_tmp
-	    mv -f -- $prel_tmp $prel_new
-	done
-	for p in $preloads ; do
-	    echo "$p" >> $prel_new
-	done
-        chmod --reference=$prel_fil -- $prel_new
-        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_fil
-        rm -f -- $prel_new
-    fi
-}
-
-# -----------------------------------------------------------------------------
-# Primary functions:
-# -----------------------------------------------------------------------------
-#
-# We are configuring the installed package.
-#
-configure_init_postinst() { :
+postinst_init () { :
     #
     # At this point we want to ensure that our lines are added to the modules.conf (if necessary)
-    # and that our preloads are added to the our modules or modprobe.preload file.
+    # and that our preloads are added to the modules or modprobe.preload file.
     #
-    @WITH_KO_MODULES_FALSE@configure_modconf
-    configure_preloads
+    @WITH_KO_MODULES_FALSE@postinst_modconf
+    postinst_preloads
     #
     # Note that init scripts are handled by debhelper additions to this script.
     #
 }
 
-triggered_init_postinst() { :
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+
+# xxx-postinst configure
+configure_init_postinst () { :
+    postinst_init
+}
+
+# xxx-postinst configure most-recently-configured-version
+reconfigure_init_postinst () { :
+}
+
+# xxx-postinst triggered triggered-packages
+triggered_init_postinst () { :
+}
+
+# old-prerm upgrade new-version ...FAILED
+# new-prerm failed-upgrade new-version ...FAILED
+# old-posinst abort-upgrade new-version
+abort_upgrade_init_postinst () { :
+}
+
+# con-prerm remove 'in-favour' package new-version ...FAILED
+# con-postinst abort-remove 'in-favour' package new-version
+abort_remove_init_postinst () { :
+}
+
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
+# dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
+abort_deconfigure_init_postinst () { :
 }
 
 subpkg=init

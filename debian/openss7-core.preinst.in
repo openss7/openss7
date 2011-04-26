@@ -6,8 +6,9 @@
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -20,10 +21,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -52,87 +52,39 @@
 #
 # =============================================================================
 
-@mscript_header@
+@openss7_preinst@
+
+preinst_core_install () { :
+    preinst_rmmod
+}
+
+preinst_core_upgrade () { :
+    preinst_shutdown
+}
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-#
-# Unfortunately recent non-autoconf/dpkg releases of LiS have chosen to install their kernel modules
-# in locations mimicing our releases, so this pre-installation scriptlet goes and finds any
-# offending modules (modules with the same name as ours) and simply removes them.
-#
-install_core_preinst() {
-    for dir in '/' '/../preferred' '/../default' '/../boot' ; do
-	eval "d=\"$kmoduledir$dir\""
-	test -d $d || continue
-	for m in `find $d \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
-	    b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?$||'`
-	    case " $modules " in (*" $b "*) rm -f -- $m ;; esac
-	done
-    done
-    return 0
+
+# new-preinst install
+install_core_preinst () { :
+    preinst_core_install
 }
 
-#
-# This is our chance to check that an old-prerm upgrade scriplet did at least somewhat what it was
-# supposed to do.  This is not as extensive as the non-deb install since we do not have to check
-# that package files are removed and we don't have to check for things from non-deb versions.
-#
-upgrade_core_preinst() {
-    if [ ":$kversion" = ":`uname -r`" ] ; then
-	#
-	# If we are upgrading and the upgrade is for the running kernel, or we are installing new on
-	# the running kernel, we have to worry about previous loaded modules for the old version or
-	# a non-deb version kicking around.  This scriplet kills any streams modules that are loaded
-	# and running.
-	#
-	for m in $modules
-	do
-	    if ( /sbin/lsmod | grep -q "^$m" ) ; then
-		#
-		# Module running, kick the stack.
-		#
-		/sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-		if ( /sbin/lsmod | grep -q "^$m" ) ; then
-		    fdetach -a 2>/dev/null
-		    /sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-		    if ( /sbin/lsmod | grep -q "^$m" ) ; then
-			/usr/sbin/lsof | while read -a tokens; do
-			    if [ :"${tokens[4]}" = :"CHR" ]; then
-				major=`echo "${tokens[5]}" | sed -e 's|,.*||'`
-				if [ $major -eq $STRCONF_MAJBASE ]; then
-				    eval "kill -HUP ${tokens[1]}"
-				fi
-			    fi
-			done
-			/sbin/sleep 5 # wait for processes to die and close streams
-			/sbin/modprobe -r `/sbin/lsmod | grep "^$m" | cut -f1 '-d '`
-			if ( /sbin/lsmod | grep -q "^$m" ) ; then
-			    echo "Cannot install or upgrade with $m module running." >&2
-			    return 1
-			fi
-		    fi
-		fi
-	    fi
-	done
-    fi
-    return 0
+# new-preinst install old-version
+reinstall_core_preinst () { :
 }
 
-##
-## Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen to install their
-## modconf files in a similar fashion to ours and in a similar location.  It even uses the prune
-## modules line that we normally use, however, on Debian their modules.conf edits will be lost
-## because the modules.conf file is generated from the modules/conf.d directory.
-##
-#function preinst_modconf() {
-#    for ext in LiS lis STREAMS streams ; do
-#	eval "d=\"$kmoduledir\""
-#	test -f $d/modules.$ext || continue
-#	rm -f -- $d/modules.$ext
-#    done
-#}
+# new-preinst upgrade old-version
+upgrade_core_preinst () { :
+    preinst_core_upgrade
+}
+
+# old-postrm upgrade new-version ...FAILED
+# new-postrm failed-upgrade old-version ...FAILED
+# old-preinst abort-upgrade new-version
+abort_upgrade_core_preinst () { :
+}
 
 subpkg=core
 

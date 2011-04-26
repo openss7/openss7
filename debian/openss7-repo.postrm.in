@@ -1,4 +1,5 @@
 #!/bin/sh
+# @configure_input@
 # =============================================================================
 # 
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
@@ -50,25 +51,42 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-@mscript_header@
+
+@openss7_postrm@
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 
-remove_repo_postrm() { :
+# remove-postrm remove
+remove_repo_postrm () { :
 }
 
-purge_repo_postrm() { :
+# remove-postrm purge
+purge_repo_postrm () { :
 }
 
-upgrade_repo_postrm() { :
+# old-postrm upgrade new-version
+upgrade_repo_postrm () { :
 }
 
-failed_upgrade_repo_postrm() { :
+# old-postrm upgrade new-version ...FAILED
+# new-postrm failed-upgrade old-version
+failed_upgrade_repo_postrm () { :
 }
 
-disappear_repo_postrm() { :
+# new-preinst install [old-version] ...FAILED
+# new-postrm abort-install [old-version]
+abort_install_repo_postrm () { :
+}
+
+# new-preinst upgrade old-version ...FAILED
+# new-postrm abort-upgrade old-version
+abort_upgrade_repo_postrm () { :
+}
+
+# dis-postrm disappear overwriter overwriter-version
+disappear_repo_postrm () { :
 }
 
 subpkg=repo

@@ -6,8 +6,9 @@
 #
 # -----------------------------------------------------------------------------
 #
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
 # All Rights Reserved.
 #
@@ -20,10 +21,9 @@
 # FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
 # details.
 #
-# You should have received a copy of the GNU Affero General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>, or
-# write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
-# 02139, USA.
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 #
 # -----------------------------------------------------------------------------
 #
@@ -51,21 +51,45 @@
 # Last Modified $Date: 2008-04-28 11:46:32 $ by $Author: brian $
 #
 # =============================================================================
-@mscript_header@
+
+@openss7_postinst@
+
+postinst_dev () { :
+    postinst_mknods
+}
 
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 
-configure_dev_postinst() { :
-    if test -x '/usr/sbin/@STRMAKENODES@' ; then
-	# ensure that devices are added
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): creating devices."
-	/usr/sbin/@STRMAKENODES@
-    fi
+# xxx-postinst configure
+configure_dev_postinst () { :
+    postinst_dev
 }
 
-triggered_dev_postinst() { :
+# xxx-postinst configure most-recently-configured-version
+reconfigure_dev_postinst () { :
+    postinst_dev
+}
+
+# xxx-postinst triggered triggered-packages
+triggered_dev_postinst () { :
+}
+
+# old-prerm upgrade new-version ...FAILED
+# new-prerm failed-upgrade new-version ...FAILED
+# old-posinst abort-upgrade new-version
+abort_upgrade_dev_postinst () { :
+}
+
+# con-prerm remove 'in-favour' package new-version ...FAILED
+# con-postinst abort-remove 'in-favour' package new-version
+abort_remove_dev_postinst () { :
+}
+
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
+# dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
+abort_deconfigure_dev_postinst () { :
 }
 
 subpkg=dev

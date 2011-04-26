@@ -19,7 +19,13 @@ echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
 case "$operation" in
     (configure) : # postinstallation configuration
 	# configure-postinst configure [most-recently-configured-version]
-	eval "$function \"$@\""
+	if [ $# -gt 0 ]
+	then
+	    function=`echo "reconfigure${subpkg:+'_'}${subpkg}_postinst" | tr '-' '_'`
+	    eval "$function \"$@\""
+	else
+	    eval "$function \"$@\""
+	fi
 	;;
     (triggered) : # postinst triggered triggered-packages
 	eval "$function \"$@\""
