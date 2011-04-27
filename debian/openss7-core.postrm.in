@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=core
+
 @openss7_postrm@
 
 postrm_core () { :
@@ -95,8 +97,6 @@ abort_upgrade_postrm () { :
 # dis-postrm disappear overwriter overwriter-version
 disappear_postrm () { :
 }
-
-subpkg=core
 
 @mscript_postrm@
 

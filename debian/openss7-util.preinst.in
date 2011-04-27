@@ -52,7 +52,14 @@
 #
 # =============================================================================
 
+subpkg=util
+
 @openss7_preinst@
+
+preinst_util () { :
+    preinst_tools
+    preinst_manpages
+}
 
 # -----------------------------------------------------------------------------
 # Primary functions:
@@ -60,7 +67,7 @@
 
 # new-preinst install
 install_preinst () { :
-    preinst_rmtools
+    preinst_util
 }
 
 # new-preinst install old-version
@@ -76,8 +83,6 @@ upgrade_preinst () { :
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
-subpkg=util
 
 @mscript_preinst@
 

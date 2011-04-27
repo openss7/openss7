@@ -1,61 +1,31 @@
 #!/bin/sh
 # @configure_input@
 # =============================================================================
-# 
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
-#
-# -----------------------------------------------------------------------------
-#
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-#
-# All Rights Reserved.
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation; version 3 of the License.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
-# -----------------------------------------------------------------------------
-#
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-#
-# -----------------------------------------------------------------------------
-#
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date$ by $Author$
-#
-# =============================================================================
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+
 @mscript_header@
 
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
+
+prerm_repo () { :
+    d="@sysconfdir@/apt/sources.list.d"
+    for f in openss7.list; do
+	f="$d/$f"
+	if [ -r $f ]; then
+	    mv -f -- $f $f.dpkg-save
+	fi
+	rm -f -- $f
+    done
+    :
+    return 0
+}
 
 remove_depends() {
     local modrex depend depends
@@ -70,19 +40,433 @@ remove_depends() {
     return 0
 }
 
+prerm_rmnods () { :
+    if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
+	echo "${package}: removing old devices."
+	@sbindir@/@STRCONF_DEVICES@ --remove || :
+    fi
+    return 0
+}
+
+#
+# When we are going away altogether we want to remove any lines whatsoever from
+# the modules.conf file.
+#
+prerm_oldmods () { :
+    conf_old=@sysconfdir@/modules.conf
+    if [ -f $conf_old ] ; then
+        conf_tmp=$tmppath/modules.conf.tmp.$$
+        conf_new=$tmppath/modules.conf.new.$$
+        cp -f -- $conf_old $conf_new
+        sed -e '\|^include[[:space:]].*@modutildir@/'"$base"'|d' $conf_new > $conf_tmp
+        mv -f -- $conf_tmp $conf_new
+        chmod --reference=$conf_old $conf_new
+        cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
+        rm -f -- $conf_new
+    fi
+}
+
+#
+# When we are going away altogether we want to remove any of our preloads
+# whatsoever from the modules or modprobe.preload file.
+#
+prerm_preloads () { :
+    case @kminor@ in
+	4) prel_old=@sysconfdir@/modules ;;
+	5)  if [ @kpatch@ -lt 48 ]
+	    then prel_old=@sysconfdir@/modules
+	    else prel_old=@sysconfdir@/modprobe.preload
+	    fi ;;
+	6) prel_old=@sysconfdir@/modprobe.preload ;;
+	*) prel_old=@sysconfdir@/modprobe.preload ;;
+    esac
+    if [ -f $prel_old ] ; then
+        prel_tmp=$tmppath/modprobe.preload.tmp.$$
+        prel_new=$tmppath/modprobe.preload.new.$$
+        cp -f -- $prel_old $prel_new
+        mods="${preloads}" ; for m in $mods ; do
+            sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $repl_new > $prel_tmp
+            mv -f -- $prel_tmp $prel_new
+        done
+        chmod --reference=$prel_old -- $prel_new
+        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
+        rm -f -- $prel_new
+    fi
+    :
+    return 0
+}
+
+#
+# After going away altogether, we want to rebuild the netconfig database, but
+# only if the netconfig database was built by use or does not exist.
+#
+prerm_netconfig () { :
+    t="@sysconfdir@/netconfig"
+    a="${t}.xnsl"
+    d="${t}.d"
+    if [ -f $t ] ; then
+        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+            t="${a}"
+        fi
+    fi
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
+    fi
+    :
+    return 0
+}
+
+#
+# After going away altogether, we want to rebuild the sock2path database.
+#
+prerm_sock2path () { :
+    t="@sysconfdir@/sock2path"
+    cp -f -b --suffix=.dpkg-save -- /dev/null $t
+    for f in "${t}.d/*" ; do
+        if [ -f $f ] ; then
+            case $f in
+                (*.dpkg-save|*.dpkg-new) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
+            esac
+        fi
+    done
+    :
+    return 0
+}
+
+prerm_manrefs () { :
+    rm -f -- @mandir@/${manrefs}
+    :
+    return 0
+}
+
+prerm_manmacros () { :
+    rm -f -- @mandir@/${manmacros}
+    :
+    return 0
+}
+
+prerm_infofiles () { :
+    if [ -x /sbin/install-info ] ; then
+#	Older policies do not compress info files.
+        for n in ${manuals} ; do
+            if [ -f @infodir@/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info || :
+            elif [ -f @infodir@/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.gz || :
+            elif [ -f @infodir@/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.bz2 || :
+            fi
+        done
+    fi
+    :
+    return 0
+}
+
+#
+# Stop init scripts when they are still hanging around.
+#
+prerm_stop_scripts () { :
+    reverse=
+    list="${initfiles}" ; for i in $list ; do
+        reverse="$i${reverse:+' '}$reverse"
+    done
+    for i in $reverse ; do
+        if [ -f @initrddir@/$i ] ; then
+            /sbin/service $i stop >/dev/null 2>&1 || \
+		@initrddir@/$i stop >/dev/null 2>&1 || :
+        fi
+    done
+    :
+    return 0
+}
+
+prerm_kill_strace () { :
+    if [ -r /var/run/strace.pid ] ; then
+        kill -TERM `cat /var/run/strace.pid` || :
+        rm -f /var/run/strace.pid
+        rm -f /var/lock/subsys/strace
+        rm -f /var/lock/subsys/strace.init
+    fi
+    :
+    return 0
+}
+
+prerm_kill_strerr () { :
+    if [ -r /var/run/strerr.pid ] ; then
+        kill -TERM `cat /var/run/strerr.pid` || :
+        rm -f /var/run/strerr.pid
+        rm -f /var/lock/subsys/strerr
+        rm -f /var/lock/subsys/strerr.init
+    fi
+    :
+    return 0
+}
+
+prerm_kill_streams () { :
+    if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+        if [ -x @sbindir@/fdetach ] ; then
+            @sbindir@/fdetach -a 2>/dev/null || :
+        fi
+        for signal in TERM KILL ; do
+            if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+                lsof | grep '\<STR\>' | \
+                while read fields ; do
+                    set -- $fields
+                    if [ ":$5" != ':CHR' ] ; then continue; fi
+                    ind=`expr $# - 1`
+                    eval "val=\"\${$ind}\""
+                    if [ ":$val" != ':STR' ] ; then continue; fi
+                    kill -$signal $2 >/dev/null 2>&1 || :
+                done
+                sleep 5
+            fi
+        done
+    fi
+    lsof | grep '\<STR\>' >/dev/null 2>&1 && false
+}
+
+prerm_kill () { :
+    local reboot
+    reboot='no'
+    prerm_stop_scripts
+    prerm_kill_strace
+    prerm_kill_strerr
+    umount -a -t specfs    || reboot='yes'
+    prerm_rmnods
+    prerm_kill_streams     || reboot='yes'
+    remove_depends streams || reboot='yes'
+    remove_depends specfs  || reboot='yes'
+    if [ ":$reboot" = ':yes' ] ; then
+	echo "$script: reboot required." >&2
+    fi
+    :
+    return 0
+}
+
+prerm_kill_running () { :
+    if [ ":@kversion@" = ":`uname -r`" ]; then
+	prerm_kill
+    fi
+    :
+    return 0
+}
+
+#
+# At the end of the upgrade (when _this_package_ is upgraded from) we remove our
+# lines from the modules.conf file that we placed in them in the post scriptlet.
+# We only adjust our line and leave any lines added by the new package post
+# scriptlet.
+#
+prerm_oldmods_upgrade () { :
+    conf_old=@sysconfdir@/modules.conf
+    if [ -f $conf_old ] ; then
+        conf_tmp=$tmppath/modules.conf.tmp.$$
+        conf_new=$tmppath/modules.conf.new.$$
+        cp -f -- $conf_old $conf_new
+#	This groovy sed script just pulls out the first matching line and leaves
+#	the rest untouched.
+        sed -e '
+\|^include[[:space:]].*@modutildir@/'"$base"'|!b
+N
+s|^include[[:space:]].*@modutildir@/'"$base"'.*\
+||
+: loop
+n
+b loop' $conf_new > $conf_tmp
+        mv -f -- $conf_tmp $conf_new
+        chmod --reference=$conf_old $conf_new
+        cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
+        rm -f -- $conf_new
+    fi
+    :
+    return 0
+}
+
+#
+# At the end of the upgrade (when _this_package_ is upgraded from) we remove our
+# lines from the modules or modprobe.preloads file that we placed in them in the
+# post scriptlet.  We only adjust our lines and leave any lines added by the new
+# package post scriptlet.
+#
+prerm_preloads_upgrade () { :
+    case @kminor@ in
+	4) prel_old=@sysconfdir@/modules ;;
+	5)  if [ @kpatch@ -lt 48 ]
+	    then prel_old=@sysconfdir@/modules
+	    else prel_old=@sysconfdir@/modprobe.preload
+	    fi ;;
+	6) prel_old=@sysconfdir@/modprobe.preload ;;
+	*) prel_old=@sysconfdir@/modprobe.preload ;;
+    esac
+    if [ -f $prel_old ] ; then
+        prel_tmp=$tmppath/modprobe.preload.tmp.$$
+        prel_new=$tmppath/modprobe.preload.new.$$
+        cp -f -- $prel_old $prel_new
+        mods="${preloads}" ; for m in $mods ; do
+#	    This groovy sed script just pulls out the first matching line and
+#	    leaves the rest untouched.
+            sed -e '
+\|^[[:space:]].*'"$m"'[[:space:]]*$|!b
+N
+s|^[[:space:]].*'"$m"'[[:space:]]*\
+||
+: loop
+n
+b loop' $prel_new > $prel_tmp
+            mv -f -- $prel_tmp $prel_new
+        done
+        chmod --reference=$prel_old -- $prel_new
+        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
+        rm -f -- $prel_new
+    fi
+    :
+    return 0
+}
+
+#
+# After going doing an upgrade we want to rebuild the netconfig database,
+# but only if the netconfig database was built by us or does not exist.
+#
+prerm_netconfig_upgrade () { :
+    t="@sysconfdir@/netconfig"
+    a="${t}.xnsl"
+    d="${t}.d"
+    if [ -f $t ] ; then
+        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+            t="${a}"
+        fi
+    fi
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    for f in $files ; do
+        if [ -f $f -a $f = "$d/strnsl" ] ; then
+            case $f in
+                (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    for f in $files ; do
+        if [ -f $f -a $f != "$d/strnsl" ] ; then
+            case $f in
+                (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+            esac
+        fi
+    done
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
+    fi
+    :
+    return 0
+}
+
+#
+# After going doing an upgrade we want to rebuild the sock2path database.
+#
+prerm_sock2path_upgrade () { :
+    t="@sysconfdir@/sock2path"
+    cp -f -b --suffix=.dpkg-save -- /dev/null $t
+    for f in "${t}.d/*" ; do
+        if [ -f $f ] ; then
+            case $f in
+                (*.dpkg-save|*.dpkg-new) ;;
+                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
+            esac
+        fi
+    done
+    :
+    return 0
+}
+
+prerm_initscripts_upgrade () { :
+    # Upgrading, remove our init scripts if we can
+    reverse=
+    list="${initfiles}" ; for i in $list ; do
+        reverse="$i${reverse:+' '}$reverse"
+    done
+    for i in $reverse ; do
+        if [ -f @initrddir@/$i ] ; then
+            # Try to stop them first.
+            /sbin/service $i stop >/dev/null 2>&1 || \
+		@initrddir@/$i stop >/dev/null 2>&1 || :
+            # Find the best working init script removal tool
+            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
+            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
+            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
+        fi
+    done
+    :
+    return 0
+}
+
+prerm_manrefs_upgrade () { :
+    rm -f -- @mandir@/${manrefs}
+}
+
+prerm_manmacros_upgrade () { :
+    rm -f -- @mandir@/${manmacros}
+}
+
+prerm_infofiles_upgrade () { :
+    if [ -x /sbin/install-info ] ; then
+#	Older policies do not compress info files.
+        for n in ${manuals} ; do
+            if [ -f @infodir@/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info || :
+            elif [ -f @infodir@/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.gz || :
+            elif [ -f @infodir@/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.bz2 || :
+            fi
+        done
+    fi
+}
+
 prerm_dev () { :
-    if test -x '/usr/sbin/@STRMAKENODES@' ; then
+    if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
 	# ensure that old devices are removed
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): removing old devices."
-	/usr/sbin/@STRMAKENODES@ --remove
+	echo "${package}: removing old devices."
+	@sbindir@/@STRCONF_DEVICES@ --remove || :
     fi
 }
 
 prerm_dev_failed () { :
-    if test -x '/usr/sbin/@STRMAKENODES@' ; then
+    if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
 	# ensure that old devices are put back
-	echo "@PACKAGE@-${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): restoring old devices."
-	/usr/sbin/@STRMAKENODES@
+	echo "${package}: restoring old devices."
+	@sbindir@/@STRCONF_DEVICES@ --create || :
     fi
 }
 
@@ -92,7 +476,7 @@ prerm_dev_failed () { :
 # version kicking around.  This scriplet kills any streams modules that are loaded and running.
 #
 prerm_modules () {
-    if [ ":$kversion" = ":`uname -r`" ] ; then
+    if [ ":@kversion@" = ":`uname -r`" ] ; then
 	for m in $modules
 	do
 	    if ( /sbin/lsmod | grep -q "^$m" ) ; then
@@ -144,13 +528,6 @@ prerm_preload () {
     fi
 }
 
-prerm_rmnods () { :
-    if [ -x /usr/sbin/@STRCONF_DEVICES@ ] ; then
-	/usr/sbin/@STRCONF_DEVICE@ --remove || :
-    fi
-    :
-}
-
 prerm_modconf_remove () { :
     # When we are going away altogether we want to remove any lines whatsoever
     # from the modules.conf file.
@@ -159,7 +536,7 @@ prerm_modconf_remove () { :
         conf_tmp=$tmppath/modules.conf.tmp.$$
         conf_new=$tmppath/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
-        sed -e '\|^include[[:space:]].*'"$modutildir/$base"'|d' $conf_new > $conf_tmp
+        sed -e '\|^include[[:space:]].*@modutildir@/'"$base"'|d' $conf_new > $conf_tmp
         mv -f -- $conf_tmp $conf_new
         chmod --reference=$conf_old $conf_new
         cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
@@ -169,9 +546,9 @@ prerm_modconf_remove () { :
 }
 
 prerm_preloads_remove () { :
-    case $kminor in
+    case @kminor@ in
 	4) prel_old=@sysconfdir@/modules ;;
-	5)  if test $kpatch -lt 48
+	5)  if [ @kpatch@ -lt 48 ]; then
 		prel_old=@sysconfdir@/modules
 	    else
 		prel_old=@sysconfdir@/modprobe.preload
@@ -209,9 +586,9 @@ prerm_modconf_upgrade () { :
         # This groovy sed script just pulls out the first matching line and
         # leaves the rest untouched.
         sed -e '
-\|^include[[:space:]].*'"$modutildir/$base"'|!b
+\|^include[[:space:]].*@modutildir@/'"$base"'|!b
 N
-s|^include[[:space:]].*'"$modutildir/$base"'.*\
+s|^include[[:space:]].*@modutildir@/'"$base"'.*\
 ||
 : loop
 n
@@ -225,9 +602,9 @@ b loop' $conf_new > $conf_tmp
 }
 
 prerm_preloads_upgrade () { :
-    case $kminor in
+    case @kminor@ in
 	(4) prel_old=@sysconfdir@/modules ;;
-	(5) if test $kpatch -lt 48
+	(5) if [ @kpatch@ -lt 48 ]; then
 		prel_old=@sysconfdir@/modules ;;
 	    else
 		prel_old=@sysconfdir@/modprobe.preload ;;
@@ -322,13 +699,13 @@ prerm_initscripts () { :
     # Upgrading, remove our init scripts if we can
     reverse=
     list="${initfiles}" ; for i in $list ; do
-	if test -z "$reverse" ; then reverse="$i $reverse"; else reverse="$1"; fi
+	if [ -z "$reverse" ]; then reverse="$i $reverse"; else reverse="$1"; fi
     done
     for i in $reverse ; do
-        if [ -f $initrddir/$i ] ; then
+        if [ -f @initrddir@/$i ] ; then
             # Try to stop them first.
             /sbin/service $i stop >/dev/null 2>&1 || \
-		$initrddir/$i stop >/dev/null 2>&1 || :
+		@initrddir@/$i stop >/dev/null 2>&1 || :
             # Find the best working init script removal tool
             [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
             [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
@@ -339,11 +716,11 @@ prerm_initscripts () { :
 }
 
 prerm_manrefs () { :
-    rm -f -- ${mandir}/${manrefs}
+    rm -f -- @mandir@/${manrefs}
 }
 
 prerm_manmacros () { :
-    rm -f -- ${mandir}/${manmacros}
+    rm -f -- @mandir@/${manmacros}
 }
 
 # -----------------------------------------------------------------------------
@@ -357,7 +734,5 @@ failed_upgrade_prerm () { :; }
 deconfigure_prerm () { :; }
 
 # =============================================================================
-#
-# $Log$
-# =============================================================================
-# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn
+# @configure_input@
+# vim: ft=sh sw=4 noet

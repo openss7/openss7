@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=init
+
 @openss7_prerm@
 
 # -----------------------------------------------------------------------------
@@ -78,8 +80,6 @@ failed_upgrade_init_prerm () { :
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_init_prerm () { :
 }
-
-subpkg=init
 
 @mscript_prerm@
 

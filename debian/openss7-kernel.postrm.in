@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=kernel
+
 @openss7_postrm@
 
 postrm_kernel () { :
@@ -99,8 +101,6 @@ abort_upgrade_postrm () { :
 disappear_postrm () { :
     postrm_kernel
 }
-
-subpkg=kernel
 
 @mscript_postrm@
 

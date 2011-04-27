@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=kernel
+
 @openss7_preinst@
 
 preinst_kernel () { :
@@ -84,8 +86,6 @@ upgrade_preinst () { :
 abort_upgrade_preinst () { :
     preinst_kernel_running
 }
-
-subpkg=kernel
 
 @mscript_preinst@
 

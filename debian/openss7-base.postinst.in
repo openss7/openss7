@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=base
+
 @openss7_postinst@
 
 postinst_base () { :
@@ -105,8 +107,6 @@ abort_remove_postinst () { :
 abort_deconfigure_postinst ()  { :
     postinst_base
 }
-
-subpkg=base
 
 @mscript_postinst@
 

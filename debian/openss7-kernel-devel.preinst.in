@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=kernel-devel
+
 @openss7_preinst@
 
 # -----------------------------------------------------------------------------
@@ -75,8 +77,6 @@ upgrade_preinst () { :
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
-subpkg=kernel-devel
 
 @mscript_preinst@
 

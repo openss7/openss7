@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=javadoc
+
 @openss7_postrm@
 
 # -----------------------------------------------------------------------------
@@ -88,8 +90,6 @@ abort_upgrade_postrm () { :
 # dis-postrm disappear overwriter overwriter-version
 disappear_postrm () { :
 }
-
-subpkg=javadoc
 
 @mscript_postrm@
 

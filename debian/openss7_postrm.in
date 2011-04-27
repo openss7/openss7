@@ -1,61 +1,259 @@
 #!/bin/sh
 # @configure_input@
 # =============================================================================
-# 
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
-#
-# -----------------------------------------------------------------------------
-#
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
-# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
-#
-# All Rights Reserved.
-#
-# This program is free software; you can redistribute it and/or modify it under
-# the terms of the GNU Affero General Public License as published by the Free
-# Software Foundation; version 3 of the License.
-#
-# This program is distributed in the hope that it will be useful, but WITHOUT
-# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
-# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
-# details.
-#
-# You should have received a copy of the GNU Affero General Public License along
-# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
-# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-#
-# -----------------------------------------------------------------------------
-#
-# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-# behalf of the U.S. Government ("Government"), the following provisions apply
-# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
-# is classified as "Commercial Computer Software" under paragraph 252.227-7014
-# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
-# successor regulations) and the Government is acquiring only the license rights
-# granted herein (the license rights customarily provided to non-Government
-# users).  If the Software is supplied to any unit or agency of the Government
-# other than DoD, it is classified as "Restricted Computer Software" and the
-# Government's rights in the Software are defined in paragraph 52.227-19 of the
-# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
-# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
-# (or any successor regulations).
-#
-# -----------------------------------------------------------------------------
-#
-# Commercial licensing and support of this software is available from OpenSS7
-# Corporation at a fee.  See http://www.openss7.com/
-#
-# -----------------------------------------------------------------------------
-#
-# Last Modified $Date$ by $Author$
-#
-# =============================================================================
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+
 @mscript_header@
 
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
+
+#
+# After we remove this repository package, we need to adjust whatever
+# definitions are required in configuration files.  When we changed them on
+# installation, we save an original copy in $f.dpkg-save.  Therefore, if
+# $f.dpkg-save exists, copy it back.
+#
+postrm_repo () { :
+    d="@sysconfdir@/apt/sources.list.d"
+    for f in openss7.list ; do f="$d/$f"
+        if [ -f $f -a -f $f.dpkg-save ] ; then
+            if ! diff $f $f.dpkg-save >/dev/null 2>&1 ; then
+                mv -f -- $f.dpkg-save $f
+            fi
+        fi
+        rm -f -- $f.dpkg-save
+    done
+    :
+    return 0
+}
+
+postrm_manpages () { :
+    return
+    #
+    # Note that manual pages should be handled by debhelper additions.
+    #
+    if which makewhatis >/dev/null 2>&1 ; then
+	LANGUAGE= LANG= makewhatis -u ${mandir} || :
+    fi
+    if which mandb >/dev/null 2>&1 ; then
+	LANGUAGE= LANG= mandb -p ${mandir} || :
+    fi
+}
+
+#
+# Whether complete removal or upgrade, do a load config.
+#
+postrm_lib () { :
+    if which ldconfig >/dev/null 2>&1; then
+	ldconfig
+    fi
+    :
+    return 0
+}
+
+remove_depends() {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+        remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+        rmmod $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
+
+postrm_depmod () { :
+    if [ ":@kversion@" = ":`uname -r`" ]; then
+#	This is a running kernel, do a depmod on the modules directory for.
+        if [ -r @ksysmap@ ] ; then
+            depmod -ae -F @ksysmap@ 2>&1 || :
+        else
+            depmod -ae 2>&1 || :
+        fi
+    elif [ -r @ksysmap@ ]; then
+#	Non-running kernels a depmod will be performed on boot but depmod
+#	anyway.
+        UNAME_MACHINE=@target_cpu@ \
+        depmod -ae -F @ksysmap@ @kversion@ 2>&1 || :
+    fi
+    :
+    return 0
+}
+
+#
+# Stop init scripts when they are still hanging around.
+#
+postrm_stop_scripts () { :
+    reverse=
+    list="${initfiles}" ; for i in $list ; do
+        reverse="$i${reverse:+' '}$reverse"
+    done
+    for i in $reverse ; do
+        if [ -f @initrddir@/$i ] ; then
+            /sbin/service $i stop >/dev/null 2>&1 || \
+		@initrddir@/$i stop >/dev/null 2>&1 || :
+        fi
+    done
+    :
+    return 0
+}
+
+postrm_kill_strace () { :
+    if [ -r /var/run/strace.pid ] ; then
+        kill -TERM `cat /var/run/strace.pid` || :
+        rm -f /var/run/strace.pid
+        rm -f /var/lock/subsys/strace
+        rm -f /var/lock/subsys/strace.init
+    fi
+    :
+    return 0
+}
+
+postrm_kill_strerr () { :
+    if [ -r /var/run/strerr.pid ] ; then
+        kill -TERM `cat /var/run/strerr.pid` || :
+        rm -f /var/run/strerr.pid
+        rm -f /var/lock/subsys/strerr
+        rm -f /var/lock/subsys/strerr.init
+    fi
+    :
+    return 0
+}
+
+postrm_rmnods () { :
+    if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
+	echo "${package}: removing old devices."
+	@sbindir@/@STRCONF_DEVICES@ --remove || :
+    fi
+    return 0
+}
+
+postrm_kill_streams () { :
+    if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+        if [ -x @sbindir@/fdetach ] ; then
+            @sbindir@/fdetach -a 2>/dev/null || :
+        fi
+        for signal in TERM KILL ; do
+            if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+                lsof | grep '\<STR\>' | \
+                while read fields ; do
+                    set -- $fields
+                    if [ ":$5" != ':CHR' ] ; then continue; fi
+                    ind=`expr $# - 1`
+                    eval "val=\"\${$ind}\""
+                    if [ ":$val" != ':STR' ] ; then continue; fi
+                    kill -$signal $2 >/dev/null 2>&1 || :
+                done
+                sleep 5
+            fi
+        done
+    fi
+    lsof | grep '\<STR\>' >/dev/null 2>&1 && false
+}
+
+
+postrm_modules () { :
+    local reboot
+    reboot='no'
+    postrm_stop_scripts
+    postrm_kill_strace
+    postrm_kill_strerr
+    umount -a -t specfs    || reboot='yes'
+    postrm_rmnods
+    postrm_kill_streams    || reboot='yes'
+    remove_depends streams || reboot='yes'
+    remove_depends specfs  || reboot='yes'
+    if [ ":$reboot" = ':yes' ] ; then
+	echo "$script: reboot required." >&2
+    fi
+    :
+    return 0
+}
+
+postrm_modules_running () { :
+    if [ ":@kversion@" = ":`uname -r`" ]; then
+	postrm_modules
+    fi
+    :
+    return 0
+}
+
+postrm_symvers () { :
+    f="symsets-@kversion@.tar.gz"
+    d="/lib/modules/@kversion@/build"
+    if [ -r $d/$f ] ; then
+        cp -f -- $d/$f /boot/$f || :
+    else
+        rm -f -- /boot/$f || :
+    fi
+}
+
+#
+# Complete removal or upgrade: do a load config.
+#
+postrm_jnilibs () { :
+    if which ldconfig >/dev/null 2>&1; then
+	ldconfig || :
+    fi
+    return 0
+}
+
+#
+# Complete removal or upgrade: do nothing.
+#
+postrm_gcjlibs () { :
+}
+
+#
+# Complete removal or upgrade: rebuild classmap database.
+#
+postrm_gcjmaps () { :
+    if [ -x /usr/bin/rebuild-gcj-db ] ; then
+        /usr/bin/rebuild-gcj-db
+    else
+#	basically what rebuild-gcj-db does
+        for base in /usr/lib* ; do
+            db=`/usr/bin/gcj-dbtool -p $base`
+            d=$base/gcj
+            test -d $d || continue
+            dirname $db | xargs mkdir -p
+            /usr/bin/gcj-dbtool -n $db.tmp 64
+            find $d -follow -name '*.db' -print0 | \
+                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
+            /bin/mv -f $db.tmp $db
+        done
+    fi
+    :
+    return 0
+}
+
+#
+# Complete removal or upgrade: relink the jar files.
+#
+postrm_jarfiles () { :
+    if [ -x /usr/bin/rebuild-jar-repository ] ; then
+        /usr/bin/rebuild-jar-repository @javadir@ || :
+    fi
+    return 0
+}
+
+postrm_java () { :
+    postrm_jnilibs  || :
+    postrm_gcjlibs  || :
+    postrm_gcjmaps  || :
+    postrm_jarfiles || :
+    return 0
+}
+
 
 postrm_modconf () {
     local last_core_package='yes'
@@ -68,15 +266,15 @@ postrm_modconf () {
     if [ ":$last_core_package" = ":no" ] ; then
 	return 0
     fi
-    conf_old=$sysconfdir/modules.conf
-    if grep -q 'include[^#]*'$modutildir/$base $conf_old ; then
+    conf_old=@sysconfdir@/modules.conf
+    if grep -q 'include[^#]*@modutildir@/'$base $conf_old ; then
 	conf_tmp=$tmppath/modules.conf.tmp.$$
 	sed -e "/include[^#]*\/$base/d" $conf_old > $conf_tmp
 	chmod --reference=$conf_old $conf_tmp
 	cp -fb --suffix=.old $conf_tmp $conf_old
 	rm -f $conf_tmp
     fi
-    rm -f -- "$modutildir/$base"
+    rm -f -- "@modutildir@/$base"
 }
 
 postrm_preload () {
@@ -96,24 +294,21 @@ postrm_preload () {
 }
 
 postrm_depmod () {
-    if [ ":$kversion" = ":`uname -r`" ] ; then
+    if [ ":@kversion@" = ":`uname -r`" ] ; then
 #	this is a running kernel, do a /sbin/depmod on the modules directory for
 	/sbin/depmod -ae
-    elif [ -r /boot/System.map-$kversion ] ; then
+    elif [ -r @ksysmap@ ] ; then
 #	non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
 	UNAME_MACHINE=%{_target_cpu} \
-	/sbin/depmod -ae -F /boot/System.map-$kversion $kversion
+	/sbin/depmod -ae -F @ksysmap@ @kversion@
     fi
 }
 
 postrm_update () { :
     local retval=0
-    for update in /sbin/openss7-modules /usr/sbin/openss7-modules; do
-	if [ -x $update ] ; then
-	    gawk -f $update -- -q -e --remove-modules ${kversion} || retval=$?
-	    break
-	fi
-    done
+    if [ -x @sbindir@/openss7-modules ]; then
+	gawk -f @sbindir@/openss7-modules -- -q -e --remove-modules @kversion@ || retval=$?
+    fi
     return $retval
 }
 
@@ -140,7 +335,5 @@ abort_upgrade_postrm () { :; }
 disappear_postrm () { :; }
 
 # =============================================================================
-#
-# $Log$
-# =============================================================================
-# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn
+# @configure_input@
+# vim: ft=sh sw=4 noet

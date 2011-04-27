@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=devel
+
 @openss7_prerm@
 
 # -----------------------------------------------------------------------------
@@ -78,8 +80,6 @@ failed_upgrade_devel_prerm () { :
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_devel_prerm () { :
 }
-
-subpkg=devel
 
 @mscript_prerm@
 

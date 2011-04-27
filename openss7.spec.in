@@ -87,7 +87,7 @@
 %global manuals     openss7 ATM carrier cci cdi chi cnam dlpi dlpi_porting FR hlr INET ISDN lab libxnet libxnsl lli mapi MG mg mtpi mxi nli npi npi_mtp npi_sccp OSI PHYS porting sbc sccpi sdli sdti sg sgp SIGTRAN sli SPG2 SPG SS7 ssg ss STREAMS_FAQ STREAMS tci tpi tpi_sccp tri TTY VOIP voip wan X25 x25_porting x400p xcc xmap XNS xti_sccp
 %global pngfiles    *.png
 %global cssfiles    *.css
-%global initfiles   specfs streams %{base} strerr strace
+%global initfiles   specfs streams strerr strace %{base}
 %global nonrpminit  strms_up strms_dn
 %global conffiles   *.conf
 %global testfiles   *test*
@@ -2530,20 +2530,22 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
             fi
         done
         [ ":$oldfile" != ":$file" ] || mv -f -- $file $file.rpmsave
-        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=$un}${pw:+&pw=$pw}"
+        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+'&un='}${un}${pw:+'&pw='}${pw}"
         ext="$ext"`echo '/%{_rpmsubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
-        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/rpms/repodata/'"$file$ext"
+	key=; [ -z "$un" ] || key="${un}${pw:+':'}${pw}@"
+        url='%{_reposerv}://'"${key}"'%{_repobase}/%{_reporoot}/rpms/repodata/'"$file$ext"
         rm -f -- $file
         if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
             if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
                 echo 'Authorization required for repository access.' >/dev/tty
                 u='anonymous'; p=
-                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-anonymous}
+                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-'anonymous'}
                 if [ "$u" != 'anonymous' ] ; then
                 read -es -p 'Password: ' p </dev/tty >/dev/tty
                 echo '' >/dev/tty
                 fi
-                url='%{_reposerv}://'"${u:+$u:$p@}"'%{_repobase}/%{_reporoot}/rpms/repodata/'"$file$ext"
+		key=; [ -z "$u" ] || key="${u}:${p}@"
+                url='%{_reposerv}://'"${key}"'%{_repobase}/%{_reporoot}/rpms/repodata/'"$file$ext"
                 rm -f -- $file
                 if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
                     [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
@@ -2662,7 +2664,7 @@ fi
 if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 %if %{FILES_yumrepo}
     f='%{_yumrepodir}/@PACKAGE@.repo'
-    if [ -e $f ] ; then
+    if [ -r $f ] ; then
         sed 's,^enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$,enabled = 0,' $f >$f.rpmsave
         mv -f -- $f.rpmsave $f
     fi
@@ -3761,13 +3763,17 @@ if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
 %endif
     # do it with extreme prejudice in case init scripts have been removed
     reboot='no'
-    if [ -x /var/run/strace.pid ] ; then
+    if [ -r /var/run/strace.pid ] ; then
         kill -TERM `cat /var/run/strace.pid` || :
         rm -f /var/run/strace.pid
+        rm -f /var/lock/subsys/strace
+        rm -f /var/lock/subsys/strace.init
     fi
-    if [ -x /var/run/strerr.pid ] ; then
+    if [ -r /var/run/strerr.pid ] ; then
         kill -TERM `cat /var/run/strerr.pid` || :
         rm -f /var/run/strerr.pid
+        rm -f /var/lock/subsys/strerr
+        rm -f /var/lock/subsys/strerr.init
     fi
     umount -a -t specfs || reboot='yes'
 %if %{USE_rmnods}
@@ -3776,19 +3782,19 @@ if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
     fi
 %endif
     if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
-        if [ -x /usr/sbin/fdetach ] ; then
-            /usr/sbin/fdetach -a 2>/dev/null || :
+        if [ -x %{_sbindir}/fdetach ] ; then
+            %{_sbindir}/fdetach -a 2>/dev/null || :
         fi
         for signal in TERM KILL ; do
             if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                 lsof | grep '\<STR\>' | \
                 while read fields ; do
-                    set dummy $fields
-                    if [ ":$6" != ':CHR' ] ; then continue; fi
+                    set -- $fields
+                    if [ ":$5" != ':CHR' ] ; then continue; fi
                     ind=`expr $# - 1`
                     eval "val=\"\${$ind}\""
                     if [ ":$val" != ':STR' ] ; then continue; fi
-                    kill -$signal $3 >/dev/null 2>&1 || :
+                    kill -$signal $2 >/dev/null 2>&1 || :
                 done
                 sleep 5
             fi
@@ -4291,11 +4297,11 @@ if [ $arg = 1 ] ; then : # fresh install
                     (*)     dep="$dep${dep:+' '}$line" ;;
                 esac
                 [ -n "$dep" ] || continue;
-                set dummy $dep
-                if [ "${3+set}" = "set" ] ; then
-                    t=`echo $2 | sed -e 's|:$||'`
+                set -- $dep
+                if [ $# -ge 2 ] ; then
+                    t=`echo $1 | sed -e 's|:$||'`
                     target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                    shift 2
+                    shift
                     for p in $@ ; do
                         prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
                         eval "$prereq=\"\$$prereq\${$prereq:+' '}$t\""
@@ -4331,12 +4337,12 @@ if [ $arg = 1 -o $arg = 2 ] ; then : # fresh install or upgrade
                 if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                     lsof | grep '\<STR\>' | \
                     while read fields ; do
-                        set dummy $fields
-                        if [ ":$6" != ':CHR' ] ; then continue; fi
+                        set -- $fields
+                        if [ ":$5" != ':CHR' ] ; then continue; fi
                         ind=`expr $# - 1`
                         eval "val=\"\${$ind}\""
                         if [ ":$val" != ':STR' ] ; then continue; fi
-                        kill -$signal $3 >/dev/null 2>&1 || :
+                        kill -$signal $2 >/dev/null 2>&1 || :
                     done
                     sleep 5
                 fi
@@ -4425,13 +4431,17 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 %endif
         # do it with extreme prejudice in case init scripts have been removed
         reboot='no'
-        if [ -x /var/run/strace.pid ] ; then
+        if [ -r /var/run/strace.pid ] ; then
             kill -TERM `cat /var/run/strace.pid` || :
             rm -f /var/run/strace.pid
+            rm -f /var/lock/subsys/strace
+            rm -f /var/lock/subsys/strace.init
         fi
-        if [ -x /var/run/strerr.pid ] ; then
+        if [ -r /var/run/strerr.pid ] ; then
             kill -TERM `cat /var/run/strerr.pid` || :
             rm -f /var/run/strerr.pid
+            rm -f /var/lock/subsys/strerr
+            rm -f /var/lock/subsys/strerr.init
         fi
         umount -a -t specfs || reboot='yes'
 %if %{USE_rmnods}
@@ -4447,12 +4457,12 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                 if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                     lsof | grep '\<STR\>' | \
                     while read fields ; do
-                        set dummy $fields
-                        if [ ":$6" != ':CHR' ] ; then continue; fi
+                        set -- $fields
+                        if [ ":$5" != ':CHR' ] ; then continue; fi
                         ind=`expr $# - 1`
                         eval "val=\"\${$ind}\""
                         if [ ":$val" != ':STR' ] ; then continue; fi
-                        kill -$signal $3 >/dev/null 2>&1 || :
+                        kill -$signal $2 >/dev/null 2>&1 || :
                     done
                     sleep 5
                 fi
@@ -4499,11 +4509,17 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         # One more kick at killing any loaded modules on uninstall, last stage
         # of the upgrade on a running kernel for upgrade.
         reboot='no'
-        if [ -x /var/run/strace.pid ] ; then
+        if [ -r /var/run/strace.pid ] ; then
             kill -TERM `cat /var/run/strace.pid` || :
+            rm -f /var/run/strace.pid
+            rm -f /var/lock/subsys/strace
+            rm -f /var/lock/subsys/strace.init
         fi
-        if [ -x /var/run/strerr.pid ] ; then
+        if [ -r /var/run/strerr.pid ] ; then
             kill -TERM `cat /var/run/strerr.pid` || :
+            rm -f /var/run/strerr.pid
+            rm -f /var/lock/subsys/strerr
+            rm -f /var/lock/subsys/strerr.init
         fi
         umount -a -t specfs || reboot='yes'
 %if %{USE_rmnods}
@@ -4519,12 +4535,12 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
                 if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                     lsof | grep '\<STR\>' | \
                     while read fields ; do
-                        set dummy $fields
-                        if [ ":$6" != ':CHR' ] ; then continue; fi
+                        set -- $fields
+                        if [ ":$5" != ':CHR' ] ; then continue; fi
                         ind=`expr $# - 1`
                         eval "val=\"\${$ind}\""
                         if [ ":$val" != ':STR' ] ; then continue; fi
-                        kill -$signal $3 >/dev/null 2>&1 || :
+                        kill -$signal $2 >/dev/null 2>&1 || :
                     done
                     sleep 5
                 fi

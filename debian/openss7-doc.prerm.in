@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=doc
+
 @openss7_prerm@
 
 # -----------------------------------------------------------------------------
@@ -78,8 +80,6 @@ failed_upgrade_doc_prerm () { :
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_doc_prerm () { :
 }
-
-subpkg=doc
 
 @mscript_prerm@
 

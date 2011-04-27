@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=debuginfo
+
 @openss7_prerm@
 
 # -----------------------------------------------------------------------------
@@ -78,8 +80,6 @@ failed_upgrade_debuginfo_prerm () { :
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_debuginfo_prerm () { :
 }
-
-subpkg=debuginfo
 
 @mscript_prerm@
 

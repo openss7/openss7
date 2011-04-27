@@ -674,7 +674,7 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 		print_vmore(3, pfx sprintf("%03d modules; %03d links; %03d names; %02d kernels", h, l, u, k))
 		pl = 0; ph = 0
 	    }
-	    if ((kversion,name) in modnames && modnames[kverison,name] != file)
+	    if ((kversion,name) in modnames && modnames[kversion,name] != file)
 	    { modnames[kversion,name] = modnames[kversion,name] "," file
 	      print_error(pfx "conflict amoung modules for " name ", " modnames[kversion,name]) }
 	    { modnames[kversion,name] = file }
@@ -722,20 +722,17 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     }
     return n
 }
-#global sysmaps[kversion,sym] = address
-#global counts["sysmap",kversion] = count
-function readsysmap(kversion, file,
-		    pfx,fmt,n,pn,sym,c,pc,bads,d,pd,maps) # syms
+function readsymmap(kversion, file, pfx, maps,
+		    fmt,n,pn,sym,c,pc,bads,d,pd)
 {
-    # read the system map for kernel "kversion"
-    pfx = "r: sysmap,    "
+    # read the symbol map for kernel "kversion"
     fmt = "%05d maps, %04d bads, %04d dups"
     n = 0; c = 0; d = 0; pn = 0; pc = 0; pd = 0
     print_vinfo(2, pfx "file = " file)
     if (system_command("test -r " file) == 0) {
 	print_vmore(2, pfx sprintf(fmt, n, c, d))
 	while ((getline < file) == 1) {
-	    if (NF<3) continue
+	    if (NF!=3) continue
 	    if (!($3 in maps)) {
 		maps[$3] = $1
 		n++; pn++
@@ -766,8 +763,37 @@ function readsysmap(kversion, file,
 	print_warns(pfx "file not found " file)
     }
     print_vinfo(2, pfx sprintf(fmt, n, c, d))
+    return n
+}
+#global sysmaps[kversion,sym] = address
+#global counts["sysmap",kversion] = count
+function readsysmap(kversion, file,
+		    pfx,n,sym,add,maps)
+{
+    pfx = "r: sysmap,    "
+    n = readsymmap(kversion, file, pfx, maps)
     for (sym in maps) {
-	sysmaps[kversion,sym] = maps[sym]
+	add = maps[sym]
+	sysmaps[kversion,sym] = add
+	if ((kversion,sym) in allsyms && allsyms[kversion,sym] != add) {
+	    print_warns(pfx "ksym(" kversion ":" sym ") = 0x" add " != 0x" allsyms[kversion,sym])
+	}
+    }
+    return n
+}
+#global allsyms[sym] = address
+#global counts["allsym",kversion] = count
+function readallsym(kversion, file,
+		    pfx,n,sym,add,maps)
+{
+    pfx = "r: kallsyms,  "
+    n = readsymmap(kversion, file, pfx, maps)
+    for (sym in maps) {
+	add = maps[sym]
+	allsyms[kversion,sym] = add
+	if ((kversion,sym) in sysmaps && sysmaps[kversion,sym] != add) {
+	    print_warns(pfx "ksym(" kversion ":" sym ") = 0x" add " != 0x" sysmaps[kversion,sym])
+	}
     }
     return n
 }
@@ -878,10 +904,10 @@ function readkernel(kversion,
 		}
 		if (sym~/[^A-Za-z0-9_]/)
 		    print_error(pfx "ksym(" kversion ":" sym ") = " crc)
-		if (!((kversion,sym) in sysmaps)) {
+		if (!((kversion,sym) in sysmaps) && !((kversion,sym) in allsyms)) {
 		    continue
 		}
-		if (!((kversion,"__kcrctab_"sym) in sysmaps)) {
+		if (!((kversion,"__kcrctab_"sym) in sysmaps) && !((kversion,"__kcrctab_"sym) in allsyms)) {
 		    continue
 		}
 		if (!((kversion,sym) in symvers)) {
@@ -942,6 +968,22 @@ function getsysmap(kversion,
 	    file = values["rootdir"] file
 	n = readsysmap(kversion, file)
 	counts["sysmap",kversion] = n
+    }
+    print_vinfo(2, pfx "syms " n)
+    return n
+}
+function getallsym(kversion,
+		   pfx,n,file)
+{
+    pfx = "r: allsym,    "
+    n = 0
+    print_vinfo(2, pfx "version = " kversion)
+    if (("allsym",kversion) in counts) {
+	n = counts["allsym",kversion]
+    } else {
+	file = values["allsym"]
+	n = readallsym(kversion, file)
+	counts["allsym",kversion] = n
     }
     print_vinfo(2, pfx "syms " n)
     return n
@@ -1009,18 +1051,24 @@ function getsysver(kversion,
     return n
 }
 function getsysinfo(kversion,
-		    pfx,n,e)
+		    pfx,fmt,s,n,e)
 {
     pfx = "r: sysinfo,   "
-    n = 0; e = 0
-    print_vmore(3, pfx sprintf("%04d addrs,  %04d expts", n, e))
+    fmt = "%04d symbs, %04d addrs, %04d expts"
+    s = 0; n = 0; e = 0
+    print_vmore(3, pfx sprintf(fmt, s, n, e))
+    if (kversion == krunning) {
+	s = getallsym(kversion)
+	if (s == 0) { return s }
+	print_vmore(3, pfx sprintf(fmt, s, n, e))
+    }
     n = getsysmap(kversion)
     if (n == 0) { return n }
-    print_vmore(3, pfx sprintf("%04d addrs,  %04d expts", n, e))
+    print_vmore(3, pfx sprintf(fmt, s, n, e))
     e = getsysver(kversion)
-    print_vinfo(2, pfx sprintf("%04d addrs,  %04d expts", n, e))
+    print_vinfo(2, pfx sprintf(fmt, s, n, e))
     if (e == 0) { return e }
-    return (n+e)
+    return (s+n+e)
 }
 #global modinfo[module] = count of module information
 #global export[module,sym] = crc
@@ -1347,7 +1395,7 @@ function getmodinfo(kversion,
     return n
 }
 function getresolve(kversion, kver,
-		    creates, unlinks, changes, relinks, removes, retains, inserts, unneeded,
+		    creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded,
 		    pfx,n,ksyms,pair,pairs,ver,name,module,sym,syms,s,add,crc,d,deleted,relink,reload,resolve,
 		    exporting,linking,needing,wanting,kmodver)
 {
@@ -1382,7 +1430,16 @@ function getresolve(kversion, kver,
 	split(linkedsyms[module],syms,/,/)
 	for (s in syms) { sym = syms[s]
 	    add = linked[module,sym]
-	    if ((kversion,sym) in sysmaps) {
+	    if ((kversion,sym) in allsyms) {
+		if (allsyms[kversion,sym] != add) {
+		    add = allsyms[kversion,sym]
+		    relink[name] = module
+		    if (name in reload)
+		    { reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
+		    { reload[name] = "\t" sym " = 0x" add ";" }
+		}
+	    } else
+	    if (kversion != krunning && (kversion,sym) in sysmaps) {
 		if (sysmaps[kversion,sym] != add) {
 		    add = sysmaps[kversion,sym]
 		    relink[name] = module
@@ -1422,7 +1479,7 @@ function getresolve(kversion, kver,
 		if ((kversion,sym) in symvers) {
 		    if (symvers[kversion,sym] == crc) continue
 		} else {
-		    if ((kversion,sym) in sysmaps) {
+		    if ((kversion,sym) in allsyms || (kversion != krunning && (kversion,sym) in sysmaps)) {
 			kmodver = ""
 			if (module in modules)
 			    kmodver = modules[module]
@@ -1444,7 +1501,9 @@ function getresolve(kversion, kver,
 			    # weak-updating, it is just too dangerous.  Otherwise, we might consider
 			    # linking.
 			    if (gensub(/-.*$/,"","g",kmodver) == gensub(/-.*$/,"","g",kversion)) {
-				add = sysmaps[kversion,sym]
+				if ((kversion,sym) in allsyms)
+				{ add = allsyms[kversion,sym] } else
+				{ add = sysmaps[kversion,sym] }
 				relink[name] = module
 				if (name in reload) {
 				    # need this to be indempotent
@@ -1506,7 +1565,16 @@ function getresolve(kversion, kver,
 	    if ((kversion,sym) in symvers) {
 		if (symvers[kversion,sym] == crc) {
 		    if ((module,sym) in weaken) {
-			if ((kversion,sym) in sysmaps) {
+			if ((kversion,sym) in allsyms) {
+			    add = allsyms[kversion,sym]
+			    if (weaken[module,sym] != add) {
+				relink[name] = module
+				if (name in reload)
+				{ reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
+				{ reload[name] = "\t" sym " = 0x" add ";" }
+			    }
+			} else
+			if (kversion != krunning && (kversion,sym) in sysmaps) {
 			    add = sysmaps[kversion,sym]
 			    if (weaken[module,sym] != add) {
 				relink[name] = module
@@ -1535,7 +1603,16 @@ function getresolve(kversion, kver,
 		}
 	    } else {
 		if ((module,sym) in weaken) {
-		    if ((kversion,sym) in sysmaps) {
+		    if ((kversion,sym) in allsyms) {
+			add = allsyms[kversion,sym]
+			if (weaken[module,sym] != add) {
+			    relink[name] = module
+			    if (name in reload)
+			    { reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
+			    { reload[name] = "\t" sym " = 0x" add ";" }
+			}
+		    } else
+		    if (kversion != krunning && (kversion,sym) in sysmaps) {
 			add = sysmaps[kversion,sym]
 			if (weaken[module,sym] != add) {
 			    relink[name] = module
@@ -1566,9 +1643,9 @@ function getresolve(kversion, kver,
 	    { inserts[kver] = name }
 	    if (name in relink) {
 		# also relinking it
-		if (kver in relinks)
-		{ relinks[kver] = relinks[kver] "," name } else
-		{ relinks[kver] = name }
+		if (kver in dolinks)
+		{ dolinks[kver] = dolinks[kver] "," name } else
+		{ dolinks[kver] = name }
 		if ((kversion,name) in modnames) {
 		    file = modnames[kversion,name]
 		    reloads[file] = reload[name]
@@ -1876,7 +1953,7 @@ function modinfomatches(module1, module2,		result)
     return 1
 }
 function chcksolution(kversion, kver,
-		      creates, unlinks, changes, relinks, removes, retains, inserts, unneeded,
+		      creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded,
 		      pfx,fmt,loaded,n,labels,i,name,created,removed,changed,altered)
 {
     pfx = "w: checking,  "
@@ -1906,6 +1983,11 @@ function chcksolution(kversion, kver,
 	print_vinfo(2, sprintf(fmt, "relinks", n, "links"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " relinks " labels[i])
     }
+    if (kver in dolinks) {
+	n = split(dolinks[kver],labels,/,/)
+	print_vinfo(2, sprintf(fmt, "dolinks", n, "links"))
+	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " dolinks " labels[i])
+    }
     if (kver in removes) {
 	n = split(removes[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "removes", n, "links"))
@@ -1922,7 +2004,7 @@ function chcksolution(kversion, kver,
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " inserts " labels[i])
     }
     if (kversion == krunning) {
-	if (!(kver in creates) && !(kver in unlinks) && !(kver in changes) && !(kver in relinks) && !(kversion in uneeded)) {
+	if (!(kver in creates) && !(kver in unlinks) && !(kver in changes) && !(kver in relinks) && !(kver in dolinks) && !(kversion in uneeded)) {
 	    print_vinfo(2, pfx "solution for " kversion " is no change")
 	    return 1
 	}
@@ -1985,7 +2067,7 @@ function chcksolution(kversion, kver,
     return 1
 }
 function makesolution(kversion, kver,
-		      creates, unlinks, changes, relinks, removes, retains, inserts,
+		      creates, unlinks, changes, relinks, dolinks, removes, retains, inserts,
 		      pfx,fmt,c,r,a,l,labels,i,name,pair,pairs)
 {
     pfx = "w: solution,  "
@@ -2031,6 +2113,16 @@ function makesolution(kversion, kver,
     # relink modules
     if (kver && kver in relinks) {
 	if (split(relinks[kver],labels,/,/)) {
+	    for (i in labels) { name = labels[i]
+		relinklinks(kversion, kver, name)
+		l++
+		print_vmore(3, sprintf(fmt, c, r, a, l))
+	    }
+	}
+    }
+    # relink inserts
+    if (kver && kver in dolinks) {
+	if (split(dolinks[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
 		relinklinks(kversion, kver, name)
 		l++
@@ -2086,7 +2178,12 @@ function modlink(kversion, reloads,
 		    continue
 		}
 		add = linked[module,sym]
-		if ((kversion,sym) in sysmaps) {
+		if ((kversion,sym) in allsyms) {
+		    if (allsyms[kversion,sym] == add) continue
+		    old = add
+		    add = allsyms[kversion,sym]
+		} else
+		if (kversion != krunning && (kversion,sym) in sysmaps) {
 		    if (sysmaps[kversion,sym] == add) continue
 		    old = add
 		    add = sysmaps[kversion,sym]
@@ -2116,7 +2213,11 @@ function modlink(kversion, reloads,
 			add = "00000000"
 			if (!((module,sym) in weaken) || weaken[module,sym]~/^00*$/) continue
 		    } else
-		    if ((kversion,sym) in sysmaps) {
+		    if ((kversion,sym) in allsyms) {
+			add = allsyms[kversion,sym]
+			if ((module,sym) in weaken && allsyms[kversion,sym] == weaken[module,sym]) continue
+		    } else
+		    if (kversion != krunning && (kversion,sym) in sysmaps) {
 			add = sysmaps[kversion,sym]
 			if ((module,sym) in weaken && sysmaps[kversion,sym] == weaken[module,sym]) continue
 		    } else {
@@ -2124,7 +2225,11 @@ function modlink(kversion, reloads,
 			if (!((module,sym) in weaken) || weak[module,sym]~/^00*$/) continue
 		    }
 		} else {
-		    if ((kversion,sym) in sysmaps) {
+		    if ((kversion,sym) in allsyms) {
+			add = allsyms[kversion,sym]
+			if ((module,sym) in weaken && allsyms[kversion,sym] == weaken[module,sym]) continue
+		    } else
+		    if (kversion != krunning && (kversion,sym) in sysmaps) {
 			add = sysmaps[kversion,sym]
 			if ((module,sym) in weaken && sysmaps[kversion,sym] == weaken[module,sym]) continue
 		    } else {
@@ -2286,7 +2391,7 @@ function link_kernel(kversion,
 # previous kernels and relink any absolute kernel addresses.
 #
 function add_kernel(kversion,
-		    pfx,solution,score,s,k,kver,retn,creates,unlinks,changes,relinks,removes,retains,inserts,unneeded,command,file)
+		    pfx,solution,score,s,k,kver,retn,creates,unlinks,changes,relinks,dolinks,removes,retains,inserts,unneeded,command,file)
 {
     pfx = "p: addkernel, "
     if (getsysinfo(kversion) == 0) return
@@ -2295,15 +2400,15 @@ function add_kernel(kversion,
     print_vmore(3, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
     for (k=counts["kern"];k>0;k--) { kver = kernels[k]
 	getmodinfo(kver)
-	retn = getresolve(kversion, kver, creates, unlinks, changes, relinks, removes, retains, inserts, unneeded)
+	retn = getresolve(kversion, kver, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded)
 	s++
 	print_vmore(3, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
 	if (retn < score) { score = retn; solution = kver }
 	if (score == 0) break
     }
     print_vinfo(2, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
-    if (chcksolution(kversion, kver, creates, unlinks, changes, relinks, removes, retains, inserts, unneeded)) {
-	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, removes, retains, inserts)) {
+    if (chcksolution(kversion, kver, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded)) {
+	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)) {
 	    dodepmod(kversion)
 	}
     }
@@ -2446,6 +2551,7 @@ BEGIN {
     d["style"   ] = "debian"
     d["basedir" ] = ""
     d["weakdir" ] = "weak-updates"
+    d["allsym"  ] = "/proc/kallsyms"
     d["sysmap"  ] = "/boot/System.map-$KVERSION"
     d["sysver"  ] = "/lib/modules/$KVERSION/build/Module.symvers"
     d["symver"  ] = "/boot/symvers-$KVERSION.gz"
@@ -2466,6 +2572,7 @@ BEGIN {
     longopts["rootdir"       ] = "c:" ; defaults["rootdir"       ] = ""			; descrips["rootdir"       ] = "root of the kernels being installed"
     longopts["basedir"       ] = "b:" ; defaults["basedir"       ] = d["basedir" ]	; descrips["basedir"       ] = "use a base directory other than root, BASEDIR"
     longopts["weakdir"       ] = "w:" ; defaults["weakdir"       ] = d["weakdir" ]	; descrips["weakdir"       ] = "where to place weak update symbolic links\nabsolute or rel. to /lib/modules/$KVERSION)"	; longargs["weakdir"       ] = "PATH"
+    longopts["allsym"        ] = "y:" ; defaults["allsym"        ] = d["allsym"  ]      ; descrips["allsym"        ] = "kernel symbols file (search when unspec.)"
     longopts["sysmap"        ] = "F:" ; defaults["sysmap"        ] = d["sysmap"  ]	; descrips["sysmap"        ] = "system map file (same as depmod) (search when unspec.)"
     longopts["sysver"        ] = "E:" ; defaults["sysver"        ] = d["sysver"  ]	; descrips["sysver"        ] = "system version file (same as depmod) (search when unspec.)"
     longopts["symver"        ] = "S:" ; defaults["symver"        ] = d["symver"  ]	; descrips["symver"        ] = "system version file (compressed) (search when unspec.)"
@@ -2488,6 +2595,7 @@ BEGIN {
     longopts["copying"       ] = "C!" ;							  descrips["copying"       ] = "display coding permissions and exit"
     delete d
     values["kversion"     ] = defaults["kversion"     ]
+    values["allsym"       ] = defaults["allsym"       ]
     values["sysmap"       ] = defaults["sysmap"       ]
     values["sysver"       ] = defaults["sysver"       ]
     values["symver"       ] = defaults["symver"       ]

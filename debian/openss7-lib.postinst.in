@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=lib
+
 @openss7_postinst@
 
 # -----------------------------------------------------------------------------
@@ -85,8 +87,6 @@ abort_remove_postinst () { :
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst () { :
 }
-
-subpkg=lib
 
 @mscript_postinst@
 

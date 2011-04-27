@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=kernel
+
 @openss7_postinst@
 
 postinst_kernel () { :
@@ -95,8 +97,6 @@ abort_remove_postinst () { :
 abort_deconfigure_postinst () { :
     postinst_kernel
 }
-
-subpkg=kernel
 
 @mscript_postinst@
 

@@ -52,7 +52,26 @@
 #
 # =============================================================================
 
+subpkg=doc
+
 @openss7_preinst@
+
+#
+# This is an initial installation of the doc subpackage.  We need to check for
+# non-deb installations on the host and remove any info entries that might later
+# conflict with our entries.  We treat every fresh installation like an upgrade
+# from non-deb install.
+#
+preinst_doc_install () { :
+#
+#   Search for our documentation entry and remove it.  Fortunately, GCOM
+#   releases did not install texinfo documentation.  Also, search for our man
+#   macros and references and remove them as well.
+#
+    preinst_manpages
+    preinst_manmacros
+    preinst_manrefs
+}
 
 # -----------------------------------------------------------------------------
 # Primary functions:
@@ -60,7 +79,7 @@
 
 # new-preinst install
 install_preinst () { :
-    preinst_doc
+    preinst_doc_install || :
 }
 
 # new-preinst install old-version
@@ -76,8 +95,6 @@ upgrade_preinst () { :
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
-subpkg=doc
 
 @mscript_preinst@
 
