@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=java
+
 @openss7_prerm@
 
 # -----------------------------------------------------------------------------
@@ -78,8 +80,6 @@ failed_upgrade_java_prerm () { :
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_java_prerm () { :
 }
-
-subpkg=java
 
 @mscript_prerm@
 

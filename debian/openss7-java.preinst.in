@@ -52,7 +52,16 @@
 #
 # =============================================================================
 
+subpkg=java
+
 @openss7_preinst@
+
+preinst_java_install () { :
+    preinst_jnilibs
+    preinst_gcjlibs
+    preinst_gcjmaps
+    preinst_jarfiles
+}
 
 # -----------------------------------------------------------------------------
 # Primary functions:
@@ -60,6 +69,7 @@
 
 # new-preinst install
 install_preinst () { :
+    preinst_java_install || :
 }
 
 # new-preinst install old-version
@@ -75,8 +85,6 @@ upgrade_preinst () { :
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
-subpkg=java
 
 @mscript_preinst@
 

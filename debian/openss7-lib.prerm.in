@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=lib
+
 @openss7_prerm@
 
 # -----------------------------------------------------------------------------
@@ -78,8 +80,6 @@ failed_upgrade_lib_prerm () { :
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_lib_prerm () { :
 }
-
-subpkg=lib
 
 @mscript_prerm@
 

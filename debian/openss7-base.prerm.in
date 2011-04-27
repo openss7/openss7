@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=base
+
 @openss7_prerm@
 
 prerm_base_install () { :
@@ -101,8 +103,6 @@ failed_upgrade_base_prerm () { :
 deconfigure_base_prerm () { :
     prerm_base_upgrade
 }
-
-subpkg=base
 
 @mscript_prerm@
 

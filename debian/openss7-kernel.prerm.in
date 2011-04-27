@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=kernel
+
 @openss7_prerm@
 
 # -----------------------------------------------------------------------------
@@ -78,8 +80,6 @@ failed_upgrade_kernel_prerm () { :
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_kernel_prerm () { :
 }
-
-subpkg=kernel
 
 @mscript_prerm@
 

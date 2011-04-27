@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=core
+
 @openss7_prerm@
 
 prerm_core () { :
@@ -88,8 +90,6 @@ failed_upgrade_core_prerm () { :
 deconfigure_core_prerm () { :
     prerm_core
 }
-
-subpkg=core
 
 @mscript_prerm@
 

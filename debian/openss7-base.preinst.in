@@ -52,8 +52,16 @@
 #
 # =============================================================================
 
+subpkg=base
+
 @openss7_preinst@
 
+#
+# This is an initial installation of the base subpackage.  We need to check for
+# non-deb installations on the host and remove any entries that might later
+# conflict with out entries.  We treat every fresh installation like an upgrade
+# from non-deb/rpm install.
+#
 preinst_base () { :
     preinst_preloads
     preinst_initscripts
@@ -81,8 +89,6 @@ upgrade_preinst () { :
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
-subpkg=base
 
 @mscript_preinst@
 

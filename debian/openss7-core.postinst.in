@@ -52,11 +52,13 @@
 #
 # =============================================================================
 
+subpkg=core
+
 @openss7_postinst@
 
 postinst_core () { :
     @WITH_KO_MODULES_FALSE@postinst_modconf
-    postinst_preload
+    postinst_preloads
     postinst_depmod
 }
 
@@ -92,8 +94,6 @@ abort_remove_postinst () { :
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst () { :
 }
-
-subpkg=core
 
 @mscript_postinst@
 

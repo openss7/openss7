@@ -52,6 +52,8 @@
 #
 # =============================================================================
 
+subpkg=init
+
 @openss7_preinst@
 
 # -----------------------------------------------------------------------------
@@ -76,8 +78,6 @@ upgrade_preinst () { :
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
-subpkg=init
 
 @mscript_preinst@
 

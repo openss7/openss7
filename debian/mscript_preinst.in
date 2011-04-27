@@ -8,12 +8,10 @@
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
 
-[ ":${subpkg:+'set'}" = ":set" ] || subpkg=
+eval "echo '${package}: \"$@\"'" >&2
 
 operation="$1"
 shift
-
-echo "@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@): $*" >&2
 
 case "$operation" in
     (install) : # install fresh or some configuration
@@ -40,4 +38,5 @@ esac
 @mscript_debhelper@
 
 # =============================================================================
+# @configure_input@
 # vim: ft=sh sw=4 noet
