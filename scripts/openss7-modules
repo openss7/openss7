@@ -723,7 +723,7 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     return n
 }
 function readsymmap(kversion, file, pfx, maps,
-		    fmt,n,pn,sym,c,pc,bads,d,pd)
+		    fmt,n,pn,sym,c,pc,bads,d,pd,command)
 {
     # read the symbol map for kernel "kversion"
     fmt = "%05d maps, %04d bads, %04d dups"
@@ -731,7 +731,8 @@ function readsymmap(kversion, file, pfx, maps,
     print_vinfo(2, pfx "file = " file)
     if (system_command("test -r " file) == 0) {
 	print_vmore(2, pfx sprintf(fmt, n, c, d))
-	while ((getline < file) == 1) {
+	command = "cat " file
+	while ((command | getline) == 1) {
 	    if (NF!=3) continue
 	    if (!($3 in maps)) {
 		maps[$3] = $1
@@ -757,7 +758,7 @@ function readsymmap(kversion, file, pfx, maps,
 		}
 	    }
 	}
-	close(file)
+	close(command)
 	for (sym in bads) { delete maps[sym]; n-- }
     } else {
 	print_warns(pfx "file not found " file)
@@ -786,7 +787,7 @@ function readsysmap(kversion, file,
 function readallsym(kversion, file,
 		    pfx,n,sym,add,maps)
 {
-    pfx = "r: kallsyms,  "
+    pfx = "r: allsym,    "
     n = readsymmap(kversion, file, pfx, maps)
     for (sym in maps) {
 	add = maps[sym]
