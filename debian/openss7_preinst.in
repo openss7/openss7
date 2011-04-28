@@ -83,30 +83,6 @@ preinst_manpages () { :
     return 0
 }
 #
-# Move old source tree out of the way.
-#
-preinst_source () { :
-    local d
-    for d in /usr/src/@PACKAGE@-[0-9]*; do
-	if [ -d $d ] ; then
-	    echo "$script: warning: moving directory $d out of the way" >&2
-	    mv -f -- $d $d.dpkg-save
-	fi
-    done
-}
-#
-# Remove old symbolic link.
-#
-preinst_rmlink () { :
-    local l
-    for l in /usr/src/@PACKAGE@ ; do
-	if [ -L $l ] ; then
-	    echo "$script: warning: removing symbolic link $l" >&2
-	    rm -f -- $l
-	fi
-    done
-}
-#
 # A little recursive function to delete all modules dependent on an initial
 # module set (in our case "streams.o").  The function echos the list of modules
 # to remove to stdout.

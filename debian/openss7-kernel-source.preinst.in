@@ -53,17 +53,53 @@
 # =============================================================================
 subpkg=kernel-source
 @openss7_preinst@
+#
+# preinst_source() - On an fresh install, move whatever tarball-installed source
+#   tree that might conflict out of the way.
+#
+preinst_source () { :
+    local d
+    for d in /usr/src/@PACKAGE@-[0-9]*; do
+	if [ -d $d ] ; then
+	    echo "$script: warning: moving directory $d out of the way" >&2
+	    mv -f -- $d $d.dpkg-save
+	fi
+    done
+}
+#
+# preinst_rmlink() - On a fresh install or upgrade, remove any link of the
+#   package name to any specific source tree that is installed.  This is also
+#   performed on an upgrade.
+#
+preinst_rmlink () { :
+    local l
+    for l in /usr/src/@PACKAGE@ ; do
+	if [ -L $l ] ; then
+	    echo "$script: warning: removing symbolic link $l" >&2
+	    rm -f -- $l
+	fi
+    done
+}
+preinst_source_install () { :
+    preinst_source
+    preinst_rmlink
+}
+preinst_source_upgrade () { :
+    preinst_rmlink
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # new-preinst install
 install_preinst () { :
+    preinst_source_install
 }
 # new-preinst install old-version
 reinstall_preinst () { :
 }
 # new-preinst upgrade old-version
 upgrade_preinst () { :
+    preinst_source_upgrade
 }
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
