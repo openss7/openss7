@@ -51,45 +51,78 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-
 subpkg=lib
-
-@openss7_postinst@
-
+@mscript_header@
+datarootdir=@datarootdir@
+#
+# postinst_libraries() - After a fresh installation, upgrade or reinstall, do a
+#   ldconfig.  Note that this action should be performed by the debhelper
+#   portion of the script.
+#
+postinst_libraries () { :
+    if which ldconfig >/dev/null 2>&1 ; then
+	ldconfig || true
+    fi
+    :
+    return 0
+}
+#
+# postinst_tcllibs() - After a fresh installation, upgrade or reinstall, create
+#   the indexes for the tcl libraries and modules.  Note that there is no
+#   debhelper for this.
+#
+postinst_tcllibs () { :
+    if which tclsh >/dev/null 2>&1 ; then
+	for d in `find ${pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
+	    echo -e "pkg_mkIndex $d\\nexit" | tclsh || true
+	done
+    fi
+    :
+    return 0
+}
+#
+# postinst_lib() - After a fresh installtion, upgrade or resinstall, do a
+#   ldconfig and create the indexes for the tcl libraries and modules.
+#
+postinst_lib () { :
+    postinst_libraries
+    postinst_tcllibs
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # xxx-postinst configure
 configure_postinst () { :
+    postinst_lib
 }
-
 # xxx-postinst configure most-recently-configured-version
 reconfigure_postinst () { :
+    postinst_lib
 }
-
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :
 }
-
 # old-prerm upgrade new-version ...FAILED
 # new-prerm failed-upgrade new-version ...FAILED
 # old-posinst abort-upgrade new-version
 abort_upgrade_postinst () { :
+    postinst_lib
 }
-
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
 abort_remove_postinst () { :
+    postinst_lib
 }
-
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst () { :
+    postinst_lib
 }
-
 @mscript_postinst@
-
+@mscript_debhelper@
+#if [ "$1" = "configure" ]; then
+#    ldconfig
+#fi
 # =============================================================================
 #
 # $Log$

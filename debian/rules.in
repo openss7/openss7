@@ -104,10 +104,10 @@ debian/@PACKAGE@-repo.config:
 ## Base virtual package:
 ##
 
-control		+= debian/@PACKAGE@.postinst \
-		   debian/@PACKAGE@.postrm \
-		   debian/@PACKAGE@.preinst \
-		   debian/@PACKAGE@.prerm
+#control	+= debian/@PACKAGE@.postinst \
+#		   debian/@PACKAGE@.postrm \
+#		   debian/@PACKAGE@.preinst \
+#		   debian/@PACKAGE@.prerm
 
 control		+= debian/@PACKAGE@.docs
 

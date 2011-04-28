@@ -51,48 +51,38 @@
 # Last Modified $Date: 2008-05-04 16:16:42 $ by $Author: brian $
 #
 # =============================================================================
-
 subpkg=core
-
 @openss7_prerm@
-
 prerm_core () { :
     prerm_modules
     prerm_preload
 }
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # xxx-prerm remove
 remove_core_prerm () { :
     prerm_core
 }
-
 # con-prerm remove 'in-favour' package new-version
 conflict_core_prerm () { :
     prerm_core
 }
-
 # old-prerm upgrade new-version
 upgrade_core_prerm () { :
     prerm_core
 }
-
 # old-prerm upgrade new-version ***FAILED***
 # new-prerm failed-upgrade old-version
 failed_upgrade_core_prerm () { :
     prerm_core
 }
-
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_core_prerm () { :
     prerm_core
 }
-
 @mscript_prerm@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log: streams-core.prerm.in,v $

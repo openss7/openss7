@@ -51,40 +51,31 @@
 # Last Modified $Date: 2008-04-28 10:30:21 $ by $Author: brian $
 #
 # =============================================================================
-
 subpkg=devel
-
 @openss7_preinst@
-
 preinst_devel () { :
     remove_warn_old
 }
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # new-preinst install
 install_preinst () { :
     preinst_devel
 }
-
 # new-preinst install old-version
 reinstall_preinst () { :
 }
-
 # new-preinst upgrade old-version
 upgrade_preinst () { :
 }
-
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
 @mscript_preinst@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log: streams-devel.preinst.in,v $

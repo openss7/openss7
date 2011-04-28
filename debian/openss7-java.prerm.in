@@ -51,38 +51,56 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-
 subpkg=java
-
 @openss7_prerm@
-
+#
+# Note that there is not really anything to do in the prerm stage for java
+# sub-packages.  Most of the things that need to be performed must be performed
+# after the files have been removed and are performed in the postrm stage.  Note
+# that the order of execution for upgrade is:
+#
+#   old-prerm upgrade new-version
+#   new-preinst upgrade old-version
+#	- files are unpacked, backups of old files
+#   old-postrm upgrade new-version
+#	- old files not in new version are removed
+#	- new files list replaces old
+#	- new scripts replace old
+#	- backup files are deleted
+#	- "Unpacked" state
+#   new-postinst configure [most-recently-configured-version]
+#
+# Note that this means that the old-prerm script is the only script that can
+# actually use any of the files contained in the old sub-package.
+#
+prerm_java () { :
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # xxx-prerm remove
 remove_java_prerm () { :
+    prerm_java	|| :
 }
-
 # con-prerm remove 'in-favour' package new-version
 conflict_java_prerm () { :
+    prerm_java	|| :
 }
-
 # old-prerm upgrade new-version
 upgrade_java_prerm () { :
+    prerm_java	|| :
 }
-
 # old-prerm upgrade new-version ***FAILED***
 # new-prerm failed-upgrade old-version
 failed_upgrade_java_prerm () { :
+    prerm_java	|| :
 }
-
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_java_prerm () { :
+    prerm_java	|| :
 }
-
 @mscript_prerm@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log$

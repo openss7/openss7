@@ -7,13 +7,11 @@
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
-
 @mscript_header@
-
+datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
-
 prerm_repo () { :
     d="@sysconfdir@/apt/sources.list.d"
     for f in openss7.list; do
@@ -26,7 +24,6 @@ prerm_repo () { :
     :
     return 0
 }
-
 remove_depends() {
     local modrex depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
@@ -39,7 +36,6 @@ remove_depends() {
     fi
     return 0
 }
-
 prerm_rmnods () { :
     if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
 	echo "${package}: removing old devices."
@@ -47,7 +43,6 @@ prerm_rmnods () { :
     fi
     return 0
 }
-
 #
 # When we are going away altogether we want to remove any lines whatsoever from
 # the modules.conf file.
@@ -58,14 +53,13 @@ prerm_oldmods () { :
         conf_tmp=$tmppath/modules.conf.tmp.$$
         conf_new=$tmppath/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
-        sed -e '\|^include[[:space:]].*@modutildir@/'"$base"'|d' $conf_new > $conf_tmp
+        sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
         mv -f -- $conf_tmp $conf_new
         chmod --reference=$conf_old $conf_new
         cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
         rm -f -- $conf_new
     fi
 }
-
 #
 # When we are going away altogether we want to remove any of our preloads
 # whatsoever from the modules or modprobe.preload file.
@@ -95,7 +89,6 @@ prerm_preloads () { :
     :
     return 0
 }
-
 #
 # After going away altogether, we want to rebuild the netconfig database, but
 # only if the netconfig database was built by use or does not exist.
@@ -139,7 +132,6 @@ prerm_netconfig () { :
     :
     return 0
 }
-
 #
 # After going away altogether, we want to rebuild the sock2path database.
 #
@@ -157,19 +149,16 @@ prerm_sock2path () { :
     :
     return 0
 }
-
 prerm_manrefs () { :
     rm -f -- @mandir@/${manrefs}
     :
     return 0
 }
-
 prerm_manmacros () { :
     rm -f -- @mandir@/${manmacros}
     :
     return 0
 }
-
 prerm_infofiles () { :
     if [ -x /sbin/install-info ] ; then
 #	Older policies do not compress info files.
@@ -186,7 +175,6 @@ prerm_infofiles () { :
     :
     return 0
 }
-
 #
 # Stop init scripts when they are still hanging around.
 #
@@ -204,7 +192,6 @@ prerm_stop_scripts () { :
     :
     return 0
 }
-
 prerm_kill_strace () { :
     if [ -r /var/run/strace.pid ] ; then
         kill -TERM `cat /var/run/strace.pid` || :
@@ -215,7 +202,6 @@ prerm_kill_strace () { :
     :
     return 0
 }
-
 prerm_kill_strerr () { :
     if [ -r /var/run/strerr.pid ] ; then
         kill -TERM `cat /var/run/strerr.pid` || :
@@ -226,7 +212,6 @@ prerm_kill_strerr () { :
     :
     return 0
 }
-
 prerm_kill_streams () { :
     if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
         if [ -x @sbindir@/fdetach ] ; then
@@ -247,9 +232,8 @@ prerm_kill_streams () { :
             fi
         done
     fi
-    lsof | grep '\<STR\>' >/dev/null 2>&1 && false
+    lsof | grep '\<STR\>' >/dev/null 2>&1 && false || true
 }
-
 prerm_kill () { :
     local reboot
     reboot='no'
@@ -267,7 +251,6 @@ prerm_kill () { :
     :
     return 0
 }
-
 prerm_kill_running () { :
     if [ ":@kversion@" = ":`uname -r`" ]; then
 	prerm_kill
@@ -275,7 +258,6 @@ prerm_kill_running () { :
     :
     return 0
 }
-
 #
 # At the end of the upgrade (when _this_package_ is upgraded from) we remove our
 # lines from the modules.conf file that we placed in them in the post scriptlet.
@@ -291,9 +273,9 @@ prerm_oldmods_upgrade () { :
 #	This groovy sed script just pulls out the first matching line and leaves
 #	the rest untouched.
         sed -e '
-\|^include[[:space:]].*@modutildir@/'"$base"'|!b
+\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|!b
 N
-s|^include[[:space:]].*@modutildir@/'"$base"'.*\
+s|^include[[:space:]].*'"@modutildir@"'/'"$base"'.*\
 ||
 : loop
 n
@@ -306,7 +288,6 @@ b loop' $conf_new > $conf_tmp
     :
     return 0
 }
-
 #
 # At the end of the upgrade (when _this_package_ is upgraded from) we remove our
 # lines from the modules or modprobe.preloads file that we placed in them in the
@@ -347,7 +328,6 @@ b loop' $prel_new > $prel_tmp
     :
     return 0
 }
-
 #
 # After going doing an upgrade we want to rebuild the netconfig database,
 # but only if the netconfig database was built by us or does not exist.
@@ -391,7 +371,6 @@ prerm_netconfig_upgrade () { :
     :
     return 0
 }
-
 #
 # After going doing an upgrade we want to rebuild the sock2path database.
 #
@@ -409,7 +388,6 @@ prerm_sock2path_upgrade () { :
     :
     return 0
 }
-
 prerm_initscripts_upgrade () { :
     # Upgrading, remove our init scripts if we can
     reverse=
@@ -430,15 +408,12 @@ prerm_initscripts_upgrade () { :
     :
     return 0
 }
-
 prerm_manrefs_upgrade () { :
     rm -f -- @mandir@/${manrefs}
 }
-
 prerm_manmacros_upgrade () { :
     rm -f -- @mandir@/${manmacros}
 }
-
 prerm_infofiles_upgrade () { :
     if [ -x /sbin/install-info ] ; then
 #	Older policies do not compress info files.
@@ -453,7 +428,6 @@ prerm_infofiles_upgrade () { :
         done
     fi
 }
-
 prerm_dev () { :
     if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
 	# ensure that old devices are removed
@@ -461,7 +435,6 @@ prerm_dev () { :
 	@sbindir@/@STRCONF_DEVICES@ --remove || :
     fi
 }
-
 prerm_dev_failed () { :
     if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
 	# ensure that old devices are put back
@@ -469,7 +442,6 @@ prerm_dev_failed () { :
 	@sbindir@/@STRCONF_DEVICES@ --create || :
     fi
 }
-
 #
 # If we are upgrading and the upgrade is for the running kernel, or we are installing new on the
 # running kernel, we have to worry about previous loaded modules for the old version or a non-deb
@@ -507,11 +479,9 @@ prerm_modules () {
     fi
     return 0
 }
-
 prerm_oldmods () {
     prerm_modules
 }
-
 prerm_preload () {
     prel_old="@preloads@"
     if [ -f $prel_old ] ; then
@@ -527,7 +497,6 @@ prerm_preload () {
 	rm -f -- $prel_new
     fi
 }
-
 prerm_modconf_remove () { :
     # When we are going away altogether we want to remove any lines whatsoever
     # from the modules.conf file.
@@ -536,7 +505,7 @@ prerm_modconf_remove () { :
         conf_tmp=$tmppath/modules.conf.tmp.$$
         conf_new=$tmppath/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
-        sed -e '\|^include[[:space:]].*@modutildir@/'"$base"'|d' $conf_new > $conf_tmp
+        sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
         mv -f -- $conf_tmp $conf_new
         chmod --reference=$conf_old $conf_new
         cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
@@ -544,7 +513,6 @@ prerm_modconf_remove () { :
     fi
     :
 }
-
 prerm_preloads_remove () { :
     case @kminor@ in
 	4) prel_old=@sysconfdir@/modules ;;
@@ -572,7 +540,6 @@ prerm_preloads_remove () { :
     fi
     :
 }
-
 prerm_modconf_upgrade () { :
     # At the end of the upgrade (when _this_package_ is upgraded from) we remove
     # our lines from the modules.conf file that we placed in them in the post
@@ -586,9 +553,9 @@ prerm_modconf_upgrade () { :
         # This groovy sed script just pulls out the first matching line and
         # leaves the rest untouched.
         sed -e '
-\|^include[[:space:]].*@modutildir@/'"$base"'|!b
+\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|!b
 N
-s|^include[[:space:]].*@modutildir@/'"$base"'.*\
+s|^include[[:space:]].*'"@modutildir@"'/'"$base"'.*\
 ||
 : loop
 n
@@ -600,7 +567,6 @@ b loop' $conf_new > $conf_tmp
     fi
     :
 }
-
 prerm_preloads_upgrade () { :
     case @kminor@ in
 	(4) prel_old=@sysconfdir@/modules ;;
@@ -638,7 +604,6 @@ b loop' $prel_new > $prel_tmp
     fi
     :
 }
-
 prerm_netconfig () { :
     # After going doing an upgrade we want to rebuild the netconfig database,
     # but only if the netconfig database was built by us or does not exist.
@@ -679,7 +644,6 @@ prerm_netconfig () { :
     fi
     :
 }
-
 prerm_sock2path () { :
     # After going doing an upgrade we want to rebuild the sock2path database.
     t=@sysconfdir@/sock2path
@@ -693,7 +657,6 @@ prerm_sock2path () { :
         fi
     done
 }
-
 prerm_initscripts () { :
     return
     # Upgrading, remove our init scripts if we can
@@ -714,25 +677,20 @@ prerm_initscripts () { :
     done
     :
 }
-
 prerm_manrefs () { :
     rm -f -- @mandir@/${manrefs}
 }
-
 prerm_manmacros () { :
     rm -f -- @mandir@/${manmacros}
 }
-
 # -----------------------------------------------------------------------------
 # Default functions:
 # -----------------------------------------------------------------------------
-
 remove_prerm () { :; }
 conflict_prerm () { :; }
 upgrade_prerm () { :; }
 failed_upgrade_prerm () { :; }
 deconfigure_prerm () { :; }
-
 # =============================================================================
 # @configure_input@
 # vim: ft=sh sw=4 noet

@@ -51,11 +51,8 @@
 # Last Modified $Date: 2008-05-04 16:16:42 $ by $Author: brian $
 #
 # =============================================================================
-
 subpkg=init
-
 @openss7_postinst@
-
 postinst_init () { :
     #
     # At this point we want to ensure that our lines are added to the modules.conf (if necessary)
@@ -67,42 +64,34 @@ postinst_init () { :
     # Note that init scripts are handled by debhelper additions to this script.
     #
 }
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # xxx-postinst configure
 configure_postinst () { :
     postinst_init
 }
-
 # xxx-postinst configure most-recently-configured-version
 reconfigure_postinst () { :
 }
-
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :
 }
-
 # old-prerm upgrade new-version ...FAILED
 # new-prerm failed-upgrade new-version ...FAILED
 # old-posinst abort-upgrade new-version
 abort_upgrade_postinst () { :
 }
-
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
 abort_remove_postinst () { :
 }
-
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst () { :
 }
-
 @mscript_postinst@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log: streams-init.postinst.in,v $

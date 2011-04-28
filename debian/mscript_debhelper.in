@@ -3,8 +3,6 @@
 # The following are debhelper script fragments under separate copyright:
 #
 # =============================================================================
-
 #DEBHELPER#
-
 # =============================================================================
 # vim: ft=sh sw=4 noet

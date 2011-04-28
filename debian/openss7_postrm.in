@@ -7,13 +7,11 @@
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
-
 @mscript_header@
-
+datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
-
 #
 # After we remove this repository package, we need to adjust whatever
 # definitions are required in configuration files.  When we changed them on
@@ -33,7 +31,6 @@ postrm_repo () { :
     :
     return 0
 }
-
 postrm_manpages () { :
     return
     #
@@ -46,18 +43,6 @@ postrm_manpages () { :
 	LANGUAGE= LANG= mandb -p ${mandir} || :
     fi
 }
-
-#
-# Whether complete removal or upgrade, do a load config.
-#
-postrm_lib () { :
-    if which ldconfig >/dev/null 2>&1; then
-	ldconfig
-    fi
-    :
-    return 0
-}
-
 remove_depends() {
     local modrex depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
@@ -70,7 +55,6 @@ remove_depends() {
     fi
     return 0
 }
-
 postrm_depmod () { :
     if [ ":@kversion@" = ":`uname -r`" ]; then
 #	This is a running kernel, do a depmod on the modules directory for.
@@ -88,7 +72,6 @@ postrm_depmod () { :
     :
     return 0
 }
-
 #
 # Stop init scripts when they are still hanging around.
 #
@@ -106,7 +89,6 @@ postrm_stop_scripts () { :
     :
     return 0
 }
-
 postrm_kill_strace () { :
     if [ -r /var/run/strace.pid ] ; then
         kill -TERM `cat /var/run/strace.pid` || :
@@ -117,7 +99,6 @@ postrm_kill_strace () { :
     :
     return 0
 }
-
 postrm_kill_strerr () { :
     if [ -r /var/run/strerr.pid ] ; then
         kill -TERM `cat /var/run/strerr.pid` || :
@@ -128,7 +109,6 @@ postrm_kill_strerr () { :
     :
     return 0
 }
-
 postrm_rmnods () { :
     if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
 	echo "${package}: removing old devices."
@@ -136,7 +116,6 @@ postrm_rmnods () { :
     fi
     return 0
 }
-
 postrm_kill_streams () { :
     if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
         if [ -x @sbindir@/fdetach ] ; then
@@ -159,8 +138,6 @@ postrm_kill_streams () { :
     fi
     lsof | grep '\<STR\>' >/dev/null 2>&1 && false
 }
-
-
 postrm_modules () { :
     local reboot
     reboot='no'
@@ -178,7 +155,6 @@ postrm_modules () { :
     :
     return 0
 }
-
 postrm_modules_running () { :
     if [ ":@kversion@" = ":`uname -r`" ]; then
 	postrm_modules
@@ -186,7 +162,6 @@ postrm_modules_running () { :
     :
     return 0
 }
-
 postrm_symvers () { :
     f="symsets-@kversion@.tar.gz"
     d="/lib/modules/@kversion@/build"
@@ -196,65 +171,6 @@ postrm_symvers () { :
         rm -f -- /boot/$f || :
     fi
 }
-
-#
-# Complete removal or upgrade: do a load config.
-#
-postrm_jnilibs () { :
-    if which ldconfig >/dev/null 2>&1; then
-	ldconfig || :
-    fi
-    return 0
-}
-
-#
-# Complete removal or upgrade: do nothing.
-#
-postrm_gcjlibs () { :
-}
-
-#
-# Complete removal or upgrade: rebuild classmap database.
-#
-postrm_gcjmaps () { :
-    if [ -x /usr/bin/rebuild-gcj-db ] ; then
-        /usr/bin/rebuild-gcj-db
-    else
-#	basically what rebuild-gcj-db does
-        for base in /usr/lib* ; do
-            db=`/usr/bin/gcj-dbtool -p $base`
-            d=$base/gcj
-            test -d $d || continue
-            dirname $db | xargs mkdir -p
-            /usr/bin/gcj-dbtool -n $db.tmp 64
-            find $d -follow -name '*.db' -print0 | \
-                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
-            /bin/mv -f $db.tmp $db
-        done
-    fi
-    :
-    return 0
-}
-
-#
-# Complete removal or upgrade: relink the jar files.
-#
-postrm_jarfiles () { :
-    if [ -x /usr/bin/rebuild-jar-repository ] ; then
-        /usr/bin/rebuild-jar-repository @javadir@ || :
-    fi
-    return 0
-}
-
-postrm_java () { :
-    postrm_jnilibs  || :
-    postrm_gcjlibs  || :
-    postrm_gcjmaps  || :
-    postrm_jarfiles || :
-    return 0
-}
-
-
 postrm_modconf () {
     local last_core_package='yes'
     for file in /lib/modules/*/modules.$base ; do
@@ -267,7 +183,7 @@ postrm_modconf () {
 	return 0
     fi
     conf_old=@sysconfdir@/modules.conf
-    if grep -q 'include[^#]*@modutildir@/'$base $conf_old ; then
+    if grep -q 'include[^#]*'"@modutildir@"'/'$base $conf_old ; then
 	conf_tmp=$tmppath/modules.conf.tmp.$$
 	sed -e "/include[^#]*\/$base/d" $conf_old > $conf_tmp
 	chmod --reference=$conf_old $conf_tmp
@@ -276,7 +192,6 @@ postrm_modconf () {
     fi
     rm -f -- "@modutildir@/$base"
 }
-
 postrm_preload () {
     prel_old="@preloads@"
     if [ -f $prel_old ] ; then
@@ -292,7 +207,6 @@ postrm_preload () {
 	rm -f -- $prel_new
     fi
 }
-
 postrm_depmod () {
     if [ ":@kversion@" = ":`uname -r`" ] ; then
 #	this is a running kernel, do a /sbin/depmod on the modules directory for
@@ -303,7 +217,6 @@ postrm_depmod () {
 	/sbin/depmod -ae -F @ksysmap@ @kversion@
     fi
 }
-
 postrm_update () { :
     local retval=0
     if [ -x @sbindir@/openss7-modules ]; then
@@ -311,21 +224,17 @@ postrm_update () { :
     fi
     return $retval
 }
-
 postrm_kernel () { :
     postrm_update
 }
-
 postrm_core () { :
     @WITH_KO_MODULES_FALSE@postrm_modconf
     postrm_preload
     postrm_depmod
 }
-
 # -----------------------------------------------------------------------------
 # Default functions:
 # -----------------------------------------------------------------------------
-
 remove_postrm () { :; }
 purge_postrm () { :; }
 upgrade_postrm () { :; }
@@ -333,7 +242,6 @@ failed_upgrade_postrm () { :; }
 abort_install_postrm () { :; }
 abort_upgrade_postrm () { :; }
 disappear_postrm () { :; }
-
 # =============================================================================
 # @configure_input@
 # vim: ft=sh sw=4 noet

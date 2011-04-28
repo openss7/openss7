@@ -51,48 +51,87 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-
 subpkg=java
-
 @openss7_postrm@
-
+postrm_jnilibs () { :
+    if which ldconfig >/dev/null 2>&1; then
+	ldconfig || :
+    fi
+    return 0
+}
+postrm_gcjlibs () { :
+}
+postrm_gcjmaps () { :
+    if [ -x /usr/bin/rebuild-gcj-db ] ; then
+        /usr/bin/rebuild-gcj-db
+    else
+#	basically what rebuild-gcj-db does
+        for base in /usr/lib* ; do
+            db=`/usr/bin/gcj-dbtool -p $base`
+            d=$base/gcj
+            test -d $d || continue
+            dirname $db | xargs mkdir -p
+            /usr/bin/gcj-dbtool -n $db.tmp 64
+            find $d -follow -name '*.db' -print0 | \
+                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
+            /bin/mv -f $db.tmp $db
+        done
+    fi
+    :
+    return 0
+}
+postrm_jarfiles () { :
+    if [ -x /usr/bin/rebuild-jar-repository ] ; then
+        /usr/bin/rebuild-jar-repository @javadir@ || :
+    fi
+    return 0
+}
+postrm_java () { :
+    postrm_jnilibs  || :
+    postrm_gcjlibs  || :
+    postrm_gcjmaps  || :
+    postrm_jarfiles || :
+    return 0
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # remove-postrm remove
 remove_postrm () { :
+    postrm_java	|| :
 }
-
 # remove-postrm purge
 purge_postrm () { :
+    postrm_java	|| :
 }
-
 # old-postrm upgrade new-version
 upgrade_postrm () { :
+    postrm_java	|| :
 }
-
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version
 failed_upgrade_postrm () { :
+    postrm_java	|| :
 }
-
 # new-preinst install [old-version] ...FAILED
 # new-postrm abort-install [old-version]
 abort_install_postrm () { :
+    postrm_java	|| :
 }
-
 # new-preinst upgrade old-version ...FAILED
 # new-postrm abort-upgrade old-version
 abort_upgrade_postrm () { :
+    postrm_java	|| :
 }
-
 # dis-postrm disappear overwriter overwriter-version
 disappear_postrm () { :
+    postrm_java	|| :
 }
-
 @mscript_postrm@
-
+@mscript_debhelper@
+#if [ "$1" = "remove" ]; then
+#    ldconfig
+#fi
 # =============================================================================
 #
 # $Log$

@@ -7,13 +7,11 @@
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
-
 @mscript_header@
-
+datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
-
 preinst_repo () { :
     local d
     d="@sysconfdir@/apt/sources.list.d"
@@ -62,8 +60,6 @@ preinst_repo () { :
     ) || return 1
     return 0
 }
-
-
 #
 # Old non-deb distro puts some man pages in the wrong place, clean them out on a
 # fresh install.
@@ -86,7 +82,6 @@ preinst_manpages () { :
     :
     return 0
 }
-
 #
 # Move old source tree out of the way.
 #
@@ -99,7 +94,6 @@ preinst_source () { :
 	fi
     done
 }
-
 #
 # Remove old symbolic link.
 #
@@ -112,49 +106,6 @@ preinst_rmlink () { :
 	fi
     done
 }
-
-#
-# Unfortunately, non-autoconf releases of LiS placed libraries all over the
-# place.  On an initial installation, this checks for other libraries with the
-# same name and deletes them.  This is only done on a fresh install.
-#
-preinst_libraries () { :
-    local old_libs
-    for lib in $libraries ; do
-        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
-        if [ -n "$old_libs" ] ; then
-#
-#	    Old libraries hanging around, delete them.
-#
-            echo "$script: warning: Deleting old non-deb libraries $old_libs" >&2
-            rm -f $old_libs
-        fi
-    done
-    return 0
-}
-
-#
-# On a fresh install, look for and remove old non-deb tools.
-#
-preinst_tools () { :
-    local tool location
-    for tool in $tools ; do
-        location="`which $tool 2>/dev/null`"
-        while [ -n "$location" -a -x "$location" ] ; do
-	    echo "$script: warning: Deleting old non-deb tool $location" >&2
-            eval "rm -f -- $location"
-            location="`which $tool 2>/dev/null`"
-            while [ -n "$location" -a -x "$location" ] ; do
-		echo "$script: warning: Deleting old non-deb tool $location" >&2
-                eval "rm -f -- $location"
-                location="`which $tool 2>/dev/null`"
-            done
-        done
-    done
-    :
-    return 0
-}
-
 #
 # A little recursive function to delete all modules dependent on an initial
 # module set (in our case "streams.o").  The function echos the list of modules
@@ -181,7 +132,6 @@ remove_depends () {
     fi
     return 0
 }
-
 preinst_kernel_modules () { :
 #
 #   This is a fresh install of this version of kernel module.  Make sure that
@@ -238,7 +188,6 @@ preinst_kernel_modules () { :
     :
     return 0
 }
-
 #
 # FIXME: there is a way in debian to indicate that a reboot is required (use it)
 #
@@ -276,7 +225,6 @@ preinst_kernel_running () {
     fi
     :
 }
-
 #
 # For a fresh installation make sure that there are no entries from an non-deb
 # installation in the moduels directories nor in the modules.conf file that will
@@ -328,7 +276,7 @@ preinst_oldmods () { :
 #
 	    if [ -f @modutildir@/$suffix ] ; then
 		rm -f -- @modutildir@/$suffix
-		sed -e '\|^include[[:space:]].*@modutildir@/'$suffix'|d' $conf_new > $conf_tmp
+		sed -e '\|^include[[:space:]].*'"@modutildir@"'/'$suffix'|d' $conf_new > $conf_tmp
 		mv -f -- $conf_tmp $conf_new
 	    fi
 	done
@@ -339,7 +287,6 @@ preinst_oldmods () { :
     :
     return 0
 }
-
 #
 # This is an initial installation of the init subpackage.  We need to check for non-deb
 # installations on the host and remove any entries that might later conflict with our entries.  We
@@ -424,7 +371,7 @@ preinst_init () { :
 #
 		if [ -f @modutildir@/$suffix ] ; then
 		    rm -f -- @modutildir@/$suffix
-		    sed -e '\|^include[[:space:]].*@modutildir@/'$suffix'|d' $conf_new > $conf_tmp
+		    sed -e '\|^include[[:space:]].*'"@modutildir@"'/'$suffix'|d' $conf_new > $conf_tmp
 		    mv -f -- $conf_tmp $conf_new
 		fi
 	    done
@@ -467,7 +414,6 @@ preinst_init () { :
 	done
     fi
 }
-
 preinst_manmacros () { :
     if [ -r @mandir@/$base.macros ] ; then
 	echo "$script: warning: Deleting manual macros file @mandir@/$base.macros" >&2
@@ -476,7 +422,6 @@ preinst_manmacros () { :
     :
     return 0
 }
-
 preinst_manrefs () { :
     if [ -r @mandir@/$base.refs ]; then
 	echo "$script: warning: Deleting manual references file @mandir@/$base.refs" >&2
@@ -485,7 +430,6 @@ preinst_manrefs () { :
     :
     return 0
 }
-
 preinst_dev () { :
     if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
 	# ensure that devices were removed
@@ -495,7 +439,6 @@ preinst_dev () { :
     :
     return 0
 }
-
 remove_warn_file () {
     if [ -f "$1" ] ; then
 	echo "$script: warning: removing old file $1" >&2
@@ -525,7 +468,6 @@ remove_warn_dirs () {
 	remove_warn_dir $d
     done
 }
-
 #
 # This is an initial installation of the doc subpackage.  We need to check for
 # non-deb installations on the host and remove any info entries that might later
@@ -571,7 +513,6 @@ remove_warn_old () { :
 	    $d/sctp
     done
 }
-
 #
 # On an initial installation of the package, we need to check for non-deb
 # installations on the host and remove any entries that might later conflict
@@ -600,7 +541,6 @@ preinst_preloads () {
         rm -f -- $prel_new
     fi
 }
-
 #
 # Fresh install, go looking for non-deb initscripts and remove them.
 #
@@ -616,7 +556,6 @@ preinst_initscripts () {
 	fi
     done
 }
-
 #
 # Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen to
 # install their modconf files in a similar fashion to ours and in a similar
@@ -630,7 +569,6 @@ preinst_modconf () {
 	rm -f -- @kmoduledir@/modules.$ext
     done
 }
-
 #
 # Unfortunately recent non-autoconf/dpkg releases of LiS have chosen to install
 # their kernel modules in locations mimicing our releases, so this
@@ -648,7 +586,6 @@ preinst_rmmod () { :
     done
     return 0
 }
-
 #
 # This is our chance to check that an old-prerm upgrade scriplet did at least
 # somewhat what it was supposed to do.  This is not as extensive as the non-deb
@@ -695,55 +632,13 @@ preinst_shutdown () { :
     fi
     return 0
 }
-
-#
-# On fresh install: look for non-deb libraries and remove them.
-#
-preinst_jnilibs () { :
-    libs="$jnilibs"; for lib in $libs; do
-        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
-        if [ -n "$old_libs" ] ; then
-#
-#	    Old libraries hanging around, delete them.
-#
-            echo "$script: warning: Deleting old non-rpm libraries $old_libs" >&2
-            rm -f $old_libs
-        fi
-    done
-    :
-    return 0
-}
-
-#
-# On fresh install: look for non-deb libraries and remove them.
-#
-preinst_gcjlibs () { :
-#   FIXME: write this function
-}
-
-#
-# On fresh install: look for non-deb libraries and remove them.
-#
-preinst_gcjmaps () { :
-#   FIXME: write this function
-}
-
-#
-# On fresh install: look for non-deb libraries and remove them.
-#
-preinst_jarfiles () { :
-#   FIXME: write this function
-}
-
 # -----------------------------------------------------------------------------
 # Default functions:
 # -----------------------------------------------------------------------------
-
 install_preinst () { :; }
 reinstall_preinst () { :; }
 upgrade_preinst () { :; }
 abort_upgrade_preinst () { :; }
-
 # =============================================================================
 # @configure_input@
 # vim: ft=sh sw=4 noet

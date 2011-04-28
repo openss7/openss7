@@ -51,46 +51,36 @@
 # Last Modified $Date: 2008-08-11 22:24:26 $ by $Author: brian $
 #
 # =============================================================================
-
 subpkg=source
-
 @openss7_preinst@
-
 preinst_source_install () { :
     preinst_source
     preinst_rmlink
 }
-
 preinst_source_upgrade () { :
     preinst_rmlink
 }
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # new-preinst install
 install_preinst () { :
     preinst_source_install
 }
-
 # new-preinst install old-version
 reinstall_preinst () { :
 }
-
 # new-preinst upgrade old-version
 upgrade_preinst () { :
     preinst_source_upgrade
 }
-
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
 @mscript_preinst@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log: streams-source.preinst.in,v $

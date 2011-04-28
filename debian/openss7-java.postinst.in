@@ -51,45 +51,86 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-
 subpkg=java
-
 @openss7_postinst@
-
+postinst_jnilibs () { :
+    if which ldconfig >/dev/null 2>&1 ; then
+	ldconfig
+    fi
+    :
+    return 0
+}
+postinst_gcjlibs () { :
+    return 0
+}
+postinst_gcjmaps () { :
+    if [ -x /usr/bin/rebuild-gcj-db ] ; then
+        /usr/bin/rebuild-gcj-db
+    else
+        # basically what rebuild-gcj-db does
+        for base in /usr/lib* ; do
+            db=`/usr/bin/gcj-dbtool -p $base`
+            d=$base/gcj
+            test -d $d || continue
+            dirname $db | xargs mkdir -p
+            /usr/bin/gcj-dbtool -n $db.tmp 64
+            find $d -follow -name '*.db' -print0 | \
+                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
+            /bin/mv -f $db.tmp $db
+        done
+    fi
+    :
+    return 0
+}
+postinst_jarfiles () { :
+    if [ -x /usr/bin/rebuild-jar-repository ] ; then
+        /usr/bin/rebuild-jar-repository @javadir@
+    fi
+    :
+    return 0
+}
+postinst_java () { :
+    postinst_jnilibs	|| :
+    postinst_gcjlibs	|| :
+    postinst_gcjmaps	|| :
+    postinst_jarfiles	|| :
+    return 0
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # xxx-postinst configure
 configure_postinst () { :
+    postinst_java   || :
 }
-
 # xxx-postinst configure most-recently-configured-version
 reconfigure_postinst () { :
+    postinst_java   || :
 }
-
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :
 }
-
 # old-prerm upgrade new-version ...FAILED
 # new-prerm failed-upgrade new-version ...FAILED
 # old-posinst abort-upgrade new-version
 abort_upgrade_postinst () { :
+    postinst_java   || :
 }
-
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
 abort_remove_postinst () { :
+    postinst_java   || :
 }
-
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst () { :
+    postinst_java   || :
 }
-
 @mscript_postinst@
-
+@mscript_debhelper@
+#if [ "$1" = "configure" ]; then
+#    ldconfig
+#fi
 # =============================================================================
 #
 # $Log$

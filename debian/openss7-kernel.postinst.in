@@ -51,55 +51,317 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-
 subpkg=kernel
-
 @openss7_postinst@
-
-postinst_kernel () { :
-    postinst_updates
+#
+# For old modules we need to do a depmod.
+#
+postinst_depmod () { :
+    if which depmod >/dev/null 2>&1; then
+	if [ ":@kversion@" = ":`uname -r`" ] ; then
+	    # This is a running kernel, do a depmod on the modules directory for the
+	    # running kernel.
+	    if [ -r @ksysmap@ ] ; then
+		depmod -ae -F @ksysmap@ 2>&1 || :
+	    else
+		depmod -ae 2>&1 || :
+	    fi
+	elif [ -r @ksysmap@ ] ; then
+	    # Non-running kernels a depmod will be performed on boot by depmod
+	    # anyway, but try one now.
+	    UNAME_MACHINE=@target_cpu@ \
+	    depmod -ae -F @ksysmap@ @kversion@ 2>&1 || :
+	fi
+    fi
+    return 0
 }
-
+#
+# For old modules, start init scripts when they have already been installed and
+# are normally started in the current runlevel.  Note that if init scripts are
+# started and they are already running, they will not affect anything until
+# reboot.
+#
+postinst_startscripts () { :
+    local r list i
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    r=`runlevel | awk '{print$2}'`
+    list="${initfiles}" ; for i in $list ; do
+        if [ -f @initrddir@/$i ] ; then
+            if [ -L @initrddir@/../rc${r}.d/S[0-9][0-9]$i -o \
+                 -L @initrddir@/rc${r}.d/S[0-9][0-9]$i ] ; then
+                 /sbin/service $i start >/dev/null 2>&1 || \
+		     @initrddir@/$i start >/dev/null 2>&1 || :
+            fi
+        fi
+    done
+    return 0
+}
+#
+# The openss7-modules script will return a bitwise OR (sum) of the following
+# values:
+#
+#   0 - Everything proceeded according to plan.
+#
+#   1 - When set, an error occured.  When unset, no errors were issued.
+#
+#   2 - When set, a syntax error occurred.  When unset, no syntax errors
+#       occured.
+#
+#   4 - When set, the running kernel would be affected and the running kernel
+#       has kallsyms that are different addresses than System.map.   Kernel
+#       modules have been linked against the running kernel, no depmod has been
+#       performed, and the script has touched /.openss7-update-@krunning@ to
+#       signal the init scripts that a relink on shutdown or reboot is required.
+#       When unset, the running kernel /proc/kallsyms and System.map-@krunning@
+#       are consistent.
+#
+#   8 - When set, the running kernel has the STREAMS subsystem running and
+#       outdated kernel modules are loaded.  Kernel modules have been linked
+#       against the running kernel, no depmod has been performed, and the script
+#       has touched /.openss7-update-@krunning@ to signal the init scripts that
+#       a relink on shutdown or reboot is required.  When unset, the STREAMS
+#       subsystem is stopped and has no kernel modules loaded.
+#
+#  16 - When set, the running kernel would have weak-update links changed, but
+#       have not yet been altered.  No depmod has been performed, and the script
+#       has touched /.openss7-update-@krunning@ to signal the init scripts that
+#       a relink on shutdown or reboot is required.  When unset, weak-update
+#       links have been altered and the STREAMS subsystem is stopped.
+#
+# 128 - When set, a warning occurred.  When unset, no warnings were issued.
+#
+postinst_updates () { :
+    [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
+    local retval
+    retval=0
+    if [ -x @sbindir@/$name-modules ] ; then
+	@sbindir@/$name-modules -- -q -e --add-modules @kversion@ || retval=$?
+    fi
+    if [ $retval -ge 128 ]
+    then : # a warning occurred
+	retval=`expr $retval - 128`
+    else : # no warnings occurred
+    fi
+    if [ $retval -ge 8 ]
+    then : # outdated kernel modules loaded
+	retval=`expr $retval - 8`
+    else : # no kernel modules loaded
+    fi
+    if [ $retval -ge 4 ]
+    then : # running kernel mismatch
+	retval=`expr $retval - 4`
+    else : # running kernel consistent
+    fi
+    if [ $retval -ge 2 ]
+    then : # a syntax error occurred
+	retval=`expr $retval - 2`
+    fi
+    if [ $retval -ge 1 ]
+    then : # an error occurred
+	retval=`expr $retval - 1`
+    fi
+    if [ $retval -ne 0 ]
+    then : # invalid return code
+    fi
+    :
+    return 0
+}
+#   new-preinst install
+#	- files are unpacked
+#	- file list added
+#	- scripts added
+#	- "Unpacked" state
+#   new-postinst configure
+#
+# This is a fresh installation of the package for @kversion@.  Either the
+# package has never been installed before, or a purge was performed on the
+# package after it was removed (unlikely, but possible).  Actions that need to
+# be performed are as follows:
+#
+# The preinst script will:
+#
+# 1.  Seek out and remove any non-deb or old LiS installations.
+# 2.  Remove any weak links by calling openss7-update --remove-kernel @kversion@
+# 3.  Perform a depmod so that no attempt is made to load the kernel modules
+#     that are about to be installed.  Note that this may result in an error
+#     because client modules may be present.
+# 4.  Do not stop any running subsystems regardless of whether @kversion@ is the
+#     running kernel.
+# 5.  Touch /.openss7-update-@kversion@ to indicate to init scripts that
+#     openss7-update --boot-kernel @kversion@ should be run on reboot.
+#
+# The postinst script will:
+#
+# 1.  Relink installed kernel modules for the running kernel if required.  This
+#     is performed with openss7-update --add-modules @kversion@.
+# 2.  Perform a weak update using openss7-update --add-modules @kversion@.  Note
+#     that this will not affect the running kernel when @kversion@ is other than
+#     the running kernel.
+# 3.  Perform a depmod so that kernel module dependencies are proper. (This will
+#     be performed by openss7-update.)
+# 4.  Can start init scripts for the running kernel if desired and they are not
+#     already running.  The user can be prompted using debconf.  However, it is
+#     best to leave them in their previous state by default.
+# 5.  If init scripts are running or kernel modules are loaded and the
+#     installation is for the running kernel, warn the user that a restart of
+#     the STREAMS subsystems is recommended.  The user can be prompted using
+#     debconf.  However, it is best to leave them in their previous state by
+#     default.
+#
+# Note that if the package is not configured, kernel modules will be installed
+# in the directories; however, they will not be included in the depmod files and
+# therefore will not load.  If the kernel should be rebooted a depmod on reboot
+# will include these modules, however, the postinst actions will be performed by
+# the init scripts on shutdown and reboot if necessary (as signalled by the
+# presence of the /.openss7-update-@kversion@ file) and modules will be properly
+# linked either before or after reboot and depmod performed again when necessary
+# before the init scripts attempt to start the subsystem.
+#
+postinst_kernel_configure () { :
+@WITH_KO_MODULES_TRUE@    postinst_updates || true
+@WITH_KO_MODULES_FALSE@    postinst_depmod || true
+@WITH_KO_MODULES_FALSE@    postinst_startscripts || true
+}
+#   new-preinst install old-version
+#	- files are unpacked
+#	- file list added
+#	- scripts added
+#	- "Unpacked" state
+#   new-postinst configure most-recently-configured-version
+#
+# This is a reinstallation of the package for @kversion@.  A version of the
+# package (old-version) has been installed before.  Actions that need to be
+# performed are the same as for a fresh install; however, there is no need to
+# seek out non-deb or LiS installations are remove them because this would have
+# been performed on the previous fresh install.
+#
+postinst_kernel_reconfigure () { :
+@WITH_KO_MODULES_TRUE@    postinst_updates || true
+@WITH_KO_MODULES_FALSE@    postinst_depmod || true
+@WITH_KO_MODULES_FALSE@    postinst_startscripts || true
+}
+#   old-prerm upgrade new-version
+#   new-preinst upgrade old-version
+#	- files are unpacked, backups of old files
+#   old-postrm upgrade new-version
+#	- old files not in new version are removed
+#	- new files list replaces old
+#	- new scripts replace old
+#	- backup files are deleted
+#	- "Unpacked" state
+#   new-postinst configure [most-recently-configured-version]
+#
+# This is an upgrade of the package for @kversion@.  An older version of the
+# package is installed.  Actions that need to be performed are as follows:
+#
+# The prerm script will:
+#
+# 1.  Remove any weak links to the modules that are about to be removed (for
+#     kernels other than @kversion@) by calling openss7-update --remove-modules
+#     @kversion@.  This may as last step remove the modules themselves.  The
+#     openss7-update script can be passed the EVR of the modules so that they
+#     may be identified by their srcversion.
+# 2.  If the running kernel was linked to the modules being removed, those
+#     symbolic links must be removed and a depmod performed so that the running
+#     kernel will not attempt to load any modules that are about to be
+#     installed.  Note that this may result in an error because client modules
+#     may be present.
+# 3.  Do not stop any running subsystems regardless of whether @kversion@ is the
+#     running kernel.
+#
+# The preinst script will:
+#
+# 1.  Remove any weak links by calling openss7-update --remove-kernel
+#     @kversion@.
+# 2.  Perform a depmod so that no attempt is made to load the kernel modules
+#     that are about to be installed.  Note that this may result in an error
+#     because client modules may be present.
+# 3.  Do not stop any running subsystems regardless of whether @kversion@ is the
+#     running kernel.
+# 4.  Touch /.openss7-update-@kversion@ to indicate to init scripts that
+#     openss7-update --boot-kernel @kversion@ should be run on reboot.
+#
+# The postrm script will:
+#
+# 1.  Do nothing.  The new modules could be relinked at this stage, but it is
+#     not wise to use scripts is a questionable state to relink newer version
+#     modules.
+#
+# The postinst script will:
+#
+# 1.  Relink installed kernel modules for the running kernel if required.  This
+#     is performed with openss7-update --add-modules @kversion@.
+# 2.  Perform a weak update using openss7-update --add-modules @kversion@.  Note
+#     that this will not affect the running kernel when @kversion@ is other than
+#     the running kernel.
+# 3.  Perform a depmod so that kernel module dependencies are proper. (This will
+#     be performed by openss7-update.)
+# 4.  Can start init scripts for the running kernel if desired and they are not
+#     already running.  The user can be prompted using debconf.  However, it is
+#     best to leave them in their previous state by default.
+# 5.  If init scripts are running or kernel modules are loaded and the
+#     installation is for the running kernel, warn the user that a restart of
+#     the STREAMS subsystems is recommended.  The user can be prompted using
+#     debconf.  However, it is best to leave them in their previous state by
+#     default.
+#
+# Note that if the package is not configured, kernel modules will be installed
+# in the directories; however, they will not be included in the depmod files and
+# therefore will not load.  If the kernel should be rebooted a depmod on reboot
+# will include these modules, however, the postinst actions will be performed by
+# the init scripts on shutdown and reboot if necessary (as signalled by the
+# presence of the /.openss7-update-@kversion@ file) and modules will be properly
+# linked either before or after reboot and depmod performed again when necessary
+# before the init scripts attempt to start the subsystem.
+#
+postinst_kernel () { :
+@WITH_KO_MODULES_TRUE@    postinst_updates || :
+@WITH_KO_MODULES_FALSE@    postinst_depmod || :
+@WITH_KO_MODULES_FALSE@    postinst_startscripts || :
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # xxx-postinst configure
 configure_postinst () { :
-    postinst_kernel
+    postinst_kernel_configure
 }
-
 # xxx-postinst configure most-recently-configured-version
 reconfigure_postinst () { :
-    postinst_kernel
+    postinst_kernel_reconfigure
 }
-
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :
     postinst_kernel
 }
-
 # old-prerm upgrade new-version ...FAILED
 # new-prerm failed-upgrade new-version ...FAILED
 # old-posinst abort-upgrade new-version
 abort_upgrade_postinst () { :
     postinst_kernel
 }
-
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
 abort_remove_postinst () { :
     postinst_kernel
 }
-
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ..FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst () { :
     postinst_kernel
 }
-
 @mscript_postinst@
-
+#
+# For weak updates we cannot invoke the debian helper script because it will do
+# an inopportune depmod on "configure".
+#
+if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
+@mscript_debhelper@
+#if [ "$1" = "configure" ]; then
+#    if [ -e @ksysmap@ ]; then
+#	depmod -a -F @ksysmap@ @kversion@ || true
+#    fi
+#fi
 # =============================================================================
 #
 # $Log$
