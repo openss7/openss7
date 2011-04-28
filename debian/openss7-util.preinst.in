@@ -51,41 +51,32 @@
 # Last Modified $Date: 2008-04-28 10:30:21 $ by $Author: brian $
 #
 # =============================================================================
-
 subpkg=util
-
 @openss7_preinst@
-
 preinst_util () { :
     preinst_tools
     preinst_manpages
 }
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # new-preinst install
 install_preinst () { :
     preinst_util
 }
-
 # new-preinst install old-version
 reinstall_preinst () { :
 }
-
 # new-preinst upgrade old-version
 upgrade_preinst () { :
 }
-
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
 @mscript_preinst@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log: streams-util.preinst.in,v $

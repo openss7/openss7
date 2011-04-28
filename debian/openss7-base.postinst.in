@@ -51,11 +51,106 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-
 subpkg=base
-
 @openss7_postinst@
-
+#
+# postinst_modconf() - Ensure that include line is added to the module.conf
+#   file for old 2.4 module systems.  This must remove lines before including
+#   them because it may also be run from reconfigure.
+#
+postinst_modconf () { :
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    conf_old=@sysconfdir@/modules.conf
+    if [ -f $conf_old ] ; then
+        conf_tmp=$tmppath/modules.conf.tmp.$$
+        conf_new=$tmppath/modules.conf.new.$$
+        cp -f -- $conf_old $conf_new
+        sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
+        mv -f -- $conf_tmp $conf_new
+        chmod --reference=$conf_old $conf_new
+        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
+        rm -f -- $conf_new
+    fi
+    :
+}
+#
+# postinst_netconfig() - Rebuild the netconfig database, but only if it was
+#   built by us or does not exist.  This is indempotent and can be called from
+#   configure or reconfigure.
+#
+postinst_netconfig () { :
+    t=@sysconfdir@/netconfig
+    a="${t}.xnsl"
+    d="${t}.d"
+    if [ -f $t ] ; then
+        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+            t="${a}"
+        fi
+    fi
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    files="$d/*"
+    if [ -d $d ]; then
+	for f in $files ; do
+	    if [ -f $f -a $f = "$d/strnsl" ] ; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+		esac
+	    fi
+	done
+	for f in $files ; do
+	    if [ -f $f -a $f != "$d/strnsl" ] ; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+		esac
+	    fi
+	done
+    fi
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
+    fi
+    :
+}
+#
+# postinst_sock2path() - Rebuild the sock2path database.  This is indempotent
+#   and can be called from configure or reconfigure.
+#
+postinst_sock2path () { :
+    local t f empty='yes'
+    t=@sysconfdir@/sock2path
+    cp -f -b --suffix=.dpkg-save -- /dev/null $t
+    if [ -d ${t}.d ]; then
+	for f in "${t}.d/*"; do
+	    if [ -f $f ]; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t; empty='no' ;;
+		esac
+	    fi
+	done
+    fi
+    if [ "$empty" = 'yes' ]; then
+	rm -f -- ${t} || :
+	rmdir --ignore-fail-on-non-empty -- ${t}.d || :
+    fi
+    :
+    return 0
+}
+postinst_base_reconfigure () { :
+    postinst_modconf
+    postinst_netconfig
+    postinst_sock2path
+}
+postinst_base_configure () { :
+    postinst_base_reconfigure
+}
 postinst_base () { :
     #
     # At this point we want to ensure that our lines are added to the modules.conf (if necessary)
@@ -69,47 +164,39 @@ postinst_base () { :
     postinst_manrefs
     postinst_manmacros
 }
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # xxx-postinst configure
 configure_postinst () { :
-    postinst_base
+    postinst_base_configure
 }
-
 # xxx-postinst configure most-recently-configured-version
 reconfigure_postinst () { :
-    postinst_base
+    postinst_base_reconfigure
 }
-
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :
     postinst_base
 }
-
 # old-prerm upgrade new-version ...FAILED
 # new-prerm failed-upgrade new-version ...FAILED
-# old-posinst abort-upgrade new-version
+# old-postinst abort-upgrade new-version
 abort_upgrade_postinst () { :
     postinst_base
 }
-
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
 abort_remove_postinst () { :
     postinst_base
 }
-
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst ()  { :
     postinst_base
 }
-
 @mscript_postinst@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log$

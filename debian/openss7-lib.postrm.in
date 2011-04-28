@@ -51,48 +51,82 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-
 subpkg=lib
-
-@openss7_postrm@
-
+@mscript_header@
+datarootdir=@datarootdir@
+#
+# postrm_libraries() - When complete removal, perform a ldconfig after the
+#   libraries have been removed to flush them from the ldconfig cache.  Note
+#   that this should not be done on upgrade, because building the ldconfig cache
+#   is up to the new-postinst "configure" stage or an appropriate trigger.
+#
+postrm_libraries () { :
+    if which ldconfig >/dev/null 2>&1; then
+	ldconfig
+    fi
+    :
+    return 0
+}
+#
+# postrm_tcllibs() - After removal or upgrade, the tcl module index files should
+#   be removed.  Note that after removal there are no tcl modules around and the
+#   directories can be removed as well.  For upgrade, however, the tcl modules
+#   still exist, but all index files for them can be removed.
+#
+postrm_tcllibs () { :
+    # FIXME: figure out which files to remove
+}
+#
+# postrm_lib_remove() - After a removal, do a ldconfig and remove the indexes
+#   for the tcl libraries and modules.
+#
+postrm_lib_remove () { :
+    postrm_libraries
+    postrm_tcllibs
+}
+#
+# postrm_lib_upgrade() - During an upgrade, we should probably remove our tcl
+#   modules index files because dpkg does not know about them.  The new-postinst
+#   "configure" will generate new index files for any tcl modules that were
+#   also in the new version.
+#
+postrm_lib_upgrade () { :
+    postrm_tcllibs
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # remove-postrm remove
 remove_postrm () { :
+    postrm_lib_remove
 }
-
 # remove-postrm purge
 purge_postrm () { :
 }
-
 # old-postrm upgrade new-version
 upgrade_postrm () { :
+    postrm_lib_upgrade
 }
-
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version
 failed_upgrade_postrm () { :
 }
-
 # new-preinst install [old-version] ...FAILED
 # new-postrm abort-install [old-version]
 abort_install_postrm () { :
 }
-
 # new-preinst upgrade old-version ...FAILED
 # new-postrm abort-upgrade old-version
 abort_upgrade_postrm () { :
 }
-
 # dis-postrm disappear overwriter overwriter-version
 disappear_postrm () { :
 }
-
 @mscript_postrm@
-
+@mscript_debhelper@
+#if [ "$1" = "remove" ]; then
+#    ldconfig
+#fi
 # =============================================================================
 #
 # $Log$

@@ -51,43 +51,67 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-
 subpkg=java
-
 @openss7_preinst@
-
-preinst_java_install () { :
+#
+# On fresh install: look for non-deb libraries and remove them.
+#
+preinst_jnilibs () { :
+    libs="$jnilibs"; for lib in $libs; do
+        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
+        if [ -n "$old_libs" ] ; then
+#	    Old libraries hanging around, delete them.
+            echo "$script: warning: Deleting old non-rpm libraries $old_libs" >&2
+            rm -f $old_libs
+        fi
+    done
+    :
+    return 0
+}
+#
+# On fresh install: look for non-deb libraries and remove them.
+#
+preinst_gcjlibs () { :
+#   FIXME: write this function
+}
+#
+# On fresh install: look for non-deb libraries and remove them.
+#
+preinst_gcjmaps () { :
+#   FIXME: write this function
+}
+#
+# On fresh install: look for non-deb libraries and remove them.
+#
+preinst_jarfiles () { :
+#   FIXME: write this function
+}
+preinst_java () { :
     preinst_jnilibs
     preinst_gcjlibs
     preinst_gcjmaps
     preinst_jarfiles
 }
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # new-preinst install
 install_preinst () { :
-    preinst_java_install || :
+    preinst_java    || :
 }
-
 # new-preinst install old-version
 reinstall_preinst () { :
 }
-
 # new-preinst upgrade old-version
 upgrade_preinst () { :
 }
-
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
 @mscript_preinst@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log$

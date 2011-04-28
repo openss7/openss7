@@ -51,11 +51,8 @@
 # Last Modified $Date: 2008-04-28 10:30:21 $ by $Author: brian $
 #
 # =============================================================================
-
 subpkg=doc
-
 @openss7_preinst@
-
 #
 # This is an initial installation of the doc subpackage.  We need to check for
 # non-deb installations on the host and remove any info entries that might later
@@ -72,32 +69,26 @@ preinst_doc_install () { :
     preinst_manmacros
     preinst_manrefs
 }
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # new-preinst install
 install_preinst () { :
     preinst_doc_install || :
 }
-
 # new-preinst install old-version
 reinstall_preinst () { :
 }
-
 # new-preinst upgrade old-version
 upgrade_preinst () { :
 }
-
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
 @mscript_preinst@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log: streams-doc.preinst.in,v $

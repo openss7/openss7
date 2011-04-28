@@ -55,7 +55,7 @@ javadocdir=@javadocdir@
 pkgjavadocdir=@javadocdir@/@PACKAGE@
 tcllibdir=@tcllibdir@
 tclsrcdir=@tclsrcdir@
-pkgtcllibdir="@libdir@/@PACKAGE_NAME@@PACKAGE_VERSION@"
+pkgtcllibdir="@tcllibdir@/@PACKAGE_NAME@@PACKAGE_VERSION@"
 perldir=@perldir@
 yumrepodir=@yumrepodir@
 yumplugdir="@libdir@/yum-plugins"
@@ -130,13 +130,14 @@ snmpmods=
 nonrpminit="strms_up strms_dn"
 mknods="@sbindir@/@STRCONF_DEVICES@"
 rmnods="@sbindir@/@STRCONF_DEVICES@ --remove"
+netconfig="${base}"
+sock2path="${base}"
 manrefs=$base.refs
 manmacros=$base.macros
 target_cpu="@target_cpu@"
 [ ":${subpkg:+'set'}" = ":set" ] || subpkg=
 package="@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_DEBRELEASE@)"
 script="${0##*/}"
-
 # @configure_input@
 # =============================================================================
 # vim: ft=sh sw=4 noet

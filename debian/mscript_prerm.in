@@ -7,15 +7,10 @@
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
-
 eval "echo '${package}: \"$@\"'" >&2
-
-operation="$1"
-shift
-
-case "$operation" in
+case "$1" in
     (remove) :
-	if [ $# -gt 0 -a  ":$1" = ':in-favour' ]
+	if [ $# -gt 1 -a  ":$2" = ':in-favour' ]
 	then : # conflict-prerm remove in-favour package new-version
 	    conflict_prerm "$@"
 	else : # remove-prerm remove
@@ -36,9 +31,6 @@ case "$operation" in
 	deconfigure_prerm "$@"
 	;;
 esac
-
-@mscript_debhelper@
-
 # =============================================================================
 # @configure_input@
 # vim: ft=sh sw=4 noet

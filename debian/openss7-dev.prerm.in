@@ -51,43 +51,34 @@
 # Last Modified $Date: 2008-04-28 11:46:32 $ by $Author: brian $
 #
 # =============================================================================
-
 subpkg=dev
-
 @openss7_prerm@
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # xxx-prerm remove
 remove_dev_prerm () { :
     prerm_dev
 }
-
 # con-prerm remove 'in-favour' package new-version
 conflict_dev_prerm () { :
     prerm_dev
 }
-
 # old-prerm upgrade new-version
 upgrade_dev_prerm () { :
     prerm_dev
 }
-
 # old-prerm upgrade new-version ***FAILED***
 # new-prerm failed-upgrade old-version
 failed_upgrade_dev_prerm () { :
     prerm_dev_failed
 }
-
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_dev_prerm () { :
     prerm_dev
 }
-
 @mscript_prerm@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log: streams-dev.prerm.in,v $

@@ -51,45 +51,35 @@
 # Last Modified $Date: 2008-05-04 16:16:42 $ by $Author: brian $
 #
 # =============================================================================
-
 subpkg=core
-
 @openss7_preinst@
-
 preinst_core_install () { :
     preinst_rmmod
 }
-
 preinst_core_upgrade () { :
     preinst_shutdown
 }
-
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-
 # new-preinst install
 install_preinst () { :
     preinst_core_install
 }
-
 # new-preinst install old-version
 reinstall_preinst () { :
 }
-
 # new-preinst upgrade old-version
 upgrade_preinst () { :
     preinst_core_upgrade
 }
-
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
 }
-
 @mscript_preinst@
-
+@mscript_debhelper@
 # =============================================================================
 #
 # $Log: streams-core.preinst.in,v $

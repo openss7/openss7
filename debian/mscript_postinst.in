@@ -7,16 +7,11 @@
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
-
 eval "echo '${package}: \"$@\"'" >&2
-
-operation="$1"
-shift
-
-case "$operation" in
+case "$1" in
     (configure) : # postinstallation configuration
 	# configure-postinst configure [most-recently-configured-version]
-	if [ $# -gt 0 ]
+	if [ $# -gt 1 ]
 	then
 	    reconfigure_postinst "$@"
 	else
@@ -43,9 +38,6 @@ case "$operation" in
 	abort_deconfigure_postinst "$@"
 	;;
 esac
-
-@mscript_debhelper@
-
 # =============================================================================
 # @configure_input@
 # vim: ft=sh sw=4 noet

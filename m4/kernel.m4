@@ -622,7 +622,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SUBDIR], [dnl
 	    fi
 	    if test -z "$linux_cv_k_subdir"
 	    then
-		linux_cv_k_subdir="$PACKAGE_LCNAME"
+		linux_cv_k_subdir="updates/$PACKAGE_LCNAME"
 	    fi
 	fi
     ])
