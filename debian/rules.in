@@ -94,6 +94,7 @@ control		+= debian/@PACKAGE@-repo.prerm
 
 control		+= debian/@PACKAGE@-repo.config
 
+sysconfdir	= @sysconfdir@
 aptsourceslistdir = ${sysconfdir}/apt/sources.list.d
 
 debian/@PACKAGE@-repo.config:
@@ -149,16 +150,10 @@ control		+= debian/@PACKAGE@-base.postinst \
 
 control		+= debian/@PACKAGE@-base.config
 
-sysconfdir	= @sysconfdir@
-snmpconfdir	= ${sysconfdir}/snmp
 configdir	= @configdir@
 
 debian/@PACKAGE@-base.config:
-	( [ ! -d '$(debtmpdir)$(snmpconfdir)'				] || find '$(debtmpdir)$(snmpconfdir)' \( -type f -o -type l \) ; \
-	  [ ! -d '$(debtmpdir)$(sysconfdir)'				] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
-	  [ ! -f '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@' ; \
-	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path'			] || echo '$(debtmpdir)$(sysconfdir)/sock2path' ; \
-	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
+	( [ ! -d '$(debtmpdir)$(sysconfdir)'				] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
 	  [ ! -d '$(debtmpdir)$(configdir)'				] || find '$(debtmpdir)$(configdir)' \( -type f -o -type l \) ; \
 	) | sort -u > $@
 
@@ -233,7 +228,19 @@ debian/@PACKAGE@-doc.manpages:
 
 control		+= debian/@PACKAGE@-lib.postinst \
 		   debian/@PACKAGE@-lib.postrm \
-		   debian/@PACKAGE@-lib.preinst
+		   debian/@PACKAGE@-lib.preinst \
+		   debian/@PACKAGE@-lib.prerm
+
+control		+= debian/@PACKAGE@-lib.config
+
+snmpconfdir	= ${sysconfdir}/snmp
+
+debian/@PACKAGE@-lib.config:
+	( [ ! -d '$(debtmpdir)$(snmpconfdir)'				] || find '$(debtmpdir)$(snmpconfdir)' \( -type f -o -type l \) ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path'			] || echo '$(debtmpdir)$(sysconfdir)/sock2path' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
+	) | sort -u > $@
 
 control		+= debian/@PACKAGE@-lib.install
 
@@ -338,14 +345,22 @@ debian/@PACKAGE@-debugsource.install:
 ##
 
 control		+= debian/@PACKAGE@-$(kversion).postinst \
+		   debian/@PACKAGE@-$(kversion).postrm \
 		   debian/@PACKAGE@-$(kversion).preinst \
 		   debian/@PACKAGE@-$(kversion).prerm
 
-debian/@PACKAGE@-$(kversion).postinst: debian/@PACKAGE@-kernel.postinst \
-debian/@PACKAGE@-$(kversion).preinst: debian/@PACKAGE@-kernel.preinst \
-debian/@PACKAGE@-$(kversion).prerm: debian/@PACKAGE@-kernel.prerm: \
+debian/@PACKAGE@-$(kversion).postinst \
+debian/@PACKAGE@-$(kversion).postrm \
+debian/@PACKAGE@-$(kversion).preinst \
+debian/@PACKAGE@-$(kversion).prerm: \
 debian/@PACKAGE@-$(kversion).%: debian/@PACKAGE@-kernel.%
 	cp -fv $< $@
+
+@WITH_KO_MODULES_FALSE@control		+= debian/@PACKAGE@-$(kversion).config
+
+@WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion).config:
+@WITH_KO_MODULES_FALSE@	( [ ! -f $(debtmpdir)$(kmoduledir)/modules.@PACKAGE@ ] || echo '$(debtmpdir)$(kmoduledir)/modules.@PACKAGE@'; \
+@WITH_KO_MODULES_FALSE@	) | sort -u > $@
 
 control		+= debian/@PACKAGE@-$(kversion).install
 
@@ -361,8 +376,7 @@ ksubdir		= @ksubdir@
 @WITH_KO_MODULES_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
 @WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion).install:
-@WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(kmoduledir) ] || echo '$(debtmpdir)$(kmoduledir)/modules.@PACKAGE@' ; \
-@WITH_KO_MODULES_FALSE@	  [ ! -d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.o' ; \
+@WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.o' ; \
 @WITH_KO_MODULES_FALSE@	) $(am__debian_install_format) | sort -u > $@
 
 ##

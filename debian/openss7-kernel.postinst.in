@@ -80,6 +80,42 @@ postinst_depmod () { :
     return 0
 }
 #
+# postinst_preload() - For old modules, ensure that our preloaded modules are in
+#   the appropriate preload file.
+#
+postinst_preload () { :
+    if [ -f @sysconfdir@/modprobe.preload ]; then
+	prel_old="@sysconfdir@/modprobe.preload"
+    elif [ -f @sysconfdir@/modules -o -f @sysconfdir@/modules-@kversion@ ]; then
+	prel_old="@sysconfdir@/modules-@kversion@"
+    else
+	return 0
+    fi
+    prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
+    if [ -f $prel_old ]
+    then cp -f -- $prel_old $prel_new
+    else touch $prel_new
+    fi
+    missing=no
+    mods="${preloads}"
+    for m in $mods; do
+	if ! grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+	    missing=yes
+	fi
+    done
+    if [ $missing = yes ]; then
+	for m in $mods; do
+	    ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new;
+	      echo "$m" ) >$prel_tmp
+	    mv -f -- $prel_tmp $prel_new
+	done
+	chmod --reference=$prel_old -- $prel_new || true
+	cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
+    fi
+    rm -f -- $prel_new || true
+}
+#
 # postinst_startscripts() - For old modules, start init scripts when they have
 #   already been installed and are normally started in the current runlevel.
 #   Note that if init scripts are started and they are already running, they
@@ -166,9 +202,10 @@ postinst_updates () { :
 # before the init scripts attempt to start the subsystem.
 #
 postinst_kernel_configure () { :
-@WITH_KO_MODULES_TRUE@    postinst_updates || true
-@WITH_KO_MODULES_FALSE@    postinst_depmod || true
-@WITH_KO_MODULES_FALSE@    postinst_startscripts || true
+    @WITH_KO_MODULES_TRUE@postinst_updates || true
+    @WITH_KO_MODULES_FALSE@postinst_depmod || true
+    @WITH_KO_MODULES_FALSE@postinst_preload || true
+    @WITH_KO_MODULES_FALSE@postinst_startscripts || true
 }
 #   new-preinst install old-version
 #	- files are unpacked
@@ -184,9 +221,10 @@ postinst_kernel_configure () { :
 # been performed on the previous fresh install.
 #
 postinst_kernel_reconfigure () { :
-@WITH_KO_MODULES_TRUE@    postinst_updates || true
-@WITH_KO_MODULES_FALSE@    postinst_depmod || true
-@WITH_KO_MODULES_FALSE@    postinst_startscripts || true
+    @WITH_KO_MODULES_TRUE@postinst_updates || true
+    @WITH_KO_MODULES_FALSE@postinst_depmod || true
+    @WITH_KO_MODULES_FALSE@postinst_preload || true
+    @WITH_KO_MODULES_FALSE@postinst_startscripts || true
 }
 #   old-prerm upgrade new-version
 #   new-preinst upgrade old-version
@@ -263,9 +301,10 @@ postinst_kernel_reconfigure () { :
 # before the init scripts attempt to start the subsystem.
 #
 postinst_kernel () { :
-@WITH_KO_MODULES_TRUE@    postinst_updates || :
-@WITH_KO_MODULES_FALSE@    postinst_depmod || :
-@WITH_KO_MODULES_FALSE@    postinst_startscripts || :
+    @WITH_KO_MODULES_TRUE@postinst_updates || :
+    @WITH_KO_MODULES_FALSE@postinst_depmod || :
+    @WITH_KO_MODULES_FALSE@postinst_preload || :
+    @WITH_KO_MODULES_FALSE@postinst_startscripts || :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
@@ -310,6 +349,7 @@ if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
 #	depmod -a -F @ksysmap@ @kversion@ || true
 #    fi
 #fi
+fi
 # =============================================================================
 #
 # $Log$

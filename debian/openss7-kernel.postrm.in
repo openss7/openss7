@@ -51,85 +51,87 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-subpkg=base
-@openss7_preinst@
-datarootdir=@datarootdir@
-# -----------------------------------------------------------------------------
-# Auxiliary functions:
-# -----------------------------------------------------------------------------
+subpkg=kernel
+@openss7_postrm@
 #
-# On an initial installation of the package, we need to check for non-deb
-# installations on the host and remove any entries that might later conflict
-# with out entries.  We treat every fresh installation like an upgrade from
-# non-deb/rpm install.
+# There is really nothing to do at this stage, but this control script cannot be
+# omitted for the kernel subpackage or debhelper will insert one that does an
+# inopportune depmod.
 #
-preinst_preload () {
-    case @kminor@ in
-	4) prel_old=@sysconfdir@/modules ;;
-	5)  if [ @kpatch@ -lt 48 ]; then
-		prel_old=@sysconfdir@/modules
-	    else
-		prel_old=@sysconfdir@/modprobe.preload
-	    fi ;;
-	6) prel_old=@sysconfdir@/modprobe.preload ;;
-	*) return 0 ;;
-    esac
+# postrm_preload() - When removing for good, make sure that the preload modules
+#   are no longer included in the preloads file for 2.4 module systems.
+#
+postrm_preload () { :
+    prel_old="@sysconfdir@/modules-@kversion@"
     if [ -f $prel_old ]; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-	sed -r -e '/^[[:space:]]*(specfs|streams)/d' $prel_new > $prel_tmp
-        mv -f -- $prel_tmp $prel_new
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-}
-#
-# Fresh install, go looking for non-deb initscripts and remove them.
-#
-preinst_initscripts () {
-    list="$inifiles $nonrpminit"; for i in $list; do
-	if [ -f @initrddir@/$i ]; then
-#
-#	    Find the best working init script removal tool
-#
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
+	prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
+	prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
+	cp -f -- $prel_old $prel_new
+	included=no
+	modules="${preload}"
+	for m in $modules; do
+	    if grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		included=yes
+	    fi
+	done
+	if [ $included = yes ]; then
+	    for m in $modules; do
+		grep -v '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >$prel_tmp
+		cp -f -- $prel_tmp $prel_new
+	    done
+	    chmod --reference=$prel_old -- $prel_new
+	    cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
 	fi
-    done
+	rm -f -- $prel_new
+    fi
+    :
 }
-#
-# This is an initial installation of the base subpackage.  We need to check for
-# non-deb installations on the host and remove any entries that might later
-# conflict with out entries.  We treat every fresh installation like an upgrade
-# from non-deb/rpm install.
-#
-preinst_base () { :
-    @WITH_KO_MODULES_FALSE@preinst_preload
-    @WITH_KO_MODULES_FALSE@preinst_initscripts
+postrm_kernel () { :
+    @WITH_KO_MODULES_FALSE@postrm_preload
+}
+postrm_kernel_purge () { :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-# new-preinst install
-install_preinst () { :
-    preinst_base
+# remove-postrm remove
+remove_postrm () { :
+    postrm_kernel
 }
-# new-preinst install old-version
-reinstall_preinst () { :
+# remove-postrm purge
+purge_postrm () { :
+    postrm_kernel_purge
 }
-# new-preinst upgrade old-version
-upgrade_preinst () { :
+# old-postrm upgrade new-version
+upgrade_postrm () { :
+    postrm_kernel
 }
 # old-postrm upgrade new-version ...FAILED
-# new-postrm failed-upgrade old-version ...FAILED
-# old-preinst abort-upgrade new-version
-abort_upgrade_preinst () { :
+# new-postrm failed-upgrade old-version
+failed_upgrade_postrm () { :
 }
-@mscript_preinst@
+# new-preinst install [old-version] ...FAILED
+# new-postrm abort-install [old-version]
+abort_install_postrm () { :
+}
+# new-preinst upgrade old-version ...FAILED
+# new-postrm abort-upgrade old-version
+abort_upgrade_postrm () { :
+}
+# dis-postrm disappear overwriter overwriter-version
+disappear_postrm () { :
+}
+@mscript_postrm@
+#
+# For weak updates we cannot invoke the debian helper script because it will do
+# an inopportune depmod on any run of postrm.
+#
+if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
 @mscript_debhelper@
+#if [ -e @ksysmap@ ]; then
+#    depmod -a -F @ksysmap@ @kversion@ || true
+#fi
+fi
 # =============================================================================
 #
 # $Log$

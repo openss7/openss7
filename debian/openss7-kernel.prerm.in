@@ -399,28 +399,28 @@ prerm_kernel_upgrade () { :
 # Primary functions:
 # -----------------------------------------------------------------------------
 # xxx-prerm remove
-remove_kernel_prerm () { :
+remove_prerm () { :
     prerm_kernel_remove
     return $?
 }
 # con-prerm remove 'in-favour' package new-version
-conflict_kernel_prerm () { :
+conflict_prerm () { :
     prerm_kernel_remove
     return $?
 }
 # old-prerm upgrade new-version
-upgrade_kernel_prerm () { :
+upgrade_prerm () { :
     prerm_kernel_upgrade
     return $?
 }
 # old-prerm upgrade new-version ***FAILED***
 # new-prerm failed-upgrade old-version
-failed_upgrade_kernel_prerm () { :
+failed_upgrade_prerm () { :
     prerm_kernel_failed
     return $?
 }
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
-deconfigure_kernel_prerm () { :
+deconfigure_prerm () { :
     prerm_kernel_remove || :
     return $?
 }
