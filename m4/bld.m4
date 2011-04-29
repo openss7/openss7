@@ -153,7 +153,9 @@ dnl	These use rpm
 		    ;;
 dnl	These use dpkg
 		(debian|ubuntu|mint)
-		    tmp_result=`dpkg -S $tmp_cmd 2>/dev/null | tail -1`
+dnl		    dlocate is much faster than dpkg and dpkg-query
+		    if which dlocate >/dev/null 2>&1; then dlocate=dlocate; else dlocate=dpkg; fi
+		    tmp_result=`$dlocate -S $tmp_cmd 2>/dev/null | tail -1`
 		    tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
 		    tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
 		    ;;
@@ -174,8 +176,10 @@ dnl	These use rpm
 		    ;;
 dnl	These use dpkg
 		(debian|ubuntu|mint)
+dnl		    dlocate is much faster than dpkg and dpkg-query
+		    if which dlocate >/dev/null 2>&1; then dlocate=dlocate; else dlocate=dpkg; fi
 		    if test -n "$bld_cv_pkg_name_$1" ; then
-			tmp_result=`dpkg-query -W -f='${Version}' $bld_cv_pkg_name_$1 2>/dev/null`
+			tmp_result=`$dlocate -s "$bld_cv_pkg_name_$1" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
 		    fi
 		    ;;
 	    esac

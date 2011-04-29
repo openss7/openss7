@@ -57,31 +57,40 @@ datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
-postrm_preloads () { :
-}
-postrm_base () { :
-    postrm_preloads
-}
-postrm_modconf () {
-    local last_core_package='yes'
-    for file in /lib/modules/*/modules.$base ; do
-	if [ -f $file ] ; then
-	    last_core_package='no'
-	    break
+#
+# postrm_preload() - When removing for good, make sure that the preload modules
+#   are no longer included in the preloads file for 2.4 module systems.  Note
+#   that removing lines from the /etc/modules-@kversion@ file are the
+#   responsibility of the -kernel subpackage.
+#
+postrm_preload () { :
+    for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
+	if [ -f $prel_old ]; then
+	    prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
+	    prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
+	    cp -f -- $prel_old $prel_new
+	    included=no
+	    modules="${preload}"
+	    for m in $modules; do
+		if grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		    included=yes
+		fi
+	    done
+	    if [ $included = yes ]; then
+		for m in $modules; do
+		    grep -v '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >$prel_tmp
+		    cp -f -- $prel_tmp $prel_new
+		done
+		chmod --reference=$prel_old -- $prel_new
+		cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new
 	fi
     done
-    if [ ":$last_core_package" = ":no" ] ; then
-	return 0
-    fi
-    conf_old=@sysconfdir@/modules.conf
-    if grep -q 'include[^#]*'"@modutildir@"'/'$base $conf_old ; then
-	conf_tmp=$tmppath/modules.conf.tmp.$$
-	sed -e "/include[^#]*\/$base/d" $conf_old > $conf_tmp
-	chmod --reference=$conf_old $conf_tmp
-	cp -fb --suffix=.old $conf_tmp $conf_old
-	rm -f $conf_tmp
-    fi
-    rm -f -- "@modutildir@/$base"
+    :
+}
+postrm_base () { :
+    @WITH_KO_MODULES_FALSE@postrm_preload
 }
 #
 # postrm_modconf() - As the subpackage is being purged, remove the line from
@@ -92,94 +101,18 @@ postrm_modconf () {
 #   the -kernel sub-packages.
 #
 postrm_modconf () { :
-    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
     conf_old=@sysconfdir@/modules.conf
     if [ -f $conf_old ] ; then
-        conf_tmp=$tmppath/modules.conf.tmp.$$
-        conf_new=$tmppath/modules.conf.new.$$
+        conf_tmp=${tmppath:-'/var/tmp'}/modules.conf.tmp.$$
+        conf_new=${tmppath:-'/var/tmp'}/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
         sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
         mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
+	if diff $conf_new $conf_old >/dev/null 2>&1; then
+	    chmod --reference=$conf_old $conf_new
+	    cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
+	fi
         rm -f -- $conf_new
-    fi
-    :
-}
-#
-# postrm_netconfig() - As the subpackage is being purged, rebuild the netconfig
-#   database, but only when the netconfig database was built by us or does not
-#   exist.  Note that we need to remove our configuration files from the
-#   netconfig.d directory first because config files have not yet been removed.
-#   If the netconfig database would be empty, remove it altogether.
-#
-postrm_netconfig () {
-    local t a d found files f
-    t=@sysconfdir@/netconfig
-    a="${t}.xnsl"
-    d="${t}.d"
-    for f in ${netconfig}; do rm -f -- $d/$f || :; done
-    if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            t="${a}"
-        fi
-    fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-    found='no'
-    if [ -d $d ]; then
-	files="$d/*"
-	for f in $files ; do
-	    if [ -f $f -a $f = "$d/strnsl" ] ; then
-		case $f in
-		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
-		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-		esac
-	    fi
-	done
-	for f in $files ; do
-	    if [ -f $f -a $f != "$d/strnsl" ] ; then
-		case $f in
-		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
-		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-		esac
-	    fi
-	done
-    fi
-    if [ $found = "no" ] ; then
-        rm -f $t $t.tmp
-	rmdir --ignore-fail-on-non-empty -- $d || :
-    else
-        mv -f $t.tmp $t
-    fi
-    if [ "${t}" != "${a}" ] ; then
-        rm -f $a
-    fi
-    :
-}
-#
-# postrm_sock2path() - As the subpackage is being purged, rebuild the sock2path
-#   database.  Note that we need to remove our configuration files from the
-#   sock2path.d directory first because config files have not yet been removed.
-#   If the sock2path database would be empty, remove it altogether.
-#
-postrm_sock2path () {
-    local t f empty='yes'
-    t=@sysconfdir@/sock2path
-    for f in ${sock2path}; do rm -f -- ${t}.d/$f || :; done
-    cp -f -b --suffix=.dpkg-save -- /dev/null $t
-    if [ -d ${t}.d ]; then
-	for f in "${t}.d/*"; do
-	    if [ -f $f ]; then
-		case $f in
-		    (*.dpkg-save|*.dpkg-new) ;;
-		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t; empty='no' ;;
-		esac
-	    fi
-	done
-    fi
-    if [ "$empty" = 'yes' ]; then
-	rm -f -- ${t} || :
-	rmdir --ignore-fail-on-non-empty -- ${t}.d || :
     fi
     :
 }
@@ -188,10 +121,7 @@ postrm_sock2path () {
 #   adjust other files in preparation for removal of configuration files.
 #
 postrm_base_purge () { :
-    postrm_modconf
-    postrm_netconfig
-    postrm_sock2path
-    :
+    @WITH_KO_MODULES_FALSE@postrm_modconf
 }
 # -----------------------------------------------------------------------------
 # Primary functions:

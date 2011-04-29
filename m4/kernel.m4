@@ -2278,9 +2278,13 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 	linux_cv_k_version=unknown
 	if test ":$deb_cv_debs:$deb_cv_dscs" = :yes:yes
 	then
-	    linux_pkg=`dpkg -S $linux_cv_k_sysmap 2>/dev/null | cut -f1 -d:` || linux_pkg=
+dnl
+dnl	    dlocate is much much faster than dpkg and dpkg-query
+dnl
+	    if which dlocate >/dev/null 2>&1; then dlocate=dlocate; else dlocate=dpkg; fi
+	    linux_pkg=`$dlocate -S $linux_cv_k_sysmap 2>/dev/null | cut -f1 -d:` || linux_pkg=
 	    if test -n "$linux_pkg" ; then
-		linux_ver=`dpkg -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
+		linux_ver=`$dlocate -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
 	    else
 		linux_ver=
 	    fi
@@ -2332,9 +2336,13 @@ dnl
 		linux_cv_vers=
 		for linux_file in $linux_cv_files
 		do
-		    linux_pkg=`dpkg -S $linux_file 2>/dev/null | cut -f1 -d:` || linux_pkg=
+dnl
+dnl		    dlocate is much much faster than dpkg and dpkg-query
+dnl
+		    if which dlocate >/dev/null 2>&1; then dlocate=dlocate; else dlocate=dpkg; fi
+		    linux_pkg=`$dlocate -S $linux_file 2>/dev/null | cut -f1 -d:` || linux_pkg=
 		    if test -n "$linux_pkg" ; then
-			linux_ver=`dpkg -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
+			linux_ver=`$dlocate -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
 		    else
 			linux_ver=
 		    fi

@@ -123,11 +123,13 @@ AC_DEFUN([AC_OPENSS7], [dnl
 		     debian/openss7-java.postrm
 		     debian/openss7-java.preinst
 		     debian/openss7-kernel.postinst
+		     debian/openss7-kernel.postrm
 		     debian/openss7-kernel.preinst
 		     debian/openss7-kernel.prerm
 		     debian/openss7-lib.postinst
 		     debian/openss7-lib.postrm
 		     debian/openss7-lib.preinst
+		     debian/openss7-lib.prerm
 		     debian/openss7-repo.postinst
 		     debian/openss7-repo.postrm
 		     debian/openss7-repo.preinst

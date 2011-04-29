@@ -292,8 +292,6 @@ preinst_kernel_reinstall () { :
 # linked either before or after reboot and depmod performed again when necessary
 # before the init scripts attempt to start the subsystem.
 #
-preinst_kernel_upgrade () { :
-}
 preinst_kernel () { :
     preinst_kernel_modules
     preinst_kernel_running

@@ -78,12 +78,156 @@ postrm_tcllibs () { :
     # FIXME: figure out which files to remove
 }
 #
+# postrm_snmpdlmod () - When we performed a prerm 'remove' we moved the snmp
+#   dlmod files to .dpkg-orig in preparation for an abort, but dpkg does not
+#   know about that so remove them here.
+#
+postrm_snmpdlmod () { :
+    local f d='@snmpconfdir@/snmp.d'
+    [ -d $d ] || return 0
+    for f in "$d/*"; do
+	if [ -f $f ]; then
+	    case $f in
+		([0-9][0-9]@PACKAGE@.dpkg-orig) rm -f -- $f || true ;;
+	    esac
+	fi
+    done
+    return 0
+}
+#
+# postrm_netconfig_kill() - Kill all processes that are holding open the libxnsl
+#   library.  This is in prepration for removing the netconfig database.
+#
+postrm_netconfig_kill () {
+    local pids signal
+    if which lsof >/dev/null 2>&1; then
+	for signal in TERM KILL; do
+	    pids=`lsof | awk '{if($NF~"^@libdir@/libxnsl"||$NF~"^@lib32dir@/libxnsl"){print$2}}'`
+	    if [ -n "$pids" ]; then
+		kill -$signal $pids || true
+		sleep 1
+	    fi
+	done
+    fi
+}
+#
+# postrm_netconfig_purge() - As the subpackage is being purged, rebuild the netconfig
+#   database, but only when the netconfig database was built by us or does not
+#   exist.  Note that we need to remove our configuration files from the
+#   netconfig.d directory first because config files have not yet been removed.
+#   If the netconfig database would be empty, remove it altogether.
+#
+#   Note that it might be a good idea to kill any process that has the libxnsl
+#   library open.  Dpkg processes that are properly dependent upon this package
+#   will have been removed, however, non-deb programs or debs that do not
+#   properly rely upon this package will not be stopped.
+#
+postrm_netconfig_purge () {
+    local t a d found files f
+    t=@sysconfdir@/netconfig
+    a="${t}.xnsl"
+    d="${t}.d"
+    for f in ${netconfig}; do rm -f -- $d/$f || :; done
+    if [ -f $t ] ; then
+        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+            t="${a}"
+        fi
+    fi
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    if [ -d $d ]; then
+	files="$d/*"
+	for f in $files ; do
+	    if [ -f $f -a $f = "$d/strnsl" ] ; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+		esac
+	    fi
+	done
+	for f in $files ; do
+	    if [ -f $f -a $f != "$d/strnsl" ] ; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+		esac
+	    fi
+	done
+    fi
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+	rmdir --ignore-fail-on-non-empty -- $d || :
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
+    fi
+    :
+}
+#
+# postrm_sock2path_kill() - Kill all processes that are holding open the
+#   libsocket library.  This is in prepration for removing the sock2path
+#   database.
+#
+postrm_netconfig_kill () {
+    local pids signal
+    if which lsof >/dev/null 2>&1; then
+	for signal in TERM KILL; do
+	    pids=`lsof | awk '{if($NF~"^@libdir@/libsocket"||$NF~"^@lib32dir@/libsocket"){print$2}}'`
+	    if [ -n "$pids" ]; then
+		kill -$signal $pids || true
+		sleep 1
+	    fi
+	done
+    fi
+}
+#
+# postrm_sock2path_purge() - As the subpackage is being purged, rebuild the sock2path
+#   database.  Note that we need to remove our configuration files from the
+#   sock2path.d directory first because config files have not yet been removed.
+#   If the sock2path database would be empty, remove it altogether.
+#
+postrm_sock2path_purge () {
+    local t f empty='yes'
+    t=@sysconfdir@/sock2path
+    for f in ${sock2path}; do rm -f -- ${t}.d/$f || :; done
+    cp -f -b --suffix=.dpkg-save -- /dev/null $t
+    if [ -d ${t}.d ]; then
+	for f in "${t}.d/*"; do
+	    if [ -f $f ]; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t; empty='no' ;;
+		esac
+	    fi
+	done
+    fi
+    if [ "$empty" = 'yes' ]; then
+	rm -f -- ${t} || :
+	rmdir --ignore-fail-on-non-empty -- ${t}.d || :
+    fi
+    :
+}
+#
 # postrm_lib_remove() - After a removal, do a ldconfig and remove the indexes
 #   for the tcl libraries and modules.
 #
 postrm_lib_remove () { :
     postrm_libraries
     postrm_tcllibs
+    postrm_snmpdlmod
+}
+#
+# postrm_lib_purge() - When purging library configuration files, kill all
+#   processes using the libraries and then purge the configuration databases
+#   used by those libraries.
+#
+postrm_lib_purge () { :
+    postrm_netconfig_kill
+    postrm_netconfig_purge
+    postrm_sock2path_kill
+    postrm_sock2path_purge
 }
 #
 # postrm_lib_upgrade() - During an upgrade, we should probably remove our tcl
@@ -103,6 +247,7 @@ remove_postrm () { :
 }
 # remove-postrm purge
 purge_postrm () { :
+    postrm_lib_purge
 }
 # old-postrm upgrade new-version
 upgrade_postrm () { :

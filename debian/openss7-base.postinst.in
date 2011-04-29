@@ -65,54 +65,59 @@ postinst_mknods () { :
     fi
 }
 #
-# postinst_modconf() - Ensure that include line is added to the module.conf
+# postinst_modconf() - Ensure that include line is added to the modules.conf
 #   file for old 2.4 module systems.  This must remove lines before including
 #   them because it may also be run from reconfigure.
 #
 postinst_modconf () { :
-    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
     conf_old=@sysconfdir@/modules.conf
     if [ -f $conf_old ] ; then
-	conf_tmp=$tmppath/modules.conf.tmp.$$
-	conf_new=$tmppath/modules.conf.new.$$
+	conf_tmp=${tmppath:-'/var/tmp'}/modules.conf.tmp.$$
+	conf_new=${tmppath:-'/var/tmp'}/modules.conf.new.$$
 	cp -f -- $conf_old $conf_new
 	( sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new
 	  echo "include @modutildir@/$base" ) > $conf_tmp
 	mv -f -- $conf_tmp $conf_new
-	chmod --reference=$conf_old -- $conf_new
-	cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
+	if diff $conf_new $conf_old >/dev/null 2>&1; then
+	    chmod --reference=$conf_old -- $conf_new
+	    cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
+	fi
 	rm -f -- $conf_new
     fi
     :
 }
 #
-# At the end of a fresh install we need to add our preloads to the modules or
-# modprobe.preload file, if it exists, and is necessary, and even if the lines
-# are already there (in which case we remove the existing line.
+# postinst_preload() - At the end of a fresh install or upgrade, check that our
+#   preload modules have been added to the modprobe.preload file.  Note,
+#   however, that the modprobe.preload does not normally exist for Debian.  The
+#   -kernel subpackage is responsible for adding preloads to the debian
+#   /etc/modules-@kversion@ file.
 #
-postinst_preloads () { :
-    case @kminor@ in
-	4) prel_old=@sysconfdir@/modules ;;
-	5)  if [ @kpatch@ -lt 48 ]
-	    then prel_old=@sysconfdir@/modules
-	    else prel_old=@sysconfdir@/modprobe.preload
-	    fi ;;
-	6) prel_old=@sysconfdir@/modprobe.preload ;;
-	*) return ;;
-    esac
+postinst_preload () { :
+    prel_old="@sysconfdir@/modprobe.preload"
     if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
+        prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
+        prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
-        mods="${preloads}" ; for m in $mods ; do
-            ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new
-              echo "$m" ) > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
+	missing=no
+        mods="${preloads}"
+	for m in $mods ; do
+	    if ! grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		missing=yes
+	    fi
         done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
+	if [ $missing = yes ]; then
+	    for m in $mods; do
+		( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new;
+		  echo "$m" ) >$prel_tmp
+		mv -f -- $prel_tmp $prel_new
+	    done
+	    chmod --reference=$prel_old -- $prel_new
+	    cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
+	fi
         rm -f -- $prel_new
     fi
+    :
 }
 #
 # This is the end of a fresh install, add init scripts if we can
@@ -193,96 +198,17 @@ postinst_manmacros () {
 	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m
     done
 }
-#
-# postinst_netconfig() - Rebuild the netconfig database, but only if it was
-#   built by us or does not exist.  This is indempotent and can be called from
-#   configure or reconfigure.
-#
-postinst_netconfig () { :
-    t=@sysconfdir@/netconfig
-    a="${t}.xnsl"
-    d="${t}.d"
-    if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            t="${a}"
-        fi
-    fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-    found='no'
-    files="$d/*"
-    if [ -d $d ]; then
-	for f in $files ; do
-	    if [ -f $f -a $f = "$d/strnsl" ] ; then
-		case $f in
-		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
-		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-		esac
-	    fi
-	done
-	for f in $files ; do
-	    if [ -f $f -a $f != "$d/strnsl" ] ; then
-		case $f in
-		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
-		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-		esac
-	    fi
-	done
-    fi
-    if [ $found = "no" ] ; then
-        rm -f $t $t.tmp
-    else
-        mv -f $t.tmp $t
-    fi
-    if [ "${t}" != "${a}" ] ; then
-        rm -f $a
-    fi
-    :
-}
-#
-# postinst_sock2path() - Rebuild the sock2path database.  This is indempotent
-#   and can be called from configure or reconfigure.
-#
-postinst_sock2path () { :
-    local t f empty='yes'
-    t=@sysconfdir@/sock2path
-    cp -f -b --suffix=.dpkg-save -- /dev/null $t
-    if [ -d ${t}.d ]; then
-	for f in "${t}.d/*"; do
-	    if [ -f $f ]; then
-		case $f in
-		    (*.dpkg-save|*.dpkg-new) ;;
-		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t; empty='no' ;;
-		esac
-	    fi
-	done
-    fi
-    if [ "$empty" = 'yes' ]; then
-	rm -f -- ${t} || :
-	rmdir --ignore-fail-on-non-empty -- ${t}.d || :
-    fi
-    :
-    return 0
-}
 postinst_base_reconfigure () { :
-    postinst_modconf
-    postinst_netconfig
-    postinst_sock2path
-}
-postinst_base_configure () { :
-    postinst_base_reconfigure
-}
-postinst_base () { :
-    #
-    # At this point we want to ensure that our lines are added to the modules.conf (if necessary)
-    # and that our preloads are added to the modules or modprobe.preload file.
-    #
     postinst_mknods
     @WITH_KO_MODULES_FALSE@postinst_modconf
-    postinst_preloads
-    postinst_initscripts
+    @WITH_KO_MODULES_FALSE@postinst_preload
+    @WITH_KO_MODULES_FALSE@postinst_initscripts
     postinst_manpages
     postinst_manrefs
     postinst_manmacros
+}
+postinst_base_configure () { :
+    postinst_base_reconfigure
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
@@ -297,23 +223,19 @@ reconfigure_postinst () { :
 }
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :
-    postinst_base
 }
 # old-prerm upgrade new-version ...FAILED
 # new-prerm failed-upgrade new-version ...FAILED
 # old-postinst abort-upgrade new-version
 abort_upgrade_postinst () { :
-    postinst_base
 }
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
 abort_remove_postinst () { :
-    postinst_base
 }
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst ()  { :
-    postinst_base
 }
 @mscript_postinst@
 @mscript_debhelper@
