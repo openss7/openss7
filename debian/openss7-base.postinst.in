@@ -53,6 +53,17 @@
 # =============================================================================
 subpkg=base
 @openss7_postinst@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+postinst_mknods () { :
+    if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
+	# ensure that devices are added
+	echo "${package}: creating devices."
+	@sbindir@/@STRCONF_DEVICES@ --create || :
+    fi
+}
 #
 # postinst_modconf() - Ensure that include line is added to the module.conf
 #   file for old 2.4 module systems.  This must remove lines before including
@@ -62,16 +73,125 @@ postinst_modconf () { :
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
     conf_old=@sysconfdir@/modules.conf
     if [ -f $conf_old ] ; then
-        conf_tmp=$tmppath/modules.conf.tmp.$$
-        conf_new=$tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-        rm -f -- $conf_new
+	conf_tmp=$tmppath/modules.conf.tmp.$$
+	conf_new=$tmppath/modules.conf.new.$$
+	cp -f -- $conf_old $conf_new
+	( sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new
+	  echo "include @modutildir@/$base" ) > $conf_tmp
+	mv -f -- $conf_tmp $conf_new
+	chmod --reference=$conf_old -- $conf_new
+	cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
+	rm -f -- $conf_new
     fi
     :
+}
+#
+# At the end of a fresh install we need to add our preloads to the modules or
+# modprobe.preload file, if it exists, and is necessary, and even if the lines
+# are already there (in which case we remove the existing line.
+#
+postinst_preloads () { :
+    case @kminor@ in
+	4) prel_old=@sysconfdir@/modules ;;
+	5)  if [ @kpatch@ -lt 48 ]
+	    then prel_old=@sysconfdir@/modules
+	    else prel_old=@sysconfdir@/modprobe.preload
+	    fi ;;
+	6) prel_old=@sysconfdir@/modprobe.preload ;;
+	*) return ;;
+    esac
+    if [ -f $prel_old ] ; then
+        prel_tmp=$tmppath/modprobe.preload.tmp.$$
+        prel_new=$tmppath/modprobe.preload.new.$$
+        cp -f -- $prel_old $prel_new
+        mods="${preloads}" ; for m in $mods ; do
+            ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new
+              echo "$m" ) > $prel_tmp
+            mv -f -- $prel_tmp $prel_new
+        done
+        chmod --reference=$prel_old -- $prel_new
+        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
+        rm -f -- $prel_new
+    fi
+}
+#
+# This is the end of a fresh install, add init scripts if we can
+#
+postinst_initscripts () { :
+    return
+    #
+    # Note that init scripts are handled by debhelper additions to this script.
+    #
+    list="${initfiles}" ; for i in $list ; do
+        # Find the best working init script installation tool
+        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue || :
+        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue || :
+        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue || :
+    done
+}
+postinst_initscripts2 () { :
+    #
+    # Note that initscripts are updated by debian helpers, however, debian
+    # helpers do not start and stop init scripts.
+    #
+    # Unlike rpm, we actually have a terminal here and can interact with the
+    # user.
+    #
+    if [ ":@kversion@" = ":`uname -r`" ] ; then
+	# Running kernels do need init scripts run, but only when normally
+	# started in the current runlevel.
+	r=`runlevel | awk '{print$2}'`
+	list="$initfiles" ; for i in $list ; do
+	    if [ -f @initrddir@/$i ] ; then
+		if [ -L @initrddir@/../rc${r}.d/S[0-9][0-9]$i -o \
+		     -L @initrddir@/rc${r}.d/S[0-9][0-9]$i ] ; then
+		    /sbin/service $i start >/dev/null 2>&1 || \
+		    @initrddir@/$i    start >/dev/null 2>&1 || :
+		fi
+	    fi
+	done
+    fi
+}
+#
+# postinst_manpages() - Add our manual pages to the aprospros database.  One
+#   problem with doing this is that even the oldest of debian policies and
+#   debhelper implementations will implement the debhelper code to do this.
+#   Therefore, this function is shortcircuited for now.  (We install >3000
+#   manual pages and it takes forever anyway.)  Failing to do this altogether is
+#   not critical because most machines run an evening cron job to update these.
+#
+postinst_manpages () { :; return
+    if which makewhatis >/dev/null 2>&1 ; then
+	LANGUAGE= LANG= makewhatis -u @mandir@ || true
+    fi
+    if which mandb >/dev/null 2>&1 ; then
+	LANGUAGE= LANG= mandb -p @mandir@ || :true
+    fi
+}
+#
+# postinst_manrefs() - Some systems compress our reference database but do not
+#   provide nor invoke the zrefer command necessary to use compressed reference
+#   databases.  Therefore, we always provide a decompressed copy of the
+#   reference database.
+#
+postinst_manrefs () {
+    local m
+    for m in ${manrefs}; do
+	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m
+	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m
+    done
+}
+#
+# postinst_manrefs() - Some systems compress our man macros but do not provide
+#   nor invoke the zsoelim command necessary to use compressed man macros.
+#   Therefore, we always provide a decompressed copy of the man macros.
+#
+postinst_manmacros () {
+    local m
+    for m in ${manmacros}; do
+	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m
+	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m
+    done
 }
 #
 # postinst_netconfig() - Rebuild the netconfig database, but only if it was

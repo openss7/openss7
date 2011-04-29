@@ -53,16 +53,24 @@
 # =============================================================================
 subpkg=java
 @openss7_postinst@
-postinst_jnilibs () { :
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postinst_jnilibs() - After a fresh installation, upgrade or reinstall, do a
+#   ldconfig.  Note that this action should be performed by the debhelper
+#   portion of the script and is therefore short-circuited.
+#
+postinst_jnilibs () { :; return
     if which ldconfig >/dev/null 2>&1 ; then
-	ldconfig
+	ldconfig || true
     fi
-    :
-    return 0
 }
-postinst_gcjlibs () { :
-    return 0
-}
+#
+# postinst_gcjmaps() - After installation, rebuild the gcj map database.  Note
+#   that there is currently no debhelper nor trigger for this.
+#
 postinst_gcjmaps () { :
     if [ -x /usr/bin/rebuild-gcj-db ] ; then
         /usr/bin/rebuild-gcj-db
@@ -79,33 +87,35 @@ postinst_gcjmaps () { :
             /bin/mv -f $db.tmp $db
         done
     fi
-    :
-    return 0
 }
+#
+# postinst_jarfiles() - After installation, rebuild the jar repository.  Note
+#   that there is currently no debhelper nor trigger for this.
+#
 postinst_jarfiles () { :
     if [ -x /usr/bin/rebuild-jar-repository ] ; then
-        /usr/bin/rebuild-jar-repository @javadir@
+        /usr/bin/rebuild-jar-repository @javadir@ || true
     fi
-    :
-    return 0
 }
+#
+# postinst_java() - After installation, rebuild the ldconfig caches, GCJ map
+#   database and jar repository.
+#
 postinst_java () { :
-    postinst_jnilibs	|| :
-    postinst_gcjlibs	|| :
-    postinst_gcjmaps	|| :
-    postinst_jarfiles	|| :
-    return 0
+    postinst_jnilibs
+    postinst_gcjmaps
+    postinst_jarfiles
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # xxx-postinst configure
 configure_postinst () { :
-    postinst_java   || :
+    postinst_java
 }
 # xxx-postinst configure most-recently-configured-version
 reconfigure_postinst () { :
-    postinst_java   || :
+    postinst_java
 }
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :
@@ -114,17 +124,14 @@ triggered_postinst () { :
 # new-prerm failed-upgrade new-version ...FAILED
 # old-posinst abort-upgrade new-version
 abort_upgrade_postinst () { :
-    postinst_java   || :
 }
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
 abort_remove_postinst () { :
-    postinst_java   || :
 }
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst () { :
-    postinst_java   || :
 }
 @mscript_postinst@
 @mscript_debhelper@

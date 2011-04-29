@@ -53,6 +53,10 @@
 # =============================================================================
 subpkg=kernel
 @openss7_prerm@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
 #
 # prerm_modules_remove(), prerm_modules_replace() - For older 2.4 module
 #   systems, we cannot perform weak updates, so the simplification is that

@@ -53,14 +53,27 @@
 # =============================================================================
 subpkg=java
 @openss7_postrm@
-postrm_jnilibs () { :
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postrm_jnilibs() - When complete removal, perform a ldconfig after the
+#   libraries have been removed to flush them from the ldconfig cache.  Note
+#   that this should not be done on upgrade, because building the ldconfig cache
+#   is up to the new-postinst "configure" stage or an appropriate trigger.  Note
+#   that this action should be performed by the debhelper portion of the script
+#   and is therefore short-circuited.
+#
+postrm_jnilibs () { :; return
     if which ldconfig >/dev/null 2>&1; then
-	ldconfig || :
+	ldconfig || true
     fi
-    return 0
 }
-postrm_gcjlibs () { :
-}
+#
+# postrm_gcjmaps() - On complete removal, rebuild the gcj database.  Note that
+#   there is no debhelper or trigger for this as yet.
+#
 postrm_gcjmaps () { :
     if [ -x /usr/bin/rebuild-gcj-db ] ; then
         /usr/bin/rebuild-gcj-db
@@ -77,55 +90,52 @@ postrm_gcjmaps () { :
             /bin/mv -f $db.tmp $db
         done
     fi
-    :
-    return 0
 }
+#
+# postrm_jarfiles() - On complete removal, rebuild the jar repository.  Note
+#   that there is no debhelper or trigger for this as yet.
+#
 postrm_jarfiles () { :
     if [ -x /usr/bin/rebuild-jar-repository ] ; then
-        /usr/bin/rebuild-jar-repository @javadir@ || :
+        /usr/bin/rebuild-jar-repository @javadir@ || true
     fi
-    return 0
 }
+#
+# postrm_java() - On complete removal, rebuild the ldconfig caches, GCJ map
+#   database and jar repository.
+#
 postrm_java () { :
-    postrm_jnilibs  || :
-    postrm_gcjlibs  || :
-    postrm_gcjmaps  || :
-    postrm_jarfiles || :
-    return 0
+    postrm_jnilibs
+    postrm_gcjmaps
+    postrm_jarfiles
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # remove-postrm remove
 remove_postrm () { :
-    postrm_java	|| :
+    postrm_java
 }
 # remove-postrm purge
 purge_postrm () { :
-    postrm_java	|| :
 }
 # old-postrm upgrade new-version
 upgrade_postrm () { :
-    postrm_java	|| :
 }
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version
 failed_upgrade_postrm () { :
-    postrm_java	|| :
 }
 # new-preinst install [old-version] ...FAILED
 # new-postrm abort-install [old-version]
 abort_install_postrm () { :
-    postrm_java	|| :
 }
 # new-preinst upgrade old-version ...FAILED
 # new-postrm abort-upgrade old-version
 abort_upgrade_postrm () { :
-    postrm_java	|| :
 }
 # dis-postrm disappear overwriter overwriter-version
 disappear_postrm () { :
-    postrm_java	|| :
 }
 @mscript_postrm@
 @mscript_debhelper@

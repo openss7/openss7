@@ -87,10 +87,10 @@ control		=
 ## Repo package:
 ##
 
-control		+= debian/@PACKAGE@-repo.postinst \
-		   debian/@PACKAGE@-repo.postrm \
-		   debian/@PACKAGE@-repo.preinst \
-		   debian/@PACKAGE@-repo.prerm
+control		+= debian/@PACKAGE@-repo.postinst
+control		+= debian/@PACKAGE@-repo.postrm
+control		+= debian/@PACKAGE@-repo.preinst
+control		+= debian/@PACKAGE@-repo.prerm
 
 control		+= debian/@PACKAGE@-repo.config
 
@@ -103,11 +103,6 @@ debian/@PACKAGE@-repo.config:
 ##
 ## Base virtual package:
 ##
-
-#control	+= debian/@PACKAGE@.postinst \
-#		   debian/@PACKAGE@.postrm \
-#		   debian/@PACKAGE@.preinst \
-#		   debian/@PACKAGE@.prerm
 
 control		+= debian/@PACKAGE@.docs
 
@@ -150,8 +145,7 @@ debian/@PACKAGE@.docs:
 control		+= debian/@PACKAGE@-base.postinst \
 		   debian/@PACKAGE@-base.postrm \
 		   debian/@PACKAGE@-base.preinst \
-		   debian/@PACKAGE@-base.prerm \
-		   debian/@PACKAGE@-base.triggers
+		   debian/@PACKAGE@-base.prerm
 
 control		+= debian/@PACKAGE@-base.config
 
@@ -237,9 +231,9 @@ debian/@PACKAGE@-doc.manpages:
 ## Library package:
 ##
 
-control		+= debian/@PACKAGE@-lib.preinst \
+control		+= debian/@PACKAGE@-lib.postinst \
 		   debian/@PACKAGE@-lib.postrm \
-		   debian/@PACKAGE@-lib.postinst
+		   debian/@PACKAGE@-lib.preinst
 
 control		+= debian/@PACKAGE@-lib.install
 
@@ -297,11 +291,7 @@ pkglibexec32dir	= @pkglibexec32dir@
 ## Development package:
 ##
 
-#control	+= debian/@PACKAGE@-devel.postinst \
-#		   debian/@PACKAGE@-devel.postrm \
-#		   debian/@PACKAGE@-devel.preinst \
-#		   debian/@PACKAGE@-devel.prerm \
-#		   debian/@PACKAGE@-devel.triggers
+control		+= debian/@PACKAGE@-devel.preinst
 
 control		+= debian/@PACKAGE@-devel.install
 
@@ -323,11 +313,6 @@ pkgincludedir	= $(includedir)/@PACKAGE@
 ## Debugging information package:
 ##
 
-#control	+= debian/@PACKAGE@-debuginfo.postinst \
-#		   debian/@PACKAGE@-debuginfo.postrm \
-#		   debian/@PACKAGE@-debuginfo.preinst \
-#		   debian/@PACKAGE@-debuginfo.prerm
-
 control		+= debian/@PACKAGE@-debuginfo.install
 
 @WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-debuginfo.install:
@@ -342,11 +327,6 @@ control		+= debian/@PACKAGE@-debuginfo.install
 ## Debugging source package:
 ##
 
-#control	+= debian/@PACKAGE@-debugsource.postinst \
-#		   debian/@PACKAGE@-debugsource.postrm \
-#		   debian/@PACKAGE@-debugsource.preinst \
-#		   debian/@PACKAGE@-debugsource.prerm
-
 control		+= debian/@PACKAGE@-debugsource.install
 
 debian/@PACKAGE@-debugsource.install:
@@ -358,16 +338,12 @@ debian/@PACKAGE@-debugsource.install:
 ##
 
 control		+= debian/@PACKAGE@-$(kversion).postinst \
-		   debian/@PACKAGE@-$(kversion).postrm \
 		   debian/@PACKAGE@-$(kversion).preinst \
-		   debian/@PACKAGE@-$(kversion).prerm \
-		   debian/@PACKAGE@-$(kversion).triggers
+		   debian/@PACKAGE@-$(kversion).prerm
 
-debian/@PACKAGE@-$(kversion).postinst \
-debian/@PACKAGE@-$(kversion).postrm \
-debian/@PACKAGE@-$(kversion).preinst \
-debian/@PACKAGE@-$(kversion).prerm \
-debian/@PACKAGE@-$(kversion).triggers: \
+debian/@PACKAGE@-$(kversion).postinst: debian/@PACKAGE@-kernel.postinst \
+debian/@PACKAGE@-$(kversion).preinst: debian/@PACKAGE@-kernel.preinst \
+debian/@PACKAGE@-$(kversion).prerm: debian/@PACKAGE@-kernel.prerm: \
 debian/@PACKAGE@-$(kversion).%: debian/@PACKAGE@-kernel.%
 	cp -fv $< $@
 
@@ -392,20 +368,6 @@ ksubdir		= @ksubdir@
 ##
 ## Kernel development package:
 ##
-
-#control	+= debian/@PACKAGE@-$(kversion)-devel.postinst \
-#		   debian/@PACKAGE@-$(kversion)-devel.postrm \
-#		   debian/@PACKAGE@-$(kversion)-devel.preinst \
-#		   debian/@PACKAGE@-$(kversion)-devel.prerm \
-#		   debian/@PACKAGE@-$(kversion)-devel.triggers
-
-#debian/@PACKAGE@-$(kversion)-devel.postinst \
-#debian/@PACKAGE@-$(kversion)-devel.postrm \
-#debian/@PACKAGE@-$(kversion)-devel.preinst \
-#debian/@PACKAGE@-$(kversion)-devel.prerm \
-#debian/@PACKAGE@-$(kversion)-devel.triggers: \
-#debian/@PACKAGE@-$(kversion)-devel.%: debian/@PACKAGE@-kernel-devel.%
-#	cp -fv $< $@
 
 control		+= debian/@PACKAGE@-$(kversion)-devel.install
 
@@ -443,18 +405,6 @@ control		+= debian/@PACKAGE@-$(kversion)-devel.install
 ## Kernel debugging information package:
 ##
 
-#control	+= debian/@PACKAGE@-$(kversion)-debuginfo.postinst \
-#		   debian/@PACKAGE@-$(kversion)-debuginfo.postrm \
-#		   debian/@PACKAGE@-$(kversion)-debuginfo.preinst \
-#		   debian/@PACKAGE@-$(kversion)-debuginfo.prerm
-
-#debian/@PACKAGE@-$(kversion)-debuginfo.postinst \
-#debian/@PACKAGE@-$(kversion)-debuginfo.postrm \
-#debian/@PACKAGE@-$(kversion)-debuginfo.preinst \
-#debian/@PACKAGE@-$(kversion)-debuginfo.prerm: \
-#debian/@PACKAGE@-$(kversion)-debuginfo.%: debian/@PACKAGE@-kernel-debuginfo.%
-#	cp -fv $< $@
-
 control		+= debian/@PACKAGE@-$(kversion)-debuginfo.install
 
 @WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-$(kversion)-debuginfo.install:
@@ -469,19 +419,6 @@ control		+= debian/@PACKAGE@-$(kversion)-debuginfo.install
 ## Kernel debugging source package:
 ##
 
-#control	+= debian/@PACKAGE@-$(kversion)-debugsource.postinst \
-#		   debian/@PACKAGE@-$(kversion)-debugsource.postrm \
-#		   debian/@PACKAGE@-$(kversion)-debugsource.preinst \
-#		   debian/@PACKAGE@-$(kversion)-debugsource.prerm
-
-#debian/@PACKAGE@-$(kversion)-debugsource.postinst \
-#debian/@PACKAGE@-$(kversion)-debugsource.postrm \
-#debian/@PACKAGE@-$(kversion)-debugsource.preinst \
-#debian/@PACKAGE@-$(kversion)-debugsource.prerm: \
-#debian/@PACKAGE@-$(kversion)-debugsource.%: debian/@PACKAGE@-kernel-debugsource.%
-#	cp -fv $< $@
-
-
 control		+= debian/@PACKAGE@-$(kversion)-debugsource.install
 
 debian/@PACKAGE@-$(kversion)-debugsource.install:
@@ -491,18 +428,6 @@ debian/@PACKAGE@-$(kversion)-debugsource.install:
 ##
 ## Kernel source package:
 ##
-
-control		+= debian/@PACKAGE@-$(kversion)-source.postinst \
-		   debian/@PACKAGE@-$(kversion)-source.postrm \
-		   debian/@PACKAGE@-$(kversion)-source.preinst \
-		   debian/@PACKAGE@-$(kversion)-source.prerm
-
-debian/@PACKAGE@-$(kversion)-source.postinst \
-debian/@PACKAGE@-$(kversion)-source.postrm \
-debian/@PACKAGE@-$(kversion)-source.preinst \
-debian/@PACKAGE@-$(kversion)-source.prerm: \
-debian/@PACKAGE@-$(kversion)-source.%: debian/@PACKAGE@-kernel-source.%
-	cp -fv $< $@
 
 control		+= debian/@PACKAGE@-$(kversion)-source.install
 
@@ -515,8 +440,7 @@ debian/@PACKAGE@-$(kversion)-source.install:
 
 control		+= debian/@PACKAGE@-java.postinst \
 		   debian/@PACKAGE@-java.postrm \
-		   debian/@PACKAGE@-java.preinst \
-		   debian/@PACKAGE@-java.prerm
+		   debian/@PACKAGE@-java.preinst
 
 control		+= debian/@PACKAGE@-java.install
 
@@ -535,11 +459,6 @@ debian/@PACKAGE@-java.install:
 ##
 ## Java documentation package:
 ##
-
-control		+= debian/@PACKAGE@-javadoc.postinst \
-		   debian/@PACKAGE@-javadoc.postrm \
-		   debian/@PACKAGE@-javadoc.preinst \
-		   debian/@PACKAGE@-javadoc.prerm
 
 control		+= debian/@PACKAGE@-javadoc.docs
 

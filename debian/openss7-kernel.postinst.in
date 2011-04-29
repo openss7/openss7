@@ -53,33 +53,37 @@
 # =============================================================================
 subpkg=kernel
 @openss7_postinst@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
 #
-# For old modules we need to do a depmod.
+# postinst_depmod() - Perform a depmod when the kernel modules installed are for
+#   the running kernel.  This only applies to 2.4 module systems.  The
+#   openss7-modules script performs the comparable actions for 2.6 module
+#   systems.
 #
 postinst_depmod () { :
     if which depmod >/dev/null 2>&1; then
 	if [ ":@kversion@" = ":`uname -r`" ] ; then
-	    # This is a running kernel, do a depmod on the modules directory for the
-	    # running kernel.
 	    if [ -r @ksysmap@ ] ; then
-		depmod -ae -F @ksysmap@ 2>&1 || :
+		depmod -ae -F @ksysmap@ 2>&1 || true
 	    else
-		depmod -ae 2>&1 || :
+		depmod -ae 2>&1 || :true
 	    fi
 	elif [ -r @ksysmap@ ] ; then
-	    # Non-running kernels a depmod will be performed on boot by depmod
-	    # anyway, but try one now.
 	    UNAME_MACHINE=@target_cpu@ \
-	    depmod -ae -F @ksysmap@ @kversion@ 2>&1 || :
+	    depmod -ae -F @ksysmap@ @kversion@ 2>&1 || :true
 	fi
     fi
+    :
     return 0
 }
 #
-# For old modules, start init scripts when they have already been installed and
-# are normally started in the current runlevel.  Note that if init scripts are
-# started and they are already running, they will not affect anything until
-# reboot.
+# postinst_startscripts() - For old modules, start init scripts when they have
+#   already been installed and are normally started in the current runlevel.
+#   Note that if init scripts are started and they are already running, they
+#   will not affect anything until reboot.
 #
 postinst_startscripts () { :
     local r list i
@@ -97,71 +101,15 @@ postinst_startscripts () { :
     return 0
 }
 #
-# The openss7-modules script will return a bitwise OR (sum) of the following
-# values:
-#
-#   0 - Everything proceeded according to plan.
-#
-#   1 - When set, an error occured.  When unset, no errors were issued.
-#
-#   2 - When set, a syntax error occurred.  When unset, no syntax errors
-#       occured.
-#
-#   4 - When set, the running kernel would be affected and the running kernel
-#       has kallsyms that are different addresses than System.map.   Kernel
-#       modules have been linked against the running kernel, no depmod has been
-#       performed, and the script has touched /.openss7-update-@krunning@ to
-#       signal the init scripts that a relink on shutdown or reboot is required.
-#       When unset, the running kernel /proc/kallsyms and System.map-@krunning@
-#       are consistent.
-#
-#   8 - When set, the running kernel has the STREAMS subsystem running and
-#       outdated kernel modules are loaded.  Kernel modules have been linked
-#       against the running kernel, no depmod has been performed, and the script
-#       has touched /.openss7-update-@krunning@ to signal the init scripts that
-#       a relink on shutdown or reboot is required.  When unset, the STREAMS
-#       subsystem is stopped and has no kernel modules loaded.
-#
-#  16 - When set, the running kernel would have weak-update links changed, but
-#       have not yet been altered.  No depmod has been performed, and the script
-#       has touched /.openss7-update-@krunning@ to signal the init scripts that
-#       a relink on shutdown or reboot is required.  When unset, weak-update
-#       links have been altered and the STREAMS subsystem is stopped.
-#
-# 128 - When set, a warning occurred.  When unset, no warnings were issued.
+# postinst_updates() - Perform weak-updates on modules, perform depmod, and
+#   signal init scripts when a relink is required on shutdown or reboot.
 #
 postinst_updates () { :
     [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
     local retval
     retval=0
     if [ -x @sbindir@/$name-modules ] ; then
-	@sbindir@/$name-modules -- -q -e --add-modules @kversion@ || retval=$?
-    fi
-    if [ $retval -ge 128 ]
-    then : # a warning occurred
-	retval=`expr $retval - 128`
-    else : # no warnings occurred
-    fi
-    if [ $retval -ge 8 ]
-    then : # outdated kernel modules loaded
-	retval=`expr $retval - 8`
-    else : # no kernel modules loaded
-    fi
-    if [ $retval -ge 4 ]
-    then : # running kernel mismatch
-	retval=`expr $retval - 4`
-    else : # running kernel consistent
-    fi
-    if [ $retval -ge 2 ]
-    then : # a syntax error occurred
-	retval=`expr $retval - 2`
-    fi
-    if [ $retval -ge 1 ]
-    then : # an error occurred
-	retval=`expr $retval - 1`
-    fi
-    if [ $retval -ne 0 ]
-    then : # invalid return code
+	@sbindir@/$name-modules -- -q -e --add-modules @kversion@ || true
     fi
     :
     return 0

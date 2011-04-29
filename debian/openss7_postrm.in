@@ -1,48 +1,17 @@
-#!/bin/sh
-# @configure_input@
+@openss7_header@
 # =============================================================================
+# @configure_input@
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
-@mscript_header@
+# -----------------------------------------------------------------------------
 datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
-#
-# After we remove this repository package, we need to adjust whatever
-# definitions are required in configuration files.  When we changed them on
-# installation, we save an original copy in $f.dpkg-save.  Therefore, if
-# $f.dpkg-save exists, copy it back.
-#
-postrm_repo () { :
-    d="@sysconfdir@/apt/sources.list.d"
-    for f in openss7.list ; do f="$d/$f"
-        if [ -f $f -a -f $f.dpkg-save ] ; then
-            if ! diff $f $f.dpkg-save >/dev/null 2>&1 ; then
-                mv -f -- $f.dpkg-save $f
-            fi
-        fi
-        rm -f -- $f.dpkg-save
-    done
-    :
-    return 0
-}
-postrm_manpages () { :
-    return
-    #
-    # Note that manual pages should be handled by debhelper additions.
-    #
-    if which makewhatis >/dev/null 2>&1 ; then
-	LANGUAGE= LANG= makewhatis -u ${mandir} || :
-    fi
-    if which mandb >/dev/null 2>&1 ; then
-	LANGUAGE= LANG= mandb -p ${mandir} || :
-    fi
-}
 remove_depends() {
     local modrex depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
@@ -171,27 +140,6 @@ postrm_symvers () { :
         rm -f -- /boot/$f || :
     fi
 }
-postrm_modconf () {
-    local last_core_package='yes'
-    for file in /lib/modules/*/modules.$base ; do
-	if [ -f $file ] ; then
-	    last_core_package='no'
-	    break
-	fi
-    done
-    if [ ":$last_core_package" = ":no" ] ; then
-	return 0
-    fi
-    conf_old=@sysconfdir@/modules.conf
-    if grep -q 'include[^#]*'"@modutildir@"'/'$base $conf_old ; then
-	conf_tmp=$tmppath/modules.conf.tmp.$$
-	sed -e "/include[^#]*\/$base/d" $conf_old > $conf_tmp
-	chmod --reference=$conf_old $conf_tmp
-	cp -fb --suffix=.old $conf_tmp $conf_old
-	rm -f $conf_tmp
-    fi
-    rm -f -- "@modutildir@/$base"
-}
 postrm_preload () {
     prel_old="@preloads@"
     if [ -f $prel_old ] ; then
@@ -217,16 +165,6 @@ postrm_depmod () {
 	/sbin/depmod -ae -F @ksysmap@ @kversion@
     fi
 }
-postrm_update () { :
-    local retval=0
-    if [ -x @sbindir@/openss7-modules ]; then
-	gawk -f @sbindir@/openss7-modules -- -q -e --remove-modules @kversion@ || retval=$?
-    fi
-    return $retval
-}
-postrm_kernel () { :
-    postrm_update
-}
 postrm_core () { :
     @WITH_KO_MODULES_FALSE@postrm_modconf
     postrm_preload
@@ -242,6 +180,7 @@ failed_upgrade_postrm () { :; }
 abort_install_postrm () { :; }
 abort_upgrade_postrm () { :; }
 disappear_postrm () { :; }
-# =============================================================================
-# @configure_input@
+# -----------------------------------------------------------------------------
 # vim: ft=sh sw=4 noet
+# @configure_input@
+# =============================================================================
