@@ -53,11 +53,40 @@
 # =============================================================================
 subpkg=doc
 @openss7_postrm@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postrm_manpages() - Update the removed and replaced manual pages in the
+#   aprospros database.  One problem with doing this is that even the oldest of
+#   debian policies and debhelper implementations will implement the debhelper
+#   code to do this.  Therefore, this function is shortcircuited for now.  (We
+#   install >3000 manual pages and it takes forever anyway.)  Failing to do this
+#   altogether is not cricical because most machines run an evening cron job to
+#   update these.
+#
+postrm_manpages () { :; return
+    if which makewhatis >/dev/null 2>&1 ; then
+	LANGUAGE= LANG= makewhatis -u ${mandir} || :
+    fi
+    if which mandb >/dev/null 2>&1 ; then
+	LANGUAGE= LANG= mandb -p ${mandir} || :
+    fi
+}
+#
+# postrm_doc() - On final removal of the package, update aprospros database with
+#   removed manual pages.
+#
+postrm_doc () { :
+    postrm_manpages
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # remove-postrm remove
 remove_postrm () { :
+    postrm_doc
 }
 # remove-postrm purge
 purge_postrm () { :

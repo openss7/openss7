@@ -52,8 +52,11 @@
 #
 # =============================================================================
 subpkg=lib
-@mscript_header@
+@openss7_preinst@
 datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
 #
 # preinst_libraries() - On a fresh installation, look for an remove any non-deb
 #   or old tarball release libraries.  On reinstallations this step can (and
@@ -70,8 +73,6 @@ preinst_libraries () {
             rm -f $old_libs || true
         fi
     done
-    :
-    return 0
 }
 #
 # preinst_tools() - On a fresh installation, look for and remove any non-deb or
@@ -88,40 +89,33 @@ preinst_tools () {
             location="`which $tool 2>/dev/null`"
         done
     done
-    :
-    return 0
 }
 #
-# preinst_lib_install() - On a fresh installation, look for and remove any
-#   conflicting non-deb or old tarball release tools and libraries.  On
-#   reinstallations this step can (and should) be skipped.
+# preinst_lib() - On a fresh installation, look for and remove any conflicting
+#   non-deb or old tarball release tools and libraries.  On reinstallations this
+#   step can (and should) be skipped.
 #
-preinst_lib_install () { :
+preinst_lib () { :
     preinst_libraries
     preinst_tools
-}
-preinst_lib_reinstall () { :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # new-preinst install
 install_preinst () { :
-    preinst_lib_install
+    preinst_lib
 }
 # new-preinst install old-version
 reinstall_preinst () { :
-    preinst_lib_reinstall
 }
 # new-preinst upgrade old-version
 upgrade_preinst () { :
-    preinst_lib_reinstall
 }
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
-    preinst_lib_reinstall
 }
 @mscript_preinst@
 @mscript_debhelper@

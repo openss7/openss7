@@ -53,6 +53,30 @@
 # =============================================================================
 subpkg=repo
 @openss7_prerm@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# prerm_repo() - Before removing, we need to save whatever definitions are
+#   required in common configuration files.
+#
+#   FIXME: For the rpm version this is much more than this.  It is moving common
+#	configuration files that were altered by the installation.  Short
+#	circuited for now.
+#
+prerm_repo () { :; return
+    d="@sysconfdir@/apt/sources.list.d"
+    for f in openss7.list; do
+	f="$d/$f"
+	if [ -r $f ]; then
+	    mv -f -- $f $f.dpkg-save
+	fi
+	rm -f -- $f
+    done
+    :
+    return 0
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------

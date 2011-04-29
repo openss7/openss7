@@ -1,29 +1,17 @@
-#!/bin/sh
-# @configure_input@
+@openss7_header@
 # =============================================================================
+# @configure_input@
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
-@mscript_header@
+# -----------------------------------------------------------------------------
 datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
-prerm_repo () { :
-    d="@sysconfdir@/apt/sources.list.d"
-    for f in openss7.list; do
-	f="$d/$f"
-	if [ -r $f ]; then
-	    mv -f -- $f $f.dpkg-save
-	fi
-	rm -f -- $f
-    done
-    :
-    return 0
-}
 remove_depends() {
     local modrex depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
@@ -146,32 +134,6 @@ prerm_sock2path () { :
             esac
         fi
     done
-    :
-    return 0
-}
-prerm_manrefs () { :
-    rm -f -- @mandir@/${manrefs}
-    :
-    return 0
-}
-prerm_manmacros () { :
-    rm -f -- @mandir@/${manmacros}
-    :
-    return 0
-}
-prerm_infofiles () { :
-    if [ -x /sbin/install-info ] ; then
-#	Older policies do not compress info files.
-        for n in ${manuals} ; do
-            if [ -f @infodir@/$n.info ] ; then
-                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info || :
-            elif [ -f @infodir@/$n.info.gz ] ; then
-                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.gz || :
-            elif [ -f @infodir@/$n.info.bz2 ] ; then
-                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.bz2 || :
-            fi
-        done
-    fi
     :
     return 0
 }
@@ -407,26 +369,6 @@ prerm_initscripts_upgrade () { :
     done
     :
     return 0
-}
-prerm_manrefs_upgrade () { :
-    rm -f -- @mandir@/${manrefs}
-}
-prerm_manmacros_upgrade () { :
-    rm -f -- @mandir@/${manmacros}
-}
-prerm_infofiles_upgrade () { :
-    if [ -x /sbin/install-info ] ; then
-#	Older policies do not compress info files.
-        for n in ${manuals} ; do
-            if [ -f @infodir@/$n.info ] ; then
-                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info || :
-            elif [ -f @infodir@/$n.info.gz ] ; then
-                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.gz || :
-            elif [ -f @infodir@/$n.info.bz2 ] ; then
-                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.bz2 || :
-            fi
-        done
-    fi
 }
 prerm_dev () { :
     if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
@@ -677,12 +619,6 @@ prerm_initscripts () { :
     done
     :
 }
-prerm_manrefs () { :
-    rm -f -- @mandir@/${manrefs}
-}
-prerm_manmacros () { :
-    rm -f -- @mandir@/${manmacros}
-}
 # -----------------------------------------------------------------------------
 # Default functions:
 # -----------------------------------------------------------------------------
@@ -691,6 +627,7 @@ conflict_prerm () { :; }
 upgrade_prerm () { :; }
 failed_upgrade_prerm () { :; }
 deconfigure_prerm () { :; }
-# =============================================================================
-# @configure_input@
+# -----------------------------------------------------------------------------
 # vim: ft=sh sw=4 noet
+# @configure_input@
+# =============================================================================

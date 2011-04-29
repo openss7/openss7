@@ -53,6 +53,53 @@
 # =============================================================================
 subpkg=base
 @openss7_preinst@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# On an initial installation of the package, we need to check for non-deb
+# installations on the host and remove any entries that might later conflict
+# with out entries.  We treat every fresh installation like an upgrade from
+# non-deb/rpm install.
+#
+preinst_preloads () {
+    case @kminor@ in
+	4) prel_old=@sysconfdir@/modules ;;
+	5)  if [ @kpatch@ -lt 48 ]; then
+		prel_old=@sysconfdir@/modules
+	    else
+		prel_old=@sysconfdir@/modprobe.preload
+	    fi ;;
+	6) prel_old=@sysconfdir@/modprobe.preload ;;
+	*) return 0 ;;
+    esac
+    if [ -f $prel_old ]; then
+        prel_tmp=$tmppath/modprobe.preload.tmp.$$
+        prel_new=$tmppath/modprobe.preload.new.$$
+        cp -f -- $prel_old $prel_new
+	sed -r -e '/^[[:space:]]*(specfs|streams)/d' $prel_new > $prel_tmp
+        mv -f -- $prel_tmp $prel_new
+        chmod --reference=$prel_old -- $prel_new
+        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
+        rm -f -- $prel_new
+    fi
+}
+#
+# Fresh install, go looking for non-deb initscripts and remove them.
+#
+preinst_initscripts () {
+    list="$inifiles $nonrpminit"; for i in $list; do
+	if [ -f @initrddir@/$i ]; then
+#
+#	    Find the best working init script removal tool
+#
+            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
+            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
+            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
+	fi
+    done
+}
 #
 # This is an initial installation of the base subpackage.  We need to check for
 # non-deb installations on the host and remove any entries that might later

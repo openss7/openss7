@@ -52,8 +52,11 @@
 #
 # =============================================================================
 subpkg=lib
-@mscript_header@
+@openss7_postinst@
 datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
 #
 # postinst_libraries() - After a fresh installation, upgrade or reinstall, do a
 #   ldconfig.  Note that this action should be performed by the debhelper
@@ -63,8 +66,6 @@ postinst_libraries () { :
     if which ldconfig >/dev/null 2>&1 ; then
 	ldconfig || true
     fi
-    :
-    return 0
 }
 #
 # postinst_tcllibs() - After a fresh installation, upgrade or reinstall, create
@@ -77,8 +78,6 @@ postinst_tcllibs () { :
 	    echo -e "pkg_mkIndex $d\\nexit" | tclsh || true
 	done
     fi
-    :
-    return 0
 }
 #
 # postinst_lib() - After a fresh installtion, upgrade or resinstall, do a
@@ -106,17 +105,14 @@ triggered_postinst () { :
 # new-prerm failed-upgrade new-version ...FAILED
 # old-posinst abort-upgrade new-version
 abort_upgrade_postinst () { :
-    postinst_lib
 }
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
 abort_remove_postinst () { :
-    postinst_lib
 }
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst () { :
-    postinst_lib
 }
 @mscript_postinst@
 @mscript_debhelper@

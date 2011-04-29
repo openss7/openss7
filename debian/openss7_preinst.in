@@ -1,87 +1,17 @@
-#!/bin/sh
-# @configure_input@
+@openss7_header@
 # =============================================================================
+# @configure_input@
 # @(#) $RCSfile$ $Name$($Revision$) $Date$
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # This software is licensed under the GNU Affero General Public License (AGPL)
 # Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
-@mscript_header@
+# -----------------------------------------------------------------------------
 datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
-preinst_repo () { :
-    local d
-    d="@sysconfdir@/apt/sources.list.d"
-    [ -d $d ] || return 1
-    (
-	cd "$d"
-	un=; pw=; oldfile=; file="@PACKAGE@.list"
-	for s in '' '.dpkg-save' '.dpkg-new'; do
-	    oldfile="$file$s"
-	    if [ -r $oldfile ]; then
-                un=`sed -n -r 's,^.*deb[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $oldfile`
-                pw=`sed -n -r 's,^.*deb[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $oldfile`
-                [ -n "$un" -a -n "$pw" ] || continue
-                break
-	    fi
-	done
-	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.dpkg-save
-        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+'&un='}${un}${pw:+'&pw='}${pw}"
-        ext="$ext"`echo /@reposubdir@ | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
-	key=; [ -z "$un" ] || key="$un${pw:+':'}${pw}@"
-        url="@reposerv@://${key}@repobase@/@reporoot@/debs/$file$ext"
-        rm -f -- $file
-        if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-            if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
-                echo 'Authorization required for repository access.' >/dev/tty
-                u='anonymous'; p=
-                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-'anonymous'}
-                if [ "$u" != 'anonymous' ] ; then
-                read -es -p 'Password: ' p </dev/tty >/dev/tty
-                echo '' >/dev/tty
-                fi
-		key=; [ -z "$u" ] || key="${u}:${p}@"
-                url="@reposerv@://${key}@repobase@/@reporoot@/debs/$file$ext"
-                rm -f -- $file
-                if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-                    [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-save $file
-                    echo 'Authorization failed.' >/dev/tty
-		    return 1
-                fi
-            fi
-        fi
-        if [ ! -e $file ] ; then
-            [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-save $file
-	    return 1
-        fi
-    ) || return 1
-    return 0
-}
-#
-# Old non-deb distro puts some man pages in the wrong place, clean them out on a
-# fresh install.
-#
-preinst_manpages () { :
-    if [ -f /usr/man/man3/fattach.3 ] ; then
-        rm -f /usr/man/man3/fattach.3 2>/dev/null
-        rm -f /usr/man/man3/detach.3 2>/dev/null
-        rm -f /usr/man/man3/isastream.3 2>/dev/null
-        rmdir -p /usr/man/man3 2>/dev/null || :
-        rm -f /usr/man/man8/fattach.8 2>/dev/null
-        rm -f /usr/man/man8/fdetach.8 2>/dev/null
-        rmdir -p /usr/man/man8 2>/dev/null || :
-        rm -f /usr/man/man9/connld.9 2>/dev/null
-        rm -f /usr/man/man9/fifo.9 2>/dev/null
-        rm -f /usr/man/man9/pipemod.9 2>/dev/null
-        rmdir -p /usr/man/man9 2>/dev/null || :
-        rmdir -p /usr/man 2>/dev/null || :
-    fi
-    :
-    return 0
-}
 #
 # A little recursive function to delete all modules dependent on an initial
 # module set (in our case "streams.o").  The function echos the list of modules
@@ -107,99 +37,6 @@ remove_depends () {
 	rmmod $1 >/dev/null 2>&1 || return $?
     fi
     return 0
-}
-preinst_kernel_modules () { :
-#
-#   This is a fresh install of this version of kernel module.  Make sure that
-#   there are no tarball installed kernel modules hanging around for this
-#   kernel version.
-#
-    local list m b modl_mods line dep
-    list="${modules}" ; modl_mods=
-    if [ -d @kmoduledir@ ] ; then
-	for m in `find @kmoduledir@ \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
-		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
-		case " $list " in (*" $b "*) ;; (*) continue ;; esac
-		echo "$m"
-		modl_mods="$modl_mods${modl_mods:+' '}$m"
-	done
-	if [ -n "$modl_mods" -a -f @kmoduledir@/modules.dep ] ; then
-#	    First we can build a dependency tree from every dependency
-#	    expression that can be found in the modules.dep file.
-	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
-	    set +x
-	    dep= ; while read line ; do
-		case $line in
-		    (*\\)   line="`echo $line | sed -e 's|\\$||'`"
-			    dep="$dep${dep:+' '}$line"; continue ;;
-		    (*)     dep="$dep${dep:+' '}$line" ;;
-		esac
-		[ -n "$dep" ] || continue;
-		set -- $dep
-		if [ $# -ge 2 ] ; then
-		    t=`echo $1 | sed -e 's|:$||'`
-		    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-		    shift
-		    for p in $@ ; do
-			prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-			eval "$prereq=\"\$$prereq\${$prereq:+' '}$t\""
-			eval "$target=\"\$$target\${$target:+' '}$p\""
-		    done
-		fi
-		dep=
-	    done < @kmoduledir@/modules.dep
-	    eval "$xtrace"
-	fi
-    fi
-#   remove conflicting and dependent modules
-    if [ -n "$modl_mods" ] ; then
-	rm -f -- $modl_mods
-	for m in $list ; do
-	    prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-	    eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
-	    [ -n "$modl_deps" ] || continue
-	    rm -f -- $modl_deps
-	done
-    fi
-    :
-    return 0
-}
-#
-# FIXME: there is a way in debian to indicate that a reboot is required (use it)
-#
-preinst_kernel_running () {
-    local fields ind val signal reboot
-    if [ ":@kversion@" = ":`uname -r`" ] ; then
-#
-#	If we are upgrading and the upgrade is for the running kernel, or we are
-#	installing new on the running kernel, we have to worry about previous
-#	loaded modules for the old version or a non-deb version.
-#
-	if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
-	    if [ -x /usr/sbin/fdetach ] ; then
-		/usr/sbin/fdetach -a 2>/dev/null || :
-	    fi
-	    for signal in TERM KILL ; do
-		if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
-		    lsof | grep '\<STR\>' | \
-		    while read fields ; do
-			set -- $fields
-			if [ ":$5" != ':CHR' ] ; then continue; fi
-			ind=`expr $# - 1`
-			eval "val=\"\${$ind}\""
-			if [ ":$val" != ':STR' ] ; then continue; fi
-			kill -$signal $2 >/dev/null 2>&1 || :
-		    done
-		    sleep 5
-		fi
-	    done
-	fi
-	lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
-	remove_depends streams || reboot='yes'
-	remove_depends specfs  || reboot='yes'
-	[ ":$reboot" != ':yes' ] || echo "$script: warning: reboot required." >&2
-    fi
-    :
 }
 #
 # For a fresh installation make sure that there are no entries from an non-deb
@@ -390,22 +227,6 @@ preinst_init () { :
 	done
     fi
 }
-preinst_manmacros () { :
-    if [ -r @mandir@/$base.macros ] ; then
-	echo "$script: warning: Deleting manual macros file @mandir@/$base.macros" >&2
-	rm -f -- @mandir@/$base.macros
-    fi
-    :
-    return 0
-}
-preinst_manrefs () { :
-    if [ -r @mandir@/$base.refs ]; then
-	echo "$script: warning: Deleting manual references file @mandir@/$base.refs" >&2
-	rm -f -- @mandir@/$base.refs
-    fi
-    :
-    return 0
-}
 preinst_dev () { :
     if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
 	# ensure that devices were removed
@@ -414,123 +235,6 @@ preinst_dev () { :
     fi
     :
     return 0
-}
-remove_warn_file () {
-    if [ -f "$1" ] ; then
-	echo "$script: warning: removing old file $1" >&2
-	rm -f -- $1
-    fi
-}
-remove_warn_files () {
-    local f
-    for f in $@ ; do
-	remove_warn_file $f
-    done
-}
-remove_warn_dir () {
-    if [ -d $1 -a "`(cd $1; pwd)`" != "/"  ] ; then
-	if [ -L $1 ] ; then
-	    echo "$script: warning: removing symbolic link $1" >&2
-	    rm -f -- $1
-	else
-	    echo "$script: warning: removing directory $1" >&2
-	    rm -rf -- $1
-	fi
-    fi
-}
-remove_warn_dirs () {
-    local d
-    for d in $@ ; do
-	remove_warn_dir $d
-    done
-}
-#
-# This is an initial installation of the doc subpackage.  We need to check for
-# non-deb installations on the host and remove any info entries that might later
-# conflict with our entries.  We treat every fresh installation like an upgrade
-# from non-deb install.
-#
-remove_warn_old () { :
-#
-#   Check for old non-deb install static libraries and header files.
-#
-#   We are really the only distribution that has shipped static libraries for
-#   LiS, but we should go looking to clean them out in the usual places.
-#
-    for d in /lib /usr/lib /usr/local/lib @libdir@ ; do
-	for subdir in / /LiS/ /lis/ /streams/ /strxnet/ ; do
-	    if [ -d $d${subdir} ] ; then
-		remove_warn_files \
-		    $d${subdir}libLiS.a \
-		    $d${subdir}libpLiS.a \
-		    $d${subdir}libstreams.a \
-		    $d${subdir}libxnet.a \
-		    $d${subdir}libxti.a
-	    fi
-	done
-    done
-#
-#   There are a lot of places that we and other distributions have placed header
-#   files.  We go an clean out all of them.
-#
-    for d in /include /usr/include /usr/local/include @includedir@ @oldincludedir@ ; do
-	remove_warn_dirs \
-	    $d/LiS \
-	    $d/streams \
-	    $d/strxns \
-	    $d/strinet \
-	    $d/strxnet \
-	    $d/strsctp \
-	    $d/strss7 \
-	    $d/xnet \
-	    $d/xti \
-	    $d/ss7 \
-	    $d/os7 \
-	    $d/sctp
-    done
-}
-#
-# On an initial installation of the package, we need to check for non-deb
-# installations on the host and remove any entries that might later conflict
-# with out entries.  We treat every fresh installation like an upgrade from
-# non-deb/rpm install.
-#
-preinst_preloads () {
-    case @kminor@ in
-	4) prel_old=@sysconfdir@/modules ;;
-	5)  if [ @kpatch@ -lt 48 ]; then
-		prel_old=@sysconfdir@/modules
-	    else
-		prel_old=@sysconfdir@/modprobe.preload
-	    fi ;;
-	6) prel_old=@sysconfdir@/modprobe.preload ;;
-	*) return 0 ;;
-    esac
-    if [ -f $prel_old ]; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-	sed -r -e '/^[[:space:]]*(specfs|streams)/d' $prel_new > $prel_tmp
-        mv -f -- $prel_tmp $prel_new
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-}
-#
-# Fresh install, go looking for non-deb initscripts and remove them.
-#
-preinst_initscripts () {
-    list="$inifiles $nonrpminit"; for i in $list; do
-	if [ -f @initrddir@/$i ]; then
-#
-#	    Find the best working init script removal tool
-#
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
-	fi
-    done
 }
 #
 # Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen to
@@ -615,6 +319,7 @@ install_preinst () { :; }
 reinstall_preinst () { :; }
 upgrade_preinst () { :; }
 abort_upgrade_preinst () { :; }
-# =============================================================================
-# @configure_input@
+# -----------------------------------------------------------------------------
 # vim: ft=sh sw=4 noet
+# @configure_input@
+# =============================================================================

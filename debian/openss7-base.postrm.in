@@ -53,10 +53,35 @@
 # =============================================================================
 subpkg=base
 @openss7_postrm@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
 postrm_preloads () { :
 }
 postrm_base () { :
     postrm_preloads
+}
+postrm_modconf () {
+    local last_core_package='yes'
+    for file in /lib/modules/*/modules.$base ; do
+	if [ -f $file ] ; then
+	    last_core_package='no'
+	    break
+	fi
+    done
+    if [ ":$last_core_package" = ":no" ] ; then
+	return 0
+    fi
+    conf_old=@sysconfdir@/modules.conf
+    if grep -q 'include[^#]*'"@modutildir@"'/'$base $conf_old ; then
+	conf_tmp=$tmppath/modules.conf.tmp.$$
+	sed -e "/include[^#]*\/$base/d" $conf_old > $conf_tmp
+	chmod --reference=$conf_old $conf_tmp
+	cp -fb --suffix=.old $conf_tmp $conf_old
+	rm -f $conf_tmp
+    fi
+    rm -f -- "@modutildir@/$base"
 }
 #
 # postrm_modconf() - As the subpackage is being purged, remove the line from

@@ -53,6 +53,17 @@
 # =============================================================================
 subpkg=repo
 @openss7_postinst@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# After we install this repository package, we need to adjust whatever
+# definitions are required in either the /etc/yum/yum-plugins.d/kmod.conf or
+# /etc/zypp/zypp.conf files.
+#
+postinst_repo () { :
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------

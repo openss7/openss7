@@ -52,8 +52,11 @@
 #
 # =============================================================================
 subpkg=lib
-@mscript_header@
+@openss7_postrm@
 datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
 #
 # postrm_libraries() - When complete removal, perform a ldconfig after the
 #   libraries have been removed to flush them from the ldconfig cache.  Note
@@ -62,10 +65,8 @@ datarootdir=@datarootdir@
 #
 postrm_libraries () { :
     if which ldconfig >/dev/null 2>&1; then
-	ldconfig
+	ldconfig || true
     fi
-    :
-    return 0
 }
 #
 # postrm_tcllibs() - After removal or upgrade, the tcl module index files should

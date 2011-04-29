@@ -53,6 +53,84 @@
 # =============================================================================
 subpkg=devel
 @openss7_preinst@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+remove_warn_file () {
+    if [ -f "$1" ] ; then
+	echo "$script: warning: removing old file $1" >&2
+	rm -f -- $1
+    fi
+}
+remove_warn_files () {
+    local f
+    for f in $@ ; do
+	remove_warn_file $f
+    done
+}
+remove_warn_dir () {
+    if [ -d $1 -a "`(cd $1; pwd)`" != "/"  ] ; then
+	if [ -L $1 ] ; then
+	    echo "$script: warning: removing symbolic link $1" >&2
+	    rm -f -- $1
+	else
+	    echo "$script: warning: removing directory $1" >&2
+	    rm -rf -- $1
+	fi
+    fi
+}
+remove_warn_dirs () {
+    local d
+    for d in $@ ; do
+	remove_warn_dir $d
+    done
+}
+#
+# This is an initial installation of the doc subpackage.  We need to check for
+# non-deb installations on the host and remove any info entries that might later
+# conflict with our entries.  We treat every fresh installation like an upgrade
+# from non-deb install.
+#
+remove_warn_old () { :
+#
+#   Check for old non-deb install static libraries and header files.
+#
+#   We are really the only distribution that has shipped static libraries for
+#   LiS, but we should go looking to clean them out in the usual places.
+#
+    for d in /lib /usr/lib /usr/local/lib @libdir@ ; do
+	for subdir in / /LiS/ /lis/ /streams/ /strxnet/ ; do
+	    if [ -d $d${subdir} ] ; then
+		remove_warn_files \
+		    $d${subdir}libLiS.a \
+		    $d${subdir}libpLiS.a \
+		    $d${subdir}libstreams.a \
+		    $d${subdir}libxnet.a \
+		    $d${subdir}libxti.a
+	    fi
+	done
+    done
+#
+#   There are a lot of places that we and other distributions have placed header
+#   files.  We go an clean out all of them.
+#
+    for d in /include /usr/include /usr/local/include @includedir@ @oldincludedir@ ; do
+	remove_warn_dirs \
+	    $d/LiS \
+	    $d/streams \
+	    $d/strxns \
+	    $d/strinet \
+	    $d/strxnet \
+	    $d/strsctp \
+	    $d/strss7 \
+	    $d/xnet \
+	    $d/xti \
+	    $d/ss7 \
+	    $d/os7 \
+	    $d/sctp
+    done
+}
 preinst_devel () { :
     remove_warn_old
 }

@@ -53,17 +53,72 @@
 # =============================================================================
 subpkg=doc
 @openss7_prerm@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# prerm_manrefs() - Some debian policies mistakenly compress our manrefs and
+#   manmacros files.  This means that only a .gz form exists in the files list,
+#   so we must manually remove the manrefs.
+#
+prerm_manrefs () { :
+    if [ -n "${manrefs}" -a -f @mandir@/${manrefs} ]; then
+	rm -f -- "@mandir@/${manrefs}" || :
+    fi
+}
+#
+# prerm_manmacros() - Some debian policies mistakenly compress our manmacros and
+#   manmacros files.  This means that only a .gz form exists in the files list,
+#   so we must manually remove the manmacros.
+#
+prerm_manmacros () { :
+    if [ -n "${manmacros}" -a -f @mandir@/${manmacros} ]; then
+	rm -f -- "@mandir@/${manmacros}" || :
+    fi
+}
+#
+# prerm_infofiles() - Recent debian policies will remove info files from the
+#   directories based on trigger directories.  However, performing this removal
+#   will not hurt them and is necessary for older policies.
+#
+prerm_infofiles () { :
+    if [ -x /sbin/install-info ] ; then
+#	Older policies do not compress info files.
+        for n in ${manuals} ; do
+            if [ -f @infodir@/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info || :
+            elif [ -f @infodir@/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.gz || :
+            elif [ -f @infodir@/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=@infodir@ @infodir@/$n.info.bz2 || :
+            fi
+        done
+    fi
+}
+#
+# prerm_doc() - On a removal, go an remove things that are not in the files
+#   lists and therefore unknown to dpkg.
+#
+prerm_doc () { :
+    prerm_manrefs
+    prerm_manmacros
+    prerm_infofiles
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # xxx-prerm remove
 remove_doc_prerm () { :
+    prerm_doc
 }
 # con-prerm remove 'in-favour' package new-version
 conflict_doc_prerm () { :
+    prerm_doc
 }
 # old-prerm upgrade new-version
 upgrade_doc_prerm () { :
+    prerm_doc
 }
 # old-prerm upgrade new-version ***FAILED***
 # new-prerm failed-upgrade old-version

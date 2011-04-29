@@ -53,6 +53,103 @@
 # =============================================================================
 subpkg=kernel
 @openss7_preinst@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+preinst_kernel_modules () { :
+#
+#   This is a fresh install of this version of kernel module.  Make sure that
+#   there are no tarball installed kernel modules hanging around for this
+#   kernel version.
+#
+    local list m b modl_mods line dep
+    list="${modules}" ; modl_mods=
+    if [ -d @kmoduledir@ ] ; then
+	for m in `find @kmoduledir@ \( -name 'streams*.o' -o -name 'streams*.ko' -o -name 'streams*.o.gz' -o -name 'streams*.ko.gz' \) 2>/dev/null` ; do
+		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
+		case " $list " in (*" $b "*) ;; (*) continue ;; esac
+		echo "$m"
+		modl_mods="$modl_mods${modl_mods:+' '}$m"
+	done
+	if [ -n "$modl_mods" -a -f @kmoduledir@/modules.dep ] ; then
+#	    First we can build a dependency tree from every dependency
+#	    expression that can be found in the modules.dep file.
+	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+	    set +x
+	    dep= ; while read line ; do
+		case $line in
+		    (*\\)   line="`echo $line | sed -e 's|\\$||'`"
+			    dep="$dep${dep:+' '}$line"; continue ;;
+		    (*)     dep="$dep${dep:+' '}$line" ;;
+		esac
+		[ -n "$dep" ] || continue;
+		set -- $dep
+		if [ $# -ge 2 ] ; then
+		    t=`echo $1 | sed -e 's|:$||'`
+		    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+		    shift
+		    for p in $@ ; do
+			prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+			eval "$prereq=\"\$$prereq\${$prereq:+' '}$t\""
+			eval "$target=\"\$$target\${$target:+' '}$p\""
+		    done
+		fi
+		dep=
+	    done < @kmoduledir@/modules.dep
+	    eval "$xtrace"
+	fi
+    fi
+#   remove conflicting and dependent modules
+    if [ -n "$modl_mods" ] ; then
+	rm -f -- $modl_mods
+	for m in $list ; do
+	    prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	    eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
+	    [ -n "$modl_deps" ] || continue
+	    rm -f -- $modl_deps
+	done
+    fi
+    :
+    return 0
+}
+#
+# FIXME: there is a way in debian to indicate that a reboot is required (use it)
+#
+preinst_kernel_running () {
+    local fields ind val signal reboot
+    if [ ":@kversion@" = ":`uname -r`" ] ; then
+#
+#	If we are upgrading and the upgrade is for the running kernel, or we are
+#	installing new on the running kernel, we have to worry about previous
+#	loaded modules for the old version or a non-deb version.
+#
+	if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+	    if [ -x /usr/sbin/fdetach ] ; then
+		/usr/sbin/fdetach -a 2>/dev/null || :
+	    fi
+	    for signal in TERM KILL ; do
+		if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+		    lsof | grep '\<STR\>' | \
+		    while read fields ; do
+			set -- $fields
+			if [ ":$5" != ':CHR' ] ; then continue; fi
+			ind=`expr $# - 1`
+			eval "val=\"\${$ind}\""
+			if [ ":$val" != ':STR' ] ; then continue; fi
+			kill -$signal $2 >/dev/null 2>&1 || :
+		    done
+		    sleep 5
+		fi
+	    done
+	fi
+	lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
+	remove_depends streams || reboot='yes'
+	remove_depends specfs  || reboot='yes'
+	[ ":$reboot" != ':yes' ] || echo "$script: warning: reboot required." >&2
+    fi
+    :
+}
 #   new-preinst install
 #	- files are unpacked
 #	- file list added

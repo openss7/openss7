@@ -53,22 +53,90 @@
 # =============================================================================
 subpkg=repo
 @openss7_preinst@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# preinst_repo() - When we go to install this subpackage fresh, we need to
+#   acquire a username and password from the user and get credentials for this
+#   machine.  When reinstalling (previous package was not purged), this function
+#   gets the existing credentials from the persistent configuration file.  Even
+#   when a package is purged, we like to keep a copy of the credentials lying
+#   around in a .dpkg-save file so that the machine credentials don't get lost.
+#
+#   Note that because the credentials are really machine credentials, we should
+#   really be saving them in /boot so that installations of other distros can
+#   also see the same machine credentials.
+#
+preinst_repo () { :
+    local d
+    d="@sysconfdir@/apt/sources.list.d"
+    [ -d $d ] || return 1
+    (
+	cd "$d"
+	un=; pw=; oldfile=; file="@PACKAGE@.list"
+	for s in '' '.dpkg-save' '.dpkg-new'; do
+	    oldfile="$file$s"
+	    if [ -r $oldfile ]; then
+                un=`sed -n -r 's,^.*deb[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $oldfile`
+                pw=`sed -n -r 's,^.*deb[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $oldfile`
+                [ -n "$un" -a -n "$pw" ] || continue
+                break
+	    fi
+	done
+	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.dpkg-save
+        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+'&un='}${un}${pw:+'&pw='}${pw}"
+        ext="$ext"`echo /@reposubdir@ | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
+	key=; [ -z "$un" ] || key="$un${pw:+':'}${pw}@"
+        url="@reposerv@://${key}@repobase@/@reporoot@/debs/$file$ext"
+        rm -f -- $file
+        if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
+            if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
+                echo 'Authorization required for repository access.' >/dev/tty
+                u='anonymous'; p=
+                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-'anonymous'}
+                if [ "$u" != 'anonymous' ] ; then
+                read -es -p 'Password: ' p </dev/tty >/dev/tty
+                echo '' >/dev/tty
+                fi
+		key=; [ -z "$u" ] || key="${u}:${p}@"
+                url="@reposerv@://${key}@repobase@/@reporoot@/debs/$file$ext"
+                rm -f -- $file
+                if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
+                    [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-save $file
+                    echo 'Authorization failed.' >/dev/tty
+		    return 1
+                fi
+            fi
+        fi
+        if [ ! -e $file ] ; then
+            [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-save $file
+	    return 1
+        fi
+    ) || return 1
+    return 0
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # new-preinst install
 install_preinst () { :
+    preinst_repo
 }
 # new-preinst install old-version
 reinstall_preinst () { :
+    preinst_repo
 }
 # new-preinst upgrade old-version
 upgrade_preinst () { :
+    preinst_repo
 }
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
+    preinst_repo
 }
 @mscript_preinst@
 @mscript_debhelper@
