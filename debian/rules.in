@@ -80,6 +80,7 @@ export BUILD_CFGOPTIONS
 debtmpdir	= ${debbuilddir}/tmp
 
 am__debian_install_format = | sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,'
+am__debian_conffil_format = | sed -r -e 's,^$(debtmpdir),,'
 
 control		=
 
@@ -96,7 +97,7 @@ control		+= debian/@PACKAGE@-repo.conffiles
 
 debian/@PACKAGE@-repo.conffiles:
 	( [ ! -d '$(debtmpdir)$(aptsourceslistdir)' ] || find '$(debtmpdir)$(aptsourceslistdir)' -type f -name '*.list' ; \
-	) | sort -u > $@
+	) $(am__debian_conffil_format) | sort -u > $@
 
 sysconfdir	= @sysconfdir@
 aptsourceslistdir = ${sysconfdir}/apt/sources.list.d
@@ -158,7 +159,7 @@ control		+= debian/@PACKAGE@-base.conffiles
 
 debian/@PACKAGE@-base.conffiles:
 	( [ ! -d '$(debtmpdir)$(sysconfdir)'				] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
-	) | sort -u > $@
+	) $(am__debian_conffil_format) | sort -u > $@
 
 initrddir	= @initrddir@
 sbindir		= @sbindir@
@@ -273,7 +274,7 @@ debian/@PACKAGE@-lib.conffiles:
 	  [ ! -f '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@' ; \
 	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path'			] || echo '$(debtmpdir)$(sysconfdir)/sock2path' ; \
 	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
-	) | sort -u > $@
+	) $(am__debian_conffil_format) | sort -u > $@
 
 bindir		= @bindir@
 libdir		= @libdir@
@@ -397,7 +398,7 @@ debian/@PACKAGE@-$(kversion).%: debian/@PACKAGE@-kernel.%
 
 @WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion).conffiles:
 @WITH_KO_MODULES_FALSE@	( [ ! -f $(debtmpdir)$(kmoduledir)/modules.@PACKAGE@ ] || echo '$(debtmpdir)$(kmoduledir)/modules.@PACKAGE@'; \
-@WITH_KO_MODULES_FALSE@	) | sort -u > $@
+@WITH_KO_MODULES_FALSE@	) $(am__debian_conffil_format) | sort -u > $@
 
 kmoduledir	= @kmoduledir@
 ksubdir		= @ksubdir@
