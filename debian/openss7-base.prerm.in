@@ -52,7 +52,7 @@
 #
 # =============================================================================
 subpkg=base
-@openss7_prerm@
+@openss7_header@
 datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
@@ -72,21 +72,25 @@ prerm_rmnods () { :
 #
 # prerm_initscripts() - Before removing or upgrading a package, stop the init
 #   scripts.  This is fine for 2.4 module systems, but it is a little too
-#   disruptive for weak-module updates in the 2.6 module system.  Also, this
-#   action is performed by debhelper scripts and is therefore short-circuited.
+#   disruptive for weak-module updates in the 2.6 module system.  Because this
+#   is too disruptive for weak-updated systems, we disable the debhelper
+#   scriplets and only stop init scripts when not performing weak updates, and
+#   even then, only when the updates are for the running kernel.
 #
-prerm_initscripts () { :; return
-    local reverse= list="${initfiles}"
-    for i in $list; do
-        reverse="$i${reverse:+' '}$reverse"
-    done
-    for i in $reverse; do
-        if [ -f "@initrddir@/$i" ] ; then
-	    [ ! -x "`which invoke-rc.d 2>/dev/null`" ] || invoke-rc.d $i stop && continue || true
-	    [ ! -x "`which service     2>/dev/null`" ] || service     $i stop && continue || true
-	    [ ! -x "@initrddir@/$i"                  ] || @initrddir@/$i stop && continue || true
-        fi
-    done
+prerm_initscripts () {
+    local reverse= list="${initfiles}" i
+    if [ "@kversion@" = "`uname -r`" ]; then
+	for i in $list; do
+	    reverse="$i${reverse:+' '}$reverse"
+	done
+	for i in $reverse; do
+	    if [ -f "@initrddir@/$i" ] ; then
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || true
+		[ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || true
+		[ -x "@initrddir@/$i"                  ] && @initrddir@/$i stop && continue || true
+	    fi
+	done
+    fi
     :
 }
 prerm_manrefs () { :

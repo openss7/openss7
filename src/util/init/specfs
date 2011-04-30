@@ -320,8 +320,22 @@ stop_update () {
     then
 	if [ ":$SPECFS_KUPDATE" = ':yes' ]
 	then :
+	    if [ -e /.openss7_update-@kversion@ ]; then
+		for command in /sbin/openss7-modules /usr/sbin/openss7-modules
+		do
+		    [ -x $command ] || continue
+		    action "Updating kernel modules" \
+			$command -- -q --boot-kernel
+		    RETVAL=$?
+		    if [ $RETVAL -eq 0 ]; then
+			rm -f -- /.openss7_update-@kversion@
+		    fi
+		    break
+		done
+	    fi
 	fi
     fi
+    :
 }
 
 #
@@ -631,7 +645,7 @@ stop_preload () {
     # remove in reverse order
     modules=
     for module in $SPECFS_PRELOAD ; do
-	modules="$module${modules:+ $modules}"
+	modules="$module${modules:+' '}$modules"
     done
     for module in $modules ; do
 	remove_depends $module || ( RETVAL=$? ; break )

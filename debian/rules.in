@@ -73,13 +73,13 @@ localstatedir	= @localstatedir@
 export DEB_HOST_ARCH
 export DEB_HOST_GNU_TYPE
 #xport DH_VERBOSE	= 1
-export DH_COMPAT	= 7
+#xport DH_COMPAT	= 7
 export DH_OPTIONS	=
 export BUILD_CFGOPTIONS
 
-debtmpdir	= ${debbuilddir}/tmp
+#ebtmpdir	= ${debbuilddir}/tmp
 
-am__debian_install_format = | sed -r -e 's,^($(debtmpdir)/(.*))$$,\1 \2,;s,/[^/]*$$,,'
+am__debian_install_format = | sed -r -e 's,^($(debtmpdir)/(.*))$$,\2 \2,;s,/[^/]*$$,,'
 am__debian_conffil_format = | sed -r -e 's,^$(debtmpdir),,'
 
 control		=
@@ -406,10 +406,10 @@ ksubdir		= @ksubdir@
 control		+= debian/@PACKAGE@-$(kversion).install
 
 @WITH_KO_MODULES_TRUE@debian/@PACKAGE@-$(kversion).install:
-@WITH_KO_MODULES_TRUE@	( [ ! d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.ko' ; \
-@WITH_KO_MODULES_TRUE@	  [ ! d $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers ] || \
+@WITH_KO_MODULES_TRUE@	( [ ! -d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.ko' ; \
+@WITH_KO_MODULES_TRUE@	  [ ! -d $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers ] || \
 @WITH_KO_MODULES_TRUE@	  echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/System.symvers' ; \
-@WITH_KO_MODULES_TRUE@	  [ ! f $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.symvers ] || \
+@WITH_KO_MODULES_TRUE@	  [ ! -f $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.symvers ] || \
 @WITH_KO_MODULES_TRUE@	  echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.symvers' ; \
 @WITH_KO_MODULES_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
@@ -482,10 +482,11 @@ debian/@PACKAGE@-$(kversion)-debugsource.install:
 ## Kernel source package:
 ##
 
-control		+= debian/@PACKAGE@-$(kversion)-source.install
+@WITH_K_PACKAGE_TRUE@control		+= debian/@PACKAGE@-$(kversion)-source.install
 
-debian/@PACKAGE@-$(kversion)-source.install:
-	echo './@PACKAGE@-@VERSION@/ usr/src' > $@
+@WITH_K_PACKAGE_TRUE@debian/@PACKAGE@-$(kversion)-source.install:
+@WITH_K_PACKAGE_TRUE@	( [ ! -f $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz ] || echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz' ; \
+@WITH_K_PACKAGE_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
 ##
 ## Java package:
@@ -552,11 +553,11 @@ build:
 		$(BUILD_CFGOPTIONS) \
 		|| { rm -f $(cache_file) $(csite_file) $(mpost_file) ; exit 1 ; }
 	$(MAKE)
-	mkdir -p @PACKAGE@-@VERSION@
-	tar cf - --exclude=$(debtmpdir) --exclude=@PACKAGE@-@VERSION@ . | \
-	tar xf - -C @PACKAGE@-@VERSION@
 	$(MAKE) check check-clean
 	chmod +x debian/rules
+@WITH_K_PACKAGE_TRUE@	mkdir -p $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@
+@WITH_K_PACKAGE_TRUE@	tar cf - --exclude=$(debtmpdir) --exclude=@PACKAGE@-@VERSION@ . | \
+@WITH_K_PACKAGE_TRUE@		gzip -c > $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz
 
 clean:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
@@ -568,15 +569,16 @@ clean:
 	rm -fr $(debtmpdir)
 	dh_clean -v -k
 
-install:
+install-autoconf:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	if [ -f $(debtmpdir)/stamp-debian ]; exit 0; fi
 	dh_testdir -v
 	dh_testroot -v
 	dh_clean -v -k
 	dh_prep -v
-	dh_installdirs -v
 	[ -d $(debtmpdir) ] || mkdir -p -- $(debtmpdir)
 	$(MAKE) DESTDIR=`pwd`/$(debtmpdir) install
+	echo "`date`" > $(debtmpdir)/stamp-debian
 	d=$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion) ; \
 		mkdir -p $$d ; \
 		b=$(debtmpdir)/boot ; \
@@ -594,12 +596,13 @@ install:
 		cp -p symsets-$(kversion).tar.gz $$d ; \
 		cp -p symsets-$(kversion).tar.gz $$b
 	$(MAKE) -f debian/rules $(control)
-	dh_install -v --list-missing
 
-binary-common:
+install: install-autoconf
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	dh_testdir -v
 	dh_testroot -v
+	dh_installdirs -v
+	dh_install -v
 	dh_installmodules -v
 	dh_installchangelogs -v
 	dh_installdocs -v debian/README.Debian debian/TODO.Debian
@@ -611,7 +614,7 @@ binary-common:
 	dh_installinit -v --name=@PACKAGE@.sh -- start 35 S . stop 35 0 6 .
 	dh_installman -v --language=C
 	dh_installinfo -v
-	dh_strip -v --keep-debug
+	dh_strip -v --dbg-package=@PACKAGE@-debuginfo
 	dh_link -v
 	dh_compress -v -X@PACKAGE@.macros -X@PACKAGE@.refs
 	dh_fixperms -v
@@ -619,6 +622,11 @@ binary-common:
 	dh_installdeb -v
 	dh_shlibdeps -v -X.ko -X.o -L @PACKAGE@-lib -l `pwd`/debian/@PACKAGE@-lib/usr/lib
 	dh_perl -v
+
+binary-common:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	dh_testdir -v
+	dh_testroot -v
 	dh_gencontrol -v
 	dh_md5sums -v
 	dh_builddeb -v
@@ -632,41 +640,47 @@ binary-common:
 binary-indep: DH_OPTIONS = -i
 binary-indep: install
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-repo			binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@ 				binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-base			binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-doc			binary-common
-	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-javadoc			binary-common
+	DH_OPTIONS= ; \
+	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-repo" ; \
+	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@" ; \
+	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-base" ; \
+	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-doc" ; \
+	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-javadoc" ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" binary-common
 
 binary-arch: DH_OPTIONS = -s
 binary-arch: install
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	DH_OPTIONS= ; \
 	case " $(BUILD_CFGOPTIONS) " in \
 	(*" --without-tools "*) ;; \
 	(*) \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-lib			binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-compat			binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-devel			binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-debuginfo		binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-debugsource		binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-java			binary-common ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-lib" ; \
+		if test -z '@WITH_32BIT_LIBS_TRUE@'; then \
+			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-compat" ; \
+		fi ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-devel" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-debuginfo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-debugsource" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-java" ; \
 		;; \
-	esac
+	esac ; \
 	case " $(BUILD_CFGOPTIONS) " in \
 	(*" --without-modules "*) ;; \
 	(*) \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)		binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)-devel	binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)-debuginfo	binary-common ; \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)-debugsource	binary-common ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-devel" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debuginfo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debugsource" ; \
+		if test -z '@WITH_K_PACKAGE_TRUE@' ; then \
+			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-source" ; \
+		fi ; \
 		;; \
-	esac
-	if test -z '@WITH_K_PACKAGE_TRUE@' ; then \
-		$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$(kversion)-source	binary-common ; \
-	fi
+	esac ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" binary-common
 
 binary: DH_OPTIONS = -i -s
-binary:
+binary: install
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	$(MAKE) -f debian/rules binary-indep
 	$(MAKE) -f debian/rules binary-arch

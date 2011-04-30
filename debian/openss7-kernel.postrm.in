@@ -52,7 +52,11 @@
 #
 # =============================================================================
 subpkg=kernel
-@openss7_postrm@
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
 #
 # There is really nothing to do at this stage, but this control script cannot be
 # omitted for the kernel subpackage or debhelper will insert one that does an

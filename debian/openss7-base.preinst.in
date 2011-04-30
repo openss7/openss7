@@ -52,7 +52,7 @@
 #
 # =============================================================================
 subpkg=base
-@openss7_preinst@
+@openss7_header@
 datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
@@ -64,17 +64,257 @@ datarootdir=@datarootdir@
 # non-deb/rpm install.
 #
 #
-# Fresh install, go looking for non-deb initscripts and remove them.
+# remove_depmods() - A little recursive function to delete all modules dependent
+#   on an initial module set (in our case "streams.o").  The function echos the
+#   list of modules to remove to stdout.
+#
+remove_depmods () {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+	prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	eval "remove_depmods \$$prereq"
+    done
+}
+# FIXME: we need to remove loaded modules from the running kernel as well
+remove_depends () {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+	remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+	rmmod $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
+postinst_modconf_noupdate () { :
+#   Check that our line is in the modules.conf file
+    conf_old="@sysconfdir@/modules.conf"
+    if ! grep -q 'include.*'"@modutildir@"'/'$base $conf_old ; then
+	streams_dirs="@kmoduledir@ @kmoduledir@/../preferred @kmoduledir@/../default @kmoduledir@/../boot"
+	streams_subs="@ksubdir@ misc streams"
+	conf_new=$tmppath/modules.conf.new.$$
+	cp -f $conf_old $conf_new
+#	if not, check for an old non-rpm LiS
+	if ( grep -q 'BEGIN LiS' $conf_old ) ; then
+	    conf_tmp=$tmppath/modules.conf.tmp.$$
+	    list=`find @kmoduledir@/$base \( -name "*.o" -o -name "*.o.gz" \)`
+	    for p in $list ; do
+		f=`echo $p | sed -e 's|^.*/||'`
+		m=`echo $f | sed -r -e 's|\.(k)?o(\.gz)? | |'`
+#		Remove references to our modules from old installation.
+		sed -e '/alias[^#]*\<'$m'\>/d' $conf_new > $conf_tmp
+		mv -f $conf_tmp $conf_new
+#		Remove conflicting modules.
+		for d in $streams_dirs ; do
+		    for s in $streams_subs ; do
+			rm -f -- $d/$s/$f $d/$s/boot/$f
+		    done
+		done
+	    done
+	    for d in $streams_dirs ; do
+		for s in $streams_subs ; do
+		    rmdir --ignore-fail-on-non-empty $d/$s/boot $d/$s $d
+		done
+	    done
+	fi
+#	check for forced over installs of older LiS or LfS rpm installations
+#	or installs over older LiS or LfS autoconf installations
+	streams_old=@kmoduledir@/modules.$kmodext
+	if [ -d @kmoduledir@/@ksubdir@ -a -f $streams_old ] ; then
+	    streams_new=$tmppath/modules.$kmodext.new.$$
+	    streams_tmp=$tmppath/modules.$kmodext.tmp.$$
+	    cp -f $streams_old $streams_new
+	    list=`find @kmoduledir@/$base -name "*.o"`
+	    for p in $list ; do
+		f=`echo $p | sed -e 's|^.*/||'`
+		m=`echo $f | sed -r -e 's|\.(k)?o(\.gz)? | |'`
+#		Remove references to our modules from old installation.
+		sed -e '/alias[^#]*\<'$m'\>/d' $streams_new > $streams_tmp
+		mv -f $streams_tmp $streams_new
+#		Remove conflicting modules.
+		for d in $streams_dirs ; do
+		    for s in $streams_subs ; do
+			rm -f -- $d/$s/$f $d/$s/boot/$f
+		    done
+		done
+	    done
+	    for d in $streams_dirs ; do
+		for s in $streams_subs ; do
+		    rmdir --ignore-fail-on-non-empty $d/$s/boot $d/$s $d
+		done
+	    done
+#	    can't make backups in modules directory
+	    chmod --reference=$streams_old $streams_new
+	    cp -f $streams_new $streams_old
+	    rm -f $streams_new
+	fi
+	echo "include @modutildir@/$base" >> $conf_new
+	chmod --reference=$conf_old $conf_new
+	cp -fb --suffix=.old $conf_new $conf_old
+	rm -f $conf_new
+    fi
+}
+#
+# preinst_modules() - When performing a fresh install we want to go looking for
+#   non-deb installations of LiS or STREAMS or supplementary packages and
+#   perform what would otherwise have been the prerm or postrm actions.  Build a
+#   dependency tree from every dependency expression that can be found in each
+#   modules.dep file and remove all conflicting modules and their dependents.
+#
+preinst_modules () {
+    for dir in /lib/modules/2.[456].* /lib/modules/preferred /lib/modules/default /lib/modules/boot
+    do
+	[ -d $dir ] || continue
+	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+	    b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)? | |'`
+	    case " $modules " in (*" $b "*) modl_mods="${modl_mods:+$modl_mods }$m" ;; (*) continue ;; esac
+	done
+	if [ -f $dir/modules.dep ] ; then
+	    dep= ; while read line ; do
+		case $line in
+		    *\\) line="`echo $line | sed -e 's|\\$||'`"
+			dep="${dep}${dep:+' '}$line" ; continue ;;
+		    *)  dep="${dep}${dep:+' '}$line" ;;
+		esac
+		set -- $dep
+		if [ $# -ge 2 ] ; then
+		    t=`echo $1 | sed -e 's|:$||'`
+		    target=target_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+		    shift
+		    for p in $@ ; do
+			prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+			eval "$prereq=\"\${$prereq}\${$prereq:+' '}$t\""
+			eval "$target=\"\${$target}\${$target:+' '}$p\""
+		    done
+		fi
+		dep=
+		continue
+	    done < $dir/modules.dep
+	fi
+    done
+    if [ -n "$modl_mods" ] ; then
+	rm -f -- $modl_mods
+	for m in $modules ; do
+	    prereq=prereq_`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	    eval "modl_deps=\"\`remove_depmods \$$prereq\`\""
+	    [ -n "$modl_deps" ] || continue
+	    rm -f -- $modl_deps
+	done
+    fi
+}
+#
+# preinst_modconf() - For a fresh install make sure that there are no entries
+#   from a non-deb installation in the modules directories nor in the
+#   modules.conf file that will interfere with our entries.  Especially older
+#   LiS entries.
+#
+#   Unfortunately davem starting copying our install procedure, so we need to
+#   root out all kinds of things from the modules.conf file, all prune
+#   statements, any if include statements.  The old style /BEGIN LiS/,/END LiS/
+#   enclosure in the modules.conf file.  My newer technique with a prune and an
+#   if statement in the modules.conf file that was also used by davem in
+#   LiS-2.18.0.  Also, my newer latest technique with only an include statement
+#   in modules.conf and a modules.conf fragment in the debian update-modules
+#   directory @modutildir@ that includes the prune and if statements.  That
+#   works both for RH-style and Debian-style modules.conf.
+#
+#   Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen
+#   to install their modconf files in a similar fashion to ours and in a similar
+#   location.  It even uses the prune modules line that we normally use,
+#   however, on Debian their modules.conf edits will be lost because the
+#   modules.conf file is generated from the modules/conf.d directory.
+#
+preinst_modconf () {
+    local conf_old conf_tmp conf_new suffix dir
+    conf_old="@sysconfdir@/modules.conf"
+    if [ -f $conf_old ]; then
+	conf_tmp=${tmppath:-'/var/tmp'}/modules.conf.tmp.$$
+	conf_new=${tmppath:-'/var/tmp'}/modules.conf.new.$$
+	cp -f -- $conf_old $conf_new
+	for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61
+	do
+	    if ( grep -q -- "BEGIN $suffix" $conf_new && grep -q -- "END $suffix" $conf_new ) 2>/dev/null
+	    then
+		sed -e '\|BEGIN '$suffix'|,\|END '$suffix'|d' $conf_new > $conf_tmp
+		mv -f -- $conf_tmp $conf_new
+	    fi
+	    for dir in /lib/modules/2.[456].* /lib/modules/preferred /lib/modules/default /lib/modules/boot
+	    do
+		[ -d $dir ] || continue
+		if [ -f $dir/modules.$suffix ] ; then
+		    rm -f -- $dir/modules.$suffix
+		    sed -e '\|^prune[[:space:]].*modules.'$suffix'|d'        $conf_new > $conf_tmp
+		    sed -e '\|^if[[:space:]].*modules.'$suffix'|,\|^endif|d' $conf_tmp > $conf_new
+		    sed -e '\|^include[[:space:]].*modules.'$suffix'|d'      $conf_new > $conf_tmp
+		    mv -f -- $conf_tmp $conf_new
+		fi
+	    done
+	done
+	for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61 ; do
+	    if [ -f @modutildir@/$suffix ] ; then
+		rm -f -- @modutildir@/$suffix
+		sed -e '\|^include[[:space:]].*'"@modutildir@"'/'$suffix'|d' $conf_new > $conf_tmp
+		mv -f -- $conf_tmp $conf_new
+	    fi
+	done
+	if diff $conf_old $conf_new >/dev/null 2>&1; then
+	    chmod --reference=$conf_old -- $conf_new
+	    cp -f -b --suffix=.dpkg-orig -- $conf_new $conf_old
+	fi
+        rm -f -- $conf_new
+    fi
+    :
+}
+#
+# preinst_preload() - Go looking for non-deb or legacy preloads and remove them.
+#   This includes all preloads techniques: modprobe.preload and modules or
+#   modules-@kversion@ files.
+#
+preinst_preload () {
+    local prel_fil prel_tmp prel_new
+    for prel_fil in @sysconfdir@/modprobe.preload @sysconfdir@/modules @sysconfdir@/modules-*
+    do
+	if [ -f $prel_fil ]; then
+	    prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
+	    prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
+	    cp -f -- $prel_fil $prel_new
+	    sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new > $prel_tmp
+	    mv -f -- $prel_tmp $prel_new
+	    if diff $prel_new $prel_fil >/dev/null 2>&1; then
+		chmod --reference=$prel_fil -- $prel_new
+		cp -f -b --suffix=.dpkg-orig -- $prel_new $prel_fil
+	    fi
+	    rm -f -- $prel_new
+	fi
+    done
+    :
+}
+#
+# preinst_initscripts() - Fresh install, go looking for non-deb initscripts and
+#   remove them.
 #
 preinst_initscripts () {
-    list="$inifiles $nonrpminit"; for i in $list; do
-	if [ -f @initrddir@/$i ]; then
-#
-#	    Find the best working init script removal tool
-#
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
+    local reverse= list="$initfiles $nonrpminit" i
+    for i in $list; do
+	reverse="$i${reverse:+' '}$reverse"
+    done
+    for i in $reverse; do
+	if [ -f "@initrddir@/$i" ]; then
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || true
+	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || true
+	    [ -x "@initrddir@/$i"                  ] && @initrddir@/$i stop && continue || true
+	fi
+    done
+    for i in $reverse; do
+	if [ -f "@initrddir@/$i" ]; then
+	    [ -x /usr/sbin/update-rc.d     ] && /usr/bin/update-rc.d      $i remove 2>&1 && continue || true
+	    [ -x /sbin/insserv             ] && /sbin/insserv -r          $i        2>&1 && continue || true
+	    [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i        2>&1 && continue || true
+	    [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i        2>&1 && continue || true
 	fi
     done
 }
@@ -85,7 +325,10 @@ preinst_initscripts () {
 # from non-deb/rpm install.
 #
 preinst_base () { :
-    @WITH_KO_MODULES_FALSE@preinst_initscripts
+    preinst_modules
+    @WITH_KO_MODULES_FALSE@preinst_modconf
+    preinst_preload
+    preinst_initscripts
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
