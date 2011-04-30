@@ -52,7 +52,7 @@
 #
 # =============================================================================
 subpkg=base
-@openss7_postinst@
+@openss7_header@
 datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
@@ -114,10 +114,13 @@ postinst_preload () { :
 }
 #
 # postinst_initscripts() - At the end of an install or upgrade, add init scripts
-#   if we can and then start them.  Note that this is performed by debhelper
-#   scripts, so it is short-circuited.
+#   if we can and then start them.  Note that the debhelper scriptlets are
+#   defeated because they are too disruptive in the 2.6 environment.  This
+#   function starts init scripts; however, if they are already running, this has
+#   no effect.  Also, the init scripts detect whether they can be indeed started
+#   and skip some of their functions otherwise.
 #
-postinst_initscripts () { :; return
+postinst_initscripts () {
     local list="${initfiles}" i
     for i in $list; do
 	if [ -f "@initrddir@/$i" ]; then
@@ -203,7 +206,7 @@ postinst_manmacros () {
 postinst_base_reconfigure () { :
     @WITH_KO_MODULES_FALSE@postinst_modconf
     @WITH_KO_MODULES_FALSE@postinst_preload
-    @WITH_KO_MODULES_FALSE@postinst_initscripts
+    postinst_initscripts
     postinst_manpages
     postinst_manrefs
     postinst_manmacros
