@@ -14,7 +14,7 @@
 # arguments to add and remove links after the the name argument:
 #
 # strace:	start and stop strace facility
-# update-rc.d:	stop 35 S . stop 35 0 6 .
+# update-rc.d:	start 35 S . stop 35 0 6 .
 # lockfile:	/var/lock/subsys/strace
 # config:	/etc/default/strace
 # processname:	strace

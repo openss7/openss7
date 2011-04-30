@@ -24,23 +24,6 @@ remove_depends() {
     fi
     return 0
 }
-postrm_depmod () { :
-    if [ ":@kversion@" = ":`uname -r`" ]; then
-#	This is a running kernel, do a depmod on the modules directory for.
-        if [ -r @ksysmap@ ] ; then
-            depmod -ae -F @ksysmap@ 2>&1 || :
-        else
-            depmod -ae 2>&1 || :
-        fi
-    elif [ -r @ksysmap@ ]; then
-#	Non-running kernels a depmod will be performed on boot but depmod
-#	anyway.
-        UNAME_MACHINE=@target_cpu@ \
-        depmod -ae -F @ksysmap@ @kversion@ 2>&1 || :
-    fi
-    :
-    return 0
-}
 #
 # Stop init scripts when they are still hanging around.
 #
@@ -130,45 +113,6 @@ postrm_modules_running () { :
     fi
     :
     return 0
-}
-postrm_symvers () { :
-    f="symsets-@kversion@.tar.gz"
-    d="/lib/modules/@kversion@/build"
-    if [ -r $d/$f ] ; then
-        cp -f -- $d/$f /boot/$f || :
-    else
-        rm -f -- /boot/$f || :
-    fi
-}
-postrm_preload () {
-    prel_old="@preloads@"
-    if [ -f $prel_old ] ; then
-	prel_new="$tmppath/modprobe.preload.new.$$"
-	prel_tmp="$tmppath/modprobe.preload.tmp.$$"
-	cp -f -- $prel_old $prel_new
-	for m in $preloads ; do
-	    sed -e "/^[[:space:]]*$m\>/d" $prel_new > $prel_tmp
-	    mv -f -- $prel_new $prel_tmp
-	done
-	chmod --reference=$prel_old -- $prel_new
-	cp -fb --suffix=.dpkg-save -- $prel_new $prel_old
-	rm -f -- $prel_new
-    fi
-}
-postrm_depmod () {
-    if [ ":@kversion@" = ":`uname -r`" ] ; then
-#	this is a running kernel, do a /sbin/depmod on the modules directory for
-	/sbin/depmod -ae
-    elif [ -r @ksysmap@ ] ; then
-#	non-running kernels a /sbin/depmod will be performed on boot by /sbin/depmod anyway
-	UNAME_MACHINE=%{_target_cpu} \
-	/sbin/depmod -ae -F @ksysmap@ @kversion@
-    fi
-}
-postrm_core () { :
-    @WITH_KO_MODULES_FALSE@postrm_modconf
-    postrm_preload
-    postrm_depmod
 }
 # -----------------------------------------------------------------------------
 # Default functions:

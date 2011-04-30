@@ -106,9 +106,9 @@ postrm_modconf () { :
         conf_tmp=${tmppath:-'/var/tmp'}/modules.conf.tmp.$$
         conf_new=${tmppath:-'/var/tmp'}/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
-        sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-	if diff $conf_new $conf_old >/dev/null 2>&1; then
+	if grep '^include[[:space:]].*'"@modutildir@"'/'"$base" $conf_new >/dev/null 2>&1; then
+	    sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
+	    mv -f -- $conf_tmp $conf_new
 	    chmod --reference=$conf_old $conf_new
 	    cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
 	fi
@@ -117,11 +117,39 @@ postrm_modconf () { :
     :
 }
 #
+# postrm_initscripts() - When purging the package, remove the symbolic links
+#   associated with the init scripts before they are purged.  Note that this is
+#   currently done by the debhelper scriptlets, so it is short-circuited.
+#
+postrm_initscripts () { :; return
+    local reverse= list="${initfiles}" i
+    for i in $list; do
+	reverse="$i${reverse:+' '}$reverse"
+    done
+    for i in $reverse; do
+	if [ -f "@initrddir@/$i" ]; then
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || true
+	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || true
+	    [ -x "@initrddir@/$i"                  ] && @initrddir@/$i stop && continue || true
+	fi
+    done
+    for i in $reverse; do
+	if [ -f "@initrddir@/$i" ]; then
+	    [ -x /usr/sbin/update-rc.d     ] && /usr/bin/update-rc.d      $i remove 2>&1 && continue || true
+	    [ -x /sbin/insserv             ] && /sbin/insserv -r          $i        2>&1 && continue || true
+	    [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i        2>&1 && continue || true
+	    [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i        2>&1 && continue || true
+	fi
+    done
+    :
+}
+#
 # postrm_base_purge() - The subpackage is being purged, rebuild databases and
 #   adjust other files in preparation for removal of configuration files.
 #
 postrm_base_purge () { :
     @WITH_KO_MODULES_FALSE@postrm_modconf
+    postrm_initscripts
 }
 # -----------------------------------------------------------------------------
 # Primary functions:

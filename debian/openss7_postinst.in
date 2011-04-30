@@ -80,15 +80,6 @@ postinst_modconf_noupdate () { :
 	rm -f $conf_new
     fi
 }
-postinst_symvers () { :
-    # Debian kernels do no create symbol versions.  But this should not be done
-    # here, because System.symvers
-    local f
-    f=/usr/src/$name-@VERSION@-@PACKAGE_DEBRELEASE@/@kversion@/System.symver
-    if [ ! -r /boot/symvers-@kversion@.gz -a -r $f ] ; then
-	gzip -c $f > /boot/symvers-@kversion@.gz
-    fi
-}
 # -----------------------------------------------------------------------------
 # Default functions:
 # -----------------------------------------------------------------------------

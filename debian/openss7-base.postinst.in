@@ -57,13 +57,6 @@ datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
-postinst_mknods () { :
-    if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
-	# ensure that devices are added
-	echo "${package}: creating devices."
-	@sbindir@/@STRCONF_DEVICES@ --create || :
-    fi
-}
 #
 # postinst_modconf() - Ensure that include line is added to the modules.conf
 #   file for old 2.4 module systems.  This must remove lines before including
@@ -120,19 +113,28 @@ postinst_preload () { :
     :
 }
 #
-# This is the end of a fresh install, add init scripts if we can
+# postinst_initscripts() - At the end of an install or upgrade, add init scripts
+#   if we can and then start them.  Note that this is performed by debhelper
+#   scripts, so it is short-circuited.
 #
-postinst_initscripts () { :
-    return
-    #
-    # Note that init scripts are handled by debhelper additions to this script.
-    #
-    list="${initfiles}" ; for i in $list ; do
-        # Find the best working init script installation tool
-        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue || :
-        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue || :
-        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue || :
+postinst_initscripts () { :; return
+    local list="${initfiles}" i
+    for i in $list; do
+	if [ -f "@initrddir@/$i" ]; then
+	    # Find the best working init script installation tool
+	    [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue || true
+	    [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue || true
+	    [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue || true
+	fi
     done
+    for i in $list; do
+	if [ -f "@initrddir@/$i" ]; then
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i start && continue || true
+	    [ -x "`which service     2>/dev/null`" ] && service     $i start && continue || true
+	    [ -x "@initrddir@/$i"                  ] && @initrddir@/$i start && continue || true
+	fi
+    done
+    :
 }
 postinst_initscripts2 () { :
     #
@@ -199,7 +201,6 @@ postinst_manmacros () {
     done
 }
 postinst_base_reconfigure () { :
-    postinst_mknods
     @WITH_KO_MODULES_FALSE@postinst_modconf
     @WITH_KO_MODULES_FALSE@postinst_preload
     @WITH_KO_MODULES_FALSE@postinst_initscripts
