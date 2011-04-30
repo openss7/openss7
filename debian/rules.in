@@ -94,12 +94,18 @@ control		+= debian/@PACKAGE@-repo.prerm
 
 control		+= debian/@PACKAGE@-repo.conffiles
 
-sysconfdir	= @sysconfdir@
-aptsourceslistdir = ${sysconfdir}/apt/sources.list.d
-
 debian/@PACKAGE@-repo.conffiles:
 	( [ ! -d '$(debtmpdir)$(aptsourceslistdir)' ] || find '$(debtmpdir)$(aptsourceslistdir)' -type f -name '*.list' ; \
 	) | sort -u > $@
+
+sysconfdir	= @sysconfdir@
+aptsourceslistdir = ${sysconfdir}/apt/sources.list.d
+
+control		+= debian/@PACKAGE@-repo.install
+
+debian/@PACKAGE@-repo.install:
+	( [ ! -d '$(debtmpdir)$(aptsourceslistdir)' ] || find '$(debtmpdir)$(aptsourceslistdir)' -type f -name '*.list' ; \
+	) $(am__debian_install_format) | sort -u > $@
 
 ##
 ## Base virtual package:
@@ -154,8 +160,6 @@ debian/@PACKAGE@-base.conffiles:
 	( [ ! -d '$(debtmpdir)$(sysconfdir)'				] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
 	) | sort -u > $@
 
-control		+= debian/@PACKAGE@-base.install
-
 initrddir	= @initrddir@
 sbindir		= @sbindir@
 snmpmibdir	= @snmpmibdir@
@@ -192,8 +196,11 @@ debian/@PACKAGE@-base.@PACKAGE@.sh.default: \
 debian/@PACKAGE@-base.%.sh.default: $(debtmpdir)$(configdir)/%
 	cp -f -- $< $@
 
+control		+= debian/@PACKAGE@-base.install
+
 debian/@PACKAGE@-base.install:
-	( [ ! -f '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)'			] || echo '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)' ; \
+	( [ ! -d '$(debtmpdir)$(sysconfdir)'					] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
+	  [ ! -f '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)'			] || echo '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)' ; \
 	  [ ! -d '$(debtmpdir)$(snmpmibdir)'					] || echo '$(debtmpdir)$(snmpmibdir)/*' ; \
 	  [ ! -f '$(debtmpdir)$(pkglibexecdir)/aclocal'				] || echo '$(debtmpdir)$(pkglibexecdir)/aclocal' ; \
 	  [ ! -d '$(debtmpdir)$(pkglibexecdir)'					] || echo '$(debtmpdir)$(pkglibexecdir)/testsuite*' ; \
@@ -268,8 +275,6 @@ debian/@PACKAGE@-lib.conffiles:
 	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
 	) | sort -u > $@
 
-control		+= debian/@PACKAGE@-lib.install
-
 bindir		= @bindir@
 libdir		= @libdir@
 perldir		= @perldir@
@@ -278,26 +283,32 @@ pkgtcllibdir	= ${tcllibdir}/$(PACKAGE_NAME)$(PACKAGE_VERSION)
 localedir	= @localedir@
 snmpdlmoddir	= @snmpdlmoddir@
 
+control		+= debian/@PACKAGE@-lib.install
+
 debian/@PACKAGE@-lib.install:
-	( [ ! -d '$(debtmpdir)$(bindir)'			] || echo '$(debtmpdir)$(bindir)/*' ; \
-	  [ ! -d '$(debtmpdir)$(sbindir)'			] || echo '$(debtmpdir)$(sbindir)/*' ; \
-	  [ ! -d '$(debtmpdir)$(libdir)'			] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
-	  [ ! -d '$(debtmpdir)$(libdir)'			] || echo '$(debtmpdir)$(libdir)/*.la' ; \
-	  [ ! -d '$(debtmpdir)$(perldir)/auto/Xti'		] || echo '$(debtmpdir)$(perldir)/auto/Xti/*' ; \
-	  [ ! -f '$(debtmpdir)$(pkgtcllibdir)/pkgIndex.tcl'	] || echo '$(debtmpdir)$(pkgtcllibdir)/pkgIndex.tcl' ; \
-	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'		] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.tcl' ; \
-	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'		] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.so' ; \
-	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'		] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.la' ; \
-	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/tcap'		] || echo '$(debtmpdir)$(pkgtcllibdir)/tcap/*.tcl' ; \
-	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/tcap'		] || echo '$(debtmpdir)$(pkgtcllibdir)/tcap/*.so' ; \
-	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/tcap'		] || echo '$(debtmpdir)$(pkgtcllibdir)/tcap/*.la' ; \
-	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/streams'		] || echo '$(debtmpdir)$(pkgtcllibdir)/streams/*.tcl' ; \
-	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/streams'		] || echo '$(debtmpdir)$(pkgtcllibdir)/streams/*.so' ; \
-	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/streams'		] || echo '$(debtmpdir)$(pkgtcllibdir)/streams/*.la' ; \
-	  [ ! -d '$(debtmpdir)$(localedir)'			] || find '$(debtmpdir)$(localedir)' -type f -name '*.mo' ; \
-	  [ ! -f '$(debtmpdir)$(pkglibexecdir)/gdmo'		] || echo '$(debtmpdir)$(pkglibexecdir)/gdmo' ; \
-	  [ ! -d '$(debtmpdir)$(pkglibexecdir)'			] || echo '$(debtmpdir)$(pkglibexecdir)/*test*' ; \
-	  [ ! -d '$(debtmpdir)$(snmpdlmoddir)'			] || echo '$(debtmpdir)$(snmpdlmoddir)/*' ; \
+	( [ ! -d '$(debtmpdir)$(snmpconfdir)'				] || find '$(debtmpdir)$(snmpconfdir)' \( -type f -o -type l \) ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path'			] || echo '$(debtmpdir)$(sysconfdir)/sock2path' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
+	  [ ! -d '$(debtmpdir)$(bindir)'				] || echo '$(debtmpdir)$(bindir)/*' ; \
+	  [ ! -d '$(debtmpdir)$(sbindir)'				] || echo '$(debtmpdir)$(sbindir)/*' ; \
+	  [ ! -d '$(debtmpdir)$(libdir)'				] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
+	  [ ! -d '$(debtmpdir)$(libdir)'				] || echo '$(debtmpdir)$(libdir)/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(perldir)/auto/Xti'			] || echo '$(debtmpdir)$(perldir)/auto/Xti/*' ; \
+	  [ ! -f '$(debtmpdir)$(pkgtcllibdir)/pkgIndex.tcl'		] || echo '$(debtmpdir)$(pkgtcllibdir)/pkgIndex.tcl' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'			] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.tcl' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'			] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.so' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'			] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/tcap'			] || echo '$(debtmpdir)$(pkgtcllibdir)/tcap/*.tcl' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/tcap'			] || echo '$(debtmpdir)$(pkgtcllibdir)/tcap/*.so' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/tcap'			] || echo '$(debtmpdir)$(pkgtcllibdir)/tcap/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/streams'			] || echo '$(debtmpdir)$(pkgtcllibdir)/streams/*.tcl' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/streams'			] || echo '$(debtmpdir)$(pkgtcllibdir)/streams/*.so' ; \
+	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/streams'			] || echo '$(debtmpdir)$(pkgtcllibdir)/streams/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(localedir)'				] || find '$(debtmpdir)$(localedir)' -type f -name '*.mo' ; \
+	  [ ! -f '$(debtmpdir)$(pkglibexecdir)/gdmo'			] || echo '$(debtmpdir)$(pkglibexecdir)/gdmo' ; \
+	  [ ! -d '$(debtmpdir)$(pkglibexecdir)'				] || echo '$(debtmpdir)$(pkglibexecdir)/*test*' ; \
+	  [ ! -d '$(debtmpdir)$(snmpdlmoddir)'				] || echo '$(debtmpdir)$(snmpdlmoddir)/*' ; \
 	) $(am__debian_install_format) | sort -u > $@
 
 ##
@@ -388,10 +399,10 @@ debian/@PACKAGE@-$(kversion).%: debian/@PACKAGE@-kernel.%
 @WITH_KO_MODULES_FALSE@	( [ ! -f $(debtmpdir)$(kmoduledir)/modules.@PACKAGE@ ] || echo '$(debtmpdir)$(kmoduledir)/modules.@PACKAGE@'; \
 @WITH_KO_MODULES_FALSE@	) | sort -u > $@
 
-control		+= debian/@PACKAGE@-$(kversion).install
-
 kmoduledir	= @kmoduledir@
 ksubdir		= @ksubdir@
+
+control		+= debian/@PACKAGE@-$(kversion).install
 
 @WITH_KO_MODULES_TRUE@debian/@PACKAGE@-$(kversion).install:
 @WITH_KO_MODULES_TRUE@	( [ ! d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.ko' ; \
@@ -402,7 +413,8 @@ ksubdir		= @ksubdir@
 @WITH_KO_MODULES_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
 @WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion).install:
-@WITH_KO_MODULES_FALSE@	( [ ! -d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.o' ; \
+@WITH_KO_MODULES_FALSE@	( [ ! -f $(debtmpdir)$(kmoduledir)/modules.@PACKAGE@ ] || echo '$(debtmpdir)$(kmoduledir)/modules.@PACKAGE@'; \
+@WITH_KO_MODULES_FALSE@	  [ ! -d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.o' ; \
 @WITH_KO_MODULES_FALSE@	) $(am__debian_install_format) | sort -u > $@
 
 ##
