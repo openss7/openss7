@@ -63,28 +63,6 @@ datarootdir=@datarootdir@
 # with out entries.  We treat every fresh installation like an upgrade from
 # non-deb/rpm install.
 #
-preinst_preload () {
-    case @kminor@ in
-	4) prel_old=@sysconfdir@/modules ;;
-	5)  if [ @kpatch@ -lt 48 ]; then
-		prel_old=@sysconfdir@/modules
-	    else
-		prel_old=@sysconfdir@/modprobe.preload
-	    fi ;;
-	6) prel_old=@sysconfdir@/modprobe.preload ;;
-	*) return 0 ;;
-    esac
-    if [ -f $prel_old ]; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-	sed -r -e '/^[[:space:]]*(specfs|streams)/d' $prel_new > $prel_tmp
-        mv -f -- $prel_tmp $prel_new
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-}
 #
 # Fresh install, go looking for non-deb initscripts and remove them.
 #
@@ -107,7 +85,6 @@ preinst_initscripts () {
 # from non-deb/rpm install.
 #
 preinst_base () { :
-    @WITH_KO_MODULES_FALSE@preinst_preload
     @WITH_KO_MODULES_FALSE@preinst_initscripts
 }
 # -----------------------------------------------------------------------------

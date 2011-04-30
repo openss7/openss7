@@ -86,10 +86,42 @@ postrm_preload () { :
     fi
     :
 }
+#
+# postrm_demod() - Perform a depmod on the kernel for which we have removed
+#   kernel modules.  This can only be performed for 2.4 module systems.  Also,
+#   the debhelper scripts will perform this action when necessary so this is
+#   currently short-circuited.
+#
+postrm_depmod () { :; return
+    if [ ":@kversion@" = ":`uname -r`" ]; then
+        if [ -r @ksysmap@ ]
+	then depmod -ae -F @ksysmap@ 2>&1 || true
+        else depmod -ae 2>&1 || true
+        fi
+    elif [ -r @ksysmap@ ]; then
+        UNAME_MACHINE=@target_cpu@ \
+        depmod -ae -F @ksysmap@ @kversion@ 2>&1 || true
+    fi
+}
+#
+# postrm_symvers() - Remove the symvers file that we created for Debian.
+#
+postrm_symvers () { :
+    local f="/boot/symsets-@kversion@.tar.gz"
+    rm -f -- $f || true
+}
 postrm_kernel () { :
     @WITH_KO_MODULES_FALSE@postrm_preload
+    @WITH_KO_MODULES_FALSE@postrm_depmod
+    @WITH_KO_MODULES_TRUE@postrm_symvers
 }
 postrm_kernel_purge () { :
+    @WITH_KO_MODULES_FALSE@postrm_depmod
+    @WITH_KO_MODULES_TRUE@postrm_symvers
+}
+postrm_kernel_abort () { :
+    @WITH_KO_MODULES_FALSE@postrm_depmod
+    @WITH_KO_MODULES_TRUE@postrm_symvers
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
@@ -109,17 +141,21 @@ upgrade_postrm () { :
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version
 failed_upgrade_postrm () { :
+    postrm_kernel_abort
 }
 # new-preinst install [old-version] ...FAILED
 # new-postrm abort-install [old-version]
 abort_install_postrm () { :
+    postrm_kernel_abort
 }
 # new-preinst upgrade old-version ...FAILED
 # new-postrm abort-upgrade old-version
 abort_upgrade_postrm () { :
+    postrm_kernel_abort
 }
 # dis-postrm disappear overwriter overwriter-version
 disappear_postrm () { :
+    postrm_kernel_purge
 }
 @mscript_postrm@
 #

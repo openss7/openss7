@@ -32,52 +32,6 @@ prerm_rmnods () { :
     return 0
 }
 #
-# When we are going away altogether we want to remove any lines whatsoever from
-# the modules.conf file.
-#
-prerm_oldmods () { :
-    conf_old=@sysconfdir@/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=$tmppath/modules.conf.tmp.$$
-        conf_new=$tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
-        rm -f -- $conf_new
-    fi
-}
-#
-# When we are going away altogether we want to remove any of our preloads
-# whatsoever from the modules or modprobe.preload file.
-#
-prerm_preloads () { :
-    case @kminor@ in
-	4) prel_old=@sysconfdir@/modules ;;
-	5)  if [ @kpatch@ -lt 48 ]
-	    then prel_old=@sysconfdir@/modules
-	    else prel_old=@sysconfdir@/modprobe.preload
-	    fi ;;
-	6) prel_old=@sysconfdir@/modprobe.preload ;;
-	*) prel_old=@sysconfdir@/modprobe.preload ;;
-    esac
-    if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="${preloads}" ; for m in $mods ; do
-            sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $repl_new > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-    :
-    return 0
-}
-#
 # Stop init scripts when they are still hanging around.
 #
 prerm_stop_scripts () { :
@@ -160,36 +114,6 @@ prerm_kill_running () { :
     :
     return 0
 }
-#
-# At the end of the upgrade (when _this_package_ is upgraded from) we remove our
-# lines from the modules.conf file that we placed in them in the post scriptlet.
-# We only adjust our line and leave any lines added by the new package post
-# scriptlet.
-#
-prerm_oldmods_upgrade () { :
-    conf_old=@sysconfdir@/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=$tmppath/modules.conf.tmp.$$
-        conf_new=$tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-#	This groovy sed script just pulls out the first matching line and leaves
-#	the rest untouched.
-        sed -e '
-\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|!b
-N
-s|^include[[:space:]].*'"@modutildir@"'/'"$base"'.*\
-||
-: loop
-n
-b loop' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
-        rm -f -- $conf_new
-    fi
-    :
-    return 0
-}
 prerm_dev () { :
     if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
 	# ensure that old devices are removed
@@ -205,9 +129,11 @@ prerm_dev_failed () { :
     fi
 }
 #
-# If we are upgrading and the upgrade is for the running kernel, or we are installing new on the
-# running kernel, we have to worry about previous loaded modules for the old version or a non-deb
-# version kicking around.  This scriplet kills any streams modules that are loaded and running.
+# prerm_modules() - If we are upgrading and the upgrade is for the running
+#   kernel, or we are installing new on the running kernel, we have to worry
+#   about previous loaded modules for the old version or a non-deb version
+#   kicking around.  This scriplet kills any streams modules that are loaded and
+#   running.
 #
 prerm_modules () {
     if [ ":@kversion@" = ":`uname -r`" ] ; then
@@ -240,52 +166,6 @@ prerm_modules () {
 	done
     fi
     return 0
-}
-prerm_oldmods () {
-    prerm_modules
-}
-prerm_modconf_remove () { :
-    # When we are going away altogether we want to remove any lines whatsoever
-    # from the modules.conf file.
-    conf_old=@sysconfdir@/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=$tmppath/modules.conf.tmp.$$
-        conf_new=$tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-        rm -f -- $conf_new
-    fi
-    :
-}
-prerm_modconf_upgrade () { :
-    # At the end of the upgrade (when _this_package_ is upgraded from) we remove
-    # our lines from the modules.conf file that we placed in them in the post
-    # scriptlet.  We only adjust our line and leave any lines added by the new
-    # package post scriptlet.
-    conf_old=@sysconfdir@/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=$tmppath/modules.conf.tmp.$$
-        conf_new=$tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        # This groovy sed script just pulls out the first matching line and
-        # leaves the rest untouched.
-        sed -e '
-\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|!b
-N
-s|^include[[:space:]].*'"@modutildir@"'/'"$base"'.*\
-||
-: loop
-n
-b loop' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-        rm -f -- $conf_new
-    fi
-    :
 }
 # -----------------------------------------------------------------------------
 # Default functions:

@@ -283,16 +283,16 @@ prerm_updates () { :
     return 0
 }
 prerm_kernel () { :
-@WITH_KO_MODULES_FALSE@    prerm_modules_remove	|| :
-@WITH_KO_MODULES_FALSE@    prerm_depmod		|| :
-@WITH_KO_MODULES_FALSE@    prerm_modules_replace	|| :
-@WITH_KO_MODULES_FALSE@    prerm_kill_running		|| :
-@WITH_KO_MODULES_TRUE@    prerm_updates		|| :
+    @WITH_KO_MODULES_FALSE@prerm_modules_remove || :
+    @WITH_KO_MODULES_FALSE@prerm_depmod || :
+    @WITH_KO_MODULES_FALSE@prerm_modules_replace || :
+    @WITH_KO_MODULES_FALSE@prerm_kill_running || :
+    @WITH_KO_MODULES_TRUE@prerm_updates || :
     return 0
 }
 prerm_kernel_failed () { :
-@WITH_KO_MODULES_FALSE@    prerm_depmod || return $?
-@WITH_KO_MODULES_TRUE@    prerm_restore || return $?
+    @WITH_KO_MODULES_FALSE@prerm_depmod || return $?
+    @WITH_KO_MODULES_TRUE@prerm_restore || return $?
     return 0
 }
 #   xxx-prerm remove

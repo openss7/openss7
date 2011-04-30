@@ -58,6 +58,32 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
+# postinst_symvers() - Install redhat-like symvers file in the /boot directory.
+#   Debian kernels do not create a symbol versions file.  This is a bit
+#   dangerous because it relies on the symbol versions not changing when the ABI
+#   number in the kernel version does not change.
+#
+postinst_symvers () {
+    local f t
+    f="/usr/src/$name-@VERSION@-@PACKAGE_DEBRELEASE@/@kversion@/System.symvers"
+    t="/boot/symvers-@kversion@.gz"
+    if [ ! -r $t -a -r $f ] ; then
+	gzip -c $f >$t || true
+    fi
+    :
+}
+#
+# postinst_updates() - Perform weak-updates on modules, perform depmod, and
+#   signal init scripts when a relink is required on shutdown or reboot.
+#
+postinst_updates () {
+    local retval=0 update="@sbindir@/${name}-modules"
+    if [ -x $update ] ; then
+	$update -- -q -e --add-modules @kversion@ || true
+    fi
+    :
+}
+#
 # postinst_depmod() - Perform a depmod when the kernel modules installed are for
 #   the running kernel.  This only applies to 2.4 module systems.  The
 #   openss7-modules script performs the comparable actions for 2.6 module
@@ -66,18 +92,15 @@ datarootdir=@datarootdir@
 postinst_depmod () { :
     if which depmod >/dev/null 2>&1; then
 	if [ ":@kversion@" = ":`uname -r`" ] ; then
-	    if [ -r @ksysmap@ ] ; then
-		depmod -ae -F @ksysmap@ 2>&1 || true
-	    else
-		depmod -ae 2>&1 || :true
+	    if [ -r @ksysmap@ ]
+	    then depmod -ae -F @ksysmap@ 2>&1 || true
+	    else depmod -ae 2>&1 || true
 	    fi
 	elif [ -r @ksysmap@ ] ; then
 	    UNAME_MACHINE=@target_cpu@ \
-	    depmod -ae -F @ksysmap@ @kversion@ 2>&1 || :true
+	    depmod -ae -F @ksysmap@ @kversion@ 2>&1 || true
 	fi
     fi
-    :
-    return 0
 }
 #
 # postinst_preload() - For old modules, ensure that our preloaded modules are in
@@ -136,20 +159,6 @@ postinst_startscripts () { :
     done
     return 0
 }
-#
-# postinst_updates() - Perform weak-updates on modules, perform depmod, and
-#   signal init scripts when a relink is required on shutdown or reboot.
-#
-postinst_updates () { :
-    [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
-    local retval
-    retval=0
-    if [ -x @sbindir@/$name-modules ] ; then
-	@sbindir@/$name-modules -- -q -e --add-modules @kversion@ || true
-    fi
-    :
-    return 0
-}
 #   new-preinst install
 #	- files are unpacked
 #	- file list added
@@ -202,6 +211,7 @@ postinst_updates () { :
 # before the init scripts attempt to start the subsystem.
 #
 postinst_kernel_configure () { :
+    @WITH_KO_MODULES_TRUE@postinst_symvers || true
     @WITH_KO_MODULES_TRUE@postinst_updates || true
     @WITH_KO_MODULES_FALSE@postinst_depmod || true
     @WITH_KO_MODULES_FALSE@postinst_preload || true
@@ -221,6 +231,7 @@ postinst_kernel_configure () { :
 # been performed on the previous fresh install.
 #
 postinst_kernel_reconfigure () { :
+    @WITH_KO_MODULES_TRUE@postinst_symvers || true
     @WITH_KO_MODULES_TRUE@postinst_updates || true
     @WITH_KO_MODULES_FALSE@postinst_depmod || true
     @WITH_KO_MODULES_FALSE@postinst_preload || true
@@ -301,10 +312,11 @@ postinst_kernel_reconfigure () { :
 # before the init scripts attempt to start the subsystem.
 #
 postinst_kernel () { :
-    @WITH_KO_MODULES_TRUE@postinst_updates || :
-    @WITH_KO_MODULES_FALSE@postinst_depmod || :
-    @WITH_KO_MODULES_FALSE@postinst_preload || :
-    @WITH_KO_MODULES_FALSE@postinst_startscripts || :
+    @WITH_KO_MODULES_TRUE@postinst_symvers || true
+    @WITH_KO_MODULES_TRUE@postinst_updates || true
+    @WITH_KO_MODULES_FALSE@postinst_depmod || true
+    @WITH_KO_MODULES_FALSE@postinst_preload || true
+    @WITH_KO_MODULES_FALSE@postinst_startscripts || true
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
@@ -319,7 +331,6 @@ reconfigure_postinst () { :
 }
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :
-    postinst_kernel
 }
 # old-prerm upgrade new-version ...FAILED
 # new-prerm failed-upgrade new-version ...FAILED

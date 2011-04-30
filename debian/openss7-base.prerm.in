@@ -70,187 +70,24 @@ prerm_rmnods () { :
     return 0
 }
 #
-# prerm_preload() - As the sub-package is being removed altogether,
-#   remove added preloads from the modules or modprobe.preload file.  The
-#   modules themselves have already been removed.
+# prerm_initscripts() - Before removing or upgrading a package, stop the init
+#   scripts.  This is fine for 2.4 module systems, but it is a little too
+#   disruptive for weak-module updates in the 2.6 module system.  Also, this
+#   action is performed by debhelper scripts and is therefore short-circuited.
 #
-prerm_preload () { :
-    if [ -n '@WITH_KO_MODULES_FALSE@' ]
-    then prel_old=@sysconfdir@/modules
-    else prel_old=@sysconfdir@/modprobe.preload
-    fi
-    if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="${preloads}" ; for m in $mods ; do
-            sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $repl_new > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-    :
-}
-prerm_preload () {
-    prel_old="@preloads@"
-    if [ -f $prel_old ] ; then
-	prel_new="$tmppath/modprobe.preload.new.$$"
-	prel_tmp="$tmppath/modprobe.preload.tmp.$$"
-	cp -f -- $prel_old $prel_new
-	for m in $preloads ; do
-	    sed -e "/^[[:space:]]*$m>/d" $prel_new > $prel_tmp
-	    mv -f -- $prel_tmp $prel_new
-	done
-	chmod --reference=$prel_old -- $prel_new
-	cp -fb --suffix=.dpkg-save -- $prel_new $prel_old
-	rm -f -- $prel_new
-    fi
-}
-prerm_preload_remove () { :
-    case @kminor@ in
-	4) prel_old=@sysconfdir@/modules ;;
-	5)  if [ @kpatch@ -lt 48 ]; then
-		prel_old=@sysconfdir@/modules
-	    else
-		prel_old=@sysconfdir@/modprobe.preload
-	    fi ;;
-	6) prel_old=@sysconfdir@/modprobe.preload ;;
-	*) return ;;
-    esac
-    # When we are going away altogether we want to remove any of our preloads
-    # whatsoever from the modules or modprobe.preload file.
-    if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="${preloads}" ; for m in $mods ; do
-            sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $repl_new > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-    :
-}
-#
-# At the end of the upgrade (when _this_package_ is upgraded from) we remove our
-# lines from the modules or modprobe.preloads file that we placed in them in the
-# post scriptlet.  We only adjust our lines and leave any lines added by the new
-# package post scriptlet.
-#
-prerm_preload_upgrade () { :
-    case @kminor@ in
-	4) prel_old=@sysconfdir@/modules ;;
-	5)  if [ @kpatch@ -lt 48 ]
-	    then prel_old=@sysconfdir@/modules
-	    else prel_old=@sysconfdir@/modprobe.preload
-	    fi ;;
-	6) prel_old=@sysconfdir@/modprobe.preload ;;
-	*) prel_old=@sysconfdir@/modprobe.preload ;;
-    esac
-    if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="${preloads}" ; for m in $mods ; do
-#	    This groovy sed script just pulls out the first matching line and
-#	    leaves the rest untouched.
-            sed -e '
-\|^[[:space:]].*'"$m"'[[:space:]]*$|!b
-N
-s|^[[:space:]].*'"$m"'[[:space:]]*\
-||
-: loop
-n
-b loop' $prel_new > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-    :
-    return 0
-}
-prerm_preload_upgrade () { :
-    case @kminor@ in
-	(4) prel_old=@sysconfdir@/modules ;;
-	(5) if [ @kpatch@ -lt 48 ]; then
-		prel_old=@sysconfdir@/modules ;;
-	    else
-		prel_old=@sysconfdir@/modprobe.preload ;;
-	    fi ;;
-	(6) prel_old=@sysconfdir@/modprobe.preload ;;
-    esac
-    # At the end of the upgrade (when _this_package_ is upgraded from) we remove
-    # our lines from the modules or modprobe.preloads file that we placed in
-    # them in the post scriptlet.  We only adjust our lines and leave any lines
-    # added by the new package post scriptlet.
-    if [ -f $prel_old ] ; then
-        prel_tmp=$tmppath/modprobe.preload.tmp.$$
-        prel_new=$tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="${preloads}" ; for m in $mods ; do
-            # This groovy sed script just pulls out the first matching line and
-            # leaves the rest untouched.
-            sed -e '
-\|^[[:space:]].*'"$m"'[[:space:]]*$|!b
-N
-s|^[[:space:]].*'"$m"'[[:space:]]*\
-||
-: loop
-n
-b loop' $prel_new > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-    :
-}
-prerm_initscripts () { :
-    return
-    # Upgrading, remove our init scripts if we can
-    reverse=
-    list="${initfiles}" ; for i in $list ; do
-	if [ -z "$reverse" ]; then reverse="$i $reverse"; else reverse="$1"; fi
-    done
-    for i in $reverse ; do
-        if [ -f @initrddir@/$i ] ; then
-            # Try to stop them first.
-            /sbin/service $i stop >/dev/null 2>&1 || \
-		@initrddir@/$i stop >/dev/null 2>&1 || :
-            # Find the best working init script removal tool
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
-        fi
-    done
-    :
-}
-prerm_initscripts_upgrade () { :
-    # Upgrading, remove our init scripts if we can
-    reverse=
-    list="${initfiles}" ; for i in $list ; do
+prerm_initscripts () { :; return
+    local reverse= list="${initfiles}"
+    for i in $list; do
         reverse="$i${reverse:+' '}$reverse"
     done
-    for i in $reverse ; do
-        if [ -f @initrddir@/$i ] ; then
-            # Try to stop them first.
-            /sbin/service $i stop >/dev/null 2>&1 || \
-		@initrddir@/$i stop >/dev/null 2>&1 || :
-            # Find the best working init script removal tool
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
+    for i in $reverse; do
+        if [ -f "@initrddir@/$i" ] ; then
+	    [ ! -x "`which invoke-rc.d 2>/dev/null`" ] || invoke-rc.d $i stop && continue || true
+	    [ ! -x "`which service     2>/dev/null`" ] || service     $i stop && continue || true
+	    [ ! -x "@initrddir@/$i"                  ] || @initrddir@/$i stop && continue || true
         fi
     done
     :
-    return 0
 }
 prerm_manrefs () { :
 }
@@ -262,13 +99,11 @@ prerm_manmacros () { :
 prerm_base_remove () { :
     # We are being removed for good.
     prerm_rmnods
-    prerm_preload
-    prerm_initscripts
+    @WITH_KO_MODULES_FALSE@prerm_initscripts
 }
 prerm_base_upgrade () { :
     # We are being removed because we are being replaced with a newer version.
-    prerm_preload_upgrade
-    prerm_initscripts_upgrade
+    @WITH_KO_MODULES_FALSE@prerm_initscripts
     prerm_manrefs
     prerm_manmacros
 }
