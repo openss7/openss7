@@ -311,10 +311,10 @@ preinst_initscripts () {
     done
     for i in $reverse; do
 	if [ -f "@initrddir@/$i" ]; then
-	    [ -x /usr/sbin/update-rc.d     ] && /usr/bin/update-rc.d      $i remove 2>&1 && continue || true
 	    [ -x /sbin/insserv             ] && /sbin/insserv -r          $i        2>&1 && continue || true
 	    [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i        2>&1 && continue || true
 	    [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i        2>&1 && continue || true
+	    [ -x /usr/sbin/update-rc.d     ] && /usr/bin/update-rc.d      $i remove 2>&1 && continue || true
 	fi
     done
 }
