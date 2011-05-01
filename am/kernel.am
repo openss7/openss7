@@ -177,16 +177,16 @@ modsrc = %.mod.c
 if am__fastdepCC
 ## am__fastdepCC
 $(modobj): $(modsrc) stamp-modpost
-	$(AM_V_CC)if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $@ -MMD -MP -MF $(DEPDIR)/$$(basename $@ .mod.o).mod.Tpo -c -o $@ $< ; \
+	$(AM_V_CC)if $(KCC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $@ -MMD -MP -MF $(DEPDIR)/$$(basename $@ .mod.o).mod.Tpo -c -o $@ $< ; \
 	then $(am__mv) $(DEPDIR)/$$(basename $@ .mod.o).mod.Tpo $(DEPDIR)/$$(basename $@ .mod.o).mod.Po ; else rm -f $(DEPDIR)/$$(basename $@ .mod.o).mod.Tpo ; exit 1 ; fi
 
 stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	@mods=`printf '%s\n' $? | sed -rn 's,^lib.*_a-,$(kpre),;s,^([^\.]*)(\.mod\.[co]|\.k?o)$$,\1,p' | awk '{if(!($$0 in dups)){dups[$$0]=1;print}}'` ; \
 	for m in $$mods ; do b=`basename $$m` ; \
-		$(ECHO_Q) "  CC    " $$m.mod.o ; \
-		$(ECHO_V) "if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
+		$(ECHO_Q) "  KCC   " $$m.mod.o ; \
+		$(ECHO_V) "if $(KCC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
 		then $(am__mv) $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi" ; \
-		if $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
+		if $(KCC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -MT $$m.mod.o -MMD -MP -MF $(DEPDIR)/$$b.mod.Tpo -c -o $$m.mod.o $$m.mod.c ; \
 		then $(am__mv) $(DEPDIR)/$$b.mod.Tpo $(DEPDIR)/$$b.mod.Po ; else rm -f $(DEPDIR)/$$b.mod.Tpo ; exit 1 ; fi ; \
 	done ; \
 	date -uIseconds > $@
@@ -197,30 +197,30 @@ if AMDEP
 ## AMDEP
 $(modobj): $(modsrc) stamp-modpost
 	$(AM_V_CC)source=$< object=$@ libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $<
+	$(KCC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $<
 
 stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	@mods=`printf '%s\n' $? | sed -rn 's,^lib.*_a-,$(kpre),;s,^([^\.]*)(\.mod\.[co]|\.k?o)$$,\1,p' | awk '{if(!($$0 in dups)){dups[$$0]=1;print}}'` ; \
 	for m in $$mods ; do \
-		$(ECHO_Q) "  CC    " $$m.mod.o ; \
+		$(ECHO_Q) "  KCC   " $$m.mod.o ; \
 		$(ECHO_V) "source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
+		$(KCC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
 		source=$$m.mod.c object=$$m.mod.o libtool=no DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) \
-		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
+		$(KCC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
 	done ; \
 	date -uIseconds > $@
 ## AMDEP
 else
 ## !AMDEP
 $(modobj): $(modsrc) stamp-modpost
-	$(AM_V_CC)$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $<
+	$(AM_V_CC)$(KCC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $<
 
 stamp-mobjects: stamp-modpost $(KERNEL_MODULES)
 	@mods=`printf '%s\n' $? | sed -rn 's,^lib.*_a-,$(kpre),;s,^([^\.]*)(\.mod\.[co]|\.k?o)$$,\1,p' | awk '{if(!($$0 in dups)){dups[$$0]=1;print}}'` ; \
 	for m in $$mods ; do \
-		$(ECHO_Q) "  CC    " $$m.mod.o ; \
-		$(ECHO_V) "$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
-		$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
+		$(ECHO_Q) "  KCC   " $$m.mod.o ; \
+		$(ECHO_V) "$(KCC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c" ; \
+		$(KCC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_CFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) -c $$m.mod.c ; \
 	done ; \
 	date -uIseconds > $@
 ## !AMDEP
