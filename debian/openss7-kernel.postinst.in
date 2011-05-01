@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # @configure_input@
 # =============================================================================
 # 
@@ -349,18 +349,7 @@ abort_deconfigure_postinst () { :
     postinst_kernel
 }
 @mscript_postinst@
-#
-# For weak updates we cannot invoke the debian helper script because it will do
-# an inopportune depmod on "configure".
-#
-if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
 @mscript_debhelper@
-#if [ "$1" = "configure" ]; then
-#    if [ -e @ksysmap@ ]; then
-#	depmod -a -F @ksysmap@ @kversion@ || true
-#    fi
-#fi
-fi
 # =============================================================================
 #
 # $Log$

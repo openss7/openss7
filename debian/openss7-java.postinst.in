@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # @configure_input@
 # =============================================================================
 # 
@@ -63,7 +63,7 @@ datarootdir=@datarootdir@
 #   portion of the script and is therefore short-circuited.
 #
 postinst_jnilibs () { :; return
-    if which ldconfig >/dev/null 2>&1 ; then
+    if [ -x "`which ldconfig 2>/dev/null`" ] ; then
 	ldconfig || true
     fi
 }

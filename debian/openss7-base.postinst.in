@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # @configure_input@
 # =============================================================================
 # 
@@ -118,49 +118,35 @@ postinst_preload () { :
 #   defeated because they are too disruptive in the 2.6 environment.  This
 #   function starts init scripts; however, if they are already running, this has
 #   no effect.  Also, the init scripts detect whether they can be indeed started
-#   and skip some of their functions otherwise.
+#   and skip some of their functions otherwise.  Nevertheless, and unlike the
+#   debhelper scriptlets, this script only starts initscripts when they are
+#   normally started in the current runlevel.
 #
 postinst_initscripts () {
-    local list="${initfiles}" i
+    local list="${initfiles}" i args r
     for i in $list; do
-	if [ -f "@initrddir@/$i" ]; then
+	if [ -x "@initrddir@/$i" ]; then
 	    # Find the best working init script installation tool
-	    [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue || true
-	    [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue || true
-	    [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue || true
+	    [ -x /sbin/insserv              ] && /sbin/insserv              $i       2>&1 && continue || true
+	    [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i       2>&1 && continue || true
+	    [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i       2>&1 && continue || true
+	    args="`grep '^#[[:space:]]*update-rc.d:' @initrddir@/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
+	    [ -x /usr/sbin/update-rc.d      ] && /usr/sbin/update-rc.d      $i $args 2>&1 && continue || true
 	fi
     done
+    r="`runlevel | awk '{print$2}'`"
     for i in $list; do
-	if [ -f "@initrddir@/$i" ]; then
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i start && continue || true
-	    [ -x "`which service     2>/dev/null`" ] && service     $i start && continue || true
-	    [ -x "@initrddir@/$i"                  ] && @initrddir@/$i start && continue || true
+	if [ -x "@initrddir@/$i" ]; then
+	    if [ -L @initrddir@/../rc${r}.d/S[0-9][0-9]$i -o \
+		 -L @initrddir@/../rc${r}.d/S[0-9][0-9]$i ]
+	    then
+		[ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i start && continue || true
+		[ -x "`which service     2>/dev/null`" ] && service     $i start && continue || true
+		[ -x "@initrddir@/$i"                  ] && @initrddir@/$i start && continue || true
+	    fi
 	fi
     done
     :
-}
-postinst_initscripts2 () { :
-    #
-    # Note that initscripts are updated by debian helpers, however, debian
-    # helpers do not start and stop init scripts.
-    #
-    # Unlike rpm, we actually have a terminal here and can interact with the
-    # user.
-    #
-    if [ ":@kversion@" = ":`uname -r`" ] ; then
-	# Running kernels do need init scripts run, but only when normally
-	# started in the current runlevel.
-	r=`runlevel | awk '{print$2}'`
-	list="$initfiles" ; for i in $list ; do
-	    if [ -f @initrddir@/$i ] ; then
-		if [ -L @initrddir@/../rc${r}.d/S[0-9][0-9]$i -o \
-		     -L @initrddir@/rc${r}.d/S[0-9][0-9]$i ] ; then
-		    /sbin/service $i start >/dev/null 2>&1 || \
-		    @initrddir@/$i    start >/dev/null 2>&1 || :
-		fi
-	    fi
-	done
-    fi
 }
 #
 # postinst_manpages() - Add our manual pages to the aprospros database.  One
@@ -214,6 +200,9 @@ postinst_base_reconfigure () { :
 postinst_base_configure () { :
     postinst_base_reconfigure
 }
+postinst_base_abort () { :
+    postinst_initscripts
+}
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
@@ -232,14 +221,17 @@ triggered_postinst () { :
 # new-prerm failed-upgrade new-version ...FAILED
 # old-postinst abort-upgrade new-version
 abort_upgrade_postinst () { :
+    postinst_base_abort
 }
 # con-prerm remove 'in-favour' package new-version ...FAILED
 # con-postinst abort-remove 'in-favour' package new-version
 abort_remove_postinst () { :
+    postinst_base_abort
 }
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
 # dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
 abort_deconfigure_postinst ()  { :
+    postinst_base_abort
 }
 @mscript_postinst@
 @mscript_debhelper@
