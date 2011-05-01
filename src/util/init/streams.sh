@@ -167,13 +167,13 @@ build_options () {
     # Build up the options string
     STREAMS_OPTIONS=
     [ -n "$STREAMS_UID" ] && \
-	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:-'-o '}${STREAMS_OPTIONS:+','}uid=${STREAMS_UID}"
+	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}uid=${STREAMS_UID}"
     [ -n "$STREAMS_GID" ] && \
-	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:-'-o '}${STREAMS_OPTIONS:+','}gid=${STREAMS_GID}"
+	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}gid=${STREAMS_GID}"
     [ -n "$STREAMS_MODE" ] && \
-	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:-'-o '}${STREAMS_OPTIONS:+','}mode=${STREAMS_MODE}"
+	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}mode=${STREAMS_MODE}"
     [ "$1" = remount ] && \
-	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:-'-o '}${STREAMS_OPTIONS:+','}remount"
+	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}remount"
 }
 
 modprobe_name () {
@@ -552,7 +552,7 @@ start_preload () {
     # insert in forward order
     modules=
     for module in $STREAMS_PRELOAD ; do
-	modules="$modules${modules:+' '}$module"
+	modules="$modules${modules:+ }$module"
     done
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
@@ -608,7 +608,7 @@ stop_preload () {
     # remove in reverse order
     modules=
     for module in $OPENSS7_PRELOAD ; do
-	modules="$module${modules:+' '}$modules"
+	modules="$module${modules:+ }$modules"
     done
     for module in $modules ; do
 	remove_depends $module || ( RETVAL=$? ; break )
@@ -820,7 +820,7 @@ stop_modules () {
     # try to remove modules that we know about in reverse order
     modules=
     for module in $STREAMS_DRIVERS $STREAMS_MODULES ; do
-	modules="${module}${modules:+' '}$modules"
+	modules="${module}${modules:+ }$modules"
     done
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`

@@ -68,8 +68,8 @@ datarootdir=@datarootdir@
 postrm_preload () { :
     prel_old="@sysconfdir@/modules-@kversion@"
     if [ -f $prel_old ]; then
-	prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
-	prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
+	prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+	prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
 	cp -f -- $prel_old $prel_new
 	included=no
 	modules="${preload}"
