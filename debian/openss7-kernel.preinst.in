@@ -70,7 +70,7 @@ preinst_kernel_modules () { :
 		b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
 		case " $list " in (*" $b "*) ;; (*) continue ;; esac
 		echo "$m"
-		modl_mods="$modl_mods${modl_mods:+' '}$m"
+		modl_mods="$modl_mods${modl_mods:+ }$m"
 	done
 	if [ -n "$modl_mods" -a -f @kmoduledir@/modules.dep ] ; then
 #	    First we can build a dependency tree from every dependency
@@ -80,8 +80,8 @@ preinst_kernel_modules () { :
 	    dep= ; while read line ; do
 		case $line in
 		    (*\\)   line="`echo $line | sed -e 's|\\$||'`"
-			    dep="$dep${dep:+' '}$line"; continue ;;
-		    (*)     dep="$dep${dep:+' '}$line" ;;
+			    dep="$dep${dep:+ }$line"; continue ;;
+		    (*)     dep="$dep${dep:+ }$line" ;;
 		esac
 		[ -n "$dep" ] || continue;
 		set -- $dep
@@ -91,8 +91,8 @@ preinst_kernel_modules () { :
 		    shift
 		    for p in $@ ; do
 			prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-			eval "$prereq=\"\$$prereq\${$prereq:+' '}$t\""
-			eval "$target=\"\$$target\${$target:+' '}$p\""
+			eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
+			eval "$target=\"\$$target\${$target:+ }$p\""
 		    done
 		fi
 		dep=

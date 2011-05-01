@@ -416,7 +416,7 @@ if [ -n "$args" ] ; then
     set $args
 fi
 
-command=${command:-'install'}
+command=${command:-install}
 
 # parse non-option arguments
 case ":$command" in

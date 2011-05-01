@@ -3208,7 +3208,7 @@ if [ $1 = 0 ] ; then : # final removal
     # Uninstalling for good, remove init scripts if we can
     reverse=
     list="%{initfiles}" ; for i in $list ; do
-        reverse="$i${reverse:+' '}$reverse"
+        reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse ; do
         if [ -f %_initrddir/$i ] ; then
@@ -3346,7 +3346,7 @@ b loop' $prel_new > $prel_tmp
     # Upgrading, remove our init scripts if we can
     reverse=
     list="%{initfiles}" ; for i in $list ; do
-        reverse="$i${reverse:+' '}$reverse"
+        reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse ; do
         if [ -f %_initrddir/$i ] ; then
@@ -3753,7 +3753,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
     # Stop init scripts when they are still hanging around.
     reverse=
     list="%{initfiles}" ; for i in $list ; do
-        reverse="$i${reverse:+' '}$reverse"
+        reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse ; do
         if [ -f %_initrddir/$i ] ; then
@@ -4283,7 +4283,7 @@ if [ $arg = 1 ] ; then : # fresh install
                 b=`echo $m | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?||'`
                 case " $list " in (*" $b "*) ;; (*) continue ;; esac
                 echo "$m"
-                modl_mods="$modl_mods${modl_mods:+' '}$m"
+                modl_mods="$modl_mods${modl_mods:+ }$m"
         done
         if [ -n "$modl_mods" -a -f %{_kmoduledir}/modules.dep ] ; then
             # First we can build a dependency tree from every dependency
@@ -4293,8 +4293,8 @@ if [ $arg = 1 ] ; then : # fresh install
             dep= ; while read line ; do
                 case $line in
                     (*\\)   line="`echo $line | sed -e 's|\\$||'`"
-                            dep="$dep${dep:+' '}$line" ; continue ;;
-                    (*)     dep="$dep${dep:+' '}$line" ;;
+                            dep="$dep${dep:+ }$line" ; continue ;;
+                    (*)     dep="$dep${dep:+ }$line" ;;
                 esac
                 [ -n "$dep" ] || continue;
                 set -- $dep
@@ -4304,8 +4304,8 @@ if [ $arg = 1 ] ; then : # fresh install
                     shift
                     for p in $@ ; do
                         prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-                        eval "$prereq=\"\$$prereq\${$prereq:+' '}$t\""
-                        eval "$target=\"\$$target\${$target:+' '}$p\""
+                        eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
+                        eval "$target=\"\$$target\${$target:+ }$p\""
                     done
                 fi
                 dep=
@@ -4421,7 +4421,7 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         # Try using init scripts to shutdown if they exist.
         reverse=
         list="%{initfiles}" ; for i in $list ; do
-            reverse="$i${reverse:+' '}$reverse"
+            reverse="$i${reverse:+ }$reverse"
         done
         for i in $reverse ; do
             if [ -f %_initrddir/$i ] ; then
