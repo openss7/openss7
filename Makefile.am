@@ -117,6 +117,10 @@ noinst_LIBRARIES		=
 KERNEL_OBJECTS			=
 KERNEL_MODULES			=
 
+AM_V_KCC = $(am__v_KCC_$(V))
+am__v_KCC_ = $(am__v_KCC_$(AM_DEFAULT_VERBOSITY))
+am__v_KCC_0 = @echo "  KCC   " $@;
+
 ## =====================================================================
 if CONFIG_STREAMS_WEAK_MODULES
 else
@@ -133,6 +137,7 @@ libOS7wrapper_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS)
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libOS7wrapper_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7wrapper_a_OBJECTS): 	AM_V_CC = $(AM_V_KCC)
 $(libOS7wrapper_a_OBJECTS): 	CC = $(KCC)
 $(libOS7wrapper_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
@@ -169,6 +174,7 @@ libOS7specfs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS)
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libOS7specfs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7specfs_a_OBJECTS): 	AM_V_CC = $(AM_V_KCC)
 $(libOS7specfs_a_OBJECTS): 	CC = $(KCC)
 $(libOS7specfs_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
@@ -207,6 +213,7 @@ libOS7streams_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS)
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libOS7streams_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7streams_a_OBJECTS): 	AM_V_CC = $(AM_V_KCC)
 $(libOS7streams_a_OBJECTS): 	CC = $(KCC)
 $(libOS7streams_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
@@ -237,6 +244,7 @@ libOS7kernel_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS)
 				  $(KERNEL_EXPSYMTAB)
 libOS7kernel_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7kernel_a_OBJECTS): 	AM_V_CC = $(AM_V_KCC)
 $(libOS7kernel_a_OBJECTS): 	CC = $(KCC)
 $(libOS7kernel_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
@@ -505,6 +513,7 @@ libOS7modules_a_CPPFLAGS	= -I$(top_builddir)/src/modules -I$(top_srcdir)/src/mod
 				  $(KERNEL_EXPSYMTAB)
 libOS7modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7modules_a_OBJECTS):	AM_V_CC = $(AM_V_KCC)
 $(libOS7modules_a_OBJECTS):	CC = $(KCC)
 $(libOS7modules_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
@@ -771,6 +780,7 @@ libOS7drivers_a_CPPFLAGS	= -I$(top_builddir)/src/drivers -I$(top_srcdir)/src/dri
 				  $(KERNEL_EXPSYMTAB)
 libOS7drivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7drivers_a_OBJECTS):	AM_V_CC = $(AM_V_KCC)
 $(libOS7drivers_a_OBJECTS):	CC = $(KCC)
 $(libOS7drivers_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
@@ -878,6 +888,7 @@ libOS7sctp_a_CPPFLAGS		= -I$(top_builddir)/src/drivers -I$(top_srcdir)/src/drive
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libOS7sctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7sctp_a_OBJECTS):	AM_V_CC = $(AM_V_KCC)
 $(libOS7sctp_a_OBJECTS):	CC = $(KCC)
 $(libOS7sctp_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
