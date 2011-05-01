@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # @configure_input@
 # =============================================================================
 # 
@@ -63,8 +63,8 @@ datarootdir=@datarootdir@
 #   that this should not be done on upgrade, because building the ldconfig cache
 #   is up to the new-postinst "configure" stage or an appropriate trigger.
 #
-postrm_libraries () { :
-    if which ldconfig >/dev/null 2>&1; then
+postrm_libraries () { :; return
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig || true
     fi
 }

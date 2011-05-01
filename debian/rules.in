@@ -595,6 +595,8 @@ install-autoconf:
 		cp -p $(mpost_file) $$d ; \
 		cp -p symsets-$(kversion).tar.gz $$d ; \
 		cp -p symsets-$(kversion).tar.gz $$b
+	mkdir -p debian/source
+	echo "3.0" > debian/source/format
 	$(MAKE) -f debian/rules $(control)
 
 install: install-autoconf
@@ -603,15 +605,15 @@ install: install-autoconf
 	dh_testroot -v
 	dh_installdirs -v
 	dh_install -v
-	dh_installmodules -v
+	dh_installmodules -v -n
 	dh_installchangelogs -v
 	dh_installdocs -v debian/README.Debian debian/TODO.Debian
 	dh_installdebconf -v
-	dh_installinit -v --name=specfs.sh    -- start 33 S .
-	dh_installinit -v --name=streams.sh   -- start 34 S .
-	dh_installinit -v --name=strace.sh    -- start 35 S . stop 35 0 6 .
-	dh_installinit -v --name=strerr.sh    -- start 35 S . stop 35 0 6 .
-	dh_installinit -v --name=@PACKAGE@.sh -- start 35 S . stop 35 0 6 .
+	dh_installinit -v -n --name=specfs.sh    -- start 33 S .
+	dh_installinit -v -n --name=streams.sh   -- start 34 S .
+	dh_installinit -v -n --name=strace.sh    -- start 35 S . stop 35 0 6 .
+	dh_installinit -v -n --name=strerr.sh    -- start 35 S . stop 35 0 6 .
+	dh_installinit -v -n --name=@PACKAGE@.sh -- start 35 S . stop 35 0 6 .
 	dh_installman -v --language=C
 	dh_installinfo -v
 	dh_strip -v --dbg-package=@PACKAGE@-debuginfo

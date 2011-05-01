@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # @configure_input@
 # =============================================================================
 # 
@@ -141,7 +141,7 @@ postinst_sock2path () { :
 #   short-circuited.
 #
 postinst_libraries () { :; return
-    if which ldconfig >/dev/null 2>&1 ; then
+    if [ -x "`which ldconfig 2>/dev/null`" ] ; then
 	ldconfig || true
     fi
 }
