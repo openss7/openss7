@@ -257,6 +257,7 @@
 %global HAVE_wmscripts      0
 %global _ksubdir            %{base}
 %else
+%global HAVE_preloads       0
 %global HAVE_oldmods        0
 %global HAVE_oldprel        0
 %global HAVE_newmods        %{HAVE_modules}
@@ -2858,8 +2859,7 @@ if [ $1 = 1 ] ; then : # fresh install
         fi
     done
 %endif
-fi
-if [ $1 = 2 ] ; then : # upgrade
+elif [ $1 = 2 ] ; then : # upgrade
     # Because we are doing an upgrade, the preun and postun scriplets for the
     # old rpm are going to be called.  Hopefully the old rpm can handle removal
     # correctly.
