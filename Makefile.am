@@ -128,10 +128,12 @@ noinst_LIBRARIES		+= libOS7wrapper.a
 
 EXTRA_libOS7wrapper_a_SOURCES	= src/kernel/wrapper.c
 libOS7wrapper_a_SOURCES		= src/kernel/wrapper.c
+libOS7wrapper_a_CC		= $(KCC)
 libOS7wrapper_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libOS7wrapper_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7wrapper_a_OBJECTS): 	CC = $(KCC)
 $(libOS7wrapper_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
 KERNEL_OBJECTS			+= $(libOS7wrapper_a_OBJECTS)
@@ -162,10 +164,12 @@ libOS7specfs_a_SOURCES		= src/kernel/specfs.c \
 				  src/kernel/strattach.h \
 				  src/kernel/strpipe.h \
 				  src/kernel/strargs.h
+libOS7specfs_a_CC		= $(KCC)
 libOS7specfs_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libOS7specfs_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7specfs_a_OBJECTS): 	CC = $(KCC)
 $(libOS7specfs_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
 KERNEL_OBJECTS			+= $(libOS7specfs_a_OBJECTS)
@@ -198,10 +202,12 @@ libOS7streams_a_SOURCES		= src/kernel/streams.c \
 				  src/kernel/strsad.h \
 				  src/kernel/strargs.h \
 				  src/kernel/strmain.h
+libOS7streams_a_CC		= $(KCC)
 libOS7streams_a_CPPFLAGS	= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libOS7streams_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7streams_a_OBJECTS): 	CC = $(KCC)
 $(libOS7streams_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
 KERNEL_OBJECTS			+= $(libOS7streams_a_OBJECTS)
@@ -226,10 +232,12 @@ libOS7kernel_a_SOURCES	        = src/include/sys/os7/allocb.h \
 				  src/include/sys/os7/priv.h \
 				  src/include/sys/os7/queue.h \
 				  src/include/sys/os7/timer.h
+libOS7kernel_a_CC		= $(KCC)
 libOS7kernel_a_CPPFLAGS		= $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_EXPSYMTAB)
 libOS7kernel_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7kernel_a_OBJECTS): 	CC = $(KCC)
 $(libOS7kernel_a_OBJECTS): 	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
 KERNEL_OBJECTS			+= $(libOS7kernel_a_OBJECTS)
@@ -491,11 +499,13 @@ libOS7modules_a_SOURCES		= \
 				  src/modules/dlpi_conv.c \
 				  src/modules/npi_conv.c \
 				  src/modules/tpi_conv.c
+libOS7modules_a_CC		= $(KCC)
 libOS7modules_a_CPPFLAGS	= -I$(top_builddir)/src/modules -I$(top_srcdir)/src/modules \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_EXPSYMTAB)
 libOS7modules_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7modules_a_OBJECTS):	CC = $(KCC)
 $(libOS7modules_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
 KERNEL_OBJECTS			+= $(libOS7modules_a_OBJECTS)
@@ -755,11 +765,13 @@ libOS7drivers_a_SOURCES		= src/drivers/pty.c \
 				  src/drivers/sua_as.c \
 				  src/drivers/tua_as.c \
 				  src/drivers/isua_as.c
+libOS7drivers_a_CC		= $(KCC)
 libOS7drivers_a_CPPFLAGS	= -I$(top_builddir)/src/drivers -I$(top_srcdir)/src/drivers \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_EXPSYMTAB)
 libOS7drivers_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7drivers_a_OBJECTS):	CC = $(KCC)
 $(libOS7drivers_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
 KERNEL_OBJECTS			+= $(libOS7drivers_a_OBJECTS)
@@ -860,11 +872,13 @@ libOS7sctp_a_SOURCES		= src/drivers/sctp2.c src/drivers/sctp_compat.h \
 				  src/drivers/sctp_hmac_sha1.c src/drivers/sctp_hmac_sha1.h \
 				  src/drivers/sctp_adler32.c src/drivers/sctp_adler32.h \
 				  src/drivers/sctp_crc32c.c src/drivers/sctp_crc32c.h
+libOS7sctp_a_CC			= $(KCC)
 libOS7sctp_a_CPPFLAGS		= -I$(top_builddir)/src/drivers -I$(top_srcdir)/src/drivers \
 				  $(PKG_INCLUDES) $(KERNEL_CPPFLAGS) $(KERNEL_BLDFLAGS) $(KERNEL_MODFLAGS) $(PKG_MODFLAGS) \
 				  $(KERNEL_NOVERSION) $(KERNEL_EXPSYMTAB)
 libOS7sctp_a_CFLAGS		= $(KERNEL_CFLAGS)
 
+$(libOS7sctp_a_OBJECTS):	CC = $(KCC)
 $(libOS7sctp_a_OBJECTS):	$(STRCONF_MODCONF) $(MODVERSIONS_H) $(STRCONF_CONFIG)
 
 KERNEL_OBJECTS			+= $(libOS7sctp_a_OBJECTS)

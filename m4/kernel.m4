@@ -92,6 +92,7 @@ AC_REQUIRE([_LINUX_KERNEL_ENV_FUNCTIONS])dnl
 AC_REQUIRE_SHELL_FN([linux_flags_push],
     [AS_FUNCTION_DESCRIBE([linux_flags_push], [], [Save the current compilation
      flags to be popped later.])], [dnl
+    eval "linux_${linux_flag_nest}_cc=\"\$CC\""
     eval "linux_${linux_flag_nest}_cppflags=\"\$CPPFLAGS\""
     eval "linux_${linux_flag_nest}_cflags=\"\$CFLAGS\""
     eval "linux_${linux_flag_nest}_ldflags=\"\$LDFLAGS\""
@@ -100,6 +101,7 @@ AC_REQUIRE_SHELL_FN([linux_flags_pop],
     [AS_FUNCTION_DESCRIBE([linux_flags_pop], [], [Restore the previous
      compilation flags that were pushed and saved.])], [dnl
     ((linux_flag_nest--))
+    eval "CC=\"\$linux_${linux_flag_nest}_cc\""
     eval "CPPFLAGS=\"\$linux_${linux_flag_nest}_cppflags\""
     eval "CFLAGS=\"\$linux_${linux_flag_nest}_cflags\""
     eval "LDFLAGS=\"\$linux_${linux_flag_nest}_ldflags\""])dnl
@@ -111,6 +113,7 @@ AC_REQUIRE_SHELL_FN([linux_kernel_env_push],
 dnl We need safe versions of these flags without warnings or strange optimizations
 dnl but with module flags included
 dnl But we need to skip -DMODVERSIONS and -include /blah/blah/modversion.h on rh systems.
+    CC="$KCC"
     BLDFLAGS=`echo "$KERNEL_BLDFLAGS" | sed -e "s|'||g;s|.#s|#s|;s|-DKBUILD_BASENAME.*|-DKBUILD_BASENAME=KBUILD_STR(phony)|"`
     MODFLAGS=`echo " $KERNEL_MODFLAGS -DKBUILD_MODNAME=\"phony\" -DDEBUG_HASH=0 -DDEBUG_HASH2=0" | sed -e 's| -DMODVERSIONS||g;s| -include [[^ ]]*||g'`
     CPPFLAGS=`echo " $BLDFLAGS $MODFLAGS $KERNEL_CPPFLAGS " | sed -e 's| -W[[^[:space:]]]*||g;s| -O[[0-9s]]*| -O2|g;s|^ *||;s| *$||'`
@@ -170,7 +173,7 @@ dnl protect against nesting
 # -----------------------------------------------------------------------------
 AC_DEFUN([_LINUX_KBUILD_ENV], [dnl
 	cp -f "$kconfig" .config
-	echo "CC = \$(CROSS_COMPILE)$CC" > .kernelvariables
+	echo "CC = \$(CROSS_COMPILE)$KCC" > .kernelvariables
 	$1
 	rm -f .kernelvariables
 	rm -f .config
@@ -471,6 +474,11 @@ dnl fi
 # _LINUX_CHECK_KERNEL_TOOLS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
+    AC_ARG_VAR([KCC],
+	       [Kernel compiler. @<:@default=gcc@:>@])
+    if test ":$KCC" = : ; then
+	KCC="${CC:-gcc}"
+    fi
     AC_ARG_VAR([DEPMOD],
 	       [Build kernel module dependencies command. @<:@default=depmod@:>@])
     _BLD_PATH_PROG([DEPMOD], [depmod], [/sbin/depmod],
@@ -1834,7 +1842,7 @@ dnl
 		fi
 	    done
 	fi
-	linux_cv_compiler=`$CC -v 2>&1 | grep 'gcc version'`
+	linux_cv_compiler=`$KCC -v 2>&1 | grep 'gcc version'`
 	if test -z "$linux_cv_k_compiler" -o -z "$linux_cv_compiler"
 	then
 	    linux_cv_k_compiler_match=unknown
@@ -1874,6 +1882,8 @@ dnl
 *** 
 *** These compilers do not match, not even in version.
 *** This will cause real problems later.  Cannot proceed.
+*** Specify the correct compiler with the KCC environment
+*** variable when retrying.
 *** ])
 		    ;;
 		(:yes)
@@ -2281,8 +2291,11 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 dnl
 dnl	    dlocate is much much faster than dpkg and dpkg-query
 dnl
-	    if which dlocate >/dev/null 2>&1; then dlocate=dlocate; else dlocate=dpkg; fi
-	    linux_pkg=`$dlocate -S $linux_cv_k_sysmap 2>/dev/null | cut -f1 -d:` || linux_pkg=
+	    if which dlocate >/dev/null 2>&1
+	    then dlocate=dlocate; term='$'
+	    else dlocate=dpkg;    term=
+	    fi
+	    linux_pkg=`$dlocate -S "$linux_cv_k_sysmap$term" 2>/dev/null | cut -f1 -d:` || linux_pkg=
 	    if test -n "$linux_pkg" ; then
 		linux_ver=`$dlocate -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
 	    else
@@ -2339,8 +2352,11 @@ dnl
 dnl
 dnl		    dlocate is much much faster than dpkg and dpkg-query
 dnl
-		    if which dlocate >/dev/null 2>&1; then dlocate=dlocate; else dlocate=dpkg; fi
-		    linux_pkg=`$dlocate -S $linux_file 2>/dev/null | cut -f1 -d:` || linux_pkg=
+		    if which dlocate >/dev/null 2>&1
+		    then dlocate=dlocate; term='$'
+		    else dlocate=dpkg;    term=
+		    fi
+		    linux_pkg=`$dlocate -S "$linux_file$term" 2>/dev/null | cut -f1 -d:` || linux_pkg=
 		    if test -n "$linux_pkg" ; then
 			linux_ver=`$dlocate -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
 		    else
@@ -2375,7 +2391,7 @@ AC_DEFUN([_LINUX_SETUP_KERNEL_CFLAGS], [dnl
 	then
 	    linux_tmp=""
 	else
-	    linux_tmp="CROSS_COMPILING=`dirname $CC` ARCH=${linux_cv_k_mach}"
+	    linux_tmp="CROSS_COMPILING=`dirname $KCC` ARCH=${linux_cv_k_mach}"
 	fi
 	_LINUX_KBUILD_ENV([dnl
 dnl
@@ -2583,7 +2599,7 @@ dnl
 	linux_builddir=`pwd`
 	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} cppflag-check | tail -1`"
 	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"])
-	linux_cv_k_cppflags="-nostdinc -isystem `$CC -print-file-name=include` -iwithprefix include -DLINUX $linux_cv_k_cppflags"
+	linux_cv_k_cppflags="-nostdinc -isystem `$KCC -print-file-name=include` -iwithprefix include -DLINUX $linux_cv_k_cppflags"
 dnl
 dnl	Need to adjust 2.6.3 kernel stupid include includes to add the absolute
 dnl	location of the source directory.  include2 on the otherhand is properly
