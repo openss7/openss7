@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 # @configure_input@
 # =============================================================================
 # 
@@ -92,11 +92,11 @@ postrm_preload () { :
 }
 #
 # postrm_demod() - Perform a depmod on the kernel for which we have removed
-#   kernel modules.  This can only be performed for 2.4 module systems.  Also,
-#   the debhelper scripts will perform this action when necessary so this is
-#   currently short-circuited.
+#   kernel modules.  This can only be performed for 2.4 module systems.  The
+#   debhelper scriptlets will perform this opperation at an inopportune moment
+#   so the dh_installmodules debhelpers are disabled.
 #
-postrm_depmod () { :; return
+postrm_depmod () {
     if [ ":@kversion@" = ":`uname -r`" ]; then
         if [ -r @ksysmap@ ]
 	then depmod -ae -F @ksysmap@ 2>&1 || true
@@ -162,16 +162,7 @@ disappear_postrm () { :
     postrm_kernel_purge
 }
 @mscript_postrm@
-#
-# For weak updates we cannot invoke the debian helper script because it will do
-# an inopportune depmod on any run of postrm.
-#
-if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
 @mscript_debhelper@
-#if [ -e @ksysmap@ ]; then
-#    depmod -a -F @ksysmap@ @kversion@ || true
-#fi
-fi
 # =============================================================================
 #
 # $Log$
