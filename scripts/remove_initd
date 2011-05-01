@@ -416,7 +416,7 @@ if [ -n "$args" ] ; then
     set $args
 fi
 
-command=${command:-'remove'}
+command=${command:-remove}
 
 # parse non-option arguments
 case ":$command" in

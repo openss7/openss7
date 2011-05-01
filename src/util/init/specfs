@@ -166,13 +166,13 @@ build_options () {
     # Build up the options string
     SPECFS_OPTIONS=
     [ -n "$SPECFS_UID" ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:-'-o '}${SPECFS_OPTIONS:+','}uid=${SPECFS_UID}"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}uid=${SPECFS_UID}"
     [ -n "$SPECFS_GID" ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:-'-o '}${SPECFS_OPTIONS:+','}gid=${SPECFS_GID}"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}gid=${SPECFS_GID}"
     [ -n "$SPECFS_MODE" ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:-'-o '}${SPECFS_OPTIONS:+','}mode=${SPECFS_MODE}"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}mode=${SPECFS_MODE}"
     [ "$1" = remount ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:-'-o '}${SPECFS_OPTIONS:+','}remount"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}remount"
 }
 
 modprobe_name () {
@@ -589,7 +589,7 @@ start_preload () {
     # insert in forward order
     modules=
     for module in $SPECFS_PRELOAD ; do
-	modules="$modules${modules:+' '}$module"
+	modules="$modules${modules:+ }$module"
     done
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`
@@ -645,7 +645,7 @@ stop_preload () {
     # remove in reverse order
     modules=
     for module in $SPECFS_PRELOAD ; do
-	modules="$module${modules:+' '}$modules"
+	modules="$module${modules:+ }$modules"
     done
     for module in $modules ; do
 	remove_depends $module || ( RETVAL=$? ; break )
@@ -858,7 +858,7 @@ stop_modules () {
     # try to remove modules that we know about in reverse order
     modules=
     for module in $SPECFS_DRIVERS $SPECFS_MODULES ; do
-	modules="${module}${modules:+' '}$modules"
+	modules="${module}${modules:+ }$modules"
     done
     for module in $modules ; do
 	modrex=`echo $module | sed -e 's,[-_],[-_],g'`

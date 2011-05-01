@@ -177,8 +177,8 @@ preinst_modules () {
 	    dep= ; while read line ; do
 		case $line in
 		    *\\) line="`echo $line | sed -e 's|\\$||'`"
-			dep="${dep}${dep:+' '}$line" ; continue ;;
-		    *)  dep="${dep}${dep:+' '}$line" ;;
+			dep="${dep}${dep:+ }$line" ; continue ;;
+		    *)  dep="${dep}${dep:+ }$line" ;;
 		esac
 		set -- $dep
 		if [ $# -ge 2 ] ; then
@@ -187,8 +187,8 @@ preinst_modules () {
 		    shift
 		    for p in $@ ; do
 			prereq=prereq_`echo $p | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
-			eval "$prereq=\"\${$prereq}\${$prereq:+' '}$t\""
-			eval "$target=\"\${$target}\${$target:+' '}$p\""
+			eval "$prereq=\"\${$prereq}\${$prereq:+ }$t\""
+			eval "$target=\"\${$target}\${$target:+ }$p\""
 		    done
 		fi
 		dep=
@@ -232,8 +232,8 @@ preinst_modconf () {
     local conf_old conf_tmp conf_new suffix dir
     conf_old="@sysconfdir@/modules.conf"
     if [ -f $conf_old ]; then
-	conf_tmp=${tmppath:-'/var/tmp'}/modules.conf.tmp.$$
-	conf_new=${tmppath:-'/var/tmp'}/modules.conf.new.$$
+	conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+	conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
 	cp -f -- $conf_old $conf_new
 	for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61
 	do
@@ -279,8 +279,8 @@ preinst_preload () {
     for prel_fil in @sysconfdir@/modprobe.preload @sysconfdir@/modules @sysconfdir@/modules-*
     do
 	if [ -f $prel_fil ]; then
-	    prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
-	    prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
+	    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+	    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
 	    cp -f -- $prel_fil $prel_new
 	    sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new > $prel_tmp
 	    mv -f -- $prel_tmp $prel_new
@@ -300,7 +300,7 @@ preinst_preload () {
 preinst_initscripts () {
     local reverse= list="$initfiles $nonrpminit" i
     for i in $list; do
-	reverse="$i${reverse:+' '}$reverse"
+	reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse; do
 	if [ -f "@initrddir@/$i" ]; then

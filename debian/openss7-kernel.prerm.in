@@ -116,7 +116,7 @@ prerm_depmod () { :
 prerm_stop_scripts () { :
     reverse=
     list="${initfiles}" ; for i in $list ; do
-        reverse="$i${reverse:+' '}$reverse"
+        reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse ; do
         if [ -f @initrddir@/$i ] ; then
@@ -155,7 +155,7 @@ prerm_stop_scripts () { :
 prerm_kill_daemons () { :
     reverse=
     list="${initfiles}" ; for i in $list ; do
-	reverse="${i}${reverse:+' '}${reverse}"
+	reverse="${i}${reverse:+ }${reverse}"
     done
     for i in $reverse ; do
 	n=`echo "$i" | sed -e 's,\.sh$,,'`
