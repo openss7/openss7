@@ -57,12 +57,28 @@ datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
-preinst_kernel_modules () { :
 #
-#   This is a fresh install of this version of kernel module.  Make sure that
-#   there are no tarball installed kernel modules hanging around for this
-#   kernel version.
+# remove_depmods() - A little recursive function to delete all modules dependent
+#   on an initial module set (in our case "streams.o").  The function echos the
+#   list of modules to remove to stdout.
 #
+remove_depmods () {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+	prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	eval "remove_depmods \$$prereq"
+    done
+}
+#
+# preinst_modules() - This is a fresh install of this version of kernel module.
+#   Make sure that there are no tarball installed kernel modules hanging around
+#   for this kernel version.  Because kernel module packages are named
+#   differently for different kernels, it is important that this function not be
+#   too zealous and remove kernel modules from our other installed packages.
+#
+preinst_modules () { :
     local list m b modl_mods line dep
     list="${modules}" ; modl_mods=
     if [ -d @kmoduledir@ ] ; then
@@ -114,41 +130,158 @@ preinst_kernel_modules () { :
     return 0
 }
 #
-# FIXME: there is a way in debian to indicate that a reboot is required (use it)
+# preinst_stop_scripts() - Stop init scripts when they are still hanging around.
+#   Note that when the init scripts are already stopped this has no (negative)
+#   effect.  Note that our previous practice of stopping init scripts when
+#   removing or upgrading modules is questionable and possibly too disruptive to
+#   a running system.  Instead of stopping scripts, the user should be warned
+#   that restarting the subsystem might be required.  Under debian we can use
+#   debconf for this purpose too.
 #
-preinst_kernel_running () {
-    local fields ind val signal reboot
-    if [ ":@kversion@" = ":`uname -r`" ] ; then
-#
-#	If we are upgrading and the upgrade is for the running kernel, or we are
-#	installing new on the running kernel, we have to worry about previous
-#	loaded modules for the old version or a non-deb version.
-#
-	if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
-	    if [ -x /usr/sbin/fdetach ] ; then
-		/usr/sbin/fdetach -a 2>/dev/null || :
-	    fi
-	    for signal in TERM KILL ; do
-		if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
-		    lsof | grep '\<STR\>' | \
-		    while read fields ; do
-			set -- $fields
-			if [ ":$5" != ':CHR' ] ; then continue; fi
-			ind=`expr $# - 1`
-			eval "val=\"\${$ind}\""
-			if [ ":$val" != ':STR' ] ; then continue; fi
-			kill -$signal $2 >/dev/null 2>&1 || :
-		    done
-		    sleep 5
-		fi
-	    done
+preinst_stop_scripts () {
+    local reverse= list="${initfiles}" i tried=1
+    for i in $list ; do
+        reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse ; do
+	if [ -f "@initrddir@/$i" ]; then tried=0
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || true
+	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || true
+	    [ -x "@initrddir@/$i"                  ] && @initrddir@/$i stop && continue || true
 	fi
-	lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
-	remove_depends streams || reboot='yes'
-	remove_depends specfs  || reboot='yes'
-	[ ":$reboot" != ':yes' ] || echo "$script: warning: reboot required." >&2
+    done
+    return $tried
+}
+#
+# preinst_kill_daemons() - Kill daemons with prejudice.  Stopping init scripts
+#   should have stopped these daemons already.  One situation is where init
+#   scripts have been removed already (or not fully installed) without stopping
+#   them.
+#
+preinst_kill_daemons () {
+    local reverse= list="${initfiles}" i n
+    for i in $list ; do
+	reverse="${i}${reverse:+ }${reverse}"
+    done
+    for i in $reverse ; do
+	n=`echo "$i" | sed -e 's,\.sh$,,'`
+	if [ -r /var/run/${n}.pid ] ; then
+	    kill -TERM `cat /var/run/${n}.pid` || :
+	    rm -f /var/run/${n}.pid || :
+	    rm -f /var/lock/subsys/${n} || :
+	    rm -f /var/lock/subsys/${n}.init || :
+	fi
+    done
+}
+#
+# preinst_umount_specfs() - Unmount the Special Shadow Filesystem, making device
+#  nodes in the /dev/streams directory no longer available.  Note that this
+#  should succeed even while kernel modules are loaded.
+#
+preinst_umount_specfs () {
+    local retval=0 device mountpoint fstype options
+    while read device mountpoint fstype options
+    do
+	if [ ":$fstype" = ":specfs" ]
+	then
+	    umount -t specfs -- $mountpoint || retval=$?
+	fi
+    done </etc/mtab
+    return $retval
+}
+#
+# preinst_rmnods() - Remove device nodes in the /dev directory.
+#
+preinst_rmnods () { :
+    if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
+	@sbindir@/@STRCONF_DEVICES@ --remove || :
+    fi
+}
+#
+# preinst_kill_streams() - Uses lsof to determine which processes are holding
+#   opens STREAMS drivers and sends those processes a TERM signal followed five
+#   seconds later by a KILL signal if the process still exists.  This ensures
+#   that all STREAMS drivers are closed.  When the specfs is unmounted and
+#   STREAMS devices removed before this operation is performed, killed processes
+#   that respawn will be unable to reopen the STREAMS drivers because the device
+#   nodes no longer exist.  Note that this is not infalable: when STREAMS are
+#   permanently linked beneath a multiplexing driver, it may still be impossible
+#   to remove all STREAMS kernel modules.
+#
+preinst_kill_streams () {
+    local fields ind val signal
+    if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+	if [ -x "`which fdetach 2>/dev/null`" ] ; then
+	    fdetach -a 2>/dev/null || :
+	fi
+        for signal in TERM KILL ; do
+            if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+                lsof | grep '\<STR\>' | \
+                while read fields ; do
+                    set -- $fields
+                    if [ ":$5" != ':CHR' ] ; then continue; fi
+                    ind=`expr $# - 1`
+                    eval "val=\"\${$ind}\""
+                    if [ ":$val" != ':STR' ] ; then continue; fi
+                    kill -$signal $2 >/dev/null 2>&1 || :
+                done
+                sleep 5
+            fi
+        done
+    fi
+    lsof | grep '\<STR\>' >/dev/null 2>&1 && false || true
+    return $?
+}
+#
+# remove_depends() - A recursive function that peforms a depth first traversal
+#   of the dependency graph rooted at the kernel module supplied as an argument,
+#   removing modules that have no dependents.  This is so that entire kernel
+#   module stacks can be removed.
+#
+remove_depends () {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+        remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+        rmmod $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
+#
+# preinst_shutdown() - Shutdown the STREAMS subsystem with prejudice.  First
+#   attempt to shutdown using init scripts.  If that suceeds fully, all other
+#   steps reduce to null operations.  When it does not succeed, the other steps
+#   are largely what the initscripts would do shutting down anyway, but we can
+#   determine whether a reboot will be required.
+#
+preinst_shutdown () {
+    local reboot='no'
+    preinst_stop_scripts    || :
+    preinst_kill_daemons    || :
+    preinst_umount_specfs   || reboot='yes'
+    preinst_rmnods	    || :
+    preinst_kill_streams    || reboot='yes'
+    remove_depends streams  || reboot='yes'
+    remove_depends specfs   || reboot='yes'
+    if [ ":$reboot" = ':yes' ] ; then
+	echo "$script: warning: reboot required." >&2
     fi
     :
+    return 0
+}
+#
+# preinst_running() - Shutdown STREAMS on the running kernel if the running
+#   kernel is the same as the version of the modules we are installing or
+#   upgrading.  If streams does not happen to be running on the running kernel,
+#   this reduces to a null operation.
+#
+preinst_running () {
+    if [ "@kversion@" = "`uname -r`" ]; then
+	preinst_shutdown || :
+    fi
 }
 #   new-preinst install
 #	- files are unpacked
@@ -202,6 +335,8 @@ preinst_kernel_running () {
 # before the init scripts attempt to start the subsystem.
 #
 preinst_kernel_install () { :
+    preinst_modules
+    preinst_running
 }
 #   new-preinst install old-version
 #	- files are unpacked
@@ -217,6 +352,7 @@ preinst_kernel_install () { :
 # been performed on the previous fresh install.
 #
 preinst_kernel_reinstall () { :
+    @WITH_KO_MODULES_FALSE@preinst_running
 }
 #   old-prerm upgrade new-version
 #   new-preinst upgrade old-version
@@ -292,30 +428,32 @@ preinst_kernel_reinstall () { :
 # linked either before or after reboot and depmod performed again when necessary
 # before the init scripts attempt to start the subsystem.
 #
-preinst_kernel () { :
-    preinst_kernel_modules
-    preinst_kernel_running
+preinst_kernel_upgrade () { :
+    @WITH_KO_MODULES_FALSE@preinst_running
+}
+preinst_kernel_abort () { :
+    @WITH_KO_MODULES_FALSE@preinst_running
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # new-preinst install
 install_preinst () { :
-    preinst_kernel
+    preinst_kernel_install
 }
 # new-preinst install old-version
 reinstall_preinst () { :
-    preinst_kernel_running
+    preinst_kernel_reinstall
 }
 # new-preinst upgrade old-version
 upgrade_preinst () { :
-    preinst_kernel_running
+    preinst_kernel_upgrade
 }
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
-    preinst_kernel_running
+    preinst_kernel_abort
 }
 @mscript_preinst@
 @mscript_debhelper@

@@ -113,19 +113,19 @@ prerm_depmod () { :
 #   warned that restarting the subsystems might be required.  Under debian we
 #   can use debconf for this purpose too.
 #
-prerm_stop_scripts () { :
-    reverse=
-    list="${initfiles}" ; for i in $list ; do
+prerm_stop_scripts () {
+    local reverse= list="${initfiles}" i tried=1
+    for i in $list ; do
         reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse ; do
-        if [ -f @initrddir@/$i ] ; then
-            /sbin/service $i stop >/dev/null 2>&1 || \
-		@initrddir@/$i stop >/dev/null 2>&1 || :
-        fi
+	if [ -f "@initrddir@/$i" ]; then tried=0
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || true
+	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || true
+	    [ -x "@initrddir@/$i"                  ] && @initrddir@/$i stop && continue || true
+	fi
     done
-    :
-    return 0
+    return $tried
 }
 #
 # Under RPM (rpm is very bad with installation order and prerequisites) we used
@@ -152,40 +152,44 @@ prerm_stop_scripts () { :
 #   scripts have been removed already (or not fully installed) without stopping
 #   them.
 #
-prerm_kill_daemons () { :
-    reverse=
-    list="${initfiles}" ; for i in $list ; do
+prerm_kill_daemons () {
+    local reverse= list="${initfiles}" i n
+    for i in $list ; do
 	reverse="${i}${reverse:+ }${reverse}"
     done
     for i in $reverse ; do
 	n=`echo "$i" | sed -e 's,\.sh$,,'`
 	if [ -r /var/run/${n}.pid ] ; then
 	    kill -TERM `cat /var/run/${n}.pid` || :
-	    rm -f /var/run/${n}.pid
-	    rm -f /var/lock/subsys/${n}
-	    rm -f /var/lock/subsys/${n}.init
+	    rm -f /var/run/${n}.pid || :
+	    rm -f /var/lock/subsys/${n} || :
+	    rm -f /var/lock/subsys/${n}.init || :
 	fi
     done
-    :
-    return 0
 }
 #
 # prerm_umount_specfs() - Unmount the Special Shadow Filesystem, making device
-#  nodes in the /dev/streams directory no longer available.
+#  nodes in the /dev/streams directory no longer available.  Note that this
+#  should succeed even while kernel modules are loaded.
 #
-prerm_umount_specfs () { :
-    umount -a -t specfs
-    return $?
+prerm_umount_specfs () {
+    local retval=0 device mountpoint fstype options
+    while read device mountpoint fstype options
+    do
+	if [ ":$fstype" = ":specfs" ]
+	then
+	    umount -t specfs -- $mountpoint || retval=$?
+	fi
+    done </etc/mtab
+    return $retval
 }
 #
 # prerm_rmnods() - Remove device nodes in the /dev directory.
 #
 prerm_rmnods () { :
     if [ -x "@sbindir@/@STRCONF_DEVICES@" ]; then
-	echo "${package}: removing old devices."
 	@sbindir@/@STRCONF_DEVICES@ --remove || :
     fi
-    return 0
 }
 #
 # prerm_kill_streams() - Uses lsof to determine which processes are holding
@@ -195,14 +199,15 @@ prerm_rmnods () { :
 #   STREAMS devices removed before this operation is performed, killed processes
 #   that respawn will be unable to reopen the STREAMS drivers because the device
 #   nodes no longer exist.  Note that this is not infalable: when STREAMS are
-#   permanently linked beneath a multiplexing driver,  it may still be
-#   impossible to remove all STREAMS kernel modules.
+#   permanently linked beneath a multiplexing driver, it may still be impossible
+#   to remove all STREAMS kernel modules.
 #
-prerm_kill_streams () { :
+prerm_kill_streams () {
+    local fields ind val signal
     if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
-        if [ -x @sbindir@/fdetach ] ; then
-            @sbindir@/fdetach -a 2>/dev/null || :
-        fi
+	if [ -x "`which fdetach 2>/dev/null`" ] ; then
+	    fdetach -a 2>/dev/null || :
+	fi
         for signal in TERM KILL ; do
             if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                 lsof | grep '\<STR\>' | \
@@ -239,7 +244,14 @@ remove_depends () {
     fi
     return 0
 }
-prerm_kill () {
+#
+# prerm_shutdown() - Shutdown the STREAMS subsystem with prejudice.  First
+#   attempt to shutdown using init scripts.  If that suceeds fully, all other
+#   steps reduce to null operations.  When it does not succeed, the other steps
+#   are largely what the initscripts would do shutting down anyway, but we can
+#   determine whether a reboot will be required.
+#
+prerm_shutdown () {
     local reboot='no'
     prerm_stop_scripts	    || :
     prerm_kill_daemons	    || :
@@ -249,17 +261,21 @@ prerm_kill () {
     remove_depends streams  || reboot='yes'
     remove_depends specfs   || reboot='yes'
     if [ ":$reboot" = ':yes' ] ; then
-	echo "$script: reboot required." >&2
+	echo "$script: warning: reboot required." >&2
     fi
     :
     return 0
 }
-prerm_kill_running () { :
+#
+# prerm_running() - Shutdown STREAMS on the running kernel if the running kernel
+#   is the same as the version of modules we are removing.  If streams does not
+#   happen to be running on the running kernel, this reduces to a null
+#   operation.
+#
+prerm_running () {
     if [ "@kversion@" = "`uname -r`" ]; then
-	prerm_kill || :
+	prerm_shutdown || :
     fi
-    :
-    return 0
 }
 #
 # The --delete-modules option to the openss7-modules awk script denotes that
@@ -286,7 +302,7 @@ prerm_kernel () { :
     @WITH_KO_MODULES_FALSE@prerm_modules_remove || :
     @WITH_KO_MODULES_FALSE@prerm_depmod || :
     @WITH_KO_MODULES_FALSE@prerm_modules_replace || :
-    @WITH_KO_MODULES_FALSE@prerm_kill_running || :
+    @WITH_KO_MODULES_FALSE@prerm_running || :
     @WITH_KO_MODULES_TRUE@prerm_updates || :
     return 0
 }
