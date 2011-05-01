@@ -67,7 +67,7 @@ preinst_jnilibs () { :
     libs="$jnilibs"; for lib in $libs; do
         old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
         if [ -n "$old_libs" ] ; then
-            echo "$script: warning: Deleting old non-rpm libraries $old_libs" >&2
+            echo "$script: warning: Deleting old non-deb libraries $old_libs" >&2
             rm -f $old_libs || true
         fi
     done

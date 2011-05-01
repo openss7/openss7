@@ -2516,6 +2516,12 @@ in the set.
 
 %pre repo
 # ---------------------------------------------------------------------------
+# This is an initial installation or upgrade of the repo subpackage.  We do
+# not need to check for legacy or non-rpm installations, because the non-rpm
+# installs do not create repository definitions.  We do need to check,
+# however, whether we have some machine credentials lying around from a
+# previous install/remove/upgrade cycle.
+# ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
 %if %{FILES_yumrepo}
     (
@@ -2822,10 +2828,10 @@ binary package is required for any installation of the %{name} package.
 
 %pre base
 # ---------------------------------------------------------------------------
-# This is an initial installation of the base subpackage.  We need to check for
-# non-rpm installations on the host and remove any entries that might later
-# conflict with our entries.  We treat every fresh installation like an upgrade
-# from non-rpm install.
+# This is an initial installation or upgrade of the base subpackage.  On
+# initial installation, we need to check for non-rpm installations on the host
+# and remove any entries that might later conflict with our entries.  We treat
+# every fresh installation like an upgrade from non-rpm install.
 # ---------------------------------------------------------------------------
 #
 # remove_depmods() - A little recursive function to delete all modules dependent
@@ -3266,6 +3272,188 @@ fi
 
 %preun base
 # ---------------------------------------------------------------------------
+# This is either a final removal of, or an upgrade from, this base subpackage.
+# ---------------------------------------------------------------------------
+#
+# preun_stop_scripts() - Before removing or upgrading a package, stop the init
+#   scripts.  This is fine for 2.4 module systems, but it is a little too
+#   disruptive for weak-module updates in the 2.6 module system.  Because this
+#   is too disruptive for weak-updated systems, we disable the debhelper
+#   scriplets and only stop init scripts when not performing weak updates, and
+#   even then, only when the updates are for the running kernel.
+#
+preun_stop_scripts () {
+    local reverse= list="%{initfiles}" i tried=1
+    for i in $list ; do
+        reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse ; do
+	if [ -f "%_initrddir/$i" ]; then tried=0
+	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || :
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || :
+	    [ -x "%_initrddir/$i"                  ] && %_initrddir/$i stop && continue || :
+	fi
+    done
+    return $tried
+}
+#
+# preun_kill_daemons() - Kill daemons with prejudice.  Stopping init scripts
+#   should have stopped these daemons already.  One situation is where init
+#   scripts have been removed already (or not fully installed) without stopping
+#   them.
+#
+preun_kill_daemons () {
+    local reverse= list="%{initfiles}" i n
+    for i in $list ; do
+	reverse="${i}${reverse:+ }${reverse}"
+    done
+    for i in $reverse ; do
+	n=`echo "$i" | sed -e 's,\.sh$,,'`
+	if [ -r /var/run/${n}.pid ] ; then
+	    kill -TERM `cat /var/run/${n}.pid` || :
+	    rm -f /var/run/${n}.pid || :
+	    rm -f /var/lock/subsys/${n} || :
+	    rm -f /var/lock/subsys/${n}.init || :
+	fi
+    done
+}
+#
+# preun_umount_specfs() - Unmount the Special Shadow Filesystem, making device
+#  nodes in the /dev/streams directory no longer available.  Note that this
+#  should succeed even while kernel modules are loaded.
+#
+preun_umount_specfs () {
+    local retval=0 device mountpoint fstype options
+    while read device mountpoint fstype options
+    do
+	if [ ":$fstype" = ":specfs" ]
+	then
+	    umount -t specfs -- $mountpoint || retval=$?
+	fi
+    done </etc/mtab
+    return $retval
+}
+#
+# preun_rmnods() - Remove device nodes in the /dev directory.
+#
+preun_rmnods () { :
+%if %{USE_rmnods}
+    if [ -x "%{mknods}" ] ; then
+        %{rmnods}
+    fi
+%endif
+}
+#
+# preun_kill_streams() - Uses lsof to determine which processes are holding
+#   opens STREAMS drivers and sends those processes a TERM signal followed five
+#   seconds later by a KILL signal if the process still exists.  This ensures
+#   that all STREAMS drivers are closed.  When the specfs is unmounted and
+#   STREAMS devices removed before this operation is performed, killed processes
+#   that respawn will be unable to reopen the STREAMS drivers because the device
+#   nodes no longer exist.  Note that this is not infalable: when STREAMS are
+#   permanently linked beneath a multiplexing driver, it may still be impossible
+#   to remove all STREAMS kernel modules.
+#
+preun_kill_streams () {
+    local fields ind val signal
+    if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+	if [ -x "`which fdetach 2>/dev/null`" ] ; then
+	    fdetach -a 2>/dev/null || :
+	fi
+        for signal in TERM KILL ; do
+            if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+                lsof | grep '\<STR\>' | \
+                while read fields ; do
+                    set -- $fields
+                    if [ ":$5" != ':CHR' ] ; then continue; fi
+                    ind=`expr $# - 1`
+                    eval "val=\"\${$ind}\""
+                    if [ ":$val" != ':STR' ] ; then continue; fi
+                    kill -$signal $2 >/dev/null 2>&1 || :
+                done
+                sleep 5
+            fi
+        done
+    fi
+    lsof | grep '\<STR\>' >/dev/null 2>&1 && false || true
+    return $?
+}
+#
+# remove_depends() - A recursive function that peforms a depth first traversal
+#   of the dependency graph rooted at the kernel module supplied as an argument,
+#   removing modules that have no dependents.  This is so that entire kernel
+#   module stacks can be removed.
+#
+remove_depends () {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+        remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+        rmmod $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
+#
+# preun_shutdown() - Shutdown the STREAMS subsystem with prejudice.  First
+#   attempt to shutdown using init scripts.  If that suceeds fully, all other
+#   steps reduce to null operations.  When it does not succeed, the other steps
+#   are largely what the initscripts would do shutting down anyway, but we can
+#   determine whether a reboot will be required.
+#
+preun_shutdown () {
+    local reboot='no'
+    preun_stop_scripts      || :
+    preun_kill_daemons      || :
+    preun_umount_specfs     || reboot='yes'
+    preun_rmnods	    || :
+    preun_kill_streams      || reboot='yes'
+    remove_depends streams  || reboot='yes'
+    remove_depends specfs   || reboot='yes'
+    if [ ":$reboot" = ':yes' ] ; then
+	echo "warning: reboot required." >&2
+    fi
+    :
+    return 0
+}
+#
+# preun_running() - Shutdown STREAMS on the running kernel if the running
+#   kernel is the same as the version of the modules we are installing or
+#   upgrading.  If streams does not happen to be running on the running kernel,
+#   this reduces to a null operation.
+#
+preun_running () {
+    if [ "%_kversion" = "`uname -r`" ]; then
+	preun_shutdown || :
+    fi
+}
+#
+# preun_remove() - We are removing the base package for good.  Because all
+#   other packages depend on the base package, and the base package contains
+#   the initscripts, we preform all system-wide preun actions for removal
+#   here.  RPM is really, really poor on scriplet sequencing, so be careful.
+#
+preun_remove () { :
+%if %{HAVE_oldmods}
+    preun_remove || :
+%endif
+}
+#
+# preun_upgrade() - There are not too many actions to perform here.  On
+#   upgrade %pre and %post have alreday run and the new package's files have
+#   overwritten the old ones.  The new package's %pre should have stopped the
+#   STREAMS subsystem (for 2.4) before overwritting
+#
+preun_upgrade () { :
+}
+if [ $1 -eq 0 ] ; then : # final removal
+    preun_remove || :
+fi
+if [ $1 -ge 1 ] ; then : # upgrade
+    preun_upgrade || :
+fi
 if [ $1 = 0 ] ; then : # final removal
 %if %{USE_rmnods}
     # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of
@@ -3868,6 +4056,12 @@ package.
 
 %pre lib
 # ---------------------------------------------------------------------------
+# This is an initial installation or upgrade of the lib subpackage.  On fresh
+# install, we need to check for legacy and non-rpm installations on the host
+# and remove any entries that might later conflict with the subpackage's
+# entries.  We treat every fresh installation like an upgrade from non-rpm
+# install.
+# ---------------------------------------------------------------------------
 %if %{FILES_libraries}
 #
 # pre_libraries() - On a fresh installation, look for an remove any non-rpm or
@@ -4439,6 +4633,20 @@ for your kernel from the %{name} package source rpm.
 %if %{FILES_modules}
 %pre -n %{kernel_package}
 # ---------------------------------------------------------------------------
+# This is an initial installation of the kernel subpackage.  We need to check
+# for legacy and non-rpm installations on the host and remove any entries that
+# might later conflict with our entries.  We treat every fresh installation
+# like an upgrade from non-rpm install.  Note that whether we detect an
+# install or upgrade depends on the naming convention for %{kernel_package}.
+# When the name includes the kernel version, then install or upgrade only
+# applies to one kernel version.  When the kernel version is in the version or
+# release strings, install or upgrade applies to the entire system.  To avoid
+# issues associated with system pre-installation cleanup of legacy and non-rpm
+# packages, we perform most system pre-installation cleanup to the -base
+# package, where we are guaranteed that an install is a system-wide rpm
+# install.  The scope of actions here are kept to the kerne; for which the
+# modules were compiled.
+# ---------------------------------------------------------------------------
 #
 # remove_depmods() - A little recursive function to delete all modules dependent
 #   on an initial module set (in our case "streams.o").  The function echos the
@@ -4512,60 +4720,177 @@ pre_modules () { :
     return 0
 }
 #
-# remove_depends() - A recursive function to remove dependent kernel modules
-#   (that is an entire kernel module stack rooted at a module), from the running
-#   kernel.
+# pre_stop_scripts() - Stop init scripts when they are still hanging around.
+#   Note that when the init scripts are already stopped this has no (negative)
+#   effect.  Note that our previous practice of stopping init scripts when
+#   removing or upgrading modules is questionable and possibly too disruptive to
+#   a running system.  Instead of stopping scripts, the user should be warned
+#   that restarting the subsystem might be required.  Under debian we can use
+#   debconf for this purpose too.
+#
+pre_stop_scripts () {
+    local reverse= list="%{initfiles}" i tried=1
+    for i in $list ; do
+        reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse ; do
+	if [ -f "%_initrddir/$i" ]; then tried=0
+	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || :
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || :
+	    [ -x "%_initrddir/$i"                  ] && %_initrddir/$i stop && continue || :
+	fi
+    done
+    return $tried
+}
+#
+# pre_kill_daemons() - Kill daemons with prejudice.  Stopping init scripts
+#   should have stopped these daemons already.  One situation is where init
+#   scripts have been removed already (or not fully installed) without stopping
+#   them.
+#
+pre_kill_daemons () {
+    local reverse= list="%{initfiles}" i n
+    for i in $list ; do
+	reverse="${i}${reverse:+ }${reverse}"
+    done
+    for i in $reverse ; do
+	n=`echo "$i" | sed -e 's,\.sh$,,'`
+	if [ -r /var/run/${n}.pid ] ; then
+	    kill -TERM `cat /var/run/${n}.pid` || :
+	    rm -f /var/run/${n}.pid || :
+	    rm -f /var/lock/subsys/${n} || :
+	    rm -f /var/lock/subsys/${n}.init || :
+	fi
+    done
+}
+#
+# pre_umount_specfs() - Unmount the Special Shadow Filesystem, making device
+#  nodes in the /dev/streams directory no longer available.  Note that this
+#  should succeed even while kernel modules are loaded.
+#
+pre_umount_specfs () {
+    local retval=0 device mountpoint fstype options
+    while read device mountpoint fstype options
+    do
+	if [ ":$fstype" = ":specfs" ]
+	then
+	    umount -t specfs -- $mountpoint || retval=$?
+	fi
+    done </etc/mtab
+    return $retval
+}
+#
+# pre_rmnods() - Remove device nodes in the /dev directory.
+#
+pre_rmnods () { :
+%if %{USE_rmnods}
+    if [ -x "%{mknods}" ] ; then
+        %{rmnods}
+    fi
+%endif
+}
+#
+# pre_kill_streams() - Uses lsof to determine which processes are holding
+#   opens STREAMS drivers and sends those processes a TERM signal followed five
+#   seconds later by a KILL signal if the process still exists.  This ensures
+#   that all STREAMS drivers are closed.  When the specfs is unmounted and
+#   STREAMS devices removed before this operation is performed, killed processes
+#   that respawn will be unable to reopen the STREAMS drivers because the device
+#   nodes no longer exist.  Note that this is not infalable: when STREAMS are
+#   permanently linked beneath a multiplexing driver, it may still be impossible
+#   to remove all STREAMS kernel modules.
+#
+pre_kill_streams () {
+    local fields ind val signal
+    if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+	if [ -x "`which fdetach 2>/dev/null`" ] ; then
+	    fdetach -a 2>/dev/null || :
+	fi
+        for signal in TERM KILL ; do
+            if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
+                lsof | grep '\<STR\>' | \
+                while read fields ; do
+                    set -- $fields
+                    if [ ":$5" != ':CHR' ] ; then continue; fi
+                    ind=`expr $# - 1`
+                    eval "val=\"\${$ind}\""
+                    if [ ":$val" != ':STR' ] ; then continue; fi
+                    kill -$signal $2 >/dev/null 2>&1 || :
+                done
+                sleep 5
+            fi
+        done
+    fi
+    lsof | grep '\<STR\>' >/dev/null 2>&1 && false || true
+    return $?
+}
+#
+# remove_depends() - A recursive function that peforms a depth first traversal
+#   of the dependency graph rooted at the kernel module supplied as an argument,
+#   removing modules that have no dependents.  This is so that entire kernel
+#   module stacks can be removed.
 #
 remove_depends () {
     local modrex depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
     depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
     for depend in $depends ; do
-	remove_depends $depend || return $?
+        remove_depends $depend || return $?
     done
     if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
-	rmmod $1 >/dev/null 2>&1 || return $?
+        rmmod $1 >/dev/null 2>&1 || return $?
     fi
     return 0
 }
 #
-# pre_running() - If we are upgrading and the upgrade is for the running
-#   kernel and 2.4 modules are in use, or we are installing new on the running
-#   kernel for either 2.4 or 2.6 modules, we have to worry about previous loaded
-#   modules for the old version or a non-rpm version.
+# pre_shutdown() - Shutdown the STREAMS subsystem with prejudice.  First
+#   attempt to shutdown using init scripts.  If that suceeds fully, all other
+#   steps reduce to null operations.  When it does not succeed, the other steps
+#   are largely what the initscripts would do shutting down anyway, but we can
+#   determine whether a reboot will be required.
+#
+pre_shutdown () {
+    local reboot='no'
+    pre_stop_scripts        || :
+    pre_kill_daemons        || :
+    pre_umount_specfs       || reboot='yes'
+    pre_rmnods	            || :
+    pre_kill_streams        || reboot='yes'
+    remove_depends streams  || reboot='yes'
+    remove_depends specfs   || reboot='yes'
+    if [ ":$reboot" = ':yes' ] ; then
+	echo "warning: reboot required." >&2
+    fi
+    :
+    return 0
+}
+#
+# pre_running() - Shutdown STREAMS on the running kernel if the running
+#   kernel is the same as the version of the modules we are installing or
+#   upgrading.  If streams does not happen to be running on the running kernel,
+#   this reduces to a null operation.
 #
 pre_running () {
-    local fields ind val signal reboot
-    if [ ":%_kversion" = ":`uname -r`" ] ; then
-	if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
-	    if [ -x /usr/sbin/fdetach ] ; then
-		/usr/sbin/fdetach -a 2>/dev/null || :
-	    fi
-	    for signal in TERM KILL ; do
-		if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
-		    lsof | grep '\<STR\>' | \
-		    while read fields ; do
-			set -- $fields
-			if [ ":$5" != ':CHR' ] ; then continue; fi
-			ind=`expr $# - 1`
-			eval "val=\"\${$ind}\""
-			if [ ":$val" != ':STR' ] ; then continue; fi
-			kill -$signal $2 >/dev/null 2>&1 || :
-		    done
-		    sleep 5
-		fi
-	    done
-	fi
-	lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
-	remove_depends streams || reboot='yes'
-	remove_depends specfs  || reboot='yes'
-	[ ":$reboot" != ':yes' ] || echo "warning: reboot required." >&2
+    if [ "%_kversion" = "`uname -r`" ]; then
+	pre_shutdown || :
     fi
 }
+#
+# pre_install() - For a fresh installation of a kernel module package we want
+#   to make sure that there are no legacy or non-rpm installed kernel modules
+#   lying around and to stop any legacy or non-rpm subsystems.  These actions
+#   can only be performed for %_kversion because kernel module packages are
+#   named differently for their kernels.
+#
 pre_install () { :
     pre_modules || :
     pre_running || :
 }
+#
+# pre_upgrade() - Before upgrading, for a 2.4 modules system, and when the
+#   package being upgraded applies to the running kernel, then we stop the
+#   STREAMS subsystems before installing.
+#
 pre_upgrade () { :
 %if %{HAVE_oldmods}
     pre_running || :
@@ -5214,27 +5539,75 @@ interfaces for %{title} API libraries.
 
 %pre java
 # ---------------------------------------------------------------------------
-if [ $1 = 1 ] ; then : # fresh install
+# This is an initial installation of the java subpackage.  We need to check
+# for legacy and non-rpm installations on the host and remove any entries that
+# might later conflict with out entries.  We treat every fresh installation
+# like an upgrade from non-rpm install.
+# ---------------------------------------------------------------------------
 %if %{FILES_jnilibs}
-    # Fresh install: look for non-rpm libraries and remove them
-    libs="%{jnilibs}" ; for lib in $libs ; do
+#
+# pre_jnilibs() - On a fresh installation, look for an remove any non-deb or old tarball release
+#   libraries.  On reinstallations this step can (and should) be skipped.  Unfortunately,
+#   non-autoconf releases of LiS placed libraries all over the place.  On an initial installation,
+#   this checks for other libraries with the same name and deletes them.
+#
+pre_jnilibs () { :
+    libs="%jnilibs"; for lib in $libs; do
         old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
         if [ -n "$old_libs" ] ; then
-            # Old libraries hanging around, delete them.
             echo "warning: Deleting old non-rpm libraries $old_libs" >&2
-            rm -f $old_libs
+            rm -f $old_libs || true
         fi
     done
+}
 %endif
 %if %{FILES_gcjlibs}
-    # Fresh install: look for non-rpm libraries and remove then
+pre_gcjlibs () { :
+}
 %endif
 %if %{FILES_gcjmaps}
-    # Fresh install: look for non-rpm classmaps and remove then
+#
+# pre_gcjmaps() - On fresh install, look for non-deb libraries and remove
+#   them.  This is not necessary as the gcj map will simply be rebuilt once the
+#   new libraries have been installed.
+#
+pre_gcjmaps () { :
+}
 %endif
 %if %{FILES_jarfiles}
-    # Fresh install: look for non-rpm archives and remove them
+#
+# pre_jarfiles() - On fresh install, look for non-deb jarfiles and remove
+#   them.  This is not necessary as the jar repository will simply be rebuild
+#   once the new files have been installed.
+#
+pre_jarfiles () { :
+}
 %endif
+#
+# pre_java() - On fresh install, go looking for conflicting things and
+#   removing them.  Currently this is only some libraries with the same name.
+#   This is only done on fresh install.  If this operation breaks some package,
+#   it can be reinstalled after the first installation of this package.
+#
+pre_java () { :
+%if %{FILES_jnilibs}
+    pre_jnilibs || :
+%endif
+%if %{FILES_gcjlibs}
+    pre_gcjlibs || :
+%endif
+%if %{FILES_gcjmaps}
+    pre_gcjmaps || :
+%endif
+%if %{FILES_jarfiles}
+    pre_jarfiles || :
+%endif
+}
+if [ $1 -eq 1 ] ; then : # fresh install
+    pre_install || :
+fi
+if [ $1 -eq 2 ] ; then : # upgrade
+    pre_upgrade || :
 fi
 
 %post java
