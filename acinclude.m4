@@ -110,6 +110,10 @@ AC_DEFUN([AC_OPENSS7], [dnl
 		     debian/openss7-base.postrm
 		     debian/openss7-base.preinst
 		     debian/openss7-base.prerm
+		     debian/openss7-compat.postinst
+		     debian/openss7-compat.postrm
+		     debian/openss7-compat.preinst
+		     debian/openss7-compat.prerm
 		     debian/openss7-devel.preinst
 		     debian/openss7-doc.postinst
 		     debian/openss7-doc.postrm

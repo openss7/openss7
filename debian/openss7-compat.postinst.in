@@ -1,0 +1,320 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+subpkg=compat
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postinst_netconfig() - Rebuild the netconfig database, but only if it was
+#   built by us or does not exist.  This is indempotent and can be called from
+#   configure or reconfigure.  It is important that the new database be
+#   compatible with the old libxnsl library.  This should always be the case
+#   anyway.  If it were not the case, we should have to kill processes holding
+#   open the libxnsl library so that they will load the new library on respawn.
+#
+postinst_netconfig () { :
+    t="@sysconfdir@/netconfig"
+    a="${t}.xnsl"
+    d="${t}.d"
+    if [ -f $t ] ; then
+        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+            t="${a}"
+        fi
+    fi
+    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    found='no'
+    if [ -d $d ]; then
+	files="$d/*"
+	for f in $files ; do
+	    if [ -f $f -a $f = "$d/strnsl" ] ; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+		esac
+	    fi
+	done
+	for f in $files ; do
+	    if [ -f $f -a $f != "$d/strnsl" ] ; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
+		esac
+	    fi
+	done
+    fi
+    if [ $found = "no" ] ; then
+        rm -f $t $t.tmp
+    else
+        mv -f $t.tmp $t
+    fi
+    if [ "${t}" != "${a}" ] ; then
+        rm -f $a
+    fi
+    :
+}
+#
+# postinst_sock2path() - Rebuild the sock2path database.  This is indempotent
+#   and can be called from configure or reconfigure.  It is important that the
+#   new database be compatible with the old sock2path library.  This should
+#   always be the case anyway.  If it were not the case, we should have to kill
+#   processes holding open the libsocket library so that they will load the new
+#   library on respawn.
+#
+postinst_sock2path () { :
+    local t f empty='yes'
+    t="@sysconfdir@/sock2path"
+    cp -f -b --suffix=.dpkg-save -- /dev/null $t
+    if [ -d ${t}.d ]; then
+	for f in "${t}.d/*"; do
+	    if [ -f $f ]; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t; empty='no' ;;
+		esac
+	    fi
+	done
+    fi
+    if [ "$empty" = 'yes' ]; then
+	rm -f -- ${t} || :
+	rmdir --ignore-fail-on-non-empty -- ${t}.d || :
+    fi
+    :
+    return 0
+}
+#
+# postinst_libraries() - After a fresh installation, upgrade or reinstall, do a
+#   ldconfig.  Note that this action should be performed by the debhelper
+#   portion of the script (or defined directory triggers) and is therefore
+#   short-circuited.
+#
+postinst_libraries () { :; return
+    if [ -x "`which ldconfig 2>/dev/null`" ] ; then
+	ldconfig || true
+    fi
+}
+#
+# postinst_tcllibs() - After a fresh installation, upgrade or reinstall, create
+#   the indexes for the tcl libraries and modules.  Note that there is no
+#   debhelper for this.
+#
+postinst_tcllibs () { :
+    if which tclsh >/dev/null 2>&1 ; then
+	for d in `find ${pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
+	    echo -e "pkg_mkIndex $d\\nexit" | tclsh || true
+	done
+    fi
+}
+#
+# postinst_snmpdlmod() - Configure /etc/snmp/snmpd.local.conf in the target
+#   directory.  First we check if snmpd.local.conf exists.  If snmpd.local.conf
+#   exists we check if it has already been configured by checking for our
+#   'Generated' statement.  If it has, we regenerate the file from the snmp.d
+#   directory components.  If it hasn't, we move it to /etc/snmp/snmp.d/00local
+#   if 00local does not already exist.  If 00local already exists, we abort with
+#   a warning.  When snmpd.local.conf does not exist, we create an empty
+#   /etc/snmp/snmp.d/00local if one does not already exist.  If 00local already
+#   exists, we abort with a warning.
+#
+#   When we have not aborted as part of previous operations, we rebuild
+#   /etc/snmp/snmp.local.conf from the files available in the snmp.d directory
+#   (skipping any with the .dpkg-save, .dpkg-new or .dpkg-orig suffixes),
+#   placing our 'Generation' lines in the file, starting with 00local, and
+#   continuing through with the remaining files in snmp.d in lexical order.  If
+#   00local is the only file causing snmp.local.conf to be regenerated, 00local
+#   is moved back to snmp.local.conf.  After rebuilding the file, we tell the
+#   snmp daemon to reread its configuration files if it is running.
+#
+#   Unfortunately, SuSE does things a little different: the snmpd.conf file is
+#   in /etc instead of /etc/snmp and the persistent data file is in
+#   /var/run/net-snmp instead of /var/net-snmp.  This can be detected and
+#   repaired by symbolic linking /etc/snmp/snmpd.conf to /etc/snmpd.conf and
+#   linking /etc/snmpd.local.conf to /etc/snmp/snmpd.local.conf.
+#
+postinst_snmpdlmod () { :
+    snmp_dir='@snmpconfdir@'
+    if [ ! -f $snmp_dir/snmpd.conf ]; then
+	[ -f $snmp_dir/../snmpd.conf ] || return 0
+	(
+	    cd $snmp_dir
+	    ln -sf ../snmpd.conf snmpd.conf
+	    cd ..
+	    ln -sf snmp/snmpd.local.conf snmpd.local.conf
+	)
+    fi
+    conf_dir=$snmp_dir/snmp.d
+    [ -d $conf_dir ] || return 0
+    conf_fil=$snmp_dir/snmpd.local.conf
+    conf_lcl=$conf_dir/00local
+    must_create_local=yes
+    if [ -e $conf_fil ]; then
+	if grep '^# Generated from snmp.d' $conf_fil >/dev/null 2>&1 ; then
+	    must_create_local=no
+	fi
+    fi
+    if [ "${must_create_local:-'no'}" = yes ] ; then
+	if [ -e $conf_lcl ]; then
+	    # FIXME: just move it out of the way to .dpkg-save for heaven's sake
+	    echo "$script: *** " >&2
+	    echo "$script: *** WARNING: Detected overwritten $conf_file file." >&2
+	    echo "$script: *** Configuration must now be performed manually." >&2
+	    echo "$script: *** " >&2
+	    return 0
+	elif [ -e $conf_fil ]; then
+	    mv -f -- $conf_fil $conf_lcl
+	else
+	    cat /dev/null > $conf_lcl
+	fi
+    fi
+    conf_tmp="${tmppath:-'/var/tmp'}/`basename $conf_fil`.tmp.$$"
+    (
+	echo '# Generated from snmp.d by @PACKAGE_LCNAME@ '`date -uI`
+	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+	echo '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.'
+	found=no
+	files="$conf_dir/*"
+	for f in $files; do
+	    if [ -f $f -a $f = "$conf_lcl" ]; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*)
+			echo '# Generated from snmp.d/'`basename $f`
+			echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+			echo '# EDIT THE FILE IN snmp.d/'`basename $f`' INSTEAD.'
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
+			found=no ;;
+		esac
+	    fi
+	done
+	for f in $files ; do
+	    if [ -f $f -a $f != "$conf_lcl" ]; then
+		case $f in
+		    (*.dpkg-save|*.dpkg-new|*.dpkg-orig) ;;
+		    (*)
+			echo '# Generated from snmp.d/'`basename $f`
+			echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+			echo '# EDIT THE FILE IN snmp.d/'`basename $f`' INSTEAD.'
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
+			found=yes ;;
+		esac
+	    fi
+	done
+    ) >$conf_tmp
+    if [ :$found = :yes ]; then
+	mv -f -- $conf_tmp $conf_fil
+    else
+	mv -f -- $conf_lcl $conf_fil
+	rm -f -- $conf_tmp
+    fi
+#
+#   Rather than sending the snmp daemon a HUP signal it may be a better idea to
+#   inform the user that the snmp subsystem should be given a reload command.
+#
+    if [ -x /etc/init.d/snmpd ]; then
+	/etc/init.d/snmpd reload >/dev/null 2>&1 || true
+    else
+	killall -HUP snmpd || true
+    fi
+}
+#
+# postinst_lib() - After a fresh installtion, upgrade or resinstall, do a
+#   ldconfig and create the indexes for the tcl libraries and modules.  Rebuild
+#   the netconfig and sock2path databases used by the libraries before making
+#   them available with ldconfig.
+#
+postinst_lib () { :
+    postinst_netconfig
+    postinst_sock2path
+    postinst_libraries
+    postinst_tcllibs
+    postinst_snmpdlmod
+}
+# -----------------------------------------------------------------------------
+# Primary functions:
+# -----------------------------------------------------------------------------
+# xxx-postinst configure
+configure_postinst () { :
+    postinst_lib
+}
+# xxx-postinst configure most-recently-configured-version
+reconfigure_postinst () { :
+    postinst_lib
+}
+# xxx-postinst triggered triggered-packages
+triggered_postinst () { :
+}
+# old-prerm upgrade new-version ...FAILED
+# new-prerm failed-upgrade new-version ...FAILED
+# old-posinst abort-upgrade new-version
+abort_upgrade_postinst () { :
+}
+# con-prerm remove 'in-favour' package new-version ...FAILED
+# con-postinst abort-remove 'in-favour' package new-version
+abort_remove_postinst () { :
+}
+# dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version] ...FAILED
+# dec-postinst abort-deconfigure 'in-favour' package-being-installed-but-failed version ['removing' conflicting-package version]
+abort_deconfigure_postinst () { :
+}
+@mscript_postinst@
+@mscript_debhelper@
+#if [ "$1" = "configure" ]; then
+#    ldconfig
+#fi
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn
