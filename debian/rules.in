@@ -72,9 +72,7 @@ localstatedir	= @localstatedir@
 
 export DEB_HOST_ARCH
 export DEB_HOST_GNU_TYPE
-#xport DH_VERBOSE	= 1
-#xport DH_COMPAT	= 7
-export DH_OPTIONS	=
+export DH_OPTIONS
 export BUILD_CFGOPTIONS
 
 #ebtmpdir	= ${debbuilddir}/tmp
@@ -541,7 +539,7 @@ build:
 		(*" --disable-arch "*) ;; \
 		(*) rm -f $(cache_file) $(csite_file) $(mpost_file) ;; \
 	esac
-	dh_auto_configure --buildsystem=autoconf -- \
+	dh_auto_configure -- \
 		CONFIG_SITE='$(csite_file)' \
 		MODPOST_CACHE='$(mpost_file)' \
 		--cache-file='$(cache_file)' \
