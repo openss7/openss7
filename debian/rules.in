@@ -531,7 +531,7 @@ mpost_file	= $(debbuilddir)/$(DEB_HOST_GNU_TYPE)-$(kversion)-modpost.cache
 
 build:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	dh_testdir -v
+	dh_testdir
 	rm -fr @PACKAGE@-@VERSION@
 	[ ! -f Makefile ] || $(MAKE) distclean
 	rm -f $(control)
@@ -559,21 +559,21 @@ build:
 
 clean:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	dh_testdir -v
-	dh_testroot -v
+	dh_testdir
+	dh_testroot
 	rm -fr @PACKAGE@-@VERSION@
 	[ ! -f Makefile ] || $(MAKE) distclean
 	rm -f $(control)
 	rm -fr $(debtmpdir)
-	dh_clean -v -k
+	dh_clean -k
 
 install-autoconf:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	if [ -f $(debtmpdir)/stamp-debian ]; then exit 0; fi
-	dh_testdir -v
-	dh_testroot -v
-	dh_clean -v -k
-	dh_prep -v
+	dh_testdir
+	dh_testroot
+	dh_clean -k
+	dh_prep
 	[ -d $(debtmpdir) ] || mkdir -p -- $(debtmpdir)
 	$(MAKE) DESTDIR=`pwd`/$(debtmpdir) install
 	echo "`date`" > $(debtmpdir)/stamp-debian
@@ -599,37 +599,37 @@ install-autoconf:
 
 install: install-autoconf
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	dh_testdir -v
-	dh_testroot -v
-	dh_installdirs -v
-	dh_install -v
-	dh_installmodules -v -n
-	dh_installchangelogs -v
-	dh_installdocs -v debian/README.Debian debian/TODO.Debian
-	dh_installdebconf -v
-	dh_installinit -v -n --name=specfs.sh    -- start 33 S .
-	dh_installinit -v -n --name=streams.sh   -- start 34 S .
-	dh_installinit -v -n --name=strace.sh    -- start 35 S . stop 35 0 6 .
-	dh_installinit -v -n --name=strerr.sh    -- start 35 S . stop 35 0 6 .
-	dh_installinit -v -n --name=@PACKAGE@.sh -- start 35 S . stop 35 0 6 .
-	dh_installman -v --language=C
-	dh_installinfo -v
-	dh_strip -v --dbg-package=@PACKAGE@-debuginfo
-	dh_link -v
-	dh_compress -v -X@PACKAGE@.macros -X@PACKAGE@.refs
-	dh_fixperms -v
-	dh_makeshlibs -v
-	dh_installdeb -v
-	dh_shlibdeps -v -X.ko -X.o -L @PACKAGE@-lib -l `pwd`/debian/@PACKAGE@-lib/usr/lib
-	dh_perl -v
+	dh_testdir
+	dh_testroot
+	dh_installdirs
+	dh_install
+	dh_installmodules -n
+	dh_installchangelogs
+	dh_installdocs debian/README.Debian debian/TODO.Debian
+	dh_installdebconf
+	dh_installinit -n --name=specfs.sh    -- start 33 S .
+	dh_installinit -n --name=streams.sh   -- start 34 S .
+	dh_installinit -n --name=strace.sh    -- start 35 S . stop 35 0 6 .
+	dh_installinit -n --name=strerr.sh    -- start 35 S . stop 35 0 6 .
+	dh_installinit -n --name=@PACKAGE@.sh -- start 35 S . stop 35 0 6 .
+	dh_installman --language=C
+	dh_installinfo
+	dh_strip --dbg-package=@PACKAGE@-debuginfo
+	dh_link
+	dh_compress -X@PACKAGE@.macros -X@PACKAGE@.refs
+	dh_fixperms
+	dh_makeshlibs
+	dh_installdeb
+	dh_shlibdeps -X.ko -X.o -L @PACKAGE@-lib -l `pwd`/debian/@PACKAGE@-lib/usr/lib
+	dh_perl
 
 binary-common:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	dh_testdir -v
-	dh_testroot -v
-	dh_gencontrol -v
-	dh_md5sums -v
-	dh_builddeb -v
+	dh_testdir
+	dh_testroot
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
 
 #
 #  dkpg-buildpackage invoke this makefile in one of two ways: with the -b flag,
