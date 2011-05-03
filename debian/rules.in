@@ -656,7 +656,7 @@ binary-arch: install
 	(*" --without-tools "*) ;; \
 	(*) \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-lib" ; \
-		if test -z '@WITH_32BIT_LIBS_TRUE@'; then \
+		if test -z "@WITH_32BIT_LIBS_TRUE@"; then \
 			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-compat" ; \
 		fi ; \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-devel" ; \
@@ -672,7 +672,7 @@ binary-arch: install
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-devel" ; \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debuginfo" ; \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debugsource" ; \
-		if test -z '@WITH_K_PACKAGE_TRUE@' ; then \
+		if test -z "@WITH_K_PACKAGE_TRUE@" ; then \
 			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-source" ; \
 		fi ; \
 		;; \
