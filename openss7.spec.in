@@ -679,6 +679,7 @@
 %global FILES_gdmofiles     0
 %global FILES_testfiles     0
 %global FILES_test32files   0
+%global FILES_snmpconf      0
 %global FILES_snmpmods      0
 %global FILES_snmp32mods    0
 %global FILES_debugfiles    0
@@ -700,12 +701,9 @@
 %global FILES_devscripts    0
 %global FILES_configfiles   0
 %global FILES_mibfiles      0
-%global FILES_netconfig     0
-%global FILES_sock2path     0
 %global FILES_javadoc       0
 %global FILES_manrefs       0
 %global FILES_manmacros     0
-%global FILES_snmpconf      0
 %global FILES_docfiles      0
 %global FILES_testscripts   0
 %global FILES_sendpr        0
@@ -728,6 +726,8 @@
 %global FILES_libstatic     0
 %global FILES_lib32compat   0
 %global FILES_lib32static   0
+%global FILES_netconfig     0
+%global FILES_sock2path     0
 %global FILES_perlmods      0
 %global FILES_tcllibs       0
 %global FILES_gcjlibs       0
@@ -739,6 +739,7 @@
 %global FILES_gdmofiles     0
 %global FILES_testfiles     0
 %global FILES_test32files   0
+%global FILES_snmpconf      0
 %global FILES_snmpmods      0
 %global FILES_snmp32mods    0
 %global FILES_debugfiles    0
@@ -903,18 +904,15 @@
 %global NEED_base       0
 %endif
 
-%if %{HAVE_snmpconf}
-%global NEED_base       1
-%endif
 %if %{HAVE_configfiles}
 %global NEED_base       1
 %endif
-%if %{HAVE_netconfig}
-%global NEED_base       1
-%endif
-%if %{HAVE_sock2path}
-%global NEED_base       1
-%endif
+#if %{HAVE_netconfig}
+#global NEED_base       1
+#endif
+#if %{HAVE_sock2path}
+#global NEED_base       1
+#endif
 %if %{HAVE_oldmods}
 %global NEED_base       1
 %endif
@@ -952,18 +950,15 @@
 %global NEED_base       1
 %endif
 
-%if %{FILES_snmpconf}
-%global WANT_base       1
-%endif
 %if %{FILES_configfiles}
 %global WANT_base       1
 %endif
-%if %{FILES_netconfig}
-%global WANT_base       1
-%endif
-%if %{FILES_sock2path}
-%global WANT_base       1
-%endif
+#if %{FILES_netconfig}
+#global WANT_base       1
+#endif
+#if %{FILES_sock2path}
+#global WANT_base       1
+#endif
 %if %{FILES_oldprel}
 %global WANT_base       1
 %endif
@@ -1098,6 +1093,12 @@
 #if %{HAVE_lib32compat}
 #global NEED_lib        1
 #endif
+%if %{HAVE_netconfig}
+%global NEED_lib        1
+%endif
+%if %{HAVE_sock2path}
+%global NEED_lib        1
+%endif
 %if %{HAVE_perlmods}
 %global NEED_lib        1
 %endif
@@ -1116,6 +1117,9 @@
 #if %{HAVE_test32files}
 #global NEED_lib        1
 #endif
+%if %{HAVE_snmpconf}
+%global NEED_lib        1
+%endif
 %if %{HAVE_snmpmods}
 %global NEED_lib        1
 %endif
@@ -1135,6 +1139,12 @@
 #if %{FILES_lib32compat}
 #global WANT_lib        1
 #endif
+%if %{FILES_netconfig}
+%global WANT_lib        1
+%endif
+%if %{FILES_sock2path}
+%global WANT_lib        1
+%endif
 %if %{FILES_perlmods}
 %global WANT_lib        1
 %endif
@@ -1153,6 +1163,9 @@
 #if %{FILES_test32files}
 #global WANT_lib        1
 #endif
+%if %{FILES_snmpconf}
+%global WANT_lib        1
+%endif
 %if %{FILES_snmpmods}
 %global WANT_lib        1
 %endif
@@ -2757,15 +2770,15 @@ Prefix:             %{_initrddir}
 %if %{FILES_devscripts}
 Prefix:             %{_sbindir}
 %endif
-%if %{FILES_netconfig}
-Prefix:             %{_sysconfdir}/netconfig.d
-%endif
-%if %{FILES_sock2path}
-Prefix:             %{_sysconfdir}/sock2path.d
-%endif
-%if %{FILES_snmpconf}
-Prefix:             %{_snmpconfdir}
-%endif
+#if %{FILES_netconfig}
+#refix:             %{_sysconfdir}/netconfig.d
+#endif
+#if %{FILES_sock2path}
+#refix:             %{_sysconfdir}/sock2path.d
+#endif
+#if %{FILES_snmpconf}
+#refix:             %{_snmpconfdir}
+#endif
 %if %{FILES_oldmods}
 Prefix:             %{_modutildir}
 %endif
@@ -2833,6 +2846,56 @@ binary package is required for any installation of the %{name} package.
 # and remove any entries that might later conflict with our entries.  We treat
 # every fresh installation like an upgrade from non-rpm install.
 # ---------------------------------------------------------------------------
+%if %{FILES_initscripts}
+#
+# pre_initscripts_install() - On a fresh install, go looking for non-rpm initscripts
+#   and remove them.  Stop them first.
+#
+pre_initscripts_install () {
+    local reverse= list="%{initfiles} %{nonrpminit}" i
+    for i in $list; do
+        reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse; do
+        if [ -f %_initrddir/$i ]; then
+	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || true }
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || true }
+	    [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || true }
+        fi
+    done
+    for i in $reverse; do
+        if [ -f %_initrddir/$i ]; then
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        && continue || true }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        && continue || true }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        && continue || true }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove && continue || true }
+        fi
+    done
+}
+#
+# pre_initscripts_upgrade() - On an upgrade, simply remove the old initscripts
+#   without stopping them.  Note that the new initscripts will be installed in
+#   post, and started when the old version initscripts were not running.  Note
+#   that these are the init scripts from the old version.  Because our old
+#   versions have the same init scripts as the new version (for now), this is
+#   simply removing our regular list of init scripts.  To be non-disruptive
+#   during upgrades, we do not stop the scripts first.
+#
+pre_initscripts_upgrade () {
+    local reverse= list="%{initfiles}" i
+    for i in $list; do
+        reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse; do
+        if [ -f %_initrddir/$i ]; then
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        && continue || true }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        && continue || true }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        && continue || true }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove && continue || true }
+        fi
+    done
+}
+%endif
 #
 # remove_depmods() - A little recursive function to delete all modules dependent
 #   on an initial module set (in our case "streams.o").  The function echos the
@@ -2986,34 +3049,11 @@ pre_oldmods () {
     :
 }
 %endif
-%if %{FILES_initscripts}
-#
-# pre_initscripts() - On a fresh install, go looking for non-rpm initscripts
-#   and remove them.
-#
-pre_initscripts () { :
-    local reverse= list="%{initfiles} %{nonrpminit}" i
-    for i in $list; do
-        reverse="$i${reverse:+ }$reverse"
-    done
-    for i in $reverse; do
-	if [ -f "%_initrddir/$i" ]; then
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || :
-	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || :
-	    [ -x "%_initrddir/$i"                  ] && %_initrddir/$i stop && continue || :
-	fi
-    done
-    for i in $reverse; do
-	if [ -f "%_initrddir/$i" ]; then
-	    [ -x /sbin/insserv             ] && /sbin/insserv -r          $i        2>&1 && continue || :
-	    [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i        2>&1 && continue || :
-	    [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i        2>&1 && continue || :
-	    [ -x /usr/sbin/update-rc.d     ] && /usr/bin/update-rc.d      $i remove 2>&1 && continue || :
-	fi
-    done
-}
-%endif
+# ---------------------------------------------------------------------------
 pre_install () { :
+%if %{FILES_initscripts}
+    pre_initscripts_install || :
+%endif
     pre_modules || :
 %if %{HAVE_oldmods}
     pre_oldmods || :
@@ -3021,254 +3061,295 @@ pre_install () { :
 %if %{FILES_preloads}
     pre_preloads || :
 %endif
-%if %{FILES_initscripts}
-    pre_initscripts || :
-%endif
 }
 pre_upgrade () { :
+%if %{FILES_initscripts}
+    pre_initscripts_upgrade || :
+%endif
 }
+# ---------------------------------------------------------------------------
 if [ $1 -eq 1 ]; then : # fresh install
     pre_install || :
 fi
 if [ $1 -ge 2 ]; then : # upgrade
     pre_upgrade || :
 fi
+# ---------------------------------------------------------------------------
+#pre base
+# ---------------------------------------------------------------------------
 
 %post base
 # ---------------------------------------------------------------------------
-if [ $1 = 1 ] ; then : # fresh install
-%if %{USE_mknods}
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of
-    # doing rootless builds because they have no %%dev macro, so in that case we
-    # just run the makenodes program that was generated in the build to create
-    # devices.
-    if [ -x "%{mknods}" ] ; then
-        %{mknods} --create
-    fi
-%endif
+# ---------------------------------------------------------------------------
 %if %{HAVE_oldmods}
-    # At the end of a fresh install we need to add our lines to the modules.conf
-    # file if it exists, and it is necessary to use a modconf file (2.4 and pre
-    # 2.5.48 kernel), an even if the line is already there (in which case we
-    # remove the existing line).
-    conf_old=%_sysconfdir/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=%_tmppath/modules.conf.tmp.$$
-        conf_new=%_tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        ( sed -e '\|^include[[:space:]].*%_modutildir/%base|d' $conf_new
-          echo "include %_modutildir/%base" ) > $conf_tmp
+#
+# post_oldmods() - Whether installing or upgrading, add our line to the
+#   modules.conf file if it is not already present.  Note that the old version
+#   is expected to not remove this line in the upgrade case.  Note also that
+#   modules.conf entries are only installed for 2.4 module systems.  Note that
+#   we do not handle upgrades from 2.4 to 2.6 at all.
+#
+post_oldmods () {
+    local conf_fil=%_sysconfdir/modules.conf conf_tmp conf_new
+    if [ -f $conf_fil ]; then
+        conf_tmp=%_sysconfdir/modules.conf.tmp.$$
+        conf_new=%_sysconfdir/modules.conf.new.$$
+        cp -f -- $conf_fil $conf_new
+        ( sed -e '\|^include[[:space:]]*%_modutildir/%base|d' $conf_new
+          echo "include %_modutildir/%base" ) >$conf_tmp
         mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
+        if diff $conf_new $conf_fil >/dev/null 2>&1; then
+            chmod --reference=$conf_fil $conf_new
+            cp -f -b --suffix=.rpmsave -- $conf_new $conf_fil
+        fi
         rm -f -- $conf_new
     fi
-%endif
-%if %{FILES_oldprel}
-    # old-style preload file
-    prel_old=%_sysconfdir/modules
-%endif
-%if %{FILES_newprel}
-    # new-style preload file
-    prel_old=%_sysconfdir/modprobe.preload
+}
 %endif
 %if %{FILES_preloads}
-    # At the end of a fresh install we need to add our preloads to the modules
-    # or modprobe.preload file, if it exists, and is necessary, and even if the
-    # lines are already there (in which case we remove the existing line.
-    if [ -f $prel_old ] ; then
-        prel_tmp=%_tmppath/modprobe.preload.tmp.$$
-        prel_new=%_tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="%{preloads}" ; for m in $mods ; do
-            ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new
-              echo "$m" ) > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-%endif
-%if %{FILES_netconfig}
-    # At the end of a fresh install we need to rebuild the netconfig database,
-    # but only if the netconfig database was built by us or does not exist.
-    t="%_sysconfdir/netconfig"
-    a="${t}.xnsl"
-    d="${t}.d"
-    if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            t="${a}"
-        fi
-    fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-    found='no'
-    files="$d/*"
-    for f in $files ; do
-        if [ -f $f -a $f = "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
+#
+# post_preloads() - Whether installing or upgrading, add our preloads to the
+#   appropriate preloads files.  Note that the old version is expected to not
+#   remove its preloads in the upgrade case.  Note also that preloads are only
+#   installed for 2.4 module systems.
+#
+post_preloads () {
+    local preloads="%{preloads}" prel_fil prel_tmp prel_new p preloads
+    for prel_fil in %_sysconfdir/modules %_sysconfdir/modprobe.preload; do
+        if [ -f $prel_fil ]; then
+            prel_tmp=%_tmppath/modprobe.preload.tmp.$$
+            prel_new=%_tmppath/modprobe.preload.new.$$
+            cp -f -- $prel_fil $prel_new
+            for p in $preloads; do
+                ( sed -e '\|^[[:space:]]*'"$p"'[[:space:]]*$|d' $prel_new
+                  echo "$p" ) >$prel_tmp
+                mv -f -- $prel_tmp $prel_new
+            done
+            if diff $prel_new $prel_fil >/dev/null 2>&1; then
+                chmod --reference=$prel_fil -- $prel_new
+                cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
+            fi
+            rm -f -- $prel_new
         fi
     done
-    for f in $files ; do
-        if [ -f $f -a $f != "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    if [ $found = "no" ] ; then
-        rm -f $t $t.tmp
-    else
-        mv -f $t.tmp $t
-    fi
-    if [ "${t}" != "${a}" ] ; then
-        rm -f $a
-    fi
-%endif
-%if %{FILES_sock2path}
-    # At the end of a fresh install we need to rebuild the sock2path database.
-    t="%_sysconfdir/sock2path"
-    cp -f -b --suffix=.rpmsave -- /dev/null $t
-    for f in "${t}.d/*" ; do
-        if [ -f $f ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
-            esac
-        fi
-    done
+}
 %endif
 %if %{FILES_initscripts}
-    # This is the end of a fresh install, add init scripts if we can
-    list="%{initfiles}" ; for i in $list ; do
-        # Find the best working init script installation tool
-        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue || :
-        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue || :
-        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue || :
+#
+# post_initscripts() - When installing fresh, start initscripts when they are
+#   not already running and would normally be started for the current
+#   run-level.  Note that if rpm has neglected to install a kernel module
+#   package, or the library package, or if there is no solution for the
+#   running kernel, starting some or all of these scripts will fail, so we
+#   exit on the first failure.  Another attempt will be made when the lib or
+#   kernel modules sub-packages are installed fresh.
+#
+#   When this is performed as part of an upgrade and the subsystems are
+#   already running, this has no effect.  If the upgrade has just provided a
+#   solution at this point, it will succeed.
+#
+post_initscripts () {
+    local list="%{initfiles}" i args r l start
+    for i in $list; do
+        if [ -f %_initrddir/$i ]; then
+            [ -x /sbin/insserv              ] && { /sbin/insserv              $i       && continue || true }
+            [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       && continue || true }
+            [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       && continue || true }
+	    args="`grep '^#[[:space:]]*update-rc.d:' %_initrddir/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
+	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args && continue || true }
+        fi
     done
+    r="`runlevel | awk '{print$2}'`"
+    for i in list; do
+        [ -f %_initrddir/$i ] || continue
+        [ ! -e /var/lock/subsys/$i ] || continue
+        start=no
+        for l in %_initrddir/../rc$r.d/S[0-9][0-9]$i %_initrddir/rc$r.d/S[0-9][0-9]$i; do
+            if [ -L $l ]; then start=yes; break; fi
+        done
+        [ $start = yes ] || continue
+        [ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break }
+        [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break }
+        [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i start && continue || break }
+    done
+}
 %endif
-#if %{FILES_manpages}
-#   if which makewhatis >/dev/null 2>&1 ; then
-#       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
-#   fi
-#   if which mandb >/dev/null 2>&1 ; then
-#       LANGUAGE= LANG= mandb -p %{_mandir} || :
-#   fi
-#endif
 %if %{FILES_manrefs}
+post_manrefs () {
     [ ! -f %{_mandir}/%{manrefs}.gz    ] || gunzip  %{_mandir}/%{manrefs}.gz
     [ ! -f %{_mandir}/%{manrefs}.bz2   ] || bunzip2 %{_mandir}/%{manrefs}.bz2
+}
 %endif
 %if %{FILES_manmacros}
+post_manmacros () {
     [ ! -f %{_mandir}/%{manmacros}.gz  ] || gunzip  %{_mandir}/%{manmacros}.gz
     [ ! -f %{_mandir}/%{manmacros}.bz2 ] || bunzip2 %{_mandir}/%{manmacros}.bz2
+}
 %endif
-elif [ $1 = 2 ] ; then : # upgrade
-%if %{HAVE_oldmods}
-    # At the end of an upgrade we place our new lines in the modules.conf file.
-    conf_old=%_sysconfdir/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=%_tmppath/modules.conf.tmp.$$
-        conf_new=%_tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        ( cat $conf_new
-          echo "include %_modutildir/%base" ) > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-        rm -f -- $conf_new
+%if %{FILES_manpages}
+#
+# post_manpages() - Update the manual pages aprospros database.  This is quite
+#   a lengthly process.  If it is not performed, most systems will update on
+#   cron job anyway.  We should be able to background this task in nice mode
+#   somehow.  Defeat it for now 'cause it just plain take too long.
+#
+post_manpages () { :; return
+    if [ -x "`which makewhatis 2>/dev/null`" ]; then
+        LANGUAGE= LANG= makewhatis -u %{_mandir} || :
     fi
+    if [ -x "`which mandb      2>/dev/null`" ]; then
+        LANGUAGE= LANG= mandb      -p %{_mandir} || :
+    fi
+}
 %endif
-%if %{FILES_oldprel}
-    # old-style preload file
-    prel_old=%_sysconfdir/modules
-%endif
-%if %{FILES_newprel}
-    # new-style preload file
-    prel_old=%_sysconfdir/modprobe.preload
+# ---------------------------------------------------------------------------
+#
+# post_install() - This is a fresh installation of the base sub-package.  For
+#   a 2.6 module system install where manrefs and manmacros are properly
+#   exempt from compression, the only actions performed are to register and
+#   attempt to start initscripts, and possibly attempt to rebuild the
+#   aprospros database.  Weak updating modules is handled by trigger script.
+#
+post_install () { :
+%if %{HAVE_oldmods}
+    post_oldmods || :
 %endif
 %if %{FILES_preloads}
-    # At the end of an upgrade we place just our preloads in the modules or
-    # modprobe.preload file.
-    if [ -f $prel_old ] ; then
-        prel_tmp=%_tmppath/modprobe.preload.tmp.$$
-        prel_new=%_tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="%{preloads}" ; for m in $mods ; do
-            ( cat $repl_new ; echo "$m" ) > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-%endif
-%if %{FILES_netconfig}
-    # At the end of an upgrade we need to rebuild the netconfig database, but
-    # only if the netconfig database was built by us or does not exist.
-    t="%_sysconfdir/netconfig"
-    a="${t}.xnsl"
-    d="${t}.d"
-    if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            t="${a}"
-        fi
-    fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-    found='no'
-    files="$d/*"
-    for f in $files ; do
-        if [ -f $f -a $f = "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    for f in $files ; do
-        if [ -f $f -a $f != "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    if [ $found = "no" ] ; then
-        rm -f $t $t.tmp
-    else
-        mv -f $t.tmp $t
-    fi
-    if [ "${t}" != "${a}" ] ; then
-        rm -f $a
-    fi
-%endif
-%if %{FILES_sock2path}
-    # At the end of an upgrade we need to rebuild the sock2path database.
-    t="%_sysconfdir/sock2path"
-    cp -f -b --suffix=.rpmsave -- /dev/null $t
-    for f in "${t}.d/*" ; do
-        if [ -f $f ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
-            esac
-        fi
-    done
+    post_preloads || :
 %endif
 %if %{FILES_initscripts}
-    # This is the end of an upgrade, add init scripts if we can
-    list="%{initfiles}" ; for i in $list ; do
-        # Find the best working init script installation tool
-        [ -x /sbin/insserv              ] && /sbin/insserv              $i 2>&1 && continue || :
-        [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i 2>&1 && continue || :
-        [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i 2>&1 && continue || :
-    done
+    post_initscripts || :
 %endif
+%if %{FILES_manrefs}
+    post_manrefs || :
+%endif
+%if %{FILES_manmacros}
+    post_manmacros || :
+%endif
+%if %{FILES_manpages}
+    post_manpages || :
+%endif
+}
+#
+# post_upgrade() - This is an upgrade of the base sub-package.
+#
+#   Note that the manual pages aprospros database is not updated here on an
+#   upgrade: it is the responsibility of the old version's postun to do the
+#   manual page aprospros database update.
+#
+#   For a 2.6 module system upgrade where manrefs and manmacros are properly
+#   exempt from compression, the only actions performed are to register and
+#   attempt to start initscripts.  Weak updating modules is handled by trigger
+#   script.
+#
+post_upgrade () { :
+%if %{HAVE_oldmods}
+    post_oldmods || :
+%endif
+%if %{FILES_preloads}
+    post_preloads || :
+%endif
+%if %{FILES_initscripts}
+    post_initscripts || :
+%endif
+%if %{FILES_manrefs}
+    post_manrefs || :
+%endif
+%if %{FILES_manmacros}
+    post_manmacros || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    post_install || :
 fi
+if [ $1 -ge 2 ] ; then : # upgrade
+    post_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#post base
+# ---------------------------------------------------------------------------
+
+%if %{HAVE_weakmods}
+%triggerin base -- %{target_kernel}
+# ---------------------------------------------------------------------------
+#
+# triggerin_weakmodules() - When the base package is being upgraded with
+#   kernels present (always the case when the base package is being upgraded),
+#   or when a kernel is being installed or upgraded when the base package is
+#   present, perform a weak-update on all of the kernels.  We would perform a
+#   weak-update for just one kernel, however, the trigger parameters simply do
+#   not tell us the version of the kernel being installed or upgraded.
+#
+triggerin_weakmodules () { :
+    if [ -x %_sbindir/openss7-modules ]; then
+        %_sbindir/openss7-modules -- -q -e --update-kernels || :
+    fi
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # base is being upgraded with kernels present
+    triggerin_weakmodules || :
+fi
+if [ $1 -eq 1 ] ; then : # kernel is being installed or upgraded with base present
+    triggerin_weakmodules || :
+fi
+# ---------------------------------------------------------------------------
+#triggerin base -- %{target_kernel}
+# ---------------------------------------------------------------------------
+%endif
+
+%triggerin base -- %{name}-lib
+# ---------------------------------------------------------------------------
+# triggerin_initscripts() - The base and library subpackages are installed,
+#   attempt to start init scripts.
+triggerin_initscripts () {
+}
+# ---------------------------------------------------------------------------
+# triggerin_base_lib() - The base sub-package is being installed while the lib
+#   sub-package is already installed or visa-versa.
+triggerin_base_lib () { :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # base is being upgraded with lib present
+    # nothing to do, %pre and %post will do the work
+fi
+if [ $2 -ge 2 ] ; then : # lib is being upgraded with base present
+    # nothing to do, %pre and %post will do the work
+fi
+if [ $1 -eq 1 -a $2 -eq 1 ] ; then : # base or lib installed other present
+    triggerin_base_lib || :
+fi
+# ---------------------------------------------------------------------------
+
+%if %{HAVE_weakmods}
+%triggerin base -- %{kernel_package} %{kversrequire}
+# ---------------------------------------------------------------------------
+if [ -x %{_sbindir}/%{name}-modules ] ; then
+    %{_sbindir}/%{name}-modules -- -v --update-modules || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
+else
+    echo "WARNING: %triggerin base -- %{kernel_package} ($1,$2) no update script" >&2
+fi
+%endif
+
+%triggerun base -- %{name}-lib = %{epoch}:%{baseversion}-%{specrelease}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # base is being removed with lib present
+fi
+if [ $2 -eq 0 ] ; then : # lib is being removed with base present
+fi
+if [ $1 -ge 1 -a $2 -ge 1 ] ; then : # base or lib upgraded with other present
+fi
+# ---------------------------------------------------------------------------
 
 %preun base
 # ---------------------------------------------------------------------------
@@ -3283,18 +3364,18 @@ fi
 #   even then, only when the updates are for the running kernel.
 #
 preun_stop_scripts () {
-    local reverse= list="%{initfiles}" i tried=1
+    local reverse= list="%{initfiles}" i
     for i in $list ; do
         reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse ; do
 	if [ -f "%_initrddir/$i" ]; then tried=0
-	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || :
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || :
-	    [ -x "%_initrddir/$i"                  ] && %_initrddir/$i stop && continue || :
+	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || return $? }
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || return $? }
+	    [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || return $? }
 	fi
     done
-    return $tried
+    return 0
 }
 #
 # preun_kill_daemons() - Kill daemons with prejudice.  Stopping init scripts
@@ -3430,326 +3511,231 @@ preun_running () {
     fi
 }
 #
+# preun_remove_scripts() - When removing the package, remove the symbolic
+#   links associated with the initscripts before the scripts themselves are
+#   removed.
+#
+preun_remove_scripts () {
+    local reverse= list="%{initfiles}" i
+    for i in $list; do
+        reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse; do
+        if [ -f "%_initrddir/$i" ]; then
+            [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || : }
+            [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || : }
+            [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || : }
+            [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove 2>&1 && continue || : }
+        fi
+    done
+}
+#
+# preun_oldmods() - The -base sub-package is going away for good: remove our
+#   lines from the modules.conf file.  Note that %triggerun scriplets for each
+#   of the kernel module packages has already run if they were not already
+#   removed.  That scriptlet removed the corresponding modules.%base files.
+#
+preun_oldmods () { :
+}
+#
+# preun_preloads() -
+#
+preun_preloads () { :
+}
+#
+# preun_manrefs() - RPM might not know anything about the manrefs file because
+#   it was erroneously compressed and we uncompressed it.  Remove it in any
+#   case.
+#
+preun_manrefs () {
+    rm -f -- %{_mandir}/%{manrefs} || :
+}
+#
+# preun_manmacros() - RPM might not know anything about the manmacros file
+#   because it was erroneously compressed and we uncompressed it.  Remove it
+#   in any case.
+#
+preun_manmacros () {
+    rm -f -- %{_mandir}/%{manmacros} || :
+}
+# ---------------------------------------------------------------------------
+#
 # preun_remove() - We are removing the base package for good.  Because all
 #   other packages depend on the base package, and the base package contains
 #   the initscripts, we preform all system-wide preun actions for removal
 #   here.  RPM is really, really poor on scriplet sequencing, so be careful.
+#   Kernel-specific actions that need to be performed because the base package
+#   is being removed are performed in %triggerun scriplets attached to the
+#   kernel modules subpackage and triggered on this base package.
+#
+#   Actions to perform before removing the base package are: Shut down the
+#   subsystems; remove our line from the modules.conf file; remove our
+#   preloads from the system-wide preloads files; unregister the init scripts.
 #
 preun_remove () { :
+%if %{FILES_initscripts}
+    preun_shutdown || :
+%endif
 %if %{HAVE_oldmods}
-    preun_remove || :
+    preun_oldmods || :
+%endif
+%if %{FILES_preloads}
+    preun_preloads || :
+%endif
+%if %{FILES_initscripts}
+    preun_remove_scripts || :
+%endif
+%if %{FILES_manrefs}
+    preun_manrefs || :
+%endif
+%if %{FILES_manmacros}
+    preun_manmacros || :
 %endif
 }
 #
 # preun_upgrade() - There are not too many actions to perform here.  On
-#   upgrade %pre and %post have alreday run and the new package's files have
-#   overwritten the old ones.  The new package's %pre should have stopped the
-#   STREAMS subsystem (for 2.4) before overwritting
+#   upgrade %pre and %post have already run and the new package's files have
+#   overwritten the old ones.  The new package's %pre or %post should have
+#   addressed any lingering old version files.
 #
 preun_upgrade () { :
 }
+# ---------------------------------------------------------------------------
 if [ $1 -eq 0 ] ; then : # final removal
     preun_remove || :
 fi
 if [ $1 -ge 1 ] ; then : # upgrade
     preun_upgrade || :
 fi
-if [ $1 = 0 ] ; then : # final removal
-%if %{USE_rmnods}
-    # Older rpm versions < 4.0 (such as those used by SuSE) are not capable of
-    # doing rootless builds because they have no %%dev macro, so in that case we
-    # just run the makenodes program that was generated in the build to create
-    # devices.
-    if [ -x "%{mknods}" ] ; then
-        %{rmnods}
-    fi
-%endif
-%if %{HAVE_oldmods}
-    # When we are going away altogether we want to remove any lines whatsoever
-    # from the modules.conf file.
-    conf_old=%_sysconfdir/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=%_tmppath/modules.conf.tmp.$$
-        conf_new=%_tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        sed -e '\|^include[[:space:]].*%_modutildir/%base|d' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-        rm -f -- $conf_new
-    fi
-%endif
-%if %{FILES_oldprel}
-    # old-style preload file
-    prel_old=%_sysconfdir/modules
-%endif
-%if %{FILES_newprel}
-    # new-style preload file
-    prel_old=%_sysconfdir/modprobe.preload
-%endif
-%if %{FILES_preloads}
-    # When we are going away altogether we want to remove any of our preloads
-    # whatsoever from the modules or modprobe.preload file.
-    if [ -f $prel_old ] ; then
-        prel_tmp=%_tmppath/modprobe.preload.tmp.$$
-        prel_new=%_tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="%{preloads}" ; for m in $mods ; do
-            sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $repl_new > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-%endif
-%if %{FILES_netconfig}
-    # After going away altogether, we want to rebuild the netconfig database,
-    # but only if the netconfig database was built by use or does not exist.
-    t="%_sysconfdir/netconfig"
-    a="${t}.xnsl"
-    d="${t}.d"
-    if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            t="${a}"
-        fi
-    fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-    found='no'
-    files="$d/*"
-    for f in $files ; do
-        if [ -f $f -a $f = "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    for f in $files ; do
-        if [ -f $f -a $f != "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    if [ $found = "no" ] ; then
-        rm -f $t $t.tmp
-    else
-        mv -f $t.tmp $t
-    fi
-    if [ "${t}" != "${a}" ] ; then
-        rm -f $a
-    fi
-%endif
-%if %{FILES_sock2path}
-    # After going away altogether, we want to rebuild the sock2path database.
-    t="%_sysconfdir/sock2path"
-    cp -f -b --suffix=.rpmsave -- /dev/null $t
-    for f in "${t}.d/*" ; do
-        if [ -f $f ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
-            esac
-        fi
-    done
-%endif
-%if %{FILES_initscripts}
-    # Uninstalling for good, remove init scripts if we can
-    reverse=
-    list="%{initfiles}" ; for i in $list ; do
-        reverse="$i${reverse:+ }$reverse"
-    done
-    for i in $reverse ; do
-        if [ -f %_initrddir/$i ] ; then
-            # Try to stop them first.
-            /sbin/service $i stop >/dev/null 2>&1 || %_initrddir/$i stop >/dev/null 2>&1 || :
-            # Find the best working init script removal tool
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
-        fi
-    done
-%endif
-%if %{FILES_manrefs}
-    rm -f -- %{_mandir}/%{manrefs}
-%endif
-%if %{FILES_manmacros}
-    rm -f -- %{_mandir}/%{manmacros}
-%endif
-fi
-if [ $1 = 1 ] ; then : # upgrade
-%if %{HAVE_oldmods}
-    # At the end of the upgrade (when _this_package_ is upgraded from) we remove
-    # our lines from the modules.conf file that we placed in them in the post
-    # scriptlet.  We only adjust our line and leave any lines added by the new
-    # package post scriptlet.
-    conf_old=%_sysconfdir/modules.conf
-    if [ -f $conf_old ] ; then
-        conf_tmp=%_tmppath/modules.conf.tmp.$$
-        conf_new=%_tmppath/modules.conf.new.$$
-        cp -f -- $conf_old $conf_new
-        # This groovy sed script just pulls out the first matching line and
-        # leaves the rest untouched.
-        sed -e '
-\|^include[[:space:]].*%_modutildir/%base|!b
-N
-s|^include[[:space:]].*%_modutildir/%base.*\
-||
-: loop
-n
-b loop' $conf_new > $conf_tmp
-        mv -f -- $conf_tmp $conf_new
-        chmod --reference=$conf_old $conf_new
-        cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
-        rm -f -- $conf_new
-    fi
-%endif
-%if %{FILES_oldprel}
-    # old-style preload file
-    prel_old=%_sysconfdir/modules
-%endif
-%if %{FILES_newprel}
-    # new-style preload file
-    prel_old=%_sysconfdir/modprobe.preload
-%endif
-%if %{FILES_preloads}
-    # At the end of the upgrade (when _this_package_ is upgraded from) we remove
-    # our lines from the modules or modprobe.preloads file that we placed in
-    # them in the post scriptlet.  We only adjust our lines and leave any lines
-    # added by the new package post scriptlet.
-    if [ -f $prel_old ] ; then
-        prel_tmp=%_tmppath/modprobe.preload.tmp.$$
-        prel_new=%_tmppath/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-        mods="%{preloads}" ; for m in $mods ; do
-            # This groovy sed script just pulls out the first matching line and
-            # leaves the rest untouched.
-            sed -e '
-\|^[[:space:]].*'"$m"'[[:space:]]*$|!b
-N
-s|^[[:space:]].*'"$m"'[[:space:]]*\
-||
-: loop
-n
-b loop' $prel_new > $prel_tmp
-            mv -f -- $prel_tmp $prel_new
-        done
-        chmod --reference=$prel_old -- $prel_new
-        cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
-        rm -f -- $prel_new
-    fi
-%endif
-%if %{FILES_netconfig}
-    # After going doing an upgrade we want to rebuild the netconfig database,
-    # but only if the netconfig database was built by us or does not exist.
-    t="%_sysconfdir/netconfig"
-    a="${t}.xnsl"
-    d="${t}.d"
-    if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
-            t="${a}"
-        fi
-    fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
-    found='no'
-    files="$d/*"
-    for f in $files ; do
-        if [ -f $f -a $f = "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    for f in $files ; do
-        if [ -f $f -a $f != "$d/strnsl" ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t.tmp ; found='yes' ;;
-            esac
-        fi
-    done
-    if [ $found = "no" ] ; then
-        rm -f $t $t.tmp
-    else
-        mv -f $t.tmp $t
-    fi
-    if [ "${t}" != "${a}" ] ; then
-        rm -f $a
-    fi
-%endif
-%if %{FILES_sock2path}
-    # After going doing an upgrade we want to rebuild the sock2path database.
-    t="%_sysconfdir/sock2path"
-    cp -f -b --suffix=.rpmsave -- /dev/null $t
-    for f in "${t}.d/*" ; do
-        if [ -f $f ] ; then
-            case $f in
-                (*.rpmsave|*.rpmnew) ;;
-                (*) sed -e '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f >> $t ;;
-            esac
-        fi
-    done
-%endif
-%if %{FILES_initscripts}
-    # Upgrading, remove our init scripts if we can
-    reverse=
-    list="%{initfiles}" ; for i in $list ; do
-        reverse="$i${reverse:+ }$reverse"
-    done
-    for i in $reverse ; do
-        if [ -f %_initrddir/$i ] ; then
-            # Try to stop them first.
-            /sbin/service $i stop >/dev/null 2>&1 || %_initrddir/$i stop >/dev/null 2>&1 || :
-            # Find the best working init script removal tool
-            [ -x /sbin/insserv             ] && /sbin/insserv -r          $i 2>&1 && continue || :
-            [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i 2>&1 && continue || :
-            [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i 2>&1 && continue || :
-        fi
-    done
-%endif
-%if %{FILES_manrefs}
-    rm -f -- %{_mandir}/%{manrefs}
-%endif
-%if %{FILES_manmacros}
-    rm -f -- %{_mandir}/%{manmacros}
-%endif
-fi
+# ---------------------------------------------------------------------------
+#preun base
+# ---------------------------------------------------------------------------
 
 %postun base
 # ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-#if %{FILES_manpages}
-#   if which makewhatis >/dev/null 2>&1 ; then
-#       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
-#   fi
-#   if which mandb >/dev/null 2>&1 ; then
-#       LANGUAGE= LANG= mandb -p %{_mandir} || :
-#   fi
-#endif
-fi
-
-%if %{HAVE_weakmods}
-%triggerin base -- %{kernel_package} %{kversrequire}
-# ---------------------------------------------------------------------------
-if [ -x %{_sbindir}/%{name}-modules ] ; then
-    %{_sbindir}/%{name}-modules -- -v --update-modules || :
-    # It is necessary to check whether this operation altered the module links
-    # for the running kernel.  If it did, and any of the modules that were
-    # altered are resident in the kernel, a restart message should be given.
-    # If modules were added that were not in the kernel before (particularly
-    # specfs and streams), consider starting the STREAMS subsystem if it is
-    # set to start on boot.  If modules were removed that are resident in the
-    # kernel (esp. specfs and streams), consider shutting down the STREAMS
-    # subsystem, or issuing a warning to that effect.  We can either have
-    # openss7-modules issue the appropriate warnings, or we can have it file
-    # some information in /var/run and then examine it after the run.
-else
-    echo "WARNING: %triggerin base -- %{kernel_package} ($1,$2) no update script" >&2
-fi
+%if %{FILES_preloads}
+#
+# postun_preloads() - When removing for good, make sure that the preload
+#   modules are no longer included in the preloads file for 2.4 module
+#   systems.  Note that removing lines from the /etc/modules-@kversion@ file
+#   is the repsonibility of the -kernel subpackage.
+#
+postun_preloads () {
+    local prel_old prel_tmp prel_new included modules m
+    for prel_old in %_sysconfdir/modules %_sysconfdir/modprobe.preload; do
+        if [ -f $prel_old ]; then
+            prel_tmp=%_tmppath/modprobe.preload.tmp.$$
+            prel_new=%_tmppath/modprobe.preload.new.$$
+            cp -f -- $prel_old $prel_new
+            included=no
+            modules="%{modules}"
+            for m in $modules; do
+                if grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+                    included=yes
+                fi
+            done
+            if [ "$included" = yes ]; then
+                for m in $modules; do
+                    grep -v '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >$prel_tmp
+                    mv -f -- $prel_tmp $prel_new
+                done
+                chmod --reference=$prel_old -- $prel_new
+                cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
+            fi
+            rm -f -- $prel_new || :
+        fi
+    done
+}
 %endif
+%if %{FILES_oldmods}
+#
+# postun_oldmods() - As the sub-package is being purged, remove the line from
+#   the modules.conf file that points at the /etc/modutils/%name file that
+#   in turn includes the /lib/modules/%_kversion/modules.openss7 file when it
+#   exists.  Note that the files themselves referenced from the modules.conf
+#   files are removed as a normal part of the course of removing the files in
+#   the -kernel sub-packages.
+#
+postun_oldmods () {
+    local conf_old=%_sysconfdir/modules.conf conf_tmp conf_new
+    if [ -f $conf_old ]; then
+        conf_tmp=%_tmppath/modules.conf.tmp.$$
+        conf_new=%_tmppath/modules.conf.new.$$
+        cp -f -- $conf_old $conf_new
+        if grep '^include[[:space:]].*%{_modutildir}/%{base}' $conf_new >/dev/null 2>&1; then
+            sed -e '\|^include[[:space:]].*%{_modutildir}/%{base}|d' $conf_new >$conf_tmp
+            mv -f -- $conf_tmp $conf_new
+            chmod --reference=$conf_old $conf_new
+            cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
+        fi
+        rm -f -- $conf_new
+    fi
+}
+%endif
+%if %{FILES_manpages}
+#
+# postun_manpages() - Update the manual pages aprospros database.  This is
+#   quite a lengthly process.  If it is not performed, most systems will
+#   update on cron job anyway.
+#
+postun_manpages () {
+    if [ -x "`which makewhatis 2>/dev/null`" ]; then
+        LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+    fi
+    if [ -x "`which mandb      2>/dev/null`" ]; then
+        LANGUAGE= LANG= mandb      -p %{_mandir} || :
+    fi
+}
+%endif
+# ---------------------------------------------------------------------------
+#
+# postun_remove() - This is the final removal of the base package.  Due to
+#   dependencies this means that all sub-packages will be removed with the
+#   exception of the -repo subpackage.  Perform removal actions that cannot be
+#   discerned by rpm because they involve scripting.
+#
+postun_remove () { :
+%if %{FILES_preloads}
+    postun_preloads
+%endif
+%if %{FILES_oldmods}
+    postun_oldmods
+%endif
+%if %{FILES_manpages}
+    postun_manpages || :
+%endif
+}
+#
+# postun_upgrade() - This is the removal of the remnants of the old base
+#   package on upgrade.  Perform whatever actions need to be performed only
+#   after the remnants have been removed.  This consists solely of rebuilding
+#   the aprospros database so that any manual pages removed from the old
+#   package are removed from the apropros list and the caches are updated
+#   appropriately with the new files.
+#
+postun_upgrade () { :
+%if %{FILES_manpages}
+    postun_manpages || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ]; then : # final removal
+    postun_remove || :
+fi
+if [ $1 -ge 1 ]; then : # upgrade
+    postun_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#postun base
+# ---------------------------------------------------------------------------
+
+%triggerpostun base -- %{name}-lib = %{epoch}:%{baseversion}-%{specrelease}
+# ---------------------------------------------------------------------------
+if [ $2 -eq 0 ] ; then : # lib was removed with base present
+fi
+if [ $2 -ge 1 ] ; then : # lib or base upgraded with other present
+fi
+# ---------------------------------------------------------------------------
 
 %if %{HAVE_weakmods}
 %triggerpostun base -- %{kernel_package} %{kversrequire}
@@ -3772,16 +3758,34 @@ fi
 %endif
 
 
+%if %{HAVE_weakmods}
+%triggerpostun base -- %{target_kernel}
+# ---------------------------------------------------------------------------
+# This trigger results from the removal or upgrade of a kernel.  Note that the
+# kernel removal or upgrade is complete.  This never runs when the base
+# package is removed.  Unfortunately, rpm does not tell us what version of the
+# kernel is being removed or upgraded.  Also, it does not distinguish whether
+# the kernel is being removed or upgraded.  So, we consider all kernels using
+# the --update-kernels flag.
+# ---------------------------------------------------------------------------
+if [ -x %_sbindir/openss7-modules ]; then
+    %_sbindir/openss7-modules -- -q -e --update-kernels || :
+fi
+# ---------------------------------------------------------------------------
+#triggerpostun base -- %{target_kernel}
+# ---------------------------------------------------------------------------
+%endif
+
 %if %{PACKAGE_base}
 %files base %{?devicesfile:%{devicesfile}}
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
+#{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
 %{?files_configfiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
-#{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
-%{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
-%{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path}
-%{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
+##{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+#{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+#{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path}
+#{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 #{?files_oldmods:%config(noreplace) %{_modutildir}/*}
 %{?files_initscripts:%config(noreplace) %{_configdir}/*}
 %{?files_initscripts:%{_initrddir}/*}
@@ -4003,6 +4007,12 @@ Prefix:             %{_libdir}
 #if %{FILES_lib32compat}
 #refix:             %{_lib32dir}
 #endif
+%if %{FILES_netconfig}
+Prefix:             %{_sysconfdir}/netconfig.d
+%endif
+%if %{FILES_sock2path}
+Prefix:             %{_sysconfdir}/sock2path.d
+%endif
 %if %{FILES_perlmods}
 Prefix:             %{_perldir}
 %endif
@@ -4015,6 +4025,9 @@ Prefix:             %{_pkglibexecdir}
 #if %{FILES_test32files}
 #refix:             %{_pkglibexec32dir}
 #endif
+%if %{FILES_snmpconf}
+Prefix:             %{_snmpconfdir}
+%endif
 %if %{FILES_snmpmods}
 Prefix:             %{_snmpdlmoddir}
 %endif
@@ -4116,7 +4129,331 @@ if [ ":$1" = :2 ] ; then : # upgrade
     pre_upgrade || :
 fi
 
+%post lib
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+%if %{FILES_libraries}
+#
+# post_libraries() - Do a ldconfig and update the linker-loader's library
+#   cache files.
+#
+post_libraries () { :
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+        ldconfig || :
+    fi
+}
+%endif
+%if %{FILES_netconfig}
+#
+# post_netconfig() - Rebuild the netconfig database.
+#
+post_netconfig () { :
+    netc_fil="%_sysconfdir/netconfig"
+    netc_alt="%_sysconfdir/netconfig.xnsl"
+    netc_dir="%_sysconfdir/netconfig.d"
+    [ ! -r $netc_fil -o -r $netc_alt ] || return 0
+    [ -d $netc_dir ] || return 0
+    if [ -r $netc_fil ]; then
+        if ! grep '^# Generated from netconfig.d' $netc_fil >/dev/null 2>&1; then
+            netc_fil=$netc_alt
+        fi
+    else
+        if [ -r $netc_alt ]; then
+            netc_fil=$netc_alt
+        fi
+    fi
+    netc_tmp=%_tmppath/netconfig.tmp.$$
+    (
+        echo '# Generated from netconfig.d by @PACKAGE_LCNAME@'
+        found=no; files="$netc_dir/*"
+        for f in $files; do
+            if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
+                case $f in
+                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                    (*) sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                        found=yes ;;
+                esac
+            fi
+        done
+        for f in $files; do
+            if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
+                case $f in
+                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                    (*) sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                        found=yes ;;
+                esac
+            fi
+        done
+    ) >$netc_tmp
+    if [ $found = no ]; then
+        rm -f -- $netc_fil
+        rmdir $netc_dir 2>/dev/null || :
+    else
+        if diff $netc_tmp $netc_fil >/dev/null 2>&1; then
+            chmod --reference=$netc_fil -- $netc_tmp
+            cp -f -b --suffix=.rpmsave -- $netc_tmp $netc_fil
+        fi
+    fi
+    rm -f -- $netc_tmp || :
+    if [ $netc_fil != $netc_alt ]; then
+        rm -f -- $netc_alt || :
+    fi
+}
+%endif
+%if %{FILES_sock2path}
+#
+# post_sock2path() - Rebuild the sock2path database.
+#
+post_sock2path () { :
+    s2pa_fil="%_sysconfdir/sock2path"
+    s2pa_dir="%_sysconfdir/sock2path.d"
+    s2pa_tmp="%_tmppath/sock2path.tmp.$$"
+    (
+        echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
+        found=no; files="$s2pa_dir/*"
+        for f in $files; do
+            if [ -r $f ]; then
+                case $f in
+                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                    (*) sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                        found=yes ;;
+                esac
+            fi
+        done
+    ) >$s2pa_tmp
+    if [ $found = no ]; then
+        rm -f -- $s2pa_fil
+        rmdir $s2pa_dir 2>/dev/null || :
+    else
+        if diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
+            chmod --reference=$s2pa_fil -- $s2pa_tmp
+            cp -f -b --suffix=.rpmsave -- $s2pa_tmp $s2pa_fil
+        fi
+    fi
+    rm -f -- $s2pa_tmp || :
+}
+%endif
+%if %{FILES_snmpconf}
+#
+# post_snmpconf() - Rebuild the snmp configuration database.
+#
+post_snmpconf () { :
+    snmp_fil="%_snmpconfdir/snmpd.local.conf"
+    snmp_dir="%_snmpconfdir/snmp.d"
+    snmp_lcl="$snmp_dir/00local"
+    [ -d "%_snmpconfdir/snmp.d" ] || return 0
+    can_overwrite_local=no
+    if [ -e $snmp_fil ]; then
+        if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
+            can_overwrite_local=yes
+        fi
+    fi
+    [ $can_overwrite_local = yes ] || return 0
+    wrote_one=no
+    snmp_tmp="%_tmppath/`basename $snmp_fil`.tmp.$$"
+    (
+        echo '# Generated from snmp.d by @PACKAGE_LCNAME@ '`date -uI`
+        echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+        echo '# EDIT THE FILES IN THE snpm.d DIRECTORY INSTEAD.'
+        files="$snmp_dir/*"
+        for f in $files; do
+            if [ -f $f -a $f = $snmp_lcl ]; then
+                case $f in
+                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                    (*)
+                        echo '# Generated from snmp.d/'`basename $f`
+                        echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+                        echo '# EDIT THE FILE IN snmp.d/'`basename $f`' INSTEAD.'
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
+                        ;;
+                esac
+            fi
+        done
+	for f in $files ; do
+	    if [ -f $f -a $f != $snmp_lcl ]; then
+		case $f in
+		    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+		    (*)
+			echo '# Generated from snmp.d/'`basename $f`
+			echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+			echo '# EDIT THE FILE IN snmp.d/'`basename $f`' INSTEAD.'
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
+                        wrote_one=yes
+                        ;;
+		esac
+	    fi
+	done
+    ) >$snmp_tmp
+    if [ $wrote_one = yes ]; then
+        mv -f -- $snmp_tmp $snmp_fil
+    elif [ -f $snmp_lcl ]; then
+        mv -f -- $snmp_lcl $snmp_fil
+        rm -f -- $snmp_tmp
+        rmdir $snmp_dir 2>/dev/null || :
+    else
+        rm -f -- $snmp_tmp $snmp_fil
+        rmdir $snmp_dir 2>/dev/null || :
+    fi
+}
+%endif
+%if %{FILES_perlmods}
+#
+# post_perlmods() -
+#
+post_perlmods () { :
+}
+%endif
+%if %{FILES_tcllibs}
+#
+# post_tcllibs() - Rebuild tcl module index files.
+#
+post_tcllibs () { :
+    if [ -x "`which tclsh 2>/dev/null`" ]; then
+        for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
+            echo -e "pkg_mkIndex $d\\nexit" | tclsh || :
+        done
+    fi
+}
+%endif
+%if %{HAVE_initscripts}
+#
+# post_initscripts() - In the event that the base subpackage is already
+#   installed, try to start init scripts.  This would have failed partially
+#   when the base subpackage was installed because the tools for strerr and
+#   strace scripts were not present.  When the base subpackage is not yet
+#   installed, the init scripts should not be present.  If the base subpackage
+#   is present but no kernel module solution is present for the running
+#   kernel, starting the init scripts will fail, in which case we return
+#   immediately.  Note that we only attempt to start init scripts when they
+#   are not already running and they would normally be started for the current
+#   run level.  Another attempt will be made when the base or kernel modules
+#   sub-packages are installed fresh.
+#
+#   When this is performed as part of an upgrade and the subsystems are
+#   already running, this has no effect.  If the upgrade has just provided a
+#   solution at this point, it will succeed.
+#
+post_initscripts () {
+    local list="%{initfiles}" r i l start
+    r="`runlevel | awk '{print$2}'`"
+    for i in list; do
+        [ -f %_initrddir/$i ] || continue
+        [ ! -e /var/lock/subsys/$i ] || continue
+        start=no
+        for l in %_initrddir/../rc$r.d/S[0-9][0-9]$i %_initrddir/rc$r.d/S[0-9][0-9]$i; do
+            if [ -L $l ]; then start=yes; break; fi
+        done
+        [ $start = yes ] || continue
+        [ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break }
+        [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break }
+        [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i start && continue || break }
+    done
+}
+%endif
+#
+# post_install() - When a fresh installation of the library package is
+#   performed, add the database and index entries associated with the
+#   installed components.
+#
+post_install () { :
+%if %{FILES_libraries}
+    post_libraries || :
+%endif
+%if %{FILES_netconfig}
+    post_netconfig || :
+%endif
+%if %{FILES_sock2path}
+    post_sock2path || :
+%endif
+%if %{FILES_snmpconf}
+    post_snmpconf || :
+%endif
+%if %{FILES_perlmods}
+    post_perlmods || :
+%endif
+%if %{FILES_tcllibs}
+    post_tcllibs || :
+%endif
+%if %{HAVE_initscripts}
+    post_initscripts || :
+%endif
+}
+#
+# post_upgrade() - When upgrading, the new package post scripts must consider
+#   that there may be old version files which are yet to be removed from the
+#   core that were not overwritten by the new version files.  When the file
+#   lists match and all old version files are overwritten by the new version,
+#   similar actions to those performed on fresh installation can be used for
+#   upgrade as well.
+#
+post_upgrade () { :
+%if %{HAVE_initscripts}
+    post_initscripts || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    post_install || :
+fi
+if [ $1 -eq 2 ] ; then : # upgrade
+    post_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
+%if %{FILES_libraries}
+    # After a fresh install or upgrade, do a load config.
+    /sbin/ldconfig
+%endif
+%if %{FILES_tcllibs}
+    # After a fresh install, create package index files
+    for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
+        echo -e "pkg_mkIndex $d\\nexit" | tclsh
+    done
+%endif
+%if %{HAVE_initscripts}
+    # Start init scripts when they have already been installed.
+    r=`runlevel | sed -e 's|.*[[:space:]]||'`
+    list="%{initfiles}" ; for i in $list ; do
+        if [ -f %_initrddir/$i ] ; then
+            if [ -L %_initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
+                 -L %_initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
+                 /sbin/service $i start >/dev/null 2>&1 || %_initrddir/$i start >/dev/null 2>&1 || :
+            fi
+        fi
+    done
+%endif
+fi
+
+%triggerin lib -- %{name}-base
+# ---------------------------------------------------------------------------
+# triggerin_lib_base() - The base sub-package is being installed while the lib
+#   sub-package is already installed or visa-versa.
+triggerin_lib_base () { :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # lib is being upgraded with base present
+    # nothing to do, %pre and %post will do the work
+fi
+if [ $2 -ge 2 ] ; then : # base is being upgraded with lib present
+    # nothing to do, %pre and %post will do the work
+fi
+if [ $1 -eq 1 -a $2 -eq 1 ] ; then : # lib or base installed while other present
+    triggerin_lib_base || :
+fi
+# ---------------------------------------------------------------------------
+
+%triggerun lib -- %{name}-base
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # lib is being removed with base present
+fi
+if [ $2 -eq 0 ] ; then : # base is being removed with lib present
+fi
+if [ $1 -ge 1 -a $2 -ge 1 ] ; then : # lib or base upgraded with other present
+fi
+# ---------------------------------------------------------------------------
+
 %preun lib
+# ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
 remove_depends() {
     local modrex depend depends
@@ -4188,41 +4525,241 @@ if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
     [ ":$reboot" != ':yes' ] || echo "Reboot required." >&2
 fi
 
-%post lib
-# ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
-%if %{FILES_libraries}
-    # After a fresh install or upgrade, do a load config.
-    /sbin/ldconfig
-%endif
-%if %{FILES_tcllibs}
-    # After a fresh install, create package index files
-    for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
-        echo -e "pkg_mkIndex $d\\nexit" | tclsh
-    done
-%endif
-%if %{HAVE_initscripts}
-    # Start init scripts when they have already been installed.
-    r=`runlevel | sed -e 's|.*[[:space:]]||'`
-    list="%{initfiles}" ; for i in $list ; do
-        if [ -f %_initrddir/$i ] ; then
-            if [ -L %_initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
-                 -L %_initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
-                 /sbin/service $i start >/dev/null 2>&1 || %_initrddir/$i start >/dev/null 2>&1 || :
-            fi
-        fi
-    done
-%endif
-fi
-
 %postun lib
 # ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 %if %{FILES_libraries}
-if [ $1 = 0 -o $1 = 1 ] ; then
-    # Whether complete removal or upgrade, do a load config.
-    /sbin/ldconfig
-fi
+#
+# postun_libraries() - On final removal of any shared object libraries,
+#   perform a ldconfig to update the linker-loader cache.
+#
+postun_libraries () { :
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+        ldconfig || :
+    fi
+}
 %endif
+%if %{FILES_netconfig}
+#
+# postun_netconfig() - On final removal of xnsl libraries, rebuild the
+#   netconfig database, most likely removing the entire associated
+#   directories.
+#
+postun_netconfig () { :
+    netc_fil="%_sysconfdir/netconfig"
+    netc_alt="%_sysconfdir/netconfig.xnsl"
+    netc_dir="%_sysconfdir/netconfig.d"
+    [ ! -r $netc_file -o -r $netc_alt ] || return 0
+    [ -d $netc_dir ] || return 0
+    if [ -r $netc_fil ]; then
+        if ! grep '^# Generated from netconfig.d' $netc_fil >/dev/null 2>&1; then
+            netc_fil=$netc_alt
+        fi
+    else
+        if [ -r $netc_alt ]; then
+            netc_fil=$netc_alt
+        fi
+    fi
+    netc_tmp=%_tmppath/netconfig.tmp.$$
+    (
+        echo '# Generated from netconfig.d by @PACKAGE_LCNAME@'
+        found=no; files="$netc_dir/*"
+        for f in $files; do
+            if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
+                case $f in
+                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                    (*) sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                        found=yes ;;
+                esac
+            fi
+        done
+        for f in $files; do
+            if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
+                case $f in
+                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                    (*) sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                        found=yes ;;
+                esac
+            fi
+        done
+    ) >$netc_tmp
+    if [ $found = no ]; then
+        rm -f -- $netc_fil
+        rmdir $netc_dir 2>/dev/null || :
+    else
+        if diff $netc_tmp $netc_fil >/dev/null 2>&1; then
+            chmod --reference=$netc_fil -- $netc_tmp
+            cp -f -b --suffix=.rpmsave -- $netc_tmp $netc_fil
+        fi
+    fi
+    rm -f -- $netc_tmp || :
+    if [ $netc_fil != $netc_alt ]; then
+        rm -f -- $netc_alt || :
+    fi
+}
+%endif
+%if %{FILES_snmpconf}
+#
+# postun_sock2path() - On final removal of socket libraries, rebuild the
+#   sock2path database, most likely removing the entire associated
+#   directories.
+#
+postun_sock2path () { :
+    s2pa_fil="%_sysconfdir/sock2path"
+    s2pa_dir="%_sysconfdir/sock2path.d"
+    s2pa_tmp="%_tmppath/sock2path.tmp.$$"
+    (
+        echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
+        found=no; files="$s2pa_dir/*"
+        for f in $files; do
+            if [ -r $f ]; then
+                case $f in
+                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                    (*) sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                        found=yes ;;
+                esac
+            fi
+        done
+    ) >$s2pa_tmp
+    if [ $found = no ]; then
+        rm -f -- $s2pa_fil
+        rmdir $s2pa_dir 2>/dev/null || :
+    else
+        if diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
+            chmod --reference=$s2pa_fil -- $s2pa_tmp
+            cp -f -b --suffix=.rpmsave -- $s2pa_tmp $s2pa_fil
+        fi
+    fi
+    rm -f -- $s2pa_tmp || :
+}
+%endif
+%if %{FILES_snmpconf}
+#
+# postun_snmpconf() - On final removal of SNMP modules, rebuild the snmp
+#   configuration database, most likely removing the entire associated
+#   directories.
+#
+postun_snmpconf () { :
+    snmp_fil="%_snmpconfdir/snmpd.local.conf"
+    snmp_dir="%_snmpconfdir/snmp.d"
+    snmp_lcl="$snmp_dir/00local"
+    [ -d "%_snmpconfdir/snmp.d" ] || return 0
+    can_overwrite_local=no
+    if [ -e $snmp_fil ]; then
+        if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
+            can_overwrite_local=yes
+        fi
+    fi
+    [ $can_overwrite_local = yes ] || return 0
+    wrote_one=no
+    snmp_tmp="%_tmppath/`basename $snmp_fil`.tmp.$$"
+    (
+        echo '# Generated from snmp.d by @PACKAGE_LCNAME@ '`date -uI`
+        echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+        echo '# EDIT THE FILES IN THE snpm.d DIRECTORY INSTEAD.'
+        files="$snmp_dir/*"
+        for f in $files; do
+            if [ -f $f -a $f = $snmp_lcl ]; then
+                case $f in
+                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                    (*)
+                        echo '# Generated from snmp.d/'`basename $f`
+                        echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+                        echo '# EDIT THE FILE IN snmp.d/'`basename $f`' INSTEAD.'
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
+                        ;;
+                esac
+            fi
+        done
+	for f in $files ; do
+	    if [ -f $f -a $f != $snmp_lcl ]; then
+		case $f in
+		    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+		    (*)
+			echo '# Generated from snmp.d/'`basename $f`
+			echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+			echo '# EDIT THE FILE IN snmp.d/'`basename $f`' INSTEAD.'
+			sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
+                        wrote_one=yes
+                        ;;
+		esac
+	    fi
+	done
+    ) >$snmp_tmp
+    if [ $wrote_one = yes ]; then
+        mv -f -- $snmp_tmp $snmp_fil
+    elif [ -f $snmp_lcl ]; then
+        mv -f -- $snmp_lcl $snmp_fil
+        rm -f -- $snmp_tmp
+        rmdir $snmp_dir 2>/dev/null || :
+    else
+        rm -f -- $snmp_tmp $snmp_fil
+        rmdir $snmp_dir 2>/dev/null || :
+    fi
+}
+%if %{FILES_perlmods}
+postun_perlmods () { :
+}
+%endif
+%if %{FILES_tcllibs}
+postun_tcllibs () { :
+}
+%endif
+#
+# postun_remove() - When a final removal of the library package is performed,
+#   remove the database and index entries associated with the removed
+#   components.
+#
+postun_remove () { :
+%if %{FILES_libraries}
+    postun_libraries || :
+%endif
+%if %{FILES_netconfig}
+    postun_netconfig || :
+%endif
+%if %{FILES_sock2path}
+    postun_sock2path || :
+%endif
+%if %{FILES_snmpconf}
+    postun_snmpconf  || :
+%endif
+%if %{FILES_perlmods}
+    postun_perlmods  || :
+%endif
+%if %{FILES_tcllibs}
+    postun_tcllibs   || :
+%endif
+}
+#
+# postun_upgrade() - RPM runs upgrade scripts in the order: %pretrans, %pre,
+#   %post, %triggerin, %triggerun, %preun, %postun, triggerpostun, %posttrans;
+#   therefore, on upgrade the %preun and %postun scripts should not perform
+#   any actions whatsovever.  Consideration of any old package files that will
+#   not be retained in the new package should be performed in the %pre of the
+#   new package.  Similarly, rebuilding of databases and the like should be
+#   performed in the %post of the new package and must be left untouched by
+#   the old package.  Therefore, this %postun only peforms actions on removal
+#   and then only the actions that are required after the removed package
+#   files have been removed.
+#
+postun_upgrade () { :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # complete removal
+    postun_remove
+fi
+if [ $1 -ge 1 ] ; then : # upgrade
+    postun_upgrade
+fi
+# ---------------------------------------------------------------------------
+
+%triggerpostun lib -- %{name}-base
+# ---------------------------------------------------------------------------
+if [ $2 -eq 0 ] ; then : # base removed while lib present
+fi
+if [ $2 -eq 1 ] ; then : # base or lib upgraded with other present
+fi
+# ---------------------------------------------------------------------------
 
 %if %{PACKAGE_lib}
 %files lib
@@ -4234,6 +4771,10 @@ fi
 %{?files_libraries:%{_libdir}/*.la}
 #{?files_lib32compat:%{_lib32dir}/*.so*}
 #{?files_lib32compat:%{_lib32dir}/*.la}
+#{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
+%{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+%{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path}
+%{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %{?files_perlmods:%dir %{_perldir}/auto/Xti}
 %{?files_perlmods:%{_perldir}/auto/Xti/*}
 %{?files_tcllibs:%dir %{_pkgtcllibdir}}
@@ -4248,6 +4789,7 @@ fi
 %{?files_gdmofiles:%{_pkglibexecdir}/gdmo}
 %{?files_testfiles:%{_pkglibexecdir}/%{testfiles}}
 #{?files_test32files:%{_pkglibexec32dir}/%{testfiles}}
+%{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
 %{?files_snmpmods:%{_snmpdlmoddir}/*}
 %endif
 
@@ -4907,6 +5449,73 @@ fi
 %if %{FILES_modules}
 %post -n %{kernel_package}
 # ---------------------------------------------------------------------------
+%if %{HAVE_weakmods}
+#
+# post_weakmodules() - In the event that the base subpackage is already
+#   installed, try to weak-update kernel modules.  Note that on an upgrade,
+#   as rpm is stupid, this can likely cause the old version's openss7-modules
+#   script to be run instead of the new version's (because the base package
+#   has not been updated yet).
+#
+%endif
+%if %{HAVE_initscripts}
+#
+# post_initscripts() - In the event that the base subpackage is already
+#   installed, try to start init scripts.  This might have failed utterly when
+#   the base subpackage was installed because the kernel modules might not
+#   have been present for the running kernel.  If the base subpackage is not
+#   yet install, the init scripts should not be present and this scriptlet
+#   then does nothing.  If the base subpackage is installed and a solution is
+#   generated for the running kernel, the scripts should succeed.  When the
+#   base package is installed and there is no solution for the running kernel,
+#   starting the init scripts will fail, in which case we return immediately.
+#   Note that we only attempt to start init scripts when they are not already
+#   running and they would normally be started for the current run level.
+#   Another attempt to start init scripts will be made when the base or lib
+#   sub-packages are installed fresh.
+#
+#   When this is performed as part of an upgrade and the subsystems are
+#   already running, this has no effect.  If the upgrade has just provided a
+#   solution at this point, it will succeed.
+#
+post_initscripts () { :
+    local list="%{initfiles}" r i l start
+    r="`runlevel | awk '{print$2}'`"
+    for i in list; do
+        [ -f %_initrddir/$i ] || continue
+        [ ! -e /var/lock/subsys/$i ] || continue
+        start=no
+        for l in %_initrddir/../rc$r.d/S[0-9][0-9]$i %_initrddir/rc$r.d/S[0-9][0-9]$i; do
+            if [ -L $l ]; then start=yes; break; fi
+        done
+        [ $start = yes ] || continue
+        [ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break }
+        [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break }
+        [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i start && continue || break }
+    done
+}
+%endif
+# ---------------------------------------------------------------------------
+# post_install() - This is a fresh install of this kernel modules sub-package.
+post_install () { :
+%if %{HAVE_initscripts}
+    post_initscripts || :
+%endif
+}
+# post_upgrade() - This is an upgrade of this kernel modules sub-package.
+post_upgrade () { :
+%if %{HAVE_initscripts}
+    post_initscripts || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    post_install || :
+fi
+if [ $1 -ge 2 ] ; then : # upgrade
+    post_upgrade || :
+fi
+# ---------------------------------------------------------------------------
 if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
     if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
         # This is a running kernel, do a depmod on the modules directory for the
@@ -4944,6 +5553,134 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
 %endif
 fi
 %endif
+
+%triggerin -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ---------------------------------------------------------------------------
+#
+# triggerin_weakmodules() - When the kernel modules are updated with the
+#   appropriate base package installed, or the appropriate base package is
+#   updated with the kernel modules installed, or when kernel modules are
+#   installed with the appropriate base package present, or the appropriate
+#   base package is installed with kernel modules present, perform a weak
+#   update on the modules.
+#
+triggerin_weakmodules () {
+    if [ -x %_sbindir/openss7-modules ]; then
+        %_sbindir/openss7-modules -- -q -e \
+            --update-modules %_kversion || :
+    fi
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # base updated with kernel modules present
+    triggerin_weakmodules || :
+fi
+if [ $2 -ge 2 ] ; then : # kernel modules updated with base present
+    triggerin_weakmodules || :
+fi
+if [ $1 -eq 1 -a $2 -eq 1 ] ; then : # kernel modules or base install other present
+    triggerin_weakmodules || :
+fi
+# ---------------------------------------------------------------------------
+#triggerin -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ---------------------------------------------------------------------------
+
+%if %{FILES_weakmods}
+%triggerin -n %{kernel_package} -- %{target_kernel}
+# ---------------------------------------------------------------------------
+if [ -x %{_sbindir}/%{name}-modules ] ; then
+    kernels=`ls /lib/modules`
+    %{_sbindir}/%{name}-modules -- -v --update-kernel $kernels || :
+    # It is necessary to check whether this operation altered the module links
+    # for the running kernel.  If it did, and any of the modules that were
+    # altered are resident in the kernel, a restart message should be given.
+    # If modules were added that were not in the kernel before (particularly
+    # specfs and streams), consider starting the STREAMS subsystem if it is
+    # set to start on boot.  If modules were removed that are resident in the
+    # kernel (esp. specfs and streams), consider shutting down the STREAMS
+    # subsystem, or issuing a warning to that effect.  We can either have
+    # openss7-modules issue the appropriate warnings, or we can have it file
+    # some information in /var/run and then examine it after the run.
+else
+    echo "WARNING: %triggerin -n %{kernel_package} -- %{target_kernel} ($1,$2) no update script" >&2
+fi
+%endif
+
+%triggerun -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ---------------------------------------------------------------------------
+%if %{HAVE_weakmods}
+#
+# triggerun_update() -
+#
+triggerun_update () { :
+    if [ -x %_sbindir/%base-modules ]; then
+        %_sbindir/%base-modules -- -q -e${1:+ }$1 \
+            --remove-modules @kversion@ || :
+    fi
+}
+%endif
+%if %{HAVE_oldmods}
+#
+# triggerun_oldmods() - The -base sub-package is going away for good, but this
+#   kernel modules package is still installed.  Because the %preun of the
+#   -base sub-package is about to remove the modules.conf line that includes
+#   and ignores the modules.%base entry, this modules.%base entry must be
+#   removed before the base %preun runs.
+#
+triggerun_oldmods () { :
+    rm -f -- %_kmoduledir/modules.%base || :
+}
+%endif
+#
+# triggerun_mods_remove() - The %{kernel_package} sub-package is being removed
+#   (for good) while the -base sub-package is present.  This is a proper
+#   ordering.  Use the openss7-modules from the base package to remove kernel
+#   module weak links without actually removing the kernel modules.  Note that
+#   rpm will eventually delete the actual kernel modules.
+#
+triggerun_mods_remove () { :
+%if %{HAVE_weakmods}
+    triggerun_update --delete-modules || :
+%endif
+}
+#
+# triggerun_base_remove() - The -base sub-package is being removed (for good)
+#   while the kernel modules are present.  This is a misordering that only rpm
+#   designers could misconceive.  Because the base package has the openss7-
+#   modules script, removal of weak links need to be performed before the
+#   script goes away.  Note that this will be performed for each and every
+#   kernel module package that is still installed.
+#
+triggerun_base_remove () { :
+%if %{HAVE_weakmods}
+    triggerun_update || :
+%endif
+%if %{HAVE_oldmods}
+    triggerun_oldmods || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # kernel modules being removed with base present
+    triggerun_mods_remove || :
+fi
+if [ $2 -eq 0 ] ; then : # base being removed with kernel modules present
+    triggerun_base_remove || :
+fi
+if [ $1 -ge 1 -a $2 -ge 1 ] ; then : # base or kernel upgraded with other present
+    # nothing to do
+fi
+# ---------------------------------------------------------------------------
+#triggerun -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ---------------------------------------------------------------------------
+
+%triggerun -n %{kernel_package} -- %{name}-lib = %{epoch}:%{baseversion}-%{specrelease}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # kernel modules being removed with lib present
+fi
+if [ $2 -eq 0 ] ; then : # lib being removed with kernel modules present
+fi
+if [ $1 -ge 1 -a $2 -ge 1 ] ; then : # lib or kernel upgraded with other present
+fi
+# ---------------------------------------------------------------------------
 
 %if %{FILES_modules}
 %preun -n %{kernel_package}
@@ -5027,6 +5764,38 @@ fi
 %if %{FILES_modules}
 %postun -n %{kernel_package}
 # ---------------------------------------------------------------------------
+#
+# postun_preloads() - When removing for good, make sure that the
+#   modules are no longer included in the kernel-specific preloads file for
+#   2.4 module system. Note that removing lines from /etc/modules and
+#   /etc/modprobe.preload is the responsibility of the -base subpackage.
+#
+postun_preloads () {
+    local prel_old prel_tmp prel_new included modules m
+    prel_old=%_sysconfdir/modules-%_kversion
+    if [ -f $prel_old ]; then
+        prel_tmp=%_tmppath/modprobe.preload.tmp.$$
+        prel_new=%_tmppath/modprobe.preload.new.$$
+        cp -f -- $prel_old $prel_new
+        included=no
+        modules="%{modules}"
+        for m in $modules; do
+            if grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+                included=yes
+            fi
+        done
+        if [ "$included" = yes ]; then
+            for m in $modules; do
+                grep -v '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >$prel_tmp
+                mv -f -- $prel_tmp $prel_new
+            done
+            chmod --reference=$prel_old -- $prel_new
+            cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
+        fi
+        rm -f -- $prel_new || :
+    fi
+}
+#
 remove_depends() {
     local modrex depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
@@ -5102,26 +5871,31 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 fi
 %endif
 
-%if %{FILES_weakmods}
-%triggerin -n %{kernel_package} -- %{target_kernel}
+%triggerpostun -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
 # ---------------------------------------------------------------------------
-if [ -x %{_sbindir}/%{name}-modules ] ; then
-    kernels=`ls /lib/modules`
-    %{_sbindir}/%{name}-modules -- -v --update-kernel $kernels || :
-    # It is necessary to check whether this operation altered the module links
-    # for the running kernel.  If it did, and any of the modules that were
-    # altered are resident in the kernel, a restart message should be given.
-    # If modules were added that were not in the kernel before (particularly
-    # specfs and streams), consider starting the STREAMS subsystem if it is
-    # set to start on boot.  If modules were removed that are resident in the
-    # kernel (esp. specfs and streams), consider shutting down the STREAMS
-    # subsystem, or issuing a warning to that effect.  We can either have
-    # openss7-modules issue the appropriate warnings, or we can have it file
-    # some information in /var/run and then examine it after the run.
-else
-    echo "WARNING: %triggerin -n %{kernel_package} -- %{target_kernel} ($1,$2) no update script" >&2
+# triggerpostun_base_remove() - The base subpackage was removed while the
+#   kernel modules were present.
+#
+# triggerpostun_base_upgrade()
+# ---------------------------------------------------------------------------
+if [ $2 -eq 0 ] ; then : # base removed while kernel modules present
+    triggerpostun_base_remove || :
 fi
-%endif
+if [ $2 -ge 1 ] ; then : # base upgraded while kernel modules present
+    triggerpostun_base_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#triggerpostun -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ---------------------------------------------------------------------------
+
+%triggerpostun -n {%kernel_package} -- %{name}-lib = %{epoch}:%{baseversion}-%{specrelease}
+# ---------------------------------------------------------------------------
+if [ $2 -eq 0 ] ; then : # lib removed while kernel modules present
+fi
+if [ $2 -ge 1 ] ; then : # lib upgraded while kernel modules present
+fi
+# ---------------------------------------------------------------------------
+
 
 %if %{FILES_weakmods}
 %triggerpostun -n %{kernel_package} -- %{target_kernel}
@@ -5229,20 +6003,6 @@ Version:            %{kspecversion}
 Release:            %{kspecrelease}
 
 %if %{FILES_symvers}
-# ---------------------------------------------------------------------------
-%postun -n %{kernel_develop}
-if [ $1 = 0 ] ; then # we were removed for good
-    f=symsets-%{_kversion}.tar.gz
-    d=/lib/modules/%{_kversion}/build
-    if [ -r $d/$f ] ; then
-        cp -f -- $d/$f /boot/$f || :
-    else
-        rm -f -- /boot/$f || :
-    fi
-fi
-%endif
-
-%if %{FILES_symvers}
 %triggerin -n %{kernel_develop} -- %{target_kdevel}
 # ---------------------------------------------------------------------------
 # This trigger script runs after we are installed and there is already a
@@ -5258,6 +6018,20 @@ d=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}
 f=symsets-%{_kversion}.tar.gz
 if [ -r $d/$f ] then
     cp -f -- $d/$f /boot/$f
+fi
+%endif
+
+%if %{FILES_symvers}
+# ---------------------------------------------------------------------------
+%postun -n %{kernel_develop}
+if [ $1 = 0 ] ; then # we were removed for good
+    f=symsets-%{_kversion}.tar.gz
+    d=/lib/modules/%{_kversion}/build
+    if [ -r $d/$f ] ; then
+        cp -f -- $d/$f /boot/$f || :
+    else
+        rm -f -- /boot/$f || :
+    fi
 fi
 %endif
 

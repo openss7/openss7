@@ -59,7 +59,7 @@ datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 #
 prerm_snmpdlmod_move () {
-    local f d='@snmpconfdir@/snmp.d' found=no
+    local f d="@snmpconfdir@/snmp.d" found=no
     [ -d $d ] || return 0
     for f in "$d/*"; do
 	if [ -f $f ]; then
@@ -81,7 +81,7 @@ prerm_snmpdlmod_move () {
 #   the first must be undone here.
 #
 prerm_snmpdlmod_replace () {
-    local f d='@snmpconfdir@/snmp.d' found=no
+    local f d="@snmpconfdir@/snmp.d" found=no
     [ -d $d ] || return 0
     for f in "$d/*"; do
 	if [ -f $f ]; then
@@ -104,10 +104,10 @@ prerm_snmpdlmod_replace () {
 #   reload or restart.
 #
 prerm_snmpdlmod_rebuild () { :
-    snmp_dir='@snmpconfdir@'
-    conf_fil='@snmpconfdir@/snmpd.local.conf'
-    conf_dir='@snmpconfdir@/snmp.d'
-    conf_lcl='@snmpconfdir@/snmp.d/00local'
+    snmp_dir="@snmpconfdir@"
+    conf_fil="@snmpconfdir@/snmpd.local.conf"
+    conf_dir="@snmpconfdir@/snmp.d"
+    conf_lcl="@snmpconfdir@/snmp.d/00local"
     [ -d $conf_dir ] || return 0
     can_overwrite_local=no
     if [ -e $conf_fil ]; then

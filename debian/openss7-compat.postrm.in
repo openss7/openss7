@@ -83,7 +83,7 @@ postrm_tcllibs () { :
 #   know about that so remove them here.
 #
 postrm_snmpdlmod () { :
-    local f d='@snmpconfdir@/snmp.d'
+    local f d="@snmpconfdir@/snmp.d"
     [ -d $d ] || return 0
     for f in "$d/*"; do
 	if [ -f $f ]; then

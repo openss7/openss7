@@ -184,7 +184,7 @@ postinst_tcllibs () { :
 #   linking /etc/snmpd.local.conf to /etc/snmp/snmpd.local.conf.
 #
 postinst_snmpdlmod () { :
-    snmp_dir='@snmpconfdir@'
+    snmp_dir="@snmpconfdir@"
     if [ ! -f $snmp_dir/snmpd.conf ]; then
 	[ -f $snmp_dir/../snmpd.conf ] || return 0
 	(

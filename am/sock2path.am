@@ -52,8 +52,15 @@
 ##
 ## =============================================================================
 
-if PKG_BUILD_INDEP
-## PKG_BUILD_INDEP
+if PKG_BUILD_ARCH
+## PKG_BUILD_ARCH
+
+##
+# This was changed from PKG_BUILD_INDEP to PKG_BUILD_ARCH because it is far too
+# complex to maintainer scripts to place these files in an architecture
+# independent package away from the library binaries that they configure.
+##
+
 if PKG_BUILD_USER
 ## PKG_BUILD_USER
 
@@ -75,15 +82,15 @@ install-sock2path: src/util/sysconfig/sock2path
 
 post-sock2path:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@t="$(DESTDIR)$(sysconfdir)/sock2path" ; \
-	d="$(DESTDIR)$(sysconfdir)/sock2path.d" ; \
-	if test -e $$t ; then \
-		$(ECHO) "cat /dev/null > $$t" ; \
-		cat /dev/null > $$t ; \
-		files="$$d/*" ; for f in $$files ; do \
+	@s2pa_fil="$(DESTDIR)$(sysconfdir)/sock2path" ; \
+	s2pa_dir="$(DESTDIR)$(sysconfdir)/sock2path.d" ; \
+	if test -e $$s2pa_fil ; then \
+		$(ECHO) "cat /dev/null > $$s2pa_fil" ; \
+		cat /dev/null > $$s2pa_fil ; \
+		files="$$s2pa_dir/*" ; for f in $$files ; do \
 			if test -f $$f ; then \
-				$(ECHO) "sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t" ; \
-				sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t ; \
+				$(ECHO) "sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$s2pa_fil" ; \
+				sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$s2pa_fil ; \
 			fi ; \
 		done ; \
 	fi
@@ -93,6 +100,9 @@ uninstall-sock2path:
 	@$(NORMAL_UNINSTALL)
 	rm -f $(DESTDIR)$(sysconfdir)/sock2path.d/@PACKAGE_LCNAME@
 
+if INSTALL_INITSCRIPTS
+## INSTALL_INITSCRIPTS
+
 INSTALL_DATA_HOOK	+= install-sock2path
 
 POST_INSTALL_AM		+= post-sock2path
@@ -101,9 +111,12 @@ UNINSTALL_LOCAL		+= uninstall-sock2path
 
 POST_UNINSTALL_MA	+= post-sock2path
 
+## INSTALL_INITSCRIPTS
+endif
+
 ## PKG_BUILD_USER
 endif
-## PKG_BUILD_INDEP
+## PKG_BUILD_ARCH
 endif
 
 EXTRA_DIST		+= src/util/sysconfig/sock2path
