@@ -2527,16 +2527,19 @@ OpenSS7 repository definitions for installing the other packages
 in the set.
 %{descriptail}
 
-%pre repo
-# ---------------------------------------------------------------------------
+%pre -p /bin/bash repo
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This is an initial installation or upgrade of the repo subpackage.  We do
 # not need to check for legacy or non-rpm installations, because the non-rpm
 # installs do not create repository definitions.  We do need to check,
 # however, whether we have some machine credentials lying around from a
 # previous install/remove/upgrade cycle.
 # ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
-%if %{FILES_yumrepo}
+# pre_yumrepo() - On fresh installation or upgrade, establish the yum repository
+#   definitions and obtain credentials when reuquired.  This is for RedHat based
+#   systems such as RHEL 5 and 6, CentOS 5 or 6, and Fedora.
+# ---------------------------------------------------------------------------
+pre_yumrepo () { :
     (
         cd '%{_yumrepodir}'
         un=; pw=; oldfile=; file='@PACKAGE@.repo'
@@ -2579,8 +2582,13 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
             exit 1
         fi
     ) || exit 1
-%endif
-%if %{FILES_zypprepo}
+}
+# ---------------------------------------------------------------------------
+# pre_zypprepo() - On fresh installation or upgrade, establish the zypp
+#   repository definitions and obtain credentials when required.  This is for
+#   SuSE based systems such as SLES 11  and OpenSuSE.
+# ---------------------------------------------------------------------------
+pre_zypprepo () { :
     (
         cd '%{_zyppcreddir}'
         un=; pw=; oldfile=; file='@PACKAGE_UCNAME@credentials'
@@ -2643,17 +2651,46 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
             exit 1
         fi
     ) || exit 1
-%endif
-fi
-
-%post repo
+}
 # ---------------------------------------------------------------------------
+# pre_repo() - This is a fresh installation or upgrade of the repo
+#   subpackage.  Note that we leave credentials lying around regardless of
+#   whether the package was removed at some point, so all installations are the
+#   same regardless of whether they are fresh or an upgrade.
+# ---------------------------------------------------------------------------
+pre_repo () { :
+%if %{FILES_yumrepo}
+    pre_yumrepo || :
+%endif
+%if %{FILES_zypprepo}
+    pre_zypprepo || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    pre_repo || :
+fi
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # upgrade
+    pre_repo || :
+fi
+# ---------------------------------------------------------------------------
+#pre -p /bin/bash repo
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%post -p /bin/bash repo
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # After we install this repository package, we need to adjust whatever
 # definitions are required in either the /etc/yum/yum-plugins.d/kmod.conf or
 # /etc/zypp/zypp.conf files.
 # ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
 %if %{FILES_yumrepo}
+# ---------------------------------------------------------------------------
+# post_yumrepo() - On fresh install or upgrade of the repo package for RedHat
+#   based systems, edit the kmod.conf and fedorakmod.conf file to install
+#   kernel modules for all kernels and to pin kernels.
+# ---------------------------------------------------------------------------
+post_yumrepo () { :
     d="%{_sysconfdir}/yum/pluginconf.d"
     for f in kmod.conf fedorakmod.conf ; do f="$d/$f"
         if [ -f $f ] ; then
@@ -2664,8 +2701,14 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
             fi
         fi
     done
+}
 %endif
 %if %{FILES_zypprepo}
+# ---------------------------------------------------------------------------
+# post_zypprepo() - On fresh install or upgrade of the repo package for SuSE
+#   based systems, edit the zypp.conf file to multiversion kernels.
+# ---------------------------------------------------------------------------
+post_zypprepo () { :
     d="%{_sysconfdir}/zypp"
     for f in zypp.conf ; do f="$d/$f"
         if [ -f $f ] ; then
@@ -2676,37 +2719,112 @@ if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
             fi
         fi
     done
+}
 %endif
-fi
-
-%preun repo
 # ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
+# post_repo() -
+# ---------------------------------------------------------------------------
+post_repo () { :
 %if %{FILES_yumrepo}
+    post_yumrepo || :
+%endif
+%if %{FILES_zypprepo}
+    post_zypprepo || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    post_repo || :
+fi
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # upgrade
+    post_repo || :
+fi
+# ---------------------------------------------------------------------------
+#post -p /bin/bash repo
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%preun -p /bin/bash repo
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%if %{FILES_yumrepo}
+# ---------------------------------------------------------------------------
+# preun_yumrepo() - On final removal of the repo subpackage, mark the
+#   repository definition as disabled, but leave it lying around.  yum has no
+#   commands for disabling repositories, so this is done manually.  It would be
+#   unlikely that yum could be invoked from a maintenance script anyway.
+# ---------------------------------------------------------------------------
+preun_yumrepo () { :
     f='%{_yumrepodir}/@PACKAGE@.repo'
     if [ -r $f ] ; then
         sed 's,^enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$,enabled = 0,' $f >$f.rpmsave
         mv -f -- $f.rpmsave $f
     fi
+}
 %endif
 %if %{FILES_zypprepo}
+# ---------------------------------------------------------------------------
+# preun_zypprepo() - On final removal of the repo subpackage, remove the service
+#   definition, repository definition and local repository caches.  The major
+#   reason for doing this manually is that zypper cannot be invoked from within
+#   a maintenance scriptlet because when installed or upgraded using zypper,
+#   zypper is holding a lock that will keep the nested invocation from
+#   completing... ever.
+#   ---------------------------------------------------------------------------
+preun_zypprepo () { :
     rm -f -- %{_zyppservdir}/@PACKAGE_UCNAME@.service
     rm -f -- %{_zypprepodir}/@PACKAGE_UCNAME@\:@PACKAGE@*.repo
     rm -rf -- %{_localstatedir}/cache/zypp/packages/@PACKAGE_UCNAME@\:@PACKAGE@*
     rm -rf -- %{_localstatedir}/cache/zypp/raw/@PACKAGE_UCNAME@\:@PACKAGE@*
     rm -rf -- %{_localstatedir}/cache/zypp/solv/@PACKAGE_UCNAME@\:@PACKAGE@*
+}
 %endif
-fi
-
-%postun repo
 # ---------------------------------------------------------------------------
+# preun_remove() - When removing altogether the repo subpackage, disable the
+#   repositories, but do not remove credentials or anything that would be
+#   required to reinstall later with the same credentials.
+# ---------------------------------------------------------------------------
+preun_remove () { :
+%if %{FILES_yumrepo}
+    preun_yumrepo || :
+%endif
+%if %{FILES_zypprepo}
+    preun_zypprepo || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # final removal
+    preun_remove || :
+fi
+# ---------------------------------------------------------------------------
+# preun_upgrade() - When upgrading, the %post of the new version has already
+#   completed what it wants so do nothing.
+# ---------------------------------------------------------------------------
+preun_upgrade () { :
+    # do nothing
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ] ; then : # upgrade
+    preun_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#preun -p /bin/bash repo
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%postun -p /bin/bash repo
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # After we remove this repository package, we need to adjust whatever
 # definitions are required in configuration files.  When we changed them on
 # installation, we save an original copy in $f.rpmsave.  Therefore, if
 # $f.rpmsave exists, copy it back.
 # ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
 %if %{FILES_yumrepo}
+# ---------------------------------------------------------------------------
+# postun_yumrepo() - When being removed for good, we saved the kmod.conf and
+#   fedorakmod.conf configuration files when we initially installed and editted
+#   the lines in these files.  If the stored copy is lying around, restore it on
+#   complete removal.  These is nothing to do on upgrade.
+# ---------------------------------------------------------------------------
+postun_yumrepo () { :
     d="%{_sysconfdir}/yum/pluginconf.d"
     for f in kmod.conf fedorakmod.conf ; do f="$d/$f"
         if [ -f $f -a -f $f.rpmsave ] ; then
@@ -2716,8 +2834,16 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         fi
         rm -f -- $f.rpmsave
     done
+}
 %endif
 %if %{FILES_zypprepo}
+# ---------------------------------------------------------------------------
+# postun_zypprepo() - When being removed for good, we save the zypp.conf file
+#   when we initially installed and editted the lines in this file.  If the
+#   stored copy is lying around, restore it on complete removal.  There is
+#   nothing to do on upgrade.
+# ---------------------------------------------------------------------------
+postun_zypprepo () { :
     d="%{_sysconfdir}/zypp"
     for f in zypp.conf ; do f="$d/$f"
         if [ -f $f -a -f $f.rpmsave ] ; then
@@ -2727,8 +2853,39 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
         fi
         rm -f -- $f.rpmsave
     done
+}
 %endif
+# ---------------------------------------------------------------------------
+# postun_remove() - When removing altogether the repo subpackage, restore the
+#   originals if any changes that were made to yum plugin or zypper
+#   configuration files.
+#   ---------------------------------------------------------------------------
+postun_remove () { :
+%if %{FILES_yumrepo}
+    postun_yumrepo || :
+%endif
+%if %{FILES_zypprepo}
+    postun_zypprepo || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ]; then : # final removal
+    postun_remove || :
 fi
+# ---------------------------------------------------------------------------
+# postun_upgrade() - When upgrading, the %post of the new version has already
+#   completed what it wants so do nothing.
+# ---------------------------------------------------------------------------
+postun_upgrade () { :
+    # do nothing
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ]; then : # upgrade
+    postun_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#postun -p /bin/bash repo
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %if %{PACKAGE_repo}
 %files repo
@@ -2839,18 +2996,18 @@ formats as well as sections 1, 4, 5 and 8 of the manual pages.  This
 binary package is required for any installation of the %{name} package.
 %{descriptail}
 
-%pre base
-# ---------------------------------------------------------------------------
-# This is an initial installation or upgrade of the base subpackage.  On
-# initial installation, we need to check for non-rpm installations on the host
-# and remove any entries that might later conflict with our entries.  We treat
-# every fresh installation like an upgrade from non-rpm install.
+%pre -p /bin/bash base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This is an initial installation or upgrade of the base subpackage.  On initial installation, we
+# need to check for non-rpm installations on the host and remove any entries that might later
+# conflict with our entries.  We treat every fresh installation like an upgrade from non-rpm
+# install.
 # ---------------------------------------------------------------------------
 %if %{FILES_initscripts}
-#
-# pre_initscripts_install() - On a fresh install, go looking for non-rpm initscripts
-#   and remove them.  Stop them first.
-#
+# ---------------------------------------------------------------------------
+# pre_initscripts_install() - On a fresh install, go looking for non-rpm initscripts and remove
+#       them.  Stop them first.
+# ---------------------------------------------------------------------------
 pre_initscripts_install () {
     local reverse= list="%{initfiles} %{nonrpminit}" i
     for i in $list; do
@@ -2872,15 +3029,14 @@ pre_initscripts_install () {
         fi
     done
 }
-#
-# pre_initscripts_upgrade() - On an upgrade, simply remove the old initscripts
-#   without stopping them.  Note that the new initscripts will be installed in
-#   post, and started when the old version initscripts were not running.  Note
-#   that these are the init scripts from the old version.  Because our old
-#   versions have the same init scripts as the new version (for now), this is
-#   simply removing our regular list of init scripts.  To be non-disruptive
-#   during upgrades, we do not stop the scripts first.
-#
+# ---------------------------------------------------------------------------
+# pre_initscripts_upgrade() - On an upgrade, simply remove the old initscripts without stopping
+#       them.  Note that the new initscripts will be installed in post, and started when the old
+#       version initscripts were not running.  Note that these are the init scripts from the old
+#       version.  Because our old versions have the same init scripts as the new version (for now),
+#       this is simply removing our regular list of init scripts.  To be non-disruptive during
+#       upgrades, we do not stop the scripts first.
+# ---------------------------------------------------------------------------
 pre_initscripts_upgrade () {
     local reverse= list="%{initfiles}" i
     for i in $list; do
@@ -2896,11 +3052,11 @@ pre_initscripts_upgrade () {
     done
 }
 %endif
-#
-# remove_depmods() - A little recursive function to delete all modules dependent
-#   on an initial module set (in our case "streams.o").  The function echos the
-#   list of modules to remove to stdout.
-#
+# ---------------------------------------------------------------------------
+# remove_depmods() - A little recursive function to delete all modules dependent on an initial
+#       module set (in our case "streams.o").  The function echos the list of modules to remove to
+#       stdout.
+# ---------------------------------------------------------------------------
 remove_depmods () {
     local t
     [ $# -gt 0 ] || return 0
@@ -2910,13 +3066,12 @@ remove_depmods () {
 	eval "remove_depmods \$$prereq"
     done
 }
-#
-# pre_modules() - When performing a fresh install we want to go looking for
-#   non-rpm installations of LiS or STREAMS or supplementary packages and
-#   perform what would otherwise have been the preun or postun actions.  Build a
-#   dependency tree from every dependency expression that can be found in each
-#   modules.dep file and remove all conflicting modules and their dependents.
-#
+# ---------------------------------------------------------------------------
+# pre_modules() - When performing a fresh install we want to go looking for non-rpm installations of
+#       LiS or STREAMS or supplementary packages and perform what would otherwise have been the
+#       preun or postun actions.  Build a dependency tree from every dependency expression that can
+#       be found in each modules.dep file and remove all conflicting modules and their dependents.
+# ---------------------------------------------------------------------------
 pre_modules () { :
     for dir in /lib/modules/2.[456].* /lib/modules/preferred /lib/modules/default /lib/modules/boot
     do
@@ -2960,11 +3115,11 @@ pre_modules () { :
     fi
 }
 %if %{FILES_preloads}
-#
-# pre_preloads() - On a fresh install, go looking for non-rpm or legacy preloads
-#   and remove them.  This includes all preload techniques: modprobe.preload and
-#   modules or modules-%_kversion files.
-#
+# ---------------------------------------------------------------------------
+# pre_preloads() - On a fresh install, go looking for non-rpm or legacy preloads and remove them.
+#       This includes all preload techniques: modprobe.preload and modules or modules-%_kversion
+#       files.
+# ---------------------------------------------------------------------------
 pre_preloads () { :
     local prel_fil prel_tmp prel_new
     for prel_fil in %_sysconfdir/modprobe.preload %_sysconfdir/modules %_sysconfdir/modules-*
@@ -2986,27 +3141,25 @@ pre_preloads () { :
 }
 %endif
 %if %{HAVE_oldmods}
+# ---------------------------------------------------------------------------
+# pre_oldmods() - For a fresh install make sure that there are no entries from a non-rpm
+#       installation in the modules directories nor in the modules.conf file that will interfere
+#       with our entries.  Especially older LiS entries.
 #
-# pre_oldmods() - For a fresh install make sure that there are no entries from a
-#   non-rpm installation in the modules directories nor in the modules.conf file
-#   that will interfere with our entries.  Especially older LiS entries.
+#       Unfortunately davem starting copying our install procedure, so we need to root out all kinds
+#       of things from the modules.conf file, all prune statements, any if include statements.  The
+#       old style /BEGIN LiS/,/END LiS/ enclosure in the modules.conf file.  My newer technique with
+#       a prune and an if statement in the modules.conf file that was also used by davem in
+#       LiS-2.18.0.  Also, my newer latest technique with only an include statement in modules.conf
+#       and a modules.conf fragment in the debian update-modules directory %_modutildir that
+#       includes the prune and if statements.  That works both for RH-style and Debian-style
+#       modules.conf.
 #
-#   Unfortunately davem starting copying our install procedure, so we need to
-#   root out all kinds of things from the modules.conf file, all prune
-#   statements, any if include statements.  The old style /BEGIN LiS/,/END LiS/
-#   enclosure in the modules.conf file.  My newer technique with a prune and an
-#   if statement in the modules.conf file that was also used by davem in
-#   LiS-2.18.0.  Also, my newer latest technique with only an include statement
-#   in modules.conf and a modules.conf fragment in the debian update-modules
-#   directory %_modutildir that includes the prune and if statements.  That
-#   works both for RH-style and Debian-style modules.conf.
-#
-#   Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen
-#   to install their modconf files in a similar fashion to ours and in a similar
-#   location.  It even uses the prune modules line that we normally use,
-#   however, on Debian their modules.conf edits will be lost because the
-#   modules.conf file is generated from the modules/conf.d directory.
-#
+#       Again, unfortunately, recent non-autoconf/dpkg releases of LiS have chosen to install their
+#       modconf files in a similar fashion to ours and in a similar location.  It even uses the
+#       prune modules line that we normally use, however, on Debian their modules.conf edits will be
+#       lost because the modules.conf file is generated from the modules/conf.d directory.
+# ---------------------------------------------------------------------------
 pre_oldmods () {
     local conf_old conf_tmp conf_new suffix dir
     conf_old="%_sysconfdir/modules.conf"
@@ -3050,6 +3203,8 @@ pre_oldmods () {
 }
 %endif
 # ---------------------------------------------------------------------------
+# pre_install() -
+# ---------------------------------------------------------------------------
 pre_install () { :
 %if %{FILES_initscripts}
     pre_initscripts_install || :
@@ -3062,33 +3217,36 @@ pre_install () { :
     pre_preloads || :
 %endif
 }
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ]; then : # fresh install
+    pre_install || :
+fi
+# ---------------------------------------------------------------------------
+# pre_upgrade() - 
+# ---------------------------------------------------------------------------
 pre_upgrade () { :
 %if %{FILES_initscripts}
     pre_initscripts_upgrade || :
 %endif
 }
 # ---------------------------------------------------------------------------
-if [ $1 -eq 1 ]; then : # fresh install
-    pre_install || :
-fi
 if [ $1 -ge 2 ]; then : # upgrade
     pre_upgrade || :
 fi
 # ---------------------------------------------------------------------------
-#pre base
-# ---------------------------------------------------------------------------
+#pre -p /bin/bash base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%post base
-# ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
+%post -p /bin/bash base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %if %{HAVE_oldmods}
-#
+# ---------------------------------------------------------------------------
 # post_oldmods() - Whether installing or upgrading, add our line to the
 #   modules.conf file if it is not already present.  Note that the old version
 #   is expected to not remove this line in the upgrade case.  Note also that
 #   modules.conf entries are only installed for 2.4 module systems.  Note that
 #   we do not handle upgrades from 2.4 to 2.6 at all.
-#
+# ---------------------------------------------------------------------------
 post_oldmods () {
     local conf_fil=%_sysconfdir/modules.conf conf_tmp conf_new
     if [ -f $conf_fil ]; then
@@ -3107,12 +3265,12 @@ post_oldmods () {
 }
 %endif
 %if %{FILES_preloads}
-#
+# ---------------------------------------------------------------------------
 # post_preloads() - Whether installing or upgrading, add our preloads to the
 #   appropriate preloads files.  Note that the old version is expected to not
 #   remove its preloads in the upgrade case.  Note also that preloads are only
 #   installed for 2.4 module systems.
-#
+# ---------------------------------------------------------------------------
 post_preloads () {
     local preloads="%{preloads}" prel_fil prel_tmp prel_new p preloads
     for prel_fil in %_sysconfdir/modules %_sysconfdir/modprobe.preload; do
@@ -3135,19 +3293,19 @@ post_preloads () {
 }
 %endif
 %if %{FILES_initscripts}
-#
+# ---------------------------------------------------------------------------
 # post_initscripts() - When installing fresh, start initscripts when they are
-#   not already running and would normally be started for the current
-#   run-level.  Note that if rpm has neglected to install a kernel module
-#   package, or the library package, or if there is no solution for the
-#   running kernel, starting some or all of these scripts will fail, so we
-#   exit on the first failure.  Another attempt will be made when the lib or
-#   kernel modules sub-packages are installed fresh.
+#   not already running and would normally be started for the current run-level.
+#   Note that if rpm has neglected to install a kernel module package, or the
+#   library package, or if there is no solution for the running kernel, starting
+#   some or all of these scripts will fail, so we exit on the first failure.
+#   Another attempt will be made when the lib or kernel modules sub-packages are
+#   installed fresh.
 #
-#   When this is performed as part of an upgrade and the subsystems are
-#   already running, this has no effect.  If the upgrade has just provided a
-#   solution at this point, it will succeed.
-#
+#   When this is performed as part of an upgrade and the subsystems are already
+#   running, this has no effect.  If the upgrade has just provided a solution at
+#   this point, it will succeed.
+# ---------------------------------------------------------------------------
 post_initscripts () {
     local list="%{initfiles}" i args r l start
     for i in $list; do
@@ -3187,12 +3345,12 @@ post_manmacros () {
 }
 %endif
 %if %{FILES_manpages}
-#
+# ---------------------------------------------------------------------------
 # post_manpages() - Update the manual pages aprospros database.  This is quite
 #   a lengthly process.  If it is not performed, most systems will update on
 #   cron job anyway.  We should be able to background this task in nice mode
 #   somehow.  Defeat it for now 'cause it just plain take too long.
-#
+# ---------------------------------------------------------------------------
 post_manpages () { :; return
     if [ -x "`which makewhatis 2>/dev/null`" ]; then
         LANGUAGE= LANG= makewhatis -u %{_mandir} || :
@@ -3203,13 +3361,13 @@ post_manpages () { :; return
 }
 %endif
 # ---------------------------------------------------------------------------
-#
-# post_install() - This is a fresh installation of the base sub-package.  For
-#   a 2.6 module system install where manrefs and manmacros are properly
-#   exempt from compression, the only actions performed are to register and
-#   attempt to start initscripts, and possibly attempt to rebuild the
-#   aprospros database.  Weak updating modules is handled by trigger script.
-#
+# post_install() - This is the end of a fresh installation of the base
+#   sub-package at the current EVR.  For a 2.6 module system install where
+#   manrefs and manmacros are properly exempt from compression, the only
+#   actions performed are to register and attempt to start initscripts, and
+#   possibly attempt to rebuild the aprospros database.  Weak updating modules
+#   is handled by trigger script.
+# ---------------------------------------------------------------------------
 post_install () { :
 %if %{HAVE_oldmods}
     post_oldmods || :
@@ -3230,8 +3388,13 @@ post_install () { :
     post_manpages || :
 %endif
 }
-#
-# post_upgrade() - This is an upgrade of the base sub-package.
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    post_install || :
+fi
+# ---------------------------------------------------------------------------
+# post_upgrade() - This is the end of an upgrade of the base subpackage to the
+#   current EVR.
 #
 #   Note that the manual pages aprospros database is not updated here on an
 #   upgrade: it is the responsibility of the old version's postun to do the
@@ -3241,7 +3404,7 @@ post_install () { :
 #   exempt from compression, the only actions performed are to register and
 #   attempt to start initscripts.  Weak updating modules is handled by trigger
 #   script.
-#
+# ---------------------------------------------------------------------------
 post_upgrade () { :
 %if %{HAVE_oldmods}
     post_oldmods || :
@@ -3260,109 +3423,72 @@ post_upgrade () { :
 %endif
 }
 # ---------------------------------------------------------------------------
-if [ $1 -eq 1 ] ; then : # fresh install
-    post_install || :
-fi
 if [ $1 -ge 2 ] ; then : # upgrade
     post_upgrade || :
 fi
 # ---------------------------------------------------------------------------
-#post base
-# ---------------------------------------------------------------------------
+#post -p /bin/bash base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %if %{HAVE_weakmods}
-%triggerin base -- %{target_kernel}
+%triggerin -p /bin/bash base -- %{target_kernel}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# triggerin_weakmodules() - When a kernel is being installed or upgraded with
+#   the base package present, perform a weak update on the kernel being
+#   installed or upgraded.  We should perform a weak update for just one
+#   kernel, however, the trigger parameters simply do not tell us which
+#   version of the kernel is being installed or upgraded.  So we use
+#   --update-kernels which recalculates the best solution for all kernels.
+#   Note that this will not affect the running kernel until a restart of the
+#   STREAMS subsystems or reboot is performed.
 # ---------------------------------------------------------------------------
-#
-# triggerin_weakmodules() - When the base package is being upgraded with
-#   kernels present (always the case when the base package is being upgraded),
-#   or when a kernel is being installed or upgraded when the base package is
-#   present, perform a weak-update on all of the kernels.  We would perform a
-#   weak-update for just one kernel, however, the trigger parameters simply do
-#   not tell us the version of the kernel being installed or upgraded.
-#
 triggerin_weakmodules () { :
     if [ -x %_sbindir/openss7-modules ]; then
         %_sbindir/openss7-modules -- -q -e --update-kernels || :
     fi
 }
 # ---------------------------------------------------------------------------
-if [ $1 -ge 2 ] ; then : # base is being upgraded with kernels present
+# triggerin_kernel() - When rpm trigger scripts are working correctly (which
+#   is not often), this function is invoked when a kernel is being installed
+#   or upgraded with the base subpackage present.
+# ---------------------------------------------------------------------------
+triggerin_kernel () { :
     triggerin_weakmodules || :
-fi
+}
+# ---------------------------------------------------------------------------
 if [ $1 -eq 1 ] ; then : # kernel is being installed or upgraded with base present
-    triggerin_weakmodules || :
+    triggerin_kernel || :
 fi
 # ---------------------------------------------------------------------------
-#triggerin base -- %{target_kernel}
+# triggerin_base() - When rpm trigger scripts are working properly (which is
+#   not often), this function is invoked when the base subpackage is being
+#   upgraded to the current EVR while a kernel is present.  This should always
+#   by the case for any base subpackage upgrade, so any actions required
+#   should have already been invoked by the base subpackage post upgrade
+#   scriptlet.
 # ---------------------------------------------------------------------------
-%endif
-
-%triggerin base -- %{name}-lib
-# ---------------------------------------------------------------------------
-# triggerin_initscripts() - The base and library subpackages are installed,
-#   attempt to start init scripts.
-triggerin_initscripts () {
+triggerin_base () { :
 }
 # ---------------------------------------------------------------------------
-# triggerin_base_lib() - The base sub-package is being installed while the lib
-#   sub-package is already installed or visa-versa.
-triggerin_base_lib () { :
-}
-# ---------------------------------------------------------------------------
-if [ $1 -ge 2 ] ; then : # base is being upgraded with lib present
-    # nothing to do, %pre and %post will do the work
-fi
-if [ $2 -ge 2 ] ; then : # lib is being upgraded with base present
-    # nothing to do, %pre and %post will do the work
-fi
-if [ $1 -eq 1 -a $2 -eq 1 ] ; then : # base or lib installed other present
-    triggerin_base_lib || :
+if [ $1 -ge 2 ] ; then : # base is being upgraded with kernels present
+    triggerin_base || :
 fi
 # ---------------------------------------------------------------------------
-
-%if %{HAVE_weakmods}
-%triggerin base -- %{kernel_package} %{kversrequire}
-# ---------------------------------------------------------------------------
-if [ -x %{_sbindir}/%{name}-modules ] ; then
-    %{_sbindir}/%{name}-modules -- -v --update-modules || :
-    # It is necessary to check whether this operation altered the module links
-    # for the running kernel.  If it did, and any of the modules that were
-    # altered are resident in the kernel, a restart message should be given.
-    # If modules were added that were not in the kernel before (particularly
-    # specfs and streams), consider starting the STREAMS subsystem if it is
-    # set to start on boot.  If modules were removed that are resident in the
-    # kernel (esp. specfs and streams), consider shutting down the STREAMS
-    # subsystem, or issuing a warning to that effect.  We can either have
-    # openss7-modules issue the appropriate warnings, or we can have it file
-    # some information in /var/run and then examine it after the run.
-else
-    echo "WARNING: %triggerin base -- %{kernel_package} ($1,$2) no update script" >&2
-fi
+#triggerin -p /bin/bash base -- %{target_kernel}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %endif
 
-%triggerun base -- %{name}-lib = %{epoch}:%{baseversion}-%{specrelease}
-# ---------------------------------------------------------------------------
-if [ $1 -eq 0 ] ; then : # base is being removed with lib present
-fi
-if [ $2 -eq 0 ] ; then : # lib is being removed with base present
-fi
-if [ $1 -ge 1 -a $2 -ge 1 ] ; then : # base or lib upgraded with other present
-fi
-# ---------------------------------------------------------------------------
-
-%preun base
-# ---------------------------------------------------------------------------
+%preun -p /bin/bash base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This is either a final removal of, or an upgrade from, this base subpackage.
 # ---------------------------------------------------------------------------
-#
 # preun_stop_scripts() - Before removing or upgrading a package, stop the init
 #   scripts.  This is fine for 2.4 module systems, but it is a little too
 #   disruptive for weak-module updates in the 2.6 module system.  Because this
 #   is too disruptive for weak-updated systems, we disable the debhelper
 #   scriplets and only stop init scripts when not performing weak updates, and
 #   even then, only when the updates are for the running kernel.
-#
+# ---------------------------------------------------------------------------
 preun_stop_scripts () {
     local reverse= list="%{initfiles}" i
     for i in $list ; do
@@ -3377,12 +3503,12 @@ preun_stop_scripts () {
     done
     return 0
 }
-#
+# ---------------------------------------------------------------------------
 # preun_kill_daemons() - Kill daemons with prejudice.  Stopping init scripts
 #   should have stopped these daemons already.  One situation is where init
 #   scripts have been removed already (or not fully installed) without stopping
 #   them.
-#
+# ---------------------------------------------------------------------------
 preun_kill_daemons () {
     local reverse= list="%{initfiles}" i n
     for i in $list ; do
@@ -3398,11 +3524,11 @@ preun_kill_daemons () {
 	fi
     done
 }
-#
+# ---------------------------------------------------------------------------
 # preun_umount_specfs() - Unmount the Special Shadow Filesystem, making device
 #  nodes in the /dev/streams directory no longer available.  Note that this
 #  should succeed even while kernel modules are loaded.
-#
+# ---------------------------------------------------------------------------
 preun_umount_specfs () {
     local retval=0 device mountpoint fstype options
     while read device mountpoint fstype options
@@ -3414,9 +3540,9 @@ preun_umount_specfs () {
     done </etc/mtab
     return $retval
 }
-#
+# ---------------------------------------------------------------------------
 # preun_rmnods() - Remove device nodes in the /dev directory.
-#
+# ---------------------------------------------------------------------------
 preun_rmnods () { :
 %if %{USE_rmnods}
     if [ -x "%{mknods}" ] ; then
@@ -3424,7 +3550,7 @@ preun_rmnods () { :
     fi
 %endif
 }
-#
+# ---------------------------------------------------------------------------
 # preun_kill_streams() - Uses lsof to determine which processes are holding
 #   opens STREAMS drivers and sends those processes a TERM signal followed five
 #   seconds later by a KILL signal if the process still exists.  This ensures
@@ -3434,7 +3560,7 @@ preun_rmnods () { :
 #   nodes no longer exist.  Note that this is not infalable: when STREAMS are
 #   permanently linked beneath a multiplexing driver, it may still be impossible
 #   to remove all STREAMS kernel modules.
-#
+# ---------------------------------------------------------------------------
 preun_kill_streams () {
     local fields ind val signal
     if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
@@ -3459,12 +3585,12 @@ preun_kill_streams () {
     lsof | grep '\<STR\>' >/dev/null 2>&1 && false || true
     return $?
 }
-#
+# ---------------------------------------------------------------------------
 # remove_depends() - A recursive function that peforms a depth first traversal
 #   of the dependency graph rooted at the kernel module supplied as an argument,
 #   removing modules that have no dependents.  This is so that entire kernel
 #   module stacks can be removed.
-#
+# ---------------------------------------------------------------------------
 remove_depends () {
     local modrex depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
@@ -3477,13 +3603,13 @@ remove_depends () {
     fi
     return 0
 }
-#
+# ---------------------------------------------------------------------------
 # preun_shutdown() - Shutdown the STREAMS subsystem with prejudice.  First
 #   attempt to shutdown using init scripts.  If that suceeds fully, all other
 #   steps reduce to null operations.  When it does not succeed, the other steps
 #   are largely what the initscripts would do shutting down anyway, but we can
 #   determine whether a reboot will be required.
-#
+# ---------------------------------------------------------------------------
 preun_shutdown () {
     local reboot='no'
     preun_stop_scripts      || :
@@ -3499,22 +3625,22 @@ preun_shutdown () {
     :
     return 0
 }
-#
+# ---------------------------------------------------------------------------
 # preun_running() - Shutdown STREAMS on the running kernel if the running
 #   kernel is the same as the version of the modules we are installing or
 #   upgrading.  If streams does not happen to be running on the running kernel,
 #   this reduces to a null operation.
-#
+# ---------------------------------------------------------------------------
 preun_running () {
     if [ "%_kversion" = "`uname -r`" ]; then
 	preun_shutdown || :
     fi
 }
-#
+# ---------------------------------------------------------------------------
 # preun_remove_scripts() - When removing the package, remove the symbolic
 #   links associated with the initscripts before the scripts themselves are
 #   removed.
-#
+# ---------------------------------------------------------------------------
 preun_remove_scripts () {
     local reverse= list="%{initfiles}" i
     for i in $list; do
@@ -3529,37 +3655,36 @@ preun_remove_scripts () {
         fi
     done
 }
-#
+# ---------------------------------------------------------------------------
 # preun_oldmods() - The -base sub-package is going away for good: remove our
 #   lines from the modules.conf file.  Note that %triggerun scriplets for each
 #   of the kernel module packages has already run if they were not already
 #   removed.  That scriptlet removed the corresponding modules.%base files.
-#
+# ---------------------------------------------------------------------------
 preun_oldmods () { :
 }
-#
+# ---------------------------------------------------------------------------
 # preun_preloads() -
-#
+# ---------------------------------------------------------------------------
 preun_preloads () { :
 }
-#
+# ---------------------------------------------------------------------------
 # preun_manrefs() - RPM might not know anything about the manrefs file because
 #   it was erroneously compressed and we uncompressed it.  Remove it in any
 #   case.
-#
+# ---------------------------------------------------------------------------
 preun_manrefs () {
     rm -f -- %{_mandir}/%{manrefs} || :
 }
-#
+# ---------------------------------------------------------------------------
 # preun_manmacros() - RPM might not know anything about the manmacros file
 #   because it was erroneously compressed and we uncompressed it.  Remove it
 #   in any case.
-#
+# ---------------------------------------------------------------------------
 preun_manmacros () {
     rm -f -- %{_mandir}/%{manmacros} || :
 }
 # ---------------------------------------------------------------------------
-#
 # preun_remove() - We are removing the base package for good.  Because all
 #   other packages depend on the base package, and the base package contains
 #   the initscripts, we preform all system-wide preun actions for removal
@@ -3571,7 +3696,7 @@ preun_manmacros () {
 #   Actions to perform before removing the base package are: Shut down the
 #   subsystems; remove our line from the modules.conf file; remove our
 #   preloads from the system-wide preloads files; unregister the init scripts.
-#
+# ---------------------------------------------------------------------------
 preun_remove () { :
 %if %{FILES_initscripts}
     preun_shutdown || :
@@ -3592,34 +3717,35 @@ preun_remove () { :
     preun_manmacros || :
 %endif
 }
-#
-# preun_upgrade() - There are not too many actions to perform here.  On
-#   upgrade %pre and %post have already run and the new package's files have
-#   overwritten the old ones.  The new package's %pre or %post should have
-#   addressed any lingering old version files.
-#
-preun_upgrade () { :
-}
 # ---------------------------------------------------------------------------
 if [ $1 -eq 0 ] ; then : # final removal
     preun_remove || :
 fi
+# ---------------------------------------------------------------------------
+# preun_upgrade() - There are not too many actions to perform here.  On
+#   upgrade %pre and %post have already run and the new package's files have
+#   overwritten the old ones.  The new package's %pre or %post should have
+#   addressed any lingering old version files.
+# ---------------------------------------------------------------------------
+preun_upgrade () { :
+}
+# ---------------------------------------------------------------------------
 if [ $1 -ge 1 ] ; then : # upgrade
     preun_upgrade || :
 fi
 # ---------------------------------------------------------------------------
-#preun base
-# ---------------------------------------------------------------------------
+#preun -p /bin/bash base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%postun base
-# ---------------------------------------------------------------------------
+%postun -p /bin/bash base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %if %{FILES_preloads}
-#
+# ---------------------------------------------------------------------------
 # postun_preloads() - When removing for good, make sure that the preload
 #   modules are no longer included in the preloads file for 2.4 module
 #   systems.  Note that removing lines from the /etc/modules-@kversion@ file
 #   is the repsonibility of the -kernel subpackage.
-#
+# ---------------------------------------------------------------------------
 postun_preloads () {
     local prel_old prel_tmp prel_new included modules m
     for prel_old in %_sysconfdir/modules %_sysconfdir/modprobe.preload; do
@@ -3648,14 +3774,14 @@ postun_preloads () {
 }
 %endif
 %if %{FILES_oldmods}
-#
+# ---------------------------------------------------------------------------
 # postun_oldmods() - As the sub-package is being purged, remove the line from
 #   the modules.conf file that points at the /etc/modutils/%name file that
 #   in turn includes the /lib/modules/%_kversion/modules.openss7 file when it
 #   exists.  Note that the files themselves referenced from the modules.conf
 #   files are removed as a normal part of the course of removing the files in
 #   the -kernel sub-packages.
-#
+# ---------------------------------------------------------------------------
 postun_oldmods () {
     local conf_old=%_sysconfdir/modules.conf conf_tmp conf_new
     if [ -f $conf_old ]; then
@@ -3673,11 +3799,11 @@ postun_oldmods () {
 }
 %endif
 %if %{FILES_manpages}
-#
+# ---------------------------------------------------------------------------
 # postun_manpages() - Update the manual pages aprospros database.  This is
 #   quite a lengthly process.  If it is not performed, most systems will
 #   update on cron job anyway.
-#
+# ---------------------------------------------------------------------------
 postun_manpages () {
     if [ -x "`which makewhatis 2>/dev/null`" ]; then
         LANGUAGE= LANG= makewhatis -u %{_mandir} || :
@@ -3688,12 +3814,11 @@ postun_manpages () {
 }
 %endif
 # ---------------------------------------------------------------------------
-#
 # postun_remove() - This is the final removal of the base package.  Due to
 #   dependencies this means that all sub-packages will be removed with the
 #   exception of the -repo subpackage.  Perform removal actions that cannot be
 #   discerned by rpm because they involve scripting.
-#
+# ---------------------------------------------------------------------------
 postun_remove () { :
 %if %{FILES_preloads}
     postun_preloads
@@ -3705,62 +3830,34 @@ postun_remove () { :
     postun_manpages || :
 %endif
 }
-#
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ]; then : # final removal
+    postun_remove || :
+fi
+# ---------------------------------------------------------------------------
 # postun_upgrade() - This is the removal of the remnants of the old base
 #   package on upgrade.  Perform whatever actions need to be performed only
 #   after the remnants have been removed.  This consists solely of rebuilding
 #   the aprospros database so that any manual pages removed from the old
 #   package are removed from the apropros list and the caches are updated
 #   appropriately with the new files.
-#
+# ---------------------------------------------------------------------------
 postun_upgrade () { :
 %if %{FILES_manpages}
     postun_manpages || :
 %endif
 }
 # ---------------------------------------------------------------------------
-if [ $1 -eq 0 ]; then : # final removal
-    postun_remove || :
-fi
 if [ $1 -ge 1 ]; then : # upgrade
     postun_upgrade || :
 fi
 # ---------------------------------------------------------------------------
-#postun base
-# ---------------------------------------------------------------------------
-
-%triggerpostun base -- %{name}-lib = %{epoch}:%{baseversion}-%{specrelease}
-# ---------------------------------------------------------------------------
-if [ $2 -eq 0 ] ; then : # lib was removed with base present
-fi
-if [ $2 -ge 1 ] ; then : # lib or base upgraded with other present
-fi
-# ---------------------------------------------------------------------------
+#postun -p /bin/bash base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %if %{HAVE_weakmods}
-%triggerpostun base -- %{kernel_package} %{kversrequire}
-# ---------------------------------------------------------------------------
-if [ -x %{_sbindir}/%{name}-modules ] ; then
-    %{_sbindir}/%{name}-modules -- -v --update-modules || :
-    # It is necessary to check whether this operation altered the module links
-    # for the running kernel.  If it did, and any of the modules that were
-    # altered are resident in the kernel, a restart message should be given.
-    # If modules were added that were not in the kernel before (particularly
-    # specfs and streams), consider starting the STREAMS subsystem if it is
-    # set to start on boot.  If modules were removed that are resident in the
-    # kernel (esp. specfs and streams), consider shutting down the STREAMS
-    # subsystem, or issuing a warning to that effect.  We can either have
-    # openss7-modules issue the appropriate warnings, or we can have it file
-    # some information in /var/run and then examine it after the run.
-else
-    echo "WARNING: %triggerpostun base -- %{kernel_package} ($1,$2) no update script" >&2
-fi
-%endif
-
-
-%if %{HAVE_weakmods}
-%triggerpostun base -- %{target_kernel}
-# ---------------------------------------------------------------------------
+%triggerpostun -p /bin/bash base -- %{target_kernel}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This trigger results from the removal or upgrade of a kernel.  Note that the
 # kernel removal or upgrade is complete.  This never runs when the base
 # package is removed.  Unfortunately, rpm does not tell us what version of the
@@ -3772,8 +3869,8 @@ if [ -x %_sbindir/openss7-modules ]; then
     %_sbindir/openss7-modules -- -q -e --update-kernels || :
 fi
 # ---------------------------------------------------------------------------
-#triggerpostun base -- %{target_kernel}
-# ---------------------------------------------------------------------------
+#triggerpostun -p /bin/bash base -- %{target_kernel}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %endif
 
 %if %{PACKAGE_base}
@@ -3880,12 +3977,59 @@ protocol suites contained in the %{name} package.  This package is
 massive and is not normally necessary except on a development system.
 %{descriptail}
 
-%post doc
-# ---------------------------------------------------------------------------
-if [ $1 = 1 ] ; then : # fresh install
 %if %{FILES_infofiles}
+%pre -p /bin/bash doc
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ---------------------------------------------------------------------------
+# pre_infofiles() - On an upgrade, remove our info files from the info directory
+#   because the old package's directory entries might not be usable.  Also, post
+#   is going to reinstall our infofiles on upgrade regardless.  Note that older
+#   rpm versions do not compress info files.
+# ---------------------------------------------------------------------------
+pre_infofiles () {
     if [ -x /sbin/install-info ] ; then
-        # Older rpm versions do not compress info files.
+        for n in %{manuals} ; do
+            if [ -f %{_infodir}/$n.info ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info || :
+            elif [ -f %{_infodir}/$n.info.gz ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz || :
+            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
+                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2 || :
+            fi
+        done
+    fi
+}
+# ---------------------------------------------------------------------------
+# pre_doc() - On fresh installation or upgrade, remove our info files from
+#   the info directory because the old package's (maybe non-rpm package)
+#   directory entries might not be usable and install-info hates double
+#   installed directory entries.
+# ---------------------------------------------------------------------------
+pre_doc () { :
+    pre_infofiles || :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ]; then : # fresh install
+    pre_doc || :
+fi
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ]; then : # upgrade
+    pre_doc || :
+fi
+# ---------------------------------------------------------------------------
+#pre -p /bin/bash doc
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%endif
+
+%post -p /bin/bash doc
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%if %{FILES_infofiles}
+# ---------------------------------------------------------------------------
+# post_infofiles() - On a fresh installation of info files, add each info file
+#   to the directory.  Note that older rpm versions do not compress info files.
+# ---------------------------------------------------------------------------
+post_infofiles () { :
+    if [ -x /sbin/install-info ] ; then
         for n in %{manuals} ; do
             if [ -f %{_infodir}/$n.info ] ; then
                 /sbin/install-info --info-dir=%{_infodir} %{_infodir}/$n.info || :
@@ -3896,23 +4040,59 @@ if [ $1 = 1 ] ; then : # fresh install
             fi
         done
     fi
+}
 %endif
-#if %{FILES_manpages}
-#   if which makewhatis >/dev/null 2>&1 ; then
-#       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
-#   fi
-#   if which mandb >/dev/null 2>&1 ; then
-#       LANGUAGE= LANG= mandb -p %{_mandir} || :
-#   fi
-#endif
-fi
-
-%preun doc
+if %{FILES_manpages}
 # ---------------------------------------------------------------------------
-if [ $1 = 0 ] ; then : # final removal
+# post_manpages() - On a fresh installation of manual pages, update the
+#   aprospros database.  Note that this takes forever, and even when not
+#   updated, a cron job will normally updated the aprospros database on a
+#   nightly basis.  So, it is strapped out for now.
+# ---------------------------------------------------------------------------
+post_manpages () { :; return
+   if [ -x "`which makewhatis 2>/dev/null`" ] ; then
+       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+   fi
+   if [ -x "`which mandb      2>/dev/null`" ] ; then
+       LANGUAGE= LANG= mandb      -p %{_mandir} || :
+   fi
+}
+%endif
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+post_install () { :
 %if %{FILES_infofiles}
+    post_infofiles || :
+%endif
+%if %{FILES_manpages}
+    post_manpages || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    post_install || :
+fi
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+post_upgrade () { :
+%if %{FILES_infofiles}
+    post_infofiles || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # upgrade
+    post_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#post -p /bin/bash doc
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%preun -p /bin/bash doc
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ---------------------------------------------------------------------------
+%if %{FILES_infofiles}
+preun_infofiles () { :
     if [ -x /sbin/install-info ] ; then
-        # Older rpm versions do not compress info files.
         for n in %{manuals} ; do
             if [ -f %{_infodir}/$n.info ] ; then
                 /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info || :
@@ -3923,37 +4103,76 @@ if [ $1 = 0 ] ; then : # final removal
             fi
         done
     fi
+}
 %endif
-fi
-if [ $1 = 1 ] ; then : # upgrade
-%if %{FILES_infofiles}
-    if [ -x /sbin/install-info ] ; then
-        # Older rpm versions do not compress info files.
-        for n in %{manuals} ; do
-            if [ -f %{_infodir}/$n.info ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info || :
-            elif [ -f %{_infodir}/$n.info.gz ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.gz || :
-            elif [ -f %{_infodir}/$n.info.bz2 ] ; then
-                /sbin/install-info --delete --info-dir=%{_infodir} %{_infodir}/$n.info.bz2 || :
-            fi
-        done
-    fi
-%endif
-fi
-
-%postun doc
 # ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
-#if %{FILES_manpages}
-#   if which makewhatis >/dev/null 2>&1 ; then
-#       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
-#   fi
-#   if which mandb >/dev/null 2>&1 ; then
-#       LANGUAGE= LANG= mandb %{_mandir} || :
-#   fi
-#endif
+# preun_remove() - When removing the doc package altogether, ensure that the
+#   info file directory entries are removed before the info files themselves are
+#   removed.
+# ---------------------------------------------------------------------------
+preun_remove () { :
+%if %{FILES_infofiles}
+    preun_infofiles || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # final removal
+    preun_remove || :
 fi
+# ---------------------------------------------------------------------------
+# preun_upgrade() - On an upgrade, the new version's %post procedure has already
+#   removed our info files from the directory and replace them with its own.
+#   There is nothing to do here.
+# ---------------------------------------------------------------------------
+preun_upgrade () { :
+    # do nothing
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ] ; then : # upgrade
+    preun_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#preun -p /bin/bash doc
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%postun -p /bin/bash doc
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ---------------------------------------------------------------------------
+# postun_manpages() - On complete removal or upgrade, rebuild the aprospros
+#   database.  This is performed after upgrade because the only way to remove
+#   entries from the database is to rebuild it after the entries have already
+#   been removed.
+# ---------------------------------------------------------------------------
+if %{FILES_manpages}
+postun_manpages () { :
+   if [ "`which makewhatis 2>/dev/null`" ] ; then
+       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+   fi
+   if [ "`which mandb      2>/dev/null`" ] ; then
+       LANGUAGE= LANG= mandb         %{_mandir} || :
+   fi
+}
+endif
+# ---------------------------------------------------------------------------
+# postun_doc() - On final removal or upgrade, perform the same action which is
+#   to rebuild the aprospros database without the entries from this package.
+# ---------------------------------------------------------------------------
+postun_doc () { :
+%if %{FILES_manpages}
+    postun_manpages || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ]; then : # final removal
+    postun_doc || :
+fi
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ]; then : # upgrade
+    postun_doc || :
+fi
+# ---------------------------------------------------------------------------
+#postun -p /bin/bash doc
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %if %{PACKAGE_doc}
 %files doc
@@ -4039,8 +4258,11 @@ Prefix:             %{_localedir}
 %endif
 
 Requires(pre):      /sbin/ldconfig
+Requires(pre):      /usr/bin/libtool
 Requires(post):     /sbin/ldconfig
+Requires(post):     /usr/bin/libtool
 Requires(postun):   /sbin/ldconfig
+Requires(postun):   /usr/bin/libtool
 Requires(post):     %(which tclsh)
 
 # these libraries need some kernel modules to be useful
@@ -4067,7 +4289,8 @@ running the validation test suites contained in the %{name} binary
 package.
 %{descriptail}
 
-%pre lib
+%pre -p /bin/bash lib
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ---------------------------------------------------------------------------
 # This is an initial installation or upgrade of the lib subpackage.  On fresh
 # install, we need to check for legacy and non-rpm installations on the host
@@ -4076,13 +4299,13 @@ package.
 # install.
 # ---------------------------------------------------------------------------
 %if %{FILES_libraries}
-#
+# ---------------------------------------------------------------------------
 # pre_libraries() - On a fresh installation, look for an remove any non-rpm or
 #   old tarball release libraries.  On reinstallations this step can (and
 #   should) be skipped.  Unfortunately, non-autoconf releases of LiS placed
 #   libraries all over the place.  On an initial installation, this checks for
 #   other libraries with the same name and deletes them.
-#
+# ---------------------------------------------------------------------------
 pre_libraries () {
     local libraries="%{libraries}" old_libs
     for lib in $libraries ; do
@@ -4095,11 +4318,11 @@ pre_libraries () {
 }
 %endif
 %if %{FILES_tools}
-#
+# ---------------------------------------------------------------------------
 # pre_tools() - On a fresh installation, look for and remove any non-deb or old
 #   tarball release tools.  On reinstallations this step can (and should) be
 #   skipped.
-#
+# ---------------------------------------------------------------------------
 pre_tools () {
     local tool location tools="%{tools}"
     for tool in $tools ; do
@@ -4112,6 +4335,8 @@ pre_tools () {
     done
 }
 %endif
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 pre_install () { :
 %if %{FILES_libraries}
     pre_libraries || :
@@ -4120,17 +4345,24 @@ pre_install () { :
     pre_tools || :
 %endif
 }
-pre_upgrade () { :
-}
+# ---------------------------------------------------------------------------
 if [ ":$1" = :1 ] ; then : # fresh install
     pre_install || :
 fi
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+pre_upgrade () { :
+}
+# ---------------------------------------------------------------------------
 if [ ":$1" = :2 ] ; then : # upgrade
     pre_upgrade || :
 fi
-
-%post lib
 # ---------------------------------------------------------------------------
+#pre -p /bin/bash lib
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%post -p /bin/bash lib
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ---------------------------------------------------------------------------
 %if %{FILES_libraries}
 #
@@ -4138,9 +4370,15 @@ fi
 #   cache files.
 #
 post_libraries () { :
-    if [ -x "`which ldconfig 2>/dev/null`" ]; then
-        ldconfig || :
+    if [ -x "`which libtool 2>/dev/null`"]; then
+        libtool --mode=finish %{_libdir} || :
+        return 0
     fi
+    if [ -x /sbin/ldconfig ]; then
+        ldconfig -n %{_libdir} || :
+        return 0
+    fi
+    return 1
 }
 %endif
 %if %{FILES_netconfig}
@@ -4350,11 +4588,11 @@ post_initscripts () {
     done
 }
 %endif
-#
+# ---------------------------------------------------------------------------
 # post_install() - When a fresh installation of the library package is
 #   performed, add the database and index entries associated with the
 #   installed components.
-#
+# ---------------------------------------------------------------------------
 post_install () { :
 %if %{FILES_libraries}
     post_libraries || :
@@ -4378,132 +4616,200 @@ post_install () { :
     post_initscripts || :
 %endif
 }
-#
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    post_install || :
+fi
+# ---------------------------------------------------------------------------
 # post_upgrade() - When upgrading, the new package post scripts must consider
 #   that there may be old version files which are yet to be removed from the
 #   core that were not overwritten by the new version files.  When the file
 #   lists match and all old version files are overwritten by the new version,
 #   similar actions to those performed on fresh installation can be used for
 #   upgrade as well.
-#
+# ---------------------------------------------------------------------------
 post_upgrade () { :
 %if %{HAVE_initscripts}
     post_initscripts || :
 %endif
 }
 # ---------------------------------------------------------------------------
-if [ $1 -eq 1 ] ; then : # fresh install
-    post_install || :
-fi
 if [ $1 -eq 2 ] ; then : # upgrade
     post_upgrade || :
 fi
 # ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
-%if %{FILES_libraries}
-    # After a fresh install or upgrade, do a load config.
-    /sbin/ldconfig
-%endif
-%if %{FILES_tcllibs}
-    # After a fresh install, create package index files
-    for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
-        echo -e "pkg_mkIndex $d\\nexit" | tclsh
-    done
-%endif
-%if %{HAVE_initscripts}
-    # Start init scripts when they have already been installed.
-    r=`runlevel | sed -e 's|.*[[:space:]]||'`
-    list="%{initfiles}" ; for i in $list ; do
-        if [ -f %_initrddir/$i ] ; then
-            if [ -L %_initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
-                 -L %_initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
-                 /sbin/service $i start >/dev/null 2>&1 || %_initrddir/$i start >/dev/null 2>&1 || :
-            fi
-        fi
-    done
-%endif
-fi
+#post -p /bin/bash lib
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%triggerin lib -- %{name}-base
-# ---------------------------------------------------------------------------
-# triggerin_lib_base() - The base sub-package is being installed while the lib
-#   sub-package is already installed or visa-versa.
-triggerin_lib_base () { :
+%triggerin -p /bin/bash lib -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# triggerin_lib() - When rpm trigger scripts are working properly (which is
+#   not often), this function will be invoked when the lib subpackage is being
+#   upgraded to the current EVR while the base subpackage of the same EVR is
+#   present.
+#   ---------------------------------------------------------------------------
+triggerin_lib () { :
 }
 # ---------------------------------------------------------------------------
 if [ $1 -ge 2 ] ; then : # lib is being upgraded with base present
     # nothing to do, %pre and %post will do the work
 fi
+# ---------------------------------------------------------------------------
+# triggerin_base() - When rpm trigger scripts are working properly (which is
+#   not often), this function will be invoked when the base subpackage is
+#   being upgraded to the current EVR while the lib subpackage of the same EVR
+#   is present.
+# ---------------------------------------------------------------------------
+triggerin_base () { :
+}
+# ---------------------------------------------------------------------------
 if [ $2 -ge 2 ] ; then : # base is being upgraded with lib present
     # nothing to do, %pre and %post will do the work
 fi
+# ---------------------------------------------------------------------------
+# triggerin_lib_base() - The base subpackage of the current EVR is being
+#   installed while the lib subpackage of the same EVR is already installed or
+#   vise versa.
+# ---------------------------------------------------------------------------
+triggerin_lib_base () { :
+}
+# ---------------------------------------------------------------------------
 if [ $1 -eq 1 -a $2 -eq 1 ] ; then : # lib or base installed while other present
     triggerin_lib_base || :
 fi
 # ---------------------------------------------------------------------------
+#triggerin -p /bin/bash lib -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%triggerun lib -- %{name}-base
+%triggerun -p /bin/bash lib -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# triggerun_lib() - When rpm trigger scripts are working properly (which is
+#   not often), this function is invoked when the lib subpackage is about to
+#   be removed altogether while the base subpackage of the same (current) EVR
+#   is present.
+# ---------------------------------------------------------------------------
+triggerun_lib () { :
+}
 # ---------------------------------------------------------------------------
 if [ $1 -eq 0 ] ; then : # lib is being removed with base present
-fi
-if [ $2 -eq 0 ] ; then : # base is being removed with lib present
-fi
-if [ $1 -ge 1 -a $2 -ge 1 ] ; then : # lib or base upgraded with other present
+    triggerun_lib || :
 fi
 # ---------------------------------------------------------------------------
-
-%preun lib
+# triggerun_base() - When rpm trigger scripts are working properly (which is
+#   not often), this function is invoked when the base subpackage is about to
+#   be removed altogether while the lib subpackage of the same (current) EVR
+#   is present.
 # ---------------------------------------------------------------------------
-# ---------------------------------------------------------------------------
-remove_depends() {
-    local modrex depend depends
-    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
-    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
-    for depend in $depends ; do
-        remove_depends $depend || return $?
-    done
-    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
-        rmmod $1 >/dev/null 2>&1 || return $?
-    fi
-    return 0
+triggerun_base () { :
 }
-if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
-%if %{HAVE_initscripts}
-    # Stop init scripts when they are still hanging around.
-    reverse=
-    list="%{initfiles}" ; for i in $list ; do
+# ---------------------------------------------------------------------------
+if [ $2 -eq 0 ] ; then : # base is being removed with lib present
+    triggerun_base || :
+fi
+# ---------------------------------------------------------------------------
+# triggerun_upgrade() - When rpm trigger scripts are working properly (which
+#   is not often), this function is invoked when the base subpackage is about
+#   to be upgraded to the current EVR while the lib subpackage is present; or,
+#   the lib subpackage is about to be upgraded to the current EVR while the
+#   base subpackage (of the same EVR) is present.
+# ---------------------------------------------------------------------------
+triggerun_upgrade () { :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 -a $2 -ge 1 ] ; then : # lib or base upgraded with other present
+    triggerun_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#triggerun -p /bin/bash lib -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%preun -p /bin/bash lib
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# preun_stop_scripts() - Stop init scripts when they are hanging around.  Note
+#   that when the init scripts are already stopped, this has no (negative)
+#   effect.  Note that our previous practice of stopping init scripts when
+#   removing or upgrading modules is questionable and possibly too disruptive
+#   to a running system.  Instead of stopping scripts, the user should be
+#   warned that restarting the subsystem might be required.  Under debian we
+#   can use debconf for this purpose too.
+# ---------------------------------------------------------------------------
+preun_stop_scripts () {
+    local reverse= list="%{initfiles}" i tried=1
+    for i in $list; do
         reverse="$i${reverse:+ }$reverse"
     done
-    for i in $reverse ; do
-        if [ -f %_initrddir/$i ] ; then
-            /sbin/service $i stop >/dev/null 2>&1 || %_initrddir/$i stop >/dev/null 2>&1 || :
+    for i in $reverse; do
+        if [ -f %_initrddir/$i ]; then tried=0
+	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || :
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || :
+	    [ -x "%_initrddir/$i"                  ] && %_initrddir/$i stop && continue || :
         fi
     done
-%endif
-    # do it with extreme prejudice in case init scripts have been removed
-    reboot='no'
-    if [ -r /var/run/strace.pid ] ; then
-        kill -TERM `cat /var/run/strace.pid` || :
-        rm -f /var/run/strace.pid
-        rm -f /var/lock/subsys/strace
-        rm -f /var/lock/subsys/strace.init
-    fi
-    if [ -r /var/run/strerr.pid ] ; then
-        kill -TERM `cat /var/run/strerr.pid` || :
-        rm -f /var/run/strerr.pid
-        rm -f /var/lock/subsys/strerr
-        rm -f /var/lock/subsys/strerr.init
-    fi
-    umount -a -t specfs || reboot='yes'
+    return $tried
+}
+# ---------------------------------------------------------------------------
+# preun_kill_daemons() - Kill daemons with prejudice.  Stopping init scripts
+#   should have stopped these daemons already.  One situation is where init
+#   scripts have been removed already (or not fully installed) without
+#   stopping them.
+# ---------------------------------------------------------------------------
+preun_kill_daemons () {
+    local reverse= list="%{initfiles}" i n
+    for i in $list; do
+        reverse="$i${reverse:+ }$reverse"
+    done
+    for i in $reverse; do
+        n=`echo "$i" | sed -e 's,\.sh$,,'`
+        [ -r /var/run/$n.pid ] || continue
+        kill -TERM `cat /var/run/$n.pid` || :
+        rm -f -- /var/run/$n.pid || :
+        rm -f -- /var/lock/subsys/$n || :
+        rm -f -- /var/lock/subsys/$n.init || :
+    done
+}
+# ---------------------------------------------------------------------------
+# preun_umount_specfs() - Unmount the Special Shadow Filesystem, making device
+#   nodes in the /dev/streams directory no longer available.  Note that this
+#   should succeed even while kernel modules are loaded.
+# ---------------------------------------------------------------------------
+preun_umount_specfs () {
+    local retval=0 device mountpoint fstype options
+    while read device mountpoint fstype options
+    do
+	if [ ":$fstype" = ":specfs" ]
+	then
+	    umount -t specfs -- $mountpoint || retval=$?
+	fi
+    done </etc/mtab
+    return $retval
+}
+# ---------------------------------------------------------------------------
+# preun_rmnods() - Remove device nodes in the /dev directory.
+# ---------------------------------------------------------------------------
+preun_rmnods () { :
 %if %{USE_rmnods}
     if [ -x "%{mknods}" ] ; then
         %{rmnods}
     fi
 %endif
+}
+# ---------------------------------------------------------------------------
+# preun_kill_streams() - Uses lsof to determine which processes are holding
+#   opens STREAMS drivers and sends those processes a TERM signal followed
+#   five seconds later by a KILL signal if the process still exists.  This
+#   ensures that all STREAMS drivers are closed.  When the specfs is unmounted
+#   and STREAMS devices removed before this operation is performed, killed
+#   processes that respawn will be unable to reopen the STREAMS drivers
+#   because the device nodes no longer exist.  Note that this is not
+#   infalable: when STREAMS are permanently linked beneath a multiplexing
+#   driver, it may still be impossible to remove all STREAMS kernel modules.
+# ---------------------------------------------------------------------------
+preun_kill_streams () {
+    local fields ind val signal
     if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
-        if [ -x %{_sbindir}/fdetach ] ; then
-            %{_sbindir}/fdetach -a 2>/dev/null || :
-        fi
+	if [ -x "`which fdetach 2>/dev/null`" ] ; then
+	    fdetach -a 2>/dev/null || :
+	fi
         for signal in TERM KILL ; do
             if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
                 lsof | grep '\<STR\>' | \
@@ -4519,32 +4825,125 @@ if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
             fi
         done
     fi
-    lsof | grep '\<STR\>' >/dev/null 2>&1 && reboot='yes'
+    lsof | grep '\<STR\>' >/dev/null 2>&1 && false || true
+    return $?
+}
+# ---------------------------------------------------------------------------
+# remove_depends() - A recursive function that peforms a depth first traversal
+#   of the dependency graph rooted at the kernel module supplied as an argument,
+#   removing modules that have no dependents.  This is so that entire kernel
+#   module stacks can be removed.
+# ---------------------------------------------------------------------------
+remove_depends() {
+    local modrex depend depends
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    depends=`grep "^$modrex[[:space:]]" /proc/modules 2>/dev/null | cut -f4 '-d ' | sed -e 's|^-$||;s|,$||;s|,| |g'`
+    for depend in $depends ; do
+        remove_depends $depend || return $?
+    done
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+        rmmod $1 >/dev/null 2>&1 || return $?
+    fi
+    return 0
+}
+# ---------------------------------------------------------------------------
+# preun_shutdown() - Shutdown the STREAMS subsystem with prejudice.  First
+#   attempt to shutdown using init scripts.  If that suceeds fully, all other
+#   steps reduce to null operations.  When it does not succeed, the other steps
+#   are largely what the initscripts would do shutting down anyway, but we can
+#   determine whether a reboot will be required.
+# ---------------------------------------------------------------------------
+preun_shutdown () {
+    local reboot='no'
+    preun_stop_scripts      || :
+    preun_kill_daemons      || :
+    preun_umount_specfs     || reboot='yes'
+    preun_rmnods	    || :
+    preun_kill_streams      || reboot='yes'
+    remove_depends streams  || reboot='yes'
+    remove_depends specfs   || reboot='yes'
+    if [ ":$reboot" = ':yes' ] ; then
+	echo "warning: reboot required." >&2
+    fi
+    :
+    return 0
+}
+# ---------------------------------------------------------------------------
+# preun_running() - Shutdown STREAMS on the running kernel if the running
+#   kernel is the same as the version of the modules we are installing or
+#   upgrading.  If streams does not happen to be running on the running
+#   kernel, this reduces to a null operation.
+# ---------------------------------------------------------------------------
+preun_running () {
+    if [ "%_kversion" = "`uname -r`" ]; then
+	preun_shutdown || :
+    fi
+}
+# ---------------------------------------------------------------------------
+if [ $1 = 0 -o $1 = 1 ] ; then # final removal or upgrade
+%if %{HAVE_initscripts}
+    preun_stop_scripts || :
+%endif
+    # do it with extreme prejudice in case init scripts have been removed
+    reboot='no'
+    preun_kill_daemons || :
+    preun_umount_specfs || reboot='yes'
+    preun_rmnods || :
+    preun_kill_streams || reboot='yes'
     remove_depends streams || reboot='yes'
     remove_depends specfs  || reboot='yes'
     [ ":$reboot" != ':yes' ] || echo "Reboot required." >&2
 fi
-
-%postun lib
 # ---------------------------------------------------------------------------
+# preun_remove() - The library subpackage is about to be removed for good.
+# ---------------------------------------------------------------------------
+preun_remove () { :
+    pre_running || :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # final removal
+    preun_remove || :
+fi
+# ---------------------------------------------------------------------------
+# preun_upgrade() - The library subpackage is about to be upgraded from the
+#   old version.
+# ---------------------------------------------------------------------------
+preun_upgrade () { :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ] ; then : # upgrade
+    preun_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#preun -p /bin/bash lib
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%postun -p /bin/bash lib
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ---------------------------------------------------------------------------
 %if %{FILES_libraries}
-#
+# ---------------------------------------------------------------------------
 # postun_libraries() - On final removal of any shared object libraries,
 #   perform a ldconfig to update the linker-loader cache.
-#
+# ---------------------------------------------------------------------------
 postun_libraries () { :
-    if [ -x "`which ldconfig 2>/dev/null`" ]; then
-        ldconfig || :
+    if [ -x "`which libtool 2>/dev/null`" ]; then
+        libtool --mode=finish %{_libdir} || :
+        return 0
     fi
+    if [ -x /sbin/ldconfig ]; then
+        /sbin/ldconfig -n %{_libdir} || :
+        return 0
+    fi
+    return 1
 }
 %endif
 %if %{FILES_netconfig}
-#
+# ---------------------------------------------------------------------------
 # postun_netconfig() - On final removal of xnsl libraries, rebuild the
 #   netconfig database, most likely removing the entire associated
 #   directories.
-#
+# ---------------------------------------------------------------------------
 postun_netconfig () { :
     netc_fil="%_sysconfdir/netconfig"
     netc_alt="%_sysconfdir/netconfig.xnsl"
@@ -4599,11 +4998,11 @@ postun_netconfig () { :
 }
 %endif
 %if %{FILES_snmpconf}
-#
+# ---------------------------------------------------------------------------
 # postun_sock2path() - On final removal of socket libraries, rebuild the
 #   sock2path database, most likely removing the entire associated
 #   directories.
-#
+# ---------------------------------------------------------------------------
 postun_sock2path () { :
     s2pa_fil="%_sysconfdir/sock2path"
     s2pa_dir="%_sysconfdir/sock2path.d"
@@ -4634,11 +5033,11 @@ postun_sock2path () { :
 }
 %endif
 %if %{FILES_snmpconf}
-#
+# ---------------------------------------------------------------------------
 # postun_snmpconf() - On final removal of SNMP modules, rebuild the snmp
 #   configuration database, most likely removing the entire associated
 #   directories.
-#
+# ---------------------------------------------------------------------------
 postun_snmpconf () { :
     snmp_fil="%_snmpconfdir/snmpd.local.conf"
     snmp_dir="%_snmpconfdir/snmp.d"
@@ -4698,18 +5097,22 @@ postun_snmpconf () { :
     fi
 }
 %if %{FILES_perlmods}
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 postun_perlmods () { :
 }
 %endif
 %if %{FILES_tcllibs}
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
 postun_tcllibs () { :
 }
 %endif
-#
+# ---------------------------------------------------------------------------
 # postun_remove() - When a final removal of the library package is performed,
 #   remove the database and index entries associated with the removed
 #   components.
-#
+# ---------------------------------------------------------------------------
 postun_remove () { :
 %if %{FILES_libraries}
     postun_libraries || :
@@ -4730,7 +5133,11 @@ postun_remove () { :
     postun_tcllibs   || :
 %endif
 }
-#
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # complete removal
+    postun_remove
+fi
+# ---------------------------------------------------------------------------
 # postun_upgrade() - RPM runs upgrade scripts in the order: %pretrans, %pre,
 #   %post, %triggerin, %triggerun, %preun, %postun, triggerpostun, %posttrans;
 #   therefore, on upgrade the %preun and %postun scripts should not perform
@@ -4741,25 +5148,42 @@ postun_remove () { :
 #   the old package.  Therefore, this %postun only peforms actions on removal
 #   and then only the actions that are required after the removed package
 #   files have been removed.
-#
+# ---------------------------------------------------------------------------
 postun_upgrade () { :
 }
 # ---------------------------------------------------------------------------
-if [ $1 -eq 0 ] ; then : # complete removal
-    postun_remove
-fi
 if [ $1 -ge 1 ] ; then : # upgrade
     postun_upgrade
 fi
 # ---------------------------------------------------------------------------
+#postun -p /bin/bash lib
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%triggerpostun lib -- %{name}-base
+%triggerpostun -p /bin/bash lib -- %{name}-base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# ---------------------------------------------------------------------------
+# triggerpostun_remove() - The base package has been removed while the lib
+#   package is installed.
+# ---------------------------------------------------------------------------
+triggerpostun_remove () { :
+}
 # ---------------------------------------------------------------------------
 if [ $2 -eq 0 ] ; then : # base removed while lib present
-fi
-if [ $2 -eq 1 ] ; then : # base or lib upgraded with other present
+    triggerpostun_remove || :
 fi
 # ---------------------------------------------------------------------------
+# triggerpostun_base() - The base package has been upgraded while the lib
+#   package is installed.
+# ---------------------------------------------------------------------------
+triggerpostun_base () { :
+}
+# ---------------------------------------------------------------------------
+if [ $2 -eq 1 ] ; then : # base or lib upgraded with other present
+    triggerpostun_base || :
+fi
+# ---------------------------------------------------------------------------
+#triggerpostun -p /bin/bash lib -- %{name}-base
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %if %{PACKAGE_lib}
 %files lib
@@ -4841,23 +5265,93 @@ developed for %{title}.  Also included are 32-bit test utilities for the
 32-bit validation test suites contained in the %{name} binary package.
 %{descriptail}
 
-%post compat
+%post -p /bin/bash compat
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
 %if %{FILES_lib32compat}
-    # After a fresh install or upgrade, do a load config.
-    /sbin/ldconfig
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+post_lib32compat () {
+    if [ -x "`which libtool 2>/dev/null`" ]; then
+        libtool --mode=finish %{_lib32dir} || :
+        return 0
+    fi
+    if [ -x /sbin/ldconfig ]; then
+        /sbin/ldconfig -n %{_lib32dir}
+        return 0
+    fi
+    return 1
+}
 %endif
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+post_install () { :
+%if %{FILES_lib32compat}
+    post_lib32compat || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    post_install || :
 fi
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+post_upgrade () { :
+%if %{FILES_lib32compat}
+    post_lib32compat || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # upgrade
+    post_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#post -p /bin/bash compat
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-%postun compat
+%postun -p /bin/bash compat
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # ---------------------------------------------------------------------------
 %if %{FILES_lib32compat}
-if [ $1 = 0 -o $1 = 1 ] ; then
-    # Whether complete removal or upgrade, do a load config.
-    /sbin/ldconfig
-fi
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+postun_lib32compat () { :
+    if [ -x "`which libtool 2>/dev/null`" ]; then
+        libtool --mode=finish %{_lib32dir} || :
+        return 0
+    fi
+    if [ -x /sbin/ldconfig ]; then
+        /sbin/ldconfig -n %{_lib32dir} || :
+        return 0
+    fi
+    return 1
+}
 %endif
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+postun_remove () { :
+%if %{FILES_lib32compat}
+    postun_lib32compat || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # complete removal
+    postun_remove || :
+fi
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+postun_upgrade () { :
+%if %{FILES_lib32compat}
+    postun_lib32compat || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ] ; then : # upgrade
+    postun_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#postun -p /bin/bash compat
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %if %{PACKAGE_compat}
 %files compat
@@ -5173,8 +5667,8 @@ for your kernel from the %{name} package source rpm.
 %{descriptail}
 
 %if %{FILES_modules}
-%pre -n %{kernel_package}
-# ---------------------------------------------------------------------------
+%pre -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 # This is an initial installation of the kernel subpackage.  We need to check
 # for legacy and non-rpm installations on the host and remove any entries that
 # might later conflict with our entries.  We treat every fresh installation
@@ -5189,11 +5683,10 @@ for your kernel from the %{name} package source rpm.
 # install.  The scope of actions here are kept to the kerne; for which the
 # modules were compiled.
 # ---------------------------------------------------------------------------
-#
 # remove_depmods() - A little recursive function to delete all modules dependent
 #   on an initial module set (in our case "streams.o").  The function echos the
 #   list of modules to remove to stdout.
-#
+# ---------------------------------------------------------------------------
 remove_depmods () {
     local t
     [ $# -gt 0 ] || return 0
@@ -5203,13 +5696,13 @@ remove_depmods () {
 	eval "remove_depmods \$$prereq"
     done
 }
-#
+# ---------------------------------------------------------------------------
 # pre_modules() - This is a fresh install of this version of kernel module.
 #   Make sure that there are no tarball installed kernel modules hanging around
 #   for this kernel version.  Because kernel module packages are named
 #   differently for different kernels, it is important that this function not be
 #   too zealous and remove kernel modules from our other installed packages.
-#
+# ---------------------------------------------------------------------------
 pre_modules () { :
     local list m b modl_mods line dep
     list="%{modules}" ; modl_mods=
@@ -5261,7 +5754,7 @@ pre_modules () { :
     :
     return 0
 }
-#
+# ---------------------------------------------------------------------------
 # pre_stop_scripts() - Stop init scripts when they are still hanging around.
 #   Note that when the init scripts are already stopped this has no (negative)
 #   effect.  Note that our previous practice of stopping init scripts when
@@ -5269,7 +5762,7 @@ pre_modules () { :
 #   a running system.  Instead of stopping scripts, the user should be warned
 #   that restarting the subsystem might be required.  Under debian we can use
 #   debconf for this purpose too.
-#
+# ---------------------------------------------------------------------------
 pre_stop_scripts () {
     local reverse= list="%{initfiles}" i tried=1
     for i in $list ; do
@@ -5284,12 +5777,12 @@ pre_stop_scripts () {
     done
     return $tried
 }
-#
+# ---------------------------------------------------------------------------
 # pre_kill_daemons() - Kill daemons with prejudice.  Stopping init scripts
 #   should have stopped these daemons already.  One situation is where init
 #   scripts have been removed already (or not fully installed) without stopping
 #   them.
-#
+# ---------------------------------------------------------------------------
 pre_kill_daemons () {
     local reverse= list="%{initfiles}" i n
     for i in $list ; do
@@ -5305,11 +5798,11 @@ pre_kill_daemons () {
 	fi
     done
 }
-#
+# ---------------------------------------------------------------------------
 # pre_umount_specfs() - Unmount the Special Shadow Filesystem, making device
 #  nodes in the /dev/streams directory no longer available.  Note that this
 #  should succeed even while kernel modules are loaded.
-#
+# ---------------------------------------------------------------------------
 pre_umount_specfs () {
     local retval=0 device mountpoint fstype options
     while read device mountpoint fstype options
@@ -5321,9 +5814,9 @@ pre_umount_specfs () {
     done </etc/mtab
     return $retval
 }
-#
+# ---------------------------------------------------------------------------
 # pre_rmnods() - Remove device nodes in the /dev directory.
-#
+# ---------------------------------------------------------------------------
 pre_rmnods () { :
 %if %{USE_rmnods}
     if [ -x "%{mknods}" ] ; then
@@ -5331,7 +5824,7 @@ pre_rmnods () { :
     fi
 %endif
 }
-#
+# ---------------------------------------------------------------------------
 # pre_kill_streams() - Uses lsof to determine which processes are holding
 #   opens STREAMS drivers and sends those processes a TERM signal followed five
 #   seconds later by a KILL signal if the process still exists.  This ensures
@@ -5341,7 +5834,7 @@ pre_rmnods () { :
 #   nodes no longer exist.  Note that this is not infalable: when STREAMS are
 #   permanently linked beneath a multiplexing driver, it may still be impossible
 #   to remove all STREAMS kernel modules.
-#
+# ---------------------------------------------------------------------------
 pre_kill_streams () {
     local fields ind val signal
     if lsof | grep '\<STR\>' >/dev/null 2>&1 ; then
@@ -5366,12 +5859,12 @@ pre_kill_streams () {
     lsof | grep '\<STR\>' >/dev/null 2>&1 && false || true
     return $?
 }
-#
+# ---------------------------------------------------------------------------
 # remove_depends() - A recursive function that peforms a depth first traversal
 #   of the dependency graph rooted at the kernel module supplied as an argument,
 #   removing modules that have no dependents.  This is so that entire kernel
 #   module stacks can be removed.
-#
+# ---------------------------------------------------------------------------
 remove_depends () {
     local modrex depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
@@ -5384,13 +5877,13 @@ remove_depends () {
     fi
     return 0
 }
-#
+# ---------------------------------------------------------------------------
 # pre_shutdown() - Shutdown the STREAMS subsystem with prejudice.  First
 #   attempt to shutdown using init scripts.  If that suceeds fully, all other
 #   steps reduce to null operations.  When it does not succeed, the other steps
 #   are largely what the initscripts would do shutting down anyway, but we can
 #   determine whether a reboot will be required.
-#
+# ---------------------------------------------------------------------------
 pre_shutdown () {
     local reboot='no'
     pre_stop_scripts        || :
@@ -5406,60 +5899,105 @@ pre_shutdown () {
     :
     return 0
 }
-#
+# ---------------------------------------------------------------------------
 # pre_running() - Shutdown STREAMS on the running kernel if the running
 #   kernel is the same as the version of the modules we are installing or
 #   upgrading.  If streams does not happen to be running on the running kernel,
 #   this reduces to a null operation.
-#
+# ---------------------------------------------------------------------------
 pre_running () {
     if [ "%_kversion" = "`uname -r`" ]; then
 	pre_shutdown || :
     fi
 }
-#
+# ---------------------------------------------------------------------------
 # pre_install() - For a fresh installation of a kernel module package we want
 #   to make sure that there are no legacy or non-rpm installed kernel modules
 #   lying around and to stop any legacy or non-rpm subsystems.  These actions
 #   can only be performed for %_kversion because kernel module packages are
 #   named differently for their kernels.
-#
+# ---------------------------------------------------------------------------
 pre_install () { :
     pre_modules || :
     pre_running || :
 }
-#
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ]; then : # fresh install
+    pre_install || :
+fi
+# ---------------------------------------------------------------------------
 # pre_upgrade() - Before upgrading, for a 2.4 modules system, and when the
 #   package being upgraded applies to the running kernel, then we stop the
 #   STREAMS subsystems before installing.
-#
+# ---------------------------------------------------------------------------
 pre_upgrade () { :
 %if %{HAVE_oldmods}
     pre_running || :
 %endif
 }
-if [ $1 -eq 1 ]; then : # fresh install
-    pre_install || :
-fi
+# ---------------------------------------------------------------------------
 if [ $1 -ge 2 ]; then : # upgrade
     pre_upgrade || :
 fi
-%endif
+# ---------------------------------------------------------------------------
+#pre -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%endif #{FILES_modules}
 
 %if %{FILES_modules}
-%post -n %{kernel_package}
+%post -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%if %{FILES_oldmods}
 # ---------------------------------------------------------------------------
-%if %{HAVE_weakmods}
-#
-# post_weakmodules() - In the event that the base subpackage is already
-#   installed, try to weak-update kernel modules.  Note that on an upgrade,
-#   as rpm is stupid, this can likely cause the old version's openss7-modules
-#   script to be run instead of the new version's (because the base package
-#   has not been updated yet).
-#
+# post_oldmods() - After installing fresh or upgrading a kernel modules
+#   package for the 2.4 modules system, or when weak modules is not supported
+#   under 2.6 (never), then perform a depmod for the installed kernel modules.
+#   Use the most information that is available to depmod.  Note that the
+#   post_weakmods() function performs this action for 2.6 module systems with
+#   weak updates.  Maybe at some point in the future depmod will be made smarter
+#   than having do do all this.  Why can't it check these files itself?
+# ---------------------------------------------------------------------------
+post_oldmods () {
+    [ -x "`which depmod 2>/dev/null`" ] || return 0
+    if depmod --help 2>&1 | grep '[[:space:]]-E[[:space:]]' >/dev/null 2>&1; then
+        if [ -r /lib/modules/%{kernel_version}/build/Module.symvers ]; then
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae \
+                -E /lib/modules/%{kernel_version}/build/Module.symvers \
+                %{kernel_version} 2>&1 || :
+            return
+        elif [ -r %_usrsrc/%name-%baseversion-%specrelease/%_kversion/System.symvers ]; then
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae \
+                -E %usrsrc/%name-%baseversion-%specrelease/%_kversion/System.symvers \
+                %{kernel_version} 2>&1 || :
+            return
+        elif [ -r /boot/symvers-%{kernel_version}.gz ]; then
+            symtemp=%_tmppath/module.symvers.tmp.$$
+            gzip -dc /boot/symvers-%{kernel_version}.gz >$symtemp
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae \
+                -E $symtemp \
+                %{kernel_version} 2>&1 || :
+            rm -f -- $symtemp
+            return
+        fi
+    fi
+    if [ -r /boot/System.map-%{kernel_version} ] ; then
+        UNAME_MACHINE=%{_target_cpu} \
+        depmod -ae \
+            -F /boot/System.map-%{kernel_version} \
+            %{kernel_version} 2>&1 || :
+    else
+        UNAME_MACHINE=%{_target_cpu} \
+        depmod -a \
+            %{kernel_version} 2>&1 || :
+    fi
+}
+# ---------------------------------------------------------------------------
 %endif
 %if %{HAVE_initscripts}
-#
+# ---------------------------------------------------------------------------
 # post_initscripts() - In the event that the base subpackage is already
 #   installed, try to start init scripts.  This might have failed utterly when
 #   the base subpackage was installed because the kernel modules might not
@@ -5477,7 +6015,7 @@ fi
 #   When this is performed as part of an upgrade and the subsystems are
 #   already running, this has no effect.  If the upgrade has just provided a
 #   solution at this point, it will succeed.
-#
+# ---------------------------------------------------------------------------
 post_initscripts () { :
     local list="%{initfiles}" r i l start
     r="`runlevel | awk '{print$2}'`"
@@ -5494,123 +6032,153 @@ post_initscripts () { :
         [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i start && continue || break }
     done
 }
+# ---------------------------------------------------------------------------
+%endif
+%if %{NEED_symvers}
+# ---------------------------------------------------------------------------
+# post_symvers() - On a fresh install or upgrade, ensure that a symvers file is
+#   available in the boot directory.  This is necessary for proper symbol
+#   versioning support for use by weak updates.  If a file is not present,
+#   create one.  This is only really for distributions that do not include the
+#   /boot/symvers-%{_kversion}.gz file at all, or that erroneously includes it
+#   in the kernel development package instead of the kernel package.  We should
+#   probably also provide a triggerun script for the development kernel.
+# ---------------------------------------------------------------------------
+post_symvers () {
+    local f=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
+    if [ ! -r /boot/symvers-%{kernel_version}.gz -a -r $f ] ; then
+        gzip -c $f > /boot/symvers-%{kernel_version}.gz
+    fi
+}
+# ---------------------------------------------------------------------------
 %endif
 # ---------------------------------------------------------------------------
 # post_install() - This is a fresh install of this kernel modules sub-package.
+# ---------------------------------------------------------------------------
 post_install () { :
+%if %{FILES_oldmods}
+    post_oldmods || :
+%endif
 %if %{HAVE_initscripts}
     post_initscripts || :
 %endif
-}
-# post_upgrade() - This is an upgrade of this kernel modules sub-package.
-post_upgrade () { :
-%if %{HAVE_initscripts}
-    post_initscripts || :
+%if %{NEED_symvers}
+    post_symvers
 %endif
 }
 # ---------------------------------------------------------------------------
 if [ $1 -eq 1 ] ; then : # fresh install
     post_install || :
 fi
+# ---------------------------------------------------------------------------
+# post_upgrade() - This is an upgrade of this kernel modules sub-package.
+# ---------------------------------------------------------------------------
+post_upgrade () { :
+%if %{FILES_oldmods}
+    post_oldmods || :
+%endif
+%if %{HAVE_initscripts}
+    post_initscripts || :
+%endif
+%if %{NEED_symvers}
+    post_symvers
+%endif
+}
+# ---------------------------------------------------------------------------
 if [ $1 -ge 2 ] ; then : # upgrade
     post_upgrade || :
 fi
 # ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
-    if [ ":%{kernel_version}" = ":`uname -r`" ] ; then
-        # This is a running kernel, do a depmod on the modules directory for the
-        # running kernel.
-        if [ -r /boot/System.map-%{kernel_version} ] ; then
-            depmod -ae -F /boot/System.map-%{kernel_version} 2>&1 || :
-        else
-            depmod -ae 2>&1 || :
-        fi
-%if %{HAVE_initscripts}
-        # Running kernels do need init scripts run, but only when normally
-        # started in the current runlevel.
-        r=`runlevel | sed -e 's|.*[[:space:]]||'`
-        list="%{initfiles}" ; for i in $list ; do
-            if [ -f %_initrddir/$i ] ; then
-                if [ -L %_initrddir/../rc${r}.d/S[0-9][0-9]$i -o \
-                     -L %_initrddir/rc${r}.d/S[0-9][0-9]$i ] ; then
-                    /sbin/service $i start >/dev/null 2>&1 || %_initrddir/$i start >/dev/null 2>&1 || :
-                fi
-            fi
-        done
-%endif
-    elif [ -r /boot/System.map-%{kernel_version} ] ; then
-        # Non-running kernels a depmod will be performed on boot by depmod
-        # anyway, but try one now.
-        UNAME_MACHINE=%{_target_cpu} \
-        depmod -ae -F /boot/System.map-%{kernel_version} %{kernel_version} 2>&1 || :
-        # Non-running kernels do not need init scripts run.
-    fi
-%if %{NEED_symvers}
-    f=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
-    if [ ! -r /boot/symvers-%{kernel_version}.gz -a -r $f ] ; then
-        gzip -c $f > /boot/symvers-%{kernel_version}.gz
-    fi
-%endif
-fi
-%endif
+#post -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%endif #{FILES_modules}
 
-%triggerin -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
-# ---------------------------------------------------------------------------
-#
-# triggerin_weakmodules() - When the kernel modules are updated with the
-#   appropriate base package installed, or the appropriate base package is
-#   updated with the kernel modules installed, or when kernel modules are
-#   installed with the appropriate base package present, or the appropriate
-#   base package is installed with kernel modules present, perform a weak
-#   update on the modules.
-#
-triggerin_weakmodules () {
-    if [ -x %_sbindir/openss7-modules ]; then
-        %_sbindir/openss7-modules -- -q -e \
-            --update-modules %_kversion || :
-    fi
-}
-# ---------------------------------------------------------------------------
-if [ $1 -ge 2 ] ; then : # base updated with kernel modules present
-    triggerin_weakmodules || :
-fi
-if [ $2 -ge 2 ] ; then : # kernel modules updated with base present
-    triggerin_weakmodules || :
-fi
-if [ $1 -eq 1 -a $2 -eq 1 ] ; then : # kernel modules or base install other present
-    triggerin_weakmodules || :
-fi
-# ---------------------------------------------------------------------------
-#triggerin -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
-# ---------------------------------------------------------------------------
-
-%if %{FILES_weakmods}
-%triggerin -n %{kernel_package} -- %{target_kernel}
-# ---------------------------------------------------------------------------
-if [ -x %{_sbindir}/%{name}-modules ] ; then
-    kernels=`ls /lib/modules`
-    %{_sbindir}/%{name}-modules -- -v --update-kernel $kernels || :
-    # It is necessary to check whether this operation altered the module links
-    # for the running kernel.  If it did, and any of the modules that were
-    # altered are resident in the kernel, a restart message should be given.
-    # If modules were added that were not in the kernel before (particularly
-    # specfs and streams), consider starting the STREAMS subsystem if it is
-    # set to start on boot.  If modules were removed that are resident in the
-    # kernel (esp. specfs and streams), consider shutting down the STREAMS
-    # subsystem, or issuing a warning to that effect.  We can either have
-    # openss7-modules issue the appropriate warnings, or we can have it file
-    # some information in /var/run and then examine it after the run.
-else
-    echo "WARNING: %triggerin -n %{kernel_package} -- %{target_kernel} ($1,$2) no update script" >&2
-fi
-%endif
-
-%triggerun -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+%if %{FILES_modules}
+%triggerin -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This trigger script is run when kernel modules are being upgraded with the
+# base package (of the same EVR) present, or the base package is being upgraded
+# to the same EVR with the kernel modules present, or either package is
+# installed with the other package at the same EVR present.  In any case, kernel
+# modules weak links might need to be updated belonging to the kernel for which
+# the kernel modules were compiled.
 # ---------------------------------------------------------------------------
 %if %{HAVE_weakmods}
-#
+# ---------------------------------------------------------------------------
+# triggerin_weakmods() - When the kernel modules are updated with the
+#   appropriate base package installed, or the appropriate base package is
+#   updated with the kernel modules installed, or when kernel modules are
+#   installed with the appropriate base package present, or the appropriate base
+#   package is installed with kernel modules present, perform a weak update on
+#   the modules.
+# ---------------------------------------------------------------------------
+triggerin_weakmods () {
+    if [ -x %_sbindir/openss7-modules ]; then
+        %_sbindir/openss7-modules -- -q -e \
+            --add-modules %_kversion || :
+    fi
+}
+%endif
+# ---------------------------------------------------------------------------
+# triggerin_base_upgrade() - When rpm trigger scripts behave correctly (which is
+#   not often), this trigger should be run when base is upgraded (to the
+#   appropriate EVR), once for each installed kernel modules package regardless
+#   of its naming or versioning.
+# ---------------------------------------------------------------------------
+triggerin_base_upgrade () { :
+%if %{HAVE_weakmods}
+    triggerin_weakmods || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # base upgraded with kernel modules present
+    triggerin_base_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+# triggerin_kmod_upgrade() - When rpm trigger scripts behave correctly (which is
+#   not often), this trigger should be run when this kmod package is upgraded
+#   while the base package (of the appropriate EVR) is installed.
+#   ---------------------------------------------------------------------------
+triggerin_kmod_upgrade () { :
+%if %{HAVE_weakmods}
+    triggerin_weakmods || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $2 -ge 2 ] ; then : # kernel modules upgraded with base present
+    triggerin_kmod_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+# triggerin_install() - When rpm trigger scripts behave correctly (which is not
+#   often), this trigger should be run when this kmod package is installed while
+#   the appropriate EVR of base package is already installed, or vise versa.
+# ---------------------------------------------------------------------------
+triggerin_install () { :
+%if %{HAVE_weakmods}
+    triggerin_weakmods || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 -a $2 -eq 1 ] ; then : # kernel modules or base install other present
+    triggerin_weakmods || :
+fi
+# ---------------------------------------------------------------------------
+#triggerin -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%endif #{FILES_modules}
+
+%if %{FILES_modules}
+%triggerun -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# This trigger script is run when kernel modules are being removed altogether
+# while the base package is installed, or the base package is being removed
+# while kernel modules are installed; or either package is being upgraded while
+# the other is installed.
+# ---------------------------------------------------------------------------
+%if %{HAVE_weakmods}
+# ---------------------------------------------------------------------------
 # triggerun_update() -
-#
+# ---------------------------------------------------------------------------
 triggerun_update () { :
     if [ -x %_sbindir/%base-modules ]; then
         %_sbindir/%base-modules -- -q -e${1:+ }$1 \
@@ -5619,37 +6187,47 @@ triggerun_update () { :
 }
 %endif
 %if %{HAVE_oldmods}
-#
+# ---------------------------------------------------------------------------
 # triggerun_oldmods() - The -base sub-package is going away for good, but this
-#   kernel modules package is still installed.  Because the %preun of the
-#   -base sub-package is about to remove the modules.conf line that includes
-#   and ignores the modules.%base entry, this modules.%base entry must be
-#   removed before the base %preun runs.
-#
+#   kernel modules package is still installed.  Because the %preun of the -base
+#   sub-package is about to remove the modules.conf line that includes and
+#   ignores the modules.%base entry, this modules.%base entry must be removed
+#   before the base %preun runs.
+# ---------------------------------------------------------------------------
 triggerun_oldmods () { :
-    rm -f -- %_kmoduledir/modules.%base || :
+    if [ -f %_kmoduledir/modules.%name ] ; then
+        rm -f -- %_kmoduledir/modules.%name || :
+    fi
 }
 %endif
-#
+# ---------------------------------------------------------------------------
 # triggerun_mods_remove() - The %{kernel_package} sub-package is being removed
 #   (for good) while the -base sub-package is present.  This is a proper
 #   ordering.  Use the openss7-modules from the base package to remove kernel
 #   module weak links without actually removing the kernel modules.  Note that
 #   rpm will eventually delete the actual kernel modules.
-#
+# ---------------------------------------------------------------------------
 triggerun_mods_remove () { :
 %if %{HAVE_weakmods}
     triggerun_update --delete-modules || :
 %endif
 }
-#
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # kernel modules being removed with base present
+    triggerun_mods_remove || :
+fi
+# ---------------------------------------------------------------------------
 # triggerun_base_remove() - The -base sub-package is being removed (for good)
 #   while the kernel modules are present.  This is a misordering that only rpm
 #   designers could misconceive.  Because the base package has the openss7-
-#   modules script, removal of weak links need to be performed before the
-#   script goes away.  Note that this will be performed for each and every
-#   kernel module package that is still installed.
+#   modules script, removal of weak links need to be performed before the script
+#   goes away.  Note that this will be performed for each and every kernel
+#   module package that is still installed.
 #
+#   Note that we do not stop initscripts (resulting in a shutdown of the STREAMS
+#   subsystems) at this point, but STREAMS is allowed to run on until the next
+#   reboot.
+# ---------------------------------------------------------------------------
 triggerun_base_remove () { :
 %if %{HAVE_weakmods}
     triggerun_update || :
@@ -5659,32 +6237,21 @@ triggerun_base_remove () { :
 %endif
 }
 # ---------------------------------------------------------------------------
-if [ $1 -eq 0 ] ; then : # kernel modules being removed with base present
-    triggerun_mods_remove || :
-fi
 if [ $2 -eq 0 ] ; then : # base being removed with kernel modules present
     triggerun_base_remove || :
 fi
+# ---------------------------------------------------------------------------
 if [ $1 -ge 1 -a $2 -ge 1 ] ; then : # base or kernel upgraded with other present
     # nothing to do
 fi
 # ---------------------------------------------------------------------------
-#triggerun -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
-# ---------------------------------------------------------------------------
-
-%triggerun -n %{kernel_package} -- %{name}-lib = %{epoch}:%{baseversion}-%{specrelease}
-# ---------------------------------------------------------------------------
-if [ $1 -eq 0 ] ; then : # kernel modules being removed with lib present
-fi
-if [ $2 -eq 0 ] ; then : # lib being removed with kernel modules present
-fi
-if [ $1 -ge 1 -a $2 -ge 1 ] ; then : # lib or kernel upgraded with other present
-fi
-# ---------------------------------------------------------------------------
+#triggerun -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%endif
 
 %if %{FILES_modules}
-%preun -n %{kernel_package}
-# ---------------------------------------------------------------------------
+%preun -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 remove_depends() {
     local modrex depend depends
     modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
@@ -5760,16 +6327,36 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     fi
 fi
 %endif
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+preun_remove () { :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # final removal
+    preun_remove || :
+fi
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+preun_upgrade () { :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ] ; then : # upgrade
+    preun_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#preun -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %if %{FILES_modules}
-%postun -n %{kernel_package}
+%postun -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%if %{HAVE_preloads}
 # ---------------------------------------------------------------------------
-#
 # postun_preloads() - When removing for good, make sure that the
 #   modules are no longer included in the kernel-specific preloads file for
 #   2.4 module system. Note that removing lines from /etc/modules and
 #   /etc/modprobe.preload is the responsibility of the -base subpackage.
-#
+# ---------------------------------------------------------------------------
 postun_preloads () {
     local prel_old prel_tmp prel_new included modules m
     prel_old=%_sysconfdir/modules-%_kversion
@@ -5795,6 +6382,57 @@ postun_preloads () {
         rm -f -- $prel_new || :
     fi
 }
+# ---------------------------------------------------------------------------
+%endif
+%if %{FILES_oldmods}
+# ---------------------------------------------------------------------------
+# postun_oldmods() - After final removal or upgrade of a kernel modules package
+#   for 2.4 modules systems, or when weak modules are not supported under 2.6
+#   (never), then perform a depmod for the remaining kernel modules.  Use the
+#   most information that is available to depmod.  Note that the post_weakmods()
+#   function performs this action for 2.6 module systems with weak updates.
+#   Maybe at some point in the future depmod will be made smarter than having do
+#   do all this.  Why can't it check these files itself?
+# ---------------------------------------------------------------------------
+postun_oldmods () { :
+    [ -x "`which depmod 2>/dev/null`" ] || return 0
+    if depmod --help 2>&1 | grep '[[:space:]]-E[[:space:]]' >/dev/null 2>&1; then
+        if [ -r /lib/modules/%{kernel_version}/build/Module.symvers ]; then
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae \
+                -E /lib/modules/%{kernel_version}/build/Module.symvers \
+                %{kernel_version} 2>&1 || :
+            return
+        elif [ -r %_usrsrc/%name-%baseversion-%specrelease/%_kversion/System.symvers ]; then
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae \
+                -E %usrsrc/%name-%baseversion-%specrelease/%_kversion/System.symvers \
+                %{kernel_version} 2>&1 || :
+            return
+        elif [ -r /boot/symvers-%{kernel_version}.gz ]; then
+            symtemp=%_tmppath/module.symvers.tmp.$$
+            gzip -dc /boot/symvers-%{kernel_version}.gz >$symtemp
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae \
+                -E $symtemp \
+                %{kernel_version} 2>&1 || :
+            rm -f -- $symtemp
+            return
+        fi
+    fi
+    if [ -r /boot/System.map-%{kernel_version} ] ; then
+        UNAME_MACHINE=%{_target_cpu} \
+        depmod -ae \
+            -F /boot/System.map-%{kernel_version} \
+            %{kernel_version} 2>&1 || :
+    else
+        UNAME_MACHINE=%{_target_cpu} \
+        depmod -a \
+            %{kernel_version} 2>&1 || :
+    fi
+}
+# ---------------------------------------------------------------------------
+%endif
 #
 remove_depends() {
     local modrex depend depends
@@ -5870,53 +6508,34 @@ if [ $1 = 0 -o $1 = 1 ] ; then : # final removal or upgrade
     fi
 fi
 %endif
-
-%triggerpostun -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
 # ---------------------------------------------------------------------------
-# triggerpostun_base_remove() - The base subpackage was removed while the
-#   kernel modules were present.
-#
-# triggerpostun_base_upgrade()
 # ---------------------------------------------------------------------------
-if [ $2 -eq 0 ] ; then : # base removed while kernel modules present
-    triggerpostun_base_remove || :
-fi
-if [ $2 -ge 1 ] ; then : # base upgraded while kernel modules present
-    triggerpostun_base_upgrade || :
-fi
-# ---------------------------------------------------------------------------
-#triggerpostun -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
-# ---------------------------------------------------------------------------
-
-%triggerpostun -n {%kernel_package} -- %{name}-lib = %{epoch}:%{baseversion}-%{specrelease}
-# ---------------------------------------------------------------------------
-if [ $2 -eq 0 ] ; then : # lib removed while kernel modules present
-fi
-if [ $2 -ge 1 ] ; then : # lib upgraded while kernel modules present
-fi
-# ---------------------------------------------------------------------------
-
-
-%if %{FILES_weakmods}
-%triggerpostun -n %{kernel_package} -- %{target_kernel}
-# ---------------------------------------------------------------------------
-if [ -x %{_sbindir}/%{name}-modules ] ; then
-    kernels=`ls /lib/modules`
-    %{_sbindir}/%{name}-modules -- -v --update-kernel $kernels || :
-    # It is necessary to check whether this operation altered the module links
-    # for the running kernel.  If it did, and any of the modules that were
-    # altered are resident in the kernel, a restart message should be given.
-    # If modules were added that were not in the kernel before (particularly
-    # specfs and streams), consider starting the STREAMS subsystem if it is
-    # set to start on boot.  If modules were removed that are resident in the
-    # kernel (esp. specfs and streams), consider shutting down the STREAMS
-    # subsystem, or issuing a warning to that effect.  We can either have
-    # openss7-modules issue the appropriate warnings, or we can have it file
-    # some information in /var/run and then examine it after the run.
-else
-    echo "WARNING: %triggerpostun -n %{kernel_package} -- %{target_kernel} ($1,$2) no update script" >&2
-fi
+postun_remove () { :
+%if %{HAVE_preloads}
+    postun_preloads || :
 %endif
+%if %{FILES_oldmods}
+    postun_oldmods || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # complete removal
+    postun_remove || :
+fi
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+postun_upgrade () { :
+%if %{FILES_oldmods}
+    postun_oldmods || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ] ; then : # upgrade
+    postun_upgrade
+fi
+# ---------------------------------------------------------------------------
+#postun -p /bin/bash -n %{kernel_package}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %if %{PACKAGE_kmod}
 %files -n %{kernel_package}
@@ -6002,39 +6621,6 @@ Provides:           %{name}-devel-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
 Version:            %{kspecversion}
 Release:            %{kspecrelease}
 
-%if %{FILES_symvers}
-%triggerin -n %{kernel_develop} -- %{target_kdevel}
-# ---------------------------------------------------------------------------
-# This trigger script runs after we are installed and there is already a
-# development kernel at the same version level, or after a development kernel at
-# the same version level is installed and we are already installed.
-# ---------------------------------------------------------------------------
-# SuSE and RedHat are different here.  SuSE places a symsets archive in /boot
-# and also has one in /lib/modules/%{_kversion}/build.  RedHat only has a
-# symsets archive in /lib/modules/%{_kversion}/build, but find-requires.ksyms
-# checks both /boot and /usr/src/kernels/* (where /lib/modules/*/build points).
-# ---------------------------------------------------------------------------
-d=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}
-f=symsets-%{_kversion}.tar.gz
-if [ -r $d/$f ] then
-    cp -f -- $d/$f /boot/$f
-fi
-%endif
-
-%if %{FILES_symvers}
-# ---------------------------------------------------------------------------
-%postun -n %{kernel_develop}
-if [ $1 = 0 ] ; then # we were removed for good
-    f=symsets-%{_kversion}.tar.gz
-    d=/lib/modules/%{_kversion}/build
-    if [ -r $d/$f ] ; then
-        cp -f -- $d/$f /boot/$f || :
-    else
-        rm -f -- /boot/$f || :
-    fi
-fi
-%endif
-
 # ---------------------------------------------------------------------------
 %description -n %{kernel_develop}
 %{descripline}
@@ -6048,6 +6634,117 @@ package provides kernel debug information for package %{name}.  Kernel
 debug information is useful when developing kernel modules that use
 this package or when debugging kernel modules contained in the package.
 %{descriptail}
+
+%triggerin -p /bin/bash -n %{kernel_develop} -- %{target_kdevel}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%if %{FILES_symvers}
+# ---------------------------------------------------------------------------
+# triggerin_symvers() - This trigger script runs after we are installed and
+#   there is already a development kernel at the same version level install,
+#   or after a development kernel at the same version level is installed and
+#   we are already installed, or either this package or a development kernel
+#   at the same version level is upgraded.  When we have a symbol sets file,
+#   overwrite that of the development kernel with our version (which includes
+#   the STREAMS symbol sets as well).
+#
+#   SuSE and RedHat are different here.  SuSE places a symsets archive in
+#   /boot and also has one in /lib/modules/%{_kversion}/build.  RedHat only
+#   has a symsets archive in /lib/modules/%{_kversion}/build, but
+#   find-requires.ksyms checks both /boot and /usr/src/kernels/* (where
+#   /lib/modules/*/build points).  Therefore we always place it in /boot.
+# ---------------------------------------------------------------------------
+triggerin_symvers () {
+    local d=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion} \
+          f=symsets-%{_kversion}.tar.gz
+    if [ -r $d/$f ] then
+        cp -f -- $d/$f /boot/$f || :
+    fi
+}
+%endif
+# ---------------------------------------------------------------------------
+# triggerin_kernel_develop() - When rpm trigger scripts are operating properly
+#   (which is not often), this function should execute when this kernel
+#   development package is being upgraded while a corresponding development
+#   kernel is present.
+# ---------------------------------------------------------------------------
+triggerin_kernel_develop () { :
+%if %{FILES_symvers}
+    triggerin_symvers || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # develop is being upgraded with devel kernel present
+    triggerin_kernel_develop || :
+fi
+# ---------------------------------------------------------------------------
+# triggerin_develop_kernel() - When rpm trigger scripts are operating properly
+#   (which is not often), this function should execute when a corresponding
+#   development kernel is upgraded while this kernel development package is
+#   installed.
+# ---------------------------------------------------------------------------
+triggerin_develop_kernel () { :
+%if %{FILES_symvers}
+    triggerin_symvers || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $2 -ge 2 ] ; then : # devel kernel is being upgraded with develop present
+    triggerin_develop_kernel || :
+fi
+# ---------------------------------------------------------------------------
+# triggerin_install() - When rpm trigger scriptsw are operating properly
+#   (which is not often), this function should execute when a corresponding
+#   development kernel is installed while this kernel development package is
+#   already installed, or vise versa.
+# ---------------------------------------------------------------------------
+triggerin_install () { :
+%if %{FILES_symvers}
+    triggerin_symvers || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 -a $2 -eq 1 ] ; then : # devel kernel or develop installed other present
+    triggerin_install || :
+fi
+# ---------------------------------------------------------------------------
+#triggerin -p /bin/bash -n %{kernel_develop} -- %{target_kdevel}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%endif
+
+%if %{FILES_symvers}
+%postun -p /bin/bash -n %{kernel_develop}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# postun_symsets() - When this kernel development package is removed
+#   altogether, whether the development kernel is being removed as part of the
+#   same transaction or not, when the kernel version of the symbol sets still
+#   exists, copy those back to the boot directory.  Otherwise, simply remove
+#   the symbol sets from the boot directory.
+# ---------------------------------------------------------------------------
+postun_symsets () {
+    local f=symsets-%{_kversion}.tar.gz \
+          d=/lib/modules/%{_kversion}/build
+    if [ -r $d/$f ] ; then
+        cp -f -- $d/$f /boot/$f || :
+    else
+        rm -f -- /boot/$f || :
+    fi
+}
+# ---------------------------------------------------------------------------
+postun_remove () { :
+    postun_symsets || :
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # complete removal
+    postun_remove || :
+fi
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ] ; then : # upgrade
+    # do nothing
+fi
+# ---------------------------------------------------------------------------
+#postun -p /bin/bash -n %{kernel_develop}
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%endif
 
 %if %{PACKAGE_kdev}
 %files -n %{kernel_develop}
@@ -6286,13 +6983,26 @@ Prefix:             %{_javadir}
 %endif
 
 %if %{FILES_jnilibs}
-Requires:           /sbin/ldconfig
+Requires(post):     /usr/bin/libtool
+Requires(postun):   /usr/bin/libtool
+Requires(post):     /sbin/ldconfig
+Requires(postun):   /sbin/ldconfig
+%endif
+%if %{FILES_gcjlibs}
+Requires(post):     /usr/bin/libtool
+Requires(postun):   /usr/bin/libtool
+Requires(post):     /sbin/ldconfig
+Requires(postun):   /sbin/ldconfig
 %endif
 %if %{FILES_gcjmaps}
 Requires(post):     /usr/bin/gcj-dbtool
-Requires(post):     /usr/bin/rebuild-gcj-db
 Requires(postun):   /usr/bin/gcj-dbtool
+Requires(post):     /usr/bin/rebuild-gcj-db
 Requires(postun):   /usr/bin/rebuild-gcj-db
+%endif
+%if %{FILES_jarfiles}
+Requires(post):     /usr/bin/rebuild-jar-repository
+Requires(postun):   /usr/bin/rebuild-jar-repository
 %endif
 
 # Requirements will be automatic.
@@ -6311,59 +7021,62 @@ compiled libraries.  It also includes SWIG implementations of Java
 interfaces for %{title} API libraries.
 %{descriptail}
 
-%pre java
-# ---------------------------------------------------------------------------
-# This is an initial installation of the java subpackage.  We need to check
-# for legacy and non-rpm installations on the host and remove any entries that
-# might later conflict with out entries.  We treat every fresh installation
-# like an upgrade from non-rpm install.
-# ---------------------------------------------------------------------------
+%pre -p /bin/bash java
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %if %{FILES_jnilibs}
-#
-# pre_jnilibs() - On a fresh installation, look for an remove any non-deb or old tarball release
-#   libraries.  On reinstallations this step can (and should) be skipped.  Unfortunately,
-#   non-autoconf releases of LiS placed libraries all over the place.  On an initial installation,
-#   this checks for other libraries with the same name and deletes them.
-#
-pre_jnilibs () { :
-    libs="%jnilibs"; for lib in $libs; do
+# ---------------------------------------------------------------------------
+# pre_jnilibs() - On a fresh installation, look for an remove any non-deb or
+#   old tarball release libraries.  On reinstallations this step can (and
+#   should) be skipped.  Unfortunately, non-autoconf releases of LiS placed
+#   libraries all over the place.  On an initial installation, this checks for
+#   other libraries with the same name and deletes them.
+# ---------------------------------------------------------------------------
+pre_jnilibs () {
+    local libs="%jnilibs" lib old_libs old
+    for lib in $libs; do
         old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
-        if [ -n "$old_libs" ] ; then
-            echo "warning: Deleting old non-rpm libraries $old_libs" >&2
-            rm -f $old_libs || true
-        fi
+        for old in $old_libs; do
+            echo "warning: Deleting old non-rpm library $old" >&2
+            rm -f -- $old || :
+        done
     done
 }
 %endif
 %if %{FILES_gcjlibs}
+# ---------------------------------------------------------------------------
+# pre_gcjlibs() - On fresh install, look for non-rpm libraries and remove
+#   them.  This is not necessary as the gcj libraries will simply be used once
+#   the new libraries have been installed and the old ones removed.
+# ---------------------------------------------------------------------------
 pre_gcjlibs () { :
 }
 %endif
 %if %{FILES_gcjmaps}
-#
-# pre_gcjmaps() - On fresh install, look for non-deb libraries and remove
-#   them.  This is not necessary as the gcj map will simply be rebuilt once the
-#   new libraries have been installed.
-#
+# ---------------------------------------------------------------------------
+# pre_gcjmaps() - On fresh install, look for non-rpm libraries and remove
+#   them.  This is not necessary as the gcj map will simply be rebuilt once
+#   the new libraries have been installed and the old ones removed.
+# ---------------------------------------------------------------------------
 pre_gcjmaps () { :
 }
 %endif
 %if %{FILES_jarfiles}
-#
-# pre_jarfiles() - On fresh install, look for non-deb jarfiles and remove
-#   them.  This is not necessary as the jar repository will simply be rebuild
-#   once the new files have been installed.
-#
+# ---------------------------------------------------------------------------
+# pre_jarfiles() - On fresh install, look for non-rpm jarfiles and remove
+#   them.  This is not necessary as the jar repository will simply be rebuilt
+#   once the new files have been installed and the old ones removed.
+# ---------------------------------------------------------------------------
 pre_jarfiles () { :
 }
 %endif
-#
-# pre_java() - On fresh install, go looking for conflicting things and
+# ---------------------------------------------------------------------------
+# pre_install() - On fresh install, go looking for conflicting things and
 #   removing them.  Currently this is only some libraries with the same name.
-#   This is only done on fresh install.  If this operation breaks some package,
-#   it can be reinstalled after the first installation of this package.
-#
-pre_java () { :
+#   This is only done on fresh install.  If this operation breaks some
+#   package, it can be reinstalled after the first installation of this
+#   package.
+# ---------------------------------------------------------------------------
+pre_install () { :
 %if %{FILES_jnilibs}
     pre_jnilibs || :
 %endif
@@ -6377,88 +7090,265 @@ pre_java () { :
     pre_jarfiles || :
 %endif
 }
+# ---------------------------------------------------------------------------
 if [ $1 -eq 1 ] ; then : # fresh install
     pre_install || :
 fi
+# ---------------------------------------------------------------------------
+# pre_upgrade() - Priority to upgrade installation of the new version's files,
+#   it is possible to remove old files that are no longer required before adding
+#   the new files.  This would make it possible to relink libraries, rebuild
+#   caches and databases in post and not require any further actions from
+#   postun.  However, because the java libraries is still somewhat changeable
+#   here, relink and rebuild from the old version's postun instead.
+# ---------------------------------------------------------------------------
+pre_upgrade () { :
+    # do nothing
+}
+# ---------------------------------------------------------------------------
 if [ $1 -eq 2 ] ; then : # upgrade
     pre_upgrade || :
 fi
-
-%post java
 # ---------------------------------------------------------------------------
-if [ $1 = 1 -o $1 = 2 ] ; then : # fresh install or upgrade
+#pre -p /bin/bash java
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%post -p /bin/bash java
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %if %{FILES_jnilibs}
-    # Fresh install or upgrade: do a load config.
+# ---------------------------------------------------------------------------
+# post_jnilibs() - On fresh install or upgrade, do a load config.
+# ---------------------------------------------------------------------------
+post_jnilibs () { :
+    if [ -x "`which libtool 2>/dev/null`" ]; then
+        libtool --mode=finish %{_jnidir} && return 0 || :
+    fi
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+        ldconfig %{_jnidir} && return 0 || :
+    fi
+    return 1
+}
 %endif
 %if %{FILES_gcjlibs}
-    # Fresh install or upgrade: do nothing.
+# ---------------------------------------------------------------------------
+# post_gcjlibs() - On fresh install or upgrade, do nothing.
+# ---------------------------------------------------------------------------
+post_gcjlibs () { :
+    if [ -x "`which libtool 2>/dev/null`" ]; then
+        libtool --mode=finish %{_pkggcjdir} || :
+        return 0
+    fi
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+        ldconfig %{_pkggcjdir} || :
+        return 0
+    fi
+    return 1
+}
 %endif
 %if %{FILES_gcjmaps}
-    # Fresh install or upgrade: rebuild classmap database.
-    if [ -x /usr/bin/rebuild-gcj-db ] ; then
-        /usr/bin/rebuild-gcj-db
+# ---------------------------------------------------------------------------
+# post_gcjmaps() - On fresh install or upgrade, rebuild the classmap database.
+# ---------------------------------------------------------------------------
+post_gcjmaps () { :
+    if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
+        rebuild-gcj-db || :
     else
-        # basically what rebuild-gcj-db does
-        for base in /usr/lib* ; do
-            db=`/usr/bin/gcj-dbtool -p $base`
-            d=$base/gcj
-            test -d $d || continue
-            dirname $db | xargs mkdir -p
-            /usr/bin/gcj-dbtool -n $db.tmp 64
-            find $d -follow -name '*.db' -print0 | \
-                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
-            /bin/mv -f $db.tmp $db
-        done
+        if [ -x "`which gcj-dbtool 2>/dev/null`" ] ; then
+            # basically what rebuild-gcj-db does
+            for base in /usr/lib* ; do
+                d=$base/gcj
+                [ -d $d ] || continue
+                db=`gcj-dbtool -p $base`
+                [ -n "$db" ]  || continue
+                dirname $db | xargs mkdir -p
+                gcj-dbtool -n $db.tmp 64
+                find $d -follow -name '*.db' -print0 | \
+                    xargs -0 gcj-dbtool -m $db.tmp $db.tmp
+                mv -f -- $db.tmp $db
+            done
+        fi
     fi
+}
 %endif
 %if %{FILES_jarfiles}
+# ---------------------------------------------------------------------------
+# ---------------------------------------------------------------------------
+post_jarfiles () { :
     # Fresh install or upgrade: relink the jar files.
-    if [ -x /usr/bin/rebuild-jar-repository ] ; then
-        /usr/bin/rebuild-jar-repository %{_javadir}
+    if [ -x "`which rebuild-jar-repository 2>/dev/null`" ] ; then
+        rebuild-jar-repository %_javadir || :
     fi
+}
 %endif
-fi
-
-%postun java
 # ---------------------------------------------------------------------------
-if [ $1 = 0 -o $1 = 1 ] ; then
+# post_install () - This is the end of a fresh installation of the java
+#   package.  Relink libraries and rebuild caches and databases.
+# ---------------------------------------------------------------------------
+post_install () { :
 %if %{FILES_jnilibs}
-    # Complete removal or upgrade: do a load config.
+    post_jnilibs || :
 %endif
 %if %{FILES_gcjlibs}
-    # Complete removal or upgrade: do nothing.
+    post_gcjlibs || :
 %endif
 %if %{FILES_gcjmaps}
-    # Complete removal or upgrade: rebuild classmap database.
-    if [ -x /usr/bin/rebuild-gcj-db ] ; then
-        /usr/bin/rebuild-gcj-db
-    else
-        # basically what rebuild-gcj-db does
-        for base in /usr/lib* ; do
-            db=`/usr/bin/gcj-dbtool -p $base`
-            d=$base/gcj
-            test -d $d || continue
-            dirname $db | xargs mkdir -p
-            /usr/bin/gcj-dbtool -n $db.tmp 64
-            find $d -follow -name '*.db' -print0 | \
-                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
-            /bin/mv -f $db.tmp $db
-        done
-    fi
+    post_gcjmaps || :
 %endif
 %if %{FILES_jarfiles}
-    # Complete removal or upgrade: relink the jar files.
-    if [ -x /usr/bin/rebuild-jar-repository ] ; then
-        /usr/bin/rebuild-jar-repository %{_javadir}
-    fi
+    post_jarfiles || :
 %endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 1 ] ; then : # fresh install
+    post_install || :
 fi
+# ---------------------------------------------------------------------------
+# post_upgrade () - This is the end of an upgrade of the java package.  The
+#   databases and caches should not be rebuilt at this point because they
+#   would include files from the old version that are about to be removed.
+#   Let the postun of the old version do the work.
+# ---------------------------------------------------------------------------
+post_upgrade () { :
+    # do nothing
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 2 ] ; then : # upgrade
+    post_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#post -p /bin/bash java
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+%postun -p /bin/bash java
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%if %{FILES_jnilibs}
+# ---------------------------------------------------------------------------
+# postun_jnilibs() - Complete removal of the java subpackage and its jni
+#   libraries.  Perform a load config to update the shared object library
+#   caches.
+# ---------------------------------------------------------------------------
+postun_jnilibs () { :
+    if [ -x "`which libtool 2>/dev/null`" ]; then
+        libtool --mode=finish %{_jnidir} || :
+        return 0
+    fi
+    if [ -x /sbin/ldconfig ]; then
+        /sbin/ldconfig -n %{_jnidir} || :
+        return 0
+    fi
+    return 1
+}
+%endif
+%if %{FILES_gcjlibs}
+# ---------------------------------------------------------------------------
+# postun_gcjlibs() - Complete removal of the java subpackage.  Nothing to do
+#   for gcj libraries.
+# ---------------------------------------------------------------------------
+postun_gcjlibs () { :
+    if [ -x "`which libtool 2>/dev/null`" ]; then
+        libtool --mode=finish %{_pkggcjdir} && return 0 || :
+    fi
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+        ldconfig -n %{_pkggcjdir} && return 0 || :
+    fi
+    return 1
+}
+%endif
+%if %{FILES_gcjmaps}
+# ---------------------------------------------------------------------------
+# postun_gcjmaps() - Complete removal of the java subpackage and its gcj
+#   libraries.  Rebuild the GCJ classmap database to exclude the removed gcj
+#   library files.
+# ---------------------------------------------------------------------------
+postun_gcjmaps () { :
+    if [ -x "`which rebuild-gcj-db 2>/dev/null`" ]; then
+        rebuild-gcj-db || :
+    else
+        if [ -x "`which gcj-dbtool 2>/dev/null`" ]; then
+            # basically what rebuild-gcj-db does
+            for base in /usr/lib* ; do
+                d=$base/gcj
+                [ -d $d ] || continue
+                db=`gcj-dbtool -p $base`
+                [ -n "$db" ] || continue
+                dirname $db | xargs mkdir -p
+                gcj-dbtool -n $db.tmp 64
+                find $d -follow -name '*.db' -print0 | \
+                    xargs -0 gcj-dbtool -m $db.tmp $db.tmp
+                mv -f -- $db.tmp $db
+            done
+        fi
+    fi
+}
+%endif
+%if %{FILES_jarfiles}
+# ---------------------------------------------------------------------------
+# postun_jarfiles() - Complete removal of the java subpackage and its jar
+#   files: relink the jarfiles and rebuild the jar repository to exclude the
+#   removed jar files.
+# ---------------------------------------------------------------------------
+postun_jarfiles () { :
+    if [ -x "`which rebuild-jar-repository 2>/dev/null`" ] ; then
+        rebuild-jar-repository %_javadir || :
+    fi
+}
+%endif
+# ---------------------------------------------------------------------------
+# postun_remove() - Complete removal of the java subpackage.
+# ---------------------------------------------------------------------------
+postun_remove () { :
+%if %{FILES_jnilibs}
+    postun_jnilibs || :
+%endif
+%if %{FILES_gcjlibs}
+    postun_gcjlibs || :
+%endif
+%if %{FILES_gcjmaps}
+    postun_gcjmaps || :
+%endif
+%if %{FILES_jarfiles}
+    postun_jarfiles || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -eq 0 ] ; then : # complete removal
+    postun_remove || :
+fi
+# ---------------------------------------------------------------------------
+# postun_upgrade() - Upgrade of the java subpackage.  This is the old
+#   package's postun on an upgrade.  The old version should not perform any
+#   actions now that the new version's post has run.  Nevertheless, some files
+#   may now be removed that were not removed before, so relink libraries and
+#   rebuild caches and databases again.
+# ---------------------------------------------------------------------------
+postun_upgrade () { :
+%if %{FILES_jnilibs}
+    postun_jnilibs || :
+%endif
+%if %{FILES_gcjlibs}
+    postun_gcjlibs || :
+%endif
+%if %{FILES_gcjmaps}
+    postun_gcjmaps || :
+%endif
+%if %{FILES_jarfiles}
+    postun_jarfiles || :
+%endif
+}
+# ---------------------------------------------------------------------------
+if [ $1 -ge 1 ] ; then : # upgrade
+    postun_upgrade || :
+fi
+# ---------------------------------------------------------------------------
+#postun -p /bin/bash java
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 %if %{PACKAGE_java}
 %files java
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
-%{?files_jnilibs:%{_jnidir}/*}
+%{?files_jnilibs:%{_jnidir}/*.so}
+%{?files_jnilibs:%{_jnidir}/*.la}
 %{?files_gcjlibs:%dir %{_pkggcjdir}}
 %{?files_gcjlibs:%{_pkggcjdir}/*.so}
 %{?files_gcjlibs:%{_pkggcjdir}/*.la}
