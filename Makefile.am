@@ -80,6 +80,8 @@ dist_bin_SCRIPTS		=
 
 dist_sbin_SCRIPTS		=
 
+dist_sysconf_DATA		=
+
 if PKG_BUILD_ARCH
 ## PKG_BUILD_ARCH
 
@@ -2815,9 +2817,8 @@ endif
 ## ! WITH_RCSD_DIRECTORY
 endif
 
-dist_sysconf_DATA		= src/util/sysconfig/streams.conf \
-				  src/util/sysconfig/@PACKAGE_LCNAME@.conf \
-				  src/util/sysconfig/sock2path
+dist_sysconf_DATA		+= src/util/sysconfig/streams.conf \
+				   src/util/sysconfig/@PACKAGE_LCNAME@.conf
 if CONFIG_STREAMS_UTILS
 dist_sysconf_DATA		+= strsetup.conf \
 				   strload.conf
