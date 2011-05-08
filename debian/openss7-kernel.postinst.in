@@ -146,7 +146,7 @@ postinst_preload () { :
 #
 postinst_startscripts () { :
     local r list i
-    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    [ -z "@WITH_KO_MODULES_FALSE@" ] || return 0
     r=`runlevel | awk '{print$2}'`
     list="${initfiles}" ; for i in $list ; do
         if [ -f @initrddir@/$i ] ; then
