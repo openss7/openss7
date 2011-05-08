@@ -131,9 +131,6 @@ uninstall-initscripts:
 
 dist_noinst_SCRIPTS	+= $(top_srcdir)/scripts/install_initd $(top_srcdir)/scripts/remove_initd
 
-if INSTALL_INITSCRIPTS
-## INSTALL_INITSCRIPTS
-
 INSTALL_DATA_HOOK	+= install-initscripts
 
 POST_INSTALL_AM		+= post-initscripts
@@ -141,9 +138,6 @@ POST_INSTALL_AM		+= post-initscripts
 UNINSTALL_LOCAL		+= uninstall-initscripts
 
 PRE_UNINSTALL_MA	+= preun-initscripts
-
-## INSTALL_INITSCRIPTS
-endif
 
 ## PKG_BUILD_USER
 endif

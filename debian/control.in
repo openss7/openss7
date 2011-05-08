@@ -153,7 +153,7 @@ Description: shared object libraries, binary applications and utilities.
 @WITH_32BIT_LIBS_TRUE@Section: libs
 @WITH_32BIT_LIBS_TRUE@Priority: optional
 @WITH_32BIT_LIBS_TRUE@Provides: @PACKAGE_LCNAME@-compat
-@WITH_32BIT_LIBS_TRUE@Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@)
+@WITH_32BIT_LIBS_TRUE@Depends: @PACKAGE_LCNAME@-kernel (>= @VERSION@)
 @WITH_32BIT_LIBS_TRUE@Description: 32-bit shared object libs, applications and utilities.
 @WITH_32BIT_LIBS_TRUE@ The @PACKAGE_LCNAME@-compat binary package contains the 32-bit run-time (shared
 @WITH_32BIT_LIBS_TRUE@ object) libraries necessary to run 32-bit applications programs and

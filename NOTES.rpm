@@ -153,27 +153,6 @@ Source:
 openss7-source-kernel			-> openss7
 
 
-Execution of openss7-modules:
------------------------------
-
-  openss7-modules is executed with the following flags under the
-  following circumstances:
-
-  triggerin base -- %target_kernel
-    openss7-modules -- -q -e \
-	--update-kernels
-
-  triggerin %kernel_package -- %name-base = %epoch:%baseversion-%specrelease
-    openss7-modules -- -q -e \
-	--initscripts=%{initfiles} \
-	--add-modules %_kversion
-
-  triggerun %kernel_package -- %name-base = %epoch:%baseversion-%specrelease
-    openss7-modules -- -q -e \
-	--delete-modules \
-	--remove-modules %_kversion
-
-
 
 -----
 
