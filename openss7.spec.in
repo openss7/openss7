@@ -4560,6 +4560,7 @@ postun_netconfig () {
     local netc_fil="%_sysconfdir/netconfig" \
           netc_alt="%_sysconfdir/netconfig.xnsl" \
           netc_dir="%_sysconfdir/netconfig.d" \
+          netc_tmp="%_tmppath/netconfig.tmp.$$" \
 	  found=no files="$netc_dir/*" f
     [ ! -r $netc_file -o -r $netc_alt ] || return 0
     [ -d $netc_dir ] || return 0
@@ -4572,7 +4573,6 @@ postun_netconfig () {
 	    netc_fil=$netc_alt
 	fi
     fi
-    netc_tmp=%_tmppath/netconfig.tmp.$$
     (
 	echo '# Generated from netconfig.d by @PACKAGE_LCNAME@'
 	for f in $files; do
@@ -4622,7 +4622,6 @@ postun_sock2path () {
 	  found=no files="$s2pa_dir/*" f
     (
 	echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
-	found=no; files="$s2pa_dir/*"
 	for f in $files; do
 	    if [ -r $f ]; then
 		case $f in
@@ -4657,7 +4656,7 @@ postun_snmpconf () {
           snmp_lcl="$snmp_dir/00local" \
           snmp_tmp="%_tmppath/`basename $snmp_fil`.tmp.$$" \
           wrote_one=no can_overwrite_local=no files="$snmp_dir/*" f
-    [ -d "%_snmpconfdir/snmp.d" ] || return 0
+    [ -d $snmp_dir ] || return 0
     if [ -e $snmp_fil ]; then
 	if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
 	    can_overwrite_local=yes
