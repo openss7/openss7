@@ -93,15 +93,15 @@ postrm_base () { :
     @WITH_KO_MODULES_FALSE@postrm_preload
 }
 #
-# postrm_oldmods() - As the subpackage is being purged, remove the line from
+# postrm_modconf() - As the subpackage is being purged, remove the line from
 #   the modules.conf file that points at the /etc/modutils/openss7 file that in
 #   turn includes the /lib/modules/@kversion@/modules.openss7 file when it
 #   exists.  Note that the files themselves referenced from the modules.conf
 #   files are removed as a normal part of the course of removing the files in
 #   the -kernel sub-packages.
 #
-postrm_oldmods () {
-    local conf_old=@sysconfdir@/modules.conf conf_tmp conf_new
+postrm_modconf () { :
+    conf_old=@sysconfdir@/modules.conf
     if [ -f $conf_old ] ; then
         conf_tmp=${tmppath:-'/var/tmp'}/modules.conf.tmp.$$
         conf_new=${tmppath:-'/var/tmp'}/modules.conf.new.$$
@@ -114,6 +114,7 @@ postrm_oldmods () {
 	fi
         rm -f -- $conf_new
     fi
+    :
 }
 #
 # postrm_initscripts() - When purging the package, remove the symbolic links
@@ -139,30 +140,17 @@ postrm_initscripts () {
 	    [ -x /sbin/insserv             ] && /sbin/insserv -r          $i        2>&1 && continue || true
 	    [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i        2>&1 && continue || true
 	    [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i        2>&1 && continue || true
-	    [ -x /usr/sbin/update-rc.d     ] && /usr/sbin/update-rc.d     $i remove 2>&1 && continue || true
+	    [ -x /usr/sbin/update-rc.d     ] && /usr/bin/update-rc.d      $i remove 2>&1 && continue || true
 	fi
     done
     :
-}
-#
-# postrm_manpages() - When removing the package, update the aprospros database.
-#   This handled by debhelper scriptlets or triggers and is therefore
-#   short-circuited.
-#
-postrm_manpages () { :; return
-    if [ -x "`which makewhatis 2>/dev/null`" ]; then
-	LANGUAGE= LANG= makewhatis -u @mandir@ || :
-    fi
-    if [ -x "`which mandb      2>/dev/null`" ]; then
-	LANGUAGE= LANG= mandb      -p @mandir@ || :
-    fi
 }
 #
 # postrm_base_purge() - The subpackage is being purged, rebuild databases and
 #   adjust other files in preparation for removal of configuration files.
 #
 postrm_base_purge () { :
-    @WITH_KO_MODULES_FALSE@postrm_oldmods || :
+    @WITH_KO_MODULES_FALSE@postrm_modconf
     postrm_initscripts
 }
 # -----------------------------------------------------------------------------

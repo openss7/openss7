@@ -52,15 +52,8 @@
 ##
 ## =============================================================================
 
-if PKG_BUILD_ARCH
-## PKG_BUILD_ARCH
-
-##
-# This was changed from PKG_BUILD_INDEP to PKG_BUILD_ARCH because it is far too
-# complex to maintainer scripts to place these files in an architecture
-# independent package away from the library binaries that they configure.
-##
-
+if PKG_BUILD_INDEP
+## PKG_BUILD_INDEP
 if PKG_BUILD_USER
 ## PKG_BUILD_USER
 
@@ -99,55 +92,54 @@ install-netconfig: src/util/sysconfig/netconfig
 
 post-netconfig:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@netc_fil="$(DESTDIR)$(sysconfdir)/netconfig" ; \
-	netc_alt="$(DESTDIR)$(sysconfdir)/netconfig.xnsl" ; \
-	netc_dir="$(DESTDIR)$(sysconfdir)/netconfig.d" ; \
-	if test -n '$(DESTDIR)' -a ! -e $$netc_fil -a ! -e $$netc_alt ; then \
+	@t="$(DESTDIR)$(sysconfdir)/netconfig" ; \
+	a="$(DESTDIR)$(sysconfdir)/netconfig.xnsl" ; \
+	d="$(DESTDIR)$(sysconfdir)/netconfig.d" ; \
+	if test -n '$(DESTDIR)' -a ! -e $$t -a ! -e $$a ; then \
 		exit 0 ; \
 	fi ; \
-	if test -e $$netc_fil ; then \
-		if ! grep '^# Generated from netconfig.d' $$netc_fil >/dev/null 2>&1 ; then \
-			netc_fil="$$netc_alt" ; \
+	if test -e $$t ; then \
+		if ! grep '^# Generated from netconfig.d' $$t >/dev/null 2>&1 ; then \
+			t="$$a" ; \
 		fi ; \
 	else \
-		if test -e $$netc_alt -o -n '$(DESTDIR)'; then \
-			netc_fil="$$netc_alt" ; \
+		if test -e $$a -o -n '$(DESTDIR)'; then \
+			t="$$a" ; \
 		fi ; \
 	fi ; \
-	$(ECHO) "$(ECHO) '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $$netc_tmp" ; \
-	$(ECHO) '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $$netc_tmp ; \
-	found='no' ; files="$$netc_dir/*" ; \
-	netc_tmp="$${TMPDIR-/var/tmp}/netconfig.tmp.$$$$" ; \
+	$(ECHO) "$(ECHO) '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $$t.tmp" ; \
+	$(ECHO) '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $$t.tmp ; \
+	found='no' ; files="$$d/*" ; \
 	for f in $$files ; do \
-		if test -f $$f -a "$$f" = "$$netc_dir/strnsl" ; then \
+		if test -f $$f -a "$$f" = "$$d/strnsl" ; then \
 			case $$f in \
 				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
-				(*) $(ECHO) "sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$netc_tmp" ; \
-				    sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$netc_tmp ; \
+				(*) $(ECHO) "sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp" ; \
+				    sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp ; \
 				    found='yes' ;; \
 			esac ; \
 		fi ; \
 	done ; \
 	for f in $$files ; do \
-		if test -f $$f -a "$$f" != "$$netc_dir/strnsl" ; then \
+		if test -f $$f -a "$$f" != "$$d/strnsl" ; then \
 			case $$f in \
 				(*.rpmsave|*.rpmnew|*.rpmorig) ;; \
-				(*) $(ECHO) "sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$netc_tmp" ; \
-				    sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$netc_tmp ; \
+				(*) $(ECHO) "sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp" ; \
+				    sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $$f >> $$t.tmp ; \
 				    found='yes' ;; \
 			esac ; \
 		fi ; \
 	done ; \
 	if test :$$found = :no ; then \
-		$(ECHO) "rm -f $$netc_fil $$netc_tmp" ; \
-		rm -f $$netc_fil $$netc_tmp ; \
+		$(ECHO) "rm -f $$t $$t.tmp" ; \
+		rm -f $$t $$t.tmp ; \
 	else \
-		$(ECHO) "$(am__mv) $$netc_tmp $$netc_fil" ; \
-		$(am__mv) $$netc_tmp $$netc_fil ; \
+		$(ECHO) "$(am__mv) $$t.tmp $$t" ; \
+		$(am__mv) $$t.tmp $$t ; \
 	fi ; \
-	if test "$$netc_fil" != "$$netc_alt" ; then \
-		$(ECHO) "rm -f $$netc_alt" ; \
-		rm -f $$netc_alt ; \
+	if test "$$t" != "$$a" ; then \
+		$(ECHO) "rm -f $$a" ; \
+		rm -f $$a ; \
 	fi
 
 uninstall-netconfig:
@@ -172,7 +164,7 @@ endif
 
 ## PKG_BUILD_USER
 endif
-## PKG_BUILD_ARCH
+## PKG_BUILD_INDEP
 endif
 
 EXTRA_DIST		+= src/util/sysconfig/netconfig

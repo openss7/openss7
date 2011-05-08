@@ -68,7 +68,7 @@ datarootdir=@datarootdir@
 #	circuited for now.
 #
 postrm_repo () { :; return
-    local d="@sysconfdir@/apt/sources.list.d"
+    local d='@sysconfdir@/apt/sources.list.d'
     for f in openss7.list ; do f="$d/$f"
         if [ -f $f -a -f $f.dpkg-save ] ; then
             if ! diff $f $f.dpkg-save >/dev/null 2>&1 ; then
