@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: streams-lib.preinst.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 10:30:21 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,71 +48,97 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2008-04-28 10:30:21 $ by $Author: brian $
 #
 # =============================================================================
-subpkg=repo
+subpkg=compat
 @openss7_header@
 datarootdir=@datarootdir@
 # -----------------------------------------------------------------------------
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
-# postrm_repo() - After we remove (and purge) this repository package, we need
-#   to adjust whatever definitions are required in configuration files.  When we
-#   changed them on installation, we save an original copy in $f.dpkg-save.
-#   Therefore, if $f.dpkg-save exists, copy it back.
+# preinst_libraries() - On a fresh installation, look for an remove any non-deb
+#   or old tarball release libraries.  On reinstallations this step can (and
+#   should) be skipped.  Unfortunately, non-autoconf releases of LiS placed
+#   libraries all over the place.  On an initial installation, this checks for
+#   other libraries with the same name and deletes them.
 #
-#   FIXME: For the rpm version this is much more than this.  It is moving back
-#	common configuration files that were altered by the installation.  Short
-#	circuited for now.
-#
-postrm_repo () { :; return
-    local d="@sysconfdir@/apt/sources.list.d"
-    for f in openss7.list ; do f="$d/$f"
-        if [ -f $f -a -f $f.dpkg-save ] ; then
-            if ! diff $f $f.dpkg-save >/dev/null 2>&1 ; then
-                mv -f -- $f.dpkg-save $f || true
-            fi
+preinst_libraries () {
+    local old_libs
+    for lib in $libraries ; do
+        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
+        if [ -n "$old_libs" ] ; then
+            echo "$script: warning: Deleting old non-deb libraries $old_libs" >&2
+            rm -f $old_libs || true
         fi
-        rm -f -- $f.dpkg-save || true
     done
+}
+#
+# preinst_tools() - On a fresh installation, look for and remove any non-deb or
+#   old tarball release tools.  On reinstallations this step can (and should) be
+#   skipped.
+#
+preinst_tools () {
+    local tool location
+    for tool in $tools ; do
+        location="`which $tool 2>/dev/null`"
+        while [ -n "$location" -a -x "$location" ] ; do
+	    echo "$script: warning: Deleting old non-deb tool $location" >&2
+            rm -f -- $location || true
+            location="`which $tool 2>/dev/null`"
+        done
+    done
+}
+#
+# preinst_lib() - On a fresh installation, look for and remove any conflicting
+#   non-deb or old tarball release tools and libraries.  On reinstallations this
+#   step can (and should) be skipped.
+#
+preinst_lib () { :
+    preinst_libraries
+    preinst_tools
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
-# remove-postrm remove
-remove_postrm () { :
+# new-preinst install
+install_preinst () { :
+    preinst_lib
 }
-# remove-postrm purge
-purge_postrm () { :
-    postrm_repo
+# new-preinst install old-version
+reinstall_preinst () { :
 }
-# old-postrm upgrade new-version
-upgrade_postrm () { :
+# new-preinst upgrade old-version
+upgrade_preinst () { :
 }
 # old-postrm upgrade new-version ...FAILED
-# new-postrm failed-upgrade old-version
-failed_upgrade_postrm () { :
+# new-postrm failed-upgrade old-version ...FAILED
+# old-preinst abort-upgrade new-version
+abort_upgrade_preinst () { :
 }
-# new-preinst install [old-version] ...FAILED
-# new-postrm abort-install [old-version]
-abort_install_postrm () { :
-}
-# new-preinst upgrade old-version ...FAILED
-# new-postrm abort-upgrade old-version
-abort_upgrade_postrm () { :
-}
-# dis-postrm disappear overwriter overwriter-version
-disappear_postrm () { :
-}
-@mscript_postrm@
+@mscript_preinst@
 @mscript_debhelper@
-#if [ "$1" = purge ] && [ -e /usr/share/debconf/confmodule ]; then
-#    . /usr/share/debconf/confmodule
-#fi
 # =============================================================================
 #
-# $Log$
+# $Log: streams-lib.preinst.in,v $
+# Revision 0.9.2.6  2008-04-28 10:30:21  brian
+# - updated headers for release
+#
+# Revision 0.9.2.5  2007/12/15 20:19:31  brian
+# - updates
+#
+# Revision 0.9.2.4  2007/08/13 22:45:55  brian
+# - GPLv3 header updates
+#
+# Revision 0.9.2.3  2006/12/18 10:25:29  brian
+# - updated headers for release
+#
+# Revision 0.9.2.2  2005/03/26 03:11:24  brian
+# - Reworking maintainance scripts
+#
+# Revision 0.9.2.1  2005/03/24 02:09:14  brian
+# - improved debian build
+#
 # =============================================================================
 # vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn
