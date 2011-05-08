@@ -668,6 +668,8 @@
 %global FILES_libstatic     0
 %global FILES_lib32compat   0
 %global FILES_lib32static   0
+%global FILES_netconfig     0
+%global FILES_sock2path     0
 %global FILES_perlmods      0
 %global FILES_tcllibs       0
 %global FILES_gcjlibs       0
@@ -3860,7 +3862,7 @@ post_infofiles () { :
     fi
 }
 %endif
-if %{FILES_manpages}
+%if %{FILES_manpages}
 # ---------------------------------------------------------------------------
 # post_manpages() - On a fresh installation of manual pages, update the
 #   aprospros database.  Note that this takes forever, and even when not
@@ -3963,7 +3965,7 @@ fi
 #   entries from the database is to rebuild it after the entries have already
 #   been removed.
 # ---------------------------------------------------------------------------
-if %{FILES_manpages}
+%if %{FILES_manpages}
 postun_manpages () { :
    if [ "`which mandb      2>/dev/null`" ] ; then
        LANGUAGE= LANG= mandb         %{_mandir} && return || :
@@ -3972,7 +3974,7 @@ postun_manpages () { :
        LANGUAGE= LANG= makewhatis -u %{_mandir} && return || :
    fi
 }
-endif
+%endif
 # ---------------------------------------------------------------------------
 # postun_doc() - On final removal or upgrade, perform the same action which is
 #   to rebuild the aprospros database without the entries from this package.
@@ -4705,6 +4707,7 @@ postun_snmpconf () {
 	rmdir $snmp_dir 2>/dev/null || :
     fi
 }
+%endif
 %if %{FILES_perlmods}
 # ---------------------------------------------------------------------------
 # ---------------------------------------------------------------------------
@@ -5414,7 +5417,7 @@ fi
 # ---------------------------------------------------------------------------
 #pre -p /bin/bash -n %{kernel_package}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%endif #{FILES_modules}
+%endif
 
 %if %{FILES_modules}
 %post -p /bin/bash -n %{kernel_package}
@@ -5588,7 +5591,7 @@ fi
 # ---------------------------------------------------------------------------
 #post -p /bin/bash -n %{kernel_package}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%endif #{FILES_modules}
+%endif
 
 %if %{FILES_modules}
 %triggerin -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
@@ -5690,7 +5693,7 @@ fi
 # ---------------------------------------------------------------------------
 #triggerin -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-%endif #{FILES_modules}
+%endif
 
 %if %{FILES_modules}
 %triggerun -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
@@ -5863,6 +5866,7 @@ fi
 # ---------------------------------------------------------------------------
 #preun -p /bin/bash -n %{kernel_package}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+%endif
 
 %if %{FILES_modules}
 %postun -p /bin/bash -n %{kernel_package}
@@ -6044,6 +6048,7 @@ debug information is useful when developing kernel modules that use
 this package or when debugging kernel modules contained in the package.
 %{descriptail}
 
+%if %{FILES_symvers}
 %triggerin -p /bin/bash -n %{kernel_develop} -- %{target_kdevel}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 %if %{FILES_symvers}
