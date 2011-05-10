@@ -33,7 +33,8 @@ update="$awk -f $script --"
 
 
 openss7_update () { :
-    return $update "$@"
+    $update "$@"
+    return $?
 }
 
 #
