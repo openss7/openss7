@@ -2847,9 +2847,9 @@ if [ $1 -eq 1 ] ; then : # fresh install
     for i in $reverse; do
 	if [ -f %_initrddir/$i ]; then
             echo "warning: Stopping non-rpm init script, $i" >&2
-	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || true }
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || true }
-	    [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || true }
+	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || true; }
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || true; }
+	    [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || true; }
 	fi
     done
     list='%{initfiles} %{nonrpminit}'
@@ -2859,10 +2859,10 @@ if [ $1 -eq 1 ] ; then : # fresh install
     for i in $reverse; do
 	if [ -f %_initrddir/$i ]; then
             echo "warning: Deregistering non-rpm init script, $i" >&2
-	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        && continue || true }
-	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        && continue || true }
-	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        && continue || true }
-	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove && continue || true }
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        && continue || true; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        && continue || true; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        && continue || true; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove && continue || true; }
 	fi
     done
 %endif
@@ -2883,7 +2883,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null`; do
 	    b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)? , ,'`
 	    case " $modules " in (*" $b "*) ;; (*) continue ;; esac
-            modl_mods="${modl_mods:+$modl_mods }$m" ;;
+            modl_mods="${modl_mods:+$modl_mods }$m"
 	done
 	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
 	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
@@ -3002,11 +3002,11 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     list='%{initfiles}'
     for i in $list; do
 	if [ -f %_initrddir/$i ]; then
-	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       && continue || true }
-	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       && continue || true }
-	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       && continue || true }
+	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       && continue || true; }
+	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       && continue || true; }
+	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       && continue || true; }
 	    args="`grep '^#[[:space:]]*update-rc.d:' %_initrddir/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
-	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args && continue || true }
+	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args && continue || true; }
 	fi
     done
 %endif
@@ -3034,7 +3034,8 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 ] ; then : # kernel is being installed or upgraded with base present
     if [ -x %{_sbindir}/%{name}-modules ]; then
-	%{_sbindir}/%{name}-modules -- -q -e --update-kernel || :
+	%{_sbindir}/%{name}-modules -- -q -e \
+            --update-kernel >&2 || :
     fi
 fi
 %endif
@@ -3099,17 +3100,17 @@ if [ $1 -eq 0 ] ; then : # final removal
     done
     for i in $reverse; do
 	if [ -f "%_initrddir/$i" ]; then
-            [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || : }
-            [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || : }
-            [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || : }
+            [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
+            [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
+            [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || :; }
 	fi
     done
     for i in $reverse; do
 	if [ -f "%_initrddir/$i" ]; then
-	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || : }
-	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || : }
-	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || : }
-	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove 2>&1 && continue || : }
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || :; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || :; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || :; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove 2>&1 && continue || :; }
 	fi
     done
 %endif
@@ -3640,9 +3641,9 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # both present install or upgrade
 	    if [ -L $l ]; then start=yes; break; fi
 	done
 	[ $start = yes ] || continue
-	[ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break }
-	[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break }
-	[ -x "%_initrddir/$i"                  ] && { %_initrddir/$i start && continue || break }
+	[ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break; }
+	[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break; }
+	[ -x "%_initrddir/$i"                  ] && { %_initrddir/$i start && continue || break; }
     done
 fi
 %endif
@@ -3664,7 +3665,7 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     netc_tmp=%{_tmppath}/netconfig.tmp.$$
     found=no
     files="$netc_dir/*"
-    if [ ! -r $netc_file -o -r $netc_alt ]; then
+    if [ ! -r $netc_fil -o -r $netc_alt ]; then
         if [ -d $netc_dir ]; then
             if [ -r $netc_fil ]; then
                 if ! grep '^# Generated from netconfig.d' $netc_fil >/dev/null 2>&1; then
@@ -4259,6 +4260,7 @@ if [ $1 -eq 1 ]; then : # fresh install
     modules='%{modules}'
     for dir in %{_kmoduledir}; do
 	[ -d $dir ] || continue
+	modl_mods=
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
 		b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?,,'`
 		case " $modules " in (*" $b "*) ;; (*) continue ;; esac
@@ -4370,9 +4372,9 @@ if [ $1 -eq 1 -o $1 -eq 1 ] ; then : # fresh install or upgrade
 	    if [ -L $l ]; then start=yes; break; fi
 	done
 	[ $start = yes ] || continue
-	[ -x "`which service     2>/dev/null`" ] && { service       $i start && continue || break }
-	[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i start && continue || break }
-	[ -x "%{_initrddir}/$i"                ] && { %{_initrddir}/$i start && continue || break }
+	[ -x "`which service     2>/dev/null`" ] && { service       $i start && continue || break; }
+	[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i start && continue || break; }
+	[ -x "%{_initrddir}/$i"                ] && { %{_initrddir}/$i start && continue || break; }
     done
 %endif
 %endif
@@ -4392,13 +4394,13 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
         scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
-        if [ -n "$scripts"] ; then
+        if [ -n "$scripts" ] ; then
             %{_sbindir}/%{name}-modules -- -q -e \
                 --initscripts="$scripts" \
-                --add-modules %{_kversion} || :
+                --add-modules %{_kversion} >&2 || :
         else
             %{_sbindir}/%{name}-modules -- -q -e \
-                --add-modules %{_kversion} || :
+                --add-modules %{_kversion} >&2 || :
         fi
     fi
 %endif
@@ -4415,9 +4417,9 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
                 if [ -L $l ]; then start=yes; break; fi
             done
             [ $start = yes ] || continue
-            [ -x "`which service     2>/dev/null`" ] && { service       $i start && continue || break }
-            [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i start && continue || break }
-            [ -x "%{_initrddir}/$i"                ] && { %{_initrddir}/$i start && continue || break }
+            [ -x "`which service     2>/dev/null`" ] && { service       $i start && continue || break; }
+            [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i start && continue || break; }
+            [ -x "%{_initrddir}/$i"                ] && { %{_initrddir}/$i start && continue || break; }
         done
     fi
 %endif
@@ -4433,7 +4435,7 @@ if [ $1 -eq 0 ] ; then : # kernel modules being removed with base present
     if [ -x %{_sbindir}/%{name}-modules ]; then
 	%{_sbindir}/%{name}-modules -- -q -e \
             --delete-modules \
-	    --remove-modules %{_kversion} || :
+	    --remove-modules %{_kversion} >&2 || :
     fi
 %endif
 fi
@@ -4441,7 +4443,7 @@ if [ $2 -eq 0 ] ; then : # base being removed with kernel modules present
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
 	%{_sbindir}/%{name}-modules -- -q -e \
-	    --remove-modules %{_kversion} || :
+	    --remove-modules %{_kversion} >&2 || :
     fi
 %endif
 %if %{HAVE_oldmods}
