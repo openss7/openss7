@@ -637,11 +637,19 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     command = "find " dirs " -name '*.ko' 2>/dev/null"
     while ((command | getline file) == 1) {
 	#if (file~/\/lib\/modules\/[^\/]*\/kernel\//) continue
+	kversion = pathversion(file)
+	if (!kversion) { kversion = fileversion(file) }
+	if (!kversion) {
+	    continue
+	}
+	if (kversion == kremoved) {
+	    delmods[file] = kversion
+	    continue
+	}
+	if (!(kversion in kversions)) { kversions[kversion] = 1; k++ }
 	name = file; sub(/^.*\//, "", name)
 	if (!(name in names)) { names[name] = 1; u++ }
 	if (file~"/" subdir "/") {
-	    kversion = pathversion(file)
-	    if (kversion && !(kversion in kversions)) { kversions[kversion] = 1; k++ }
 	    weakmods[file] = kversion
 	    if (system_command("test -L " file) == 0) {
 		cmd = "readlink " file
@@ -664,9 +672,6 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 	    #print_vinfo(4, pfx "weak = " "yes")
 	    #print_vinfo(4, pfx "link = " module)
 	} else {
-	    kversion = pathversion(file)
-	    if (!kversion) { kversion = fileversion(file) }
-	    if (kversion && !(kversion in kversions)) { kversions[kversion] = 1; k++ }
 	    modules[file] = kversion
 	    subdirs[file] = pathsubdir(file)
 	    h++; ph++
@@ -2351,6 +2356,30 @@ function dodepmod(kversion,
     command = command " " kversion
     doit(command)
 }
+function initstart(	n,scripts,i,script,command) {
+    n = split(values["initscripts"],scripts,/,/)
+    if ( n == 0 )
+	return
+    if (system_command("test -x /sbin/service") == 0) {
+	for (i=1;i<=n;i++) { script = scripts[i]
+	    command = "/sbin/service " script " start"
+	    doit(command)
+	}
+    } else
+    if (system_command("test -x /usr/bin/invoke-rc.d") == 0) {
+	for (i=1;i<=n;i++) { script = scripts[i]
+	    command = "/usr/sbin/invoke-rc.d " script " start"
+	    doit(command)
+	}
+    } else {
+	for (i=1;i<=n;i++) { script = scripts[i]
+	    if (system_command("test -x /etc/init.d/" script) == 0) {
+		command = "/etc/init.d/" script " start"
+		doit(command)
+	    }
+	}
+    }
+}
 function remove_kernel(kversion,
 		       pfx,dir)
 {
@@ -2411,6 +2440,9 @@ function add_kernel(kversion,
     if (chcksolution(kversion, kver, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded)) {
 	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)) {
 	    dodepmod(kversion)
+	    if ( kversion == krunning ) {
+		initstart()
+	    }
 	}
     }
 }
@@ -2453,12 +2485,14 @@ function update_kernels(kversion,
 	while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
 	close(command)
     }
+    kremoved = ""
     add_kernels(kversion)
 }
 function boot_kernels(kversion,
 		      pfx,kversions,command)
 {
     pfx = "p: bootkernel, "
+    kremoved = ""
     add_kernels(kversion)
 }
 function add_modules(kversion,
@@ -2469,6 +2503,7 @@ function add_modules(kversion,
 	print_error("o: one and only one KVERSION permitted for --add-modules")
 	usage(stderr); exit 2 }
     kversion = kversions[1]
+    kremoved = ""
     kversion = ""
     command = "ls /lib/modules"
     while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
@@ -2484,6 +2519,7 @@ function link_modules(kversion,
 	print_error("o: one and only one KVERSION permitted for --link-modules")
 	usage(stderr); exit 2 }
     kversion = kversions[1]
+    kremoved = ""
     kversion = ""
     command = "ls /lib/modules"
     while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
@@ -2499,17 +2535,24 @@ function remove_modules(kversion,
 	print_error("o: one and only one KVERSION permitted for --remove-modules")
 	usage(stderr); exit 2 }
     kversion = kversions[1]
+    kremoved = kversion
     kversion = ""
     command = "ls /lib/modules"
     while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
     close(command)
     add_kernels(kversion)
+    if (values["delete-modules"]) {
+	for (file in delmods) {
+	    doit("rm -f -- " file)
+	}
+    }
 }
 function update_modules(kversion,
 			pfx,kversions,command)
 {
     pfx = "p: updmodules, "
     kversion = ""
+    kremoved = ""
     command = "ls /lib/modules"
     while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
     close(command)
@@ -2581,6 +2624,7 @@ BEGIN {
     longopts["package"       ] = "P:" ; defaults["package"       ] = d["package" ]	; descrips["package"       ] = "package name (used to find subdirectories)"
     longopts["style"         ] = "s:" ; defaults["style"         ] = d["style"   ]	; descrips["style"         ] = "style of weak-updates (detect when unspec.)"						; longargs["style"         ] = "{debian|redhat|suse10|suse11|ubuntu}"
     longopts["initscripts"   ] = "i::"; defaults["initscripts"   ] = d["inits"   ]	; descrips["initscripts"   ] = "comma-separated list of init scripts to run"						; longargs["initscripts"   ] = "[SCRIPT[,SCRIPT]...]"
+    longopts["delete-modules"] = "d"  ; defaults["delete-modules"] = 0			; descrips["delete-modules"] = "delete modules for specified kernel version"
     longopts["depmodx"       ] = "x"  ; defaults["depmodx"       ] = 0			; descrips["depmodx"       ] = "depmod supports -E option (detect when unspec.)"
     longopts["preserve"      ] = "p"  ; defaults["preserve"      ] = 1			; descrips["preserve"      ] = "preserve configuration for running kernel"
     longopts["overwrite"     ] = "o"  ; defaults["overwrite"     ] = 0			; descrips["overwrite"     ] = "overwrite configuration for running kernel"
@@ -2595,25 +2639,26 @@ BEGIN {
     longopts["version"       ] = "V!" ;							  descrips["version"       ] = "display script version and exit"
     longopts["copying"       ] = "C!" ;							  descrips["copying"       ] = "display coding permissions and exit"
     delete d
-    values["kversion"     ] = defaults["kversion"     ]
-    values["allsym"       ] = defaults["allsym"       ]
-    values["sysmap"       ] = defaults["sysmap"       ]
-    values["sysver"       ] = defaults["sysver"       ]
-    values["symver"       ] = defaults["symver"       ]
-    values["symabi"       ] = defaults["symabi"       ]
-    values["package"      ] = defaults["package"      ]
-    values["rootdir"      ] = defaults["rootdir"      ]
-    values["basedir"      ] = defaults["basedir"      ]
-    values["preserve"     ] = defaults["preserve"     ]
-    values["overwrite"    ] = defaults["overwrite"    ]
-    values["exit-on-error"] = defaults["exit-on-error"]
-    values["dryrun"       ] = defaults["dryrun"       ]
-    values["dry-run"      ] = defaults["dry-run"      ]
-    values["quiet"        ] = defaults["quiet"        ]
-    values["silent"       ] = defaults["silent"       ]
-    values["debug"        ] = defaults["debug"        ]
-    values["verbose"      ] = defaults["verbose"      ]
-    optstring = "k:ALRUalruM:c:b:w:F:E:S:Y:P:s:i::poxjenqD::v::hVC"
+    values["kversion"      ] = defaults["kversion"      ]
+    values["allsym"        ] = defaults["allsym"        ]
+    values["sysmap"        ] = defaults["sysmap"        ]
+    values["sysver"        ] = defaults["sysver"        ]
+    values["symver"        ] = defaults["symver"        ]
+    values["symabi"        ] = defaults["symabi"        ]
+    values["package"       ] = defaults["package"       ]
+    values["rootdir"       ] = defaults["rootdir"       ]
+    values["basedir"       ] = defaults["basedir"       ]
+    values["delete-modules"] = defaults["delete-modules"]
+    values["preserve"      ] = defaults["preserve"      ]
+    values["overwrite"     ] = defaults["overwrite"     ]
+    values["exit-on-error" ] = defaults["exit-on-error" ]
+    values["dryrun"        ] = defaults["dryrun"        ]
+    values["dry-run"       ] = defaults["dry-run"       ]
+    values["quiet"         ] = defaults["quiet"         ]
+    values["silent"        ] = defaults["silent"        ]
+    values["debug"         ] = defaults["debug"         ]
+    values["verbose"       ] = defaults["verbose"       ]
+    optstring = "k:ALRUalruM:c:b:w:F:E:S:Y:P:s:i::podxjenqD::v::hVC"
     optind = 0
     #opts = ""; for (i=1;i<ARGC;i++) { if (i == 1) { opts = ARGV[i] } else { opts = opts " " ARGV[i] } }
     #print me ": D: o: command line: " opts > stderr; written[stderr] = 1
@@ -2623,7 +2668,7 @@ BEGIN {
 	#if (c != -1) { print me ": D: o: option -" c ", longopt --" option ", optset = " optset ", optarg = " optarg > stderr; written[stderr] = 1 }
 	if (c == -1) break
 	else if (c~/[kMcbwFESPsi]/)			{ values[option] = optarg }
-	else if (c~/[poxjenq]/)				{ values[option] = optset }
+	else if (c~/[podxjenq]/)			{ values[option] = optset }
 	else if (c~/[Dv]/)	{ if (optarg  != "")	{ values[option] = optarg } else { if (optset)  { values[option]++ } else { values[option] = optset } } }
 	else if (c~/[ALRUBalru]/)			{ values[option] = optset; if (!optset && command == option)	{ command = "" } else
 										   if (optset && !command)		{ command = option } else
