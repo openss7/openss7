@@ -3034,8 +3034,9 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 ] ; then : # kernel is being installed or upgraded with base present
     if [ -x %{_sbindir}/%{name}-modules ]; then
-	%{_sbindir}/%{name}-modules -- -q -e \
-            --update-kernel >&2 || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
+	%{_sbindir}/%{name}-modules -- $v -e \
+            --update-kernel || :
     fi
 fi
 %endif
@@ -4395,12 +4396,14 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
     if [ -x %{_sbindir}/%{name}-modules ]; then
         scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
         if [ -n "$scripts" ] ; then
-            %{_sbindir}/%{name}-modules -- -q -e \
+            v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
+            %{_sbindir}/%{name}-modules -- $v -e \
                 --initscripts="$scripts" \
-                --add-modules %{_kversion} >&2 || :
+                --add-modules %{_kversion} || :
         else
-            %{_sbindir}/%{name}-modules -- -q -e \
-                --add-modules %{_kversion} >&2 || :
+            v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
+            %{_sbindir}/%{name}-modules -- $v -e \
+                --add-modules %{_kversion} || :
         fi
     fi
 %endif
@@ -4433,17 +4436,19 @@ fi
 if [ $1 -eq 0 ] ; then : # kernel modules being removed with base present
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
-	%{_sbindir}/%{name}-modules -- -q -e \
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
+	%{_sbindir}/%{name}-modules -- $v -e \
             --delete-modules \
-	    --remove-modules %{_kversion} >&2 || :
+	    --remove-modules %{_kversion} || :
     fi
 %endif
 fi
 if [ $2 -eq 0 ] ; then : # base being removed with kernel modules present
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
-	%{_sbindir}/%{name}-modules -- -q -e \
-	    --remove-modules %{_kversion} >&2 || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
+	%{_sbindir}/%{name}-modules -- $v -e \
+	    --remove-modules %{_kversion} || :
     fi
 %endif
 %if %{HAVE_oldmods}

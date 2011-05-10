@@ -631,66 +631,65 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     for (path in paths) {
 	if (dirs == "") { dirs = path } else { dirs = dirs " " path }
     }
-    if (dirs == "") { dirs = "`pwd`" } else { dirs = "`pwd`" " " dirs }
-    print_vinfo(2, pfx "dirs = " dirs)
-    h = 0; l = 0; u = 0; ph = 0; pl = 0
-    command = "find " dirs " -name '*.ko' 2>/dev/null"
-    while ((command | getline file) == 1) {
-	#if (file~/\/lib\/modules\/[^\/]*\/kernel\//) continue
-	kversion = pathversion(file)
-	if (!kversion) { kversion = fileversion(file) }
-	if (!kversion) {
-	    continue
-	}
-	if (kversion == kremoved) {
-	    delmods[file] = kversion
-	    continue
-	}
-	if (!(kversion in kversions)) { kversions[kversion] = 1; k++ }
-	name = file; sub(/^.*\//, "", name)
-	if (!(name in names)) { names[name] = 1; u++ }
-	if (file~"/" subdir "/") {
-	    weakmods[file] = kversion
-	    if (system_command("test -L " file) == 0) {
-		cmd = "readlink " file
-		while ((cmd | getline) == 1) { module = $0 }
-		close(cmd)
-		weaklinks[file] = module
-	    }
-	    l++; pl++
-	    if (pl >= 100) {
-		print_vmore(3, pfx sprintf("%03d modules; %03d links; %03d names; %02d kernels", h, l, u, k))
-		pl = 0; ph = 0
-	    }
-	    if ((kversion,name) in weaknames && weaknames[kversion,name] != file)
-	    { weaknames[kversion,name] = weaknames[kversion,name] "," file
-	      print_error(pfx "conflict amoung updates for " name ", " weaknames[kversion,name]) }
-	    { weaknames[kversion,name] = file }
-	    #print_vinfo(4, pfx "name = " name)
-	    #print_vinfo(4, pfx "vers = " kversion)
-	    #print_vinfo(4, pfx "file = " file)
-	    #print_vinfo(4, pfx "weak = " "yes")
-	    #print_vinfo(4, pfx "link = " module)
-	} else {
-	    modules[file] = kversion
-	    subdirs[file] = pathsubdir(file)
-	    h++; ph++
-	    if (ph >= 100) {
-		print_vmore(3, pfx sprintf("%03d modules; %03d links; %03d names; %02d kernels", h, l, u, k))
-		pl = 0; ph = 0
-	    }
-	    if ((kversion,name) in modnames && modnames[kversion,name] != file)
-	    { modnames[kversion,name] = modnames[kversion,name] "," file
-	      print_error(pfx "conflict amoung modules for " name ", " modnames[kversion,name]) }
-	    { modnames[kversion,name] = file }
-	    #print_vinfo(4, pfx "name = " name)
-	    #print_vinfo(4, pfx "vers = " kversion)
-	    #print_vinfo(4, pfx "file = " file)
-	    #print_vinfo(4, pfx "weak = " "no")
-	    #print_vinfo(4, pfx "subd = " subdirs[file])
-	}
+    if (values["test"]) {
+	if (dirs == "") { dirs = "`pwd`" } else { dirs = "`pwd`" " " dirs }
     }
-    close(command)
+    if (dirs != "") {
+	print_vinfo(2, pfx "dirs = " dirs)
+	h = 0; l = 0; u = 0; ph = 0; pl = 0
+	command = "find " dirs " -name '*.ko' 2>/dev/null"
+	while ((command | getline file) == 1) {
+	    #if (file~/\/lib\/modules\/[^\/]*\/kernel\//) continue
+	    kversion = pathversion(file)
+	    if (!kversion) { kversion = fileversion(file) }
+	    if (!kversion) { continue }
+	    if (kversion == kremoved) { delmods[file] = kversion; continue }
+	    if (!(kversion in kversions)) { kversions[kversion] = 1; k++ }
+	    name = file; sub(/^.*\//, "", name)
+	    if (!(name in names)) { names[name] = 1; u++ }
+	    if (file~"/" subdir "/") {
+		weakmods[file] = kversion
+		if (system_command("test -L " file) == 0) {
+		    cmd = "readlink " file
+		    while ((cmd | getline) == 1) { module = $0 }
+		    close(cmd)
+		    weaklinks[file] = module
+		}
+		l++; pl++
+		if (pl >= 100) {
+		    print_vmore(3, pfx sprintf("%03d modules; %03d links; %03d names; %02d kernels", h, l, u, k))
+		    pl = 0; ph = 0
+		}
+		if ((kversion,name) in weaknames && weaknames[kversion,name] != file)
+		{ weaknames[kversion,name] = weaknames[kversion,name] "," file
+		  print_error(pfx "conflict amoung updates for " name ", " weaknames[kversion,name]) }
+		{ weaknames[kversion,name] = file }
+		#print_vinfo(4, pfx "name = " name)
+		#print_vinfo(4, pfx "vers = " kversion)
+		#print_vinfo(4, pfx "file = " file)
+		#print_vinfo(4, pfx "weak = " "yes")
+		#print_vinfo(4, pfx "link = " module)
+	    } else {
+		modules[file] = kversion
+		subdirs[file] = pathsubdir(file)
+		h++; ph++
+		if (ph >= 100) {
+		    print_vmore(3, pfx sprintf("%03d modules; %03d links; %03d names; %02d kernels", h, l, u, k))
+		    pl = 0; ph = 0
+		}
+		if ((kversion,name) in modnames && modnames[kversion,name] != file)
+		{ modnames[kversion,name] = modnames[kversion,name] "," file
+		  print_error(pfx "conflict amoung modules for " name ", " modnames[kversion,name]) }
+		{ modnames[kversion,name] = file }
+		#print_vinfo(4, pfx "name = " name)
+		#print_vinfo(4, pfx "vers = " kversion)
+		#print_vinfo(4, pfx "file = " file)
+		#print_vinfo(4, pfx "weak = " "no")
+		#print_vinfo(4, pfx "subd = " subdirs[file])
+	    }
+	}
+	close(command)
+    }
     print_vinfo(2, pfx sprintf("%03d modules; %03d links; %03d names; %02d kernels", h, l, u, k))
     counts["hard"] = h
     counts["link"] = l
@@ -2628,6 +2627,7 @@ BEGIN {
     longopts["depmodx"       ] = "x"  ; defaults["depmodx"       ] = 0			; descrips["depmodx"       ] = "depmod supports -E option (detect when unspec.)"
     longopts["preserve"      ] = "p"  ; defaults["preserve"      ] = 1			; descrips["preserve"      ] = "preserve configuration for running kernel"
     longopts["overwrite"     ] = "o"  ; defaults["overwrite"     ] = 0			; descrips["overwrite"     ] = "overwrite configuration for running kernel"
+    longopts["test"          ] = "t"  ; defaults["test"          ] = 0			; descrips["test"          ] = "test modules in current directory"
     longopts["exit-on-error" ] = "e"  ; defaults["exit-on-error" ] = 0			; descrips["exit-on-error" ] = "exit with error status on program errors"
     longopts["dryrun"        ] = "n"  ; defaults["dryrun"        ] = 0			; descrips["dryrun"        ] = "don't perform actions, just check them"
     longopts["dry-run"       ] = "n"  ; defaults["dry-run"       ] = 0			; descrips["dry-run"       ] = "don't perform actions, just check them"
@@ -2651,6 +2651,7 @@ BEGIN {
     values["delete-modules"] = defaults["delete-modules"]
     values["preserve"      ] = defaults["preserve"      ]
     values["overwrite"     ] = defaults["overwrite"     ]
+    values["test"          ] = defaults["test"          ]
     values["exit-on-error" ] = defaults["exit-on-error" ]
     values["dryrun"        ] = defaults["dryrun"        ]
     values["dry-run"       ] = defaults["dry-run"       ]
@@ -2658,7 +2659,7 @@ BEGIN {
     values["silent"        ] = defaults["silent"        ]
     values["debug"         ] = defaults["debug"         ]
     values["verbose"       ] = defaults["verbose"       ]
-    optstring = "k:ALRUalruM:c:b:w:F:E:S:Y:P:s:i::podxjenqD::v::hVC"
+    optstring = "k:ALRUalruM:c:b:w:F:E:S:Y:P:s:i::podtxjenqD::v::hVC"
     optind = 0
     #opts = ""; for (i=1;i<ARGC;i++) { if (i == 1) { opts = ARGV[i] } else { opts = opts " " ARGV[i] } }
     #print me ": D: o: command line: " opts > stderr; written[stderr] = 1
@@ -2668,7 +2669,7 @@ BEGIN {
 	#if (c != -1) { print me ": D: o: option -" c ", longopt --" option ", optset = " optset ", optarg = " optarg > stderr; written[stderr] = 1 }
 	if (c == -1) break
 	else if (c~/[kMcbwFESPsi]/)			{ values[option] = optarg }
-	else if (c~/[podxjenq]/)			{ values[option] = optset }
+	else if (c~/[podtxjenq]/)			{ values[option] = optset }
 	else if (c~/[Dv]/)	{ if (optarg  != "")	{ values[option] = optarg } else { if (optset)  { values[option]++ } else { values[option] = optset } } }
 	else if (c~/[ALRUBalru]/)			{ values[option] = optset; if (!optset && command == option)	{ command = "" } else
 										   if (optset && !command)		{ command = option } else
