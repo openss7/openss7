@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-07 04:48:31 $
+# @(#) $RCSfile: configure.ac,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-05-10 13:45:30 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-02-07 04:48:31 $ by $Author: brian $
+# Last Modified $Date: 2011-05-10 13:45:30 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -58,7 +58,7 @@ dnl Process this file with autoconf to produce a configure script.
 dnl
 AC_PREREQ(2.68)
 AC_INIT([OpenSS7],[1.1],[bugs@openss7.org],[openss7])
-AC_REVISION([$Name:  $($Revision: 1.1.2.10 $) $Date: 2011-02-07 04:48:31 $])
+AC_REVISION([$Name:  $($Revision: 1.1.2.11 $) $Date: 2011-05-10 13:45:30 $])
 
 AC_LANG_DEFINES_PROVIDED
 
@@ -298,6 +298,9 @@ AC_OUTPUT
 # =============================================================================
 #
 # $Log: configure.ac,v $
+# Revision 1.1.2.11  2011-05-10 13:45:30  brian
+# - weak modules workup
+#
 # Revision 1.1.2.10  2011-02-07 04:48:31  brian
 # - updated configure and build scripts
 #

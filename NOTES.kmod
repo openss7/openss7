@@ -1,5 +1,5 @@
 OpenSS7 -- kernel module notes.  2011-02-12
-$Id: NOTES.kmod,v 1.1.2.4 2011-04-11 06:13:40 brian Exp $
+$Id: NOTES.kmod,v 1.1.2.5 2011-05-10 13:45:30 brian Exp $
 Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
 Copyright (c) 1997-2001  Brian Bidulock <bidulock@openss7.org>
