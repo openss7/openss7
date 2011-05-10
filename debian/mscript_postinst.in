@@ -1,6 +1,6 @@
 # =============================================================================
 # @configure_input@
-# @(#) $RCSfile: mscript_postinst.in,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 10:26:51 $
+# @(#) $RCSfile: mscript_postinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:29 $
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>

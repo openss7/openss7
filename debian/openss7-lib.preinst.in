@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: streams-lib.preinst.in,v $ $Name:  $($Revision: 0.9.2.6 $) $Date: 2008-04-28 10:30:21 $
+# @(#) $RCSfile: openss7-lib.preinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 10:30:21 $ by $Author: brian $
+# Last Modified $Date: 2011-05-10 13:45:29 $ by $Author: brian $
 #
 # =============================================================================
 subpkg=lib
@@ -121,7 +121,10 @@ abort_upgrade_preinst () { :
 @mscript_debhelper@
 # =============================================================================
 #
-# $Log: streams-lib.preinst.in,v $
+# $Log: openss7-lib.preinst.in,v $
+# Revision 1.1.2.2  2011-05-10 13:45:29  brian
+# - weak modules workup
+#
 # Revision 0.9.2.6  2008-04-28 10:30:21  brian
 # - updated headers for release
 #

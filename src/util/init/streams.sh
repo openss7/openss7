@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 00:19:32 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-10 13:45:37 $
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -939,7 +939,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 00:19:32 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-10 13:45:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -985,11 +985,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-12 00:19:32 $ by $Author: brian $
+# Last Modified $Date: 2011-05-10 13:45:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: streams.sh,v $
+# Revision 1.1.2.4  2011-05-10 13:45:37  brian
+# - weak modules workup
+#
 # Revision 1.1.2.3  2011-01-12 00:19:32  brian
 # - modprobe no longer accepts k option
 #

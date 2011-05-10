@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-11 06:13:44 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-10 13:45:37 $
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -979,7 +979,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-11 06:13:44 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-10 13:45:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -1025,11 +1025,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-04-11 06:13:44 $ by $Author: brian $
+# Last Modified $Date: 2011-05-10 13:45:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: specfs.sh,v $
+# Revision 1.1.2.6  2011-05-10 13:45:37  brian
+# - weak modules workup
+#
 # Revision 1.1.2.5  2011-04-11 06:13:44  brian
 # - working up weak updates
 #

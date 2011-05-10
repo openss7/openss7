@@ -1,7 +1,7 @@
 #!/bin/bash
 # =============================================================================
 # 
-# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# @(#) $RCSfile: weak-modules.openss7,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-05-10 13:45:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date$ by $Author$
+# Last Modified $Date: 2011-05-10 13:45:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -81,7 +81,7 @@ progname="$program"
 reexec="$SHELL $0"
 
 version="3.0.0"
-ident='$RCSfile: weak-modules.openss7,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-01-12 03:44:13 $'
+ident='$RCSfile: weak-modules.openss7,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-05-10 13:45:31 $'
 
 # Sed substitution that helps us do robust quoting.  It backslashifies
 # metacharacters that are still active within double-quoted strings.
@@ -388,7 +388,7 @@ for d in $defaults ; do
 done
 
 if test X$show_vers = Xyes ; then
-    $echo "$progname:"' Version $Name$($Revision$) $Date$'
+    $echo "$progname:"' Version $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-05-10 13:45:31 $'
 fi
 
 if test $debug -gt 1 -o $verbose -gt 1 ; then
@@ -667,6 +667,9 @@ exit $retval
 
 # =============================================================================
 #
-# $Log$
+# $Log: weak-modules.openss7,v $
+# Revision 1.1.2.1  2011-05-10 13:45:31  brian
+# - weak modules workup
+#
 # =============================================================================
 # vim: ft=sh sw=4 et nocin nosi

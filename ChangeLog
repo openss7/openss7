@@ -1,3 +1,152 @@
+2011-05-10  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/openss7-core.postinst.in: deleted
+	* debian/openss7-core.postrm.in: deleted
+	* debian/openss7-core.preinst.in: deleted
+	* debian/openss7-core.prerm.in: deleted
+	* debian/openss7-dev.postinst.in: deleted
+	* debian/openss7-dev.preinst.in: deleted
+	* debian/openss7-dev.prerm.in: deleted
+	* debian/openss7-init.postinst.in: deleted
+	* debian/openss7-init.postrm.in: deleted
+	* debian/openss7-init.preinst.in: deleted
+	* debian/openss7-init.prerm.in: deleted
+	* debian/openss7-source.preinst.in: deleted
+	* debian/openss7-util.preinst.in: deleted
+
+	* NOTES.deb: new file
+	* NOTES.init: new file
+	* debian-lenny-i686-config.cache: new file
+	* debian/mscript_debhelper.in: new file
+	* debian/openss7-base.postinst.in: new file
+	* debian/openss7-base.postrm.in: new file
+	* debian/openss7-base.preinst.in: new file
+	* debian/openss7-base.prerm.in: new file
+	* debian/openss7-compat.postinst.in: new file
+	* debian/openss7-compat.postrm.in: new file
+	* debian/openss7-compat.preinst.in: new file
+	* debian/openss7-compat.prerm.in: new file
+	* debian/openss7-doc.postrm.in: new file
+	* debian/openss7-java.postinst.in: new file
+	* debian/openss7-java.postrm.in: new file
+	* debian/openss7-java.preinst.in: new file
+	* debian/openss7-kernel.postinst.in: new file
+	* debian/openss7-kernel.postrm.in: new file
+	* debian/openss7-kernel.preinst.in: new file
+	* debian/openss7-kernel.prerm.in: new file
+	* debian/openss7-lib.postinst.in: new file
+	* debian/openss7-lib.postrm.in: new file
+	* debian/openss7-lib.prerm.in: new file
+	* debian/openss7-repo.postinst.in: new file
+	* debian/openss7-repo.postrm.in: new file
+	* debian/openss7-repo.preinst.in: new file
+	* debian/openss7-repo.prerm.in: new file
+	* debian/openss7_header.in: new file
+	* scripts/weak-modules.openss7: new file
+	* scripts/rpm/rpmsort: new file
+	* src/util/update-netconfig: new file
+	* src/util/update-snmp: new file
+	* src/util/update-sock2path: new file
+	* src/util/weak-modules.centos5.openss7: new file
+	* src/util/weak-modules.rhel6.openss7: new file
+	* src/util/weak-modules.suse.openss7: new file
+	* src/util/weak-modules2.suse.openss7: new file
+
+	* AUTHORS: release files
+	* ChangeLog: release files
+	* NEWS: release files
+	* NOTES.kmod: release files
+	* NOTES.kmp: release files
+	* NOTES.rpm: release files
+	* README: release files
+	* THANKS: release files
+
+	* Makefile.am: used KCC for kernel compiler
+	* acinclude.m4: used different debian control files
+	* configure.ac: make RPM optimization flags separate
+	* debian-squeeze-i686-config.cache: update
+	* openss7.spec.in: completely rework install, uninstall and trigger
+	  scriplets
+
+	* am/deb.am: adjust debian release build
+	* am/help.am: install README-make and INSTALL-PACKAGE
+	* am/init.am: condition on INSTALL_INITSCRIPTS
+	* am/kernel.am: use KCC for kernel compiler
+	* am/lsm.am: install lsm file
+	* am/netconfig.am: make consistent with rpm and deb scripts
+	* am/openss7.am: define dist_doc_DATA
+	* am/release.am: install release files
+	* am/rpm.am: don't build rpms on debian anymore
+	* am/snmp.am: reformat comments
+	* am/sock2path.am: make consistent with rpm and deb scripts
+
+	* debian/changelog.in: working up debian build
+	* debian/control.in: working up debian build
+	* debian/copyright: working up debian build
+	* debian/mscript_header.in: working up debian build
+	* debian/mscript_postinst.in: working up debian build
+	* debian/mscript_postrm.in: working up debian build
+	* debian/mscript_preinst.in: working up debian build
+	* debian/mscript_prerm.in: working up debian build
+	* debian/openss7-devel.preinst.in: working up debian build
+	* debian/openss7-doc.postinst.in: working up debian build
+	* debian/openss7-doc.preinst.in: working up debian build
+	* debian/openss7-doc.prerm.in: working up debian build
+	* debian/openss7-lib.preinst.in: working up debian build
+	* debian/rules.in: working up debian build
+
+	* m4/bld.m4: dlocate is faster than dpkg.
+	* m4/deb.m4: add debhelper master script
+	* m4/genksyms.m4: symsets must have only one name
+	* m4/init.m4: comments
+	* m4/kernel.m4: use KCC now for kernel compiler
+	* m4/snmp.m4: avoid useless warnings on debian
+	* po/de.po: update release files
+
+	* scripts/install_initd: updated scripts
+	* scripts/modpost.awk: updated scripts
+	* scripts/remove_initd: updated scripts
+	* scripts/rpm/check-files: updated scripts
+	* scripts/rpm/find-provides.kmod: updated scripts
+	* scripts/rpm/find-provides.ksyms: updated scripts
+	* scripts/rpm/find-provides.libtool: updated scripts
+	* scripts/rpm/find-provides.pkgconfig: updated scripts
+	* scripts/rpm/find-provides.so: updated scripts
+	* scripts/rpm/find-requires: updated scripts
+	* scripts/rpm/find-requires.kmod: updated scripts
+	* scripts/rpm/find-requires.ksyms: updated scripts
+	* scripts/rpm/find-requires.libtool: updated scripts
+	* scripts/rpm/find-requires.pkgconfig: updated scripts
+	* scripts/rpm/find-requires.so: updated scripts
+	* scripts/rpm/find-requires.tcl: updated scripts
+	* scripts/rpm/remove-unprovided: updated scripts
+
+	* scripts/openss7-modules: weak module update script (this is a very
+	  large awk script)
+	* src/util/openss7-update: bash script to invoke openss7-modules
+	* doc/man/man8/openss7-modules.8.man: manual page for same
+
+	* src/util/init/README: updated init scripts
+	* src/util/init/openss7: updated init scripts
+	* src/util/init/openss7.sh: updated init scripts
+	* src/util/init/specfs: updated init scripts
+	* src/util/init/specfs.sh: updated init scripts
+	* src/util/init/strace: updated init scripts
+	* src/util/init/strace.sh: updated init scripts
+	* src/util/init/streams: updated init scripts
+	* src/util/init/streams.sh: updated init scripts
+	* src/util/init/strerr: updated init scripts
+	* src/util/init/strerr.sh: updated init scripts
+	* src/util/init/strsock: updated init scripts
+	* src/util/init/strsock.sh: updated init scripts
+	* src/util/init/strtty: updated init scripts
+	* src/util/init/strtty.sh: updated init scripts
+	* src/util/sysconfig/openss7: updated init scripts
+	* src/util/sysconfig/snmp: updated init scripts
+	* src/util/sysconfig/specfs: updated init scripts
+	* src/util/sysconfig/streams: updated init scripts
+
+
 2011-04-12  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: do basic doc files right

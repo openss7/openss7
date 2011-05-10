@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-10 13:45:37 $
 # Copyright (c) 2001-2011  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -223,7 +223,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-01-12 00:19:32 $
+# @(#) $RCSfile: strsock.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-10 13:45:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -268,11 +268,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-12 00:19:32 $ by $Author: brian $
+# Last Modified $Date: 2011-05-10 13:45:37 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strsock.sh,v $
+# Revision 1.1.2.3  2011-05-10 13:45:37  brian
+# - weak modules workup
+#
 # Revision 1.1.2.2  2011-01-12 00:19:32  brian
 # - modprobe no longer accepts k option
 #

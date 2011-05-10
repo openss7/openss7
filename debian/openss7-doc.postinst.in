@@ -2,7 +2,7 @@
 # @configure_input@
 # =============================================================================
 # 
-# @(#) $RCSfile: streams-doc.postinst.in,v $ $Name:  $($Revision: 0.9.2.7 $) $Date: 2008-04-28 11:46:32 $
+# @(#) $RCSfile: openss7-doc.postinst.in,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2008-04-28 11:46:32 $ by $Author: brian $
+# Last Modified $Date: 2011-05-10 13:45:29 $ by $Author: brian $
 #
 # =============================================================================
 subpkg=doc
@@ -165,7 +165,10 @@ abort_deconfigure_postinst () { :
 @mscript_debhelper@
 # =============================================================================
 #
-# $Log: streams-doc.postinst.in,v $
+# $Log: openss7-doc.postinst.in,v $
+# Revision 1.1.2.2  2011-05-10 13:45:29  brian
+# - weak modules workup
+#
 # Revision 0.9.2.7  2008-04-28 11:46:32  brian
 # - adjust headers for release
 #

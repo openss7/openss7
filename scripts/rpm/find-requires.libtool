@@ -73,7 +73,7 @@ END {
 
 # =============================================================================
 #
-# @(#) $RCSfile: find-requires.libtool,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2009-07-13 07:13:28 $
+# @(#) $RCSfile: find-requires.libtool,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-10 13:45:32 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -119,11 +119,14 @@ END {
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-07-13 07:13:28 $ by $Author: brian $
+# Last Modified $Date: 2011-05-10 13:45:32 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: find-requires.libtool,v $
+# Revision 1.1.2.5  2011-05-10 13:45:32  brian
+# - weak modules workup
+#
 # Revision 1.1.2.4  2009-07-13 07:13:28  brian
 # - changes for multiple distro build
 #
