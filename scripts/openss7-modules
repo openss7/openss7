@@ -643,7 +643,10 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 	    kversion = pathversion(file)
 	    if (!kversion) { kversion = fileversion(file) }
 	    if (!kversion) { continue }
-	    if (kversion == kremoved) { delmods[file] = kversion; continue }
+	    if (kremoved && kversion == kremoved) {
+		print_vinfo(3, pfx "marking for deletion: " file)
+		delmods[file] = kversion
+	    }
 	    if (!(kversion in kversions)) { kversions[kversion] = 1; k++ }
 	    name = file; sub(/^.*\//, "", name)
 	    if (!(name in names)) { names[name] = 1; u++ }
@@ -1328,14 +1331,15 @@ function getmodule(module,
 # getmodinfo()
 # Get the required symbols for each of the modules for a given kernel version.
 function getmodinfo(kversion,
-		     pfx,fmt,n,pn,w,pw,i,m,pm,name,module,pair,pairs,link)
+		     pfx,fmt,n,pn,w,pw,i,m,pm,name,module,pair,pairs,link,nums)
 {
     pfx = "r: modinfo,   "
     fmt = "%05d symbols, %04d modules, %04d weakmods"
     print_vinfo(2, pfx "version = " kversion)
     n = 0; w = 0; m = 0
     if (("modinfo",kversion) in counts) {
-	n = counts["modinfo",kversion]
+	split(counts["modinfo",kversion],nums,/,/)
+	n = nums[1]; m = nums[2]; w = nums[3]
     } else {
 	pw = 0; pm = 0; pn = 0
 	print_vmore(2, pfx sprintf(fmt, n, m, w))
@@ -1370,7 +1374,7 @@ function getmodinfo(kversion,
 		print_error(pfx "no module name for " kversion "," name)
 	    }
 	}
-	counts["modinfo",kversion] = n
+	counts["modinfo",kversion] = n "," m "," w
     }
     print_vinfo(2, pfx sprintf(fmt, n, m, w))
 #    if (m == 0) {
@@ -1409,12 +1413,15 @@ function getresolve(kversion, kver,
     n = 0
     print_vmore(2, pfx sprintf("%-40s", "collecting module names..."))
     for (name in names) {
-	module = modnames[kver,name]
-	resolve[name] = module
-	if (module in exportsyms) exporting[name] = module
-	if (module in linkedsyms) linking[name] = module
-	if (module in neededsyms) needing[name] = module
-	if (module in wantedsyms) wanting[name] = module
+	if ((kver,name) in modnames) {
+	    module = modnames[kver,name]
+	    resolve[name] = module
+	    if (module in exportsyms) exporting[name] = module
+	    if (module in linkedsyms) linking[name] = module
+	    if (module in neededsyms) needing[name] = module
+	    if (module in wantedsyms) wanting[name] = module
+	    if (module in delmods)    deleted[name] = module
+	}
     }
     print_vmore(2, pfx sprintf("%-40s", "mapping module symbol exports..."))
     for (name in exporting) {
@@ -1642,21 +1649,6 @@ function getresolve(kversion, kver,
     d = 0
     for (name in resolve) {
 	module = resolve[name]
-	if (modules[module] == kversion) {
-	    if (kver in inserts)
-	    { inserts[kver] = inserts[kver] "," name } else
-	    { inserts[kver] = name }
-	    if (name in relink) {
-		# also relinking it
-		if (kver in dolinks)
-		{ dolinks[kver] = dolinks[kver] "," name } else
-		{ dolinks[kver] = name }
-		if ((kversion,name) in modnames) {
-		    file = modnames[kversion,name]
-		    reloads[file] = reload[name]
-		}
-	    }
-	} else
 	if (module in deleted) {
 	    if ((kversion,name) in weaknames) {
 		file = weaknames[kversion,name]
@@ -1684,6 +1676,21 @@ function getresolve(kversion, kver,
 		{ removes[kver] = removes[kver] "," name } else
 		{ removes[kver] = name }
 		d++
+	    }
+	} else
+	if (modules[module] == kversion) {
+	    if (kver in inserts)
+	    { inserts[kver] = inserts[kver] "," name } else
+	    { inserts[kver] = name }
+	    if (name in relink) {
+		# also relinking it
+		if (kver in dolinks)
+		{ dolinks[kver] = dolinks[kver] "," name } else
+		{ dolinks[kver] = name }
+		if ((kversion,name) in modnames) {
+		    file = modnames[kversion,name]
+		    reloads[file] = reload[name]
+		}
 	    }
 	} else {
 	    if ((kversion,name) in weaknames) {
@@ -1783,9 +1790,8 @@ function getresolve(kversion, kver,
 	    continue
 	}
 	name = pairs[2]
-	if (kver in inserts && ","inserts[kver]"," ~ ","name",") {
-	    unneeded[pair] = 1
-	}
+	if (kver && kver in inserts && ","inserts[kver]"," ~ ","name",") { unneeded[pair] = 1 }
+	if (kver && kver in dolinks && ","dolinks[kver]"," ~ ","name",") { unneeded[pair] = 1 }
     }
     return d
 }
@@ -2072,7 +2078,7 @@ function chcksolution(kversion, kver,
     return 1
 }
 function makesolution(kversion, kver,
-		      creates, unlinks, changes, relinks, dolinks, removes, retains, inserts,
+		      creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, uneeded,
 		      pfx,fmt,c,r,a,l,labels,i,name,pair,pairs)
 {
     pfx = "w: solution,  "
@@ -2136,14 +2142,11 @@ function makesolution(kversion, kver,
 	}
     }
     print_vmore(2, sprintf(fmt, c, r, a, l))
-    # remove symbolic links to modules installed for this kernel
-    for (pair in weaknames) {
+    # remove unneeded symbolic links (modules installed for this kernel)
+    for (pair in unneeded) {
 	if (split(pair,pairs,SUBSEP) != 2) continue
 	if (pairs[1] != kversion) continue
 	name = pairs[2]
-	if (kver && kver in creates && ","creates[kver]"," ~ ","name",") continue
-	if (kver && kver in unlinks && ","unlinks[kver]"," ~ ","name",") continue
-	if (kver && kver in changes && ","changes[kver]"," ~ ","name",") continue
 	removelinks(kversion, name)
 	r++
 	print_vmore(3, sprintf(fmt, c, r, a, l))
@@ -2437,12 +2440,18 @@ function add_kernel(kversion,
     }
     print_vinfo(2, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
     if (chcksolution(kversion, kver, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded)) {
-	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)) {
+	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded)) {
 	    dodepmod(kversion)
 	    if ( kversion == krunning ) {
 		initstart()
+	    } else {
+		print_vinfo(3, "not starting init scripts for kversion = " kversion)
 	    }
+	} else {
+	    print_vinfo(3, "not performing depmod for kversion = " kversion)
 	}
+    } else {
+	print_vinfo(3, "not making solution for kversion = " kversion)
     }
 }
 function remove_kernels(kversion,	pfx,kversions,v,dir)
