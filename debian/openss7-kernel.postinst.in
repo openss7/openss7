@@ -114,8 +114,8 @@ postinst_preload () { :
     else
 	return 0
     fi
-    prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
-    prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     if [ -f $prel_old ]
     then cp -f -- $prel_old $prel_new
     else touch $prel_new

@@ -86,16 +86,16 @@ preinst_repo () { :
 	    fi
 	done
 	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.dpkg-save
-        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+'&un='}${un}${pw:+'&pw='}${pw}"
+        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
         ext="$ext"`echo /@reposubdir@ | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
-	key=; [ -z "$un" ] || key="$un${pw:+':'}${pw}@"
+	key=; [ -z "$un" ] || key="$un${pw:+:}${pw}@"
         url="@reposerv@://${key}@repobase@/@reporoot@/debs/$file$ext"
         rm -f -- $file
         if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
             if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
                 echo 'Authorization required for repository access.' >/dev/tty
                 u='anonymous'; p=
-                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-'anonymous'}
+                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-anonymous}
                 if [ "$u" != 'anonymous' ] ; then
                 read -es -p 'Password: ' p </dev/tty >/dev/tty
                 echo '' >/dev/tty

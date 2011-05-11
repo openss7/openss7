@@ -2853,6 +2853,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
 	fi
     done
     list='%{initfiles} %{nonrpminit}'
+    reverse=
     for i in $list; do
 	reverse="$i${reverse:+ }$reverse"
     done
@@ -2882,18 +2883,17 @@ if [ $1 -eq 1 ] ; then : # fresh install
 	modl_mods=
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null`; do
 	    b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)? , ,'`
-	    case " $modules " in (*" $b "*) ;; (*) continue ;; esac
-            modl_mods="${modl_mods:+$modl_mods }$m"
+	    case " $modules " in (*" $b "*) modl_mods="$modl_mods${modl_mods:+ }$m" ;; esac
 	done
 	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
 	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
 	    set +x
 	    dep=
-            while read line ; do
+            while read line; do
 		case $line in
 		    (*\\)   line="`echo $line | sed -e 's,\\$,,'`"
-			    dep="${dep}${dep:+ }$line" ; continue ;;
-		    (*)     dep="${dep}${dep:+ }$line" ;;
+			    dep="$dep${dep:+ }$line" ; continue ;;
+		    (*)     dep="$dep${dep:+ }$line" ;;
 		esac
 		if [ -n "$dep" ] ; then
 		    set -- $dep
@@ -2903,8 +2903,8 @@ if [ $1 -eq 1 ] ; then : # fresh install
 			shift
 			for p in $@ ; do
 			    prereq=prereq_`echo $p | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
-			    eval "$prereq=\"\${$prereq}\${$prereq:+ }$t\""
-			    eval "$target=\"\${$target}\${$target:+ }$p\""
+			    eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
+			    eval "$target=\"\$$target\${$target:+ }$p\""
 			done
 		    fi
 		    dep=
@@ -2953,7 +2953,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
 	for suffix in %{name} LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61 ; do
 	    if [ -f %_modutildir/$suffix ] ; then
 		rm -f -- %_modutildir/$suffix
-		sed -e '\|^include[[:space:]].*'"%_modutildir"'/'$suffix'|d' $conf_new > $conf_tmp
+		sed -e '\|^include[[:space:]].*%{_modutildir}/'$suffix'|d' $conf_new > $conf_tmp
 		mv -f -- $conf_tmp $conf_new
 	    fi
 	done
@@ -3034,7 +3034,7 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 ] ; then : # kernel is being installed or upgraded with base present
     if [ -x %{_sbindir}/%{name}-modules ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=5,p;s,xtrace[[:space:]]*off$,-q,p'`"
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4 --debug=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
 	%{_sbindir}/%{name}-modules -- $v -e \
             --update-kernel || :
     fi
@@ -3100,14 +3100,14 @@ if [ $1 -eq 0 ] ; then : # final removal
 	reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse; do
-	if [ -f "%_initrddir/$i" ]; then
+	if [ -f %_initrddir/$i ]; then
             [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
             [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
-            [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || :; }
+            [ -x %_initrddir/$i                    ] && { %_initrddir/$i stop && continue || :; }
 	fi
     done
     for i in $reverse; do
-	if [ -f "%_initrddir/$i" ]; then
+	if [ -f %_initrddir/$i ]; then
 	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || :; }
 	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || :; }
 	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || :; }
@@ -3116,10 +3116,16 @@ if [ $1 -eq 0 ] ; then : # final removal
     done
 %endif
 %if %{FILES_manrefs}
-    rm -f -- %{_mandir}/%{manrefs} 2>/dev/null || :
+    manrefs='%{manrefs}'
+    for m in $manrefs; do
+        rm -f -- %{_mandir}/$m 2>/dev/null || :
+    done
 %endif
 %if %{FILES_manmacros}
-    rm -f -- %{_mandir}/%{manmacros} 2>/dev/null || :
+    manmacros='%{manmacros}'
+    for m in $manmacros; do
+        rm -f -- %{_mandir}/$m 2>/dev/null || :
+    done
 %endif
 fi
 
@@ -4416,12 +4422,12 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
     if [ -x %{_sbindir}/%{name}-modules ]; then
         scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
         if [ -n "$scripts" ] ; then
-            v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=5,p;s,xtrace[[:space:]]*off$,-q,p'`"
+            v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4 --debug=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
             %{_sbindir}/%{name}-modules -- $v -e \
                 --initscripts="$scripts" \
                 --add-modules %{_kversion} || :
         else
-            v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=5,p;s,xtrace[[:space:]]*off$,-q,p'`"
+            v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4 --debug=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
             %{_sbindir}/%{name}-modules -- $v -e \
                 --add-modules %{_kversion} || :
         fi
@@ -4456,7 +4462,7 @@ fi
 if [ $1 -eq 0 ] ; then : # kernel modules being removed with base present
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=5,p;s,xtrace[[:space:]]*off$,-q,p'`"
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4 --debug=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
 	%{_sbindir}/%{name}-modules -- $v -e \
             --delete-modules \
 	    --remove-modules %{_kversion} || :
@@ -4466,7 +4472,7 @@ fi
 if [ $2 -eq 0 ] ; then : # base being removed with kernel modules present
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=5,p;s,xtrace[[:space:]]*off$,-q,p'`"
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=4 --debug=4,p;s,xtrace[[:space:]]*off$,-q,p'`"
 	%{_sbindir}/%{name}-modules -- $v -e \
 	    --remove-modules %{_kversion} || :
     fi
