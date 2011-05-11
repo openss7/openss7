@@ -63,15 +63,15 @@ datarootdir=@datarootdir@
 #   them because it may also be run from reconfigure.
 #
 postinst_modconf () { :
-    conf_old=@sysconfdir@/modules.conf
+    local conf_old=@sysconfdir@/modules.conf \
+	  conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
+	  conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
     if [ -f $conf_old ] ; then
-	conf_tmp=${tmppath:-'/var/tmp'}/modules.conf.tmp.$$
-	conf_new=${tmppath:-'/var/tmp'}/modules.conf.new.$$
 	cp -f -- $conf_old $conf_new
 	( sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new
 	  echo "include @modutildir@/$base" ) > $conf_tmp
 	mv -f -- $conf_tmp $conf_new
-	if diff $conf_new $conf_old >/dev/null 2>&1; then
+	if ! diff $conf_new $conf_old >/dev/null 2>&1; then
 	    chmod --reference=$conf_old -- $conf_new
 	    cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
 	fi
@@ -89,8 +89,8 @@ postinst_modconf () { :
 postinst_preload () { :
     prel_old="@sysconfdir@/modprobe.preload"
     if [ -f $prel_old ] ; then
-        prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
-        prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
+        prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+        prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
         cp -f -- $prel_old $prel_new
 	missing=no
         mods="${preloads}"

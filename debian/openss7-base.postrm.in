@@ -66,8 +66,8 @@ datarootdir=@datarootdir@
 postrm_preload () { :
     for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
 	if [ -f $prel_old ]; then
-	    prel_tmp=${tmppath:-'/var/tmp'}/modprobe.preload.tmp.$$
-	    prel_new=${tmppath:-'/var/tmp'}/modprobe.preload.new.$$
+	    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+	    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
 	    cp -f -- $prel_old $prel_new
 	    included=no
 	    modules="${preload}"
@@ -101,18 +101,18 @@ postrm_base () { :
 #   the -kernel sub-packages.
 #
 postrm_oldmods () {
-    local conf_old=@sysconfdir@/modules.conf conf_tmp conf_new
+    local conf_old=@sysconfdir@/modules.conf \
+          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
+          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
     if [ -f $conf_old ] ; then
-        conf_tmp=${tmppath:-'/var/tmp'}/modules.conf.tmp.$$
-        conf_new=${tmppath:-'/var/tmp'}/modules.conf.new.$$
         cp -f -- $conf_old $conf_new
-	if grep '^include[[:space:]].*'"@modutildir@"'/'"$base" $conf_new >/dev/null 2>&1; then
-	    sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new > $conf_tmp
+	if grep '^include[[:space:]].*@modutildir@/'"$base" $conf_new >/dev/null 2>&1; then
+	    sed -e '\|^include[[:space:]].*@modutildir@/'"$base"'|d' $conf_new > $conf_tmp
 	    mv -f -- $conf_tmp $conf_new
 	    chmod --reference=$conf_old $conf_new
 	    cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
 	fi
-        rm -f -- $conf_new
+        rm -f -- $conf_new || :
     fi
 }
 #
