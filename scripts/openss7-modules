@@ -571,7 +571,7 @@ function fileversion(module,			pfx,kversion)
 {
     pfx = "r: filevers,  "
     kversion = ""
-    if (system_command("test -r \"" module "\"") == 0) {
+    if (system("test -r \"" module "\"") == 0) {
 	command = "strings " module " | grep -m 1 '^vermagic='"
 	while((command | getline) == 1) { sub(/=/, " "); kversion = $2 }
 	close(command)
@@ -640,23 +640,28 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 	command = "find " dirs " -name '*.ko' 2>/dev/null"
 	while ((command | getline file) == 1) {
 	    #if (file~/\/lib\/modules\/[^\/]*\/kernel\//) continue
+	    name = file; sub(/^.*\//, "", name)
+	    if (!(name in names)) { names[name] = 1; u++ }
 	    kversion = pathversion(file)
 	    if (!kversion) { kversion = fileversion(file) }
 	    if (!kversion) { continue }
-	    if (kremoved && kversion == kremoved) {
+	    if (kversion in kremoved) {
 		print_vinfo(3, pfx "marking for deletion: " file)
 		delmods[file] = kversion
+		if ((kversion,name) in modremoves)
+		{ modremoves[kversion,name] = modremoves[kversion,name] "," file } else
+		{ modremoves[kversion,name] = file }
 	    }
 	    if (!(kversion in kversions)) { kversions[kversion] = 1; k++ }
-	    name = file; sub(/^.*\//, "", name)
-	    if (!(name in names)) { names[name] = 1; u++ }
 	    if (file~"/" subdir "/") {
-		weakmods[file] = kversion
-		if (system_command("test -L " file) == 0) {
+		weakmods[file] = fileversion(file)
+		#print_debug(3,pfx "module " file " = " kversion)
+		if (system("test -L " file) == 0) {
 		    cmd = "readlink " file
 		    while ((cmd | getline) == 1) { module = $0 }
 		    close(cmd)
 		    weaklinks[file] = module
+		    #print_debug(3,pfx "symbolic link " file " -> " module)
 		}
 		l++; pl++
 		if (pl >= 100) {
@@ -724,7 +729,7 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 	    if (!((kversion,name) in modnames))
 		print_error(pfx sprintf("modname for (%s,%s) does not exist", kversion,name))
 	    else
-		print_debug(2,pfx sprintf("modname for (%s,%s) is %s", kversion,name,modnames[kversion,name]))
+		print_debug(4,pfx sprintf("modname for (%s,%s) is %s", kversion,name,modnames[kversion,name]))
 	}
     }
     return n
@@ -736,7 +741,7 @@ function readsymmap(kversion, file, pfx, maps,
     fmt = "%05d maps, %04d bads, %04d dups"
     n = 0; c = 0; d = 0; pn = 0; pc = 0; pd = 0
     print_vinfo(2, pfx "file = " file)
-    if (system_command("test -r " file) == 0) {
+    if (system("test -r " file) == 0) {
 	print_vmore(2, pfx sprintf(fmt, n, c, d))
 	command = "cat " file
 	while ((command | getline) == 1) {
@@ -813,7 +818,7 @@ function readsymabi(kversion, file,
     pfx = "r: symabi,    "
     n = 0
     print_vinfo(2, pfx "file = " file)
-    if (system_command("test -r " file) == 0) {
+    if (system("test -r " file) == 0) {
 	if (file~/\.gz/)
 	    command = "zcat " file
 	else
@@ -845,7 +850,7 @@ function readsymver(kversion, file,
     pfx = "r: symver,    "
     n = 0; pn = 0
     print_vinfo(2, pfx "file = " file)
-    if (system_command("test -r " file) == 0) {
+    if (system("test -r " file) == 0) {
 	if (file~/\.gz/)
 	    command = "zcat " file
 	else
@@ -970,7 +975,7 @@ function getsysmap(kversion,
 	file = values["sysmap"]
 	gsub(/\$KVERSION/,kversion,file)
 	gsub(/\$PACKAGE/,values["package"],file)
-	if (values["basedir"] && system_command("test -r " values["basedir"] file) == 0)
+	if (values["basedir"] && system("test -r " values["basedir"] file) == 0)
 	    file = values["basedir"] file
 	else
 	    file = values["rootdir"] file
@@ -1019,7 +1024,7 @@ function getsysver(kversion,
 	    file = values["sysver"]
 	    gsub(/\$KVERSION/,kversion,file)
 	    gsub(/\$PACKAGE/,values["package"],file)
-	    if (values["basedir"] && system_command("test -r " values["basedir"] file) == 0)
+	    if (values["basedir"] && system("test -r " values["basedir"] file) == 0)
 		file = values["basedir"] file
 	    else
 		file = values["rootdir"] file
@@ -1029,7 +1034,7 @@ function getsysver(kversion,
 	    file = values["symver"]
 	    gsub(/\$KVERSION/,kversion,file)
 	    gsub(/\$PACKAGE/,values["package"],file)
-	    if (values["basedir"] && system_command("test -r " values["basedir"] file) == 0)
+	    if (values["basedir"] && system("test -r " values["basedir"] file) == 0)
 		file = values["basedir"] file
 	    else
 		file = values["rootdir"] file
@@ -1039,7 +1044,7 @@ function getsysver(kversion,
 	    file = values["symabi"]
 	    gsub(/\$KVERSION/,kversion,file)
 	    gsub(/\$PACKAGE/,values["package"],file)
-	    if (values["basedir"] && system_command("test -r " values["basedir"] file) == 0)
+	    if (values["basedir"] && system("test -r " values["basedir"] file) == 0)
 		file = values["basedir"] file
 	    else
 		file = values["rootdir"] file
@@ -1193,7 +1198,7 @@ function getmodule(module,
 {
     pfx = "r: required,  "
     n = 0
-    if (system_command("test -r " module) == 0) {
+    if (system("test -r " module) == 0) {
 	h = 0; r = 0; w = 0; l = 0; a = 0
 	fmt = "%04d needs,  %04d wants,  %04d links,  %04d weaks,  %s"
 	print_vmore(3, pfx sprintf(fmt, r, w, l, a, module))
@@ -1404,9 +1409,9 @@ function getmodinfo(kversion,
     return n
 }
 function getresolve(kversion, kver,
-		    creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded,
+		    creates, unlinks, changes, relinks, dolinks, removes, retains, inserts,
 		    pfx,n,ksyms,pair,pairs,ver,name,module,sym,syms,s,add,crc,d,deleted,relink,reload,resolve,
-		    exporting,linking,needing,wanting,kmodver)
+		    exporting,linking,needing,wanting,kmodver,files,i,file)
 {
     pfx = "p: resolve,   "
     # map symbols exported by modules in the module set
@@ -1420,7 +1425,7 @@ function getresolve(kversion, kver,
 	    if (module in linkedsyms) linking[name] = module
 	    if (module in neededsyms) needing[name] = module
 	    if (module in wantedsyms) wanting[name] = module
-	    if (module in delmods)    deleted[name] = module
+	    if (module in delmods)    deleted[module] = name
 	}
     }
     print_vmore(2, pfx sprintf("%-40s", "mapping module symbol exports..."))
@@ -1653,7 +1658,6 @@ function getresolve(kversion, kver,
 	    if ((kversion,name) in weaknames) {
 		file = weaknames[kversion,name]
 		if (file ~/,/) {
-		    unneeded[kversion,name] = 1
 		    split(file,files,/,/)
 		    file = files[1]
 		}
@@ -1696,7 +1700,6 @@ function getresolve(kversion, kver,
 	    if ((kversion,name) in weaknames) {
 		file = weaknames[kversion,name]
 		if (file ~ /,/) {
-		    unneeded[kversion,name] = 1
 		    split(file,files,/,/)
 		    file = files[1]
 		}
@@ -1782,17 +1785,6 @@ function getresolve(kversion, kver,
 	    }
 	}
     }
-    for (pair in weaknames) {
-	if (split(pair,pairs,SUBSEP) != 2) continue
-	if (pairs[1] != kversion) continue
-	if (weaknames[pair]~/,/) {
-	    unneeded[pair] = 1
-	    continue
-	}
-	name = pairs[2]
-	if (kver && kver in inserts && ","inserts[kver]"," ~ ","name",") { unneeded[pair] = 1 }
-	if (kver && kver in dolinks && ","dolinks[kver]"," ~ ","name",") { unneeded[pair] = 1 }
-    }
     return d
 }
 function readloaded(kversion,
@@ -1824,6 +1816,29 @@ function doit(cmd,
     }
     return system_command(cmd)
 }
+#global rmdirs[directory] = 1
+function removefiles(kversion, name,
+		     pfx,file,modules,files,j,dir)
+{
+    pfx = "w: delete,    "
+    if ((kversion,name) in modremoves) {
+	if (values["delete-modules"]) {
+	    file = modremoves[kversion,name]
+	    if (split(file,files,/,/)) {
+		for (j in files) { file = files[j]
+		    print_action("deleting", file, "from", kversion)
+		    doit("rm -f -- " file)
+		    #if (file in delmods) delete delmods[file]
+		    dir = file; sub(/\/[^\/]*$/, "", dir)
+		    rmdirs[dir] = 1
+		}
+	    }
+	}
+	delete modremoves[kversion,name]
+    } else {
+	print_error(pfx, "no modremove for " kversion ":" name)
+    }
+}
 #global mkdirs[directory] = 1
 function createlinks(kversion, kver, name,
 		     pfx,module,file,files,n,j)
@@ -1848,7 +1863,10 @@ function createlinks(kversion, kver, name,
 	print_action("adding", module, " to ", kversion)
 	doit("ln -sf " module " " file)
 	# this is a correction to internal data structures
-	weakmods[file] = kversion # FIXME
+	if (module in modules)
+	    weakmods[file] = modules[module]
+	else
+	    weakmods[file] = kversion # FIXME (an error really)
 	weaklinks[file] = module
 	if ((kversion,name) in weaknames && weaknames[kversion,name] != file)
 	{ weaknames[kversion,name] = weaknames[kversion,name] "," file
@@ -1859,7 +1877,7 @@ function createlinks(kversion, kver, name,
     }
 }
 function removelinks(kversion, name,
-		     pfx,file,module,files,j)
+		     pfx,file,module,files,j,dir)
 {
     pfx = "w: unlink,    "
     if ((kversion,name) in weaknames) {
@@ -1872,6 +1890,8 @@ function removelinks(kversion, name,
 		    delete weaklinks[file]
 		if (file in weakmods)
 		    delete weakmods[file]
+		dir = file; sub(/\/[^\/]*$/, "", dir)
+		rmdirs[dir] = 1
 	    }
 	}
 	delete weaknames[kversion,name]
@@ -1889,7 +1909,10 @@ function changelinks(kversion, kver, name,
 	    file = weaknames[kversion,name]
 	    doit("ln -sf " module " " file)
 	    # this is a correction to internal data structures
-	    weakmods[file] = kversion # FIXME
+	    if (module in modules)
+		weakmods[file] = modules[module]
+	    else
+		weakmods[file] = kversion # FIXME (an error really)
 	    weaklinks[file] = module
 	    if ((kversion, name) in weaknames && weaknames[kversion,name] != file)
 	    { weaknames[kversion,name] = weaknames[kversion,name] "," file
@@ -1942,7 +1965,16 @@ function relinklinks(kversion, kver, name,
 	print_error(pfx "no modname for " kver ":" name)
     }
 }
-
+function removedirs(kversion,
+		    pfx,dir)
+{
+    pfx = "w: rmdirs,    "
+    for (dir in rmdirs) {
+	print_action("removing", dir, "from", kversion)
+	doit("rmdir -p " dir " 2>/dev/null")
+    }
+    delete rmdirs
+}
 function modinfomatch(module1, module2, info,		item1, item2)
 {
     if ((module1,info) in modinfos) { item1 = modinfos[module1,info] } else { item1 = "" }
@@ -1963,59 +1995,150 @@ function modinfomatches(module1, module2,		result)
     if (!modinfomatch(module1, module2, "author"     )) { return 0 }
     return 1
 }
+function chckunneeded(kversion, kver,
+		      creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, deletes, unneeded,
+		      pfx,pair,pairs,file,name,files,i)
+{
+    pfx = "p: unneeded,  "
+    for (pair in weaknames) {
+	if (split(pair,pairs,SUBSEP) != 2) continue
+	if (pairs[1] != kversion) continue
+	file = weaknames[pair]
+	name = pairs[2]
+	if (file~/,/) {
+	    if (!(kver in unneeded) || ","unneeded[kver]"," !~ ","name",") {
+		print_debug(3, pfx "module is redundant, (" kversion "," name ")")
+		if (kver in unneeded)
+		{ unneeded[kver] = unneeded[kver] "," name } else
+		{ unneeded[kver] = name }
+	    }
+	} else
+	if (kver) {
+	    # unnecessary weak links (installed module exists)
+	    if (kver in inserts && ","inserts[kver]"," ~ ","name",") {
+		if (!(kver in unneeded) || ","unneeded[kver]"," !~ ","name",") {
+		    print_debug(3, pfx "module is installed, (" kversion "," name ")")
+		    if (kver in unneeded)
+		    { unneeded[kver] = unneeded[kver] "," name } else
+		    { unneeded[kver] = name }
+		}
+	    } else
+	    if (kver in dolinks && ","dolinks[kver]"," ~ ","name",") {
+		if (!(kver in unneeded) || ","unneeded[kver]"," !~ ","name",") {
+		    print_debug(3, pfx "module is  reloaded, (" kversion "," name ")")
+		    if (kver in unneeded)
+		    { unneeded[kver] = unneeded[kver] "," name } else
+		    { unneeded[kver] = name }
+		}
+	    }
+	}
+	# unnecessary weak links (reference a deleted module)
+	split(file,files,/,/)
+	for (i in files) { file = files[i]
+	    if (file in weaklinks && weaklinks[file] in delmods) {
+		if (!(kver in unneeded) || ","unneeded[kver]"," !~ ","name",") {
+		    print_debug(3, pfx "module link removed, (" kversion "," name ")")
+		    if (kver in unneeded)
+		    { unneeded[kver] = unneeded[kver] "," name } else
+		    { unneeded[kver] = name }
+		}
+	    } else
+	    if (file in weakmods && weakmods[file] in kremoved)  {
+		if (!(kver in unneeded) || ","unneeded[kver]"," !~ ","name",") {
+		    print_debug(3, pfx "module load removed, (" kversion "," name ")")
+		    if (kver in unneeded)
+		    { unneeded[kver] = unneeded[kver] "," name } else
+		    { unneeded[kver] = name }
+		}
+	    }
+	}
+    }
+    for (pair in modremoves) {
+	if (split(pair,pairs,SUBSEP) != 2) continue
+	if (pairs[1] != kversion) continue
+	file = modremoves[pair]
+	name = pairs[2]
+	split(file,files,/,/)
+	for (i in files) { file = files[i]
+	    if (!(kver in deletes) || ","deletes[kver]"," !~ ","name",") {
+		print_debug(3, pfx "module file deleted, (" kversion "," name ")")
+		if (kver in deletes)
+		{ deletes[kver] = deletes[kver] "," name } else
+		{ deletes[kver] = name }
+	    }
+	}
+    }
+}
 function chcksolution(kversion, kver,
-		      creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded,
+		      creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, deletes, unneeded,
 		      pfx,fmt,loaded,n,labels,i,name,created,removed,changed,altered)
 {
-    pfx = "w: checking,  "
-    if (!kver) {
-	print_warns(pfx "no solution for " kversion)
-	return 0
-    }
+    pfx = "p: checking,  "
     print_vinfo(2, pfx "solution for " kversion " is " kver)
     fmt = pfx "solution for " kversion " %-7s %3d %s"
+    change = 0
     if (kver in creates) {
 	n = split(creates[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "creates", n, "links"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " creates " labels[i])
+	change = 1
     }
     if (kver in unlinks) {
 	n = split(unlinks[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "unlinks", n, "links"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " unlinks " labels[i])
+	change = 1
     }
     if (kver in changes) {
 	n = split(changes[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "changes", n, "links"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " changes " labels[i])
+	change = 1
     }
     if (kver in relinks) {
 	n = split(relinks[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "relinks", n, "links"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " relinks " labels[i])
+	change = 1
     }
     if (kver in dolinks) {
 	n = split(dolinks[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "dolinks", n, "links"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " dolinks " labels[i])
+	change = 1
     }
     if (kver in removes) {
 	n = split(removes[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "removes", n, "links"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " removes " labels[i])
+	change = 1
     }
     if (kver in retains) {
 	n = split(retains[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "retains", n, "links"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " retains " labels[i])
+	change = 1
     }
     if (kver in inserts) {
 	n = split(inserts[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "inserts", n, "modules"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " inserts " labels[i])
+	change = 1
+    }
+    if (kver in deletes) {
+	n = split(deletes[kver],labels,/,/)
+	print_vinfo(2, sprintf(fmt, "deletes", n, "modules"))
+	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " deletes " labels[i])
+	change = 1
+    }
+    if (kver in unneeded) {
+	n = split(unneeded[kver],labels,/,/)
+	print_vinfo(2, sprintf(fmt, "deletes", n, "links"))
+	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " deletes " labels[i])
+	change = 1
     }
     if (kversion == krunning) {
-	if (!(kver in creates) && !(kver in unlinks) && !(kver in changes) && !(kver in relinks) && !(kver in dolinks) && !(kversion in uneeded)) {
+	if (change == 0) {
 	    print_vinfo(2, pfx "solution for " kversion " is no change")
 	    return 1
 	}
@@ -2041,7 +2164,11 @@ function chcksolution(kversion, kver,
 		    print_warns(pfx "not relinkin link for loaded module " name)
 		    altered = 1
 		}
-		if ((kversion,name) in unneeded) {
+		if (kver in deletes && ","deletes[kver]"," ~ ","name",") {
+		    print_warns(pfx "not deleting file for loaded module " name)
+		    altered = 1
+		}
+		if (kver in unneeded && ","unneeded[kver]"," ~ ","name",") {
 		    print_warns(pfx "not deleting link for loaded module " name)
 		    altered = 1
 		}
@@ -2078,81 +2205,91 @@ function chcksolution(kversion, kver,
     return 1
 }
 function makesolution(kversion, kver,
-		      creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, uneeded,
-		      pfx,fmt,c,r,a,l,labels,i,name,pair,pairs)
+		      creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, deletes, unneeded,
+		      pfx,fmt,c,r,a,l,d,labels,i,name,pair,pairs)
 {
     pfx = "w: solution,  "
-    fmt = pfx "sym links: %04d created, %04d removed, %04d changed, %04d relinked"
-    c = 0; r = 0; a = 0; l = 0
-    if (kver)
-    { print_vinfo(2, pfx "solution = " kver) } else
-    { print_vinfo(2, pfx "solution = (none)") }
-    print_vinfo(2, sprintf(fmt, c, r, a, l))
+    fmt = pfx "sym links: %04d created, %04d removed, %04d changed, %04d relinked, %04d deleted"
+    c = 0; r = 0; a = 0; l = 0; d = 0
+    print_vinfo(2, pfx "solution = " kver)
+    print_vinfo(2, sprintf(fmt, c, r, a, l, d))
     # create symbolic links
-    if (kver && kver in creates) {
+    if (kver in creates) {
 	if (split(creates[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
 		createlinks(kversion, kver, name)
 		c++
-		print_vmore(3, sprintf(fmt, c, r, a, l))
+		print_vmore(3, sprintf(fmt, c, r, a, l, d))
 	    }
 	}
     }
-    print_vmore(2, sprintf(fmt, c, r, a, l))
+    print_vmore(2, sprintf(fmt, c, r, a, l, d))
     # remove symbolic links to old modules
-    if (kver && kver in unlinks) {
+    if (kver in unlinks) {
 	if (split(unlinks[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
 		removelinks(kversion, name)
 		r++
-		print_vmore(3, sprintf(fmt, c, r, a, l))
+		print_vmore(3, sprintf(fmt, c, r, a, l, d))
 	    }
 	}
     }
-    print_vmore(2, sprintf(fmt, c, r, a, l))
+    print_vmore(2, sprintf(fmt, c, r, a, l, d))
     # change symbolic links
-    if (kver && kver in changes) {
+    if (kver in changes) {
 	if (split(changes[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
 		changelinks(kversion, kver, name)
 		a++
-		print_vmore(3, sprintf(fmt, c, r, a, l))
+		print_vmore(3, sprintf(fmt, c, r, a, l, d))
 	    }
 	}
     }
-    print_vmore(2, sprintf(fmt, c, r, a, l))
+    print_vmore(2, sprintf(fmt, c, r, a, l, d))
     # relink modules
-    if (kver && kver in relinks) {
+    if (kver in relinks) {
 	if (split(relinks[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
 		relinklinks(kversion, kver, name)
 		l++
-		print_vmore(3, sprintf(fmt, c, r, a, l))
+		print_vmore(3, sprintf(fmt, c, r, a, l, d))
 	    }
 	}
     }
     # relink inserts
-    if (kver && kver in dolinks) {
+    if (kver in dolinks) {
 	if (split(dolinks[kver],labels,/,/)) {
 	    for (i in labels) { name = labels[i]
 		relinklinks(kversion, kver, name)
 		l++
-		print_vmore(3, sprintf(fmt, c, r, a, l))
+		print_vmore(3, sprintf(fmt, c, r, a, l, d))
 	    }
 	}
     }
-    print_vmore(2, sprintf(fmt, c, r, a, l))
-    # remove unneeded symbolic links (modules installed for this kernel)
-    for (pair in unneeded) {
-	if (split(pair,pairs,SUBSEP) != 2) continue
-	if (pairs[1] != kversion) continue
-	name = pairs[2]
-	removelinks(kversion, name)
-	r++
-	print_vmore(3, sprintf(fmt, c, r, a, l))
+    print_vmore(2, sprintf(fmt, c, r, a, l, d))
+    # delete modules
+    if (kver in deletes) {
+	if (split(deletes[kver],labels,/,/)) {
+	    for (i in labels) { name = labels[i]
+		removefiles(kversion,name)
+		d++
+		print_vmore(3, sprintf(fmt, c, r, a, l, d))
+	    }
+	}
     }
-    print_vinfo(2, sprintf(fmt, c, r, a, l))
-    return (c+r+a)
+    # remove unneeded symbolic links (modules installed for this kernel)
+    if (kver in unneeded) {
+	name = unneeded[kver]
+	split(name,names,/,/)
+	for (i in names) { name = names[i]
+	    removelinks(kversion,name)
+	    r++
+	    print_vmore(3, sprintf(fmt, c, r, a, l, d))
+	}
+    }
+    print_vinfo(2, sprintf(fmt, c, r, a, l, d))
+    removedirs(kversion)
+    return (c+r+a+d)
 }
 function modlink(kversion, reloads,
 		  pfx,n,m,name,module,sym,syms,s,add,crc,old)
@@ -2359,6 +2496,8 @@ function dodepmod(kversion,
     doit(command)
 }
 function initstart(	n,scripts,i,script,command) {
+    if (!("initscripts" in values))
+	return
     n = split(values["initscripts"],scripts,/,/)
     if ( n == 0 )
 	return
@@ -2423,24 +2562,25 @@ function link_kernel(kversion,
 # previous kernels and relink any absolute kernel addresses.
 #
 function add_kernel(kversion,
-		    pfx,solution,score,s,k,kver,retn,creates,unlinks,changes,relinks,dolinks,removes,retains,inserts,unneeded,command,file)
+		    pfx,solution,score,s,k,kver,retn,creates,unlinks,changes,relinks,dolinks,removes,retains,inserts,deletes,unneeded,command,file)
 {
     pfx = "p: addkernel, "
     if (getsysinfo(kversion) == 0) return
     getmodinfo(kversion)
-    solution = ""; score = counts["uniq"]; s = 0
+    solution = "(none)"; score = counts["uniq"]; s = 0
     print_vmore(3, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
     for (k=counts["kern"];k>0;k--) { kver = kernels[k]
 	getmodinfo(kver)
-	retn = getresolve(kversion, kver, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded)
+	retn = getresolve(kversion, kver, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)
 	s++
 	print_vmore(3, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
 	if (retn < score) { score = retn; solution = kver }
 	if (score == 0) break
     }
     print_vinfo(2, pfx sprintf("%04d solutions, kversion = %-20s", s, kversion))
-    if (chcksolution(kversion, kver, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded)) {
-	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, unneeded)) {
+    chckunneeded(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, deletes, unneeded)
+    if (chcksolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, deletes, unneeded)) {
+	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts, deletes, unneeded)) {
 	    dodepmod(kversion)
 	    if ( kversion == krunning ) {
 		initstart()
@@ -2493,14 +2633,14 @@ function update_kernels(kversion,
 	while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
 	close(command)
     }
-    kremoved = ""
+    delete kremoved
     add_kernels(kversion)
 }
 function boot_kernels(kversion,
 		      pfx,kversions,command)
 {
     pfx = "p: bootkernel, "
-    kremoved = ""
+    delete kremoved
     add_kernels(kversion)
 }
 function add_modules(kversion,
@@ -2511,7 +2651,7 @@ function add_modules(kversion,
 	print_error("o: one and only one KVERSION permitted for --add-modules")
 	usage(stderr); exit 2 }
     kversion = kversions[1]
-    kremoved = ""
+    delete kremoved
     kversion = ""
     command = "ls /lib/modules"
     while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
@@ -2527,7 +2667,7 @@ function link_modules(kversion,
 	print_error("o: one and only one KVERSION permitted for --link-modules")
 	usage(stderr); exit 2 }
     kversion = kversions[1]
-    kremoved = ""
+    delete kremoved
     kversion = ""
     command = "ls /lib/modules"
     while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
@@ -2543,24 +2683,19 @@ function remove_modules(kversion,
 	print_error("o: one and only one KVERSION permitted for --remove-modules")
 	usage(stderr); exit 2 }
     kversion = kversions[1]
-    kremoved = kversion
+    kremoved[kversion] = 1
     kversion = ""
     command = "ls /lib/modules"
     while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
     close(command)
     add_kernels(kversion)
-    if (values["delete-modules"]) {
-	for (file in delmods) {
-	    doit("rm -f -- " file)
-	}
-    }
 }
 function update_modules(kversion,
 			pfx,kversions,command)
 {
     pfx = "p: updmodules, "
     kversion = ""
-    kremoved = ""
+    delete kremoved
     command = "ls /lib/modules"
     while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
     close(command)
