@@ -194,7 +194,7 @@ if [ -n "$libtoollist" ] ; then
     if [ -n "$tool" -a -x "$tool" ] ; then
 	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${libtoollist[@]}" | \
-	$tool "${args[@]}"
+	$tool "${args[@]}" | remove_unprovided
     fi
 fi
 
