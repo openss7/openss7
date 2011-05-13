@@ -167,13 +167,13 @@ build_options () {
     # Build up the options string
     OPENSS7_OPTIONS=
     [ -n "$OPENSS7_UID" ] && \
-	OPENSS7_OPTIONS="${OPENSS7_OPTIONS}${OPENSS7_OPTIONS:--o }${OPENSS7_OPTIONS:+,}uid=${OPENSS7_UID}"
+	OPENSS7_OPTIONS="${OPENSS7_OPTIONS:--o }${OPENSS7_OPTIONS:+,}uid=${OPENSS7_UID}"
     [ -n "$OPENSS7_GID" ] && \
-	OPENSS7_OPTIONS="${OPENSS7_OPTIONS}${OPENSS7_OPTIONS:--o }${OPENSS7_OPTIONS:+,}gid=${OPENSS7_GID}"
+	OPENSS7_OPTIONS="${OPENSS7_OPTIONS:--o }${OPENSS7_OPTIONS:+,}gid=${OPENSS7_GID}"
     [ -n "$OPENSS7_MODE" ] && \
-	OPENSS7_OPTIONS="${OPENSS7_OPTIONS}${OPENSS7_OPTIONS:--o }${OPENSS7_OPTIONS:+,}mode=${OPENSS7_MODE}"
+	OPENSS7_OPTIONS="${OPENSS7_OPTIONS:--o }${OPENSS7_OPTIONS:+,}mode=${OPENSS7_MODE}"
     [ "$1" = remount ] && \
-	OPENSS7_OPTIONS="${OPENSS7_OPTIONS}${OPENSS7_OPTIONS:--o }${OPENSS7_OPTIONS:+,}remount"
+	OPENSS7_OPTIONS="${OPENSS7_OPTIONS:--o }${OPENSS7_OPTIONS:+,}remount"
 }
 
 modprobe_name () {
@@ -318,7 +318,7 @@ start_update () {
 #
 stop_update () {
     RETVAL=0
-    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' ]; then
+    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' \) ]; then
 	marker="/.openss7_update-`uname -r`"
 	if [ ":$OPENSS7_KUPDATE" = ':yes' -a -e $marker ]; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules

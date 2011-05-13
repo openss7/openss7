@@ -168,13 +168,13 @@ build_options () {
     # Build up the options string
     SPECFS_OPTIONS=
     [ -n "$SPECFS_UID" ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}uid=${SPECFS_UID}"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}uid=${SPECFS_UID}"
     [ -n "$SPECFS_GID" ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}gid=${SPECFS_GID}"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}gid=${SPECFS_GID}"
     [ -n "$SPECFS_MODE" ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}mode=${SPECFS_MODE}"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}mode=${SPECFS_MODE}"
     [ "$1" = remount ] && \
-	SPECFS_OPTIONS="${SPECFS_OPTIONS}${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}remount"
+	SPECFS_OPTIONS="${SPECFS_OPTIONS:--o }${SPECFS_OPTIONS:+,}remount"
 }
 
 modprobe_name () {
@@ -319,7 +319,7 @@ start_update () {
 #
 stop_update () {
     RETVAL=0
-    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' ]; then
+    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' \) ]; then
 	marker="/.openss7_update-`uname -r`"
 	if [ ":$SPECFS_KUPDATE" = ':yes' -a -e $marker ]; then
 		for command in /sbin/openss7-modules /usr/sbin/openss7-modules
