@@ -769,7 +769,7 @@ function read_modobject(command, dir, own, src,
     string = ""
     mod = ""
     count_syms = 0; count_unds = 0; count_weak = 0; count_vers = 0
-    # use objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -s 
+    # use objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s
     while ((command | getline) == 1) {
 	if (SECTION) {
 	    if (/^$/) {
@@ -1140,10 +1140,10 @@ function read_moduledir(directory, src,	    dir,command)
 {
     print_vinfo(1,"r: moduledir, directory = \"" directory "\"")
     dir = "kernel"
-    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -s"
+    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
     read_modobject(command, dir, "kernel", src)
     dir = values["pkgdirectory"]
-    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -s"
+    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
     read_modobject(command, dir, values["pkgdirectory"], "pkgdirectory")
 }
 function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
@@ -1152,7 +1152,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
     for (i = 1; i in modules; i++)
 	print modules[i] > "modvers.list"
     close("modvers.list")
-    command = "cat modvers.list | xargs objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -s"
+    command = "cat modvers.list | xargs objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
     read_modobject(command, ".", values["pkgdirectory"], src)
     system("rm -f modvers.list")
     # double check

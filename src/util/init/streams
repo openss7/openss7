@@ -165,13 +165,13 @@ build_options () {
     # Build up the options string
     STREAMS_OPTIONS=
     [ -n "$STREAMS_UID" ] && \
-	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}uid=${STREAMS_UID}"
+	STREAMS_OPTIONS="${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}uid=${STREAMS_UID}"
     [ -n "$STREAMS_GID" ] && \
-	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}gid=${STREAMS_GID}"
+	STREAMS_OPTIONS="${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}gid=${STREAMS_GID}"
     [ -n "$STREAMS_MODE" ] && \
-	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}mode=${STREAMS_MODE}"
+	STREAMS_OPTIONS="${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}mode=${STREAMS_MODE}"
     [ "$1" = remount ] && \
-	STREAMS_OPTIONS="${STREAMS_OPTIONS}${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}remount"
+	STREAMS_OPTIONS="${STREAMS_OPTIONS:--o }${STREAMS_OPTIONS:+,}remount"
 }
 
 modprobe_name () {
@@ -316,7 +316,7 @@ start_update () {
 #
 stop_update () {
     RETVAL=0
-    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' ]; then
+    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' \) ]; then
 	marker="/.openss7_update-`uname -r`"
 	if [ ":$STREAMS_KUPDATE" = ':yes' -a -e $marker ]; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules
