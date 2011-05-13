@@ -2076,7 +2076,7 @@ function removedirs(kversion,
     pfx = "w: rmdirs,    "
     for (dir in rmdirs) {
 	print_action("removing", dir, "from", kversion)
-	doit("rmdir -p " dir " 2>/dev/null")
+	doit("rmdir " dir " 2>/dev/null")
     }
     delete rmdirs
 }
@@ -2284,7 +2284,12 @@ function chcksolution(kversion, kver,
 		}
 	    }
 	}
-	if (altered) return 0
+	if (altered) {
+	    # tell init script to correct on reboot
+	    print_warns(pfx "*** REBOOT REQUIRED ***")
+	    doit("touch /.openss7_update-" krunning)
+	    return 0
+	}
     }
     return 1
 }
@@ -2606,6 +2611,32 @@ function initstart(	n,scripts,i,script,command) {
 	}
     }
 }
+function initstop(	n,scripts,i,script,command) {
+    if (!("initscripts" in values))
+	return
+    n = split(values["initscripts"],scripts,/,/)
+    if (n == 0)
+	return
+    if (system_command("test -x /sbin/service") == 0) {
+	for (i=n;i>=1;i--) { script = scripts[i]
+	    command = "/sbin/service " script " stop"
+	    doit(command)
+	}
+    } else
+    if (system_command("test -x /usr/bin/invoke-rc.d") == 0) {
+	for (i=n;i>=1;i--) { script = scripts[i]
+	    command = "/usr/sbin/invoke-rc.d " script " stop"
+	    doit(command)
+	}
+    } else {
+	for (i=n;i>=1;i--) { script = scripts[i]
+	    if (system_command("test -x /etc/init.d/" script) == 0) {
+		command = "/etc/init.d/" script " stop"
+		doit(command)
+	    }
+	}
+    }
+}
 function remove_kernel(kversion,
 		       pfx,dir)
 {
@@ -2617,7 +2648,6 @@ function remove_kernel(kversion,
     gsub(/\$KVERSION/,kversion,dir)
     gsub(/\$PACKAGE/,values["package"],dir)
     doit("rm -fr -- " dir)
-    doit("rmdir -p " dir " 2>/dev/null")
 }
 function link_kernel(kversion,
 		     pfx,n,name,weakmod,module,reloads)
@@ -2668,10 +2698,15 @@ function add_kernel(kversion,
     if (chcksolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)) {
 	if (makesolution(kversion, solution, creates, unlinks, changes, relinks, dolinks, removes, retains, inserts)) {
 	    dodepmod(kversion)
-	    if ( kversion == krunning ) {
-		initstart()
-	    } else {
-		print_vinfo(2, "not starting init scripts for kversion = " kversion)
+	    if ("initscripts" in values && values["initscripts"]) {
+		if ( kversion == krunning ) {
+		    if (kversion in kremoved)
+			initstop()
+		    if (kversion in kinserts)
+			initstart()
+		} else {
+		    print_vinfo(2, "not running init scripts for kversion = " kversion)
+		}
 	    }
 	} else {
 	    print_vinfo(2, "not performing depmod for kversion = " kversion)

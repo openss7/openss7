@@ -287,14 +287,15 @@ remove_depends () {
 start_update () {
     RETVAL=0
     if [ ":$previous" = 'N' -a ":$runlevel" != ':' ] ; then
-	if [ ":$SPECFS_KUPDATE" = ':yes' -o -e /.openss7_update ] ; then
+	marker="/.openss7_update-`uname -r`"
+	if [ ":$SPECFS_KUPDATE" = ':yes' -a -e $marker ] ; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules ; do
 		if [ -x $command ] ; then
 		    action "Updating kernel modules" \
 			$command -- -q --boot-kernel
 		    RETVAL=$?
 		    if [ $RETVAL -eq 0 ] ; then
-			rm -f -- /.openss7_update
+			rm -f -- $marker || :
 		    fi
 		    break
 		fi
@@ -310,7 +311,7 @@ start_update () {
 #   run when updates have been marked.  The existing kernel modules may have to
 #   be relinked to match a rebooting kernel with the same ABI as an overwritten
 #   kernel.  This is the case for Debian, Ubuntu, SuSE and OpenSuSE, but not, it
-#   seems, RedHat, CentOS nor Fedora.  Note that this sould really only be run
+#   seems, RedHat, CentOS nor Fedora.  Note that this should really only be run
 #   once on kernel shutdown or restart, and not any time that the Special
 #   Filesystem is stopped, so the 'runlevel' and 'previous' environment
 #   variables are consulted to ensure that we are shutting down or rebooting
@@ -318,11 +319,9 @@ start_update () {
 #
 stop_update () {
     RETVAL=0
-    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' ]
-    then
-	if [ ":$SPECFS_KUPDATE" = ':yes' ]
-	then :
-	    if [ -e /.openss7_update-@kversion@ ]; then
+    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' ]; then
+	marker="/.openss7_update-`uname -r`"
+	if [ ":$SPECFS_KUPDATE" = ':yes' -a -e $marker ]; then
 		for command in /sbin/openss7-modules /usr/sbin/openss7-modules
 		do
 		    [ -x $command ] || continue
@@ -330,14 +329,13 @@ stop_update () {
 			$command -- -q --boot-kernel
 		    RETVAL=$?
 		    if [ $RETVAL -eq 0 ]; then
-			rm -f -- /.openss7_update-@kversion@
+		    rm -f -- $marker || :
 		    fi
 		    break
 		done
 	    fi
 	fi
-    fi
-    :
+    return $RETVAL
 }
 
 #
@@ -892,6 +890,7 @@ stop () {
     stop_preload	# remove preloads
     stop_specfs		# remove the specfs kernel module
     stop_mountpoint	# remove the mountpoint (usually /dev/streams)
+    stop_update		# check kernel module weak updates
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     return $RETVAL
 }

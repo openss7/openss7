@@ -254,7 +254,7 @@ modprobe_remove () {
 }
 
 #
-# remove_depends() is a recursive function that attempts to remove all dependent
+# remove_depends() - A recursive function that attempts to remove all dependent
 # modules starting at a target module and finally removing the target module.
 # When any of the removals fail, the function escapes with a non-zero return
 # value.
@@ -271,29 +271,30 @@ remove_depends () {
 }
 
 #
-# start_update() checks that kernel modules have been appropriately modified for
-# the booting kernel before inserting the 'specfs' kernel module.  Note that
-# this must be run regardless of the presence or absence of any given kernel
-# module in the booting kernel.  The existing kernel modules may have to be
-# relinked to match a booting kernel with the same ABI as an overwritten kernel.
-# This is the case for Debian, Ubuntu, SuSE and OpenSuSE, but not, it seems,
-# RedHat or Fedora.  Note that this should really only be run once on kernel
-# boot, and not any time that the Special Filesystem is restarted, so the
-# 'runlevel' and 'previous' environment variables are consulted to ensure that
-# we are starting from boot (and not just switching run levels or manually
-# invoked).
+# start_update() - Checks that kernel modules have been appropriately modified
+#   for the booting kernel before inserting the 'specfs' kernel module.  Note
+#   that this must be run regardless of the presence or absence of any given
+#   kernel module in the booting kernel.  The existing kernel modules may have
+#   to be relinked to match a booting kernel with the same ABI as an overwritten
+#   kernel.  This is the case for Debian, Ubuntu, SuSE and OpenSuSE, but not, it
+#   seems, RedHat or Fedora.  Note that this should really only be run once on
+#   kernel boot, and not any time that the Special Filesystem is restarted, so
+#   the 'runlevel' and 'previous' environment variables are consulted to ensure
+#   that we are starting from boot (and not just switching run levels or
+#   manually invoked).
 #
 start_update () {
     RETVAL=0
     if [ ":$previous" = 'N' -a ":$runlevel" != ':' ] ; then
-	if [ ":$STREAMS_KUPDATE" = ':yes' -o -e /.openss7_update ] ; then
+	marker="/.openss7_update-`uname -r`"
+	if [ ":$STREAMS_KUPDATE" = ':yes' -a -e $marker ] ; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules ; do
 		if [ -x $command ] ; then
 		    action "Updating kernel modules" \
 			$command -- -q --boot-kernel
 		    RETVAL=$?
 		    if [ $RETVAL -eq 0 ] ; then
-			rm -f -- /.openss7_update
+			rm -f -- $marker || :
 		    fi
 		    break
 		fi
@@ -304,8 +305,41 @@ start_update () {
 }
 
 #
-# start_specfs() inserts the 'specfs' kernel module.  This is done even when we
-# are not mounting the specfs filesystem: the specfs filesystem is kernel
+# stop_update() - Checks that kernel modules have been appropriately modified
+#   for the running kernel before shutting down.  Note that this need only be
+#   run when updates have been marked.  The existing kernel modules may have to
+#   be relinked to match a rebooting kernel with the same ABI as an overwritten
+#   kernel.  This is the case for Debian, Ubuntu, SuSE and OpenSuSE, but not, it
+#   seems, RedHat, CentOS nor Fedora.  Note that this should really only be run
+#   once on kernel shutdown or restart, and not any time that the Special
+#   Filesystem is stopped, so the 'runlevel' and 'previous' environment
+#   variables are consulted to ensure that we are shutting down or rebooting
+#   (and not just switching run levels or manually invoked).
+#
+stop_update () {
+    RETVAL=0
+    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' ]; then
+	marker="/.openss7_update-`uname -r`"
+	if [ ":$STREAMS_KUPDATE" = ':yes' -a -e $marker ]; then
+	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules
+	    do
+		[ -x $command ] || continue
+		action "Updating kernel modules" \
+		    $command -- -q --boot-kernel
+		RETVAL=$?
+		if [ $RETVAL -eq 0 ]; then
+		    rm -f -- $marker || :
+		fi
+		break
+	    done
+	fi
+    fi
+    return $RETVAL
+}
+
+#
+# start_specfs() - Inserts the 'specfs' kernel module.  This is done even when
+#   we are not mounting the specfs filesystem: the specfs filesystem is kernel
 # mounted and can still be accessed through external character devices.
 #
 start_specfs () {
@@ -316,7 +350,7 @@ start_specfs () {
 }
 
 #
-# reload_specfs() simply ensures that the 'specfs' kernel module is loaded, so
+# reload_specfs() - Simply ensures that the 'specfs' kernel module is loaded, so
 # it simply call start_specfs().
 #
 reload_specfs () {
@@ -347,9 +381,9 @@ status_specfs () {
 }
 
 #
-# stop_specfs() attempts to remove the 'specfs' kernel module.  This can only be
-# successful when the specfs filesystem is unmounted.  This also attempts to
-# remove any dependent modules.
+# stop_specfs() - Attempts to remove the 'specfs' kernel module.  This can only
+#   be successful when the specfs filesystem is unmounted.  This also attempts
+#   to remove any dependent modules.
 #
 stop_specfs () {
     if [ ":$STREAMS_UMOUNTSPECFS" = ':yes' ] ; then
@@ -359,7 +393,7 @@ stop_specfs () {
 }
 
 #
-# start_mountpoint() attempts to create all of the mount point directories
+# start_mountpoint() - Attempts to create all of the mount point directories
 # specified when the script is set to mount the specfs filesystem at those
 # points.
 #
@@ -377,7 +411,7 @@ start_mountpoint () {
 }
 
 #
-# reload_mountpoint() simply ensures that all of the specified mount points
+# reload_mountpoint() - Simply ensures that all of the specified mount points
 # exist when the script is configured to mount the specfs filesystem at those
 # points.  It simply calls start_mountpoint().
 #
@@ -414,7 +448,7 @@ status_mountpoint () {
 }
 
 #
-# stop_mountpoint() attempts to remove all of the mount point directories
+# stop_mountpoint() - Attempts to remove all of the mount point directories
 # specified when the script is set to unmount the specfs filesystem from those
 # mount points.
 #
@@ -432,8 +466,8 @@ stop_mountpoint () {
 }
 
 #
-# start_mount() attempts to mount the specfs filesystem on all of the specified
-# mount points and with the specified options.
+# start_mount() - Attempts to mount the specfs filesystem on all of the
+#   specified mount points and with the specified options.
 #
 start_mount () {
     if [ ":$STREAMS_MOUNTSPECFS" = ':yes' ] ; then
@@ -450,11 +484,12 @@ start_mount () {
 }
 
 #
-# reload_mount() attempts to unmount and remove the directory for any mount
-# point that is no longer specified but has a specfs filesystem mounted at that
-# point.  It also remounts any mount point that is specified and currently
-# mounted so that mount parameters are updated.  It then uses start_mount() to
-# ensure that a mount point and mount exists for all the specified mount points.
+# reload_mount() - Attempts to unmount and remove the directory for any mount
+#   point that is no longer specified but has a specfs filesystem mounted at
+#   that point.  It also remounts any mount point that is specified and
+#   currently mounted so that mount parameters are updated.  It then uses
+#   start_mount() to ensure that a mount point and mount exists for all the
+#   specified mount points.
 #
 reload_mount () {
     local device mountpoint fstype options
@@ -522,13 +557,13 @@ status_mount () {
 }
 
 #
-# stop_mount() attempts to unmount the specfs filesystem from wherever it is
-# mounted (in user space).  The filesystem should unmount regardless of whether
-# a Stream is open or not.  Failure to unmount a mount point is an error.  The
-# only thing that could cause a failure is a busy filesystem (i.e. some process
-# has a subdirectory as the current working directory).  Note that we should
-# always unmount the filesystems when performing a forced remove so that killed
-# processes cannot reopen drivers.
+# stop_mount() - Attempts to unmount the specfs filesystem from wherever it is
+#   mounted (in user space).  The filesystem should unmount regardless of
+#   whether a Stream is open or not.  Failure to unmount a mount point is an
+#   error.  The only thing that could cause a failure is a busy filesystem (i.e.
+#   some process has a subdirectory as the current working directory).  Note
+#   that we should always unmount the filesystems when performing a forced
+#   remove so that killed processes cannot reopen drivers.
 #
 stop_mount () {
     if [ ":$STREAMS_UMOUNTSPECFS" = ':yes' -o ":$STREAMS_FORCEREMOVE" = ':yes' ] ; then
@@ -542,11 +577,11 @@ stop_mount () {
 }
 
 #
-# start_preload() is used to insert all preload specified modules.  Typically
-# for streams this is the 'streams' module itself.  The 'streams' module must be
-# loaded before sysctl parameters can be configured.
-# On some systems it is possible to identify this module as a system preloaded
-# module, but on others the module is only loaded when the initscript is run.
+# start_preload() - Used to insert all preload specified modules.  Typically for
+#   streams this is the 'streams' module itself.  The 'streams' module must be
+#   loaded before sysctl parameters can be configured.  On some systems it is
+#   possible to identify this module as a system preloaded module, but on others
+#   the module is only loaded when the initscript is run.
 #
 start_preload () {
     # insert in forward order
@@ -565,9 +600,9 @@ start_preload () {
 }
 
 #
-# reload_preload() is used when reloading.  The only necessity is to ensure that
-# preloaded modules are present to be reconfigured, so start_preload() is simply
-# called.
+# reload_preload() - Used when reloading.  The only necessity is to ensure that
+#   preloaded modules are present to be reconfigured, so start_preload() is
+#   simply called.
 #
 reload_preload () {
     start_preload || RETVAL=$?
@@ -599,7 +634,7 @@ status_preload () {
 }
 
 #
-# stop_preload() is used to remove specified preloaded modules.  Typically for
+# stop_preload() - Used to remove specified preloaded modules.  Typically for
 # streams this would include the 'streams' module itself.  This function also
 # attempts to remove all dependent modules.  Note that for streams all STREAMS
 # devices must be closed and unlinked or this could fail.
@@ -617,9 +652,8 @@ stop_preload () {
 }
 
 #
-# start_params() is used to configure sysctl parameters associated with
-# preloaded STREAMS modules and drivers, and, in particular the 'streams' kernel
-# module.
+# start_params() - Used to configure sysctl parameters associated with preloaded
+#   STREAMS modules and drivers, and, in particular the 'streams' kernel module.
 #
 start_params () {
     if grep '^[[:space:]]*'${name}'[/.]' /etc/sysctl.conf >/dev/null 2>&1 ; then
@@ -670,16 +704,17 @@ status_params () {
 }
 
 #
-# stop_params() is used to deconfigure sysctl parameters associated with
-# preloaded STREAMS modules and drivers, and, in particular the 'streams' kernel
-# module.  There are no actions required to deconfigure sysctl parameters.
+# stop_params() - Used to deconfigure sysctl parameters associated with
+#   preloaded STREAMS modules and drivers, and, in particular the 'streams'
+#   kernel module.  There are no actions required to deconfigure sysctl
+#   parameters.
 #
 stop_params () {
     return $RETVAL
 }
 
 #
-# start_devices() is used to configure devices associated with the STREAMS
+# start_devices() - Used to configure devices associated with the STREAMS
 # subsystem.
 #
 start_devices () {
@@ -719,7 +754,7 @@ status_devices () {
 }
 
 #
-# stop_devices() is used to deconfigure devices associated with the STREAMS
+# stop_devices() - Used to deconfigure devices associated with the STREAMS
 # susbsystem.
 #
 stop_devices () {
@@ -734,7 +769,7 @@ stop_devices () {
 }
 
 #
-# start_modules() is used to insert kernel modules at startup.  Because modules
+# start_modules() - Used to insert kernel modules at startup.  Because modules
 # are autoloaded as required, there is nothing to do here.
 #
 start_modules () {
@@ -755,11 +790,12 @@ status_modules () {
 }
 
 #
-# stop_modules() is used to remove kernel modules at shutdown of the STREAMS
-# subsystem.  There are two ways to do this: with or without extreme prejudice.
-# The order of removal can be gleened from lsmod: the streams modules that are
-# higher on the list have the least dependencies.  Also, when we use the '-r'
-# option to modprobe, complete unused module stacks will be removed.
+# stop_modules() - Used to remove kernel modules at shutdown of the STREAMS
+#   subsystem.  There are two ways to do this: with or without extreme
+#   prejudice.  The order of removal can be gleened from lsmod: the streams
+#   modules that are higher on the list have the least dependencies.  Also, when
+#   we use the '-r' option to modprobe, complete unused module stacks will be
+#   removed.
 #
 stop_modules () {
     local module more
@@ -852,6 +888,7 @@ stop () {
     stop_preload	# remove preloads
     stop_specfs		# remove the specfs kernel module
     stop_mountpoint	# remove the mountpoint (usually /dev/streams)
+    stop_update		# check kernel module weak updates
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     return $RETVAL
 }
