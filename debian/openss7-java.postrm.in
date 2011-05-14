@@ -61,13 +61,20 @@ datarootdir=@datarootdir@
 # postrm_jnilibs() - When complete removal, perform a ldconfig after the
 #   libraries have been removed to flush them from the ldconfig cache.  Note
 #   that this should not be done on upgrade, because building the ldconfig cache
-#   is up to the new-postinst "configure" stage or an appropriate trigger.  Note
-#   that this action should be performed by the debhelper portion of the script
-#   and is therefore short-circuited.
+#   is up to the new-postinst "configure" stage or an appropriate trigger.
 #
-postrm_jnilibs () { :; return
-    if [ -x "`which ldconfig 2>/dev/null`" ]; then
-	ldconfig || true
+postrm_jnilibs () {
+    if   [ -x "`which libtool  2>/dev/null`" ] ; then
+	libtool --mode=finish @jnidir@ || :
+    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
+	ldconfig -n @jnidir@ || :
+    fi
+}
+postrm_gcjlibs () {
+    if   [ -x "`which libtool  2>/dev/null`" ] ; then
+	libtool --mode=finish @libdir@/gcj/@PACKAGE@ || :
+    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
+	ldconfig -n @libdir@/gcj/@PACKAGE@ || :
     fi
 }
 #
@@ -75,20 +82,23 @@ postrm_jnilibs () { :; return
 #   there is no debhelper or trigger for this as yet.
 #
 postrm_gcjmaps () { :
-    if [ -x /usr/bin/rebuild-gcj-db ] ; then
-        /usr/bin/rebuild-gcj-db
+    local d db
+    if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
+        rebuild-gcj-db || :
     else
-#	basically what rebuild-gcj-db does
-        for base in /usr/lib* ; do
-            db=`/usr/bin/gcj-dbtool -p $base`
-            d=$base/gcj
-            test -d $d || continue
-            dirname $db | xargs mkdir -p
-            /usr/bin/gcj-dbtool -n $db.tmp 64
-            find $d -follow -name '*.db' -print0 | \
-                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
-            /bin/mv -f $db.tmp $db
-        done
+	if [ -x "`which gcj-dbtool 2>/dev/null`" ] ; then
+	    for base in /usr/lib* ; do
+		d=$base/gcj
+		[ -d $d ] || continue
+		db=`gcj-dbtool -p $base`
+		[ -n "$db" ] || continue
+		dirname $db | xargs mkdir -p
+		gcj-dbtool -n $db.tmp 64
+		find $d -follow -name '*.db' -print0 | \
+		    xargs -0 gcj-dbtool -m $db.tmp $db.tmp
+		mv -f -- $db.tmp $db
+	    done
+	fi
     fi
 }
 #
@@ -96,8 +106,8 @@ postrm_gcjmaps () { :
 #   that there is no debhelper or trigger for this as yet.
 #
 postrm_jarfiles () { :
-    if [ -x /usr/bin/rebuild-jar-repository ] ; then
-        /usr/bin/rebuild-jar-repository @javadir@ || true
+    if [ -x "`which rebuild-jar-repository 2>/dev/null`" ] ; then
+        rebuild-jar-repository @javadir@ || :
     fi
 }
 #
@@ -105,9 +115,10 @@ postrm_jarfiles () { :
 #   database and jar repository.
 #
 postrm_java () { :
-    postrm_jnilibs
-    postrm_gcjmaps
-    postrm_jarfiles
+    postrm_jnilibs || :
+    postrm_gcjlibs || :
+    postrm_gcjmaps || :
+    postrm_jarfiles || :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:

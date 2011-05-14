@@ -58,80 +58,91 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
-# prerm_initscripts() - Before removing a package, stop the init scripts and deregister them.
-#   Because this is too disruptive for weak-updated systems on upgrade, we disable the debhelper
-#   scriplets and only stop init scripts on complete removal.
+# prerm_preloads() - When removing for good (purging), make sure that the preload modules are no
+#   longer included in the preloads file.  Note that removing lines from the /etc/modules-@kversion@
+#   file is the responsibility of the kernel modules subpackage.  On upgrade, the new package will
+#   add its own lines later.
 #
-prerm_initscripts () {
-    local list reverse i
-    list="${initfiles}"
-    reverse=
-    for i in $list; do
-	reverse="$i${reverse:+ }$reverse"
-    done
-    for i in $reverse; do
-	if [ -f @initrddir@/$i ]; then
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || true; }
-	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || true; }
-	    [ -x @initrddir@/$i                    ] && { @initrddir@/$i stop && continue || true; }
+prerm_preloads () {
+    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
+	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
+	  prel_old included p
+    for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
+	if [ -f $prel_old ]; then
+	    cp -f -- $prel_old $prel_new
+	    included=no
+	    for p in ${preloads}; do
+		if grep '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		    included=yes
+		    break
+		fi
+	    done
+	    if [ $included = yes ]; then
+		for p in ${preloads}; do
+		    grep -v '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >$prel_tmp
+		    mv -f -- $prel_tmp $prel_new
+		done
+		cp -f -b --suffix=.dpkg-old -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
 	fi
     done
-    for i in $reverse; do
-	if [ -f @initrddir@/$i ]; then
-	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || :; }
-	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || :; }
-	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || :; }
-	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove 2>&1 && continue || :; }
-	fi
-    done
-    :
 }
+#
+# prerm_manrefs() - When removing or upgrading the package, remove the uncompressed manual
+#   references when there is a compressed version lying around from before.  One upgrade, the new
+#   version will provide its own one way or another.
+#
 prerm_manrefs () { :
     for m in $manrefs; do
-	rm -f -- @mandir@/$m 2>/dev/null || :
+	if [ -f @mandir@/$m.gz -o -f @mandir@/$m.bz2 ]; then
+	    rm -f -- @mandir@/$m 2>/dev/null || :
+	fi
     done
 }
+#
+# prerm_manmacros() - When removing or upgrading the package, remove the uncompressed manual
+#   references when there is a compressed version lying around from before.  One upgrade, the new
+#   version will provide its own one way or another.
+#
 prerm_manmacros () { :
     for m in $manmacros; do
-	rm -f -- @mandir@/$m 2>/dev/null || :
+	if [ -f @mandir@/$m.gz -o -f @mandir@/$m.bz2 ]; then
+	    rm -f -- @mandir@/$m 2>/dev/null || :
+	fi
     done
 }
 #
-# prerm_base_remove() - Remove the -base subpackage completely.  No upgrade is in processes.
+# prerm_base() - Remove or upgrade the base subpackage.
 #
-prerm_base_remove () { :
-    # We are being removed for good.
-    @WITH_KO_MODULES_FALSE@prerm_initscripts
-    prerm_manrefs
-    prerm_manmacros
-}
-prerm_base_upgrade () { :
-    # We are being removed because we are being replaced with a newer version.
-    @WITH_KO_MODULES_FALSE@prerm_initscripts
+prerm_base () { :
+    prerm_preloads || :
+    prerm_manrefs || :
+    prerm_manmacros || :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # xxx-prerm remove
 remove_prerm () { :
-    prerm_base_remove
+    prerm_base "$@"
 }
 # con-prerm remove 'in-favour' package new-version
 conflict_prerm () { :
-    prerm_base_remove
+    prerm_base "$@"
 }
 # old-prerm upgrade new-version
 upgrade_prerm () { :
-    prerm_base_upgrade
+    prerm_base "$@"
 }
 # old-prerm upgrade new-version ***FAILED***
 # new-prerm failed-upgrade old-version
 failed_upgrade_prerm () { :
-    prerm_base_upgrade
+    prerm_base "$@"
 }
 # dec-prerm deconfigure 'in-favour' package-being-installed version ['removing' conflicting-package version]
 deconfigure_prerm () { :
-    prerm_base_upgrade
+    prerm_base "$@"
 }
 @mscript_prerm@
 @mscript_debhelper@

@@ -58,13 +58,20 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
-# postinst_jnilibs() - After a fresh installation, upgrade or reinstall, do a
-#   ldconfig.  Note that this action should be performed by the debhelper
-#   portion of the script and is therefore short-circuited.
+# postinst_jnilibs() - After a fresh installation, upgrade or reinstall, do a ldconfig.
 #
-postinst_jnilibs () { :; return
-    if [ -x "`which ldconfig 2>/dev/null`" ] ; then
-	ldconfig || true
+postinst_jnilibs () {
+    if   [ -x "`which libtool  2>/dev/null`" ] ; then
+	libtool --mode=finish @jnidir@ || :
+    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
+	ldconfig -n @jnidir@ || :
+    fi
+}
+postinst_gcjlibs () {
+    if   [ -x "`which libtool  2>/dev/null`" ] ; then
+	libtool --mode=finish @libdir@/gcj/@PACKAGE@ || :
+    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
+	ldconfig -n @libdir@/gcj/@PACKAGE@ || :
     fi
 }
 #
@@ -72,20 +79,23 @@ postinst_jnilibs () { :; return
 #   that there is currently no debhelper nor trigger for this.
 #
 postinst_gcjmaps () { :
-    if [ -x /usr/bin/rebuild-gcj-db ] ; then
-        /usr/bin/rebuild-gcj-db
+    local d db
+    if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
+        rebuild-gcj-db || :
     else
-        # basically what rebuild-gcj-db does
-        for base in /usr/lib* ; do
-            db=`/usr/bin/gcj-dbtool -p $base`
-            d=$base/gcj
-            test -d $d || continue
-            dirname $db | xargs mkdir -p
-            /usr/bin/gcj-dbtool -n $db.tmp 64
-            find $d -follow -name '*.db' -print0 | \
-                xargs -0 /usr/bin/gcj-dbtool -m $db.tmp $db.tmp
-            /bin/mv -f $db.tmp $db
-        done
+	if [ -x "`which gcj-dbtool 2>/dev/null`" ] ; then
+	    for base in /usr/lib* ; do
+		d=$base/gcj
+		[ -d $d ] || continue
+		db=`gcj-dbtool -p $base`
+		[ -n "$db" ] || continue
+		dirname $db | xargs mkdir -p
+		gcj-dbtool -n $db.tmp 64
+		find $d -follow -name '*.db' -print0 | \
+		    xargs -0 gcj-dbtool -m $db.tmp $db.tmp
+		mv -f -- $db.tmp $db
+	    done
+	fi
     fi
 }
 #
@@ -93,8 +103,8 @@ postinst_gcjmaps () { :
 #   that there is currently no debhelper nor trigger for this.
 #
 postinst_jarfiles () { :
-    if [ -x /usr/bin/rebuild-jar-repository ] ; then
-        /usr/bin/rebuild-jar-repository @javadir@ || true
+    if [ -x "`which rebuild-jar-repository 2>/dev/null`" ] ; then
+        rebuild-jar-repository @javadir@ || :
     fi
 }
 #
@@ -103,6 +113,7 @@ postinst_jarfiles () { :
 #
 postinst_java () { :
     postinst_jnilibs
+    postinst_gcjlibs
     postinst_gcjmaps
     postinst_jarfiles
 }

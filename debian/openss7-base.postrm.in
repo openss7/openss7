@@ -58,69 +58,31 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
-# postrm_preload() - When removing for good, make sure that the preload modules
-#   are no longer included in the preloads file for 2.4 module systems.  Note
-#   that removing lines from the /etc/modules-@kversion@ file are the
-#   responsibility of the -kernel subpackage.
+# postrm_oldmods() - As the subpackage is being purged, remove the line from the modules.conf file
+#   that points at the /etc/modutils/openss7 file that in turn includes the /lib/modules/@kversion@-
+#   /modules.openss7 file when it exists.  Note that the files themselves referenced from the
+#   modules.conf files are removed as a normal part of the course of removing the files in the
+#   -kernel sub-packages.
 #
-postrm_preload () { :
-    for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
-	if [ -f $prel_old ]; then
-	    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
-	    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
-	    cp -f -- $prel_old $prel_new
-	    included=no
-	    modules="${preload}"
-	    for m in $modules; do
-		if grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
-		    included=yes
-		fi
-	    done
-	    if [ $included = yes ]; then
-		for m in $modules; do
-		    grep -v '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >$prel_tmp
-		    cp -f -- $prel_tmp $prel_new
-		done
-		chmod --reference=$prel_old -- $prel_new
-		cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
-	    fi
-	    rm -f -- $prel_new
-	fi
-    done
-    :
-}
-postrm_base () { :
-    @WITH_KO_MODULES_FALSE@postrm_preload
-}
+@WITH_KO_MODULES_FALSE@postrm_oldmods () {
+@WITH_KO_MODULES_FALSE@    local conf_old=@sysconfdir@/modules.conf \
+@WITH_KO_MODULES_FALSE@          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
+@WITH_KO_MODULES_FALSE@          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+@WITH_KO_MODULES_FALSE@    if [ -f $conf_old ] ; then
+@WITH_KO_MODULES_FALSE@        cp -f -- $conf_old $conf_new
+@WITH_KO_MODULES_FALSE@        if grep '^include[[:space:]].*@modutildir@/@PACKAGE_LCNAME@' $conf_new >/dev/null 2>&1; then
+@WITH_KO_MODULES_FALSE@            sed -e '\|^include[[:space:]].*@modutildir@/@PACKAGE_LCNAME@|d' $conf_new > $conf_tmp
+@WITH_KO_MODULES_FALSE@            mv -f -- $conf_tmp $conf_new
+@WITH_KO_MODULES_FALSE@            cp -f -b --suffix=.dpkg-old -- $conf_new $conf_old
+@WITH_KO_MODULES_FALSE@        fi
+@WITH_KO_MODULES_FALSE@        rm -f -- $conf_new || :
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@}
 #
-# postrm_oldmods() - As the subpackage is being purged, remove the line from
-#   the modules.conf file that points at the /etc/modutils/openss7 file that in
-#   turn includes the /lib/modules/@kversion@/modules.openss7 file when it
-#   exists.  Note that the files themselves referenced from the modules.conf
-#   files are removed as a normal part of the course of removing the files in
-#   the -kernel sub-packages.
-#
-postrm_oldmods () {
-    local conf_old=@sysconfdir@/modules.conf \
-          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
-          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
-    if [ -f $conf_old ] ; then
-        cp -f -- $conf_old $conf_new
-	if grep '^include[[:space:]].*@modutildir@/'"$base" $conf_new >/dev/null 2>&1; then
-	    sed -e '\|^include[[:space:]].*@modutildir@/'"$base"'|d' $conf_new > $conf_tmp
-	    mv -f -- $conf_tmp $conf_new
-	    chmod --reference=$conf_old $conf_new
-	    cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
-	fi
-        rm -f -- $conf_new || :
-    fi
-}
-#
-# postrm_initscripts() - When purging the package, remove the symbolic links
-#   associated with the init scripts before they are purged.  Note that the
-#   debhelper scriptlets are too disruptive in some stages and are therefore
-#   disabled.  Because some time could have elapsed between package removal and
-#   package purge, unlike debhelper, we also stop any running initscripts.
+# postrm_initscripts() - When purging the package, remove the symbolic links associated with the
+#   init scripts before they are purged.  Note that the debhelper scriptlets are too disruptive in
+#   some stages and are therefore disabled.  Because some time could have elapsed between package
+#   removal and package purge, unlike debhelper, we also stop any running initscripts.
 #
 postrm_initscripts () {
     local reverse= list="${initfiles}" i
@@ -128,57 +90,52 @@ postrm_initscripts () {
 	reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse; do
-	if [ -f "@initrddir@/$i" ]; then
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i stop && continue || true
-	    [ -x "`which service     2>/dev/null`" ] && service     $i stop && continue || true
-	    [ -x "@initrddir@/$i"                  ] && @initrddir@/$i stop && continue || true
+	if [ -f @initrddir@/$i ]; then
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
+	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
+	    [ -x @initrddir@/$i                    ] && { @initrddir@/$i stop && continue || :; }
 	fi
     done
     for i in $reverse; do
-	if [ -f "@initrddir@/$i" ]; then
-	    [ -x /sbin/insserv             ] && /sbin/insserv -r          $i        2>&1 && continue || true
-	    [ -x /sbin/chkconfig           ] && /sbin/chkconfig --del     $i        2>&1 && continue || true
-	    [ -x /usr/lib/lsb/remove_initd ] && /usr/lib/lsb/remove_initd $i        2>&1 && continue || true
-	    [ -x /usr/sbin/update-rc.d     ] && /usr/sbin/update-rc.d     $i remove 2>&1 && continue || true
+	if [ -f @initrddir@/$i ]; then
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        2>&1 && continue || :; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        2>&1 && continue || :; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        2>&1 && continue || :; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/sbin/update-rc.d     $i remove 2>&1 && continue || :; }
 	fi
     done
-    :
 }
 #
-# postrm_manpages() - When removing the package, update the aprospros database.
-#   This handled by debhelper scriptlets or triggers and is therefore
-#   short-circuited.
+# postrm_manpages() - When removing the package, update the aprospros database.  This handled by
+#   debhelper scriptlets or triggers and is therefore short-circuited.
 #
 postrm_manpages () { :; return
-    if [ -x "`which makewhatis 2>/dev/null`" ]; then
+    if   [ -x "`which makewhatis 2>/dev/null`" ]; then
 	LANGUAGE= LANG= makewhatis -u @mandir@ || :
-    fi
-    if [ -x "`which mandb      2>/dev/null`" ]; then
+    elif [ -x "`which mandb      2>/dev/null`" ]; then
 	LANGUAGE= LANG= mandb      -p @mandir@ || :
     fi
 }
 #
-# postrm_base_purge() - The subpackage is being purged, rebuild databases and
-#   adjust other files in preparation for removal of configuration files.
+# postrm_purge() - The subpackage is being purged, rebuild databases and adjust other files in
+#   preparation for removal of configuration files.
 #
-postrm_base_purge () { :
-    @WITH_KO_MODULES_FALSE@postrm_oldmods || :
-    postrm_initscripts
+postrm_purge () { :
+@WITH_KO_MODULES_FALSE@    postrm_oldmods || :
+    postrm_manpages || :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # remove-postrm remove
 remove_postrm () { :
-    postrm_base
 }
 # remove-postrm purge
 purge_postrm () { :
-    postrm_base_purge
+    postrm_purge || :
 }
 # old-postrm upgrade new-version
 upgrade_postrm () { :
-    postrm_base
 }
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version

@@ -58,26 +58,6 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
-# prerm_manrefs() - Some debian policies mistakenly compress our manrefs and
-#   manmacros files.  This means that only a .gz form exists in the files list,
-#   so we must manually remove the manrefs.
-#
-prerm_manrefs () { :
-    if [ -n "${manrefs}" -a -f @mandir@/${manrefs} ]; then
-	rm -f -- "@mandir@/${manrefs}" || :
-    fi
-}
-#
-# prerm_manmacros() - Some debian policies mistakenly compress our manmacros and
-#   manmacros files.  This means that only a .gz form exists in the files list,
-#   so we must manually remove the manmacros.
-#
-prerm_manmacros () { :
-    if [ -n "${manmacros}" -a -f @mandir@/${manmacros} ]; then
-	rm -f -- "@mandir@/${manmacros}" || :
-    fi
-}
-#
 # prerm_infofiles() - Recent debian policies will remove info files from the
 #   directories based on trigger directories.  However, performing this removal
 #   will not hurt them and is necessary for older policies.
@@ -101,24 +81,22 @@ prerm_infofiles () { :
 #   lists and therefore unknown to dpkg.
 #
 prerm_doc () { :
-    prerm_manrefs
-    prerm_manmacros
-    prerm_infofiles
+    prerm_infofiles || :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # xxx-prerm remove
 remove_prerm () { :
-    prerm_doc
+    prerm_doc || :
 }
 # con-prerm remove 'in-favour' package new-version
 conflict_prerm () { :
-    prerm_doc
+    prerm_doc || :
 }
 # old-prerm upgrade new-version
 upgrade_prerm () { :
-    prerm_doc
+    prerm_doc || :
 }
 # old-prerm upgrade new-version ***FAILED***
 # new-prerm failed-upgrade old-version

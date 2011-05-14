@@ -1230,7 +1230,7 @@ Prefix:         %{_configdir}
 Prefix:         %{_initrddir}
 %endif
 %if %{FILES_netconfig}
-Prefix:         %{_sysconfdir}/netconfig.d
+Prefix:         %{_sysconfdir}/nslconfig.d
 %endif
 %if %{FILES_sock2path}
 Prefix:         %{_sysconfdir}/sock2path.d
@@ -1948,11 +1948,11 @@ if [ $1 = 1 ] ; then : # fresh install
     a="${t}.xnsl"
     d="${t}.d"
     if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+        if ! grep '^# Generated from nslconfig.d' $t >/dev/null 2>&1 ; then
             t="${a}"
         fi
     fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    echo '# Generated from nslconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
     found='no'
     files="$d/*"
     for f in $files ; do
@@ -2074,11 +2074,11 @@ if [ $1 = 2 ] ; then : # upgrade
     a="${t}.xnsl"
     d="${t}.d"
     if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+        if ! grep '^# Generated from nslconfig.d' $t >/dev/null 2>&1 ; then
             t="${a}"
         fi
     fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    echo '# Generated from nslconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
     found='no'
     files="$d/*"
     for f in $files ; do
@@ -2185,11 +2185,11 @@ if [ $1 = 0 ] ; then : # final removal
     a="${t}.xnsl"
     d="${t}.d"
     if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+        if ! grep '^# Generated from nslconfig.d' $t >/dev/null 2>&1 ; then
             t="${a}"
         fi
     fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    echo '# Generated from nslconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
     found='no'
     files="$d/*"
     for f in $files ; do
@@ -2329,11 +2329,11 @@ b loop' $prel_new > $prel_tmp
     a="${t}.xnsl"
     d="${t}.d"
     if [ -f $t ] ; then
-        if ! grep '^# Generated from netconfig.d' $t >/dev/null 2>&1 ; then
+        if ! grep '^# Generated from nslconfig.d' $t >/dev/null 2>&1 ; then
             t="${a}"
         fi
     fi
-    echo '# Generated from netconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
+    echo '# Generated from nslconfig.d by @PACKAGE_LCNAME@ '`date -uI` > $t.tmp
     found='no'
     files="$d/*"
     for f in $files ; do
@@ -2422,7 +2422,7 @@ fi
 %{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
 %{?files_configfiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
 #{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
-%{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+%{?files_netconfig:%config(noreplace) %{_sysconfdir}/nslconfig.d/%{netconfig}}
 %{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 #{?files_oldmods:%config(noreplace) %{_modutildir}/*}
 %{?files_initscripts:%config(noreplace) %{_configdir}/*}

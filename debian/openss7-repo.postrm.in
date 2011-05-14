@@ -60,8 +60,8 @@ datarootdir=@datarootdir@
 #
 # postrm_repo() - After we remove (and purge) this repository package, we need
 #   to adjust whatever definitions are required in configuration files.  When we
-#   changed them on installation, we save an original copy in $f.dpkg-save.
-#   Therefore, if $f.dpkg-save exists, copy it back.
+#   changed them on installation, we save an original copy in $f.dpkg-old.
+#   Therefore, if $f.dpkg-old exists, copy it back.
 #
 #   FIXME: For the rpm version this is much more than this.  It is moving back
 #	common configuration files that were altered by the installation.  Short
@@ -70,12 +70,12 @@ datarootdir=@datarootdir@
 postrm_repo () { :; return
     local d="@sysconfdir@/apt/sources.list.d"
     for f in openss7.list ; do f="$d/$f"
-        if [ -f $f -a -f $f.dpkg-save ] ; then
-            if ! diff $f $f.dpkg-save >/dev/null 2>&1 ; then
-                mv -f -- $f.dpkg-save $f || true
+        if [ -f $f -a -f $f.dpkg-old ] ; then
+            if ! diff $f $f.dpkg-old >/dev/null 2>&1 ; then
+                mv -f -- $f.dpkg-old $f || true
             fi
         fi
-        rm -f -- $f.dpkg-save || true
+        rm -f -- $f.dpkg-old || true
     done
 }
 # -----------------------------------------------------------------------------
