@@ -58,147 +58,118 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
-# postinst_modconf() - Ensure that include line is added to the modules.conf
-#   file for old 2.4 module systems.  This must remove lines before including
-#   them because it may also be run from reconfigure.
+# postinst_modconf() - Ensure that include line is added to the modules.conf file for old 2.4 module
+#   systems.  This must remove lines before including them because it may also be run from
+#   reconfigure.
 #
-postinst_modconf () { :
-    local conf_old=@sysconfdir@/modules.conf \
-	  conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
-	  conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
-    if [ -f $conf_old ] ; then
-	cp -f -- $conf_old $conf_new
-	( sed -e '\|^include[[:space:]].*'"@modutildir@"'/'"$base"'|d' $conf_new
-	  echo "include @modutildir@/$base" ) > $conf_tmp
-	mv -f -- $conf_tmp $conf_new
-	if ! diff $conf_new $conf_old >/dev/null 2>&1; then
-	    chmod --reference=$conf_old -- $conf_new
-	    cp -f -b --suffix=.dpkg-save -- $conf_new $conf_old
-	fi
-	rm -f -- $conf_new
-    fi
-    :
-}
+@WITH_KO_MODULES_FALSE@postinst_modconf () { :
+@WITH_KO_MODULES_FALSE@    local conf_old=@sysconfdir@/modules.conf \
+@WITH_KO_MODULES_FALSE@          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
+@WITH_KO_MODULES_FALSE@          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+@WITH_KO_MODULES_FALSE@    if [ -f $conf_old ] ; then
+@WITH_KO_MODULES_FALSE@        cp -f -- $conf_old $conf_new
+@WITH_KO_MODULES_FALSE@        ( sed -e '\|^include[[:space:]].*@modutildir@/@PACKAGE_LCNAME@|d' $conf_new
+@WITH_KO_MODULES_FALSE@          echo "include @modutildir@/@PACKAGE_LCNAME@" ) > $conf_tmp
+@WITH_KO_MODULES_FALSE@        mv -f -- $conf_tmp $conf_new
+@WITH_KO_MODULES_FALSE@        if ! diff $conf_new $conf_old >/dev/null 2>&1; then
+@WITH_KO_MODULES_FALSE@            cp -f -b --suffix=.dpkg-old -- $conf_new $conf_old
+@WITH_KO_MODULES_FALSE@        fi
+@WITH_KO_MODULES_FALSE@        rm -f -- $conf_new || :
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@}
 #
-# postinst_preload() - At the end of a fresh install or upgrade, check that our
-#   preload modules have been added to the modprobe.preload file.  Note,
-#   however, that the modprobe.preload does not normally exist for Debian.  The
-#   -kernel subpackage is responsible for adding preloads to the debian
-#   /etc/modules-@kversion@ file.
+# postinst_preloads() - At the end of a fresh install or upgrade, check that our preload modules have
+#   been added to the modprobe.preload file.  Note, however, that the modprobe.preload does not
+#   normally exist for Debian.  The -kernel subpackage is responsible for adding preloads to the
+#   debian /etc/modules-@kversion@ file.
 #
-postinst_preload () { :
-    prel_old="@sysconfdir@/modprobe.preload"
-    if [ -f $prel_old ] ; then
-        prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
-        prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
-        cp -f -- $prel_old $prel_new
-	missing=no
-        mods="${preloads}"
-	for m in $mods ; do
-	    if ! grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
-		missing=yes
-	    fi
-        done
-	if [ $missing = yes ]; then
-	    for m in $mods; do
-		( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new;
-		  echo "$m" ) >$prel_tmp
-		mv -f -- $prel_tmp $prel_new
+postinst_preloads () { :
+    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
+	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
+	  prel_old
+    for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
+	if [ -f $prel_old ] ; then
+	    cp -f -- $prel_old $prel_new
+	    missing=no
+	    for m in $preloads ; do
+		if ! grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		    missing=yes
+		fi
 	    done
-	    chmod --reference=$prel_old -- $prel_new
-	    cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
+	    if [ $missing = yes ]; then
+		for m in $preloads; do
+		    ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new;
+		      echo "$m" ) >$prel_tmp
+		    mv -f -- $prel_tmp $prel_new
+		done
+		cp -f -b --suffix=.dpkg-old -- $prel_new $prel_old
+	    fi
+	    rm -f -- $prel_new || :
 	fi
-        rm -f -- $prel_new
-    fi
-    :
+    done
 }
 #
-# postinst_initscripts() - At the end of an install or upgrade, add init scripts
-#   if we can and then start them.  Note that the debhelper scriptlets are
-#   defeated because they are too disruptive in the 2.6 environment.  This
-#   function starts init scripts; however, if they are already running, this has
-#   no effect.  Also, the init scripts detect whether they can be indeed started
-#   and skip some of their functions otherwise.  Nevertheless, and unlike the
-#   debhelper scriptlets, this script only starts initscripts when they are
-#   normally started in the current runlevel.
+# postinst_initscripts() - At the end of an install or upgrade, add init scripts if we can.  Note
+#   that the debhelper scriptlets are defeated because they are too disruptive in the 2.6
+#   environment.
 #
 postinst_initscripts () {
     local list="${initfiles}" i args r
     for i in $list; do
-	if [ -x "@initrddir@/$i" ]; then
-	    # Find the best working init script installation tool
-	    [ -x /sbin/insserv              ] && /sbin/insserv              $i       2>&1 && continue || true
-	    [ -x /sbin/chkconfig            ] && /sbin/chkconfig --add      $i       2>&1 && continue || true
-	    [ -x /usr/lib/lsb/install_initd ] && /usr/lib/lsb/install_initd $i       2>&1 && continue || true
+	if [ -f @initrddir@/$i ]; then
+	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       2>&1 && continue || true; }
+	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       2>&1 && continue || true; }
+	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       2>&1 && continue || true; }
 	    args="`grep '^#[[:space:]]*update-rc.d:' @initrddir@/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
-	    [ -x /usr/sbin/update-rc.d      ] && /usr/sbin/update-rc.d      $i $args 2>&1 && continue || true
+	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args 2>&1 && continue || true; }
 	fi
     done
-    r="`runlevel | awk '{print$2}'`"
-    for i in $list; do
-	if [ -x "@initrddir@/$i" ]; then
-	    if [ -L @initrddir@/../rc${r}.d/S[0-9][0-9]$i -o \
-		 -L @initrddir@/../rc${r}.d/S[0-9][0-9]$i ]
-	    then
-		[ -x "`which invoke-rc.d 2>/dev/null`" ] && invoke-rc.d $i start && continue || true
-		[ -x "`which service     2>/dev/null`" ] && service     $i start && continue || true
-		[ -x "@initrddir@/$i"                  ] && @initrddir@/$i start && continue || true
-	    fi
-	fi
-    done
-    :
 }
 #
-# postinst_manpages() - Add our manual pages to the aprospros database.  One
-#   problem with doing this is that even the oldest of debian policies and
-#   debhelper implementations will implement the debhelper code to do this.
-#   Therefore, this function is shortcircuited for now.  (We install >3000
-#   manual pages and it takes forever anyway.)  Failing to do this altogether is
-#   not critical because most machines run an evening cron job to update these.
-#
-postinst_manpages () { :; return
-    if which makewhatis >/dev/null 2>&1 ; then
-	LANGUAGE= LANG= makewhatis -u @mandir@ || true
-    fi
-    if which mandb >/dev/null 2>&1 ; then
-	LANGUAGE= LANG= mandb -p @mandir@ || :true
-    fi
-}
-#
-# postinst_manrefs() - Some systems compress our reference database but do not
-#   provide nor invoke the zrefer command necessary to use compressed reference
-#   databases.  Therefore, we always provide a decompressed copy of the
-#   reference database.
+# postinst_manrefs() - Some systems compress our reference database but do not provide nor invoke
+#   the zrefer command necessary to use compressed reference databases.  Therefore, we always
+#   provide a decompressed copy of the reference database.
 #
 postinst_manrefs () {
     local m
     for m in ${manrefs}; do
-	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m
-	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m
+	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m || :
+	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m || :
     done
 }
 #
-# postinst_manrefs() - Some systems compress our man macros but do not provide
-#   nor invoke the zsoelim command necessary to use compressed man macros.
-#   Therefore, we always provide a decompressed copy of the man macros.
+# postinst_manmacros() - Some systems compress our man macros but do not provide nor invoke the
+#   zsoelim command necessary to use compressed man macros.  Therefore, we always provide a
+#   decompressed copy of the man macros.
 #
 postinst_manmacros () {
     local m
     for m in ${manmacros}; do
-	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m
-	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m
+	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m || :
+	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m || :
     done
 }
-postinst_base_reconfigure () { :
-    @WITH_KO_MODULES_FALSE@postinst_modconf
-    @WITH_KO_MODULES_FALSE@postinst_preload
-    postinst_initscripts
-    postinst_manpages
-    postinst_manrefs
-    postinst_manmacros
+#
+# postinst_manpages() - Add our manual pages to the aprospros database.  One problem with doing this
+#   is that even the oldest of debian policies and debhelper implementations will implement the
+#   debhelper code to do this.  Therefore, this function is shortcircuited for now.  (We install
+#   >3000 manual pages and it takes forever anyway.)  Failing to do this altogether is not critical
+#   because most machines run an evening cron job to update these.
+#
+postinst_manpages () { :; return
+    if   [ -x "`which mandb      2>/dev/null`" ]; then
+	LANGUAGE= LANG= mandb      -p @mandir@ || :
+    elif [ -x "`which makewhatis 2>/dev/null`" ]; then
+	LANGUAGE= LANG= makewhatis -u @mandir@ || :
+    fi
 }
 postinst_base_configure () { :
-    postinst_base_reconfigure
+@WITH_KO_MODULES_FALSE@    postinst_modconf
+    postinst_preloads
+    postinst_initscripts
+    postinst_manrefs
+    postinst_manmacros
+    postinst_manpages
 }
 postinst_base_abort () { :
     postinst_initscripts
@@ -212,7 +183,7 @@ configure_postinst () { :
 }
 # xxx-postinst configure most-recently-configured-version
 reconfigure_postinst () { :
-    postinst_base_reconfigure
+    postinst_base_configure
 }
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :

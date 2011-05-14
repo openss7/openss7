@@ -58,276 +58,119 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
-# postinst_symvers() - Install redhat-like symvers file in the /boot directory.
-#   Debian kernels do not create a symbol versions file.  This is a bit
-#   dangerous because it relies on the symbol versions not changing when the ABI
-#   number in the kernel version does not change.
+# postinst_preloads() - For old modules, ensure that our preloaded modules are in the appropriate
+#   kernel-specific preloads file.  Note that the prerm on upgrade removed the old package's
+#   preloads from the file so we only need to add ours.
 #
-postinst_symvers () {
-    local f t
-    f="/usr/src/$name-@VERSION@-@PACKAGE_DEBRELEASE@/@kversion@/System.symvers"
-    t="/boot/symvers-@kversion@.gz"
-    if [ ! -r $t -a -r $f ] ; then
-	gzip -c $f >$t || true
-    fi
-    :
-}
+@WITH_KO_MODULES_FALSE@postinst_preloads () {
+@WITH_KO_MODULES_FALSE@    local prel_old=@sysconfdir@/modules-@kversion@ \
+@WITH_KO_MODULES_FALSE@          prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
+@WITH_KO_MODULES_FALSE@          prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
+@WITH_KO_MODULES_FALSE@          p
+@WITH_KO_MODULES_FALSE@    if [ -f $prel_old ]; then cp -f -- $prel_old $prel_new; else touch $prel_new; fi
+@WITH_KO_MODULES_FALSE@    ( cat $prel_new; for p in ${preloads}; do echo "$p"; done ) >$prel_tmp
+@WITH_KO_MODULES_FALSE@    mv -f -- $prel_tmp $prel_new
+@WITH_KO_MODULES_FALSE@    if ! diff $prel_new $prel_old >/dev/null 2>&1; then
+@WITH_KO_MODULES_FALSE@        cp -f -b --suffix=.dpkg-old -- $prel_new $prel_old
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@    rm -f -- $prel_new
+@WITH_KO_MODULES_FALSE@}
 #
-# postinst_updates() - Perform weak-updates on modules, perform depmod, and
-#   signal init scripts when a relink is required on shutdown or reboot.
+# postinst_oldmods() - Perform a depmod when the kernel modules installed are for the running
+#   kernel.  This only applies to 2.4 module systems.  The openss7-modules script performs the
+#   comparable actions for 2.6 module systems.
 #
-postinst_updates () {
-    local retval=0 update="@sbindir@/${name}-modules"
-    if [ -x $update ] ; then
-	$update -- -q -e --add-modules @kversion@ || true
-    fi
-    :
-}
+@WITH_KO_MODULES_FALSE@postinst_oldmods () {
+@WITH_KO_MODULES_FALSE@    local sysmap=/boot/System.map-@kversion@
+@WITH_KO_MODULES_FALSE@    if [ -x "`which depmod 2>/dev/null`" ]; then
+@WITH_KO_MODULES_FALSE@        if [ "@kversion@" = "`uname -r`" ]; then
+@WITH_KO_MODULES_FALSE@            depmod -a || :
+@WITH_KO_MODULES_FALSE@        elif [ -r $sysmap ]; then
+@WITH_KO_MODULES_FALSE@            UNAME_MACHINE=@target_cpu@ \
+@WITH_KO_MODULES_FALSE@            depmod -ae -F $sysmap @kversion@ || :
+@WITH_KO_MODULES_FALSE@        fi
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@}
 #
-# postinst_depmod() - Perform a depmod when the kernel modules installed are for
-#   the running kernel.  This only applies to 2.4 module systems.  The
-#   openss7-modules script performs the comparable actions for 2.6 module
-#   systems.
+# postinst_symvers() - Install redhat-like symvers file in the /boot directory.  Debian kernels do
+#   not create a symbol versions file.  This is a bit dangerous because it relies on the symbol
+#   versions not changing when the ABI number in the kernel version does not change.
 #
-postinst_depmod () { :
-    if which depmod >/dev/null 2>&1; then
-	if [ ":@kversion@" = ":`uname -r`" ] ; then
-	    if [ -r @ksysmap@ ]
-	    then depmod -ae -F @ksysmap@ 2>&1 || true
-	    else depmod -ae 2>&1 || true
-	    fi
-	elif [ -r @ksysmap@ ] ; then
-	    UNAME_MACHINE=@target_cpu@ \
-	    depmod -ae -F @ksysmap@ @kversion@ 2>&1 || true
-	fi
-    fi
-}
+@WITH_KO_MODULES_TRUE@postinst_symvers () {
+@WITH_KO_MODULES_TRUE@    local f t
+@WITH_KO_MODULES_TRUE@    f=/usr/src/${name}-@VERSION@-@PACKAGE_DEBRELEASE@/@kversion@/System.symvers
+@WITH_KO_MODULES_TRUE@    t=/boot/symvers-@kversion@.gz
+@WITH_KO_MODULES_TRUE@    if [ ! -r $t -a -r $f ] ; then
+@WITH_KO_MODULES_TRUE@        gzip -c $f >$t || :
+@WITH_KO_MODULES_TRUE@    fi
+@WITH_KO_MODULES_TRUE@    :
+@WITH_KO_MODULES_TRUE@}
 #
-# postinst_preload() - For old modules, ensure that our preloaded modules are in
-#   the appropriate preload file.
+# postinst_weakmods() - Perform weak-updates on modules, perform depmod, and signal init scripts when
+#   a relink is required on shutdown or reboot.  Note that dpkg is way smarter than rpm about
+#   installation order so the weak-updates script from the base package should already be installed.
 #
-postinst_preload () { :
-    if [ -f @sysconfdir@/modprobe.preload ]; then
-	prel_old="@sysconfdir@/modprobe.preload"
-    elif [ -f @sysconfdir@/modules -o -f @sysconfdir@/modules-@kversion@ ]; then
-	prel_old="@sysconfdir@/modules-@kversion@"
-    else
-	return 0
-    fi
-    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
-    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
-    if [ -f $prel_old ]
-    then cp -f -- $prel_old $prel_new
-    else touch $prel_new
-    fi
-    missing=no
-    mods="${preloads}"
-    for m in $mods; do
-	if ! grep '^[[:space:]]*'"$m"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
-	    missing=yes
-	fi
-    done
-    if [ $missing = yes ]; then
-	for m in $mods; do
-	    ( sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new;
-	      echo "$m" ) >$prel_tmp
-	    mv -f -- $prel_tmp $prel_new
-	done
-	chmod --reference=$prel_old -- $prel_new || true
-	cp -f -b --suffix=.dpkg-save -- $prel_new $prel_old
-    fi
-    rm -f -- $prel_new || true
-}
+@WITH_KO_MODULES_TRUE@postinst_weakmods () {
+@WITH_KO_MODULES_TRUE@    local scripts v
+@WITH_KO_MODULES_TRUE@    if [ -x @sbindir@/${name}-modules ]; then
+@WITH_KO_MODULES_TRUE@        scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
+@WITH_KO_MODULES_TRUE@        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+@WITH_KO_MODULES_TRUE@        if [ -n "$scripts" ] ; then
+@WITH_KO_MODULES_TRUE@            @sbindir@/${name}-modules -- $v -e \
+@WITH_KO_MODULES_TRUE@                --initscripts="$scripts" \
+@WITH_KO_MODULES_TRUE@                --add-modules @kversion@ || :
+@WITH_KO_MODULES_TRUE@        else
+@WITH_KO_MODULES_TRUE@            @sbindir@/${name}-modules -- $v -e \
+@WITH_KO_MODULES_TRUE@                --add-modules @kversion@ || :
+@WITH_KO_MODULES_TRUE@        fi
+@WITH_KO_MODULES_TRUE@    fi
+@WITH_KO_MODULES_TRUE@}
 #
-# postinst_startscripts() - For old modules, start init scripts when they have
-#   already been installed and are normally started in the current runlevel.
-#   Note that if init scripts are started and they are already running, they
-#   will not affect anything until reboot.
+# postinst_initscripts() - For old modules attempt to start init scripts when they are not already
+#   started and they are supposed to be started in the current run level.
 #
-postinst_startscripts () { :
-    local r list i
-    [ -z "@WITH_KO_MODULES_FALSE@" ] || return 0
-    r=`runlevel | awk '{print$2}'`
-    list="${initfiles}" ; for i in $list ; do
-        if [ -f @initrddir@/$i ] ; then
-            if [ -L @initrddir@/../rc${r}.d/S[0-9][0-9]$i -o \
-                 -L @initrddir@/rc${r}.d/S[0-9][0-9]$i ] ; then
-                 /sbin/service $i start >/dev/null 2>&1 || \
-		     @initrddir@/$i start >/dev/null 2>&1 || :
-            fi
-        fi
-    done
-    return 0
-}
-#   new-preinst install
-#	- files are unpacked
-#	- file list added
-#	- scripts added
-#	- "Unpacked" state
-#   new-postinst configure
+@WITH_KO_MODULES_FALSE@postinst_initscripts () {
+@WITH_KO_MODULES_FALSE@    local r i start l
+@WITH_KO_MODULES_FALSE@    if [ "@kversion@" = "`uname -r`" ]; then
+@WITH_KO_MODULES_FALSE@        r="`runlevel | awk '{print$2}'`"
+@WITH_KO_MODULES_FALSE@        for i in ${initfiles}; do
+@WITH_KO_MODULES_FALSE@            [ -f @initrddir@/$i ] || continue
+@WITH_KO_MODULES_FALSE@            [ ! -e /var/lock/subsys/$i ] || continue
+@WITH_KO_MODULES_FALSE@            start=no
+@WITH_KO_MODULES_FALSE@            for l in @initrddir@/../rc${r}.d/S[0-9][0-9]$i @initrddir@/rc${r}.d/S[0-9][0-9]$i; do
+@WITH_KO_MODULES_FALSE@                if [ -L $l ]; then start=yes; break; fi
+@WITH_KO_MODULES_FALSE@            done
+@WITH_KO_MODULES_FALSE@            [ $start = yes ] || continue
+@WITH_KO_MODULES_FALSE@            [ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break; }
+@WITH_KO_MODULES_FALSE@            [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break; }
+@WITH_KO_MODULES_FALSE@            [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i start && continue || break; }
+@WITH_KO_MODULES_FALSE@        done
+@WITH_KO_MODULES_FALSE@    fi
+@WITH_KO_MODULES_FALSE@}
 #
-# This is a fresh installation of the package for @kversion@.  Either the
-# package has never been installed before, or a purge was performed on the
-# package after it was removed (unlikely, but possible).  Actions that need to
-# be performed are as follows:
-#
-# The preinst script will:
-#
-# 1.  Seek out and remove any non-deb or old LiS installations.
-# 2.  Remove any weak links by calling openss7-update --remove-kernel @kversion@
-# 3.  Perform a depmod so that no attempt is made to load the kernel modules
-#     that are about to be installed.  Note that this may result in an error
-#     because client modules may be present.
-# 4.  Do not stop any running subsystems regardless of whether @kversion@ is the
-#     running kernel.
-# 5.  Touch /.openss7-update-@kversion@ to indicate to init scripts that
-#     openss7-update --boot-kernel @kversion@ should be run on reboot.
-#
-# The postinst script will:
-#
-# 1.  Relink installed kernel modules for the running kernel if required.  This
-#     is performed with openss7-update --add-modules @kversion@.
-# 2.  Perform a weak update using openss7-update --add-modules @kversion@.  Note
-#     that this will not affect the running kernel when @kversion@ is other than
-#     the running kernel.
-# 3.  Perform a depmod so that kernel module dependencies are proper. (This will
-#     be performed by openss7-update.)
-# 4.  Can start init scripts for the running kernel if desired and they are not
-#     already running.  The user can be prompted using debconf.  However, it is
-#     best to leave them in their previous state by default.
-# 5.  If init scripts are running or kernel modules are loaded and the
-#     installation is for the running kernel, warn the user that a restart of
-#     the STREAMS subsystems is recommended.  The user can be prompted using
-#     debconf.  However, it is best to leave them in their previous state by
-#     default.
-#
-# Note that if the package is not configured, kernel modules will be installed
-# in the directories; however, they will not be included in the depmod files and
-# therefore will not load.  If the kernel should be rebooted a depmod on reboot
-# will include these modules, however, the postinst actions will be performed by
-# the init scripts on shutdown and reboot if necessary (as signalled by the
-# presence of the /.openss7-update-@kversion@ file) and modules will be properly
-# linked either before or after reboot and depmod performed again when necessary
-# before the init scripts attempt to start the subsystem.
-#
-postinst_kernel_configure () { :
-    @WITH_KO_MODULES_TRUE@postinst_symvers || true
-    @WITH_KO_MODULES_TRUE@postinst_updates || true
-    @WITH_KO_MODULES_FALSE@postinst_depmod || true
-    @WITH_KO_MODULES_FALSE@postinst_preload || true
-    @WITH_KO_MODULES_FALSE@postinst_startscripts || true
-}
-#   new-preinst install old-version
-#	- files are unpacked
-#	- file list added
-#	- scripts added
-#	- "Unpacked" state
-#   new-postinst configure most-recently-configured-version
-#
-# This is a reinstallation of the package for @kversion@.  A version of the
-# package (old-version) has been installed before.  Actions that need to be
-# performed are the same as for a fresh install; however, there is no need to
-# seek out non-deb or LiS installations are remove them because this would have
-# been performed on the previous fresh install.
-#
-postinst_kernel_reconfigure () { :
-    @WITH_KO_MODULES_TRUE@postinst_symvers || true
-    @WITH_KO_MODULES_TRUE@postinst_updates || true
-    @WITH_KO_MODULES_FALSE@postinst_depmod || true
-    @WITH_KO_MODULES_FALSE@postinst_preload || true
-    @WITH_KO_MODULES_FALSE@postinst_startscripts || true
-}
-#   old-prerm upgrade new-version
-#   new-preinst upgrade old-version
-#	- files are unpacked, backups of old files
-#   old-postrm upgrade new-version
-#	- old files not in new version are removed
-#	- new files list replaces old
-#	- new scripts replace old
-#	- backup files are deleted
-#	- "Unpacked" state
-#   new-postinst configure [most-recently-configured-version]
-#
-# This is an upgrade of the package for @kversion@.  An older version of the
-# package is installed.  Actions that need to be performed are as follows:
-#
-# The prerm script will:
-#
-# 1.  Remove any weak links to the modules that are about to be removed (for
-#     kernels other than @kversion@) by calling openss7-update --remove-modules
-#     @kversion@.  This may as last step remove the modules themselves.  The
-#     openss7-update script can be passed the EVR of the modules so that they
-#     may be identified by their srcversion.
-# 2.  If the running kernel was linked to the modules being removed, those
-#     symbolic links must be removed and a depmod performed so that the running
-#     kernel will not attempt to load any modules that are about to be
-#     installed.  Note that this may result in an error because client modules
-#     may be present.
-# 3.  Do not stop any running subsystems regardless of whether @kversion@ is the
-#     running kernel.
-#
-# The preinst script will:
-#
-# 1.  Remove any weak links by calling openss7-update --remove-kernel
-#     @kversion@.
-# 2.  Perform a depmod so that no attempt is made to load the kernel modules
-#     that are about to be installed.  Note that this may result in an error
-#     because client modules may be present.
-# 3.  Do not stop any running subsystems regardless of whether @kversion@ is the
-#     running kernel.
-# 4.  Touch /.openss7-update-@kversion@ to indicate to init scripts that
-#     openss7-update --boot-kernel @kversion@ should be run on reboot.
-#
-# The postrm script will:
-#
-# 1.  Do nothing.  The new modules could be relinked at this stage, but it is
-#     not wise to use scripts is a questionable state to relink newer version
-#     modules.
-#
-# The postinst script will:
-#
-# 1.  Relink installed kernel modules for the running kernel if required.  This
-#     is performed with openss7-update --add-modules @kversion@.
-# 2.  Perform a weak update using openss7-update --add-modules @kversion@.  Note
-#     that this will not affect the running kernel when @kversion@ is other than
-#     the running kernel.
-# 3.  Perform a depmod so that kernel module dependencies are proper. (This will
-#     be performed by openss7-update.)
-# 4.  Can start init scripts for the running kernel if desired and they are not
-#     already running.  The user can be prompted using debconf.  However, it is
-#     best to leave them in their previous state by default.
-# 5.  If init scripts are running or kernel modules are loaded and the
-#     installation is for the running kernel, warn the user that a restart of
-#     the STREAMS subsystems is recommended.  The user can be prompted using
-#     debconf.  However, it is best to leave them in their previous state by
-#     default.
-#
-# Note that if the package is not configured, kernel modules will be installed
-# in the directories; however, they will not be included in the depmod files and
-# therefore will not load.  If the kernel should be rebooted a depmod on reboot
-# will include these modules, however, the postinst actions will be performed by
-# the init scripts on shutdown and reboot if necessary (as signalled by the
-# presence of the /.openss7-update-@kversion@ file) and modules will be properly
-# linked either before or after reboot and depmod performed again when necessary
-# before the init scripts attempt to start the subsystem.
+# postinst_kernel() - For old modules, make sure that the preloads are in the kernel-specific
+#   preloads file, perform a depmod on the kernel modules directory, start init scripts when they
+#   are to be started for the installed kernel modules.  For new modules, add the symvers file when
+#   possible ('cause debian doesn't have one) and invoke the weak-modules update script.  Note that
+#   the script will perform a depmod and start init scripts when necessary.
 #
 postinst_kernel () { :
-    @WITH_KO_MODULES_TRUE@postinst_symvers || true
-    @WITH_KO_MODULES_TRUE@postinst_updates || true
-    @WITH_KO_MODULES_FALSE@postinst_depmod || true
-    @WITH_KO_MODULES_FALSE@postinst_preload || true
-    @WITH_KO_MODULES_FALSE@postinst_startscripts || true
+@WITH_KO_MODULES_FALSE@    postinst_preloads || :
+@WITH_KO_MODULES_FALSE@    postinst_oldmods || :
+@WITH_KO_MODULES_TRUE@    postinst_symvers || :
+@WITH_KO_MODULES_TRUE@    postinst_weakmods || :
+@WITH_KO_MODULES_FALSE@    postinst_initscripts || :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # xxx-postinst configure
 configure_postinst () { :
-    postinst_kernel_configure
+    postinst_kernel
 }
 # xxx-postinst configure most-recently-configured-version
 reconfigure_postinst () { :
-    postinst_kernel_reconfigure
+    postinst_kernel
 }
 # xxx-postinst triggered triggered-packages
 triggered_postinst () { :

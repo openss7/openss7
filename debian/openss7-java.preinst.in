@@ -64,13 +64,16 @@ datarootdir=@datarootdir@
 #   this checks for other libraries with the same name and deletes them.
 #
 preinst_jnilibs () { :
-    libs="$jnilibs"; for lib in $libs; do
-        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
-        if [ -n "$old_libs" ] ; then
-            echo "$script: warning: Deleting old non-deb libraries $old_libs" >&2
-            rm -f $old_libs || true
-        fi
-    done
+    local lib l
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+	for lib in $jnilibs; do
+	    ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
+	    while read l; do
+		echo "$script: warning: Deleting old non-deb library, $l" >&2
+		rm -f -- $l || :
+	    done
+	done
+    fi
 }
 #
 # preinst_gcjmap() - On fresh install, look for non-deb libraries and remove
@@ -93,16 +96,16 @@ preinst_jarfiles () { :
 #   it can be reinstalled after the first installation of this package.
 #
 preinst_java () { :
-    preinst_jnilibs
-    preinst_gcjmaps
-    preinst_jarfiles
+    preinst_jnilibs || :
+    preinst_gcjmaps || :
+    preinst_jarfiles || :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # new-preinst install
 install_preinst () { :
-    preinst_java
+    preinst_java || :
 }
 # new-preinst install old-version
 reinstall_preinst () { :

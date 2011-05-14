@@ -65,14 +65,16 @@ datarootdir=@datarootdir@
 #   other libraries with the same name and deletes them.
 #
 preinst_libraries () {
-    local old_libs
-    for lib in $libraries ; do
-        old_libs="`( /sbin/ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null`"
-        if [ -n "$old_libs" ] ; then
-            echo "$script: warning: Deleting old non-deb libraries $old_libs" >&2
-            rm -f $old_libs || true
-        fi
-    done
+    local lib l
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+	for lib in $libraries ; do
+	    ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
+	    while read l; do
+		echo "$script: warning: Deleting old non-deb library, $l" >&2
+		rm -f -- $l || :
+	    done
+	done
+    fi
 }
 #
 # preinst_tools() - On a fresh installation, look for and remove any non-deb or
@@ -85,7 +87,7 @@ preinst_tools () {
         location="`which $tool 2>/dev/null`"
         while [ -n "$location" -a -x "$location" ] ; do
 	    echo "$script: warning: Deleting old non-deb tool $location" >&2
-            rm -f -- $location || true
+            rm -f -- $location || :
             location="`which $tool 2>/dev/null`"
         done
     done
@@ -96,15 +98,15 @@ preinst_tools () {
 #   step can (and should) be skipped.
 #
 preinst_lib () { :
-    preinst_libraries
-    preinst_tools
+    preinst_libraries || :
+    preinst_tools || :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # new-preinst install
 install_preinst () { :
-    preinst_lib
+    preinst_lib || :
 }
 # new-preinst install old-version
 reinstall_preinst () { :

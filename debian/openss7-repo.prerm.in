@@ -70,7 +70,7 @@ prerm_repo () { :; return
     for f in openss7.list; do
 	f="$d/$f"
 	if [ -r $f ]; then
-	    mv -f -- $f $f.dpkg-save
+	    mv -f -- $f $f.dpkg-old
 	fi
 	rm -f -- $f
     done

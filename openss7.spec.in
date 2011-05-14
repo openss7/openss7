@@ -2745,7 +2745,7 @@ Prefix:             %{_initrddir}
 Prefix:             %{_sbindir}
 %endif
 #if %{FILES_netconfig}
-#refix:             %{_sysconfdir}/netconfig.d
+#refix:             %{_sysconfdir}/nslconfig.d
 #endif
 #if %{FILES_sock2path}
 #refix:             %{_sysconfdir}/sock2path.d
@@ -2831,7 +2831,6 @@ if [ $1 -eq 1 ] ; then : # fresh install
 	    done
 	    if ! diff $prel_new $prel_old >/dev/null 2>&1; then
                 echo "warning: Removing non-rpm entries from preloads file, $prel_old" >&2
-		chmod --reference=$prel_old -- $prel_new
 		cp -f -b --suffix=.rpmorig -- $prel_new $prel_old
 	    fi
 	    rm -f -- $prel_new || :
@@ -2839,31 +2838,31 @@ if [ $1 -eq 1 ] ; then : # fresh install
     done
 %endif
 %if %{FILES_initscripts}
-    list='%{nonrpminit}'
+    nonrpminit='%{nonrpminit}'
     reverse=
-    for i in $list; do
+    for i in $nonrpminit; do
 	reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse; do
 	if [ -f %_initrddir/$i ]; then
             echo "warning: Stopping non-rpm init script, $i" >&2
-	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || true; }
-	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || true; }
-	    [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || true; }
+	    [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
+	    [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
+	    [ -x "%_initrddir/$i"                  ] && { %_initrddir/$i stop && continue || :; }
 	fi
     done
-    list='%{initfiles} %{nonrpminit}'
+    initfiles='%{initfiles}'
     reverse=
-    for i in $list; do
+    for i in $initfiles $nonrpminit; do
 	reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse; do
 	if [ -f %_initrddir/$i ]; then
             echo "warning: Deregistering non-rpm init script, $i" >&2
-	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        && continue || true; }
-	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        && continue || true; }
-	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        && continue || true; }
-	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove && continue || true; }
+	    [ -x /sbin/insserv             ] && { /sbin/insserv -r          $i        && continue || :; }
+	    [ -x /sbin/chkconfig           ] && { /sbin/chkconfig --del     $i        && continue || :; }
+	    [ -x /usr/lib/lsb/remove_initd ] && { /usr/lib/lsb/remove_initd $i        && continue || :; }
+	    [ -x /usr/sbin/update-rc.d     ] && { /usr/bin/update-rc.d      $i remove && continue || :; }
 	fi
     done
 %endif
@@ -2959,11 +2958,53 @@ if [ $1 -eq 1 ] ; then : # fresh install
 	done
 	if ! diff $conf_old $conf_new >/dev/null 2>&1; then
             echo "warning: Removing non-rpm entries from $conf_old" >&2
-	    chmod --reference=$conf_old -- $conf_new
 	    cp -f -b --suffix=.dpkg-orig -- $conf_new $conf_old
 	fi
 	rm -f -- $conf_new || :
     fi
+%endif
+%if %{FILES_manpages}
+    pre_remove_warn_file () {
+        echo "warning: Deleting non-rpm manual $1 file $2" >&2
+        rm -f -- $2 2>/dev/null || :
+    }
+    if [ -f /usr/man/man3/fattach.3 ]; then
+        pre_remove_warn_file "page" /usr/man/man3/fattach.3
+        pre_remove_warn_file "page" /usr/man/man3/detach.3
+        pre_remove_warn_file "page" /usr/man/man3/isastream.3
+        rmdir -p /usr/man/man3 2>/dev/null || :
+        pre_remove_warn_file "page" /usr/man/man8/fattach.8
+        pre_remove_warn_file "page" /usr/man/man8/fdetach.8
+        rmdir -p /usr/man/man8 2>/dev/null || :
+        pre_remove_warn_file "page" /usr/man/man9/connld.9
+        pre_remove_warn_file "page" /usr/man/man9/fifo.9
+        pre_remove_warn_file "page" /usr/man/man9/pipemod.9
+        rmdir -p /usr/man/man9 2>/dev/null || :
+    fi
+%endif
+%if %{FILES_manrefs}
+    pre_remove_warn_file () {
+        echo "warning: Deleting non-rpm manual $1 file $2" >&2
+        rm -f -- $2 2>/dev/null || :
+    }
+    manrefs='%{manrefs}'
+    for m in $manrefs; do
+        [ ! -f %{_mandir}/$m     ] || pre_remove_warn_file "references" %{_mandir}/$m     || :
+        [ ! -f %{_mandir}/$m.gz  ] || pre_remove_warn_file "references" %{_mandir}/$m.gz  || :
+        [ ! -f %{_mandir}/$m.bz2 ] || pre_remove_warn_file "references" %{_mandir}/$m.bz2 || :
+    done
+%endif
+%if %{FILES_manmacros}
+    pre_remove_warn_file () {
+        echo "warning: Deleting non-rpm manual $1 file $2" >&2
+        rm -f -- $2 2>/dev/null || :
+    }
+    manmacros='%{manmacros}'
+    for m in $manmacros; do
+        [ ! -f %{_mandir}/$m     ] || pre_remove_warn_file "macros" %{_mandir}/$m     || :
+        [ ! -f %{_mandir}/$m.gz  ] || pre_remove_warn_file "macros" %{_mandir}/$m.gz  || :
+        [ ! -f %{_mandir}/$m.bz2 ] || pre_remove_warn_file "macros" %{_mandir}/$m.bz2 || :
+    done
 %endif
 fi
 
@@ -2978,7 +3019,6 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     ( cat $conf_new; echo "include %{_modutildir}/%{base}" ) >$conf_tmp
     mv -f -- $conf_tmp $conf_new
     if ! diff $conf_new $conf_old >/dev/null 2>&1; then
-	chmod --reference=$conf_old -- $conf_new
 	cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
     fi
     rm -f -- $conf_new || :
@@ -2992,31 +3032,36 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 	( cat $prel_new; for p in $preloads; do echo "$p"; done ) >$prel_tmp
 	mv -f -- $prel_tmp $prel_new
 	if ! diff $prel_new $prel_old >/dev/null 2>&1; then
-	    chmod --reference=$prel_old -- $prel_new
 	    cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
 	fi
-	rm -f -- $prel_new
+	rm -f -- $prel_new || :
     done
 %endif
 %if %{FILES_initscripts}
-    list='%{initfiles}'
-    for i in $list; do
+    initfiles='%{initfiles}'
+    for i in $initfiles; do
 	if [ -f %_initrddir/$i ]; then
-	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       && continue || true; }
-	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       && continue || true; }
-	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       && continue || true; }
+	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       && continue || :; }
+	    [ -x /sbin/chkconfig            ] && { /sbin/chkconfig --add      $i       && continue || :; }
+	    [ -x /usr/lib/lsb/install_initd ] && { /usr/lib/lsb/install_initd $i       && continue || :; }
 	    args="`grep '^#[[:space:]]*update-rc.d:' %_initrddir/$i | sed -e 's,#[[:space:]]*update-rc.d:[[:space:]]*,,'`"
-	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args && continue || true; }
+	    [ -x /usr/sbin/update-rc.d      ] && { /usr/sbin/update-rc.d      $i $args && continue || :; }
 	fi
     done
 %endif
 %if %{FILES_manrefs}
-    [ ! -f %{_mandir}/%{manrefs}.gz    ] || gunzip  %{_mandir}/%{manrefs}.gz
-    [ ! -f %{_mandir}/%{manrefs}.bz2   ] || bunzip2 %{_mandir}/%{manrefs}.bz2
+    manrefs='%{manrefs}'
+    for m in $manrefs; do
+        [ ! -f %{_mandir}/$m.gz    ] || gzip  -dc %{_mandir}/$m.gz  > %{_mandir}/$m || :
+        [ ! -f %{_mandir}/$m.bz2   ] || bzip2 -dc %{_mandir}/$m.bz2 > %{_mandir}/$m || :
+    done
 %endif
 %if %{FILES_manmacros}
-    [ ! -f %{_mandir}/%{manmacros}.gz  ] || gunzip  %{_mandir}/%{manmacros}.gz
-    [ ! -f %{_mandir}/%{manmacros}.bz2 ] || bunzip2 %{_mandir}/%{manmacros}.bz2
+    manmacros='%{manmacros}'
+    for m in $manmacros; do
+        [ ! -f %{_mandir}/$m.gz  ] || gzip  -dc %{_mandir}/$m.gz  > %{_mandir}/$m || :
+        [ ! -f %{_mandir}/$m.bz2 ] || bzip2 -dc %{_mandir}/$m.bz2 > %{_mandir}/$m || :
+    done
 %endif
 fi
 if [ $1 -eq 1 ] ; then : # fresh install
@@ -3070,7 +3115,6 @@ n
 b loop' $conf_new >$conf_tmp
         mv -f -- $conf_tmp $conf_new
         if ! diff $conf_new $conf_old >/dev/null 2>&1; then
-            chmod --reference=$conf_old -- $conf_new
             cp -f -b --suffix=.rpmsave -- $conf_new $conf_old
         fi
         rm -f -- $conf_new || :
@@ -3095,7 +3139,6 @@ b loop' $prel_new >$prel_tmp
 	    mv -f -- $prel_tmp $prel_new
 	done
 	if ! diff $prel_new $prel_old >/dev/null 2>&1; then
-	    chmod --reference=$prel_old -- $prel_new
 	    cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
 	fi
 	rm -f -- $prel_new || :
@@ -3104,9 +3147,9 @@ b loop' $prel_new >$prel_tmp
 fi
 if [ $1 -eq 0 ] ; then : # final removal
 %if %{FILES_initscripts}
-    list='%{initfiles}'
+    initfiles='%{initfiles}'
     reverse=
-    for i in $list; do
+    for i in $initfiles; do
 	reverse="$i${reverse:+ }$reverse"
     done
     for i in $reverse; do
@@ -3128,13 +3171,17 @@ if [ $1 -eq 0 ] ; then : # final removal
 %if %{FILES_manrefs}
     manrefs='%{manrefs}'
     for m in $manrefs; do
-        rm -f -- %{_mandir}/$m 2>/dev/null || :
+        if [ -f %{_mandir}/$m.gz -o -f %{_mandir}/$m.bz2 ]; then
+            rm -f -- %{_mandir}/$m 2>/dev/null || :
+        fi
     done
 %endif
 %if %{FILES_manmacros}
     manmacros='%{manmacros}'
     for m in $manmacros; do
-        rm -f -- %{_mandir}/$m 2>/dev/null || :
+        if [ -f %{_mandir}/$m.gz -o -f %{_mandir}/$m.bz2 ]; then
+            rm -f -- %{_mandir}/$m 2>/dev/null || :
+        fi
     done
 %endif
 fi
@@ -3181,7 +3228,7 @@ fi
 #{?files_snmpconf:%config(noreplace) %{_snmpconfdir}/*}
 %{?files_configfiles:%config(noreplace) %{_sysconfdir}/%{conffiles}}
 ##{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
-#{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+#{?files_netconfig:%config(noreplace) %{_sysconfdir}/nslconfig.d/%{netconfig}}
 #{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path}
 #{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 #{?files_oldmods:%config(noreplace) %{_modutildir}/*}
@@ -3411,7 +3458,7 @@ Prefix:             %{_libdir}
 #refix:             %{_lib32dir}
 #endif
 %if %{FILES_netconfig}
-Prefix:             %{_sysconfdir}/netconfig.d
+Prefix:             %{_sysconfdir}/nslconfig.d
 %endif
 %if %{FILES_sock2path}
 Prefix:             %{_sysconfdir}/sock2path.d
@@ -3515,62 +3562,56 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 %if %{FILES_netconfig}
     netc_fil=%{_sysconfdir}/netconfig
     netc_alt=%{_sysconfdir}/netconfig.xnsl
-    netc_dir=%{_sysconfdir}/netconfig.d
+    netc_dir=%{_sysconfdir}/nslconfig.d
     netc_tmp=%{_tmppath}/netconfig.tmp.$$
     found=no
     files="$netc_dir/*"
-    if [ -d $netc_dir ]; then
-        if [ -r $netc_fil ]; then
-            if ! grep '^# Generated from netconfig.d' $netc_fil >/dev/null 2>&1; then
-                netc_fil=$netc_alt
-            fi
-        else
-            if [ -r $netc_alt ]; then
-                netc_fil=$netc_alt
-            fi
+    if [ -r $netc_fil ]; then
+        if ! grep '^# Generated from nslconfig.d' $netc_fil >/dev/null 2>&1; then
+            netc_fil=$netc_alt
         fi
-        (
-            echo '# Generated from netconfig.d by @PACKAGE_LCNAME@'
-            echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
-            echo '# EDIT THE FILES IN THE netconfig.d DIRECTORY INSTEAD.'
-        ) >$netc_tmp
-        for f in $files; do
-            if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) (
-                            echo '# Generated from netconfig.d/'`basename $f`
-                            sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
-                        ) >>$netc_tmp
-                        found=yes ;;
-                esac
-            fi
-        done
-        for f in $files; do
-            if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) (
-                            echo '# Generated from netconfig.d/'`basename $f`
-                            sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
-                        ) >>$netc_tmp
-                        found=yes ;;
-                esac
-            fi
-        done
-        if [ $found = no ]; then
-            rm -f -- $netc_fil
-            rmdir $netc_dir 2>/dev/null || :
-        else
-            if ! diff $netc_tmp $netc_fil >/dev/null 2>&1; then
-                chmod --reference=$netc_fil -- $netc_tmp
-                cp -f -b --suffix=.rpmsave -- $netc_tmp $netc_fil
-            fi
+    else
+        if [ -r $netc_alt ]; then
+            netc_fil=$netc_alt
         fi
-        rm -f -- $netc_tmp || :
-        if [ $netc_fil != $netc_alt ]; then
-            rm -f -- $netc_alt || :
+    fi
+    (   echo '# Generated from nslconfig.d by @PACKAGE_LCNAME@'
+        echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+        echo '# EDIT THE FILES IN THE nslconfig.d DIRECTORY INSTEAD.'
+    ) >$netc_tmp
+    for f in $files; do
+        if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) (   echo '# Generated from nslconfig.d/'`basename $f`
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                    ) >>$netc_tmp
+                    found=yes ;;
+            esac
         fi
+    done
+    for f in $files; do
+        if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) (   echo '# Generated from nslconfig.d/'`basename $f`
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                    ) >>$netc_tmp
+                    found=yes ;;
+            esac
+        fi
+    done
+    if [ $found = no ]; then
+        rm -f -- $netc_fil
+        rmdir $netc_dir 2>/dev/null || :
+    else
+        if ! diff $netc_tmp $netc_fil >/dev/null 2>&1; then
+            cp -f -b --suffix=.rpmsave -- $netc_tmp $netc_fil
+        fi
+    fi
+    rm -f -- $netc_tmp || :
+    if [ $netc_fil != $netc_alt ]; then
+        rm -f -- $netc_alt || :
     fi
 %endif
 %if %{FILES_sock2path}
@@ -3579,8 +3620,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     s2pa_tmp=%{_tmppath}/sock2path.tmp.$$
     found=no
     files="$s2pa_dir/*"
-    (
-        echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
+    (   echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
         echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
         echo '# EDIT THE FILES IN THE sock2path.d DIRECTORY INSTEAD.'
     ) >$s2pa_tmp
@@ -3588,8 +3628,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
         if [ -r $f ]; then
             case $f in
                 (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) (
-                        echo '# Generated from sock2path.d/'`basename $f`
+                (*) (   echo '# Generated from sock2path.d/'`basename $f`
                         sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
                     ) >>$s2pa_tmp
                     found=yes ;;
@@ -3597,13 +3636,12 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
         fi
     done
     if [ $found = no ]; then
-	rm -f -- $s2pa_fil
-	rmdir $s2pa_dir 2>/dev/null || :
+        rm -f -- $s2pa_fil
+        rmdir $s2pa_dir 2>/dev/null || :
     else
-	if ! diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
-	    chmod --reference=$s2pa_fil -- $s2pa_tmp
-	    cp -f -b --suffix=.rpmsave -- $s2pa_tmp $s2pa_fil
-	fi
+        if ! diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
+            cp -f -b --suffix=.rpmsave -- $s2pa_tmp $s2pa_fil
+        fi
     fi
     rm -f -- $s2pa_tmp || :
 %endif
@@ -3612,79 +3650,96 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     snmp_dir=%{_snmpconfdir}/snmp.d
     snmp_lcl=%{_snmpconfdir}/snmp.d/00local
     snmp_tmp=%{_tmppath}/snmpd.local.conf.tmp.$$
-    can_overwrite_local=no
     files="$snmp_dir/*"
-    if [ -d $snmp_dir ]; then
-        if [ -s $snmp_fil ]; then
-            if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
-                can_overwrite_local=yes
+    if [ ! -e %{_snmpconfdir}/snmpd.conf -a -e %{_snmpconfdir}/../snmpd.conf ]; then
+        ln -L %{_snmpconfdir}/../snmpd.conf %{_snmpconfdir}/snmpd.conf
+        touch %{_snmpconfdir}/../snmpd.local.conf
+    fi
+    if [ ! -e %{_snmpconfdir}/snmpd.local.conf -a -e %{_snmpconfdir}/../snmpd.local.conf ]; then
+        ln -L %{_snmpconfdir}/../snmpd.local.conf %{_snmpconfdir}/snmpd.local.conf
+    fi
+    if [ -s $snmp_fil ]; then
+        if ! grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
+            cp -f -b --suffix=.rpmsave -- $snmp_fil $snmp_lcl
+        fi
+    fi
+    (   echo '# Generated from snmp.d by @PACKAGE_LCNAME@'
+        echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+        echo '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.'
+    ) >$snmp_tmp
+    for f in $files; do
+        if [ -f $f -a $f = $snmp_lcl ]; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) (   echo '# Generated from snmp.d/'`basename $f`
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                    ) >>$snmp_tmp
+                    ;;
+            esac
+        fi
+    done
+    wrote_one=no
+    for f in $files ; do
+        if [ -f $f -a $f != $snmp_lcl ]; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) (   echo '# Generated from snmp.d/'`basename $f`
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                    ) >>$snmp_tmp
+                    wrote_one=yes
+                    ;;
+            esac
+        fi
+    done
+    changed_local=no
+    if [ $wrote_one = yes ]; then
+        if ! diff $snmp_tmp $snmp_fil >/dev/null 2>&1; then
+            cp -f -b --suffix=.rpmsave -- $snmp_tmp $snmp_fil
+            changed_local=yes
+        fi
+    elif [ -f $snmp_lcl ]; then
+        cp -f -- $snmp_lcl $snmp_fil
+        rm -f -- $snmp_lcl
+        changed_local=yes
+    else
+        cat /dev/null > $snmp_fil
+        changed_local=yes
+    fi
+    rmdir $snmp_dir 2>/dev/null || :
+    rm -f -- $snmp_tmp || :
+    if [ $changed_local = yes ]; then
+        if [ -f %_initrddir/snmpd ]; then
+            r="`runlevel | awk '{print$2}'`"
+            start=no
+            for l in %_initrddir/../rc${r}.d/S[0-9][0-9]snmpd %_initrddir/rc${r}.d/S[0-9][0-9]snmpd; do
+                if [ -L $l ]; then start=yes; break; fi
+            done
+            if [ $start = yes -o -e /var/lock/subsys/snmpd ]; then
+                [ -x "`which service     2>/dev/null`" ] && { service     snmpd reload || :; }
+                [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d snmpd reload || :; }
+                [ -x "%_initrddir/snmpd"               ] && { %_initrddir/snmpd reload || :; }
             fi
         else
-            can_overwrite_local=yes
-        fi
-        if [ $can_overwrite_local = yes ]; then
-            wrote_one=no
-            (
-                echo '# Generated from snmp.d by @PACKAGE_LCNAME@'
-                echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
-                echo '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.'
-            ) >$snmp_tmp
-            for f in $files; do
-                if [ -f $f -a $f = $snmp_lcl ]; then
-                    case $f in
-                        (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                        (*)
-                            (
-                                echo '# Generated from snmp.d/'`basename $f`
-                                sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
-                            ) >>$snmp_tmp
-                            ;;
-                    esac
-                fi
-            done
-            for f in $files ; do
-                if [ -f $f -a $f != $snmp_lcl ]; then
-                    case $f in
-                        (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                        (*)
-                            (
-                                echo '# Generated from snmp.d/'`basename $f`
-                                sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
-                            ) >>$snmp_tmp
-                            wrote_one=yes
-                            ;;
-                    esac
-                fi
-            done
-            if [ $wrote_one = yes ]; then
-                mv -f -- $snmp_tmp $snmp_fil
-            elif [ -f $snmp_lcl ]; then
-                mv -f -- $snmp_lcl $snmp_fil
-                rm -f -- $snmp_tmp
-                rmdir $snmp_dir 2>/dev/null || :
-            else
-                rm -f -- $snmp_tmp $snmp_fil
-                rmdir $snmp_dir 2>/dev/null || :
-            fi
+            killall -HUP snmpd || :
         fi
     fi
 %endif
-%if %{FILES_tcllibs}
-    if [ -x "`which tclsh 2>/dev/null`" ]; then
-	for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
-	    echo -e "pkg_mkIndex $d\\nexit" | tclsh || :
-	done
-    fi
-%endif
+#if %{FILES_tcllibs}
+#   if [ -x "`which tclsh 2>/dev/null`" ]; then
+#       for d in `find %{_pkgtcllibdir} -mindepth 1 -maxdepth 1 -type d` ; do
+#           echo -e "pkg_mkIndex $d\\nexit" | tclsh || :
+#       done
+#   fi
+#endif
 fi
 
 %if %{HAVE_initscripts}
 %triggerin -p /bin/bash lib -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # both present install or upgrade
-    list='%{initfiles}'
+    initfiles='%{initfiles}'
     r="`runlevel | awk '{print$2}'`"
-    for i in $list; do
+    for i in $initfiles; do
 	[ -f %_initrddir/$i ] || continue
 	[ ! -e /var/lock/subsys/$i ] || continue
 	n=`echo "$i" | sed -e 's,\.sh$,,'`
@@ -3712,74 +3767,97 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     fi
 %endif
 %if %{FILES_netconfig}
-    netc_fil=%{_sysconfdir}/netconfig
-    netc_alt=%{_sysconfdir}/netconfig.xnsl
-    netc_dir=%{_sysconfdir}/netconfig.d
-    netc_tmp=%{_tmppath}/netconfig.tmp.$$
-    found=no
-    files="$netc_dir/*"
-    if [ -d $netc_dir ]; then
-        if [ -r $netc_fil ]; then
-            if ! grep '^# Generated from netconfig.d' $netc_fil >/dev/null 2>&1; then
-                netc_fil=$netc_alt
-            fi
-        else
-            if [ -r $netc_alt ]; then
-                netc_fil=$netc_alt
-            fi
-        fi
-        (
-            echo '# Generated from netconfig.d by @PACKAGE_LCNAME@'
-            echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
-            echo '# EDTI THE FILES IN netconfig.d DIRECTORY INSTEAD'
-        ) >$netc_tmp
-        for f in $files; do
-            if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) (
-                            echo '# Generated from netconfig.d/'`basename $f`
-                            sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
-                        ) >>$netc_tmp
-                        found=yes ;;
-                esac
-            fi
-        done
-        for f in $files; do
-            if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
-                case $f in
-                    (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                    (*) (
-                            echo '# Generated from netconfig.d/'`basename $f`
-                            sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
-                        ) >>$netc_tmp
-                        found=yes ;;
-                esac
-            fi
-        done
-        if [ $found = no ]; then
-            rm -f -- $netc_fil
-            rmdir $netc_dir 2>/dev/null || :
-        else
-            if ! diff $netc_tmp $netc_fil >/dev/null 2>&1; then
-                chmod --reference=$netc_fil -- $netc_tmp
-                cp -f -b --suffix=.rpmsave -- $netc_tmp $netc_fil
-            fi
-        fi
-        rm -f -- $netc_tmp || :
-        if [ $netc_fil != $netc_alt ]; then
-            rm -f -- $netc_alt || :
+    if [ $1 -eq 0 ] ; then : # final removal
+        if [ -x "`which lsof 2>/dev/null`" ]; then
+            for signal in TERM KILL; do
+                did_one=no
+                lsof | awk '{if($NF~"^%{_libdir}/libxnsl"||$NF~"^%{_lib32dir}/libxnsl"){print$2}}' | \
+                while read pid; do
+                    kill -$signal $pid || :
+                    did_one=yes
+                done
+                [ $did_one = no ] || sleep 1
+            done
         fi
     fi
 %endif
-%if %{FILES_snmpconf}
+%if %{FILES_netconfig}
+    netc_fil=%{_sysconfdir}/netconfig
+    netc_alt=%{_sysconfdir}/netconfig.xnsl
+    netc_dir=%{_sysconfdir}/nslconfig.d
+    netc_tmp=%{_tmppath}/netconfig.tmp.$$
+    found=no
+    files="$netc_dir/*"
+    if [ -r $netc_fil ]; then
+        if ! grep '^# Generated from nslconfig.d' $netc_fil >/dev/null 2>&1; then
+            netc_fil=$netc_alt
+        fi
+    else
+        if [ -r $netc_alt ]; then
+            netc_fil=$netc_alt
+        fi
+    fi
+    (   echo '# Generated from nslconfig.d by @PACKAGE_LCNAME@'
+        echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+        echo '# EDTI THE FILES IN nslconfig.d DIRECTORY INSTEAD'
+    ) >$netc_tmp
+    for f in $files; do
+        if [ -f $f -a $f = "$netc_dir/strnsl" ]; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) (   echo '# Generated from nslconfig.d/'`basename $f`
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                    ) >>$netc_tmp
+                    found=yes ;;
+            esac
+        fi
+    done
+    for f in $files; do
+        if [ -f $f -a $f != "$netc_dir/strnsl" ]; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) (   echo '# Generated from nslconfig.d/'`basename $f`
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                    ) >>$netc_tmp
+                    found=yes ;;
+            esac
+        fi
+    done
+    if [ $found = no ]; then
+        rm -f -- $netc_fil
+        rmdir $netc_dir 2>/dev/null || :
+    else
+        if ! diff $netc_tmp $netc_fil >/dev/null 2>&1; then
+            cp -f -b --suffix=.rpmsave -- $netc_tmp $netc_fil
+        fi
+    fi
+    rm -f -- $netc_tmp || :
+    if [ $netc_fil != $netc_alt ]; then
+        rm -f -- $netc_alt || :
+    fi
+%endif
+%if %{FILES_sock2path}
+    if [ $1 -eq 0 ] ; then : # final removal
+        if [ -x "`which lsof 2>/dev/null`" ]; then
+            for signal in TERM KILL; do
+                did_one=no
+                lsof | awk '{if($NF~"^%{_libdir}/libsocket"||$NF~"^%{_lib32dir}/libsocket"){print$2}}' | \
+                while read pid; do
+                    kill -$signal $pid || :
+                    did_one=yes
+                done
+                [ $did_one = no ] || sleep 1
+            done
+        fi
+    fi
+%endif
+%if %{FILES_sock2path}
     s2pa_fil=%{_sysconfdir}/sock2path
     s2pa_dir=%{_sysconfdir}/sock2path.d
     s2pa_tmp=%{_tmppath}/sock2path.tmp.$$
     found=no
     files="$s2pa_dir/*"
-    (
-        echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
+    (   echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
         echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
         echo '# EDIT THE FILES IN THE sock2path.d DIRECTORY INSTEAD.'
     ) >$s2pa_tmp
@@ -3787,8 +3865,7 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
         if [ -r $f ]; then
             case $f in
                 (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                (*) (
-                        echo '# Generated from sock2path.d/'`basename $f`
+                (*) (   echo '# Generated from sock2path.d/'`basename $f`
                         sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
                     ) >>$s2pa_tmp
                     found=yes ;;
@@ -3796,13 +3873,12 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
         fi
     done
     if [ $found = no ]; then
-	rm -f -- $s2pa_fil
-	rmdir $s2pa_dir 2>/dev/null || :
+        rm -f -- $s2pa_fil
+        rmdir $s2pa_dir 2>/dev/null || :
     else
-	if ! diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
-	    chmod --reference=$s2pa_fil -- $s2pa_tmp
-	    cp -f -b --suffix=.rpmsave -- $s2pa_tmp $s2pa_fil
-	fi
+        if ! diff $s2pa_tmp $s2pa_fil >/dev/null 2>&1; then
+            cp -f -b --suffix=.rpmsave -- $s2pa_tmp $s2pa_fil
+        fi
     fi
     rm -f -- $s2pa_tmp || :
 %endif
@@ -3811,62 +3887,95 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     snmp_dir=%{_snmpconfdir}/snmp.d
     snmp_lcl=%{_snmpconfdir}/snmp.d/00local
     snmp_tmp=%{_tmppath}/snmpd.local.conf.tmp.$$
-    wrote_one=no
-    can_overwrite_local=no
     files="$snmp_dir/*"
-    if [ -d $snmp_dir ]; then
-        if [ -s $snmp_fil ]; then
-            if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
-                can_overwrite_local=yes
+    if [ ! -e %{_snmpconfdir}/snmpd.conf -a -e %{_snmpconfdir}/../snmpd.conf ]; then
+        ln -L %{_snmpconfdir}/../snmpd.conf %{_snmpconfdir}/snmpd.conf
+        touch %{_snmpconfdir}/../snmpd.local.conf
+    fi
+    if [ ! -e %{_snmpconfdir}/snmpd.local.conf -a -e %{_snmpconfdir}/../snmpd.local.conf ]; then
+        ln -L %{_snmpconfdir}/../snmpd.local.conf %{_snmpconfdir}/snmpd.local.conf
+    fi
+    if [ -s $snmp_fil ]; then
+        if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
+            cp -f -b --suffix=.rpmsave -- $snmp_fil $snmp_lcl
+        fi
+    fi
+    (   echo '# Generated from snmp.d by @PACKAGE_LCNAME@'
+        echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
+        echo '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.'
+    ) >$snmp_tmp
+    for f in $files; do
+        if [ -f $f -a $f = $snmp_lcl ]; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) (   echo '# Generated from snmp.d/'`basename $f`
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                    ) >>$snmp_tmp
+                    ;;
+            esac
+        fi
+    done
+    wrote_one=no
+    for f in $files ; do
+        if [ -f $f -a $f != $snmp_lcl ]; then
+            case $f in
+                (*.rpmsave|*.rpmnew|*.rpmorig) ;;
+                (*) (   echo '# Generated from snmp.d/'`basename $f`
+                        sed '/^[[:space:]]*##/d;/^[[:space:]]*$/d' $f
+                    ) >>$snmp_tmp
+                    wrote_one=yes
+                    ;;
+            esac
+        fi
+    done
+    changed_local=no
+    if [ $wrote_one = yes ]; then
+        if ! diff $snmp_tmp $snmp_fil >/dev/null 2>&1; then
+            cp -f -b --suffix=.rpmsave -- $snmp_tmp $snmp_fil
+            changed_local=yes
+        fi
+    elif [ -f $snmp_lcl ]; then
+        cp -f -- $snmp_lcl $snmp_fil
+        rm -f -- $snmp_lcl
+        changed_local=yes
+    else
+        cat /dev/null > $snmp_fil
+        changed_local=yes
+    fi
+    rmdir $snmp_dir 2>/dev/null || :
+    rm -f -- $snmp_tmp || :
+    if [ $changed_local = yes ]; then
+        if [ -f %_initrddir/snmpd ]; then
+            r="`runlevel | awk '{print$2}'`"
+            start=no
+            for l in %_initrddir/../rc${r}.d/S[0-9][0-9]snmpd %_initrddir/rc${r}.d/S[0-9][0-9]snmpd; do
+                if [ -L $l ]; then start=yes; break; fi
+            done
+            if [ $start = yes -o -e /var/lock/subsys/snmpd ]; then
+                [ -x "`which service     2>/dev/null`" ] && { service     snmpd reload || :; }
+                [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d snmpd reload || :; }
+                [ -x "%_initrddir/snmpd"               ] && { %_initrddir/snmpd reload || :; }
             fi
         else
-            can_overwrite_local=yes
-        fi
-        if [ $can_overwrite_local = yes ]; then
-            (
-                echo '# Generated from snmp.d by @PACKAGE_LCNAME@'
-                echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
-                echo '# EDIT THE FILES IN THE snmp.d DIRECTORY INSTEAD.'
-            ) >$snmp_tmp
-            for f in $files; do
-                if [ -f $f -a $f = $snmp_lcl ]; then
-                    case $f in
-                        (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                        (*) (
-                                echo '# Generated from snmp.d/'`basename $f`
-                                sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
-                            ) >>$snmp_tmp
-                            ;;
-                    esac
-                fi
-            done
-            for f in $files ; do
-                if [ -f $f -a $f != $snmp_lcl ]; then
-                    case $f in
-                        (*.rpmsave|*.rpmnew|*.rpmorig) ;;
-                        (*) (
-                                echo '# Generated from snmp.d/'`basename $f`
-                                sed '/^[[:space:]]*##/d;/^[[:space:]]*$$/d' $f
-                            ) >>$snmp_tmp
-                            wrote_one=yes
-                            ;;
-                    esac
-                fi
-            done
-            if [ $wrote_one = yes ]; then
-                mv -f -- $snmp_tmp $snmp_fil
-            elif [ -f $snmp_lcl ]; then
-                mv -f -- $snmp_lcl $snmp_fil
-                rm -f -- $snmp_tmp
-                rmdir $snmp_dir 2>/dev/null || :
-            else
-                rm -f -- $snmp_tmp $snmp_fil
-                rmdir $snmp_dir 2>/dev/null || :
-            fi
+            killall -HUP snmpd || :
         fi
     fi
 %endif
 fi
+#if %{FILES_tcllibs}
+#f [ $1 -eq 0 ] ; then : # final removal
+#   files="%{_pkgtcllibdir}/pkgIndex.tcl %{_pkgtcllibdir}/*/pkgIndex.tcl" f d
+#   for f in $files; do
+#       if [ -f $f ]; then
+#           rm -f -- $f || :
+#           d=`dirname $f`
+#           if [ -d $d ]; then
+#               rmdir -p $d 2>/dev/null || :
+#           fi
+#       fi
+#   done
+#i
+#endif
 
 %if %{PACKAGE_lib}
 %files lib
@@ -3879,7 +3988,7 @@ fi
 #{?files_lib32compat:%{_lib32dir}/*.so*}
 #{?files_lib32compat:%{_lib32dir}/*.la}
 #{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
-%{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.d/%{netconfig}}
+%{?files_netconfig:%config(noreplace) %{_sysconfdir}/nslconfig.d/%{netconfig}}
 %{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path}
 %{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %{?files_perlmods:%dir %{_perldir}/auto/Xti}
@@ -4042,6 +4151,41 @@ This binary package does not contain developer or programmer
 documentation nor manual pages.  To obtain the developer and programmer
 documentation, load the %{name}-doc package.
 %{descriptail}
+
+%pre -p /bin/bash devel
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -eq 1 ] ; then : # fresh install
+    pre_remove_warn_files () {
+        local f
+        for f in $@; do
+            if [ -f "$f" ]
+            then echo "warning: removing old non-rpm file $f" >&2; rm -f -- $f || :
+            fi
+        done
+    }
+    pre_remove_warn_dirs () {
+        local d
+        for d in $@; do
+            if [ -d $d -a "`(cd $d; pwd)`" != "/" ] ; then
+                if [ -L $d ]
+                then echo "warning: removing non-rpm symbolic link $d" >&2; rm -f  -- $d || :
+                else echo "warning: removing non-rpm directory $d"     >&2; rm -rf -- $d || :
+                fi
+            fi
+        done
+    }
+    for d in /lib /usr/lib /usr/local/lib %{_libdir} ; do
+        for subdir in / /LiS/ /lis/ /streams/ /strxnet/ ; do
+            if [ -d $d${subdir} ] ; then
+                pre_remove_warn_files $d${subdir}libLiS.a $d${subdir}libpLiS.a $d${subdir}libstreams.a $d${subdir}libxnet.a $d${subdir}libxti.a
+            fi
+        done
+    done
+    for d in /include /usr/include /usr/local/include %{_includedir} %{_oldincludedir} ; do
+        pre_remove_warn_dirs $d/LiS $d/streams $d/strxns $d/strinet $d/strxnet $d/strsctp $d/strss7 $d/xnet $d/xti $d/ss7 $d/os7 $d/sctp
+    done
+fi
+
 
 %if %{PACKAGE_devel}
 %files devel
@@ -4294,18 +4438,18 @@ if [ $1 -eq 1 ]; then : # fresh install
     prel_old=%{_sysconfdir}/modules-%{_kversion}
     prel_tmp=%{_tmppath}/modules-%{_kversion}.tmp.$$
     prel_new=%{_tmppath}/modules-%{_kversion}.new.$$
-    modules='%{modules} %{preloads}'
+    modules='%{modules}'
+    preloads='%{preloads}'
     if [ -f $prel_old ] ; then
         cp -f -- $prel_old $prel_new
         sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new >$prel_tmp
         mv -f -- $prel_tmp $prel_new
-        for m in $modules; do
+        for m in $modules $preloads; do
             sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new >$prel_tmp
             mv -f -- $prel_tmp $prel_new
         done
         if ! diff $prel_new $prel_old >/dev/null 2>&1; then
             echo "warning: Removing non-rpm lines from preload file, $prel_old" >&2
-            chmod --reference=$prel_old -- $prel_new
             cp -f -b --suffix=.rpmorig -- $prel_new $prel_old
         fi
         rm -f -- $prel_new || :
@@ -4386,49 +4530,26 @@ if [ $1 -eq 1 -o $1 -eq 1 ] ; then : # fresh install or upgrade
     ( cat $prel_new; for p in $preloads; do echo "$p"; done ) >$prel_tmp
     mv -f -- $prel_tmp $prel_new
     if ! diff $prel_new $prel_old >/dev/null 2>&1; then
-	chmod --reference=$prel_old -- $prel_new
 	cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
     fi
     rm -f -- $prel_new
 %endif
 %if %{FILES_oldmods}
     sysmap=/boot/System.map-%{_kversion}
-    modvers=/lib/modules/%{_kversion}/build/Module.symvers
-    sysvers=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
-    symvers=/boot/symvers-%{_kversion}.gz
-    symtemp=%{_tmppath}/module.symvers.tmp.$$
     if [ -x "`which depmod 2>/dev/null`" ] ; then
-        if [ -r $sysmap -o "%{_kversion}" = "`uname -r`" ] ; then
-            export UNAME_MACHINE=%{_target_cpu}
-            if depmod --help 2>&1 | grep '[[:space:]]-E[[:space:]]' >/dev/null 2>&1; then
-                if [ -r $modvers ]; then
-                    depmod -ae -E $modvers %{_kversion} || :
-                elif [ -r $sysvers ]; then
-                    depmod -ae -E $sysvers %{_kversion} || :
-                elif [ -r $symvers ]; then
-                    gzip -dc $symvers >$symtemp
-                    depmod -ae -E $symtemp %{_kversion} || :
-                    rm -f -- $symtemp
-                elif [ -r $sysmap ] ; then
-                    depmod -ae -F $sysmap %{_kversion} || :
-                else
-                    depmod -a || :
-                fi
-            else
-                if [ -r $sysmap ] ; then
-                    depmod -ae -F $sysmap %{_kversion} || :
-                elif [ "%{_kversion}" = "`uname -r`" ] ; then
-                    depmod -a || :
-                fi
-            fi
+        if [ "%{_kversion}" = "`uname -r`" ] ; then
+            depmod -a || :
+        elif [ -r $sysmap ] ; then
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae -F $sysmap %{_kversion} || :
         fi
     fi
 %endif
 %if %{FILES_oldmods}
 %if %{HAVE_initscripts}
-    list='%{initfiles}'
+    initfiles='%{initfiles}'
     r="`runlevel | awk '{print$2}'`"
-    for i in $list; do
+    for i in $initfiles; do
 	[ -f %{_initrddir}/$i ] || continue
 	[ ! -e /var/lock/subsys/$i ] || continue
 	start=no
@@ -4438,14 +4559,15 @@ if [ $1 -eq 1 -o $1 -eq 1 ] ; then : # fresh install or upgrade
 	[ $start = yes ] || continue
 	[ -x "`which service     2>/dev/null`" ] && { service       $i start && continue || break; }
 	[ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i start && continue || break; }
-	[ -x "%{_initrddir}/$i"                ] && { %{_initrddir}/$i start && continue || break; }
+	[ -x %{_initrddir}/$i                  ] && { %{_initrddir}/$i start && continue || break; }
     done
 %endif
 %endif
 %if %{NEED_symvers}
     f=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
-    if [ ! -r /boot/symvers-%{kernel_version}.gz -a -r $f ] ; then
-	gzip -c $f > /boot/symvers-%{kernel_version}.gz
+    t=/boot/symvers-%{_kversion}.gz
+    if [ ! -r $t -a -r $f ] ; then
+	gzip -c $f > $t || :
     fi
 %endif
 fi
@@ -4472,9 +4594,9 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
 %if %{FILES_oldmods}
 %if %{HAVE_initscripts}
     if [ "%{_kversion}" = "`uname -r`" ]; then
-        list='%{initfiles}'
+        initfiles='%{initfiles}'
         r="`runlevel | awk '{print$2}'`"
-        for i in $list; do
+        for i in $initfiles; do
             [ -f %{_initrddir}/$i ] || continue
             [ ! -e /var/lock/subsys/$i ] || continue
             start=no
@@ -4496,6 +4618,11 @@ fi
 %triggerun -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 0 ] ; then : # kernel modules being removed with base present
+    delete_modules='--delete-modules'
+else
+    delete_modules=
+fi
+if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # one being removed with other present
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
         scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
@@ -4503,31 +4630,33 @@ if [ $1 -eq 0 ] ; then : # kernel modules being removed with base present
         if [ -n "$scripts" ] ; then
             %{_sbindir}/%{name}-modules -- $v -e \
                 --initscripts="$scripts" \
-                --delete-modules \
+                $delete_modules \
                 --remove-modules %{_kversion} || :
         else
             %{_sbindir}/%{name}-modules -- $v -e \
-                --delete-modules \
+                $delete_modules \
                 --remove-modules %{_kversion} || :
         fi
+    fi
+%endif
+%if %{FILES_oldmods}
+    if [ "%{_kversion}" = "`uname -r`" ]; then
+        initfiles='%{initfiles}'
+        reverse=
+        for i in $initfiles; do
+            reverse="$i${reverse:+ }$reverse"
+        done
+        for i in $reverse; do
+            if [ -f %{_initrddir}/$i ] ; then
+                [ -x "`which service     2>/dev/null`" ] && { service       $i stop && continue || :; }
+                [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d   $i stop && continue || :; }
+                [ -x "%{_initrddir}/$i"                ] && { %{_initrddir}/$i stop && continue || :; }
+            fi
+        done
     fi
 %endif
 fi
 if [ $2 -eq 0 ] ; then : # base being removed with kernel modules present
-%if %{HAVE_weakmods}
-    if [ -x %{_sbindir}/%{name}-modules ]; then
-        scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
-        if [ -n "$scripts" ] ; then
-            %{_sbindir}/%{name}-modules -- $v -e \
-                --initscripts="$scripts" \
-                --remove-modules %{_kversion} || :
-        else
-            %{_sbindir}/%{name}-modules -- $v -e \
-                --remove-modules %{_kversion} || :
-        fi
-    fi
-%endif
 %if %{HAVE_oldmods}
     if [ -f %{_kmoduledir}/modules.%{name} ] ; then
 	rm -f -- %{_kmoduledir}/modules.%{name} || :
@@ -4559,7 +4688,6 @@ b loop' $prel_new >$prel_tmp
             mv -f -- $prel_tmp $prel_new
         done
         if ! diff $prel_new $prel_old >/dev/null 2>&1; then
-            chmod --reference=$prel_old -- $prel_new
             cp -f -b --suffix=.rpmsave -- $prel_new $prel_old
         fi
         rm -f -- $prel_new
@@ -4574,34 +4702,12 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     sysmap=/boot/System.map-%{_kversion}
-    modvers=/lib/modules/%{_kversion}/build/Module.symvers
-    sysvers=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
-    symvers=/boot/symvers-%{_kversion}.gz
-    symtemp=%{_tmppath}/module.symvers.tmp.$$
     if [ -x "`which depmod 2>/dev/null`" ]; then
-        if [ -r $sysmap -o "%{_kversion}" = "`uname -r`" ]; then
-            export UNAME_MACHINE=%{_target_cpu}
-            if depmod --help 2>&1 | grep '[[:space:]]-E[[:space:]]' >/dev/null 2>&1; then
-                if [ -r $modvers ]; then
-                    depmod -ae -E $modvers %{_kversion} || :
-                elif [ -r $sysvers ]; then
-                    depmod -ae -E $sysvers %{_kversion} || :
-                elif [ -r $symvers ]; then
-                    gzip -dc $symvers >$symtemp
-                    depmod -ae -E $symtemp %{_kversion} || :
-                    rm -f -- $symtemp
-                elif [ -r $sysmap ] ; then
-                    depmod -ae -F $sysmap %{_kversion} || :
-                elif [ "%{_kversion}" = "`uname -r`" ] ; then
-                    depmod -a || :
-                fi
-            else
-                if [ -r $sysmap ] ; then
-                    depmod -ae -F $sysmap %{_kversion} || :
-                elif [ "%{_kversion}" = "`uname -r`" ] ; then
-                    depmod -a || :
-                fi
-            fi
+        if [ "%{_kversion}" = "`uname -r`" ] ; then
+            depmod -a || :
+        elif [ -r $sysmap ] ; then
+            UNAME_MACHINE=%{_target_cpu} \
+            depmod -ae -F $sysmap %{_kversion} || :
         fi
     fi
 fi
@@ -5011,9 +5117,9 @@ interfaces for %{title} API libraries.
 %pre -p /bin/bash java
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 ] ; then : # fresh install
-    libraries='%{jnilibs}'
+    jnilibs='%{jnilibs}'
     if [ -x "`which ldconfig 2>/dev/null`" ]; then
-        for lib in $libraries; do
+        for lib in $jnilibs; do
             ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
             while read l; do
                 echo "warning: Removing old non-rpm library, $l" >&2

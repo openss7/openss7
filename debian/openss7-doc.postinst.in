@@ -58,12 +58,11 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
-# postinst_manpages() - Add our manual pages to the aprospros database.  One
-#   problem with doing this is that even the oldest of debian policies and
-#   debhelper implementations will implement the debhelper code to do this.
-#   Therefore, this function is shortcircuited for now.  (We install >3000
-#   manual pages and it takes forever anyway.)  Failing to do this altogether is
-#   not critical because most machines run an evening cron job to update these.
+# postinst_manpages() - Add our manual pages to the aprospros database.  One problem with doing this
+#   is that even the oldest of debian policies and debhelper implementations will implement the
+#   debhelper code to do this.  Therefore, this function is shortcircuited for now.  (We install
+#   >3000 manual pages and it takes forever anyway.)  Failing to do this altogether is not critical
+#   because most machines run an evening cron job to update these.
 #
 postinst_manpages () { :; return
     if which makewhatis >/dev/null 2>&1 ; then
@@ -74,36 +73,10 @@ postinst_manpages () { :; return
     fi
 }
 #
-# postinst_manrefs() - Some systems compress our reference database but do not
-#   provide nor invoke the zrefer command necessary to use compressed reference
-#   databases.  Therefore, we always provide a decompressed copy of the
-#   reference database.
-#
-postinst_manrefs () {
-    local m
-    for m in ${manrefs}; do
-	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m
-	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m
-    done
-}
-#
-# postinst_manrefs() - Some systems compress our man macros but do not provide
-#   nor invoke the zsoelim command necessary to use compressed man macros.
-#   Therefore, we always provide a decompressed copy of the man macros.
-#
-postinst_manmacros () {
-    local m
-    for m in ${manmacros}; do
-	[ ! -f @mandir@/$m.gz  ] || gzip  -dc @mandir@/$m.gz  > @mandir@/$m
-	[ ! -f @mandir@/$m.bz2 ] || bzip2 -dc @mandir@/$m.bz2 > @mandir@/$m
-    done
-}
-#
-# postinst_infofiles() - Add our info files to the info directory.  One problem
-#   with doing this is that even the oldest of debian policies and debhelper
-#   implementations will implement the debhelper code to do this.  Therefore,
-#   this function is shorcricuited for now.  Current debian policies will use
-#   trigger directories to perform this action.
+# postinst_infofiles() - Add our info files to the info directory.  One problem with doing this is
+#   that even the oldest of debian policies and debhelper implementations will implement the
+#   debhelper code to do this.  Therefore, this function is shorcricuited for now.  Current debian
+#   policies will use trigger directories to perform this action.
 #
 postinst_infofiles () { :; return
     if [ -x /sbin/install-info ]; then
@@ -120,15 +93,12 @@ postinst_infofiles () { :; return
     fi
 }
 #
-# postinst_doc() - Perform necessary activies for post installation of
-#   documentation files.  This is primarly handing man macros, reference
-#   database, info directories and aprospros databases.  Some of these
-#   operations are performed by debhelper code or directory trigger processing.
+# postinst_doc() - Perform necessary activies for post installation of documentation files.  This is
+#   primarly handing man macros, reference database, info directories and aprospros databases.  Some
+#   of these operations are performed by debhelper code or directory trigger processing.
 #
 postinst_doc () { :
     postinst_manpages
-    postinst_manrefs
-    postinst_manmacros
     postinst_infofiles
 }
 # -----------------------------------------------------------------------------

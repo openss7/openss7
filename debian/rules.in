@@ -260,8 +260,7 @@ debian/@PACKAGE@-doc.manpages:
 
 control		+= debian/@PACKAGE@-lib.postinst \
 		   debian/@PACKAGE@-lib.postrm \
-		   debian/@PACKAGE@-lib.preinst \
-		   debian/@PACKAGE@-lib.prerm
+		   debian/@PACKAGE@-lib.preinst
 
 control		+= debian/@PACKAGE@-lib.conffiles
 
@@ -269,7 +268,7 @@ snmpconfdir	= ${sysconfdir}/snmp
 
 debian/@PACKAGE@-lib.conffiles:
 	( [ ! -d '$(debtmpdir)$(snmpconfdir)'				] || find '$(debtmpdir)$(snmpconfdir)' \( -type f -o -type l \) ; \
-	  [ ! -f '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/nslconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/nslconfig.d/@PACKAGE@' ; \
 	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path'			] || echo '$(debtmpdir)$(sysconfdir)/sock2path' ; \
 	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
 	) $(am__debian_conffil_format) | sort -u > $@
@@ -286,7 +285,7 @@ control		+= debian/@PACKAGE@-lib.install
 
 debian/@PACKAGE@-lib.install:
 	( [ ! -d '$(debtmpdir)$(snmpconfdir)'				] || find '$(debtmpdir)$(snmpconfdir)' \( -type f -o -type l \) ; \
-	  [ ! -f '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/netconfig.d/@PACKAGE@' ; \
+	  [ ! -f '$(debtmpdir)$(sysconfdir)/nslconfig.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/nslconfig.d/@PACKAGE@' ; \
 	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path'			] || echo '$(debtmpdir)$(sysconfdir)/sock2path' ; \
 	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
 	  [ ! -d '$(debtmpdir)$(bindir)'				] || echo '$(debtmpdir)$(bindir)/*' ; \
@@ -319,8 +318,6 @@ pkglibexec32dir	= @pkglibexec32dir@
 
 @WITH_32BIT_LIBS_TRUE@control		+= debian/@PACKAGE@-compat.postinst \
 @WITH_32BIT_LIBS_TRUE@		   debian/@PACKAGE@-compat.postrm \
-@WITH_32BIT_LIBS_TRUE@		   debian/@PACKAGE@-compat.preinst \
-@WITH_32BIT_LIBS_TRUE@		   debian/@PACKAGE@-compat.prerm
 @WITH_32BIT_LIBS_TRUE@
 @WITH_32BIT_LIBS_TRUE@control		+= debian/@PACKAGE@-compat.install
 @WITH_32BIT_LIBS_TRUE@

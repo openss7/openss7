@@ -63,7 +63,7 @@ datarootdir=@datarootdir@
 #   machine.  When reinstalling (previous package was not purged), this function
 #   gets the existing credentials from the persistent configuration file.  Even
 #   when a package is purged, we like to keep a copy of the credentials lying
-#   around in a .dpkg-save file so that the machine credentials don't get lost.
+#   around in a .dpkg-old file so that the machine credentials don't get lost.
 #
 #   Note that because the credentials are really machine credentials, we should
 #   really be saving them in /boot so that installations of other distros can
@@ -76,7 +76,7 @@ preinst_repo () { :
     (
 	cd "$d"
 	un=; pw=; oldfile=; file="@PACKAGE@.list"
-	for s in '' '.dpkg-save' '.dpkg-new'; do
+	for s in '' '.dpkg-old' '.dpkg-new'; do
 	    oldfile="$file$s"
 	    if [ -r $oldfile ]; then
                 un=`sed -n -r 's,^.*deb[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $oldfile`
@@ -85,7 +85,7 @@ preinst_repo () { :
                 break
 	    fi
 	done
-	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.dpkg-save
+	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.dpkg-old
         ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
         ext="$ext"`echo /@reposubdir@ | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
 	key=; [ -z "$un" ] || key="$un${pw:+:}${pw}@"
@@ -104,14 +104,14 @@ preinst_repo () { :
                 url="@reposerv@://${key}@repobase@/@reporoot@/debs/$file$ext"
                 rm -f -- $file
                 if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-                    [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-save $file
+                    [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-old $file
                     echo 'Authorization failed.' >/dev/tty
 		    return 1
                 fi
             fi
         fi
         if [ ! -e $file ] ; then
-            [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-save $file
+            [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-old $file
 	    return 1
         fi
     ) || return 1

@@ -58,65 +58,45 @@ datarootdir=@datarootdir@
 # Auxiliary functions:
 # -----------------------------------------------------------------------------
 #
+# preinst_remove_warn_file()
+#
+preinst_remove_warn_file () {
+    echo "$script: warning: Deleting non-deb manual $1 file $2" >&2
+    rm -f -- $2 2?dev/null || :
+}
+#
 # preinst_manpages() - Old non-deb distribution puts some man pages in the wrong
 #   place, clean them out on a fresh install.
 #
 preinst_manpages () { :
     if [ -f /usr/man/man3/fattach.3 ] ; then
-        rm -f /usr/man/man3/fattach.3 2>/dev/null
-        rm -f /usr/man/man3/detach.3 2>/dev/null
-        rm -f /usr/man/man3/isastream.3 2>/dev/null
-        rmdir -p /usr/man/man3 2>/dev/null || true
-        rm -f /usr/man/man8/fattach.8 2>/dev/null
-        rm -f /usr/man/man8/fdetach.8 2>/dev/null
-        rmdir -p /usr/man/man8 2>/dev/null || true
-        rm -f /usr/man/man9/connld.9 2>/dev/null
-        rm -f /usr/man/man9/fifo.9 2>/dev/null
-        rm -f /usr/man/man9/pipemod.9 2>/dev/null
-        rmdir -p /usr/man/man9 2>/dev/null || true
-        rmdir -p /usr/man 2>/dev/null || true
+        preinst_remove_warn_file "page" /usr/man/man3/fattach.3
+        preinst_remove_warn_file "page" /usr/man/man3/detach.3
+        preinst_remove_warn_file "page" /usr/man/man3/isastream.3
+        rmdir -p /usr/man/man3 2>/dev/null || :
+        preinst_remove_warn_file "page" /usr/man/man8/fattach.8
+        preinst_remove_warn_file "page" /usr/man/man8/fdetach.8
+        rmdir -p /usr/man/man8 2>/dev/null || :
+        preinst_remove_warn_file "page" /usr/man/man9/connld.9
+        preinst_remove_warn_file "page" /usr/man/man9/fifo.9
+        preinst_remove_warn_file "page" /usr/man/man9/pipemod.9
+        rmdir -p /usr/man/man9 2>/dev/null || :
     fi
 }
 #
-# preinst_manmacros() - On a fresh installation, lean out macro files from old
-#   non-deb distribution.
+# preinst_install() - This is an initial installation of the base subpackage.  We need to check for
+#   non-deb installations on the host and remove any entries that might later conflict with out
+#   entries.  We treat every fresh installation like an upgrade from non-deb/rpm install.
 #
-preinst_manmacros () { :
-    if [ -r @mandir@/$base.macros ] ; then
-	echo "$script: warning: Deleting manual macros file @mandir@/$base.macros" >&2
-	rm -f -- @mandir@/$base.macros 2>/dev/null
-    fi
-}
-#
-# preinst_manrefs() - On a fresh installation, clean out reference database from
-#   old non-deb distribution.
-#
-preinst_manrefs () { :
-    if [ -r @mandir@/$base.refs ]; then
-	echo "$script: warning: Deleting manual references file @mandir@/$base.refs" >&2
-	rm -f -- @mandir@/$base.refs 2>/dev/null
-    fi
-}
-#
-# preinst_doc() - This is an initial installation of the doc subpackage.  We
-#   need to check for non-deb installations on the host and remove any info
-#   entries that might later conflict with our entries.  We treat every fresh
-#   installation like an upgrade from non-deb install.  Search for our
-#   documentation entry and remove it.  Fortunately, GCOM releases did not
-#   install texinfo documentation.  Also, search for our man macros and
-#   references and remove them as well.
-#
-preinst_doc () { :
-    preinst_manpages
-    preinst_manmacros
-    preinst_manrefs
+preinst_install () { :
+    preinst_manpages || :
 }
 # -----------------------------------------------------------------------------
 # Primary functions:
 # -----------------------------------------------------------------------------
 # new-preinst install
 install_preinst () { :
-    preinst_doc
+    preinst_install || :
 }
 # new-preinst install old-version
 reinstall_preinst () { :
