@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 17:04:36 $
+# @(#) $RCSfile: speccommon.in,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-15 12:01:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-01-18 17:04:36 $ by $Author: brian $
+# Last Modified $Date: 2011-05-15 12:01:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -3294,6 +3294,9 @@ use this package or when debugging this package.
 # =============================================================================
 #
 # $Log: speccommon.in,v $
+# Revision 1.1.2.4  2011-05-15 12:01:20  brian
+# - many build system refinements
+#
 # Revision 1.1.2.3  2011-01-18 17:04:36  brian
 # - remove non-POSIX function syntax
 #

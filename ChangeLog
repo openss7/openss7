@@ -1,3 +1,68 @@
+2011-05-15  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/openss7-compat.preinst.in: deleted
+	* debian/openss7-compat.prerm.in: deleted
+
+	* .pkgpatchlevel: bumped patch level
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* README: update release files
+	* THANKS: update release files
+	* acinclude.m4: removed unneeded maintenance scripts
+	* debian-squeeze-i686-config.cache: updates
+	* openss7.spec.in: many refinements
+
+	* am/netconfig.am: updated post install
+	* am/snmp.am: updated post install
+	* am/sock2path.am: updated post install
+
+	* debian/openss7-base.postinst.in: many refinements
+	* debian/openss7-base.postrm.in: many refinements
+	* debian/openss7-base.preinst.in: many refinements
+	* debian/openss7-base.prerm.in: many refinements
+	* debian/openss7-compat.postinst.in: many refinements
+	* debian/openss7-compat.postrm.in: many refinements
+	* debian/openss7-doc.postinst.in: many refinements
+	* debian/openss7-doc.postrm.in: many refinements
+	* debian/openss7-doc.preinst.in: many refinements
+	* debian/openss7-doc.prerm.in: many refinements
+	* debian/openss7-java.postinst.in: many refinements
+	* debian/openss7-java.postrm.in: many refinements
+	* debian/openss7-java.preinst.in: many refinements
+	* debian/openss7-kernel.postinst.in: many refinements
+	* debian/openss7-kernel.postrm.in: many refinements
+	* debian/openss7-kernel.preinst.in: many refinements
+	* debian/openss7-kernel.prerm.in: many refinements
+	* debian/openss7-lib.postinst.in: many refinements
+	* debian/openss7-lib.postrm.in: many refinements
+	* debian/openss7-lib.preinst.in: many refinements
+	* debian/openss7-lib.prerm.in: many refinements
+	* debian/openss7-repo.postrm.in: many refinements
+	* debian/openss7-repo.preinst.in: many refinements
+	* debian/openss7-repo.prerm.in: many refinements
+	* debian/rules.in: removed unneeded scripts, netconfig.d renamed
+	  nslconfig.d
+
+	* po/de.po: release update
+	* scripts/modpost.awk: correction for missing section (init_module)
+	* scripts/openss7-modules: many refinements
+	* scripts/rpm/find-requires: SuSE installs libtool archives but does not
+	  "provide" them
+	* src/util/openss7-update: correction
+
+	* src/util/strace.c: correct month of year
+	* src/util/strerr.c: correct month of year
+
+	* scripts/speccommon.in: netconfig.d renamed nslconfig.d
+	* src/util/update-netconfig: netconfig.d renamed nslconfig.d
+
+	* src/util/init/openss7: init script corrections
+	* src/util/init/openss7.sh: init script corrections
+	* src/util/init/specfs: init script corrections
+	* src/util/init/specfs.sh: init script corrections
+	* src/util/init/streams: init script corrections
+	* src/util/init/streams.sh: init script corrections
+
 2011-05-10  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/openss7-core.postinst.in: deleted
