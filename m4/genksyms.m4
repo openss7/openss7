@@ -367,7 +367,11 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 	    for ksyms_dir in $k_updatedir_search_path
 	    do
 		AC_MSG_CHECKING([for updates directory... $ksyms_dir])
-		if test -d "$ksyms_dir" -a \( -d "$ksyms_dir/postinst.d" -o -d "$ksyms_dir/postrm.d" \)
+		if test -d "$ksyms_dir" -a \( \
+		    -d "$ksyms_dir/preinst.d" -o \
+		    -d "$ksyms_dir/postinst.d" -o \
+		    -d "$ksyms_dir/prerm.d" -o \
+		    -d "$ksyms_dir/postrm.d" \)
 		then
 		    ksyms_cv_updates_directory="$ksyms_dir"
 		    AC_MSG_RESULT([yes])
@@ -379,7 +383,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 	if test :"${ksyms_cv_updates_directory:-no}" = :no -o ! -d "$ksyms_cv_updates_directory"
 	then
 	    case "$target_vendor" in
-		(debian|unbuntu)
+		(debian|unbuntu) ;;
 		(*) ;;
 	    esac
 	fi
