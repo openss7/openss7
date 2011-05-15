@@ -257,7 +257,6 @@ dnl     [], [enable_k_install=yes])
 	weak updating modules.  When defined, unsupported kernel symbols will
 	not be used.])
     fi
-    AC_MSG_RESULT([$linux_cv_k_abi_support])
 ])# _LINUX_KERNEL_OPTIONS
 # =============================================================================
 
