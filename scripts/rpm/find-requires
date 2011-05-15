@@ -304,7 +304,7 @@ if [ -n "$jarlist" ] ; then
     if [ -n "$tool" -a -x "$tool" ] ; then
 	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${jarlist[@]}" | \
-	$tool "${args[@]}"
+	$tool "${args[@]}" | remove_unprovided
     fi
     # we built them, so anything unprovided is a false positive 
 fi
