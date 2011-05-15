@@ -198,8 +198,7 @@ debian/@PACKAGE@-base.%.sh.default: $(debtmpdir)$(configdir)/%
 control		+= debian/@PACKAGE@-base.install
 
 debian/@PACKAGE@-base.install:
-	( [ ! -d '$(debtmpdir)$(sysconfdir)'					] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
-	  [ ! -f '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)'			] || echo '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)' ; \
+	( [ ! -f '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)'			] || echo '$(debtmpdir)$(sbindir)/$(STRCONF_DEVICES)' ; \
 	  [ ! -d '$(debtmpdir)$(snmpmibdir)'					] || echo '$(debtmpdir)$(snmpmibdir)/*' ; \
 	  [ ! -f '$(debtmpdir)$(pkglibexecdir)/aclocal'				] || echo '$(debtmpdir)$(pkglibexecdir)/aclocal' ; \
 	  [ ! -d '$(debtmpdir)$(pkglibexecdir)'					] || echo '$(debtmpdir)$(pkglibexecdir)/testsuite*' ; \
