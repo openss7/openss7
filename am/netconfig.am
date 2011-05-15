@@ -105,7 +105,7 @@ post-netconfig:
 	netc_tmp="$${TMPDIR-/var/tmp}/netconfig.tmp.$$$$" ; \
 	found='no' ; \
 	files="$$netc_dir/*" ; \
-	if test -n '$(DESTDIR)' -a ! -e $$netc_fil -a ! -e $$netc_alt ; then \
+	if test -n '$(DESTDIR)$(rootdir)' -a ! -e $$netc_fil -a ! -e $$netc_alt ; then \
 		exit 0 ; \
 	fi ; \
 	if test -r $$netc_fil ; then \
@@ -113,7 +113,7 @@ post-netconfig:
 			netc_fil="$$netc_alt" ; \
 		fi ; \
 	else \
-		if test -r $$netc_alt -o -n '$(DESTDIR)'; then \
+		if test -r $$netc_alt -o -n '$(DESTDIR)$(rootdir)'; then \
 			netc_fil="$$netc_alt" ; \
 		fi ; \
 	fi ; \
@@ -154,8 +154,8 @@ post-netconfig:
 		rmdir $$netc_dir 2>/dev/null || :; \
 	else \
 		if ! diff $$netc_tmp $$netc_fil >/dev/null 2>&1 ; then \
-			$(ECHO) "  cp -f -b --suffix=.rpmsave -- $$netc_tmp $$netc_fil" ; \
-			cp -f - b --suffix=.rpmsave -- $$netc_tmp $$netc_fil ; \
+			$(ECHO) "  cp -f -b -v --suffix=.rpmsave -- $$netc_tmp $$netc_fil" ; \
+			cp -f - b -v --suffix=.rpmsave -- $$netc_tmp $$netc_fil ; \
 		fi ; \
 	fi ; \
 	rm -f -- $$netc_tmp || :; \

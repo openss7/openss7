@@ -120,22 +120,23 @@ post-snmp-conf:
 	snmp_lcl=$(DESTDIR)$(sysconfdir)/snmp/snmp.d/00local ; \
 	snmp_tmp=$${TMPDIR-/var/tmp}/snmpd.local.conf.tmp.$$$$ ; \
 	files="$$snmp_dir/*" ; \
-	if test -z "$(DESTDIR)" ; then \
-		if test ! -e $(sysconfdir)/snmp/snmpd.conf -a -e $(sysconfdir)/snmpd.conf ; then \
-			$(ECHO) "  ln -L $(sysconfdir)/snmpd.conf $(sysconfdir)/snmp/snmpd.conf" ; \
-			ln -L $(sysconfdir)/snmpd.conf $(sysconfdir)/snmp/snmpd.conf ; \
-			$(ECHO) "  touch $(sysconfdir)/snmpd.local.conf" ; \
-			touch $(sysconfdir)/snmpd.local.conf ; \
-		fi ; \
-		if test ! -e $(sysconfdir)/snmp/snmpd.local.conf -a -e $(sysconfdir)/snmpd.local.conf ; then \
-			$(ECHO) "  ln -L $(sysconfdir)/snmpd.local.conf $(sysconfdir)/snmp/snmpd.local.conf" ; \
-			ln -L $(sysconfdir)/snmpd.local.conf $(sysconfdir)/snmp/snmpd.local.conf ; \
-		fi ; \
+	if test -n '$(DESTDIR)$(rootdir)' -a ! -e $$snmp_fil ; then \
+		exit 0 ; \
+	fi ; \
+	if test ! -e $(sysconfdir)/snmp/snmpd.conf -a -e $(sysconfdir)/snmpd.conf ; then \
+		$(ECHO) "  ln -L $(sysconfdir)/snmpd.conf $(sysconfdir)/snmp/snmpd.conf" ; \
+		ln -L $(sysconfdir)/snmpd.conf $(sysconfdir)/snmp/snmpd.conf ; \
+		$(ECHO) "  touch $(sysconfdir)/snmpd.local.conf" ; \
+		touch $(sysconfdir)/snmpd.local.conf ; \
+	fi ; \
+	if test ! -e $(sysconfdir)/snmp/snmpd.local.conf -a -e $(sysconfdir)/snmpd.local.conf ; then \
+		$(ECHO) "  ln -L $(sysconfdir)/snmpd.local.conf $(sysconfdir)/snmp/snmpd.local.conf" ; \
+		ln -L $(sysconfdir)/snmpd.local.conf $(sysconfdir)/snmp/snmpd.local.conf ; \
 	fi ; \
 	if test -s $$snmp_fil ; then \
-		if grep '^# Generated from snmp.d' $$snmp_fil >/dev/null 2>&1 ; then \
-			$(ECHO) "  cp -f -b --suffix=.rpmsave -- $$snmp_fil $$snmp_lcl" ; \
-			cp -f -b --suffix=.rpmsave -- $$snmp_fil $$snmp_lcl ; \
+		if ! grep '^# Generated from snmp.d' $$snmp_fil >/dev/null 2>&1 ; then \
+			$(ECHO) "  cp -f -b -v --suffix=.rpmsave -- $$snmp_fil $$snmp_lcl" ; \
+			cp -f -b -v --suffix=.rpmsave -- $$snmp_fil $$snmp_lcl ; \
 		fi ; \
 	fi ; \
 	$(ECHO) "  $(ECHO) '# Generated from snmp.d by $(PACKAGE_LCNAME)' >$$snmp_tmp" ; \
@@ -191,7 +192,7 @@ post-snmp-conf:
 	rmdir $$snmp_dir 2>/dev/null || :; \
 	$(ECHO) "  rm -f -- $$snmp_tmp" ; \
 	rm -f -- $$snmp_tmp || :; \
-	if test -z "$(DESTDIR)" ; then \
+	if test -z '$(DESTDIR)$(rootdir)' ; then \
 		if test $$changed_local = yes ; then \
 			r="`runlevel | awk '{print$$2}'`" ; \
 			start=no ; \
