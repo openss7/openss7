@@ -4818,7 +4818,7 @@ this package or when debugging kernel modules contained in the package.
 if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install or upgrade, other present
     f="symsets-%{_kversion}.tar.gz"
     d="/lib/modules/%{_kversion}/build"
-    if [ -r $d/$f ] then
+    if [ -r $d/$f ] ; then
 	cp -f -- $d/$f /boot/$f || :
     fi
 fi
