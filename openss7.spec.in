@@ -4166,10 +4166,12 @@ if [ $1 -eq 1 ] ; then : # fresh install
     pre_remove_warn_dirs () {
         local d
         for d in $@; do
-            if [ -d $d -a "`(cd $d; pwd)`" != "/" ] ; then
-                if [ -L $d ]
-                then echo "warning: removing non-rpm symbolic link $d" >&2; rm -f  -- $d || :
-                else echo "warning: removing non-rpm directory $d"     >&2; rm -rf -- $d || :
+            if [ -d $d ] ; then
+                if [ "`(cd $d; pwd)`" != "/" ] ; then
+                    if [ -L $d ]
+                    then echo "warning: removing non-rpm symbolic link $d" >&2; rm -f  -- $d || :
+                    else echo "warning: removing non-rpm directory $d"     >&2; rm -rf -- $d || :
+                    fi
                 fi
             fi
         done

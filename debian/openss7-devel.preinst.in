@@ -70,13 +70,15 @@ remove_warn_files () {
     done
 }
 remove_warn_dir () {
-    if [ -d $1 -a "`(cd $1; pwd)`" != "/"  ] ; then
-	if [ -L $1 ] ; then
-	    echo "$script: warning: removing symbolic link $1" >&2
-	    rm -f -- $1
-	else
-	    echo "$script: warning: removing directory $1" >&2
-	    rm -rf -- $1
+    if [ -d $1 ] ; then
+	if [ "`(cd $1; pwd)`" != "/"  ] ; then
+	    if [ -L $1 ] ; then
+		echo "$script: warning: removing symbolic link $1" >&2
+		rm -f -- $1
+	    else
+		echo "$script: warning: removing directory $1" >&2
+		rm -rf -- $1
+	    fi
 	fi
     fi
 }
