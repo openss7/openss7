@@ -84,61 +84,61 @@ $(man_MANS):: %: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man_SED_SCRIPT) >$@ ;
 
 $(man1_MANS):: %.1: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man1_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man1_SED_SCRIPT) >$@ ;
 
 $(man2_MANS):: %.2: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man2_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man2_SED_SCRIPT) >$@ ;
 
 $(man3_MANS):: %.3: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man3_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man3_SED_SCRIPT) >$@ ;
 
 $(man4_MANS):: %.4: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man4_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man4_SED_SCRIPT) >$@ ;
 
 $(man5_MANS):: %.5: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man5_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man5_SED_SCRIPT) >$@ ;
 
 $(man6_MANS):: %.6: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man6_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man6_SED_SCRIPT) >$@ ;
 
 $(man7_MANS):: %.7: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man7_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man7_SED_SCRIPT) >$@ ;
 
 $(man8_MANS):: %.8: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man8_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man8_SED_SCRIPT) >$@ ;
 
 $(man9_MANS):: %.9: %.man $(man_MACROS)
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting (soelim, grefer) manpage $< to $@" ; \
-	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man9_SED_SCRIPT) > $@ ;
+	cat $< | (cd $(srcdir) ; $(SOELIM) 2>/dev/null | $(REFER) 2>/dev/null) | sed $(man9_SED_SCRIPT) >$@ ;
 
 all-manmacros:
 
@@ -176,72 +176,84 @@ $(man_MANS): %: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man_SED_SCRIPT) >$@ ;
 
 $(man1_MANS): %.1: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man1_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man1_SED_SCRIPT) >$@ ;
 
 $(man2_MANS): %.2: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man2_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man2_SED_SCRIPT) >$@ ;
 
 $(man3_MANS): %.3: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man3_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man3_SED_SCRIPT) >$@ ;
 
 $(man4_MANS): %.4: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man4_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man4_SED_SCRIPT) >$@ ;
 
 $(man5_MANS): %.5: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man5_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man5_SED_SCRIPT) >$@ ;
 
 $(man6_MANS): %.6: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man6_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man6_SED_SCRIPT) >$@ ;
 
 $(man7_MANS): %.7: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man7_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man7_SED_SCRIPT) >$@ ;
 
 $(man8_MANS): %.8: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man8_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man8_SED_SCRIPT) >$@ ;
 
 $(man9_MANS): %.9: %.man
 	@p=`$(ECHO) $@ | sed 's|/[^/]*$$||'` ; test -d $$p || $(mkdir_p) $$p ; \
 	$(ECHO_Q) "  GEN   " `basename $@` ; \
 	$(ECHO_V) "converting manpage $< to $@" ; \
-	cat $< | sed $(man9_SED_SCRIPT) > $@ ;
+	cat $< | sed $(man9_SED_SCRIPT) >$@ ;
 
 ##
 # When manpages are uncooked, we need macro files in the build directory for
-# tests.
+# tests.  When building in place in the source directory, the macro files were
+# not being converted, so in this case, move them out of the way and convert
+# them anyway.  The clean target will move them back.
 ##
 all-manmacros:
 	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
 		if test ! -e $$macro -o $(srcdir)/$$macro -nt $$macro ; then \
 			$(ECHO_Q) "  GEN   " $$macro ; \
-			$(ECHO_V) "cat $(srcdir)/$$macro | sed '\$$(MAN_SUBST_STRING)' > $$macro" ; \
-			cat $(srcdir)/$$macro | sed '$(MAN_SUBST_STRING)' > $$macro ; \
+			$(ECHO_V) "sed '\$$(MAN_SUBST_STRING)' $(srcdir)/$$macro >$$macro" ; \
+			sed '$(MAN_SUBST_STRING)' $(srcdir)/$$macro >$$macro ; \
+		elif test "`(cd $(srcdir); pwd)`" = "`pwd`" ; then \
+			if test -e $$macro && ! -e $$macro.in ; then \
+				$(ECHO_V) "mv -f -- $$macro $$macro.in" ; \
+				mv -f -- $$macro $$macro.in ; \
+			fi ; \
+			if test ! -e $$macro -o $$macro.in -nt $$macro ; then \
+				$(ECHO_Q) "  GEN   " $$macro ; \
+				$(ECHO_V) "sed '$(MAN_SUBST_STRING)' $$macro.in >$$macro" ; \
+				sed '$(MAN_SUBST_STRING)' $$macro.in >$$macro ; \
+			fi ; \
 		fi ; \
 	done
 
@@ -263,12 +275,21 @@ uninstall-manmacros:
 ##
 # We only need to clean the manmacros files from the build directory when the
 # build directory is different from the source directory, so, we check whether
-# the srcdir and the builddir are different before removing.
+# the srcdir and the builddir are different before removing.  When building in
+# place, the originals were moved out of the way, so in that case, move them
+# back.
 ##
 clean-manmacros:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test "`(cd $(srcdir); pwd)`" != "`pwd`" ; then \
 		list='$(man_MACROS)' ; $(am__list_remove) ; \
+	else \
+		macros='$(man_MACROS)' ; for macro in $$macros ; do \
+			if test -e $$macro.in ; then \
+				$(ECHO) "mv -f -- $$macros.in $$macros" ; \
+				mv -f -- $$macros.in $$macros ; \
+			fi ; \
+		done ; \
 	fi
 
 distclean-manmacros:
