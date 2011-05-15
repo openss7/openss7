@@ -3989,7 +3989,7 @@ fi
 #{?files_lib32compat:%{_lib32dir}/*.la}
 #{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
 %{?files_netconfig:%config(noreplace) %{_sysconfdir}/nslconfig.d/%{netconfig}}
-%{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path}
+#{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path}
 %{?files_sock2path:%config(noreplace) %{_sysconfdir}/sock2path.d/%{sock2path}}
 %{?files_perlmods:%dir %{_perldir}/auto/Xti}
 %{?files_perlmods:%{_perldir}/auto/Xti/*}
@@ -4122,7 +4122,7 @@ Conflicts:          texinfo < 3.11
 
 # development info is somewhat useless without kernel module develoment info
 %if %{NEED_kdev}
-Requires:           %{name}-kernel-devel = %{epoch}:%{baseversion}-%{baserelease}
+Requires:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{specrelease}
@@ -4217,7 +4217,7 @@ Autoprov:           true
 
 # debugging info is somewhat useless without kernel module debugging info
 %if %{NEED_kbug}
-Requires:           %{name}-kernel-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
+Requires:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{specrelease}
@@ -4259,7 +4259,7 @@ Autoprov:           true
 Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
 # debugging source is somewhat useless without kernel module debugging source
 %if %{NEED_kbug}
-Requires:           %{name}-kernel-debugsource = %{epoch}:%{baseversion}-%{baserelease}
+Requires:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{specrelease}
