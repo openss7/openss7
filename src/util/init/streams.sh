@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-10 13:45:37 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-15 12:01:22 $
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -976,7 +976,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-10 13:45:37 $
+# @(#) $RCSfile: streams.sh,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-15 12:01:22 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -1022,11 +1022,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-05-10 13:45:37 $ by $Author: brian $
+# Last Modified $Date: 2011-05-15 12:01:22 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: streams.sh,v $
+# Revision 1.1.2.5  2011-05-15 12:01:22  brian
+# - many build system refinements
+#
 # Revision 1.1.2.4  2011-05-10 13:45:37  brian
 # - weak modules workup
 #

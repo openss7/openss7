@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.25 $) $Date: 2011-05-10 13:45:30 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.26 $) $Date: 2011-05-15 12:01:19 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-05-10 13:45:30 $ by $Author: brian $
+# Last Modified $Date: 2011-05-15 12:01:19 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -5271,6 +5271,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.26  2011-05-15 12:01:19  brian
+# - many build system refinements
+#
 # Revision 1.1.2.25  2011-05-10 13:45:30  brian
 # - weak modules workup
 #
