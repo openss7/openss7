@@ -57,7 +57,7 @@ if PKG_BUILD_INDEP
 if WITH_YUM_SOURCE
 
 $(PACKAGE).yum.repo: Makefile
-	rb=`echo '$(repobranch)' | sed 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
 	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
 	for branch in $$rlist ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
@@ -80,7 +80,7 @@ INSTALL_YUM_REPOS = $(PACKAGE).yum.repo
 if MAINTAINER_MODE
 
 $(PACKAGE)-local.yum.repo: Makefile
-	rb=`echo '$(repobranch)' | sed 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
 	for branch in $$rb ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
 		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
@@ -92,7 +92,7 @@ $(PACKAGE)-local.yum.repo: Makefile
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
 				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
 			$(ECHO) 'name = $(PACKAGE_TITLE) Local'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
-			$(ECHO) 'baseurl = file://$(rpmdistdir)'$${s:+/$$s}$${d:+/$$d}; \
+			$(ECHO) 'baseurl = file://$(rpmdistdir)'$${b:+/$$b}$${d:+/$$d}; \
 			$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
 			$(ECHO) 'gpgcheck = 1'; \
 			$(ECHO) ''; \
@@ -103,19 +103,6 @@ INSTALL_YUM_REPOS += $(PACKAGE)-local.yum.repo
 
 ## MAINTAINER_MODE
 endif
-
-##
-## Before installing yum, check whether there is an existing remote repo file.
-## If there is an existing file, just use it.  Otherwise, we need to create the
-## remote repo file.  This is accomplished by downloading it from the install
-## source.
-##
-pre-yum:
-	if test ! -d '$(DESTDIR)$(yumrepodir)' -o \
-		! -e '$(DESTDIR)$(yumrepodir)/$(PACKAGE).repo' ; then \
-		$(MKDIR_P) '$(DESTDIR)$(yumrepodir)' ; \
-	fi
-
 
 install-yum: $(INSTALL_YUM_REPOS)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -164,9 +151,9 @@ post-yum:
 
 #ALL_LOCAL			+= $(PACKAGE).yum.repo
 #INSTALL_DATA_LOCAL		+= install-yum
-#UNINSTALL_LOCAL			+= uninstall-yum
+#UNINSTALL_LOCAL		+= uninstall-yum
 #CLEANFILES			+= $(PACKAGE).yum.repo
-#POST_INSTALL_AM			+= post-yum
+#POST_INSTALL_AM		+= post-yum
 
 MY_PHONY			+= install-yum uninstall-yum post-zypp
 
@@ -193,8 +180,9 @@ repo-install-yum:
 				break ; \
 			fi ; \
 		done ; \
+		f='$(PACKAGE).repo' ; \
 		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
-		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/rpms/$(target_distro)/$(target_edition)/$(target_cpu)/repodata/'"$$f$$ext" ; \
+		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/rpms/$(reposubdir)/repodata/'"$$f$$ext" ; \
 		rm -f -- $$f ; \
 		if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
 			if echo "$$url" | wget -i - 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
@@ -203,7 +191,7 @@ repo-install-yum:
 				read -e  -p 'Username: ' u </dev/tty >/dev/tty ; \
 				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
 				echo '' >/dev/tty ; \
-				url='$(reposerv)://'"$${u:+$$u$${p:+:$$p}@}"'$(repobase)/$(reporoot)/rpms/$(target_distro)/$(target_edition)/$(target_cpu)/repodata/'"$$f$$ext" ; \
+				url='$(reposerv)://'"$${u:+$$u$${p:+:$$p}@}"'$(repobase)/$(reporoot)/rpms/$(reposubdir)/repodata/'"$$f$$ext" ; \
 				rm -f -- $$f ; \
 				if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
 					exit 1 ; \
@@ -292,7 +280,7 @@ $(PACKAGE).zypp.service: Makefile
 	) >$@
 
 $(PACKAGE).zypp.repo: Makefile
-	rb=`echo '$(repobranch)' | sed 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
 	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
 	for branch in $$rlist ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
@@ -324,7 +312,7 @@ if MAINTAINER_MODE
 ## file so that zypper can be used to import them.
 ##
 $(PACKAGE)-local.zypp.repo: Makefile
-	rb=`echo '$(repobranch)' | sed 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
 	for branch in $$rb ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
 		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
@@ -497,12 +485,50 @@ endif
 if WITH_APT_SOURCE
 
 $(PACKAGE).sources.list: Makefile
-	( \
-		$(ECHO) "deb ..."; \
-		$(ECHO) "deb-src ..."; \
-	) >$@
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	for branch in $$rlist ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+				$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+			$(ECHO) 'deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b} $${d}'/' ; \
+			if test "$$repo" = 'Source' ; then \
+				$(ECHO) '#deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b} $${d}'/' ; \
+			fi ; \
+		done ; \
+	done >$@
 
-install-apt: $(PACKAGE).sources.list
+INSTALL_APT_SRCES = $(PACKAGE).sources.list
+
+if MAINTAINER_MODE
+
+$(PACKAGE)-local.sources.list: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
+			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
+				$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+			$(ECHO) 'deb file://$(debdistdir)'$${b:+/$$b} $${d}'/' ; \
+			if test "$$repo" = 'Source' ; then \
+				$(ECHO) '#deb-src file://$(debdistdir)'$${b:+/$$b} $${d}'/' ; \
+			fi ; \
+		done ; \
+	done >$@
+
+INSTALL_APT_SRCES += $(PACKAGE)-local.sources.list
+
+## MAINTAINER_MODE
+endif
+
+install-apt: $(INSTALL_APT_SRCES)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	@if test -n "$(aptrepodir)" ; then \
@@ -517,12 +543,23 @@ install-apt: $(PACKAGE).sources.list
 		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc'" ; \
 		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc" ; \
 	fi
+if MAINTAINER_MODE
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.sources.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list" ; \
+	fi
+endif
 
 uninstall-apt:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE).list
 	rm -f -- $(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE).list
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list
+endif
 
 post-apt:
 	aptitude refresh
@@ -534,6 +571,74 @@ post-apt:
 #POST_INSTALL_AM		+= post-apt
 
 MY_PHONY			+= install-apt uninstall-apt post-apt
+
+##
+# Install an apt installation source for both remote and local repositories.  This involves
+# downloading the @PACKAGE@.list file, installing the @PACKAGE@-local.list file, and performing
+# aptitude refresh.
+##
+repo-install-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test ! -d '$(DESTDIR)$(aptrepodir)' ; then \
+		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(aptrepodir)" ; \
+		$(MKDIR_P) $(DESTDIR)$(aptrepodir) ; \
+	fi
+	( \
+		cd $(DESTDIR)$(aptrepodir) ; \
+		un=; pw=; \
+		for s in '' '.dpkg-new' '.dpkg-old' ; do \
+			f='$(PACKAGE).list'$$s ; \
+			if test -f $$f ; then \
+				un=`sed -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $$f` ; \
+				pw=`sed -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $$f` ; \
+				test -n "$$un" -a -n "$$pw" || continue ; \
+				break ; \
+			fi ; \
+		done ; \
+		f='$(PACKAGE).list' ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
+		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/rpms/$(reposubdir)/'"$$f$$ext" ; \
+		rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
+			if echo "$$url" | wget -i - 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				echo 'Authorization required for repository access.' >/dev/tty ; \
+				u=; p=; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty ; \
+				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
+				echo '' >/dev/tty ; \
+				url='$(reposerv)://'"$${u:+$$u$${p:+:$$p}@}"'$(repobase)/$(reporoot)/rpms/$(reposubdir)/'"$$f$$ext" ; \
+				rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+	)
+
+##
+## To remove an apt install source, disable and copy the @PACKAGE@.list file to
+## @PACKAGE@.list.dpkg-old so that the credentials will be maintained even when the repository has
+## been removed.  Next remove the @PACKAGE@.list and @PACKAGE@-local.list repositories and refresh
+## aptitude.
+##
+repo-uninstall-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(DESTDIR)$(aptrepodir)/$(PACKAGE).list' ; \
+	if test -f $$f ; then \
+	$(ECHO) "sed 's,^deb,#deb,' $$f >$$f.dpkg-old" ; \
+	sed 's,^deb,#deb,' $$f >$$f.dpkg-old
+	@for s in '' '-local' ; do \
+		f='$(DESTDIR)$(aptrepodir)/$(PACKAGE)'$$s'.list' ; \
+		if test -f $$f ; then \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
+	@$(ECHO) "aptitude refresh" ; \
+	aptitude refresh || :
+
+REPO_INSTALL			+= repo-install-apt
+REPO_UNINSTALL			+= repo-uninistall-apt
 
 ## WITH_APT_SOURCE
 endif

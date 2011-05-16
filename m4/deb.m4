@@ -187,11 +187,11 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([deb-topdir],
 	[AS_HELP_STRING([--with-deb-topdir=DIR],
 	    [deb top directory @<:@default=DEB-DISTDIR/BRANCH@:>@])],
-	[], [with_deb_topdir='$(debdistdir)/$(repobranch)'])
+	[], [with_deb_topdir='$(debdistdir)$(repobranch)'])
     AC_MSG_CHECKING([for deb top build directory])
     if test ":${debdir+set}" != :set ; then
 	case ":${with_deb_topdir:-no}" in
-	    (:no|:yes)	debdir='$(debdistdir)/$(repobranch)' ;;
+	    (:no|:yes)	debdir='$(debdistdir)$(repobranch)' ;;
 	    (*)		debdir="$with_deb_topdir" ;;
 	esac
     fi
@@ -355,6 +355,14 @@ dnl
     AM_CONDITIONAL([BUILD_REPO_APT], [test ":$deb_cv_repo_apt" = :yes])
     aptdir='$(debdir)'
     AC_SUBST([aptdir])dnl
+    aptmaindir='$(aptdir)/main'
+    AC_SUBST([aptmaindir])dnl
+    aptdebgdir='$(aptdir)/debug'
+    AC_SUBST([aptdebgdir])dnl
+    aptdevldir='$(aptdir)/devel'
+    AC_SUBST([aptdevldir])dnl
+    aptsrcsdir='$(aptdir)/source'
+    AC_SUBST([aptsrcsdir])dnl
 ])# _DEB_DPKG_SETUP_BUILD
 # =============================================================================
 
