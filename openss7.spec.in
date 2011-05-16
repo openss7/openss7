@@ -3063,6 +3063,9 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
         [ ! -f %{_mandir}/$m.bz2 ] || bzip2 -dc %{_mandir}/$m.bz2 > %{_mandir}/$m || :
     done
 %endif
+%if %{HAVE_weakmods}
+    touch /var/run/%{name}-base.post
+%endif
 fi
 if [ $1 -eq 1 ] ; then : # fresh install
 %if %{FILES_manpages}
@@ -3079,18 +3082,12 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 ] ; then : # kernel is being installed or upgraded with base present
     if [ -x %{_sbindir}/%{name}-modules ]; then
-        if rpm -q %{name}-base >/dev/null 2>&1; then
-            kernels=
-            for d in /lib/modules/*; do
-                if [ -d $d ]; then
-                    if ! rpm -q --whatprovides $d >/dev/null 2>&1; then
-                        kernels="$kernels${kernels:+ }`basename $d`"
-                    fi
-                fi
-            done
+        if [ -e /var/run/%{name}-base.post ] then
+            rm -f -- /var/run/%{name}-base.post
+        else
             v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
             %{_sbindir}/%{name}-modules -- $v -e \
-                --add-kernel $kernels || :
+                --update-kernel || :
         fi
     fi
 fi
@@ -4470,12 +4467,15 @@ if [ $1 -eq 1 ]; then : # fresh install
     modules='%{modules}'
     for dir in %{_kmoduledir}; do
 	[ -d $dir ] || continue
+        xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+        set +x
 	modl_mods=
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
 		b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?,,'`
 		case " $modules " in (*" $b "*) ;; (*) continue ;; esac
 		modl_mods="$modl_mods${modl_mods:+ }$m"
 	done
+        eval "$xtrace"
 	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
 	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
 	    set +x
