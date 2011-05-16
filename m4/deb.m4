@@ -355,6 +355,14 @@ dnl
     AM_CONDITIONAL([BUILD_REPO_APT], [test ":$deb_cv_repo_apt" = :yes])
     aptdir='$(debdir)'
     AC_SUBST([aptdir])dnl
+    aptmaindir='$(aptdir)/main'
+    AC_SUBST([aptmaindir])dnl
+    aptdebgdir='$(aptdir)/debug'
+    AC_SUBST([aptdebgdir])dnl
+    aptdevldir='$(aptdir)/devel'
+    AC_SUBST([aptdevldir])dnl
+    aptsrcsdir='$(aptdir)/source'
+    AC_SUBST([aptsrcsdir])dnl
 ])# _DEB_DPKG_SETUP_BUILD
 # =============================================================================
 

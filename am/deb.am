@@ -99,16 +99,18 @@ debian_change_files	= $(debbuilddir)/$(debianpkg)_*.changes $(debbuilddir)/$(deb
 debian_binary_files	= $(debbuilddir)/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
 			  $(debbuilddir)/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb
 
-debtop_tar_file		= $(debdir)/$(debianpkg).tar.gz
-debtop_dsc_file		= $(debdir)/$(debianpkg).dsc
-debtop_sig_file		= $(debdir)/$(debianpkg).dsc.sig
+debtop_tar_file		= $(debdir)/source/$(debianpkg).tar.gz
+debtop_dsc_file		= $(debdir)/source/$(debianpkg).dsc
+debtop_sig_file		= $(debdir)/source/$(debianpkg).dsc.sig
 debtop_source_files	= $(debtop_tar_file) $(debtop_dsc_file) $(debtop_sig_file)
 debtop_change_files	= $(debdir)/$(debianpkg)_*.changes $(debdir)/$(debianpkg)_*.changes.asc
 debtop_binary_files	= $(debdir)/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
-			  $(debdir)/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb
+			  $(debdir)/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb \
+			  $(debdir)/*/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
+			  $(debdir)/*/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb
 
-RELEASE_DIRECTORIES	+= $(debdir)
-UPDATE_DIRECTORIES	+= $(debdir)
+RELEASE_DIRECTORIES	+= $(aptdir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
+UPDATE_DIRECTORIES	+= $(aptdir)
 
 ##
 # For the master build package it is sometime necessary to pass extra options down to configured
@@ -153,7 +155,7 @@ $(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
 
 $(debtop_dsc_file) $(debtop_tar_file)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@f=`$(ECHO) "$@" | sed 's|^$(debdir)/|$(debbuilddir)/|'`; \
+	@f=`$(ECHO) "$@" | sed 's|^$(debdir)/source/|$(debbuilddir)/|'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f"; \
 		$(MAKE) $(AM_MAKEFLAGES) -- $$f; }; \
@@ -233,7 +235,14 @@ chg-deb:
 	@if test "$(debdir)" != "$(debbuilddir)"; then \
 		list="$(debian_binary_files) $(debian_change_files)"; for f in $$list; do \
 			test -f $$f || continue; \
-			t=`echo $$f | sed 's|^$(debbuilddir)/|$(debdir)/|'`; \
+			s= ; \
+			case `basename $$f` in \
+				(*source*) s=source ;; \
+				(*-debug*) s=debug ;; \
+				(*-devel*) s=devel ;; \
+				(*deb)     s=main ;; \
+			esac ; \
+			t=`echo $$f | sed 's|^$(debbuilddir)/|$(debdir)'$${s:+/$$s}'/|'`; \
 			if test ":$(FORCE)" = :force -o ! -f "$$t"; then \
 				$(ECHO) "cp -f -- $$f $$t"; \
 				cp -f -- $$f $$t; \
@@ -535,24 +544,108 @@ if BUILD_REPO_APT
 ## The following builds apt repositories.
 ##
 
-apt_nonrel_files	= $(aptdir)/Packages \
-			  $(aptdir)/Sources \
-			  $(aptdir)/Contents \
-			  $(aptdir)/Packages.gz \
-			  $(aptdir)/Sources.gz \
-			  $(aptdir)/Contents.gz \
-			  $(aptdir)/Packages.bz2 \
-			  $(aptdir)/Sources.bz2 \
-			  $(aptdir)/Contents.bz2 \
-			  $(aptdir)/md5sum.txt
+apt_packages		= $(aptdir)/Packages \
+			  $(aptmaindir)/Packages \
+			  $(aptdebgdir)/Packages \
+			  $(aptdevldir)/Packages \
+			  $(aptsrcsdir)/Packages
 
-apt_release_files	= $(aptdir)/Release \
-			  $(aptdir)/Release.gz \
-			  $(aptdir)/Release.bz2
+apt_package_gzips	= $(aptdir)/Packages.gz \
+			  $(aptmaindir)/Packages.gz \
+			  $(aptdebgdir)/Packages.gz \
+			  $(aptdevldir)/Packages.gz \
+			  $(aptsrcsdir)/Packages.gz
+
+apt_package_bzips	= $(aptdir)/Packages.bz2 \
+			  $(aptmaindir)/Packages.bz2 \
+			  $(aptdebgdir)/Packages.bz2 \
+			  $(aptdevldir)/Packages.bz2 \
+			  $(aptsrcsdir)/Packages.bz2
+
+apt_sources		= $(aptdir)/Sources \
+			  $(aptsrcsdir)/Sources
+
+apt_source_gzips	= $(aptdir)/Sources.gz \
+			  $(aptsrcsdir)/Sources.gz
+
+apt_source_bzips	= $(aptdir)/Sources.bz2 \
+			  $(aptsrcsdir)/Sources.bz2
+
+apt_contents		= $(aptdir)/Contents \
+			  $(aptmaindir)/Contents \
+			  $(aptdebgdir)/Contents \
+			  $(aptdevldir)/Contents \
+			  $(aptsrcsdir)/Contents
+
+apt_content_gzips	= $(aptdir)/Contents.gz \
+			  $(aptmaindir)/Contents.gz \
+			  $(aptdebgdir)/Contents.gz \
+			  $(aptdevldir)/Contents.gz \
+			  $(aptsrcsdir)/Contents.gz
+
+apt_content_bzips	= $(aptdir)/Contents.bz2 \
+			  $(aptmaindir)/Contents.bz2 \
+			  $(aptdebgdir)/Contents.bz2 \
+			  $(aptdevldir)/Contents.bz2 \
+			  $(aptsrcsdir)/Contents.bz2
+
+apt_md5sums		= $(aptdir)/md5sum.txt \
+			  $(aptmaindir)/md5sum.txt \
+			  $(aptdebgdir)/md5sum.txt \
+			  $(aptdevldir)/md5sum.txt \
+			  $(aptsrcsdir)/md5sum.txt
+
+apt_releases		= $(aptdir)/Release \
+			  $(aptmaindir)/Release \
+			  $(aptdebgdir)/Release \
+			  $(aptdevldir)/Release \
+			  $(aptsrcsdir)/Release
+
+apt_release_gzips	= $(aptdir)/Release.gz \
+			  $(aptmaindir)/Release.gz \
+			  $(aptdebgdir)/Release.gz \
+			  $(aptdevldir)/Release.gz \
+			  $(aptsrcsdir)/Release.gz
+
+apt_release_bzips	= $(aptdir)/Release.bz2 \
+			  $(aptmaindir)/Release.bz2 \
+			  $(aptdebgdir)/Release.bz2 \
+			  $(aptdevldir)/Release.bz2 \
+			  $(aptsrcsdir)/Release.bz2
+
+apt_release_gpgs	= $(aptdir)/Release.gpg \
+			  $(aptmaindir)/Release.gpg \
+			  $(aptdebgdir)/Release.gpg \
+			  $(aptdevldir)/Release.gpg \
+			  $(aptsrcsdir)/Release.gpg
+
+apt_release_keys	= $(aptmaindir)/Release.key \
+			  $(aptdebgdir)/Release.key \
+			  $(aptdevldir)/Release.key \
+			  $(aptsrcsdir)/Release.key
+
+apt_gzips		= $(apt_package_gzips) \
+			  $(apt_source_gzips) \
+			  $(apt_content_gzips) \
+			  $(apt_release_gzips)
+
+apt_bzips		= $(apt_package_bzips) \
+			  $(apt_source_bzips) \
+			  $(apt_content_bzips) \
+			  $(apt_release_bzips)
+
+apt_nonrel_files	= $(apt_packages) $(apt_package_gzips) $(apt_package_bzips) \
+			  $(apt_sources)  $(apt_source_gzips)  $(apt_source_bzips)  \
+			  $(apt_contents) $(apt_content_gzips) $(apt_content_bzips) \
+			  $(apt_md5sums)
+
+apt_release_files	= $(apt_releases) $(apt_release_gzips) $(apt_release_bzips)
 
 apt_files		= $(apt_nonrel_files) \
-			  $(apt_release_files) \
-			  $(aptdir)/Release.gpg
+			  $(apt_release_files)
+
+apt_signs		= $(apt_release_gpgs)
+apt_keys		= $(apt_release_keys)
 
 #!
 #! APT Build Targets:
@@ -562,59 +655,62 @@ apt_files		= $(apt_nonrel_files) \
 #! repository metadata creation tools, the following targets are used to manage
 #! apt source repository meta data files.
 #!
-$(aptdir)/Packages:
+$(apt_packages):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) packages $(aptdir) | sed 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) packages `dirname $@` | sed 's, $(aptdir)/, ,' > $@
 
-$(aptdir)/Sources:
+$(apt_sources):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) sources $(aptdir) | sed 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) sources `dirname $@` | sed 's, $(aptdir)/, ,' > $@
 
-$(aptdir)/Contents:
+$(apt_contents):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) contents $(aptdir) | sed 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) contents `dirname $@` | sed 's, $(aptdir)/, ,' > $@
 
-$(aptdir)/Packages.gz $(aptdir)/Sources.gz $(aptdir)/Contents.gz $(aptdir)/Release.gz: %.gz : %
+$(apt_gzips): %.gz : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	cat $< | gzip -c > $@
 
-$(aptdir)/Packages.bz2 $(aptdir)/Sources.bz2 $(aptdir)/Contents.bz2 $(aptdir)/Release.bz2: %.bz2 : %
+$(apt_bzips): %.bz2 : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	cat $< | bzip2 -c > $@
 
-$(aptdir)/md5sum.txt:
+$(apt_md5sums):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	find $(aptdir) -type f | egrep -v '(md5sum.txt|Release.gz)' | xargs $(MD5SUM) | sed 's, $(aptdir)/, ,' > $@
+	find `dirname $@` -type f | egrep -v '(md5sum.txt|Release.gz)' | xargs $(MD5SUM) | sed 's, $(aptdir)/, ,' > $@
 
-$(aptdir)/Release: $(apt_nonrel_files)
+$(apt_releases): $(apt_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) release $(aptdir) | sed 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(aptdir)/, ,' > $@
 
-$(aptdir)/Release.gpg:: \
-$(aptdir)/Release
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+GPGVERIFYSIGN = \
+	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
+		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
 	else touch "$@"; fi
 
+$(apt_release_gpgs): %.gpg : %
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
 
-#! repo-apt:
-#!     Create (or recreate) the meta data files for an APT repository in the
-#!     package distribution directory, @aptdir@/.
-#!     When executed with root privilege, it will also place a local
-#!     installation source for use by apt on the build system.
-#!
+GPGEXPORTKEY = \
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
+	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+
+$(apt_release_keys):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGEXPORTKEY)
+
 repo-apt: $(apt_files)
 
-#! repo-clean-apt:
-#! 	Cleans the metadata files for an APT repository from the package
-#! 	distribution directory, @aptdir@/.
-#!
+repo-sign-apt: $(apt_signs) $(apt_keys)
+
 repo-clean-apt:
 
 REPO			+= repo-apt
