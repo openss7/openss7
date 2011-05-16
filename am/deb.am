@@ -619,7 +619,8 @@ apt_release_gpgs	= $(aptdir)/Release.gpg \
 			  $(aptdevldir)/Release.gpg \
 			  $(aptsrcsdir)/Release.gpg
 
-apt_release_keys	= $(aptmaindir)/Release.key \
+apt_release_keys	= $(aptdir)/Release.key \
+			  $(aptmaindir)/Release.key \
 			  $(aptdebgdir)/Release.key \
 			  $(aptdevldir)/Release.key \
 			  $(aptsrcsdir)/Release.key
@@ -716,14 +717,14 @@ repo-clean-apt:
 REPO			+= repo-apt
 REPO_SIGN		+= repo-sign-apt
 REPO_CLEAN		+= repo-clean-apt
-REPOCLEANFILES		+= $(apt_files)
+REPOCLEANFILES		+= $(apt_files) $(apt_signs) $(apt_keys)
 
 MY_PHONY		+= repo-apt repo-clean-apt
 
 RELEASE			+= repo-apt
 RELEASE_SIGN		+= repo-sign-apt
 RELEASE_CLEAN_LOCAL	+= repo-clean-apt
-RELEASECLEANFILES	+= $(apt_files)
+RELEASECLEANFILES	+= $(apt_files) $(apt_signs) $(apt_keys)
 
 UPDATE			+= repo-apt
 UPDATE_SIGN		+= repo-sign-apt
