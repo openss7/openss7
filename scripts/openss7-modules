@@ -2227,7 +2227,7 @@ function chcksolution(kversion, kver,
 	n = split(inserts[kver],labels,/,/)
 	print_vinfo(2, sprintf(fmt, "inserts", n, "modules"))
 	for(i=1;i<=n;i++) print_vinfo(3,pfx "solution for " kversion " inserts " labels[i])
-	if (kver in kinserts) change = 1
+	if (kversion in kinserts) change = 1
     }
     if (change == 0) {
 	print_vinfo(2, pfx "solution for " kversion " is no change")
