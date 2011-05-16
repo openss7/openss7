@@ -101,7 +101,9 @@ Architecture: all
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-base
+@WITH_32BIT_LIBS_FALSE@Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@)
 @WITH_32BIT_LIBS_FALSE@Pre-Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@)
+@WITH_32BIT_LIBS_TRUE@Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@),
 @WITH_32BIT_LIBS_TRUE@Pre-Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@),
 @WITH_32BIT_LIBS_TRUE@ @PACKAGE_LCNAME@-compat (>= @VERSION@)
 Depends: @PACKAGE_LCNAME@ (>= @VERSION@)
@@ -210,6 +212,7 @@ Architecture: any
 Section: kernel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-kernel, @PACKAGE_LCNAME@-@kversion@
+Depends: @PACKAGE_LCNAME@-base (>= @VERSION@)
 Pre-Depends: @PACKAGE_LCNAME@-base (>= @VERSION@)
 Description: kernel modules compiled for @kversion@.
  The @PACKAGE_LCNAME@-@kversion@ binary package the kernel modules that

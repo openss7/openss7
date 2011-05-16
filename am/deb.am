@@ -546,12 +546,13 @@ apt_nonrel_files	= $(aptdir)/Packages \
 			  $(aptdir)/Contents.bz2 \
 			  $(aptdir)/md5sum.txt
 
-apt_release_file	= $(aptdir)/Release \
+apt_release_files	= $(aptdir)/Release \
 			  $(aptdir)/Release.gz \
 			  $(aptdir)/Release.bz2
 
 apt_files		= $(apt_nonrel_files) \
-			  $(apt_release_file)
+			  $(apt_release_files) \
+			  $(aptdir)/Release.gpg
 
 #!
 #! APT Build Targets:
@@ -588,6 +589,19 @@ $(aptdir)/md5sum.txt:
 $(aptdir)/Release: $(apt_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	$(APT_FTPARCHIVE) release $(aptdir) | sed 's, $(aptdir)/, ,' > $@
+
+$(aptdir)/Release.gpg:: \
+$(aptdir)/Release
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+		pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
+	else touch "$@"; fi
+
 
 #! repo-apt:
 #!     Create (or recreate) the meta data files for an APT repository in the

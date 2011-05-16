@@ -388,11 +388,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([rpm-topdir],
 	[AS_HELP_STRING([--with-rpm-topdir=DIR],
 	    [rpm top directory @<:@default=RPM-DISTDIR/BRANCH@:>@])],
-	[], [with_rpm_topdir='$(rpmdistdir)/$(repobranch)'])
+	[], [with_rpm_topdir='$(rpmdistdir)$(repobranch)'])
     AC_MSG_CHECKING([for rpm top build directory])
     if test ":${topdir+set}" != :set ; then
 	case ":${with_rpm_topdir:-no}" in
-	    (:no|:yes)	topdir='$(rpmdistdir)/$(repobranch)' ;;
+	    (:no|:yes)	topdir='$(rpmdistdir)$(repobranch)' ;;
 	    (*)		topdir="$with_rpm_topdir" ;;
 	esac
     fi

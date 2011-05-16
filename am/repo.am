@@ -498,31 +498,50 @@ if WITH_APT_SOURCE
 
 $(PACKAGE).sources.list: Makefile
 	( \
-		$(ECHO) "deb ..."; \
-		$(ECHO) "deb-src ..."; \
+		$(ECHO) "deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)$(repobranch) ./"; \
+		$(ECHO) "deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)$(repobranch) ./"; \
 	) >$@
+
+if MAINTAINER_MODE
+$(PACKAGE)-local.sources.list: Makefile
+	( \
+		$(ECHO) "deb file://$(debdir) ./"; \
+		$(ECHO) "deb-src file://$(debdir) ./"; \
+	) >$@
+endif
 
 install-apt: $(PACKAGE).sources.list
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
-	@if test -n "$(aptrepodir)" ; then \
-		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
-		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
-		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
-		$(INSTALL_DATA) $(PACKAGE).sources.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
-	fi
 	@if test -n "$(aptgpgdir)" ; then \
 		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptgpgdir)'" ; \
 		$(MKDIR_P) "$(DESTDIR)$(aptgpgdir)" ; \
 		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc'" ; \
 		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc" ; \
 	fi
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
+		$(INSTALL_DATA) $(PACKAGE).sources.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.sources.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list" ; \
+	fi
+endif
 
 uninstall-apt:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
-	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE).list
 	rm -f -- $(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE).list
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list
+endif
 
 post-apt:
 	aptitude refresh

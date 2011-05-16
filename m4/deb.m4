@@ -187,11 +187,11 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([deb-topdir],
 	[AS_HELP_STRING([--with-deb-topdir=DIR],
 	    [deb top directory @<:@default=DEB-DISTDIR/BRANCH@:>@])],
-	[], [with_deb_topdir='$(debdistdir)/$(repobranch)'])
+	[], [with_deb_topdir='$(debdistdir)$(repobranch)'])
     AC_MSG_CHECKING([for deb top build directory])
     if test ":${debdir+set}" != :set ; then
 	case ":${with_deb_topdir:-no}" in
-	    (:no|:yes)	debdir='$(debdistdir)/$(repobranch)' ;;
+	    (:no|:yes)	debdir='$(debdistdir)$(repobranch)' ;;
 	    (*)		debdir="$with_deb_topdir" ;;
 	esac
     fi

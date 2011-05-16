@@ -189,17 +189,17 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    AC_ARG_VAR([MAKEWHATIS], [Makewhatis command. @<:@default=makewhatis,mandb@:>@])
-    _BLD_PATH_PROGS([MAKEWHATIS], [makewhatis mandb],
+    AC_ARG_VAR([MAKEWHATIS], [Makewhatis command. @<:@default=mandb,makewhatis@:>@])
+    _BLD_PATH_PROGS([MAKEWHATIS], [mandb makewhatis],
 		 [], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([MAKEWHATIS], [
 ***
 *** Configure cannot find a suitable 'makewhatis' program.  Installing
-*** manual pages requires the 'makewhatis' program from the 'man'
-*** package.  You can normally get 'man' as part of most populate Linux
-*** distributions and all current versions are acceptable.  The 'man'
-*** package has been available for many years and is available on the
-*** web from the Linux Documentation Project.  Use the following
+*** manual pages requires the 'mandb' or 'makewhatis' program from the
+*** 'man' package.  You can normally get 'man' as part of most populate
+*** Linux distributions and all current versions are acceptable.  The
+*** 'man' package has been available for many years and is available on
+*** the web from the Linux Documentation Project.  Use the following
 *** commands to obtain 'man':
 *** ], [
 *** Debian 5.0:  'apt-get install man-db'
