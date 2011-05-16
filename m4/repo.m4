@@ -378,8 +378,9 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
     AC_SUBST([repobase])dnl
     repobranch=
     if test :"${repo_cv_branch:-no}" != :no ; then
-	repobranch="$repo_cv_repobranch"
+	repobranch="/$repo_cv_repobranch"
     fi
+    repobranch=`echo "$repobranch" | sed -e 's,^//*,/,'`
     AC_SUBST([repobranch])dnl
     reposerv='https'
     if test :"${repo_cv_reposervice:-no}" != :no ; then
