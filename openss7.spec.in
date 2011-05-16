@@ -3082,7 +3082,7 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 ] ; then : # kernel is being installed or upgraded with base present
     if [ -x %{_sbindir}/%{name}-modules ]; then
-        if [ -e /var/run/%{name}-base.post ] then
+        if [ -e /var/run/%{name}-base.post ]; then
             rm -f -- /var/run/%{name}-base.post
         else
             v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
