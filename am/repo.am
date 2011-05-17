@@ -489,7 +489,7 @@ $(PACKAGE).sources.list: Makefile
 	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
 	for branch in $$rlist ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
-		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
 			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
@@ -511,11 +511,9 @@ $(PACKAGE)-local.sources.list: Makefile
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
 		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
 			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
-		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
 			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
-			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
-				$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
 			$(ECHO) 'deb file://$(debdistdir)'$${b:+/$$b} $${d}'/' ; \
 			if test "$$repo" = 'Source' ; then \
 				$(ECHO) '#deb-src file://$(debdistdir)'$${b:+/$$b} $${d}'/' ; \
