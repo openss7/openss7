@@ -536,6 +536,7 @@ AC_DEFUN([_OPENSS7_OPTIONS], [dnl
     _OPENSS7_OPTIONS_PKG_RELEASE
     _OPENSS7_OPTIONS_PKG_PATCHLEVEL
     _OPENSS7_OPTIONS_PKG_DISTDIR
+    _OPENSS7_OPTIONS_PKG_REPODIR
     _OPENSS7_OPTIONS_PKG_TARDIR
     _OPENSS7_OPTIONS_PKG_ARCH
     _OPENSS7_OPTIONS_PKG_INDEP
@@ -750,6 +751,26 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_DISTDIR], [dnl
     AC_SUBST([DISTDIR])dnl
 ])# _OPENSS7_OPTIONS_PKG_DISTDIR
 # =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_PKG_REPODIR
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_PKG_REPODIR], [dnl
+    AC_ARG_WITH([pkg-repodir],
+	[AS_HELP_STRING([--with-pkg-repodir=DIR],
+	    [package repository directory @<:@default=DISTDIR@:>@])],
+	[], [with_pkg_repodir='$(DISTDIR)'])
+    AC_MSG_CHECKING([for pkg repodir])
+    if test ":${REPODIR+set}" != :set ; then
+	case :"${wtih_pkg_repodir:-no}" in
+	    (:no|:yes) REPODIR='$(DISTDIR)' ;;
+	    (*)        REPODIR="$with_pkg_repodir" ;;
+	esac
+    fi
+    AC_MSG_RESULT([$REPODIR])
+    AC_SUBST([REPODIR])dnl
+])# _OPENSS7_OPTIONS_PKG_REPODIR
+# =========================================================================
 
 # =============================================================================
 # _OPENSS7_OPTIONS_PKG_TARDIR

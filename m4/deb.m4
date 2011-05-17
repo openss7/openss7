@@ -197,6 +197,14 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     fi
     AC_MSG_RESULT([$debdir])
     AC_SUBST([debdir])dnl
+    debmaindir='$(debdir)/main'
+    AC_SUBST([debmaindir])dnl
+    debdebgdir='$(debdir)/debug'
+    AC_SUBST([debdebgdir])dnl
+    debdevldir='$(debdir)/devel'
+    AC_SUBST([debdevldir])dnl
+    debsrcsdir='$(debdir)/source'
+    AC_SUBST([debsrcsdir])dnl
     AC_MSG_CHECKING([for deb BUILD directory])
     if test ":${debbuilddir+set}" != :set ; then
 	# debbuilddir needs to be absolute: always build in the top build
@@ -353,16 +361,6 @@ dnl
 	deb_cv_repo_apt=${enable_repo_apt:-no}
     ])
     AM_CONDITIONAL([BUILD_REPO_APT], [test ":$deb_cv_repo_apt" = :yes])
-    aptdir='$(debdir)'
-    AC_SUBST([aptdir])dnl
-    aptmaindir='$(aptdir)/main'
-    AC_SUBST([aptmaindir])dnl
-    aptdebgdir='$(aptdir)/debug'
-    AC_SUBST([aptdebgdir])dnl
-    aptdevldir='$(aptdir)/devel'
-    AC_SUBST([aptdevldir])dnl
-    aptsrcsdir='$(aptdir)/source'
-    AC_SUBST([aptsrcsdir])dnl
 ])# _DEB_DPKG_SETUP_BUILD
 # =============================================================================
 

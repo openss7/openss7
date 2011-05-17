@@ -398,6 +398,14 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     fi
     AC_MSG_RESULT([$topdir])
     AC_SUBST([topdir])dnl
+    topmaindir='$(topdir)/main'
+    AC_SUBST([topmaindir])dnl
+    topdebgdir='$(topdir)/debug'
+    AC_SUBST([topdebgdir])dnl
+    topdevldir='$(topdir)/devel'
+    AC_SUBST([topdevldir])dnl
+    topsrcsdir='$(topdir)/source'
+    AC_SUBST([topsrcsdir])dnl
     # set defaults for the rest
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_TARDIR])
     AC_MSG_CHECKING([for rpm SOURCES directory])
@@ -592,13 +600,13 @@ dnl
     AM_CONDITIONAL([BUILD_REPO_YUM], [test ":$rpm_cv_repo_yum" = :yes])dnl
     repodir='$(topdir)/repodata'
     AC_SUBST([repodir])dnl
-    repomaindir='$(topdir)/main/repodata'
+    repomaindir='$(topmaindir)/repodata'
     AC_SUBST([repomaindir])dnl
-    repodebgdir='$(topdir)/debug/repodata'
+    repodebgdir='$(topdebgdir)/repodata'
     AC_SUBST([repodebgdir])dnl
-    repodevldir='$(topdir)/devel/repodata'
+    repodevldir='$(topdevldir)/repodata'
     AC_SUBST([repodevldir])dnl
-    reposrcsdir='$(topdir)/source/repodata'
+    reposrcsdir='$(topsrcsdir)/repodata'
     AC_SUBST([reposrcsdir])dnl
 
 dnl

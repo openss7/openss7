@@ -109,8 +109,8 @@ debtop_binary_files	= $(debdir)/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEA
 			  $(debdir)/*/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
 			  $(debdir)/*/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb
 
-RELEASE_DIRECTORIES	+= $(aptdir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
-UPDATE_DIRECTORIES	+= $(aptdir)
+RELEASE_DIRECTORIES	+= $(debdir) $(debmaindir) $(debdebgdir) $(debdevldir) $(debsrcsdir)
+UPDATE_DIRECTORIES	+= $(debdir)
 
 ##
 # For the master build package it is sometime necessary to pass extra options down to configured
@@ -544,86 +544,86 @@ if BUILD_REPO_APT
 ## The following builds apt repositories.
 ##
 
-apt_packages		= $(aptdir)/Packages \
-			  $(aptmaindir)/Packages \
-			  $(aptdebgdir)/Packages \
-			  $(aptdevldir)/Packages \
-			  $(aptsrcsdir)/Packages
+apt_packages		= $(debdir)/Packages \
+			  $(debmaindir)/Packages \
+			  $(debdebgdir)/Packages \
+			  $(debdevldir)/Packages \
+			  $(debsrcsdir)/Packages
 
-apt_package_gzips	= $(aptdir)/Packages.gz \
-			  $(aptmaindir)/Packages.gz \
-			  $(aptdebgdir)/Packages.gz \
-			  $(aptdevldir)/Packages.gz \
-			  $(aptsrcsdir)/Packages.gz
+apt_package_gzips	= $(debdir)/Packages.gz \
+			  $(debmaindir)/Packages.gz \
+			  $(debdebgdir)/Packages.gz \
+			  $(debdevldir)/Packages.gz \
+			  $(debsrcsdir)/Packages.gz
 
-apt_package_bzips	= $(aptdir)/Packages.bz2 \
-			  $(aptmaindir)/Packages.bz2 \
-			  $(aptdebgdir)/Packages.bz2 \
-			  $(aptdevldir)/Packages.bz2 \
-			  $(aptsrcsdir)/Packages.bz2
+apt_package_bzips	= $(debdir)/Packages.bz2 \
+			  $(debmaindir)/Packages.bz2 \
+			  $(debdebgdir)/Packages.bz2 \
+			  $(debdevldir)/Packages.bz2 \
+			  $(debsrcsdir)/Packages.bz2
 
-apt_sources		= $(aptdir)/Sources \
-			  $(aptsrcsdir)/Sources
+apt_sources		= $(debdir)/Sources \
+			  $(debsrcsdir)/Sources
 
-apt_source_gzips	= $(aptdir)/Sources.gz \
-			  $(aptsrcsdir)/Sources.gz
+apt_source_gzips	= $(debdir)/Sources.gz \
+			  $(debsrcsdir)/Sources.gz
 
-apt_source_bzips	= $(aptdir)/Sources.bz2 \
-			  $(aptsrcsdir)/Sources.bz2
+apt_source_bzips	= $(debdir)/Sources.bz2 \
+			  $(debsrcsdir)/Sources.bz2
 
-apt_contents		= $(aptdir)/Contents \
-			  $(aptmaindir)/Contents \
-			  $(aptdebgdir)/Contents \
-			  $(aptdevldir)/Contents \
-			  $(aptsrcsdir)/Contents
+apt_contents		= $(debdir)/Contents \
+			  $(debmaindir)/Contents \
+			  $(debdebgdir)/Contents \
+			  $(debdevldir)/Contents \
+			  $(debsrcsdir)/Contents
 
-apt_content_gzips	= $(aptdir)/Contents.gz \
-			  $(aptmaindir)/Contents.gz \
-			  $(aptdebgdir)/Contents.gz \
-			  $(aptdevldir)/Contents.gz \
-			  $(aptsrcsdir)/Contents.gz
+apt_content_gzips	= $(debdir)/Contents.gz \
+			  $(debmaindir)/Contents.gz \
+			  $(debdebgdir)/Contents.gz \
+			  $(debdevldir)/Contents.gz \
+			  $(debsrcsdir)/Contents.gz
 
-apt_content_bzips	= $(aptdir)/Contents.bz2 \
-			  $(aptmaindir)/Contents.bz2 \
-			  $(aptdebgdir)/Contents.bz2 \
-			  $(aptdevldir)/Contents.bz2 \
-			  $(aptsrcsdir)/Contents.bz2
+apt_content_bzips	= $(debdir)/Contents.bz2 \
+			  $(debmaindir)/Contents.bz2 \
+			  $(debdebgdir)/Contents.bz2 \
+			  $(debdevldir)/Contents.bz2 \
+			  $(debsrcsdir)/Contents.bz2
 
-apt_md5sums		= $(aptdir)/md5sum.txt \
-			  $(aptmaindir)/md5sum.txt \
-			  $(aptdebgdir)/md5sum.txt \
-			  $(aptdevldir)/md5sum.txt \
-			  $(aptsrcsdir)/md5sum.txt
+apt_md5sums		= $(debdir)/md5sum.txt \
+			  $(debmaindir)/md5sum.txt \
+			  $(debdebgdir)/md5sum.txt \
+			  $(debdevldir)/md5sum.txt \
+			  $(debsrcsdir)/md5sum.txt
 
-apt_releases		= $(aptdir)/Release \
-			  $(aptmaindir)/Release \
-			  $(aptdebgdir)/Release \
-			  $(aptdevldir)/Release \
-			  $(aptsrcsdir)/Release
+apt_releases		= $(debdir)/Release \
+			  $(debmaindir)/Release \
+			  $(debdebgdir)/Release \
+			  $(debdevldir)/Release \
+			  $(debsrcsdir)/Release
 
-apt_release_gzips	= $(aptdir)/Release.gz \
-			  $(aptmaindir)/Release.gz \
-			  $(aptdebgdir)/Release.gz \
-			  $(aptdevldir)/Release.gz \
-			  $(aptsrcsdir)/Release.gz
+apt_release_gzips	= $(debdir)/Release.gz \
+			  $(debmaindir)/Release.gz \
+			  $(debdebgdir)/Release.gz \
+			  $(debdevldir)/Release.gz \
+			  $(debsrcsdir)/Release.gz
 
-apt_release_bzips	= $(aptdir)/Release.bz2 \
-			  $(aptmaindir)/Release.bz2 \
-			  $(aptdebgdir)/Release.bz2 \
-			  $(aptdevldir)/Release.bz2 \
-			  $(aptsrcsdir)/Release.bz2
+apt_release_bzips	= $(debdir)/Release.bz2 \
+			  $(debmaindir)/Release.bz2 \
+			  $(debdebgdir)/Release.bz2 \
+			  $(debdevldir)/Release.bz2 \
+			  $(debsrcsdir)/Release.bz2
 
-apt_release_gpgs	= $(aptdir)/Release.gpg \
-			  $(aptmaindir)/Release.gpg \
-			  $(aptdebgdir)/Release.gpg \
-			  $(aptdevldir)/Release.gpg \
-			  $(aptsrcsdir)/Release.gpg
+apt_release_gpgs	= $(debdir)/Release.gpg \
+			  $(debmaindir)/Release.gpg \
+			  $(debdebgdir)/Release.gpg \
+			  $(debdevldir)/Release.gpg \
+			  $(debsrcsdir)/Release.gpg
 
-apt_release_keys	= $(aptdir)/Release.key \
-			  $(aptmaindir)/Release.key \
-			  $(aptdebgdir)/Release.key \
-			  $(aptdevldir)/Release.key \
-			  $(aptsrcsdir)/Release.key
+apt_release_keys	= $(debdir)/Release.key \
+			  $(debmaindir)/Release.key \
+			  $(debdebgdir)/Release.key \
+			  $(debdevldir)/Release.key \
+			  $(debsrcsdir)/Release.key
 
 apt_gzips		= $(apt_package_gzips) \
 			  $(apt_source_gzips) \
@@ -658,15 +658,15 @@ apt_keys		= $(apt_release_keys)
 #!
 $(apt_packages):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) packages `dirname $@` | sed 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) packages `dirname $@` | sed 's, $(debdir)/, ,' > $@
 
 $(apt_sources):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) sources `dirname $@` | sed 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) sources `dirname $@` | sed 's, $(debdir)/, ,' > $@
 
 $(apt_contents):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) contents `dirname $@` | sed 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) contents `dirname $@` | sed 's, $(debdir)/, ,' > $@
 
 $(apt_gzips): %.gz : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -678,11 +678,11 @@ $(apt_bzips): %.bz2 : %
 
 $(apt_md5sums):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	find `dirname $@` -type f | egrep -v '(md5sum.txt|Release.gz)' | xargs $(MD5SUM) | sed 's, $(aptdir)/, ,' > $@
+	find `dirname $@` -type f | egrep -v '(md5sum.txt|Release)' | xargs $(MD5SUM) | sed 's, $(debdir)/, ,' > $@
 
 $(apt_releases): $(apt_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(aptdir)/, ,' > $@
+	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(debdir)/, ,' > $@
 
 GPGVERIFYSIGN = \
 	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
@@ -719,8 +719,6 @@ REPO_SIGN		+= repo-sign-apt
 REPO_CLEAN		+= repo-clean-apt
 REPOCLEANFILES		+= $(apt_files) $(apt_signs) $(apt_keys)
 
-MY_PHONY		+= repo-apt repo-clean-apt
-
 RELEASE			+= repo-apt
 RELEASE_SIGN		+= repo-sign-apt
 RELEASE_CLEAN_LOCAL	+= repo-clean-apt
@@ -730,6 +728,163 @@ UPDATE			+= repo-apt
 UPDATE_SIGN		+= repo-sign-apt
 UPDATE_CLEAN_LOCAL	+= repo-apt repo-sign-apt
 UPDATECLEANFILES	+=
+
+release-copy-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files='$(debtop_source_files) $(debtop_binary_files)' ; \
+	for f in $$files ; do \
+		test -f $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		if test ! -f $$f -o \( ":$(FORCE)" = :force -a $$f -nt $$t \) ; then \
+			$(ECHO) "  install -T -C -D -p -- $$f $$t" ; \
+			install -T -C -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+release-remove-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files=`echo ' $(debtop_source_files) $(debtop_binary_files) ' | sed -e 's, $(DISTDIR), $(REPODIR),g;s,^ ,,;s, $$,,'` ; \
+	for f in $$files ; do \
+		test -f $$f || continue ; \
+		$(ECHO) "  rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done
+
+release-update-apt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@repodir=` echo '$(debdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	for branch in $$rlist ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
+			test -d $$dir || continue ; \
+			if find $$dir -name '*.deb' >/dev/null 2>&1 ; then \
+				$(ECHO) "  $(APT_FTPARCHIVE) packages $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Packages" ; \
+				$(APT_FTPARCHIVE) packages $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Packages ; \
+				$(ECHO) "    gzip -c $$dir/Packages > $$dir/Packages.gz" ; \
+				gzip -c $$dir/Packages > $$dir/Packages.gz ; \
+				$(ECHO) "    bzip2 -c $$dir/Packages > $$dir/Packages.bz2" ; \
+				bzip2 -c $$dir/Packages > $$dir/Packages.bz2 ; \
+			else \
+				for ext in '' '.gz' '.bz2' ; then \
+					if test -f $$dir/Packages$$ext ; then \
+						$(ECHO) "  rm -f -- $$dir/Packages$$ext" ; \
+						rm -f -- $$dir/Packages$$ext ; \
+					fi ; \
+				done ; \
+			fi ; \
+			if find $$dir -name '*.dsc' >/dev/null 2>&1 ; then \
+				$(ECHO) "  $(APT_FTPARCHIVE) sources  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Sources" ; \
+				$(APT_FTPARCHIVE) sources  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Sources ; \
+				$(ECHO) "    gzip -c $$dir/Sources > $$dir/Sources.gz" ; \
+				gzip -c $$dir/Sources > $$dir/Sources.gz ; \
+				$(ECHO) "    bzip2 -c $$dir/Sources > $$dir/Sources.bz2" ; \
+				bzip2 -c $$dir/Sources > $$dir/Sources.bz2 ; \
+			else \
+				for ext in '' '.gz' '.bz2' ; then \
+					if test -f $$dir/Sources$$ext ; then \
+						$(ECHO) "  rm -f -- $$dir/Sources$$ext" ; \
+						rm -f -- $$dir/Sources$$ext ; \
+					fi ; \
+				done ; \
+			fi ; \
+			if find $$dir -name '*.deb' >/dev/null 2>&1 ; then \
+				$(ECHO) "  $(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents" ; \
+				$(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents ; \
+				$(ECHO) "    gzip -c $$dir/Contents > $$dir/Contents.gz" ; \
+				gzip -c $$dir/Contents > $$dir/Contents.gz ; \
+				$(ECHO) "    bzip2 -c $$dir/Contents > $$dir/Contents.bz2" ; \
+				bzip2 -c $$dir/Contents > $$dir/Contents.bz2 ; \
+			else \
+				for ext in '' '.gz' '.bz2' ; then \
+					if test -f $$dir/Contents$$ext ; then \
+						$(ECHO) "  rm -f -- $$dir/Contents$$ext" ; \
+						rm -f -- $$dir/Contents$$ext ; \
+					fi ; \
+				done ; \
+			fi ; \
+			if find $$dir -name 'Packages' -o -name 'Sources' -o -name 'Contents' ; then \
+				$(ECHO) "  find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt" ; \
+				find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt ; \
+				$(ECHO) "  $(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release" ; \
+				$(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release ; \
+				$(ECHO) "    gzip -c $$dir/Release > $$dir/Release.gz" ; \
+				gzip -c $$dir/Release > $$dir/Release.gz ; \
+				$(ECHO) "    bzip2 -c $$dir/Release > $$dir/Release.bz2" ; \
+				bzip2 -c $$dir/Release > $$dir/Release.bz2 ; \
+			else \
+				for ext in '' '.gz' '.bz2' ; then \
+					if test -f $$dir/Release$$ext ; then \
+						$(ECHO) "  rm -f -- $$dir/Release$$ext" ; \
+						rm -f -- $$dir/Release$$ext ; \
+					fi ; \
+				done ; \
+			fi ; \
+			if test -f $$dir/Release ; then \
+				if test ! -f $$dir/Release.gpg || $(GPG) --verify -- $$dir/Release.gpg >/dev/null 2>&1 ; then \
+					user="$(GNUPGUSER)"; user="$${user:+ -u }$$user" ; \
+					home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home" ; \
+					pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }" ; \
+					pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+					$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null" ; \
+					$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null ; \
+				else touch $$dir/Release.gpg; fi ; \
+				user="$(GNUPGUSER)"; user="$${user:+ -u }$$user" ; \
+				home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home" ; \
+				$(ECHO) "  $(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/Release.key" ; \
+				$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/Release.key ; \
+			else \
+				if test -f $$dir/Release.gpg ; then \
+					$(ECHO) "  rm -f -- $$dir/Release.gpg" ; \
+					rm -f -- $$dir/Release.gpg ; \
+				fi ; \
+				if test -f $$dir/Release.key ; then \
+					$(ECHO) "  rm -f -- $$dir/Release.key" ; \
+					rm -f -- $$dir/Release.key ; \
+				fi ; \
+			fi ; \
+		done ; \
+	done
+
+MY_PHONY		+= release-copy-apt release-remove-apt release-update-apt
+
+##
+# Copy debs from the distribution directory to the release directory and rebuild
+# the archive metafiles in the release directory.
+##
+release-install-apt: release-copy-apt release-update-apt
+
+##
+# Remove debs from the release directory that are present in the distribution
+# directory and rebuild the archive metafiles in the release directory.
+##
+release-uninstall-apt: release-remove-apt release-update-apt
+
+RELEASE_INSTALL		+= release-install-apt
+RELEASE_UNINSTALL	+= release-uninstall-apt
+
+##
+# Copy update debs from the distribution directory to the release directory and
+# rebuild the archive metafiles in the release directory.
+##
+update-install-apt: release-copy-apt release-update-apt
+
+##
+# Remove update debs from the release directory that are present in the
+# distribution directory and rebuild the repomd metafiles in the release
+# directory.
+##
+update-uninstall-apt: release-remove-apt release-update-apt
+
+UPDATE_INSTALL		+= update-install-apt
+UPDATE_UNINSTALL	+= update-uninstall-apt
 
 ## BUILD_REPO_APT
 endif
