@@ -736,9 +736,9 @@ release-copy-apt:
 	for f in $$files ; do \
 		test -f $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
-		if test ! -f $$f -o \( ":$(FORCE)" = :force -a $$f -nt $$t \) ; then \
-			$(ECHO) "  install -T -C -D -p -- $$f $$t" ; \
-			install -T -C -D -p -- $$f $$t ; \
+		if test ! -f $$t -o \( ":$(FORCE)" = :force -a $$f -nt $$t \) ; then \
+			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
+			install -T -D -p -- $$f $$t ; \
 		fi ; \
 	done
 
@@ -760,42 +760,42 @@ release-update-apt:
 	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
 	for branch in $$rlist ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
-		for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+		for repo in 'Main' 'Debug' 'Devel' 'Source' '' ; do \
 			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
 			test -d $$dir || continue ; \
-			if find $$dir -name '*.deb' >/dev/null 2>&1 ; then \
-				$(ECHO) "  $(APT_FTPARCHIVE) packages $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Packages" ; \
-				$(APT_FTPARCHIVE) packages $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Packages ; \
+			if test -n "`find $$dir -name '*.deb' 2>/dev/null`" ; then \
+				$(ECHO) "  $(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Packages" ; \
+				$(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Packages ; \
 				$(ECHO) "    gzip -c $$dir/Packages > $$dir/Packages.gz" ; \
 				gzip -c $$dir/Packages > $$dir/Packages.gz ; \
 				$(ECHO) "    bzip2 -c $$dir/Packages > $$dir/Packages.bz2" ; \
 				bzip2 -c $$dir/Packages > $$dir/Packages.bz2 ; \
 			else \
-				for ext in '' '.gz' '.bz2' ; then \
+				for ext in '' '.gz' '.bz2' ; do \
 					if test -f $$dir/Packages$$ext ; then \
 						$(ECHO) "  rm -f -- $$dir/Packages$$ext" ; \
 						rm -f -- $$dir/Packages$$ext ; \
 					fi ; \
 				done ; \
 			fi ; \
-			if find $$dir -name '*.dsc' >/dev/null 2>&1 ; then \
-				$(ECHO) "  $(APT_FTPARCHIVE) sources  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Sources" ; \
-				$(APT_FTPARCHIVE) sources  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Sources ; \
+			if test -n "`find $$dir -name '*.dsc' 2>/dev/null`" ; then \
+				$(ECHO) "  $(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Sources" ; \
+				$(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Sources ; \
 				$(ECHO) "    gzip -c $$dir/Sources > $$dir/Sources.gz" ; \
 				gzip -c $$dir/Sources > $$dir/Sources.gz ; \
 				$(ECHO) "    bzip2 -c $$dir/Sources > $$dir/Sources.bz2" ; \
 				bzip2 -c $$dir/Sources > $$dir/Sources.bz2 ; \
 			else \
-				for ext in '' '.gz' '.bz2' ; then \
+				for ext in '' '.gz' '.bz2' ; do \
 					if test -f $$dir/Sources$$ext ; then \
 						$(ECHO) "  rm -f -- $$dir/Sources$$ext" ; \
 						rm -f -- $$dir/Sources$$ext ; \
 					fi ; \
 				done ; \
 			fi ; \
-			if find $$dir -name '*.deb' >/dev/null 2>&1 ; then \
+			if test -n "`find $$dir -name '*.deb' 2>/dev/null`" ; then \
 				$(ECHO) "  $(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents" ; \
 				$(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents ; \
 				$(ECHO) "    gzip -c $$dir/Contents > $$dir/Contents.gz" ; \
@@ -803,14 +803,14 @@ release-update-apt:
 				$(ECHO) "    bzip2 -c $$dir/Contents > $$dir/Contents.bz2" ; \
 				bzip2 -c $$dir/Contents > $$dir/Contents.bz2 ; \
 			else \
-				for ext in '' '.gz' '.bz2' ; then \
+				for ext in '' '.gz' '.bz2' ; do \
 					if test -f $$dir/Contents$$ext ; then \
 						$(ECHO) "  rm -f -- $$dir/Contents$$ext" ; \
 						rm -f -- $$dir/Contents$$ext ; \
 					fi ; \
 				done ; \
 			fi ; \
-			if find $$dir -name 'Packages' -o -name 'Sources' -o -name 'Contents' ; then \
+			if test -n "`find $$dir -name 'Packages' -o -name 'Sources' -o -name 'Contents' 2>/dev/null`" ; then \
 				$(ECHO) "  find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt" ; \
 				find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt ; \
 				$(ECHO) "  $(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release" ; \
@@ -820,7 +820,11 @@ release-update-apt:
 				$(ECHO) "    bzip2 -c $$dir/Release > $$dir/Release.bz2" ; \
 				bzip2 -c $$dir/Release > $$dir/Release.bz2 ; \
 			else \
-				for ext in '' '.gz' '.bz2' ; then \
+				if test -f $$dir/md5sums.txt ; then \
+					$(ECHO) "  rm -f -- $$dir/md5sums.txt" ; \
+					rm -f -- $$dir/md5sums.txt ; \
+				fi ; \
+				for ext in '' '.gz' '.bz2' ; do \
 					if test -f $$dir/Release$$ext ; then \
 						$(ECHO) "  rm -f -- $$dir/Release$$ext" ; \
 						rm -f -- $$dir/Release$$ext ; \
@@ -829,12 +833,12 @@ release-update-apt:
 			fi ; \
 			if test -f $$dir/Release ; then \
 				if test ! -f $$dir/Release.gpg || $(GPG) --verify -- $$dir/Release.gpg >/dev/null 2>&1 ; then \
-					user="$(GNUPGUSER)"; user="$${user:+ -u }$$user" ; \
-					home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home" ; \
-					pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }" ; \
-					pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-					$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null" ; \
-					$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null ; \
+					user="$(GNUPGUSER)"; user="$${user:+ -u $$user}"; \
+					home="$(GNUPGHOME)"; home="$${home:+ --homedir $$home}"; \
+					pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+					pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
+					$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null"; \
+					eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null"; \
 				else touch $$dir/Release.gpg; fi ; \
 				user="$(GNUPGUSER)"; user="$${user:+ -u }$$user" ; \
 				home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home" ; \
@@ -849,6 +853,8 @@ release-update-apt:
 					$(ECHO) "  rm -f -- $$dir/Release.key" ; \
 					rm -f -- $$dir/Release.key ; \
 				fi ; \
+				$(ECHO) "  rmdir -p $$dir" ; \
+				rmdir -p -- $$dir 2>/dev/null || : ; \
 			fi ; \
 		done ; \
 	done

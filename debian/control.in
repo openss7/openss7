@@ -101,12 +101,11 @@ Architecture: all
 Section: base
 Priority: optional
 Provides: @PACKAGE_LCNAME@-base
-@WITH_32BIT_LIBS_FALSE@Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@)
-@WITH_32BIT_LIBS_FALSE@Pre-Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@)
-@WITH_32BIT_LIBS_TRUE@Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@),
+@WITH_32BIT_LIBS_TRUE@Depends:  @PACKAGE_LCNAME@ (>= @VERSION@), @PACKAGE_LCNAME@-lib (>= @VERSION@),
 @WITH_32BIT_LIBS_TRUE@Pre-Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@),
 @WITH_32BIT_LIBS_TRUE@ @PACKAGE_LCNAME@-compat (>= @VERSION@)
-Depends: @PACKAGE_LCNAME@ (>= @VERSION@)
+@WITH_32BIT_LIBS_FALSE@Depends:  @PACKAGE_LCNAME@ (>= @VERSION@), @PACKAGE_LCNAME@-lib (>= @VERSION@)
+@WITH_32BIT_LIBS_FALSE@Pre-Depends: @PACKAGE_LCNAME@-lib (>= @VERSION@)
 Description: init scripts, utility scripts and base documentation.
  The @PACKAGE_LCNAME@-base binary package contains the init scripts, test
  scripts, maintenance scripts and base system configuration
@@ -139,7 +138,7 @@ Architecture: any
 Section: libs
 Priority: optional
 Provides: @PACKAGE_LCNAME@-lib
-Depends: @PACKAGE_LCNAME@-kernel (>= @VERSION@)
+Depends: @PACKAGE_LCNAME@-kernel
 Description: shared object libraries, binary applications and utilities.
  The @PACKAGE_LCNAME@-lib binary package contains the run-time (shared
  object) libraries necessary to run applications programs and
@@ -169,7 +168,7 @@ Architecture: any
 Section: devel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-devel
-Depends: @PACKAGE_LCNAME@-kernel-devel (>= @VERSION@)
+Depends: @PACKAGE_LCNAME@-kernel-devel
 Description: development headers, static libraries, developer documentation.
  The @PACKAGE_LCNAME@-devel binary package contains library archives for
  static compilation, and header files to develop @PACKAGE_TITLE@
@@ -185,7 +184,7 @@ Architecture: any
 Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-debuginfo
-Depends: @PACKAGE_LCNAME@-kernel-debuginfo (>= @VERSION@)
+Depends: @PACKAGE_LCNAME@-kernel-debuginfo
 Description: user library and program debugging information.
  The @PACKAGE_LCNAME@-debuginfo binary package contains debugging symbols
  for libraries and applications programs.  This package provides
@@ -199,7 +198,7 @@ Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-debugsource
 Depends: @PACKAGE_LCNAME@-debuginfo (>= @VERSION@),
- @PACKAGE_LCNAME@-kernel-debugsource (>= @VERSION@)
+ @PACKAGE_LCNAME@-kernel-debugsource
 Description: user library and program debugging source.
  The @PACKAGE_LCNAME@-debugsource binary package contains source code for
  debugging libraries and applications programs.  This package
