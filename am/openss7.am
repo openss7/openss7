@@ -189,10 +189,14 @@ RELEASE			=
 RELEASE_SIGN		=
 RELEASE_LINKS		=
 RELEASE_DIRECTORIES	=
+RELEASE_INSTALL		=
+RELEASE_UNINSTALL	=
 
 UPDATE			=
 UPDATE_SIGN		=
 UPDATE_DIRECTORIES	=
+UPDATE_INSTALL		=
+UPDATE_UNINSTALL	=
 
 REPO			=
 REPO_SIGN		=
@@ -1002,6 +1006,28 @@ release-clean-local:
 MY_REVERSIVE_TARGETS	+= release-clean-reversive
 MY_PHONY		+= release-clean-ma release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
 
+#! release-install:
+#! 	Installs release rpms or debs into the release directory
+#! 	@REPODIR@ and updates any required repository
+#! 	metafiles.  It is intended on being used with REPODIR specified on the
+#! 	command line or during configure.  The directory defaults to the
+#! 	distribution directory.
+#!
+release-install: $(RELEASE_INSTALL)
+
+MY_PHONY		+= release-install $(RELEASE_INSTALL)
+
+#! release-uninstall:
+#! 	Removes release rpms or debs from the release directory
+#! 	@REPODIR@ and updates any required repository
+#! 	metafiles.  It is intended on being used with REPODIR specified on the
+#! 	command line or during configure.  The directory defaults to the
+#! 	distribution directory.
+#!
+release-uninstall: $(RELEASE_UNINSTALL)
+
+MY_PHONY		+= release-uninstall $(RELEASE_UNINSTALL)
+
 $(UPDATE_DIRECTORIES)::
 	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
 
@@ -1083,6 +1109,30 @@ update-clean-local:
 
 MY_REVERSIVE_TARGETS 	+= update-clean-reversive
 MY_PHONY		+= update-clean-ma update-clean-local update-clean $(UPDATE_CLEAN_LOCAL)
+
+#! update-install:
+#! 	Installs updated rpms or debs into the release directory
+#! 	@REPODIR@ and updates any required repository
+#! 	metafiles.  It is intended on being used with REPODIR specified on the
+#! 	command line or during configure.  The directory defaults to the
+#! 	distribution directory.  This differs from the release-install target in
+#! 	that it only affects updated rpms or debs.
+#!
+update-install: $(UPDATE_INSTALL)
+
+MY_PHONY		+= update-install $(UPDATE_INSTALL)
+
+#! update-uninstall:
+#! 	Removes updated rpms or debs from the release directory
+#! 	@REPODIR@ and updates any required repository
+#! 	metafiles.  It is intended on being used with REPODIR specified on the
+#! 	command line or during configure.  The directory defaults to the
+#! 	distribution directory.  This differs from the release-uninstall target
+#! 	in that it only affects updated rpms or debs.
+#!
+update-uninstall: $(UPDATE_UNINSTALL)
+
+MY_PHONY		+= update-uninstall $(UPDATE_UNINSTALL)
 
 ##
 ## Some logging targets for the head makefile targets.

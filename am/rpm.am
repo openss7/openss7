@@ -1345,6 +1345,87 @@ UPDATE_SIGN		+= repo-sign-yum
 UPDATE_CLEAN_LOCAL	+= repo-clean-yum
 UPDATECLEANFILES	+=
 
+release-copy-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files='$(rpm_source_files) $(rpm_binary_files)' ; \
+	for f in $$files ; do \
+		test -f $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		if test ! -f $$f -o \( ":$(FORCE)" = :force -a $$f -nt $$t \) ; then \
+			$(ECHO) "  install -T -C -D -p -- $$f $$t" ; \
+			install -T -C -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+release-remove-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files=`echo ' $(rpm_source_files) $(rpm_binary_files) ' | sed -e 's, $(DISTDIR), $(REPODIR),g;s,^ ,,;s, $$,,'` ; \
+	for f in $$files ; do \
+		test -f $$f || continue ; \
+		$(ECHO) "  rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done
+
+release-update-yum:
+
+MY_PHONY		+= release-copy-yum release-remove-yum release-update-yum
+
+##
+# Copy rpms from the distribution directory to the release directory and
+# rebuild the repomd metafiles in the release directory.
+##
+release-install-yum: release-copy-yum release-update-yum
+
+##
+# Remove rpms from the release directory that are present in the distribution
+# directory and rebuild the repomd metafiles in the release directory.
+##
+release-uninstall-yum: release-remove-yum release-update-yum
+
+RELEASE_INSTALL		+= release-install-yum
+RELEASE_UNINSTALL	+= release-uninstall-yum
+
+##
+# Copy update rpms from the distribution directory to the release directory and
+# rebuild the repomd metafiles in the release directory.
+##
+update-install-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@\
+	if test '$(DISTDIR)' != '$(REPODIR)' ; then \
+		files='$(rpm_source_files) $(rpm_binary_files)' ; \
+		for f in $$files ; do \
+			test -f $$f || continue ; \
+			t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+			if test ! -f $$f -o \( ":$(FORCE)" = :force -a $$f -nt $$t \) ; then \
+				$(ECHO) "  install -T -C -D -p -- $$f $$t" ; \
+				install -T -C -D -p -- $$f $$t ; \
+			fi ; \
+		done ; \
+	fi
+
+##
+# Remove update rpms from the release directory that are present in the
+# distribution directory and rebuild the repomd metafiles in the release
+# directory.
+##
+update-uninstall-yum:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@\
+	if test '$(DISTDIR)' != '$(REPODIR)' ; then \
+		files=`echo ' $(rpm_source_files) $(rpm_binary_files) ' | sed -e 's, $(DISTDIR), $(REPODIR),g;s,^ ,,;s, $$,,'` ; \
+		for f in $$files ; do \
+			test -f $$f || continue ; \
+			$(ECHO) "  rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		done ; \
+	fi
+
+UPDATE_INSTALL		+= update-install-yum
+UPDATE_UNINSTALL	+= update-uninstall-yum
+
 ## BUILD_REPO_YUM
 endif
 
@@ -1460,6 +1541,84 @@ UPDATE_SIGN		+= repo-sign-yast
 UPDATE_CLEAN_LOCAL	+= repo-yast repo-sign-yast
 UPDATECLEANFILES	+=
 
+##
+# Copy rpms from the distribution directory to the release directory (if
+# required) and rebuild the yast metafiles in the release directory.
+##
+release-install-yast:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@\
+	if test '$(DISTDIR)' != '$(REPODIR)' ; then \
+		files='$(rpm_source_files) $(rpm_binary_files)' ; \
+		for f in $$files ; do \
+			test -f $$f || continue ; \
+			t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+			if test ! -f $$f -o \( ":$(FORCE)" = :force -a $$f -nt $$t \) ; then \
+				$(ECHO) "  install -T -C -D -p -- $$f $$t" ; \
+				install -T -C -D -p -- $$f $$t ; \
+			fi ; \
+		done ; \
+	fi
+
+##
+# Remove rpms from the release directory that are present in the distribution
+# directory (if required) and rebuild the yast metafiles in the release
+# directory.
+##
+release-uninstall-yast:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@\
+	if test '$(DISTDIR)' != '$(REPODIR)' ; then \
+		files=`echo ' $(rpm_source_files) $(rpm_binary_files) ' | sed -e 's, $(DISTDIR), $(REPODIR),g;s,^ ,,;s, $$,,'` ; \
+		for f in $$files ; do \
+			test -f $$f || continue ; \
+			$(ECHO) "  rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		done ; \
+	fi
+
+RELEASE_INSTALL		+= release-install-yast
+RELEASE_UNINSTALL	+= release-uninstall-yast
+
+##
+# Copy update rpms from the distribution directory to the release directory (if
+# required) and rebuild the yast metafiles in the release directory.
+##
+update-install-yast:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@\
+	if test '$(DISTDIR)' != '$(REPODIR)' ; then \
+		files='$(rpm_source_files) $(rpm_binary_files)' ; \
+		for f in $$files ; do \
+			test -f $$f || continue ; \
+			t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+			if test ! -f $$f -o \( ":$(FORCE)" = :force -a $$f -nt $$t \) ; then \
+				$(ECHO) "  install -T -C -D -p -- $$f $$t" ; \
+				install -T -C -D -p -- $$f $$t ; \
+			fi ; \
+		done ; \
+	fi
+
+##
+# Remove update rpms from the release directory that are present in the
+# distribution directory (if required) and rebuild the yast metafiles in the
+# release directory.
+##
+update-uninstall-yast:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@\
+	if test '$(DISTDIR)' != '$(REPODIR)' ; then \
+		files=`echo ' $(rpm_source_files) $(rpm_binary_files) ' | sed -e 's, $(DISTDIR), $(REPODIR),g;s,^ ,,;s, $$,,'` ; \
+		for f in $$files ; do \
+			test -f $$f || continue ; \
+			$(ECHO) "  rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		done ; \
+	fi
+
+UPDATE_INSTALL		+= update-install-yast
+UPDATE_UNINSTALL	+= update-uninstall-yast
+
 ## BUILD_REPO_YAST
 endif
 
@@ -1516,6 +1675,36 @@ UPDATE			+= repo-ris
 UPDATE_SIGN		+= repo-sign-ris
 UPDATE_CLEAN_LOCAL	+= repo-clean-ris
 UPDATECLEANFILES	+= 
+
+##
+# Rebuild the repository index service files in the release directory.
+##
+release-install-ris:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+##
+# Rebuild the repository index service files in the release directory.
+##
+release-uninstall-ris:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+RELEASE_INSTALL		+= release-install-ris
+RELEASE_UNINSTALL	+= release-uninstall-ris
+
+##
+# Rebuild the repository index service files in the release directory.
+##
+update-install-ris:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+##
+# Rebuild the repository index service files in the release directory.
+##
+update-uninstall-ris:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+UPDATE_INSTALL		+= update-install-ris
+UPDATE_UNINSTALL	+= update-uninstall-ris
 
 ## BUILD_RPMS
 endif
