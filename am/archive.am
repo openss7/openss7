@@ -534,10 +534,12 @@ release-remove-tar:
 
 release-update-tar:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	test -d $$tardir || exit 0 ; \
 	found_one=no ; \
-	find $$tardir -follow -maxdepth 1 -type f | LANG= sort | \
-	while read f ; do \
+	files="`( find $$tardir -follow -maxdepth 1 -type f | LANG= sort ) 2>/dev/null`" ; \
+	for f in $$files ; do \
 		case "$$f" in \
 			(*.asc)	\
 				found_one=yes ; \
@@ -551,14 +553,15 @@ release-update-tar:
 		for f in OPENSS7-GPG-KEY ARCHIVE.gz INDEX.gz ls-lR.gz MD5SUMS SHA1SUMS MD5SUMS.meta SHA1SUMS.meta; do \
 			if test -f $$tardir/$$f; then \
 				$(ECHO) "rm -f -- $$tardir/$$f" ; \
-				rm -f -- $$tardir/$$f ; } ; \
+				rm -f -- $$tardir/$$f ; \
 			fi ; \
 		done ; \
+		$(ECHO) "rmdir -p -- $$tardir" ; \
+		rmdir -p -- $$tardir 2>/dev/null || : ; \
 		exit 0 ; \
 	fi ; \
 	found_one=no ; \
-	find $$tardir -follow -maxdepth 1 -type f | LANG= sort | \
-	while read f ; do \
+	for f in $$files ; do \
 		case "$$f" in \
 			(*.asc) \
 				a=`echo "$$f" | sed -e 's,\.asc$$,,'` ; \
