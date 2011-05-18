@@ -143,7 +143,12 @@ AC_DEFUN([_DEB_DPKG_SETUP_HELPER], [dnl
     if test ":${DH_COMPAT+set}" != :set ; then
 	DH_COMPAT="${deb_cv_dh_compat:-5}"
     fi
-    AC_SUBST([DH_COMPAT])
+    if test ":${DH_COMPAT:-5}" != :5 ; then
+	PACKAGE_RPMOPTIONS="DH_COMPAT=\"$DH_COMPAT\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
+	PACKAGE_DEBOPTIONS="DH_COMPAT=\"$DH_COMPAT\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
+	ac_configure_args="DH_COMPAT=\"$DH_COMPAT\"${ac_configure_args:+ $ac_configure_args}"
+    fi
+    AC_SUBST([DH_COMPAT])dnl
     AC_ARG_WITH([dh-verbose],
 	[AS_HELP_STRING([--with-dh-verbose=LEVEL],
 	    [debhelper verbose level @<:@default=0@:>@])],
@@ -160,7 +165,12 @@ AC_DEFUN([_DEB_DPKG_SETUP_HELPER], [dnl
     if test ":${DH_VERBOSE+set}" != :set ; then
 	DH_VERBOSE="${deb_cv_dh_verbose:-0}"
     fi
-    AC_SUBST([DH_VERBOSE])
+    if test ":${DH_VERBOSE:-0}" != :0 ; then
+	PACKAGE_RPMOPTIONS="DH_VERBOSE=\"$DH_VERBOSE\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
+	PACKAGE_DEBOPTIONS="DH_VERBOSE=\"$DH_VERBOSE\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
+	ac_configure_args="DH_VERBOSE=\"$DH_VERBOSE\"${ac_configure_args:+ $ac_configure_args}"
+    fi
+    AC_SUBST([DH_VERBOSE])dnl
 
 ])# _DEB_DPKG_SETUP_HELPER
 # =============================================================================
