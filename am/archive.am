@@ -141,7 +141,7 @@ $(distdir).tar.xz:: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
 ## WITH_XZ
 endif
 
-archive_signs		+= $(tardir)/OPENSS7-GPG-KEY
+archive_keys		= $(tardir)/OPENSS7-GPG-KEY
 
 ##
 # creates the package directory
@@ -198,8 +198,7 @@ release-archives: $(archive_files)
 # generate a detached signature.  Redirect output to avoid gpg problems with existing files.  We
 # pipe in an environment variable for automated builds.
 ##
-$(tardir)/$(PACKAGE)-$(VERSION).tar.gz.asc:: \
-$(tardir)/$(PACKAGE)-$(VERSION).tar.gz
+$(archive_signs):: %.asc : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
@@ -210,48 +209,12 @@ $(tardir)/$(PACKAGE)-$(VERSION).tar.gz
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
 	else touch "$@"; fi
 
-$(tardir)/$(PACKAGE)-$(VERSION).tar.bz2.asc:: \
-$(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) "$$pipe" |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-	else touch "$@"; fi
-
-$(tardir)/$(PACKAGE)-$(VERSION).tar.lzma.asc:: \
-$(tardir)/$(PACKAGE)-$(VERSION).tar.lzma
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) "$$pipe" |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-	else touch "$@"; fi
-
-$(tardir)/$(PACKAGE)-$(VERSION).tar.xz.asc:: \
-$(tardir)/$(PACKAGE)-$(VERSION).tar.xz
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
-		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) "$$pipe" |}"; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-	else touch "$@"; fi
-
-$(tardir)/OPENSS7-GPG-KEY:
+$(archive_keys):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@"; \
-	$(GPG) -a$$user$$home --export $(GNUPGUSER) >> $@
+	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
+	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
 
 #! release-sign-archives:
 #!     This target is like `release-archives', except that it also signs the
@@ -268,7 +231,7 @@ $(tardir)/OPENSS7-GPG-KEY:
 #!     These files will be moved to the package distribution directory
 #!     @tardir@ with the plaintext archives.
 #!
-release-sign-archives: $(archive_signs)
+release-sign-archives: $(archive_signs) $(archive_keys)
 
 RELEASE			+= all-release-archives
 RELEASE_SIGN		+= all-release-sign-archives
@@ -294,6 +257,7 @@ RELEASE_CLEAN_LOCAL	+= release-clean-archives
 RELEASECLEANFILES	+= $(DIST_ARCHIVES) \
 			   $(archive_files) \
 			   $(archive_signs) \
+			   $(archive_keys) \
 			   $(distdir).tar.lzma \
 			   $(distdir).tar.xz
 
@@ -402,97 +366,108 @@ tar_files		= $(tardir)/MD5SUMS \
 #! tarball install source repository meta data files.
 #!
 $(tardir)/MD5SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
-	if ( $(MD5SUM) --version >/dev/null 2>&1 ); then \
-		( cd $(tardir); find . -maxdepth 1 -type f | LANG= sort | \
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if ( $(MD5SUM) --version >/dev/null 2>&1 ); then \
+		$(ECHO) "(" >&2 ; \
+		( cd `dirname $@`; find . -maxdepth 1 -type f | LANG= sort | \
 		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 		  sed 's,^\./,,' | while read f; do \
 		  	case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
+			$(ECHO) "  $(MD5SUM) $$f ; " >&2 ; \
 		  	$(MD5SUM) $$f; \
-		  done ) > $@; \
-	else touch $@; fi
+		  done ) >$@; \
+		$(ECHO) ") >$@" >&2 ; \
+	else $(ECHO) "touch $@"; touch $@; fi
 
 $(tardir)/MD5SUMS.meta: $(tardir)/MD5SUMS
-	if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
-		( cd $(tardir); $(MD5SUM) MD5SUMS ) > $@; \
-	else touch $@; fi
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
+		( cd `dirname $@`; $(ECHO) "$(MD5SUM) MD5SUMS >$@"; $(MD5SUM) MD5SUMS >$@ ) ; \
+	else $(ECHO) "touch $@"; touch $@; fi
 
 $(tardir)/SHA1SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
-	if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
-		( cd $(tardir); find . -maxdepth 1 -type f | LANG= sort | \
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
+		$(ECHO) "(" >&2 ; \
+		( cd `dirname $@`; find . -maxdepth 1 -type f | LANG= sort | \
 		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 		  sed 's,^\./,,' | while read f; do \
 		  	case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
+			$(ECHO) "  $(SHA1SUM) $$f ; " >&2 ; \
 			$(SHA1SUM) $$f; \
-		  done ) > $@; \
-	else touch $@; fi
+		  done ) >$@; \
+		$(ECHO) ") >$@" >&2 ; \
+	else $(ECHO) "touch $@"; touch $@; fi
 
 $(tardir)/SHA1SUMS.meta: $(tardir)/SHA1SUMS
-	if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
-		( cd $(tardir); $(SHA1SUM) SHA1SUMS ) > $@; \
-	else touch $@; fi
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
+		( cd `dirname $@`; $(ECHO) "$(SHA1SUM) SHA1SUMS >$@"; $(SHA1SUM) SHA1SUMS >$@ ) ; \
+	else $(ECHO) "touch $@"; touch $@; fi
 
 
 $(tardir)/ls-lR.gz:
-	@$(ECHO) "(cd $(tardir); ls -lR | gzip -c > $@)"; \
-	( cd $(tardir); ls -lR | gzip -c > $@)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@( cd `dirname $@`; $(ECHO) "ls -lR | gzip -c >$@"; ls -lR | gzip -c >$@ )
 
 $(tardir)/INDEX.gz:
-	@$(ECHO) "(cd $(tardir); ls -A1 | gzip -c > $@)"; \
-	( cd $(tardir); ls -A1 | gzip -c > $@)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@( cd `dirname $@`; $(ECHO) "ls -A1 | gzip -c >$@"; ls -A1 | gzip -c >$@ )
 
 $(tardir)/ARCHIVE.gz:
-	@$(ECHO) "cat /dev/null > $@" ; \
-	cat /dev/null > $@; \
-	find $(tardir) -follow -maxdepth 1 -type f | LANG= sort | sed 's,^$(tardir)/,,' | while read f ; do \
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(ECHO) "(" >&2 ; \
+	@find $(tardir) -follow -maxdepth 1 -type f | LANG= sort | sed 's,^$(tardir)/,,' | while read f ; do \
 		case "$$f" in \
 			(*.tar) \
-				$(ECHO) "$(AMTAR) tvvf $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				$(AMTAR) tvvf $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  $(AMTAR) tvvf $(tardir)/$$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				$(AMTAR) tvvf $(tardir)/$$f | sed "s,^,$$f:=," || : \
 				;; \
 			(*.tgz|*.tar.gz|*.tar.[zZ]) \
-				$(ECHO) "gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 				;; \
 			(*.tbz2|*.tar.bz2) \
-				$(ECHO) "bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 				;; \
 			(*.tlzma|*.tar.lzma) \
-				$(ECHO) "lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 				;; \
 			(*.txz|*.tar.xz) \
-				$(ECHO) "xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 				;; \
 			(*.t[zZ]|*.tar.[zZ]) \
-				$(ECHO) "uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 				;; \
 			(*.rpm) \
-				$(ECHO) "$(RPM) -qvlp $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				$(RPM) -qvlp $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  $(RPM) -qvlp $(tardir)/$$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				$(RPM) -qvlp $(tardir)/$$f | sed "s,^,$$f:=," || : \
 				;; \
 			(*.deb|*.udeb|*.ddeb) \
-				$(ECHO) "$(DPKG) --contents $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				$(DPKG) --contents $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  $(DPKG) --contents $(tardir)/$$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				$(DPKG) --contents $(tardir)/$$f | sed "s,^,$$f:=," || : \
 				;; \
 			(*.cpi|*.cpio) \
-				$(ECHO) "cpio -itv < $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				cpio -itv < $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  cpio -itv < $(tardir)/$$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				cpio -itv < $(tardir)/$$f | sed "s,^,$$f:=," || : \
 				;; \
 			(*.shar.gz) \
-				$(ECHO) "gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				gunzip -c $(tardir)/$$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed "s,^,$$f:=," || : \
 				;; \
 			(*.zip) \
-				$(ECHO) "zipinfo $(tardir)/$$f | sed \"s,^,$$f:=,\" | tr '=' '\t' | gzip -c >> $@" ; \
-				zipinfo $(tardir)/$$f | sed "s,^,$$f:=," | tr '=' '\t' | gzip -c >> $@ || : \
+				$(ECHO) "  zipinfo $(tardir)/$$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				zipinfo $(tardir)/$$f | sed "s,^,$$f:=," || : \
 				;; \
 			(*) \
 				;; \
 		esac; \
-	done
+	done | tr '=' '\t' | gzip -c >$@ ; \
+	$(ECHO) ") | tr '=' '\t' | gzip -c >$@" >&2
 
 #! repo-tar:
 #!     This target is also invoked by the `repo' and `release' targets.  It
@@ -523,8 +498,6 @@ REPO_SIGN		+= repo-sign-tar
 REPO_CLEAN		+= repo-clean-tar
 REPOCLEANFILES		+= $(tar_files)
 
-MY_PHONY		+= repo-tar repo-sign-tar repo-clean-tar
-
 RELEASE			+= repo-tar
 RELEASE_SIGN		+= repo-sign-tar
 RELEASE_CLEAN_LOCAL	+= repo-clean-tar
@@ -534,6 +507,208 @@ UPDATE			+= repo-tar
 UPDATE_SIGN		+= repo-sign-tar
 UPDATE_CLEAN_LOCAL	+= repo-tar repo-sign-tar
 UPDATECLEANFILES	+=
+
+release-copy-tar:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files='$(archive_files) $(archive_signs) $(archive_keys)' ; \
+	for f in $$files ; do \
+		test -f $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		if test ! -f $$t -o \( :$(FORCE) = :force -a $$t -nt $$f \) ; then \
+			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
+			install -T -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+release-remove-tar:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files=`echo ' $(archive_files) $(archive_signs) $(archive_keys)' | sed -e 's, $(DISTDIR), $(REPODIR),g;s,^ ,,;s, $$,,'` ; \
+	for f in $$files ; do \
+		test -f $$f || continue ; \
+		$(ECHO) "  rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done
+
+
+release-update-tar:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	found_one=no ; \
+	find $$tardir -follow -maxdepth 1 -type f | LANG= sort | \
+	while read f ; do \
+		case "$$f" in \
+			(*.asc)	\
+				found_one=yes ; \
+				;; \
+			(*.tar|*.tgz|*.tar.gz|*.tar.[zZ]|*.tbz2|*.tar.bz2|*.tlzma|*.tar.lzma|*.txz|*.tar.xz|*.t[zZ]|*.tar.[zZ]|*.rpm|*.deb|*.udeb|*.ddeb|*.cpi|*.cpio|*.shar.gz|*.zip) \
+				found_one=yes ; \
+				;; \
+		esac ; \
+	done ; \
+	if test "$$found_one" = no ; then \
+		for f in OPENSS7-GPG-KEY ARCHIVE.gz INDEX.gz ls-lR.gz MD5SUMS SHA1SUMS MD5SUMS.meta SHA1SUMS.meta; do \
+			if test -f $$tardir/$$f; then \
+				$(ECHO) "rm -f -- $$tardir/$$f" ; \
+				rm -f -- $$tardir/$$f ; } ; \
+			fi ; \
+		done ; \
+		exit 0 ; \
+	fi ; \
+	found_one=no ; \
+	find $$tardir -follow -maxdepth 1 -type f | LANG= sort | \
+	while read f ; do \
+		case "$$f" in \
+			(*.asc) \
+				a=`echo "$$f" | sed -e 's,\.asc$$,,'` ; \
+				if test -f $$a ; then \
+					if ! $(GPG) --verify $$f >/dev/null 2>&1; then \
+						user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+						home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+						pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+						pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) "$$pipe" |}"; \
+						$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$a >$$f 2>/dev/null"; \
+						eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$a >$$f 2>/dev/null"; \
+					fi ; \
+				else \
+					$(ECHO) "rm -f -- $$f" ; \
+					rm -f -- $$f ; \
+				fi ; \
+				found_one=yes ; \
+				;; \
+			(*.tar|*.tgz|*.tar.gz|*.tar.[zZ]|*.tbz2|*.tar.bz2|*.tlzma|*.tar.lzma|*.txz|*.tar.xz|*.t[zZ]|*.tar.[zZ]|*.rpm|*.deb|*.udeb|*.ddeb|*.cpi|*.cpio|*.shar.gz|*.zip) \
+				a="$$f.asc" ; \
+				if test ! -f $$a || ! $(GPG) --verify $$a >/dev/null 2>&1; then \
+					user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+					home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+					pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+					pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) "$$pipe" |}"; \
+					$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+					eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+				fi ; \
+				found_one=yes ; \
+				;; \
+		esac ; \
+	done ; \
+	if test "$$found_one" = yes ; then \
+		if test ! -f $$tardir/OPENSS7-GPG-KEY ; then \
+			user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+			home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+			$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$tardir/OPENSS7-GPG-KEY"; \
+			$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$tardir/OPENSS7-GPG-KEY ; \
+		fi ; \
+	else \
+		$(ECHO) "rm -f -- $$tardir/OPENSS7-GPG-KEY" ; \
+		rm -f -- $$tardir/OPENSS7-GPG-KEY ; \
+	fi ; \
+	( \
+		cd $$tardir; \
+		$(ECHO) "(" ; \
+		find . -follow -maxdepth 1 -type f | LANG= sort | sed 's,^\./,,' | \
+		while read f ; do \
+			case "$$f" in \
+				(*.tar) \
+					$(ECHO) "  $(AMTAR) tvvf $$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					$(AMTAR) tvvf $$f | sed "s,^,$$f:=," || : \
+					;; \
+				(*.tgz|*.tar.gz|*.tar.[zZ]) \
+					$(ECHO) "  gzip -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					gzip -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+					;; \
+				(*.tbz2|*.tar.bz2) \
+					$(ECHO) "  bzip2 -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					bzip2 -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+					;; \
+				(*.tlzma|*.tar.lzma) \
+					$(ECHO) "  lzma -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					lzma -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+					;; \
+				(*.txz|*.tar.xz) \
+					$(ECHO) "  xz -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					xz -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+					;; \
+				(*.t[zZ]|*.tar.[zZ]) \
+					$(ECHO) "  uncompress -c $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					uncompress -c $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+					;; \
+				(*.rpm) \
+					$(ECHO) "  $(RPM) -qvlp $$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					$(RPM) -qvlp $$f | sed "s,^,$$f:=," || : \
+					;; \
+				(*.deb|*.udeb|*.ddeb) \
+					$(ECHO) "  $(DPKG) --contents $$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					$(DPKG) --contents $$f | sed "s,^,$$f:=," || : \
+					;; \
+				(*.cpi|*.cpio) \
+					$(ECHO) "  cpio -itv < $$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					cpio -itv < $$f | sed "s,^,$$f:=," || : \
+					;; \
+				(*.shar.gz) \
+					$(ECHO) "  gunzip -c $$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					gunzip -c $$f | sed '/^[^#]/,$$d;1,/---/d;1,/contains/d;s/^#//;/^[[:space:]]*$$/d' | sed "s,^,$$f:=," || : \
+					;; \
+				(*.zip) \
+					$(ECHO) "  zipinfo $$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					zipinfo $$f | sed "s,^,$$f:=," || : \
+					;; \
+				(*) \
+					;; \
+			esac; \
+		done | tr '=' '\t' | gzip -c >ARCHIVE.gz ; \
+		$(ECHO) ") | tr '=' '\t' | gzip -c >ARCHIVE.gz" ; \
+		ls -A1 | gzip -c >INDEX.gz ; \
+		ls -lR | gzip -c >ls-lR.gz ; \
+		if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
+			$(ECHO) "(" ; \
+			find . -maxdepth 1 -type f | LANG= sort | \
+			egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
+			sed 's,^\./,,' | while read f; do \
+				case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
+				$(ECHO) "  $(SHA1SUM) $$f ;" >&2 ; \
+				$(SHA1SUM) $$f; \
+			done >SHA1SUMS ; \
+			$(ECHO) ") >SHA1SUMS" ; \
+			$(ECHO) "$(SHA1SUM) SHA1SUMS >SHA1SUMS.meta" ; \
+			$(SHA1SUM) SHA1SUMS >SHA1SUMS.meta ; \
+		fi ; \
+		if ( $(MD5SUM) --version >/dev/null 2>&1 ); then \
+			$(ECHO) "(" ; \
+			find . -maxdepth 1 -type f | LANG= sort | \
+			egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
+			sed 's,^\./,,' | while read f; do \
+				case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
+				$(ECHO) "  $(MD5SUM) $$f ;" >&2 ; \
+				$(MD5SUM) $$f; \
+			done >MD5SUMS ; \
+			$(ECHO) ") >MD5SUMS" ; \
+			$(ECHO) "$(MD5SUM) MD5SUMS >MD5SUMS.meta" ; \
+			$(MD5SUM) MD5SUMS >MD5SUMS.meta ; \
+		fi ; \
+	)
+
+
+MY_PHONY		+= release-copy-tar release-remove-tar release-update-tar
+
+release-install-tar: release-copy-tar release-update-tar
+
+release-uninstall-tar: release-remove-tar release-update-tar
+
+RELEASE_INSTALL		+= release-install-tar
+RELEASE_UNINSTALL	+= release-uninstall-tar
+
+update-copy-tar:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+update-remove-tar:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+update-install-tar: update-copy-tar release-update-tar
+
+update-uninstall-tar: update-remove-tar release-update-tar
+
+UPDATE_INSTALL		+= update-install-tar
+UPDATE_UNINSTALL	+= update-uninstall-tar
 
 endif
 ## BUILD_REPO_TAR
