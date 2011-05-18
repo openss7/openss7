@@ -119,7 +119,50 @@ dnl _DEB_DPKG_SETUP_INDEP
     _DEB_DPKG_SETUP_TOPDIR
     _DEB_DPKG_SETUP_OPTIONS
     _DEB_DPKG_SETUP_BUILD
+    _DEB_DPKG_SETUP_HELPER
 ])# _DEB_DPKG_SETUP
+# =============================================================================
+
+# =============================================================================
+# _DEB_DPKG_SETUP_HELPER
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DEB_DPKG_SETUP_HELPER], [dnl
+    AC_ARG_WITH([dh-compat],
+	[AS_HELP_STRING([--with-dh-compat=LEVEL],
+	    [debhelper compatability level @<:@default=5@:>@])],
+	[], [with_dh_compat=5])
+    AC_CACHE_CHECK([for deb helper compatability], [deb_cv_dh_compat], [dnl
+	if test ":${DH_COMPAT+set}" != :set ; then
+	    case :"${with_dh_compat:-no}" in
+		(:no|:yes) DH_COMPAT=5 ;;
+		(*)        DH_COMPAT="$with_dh_compat" ;;
+	    esac
+	fi
+	deb_cv_dh_compat="$DH_COMPAT"
+    ])
+    if test ":${DH_COMPAT+set}" != :set ; then
+	DH_COMPAT="${deb_cv_dh_compat:-5}"
+    fi
+    AC_SUBST([DH_COMPAT])
+    AC_ARG_WITH([dh-verbose],
+	[AS_HELP_STRING([--with-dh-verbose=LEVEL],
+	    [debhelper verbose level @<:@default=0@:>@])],
+	[], [with_dh_verbose=0])
+    AC_CACHE_CHECK([for deb helper verbosity], [deb_cv_dh_verbose], [dnl
+	if test ":${DH_VERBOSE+set}" != :set ; then
+	    case :"${with_dh_verbose:-no}" in
+		(:no|:yes) DH_VERBOSE=0 ;;
+		(*)        DH_VERBOSE="$with_dh_verbose" ;;
+	    esac
+	fi
+	deb_cv_dh_verbose="$DH_VERBOSE"
+    ])
+    if test ":${DH_VERBOSE+set}" != :set ; then
+	DH_VERBOSE="${deb_cv_dh_verbose:-0}"
+    fi
+    AC_SUBST([DH_VERBOSE])
+
+])# _DEB_DPKG_SETUP_HELPER
 # =============================================================================
 
 # =============================================================================

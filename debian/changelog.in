@@ -1,4 +1,4 @@
-@PACKAGE_LCNAME@ (@VERSION@-@PACKAGE_DEBRELEASE@) experimental; urgency=low
+@PACKAGE_LCNAME@ (@PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@) experimental; urgency=low
 
   * Public release.
 

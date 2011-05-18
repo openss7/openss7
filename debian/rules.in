@@ -70,9 +70,14 @@ datarootdir	= @datarootdir@
 datadir		= @datadir@
 localstatedir	= @localstatedir@
 
+DH_COMPAT	= @DH_COMPAT@
+DH_VERBOSE	= @DH_VERBOSE@
+
+export DH_COMPAT
+export DH_VERBOSE
+export DH_OPTIONS
 export DEB_HOST_ARCH
 export DEB_HOST_GNU_TYPE
-export DH_OPTIONS
 export BUILD_CFGOPTIONS
 
 #ebtmpdir	= ${debbuilddir}/tmp

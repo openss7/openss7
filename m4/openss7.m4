@@ -762,7 +762,7 @@ AC_DEFUN([_OPENSS7_OPTIONS_PKG_REPODIR], [dnl
 	[], [with_pkg_repodir='$(DISTDIR)'])
     AC_MSG_CHECKING([for pkg repodir])
     if test ":${REPODIR+set}" != :set ; then
-	case :"${wtih_pkg_repodir:-no}" in
+	case :"${with_pkg_repodir:-no}" in
 	    (:no|:yes) REPODIR='$(DISTDIR)' ;;
 	    (*)        REPODIR="$with_pkg_repodir" ;;
 	esac
