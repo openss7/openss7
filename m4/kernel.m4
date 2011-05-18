@@ -473,11 +473,21 @@ dnl fi
 # _LINUX_CHECK_KERNEL_TOOLS
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
-    AC_ARG_VAR([KCC],
-	       [Kernel compiler. @<:@default=gcc@:>@])
-    if test ":$KCC" = : ; then
-	KCC="${CC:-gcc}"
+    AC_CACHE_CHECK([for kernel compiler], [linux_cv_k_cc], [dnl
+	if test ":${KCC+set}" != :set ; then
+	    KCC="${CC:-gcc}"
+	fi
+	linux_cv_k_cc="$KCC"
+    ])
+    if test ":${KCC+set}" != :set ; then
+	KCC="${linux_cv_k_cc:-gcc}"
     fi
+    if test ":${KCC:-gcc}" != :gcc; then
+	PACKAGE_RPMOPTIONS="KCC=\"$KCC\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
+	PACKAGE_DEBOPTIONS="KCC=\"$KCC\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
+	ac_configure_args="KCC=\"$KCC\"${ac_configure_args:+ $ac_configure_args}"
+    fi
+    AC_SUBST([KCC])dnl
     AC_ARG_VAR([DEPMOD],
 	       [Build kernel module dependencies command. @<:@default=depmod@:>@])
     _BLD_PATH_PROG([DEPMOD], [depmod], [/sbin/depmod],
