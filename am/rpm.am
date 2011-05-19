@@ -1406,12 +1406,28 @@ release-update-yum:
 				else $(ECHO) "rmdir -p -- $$dir/RPMS" ; rmdir -p -- $$dir/RPMS 2>/dev/null || : ; \
 				fi ; \
 				for p in '*repomd' '*comps' '*primary' '*filelists' '*other' '*susedata' '*patterns' '*products' '*product' '$(PACKAGE_LCNAME)*' ; do \
-					for f in $$dir/repodata/$${p}.xml $$dir/repodata/$${p}.xml.gz $$dir/repodata/$${p}.xml.asc $$dir/repodata/$${p}.xml.key $$dir/repodata/$${p}.repo ; \
-					do if test -f $$f ; then $(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; fi ; done ; \
+					for e in .xml .xml.gz .xml.asc .xml.key .repo ; do \
+						for f in $$dir/repodata/$${p}$${e} ; do \
+							if test -f $$f ; then $(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; fi ; \
+						done ; \
+					done ; \
 				done ; \
 				$(ECHO) "rm -p -- $$dir/repodata" ; \
 				rmdir -p -- $$dir/repodata 2>/dev/null || : ; \
 			else \
+				f="$$dir/repodata/repomd.xml" ; \
+				if test -f $$f ; then a="$$f.asc" ; k="$$f.key" ; \
+					if test ! -f $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1 ; then \
+						user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+						home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+						pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+						pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+						$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+						eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+						$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
+						$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k; \
+					fi ; \
+				fi ; \
 				(	$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
 					$(ECHO) '<susedata packages="'"$$numb"'">' ; \
 					for f in $$rpms ; do \
