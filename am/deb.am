@@ -756,13 +756,11 @@ release-update-apt:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@repodir=` echo '$(debdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
-	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
-	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
-	for branch in $$rlist ; do \
-		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
-		for repo in 'Main' 'Debug' 'Devel' 'Source' '' ; do \
-			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
-			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
+	for b in '' updates extras testing $$rb; do \
+		dir="$${repodir}$${b:+/$$b}" ; \
+		test -d $$dir || continue ; \
+		for r in main debug devel source '' ; do \
 			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
 			test -d $$dir || continue ; \
 			if test -n "`find $$dir -name '*.deb' 2>/dev/null`" ; then \

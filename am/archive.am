@@ -370,9 +370,9 @@ $(tardir)/MD5SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
 	@if ( $(MD5SUM) --version >/dev/null 2>&1 ); then \
 		$(ECHO) "(" >&2 ; \
 		( cd `dirname $@`; find . -maxdepth 1 -type f | LANG= sort | \
-		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
+		  egrep '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 		  sed 's,^\./,,' | while read f; do \
-		  	case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
+		  	case $$f in (INDEX*|ARCHIVE*|ls-lR*|*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
 			$(ECHO) "  $(MD5SUM) $$f ; " >&2 ; \
 		  	$(MD5SUM) $$f; \
 		  done ) >$@; \
@@ -390,9 +390,9 @@ $(tardir)/SHA1SUMS: $(tardir)/ARCHIVE.gz $(tardir)/INDEX.gz $(tardir)/ls-lR.gz
 	@if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
 		$(ECHO) "(" >&2 ; \
 		( cd `dirname $@`; find . -maxdepth 1 -type f | LANG= sort | \
-		  egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
+		  egrep '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 		  sed 's,^\./,,' | while read f; do \
-		  	case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
+		  	case $$f in (INDEX*|ARCHIVE*|ls-lR*|*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
 			$(ECHO) "  $(SHA1SUM) $$f ; " >&2 ; \
 			$(SHA1SUM) $$f; \
 		  done ) >$@; \
@@ -665,9 +665,9 @@ release-update-tar:
 		if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
 			$(ECHO) "(" ; \
 			find . -maxdepth 1 -type f | LANG= sort | \
-			egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
+			egrep '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 			sed 's,^\./,,' | while read f; do \
-				case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
+				case $$f in (INDEX*|ARCHIVE*|ls-lR*|*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
 				$(ECHO) "  $(SHA1SUM) $$f ;" >&2 ; \
 				$(SHA1SUM) $$f; \
 			done >SHA1SUMS ; \
@@ -678,9 +678,9 @@ release-update-tar:
 		if ( $(MD5SUM) --version >/dev/null 2>&1 ); then \
 			$(ECHO) "(" ; \
 			find . -maxdepth 1 -type f | LANG= sort | \
-			egrep -v '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
+			egrep '\.((tar\.|shar\.|[t]?)(gz|bz2|[zZ]|lzma|xz)|zip|cpi|cpio|iso|rpm|[ud]?deb)$$' | \
 			sed 's,^\./,,' | while read f; do \
-				case $$f in (*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
+				case $$f in (INDEX*|ARCHIVE*|ls-lR*|*MD5SUMS*|*SHA1SUMS*|.*) continue ;; esac ; \
 				$(ECHO) "  $(MD5SUM) $$f ;" >&2 ; \
 				$(MD5SUM) $$f; \
 			done >MD5SUMS ; \
