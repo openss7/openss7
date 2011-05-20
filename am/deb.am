@@ -764,12 +764,17 @@ release-update-apt:
 			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
 			test -d $$dir || continue ; \
 			if test -n "`find $$dir -name '*.deb' 2>/dev/null`" ; then \
+				rm -f -- $$dir/Packages $$dir/Packages.gz $$dir/Packages.bz2 ; \
 				$(ECHO) "  $(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Packages" ; \
 				$(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Packages ; \
-				$(ECHO) "    gzip -c $$dir/Packages > $$dir/Packages.gz" ; \
-				gzip -c $$dir/Packages > $$dir/Packages.gz ; \
-				$(ECHO) "    bzip2 -c $$dir/Packages > $$dir/Packages.bz2" ; \
-				bzip2 -c $$dir/Packages > $$dir/Packages.bz2 ; \
+				if test ! -f $$dir/Packages.gz ; then \
+					$(ECHO) "    gzip -c $$dir/Packages > $$dir/Packages.gz" ; \
+					gzip -c $$dir/Packages > $$dir/Packages.gz ; \
+				fi ; \
+				if test ! -f $$dir/Packages.bz2 ; then \
+					$(ECHO) "    bzip2 -c $$dir/Packages > $$dir/Packages.bz2" ; \
+					bzip2 -c $$dir/Packages > $$dir/Packages.bz2 ; \
+				fi ; \
 			else \
 				for ext in '' '.gz' '.bz2' ; do \
 					if test -f $$dir/Packages$$ext ; then \
@@ -779,12 +784,17 @@ release-update-apt:
 				done ; \
 			fi ; \
 			if test -n "`find $$dir -name '*.dsc' 2>/dev/null`" ; then \
+				rm -f -- $$dir/Sources $$dir/Sources.gz $$dir/Sources.bz2 ; \
 				$(ECHO) "  $(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Sources" ; \
 				$(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Sources ; \
-				$(ECHO) "    gzip -c $$dir/Sources > $$dir/Sources.gz" ; \
-				gzip -c $$dir/Sources > $$dir/Sources.gz ; \
-				$(ECHO) "    bzip2 -c $$dir/Sources > $$dir/Sources.bz2" ; \
-				bzip2 -c $$dir/Sources > $$dir/Sources.bz2 ; \
+				if test ! -f $$dir/Sources.gz ; then \
+					$(ECHO) "    gzip -c $$dir/Sources > $$dir/Sources.gz" ; \
+					gzip -c $$dir/Sources > $$dir/Sources.gz ; \
+				fi ; \
+				if test ! -f $$dir/Sources.bz2 ; then \
+					$(ECHO) "    bzip2 -c $$dir/Sources > $$dir/Sources.bz2" ; \
+					bzip2 -c $$dir/Sources > $$dir/Sources.bz2 ; \
+				fi ; \
 			else \
 				for ext in '' '.gz' '.bz2' ; do \
 					if test -f $$dir/Sources$$ext ; then \
@@ -794,12 +804,17 @@ release-update-apt:
 				done ; \
 			fi ; \
 			if test -n "`find $$dir -name '*.deb' 2>/dev/null`" ; then \
+				rm -f -- $$dir/Contents $$dir/Contents.gz $$dir/Contents.bz2 ; \
 				$(ECHO) "  $(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents" ; \
 				$(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents ; \
-				$(ECHO) "    gzip -c $$dir/Contents > $$dir/Contents.gz" ; \
-				gzip -c $$dir/Contents > $$dir/Contents.gz ; \
-				$(ECHO) "    bzip2 -c $$dir/Contents > $$dir/Contents.bz2" ; \
-				bzip2 -c $$dir/Contents > $$dir/Contents.bz2 ; \
+				if test ! -f $$dir/Contents.gz ; then \
+					$(ECHO) "    gzip -c $$dir/Contents > $$dir/Contents.gz" ; \
+					gzip -c $$dir/Contents > $$dir/Contents.gz ; \
+				fi ; \
+				if test ! -f $$dir/Contents.bz2 ; then \
+					$(ECHO) "    bzip2 -c $$dir/Contents > $$dir/Contents.bz2" ; \
+					bzip2 -c $$dir/Contents > $$dir/Contents.bz2 ; \
+				fi ; \
 			else \
 				for ext in '' '.gz' '.bz2' ; do \
 					if test -f $$dir/Contents$$ext ; then \
@@ -809,8 +824,8 @@ release-update-apt:
 				done ; \
 			fi ; \
 			if test -n "`find $$dir -name 'Packages' -o -name 'Sources' -o -name 'Contents' 2>/dev/null`" ; then \
-				$(ECHO) "  find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt" ; \
-				find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt ; \
+				$(ECHO) "  find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sum.txt" ; \
+				find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sum.txt ; \
 				$(ECHO) "  $(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release" ; \
 				$(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release ; \
 				$(ECHO) "    gzip -c $$dir/Release > $$dir/Release.gz" ; \
@@ -818,9 +833,9 @@ release-update-apt:
 				$(ECHO) "    bzip2 -c $$dir/Release > $$dir/Release.bz2" ; \
 				bzip2 -c $$dir/Release > $$dir/Release.bz2 ; \
 			else \
-				if test -f $$dir/md5sums.txt ; then \
-					$(ECHO) "  rm -f -- $$dir/md5sums.txt" ; \
-					rm -f -- $$dir/md5sums.txt ; \
+				if test -f $$dir/md5sum.txt ; then \
+					$(ECHO) "  rm -f -- $$dir/md5sum.txt" ; \
+					rm -f -- $$dir/md5sum.txt ; \
 				fi ; \
 				for ext in '' '.gz' '.bz2' ; do \
 					if test -f $$dir/Release$$ext ; then \
