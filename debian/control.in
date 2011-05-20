@@ -17,6 +17,7 @@ Architecture: all
 Section: base
 Priority: optional
 Depends: @PACKAGE_LCNAME@-repo (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Recommends: @PACKAGE_LCNAME@-base (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
 Description: virtual base package.
  The @PACKAGE_LCNAME@ package includes kernel modules, STREAMS drivers,
  modules, libraries, utilities, test programs, daemons, and
@@ -87,6 +88,7 @@ Package: @PACKAGE_LCNAME@-repo
 Architecture: all
 Section: base
 Priority: optional
+Recommends: @PACKAGE_LCNAME@ (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
 Description: repository source definitions.
  The @PACKAGE_LCNAME@-repo binary package contains the repository source
  and package updater information necessary to properly establish
@@ -98,6 +100,8 @@ Architecture: all
 Section: base
 Priority: optional
 Depends: @PACKAGE_LCNAME@ (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+@WITH_32BIT_LIBS_FALSE@Recommends: @PACKAGE_LCNAME@-lib (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+@WITH_32BIT_LIBS_TRUE@Recommends: @PACKAGE_LCNAME@-lib (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@), @PACKAGE_LCNAME@-compat (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
 Description: init scripts, utility scripts and base documentation.
  The @PACKAGE_LCNAME@-base binary package contains the init scripts, test
  scripts, maintenance scripts and base system configuration
@@ -113,6 +117,7 @@ Architecture: all
 Section: doc
 Priority: optional
 Depends: @PACKAGE_LCNAME@-base (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Recommends: @PACKAGE_LCNAME@-devel (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
 Description: full documentation.
  The @PACKAGE_LCNAME@-doc binary package contains the documentation used
  in the development of applications and programs that use the
@@ -129,6 +134,9 @@ Architecture: any
 Section: libs
 Priority: optional
 Pre-Depends: @PACKAGE_LCNAME@-base (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+@WITH_32BIT_LIBS_FALSE@Recommends: @PACKAGE_LCNAME@-kernel
+@WITH_32BIT_LIBS_TRUE@Recommends: @PACKAGE_LCNAME@-kernel, @PACKAGE_LCNAME@-compat (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Suggests: @PACKAGE_LCNAME@-kernel-devel, @PACKAGE_LCNAME@-devel (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
 Description: shared object libraries, binary applications and utilities.
  The @PACKAGE_LCNAME@-lib binary package contains the run-time (shared
  object) libraries necessary to run applications programs and
@@ -157,6 +165,7 @@ Architecture: any
 Section: devel
 Priority: optional
 Depends: @PACKAGE_LCNAME@-lib (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Recommends: @PACKAGE_LCNAME@-kernel-devel
 Description: development headers, static libraries, developer documentation.
  The @PACKAGE_LCNAME@-devel binary package contains library archives for
  static compilation, and header files to develop @PACKAGE_TITLE@
@@ -172,6 +181,7 @@ Architecture: any
 Section: debug
 Priority: extra
 Depends: @PACKAGE_LCNAME@-lib (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Recommends: @PACKAGE_LCNAME@-kernel-debuginfo
 Description: user library and program debugging information.
  The @PACKAGE_LCNAME@-debuginfo binary package contains debugging symbols
  for libraries and applications programs.  This package provides
@@ -184,6 +194,7 @@ Architecture: any
 Section: debug
 Priority: extra
 Depends: @PACKAGE_LCNAME@-debuginfo (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Recommends: @PACKAGE_LCNAME@-kernel-debugsource
 Description: user library and program debugging source.
  The @PACKAGE_LCNAME@-debugsource binary package contains source code for
  debugging libraries and applications programs.  This package
@@ -197,7 +208,8 @@ Section: kernel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-kernel
 Pre-Depends: @PACKAGE_LCNAME@-lib (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
-@WITH_32BIT_LIBS_TRUE@Depends: @PACKAGE_LCNAME@-compat (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+@WITH_32BIT_LIBS_TRUE@Recommends: @PACKAGE_LCNAME@-compat (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Suggests: @PACKAGE_LCNAME@-kernel-devel, @PACKAGE_LCNAME@-kernel-debuginfo
 Description: kernel modules compiled for @kversion@.
  The @PACKAGE_LCNAME@-@kversion@ binary package the kernel modules that
  provide the Linux kernel @PACKAGE_TITLE@ drivers and modules.  This
@@ -217,6 +229,7 @@ Section: devel
 Priority: optional
 Provides: @PACKAGE_LCNAME@-kernel-devel
 Depends: @PACKAGE_LCNAME@-@kversion@ (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@), @PACKAGE_LCNAME@-devel (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Suggests: @PACKAGE_LCNAME@-kernel-debuginfo
 Description: kernel module development support for @kversion@.
  The @PACKAGE_LCNAME@-@kversion@-devel binary package contains the
  kernel modules symbol information for development of additional
@@ -232,6 +245,7 @@ Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-debuginfo
 Depends: @PACKAGE_LCNAME@-@kversion@ (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@), @PACKAGE_LCNAME@-debuginfo (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Suggests: @PACKAGE_LCNAME@-kernel-debugsource
 Description: kernel module debugging information for @kversion@.
  The @PACKAGE_LCNAME@-@kversion@-debuginfo binary package contains
  debugging symbols for kernel modules.  This package provides
@@ -245,6 +259,7 @@ Section: debug
 Priority: extra
 Provides: @PACKAGE_LCNAME@-kernel-debugsource
 Depends: @PACKAGE_LCNAME@-@kversion@-debuginfo (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@), @PACKAGE_LCNAME@-debugsource (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Suggests: @PACKAGE_LCNAME@-kernel-source
 Description: kernel module debugging source for @kversion@.
  The @PACKAGE_LCNAME@-@kversion@-debugsource binary package contains
  source code for debugging kernel modules.  This package
@@ -258,6 +273,7 @@ Description: kernel module debugging source for @kversion@.
 @WITH_K_PACKAGE_TRUE@Priority: extra
 @WITH_K_PACKAGE_TRUE@Provides: @PACKAGE_LCNAME@-kernel-source
 @WITH_K_PACKAGE_TRUE@Depends: @PACKAGE_LCNAME@ (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+@WITH_K_PACKAGE_TRUE@Suggests: @PACKAGE_LCNAME@-@kversion@ (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
 @WITH_K_PACKAGE_TRUE@Description: configured kernel source for @kversion@.
 @WITH_K_PACKAGE_TRUE@ The @PACKAGE_LCNAME@-@kversion@-source binary package contains the
 @WITH_K_PACKAGE_TRUE@ source code necessary for building the @PACKAGE_LCNAME@ release for the
@@ -273,6 +289,7 @@ Architecture: any
 Section: java
 Priority: optional
 Depends: @PACKAGE_LCNAME@-lib (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Suggests: @PACKAGE_LCNAME@-javadoc (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
 Description: java class libraries and jar files.
  The @PACKAGE_LCNAME@-java binary package contains JAIN implementations
  for @PACKAGE_TITLE@.  It includes jar files, JNI and CNI libraries, and
@@ -284,6 +301,7 @@ Architecture: all
 Section: javadoc
 Priority: optional
 Depends: @PACKAGE_LCNAME@ (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Suggests: @PACKAGE_LCNAME@-java (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
 Description: javadoc documentation.
  The @PACKAGE_LCNAME@-javadoc binary package contains Javadoc
  documentation for @PACKAGE_TITLE@.  Install this binary package if you
