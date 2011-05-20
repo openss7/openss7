@@ -682,7 +682,9 @@ $(apt_md5sums):
 
 $(apt_releases): $(apt_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(debdir)/, ,' > $@.$$$$
+	@$(ECHO) "$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(debdir)/, ,' >$@.$$$$" ; \
+	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(debdir)/, ,' >$@.$$$$ ; \
+	$(ECHO) "mv -f -- $@.$$$$ $@" ; \
 	mv -f -- $@.$$$$ $@
 
 GPGVERIFYSIGN = \
