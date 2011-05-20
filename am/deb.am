@@ -682,7 +682,8 @@ $(apt_md5sums):
 
 $(apt_releases): $(apt_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(debdir)/, ,' > $@
+	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(debdir)/, ,' > $@.$$$$
+	mv -f -- $@.$$$$ $@
 
 GPGVERIFYSIGN = \
 	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
@@ -768,12 +769,12 @@ release-update-apt:
 				$(ECHO) "  $(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Packages" ; \
 				$(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Packages ; \
 				if test ! -f $$dir/Packages.gz ; then \
-					$(ECHO) "    gzip -c $$dir/Packages > $$dir/Packages.gz" ; \
-					gzip -c $$dir/Packages > $$dir/Packages.gz ; \
+					$(ECHO) "    cat $$dir/Packages | gzip -c > $$dir/Packages.gz" ; \
+					cat $$dir/Packages | gzip -c > $$dir/Packages.gz ; \
 				fi ; \
 				if test ! -f $$dir/Packages.bz2 ; then \
-					$(ECHO) "    bzip2 -c $$dir/Packages > $$dir/Packages.bz2" ; \
-					bzip2 -c $$dir/Packages > $$dir/Packages.bz2 ; \
+					$(ECHO) "    cat $$dir/Packages | bzip2 -c > $$dir/Packages.bz2" ; \
+					cat $$dir/Packages | bzip2 -c > $$dir/Packages.bz2 ; \
 				fi ; \
 			else \
 				for ext in '' '.gz' '.bz2' ; do \
@@ -788,12 +789,12 @@ release-update-apt:
 				$(ECHO) "  $(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Sources" ; \
 				$(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Sources ; \
 				if test ! -f $$dir/Sources.gz ; then \
-					$(ECHO) "    gzip -c $$dir/Sources > $$dir/Sources.gz" ; \
-					gzip -c $$dir/Sources > $$dir/Sources.gz ; \
+					$(ECHO) "    cat $$dir/Sources | gzip -c > $$dir/Sources.gz" ; \
+					cat $$dir/Sources | gzip -c > $$dir/Sources.gz ; \
 				fi ; \
 				if test ! -f $$dir/Sources.bz2 ; then \
-					$(ECHO) "    bzip2 -c $$dir/Sources > $$dir/Sources.bz2" ; \
-					bzip2 -c $$dir/Sources > $$dir/Sources.bz2 ; \
+					$(ECHO) "    cat $$dir/Sources | bzip2 -c > $$dir/Sources.bz2" ; \
+					cat $$dir/Sources | bzip2 -c > $$dir/Sources.bz2 ; \
 				fi ; \
 			else \
 				for ext in '' '.gz' '.bz2' ; do \
@@ -808,12 +809,12 @@ release-update-apt:
 				$(ECHO) "  $(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents" ; \
 				$(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents ; \
 				if test ! -f $$dir/Contents.gz ; then \
-					$(ECHO) "    gzip -c $$dir/Contents > $$dir/Contents.gz" ; \
-					gzip -c $$dir/Contents > $$dir/Contents.gz ; \
+					$(ECHO) "    cat $$dir/Contents | gzip -c > $$dir/Contents.gz" ; \
+					cat $$dir/Contents | gzip -c > $$dir/Contents.gz ; \
 				fi ; \
 				if test ! -f $$dir/Contents.bz2 ; then \
-					$(ECHO) "    bzip2 -c $$dir/Contents > $$dir/Contents.bz2" ; \
-					bzip2 -c $$dir/Contents > $$dir/Contents.bz2 ; \
+					$(ECHO) "    cat $$dir/Contents | bzip2 -c > $$dir/Contents.bz2" ; \
+					cat $$dir/Contents | bzip2 -c > $$dir/Contents.bz2 ; \
 				fi ; \
 			else \
 				for ext in '' '.gz' '.bz2' ; do \
@@ -826,12 +827,18 @@ release-update-apt:
 			if test -n "`find $$dir -name 'Packages' -o -name 'Sources' -o -name 'Contents' 2>/dev/null`" ; then \
 				$(ECHO) "  find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sum.txt" ; \
 				find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sum.txt ; \
-				$(ECHO) "  $(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release" ; \
-				$(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release ; \
-				$(ECHO) "    gzip -c $$dir/Release > $$dir/Release.gz" ; \
-				gzip -c $$dir/Release > $$dir/Release.gz ; \
-				$(ECHO) "    bzip2 -c $$dir/Release > $$dir/Release.bz2" ; \
-				bzip2 -c $$dir/Release > $$dir/Release.bz2 ; \
+				rm -f -- $$dir/Release $$dir/Release.gz $$dir/Release.bz2 ; \
+				$(ECHO) "  $(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release.$$$$" ; \
+				$(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release.$$$$ ; \
+				mv -f -- $$dir/Release.$$$$ $$dir/Release ; \
+				if test ! -f $$dir/Release.gz ; then \
+					$(ECHO) "    cat $$dir/Release | gzip -c > $$dir/Release.gz" ; \
+					cat $$dir/Release | gzip -c > $$dir/Release.gz ; \
+				fi ; \
+				if test ! -f $$dir/Release.bz2 ; then \
+					$(ECHO) "    cat $$dir/Release | bzip2 -c > $$dir/Release.bz2" ; \
+					cat $$dir/Release | bzip2 -c > $$dir/Release.bz2 ; \
+				fi ; \
 			else \
 				if test -f $$dir/md5sum.txt ; then \
 					$(ECHO) "  rm -f -- $$dir/md5sum.txt" ; \
@@ -845,16 +852,12 @@ release-update-apt:
 				done ; \
 			fi ; \
 			if test -f $$dir/Release ; then \
-				if test ! -f $$dir/Release.gpg || $(GPG) --verify -- $$dir/Release.gpg >/dev/null 2>&1 ; then \
-					user="$(GNUPGUSER)"; user="$${user:+ -u $$user}"; \
-					home="$(GNUPGHOME)"; home="$${home:+ --homedir $$home}"; \
-					pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-					pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
-					$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null"; \
-					eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null"; \
-				else touch $$dir/Release.gpg; fi ; \
-				user="$(GNUPGUSER)"; user="$${user:+ -u }$$user" ; \
-				home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home" ; \
+				user="$(GNUPGUSER)"; user="$${user:+ -u $$user}"; \
+				home="$(GNUPGHOME)"; home="$${home:+ --homedir $$home}"; \
+				pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+				pipe="$(GNUPGPASS)"; pipe="$${pipe:+ $(ECHO) "$$pipe" |}"; \
+				$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null"; \
+				eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$dir/Release >$$dir/Release.gpg 2>/dev/null"; \
 				$(ECHO) "  $(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/Release.key" ; \
 				$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/Release.key ; \
 			else \

@@ -500,9 +500,9 @@ $(PACKAGE).sources.list: Makefile
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
 				$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
-			$(ECHO) 'deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b} $${d}'/' ; \
+			$(ECHO) 'deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' ./' ; \
 			if test "$$repo" = 'Source' ; then \
-				$(ECHO) '#deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b} $${d}'/' ; \
+				$(ECHO) '#deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' ./' ; \
 			fi ; \
 		done ; \
 	done >$@
@@ -521,9 +521,9 @@ $(PACKAGE)-local.sources.list: Makefile
 		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
 			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
-			$(ECHO) 'deb file://'$${repodir}$${b:+/$$b} $${d}'/' ; \
+			$(ECHO) 'deb file://'$${repodir}$${b:+/$$b}$${d:+/$$d}' ./' ; \
 			if test "$$repo" = 'Source' ; then \
-				$(ECHO) 'deb-src file://'$${repodir}$${b:+/$$b} $${d}'/' ; \
+				$(ECHO) 'deb-src file://'$${repodir}$${b:+/$$b}$${d:+/$$d}' ./' ; \
 			fi ; \
 		done ; \
 	done >$@
