@@ -81,6 +81,8 @@ if MAINTAINER_MODE
 
 $(PACKAGE)-local.yum.repo: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	repodir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	tardir='$(tardir)'; test '$(REPODIR)' = '$(DISTDIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 	for branch in $$rb ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
 		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
@@ -92,8 +94,8 @@ $(PACKAGE)-local.yum.repo: Makefile
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
 				$(ECHO) 'enabled = 1'; else $(ECHO) 'enabled = 0'; fi ; \
 			$(ECHO) 'name = $(PACKAGE_TITLE) Local'$${branch:+ $$branch}$${repo:+ $$repo}' ($(target_distos))'; \
-			$(ECHO) 'baseurl = file://$(rpmdistdir)'$${b:+/$$b}$${d:+/$$d}; \
-			$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'baseurl = file://'$${repodir}$${b:+/$$b}$${d:+/$$d}; \
+			$(ECHO) 'gpgkey = file://'$${tardir}'/OPENSS7-GPG-KEY'; \
 			$(ECHO) 'gpgcheck = 1'; \
 			$(ECHO) ''; \
 		done ; \
@@ -198,12 +200,14 @@ repo-install-yum:
 				fi ; \
 			fi ; \
 		fi ; \
+		repodir='$(rpmdistdir)' ; test '$(DISTDIR)' = '$(REPODIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		tardir='$(tardir)' ; test '$(DISTDIR)' = '$(REPODIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		( \
 			$(ECHO) '[$(PACKAGE)]-local]' ; \
 			$(ECHO) 'enabled = 1' ; \
 			$(ECHO) 'name = $(PACKAGE_TITLE) Local Repository' ; \
-			$(ECHO) 'baseurl = file://$(rpmdistdir)' ; \
-			$(ECHO) 'gpgkey = file://$(tardir)/OPENSS7-GPG-KEY' ; \
+			$(ECHO) 'baseurl = file://'$${rpmdistdir} ; \
+			$(ECHO) 'gpgkey = file://'$${tardir}'/OPENSS7-GPG-KEY' ; \
 			$(ECHO) 'gpgcheck = 1' ; \
 			$(ECHO) 'repo_gpgcheck = 0' \
 		) >$(PACKAGE)-local.repo \
@@ -313,6 +317,8 @@ if MAINTAINER_MODE
 ##
 $(PACKAGE)-local.zypp.repo: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	repodir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	tardir='$(tardir)'; test '$(REPODIR)' = '$(DISTDIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 	for branch in $$rb ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
 		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
@@ -326,9 +332,9 @@ $(PACKAGE)-local.zypp.repo: Makefile
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' -o -n '$(repobranch)' \) ; then \
 				$(ECHO) 'enabled=1'; else $(ECHO) 'enabled=0'; fi ; \
 			$(ECHO) 'autorefresh=0'; \
-			$(ECHO) 'baseurl=file://$(rpmdistdir)'$${s:+/$$s}$${d:+/$$d}; \
+			$(ECHO) 'baseurl = file://'$${repodir}$${b:+/$$b}$${d:+/$$d}; \
 			$(ECHO) 'gpgcheck=1'; \
-			$(ECHO) 'gpgkey=file://$(tardir)/OPENSS7-GPG-KEY'; \
+			$(ECHO) 'gpgkey = file://'$${tardir}'/OPENSS7-GPG-KEY'; \
 			$(ECHO) 'keeppackages=0'; \
 			$(ECHO) ''; \
 		done ; \
@@ -507,16 +513,17 @@ if MAINTAINER_MODE
 
 $(PACKAGE)-local.sources.list: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	repodir='$(debdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(debdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 	for branch in $$rb ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
-		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
+		if test -n '$(repobranch)' -a '$(debdistdir)' = '$(debdir)' ; then \
 			test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
 		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
 			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
-			$(ECHO) 'deb file://$(debdistdir)'$${b:+/$$b} $${d}'/' ; \
+			$(ECHO) 'deb file://'$${repodir}$${b:+/$$b} $${d}'/' ; \
 			if test "$$repo" = 'Source' ; then \
-				$(ECHO) '#deb-src file://$(debdistdir)'$${b:+/$$b} $${d}'/' ; \
+				$(ECHO) 'deb-src file://'$${repodir}$${b:+/$$b} $${d}'/' ; \
 			fi ; \
 		done ; \
 	done >$@
