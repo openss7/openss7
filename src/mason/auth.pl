@@ -21,16 +21,22 @@ sub rpmauthenhandler {
 
     my $user = $r->connection->user;
 
-    if ( $r->filename =~ m/\/openss7-repo.*\.rpm$/ ) {
-	#$r->warn("Any host ($user) can download the repo defintion rpm ".$r->uri);
+    if ( $r->filename =~ m,/openss7-repo.*\.(rpm|deb)$, ) {
+	#$r->warn("Any host ($user) can download the repo defintion rpm or deb ".$r->uri);
 	return OK;
     }
     if ( $r->filename =~ m,/repo/rpms/repodata/[^/]+\.xml(\.gz)?$, ) {
 	#$r->warn("Any host ($user) can download the empty repository ".$r->uri);
 	return OK;
     }
-    if ( $r->filename !~ m/(\.xml(\.gz)?|\.rpm)$/ ) {
-	$r->log_reason("not an rpm or xml file", $r->filename);
+    if ( $r->filename =~ m,/repo/debs/((Packages|Sources|Contents|Release)(\.(gz|bz2|gpg|key))?|md5sum.txt)$, ) {
+	#$r->warn("Any host ($user) can download the empty repository ".$r->uri);
+	return OK;
+    }
+    if ( $r->filename !~ m,(\.xml(\.gz)?|\.rpm|\.deb)$, and
+	 $r->filename !~ m,((Packages|Sources|Contents|Release)(\.(gz|bz2|gpg|key))?|md5sum.txt)$, )
+    {
+	$r->log_reason("not an rpm, deb, xml or apt file", $r->filename);
 	return FORBIDDEN;
     }
 
@@ -50,7 +56,16 @@ sub rpmauthenhandler {
 	}
 	return OK;
     }
-    if ( $r->filename !~ m/\/repo\/rpms\/(([^\/].*)\/)?(repodata|RPMS|SRPMS)\/(.*)$/ ) {
+    if ( $r->filename =~ m,/repo/openss7\.list$, ) {
+	if ( ",$grps," != ',apt-hosts,' ) {
+	    $r->log_reason("Host $user not in group 'apt-hosts'", $r->filename);
+	    return FORBIDDEN;
+	}
+	return OK;
+    }
+    if ( $r->filename !~ m,/repo/rpms/(([^/].*)/)?(repodata|RPMS|SRPMS)/(.*)$, and
+	 $r->filename !~ m,/repo/debs/(([^/].*)/)?()(.*)$, )
+    {
 	$r->log_reason("file is out of place", $r->filename);
 	return FORBIDDEN;
     }
@@ -58,7 +73,7 @@ sub rpmauthenhandler {
     my $type = $3;
     my $also = $4;
 
-    unless ($type and $also) {
+    unless ($type or $also) {
 	$r->log_reason("incorrect data in path", $r->filename);
 	return NOT_FOUND;
     }
@@ -67,8 +82,16 @@ sub rpmauthenhandler {
 	$r->log_reason("SRPM access forbidden by rule", $r->filename);
 	return NOT_FOUND;
     }
-    if ( $r->filename =~ m/\.src\.rpm$/ ) {
+    if ( $r->filename =~ m,\.src\.rpm$, ) {
 	$r->log_reason("SRPM access forbidden by rule", $r->filename);
+	return NOT_FOUND;
+    }
+    if ( $r->filename =~ m,\.dsc(\.asc)?$, ) {
+	$r->log_reason("DSC access forbidden by rule", $r->filename);
+	return NOT_FOUND;
+    }
+    if ( $r->filename =~ m,\.tar(\.(gz|bz2|lzma|xz))?$, ) {
+	$r->log_reason("DSC access forbidden by rule", $r->filename);
 	return NOT_FOUND;
     }
 
@@ -87,7 +110,7 @@ sub rpmauthenhandler {
 	    $fields[4] = 'full';
 	}
 	if ($#fields == 3) {
-	    if ($fields[3] =~ m/^(main|debug|devel|source)$/) {
+	    if ($fields[3] =~ m,^(main|debug|devel|source)$,) {
 		$fields[4] = $fields[3];
 		$fields[3] = 'base';
 	    } else {
@@ -97,7 +120,7 @@ sub rpmauthenhandler {
 	$fields[3] = 'base' unless ($fields[3]);
 	$fields[4] = 'full' unless ($fields[4]);
 
-	if ($fields[4] !~ m/^(main|debug|devel|source|full)$/) {
+	if ($fields[4] !~ m,^(main|debug|devel|source|full)$,) {
 	    $r->log_reason("incorrect data in filename", $r->filename);
 	    return NOT_FOUND;
 	}
@@ -111,7 +134,7 @@ sub rpmauthenhandler {
     if ($retval == OK) { $retval = check_bransubr($r,$user,$grps,$branch,$subrep); }
 
     if ($retval == FORBIDDEN) {
-	return NOT_FOUND unless ( $type eq 'repodata' );
+	return NOT_FOUND unless ( $type eq 'repodata' or $type eq '' );
 	my $subr = $r->lookup_uri("/repo/rpms/$type/$also");
 	my $file = $subr->filename;
 	return NOT_FOUND unless ($file and -e $file);
@@ -153,9 +176,18 @@ sub check_host {
 sub check_distarch {
     my ($r,$user,$grps,$distro,$osarch) = @_;
 
-    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
-    my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ ) ? 'enterprise' : 'community';
-    my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
+    my ($manage,$enterp,$server) = ( 'yum', 'community', 'desktop' );
+
+    $manage = 'yum';
+    $manage = 'zypp' if ( $distro =~ m,^(sle|sles|sled|suse|opensuse)$, );
+    $manage = 'apt'  if ( $distro =~ m,^(debian|ubuntu|mint|mepis|knoppix|pclinux)$, );
+
+    $enterp = 'community'; 
+    $enterp = 'enterprise' if ( $distro =~ m,^(sle|sles|sled|rhel|centos)$, );
+    # FIXME: need to make ubuntu LTS enterprise
+
+    $server = 'desktop';
+    $server = 'server' if ( $osarch !~ m,^i[3456]86$, );
 
     my $access = ",$grps,";
 
