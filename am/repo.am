@@ -170,37 +170,56 @@ repo-install-yum:
 		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(yumrepodir)" ; \
 		$(MKDIR_P) $(DESTDIR)$(yumrepodir) ; \
 	fi
-	( \
-		cd $(DESTDIR)$(yumrepodir) ; \
-		un=; pw=; \
-		for s in '' '.rpmsave' '.rpmnew' ; do \
-			f='$(PACKAGE).repo'$$s ; \
-			if test -f $$f ; then \
-				un=`sed -r 's,^baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $$f` ; \
-				pw=`sed -r 's,^baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $$f` ; \
+	@( \
+		cd '$(DESTDIR)$(yumrepodir)' ; \
+		un=; pw=; o=; f='$(PACKAGE).repo' ; \
+		for s in '' '.rpmsave' '.rpmnew' ; do  \
+			o="$$f$$s" ; \
+			if test -e $$o ; then \
+				un=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,p;t end;b;: end q' $$o` ; \
+				pw=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,p;t end;b;: end q' $$o` ; \
 				test -n "$$un" -a -n "$$pw" || continue ; \
 				break ; \
 			fi ; \
 		done ; \
-		f='$(PACKAGE).repo' ; \
-		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
-		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/rpms/$(reposubdir)/repodata/'"$$f$$ext" ; \
+		if test "$$o" != "$$f" ; then \
+			$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+			mv -f -- $$f $$f.rpmsave || : ; \
+		fi ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
+		ext="$$ext"`echo '/$(rpmsubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
+		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/rpms/repodata/'"$$f$$ext" ; \
+		$(ECHO) "rm -f -- $$f" ; \
 		rm -f -- $$f ; \
-		if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
-			if echo "$$url" | wget -i - 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+		if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
 				echo 'Authorization required for repository access.' >/dev/tty ; \
-				u=; p=; \
-				read -e  -p 'Username: ' u </dev/tty >/dev/tty ; \
+				u='anonymous'; p= ; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=$${u:-anonymous} ; \
+				if test "$$u" != 'anonymous' ; then \
 				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
 				echo '' >/dev/tty ; \
-				url='$(reposerv)://'"$${u:+$$u$${p:+:$$p}@}"'$(repobase)/$(reporoot)/rpms/$(reposubdir)/repodata/'"$$f$$ext" ; \
+				fi ; \
+				key=; test -z "$$u" || key="$${u}:$${p}@" ; \
+				url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/rpms/repodata/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; \
 				rm -f -- $$f ; \
-				if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					test ":$$o" != ":$$f" || mv -f -- $$f.rpmsave $$f ; \
+					echo 'Authorization failed.' >/dev/tty ; \
 					exit 1 ; \
 				fi ; \
 			fi ; \
 		fi ; \
-		repodir='$(rpmdistdir)' ; test '$(DISTDIR)' = '$(REPODIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		if test ! -e $$f ; then \
+			if test ":$$o" != ":$$f" ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+			exit 1 ; \
+		fi ; \
+		rpmdistdir='$(rpmdistdir)' ; test '$(DISTDIR)' = '$(REPODIR)' || rpmdistdir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		tardir='$(tardir)' ; test '$(DISTDIR)' = '$(REPODIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		( \
 			$(ECHO) '[$(PACKAGE)]-local]' ; \
@@ -211,7 +230,7 @@ repo-install-yum:
 			$(ECHO) 'gpgcheck = 1' ; \
 			$(ECHO) 'repo_gpgcheck = 0' \
 		) >$(PACKAGE)-local.repo \
-	)
+	) || exit 1
 	@f='$(DESTDIR)$(yumkmodconf)' ; \
 	if test -f $$f ; then \
 		$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
@@ -223,7 +242,10 @@ repo-install-yum:
 			mv -f -- $$f.rpmsave $$f ; \
 		fi ; \
 	fi
-	yum makecache
+	@if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) "yum makecache" ; \
+		yum makecache || : ; \
+	fi
 
 ##
 ## To remove a yum install source, first remove any changes that were made to the (fedora)kmod.conf
@@ -404,57 +426,90 @@ repo-install-zypp:
 		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(zyppcreddir)" ; \
 		$(MKDIR_P) $(DESTDIR)$(zyppcreddir) ; \
 	fi
-	( \
-		cd $(DESTDIR)$(zyppcreddir) ; \
-		un=; pw=; \
-		for p in '$(PACKAGE_UCNAME)' 'NCC' ; do \
-			for s in '' '.rpmsave' '.rpmnew' ; do \
-				f="$${p}credentials$${s}" ; \
-				if test -e $$f ; then \
-					un=`sed -r 's,^username=([^[:space:]]*)$$,\1,;t;d' $$f` ; \
-					pw=`sed -r 's,^password=([^[:space:]]*)$$,\1,;t;d' $$f` ; \
-					break ; \
-				fi ; \
-			done ; \
+	@(
+		cd '$(DESTDIR)$(zyppcreddir)' ; \
+		un=; pw=; o=; f='$(PACKAGE_UCNAME)credentials' ; \
+		for s in '$(PACKAGE_UCNAME)' 'NCC' ; do ; \
+			o="$${s}credentials" ; \
+			if test -e $$o ; then \
+				un=`awk 'BEGIN{FS="="}{if($$1~/^username$$/){print$$2;exit}}' $$f` ; \
+				pw=`awk 'BEGIN{FS="="}{if($$1~/^password$$/){print$$2;exit}}' $$f` ; \
+				test -n "$$un" -a -n "$$pw" || continue ; \
+				break ; \
+			fi ; \
 		done ; \
-		f='$(PACKAGE_UCNAME)credentials' ; \
+		if test "$$o" != "$$f" ; then \
+			$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+			mv -f -- $$f $$f.rpmsave ; \
+		fi ; \
 		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
-		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+		ext="$$ext"`echo '/$(rpmsubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ;  \
+		$(ECHO) "rm -f -- $$f" ; \
 		rm -f -- $$f ; \
-		if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
-			if echo "$$url" | wget -i - 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+		if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
 				echo 'Authorization required for repository access.' >/dev/tty ; \
-				u=; p=; \
-				read -e  -p 'Username: ' u </dev/tty >/dev/tty ; \
+				u='anonymous'; p= ; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=$${u:-anonymous} ; \
+				if test "$$u" != 'anonymous' ; then \
 				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
-				echo '' >/dev/tty ; 
-				url='$(reposerv)://'"$${u:+$$u$${p:+:$$p}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+				echo '' >/dev/tty ; \
+				fi ; \
+				url='$(reposerv)://'"$${u:+$$u:$$p@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; \
 				rm -f -- $$f ; \
-				if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					if test "$$o" != "$$f" ; then \
+						$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+						mv -f -- $$f.rpmsave $$f ; \
+					fi ; \
+					echo 'Authorization failed.' >/dev/tty ; \
 					exit 1 ; \
 				fi ; \
 			fi ; \
 		fi ; \
-	)
-	f='$(DESTDIR)$(zyppconfig)' ; \
+		if test -e $$f ; then chmod go-rw $$f; else \
+			if test "$$o" != "$$f" ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+			exit 1 ; \
+		fi ; \
+	) || exit 1
+	@f='$(DESTDIR)$(zyppconfig)' ; \
 	if test -f $$f ; then \
+		$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
 		mv -f -- $$f $$f.rpmsave ; \
+		$(ECHO) "sed -r 's,^multiversion.*$$,multiversion = provides:multiversion(kernel),' $$f.rpmsave >$$f" ; \
 		sed -r 's,^multiversion.*$$,multiversion = provides:multiversion(kernel),' $$f.rpmsave >$$f ; \
-		if diff $$f.rpmsave $$f >/dev/null 2>&1 ; then \
+		if ! diff $$f.rpmsave $$f >/dev/null 2>&1 ; then \
+			$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
 			mv -f -- $$f.rpmsave $$f ; \
 		fi ; \
 	fi
-	zypper addservice -t ris -n '$(PACKAGE_UCNAME)-service' \
-		'$(reposerv)://$(repobase)/?credentials=$(PACKAGE_UCNAME)credentials' \
-		'$(PACKAGE_UCNAME)-service'
-	zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-service'
-	if test :$$(basename '$(DISTDIR)') = ':repo' ; then \
-		zypper addservice -t ris -n '$(PACKAGE_UCNAME)-local-service' \
-			"file://`dirname '$(DISTDIR)'`" \
-			'$(PACKAGE_UCNAME)-local-service' ; \
-		zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-local-service' ; \
+	@if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) "zypper addservice -t ris -n '$(PACKAGE_UCNAME)-service' \
+			'$(reposerv)://$(repobase)/?credentials=$(PACKAGE_UCNAME)credentials' \
+			'$(PACKAGE_UCNAME)-service'" ; \
+		zypper addservice -t ris -n '$(PACKAGE_UCNAME)-service' \
+			'$(reposerv)://$(repobase)/?credentials=$(PACKAGE_UCNAME)credentials' \
+			'$(PACKAGE_UCNAME)-service' ; \
+		$(ECHO) "zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-service'" ; \
+		zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-service' ; \
+		if test :$$(basename '$(REPODIR)') = ':repo' ; then \
+			$(ECHO) "zypper addservice -t ris -n '$(PACKAGE_UCNAME)-local-service' \
+				\"file://`dirname '$(REPODIR)'`\" \
+				'$(PACKAGE_UCNAME)-local-service'" ; \
+			zypper addservice -t ris -n '$(PACKAGE_UCNAME)-local-service' \
+				"file://`dirname '$(REPODIR)'`" \
+				'$(PACKAGE_UCNAME)-local-service' ; \
+			$(ECHO) "zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-local-service'" ; \
+			zypper modifyservice -r -i -e '$(PACKAGE_UCNAME)-local-service' ; \
+		fi ; \
+		$(ECHO) "zypper refresh" ; \
+		zypper refresh || : ; \
 	fi
-	zypper refresh
 
 ##
 ## To remove a zypper install source, first remove any changes that we made to the zypp.conf file.
@@ -500,9 +555,9 @@ $(PACKAGE).sources.list: Makefile
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
 				$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
-			$(ECHO) 'deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' ./' ; \
+			$(ECHO) 'deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
 			if test "$$repo" = 'Source' ; then \
-				$(ECHO) '#deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' ./' ; \
+				$(ECHO) '#deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
 			fi ; \
 		done ; \
 	done >$@
@@ -513,7 +568,7 @@ if MAINTAINER_MODE
 
 $(PACKAGE)-local.sources.list: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
-	repodir='$(debdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(debdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	debdistdir='$(debdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || debdistdir=`echo '$(debdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 	for branch in $$rb ; do \
 		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
 		if test -n '$(repobranch)' -a '$(debdistdir)' = '$(debdir)' ; then \
@@ -521,9 +576,9 @@ $(PACKAGE)-local.sources.list: Makefile
 		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
 			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
-			$(ECHO) 'deb file://'$${repodir}$${b:+/$$b}$${d:+/$$d}' ./' ; \
+			$(ECHO) 'deb file://'$${debdistdir}$${b:+/$$b}$${d:+/$$d}' /' ; \
 			if test "$$repo" = 'Source' ; then \
-				$(ECHO) 'deb-src file://'$${repodir}$${b:+/$$b}$${d:+/$$d}' ./' ; \
+				$(ECHO) 'deb-src file://'$${debdistdir}$${b:+/$$b}$${d:+/$$d}' /' ; \
 			fi ; \
 		done ; \
 	done >$@
@@ -590,35 +645,69 @@ repo-install-apt:
 	fi
 	( \
 		cd $(DESTDIR)$(aptrepodir) ; \
-		un=; pw=; \
+		un=; pw=; o=; f='$(PACKAGE).list' ; \
 		for s in '' '.dpkg-new' '.dpkg-old' ; do \
-			f='$(PACKAGE).list'$$s ; \
-			if test -f $$f ; then \
-				un=`sed -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,;t;d' $$f` ; \
-				pw=`sed -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,;t;d' $$f` ; \
+			o="$$f$$s" ; \
+			if test -e $$o ; then \
+				un=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,p;t end;b;: end q' $$o` ; \
+				pw=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,p;t end;b;: end q' $$o` ; \
 				test -n "$$un" -a -n "$$pw" || continue ; \
 				break ; \
 			fi ; \
 		done ; \
-		f='$(PACKAGE).list' ; \
-		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
-		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/rpms/$(reposubdir)/'"$$f$$ext" ; \
+		if test "$$o" != "$$f" ; then \
+			$(ECHO) "mv -f -- $$f $$f.dpkg-old" ; \
+			mv -f -- $$f $$f.dpkg-old || : ; \
+		fi ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
+		ext="$$ext"`echo '/$(rpmsubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
+		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/debs/'"$$f$$ext" ; \
+		$(ECHO) "rm -f -- $$f" ; \
 		rm -f -- $$f ; \
-		if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
-			if echo "$$url" | wget -i - 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+		if ! echo "$$url" | wget -i - -O $$f >/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
 				echo 'Authorization required for repository access.' >/dev/tty ; \
-				u=; p=; \
-				read -e  -p 'Username: ' u </dev/tty >/dev/tty ; \
+				u='anonymous'; p= ; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=$${u:-anonymous} ; \
+				if test "$$u" != 'anonymous' ; then \
 				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
 				echo '' >/dev/tty ; \
-				url='$(reposerv)://'"$${u:+$$u$${p:+:$$p}@}"'$(repobase)/$(reporoot)/rpms/$(reposubdir)/'"$$f$$ext" ; \
+				fi ; \
+				key=; test -z "$$u" || key="$${u}:$${p}@" ; \
+				url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/debs/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; \
 				rm -f -- $$f ; \
-				if ! echo "$$url" | wget -i - >/dev/null 2>&1 ; then \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					test ":$$o" != ":$$f" || mv -f -- $$f.dpkg-old $$f ; \
+					echo 'Authorization failed.' >/dev/tty ; \
 					exit 1 ; \
 				fi ; \
 			fi ; \
 		fi ; \
-	)
+		if test ! -e $$f ; then \
+			if test ":$$o" != ":$$f" ; then \
+				$(ECHO) "mv -f -- $$f.dpkg-old $$f" ; \
+				mv -f -- $$f.dpkg-old $$f ; \
+			fi ; \
+			exit 1 ; \
+		fi ; \
+		debdistdir='$(debdistdir)' ; test '$(DISTDIR)' = '$(REPODIR)' || debdistdir=`echo '$(debdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		tardir='$(tardir)' ; test '$(DISTDIR)' = '$(REPODIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		( \
+			rb='$(repobranch)'; case "$${rb:-base}" in (base|updates|extras|testing) rb=;; esac ; \
+			for b in '' updates extras testing $$rb ; do \
+				d="$${debdistdir}$${b:+/$$b}" ; \
+				for r in main debug devel source '' ; do \
+					d="$${debdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
+					if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'deb     file://'$$d' /' ; \
+					if test -z "$$r" -o "$$r" = 'source'; then \
+					if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'deb-src file://'$$d' /' ; \
+					fi ; \
+				done ; \
+			done \
+		) >$(PACKAGE)-local.list \
+	) || exit 1
 
 ##
 ## To remove an apt install source, disable and copy the @PACKAGE@.list file to
