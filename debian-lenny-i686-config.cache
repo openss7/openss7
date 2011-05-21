@@ -140,6 +140,7 @@ bld_cv_pkg_prog_REFER=${bld_cv_pkg_prog_REFER=refer}
 bld_cv_pkg_prog_SHA1SUM=${bld_cv_pkg_prog_SHA1SUM=sha1sum}
 bld_cv_pkg_prog_SHA256SUM=${bld_cv_pkg_prog_SHA256SUM=sha256sum}
 bld_cv_pkg_prog_SOELIM=${bld_cv_pkg_prog_SOELIM=soelim}
+bld_cv_pkg_prog_SWIG=${bld_cv_pkg_prog_SWIG=swig}
 bld_cv_pkg_prog_TBL=${bld_cv_pkg_prog_TBL=gtbl}
 bld_cv_pkg_prog_TEX=${bld_cv_pkg_prog_TEX=etex}
 bld_cv_pkg_prog_XZ_CMD=${bld_cv_pkg_prog_XZ_CMD=xz}
