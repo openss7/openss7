@@ -89,7 +89,7 @@ RPMOPTS			= $(PACKAGE_RPMOPTIONS) \
 			  --define "_srcrpmdir $(srcrpmdir)" \
 			  --define "_specdir $(specdir)" \
 			  --define "_buildrootdir $(rpmbuildrootdir)" \
-			  --define "_rpmsubdir $(reposubdir)"
+			  --define "_reposubdir $(reposubdir)"
 
 ##
 # Note that we created the usual rpm directories as well.  This is because rpm sometimes complains
