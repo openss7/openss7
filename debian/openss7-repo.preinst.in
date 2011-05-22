@@ -70,28 +70,28 @@ datarootdir=@datarootdir@
 #   also see the same machine credentials.
 #
 preinst_repo () { :
-    local d
+    local d un pw o f s ext
     d="@sysconfdir@/apt/sources.list.d"
     [ -d $d ] || return 1
     (
 	cd "$d"
-	un=; pw=; oldfile=; file="@PACKAGE@.list"
+	un=; pw=; o=; f="@PACKAGE@.list"
 	for s in '' '.dpkg-old' '.dpkg-new'; do
-	    oldfile="$file$s"
-	    if [ -r $oldfile ]; then
-                un=`sed -n -r 's,^.*deb[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $oldfile`
-                pw=`sed -n -r 's,^.*deb[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $oldfile`
+	    o="$f$s"
+	    if [ -r $o ]; then
+		un=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $o`
+		pw=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
                 [ -n "$un" -a -n "$pw" ] || continue
                 break
 	    fi
 	done
-	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.dpkg-old
+	[ ":$o" != ":$f" ] || mv -f -- $f $f.dpkg-old
         ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
-        ext="$ext"`echo /@reposubdir@ | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
+        ext="$ext"`echo '/@reposubdir@' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
 	key=; [ -z "$un" ] || key="$un${pw:+:}${pw}@"
-        url="@reposerv@://${key}@repobase@/@reporoot@/debs/$file$ext"
-        rm -f -- $file
-        if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
+        url="@reposerv@://${key}@repobase@/@reporoot@/debs/$f$ext"
+        rm -f -- $f
+        if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
             if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
                 echo 'Authorization required for repository access.' >/dev/tty
                 u='anonymous'; p=
@@ -101,17 +101,17 @@ preinst_repo () { :
                 echo '' >/dev/tty
                 fi
 		key=; [ -z "$u" ] || key="${u}:${p}@"
-                url="@reposerv@://${key}@repobase@/@reporoot@/debs/$file$ext"
-                rm -f -- $file
-                if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-                    [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-old $file
+                url="@reposerv@://${key}@repobase@/@reporoot@/debs/$f$ext"
+                rm -f -- $f
+                if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
+                    [ ":$o" != ":$f" ] || mv -f -- $f.dpkg-old $f
                     echo 'Authorization failed.' >/dev/tty
 		    return 1
                 fi
             fi
         fi
-        if [ ! -e $file ] ; then
-            [ ":$oldfile" != ":$file" ] || mv -f -- $file.dpkg-old $file
+        if [ ! -e $f ] ; then
+            [ ":$o" != ":$f" ] || mv -f -- $f.dpkg-old $f
 	    return 1
         fi
     ) || return 1
@@ -122,21 +122,21 @@ preinst_repo () { :
 # -----------------------------------------------------------------------------
 # new-preinst install
 install_preinst () { :
-    preinst_repo
+    preinst_repo || exit $?
 }
 # new-preinst install old-version
 reinstall_preinst () { :
-    preinst_repo
+    preinst_repo || exit $?
 }
 # new-preinst upgrade old-version
 upgrade_preinst () { :
-    preinst_repo
+    preinst_repo || exit $?
 }
 # old-postrm upgrade new-version ...FAILED
 # new-postrm failed-upgrade old-version ...FAILED
 # old-preinst abort-upgrade new-version
 abort_upgrade_preinst () { :
-    preinst_repo
+    preinst_repo || exit $?
 }
 @mscript_preinst@
 @mscript_debhelper@

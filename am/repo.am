@@ -187,7 +187,7 @@ repo-install-yum:
 			mv -f -- $$f $$f.rpmsave || : ; \
 		fi ; \
 		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
-		ext="$$ext"`echo '/$(rpmsubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
 		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
 		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/rpms/repodata/'"$$f$$ext" ; \
 		$(ECHO) "rm -f -- $$f" ; \
@@ -443,7 +443,7 @@ repo-install-zypp:
 			mv -f -- $$f $$f.rpmsave ; \
 		fi ; \
 		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=$$un}$${pw:+&pw=$$pw}" ; \
-		ext="$$ext"`echo '/$(rpmsubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
 		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ;  \
 		$(ECHO) "rm -f -- $$f" ; \
 		rm -f -- $$f ; \
@@ -660,7 +660,7 @@ repo-install-apt:
 			mv -f -- $$f $$f.dpkg-old || : ; \
 		fi ; \
 		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
-		ext="$$ext"`echo '/$(rpmsubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
 		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
 		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/debs/'"$$f$$ext" ; \
 		$(ECHO) "rm -f -- $$f" ; \

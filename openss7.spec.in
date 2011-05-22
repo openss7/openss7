@@ -177,8 +177,8 @@
 
 %global HAVE_yumrepo        %(if (rpm -q --whatprovides yum >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 %global HAVE_zypprepo       %(if (rpm -q --whatprovides zypper >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
-# when _rpmsubdir is not defined we cannot build a repo package
-%{!?_rpmsubdir:             %{expand: %%global HAVE_yumrepo 0}}
+# when _reposubdir is not defined we cannot build a repo package
+%{!?_reposubdir:            %{expand: %%global HAVE_yumrepo 0}}
 
 %global HAVE_devscripts     0
 %if %{HAVE_mknods}
@@ -2534,7 +2534,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 	done
 	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.rpmsave
 	ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
-	ext="$ext"`echo '/%{_rpmsubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
+	ext="$ext"`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
 	key=; [ -z "$un" ] || key="${un}${pw:+:}${pw}@"
 	url='%{_reposerv}://'"${key}"'%{_repobase}/%{_reporoot}/rpms/repodata/'"$file$ext"
 	rm -f -- $file
@@ -2578,7 +2578,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 	done
 	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.rpmsave
 	ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=$un}${pw:+&pw=$pw}"
-	ext="$ext"`echo '/%{_rpmsubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
+	ext="$ext"`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
 	url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
 	rm -f -- $file
 	if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
