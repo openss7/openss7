@@ -643,8 +643,7 @@ repo-install-apt:
 		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(aptrepodir)" ; \
 		$(MKDIR_P) $(DESTDIR)$(aptrepodir) ; \
 	fi
-	@test "$V" -ne 1 || set -x; \
-	( \
+	@( \
 		cd $(DESTDIR)$(aptrepodir) ; \
 		un=; pw=; o=; f='$(PACKAGE).list' ; \
 		for s in '' '.dpkg-new' '.dpkg-old' ; do \
