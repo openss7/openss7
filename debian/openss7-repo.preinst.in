@@ -79,8 +79,8 @@ preinst_repo () { :
 	for s in '' '.dpkg-old' '.dpkg-new'; do
 	    o="$f$s"
 	    if [ -r $o ]; then
-		un=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $o`
-		pw=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
+		un=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
+		pw=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
                 [ -n "$un" -a -n "$pw" ] || continue
                 break
 	    fi

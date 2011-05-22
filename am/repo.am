@@ -643,26 +643,27 @@ repo-install-apt:
 		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(aptrepodir)" ; \
 		$(MKDIR_P) $(DESTDIR)$(aptrepodir) ; \
 	fi
+	@test "$V" -ne 1 || set -x; \
 	( \
 		cd $(DESTDIR)$(aptrepodir) ; \
 		un=; pw=; o=; f='$(PACKAGE).list' ; \
 		for s in '' '.dpkg-new' '.dpkg-old' ; do \
 			o="$$f$$s" ; \
 			if test -e $$o ; then \
-				un=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\1,p;t end;b;: end q' $$o` ; \
-				pw=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\3,p;t end;b;: end q' $$o` ; \
+				un=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\2,p;t end;b;: end q' $$o` ; \
+				pw=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$$,\4,p;t end;b;: end q' $$o` ; \
 				test -n "$$un" -a -n "$$pw" || continue ; \
 				break ; \
 			fi ; \
 		done ; \
-		if test "$$o" != "$$f" ; then \
+		if test -f "$$f" -a "$$o" != "$$f" ; then \
 			$(ECHO) "mv -f -- $$f $$f.dpkg-old" ; \
 			mv -f -- $$f $$f.dpkg-old || : ; \
 		fi ; \
 		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
 		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
 		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
-		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/debs/'"$$f$$ext" ; \
+		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
 		$(ECHO) "rm -f -- $$f" ; \
 		rm -f -- $$f ; \
 		if ! echo "$$url" | wget -i - -O $$f >/dev/null ; then \
@@ -675,7 +676,7 @@ repo-install-apt:
 				echo '' >/dev/tty ; \
 				fi ; \
 				key=; test -z "$$u" || key="$${u}:$${p}@" ; \
-				url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/debs/'"$$f$$ext" ; \
+				url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
 				$(ECHO) "rm -f -- $$f" ; \
 				rm -f -- $$f ; \
 				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
