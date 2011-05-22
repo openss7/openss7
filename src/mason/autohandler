@@ -381,12 +381,7 @@ password=<% $hostpass %>
 	@brarepos = ( $branch ) if ( $branch and $branch ne 'base' );
 	@subrepos = ( $subrep ) if ( $subrep and $subrep ne 'full' );
 
-	my $emptyrepo;
-	if ( $page eq 'openss7.list' ) {
-	    $emptyrepo = ( -e $ENV{'DOCUMENT_ROOT'}.'/repo/debs/Release' ) ? 1 : 0;
-	} else {
-	    $emptyrepo = ( -e $ENV{'DOCUMENT_ROOT'}.'/repo/rpms/repodata/repomd.xml' ) ? 1 : 0;
-	}
+	my $emptyrepo = ( -e $ENV{'DOCUMENT_ROOT'}.'/repo/rpms/repodata/repomd.xml' ) ? 1 : 0;
 
 	my $toenable;
 
@@ -472,38 +467,38 @@ password=<% $hostpass %>
 		$name .= '-'.$subrep if ($subrep ne 'full');
 		if ( $page eq 'openss7.repo' )
 		{
-		$desc = 'OpenSS7';
-		$desc .= ' '.$bdesc if ($bdesc ne 'Base');
-		$desc .= ' '.$sdesc if ($sdesc ne 'Full');
-		$desc .= ' ('.$target.')';
+		    $desc = 'OpenSS7';
+		    $desc .= ' '.$bdesc if ($bdesc ne 'Base');
+		    $desc .= ' '.$sdesc if ($sdesc ne 'Full');
+		    $desc .= ' ('.$target.')';
 
-		my $rcreds = $hostname.':'.$hostpass.'@';
+		    my $rcreds = $hostname.':'.$hostpass.'@';
 
-		my $repostr = '?un='.$hostname;
-		$repostr .= '&distro='.$distro if ($distro);
-		$repostr .= '&relver='.'$releasever';
-		$repostr .= '&osarch='.'$basearch';
-		$repostr .= '&branch='.$branch if ($branch ne 'base');
-		$repostr .= '&subrep='.$subrep if ($subrep ne 'full');
+		    my $repostr = '?un='.$hostname;
+		    $repostr .= '&distro='.$distro if ($distro);
+		    $repostr .= '&relver='.'$releasever';
+		    $repostr .= '&osarch='.'$basearch';
+		    $repostr .= '&branch='.$branch if ($branch ne 'base');
+		    $repostr .= '&subrep='.$subrep if ($subrep ne 'full');
 
-		$url = '/repo/rpms';
-		$url .= "/$distro" if ($distro);
-		$url .= '/$releasever';
-		$url .= '/$basearch';
-		$url .= "/$branch" if ($branch ne 'base');
-		$url .= "/$subrep" if ($subrep ne 'full');
-		
-		    next if ( !$offerred );
-
-		    # do not even advertize 'testing', 'extras' or 'source'-containing repos
-		    next if ( !$allowed and $branch eq 'testing' );
-		    next if ( !$allowed and $subrep eq 'full'    );
-		    next if ( !$allowed and $subrep eq 'source'  );
+		    $url = '/repo/rpms';
+		    $url .= "/$distro" if ($distro);
+		    $url .= '/$releasever';
+		    $url .= '/$basearch';
+		    $url .= "/$branch" if ($branch ne 'base');
+		    $url .= "/$subrep" if ($subrep ne 'full');
 		    
-		my $pre = '';
+			next if ( !$offerred );
+
+			# do not even advertize 'testing', 'extras' or 'source'-containing repos
+			next if ( !$allowed and $branch eq 'testing' );
+			next if ( !$allowed and $subrep eq 'full'    );
+			next if ( !$allowed and $subrep eq 'source'  );
+			
+		    my $pre = '';
 
 		    if ( !$allowed ) {
-		    $enabled = 0;
+			$enabled = 0;
 			$pre = '#' unless ( $emptyrepo );
 			if ( $hostaccs =~ /,guests-hosts,/ ) {
 </%perl>
@@ -516,7 +511,7 @@ password=<% $hostpass %>
 <% $pre %># <% $reason %>.
 <% $pre %># To activate this repository, contact your software provider [<% $username %>].
 <%perl>
-		}
+			}
 		    }
 </%perl>
 <% $pre %>[<% $name %>]
@@ -529,7 +524,7 @@ password=<% $hostpass %>
 <% $pre %>gpgcheck = 1
 
 <%perl>
-	    }
+		}
 		elsif ( $page eq 'openss7.list' )
 		{
 		    my $rcreds = $hostname.':'.$hostpass.'@';
@@ -544,7 +539,7 @@ password=<% $hostpass %>
 		    my $pre = '';
 
 		    if ( !$allowed ) {
-			$pre = '#' unless ( $emptyrepo );
+			$pre = '#';
 			if ( $hostaccs =~ /,guests-hosts,/ ) {
 </%perl>
 <% $pre %># This repository is not autnorized by default.
