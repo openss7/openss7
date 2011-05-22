@@ -8,7 +8,7 @@
 	ForceType "text/plain"
 </FilesMatch>
 # All repo files are controlled by the autohandler
-<FilesMatch "^(OPENSS7credentials|openss7.repo)$">
+<FilesMatch "^(OPENSS7credentials|openss7.repo|openss7.list)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
@@ -57,6 +57,19 @@
 	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
 	Require group hosts
 </FilesMatch>
+# apt meta files must only be downloaded by machines (but any machine)
+<FilesMatch "^((Packages|Sources|Contents|Release)(.gz|.bz2|.gpg|.key)?|md5sum.txt)$">
+	Order allow,deny
+	Allow from all
+	SSLRequireSSL
+	AuthType Basic
+	AuthName "OpenSS7 Repository Host Access Credentials"
+	AuthDBUserFile /var/www/mason/repousers
+	AuthDBGroupFile /var/www/mason/repousers
+	PerlRequire /var/www/mason/perl/auth.pl
+	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
+	Require group hosts
+</FilesMatch>
 # repoindex.xml only downloaded by machines with correct credentials
 <Files "repoindex.xml">
 	Order allow,deny
@@ -72,9 +85,9 @@
 	SetHandler perl-script
 	PerlHandler HTML::Mason::ApacheHandler
 </Files>
-# RPMs (other than openss7-repo) must only be downloaded by machines
-# RPMs must be overridden to allow guests-hosts in individual subdirectories
-<FilesMatch "^openss7-[^r].*\.rpm$">
+# RPMs or DEBs (other than openss7-repo) must only be downloaded by machines
+# RPMs or DEBs must be overridden to allow guests-hosts in individual subdirectories
+<FilesMatch "^openss7-[^r].*\.(rpm|u?d?deb)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
@@ -86,8 +99,8 @@
 	PerlAuthenHandler OpenSS7::Auth::rpmauthenhandler
 	Require group hosts
 </FilesMatch>
-# Anybody can download the repository RPMs
-<FilesMatch "^openss7-repo.*\.rpm$">
+# Anybody can download the repository RPMs or DEBs
+<FilesMatch "^openss7-repo.*\.(rpm|u?d?deb)$">
 	Order allow,deny
 	Allow from all
 #SSLRequireSSL
@@ -101,7 +114,7 @@
 </FilesMatch>
 # tarballs and spec files must only be downloaded by subscribers
 # must be overridden to allow guests
-<FilesMatch "^openss7-1\..*(\.tar\.(gz|bz2|xz|lzma)|\.spec)$">
+<FilesMatch "^openss7-1\..*\.(tar\.(gz|bz2|xz|lzma)|spec|src\.rpm|dsc(\.asc)?)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
