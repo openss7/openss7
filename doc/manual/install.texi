@@ -148,8 +148,6 @@ Repository Access::			access to the repositories
 Repositories for YUM::			the @manpage{yum(8)} repository
 Repositories for YAST::			the @manpage{yast(8)} repository
 Repositories for APT::			the @manpage{apt(8)} repository
-REPO-MD Repositories::
-APTITUDE Repositories::			
 @end menu
 
 @node Repository Access
@@ -265,8 +263,8 @@ follows:
 
 @cartouche
 @smallexample
-$> REPOS="https://user@@www.openss7.org/repo/rpms"
-$> REPONOARCH="$REPOS/fedora/14/x86_64/RPMS/noarch"
+$> REPO="https://user@@www.openss7.org/repo/rpms"
+$> REPONOARCH="$REPO/fedora/14/x86_64/RPMS/noarch"
 $> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
 $> sudo rpm -Uhv $REPORPM
 $> Username: anonymous
@@ -276,13 +274,13 @@ $> Password: *******
 
 The example, above, assumes that the distribution is @samp{fedora} and the distribution release is
 @samp{14} and the required architecture is @samp{x86_64}.  Another example would be
-@file{$REPOS/redhat/6.0/x86_64/RPMS/noarch}, for using @manpage{yum(8)} with RHEL.
+@file{$REPO/redhat/6.0/x86_64/RPMS/noarch}, for using @manpage{yum(8)} with RHEL.
 
 To obtain access to the repository at the level to which you are entitled, you will have to respond
 to the @samp{Username:} query with the user name with which you are registered with
 @uref{https://www.openss7.org/}, and to the @samp{Password:} query with your repository access
-password.@footnote{Note that your repository access password is separate from you web access
-password.}
+password.@footnote{Note that your repository access password is separate and distinct from your web
+access password.}
 
 You can test whether the @manpage{yum(8)} repository is properly set up by refreshing the repository
 and by listing the packages:
@@ -359,8 +357,8 @@ follows:
 
 @cartouche
 @smallexample
-$> REPOS="https://user@@www.openss7.org/repo/rpms"
-$> REPONOARCH="$REPOS/opensuse/11/x86_64/RPMS/noarch"
+$> REPO="https://user@@www.openss7.org/repo/rpms"
+$> REPONOARCH="$REPO/opensuse/11/x86_64/RPMS/noarch"
 $> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
 $> sudo rpm -Uhv $REPORPM
 $> Username: anonymous
@@ -370,7 +368,7 @@ $> Password: *******
 
 The example assumes that the distribution is @samp{opensuse} and the distribution release is
 @samp{11} and the architecture requiresd is @samp{x86_64}.  Another example would be
-@file{$REPOS/suse/11/x86_64/RPMS/noarch}, for using @manpage{zypper(8)} with SLES.
+@file{$REPO/suse/11/x86_64/RPMS/noarch}, for using @manpage{zypper(8)} with SLES.
 
 To obtain access to the repository at the level to which you are entitled, you will have to respond
 to the @samp{Username:} query with the user name with which you are registered with
@@ -424,9 +422,9 @@ $> sudo zypper remove @value{PACKAGE}
 @end smallexample
 @end cartouche
 
-To install the development packages for developing STREAMS modules and drivers, or applications that
-use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the development packages using (one
-of):
+To install the development packages for developing @cite{STREAMS} modules and drivers, or
+applications that use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the development
+packages using (one of):
 
 @cartouche
 @smallexample
@@ -442,10 +440,11 @@ $> sudo zypper install @value{PACKAGE}-devel
 
 The @cite{@value{PACKAGE_TITLE}} @manpage{zypper(8)} repository definitions support the automatic
 updating of kernel modules when kernels are updated.  When the system is updated, using @samp{zypper
-update}, openss7 packages that are available for an updated kernel will be installed automatically.
-@cite{@value{PACKAGE_TITLE}} kernel module packages also support weak updates and when kernels are
-updated to compatible kernels (e.g.  for security updates, or normally for any update within an
-Enterprise distribution), kernel modules are automatically applied against the updated kernel.
+update}, @cite{@value{PACKAGE_TITLE}} packages that are available for an updated kernel will be
+installed automatically.  @cite{@value{PACKAGE_TITLE}} kernel module packages also support weak
+updates and when kernels are updated to compatible kernels (e.g.  for security updates, or normally
+for any update within an Enterprise distribution), kernel modules are automatically applied against
+the updated kernel.
 
 @node General REPO-MD Repository
 @subsubsection General REPO-MD Repository
@@ -571,6 +570,116 @@ $> sudo zypper addrepo --type yast2 $REPODIR openss7
 
 For assistance with specific DEBs, see @ref{Downloading the Debian DEB}.
 
+@menu
+Setting up APT::			setting up repository access with APT
+Using the APT Repository::		using the respository with APT
+APT Kernel Updates::			updating kernels with APT
+@end menu
+
+@node Setting up APT
+@subsubsection Setting up APT
+@cindex apt
+
+To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{apt} repositories using
+@manpage{apt(8)}, you will need to install the @file{@value{PACKAGE}-repo} DEB on your system, as
+follows:
+
+@cartouche
+@smallexample
+$> REPO="https://user@@www.openss7.org/repo/rpms"
+$> REPONOARCH="$REPO/debian/squeeze/x86_64"
+$> REPODEB="$REPONOARCH/@value{PACKAGE}-repo_all.deb"
+$> wget $REPODEB
+$> dpkg -i -D010077 @value{PACKAGE}-repo_all.deb
+$> Username: anonymous
+$> Password: ********
+@end smallexample
+@end cartouche
+
+The example, above, assumes that the distribution is @samp{debian} and the distribution release is
+@samp{squeeze} and the required architecture is @samp{x86_64}.@footnote{Note that this is the
+@samp{$(uname -m)} style architecture and not the Debian sytle architecture.}  Another example would
+be @file{$REPO/ubuntu/10.04/x86_64}, for using @manpage{apt(8)} with Ubuntu.
+
+To obtain access to the repository at the leve to which you are entitled, you will have to respond
+to the @samp{Username:} query with the user name with which you are registered with
+@uref{https://www.openss7.org/}, and to the @samp{Password:} query with your repository access
+password.@footnote{Note that your repository access password is separate and distinct from your web
+access password.}
+
+@manpage{apt(8)} does not do a very good job of importing GPG signatures.  When @command{apt-get} is
+reporting that there are no keys for the DEBs being installed, the key can be imported directly into
+APT as follows:
+
+@cartouche
+@smallexample
+$> wget https://www.openss7.org/pubkey.asc
+$> sudo apt-key add pubkey.asc
+@end smallexample
+@end cartouche
+
+You can test whether the @manpage{apt(8)} repository is properly set up by refreshing the repository
+and by listing the packages.
+
+@cartouche
+@smallexample
+$> sudo apt-get update
+$> aptitude search openss7
+@end smallexample
+@end cartouche
+
+@node Using the APT Repository
+@subsubsection Using the APT Repository
+@cindex apt
+
+Once the repository is set up, @cite{@value{PACKAGE_TITLE}} includes a number of virtual packages
+and packages recommendations that ease the installation and removal of kernel modules, libraries and
+utilities.  Downloading, configuring, building and installation for a single-kernel distribution is
+as easy as:@footnote{Note that using @manpage{aptitude(8)} in this way relies upon recommendations
+being treated as strong dependencies.  This is normaly the case for default @manpage{apt(8)}
+configuration files (particularly when @command{synaptic} is installed); however, it is not
+necessarily the case.  If you are not getting recommended packages being automatically installed,
+add @option{--with-recommends} to the command line.}
+
+@cartouche
+@smallexample
+$> sudo aptitude install @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+Removing the package is as easy as:
+
+@cartouche
+@smallexample
+$> sudo aptitude remove @value{PACKAGE}
+$> sudo aptitude purge @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+To install the development packages for developing @cite{STREAMS} modules and drivers, or
+applications that use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the development
+packages using:
+
+@cartouche
+@smallexample
+$> sudo aptitude install @value{PACKAGE}-devel
+@end smallexample
+@end cartouche
+
+@node APT Kernel Updates
+@subsubsection APT Kernel Updates
+@cindex apt
+@cindex kernel updates
+
+The @cite{@value{PACKAGE_TITLE}} @manpage{apt(8)} repository definitions support the automatic
+updating of kernel modules when kenrels are updated.  When the system is updated, using
+@samp{apt-get upgrade}, @cite{@value{PACKAGE_TITLE}} packages that are available for an updated
+kernel will be installed automatically.  @cite{@value{PACKAGE_TITLE}} kernel module packages also
+support weak updates and when kernels are updated to compatible kernels (e.g. for security upgrades,
+or normally for any updated within an Enterprise (LTS) distribution), kernel modules are
+automatically applied against the updated kernel.
+
+
 @c ----------------------------------------------------------------------------
 @c ----------------------------------------------------------------------------
 
@@ -692,6 +801,12 @@ components are as follows:
 
 @table @file
 
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-repo-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-repo-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
+
+This packages can be used to install or remove the repository source definitions for all
+@value{PACKAGE_TITLE} release packages.  On systems that support repository access, this package is
+required by the other packages.
+
 @item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/noarch/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.noarch.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.noarch@-.rpm}
 
 This package can be used to install or remove the entire @value{PACKAGE_TITLE} package.  When
@@ -802,6 +917,10 @@ This package can be used to install or remove the development components of the
 module and kernel module development and debug packages will also be installed.  When removing, the
 development package and all kernel module development and debug packages will also be removed.
 
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-debuginfo-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-debuginfo-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-debugsource-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-debugsource-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
 @end table
 
 @subsubsection Kernel-Dependent RPM
@@ -863,6 +982,10 @@ modules that use the exported symbols without loading the actual kernel modules 
 This particular package applies to kernel version @samp{@value{_kversion}}.@footnote{Note that the
 @samp{_kversion} of @samp{@value{_kversion}} is only an example.}
 
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-debuginfo-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-debuginfo-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
+@item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-debugsource-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-debugsource-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
+
 @item @uref{https://www.openss7.org/repo/rpms/@value{PACKAGE_RPMSUBDIR}/RPMS/@value{_target_cpu}/@value{PACKAGE}-source-@value{_kversion}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}.@value{_target_cpu}.rpm,, @value{PACKAGE}-@-source-@-@value{_kversion}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@value{PACKAGE_RPMEXTRA}@-.@value{_target_cpu}@-.rpm}
 
 The @file{@value{PACKAGE}-@-source-@-@value{_kversion}} package contains the configured source for
@@ -918,6 +1041,8 @@ downloads site.  If your architecture is not available, you can build binary DEB
 
 @subsubheading Architecture Independent
 @table @asis
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-repo_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-repo_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
+
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}-dev_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_all.deb,, @value{PACKAGE}-@-dev_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_all@-.deb}
 The @file{@value{PACKAGE}-@-dev} package contains the device definitions necessary to run
 applications programs developed for @value{PACKAGE_TITLE}.  @footnote{Note that not all release
@@ -958,6 +1083,11 @@ necessary to run application programs and utilities developed for the
 The @file{@value{PACKAGE}-@-util} package provides administrative and configuration test utilities
 and commands associated with the @value{PACKAGE_TITLE} package.
 @end ignore
+
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-debuginfo_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-debuginfo_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+
+@item @uref{http://www.openss7.org/debian/@value{PACKAGE}-debugsource_@value{VERSION}-@value{PACKAGE_DEBRELEASE}_i386.deb,, @value{PACKAGE}-@-debugsource_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}_i386@-.deb}
+
 @end table
 
 @subsubheading Kernel-Dependent DEB
