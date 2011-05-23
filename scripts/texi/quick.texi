@@ -146,9 +146,9 @@ See
 
 @unnumberedsubsec Repository Installation
 
-The simplest way of installing the package is to use the @cite{OpenSS7} @file{repomd} repositories
-instead of attempting to build from tarball.  When you already have a the repository set up, the
-package can be udpated simply with (one of):
+The simplest way of installing the package is to use the @cite{OpenSS7} @file{repomd} or @file{apt}
+repositories instead of attempting to build from tarball.  When you already have a the repository
+set up, the package can be udpated simply with (one of):
 
 @example
 Fedora:   $> sudo yum update openss7
@@ -156,31 +156,83 @@ CentOS:   $> sudo yum update openss7
 RHEL:     $> sudo yum update openss7
 OpenSUSE: $> sudo zypper update openss7
 SLES:     $> sudo zypper update openss7
-Ubuntu:   $> sudo apt-get update openss7
-Debian:   $> sudo apt-get update openss7
+Ubuntu:   $> sudo aptitude install openss7
+Debian:   $> sudo aptitude install openss7
 @end example
 
+@noindent
 If you have not yet set up an installation source for the @cite{OpenSS7} repositories, one of the
 following commands will establish repository access for RPM-based systems:
 
 @example
-          $> REPOS=http://www.openss7.org/repos/
-Fedora:   $> SUBDIR=rpms/fedora/14/$(uname -m)/RPMS/noarch
-CentOS:   $> SUBDIR=rpms/centos/5.5/$(uname -m)/RPMS/noarch
-RHEL:     $> SUBDIR=rpms/redhat/6.0/$(uname -m)/RPMS/noarch
-OpenSUSE: $> SUBDIR=rpms/opensuse/11.3/$(uname -m)/RPMS/noarch
+          $> REPO=http://www.openss7.org/repo/rpms
+Fedora:   $> SUBDIR=fedora/14/$(uname -m)/RPMS/noarch
+CentOS:   $> SUBDIR=centos/5.5/$(uname -m)/RPMS/noarch
+RHEL:     $> SUBDIR=redhat/6.0/$(uname -m)/RPMS/noarch
+OpenSUSE: $> SUBDIR=opensuse/11.3/$(uname -m)/RPMS/noarch
 SUSE:     $> SUBDIR=suse/11.1/$(uname -m)/RPMS/noarch
-          $> sudo rpm -Uhv $REPOS/$SUBDIR/openss7-repo.noarch.rpm
+          $> sudo rpm -Uhv $REPO/$SUBDIR/openss7-repo.noarch.rpm
+@end example
+
+@noindent
+For DPKG-based systems, one of the following command sequences will establish repository access for
+DPKG-based systems:
+
+@example
+          $> REPO=http://www.openss7.org/repo/debs/
+Debian:   $> SUBDIR=debian/squeeze/$(uname -m)/main
+Ubuntu:   $> SUBDIR=ubuntu/10.04/$(uname -m)/main
+          $> wget $REPO/$SUBDIR/openss7-repo_all.deb
+          $> dpkg -i -D010077 openss7-repo_all.deb
 @end example
 
 @noindent
 For @manpage{zypper(8)} based systems it may be first necessary to perform:
 
 @example
-OpenSUSE: $> sudo rpm --import http://www.openss7.org/pubkey.asc
-SLES:     $> sudo rpm --import http://www.openss7.org/pubkey.asc
+OpenSUSE: $> sudo rpm --import https://www.openss7.org/pubkey.asc
+SLES:     $> sudo rpm --import https://www.openss7.org/pubkey.asc
 @end example
 
+@noindent
+For @manpage{apt(8)} based systems it may be first necessary to perform:
+
+@example
+          $> wget https://www.openss7.org/pubkey.asc
+Debian:   $> sudo apt-key add pubkey.asc
+Ubuntu:   $> sudo apt-key add pubkey.asc
+@end example
+
+@noindent
+For @manpage{yum(8)} based systems, caches should be refreshed with:
+
+@example
+Fedora:   $> sudo yum makecache
+CentOS:   $> sudo yum makecache
+RHEL:     $> sudo yum makecache
+@end example
+
+@noindent
+For @manpage{zypper(8)} base systems, caches should be refreshed with:
+
+@example
+OpenSUSE: $> sudo zypper refresh-services
+OpenSUSE: $> sudo zypper refresh
+SLES:     $> sudo zypper refresh-services
+SLES:     $> sudo zypper refresh
+@end example
+
+@noindent
+For @manpage{apt(8)} base systems, caches should be refreshed with:@footnote{Note that the
+apt-transport-https package must be installed for the openss7 repositories to function correctly.
+Try @samp{sudo aptitude install apt-transport-https}.}
+
+@example
+Debian:   $> sudo aptitude update
+Ubuntu:   $> sudo aptitude update
+@end example
+
+@noindent
 Once the repository is set up in this fashion, it should be possible to install using (one of):
 
 @example
@@ -189,8 +241,11 @@ CentOS:   $> sudo yum install openss7
 RHEL:     $> sudo yum install openss7
 OpenSUSE: $> sudo zypper install openss7
 SLES:     $> sudo zypper install openss7
+Debian:   $> aptitude install openss7
+Ubuntu:   $> aptitude install openss7
 @end example
 
+@noindent
 The entire process can be undone with:
 
 @example
@@ -199,6 +254,8 @@ CentOS:   $> sudo yum remove openss7 openss7-repo
 RHEL:     $> sudo yum remove openss7 openss7-repo
 OpenSUSE: $> sudo zypper remove openss7 openss7-repo
 SLES:     $> sudo zypper remove openss7 openss7-repo
+Debian:   $> sudo aptitude remove openss7 openss7-repo
+Ubuntu:   $> sudo aptitude remove openss7 openss7-repo
 @end example
 
 @unnumberedsubsec Build Prerequisites
