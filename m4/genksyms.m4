@@ -346,7 +346,9 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 		ksyms_cv_updates_options='--style=redhat' ;;
 	    (suse|opensuse|sles|sled)
 		ksyms_cv_updates_options='--style=suse11' ;;
-	    (debian|ubuntu|*)
+	    (ubuntu)
+		ksyms_cv_updates_options='--style=ubuntu' ;;
+	    (debian|mandrake|mandriva|manbo|*)
 		ksyms_cv_updates_options='--style=debian' ;;
 	esac])
     UPDATES_OPTIONS="${ksyms_cv_updates_options:+ $ksyms_cv_updates_options}"

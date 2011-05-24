@@ -718,7 +718,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		;;
 	    (mandriva|manbo)
 		case "${kversion}" in
-		    # mandriva boot kernels (not needed for kernel.h
+		    # mandriva boot kernels (not needed for kernel.h)
 		    (*-rsbac-desktop586-*)  linux_cv_k_boot='rsbac-desktop586'	;;
 		    (*-rsbac-desktop-*)	    linux_cv_k_boot='rsbac-desktop'	;;
 		    (*-rsbac-server-*)	    linux_cv_k_boot='rsbac-server'	;;

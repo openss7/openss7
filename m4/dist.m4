@@ -157,6 +157,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    /etc/lineox-release
 	    /etc/whitebox-release
 	    /etc/fedora-release
+	    /etc/manbo-release
 	    /etc/mandriva-release
 	    /etc/mandrake-release
 	    /etc/redhat-release
@@ -204,6 +205,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	(*Fedora*|*FEDORA*)				echo 'fedora'	;;
 	(*Mandrake*|*MANDRAKE*)				echo 'mandrake'	;;
 	(*Mandriva*|*MANDRIVA*)				echo 'mandriva'	;;
+	(*Manbo*|*MANBO*)				echo 'manbo'	;;
 	(*Red?Hat?Enterprise*)				echo 'rhel'	;;
 	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	;;
 	(*SUSE?Linux?Enterprise?Server*)		echo 'sles'	;;
@@ -322,7 +324,7 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 	(fedora)	echo 'Fedora' ;;
 	(mandrake)	echo 'Mandrake Linux' ;;
 	(mandriva)	echo 'Mandriva Linux' ;;
-	(manbo)		echo 'Mandriva/Turbo Linux' ;;
+	(manbo)		echo 'Manbo Linux' ;;
 	(redhat)	echo 'Red Hat Linux' ;;
 	(rhel)		echo 'Red Hat Enterprise Linux' ;;
 	(suse)		echo 'SuSE Linux' ;;
@@ -450,6 +452,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	    ${DESTDIR}${sysconfdir}/lineox-release
 	    ${DESTDIR}${sysconfdir}/whitebox-release
 	    ${DESTDIR}${sysconfdir}/fedora-release
+	    ${DESTDIR}${sysconfdir}/manbo-release
 	    ${DESTDIR}${sysconfdir}/mandriva-release
 	    ${DESTDIR}${sysconfdir}/mandrake-release
 	    ${DESTDIR}${sysconfdir}/redhat-release
