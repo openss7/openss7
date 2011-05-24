@@ -628,6 +628,7 @@ dnl
 *** JAVADOC environment variable when running configure.
 ***])
 	fi])
+    AC_REQUIRE_SHELL_FN([bld_path_check])dnl
     AC_CACHE_CHECK([for libgcj javadoc directory], [ac_cv_libgcj_doc], [dnl
 	eval "gcj_search_path=\"
 	    ${DESTDIR}${rootdir}${javadocdir}
@@ -661,21 +662,28 @@ dnl
 	AC_MSG_CHECKING([for libgcj javadoc directory])
     ])
     if test :"${ac_cv_libgcj_doc:-no}" = :no ; then
-	AC_MSG_WARN([
+	_BLD_INSTALL_WARN([PACKAGE_LIST], [
 ***
 *** Configure could not find a suitable libgcj javadoc documentation
 *** directory.  The libgcj javadoc documentation is part of the 'libgcj'
 *** documentation package which is not always loaded on all
-*** distributions.  Use the following commands to obtain 'libgcj'
-*** javadoc documentation:
+*** distributions.  Try:
+*** ], [
+*** On RPM based distributions, try 'yum install libgcj-doc'.
+*** On DEB based distributions, try 'aptitude install libgcj-doc'.
 ***
 *** Debian 5.0:   'apt-get install libgcj-doc'
 *** Ubuntu 8.04:  'apt-get install libgcj-doc'
-*** CentOS 5.x:   'yum install '
+*** CentOS 5.x:   'yum install libgcj-doc'], [
 ***
-])
+*** Repeat after loading the correct package.  Otherwise, java
+*** documentation will be linked with the online versions of the
+*** classpath documentation instead.  Proceeding with linking javadoc
+*** online instead of offline.
+*** ])
 	gcjdocdir=
     else
+	bld_path_check "ac_cv_libgcj_doc" "package-list"
 	gcjdocdir="$ac_cv_libgcj_doc"
     fi
     AC_SUBST([gcjdocdir])dnl
@@ -687,7 +695,6 @@ dnl
     if test -n "$gcjdocdir" ; then
 	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }"'-linkoffline http://developer.classpath.org/doc/ $(gcjdocdir)'
     else
-	AC_MSG_WARN([Linking javadoc online.])
 	JAVADOCFLAGS="${JAVADOCFLAGS:+$JAVADOCFLAGS }"'-link http://developer.classpath.org/doc/'
     fi
 ])# _GCJ_TOOLS
@@ -783,15 +790,16 @@ AC_DEFUN([_GCJ_SETUP], [dnl
 	    [GCJ library header directory @<:@default=search@:>@])],
 	[], [with_libgcj=search])
     _BLD_FIND_DIR([libgcj include directory], [gcj_cv_includedir], [
-	${DESTDIR}${rootdir}${includedir}
-	${DESTDIR}${rootdir}${oldincludedir}
-	${DESTDIR}${rootdir}/usr/include
-	${DESTDIR}${rootdir}/usr/local/include
-	${DESTDIR}${includedir}
-	${DESTDIR}${oldincludedir}
-	${DESTDIR}/usr/include
-	${DESTDIR}/usr/local/include], [gcj/cni.h], [no], [dnl
-	_BLD_INSTALL_WARN([GCJ_CNI_H], [
+	    ${DESTDIR}${rootdir}${includedir}
+	    ${DESTDIR}${rootdir}${oldincludedir}
+	    ${DESTDIR}${rootdir}/usr/include
+	    ${DESTDIR}${rootdir}/usr/local/include
+	    ${DESTDIR}${includedir}
+	    ${DESTDIR}${oldincludedir}
+	    ${DESTDIR}/usr/include
+	    ${DESTDIR}/usr/local/include], [gcj/cni.h], [no], [dnl
+	if test ${with_libgcj:-search} != no ; then
+	    _BLD_INSTALL_WARN([GCJ_CNI_H], [
 ***
 *** Configure cannot find the libgcj development header gcj/cni.h.  This
 *** header is required to compile CNI components for Java.  The
@@ -808,12 +816,12 @@ AC_DEFUN([_GCJ_SETUP], [dnl
 *** configure, or by specifying --without-java: continuing under the
 *** assumption that the option --without-java was intended.
 *** ])
-	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_libgcj --without-libgcj\""
-	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-libgcj'"
-	ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-libgcj'"
-	with_libgcj=no
-    ], [], [with_libgcj])
-    if test :"${with_libgcj:-search}" = :no -o :"${gcj_cv_includedir:-no}" = :no ; then
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_libgcj --without-libgcj\""
+	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-libgcj'"
+	    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-libgcj'"
+	    with_libgcj=no
+	fi], [], [with_libgcj])
+    if test ${gcj_cv_includedir:-no} = no ; then
 	gcjincludedir=
     else
 	gcjincludedir="$gcj_cv_includedir"

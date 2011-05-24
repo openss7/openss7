@@ -93,8 +93,7 @@ AC_DEFUN([_AGENT_MSG_WARN],
 *** Compiling SNMP agents requires the availability of UCD-SNMP header
 *** files and in particular <[$]1>.  This file
 *** could not be found.  Perhaps you need to load the NET-SNMP
-*** development package (net-snmp-dev or libsnmp-dev).  Use the
-*** following commands to obtain the NET-SNMP development package:
+*** development package (net-snmp-dev or libsnmp-dev).  Try:
 ***
 *** Debian 5.0:  'apt-get install libsnmp-dev'
 *** Ubuntu 8.04: 'apt-get install libsnmp-dev'
