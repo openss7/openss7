@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -99,7 +99,9 @@
 #define __STREAMS_EXTERN __EXTERN streams_fastcall
 #endif
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/module.h>
 #include <linux/types.h>	/* for various types */
 

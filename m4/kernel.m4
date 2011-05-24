@@ -716,6 +716,30 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		esac
 		linux_cv_k_base=`echo "$kversion" | sed -r -e s/$linux_cv_k_boot$// -e s/-$//`
 		;;
+	    (mandriva|manbo)
+		case "${kversion}" in
+		    # mandriva boot kernels (not needed for kernel.h
+		    (*-rsbac-desktop586-*)  linux_cv_k_boot='rsbac-desktop586'	;;
+		    (*-rsbac-desktop-*)	    linux_cv_k_boot='rsbac-desktop'	;;
+		    (*-rsbac-server-*)	    linux_cv_k_boot='rsbac-server'	;;
+		    (*-tmb-desktop586-*)    linux_cv_k_boot='tmb-desktop586'	;;
+		    (*-tmb-desktop-*)	    linux_cv_k_boot='tmb-desktop'	;;
+		    (*-tmb-server-*)	    linux_cv_k_boot='tmb-server'	;;
+		    (*-tmb-laptop-*)	    linux_cv_k_boot='tmb-laptop'	;;
+		    (*-desktop586-*)	    linux_cv_k_boot='desktop586'	;;
+		    (*-desktop-*)	    linux_cv_k_boot='desktop'		;;
+		    (*-server-*)	    linux_cv_k_boot='server'		;;
+		    (*-netbook-*)	    linux_cv_k_boot='netbook'		;;
+		    (*-kerrighed-*)	    linux_cv_k_boot='kerrighed'		;;
+		    (*-vserver-*)	    linux_cv_k_boot='vserver'		;;
+		    (*-openvz-*)	    linux_cv_k_boot='openvz'		;;
+		    (*-linus-*)		    linux_cv_k_boot='linux'		;;
+		    (*-xen-pvops-*)	    linux_cv_k_boot='xen-pvops'		;;
+		    (*-xen-*)		    linux_cv_k_boot='xen'		;;
+		    (*-rt-*)		    linux_cv_k_boot='rt'		;;
+		    (*)			    linux_cv_k_boot=			;;
+		esac
+		;;
 	    (suse)
 		case "${kversion}" in
 		    # suse boot kernels
@@ -859,7 +883,7 @@ dnl ***
 dnl *** ])
 dnl 			fi
 dnl 			;;
-dnl 		    (mandrake)
+dnl 		    (mandrake|mandriva|manbo)
 dnl 			;;
 dnl 		    (*)
 dnl 			;;
@@ -1022,7 +1046,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		if test -d "$linux_dir" -a \
 			-d "$linux_dir/include" -a \
 			-d "$linux_dir/include/linux" -a \
-			-f "$linux_dir/include/linux/autoconf.h" -a \
+			\( -f "$linux_dir/include/linux/autoconf.h" -o \
+			   -f "$linux_dir/include/generated/autoconf.h" \) -a \
 			-f "$linux_dir/include/linux/version.h"
 		then
 		    linux_cv_k_build="$linux_dir"
@@ -1289,7 +1314,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
-			    (mandrake|mandriva)
+			    (mandrake|mandriva|manbo)
 				;;
 			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
 				AC_MSG_WARN([
@@ -1383,7 +1408,7 @@ dnl
 			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
-			    (mandrake)
+			    (mandrake|mandriva|manbo)
 dnl
 dnl				Mandrakelinux blends the debian architecture name in the kernel
 dnl				image name approach with the Redhat kernel version number in the
@@ -1535,7 +1560,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
-			    (mandrake|mandriva)
+			    (mandrake|mandriva|manbo)
 				;;
 			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
 				AC_MSG_WARN([
@@ -1627,7 +1652,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
 			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
-			    (mandrake|mandriva)
+			    (mandrake|mandriva|manbo)
 				;;
 			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
 				AC_MSG_WARN([
@@ -1720,7 +1745,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
-			    (mandrake|mandriva)
+			    (mandrake|mandriva|manbo)
 				;;
 			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
 				AC_MSG_WARN([
@@ -2346,7 +2371,7 @@ dnl
     AC_CACHE_CHECK([for kernel file sanity], [linux_cv_kernel_sanity], [dnl
 	eval "linux_cv_files=\"$linux_cv_k_sysmap $linux_cv_k_build $linux_cv_k_source $linux_cv_k_config\""
 	case "$target_vendor" in
-	    (mandrake)
+	    (mandrake|mandriva|manbo)
 dnl
 dnl		Mandrakelinux is built correctly.
 dnl
@@ -2630,9 +2655,10 @@ dnl	Recent 2.6.15+ kernels include autoconf.h from the build directory instead o
 dnl	directory.  I suppose the idea is to allow you to configure in a separate directory as
 dnl	well as build.  Given 100 years, kbuild might catch up to autoconf.  SLES 10 for some silly
 dnl	reason expands the current working directory in the autoconf.h include, so watch out for
-dnl	leading junk in the autoconf.h argument.
+dnl	leading junk in the autoconf.h argument.  Note that Mandriva puts autoconf.h in
+dnl	<generated/autoconf.h>.
 dnl
-	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -r -e "s| -include (\.*/.*/)?include/linux/autoconf.h| -include ${kbuilddir}/include/linux/autoconf.h|;s|^[[[:space:]]]*||;s|[[[:space:]]]*$||"`
+	linux_cv_k_cppflags=`echo " $linux_cv_k_cppflags " | sed -r -e "s, -include (\.*/.*/)?include/(linux|generated)/autoconf.h, -include ${kbuilddir}/include/\2/autoconf.h,;s,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,"`
 dnl
 dnl	Non-kbuild (2.4 kernel) always needs include directories to be in the
 dnl	build directory.
@@ -2645,6 +2671,10 @@ dnl
 	    fi
 	fi
     ])
+    if ! echo "$linux_cv_k_cppflags" | grep 'autoconf\.h' >/dev/null 2>&1 ; then
+	AC_DEFINE([NEED_LINUX_AUTOCONF_H], [1], [Defined when the header file
+	    <linux/autoconf.h> needs to be explicitly included.])
+    fi
     AC_CACHE_CHECK([for kernel MODFLAGS], [linux_cv_k_modflags], [dnl
 	_LINUX_KBUILD_ENV([dnl
 dnl
@@ -3199,7 +3229,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_CONFIG_internal], [dnl
     AC_CACHE_CHECK([$linux_tmp], [linux_cv_$2], [dnl
 	AC_EGREP_CPP([\<yes_we_have_$2_defined\>], [
 #include <linux/version.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #ifdef $2
     yes_we_have_$2_defined
 #endif
@@ -3373,7 +3405,9 @@ AC_CACHE_CHECK([for kernel symbol $[]2 export], [linux_cv_$[]{2}_export],
 	    linux_tmp="yes ($ksymvers)"; fi; fi
     if test -z "$linux_tmp" -a ":$linux_cv_k_ko_modules" != :yes; then
 	AC_EGREP_CPP([\<yes_symbol_${2}_is_exported\>],
-[#include <linux/autoconf.h>
+[#ifdef NEED_LINUX_AUTOCONF_H
+#include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #ifdef $[]2

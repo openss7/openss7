@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -65,7 +65,9 @@
 
 static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $";
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -76,7 +78,7 @@ static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.
 #include "sys/config.h"
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define STREAMS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define STREAMS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:56 $"
 #define STREAMS_DEVICE		"SVR 4.2 MP STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

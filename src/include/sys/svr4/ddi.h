@@ -194,7 +194,7 @@ LOCK_OWNED(lock_t * lockp)
 #ifdef TRYLOCK
 #undef TRYLOCK
 #endif
-__SVR4_EXTERN_INLINE pl_t
+static __inline__ pl_t
 TRYLOCK(lock_t * lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);
@@ -218,7 +218,7 @@ UNLOCK(lock_t * lockp, pl_t pl)
 #ifdef LOCK
 #undef LOCK
 #endif
-__SVR4_EXTERN_INLINE pl_t
+static __inline__ pl_t
 LOCK(lock_t * lockp, pl_t pl)
 {
 	pl_t old_pl = spl(pl);

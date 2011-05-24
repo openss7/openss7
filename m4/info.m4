@@ -152,13 +152,14 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** acceptable.  The 'tex' package has been available for many years and
 *** is available from any CTAN site.  Use the following to obtain 'tex':
 *** ], [
-*** Debian 5.0:  'apt-get install texlive-base-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
-*** Fedora 7:    'yum install tetex-latex'
-*** Fedora 9:    'yum install texlive-latex'
-*** CentOS 5.x:  'yum install texex-latex'
-*** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-texinfo-print'], [
+*** Debian 5.0:    'apt-get install texlive-base-bin'
+*** Ubuntu 8.04:   'apt-get install texlive-base-bin'
+*** Mandriva 2010: 'urpmi tetex'
+*** Fedora 7:      'yum install tetex-latex'
+*** Fedora 9:      'yum install texlive-latex'
+*** CentOS 5.x:    'yum install texex-latex'
+*** openSUSE 11:   'zypper install texlive-latex'
+*** SLES 10:       'configure --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the TEX environment variable to
@@ -179,13 +180,14 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** acceptable.  The 'tex' package has been available for many years and
 *** is available from any CTAN site.  Use the following to obtain 'tex':
 *** ], [
-*** Debian 5.0:  'apt-get install texlive-base-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
-*** Fedora 7:    'yum install tetex-latex'
-*** Fedora 9:    'yum install texlive-latex'
-*** CentOS 5.x:  'yum install texex-latex'
-*** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-texinfo-print'], [
+*** Debian 5.0:    'apt-get install texlive-base-bin'
+*** Ubuntu 8.04:   'apt-get install texlive-base-bin'
+*** Mandriva 2010: 'urpmi tetex'
+*** Fedora 7:      'yum install tetex-latex'
+*** Fedora 9:      'yum install texlive-latex'
+*** CentOS 5.x:    'yum install texex-latex'
+*** openSUSE 11:   'zypper install texlive-latex'
+*** SLES 10:       'configure --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the PDFTEX environment variable to
@@ -206,10 +208,11 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** years and is available on the web from any GNU archive site.  Use
 *** the following commands to obtain 'groff':
 *** ], [
-*** Debian 5.0:  'apt-get install groff-base'
-*** Ubuntu 8.04: 'apt-get install groff-base'
-*** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** Debian 5.0:    'apt-get install groff-base'
+*** Ubuntu 8.04:   'apt-get install groff-base'
+*** Mandriva 2010: 'urpmi groff-for-man'
+*** CentOS 5.x:    'yum install groff'
+*** SLES 10:       'zypper install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the TBL environment variable to
@@ -233,10 +236,11 @@ dnl	fi])
 *** many years and is available on the web from any GNU archive site.
 *** Use the following commands to obtain 'groff':
 *** ], [
-*** Debian 5.0:  'apt-get install groff-base'
-*** Ubuntu 8.04: 'apt-get install groff-base'
-*** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** Debian 5.0:    'apt-get install groff-base'
+*** Ubuntu 8.04:   'apt-get install groff-base'
+*** Mandriva 2010: 'urpmi groff-for-man'
+*** CentOS 5.x:    'yum install groff'
+*** SLES 10:       'zypper install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the GROFF environment variable to
@@ -261,13 +265,14 @@ dnl	fi])
 *** years and is available from many web sources.  Use the following
 *** commands to obtain 'fig2dev':
 *** ], [
-*** Debian 5.0:  'apt-get install transfig'
-*** Ubuntu 8.04: 'apt-get install transfig'
-*** Fedora 7:    'yum install transfig'
-*** Fedora 9:    'yum install transfig'
-*** CentOS 5.x:  'yum install transfig'
-*** openSUSE 11: 'zypper install transfig'
-*** SLES 10:     'configure --disable-texinfo-html --disable-texinfo-print'], [
+*** Debian 5.0:    'apt-get install transfig'
+*** Ubuntu 8.04:   'apt-get install transfig'
+*** Mandriva 2010: 'urpmi transfig'
+*** Fedora 7:      'yum install transfig'
+*** Fedora 9:      'yum install transfig'
+*** CentOS 5.x:    'yum install transfig'
+*** openSUSE 11:   'zypper install transfig'
+*** SLES 10:       'configure --disable-texinfo-html --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
 *** appropriate program with the FIG2DEV environment variable to
@@ -293,13 +298,14 @@ dnl	fi])
 *** years and is available on the web from many sources.  Use the
 *** following commands to obtain 'ImageMagick':
 *** ], [
-*** Debian 5.0:  'apt-get install imagemagick'
-*** Ubuntu 8.04: 'apt-get install imagemagick'
-*** Fedora 7:    'yum install ImageMagick'
-*** Fedora 9:    'yum install ImageMagick'
-*** CentOS 5.x:  'yum install ImageMagick'
-*** openSUSE 11: 'zypper install ImageMagick'
-*** SLES 10:     'configure --disable-texinfo-html --disable-texinfo-print'], [
+*** Debian 5.0:    'apt-get install imagemagick'
+*** Ubuntu 8.04:   'apt-get install imagemagick'
+*** Mandriva 2010: 'urpmi imagemagick'
+*** Fedora 7:      'yum install ImageMagick'
+*** Fedora 9:      'yum install ImageMagick'
+*** CentOS 5.x:    'yum install ImageMagick'
+*** openSUSE 11:   'zypper install ImageMagick'
+*** SLES 10:       'configure --disable-texinfo-html --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'latex2html' package, specify
 *** the appropriate program with the CONVERT environment variable to
@@ -333,13 +339,14 @@ dnl
 *** 'tex' package has been available for may years and is available form
 *** any CTAN site.  Use the following command to obtain 'tex':
 *** ], [
-*** Debian 5.0:  'apt-get install texlive-base-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
-*** Fedora 7:    'yum install tetex-latex'
-*** Fedora 9:    'yum install texlive-latex'
-*** CentOS 5.x:  'yum install texex-latex'
-*** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-texinfo-print'], [
+*** Debian 5.0:    'apt-get install texlive-base-bin'
+*** Ubuntu 8.04:   'apt-get install texlive-base-bin'
+*** Mandriva 2010: 'urpmi tetex-dvips'
+*** Fedora 7:      'yum install tetex-latex'
+*** Fedora 9:      'yum install texlive-latex'
+*** CentOS 5.x:    'yum install texex-latex'
+*** openSUSE 11:   'zypper install texlive-latex'
+*** SLES 10:       'configure --disable-texinfo-print'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the DVI2PS environment variable to

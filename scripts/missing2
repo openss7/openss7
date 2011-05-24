@@ -356,13 +356,14 @@ case $program in
 	*** install latex2html'.  \`Latex2html' has been available for many
 	*** years: you can get \`Latex2html' from any CTAN site.
 	***
-	*** Debian 4.0:  \`apt-get install latex2html'
-	*** Ubuntu 8.04: \`apt-get install latex2html'
-	*** Fedora 7:    \`yum install latex2html'
-	*** Fedora 9:    \`yum install latex2html'
-	*** CentOS 5.x:  \`yum install latex2html'
-	*** openSUSE 11: \`zypper install latex2html'
-	*** SLES 10:     \`configure --disable-docs'
+	*** Debian 4.0:      \`apt-get install latex2html'
+	*** Ubuntu 8.04:     \`apt-get install latex2html'
+	*** Mandriva 2010.2: \`urpmi latex2html'
+	*** Fedora 7:        \`yum install latex2html'
+	*** Fedora 9:        \`yum install latex2html'
+	*** CentOS 5.x:      \`yum install latex2html'
+	*** openSUSE 11:     \`zypper install latex2html'
+	*** SLES 10:         \`configure --disable-docs'
 	EOF
 	;;
     (dvips)
@@ -418,13 +419,14 @@ case $program in
 	*** install gnuplot'.  \`Gnuplot' has been available for many years: you
 	*** can get \`Gnuplot' from any GNU archive site.
 	***
-	*** Debian 4.0:  \`apt-get install gnuplot-nox'
-	*** Ubuntu 8.04: \`apt-get install gnuplot-nox'
-	*** Fedora 7:    \`yum install gnuplot'
-	*** Fedora 9:    \`yum install gnuplot'
-	*** CentOS 5.x:  \`yum install gnuplot'
-	*** openSUSE 11: \`zypper install gnuplot'
-	*** SLES 10:     \`zypper install gnuplot'
+	*** Debian 4.0:      \`apt-get install gnuplot-nox'
+	*** Ubuntu 8.04:     \`apt-get install gnuplot-nox'
+	*** Mandriva 2010.2: \`urpmi gnuplot'
+	*** Fedora 7:        \`yum install gnuplot'
+	*** Fedora 9:        \`yum install gnuplot'
+	*** CentOS 5.x:      \`yum install gnuplot'
+	*** openSUSE 11:     \`zypper install gnuplot'
+	*** SLES 10:         \`zypper install gnuplot'
 	***
 	EOF
 	;;
@@ -440,13 +442,14 @@ case $program in
 	*** \`transfig' package derives from xfig and has been available for
 	*** many years and is availble on the web from many sources.
 	***
-	*** Debian 4.0:  \`apt-get install transfig'
-	*** Ubuntu 8.04: \`apt-get install transfig'
-	*** Fedora 7:    \`yum install transfig'
-	*** Fedora 9:    \`yum install transfig'
-	*** CentOS 5.x:  \`yum install transfig'
-	*** openSUSE 11: \`zypper install transfig'
-	*** SLES 10:     \`configure --disable-docs'
+	*** Debian 4.0:      \`apt-get install transfig'
+	*** Ubuntu 8.04:     \`apt-get install transfig'
+	*** Mandriva 2010.2: \`urpmi transfig'
+	*** Fedora 7:        \`yum install transfig'
+	*** Fedora 9:        \`yum install transfig'
+	*** CentOS 5.x:      \`yum install transfig'
+	*** openSUSE 11:     \`zypper install transfig'
+	*** SLES 10:         \`configure --disable-texinfo-html --disable-texinfo-print'
 	EOF
 	;;
     (convert)

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -84,13 +84,22 @@ static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.
 #include <stdbool.h>		/* for bool, true and false */
 #endif
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #ifdef HAVE_KINC_LINUX_COMPILE_H
 /* some brain-dead distributions such as SuSE do not distribute linux/compile.h */
 #include <linux/compile.h>
 #endif
+#ifdef HAVE_KINC_GENERATED_COMPILE_H
+/* Mandriva distributes this in the generated directory. */
+#include <generated/compile.h>
+#endif
 #ifdef HAVE_KINC_LINUX_UTSRELEASE_H
 #include <linux/utsrelease.h>
+#endif
+#ifdef HAVE_KINC_GENERATED_UTSRELEASE_H
+#include <generated/utsrelease.h>
 #endif
 #include <linux/version.h>
 #include <linux/module.h>

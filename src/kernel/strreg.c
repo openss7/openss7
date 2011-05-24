@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -66,7 +66,9 @@
 static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:32 $";
 
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

@@ -88,7 +88,7 @@ bufq_init(bufq_t * q)
 	q->q_msgs = 0;
 	q->q_count = 0;
 }
-__OS7_EXTERN_INLINE streamscall psw_t
+static __inline__ streamscall psw_t
 bufq_lock(bufq_t * q)
 {
 	unsigned long flags;
@@ -96,31 +96,31 @@ bufq_lock(bufq_t * q)
 	spin_lock_irqsave(&q->q_lock, flags);
 	return (flags);
 }
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_unlock(bufq_t * q, unsigned long flags)
 {
 	spin_unlock_irqrestore(&q->q_lock, flags);
 }
 
-__OS7_EXTERN_INLINE streamscall size_t
+__OS7_EXTERN_INLINE size_t
 bufq_length(bufq_t * q)
 {
 	return q->q_msgs;
 }
 
-__OS7_EXTERN_INLINE streamscall size_t
+__OS7_EXTERN_INLINE size_t
 bufq_size(bufq_t * q)
 {
 	return q->q_count;
 }
 
-__OS7_EXTERN_INLINE streamscall mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 bufq_head(bufq_t * q)
 {
 	return (mblk_t *volatile) q->q_head;
 }
 
-__OS7_EXTERN_INLINE streamscall mblk_t *
+__OS7_EXTERN_INLINE mblk_t *
 bufq_tail(bufq_t * q)
 {
 	return (mblk_t *volatile) q->q_tail;
@@ -175,7 +175,7 @@ __bufq_queue(bufq_t * q, mblk_t *mp)
 	__bufq_add(q, mp);
 }
 
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_queue(bufq_t * q, mblk_t *mp)
 {
 	psw_t pl;
@@ -186,7 +186,7 @@ bufq_queue(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q, pl);
 }
 
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_queue_head(bufq_t * q, mblk_t *mp)
 {
 	psw_t pl;
@@ -203,7 +203,7 @@ bufq_queue_head(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q, pl);
 }
 
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	psw_t pl;
@@ -220,7 +220,7 @@ bufq_insert(bufq_t * q, mblk_t *mp, mblk_t *np)
 	bufq_unlock(q, pl);
 }
 
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_append(bufq_t * q, mblk_t *mp, mblk_t *np)
 {
 	psw_t pl;
@@ -254,7 +254,7 @@ __bufq_dequeue(bufq_t * q)
 	return mp;
 }
 
-__OS7_EXTERN_INLINE mblk_t *
+static __inline__ mblk_t *
 bufq_dequeue(bufq_t * q)
 {
 	mblk_t *mp;
@@ -284,7 +284,7 @@ __bufq_dequeue_tail(bufq_t * q)
 	return (mp);
 }
 
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ mblk_t *
 bufq_dequeue_tail(bufq_t * q)
 {
 	mblk_t *mp;
@@ -323,7 +323,7 @@ __bufq_unlink(bufq_t * q, mblk_t *mp)
 	return mp;
 }
 
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ mblk_t *
 bufq_unlink(bufq_t * q, mblk_t *mp)
 {
 	psw_t pl;
@@ -338,7 +338,7 @@ bufq_unlink(bufq_t * q, mblk_t *mp)
 /*
    splice bufq2 onto the head of bufq1 
  */
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_splice_head(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
@@ -352,7 +352,7 @@ bufq_splice_head(bufq_t * q1, bufq_t * q2)
 /*
    splice bufq2 onto the tail of bufq1 
  */
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 {
 	mblk_t *mp;
@@ -362,7 +362,7 @@ bufq_splice_tail(bufq_t * q1, bufq_t * q2)
 		bufq_queue(q1, mp);
 }
 
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_freehead(bufq_t * q)
 {
 	psw_t pl;
@@ -373,7 +373,7 @@ bufq_freehead(bufq_t * q)
 	bufq_unlock(q, pl);
 }
 
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_purge(bufq_t * q)
 {
 	psw_t pl;
@@ -397,7 +397,7 @@ __bufq_supply(bufq_t * q, mblk_t *mp)
 	}
 }
 
-__OS7_EXTERN_INLINE streamscall void
+static __inline__ void
 bufq_supply(bufq_t * q, mblk_t *mp)
 {
 	psw_t pl;
@@ -407,7 +407,7 @@ bufq_supply(bufq_t * q, mblk_t *mp)
 	bufq_unlock(q, pl);
 }
 
-__OS7_EXTERN_INLINE streamscall mblk_t *
+static __inline__ mblk_t *
 bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount)
 {
 	psw_t pl;
@@ -423,7 +423,7 @@ bufq_resupply(bufq_t * q, mblk_t *mp, int maxsize, int maxcount)
 }
 
 #ifndef SCTP_VERSION_2
-__OS7_EXTERN_INLINE streamscall void
+__OS7_EXTERN_INLINE void
 freechunks(mblk_t *mp)
 {
 	mblk_t *dp, *dp_next;

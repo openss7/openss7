@@ -120,7 +120,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** ], [
 *** Debian:   'apt-get install gzip'
 *** SuSE:     'zypper install gzip'
-*** CentOS:   'yum install gzip'], [
+*** CentOS:   'yum install gzip'
+*** Mandriva: 'urpmi gzip'], [
 ***
 *** To get rid of this error, load the 'gzip' package, or specify the
 *** location with the GZIP_CMD environment variable to 'configure'.
@@ -136,9 +137,10 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** the build host.  The 'bzip2' package has been available for many
 *** years on all distributions.  Try:
 *** ], [
-*** Debian:  'apt-get install bzip2'
-*** SuSE:    'zypper install bzip2'
-*** CentOS:  'yum install bzip2'], [
+*** Debian:   'apt-get install bzip2'
+*** SuSE:     'zypper install bzip2'
+*** CentOS:   'yum install bzip2'
+*** Mandriva: 'urpmi bzip2'], [
 ***
 *** To get rid of this error, load the 'bzip2' package, or specify the
 *** location with the BZIP2_CMD environment variable to 'configure'.
@@ -154,9 +156,10 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** Configure cannot find the 'lzma' program, which is sometimes present
 *** on recent systems.  Try:
 *** ], [
-*** Debian:  'apt-get install lzma'
-*** SuSE:    'zypper install lzma'
-*** CentOS:  'yum install lzma'], [
+*** Debian:   'apt-get install lzma'
+*** SuSE:     'zypper install lzma'
+*** CentOS:   'yum install lzma'
+*** Mandriva: 'urpmi install xz'], [
 ***
 *** To get rid of this warning, load the 'lzma' package, or specify the
 *** full path to the utility in the LZMA_CMD environment variable, or
@@ -187,7 +190,8 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian Squeeze:  'apt-get install xz-utils'], [
+*** Debian Squeeze:  'apt-get install xz-utils'
+*** Mandriva 2010.2: 'urpmi xz'], [
 ***
 *** To get rid of this warning, load the 'xz' package, or specify the
 *** full path to the utility in the XZ_CMD environment variable, or
@@ -224,7 +228,10 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian:  'apt-get install coreutils'], [
+*** Debian:   'apt-get install coreutils'
+*** RedHat:   'yum install coreutils'
+*** SuSE:     'zypper install coreutils'
+*** Mandriva: 'urpmi coreutils'], [
 ***
 *** To get rid of this warning, load the 'md5sum' program from the
 *** 'coreutils' package, specify the appropriate program with the MD5SUM
@@ -254,7 +261,10 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian:  'apt-get install coreutils'], [
+*** Debian:   'apt-get install coreutils'
+*** RedHat:   'yum install coreutils'
+*** SuSE:     'zypper install coreutils'
+*** Mandriva: 'urpmi coreutils'], [
 ***
 *** To get rid of this warning, load the 'sha1sum' program from the
 *** 'coreutils' package, specify the appropriate program with the
@@ -284,7 +294,10 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian:  'apt-get install coreutils'], [
+*** Debian:   'apt-get install coreutils'
+*** RedHat:   'yum install coreutils'
+*** SuSE:     'zypper install coreutils'
+*** Mandriva: 'urpmi coreutiles'], [
 ***
 *** To get rid of this warning, load the 'sha256sum' program from the
 *** 'coreutils' package, specify the appropriate program with the

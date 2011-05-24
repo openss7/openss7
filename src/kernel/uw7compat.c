@@ -175,7 +175,7 @@ printf_UW7(char *fmt, ...)
 {
 	va_list args;
 	int n;
-	char printf_buf[1024];
+	char printf_buf[512];
 
 	va_start(args, fmt);
 	n = vsnprintf(printf_buf, sizeof(printf_buf), fmt, args);

@@ -462,7 +462,13 @@ dnl
 *** of most Java SDKs.
 *** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
-*** On DEB based distributions, try 'apt-get install gcj'.], [
+*** On DEB based distributions, try 'apt-get install gcj'.
+***
+*** Debian 5.0:  'apt-get install gcj'
+*** Ubuntu 8.04: 'apt-get install gcj'
+*** CentOS 5.x:  'yum install gcc-java'
+*** SLES 11:     'zypper install gcc-java'
+*** Mandriva 10: 'urpmi gcc-java'], [
 ***
 *** Alternatively, you can specify an equivalent command with the JAVAC
 *** environment variable when rerunning configure.
@@ -499,7 +505,8 @@ dnl
 *** Debian 5.0:  'apt-get install gij'
 *** Ubuntu 8.04: 'apt-get install gij'
 *** CentOS 5.x:  'yum install libgcj'
-*** SLES 10:     'zypper install libgcj'], [
+*** SLES 11:     'zypper install gcc-java'
+*** Mandriva 10: 'urpmi gcj-tools'], [
 ***
 *** Alternatively, you can specify an equivalent command with the
 *** GCJDBTOOL environment variable when running configure.
@@ -535,7 +542,8 @@ dnl
 *** Debian 5.0:	 'apt-get install gcj'
 *** Ubuntu 8.04: 'apt-get install gcj'
 *** CentOS 5.x:	 'yum install gcc-java'
-*** SLES 10:	 'zypper install gcc-java'
+*** SLES 11:	 'zypper install gcc-java'
+*** Mandriva 10: 'urpmi gcj-tools'
 *** RH 7.3:	 'rpm -i gcc-java'], [
 ***
 *** Alternatively, you can specify an equivalent command with the GCJH
@@ -573,7 +581,8 @@ dnl
 *** Debian 5.0:	 'apt-get install gcj'
 *** Ubuntu 8.04: 'apt-get install gcj'
 *** CentOS 5.x:	 'yum install gcc-java'
-*** SLES 10:	 'zypper install gcc-java'
+*** SLES 11:	 'zypper install gcc-java'
+*** Mandriva 10: 'urpmi gcj-tools'
 *** RH 7.3:	 'rpm -i gcc-java'], [
 ***
 *** Alternatively, you can specify an equivalent command with the JAVAH
@@ -611,6 +620,8 @@ dnl
 *** Ubuntu 8.04: 'apt-get install gjdoc'
 *** CentOS 5.x:	 'yum install gjdoc'
 *** SLES 10:	 'zypper install java-1_5_0-ibm-devel'
+*** SLES 11:     'zypper install gjdoc'
+*** Mandriva 10: 'urpmi javadoc'
 *** RH 7.3:	 'rpm -i kaffe'], [
 ***
 *** Alternatively, you can specify an equivalent command with the
@@ -767,6 +778,62 @@ AC_DEFUN([_GCJ_OPTIONS], [dnl
 # _GCJ_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_GCJ_SETUP], [dnl
+    AC_ARG_WITH([libgcj],
+	[AS_HELP_STRING([--with-libgcj=HEADERS],
+	    [GCJ library header directory @<:@default=search@:>@])],
+	[], [with_libgcj=search])
+    case "${with_libgcj:-search}" in
+	(no) gcj_cv_includedir=no ;;
+	(yes|search) ;;
+	(*) if test -f "$with_libgcj/gcj/cni.h" ; then gcj_cv_includedir="$with_libgcj" ; fi ;;
+    esac
+    _BLD_FIND_DIR([libgcj include directory], [gcj_cv_includedir], [
+	${DESTDIR}${rootdir}${includedir}
+	${DESTDIR}${rootdir}${oldincludedir}
+	${DESTDIR}${rootdir}/usr/include
+	${DESTDIR}${rootdir}/usr/local/include
+	${DESTDIR}${includedir}
+	${DESTDIR}${oldincludedir}
+	${DESTDIR}/usr/include
+	${DESTDIR}/usr/local/include], [gcj/cni.h], [no], [dnl
+	_BLD_INSTALL_WARN([GCJ_CNI_H], [
+***
+*** Configure cannot find the libgcj development header gcj/cni.h.  This
+*** header is required to compile CNI components for Java.  The
+*** gcj/cni.h header is part of the libgcj-devel package on most Linux
+*** distributions.  Try:
+*** ], [
+*** Debian/Ubuntu: 'aptitude install libgcj-devel'
+*** Mandriva 2010: 'urpmi libgcj-devel'
+*** SuSE 11:       'zypper install libgcj-devel'
+*** CentOS/RHEL:   'yum install libgcj10-devel'], [
+***
+*** Repeat after loading the correct package or by specifying the
+*** location of the headers with the --with-libgcj=DIRECTORY option to
+*** configure, or by specifying --without-java: continuing under the
+*** assumption that the option --without-java was intended.
+*** ])
+	PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_libgcj --without-libgcj\""
+	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-libgcj'"
+	ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-libgcj'"
+	with_libgcj=no
+    ])
+    if test :"${with_libgcj:-search}" = :no -o :"${gcj_cv_includedir:-no}" = :no ; then
+	gcjincludedir=
+    else
+	gcjincludedir="$gcj_cv_includedir"
+    fi
+    AM_CONDITIONAL([WITH_LIBGCJ], [test :"${with_libgcj:-search}" != :no])
+    AC_SUBST([gcjincludedir])dnl
+    AC_CACHE_CHECK([for libgcj cxxflags], [gcj_cv_cxxflags], [dnl
+	if test -n "$gcjincludedir" ; then
+	    gcj_cv_cxxflags="-I$gcjincludedir"
+	else
+	    gcj_cv_cxxflags=
+	fi
+    ])
+    LIBGCJ_CXXFLAGS="$gcj_cv_cxxflags"
+    AC_SUBST([LIBGCJ_CXXFLAGS])dnl
 ])# _GCJ_SETUP
 # =============================================================================
 

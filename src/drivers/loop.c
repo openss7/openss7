@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -72,7 +72,9 @@ static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.3 $
  *  module beneath each STREAM head.  Upper level STREAMS are linked together using ioctl()
  *  commands contained in <sys/loop.h>.
  */
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -89,7 +91,7 @@ static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include "sys/config.h"
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define LOOP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define LOOP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:33 $"
 #define LOOP_DEVICE	"SVR 4.2 MP STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

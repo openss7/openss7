@@ -552,7 +552,7 @@ tpiperf_wsrv(queue_t *q)
 										unbufcall(xchg
 											  (&priv->
 											   bcid,
-											   NULL));
+											   0));
 									priv->bcid =
 									    bufcall(msgsize
 										    (mp->b_cont),
@@ -564,7 +564,7 @@ tpiperf_wsrv(queue_t *q)
 						} else {
 							/* need bufcall */
 							if (priv->bcid)
-								unbufcall(xchg(&priv->bcid, NULL));
+								unbufcall(xchg(&priv->bcid, 0));
 							priv->bcid =
 							    bufcall(mp->b_wptr - mp->b_rptr,
 								    BPRI_MED, &tpiperf_bufcall,

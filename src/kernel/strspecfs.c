@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -80,7 +80,9 @@
 
 static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-07 15:24:04 $";
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -128,7 +130,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 #include "sys/config.h"
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define SPECFS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SPECFS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-07 15:24:04 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

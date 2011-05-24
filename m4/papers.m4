@@ -154,13 +154,14 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** from any GNU archive site.  Use the following commands to obtain
 *** 'gnuplot':
 *** ], [
-*** Debian 5.0:  'apt-get install gnuplot-nox'
-*** Ubuntu 8.04: 'apt-get install gnuplot-nox'
-*** Fedora 7:    'yum install gnuplot'
-*** Fedora 9:    'yum install gnuplot'
-*** CentOS 5.x:  'yum install gnuplot'
-*** openSUSE 11: 'zypper install gnuplot'
-*** SLES 10:     'zypper install gnuplot'], [
+*** Debian 5.0:      'apt-get install gnuplot-nox'
+*** Ubuntu 8.04:     'apt-get install gnuplot-nox'
+*** Mandriva 2010.2: 'urpmi gnuplot'
+*** Fedora 7:        'yum install gnuplot'
+*** Fedora 9:        'yum install gnuplot'
+*** CentOS 5.x:      'yum install gnuplot'
+*** openSUSE 11:     'zypper install gnuplot'
+*** SLES 10:         'zypper install gnuplot'], [
 ***
 *** To get rid of this warning, load the 'gnuplot' package, specify the
 *** appropriate program with the GNUPLOT environment variable to
@@ -180,13 +181,15 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** available from many web sources.  Use the following commands to
 *** obtain 'fig2dev':
 *** ], [
-*** Debian 5.0:  'apt-get install transfig'
-*** Ubuntu 8.04: 'apt-get install transfig'
-*** Fedora 7:    'yum install transfig'
-*** Fedora 9:    'yum install transfig'
-*** CentOS 5.x:  'yum install transfig'
-*** openSUSE 11: 'zypper install transfig'
-*** SLES 10:     'configure --disable-papers'], [
+*** Debian 5.0:      'apt-get install transfig'
+*** Ubuntu 8.04:     'apt-get install transfig'
+*** Mandriva 2010.2: 'urpmi transfig'
+*** Fedora 7:        'yum install transfig'
+*** Fedora 9:        'yum install transfig'
+*** CentOS 5.x:      'yum install transfig'
+*** openSUSE 11:     'zypper install transfig'
+*** SLES 11:         'zypper install transfig'
+*** SLES 10:         'configure --disable-papers'], [
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
 *** appropriate program with the FIG2DEV environment variable to
@@ -205,10 +208,12 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** package has been available for many years and is available from any
 *** CTAN site.  Use the following command to obtain 'bibtex':
 *** ], [
-*** Debian 5.0:  'apt-get install texlive-base-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
-*** CentOS 5.x:  'yum install tetex'
-*** SLES 10:     'configure --disable-papers-print'], [
+*** Debian 5.0:      'apt-get install texlive-base-bin'
+*** Ubuntu 8.04:     'apt-get install texlive-base-bin'
+*** Mandriva 2010.2: 'urpmi tetex'
+*** CentOS 5.x:      'yum install tetex'
+*** SLES 11:         'zypperin install texlive-latex'
+*** SLES 10:         'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'tetex' package, specify the
 *** appropriate program with the BIBTEX environment variable to
@@ -228,13 +233,14 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** been available for many years and is available from any CTAN site.
 *** Use the following command to obtain 'latex':
 *** ], [
-*** Debian 5.0:  'apt-get install texlive-latex-base'
-*** Ubuntu 8.04: 'apt-get install texlive-latex-base'
-*** Fedora 7:    'yum install tetex-latex'
-*** Fedora 9:    'yum install texlive-latex'
-*** CentOS 5.x:  'yum install texex-latex'
-*** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-papers-print'], [
+*** Debian 5.0:      'apt-get install texlive-latex-base'
+*** Ubuntu 8.04:     'apt-get install texlive-latex-base'
+*** Mandriva 2010.2: 'urpmi tetex-latex'
+*** Fedora 7:        'yum install tetex-latex'
+*** Fedora 9:        'yum install texlive-latex'
+*** CentOS 5.x:      'yum install texex-latex'
+*** openSUSE 11:     'zypper install texlive-latex'
+*** SLES 10:         'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'latex' package, specify the
 *** appropriate program with the LATEX environment variable to
@@ -254,13 +260,14 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** package has been available for many years and is available from any
 *** CTAN site.  Use the following command to obtain 'latex':
 *** ], [
-*** Debian 5.0:  'apt-get install texlive-base-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-latex-base'
-*** Fedora 7:    'yum install tetex-latex'
-*** Fedora 9:    'yum install texlive-latex'
-*** CentOS 5.x:  'yum install texex-latex'
-*** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-papers-print'], [
+*** Debian 5.0:      'apt-get install texlive-base-bin'
+*** Ubuntu 8.04:     'apt-get install texlive-latex-base'
+*** Mandriva 2010.2: 'urpmi tetex-latex'
+*** Fedora 7:        'yum install tetex-latex'
+*** Fedora 9:        'yum install texlive-latex'
+*** CentOS 5.x:      'yum install texex-latex'
+*** openSUSE 11:     'zypper install texlive-latex'
+*** SLES 10:         'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'latex' package, specify the
 *** appropriate program with the PSLATEX environment variable to
@@ -280,13 +287,14 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** package has been available for many years and is available from any
 *** CTAN site.  Use the following commands to obtain 'latex':
 *** ], [
-*** Debian 5.0:  'apt-get install texlive-latex-base'
-*** Ubuntu 8.04: 'apt-get install texlive-latex-base'
-*** Fedora 7:    'yum install tetex-latex'
-*** Fedora 9:    'yum install texlive-latex'
-*** CentOS 5.x:  'yum install texex-latex'
-*** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-papers-print'], [
+*** Debian 5.0:      'apt-get install texlive-latex-base'
+*** Ubuntu 8.04:     'apt-get install texlive-latex-base'
+*** Mandriva 2010.2: 'urpmi tetex-latex'
+*** Fedora 7:        'yum install tetex-latex'
+*** Fedora 9:        'yum install texlive-latex'
+*** CentOS 5.x:      'yum install texex-latex'
+*** openSUSE 11:     'zypper install texlive-latex'
+*** SLES 10:         'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'latex' package, specify the
 *** appropriate program with the PDFLATEX environment variable to
@@ -307,13 +315,14 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** available from any CTAN site.  Use the following commands to obtain
 *** 'latex2html':
 *** ], [
-*** Debian 5.0:  'apt-get install latex2html'
-*** Ubuntu 8.04: 'apt-get install latex2html'
-*** Fedora 7:    'yum install latex2html'
-*** Fedora 9:    'yum install latex2html'
-*** CentOS 5.x:  'yum install latex2html'
-*** openSUSE 11: 'zypper install latex2html'
-*** SLES 10:     'configure --disable-papers-html'], [
+*** Debian 5.0:      'apt-get install latex2html'
+*** Ubuntu 8.04:     'apt-get install latex2html'
+*** Mandriva 2010.2: 'urpmi latex2html'
+*** Fedora 7:        'yum install latex2html'
+*** Fedora 9:        'yum install latex2html'
+*** CentOS 5.x:      'yum install latex2html'
+*** openSUSE 11:     'zypper install latex2html'
+*** SLES 10:         'configure --disable-papers-html'], [
 ***
 *** To get rid of this warning, load the 'latex2html' package, specify
 *** the appropriate program with the LATEX2HTML environment variable to
@@ -334,13 +343,14 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** years and is available on the web from many sources.  Use the
 *** following commands to obtain 'ImageMagick':
 *** ], [
-*** Debian 5.0:  'apt-get install imagemagick'
-*** Ubuntu 8.04: 'apt-get install imagemagick'
-*** Fedora 7:    'yum install ImageMagick'
-*** Fedora 9:    'yum install ImageMagick'
-*** CentOS 5.x:  'yum install ImageMagick'
-*** openSUSE 11: 'zypper install ImageMagick'
-*** SLES 10:     'configure --disable-papers'], [
+*** Debian 5.0:      'apt-get install imagemagick'
+*** Ubuntu 8.04:     'apt-get install imagemagick'
+*** Mandriva 2010.2: 'urpmi imagemagick'
+*** Fedora 7:        'yum install ImageMagick'
+*** Fedora 9:        'yum install ImageMagick'
+*** CentOS 5.x:      'yum install ImageMagick'
+*** openSUSE 11:     'zypper install ImageMagick'
+*** SLES 10:         'configure --disable-papers'], [
 ***
 *** To get rid of this warning, load the 'latex2html' package, specify
 *** the appropriate program with the CONVERT environment variable to
@@ -374,13 +384,14 @@ dnl
 *** package has been available for may years and is available form any
 *** CTAN site.  Use the following command to obtain 'tex':
 *** ], [
-*** Debian 5.0:  'apt-get install texlive-base-bin'
-*** Ubuntu 8.04: 'apt-get install texlive-base-bin'
-*** Fedora 7:    'yum install tetex-latex'
-*** Fedora 9:    'yum install texlive-latex'
-*** CentOS 5.x:  'yum install texex-dvips'
-*** openSUSE 11: 'zypper install texlive-latex'
-*** SLES 10:     'configure --disable-papers-print'], [
+*** Debian 5.0:      'apt-get install texlive-base-bin'
+*** Ubuntu 8.04:     'apt-get install texlive-base-bin'
+*** Mandriva 2010.2: 'urpmi tetex-dvips'
+*** Fedora 7:        'yum install tetex-latex'
+*** Fedora 9:        'yum install texlive-latex'
+*** CentOS 5.x:      'yum install texex-dvips'
+*** openSUSE 11:     'zypper install texlive-latex'
+*** SLES 10:         'configure --disable-papers-print'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the DVI2PS environment variable to

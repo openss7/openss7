@@ -157,8 +157,8 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    /etc/lineox-release
 	    /etc/whitebox-release
 	    /etc/fedora-release
-	    /etc/mandrake-release
 	    /etc/mandriva-release
+	    /etc/mandrake-release
 	    /etc/redhat-release
 	    /etc/SuSE-release
 	    /etc/debian_version\""
@@ -202,7 +202,8 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	(*Lineox*|*LINEOX*)				echo 'lineox'	;;
 	(*White?Box*|*WHITE?BOX*)			echo 'whitebox'	;;
 	(*Fedora*|*FEDORA*)				echo 'fedora'	;;
-	(*Mandrake*|*Mandriva*|*MANDRAKE*|*MANDRIVA*)	echo 'mandrake'	;;
+	(*Mandrake*|*MANDRAKE*)				echo 'mandrake'	;;
+	(*Mandriva*|*MANDRIVA*)				echo 'mandriva'	;;
 	(*Red?Hat?Enterprise*)				echo 'rhel'	;;
 	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	;;
 	(*SUSE?Linux?Enterprise?Server*)		echo 'sles'	;;
@@ -256,6 +257,8 @@ dnl AC_MSG_WARN([checking for vendor in $[1]])
 	(lineox)			echo 'lineox'	;;
 	(whitebox)			echo 'whitebox'	;;
 	(mandrake)			echo 'mandrake'	;;
+	(mandriva)			echo 'mandriva'	;;
+	(manbo)				echo 'manbo'	;;
 	(fedora|redhat|rhel)		echo 'redhat'	;;
 	(suse|sle|sles|sled|opensuse)	echo 'suse'	;;
 	(debian)			echo 'debian'	;;
@@ -318,6 +321,8 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 	(whitebox)	echo 'White Box Enterprise Linux' ;;
 	(fedora)	echo 'Fedora' ;;
 	(mandrake)	echo 'Mandrake Linux' ;;
+	(mandriva)	echo 'Mandriva Linux' ;;
+	(manbo)		echo 'Mandriva/Turbo Linux' ;;
 	(redhat)	echo 'Red Hat Linux' ;;
 	(rhel)		echo 'Red Hat Enterprise Linux' ;;
 	(suse)		echo 'SuSE Linux' ;;
@@ -393,7 +398,7 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
 	    (centos|lineox|whitebox|rhel|sle)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,\..*[$],,'` ;;
-	    (fedora|mandrake|mandriva|redhat)
+	    (fedora|mandrake|mandriva|manbo|redhat)
 		dist_tmp="${dist_cv_build_release}" ;;
 	    (debian|ubuntu|*)
 		dist_tmp="${dist_cv_build_codename}" ;;
@@ -445,8 +450,8 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	    ${DESTDIR}${sysconfdir}/lineox-release
 	    ${DESTDIR}${sysconfdir}/whitebox-release
 	    ${DESTDIR}${sysconfdir}/fedora-release
-	    ${DESTDIR}${sysconfdir}/mandrake-release
 	    ${DESTDIR}${sysconfdir}/mandriva-release
+	    ${DESTDIR}${sysconfdir}/mandrake-release
 	    ${DESTDIR}${sysconfdir}/redhat-release
 	    ${DESTDIR}${sysconfdir}/SuSE-release
 	    ${DESTDIR}${sysconfdir}/debian_version\""
@@ -607,7 +612,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
 	    (centos|lineox|whitebox|rhel|sle)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,\..*[$],,'` ;;
-	    (fedora|mandrake|mandriva|redhat)
+	    (fedora|mandrake|mandriva|manbo|redhat)
 		dist_tmp="${dist_cv_host_release}" ;;
 	    (debian|ubuntu|*)
 		dist_tmp="${dist_cv_host_codename}" ;;
@@ -663,7 +668,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     case "$build_vendor" in
 	(centos|lineox|whitebox|redhat|suse|debian)  
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
-	(mandrake|ubuntu)  
+	(mandrake|mandriva|manbo|ubuntu)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
     esac
     build_distro="${dist_cv_build_distro:-unknown}"
@@ -686,7 +691,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$host_vendor" in
 	    (centos|lineox|whitebox|redhat|suse|debian)  
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
-	    (mandrake|ubuntu)  
+	    (mandrake|mandriva|manbo|ubuntu)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
 	esac
 	host_distro="${dist_cv_host_distro:-unknown}"
@@ -708,7 +713,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$target_vendor" in
 	    (centos|lineox|whitebox|redhat|suse|debian)  
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
-	    (mandrake|ubuntu)  
+	    (mandrake|mandriva|manbo|ubuntu)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;
 	esac
     fi

@@ -141,14 +141,14 @@ int umount2(char *pathname, int flags);
 int unlink(char *pathname);
 #endif
 
-__STRUTIL_EXTERN_INLINE int
+static __inline__ int
 copyin(const void *from, void *to, size_t len)
 {
 	if (!copy_from_user(to, from, len))
 		return (0);
 	return (-EFAULT);
 }
-__STRUTIL_EXTERN_INLINE int
+static __inline__ int
 copyout(const void *from, void *to, size_t len)
 {
 	if (!copy_to_user(to, from, len))

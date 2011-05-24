@@ -324,10 +324,26 @@ static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.8 $
 #define sock_clr_debug(_sk)		(sock_reset_flag(_sk, SOCK_DBG))
 #endif
 
+#ifdef HAVE_KMEMB_STRUCT_INET_SOCK_INET_SADDR
+#define sock_saddr(_sk)			(inet_sk(_sk)->inet_saddr)
+#else
 #define sock_saddr(_sk)			(inet_sk(_sk)->saddr)
+#endif
+#ifdef HAVE_KMEMB_STRUCT_INET_SOCK_INET_SPORT
+#define sock_sport(_sk)			(inet_sk(_sk)->inet_sport)
+#else
 #define sock_sport(_sk)			(inet_sk(_sk)->sport)
+#endif
+#ifdef HAVE_KMEMB_STRUCT_INET_SOCK_INET_DADDR
+#define sock_daddr(_sk)			(inet_sk(_sk)->inet_daddr)
+#else
 #define sock_daddr(_sk)			(inet_sk(_sk)->daddr)
+#endif
+#ifdef HAVE_KMEMB_STRUCT_INET_SOCK_INET_DPORT
+#define sock_dport(_sk)			(inet_sk(_sk)->inet_dport)
+#else
 #define sock_dport(_sk)			(inet_sk(_sk)->dport)
+#endif
 
 #define inet_opt	inet_sock
 #define tcp_opt		tcp_sock
@@ -677,7 +693,7 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define SS__COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SS__COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-07 15:24:02 $"
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
