@@ -526,7 +526,8 @@ AC_DEFUN([_BLD_INSTALL_WARN], [dnl
     else
 	tmp_msg="$3"
     fi
-    AC_MSG_WARN([$2$tmp_msg$4])
+    tmp_msg="$2$tmp_msg$4"
+    AC_MSG_WARN([$tmp_msg])
 ])# _BLD_INSTALL_WARN
 # =============================================================================
 
@@ -547,7 +548,8 @@ AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
     else
 	tmp_msg="$3"
     fi
-    AC_MSG_ERROR([$2$tmp_msg$4])
+    tmp_msg="$2$tmp_msg$4"
+    AC_MSG_ERROR([$tmp_msg])
 ])# _BLD_INSTALL_ERROR
 # =============================================================================
 

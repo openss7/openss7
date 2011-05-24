@@ -81,78 +81,50 @@ AC_DEFUN([_PERL_EXTENSIONS], [dnl
     AC_MSG_NOTICE([+------------------------+])
     AC_MSG_NOTICE([| Perl Extension Support |])
     AC_MSG_NOTICE([+------------------------+])
-    AC_CACHE_CHECK([for perl headers], [perl_cv_includedir], [dnl
-	AC_ARG_WITH([perl],
-	    [AS_HELP_STRING([--with-perl=@<:@HEADERS@:>@],
-		[PERL header directory @<:@default=search@:>@])],
-	    [], [with_perl=search])
-	case "${with_perl:-search}" in
-	    (no) perl_cv_includedir=no ;;
-	    (yes|search) ;;
-	    (*) if test -f "$with_perl/EXTERN.h" ; then perl_cv_includedir="$with_perl" ; fi ;;
-	esac
-	if test -z "$perl_cv_includedir" ; then
-	    eval "perl_search_path=\"
-		${DESTDIR}${rootdir}${libdir}/perl5
-		${DESTDIR}${rootdir}${libdir}/perl
-		${DESTDIR}${rootdir}/usr/lib/perl5
-		${DESTDIR}${rootdir}/usr/lib/perl
-		${DESTDIR}${rootdir}/usr/local/lib/perl5
-		${DESTDIR}${rootdir}/usr/local/lib/perl
-		${DESTDIR}${libdir}/perl5
-		${DESTDIR}${libdir}/perl
-		${DESTDIR}/usr/lib/perl5
-		${DESTDIR}/usr/lib/perl
-		${DESTDIR}/usr/local/lib/perl5
-		${DESTDIR}/usr/local/lib/perl\""
-	    perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
-	    AC_MSG_RESULT([searching])
-	    for perl_dir in $perl_search_path ; do
-		test -d "$perl_dir" || continue
-		AC_MSG_CHECKING([for perl headers... $perl_dir])
-		perl_files=`find "$perl_dir" -type f -name 'EXTERN.h' 2>/dev/null | sort -ru`
-		for perl_file in $perl_files ; do
-		    test -r "$perl_file" || continue
-		    perl_dir="${perl_file%/EXTERN.h}"
-		    #perl_dir="${perl_dir#$DESTDIR}"
-		    #perl_dir="${perl_dir#$rootdir}"
-		    perl_cv_includedir="$perl_dir"
-		    AC_MSG_RESULT([yes])
-		    break 2
-		done
-		AC_MSG_RESULT([no])
-	    done
-	    test -n "$perl_cv_includedir" || perl_cv_includedir=no
-	    AC_MSG_CHECKING([for perl headers])
-	fi
-    ])
-    if test :"${perl_cv_includedir:-no}" = :no ; then
-	if test :"${with_perl:-search}" != :no ; then
-	    AC_MSG_WARN([
+    AC_ARG_WITH([perl],
+	[AS_HELP_STRING([--with-perl=@<:@HEADERS@:>@],
+	    [PERL header directory @<:@default=search@:>@])],
+	[], [with_perl=search])
+    _BLD_FIND_DIR([perl headers], [perl_cv_includedir], [
+	    ${DESTDIR}${rootdir}${libdir}/perl5
+	    ${DESTDIR}${rootdir}${libdir}/perl
+	    ${DESTDIR}${rootdir}/usr/lib/perl5
+	    ${DESTDIR}${rootdir}/usr/lib/perl
+	    ${DESTDIR}${rootdir}/usr/local/lib/perl5
+	    ${DESTDIR}${rootdir}/usr/local/lib/perl
+	    ${DESTDIR}${libdir}/perl5
+	    ${DESTDIR}${libdir}/perl
+	    ${DESTDIR}/usr/lib/perl5
+	    ${DESTDIR}/usr/lib/perl
+	    ${DESTDIR}/usr/local/lib/perl5
+	    ${DESTDIR}/usr/local/lib/perl], [EXTERN.h], [no], [dnl
+	if test ${with_perl:-search} != no ; then
+	    _BLD_INSTALL_WARN([EXTERN_H], [
 ***
 *** Configure could not find the PERL extension include file EXTERN.h.
 *** This file is required to compile PERL extension libraries.  This
 *** file is part of the 'perl' development package which is not always
 *** loaded on all distributions.  Use the following commands to obtain
 *** the 'perl' development package:
-***
+*** ], [
 *** Debian 5.0:  'apt-get install perl'
 *** Ubuntu 8.04: 'apt-get install perl'
 *** CentOS 5.x:  'yum install perl'
 *** openSUSE 11: 'zypper install perl'
 *** SLES 10:     'zypper install perl'
-*** RedHat 7.2:  'rpm -i perl-5.6.1-36.1.73'
+*** RedHat 7.2:  'rpm -i perl-5.6.1-36.1.73'], [
 ***
 *** Otherwise, specify the location of the PERL headers with the
 *** --with-perl=DIRECTORY argument, or --without-perl, on the next run
 *** of configure.  Continuing under the assumption that --without-perl
 *** was intended.
-***])
+*** ])
 	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"__without_perl --without-perl\""
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-perl'"
 	    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-perl'"
 	    with_perl=no
-	fi
+	fi], [], [with_perl])
+    if test ${perl_cv_includedir:-no} = no ; then
 	perlincludedir=
     else
 	perlincludedir="$perl_cv_includedir"
