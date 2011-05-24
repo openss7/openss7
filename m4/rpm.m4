@@ -209,9 +209,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		rpm_cv_dist_extra=".el${dist_cv_host_release}"	    ;;
 			esac
 			;;
-		    (mandrake|mandriva)
+		    (mandrake)
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
 			rpm_cv_dist_extra=".${rpm_tmp}mdk"
+			;;
+		    (mandriva)
+			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
+			rpm_cv_dist_extra=".${rpm_tmp}mdv"
 			;;
 		    (manbo)
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
@@ -296,9 +300,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		  rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
 			esac
 			;;
-		    (mandrake|mandriva)
+		    (mandrake)
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
 			rpm_cv_dist_extra2=".${rpm_tmp}mdk"
+			;;
+		    (mandriva)
+			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
+			rpm_cv_dist_extra2=".${rpm_tmp}mdv"
 			;;
 		    (manbo)
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
