@@ -130,13 +130,14 @@ CONFIG_BLDREQ="$CONFIG_BLDREQ"
 # Tests to see which distro package and distro package version provides the
 # command specified in variable COMMAND.  Saves the package name in cache
 # variable bld_cv_pkg_name_[COMMAND]  and the package version in cache variable
-# bld_cv_pkg_ver_[COMMAND].
+# bld_cv_pkg_ver_[COMMAND].  The program itself is saved in cache variable
+# bld_cv_pkg_prog_[COMMAND].
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_PROG_CHECK],
     [AC_REQUIRE_SHELL_FN([bld_prog_check],
 	[AS_FUNCTION_DESCRIBE([bld_prog_check],
 	    [COMMAND],
-	    [Variable containing the command to check.])], [dnl
+	    [COMMAND - Variable containing the command to check.])], [dnl
     tmp_cn="[$]1"
     eval "tmp_result=\"\${$tmp_cn}\""
     case "$tmp_result" in
@@ -236,6 +237,216 @@ dnl		dlocate is much faster than dpkg and dpkg-query
     fi])
 ])# _BLD_PROG_CHECK
 # =============================================================================
+
+# =============================================================================
+# _BLD_PATH_CHECK(VARIABLE, [PATH])
+# -----------------------------------------------------------------------------
+# Tests to see which distro package and distro package version provides the path
+# specified in the VARIABLE,PATH arguments.  Save the path name in cache variable
+# bld_cv_pkg_path_[PATHNAME], package name in cache variable bld_cv_pkg_name_-
+# [PATHNAME] and the package version in cache variable bld_cv_pkg_ver_[PATHNAME],
+# where, [PATHNAME] is the upper-case translated [PATH] name (or VARIABLE contents).
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_PATH_CHECK],
+    [AC_REQUIRE_SHELL_FN([bld_path_check],
+	[AS_FUNCTION_DESCRIBE([bld_path_check],
+	    [VARIABLE, [[PATH]]],
+[VARIABLE - Variable name containing the directory portion of the path.
+PATH - Optional subdirectory and filename within directory])], [dnl
+    if test -n "[$]2" ; then
+	eval "tmp_path=\"\${[$]1}/[$]2\""
+	eval "tmp_pn=\"[$]2\""
+    else
+	eval "tmp_path=\"\${[$]1}\""
+	eval "tmp_pn=\"\${[$]1}\""
+    fi
+    tmp_pn=`echo "$tmp_pn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+    tmp_pn=`echo "$tmp_pn" | sed -e 's,[[^A-Z0-9_]],_,g'`
+    tmp_result=
+    if test -n "$tmp_path"; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
+		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+		;;
+	    (debian|ubuntu|mint)
+		if which dlocate >/dev/null 2>&1
+		then dlocate=dlocate; term='$'
+		else dlocate=dpkg;    term=
+		fi
+		tmp_result=`$dlocate -S "$tmp_path$term" 2>/dev/null | tail -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
+		;;
+	esac
+    fi
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_name_${tmp_pn}=\"$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_name_${tmp_pn}"
+    fi
+    tmp_result=
+    if test -n "$tmp_path" ; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
+		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+		;;
+	    (debian|ubuntu|mint)
+		if which dlocate >/dev/null 2>&1
+		then dlocate=dlocate; term='$'
+		else dlocate=dpkg;    term=
+		fi
+		eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
+		if test -n "$tmp_result" ; then
+		    tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+		fi
+		;;
+	esac
+    fi
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_ver_${tmp_pn}=\"\$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_ver_${tmp_pn}"
+    fi
+    tmp_result="$tmp_path"
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_path_${tmp_pn}=\"\$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_path_${tmp_pn}"
+    fi
+    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
+    if test -n "$tmp_result" ; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|rhel)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"yum install \$tmp_result\""
+		;;
+	    (suse|sle)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"zypper install \$tmp_result\""
+		;;
+	    (redhat)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"up2date install \$tmp_result\""
+		;;
+	    (mandrake|mandriva|manbo)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"urpmi \$tmp_result\""
+		;;
+	    (debian|ubuntu|mint)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"aptitude install \$tmp_result\""
+		;;
+	    (*)
+		eval "unset bld_cv_pkg_cmd_${tmp_pn}"
+		;;
+	esac
+    else
+	eval "unset bld_cv_pkg_cmd_${tmp_pn}"
+    fi])dnl
+])# _BLD_PATH_CHECK
+# =============================================================================
+
+# =============================================================================
+# _BLD_FILE_CHECK(VARIABLE)
+# -----------------------------------------------------------------------------
+# Tests to see which distro package and distro package version provides the file
+# specified in variable VARIABLE.  Save the package name in cache variable
+# bld_cv_pkg_name_[FILENAME] and the package version in cache variable
+# bld_cv_pkg_ver_[FILENAME].  The file name itself is save in cache variable
+# bld_cv_pkg_file_[FILENAME].  Where, FILENAME is the file name portion of the
+# file name converted to uppercase and only containing A-Za-z0-9_.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_FILE_CHECK],
+    [AC_REQUIRE_SHELL_FN([bld_file_check],
+	[AS_FUNCTION_DESCRIBE([bld_file_check],
+	    [FILENAME],
+	    [FILENAME - Variable containing the file to check.])], [dnl
+    eval "tmp_file=\"\${[$]1}\""
+    tmp_fn=`basename $tmp_file`
+    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
+    tmp_result=
+    if test -n "$tmp_file"; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
+		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+		;;
+	    (debian|ubuntu|mint)
+		if which dlocate >/dev/null 2>&1
+		then dlocate=dlocate; term='$'
+		else dlocate=dpkg;    term=
+		fi
+		tmp_result=`$dlocate -S "$tmp_file$term" 2>/dev/null | tail -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
+		;;
+	esac
+    fi
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_name_${tmp_fn}=\"$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_name_${tmp_fn}"
+    fi
+    tmp_result=
+    if test -n "$tmp_file" ; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
+		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+		;;
+	    (debian|ubuntu|mint)
+		if which dlocate >/dev/null 2>&1
+		then dlocate=dlocate; term='$'
+		else dlocate=dpkg;    term=
+		fi
+		eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_fn}\""
+		if test -n "$tmp_result" ; then
+		    tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+		fi
+		;;
+	esac
+    fi
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_ver_${tmp_fn}=\"\$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_ver_${tmp_fn}"
+    fi
+    tmp_result="$tmp_file"
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_path_${tmp_fn}=\"\$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_path_${tmp_fn}"
+    fi
+    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_fn}\""
+    if test -n "$tmp_result" ; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|rhel)
+		eval "bld_cv_pkg_cmd_${tmp_fn}=\"yum install \$tmp_result\""
+		;;
+	    (suse|sle)
+		eval "bld_cv_pkg_cmd_${tmp_fn}=\"zypper install \$tmp_result\""
+		;;
+	    (redhat)
+		eval "bld_cv_pkg_cmd_${tmp_fn}=\"up2date install \$tmp_result\""
+		;;
+	    (mandrake|mandriva|manbo)
+		eval "bld_cv_pkg_cmd_${tmp_fn}=\"urpmi \$tmp_result\""
+		;;
+	    (debian|ubuntu|mint)
+		eval "bld_cv_pkg_cmd_${tmp_fn}=\"aptitude install \$tmp_result\""
+		;;
+	    (*)
+		eval "unset bld_cv_pkg_cmd_${tmp_fn}"
+		;;
+	esac
+    else
+	eval "unset bld_cv_pkg_cmd_${tmp_fn}"
+    fi])dnl
+])# _BLD_FILE_CHECK
+# =============================================================================
+
 
 # =============================================================================
 # _BLD_VAR_PATH_PROG([VARIABLE], [PROGRAMS], [PATH], [VAR-MSG], [IF-NOT-FOUND])
@@ -341,115 +552,8 @@ AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
 # =============================================================================
 
 # =============================================================================
-# _BLD_PATH_CHECK(VARIABLE, [PATH])
-# -----------------------------------------------------------------------------
-# Tests to see which distro package and distro package version provides the path
-# specified in the VARIABLE,PATH arguments.  Save the path name in cache variable
-# bld_cv_pkg_path_[PATHNAME], package name in cache variable bld_cv_pkg_name_-
-# [PATHNAME] and the package version in cache variable bld_cv_pkg_ver_[PATHNAME],
-# where, [PATHNAME] is the upper-case translated [PATH] name (or VARIABLE contents).
-# -----------------------------------------------------------------------------
-AC_DEFUN([_BLD_PATH_CHECK],
-    [AC_REQUIRE_SHELL_FN([bld_path_check],
-	[AS_FUNCTION_DESCRIBE([bld_path_check],
-	    [VARIABLE, [PATH]], [dnl
-VARIABLE Variable name containing the directory portion of the path.
-PATH Optional subdirectory and filename within directory])], [dnl
-    if test -n "[$]2" ; then
-	eval "tmp_path=\"\${[$]1}/[$]2\""
-	eval "tmp_pn=\"[$]2\""
-    else
-	eval "tmp_path=\"\${[$]1}\""
-	eval "tmp_pn=\"\${[$]1}\""
-    fi
-    tmp_pn=`echo "$tmp_pn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
-    tmp_pn=`echo "$tmp_pn" | sed -e 's,[[^A-Z0-9_]],_,g'`
-    tmp_result=
-    if test -n "$tmp_path"; then
-	case "$build_distro" in
-	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
-		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
-		;;
-	    (debian|ubuntu|mint)
-		if which dlocate >/dev/null 2>&1
-		then dlocate=dlocate; term='$'
-		else dlocate=dpkg;    term=
-		fi
-		tmp_result=`$dlocate -S "$tmp_path$term" 2>/dev/null | tail -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
-		;;
-	esac
-    fi
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_name_${tmp_pn}=\"$tmp_result\""
-    else
-	eval "unset bld_cv_pkg_name_${tmp_pn}"
-    fi
-    tmp_result=
-    if test -n "$tmp_path" ; then
-	case "$build_distro" in
-	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
-		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
-		;;
-	    (debian|ubuntu|mint)
-		if which dlocate >/dev/null 2>&1
-		then dlocate=dlocate; term='$'
-		else dlocate=dpkg;    term=
-		fi
-		eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
-		if test -n "$tmp_result" ; then
-		    tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
-		fi
-		;;
-	esac
-    fi
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_ver_${tmp_pn}=\"\$tmp_result\""
-    else
-	eval "unset bld_cv_pkg_ver_${tmp_pn}"
-    fi
-    tmp_result="$tmp_path"
-    if test -n "$tmp_result" ; then
-	eval "bld_cv_pkg_path_${tmp_pn}=\"\$tmp_result\""
-    else
-	eval "unset bld_cv_pkg_path_${tmp_pn}"
-    fi
-    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
-    if test -n "$tmp_result" ; then
-	case "$build_distro" in
-	    (centos|lineox|whitebox|fedora|rhel)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"yum install \$tmp_result\""
-		;;
-	    (suse|sle)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"zypper install \$tmp_result\""
-		;;
-	    (redhat)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"up2date install \$tmp_result\""
-		;;
-	    (mandrake|mandriva|manbo)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"urpmi \$tmp_result\""
-		;;
-	    (debian|ubuntu|mint)
-		eval "bld_cv_pkg_cmd_${tmp_pn}=\"aptitude install \$tmp_result\""
-		;;
-	    (*)
-		eval "unset bld_cv_pkg_cmd_${tmp_pn}"
-		;;
-	esac
-    else
-	eval "unset bld_cv_pkg_cmd_${tmp_pn}"
-    fi])dnl
-])# _BLD_PATH_CHECK
-# =============================================================================
-
-# =============================================================================
 # _BLD_FIND_DIR (DESC, VARIABLE, SEARCH-PATH, [FILE-PATH], [VALUE-IF-NOT-FOUND],
-#		 [IF-NOT-FOUND], [IF-FOUND])
+#		 [IF-NOT-FOUND], [IF-FOUND], [OPTION-VARIABLE])
 # -----------------------------------------------------------------------------
 # Finds a directory by searching the directories specified in SEARCH-PATH for
 # one that exists.  When [FILE-PATH] is specified, the specified subdirectory
@@ -458,45 +562,102 @@ PATH Optional subdirectory and filename within directory])], [dnl
 # specifies the value to use for the directory and assign to VARIABLE when the
 # directory is not found; otherwise, the value 'no' will be assigned to
 # VARIABLE.  When [IF-NOT-FOUND] is specified it will be executed when a
-# suitable directory was not found, [IF-FOUND] will be exected when a suitable
+# suitable directory was not found, [IF-FOUND] will be executed when a suitable
 # directory was found and the value of the found directory will be assigned to
 # VARIABLE.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_FIND_DIR], [dnl
     AC_REQUIRE([_BLD])dnl
     AC_CACHE_CHECK([for $1], [$2], [dnl
-	eval "bld_search_path=\"$3\""
-	bld_search_path=`echo "$bld_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
-	AC_MSG_RESULT([searching])
-	for bld_dir in $bld_search_path ; do
-	    AC_MSG_CHECKING([for $1... $bld_dir])
-	    if test -d "$bld_dir" ; then
-		m4_if([$4], [],
-[		$2="$bld_dir"
-		AC_MSG_RESULT([yes])
-		break],
-[		bld_files=`find $bld_dir -follow -type f -name $(basename '$4') 2>/dev/null | grep -F '$4' | sort -ru`
-		for bld_file in $bld_files ; do
-		    test -r "$bld_file" || continue
-		    bld_dir="${bld_file%/$4}"
-		    test -d "$bld_dir" || continue
-		    $2="$bld_dir"
-		    AC_MSG_RESULT([yes])
-		    break 2
-		done])
-	    fi
-	    AC_MSG_RESULT([no])
-	done
+	m4_if([$8], [], [],
+[	case "${$8:-search}" in
+	    (no) $2=no ;;
+	    (yes|search) ;;
+	    (*) m4_if([$4], [],
+		[if test -d "${$8}" ; then $2="${$8}" ; fi ;;],
+		[if test -f "${$8}/$4" ; then $2="${$8}" ; fi ;;])
+	esac])
 	if test -z "${$2}" ; then
-	    $2="$5"
-	    m4_if([$6], [], [AC_MSG_WARN([Cannot find $1.])], [$6])
-	else
-	    bld_path_check "$2" "$4"
-	    m4_if([$7], [], [:], [$7])
+	    eval "bld_search_path=\"$3\""
+	    bld_search_path=`echo "$bld_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    AC_MSG_RESULT([searching])
+	    for bld_dir in $bld_search_path ; do
+		AC_MSG_CHECKING([for $1... $bld_dir])
+		if test -d "$bld_dir" ; then
+		    m4_if([$4], [],
+    [		$2="$bld_dir"
+		    AC_MSG_RESULT([yes])
+		    break],
+    [		bld_files=`find $bld_dir -follow -type f -name $(basename '$4') 2>/dev/null | grep -F '$4' | sort -ru`
+		    for bld_file in $bld_files ; do
+			test -r "$bld_file" || continue
+			bld_dir="${bld_file%/$4}"
+			test -d "$bld_dir" || continue
+			$2="$bld_dir"
+			AC_MSG_RESULT([yes])
+			break 2
+		    done])
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	    if test -z "${$2}" ; then
+		$2="$5"
+		m4_if([$6], [], [AC_MSG_WARN([Cannot find $1.])], [$6])
+	    else
+		bld_path_check "$2" "$4"
+		m4_if([$7], [], [:], [$7])
+	    fi
+	    AC_MSG_CHECKING([for $1])
 	fi
-	AC_MSG_CHECKING([for $1])
     ])
 ])# _BLD_FIND_DIR
+# =============================================================================
+
+# =============================================================================
+# _BLD_FIND_FILE (DESC, VARIABLE, SEARCH-PATH, [VALUE-IF-NOT-FOUND],
+#		  [IF-NOT-FOUND], [IF-FOUND], [OPTION-VARIABLE])
+# -----------------------------------------------------------------------------
+# Finds a directory by searching the full path filenames specified in
+# SEARCH-PATH for one that exists.  [VALUE-IF-NOT-FOUND] specifies the value to
+# use for the file and assign to VARIABLE when the file is not found; otherwise,
+# the value 'no' will be assigned to VARIABLE.  When [IF-NOT-FOUND] is specified
+# it will be executed when the file was not found, [IF-FOUND] will be executed
+# when the file was found and the path of the found file will be assigned to
+# VARIABLE.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_FIND_FILE], [dnl
+    AC_REQUIRE([_BLD])dnl
+    AC_CACHE_CHECK([for $1], [$2], [dnl
+	m4_if([$7], [], [],
+[	case "${$7:-search}" in
+	    (no) $2=no ;;
+	    (yes|search) ;;
+	    (*) if test -f "${$7}" ; then $2="${$7}"; fi ;;
+	esac])
+	if test -z "${$2}" ; then
+	    eval "bld_search_path=\"$3\""
+	    bld_search_path=`echo "$bld_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    AC_MSG_RESULT([searching])
+	    for bld_file in $bld_search_path ; do
+		AC_MSG_CHECKING([for $1... $bld_file])
+		if test -f "$bld_file" ; then
+		    $2="$bld_file"
+		    AC_MSG_RESULT([yes])
+		    break
+		fi
+		AC_MSG_RESULT([no])
+	    done
+	    if test -z "${$2}" ; then
+		$2="$4"
+		m4_if([$5], [], [AC_MSG_WARN([Cannot find $1.])], [$5])
+	    else
+		bld_file_check "$2"
+		m4_if([$6], [], [:], [$6])
+	    fi
+	    AC_MSG_CHECKING([for $1])
+	fi
+    ])
+])# _BLD_FIND_FILE
 # =============================================================================
 
 # =============================================================================

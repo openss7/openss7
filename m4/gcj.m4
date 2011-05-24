@@ -782,11 +782,6 @@ AC_DEFUN([_GCJ_SETUP], [dnl
 	[AS_HELP_STRING([--with-libgcj=HEADERS],
 	    [GCJ library header directory @<:@default=search@:>@])],
 	[], [with_libgcj=search])
-    case "${with_libgcj:-search}" in
-	(no) gcj_cv_includedir=no ;;
-	(yes|search) ;;
-	(*) if test -f "$with_libgcj/gcj/cni.h" ; then gcj_cv_includedir="$with_libgcj" ; fi ;;
-    esac
     _BLD_FIND_DIR([libgcj include directory], [gcj_cv_includedir], [
 	${DESTDIR}${rootdir}${includedir}
 	${DESTDIR}${rootdir}${oldincludedir}
@@ -817,7 +812,7 @@ AC_DEFUN([_GCJ_SETUP], [dnl
 	PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-libgcj'"
 	ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-libgcj'"
 	with_libgcj=no
-    ])
+    ], [], [with_libgcj])
     if test :"${with_libgcj:-search}" = :no -o :"${gcj_cv_includedir:-no}" = :no ; then
 	gcjincludedir=
     else
