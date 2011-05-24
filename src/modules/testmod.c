@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -68,7 +68,9 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.
  * perform some more specialized functions.
  */
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -85,7 +87,7 @@ static char const ident[] = "$RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.
 #include "sys/config.h"
 
 #define TESTMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define TESTMOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define TESTMOD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TESTMOD_REVISION	"LfS $RCSfile: testmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:07 $"
 #define TESTMOD_DEVICE		"SVR 4.2 Test Module for STREAMS"
 #define TESTMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -63,7 +63,9 @@
 static char const ident[] = "$RCSfile: sctp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:35 $";
 
 #ifdef LINUX
-#   include <linux/autoconf.h>
+#   ifdef NEED_LINUX_AUTOCONF_H
+#	include <linux/autoconf.h>
+#   endif
 #   include <linux/version.h>
 #   ifndef HAVE_SYS_LIS_MODULE_H
 #	include <linux/module.h>
@@ -155,7 +157,7 @@ struct sockaddr_storage {
 #define SCTP_DESCRIP	"SCTP/IP STREAMS (NPI/TPI) DRIVER." "\n" \
 			"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCTP_REVISION	"LfS $RCSfile: sctp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:35 $"
-#define SCTP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SCTP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCTP_DEVICE	"Supports LiS STREAMS and Linux NET4."
 #define SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCTP_LICENSE	"GPL"

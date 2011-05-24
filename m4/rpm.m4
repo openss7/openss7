@@ -209,9 +209,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		rpm_cv_dist_extra=".el${dist_cv_host_release}"	    ;;
 			esac
 			;;
-		    (mandrake)
+		    (mandrake|mandriva)
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
 			rpm_cv_dist_extra=".${rpm_tmp}mdk"
+			;;
+		    (manbo)
+			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
+			rpm_cv_dist_extra=".${rpm_tmp}mnb"
 			;;
 		    (suse)
 			rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}"
@@ -292,9 +296,13 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		  rpm_cv_dist_extra2=".el${rpm_tmp}"		    ;;
 			esac
 			;;
-		    (mandrake)
+		    (mandrake|mandriva)
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
 			rpm_cv_dist_extra2=".${rpm_tmp}mdk"
+			;;
+		    (manbo)
+			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
+			rpm_cv_dist_extra2=".${rpm_tmp}mnb"
 			;;
 		    (suse)
 			rpm_cv_dist_extra2=".${dist_cv_host_release:-SuSE}"
@@ -329,7 +337,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		rpm_cv_dist_topdir='/usr/src/SuSE'	;;
 	    (sle)
 		rpm_cv_dist_topdir='/usr/src/packages'	;;
-	    (mandrake)
+	    (mandrake|mandriva|manbo)
 		rpm_cv_dist_topdir='/usr/src/RPM'	;;
 	    (debian|ubuntu)
 		rpm_cv_dist_topdir='/usr/src/rpm'	;;
@@ -542,7 +550,7 @@ dnl
 		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
-		(centos|lineox|whitebox|fedora|mandrake|mandriva|redhat|suse)
+		(centos|lineox|whitebox|fedora|mandrake|mandriva|manbo|redhat|suse)
 		    AC_MSG_WARN([Could not find rpm program in PATH.]) ;;
 		(*) enable_rpms=no ;;
 	    esac

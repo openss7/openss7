@@ -1240,7 +1240,7 @@ strMIB_la_SOURCES		= src/snmp/strMIB.c \
 				  src/snmp/mib_modules.h \
 				  src/snmp/struct.h \
 				  src/snmp/util_funcs.h
-strMIB_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+strMIB_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS) -DMODULE
 strMIB_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 strMIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
 strMIB_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared $(SNMP_LDFLAGS)
@@ -1266,7 +1266,7 @@ mxMIB_la_SOURCES		= src/snmp/ds0Bundle.c \
 				  src/snmp/mib_modules.h \
 				  src/snmp/struct.h \
 				  src/snmp/util_funcs.h
-mxMIB_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+mxMIB_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS) -DMODULE
 mxMIB_la_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 mxMIB_la_LIBADD			= libstreams.la $(SNMP_LDADD)
 mxMIB_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared $(SNMP_LDFLAGS)
@@ -1296,7 +1296,7 @@ ss7MIB_la_SOURCES		= src/snmp/ss7MIB.c \
 				  src/snmp/mib_modules.h \
 				  src/snmp/struct.h \
 				  src/snmp/util_funcs.h
-ss7MIB_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) -DMODULE
+ss7MIB_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS) -DMODULE
 ss7MIB_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 ss7MIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
 ss7MIB_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared $(SNMP_LDFLAGS)
@@ -1523,7 +1523,7 @@ streamsd_SOURCES		= src/snmp/streamsd.c \
 				  src/snmp/mib_modules.h \
 				  src/snmp/struct.h \
 				  src/snmp/util_funcs.h
-streamsd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+streamsd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS)
 streamsd_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 streamsd_LDADD			= libstreams.la $(SNMP_LDADD)
 streamsd_LDFLAGS		= $(SNMP_LDFLAGS)
@@ -1579,7 +1579,7 @@ chand_SOURCES			= src/snmp/chand.c \
 				  src/snmp/mib_modules.h \
 				  src/snmp/struct.h \
 				  src/snmp/util_funcs.h
-chand_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS)
+chand_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS)
 chand_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 chand_LDADD			= libstreams.la $(SNMP_LDADD)
 chand_LDFLAGS			= $(SNMP_LDFLAGS)

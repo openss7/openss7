@@ -59,6 +59,8 @@
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD], [dnl
     AC_REQUIRE([_DISTRO])dnl
+    _BLD_PROG_CHECK
+    _BLD_PATH_CHECK
     _BLD_BUILD_REQ
 ])# _BLD
 # =============================================================================
@@ -123,111 +125,116 @@ CONFIG_BLDREQ="$CONFIG_BLDREQ"
 # =============================================================================
 
 # =============================================================================
-# _BLD_BUILD_CHECK(COMMAND)
+# _BLD_PROG_CHECK(COMMAND)
 # -----------------------------------------------------------------------------
 # Tests to see which distro package and distro package version provides the
 # command specified in variable COMMAND.  Saves the package name in cache
 # variable bld_cv_pkg_name_[COMMAND]  and the package version in cache variable
 # bld_cv_pkg_ver_[COMMAND].
 # -----------------------------------------------------------------------------
-AC_DEFUN([_BLD_BUILD_CHECK], [dnl
-    AC_REQUIRE([_BLD])dnl
-    eval "tmp_cmd=\"\$bld_cv_pkg_name_$1\""
-    if test ":$tmp_cmd" = : ; then
-	case "${$1}" in
-	    ([[\\/]]* | ?:[[\\/]]*)
-		tmp_cmd="${$1}"
+AC_DEFUN([_BLD_PROG_CHECK],
+    [AC_REQUIRE_SHELL_FN([bld_prog_check],
+	[AS_FUNCTION_DESCRIBE([bld_prog_check],
+	    [COMMAND],
+	    [Variable containing the command to check.])], [dnl
+    tmp_cn="[$]1"
+    eval "tmp_result=\"\${$tmp_cn}\""
+    case "$tmp_result" in
+	([[\\/]]* | ?:[[\\/]]*)
+	    eval "tmp_cmd=\"\${$tmp_cn}\""
+	    ;;
+	(*)
+	    # the command is expected just to be in the configure path
+	    eval "tmp_cmd=\"\`which \${$tmp_cn} 2>/dev/null\`\""
+	    ;;
+    esac
+    tmp_result=
+    if test -n "$tmp_cmd" ; then
+	case "$build_distro" in
+dnl These use rpm
+	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
+		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
-	    (*)
-		# the command is expected just to be in the configure path
-		tmp_cmd=`which ${$1} 2>/dev/null`
+dnl These use dpkg
+	    (debian|ubuntu|mint)
+dnl		dlocate is much faster than dpkg and dpkg-query
+		if which dlocate >/dev/null 2>&1
+		then dlocate=dlocate; term='$'
+		else dlocate=dpkg;    term=
+		fi
+		tmp_result=`$dlocate -S "$tmp_cmd$term" 2>/dev/null | tail -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
 		;;
 	esac
-	tmp_result=
-	if test -n "$tmp_cmd" ; then
-	    case "$build_distro" in
-dnl	These use rpm
-		(centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva)
-		    tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
-		    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		    ;;
-dnl	These use dpkg
-		(debian|ubuntu|mint)
-dnl		    dlocate is much faster than dpkg and dpkg-query
-		    if which dlocate >/dev/null 2>&1
-		    then dlocate=dlocate; term='$'
-		    else dlocate=dpkg;    term=
-		    fi
-		    tmp_result=`$dlocate -S "$tmp_cmd$term" 2>/dev/null | tail -1`
-		    tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
-		    tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
-		    ;;
-	    esac
-	fi
-	if test -n "$tmp_result" ; then
-	    bld_cv_pkg_name_$1="$tmp_result"
-	else
-	    unset bld_cv_pkg_name_$1
-	fi
-	tmp_result=
-	if test -n "$tmp_cmd" ; then
-	    case "$build_distro" in
-dnl	These use rpm
-		(centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva)
-		    tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
-		    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		    ;;
-dnl	These use dpkg
-		(debian|ubuntu|mint)
-dnl		    dlocate is much faster than dpkg and dpkg-query
-		    if which dlocate >/dev/null 2>&1
-		    then dlocate=dlocate; term='$'
-		    else dlocate=dpkg;    term=
-		    fi
-		    if test -n "$bld_cv_pkg_name_$1" ; then
-			tmp_result=`$dlocate -s "$bld_cv_pkg_name_$1" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
-		    fi
-		    ;;
-	    esac
-	fi
-	if test -n "$tmp_result" ; then
-	    bld_cv_pkg_ver_$1="$tmp_result"
-	else
-	    unset bld_cv_pkg_ver_$1
-	fi
-	tmp_result=`echo "$tmp_cmd" | sed -e 's|.*/||;s| .*||'`
-	if test -n "$tmp_result" ; then
-	    bld_cv_pkg_prog_$1="$tmp_result"
-	else
-	    unset bld_cv_pkg_prog_$1
-	fi
-	tmp_result="$bld_cv_pkg_name_$1"
-	if test -n "$tmp_result" ; then
-	    case "$build_distro" in
-		(centos|lineox|whitebox|fedora|rhel)
-		    bld_cv_pkg_cmd_$1="yum install $tmp_result"
-		    ;;
-		(suse|sle)
-		    bld_cv_pkg_cmd_$1="zypper install $tmp_result"
-		    ;;
-		(redhat)
-		    bld_cv_pkg_cmd_$1="up2date install $tmp_result"
-		    ;;
-		(mandrake|mandriva)
-		    bld_cv_pkg_cmd_$1="rpmi $tmp_result"
-		    ;;
-		(debian|ubuntu|mint)
-		    bld_cv_pkg_cmd_$1="apt-get install $tmp_result"
-		    ;;
-		(*)
-		    unset bld_cv_pkg_cmd_$1
-		    ;;
-	    esac
-	else
-	    unset bld_cv_pkg_cmd_$1
-	fi
+    fi
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_name_${tmp_cn}=\"\$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_name_${tmp_cn}"
+    fi
+    tmp_result=
+    if test -n "$tmp_cmd" ; then
+	case "$build_distro" in
+dnl These use rpm
+	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
+		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+		;;
+dnl These use dpkg
+	    (debian|ubuntu|mint)
+dnl		dlocate is much faster than dpkg and dpkg-query
+		if which dlocate >/dev/null 2>&1
+		then dlocate=dlocate; term='$'
+		else dlocate=dpkg;    term=
+		fi
+		eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_cn}\""
+		if test -n "$tmp_result" ; then
+		    tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+		fi
+		;;
+	esac
+    fi
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_ver_${tmp_cn}=\"\$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_ver_${tmp_cn}"
+    fi
+    tmp_result=`echo "$tmp_cmd" | sed -e 's|.*/||;s| .*||'`
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_prog_${tmp_cn}=\"\$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_prog_${tmp_cn}"
+    fi
+    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_cn}\""
+    if test -n "$tmp_result" ; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|rhel)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"yum install \$tmp_result\""
+		;;
+	    (suse|sle)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"zypper install \$tmp_result\""
+		;;
+	    (redhat)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"up2date install \$tmp_result\""
+		;;
+	    (mandrake|mandriva|manbo)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"urpmi \$tmp_result\""
+		;;
+	    (debian|ubuntu|mint)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"apt-get install \$tmp_result\""
+		;;
+	    (*)
+		eval "unset bld_cv_pkg_cmd_${tmp_cn}"
+		;;
+	esac
+    else
+	eval "unset bld_cv_pkg_cmd_${tmp_cn}"
     fi])
-])# _BLD_BUILD_CHECK
+])# _BLD_PROG_CHECK
 # =============================================================================
 
 # =============================================================================
@@ -235,7 +242,7 @@ dnl		    dlocate is much faster than dpkg and dpkg-query
 # -----------------------------------------------------------------------------
 # Performs AC_ARG_VAR([VARIABLE], [VAR-MSG]), and then performs a call to
 # AC_PATH_PROG([VARIABLE], [PROGRAMS], [IF-NOT-FOUND], [PATH]) and examines the
-# result.  It then calls _BLD_BUILD_CHECK([VARIABLE]) when successful to set
+# result.  It then calls bld_prog_check "VARIABLE" when successful to set
 # what package name and package version provides the program (if any).
 # -----------------------------------------------------------------------------
 AC_DEFUN([_BLD_VAR_PATH_PROG], [dnl
@@ -246,7 +253,7 @@ AC_DEFUN([_BLD_VAR_PATH_PROG], [dnl
 	:
 	$5
     else
-	_BLD_BUILD_CHECK([$1])
+	bld_prog_check "$1"
     fi
 ])# _BLD_VAR_PATH_PROG
 # =============================================================================
@@ -265,7 +272,7 @@ AC_DEFUN([_BLD_PATH_PROG], [dnl
 	$1="$3"
 	m4_if([$5], [], [AC_MSG_WARN([Cannot find $2 in PATH.])], [$5])
     else
-	_BLD_BUILD_CHECK([$1])
+	bld_prog_check "$1"
 	m4_if([$6], [], [:], [$6])
     fi
 ])# _BLD_PATH_PROG
@@ -285,7 +292,7 @@ AC_DEFUN([_BLD_PATH_PROGS], [dnl
 	$1="$3"
 	m4_if([$5], [], [AC_MSG_WARN([Cannot find $2 in PATH.])], [$5])
     else
-	_BLD_BUILD_CHECK([$1])
+	bld_prog_check "$1"
 	m4_if([$6], [], [:], [$6])
     fi
 ])# _BLD_PATH_PROGS
@@ -331,6 +338,165 @@ AC_DEFUN([_BLD_INSTALL_ERROR], [dnl
     fi
     AC_MSG_ERROR([$2$tmp_msg$4])
 ])# _BLD_INSTALL_ERROR
+# =============================================================================
+
+# =============================================================================
+# _BLD_PATH_CHECK(VARIABLE, [PATH])
+# -----------------------------------------------------------------------------
+# Tests to see which distro package and distro package version provides the path
+# specified in the VARIABLE,PATH arguments.  Save the path name in cache variable
+# bld_cv_pkg_path_[PATHNAME], package name in cache variable bld_cv_pkg_name_-
+# [PATHNAME] and the package version in cache variable bld_cv_pkg_ver_[PATHNAME],
+# where, [PATHNAME] is the upper-case translated [PATH] name (or VARIABLE contents).
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_PATH_CHECK],
+    [AC_REQUIRE_SHELL_FN([bld_path_check],
+	[AS_FUNCTION_DESCRIBE([bld_path_check],
+	    [VARIABLE, [PATH]], [dnl
+VARIABLE Variable name containing the directory portion of the path.
+PATH Optional subdirectory and filename within directory])], [dnl
+    if test -n "[$]2" ; then
+	eval "tmp_path=\"\${[$]1}/[$]2\""
+	eval "tmp_pn=\"[$]2\""
+    else
+	eval "tmp_path=\"\${[$]1}\""
+	eval "tmp_pn=\"\${[$]1}\""
+    fi
+    tmp_pn=`echo "$tmp_pn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+    tmp_pn=`echo "$tmp_pn" | sed -e 's,[[^A-Z0-9_]],_,g'`
+    tmp_result=
+    if test -n "$tmp_path"; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
+		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+		;;
+	    (debian|ubuntu|mint)
+		if which dlocate >/dev/null 2>&1
+		then dlocate=dlocate; term='$'
+		else dlocate=dpkg;    term=
+		fi
+		tmp_result=`$dlocate -S "$tmp_path$term" 2>/dev/null | tail -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
+		;;
+	esac
+    fi
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_name_${tmp_pn}=\"$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_name_${tmp_pn}"
+    fi
+    tmp_result=
+    if test -n "$tmp_path" ; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo)
+		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+		;;
+	    (debian|ubuntu|mint)
+		if which dlocate >/dev/null 2>&1
+		then dlocate=dlocate; term='$'
+		else dlocate=dpkg;    term=
+		fi
+		eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
+		if test -n "$tmp_result" ; then
+		    tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+		fi
+		;;
+	esac
+    fi
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_ver_${tmp_pn}=\"\$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_ver_${tmp_pn}"
+    fi
+    tmp_result="$tmp_path"
+    if test -n "$tmp_result" ; then
+	eval "bld_cv_pkg_path_${tmp_pn}=\"\$tmp_result\""
+    else
+	eval "unset bld_cv_pkg_path_${tmp_pn}"
+    fi
+    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
+    if test -n "$tmp_result" ; then
+	case "$build_distro" in
+	    (centos|lineox|whitebox|fedora|rhel)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"yum install \$tmp_result\""
+		;;
+	    (suse|sle)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"zypper install \$tmp_result\""
+		;;
+	    (redhat)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"up2date install \$tmp_result\""
+		;;
+	    (mandrake|mandriva|manbo)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"urpmi \$tmp_result\""
+		;;
+	    (debian|ubuntu|mint)
+		eval "bld_cv_pkg_cmd_${tmp_pn}=\"aptitude install \$tmp_result\""
+		;;
+	    (*)
+		eval "unset bld_cv_pkg_cmd_${tmp_pn}"
+		;;
+	esac
+    else
+	eval "unset bld_cv_pkg_cmd_${tmp_pn}"
+    fi])dnl
+])# _BLD_PATH_CHECK
+# =============================================================================
+
+# =============================================================================
+# _BLD_FIND_DIR (DESC, VARIABLE, SEARCH-PATH, [FILE-PATH], [VALUE-IF-NOT-FOUND],
+#		 [IF-NOT-FOUND], [IF-FOUND])
+# -----------------------------------------------------------------------------
+# Finds a directory by searching the directories specified in SEARCH-PATH for
+# one that exists.  When [FILE-PATH] is specified, the specified subdirectory
+# and file must exist relative to the searched directory, otherwise it is not
+# considered a valid result and the search continues.  [VALUE-IF-NOT-FOUND]
+# specifies the value to use for the directory and assign to VARIABLE when the
+# directory is not found; otherwise, the value 'no' will be assigned to
+# VARIABLE.  When [IF-NOT-FOUND] is specified it will be executed when a
+# suitable directory was not found, [IF-FOUND] will be exected when a suitable
+# directory was found and the value of the found directory will be assigned to
+# VARIABLE.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_BLD_FIND_DIR], [dnl
+    AC_REQUIRE([_BLD])dnl
+    AC_CACHE_CHECK([for $1], [$2], [dnl
+	eval "bld_search_path=\"$3\""
+	bld_search_path=`echo "$bld_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for bld_dir in $bld_search_path ; do
+	    AC_MSG_CHECKING([for $1... $bld_dir])
+	    if test -d "$bld_dir" ; then
+		m4_if([$4], [],
+[		$2="$bld_dir"
+		AC_MSG_RESULT([yes])
+		break],
+[		bld_files=`find $bld_dir -follow -type f -name $(basename '$4') 2>/dev/null | grep -F '$4' | sort -ru`
+		for bld_file in $bld_files ; do
+		    test -r "$bld_file" || continue
+		    bld_dir="${bld_file%/$4}"
+		    test -d "$bld_dir" || continue
+		    $2="$bld_dir"
+		    AC_MSG_RESULT([yes])
+		    break 2
+		done])
+	    fi
+	    AC_MSG_RESULT([no])
+	done
+	if test -z "${$2}" ; then
+	    $2="$5"
+	    m4_if([$6], [], [AC_MSG_WARN([Cannot find $1.])], [$6])
+	else
+	    bld_path_check "$2" "$4"
+	    m4_if([$7], [], [:], [$7])
+	fi
+	AC_MSG_CHECKING([for $1])
+    ])
+])# _BLD_FIND_DIR
 # =============================================================================
 
 # =============================================================================

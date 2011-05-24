@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -62,7 +62,9 @@
 
 static char const ident[] = "$RCSfile: strsysctl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:57 $";
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -121,228 +123,354 @@ STATIC struct ctl_table_header *streams_sysctl_handle;
 
 STATIC ctl_table streams_table[] = {
 	/* stream head default maximum packet size */
-	{STREAMS_MAXPSZ, "maxpsz",
-	 &sysctl_str_maxpsz, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_MAXPSZ,
+#endif
+	 "maxpsz", &sysctl_str_maxpsz, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 &sysctl_str_minpsz, NULL},
 	/* stream head default minimum packet size */
-	{STREAMS_MINPSZ, "minpsz",
-	 &sysctl_str_minpsz, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_MINPSZ,
+#endif
+	 "minpsz", &sysctl_str_minpsz, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, &sysctl_str_maxpsz},
 	/* stream head default high water mark */
-	{STREAMS_HIWAT, "hiwat",
-	 &sysctl_str_hiwat, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_HIWAT,
+#endif
+	 "hiwat", &sysctl_str_hiwat, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 &sysctl_str_lowat, NULL},
 	/* stream head default low water mark */
-	{STREAMS_LOWAT, "lowat",
-	 &sysctl_str_lowat, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_LOWAT,
+#endif
+	 "lowat", &sysctl_str_lowat, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, &sysctl_str_hiwat},
 	/* default close time */
-	{STREAMS_CLTIME, "cltime",
-	 &sysctl_str_cltime, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_CLTIME,
+#endif
+	 "cltime", &sysctl_str_cltime, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_ms_jiffies_minmax, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* default hold time maximum */
-	{STREAMS_RTIME, "rtime",
-	 &sysctl_str_rtime, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_RTIME,
+#endif
+	 "rtime", &sysctl_str_rtime, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_ms_jiffies_minmax, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* default ioctl() acknowledgement time */
-	{STREAMS_IOCTIME, "ioctime",
-	 &sysctl_str_ioctime, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_IOCTIME,
+#endif
+	 "ioctime", &sysctl_str_ioctime, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_ms_jiffies_minmax, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* maximum number of pushed modules - system wide */
-	{STREAMS_NSTRPUSH, "nstrpush",
-	 &sysctl_str_nstrpush, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_NSTRPUSH,
+#endif
+	 "nstrpush", &sysctl_str_nstrpush, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* maximum memory threshold */
-	{STREAMS_STRTHRESH, "strthresh",
-	 &sysctl_str_strthresh, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_STRTHRESH,
+#endif
+	 "strthresh", &sysctl_str_strthresh, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* hold time for STRHOLD feature in milliseconds, zero disables */
-	{STREAMS_STRHOLD, "strhold",
-	 &sysctl_str_strhold, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_STRHOLD,
+#endif
+	 "strhold", &sysctl_str_strhold, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_ms_jiffies_minmax, NULL,
+	 &proc_doulongvec_ms_jiffies_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* maximum ctrl part size */
-	{STREAMS_STRCTLSZ, "strctlsz",
-	 &sysctl_str_strctlsz, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_STRCTLSZ,
+#endif
+	 "strctlsz", &sysctl_str_strctlsz, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* maximum data part size */
-	{STREAMS_STRMSGSZ, "strmsgsz",
-	 &sysctl_str_strmsgsz, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_STRMSGSZ,
+#endif
+	 "strmsgsz", &sysctl_str_strmsgsz, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
-	{STREAMS_NSTRMSGS, "nstrmsgs",
-	 &sysctl_str_nstrmsgs, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_NSTRMSGS,
+#endif
+	 "nstrmsgs", &sysctl_str_nstrmsgs, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* number of queue bands, 256 is too many already */
-	{STREAMS_NBAND, "nband",
-	 &sysctl_str_nband, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_NBAND,
+#endif
+	 "nband", &sysctl_str_nband, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
-	{STREAMS_REUSE_FMODSW, "reuse_fmodsw",
-	 &sysctl_str_reuse_fmodsw, sizeof(int), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_REUSE_FMODSW,
+#endif
+	 "reuse_fmodsw", &sysctl_str_reuse_fmodsw, sizeof(int), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_dointvec, NULL,
+	 &proc_dointvec,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* maximum number of autopushed modules - per device */
-	{STREAMS_MAX_APUSH, "max_apush",
-	 &sysctl_str_max_apush, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_MAX_APUSH,
+#endif
+	 "max_apush", &sysctl_str_max_apush, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
-	{STREAMS_MAX_STRAMOD, "max_stramod",
-	 &sysctl_str_max_stramod, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_MAX_STRAMOD,
+#endif
+	 "max_stramod", &sysctl_str_max_stramod, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* maximum number of STREAMS cdevsw[] entries */
-	{STREAMS_MAX_STRDEV, "max_strdev",
-	 &sysctl_str_max_strdev, sizeof(ulong), 0444, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_MAX_STRDEV,
+#endif
+	 "max_strdev", &sysctl_str_max_strdev, sizeof(ulong), 0444, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* maximum number of STREAMS fmodsw[] entries */
-	{STREAMS_MAX_STRMOD, "max_strmod",
-	 &sysctl_str_max_strmod, sizeof(ulong), 0444, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_MAX_STRMOD,
+#endif
+	 "max_strmod", &sysctl_str_max_strmod, sizeof(ulong), 0444, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
 	/* maximum number of allocated mdbblocks */
-	{STREAMS_MAX_MBLK, "max_mblk",
-	 &sysctl_str_max_mblk, sizeof(ulong), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_MAX_MBLK,
+#endif
+	 "max_mblk", &sysctl_str_max_mblk, sizeof(ulong), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_doulongvec_minmax, NULL,
+	 &proc_doulongvec_minmax,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
 	 NULL, NULL},
-	{STREAMS_MSG_PRIORITY, "msg_priority",
-	 &sysctl_str_msg_priority, sizeof(int), 0644, NULL,
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 STREAMS_MSG_PRIORITY,
+#endif
+	 "msg_priority", &sysctl_str_msg_priority, sizeof(int), 0644, NULL,
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_PARENT
 	 NULL,
 #endif
-	 &proc_dointvec, NULL,
+	 &proc_dointvec,
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_STRATEGY
+	 NULL,
+#endif
 #ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_DE
 	 NULL,
 #endif
@@ -351,7 +479,11 @@ STATIC ctl_table streams_table[] = {
 };
 
 STATIC ctl_table streams_root_table[] = {
-	{CTL_STREAMS, "streams", NULL, 0, 0555, streams_table,},
+	{
+#ifdef HAVE_KMEMB_STRUCT_CTL_TABLE_CTL_NAME
+	 CTL_STREAMS,
+#endif
+	 "streams", NULL, 0, 0555, streams_table,},
 	{0}
 };
 

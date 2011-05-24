@@ -79,7 +79,9 @@ static char const ident[] =
     "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $";
 
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>

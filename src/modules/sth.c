@@ -86,7 +86,9 @@ static char const ident[] = "$RCSfile: sth.c,v $ $Name:  $($Revision: 1.1.2.8 $)
 
 //#define __NO_VERSION__
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>

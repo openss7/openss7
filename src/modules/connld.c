@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -67,7 +67,9 @@ static char const ident[] = "$RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.2.2
  *  existing pipe-end.
  */
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -80,7 +82,7 @@ static char const ident[] = "$RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.2.2
 #include "sys/config.h"
 
 #define CONNLD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define CONNLD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define CONNLD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CONNLD_REVISION		"LfS $RCSfile: connld.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $"
 #define CONNLD_DEVICE		"SVR 4.2 CONNLD Module for STREAMS-based pipes"
 #define CONNLD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

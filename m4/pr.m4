@@ -95,7 +95,9 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 		    (6|6.?)	ap_cv_distribution="RHEL6" ;;
 		    (*)		ap_cv_distribution="RHEL$dist_cv_host_release" ;;
 	        esac ;;
-	    (mandrake)	 ap_cv_distribution="MDK$dist_cv_host_release"	    ;;
+	    (mandrake|mandriva)
+				ap_cv_distribution="MDK$dist_cv_host_release"	    ;;
+	    (manbo)		ap_cv_distribution="MNB$dist_cv_host_release"	    ;;
 	    (suse)
 	        case $dist_cv_host_release in
 		    (6.2|7.[[0-3]]|8.[[0-3]]|9.[[0-3]])

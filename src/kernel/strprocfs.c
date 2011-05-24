@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -68,7 +68,9 @@
 
 static char const ident[] = "$RCSfile: strprocfs.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-03-26 04:28:48 $";
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -464,7 +466,7 @@ get_streams_cdevsw_list
 #endif
 {
 	int len = 0;
-	static const int maxlen = 1024;
+	static const int maxlen = 512;
 	int num = 0;
 	off_t begin, pos;
 	char buffer[maxlen + 1];
@@ -575,7 +577,7 @@ get_streams_fmodsw_list
 #endif
 {
 	int len = 0;
-	static const int maxlen = 1024;
+	static const int maxlen = 512;
 	int num = 0;
 	off_t begin, pos;
 	char buffer[maxlen + 1];

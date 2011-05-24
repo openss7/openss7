@@ -146,11 +146,12 @@ dnl
 ***
 *** Configure cannot find a suitable 'zip' program.  Try:
 *** ], [
-*** Debian 5.0:	 'apt-get install zip'
-*** Ubuntu 8.04: 'apt-get install zip'
-*** CentOS 5.x:	 'yum install zip'
-*** SLES 10:	 'zypper install zip'
-*** RH 7.3:	 'rpm -i zip'], [
+*** Debian 5.0:	   'apt-get install zip'
+*** Ubuntu 8.04:   'apt-get install zip'
+*** Mandriva 2010: 'urpmi zip'
+*** CentOS 5.x:	   'yum install zip'
+*** SLES 10:	   'zypper install zip'
+*** RH 7.3:	   'rpm -i zip'], [
 ***
 *** To get rid of this warning, load the 'zip' program or specify the
 *** appropriate program with the ZIP enviornment variable to

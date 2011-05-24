@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -65,7 +65,9 @@ static char const ident[] = "$RCSfile: sctp_t.c,v $ $Name:  $($Revision: 1.1.2.2
 #define __NO_VERSION__
 
 #ifdef LINUX
-#   include <linux/autoconf.h>
+#   ifdef NEED_LINUX_AUTOCONF_H
+#	include <linux/autoconf.h>
+#   endif
 #   include <linux/version.h>
 #   ifndef HAVE_SYS_LIS_MODULE_H
 #	include <linux/module.h>

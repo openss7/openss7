@@ -122,7 +122,9 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** RHEL 5.x:    'yum install groff'
+*** SLES 10:     'zypper install groff'
+*** Mandriva:    'urpmi groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify an
 *** appropriate program with the SOELIM environment variable to
@@ -148,7 +150,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** Debian 5.0:  'apt-get install groff'
 *** Ubuntu 8.04: 'apt-get install groff_ext'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** SLES 10:     'zypper install groff'
+*** Mandriva:    'urpmi groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify an
 *** appropriate program with the REFER environment variable to
@@ -181,7 +184,9 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** RHEL 5.x:    'yum install groff'
+*** SLES 10:     'zypper install groff'
+*** Mandriva:    'urpmi groff-for-man'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify an
 *** appropriate program with the TBL environment variable to
@@ -207,7 +212,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** Fedora 9:    'yum install man'
 *** CentOS 5.x:  'yum install man'
 *** openSUSE 11: 'zypper install man'
-*** SLES 10:     'zypper isntall man'], [
+*** SLES 10:     'zypper install man'
+*** Mandriva:    'urpmi man'], [
 ***
 *** To get rid of this warning, load the 'man' package, specify an
 *** appropriate program with the MAKEWHATIS environment variable to
@@ -232,9 +238,11 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** build host.  The 'gzip' package has been available for many years on
 *** all distributions and is available from any GNU archive site.  Try:
 *** ], [
-*** Debian:  'apt-get install gzip'
-*** SuSE:    'zypper install gzip'
-*** CentOS:  'yum install gzip'], [
+*** Debian:   'apt-get install gzip'
+*** SuSE:     'zypper install gzip'
+*** CentOS:   'yum install gzip'
+*** RedHat:   'yum install gzip'
+*** Mandriva: 'urpmi gzip'], [
 ***
 *** To get rid of this warning, load the 'gzip' package, or specify the
 *** location with the GZIP_CMD environment variable to 'configure'.
@@ -251,9 +259,11 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** for many years on all distributions and is available from various
 *** web sources.  Try:
 *** ], [
-*** Debian:  'apt-get install bzip2'
-*** SuSE:    'zypper install bzip2'
-*** CentOS:  'yum install bzip2'], [
+*** Debian:   'apt-get install bzip2'
+*** SuSE:     'zypper install bzip2'
+*** CentOS:   'yum install bzip2'
+*** RedHat:   'yum install bzip2'
+*** Mandriva: 'urpmi bzip2'], [
 ***
 *** To get rid of this warning, load the 'bzip2' package, or specify the
 *** location with the BZIP2_CMD environment variable to 'configure'.
@@ -272,7 +282,9 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** ], [
 *** Debian 5.0:  'apt-get install lzma'
 *** SuSE:        'zypper install lmza'
-*** CentOS:      'yum install lzma'], [
+*** CentOS:      'yum install lzma'
+*** CentOS:      'yum install xz-lzma-compat'
+*** Mandriva:    'urpmi xz'], [
 ***
 *** To get rid of this warning, load the 'lzma' package or specify the
 *** location with the LZMA_CMD environment variable to 'configure'.
@@ -283,15 +295,16 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     _BLD_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([XZ_CMD], [
 *** 
-*** Configurat cannot find a suitable 'xz' program.  Compressing
-*** archives may require the 'xz' program from the 'xz' package on the
-*** build host.  The 'xz' package has been available for a number
-*** of years on recent distributions and is available from various web
-*** sources for others.  Try:
+*** Configure cannot find a suitable 'xz' program.  Compressing archives
+*** may require the 'xz' program from the 'xz' package on the build
+*** host.  The 'xz' package has been available for a number of years on
+*** recent distributions and is available from various web sources for
+*** others.  Try:
 *** ], [
-*** Debian Squeeze: 'apt-get install xz'
-*** SuSE:           'zypper install xz'
-*** CentOS:         'yum install xz'], [
+*** Debian 5.0: 'apt-get install xz-utils'
+*** SuSE:       'zypper install xz'
+*** CentOS:     'yum install xz'
+*** Mandriva:   'urpmi xz'], [
 ***
 *** To get rid of this warning, load the 'xz' package or specify the
 *** location with the XZ_CMD environment variable to 'configure'.

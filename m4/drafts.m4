@@ -148,7 +148,8 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** SLES 10:     'zypper install groff'
+*** Mandriva 10: 'urpmi groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the SOELIM environment variable to
@@ -171,7 +172,8 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** Debian 5.0:  'apt-get install groff'
 *** Ubuntu 8.04: 'apt-get install groff_ext'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** SLES 10:     'zypper install groff'
+*** Mandriva 10: 'urpmi groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the REFER environment variable to
@@ -194,7 +196,8 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** SLES 10:     'zypper install groff'
+*** Mandriva 10: 'urpmi groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the PIC environment variable to
@@ -217,7 +220,8 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** SLES 10:     'zypper install groff'
+*** Mandriva 10: 'urpmi groff-for-man'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the TBL environment variable to
@@ -245,7 +249,8 @@ dnl	fi])
 *** Debian 5.0:  'apt-get install groff-base'
 *** Ubuntu 8.04: 'apt-get install groff'
 *** CentOS 5.x:  'yum install groff'
-*** SLES 10:     'zypper install groff'], [
+*** SLES 10:     'zypper install groff'
+*** Mandriva 10: 'urpmi groff-for-man'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the GROFF environment variable to
@@ -274,6 +279,7 @@ dnl	fi])
 *** CentOS 5.x:  'yum install ghostscript'
 *** openSUSE 11: 'zypper install ghostscript-library'
 *** SLES 10:     'zypper install ghostscript-library'
+*** Mandriva 10: 'urpmi ghostscript-common'
 *** RedHat 7.2:  'rpm -i ghostscript-6.52-9.5'], [
 ***
 *** To get rid of this warning, load the 'ghostscript' package, specify
@@ -302,7 +308,8 @@ dnl	fi])
 *** Fedora 9:    'yum install transfig'
 *** CentOS 5.x:  'yum install transfig'
 *** openSUSE 11: 'zypper install transfig'
-*** SLES 10:     'configure --disable-drafts-print'], [
+*** SLES 10:     'configure --disable-drafts-print'
+*** Mandriva 10: 'urpmi transfig'], [
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
 *** appropriate program with the FIG2DEV environment variable to

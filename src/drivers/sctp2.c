@@ -5200,7 +5200,7 @@ my_dst_check(struct dst_entry **dstp)
 	}
 }
 
-STATIC void
+STATIC INLINE void
 sp_dst_reset(struct sctp *sp)
 {
 	struct sctp_daddr *sd;
@@ -5208,6 +5208,20 @@ sp_dst_reset(struct sctp *sp)
 	for (sd = sp->daddr; sd; sd = sd->next)
 		if (sd->dst_cache)
 			dst_release(xchg(&sd->dst_cache, NULL));
+}
+
+STATIC INLINE void
+my_dst_negative_advice(struct dst_entry **dst_p)
+{
+	struct dst_entry *dst = *dst_p;
+
+	if (dst && dst->ops->negative_advice) {
+		*dst_p = dst->ops->negative_advice(dst);
+
+		if (dst != *dst_p) {
+			/* FIXME: reset the transmit queue */
+		}
+	}
 }
 
 #ifdef HAVE_KFUNC_DST_MTU
@@ -7385,7 +7399,7 @@ sctp_assoc_timedout(struct sctp *sp,	/* association */
 				return (0);
 		} else {
 			if (sd->dst_cache)
-				dst_negative_advice(&sd->dst_cache);
+				my_dst_negative_advice(&sd->dst_cache);
 #if 0
 			if (sd->dst_cache)
 				dst_release(xchg(&sd->dst_cache, NULL));
@@ -13252,7 +13266,7 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 		}
 	}
 	if (sd && sd->dst_cache)
-		dst_negative_advice(&sd->dst_cache);
+		my_dst_negative_advice(&sd->dst_cache);
 	goto done;
       done:
 	freemsg(mp);

@@ -756,7 +756,9 @@ dnl----------------------------------------------------------------------------
 	linux/smp_lock.h \
 	linux/devfs_fs_kernel.h \
 	linux/compile.h \
+	generated/compile.h \
 	linux/utsrelease.h \
+	generated/utsrelease.h \
 	linux/fdtable.h \
 	linux/snmp.h \
 	net/xfrm.h \
@@ -766,7 +768,9 @@ dnl----------------------------------------------------------------------------
 	linux/cred.h \
 	], [:], [:], [
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -914,7 +918,9 @@ dnl----------------------------------------------------------------------------
 				;;
 			esac ], [
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -998,7 +1004,9 @@ dnl----------------------------------------------------------------------------
 	write_trylock \
     ], [:], [:], [
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1059,7 +1067,9 @@ dnl----------------------------------------------------------------------------
 	struct net_protocol,
 	struct net_device_ops], [:], [:], [
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1103,8 +1113,10 @@ dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
 dnl----------------------------------------------------------------------------
     _LINUX_CHECK_MEMBERS([
+	struct ctl_table.ctl_name,
 	struct ctl_table.de,
 	struct ctl_table.parent,
+	struct ctl_table.strategy,
 	struct dst_entry.path,
 	struct file.f_cred,
 	struct file.f_gid,
@@ -1120,6 +1132,13 @@ dnl----------------------------------------------------------------------------
 	struct inet_protocol.next,
 	struct inet_protocol.no_policy,
 	struct inet_protocol.protocol,
+	struct inet_sock.inet_dport,
+	struct inet_sock.inet_daddr,
+	struct inet_sock.inet_id,
+	struct inet_sock.inet_num,
+	struct inet_sock.inet_rcv_saddr,
+	struct inet_sock.inet_saddr,
+	struct inet_sock.inet_sport,
 	struct inode.i_blksize,
 	struct inode.i_lock,
 	struct inode.i_mutex,
@@ -1163,7 +1182,9 @@ dnl----------------------------------------------------------------------------
 	struct nameidata.dentry,
 	struct nameidata.mnt], [:], [:], [
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1653,7 +1674,9 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1701,7 +1724,9 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1761,7 +1786,9 @@ dnl----------------------------------------------------------------------------
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1799,7 +1826,9 @@ dnl----------------------------------------------------------------------------
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1837,7 +1866,9 @@ dnl----------------------------------------------------------------------------
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1875,7 +1906,9 @@ dnl----------------------------------------------------------------------------
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1913,7 +1946,9 @@ dnl----------------------------------------------------------------------------
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -1968,7 +2003,9 @@ dnl----------------------------------------------------------------------------
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -2017,7 +2054,9 @@ dnl----------------------------------------------------------------------------
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -2071,7 +2110,9 @@ dnl----------------------------------------------------------------------------
 	    CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <net/ip.h>
@@ -2118,7 +2159,9 @@ dnl----------------------------------------------------------------------------
 	AC_CACHE_CHECK([for kernel ICMP_INC_STATS_BH with 2 args], [linux_cv_icmp_inc_stats_bh_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <net/ip.h>
@@ -2142,7 +2185,9 @@ dnl----------------------------------------------------------------------------
 	    AC_CACHE_CHECK([for kernel const inet_protos], [linux_cv_inet_protos_is_const], [dnl
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2173,7 +2218,9 @@ dnl----------------------------------------------------------------------------
 		AC_COMPILE_IFELSE([
 		    AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -2203,7 +2250,9 @@ dnl----------------------------------------------------------------------------
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 2 arguments], [linux_cv_have___ip_select_ident_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2228,7 +2277,9 @@ dnl----------------------------------------------------------------------------
 	AC_CACHE_CHECK([for kernel __ip_select_ident with 3 arguments], [linux_cv_have___ip_select_ident_3_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2262,7 +2313,9 @@ dnl 	fi
 	AC_CACHE_CHECK([for kernel skb_linearize with 1 argument], [linux_cv_have_skb_linearize_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/skbuff.h>]],
@@ -2278,7 +2331,9 @@ dnl 	fi
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -2305,7 +2360,9 @@ dnl 	fi
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -2333,7 +2390,9 @@ dnl 	fi
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -2360,7 +2419,9 @@ dnl 	fi
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -2388,7 +2449,9 @@ dnl----------------------------------------------------------------------------
     _LINUX_CHECK_MEMBER([struct inet_protocol.protocol],
 	[linux_cv_inet_protocol_style='old'],
 	[:], [
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2400,7 +2463,9 @@ dnl----------------------------------------------------------------------------
     _LINUX_CHECK_MEMBER([struct inet_protocol.no_policy],
 	[linux_cv_inet_protocol_style='new'],
 	[:], [
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2412,7 +2477,9 @@ dnl----------------------------------------------------------------------------
     _LINUX_CHECK_MEMBER([struct dst_entry.path],
 	[linux_cv_dst_entry_path='yes'],
 	[linux_cv_dst_entry_path='no'], [
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2461,7 +2528,9 @@ dnl----------------------------------------------------------------------------
 	    not define struct sockaddr_storage.  Define to 1 if your kernel
 	    supports struct sockaddr_storage.])],
 	[:], [
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2477,7 +2546,9 @@ dnl----------------------------------------------------------------------------
 		       [linux_cv_ip_frag_mem_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2500,7 +2571,9 @@ dnl----------------------------------------------------------------------------
 		       [linux_cv_ip_frag_mem_0_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2523,7 +2596,9 @@ dnl----------------------------------------------------------------------------
 		       [linux_cv_ip_frag_nqueues_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2546,7 +2621,9 @@ dnl----------------------------------------------------------------------------
 		       [linux_cv_ip_frag_nqueues_0_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2569,7 +2646,9 @@ dnl----------------------------------------------------------------------------
 		       [linux_cv_first_net_device_1_arg], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2592,7 +2671,9 @@ dnl----------------------------------------------------------------------------
 		       [linux_cv_inet_addr_type_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2615,7 +2696,9 @@ dnl----------------------------------------------------------------------------
 		       [linux_cv_ip_route_output_key_2_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2638,7 +2721,9 @@ dnl----------------------------------------------------------------------------
 		       [linux_cv_ip_route_output_key_3_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2664,7 +2749,9 @@ dnl----------------------------------------------------------------------------
 	    [linux_cv_kmem_struct_packet_type_func_4_args], [
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2693,7 +2780,9 @@ dnl----------------------------------------------------------------------------
 	    structure.])
     ], [
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -2709,7 +2798,9 @@ dnl----------------------------------------------------------------------------
 	    the new Linux 2.6 struct sock.])
     ], [
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>
@@ -2724,7 +2815,9 @@ dnl----------------------------------------------------------------------------
 	AC_CACHE_CHECK([for kernel function tcp_set_skb_tso_segs with sock argument], [linux_cv_tcp_set_skb_tso_segs_sock], [
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2755,7 +2848,9 @@ dnl----------------------------------------------------------------------------
 	AC_CACHE_CHECK([for kernel ip_route_connect with 9 arguments], [linux_cv_have_ip_route_connect_9_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2781,7 +2876,9 @@ dnl----------------------------------------------------------------------------
 	AC_CACHE_CHECK([for kernel ip_route_connect with 10 arguments], [linux_cv_have_ip_route_connect_10_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2812,7 +2909,9 @@ dnl----------------------------------------------------------------------------
 	AC_CACHE_CHECK([for kernel ip_route_output_flow with 4 arguments], [linux_cv_have_ip_route_output_flow_4_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2838,7 +2937,9 @@ dnl----------------------------------------------------------------------------
 	AC_CACHE_CHECK([for kernel ip_route_output_flow with 5 arguments], [linux_cv_have_ip_route_output_flow_5_args], [dnl
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/net.h>
@@ -2869,7 +2970,9 @@ dnl----------------------------------------------------------------------------
 	    AC_COMPILE_IFELSE([
 		AC_LANG_PROGRAM([[
 #include <linux/compiler.h>
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/types.h>
 #include <linux/module.h>

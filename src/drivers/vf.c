@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -75,7 +75,9 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
  *  more complicated driver and module.
  */
 
+#ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
+#endif
 #include <linux/version.h>
 #include <linux/module.h>
 #include <linux/init.h>
@@ -90,7 +92,7 @@ static char const ident[] = "$RCSfile: vf.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
 #include "sys/config.h"
 
 #define VF_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define VF_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define VF_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define VF_REVISION	"LfS $RCSfile: vf.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:41 $"
 #define VF_DEVICE	"SVR 4.2 MP STREAMS Verification Driver (VF)"
 #define VF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
