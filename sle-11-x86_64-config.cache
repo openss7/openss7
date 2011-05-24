@@ -9,9 +9,11 @@ bld_cv_pkg_cmd_DOXYGEN=${bld_cv_pkg_cmd_DOXYGEN='zypper install doxygen'}
 bld_cv_pkg_cmd_DVI2PS=${bld_cv_pkg_cmd_DVI2PS='zypper install texlive'}
 bld_cv_pkg_cmd_DVIPDF=${bld_cv_pkg_cmd_DVIPDF='zypper install ghostscript-library'}
 bld_cv_pkg_cmd_EPSTOPDF=${bld_cv_pkg_cmd_EPSTOPDF='zypper install texlive'}
+bld_cv_pkg_cmd_EXTERN_H=${bld_cv_pkg_cmd_EXTERN_H='zypper install perl'}
 bld_cv_pkg_cmd_FIG2DEV=${bld_cv_pkg_cmd_FIG2DEV='zypper install transfig'}
 bld_cv_pkg_cmd_GCJDBTOOL=${bld_cv_pkg_cmd_GCJDBTOOL='zypper install gcc-java'}
 bld_cv_pkg_cmd_GCJH=${bld_cv_pkg_cmd_GCJH='zypper install gcc-java'}
+bld_cv_pkg_cmd_GCJ_CNI_H=${bld_cv_pkg_cmd_GCJ_CNI_H='zypper install libgcj43-devel'}
 bld_cv_pkg_cmd_GNUPLOT=${bld_cv_pkg_cmd_GNUPLOT='zypper install gnuplot'}
 bld_cv_pkg_cmd_GPG=${bld_cv_pkg_cmd_GPG='zypper install gpg2'}
 bld_cv_pkg_cmd_GROFF=${bld_cv_pkg_cmd_GROFF='zypper install groff'}
@@ -45,6 +47,7 @@ bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='zypper install coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='zypper install coreutils'}
 bld_cv_pkg_cmd_SOELIM=${bld_cv_pkg_cmd_SOELIM='zypper install groff'}
 bld_cv_pkg_cmd_TBL=${bld_cv_pkg_cmd_TBL='zypper install groff'}
+bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='zypper install tcl-devel'}
 bld_cv_pkg_cmd_TEX=${bld_cv_pkg_cmd_TEX='zypper install texlive'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='zypper install zip'}
 bld_cv_pkg_name_BIBTEX=${bld_cv_pkg_name_BIBTEX=texlive-latex}
@@ -58,9 +61,11 @@ bld_cv_pkg_name_DOXYGEN=${bld_cv_pkg_name_DOXYGEN=doxygen}
 bld_cv_pkg_name_DVI2PS=${bld_cv_pkg_name_DVI2PS=texlive}
 bld_cv_pkg_name_DVIPDF=${bld_cv_pkg_name_DVIPDF=ghostscript-library}
 bld_cv_pkg_name_EPSTOPDF=${bld_cv_pkg_name_EPSTOPDF=texlive}
+bld_cv_pkg_name_EXTERN_H=${bld_cv_pkg_name_EXTERN_H=perl}
 bld_cv_pkg_name_FIG2DEV=${bld_cv_pkg_name_FIG2DEV=transfig}
 bld_cv_pkg_name_GCJDBTOOL=${bld_cv_pkg_name_GCJDBTOOL=gcc-java}
 bld_cv_pkg_name_GCJH=${bld_cv_pkg_name_GCJH=gcc-java}
+bld_cv_pkg_name_GCJ_CNI_H=${bld_cv_pkg_name_GCJ_CNI_H=libgcj43-devel}
 bld_cv_pkg_name_GNUPLOT=${bld_cv_pkg_name_GNUPLOT=gnuplot}
 bld_cv_pkg_name_GPG=${bld_cv_pkg_name_GPG=gpg2}
 bld_cv_pkg_name_GROFF=${bld_cv_pkg_name_GROFF=groff}
@@ -94,8 +99,12 @@ bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
 bld_cv_pkg_name_SOELIM=${bld_cv_pkg_name_SOELIM=groff}
 bld_cv_pkg_name_TBL=${bld_cv_pkg_name_TBL=groff}
+bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl-devel}
 bld_cv_pkg_name_TEX=${bld_cv_pkg_name_TEX=texlive}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
+bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib/perl5/5.10.0/x86_64-linux-thread-multi/CORE/EXTERN.h}
+bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.3/gcj/cni.h}
+bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_prog_AUTOM4TE=${bld_cv_pkg_prog_AUTOM4TE=autom4te}
 bld_cv_pkg_prog_BIBTEX=${bld_cv_pkg_prog_BIBTEX=bibtex}
 bld_cv_pkg_prog_BZIP2_CMD=${bld_cv_pkg_prog_BZIP2_CMD=bzip2}
@@ -160,9 +169,11 @@ bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.5.6}
 bld_cv_pkg_ver_DVI2PS=${bld_cv_pkg_ver_DVI2PS=2007}
 bld_cv_pkg_ver_DVIPDF=${bld_cv_pkg_ver_DVIPDF=8.62}
 bld_cv_pkg_ver_EPSTOPDF=${bld_cv_pkg_ver_EPSTOPDF=2007}
+bld_cv_pkg_ver_EXTERN_H=${bld_cv_pkg_ver_EXTERN_H=5.10.0}
 bld_cv_pkg_ver_FIG2DEV=${bld_cv_pkg_ver_FIG2DEV=3.2.5}
 bld_cv_pkg_ver_GCJDBTOOL=${bld_cv_pkg_ver_GCJDBTOOL=4.3}
 bld_cv_pkg_ver_GCJH=${bld_cv_pkg_ver_GCJH=4.3}
+bld_cv_pkg_ver_GCJ_CNI_H=${bld_cv_pkg_ver_GCJ_CNI_H=4.3.4_20091019}
 bld_cv_pkg_ver_GNUPLOT=${bld_cv_pkg_ver_GNUPLOT=4.2.3}
 bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=2.0.9}
 bld_cv_pkg_ver_GROFF=${bld_cv_pkg_ver_GROFF=1.18.1.1}
@@ -196,5 +207,6 @@ bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=6.12}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=6.12}
 bld_cv_pkg_ver_SOELIM=${bld_cv_pkg_ver_SOELIM=1.18.1.1}
 bld_cv_pkg_ver_TBL=${bld_cv_pkg_ver_TBL=1.18.1.1}
+bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.5.5}
 bld_cv_pkg_ver_TEX=${bld_cv_pkg_ver_TEX=2007}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=2.32}
