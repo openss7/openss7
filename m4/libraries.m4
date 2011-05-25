@@ -78,11 +78,11 @@ AC_DEFUN([_LDCONFIG_SPEC_OPTIONS], [dnl
 # _LDCONFIG_SPEC_SETUP
 # -------------------------------------------------------------------------
 AC_DEFUN([_LDCONFIG_SPEC_SETUP], [dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
     AC_ARG_VAR([LDCONFIG],
 	       [Configure loader command. @<:@default=ldconfig@:>@])
-    _BLD_PATH_PROG([LDCONFIG], [ldconfig], [/sbin/ldconfig],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	AC_MSG_WARN([Could not find ldconfig program in PATH.])])
+    _BLD_PATH_PROG([LDCONFIG], [ldconfig], [/sbin/ldconfig], [$tmp_path], [dnl
+	AC_MSG_WARN([Cannot find ldconfig program in PATH.])])
 ])# _LDCONFIG_SPEC_SETUP
 # =========================================================================
 

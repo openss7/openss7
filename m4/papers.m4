@@ -154,8 +154,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** from any GNU archive site.  Use the following commands to obtain
 *** 'gnuplot':
 *** ], [
-*** Debian 5.0:      'apt-get install gnuplot-nox'
-*** Ubuntu 8.04:     'apt-get install gnuplot-nox'
+*** Debian 5.0:      'aptitude install gnuplot-nox'
+*** Ubuntu 8.04:     'aptitude install gnuplot-nox'
 *** Mandriva 2010.2: 'urpmi gnuplot'
 *** Fedora 7:        'yum install gnuplot'
 *** Fedora 9:        'yum install gnuplot'
@@ -181,8 +181,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** available from many web sources.  Use the following commands to
 *** obtain 'fig2dev':
 *** ], [
-*** Debian 5.0:      'apt-get install transfig'
-*** Ubuntu 8.04:     'apt-get install transfig'
+*** Debian 5.0:      'aptitude install transfig'
+*** Ubuntu 8.04:     'aptitude install transfig'
 *** Mandriva 2010.2: 'urpmi transfig'
 *** Fedora 7:        'yum install transfig'
 *** Fedora 9:        'yum install transfig'
@@ -208,8 +208,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** package has been available for many years and is available from any
 *** CTAN site.  Use the following command to obtain 'bibtex':
 *** ], [
-*** Debian 5.0:      'apt-get install texlive-base-bin'
-*** Ubuntu 8.04:     'apt-get install texlive-base-bin'
+*** Debian 5.0:      'aptitude install texlive-base-bin'
+*** Ubuntu 8.04:     'aptitude install texlive-base-bin'
 *** Mandriva 2010.2: 'urpmi tetex'
 *** CentOS 5.x:      'yum install tetex'
 *** SLES 11:         'zypperin install texlive-latex'
@@ -233,8 +233,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** been available for many years and is available from any CTAN site.
 *** Use the following command to obtain 'latex':
 *** ], [
-*** Debian 5.0:      'apt-get install texlive-latex-base'
-*** Ubuntu 8.04:     'apt-get install texlive-latex-base'
+*** Debian 5.0:      'aptitude install texlive-latex-base'
+*** Ubuntu 8.04:     'aptitude install texlive-latex-base'
 *** Mandriva 2010.2: 'urpmi tetex-latex'
 *** Fedora 7:        'yum install tetex-latex'
 *** Fedora 9:        'yum install texlive-latex'
@@ -260,8 +260,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** package has been available for many years and is available from any
 *** CTAN site.  Use the following command to obtain 'latex':
 *** ], [
-*** Debian 5.0:      'apt-get install texlive-base-bin'
-*** Ubuntu 8.04:     'apt-get install texlive-latex-base'
+*** Debian 5.0:      'aptitude install texlive-base-bin'
+*** Ubuntu 8.04:     'aptitude install texlive-latex-base'
 *** Mandriva 2010.2: 'urpmi tetex-latex'
 *** Fedora 7:        'yum install tetex-latex'
 *** Fedora 9:        'yum install texlive-latex'
@@ -287,8 +287,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** package has been available for many years and is available from any
 *** CTAN site.  Use the following commands to obtain 'latex':
 *** ], [
-*** Debian 5.0:      'apt-get install texlive-latex-base'
-*** Ubuntu 8.04:     'apt-get install texlive-latex-base'
+*** Debian 5.0:      'aptitude install texlive-latex-base'
+*** Ubuntu 8.04:     'aptitude install texlive-latex-base'
 *** Mandriva 2010.2: 'urpmi tetex-latex'
 *** Fedora 7:        'yum install tetex-latex'
 *** Fedora 9:        'yum install texlive-latex'
@@ -315,8 +315,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** available from any CTAN site.  Use the following commands to obtain
 *** 'latex2html':
 *** ], [
-*** Debian 5.0:      'apt-get install latex2html'
-*** Ubuntu 8.04:     'apt-get install latex2html'
+*** Debian 5.0:      'aptitude install latex2html'
+*** Ubuntu 8.04:     'aptitude install latex2html'
 *** Mandriva 2010.2: 'urpmi latex2html'
 *** Fedora 7:        'yum install latex2html'
 *** Fedora 9:        'yum install latex2html'
@@ -343,8 +343,8 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** years and is available on the web from many sources.  Use the
 *** following commands to obtain 'ImageMagick':
 *** ], [
-*** Debian 5.0:      'apt-get install imagemagick'
-*** Ubuntu 8.04:     'apt-get install imagemagick'
+*** Debian 5.0:      'aptitude install imagemagick'
+*** Ubuntu 8.04:     'aptitude install imagemagick'
 *** Mandriva 2010.2: 'urpmi imagemagick'
 *** Fedora 7:        'yum install ImageMagick'
 *** Fedora 9:        'yum install ImageMagick'
@@ -384,8 +384,8 @@ dnl
 *** package has been available for may years and is available form any
 *** CTAN site.  Use the following command to obtain 'tex':
 *** ], [
-*** Debian 5.0:      'apt-get install texlive-base-bin'
-*** Ubuntu 8.04:     'apt-get install texlive-base-bin'
+*** Debian 5.0:      'aptitude install texlive-base-bin'
+*** Ubuntu 8.04:     'aptitude install texlive-base-bin'
 *** Mandriva 2010.2: 'urpmi tetex-dvips'
 *** Fedora 7:        'yum install tetex-latex'
 *** Fedora 9:        'yum install texlive-latex'

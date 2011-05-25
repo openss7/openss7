@@ -87,8 +87,8 @@ AC_DEFUN([_TCL_EXTENSIONS], [dnl
 *** on all distributions.  Use the following commands to obtain the
 *** 'tcl8.x' development package:
 *** ], [
-*** Debian 5.0:      'apt-get install tcl8.4-dev'
-*** Ubuntu 8.04:     'apt-get install tcl8.4-dev'
+*** Debian 5.0:      'aptitude install tcl8.4-dev'
+*** Ubuntu 8.04:     'aptitude install tcl8.4-dev'
 *** Mandriva 2010.2: 'urpmi libtcl-devel'
 *** CentOS 5.x:      'yum install tcl-devel'
 *** openSUSE 11:     'zypper install tcl-devel'

@@ -83,7 +83,7 @@ AC_DEFUN([_SNMP_MSG_WARN],
 	[cat <<EOF
 
 *** 
-*** Cannot find the UCD-SNMP compatibility header:
+*** Configure cannot find the UCD-SNMP compatibility header:
 ***
 ***	<[$]1>
 *** 
@@ -93,10 +93,10 @@ AC_DEFUN([_SNMP_MSG_WARN],
 *** configure.  Use the following commands to obtain the NET-SNMP
 *** development package:
 ***
-*** Debian 5.0:  'apt-get install libsnmp-dev'
-*** Ubuntu 8.04: 'apt-get install libsnmp-dev'
+*** Debian 5.0:  'aptitude install libsnmp-dev'
+*** Ubuntu 8.04: 'aptitude install libsnmp-dev'
 *** CentOS 5.x:  'yum install net-snmp-devel'
-*** SLES 10:     'zypper install net-snmp-devel'
+*** SLES 10/11:  'zypper install net-snmp-devel'
 *** RedHat 7.2:  'rpm -i ucd-snmp-devel-4.2.5-8.72.1'
 *** RedHat 7.3:  'rpm -i ucd-snmp-devel-4.2.5-8.73.1'
 ***
@@ -130,84 +130,48 @@ EOF])dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_SNMP_HEADERS], [dnl
     # allow the user to specify the header file location.
-    AC_CACHE_CHECK([for snmp include directory], [snmp_cv_includedir], [dnl
-	AC_ARG_WITH([snmp],
-	    [AS_HELP_STRING([--with-snmp=HEADERS],
-		[SNMP header directory @<:@default=search@:>@])],
-	    [], [with_snmp=search])
-	case "${with_snmp:-search}" in
-	    (no) snmp_cv_includedir=no ;;
-	    (yes|search) ;;
-	    (*) if test -f "$with_snmp/ucd-snmp-config.h" ; then snmp_cv_includedir="$with_snmp" ; fi ;;
-	esac
-	if test -z "$snmp_cv_includedir" ; then
-	    eval "snmp_search_path=\"
-		${DESTDIR}${rootdir}${includedir}
-		${DESTDIR}${rootdir}${oldincludedir}
-		${DESTDIR}${rootdir}/usr/include
-		${DESTDIR}${rootdir}/usr/local/include
-		${DESTDIR}${includedir}
-		${DESTDIR}${oldincludedir}
-		${DESTDIR}/usr/include
-		${DESTDIR}/usr/local/include\""
-	    snmp_search_path=`echo "$snmp_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
-	    AC_MSG_RESULT([searching])
-	    for snmp_dir in $snmp_search_path ; do
-		test -d "$snmp_dir" || continue
-		AC_MSG_CHECKING([for snmp include directory... $snmp_dir])
-		snmp_files=`find $snmp_dir -mindepth 1 -maxdepth 3 -type f -name 'ucd-snmp-config.h' 2>/dev/null`
-		for snmp_file in $snmp_files ; do
-		    test -r "$snmp_file" || continue
-		    snmp_dir="$snmp_file"
-		    snmp_dir="${snmp_dir%/ucd-snmp-config.h}"; test -d "$snmp_dir" || continue
-		    snmp_dir="${snmp_dir%/ucd-snmp}";          test -d "$snmp_dir" || continue
-		    snmp_cv_includedir="$snmp_dir"
-		    AC_MSG_RESULT([yes])
-		    break 2
-		done
-		AC_MSG_RESULT([no])
-	    done
-	    test -n "$snmp_cv_includedir" || snmp_cv_includedir=no
-	fi
-	AC_MSG_CHECKING([for snmp include directory])
-    ])
-    if test :"${snmp_cv_includedir:-no}" = :no ; then
-	if test :"${with_snmp:-search}" != :no ; then
-	    _SNMP_MSG_WARN([ucd-snmp/ucd-snmp-config.h])
-	fi
-    else
-	snmp_save_CPPFLAGS="$CPPFLAGS"
-	CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }-I$snmp_cv_includedir"
-	AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [], [dnl
-	    _SNMP_MSG_WARN([ucd-snmp/ucd-snmp-config.h]) ])
-	AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-includes.h], [], [dnl
-	    _SNMP_MSG_WARN([ucd-snmp/ucd-snmp-includes.h]) ], [
-#include <ucd-snmp/ucd-snmp-config.h>
-])
-	AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-agent-includes.h], [], [
-	    _SNMP_MSG_WARN([ucd-snmp/ucd-snmp-agent-includes.h]) ], [
-#include <ucd-snmp/ucd-snmp-config.h>
-#include <ucd-snmp/ucd-snmp-includes.h>
-])
-	AC_CHECK_HEADERS([ucd-snmp/callback.h ucd-snmp/snmp-tc.h ucd-snmp/default_store.h ucd-snmp/snmp_alarm.h],
-	    [], [], [
-#include <ucd-snmp/ucd-snmp-config.h>
-#include <ucd-snmp/ucd-snmp-includes.h>
-#include <ucd-snmp/ucd-snmp-agent-includes.h>
-])
-	AC_CHECK_HEADERS([ucd-snmp/ds_agent.h ucd-snmp/util_funcs.h ucd-snmp/header-complex.h ucd-snmp/mib_modules.h net-snmp/agent/mib_modules.h],
-	    [], [], [
-#include <ucd-snmp/ucd-snmp-config.h>
-#include <ucd-snmp/ucd-snmp-includes.h>
-#include <ucd-snmp/ucd-snmp-agent-includes.h>
-#include <ucd-snmp/callback.h>
-#include <ucd-snmp/snmp-tc.h>
-#include <ucd-snmp/default_store.h>
-#include <ucd-snmp/snmp_alarm.h>
-])
-	CPPFLAGS="$snmp_save_CPPFLAGS"
-    fi
-    if test :"${with_snmp:-search}" = :no -o :"${snmp_cv_includedir:-no}" = :no ; then
+    AC_ARG_WITH([snmp],
+	[AS_HELP_STRING([--with-snmp=HEADERS],
+	    [SNMP header directory @<:@default=search@:>@])],
+	[], [with_snmp=search])
+    _BLD_FIND_DIR([snmp include directory], [snmp_cv_includedir], [
+	    ${DESTDIR}${rootdir}${includedir}
+	    ${DESTDIR}${rootdir}${oldincludedir}
+	    ${DESTDIR}${rootdir}/usr/include
+	    ${DESTDIR}${rootdir}/usr/local/include
+	    ${DESTDIR}${includedir}
+	    ${DESTDIR}${oldincludedir}
+	    ${DESTDIR}/usr/include
+	    ${DESTDIR}/usr/local/include], [ucd-snmp/ucd-snmp-config.h], [no], [dnl
+	if test ${with_snmp:-search} != no ; then
+	    _BLD_INSTALL_WARN([UCD_SNMP_UCD_SNMP_CONFIG_H], [
+*** 
+*** Configure cannot find the UCD-SNMP compatability header:
+*** 
+***	<ucd-snmp/ucd-snmp-config.h>
+***
+*** Perhaps you need to load the NET-SNMP development package (e.g.,
+*** net-snmp-devel or libsnmp-dev).  SNMP programs cannot be built
+*** without this header.  If this is not what you want, load the
+*** development package and rerun configure.  Try:
+*** ], [
+*** Debian 5.0:  'aptitude install libsnmp-dev'
+*** Ubuntu 8.04: 'aptitude install libsnmp-dev'
+*** CentOS 5.x:  'yum install net-snmp-devel'
+*** SLES 10/11:  'zypper install net-snmp-devel'
+*** RedHat 7.2:  'rpm -i ucd-snmp-devel-4.2.5-8.72.1'
+*** RedHat 7.3:  'rpm -i ucd-snmp-devel-4.2.5-8.73.1'], [
+*** 
+*** Repeat after loading the correct package or by specifying the
+*** configure argument --without-snmp: continuing under the assumption
+*** that the option --without-snmp was intended.
+*** ])
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_snmp --without-snmp\""
+	    PACKAGE_DEPOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-snmp'"
+	    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-snmp'"
+	    with_snmp=no
+	fi], [], [with_snmp])
+    if test ${snmp_cv_includedir:-no} = no ; then
 	snmpincludedir=
     else
 	snmpincludedir="$snmp_cv_includedir"
@@ -223,6 +187,38 @@ AC_DEFUN([_SNMP_HEADERS], [dnl
     ])
     SNMP_CPPFLAGS="$snmp_cv_cppflags"
     AC_SUBST([SNMP_CPPFLAGS])dnl
+    snmp_save_CPPFLAGS="$CPPFLAGS"
+    if test -n "$SNMP_CPPFLAGS" ; then
+	CPPFLAGS="${CPPFLAGS:+$CPPFLAGS }$SNMP_CPPFLAGS"
+    fi
+    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-config.h], [], [dnl
+	_SNMP_MSG_WARN([ucd-snmp/ucd-snmp-config.h]) ])
+    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-includes.h], [], [dnl
+	_SNMP_MSG_WARN([ucd-snmp/ucd-snmp-includes.h]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/ucd-snmp-agent-includes.h], [], [
+	_SNMP_MSG_WARN([ucd-snmp/ucd-snmp-agent-includes.h]) ], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/callback.h ucd-snmp/snmp-tc.h ucd-snmp/default_store.h ucd-snmp/snmp_alarm.h],
+	[], [], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/ucd-snmp-agent-includes.h>
+])
+    AC_CHECK_HEADERS([ucd-snmp/ds_agent.h ucd-snmp/util_funcs.h ucd-snmp/header-complex.h ucd-snmp/mib_modules.h net-snmp/agent/mib_modules.h],
+	[], [], [
+#include <ucd-snmp/ucd-snmp-config.h>
+#include <ucd-snmp/ucd-snmp-includes.h>
+#include <ucd-snmp/ucd-snmp-agent-includes.h>
+#include <ucd-snmp/callback.h>
+#include <ucd-snmp/snmp-tc.h>
+#include <ucd-snmp/default_store.h>
+#include <ucd-snmp/snmp_alarm.h>
+])
+    CPPFLAGS="$snmp_save_CPPFLAGS"
 ])# _SNMP_HEADERS
 # =============================================================================
 

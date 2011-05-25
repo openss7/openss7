@@ -108,16 +108,15 @@ AC_DEFUN([_JAVA_SETUP], [dnl
 # using a script and the zip command.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_JAVA_SETUP_JAR], [dnl
-    AC_REQUIRE([_OPENSS7_MISSING4])
-    jar_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    AC_REQUIRE([_OPENSS7_MISSING4])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([JAR],
 	[Java archive command. @<:@default=fastjar,jar@:>@])
 dnl
 dnl On older systems with both gcj and gcj3 use jar3 over jar.
 dnl fastjar is a later incarnation.
 dnl
-    _BLD_PATH_PROGS([JAR], [fastjar jar3 jar], [${am_missing4_run}jar],
-	[$jar_tmp], [dnl
+    _BLD_PATH_PROGS([JAR], [fastjar jar3 jar], [${am_missing4_run}jar], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([JAR], [
 ***
 *** Configure cannot find a suitable 'jar' program.  Generating Java
@@ -128,8 +127,8 @@ dnl
 *** can also get 'jar' as part of any JDK.  Use the following command to
 *** obtain 'fastjar':
 *** ], [
-*** Debian 5.0:	 'apt-get install fastjar'
-*** Ubuntu 8.04: 'apt-get install fastjar'
+*** Debian 5.0:	 'aptitude install fastjar'
+*** Ubuntu 8.04: 'aptitude install fastjar'
 *** CentOS 5.x:	 'yum install libgcj'
 *** SLES 10:	 'zypper install fastjar'
 *** RH 7.3:	 'rpm -i libgcj3'], [
@@ -140,14 +139,13 @@ dnl
 *** ])])
     AC_ARG_VAR([ZIP],
 	[Zip archive command. @<:@default=zip@:>@])
-    _BLD_PATH_PROG([ZIP], [zip], [${am_missing4_run}zip],
-	[$jar_tmp], [dnl
+    _BLD_PATH_PROG([ZIP], [zip], [${am_missing4_run}zip], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([ZIP], [
 ***
 *** Configure cannot find a suitable 'zip' program.  Try:
 *** ], [
-*** Debian 5.0:	   'apt-get install zip'
-*** Ubuntu 8.04:   'apt-get install zip'
+*** Debian 5.0:	   'aptitude install zip'
+*** Ubuntu 8.04:   'aptitude install zip'
 *** Mandriva 2010: 'urpmi zip'
 *** CentOS 5.x:	   'yum install zip'
 *** SLES 10:	   'zypper install zip'
@@ -162,10 +160,30 @@ dnl Note that SLES 11.1 fails to provide proper symbolic links from gjarsigner
 dnl to gjarsigner-4.3 as well as from gkeytool to gkeytool-4.3.  This is the
 dnl reason for explicitly placing gjarsigner-4.3 and gkeytool-4.3 in the lists.
 dnl
-    _BLD_PATH_PROGS([JARSIGNER], [gjarsigner jarsigner gjarsigner-4.3],
-		    [${am_missing4_run}jarsigner], [$jar_tmp])
-    _BLD_PATH_PROGS([KEYTOOL], [gkeytool keytool gkeytool-4.3],
-		    [${am_missing4_run}keytool], [$jar_tmp])
+    _BLD_PATH_PROGS([JARSIGNER], [gjarsigner jarsigner gjarsigner-4.3], [${am_missing4_run}jarsigner], [$tmp_path], [dnl
+	_BLD_INSTALL_WARN([JARSIGNER], [
+*** 
+*** Configure cannot find a suitable 'jarsigner' program.  Try:
+*** ], [
+*** Debian 5.0:    'aptitude install gcj-jdk'
+*** Ubuntu 8.04:   'aptitude install gcj-jdk'], [
+***
+*** To get rid of this warning, load the 'jarsigner' program or specify
+*** the appropriate program with the JARSIGNER environment variable to
+*** 'configure'.
+*** ])])
+    _BLD_PATH_PROGS([KEYTOOL], [gkeytool keytool gkeytool-4.3], [${am_missing4_run}keytool], [$tmp_path], [dnl
+	_BLD_INSTALL_WARN([KEYTOOL], [
+*** 
+*** Configure cannot find a suitable 'keytool' program.  Try:
+*** ], [
+*** Debian 5.0:    'aptitude install gcj-jre-headless'
+*** Ubuntu 8.04:   'aptitude install gcj-jre-headless'], [
+*** 
+*** To get rid of this warning, load the 'keytool' program or specify
+*** the appropriate progrm with the KEYTOOL environment variable to
+*** 'configure'.
+*** ])])
 ])# _JAVA_SETUP_JAR
 # =============================================================================
 

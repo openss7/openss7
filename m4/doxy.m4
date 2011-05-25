@@ -139,11 +139,12 @@ dnl	AC_MSG_RESULT([yes])
 # _DOXY_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DOXY_SETUP], [dnl
+    AC_REQUIRE([_OPENSS7_MISSING2])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([DOXYGEN],
 	       [doxygen command. @<:@default=doxygen@:>@])
-    _BLD_PATH_PROG([DOXYGEN], [doxygen], [${am_missing2_run}doxygen],
-		 [$PATH:/usr/local/bin:/usr/bin], [dnl
-	AC_MSG_WARN([Could not find doxygen program in PATH.])])
+    _BLD_PATH_PROG([DOXYGEN], [doxygen], [${am_missing2_run}doxygen], [$tmp_path], [dnl
+	AC_MSG_WARN([Cannot find doxygen program in PATH.])])
     AM_CONDITIONAL([HAVE_DOXYGEN], [test ":${ac_cv_path_DOXYGEN:-no}" != :no])dnl
 ])# _DOXY_SETUP
 # =============================================================================

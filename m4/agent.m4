@@ -95,8 +95,8 @@ AC_DEFUN([_AGENT_MSG_WARN],
 *** could not be found.  Perhaps you need to load the NET-SNMP
 *** development package (net-snmp-dev or libsnmp-dev).  Try:
 ***
-*** Debian 5.0:  'apt-get install libsnmp-dev'
-*** Ubuntu 8.04: 'apt-get install libsnmp-dev'
+*** Debian 5.0:  'aptitude install libsnmp-dev'
+*** Ubuntu 8.04: 'aptitude install libsnmp-dev'
 *** CentOS 5.x:  'yum install net-snmp-devel'
 *** SLES 10:     'zypper install net-snmp-devel'
 *** RedHat 7.2:  'rpm -i ucd-snmp-devel-4.2.5-8.72.1'

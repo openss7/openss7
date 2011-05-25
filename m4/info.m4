@@ -152,8 +152,8 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** acceptable.  The 'tex' package has been available for many years and
 *** is available from any CTAN site.  Use the following to obtain 'tex':
 *** ], [
-*** Debian 5.0:    'apt-get install texlive-base-bin'
-*** Ubuntu 8.04:   'apt-get install texlive-base-bin'
+*** Debian 5.0:    'aptitude install texlive-base-bin'
+*** Ubuntu 8.04:   'aptitude install texlive-base-bin'
 *** Mandriva 2010: 'urpmi tetex'
 *** Fedora 7:      'yum install tetex-latex'
 *** Fedora 9:      'yum install texlive-latex'
@@ -167,8 +167,7 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** 'configure'.
 *** ])
 	fi])
-    _BLD_PATH_PROGS([PDFTEX], [pdfetex pdftex], [${am_missing2_run}pdftex],
-		    [$tmp_path], [dnl
+    _BLD_PATH_PROGS([PDFTEX], [pdfetex pdftex], [${am_missing2_run}pdftex], [$tmp_path], [dnl
 	if test :$enable_texinfo_print != :no ; then
 	    disable_texinfo_print=yes
 	    _BLD_INSTALL_WARN([PDFTEX], [
@@ -180,8 +179,8 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** acceptable.  The 'tex' package has been available for many years and
 *** is available from any CTAN site.  Use the following to obtain 'tex':
 *** ], [
-*** Debian 5.0:    'apt-get install texlive-base-bin'
-*** Ubuntu 8.04:   'apt-get install texlive-base-bin'
+*** Debian 5.0:    'aptitude install texlive-base-bin'
+*** Ubuntu 8.04:   'aptitude install texlive-base-bin'
 *** Mandriva 2010: 'urpmi tetex'
 *** Fedora 7:      'yum install tetex-latex'
 *** Fedora 9:      'yum install texlive-latex'
@@ -208,8 +207,8 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** years and is available on the web from any GNU archive site.  Use
 *** the following commands to obtain 'groff':
 *** ], [
-*** Debian 5.0:    'apt-get install groff-base'
-*** Ubuntu 8.04:   'apt-get install groff-base'
+*** Debian 5.0:    'aptitude install groff-base'
+*** Ubuntu 8.04:   'aptitude install groff-base'
 *** Mandriva 2010: 'urpmi groff-for-man'
 *** CentOS 5.x:    'yum install groff'
 *** SLES 10:       'zypper install groff'], [
@@ -236,8 +235,8 @@ dnl	fi])
 *** many years and is available on the web from any GNU archive site.
 *** Use the following commands to obtain 'groff':
 *** ], [
-*** Debian 5.0:    'apt-get install groff-base'
-*** Ubuntu 8.04:   'apt-get install groff-base'
+*** Debian 5.0:    'aptitude install groff-base'
+*** Ubuntu 8.04:   'aptitude install groff-base'
 *** Mandriva 2010: 'urpmi groff-for-man'
 *** CentOS 5.x:    'yum install groff'
 *** SLES 10:       'zypper install groff'], [
@@ -265,8 +264,8 @@ dnl	fi])
 *** years and is available from many web sources.  Use the following
 *** commands to obtain 'fig2dev':
 *** ], [
-*** Debian 5.0:    'apt-get install transfig'
-*** Ubuntu 8.04:   'apt-get install transfig'
+*** Debian 5.0:    'aptitude install transfig'
+*** Ubuntu 8.04:   'aptitude install transfig'
 *** Mandriva 2010: 'urpmi transfig'
 *** Fedora 7:      'yum install transfig'
 *** Fedora 9:      'yum install transfig'
@@ -298,8 +297,8 @@ dnl	fi])
 *** years and is available on the web from many sources.  Use the
 *** following commands to obtain 'ImageMagick':
 *** ], [
-*** Debian 5.0:    'apt-get install imagemagick'
-*** Ubuntu 8.04:   'apt-get install imagemagick'
+*** Debian 5.0:    'aptitude install imagemagick'
+*** Ubuntu 8.04:   'aptitude install imagemagick'
 *** Mandriva 2010: 'urpmi imagemagick'
 *** Fedora 7:      'yum install ImageMagick'
 *** Fedora 9:      'yum install ImageMagick'
@@ -339,8 +338,8 @@ dnl
 *** 'tex' package has been available for may years and is available form
 *** any CTAN site.  Use the following command to obtain 'tex':
 *** ], [
-*** Debian 5.0:    'apt-get install texlive-base-bin'
-*** Ubuntu 8.04:   'apt-get install texlive-base-bin'
+*** Debian 5.0:    'aptitude install texlive-base-bin'
+*** Ubuntu 8.04:   'aptitude install texlive-base-bin'
 *** Mandriva 2010: 'urpmi tetex-dvips'
 *** Fedora 7:      'yum install tetex-latex'
 *** Fedora 9:      'yum install texlive-latex'

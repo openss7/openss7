@@ -60,6 +60,7 @@
 # RPM.spec.in file.  This also includes stuff for converting the LSM file.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_SPEC], [dnl
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_TARDIR])
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_REQUIRE([_DISTRO])dnl
     AC_REQUIRE([_REPO])dnl
@@ -68,6 +69,7 @@ AC_DEFUN([_RPM_SPEC], [dnl
     AC_MSG_NOTICE([+------------------------+])
     _RPM_SPEC_OPTIONS
     _RPM_SPEC_SETUP
+    _RPM_REPO_SETUP
     _RPM_SPEC_OUTPUT
 ])# _RPM_SPEC
 # =============================================================================
@@ -544,6 +546,8 @@ dnl AC_ARG_VAR([PKG_CONFIG_PATH], [RPM configuration path.])
 dnl
 dnl These commands are needed to perform RPM package builds.
 dnl
+    AC_REQUIRE([_OPENSS7_MISSING3])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([rpms],
 	[AS_HELP_STRING([--disable-rpms],
 	    [build rpms @<:@default=auto@:>@])],
@@ -554,19 +558,17 @@ dnl
 	[], [enable_srpms=yes])
     AC_ARG_VAR([RPM],
 	       [Rpm command. @<:@default=rpm@:>@])
-    _BLD_PATH_PROG([RPM], [rpm], [${am_missing3_run}rpm],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+    _BLD_PATH_PROG([RPM], [rpm], [${am_missing3_run}rpm], [$tmp_path], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
 		(centos|lineox|whitebox|fedora|mandrake|mandriva|manbo|redhat|suse)
-		    AC_MSG_WARN([Could not find rpm program in PATH.]) ;;
+		    AC_MSG_WARN([Cannot find rpm program in PATH.]) ;;
 		(*) enable_rpms=no ;;
 	    esac
 	fi])
     AC_ARG_VAR([RPMBUILD],
 	       [Rpm build command. @<:@default=rpmbuild@:>@])
-    _BLD_PATH_PROG([RPMBUILD], [rpmbuild], [${am_missing3_run}rpmbuild],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+    _BLD_PATH_PROG([RPMBUILD], [rpmbuild], [${am_missing3_run}rpmbuild], [$tmp_path], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    RPMBUILD="$RPM"
 	else
@@ -588,27 +590,81 @@ dnl
     ])
     AM_CONDITIONAL([BUILD_RPMS], [test ":$enable_rpms" = :yes])dnl
     AM_CONDITIONAL([BUILD_SRPMS], [test ":$enable_srpms" = :yes])dnl
-dnl
-dnl These commands are needed to create RPM (e.g. YUM) repositories.
-dnl
+])# _RPM_SPEC_SETUP_BUILD
+# =============================================================================
+
+# =============================================================================
+# _RPM_REPO_SETUP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_RPM_REPO_SETUP], [dnl
+    _RPM_REPO_SETUP_YUM
+    _RPM_REPO_SETUP_YAST
+    _RPM_REPO_SETUP_URPMI
+])# _RPM_REPO_SETUP
+# =============================================================================
+
+# =============================================================================
+# _RPM_REPO_SETUP_YUM
+# -----------------------------------------------------------------------------
+# These commands are needed to create RPM (e.g. YUM) repositories.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
+    AC_REQUIRE([_OPENSS7_MISSING3])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-yum],
 	[AS_HELP_STRING([--disable-repo-yum],
 	    [yum repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_yum=yes])
     AC_ARG_VAR([CREATEREPO],
 	       [Create repomd repository command. @<:@default=createrepo@:>@])
-    _BLD_PATH_PROG([CREATEREPO], [createrepo], [${am_missing3_run}createrepo],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	if test ":$rpm_cv_rpms" = :yes; then
-	    AC_MSG_WARN([Could not find createrepo program in PATH.])
+    _BLD_PATH_PROG([CREATEREPO], [createrepo], [${am_missing3_run}createrepo], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(redhat|rhel|whitebox|lineox|fedora|centos)
+		    _BLD_INSTALL_WARN([CREATEREPO], [
+*** 
+*** Configure could not find a suitable  tool for creating REPOMD
+*** repositories.  This program is part of the 'createrepo' package on
+*** RPM based distributions supporting REPOMD repositories.
+*** ], [
+*** On YUM  based distributions, try 'yum install createrepo'
+*** On ZYPP based distributions, try 'zypper install createrepo'], [
+*** 
+*** Alteratively, you can reconfigure with --disable-repo-yum to disable
+*** generation of REPOMD repositories.  Proceeding under the assumption
+*** that --disable-repo-yum was specified.
+*** ])
+		    ;;
+		(*)
+		    AC_MSG_WARN([Cannot find createrepo program in PATH.])
+		    ;;
+	    esac
 	fi
 	enable_repo_yum=no])
     AC_ARG_VAR([MODIFYREPO],
 	       [Modify repomd repository command. @<:@default=modifyrepo@:>@])
-    _BLD_PATH_PROG([MODIFYREPO], [modifyrepo], [${am_missing3_run}modifyrepo],
-		   [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	if test ":$rpm_cv_rpms" = :yes; then
-	    AC_MSG_WARN([Could not find modifyrepo program in PATH.])
+    _BLD_PATH_PROG([MODIFYREPO], [modifyrepo], [${am_missing3_run}modifyrepo], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(redhat|rhel|whitebox|lineox|fedora|centos)
+		    _BLD_INSTALL_WARN([MODIFYREPO], [
+*** 
+*** Configure could not find a suitable tool for modifying REPOMD
+*** repositories.  This program is part of the 'modifyrepo' package on
+*** RPM based distributions supporting REPOMD repositories.
+*** ], [
+*** On YUM  based distributions, try 'yum install createrepo'
+*** On ZYPP based distributions, try 'zypper install createrepo'], [
+*** 
+*** Alteratively, you can reconfigure with --disable-repo-yum to disable
+*** generation of REPOMD repositories.  Proceeding under the assumption
+*** that --disable-repo-yum was specified.
+*** ])
+		    ;;
+		(*)
+		    AC_MSG_WARN([Cannot find modifyrepo program in PATH.])
+		    ;;
+	    esac
 	fi])
     AC_CACHE_CHECK([for rpm yum repo construction], [rpm_cv_repo_yum], [dnl
 	rpm_cv_repo_yum=${enable_repo_yum:-no}
@@ -624,22 +680,47 @@ dnl
     AC_SUBST([repodevldir])dnl
     reposrcsdir='$(topsrcsdir)/repodata'
     AC_SUBST([reposrcsdir])dnl
+])# _RPM_REPO_SETUP_YUM
+# =============================================================================
 
-dnl
-dnl These commands can be used to create YaST repositories.
-dnl
+# =============================================================================
+# _RPM_REPO_SETUP_YAST
+# -----------------------------------------------------------------------------
+# These commands are needed to create YAST repositories.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_RPM_REPO_SETUP_YAST], [dnl
+    AC_REQUIRE([_OPENSS7_MISSING3])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-yast],
 	[AS_HELP_STRING([--disable-repo-yast],
 	    [yast repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_yast=yes])
     AC_ARG_VAR([CREATE_PACKAGE_DESCR],
 	       [Create YaST package descriptions command.  @<:@default=create_package_descr@:>@])
-    _BLD_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [${am_missing3_run}create_package_descr],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	if test ":$rpm_cv_rpms" = :yes; then
-	    if test ":$target_vendor" = :suse; then
-		AC_MSG_WARN([Could not find create_package_descr program in PATH.])
-	    fi
+    _BLD_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [${am_missing3_run}create_package_descr], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(suse|sle|sles|sled|opensuse)
+		    _BLD_INSTALL_WARN([CREATE_PACKAGE_DESCR], [
+*** 
+*** Configure could not find a suitable tool for creating YaST package
+*** descriptions.  This program is part of the inst-source-utils package
+*** on SuSE Linux based distributions.
+*** ], [
+*** On SuSE based distributions, try 'zypper install inst-source-utils'.
+***
+*** SLES 10/11: 'zypper install inst-source-utils'
+*** OpenSuSE:   'zypper install inst-source-utils'], [
+*** 
+*** Alternatively, you can reconfigured with --disable-repo-yast to
+*** disable generation of YaST repositories.  Proceeding under the
+*** assumption that --disable-repo-yast was specified.
+*** ])
+		    ;;
+		(*)
+		    AC_MSG_WARN([Cannot find 'create_package_descr' program in PATH.])
+		    ;;
+	    esac
 	fi
 	enable_repo_yast=no])
     AC_CACHE_CHECK([for rpm yast repo construction], [rpm_cv_repo_yast], [dnl
@@ -648,7 +729,90 @@ dnl
     AM_CONDITIONAL([BUILD_REPO_YAST], [test ":$rpm_cv_repo_yast" = :yes])dnl
     yastdir="$topdir"
     AC_SUBST([yastdir])dnl
-])# _RPM_SPEC_SETUP_BUILD
+])# _RPM_REPO_SETUP_YAST
+# =============================================================================
+
+# =============================================================================
+# _RPM_REPO_SETUP_URPMI
+# -----------------------------------------------------------------------------
+# These commands are needed to create URPMI repositories
+# -----------------------------------------------------------------------------
+AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
+    AC_REQUIRE([_OPENSS7_MISSING3])
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    AC_ARG_ENABLE([repo-urpmi],
+	[AS_HELP_STRING([--disable-repo-urpmi],
+	    [urpmi repo construction @<:@default=auto@:>@])],
+	[], [enable_repo_urpmi=yes])
+    AC_ARG_VAR([GENHDLIST],
+	       [Generate urpmi repository command. @<:@default=genhdlist@:>@])
+    _BLD_PATH_PROGS([GENHDLIST], [genhdlist2 genhdlist], [${am_missing3_run}genhdlist2], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(mandrake|mandriva|manbo)
+		    _BLD_INSTALL_WARN([GENHDLIST], [
+*** 
+*** Configure could not find a suitable tool for generating the hdlists
+*** for a URPMI repository.  This program is part of the rpm-tools
+*** package on MandrivaLinux based distributions.
+*** ], [
+*** On Mandriva based distributions, try 'urpmi rpm-tools'.
+***
+*** Mandriva 2010.2: 'urpmi rpm-tools'], [
+*** 
+*** Alternatively, you can reconfigure with --disable-repo-urpmi to
+*** disable generation of URPMI repositories.  Proceeding under the
+*** assumption that --disable-repo-urpmi was specified.
+*** ])
+		    ;;
+		(*)
+		    AC_MSG_WARN([Cannot find 'genhdlist' program in PATH.])
+		    ;;
+	    esac
+	fi
+	enable_repo_urpmi=no])
+    AC_ARG_VAR([GENDISTRIB],
+	       [Generate urpmi distribution command. @<:@default=gendistrib@:>@])
+    _BLD_PATH_PROG([GENDISTRIB], [gendistrib], [${am_missing3_run}gendistrib], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(mandrake|mandriva|manbo)
+		    _BLD_INSTALL_WARN([GENDISTRIB], [
+*** 
+*** Configure could not find a suitable tool for generating the media
+*** info for a URPMI repository.  This program is part of the rpm-tools
+*** package on MandrivaLinux based distributions.
+*** ], [
+*** On Mandriva based distributions, try 'urpmi rpm-tools'.
+***
+*** Mandriva 2010.2: 'urpmi rpm-tools'], [
+*** 
+*** Atlernatively, you can reconfigure with --disable-repo-urpmi to
+*** disable generation of URPMI repositories.  Proceeding under the
+*** assumption that --disable-repo-urpmi was specified.
+*** ])
+		    ;;
+		(*)
+		    AC_MSG_WARN([Cannot find 'gendistrib' program in PATH.])
+		    ;;
+	    esac
+	fi
+	enable_repo_urpmi=no])
+    AC_CACHE_CHECK([for rpm urpmi repo construction], [rpm_cv_repo_urpmi], [dnl
+	rpm_cv_repo_urpmi=${enable_repo_urpmi:-no}
+    ])
+    AM_CONDITIONAL([BUILD_REPO_URPMI], [test ":$rpm_cv_repo_urpmi" = :yes])dnl
+    mediadir='$(topdir)/media_info'
+    AC_SUBST([mediadir])dnl
+    mediamaindir='$(topmaindir)/media_info'
+    AC_SUBST([mediamaindir])dnl
+    mediadebgdir='$(topdebgdir)/media_info'
+    AC_SUBST([mediadebgdir])dnl
+    mediadevldir='$(topdevldir)/media_info'
+    AC_SUBST([mediadevldir])dnl
+    mediasrcsdir='$(topsrcsdir)/media_info'
+    AC_SUBST([mediasrcsdir])dnl
+])# _RPM_REPO_SETUP_URPMI
 # =============================================================================
 
 # =============================================================================
