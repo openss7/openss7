@@ -105,8 +105,7 @@ AC_DEFUN([_MAN_CONVERSION_ARGS], [dnl
 AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
     tmp_path="${PATH:+$PATH:}/usr/local/bin:/usr/bin:/bin:/usr/X11R6/bin:$am_aux_dir";
     AC_ARG_VAR([SOELIM], [Roff source elimination command. @<:@default=gsoelim,soelim@:>@])
-    _BLD_PATH_PROGS([SOELIM], [gsoelim soelim],
-		  [/bin/cat], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([SOELIM], [gsoelim soelim], [/bin/cat], [$tmp_path], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    without_cooked_manpages=yes
 	    _BLD_INSTALL_WARN([SOELIM], [
@@ -119,8 +118,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** on the web from any GNU archive site.  Use the following commands to
 *** obtain 'groff':
 *** ], [
-*** Debian 5.0:  'apt-get install groff-base'
-*** Ubuntu 8.04: 'apt-get install groff'
+*** Debian 5.0:  'aptitude install groff-base'
+*** Ubuntu 8.04: 'aptitude install groff'
 *** CentOS 5.x:  'yum install groff'
 *** RHEL 5.x:    'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -133,8 +132,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** ])
 	fi])
     AC_ARG_VAR([REFER], [Roff references command. @<:@default=grefer,refer@:>@])
-    _BLD_PATH_PROGS([REFER], [grefer refer],
-		  [/bin/cat], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([REFER], [grefer refer], [/bin/cat], [$tmp_path], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    without_cooked_manpages=yes
 	    _BLD_INSTALL_WARN([REFER], [
@@ -147,8 +145,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** web from any GNU archive site.  Use the following commands to obtain
 *** 'groff':
 *** ], [
-*** Debian 5.0:  'apt-get install groff'
-*** Ubuntu 8.04: 'apt-get install groff_ext'
+*** Debian 5.0:  'aptitude install groff'
+*** Ubuntu 8.04: 'aptitude install groff_ext'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
 *** Mandriva:    'urpmi groff'], [
@@ -160,15 +158,13 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** ])
 	fi])
     AC_ARG_VAR([PIC], [Roff picture command. @<:@default=gpic,pic@:>@])
-    _BLD_PATH_PROGS([PIC], [gpic pic],
-		  [/bin/cat], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([PIC], [gpic pic], [/bin/cat], [$tmp_path], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    # without_cooked_manpages=yes
 	    : # do not need pic to cook manpages
 	fi])
     AC_ARG_VAR([TBL], [Roff table command. @<:@default=gtbl,tbl@:>@])
-    _BLD_PATH_PROGS([TBL], [gtbl tbl],
-		  [/bin/cat], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([TBL], [gtbl tbl], [/bin/cat], [$tmp_path], [dnl
 	if test :$with_cooked_manpages != :no ; then
 	    without_cooked_manpages=yes
 	    _BLD_INSTALL_WARN([TBL], [
@@ -181,8 +177,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** web from any GNU archive site.  Use the following commands to obtain
 *** 'groff':
 *** ], [
-*** Debian 5.0:  'apt-get install groff-base'
-*** Ubuntu 8.04: 'apt-get install groff'
+*** Debian 5.0:  'aptitude install groff-base'
+*** Ubuntu 8.04: 'aptitude install groff'
 *** CentOS 5.x:  'yum install groff'
 *** RHEL 5.x:    'yum install groff'
 *** SLES 10:     'zypper install groff'
@@ -195,8 +191,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** ])
 	fi])
     AC_ARG_VAR([MAKEWHATIS], [Makewhatis command. @<:@default=mandb,makewhatis@:>@])
-    _BLD_PATH_PROGS([MAKEWHATIS], [mandb makewhatis],
-		 [], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([MAKEWHATIS], [mandb makewhatis], [], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([MAKEWHATIS], [
 ***
 *** Configure cannot find a suitable 'makewhatis' program.  Installing
@@ -207,8 +202,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** the web from the Linux Documentation Project.  Use the following
 *** commands to obtain 'man':
 *** ], [
-*** Debian 5.0:  'apt-get install man-db'
-*** Ubuntu 8.04: 'apt-get install man'
+*** Debian 5.0:  'aptitude install man-db'
+*** Ubuntu 8.04: 'aptitude install man'
 *** Fedora 9:    'yum install man'
 *** CentOS 5.x:  'yum install man'
 *** openSUSE 11: 'zypper install man'
@@ -238,7 +233,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** build host.  The 'gzip' package has been available for many years on
 *** all distributions and is available from any GNU archive site.  Try:
 *** ], [
-*** Debian:   'apt-get install gzip'
+*** Debian:   'aptitude install gzip'
 *** SuSE:     'zypper install gzip'
 *** CentOS:   'yum install gzip'
 *** RedHat:   'yum install gzip'
@@ -259,7 +254,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** for many years on all distributions and is available from various
 *** web sources.  Try:
 *** ], [
-*** Debian:   'apt-get install bzip2'
+*** Debian:   'aptitude install bzip2'
 *** SuSE:     'zypper install bzip2'
 *** CentOS:   'yum install bzip2'
 *** RedHat:   'yum install bzip2'
@@ -280,7 +275,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** of years on recent distributions and is available from various web
 *** sources for others.  Try:
 *** ], [
-*** Debian 5.0:  'apt-get install lzma'
+*** Debian 5.0:  'aptitude install lzma'
 *** SuSE:        'zypper install lmza'
 *** CentOS:      'yum install lzma'
 *** CentOS:      'yum install xz-lzma-compat'
@@ -301,7 +296,7 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** recent distributions and is available from various web sources for
 *** others.  Try:
 *** ], [
-*** Debian 5.0: 'apt-get install xz-utils'
+*** Debian 5.0: 'aptitude install xz-utils'
 *** SuSE:       'zypper install xz'
 *** CentOS:     'yum install xz'
 *** Mandriva:   'urpmi xz'], [

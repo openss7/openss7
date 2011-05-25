@@ -54,12 +54,27 @@
 # =============================================================================
 
 # =============================================================================
-# _DEB_DPKG_OPTIONS
+# _DEB_DPKG
 # -----------------------------------------------------------------------------
-AC_DEFUN([_DEB_DPKG_OPTIONS], [dnl
+AC_DEFUN([_DEB_DPKG], [dnl
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_TARDIR])
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
+    AC_REQUIRE([_DISTRO])
+    AC_REQUIRE([_REPO])
     AC_MSG_NOTICE([+-----------------------+])
     AC_MSG_NOTICE([| Debian Archive Checks |])
     AC_MSG_NOTICE([+-----------------------+])
+    _DEB_DPKG_OPTIONS
+    _DEB_DPKG_SETUP
+    _DEB_REPO_SETUP
+    _DEB_DPKG_OUTPUT
+])# _DEB_DPKG
+# =============================================================================
+
+# =============================================================================
+# _DEB_DPKG_OPTIONS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DEB_DPKG_OPTIONS], [dnl
     _DEB_OPTIONS_DEB_EPOCH
     _DEB_OPTIONS_DEB_RELEASE
 ])# _DEB_DPKG_OPTIONS
@@ -121,58 +136,6 @@ dnl _DEB_DPKG_SETUP_INDEP
     _DEB_DPKG_SETUP_BUILD
     _DEB_DPKG_SETUP_HELPER
 ])# _DEB_DPKG_SETUP
-# =============================================================================
-
-# =============================================================================
-# _DEB_DPKG_SETUP_HELPER
-# -----------------------------------------------------------------------------
-AC_DEFUN([_DEB_DPKG_SETUP_HELPER], [dnl
-    AC_ARG_WITH([dh-compat],
-	[AS_HELP_STRING([--with-dh-compat=LEVEL],
-	    [debhelper compatability level @<:@default=5@:>@])],
-	[], [with_dh_compat=5])
-    AC_CACHE_CHECK([for deb helper compatability], [deb_cv_dh_compat], [dnl
-	if test ":${DH_COMPAT+set}" != :set ; then
-	    case :"${with_dh_compat:-no}" in
-		(:no|:yes) DH_COMPAT=5 ;;
-		(*)        DH_COMPAT="$with_dh_compat" ;;
-	    esac
-	fi
-	deb_cv_dh_compat="$DH_COMPAT"
-    ])
-    if test ":${DH_COMPAT+set}" != :set ; then
-	DH_COMPAT="${deb_cv_dh_compat:-5}"
-    fi
-    if test ":${DH_COMPAT:-5}" != :5 ; then
-	PACKAGE_RPMOPTIONS="DH_COMPAT=\"$DH_COMPAT\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
-	PACKAGE_DEBOPTIONS="DH_COMPAT=\"$DH_COMPAT\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
-	ac_configure_args="DH_COMPAT=\"$DH_COMPAT\"${ac_configure_args:+ $ac_configure_args}"
-    fi
-    AC_SUBST([DH_COMPAT])dnl
-    AC_ARG_WITH([dh-verbose],
-	[AS_HELP_STRING([--with-dh-verbose=LEVEL],
-	    [debhelper verbose level @<:@default=0@:>@])],
-	[], [with_dh_verbose=0])
-    AC_CACHE_CHECK([for deb helper verbosity], [deb_cv_dh_verbose], [dnl
-	if test ":${DH_VERBOSE+set}" != :set ; then
-	    case :"${with_dh_verbose:-no}" in
-		(:no|:yes) DH_VERBOSE=0 ;;
-		(*)        DH_VERBOSE="$with_dh_verbose" ;;
-	    esac
-	fi
-	deb_cv_dh_verbose="$DH_VERBOSE"
-    ])
-    if test ":${DH_VERBOSE+set}" != :set ; then
-	DH_VERBOSE="${deb_cv_dh_verbose:-0}"
-    fi
-    if test ":${DH_VERBOSE:-0}" != :0 ; then
-	PACKAGE_RPMOPTIONS="DH_VERBOSE=\"$DH_VERBOSE\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
-	PACKAGE_DEBOPTIONS="DH_VERBOSE=\"$DH_VERBOSE\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
-	ac_configure_args="DH_VERBOSE=\"$DH_VERBOSE\"${ac_configure_args:+ $ac_configure_args}"
-    fi
-    AC_SUBST([DH_VERBOSE])dnl
-
-])# _DEB_DPKG_SETUP_HELPER
 # =============================================================================
 
 # =============================================================================
@@ -333,6 +296,8 @@ dnl AC_ARG_VAR([DEB_HOST_GNU_TYPE], [Debian host/target alias])
 dnl
 dnl These commands are needed to perform DPKG package builds.
 dnl
+    AC_REQUIRE([_OPENSS7_MISSING3])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([debs],
 	[AS_HELP_STRING([--disable-debs],
 	    [build debs @<:@default=auto@:>@])],
@@ -343,29 +308,26 @@ dnl
 	[], [enable_dscs=yes])
     AC_ARG_VAR([DPKG],
 	       [dpkg command. @<:@default=dpkg@:>@])
-    _BLD_PATH_PROG([DPKG], [dpkg], [${am_missing3_run}dpkg],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+    _BLD_PATH_PROG([DPKG], [dpkg], [${am_missing3_run}dpkg], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu)
-		AC_MSG_WARN([Could not find dpkg program in PATH.]) ;;
+	    (debian|ubuntu|mint)
+		AC_MSG_WARN([Cannot find dpkg program in PATH.]) ;;
 	    (*) enable_debs=no; enable_dscs=no ;;
 	esac])
     AC_ARG_VAR([DPKG_SOURCE],
 	       [dpkg-source command. @<:@default=dpkg-source@:>@])
-    _BLD_PATH_PROG([DPKG_SOURCE], [dpkg-source], [${am_missing3_run}dpkg-source],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+    _BLD_PATH_PROG([DPKG_SOURCE], [dpkg-source], [${am_missing3_run}dpkg-source], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu)
-		AC_MSG_WARN([Could not find dpkg-source program in PATH.]) ;;
+	    (debian|ubuntu|mint)
+		AC_MSG_WARN([Cannot find dpkg-source program in PATH.]) ;;
 	    (*) enable_dscs=no ;;
 	esac])
     AC_ARG_VAR([DPKG_BUILDPACKAGE],
 	       [dpkg-buildpackage command. @<:@default=dpkg-buildpackage@:>@])
-    _BLD_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [${am_missing3_run}dpkg-buildpackage],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
+    _BLD_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [${am_missing3_run}dpkg-buildpackage], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu)
-		AC_MSG_WARN([Could not find dpkg-buildpackage program in PATH.]) ;;
+	    (debian|ubuntu|mint)
+		AC_MSG_WARN([Cannot find dpkg-buildpackage program in PATH.]) ;;
 	    (*) enable_debs=no ;;
 	esac])
     AC_CACHE_CHECK([for deb building of debs], [deb_cv_debs], [dnl
@@ -375,46 +337,174 @@ dnl
 	deb_cv_dscs=${enable_dscs:-no}
     ])
     AM_CONDITIONAL([BUILD_DPKG], [test ":$deb_cv_debs:$deb_cv_dscs" = :yes:yes])dnl
-dnl
-dnl These commands are needed to create DPKG (e.g. APT) repositories.
-dnl
+])# _DEB_DPKG_SETUP_BUILD
+# =============================================================================
+
+# =============================================================================
+# _DEB_DPKG_SETUP_HELPER
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DEB_DPKG_SETUP_HELPER], [dnl
+    AC_ARG_WITH([dh-compat],
+	[AS_HELP_STRING([--with-dh-compat=LEVEL],
+	    [debhelper compatability level @<:@default=5@:>@])],
+	[], [with_dh_compat=5])
+    AC_CACHE_CHECK([for deb helper compatability], [deb_cv_dh_compat], [dnl
+	if test ":${DH_COMPAT+set}" != :set ; then
+	    case :"${with_dh_compat:-no}" in
+		(:no|:yes) DH_COMPAT=5 ;;
+		(*)        DH_COMPAT="$with_dh_compat" ;;
+	    esac
+	fi
+	deb_cv_dh_compat="$DH_COMPAT"
+    ])
+    if test ":${DH_COMPAT+set}" != :set ; then
+	DH_COMPAT="${deb_cv_dh_compat:-5}"
+    fi
+    if test ":${DH_COMPAT:-5}" != :5 ; then
+	PACKAGE_RPMOPTIONS="DH_COMPAT=\"$DH_COMPAT\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
+	PACKAGE_DEBOPTIONS="DH_COMPAT=\"$DH_COMPAT\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
+	ac_configure_args="DH_COMPAT=\"$DH_COMPAT\"${ac_configure_args:+ $ac_configure_args}"
+    fi
+    AC_SUBST([DH_COMPAT])dnl
+    AC_ARG_WITH([dh-verbose],
+	[AS_HELP_STRING([--with-dh-verbose=LEVEL],
+	    [debhelper verbose level @<:@default=0@:>@])],
+	[], [with_dh_verbose=0])
+    AC_CACHE_CHECK([for deb helper verbosity], [deb_cv_dh_verbose], [dnl
+	if test ":${DH_VERBOSE+set}" != :set ; then
+	    case :"${with_dh_verbose:-no}" in
+		(:no|:yes) DH_VERBOSE=0 ;;
+		(*)        DH_VERBOSE="$with_dh_verbose" ;;
+	    esac
+	fi
+	deb_cv_dh_verbose="$DH_VERBOSE"
+    ])
+    if test ":${DH_VERBOSE+set}" != :set ; then
+	DH_VERBOSE="${deb_cv_dh_verbose:-0}"
+    fi
+    if test ":${DH_VERBOSE:-0}" != :0 ; then
+	PACKAGE_RPMOPTIONS="DH_VERBOSE=\"$DH_VERBOSE\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
+	PACKAGE_DEBOPTIONS="DH_VERBOSE=\"$DH_VERBOSE\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
+	ac_configure_args="DH_VERBOSE=\"$DH_VERBOSE\"${ac_configure_args:+ $ac_configure_args}"
+    fi
+    AC_SUBST([DH_VERBOSE])dnl
+
+])# _DEB_DPKG_SETUP_HELPER
+# =============================================================================
+
+# =============================================================================
+# _DEB_REPO_SETUP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DEB_REPO_SETUP], [dnl
+    _DEB_REPO_SETUP_APT
+])# _DEB_REPO_SETUP
+# =============================================================================
+
+# =============================================================================
+# _DEB_REPO_SETUP_APT
+# -----------------------------------------------------------------------------
+# These commands are needed to create DPKG (e.g. APT) repositories.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
+    AC_REQUIRE([_OPENSS7_MISSING3])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([repo-apt],
 	[AS_HELP_STRING([--disable-repo-apt],
 	    [apt repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_apt=yes])
     AC_ARG_VAR([APT_FTPARCHIVE],
 	       [apt-ftparchive command. @<:@default=apt-ftparchive@:>@])
-    _BLD_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [${am_missing3_run}apt-ftparchive],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	if test ":$deb_cv_debs" = :yes; then
-	    AC_MSG_WARN([Could not find apt-ftparchive program in PATH.])
+    _BLD_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [${am_missing3_run}apt-ftparchive], [$tmp_path], [dnl
+	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(debian|ubuntu|mint)
+		    _BLD_INSTALL_WARN([APT_FTPARCHIVE], [
+*** 
+*** Configure could not find a suitable tool for creating APT
+*** repository metadata.  This program is part of the 'apt-utils'
+*** package on Debian based distributions.
+*** ], [
+*** On Debian based distributions, try 'aptitude install apt-utils'.
+***
+*** Debian 5.0:   'aptitude install apt-utils'], [
+*** 
+*** Alternatively, you can reconfigure with --disable-repo-apt to
+*** disable generation of APT repositories.  Proceeding under the
+*** assumption that --disable-repo-apt was specified.
+*** ])
+		    ;;
+		(*) AC_MSG_WARN([Cannot find 'apt-ftparchive' program in PATH.]) ;;
+	    esac
 	else enable_repo_apt=no; fi])
     AC_ARG_VAR([DPKG_SCANSOURCES],
 	       [dpkg-scansources command. @<:@default=dpkg-scansources@:>@])
-    _BLD_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [${am_missing3_run}dpkg-scansources],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	if test ":$deb_cv_debs" = :yes; then
-	    AC_MSG_WARN([Could not find dpkg-scansources program in PATH.])
+    _BLD_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [${am_missing3_run}dpkg-scansources], [$tmp_path], [dnl
+	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(debian|ubuntu|mint)
+		    _BLD_INSTALL_WARN([DPKG_SCANSOURCES], [
+*** 
+*** Configure could not find a suitable tool for creating APT source
+*** repository metadata.  This program is part of the 'dpkg-dev' package
+*** on Debian based distributions.
+*** ], [
+*** On Debian based distributions, try 'aptitude install dpkg-dev'.
+***
+*** Debian 5.0:   'aptitude install dpkg-dev'], [
+*** 
+*** Alternatively, you can reconfigure with --disable-repo-apt to
+*** disable generation of APT repositories.  Proceeding under the
+*** assumption that --disable-repo-apt was specified.
+*** ])
+		    ;;
+		(*) AC_MSG_WARN([Cannot find 'dpkg-scansources' program in PATH.]) ;;
+	    esac
 	else enable_repo_apt=no; fi])
     AC_ARG_VAR([DPKG_SCANPACKAGES],
 	       [dpkg-scanpackages command. @<:@default=dpkg-scanpackages@:>@])
-    _BLD_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [${am_missing3_run}dpkg-scanpackages],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	if test ":$deb_cv_debs" = :yes; then
-	    AC_MSG_WARN([Could not find dpkg-scanpackages program in PATH.])
+    _BLD_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [${am_missing3_run}dpkg-scanpackages], [$tmp_path], [dnl
+	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(debian|ubuntu|mint)
+		    _BLD_INSTALL_WARN([DPKG_SCANPACKAGES], [
+*** 
+*** Configure could not find a suitable tool for creating APT binary
+*** repository metadata.  This program is part of the 'dpkg-dev' package
+*** on Debian based distributions.
+*** ], [
+*** On Debian based distributions, try 'aptitude install dpkg-dev'.
+***
+*** Debian 5.0:   'aptitude install dpkg-dev'], [
+*** 
+*** Alternatively, you can reconfigure with --disable-repo-apt to
+*** disable generation of APT repositories.  Proceeding under the
+*** assumption that --disable-repo-apt was specified.
+*** ])
+		    ;;
+		(*) AC_MSG_WARN([Cannot find 'dpkg-scanpackages' program in PATH.]) ;;
+	    esac
 	else enable_repo_apt=no; fi])
     AC_ARG_VAR([DPKG_DEB],
 	       [dpkg-deb command. @<:@default=dpkg-deb@:>@])
-    _BLD_PATH_PROG([DPKG_DEB], [dpkg-deb], [${am_missing3_run}dpkg-deb],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	if test ":$deb_cv_debs" = :yes; then
-	    AC_MSG_WARN([Could not find dpkg-deb program in PATH.])
+    _BLD_PATH_PROG([DPKG_DEB], [dpkg-deb], [${am_missing3_run}dpkg-deb], [$tmp_path], [dnl
+	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(debian|ubuntu|mint)
+		    _BLD_INSTALL_ERROR([DPKG_DEB], [
+*** 
+*** Configure could not find a suitable tool for examining APT binary
+*** packages.  This program is part of the 'dpkg' package on Debian
+*** based distributions and is essential.  Cannot continue.
+*** ])
+		    ;;
+		(*) AC_MSG_WARN([Cannot find 'dpkg-deb' program in PATH.]) ;;
+	    esac
 	else enable_repo_apt=no; fi])
-    AC_CACHE_CHECK([for deb apt repo constructtion], [deb_cv_repo_apt], [dnl
+    AC_CACHE_CHECK([for deb apt repo construction], [deb_cv_repo_apt], [dnl
 	deb_cv_repo_apt=${enable_repo_apt:-no}
     ])
     AM_CONDITIONAL([BUILD_REPO_APT], [test ":$deb_cv_repo_apt" = :yes])
-])# _DEB_DPKG_SETUP_BUILD
+])# _DEB_REPO_SETUP_APT
 # =============================================================================
 
 # =============================================================================
@@ -453,17 +543,6 @@ dnl fi
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_], [dnl
 ])# _DEB_
-# =============================================================================
-
-# =============================================================================
-# _DEB_DPKG
-# -----------------------------------------------------------------------------
-AC_DEFUN([_DEB_DPKG], [dnl
-    AC_REQUIRE([_DISTRO])
-    _DEB_DPKG_OPTIONS
-    _DEB_DPKG_SETUP
-    _DEB_DPKG_OUTPUT
-])# _DEB_DPKG
 # =============================================================================
 
 # =============================================================================

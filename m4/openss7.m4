@@ -581,13 +581,13 @@ AC_DEFUN([_OPENSS7_OPTIONS_DOCS], [dnl
 # _OPENSS7_OPTIONS_GPG
 # -----------------------------------------------------------------------------
 AC_DEFUN([_OPENSS7_OPTIONS_GPG], [dnl
-    os7_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
-    _BLD_VAR_PATH_PROG([GPG], [gpg pgp], [$os7_tmp], [GPG signature command. @<:@default=gpg@:>@], [dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    _BLD_VAR_PATH_PROG([GPG], [gpg pgp], [$tmp_path], [GPG signature command. @<:@default=gpg@:>@], [dnl
 	GPG=/usr/bin/gpg
-	AC_MSG_WARN([could not find 'gpg' program in PATH.])])
+	AC_MSG_WARN([Cannot find 'gpg' program in PATH.])])
 dnl AC_ARG_VAR([GPG], [GPG signature command. @<:@default=gpg@:>@])
-dnl _BLD_PATH_PROG([GPG], [gpg pgp], [/usr/bin/gpg], [$os7_tmp], [dnl
-dnl	AC_MSG_WARN([Could not find gpg program in PATH.])])
+dnl _BLD_PATH_PROG([GPG], [gpg pgp], [/usr/bin/gpg], [$tmp_path], [dnl
+dnl	AC_MSG_WARN([Cannot find gpg program in PATH.])])
 dnl ---------------------------------------------------------
     AC_MSG_CHECKING([for gpg user])
     AC_ARG_VAR([GNUPGUSER], [GPG user name. @<:@default=auto@:>@])

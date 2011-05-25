@@ -107,8 +107,8 @@ AC_DEFUN([_PERL_EXTENSIONS], [dnl
 *** loaded on all distributions.  Use the following commands to obtain
 *** the 'perl' development package:
 *** ], [
-*** Debian 5.0:  'apt-get install perl'
-*** Ubuntu 8.04: 'apt-get install perl'
+*** Debian 5.0:  'aptitude install perl'
+*** Ubuntu 8.04: 'aptitude install perl'
 *** CentOS 5.x:  'yum install perl'
 *** openSUSE 11: 'zypper install perl'
 *** SLES 10:     'zypper install perl'

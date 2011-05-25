@@ -149,6 +149,11 @@ AC_DEFUN([_BLD_PROG_CHECK],
 	    eval "tmp_cmd=\"\`which \${$tmp_cn} 2>/dev/null\`\""
 	    ;;
     esac
+    # check four levels of indirection for /etc/alternatives
+    test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
+    test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
+    test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
+    test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
     tmp_result=
     if test -n "$tmp_cmd" ; then
 	case "$build_distro" in
@@ -226,7 +231,7 @@ dnl		dlocate is much faster than dpkg and dpkg-query
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"urpmi \$tmp_result\""
 		;;
 	    (debian|ubuntu|mint)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"apt-get install \$tmp_result\""
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"aptitude install \$tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_cn}"
@@ -501,7 +506,7 @@ AC_DEFUN([_BLD_PATH_PROGS], [dnl
     AC_PATH_PROGS([$1], [$2], [], [$4])
     if test :"${$1:-no}" = :no ; then
 	$1="$3"
-	m4_if([$5], [], [AC_MSG_WARN([Cannot find $2 in PATH.])], [$5])
+	m4_if([$5], [], [AC_MSG_WARN([Cannot find '$2' program in PATH.])], [$5])
     else
 	bld_prog_check "$1"
 	m4_if([$6], [], [:], [$6])

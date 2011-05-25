@@ -93,14 +93,12 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
     if test :"${linux_cv_CONFIG_REGPARM:-no}" = :yes ; then
 	GENKSYMS_SMP_PREFIX="${GENKSYMS_SMP_PREFIX}${GENKSYMS_SMP_PREFIX:--p }regparm_"
     fi
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
     AC_ARG_VAR([GENKSYMS],
 	       [Generate kernel symbols command. @<:@default=genksyms@:>@])
-    _BLD_PATH_PROG([GENKSYMS], [genksyms], [/sbin/genksyms],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin],
-		 [dnl
-	if test :"$linux_cv_k_ko_modules" != :yes
-	then
-	    AC_MSG_WARN([Could not find genksyms program in PATH.])
+    _BLD_PATH_PROG([GENKSYMS], [genksyms], [/sbin/genksyms], [$tmp_path], [dnl
+	if test :"$linux_cv_k_ko_modules" != :yes ; then
+	    AC_MSG_WARN([Cannot find genksyms program in PATH.])
 	fi])
     AC_ARG_VAR([KGENKSYMS],
 	       [Generate kernel symbols command. @<:@default=auto@:>@])
@@ -111,8 +109,7 @@ AC_DEFUN([_KSYMS_SETUP], [dnl
     done
     _BLD_PATH_PROG([KGENKSYMS], [genksyms], [\${kbuilddir}/scripts/genksyms/genksyms],
 		 [$ksyms_path], [dnl
-	if test :"$linux_cv_k_ko_modules" = :yes
-	then
+	if test :"$linux_cv_k_ko_modules" = :yes ; then
 	    AC_MSG_WARN([Could not find executable kernel genksyms program in $ksyms_path.])
 	fi])
 dnl AC_ARG_VAR([MODPOST],
@@ -125,15 +122,14 @@ dnl This is a weird place to put these I know, but genksyms.am needs it
 dnl
     AC_ARG_VAR([OBJDUMP],
 	       [Dump object files. @<:@default=objdump@:>@])
-    AC_PATH_TOOL([OBJDUMP], [objdump], [], [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_TOOL([OBJDUMP], [objdump], [], [$tmp_path])
     if test :"${OBJDUMP:-no}" = :no ; then
 	AC_MSG_WARN([Could not find executable objdump program in $PATH.])
 	OBJDUMP=/usr/bin/objdump
     fi
     AC_ARG_VAR([NM],
 	       [List object file symbols. @<:@default=nm@:>@])
-    AC_PATH_TOOL([NM], [nm], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    AC_PATH_TOOL([NM], [nm], [], [$tmp_path])
     if test :"${NM:-no}" = :no ; then
 	AC_MSG_WARN([Could not find executable nm program in $PATH.])
 	NM=/usr/bin/nm

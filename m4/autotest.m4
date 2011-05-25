@@ -98,10 +98,10 @@ AC_DEFUN([_AUTOTEST_SETUP], [dnl
 # _AUTOTEST_SETUP_AUTOM4TE
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
     AC_ARG_VAR([AUTOM4TE],
 	       [Autom4te command. @<:@default=autom4te@:>@])
-    _BLD_PATH_PROG([AUTOM4TE], [autom4te], [${am_missing_run}autom4te],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    _BLD_PATH_PROG([AUTOM4TE], [autom4te], [${am_missing_run}autom4te], [$tmp_path])
 ])# _AUTOTEST_SETUP_AUTOM4TE
 # ===========================================================================
 
@@ -109,10 +109,10 @@ AC_DEFUN([_AUTOTEST_SETUP_AUTOM4TE], [dnl
 # _AUTOTEST_SETUP_AUTOTEST
 # ---------------------------------------------------------------------------
 AC_DEFUN([_AUTOTEST_SETUP_AUTOTEST], [dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
     AC_ARG_VAR([AUTOTEST],
 	       [Autotest macro build command. @<:@default=autotest@:>@])
-    _BLD_PATH_PROG([AUTOTEST], [autotest], [$AUTOM4TE --language=autotest],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin])
+    _BLD_PATH_PROG([AUTOTEST], [autotest], [$AUTOM4TE --language=autotest], [$tmp_path])
 ])# _AUTOTEST_SETUP_AUTOTEST
 # ===========================================================================
 

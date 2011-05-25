@@ -442,8 +442,8 @@ AC_DEFUN([_GCJ_CONFIG], [dnl
 # _GCJ_TOOLS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_GCJ_TOOLS], [dnl
-    AC_REQUIRE([_OPENSS7_MISSING4])
-    gcj_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    AC_REQUIRE([_OPENSS7_MISSING4])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
 dnl
 dnl We need a javac compiler or we cannot compile any classes.
 dnl
@@ -452,8 +452,7 @@ dnl
 	[Java class compiler. @<:@default=[$]GCJ@:>@])
     AC_ARG_VAR([JAVACFLAGS],
 	[Java class compiler flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVAC], [$GCJ javac], [],
-	[$gcj_tmp], [dnl
+    _BLD_PATH_PROGS([JAVAC], [$GCJ javac], [], [$tmp_path], [dnl
 	_BLD_INSTALL_ERROR([JAVAC], [
 ***
 *** Configure could not find the Java class compiler program 'javac'
@@ -462,10 +461,10 @@ dnl
 *** of most Java SDKs.
 *** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
-*** On DEB based distributions, try 'apt-get install gcj'.
+*** On DEB based distributions, try 'aptitude install gcj'.
 ***
-*** Debian 5.0:  'apt-get install gcj'
-*** Ubuntu 8.04: 'apt-get install gcj'
+*** Debian 5.0:  'aptitude install gcj'
+*** Ubuntu 8.04: 'aptitude install gcj'
 *** CentOS 5.x:  'yum install gcc-java'
 *** SLES 11:     'zypper install gcc-java'
 *** Mandriva 10: 'urpmi gcc-java'], [
@@ -485,10 +484,8 @@ dnl classmap databases.
 dnl
     AC_ARG_VAR([GCJDBTOOL],
 	[GCJ database tool. @<:@default=gcj-dbtool@:>@])
-    _BLD_PATH_PROGS([GCJDBTOOL], [gcj-dbtool], [${am_missing4_run}gcj-dbtool],
-	[$gcj_tmp], [dnl
-	if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	then
+    _BLD_PATH_PROGS([GCJDBTOOL], [gcj-dbtool], [${am_missing4_run}gcj-dbtool], [$tmp_path], [dnl
+	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([GCJDBTOOL], [
 ***
 *** Configure could not find a suitable GCJ database tool program,
@@ -499,11 +496,11 @@ dnl
 *** that GCJ does not support the -indirect-dispatch flag.
 *** ], [
 *** On RPM based distributions, try 'yum install libgcj'.
-*** On DEB based distributions, try 'apt-get install gij'.
+*** On DEB based distributions, try 'aptitude install gij'.
 *** On SuSE distributions, try 'zypper install libgcj'.
 ***
-*** Debian 5.0:  'apt-get install gij'
-*** Ubuntu 8.04: 'apt-get install gij'
+*** Debian 5.0:  'aptitude install gij'
+*** Ubuntu 8.04: 'aptitude install gij'
 *** CentOS 5.x:  'yum install libgcj'
 *** SLES 11:     'zypper install gcc-java'
 *** Mandriva 10: 'urpmi gcj-tools'], [
@@ -525,10 +522,8 @@ dnl
 	[Java CNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([GCJHFLAGS],
 	[Java CNI header command flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([GCJH], [gcjh3 gcjh], [${am_missing4_run}gcjh],
-	[$gcj_tmp], [dnl
-	if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	then
+    _BLD_PATH_PROGS([GCJH], [gcjh3 gcjh], [${am_missing4_run}gcjh], [$tmp_path], [dnl
+	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([GCJH], [
 ***
 *** Configure could not find the GNU Java Compiler CNI header generation
@@ -536,11 +531,11 @@ dnl
 *** Collection, but is not always loaded on recent distributions.
 *** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
-*** On DEB based distributions, try 'apt-get install gcj'.
+*** On DEB based distributions, try 'aptitude install gcj'.
 *** On SUSE distributions, try 'zypper install gcc-java'.
 ***
-*** Debian 5.0:	 'apt-get install gcj'
-*** Ubuntu 8.04: 'apt-get install gcj'
+*** Debian 5.0:	 'aptitude install gcj'
+*** Ubuntu 8.04: 'aptitude install gcj'
 *** CentOS 5.x:	 'yum install gcc-java'
 *** SLES 11:	 'zypper install gcc-java'
 *** Mandriva 10: 'urpmi gcj-tools'
@@ -563,10 +558,8 @@ dnl
 	[Java JNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([JAVAHFLAGS],
 	[Java JNI header command flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVAH], [gcjh3 gcjh javah], [${am_missing4_run}gcjh],
-	[$gcj_tmp], [dnl
-	if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	then
+    _BLD_PATH_PROGS([JAVAH], [gcjh3 gcjh javah], [${am_missing4_run}gcjh], [$tmp_path], [dnl
+	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([JAVAH], [
 ***
 *** Configure could not find the Java JNI header generation program
@@ -575,11 +568,11 @@ dnl
 *** also part of most Java SDKs.
 *** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
-*** On DEB based distributions, try 'apt-get install gcj'.
+*** On DEB based distributions, try 'aptitude install gcj'.
 *** On SUSE distributions, try 'zypper install gcc-java'.
 ***
-*** Debian 5.0:	 'apt-get install gcj'
-*** Ubuntu 8.04: 'apt-get install gcj'
+*** Debian 5.0:	 'aptitude install gcj'
+*** Ubuntu 8.04: 'aptitude install gcj'
 *** CentOS 5.x:	 'yum install gcc-java'
 *** SLES 11:	 'zypper install gcc-java'
 *** Mandriva 10: 'urpmi gcj-tools'
@@ -601,10 +594,8 @@ dnl
 	[Java documentation doclet. @<:@default=gjdoc@:>@])
     AC_ARG_VAR([JAVADOCFLAGS],
 	[Java documentation flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVADOC], [gjdoc javadoc], [${am_missing4_run}gjdoc],
-	[$gcj_tmp], [dnl
-	if test :"${USE_MAINTAINER_MODE:-no}" != :no
-	then
+    _BLD_PATH_PROGS([JAVADOC], [gjdoc javadoc], [${am_missing4_run}gjdoc], [$tmp_path], [dnl
+	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([JAVADOC], [
 ***
 *** Configure could not find the Java documentation program 'javadoc'
@@ -613,11 +604,11 @@ dnl
 *** of most Java SDKs.
 *** ], [
 *** On RPM based distributions, try 'yum install gcc-java'.
-*** On DEB based distributions, try 'apt-get install gcj'.
+*** On DEB based distributions, try 'aptitude install gcj'.
 *** On SUSE, try 'zypper install jdk-1_5_0-ibm-devel'.
 ***
-*** Debian 5.0:	 'apt-get install gjdoc'
-*** Ubuntu 8.04: 'apt-get install gjdoc'
+*** Debian 5.0:	 'aptitude install gjdoc'
+*** Ubuntu 8.04: 'aptitude install gjdoc'
 *** CentOS 5.x:	 'yum install gjdoc'
 *** SLES 10:	 'zypper install java-1_5_0-ibm-devel'
 *** SLES 11:     'zypper install gjdoc'
@@ -672,8 +663,8 @@ dnl
 *** On RPM based distributions, try 'yum install libgcj-doc'.
 *** On DEB based distributions, try 'aptitude install libgcj-doc'.
 ***
-*** Debian 5.0:   'apt-get install libgcj-doc'
-*** Ubuntu 8.04:  'apt-get install libgcj-doc'
+*** Debian 5.0:   'aptitude install libgcj-doc'
+*** Ubuntu 8.04:  'aptitude install libgcj-doc'
 *** CentOS 5.x:   'yum install libgcj-doc'], [
 ***
 *** Repeat after loading the correct package.  Otherwise, java

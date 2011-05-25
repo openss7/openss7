@@ -488,26 +488,23 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_TOOLS], [dnl
 	ac_configure_args="KCC=\"$KCC\"${ac_configure_args:+ $ac_configure_args}"
     fi
     AC_SUBST([KCC])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_VAR([DEPMOD],
 	       [Build kernel module dependencies command. @<:@default=depmod@:>@])
-    _BLD_PATH_PROG([DEPMOD], [depmod], [/sbin/depmod],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	AC_MSG_WARN([Could not find depmod program in PATH.])])
+    _BLD_PATH_PROG([DEPMOD], [depmod], [/sbin/depmod], [$tmp_path], [dnl
+	AC_MSG_WARN([Cannot find depmod program in PATH.])])
     AC_ARG_VAR([MODPROBE],
 	       [Probe kernel module dependencies command. @<:@default=modprobe@:>@])
-    _BLD_PATH_PROG([MODPROBE], [modprobe], [/sbin/modprobe],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	AC_MSG_WARN([Could not find depmod program in PATH.])])
+    _BLD_PATH_PROG([MODPROBE], [modprobe], [/sbin/modprobe], [$tmp_path], [dnl
+	AC_MSG_WARN([Cannot find depmod program in PATH.])])
     AC_ARG_VAR([LSMOD],
 	       [List kernel modules command. @<:@default=lsmod@:>@])
-    _BLD_PATH_PROG([LSMOD], [lsmod], [/sbin/lsmod],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	AC_MSG_WARN([Could not find lsmod program in PATH.])])
+    _BLD_PATH_PROG([LSMOD], [lsmod], [/sbin/lsmod], [$tmp_path], [dnl
+	AC_MSG_WARN([Cannot find lsmod program in PATH.])])
     AC_ARG_VAR([LSOF],
 	       [List open files command. @<:@default=lsof@:>@])
-    _BLD_PATH_PROG([LSOF], [lsof], [/sbin/lsof],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	AC_MSG_WARN([Could not find lsof program in PATH.])])
+    _BLD_PATH_PROG([LSOF], [lsof], [/sbin/lsof], [$tmp_path], [dnl
+	AC_MSG_WARN([Cannot find lsof program in PATH.])])
 ])# _LINUX_CHECK_KERNEL_TOOLS
 # =========================================================================
 
@@ -1720,10 +1717,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 	    then
 		if test :"${linux_cv_k_versions}" != :no -a :"${linux_cv_k_modversions}" != :no
 		then
-		    # debian based systems don't have this file
-		    if test ":$deb_cv_debs:$deb_cv_dscs" != :yes:yes
-		    then
-			AC_MSG_WARN([
+		    case "$target_vendor" in
+			(centos|lineox|whitebox|fedora|redhat|rhel|suse|sle|sles|sled|opensuse)
+			    AC_MSG_WARN([
 *** 
 *** Configure could not find the symbol sets file for kernel version
 *** "$kversion".  The locations searched were:
@@ -1734,7 +1730,11 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 *** of your kernel symbol versions file with option --with-k-symsets
 *** before repeating.
 *** ])
-		    fi
+			    ;;
+			# debian and some rpm based systems do not have this file
+			(debian|ubuntu|mint|mandrake|mandriva|manbo|*)
+			    ;;
+		    esac
 		fi
 	    fi
 	else

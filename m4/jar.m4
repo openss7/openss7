@@ -81,16 +81,14 @@ AC_DEFUN([_JAR_OPTIONS], [dnl
 # using a script and the zip command.
 # -----------------------------------------------------------------------------
 AC_DEFUN([_JAR_SETUP], [dnl
-    AC_REQUIRE([_OPENSS7_MISSING4])
-    jar_tmp="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    AC_REQUIRE([_OPENSS7_MISSING4])dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
     AC_ARG_VAR([JAR],
 	[Java archive command. @<:@default=fastjar,jar@:>@])
-    _BLD_PATH_PROGS([JAR], [fastjar jar], [${am_missing4_run}jar],
-	[$jar_tmp])
+    _BLD_PATH_PROGS([JAR], [fastjar jar], [${am_missing4_run}jar], [$tmp_path])
     AC_ARG_VAR([ZIP],
 	[Zip archive command. @<:@default=zip@:>@])
-    _BLD_PATH_PROGS([ZIP], [zip], [${am_missing4_run}zip],
-	[$jar_tmp])
+    _BLD_PATH_PROGS([ZIP], [zip], [${am_missing4_run}zip], [$tmp_path])
 ])# _JAR_SETUP
 # =============================================================================
 

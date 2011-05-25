@@ -218,16 +218,15 @@ dnl I suppose we really don't care about these.  It is funny, though, that SuSE
 dnl used to use insserv (SuSE wrote it!), but now, SuSE uses service.  Debian
 dnl used to use update-rc.d, but now uses insserv!
 dnl
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin";
     AC_ARG_VAR([CHKCONFIG],
 	       [Chkconfig command. @<:@default=chkconfig@:>@])
-    _BLD_PATH_PROG([CHKCONFIG], [chkconfig], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	AC_MSG_WARN([Could not find chkconfig program in PATH.])])
+    _BLD_PATH_PROG([CHKCONFIG], [chkconfig], [], [$tmp_path], [dnl
+	AC_MSG_WARN([Cannot find chkconfig program in PATH.])])
     AC_ARG_VAR([INSSERV],
 	       [Insserv command. @<:@default=inserv@:>@])
-    _BLD_PATH_PROG([INSSERV], [insserv], [],
-		 [$PATH:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin], [dnl
-	AC_MSG_WARN([Could not find insserv program in PATH.])])
+    _BLD_PATH_PROG([INSSERV], [insserv], [], [$tmp_path], [dnl
+	AC_MSG_WARN([Cannot find insserv program in PATH.])])
 dnl
 dnl initrddir is where we are going to put init scripts
 dnl

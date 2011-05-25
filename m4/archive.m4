@@ -118,7 +118,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** build host.  The 'gzip' package has been available for many years on
 *** all distributions and is available from any GNU archive site.  Try:
 *** ], [
-*** Debian:   'apt-get install gzip'
+*** Debian:   'aptitude install gzip'
 *** SuSE:     'zypper install gzip'
 *** CentOS:   'yum install gzip'
 *** Mandriva: 'urpmi gzip'], [
@@ -137,7 +137,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** the build host.  The 'bzip2' package has been available for many
 *** years on all distributions.  Try:
 *** ], [
-*** Debian:   'apt-get install bzip2'
+*** Debian:   'aptitude install bzip2'
 *** SuSE:     'zypper install bzip2'
 *** CentOS:   'yum install bzip2'
 *** Mandriva: 'urpmi bzip2'], [
@@ -156,7 +156,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 *** Configure cannot find the 'lzma' program, which is sometimes present
 *** on recent systems.  Try:
 *** ], [
-*** Debian:   'apt-get install lzma'
+*** Debian:   'aptitude install lzma'
 *** SuSE:     'zypper install lzma'
 *** CentOS:   'yum install lzma'
 *** Mandriva: 'urpmi install xz'], [
@@ -190,7 +190,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian Squeeze:  'apt-get install xz-utils'
+*** Debian Squeeze:  'aptitude install xz-utils'
 *** Mandriva 2010.2: 'urpmi xz'], [
 ***
 *** To get rid of this warning, load the 'xz' package, or specify the
@@ -228,7 +228,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian:   'apt-get install coreutils'
+*** Debian:   'aptitude install coreutils'
 *** RedHat:   'yum install coreutils'
 *** SuSE:     'zypper install coreutils'
 *** Mandriva: 'urpmi coreutils'], [
@@ -261,7 +261,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian:   'apt-get install coreutils'
+*** Debian:   'aptitude install coreutils'
 *** RedHat:   'yum install coreutils'
 *** SuSE:     'zypper install coreutils'
 *** Mandriva: 'urpmi coreutils'], [
@@ -294,7 +294,7 @@ AC_DEFUN([_ARCHIVE_SETUP], [dnl
 ***   #> make
 ***   #> sudo make install
 ***
-*** Debian:   'apt-get install coreutils'
+*** Debian:   'aptitude install coreutils'
 *** RedHat:   'yum install coreutils'
 *** SuSE:     'zypper install coreutils'
 *** Mandriva: 'urpmi coreutiles'], [
