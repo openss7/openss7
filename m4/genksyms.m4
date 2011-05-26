@@ -338,7 +338,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
     AC_SUBST([UPDATES])dnl
     AC_CACHE_CHECK([for updates options], [ksyms_cv_updates_options], [dnl
 	case "$target_vendor" in
-	    (centos|lineox|whitebox|redhat|fedora)
+	    (centos|lineox|whitebox|scientific|redhat|fedora)
 		ksyms_cv_updates_options='--style=redhat' ;;
 	    (suse|opensuse|sles|sled)
 		ksyms_cv_updates_options='--style=suse11' ;;
@@ -408,7 +408,7 @@ AC_DEFUN([_KSYMS_OUTPUT_SYMSETS_CONFIG], [dnl
     AC_SUBST([SYMSETS])dnl
     AC_CACHE_CHECK([for symsets options], [ksyms_cv_symsets_options], [dnl
 	case "$target_vendor" in
-	    (centos|lineox|whitebox|redhat)
+	    (centos|lineox|whitebox|scientific|redhat)
 		ksyms_cv_symsets_options='--redhat' ;;
 	    (*) ksyms_cv_symsets_options='--suse'   ;;
 	esac])
