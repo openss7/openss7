@@ -430,6 +430,8 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
     fi
     AC_MSG_RESULT([$topdir])
     AC_SUBST([topdir])dnl
+    topfulldir='$(topdir)'
+    AC_SUBST([topfulldir])dnl
     topmaindir='$(topdir)/main'
     AC_SUBST([topmaindir])dnl
     topdebgdir='$(topdir)/debug'
@@ -684,8 +686,10 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
 	rpm_cv_repo_yum=${enable_repo_yum:-no}
     ])
     AM_CONDITIONAL([BUILD_REPO_YUM], [test ":$rpm_cv_repo_yum" = :yes])dnl
-    repodir='$(topdir)/repodata'
+    repodir='$(rpmdistdir)/repodata'
     AC_SUBST([repodir])dnl
+    repofulldir='$(topfulldir)/repodata'
+    AC_SUBST([topfulldir])dnl
     repomaindir='$(topmaindir)/repodata'
     AC_SUBST([repomaindir])dnl
     repodebgdir='$(topdebgdir)/repodata'
@@ -816,15 +820,17 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
 	rpm_cv_repo_urpmi=${enable_repo_urpmi:-no}
     ])
     AM_CONDITIONAL([BUILD_REPO_URPMI], [test ":$rpm_cv_repo_urpmi" = :yes])dnl
-    mediadir='$(topdir)/media_info'
+    mediadir='$(rpmdistdir)/media/media_info'
     AC_SUBST([mediadir])dnl
-    mediamaindir='$(topmaindir)/media_info'
+    mediafulldir='$(rpmdistdir)/media$(repobranch)/media_info'
+    AC_SUBST([mediafulldir])dnl
+    mediamaindir='$(rpmdistdir)/media$(repobranch)/main/media_info'
     AC_SUBST([mediamaindir])dnl
-    mediadebgdir='$(topdebgdir)/media_info'
+    mediadebgdir='$(rpmdistdir)/media$(repobranch)/debug/media_info'
     AC_SUBST([mediadebgdir])dnl
-    mediadevldir='$(topdevldir)/media_info'
+    mediadevldir='$(rpmdistdir)/media$(repobranch)/devel/media_info'
     AC_SUBST([mediadevldir])dnl
-    mediasrcsdir='$(topsrcsdir)/media_info'
+    mediasrcsdir='$(rpmdistdir)/media$(repobranch)/source/media_info'
     AC_SUBST([mediasrcsdir])dnl
 ])# _RPM_REPO_SETUP_URPMI
 # =============================================================================
