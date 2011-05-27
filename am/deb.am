@@ -109,8 +109,8 @@ debtop_binary_files	= $(debdir)/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEA
 			  $(debdir)/*/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
 			  $(debdir)/*/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb
 
-RELEASE_DIRECTORIES	+= $(debdir) $(debmaindir) $(debdebgdir) $(debdevldir) $(debsrcsdir)
-UPDATE_DIRECTORIES	+= $(debdir)
+RELEASE_DIRECTORIES	+= $(aptdir) $(aptfulldir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
+UPDATE_DIRECTORIES	+= $(aptdir) $(aptfulldir)
 
 ##
 # For the master build package it is sometime necessary to pass extra options down to configured
@@ -157,8 +157,8 @@ $(debtop_dsc_file) $(debtop_tar_file)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed 's|^$(debdir)/source/|$(debbuilddir)/|'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGES) -- $$f"; \
-		$(MAKE) $(AM_MAKEFLAGES) -- $$f; }; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) -- $$f"; \
+		$(MAKE) $(AM_MAKEFLAGS) -- $$f; }; \
 	test ! \( "$@" -ef "$$f" \) || exit 0; \
 	d=; test -f $$f || d='$(srcdir)/'; \
 	test ":$(FORCE)" != :force -a -f "$@" || { \
@@ -544,86 +544,86 @@ if BUILD_REPO_APT
 ## The following builds apt repositories.
 ##
 
-apt_packages		= $(debdir)/Packages \
-			  $(debmaindir)/Packages \
-			  $(debdebgdir)/Packages \
-			  $(debdevldir)/Packages \
-			  $(debsrcsdir)/Packages
+apt_packages		= $(aptfulldir)/Packages \
+			  $(aptmaindir)/Packages \
+			  $(aptdebgdir)/Packages \
+			  $(aptdevldir)/Packages \
+			  $(aptsrcsdir)/Packages
 
-apt_package_gzips	= $(debdir)/Packages.gz \
-			  $(debmaindir)/Packages.gz \
-			  $(debdebgdir)/Packages.gz \
-			  $(debdevldir)/Packages.gz \
-			  $(debsrcsdir)/Packages.gz
+apt_package_gzips	= $(aptfulldir)/Packages.gz \
+			  $(aptmaindir)/Packages.gz \
+			  $(aptdebgdir)/Packages.gz \
+			  $(aptdevldir)/Packages.gz \
+			  $(aptsrcsdir)/Packages.gz
 
-apt_package_bzips	= $(debdir)/Packages.bz2 \
-			  $(debmaindir)/Packages.bz2 \
-			  $(debdebgdir)/Packages.bz2 \
-			  $(debdevldir)/Packages.bz2 \
-			  $(debsrcsdir)/Packages.bz2
+apt_package_bzips	= $(aptfulldir)/Packages.bz2 \
+			  $(aptmaindir)/Packages.bz2 \
+			  $(aptdebgdir)/Packages.bz2 \
+			  $(aptdevldir)/Packages.bz2 \
+			  $(aptsrcsdir)/Packages.bz2
 
-apt_sources		= $(debdir)/Sources \
-			  $(debsrcsdir)/Sources
+apt_sources		= $(aptfulldir)/Sources \
+			  $(aptsrcsdir)/Sources
 
-apt_source_gzips	= $(debdir)/Sources.gz \
-			  $(debsrcsdir)/Sources.gz
+apt_source_gzips	= $(aptfulldir)/Sources.gz \
+			  $(aptsrcsdir)/Sources.gz
 
-apt_source_bzips	= $(debdir)/Sources.bz2 \
-			  $(debsrcsdir)/Sources.bz2
+apt_source_bzips	= $(aptfulldir)/Sources.bz2 \
+			  $(aptsrcsdir)/Sources.bz2
 
-apt_contents		= $(debdir)/Contents \
-			  $(debmaindir)/Contents \
-			  $(debdebgdir)/Contents \
-			  $(debdevldir)/Contents \
-			  $(debsrcsdir)/Contents
+apt_contents		= $(aptfulldir)/Contents \
+			  $(aptmaindir)/Contents \
+			  $(aptdebgdir)/Contents \
+			  $(aptdevldir)/Contents \
+			  $(aptsrcsdir)/Contents
 
-apt_content_gzips	= $(debdir)/Contents.gz \
-			  $(debmaindir)/Contents.gz \
-			  $(debdebgdir)/Contents.gz \
-			  $(debdevldir)/Contents.gz \
-			  $(debsrcsdir)/Contents.gz
+apt_content_gzips	= $(aptfulldir)/Contents.gz \
+			  $(aptmaindir)/Contents.gz \
+			  $(aptdebgdir)/Contents.gz \
+			  $(aptdevldir)/Contents.gz \
+			  $(aptsrcsdir)/Contents.gz
 
-apt_content_bzips	= $(debdir)/Contents.bz2 \
-			  $(debmaindir)/Contents.bz2 \
-			  $(debdebgdir)/Contents.bz2 \
-			  $(debdevldir)/Contents.bz2 \
-			  $(debsrcsdir)/Contents.bz2
+apt_content_bzips	= $(aptfulldir)/Contents.bz2 \
+			  $(aptmaindir)/Contents.bz2 \
+			  $(aptdebgdir)/Contents.bz2 \
+			  $(aptdevldir)/Contents.bz2 \
+			  $(aptsrcsdir)/Contents.bz2
 
-apt_md5sums		= $(debdir)/md5sum.txt \
-			  $(debmaindir)/md5sum.txt \
-			  $(debdebgdir)/md5sum.txt \
-			  $(debdevldir)/md5sum.txt \
-			  $(debsrcsdir)/md5sum.txt
+apt_md5sums		= $(aptfulldir)/md5sum.txt \
+			  $(aptmaindir)/md5sum.txt \
+			  $(aptdebgdir)/md5sum.txt \
+			  $(aptdevldir)/md5sum.txt \
+			  $(aptsrcsdir)/md5sum.txt
 
-apt_releases		= $(debdir)/Release \
-			  $(debmaindir)/Release \
-			  $(debdebgdir)/Release \
-			  $(debdevldir)/Release \
-			  $(debsrcsdir)/Release
+apt_releases		= $(aptfulldir)/Release \
+			  $(aptmaindir)/Release \
+			  $(aptdebgdir)/Release \
+			  $(aptdevldir)/Release \
+			  $(aptsrcsdir)/Release
 
-apt_release_gzips	= $(debdir)/Release.gz \
-			  $(debmaindir)/Release.gz \
-			  $(debdebgdir)/Release.gz \
-			  $(debdevldir)/Release.gz \
-			  $(debsrcsdir)/Release.gz
+apt_release_gzips	= $(aptfulldir)/Release.gz \
+			  $(aptmaindir)/Release.gz \
+			  $(aptdebgdir)/Release.gz \
+			  $(aptdevldir)/Release.gz \
+			  $(aptsrcsdir)/Release.gz
 
-apt_release_bzips	= $(debdir)/Release.bz2 \
-			  $(debmaindir)/Release.bz2 \
-			  $(debdebgdir)/Release.bz2 \
-			  $(debdevldir)/Release.bz2 \
-			  $(debsrcsdir)/Release.bz2
+apt_release_bzips	= $(aptfulldir)/Release.bz2 \
+			  $(aptmaindir)/Release.bz2 \
+			  $(aptdebgdir)/Release.bz2 \
+			  $(aptdevldir)/Release.bz2 \
+			  $(aptsrcsdir)/Release.bz2
 
-apt_release_gpgs	= $(debdir)/Release.gpg \
-			  $(debmaindir)/Release.gpg \
-			  $(debdebgdir)/Release.gpg \
-			  $(debdevldir)/Release.gpg \
-			  $(debsrcsdir)/Release.gpg
+apt_release_gpgs	= $(aptfulldir)/Release.gpg \
+			  $(aptmaindir)/Release.gpg \
+			  $(aptdebgdir)/Release.gpg \
+			  $(aptdevldir)/Release.gpg \
+			  $(aptsrcsdir)/Release.gpg
 
-apt_release_keys	= $(debdir)/Release.key \
-			  $(debmaindir)/Release.key \
-			  $(debdebgdir)/Release.key \
-			  $(debdevldir)/Release.key \
-			  $(debsrcsdir)/Release.key
+apt_release_keys	= $(aptfulldir)/Release.key \
+			  $(aptmaindir)/Release.key \
+			  $(aptdebgdir)/Release.key \
+			  $(aptdevldir)/Release.key \
+			  $(aptsrcsdir)/Release.key
 
 apt_gzips		= $(apt_package_gzips) \
 			  $(apt_source_gzips) \
@@ -658,15 +658,15 @@ apt_keys		= $(apt_release_keys)
 #!
 $(apt_packages):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) packages `dirname $@` | sed 's, $(debdir)/, ,' > $@
+	$(APT_FTPARCHIVE) packages `dirname $@` | sed 's, $(aptfulldir)/, ,' > $@
 
 $(apt_sources):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) sources `dirname $@` | sed 's, $(debdir)/, ,' > $@
+	$(APT_FTPARCHIVE) sources `dirname $@` | sed 's, $(aptfulldir)/, ,' > $@
 
 $(apt_contents):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(APT_FTPARCHIVE) contents `dirname $@` | sed 's, $(debdir)/, ,' > $@
+	$(APT_FTPARCHIVE) contents `dirname $@` | sed 's, $(aptfulldir)/, ,' > $@
 
 $(apt_gzips): %.gz : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -678,12 +678,12 @@ $(apt_bzips): %.bz2 : %
 
 $(apt_md5sums):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	find `dirname $@` -type f | egrep -v '(md5sum.txt|Release)' | xargs $(MD5SUM) | sed 's, $(debdir)/, ,' > $@
+	find `dirname $@` -type f | egrep -v '(md5sum.txt|Release)' | xargs $(MD5SUM) | sed 's, $(aptfulldir)/, ,' > $@
 
 $(apt_releases): $(apt_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@$(ECHO) "$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(debdir)/, ,' >$@.$$$$" ; \
-	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(debdir)/, ,' >$@.$$$$ ; \
+	@$(ECHO) "$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(aptfulldir)/, ,' >$@.$$$$" ; \
+	$(APT_FTPARCHIVE) release `dirname $@` | sed 's, $(aptfulldir)/, ,' >$@.$$$$ ; \
 	$(ECHO) "mv -f -- $@.$$$$ $@" ; \
 	mv -f -- $@.$$$$ $@
 
