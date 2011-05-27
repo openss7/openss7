@@ -370,6 +370,11 @@ AC_DEFUN([_BLD_FILE_CHECK],
     tmp_fn=`basename $tmp_file`
     tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
     tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
+    # check four levels of indirection for /etc/alternatives
+    test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
+    test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
+    test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
+    test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
     tmp_result=
     if test -n "$tmp_file"; then
 	case "$build_distro" in
