@@ -298,6 +298,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_SYMVERS
     _LINUX_CHECK_KERNEL_MODABI
     _LINUX_CHECK_KERNEL_SYMSETS
+    _LINUX_CHECK_KERNEL_KABI
     _LINUX_CHECK_KERNEL_UPDATE_MODULES
     _LINUX_CHECK_KERNEL_MODULE_PRELOAD
     PACKAGE_KNUMBER="${knumber}"
@@ -684,7 +685,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 	linux_cv_k_boot=no
 	linux_cv_k_base="$kversion"
 	case "$target_vendor" in
-	    (centos|whitebox|redhat)
+	    (centos|whitebox|redhat|scientific)
 		case "${kversion}" in
 		    # redhat boot kernels
 		    (*BOOT)	    linux_cv_k_boot=BOOT	 ;;
@@ -858,7 +859,7 @@ dnl *** ])
 dnl 		fi
 dnl 	    else
 dnl 		case "$target_vendor" in
-dnl 		    (redhat|centos|whitebox)
+dnl 		    (redhat|centos|whitebox|scientific)
 dnl dnl
 dnl dnl			Unfortunately the redhat system map files are unreliable
 dnl dnl			because the are not unique for each architecture.
@@ -1251,86 +1252,79 @@ dnl
 # _LINUX_CHECK_KERNEL_MODVER
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
-    AC_CACHE_CHECK([for kernel module ver], [linux_cv_k_modver], [dnl
-	AC_MSG_RESULT([searching...])
-	AC_ARG_WITH([k-modver],
-	    [AS_HELP_STRING([--with-k-modver=MAP],
-		[kernel module symbol versions @<:@default=K-BUILD-DIR/Module.symvers@:>@])])
-	if test :"${with_k_modver:-no}" != :no
-	then
-	    linux_cv_k_modver="$with_k_modver"
-	else
-	    eval "k_modver_search_path=\"
-		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/Module.symvers
-		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/Module.symvers
-		${kbuilddir}/Module.symvers-${kversion}
-		${kbuilddir}/Module.symvers
-		${DESTDIR}${rootdir}/boot/Module.symvers-${kversion}
-		${DESTDIR}${rootdir}/boot/Module.symvers
-		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/Module.symvers
-		${DESTDIR}/usr/src/kernels/${kversion}/Module.symvers
-		${DESTDIR}/boot/Module.symvers-${kversion}
-		${DESTDIR}/boot/Module.symvers\""
-	    k_modver_search_path=`echo "$k_modver_search_path" | sed -e 's|\<NONE\>||g;s|/\./|/|g;s|//|/|g'`
-	    linux_cv_k_modver=
-	    for linux_file in $k_modver_search_path ; do
-		AC_MSG_CHECKING([for kernel module ver... $linux_file])
-		if test -r $linux_file
-		then
-		    linux_cv_k_modver="$linux_file"
-		    AC_MSG_RESULT([yes])
-		    break
-		fi
-		AC_MSG_RESULT([no])
-	    done
-	fi
-	if test :"${linux_cv_k_modver:-no}" = :no
-	then
-	    if test :"${linux_cv_k_ko_modules:-no}" != :no
-	    then
-		if test :"${linux_cv_k_versions}" != :no -a ":${linux_cv_k_modversions}" != :no
-		then
-		    AC_MSG_WARN([
+    AC_ARG_WITH([k-modvers],
+	[AS_HELP_STRING([--with-k-modvers=MODVERS],
+	    [kernel module symbol versions @<:@default=K-BUILD-DIR/Module.symvers@:>@])],
+	[], [with_k_modvers=search])
+    _BLD_FIND_FILE([kernel module ver], [linux_cv_k_modvers], [
+	    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/Module.symvers
+	    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/Module.symvers
+	    ${kbuilddir}/Module.symvers-${kversion}
+	    ${kbuilddir}/Module.symvers
+	    ${DESTDIR}${rootdir}/boot/Module.symvers-${kversion}
+	    ${DESTDIR}${rootdir}/boot/Module.symvers
+	    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/Module.symvers
+	    ${DESTDIR}/usr/src/kernels/${kversion}/Module.symvers
+	    ${DESTDIR}/boot/Module.symvers-${kversion}
+	    ${DESTDIR}/boot/Module.symvers], [no], [dnl
+	if test ${with_k_modvers:-search} != no ; then
+	    if test ${linux_cv_k_ko_modules:-no} != no ; then
+		if test ${linux_cv_k_versions:-no} != no -a ${linux_cv_k_modversions:-no} != no ; then
+		    _BLD_INSTALL_WARN([MODULE_SYMVERS], [
 *** 
 *** Configure could not find the module versions file for kernel version
-*** "$kversion".  The locations searched were:
-***	    "$with_k_modver"
-***	    "$k_modver_search_path"
+*** "${kversion}".  The locations searched were:
+***	    "$with_k_modvers$bld_search_path"
 *** 
-*** This can cause problems later.  Please specify the absolute location
-*** of your kernel module versions file with option --with-k-modver
-*** before repeating.
+*** Perhaps you need to load the kernel development package (e.g.,
+*** kernel-develop) for kernel version "${kversion}".
+*** Kernel module versions cannot be checked without this file.  This
+*** can cause problems later.  If this is not what you want, load the
+*** kernel development package and rerun configure.  Try:
+*** ], [
+*** RHEL 5.x:   'yum install kernel-develop-"${kversion}"'], [
+***
+*** Repeat after loading the correct package, specifying the correct
+*** file using configure argument --with-k-modvers=MODVER, or by
+*** specifying the configure argument --without-k-modvers: continuing
+*** under the assumption that --without-k-modvers was intended.
 *** ])
+		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_k_modvers --without-k-modvers\""
+		    PACKAGE_DEPOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-k-modvers'"
+		    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-k-modvers'"
+		    with_k_modvers=no
 		fi
 	    fi
-	else
-	    if test :"$linux_cv_k_running" != :yes
-	    then
-		case "$linux_cv_k_modver" in
-		    (*/usr/src/kernels/*)
-			;;
-		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
-			case "$target_vendor" in
-			    (mandrake|mandriva|manbo)
-				;;
-			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
-				AC_MSG_WARN([
+	fi], [dnl
+	if test ${linux_cv_k_running:-no} != yes ; then
+	    case "${linux_cv_k_modvers}" in
+		(*/usr/src/kernels/*)
+		    ;;
+		(*/boot/*|*/usr/src/*|*/lib/modules/*)
+		    case "$target_vendor" in
+			(mandrake|mandriva|manbo)
+			    ;;
+			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
-*** 
-***	"$linux_cv_k_modver"
-*** 
+***
+***	"$linux_cv_k_modvers"
+***
 *** This may cause problems later if you have mismatches between the
 *** target kernel and the kernel symbols contained in that file.
 *** ])
 				;;
-			esac
-			;;
-		esac
-	    fi
-	fi
-	AC_MSG_CHECKING([for kernel module ver]) ])
-    kmodver="$linux_cv_k_modver"
+		    esac
+		    ;;
+	    esac
+	fi], [with_k_modvers])
+    if test ${linux_cv_k_modvers:-no} = no ; then
+	kmodver=
+    else
+	kmodver="$linux_cv_k_modvers"
+    fi
+    AM_CONDITIONAL([WITH_K_MODVERS], [test :"${with_k_modvers:-search}" != :no])dnl
     AC_SUBST([kmodver])dnl
 ])# _LINUX_CHECK_KERNEL_MODVER
 # =========================================================================
@@ -1412,7 +1406,7 @@ dnl				image name approach with the Redhat kernel version number in the
 dnl				kernel image name approach to yeild reliable system map files.
 dnl
 				;;
-			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
+			    (redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
 dnl
 dnl				Unfortunately the redhat system map files are unreliable because the
 dnl				are not unique for each architecture.  The system map file has to be
@@ -1497,70 +1491,66 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KALLSYMS], [dnl
 # performed properly.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
-    AC_CACHE_CHECK([for kernel symvers], [linux_cv_k_symvers], [dnl
-	AC_MSG_RESULT([searching...])
-	AC_ARG_WITH([k-symvers],
-	    [AS_HELP_STRING([--with-k-symvers=SYMVERS],
-		[kernel symbol versions @<:@default=/boot/symvers-KVERSION.gz@:>@])])
-	if test :"${with_k_symvers:-no}" != :no
-	then
-	    linux_cv_k_symvers="$with_k_symvers"
-	else
-	    eval "k_symvers_search_path=\"
-		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/symvers-${kversion}.gz
-		${kbuildir}/symvers-${kversion}.gz
-		${DESTDIR}${rootdir}/boot/symvers-${kversion}.gz
-		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/symvers-${kversion}.gz
-		${DESTDIR}/usr/src/kernels/${kversion}/symvers-${kversion}.gz
-		${DESTDIR}/boot/symvers-${kversion}.gz\""
-	    k_symvers_search_path=`echo "$k_symvers_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	    linux_cv_k_symvers=
-	    for linux_file in $k_symvers_search_path ; do
-		AC_MSG_CHECKING([for kernel symvers... $linux_file])
-		if test -r $linux_file
-		then
-		    linux_cv_k_symvers="$linux_file"
-		    AC_MSG_RESULT([yes])
-		    break
-		fi
-		AC_MSG_RESULT([no])
-	    done
-	fi
-	if test :"${linux_cv_k_symvers:-no}" = :no
-	then
-	    if test :"${linux_cv_k_ko_modules:-no}" != :no
-	    then
-		if test :"${linux_cv_k_versions}" != :no -a :"${linux_cv_k_modversions}" != :no
-		then
-		    # debian based systems don't have this file
-		    if test ":$deb_cv_debs:$deb_cv_dscs" != :yes:yes
-		    then
-			AC_MSG_WARN([
+    AC_ARG_WITH([k-symvers],
+	[AS_HELP_STRING([--with-k-symvers=SYMVERS],
+	    [kernel symbol versions @<:@default=/boot/symvers-KVERSION.gz@:>@])],
+	[], [with_k_symvers=search])
+    _BLD_FIND_FILE([kernel symvers], [linux_cv_k_symvers], [
+	    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/symvers-${kversion}.gz
+	    ${kbuildir}/symvers-${kversion}.gz
+	    ${DESTDIR}${rootdir}/boot/symvers-${kversion}.gz
+	    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/symvers-${kversion}.gz
+	    ${DESTDIR}/usr/src/kernels/${kversion}/symvers-${kversion}.gz
+	    ${DESTDIR}/boot/symvers-${kversion}.gz], [no], [dnl
+	if test ${with_k_symvers:-search} != no ; then
+	    if test ${linux_cv_k_ko_modules:-no} != no ; then
+		if test ${linux_cv_k_versions:-no} != no -a ${linux_cv_k_modversions:-no} != no ; then
+		    case "$target_vendor" in
+			# debian based systems do not have this file
+			(debian:*|ubuntu:*|mint:*)
+			    ;;
+			(centos|lineox|whitebox|scientific|fedora|redhat|rhel|suse|sle|sles|sled|opensuse)
+			    tmp_fn="symvers-${kversion}.gz"
+			    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+			    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
+			    _BLD_INSTALL_WARN([$tmp_fn], [
 *** 
 *** Configure could not find the symbol versions file for kernel version
-*** "$kversion".  The locations searched were:
-***	    "$with_k_symvers"
-***	    "$k_symvers_search_path"
+*** "${kversion}".  The locations searched were:
+***	    "$with_k_symvers$bld_search_path"
+*** 
+*** Perhaps you need to load the kernel development package (e.g.,
+*** kernel-develop) for kernel version "${kversion}".
+*** Kernel symbol sets cannot be checked without this file.  This can
+*** cause problems later.  If this is not what you want, load the kernel
+*** development package and rerun configure.  Try:
+*** ], [
+*** RHEL 5.x:   'yum install kernel-develop-"${kversion}"'], [
 ***
-*** This can cause problems later.  Please specify the absolute location
-*** of your kernel symbol versions file with option --with-k-symvers
-*** before repeating.
+*** Repeat after loading the correct package, specifying the correct
+*** file using configure argument --with-k-symvers=SYMVERS, or by
+*** specifying the configure argument --without-k-symvers: continuing
+*** under the assumption that --without-k-symvers was intended.
 *** ])
-		    fi
+			    ;;
+		    esac
+		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_k_symvers --without-k-symvers\""
+		    PACKAGE_DEPOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-k-symvers'"
+		    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-k-symvers'"
+		    with_k_symvers=no
 		fi
 	    fi
-	else
-	    if test :"$linux_cv_k_running" != :yes
-	    then
-		case "$linux_cv_k_symvers" in
-		    (*/usr/src/kernels/*)
-			;;
-		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
-			case "$target_vendor" in
-			    (mandrake|mandriva|manbo)
-				;;
-			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
-				AC_MSG_WARN([
+	fi], [dnl
+	if test ${linux_cv_k_running:-no} != yes ; then
+	    case "$linux_cv_k_symvers" in
+		(*/usr/src/kernels/*)
+		    ;;
+		(*/boot/*|*/usr/src/*|*/lib/modules/*)
+		    case "$target_vendor" in
+			(mandrake|mandriva|manbo)
+			    ;;
+			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
 ***
@@ -1569,14 +1559,17 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 *** This may cause problems later if you have mismatches between the
 *** target kernel and the kernel symbols contained in that file.
 *** ])
-				;;
-			esac
-			;;
-		esac
-	    fi
-	fi
-	AC_MSG_CHECKING([for kernel symvers]) ])
-    ksymvers="$linux_cv_k_symvers"
+			    ;;
+		    esac
+		    ;;
+	    esac
+	fi], [with_k_symvers])
+    if test ${linux_cv_k_symvers:-no} = no ; then
+	ksymvers=
+    else
+	ksymvers="$linux_cv_k_symvers"
+    fi
+    AM_CONDITIONAL([WITH_K_SYMVERS], [test :"${with_k_symvers:-search}" != :no])dnl
     AC_SUBST([ksymvers])dnl
 ])# _LINUX_CHECK_KERNEL_SYMVERS
 # =========================================================================
@@ -1585,74 +1578,65 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 # _LINUX_CHECK_KERNEL_MODABI
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
-    AC_CACHE_CHECK([for kernel module abi], [linux_cv_k_modabi], [dnl
-	AC_MSG_RESULT([searching...])
-	AC_ARG_WITH([k-modabi],
-	    [AS_HELP_STRING([--with-k-modabi=MAP],
-		[kernel module symbols in kabi @<:@default=K-BUILD-DIR/Module.kabi@:>@])])
-	if test :"${with_k_modabi:-no}" != :no
-	then
-	    linux_cv_k_modabi="$with_k_modabi"
-	else
-	    eval "k_modabi_search_path=\"
-		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/Module.kabi
-		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/Module.kabi
-		${kbuilddir}/Module.kabi-${kversion}
-		${kbuilddir}/Module.kabi
-		${DESTDIR}${rootdir}/boot/Module.kabi-${kversion}
-		${DESTDIR}${rootdir}/boot/Module.kabi
-		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/Module.kabi
-		${DESTDIR}/usr/src/kernels/${kversion}/Module.kabi
-		${DESTDIR}/boot/Module.kabi-${kversion}
-		${DESTDIR}/boot/Module.kabi\""
-	    k_modabi_search_path=`echo "$k_modabi_search_path" | sed -e 's|\<NONE\>||g;s|/\./|/|g;s|//|/|g'`
-	    linux_cv_k_modabi=
-	    for linux_file in $k_modabi_search_path ; do
-		AC_MSG_CHECKING([for kernel module abi... $linux_file])
-		if test -r $linux_file
-		then
-		    linux_cv_k_modabi="$linux_file"
-		    AC_MSG_RESULT([yes])
-		    break
-		fi
-		AC_MSG_RESULT([no])
-	    done
-	fi
-	if test :"${linux_cv_k_modabi:-no}" = :no
-	then
-	    if test :"${linux_cv_k_ko_modules:-no}" != :no
-	    then
-		if test :"${linux_cv_k_version}" != :no -a ":${linux_cv_k_modversion}" != :no
-		then
-		    case "$target_vendor" in
-			(redhat|centos|whitebox)
-			    AC_MSG_WARN([
+    AC_ARG_WITH([k-modabi],
+	[AS_HELP_STRING([--with-k-modabi=MAP],
+	    [kernel module symbols in kabi @<:@default=K-BUILD-DIR/Module.kabi@:>@])],
+	[], [with_k_modabi=search])
+    _BLD_FIND_FILE([kernel module abi], [linux_cv_k_modabi], [
+	    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/Module.kabi
+	    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/Module.kabi
+	    ${kbuilddir}/Module.kabi-${kversion}
+	    ${kbuilddir}/Module.kabi
+	    ${DESTDIR}${rootdir}/boot/Module.kabi-${kversion}
+	    ${DESTDIR}${rootdir}/boot/Module.kabi
+	    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/Module.kabi
+	    ${DESTDIR}/usr/src/kernels/${kversion}/Module.kabi
+	    ${DESTDIR}/boot/Module.kabi-${kversion}
+	    ${DESTDIR}/boot/Module.kabi], [no], [dnl
+	if test ${with_k_modabi:-search} != no ; then
+	    if test ${linux_cv_k_ko_modules:-no} != no ; then
+		if test ${linux_cv_k_versions:-no} != no -a ${linux_cv_k_modversions:-no} != no ; then
+		    case "$target_vendor:$target_edition" in
+			(redhat:[45]|centos:[45]|whitebox:[45]|scientific:[45])
+			    _BLD_INSTALL_WARN([MODULE_KABI], [
 *** 
 *** Configure could not find the module kABI file for kernel version
 *** "$kversion".  The locations searched were:
 ***	    "$with_k_modabi"
-***	    "$k_modabi_search_path"
+***	    "$bld_search_path"
 ***
-*** This can cause problems later.  Please specify the absolute location
-*** of your kernel module kABI file with option --with-k-modabi
-*** before repeating.
+*** Perhaps you need to load the kernel development package (e.g.,
+*** kernel-develop) for kernel version "${kversion}".
+*** Kernel symbols used cannot be checked against the abi without this
+*** file.  This can cause problems later.  If this is not what you want,
+*** load the kernel development package and rerun configure.  Try:
+*** ], [
+*** RHEL 5.x:   'yum install kernel-develop-${kversion}'], [
+***
+*** Repeat after loading the correct package, specifying the correct
+*** file using configure argument --with-k-modabi=MODABI, or by
+*** specifying the configure argument --without-k-modabi: continuing
+*** under the assumption that --without-k-modabi was intended.
 *** ])
 			    ;;
 		    esac
+		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_k_modabi --without-k-modabi\""
+		    PACKAGE_DEPOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-k-modabi'"
+		    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-k-modabi'"
+		    with_k_modabi=no
 		fi
 	    fi
-	else
-	    if test :"$linux_cv_k_running" != :yes
-	    then
-		case "$linux_cv_k_modabi" in
-		    (*/usr/src/kernels/*)
-			;;
-		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
-			case "$target_vendor" in
-			    (mandrake|mandriva|manbo)
-				;;
-			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
-				AC_MSG_WARN([
+	fi], [dnl
+	if test ${linux_cv_k_running:-no} != yes ; then
+	    case "$linux_cv_k_modabi" in
+		(*/usr/src/kernels/*)
+		    ;;
+		(*/boot/*|*/usr/src/*|*/lib/modules/*)
+		    case "$target_vendor" in
+			(mandrake|mandriva|manbo)
+			    ;;
+			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
 *** 
@@ -1661,14 +1645,17 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
 *** This may cause problems later if you have mismatches between the
 *** target kernel and the kernel symbols contained in that file.
 *** ])
-				;;
-			esac
-			;;
-		esac
-	    fi
-	fi
-	AC_MSG_CHECKING([for kernel module abi]) ])
-    kmodabi="$linux_cv_k_modabi"
+			    ;;
+		    esac
+		    ;;
+	    esac
+	fi], [with_k_modabi])
+    if test ${linux_cv_k_modabi:-no} = no ; then
+	kmodabi=
+    else
+	kmodabi="$linux_cv_k_modabi"
+    fi
+    AM_CONDITIONAL([WITH_K_MODABI], [test :"${with_k_modabi:-search}" != :no])dnl
     AC_SUBST([kmodabi])dnl
 ])# _LINUX_CHECK_KERNEL_MODABI
 # =========================================================================
@@ -1681,74 +1668,68 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
 # properly.
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
-    AC_CACHE_CHECK([for kernel symsets], [linux_cv_k_symsets], [dnl
-	AC_MSG_RESULT([searching...])
-	AC_ARG_WITH([k-symsets],
-	    [AS_HELP_STRING([--with-k-symsets=SYMVERS],
-		[kernel symbol versions @<:@default=/boot/symsets-KVERSION.tar.gz@:>@])])
-	if test :"${with_k_symsets:-no}" != :no
-	then
-	    linux_cv_k_symsets="$with_k_symsets"
-	else
-	    eval "k_symsets_search_path=\"
-		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/symsets-${kversion}.tar.gz
-		${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/symsets-${kversion}.tar.gz
-		${kbuildir}/symsets-${kversion}.tar.gz
-		${DESTDIR}${rootdir}/boot/symsets-${kversion}.tar.gz
-		${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/symsets-${kversion}.tar.gz
-		${DESTDIR}/usr/src/kernels/${kversion}/symsets-${kversion}.tar.gz
-		${DESTDIR}/boot/symsets-${kversion}.tar.gz\""
-	    k_symsets_search_path=`echo "$k_symsets_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
-	    linux_cv_k_symsets=
-	    for linux_file in $k_symsets_search_path ; do
-		AC_MSG_CHECKING([for kernel symsets... $linux_file])
-		if test -r $linux_file
-		then
-		    linux_cv_k_symsets="$linux_file"
-		    AC_MSG_RESULT([yes])
-		    break
-		fi
-		AC_MSG_RESULT([no])
-	    done
-	fi
-	if test :"${linux_cv_k_symsets:-no}" = :no
-	then
-	    if test :"${linux_cv_k_ko_modules:-no}" != :no
-	    then
-		if test :"${linux_cv_k_versions}" != :no -a :"${linux_cv_k_modversions}" != :no
-		then
-		    case "$target_vendor" in
-			(centos|lineox|whitebox|fedora|redhat|rhel|suse|sle|sles|sled|opensuse)
-			    AC_MSG_WARN([
+    AC_ARG_WITH([k-symsets],
+	[AS_HELP_STRING([--with-k-symsets=SYMVERS],
+	    [kernel symbol versions @<:@default=/boot/symsets-KVERSION.tar.gz@:>@])],
+	[], [with_k_symsets=search])
+    _BLD_FIND_FILE([kernel symsets], [linux_cv_k_symsets], [
+	    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}-${kmarch}/symsets-${kversion}.tar.gz
+	    ${DESTDIR}${rootdir}/usr/src/kernels/${kversion}/symsets-${kversion}.tar.gz
+	    ${kbuildir}/symsets-${kversion}.tar.gz
+	    ${DESTDIR}${rootdir}/boot/symsets-${kversion}.tar.gz
+	    ${DESTDIR}/usr/src/kernels/${kversion}-${kmarch}/symsets-${kversion}.tar.gz
+	    ${DESTDIR}/usr/src/kernels/${kversion}/symsets-${kversion}.tar.gz
+	    ${DESTDIR}/boot/symsets-${kversion}.tar.gz], [no], [dnl
+	if test ${with_k_symsets:-search} != no ; then
+	    if test ${linux_cv_k_ko_modules:-no} != no ; then
+		if test ${linux_cv_k_versions:-no} != no -a ${linux_cv_k_modversions:-no} != no ; then
+		    case "$target_vendor:$target_edition" in
+			(centos:[345]|lineox:[345]|whitebox:[345]|scientific:[345]|fedora:*|redhat:[345]|rhel:[345]|\
+			 suse:9|suse:1[012]|sle:9|sle:1[012]|sles:9|sles:1[012]|sled:9|sled:1[012]|opensuse:9|opensuse:1[012])
+			    tmp_fn="symsets-${kversion}.tar.gz"
+			    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+			    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
+			    _BLD_INSTALL_WARN([$tmp_fn], [
 *** 
 *** Configure could not find the symbol sets file for kernel version
-*** "$kversion".  The locations searched were:
-***	    "$with_k_symsets"
-***	    "$k_symsets_search_path"
+*** "${kversion}".  The locations searched were:
+***	    "$with_k_symsets$bld_search_path"
+*** 
+*** Perhaps you need to load the kernel development package (e.g.,
+*** kernel-develop) for kernel version "${kversion}".
+*** Kernel symbol sets cannot be checked without this file.  This can
+*** cause problems later.  If this is not what you want, load the kernel
+*** development package and rerun configure.  Try:
+*** ], [
+*** RHEL 5.x:   'yum install kernel-develop-"${kversion}"'], [
 ***
-*** This can cause problems later.  Please specify the absolute location
-*** of your kernel symbol versions file with option --with-k-symsets
-*** before repeating.
+*** Repeat after loading the correct package, specifying the correct
+*** file using configure argument --with-k-symsets=SYMSETS, or by
+*** specifying the configure argument --without-k-symsets: continuing
+*** under the assumption that --without-k-symsets was intended.
 *** ])
 			    ;;
 			# debian and some rpm based systems do not have this file
-			(debian|ubuntu|mint|mandrake|mandriva|manbo|*)
+			(debian:*|ubuntu:*|mint:*|mandrake:*|mandriva:*|manbo:*|*)
 			    ;;
 		    esac
+		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_k_symsets --without-k-symsets\""
+		    PACKAGE_DEPOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-k-symsets'"
+		    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-k-symsets'"
+		    with_k_symsets=no
 		fi
 	    fi
-	else
-	    if test :"$linux_cv_k_running" != :yes
-	    then
-		case "$linux_cv_k_symsets" in
-		    (*/usr/src/kernels/*)
-			;;
-		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
-			case "$target_vendor" in
-			    (mandrake|mandriva|manbo)
-				;;
-			    (redhat|centos|whitebox|debian|ubuntu|suse|*)
-				AC_MSG_WARN([
+	fi], [dnl
+	if test ${linux_cv_k_running:-no} != yes ; then
+	    case "${linux_cv_k_symsets}" in
+		(*/usr/src/kernels/*)
+		    ;;
+		(*/boot/*|*/usr/src/*|*/lib/modules/*)
+		    case "$target_vendor" in
+			(mandrake|mandriva|manbo)
+			    ;;
+			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
 ***
@@ -1758,15 +1739,81 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 *** target kernel and the kernel symbols contained in that file.
 *** ])
 				;;
-			esac
-			;;
-		esac
-	    fi
-	fi
-	AC_MSG_CHECKING([for kernel symsets]) ])
-    ksymsets="$linux_cv_k_symsets"
+		    esac
+		    ;;
+	    esac
+	fi], [with_k_symsets])
+    if test ${linux_cv_k_symsets:-no} = no ; then
+	ksymsets=
+    else
+	ksymsets="$linux_cv_k_symsets"
+    fi
+    AM_CONDITIONAL([WITH_K_SYMSETS], [test :"${with_k_symsets:-search}" != :no])dnl
     AC_SUBST([ksymsets])dnl
 ])# _LINUX_CHECK_KERNEL_SYMSETS
+# =========================================================================
+
+# =========================================================================
+# _LINUX_CHECK_KERNEL_KABI
+# -------------------------------------------------------------------------
+# Starting with RHEL6.0, RHEL kernels publish a separate kABI whitelist that may
+# be used to enforce non-loading of kernel module packages that use symbols not
+# provided in the kABI whitelist.  The directory is under /lib/modules/kabi and
+# contains files such as: kabi_whitelist_$(arch).  The files contain a .ini
+# style header [rhel6_$(arch)_whitelist] and then a list of tab indented symbol
+# names.
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_KABI], [dnl
+    AC_ARG_WITH([kabi-whitelist],
+	[AS_HELP_STRING([--with-kabi-whitelist=WHITELIST],
+			[kABI whitelist file @<:@default=/lib/modules/kabi/kabi_whitelist_ARCH@:>@])],
+	[], [with_kabi_whitelist=search])
+    _BLD_FIND_FILE([kernel kABI whitelist], [linux_cv_kabi_whitelist], [
+	    ${DESTDIR}${rootdir}/lib/modules/kabi/kabi_whitelist_${karch}
+	    ${DESTDIR}/lib/modules/kabi/kabi_whitelist_${karch}], [no], [dnl
+	if test ${with_kabi_whitelist:-search} != no ; then
+	    case "$target_vendor:$target_edition" in
+		(redhat:6|centos:6|scientific:6)
+		    tmp_fn="kabi_whitelist_${karch}"
+		    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
+		    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
+		    _BLD_INSTALL_WARN([$tmp_fn], [
+*** 
+*** Configure cannot find the kABI whitelist:
+***
+***	/lib/modules/kabi/kabi_whitelist_${karch}
+***
+*** Perhaps you need to load the kABI whitelist package (e.g.,
+*** kabi-whitelist).  Kernel symbols cannot be checked against the
+*** whitelist without this file.  This can cause problems later.
+*** If this is not what you want, load the kABI whitelist package
+*** and rerun configure.  Try:
+*** ], [
+*** RHEL 6.x:   'yum install kabi-whitelist'
+*** CentOS 6.x: 'yum install kabi-whitelist'
+*** SL 6.x:     'yum install kabi-whitelist'], [
+***
+*** Repeat after loading the correct package, specifying the correct
+*** file using configure argument --with-kabi-whitelist=WHITELIST,
+*** or by specifying the configure argument --without-kabi-whitelist:
+*** continuing under the assumption that --without-kabi-whitelist was
+*** intended.
+*** ])
+		    ;;
+	    esac
+	    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_kabi_whitelist --without-kabi-whitelist\""
+	    PACKAGE_DEPOPTIONS="${PACKAGE_DEBOPTIONS:+$PACKAGE_DEBOPTIONS }'--without-kabi-whitelist'"
+	    ac_configure_args="${ac_configure_args:+$ac_configure_args }'--without-kabi-whitelist'"
+	    with_kabi_whitelist=no
+	fi], [], [with_kabi_whitelist])
+    if test ${linux_cv_kabi_whitelist:-no} = no ; then
+	kabiwhitelist=
+    else
+	kabiwhitelist="$linux_cv_kabi_whitelist"
+    fi
+    AM_CONDITIONAL([WITH_KABI_WHITELIST], [test :"${with_kabi_whitelist:-search}" != :no])dnl
+    AC_SUBST([kabiwhitelist])dnl
+])# _LINUX_CHECK_KERNEL_KABI
 # =========================================================================
 
 # =========================================================================
@@ -2399,7 +2446,7 @@ dnl
 		    linux_cv_vers="${linux_cv_vers:+$linux_cv_vers }'$linux_ver'"
 		done
 		;;
-	    (redhat|centos|whitebox|suse)
+	    (redhat|centos|whitebox|scientific|suse)
 dnl
 dnl		Redhat and variants can have a mismatch in kernel architecture.
 dnl

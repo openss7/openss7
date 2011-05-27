@@ -162,6 +162,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    /etc/mandrake-release
 	    /etc/redhat-release
 	    /etc/SuSE-release
+	    /etc/system-release
 	    /etc/debian_version\""
 	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
 	for dist_file in $dist_search_path
@@ -199,21 +200,22 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	 for some stupid reason).  Also expect Mandrake to change to Mandriva any day soon.])], [dnl
 dnl AC_MSG_WARN([checking for flavor in $[1]])
     case "$[1]" in
-	(*CentOS*|*CENTOS*)				echo 'centos'	;;
-	(*Lineox*|*LINEOX*)				echo 'lineox'	;;
-	(*White?Box*|*WHITE?BOX*)			echo 'whitebox'	;;
-	(*Fedora*|*FEDORA*)				echo 'fedora'	;;
-	(*Mandrake*|*MANDRAKE*)				echo 'mandrake'	;;
-	(*Mandriva*|*MANDRIVA*)				echo 'mandriva'	;;
-	(*Manbo*|*MANBO*)				echo 'manbo'	;;
-	(*Red?Hat?Enterprise*)				echo 'rhel'	;;
-	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	;;
-	(*SUSE?Linux?Enterprise?Server*)		echo 'sles'	;;
-	(*SUSE?Linux?Enterprise?Desktop*)		echo 'sled'	;;
-	(*SUSE?Linux?Enterprise*)			echo 'sle'	;;
-	(*SuSE*|*SUSE*|*Novell*|*NOVELL*)		echo 'suse'	;;
-	(*Debian*|*DEBIAN*)				echo 'debian'	;;
-	(*Ubuntu*|*UBUNTU*)				echo 'ubuntu'	;;
+	(*CentOS*|*CENTOS*)				echo 'centos'	  ;;
+	(*Lineox*|*LINEOX*)				echo 'lineox'	  ;;
+	(*White?Box*|*WHITE?BOX*)			echo 'whitebox'	  ;;
+	(*Scientific*|*SCIENTIFIC*)			echo 'scientific' ;;
+	(*Fedora*|*FEDORA*)				echo 'fedora'	  ;;
+	(*Mandrake*|*MANDRAKE*)				echo 'mandrake'	  ;;
+	(*Mandriva*|*MANDRIVA*)				echo 'mandriva'	  ;;
+	(*Manbo*|*MANBO*)				echo 'manbo'	  ;;
+	(*Red?Hat?Enterprise*)				echo 'rhel'	  ;;
+	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	  ;;
+	(*SUSE?Linux?Enterprise?Server*)		echo 'sles'	  ;;
+	(*SUSE?Linux?Enterprise?Desktop*)		echo 'sled'	  ;;
+	(*SUSE?Linux?Enterprise*)			echo 'sle'	  ;;
+	(*SuSE*|*SUSE*|*Novell*|*NOVELL*)		echo 'suse'	  ;;
+	(*Debian*|*DEBIAN*)				echo 'debian'	  ;;
+	(*Ubuntu*|*UBUNTU*)				echo 'ubuntu'	  ;;
     esac])
     AC_CACHE_CHECK([for dist build flavor], [dist_cv_build_flavor], [dnl
 	if test -z "$dist_cv_build_flavor" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
@@ -255,18 +257,19 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	 vendor.])], [dnl
 dnl AC_MSG_WARN([checking for vendor in $[1]])
     case "$[1]" in
-	(centos)			echo 'centos'	;;
-	(lineox)			echo 'lineox'	;;
-	(whitebox)			echo 'whitebox'	;;
-	(mandrake)			echo 'mandrake'	;;
-	(mandriva)			echo 'mandriva'	;;
-	(manbo)				echo 'manbo'	;;
-	(fedora|redhat|rhel)		echo 'redhat'	;;
-	(suse|sle|sles|sled|opensuse)	echo 'suse'	;;
-	(debian)			echo 'debian'	;;
-	(ubuntu)			echo 'ubuntu'	;;
-	(unknown)			echo 'pc'	;;
-	(*)				echo "$[1]"	;;
+	(centos)			echo 'centos'	  ;;
+	(lineox)			echo 'lineox'	  ;;
+	(whitebox)			echo 'whitebox'	  ;;
+	(scientific)			echo 'scientific' ;;
+	(mandrake)			echo 'mandrake'	  ;;
+	(mandriva)			echo 'mandriva'	  ;;
+	(manbo)				echo 'manbo'	  ;;
+	(fedora|redhat|rhel)		echo 'redhat'	  ;;
+	(suse|sle|sles|sled|opensuse)	echo 'suse'	  ;;
+	(debian)			echo 'debian'	  ;;
+	(ubuntu)			echo 'ubuntu'	  ;;
+	(unknown)			echo 'pc'	  ;;
+	(*)				echo "$[1]"	  ;;
     esac])
     AC_CACHE_CHECK([for dist build vendor], [dist_cv_build_vendor], [dnl
 	dist_cv_build_vendor=$(dist_get_vendor "${dist_cv_build_flavor:-unknown}")
@@ -321,6 +324,7 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 	(centos)	echo 'CentOS Enterprise Linux' ;;
 	(lineox)	echo 'Lineox Enterprise Linux' ;;
 	(whitebox)	echo 'White Box Enterprise Linux' ;;
+	(scientific)	echo 'Scientific Linux' ;;
 	(fedora)	echo 'Fedora' ;;
 	(mandrake)	echo 'Mandrake Linux' ;;
 	(mandriva)	echo 'Mandriva Linux' ;;
@@ -398,7 +402,7 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 	case "$dist_cv_build_distro" in
 	    (suse)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
-	    (centos|lineox|whitebox|rhel|sle)
+	    (centos|lineox|whitebox|scientific|rhel|sle)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,\..*[$],,'` ;;
 	    (fedora|mandrake|mandriva|manbo|redhat)
 		dist_tmp="${dist_cv_build_release}" ;;
@@ -457,6 +461,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	    ${DESTDIR}${sysconfdir}/mandrake-release
 	    ${DESTDIR}${sysconfdir}/redhat-release
 	    ${DESTDIR}${sysconfdir}/SuSE-release
+	    ${DESTDIR}${sysconfdir}/system-release
 	    ${DESTDIR}${sysconfdir}/debian_version\""
 	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
 	for dist_file in $dist_search_path
@@ -613,7 +618,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	case "$dist_cv_host_distro" in
 	    (suse)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
-	    (centos|lineox|whitebox|rhel|sle)
+	    (centos|lineox|whitebox|scientific|rhel|sle)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,\..*[$],,'` ;;
 	    (fedora|mandrake|mandriva|manbo|redhat)
 		dist_tmp="${dist_cv_host_release}" ;;
@@ -669,7 +674,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     AC_MSG_CHECKING([build system type])
     build_vendor="$dist_cv_build_vendor"
     case "$build_vendor" in
-	(centos|lineox|whitebox|redhat|suse|debian)  
+	(centos|lineox|whitebox|scientific|redhat|suse|debian)  
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
 	(mandrake|mandriva|manbo|ubuntu)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
@@ -692,7 +697,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	host_vendor="$dist_cv_host_vendor"
 	case "$host_vendor" in
-	    (centos|lineox|whitebox|redhat|suse|debian)  
+	    (centos|lineox|whitebox|scientific|redhat|suse|debian)  
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
 	    (mandrake|mandriva|manbo|ubuntu)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
@@ -714,7 +719,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	target_vendor="$dist_cv_host_vendor"
 	case "$target_vendor" in
-	    (centos|lineox|whitebox|redhat|suse|debian)  
+	    (centos|lineox|whitebox|scientific|redhat|suse|debian)  
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
 	    (mandrake|mandriva|manbo|ubuntu)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;
