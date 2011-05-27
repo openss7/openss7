@@ -77,8 +77,12 @@ AC_DEFUN([_REPO_OPTIONS], [dnl
 	[], [with_install_source_yum=search])
     AC_ARG_WITH([install-source-zypp],
 	[AS_HELP_STRING([--with-install-source-zypp=@<:@REPODIR@:>@],
-	    [ZYPP repo directory @<:@default=search@;>@])],
+	    [ZYPP repo directory @<:@default=search@:>@])],
 	[], [with_install_source_zypp=search])
+    AC_ARG_WITH([install-source-urpmi],
+	[AS_HELP_STRING([--with-install-source-urpmi=@<:@MEDIACFGDIR@:>@],
+	    [URPMI repo directory @<:@default=search@:>@])],
+	[], [with_install_source_urpmi=search])
     AC_ARG_WITH([install-source-apt],
 	[AS_HELP_STRING([--with-install-source-apt=@<:@SOURCESDIR@:>@],
 	    [APT sources directory @<:@default=search@:>@])],
@@ -106,6 +110,19 @@ AC_DEFUN([_REPO_OPTIONS], [dnl
 # _REPO_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP], [dnl
+    _REPO_SETUP_URL
+    _REPO_SETUP_RPM
+    _REPO_SETUP_YUM
+    _REPO_SETUP_ZYPP
+    _REPO_SETUP_URPMI
+    _REPO_SETUP_APT
+])# _REPO_SETUP
+# =============================================================================
+
+# =============================================================================
+# _REPO_SETUP_URL
+# -----------------------------------------------------------------------------
+AC_DEFUN([_REPO_SETUP_URL], [dnl
     AC_MSG_CHECKING([for repo root])
     repo_cv_reporoot="${with_repo_root:-repo}"
     AC_MSG_RESULT(["$repo_cv_reporoot"])
@@ -121,6 +138,41 @@ AC_DEFUN([_REPO_SETUP], [dnl
     AC_MSG_CHECKING([for repo subdirectory])
     repo_cv_dist_subdir="${host_distro}/${host_edition}/${host_cpu}"
     AC_MSG_RESULT(["$repo_cv_dist_subdir"])
+])# _REPO_SETUP_URL
+# =============================================================================
+
+# =============================================================================
+# _REPO_SETUP_RPM
+# -----------------------------------------------------------------------------
+AC_DEFUN([_REPO_SETUP_RPM], [dnl
+    AC_CACHE_CHECK([for rpm gpg directory], [repo_cv_rpm_gpgdir], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${rootdir}${sysconfdir}/pki/rpm-gpg
+	    ${DESTDIR}${rootdir}/etc/pki/rpm-gpg
+	    ${DESTDIR}${sysconfdir}/pki/rpm-gpg
+	    ${DESTDIR}/etc/pki/rpm-gpg\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for rpm gpg directory... $repo_dir])
+	    if test -d "$repo_dir" ; then
+		repo_cv_rpm_gpgdir="$repo_dir"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_rpm_gpgdir" || repo_cv_rpm_gpgdir=no
+	AC_MSG_CHECKING([for rpm gpg directory])
+    ])
+])# _REPO_SETUP_RPM
+# =============================================================================
+
+# =============================================================================
+# _REPO_SETUP_YUM
+# -----------------------------------------------------------------------------
+AC_DEFUN([_REPO_SETUP_YUM], [dnl
     AC_CACHE_CHECK([for yum repo directory], [repo_cv_yum_repodir], [dnl
 	case "${with_install_source_yum:-search}" in
 	    (no) repo_cv_yum_repodir=no ;;
@@ -176,27 +228,13 @@ AC_DEFUN([_REPO_SETUP], [dnl
 	test -n "$repo_cv_yum_kmodconf" || repo_cv_yum_kmodconf=no
 	AC_MSG_CHECKING([for yum kmod config file])
     ])
-    AC_CACHE_CHECK([for rpm gpg directory], [repo_cv_rpm_gpgdir], [dnl
-	eval "repo_search_path=\"
-	    ${DESTDIR}${rootdir}${sysconfdir}/pki/rpm-gpg
-	    ${DESTDIR}${rootdir}/etc/pki/rpm-gpg
-	    ${DESTDIR}${sysconfdir}/pki/rpm-gpg
-	    ${DESTDIR}/etc/pki/rpm-gpg\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
-	AC_MSG_RESULT([searching])
-	for repo_dir in $repo_search_path ; do
-	    AC_MSG_CHECKING([for rpm gpg directory... $repo_dir])
-	    if test -d "$repo_dir" ; then
-		repo_cv_rpm_gpgdir="$repo_dir"
-		AC_MSG_RESULT([yes])
-		break
-	    else
-		AC_MSG_RESULT([no])
-	    fi
-	done
-	test -n "$repo_cv_rpm_gpgdir" || repo_cv_rpm_gpgdir=no
-	AC_MSG_CHECKING([for rpm gpg directory])
-    ])
+])# _REPO_SETUP_YUM
+# =============================================================================
+
+# =============================================================================
+# _REPO_SETUP_ZYPP
+# -----------------------------------------------------------------------------
+AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
     AC_CACHE_CHECK([for zypp cred directory], [repo_cv_zypp_creddir], [dnl
 	case "${with_credentials_zypp:-search}" in
 	    (no) repo_cv_zypp_creddir=no ;;
@@ -308,6 +346,50 @@ AC_DEFUN([_REPO_SETUP], [dnl
 	test -n "$repo_cv_zypp_config" || repo_cv_zypp_config=no
 	AC_MSG_CHECKING([for zypp config file])
     ])
+])# _REPO_SETUP_ZYPP
+# =============================================================================
+
+# =============================================================================
+# _REPO_SETUP_URPMI
+# -----------------------------------------------------------------------------
+AC_DEFUN([_REPO_SETUP_URPMI], [dnl
+    AC_CACHE_CHECK([for urpmi media directory], [repo_cv_urpmi_repodir], [dnl
+	case "${with_install_source_urpmi:-search}" in
+	    (no) repo_cv_urpmi_repodir=no ;;
+	    (yes|search) ;;
+	    (*) if test -d "$with_install_source_urpmi" ; then
+		    repo_cv_urpmi_repodir="$with_install_source_urpmi"
+		fi ;;
+	esac
+	if test -z "$repo_cv_urpmi_repodir" ; then
+	    eval "repo_search_path=\"
+		${DESTDIR}${rootdir}${sysconfdir}/urpmi/mediacfg.d
+		${DESTDIR}${rootdir}/etc/urpmi/mediacfg.d
+		${DESTDIR}${sysconfdir}/urpmi/mediacfg.d
+		${DESTDIR}/etc/urpmi/mediacfg.d\""
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    AC_MSG_RESULT([searching])
+	    for repo_dir in $repo_search_path ; do
+		AC_MSG_CHECKING([for urpmi media directory... $repo_dir])
+		if test -d "$repo_dir" ; then
+		    repo_cv_urpmi_repodir="$repo_dir"
+		    AC_MSG_RESULT([yes])
+		    break
+		else
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    test -n "$repo_cv_urpmi_repodir" || repo_cv_urpmi_repodir=no
+	    AC_MSG_CHECKING([for urpmi media directory])
+	fi
+    ])
+])# _REPO_SETUP_URPMI
+# =============================================================================
+
+# =============================================================================
+# _REPO_SETUP_APT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_REPO_SETUP_APT], [dnl
     AC_CACHE_CHECK([for apt sources directory], [repo_cv_apt_repodir], [dnl
 	case "${with_install_source_apt:-search}" in
 	    (no) repo_cv_apt_repodir=no ;;
@@ -359,7 +441,7 @@ AC_DEFUN([_REPO_SETUP], [dnl
 	test -n "$repo_cv_apt_gpgdir" || repo_cv_apt_gpgdir=no
 	AC_MSG_CHECKING([for apt gpg directory])
     ])
-])# _REPO_SETUP
+])# _REPO_SETUP_APT
 # =============================================================================
 
 # =============================================================================
@@ -397,7 +479,7 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	yumrepodir="$repo_cv_yum_repodir"
     fi
     AC_SUBST([yumrepodir])dnl
-    AM_CONDITIONAL([WITH_YUM_SOURCE], [test :"${repo_cv_yum_repodir:-no}" != :no])
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_YUM], [test :"${repo_cv_yum_repodir:-no}" != :no])
     yumkmodconf=
     if test "${repo_cv_yum_kmodconf:-no}" != :no ; then
 	yumkmodconf="$repo_cv_yum_kmodconf"
@@ -423,18 +505,24 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	zypprepodir="$repo_cv_zypp_repodir"
     fi
     AC_SUBST([zypprepodir])dnl
-    AM_CONDITIONAL([WITH_ZYPP_SOURCE], [test :"${repo_cv_zypp_repodir:-no}" != :no])
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_ZYPP], [test :"${repo_cv_zypp_repodir:-no}" != :no])
     zyppconfig=
     if test :"${repo_cv_zypp_config:-no}" != :no ; then
 	zyppconfig="$repo_cv_zypp_config"
     fi
     AC_SUBST([zyppconfig])dnl
+    urpmirepodir=
+    if test :"${repo_cv_urpmi_repodir:-no}" != :no ; then
+	urpmirepodir="$repo_cv_urpmi_repodir"
+    fi
+    AC_SUBST([urpmirepodir])dnl
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_URPMI], [test :"${repo_cv_urpmi_repodir:-no}" != :no])
     aptrepodir=
     if test :"${repo_cv_apt_repodir:-no}" != :no ; then
 	aptrepodir="$repo_cv_apt_repodir"
     fi
     AC_SUBST([aptrepodir])dnl
-    AM_CONDITIONAL([WITH_APT_SOURCE], [test :"${repo_cv_apt_repodir:-no}" != :no])
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_APT], [test :"${repo_cv_apt_repodir:-no}" != :no])
     aptgpgdir=
     if test :"${repo_cv_apt_gpgdir:-no}" != :no ; then
 	aptgpgdir="$repo_cv_apt_gpgdir"

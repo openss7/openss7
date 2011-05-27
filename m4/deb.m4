@@ -213,14 +213,18 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
     fi
     AC_MSG_RESULT([$debdir])
     AC_SUBST([debdir])dnl
-    debmaindir='$(debdir)/main'
-    AC_SUBST([debmaindir])dnl
-    debdebgdir='$(debdir)/debug'
-    AC_SUBST([debdebgdir])dnl
-    debdevldir='$(debdir)/devel'
-    AC_SUBST([debdevldir])dnl
-    debsrcsdir='$(debdir)/source'
-    AC_SUBST([debsrcsdir])dnl
+    aptdir='$(debdistdir)'
+    AC_SUBST([aptdir])dnl
+    aptfulldir='$(debdir)'
+    AC_SUBST([aptfulldir])dnl
+    aptmaindir='$(debdir)/main'
+    AC_SUBST([aptmaindir])dnl
+    aptdebgdir='$(debdir)/debug'
+    AC_SUBST([aptdebgdir])dnl
+    aptdevldir='$(debdir)/devel'
+    AC_SUBST([aptdevldir])dnl
+    aptsrcsdir='$(debdir)/source'
+    AC_SUBST([aptsrcsdir])dnl
     AC_MSG_CHECKING([for deb BUILD directory])
     if test ":${debbuilddir+set}" != :set ; then
 	# debbuilddir needs to be absolute: always build in the top build

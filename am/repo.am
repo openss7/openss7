@@ -54,7 +54,8 @@
 
 if PKG_BUILD_INDEP
 
-if WITH_YUM_SOURCE
+if WITH_INSTALL_SOURCE_YUM
+## WITH_INSTALL_SOURCE_YUM
 
 $(PACKAGE).yum.repo: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
@@ -78,6 +79,7 @@ $(PACKAGE).yum.repo: Makefile
 INSTALL_YUM_REPOS = $(PACKAGE).yum.repo
 
 if MAINTAINER_MODE
+## MAINTAINER_MODE
 
 $(PACKAGE)-local.yum.repo: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
@@ -286,10 +288,11 @@ repo-uninstall-yum:
 REPO_INSTALL			+= repo-install-yum
 REPO_UNINSTALL			+= repo-uninstall-yum
 
-## WITH_YUM_SOURCE
+## WITH_INSTALL_SOURCE_YUM
 endif
 
-if WITH_ZYPP_SOURCE
+if WITH_INSTALL_SOURCE_ZYPP
+## WITH_INSTALL_SOURCE_ZYPP
 
 $(PACKAGE_UCNAME).zypp.credentials: Makefile
 	( \
@@ -330,6 +333,7 @@ $(PACKAGE).zypp.repo: Makefile
 INSTALL_ZYPP_REPOS = $(PACKAGE).zypp.repo
 
 if MAINTAINER_MODE
+## MAINTAINER_MODE
 
 ##
 ## The only purpose for making this file in the build directory before installing it is for
@@ -540,10 +544,35 @@ repo-uninstall-zypp:
 REPO_INSTALL			+= repo-install-zypp
 REPO_UNINSTALL			+= repo-uninstall-zypp
 
-## WITH_ZYPP_SOURCE
+## WITH_INSTALL_SOURCE_ZYPP
 endif
 
-if WITH_APT_SOURCE
+if WITH_INSTALL_SOURCE_URPMI
+## WITH_INSTALL_SOURCE_URPMI
+
+$(PACKAGE).media.cfg: Makefile
+
+$(PACKAGE).url: Makefile
+
+$(PACKAGE).mirrorlist: Makefile
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+$(PACKAGE)-local.media.cfg: Makefile
+
+$(PACKAGE)-local.url: Makefile
+
+$(PACKAGE)-local.mirrorlist: Makefile
+
+## MAINTAINER_MODE
+endif
+
+## WITH_INSTALL_SOURCE_URPMI
+endif
+
+if WITH_INSTALL_SOURCE_APT
+## WITH_INSTALL_SOURCE_APT
 
 $(PACKAGE).sources.list: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
@@ -565,6 +594,7 @@ $(PACKAGE).sources.list: Makefile
 INSTALL_APT_SRCES = $(PACKAGE).sources.list
 
 if MAINTAINER_MODE
+## MAINTAINER_MODE
 
 $(PACKAGE)-local.sources.list: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
@@ -734,7 +764,7 @@ repo-uninstall-apt:
 REPO_INSTALL			+= repo-install-apt
 REPO_UNINSTALL			+= repo-uninistall-apt
 
-## WITH_APT_SOURCE
+## WITH_INSTALL_SOURCE_APT
 endif
 
 ## PKG_BUILD_INDEP
