@@ -270,8 +270,13 @@ SLEEP_ALLOC(int arg, lkinfo_t * lkinfop, int flag)
 {
 	sleep_t *lockp;
 
-	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
+	if ((lockp = kmem_alloc(sizeof(*lockp), flag))) {
+#if defined init_MUTEX
 		init_MUTEX(lockp);
+#else
+		sema_init(lockp, 1);
+#endif
+	}
 	return (lockp);
 }
 __SVR4_EXTERN_INLINE void
