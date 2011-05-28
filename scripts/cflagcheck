@@ -91,7 +91,11 @@ cppflag-check:
 
 .PHONY: modflag-check
 modflag-check:
-	@echo "$(MODFLAGS)"
+	@echo "$(MODFLAGS)$(KBUILD_CFLAGS_MODULE) $(CFLAGS_MODULE)"
+
+.PHONY: ldflag-check
+ldflag-check:
+	@echo "$(LDFLAGS) $(LDFLAGS_MODULE) $(KBUILD_LDFLAGS_MODULE)"
 
 .PHONY: bldflag-check
 bldflag-check:
