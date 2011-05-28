@@ -308,6 +308,8 @@ MODULE_ALIAS("/dev/streams/*");
 
 #if   defined HAVE_FILE_MOVE_SYMBOL
 extern void file_move(struct file *file, struct list_head *list);
+#elif defined HAVE_FILE_SB_LIST_ADD_SYMBOL
+extern void file_sb_list_add(struct file *file, struct super_block *sb);
 #else
 #error Need a way to move a file pointer.
 #endif
@@ -442,7 +444,13 @@ spec_reparent(struct file *file, struct cdevsw *cdev, dev_t dev)
 	if (file->f_vfsmnt != NULL)
 		mntput(file->f_vfsmnt);
 	file->f_vfsmnt = mnt;
+#if   defined HAVE_FILE_MOVE_SYMBOL
 	file_move(file, &mnt->mnt_sb->s_files);
+#elif defined HAVE_FILE_SB_LIST_ADD_SYMBOL
+	file_sb_list_add(file, mnt->mnt_sb);
+#else
+#error Need a way to move a file pointer.
+#endif
 	return (0);
 
       put_error:
@@ -1338,7 +1346,15 @@ STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE);
 #endif
 #endif
 
+#if    defined DECLARE_MUTEX
 STATIC DECLARE_MUTEX(specfs_sem);
+#elif  defined DEFINE_SEMAPHORE
+STATIC DEFINE_SEMAPHORE(specfs_sem);
+#else
+#error Need some way to declare a semaphore.
+#endif
+STATIC int specfs_count = 0;
+
 
 streams_fastcall struct vfsmount *
 specfs_mount(void)
@@ -1349,6 +1365,8 @@ specfs_mount(void)
 		if (IS_ERR(specfs_mnt))
 			specfs_mnt = NULL;
 	}
+	if (specfs_mnt != NULL)
+		specfs_count++;
 	up(&specfs_sem);
 	return (mntget(specfs_mnt));
 }
@@ -1366,7 +1384,9 @@ specfs_umount(void)
 	if (specfs_mnt) {
 		mntput(specfs_mnt);
 		down(&specfs_sem);
-		if (atomic_read(&specfs_mnt->mnt_count) == 1) {
+		if (specfs_mnt && specfs_count > 0)
+			specfs_count--;
+		if (specfs_count == 0 && specfs_mnt != NULL) {
 			kern_umount(specfs_mnt);
 			specfs_mnt = NULL;
 		}

@@ -263,7 +263,14 @@ do_spipe(int *fds)
 STATIC spinlock_t pipe_ino_lock = SPIN_LOCK_UNLOCKED;
 STATIC int pipe_ino = 0;
 
-void file_kill(struct file *file);
+#if   defined HAVE_FILE_KILL_SYMBOL
+extern void file_kill(struct file *file);
+#elif defined HAVE_FILE_SB_LIST_DEL_SYMBOL
+extern void file_sb_list_del(struct file *file);
+#else
+#error Need some way to delete a file pointer from the list.
+#endif
+
 
 streams_fastcall long
 do_spipe(int *fds)
@@ -366,8 +373,15 @@ do_spipe(int *fds)
 
 	specfs_umount();
 
+#if    defined HAVE_FILE_MOVE_SYMBOL
 	file_move(fr, &snode->i_sb->s_files);
 	file_move(fw, &snode->i_sb->s_files);
+#elif  defined HAVE_FILE_SB_LIST_ADD_SYMBOL
+	file_sb_list_add(fr, snode->i_sb);
+	file_sb_list_add(fw, snode->i_sb);
+#else
+#error Need a way to move a file pointer.
+#endif
 
 	fr->f_flags |= O_CLONE;
 	if ((err = fr->f_op->open(snode, fr))) {
@@ -429,8 +443,15 @@ do_spipe(int *fds)
 	return (err);
 
       cleanup_both:
+#if    defined HAVE_FILE_KILL_SYMBOL
 	file_kill(fr);
 	file_kill(fw);
+#elif  defined HAVE_FILE_SB_LIST_DEL_SYMBOL
+	file_sb_list_del(fr);
+	file_sb_list_del(fw);
+#else
+#error Need some way to delete a file pointer from the list.
+#endif
 	fops_put(f_op);
 	fops_put(f_op);
 	fr->f_dentry = fw->f_dentry = NULL;
@@ -447,7 +468,13 @@ do_spipe(int *fds)
 
       cleanup_write:
 	fput(fr);
+#if    defined HAVE_FILE_KILL_SYMBOL
 	file_kill(fw);
+#elif  defined HAVE_FILE_SB_LIST_DEL_SYMBOL
+	file_sb_list_del(fw);
+#else
+#error Need some way to delete a file pointer from the list.
+#endif
 	fops_put(f_op);
 	fw->f_dentry = NULL;
 	dput(dentry);

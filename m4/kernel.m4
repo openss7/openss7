@@ -1359,6 +1359,20 @@ dnl	    could be 2.4.18-13.1, another could be 2.4.18-12 and they do not necessa
 dnl	    running kernel.  In fact, on debian, there is no way to tell which exact version of the
 dnl	    kernel is running.  Ubuntu understandably has the same problem.
 dnl
+dnl	    SuSE also has this problem.  There is one more .n number in the kernel package version
+dnl	    than there is in the version following the system map name (i.e. the kernel version and
+dnl	    /boot/System.map-$(kversion) are different.  Multiple kernel packages can generate
+dnl	    conflicting System map files; therefore, it is not possible to determine for which the
+dnl	    running kernel belongs (because uname -r does not return the full kernel version
+dnl	    either).
+dnl
+dnl	    In any case, the System.map file is only unreliable as regards the address of symbols
+dnl	    when the conflict is between same architecture kernels (e.g. for SuSE, Debain, Ubuntue),
+dnl	    but not otherwise (i.e., for RedHat).  This is because the header files are the same and
+dnl	    the kABI is the same, it is just the addresses that might change because it is a
+dnl	    different compilation.  For the running kernel use /proc/kallsyms for detection and
+dnl	    addresses instead.
+dnl
 	    eval "k_sysmap_search_path=\"
 		${kbuilddir}/System.map-${kversion}
 		${kbuilddir}/System.map

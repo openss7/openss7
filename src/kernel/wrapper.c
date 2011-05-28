@@ -286,6 +286,13 @@ __asm__(".global " __stringify(file_move));
 EXPORT_SYMBOL_GPL(file_move);
 #endif				/* HAVE_FILE_MOVE_ADDR */
 
+#ifdef HAVE_FILE_SB_LIST_ADD_ADDR
+__asm__(".equiv  " __stringify(file_sb_list_add) "," __stringify(HAVE_FILE_SB_LIST_ADD_ADDR));
+__asm__(".type   " __stringify(file_sb_list_add) ",@function");
+__asm__(".global " __stringify(file_sb_list_add));
+EXPORT_SYMBOL_GPL(file_sb_list_add);
+#endif				/* HAVE_FILE_SB_LIST_ADD_ADDR */
+
 #ifdef HAVE_KERNEL_PIPE_SUPPORT
 /* These are only required when we have kernel pipe support (making all linux
  * pipes STREAMS pipes).  We don't normally do this as it requires some serious
@@ -298,6 +305,14 @@ __asm__(".type   " __stringify(file_kill) ",@function");
 __asm__(".global " __stringify(file_kill));
 EXPORT_SYMBOL_GPL(file_kill);
 #endif				/* HAVE_FILE_KILL_ADDR */
+
+#ifdef HAVE_FILE_SB_LIST_DEL_ADDR
+//extern void file_sb_list_del(struct file *file);
+__asm__(".equiv  " __stringify(file_sb_list_del) "," __stringify(HAVE_FILE_SB_LIST_DEL_ADDR));
+__asm__(".type   " __stringify(file_sb_list_del) ",@function");
+__asm__(".global " __stringify(file_sb_list_del));
+EXPORT_SYMBOL_GPL(file_sb_list_del);
+#endif				/* HAVE_FILE_SB_LIST_DEL_ADDR */
 
 #ifdef HAVE_PUT_FILP_ADDR
 __asm__(".equiv  " __stringify(put_filp) "," __stringify(HAVE_PUT_FILP_ADDR));
