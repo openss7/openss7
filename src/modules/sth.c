@@ -10418,12 +10418,14 @@ _strioctl(struct file *file, unsigned int cmd, unsigned long arg)
 	goto exit;
 }
 
+#ifdef HAVE_KMEMB_STRUCT_FILE_OPERATIONS_IOCTL
 STATIC __hot int
 _strioctl_locked(struct inode *inode, struct file *file, unsigned int cmd, unsigned long arg)
 {
 	/* never need the inode anyway */
 	return _strioctl(file, cmd, arg);
 }
+#endif
 
 #if defined WITH_32BIT_CONVERSION
 #if defined HAVE_COMPAT_IOCTL
@@ -10809,7 +10811,9 @@ struct file_operations strm_f_ops ____cacheline_aligned = {
 #if defined HAVE_COMPAT_IOCTL && defined WITH_32BIT_CONVERSION
 	.compat_ioctl = _strioctl_compat,
 #endif
+#if defined HAVE_KMEMB_STRUCT_FILE_OPERATIONS_IOCTL
 	.ioctl = _strioctl_locked,
+#endif
 	.mmap = strmmap,
 	.open = stropen,
 	.flush = strflush,

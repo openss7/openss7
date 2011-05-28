@@ -114,8 +114,8 @@ References
 
 #include <sys/os7/compat.h>
 
-#include <sys/strtty.h>
 #include <ttcompat.h>
+#include <sys/strtty.h>
 
 #define PTEM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTEM_COPYRIGHT		"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."

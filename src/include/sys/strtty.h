@@ -78,6 +78,7 @@
 #define WIOC	0000100		/* wait for ioctl to complete */
 #define WGETTY	0000200		/* opened by supergetty , waiting for getty */
 #define TTSTOP	0000400		/* output stopped by ^s */
+#undef EXTPROC                  /* conflict from include/asm-generic/termbits.h */
 #define EXTPROC	0001000		/* external processing */
 #define TAC	0002000
 #define CLESC	0004000		/* last char escape */

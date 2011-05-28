@@ -366,7 +366,7 @@ sl_set_i_state(struct sl *sl, int newstate)
 
 	strlog(sl->mid, sl->sid, SLLOGST, SL_TRACE, "%s <- %s", sl_i_state_name(newstate),
 	       sl_i_state_name(oldstate));
-	return ((sl->info.lm.lmi_state = sl->info.lm.lmi_state = newstate));
+	return ((sl->info.lm.lmi_state = newstate));
 }
 static inline int
 sl_get_i_state(struct sl *sl)
