@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -294,6 +294,7 @@ __inet_netdir_getbyaddr(struct netconfig *nc, struct netbuf *addr)
 	} else {
 		host = h->h_name;
 		aliases = h->h_aliases;
+		(void) aliases;
 	}
 	/* count 'em all */
 	for (cnt = 1, aliasp = h->h_aliases; *aliasp; cnt++, aliasp++) ;

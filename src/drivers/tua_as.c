@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -125,7 +125,7 @@ static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.2
 
 #define TUA_AS_DESCRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
 #define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $"
-#define TUA_AS_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define TUA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TUA_AS_LICENSE		"GPL"
@@ -9394,6 +9394,7 @@ up_recv_snmm_scon(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 	addr.si = 0;
 	addr.ni = 0;
 	/* FIXME: sanity check value */
+	(void) addr;
 	(void) status;
 	(void) cong;
 #if M3UA
@@ -9480,6 +9481,7 @@ up_recv_snmm_dupu(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 	addr.si = (cause.val & 0xffff);
 	addr.ni = 0;
 	/* FIXME: sanity check value */
+	(void) addr;
 #if M3UA
 	switch (cause.val >> 16) {
 	default:
@@ -9535,6 +9537,7 @@ up_recv_snmm_drst(struct up *up, struct tp *tp, queue_t *q, mblk_t *mp)
 	addr.si = 0;
 	addr.ni = 0;
 	/* FIXME: sanity check value */
+	(void) addr;
 #if M3UA
 	return mtp_status_ind(up, q, mp, &addr, MTP_STATUS_TYPE_RSTR, 0);
 #endif

@@ -1744,6 +1744,8 @@ m_info_ack(queue_t *q, struct mtp *mtp, mblk_t *msg)
 		dst_ptr = (uchar *) &mtp->dst;
 		break;
 	}
+	(void) dst_ptr;
+	(void) src_ptr;
 	if ((mp = mi_allocb(q, sizeof(*p) + src_len + dst_len, BPRI_MED))) {
 		DB_TYPE(mp) = M_PCPROTO;
 		p = (typeof(p)) mp->b_wptr;

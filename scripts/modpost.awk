@@ -828,11 +828,15 @@ function read_modobject(command, dir, own, src,
 			print_debug(3,pfx "undefined symbol: " sym)
 			mod_unds[mod,sym] = 1
 			count_unds++
-		    }
+			if (!values["modversions"])
+			    set_symbol(sym, "", "", "", "", 0, "", src, 1, "ko object")
+		    } else
 		    if (substr(flags,2,1) == "w" && !((mod,sym) in mod_weak)) {
 			print_debug(3,pfx "weakundef symbol: " sym)
 			mod_weak[mod,sym] = 1
 			count_weak++
+			if (!values["modversions"])
+			    set_symbol(sym, "", "", "", "", 0, "", src, 1, "ko object")
 		    }
 		    continue
 		}
@@ -909,7 +913,7 @@ function read_modobject(command, dir, own, src,
 		}
 		mod = $0
 		print_debug(1,pfx mod)
-		if (own == values["pkgdirectory"]) {
+		if (own == values["pkgdirectory"] && values["modversions"]) {
 		    if (("vmlinux","struct_module") in mod_syms) {
 			mod_unds[mod,"struct_module"] = 1
 		    } else if (("vmlinux","module_layout") in mod_syms) {
@@ -1193,7 +1197,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		    print_error(sprintf(fmt, base, "unsupportd", sym))
 	    }
 	}
-	if (!(sym in crcs)) {
+	if (!(sym in crcs) && values["modversions"]) {
 	    print_error("r: mymodules, symbol " sym " defined in module " mods[sym] " has no version")
 	    continue
 	}
@@ -1234,7 +1238,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		    print_warns(sprintf(fmt, base, "weak unsup", sym))
 	    }
 	}
-	if (!(sym in crcs)) {
+	if (!(sym in crcs) && values["modversions"]) {
 	    print_warns(sprintf(fmt " in %-20s", base, "no version", sym, mods[sym]))
 	    continue
 	}
@@ -1354,20 +1358,18 @@ function write_syssymver(file,    sym,line,count_syms,mod)
     for (sym in syms) {
 	if (sym in ownr && ownr[sym] == values["pkgdirectory"])
 	    continue
-	if (!(sym in crcs)) {
+	if (!(sym in exps) && values["exportsyms"])
+	    continue
+	if (!(sym in crcs) && values["modversions"]) {
 	    print_error("no crc for symbol: " sym)
 	    continue
 	}
 	mod = mods[sym]
 	sub(/^.*\/built-in(\.o)?$/,"vmlinux",mod)
-	line = crcs[sym] "\t" sym "\t" mod
-	if (values["exportsyms"]) {
-	    if (!(sym in exps)) {
-		print_error("w: syssymver, no export for symbol: " sym)
-		continue
-	    }
-	    line = line "\t" exps[sym]
-	}
+	if (sym in crcs && crcs[sym] && crcs[sym]!~/^0x$/)
+	{ line = crcs[sym] } else
+	{ line = "0x00000000" }
+	line = line "\t" sym "\t" mod "\t" exps[sym]
 	count_syms++
 	print line > file
     }
@@ -1375,24 +1377,25 @@ function write_syssymver(file,    sym,line,count_syms,mod)
 	close(file)
     print_vinfo(1,"w: syssymver, syms " count_syms)
 }
-function write_modsymver(file,    sym, line, count_syms)
+function write_modsymver(file,    sym,line,count_syms,mod)
 {
     print_vinfo(1,"w: modsymver, file = \"" file "\"")
     count_syms = 0
     for (sym in ownr) {
-	if (ownr[sym] != values["pkgdirectory"]) continue
-	if (!(sym in crcs)) {
+	if (!sym in ownr || ownr[sym] != values["pkgdirectory"])
+	    continue
+	if (!(sym in exps) && values["exportsyms"])
+	    continue
+	if (!(sym in crcs) && values["modversions"]) {
 	    print_warns("no crc for symbol: " sym)
 	    continue
 	}
-	line = crcs[sym] "\t" sym "\t" mods[sym]
-	if (values["exportsyms"]) {
-	    if (!(sym in exps)) {
-		print_warns("w: modsymver, no export for symbol: " sym)
-		continue
-	    }
-	    line = line "\t" exps[sym]
-	}
+	mod = mods[sym]
+	sub(/^.*\/built-in(\.o)?$/,"vmlinux",mod)
+	if (sym in crcs && crcs[sym] && crcs[sym]!~/^0x$/)
+	{ line = crcs[sym] } else
+	{ line = "0x00000000" }
+	line = line "\t" sym "\t" mod "\t" exps[sym]
 	count_syms++
 	print line > file
     }
@@ -1734,7 +1737,7 @@ function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name
     for (pair in mod_unds) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	if (name != mod) continue
-	if (sym in crcs) continue
+	if (sym in crcs || (!values["modversions"] && sym in syms)) continue
 	if (!(sym in mapsyms)) {
 	    print_error(sprintf(fmt, base, "norm no res", sym))
 	    continue
@@ -1872,7 +1875,7 @@ BEGIN {
     else                       { kversion = getline_command("uname -r") }
     # MODPOST_SYSVER  contains all the system  defined symbol versions
     # MODPOST_MODVER  contains all the package defined symbol versions
-    # MODPOST_SYMSETS contains the new symbol sets
+    # MODPOST_SYMSETS contains the new symbol sets (jltz)
     longopts["modules"      ] = "M:" ;																		  descrips["modules"      ] = "modules for which to generate symbols (space separated list)"			; longargs["modules"] = "MODULE ..."
     longopts["cachefile"    ] = "c:" ; environs["cachefile"    ] = "MODPOST_CACHE"		 ; defaults["cachefile"    ] = "modpost.cache"					; descrips["cachefile"    ] = "where to cache system smybol versions"
     longopts["kversion"     ] = "k:" ; environs["kversion"     ] = "kversion"			 ; defaults["kversion"     ] = kversion						; descrips["kversion"     ] = "kernel version KVERSION"

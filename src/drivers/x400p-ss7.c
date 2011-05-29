@@ -2101,6 +2101,7 @@ sdl_commit_config(struct xp *xp, sdl_config_t * arg)
 	struct cd *cd = NULL;
 	psw_t flags = 0;
 
+	(void) chan_reconfig;
 	if (!xp)
 		return;
 	spin_lock_irqsave(&xp->lock, flags);

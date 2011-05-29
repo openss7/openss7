@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -208,7 +208,6 @@ static int test_pflags = MSG_BAND;	/* MSG_BAND | MSG_HIPRI */
 static int test_pband = 0;
 static int test_gflags = 0;		/* MSG_BAND | MSG_HIPRI */
 static int test_gband = 0;
-static int test_timout = 200;
 
 static int test_bufsize = 256;
 static int test_nidu = 256;
@@ -3919,12 +3918,7 @@ do_signal(int child, int action)
 	struct strbuf ctrl_buf, data_buf, *ctrl = &ctrl_buf, *data = &data_buf;
 	char cbuf[BUFSIZE], dbuf[BUFSIZE];
 	union N_primitives *p = (typeof(p)) cbuf;
-	struct strioctl ic;
 
-	ic.ic_cmd = 0;
-	ic.ic_timout = test_timout;
-	ic.ic_len = sizeof(cbuf);
-	ic.ic_dp = cbuf;
 	ctrl->maxlen = 0;
 	ctrl->buf = cbuf;
 	data->maxlen = 0;
@@ -11974,7 +11968,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -12031,7 +12025,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\

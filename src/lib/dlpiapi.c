@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -594,9 +594,8 @@ static int __dlpi_log_options = DLPI_LOG_DEFAULT;
 static int
 __dlpi_putmsg(int fd, struct strbuf *ctlp, struct strbuf *datp, int flag)
 {
-	int ret, save;
+	int ret;
 
-	save = errno;
 	if (likely((ret = putmsg(fd, ctlp, datp, flag)) >= 0))
 		return (ret);
 	dlerrno = DL_SYSERR;

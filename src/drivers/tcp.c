@@ -785,6 +785,7 @@ t_opts_build(const struct tpi *t, mblk_t *mp, unsigned char *op, size_t olen)
 		oh->level = T_INET_TCP;
 		oh->name = T_TCP_MAXSEG;
 		oh->status = T_SUCCESS;
+		(void) th;
 		// *((t_uscalar_t *) T_OPT_DATA(oh)) = th->maxseg; /* FIXME */
 		/* FIXME: have to find maxseg option in TCP options portion of TCP header and then
 		   extract it */
@@ -892,6 +893,7 @@ t_errs_build(const struct tpi *t, mblk_t *mp, unsigned char *op, size_t olen, in
 		oh->level = T_INET_TCP;
 		oh->name = T_TCP_MAXSEG;
 		oh->status = T_SUCCESS;
+		(void) th;
 		// *((t_uscalar_t *) T_OPT_DATA(oh)) = th->maxseg; /* FIXME */
 		/* FIXME: have to find maxseg option in options portion of TCP header and extract
 		   it. */
@@ -925,6 +927,7 @@ t_opts_parse(unsigned char *ip, size_t ilen, struct tpi_options *op)
 		if (unlikely((unsigned char *) ih + ih->len > ip + ilen))
 			goto error;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto error;
@@ -1055,6 +1058,7 @@ t_size_default_options(struct tpi *t, const unsigned char *ip, size_t ilen)
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -1230,6 +1234,7 @@ t_size_current_options(struct tpi *t, const unsigned char *ip, size_t ilen)
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -1923,6 +1928,7 @@ t_build_default_options(const struct tpi *t, const unsigned char *ip, size_t ile
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -2253,6 +2259,7 @@ t_build_current_options(const struct tpi *t, const unsigned char *ip, size_t ile
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -4371,9 +4378,11 @@ t_tpi_connect(struct tpi *tpi, struct sockaddr_storage *ADDR_buffer, t_uscalar_t
 	sin = (struct sockaddr_in *) &tpi->SRC_buffer;
 	sport = sin->sin_port;
 	saddr = sin->sin_addr.s_addr;
+	(void) saddr;
 	din = (struct sockaddr_in *) ADDR_buffer;
 	dport = din->sin_port;
 	daddr = din->sin_addr.s_addr;
+	(void) daddr;
 	hp = &tpi_chash[tpi_chashfn(dport, sport)];
 
 	write_lock(&hp->lock);

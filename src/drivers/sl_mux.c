@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -102,7 +102,7 @@ static char const ident[] = "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.2
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
 #define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $"
-#define SL_MUX_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SL_MUX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SL_MUX_LICENSE		"GPL"
@@ -2732,6 +2732,7 @@ sl_rx_link_congested_ind(struct sl *sl, queue_t *q, mblk_t *mp)
 	return sl_passalong_ind(sl, q, mp);
       badprim:
 	err = LMI_BADPRIM;
+	(void) err;
 	goto error;
       error:
 	freemsg(mp);
