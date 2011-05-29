@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -3665,7 +3665,7 @@ strExtMIB_fd_handler(int fd, void *dummy)
 		struct variable_list *vars = NULL;
 		struct strExtStrlogRecordTable_data *d;
 		struct header_complex_index *h_prev, *h;
-		size_t len, mlen;
+		size_t len;
 		char msg[LOGMSGSZ << 1], *fmt;
 
 		if ((ret = getmsg(fd, &ctl, &dat, &flag)) < 0) {
@@ -3762,7 +3762,7 @@ strExtMIB_fd_handler(int fd, void *dummy)
 		len = strnlen(fmt, LOGMSGSZ);
 		snmp_varlist_add_variable(&vars, strExtStrlogFmtString_oid, sizeof(strExtStrlogFmtString_oid) / sizeof(oid), ASN_UNSIGNED, (u_char *) fmt, len);
 		/* generates formatted string and also adds promoted variables to varlist */
-		mlen = snprintfit(msg, sizeof(msg), fmt, len, &vars);
+		snprintfit(msg, sizeof(msg), fmt, len, &vars);
 		/* add formatted string to record */
 		if ((d->strExtStrlogRecordMsgString = (u_char *) strdup(msg)) != NULL)
 			d->strExtStrlogRecordMsgStringLen = strnlen(msg, sizeof(msg));

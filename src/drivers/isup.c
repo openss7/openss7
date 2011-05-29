@@ -11115,6 +11115,8 @@ __sr_timer_stop(struct sr *sr, const uint t)
 			printd(("%s: %p: stopping t4 at %lu\n", DRV_NAME, sr, jiffies));
 			sr_put(sr);
 		}
+		if (single)
+			break;
 		/* 
 		   fall through */
 	case t29:
@@ -11123,6 +11125,8 @@ __sr_timer_stop(struct sr *sr, const uint t)
 			printd(("%s: %p: stopping t29 at %lu\n", DRV_NAME, sr, jiffies));
 			sr_put(sr);
 		}
+		if (single)
+			break;
 		/* 
 		   fall through */
 	case t30:
@@ -11131,6 +11135,8 @@ __sr_timer_stop(struct sr *sr, const uint t)
 			printd(("%s: %p: stopping t30 at %lu\n", DRV_NAME, sr, jiffies));
 			sr_put(sr);
 		}
+		if (single)
+			break;
 		/* 
 		   fall through */
 	}
@@ -17955,6 +17961,7 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 	uchar *p, *e;
 	ulong x, y;
 
+	(void) segmentation;
 	if (!mp)
 		goto efault;
 	if (mp->b_cont && !pullupmsg(mp, -1))
@@ -18729,8 +18736,8 @@ mtp_info_ack(queue_t *q, mblk_t *mp)
 		} else if (add_len)
 			goto efault;
 	}
-	loc = (typeof(loc)) loc_ptr;
-	rem = (typeof(rem)) rem_ptr;
+	loc = (typeof(loc)) loc_ptr; (void) loc_len;
+	rem = (typeof(rem)) rem_ptr; (void) rem_len;
 	if (!loc)
 		goto efault;
 	for (sp = master.sp.list;

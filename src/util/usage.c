@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -1177,6 +1177,7 @@ parse_v1_pdu(unsigned char *p, unsigned char *e, int version)
 		goto error;
 	}
 	generic = value;
+	(void) generic;
 	p = m;
 	m = e;
 	/* pull out specific trap type */
@@ -1255,6 +1256,7 @@ parse_v2_pdu(unsigned char *p, unsigned char *e, int version)
 		goto error;
 	}
 	request_id = value;
+	(void) request_id;
 	p = m;
 	m = e;
 	/* pull out error-status */
@@ -1267,6 +1269,7 @@ parse_v2_pdu(unsigned char *p, unsigned char *e, int version)
 		goto error;
 	}
 	error_status = value;
+	(void) error_status;
 	p = m;
 	m = e;
 	/* pull out error-index */
@@ -1279,6 +1282,7 @@ parse_v2_pdu(unsigned char *p, unsigned char *e, int version)
 		goto error;
 	}
 	error_index = value;
+	(void) error_index;
 	p = m;
 	m = e;
 	if (parse_varbind_list(p, m, version, -1))
@@ -1520,7 +1524,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -1567,7 +1571,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -1643,9 +1647,9 @@ main(int argc, char *argv[])
 {
 	char *host = "127.0.0.1";
 	char hostbuf[BUFSIZ];
-	char **hostp = &host;
 	short port = DEFAULT_PORT;
 
+	(void) host;
 	while (1) {
 		int c, val;
 
@@ -1677,7 +1681,6 @@ main(int argc, char *argv[])
 		case 'H':
 			strncpy(hostbuf, optarg, BUFSIZ);
 			host = hostbuf;
-			hostp = &host;
 			break;
 		case 'p':
 			port = atoi(optarg);

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -2838,7 +2838,7 @@ postamble_8(int child)
 	if (postamble_0(child) != __RESULT_SUCCESS)
 		result = __RESULT_FAILURE;
 	state++;
-	return __RESULT_SUCCESS;
+	return (result);
 }
 
 /*
@@ -7820,6 +7820,7 @@ test_case_2_16_13(int child)
 	fdi.flags = RS_HIPRI;
 	fdi.fildes = test_fd[child];
 	fdi.offset = 0;
+	(void) fdi;
 	if (test_ioctl(child, I_FDINSERT, (intptr_t) INVALID_ADDRESS) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
 	state++;
@@ -14355,6 +14356,7 @@ test_case_3_2_9(int child)
 
 	iov[0].iov_base = buf;
 	iov[0].iov_len = sizeof(buf);
+	(void) iov;
 
 	if (test_readv(child, (struct iovec *) INVALID_ADDRESS, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
@@ -15241,6 +15243,7 @@ test_case_3_4_9(int child)
 
 	iov[0].iov_base = buf;
 	iov[0].iov_len = sizeof(buf);;
+	(void) iov;
 
 	if (test_writev(child, (struct iovec *) INVALID_ADDRESS, 1) == __RESULT_SUCCESS || last_errno != EFAULT)
 		return (__RESULT_FAILURE);
@@ -22353,7 +22356,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -22411,7 +22414,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\

@@ -1373,6 +1373,7 @@ mon_attach(void)
 	size_t ppa_len;
 	caddr_t ppa_ptr;
 
+	(void) ppa_ptr;
 	if (ppa != 0) {
 		ppa_len = sizeof(ppa);
 		ppa_ptr = (caddr_t) &ppa;

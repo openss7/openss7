@@ -1567,6 +1567,7 @@ t_size_default_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -1681,6 +1682,7 @@ t_size_current_options(const struct tp *t, const unsigned char *ip, size_t ilen)
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -2130,6 +2132,7 @@ t_build_default_options(const struct tp *t, const unsigned char *ip, size_t ilen
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -2342,6 +2345,7 @@ t_build_current_options(const struct tp *t, const unsigned char *ip, size_t ilen
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -7117,6 +7121,7 @@ te_write_req(queue_t *q, mblk_t *mp)
 	freemsg(mp);
 	return (QR_ABSORBED);	/* tp_senddata() did not consume message blocks */
       error:
+	(void) err;
 	return te_error_reply(q, mp, -EPROTO);
 }
 
@@ -7656,6 +7661,7 @@ tp_w_data(queue_t *q, mblk_t *mp)
 	if (likely(ss7_trylockq(q))) {
 		rtn = te_write_req(q, mp);
 		ss7_unlockq(q);
+		return (rtn);
 	}
 	return (-EAGAIN);
 }

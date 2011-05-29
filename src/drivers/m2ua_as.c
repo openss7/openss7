@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -181,7 +181,7 @@ static char const ident[] = "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
 #define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:33 $"
-#define M2UA_AS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define M2UA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define M2UA_AS_LICENSE		"GPL"
@@ -11511,6 +11511,7 @@ lmi_detach_req(struct up *up, queue_t *q, mblk_t *mp)
 			/* need to deregister */
 			as_set_state(up->as.as, q, AS_WRSP_DREQ);
 			tp = sp->sg.list->gp.list->xp.xp;
+			(void) tp;
 			return rp_send_rkmm_dereg_req(as->rp.list, q, mp);
 		}
 		break;

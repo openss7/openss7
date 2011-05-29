@@ -4489,6 +4489,7 @@ ss_cmsg_size(const ss_t *ss, const unsigned char *ip, size_t ilen)
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		case T_INET_IP:
 			if (ss->p.prot.family == PF_INET) {
@@ -5011,6 +5012,7 @@ t_size_default_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -5404,6 +5406,7 @@ t_size_current_options(const ss_t *t, const unsigned char *ip, size_t ilen)
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -6940,6 +6943,7 @@ t_build_default_options(const ss_t *ss, const unsigned char *ip, size_t ilen, un
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -7779,6 +7783,7 @@ t_build_current_options(const ss_t *t, const unsigned char *ip, size_t ilen, uns
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;

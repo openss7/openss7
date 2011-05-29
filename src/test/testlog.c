@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -523,6 +523,8 @@ my_vstrlog(short mid, short sid, char level, unsigned short flags, char *fmt, va
 	else
 		pri = LOG_INFO;
 
+	(void) band;
+	(void) flag;
 	if (flags & SL_CONSOLE) {
 		band = 0;
 		flag = MSG_HIPRI;

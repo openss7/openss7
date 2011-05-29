@@ -7817,6 +7817,8 @@ tc_bind_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	xact = p->XACT_number;
 	flags = p->BIND_flags;
 	fixme(("Complete this function\n"));
+	(void) xact;
+	(void) flags;
 	return (-EFAULT);
       badaddr:
 	err = TCBADADDR;
@@ -7924,6 +7926,7 @@ tc_optmgmt_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	}
 	flags = p->MGMT_flags;
 	fixme(("Complete this function\n"));
+	(void) flags;
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
@@ -8042,6 +8045,7 @@ tc_begin_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	flags = p->COMP_flags;
 	fixme(("Complete this function\n"));
+	(void) flags;
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
@@ -8094,6 +8098,7 @@ tc_begin_res(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	flags = p->COMP_flags;
 	fixme(("Complete this function\n"));
+	(void) flags;
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
@@ -8136,6 +8141,7 @@ tc_cont_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	flags = p->COMP_flags;
 	fixme(("Complete this function\n"));
+	(void) flags;
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
@@ -8178,6 +8184,7 @@ tc_end_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	scenario = p->TERM_scenario;
 	fixme(("Complete this function\n"));
+	(void) scenario;
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
@@ -8220,6 +8227,7 @@ tc_abort_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	reason = p->ABORT_reason;
 	fixme(("Complete this function\n"));
+	(void) reason;
 	return (-EFAULT);
       badopt:
 	err = TCBADOPT;
@@ -8263,6 +8271,10 @@ tc_invoke_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	more = (p->MORE_flag & T_MORE);
 	to = p->TIMEOUT;
 	fixme(("Complete this function\n"));
+	(void) pcls;
+	(void) oper;
+	(void) more;
+	(void) to;
 	return (-EFAULT);
       badaddr:
 	err = TCBADADDR;
@@ -8298,6 +8310,8 @@ tc_result_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	oper = p->OPERATION;
 	more = (p->MORE_flag & T_MORE);
 	fixme(("Complete this function\n"));
+	(void) oper;
+	(void) more;
 	return (-EFAULT);
       badaddr:
 	err = TCBADADDR;
@@ -8333,6 +8347,8 @@ tc_error_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	ecode = p->ERROR_code;
 	more = (p->MORE_flag & T_MORE);
 	fixme(("Complete this function\n"));
+	(void) ecode;
+	(void) more;
 	return (-EFAULT);
       badaddr:
 	err = TCBADADDR;
@@ -8399,6 +8415,7 @@ tc_reject_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	pcode = p->PROBLEM_code;
 	fixme(("Complete this function\n"));
+	(void) pcode;
 	return (-EFAULT);
       badaddr:
 	err = TCBADADDR;
@@ -8485,6 +8502,8 @@ tr_bind_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	xact = p->XACT_number;
 	flags = p->BIND_flags;
 	fixme(("Complete this function\n"));
+	(void) xact;
+	(void) flags;
 	return (-EFAULT);
       badaddr:
 	err = TRBADADDR;
@@ -8542,6 +8561,7 @@ tr_optmgmt_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	}
 	flags = p->MGMT_flags;
 	fixme(("Complete this function\n"));
+	(void) flags;
 	return (-EFAULT);
       badopt:
 	err = TRBADOPT;
@@ -8796,6 +8816,7 @@ tr_end_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badtid;
 	term = p->TERM_scenario;
 	fixme(("Complete this function\n"));
+	(void) term;
 	return (-EFAULT);
       badtid:
 	err = TRBADADDR;
@@ -8838,6 +8859,7 @@ tr_abort_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badtid;
 	cause = p->ABORT_cause;
 	fixme(("Complete this function\n"));
+	(void) cause;
 	return (-EFAULT);
       badtid:
 	err = TRBADADDR;
@@ -8954,6 +8976,8 @@ t_conn_res(struct tc *tc, queue_t *q, mblk_t *mp)
 	tok = p->ACCEPTOR_id;
 	seq = p->SEQ_number;
 	fixme(("Complete this function\n"));
+	(void) tok;
+	(void) seq;
 	return (-EFAULT);
       badopt:
 	err = TBADOPT;
@@ -8982,6 +9006,7 @@ t_discon_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badprim;
 	seq = p->SEQ_number;
 	fixme(("Complete this function\n"));
+	(void) seq;
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
@@ -9006,6 +9031,7 @@ t_data_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badprim;
 	more = (p->MORE_flag & T_MORE);
 	fixme(("Complete this function\n"));
+	(void) more;
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
@@ -9030,6 +9056,7 @@ t_exdata_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badprim;
 	more = (p->MORE_flag & T_MORE);
 	fixme(("Complete this function\n"));
+	(void) more;
 	return (-EFAULT);
       badprim:
 	err = -EINVAL;
@@ -9086,6 +9113,7 @@ t_bind_req(struct tc *tc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	cons = p->CONIND_number;
 	fixme(("Complete this function\n"));
+	(void) cons;
 	return (-EFAULT);
       badaddr:
 	err = TBADADDR;
@@ -9282,6 +9310,7 @@ t_optdata_req(struct tc *tc, queue_t *q, mblk_t *mp)
 	}
 	flags = p->DATA_flag;
 	fixme(("Complete this function\n"));
+	(void) flags;
 	return (-EFAULT);
       badopt:
 	err = TBADOPT;
@@ -9412,6 +9441,7 @@ n_conn_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 		if (qos.protocol_class != 2 && qos.protocol_class != 3)
 			goto badqosparam;
 	}
+	(void) flags;
 	goto notsupport;
       notsupport:
 	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sc));
@@ -9471,6 +9501,7 @@ n_conn_con(struct sc *sc, queue_t *q, mblk_t *mp)
 		if (qos.protocol_class != 2 && qos.protocol_class != 3)
 			goto badqosparam;
 	}
+	(void) flags;
 	goto notsupport;
       notsupport:
 	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sc));
@@ -9517,6 +9548,9 @@ n_discon_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	orig = p->DISCON_orig;
 	reason = p->DISCON_reason;
 	seq = p->SEQ_number;
+	(void) orig;
+	(void) reason;
+	(void) seq;
 	goto notsupport;
       notsupport:
 	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sc));
@@ -9545,6 +9579,7 @@ n_data_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	flags = p->DATA_xfer_flags;
+	(void) flags;
 	goto notsupport;
       notsupport:
 	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sc));
@@ -9678,6 +9713,8 @@ n_bind_ack(struct sc *sc, queue_t *q, mblk_t *mp)
 			goto badprim;
 		pro = (typeof(pro)) (mp->b_rptr + p->PROTOID_offset);
 	}
+	(void) conind;
+	(void) tok;
 	goto notsupport;
       notsupport:
 	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sc));
@@ -9710,6 +9747,8 @@ n_error_ack(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto badprim;
 	prim = p->ERROR_prim;
 	etype = (p->NPI_error == NSYSERR) ? -p->UNIX_error : p->NPI_error;
+	(void) prim;
+	(void) etype;
 	goto notsupport;
       notsupport:
 	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sc));
@@ -9735,6 +9774,7 @@ n_ok_ack(struct sc *sc, queue_t *q, mblk_t *mp)
 	if (mp->b_wptr < mp->b_rptr + sizeof(*p))
 		goto badprim;
 	prim = p->CORRECT_prim;
+	(void) prim;
 	goto notsupport;
       notsupport:
 	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sc));
@@ -9872,6 +9912,7 @@ n_uderror_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	etype = p->ERROR_type;
 	fixme(("Complete this function\n"));
+	(void) etype;
 	return (-EFAULT);
       badaddr:
 	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sc));
@@ -9924,6 +9965,8 @@ n_reset_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto badprim;
 	orig = p->RESET_orig;
 	reason = p->RESET_reason;
+	(void) orig;
+	(void) reason;
 	goto notsupport;
       notsupport:
 	pswerr(("%s: %p: SWERR: unsupported primitive from below\n", DRV_NAME, sc));
@@ -9982,6 +10025,7 @@ n_coord_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	if (p->ADDR_length != sizeof(*add) + add->alen)
 		goto badaddr;
 	smi = p->SMI;
+	(void) smi;
 	fixme(("Complete this function\n"));
 	return (-EFAULT);
       badaddr:
@@ -10022,6 +10066,7 @@ n_coord_con(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	smi = p->SMI;
 	fixme(("Complete this function\n"));
+	(void) smi;
 	return (-EFAULT);
       badaddr:
 	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sc));
@@ -10062,6 +10107,8 @@ n_state_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 	status = p->STATUS;
 	smi = p->SMI;
 	fixme(("Complete this function\n"));
+	(void) status;
+	(void) smi;
 	return (-EFAULT);
       badaddr:
 	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sc));
@@ -10103,6 +10150,7 @@ n_pcstate_ind(struct sc *sc, queue_t *q, mblk_t *mp)
 		goto badaddr;
 	status = p->STATUS;
 	fixme(("Complete this function\n"));
+	(void) status;
 	return (-EFAULT);
       badaddr:
 	pswerr(("%s: %p: SWERR: bad address\n", DRV_NAME, sc));

@@ -2153,6 +2153,8 @@ rcv_ping(int fd, __u16 id, __u16 * sequence)
 	daddr = (unsigned char *) dlsap_addr((char *) d_dlsap);
 	saddr = (unsigned char *) dlsap_addr((char *) s_dlsap);
 
+	(void) ssap;
+
 	if (memcmp(daddr, my_addr, addr_len)) {
 		if (verbose > 2)
 			printf("rcv_ping: Reply is not for our address\n");
@@ -2510,6 +2512,7 @@ version(int argc, char *argv[])
 	fprintf(stdout, "\
 \n\
 %1$s %2$s:\n\
+    Copyright (c) 2008-2011  Monavacon Limited.    All Rights Reserved.\n\
     Copyright (c) 2003-2007  OpenSS7 Corporation.  All Rights Reserved.\n\
     Copyright (c) 1998       Ole Husgaard (sparre@login.dknet.dk)\n\
 \n\

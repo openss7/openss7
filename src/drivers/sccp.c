@@ -4302,6 +4302,7 @@ unpack_cpa(np_ulong pvar, register uchar *p, uchar *e, struct sccp_addr *a)
 {
 	np_ulong oe = 0, pci, ssni, len = 0;
 
+	(void) oe;
 	if (p + 1 > e)
 		return (-EMSGSIZE);
 	pci = (p[0] >> 0) & 0x01;
@@ -13335,8 +13336,8 @@ mtp_info_ack(struct mt *mt, queue_t *q, mblk_t *mp)
 		} else if (add_len)
 			goto efault;
 	}
-	loc = (typeof(loc)) loc_ptr;
-	rem = (typeof(rem)) rem_ptr;
+	loc = (typeof(loc)) loc_ptr; (void) loc_len;
+	rem = (typeof(rem)) rem_ptr; (void) rem_len;
 	if (!loc)
 		goto efault;
 	for (sp = master.sp.list;

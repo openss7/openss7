@@ -5241,14 +5241,12 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 	int viable_route = 0;
 	int route_changed = 0;
 	struct sctp_daddr *sd;
-	struct sctp_daddr *taddr;
 	int old_pmtu;
 
 	assert(sp);
 	__ensure(sp->daddr, return (-EFAULT));
 	old_pmtu = xchg(&sp->pmtu, INT_MAX);	/* big enough? */
 	sp->route_caps = -1L;
-	taddr = sp->taddr;
 	/* First we check our cached routes..  */
 	for (sd = sp->daddr; sd; sd = sd->next) {
 		struct rtable *rt = (struct rtable *) sd->dst_cache;
@@ -13172,6 +13170,7 @@ sctp_recv_err(struct sctp *sp, mblk_t *mp)
 	int code = icmph->code;
 	int err = 0, abt = 0;
 
+	(void) err;
 	if (sp->state == SCTP_CLOSED)
 		goto closed;
 	sd = sctp_find_daddr(sp, daddr);
@@ -19543,6 +19542,7 @@ t_size_default_options(const struct sctp *t, const unsigned char *ip, size_t ile
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -19833,6 +19833,7 @@ t_size_current_options(const struct sctp *t, unsigned char *ip, size_t ilen)
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -21807,6 +21808,7 @@ t_build_default_options(const struct sctp *t, const unsigned char *ip, size_t il
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
@@ -22432,6 +22434,7 @@ t_build_current_options(const struct sctp *t, const unsigned char *ip, size_t il
 		if ((unsigned char *) ih + ih->len > ip + ilen)
 			goto einval;
 		optlen = ih->len - sizeof(*ih);
+		(void) optlen;
 		switch (ih->level) {
 		default:
 			goto einval;
