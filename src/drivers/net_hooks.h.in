@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -88,8 +88,14 @@ extern spinlock_t inet_proto_lock;
 #define net_protocol_lock() spin_lock_bh(&inet_proto_lock)
 #define net_protocol_unlock() spin_unlock_bh(&inet_proto_lock)
 #else
+#undef HAVE_KINC_LINUX_BRLOCK_H
+#ifdef HAVE_KINC_LINUX_BRLOCK_H
 #define net_protocol_lock() br_write_lock_bh(BR_NETPROTO_LOCK)
 #define net_protocol_unlock() br_write_unlock_bh(BR_NETPROTO_LOCK)
+#else
+#define net_protocol_lock() local_bh_disable()
+#define net_protocol_unlock() local_bh_enable()
+#endif
 #endif
 #endif				/* CONFIG_SMP */
 

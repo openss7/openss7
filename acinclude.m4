@@ -7,7 +7,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2009-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2009-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -1130,6 +1130,8 @@ dnl----------------------------------------------------------------------------
 	struct file_system_type.get_sb,
 	struct file_system_type.read_super,
 	struct fown_struct.pid_type,
+	struct rtable.u.dst,
+	struct rtable.dst,
 	struct inet_protocol.copy,
 	struct inet_protocol.next,
 	struct inet_protocol.no_policy,
@@ -4391,7 +4393,7 @@ AC_DEFUN([_OS7_], [dnl
 #
 # =============================================================================
 # 
-# Copyright (c) 2009-2010  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2009-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2009  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # 

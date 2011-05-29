@@ -13293,7 +13293,8 @@ mtp_dec_com(mblk_t *mp, struct mtp_msg *m)
 		if (mp->b_wptr < mp->b_rptr + 2)
 			break;
 		m->slc = *mp->b_rptr & 0x0f;
-		m->arg.fsnl = (*mp->b_rptr++ >> 4) | ((*mp->b_rptr++ & 0x7) << 4);
+		m->arg.fsnl = (mp->b_rptr[0] >> 4) | ((mp->b_rptr[1] & 0x7) << 4);
+		mp->b_rptr += 2;
 		return (0);
 	}
 	return (-EPROTO);
@@ -13325,7 +13326,8 @@ mtp_dec_cbm(mblk_t *mp, struct mtp_msg *m)
 		if (mp->b_wptr < mp->b_rptr + 2)
 			break;
 		m->slc = *mp->b_rptr & 0x0f;
-		m->arg.cbc = (*mp->b_rptr++ >> 4) | ((*mp->b_rptr++ & 0xf) << 4);
+		m->arg.cbc = (mp->b_rptr[0] >> 4) | ((mp->b_rptr[1] & 0xf) << 4);
+		mp->b_rptr += 2;
 		return (0);
 	}
 	return (-EPROTO);
@@ -13380,16 +13382,18 @@ mtp_dec_tfc(mblk_t *mp, struct mtp_msg *m)
 	case SS7_PVAR_ETSI:
 		if (mp->b_wptr < mp->b_rptr + 2)
 			break;
-		m->dest = (*mp->b_rptr++) | ((*mp->b_rptr & 0x3f) << 8);
-		m->arg.stat = *mp->b_rptr++ >> 6;
+		m->dest = (mp->b_rptr[0]) | ((mp->b_rptr[1] & 0x3f) << 8);
+		m->arg.stat = mp->b_rptr[1] >> 6;
+		mp->b_rptr += 2;
 		return (0);
 	case SS7_PVAR_ANSI:
 	case SS7_PVAR_JTTC:
 	case SS7_PVAR_CHIN:
 		if (mp->b_wptr < mp->b_rptr + 4)
 			break;
-		m->dest = (*mp->b_rptr++) | (*mp->b_rptr++ << 8) | (*mp->b_rptr++ << 16);
-		m->arg.stat = (*mp->b_rptr++ & 0x3);
+		m->dest = (mp->b_rptr[0]) | (mp->b_rptr[1] << 8) | (mp->b_rptr[2] << 16);
+		m->arg.stat = (mp->b_rptr[3] & 0x3);
+		mp->b_wptr += 4;
 		return (0);
 	}
 	return (-EPROTO);
@@ -13416,14 +13420,16 @@ mtp_dec_tfm(mblk_t *mp, struct mtp_msg *m)
 	case SS7_PVAR_ETSI:
 		if (mp->b_wptr < mp->b_rptr + 2)
 			break;
-		m->dest = (*mp->b_rptr++) | ((*mp->b_rptr & 0x3f) << 8);
+		m->dest = (mp->b_rptr[0]) | ((mp->b_rptr[1] & 0x3f) << 8);
+		mp->b_rptr += 2;
 		return (0);
 	case SS7_PVAR_ANSI:
 	case SS7_PVAR_JTTC:
 	case SS7_PVAR_CHIN:
 		if (mp->b_wptr < mp->b_rptr + 3)
 			break;
-		m->dest = (*mp->b_rptr++) | (*mp->b_rptr++ << 8) | (*mp->b_rptr++ << 16);
+		m->dest = (mp->b_rptr[0]) | (mp->b_rptr[1] << 8) | (mp->b_rptr[2] << 16);
+		mp->b_rptr += 3;
 		return (0);
 	}
 	return (-EPROTO);
@@ -13449,14 +13455,16 @@ mtp_dec_dlc(mblk_t *mp, struct mtp_msg *m)
 		if (mp->b_wptr < mp->b_rptr + 2)
 			break;
 		m->slc = m->sls;
-		m->arg.sdli = (*mp->b_rptr++) | ((*mp->b_rptr++ & 0x0f) << 8);
+		m->arg.sdli = (mp->b_rptr[0]) | ((mp->b_rptr[1] & 0x0f) << 8);
+		mp->b_rptr += 2;
 		return (0);
 	case SS7_PVAR_ANSI:
 		if (mp->b_wptr < mp->b_rptr + 3)
 			break;
-		m->slc = (*mp->b_rptr & 0x0f);
+		m->slc = (mp->b_rptr[0] & 0x0f);
 		m->arg.sdli =
-		    (*mp->b_rptr++ >> 4) | (*mp->b_rptr++ << 4) | ((*mp->b_rptr++ & 0x03) << 12);
+		    (mp->b_rptr[0] >> 4) | (mp->b_rptr[1] << 4) | ((mp->b_rptr[2] & 0x03) << 12);
+		mp->b_rptr += 3;
 		return (0);
 	}
 	return (-EPROTO);
@@ -13482,14 +13490,16 @@ mtp_dec_upm(mblk_t *mp, struct mtp_msg *m)
 	default:
 		if (mp->b_wptr < mp->b_rptr + 3)
 			break;
-		m->dest = ((*mp->b_rptr++)) | ((*mp->b_rptr++) & 0x3f << 8);
-		m->arg.upi = (*mp->b_rptr++ & 0x0f);
+		m->dest = ((mp->b_rptr[0])) | ((mp->b_rptr[1]) & 0x3f << 8);
+		m->arg.upi = (mp->b_rptr[2] & 0x0f);
+		mp->b_rptr += 3;
 		return (0);
 	case SS7_PVAR_ANSI:
 		if (mp->b_wptr < mp->b_rptr + 4)
 			break;
-		m->dest = ((*mp->b_rptr++)) | ((*mp->b_rptr++ << 8)) | ((*mp->b_rptr++ << 16));
-		m->arg.upi = (*mp->b_rptr++ & 0x0f);
+		m->dest = ((mp->b_rptr[0])) | ((mp->b_rptr[1] << 8)) | ((mp->b_rptr[2] << 16));
+		m->arg.upi = (mp->b_rptr[3] & 0x0f);
+		mp->b_rptr += 4;
 		return (0);
 	}
 	return (-EPROTO);
@@ -13631,10 +13641,10 @@ mtp_dec_rl(mblk_t *mp, struct mtp_msg *m)
 		/* 14-bit point codes - 32-bit RL */
 		if (mp->b_wptr < mp->b_rptr + 4)
 			break;
-		m->dpc = (*mp->b_rptr++ | ((*mp->b_rptr & 0x3f) << 8));
-		m->opc =
-		    ((*mp->b_rptr++ >> 6) | (*mp->b_rptr++ << 2) | ((*mp->b_rptr & 0x0f) << 10));
-		m->sls = (*mp->b_rptr++ >> 4) & 0x0f;
+		m->dpc = (mp->b_rptr[0] | ((mp->b_rptr[1] & 0x3f) << 8));
+		m->opc = ((mp->b_rptr[1] >> 6) | (mp->b_rptr[2] << 2) | ((mp->b_rptr[2] & 0x0f) << 10));
+		m->sls = (mp->b_rptr[3] >> 4) & 0x0f;
+		mp->b_rptr += 4;
 		return (0);
 	case SS7_PVAR_ANSI:
 	case SS7_PVAR_JTTC:
@@ -13642,9 +13652,10 @@ mtp_dec_rl(mblk_t *mp, struct mtp_msg *m)
 		/* 24-bit point codes - 56-bit RL */
 		if (mp->b_wptr < mp->b_rptr + 7)
 			break;
-		m->dpc = (*mp->b_rptr++ | (*mp->b_rptr++ << 8) | (*mp->b_rptr++ << 16));
-		m->opc = (*mp->b_rptr++ | (*mp->b_rptr++ << 8) | (*mp->b_rptr++ << 16));
-		m->sls = *mp->b_rptr++;
+		m->dpc = (mp->b_rptr[0] | (mp->b_rptr[1] << 8) | (mp->b_rptr[2] << 16));
+		m->opc = (mp->b_rptr[3] | (mp->b_rptr[4] << 8) | (mp->b_rptr[5] << 16));
+		m->sls = mp->b_rptr[6];
+		mp->b_rptr += 7;
 		if ((m->pvar & SS7_PVAR_YR) != SS7_PVAR_00)
 			m->sls &= 0x1f;
 		else

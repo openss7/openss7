@@ -13389,7 +13389,7 @@ t_conn_ind(ss_t *ss, queue_t *q, struct sock *sk)
 			return (0);
 		}
 	}
-	ss->seq = ++ss->seq ? : ++ss->seq;
+	ss->seq = (ss->seq + 1) ? : (ss->seq + 2);
 	SOCK_PRIV(sk) = (void *) ci;
 	__bufq_queue(&ss->conq, cp);
 	ss_set_state(ss, TS_WRES_CIND);

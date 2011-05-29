@@ -130,7 +130,7 @@ struct sockaddr_storage {
 /* Symbol icmp_err_convert is supported. */
 #undef HAVE_ICMP_ERR_CONVERT_SUPPORT
 #if defined HAVE_ICMP_ERR_CONVERT_SUPPORT || !defined CONFIG_KERNEL_WEAK_SYMBOLS
-extern struct icmp_err icmp_err_convert[];
+/* extern struct icmp_err icmp_err_convert[]; */ /* somebody made it const */
 #else
 extern struct icmp_err icmp_err_convert[];
 #endif
@@ -331,6 +331,17 @@ extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
 extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp);
 #endif
 #endif
+#endif
+
+#undef HAVE_KMEMB_STRUCT_RTABLE_U_DST
+#undef HAVE_KMEMB_STRUCT_RTABLE_DST
+
+#if   defined HAVE_KMEMB_STRUCT_RTABLE_U_DST
+#define rt_dst(__rt) (&(__rt)->u.dst)
+#elif defined HAVE_KMEMB_STRUCT_RTABLE_DST
+#define rt_dst(__rt) (&(__rt)->dst)
+#else
+#error Need to find the dst_entry from the rtable.
 #endif
 
 /* Define to 1 if 'path' is member of 'struct dst_entry'. */

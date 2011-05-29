@@ -3771,8 +3771,7 @@ tp_init_nproto(unsigned char proto, unsigned int type)
 				pp->proto.next = (*ppp)->next;
 #endif
 			}
-			pp->next = (*ppp);
-			*ppp = &pp->proto;
+			pp->next = xchg(ppp, &pp->proto);
 			net_protocol_unlock();
 		}
 		/* link into hash slot */
@@ -4410,8 +4409,8 @@ tp_route_output_slow(struct tp *tp, const struct tp_options *opt, struct rtable 
 	if (XCHG(rtp, NULL) != NULL)
 		dst_release(XCHG(&tp->daddrs[0].dst, NULL));
 	if (likely((err = ip_route_output(rtp, opt->ip.daddr, opt->ip.addr, 0, 0)) == 0)) {
-		dst_hold(&(*rtp)->u.dst);
-		tp->daddrs[0].dst = &(*rtp)->u.dst;
+		dst_hold(rt_dst(*rtp));
+		tp->daddrs[0].dst = rt_dst(*rtp);
 	}
 	return (err);
 }
@@ -4423,7 +4422,7 @@ tp_route_output(struct tp *tp, const struct tp_options *opt, struct rtable **rtp
 
 	if (likely((rt = *rtp) != NULL)) {
 		if (likely(rt->rt_dst == opt->ip.daddr)) {
-			dst_hold(&rt->u.dst);
+			dst_hold(rt_dst(rt));
 			return (0);
 		}
 	}
@@ -4458,7 +4457,7 @@ tp_senddata(struct tp *tp, mblk_t *db, const unsigned short dport, const struct 
 	dassert(opt != NULL);
 	if (likely((err = tp_route_output(tp, opt, &rt)) == 0)) {
 		struct sk_buff *skb;
-		struct net_device *dev = rt->u.dst.dev;
+		struct net_device *dev = rt_dst(rt)->dev;
 		size_t hlen = ((dev->hard_header_len + 15) & ~15)
 		    + sizeof(struct iphdr) + sizeof(struct udphdr);
 		size_t dlen = msgsize(mp);
@@ -4492,7 +4491,7 @@ tp_senddata(struct tp *tp, mblk_t *db, const unsigned short dport, const struct 
 			__skb_push(skb, sizeof(struct iphdr));
 			skb_reset_network_header(skb);
 
-			skb_dst_set(skb, &rt->u.dst);
+			skb_dst_set(skb, rt_dst(rt));
 			skb->priority = 0;	// opt->xti.priority;
 
 			iph = (typeof(iph)) skb_network_header(skb);
@@ -4515,10 +4514,10 @@ tp_senddata(struct tp *tp, mblk_t *db, const unsigned short dport, const struct 
 
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
-			__ip_select_ident(iph, &rt->u.dst);
+			__ip_select_ident(iph, rt_dst(rt));
 #else
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
-			__ip_select_ident(iph, &rt->u.dst, 0);
+			__ip_select_ident(iph, rt_dst(rt), 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
 #endif
@@ -4795,7 +4794,7 @@ tp_connect(struct tp *tp, const struct sockaddr_in *DEST_buffer, const socklen_t
 
 		if ((err = ip_route_output(&rt, DEST_buffer[i].sin_addr.s_addr, 0, 0, 0)))
 			goto recover;
-		tp->daddrs[i].dst = &rt->u.dst;
+		tp->daddrs[i].dst = rt_dst(rt);
 
 		/* Note that we do not have to use the destination reference cached above.  It is
 		   enough that we hold a reference to it so that it remains in the routing caches
@@ -5137,7 +5136,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 
 			if ((err = ip_route_output(&rt, RES_buffer[i].sin_addr.s_addr, 0, 0, 0)))
 				goto recover;
-			ACCEPTOR_id->daddrs[i].dst = &rt->u.dst;
+			ACCEPTOR_id->daddrs[i].dst = rt_dst(rt);
 
 			/* Note that we do not have to use the destination reference cached above.
 			   It is enough that we hold a reference to it so that it remains in the
@@ -5157,7 +5156,7 @@ tp_passive(struct tp *tp, const struct sockaddr_in *RES_buffer, const socklen_t 
 
 		if ((err = ip_route_output(&rt, iph->saddr, 0, 0, 0)))
 			goto recover;
-		ACCEPTOR_id->daddrs[0].dst = &rt->u.dst;
+		ACCEPTOR_id->daddrs[0].dst = rt_dst(rt);
 
 		/* Note that we do not have to use the destination reference cached above.  It is
 		   enough that we hold a reference to it so that it remains in the routing caches

@@ -318,7 +318,7 @@ sctp_update_routes(sp, force_reselect)
 	for (sd = sp->daddr; sd; sd = sd->next) {
 		struct rtable *rt = (struct rtable *) sd->dst_cache;
 
-		if (rt && (rt->u.dst.obsolete || rt->u.dst.ops->check(&rt->u.dst, 0))) {
+		if (rt && (rt_dst(rt)->obsolete || rt_dst(rt)->ops->check(rt_dst(rt), 0))) {
 			rare();
 			sd->dst_cache = NULL;
 			ip_rt_put(rt);
@@ -373,10 +373,10 @@ sctp_update_routes(sp, force_reselect)
 			sd->rto = sp->rto_ini;
 			sd->rttvar = 0;
 			sd->srtt = 0;
-			sd->mtu = dst_pmtu(&rt->u.dst);
+			sd->mtu = dst_pmtu(rt_dst(rt));
 			sd->ssthresh = 2 * sd->mtu;
 			sd->cwnd = sd->mtu;
-			sd->dst_cache = &rt->u.dst;
+			sd->dst_cache = rt_dst(rt);
 
 			route_changed = 1;
 		}
@@ -405,10 +405,10 @@ sctp_update_routes(sp, force_reselect)
 					sd->rto = sp->rto_ini;
 					sd->rttvar = 0;
 					sd->srtt = 0;
-					sd->mtu = dst_pmtu(&rt->u.dst);
+					sd->mtu = dst_pmtu(rt_dst(rt));
 					sd->ssthresh = 2 * sd->mtu;
 					sd->cwnd = sd->mtu;
-					sd->dst_cache = &rt->u.dst;
+					sd->dst_cache = rt_dst(rt);
 
 					route_changed = 1;
 				}
@@ -419,8 +419,8 @@ sctp_update_routes(sp, force_reselect)
 
 		/* always update MTU if we have a viable route */
 
-		if (sd->mtu != dst_pmtu(&rt->u.dst)) {
-			sd->mtu = dst_pmtu(&rt->u.dst);
+		if (sd->mtu != dst_pmtu(rt_dst(rt))) {
+			sd->mtu = dst_pmtu(rt_dst(rt));
 			mtu_changed = 1;
 			rare();
 		}

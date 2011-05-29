@@ -195,7 +195,7 @@ sctp_queue_xmit(struct sk_buff *skb)
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
 
-	if (skb->len > rt->u.dst.pmtu) {
+	if (skb->len > rt_dst(rt)->pmtu) {
 		rare();
 		return ip_fragment(skb, skb->dst->output);
 	} else {
@@ -226,7 +226,7 @@ sctp_xmit_ootb(daddr, saddr, mp)
 	ensure(mp, return);
 	if (!ip_route_output(&rt, daddr, 0, 0, 0)) {
 		struct sk_buff *skb;
-		struct net_device *dev = rt->u.dst.dev;
+		struct net_device *dev = rt_dst(rt)->dev;
 		size_t hlen = (dev->hard_header_len + 15) & ~15;
 		size_t plen = msgdsize(mp);
 		size_t tlen = plen + sizeof(struct iphdr);
@@ -245,7 +245,7 @@ sctp_xmit_ootb(daddr, saddr, mp)
 			sh = (struct sctphdr *) (iph + 1);
 			data = (unsigned char *) (sh);
 
-			skb->dst = &rt->u.dst;
+			skb->dst = rt_dst(rt);
 			skb->priority = 0;
 
 			iph->version = 4;
@@ -258,7 +258,7 @@ sctp_xmit_ootb(daddr, saddr, mp)
 			iph->protocol = 132;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
-			__ip_select_ident(iph, &rt->u.dst);
+			__ip_select_ident(iph, rt_dst(rt));
 
 			for (bp = mp; bp; bp = bp->b_cont) {
 				int blen = bp->b_wptr - bp->b_rptr;
@@ -305,7 +305,7 @@ sctp_xmit_msg(daddr, mp, sp)
 	ensure(mp, return);
 	if (!ip_route_output(&rt, daddr, 0, RT_TOS(sp->ip_tos) | sp->ip_dontroute, 0)) {
 		struct sk_buff *skb;
-		struct net_device *dev = rt->u.dst.dev;
+		struct net_device *dev = rt_dst(rt)->dev;
 		size_t hlen = (dev->hard_header_len + 15) & ~15;
 		size_t plen = msgdsize(mp);
 		size_t tlen = plen + sizeof(struct iphdr);
@@ -325,7 +325,7 @@ sctp_xmit_msg(daddr, mp, sp)
 			sh = (struct sctphdr *) (iph + 1);
 			data = (unsigned char *) (sh);
 
-			skb->dst = &rt->u.dst;
+			skb->dst = rt_dst(rt);
 			skb->priority = sp->ip_priority;
 
 			iph->version = 4;
@@ -338,7 +338,7 @@ sctp_xmit_msg(daddr, mp, sp)
 			iph->protocol = sp->ip_proto;
 			iph->tot_len = htons(tlen);
 			skb->nh.iph = iph;
-			__ip_select_ident(iph, &rt->u.dst);
+			__ip_select_ident(iph, rt_dst(rt));
 
 			for (bp = mp; bp; bp = bp->b_cont) {
 				int blen = bp->b_wptr - bp->b_rptr;
