@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -87,7 +87,7 @@ static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.
 #include <asm/div64.h>		/* for do_div */
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:31 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -2442,18 +2442,15 @@ EXPORT_SYMBOL(mi_freeq);
 __MPS_EXTERN int
 mi_strlog(queue_t *q, char level, ushort flags, char *fmt, ...)
 {
-	int result = 0;
+	int result;
+	struct mi_comm *mi = ptr_to_mi(q->q_ptr);
+	modID_t mid = mi->mi_mid;
+	minor_t sid = mi->mi_sid;
+	va_list args;
 
-	if (vstrlog != NULL) {
-		struct mi_comm *mi = ptr_to_mi(q->q_ptr);
-		modID_t mid = mi->mi_mid;
-		minor_t sid = mi->mi_sid;
-		va_list args;
-
-		va_start(args, fmt);
-		result = vstrlog(mid, sid, level, flags, fmt, args);
-		va_end(args);
-	}
+	va_start(args, fmt);
+	result = vstrlog(mid, sid, level, flags, fmt, args);
+	va_end(args);
 	return (result);
 }
 
