@@ -1125,7 +1125,7 @@ npi_connect(struct np *np, struct sockaddr_in *DEST_buffer, socklen_t DEST_lengt
 				dst_release(XCHG(&np->daddrs[i].dst, NULL));
 			goto error;
 		}
-		np->daddrs[i].dst = &rt->u.dst;
+		np->daddrs[i].dst = rt_dst(rt);
 
 		/* Note that we do not have to use the destination reference cached above.  It is
 		   enough that we hold a reference to it so that it remains in the routing caches
@@ -1603,7 +1603,7 @@ npi_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 					dst_release(XCHG(&TOKEN_value->daddrs[i].dst, NULL));
 				goto error;
 			}
-			TOKEN_value->daddrs[i].dst = &rt->u.dst;
+			TOKEN_value->daddrs[i].dst = rt_dst(rt);
 
 			/* Note that we do not have to use the destination reference cached above.
 			   It is enough that we hold a reference to it so that it remains in the
@@ -1623,7 +1623,7 @@ npi_passive(struct np *np, struct sockaddr_in *RES_buffer, socklen_t RES_length,
 
 		if ((NPI_error = ip_route_output(&rt, iph->saddr, 0, 0, 0)))
 			goto error;
-		TOKEN_value->daddrs[0].dst = &rt->u.dst;
+		TOKEN_value->daddrs[0].dst = rt_dst(rt);
 
 		/* Note that we do not have to use the destination reference cached above.  It is
 		   enough that we hold a reference to it so that it remains in the routing caches
@@ -1680,15 +1680,15 @@ npi_ip_queue_xmit(struct sk_buff *skb)
 	struct iphdr *iph = skb->nh.iph;
 
 #ifdef NETIF_F_TSO
-	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
+	ip_select_ident_more(iph, rt_dst(rt), NULL, 0);
 #else
-	ip_select_ident(iph, &rt->u.dst, NULL);
+	ip_select_ident(iph, rt_dst(rt), NULL);
 #endif
 	ip_send_check(iph);
 #ifdef HAVE_KFUNC_IP_DST_OUTPUT
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, ip_dst_output);
 #else
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, dst_output);
 #endif
 }
 #else
@@ -1698,7 +1698,7 @@ npi_ip_queue_xmit(struct sk_buff *skb)
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
 
-	if (skb->len > dst_pmtu(&rt->u.dst)) {
+	if (skb->len > dst_pmtu(rt_dst(rt))) {
 		rare();
 		return ip_fragment(skb, skb->dst->output);
 	} else {
@@ -1723,7 +1723,7 @@ npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 
 	if (!ip_route_output(&rt, daddr, np->qos.saddr, 0, 0)) {
 		struct sk_buff *skb;
-		struct net_device *dev = rt->u.dst.dev;
+		struct net_device *dev = rt_dst(rt)->dev;
 		size_t hlen = (dev->hard_header_len + 15) & ~15;
 		size_t plen = msgdsize(mp);
 		size_t tlen = plen + sizeof(struct iphdr);
@@ -1740,7 +1740,7 @@ npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 			/* find headers */
 			iph = (typeof(iph)) __skb_put(skb, tlen);
 			data = (unsigned char *) iph + sizeof(struct iphdr);
-			skb->dst = &rt->u.dst;
+			skb->dst = rt_dst(rt);
 			skb->priority = np->qos.priority;
 			iph->version = 4;
 			iph->ihl = 5;
@@ -1753,10 +1753,10 @@ npi_senddata(struct np *np, unsigned char protocol, uint32_t daddr, mblk_t *mp)
 			skb->nh.iph = iph;
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
-			__ip_select_ident(iph, &rt->u.dst);
+			__ip_select_ident(iph, rt_dst(rt));
 #else
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
-			__ip_select_ident(iph, &rt->u.dst, 0);
+			__ip_select_ident(iph, rt_dst(rt), 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
 #endif

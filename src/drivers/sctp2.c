@@ -5287,7 +5287,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 #endif
 #endif
 #endif
-			if (err < 0 || !rt || rt->u.dst.obsolete) {
+			if (err < 0 || !rt || rt_dst(rt)->obsolete) {
 				rare();
 				LOGERR(sp, "%s() no route", __FUNCTION__);
 				if (rt)
@@ -5336,16 +5336,16 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			sd->rto = sp->rto_ini;
 			sd->rttvar = 0;
 			sd->srtt = 0;
-			sd->mtu = dst_pmtu(&rt->u.dst);
+			sd->mtu = dst_pmtu(rt_dst(rt));
 			sd->dmps =
 			    sd->mtu - sp->ext_header_len - sizeof(struct iphdr) -
 			    sizeof(struct sctphdr);
-			sd->ssthresh = 2 * dst_pmtu(&rt->u.dst);
-			sd->cwnd = dst_pmtu(&rt->u.dst);
+			sd->ssthresh = 2 * dst_pmtu(rt_dst(rt));
+			sd->cwnd = dst_pmtu(rt_dst(rt));
 			/* SCTP IG Section 2.9 */
 			sd->partial_ack = 0;
-			sd->dst_cache = &rt->u.dst;
-			sd->route_caps = rt->u.dst.dev->features;
+			sd->dst_cache = rt_dst(rt);
+			sd->route_caps = rt_dst(rt)->dev->features;
 			route_changed = 1;
 		}
 		/* You're welcome diald! */
@@ -5380,16 +5380,16 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 					sd->rto = sp->rto_ini;
 					sd->rttvar = 0;
 					sd->srtt = 0;
-					sd->mtu = dst_pmtu(&rt->u.dst);
+					sd->mtu = dst_pmtu(rt_dst(rt));
 					sd->dmps =
 					    sd->mtu - sp->ext_header_len - sizeof(struct iphdr) -
 					    sizeof(struct sctphdr);
-					sd->ssthresh = 2 * dst_pmtu(&rt->u.dst);
-					sd->cwnd = dst_pmtu(&rt->u.dst);
+					sd->ssthresh = 2 * dst_pmtu(rt_dst(rt));
+					sd->cwnd = dst_pmtu(rt_dst(rt));
 					/* SCTP IG Section 2.9 */
 					sd->partial_ack = 0;
-					sd->dst_cache = &rt->u.dst;
-					sd->route_caps = rt->u.dst.dev->features;
+					sd->dst_cache = rt_dst(rt);
+					sd->route_caps = rt_dst(rt)->dev->features;
 					route_changed = 1;
 				}
 				ip_rt_put(rt2);
@@ -5397,9 +5397,9 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 		}
 		viable_route = 1;
 		/* always update MTU if we have a viable route */
-		sd->route_caps &= rt->u.dst.dev->features;	/* XXX */
-		if (sd->mtu != dst_pmtu(&rt->u.dst)) {
-			sd->mtu = dst_pmtu(&rt->u.dst);
+		sd->route_caps &= rt_dst(rt)->dev->features;	/* XXX */
+		if (sd->mtu != dst_pmtu(rt_dst(rt))) {
+			sd->mtu = dst_pmtu(rt_dst(rt));
 			sd->dmps =
 			    sd->mtu - sp->ext_header_len - sizeof(struct iphdr) -
 			    sizeof(struct sctphdr);
@@ -5474,18 +5474,18 @@ sctp_queue_xmit(struct sk_buff *skb)
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #ifdef NETIF_F_TSO
-	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
+	ip_select_ident_more(iph, rt_dst(rt), NULL, 0);
 #else
-	ip_select_ident(iph, &rt->u.dst, NULL);
+	ip_select_ident(iph, rt_dst(rt), NULL);
 #endif
 	ip_send_check(iph);
 #ifndef NF_IP_LOCAL_OUT
 #define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
 #endif
 #ifdef HAVE_KFUNC_IP_DST_OUTPUT
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, ip_dst_output);
 #else
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, dst_output);
 #endif
 }
 #else
@@ -5495,7 +5495,7 @@ sctp_queue_xmit(struct sk_buff *skb)
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
 
-	if (skb->len > dst_pmtu(&rt->u.dst)) {
+	if (skb->len > dst_pmtu(rt_dst(rt))) {
 		rare();
 		return ip_fragment(skb, skb->dst->output);
 	} else {
@@ -5535,7 +5535,7 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 	ensure(mp, return);
 	if (!ip_route_output(&rt, daddr, 0, 0, 0)) {
 		struct sk_buff *skb;
-		struct net_device *dev = rt->u.dst.dev;
+		struct net_device *dev = rt_dst(rt)->dev;
 		size_t hlen = (dev->hard_header_len + 15) & ~15;
 		size_t plen = msgdsize(mp);
 		size_t tlen = plen + sizeof(struct iphdr);
@@ -5558,7 +5558,7 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 			iph = (typeof(iph)) __skb_put(skb, tlen);
 			sh = (typeof(sh)) (iph + 1);
 			data = (unsigned char *) (sh);
-                        skb_dst_set(skb, &rt->u.dst);
+                        skb_dst_set(skb, rt_dst(rt));
 			skb->priority = 0;
 			iph->version = 4;
 			iph->ihl = 5;
@@ -5582,10 +5582,10 @@ sctp_xmit_ootb(uint32_t daddr, uint32_t saddr, mblk_t *mp)
 #endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
-			__ip_select_ident(iph, &rt->u.dst);
+			__ip_select_ident(iph, rt_dst(rt));
 #else
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
-			__ip_select_ident(iph, &rt->u.dst, 0);
+			__ip_select_ident(iph, rt_dst(rt), 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
 #endif
@@ -5650,7 +5650,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 	ensure(mp, return);
 	if (!ip_route_output(&rt, daddr, saddr, RT_TOS(ip->tos) | sp->localroute, 0)) {
 		struct sk_buff *skb;
-		struct net_device *dev = rt->u.dst.dev;
+		struct net_device *dev = rt_dst(rt)->dev;
 		size_t hlen = (dev->hard_header_len + 15) & ~15;
 		size_t plen = msgdsize(mp);
 		size_t tlen = plen + sizeof(struct iphdr);
@@ -5672,7 +5672,7 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 			iph = (struct iphdr *) __skb_put(skb, tlen);
 			sh = (struct sctphdr *) (iph + 1);
 			data = (unsigned char *) (sh);
-                        skb_dst_set(skb, &rt->u.dst);
+                        skb_dst_set(skb, rt_dst(rt));
 			skb->priority = sp->priority;
 			iph->version = 4;
 			iph->ihl = 5;
@@ -5706,10 +5706,10 @@ sctp_xmit_msg(uint32_t saddr, uint32_t daddr, mblk_t *mp, struct sctp *sp)
 #endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #ifndef HAVE_KFUNC_DST_OUTPUT
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
-			__ip_select_ident(iph, &rt->u.dst);
+			__ip_select_ident(iph, rt_dst(rt));
 #else
 #ifdef HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
-			__ip_select_ident(iph, &rt->u.dst, 0);
+			__ip_select_ident(iph, rt_dst(rt), 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
 #endif

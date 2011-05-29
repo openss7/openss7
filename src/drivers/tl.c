@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -103,7 +103,7 @@ static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
 
 #define TI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TI_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define TI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:40 $"
 #define TI_DEVICE	"SVR 4.2 MP STREAMS TI Driver"
 #define TI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1973,7 +1973,7 @@ tp_passive(struct tp *tp, const struct sockaddr_un *RES_buffer, const socklen_t 
 
 			if ((err = ip_route_output(&rt, RES_buffer[i].sin_addr.s_addr, 0, 0, 0)))
 				goto recover;
-			ACCEPTOR_id->daddrs[i].dst = &rt->u.dst;
+			ACCEPTOR_id->daddrs[i].dst = rt_dst(rt);
 
 			/* Note that we do not have to use the destination reference cached above.
 			   It is enough that we hold a reference to it so that it remains in the
@@ -1993,7 +1993,7 @@ tp_passive(struct tp *tp, const struct sockaddr_un *RES_buffer, const socklen_t 
 
 		if ((err = ip_route_output(&rt, iph->saddr, 0, 0, 0)))
 			goto recover;
-		ACCEPTOR_id->daddrs[0].dst = &rt->u.dst;
+		ACCEPTOR_id->daddrs[0].dst = rt_dst(rt);
 
 		/* Note that we do not have to use the destination reference cached above.  It is
 		   enough that we hold a reference to it so that it remains in the routing caches

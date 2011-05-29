@@ -4075,8 +4075,6 @@ tpi_v4_err_next(struct sk_buff *skb, __u32 info)
 	return (0);
 }
 
-extern spinlock_t inet_proto_lock;
-
 /**
  * tpi_init_nproto - initialize network protocol override
  *
@@ -4095,18 +4093,18 @@ tpi_init_nproto(unsigned char proto)
 		return (-EALREADY);	/* already initialized */
 	ip = tpi_bhash[slot].ipproto = &tpi_proto[slot];
 	/* reduces to inet_add_protocol() if no protocol registered */
-	spin_lock_bh(&inet_proto_lock);
+	net_protocol_lock();
 	if ((ip->next = (struct net_protocol *)inet_protos[hash]) != NULL) {
 		if ((ip->kmod = streams_module_address((ulong) ip->next))
 		    && ip->kmod != THIS_MODULE) {
 			if (!try_module_get(ip->kmod)) {
-				spin_unlock_bh(&inet_proto_lock);
+				net_protocol_unlock();
 				return (-EAGAIN);
 			}
 		}
 	}
 	inet_protos[hash] = &ip->proto;
-	spin_unlock_bh(&inet_proto_lock);
+	net_protocol_unlock();
 	synchronize_net();
 	return (0);
 }
@@ -4128,9 +4126,9 @@ tpi_term_nproto(unsigned char proto)
 	if ((ip = tpi_bhash[slot].ipproto) == NULL)
 		return (-EALREADY);	/* already terminated */
 	/* reduces to inet_del_protocol() if no protocol was registered */
-	spin_lock_bh(&inet_proto_lock);
+	net_protocol_lock();
 	inet_protos[hash] = ip->next;
-	spin_unlock_bh(&inet_proto_lock);
+	net_protocol_unlock();
 	synchronize_net();
 	tpi_bhash[slot].ipproto = NULL;
 	if (ip->next != NULL && ip->kmod != NULL && ip->kmod != THIS_MODULE)
@@ -4432,18 +4430,18 @@ t_tpi_queue_xmit(struct sk_buff *skb)
 	struct iphdr *iph = (typeof(iph)) skb_network_header(skb);
 
 #if defined NETIF_F_TSO
-	ip_select_ident_more(iph, &rt->u.dst, NULL, 0);
+	ip_select_ident_more(iph, rt_dst(rt), NULL, 0);
 #else				/* !defined NETIF_F_TSO */
-	ip_select_ident(iph, &rt->u.dst, NULL);
+	ip_select_ident(iph, rt_dst(rt), NULL);
 #endif				/* defined NETIF_F_TSO */
 	ip_send_check(iph);
 #ifndef NF_IP_LOCAL_OUT
 #define NF_IP_LOCAL_OUT NF_INET_LOCAL_OUT
 #endif
 #if defined HAVE_KFUNC_IP_DST_OUTPUT
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, ip_dst_output);
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, ip_dst_output);
 #else				/* !defined HAVE_KFUNC_IP_DST_OUTPUT */
-	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt->u.dst.dev, dst_output);
+	return NF_HOOK(PF_INET, NF_IP_LOCAL_OUT, skb, NULL, rt_dst(rt)->dev, dst_output);
 #endif				/* defined HAVE_KFUNC_IP_DST_OUTPUT */
 }
 #else				/* !defined HAVE_KFUNC_DST_OUTPUT */
@@ -4453,7 +4451,7 @@ t_tpi_queue_xmit(struct sk_buff *skb)
 	struct rtable *rt = (struct rtable *) skb->dst;
 	struct iphdr *iph = skb->nh.iph;
 
-	if (skb->len > dst_pmtu(&rt->u.dst)) {
+	if (skb->len > dst_pmtu(rt_dst(rt))) {
 		rare();
 		return ip_fragment(skb, skb->dst->output);
 	} else {
@@ -4495,7 +4493,7 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 
 	if (likely((err = ip_route_output(&rt, sin->sin_addr.s_addr, 0, 0, 0)) == 0)) {
 		struct sk_buff *skb;
-		struct net_device *dev = rt->u.dst.dev;
+		struct net_device *dev = rt_dst(rt)->dev;
 		size_t hlen = (dev->hard_header_len + 15) & ~15;
 		size_t ulen = msgsize(dp);
 		size_t plen = sizeof(struct tcphdr) + ulen;
@@ -4517,7 +4515,7 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 			th->source = htons(tpi->port);
 			// uh->len = htons(ulen);
 			th->check = 0;
-			skb_dst_set(skb, &rt->u.dst);
+			skb_dst_set(skb, rt_dst(rt));
 			/* Should probably add an XTI_PRIORITY option at the XTI_GENERIC level. */
 			skb->priority = 0;
 			iph->version = 4;
@@ -4547,9 +4545,9 @@ t_tpi_xmitmsg(queue_t *q, mblk_t *dp, struct sockaddr_in *sin, struct tpi_option
 #endif				/* defined HAVE_KMEMB_STRUCT_SK_BUFF_TRANSPORT_HEADER */
 #if !defined HAVE_KFUNC_DST_OUTPUT
 #if defined HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS
-			__ip_select_ident(iph, &rt->u.dst);
+			__ip_select_ident(iph, rt_dst(rt));
 #elif defined HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS
-			__ip_select_ident(iph, &rt->u.dst, 0);
+			__ip_select_ident(iph, rt_dst(rt), 0);
 #else
 #error HAVE_KFUNC___IP_SELECT_IDENT_2_ARGS or HAVE_KFUNC___IP_SELECT_IDENT_3_ARGS must be defined.
 #endif

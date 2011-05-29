@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -118,9 +118,11 @@ int Search_Table(mib_table_t, void *, int);
 int Add_Entry(mib_table_t, void *);
 void *Retrieve_Table_Data(mib_table_t, int *);
 
+#if 0
 int marker_uptime(marker_t pm);
 int marker_tticks(marker_t pm);
 int timeval_uptime(struct timeval *tv);
 int timeval_tticks(struct timeval *tv);
+#endif
 
 #endif				/* __LOCAL_UTIL_FUNCS_H__ */
