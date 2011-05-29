@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -86,7 +86,7 @@ static char const ident[] = "$RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <net/ip.h>
 
 #define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define ITOT_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define ITOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:02 $"
 #define ITOT_DEVICE	"SVR 4.2 MP STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -208,7 +208,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 		struct T_conn_ind *t = (typeof(t)) mp->b_rptr;
 		struct sockaddr_in *sin =
 		    (struct sockaddr_in *) ((unsigned char *) t + t->SRC_offset);
-		int length = 0;
+		int length;
 
 		(void) sin;
 		n.prim.PRIM_type = N_CONN_IND;
@@ -237,7 +237,7 @@ itot_r_proto(queue_t *q, mblk_t *mp)
 			length = sizeof(n);
 		} else
 			length = sizeof(n.prim);
-
+		(void) length;
 	}
 	case T_CONN_CON:
 	{

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -137,7 +137,7 @@ static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
 #define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $"
-#define M3UA_AS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define M3UA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define M3UA_AS_LICENSE		"GPL"
@@ -4212,6 +4212,7 @@ n_data_ind_slow(struct mtp *mtp, queue_t *q, mblk_t *mp, N_data_ind_t * p)
 		mtp->rbuf = linkmsg(mtp->rbuf, dp);
 	} else {
 		bp = linkmsg(XCHG(&mtp->rbuf, NULL), dp);
+		(void) bp;
 		if ((err = mtp_recv_msg(mtp, q, mp))) {
 			if (err < 0) {
 				mtp->rbuf = unlinkmsg(mtp->rbuf, dp);
