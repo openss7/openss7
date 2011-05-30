@@ -12,7 +12,7 @@ bld_cv_pkg_cmd_GPG=${bld_cv_pkg_cmd_GPG='zypper install gpg2'}
 bld_cv_pkg_cmd_GROFF=${bld_cv_pkg_cmd_GROFF='zypper install groff'}
 bld_cv_pkg_cmd_GZIP_CMD=${bld_cv_pkg_cmd_GZIP_CMD='zypper install gzip'}
 bld_cv_pkg_cmd_INSSERV=${bld_cv_pkg_cmd_INSSERV='zypper install insserv'}
-bld_cv_pkg_cmd_JAVADOC=${bld_cv_pkg_cmd_JAVADOC='zypper install gjdoc'}
+bld_cv_pkg_cmd_JAVADOC=${bld_cv_pkg_cmd_JAVADOC='zypper install java-1_6_0-openjdk-devel'}
 bld_cv_pkg_cmd_KGENKSYMS=${bld_cv_pkg_cmd_KGENKSYMS='zypper install kernel-desktop-devel'}
 bld_cv_pkg_cmd_LATEX2HTML=${bld_cv_pkg_cmd_LATEX2HTML='zypper install latex2html'}
 bld_cv_pkg_cmd_LDCONFIG=${bld_cv_pkg_cmd_LDCONFIG='zypper install glibc'}
@@ -23,6 +23,7 @@ bld_cv_pkg_cmd_MAKEWHATIS=${bld_cv_pkg_cmd_MAKEWHATIS='zypper install man'}
 bld_cv_pkg_cmd_MD5SUM=${bld_cv_pkg_cmd_MD5SUM='zypper install coreutils'}
 bld_cv_pkg_cmd_MODPROBE=${bld_cv_pkg_cmd_MODPROBE='zypper install module-init-tools'}
 bld_cv_pkg_cmd_MODULE_SYMVERS=${bld_cv_pkg_cmd_MODULE_SYMVERS='zypper install kernel-desktop-devel'}
+bld_cv_pkg_cmd_PACKAGE_LIST=${bld_cv_pkg_cmd_PACKAGE_LIST='zypper install java-1_6_0-openjdk-javadoc'}
 bld_cv_pkg_cmd_PIC=${bld_cv_pkg_cmd_PIC='zypper install groff'}
 bld_cv_pkg_cmd_PS2EPSI=${bld_cv_pkg_cmd_PS2EPSI='zypper install ghostscript-library'}
 bld_cv_pkg_cmd_PS2PDF=${bld_cv_pkg_cmd_PS2PDF='zypper install ghostscript-library'}
@@ -51,7 +52,7 @@ bld_cv_pkg_name_GPG=${bld_cv_pkg_name_GPG=gpg2}
 bld_cv_pkg_name_GROFF=${bld_cv_pkg_name_GROFF=groff}
 bld_cv_pkg_name_GZIP_CMD=${bld_cv_pkg_name_GZIP_CMD=gzip}
 bld_cv_pkg_name_INSSERV=${bld_cv_pkg_name_INSSERV=insserv}
-bld_cv_pkg_name_JAVADOC=${bld_cv_pkg_name_JAVADOC=gjdoc}
+bld_cv_pkg_name_JAVADOC=${bld_cv_pkg_name_JAVADOC=java-1_6_0-openjdk-devel}
 bld_cv_pkg_name_KGENKSYMS=${bld_cv_pkg_name_KGENKSYMS=kernel-desktop-devel}
 bld_cv_pkg_name_LATEX2HTML=${bld_cv_pkg_name_LATEX2HTML=latex2html}
 bld_cv_pkg_name_LDCONFIG=${bld_cv_pkg_name_LDCONFIG=glibc}
@@ -62,6 +63,7 @@ bld_cv_pkg_name_MAKEWHATIS=${bld_cv_pkg_name_MAKEWHATIS=man}
 bld_cv_pkg_name_MD5SUM=${bld_cv_pkg_name_MD5SUM=coreutils}
 bld_cv_pkg_name_MODPROBE=${bld_cv_pkg_name_MODPROBE=module-init-tools}
 bld_cv_pkg_name_MODULE_SYMVERS=${bld_cv_pkg_name_MODULE_SYMVERS=kernel-desktop-devel}
+bld_cv_pkg_name_PACKAGE_LIST=${bld_cv_pkg_name_PACKAGE_LIST=java-1_6_0-openjdk-javadoc}
 bld_cv_pkg_name_PIC=${bld_cv_pkg_name_PIC=groff}
 bld_cv_pkg_name_PS2EPSI=${bld_cv_pkg_name_PS2EPSI=ghostscript-library}
 bld_cv_pkg_name_PS2PDF=${bld_cv_pkg_name_PS2PDF=ghostscript-library}
@@ -79,6 +81,7 @@ bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib/perl5/5.12.3/x86_64-linux-thread-multi/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.5/gcj/cni.h}
 bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/lib/modules/2.6.37.1-1.2-desktop/build/Module.symvers}
+bld_cv_pkg_path_PACKAGE_LIST=${bld_cv_pkg_path_PACKAGE_LIST=/usr/share/javadoc/java-1.6.0-openjdk/api/package-list}
 bld_cv_pkg_path_SYMVERS_2_6_37_1_1_2_DESKTOP_GZ=${bld_cv_pkg_path_SYMVERS_2_6_37_1_1_2_DESKTOP_GZ=/boot/symvers-2.6.37.1-1.2-desktop.gz}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
@@ -103,7 +106,7 @@ bld_cv_pkg_prog_INSSERV=${bld_cv_pkg_prog_INSSERV=insserv}
 bld_cv_pkg_prog_JAR=${bld_cv_pkg_prog_JAR=gjar-4.5}
 bld_cv_pkg_prog_JARSIGNER=${bld_cv_pkg_prog_JARSIGNER=gjarsigner-4.5}
 bld_cv_pkg_prog_JAVAC=${bld_cv_pkg_prog_JAVAC=gcj-4.5}
-bld_cv_pkg_prog_JAVADOC=${bld_cv_pkg_prog_JAVADOC=gjdoc}
+bld_cv_pkg_prog_JAVADOC=${bld_cv_pkg_prog_JAVADOC=javadoc}
 bld_cv_pkg_prog_JAVAH=${bld_cv_pkg_prog_JAVAH=gcjh-4.5}
 bld_cv_pkg_prog_KEYTOOL=${bld_cv_pkg_prog_KEYTOOL=gkeytool-4.5}
 bld_cv_pkg_prog_KGENKSYMS=${bld_cv_pkg_prog_KGENKSYMS=genksyms}
@@ -147,7 +150,7 @@ bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=2.0.16}
 bld_cv_pkg_ver_GROFF=${bld_cv_pkg_ver_GROFF=1.20.1}
 bld_cv_pkg_ver_GZIP_CMD=${bld_cv_pkg_ver_GZIP_CMD=1.4}
 bld_cv_pkg_ver_INSSERV=${bld_cv_pkg_ver_INSSERV=1.14.0}
-bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=0.7.9}
+bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=1.6.0.0_b20.1.9.7}
 bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=2.6.37.1}
 bld_cv_pkg_ver_LATEX2HTML=${bld_cv_pkg_ver_LATEX2HTML=2008}
 bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.11.3}
@@ -158,6 +161,7 @@ bld_cv_pkg_ver_MAKEWHATIS=${bld_cv_pkg_ver_MAKEWHATIS=2.5.2}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=8.9}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.12}
 bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=2.6.37.1}
+bld_cv_pkg_ver_PACKAGE_LIST=${bld_cv_pkg_ver_PACKAGE_LIST=1.6.0.0_b20.1.9.7}
 bld_cv_pkg_ver_PIC=${bld_cv_pkg_ver_PIC=1.20.1}
 bld_cv_pkg_ver_PS2EPSI=${bld_cv_pkg_ver_PS2EPSI=9.00}
 bld_cv_pkg_ver_PS2PDF=${bld_cv_pkg_ver_PS2PDF=9.00}

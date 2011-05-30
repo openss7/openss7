@@ -270,6 +270,7 @@ AC_LANG_POP(Java)dnl
 AN_MAKEVAR([JAVAH], [AC_PROG_JAVAH])
 AN_PROGRAM([gcjh], [AC_PROG_JAVAH])
 AN_PROGRAM([gcjnih], [AC_PROG_JAVAH])
+AN_PROGRAM([gjavah], [AC_PROG_JAVAH])
 AN_PROGRAM([javah], [AC_PROG_JAVAH])
 AC_DEFUN([AC_PROG_JAVAH],
 [AC_REQUIRE([AC_PROG_GCJH])
@@ -278,7 +279,7 @@ AC_ARG_VAR([JAVAH], [Java JNI header command])dnl
 AC_ARG_VAR([JAVAHFLAGS], [Java JNI header flags])dnl
 if test -z "$JAVAH"; then
     AC_CHECK_TOOLS(JAVAH,
-	[m4_default([$1], [$GCJH gcjh3 gcjh gcjnih javah])],
+	[m4_default([$1], [$GCJH gcjh3 gcjh gcjnih gjavah javah])],
 	gcjh)
 fi
 # Provide some information about the compiler
@@ -558,7 +559,7 @@ dnl
 	[Java JNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([JAVAHFLAGS],
 	[Java JNI header command flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVAH], [gcjh3 gcjh javah], [${am_missing4_run}gcjh], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([JAVAH], [gcjh3 gcjh gjavah javah], [${am_missing4_run}gcjh], [$tmp_path], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([JAVAH], [
 ***
@@ -594,7 +595,7 @@ dnl
 	[Java documentation doclet. @<:@default=gjdoc@:>@])
     AC_ARG_VAR([JAVADOCFLAGS],
 	[Java documentation flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVADOC], [gjdoc javadoc], [${am_missing4_run}gjdoc], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([JAVADOC], [javadoc gjdoc], [${am_missing4_run}gjdoc], [$tmp_path], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([JAVADOC], [
 ***
@@ -634,7 +635,7 @@ dnl
 	AC_MSG_RESULT([searching])
 	for gcj_dir in $gcj_search_path ; do
 	    if test -d "$gcj_dir" ; then
-		gcj_dirs=`find "$gcj_dir" -mindepth 1 -maxdepth 2 -type d -name '*gcj*' 2>/dev/null | sort -ru`
+		gcj_dirs=`find "$gcj_dir" -name 'Class.html' 2>/dev/null | egrep '(gcj|openjdk)' | grep '/java/lang/Class.html' | sed -r -e 's,^(.*)/java/lang/Class.html,\1,' | sort -ru`
 		for gcj_sub in $gcj_dirs ; do
 		    for gcj_sdir in $gcj_sub $gcj_sub/html ; do
 			AC_MSG_CHECKING([for libgcj javadoc directory... $gcj_sdir])
