@@ -689,7 +689,7 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
     repodir='$(rpmdistdir)/repodata'
     AC_SUBST([repodir])dnl
     repofulldir='$(topfulldir)/repodata'
-    AC_SUBST([topfulldir])dnl
+    AC_SUBST([repofulldir])dnl
     repomaindir='$(topmaindir)/repodata'
     AC_SUBST([repomaindir])dnl
     repodebgdir='$(topdebgdir)/repodata'
