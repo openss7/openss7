@@ -116,7 +116,7 @@ dnl
 dnl On older systems with both gcj and gcj3 use jar3 over jar.
 dnl fastjar is a later incarnation.
 dnl
-    _BLD_PATH_PROGS([JAR], [fastjar jar3 jar], [${am_missing4_run}jar], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([JAR], [gjar fastjar jar3 jar], [${am_missing4_run}jar], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([JAR], [
 ***
 *** Configure cannot find a suitable 'jar' program.  Generating Java
