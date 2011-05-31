@@ -1,3 +1,247 @@
+2011-05-31  Brian Bidulock  <bidulock@openss7.org>
+
+	* NOTES.problems: added notes file
+
+	* fedora-15-x86_64-config.cache: added build cache
+	* mandriva-2010.2-i686-config.cache: added build cache
+	* scientific-6-x86_64-config.cache: added build cache
+	* ubuntu-lucid-x86_64-config.cache: added build cache
+
+	* debian-lenny-i386-config.cache: delete unused
+	* debian-squeeze-i386-config.cache: delete unused
+	* debian-unknown-i386-config.cache: delete unused
+
+	* debian-lenny-i686-config.cache: updated cache files
+	* debian-squeeze-i686-config.cache: updated cache files
+	* debian-squeeze-x86_64-config.cache: updated cache files
+	* redhat-6.0-x86_64-config.cache: updated cache files
+	* sle-11-x86_64-config.cache: updated cache files
+	* suse-11-x86_64-config.cache: updated cache files
+
+	* AUTHORS: updated release files
+	* NEWS: updated release files
+	* README: updated release files
+	* THANKS: updated release files
+
+	* Makefile.am: add SNMP_CPPFLAGS for building SNMP modules
+	* acinclude.m4: handle generated files, check additional
+	  functions and structures
+	* openss7.spec.in: general corrections
+	* am/archive.am: generate repositories better
+	* am/deb.am: build proper debian archives
+	* am/kernel.am: typo
+	* am/man.am: correct manual page generation for in-place build
+	* am/openss7.am: add release-(un)install update-(un)install targets
+	* am/repo.am: general updates and corrections
+	* am/rpm.am: updates and corrections for release-(un)install target
+	* debian/changelog.in: corrections for version
+	* debian/control.in: general updates and corrections for debian build
+	* debian/openss7-devel.preinst.in: correction
+	* debian/openss7-repo.preinst.in: correction
+	* debian/rules.in: handle DH_COMPAT and DH_VERBOSE better
+
+	* doc/manual/install.texi: documentation updates
+	* doc/manual/prerequisites.texi: documentation updates
+	* scripts/texi/compat.texi: documentation updates
+	* scripts/texi/quick.texi: documentation updates
+
+	* m4/agent.m4: change apt-get to aptitude
+	* m4/archive.m4: change apt-get to aptitude
+	* m4/autotest.m4: correction
+	* m4/bld.m4: general updates and corrections
+	* m4/deb.m4: more checks
+	* m4/dist.m4: handle newly supported distributions
+	* m4/doxy.m4: check build requirements
+	* m4/drafts.m4: change apt-get to aptitude
+	* m4/gcj.m4: corrections to javadoc build for funky SUSE
+	* m4/genksyms.m4: corrections
+	* m4/info.m4: updates
+	* m4/init.m4: corrections
+	* m4/jar.m4: corrections
+	* m4/java.m4: corections
+	* m4/kernel.m4: corrections and general updates
+	* m4/libraries.m4: corrections
+	* m4/man.m4: change apt-get to aptitude
+	* m4/openss7.m4: option for package repo directory
+	* m4/papers.m4: change apt-get to aptitude
+	* m4/perl.m4: better search for perl headers
+	* m4/pr.m4: add new distros
+	* m4/repo.m4: better organization, add distros
+	* m4/rpm.m4: updates and corrections
+	* m4/snmp.m4: find headers better
+	* m4/swig.m4: corrections
+	* m4/tcl.m4: corrections
+	* scripts/cflagcheck: better modflags rule
+	* scripts/missing2: add new distros
+	* scripts/modpost.awk: handle unversioned kernels
+	* scripts/openss7-modules: corections
+	* scripts/rpm/find-requires: corections
+	* src/drivers/clone.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/echo.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/fifo.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/inet.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/ip.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/ip_hooks.h.in: update copyright, handle new compilers, build for new distros
+	* src/drivers/isua_as.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/isup.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/log.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/loop.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/m2ua_as.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/mtp.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/mtp_min.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/mux.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/net_hooks.h.in: update copyright, handle new compilers, build for new distros
+	* src/drivers/np_ip.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/np_rtp.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/np_udp.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/nsdev.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/nuls.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/pipe.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/rawip.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sad.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sccp.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp2.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_adler32.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_cache.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_cookie.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_crc32c.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_hash.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_hmac_md5.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_hmac_sha1.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_input.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_md5.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_msg.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_n.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_output.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_route.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_sha1.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sctp_t.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sfx.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sl_mux.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/spx.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/sua_as.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/tcap.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/tcp.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/tl.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/tua_as.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/ua_as.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/udp.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/vf.c: update copyright, handle new compilers, build for new distros
+	* src/drivers/x400p-ss7.c: update copyright, handle new compilers, build for new distros
+	* src/include/sys/strtty.h: update copyright, handle new compilers, build for new distros
+	* src/include/sys/openss7/ddi.h: update copyright, handle new compilers, build for new distros
+	* src/include/sys/openss7/dki.h: update copyright, handle new compilers, build for new distros
+	* src/include/sys/openss7/kmem.h: update copyright, handle new compilers, build for new distros
+	* src/include/sys/openss7/stream.h: update copyright, handle new compilers, build for new distros
+	* src/include/sys/os7/bufq.h: update copyright, handle new compilers, build for new distros
+	* src/include/sys/os7/compat.h: update copyright, handle new compilers, build for new distros
+	* src/include/sys/svr4/ddi.h: update copyright, handle new compilers, build for new distros
+	* src/java/Makefile.am: update copyright, handle new compilers, build for new distros
+	* src/kernel/mpscompat.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/osfcompat.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strattach.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strlookup.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strmain.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strpipe.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strprocfs.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strreg.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strsad.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strsched.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strspecfs.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strsyms.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strsysctl.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/strutil.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/uw7compat.c: update copyright, handle new compilers, build for new distros
+	* src/kernel/wrapper.c: update copyright, handle new compilers, build for new distros
+	* src/lib/dlpiapi.c: update copyright, handle new compilers, build for new distros
+	* src/lib/netdir_inet.c: update copyright, handle new compilers, build for new distros
+	* src/lib/npiapi.c: update copyright, handle new compilers, build for new distros
+	* src/mason/.htaccess: update copyright, handle new compilers, build for new distros
+	* src/mason/auth.pl: update copyright, handle new compilers, build for new distros
+	* src/mason/autohandler: update copyright, handle new compilers, build for new distros
+	* src/modules/bufmod.c: update copyright, handle new compilers, build for new distros
+	* src/modules/connld.c: update copyright, handle new compilers, build for new distros
+	* src/modules/itot.c: update copyright, handle new compilers, build for new distros
+	* src/modules/m2ua_as.c: update copyright, handle new compilers, build for new distros
+	* src/modules/m3ua_as.c: update copyright, handle new compilers, build for new distros
+	* src/modules/nullmod.c: update copyright, handle new compilers, build for new distros
+	* src/modules/pipemod.c: update copyright, handle new compilers, build for new distros
+	* src/modules/ptem.c: update copyright, handle new compilers, build for new distros
+	* src/modules/sc.c: update copyright, handle new compilers, build for new distros
+	* src/modules/sth.c: update copyright, handle new compilers, build for new distros
+	* src/modules/testmod.c: update copyright, handle new compilers, build for new distros
+	* src/modules/tpiperf.c: update copyright, handle new compilers, build for new distros
+	* src/snmp/ds0.c: update copyright, handle new compilers, build for new distros
+	* src/snmp/ds1EXT.c: update copyright, handle new compilers, build for new distros
+	* src/snmp/phyMIB.c: update copyright, handle new compilers, build for new distros
+	* src/snmp/sccpMIB.c: update copyright, handle new compilers, build for new distros
+	* src/snmp/ss7MIB.c: update copyright, handle new compilers, build for new distros
+	* src/snmp/strExtMIB.c: update copyright, handle new compilers, build for new distros
+	* src/snmp/tcapMIB.c: update copyright, handle new compilers, build for new distros
+	* src/snmp/util_funcs.h: update copyright, handle new compilers, build for new distros
+	* src/test/ldltest.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-atm.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-chan.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-clone.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-connld.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-echo.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-etsi_n.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-etsi_t.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-fifo.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-inet_raw.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-inet_sctp.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-inet_tcp.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-inet_udp.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-interop.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-ip.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-isdn.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-log.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-loop.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-m2pa.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-m2ua_as.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-m3ua-raw.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-mux.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-np_ip.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-nsdev.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-nuls.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-pipe.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-pipemod.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-q781-pipe.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-q781.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-sad.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-sc.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-sctp_n.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-sctp_n2.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-sctp_t.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-sigtran.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-socket.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-socklib.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-sockmod.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-sockpath.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-socksys.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-streams.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-tcps.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-timod.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-tirdwr.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-tty.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-udps.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-voip.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-x100p.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-x400p-cap.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-x400p-cap2.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-x400p.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-xnet.c: update copyright, handle new compilers, build for new distros
+	* src/test/test-xnsl.c: update copyright, handle new compilers, build for new distros
+	* src/test/testlog.c: update copyright, handle new compilers, build for new distros
+	* src/util/slmon.c: update copyright, handle new compilers, build for new distros
+	* src/util/ss7capd.c: update copyright, handle new compilers, build for new distros
+	* src/util/ss7statsd.c: update copyright, handle new compilers, build for new distros
+	* src/util/strace.c: update copyright, handle new compilers, build for new distros
+	* src/util/strchg.c: update copyright, handle new compilers, build for new distros
+	* src/util/strerr.c: update copyright, handle new compilers, build for new distros
+	* src/util/usage.c: update copyright, handle new compilers, build for new distros
+
 2011-05-15  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/openss7-compat.preinst.in: deleted
