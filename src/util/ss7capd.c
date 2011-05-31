@@ -435,9 +435,9 @@ output_header(void)
 	fprintf(stdout, " # device: %s (%d:%d:%d) %s\n", devname, card, span, slot, lnkname);
 	fprint_time(stdout);
 	if (outpath[0] != '\0')
-		snprintf(buf, sizeof(buf), outpath);
+		snprintf(buf, sizeof(buf), "%s", outpath);
 	else
-		snprintf(buf, sizeof(buf), "(stdout)");
+		snprintf(buf, sizeof(buf), "%s", "(stdout)");
 	fprintf(stdout, " # original file name: %s\n", buf);
 	fprint_time(stdout);
 	gethostname(buf, sizeof(buf));

@@ -9652,7 +9652,7 @@ run_test(test_case_t * tcase)
 {
 	int ret = 0;
 
-	printf(tcase->title);
+	printf("%s", tcase->title);
 	fflush(stdout);
 	state = 0;
 	event = 0;
