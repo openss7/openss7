@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $
+ @(#) $RCSfile: strchg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:19 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:38 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strchg.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:19  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:22:38  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strchg.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $";
+static char const ident[] = "$RCSfile: strchg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:19 $";
 
 #ifndef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 600
@@ -158,7 +161,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2010-11-28 14:22:38 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-05-31 09:46:19 $");
 }
 
 static void

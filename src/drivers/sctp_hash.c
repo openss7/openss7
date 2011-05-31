@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:02 $
+ @(#) $RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:05 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-07 15:24:02 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_hash.c,v $
+ Revision 1.1.2.5  2011-05-31 09:46:05  brian
+ - new distros
+
  Revision 1.1.2.4  2011-04-07 15:24:02  brian
  - weak reference corrections
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:02 $";
+static char const ident[] = "$RCSfile: sctp_hash.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:05 $";
 
 #define __NO_VERSION__
 

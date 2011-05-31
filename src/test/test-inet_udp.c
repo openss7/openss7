@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:27 $
+ @(#) $RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:15 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:27 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-inet_udp.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:15  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:22:27  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:27 $";
+static char const ident[] = "$RCSfile: test-inet_udp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:15 $";
 
 /*
  *  Simple test program for INET streams.

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:48 $
+ @(#) $RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-31 09:46:08 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:48 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strpipe.c,v $
+ Revision 1.1.2.6  2011-05-31 09:46:08  brian
+ - new distros
+
  Revision 1.1.2.5  2011-03-26 04:28:48  brian
  - updates to build process
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-03-26 04:28:48 $";
+static char const ident[] = "$RCSfile: strpipe.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-31 09:46:08 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>

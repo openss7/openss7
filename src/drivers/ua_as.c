@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:41 $
+ @(#) $RCSfile: ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:06 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:41 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ua_as.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:06  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:21:41  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:41 $";
+static char const ident[] = "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:06 $";
 
 /*
  *  This is an UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -155,7 +158,7 @@ static char const ident[] = "$RCSfile: ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 
 /* ============================== */
 
 #define UA_AS_DESCRIP	"UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:41 $"
+#define UA_AS_REVISION	"OpenSS7 $RCSfile: ua_as.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:06 $"
 #define UA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define UA_AS_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define UA_AS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

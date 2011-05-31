@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npiapi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:59 $
+ @(#) $RCSfile: npiapi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:10 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:59 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npiapi.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:10  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:21:59  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: npiapi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:59 $";
+static char const ident[] = "$RCSfile: npiapi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:10 $";
 
 /*
  * This is an OpenSS7 implemetnation of the GCOM npiapi library.  It builds

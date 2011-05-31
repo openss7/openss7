@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-07 15:24:04 $
+ @(#) $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:09 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-07 15:24:04 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strspecfs.c,v $
+ Revision 1.1.2.9  2011-05-31 09:46:09  brian
+ - new distros
+
  Revision 1.1.2.8  2011-04-07 15:24:04  brian
  - weak reference corrections
 
@@ -78,7 +81,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-07 15:24:04 $";
+static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:09 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
@@ -131,7 +134,7 @@ static char const ident[] = "$RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.
 
 #define SPECFS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPECFS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-07 15:24:04 $"
+#define SPECFS_REVISION		"LfS $RCSfile: strspecfs.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:09 $"
 #define SPECFS_DEVICE		"SVR 4.2 Special Shadow Filesystem (SPECFS)"
 #define SPECFS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SPECFS_LICENSE		"GPL"

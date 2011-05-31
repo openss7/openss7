@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:31 $
+ @(#) $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:08 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:31 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mpscompat.c,v $
+ Revision 1.1.2.4  2011-05-31 09:46:08  brian
+ - new distros
+
  Revision 1.1.2.3  2011-01-12 04:10:31  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:31 $";
+static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:08 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or who don't use
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.
 
 #define MPSCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MPSCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:31 $"
+#define MPSCOMP_REVISION	"LfS $RCSfile: mpscompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:08 $"
 #define MPSCOMP_DEVICE		"Mentat Portable STREAMS Compatibility"
 #define MPSCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MPSCOMP_LICENSE		"GPL"

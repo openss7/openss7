@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:35 $
+ @(#) $RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:17 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:35 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-sctp_n2.c,v $
+ Revision 1.1.2.4  2011-05-31 09:46:17  brian
+ - new distros
+
  Revision 1.1.2.3  2011-01-12 04:10:35  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -76,7 +79,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:35 $";
+static char const ident[] = "$RCSfile: test-sctp_n2.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:17 $";
 
 /*
  *  This file is for testing the sctp_n driver.  It is provided for the

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:28 $
+ @(#) $RCSfile: test-interop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:15 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:28 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-interop.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:15  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:22:28  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:28 $";
+static char const ident[] = "$RCSfile: test-interop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:15 $";
 
 /*
  *  This file is for testing the sctp_t driver.  It is provided for the

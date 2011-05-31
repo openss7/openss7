@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-07 15:24:03 $
+ @(#) $RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-05-31 09:46:09 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strsched.c,v $
+ Revision 1.1.2.10  2011-05-31 09:46:09  brian
+ - new distros
+
  Revision 1.1.2.9  2011-04-07 15:24:03  brian
  - weak reference corrections
 
@@ -81,7 +84,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-04-07 15:24:03 $";
+static char const ident[] = "$RCSfile: strsched.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-05-31 09:46:09 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>

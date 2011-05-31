@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:33 $
+ @(#) $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:04 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:33 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: loop.c,v $
+ Revision 1.1.2.4  2011-05-31 09:46:04  brian
+ - new distros
+
  Revision 1.1.2.3  2010-11-28 14:21:33  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:33 $";
+static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:04 $";
 
 /*
  *  This file contains a classic loop driver for SVR 4.2 MP STREAMS.  The loop driver is a general
@@ -92,7 +95,7 @@ static char const ident[] = "$RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.3 $
 
 #define LOOP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOOP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:33 $"
+#define LOOP_REVISION	"LfS $RCSfile: loop.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:04 $"
 #define LOOP_DEVICE	"SVR 4.2 MP STREAMS Null Stream (LOOP) Device"
 #define LOOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOOP_LICENSE	"GPL"
