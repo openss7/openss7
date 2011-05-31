@@ -2287,7 +2287,7 @@ void
 print_simple(int child, const char *msgs[])
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child]);
+	fprintf(stdout, "%s", msgs[child]);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
@@ -6607,7 +6607,8 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 1997-2011  Monavacon Limited.  All Rights Reserved.\n\
+    Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved.\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
     incorporated here by reference.\n\

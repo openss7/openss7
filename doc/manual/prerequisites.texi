@@ -106,7 +106,7 @@ more information.}
 @item @tab @minus{}
 Linux 2.4 kernel (2.4.10 - 2.4.27), or
 @item @tab @minus{}
-Linux 2.6 kernel (2.6.3 - 2.6.32);
+Linux 2.6 kernel (2.6.3 - 2.6.38);
 @item @tab @minus{}
 glibc2 or better.
 @item @tab @minus{}

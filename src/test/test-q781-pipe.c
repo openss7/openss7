@@ -9610,7 +9610,7 @@ run_test(test_case_t * tcase)
 {
 	int ret = 0;
 
-	printf(tcase->title);
+	printf("%s", tcase->title);
 	fflush(stdout);
 	// ioctl(pt_fd, I_FLUSH, FLUSHRW); /* flush PT */
 	state = 0;
