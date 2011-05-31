@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-02-07 04:54:44 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 1.1.2.4  2011-05-31 09:46:11  brian
+ - new distros
+
  Revision 1.1.2.3  2011-02-07 04:54:44  brian
  - code updates for new distro support
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $";
+static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $";
 
 /*
  *  This is the AS side of M3UA implemented as a pushable module that pushes over an SCTP NPI
@@ -136,7 +139,7 @@ static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.
 /* ======================= */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP MESSAGE TRANSFER PART (MTP) STREAMS MODULE."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

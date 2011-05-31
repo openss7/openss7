@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $
+ @(#) $RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:06 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:40 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:06 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tua_as.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:06  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:21:40  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $";
+static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:06 $";
 
 #define _SVR4_SOURCE	1
 #define _MPS_SOURCE	1
@@ -124,7 +127,7 @@ static char const ident[] = "$RCSfile: tua_as.c,v $ $Name:  $($Revision: 1.1.2.2
 /* ============================== */
 
 #define TUA_AS_DESCRIP		"TUA/SCTP AS TCAP STREAMS MULTIPLEXING DRIVER."
-#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:40 $"
+#define TUA_AS_REVISION		"OpenSS7 $RCSfile: tua_as.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:06 $"
 #define TUA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define TUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-x400p-cap2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:35 $
+ @(#) $RCSfile: test-x400p-cap2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:18 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:35 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-x400p-cap2.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:18  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:22:35  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-x400p-cap2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:35 $";
+static char const ident[] = "$RCSfile: test-x400p-cap2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:18 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -10158,7 +10161,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2010-11-28 14:22:35 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-05-31 09:46:18 $");
 }
 
 void

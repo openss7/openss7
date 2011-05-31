@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:14 $
+ @(#) $RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-31 09:46:08 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:08 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strlookup.c,v $
+ Revision 1.1.2.6  2011-05-31 09:46:08  brian
+ - new distros
+
  Revision 1.1.2.5  2011-04-05 16:35:14  brian
  - weak module design
 
@@ -70,7 +73,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-04-05 16:35:14 $";
+    "$RCSfile: strlookup.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-31 09:46:08 $";
 
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H

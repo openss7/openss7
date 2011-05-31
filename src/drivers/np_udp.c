@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:12 $
+ @(#) $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-05-31 09:46:05 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_udp.c,v $
+ Revision 1.1.2.8  2011-05-31 09:46:05  brian
+ - new distros
+
  Revision 1.1.2.7  2011-04-05 16:35:12  brian
  - weak module design
 
@@ -75,7 +78,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:12 $";
+static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-05-31 09:46:05 $";
 
 /*
  * This driver provides the functionality of a UDP (User Datagram Protocol) hook similary to udp
@@ -141,7 +144,7 @@ static char const ident[] = "$RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.7
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:12 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_udp.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-05-31 09:46:05 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_UDP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

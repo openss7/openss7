@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:58 $
+ @(#) $RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:10 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:58 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:10 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: netdir_inet.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:10  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:21:58  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:58 $";
+static char const ident[] = "$RCSfile: netdir_inet.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:10 $";
 
 /* This file can be processed with doxygen(1). */
 

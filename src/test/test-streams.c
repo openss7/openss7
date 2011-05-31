@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:35 $
+ @(#) $RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:17 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:35 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:17 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-streams.c,v $
+ Revision 1.1.2.5  2011-05-31 09:46:17  brian
+ - new distros
+
  Revision 1.1.2.4  2011-01-12 04:10:35  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -79,7 +82,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:35 $";
+static char const ident[] = "$RCSfile: test-streams.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:17 $";
 
 #include <sys/types.h>
 #include <stropts.h>
@@ -22422,7 +22425,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.4 $ $Date: 2011-01-12 04:10:35 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.5 $ $Date: 2011-05-31 09:46:17 $");
 }
 
 void

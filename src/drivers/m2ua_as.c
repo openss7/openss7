@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:33 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:04 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:33 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:04  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:21:33  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:33 $";
+static char const ident[] = "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:04 $";
 
 /*
  *  This is an M2UA multiplexing driver.  It is necessary to use a multiplexing driver because most
@@ -180,7 +183,7 @@ static char const ident[] = "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.
 /* ============================== */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:33 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:04 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

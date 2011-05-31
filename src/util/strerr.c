@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-15 12:01:21 $
+ @(#) $RCSfile: strerr.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:19 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-15 12:01:21 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strerr.c,v $
+ Revision 1.1.2.4  2011-05-31 09:46:19  brian
+ - new distros
+
  Revision 1.1.2.3  2011-05-15 12:01:21  brian
  - many build system refinements
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strerr.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-15 12:01:21 $";
+static char const ident[] = "$RCSfile: strerr.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:19 $";
 
 /*
  *  SVR 4.2 Daemon: strerr - (Daemon) Receives error log messages from the STREAMS
@@ -729,7 +732,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-05-15 12:01:21 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.4 $ $Date: 2011-05-31 09:46:19 $");
 }
 
 static void

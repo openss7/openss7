@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:35 $
+ @(#) $RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:05 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:35 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sctp_adler32.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:05  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:21:35  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:35 $";
+static char const ident[] = "$RCSfile: sctp_adler32.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:05 $";
 
 #undef _DEBUG
 #undef SCTP_CONFIG_DEBUG

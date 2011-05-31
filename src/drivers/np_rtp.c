@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:12 $
+ @(#) $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:05 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_rtp.c,v $
+ Revision 1.1.2.4  2011-05-31 09:46:05  brian
+ - new distros
+
  Revision 1.1.2.3  2011-04-05 16:35:12  brian
  - weak module design
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:12 $";
+static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:05 $";
 
 /*
  *  This driver is similar to the NPI-UDP driver in that it provides NPI access to UDP; however, it
@@ -147,7 +150,7 @@ static char const ident[] = "$RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.3
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-04-05 16:35:12 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_rtp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:05 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_RTP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

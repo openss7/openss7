@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:02 $
+ @(#) $RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:02 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:11 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: itot.c,v $
+ Revision 1.1.2.4  2011-05-31 09:46:11  brian
+ - new distros
+
  Revision 1.1.2.3  2010-11-28 14:22:02  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:02 $";
+static char const ident[] = "$RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $";
 
 
 /*
@@ -87,7 +90,7 @@ static char const ident[] = "$RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.3 $
 
 #define ITOT_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ITOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:02 $"
+#define ITOT_REVISION	"OpenSS7 $RCSfile: itot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $"
 #define ITOT_DEVICE	"SVR 4.2 MP STREAMS ITOT Module for RFC 2126 (ITOT)"
 #define ITOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ITOT_LICENSE	"GPL"

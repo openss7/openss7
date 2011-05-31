@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:36 $
+ @(#) $RCSfile: testlog.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:18 $
 
  -----------------------------------------------------------------------------
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:36 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: testlog.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:18  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:22:36  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: testlog.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:36 $";
+static char const ident[] = "$RCSfile: testlog.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:18 $";
 
 /*
  *  This is a little user space program to test the correctness of the formatting of the data blocks
