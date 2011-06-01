@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: openss7 1.2.2\n"
 "Report-Msgid-Bugs-To: bugs@openss7.org\n"
-"POT-Creation-Date: 2011-05-10 08:04-0600\n"
+"POT-Creation-Date: 2011-05-29 11:44-0600\n"
 "PO-Revision-Date: 2009-05-08 20:16-0600\n"
 "Last-Translator: Brian F. G. Bidulock <bidulock@openss7.org>\n"
 "Language-Team: German\n"
@@ -536,7 +536,7 @@ msgstr ""
 
 #. TRANS  Any other value: Unknown error.
 #.
-#: src/lib/cdiapi.c:2761 src/lib/dlpiapi.c:2472
+#: src/lib/cdiapi.c:2761 src/lib/dlpiapi.c:2471
 msgid "Unknown error"
 msgstr ""
 
@@ -676,13 +676,13 @@ msgstr ""
 #. TRANS  subroutine that will return this function.  See dlpi_bind(3),
 #. TRANS  DL_BIND_REQ(7) and DL_ERROR_ACK(7) for more information.
 #.
-#: src/lib/dlpiapi.c:2360 src/lib/dlpi.c:3189
+#: src/lib/dlpiapi.c:2359 src/lib/dlpi.c:3189
 msgid "Bad LSAP selector"
 msgstr ""
 
 #. TRANS  DL_BADADDR: DLSAP addr in improper format or invalid.
 #.
-#: src/lib/dlpiapi.c:2364
+#: src/lib/dlpiapi.c:2363
 msgid "DLSAP addr in improper format or invalid"
 msgstr ""
 
@@ -706,7 +706,7 @@ msgstr ""
 #. TRANS
 #. TRANS  Other uses of this error code are not supoprted by the DLPI Library.
 #.
-#: src/lib/dlpiapi.c:2368 src/lib/dlpi.c:3232
+#: src/lib/dlpiapi.c:2367 src/lib/dlpi.c:3232
 msgid "Improper permissions for request"
 msgstr ""
 
@@ -723,7 +723,7 @@ msgstr ""
 #. TRANS  this consists largely of the bind and unbind subroutines.  See
 #. TRANS  dlpi_bind(3), dlpi_unbind(3), DL_BIND_REQ(7) and DL_UNBIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2372 src/lib/dlpi.c:3245
+#: src/lib/dlpiapi.c:2371 src/lib/dlpi.c:3245
 msgid "Primitive issued in improper state"
 msgstr ""
 
@@ -737,19 +737,19 @@ msgstr ""
 #. TRANS  of the associate DL_ERROR_ACK primitive, or, when returned by the DLPI
 #. TRANS  Library subroutines, contained in the errno(3) global variable.
 #.
-#: src/lib/dlpiapi.c:2376 src/lib/dlpi.c:3255
+#: src/lib/dlpiapi.c:2375 src/lib/dlpi.c:3255
 msgid "UNIX system error occurred"
 msgstr ""
 
 #. TRANS  DL_BADCORR: Seq number not from outstand DL_CONN_IND.
 #.
-#: src/lib/dlpiapi.c:2380
+#: src/lib/dlpiapi.c:2379
 msgid "Seq number not from outstand DL_CONN_IND"
 msgstr ""
 
 #. TRANS  DL_BADDATA: User data exceeded provider limit.
 #.
-#: src/lib/dlpiapi.c:2384 src/lib/dlpi.c:3265
+#: src/lib/dlpiapi.c:2383 src/lib/dlpi.c:3265
 msgid "User data exceeded provider limit"
 msgstr ""
 
@@ -764,7 +764,7 @@ msgstr ""
 #. TRANS  does not support the DL_CLDLS service mode, this error code is returned.
 #. TRANS  See dlpi_bind(3) and DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2388 src/lib/dlpi.c:3276
+#: src/lib/dlpiapi.c:2387 src/lib/dlpi.c:3276
 msgid "Requested service not supplied by provider"
 msgstr ""
 
@@ -778,7 +778,7 @@ msgstr ""
 #. TRANS  When the determined PPA is not appropriate for the driver, this error
 #. TRANS  code is returned.  See dlpi_open(3) and DL_ATTACH_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2392 src/lib/dlpi.c:3286
+#: src/lib/dlpiapi.c:2391 src/lib/dlpi.c:3286
 msgid "Specified PPA was invalid"
 msgstr ""
 
@@ -793,7 +793,7 @@ msgstr ""
 #. TRANS  extension primitives that are not known to the DLS provider.  See
 #. TRANS  dlpi_enabnotify(3) and dlpi_disabnotify(3).
 #.
-#: src/lib/dlpiapi.c:2396 src/lib/dlpi.c:3297
+#: src/lib/dlpiapi.c:2395 src/lib/dlpi.c:3297
 msgid "Primitive received not known by provider"
 msgstr ""
 
@@ -803,13 +803,13 @@ msgstr ""
 #. TRANS  is not currently returned by any function in the DLPI Library for a
 #. TRANS  properly functioning DLS provider.  See DL_UDQOS_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2400 src/lib/dlpi.c:3303
+#: src/lib/dlpiapi.c:2399 src/lib/dlpi.c:3303
 msgid "QOS parameters contained invalid values"
 msgstr ""
 
 #. TRANS  DL_BADQOSTYPE: QOS structure type is unknown/unsupported.
 #.
-#: src/lib/dlpiapi.c:2404
+#: src/lib/dlpiapi.c:2403
 msgid "QOS structure type is unknown/unsupported"
 msgstr ""
 
@@ -819,7 +819,7 @@ msgstr ""
 #. TRANS  currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_CONNECT_RES(7).
 #.
-#: src/lib/dlpiapi.c:2408 src/lib/dlpi.c:3315
+#: src/lib/dlpiapi.c:2407 src/lib/dlpi.c:3315
 msgid "Token used not an active stream"
 msgstr ""
 
@@ -829,7 +829,7 @@ msgstr ""
 #. TRANS  not currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2412 src/lib/dlpi.c:3321
+#: src/lib/dlpiapi.c:2411 src/lib/dlpi.c:3321
 msgid "Attempted second bind with dl_max_conind"
 msgstr ""
 
@@ -846,25 +846,25 @@ msgstr ""
 #. TRANS  or bind.  See dlpi_open(3), dlpi_bind(3), DL_ATTACH_REQ(7) and
 #. TRANS  DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2416 src/lib/dlpi.c:3334
+#: src/lib/dlpiapi.c:2415 src/lib/dlpi.c:3334
 msgid "Physical Link initialization failed"
 msgstr ""
 
 #. TRANS  DL_NOADDR: Provider couldn't allocate alternate address.
 #.
-#: src/lib/dlpiapi.c:2420
+#: src/lib/dlpiapi.c:2419
 msgid "Provider couldn't allocate alternate address"
 msgstr ""
 
 #. TRANS  DL_NOTINIT: Physical Link not initialized.
 #.
-#: src/lib/dlpiapi.c:2424
+#: src/lib/dlpiapi.c:2423
 msgid "Physical Link not initialized"
 msgstr ""
 
 #. TRANS  DL_UNDELIVERABLE: Previous data unit could not be delivered.
 #.
-#: src/lib/dlpiapi.c:2428 src/lib/dlpi.c:3363
+#: src/lib/dlpiapi.c:2427 src/lib/dlpi.c:3363
 msgid "Previous data unit could not be delivered"
 msgstr ""
 
@@ -879,7 +879,7 @@ msgstr ""
 #. TRANS  dlpi_enabmulti(3), dlpi_enabnotify(3), dlpi_get_physaddr(3),
 #. TRANS  dlpi_promiscoff(3), dlpi_promiscon(3) and dlpi_set_physaddr(3).
 #.
-#: src/lib/dlpiapi.c:2432 src/lib/dlpi.c:3374
+#: src/lib/dlpiapi.c:2431 src/lib/dlpi.c:3374
 msgid "Primitive is known but not supported"
 msgstr ""
 
@@ -895,13 +895,13 @@ msgstr ""
 #. TRANS  dlpi_enabmulti(3) library call.  See dlpi_enabmulti(3) and
 #. TRANS  DL_ENABMULTI_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2436 src/lib/dlpi.c:3386
+#: src/lib/dlpiapi.c:2435 src/lib/dlpi.c:3386
 msgid "Limit exceeded"
 msgstr ""
 
 #. TRANS  DL_NOTENAB: Promiscuous mode not enabled.
 #.
-#: src/lib/dlpiapi.c:2440
+#: src/lib/dlpiapi.c:2439
 msgid "Promiscuous mode not enabled"
 msgstr ""
 
@@ -915,13 +915,13 @@ msgstr ""
 #. TRANS  physical address, this error code is returned.  See dlpi_set_physaddr(3)
 #. TRANS  and DL_SET_PHYS_ADDR_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2444 src/lib/dlpi.c:3407
+#: src/lib/dlpiapi.c:2443 src/lib/dlpi.c:3407
 msgid "Other streams for PPA in post-attached state"
 msgstr ""
 
 #. TRANS  DL_NOAUTO: Automatic handling of XID and TEST response not supported.
 #.
-#: src/lib/dlpiapi.c:2448
+#: src/lib/dlpiapi.c:2447
 msgid "Automatic handling of XID and TEST response not supported"
 msgstr ""
 
@@ -931,7 +931,7 @@ msgstr ""
 #. TRANS  is not currently returned by any function in the DLPI Library for a
 #. TRANS  properly functioning DLS provider.  See DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2452 src/lib/dlpi.c:3419
+#: src/lib/dlpiapi.c:2451 src/lib/dlpi.c:3419
 msgid "Automatic handling of XID not supported"
 msgstr ""
 
@@ -941,7 +941,7 @@ msgstr ""
 #. TRANS  is not currently returned by any function in the DLPI Library for a
 #. TRANS  properly functioning DLS provider.  See DL_BIND_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2456 src/lib/dlpi.c:3425
+#: src/lib/dlpiapi.c:2455 src/lib/dlpi.c:3425
 msgid "Automatic handling of TEST not supported"
 msgstr ""
 
@@ -951,7 +951,7 @@ msgstr ""
 #. TRANS  currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_XID_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2460 src/lib/dlpi.c:3431
+#: src/lib/dlpiapi.c:2459 src/lib/dlpi.c:3431
 msgid "Automatic handling of XID response"
 msgstr ""
 
@@ -961,7 +961,7 @@ msgstr ""
 #. TRANS  currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_TEST_REQ(7).
 #.
-#: src/lib/dlpiapi.c:2464 src/lib/dlpi.c:3437
+#: src/lib/dlpiapi.c:2463 src/lib/dlpi.c:3437
 msgid "Automatic handling of TEST response"
 msgstr ""
 
@@ -971,13 +971,13 @@ msgstr ""
 #. TRANS  not currently returned by any function in the DLPI Library for a properly
 #. TRANS  functioning DLS provider.  See DL_CONNECT_RES(7).
 #.
-#: src/lib/dlpiapi.c:2468 src/lib/dlpi.c:3443
+#: src/lib/dlpiapi.c:2467 src/lib/dlpi.c:3443
 msgid "Pending outstanding connect indications"
 msgstr ""
 
 #. TRANS  Values from 0x80-0xff: Device-specific error.
 #.
-#: src/lib/dlpiapi.c:2476
+#: src/lib/dlpiapi.c:2475
 msgid "Device-specific error"
 msgstr ""
 
