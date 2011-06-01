@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -95,7 +95,7 @@ static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define LDL_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define LDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2010-11-28 14:32:24 $"
 #define LDL_DEVICE	"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -1937,6 +1937,15 @@ eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 	/* 
 	 * Check the registered multicast address list ...
 	 */
+#ifdef netdev_for_each_mc_addr
+	{
+		struct netdev_hw_addr *ha;
+		netdev_for_each_mc_addr(ha, dl->ndev->dev) {
+			if (!memcmp(fr, ha->addr, 6))
+				return 1;
+		}
+	}
+#else
 	{
 		struct dev_mc_list *dmi = dl->ndev->dev->mc_list;
 
@@ -1946,6 +1955,7 @@ eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 			else
 				dmi = dmi->next;
 	}
+#endif
 	return 0;
 }
 
@@ -4181,6 +4191,8 @@ ws_promiscoff(struct dl *dl, mblk_t *mp)
 STATIC INLINE int
 ws_enabmulti(struct dl *dl, mblk_t *mp)
 {
+	int result;
+
 	dl_enabmulti_req_t *reqp;
 
 	if (dl->dlstate == DL_UNATTACHED)
@@ -4188,8 +4200,12 @@ ws_enabmulti(struct dl *dl, mblk_t *mp)
 
 	reqp = (dl_enabmulti_req_t *) mp->b_rptr;
 
-	switch (dev_mc_add
-		(dl->ndev->dev, mp->b_rptr + reqp->dl_addr_offset, reqp->dl_addr_length, 0)) {
+#ifdef HAVE_KFUNC_DEV_MC_ADD_2_ARGS
+	result = dev_mc_add(dl->ndev->dev, mp->b_rptr + reqp->dl_addr_offset);
+#else
+	result = dev_mc_add(dl->ndev->dev, mp->b_rptr + reqp->dl_addr_offset, reqp->dl_addr_length, 0);
+#endif
+	switch (result) {
 	case 0:
 		if (do_ok_ack(dl, &mp, DL_ENABMULTI_REQ) == RETRY)
 			return RETRY;
@@ -4215,6 +4231,8 @@ ws_disabmulti(struct dl *dl, mblk_t *mp)
 		return reply_error_ack(dl, mp, DL_DISABMULTI_REQ, DL_OUTSTATE, 0);
 
 	reqp = (dl_disabmulti_req_t *) mp->b_rptr;
+	(void) reqp;
+	/* FIXME: this does nothing. */
 	return 0;
 }
 

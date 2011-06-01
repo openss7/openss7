@@ -2114,6 +2114,26 @@ my_autoconf_function_pointer1 = my_autoconf_function_pointer2;
     ])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
+	AC_CACHE_CHECK([for kernel dev_mc_add with 2 args], [linux_cv_dev_mc_add_2_args], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include <linux/autoconf.h>
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/netdevice.h>]],
+		[[int (*my_autoconf_function_point)(struct net_device *, unsigned char *) = &dev_mc_add;]]) ],
+		[linux_cv_dev_mc_add_2_args='yes'],
+		[linux_cv_dev_mc_add_2_args='no'])
+	])
+	if test :$linux_cv_dev_mc_add_2_args = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_DEV_MC_ADD_2_ARGS], [1], [Define if
+		function dev_mc_add takes 2 arguments.])
+	fi
+    ])
+dnl----------------------------------------------------------------------------
+    _LINUX_KERNEL_ENV([dnl
 	AC_CACHE_CHECK([for kernel ip_route_output], [linux_cv_have_ip_route_output], [dnl
 	    CFLAGS="$CFLAGS -Werror-implicit-function-declaration"
 	    AC_COMPILE_IFELSE([
