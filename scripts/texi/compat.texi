@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: compat.texi,v 1.1.2.4 2011-04-11 06:13:44 brian Exp $
+@c @(#) $Id: compat.texi,v 1.1.2.5 2011-05-31 09:46:02 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-04-11 06:13:44 $ by $Author: brian $
+@c Last Modified $Date: 2011-05-31 09:46:02 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -105,8 +105,9 @@ release.}
 @item CentOS Enterprise Linux 5.3 (centos53)
 @item CentOS Enterprise Linux 5.4 (centos54)
 @item CentOS Enterprise Linux 5.5 (centos55)
-@item CentOS Enterprise Linux 5.6 (centos56)
-@item CentOS Enterprise Linux 6.0 (centos60)
+@item CentOS Enterprise Linux 5.6 (centos56) (untested)
+@item CentOS Enterprise Linux 5.7 (centos56) (untested)
+@item CentOS Enterprise Linux 6.0 (centos60) (untested)
 @item Debian 3.0r2 Woody (deb3.0) TBD
 @item Debian 3.1r0a Sarge (deb3.1) TBD
 @item Debian 4.0r1 Etch (deb4.0)
@@ -114,6 +115,7 @@ release.}
 @item Debian 4.0r3 Etch (deb4.0)
 @item Debian 5.0 Lenny (deb5.0)
 @item Debian 6.0 Squeeze (deb6.0)
+@item Debian 7.0 Wheezy (deb7.0)
 @item Fedora Core 1 (FC1) TBD
 @item Fedora Core 2 (FC2) TBD
 @item Fedora Core 3 (FC3) TBD
@@ -139,6 +141,8 @@ release.}
 @item Mandriva Linux LE2005 (MDK102) TBD
 @item Mandriva Linux LE2006 (MDK103) TBD
 @item Mandriva One (untested)
+@item Mandriva 2010.2 (MDV2010)
+@item Mandriva Enterprise Server 5.2 (MES52)
 @item RedHat Linux 7.2 (RH7)
 @item RedHat Linux 7.3 (RH7)
 @item RedHat Linux 8.0 (RH8) TBD
@@ -147,6 +151,14 @@ release.}
 @item RedHat Enterprise Linux 4 (EL4) TBD
 @item RedHat Enterprise Linux 5 (EL5)
 @item RedHat Enterprise Linux 6 (EL6)
+@item Scientific Linux 5 (SL5)
+@item Scientific Linux 5.1 (SL5)
+@item Scientific Linux 5.2 (SL5)
+@item Scientific Linux 5.3 (SL5)
+@item Scientific Linux 5.4 (SL5)
+@item Scientific Linux 5.5 (SL5)
+@item Scientific Linux 5.6 (SL5)
+@item Scientific Linux 6.0 (SL6)
 @item SuSE 8.0 Professional (SuSE8.0) TBD
 @item SuSE 9.1 Personal (SuSE9.1) TBD
 @item SuSE 9.2 Professional (SuSE9.2) TBD
@@ -174,11 +186,14 @@ release.}
 @item Ubuntu 7.04 (ubu7.04) TBD
 @item Ubuntu 7.10 (ubu7.10)
 @item Ubuntu 8.04 (ubu8.04)
+@item Ubuntu 8.04 LTS (ubu8.04)
 @item Ubuntu 8.10 (ubu8.10)
 @item Ubuntu 9.04 (ubu9.04)
 @item Ubuntu 9.10 (ubu9.10)
 @item Ubuntu 10.04 (ubu10.04)
+@item Ubuntu 10.04.2 LTS (ubu10.04)
 @item Ubuntu 10.10 (ubu10.10)
+@item Ubuntu 11.04 (ubu11.04)
 @item WhiteBox Enterprise Linux 3.0 (WBEL3) TBD
 @item WhiteBox Enterprise Linux 4 (WBEL4) TBD
 @end itemize
@@ -205,9 +220,9 @@ official @url{http://www.kernel.org/, kernel.org} sources.
 @subsubsection Compatible Kernels
 
 The @cite{@value{PACKAGE_TITLE}} package is compatible with 2.4 kernel series after 2.4.10 and has
-been tested up to and including 2.4.33.  It has been tested from 2.6.3 up to and including 2.6.32
+been tested up to and including 2.4.33.  It has been tested from 2.6.3 up to and including 2.6.38
 (with @cite{RHEL 6.0}, @cite{SLES 11.1} and @cite{Debian  6.0} patch sets).  Please note that your
-mileage may vary if you use a kernel more recent than 2.6.32: it is difficult to anticipate changes
+mileage may vary if you use a kernel more recent than 2.6.38: it is difficult to anticipate changes
 that kernel developers will make in the future.  Many kernels in the 2.6 series now vary widely by
 release version and if you encounter problems, try a kernel within the supported series.
 

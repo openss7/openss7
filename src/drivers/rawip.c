@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:12 $
+ @(#) $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:05 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:12 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:05 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rawip.c,v $
+ Revision 1.1.2.9  2011-05-31 09:46:05  brian
+ - new distros
+
  Revision 1.1.2.8  2011-04-05 16:35:12  brian
  - weak module design
 
@@ -78,7 +81,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:12 $";
+static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:05 $";
 
 /*
  *  This driver provides a somewhat different approach to RAW IP that the inet
@@ -158,7 +161,7 @@ static char const ident[] = "$RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.8 
 #define TP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-04-05 16:35:12 $"
+#define TP_REVISION	"OpenSS7 $RCSfile: rawip.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:05 $"
 #define TP_DEVICE	"SVR 4.2 MP STREAMS RAW IP Driver"
 #define TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TP_LICENSE	"GPL"

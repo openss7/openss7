@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:29 $
+ @(#) $RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:16 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:29 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:16 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m3ua-raw.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:16  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:22:29  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:29 $";
+static char const ident[] = "$RCSfile: test-m3ua-raw.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:16 $";
 
 /*
  *  This file is for testing raw M3UA in conjunction with the sctp_t driver.  It provides test cases
@@ -2977,7 +2980,7 @@ void
 print_simple(int child, const char *msgs[])
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child]);
+	fprintf(stdout, "%s", msgs[child]);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
@@ -9436,7 +9439,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -9493,7 +9496,8 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
-    Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved.\n\
+    Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved.\n\
+    Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under AGPL Version 3,\n\
     incorporated here by reference.\n\

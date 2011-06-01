@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:41 $
+ @(#) $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:04 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-02-07 04:54:41 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:04 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mtp.c,v $
+ Revision 1.1.2.5  2011-05-31 09:46:04  brian
+ - new distros
+
  Revision 1.1.2.4  2011-02-07 04:54:41  brian
  - code updates for new distro support
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:41 $";
+static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:04 $";
 
 /*
  *  This an MTP (Message Transfer Part) multiplexing driver which can have SL
@@ -106,7 +109,7 @@ static char const ident[] = "$RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 #define STRLOGDA	7	/* log Stream data */
 
 #define MTP_DESCRIP	"SS7 MESSAGE TRANSFER PART (MTP) STREAMS MULTIPLEXING DRIVER."
-#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-02-07 04:54:41 $"
+#define MTP_REVISION	"LfS $RCSfile: mtp.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:04 $"
 #define MTP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MTP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:41 $
+ @(#) $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-31 09:46:03 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-02-07 04:54:41 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isup.c,v $
+ Revision 1.1.2.7  2011-05-31 09:46:03  brian
+ - new distros
+
  Revision 1.1.2.6  2011-02-07 04:54:41  brian
  - code updates for new distro support
 
@@ -72,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:41 $";
+static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-31 09:46:03 $";
 
 /*
  *  ISUP STUB MULTIPLEXOR
@@ -99,7 +102,7 @@ static char const ident[] = "$RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.6 $
 #include <ss7/isupi_ioctl.h>
 
 #define ISUP_DESCRIP	"ISUP STREAMS MULTIPLEXING DRIVER."
-#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-02-07 04:54:41 $"
+#define ISUP_REVISION	"LfS $RCSfile: isup.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-31 09:46:03 $"
 #define ISUP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ISUP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define ISUP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -17957,7 +17960,7 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 	struct cc *cc;
 	uint pvar;
 	int err, segmentation = 0;
-	isup_msg_t msg = { NULL, };
+	isup_msg_t *msg = NULL;
 	uchar *p, *e;
 	ulong x, y;
 
@@ -17972,7 +17975,10 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		goto emsgsize;
 	x = *p++;
 	y = *p++;
-	msg.cic = (y << 8 | x) & 0x0fff;
+	if ((msg = (isup_msg_t *)kmem_alloc(sizeof(*msg), KM_NOSLEEP)) == NULL)
+		goto enomem;
+	bzero(msg, sizeof(*msg));
+	msg->cic = (y << 8 | x) & 0x0fff;
 #if 0
 	{
 		int i;
@@ -17985,28 +17991,27 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 #endif
 	if (p + 1 > e)
 		goto emsgsize;
-	msg.mt = *p++;
+	msg->mt = *p++;
 	/* 
 	   Q.752 11.2 */
 	sr->stats.msgs_recv++;
-	sr->stats.msgs_recv_by_type[msg.mt]++;
+	sr->stats.msgs_recv_by_type[msg->mt]++;
 	sr->sp.sp->stats.msgs_recv++;
-	sr->sp.sp->stats.msgs_recv_by_type[msg.mt]++;
+	sr->sp.sp->stats.msgs_recv_by_type[msg->mt]++;
 	master.stats.msgs_recv++;
-	master.stats.msgs_recv_by_type[msg.mt]++;
-	todo(("Change to hash lookup later (cic = %lu, mt = %lu)\n", msg.cic, msg.mt));
-	for (ct = sr->ct.list; ct && ct->cic != msg.cic; ct = ct->sr.next) ;
+	master.stats.msgs_recv_by_type[msg->mt]++;
+	todo(("Change to hash lookup later (cic = %lu, mt = %lu)\n", msg->cic, msg->mt));
+	for (ct = sr->ct.list; ct && ct->cic != msg->cic; ct = ct->sr.next) ;
 	if (!ct)
 		goto unequipped;
 	if (!ct->tg.tg)
 		goto unequipped;
 	pvar = ct->tg.tg->proto.pvar;	/* use trunk group protocol variant */
-	/* 
-	   2.1.12 f) In case any other message except the ones listed below is received before the
+	/* 2.1.12 f) In case any other message except the ones listed below is received before the
 	   segmentation message containing the second segment the exchange should react as if the
 	   second segment is lost, i.e., the timer T34 is stopped and the call continues */
 	if ((cc = ct->cpc.cc) && ct->sgm) {
-		switch (msg.mt) {
+		switch (msg->mt) {
 		case ISUP_MT_COT:
 		case ISUP_MT_BLO:
 		case ISUP_MT_UBL:
@@ -18024,256 +18029,256 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		default:
 			segmentation = 1;
 			ct_timer_stop(ct, t34);
-			msg.mt = ct->sgm->b_rptr[2];
+			msg->mt = ct->sgm->b_rptr[2];
 		}
 	}
-	switch (msg.mt) {
+	switch (msg->mt) {
 	case ISUP_MT_IAM:	/* 0x01 - Initial address */
-		if (!(err = isup_dec_iam(pvar, p, e, &msg)))
-			err = isup_recv_iam(q, ct, &msg);
+		if (!(err = isup_dec_iam(pvar, p, e, msg)))
+			err = isup_recv_iam(q, ct, msg);
 		break;
 	case ISUP_MT_SAM:	/* 0x02 - Subsequent address (not ANSI) */
-		if (!(err = isup_dec_sam(pvar, p, e, &msg)))
-			err = isup_recv_sam(q, ct, &msg);
+		if (!(err = isup_dec_sam(pvar, p, e, msg)))
+			err = isup_recv_sam(q, ct, msg);
 		break;
 	case ISUP_MT_INR:	/* 0x03 - Information request */
-		if (!(err = isup_dec_inr(pvar, p, e, &msg)))
-			err = isup_recv_inr(q, ct, &msg);
+		if (!(err = isup_dec_inr(pvar, p, e, msg)))
+			err = isup_recv_inr(q, ct, msg);
 		break;
 	case ISUP_MT_INF:	/* 0x04 - Information */
-		if (!(err = isup_dec_inf(pvar, p, e, &msg)))
-			err = isup_recv_inf(q, ct, &msg);
+		if (!(err = isup_dec_inf(pvar, p, e, msg)))
+			err = isup_recv_inf(q, ct, msg);
 		break;
 	case ISUP_MT_COT:	/* 0x05 - Continuity */
-		if (!(err = isup_dec_cot(pvar, p, e, &msg)))
-			err = isup_recv_cot(q, ct, &msg);
+		if (!(err = isup_dec_cot(pvar, p, e, msg)))
+			err = isup_recv_cot(q, ct, msg);
 		break;
 	case ISUP_MT_ACM:	/* 0x06 - Address complete */
-		if (!(err = isup_dec_acm(pvar, p, e, &msg)))
-			err = isup_recv_acm(q, ct, &msg);
+		if (!(err = isup_dec_acm(pvar, p, e, msg)))
+			err = isup_recv_acm(q, ct, msg);
 		break;
 	case ISUP_MT_CON:	/* 0x07 - Connect (not ANSI) */
-		if (!(err = isup_dec_con(pvar, p, e, &msg)))
-			err = isup_recv_con(q, ct, &msg);
+		if (!(err = isup_dec_con(pvar, p, e, msg)))
+			err = isup_recv_con(q, ct, msg);
 		break;
 	case ISUP_MT_FOT:	/* 0x08 - Forward transfer */
-		if (!(err = isup_dec_fot(pvar, p, e, &msg)))
-			err = isup_recv_fot(q, ct, &msg);
+		if (!(err = isup_dec_fot(pvar, p, e, msg)))
+			err = isup_recv_fot(q, ct, msg);
 		break;
 	case ISUP_MT_ANM:	/* 0x09 - Answer */
-		if (!(err = isup_dec_anm(pvar, p, e, &msg)))
-			err = isup_recv_anm(q, ct, &msg);
+		if (!(err = isup_dec_anm(pvar, p, e, msg)))
+			err = isup_recv_anm(q, ct, msg);
 		break;
 	case ISUP_MT_REL:	/* 0x0c - Release */
-		if (!(err = isup_dec_rel(pvar, p, e, &msg)))
-			err = isup_recv_rel(q, ct, &msg);
+		if (!(err = isup_dec_rel(pvar, p, e, msg)))
+			err = isup_recv_rel(q, ct, msg);
 		break;
 	case ISUP_MT_SUS:	/* 0x0d - Suspend */
-		if (!(err = isup_dec_sus(pvar, p, e, &msg)))
-			err = isup_recv_sus(q, ct, &msg);
+		if (!(err = isup_dec_sus(pvar, p, e, msg)))
+			err = isup_recv_sus(q, ct, msg);
 		break;
 	case ISUP_MT_RES:	/* 0x0e - Resume */
-		if (!(err = isup_dec_res(pvar, p, e, &msg)))
-			err = isup_recv_res(q, ct, &msg);
+		if (!(err = isup_dec_res(pvar, p, e, msg)))
+			err = isup_recv_res(q, ct, msg);
 		break;
 	case ISUP_MT_RLC:	/* 0x10 - Release complete */
-		if (!(err = isup_dec_rlc(pvar, p, e, &msg)))
-			err = isup_recv_rlc(q, ct, &msg);
+		if (!(err = isup_dec_rlc(pvar, p, e, msg)))
+			err = isup_recv_rlc(q, ct, msg);
 		break;
 	case ISUP_MT_CCR:	/* 0x11 - Continuity check request */
-		if (!(err = isup_dec_ccr(pvar, p, e, &msg)))
-			err = isup_recv_ccr(q, ct, &msg);
+		if (!(err = isup_dec_ccr(pvar, p, e, msg)))
+			err = isup_recv_ccr(q, ct, msg);
 		break;
 	case ISUP_MT_RSC:	/* 0x12 - Reset circuit */
-		if (!(err = isup_dec_rsc(pvar, p, e, &msg)))
-			err = isup_recv_rsc(q, ct, &msg);
+		if (!(err = isup_dec_rsc(pvar, p, e, msg)))
+			err = isup_recv_rsc(q, ct, msg);
 		break;
 	case ISUP_MT_BLO:	/* 0x13 - Blocking */
-		if (!(err = isup_dec_blo(pvar, p, e, &msg)))
-			err = isup_recv_blo(q, ct, &msg);
+		if (!(err = isup_dec_blo(pvar, p, e, msg)))
+			err = isup_recv_blo(q, ct, msg);
 		break;
 	case ISUP_MT_UBL:	/* 0x14 - Unblcoking */
-		if (!(err = isup_dec_ubl(pvar, p, e, &msg)))
-			err = isup_recv_ubl(q, ct, &msg);
+		if (!(err = isup_dec_ubl(pvar, p, e, msg)))
+			err = isup_recv_ubl(q, ct, msg);
 		break;
 	case ISUP_MT_BLA:	/* 0x15 - Blocking acknowledgement */
-		if (!(err = isup_dec_bla(pvar, p, e, &msg)))
-			err = isup_recv_bla(q, ct, &msg);
+		if (!(err = isup_dec_bla(pvar, p, e, msg)))
+			err = isup_recv_bla(q, ct, msg);
 		break;
 	case ISUP_MT_UBA:	/* 0x16 - Unblocking acknowledgement */
-		if (!(err = isup_dec_uba(pvar, p, e, &msg)))
-			err = isup_recv_uba(q, ct, &msg);
+		if (!(err = isup_dec_uba(pvar, p, e, msg)))
+			err = isup_recv_uba(q, ct, msg);
 		break;
 	case ISUP_MT_GRS:	/* 0x17 - 0b00010111 - Circuit group reset */
-		if (!(err = isup_dec_grs(pvar, p, e, &msg)))
-			err = isup_recv_grs(q, ct, &msg);
+		if (!(err = isup_dec_grs(pvar, p, e, msg)))
+			err = isup_recv_grs(q, ct, msg);
 		break;
 	case ISUP_MT_CGB:	/* 0x18 - 0b00011000 - Circuit group blocking */
-		if (!(err = isup_dec_cgb(pvar, p, e, &msg)))
-			err = isup_recv_cgb(q, ct, &msg);
+		if (!(err = isup_dec_cgb(pvar, p, e, msg)))
+			err = isup_recv_cgb(q, ct, msg);
 		break;
 	case ISUP_MT_CGU:	/* 0x19 - 0b00011001 - Circuit group unblocking */
-		if (!(err = isup_dec_cgu(pvar, p, e, &msg)))
-			err = isup_recv_cgu(q, ct, &msg);
+		if (!(err = isup_dec_cgu(pvar, p, e, msg)))
+			err = isup_recv_cgu(q, ct, msg);
 		break;
 	case ISUP_MT_CGBA:	/* 0x1a - 0b00011010 - Circuit group blocking acknowledgement */
-		if (!(err = isup_dec_cgba(pvar, p, e, &msg)))
-			err = isup_recv_cgba(q, ct, &msg);
+		if (!(err = isup_dec_cgba(pvar, p, e, msg)))
+			err = isup_recv_cgba(q, ct, msg);
 		break;
 	case ISUP_MT_CGUA:	/* 0x1b - 0b00011011 - Circuit group unblocking acknowledgement */
-		if (!(err = isup_dec_cgua(pvar, p, e, &msg)))
-			err = isup_recv_cgua(q, ct, &msg);
+		if (!(err = isup_dec_cgua(pvar, p, e, msg)))
+			err = isup_recv_cgua(q, ct, msg);
 		break;
 	case ISUP_MT_CMR:	/* 0x1c - Call Modification Request (not ANSI) */
-		if (!(err = isup_dec_cmr(pvar, p, e, &msg)))
-			err = isup_recv_cmr(q, ct, &msg);
+		if (!(err = isup_dec_cmr(pvar, p, e, msg)))
+			err = isup_recv_cmr(q, ct, msg);
 		break;
 	case ISUP_MT_CMC:	/* 0x1d - Call Modification Completed (not ANSI) */
-		if (!(err = isup_dec_cmc(pvar, p, e, &msg)))
-			err = isup_recv_cmc(q, ct, &msg);
+		if (!(err = isup_dec_cmc(pvar, p, e, msg)))
+			err = isup_recv_cmc(q, ct, msg);
 		break;
 	case ISUP_MT_CMRJ:	/* 0x1e - Call Modification Reject (not ANSI) */
-		if (!(err = isup_dec_cmrj(pvar, p, e, &msg)))
-			err = isup_recv_cmrj(q, ct, &msg);
+		if (!(err = isup_dec_cmrj(pvar, p, e, msg)))
+			err = isup_recv_cmrj(q, ct, msg);
 		break;
 	case ISUP_MT_FAR:	/* 0x1f - Facility request (not ANSI) */
-		if (!(err = isup_dec_far(pvar, p, e, &msg)))
-			err = isup_recv_far(q, ct, &msg);
+		if (!(err = isup_dec_far(pvar, p, e, msg)))
+			err = isup_recv_far(q, ct, msg);
 		break;
 	case ISUP_MT_FAA:	/* 0x20 - Facility accepted (not ANSI) */
-		if (!(err = isup_dec_faa(pvar, p, e, &msg)))
-			err = isup_recv_faa(q, ct, &msg);
+		if (!(err = isup_dec_faa(pvar, p, e, msg)))
+			err = isup_recv_faa(q, ct, msg);
 		break;
 	case ISUP_MT_FRJ:	/* 0x21 - Facility reject (not ANSI) */
-		if (!(err = isup_dec_frj(pvar, p, e, &msg)))
-			err = isup_recv_frj(q, ct, &msg);
+		if (!(err = isup_dec_frj(pvar, p, e, msg)))
+			err = isup_recv_frj(q, ct, msg);
 		break;
 	case ISUP_MT_FAD:	/* 0x22 - Facility Deactivated (Bellcore only, not ANSI) */
-		if (!(err = isup_dec_fad(pvar, p, e, &msg)))
-			err = isup_recv_fad(q, ct, &msg);
+		if (!(err = isup_dec_fad(pvar, p, e, msg)))
+			err = isup_recv_fad(q, ct, msg);
 		break;
 	case ISUP_MT_FAI:	/* 0x23 - Facility Information (Bellcore only) */
-		if (!(err = isup_dec_fai(pvar, p, e, &msg)))
-			err = isup_recv_fai(q, ct, &msg);
+		if (!(err = isup_dec_fai(pvar, p, e, msg)))
+			err = isup_recv_fai(q, ct, msg);
 		break;
 	case ISUP_MT_LPA:	/* 0x24 - Loop back acknowledgement */
-		if (!(err = isup_dec_lpa(pvar, p, e, &msg)))
-			err = isup_recv_lpa(q, ct, &msg);
+		if (!(err = isup_dec_lpa(pvar, p, e, msg)))
+			err = isup_recv_lpa(q, ct, msg);
 		break;
 	case ISUP_MT_DRS:	/* 0x27 - Delayed release (not ANSI) */
-		if (!(err = isup_dec_drs(pvar, p, e, &msg)))
-			err = isup_recv_drs(q, ct, &msg);
+		if (!(err = isup_dec_drs(pvar, p, e, msg)))
+			err = isup_recv_drs(q, ct, msg);
 		break;
 	case ISUP_MT_PAM:	/* 0x28 - Pass along */
-		if (!(err = isup_dec_pam(pvar, p, e, &msg)))
-			err = isup_recv_pam(q, ct, &msg);
+		if (!(err = isup_dec_pam(pvar, p, e, msg)))
+			err = isup_recv_pam(q, ct, msg);
 		break;
 	case ISUP_MT_GRA:	/* 0x29 - 0b00101001 - Circuit group reset acknowledgement */
-		if (!(err = isup_dec_gra(pvar, p, e, &msg)))
-			err = isup_recv_gra(q, ct, &msg);
+		if (!(err = isup_dec_gra(pvar, p, e, msg)))
+			err = isup_recv_gra(q, ct, msg);
 		break;
 	case ISUP_MT_CQM:	/* 0x2a - 0b00101010 - Circuit group query */
-		if (!(err = isup_dec_cqm(pvar, p, e, &msg)))
-			err = isup_recv_cqm(q, ct, &msg);
+		if (!(err = isup_dec_cqm(pvar, p, e, msg)))
+			err = isup_recv_cqm(q, ct, msg);
 		break;
 	case ISUP_MT_CQR:	/* 0x2b - 0b00101011 - Circuit group query response */
-		if (!(err = isup_dec_cqr(pvar, p, e, &msg)))
-			err = isup_recv_cqr(q, ct, &msg);
+		if (!(err = isup_dec_cqr(pvar, p, e, msg)))
+			err = isup_recv_cqr(q, ct, msg);
 		break;
 	case ISUP_MT_CPG:	/* 0x2c - Call progress */
-		if (!(err = isup_dec_cpg(pvar, p, e, &msg)))
-			err = isup_recv_cpg(q, ct, &msg);
+		if (!(err = isup_dec_cpg(pvar, p, e, msg)))
+			err = isup_recv_cpg(q, ct, msg);
 		break;
 	case ISUP_MT_USR:	/* 0x2d - User-to-user information */
-		if (!(err = isup_dec_usr(pvar, p, e, &msg)))
-			err = isup_recv_usr(q, ct, &msg);
+		if (!(err = isup_dec_usr(pvar, p, e, msg)))
+			err = isup_recv_usr(q, ct, msg);
 		break;
 	case ISUP_MT_UCIC:	/* 0x2e - Unequipped circuit identification code */
-		if (!(err = isup_dec_ucic(pvar, p, e, &msg)))
-			err = isup_recv_ucic(q, ct, &msg);
+		if (!(err = isup_dec_ucic(pvar, p, e, msg)))
+			err = isup_recv_ucic(q, ct, msg);
 		break;
 	case ISUP_MT_CFN:	/* 0x2f - Confusion */
-		if (!(err = isup_dec_cfn(pvar, p, e, &msg)))
-			err = isup_recv_cfn(q, ct, &msg);
+		if (!(err = isup_dec_cfn(pvar, p, e, msg)))
+			err = isup_recv_cfn(q, ct, msg);
 		break;
 	case ISUP_MT_OLM:	/* 0x30 - Overload */
-		if (!(err = isup_dec_olm(pvar, p, e, &msg)))
-			err = isup_recv_olm(q, ct, &msg);
+		if (!(err = isup_dec_olm(pvar, p, e, msg)))
+			err = isup_recv_olm(q, ct, msg);
 		break;
 	case ISUP_MT_CRG:	/* 0x31 - Charge information (Not ANSI) */
-		if (!(err = isup_dec_crg(pvar, p, e, &msg)))
-			err = isup_recv_crg(q, ct, &msg);
+		if (!(err = isup_dec_crg(pvar, p, e, msg)))
+			err = isup_recv_crg(q, ct, msg);
 		break;
 	case ISUP_MT_NRM:	/* 0x32 - Network resource management */
-		if (!(err = isup_dec_nrm(pvar, p, e, &msg)))
-			err = isup_recv_nrm(q, ct, &msg);
+		if (!(err = isup_dec_nrm(pvar, p, e, msg)))
+			err = isup_recv_nrm(q, ct, msg);
 		break;
 	case ISUP_MT_FAC:	/* 0x33 - Facility */
-		if (!(err = isup_dec_fac(pvar, p, e, &msg)))
-			err = isup_recv_fac(q, ct, &msg);
+		if (!(err = isup_dec_fac(pvar, p, e, msg)))
+			err = isup_recv_fac(q, ct, msg);
 		break;
 	case ISUP_MT_UPT:	/* 0x34 - 0b00110100 - User part test */
-		if (!(err = isup_dec_upt(pvar, p, e, &msg)))
-			err = isup_recv_upt(q, ct, &msg);
+		if (!(err = isup_dec_upt(pvar, p, e, msg)))
+			err = isup_recv_upt(q, ct, msg);
 		break;
 	case ISUP_MT_UPA:	/* 0x35 - 0b00110101 - User part available */
-		if (!(err = isup_dec_upa(pvar, p, e, &msg)))
-			err = isup_recv_upa(q, ct, &msg);
+		if (!(err = isup_dec_upa(pvar, p, e, msg)))
+			err = isup_recv_upa(q, ct, msg);
 		break;
 	case ISUP_MT_IDR:	/* 0x36 - Identification request */
-		if (!(err = isup_dec_idr(pvar, p, e, &msg)))
-			err = isup_recv_idr(q, ct, &msg);
+		if (!(err = isup_dec_idr(pvar, p, e, msg)))
+			err = isup_recv_idr(q, ct, msg);
 		break;
 	case ISUP_MT_IRS:	/* 0x37 - Identification response */
-		if (!(err = isup_dec_irs(pvar, p, e, &msg)))
-			err = isup_recv_irs(q, ct, &msg);
+		if (!(err = isup_dec_irs(pvar, p, e, msg)))
+			err = isup_recv_irs(q, ct, msg);
 		break;
 	case ISUP_MT_SGM:	/* 0x38 - Segmentation */
-		if (!(err = isup_dec_sgm(pvar, p, e, &msg)))
-			err = isup_recv_sgm(q, ct, &msg);
+		if (!(err = isup_dec_sgm(pvar, p, e, msg)))
+			err = isup_recv_sgm(q, ct, msg);
 		break;
 	case ISUP_MT_CRA:	/* 0xe9 - Circuit Reservation Acknowledgement (Bellcore) */
-		if (!(err = isup_dec_cra(pvar, p, e, &msg)))
-			err = isup_recv_cra(q, ct, &msg);
+		if (!(err = isup_dec_cra(pvar, p, e, msg)))
+			err = isup_recv_cra(q, ct, msg);
 		break;
 	case ISUP_MT_CRM:	/* 0xea - Circuit Reservation (Bellcore) */
-		if (!(err = isup_dec_crm(pvar, p, e, &msg)))
-			err = isup_recv_crm(q, ct, &msg);
+		if (!(err = isup_dec_crm(pvar, p, e, msg)))
+			err = isup_recv_crm(q, ct, msg);
 		break;
 	case ISUP_MT_CVR:	/* 0xeb - Circuit Validation Response (Bellcore) */
-		if (!(err = isup_dec_cvr(pvar, p, e, &msg)))
-			err = isup_recv_cvr(q, ct, &msg);
+		if (!(err = isup_dec_cvr(pvar, p, e, msg)))
+			err = isup_recv_cvr(q, ct, msg);
 		break;
 	case ISUP_MT_CVT:	/* 0xec - Circuit Validation Test (Bellcore) */
-		if (!(err = isup_dec_cvt(pvar, p, e, &msg)))
-			err = isup_recv_cvt(q, ct, &msg);
+		if (!(err = isup_dec_cvt(pvar, p, e, msg)))
+			err = isup_recv_cvt(q, ct, msg);
 		break;
 	case ISUP_MT_EXM:	/* 0xed - Exit (Bellcore) */
-		if (!(err = isup_dec_exm(pvar, p, e, &msg)))
-			err = isup_recv_exm(q, ct, &msg);
+		if (!(err = isup_dec_exm(pvar, p, e, msg)))
+			err = isup_recv_exm(q, ct, msg);
 		break;
 	case ISUP_MT_CAK:	/* 0xfd - Charge Acknowledgement (Singapore) */
-		if (!(err = isup_dec_cak(pvar, p, e, &msg)))
-			err = isup_recv_cak(q, ct, &msg);
+		if (!(err = isup_dec_cak(pvar, p, e, msg)))
+			err = isup_recv_cak(q, ct, msg);
 		break;
 	case ISUP_MT_TCM:	/* 0xfe - Tariff Charge (Singapore) */
-		if (!(err = isup_dec_tcm(pvar, p, e, &msg)))
-			err = isup_recv_tcm(q, ct, &msg);
+		if (!(err = isup_dec_tcm(pvar, p, e, msg)))
+			err = isup_recv_tcm(q, ct, msg);
 		break;
 	case ISUP_MT_MCP:	/* 0xff - Malicious Call Print (Singapore) */
-		if (!(err = isup_dec_mcp(pvar, p, e, &msg)))
-			err = isup_recv_mcp(q, ct, &msg);
+		if (!(err = isup_dec_mcp(pvar, p, e, msg)))
+			err = isup_recv_mcp(q, ct, msg);
 		break;
 	case ISUP_MT_NON:	/* 0xf8 - National Notification (Spain) */
-		if (!(err = isup_dec_non(pvar, p, e, &msg)))
-			err = isup_recv_non(q, ct, &msg);
+		if (!(err = isup_dec_non(pvar, p, e, msg)))
+			err = isup_recv_non(q, ct, msg);
 		break;
 	case ISUP_MT_LLM:	/* 0xfc - National Malicious Call (Spain) */
-		if (!(err = isup_dec_llm(pvar, p, e, &msg)))
-			err = isup_recv_llm(q, ct, &msg);
+		if (!(err = isup_dec_llm(pvar, p, e, msg)))
+			err = isup_recv_llm(q, ct, msg);
 		break;
 	default:
-		if (!(err = isup_dec_unrecognized(pvar, p, e, &msg)))
+		if (!(err = isup_dec_unrecognized(pvar, p, e, msg)))
 			err = -ENOPROTOOPT;
 		break;
 	}
@@ -18281,30 +18286,27 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		switch (err) {
 		case QR_DONE:
 			freemsg(ct->sgm);
-			/* 
-			   fall through */
+			/* fall through */
 		case QR_ABSORBED:
 			ct->sgm = NULL;
-			return (QR_RETRY);
+			err = QR_RETRY;
+			goto error;
 		}
 	}
 	switch (err) {
 	case -EOPNOTSUPP:
-		/* 
-		   2.5.9.1 f) if other unexpected signalling messages are received, the following
+		/* 2.5.9.1 f) if other unexpected signalling messages are received, the following
 		   actions will be undertaken: */
 		switch (ct_get_c_state(ct)) {
 		case CTS_ICC_WAIT_SAM:
 		case CTS_ICC_WAIT_ACM:
-			/* 
-			   responsibility of CC to remove loopback */
+			/* responsibility of CC to remove loopback */
 			if (ct_tst(ct, CCTF_COR_PENDING))
 				ct_timer_stop(ct, t8);
 			break;
 		case CTS_OGC_WAIT_SAM:
 		case CTS_OGC_WAIT_ACM:
-			/* 
-			   responsibility of CC to disconnect tone/detector */
+			/* responsibility of CC to disconnect tone/detector */
 			if (ct_tst(ct, CCTF_COT_PENDING))
 				ct_timer_stop(ct, t24);
 			ct_timer_stop(ct, t7);
@@ -18322,62 +18324,54 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		case CCS_WIND_INFO:
 		case CCS_WRES_SIND:
 		case CCS_WREQ_PROCEED:
-			/* 
-			   If the circuit is seized by an incoming call, any interconnected
+			/* If the circuit is seized by an incoming call, any interconnected
 			   circuits will be released. */
 			if ((err =
 			     cc_call_failure_ind(q, ct->cpc.cc, ct, ISUP_CALL_FAILURE_RESET,
 						 CC_CAUS_INVALID_MESSAGE)))
-				return (err);
+				goto error;
 			ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 			break;
 		case CCS_WIND_MORE:
 		case CCS_WREQ_INFO:
 		case CCS_WCON_SREQ:
 		case CCS_WIND_PROCEED:
-			/* 
-			   If the circuit is seized by an outgoing call, an automatic repeat
+			/* If the circuit is seized by an outgoing call, an automatic repeat
 			   attempt is provided on another circuit. */
 			if ((err =
 			     cc_call_reattempt_ind(q, ct->cpc.cc, ct, ISUP_REATTEMPT_UNEXPECTED)))
-				return (err);
-			/* 
-			   responsibility of CC to reattempt */
+				goto error;
+			/* responsibility of CC to reattempt */
 			ct_set_i_state(ct, ct->cpc.cc, CCS_IDLE);
 			break;
 		}
 		switch (ct_get_c_state(ct)) {
-			/* 
-			   -- if the circuit is seized by a call, before receipt of a backward
+			/* -- if the circuit is seized by a call, before receipt of a backward
 			   message required for the call setup, the Reset Circuit Message is sent
 			   (or, in the case of a multirate connection type or N x 64 kbit/s
 			   connection type call, a circuit group reset message or multiple reset
 			   circuit messages are sent). */
 		case CTS_ICC_WAIT_SAM:
 		case CTS_ICC_WAIT_ACM:
-			/* 
-			   If the circuit is seized by an incoming call, any interconnected
+			/* If the circuit is seized by an incoming call, any interconnected
 			   circuits will be released. */
 		case CTS_OGC_WAIT_SAM:
 		case CTS_OGC_WAIT_ACM:
-			/* 
-			   If the circuit is seized by an outgoing call, an automatic repeat
+			/* If the circuit is seized by an outgoing call, an automatic repeat
 			   attempt is provided on another circuit. */
 		case CTS_IDLE:
-			/* 
-			   -- if the circuit is idle, the reset circuit message is sent; */
+			/* -- if the circuit is idle, the reset circuit message is sent; */
 			if (!ct_tst(ct, CCTF_LOC_RESET_PENDING)) {
 				if ((err = cc_maint_ind(q, ct, ISUP_MAINT_UNEXPECTED_MESSAGE)))
-					return (err);
-				/* 
-				   Q.752 12.21 1st and delta */
+					goto error;
+				/* Q.752 12.21 1st and delta */
 				ct->stats.ct_unexpected_msg++;
 				ct->tg.tg->stats.ct_unexpected_msg++;
 				ct->sr.sr->stats.ct_unexpected_msg++;
 				ct->sp.sp->stats.ct_unexpected_msg++;
 				master.stats.ct_unexpected_msg++;
 				if ((err = isup_send_rsc(q, ct)))
-					return (err);
+					goto error;
 				ct_timer_start(ct, t16);
 				ct_timer_start(ct, t17);
 				ct_set(ct, CCTF_LOC_RESET_PENDING);
@@ -18394,61 +18388,51 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 		case CTS_OGC_WAIT_RLC:
 		case CTS_ICC_SEND_RLC:
 		case CTS_OGC_SEND_RLC:
-			/* 
-			   -- if the circuit is seized by a call after receipt of a backward
+			/* -- if the circuit is seized by a call after receipt of a backward
 			   message required for the call setup, the unexpected signalling message
 			   is discarded ... */
-			err = QR_DONE;
-			break;
+			goto qr_done;
 		}
 		break;
 	case -ENOPROTOOPT:	/* message type error */
 		switch (ct->tg.tg->config.exchange_type) {
 		default:
 			if (cc->mci & ISUP_MCI_E_BIT) {
-				/* 
-				   discard */
-				return (QR_DONE);
+				/* discard */
+				goto qr_done;
 			}
-			/* 
-			   release call */
-			return (QR_DONE);
+			/* release call */
+			goto qr_done;
 		case ISUP_XCHG_TYPE_B:
 			if (cc->mci & ISUP_MCI_B_BIT) {
-				/* 
-				   release call */
-				return (QR_DONE);
+				/* release call */
+				goto qr_done;
 			}
 			if (cc->mci & ISUP_MCI_D_BIT) {
-				/* 
-				   discard message */
+				/* discard message */
 				if (cc->mci & ISUP_MCI_C_BIT) {
 					/* 
 					   send notification */
 				}
-				return (QR_DONE);
+				goto qr_done;
 			}
 			if (1 /* pass_along_possible */ ) {
-				/* 
-				   pass along */
-				return (QR_ABSORBED);
+				/* pass along */
+				goto qr_absorbed;
 			}
 			if (cc->mci & ISUP_MCI_E_BIT) {
-				/* 
-				   discard message */
+				/* discard message */
 				if (cc->mci & ISUP_MCI_C_BIT) {
 					/* 
 					   send notification */
 				}
-				return (QR_DONE);
+				goto qr_done;
 			}
-			/* 
-			   release call */
+			/* release call */
 			if (cc->mci & ISUP_MCI_C_BIT) {
-				/* 
-				   send notification */
+				/* send notification */
 			}
-			return (QR_DONE);
+			goto qr_done;
 		}
 		break;
 	case -EPROTONOSUPPORT:	/* parameter type error */
@@ -18458,77 +18442,82 @@ mtp_read(queue_t *q, mblk_t *mp, struct sr *sr)
 			switch (cc->pci & (ISUP_PCI_G_BIT | ISUP_PCI_F_BIT)) {
 			case 0:
 			case ISUP_PCI_G_BIT | ISUP_PCI_F_BIT:
-				/* 
-				   release call */
-				return (QR_DONE);
+				/* release call */
+				goto qr_done;
 			case ISUP_PCI_G_BIT:
-				/* 
-				   discard parameter */
-				return (QR_DONE);
+				/* discard parameter */
+				goto qr_done;
 			case ISUP_PCI_F_BIT:
-				/* 
-				   discard message */
-				return (-EPROTO);
+				/* discard message */
+				goto eproto;
 			}
 			swerr();
-			return (-EFAULT);
+			goto efault;
 		case ISUP_XCHG_TYPE_B:
 			switch (cc->
 				pci & (ISUP_PCI_B_BIT | ISUP_PCI_C_BIT | ISUP_PCI_D_BIT |
 				       ISUP_PCI_E_BIT)) {
 			case 0:
 			case ISUP_PCI_C_BIT:
-				/* 
-				   pass on parameter */
-				return (QR_DONE);
+				/* pass on parameter */
+				goto qr_done;
 			case ISUP_PCI_E_BIT:
-				/* 
-				   discard parameter */
-				return (QR_DONE);
+				/* discard parameter */
+				goto qr_done;
 			case ISUP_PCI_D_BIT:
 			case ISUP_PCI_D_BIT | ISUP_PCI_E_BIT:
-				/* 
-				   discard message */
-				return (-EPROTO);
+				/* discard message */
+				goto eproto;
 			case ISUP_PCI_C_BIT | ISUP_PCI_E_BIT:
 			case ISUP_PCI_C_BIT | ISUP_PCI_D_BIT:
 			case ISUP_PCI_C_BIT | ISUP_PCI_D_BIT | ISUP_PCI_E_BIT:
-				/* 
-				   discard message */
-				/* 
-				   send notification */
-				return (-EPROTO);
+				/* discard message */
+				/* send notification */
+				goto eproto;
 			default:
-				/* 
-				   release call */
-				return (-EPROTO);
+				/* release call */
+				goto eproto;
 			}
-			swerr();
-			return (-EFAULT);
+			goto efault;
 		}
 		break;
 	}
-	return (err);
+	goto error;
       unequipped:
-	/* 
-	   the circuit does is not equipped, respond with unequipped cic */
-	if ((err = cc_if_maint_ind(q, sr, msg.cic, ISUP_MAINT_UNEQUIPPED_CIC)))
-		return (err);
-	/* 
-	   Custom 1st and delta */
+	/* the circuit does is not equipped, respond with unequipped cic */
+	if ((err = cc_if_maint_ind(q, sr, msg->cic, ISUP_MAINT_UNEQUIPPED_CIC)))
+		goto error;
+	/* Custom 1st and delta */
 	sr->sp.sp->stats.sr_unequipped_cic++;
 	if (sr->proto.popt & SS7_POPT_UCIC)
-		isup_send_ucic(q, sr, msg.cic);
-	return (QR_DONE);
+		isup_send_ucic(q, sr, msg->cic);
+	goto qr_done;
+      qr_done:
+	err = QR_DONE;
+	goto error;
+      qr_absorbed:
+	err = QR_ABSORBED;
+	goto error;
       enomem:
 	swerr();
-	return (-ENOMEM);
+	err = -ENOMEM;
+	goto error;
       efault:
 	swerr();
-	return (-EFAULT);
+	err = -EFAULT;
+	goto error;
       emsgsize:
 	swerr();
-	return (-EPROTO);
+	err = -EPROTO;
+	goto error;
+      eproto:
+	swerr();
+	err = -EPROTO;
+	goto error;
+      error:
+	if (msg != NULL)
+		kmem_free(msg, sizeof(*msg));
+	return (err);
 }
 
 /*

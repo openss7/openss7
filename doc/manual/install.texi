@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.9 2011-04-11 06:13:42 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.10 2011-05-31 09:46:01 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-04-11 06:13:42 $ by $Author: brian $
+@c Last Modified $Date: 2011-05-31 09:46:01 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -199,6 +199,16 @@ For the following distributions, follow the instructions in the sections referen
 @item Debian 4.0r3 Etch            @tab deb4.3   @tab @ref{Installing with APT}
 @item Debian 5.0 Lenny             @tab deb5.0   @tab @ref{Installing with APT}
 @item Debian 6.0 Squeeze           @tab deb6.0   @tab @ref{Installing with APT}
+@item Debian 7.0 Wheezy            @tab deb7.0   @tab @ref{Installing with APT}
+@item Scientific Linux 5.0 @tab sl5  @tab @ref{Installing with YUM}
+@item Scientific Linux 5.1 @tab sl51 @tab @ref{Installing with YUM}
+@item Scientific Linux 5.2 @tab sl52 @tab @ref{Installing with YUM}
+@item Scientific Linux 5.3 @tab sl53 @tab @ref{Installing with YUM}
+@item Scientific Linux 5.4 @tab sl54 @tab @ref{Installing with YUM}
+@item Scientific Linux 5.5 @tab sl55 @tab @ref{Installing with YUM}
+@item Scientific Linux 5.6 @tab sl56 @tab @ref{Installing with YUM}
+@item Scientific Linux 5.7 @tab sl57 @tab @ref{Installing with YUM}
+@item Scientific Linux 6.0 @tab sl6  @tab @ref{Installing with YUM}
 @item Fedora 7 @tab FC7 @tab @ref{Installing with YUM}
 @item Fedora 8 @tab FC8 @tab @ref{Installing with YUM}
 @item Fedora 9 @tab FC9 @tab @ref{Installing with YUM}
@@ -228,10 +238,16 @@ For the following distributions, follow the instructions in the sections referen
 @item SLES 10 SP2 @tab SLES10 @tab @ref{Installing with ZYPPER}
 @item SLES 11 @tab SLES11 @tab @ref{Installing with ZYPPER}
 @item SLES 11 SP1 @tab SLES11 @tab @ref{Installing with ZYPPER}
+@item Ubuntu 8.10 @tab ubu8.10 @tab @ref{Installing with APT}
 @item Ubuntu 9.04 @tab ubu9.04 @tab @ref{Installing with APT}
 @item Ubuntu 9.10 @tab ubu9.10 @tab @ref{Installing with APT}
 @item Ubuntu 10.04 @tab ubu10.04 @tab @ref{Installing with APT}
 @item Ubuntu 10.10 @tab ubu10.10 @tab @ref{Installing with APT}
+@item Ubuntu 11.04 @tab ubu11.04 @tab @ref{Installing with APT}
+@item Ubuntu 11.10 @tab ubu11.10 @tab @ref{Installing with APT}
+@item Ubuntu 8.04 Server (LTS) @tab ubu8.04 @tab @ref{Installing with APT}
+@item Ubuntu 10.04 Server (LTS) @tab ubu10.04 @tab @ref{Installing with APT}
+@item Ubuntu 10.04.2 Server (LTS) @tab ubu10.04 @tab @ref{Installing with APT}
 @end multitable
 
 @node Repositories for YUM

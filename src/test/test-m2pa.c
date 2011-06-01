@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:34 $
+ @(#) $RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:15 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:34 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:15 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-m2pa.c,v $
+ Revision 1.1.2.5  2011-05-31 09:46:15  brian
+ - new distros
+
  Revision 1.1.2.4  2011-01-12 04:10:34  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -79,7 +82,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:34 $";
+static char const ident[] = "$RCSfile: test-m2pa.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-05-31 09:46:15 $";
 
 #define TEST_M2PA   1
 #define TEST_X400   0
@@ -736,11 +739,11 @@ dual_milliseconds(int child, int t1, int t2)
 
 	if (show && verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, blank[child]);
+		fprintf(stdout, "%s", blank[child]);
 		fprintf(stdout, msgs[child], timer[t1].name, timer[t1].lo / 1000, timer[t1].lo - ((timer[t1].lo / 1000) * 1000), timer[t1].name, timer[t1].hi / 1000, timer[t1].hi - ((timer[t1].hi / 1000) * 1000), child, state);
-		fprintf(stdout, plus[child]);
+		fprintf(stdout, "%s", plus[child]);
 		fprintf(stdout, msgs[child], timer[t2].name, timer[t2].lo / 1000, timer[t2].lo - ((timer[t2].lo / 1000) * 1000), timer[t2].name, timer[t2].hi / 1000, timer[t2].hi - ((timer[t2].hi / 1000) * 1000), child, state);
-		fprintf(stdout, blank[child]);
+		fprintf(stdout, "%s", blank[child]);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -777,9 +780,9 @@ milliseconds(int child, int t)
 
 	if (show && verbose > 0) {
 		dummy = lockf(fileno(stdout), F_LOCK, 0);
-		fprintf(stdout, blank[child]);
+		fprintf(stdout, "%s", blank[child]);
 		fprintf(stdout, msgs[child], timer[t].name, timer[t].lo / 1000, timer[t].lo - ((timer[t].lo / 1000) * 1000), timer[t].name, timer[t].hi / 1000, timer[t].hi - ((timer[t].hi / 1000) * 1000), child, state);
-		fprintf(stdout, blank[child]);
+		fprintf(stdout, "%s", blank[child]);
 		fflush(stdout);
 		dummy = lockf(fileno(stdout), F_ULOCK, 0);
 	}
@@ -3824,7 +3827,7 @@ void
 print_simple(int child, const char *msgs[])
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child]);
+	fprintf(stdout, "%s", msgs[child]);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
@@ -21332,7 +21335,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -21389,6 +21392,7 @@ version(int argc, char *argv[])
 \n\
 %1$s:\n\
     %2$s\n\
+    Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved.\n\
     Copyright (c) 1997-2008  OpenSS7 Corporation.  All Rights Reserved.\n\
 \n\
     Distributed by OpenSS7 Corporation under AGPL Version 3,\n\

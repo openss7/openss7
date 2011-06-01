@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:32 $
+ @(#) $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:03 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:32 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:03 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: echo.c,v $
+ Revision 1.1.2.4  2011-05-31 09:46:03  brian
+ - new distros
+
  Revision 1.1.2.3  2010-11-28 14:21:32  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:32 $";
+static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:03 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.3 $
 
 #define ECHO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define ECHO_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:32 $"
+#define ECHO_REVISION	"LfS $RCSfile: echo.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:03 $"
 #define ECHO_DEVICE	"SVR 4.2 MP STREAMS Echo (ECHO) Device"
 #define ECHO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ECHO_LICENSE	"GPL"

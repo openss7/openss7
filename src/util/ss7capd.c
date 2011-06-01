@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:36 $
+ @(#) $RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:19 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:36 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7capd.c,v $
+ Revision 1.1.2.4  2011-05-31 09:46:19  brian
+ - new distros
+
  Revision 1.1.2.3  2011-01-12 04:10:36  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:36 $";
+static char const ident[] = "$RCSfile: ss7capd.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:19 $";
 
 #include <stropts.h>
 #include <stdlib.h>
@@ -202,7 +205,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-01-12 04:10:36 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.4 $ $Date: 2011-05-31 09:46:19 $");
 }
 
 static void
@@ -426,7 +429,7 @@ output_header(void)
 	ftimestamp();
 	fprint_time(stdout);
 	fprintf(stdout,
-		" # SS7CAPD $Id: ss7capd.c,v 1.1.2.3 2011-01-12 04:10:36 brian Exp $ Output File Header\n");
+		" # SS7CAPD $Id: ss7capd.c,v 1.1.2.4 2011-05-31 09:46:19 brian Exp $ Output File Header\n");
 	uname(&uts);
 	fprint_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
@@ -435,9 +438,9 @@ output_header(void)
 	fprintf(stdout, " # device: %s (%d:%d:%d) %s\n", devname, card, span, slot, lnkname);
 	fprint_time(stdout);
 	if (outpath[0] != '\0')
-		snprintf(buf, sizeof(buf), outpath);
+		snprintf(buf, sizeof(buf), "%s", outpath);
 	else
-		snprintf(buf, sizeof(buf), "(stdout)");
+		snprintf(buf, sizeof(buf), "%s", "(stdout)");
 	fprintf(stdout, " # original file name: %s\n", buf);
 	fprint_time(stdout);
 	gethostname(buf, sizeof(buf));

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $
+ @(#) $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-05-31 09:46:09 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-05 16:35:14 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:09 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: wrapper.c,v $
+ Revision 1.1.2.8  2011-05-31 09:46:09  brian
+ - new distros
+
  Revision 1.1.2.7  2011-04-05 16:35:14  brian
  - weak module design
 
@@ -76,7 +79,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $";
+    "$RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-05-31 09:46:09 $";
 
 #include <linux/compiler.h>
 #ifdef NEED_LINUX_AUTOCONF_H
@@ -118,7 +121,7 @@ static char const ident[] =
 
 #define WRAPPER_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define WRAPPER_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-04-05 16:35:14 $"
+#define WRAPPER_REVISION	"LfS $RCSfile: wrapper.c,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-05-31 09:46:09 $"
 #define WRAPPER_DEVICE		"SVR 4.2 Wrappers (WRAPPER)"
 #define WRAPPER_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define WRAPPER_LICENSE		"GPL"

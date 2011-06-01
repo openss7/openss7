@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $
+ @(#) $RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:19 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:38 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:19 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7statsd.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:19  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:22:38  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:38 $";
+static char const ident[] = "$RCSfile: ss7statsd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:19 $";
 
 /* This file can be processed with doxygen(1). */
 
@@ -213,7 +216,7 @@ copying(int argc, char *argv[])
 --------------------------------------------------------------------------------\n\
 %1$s\n\
 --------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -269,7 +272,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock.\n\
 \n\
-Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -279,7 +282,7 @@ Distributed by OpenSS7 under GNU Affero General Public License Version 3,\n\
 with conditions, incorporated herein by reference.\n\
 \n\
 See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2010-11-28 14:22:38 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-05-31 09:46:19 $");
 }
 
 static void
@@ -566,16 +569,16 @@ stats_header(void)
 
 	ftimestamp();
 	fprintf_time(stdout);
-	fprintf(stdout, " # SLSTATSD $Id: ss7statsd.c,v 1.1.2.2 2010-11-28 14:22:38 brian Exp $ Output Header\n");
+	fprintf(stdout, " # SLSTATSD $Id: ss7statsd.c,v 1.1.2.3 2011-05-31 09:46:19 brian Exp $ Output Header\n");
 	uname(&uts);
 	fprintf_time(stdout);
 	fprintf(stdout, " # machine: %s %s %s %s %s\n", uts.sysname, uts.nodename, uts.release,
 		uts.version, uts.machine);
 	fprintf_time(stdout);
 	if (outpath[0] != '\0')
-		snprintf(buf, sizeof(buf), outpath);
+		snprintf(buf, sizeof(buf), "%s", outpath);
 	else
-		snprintf(buf, sizeof(buf), "(stdout)");
+		snprintf(buf, sizeof(buf), "%s", "(stdout)");
 	fprintf(stdout, " # original file name: %s\n", buf);
 	fprintf_time(stdout);
 	gethostname(buf, sizeof(buf));

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:36 $
+ @(#) $RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:18 $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -60,11 +60,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:36 $ by $Author: brian $
+ Last Modified $Date: 2011-05-31 09:46:18 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: test-xnsl.c,v $
+ Revision 1.1.2.3  2011-05-31 09:46:18  brian
+ - new distros
+
  Revision 1.1.2.2  2010-11-28 14:22:36  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -73,7 +76,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:36 $";
+static char const ident[] = "$RCSfile: test-xnsl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:18 $";
 
 /*
  *  This is a basic test program for the Network Services Library, libxnsl,
@@ -2310,7 +2313,7 @@ void
 print_simple(int child, const char *msgs[])
 {
 	dummy = lockf(fileno(stdout), F_LOCK, 0);
-	fprintf(stdout, msgs[child]);
+	fprintf(stdout, "%s", msgs[child]);
 	fflush(stdout);
 	dummy = lockf(fileno(stdout), F_ULOCK, 0);
 }
@@ -6099,7 +6102,7 @@ copying(int argc, char *argv[])
 	print_header();
 	fprintf(stdout, "\
 \n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>\n\
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>\n\
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>\n\
 Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>\n\
 \n\
@@ -6157,7 +6160,7 @@ version(int argc, char *argv[])
 %1$s (OpenSS7 %2$s) %3$s (%4$s)\n\
 Written by Brian Bidulock\n\
 \n\
-Copyright (c) 2008, 2009  Monavacon Limited.\n\
+Copyright (c) 2008, 2009, 2010, 2011  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
 This is free software; see the source for copying conditions.  There is NO\n\
@@ -6165,7 +6168,7 @@ warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.\n\
 \n\
 Distributed by OpenSS7 Corporation under GNU Affero General Public License Version 3,\n\
 incorporated herein by reference.  See `%1$s --copying' for copying permissions.\n\
-", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.2 $ $Date: 2010-11-28 14:22:36 $");
+", NAME, PACKAGE, VERSION, "$Revision: 1.1.2.3 $ $Date: 2011-05-31 09:46:18 $");
 }
 
 void
