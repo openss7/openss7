@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 #
 # The purpose of this script is to invoke the openss7-modules awk script with
 # the necessary arguments depending upon how it was called.
@@ -62,17 +62,23 @@ ou_preinst_upgrade () { :
 ou_preinst_abort_upgrade () { :
     return 0
 }
+# never (RedHat's new-kernel-pkg only invokes postinst and prerm targets).
+ou_preinst_redhat () { :
+    return 0
+}
 ou_preinst () { :
     local retval=0
     operation="$1"; shift
-    case "$operation" in
-	install)
+    case "${operation:-redhat}" in
+	(install)
 	    ou_preinst_install		"$@" || retval=$? ;;
-	upgrade)
+	(upgrade)
 	    ou_preinst_upgrade		"$@" || retval=$? ;;
-	abort-upgrade)
+	(abort-upgrade)
 	    ou_preinst_abort_upgrade	"$@" || retval=$? ;;
-	*)  : ;;
+	(redhat)
+	    ou_preinst_redhat		"$@" || retval=$? ;;
+	(*)  : ;;
     esac
     return $retval
 }
@@ -117,7 +123,7 @@ ou_postinst_configure () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -127,7 +133,7 @@ ou_postinst_triggered () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -137,7 +143,7 @@ ou_postinst_abort_upgrade () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -148,7 +154,7 @@ ou_postinst_abort_remove () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -160,25 +166,38 @@ ou_postinst_abort_deconfigure () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
+    fi
+    return $retval
+}
+# RedHat's new-kernel-pkg only invokes postinst and prerm targets.  When this
+# target is invoked, it is invoked without arguments.
+ou_postinst_redhat () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --add-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
 ou_postinst () { :
     local retval=0
     operation="$1"; shift
-    case "$operation" in
-	configure)
+    case "${operation:-redhat}" in
+	(configure)
 	    ou_postinst_configure		"$@" || retval=$? ;;
-	triggered)
+	(triggered)
 	    ou_postinst_triggered		"$@" || retval=$? ;;
-	abort-upgrade)
+	(abort-upgrade)
 	    ou_postinst_abort_upgrade		"$@" || retval=$? ;;
-	abort-remove)
+	(abort-remove)
 	    ou_postinst_abort_remove		"$@" || retval=$? ;;
-	abort-deconfigure)
+	(abort-deconfigure)
 	    ou_postinst_abort_deconfigure	"$@" || retval=$? ;;
-	*)  : ;;
+	(redhat)
+	    ou_postinst_redhat			"$@" || retval=$? ;;
+	(*)  : ;;
     esac
     return $retval
 }
@@ -203,19 +222,32 @@ ou_prerm_failed_upgrade () { :
 ou_prerm_deconfigure () { :
     return 0
 }
+# RedHat's new-kernel-pkg only invokes postinst and prerm targets.  When this
+# target is invoked, it is invoked without arguments.
+ou_prerm_redhat () { :
+    local retval=0
+    if [ ${kversion} != `uname -r` ] ; then
+	$update -q -e --remove-kernel ${kversion} || retval=$?
+    else
+	touch /.openss7_update-${kversion} || :
+    fi
+    return 0
+}
 ou_prerm () { :
     local retval=0
     operation="$1"; shift
-    case "$operation" in
-	remove)
+    case "${operation:-redhat}" in
+	(remove)
 	    ou_prerm_remove			"$@" || retval=$? ;;
-	upgrade)
+	(upgrade)
 	    ou_prerm_upgrade			"$@" || retval=$? ;;
-	failed-upgrade)
+	(failed-upgrade)
 	    ou_prerm_failed_upgrade		"$@" || retval=$? ;;
-	deconfigure)
+	(deconfigure)
 	    ou_prerm_deconfigure		"$@" || retval=$? ;;
-	*)  : ;;
+	(redhat)
+	    ou_prerm_redhat			"$@" || retval=$? ;;
+	(*)  : ;;
     esac
     return $retval
 }
@@ -251,7 +283,7 @@ ou_postrm_remove () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --remove-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -261,7 +293,7 @@ ou_postrm_purge () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --remove-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -271,7 +303,7 @@ ou_postrm_upgrade () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --remove-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -281,7 +313,7 @@ ou_postrm_failed_upgrade () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --remove-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -291,7 +323,7 @@ ou_postrm_abort_install () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --remove-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -301,7 +333,7 @@ ou_postrm_abort_upgrade () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --remove-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -311,29 +343,35 @@ ou_postrm_disappear () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --remove-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
+}
+# never (RedHat's new-kernel-pkg only invokes postinst and prerm targets).
+ou_postrm_redhat () { :
+    return 0
 }
 ou_postrm () { :
     local retval=0
     operation="$1"; shift
-    case "$operation" in
-	remove)
+    case "${operation:-redhat}" in
+	(remove)
 	    ou_postrm_remove			"$@" || retval=$? ;;
-	purge)
+	(purge)
 	    ou_postrm_purge			"$@" || retval=$? ;;
-	upgrade)
+	(upgrade)
 	    ou_postrm_upgrade			"$@" || retval=$? ;;
-	failed-upgrade)
+	(failed-upgrade)
 	    ou_postrm_failed_upgrade		"$@" || retval=$? ;;
-	abort-install)
+	(abort-install)
 	    ou_postrm_abort_install		"$@" || retval=$? ;;
-	abort-upgrade)
+	(abort-upgrade)
 	    ou_postrm_abort_upgrade		"$@" || retval=$? ;;
-	disappear)
+	(disappear)
 	    ou_postrm_disappear			"$@" || retval=$? ;;
-	*)  : ;;
+	(redhat)
+	    ou_postrm_redhat			"$@" || retval=$? ;;
+	(*)  : ;;
     esac
     return $retval
 }
@@ -350,7 +388,7 @@ ou_hdr_postinst_configure () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -360,7 +398,7 @@ ou_hdr_postinst_triggered () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -370,7 +408,7 @@ ou_hdr_postinst_abort_upgrade () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -381,7 +419,7 @@ ou_hdr_postinst_abort_remove () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
 }
@@ -393,25 +431,31 @@ ou_hdr_postinst_abort_deconfigure () { :
     if [ ${kversion} != `uname -r` ] ; then
 	$update -q -e --add-kernel ${kversion} || retval=$?
     else
-	touch /.openss7_update || :
+	touch /.openss7_update-${kversion} || :
     fi
     return $retval
+}
+# never (RedHat's new-kernel-pkg only invokes postinst and prerm targets).
+ou_hdr_postinst_redhat () { :
+    return 0
 }
 ou_hdr_postinst () { :
     local retval=0
     operation="$1"; shift
-    case "$operation" in
-	configure)
+    case "${operation:-redhat}" in
+	(configure)
 	    ou_hdr_postinst_configure		"$@" || retval=$? ;;
-	triggered)
+	(triggered)
 	    ou_hdr_postinst_triggered		"$@" || retval=$? ;;
-	abort-upgrade)
+	(abort-upgrade)
 	    ou_hdr_postinst_abort_upgrade	"$@" || retval=$? ;;
-	abort-remove)
+	(abort-remove)
 	    ou_hdr_postinst_abort_remove	"$@" || retval=$? ;;
-	abort-deconfigure)
+	(abort-deconfigure)
 	    ou_hdr_postinst_abort_deconfigure	"$@" || retval=$? ;;
-	*)  : ;;
+	(redhat)
+	    ou_hdr_postinst_redhat		"$@" || retval=$? ;;
+	(*)  : ;;
     esac
     return $retval
 }
@@ -443,21 +487,27 @@ ou_src_postinst_abort_remove () { :
 ou_src_postinst_abort_deconfigure () { :
     return 0
 }
+# never (RedHat's new-kernel-pkg only invokes postinst and prerm targets).
+ou_src_postinst_redhat () { :
+    return 0
+}
 ou_src_postinst ()  { :
     local retval=0
     operation="$1"; shift
     case "$operation" in
-	configure)
+	(configure)
 	    ou_src_postinst_configure		"$@" || retval=$? ;;
-	triggered)
+	(triggered)
 	    ou_src_postinst_triggered		"$@" || retval=$? ;;
-	abort-upgrade)
+	(abort-upgrade)
 	    ou_src_postinst_abort_upgrade	"$@" || retval=$? ;;
-	abort-remove)
+	(abort-remove)
 	    ou_src_postinst_abort_remove	"$@" || retval=$? ;;
-	abort-deconfigure)
+	(abort-deconfigure)
 	    ou_src_postinst_abort_deconfigure	"$@" || retval=$? ;;
-	*)  : ;;
+	(redhat)
+	    ou_src_postinst_redhat		"$@" || retval=$? ;;
+	(*)  : ;;
     esac
     return $retval
 }
@@ -465,19 +515,19 @@ ou_src_postinst ()  { :
 RETVAL=0
 
 case "$command" in
-    */etc/kernel/preinst.d/openss7-update)
+    (*/etc/kernel/preinst.d/openss7-update)
 	kversion="$1"; ou_preinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
-    */etc/kernel/postinst.d/openss7-update)
+    (*/etc/kernel/postinst.d/openss7-update)
 	kversion="$1"; ou_postinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
-    */etc/kernel/prerm.d/openss7-update)
+    (*/etc/kernel/prerm.d/openss7-update)
 	kversion="$1"; ou_prerm		$DEB_MAINT_PARAMS || RETVAL=$? ;;
-    */etc/kernel/postrm.d/openss7-update)
+    (*/etc/kernel/postrm.d/openss7-update)
 	kversion="$1"; ou_postrm	$DEB_MAINT_PARAMS || RETVAL=$? ;;
-    */etc/kernel/header_postinst.d/openss7-update)
+    (*/etc/kernel/header_postinst.d/openss7-update)
 	kversion="$1"; ou_hdr_postinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
-    */etc/kernel/src_postinst.d/openss7-update)
+    (*/etc/kernel/src_postinst.d/openss7-update)
 	kversion="$1"; ou_src_postinst	$DEB_MAINT_PARAMS || RETVAL=$? ;;
-    */sbin/openss7-update | */usr/sbin/openss7-update | *)
+    (*/sbin/openss7-update | */usr/sbin/openss7-update | *)
 	openss7_update "$@" || RETVAL=$? ;;
 esac
 

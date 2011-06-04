@@ -369,7 +369,9 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 		    -d "$ksyms_dir/preinst.d" -o \
 		    -d "$ksyms_dir/postinst.d" -o \
 		    -d "$ksyms_dir/prerm.d" -o \
-		    -d "$ksyms_dir/postrm.d" \)
+		    -d "$ksyms_dir/postrm.d" -o \
+		    -d "$ksyms_dir/header_postinst.d" -o \
+		    -d "$ksyms_dir/src_postinst.d" \)
 		then
 		    ksyms_cv_updates_directory="$ksyms_dir"
 		    AC_MSG_RESULT([yes])
@@ -381,8 +383,44 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 	if test :"${ksyms_cv_updates_directory:-no}" = :no -o ! -d "$ksyms_cv_updates_directory"
 	then
 	    case "$target_vendor" in
-		(debian|unbuntu) ;;
-		(*) ;;
+		(debian|unbuntu|mint)
+		    if test -z "${DESTDIR}${rootdir}" ; then
+			AC_MSG_WARN([
+***
+*** Configure cannot find the kernel updates directory, /etc/kernel,
+*** even though the distribution supports it.  Proceeding under the
+*** assumption that that --with-k-updates=/etc/kernel was intended.
+*** ])
+		    fi
+		    ksyms_cv_updates_directory=/etc/kernel
+		    ;;
+		(redhat|rhel|fedora|centos|scientific|lineox|whitebox)
+		    if test -z "${DESTDIR}${rootdir}" ; then
+			AC_MSG_WARN([
+***
+*** Configure cannot find the kernel updates directory, /etc/kernel,
+*** even though the distribution supports it.  This is likely because
+*** the DKMS package is not installed.  Proceeding under the assumption
+*** that that --with-k-updates=/etc/kernel was intended.
+*** ])
+		    fi
+		    ksyms_cv_updates_directory=/etc/kernel
+		    ;;
+		(sles|sled|sle|suse|opensuse)
+		    ;;
+		(mandrake|mandriva|manbo)
+		    ;;
+		(*) if test -x "${DESTDIR}${rootdir}/sbin/new-kernel-pkg" ; then
+			if test -z "${DESTDIR}${rootdir}" ; then
+			    AC_MSG_WARN([
+***
+*** Configure cannot find the kernel updates directory, /etc/kernel.
+*** This is likely because the DKMS package is not installed or
+*** supported and the distro does not provide /sbin/new-kernel-pkg.
+*** ])
+			fi
+		    fi
+		    ;;
 	    esac
 	fi
 	AC_MSG_CHECKING([for updates directory])

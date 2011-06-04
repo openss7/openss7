@@ -273,6 +273,9 @@
 %if %(if test -d %_sysconfdir/kernel ; then echo 0 ; else echo 1 ; fi)
 %global HAVE_kupdate        0
 %endif
+%if %(if test -x /sbin/new-kernel-pkg ; then echo 0 ; else echo 1 ; fi)
+%global HAVE_kupdate        0
+%endif
 
 %if %(if test -x /sbin/weak-modules -o -x /usr/lib/module-init-tools/weak-modules -o -x /usr/lib/module-init-tools/weak-modules2; then echo 0; else echo 1; fi)
 %global _ksubdir            %{base}
@@ -2769,8 +2772,7 @@ Prefix:             %{_pkglibexecdir}
 Prefix:             %{_mandir}
 %endif
 %if %{FILES_kupdate}
-Prefix:             %{_sysconfdir}/kernel/postinst.d
-Prefix:             %{_sysconfdir}/kernel/postrm.d
+Prefix:             %{_sysconfdir}/kernel
 %endif
 
 Conflicts:          texinfo < 3.11
@@ -3240,8 +3242,12 @@ fi
 %{?files_manrefs:%{_mandir}/%{manrefs}*}
 %{?files_manmacros:%{_mandir}/%{manmacros}*}
 %{?files_manpages:%{_mandir}/man[1458]*/*}
+%{?files_kupdate:%{_sysconfdir}/kernel/preinst.d/%{name}-update}
 %{?files_kupdate:%{_sysconfdir}/kernel/postinst.d/%{name}-update}
+%{?files_kupdate:%{_sysconfdir}/kernel/prerm.d/%{name}-update}
 %{?files_kupdate:%{_sysconfdir}/kernel/postrm.d/%{name}-update}
+%{?files_kupdate:%{_sysconfdir}/kernel/header_postinst.d/%{name}-update}
+%{?files_kupdate:%{_sysconfdir}/kernel/src_postinst.d/%{name}-update}
 %{?files_wmscripts:%{_sbindir}/%{name}-modules}
 %{?files_wmscripts:%{_sbindir}/%{name}-update}
 %endif
