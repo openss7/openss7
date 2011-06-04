@@ -65,24 +65,39 @@ if WITH_KO_MODULES
 if KERNEL_UPDATES
 ## KERNEL_UPDATES
 
+##
+# Note that the redhat /sbin/new-kernel-pkg only invokes the scripts in postinst.d and prerm.d and
+# even then with different arguments as the debian versions of these scripts.  Also,
+# DEB_MAINT_PARAMS is not set in the redhat case.
+##
 install-updates:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
+	@test -n '$(kupdatedir)' || exit 0
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/preinst.d
+	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/preinst.d ; $(LN_S) -fn /sbin/openss7-update .)
 	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d
+	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d ; $(LN_S) -fn /sbin/openss7-update .)
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/prerm.d
+	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/prerm.d ; $(LN_S) -fn /sbin/openss7-update .)
 	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d
-	@test -d "$(kupdatedir)" || exit 0; \
-	$(ECHO) "( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
-	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d ; $(LN_S) -fn $(sbindir)/openss7-update .) ; \
-	$(ECHO) "( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)" ; \
-	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d   ; $(LN_S) -fn $(sbindir)/openss7-update .)
+	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d ; $(LN_S) -fn /sbin/openss7-update .)
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/header_postinst.d
+	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/header_postinst.d ; $(LN_S) -fn /sbin/openss7-update .)
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)$(kupdatedir)/src_postinst.d
+	( cd $(DESTDIR)$(rootdir)$(kupdatedir)/src_postinst.d   ; $(LN_S) -fn /sbin/openss7-update .)
 
 INSTALL_EXEC_LOCAL	+= install-updates
 
 uninstall-updates:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_UNINSTALL)
+	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/preinst.d/openss7-update"
 	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/postinst.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/prerm.d/openss7-update"
 	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/postrm.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/header_postinst.d/openss7-update"
+	rm -f -- "$(DESTDIR)$(rootdir)$(kupdatedir)/src_postinst.d/openss7-update"
 
 UNINSTALL_LOCAL		+= uninstall-updates
 
