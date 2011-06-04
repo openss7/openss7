@@ -164,7 +164,8 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    /etc/redhat-release
 	    /etc/SuSE-release
 	    /etc/system-release
-	    /etc/debian_version\""
+	    /etc/debian_version
+	    /etc/release\""
 	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
 	for dist_file in $dist_search_path
 	do
@@ -206,6 +207,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	(*White?Box*|*WHITE?BOX*)			echo 'whitebox'	  ;;
 	(*Scientific*|*SCIENTIFIC*)			echo 'scientific' ;;
 	(*Fedora*|*FEDORA*)				echo 'fedora'	  ;;
+	(*Mandriva?Linux?Enterprise?Server*)		echo 'mes'	  ;;
 	(*Mandrake*|*MANDRAKE*)				echo 'mandrake'	  ;;
 	(*Mandriva*|*MANDRIVA*)				echo 'mandriva'	  ;;
 	(*Manbo*|*MANBO*)				echo 'manbo'	  ;;
@@ -264,8 +266,7 @@ dnl AC_MSG_WARN([checking for vendor in $[1]])
 	(whitebox)			echo 'whitebox'	  ;;
 	(scientific)			echo 'scientific' ;;
 	(mandrake)			echo 'mandrake'	  ;;
-	(mandriva)			echo 'mandriva'	  ;;
-	(manbo)				echo 'manbo'	  ;;
+	(mandriva|manbo|mes)		echo 'mandriva'	  ;;
 	(mageia)			echo 'mageia'	  ;;
 	(fedora|redhat|rhel)		echo 'redhat'	  ;;
 	(suse|sle|sles|sled|opensuse)	echo 'suse'	  ;;
@@ -333,6 +334,7 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 	(mandriva)	echo 'Mandriva Linux' ;;
 	(manbo)		echo 'Manbo Linux' ;;
 	(mageia)	echo 'Mageia Linux' ;;
+	(mes)		echo 'Mandriva Linux Enterprise Server' ;;
 	(redhat)	echo 'Red Hat Linux' ;;
 	(rhel)		echo 'Red Hat Enterprise Linux' ;;
 	(suse)		echo 'SuSE Linux' ;;
@@ -408,7 +410,7 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
 	    (centos|lineox|whitebox|scientific|rhel|sle)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,\..*[$],,'` ;;
-	    (fedora|mandrake|mandriva|manbo|mageia|redhat)
+	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat)
 		dist_tmp="${dist_cv_build_release}" ;;
 	    (debian|ubuntu|*)
 		dist_tmp="${dist_cv_build_codename}" ;;
@@ -467,7 +469,8 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	    ${DESTDIR}${sysconfdir}/redhat-release
 	    ${DESTDIR}${sysconfdir}/SuSE-release
 	    ${DESTDIR}${sysconfdir}/system-release
-	    ${DESTDIR}${sysconfdir}/debian_version\""
+	    ${DESTDIR}${sysconfdir}/debian_version
+	    ${DESTDIR}${sysconfdir}/release\""
 	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
 	for dist_file in $dist_search_path
 	do
@@ -625,7 +628,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
 	    (centos|lineox|whitebox|scientific|rhel|sle)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,\..*[$],,'` ;;
-	    (fedora|mandrake|mandriva|manbo|mageia|redhat)
+	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat)
 		dist_tmp="${dist_cv_host_release}" ;;
 	    (debian|ubuntu|*)
 		dist_tmp="${dist_cv_host_codename}" ;;
@@ -681,7 +684,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     case "$build_vendor" in
 	(centos|lineox|whitebox|scientific|redhat|suse|debian)  
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
-	(mandrake|mandriva|manbo|mageia|ubuntu)  
+	(mandrake|mandriva|manbo|mageia|mes|ubuntu)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
     esac
     build_distro="${dist_cv_build_distro:-unknown}"
@@ -704,7 +707,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$host_vendor" in
 	    (centos|lineox|whitebox|scientific|redhat|suse|debian)  
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
-	    (mandrake|mandriva|manbo|mageia|ubuntu)  
+	    (mandrake|mandriva|manbo|mageia|mes|ubuntu)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
 	esac
 	host_distro="${dist_cv_host_distro:-unknown}"
@@ -726,7 +729,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$target_vendor" in
 	    (centos|lineox|whitebox|scientific|redhat|suse|debian)  
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
-	    (mandrake|mandriva|manbo|mageia|ubuntu)  
+	    (mandrake|mandriva|manbo|mageia|mes|ubuntu)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;
 	esac
     fi
