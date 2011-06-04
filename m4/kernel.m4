@@ -714,7 +714,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		esac
 		linux_cv_k_base=`echo "$kversion" | sed -r -e s/$linux_cv_k_boot$// -e s/-$//`
 		;;
-	    (mandriva|manbo|mageia)
+	    (mandriva|manbo|mageia|mes)
 		case "${kversion}" in
 		    # mandriva boot kernels (not needed for kernel.h)
 		    (*-rsbac-desktop586-*)  linux_cv_k_boot='rsbac-desktop586'	;;
@@ -881,7 +881,7 @@ dnl ***
 dnl *** ])
 dnl 			fi
 dnl 			;;
-dnl 		    (mandrake|mandriva|manbo|mageia)
+dnl 		    (mandrake|mandriva|manbo|mageia|mes)
 dnl 			;;
 dnl 		    (*)
 dnl 			;;
@@ -1302,7 +1302,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    case "$target_vendor" in
-			(mandrake|mandriva|manbo|mageia)
+			(mandrake|mandriva|manbo|mageia|mes)
 			    ;;
 			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
@@ -1413,7 +1413,7 @@ dnl
 			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
-			    (mandrake|mandriva|manbo|mageia)
+			    (mandrake|mandriva|manbo|mageia|mes)
 dnl
 dnl				Mandrakelinux blends the debian architecture name in the kernel
 dnl				image name approach with the Redhat kernel version number in the
@@ -1561,7 +1561,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    case "$target_vendor" in
-			(mandrake|mandriva|manbo|mageia)
+			(mandrake|mandriva|manbo|mageia|mes)
 			    ;;
 			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
@@ -1647,7 +1647,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    case "$target_vendor" in
-			(mandrake|mandriva|manbo|mageia)
+			(mandrake|mandriva|manbo|mageia|mes)
 			    ;;
 			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
@@ -1724,7 +1724,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 *** ])
 			    ;;
 			# debian and some rpm based systems do not have this file
-			(debian:*|ubuntu:*|mint:*|mandrake:*|mandriva:*|manbo:*|mageia:*|*)
+			(debian:*|ubuntu:*|mint:*|mandrake:*|mandriva:*|manbo:*|mageia:*|mes:*|*)
 			    ;;
 		    esac
 		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_k_symsets --without-k-symsets\""
@@ -1740,7 +1740,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    case "$target_vendor" in
-			(mandrake|mandriva|manbo|mageia)
+			(mandrake|mandriva|manbo|mageia|mes)
 			    ;;
 			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
@@ -2432,7 +2432,7 @@ dnl
     AC_CACHE_CHECK([for kernel file sanity], [linux_cv_kernel_sanity], [dnl
 	eval "linux_cv_files=\"$linux_cv_k_sysmap $linux_cv_k_build $linux_cv_k_source $linux_cv_k_config\""
 	case "$target_vendor" in
-	    (mandrake|mandriva|manbo|mageia)
+	    (mandrake|mandriva|manbo|mageia|mes)
 dnl
 dnl		Mandrakelinux is built correctly.
 dnl

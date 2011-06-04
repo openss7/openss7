@@ -159,7 +159,7 @@ AC_DEFUN([_BLD_PROG_CHECK],
     if test -n "$tmp_cmd" ; then
 	case "$build_distro" in
 dnl These use rpm
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia)
+	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -186,7 +186,7 @@ dnl		dlocate is much faster than dpkg and dpkg-query
     if test -n "$tmp_cmd" ; then
 	case "$build_distro" in
 dnl These use rpm
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia)
+	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -228,7 +228,7 @@ dnl		dlocate is much faster than dpkg and dpkg-query
 	    (redhat)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"up2date install \$tmp_result\""
 		;;
-	    (mandrake|mandriva|manbo|mageia)
+	    (mandrake|mandriva|manbo|mageia|mes)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"urpmi \$tmp_result\""
 		;;
 	    (debian|ubuntu|mint)
@@ -271,7 +271,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     tmp_result=
     if test -n "$tmp_path"; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia)
+	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -295,7 +295,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     tmp_result=
     if test -n "$tmp_path" ; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia)
+	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -335,7 +335,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 	    (redhat)
 		eval "bld_cv_pkg_cmd_${tmp_pn}=\"up2date install \$tmp_result\""
 		;;
-	    (mandrake|mandriva|manbo|mageia)
+	    (mandrake|mandriva|manbo|mageia|mes)
 		eval "bld_cv_pkg_cmd_${tmp_pn}=\"urpmi \$tmp_result\""
 		;;
 	    (debian|ubuntu|mint)
@@ -378,7 +378,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
     tmp_result=
     if test -n "$tmp_file"; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia)
+	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -402,7 +402,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
     tmp_result=
     if test -n "$tmp_file" ; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia)
+	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -442,7 +442,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
 	    (redhat)
 		eval "bld_cv_pkg_cmd_${tmp_fn}=\"up2date install \$tmp_result\""
 		;;
-	    (mandrake|mandriva|manbo|mageia)
+	    (mandrake|mandriva|manbo|mageia|mes)
 		eval "bld_cv_pkg_cmd_${tmp_fn}=\"urpmi \$tmp_result\""
 		;;
 	    (debian|ubuntu|mint)
