@@ -230,6 +230,10 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
 			rpm_cv_dist_extra=".${rpm_tmp}mnb"
 			;;
+		    (mageia)
+			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
+			rpm_cv_dist_extra=".${rpm_tmp}mga"
+			;;
 		    (suse)
 			rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}"
 			;;
@@ -328,6 +332,10 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
 			rpm_cv_dist_extra2=".${rpm_tmp}mnb"
 			;;
+		    (mageia)
+			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
+			rpm_cv_dist_extra2=".${rpm_tmp}mga"
+			;;
 		    (suse)
 			rpm_cv_dist_extra2=".${dist_cv_host_release:-SuSE}"
 			;;
@@ -361,7 +369,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		rpm_cv_dist_topdir='/usr/src/SuSE'	;;
 	    (sle)
 		rpm_cv_dist_topdir='/usr/src/packages'	;;
-	    (mandrake|mandriva|manbo)
+	    (mandrake|mandriva|manbo|mageia)
 		rpm_cv_dist_topdir='/usr/src/RPM'	;;
 	    (debian|ubuntu)
 		rpm_cv_dist_topdir='/usr/src/rpm'	;;
@@ -577,7 +585,7 @@ dnl
     _BLD_PATH_PROG([RPM], [rpm], [${am_missing3_run}rpm], [$tmp_path], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
-		(centos|lineox|whitebox|scientific|fedora|mandrake|mandriva|manbo|redhat|suse)
+		(centos|lineox|whitebox|scientific|fedora|mandrake|mandriva|manbo|mageia|redhat|suse)
 		    AC_MSG_WARN([Cannot find rpm program in PATH.]) ;;
 		(*) enable_rpms=no ;;
 	    esac
@@ -767,7 +775,7 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
     _BLD_PATH_PROGS([GENHDLIST], [genhdlist2 genhdlist], [${am_missing3_run}genhdlist2], [$tmp_path], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(mandrake|mandriva|manbo)
+		(mandrake|mandriva|manbo|mageia)
 		    _BLD_INSTALL_WARN([GENHDLIST], [
 *** 
 *** Configure could not find a suitable tool for generating the hdlists
@@ -794,7 +802,7 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
     _BLD_PATH_PROG([GENDISTRIB], [gendistrib], [${am_missing3_run}gendistrib], [$tmp_path], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(mandrake|mandriva|manbo)
+		(mandrake|mandriva|manbo|mageia)
 		    _BLD_INSTALL_WARN([GENDISTRIB], [
 *** 
 *** Configure could not find a suitable tool for generating the media
