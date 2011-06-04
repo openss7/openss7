@@ -1,5 +1,13 @@
 2011-05-31  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: add in some missing extra source files
+	* acinclude.m4: add check for dev_mc_add with 2 args
+	* fedora-15-x86_64-config.cache: update build cache
+	* po/de.po: update release files
+	* src/drivers/ldl.c: changes for 2.6.38 kernel
+
+2011-05-31  Brian Bidulock  <bidulock@openss7.org>
+
 	* NOTES.problems: added notes file
 
 	* fedora-15-x86_64-config.cache: added build cache
