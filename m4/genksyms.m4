@@ -344,7 +344,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 		ksyms_cv_updates_options='--style=suse11' ;;
 	    (ubuntu)
 		ksyms_cv_updates_options='--style=ubuntu' ;;
-	    (debian|mandrake|mandriva|manbo|*)
+	    (debian|mandrake|mandriva|manbo|mageia|*)
 		ksyms_cv_updates_options='--style=debian' ;;
 	esac])
     UPDATES_OPTIONS="${ksyms_cv_updates_options:+ $ksyms_cv_updates_options}"
@@ -408,7 +408,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 		    ;;
 		(sles|sled|sle|suse|opensuse)
 		    ;;
-		(mandrake|mandriva|manbo)
+		(mandrake|mandriva|manbo|mageia)
 		    ;;
 		(*) if test -x "${DESTDIR}${rootdir}/sbin/new-kernel-pkg" ; then
 			if test -z "${DESTDIR}${rootdir}" ; then
