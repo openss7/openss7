@@ -156,6 +156,9 @@ CentOS:   $> sudo yum update openss7
 RHEL:     $> sudo yum update openss7
 OpenSUSE: $> sudo zypper update openss7
 SLES:     $> sudo zypper update openss7
+Mageia:   $> sudo uprmi openss7
+Mandriva: $> sudo urpmi openss7
+MES:      $> sudo urpmi openss7
 Ubuntu:   $> sudo aptitude install openss7
 Debian:   $> sudo aptitude install openss7
 @end example
@@ -171,6 +174,9 @@ CentOS:   $> SUBDIR=centos/5.5/$(uname -m)/RPMS/noarch
 RHEL:     $> SUBDIR=redhat/6.0/$(uname -m)/RPMS/noarch
 OpenSUSE: $> SUBDIR=opensuse/11.3/$(uname -m)/RPMS/noarch
 SUSE:     $> SUBDIR=suse/11.1/$(uname -m)/RPMS/noarch
+Mageia:   $> SUBDIR=mageia/1/$(uname -m)/RPMS/noarch
+Mandriva: $> SUBDIR=mandriva/2010.2/$(uname -m)/RPMS-noarch
+MES:      $> SUBDIR=mes/5.2/$(uname -m)/RPMS/noarch
           $> sudo rpm -Uhv $REPO/$SUBDIR/openss7-repo.noarch.rpm
 @end example
 
@@ -213,13 +219,22 @@ RHEL:     $> sudo yum makecache
 @end example
 
 @noindent
-For @manpage{zypper(8)} base systems, caches should be refreshed with:
+For @manpage{zypper(8)} based systems, caches should be refreshed with:
 
 @example
 OpenSUSE: $> sudo zypper refresh-services
 OpenSUSE: $> sudo zypper refresh
 SLES:     $> sudo zypper refresh-services
 SLES:     $> sudo zypper refresh
+@end example
+
+@noindent
+For @manpage{urpmi(8)} based systems, caches should be refreshed with:
+
+@example
+Mageia:   $> sudo urpmi.update
+Mandriva: $> sudo urpmi.update
+MES:      $> sudo urpmi.update
 @end example
 
 @noindent
@@ -241,6 +256,9 @@ CentOS:   $> sudo yum install openss7
 RHEL:     $> sudo yum install openss7
 OpenSUSE: $> sudo zypper install openss7
 SLES:     $> sudo zypper install openss7
+Mageia:   $> sudo uprmi openss7
+Mandriva: $> sudo urpmi openss7
+MES:      $> sudo urpmi openss7
 Debian:   $> aptitude install openss7
 Ubuntu:   $> aptitude install openss7
 @end example
@@ -254,6 +272,9 @@ CentOS:   $> sudo yum remove openss7 openss7-repo
 RHEL:     $> sudo yum remove openss7 openss7-repo
 OpenSUSE: $> sudo zypper remove openss7 openss7-repo
 SLES:     $> sudo zypper remove openss7 openss7-repo
+Mageia:   $> sudo uprme openss7
+Mandriva: $> sudo urpme openss7
+MES:      $> sudo urpme openss7
 Debian:   $> sudo aptitude remove openss7 openss7-repo
 Ubuntu:   $> sudo aptitude remove openss7 openss7-repo
 @end example
