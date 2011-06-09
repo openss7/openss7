@@ -147,6 +147,7 @@ method is to download, configure, build and install from the tarball.
 Repository Access::			access to the repositories
 Repositories for YUM::			the @manpage{yum(8)} repository
 Repositories for YAST::			the @manpage{yast(8)} repository
+Repositories for URPMI::		the @manpage{urpmi(8)} repository
 Repositories for APT::			the @manpage{apt(8)} repository
 @end menu
 
@@ -273,14 +274,14 @@ General REPO-MD Repository::		setting up repository access for general use
 @subsubsection Setting up YUM
 @cindex yum
 
-To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{repo-md} repositories using
-@manpage{yum(8)}, you will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as
-follows:
+To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{repo-md} repositories
+using @manpage{yum(8)}, you will need to install the @file{@value{PACKAGE}-repo} RPM on
+your system, as follows:
 
 @cartouche
 @smallexample
 $> REPO="https://user@@www.openss7.org/repo/rpms"
-$> REPONOARCH="$REPO/fedora/14/x86_64/RPMS/noarch"
+$> REPONOARCH="$REPO/fedora/15/x86_64/RPMS/noarch"
 $> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
 $> sudo rpm -Uhv $REPORPM
 $> Username: anonymous
@@ -288,18 +289,19 @@ $> Password: *******
 @end smallexample
 @end cartouche
 
-The example, above, assumes that the distribution is @samp{fedora} and the distribution release is
-@samp{14} and the required architecture is @samp{x86_64}.  Another example would be
-@file{$REPO/redhat/6.0/x86_64/RPMS/noarch}, for using @manpage{yum(8)} with RHEL.
+The example, above, assumes that the distribution is @samp{fedora} and the distribution
+release is @samp{15} and the required architecture is @samp{x86_64}.  Another example
+would be @file{$REPO/redhat/6.0/x86_64/RPMS/noarch}, for using @manpage{yum(8)} with
+RHEL.
 
-To obtain access to the repository at the level to which you are entitled, you will have to respond
-to the @samp{Username:} query with the user name with which you are registered with
-@uref{https://www.openss7.org/}, and to the @samp{Password:} query with your repository access
-password.@footnote{Note that your repository access password is separate and distinct from your web
-access password.}
+To obtain access to the repository at the level to which you are entitled, you will
+have to respond to the @samp{Username:} query with the user name with which you are
+registered with @uref{https://www.openss7.org/}, and to the @samp{Password:} query with
+your repository access password.@footnote{Note that your repository access password is
+separate and distinct from your web access or mailing list password.}
 
-You can test whether the @manpage{yum(8)} repository is properly set up by refreshing the repository
-and by listing the packages:
+You can test whether the @manpage{yum(8)} repository is properly set up by refreshing
+the repository and by listing the packages:
 
 @cartouche
 @smallexample
@@ -316,10 +318,10 @@ Note that only the packages to which you are entitled will be listed.
 @subsubsection Using the YUM Repository
 @cindex yum
 
-Once the repository is set up, @cite{@value{PACKAGE_TITLE}} includes a number of virtual package and
-package group definitions that ease the installation and removal of kernel modules, libraries and
-utilities.  Downloading, configuring, building and installation for a single-kernel distribution is
-as easy as (one of):
+Once the repository is set up, @cite{@value{PACKAGE_TITLE}} includes a number of
+virtual package and package group definitions that ease the installation and removal of
+kernel modules, libraries and utilities.  Downloading, configuring, building and
+installation for a single-kernel distribution is as easy as (one of):
 
 @cartouche
 @smallexample
@@ -339,9 +341,9 @@ $> sudo yum groupremove @value{PACKAGE}
 @end smallexample
 @end cartouche
 
-To install the development packages for developing STREAMS modules and drivers, or applications that
-use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the development packages using (one
-of):
+To install the development packages for developing STREAMS modules and drivers, or
+applications that use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the
+development packages using (one of):
 
 @cartouche
 @smallexample
@@ -351,17 +353,21 @@ $> sudo yum groupinstall @value{PACKAGE}-devel
 @end smallexample
 @end cartouche
 
+Of course, you are welcome to use a GUI based package manager, such as
+@manpage{PackageKit(8)}.
+
 @node YUM Kernel Updates
 @subsubsection YUM Kernel Updates
 @cindex yum
 @cindex kernel updates
 
-The @cite{@value{PACKAGE_TITLE}} @manpage{yum(8)} repository definitions support the automatic
-updating of kernel modules when kernels are updated.  When the system is updated, using @samp{yum
-update}, openss7 packages that are available for an updated kernel will be installed automatically.
-@cite{@value{PACKAGE_TITLE}} kernel module packages also support weak updates and when kernels are
-updated to compatible kernels (e.g.  for security updates, or normally for any update within an
-Enterprise distribution), kernel modules are automatically applied against the updated kernel.
+The @cite{@value{PACKAGE_TITLE}} @manpage{yum(8)} repository definitions support the
+automatic updating of kernel modules when kernels are updated.  When the system is
+updated, using @samp{yum update}, openss7 packages that are available for an updated
+kernel will be installed automatically.  @cite{@value{PACKAGE_TITLE}} kernel module
+packages also support weak updates and when kernels are updated to compatible kernels
+(e.g.  for security updates, or normally for any update within an Enterprise
+distribution), kernel modules are automatically applied against the updated kernel.
 
 @node Setting up ZYPPER
 @subsubsection Setting up ZYPPER
@@ -382,19 +388,20 @@ $> Password: *******
 @end smallexample
 @end cartouche
 
-The example assumes that the distribution is @samp{opensuse} and the distribution release is
-@samp{11} and the architecture requiresd is @samp{x86_64}.  Another example would be
-@file{$REPO/suse/11/x86_64/RPMS/noarch}, for using @manpage{zypper(8)} with SLES.
+The example assumes that the distribution is @samp{opensuse} and the distribution
+release is @samp{11} and the architecture requiresd is @samp{x86_64}.  Another example
+would be @file{$REPO/suse/11/x86_64/RPMS/noarch}, for using @manpage{zypper(8)} with
+SLES.
 
-To obtain access to the repository at the level to which you are entitled, you will have to respond
-to the @samp{Username:} query with the user name with which you are registered with
-@uref{https://www.openss7.org/}, and to the @samp{Password:} query with your repository access
-password.@footnote{Note that your repository access password is separate from you web access
-password.}
+To obtain access to the repository at the level to which you are entitled, you will
+have to respond to the @samp{Username:} query with the user name with which you are
+registered with @uref{https://www.openss7.org/}, and to the @samp{Password:} query with
+your repository access password.@footnote{Note that your repository access password is
+separate from you web access or mailing list password.}
 
-@manpage{zypper(8)} does not do a very good job of importing GPG signatures.  When @command{zypper}
-is reporting that there are no keys for the RPMs being installed, the key can be imported directly
-into RPM as follows:
+@manpage{zypper(8)} does not do a very good job of importing GPG signatures.  When
+@command{zypper} is reporting that there are no keys for the RPMs being installed, the
+key can be imported directly into RPM as follows:
 
 @cartouche
 @smallexample
@@ -448,6 +455,9 @@ $> sudo zypper install -t pattern @value{PACKAGE}-devel
 $> sudo zypper install @value{PACKAGE}-devel
 @end smallexample
 @end cartouche
+
+Of course, you are welcome to use a GUI based package manager, such as
+@manpage{yast2(8)}.
 
 @node ZYPPER Kernel Updates
 @subsubsection ZYPPER Kernel Updates
@@ -558,10 +568,11 @@ For assistance with specific RPMs, see @ref{Downloading the Binary RPM}.
 @cindex repositories, yast
 @cindex yast
 
-For distributions that support @cite{YaST}, such as @cite{SUSE Linux Enterprise Server}, and
-@cite{OpenSUSE}, @cite{YaST} repositories are built coexistent with @cite{repo-md} repositories.
-Setting up the installation source as a @cite{YaST} installation source instead of @cite{repo-md}
-can provide the additional features associated with @cite{YaST} install sources.
+For distributions that support @cite{YaST}, such as @cite{SUSE Linux Enterprise
+Server}, and @cite{OpenSUSE}, @cite{YaST} repositories are built coexistent with
+@cite{repo-md} repositories.  Setting up the installation source as a @cite{YaST}
+installation source instead of @cite{repo-md} can provide the additional features
+associated with @cite{YaST} install sources.
 
 @menu
 Setting up YAST::			setting up repository access with YAST
@@ -578,6 +589,116 @@ $> REPODIR="https://www.openss7.org/repo/rpms/suse/11/x86_64"
 $> sudo zypper addrepo --type yast2 $REPODIR openss7
 @end smallexample
 @end cartouche
+
+@node Repositories for URPMI
+@subsection Repositories for URPMI
+@cindex repositories, urpmi
+@cindex urpmi
+
+For distributions that support @manpage{urmpi(8)}, such as @cite{Mageia},
+@cite{Mandriva} and @cite{MES}, @manpage{urpmi(8)} repositories are build.  Setting up
+the installation source as a @manpage{urpmi(8)} installation source instead of
+@cite{repo-md} can provide the additional features associated with @manpage{urpmi(8)}
+install sources.
+
+@menu
+Setting up URPMI::			setting up repository access with URPMI
+Using the URPMI Repository::		using the repostory with URPMI
+URPMI Kernel Updates::			updating kernels with UPRMI
+@end menu
+
+@node Setting up URPMI
+@subsubsection Setting up URPMI
+@cindex setup, urpmi
+@cindex urpmi
+
+To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{urpmi} repositories
+using @manpage{urpmi(8)}, you will need to install the @file{@value{PACKAGE}-repo} RPM
+on your system as follows:
+
+@cartouche
+@smallexample
+$> REPO="https://user@@www.openss7.org/repo/repms"
+$> REPONOARCH="$REPO/mageia/1/x86_64/RPMS/noarch"
+$> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
+$> sudo rpm -Uhv $REPORPM
+$> Username: anonymous
+$> Password: *******
+@end smallexample
+@end cartouche
+
+The example, above, assumes that the distribution is @samp{mageia} and the
+distribution release is @samp{1} and the required architecture is @samp{x86_64}.
+Another exmpale would be @file{$REPO/mes/5.2/x86_64/RPMS/noarch}, for using
+@manpage{urpmi(8)} with MES (Mandriva Enterprise Server).
+
+To obtain access to the respository at the level to which you are entitled, you will
+have to respond to the @samp{Username:} query with the user name with which you are
+registered with @uref{http://www.openss7.org/}, and to the @samp{Password:} query with
+your repository access password.@footnote{Note that your repository access password is
+separate and distinct from your web access or mailing list password.}
+
+You can test whether the @manpage{urpmi(8)} repository is properly set up by
+refreshing the repository with @manpage{urpmi.update(8)} and by listing the packages
+with @manpage{urpmq(8)}:
+
+@cartouche
+@smallexample
+$> sudo uprmi.update
+$> sudo urpmq -a | grep openss7
+$> sudo urpmq -ivl openss7
+@end smallexample
+@end cartouche
+
+Note that only the packages to which you are entitled will be listed.
+
+@node Using the URPMI Repository
+@subsubsection Using the URPMI Repository
+@cindex urpmi
+
+Once the repository is set up, @cite{@value{PACKAGE_TITLE}} include a number of
+virtual package and package group definitions that ease the installation and removal
+of kernel modules, libriaries and utilities.  Downloading, configuring, building and
+installation for a single-kernel distribution is as easy as (one of):
+
+@cartouche
+@smallexample
+$> sudo urpmi @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+Removing the package is as easy as (one of):
+
+@cartouche
+@smallexample
+$> sudo urpme @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+To install the development packages for developing STREAMS modules and drivers, or
+applications that use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the
+development packages using (one of):
+
+@cartouche
+@smallexample
+$> sudo urpmi @value{PACKAGE}-devel
+@end smallexample
+@end cartouche
+
+Of course, you are welcome to use a GUI based package manager, such as
+@manpage{rpmdrake(8)}.
+
+@node URPMI Kernel Updates
+@subsubsection URPMI Kernel Updates
+@cindex urpmi
+
+The @cite{@value{PACKAGE_TITLE}} @manpage{urpmi(8)} repository definitions support the
+automatic updating of kernel modules when kernels are updated.  When the system is
+updated, using @samp{urpmi}, openss7 packages that are available for an updated kernel
+will be installed automatically.  @cite{@value{PACKAGE_TITLE}} kernel module packages
+also support weak updates and when kernels are updated to compatible kernels (e.g.
+for security updates, or normally for any update within an Enterprise distribution),
+kernel modules are automatically applied against the updated kernel.
 
 @node Repositories for APT
 @subsection Repositories for APT
@@ -596,9 +717,9 @@ APT Kernel Updates::			updating kernels with APT
 @subsubsection Setting up APT
 @cindex apt
 
-To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{apt} repositories using
-@manpage{apt(8)}, you will need to install the @file{@value{PACKAGE}-repo} DEB on your system, as
-follows:
+To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{apt} repositories
+using @manpage{apt(8)}, you will need to install the @file{@value{PACKAGE}-repo} DEB on
+your system, as follows:
 
 @cartouche
 @smallexample
@@ -681,6 +802,9 @@ packages using:
 $> sudo aptitude install @value{PACKAGE}-devel
 @end smallexample
 @end cartouche
+
+Of course, you are welcome to use a GUI based package manager, such as
+@manpage{synaptic(8)}.
 
 @node APT Kernel Updates
 @subsubsection APT Kernel Updates
