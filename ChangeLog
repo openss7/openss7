@@ -1,3 +1,24 @@
+2011-06-09  Brian Bidulock  <bidulock@openss7.org>
+
+	* mageia-1-x86_64-config.cache: new build caches
+	* mes-5.2-x86_64-config.cache: new build caches
+
+	* AUTHORS: update release files
+	* NEWS: update release files
+	* README: update release files
+	* THANKS: update release files
+	* sle-11-x86_64-config.cache: update release files
+
+	* openss7.spec.in: additional kernel update directory items
+	* am/kernel.am: additional kernel update directory items
+	* m4/bld.m4: add in mageia and mes
+	* m4/dist.m4: add in mageia and mes
+	* m4/genksyms.m4: better check for kernel updates directory
+	* m4/kernel.m4: add in mageia and mes
+	* m4/pr.m4: add in mageia and mes
+	* m4/rpm.m4: add in mageia and mes
+	* src/util/openss7-update: updates and corrections
+
 2011-05-31  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: add in some missing extra source files
