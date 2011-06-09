@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.27 $) $Date: 2011-05-31 09:45:59 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.28 $) $Date: 2011-06-09 11:30:53 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-05-31 09:45:59 $ by $Author: brian $
+# Last Modified $Date: 2011-06-09 11:30:53 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -5279,6 +5279,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.28  2011-06-09 11:30:53  brian
+# - support mageia and mes
+#
 # Revision 1.1.2.27  2011-05-31 09:45:59  brian
 # - new distros
 #
