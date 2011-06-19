@@ -1,0 +1,23 @@
+/* XPM */
+static char * mini_host6_xpm[] = {
+"16 14 6 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c green4",
+"d	c white smoke",
+"e	c green",
+"  aaaaaaaaaaa   ",
+" aeeeeeeeeeeea  ",
+" aecccccccccea  ",
+" aecccccccccea  ",
+" aecccccccccea  ",
+" aecccccccccea  ",
+" aecccccccccea  ",
+" aecccccccccea  ",
+" aeeeeeeeeeeea  ",
+"  aaaaaaaaaaa   ",
+"  aececececea   ",
+" aecececececea  ",
+"aececececececea ",
+"aaaaaaaaaaaaaaa "};

@@ -1,0 +1,32 @@
+/* XPM */
+static char *ftv_mnode[] = {
+/* columns rows colors chars-per-pixel */
+"16 22 4 1",
+"  c #808080",
+". c #FFFFFF",
+"X c #000000",
+"o c None",
+/* pixels */
+"oooooooooooooooo",
+"ooooooo oooooooo",
+"oooooooooooooooo",
+"ooooooo oooooooo",
+"oooooooooooooooo",
+"ooo         oooo",
+"ooo ....... oooo",
+"ooo ....... oooo",
+"ooo ....... oooo",
+"ooo .XXXXX. o o ",
+"ooo ....... oooo",
+"ooo ....... oooo",
+"ooo ....... oooo",
+"ooo         oooo",
+"oooooooooooooooo",
+"ooooooo oooooooo",
+"oooooooooooooooo",
+"ooooooo oooooooo",
+"oooooooooooooooo",
+"ooooooo oooooooo",
+"oooooooooooooooo",
+"ooooooo oooooooo"
+};

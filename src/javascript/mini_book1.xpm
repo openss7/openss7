@@ -1,0 +1,21 @@
+/* XPM */
+static char * mini_book1_xpm[] = {
+"16 14 4 1",
+" 	c None",
+"a	c black",
+"b	c gray50",
+"c	c white",
+"  aa            ",
+" abca    aaa    ",
+" abcca aacca    ",
+" abcccabcccaaa  ",
+" abcccaccccaba  ",
+" abcccabcccaba  ",
+" abcccaccccaba  ",
+" abcccabcccaba  ",
+" abcccaccccaba  ",
+"  abccabccaaba  ",
+"   abcacaaccba  ",
+"    abaabbbbba  ",
+"    aabaaaaaaa  ",
+"     aa         "};
