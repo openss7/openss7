@@ -1,0 +1,19 @@
+/* XPM */
+static char * mini_obj2_xpm[] = {
+"16 12 4 1",
+" 	c None",
+"a	c black",
+"b	c red",
+"c	c red3",
+"      aaa       ",
+"    aabbbaa     ",
+"   abbbbbbba    ",
+"  abbbbbbbbba   ",
+"  abbbbbbbbbac  ",
+" abbbbbbbbbbba  ",
+"  abbbbbbbbbacc ",
+"  abbbbbbbbbac  ",
+"   abbbbbbbacc  ",
+"    aabbbaacc   ",
+"     caaaccc    ",
+"       ccc      "};
