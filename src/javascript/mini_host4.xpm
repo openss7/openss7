@@ -1,12 +1,13 @@
 /* XPM */
 static char * mini_host4_xpm[] = {
-"16 14 6 1",
+"16 16 6 1",
 " 	c None",
 "a	c black",
 "b	c white",
 "c	c red4",
 "d	c white smoke",
 "e	c red",
+"                ",
 "  aaaaaaaaaaa   ",
 " aeeeeeeeeeeea  ",
 " aecccccccccea  ",
@@ -20,4 +21,5 @@ static char * mini_host4_xpm[] = {
 "  aececececea   ",
 " aecececececea  ",
 "aececececececea ",
-"aaaaaaaaaaaaaaa "};
+"aaaaaaaaaaaaaaa ",
+"                "};
