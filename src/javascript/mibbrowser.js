@@ -1,3 +1,59 @@
+//  ==========================================================================
+//  
+//  @(#) $Id$
+//  
+//  --------------------------------------------------------------------------
+//  
+//  Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+//  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+//  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+//  
+//  All Rights Reserved.
+//  
+//  This program is free software; you can redistribute it and/or modify it
+//  under the terms of the GNU Affero General Public License as published by
+//  the Free Software Foundation; version 3 of the License.
+//  
+//  This program is distributed in the hope that it will be useful, but
+//  WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+//  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public
+//  License for more details.
+//  
+//  You should have received a copy of the GNU Affero General Public License
+//  along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+//  write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+//  02139, USA.
+//  
+//  --------------------------------------------------------------------------
+//  
+//  U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+//  behalf of the U.S. Government ("Government"), the following provisions
+//  apply to you.  If the Software is supplied by the Department of Defense
+//  ("DoD"), it is classified as "Commercial Computer Software" under
+//  paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
+//  Regulations ("DFARS") (or any successor regulations) and the Government is
+//  acquiring only the license rights granted herein (the license rights
+//  customarily provided to non-Government users).  If the Software is
+//  supplied to any unit or agency of the Government other than DoD, it is
+//  classified as "Restricted Computer Software" and the Government's rights
+//  in the Software are defined in paragraph 52.227-19 of the Federal
+//  Acquisition Regulations ("FAR") (or any successor regulations) or, in the
+//  cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+//  (or any successor regulations).
+//  
+//  --------------------------------------------------------------------------
+//  
+//  Commercial licensing and support of this software is available from
+//  OpenSS7 Corporation at a fee.  See http://www.openss7.com/
+//  
+//  --------------------------------------------------------------------------
+//  
+//  Last Modified $Date$ by $Author$
+//  
+//  --------------------------------------------------------------------------
+//  
+//  $Log$
+//  ==========================================================================
 
 var images = new Array;
 images["blank"] = "data:image/gif;base64,R0lGODlhEAAQAPAAAAAAAAAAACH5BAEAAAAALAAAAAAQABAAAAIOhI+py+0Po5y02ouzPgUAOw==";
@@ -194,9 +250,32 @@ function MyTextualConvention(name, desc) {
 	tcs[name] = this;
 }
 
+function findTags(desc,topName) {
+	var words = desc.split(" ");
+	var i; var word;
+	for (i in words) {
+		word = words[i];
+		tag = word;
+		tag = tag.replace(",","");
+		tag = tag.replace("<p>","");
+		tag = tag.replace("</p>","");
+		tag = tag.replace("<li>","");
+		tag = tag.replace("</li>","");
+		tag = tag.replace(";","");
+		tag = tag.replace(":","");
+		tag = tag.replace(".","");
+		if (tree[tag] != null) {
+			word = "<a href='javascript:"+topName+".onTagClick(\"" + tag + "\")'>" + word + "</a>";
+			words[i] = word;
+		}
+	}
+	desc = words.join(" ");
+	return desc;
+}
+
 function Mib(oid, name, sid, mid, mtype, access, status, syntax, desc, refs, image, color, superior) {
 	this.SNMP = new Object;
-	this.SNMP.next = null; // Assume that mibs are created in lexical order.
+	this.SNMP.next = null;
 	this.SNMP.prev = prev;
 	if (prev != null) { prev.SNMP.next = this; }
 	prev = this;
@@ -290,9 +369,6 @@ function Mib(oid, name, sid, mid, mtype, access, status, syntax, desc, refs, ima
 		html = html + "\t\t</tr>\n";
 		html = html + "\t</table>\n";
 		html = html + "</div>\n";
-		// With the children in their own nested division it should be possible to destroy
-		// or create the children's innerHTML independent of the parent.  All contained
-		// children should appear or disappear as well.
 		html = html + "<div id=\"" + this.oid + ".children\">\n";
 		if (this.state == "o") {
 			html = html + this.returnChildrenHTML(topName);
@@ -337,22 +413,18 @@ function Mib(oid, name, sid, mid, mtype, access, status, syntax, desc, refs, ima
 		html = html + "</table>\n";
 		html = html + "<table border=2 cellpadding=2 cellspacing=2 width=\"100%\">\n";
 		html = html + "\t<tr><th width=\"50\" align=\"right\"><font size=\"-1\">Attribute</font></th><th align=\"left\"><font size=\"-1\">Value</font></th></tr>\n";
-		//if (this.state != undefined)
-		//html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">State:</font></th>  <td><font size=\"-1\">" + this.state +                  "</font></td></tr>\n";
-		//if (this.SNMP.subID != undefined)
-		//html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Id:</font></th>     <td><font size=\"-1\">" + this.SNMP.subID +             "</font></td></tr>\n";
 		if (this.SNMP.moduleID != undefined)
-		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Module:</font></th> <td><font size=\"-1\"><a href='javascript:" + topName + ".onElementClick(\"" + this.SNMP.moduleID + "\")'>" + this.SNMP.moduleID + "</a></font></td></tr>\n";
+		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Module:</font></th> <td><font size=\"-1\"><a href='javascript:" + topName + ".onTagClick(\"" + this.SNMP.moduleID + "\")'>" + this.SNMP.moduleID + "</a></font></td></tr>\n";
 		if (this.SNMP.label != undefined)
 		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Label:</font></th>  <td><font size=\"-1\">" + this.SNMP.label +             "</font></td></tr>\n";
 		if (this.SNMP.objectID != undefined)
 		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Object:</font></th> <td><font size=\"-1\">" + this.SNMP.objectID +          "</font></td></tr>\n";
 		if (this.SNMP.next != null)
-		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Next:</font></th> <td><font size=\"-1\"><a href='javascript:"+topName+".onElementClick(\"" + this.SNMP.next.oid + "\")'>" + this.SNMP.next.SNMP.label + "</a></font></td></tr>\n";
+		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Next:</font></th> <td><font size=\"-1\"><a href='javascript:"+topName+".onTagClick(\"" + this.SNMP.next.oid + "\")'>" + this.SNMP.next.SNMP.label + "</a></font></td></tr>\n";
 		if (this.SNMP.prev != null)
-		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Previous:</font></th> <td><font size=\"-1\"><a href='javascript:"+topName+".onElementClick(\"" + this.SNMP.prev.oid + "\")'>" + this.SNMP.prev.SNMP.label + "</a></font></td></tr>\n";
+		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Previous:</font></th> <td><font size=\"-1\"><a href='javascript:"+topName+".onTagClick(\"" + this.SNMP.prev.oid + "\")'>" + this.SNMP.prev.SNMP.label + "</a></font></td></tr>\n";
 		if (this.superior != null)
-		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Parent:</font></th> <td><font size=\"-1\"><a href='javascript:" + topName + ".onElementClick(\"" + this.superior.oid + "\")'>" + this.superior.SNMP.label + "</a></font></td></tr>\n";
+		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Parent:</font></th> <td><font size=\"-1\"><a href='javascript:" + topName + ".onTagClick(\"" + this.superior.oid + "\")'>" + this.superior.SNMP.label + "</a></font></td></tr>\n";
 		indexes = "";
 		if (this.SNMP.indexes != undefined) {
 			indArray = this.SNMP.indexes.split(", ");
@@ -360,7 +432,7 @@ function Mib(oid, name, sid, mid, mtype, access, status, syntax, desc, refs, ima
 				index = indArray[ind];
 				if (index != "" && tree[index] != null) {
 					if (indexes != "") { indexes = ""+indexes+", "; }
-					indexes = indexes + "<a href='javascript:" + topName + ".onElementClick(\"" + index + "\")'>" + index + "</a>";
+					indexes = indexes + "<a href='javascript:" + topName + ".onTagClick(\"" + index + "\")'>" + index + "</a>";
 				}
 			}
 		}
@@ -372,7 +444,7 @@ function Mib(oid, name, sid, mid, mtype, access, status, syntax, desc, refs, ima
 				child = this.children[ind];
 				if (child != null && tree[child.oid] != null) {
 					if (children != "") { children = ""+children+", "; }
-					children = children + "<a href='javascript:" + topName + ".onElementClick(\"" + child.oid + "\")'>" + child.name + "</a>";
+					children = children + "<a href='javascript:" + topName + ".onTagClick(\"" + child.oid + "\")'>" + child.name + "</a>";
 				}
 			}
 		}
@@ -401,14 +473,14 @@ function Mib(oid, name, sid, mid, mtype, access, status, syntax, desc, refs, ima
 		if (this.SNMP.values != undefined)
 		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Values:</font></th> <td><font size=\"-1\">" +                              "</font></td></tr>\n";
 		if (this.SNMP.description != undefined)
-		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Descrip:</font></th><td><font size=\"-1\">" + this.SNMP.description +       "</font></td></tr>\n";
+		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Descrip:</font></th><td><font size=\"-1\">" + findTags(this.SNMP.description, topName) + "</font></td></tr>\n";
 		if (this.SNMP.reference != undefined)
-		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Refer:</font></th>  <td><font size=\"-1\">" + this.SNMP.reference +         "</font></td></tr>\n";
+		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">Refer:</font></th>  <td><font size=\"-1\">" + findTags(this.SNMP.reference, topName) + "</font></td></tr>\n";
 		if (this.SNMP.textualConvention != undefined) {
 		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">TC:</font></th>     <td><font size=\"-1\">" + this.SNMP.textualConvention + "</font></td></tr>\n";
 		tc = tcs[this.SNMP.textualConvention];
 		if (tc != undefined)
-		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">TC Desc:</font></th><td><font size=\"-1\">" + tc.desc +                    "</font></td></tr>\n";
+		html = html + "\t<tr><th align=\"right\" valign=\"top\"><font size=\"-1\">TC Desc:</font></th><td><font size=\"-1\">" + findTags(tc.desc, topName) +   "</font></td></tr>\n";
 		}
 		html = html + "</table>\n";
 		return html;
@@ -472,6 +544,7 @@ function writeTree() {
 
 	menu = getMenuDivision();
 	menu.innerHTML = obj0.returnHTML("top");
+	renumberTree();
 
 	cookie = GetCookie("history");
 	if (cookie != null) {
@@ -492,7 +565,7 @@ function writeTree() {
 			if (oid != null) {
 				historySelection = 1 * cookie;
 				obj = tree[oid];
-				if (obj != null) { makeSelection(obj, false); }
+				if (obj != null) { makeSelection(obj, false, true); }
 			}
 		}
 	}
@@ -542,6 +615,23 @@ function saveTree() {
 	SetCookie("position", ""+historySelection+"");
 }
 
+function renumberSubTree(obj, start) {
+	obj.number = start;
+	start = 1 * start + 1;
+	if (obj.state == "o") {
+		for (i in obj.children) {
+			start = renumberSubTree(obj.children[i], start);
+		}
+	}
+	return start;
+}
+
+var totalNumber = 0;
+
+function renumberTree() {
+	totalNumber = renumberSubTree(obj0, 0);
+}
+
 function closeMib(obj) {
 	var cookie; var ctrl; var icon; var children;
 	var menuframe = getMenuFrame();
@@ -553,6 +643,7 @@ function closeMib(obj) {
 	if (icon != null) { icon.src = images[obj.getIconName()]; }
 	children = menuframe.document.getElementById(obj.oid+".children");
 	if (children != null) { children.innerHTML = ""; }
+	renumberTree();
 }
 function openMib(obj) {
 	var cookie; var ctrl; var icon; var children;
@@ -565,6 +656,7 @@ function openMib(obj) {
 	if (icon != null) { icon.src = images[obj.getIconName()]; }
 	children = menuframe.document.getElementById(obj.oid+".children");
 	if (children != null) { children.innerHTML = obj.returnChildrenHTML("top"); }
+	renumberTree();
 }
 
 function openUpwards(obj) {
@@ -603,7 +695,7 @@ function historyBack() {
 		if (oid == null) { return; }
 		obj = tree[oid];
 		if (obj == null) { return; }
-		makeSelection(obj, false);
+		makeSelection(obj, false, true);
 	}
 }
 
@@ -616,7 +708,7 @@ function historySelect(index) {
 		if (oid == null) { return; }
 		obj = tree[oid];
 		if (obj == null) { return; }
-		makeSelection(obj, false);
+		makeSelection(obj, false, true);
 	}
 }
 
@@ -628,7 +720,7 @@ function historyForward() {
 		if (oid == null) { return; }
 		obj = tree[oid];
 		if (obj == null) { return; }
-		makeSelection(obj, false);
+		makeSelection(obj, false, true);
 	}
 }
 
@@ -645,7 +737,7 @@ function newDataWindow(obj) {
 	return newwin;
 }
 
-function makeSelection(obj, makeHistory) {
+function makeSelection(obj, makeHistory, jumpscroll) {
 	var text; var html; var indexes; var children; var i; var cookie;
 	var menuframe = getMenuFrame();
 	if (selectedElement != null) {
@@ -666,6 +758,11 @@ function makeSelection(obj, makeHistory) {
 		text = menuframe.document.getElementById(obj.oid + ".text");
 	}
 	text.style.backgroundColor='lightgray';
+	if (jumpscroll) {
+		menuframe.document.body.scrollTop = menuframe.document.body.scrollHeight * obj.number / totalNumber - menuframe.innerHeight / 3;
+	}
+	menuframe.document.body.scrollLeft = (obj.level - 3) * 16;
+
 	selectedElement = obj;
 	if (obj.SNMP == null) { alert("Object " + obj.oid + " SNMP sub-object disappeared!"); return; }
 	html = obj.returnDataHTML("top");
@@ -676,7 +773,13 @@ function makeSelection(obj, makeHistory) {
 function onElementClick(oidOrName) {
 	var obj = findMib(oidOrName);
 	if (obj == null) { return; }
-	makeSelection(obj, true);
+	makeSelection(obj, true, false);
+}
+
+function onTagClick(oidOrName) {
+	var obj = findMib(oidOrName);
+	if (obj == null) { return; }
+	makeSelection(obj, true, true);
 }
 
 function onElementDoubleClick(oidOrName) {

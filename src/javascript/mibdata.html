@@ -7,9 +7,17 @@
 		LI { margin-top: 0; margin-bottom: 0; padding-top: 0; padding-bottom: 0.5ex }
 	</STYLE>
 	<SCRIPT>
-		if (self == top) {
-			self.location.href = "mibbrowser.html";
+		var mytop = self;
+		if (opener != null) {
+			mytop = opener;
+		} else {
+			if (self == top || self == parent) {
+				self.location.href = "mibbrowser.html";
+			} else {
+				mytop = parent;
+			}
 		}
+
 	</SCRIPT>
 </HEAD>
 <BODY>

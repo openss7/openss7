@@ -154,31 +154,35 @@ sub showMib {
 	my $mib = shift;
 	my $level = shift;
 	my $recurse = shift;
-	my $oid = $mib->{'objectID'}; $oid =~ s/^\.//;
-	my $label = $mib->{'label'};
-	my $sid = $mib->{'subID'};
-	my $mid = $mib->{'moduleID'};
-	my $mtype = $mib->{'type'};
-	my $access = $mib->{'access'};
-	my $status = $mib->{'status'};
-	my $syntax = $mib->{'syntax'};
-	my $desc = $mib->{'description'};
+	my $copy = {};
+	foreach (qw/objectID label subID moduleID type access status syntax textualConvention TCDescription units hint enums ranges description reference defaultValue indexes parent children augments/) {
+		$copy->{$_} = $mib->{$_} if defined $mib->{$_};
+	}
+	my $oid = $copy->{'objectID'}; $oid =~ s/^\.//;
+	my $label = $copy->{'label'};
+	my $sid = $copy->{'subID'};
+	my $mid = $copy->{'moduleID'};
+	my $mtype = $copy->{'type'};
+	my $access = $copy->{'access'};
+	my $status = $copy->{'status'};
+	my $syntax = $copy->{'syntax'};
+	my $desc = $copy->{'description'};
 	$desc = reformat($desc) if $desc;
-	my $refs = $mib->{'reference'};
+	my $refs = $copy->{'reference'};
 	$refs = reformat($refs) if $refs;
 	my $image = 'objs';
 	my $color = '';
 	my $state = 'c';
 	my $type = '';
-	if (defined $mib->{'indexes'} && @{$mib->{'indexes'}}) {
+	if (defined $copy->{'indexes'} && @{$copy->{'indexes'}}) {
 		$type = 'MyConceptualRow';
 		$image = 'rows';
 		$color = '';
 		$state = 'c';
-	} elsif ($mib->{'parent'} && @{$mib->{'parent'}->{'indexes'}}) {
+	} elsif ($copy->{'parent'} && @{$copy->{'parent'}->{'indexes'}}) {
 		my $found = 0;
-		foreach (@{$mib->{'parent'}->{'indexes'}}) {
-			if ($mib->{'label'} eq $_) {
+		foreach (@{$copy->{'parent'}->{'indexes'}}) {
+			if ($copy->{'label'} eq $_) {
 				$found = 1;
 				last;
 			}
@@ -194,19 +198,19 @@ sub showMib {
 			$color = '';
 			$state = 'c';
 		}
-	} elsif (defined $mib->{'children'} && @{$mib->{'children'}} && $mib->{'children'}->[0]->{'indexes'} && @{$mib->{'children'}->[0]->{'indexes'}}) {
+	} elsif (defined $copy->{'children'} && @{$copy->{'children'}} && $copy->{'children'}->[0]->{'indexes'} && @{$copy->{'children'}->[0]->{'indexes'}}) {
 		$type = 'MyConceptualTable';
 		$image = 'docs';
 		$color = '';
 		$state = 'c';
-	} elsif (defined $mib->{'children'} && @{$mib->{'children'}}) {
-		if ($mib->{'syntax'}) {
+	} elsif (defined $copy->{'children'} && @{$copy->{'children'}}) {
+		if ($copy->{'syntax'}) {
 			$type = 'MyObjectType';
 			$image = 'objs';
 			$color = '-blu';
 			$state = 'c';
-		} elsif ($mib->{'description'}) {
-			if ($mib->{'parent'} && $mib->{'parent'}->{'moduleID'} eq $mib->{'moduleID'}) {
+		} elsif ($copy->{'description'}) {
+			if ($copy->{'parent'} && $copy->{'parent'}->{'moduleID'} eq $copy->{'moduleID'}) {
 				$type = 'MyObjectIdentity';
 				$image = 'book';
 				$color = '-blu';
@@ -223,22 +227,22 @@ sub showMib {
 			$color = '';
 			$state = 'c';
 		}
-	} elsif ($mib->{'type'} && $mib->{'type'} eq 'NOTIF') {
+	} elsif ($copy->{'type'} && $copy->{'type'} eq 'NOTIF') {
 		$type = 'MyNotification';
 		$image = 'note';
 		$color = '';
 		$state = 'c';
-	} elsif ($mib->{'access'} && $mib->{'access'} eq 'Notify') {
+	} elsif ($copy->{'access'} && $copy->{'access'} eq 'Notify') {
 		$type = 'MyNotifyParameter';
 		$image = 'parm';
 		$color = '';
 		$state = 'c';
-	} elsif ($mib->{'syntax'}) {
+	} elsif ($copy->{'syntax'}) {
 		$type = 'MyObjectType';
 		$image = 'objs';
 		$color = '';
 		$state = 'c';
-	} elsif ($mib->{'description'}) {
+	} elsif ($copy->{'description'}) {
 		$type = 'MyObjectIdentity';
 		$image = 'objs';
 		$color = '-blu';
@@ -252,38 +256,38 @@ sub showMib {
 	my $superior;
 	if ($level > 0) { $superior = "obj".($level-1); } else { $superior = "null"; }
 	print "obj".$level." = new Mib(\"".$oid."\", \"".$label."\", \"".$sid."\", \"".$mid."\", \"".$mtype."\", \"".$access."\", \"".$status."\", \"".$syntax."\", \"".$desc."\", \"".$refs."\", \"".$image."\", \"".$color."\", ".$superior.");\n";
-	#if ($mib->{'parent'}) { print "obj".$level.".SNMP.parent = \"".$mib->{'parent'}->{'label'}."(".$mib->{'parent'}->{'objectID'}.")"."\";\n"; }
-	#if ($mib->{'objectID'}) { print "obj".$level.".SNMP.objectID = \"".$mib->{'objectID'}."\";\n"; }
-	#if ($mib->{'label'}) { print "obj".$level.".SNMP.label = \"".$mib->{'label'}."\";\n"; }
-	#if ($mib->{'subID'}) { print "obj".$level.".SNMP.subID = \"".$mib->{'subID'}."\";\n"; }
-	#if ($mib->{'moduleID'}) { print "obj".$level.".SNMP.moduleID = \"".$mib->{'moduleID'}."\";\n"; }
-	#if ($mib->{'type'}) { print "obj".$level.".SNMP.type = \"".$mib->{'type'}."\";\n"; }
-	#if ($mib->{'access'}) { print "obj".$level.".SNMP.access = \"".$mib->{'access'}."\";\n"; }
-	#if ($mib->{'status'}) { print "obj".$level.".SNMP.status = \"".$mib->{'status'}."\";\n"; }
-	#if ($mib->{'syntax'}) { print "obj".$level.".SNMP.syntax = \"".$mib->{'syntax'}."\";\n"; }
-	if ($mib->{'textualConvention'}) {
-		print "obj".$level.".SNMP.textualConvention = \"".$mib->{'textualConvention'}."\";\n";
-		unless (exists $tcs{$mib->{'textualConvention'}}) {
-			$tcs{$mib->{'textualConvention'}} = reformat($mib->{'TCDescription'});
-			print "tcdesc = \"".$tcs{$mib->{'textualConvention'}}."\";\n";
-			print "tcsobj = new MyTextualConvention(\"".$mib->{'textualConvention'}."\", tcdesc);\n";
+	#if ($copy->{'parent'}) { print "obj".$level.".SNMP.parent = \"".$copy->{'parent'}->{'label'}."(".$copy->{'parent'}->{'objectID'}.")"."\";\n"; }
+	#if ($copy->{'objectID'}) { print "obj".$level.".SNMP.objectID = \"".$copy->{'objectID'}."\";\n"; }
+	#if ($copy->{'label'}) { print "obj".$level.".SNMP.label = \"".$copy->{'label'}."\";\n"; }
+	#if ($copy->{'subID'}) { print "obj".$level.".SNMP.subID = \"".$copy->{'subID'}."\";\n"; }
+	#if ($copy->{'moduleID'}) { print "obj".$level.".SNMP.moduleID = \"".$copy->{'moduleID'}."\";\n"; }
+	#if ($copy->{'type'}) { print "obj".$level.".SNMP.type = \"".$copy->{'type'}."\";\n"; }
+	#if ($copy->{'access'}) { print "obj".$level.".SNMP.access = \"".$copy->{'access'}."\";\n"; }
+	#if ($copy->{'status'}) { print "obj".$level.".SNMP.status = \"".$copy->{'status'}."\";\n"; }
+	#if ($copy->{'syntax'}) { print "obj".$level.".SNMP.syntax = \"".$copy->{'syntax'}."\";\n"; }
+	if ($copy->{'textualConvention'}) {
+		print "obj".$level.".SNMP.textualConvention = \"".$copy->{'textualConvention'}."\";\n";
+		unless (exists $tcs{$copy->{'textualConvention'}}) {
+			$tcs{$copy->{'textualConvention'}} = reformat($copy->{'TCDescription'});
+			print "tcdesc = \"".$tcs{$copy->{'textualConvention'}}."\";\n";
+			print "tcsobj = new MyTextualConvention(\"".$copy->{'textualConvention'}."\", tcdesc);\n";
 		}
 	}
-	#my $tcdescription = reformat($mib->{'TCDescription'});
+	#my $tcdescription = reformat($copy->{'TCDescription'});
 	#if ($tcdescription) { print "obj".$level.".SNMP.TCDescription = \"".$tcdescription."\";\n"; }
-	if ($mib->{'units'}) { print "obj".$level.".SNMP.units = \"".guard($mib->{'units'})."\";\n"; }
-	if ($mib->{'hint'}) { print "obj".$level.".SNMP.hint = \"".guard($mib->{'hint'})."\";\n"; }
-	if ($mib->{'augments'}) { print "obj".$level.".SNMP.augments = \"".$mib->{'augments'}."\";\n"; }
+	if ($copy->{'units'}) { print "obj".$level.".SNMP.units = \"".guard($copy->{'units'})."\";\n"; }
+	if ($copy->{'hint'}) { print "obj".$level.".SNMP.hint = \"".guard($copy->{'hint'})."\";\n"; }
+	if ($copy->{'augments'}) { print "obj".$level.".SNMP.augments = \"".$copy->{'augments'}."\";\n"; }
 	my $enums = undef;
-	foreach (sort { $mib->{'enums'}{$a} <=> $mib->{'enums'}{$b}; } keys %{$mib->{'enums'}}) {
+	foreach (sort { $copy->{'enums'}{$a} <=> $copy->{'enums'}{$b}; } keys %{$copy->{'enums'}}) {
 		$enums .= ", " if $enums;
-		$enums .= "$_($mib->{'enums'}{$_})";
+		$enums .= "$_($copy->{'enums'}{$_})";
 	}
 	if ($enums) { print "obj".$level.".SNMP.enums = \"".$enums."\";\n"; }
 	my $size = '';
-	$size = 'SIZE' if ($mib->{'type'} eq 'OCTETSTR' || $mib->{'type'} eq 'OBJECTID');
+	$size = 'SIZE' if ($copy->{'type'} eq 'OCTETSTR' || $copy->{'type'} eq 'OBJECTID');
 	my $ranges = undef;
-	foreach (@{$mib->{'ranges'}}) {
+	foreach (@{$copy->{'ranges'}}) {
 		$ranges .= ", " if $ranges;
 		if ($_->{'low'} == $_->{'high'}) {
 			$ranges .= $size."($_->{'low'})";
@@ -293,32 +297,32 @@ sub showMib {
 	}
 	if ($ranges) { print "obj".$level.".SNMP.ranges = \"".$ranges."\";\n"; }
 	#my $children = undef;
-	#foreach (@{$mib->{'children'}}) {
+	#foreach (@{$copy->{'children'}}) {
 	#	$children .= ", " if $children;
 	#	$children .= $_->{'label'};
 	#}
 	#if ($children) { print "obj".$level.".SNMP.children = \"".$children."\";\n"; }
 	my $indexes = undef;
-	foreach (@{$mib->{'indexes'}}) {
+	foreach (@{$copy->{'indexes'}}) {
 		$indexes .= ", " if $indexes;
 		$indexes .= $_;
 	}
 	if ($indexes) { print "obj".$level.".SNMP.indexes = \"".$indexes."\";\n"; }
-	if ($mib->{'defaultValue'}) { print "obj".$level.".SNMP.defaultValue = \"".guard($mib->{'defaultValue'})."\";\n"; }
-	#my $description = reformat($mib->{'description'});
+	if ($copy->{'defaultValue'}) { print "obj".$level.".SNMP.defaultValue = \"".guard($copy->{'defaultValue'})."\";\n"; }
+	#my $description = reformat($copy->{'description'});
 	#if ($description) { print "obj".$level.".SNMP.description = \"".$description."\";\n"; }
-	#my $reference = reformat($mib->{'reference'});
+	#my $reference = reformat($copy->{'reference'});
 	#if ($reference) { print "obj".$level.".SNMP.reference = \"".$reference."\";\n"; }
 	if ($recurse) {
-#		if (defined $mib->{'indexes'} && @{$mib->{'indexes'}}) {
-#			foreach (@{$mib->{'indexes'}}) {
+#		if (defined $copy->{'indexes'} && @{$copy->{'indexes'}}) {
+#			foreach (@{$copy->{'indexes'}}) {
 #				if (exists $SNMP::MIB{$_}) {
 #					showMib($SNMP::MIB{$_},$level+1,0);
 #				}
 #			}
 #		}
-		if (defined $mib->{'children'} && @{$mib->{'children'}}) {
-			foreach (sort { $a->{'subID'} <=> $b->{'subID'}; } @{$mib->{'children'}}) {
+		if (defined $copy->{'children'} && @{$copy->{'children'}}) {
+			foreach (sort { $a->{'subID'} <=> $b->{'subID'}; } @{$copy->{'children'}}) {
 				showMib($_,$level+1,1);
 			}
 		}
