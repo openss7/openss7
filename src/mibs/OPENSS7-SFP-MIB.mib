@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-SFP-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2010-06-09 12:58:31 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -70,25 +70,17 @@ OPENSS7-SFP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     openss7G774
 	FROM OPENSS7-SMI
-    AdministrativeState, AvailabilityStatus, OperationalState, 
-    ProceduralStatus, SimpleNameType, StandbyStatus, UsageState, 
-    AlarmStatus, ControlStatus, attributeValueChangeNotificationPackage, 
-    communicationsAlarmPackage, createDeleteNotificationsPackage, 
-    tmnObjectInstance, tmnPerceivedSeverity, tmnProbableCause
+    AdministrativeState, AlarmStatus, AvailabilityStatus, 
+    OperationalState, ProceduralStatus, StandbyStatus
 	FROM OPENSS7-SMI-MIB
-    PerfCurrentCount, PerfIntervalCount
-	FROM PerfHist-TC-MIB
-    HCPerfIntervalThreshold, HCPerfValidIntervals
-	FROM HC-PerfHist-TC-MIB
     SnmpAdminString
 	FROM SNMP-FRAMEWORK-MIB
-    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+    MODULE-COMPLIANCE, OBJECT-GROUP
 	FROM SNMPv2-CONF
-    Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
-    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero
+    Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Opaque, 
+    Unsigned32
 	FROM SNMPv2-SMI
-    AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
-    TimeInterval, TruthValue, TimeStamp, InstancePointer, Counter
+    DateAndTime, RowPointer, TEXTUAL-CONVENTION
 	FROM SNMPv2-TC;
 
 sfpMIB MODULE-IDENTITY
@@ -121,44 +113,15 @@ sfpMIB MODULE-IDENTITY
 	    View, 02/2001.
 	 ITU-T Recommendation G.774.1, Synchronous Digital Hierarchy 
 	     (SDH), Bidirectional Performance Monitoring for the Network 
-	     Element View, 02/2001.
-	 "
+             Element View, 02/2001."
+    REVISION "201106240834Z"
+    DESCRIPTION 
+	"Passes smilint."
     REVISION "201004080744Z"
     DESCRIPTION
 	"First release of this module."
     ::= { openss7G774 11 }
 
-sfpNotifications	OBJECT IDENTIFIER ::= { sfpMIB		 0 }
-sfpObjects		OBJECT IDENTIFIER ::= { sfpMIB		 1 }
-sfpConformance		OBJECT IDENTIFIER ::= { sfpMIB		 2 }
-
-sfpTables		OBJECT IDENTIFIER ::= { sfpObjects	 1 }
-sfpScalars		OBJECT IDENTIFIER ::= { sfpObjects	 2 }
-sfpNotifs		OBJECT IDENTIFIER ::= { sfpObjects	 3 }
-sfpOids			OBJECT IDENTIFIER ::= { sfpObjects	 4 }
-
-sfpCompliance		OBJECT IDENTIFIER ::= { sfpConformance	 1 }
-sfpGroups		OBJECT IDENTIFIER ::= { sfpConformance	 2 }
-
-sfpDefaults		OBJECT IDENTIFIER ::= { sfpScalars	 1 }
-
-sfpProbableCauses	OBJECT IDENTIFIER ::= { sfpOids		 1 }
-sfpSpecificProblems	OBJECT IDENTIFIER ::= { sfpOids		 2 }
-sfpSpecificExtensions	OBJECT IDENTIFIER ::= { sfpOids		 3 }
-sfpProbableCauses2	OBJECT IDENTIFIER ::= { sfpOids		 4 }
-
-sfpModule		OBJECT IDENTIFIER ::= { sfpTables	 1 }
-sfpAppl			OBJECT IDENTIFIER ::= { sfpTables	 2 }
-sfpApplCode		OBJECT IDENTIFIER ::= { sfpTables	 3 }
-sfpDiag			OBJECT IDENTIFIER ::= { sfpTables	 4 }
-sfpCalib		OBJECT IDENTIFIER ::= { sfpTables	 5 }
-sfpMon			OBJECT IDENTIFIER ::= { sfpTables	 6 }
-sfpStatus		OBJECT IDENTIFIER ::= { sfpTables	 7 }
-
-
--- ==========================================================
--- Textual Conventions
--- ==========================================================
 
 SfpAlarms ::= TEXTUAL-CONVENTION
     STATUS current
@@ -186,11 +149,9 @@ SfpAlarms ::= TEXTUAL-CONVENTION
 	 will have a MAX-ACCESS of read-only."
     REFERENCE
 	"SFF-8472 Rev 10.4, Table 16"
-    SYNTAX BITS {
-	tempHi(0), tempLo(1), vccHi(2), vccLo(3), txBiasHi(4), 
-	txBiasLo(5), txPowerHi(6), txPowerLo(7), rxPowerHi(8), 
-	rxPowerLo(9) }
-
+    SYNTAX      BITS { tempHi(0), tempLo(1), vccHi(2), vccLo(3), 
+                    txBiasHi(4), txBiasLo(5), txPowerHi(6), txPowerLo(7), 
+                    rxPowerHi(8), rxPowerLo(9) }
 
 SfpApplication ::= TEXTUAL-CONVENTION
     STATUS current
@@ -201,55 +162,64 @@ SfpApplication ::= TEXTUAL-CONVENTION
 	 complete listing of these values and their meanings."
     REFERENCE
 	"SFF-8089 Rev 1.3, Table 4-1"
-    SYNTAX INTEGER {
-	fc100MxSNI(256), fc100SMLCL(257), fc100SMLLV(258), 
-	fc100SEELS(259), fc100DFELS(260), fc200MxSNI(266), 
-	fc200SMLCL(267), fc200SMLLV(268), fc200SEELS(269), 
-	fc200DFELS(270), fc400MxSNS(276), fc400SMLCL(277), 
-	fc400DFELS(278), fc400SEELS(279), fcMMF625(280), fcMMF50(281), 
-	fc800MxSNI(306), fc800SMLLL(307), fc1200MxSNI(346), 
-	fc1200SMLLL(347), fc1200SMLCL(348), e100baseFX(512), 
-	e100baseLX10(513), e100baseBX10(514), e1000baseSX(517), 
-	e1000baseLX(518), e1000baseBX10(519), e1000baseLX10(520), 
-	e1000basePX10(521), e1000baseLX20(522), e1000baseCX(523), 
+    SYNTAX      INTEGER { fc100MxSNI(256), fc100SMLCL(257), 
+                    fc100SMLLV(258), fc100SEELS(259), fc100DFELS(260), 
+                    fc200MxSNI(266), fc200SMLCL(267), fc200SMLLV(268), 
+                    fc200SEELS(269), fc200DFELS(270), fc400MxSNS(276), 
+                    fc400SMLCL(277), fc400DFELS(278), fc400SEELS(279), 
+                    fcMMF625(280), fcMMF50(281), fc800MxSNI(306), 
+                    fc800SMLLL(307), fc1200MxSNI(346), fc1200SMLLL(347), 
+                    fc1200SMLCL(348), e100baseFX(512), e100baseLX10(513), 
+                    e100baseBX10(514), e1000baseSX(517), 
+                    e1000baseLX(518), e1000baseBX10(519), 
+                    e1000baseLX10(520), e1000basePX10(521), 
+                    e1000baseLX20(522), e1000baseCX(523), 
 	e1000baseT(524), e10GbaseSW(532), e10GbaseLW(533), 
 	e10GbaseLR(534), e10GbaseEW(535), e10GbaseER(536), 
 	e10GbaseT(537), oc3I1(768), oc3S11(769), oc3S12(770), 
-	oc3L11(771), oc3L12(772), oc3L13(773), oc3SR1(774), oc3IR1(775), 
-	oc3IR2(776), oc3LR1(777), oc3LR2(778), oc3LR3(779), oc12I4(798), 
-	oc12S41(799), oc12S42(800), oc12L41(801), oc12L42(802), 
-	oc12L43(803), oc12V41(804), oc12V42(805), oc12V43(806), 
-	oc12U42(807), oc12U43(808), oc12SR1(809), oc12IR1(810), 
-	oc12IR2(811), oc12LR1(812), oc12LR2(813), oc12LR3(814), 
-	oc48I16(815), oc48S161(816), oc48S162(817), oc48L161(818), 
-	oc48L162(819), oc48L163(820), oc48V162(821), oc48V163(822), 
-	oc48U162(823), oc48U163(824), oc48SR1(825), oc48IR1(826), 
-	oc48IR2(827), oc48LR1(828), oc48LR2(829), oc48LR3(830), 
-	oc192VSR6002M1(858), oc192VSR6002M2(859), oc192VSR6002M5(860), 
-	oc192I641r(861), oc192I641(862), oc192I642r(863), 
-	oc192I642(864), oc192I643(865), oc192I645(866), oc192S641(867), 
-	oc192S642a(868), oc192S642b(869), oc192S643a(870), 
-	oc192S643b(871), oc192S645a(872), oc192S645b(873), 
-	oc192L641(874), oc192L642a(875), oc192L642b(876), 
-	oc192L642c(877), oc192L643(878), oc192V642a(879), 
-	oc192V642b(880), oc192V643(881), oc192SR1(882), oc192SR2(883), 
-	oc192IR1(884), oc192IR2(885), oc192IR3(886), oc192LR1(887), 
-	oc192LR2a(888), oc192LR2b(889), oc192LR2c(890), oc192LR3(891), 
-	oc192VR1(892), oc192VR2a(893), oc192VR3(894), ib1xSX(1024), 
-	ib1xLX(1025), ib1xCA(1026), ib1xCP(1027), sbconMMF(1280), 
-	sbconSMF(1281), cu100d05(1536), cu100d1(1537), cu100d15(1538), 
-	cu100d2(1539), cu100d25(1540), cu100d3(1541), cu100d35(1542), 
-	cu100d4(1543), cu100d45(1544), cu100d5(1545), cu100d55(1546), 
-	cu100d6(1547), cu100d65(1548), cu100d7(1549), cu100d75(1550), 
-	cu200d0(1556), cu200d075(1557), cu200d15(1558), cu200d225(1559), 
-	cu200d3(1560), cu200d375(1561), cu200d45(1562), cu200d525(1563), 
-	cu200d6(1564), cu200d675(1565), cu200d75(1566), cu200d825(1567), 
-	cu200d9(1568), cu200d975(1569), cu200d105(1570), 
-	cu200d1125(1571), cu400d1(1577), cu400d2(1578), cu400d3(1579), 
-	cu400d4(1580), cu400d5(1581), cu400d6(1582), cu400d7(1583), 
-	cu400d8(1584), cu400d9(1585), cu400d10(1586), cu400d11(1587), 
-	cu400d12(1588), cu400d13(1589), cu400d14(1590), cu400d15(1591)
-    }
+                    oc3L11(771), oc3L12(772), oc3L13(773), oc3SR1(774), 
+                    oc3IR1(775), oc3IR2(776), oc3LR1(777), oc3LR2(778), 
+                    oc3LR3(779), oc12I4(798), oc12S41(799), oc12S42(800), 
+                    oc12L41(801), oc12L42(802), oc12L43(803), 
+                    oc12V41(804), oc12V42(805), oc12V43(806), 
+                    oc12U42(807), oc12U43(808), oc12SR1(809), 
+                    oc12IR1(810), oc12IR2(811), oc12LR1(812), 
+                    oc12LR2(813), oc12LR3(814), oc48I16(815), 
+                    oc48S161(816), oc48S162(817), oc48L161(818), 
+                    oc48L162(819), oc48L163(820), oc48V162(821), 
+                    oc48V163(822), oc48U162(823), oc48U163(824), 
+                    oc48SR1(825), oc48IR1(826), oc48IR2(827), 
+                    oc48LR1(828), oc48LR2(829), oc48LR3(830), 
+                    oc192VSR6002M1(858), oc192VSR6002M2(859), 
+                    oc192VSR6002M5(860), oc192I641r(861), oc192I641(862), 
+                    oc192I642r(863), oc192I642(864), oc192I643(865), 
+                    oc192I645(866), oc192S641(867), oc192S642a(868), 
+                    oc192S642b(869), oc192S643a(870), oc192S643b(871), 
+                    oc192S645a(872), oc192S645b(873), oc192L641(874), 
+                    oc192L642a(875), oc192L642b(876), oc192L642c(877), 
+                    oc192L643(878), oc192V642a(879), oc192V642b(880), 
+                    oc192V643(881), oc192SR1(882), oc192SR2(883), 
+                    oc192IR1(884), oc192IR2(885), oc192IR3(886), 
+                    oc192LR1(887), oc192LR2a(888), oc192LR2b(889), 
+                    oc192LR2c(890), oc192LR3(891), oc192VR1(892), 
+                    oc192VR2a(893), oc192VR3(894), ib1xSX(1024), 
+                    ib1xLX(1025), ib1xCA(1026), ib1xCP(1027), 
+                    sbconMMF(1280), sbconSMF(1281), cu100d05(1536), 
+                    cu100d1(1537), cu100d15(1538), cu100d2(1539), 
+                    cu100d25(1540), cu100d3(1541), cu100d35(1542), 
+                    cu100d4(1543), cu100d45(1544), cu100d5(1545), 
+                    cu100d55(1546), cu100d6(1547), cu100d65(1548), 
+                    cu100d7(1549), cu100d75(1550), cu200d0(1556), 
+                    cu200d075(1557), cu200d15(1558), cu200d225(1559), 
+                    cu200d3(1560), cu200d375(1561), cu200d45(1562), 
+                    cu200d525(1563), cu200d6(1564), cu200d675(1565), 
+                    cu200d75(1566), cu200d825(1567), cu200d9(1568), 
+                    cu200d975(1569), cu200d105(1570), cu200d1125(1571), 
+                    cu400d1(1577), cu400d2(1578), cu400d3(1579), 
+                    cu400d4(1580), cu400d5(1581), cu400d6(1582), 
+                    cu400d7(1583), cu400d8(1584), cu400d9(1585), 
+                    cu400d10(1586), cu400d11(1587), cu400d12(1588), 
+                    cu400d13(1589), cu400d14(1590), cu400d15(1591) }
 
 SfpMonitor ::= TEXTUAL-CONVENTION
     STATUS current
@@ -274,207 +244,19 @@ SfpMonitor ::= TEXTUAL-CONVENTION
 	 will have a MAX-ACCESS of read-only."
     REFERENCE
 	"SFF-8472 Rev 10.4, Table 3.17"
-    SYNTAX INTEGER {
-	unknown(0), asserted(1), deasserted(2) }
+    SYNTAX      INTEGER { unknown(0), asserted(1), deasserted(2) }
 
--- ==========================================================
--- Specific Problems
--- ==========================================================
-
-temperatureHi OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 1 (temperatureHi) which represents a high temperature 
-	 threshold warning or alarm.
+sfpNotifications OBJECT IDENTIFIER
+    ::= { sfpMIB 0 }
 	 
-	 Probable Cause = temperatureUnacceptable, Perceived Severity = 
-	 warning/minor/major/cleared, Specific Problem = 1 
-	 (temperatureHi)"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 1 }
-
-temperatureLo OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 2 (temperatureLo) which represents a low temperature 
-	 threshold warning or alarm.
+sfpObjects OBJECT IDENTIFIER
+    ::= { sfpMIB 1 }
 	 
-	 Probable Cause = temperatureUnacceptable, Perceived Severity = 
-	 warning/minor/major/cleared, Specific Problem = 1 
-	 (temperatureLo)"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 2 }
+sfpTables OBJECT IDENTIFIER
+    ::= { sfpObjects 1 }
 
-voltageHi OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 3 (voltageHi) which represents a high supply voltage  
-	 threshold warning or alarm.
-	 
-	 Probable Cause = powerProblem, Perceived Severity = 
-	 warning/minor/major/cleared"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 3 }
-
-voltageLo OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 4 (voltageLo) which represents a low supply voltage  
-	 threshold warning or alarm.
-	 
-	 Probable Cause = powerProblem, Perceived Severity = 
-	 warning/minor/major/cleared"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 4 }
-
-txBiasHi OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 5 (txBiasLo) which represents a high transmitter bias 
-	 current threshold warning or alarm.
-	 
-	 probableCause = thresholdCrossed, Perceived Severity = 
-	 warning/minor/major/cleared"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 5 }
-
-txBiasLo OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 6 (txBiasHi) which represents a low transmitter bias 
-	 current threshold warning or alarm.
-	 
-	 probableCause = thresholdCrossed, Perceived Severity = 
-	 warning/minor/major/cleared"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 6 }
-
-txPowerHi OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 7 (txPowerHi) which represents a high transmitter 
-	 power threshold warning or alarm.
-	 
-	 Probable Cause = transmitFailure, Perceived Severity = 
-	 warning/minor/major/cleared"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 7 }
-
-txPowerLo OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 8 (txPowerLo) which represents a low transmitter 
-	 power threshold warning or alarm.
-	 
-	 Probable Cause = transmitFailure, Perceived Severity = 
-	 warning/minor/major"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 8 }
-
-rxPowerHi OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 9 (rxPowerHi) which represents a high receiver power 
-	 threshold warning or alarm.
-	 
-	 Probable Cause = receiveFailure, Perceived Severity = 
-	 warning/minor/major/cleared"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 9 }
-
-rxPowerLo OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 probableCause in the equipmentAlarm notification.  Specific 
-	 Problem = 10 (rxPowerLo) which represents a low receiver power 
-	 threshold warning or alarm.
-	 
-	 Probable Cause = receiveFailure, Perceived Severity = 
-	 warning/minor/major/cleared"
-    REFERENCE
-	"SFF-8472 Rec 10.4, Table 16"
-    ::= { sfpSpecificProblems 10 }
-
-rxLossOfSignal OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 specificProblems in the equipmentAlarm notification.  Specific 
-	 Problem = 11 (rxLossOfSignal) represents a loss of received 
-	 signal event.
-
-	 The agent generates this alarm by monitoring the RX_LOS pin on 
-	 the SFP module, or the equivalent bit within the 2-wire address 
-	 space under the Diagnostic Monitoring Interface (DMI) for 
-	 Optical Modules (SFF-8472).  The assertion of the RX_LOS pin 
-	 indicates that the received optical power is below the 
-	 worst-case receiver sensitivity (as defined by the standard in 
-	 use); deassertion indicates normal operation.
-	 
-	 Probable Cause = lossOfSignal, Perceived Severity = 
-	 minor/major/cleared"
-    REFERENCE
-	"SFF-8472 Rev. 10.4, Table 3.17,
-	 INF-8074, Table 1, Note 5."
-    ::= { sfpSpecificProblems 11 }
-
-txFailure OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-	"Specific Problem.  This object identity is used with 
-	 specificProblems in the equipmentAlarm notification.  Specific 
-	 Problem = 12 (txFault) represents a transmitter fault 
-	 condition.
-	 
-	 The assertion of the TxFault pin indicates a detected laser 
-	 fault of some kind; deassertion indicates normal operation.
-	 
-	 Probable Cause = transmitterFailure, Perceived Severity = 
-	 minor/major/cleared"
-    REFERENCE
-	"SFF-8472 Rev 10.4, Table 3.17,
-	 INF-8074, Table 1, Note 1."
-    ::= { sfpSpecificProblems 12 }
-
--- ==========================================================
--- Scalars
--- ==========================================================
-
--- ==========================================================
--- Notification Parameters
--- ==========================================================
-
--- ==========================================================
--- Tables
--- ==========================================================
+sfpModule OBJECT IDENTIFIER
+    ::= { sfpTables 1 }
 
 sfpModuleTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SfpModuleEntry
@@ -496,77 +278,49 @@ sfpModuleEntry OBJECT-TYPE
 	 module in the system.  Conceptual rows may neither be added nor 
 	 removed from this table my management stations but are 
 	 autonomously added or removed by the managed system from within."
-    INDEX {
-	sfpModuleId -- index
-    }
+    INDEX       { sfpModuleId }
     ::= { sfpModuleTable 1 }
 
 SfpModuleEntry ::= SEQUENCE {
-    sfpModuleId
-	Unsigned32,
-    sfpModuleType
-	INTEGER,
-    sfpModuleExtendedType
-	INTEGER,
-    sfpModuleConnectorType
-	INTEGER,
-    sfpModuleTransceiver
-	BITS,
-    sfpModuleEncoding
-	INTEGER,
-    sfpModuleNormalBitRate
-	Unsigned32,
-    sfpModuleRateIdentifier
-	INTEGER,
-    sfpModuleLinkLength9125k
-	INTEGER,
-    sfpModuleLinkLength9125m
-	INTEGER,
-    sfpModuleLinkLength50125m
-	INTEGER,
-    sfpModuleLinkLength625125m
-	INTEGER,
-    sfpModuleLinkLengthCopper
-	Unsigned32,
-    sfpModuleVendorName
-	SnmpAdminString,
-    sfpModuleVendorOUI
-	OCTET STRING,
-    sfpModulePartNumber,
-	SnmpAdminString,
-    sfpModuleRevisionLevel,
-	SnmpAdminString,
-    sfpModuleLaserWavelength
-	Unsigned32,
-    sfpModulePassiveCableCompliance
-	BITS,
-    sfpModuleActiveCableCompliance
-	BITS,
-    sfpModuleOptions
-	BITS,
-    sfpModuleUpperBitRate
-	Unsigned32,
-    sfpModuleLowerBitRate
-	Unsigned32,
-    sfpModuleVendorSerialNo
-	SnmpAdminString,
-    sfpModuleManufactureDate
-	DateAndTime
+    sfpModuleId                         Unsigned32,
+    sfpModuleType                       INTEGER,
+    sfpModuleExtendedType               INTEGER,
+    sfpModuleConnectorType              INTEGER,
+    sfpModuleTransceiver                BITS,
+    sfpModuleCompliance                 INTEGER,
+    sfpModuleEncoding                   INTEGER,
+    sfpModuleNormalBitRate              Unsigned32,
+    sfpModuleRateIdentifier             INTEGER,
+    sfpModuleLinkLength9125k            Integer32,
+    sfpModuleLinkLength9125m            Integer32,
+    sfpModuleLinkLength50125m           Integer32,
+    sfpModuleLinkLength625125m          Integer32,
+    sfpModuleLinkLengthCopper           Unsigned32,
+    sfpModuleVendorName                 SnmpAdminString,
+    sfpModuleVendorOUI                  OCTET STRING,
+    sfpModulePartNumber                 SnmpAdminString,
+    sfpModuleRevisionLevel              SnmpAdminString,
+    sfpModuleLaserWavelength            Unsigned32,
+    sfpModulePassiveCableCompliance     BITS,
+    sfpModuleActiveCableCompliance      BITS,
+    sfpModuleOptions                    BITS,
+    sfpModuleUpperBitRate               Unsigned32,
+    sfpModuleLowerBitRate               Unsigned32,
+    sfpModuleVendorSerialNo             SnmpAdminString,
+    sfpModuleManufactureDate            DateAndTime
 }
 
 sfpModuleId OBJECT-TYPE
     SYNTAX Unsigned32
-    MAX-ACCESS read-only
+    MAX-ACCESS  not-accessible
     STATUS current
     DESCRIPTION
-	""
-    REFERENCE
-	""
+        "Provides an ordinal index of the SFP module into the 
+         sfpModuleTable."
     ::= { sfpModuleEntry 1 }
 
 sfpModuleType OBJECT-TYPE
-    SYNTAX INTEGER {
-	unknown(0), gbic(1), fixed(2), sfp(3) }
+    SYNTAX      INTEGER { unknown(0), gbic(1), fixed(2), sfp(3) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -575,31 +329,23 @@ sfpModuleType OBJECT-TYPE
 	   vendor specific;
 	 - gbic(1), the module is a GBIC module;
 	 - fixed(2), the module is soldered to the motherboard; or,
-	 - sfp(3), the module is an SFP transceiver.
-	 "
-    REFERENCE
-	""
+         - sfp(3), the module is an SFP transceiver."
     ::= { sfpModuleEntry 2 }
 
 sfpModuleExtendedType OBJECT-TYPE
-    SYNTAX INTEGER {
-	serialId(4) }
+    SYNTAX      INTEGER { serialId(4) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	"
 	 - serialId(4), the module definition is a serial ID module 
-	   definition.
-	 "
-    REFERENCE
-	""
+           definition."
     ::= { sfpModuleEntry 3 }
 
 sfpModuleConnectorType OBJECT-TYPE
-    SYNTAX INTEGER {
-	unknown(0), sc(1), fc1(2), fc2(3), bnc(4), fc(5), fj(6), lc(7), 
-	mtrj(8), mu(9), sg(10), op(11), hssdc2(32), cp(33), rj45(34), 
-	other(128) }
+    SYNTAX      INTEGER { unknown(0), sc(1), fc1(2), fc2(3), bnc(4), 
+                    fc(5), fj(6), lc(7), mtrj(8), mu(9), sg(10), op(11), 
+                    hssdc2(32), cp(33), rj45(34), other(128) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -619,68 +365,22 @@ sfpModuleConnectorType OBJECT-TYPE
 	 - hssdc2(32), HSSDC II;
 	 - cp(33), copper pigtail;
 	 - rj45(34), RJ45; or,
-	 - other(128), vendor specific.
-	 "
-    REFERENCE
-	""
+         - other(128), vendor specific."
     ::= { sfpModuleEntry 4 }
 
 sfpModuleTransceiver OBJECT-TYPE
-    SYNTAX BITS {
-	ibCP(0), -- Infiniband 1X Copper Passive
-	ibCA(1), -- Infiniband 1X Copper Active
-	ibLX(2), -- Infiniband 1X LX
-	ibSX(3), -- Infiniband 1X SX
-	e10GbaseSR(4), -- 10G Base-SR
-	e10GbaseLR(5), -- 10G Base-LR
-	e10GbaseLRM(6), -- 10G Base-LRM
-	e10GbaseER(7), -- 10G Base-ER
-	oc48sr(8),
-	oc48ir(9),
-	oc48lr(10),
-	oc192sr(13),
-	oc3sr(16),
-	oc3ir(17),
-	oc3lr(18),
-	oc12sr(20),
-	oc12ir(21),
-	oc12lr(22),
-	e1000baseSX(24),
-	e1000baseLX(25),
-	e1000baseCX(26),
-	e1000baseT(27),
-	e100baseLX(28),
-	e100baseFX(29),
-	ebaseBX(30),
-	ebasePX(31),
-	fcInterEL(32),
-	fcLC(33),
-	fcSA(34),
-	fcM(35),
-	fcL(36),
-	fcI(37),
-	fcS(38),
-	fcV(39),
-	sfpPC(42), -- SFP+ Passive Cable
-	sfpAC(43), -- SFP+ Active Cable
-	fcLL(44),
-	fcSL(45),
-	fcSN(46),
-	fcIntraEL(47),
-	sM(48),
-	m5(50),
-	m6(51),
-	tV(52),
-	mI(53),
-	tP(54),
-	tW(55),
-	fcSDR(48),
-	fcDDR(50),
-	fcQDR(52),
-	fc1600(53),
-	fc800(54),
-	fc1200(55)
-	}
+    SYNTAX      BITS { ibCP(0), ibCA(1), ibLX(2), ibSX(3), e10GbaseSR(4), 
+                    e10GbaseLR(5), e10GbaseLRM(6), e10GbaseER(7), 
+                    oc48sr(8), oc48ir(9), oc48lr(10), oc192sr(13), 
+                    oc3sr(16), oc3ir(17), oc3lr(18), oc12sr(20), 
+                    oc12ir(21), oc12lr(22), e1000baseSX(24), 
+                    e1000baseLX(25), e1000baseCX(26), e1000baseT(27), 
+                    e100baseLX(28), e100baseFX(29), ebaseBX(30), 
+                    ebasePX(31), fcInterEL(32), fcLC(33), fcSA(34), 
+                    fcM(35), fcL(36), fcI(37), fcS(38), fcV(39), 
+                    sfpPC(42), sfpAC(43), fcLL(44), fcSL(45), fcSN(46), 
+                    fcIntraEL(47), sM(48), m5(50), m6(51), tV(52), 
+                    mI(53), tP(54), tW(55) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -717,18 +417,13 @@ sfpModuleTransceiver OBJECT-TYPE
 	 - tW(47), twin axial pair (TW);
 	 - fcSDR(48), 100 MBytes/sec;
 	 - fcDDR(50), 200 MBytes/sec; and,
-	 - fcQDR(52), 400 MBytes/sec.
-	 "
+         - fcQDR(52), 400 MBytes/sec."
     REFERENCE
 	"ITU-T Rec. G.774 (02/2001) : characteristicInfo ATTRIBUTE."
     ::= { sfpModuleEntry 5 }
 
 sfpModuleCompliance OBJECT-TYPE
-    SYNTAX INTEGER {
-	var0(0),
-	var1(1),
-	var2(2),
-	var3(3) }
+    SYNTAX      INTEGER { var0(0), var1(1), var2(2), var3(3) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -736,16 +431,13 @@ sfpModuleCompliance OBJECT-TYPE
 	 - var(0),
 	 - var(1),
 	 - var(2),
-	 - var(3),
-	 "
-    REFERENCE
-	""
+         - var(3),"
     ::= { sfpModuleEntry 6 }
 
 sfpModuleEncoding OBJECT-TYPE
-    SYNTAX INTEGER {
-	unspecified(0), enc8B10B(1), enc4B5B(2), encNRZ(3), 
-	encManchester(4), encSONET(5), enc64B66B(6) }
+    SYNTAX      INTEGER { unspecified(0), enc8B10B(1), enc4B5B(2), 
+                    encNRZ(3), encManchester(4), encSONET(5), 
+                    enc64B66B(6) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -791,9 +483,8 @@ sfpModuleNormalBitRate OBJECT-TYPE
     ::= { sfpModuleEntry 8 }
 
 sfpModuleRateIdentifier OBJECT-TYPE
-    SYNTAX INTEGER {
-	unspec(0), sff8079(1), sff8431rx(2), sff8431tx(4), 
-	sff8431rxtx(6) }
+    SYNTAX      INTEGER { unspec(0), sff8079(1), sff8431rx(2), 
+                    sff8431tx(4), sff8431rxtx(6) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -805,8 +496,7 @@ sfpModuleRateIdentifier OBJECT-TYPE
 	 - sff8431rx(2), SFF-8431 (8/4/2G Rx Rate_Select only);
 	 - sff8431tx(4), SFF-8431 (8/4/2G Tx Rate_Select only);
 	 - sff8431rxtx(6), SFF-8431 (8/4/2G Independent Rx & Tx 
-	   Rate_Select);
-	 "
+           Rate_Select);"
     REFERENCE
 	"SFF-8079 Rev 1.7, SFP Rate and Application Selection
 	 SFF-8431 Rev 4.1, Enhanced 10 Gbps Pluggable Module (SFP+)
@@ -814,7 +504,7 @@ sfpModuleRateIdentifier OBJECT-TYPE
     ::= { sfpModuleEntry 9 }
 
 sfpModuleLinkLength9125k OBJECT-TYPE
-    SYNTAX INTEGER (0..255)
+    SYNTAX      Integer32 (0..255)
     UNITS "kilometers"
     MAX-ACCESS read-only
     STATUS current
@@ -834,7 +524,7 @@ sfpModuleLinkLength9125k OBJECT-TYPE
     ::= { sfpModuleEntry 10 }
 
 sfpModuleLinkLength9125m OBJECT-TYPE
-    SYNTAX INTEGER (0..255)
+    SYNTAX      Integer32 (0..255)
     UNITS "100 meters"
     MAX-ACCESS read-only
     STATUS current
@@ -854,7 +544,7 @@ sfpModuleLinkLength9125m OBJECT-TYPE
     ::= { sfpModuleEntry 11 }
 
 sfpModuleLinkLength50125m OBJECT-TYPE
-    SYNTAX INTEGER (0..255)
+    SYNTAX      Integer32 (0..255)
     UNITS "10 meters"
     MAX-ACCESS read-only
     STATUS current
@@ -874,7 +564,7 @@ sfpModuleLinkLength50125m OBJECT-TYPE
     ::= { sfpModuleEntry 12 }
 
 sfpModuleLinkLength625125m OBJECT-TYPE
-    SYNTAX INTEGER (0..255)
+    SYNTAX      Integer32 (0..255)
     UNITS "10 meters"
     MAX-ACCESS read-only
     STATUS current
@@ -980,25 +670,17 @@ sfpModuleLaserWavelength OBJECT-TYPE
     ::= { sfpModuleEntry 19 }
 
 sfpModulePassiveCableCompliance OBJECT-TYPE
-    SYNTAX BITS {
-	sff8431appE(0),
-	fCPI4appH(1) }
+    SYNTAX      BITS { sff8431appE(0), fCPI4appH(1) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
 	"
 	 - sff8431appE(0), compliant to SFF-8431 Appendix E; and,
-	 - fCPI4appH(1), compliant to FC-PI-4 Appendix H.
-	 "
-    REFERENCE
-	""
+         - fCPI4appH(1), compliant to FC-PI-4 Appendix H."
     ::= { sfpModuleEntry 20 }
 
 sfpModuleActiveCableCompliance OBJECT-TYPE
-    SYNTAX BITS {
-	sff8431appE(0),
-	fCPI4appH(1),
-	sff8431lim(2),
+    SYNTAX      BITS { sff8431appE(0), fCPI4appH(1), sff8431lim(2), 
 	fCPI4lim(3) }
     MAX-ACCESS read-only
     STATUS current
@@ -1007,22 +689,13 @@ sfpModuleActiveCableCompliance OBJECT-TYPE
 	 - sff8431appE(0), compliant to SFF-8431 Appendix E;
 	 - fCPI4appH(1), compliant to FC-PI-4 Appendix H;
 	 - sff8431lim(2), compliant to SFF-8431 Limiting; and,
-	 - fCPI4lim(3), compliant to FC-PI-4 Limiting.
-	 "
-    REFERENCE
-	""
+         - fCPI4lim(3), compliant to FC-PI-4 Limiting."
     ::= { sfpModuleEntry 21 }
 
 sfpModuleOptions OBJECT-TYPE
-    SYNTAX BITS {
-	lossOfSignal(1),
-	lossOfSignalInverted(2),
-	txFault(3),
-	txDisable(4),
-	rateSelect(5),
-	lro(8),
-	pld(9),
-	ctd(10) }
+    SYNTAX      BITS { lossOfSignal(1), lossOfSignalInverted(2), 
+                    txFault(3), txDisable(4), rateSelect(5), lro(8), 
+                    pld(9), ctd(10) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1044,10 +717,7 @@ sfpModuleOptions OBJECT-TYPE
 	 - ctd(10), Cooled Transceiver Declaration (see SFF-8431); not 
 	   present identifies a conventional uncooled (or unspecified) 
 	   laser implementation; present identifies a cooled laser 
-	   transmitter implementation.
-	 "
-    REFERENCE
-	""
+           transmitter implementation."
     ::= { sfpModuleEntry 22 }
 
 sfpModuleUpperBitRate OBJECT-TYPE
@@ -1060,8 +730,6 @@ sfpModuleUpperBitRate OBJECT-TYPE
 	 still meet its specificaitons specified in units of percent 
 	 above the normal bit rate.  A value of zero indicates that this 
 	 field is not specified."
-    REFERENCE
-	""
     ::= { sfpModuleEntry 23 }
 
 sfpModuleLowerBitRate OBJECT-TYPE
@@ -1074,8 +742,6 @@ sfpModuleLowerBitRate OBJECT-TYPE
 	 still meet its specifications specified in units of percent 
 	 below the normal bit rate.  A value of zero inidcates that this 
 	 field is not specified."
-    REFERENCE
-	""
     ::= { sfpModuleEntry 24 }
 
 sfpModuleVendorSerialNo OBJECT-TYPE
@@ -1085,8 +751,6 @@ sfpModuleVendorSerialNo OBJECT-TYPE
     DESCRIPTION
 	"The vendor serial number as a 16 character string defining the 
 	 vendor's serial number for the SFP transceiver."
-    REFERENCE
-	""
     ::= { sfpModuleEntry 25 }
 
 sfpModuleManufactureDate OBJECT-TYPE
@@ -1095,11 +759,10 @@ sfpModuleManufactureDate OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"The date on which the SFP module was manufactured."
-    REFERENCE
-	""
     ::= { sfpModuleEntry 26 }
 
--- ==========================================================
+sfpAppl OBJECT IDENTIFIER
+    ::= { sfpTables 2 }
 
 sfpApplTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SfpApplEntry
@@ -1142,25 +805,18 @@ sfpApplEntry OBJECT-TYPE
 	 of the supported application codes."
     REFERENCE
 	"SFF-8079 Rev 1.7"
-    INDEX {
-	sfpModuleId -- shared index
-    }
+    INDEX       { sfpModuleId }
     ::= { sfpApplTable 1 }
 
 SfpApplEntry ::= SEQUENCE {
-    sfpApplControlMode
-	INTEGER,
-    sfpApplTableLength
-	INTEGER,
-    sfpApplTableSelect
-	INTEGER,
-    sfpApplSelectValue
-	SfpApplication
+    sfpApplControlMode  INTEGER,
+    sfpApplTableLength  Integer32,
+    sfpApplTableSelect  Integer32,
+    sfpApplSelectValue  SfpApplication
 }
 
 sfpApplControlMode OBJECT-TYPE
-    SYNTAX INTEGER {
-	emulation(0), hardware(1), software(2) }
+    SYNTAX      INTEGER { emulation(0), hardware(1), software(2) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1193,7 +849,7 @@ sfpApplControlMode OBJECT-TYPE
     ::= { sfpApplEntry 1 }
 
 sfpApplTableLength OBJECT-TYPE
-    SYNTAX INTEGER (1..63)
+    SYNTAX      Integer32 (1..63)
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1207,7 +863,7 @@ sfpApplTableLength OBJECT-TYPE
     ::= { sfpApplEntry 2 }
 
 sfpApplTableSelect OBJECT-TYPE
-    SYNTAX INTEGER (0..63)
+    SYNTAX      Integer32 (0..63)
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -1236,8 +892,8 @@ sfpApplSelectValue OBJECT-TYPE
 	"SFF-8079 Rev 1.7 Section 5.3.1 and Table 11."
     ::= { sfpApplEntry 4 }
 
-
--- ==========================================================
+sfpApplCode OBJECT IDENTIFIER
+    ::= { sfpTables 3 }
 
 sfpApplCodeTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SfpApplCodeEntry
@@ -1265,21 +921,14 @@ sfpApplCodeEntry OBJECT-TYPE
 	 codes supported by the SFP/SFP+ module given by sfpModuleId."
     REFERENCE
 	"SFF-8079 Rev 1.7, Section 5.2.1 and Table 6."
-    INDEX {
-	sfpModuleId,	-- shared index
-	sfpApplCodeIndex	-- index
-    }
+    INDEX       { sfpModuleId, sfpApplCodeIndex }
     ::= { sfpApplCodeTable 1 }
 
 SfpApplCodeEntry ::= SEQUENCE {
-    sfpApplCodeIndex
-	Unsigned32,
-    sfpApplCodeSelect
-	INTEGER,
-    sfpApplCodeCategory
-	INTEGER,
-    sfpApplCodeValue
-	SfpApplication
+    sfpApplCodeIndex        Unsigned32,
+    sfpApplCodeSelect       INTEGER,
+    sfpApplCodeCategory     INTEGER,
+    sfpApplCodeValue        SfpApplication
 }
 
 sfpApplCodeIndex OBJECT-TYPE
@@ -1300,8 +949,8 @@ sfpApplCodeIndex OBJECT-TYPE
     ::= { sfpApplCodeEntry 1 }
 
 sfpApplCodeSelect OBJECT-TYPE
-    SYNTAX INTEGER {
-	noSelect(0), code00(4), code01(5), code10(6), code11(7) }
+    SYNTAX      INTEGER { noSelect(0), code00(4), code01(5), code10(6), 
+                    code11(7) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1310,16 +959,15 @@ sfpApplCodeSelect OBJECT-TYPE
 	 - code00(4),
 	 - code01(5),
 	 - code10(6),
-	 - code11(7)
-	 "
+         - code11(7)"
     REFERENCE
 	"SFF-8079 Rev 1.7, Section 5.2.1 and Table 6."
     ::= { sfpApplCodeEntry 2 }
 
 sfpApplCodeCategory OBJECT-TYPE
-    SYNTAX INTEGER {
-	unspecified(0), fibreChannel(1), ethernet(2), sonet(3), 
-	infiniband(4), sbcon(5), copper(6), other(7) }
+    SYNTAX      INTEGER { unspecified(0), fibreChannel(1), ethernet(2), 
+                    sonet(3), infiniband(4), sbcon(5), copper(6), 
+                    other(7) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1335,8 +983,7 @@ sfpApplCodeCategory OBJECT-TYPE
 	 - infiniband(4): InfiniBand applications;
 	 - sbcon(5): SBCON applications;
 	 - copper(6): Copper applications; or,
-	 - other(7): other (unknown) applications.
-	 "
+         - other(7): other (unknown) applications."
     REFERENCE
 	"SFF-8079 Rev 1.7, Section 5.2.1 and Table 6,
 	 SFF-8089 Rev 1.3, Table 4-1."
@@ -1348,15 +995,14 @@ sfpApplCodeValue OBJECT-TYPE
     STATUS current
     DESCRIPTION
 	"Provides the code value of the supported application in 
-	 accordance with the codes provided in SFF-8089.
-	 "
+         accordance with the codes provided in SFF-8089."
     REFERENCE
 	"SFF-8079 Rev 1.7, Section 5.2.1 and Table 6,
 	 SFF-8089 Rev 1.3, Table 4-1."
     ::= { sfpApplCodeEntry 4 }
 
-
--- ==========================================================
+sfpDiag OBJECT IDENTIFIER
+    ::= { sfpTables 4 }
 
 sfpDiagTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SfpDiagEntry
@@ -1402,63 +1048,37 @@ sfpDiagEntry OBJECT-TYPE
     REFERENCE
 	"SFF-8472, Diagnostic Monitoring Interface for Optical 
 	 Transceivers."
-    INDEX {
-	sfpModuleId -- shared index
-    }
-    ::= { sfpDiag 1 }
+    INDEX       { sfpModuleId }
+    ::= { sfpDiagTable 1 }
 
 SfpDiagEntry ::= SEQUENCE {
-    sfpDiagType
-	BITS,
-    sfpDiagOptions
-	BITS,
-    sfpDiagDmiCompliance
-	BITS,
-    sfpDiagTempHiAlarm
-	Unsigned32,
-    sfpDiagTempLoAlarm
-	Unsigned32,
-    sfpDiagTempHiWarning
-	Unsigned32,
-    sfpDiagTempLoWarning
-	Unsigned32,
-    sfpDiagVoltHiAlarm
-	Unsigned32,
-    sfpDiagVoltLoAlarm
-	Unsigned32,
-    sfpDiagVoltHiWarning
-	Unsigned32,
-    sfpDiagVoltLoWarning
-	Unsigned32,
-    sfpDiagBiasHiAlarm
-	Unsigned32,
-    sfpDiagBiasLoAlarm
-	Unsigned32,
-    sfpDiagBiasHiWarning
-	Unsigned32,
-    sfpDiagBiasLoWarning
-	Unsigned32,
-    sfpDiagTxPowerHiAlarm
-	Unsigned32,
-    sfpDiagTxPowerLoAlarm
-	Unsigned32,
-    sfpDiagTxPowerHiWarning
-	Unsigned32,
-    sfpDiagTxPowerLoWarning
-	Unsigned32,
-    sfpDiagRxPowerHiAlarm
-	Unsigned32,
-    sfpDiagRxPowerLoAlarm
-	Unsigned32,
-    sfpDiagRxPowerHiWarning
-	Unsigned32,
-    sfpDiagRxPowerLoWarning
-	Unsigned32,
+    sfpDiagType                 BITS,
+    sfpDiagOptions              BITS,
+    sfpDiagDmiCompliance        BITS,
+    sfpDiagTempHiAlarm          Unsigned32,
+    sfpDiagTempLoAlarm          Unsigned32,
+    sfpDiagTempHiWarning        Unsigned32,
+    sfpDiagTempLoWarning        Unsigned32,
+    sfpDiagVoltHiAlarm          Unsigned32,
+    sfpDiagVoltLoAlarm          Unsigned32,
+    sfpDiagVoltHiWarning        Unsigned32,
+    sfpDiagVoltLoWarning        Unsigned32,
+    sfpDiagBiasHiAlarm          Unsigned32,
+    sfpDiagBiasLoAlarm          Unsigned32,
+    sfpDiagBiasHiWarning        Unsigned32,
+    sfpDiagBiasLoWarning        Unsigned32,
+    sfpDiagTxPowerHiAlarm       Unsigned32,
+    sfpDiagTxPowerLoAlarm       Unsigned32,
+    sfpDiagTxPowerHiWarning     Unsigned32,
+    sfpDiagTxPowerLoWarning     Unsigned32,
+    sfpDiagRxPowerHiAlarm       Unsigned32,
+    sfpDiagRxPowerLoAlarm       Unsigned32,
+    sfpDiagRxPowerHiWarning     Unsigned32,
+    sfpDiagRxPowerLoWarning     Unsigned32
 }
 
 sfpDiagType OBJECT-TYPE
-    SYNTAX BITS {
-	aCR(2), rPMT(3), extCal(4), intCal(5), dMI(6) }
+    SYNTAX      BITS { aCR(2), rPMT(3), extCal(4), intCal(5), dMI(6) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1489,21 +1109,14 @@ sfpDiagType OBJECT-TYPE
 	 - dMI(6), digital diagnostic monitoring implemented when 
 	   present.  For entries in this table, dMI(6) is always 
 	   present.  When the SFP module does not support DMI, there is 
-	   no entry in this table for the module.
-	"
+           no entry in this table for the module."
     REFERENCE
 	"SFF-8472 Rev 10.4, Table 3.9"
     ::= { sfpDiagEntry 1 }
 
 sfpDiagOptions OBJECT-TYPE
-    SYNTAX BITS {
-	softRateSelect(1),
-	applSelect(2),
-	rateSelect(3),
-	rxLOS(4),
-	txFault(5),
-	txDisable(6),
-	alarms(7) }
+    SYNTAX      BITS { softRateSelect(1), applSelect(2), rateSelect(3), 
+                    rxLOS(4), txFault(5), txDisable(6), alarms(7) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1526,18 +1139,13 @@ sfpDiagOptions OBJECT-TYPE
 	 Typical SFP modules implement rxLOS(4), txFault(5), 
 	 txDisable(6) and alarms(7).  Most modules auto-detect the 
 	 rate and application and do not implement softRateSelect(1) nor 
-	 applSelect(2).
-	 "
+         applSelect(2)."
     REFERENCE
 	"SFF-8472 Rev 10.4, Table 3.10"
     ::= { sfpDiagEntry 2 }
 
 sfpDiagDmiCompliance OBJECT-TYPE
-    SYNTAX INTEGER {
-	undefined(0),
-	rev93(1),
-	rev95(2),
-	rev102(3),
+    SYNTAX      BITS { undefined(0), rev93(1), rev95(2), rev102(3), 
 	rev104(4) }
     MAX-ACCESS read-only
     STATUS current
@@ -1950,7 +1558,8 @@ sfpDiagRxPowerLoWarning OBJECT-TYPE
 	"SFF-8472 Rev 10.4, Table 3.15"
     ::= { sfpDiagEntry 23 }
 
--- ==========================================================
+sfpCalib OBJECT IDENTIFIER
+    ::= { sfpTables 5 }
 
 sfpCalibTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SfpCalibEntry
@@ -1991,42 +1600,27 @@ sfpCalibEntry OBJECT-TYPE
 	 temperature and supply voltage."
     REFERENCE
 	"SFF-8472 Rev 10.4, Table 3.16"
-    INDEX {
-	sfpModuleId -- shared index
-    }
+    INDEX       { sfpModuleId }
     ::= { sfpCalibTable 1 }
 
 SfpCalibEntry ::= SEQUENCE {
-    sfpCalibRxPwr0
-	Opaque32,
-    sfpCalibRxPwr1
-	Opaque32,
-    sfpCalibRxPwr2
-	Opaque32,
-    sfpCalibRxPwr3
-	Opaque32,
-    sfpCalibRxPwr4
-	Opaque32,
-    sfpCalibTxISlope
-	Unsigned32,
-    sfpCalibTxIOffset
-	Integer32,
-    sfpCalibTxPwrSlope
-	Unsigned32,
-    sfpCalibTxPwrOffset
-	Integer32,
-    sfpCalibTSlope
-	Unsigned32,
-    sfpCalibTOffset
-	Integer32,
-    sfpCalibVSlope
-	Unsigned32,
-    sfpCalibVOffset
-	Integer32
+    sfpCalibRxPwr0          Opaque,
+    sfpCalibRxPwr1          Opaque,
+    sfpCalibRxPwr2          Opaque,
+    sfpCalibRxPwr3          Opaque,
+    sfpCalibRxPwr4          Opaque,
+    sfpCalibTxISlope        Unsigned32,
+    sfpCalibTxIOffset       Integer32,
+    sfpCalibTxPwrSlope      Unsigned32,
+    sfpCalibTxPwrOffset     Integer32,
+    sfpCalibTSlope          Unsigned32,
+    sfpCalibTOffset         Integer32,
+    sfpCalibVSlope          Unsigned32,
+    sfpCalibVOffset         Integer32
 }
 
 sfpCalibRxPwr0 OBJECT-TYPE
-    SYNTAX Opaque32
+    SYNTAX      Opaque
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2037,7 +1631,7 @@ sfpCalibRxPwr0 OBJECT-TYPE
     ::= { sfpCalibEntry 1 }
 
 sfpCalibRxPwr1 OBJECT-TYPE
-    SYNTAX Opaque32
+    SYNTAX      Opaque
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2048,7 +1642,7 @@ sfpCalibRxPwr1 OBJECT-TYPE
     ::= { sfpCalibEntry 2 }
 
 sfpCalibRxPwr2 OBJECT-TYPE
-    SYNTAX Opaque32
+    SYNTAX      Opaque
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2059,7 +1653,7 @@ sfpCalibRxPwr2 OBJECT-TYPE
     ::= { sfpCalibEntry 3 }
 
 sfpCalibRxPwr3 OBJECT-TYPE
-    SYNTAX Opaque32
+    SYNTAX      Opaque
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2070,11 +1664,12 @@ sfpCalibRxPwr3 OBJECT-TYPE
     ::= { sfpCalibEntry 4 }
 
 sfpCalibRxPwr4 OBJECT-TYPE
-    SYNTAX Opaque32
+    SYNTAX      Opaque
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
+        "This is one of four values used to externally calibrate the 
+         receiver power measurement."
     REFERENCE
 	"SFF-8472 Rev 10.4, Calibration Constants"
     ::= { sfpCalibEntry 5 }
@@ -2180,8 +1775,8 @@ sfpCalibVOffset OBJECT-TYPE
 	"SFF-8472 Rev 10.4, Calibration Constants"
     ::= { sfpCalibEntry 13 }
 
-
--- ==========================================================
+sfpMon OBJECT IDENTIFIER
+    ::= { sfpTables 6 }
 
 sfpMonTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SfpMonEntry
@@ -2198,47 +1793,30 @@ sfpMonEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-	""
+        "Each entry in ths sfpMonTable provides A/D values and status 
+         for one module."
     REFERENCE
 	"SFF-8472 Rev 10.4, Table 3.17"
-    INDEX {
-	sfpModuleId -- shared index
-    }
+    INDEX       { sfpModuleId }
     ::= { sfpMonTable 1 }
 
 SfpMonEntry ::= SEQUENCE {
-    sfpMonTemp
-	Unsigned32,
-    sfpMonVolt
-	Unsigned32,
-    sfpMonBias
-	Unsigned32,
-    sfpMonTxPower
-	Unsigned32,
-    sfpMonRxPower
-	Unsigned32,
-    sfpMonDataReadyBar
-	SfpMonitor,
-    sfpMonRxLossOfSignal
-	SfpMonitor,
-    sfpMonTxFaultState
-	SfpMonitor,
-    sfpMonRateSelect
-	SfpMonitor,
-    sfpMonApplSelect
-	SfpMonitor,
-    sfpMonTxDisable
-	SfpMonitor,
-    sfpMonPowerLevel
-	INTEGER,
-    sfpMonSoftRateSelect
-	SfpMonitor,
-    sfpMonSoftRateSelect1
-	SfpMonitor,
-    sfpMonSoftPowerLevel
-	INTEGER,
-    sfpMonSoftTxDisable
-	SfpMonitor
+    sfpMonTemp              Unsigned32,
+    sfpMonVolt              Unsigned32,
+    sfpMonBias              Unsigned32,
+    sfpMonTxPower           Unsigned32,
+    sfpMonRxPower           Unsigned32,
+    sfpMonDataReadyBar      SfpMonitor,
+    sfpMonRxLossOfSignal    SfpMonitor,
+    sfpMonTxFaultState      SfpMonitor,
+    sfpMonRateSelect        SfpMonitor,
+    sfpMonApplSelect        SfpMonitor,
+    sfpMonTxDisable         SfpMonitor,
+    sfpMonPowerLevel        INTEGER,
+    sfpMonSoftRateSelect    SfpMonitor,
+    sfpMonSoftRateSelect1   SfpMonitor,
+    sfpMonSoftPowerLevel    INTEGER,
+    sfpMonSoftTxDisable     SfpMonitor
 }
 
 sfpMonTemp OBJECT-TYPE
@@ -2448,9 +2026,7 @@ sfpMonTxDisable OBJECT-TYPE
     ::= { sfpMonEntry 11 }
 
 sfpMonPowerLevel OBJECT-TYPE
-    SYNTAX INTEGER {
-	powerLevel1(0),
-	powerLevel2(1) }
+    SYNTAX      INTEGER { powerLevel1(0), powerLevel2(1) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -2527,9 +2103,7 @@ sfpMonSoftRateSelect1 OBJECT-TYPE
     ::= { sfpMonEntry 14 }
 
 sfpMonSoftPowerLevel OBJECT-TYPE
-    SYNTAX INTEGER {
-	powerLevel1(0),
-	powerLevel2(1) }
+    SYNTAX      INTEGER { powerLevel1(0), powerLevel2(1) }
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
@@ -2601,9 +2175,8 @@ sfpMonSoftTxDisable OBJECT-TYPE
 	"SFF-8472 Rev 10.4, Table 3.17"
     ::= { sfpMonEntry 16 }
 
-
-
--- ==========================================================
+sfpStatus OBJECT IDENTIFIER
+    ::= { sfpTables 7 }
 
 sfpStatusTable OBJECT-TYPE
     SYNTAX SEQUENCE OF SfpStatusEntry
@@ -2625,34 +2198,21 @@ sfpStatusEntry OBJECT-TYPE
 	 deleted from this table by management stations, but are 
 	 autonomously added or deleted by the managed system from 
 	 within."
-    INDEX {
-	sfpModuleId -- shared index
-    }
+    INDEX       { sfpModuleId }
     ::= { sfpStatusTable 1 }
 
 SfpStatusEntry ::= SEQUENCE {
-    sfpStatusEquipId
-	RowPointer,
-    sfpStatusAdministrativeState
-	AdministrativeState,
-    sfpStatusAvailabilityStatus
-	AvailabilityStatus,
-    sfpStatusOperationalState
-	OperationalState,
-    sfpStatusAlarmStatus
-	AlarmStatus,
-    sfpStatusProceduralStatus
-	ProceduralStatus,
-    sfpStandbyStatus
-	StandbyStatus,
-    sfpStatusAlarms
-	SfpAlarms,
-    sfpStatusAlarmsHistory
-	SfpAlarms,
-    sfpStatusWarnings
-	SfpAlarms,
-    sfpStatusWarningsHistory
-	SfpAlarms
+    sfpStatusEquipId                RowPointer,
+    sfpStatusAdministrativeState    AdministrativeState,
+    sfpStatusAvailabilityStatus     AvailabilityStatus,
+    sfpStatusOperationalState       OperationalState,
+    sfpStatusAlarmStatus            AlarmStatus,
+    sfpStatusProceduralStatus       ProceduralStatus,
+    sfpStandbyStatus                StandbyStatus,
+    sfpStatusAlarms                 SfpAlarms,
+    sfpStatusAlarmsHistory          SfpAlarms,
+    sfpStatusWarnings               SfpAlarms,
+    sfpStatusWarningsHistory        SfpAlarms
 }
 
 sfpStatusEquipId OBJECT-TYPE
@@ -2660,9 +2220,7 @@ sfpStatusEquipId OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-	""
-    REFERENCE
-	""
+        "Provides an equipment identifier."
     ::= { sfpStatusEntry 1 }
 
 sfpStatusAdministrativeState OBJECT-TYPE
@@ -2725,8 +2283,7 @@ sfpStatusAvailabilityStatus OBJECT-TYPE
 	   state is enabled);
 	 - notInstalled(7), the SFP/SFP+ module is not installed (the 
 	   operational state is disabled);
-	 - logFull(8), not used.
-	 "
+         - logFull(8), not used."
     REFERENCE
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                Attribute-ASN1Module.AvailabilityStatus
@@ -2747,10 +2304,7 @@ sfpStatusOperationalState OBJECT-TYPE
 	 - disabled(0), the SFP/SFP+ module is totally inoperable and is 
 	   unable to provide service;
 	 - enabled(1), the SFP/SFP+ module is partially or fully 
-	   operable and available for use.
-	 "
-    REFERENCE
-	""
+           operable and available for use."
     ::= { sfpStatusEntry 4 }
 
 sfpStatusAlarmStatus OBJECT-TYPE
@@ -2763,10 +2317,7 @@ sfpStatusAlarmStatus OBJECT-TYPE
 	 critical(1) - 
 	 major(2) - 
 	 minor(3) - 
-	 alarmOutstanding(4) - 
-	 "
-    REFERENCE
-	""
+         alarmOutstanding(4) - "
     ::= { sfpStatusEntry 5 }
 
 sfpStatusProceduralStatus OBJECT-TYPE
@@ -2789,10 +2340,7 @@ sfpStatusProceduralStatus OBJECT-TYPE
 	 - initializing(2), the SFP/SFP+ module is initializing (the 
 	   operation state is enabled or disabled);
 	 - reporting(3), not used;
-	 - terminating(4), the SFP/SFP+ module is terminating.
-	 "
-    REFERENCE
-	""
+         - terminating(4), the SFP/SFP+ module is terminating."
     ::= { sfpStatusEntry 6 }
 
 sfpStandbyStatus OBJECT-TYPE
@@ -2814,11 +2362,7 @@ sfpStandbyStatus OBJECT-TYPE
 	 - providingService(2), the SFP/SFP+ module is providing service 
 	   and is backing up another SFP/SFP+ module (operational state, 
 	   enabled; administrative state, unlocked; availabiltiy status, 
-	   online).
-
-	 "
-    REFERENCE
-	""
+           online)."
     ::= { sfpStatusEntry 7 }
 
 sfpStatusAlarms OBJECT-TYPE
@@ -2852,8 +2396,6 @@ sfpStatusAlarms OBJECT-TYPE
 	 that the transceiver is within acceptable operating bounds.  A 
 	 non-empty set indicates an alarm condition and a corresponding 
 	 major or critical alarm condition will result."
-    REFERENCE
-	""
     ::= { sfpStatusEntry 8 }
 
 sfpStatusAlarmsHistory OBJECT-TYPE
@@ -2889,7 +2431,6 @@ sfpStatusAlarmsHistory OBJECT-TYPE
 	"SFF-8472 Rev 10.4, Table 16"
     ::= { sfpStatusEntry 9 }
     
-
 sfpStatusWarnings OBJECT-TYPE
     SYNTAX SfpAlarms
     MAX-ACCESS read-only
@@ -2958,22 +2499,235 @@ sfpStatusWarningsHistory OBJECT-TYPE
 	"SFF-8472 Rev 10.4, Table 16"
     ::= { sfpStatusEntry 11 }
 
--- ====================================================================
--- CONFORMANCE OBJECT GROUPS
--- ====================================================================
+sfpScalars OBJECT IDENTIFIER
+    ::= { sfpObjects 2 }
+
+sfpDefaults OBJECT IDENTIFIER
+    ::= { sfpScalars 1 }
+
+sfpNotifs OBJECT IDENTIFIER
+    ::= { sfpObjects 3 }
+
+sfpOids OBJECT IDENTIFIER
+    ::= { sfpObjects 4 }
+
+sfpProbableCauses OBJECT IDENTIFIER
+    ::= { sfpOids 1 }
+
+sfpSpecificProblems OBJECT IDENTIFIER
+    ::= { sfpOids 2 }
+
+temperatureHi OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 1 (temperatureHi) which represents a high temperature 
+         threshold warning or alarm.
+         
+         Probable Cause = temperatureUnacceptable, Perceived Severity = 
+         warning/minor/major/cleared, Specific Problem = 1 
+         (temperatureHi)"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 1 }
+
+temperatureLo OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 2 (temperatureLo) which represents a low temperature 
+         threshold warning or alarm.
+         
+         Probable Cause = temperatureUnacceptable, Perceived Severity = 
+         warning/minor/major/cleared, Specific Problem = 1 
+         (temperatureLo)"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 2 }
+
+voltageHi OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 3 (voltageHi) which represents a high supply voltage  
+         threshold warning or alarm.
+         
+         Probable Cause = powerProblem, Perceived Severity = 
+         warning/minor/major/cleared"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 3 }
+
+voltageLo OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 4 (voltageLo) which represents a low supply voltage  
+         threshold warning or alarm.
+         
+         Probable Cause = powerProblem, Perceived Severity = 
+         warning/minor/major/cleared"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 4 }
+
+txBiasHi OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 5 (txBiasLo) which represents a high transmitter bias 
+         current threshold warning or alarm.
+         
+         probableCause = thresholdCrossed, Perceived Severity = 
+         warning/minor/major/cleared"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 5 }
+
+txBiasLo OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 6 (txBiasHi) which represents a low transmitter bias 
+         current threshold warning or alarm.
+         
+         probableCause = thresholdCrossed, Perceived Severity = 
+         warning/minor/major/cleared"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 6 }
+
+txPowerHi OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 7 (txPowerHi) which represents a high transmitter 
+         power threshold warning or alarm.
+         
+         Probable Cause = transmitFailure, Perceived Severity = 
+         warning/minor/major/cleared"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 7 }
+
+txPowerLo OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 8 (txPowerLo) which represents a low transmitter 
+         power threshold warning or alarm.
+         
+         Probable Cause = transmitFailure, Perceived Severity = 
+         warning/minor/major"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 8 }
+
+rxPowerHi OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 9 (rxPowerHi) which represents a high receiver power 
+         threshold warning or alarm.
+         
+         Probable Cause = receiveFailure, Perceived Severity = 
+         warning/minor/major/cleared"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 9 }
+
+rxPowerLo OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         probableCause in the equipmentAlarm notification.  Specific 
+         Problem = 10 (rxPowerLo) which represents a low receiver power 
+         threshold warning or alarm.
+         
+         Probable Cause = receiveFailure, Perceived Severity = 
+         warning/minor/major/cleared"
+    REFERENCE   
+        "SFF-8472 Rec 10.4, Table 16"
+    ::= { sfpSpecificProblems 10 }
+
+rxLossOfSignal OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         specificProblems in the equipmentAlarm notification.  Specific 
+         Problem = 11 (rxLossOfSignal) represents a loss of received 
+         signal event.
+         
+         The agent generates this alarm by monitoring the RX_LOS pin on 
+         the SFP module, or the equivalent bit within the 2-wire address 
+         space under the Diagnostic Monitoring Interface (DMI) for 
+         Optical Modules (SFF-8472).  The assertion of the RX_LOS pin 
+         indicates that the received optical power is below the 
+         worst-case receiver sensitivity (as defined by the standard in 
+         use); deassertion indicates normal operation.
+         
+         Probable Cause = lossOfSignal, Perceived Severity = 
+         minor/major/cleared"
+    REFERENCE   
+        "SFF-8472 Rev. 10.4, Table 3.17,
+         INF-8074, Table 1, Note 5."
+    ::= { sfpSpecificProblems 11 }
+
+txFailure OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Specific Problem.  This object identity is used with 
+         specificProblems in the equipmentAlarm notification.  Specific 
+         Problem = 12 (txFault) represents a transmitter fault 
+         condition.
+         
+         The assertion of the TxFault pin indicates a detected laser 
+         fault of some kind; deassertion indicates normal operation.
+         
+         Probable Cause = transmitterFailure, Perceived Severity = 
+         minor/major/cleared"
+    REFERENCE   
+        "SFF-8472 Rev 10.4, Table 3.17,
+         INF-8074, Table 1, Note 1."
+    ::= { sfpSpecificProblems 12 }
+
+sfpSpecificExtensions OBJECT IDENTIFIER
+    ::= { sfpOids 3 }
+
+sfpProbableCauses2 OBJECT IDENTIFIER
+    ::= { sfpOids 4 }
+
+sfpConformance OBJECT IDENTIFIER
+    ::= { sfpMIB 2 }
+
+sfpCompliance OBJECT IDENTIFIER
+    ::= { sfpConformance 1 }
+
+sfpGroups OBJECT IDENTIFIER
+    ::= { sfpConformance 2 }
 
 sfpModulePackage OBJECT-GROUP
-    OBJECTS {
-	sfpModuleId, sfpModuleType, sfpModuleExtendedType, 
-	sfpModuleConnectorType, sfpModuleTransceiver, sfpModuleEncoding, 
+    OBJECTS     { sfpModuleType, sfpModuleExtendedType, 
+                  sfpModuleConnectorType, sfpModuleTransceiver, 
+                  sfpModuleCompliance, sfpModuleEncoding, 
 	sfpModuleNormalBitRate, sfpModuleRateIdentifier, 
 	sfpModuleLinkLength9125k, sfpModuleLinkLength9125m, 
 	sfpModuleLinkLength50125m, sfpModuleLinkLength625125m, 
 	sfpModuleLinkLengthCopper, sfpModuleVendorName, 
 	sfpModuleVendorOUI, sfpModulePartNumber, 
 	sfpModuleRevisionLevel, sfpModuleLaserWavelength, 
-	sfpModulePassiveCableCompliance, sfpModuleActiveCableCompliance, 
-	sfpModuleOptions, sfpModuleUpperBitRate, sfpModuleLowerBitRate, 
+                  sfpModulePassiveCableCompliance, 
+                  sfpModuleActiveCableCompliance, sfpModuleOptions, 
+                  sfpModuleUpperBitRate, sfpModuleLowerBitRate, 
 	sfpModuleVendorSerialNo, sfpModuleManufactureDate, 
 	sfpStatusEquipId, sfpStatusAdministrativeState, 
 	sfpStatusAvailabilityStatus, sfpStatusOperationalState, 
@@ -2988,8 +2742,8 @@ sfpModulePackage OBJECT-GROUP
     ::= { sfpGroups 1 }
 
 sfpRateSelectPackage OBJECT-GROUP
-    OBJECTS {
-	sfpMonRateSelect, sfpMonSoftRateSelect, sfpMonSoftRateSelect1 }
+    OBJECTS     { sfpMonRateSelect, sfpMonSoftRateSelect, 
+                  sfpMonSoftRateSelect1 }
     STATUS current
     DESCRIPTION
 	"This object group provides support for the rate selection 
@@ -3000,10 +2754,10 @@ sfpRateSelectPackage OBJECT-GROUP
     ::= { sfpGroups 2 }
 
 sfpApplicationSelectPackage OBJECT-GROUP
-    OBJECTS {
-	sfpApplControlMode, sfpApplTableLength, sfpApplTableSelect, 
-	sfpApplSelectValue, sfpApplCodeIndex, sfpApplCodeSelect, 
-	sfpApplCodeCategory, sfpApplCodeValue, sfpMonApplSelect }
+    OBJECTS     { sfpApplControlMode, sfpApplTableLength, 
+                  sfpApplTableSelect, sfpApplSelectValue, 
+                  sfpApplCodeSelect, sfpApplCodeCategory, 
+                  sfpApplCodeValue, sfpMonApplSelect }
     STATUS current
     DESCRIPTION
 	"This object group provides support for the application 
@@ -3014,8 +2768,7 @@ sfpApplicationSelectPackage OBJECT-GROUP
     ::= { sfpGroups 3 }
 
 sfpRxLOSPackage OBJECT-GROUP
-    OBJECTS {
-	sfpMonRxLossOfSignal }
+    OBJECTS     { sfpMonRxLossOfSignal }
     STATUS current
     DESCRIPTION
 	"This object group provides support for the monitoring of the 
@@ -3026,8 +2779,7 @@ sfpRxLOSPackage OBJECT-GROUP
     ::= { sfpGroups 4 }
 
 sfpPowerLevelPackage OBJECT-GROUP
-    OBJECTS {
-	sfpMonPowerLevel, sfpMonSoftPowerLevel }
+    OBJECTS     { sfpMonPowerLevel, sfpMonSoftPowerLevel }
     STATUS current
     DESCRIPTION
 	"This object group provides support for the monitoring and 
@@ -3040,8 +2792,7 @@ sfpPowerLevelPackage OBJECT-GROUP
     ::= { sfpGroups 5 }
 
 sfpTxDisablePackage OBJECT-GROUP
-    OBJECTS {
-	sfpMonTxDisable, sfpMonSoftTxDisable }
+    OBJECTS     { sfpMonTxDisable, sfpMonSoftTxDisable }
     STATUS current
     DESCRIPTION
 	"This object group provides support for the monitoring and 
@@ -3053,8 +2804,7 @@ sfpTxDisablePackage OBJECT-GROUP
     ::= { sfpGroups 6 }
 
 sfpTxFaultPackage OBJECT-GROUP
-    OBJECTS {
-	sfpMonTxFaultState }
+    OBJECTS     { sfpMonTxFaultState }
     STATUS current
     DESCRIPTION
 	"This object group provides support for the monitoring of the 
@@ -3064,20 +2814,22 @@ sfpTxFaultPackage OBJECT-GROUP
 	"SFF-8472"
     ::= { sfpGroups 7 }
 
-sfpDiagnosticMonitoringInterfacePackage OBJECT-GROUP
-    OBJECTS {
-	sfpDiagType, sfpDiagOptions, sfpDiagDmiCompliance, 
-	sfpDiagTempHiAlarm, sfpDiagTempLoAlarm, sfpDiagTempHiWarning, 
-	sfpDiagTempLoWarning, sfpDiagVoltHiAlarm, sfpDiagVoltLoAlarm, 
-	sfpDiagVoltHiWarning, sfpDiagVoltLoWarning, sfpDiagBiasHiAlarm, 
-	sfpDiagBiasLoAlarm, sfpDiagBiasHiWarning, sfpDiagBiasLoWarning, 
+sfpDiagnosticMonInterfacePackage OBJECT-GROUP
+    OBJECTS     { sfpDiagType, sfpDiagOptions, sfpDiagDmiCompliance, 
+                  sfpDiagTempHiAlarm, sfpDiagTempLoAlarm, 
+                  sfpDiagTempHiWarning, sfpDiagTempLoWarning, 
+                  sfpDiagVoltHiAlarm, sfpDiagVoltLoAlarm, 
+                  sfpDiagVoltHiWarning, sfpDiagVoltLoWarning, 
+                  sfpDiagBiasHiAlarm, sfpDiagBiasLoAlarm, 
+                  sfpDiagBiasHiWarning, sfpDiagBiasLoWarning, 
 	sfpDiagTxPowerHiAlarm, sfpDiagTxPowerLoAlarm, 
 	sfpDiagTxPowerHiWarning, sfpDiagTxPowerLoWarning, 
 	sfpDiagRxPowerHiAlarm, sfpDiagRxPowerLoAlarm, 
-	sfpDiagRxPowerHiWarning, sfpDiagRxPowerLoWarning, sfpMonTemp, 
-	sfpMonVolt, sfpMonBias, sfpMonTxPower, sfpMonRxPower, 
-	sfpMonDataReadyBar, sfpStatusAlarms, sfpStatusAlarmsHistory, 
-	sfpStatusWarnings, sfpStatusWarningsHistory }
+                  sfpDiagRxPowerHiWarning, sfpDiagRxPowerLoWarning, 
+                  sfpMonTemp, sfpMonVolt, sfpMonBias, sfpMonTxPower, 
+                  sfpMonRxPower, sfpMonDataReadyBar, sfpStatusAlarms, 
+                  sfpStatusAlarmsHistory, sfpStatusWarnings, 
+                  sfpStatusWarningsHistory }
     STATUS current
     DESCRIPTION
 	"This object group provides basic support for the 'Diagnostic 
@@ -3087,11 +2839,11 @@ sfpDiagnosticMonitoringInterfacePackage OBJECT-GROUP
     ::= { sfpGroups 8 }
 
 sfpDMIExternalCalibrationPackage OBJECT-GROUP
-    OBJECTS {
-	sfpCalibRxPwr0, sfpCalibRxPwr1, sfpCalibRxPwr2, sfpCalibRxPwr3, 
-	sfpCalibRxPwr4, sfpCalibTxISlope, sfpCalibTxIOffset, 
-	sfpCalibTxPwrSlope, sfpCalibTxPwrOffset, sfpCalibTSlope, 
-	sfpCalibTOffset, sfpCalibVSlope, sfpCalibVOffset }
+    OBJECTS     { sfpCalibRxPwr0, sfpCalibRxPwr1, sfpCalibRxPwr2, 
+                  sfpCalibRxPwr3, sfpCalibRxPwr4, sfpCalibTxISlope, 
+                  sfpCalibTxIOffset, sfpCalibTxPwrSlope, 
+                  sfpCalibTxPwrOffset, sfpCalibTSlope, sfpCalibTOffset, 
+                  sfpCalibVSlope, sfpCalibVOffset }
     STATUS current
     DESCRIPTION
 	"This object group provides support for external calibration of 
@@ -3109,8 +2861,7 @@ sfpINF8074Compliance MODULE-COMPLIANCE
 
     MODULE -- this module
 
-    MANDATORY-GROUPS {
-	sfpModulePackage }
+        MANDATORY-GROUPS        { sfpModulePackage }
 
     GROUP sfpRateSelectPackage
     DESCRIPTION
@@ -3122,7 +2873,7 @@ sfpINF8074Compliance MODULE-COMPLIANCE
 	"PRESENT IF a module also supports the application selection 
 	 portions of 'SFP Rate and Application Selection, SFF-8079'."
 
-    GROUP sfpDiagnosticMonitoringInterfacePackage
+        GROUP   sfpDiagnosticMonInterfacePackage
     DESCRIPTION
 	"PRESENT IF a module also supports the 'Diagnostic Monitoring 
 	 Interface (DMI) for Optical Transceivers', SFF-8472."
@@ -3157,14 +2908,6 @@ sfpINF8074Compliance MODULE-COMPLIANCE
     DESCRIPTION
 	"PRESENT IF a module also supports the SFP+ specification, 
 	 SFF-8431."
-
-    MODULE OPENSS7-SMI-MIB
-
-    GROUP smiConditionalNotificationsGroup
-    DESCRIPTION
-	"PRESENT IF the equipmentAlarm NOTIFICATION defined in 'ITU-T 
-	 Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992' is supported by an 
-	 instance of this class."
 
     ::= { sfpCompliance 1 }
 
@@ -3176,18 +2919,15 @@ sfpSFF8079Compliance MODULE-COMPLIANCE
 
     MODULE -- this module
 
-    MANDATORY-GROUPS {
-	sfpModulePackage,
-	sfpRateSelectPackage,
-	sfpApplicationSelectPackage
-    }
+        MANDATORY-GROUPS        { sfpModulePackage, sfpRateSelectPackage, 
+                  sfpApplicationSelectPackage }
 
     GROUP sfpPowerLevelPackage
     DESCRIPTION
 	"PRESENT IF a module also supports the SFP+ specification, 
 	 SFF-8431."
 
-    GROUP sfpDiagnosticMonitoringInterfacePackage
+        GROUP   sfpDiagnosticMonInterfacePackage
     DESCRIPTION
 	"PRESENT IF a module also supports the 'Diagnostic Monitoring 
 	 Interface (DMI) for Optical Transceivers', SFF-8472."
@@ -3217,31 +2957,22 @@ sfpSFF8079Compliance MODULE-COMPLIANCE
 	"PRESENT IF the module also supports the TX_FAULT pin monitoring 
 	 of 'Diagnostic Monitoring Interface (DMI) for Optical 
 	 Transceivers', SFF-8472."
-
-    MODULE OPENSS7-SMI-MIB
-
-    GROUP smiConditionalNotificationsGroup
-    DESCRIPTION
-	"PRESENT IF the equipmentAlarm NOTIFICATION defined in 'ITU-T 
-	 Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992' is supported by an 
-	 instance of this class."
 
     ::= { sfpCompliance 2 }
 
 sfpSFF8431Compliance MODULE-COMPLIANCE
     STATUS current
     DESCRIPTION
-	""
+        "This compliance add mandatory requirements for implementation 
+         supporting Enhanced Small Form Factor Pluggable Module SFP+, 
+         SFF-8431."
     
     MODULE -- this module
-    MANDATORY-GROUPS {
-	sfpModulePackage,
-	sfpRateSelectPackage,
-	sfpApplicationSelectPackage,
-	sfpPowerLevelPackage
-    }
 
-    GROUP sfpDiagnosticMonitoringInterfacePackage
+        MANDATORY-GROUPS        { sfpModulePackage, sfpRateSelectPackage, 
+                  sfpApplicationSelectPackage, sfpPowerLevelPackage }
+
+        GROUP   sfpDiagnosticMonInterfacePackage
     DESCRIPTION
 	"PRESENT IF a module also supports the 'Diagnostic Monitoring 
 	 Interface (DMI) for Optical Transceivers', SFF-8472."
@@ -3271,14 +3002,6 @@ sfpSFF8431Compliance MODULE-COMPLIANCE
 	"PRESENT IF the module also supports the TX_FAULT pin monitoring 
 	 of 'Diagnostic Monitoring Interface (DMI) for Optical 
 	 Transceivers', SFF-8472."
-
-    MODULE OPENSS7-SMI-MIB
-
-    GROUP smiConditionalNotificationsGroup
-    DESCRIPTION
-	"PRESENT IF the equipmentAlarm NOTIFICATION defined in 'ITU-T 
-	 Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992' is supported by an 
-	 instance of this class."
 
     ::= { sfpCompliance 3 }
 
@@ -3291,10 +3014,43 @@ sfpSFF8472Compliance MODULE-COMPLIANCE
 
     MODULE -- this module
 
-    MANDATORY-GROUPS {
-	sfpModulePackage,
-	sfpDiagnosticMonitoringInterfacePackage
-    }
+        MANDATORY-GROUPS        { sfpModulePackage, 
+                  sfpDiagnosticMonInterfacePackage }
+
+        GROUP   sfpDMIExternalCalibrationPackage
+        DESCRIPTION   
+              "PRESENT IF a module also supports external calibration per 
+               SFF-8472."
+
+        GROUP   sfpRateSelectPackage
+        DESCRIPTION   
+              "PRESENT IF a module also supports the rate selection portions 
+               of 'SFP Rate and Application Selection, SFF-8079'."
+
+        GROUP   sfpApplicationSelectPackage
+        DESCRIPTION   
+              "PRESENT IF a module also supports the application selection 
+               portions of 'SFP Rate and Application Selection, SFF-8079'."
+
+        GROUP   sfpRxLOSPackage
+        DESCRIPTION   
+              "PRESENT IF a module also supports optional monitoring of the 
+               RX_LOS pin per SFF-8472."
+
+        GROUP   sfpPowerLevelPackage
+        DESCRIPTION   
+              "PRESENT IF a module also supports SFF-8431 and the monitoring 
+               and setting of power level per SFF-8472."
+
+        GROUP   sfpTxDisablePackage
+        DESCRIPTION   
+              "PRESENT IF a module supports the optional monitoring and soft 
+               setting of TX_DISABLE per SFF-8472."
+
+        GROUP   sfpTxFaultPackage
+        DESCRIPTION   
+              "PRESENT IF a module supports the optional monitoring of the 
+               TX_FAULT pin."
 
     OBJECT sfpApplTableSelect
     MIN-ACCESS read-only
@@ -3339,51 +3095,6 @@ sfpSFF8472Compliance MODULE-COMPLIANCE
 	"It is not necessary that the implementation be able to set or 
 	 clear the alarm status."
 
-    GROUP sfpDMIExternalCalibrationPackage
-    DESCRIPTION
-	"PRESENT IF a module also supports external calibration per 
-	 SFF-8472."
-
-    GROUP sfpRateSelectPackage
-    DESCRIPTION
-	"PRESENT IF a module also supports the rate selection portions 
-	 of 'SFP Rate and Application Selection, SFF-8079'."
-
-    GROUP sfpApplicationSelectPackage
-    DESCRIPTION
-	"PRESENT IF a module also supports the application selection 
-	 portions of 'SFP Rate and Application Selection, SFF-8079'."
-
-    GROUP sfpRxLOSPackage
-    DESCRIPTION
-	"PRESENT IF a module also supports optional monitoring of the 
-	 RX_LOS pin per SFF-8472."
-
-    GROUP sfpPowerLevelPackage
-    DESCRIPTION
-	"PRESENT IF a module also supports SFF-8431 and the monitoring 
-	 and setting of power level per SFF-8472."
-
-    GROUP sfpTxDisablePackage
-    DESCRIPTION
-	"PRESENT IF a module supports the optional monitoring and soft 
-	 setting of TX_DISABLE per SFF-8472."
-
-    GROUP sfpTxFaultPackage
-    DESCRIPTION
-	"PRESENT IF a module supports the optional monitoring of the 
-	 TX_FAULT pin."
-
-    MODULE OPENSS7-SMI-MIB
-
-    GROUP smiConditionalNotificationsGroup
-    DESCRIPTION
-	"PRESENT IF the equipmentAlarm NOTIFICATION defined in 'ITU-T 
-	 Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992' is supported by an 
-	 instance of this class."
-
     ::= { sfpCompliance 4 }
 
-
-END -- OPENSS7-SFP-MIB module
-
+END -- end of module OPENSS7-SFP-MIB.
