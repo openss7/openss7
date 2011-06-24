@@ -1,0 +1,147 @@
+#!/usr/bin/perl
+#
+sub reformat {
+	my ($msg,@args) = @_;
+	my @lines;
+	my @result;
+	# remove indent from blank lines
+	$msg =~ s/\n([ ]|\t)+\n/\n\n/sg;
+	printf STDERR "\nMessage after indent removal:\n".$msg;
+	if ($msg =~ /([ ]|\t)\n([ ]|\t)*/s) {
+		printf STDERR "Trailing blanks indicate paragraphs.\n";
+		# trailing blanks indicate paragraphs
+		$msg =~ s/([ ]|\t)\n([ ]|\t)*/ /sg;
+		# remove blank lines between stanzas
+		$msg =~ s/\n\n+/\n/sg;
+		printf STDERR "\nMessage after preprocessing:\n".$msg;
+		# split em up
+		@lines = split(/\n/,$msg);
+	} elsif ($msg =~ /\n\n/s) {
+		printf STDERR "Blank lines indicate paragraphs.\n";
+		# blank line indicates paragraphs
+		# interior lines ending in a period need an extra blank
+		$msg =~ s/\.\n(?!\n)/. \n/sg;
+		# interior lines need a blank
+		$msg =~ s/\n(?!\n)/ \n/sg;
+		# remove space from blank lines
+		$msg =~ s/\n([ ]|\t)+\n/\n\n/sg;
+		# interior lines are joined
+		$msg =~ s/([ ]|\t)\n([ ]|\t)*/ /sg;
+		# remove blank lines between stanzas
+		$msg =~ s/\n\n+/\n/sg;
+		printf STDERR "\nMessage after preprocessing:\n".$msg;
+		# split em up
+		@lines = split(/\n/,$msg);
+	} else {
+		printf STDERR "No way to indicate paragraphs.\n";
+		$msg =~ s/\.\n/. \n/sg;
+		$msg =~ s/\n([ ]|\t)*/ /sg;
+		printf STDERR "\nMessage after preprocessing:\n".$msg;
+		# FIXME - check for lead change
+		@lines = split(/\n/,$msg);
+	}
+	# calculate the minimum indent
+	my $first = 1;
+	my $mindent = 100;
+	@result = ();
+	foreach my $line (@lines) {
+		unless ($line =~ /^([ ]|\t)*$/) {
+			unless ($first) {
+				if ($line =~ /^\t/) { $line =~ s/\t/        /g; }
+				$line =~ /^(([ ]|\t)*)/;
+				my $indent = length($1);
+				if ($indent < $mindent) {
+					$mindent = $indent;
+				}
+			}
+			push @result, $line;
+		}
+		$first = 0;
+	}
+	@lines = @result;
+	@result = ();
+	if ($mindent == 100) { $mindent = 0; }
+	# strip the minimum indent of all lines but the first
+	$first = 1;
+	foreach my $line (@lines) {
+		unless ($first) {
+			if ($line =~ /^(([ ]|\t)+)/) {
+				my $lead = '';
+				$lead = $1 if $line =~ s/^(([ ]|\t)+)//;
+				$lead = substr($lead,$mindent);
+				$line = $lead.$line;
+			}
+		}
+		push @result, $line;
+		$first = 0;
+	}
+	@lines = @result;
+	@result = ();
+	# convert paragraphs and list items
+	my @list = ();
+	my @indents = ();
+	foreach my $line (@lines) {
+		my $lead = '';
+		$lead = $1 if $line =~ s/^(([ ]|\t)+)//;
+		if ($line =~ s/^(([0-9]+\.|-|·)([ ]|\t)+)//) {
+			my $item = $1;
+			my $type;
+			if ($item =~ /^[0-9]/) {
+				$type = 'ol';
+			} else {
+				$type = 'ul';
+			}
+			while ($#list >= 0 && $indents[-1] > length($lead)) {
+				my $ltype = pop @list;
+				push @result, '</'.$ltype.'>';
+				pop @indents;
+			}
+			if ($#list < 0 || length($lead) > $indents[-1]) {
+				# start a new list
+				push @list, $type;
+				push @indents, length($lead);
+				push @result, '<'.$type.'>';
+			}
+			push @result, '<li>'.$line.'</li>';
+		} else {
+			while (my $ltype = pop @list) {
+				push @result, '</'.$ltype.'>';
+				pop @indents;
+			}
+			push @result, '<p>'.$line.'</p>';
+		}
+	}
+	$msg = join("",@result);
+	return $msg;
+}
+
+my $desc = <<EOF;
+Provides the procedural status of the signalling link 
+	 termination point following the ProceduralStatus textual 
+	 convention of the OPENSS7-SMI-MIB module and according to ITU-T 
+	 Rec. X.721 | ISO/IEC 10165-2.
+	 
+	 - initializationRequired(0), initialization is required;
+	 
+	 - notInitialized(1), the signalling link is failed, deactivated 
+	   by MTP L3 or deactivated by OS; the procedural status 
+	   notInitialized(1) applies when the link is not aligned and 
+	   the initial alignment procedure has not been started;
+	 
+	 - initializing(2), the signalling link has failed and is being 
+	   restored, or is being activated by MTP L3; the procedural 
+	   status initializing(2) is valid during initial alignment 
+	   procedure;
+	 
+	 - reporting(3), not used;
+	 - terminating(4), not used.
+	
+	 Signalling links are created in the initialization required 
+	 state.
+EOF
+
+print $desc;
+
+my $res = reformat($desc);
+
+print $res;
