@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 13:44:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2009-06-29 07:35:36 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,22 +48,62 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:44:39 $ by $Author: brian $
+# Last Modified $Date: 2009-06-29 07:35:36 $ by $Author: brian $
 #
 # =============================================================================
 
-include ../../am/openss7.am
+include ../../../am/openss7.am
 
-SUBDIRS = cci cdi chi dlpi lli mapi mtpi mxi mgi nli npi sccpi sdli sdti sli tci tpi tri wan xcc xmap xgcp
+if DEVELOPMENT
+## DEVELOPMENT
 
-## =============================================================================
-##
-## $Log: Makefile.am,v $
-## Revision 1.1.2.2  2010-11-28 13:44:39  brian
-## - update makefiles
-##
-## Revision 1.1.2.1  2009-06-21 10:51:25  brian
-## - added files to new distro
-##
-## =============================================================================
+PAPER_PREFIX = xcode
+
+PLOT_PLOTS =
+
+FIG_FIGS = \
+	xc01.fig \
+	xc02.fig \
+	xc03.fig \
+	xc04.fig \
+	xc05.fig \
+	xc06.fig \
+	xc07.fig \
+	xc08.fig \
+	xc09.fig
+
+PLOT_DATS =
+
+LATEXS = \
+     xcode.tex
+
+## DEVELOPMENT
+endif
+
+include ../../../am/papers.am
+
+EXTRA_DIST += \
+	xcode.tex \
+	xcode.bib \
+	xc01.fig \
+	xc02.fig \
+	xc03.fig \
+	xc04.fig \
+	xc05.fig \
+	xc06.fig \
+	xc07.fig \
+	xc08.fig \
+	xc09.fig \
+	org.css
+
+# =============================================================================
+#
+# $Log: Makefile.am,v $
+# Revision 1.1.2.2  2009-06-29 07:35:36  brian
+# - improvements to build process
+#
+# Revision 1.1.2.1  2009-06-21 10:43:17  brian
+# - added files to new distro
+#
+# =============================================================================
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor

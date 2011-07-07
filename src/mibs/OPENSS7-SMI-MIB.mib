@@ -6845,6 +6845,21 @@ smiCompliance MODULE-COMPLIANCE
               "Optional items when some alarms are implemented 
                and logged."
 
+        GROUP   createDeleteNotificationsPackage
+        DESCRIPTION   
+              "Optional items when notifications of deletion are 
+               implemented and logged."
+
+        GROUP   attributeValueChangeNotificationPackage
+        DESCRIPTION   
+              "Optional items when notifications of change are 
+               implemented and logged."
+
+        GROUP   communicationsAlarmPackage
+        DESCRIPTION   
+              "Optional items when alarm notifications are 
+               implemented and logged."
+
     ::= { smiCompliances 1 }
 
 END -- end of module OPENSS7-SMI-MIB.

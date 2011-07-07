@@ -2018,7 +2018,7 @@ BEGIN {
 	    command = cat_command("/lib/modules/" kversion "/build/System.map")
 	    if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
 	    else {
-	    print_error("r: systemmap, file not found") } } }
+	    print_error("r: systemmap, file not found") } } } }
 	}
 	if (("infile" in values) && values["infile"]) {
 	    command = cat_command(values["infile"])

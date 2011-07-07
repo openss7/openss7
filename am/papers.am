@@ -54,7 +54,7 @@
 
 -include $(DEPDIR)/papers.Pd
 
-$(DEPDIR)/papers.Pd: Makefile $(LATEXES)
+$(DEPDIR)/papers.Pd: Makefile $(LATEXS)
 	$(AM_V_at)test -d $(DEPDIR) || $(MKDIR_P) $(DEPDIR)
 	$(AM_V_GEN)list="$(LATEXS)" ; for f in $$list ; do \
 		if test -r "$$f" ; then d=; else d=$(srcdir)/; fi ; \
