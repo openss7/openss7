@@ -634,7 +634,7 @@ sa_init_logging(int argc, char *argv[])
 	if (sa_logfillog) {
 		snmp_enable_filelog(sa_logfile, sa_appendlog);
 	}
-	if (sa_logstderr | sa_logstdout) {
+	if (sa_logstderr || sa_logstdout) {
 #if defined LOG_PERROR
 		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr, it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as the former is better 
 		   formated. */

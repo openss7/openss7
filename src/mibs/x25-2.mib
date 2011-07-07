@@ -80,7 +80,7 @@ IMPORTS
     RowPointer, RowStatus, TEXTUAL-CONVENTION, TimeInterval, TruthValue
         FROM SNMPv2-TC;
 
-x25PLPMIB MODULE-IDENTITY
+x25PLPMIB2 MODULE-IDENTITY
     LAST-UPDATED "200807121128Z"
     ORGANIZATION
 	"The OpenSS7 Project"
@@ -104,13 +104,13 @@ x25PLPMIB MODULE-IDENTITY
     REVISION	"200807121128Z"
     DESCRIPTION
 	"First release of this module."
-    ::= { openss7Modules 3 }
+    ::= { openss7Modules 203 }
 
 x25PLPNotifications OBJECT IDENTIFIER
-    ::= { x25PLPMIB 0 }
+    ::= { x25PLPMIB2 0 }
 
 x25PLPObjects OBJECT IDENTIFIER
-    ::= { x25PLPMIB 1 }
+    ::= { x25PLPMIB2 1 }
 
 x25PLPTables OBJECT IDENTIFIER
     ::= { x25PLPObjects 1 }
@@ -637,7 +637,7 @@ x25PLPOids OBJECT IDENTIFIER
     ::= { x25PLPObjects 4 }
 
 x25PLPConform OBJECT IDENTIFIER
-    ::= { x25PLPMIB 2 }
+    ::= { x25PLPMIB2 2 }
 
 x25PLPCompliances OBJECT IDENTIFIER
     ::= { x25PLPConform 1 }

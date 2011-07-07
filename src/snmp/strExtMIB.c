@@ -237,7 +237,9 @@ oid strExtStrlogUnsigned128_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 1, 3, 
 /*
  * Other oids defined in this MIB.
  */
-
+oid strExtNotificationGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 2, 1, 1 };
+oid strExtMandatoryGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 2, 1, 2 };
+oid strExtMIBCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 1000, 2, 2, 1 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -1734,8 +1736,8 @@ write_strExtTraceMid(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceMid: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: ranges -1..-1 0..16383 */
-		if (set_value != -1 && (0 > set_value || set_value > 16383)) {
+		/* Note: ranges -1..16383 */
+		if ((-1 > set_value || set_value > 16383)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceMid: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -1804,8 +1806,8 @@ write_strExtTraceSid(int action, u_char *var_val, u_char var_val_type, size_t va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceSid: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: ranges -1..-1 0..16383 */
-		if (set_value != -1 && (0 > set_value || set_value > 16383)) {
+		/* Note: ranges -1..16383 */
+		if ((-1 > set_value || set_value > 16383)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceSid: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -1874,8 +1876,8 @@ write_strExtTraceLevel(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLevel: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: ranges -1..-1 0..255 */
-		if (set_value != -1 && (0 > set_value || set_value > 255)) {
+		/* Note: ranges -1..255 */
+		if ((-1 > set_value || set_value > 255)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to strExtTraceLevel: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}

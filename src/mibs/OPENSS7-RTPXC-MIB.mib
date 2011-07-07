@@ -1,0 +1,1000 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-RTPXC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, OperationalState, ProceduralStatus, 
+    StandbyStatus, UsageState
+        FROM OPENSS7-SMI-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TimeInterval
+        FROM SNMPv2-TC
+    TransportAddress, TransportAddressType
+        FROM TRANSPORT-ADDRESS-MIB;
+
+rtpxcMIB MODULE-IDENTITY
+    LAST-UPDATED "201107011917Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201107011917Z"
+    DESCRIPTION 
+        "Initial version of this mib."
+    ::= { openss7Modules 503 }
+
+RtpPayloadType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Provides RTP Profile for Audio and Video Conferences 
+         with Minimum Control [RFC3551] payload types as 
+         follows:
+
+         - pcmu(0), 8000, RFC 1890, RFC 3551.
+         - fs1016(1), 8000, FS1016, RFC 1890, obsoleted by RFC 3551.
+         - g721(2), 8000, G721, RFC 1890, obsoleted by RFC 3551.
+         - gsm(3), 8000, RFC 1890, RFC 3551.
+         - g723(4), RFC 3551.
+         - dvi4k8(5), 8000, RFC 1890, RFC 3551.
+         - dvi4k16(6), 16000, RFC 1890, RFC 3551.
+         - lpc(7), 8000, RFC 1890, RFC 3551.
+         - pcma(8), 8000, RFC 1890, RFC 3551.
+         - g722(9), 8000, RFC 1890, RFC 3551.
+         - l16s(10), 44100x2, RFC 1890, RFC 3551.
+         - l16m(11), 44100x1, RFC 1890, RFC 3551.
+         - qcelp(12),  RFC 3551.
+         - cn(13), RFC 3551, RFC 3389.
+         - mpa(14), 90000, RFC 1890, RFC 3551.
+         - g728(15),  8000, RFC 1890, RFC 3551.
+         - dvi4k11(16), RFC 3551.
+         - dvi4k22(17), RFC 3551.
+         - g729(18),  RFC 3551.
+         - reserved19(19), historical draft Comfort Noise, RFC 3551.
+         - unassigned20(20), RFC 1890, RFC 3551.
+         - unassigned21(21), RFC 1890, RFC 3551.
+         - unassigned22(22), RFC 1890, RFC 3551.
+         - unassigned23(23), RFC 1890, RFC 3551.
+         - unassigned24(24), RFC 1890, RFC 3551.
+         - celb(25), 90000, RFC 1890, RFC 3551.
+         - jpeg(26), 90000, RFC 1890, RFC 3551.
+         - unassigned27(27), RFC 1890, RFC 3551.
+         - nv(28), 90000, RFC 1890, RFC 3551.
+         - unassigned29(29), RFC 1890, RFC 3551.
+         - unassigned30(30), RFC 1890, RFC 3551.
+         - h261(31), 90000, RFC 1890, RFC 3551.
+         - mpv(32), 90000, RFC 1890, RFC 3551.
+         - mp2t(33), 90000, RFC 1890, RFC 3551.
+         - h263(34), 90000, RFC 3551.
+         - reserved72(72), 
+         - reserved73(73), 
+         - reserved74(74), 
+         - reserved75(75), 
+         - reserved76(76), 
+         - dynamic(96), 
+         
+         "
+    REFERENCE
+        "STD 65, RFC 3551, RTP Profile for Audio and Video 
+             Conferences with Minimal Control."
+    SYNTAX  INTEGER { pcmu(0), reserved1(1), reserved2(2), 
+                gsm(3), g723(4), dvi4k8(5), dvi4k16(6), lpc(7), 
+                pcma(8), g722(9), l16s(10), l16m(11), qcelp(12), 
+                cn(13), mpa(14), g728(15), dvi4k11(16), 
+                dvi4k22(17), g729(18), reserved19(19), 
+                unassigned20(20), unassigned21(21), 
+                unassigned22(22), unassigned23(23), 
+                unassigned24(24), celb(25), jpeg(26), 
+                unassigned27(27), nv(28), unassigned29(29), 
+                unassigned30(30), h261(31), mpv(32), mp2t(33), 
+                h263(34), reserved72(72), reserved73(73), 
+                reserved74(74), reserved75(75), reserved76(76), 
+                dynamic(96) }
+
+RtpAudioMediaSubtype ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides the RTP audio media subtype as follows:
+
+         - amr(1), audio/AMR, 8000, RFC 4867, RFC 3267;
+         - amrWb(2), audio/AMR-WB, 16000, RFC 4867, RFC 3267;
+         - clearmode(3), audio/clearmode, 8000, RFC 4040;
+         - dat12(4), audio/DAT12, RFC 3190;
+         - dsrEs201108(5), audio/dsr-es201108, RFC 3557;
+         - evrc(6), audio/EVRC, 8000, RFC 4788;
+         - evrc1(7), audio/EVRC1, 8000, RFC 4788;
+         - evrcb(8), audio/EVRCB, 8000, RFC 4778;
+         - evrcb0(9), audio/EVRCB0, 8000, RFC 4778;
+         - evrcb1(10), audio/EVRCB1, 8000, RFC 4778;
+         - evrcwb(11), audio/EVRCWB, RFC 5188;
+         - evrcwb0(12), audio/EVRCWB0, RFC 5188;
+         - evrcwb1(13), audio/EVRCWB1, RFC 5188;
+         - g7221(14), audio/G7221, 16000, RFC 3047;
+         - g72616(15), audio/G726-16, 8000, RFC 3551, RFC 4856;
+         - g72624(16), audio/G726-24, 8000, RFC 3551, RFC 4856;
+         - g72632(17), audio/G726-32, 8000, RFC 3551, RFC 4856;
+         - g72640(18), audio/G726-40, 8000, RFC 3551, RFC 4856;
+         - g729d(19), audio/G729D, 8000, RFC 3551, RFC 4856;
+         - g729e(20), audio/G729E, 8000, RFC 3551, RFC 4856;
+         - gsmEfr(21), audio/GSM-EFR, 8000, RFC 3551, RFC 4856;
+         - l8(22), audio/L8, RFC 3551, RFC 4956;
+         - red(23), audio/RED, RFC 2198, RFC 3555;
+         - rtx(24), audio/rtx, RFC 4588;
+         - vdvi(25), audio/VDVI, RFC 3551, RFC 4856;
+         - l20(26), audio/L20, RFC 3190;
+         - l24(27), audio/L24, RFC 3190;
+         - mp4aLatm(28), audio/MP4A-LATM, RFC 3016;
+         - mpaRobust(29), audio/moa-robust, 90000, RFC 3119;
+         - parityfec(30), RFC 3009;
+         - smv(31), SMV, 8000, RFC 3558;
+         - smv0(32), audio/SMV0, 8000, RFC 3558;
+         - t140c(33), audio/t140c, RFC 4351;
+         - t38(34), audio/t38, RFC 4612;
+         - telephoneEvent(35), audio/telephone-event, RFC 4733;
+         - tone(36), audio/tone, RFC 4733;
+         - dvi4(37), audio/DVI4, RFC 4856;
+         - g722(38), audio/G722, RFC 4856;
+         - g723(39), audio/G723, RFC 4856;
+         - g728(40), audio/G728, RFC 4856;
+         - g729(41), audio/G729, RFC 4856;
+         - gsm(42), audio/GSM, RFC 4856;
+         - l16(43), audio/L16, RFC 4856;
+         - lpc(44), audio/LPC, RFC 4856;
+         - pcma(45), audio/PCMA, RFC 4856;
+         - pcmu(46), audio/PCMU, RFC 4856;
+         - parityfec(47), audio/parityfec, RFC 3009;
+         - red(48), audio/red, 1000, RFC 4103;
+         - rtx(49), audio/rtx, RFC 4588;
+         - t140(50), audio/t140, 1000, RFC 4103."
+    REFERENCE
+        "RFC 2198, RTP Payload Format for Redundant Audio Data.
+         RFC 3009, Registration of parityfec MIME types.
+         RFC 3016, RTP Payload Format for MPEG-4 Audio/Visual 
+             Streams.
+         RFC 3047, RTP Payload Format for ITU-T Recommendation 
+             G.722.1.
+         RFC 3119, A More Loss-Tolerant RTP Payload Format for 
+             MP3 Audio.
+         RFC 3190, RTP Payload Format for 12-bit DAT Audio and 
+             20- and 24-bit Linear Sampled Audio.
+         RFC 3267, Real-Time Transport Protocol (RTP) Payload 
+             Format and File Storage Format for the Adaptive 
+             Multi-Rate (AMR) and Adaptive Multi-Rate Wideband 
+             (AMR-WB) Audio Codecs.
+         STD 65, RFC 3551, RTP Profile for Audio and Video 
+             Conferences with Minimal Control.
+         RFC 3555, MIME Type Registration of RTP Payload 
+             Formats.
+         RFC 3557, RTP Payload Format for European 
+             Telecommunications Standards Institute (ETSI) 
+             European Standard ES 201 108 Distributed Speech 
+             Recognition Encoding.
+         RFC 3558, RTP Payload Format for Enhanced Variable Rate 
+             Codec (EVRC) and Selectable Mode Vocoders (SMV).
+         RFC 4040, RTP Payload Format for a 64 kbit/s 
+             Transparent Call.
+         RFC 4103, RTP Payload for Text Conversation.
+         RFC 4351, RTP Payload for Text Conversation interleaved 
+             in an audio stream.
+         RFC 4588, RTP Retransmission Payload Format.
+         RFC 4612, Real-Time Facsimile (T.38) - audio/t38 MIME 
+             Sub-type Registration.
+         RFC 4733, RTP Payload for DTMF Digits.
+         RFC 4788, Enhancements to RTP Payload Formats for EVRC 
+             Family Codecs.
+         RFC 4867, RTP Payload Format and File Storage Format 
+             for the Adaptive Multi-Rate (AMR) and Adaptive 
+             Multi-Rate Wideband (AMR-WB) Audio Codecs.
+         RFC 4856, Media Type Registration of Payload Formats in 
+             the RTP Profile for Audio and Video Conferences.
+         RFC 5188, RTP Payload Format for the Enhanced Variable 
+             Rate Wideband Codec (EVRC-WB) and the Media Subtype 
+             Updates for EVRC-B Codec."
+    SYNTAX INTEGER { amr(1), amrWb(2), clearmode(3), dat12(4), 
+             dsrEs201108(5), evrc(6), evrc1(7), evrcb(8), 
+             evrcb0(9), evrcb1(10), evrcwb(11), evrcwb0(12), 
+             evrcwb1(13), g7221(14), g72616(15), g72624(16), 
+             g72632(17), g72640(18), g729d(19), g729e(20), 
+             gsmEfr(21), l8(22), red(23), rtx(24), vdvi(25), 
+             l20(26), l24(27), mp4aLatm(28), mpaRobust(27), 
+             parityfec(28), smv(29), smv0(30), t140c(31), 
+             t38(32), telephoneEvent(33), tone(34), dvi4(35), 
+             g722(36), g723(37), g728(38), g729(39), gsm(40), 
+             l16(41), lpc(42), pcma(43), pcmu(44), 
+             parityfec(45), red(46), rtx(47), t140(48) }
+
+
+RtcpPacketType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Provides the RTCP packet types as follows:
+
+         - historicFIR(192), Historic-FIR per RFC 2032;
+         - historicNACK(193), Historic-NACK per RFC 2032;
+         - smptetc(194), SMPTE time-code mapping per RFC 5484;
+         - ij(195), Extended inter-arrival jitter report per RFC 
+           5450;
+         - sr(200), sender report per RFC 3550;
+         - rr(201), receiver report per RFC 3550;
+         - sdes(202), source description per RFC 3550;
+         - bye(203), goodbye per RFC 3550;
+         - app(204), application-defined per RFC 3550;
+         - rtpfb(205), generic RTP feedback per RFC 4585;
+         - psfb(206), payload-specific per RFC 4585;
+         - xr(207), extended report per RFC 3611;
+         - avb(208), AVB RTCP packet per IEEE 1733;
+         - rsi(209), Receiver Summary Information per RFC 5760;
+         - token(210), port mapping per RFC 6284.
+         "
+    REFERENCE
+        "RFC 2032, RTP Payload Format for H.261 Video Streams.
+         STD 64, RFC 3550, RTP: A Transport Protocol for 
+             Real-Time Applications.
+         RFC 3611, RTP Control Protocol Extended Reports (RTCP 
+             XR).
+         RFC 4585, Extended RTP Profile for RTCP-based Feedback 
+             (RTP/AVPF).
+         RFC 5450, Transmission Time offsets in RTP streams.
+         RFC 5484, Associating Time-codes with RTP streams.
+         RFC 5760, RTCP Extensions for Single-Source Multicast 
+             Sessions with Unicast Feedback.
+         RFC 6284, Port mapping between Unicast and Multicast 
+             RTP Sessions."
+    SYNTAX INTEGER { reserved(0), historicFIR(192), 
+                historicNACK(193), smptetc(194), ij(195), 
+                sr(200), rr(201), sdes(202), bye(203), app(204), 
+                rtpfb(205), psfb(206), xr(207), avb(208), 
+                rsi(209), token(210) }
+
+RtpHeaderValidityFailure ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention provides a reason for an RTP 
+         header validity check failure.  This is 
+         a single-valued, read-only attribute that can assume 
+         one of the following values:
+
+         - valid(0), the header is valid and passes all validity 
+           checks;
+
+         - incorrectVersion(1), the version bits do not equal 2;
+
+         - incorrectPayload(2), the RTP Payload Type is not one 
+           of the defined static types and is not a dynamic type 
+           (96-127); or the RTCP packet type is not SR or RR;
+
+         - incorrectPbit(3), the P bit is set, but the last 
+           octet of the packet is not a valid octet, in 
+           particular, less than the total packet length minus 
+           the header size;
+
+         - incorrectXbit(4), the X bit is set, but the profile 
+           does not specify that the header extension mechanism 
+           may be used;
+
+         - incorrectLength(5), the length of the packet is not 
+           consistent with the CC and payload type.
+         "
+    REFERENCE 
+        "RFC 3550, Appendix A.1"
+    SYNTAX  INTEGER { valid(0), incorrectVersion(1), 
+                incorrectPayload(2), incorrectPbit(3), 
+                incorrectXbit(4), incorrectLength(5) }
+
+RtpLossRate ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "2.56ths of a percent"
+    STATUS      current
+    DESCRIPTION
+        "The fraction of RTP data packets from the source lost 
+         since the begginning of reception, expressed as a fixed 
+         point number with the binary point at the left edge of 
+         the field.  This value is calculated by dividnig the 
+         total number of packets lost (after the effects of 
+         applying any error protection such as FEC) by the total 
+         number of packets expected, multiplying the result of 
+         the division by 256, limiting the maximum value to 255 
+         (to avoid overflow), and taking the integer part.  The 
+         numbers of duplicated packets and discarded packets do 
+         not enter into this calculation.  Since receivers 
+         cannot be required to maintain unlimited buffers, 
+         a receiver MAY categorize late-arriving packets as 
+         lost.  The degree of lateness that triggers a loss 
+         SHOULD be significantly greater than that which 
+         tirggers a discard."
+    REFERENCE
+        "RFC 3611, Section 4.7.1"
+    SYNTAX      Integer32 (0..255)
+
+RtpDiscardRate ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "2.56ths of a percent"
+    STATUS          current
+    DESCRIPTION
+        "The fraction of RTP data packages from the source that 
+         have been discarded since the beginning of reception, 
+         due to late or early arrival, under-run or overflow at 
+         the receiving jitter buffer.   This value is expressed 
+         as a fixed point number with the binary point at the 
+         left edge of the field.  It is calculated by dividing 
+         the total number of packets discarded (excluding 
+         duplicate packet discards) by the total number of 
+         packets expected, multiplying the result of the 
+         division by 256, limiting the maximum value to 255 (to 
+         avoid overflow), and taking the integral part."
+    REFERENCE
+        "RFC 3611, Section 4.7.1"
+    SYNTAX      Integer32 (0..255)
+
+RtpBurstDensity ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "2.56ths of a percent"
+    STATUS          current
+    DESCRIPTION
+        "The fraction of RTP data packets within burst periods 
+         since the begignning of reception that were either lost 
+         or discarded.  This value is expressed as a fixed point 
+         number with the binary point at the left edge of the 
+         field.  It is calculated by dividing the total number 
+         of packets lost or discarded (excluding duplicate 
+         packet discards) within burst periods by the total 
+         number of packets expected within the burst periods, 
+         multiplying the result oft he division by 256, limiting 
+         the maximum value to 255 (to avoid overflow), and 
+         taking the integral part.  This field MUST be populated 
+         and MUST be set to zero if no packets have been 
+         received."
+    REFERENCE
+        "RFC 3611, Section 4.7.2"
+    SYNTAX      Integer32 (0..255)
+
+RtpGapDensity ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "2.56ths of a percent"
+    STATUS          current
+    DESCRIPTION
+        "The fraction of RTP data packets within inter-burst 
+         gaps since the beginning of reception that were either 
+         lost or discarded.  The valud is expressed as a fixed 
+         point number with the binary point at the left edge of 
+         the field.  It is calculated by dividing the total 
+         number of packets expected within the gap periods, 
+         multiplying the result by 256, limiting the maximum 
+         value to 255 (to avoid overflow), and taking the 
+         integer part.  This field MUST be populated and MUST be 
+         set to zero if no packets have been received."
+    REFERENCE
+        "RFC 3611, Section 4.7.2"
+    SYNTAX      Integer32 (0..255)
+
+
+RtpBurstDuration ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "milliseconds"
+    STATUS          current
+    DESCRIPTION
+        "The mean duration, expressed in milliseconds, of the 
+         burst periods that have occurred since the beginning of 
+         reception.  The duration of each period is caluclated 
+         based upon the packets that makr the beginning and end 
+         of that period.  It is equal to the timestamp of the 
+         end packet, plush the druation of the end packet, 
+         minust the timestamp of the beginning packet.  if the 
+         actual values are not available, estimate values MUST 
+         be used.  If there have been no burst periods, thie 
+         burst duration value MUST be zero."
+    REFERENCE
+        "RFC 3611, Section 4.7.2"
+    SYNTAX      Integer32 (0..65535)
+
+RtpGapDuration ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "milliseconds"
+    STATUS          current
+    DESCRIPTION
+        "The mean duration, expressed in milliseconds, of the 
+         gap periods that have occurred since the beginning of 
+         reception.  The duration of each period is calculated 
+         based upon the packet that marks the end of the prior 
+         burst and the packet that marks the beginning of the 
+         subsequent burst.  It is equal to the timestamp of the 
+         subsequent burst packet, minus the timestamp of the 
+         prior burst packet, plus the duration of the prior 
+         burst packet.  If the actual values are not available, 
+         estimated values MUST be used.  In the case of a gap 
+         that occurs at the beginning of reception, the sum of 
+         the timestamp of the prior burst packet and the 
+         duration of the prior burst packet are replaced by the 
+         reception start time.  In the case of a gap that occurs 
+         at the end of reception, the timestamp of the 
+         subsequent burst packet is replaced by the reception 
+         end time.  If there have been no gap periods, the gap 
+         duration value MUST be zero."
+    REFERENCE
+        "RFC 3611, Section 4.7.2"
+    SYNTAX      Integer32 (0..65535)
+
+RtpRoundTripDelay ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "milliseconds"
+    DESCRIPTION
+        "The most recently calculated round trip time between 
+         RTP interfaces, expressed in milliseconds.  This value 
+         MAY be measured using RTCP, the DLRR method defined in 
+         Section 4.5 of this document, where it is necessary to 
+         convert the units of measurement from NTP timestamp 
+         values to milliseconds, or other approaches.  If RTCP 
+         is used, then the reported delay value is the time of 
+         receipt of the most recent RTCP packet from source 
+         SSRC, minus the LSR (last SR) time reported in its SR 
+         (Sender Report), minus the DLSR (delay since last SR) 
+         reported in its SR.  A non-zero LSR value is required 
+         in order to calculate round trip delay.  A value of 
+         0 is permissible; however, this field MUST be populated 
+         as soon as a delay estimate is available."
+    REFERENCE
+        "RFC 3611, Section 4.7.3"
+    SYNTAX      Integer32 (0..65535)
+
+
+RtpEndSystemDelay ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "milliseconds"
+    DESCRIPTION
+        "The most recently estimated end system delay, expressed 
+         in milliseconds.  End system delay is defined as the 
+         sum of the total sample accumulation and encoding delay 
+         associated with the sending direction and the jitter 
+         buffer, decoding, and playout buffer delay associated 
+         with the receiving direction.  This delay MAY be 
+         estimated or measured.  This value SHOULD be provided 
+         in all VoIP metrics reports.  If an implementation is 
+         unable to provide the data, the value 0 MUST be used."
+    REFERENCE
+        "RFC 3611, Section 4.7.3"
+    SYNTAX      Integer32 (0..65535)
+
+
+RtpSignalLevel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    DESCRIPTION
+        "The voice signal relative level is defined as the ratio 
+         of the signal level to a 0 dBm0 reference [10], 
+         expressed in decibels as a signed integer in two's 
+         complement form.  This is measured only for packets 
+         containing speech energy.  The intent of this metric is 
+         not to provide a precise measurement of the signal 
+         level but to provide a real time indication that the 
+         signal level may be excessively high or low.
+         
+         signal level = 10 Log10 ( rms talkspurt power (mW) )
+         
+         A value of 127 indicates that this parameter is 
+         unavailable.  Typical values should generally be in the 
+         -15 to -20 dBm range.
+         
+         An object of type RtpSignalLevel can be used with an 
+         object of type RtpNoiseLevel to determine the signal to 
+         noise ratio."
+    REFERENCE
+        "RFC 3611, Section 4.7.4"
+    SYNTAX      Integer32 (0..255)
+
+RtpNoiseLevel ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    DESCRIPTION
+        "The noise level is defined as the ratio of the silent 
+         period background noise level to a 0 dBm0 reference, 
+         expressed in decibels as a signed integer in two's 
+         complement form.
+         
+         noise level = 10 Log10 ( rms silence power (mW) )
+         
+         A value of 127 indicates that this parameter is 
+         unavailable.
+         
+         An object of type RtpSignalLevel can be used with an 
+         object of type RtpNoiseLevel to determine the signal to 
+         noise ratio."
+    REFERENCE
+        "RFC 3611, Section 4.7.4"
+    SYNTAX      Integer32 (0..255)
+
+RtpRedidualEchoReturnLoss ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    DESCRIPTION
+        "The residual echo return loss value may be measured 
+         directly by the VoIP end system's echo canceller or may 
+         be estimated by adding the echo return loss (ERL) and 
+         echo return loss enhancement (ERLE) values reported by 
+         the echo canceller.
+         
+         RERL(dB) = ERL (dB) + ERLE (dB)
+         
+         In the case of a VoIP gateway, the source of echo is 
+         typically line echo that occurs at 2-4 wire conversion 
+         points in the network.  This can be in the 8-12 dB 
+         range.  A line echo canceler can provide an ERLE of 30 
+         dB or more and hence reduce this to 40-50 dB.  In the 
+         case of an IP phone, this could be acoustic coupling 
+         between handset speaker and microphone or residual 
+         acoustic echo from speakerphone operation, and may more 
+         correctly be termed terminal coupling loss (TCL).  
+         A typical handset would result in 40-50 dB of echo loss 
+         due to acoustic feedback.
+         
+         Examples:
+         
+         -  IP gateway connected to circuit switched network 
+            with 2 wire loop.  Without echo cancellation, 
+            typical 2-4 wire converter ERL of 12 dB.  RERL = ERL 
+            + ERLE = 12 + 0 = 12 dB.
+         
+         -  IP gateway connected to circuit switched network 
+            with 2 wire loop.  With echo canceler that improves 
+            echo by 30 dB.  RERL = ERL + ERLE = 12 + 30 = 42 dB.
+         
+         -  IP phone with conventional handset.  Acoustic 
+            coupling from handset speaker to microphone 
+            (terminal coupling loss) is typically 40 dB.  RERL 
+            = TCL = 40 dB.
+         
+         If we denote the local end of the VoIP path as A and 
+         the remote end as B, and if the sender loudness rating 
+         (SLR) and receiver loudness rating (RLR) are known for 
+         A (default values 8 dB and 2 dB respectively), then the 
+         echo loudness level at end A (talker echo loudness 
+         rating or TELR) is given by:
+         
+         TELR(A) = SRL(A) + ERL(B) + ERLE(B) + RLR(A)
+         
+         TELR(B) = SRL(B) + ERL(A) + ERLE(A) + RLR(B)
+         
+         Hence, in order to incorporate echo into a voice 
+         quality estimate at the A end of a VoIP connection, it 
+         is desirable to send the ERL + ERLE value from B to 
+         A using a format such as RTCP XR.
+         
+         Echo related information may not be available in all 
+         VoIP end systems.  As echo does have a significant 
+         effect on conversational quality, it is recommended 
+         that estimated values for echo return loss and terminal 
+         coupling loss be provided (if sensible estimates can be 
+         reasonably determined).
+         
+         Typical values for end systems are given below to 
+         provide guidance:
+         
+         -  IP Phone with handset: typically 45 dB.
+         
+         -  PC softphone or speakerphone: extremely variable, 
+            consider reporting "undefined" (127).
+         
+         -  IP gateway with line echo canceller: typically has 
+            ERL and ERLE available.
+         
+         -  IP gateway without line echo canceller: frequently 
+            a source of echo related problems, consider 
+            reporting either a low value (12 dB) or 'undefined' 
+            (127)."
+    REFERENCE
+        "RFC 3611, Section 4.7.4"
+    SYNTAX      Integer32 (0..255)
+
+RtpRFactor ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "percent"
+    STATUS          current
+    DESCRIPTION
+        "The R factor is a voice quality metric describing the 
+         segment of the call that is carried over this RTP 
+         session.  It is expressed as an integer in the range 
+         0 to 100, with a value of 94 corresponding to 'toll 
+         quality' and values of 50 or less regarded as unusable.  
+         This metric is defined as including the effects of 
+         delay, consistent with ITU-T G.107 [6] and ETSI TS 101 
+         329-5 [3].
+         
+         R = Ro - Is - Id - Ie-eff + A
+         
+         Ro represents in principle the basic signal-to-noise 
+         ratio, including noise sources such as circuit noise 
+         and room noise.  The factor Is is a combination of all 
+         impairments which occur more or less simultaneously 
+         with the voice signal.  Factor Id represents the 
+         impairments caused by delay and the effective equipment 
+         impairment factor Ie-eff represents impairments cause 
+         by low bit-rate codecs.  It also include impairment due 
+         to randomly distributed pack losses.  The advantage 
+         factor A allows for compensation of impairment factors 
+         when there are other advantages of access to the user.  
+         The term Ro and the Is and Id values are subdivided 
+         into further specific impairment values.
+         
+         A value of 127 indicates that this parameter is 
+         unavailable.  Values other than 127 and the valid range 
+         defined above MUST not be sent and MUST be ignored by 
+         the receiving system."
+    REFERENCE
+        "RFC 3611, Section 4.7.5.
+         ITU-T Recommendation G.107.
+         ETSI TS 101 329-5."
+    SYNTAX      Integer32 (0..100 | 127)
+
+RtpExternalRFactor ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    UNITS           "percent"
+    STATUS          current
+    DESCRIPTION
+        "The external R factor is a voice quality metric 
+         describing the segment of the call that is carried over 
+         a network segment external to the RTP segment, for 
+         example a cellular network.  Its values are interpreted 
+         in the same manner as for the RTP R factor.  This 
+         metric is defined as including the effects of delay, 
+         consistent with ITU-T G.107 [6] and ETSI TS 101 329-5 
+         [3], and relates to the outward voice path from the 
+         Voice over IP termination for which this metrics block 
+         applies.
+         
+         R = Ro - Is - Id - Ie-eff + A
+         
+         Ro represents in principle the basic signal-to-noise 
+         ratio, including noise sources such as circuit noise 
+         and room noise.  The factor Is is a combination of all 
+         impairments which occur more or less simultaneously 
+         with the voice signal.  Factor Id represents the 
+         impairments caused by delay and the effective equipment 
+         impairment factor Ie-eff represents impairments cause 
+         by low bit-rate codecs.  It also include impairment due 
+         to randomly distributed pack losses.  The advantage 
+         factor A allows for compensation of impairment factors 
+         when there are other advantages of access to the user.  
+         The term Ro and the Is and Id values are subdivided 
+         into further specific impairment values.
+         
+         A value of 127 indicates that this parameter is 
+         unavailable.  Values other than 127 and the valid range 
+         defined above MUST not be sent and MUST be ignored by 
+         the receiving system."
+    REFERENCE
+        "RFC 3611, Section 4.7.5.
+         ITU-T Recommendation G.107.
+         ETSI TS 101 329-5."
+    SYNTAX      Integer32 (0..100 | 127)
+
+RtpMosLq ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    STATUS      current
+    DESCRIPTION
+        "The estimated mean opinion score for listening quality 
+         (MOS-LQ) is a voice quality metric on a scale from 1 to 
+         5, in which 5 represents excellent and 1 represents 
+         unacceptable.  This metric is defined as not including 
+         the effects of delay and can be compared to MOS scores 
+         obtained from listening quality (ACR) tests.  It is 
+         expressed as an integer in the range 10 to 50, 
+         corresponding to MOS x 10.  For example, a value of 35 
+         would correspond to an estimated MOS score of 3.5.
+         
+         A value of 127 indicates that this parameter is 
+         unavailable.  Values other than 127 and the valid range 
+         defined above MUST not be sent and MUST be ignored by 
+         the receiving system."
+    REFERENCE
+        "RFC 3611, Section 4.7.5.
+         ETS TS 101 329-5.
+         ITU-T Recommendation G.107."
+    SYNTAX      Integer32 (1..5 | 127)
+
+RtpMosCq ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    STATUS      current
+    DESCRIPTION
+        "The estimated mean opinion score for conversational 
+         quality (MOS-CQ) is defined as including the effects of 
+         delay and other effects that would affect 
+         conversational quality.  The metric may be calculated 
+         by converting an R factor determined according to ITU-T 
+         G.107 [6] or ETSI TS 101 329-5 [3] into an estimated 
+         MOS using the equation specified in G.107.  It is 
+         expressed as an integer in the range 10 to 50, 
+         corresponding to MOS x 10, as for MOS-LQ.
+         
+         A value of 127 indicates that this parameter is 
+         unavailable.  Values other than 127 and the valid range 
+         defined above MUST not be sent and MUST be ignored by 
+         the receiving system."
+    REFERENCE
+        "RFC 3611, Section 4.7.5.
+         ITU-T Recommendation G.107.
+         ETSI TS 101 329-5."
+    SYNTAX      Integer32 (10..50 | 127)
+
+RtpGmin ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT    "1d"
+    STATUS      current
+    DESCRIPTION
+        "The gap threshold.  This field contains the value used 
+         for this report block to determine if a gap exists.  
+         The recommended value of 16 corresponds to a burst 
+         period having a minimum density of 6.25% of lost or 
+         discarded packets, which may cause noticeable 
+         degradation in call quality; during gap periods, if 
+         packet loss or discard occurs, each lost or discarded 
+         packet would be preceded by and followed by a sequence 
+         of at least 16 received non-discarded packets.  Note 
+         that lost or discarded packets that occur within Gmin 
+         packets of a report being generated may be reclassified 
+         as part of a burst or gap in later reports.  ETSI TS 
+         101 329-5 [3] defines a computationally efficient 
+         algorithm for measuring burst and gap density using 
+         a packet loss/discard event driven approach.  This 
+         algorithm is reproduced in Appendix A.2 of the present 
+         document.  Gmin MUST not be zero, MUST be provided, and 
+         MUST remain constant across VoIP Metrics report blocks 
+         for the duration of the RTP session."
+    REFERENCE
+        "RFC 3611, Section 4.7.6.
+         ITU-T Recommendation G.107.
+         ETSI TS 101 329-5."
+    SYNTAX      Integer32 (0..255)
+
+RtpPacketLossConcealment ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the attributes of the packet loss concealment 
+         algorithm being used.  This object is single-valued and 
+         read-only and can assume one of the following values:
+         
+         - standard(3), a simple replay or interpolation 
+           algorithm is being used to fill-in the missing 
+           packet; this approach is typically able to conceal 
+           isolated lost packets at low packet loss rates;
+         
+         - enhanced(2), an enhanced interpolation algorithm is 
+           being used; algorithms of this type are able to 
+           conceal high packet loss rates effectively;
+         
+         - disabled(1), silence is being inserted in place of 
+           lost packets;
+         
+         - unspecified(0), no information is available 
+           concerning the use of PLC; however, for some codecs 
+           this may be inferred."
+    REFERENCE
+        "RFC 3611, Section 4.7.6."
+    SYNTAX      INTEGER { unspecified(0), disabled(1), enhanced(2), standard(3) }
+
+RtpJitterBufferAdaptive ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Adaptive (11) / non-adaptive (10) / reserved (01)/ 
+         unknown (00).  When the jitter buffer is adaptive, then 
+         its size is being dynamically adjusted to deal with 
+         varying levels of jitter.  When non-adaptive, the 
+         jitter buffer size is maintained at a fixed level.  
+         When either adaptive or non- adaptive modes are 
+         specified, then the jitter buffer size parameters below 
+         MUST be specified."
+    REFERENCE
+        "RFC 3611, Section 4.7.6."
+    SYNTAX      INTEGER { unknown(0), reserved(1), nonAdaptive(2), Adaptive(3) }
+
+RtpJitterBufferRate ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "J = adjustment rate (0-15).  This represents the 
+         implementation specific adjustment rate of a jitter 
+         buffer in adaptive mode.  This parameter is defined in 
+         terms of the approximate time taken to fully adjust to 
+         a step change in peak to peak jitter from 30 ms to 100 
+         ms such that:
+         
+         adjustment time = 2 * J * frame size (ms)
+         
+         This parameter is intended only to provide a guide to 
+         the degree of 'aggressiveness' of an adaptive jitter 
+         buffer and may be estimated.  A value of 0 indicates 
+         that the adjustment time is unknown for this 
+         implementation."
+    REFERENCE
+        "RFC 3611, Section 4.7.6."
+    SYNTAX      Integer32 (0..15)
+
+RtpJitterBufferNominalDelay ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DISPLAY-HINT    "1d"
+    UNITS           "milliseconds"
+    DESCRIPTION
+        "This is the current nominal jitter buffer delay in 
+         milliseconds, which corresponds to the nominal jitter 
+         buffer delay for packets that arrive exactly on time.  
+         This parameter MUST be provided for both fixed and 
+         adaptive jitter buffer implementations."
+    REFERENCE
+        "RFC 3611, Section 4.7.7."
+    SYNTAX      Integer32 (0..65535)
+
+RtpJitterBufferMaximumDelay ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DISPLAY-HINT    "1d"
+    UNITS           "milliseconds"
+    DESCRIPTION
+        "This is the current maximum jitter buffer delay in 
+         milliseconds which corresponds to the earliest arriving 
+         packet that would not be discarded.  In simple queue 
+         implementations this may correspond to the nominal 
+         size.  In adaptive jitter buffer implementations, this 
+         value may dynamically vary up to JB abs max (see 
+         below).  This parameter MUST be provided for both fixed 
+         and adaptive jitter buffer implementations."
+    REFERENCE
+        "RFC 3611, Section 4.7.7."
+    SYNTAX      Integer32 (0..65535)
+
+RtpJitterBufferAbsoluteMaximumDelay ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DISPLAY-HINT    "1d"
+    UNITS           "milliseconds"
+    DESCRIPTION
+        "This is the absolute maximum delay in milliseconds that 
+         the adaptive jitter buffer can reach under worst case 
+         conditions.  If this value exceeds 65535 milliseconds, 
+         then this field SHALL convey the value 65535.  This 
+         parameter MUST be provided for adaptive jitter buffer 
+         implementations and its value MUST be set to JB maximum 
+         for fixed jitter buffer implementations."
+    REFERENCE
+        "RFC 3611, Section 4.7.7."
+    SYNTAX      Integer32 (0..65535)
+
+
+RtpDiscardRate ::= TEXTUAL-CONVENTION
+
+rtpxcNotifications OBJECT IDENTIFIER
+    ::= { rtpxcMIB 0 }
+
+rtpxcNotifs OBJECT IDENTIFIER
+    ::= { rtpxcMIB 1 }
+
+rtpxcScalars OBJECT IDENTIFIER
+    ::= { rtpxcMIB 2 }
+
+rtpxcTables OBJECT IDENTIFIER
+    ::= { rtpxcMIB 3 }
+
+rtpxcGroup OBJECT IDENTIFIER
+    ::= { rtpxcTables 1 }
+
+rtpxcInterface OBJECT IDENTIFIER
+    ::= { rtpxcTables 2 }
+
+rtpxcIfAddr OBJECT IDENTIFIER
+    ::= { rtpxcTables 3 }
+
+rtpxcTermPoint OBJECT IDENTIFIER
+    ::= { rtpxcTables 4 }
+
+rtpxcXcode OBJECT IDENTIFIER
+    ::= { rtpxcTables 5 }
+
+rtpxcCall OBJECT IDENTIFIER
+    ::= { rtpxcTables 6 }
+
+rtpxcOids OBJECT IDENTIFIER
+    ::= { rtpxcMIB 4 }
+
+rtpxcGroups OBJECT IDENTIFIER
+    ::= { rtpxcMIB 5 }
+
+rtpxcCompliances OBJECT IDENTIFIER
+    ::= { rtpxcMIB 6 }
+
+
+END -- end of module OPENSS7-RTPXC-MIB.

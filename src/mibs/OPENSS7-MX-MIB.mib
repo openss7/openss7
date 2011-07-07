@@ -122,7 +122,34 @@ mxMIB MODULE-IDENTITY
     DESCRIPTION
         "MIB Module for the MX multiplexing driver.  In the 
          OpenSS7 system the MX multiplexing driver is a TDM 
-         switching module."
+         switching module.
+
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+
+         All Rights Reserved.
+
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
     REVISION    "200901191603Z"
     DESCRIPTION
         "Rationalized OPENSS7-X400P-MIB abd OPENSS7-X400-MX-MIB.  
@@ -1015,7 +1042,7 @@ mxCardAlarmStatus OBJECT-TYPE
     REFERENCE
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          alarmStatus."
-    DEFVAL      { '00000'B }
+    DEFVAL	{ { } } -- '00000'B
     ::= { mxCardEntry 18 }
 
 mxCardProceduralStatus OBJECT-TYPE
@@ -1070,7 +1097,7 @@ mxCardProceduralStatus OBJECT-TYPE
     REFERENCE
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          proceduralStatus."
-    DEFVAL      { '00000'B }
+    DEFVAL      { { } } -- '00000'B
     ::= { mxCardEntry 19 }
 
 mxCardAvailabilityStatus OBJECT-TYPE
@@ -1145,7 +1172,7 @@ mxCardAvailabilityStatus OBJECT-TYPE
     REFERENCE
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          availabilityStatus."
-    DEFVAL      { '000000000'B }
+    DEFVAL      { { } } -- '000000000'B
     ::= { mxCardEntry 20 }
 
 mxCardControlStatus OBJECT-TYPE
@@ -1180,7 +1207,7 @@ mxCardControlStatus OBJECT-TYPE
     REFERENCE
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          controlStatus."
-    DEFVAL      { '0000'B }
+    DEFVAL      { { } } -- '0000'B
     ::= { mxCardEntry 21 }
 
 mxCardUnknownStatus OBJECT-TYPE
@@ -1456,7 +1483,7 @@ mxSpanName OBJECT-TYPE
          station creation requests with names that have already 
          been assigned to an existing row will be refused as 
          having an inconsistent value."
-    DEFVAL      { '' }
+    DEFVAL      { ''H }
     ::= { mxSpanEntry 2 }
 
 mxSpanDevice OBJECT-TYPE
@@ -1597,7 +1624,7 @@ mxSpanMode OBJECT-TYPE
 
          To request or remote a loopback at the far end, use the 
          mxSpanLineCode object."
-    DEFVAL      { '0000'B }
+    DEFVAL      { { } } -- '0000'B
     ::= { mxSpanEntry 8 }
 
 mxSpanCrc OBJECT-TYPE
@@ -2237,7 +2264,7 @@ mxSpanAlarmStatus OBJECT-TYPE
     REFERENCE
         "OPENSS7-SMI-MIB, ITU-T Rec. X.721 | ISO/IEC 10165-2, 
          alarmStatus."
-    DEFVAL      { '00000'B }
+    DEFVAL      { { } } -- '00000'B
     ::= { mxSpanEntry 31 }
 
 mxSpanProceduralStatus OBJECT-TYPE
@@ -2568,7 +2595,7 @@ mxSpanLineStatus OBJECT-TYPE
          - rcvPayloadAIS(15), receiving a payload AIS;
 
          - perfThreshold(16), performance threshold exceeded."
-    DEFVAL      { '00000000000000000'B }
+    DEFVAL      { { } } -- '00000000000000000'B
     ::= { mxSpanEntry 39 }
 
 mxSpanAlarms OBJECT-TYPE
@@ -2597,7 +2624,7 @@ mxSpanAlarms OBJECT-TYPE
            sending of yellow alarm (T1/J1) or RAI condition 
            (E1), present after the red or blue/AIS alarms clear 
            while waiting for the alarm recovery period."
-    DEFVAL      { '0000'B }
+    DEFVAL      { { } } -- '0000'B
     ::= { mxSpanEntry 40 }
 
 mxSpanEvents OBJECT-TYPE
@@ -2667,7 +2694,7 @@ mxSpanEvents OBJECT-TYPE
          operation.  Not all devices will report all conditions.  
          Some conditions may also cause alarm conditions and 
          notifications."
-    DEFVAL      { '0000000000000'B }
+    DEFVAL      { { } } -- '0000000000000'B
     ::= { mxSpanEntry 41 }
 
 mxSpanReceiveLevel OBJECT-TYPE
@@ -2858,7 +2885,7 @@ mxBertPattern OBJECT-TYPE
          Note that this value is of no significance when the 
          BERT pattern selected is other than repeating(7) or 
          alternating(8)."
-    DEFVAL      { '10FFFFFFFF'X }
+    DEFVAL      { '10FFFFFFFF'H }
     ::= { mxBertEntry 3 }
 
 mxBertOperationalState OBJECT-TYPE

@@ -398,6 +398,53 @@ oid corruptDataGnm_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 4, 153 };
 oid outOfCPUCycles_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 4, 154 };
 oid sfwrEnvironmentProblem_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 4, 155 };
 oid sfwrDownloadFailure_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 4, 156 };
+oid opticalSTM1SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 1 };
+oid opticalSTM4SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 2 };
+oid opticalSTM16SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 3 };
+oid electricalSTM1SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 4 };
+oid rsSTM1SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 5 };
+oid rsSTM4SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 6 };
+oid rsSTM16SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 7 };
+oid msSTM1SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 8 };
+oid msSTM4SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 9 };
+oid msSTM16SPICI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 10 };
+oid au3TU3VC3CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 11 };
+oid au4VC4CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 12 };
+oid tu11VC11CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 13 };
+oid tu12VC12CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 14 };
+oid tu2CV2CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 15 };
+oid tu12VC11CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 16 };
+oid vpCI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 17 };
+oid vcCI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 18 };
+oid e0CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 19 };
+oid e1CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 20 };
+oid e2CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 21 };
+oid e3CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 22 };
+oid e4CI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 23 };
+oid e5_565M_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 24 };
+oid sts3c_and_VC4_1c_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 25 };
+oid sts12c_and_VC4_4c_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 26 };
+oid sts48c_and_VC4_16c_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 27 };
+oid sts192c_and_VC4_64c_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 28 };
+oid section_OC1_STS1_and_RS_STM0_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 29 };
+oid section_OC192_STS192_and_RS_STM64_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 30 };
+oid line_OC1_STS1_and_MS_STM0_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 31 };
+oid line_OC192_STS192_and_MS_STM64_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 32 };
+oid fc_12_133M_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 33 };
+oid fc_25_266M_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 34 };
+oid fc_50_531M_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 35 };
+oid fc_100_1063M_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 36 };
+oid fddi_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 37 };
+oid fast_Ethernet_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 38 };
+oid gigabit_Ethernet_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 39 };
+oid isdn_BRI_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 40 };
+oid dsr_OC192_and_STM64_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 41 };
+oid dsr_OC768_and_STM256_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 42 };
+oid section_OC24_STS24_and_RS_STM8_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 43 };
+oid line_OC24_STS24_and_MS_STM8_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 44 };
+oid section_OC768_STS768_and_RS_STM256_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 45 };
+oid line_OC768_STS768_and_MS_STM256_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 46 };
+oid tenGigabit_Ethernet_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 4, 5, 47 };
 oid smiMandatoryParametersGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 5, 1 };
 oid smiConditionalParametersGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 5, 2 };
 oid smiOptionalParametersGroup_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 2, 5, 3 };
@@ -1426,24 +1473,24 @@ logTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->logDiscriminatorConstruct = (uint8_t *) strdup("")) != NULL)
 			StorageNew->logDiscriminatorConstructLen = strlen("");
-		StorageNew->logAdministrativeState = 1;
+		StorageNew->logAdministrativeState = LOGADMINISTRATIVESTATE_UNLOCKED;
 		StorageNew->logOperationalState = 0;
 		if (memdup((u_char **) &StorageNew->logAvailabilityStatus, (u_char *) "\x00\x00", 2) == SNMPERR_SUCCESS)
 			StorageNew->logAvailabilityStatusLen = 2;
-		StorageNew->logFullAction = 0;
+		StorageNew->logFullAction = LOGFULLACTION_WRAP;
 		StorageNew->maxLogSize = 0;
 		StorageNew->currentLogSize = 0;
 		StorageNew->numberOfRecords = 0;
-		/* StorageNew->capacityAlarmThreshold = (uint8_t *) strdup(\"\x64\"); *//* DEFVAL \"\x64\" */
-		/* StorageNew->capacityAlarmThresholdLen = strlen(\"\x64\"); *//* DEFVAL \"\x64\" */
+		if ((StorageNew->capacityAlarmThreshold = (uint8_t *) strdup("\x64")) != NULL)
+			StorageNew->capacityAlarmThresholdLen = strlen("\x64");
 		StorageNew->logStartTime = 0;
 		StorageNew->logStopTime = 6983120;
-		/* StorageNew->logIntervalsOfDay = (uint8_t *) strdup(\"\x00\x00\x17\x3B\"); *//* DEFVAL \"\x00\x00\x17\x3B\" */
-		/* StorageNew->logIntervalsOfDayLen = strlen(\"\x00\x00\x17\x3B\"); *//* DEFVAL \"\x00\x00\x17\x3B\" */
-		/* StorageNew->logWeekMask = (uint8_t *) strdup(\"\x7F\x01\x00\x00\x17\x3B\"); *//* DEFVAL \"\x7F\x01\x00\x00\x17\x3B\" */
-		/* StorageNew->logWeekMaskLen = strlen(\"\x7F\x01\x00\x00\x17\x3B\"); *//* DEFVAL \"\x7F\x01\x00\x00\x17\x3B\" */
-		/* StorageNew->logSchedulerName = NULL; *//* DEFVAL zeroDotZero */
-		/* StorageNew->logSchedulerName = 0; *//* DEFVAL zeroDotZero */
+		if (memdup((u_char **) &StorageNew->logIntervalsOfDay, (u_char *) "\x00\x00\x17\x3B", 4) == SNMPERR_SUCCESS)
+			StorageNew->logIntervalsOfDayLen = 4;
+		if (memdup((u_char **) &StorageNew->logWeekMask, (u_char *) "\x7F\x01\x00\x00\x17\x3B", 6) == SNMPERR_SUCCESS)
+			StorageNew->logWeekMaskLen = 6;
+		if ((StorageNew->logSchedulerName = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->logSchedulerNameLen = 2;
 		StorageNew->logEntryStatus = 0;
 		StorageNew->logEntryStatus = RS_NOTREADY;
 	}
@@ -2209,20 +2256,20 @@ alarmRecordTable_create(void)
 		if ((StorageNew->alarmRecordProbableCause = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->alarmRecordProbableCauseLen = 2;
 		StorageNew->alarmRecordPerceivedSeverity = 0;
-		/* StorageNew->alarmRecordSpecificProblems = NULL; *//* DEFVAL zeroDotZero */
-		/* StorageNew->alarmRecordSpecificProblems = 0; *//* DEFVAL zeroDotZero */
-		StorageNew->alarmRecordBackedUpStatus = 0;
-		/* StorageNew->alarmRecordBackUpObject = NULL; *//* DEFVAL zeroDotZero */
-		/* StorageNew->alarmRecordBackUpObject = 0; *//* DEFVAL zeroDotZero */
-		StorageNew->alarmRecordTrendIndication = 0;
+		if ((StorageNew->alarmRecordSpecificProblems = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->alarmRecordSpecificProblemsLen = 2;
+		StorageNew->alarmRecordBackedUpStatus = ALARMRECORDBACKEDUPSTATUS_NONE;
+		if ((StorageNew->alarmRecordBackUpObject = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->alarmRecordBackUpObjectLen = 2;
+		StorageNew->alarmRecordTrendIndication = ALARMRECORDTRENDINDICATION_NOCHANGE;
 		if ((StorageNew->alarmRecordThresholdInfo = (uint8_t *) strdup("")) != NULL)
 			StorageNew->alarmRecordThresholdInfoLen = strlen("");
 		if ((StorageNew->alarmRecordStateChangeDefinition = (uint8_t *) strdup("")) != NULL)
 			StorageNew->alarmRecordStateChangeDefinitionLen = strlen("");
 		if ((StorageNew->alarmRecordMonitoredAttributes = (uint8_t *) strdup("")) != NULL)
 			StorageNew->alarmRecordMonitoredAttributesLen = strlen("");
-		/* StorageNew->alarmRecordProposedRepairActions = NULL; *//* DEFVAL zeroDotZero */
-		/* StorageNew->alarmRecordProposedRepairActions = 0; *//* DEFVAL zeroDotZero */
+		if ((StorageNew->alarmRecordProposedRepairActions = snmp_duplicate_objid(zeroDotZero_oid, 2)))
+			StorageNew->alarmRecordProposedRepairActionsLen = 2;
 
 	}
 	DEBUGMSGTL(("smiMIB", "done.\n"));
@@ -4367,7 +4414,7 @@ var_logRecordTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*var_len = sizeof(StorageTmp->loggingTime);
 		rval = (u_char *) &StorageTmp->loggingTime;
 		break;
-	case (u_char) LOGRECORDENTRYSTATUS:	/* ReadWrite */
+	case (u_char) LOGRECORDENTRYSTATUS:	/* Create */
 		*write_method = write_logRecordEntryStatus;
 		if (!StorageTmp)
 			break;
@@ -6031,7 +6078,7 @@ write_logDiscriminatorConstruct(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logDiscriminatorConstruct: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -6108,7 +6155,7 @@ write_logAdministrativeState(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 1 */
+		/* Note: default value unlocked */
 		switch (set_value) {
 		case LOGADMINISTRATIVESTATE_LOCKED:
 		case LOGADMINISTRATIVESTATE_UNLOCKED:
@@ -6181,9 +6228,17 @@ write_logAvailabilityStatus(int action, u_char *var_val, u_char var_val_type, si
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logAvailabilityStatus not ASN_BIT_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logAvailabilityStatus: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to logAvailabilityStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to logAvailabilityStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -6261,7 +6316,7 @@ write_logFullAction(int action, u_char *var_val, u_char var_val_type, size_t var
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logFullAction: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value wrap */
 		switch (set_value) {
 		case LOGFULLACTION_WRAP:
 		case LOGFULLACTION_HALT:

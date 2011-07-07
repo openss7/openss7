@@ -5,7 +5,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -68,25 +68,21 @@
 OPENSS7-GMI-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    openss7, openss7Ms, openss7MsSmi
+    openss7MsSmi
         FROM OPENSS7-SMI
-
     GroupObjects, ObjectInstance, OperationalState, SimpleNameType, 
     logId, logRecordId, tmnObjectInstance
         FROM OPENSS7-SMI-MIB
-
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
-
     Counter64, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY, 
     OBJECT-TYPE, Opaque, Unsigned32
         FROM SNMPv2-SMI
-
     TEXTUAL-CONVENTION
         FROM SNMPv2-TC;
 
 gmiMIB MODULE-IDENTITY
-    LAST-UPDATED "200901210511Z"
+    LAST-UPDATED "201106252033Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -102,14 +98,44 @@ gmiMIB MODULE-IDENTITY
     DESCRIPTION 
         "This is a basic MIB module providing definitions of 
          obejcts based on TMN (ITU-T Rec. X.723 (1993) | ISO/IEC 
-         10165-5 : 1993)"
+         10165-5 : 1993)
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106252033Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted with smidump."
     REVISION    "200901210511Z"
-    DESCRIPTION
+    DESCRIPTION 
         "Flattened mib."
     REVISION    "200801152128Z"
     DESCRIPTION 
         "First release of this module."
-    ::= { openss7MsSmi 5 } -- 10165-5
+    ::= { openss7MsSmi 5 }
 
 
 ActivationAction ::= TEXTUAL-CONVENTION
@@ -214,7 +240,7 @@ ActivationAction ::= TEXTUAL-CONVENTION
          condition is removed when the procedure completes."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 activate, deactivate 
-               and deactivateWhenNoUsers actions."
+         and deactivateWhenNoUsers actions."
     SYNTAX      BITS { activate(0), deactivate(1), 
                     deactivateWhenNoUsers(2), processingFailure(3) }
 
@@ -235,10 +261,11 @@ InformationType ::= TEXTUAL-CONVENTION
          described in the DESCRIPTION clause of that macro."
     REFERENCE   
         "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, ASN.1 
-               GMI-AttributeModule.InformationType."
+         GMI-AttributeModule.InformationType."
     SYNTAX      OBJECT IDENTIFIER
 
 InformationData ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "This textual convention represents additional 
@@ -248,51 +275,11 @@ InformationData ::= TEXTUAL-CONVENTION
          self-defining."
     REFERENCE   
         "ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, ASN.1 
-               GMI-AttributeModule.InformationData."
+         GMI-AttributeModule.InformationData."
     SYNTAX      OCTET STRING
 
 gmiNotifications OBJECT IDENTIFIER
     ::= { gmiMIB 0 }
-
-communicationsInformation NOTIFICATION-TYPE
-    OBJECTS     { 
-        tmnObjectInstance, tmnInformationType }
-    STATUS      current
-    DESCRIPTION 
-        "This notification may be used to report the occurrence 
-         of events pertaining to the normal operation of a 
-         managed object. These are informational events; 
-         important enough to report, but not requiring any 
-         further action by a manager.  Faults and abnormal 
-         conditions (which may require manager action) shall be 
-         reported using the event types defined in CCITT Rec.  
-         X.733 (1992) | ISO/IEC 10164-4:1992.
-         
-         In addition to the tmnObjectInstance and 
-         tmnInformationType, the tmnInformationData parameter 
-         may also be optionally included in the notification.
-         
-         The communicationsInformation notification is modelled 
-         on the TMN notification of the same name.
-         
-         The first paraemter of the communicationInformation 
-         notification is the information type, which is an 
-         object identifier defined with the OBJECT-IDENTITY 
-         macro.  The information type identifies the event.
-         
-         Beacuse its value is defined by an OBJECT-IDENTITY 
-         macro, the DESCRIPTION clause in that macro defining an 
-         information type should clearly identify the purpose of 
-         the event notification, when it is geenrtated, ahd how 
-         any information data refines the information type.  
-         This makes this information available to managers via 
-         the MIB generating the alarms.  When a generic value is 
-         not used, the information type should be defined within 
-         the MIB module that issues them."
-    REFERENCE   
-        "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 
-               : 1993, communicationInformation notification."
-    ::= { gmiNotifications 1 }
 
 gmiScalars OBJECT IDENTIFIER
     ::= { gmiMIB 1 }
@@ -311,7 +298,7 @@ applicationProcessTable OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 applicationProcess 
-               MOC."
+         MOC."
     ::= { applicationProcess 1 }
 
 applicationProcessEntry OBJECT-TYPE
@@ -322,21 +309,16 @@ applicationProcessEntry OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 applicationProcess 
-               MO."
+         MO."
     INDEX       { applicationProcessId }
     ::= { applicationProcessTable 1 }
 
-ApplicationProcessEntry ::=
-    SEQUENCE {
-        applicationProcessId
-            SimpleNameType,
-        applicationProcessTitle
-            ObjectInstance,
-        supportEntityNames
-            GroupObjects,
-        applicationProcessOperationalState
-            OperationalState
-    }
+ApplicationProcessEntry ::= SEQUENCE {
+    applicationProcessId        SimpleNameType,
+    applicationProcessTitle     ObjectInstance,
+    supportEntityNames          GroupObjects,
+    applicationProcessOpState   OperationalState
+}
 
 applicationProcessId OBJECT-TYPE
     SYNTAX      SimpleNameType
@@ -346,7 +328,7 @@ applicationProcessId OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 applicationProcessId 
-               attribute."
+         attribute."
     ::= { applicationProcessEntry 1 }
 
 applicationProcessTitle OBJECT-TYPE
@@ -357,7 +339,7 @@ applicationProcessTitle OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
-               applicationProcessTitle attribute."
+         applicationProcessTitle attribute."
     ::= { applicationProcessEntry 2 }
 
 supportEntityNames OBJECT-TYPE
@@ -368,10 +350,10 @@ supportEntityNames OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 supportEntityNames 
-               attribute."
+         attribute."
     ::= { applicationProcessEntry 3 }
 
-applicationProcessOperationalState OBJECT-TYPE
+applicationProcessOpState OBJECT-TYPE
     SYNTAX      OperationalState
     MAX-ACCESS  read-only
     STATUS      current
@@ -379,7 +361,7 @@ applicationProcessOperationalState OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState 
-               attribute."
+         attribute."
     ::= { applicationProcessEntry 4 }
 
 communicationsEntity OBJECT IDENTIFIER
@@ -393,7 +375,7 @@ communicationsEntityTable OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 communicationsEntity 
-               MOC."
+         MOC."
     ::= { communicationsEntity 1 }
 
 communicationsEntityEntry OBJECT-TYPE
@@ -408,19 +390,15 @@ communicationsEntityEntry OBJECT-TYPE
          entry belongs."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 communicationsEntity 
-               MO."
+         MO."
     INDEX       { subsystemId, communicationsEntityId }
     ::= { communicationsEntityTable 1 }
 
-CommunicationsEntityEntry ::=
-    SEQUENCE {
-        communicationsEntityId
-            SimpleNameType,
-        localSapNames
-            GroupObjects,
-        communicationsEntityOperationalState
-            OperationalState
-    }
+CommunicationsEntityEntry ::= SEQUENCE {
+    communicationsEntityId          SimpleNameType,
+    localSapNames                   GroupObjects,
+    communicationsEntityOpState     OperationalState
+}
 
 communicationsEntityId OBJECT-TYPE
     SYNTAX      SimpleNameType
@@ -430,7 +408,7 @@ communicationsEntityId OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
-               communicationsEntityId attribute."
+         communicationsEntityId attribute."
     ::= { communicationsEntityEntry 1 }
 
 localSapNames OBJECT-TYPE
@@ -441,10 +419,10 @@ localSapNames OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 localSapNames 
-               attribute."
+         attribute."
     ::= { communicationsEntityEntry 2 }
 
-communicationsEntityOperationalState OBJECT-TYPE
+communicationsEntityOpState OBJECT-TYPE
     SYNTAX      OperationalState
     MAX-ACCESS  read-only
     STATUS      current
@@ -452,25 +430,25 @@ communicationsEntityOperationalState OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState 
-               attribute."
+         attribute."
     ::= { communicationsEntityEntry 3 }
 
 communicationsInformationRecord OBJECT IDENTIFIER
     ::= { gmiTables 3 }
 
-communicationsInformationRecordTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF CommunicationsInformationRecordEntry
+communicationsInfoRecordTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CommunicationsInfoRecordEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
-               communicationsInformationRecord MOC."
+         communicationsInformationRecord MOC."
     ::= { communicationsInformationRecord 1 }
 
-communicationsInformationRecordEntry OBJECT-TYPE
-    SYNTAX      CommunicationsInformationRecordEntry
+communicationsInfoRecordEntry OBJECT-TYPE
+    SYNTAX      CommunicationsInfoRecordEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
@@ -482,17 +460,14 @@ communicationsInformationRecordEntry OBJECT-TYPE
          logRecordId indexes this log record within the log."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
-               communicationsInformationRecord MO."
+         communicationsInformationRecord MO."
     INDEX       { logId, logRecordId }
-    ::= { communicationsInformationRecordTable 1 }
+    ::= { communicationsInfoRecordTable 1 }
 
-CommunicationsInformationRecordEntry ::=
-    SEQUENCE {
-        informationType
-            InformationType,
-        informationData
-            InformationData
-    }
+CommunicationsInfoRecordEntry ::= SEQUENCE {
+    informationType     InformationType,
+    informationData     InformationData
+}
 
 informationType OBJECT-TYPE
     SYNTAX      InformationType
@@ -502,8 +477,8 @@ informationType OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 informationType 
-               attribute."
-    ::= { communicationsInformationRecordEntry 1 }
+         attribute."
+    ::= { communicationsInfoRecordEntry 1 }
 
 informationData OBJECT-TYPE
     SYNTAX      InformationData
@@ -513,8 +488,8 @@ informationData OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 informationData 
-               attribute."
-    ::= { communicationsInformationRecordEntry 2 }
+         attribute."
+    ::= { communicationsInfoRecordEntry 2 }
 
 clProtocolMachine OBJECT IDENTIFIER
     ::= { gmiTables 4 }
@@ -527,7 +502,7 @@ clProtocolMachineTable OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 clProtocolMachine 
-               MOC."
+         MOC."
     ::= { clProtocolMachine 1 }
 
 clProtocolMachineEntry OBJECT-TYPE
@@ -541,20 +516,16 @@ clProtocolMachineEntry OBJECT-TYPE
          subsystem."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 clProtocolMachine 
-               MO."
+         MO."
     INDEX       { subsystemId, communicationsEntityId, 
                   clProtocolMachineId }
     ::= { clProtocolMachineTable 1 }
 
-ClProtocolMachineEntry ::=
-    SEQUENCE {
-        clProtocolMachineId
-            SimpleNameType,
-        clProtocolMachineOperationalState
-            OperationalState,
-        totalRemoteSAPs
-            Counter64
-    }
+ClProtocolMachineEntry ::= SEQUENCE {
+    clProtocolMachineId         SimpleNameType,
+    clProtocolMachineOpState    OperationalState,
+    totalRemoteSAPs             Counter64
+}
 
 clProtocolMachineId OBJECT-TYPE
     SYNTAX      SimpleNameType
@@ -564,10 +535,10 @@ clProtocolMachineId OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 clProtocolMachineId 
-               attribute."
+         attribute."
     ::= { clProtocolMachineEntry 1 }
 
-clProtocolMachineOperationalState OBJECT-TYPE
+clProtocolMachineOpState OBJECT-TYPE
     SYNTAX      OperationalState
     MAX-ACCESS  read-only
     STATUS      current
@@ -575,7 +546,7 @@ clProtocolMachineOperationalState OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState 
-               attribute."
+         attribute."
     ::= { clProtocolMachineEntry 2 }
 
 totalRemoteSAPs OBJECT-TYPE
@@ -586,7 +557,7 @@ totalRemoteSAPs OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 totalRemoteSAPs 
-               attribute."
+         attribute."
     ::= { clProtocolMachineEntry 3 }
 
 coProtocolMachine OBJECT IDENTIFIER
@@ -600,7 +571,7 @@ coProtocolMachineTable OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 coProtocolMachine 
-               MOC."
+         MOC."
     ::= { coProtocolMachine 1 }
 
 coProtocolMachineEntry OBJECT-TYPE
@@ -614,18 +585,15 @@ coProtocolMachineEntry OBJECT-TYPE
          subsystem."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 coProtocolMachine 
-               MO."
+         MO."
     INDEX       { subsystemId, communicationsEntityId, 
                   coProtocolMachineId }
     ::= { coProtocolMachineTable 1 }
 
-CoProtocolMachineEntry ::=
-    SEQUENCE {
-        coProtocolMachineId
-            SimpleNameType,
-        coProtocolMachineOperationalState
-            OperationalState
-    }
+CoProtocolMachineEntry ::= SEQUENCE {
+    coProtocolMachineId         SimpleNameType,
+    coProtocolMachineOpState    OperationalState
+}
 
 coProtocolMachineId OBJECT-TYPE
     SYNTAX      SimpleNameType
@@ -635,10 +603,10 @@ coProtocolMachineId OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 coProtocolMachineId 
-               attribute."
+         attribute."
     ::= { coProtocolMachineEntry 1 }
 
-coProtocolMachineOperationalState OBJECT-TYPE
+coProtocolMachineOpState OBJECT-TYPE
     SYNTAX      OperationalState
     MAX-ACCESS  read-only
     STATUS      current
@@ -646,7 +614,7 @@ coProtocolMachineOperationalState OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.721 | ISO/IEC 10165-2 operationalState 
-               attribute."
+         attribute."
     ::= { coProtocolMachineEntry 2 }
 
 sap1 OBJECT IDENTIFIER
@@ -675,15 +643,11 @@ sap1Entry OBJECT-TYPE
     INDEX       { subsystemId, communicationsEntityId, sap1Id }
     ::= { sap1Table 1 }
 
-Sap1Entry ::=
-    SEQUENCE {
-        sap1Id
-            SimpleNameType,
-        sap1Address
-            Unsigned32,
-        sap1UserEntityNames
-            GroupObjects
-    }
+Sap1Entry ::= SEQUENCE {
+    sap1Id                  SimpleNameType,
+    sap1Address             Unsigned32,
+    sap1UserEntityNames     GroupObjects
+}
 
 sap1Id OBJECT-TYPE
     SYNTAX      SimpleNameType
@@ -703,7 +667,7 @@ sap1Address OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap1Address 
-               attribute."
+         attribute."
     ::= { sap1Entry 2 }
 
 sap1UserEntityNames OBJECT-TYPE
@@ -714,7 +678,7 @@ sap1UserEntityNames OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 userEntityNames 
-               attribute."
+         attribute."
     ::= { sap1Entry 3 }
 
 sap2 OBJECT IDENTIFIER
@@ -742,17 +706,12 @@ sap2Entry OBJECT-TYPE
     INDEX       { subsystemId, sap2Id }
     ::= { sap2Table 1 }
 
-Sap2Entry ::=
-    SEQUENCE {
-        sap2Id
-            SimpleNameType,
-        sap2Address
-            Opaque,
-        sap2UserEntityNames
-            GroupObjects,
-        sap2providerEntityNames
-            GroupObjects
-    }
+Sap2Entry ::= SEQUENCE {
+    sap2Id                      SimpleNameType,
+    sap2Address                 Opaque,
+    sap2UserEntityNames         GroupObjects,
+    sap2providerEntityNames     GroupObjects
+}
 
 sap2Id OBJECT-TYPE
     SYNTAX      SimpleNameType
@@ -772,7 +731,7 @@ sap2Address OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 sap2Address 
-               attribute."
+         attribute."
     ::= { sap2Entry 2 }
 
 sap2UserEntityNames OBJECT-TYPE
@@ -783,7 +742,7 @@ sap2UserEntityNames OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 userEntityNames 
-               attribute."
+         attribute."
     ::= { sap2Entry 3 }
 
 sap2providerEntityNames OBJECT-TYPE
@@ -794,7 +753,7 @@ sap2providerEntityNames OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 providerEntityNames 
-               attribute."
+         attribute."
     ::= { sap2Entry 4 }
 
 singlePeerConnection OBJECT IDENTIFIER
@@ -808,7 +767,7 @@ singlePeerConnectionTable OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 singlePeerConnection 
-               MOC."
+         MOC."
     ::= { singlePeerConnection 1 }
 
 singlePeerConnectionEntry OBJECT-TYPE
@@ -823,20 +782,16 @@ singlePeerConnectionEntry OBJECT-TYPE
          belongs to a subsystem."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 singlePeerConnection 
-               MO."
+         MO."
     INDEX       { subsystemId, communicationsEntityId, 
                   coProtocolMachineId, connectionId }
     ::= { singlePeerConnectionTable 1 }
 
-SinglePeerConnectionEntry ::=
-    SEQUENCE {
-        connectionId
-            SimpleNameType,
-        underlyingConnectionNames
-            GroupObjects,
-        supportedConnectionNames
-            GroupObjects
-    }
+SinglePeerConnectionEntry ::= SEQUENCE {
+    connectionId                SimpleNameType,
+    underlyingConnectionNames   GroupObjects,
+    supportedConnectionNames    GroupObjects
+}
 
 connectionId OBJECT-TYPE
     SYNTAX      SimpleNameType
@@ -846,7 +801,7 @@ connectionId OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 connectionId 
-               attribute."
+         attribute."
     ::= { singlePeerConnectionEntry 1 }
 
 underlyingConnectionNames OBJECT-TYPE
@@ -857,7 +812,7 @@ underlyingConnectionNames OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
-               underlyingConnectionNames attribute."
+         underlyingConnectionNames attribute."
     ::= { singlePeerConnectionEntry 2 }
 
 supportedConnectionNames OBJECT-TYPE
@@ -868,7 +823,7 @@ supportedConnectionNames OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 
-               supportedConnectionNames attribute."
+         supportedConnectionNames attribute."
     ::= { singlePeerConnectionEntry 3 }
 
 subsystem OBJECT IDENTIFIER
@@ -895,11 +850,9 @@ subsystemEntry OBJECT-TYPE
     INDEX       { subsystemId }
     ::= { subsystemTable 1 }
 
-SubsystemEntry ::=
-    SEQUENCE {
-        subsystemId
-            SimpleNameType
-    }
+SubsystemEntry ::= SEQUENCE {
+    subsystemId     SimpleNameType
+}
 
 subsystemId OBJECT-TYPE
     SYNTAX      SimpleNameType
@@ -909,7 +862,7 @@ subsystemId OBJECT-TYPE
         ""
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5 subsystemId 
-               attribute."
+         attribute."
     ::= { subsystemEntry 1 }
 
 gmiNotifs OBJECT IDENTIFIER
@@ -947,7 +900,7 @@ tmnInformationType OBJECT-TYPE
          possible, however, a standard value should be used."
     REFERENCE   
         "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 
-               : 1993, informationType attribute."
+         : 1993, informationType attribute."
     ::= { gmiNotifs 1 }
 
 tmnInformationData OBJECT-TYPE
@@ -959,7 +912,7 @@ tmnInformationData OBJECT-TYPE
          following the InformationData textual convention."
     REFERENCE   
         "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 
-               : 1993, informationData attribute."
+         : 1993, informationData attribute."
     ::= { gmiNotifs 2 }
 
 gmiOids OBJECT IDENTIFIER
@@ -971,16 +924,57 @@ communicationsInformationType OBJECT-IDENTITY
         "The event type for the communicationsInformation notification."
     REFERENCE   
         "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 
-               : 1993, communicationInformation."
+         : 1993, communicationInformation."
     ::= { gmiOids 1 }
 
 gmiGroups OBJECT IDENTIFIER
     ::= { gmiMIB 5 }
 
+gmiCompliances OBJECT IDENTIFIER
+    ::= { gmiMIB 6 }
+
+communicationsInformation NOTIFICATION-TYPE
+    OBJECTS     { tmnObjectInstance, tmnInformationType }
+    STATUS      current
+    DESCRIPTION 
+        "This notification may be used to report the occurrence 
+         of events pertaining to the normal operation of a 
+         managed object. These are informational events; 
+         important enough to report, but not requiring any 
+         further action by a manager.  Faults and abnormal 
+         conditions (which may require manager action) shall be 
+         reported using the event types defined in CCITT Rec.  
+         X.733 (1992) | ISO/IEC 10164-4:1992.
+         
+         In addition to the tmnObjectInstance and 
+         tmnInformationType, the tmnInformationData parameter 
+         may also be optionally included in the notification.
+         
+         The communicationsInformation notification is modelled 
+         on the TMN notification of the same name.
+         
+         The first paraemter of the communicationInformation 
+         notification is the information type, which is an 
+         object identifier defined with the OBJECT-IDENTITY 
+         macro.  The information type identifies the event.
+         
+         Beacuse its value is defined by an OBJECT-IDENTITY 
+         macro, the DESCRIPTION clause in that macro defining an 
+         information type should clearly identify the purpose of 
+         the event notification, when it is geenrtated, ahd how 
+         any information data refines the information type.  
+         This makes this information available to managers via 
+         the MIB generating the alarms.  When a generic value is 
+         not used, the information type should be defined within 
+         the MIB module that issues them."
+    REFERENCE   
+        "ITU-T Recommendation X.723 (1993) | ISO/IEC 10165-5 
+         : 1993, communicationInformation notification."
+    ::= { gmiNotifications 1 }
+
 gmiApplicationProcessP1Package OBJECT-GROUP
-    OBJECTS     { 
-        applicationProcessTitle, supportEntityNames, 
-        applicationProcessOperationalState }
+    OBJECTS     { applicationProcessTitle, supportEntityNames, 
+                  applicationProcessOpState }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package.
@@ -994,12 +988,11 @@ gmiApplicationProcessP1Package OBJECT-GROUP
          enabled if it is operable."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, 
-               applicationProcessP1 package."
+         applicationProcessP1 package."
     ::= { gmiGroups 1 }
 
 gmiCommunicationsEntityP1Package OBJECT-GROUP
-    OBJECTS     { 
-        localSapNames, communicationsEntityOperationalState }
+    OBJECTS     { localSapNames, communicationsEntityOpState }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package.
@@ -1012,12 +1005,11 @@ gmiCommunicationsEntityP1Package OBJECT-GROUP
          inoperable, - an entity is enabled if it is operable."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, 
-               communicationsEntityP1 package."
+         communicationsEntityP1 package."
     ::= { gmiGroups 2 }
 
-gmiCommunicationsInformationRecordP1Package OBJECT-GROUP
-    OBJECTS     { 
-        informationType }
+gmiCommunicationsInfoRecordP1Pkg OBJECT-GROUP
+    OBJECTS     { informationType }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package.
@@ -1025,23 +1017,21 @@ gmiCommunicationsInformationRecordP1Package OBJECT-GROUP
          Log record class for communicationsInformation events."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, 
-               communicationsInformationRecordP1 package."
+         communicationsInformationRecordP1 package."
     ::= { gmiGroups 3 }
 
 gmiInformationDataPackagePackage OBJECT-GROUP
-    OBJECTS     { 
-        informationData }
+    OBJECTS     { informationData }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, 
-               informationDataPackage package."
+         informationDataPackage package."
     ::= { gmiGroups 4 }
 
 gmiClProtocolMachineP1Package OBJECT-GROUP
-    OBJECTS     { 
-        clProtocolMachineOperationalState }
+    OBJECTS     { clProtocolMachineOpState }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package.
@@ -1050,23 +1040,21 @@ gmiClProtocolMachineP1Package OBJECT-GROUP
          communications functions."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, clProtocolMachineP1 
-               package."
+         package."
     ::= { gmiGroups 5 }
 
 gmiClProtocolMachineP2Package OBJECT-GROUP
-    OBJECTS     { 
-        totalRemoteSAPs }
+    OBJECTS     { totalRemoteSAPs }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, clProtocolMachineP2 
-               package."
+         package."
     ::= { gmiGroups 6 }
 
 gmiCoProtocolMachineP1Package OBJECT-GROUP
-    OBJECTS     { 
-        coProtocolMachineOperationalState }
+    OBJECTS     { coProtocolMachineOpState }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package.
@@ -1075,12 +1063,11 @@ gmiCoProtocolMachineP1Package OBJECT-GROUP
          communications functions."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, coProtocolMachineP1 
-               package."
+         package."
     ::= { gmiGroups 7 }
 
 gmiSap1P1Package OBJECT-GROUP
-    OBJECTS     { 
-        sap1Address, sap1UserEntityNames }
+    OBJECTS     { sap1Address, sap1UserEntityNames }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package.
@@ -1094,9 +1081,8 @@ gmiSap1P1Package OBJECT-GROUP
     ::= { gmiGroups 8 }
 
 gmiSap2P1Package OBJECT-GROUP
-    OBJECTS     { 
-        sap2Address, sap2UserEntityNames, 
-        sap2providerEntityNames }
+    OBJECTS     { sap2Address, sap2UserEntityNames, 
+                  sap2providerEntityNames }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package.
@@ -1109,8 +1095,7 @@ gmiSap2P1Package OBJECT-GROUP
     ::= { gmiGroups 9 }
 
 gmiSinglePeerConnectionP1Package OBJECT-GROUP
-    OBJECTS     { 
-        underlyingConnectionNames }
+    OBJECTS     { underlyingConnectionNames }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package.
@@ -1119,23 +1104,21 @@ gmiSinglePeerConnectionP1Package OBJECT-GROUP
          peer connection between a pair of entities."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, 
-               singlePeerConnectionP1 package."
+         singlePeerConnectionP1 package."
     ::= { gmiGroups 10 }
 
 gmiSinglePeerConnectionP2Package OBJECT-GROUP
-    OBJECTS     { 
-        supportedConnectionNames }
+    OBJECTS     { supportedConnectionNames }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, 
-               singlePeerConnectionP2 package."
+         singlePeerConnectionP2 package."
     ::= { gmiGroups 11 }
 
 gmiSubsystemP1Package OBJECT-GROUP
-    OBJECTS     { 
-        subsystemId }
+    OBJECTS     { subsystemId }
     STATUS      current
     DESCRIPTION 
         "A collection of objects that implement a package.
@@ -1145,12 +1128,11 @@ gmiSubsystemP1Package OBJECT-GROUP
          components of other subsystems."
     REFERENCE   
         "ITU-T Rec. X.723 | ISO/IEC 10165-5, subsystemP1 
-               package."
+         package."
     ::= { gmiGroups 12 }
 
 gmiParametersGroup OBJECT-GROUP
-    OBJECTS     { 
-        tmnInformationType, tmnInformationData }
+    OBJECTS     { tmnInformationType, tmnInformationData }
     STATUS      current
     DESCRIPTION 
         "A collection of mandatory notification parameters."
@@ -1163,9 +1145,6 @@ gmiNotificationsGroup NOTIFICATION-GROUP
         "A collection of mandatory notifications."
     ::= { gmiGroups 14 }
 
-gmiCompliances OBJECT IDENTIFIER
-    ::= { gmiMIB 6 }
-
 gmiBasicCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
@@ -1173,15 +1152,14 @@ gmiBasicCompliance MODULE-COMPLIANCE
 
     MODULE      -- this module
 
-        MANDATORY-GROUPS    { 
-            gmiApplicationProcessP1Package, 
-            gmiCommunicationsEntityP1Package, 
-            gmiCommunicationsInformationRecordP1Package, 
-            gmiClProtocolMachineP1Package, 
-            gmiCoProtocolMachineP1Package, gmiSap1P1Package, 
-            gmiSap2P1Package, gmiSinglePeerConnectionP1Package, 
-            gmiSubsystemP1Package, gmiParametersGroup, 
-            gmiNotificationsGroup }
+        MANDATORY-GROUPS        { gmiApplicationProcessP1Package, 
+                  gmiCommunicationsEntityP1Package, 
+                  gmiCommunicationsInfoRecordP1Pkg, 
+                  gmiClProtocolMachineP1Package, 
+                  gmiCoProtocolMachineP1Package, gmiSap1P1Package, 
+                  gmiSap2P1Package, gmiSinglePeerConnectionP1Package, 
+                  gmiSubsystemP1Package, gmiParametersGroup, 
+                  gmiNotificationsGroup }
 
         GROUP   gmiInformationDataPackagePackage
         DESCRIPTION   
@@ -1201,5 +1179,3 @@ gmiBasicCompliance MODULE-COMPLIANCE
     ::= { gmiCompliances 1 }
 
 END -- end of module OPENSS7-GMI-MIB.
-
--- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\- fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et

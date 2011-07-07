@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-M2PA-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:30 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -68,7 +68,7 @@
 OPENSS7-M2PA-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    openss7, openss7Modules
+    openss7Modules
         FROM OPENSS7-SMI
     SimpleNameType
         FROM OPENSS7-SMI-MIB
@@ -82,7 +82,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 m2paMIB MODULE-IDENTITY
-    LAST-UPDATED "200812231227Z"
+    LAST-UPDATED "201106280059Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -99,21 +99,51 @@ m2paMIB MODULE-IDENTITY
         "This MIB provides configuration and status information 
          for an M2PA subsystem, where the M2PA is in accordance 
          with RFC 4165.  This MIB is intended on being used with 
-         the OPENSS7-MTP3-MIB."
+         the OPENSS7-MTP3-MIB.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106280059Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted with smidump."
     REVISION    "200812231227Z"
-    DESCRIPTION
+    DESCRIPTION 
         "Working up this module.  This module needs to provide a table 
          of M2PA signalling terminals that the OPENSS7-MTP-MIB can use 
          to assign signalling links.  The table must contain sufficient 
          information to establish the signalling data link (SCTP 
          connection) and then be linked under either the MTP or under 
          the SL-MUX driver."
+    REVISION    "200810100532Z"
+    DESCRIPTION 
+        "Corrections to work with OpenSS7 MIB Browser."
     REVISION    "200711281554Z"
     DESCRIPTION 
         "First release of this module."
-    REVISION    "200810100532Z"
-    DESCRIPTION
-        "Corrections to work with OpenSS7 MIB Browser."
     ::= { openss7Modules 202 }
 
  -- top level organization of the MIB
@@ -126,446 +156,6 @@ m2paObjects OBJECT IDENTIFIER
 
 m2paTables OBJECT IDENTIFIER
     ::= { m2paObjects 1 }
-
-m2paScalars OBJECT IDENTIFIER
-    ::= { m2paObjects 2 }
-
--- Default values:
---
--- The purpose of these default scalars is two-fold: 1. to provide a 
--- localized set of default values to be applied when creatinging 
--- underspecified entries in the m2paProtocolProfile table; 2. to 
--- provide values where no protocol profile is specified.  These are 
--- default-default values in the sense that the act as default values 
--- for management operations, however, once set by a management station 
--- or by internal system operations, they persist across both agent and 
--- system reboots.
-
-m2paDefaultSctpNoDelay OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, by default whether the 
-         Nagle algorithm should be applied to SCTP associations.  
-         The Nagle algorithm increases the size of the packets 
-         placed on the network at the expense of delaying the 
-         transmission of some data during congestion episodes.  
-         When set to true(1), the Nagle algorithm is suppressed; 
-         otherwise, set to false(2), the Nagle algorithm is in 
-         effect.
-         
-         The default default is true(1): send packets without 
-         delay.  The default default value is only application 
-         when never set by any management station.  When set, 
-         the scalar value must persist across system reboots."
-    REFERENCE   
-        "RFC 4960"
-    DEFVAL      { 1 } -- true(1)
-    ::= { m2paScalars 1 }
-
-m2paDefaultSctpMaxseg OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..65536)
-    UNITS       "octets"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default maximum SCTP 
-         payload size for outgoing packets.  Values greater than 
-         the association MTU are ignored and have no effect.  
-         The value determines the maximum size (in octets) above 
-         which SCCP will fragment larger DATA chunis into 
-         smaller DATA chunks, and beneath which SCTP will bundle 
-         DATA chunks into a single packate or combine smaller 
-         DATA chunks into larger DATA chunks.  Normally this 
-         value is the association MTU value must the size of the 
-         current IP and SCTP headers, minus the size of one DATA 
-         chunk header.  When set to a lower value, the lower 
-         value will be used.
-         
-         The default default allows the prevailing MTU to be 
-         controlling (65536 octets).  The default default value 
-         is only application when never set by any management 
-         station.  When set, the scalar value must persist 
-         across system reboots."
-    REFERENCE   
-        "RFC 4960"
-    DEFVAL      { 65536 }
-    ::= { m2paScalars 2 }
-
-m2paDefaultSctpHeartbeatItvl OBJECT-TYPE
-    SYNTAX      TimeInterval
-    UNITS       "centiseconds"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default time 
-         interval (in milliseconds) between successive HEARTBEAT 
-         messages used to probe destination transport addresses 
-         for RTT calculation and activity.  Valid values are 
-         zero (0) - do not heartbeat, or a value of 1 
-         millisecond or greater.
-         
-         In general this value determines the amount of time 
-         that it takes for an SCTP association to detect a 
-         failure on a association which has no data to transmit 
-         or retransmit.  M2PA, however, is used by MTP Level 3 
-         which generates a test message every T2, where T2 is 
-         defined in ITU-T Rec. Q.707 (1993) or ANSI T1.111.7 
-         (2000) to have a range from 4 to 12 seconds.  
-         Therefore, for M2PA, unless the SCTP heartbeat interval 
-         is set below Q.707-T2, it will only have effect on 
-         multihomed associations for checking the status of 
-         non-primary or non-CMT destinations.
-         
-         Reducing this value will reduce the amount of time 
-         taken to detect primary and non-primary, non-CMT path, 
-         interface and destination failures, but may only affect 
-         primary destinations if reduced below the coresponding 
-         Q.707-T2 value.
-         
-         The default default value is that recommended by RFC 
-         4960 (6000 centiseconds, or 60 seconds).  The default 
-         default value is only application when never set by any 
-         management station.  When set, the scalar value must 
-         persist across system reboots."
-    REFERENCE   
-        "RFC 4960 15. HB.interval, ITU-T Rec. Q.707 (1993), ANIS 
-         T1.111.7 (2000)."
-    DEFVAL      { 6000 } -- 60 seconds
-    ::= { m2paScalars 3 }
-
-m2paDefaultSctpHeartbeat OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, by default whether 
-         HEARBEAT messages used to probe destination transport 
-         addresses for RTT calculation and activity will be sent 
-         periodically.
-         
-         Disabling the heart beat mechanism reduces the 
-         protocol's repsonsiveness in detection of failures and 
-         redirection of traffic away from failed paths and 
-         interfaces, particularly, for M2PA, failed non-primary 
-         and non-CMT destinations in an multi-homed association.  
-         This scalar should normally be left at its default 
-         value.
-         
-         The default default value from RFC 4960 is true(1).  
-         The default default value is only application when 
-         never set by any management station.  When set, the 
-         scalar value must persist across system reboots."
-    REFERENCE   
-        "RFC 4960"
-    ::= { m2paScalars 4 }
-
-m2paDefaultSctpRtoInitial OBJECT-TYPE
-    SYNTAX      TimeInterval
-    UNITS       "centiseconds"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default initial time 
-         interval (in milliseconds) that will be used as an 
-         intial RTO (retransmission time out) value when sending 
-         packets to a destination for the first time.  Valid 
-         values are zero or greater but must be within the range 
-         m2paDefaultSctpRtoMin to m2paDefaultSctpRtoMax.
-         
-         Note that, in general, the default RTO initial values 
-         should not be less than the peer's maximum SACK delay, 
-         otherwise, excessive retransmission might occur while 
-         the peer is delaying acknowledgements.  That is, this 
-         value should be greater than the corresponding 
-         m2paDefaultSctpSackDelay at the peer.
-         
-         The default default value is that value recommended by 
-         RFC 4960 (3000 milliseconds, or 3 seconds).  The 
-         default default value is only application when never 
-         set by any management station.  When set, the scalar 
-         value must persist across system reboots."
-    REFERENCE   
-        "RFC 4960 15. RTO.Initial"
-    DEFVAL      { 300 }
-    ::= { m2paScalars 5 }
-
-m2paDefaultSctpRtoMin OBJECT-TYPE
-    SYNTAX      TimeInterval
-    UNITS       "centiseconds"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default minmum time 
-         interval (in milliseconds) that will be used as an RTO 
-         (retransmission time out) value when sending packets to 
-         a destination transport address and expecting 
-         acknowledgements.  Valid values are zero or greater but 
-         must be less than or equal to m2paDefaultSctpRtoInitial 
-         and strictly less than m2paDefaultSctpRtoMax.
-         
-         Note that, in general, the RTO minimum should not be 
-         less thatn the peer's maximum SACK delay, otherwise, 
-         excessive retransmissions might occur while the peer is 
-         delaying acknowledgements.  That is, this value should 
-         not be less than the corresponding 
-         m2paDefaultSctpSackDelay at the peer.
-         
-         The default default value is the value recommended by 
-         RFC 4960 (1000 milliseconds, or 1 second).  The default 
-         default value is only application when never set by any 
-         management station.  When set, the scalar value must 
-         persist across system reboots."
-    REFERENCE   
-        "RFC 4960 15. RTO.Min"
-    DEFVAL      { 100 } -- 1 second
-    ::= { m2paScalars 6 }
-
-m2paDefaultSctpRtoMax OBJECT-TYPE
-    SYNTAX      TimeInterval
-    UNITS       "centiseconds"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default maximum time 
-         interval (in milliseconds) that will be used as an RTO 
-         (retransmission timeout) value when sending packets t a 
-         destination transport address and expecting 
-         acknowledgements.  Valid values are zero or greater but 
-         must be greater than or equal to m2paSctpRtoInitial and 
-         strictly greater than m2paSctpRtoMin.
-         
-         The default default value is the value recommended by 
-         RFC 4960 (60000 milliseconds, or 60 seconds).  The 
-         default default value is only application when never 
-         set by any management station.  When set, the scalar 
-         value must persist across system reboots."
-    REFERENCE   
-        "RFC 4960 15. RTO.Max"
-    DEFVAL      { 6000 } -- 60 seconds
-    ::= { m2paScalars 7 }
-
-m2paDefaultSctpPathMaxRetrans OBJECT-TYPE
-    SYNTAX      Unsigned32
-    UNITS       "retransmissions"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default number of 
-         times that SCTP will attempt retransmitting a packet to 
-         a given detination transport address before it 
-         considers that destination transport address inactive.  
-         Valid values are zero or greater.
-         
-         Adjusting this value has an effect on th period of time 
-         taken to fail-over between destinations for multi-homed 
-         connections.  Lower values (including zero) will yield 
-         faster fail-over response times.  Lower values, 
-         however, may cause thrashing between destinations 
-         contributing to congestion in the network.  Default 
-         default values are applicable to Internet applications.
-         
-         The default default value is the value recommended in 
-         RFC 4960 (5 retransmissions).  The default default 
-         value is only application when never set by any 
-         management station.  When set, the scalar value must 
-         persist across system reboots."
-    REFERENCE   
-        "RFC 4960 15. Path.Max.Retrans"
-    DEFVAL      { 5 } -- retransmissions
-    ::= { m2paScalars 8 }
-
-m2paDefaultSctpCookieLife OBJECT-TYPE
-    SYNTAX      TimeInterval
-    UNITS       "centiseconds"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default time 
-         interval (in milliseconds) in conjunction with 
-         m2paSctpCookieInc beyond which a COOKIE-ECHO received 
-         with a cookie sent in an INIT-ACK will no longer be 
-         accepted.  For SCTP, this also limits the maximum time 
-         interval for which the HMAC secret key for the cookie 
-         will be valid.  Valid values are zero or greater.  
-         Values of zero will  be converted to a system clock 
-         tick.
-         
-         Reducing this value will increase the probability that 
-         passive connection attempts will fail due to expired 
-         cookies.  Increasing the value will reduce the overall 
-         security of the system by permitting attackers an 
-         increased interval within which to crack HMACs and 
-         guess verification tags.  This value may be adjusted in 
-         conjunction with m2paSctpCookieInc to meet most 
-         objectives for successful passive connection attempts 
-         with the best security afforded by smaller values of 
-         m2paSctpCookieLife.
-         
-         Unfortunately, the m2paSctpCookieLife and 
-         m2paSctpCookieInc must be adjusted to accomodate the 
-         slowest peer on the slowest connection.  The default 
-         setting is adequate for Internet applications.
-         
-         The default default value is the value recommended by 
-         RFC 4960 (6,000 centiseconds, or 60 seconds).  The 
-         default default value is only application when never 
-         set by any management station.  When set, the scalar 
-         value must persist across system reboots."
-    REFERENCE   
-        "RFC 4960 15. Valid.Cookie.Life"
-    DEFVAL      { 6000 } -- 60 seconds
-    ::= { m2paScalars 9 }
-
-m2paDefaultSctpCookieInc OBJECT-TYPE
-    SYNTAX      TimeInterval
-    UNITS       "centiseconds"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default time 
-         increment (in milliseconds) that will be added to the 
-         lifespan of the cookie in an INIT-ACK if the recieved 
-         INIT requests cookie preservative to lengthen the 
-         lifespan of the cookie.  Valid values are zero or 
-         greater.
-         
-         This value can be adjusted in conjunction with 
-         m2paSctpCookieLife to meet objectives of successful 
-         passive connection attempts and security.
-         
-         The default default value is the value recommended in 
-         RFC 4960 5.2.6 (100 centiseconds, or 1 second).  The 
-         default default setting is adequate for Internet 
-         applications.  The default default value is only 
-         application when never set by any management station.  
-         When set, the scalar value must persist across system 
-         reboots."
-    REFERENCE   
-        "RFC 4960, 5.2.6, 3)"
-    DEFVAL      { 100 } -- 1 second
-    ::= { m2paScalars 10 }
-
-m2paDefaultSctpMaxInitRetries OBJECT-TYPE
-    SYNTAX      Unsigned32
-    UNITS       "retries"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default number of 
-         times that an INIT or COOKIE-ECHO will be resent to a 
-         given destination before abandoning an active open 
-         attempt.  Value values are zero or greater.
-         
-         The default default value is the value recommended by 
-         RFC 4960 (8 retries).  The default default value is 
-         only application when never set by any management 
-         station.  When set, the scalar value must persist 
-         across system reboots."
-    REFERENCE   
-        "RFC 4960 15. Max.Init.Retransmits"
-    DEFVAL      { 8 }
-    ::= { m2paScalars 11 }
-
-m2paDefaultSctpMaxBurst OBJECT-TYPE
-    SYNTAX      Unsigned32
-    UNITS       "MTUs"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default maximum 
-         number of MTUs of new data chunks that will be sent in 
-         a burst in accordance with SCTP Specification Errata 
-         and Issues, RFC 4460 and RFC 4960.
-         
-         The default default value is the value recommended in 
-         RFC 4960 (4 MTUs).  The default default value is only 
-         application when never set by any management station.  
-         When set, the scalar value must persist across system 
-         reboots."
-    REFERENCE   
-        "RFC 4960 15. Max.Burst"
-    DEFVAL      { 4 }
-    ::= { m2paScalars 12 }
-
-m2paDefaultSctpAssocMaxRetrans OBJECT-TYPE
-    SYNTAX      Unsigned32
-    UNITS       "retransmissions"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default number of 
-         times that the sending endpoint will attempt 
-         retransmitting a packet on any active destination 
-         transport address before it aborts the association.  
-         Value values are zero or greater.
-         
-         This value should be larger than sum of the default 
-         path maximum number of retransmission values of each of 
-         the destinations.
-         
-         Setting this value to less than the sum of the default 
-         path maximum retransmission values for all of the 
-         destinations has the interesting effect of permitting a 
-         connection to persist even when all destinations have 
-         been deemed inactive.
-         
-         The default default value is the value recommended in 
-         RFC 4960 (10 retransmissions).  The default default 
-         value is only application when never set by any 
-         management station.  When set, the scalar value must 
-         persist across system reboots."
-    REFERENCE   
-        "RFC 4960 15. Association.Max.Retrans"
-    DEFVAL      { 10 }
-    ::= { m2paScalars 13 }
-
-m2paDefaultSctpSackDelay OBJECT-TYPE
-    SYNTAX      TimeInterval (0..50)
-    UNITS       "centiseconds"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default interval of 
-         time (in milliseconds) that will be used as an RTO 
-         (retransmission time out) value when sending packets to 
-         a destination transport address.  Valid values are zero 
-         or to 500 milliseconds (RFC 4960 forbids setting this 
-         value larger than 500 milliseconds).
-         
-         The default default value is the value recommended in 
-         RFC 4960 (200 milliseconds).  The default default value 
-         is only application when never set by any management 
-         station.  When set, the scalar value must persist 
-         across system reboots."
-    REFERENCE   
-        "RFC 4960 15. 6.2"
-    DEFVAL      { 20 }
-    ::= { m2paScalars 14 }
-
-m2paDefaultSctpLifetime OBJECT-TYPE
-    SYNTAX      TimeInterval
-    UNITS       "centiseconds"
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION 
-        "This scalar defines, for M2PA, the default life time 
-         assigned to user data to be sent on the association.
-         
-         The default default value is only application when 
-         never set by any management station.  When set, the 
-         scalar value must persist across system reboots."
-    REFERENCE   
-        "RFC 4960 10.1 E)"
-    DEFVAL      { 0 }
-    ::= { m2paScalars 15 }
-
-m2paNotifs OBJECT IDENTIFIER
-    ::= { m2paObjects 3 }
-
-m2paOids OBJECT IDENTIFIER
-    ::= { m2paObjects 4 }
 
 m2paProtocolProfile OBJECT IDENTIFIER
     ::= { m2paTables 1 }
@@ -668,7 +258,7 @@ M2paProtocolProfileEntry ::= SEQUENCE {
 
 m2paProtocolProfileId OBJECT-TYPE
     SYNTAX      SimpleNameType
-    MAX-ACCESS  not-accessible -- index
+    MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
         "Identifies an m2paProtocolProfile instance within the 
@@ -676,7 +266,7 @@ m2paProtocolProfileId OBJECT-TYPE
          whose distinguished value can be used as an RDN when 
          naming an instance of the m2paProtocolProfile MOC."
     REFERENCE   
-        ""
+        "RFC 4165"
     ::= { m2paProtocolProfileEntry 1 }
 
 m2paN1 OBJECT-TYPE
@@ -703,8 +293,8 @@ m2paProving OBJECT-TYPE
          the M2PA signalling link will, when false(2), forego 
          proving althogether."
     REFERENCE   
-        ""
-    DEFVAL      { 1 } -- true(1)
+        "RFC 4165"
+    DEFVAL      { true }
     ::= { m2paProtocolProfileEntry 3 }
 
 m2paManagementProvingState OBJECT-TYPE
@@ -747,7 +337,7 @@ m2paLoopDelayLower OBJECT-TYPE
          belonging to the same managed switching system and 
          network entity."
     REFERENCE   
-        ""
+        "RFC 4165"
     ::= { m2paProtocolProfileEntry 5 }
 
 m2paLoopDelayUpper OBJECT-TYPE
@@ -767,7 +357,7 @@ m2paLoopDelayUpper OBJECT-TYPE
          belonging to the same managed switching system and 
          network entity."
     REFERENCE   
-        ""
+        "RFC 4165"
     ::= { m2paProtocolProfileEntry 6 }
 
 m2paTransmissionRateIntervalLower OBJECT-TYPE
@@ -787,7 +377,7 @@ m2paTransmissionRateIntervalLower OBJECT-TYPE
          another entry belonging to the same managed switching 
          element and network entity."
     REFERENCE   
-        ""
+        "RFC 4165"
     ::= { m2paProtocolProfileEntry 7 }
 
 m2paTransmissionRateIntervalUpper OBJECT-TYPE
@@ -807,7 +397,7 @@ m2paTransmissionRateIntervalUpper OBJECT-TYPE
          another entry belonging to the same managed switching 
          element and network entity."
     REFERENCE   
-        ""
+        "RFC 4165"
     ::= { m2paProtocolProfileEntry 8 }
 
 m2paSctpNoDelay OBJECT-TYPE
@@ -827,7 +417,7 @@ m2paSctpNoDelay OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpNoDelay."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 9 }
 
 m2paSctpMaxseg OBJECT-TYPE
@@ -852,7 +442,7 @@ m2paSctpMaxseg OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpMaxseg."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 10 }
 
 m2paSctpHeartbeatItvl OBJECT-TYPE
@@ -870,7 +460,7 @@ m2paSctpHeartbeatItvl OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultHeartbeatItvl."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 11 }
 
 m2paSctpHeartbeat OBJECT-TYPE
@@ -891,7 +481,7 @@ m2paSctpHeartbeat OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpHeartbeat."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 12 }
 
 m2paSctpRtoInitial OBJECT-TYPE
@@ -917,7 +507,7 @@ m2paSctpRtoInitial OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpRtoInitial."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 13 }
 
 m2paSctpRtoMin OBJECT-TYPE
@@ -944,7 +534,7 @@ m2paSctpRtoMin OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpRtoMin."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 14 }
 
 m2paSctpRtoMax OBJECT-TYPE
@@ -971,7 +561,7 @@ m2paSctpRtoMax OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpRtoMax."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 15 }
 
 m2paSctpPathMaxRetrans OBJECT-TYPE
@@ -998,7 +588,7 @@ m2paSctpPathMaxRetrans OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpPathMaxRetrans."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 16 }
 
 m2paSctpCookieLife OBJECT-TYPE
@@ -1036,7 +626,7 @@ m2paSctpCookieLife OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpCookieLife."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 17 }
 
 m2paSctpCookieInc OBJECT-TYPE
@@ -1061,7 +651,7 @@ m2paSctpCookieInc OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpCookieInc."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 18 }
 
 m2paSctpMaxInitRetries OBJECT-TYPE
@@ -1079,7 +669,7 @@ m2paSctpMaxInitRetries OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpMaxInitRetries."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 19 }
 
 m2paSctpMaxBurst OBJECT-TYPE
@@ -1097,7 +687,7 @@ m2paSctpMaxBurst OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpMaxBurst."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 20 }
 
 m2paSctpAssocMaxRetrans OBJECT-TYPE
@@ -1126,7 +716,7 @@ m2paSctpAssocMaxRetrans OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultAssocMaxRetrans."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 21 }
 
 m2paSctpSackDelay OBJECT-TYPE
@@ -1147,8 +737,8 @@ m2paSctpSackDelay OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpSackDelay."
     REFERENCE   
-        ""
-    DEFVAL      { 20 } -- 200 milliseconds
+        "RFC 4096"
+    DEFVAL      { 20 }
     ::= { m2paProtocolProfileEntry 22 }
 
 m2paSctpLifetime OBJECT-TYPE
@@ -1160,7 +750,7 @@ m2paSctpLifetime OBJECT-TYPE
         "The default value is determined by the setting of 
          m2paDefaultSctpLifetime."
     REFERENCE   
-        ""
+        "RFC 4096"
     ::= { m2paProtocolProfileEntry 23 }
 
 m2paTimerT1 OBJECT-TYPE
@@ -1496,7 +1086,7 @@ m2paProvingAttempts OBJECT-TYPE
          will be conducted during link alignment before the 
          alignment procedures will be considered unsuccessful."
     REFERENCE   
-        ""
+        "RFC 4165"
     ::= { m2paProtocolProfileEntry 37 }
 
 -- bufferMechanismPackage
@@ -1621,7 +1211,7 @@ m2paReceiveCongestionThresholdAbatement OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
          receiveCongestionThresholdAbatement."
-    DEFVAL      { 3 } -- messages
+    DEFVAL      { 3 }
     ::= { m2paProtocolProfileEntry 45 }
 
 m2paReceiveCongestionThresholdOnset OBJECT-TYPE
@@ -1647,7 +1237,7 @@ m2paReceiveCongestionThresholdOnset OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1992), ANSI T1.116.1 (2000), 
          receiveCongestionThresholdOnset."
-    DEFVAL      { 6 } -- 6 messages
+    DEFVAL      { 6 }
     ::= { m2paProtocolProfileEntry 46 }
 
 m2paReceiveCongestionThresholdDiscard OBJECT-TYPE
@@ -1673,7 +1263,7 @@ m2paReceiveCongestionThresholdDiscard OBJECT-TYPE
         "ITU-T Rec. Q.751.1 and ANSI T1.116.1 do not specify a 
          discard threshold, but the OpenSS7 L2 protocol state 
          machine does."
-    DEFVAL      { 9 } -- 9 messages
+    DEFVAL      { 9 }
     ::= { m2paProtocolProfileEntry 47 }
 
 -- m2paProtocolProfileNamePackage
@@ -2046,7 +1636,6 @@ m2paTransCongThresholdDiscardL3Octets OBJECT-TYPE
          transSaalCongThresholdDiscardL3.octets."
     ::= { m2paProtocolProfileEntry 62 }
 
---
 m2paProtocolProfileRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
@@ -2059,6 +1648,446 @@ m2paProtocolProfileRowStatus OBJECT-TYPE
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
     ::= { m2paProtocolProfileEntry 63 }
+
+-- Default values:
+--
+-- The purpose of these default scalars is two-fold: 1. to provide a 
+-- localized set of default values to be applied when creatinging 
+-- underspecified entries in the m2paProtocolProfile table; 2. to 
+-- provide values where no protocol profile is specified.  These are 
+-- default-default values in the sense that the act as default values 
+-- for management operations, however, once set by a management station 
+-- or by internal system operations, they persist across both agent and 
+-- system reboots.
+
+m2paScalars OBJECT IDENTIFIER
+    ::= { m2paObjects 2 }
+
+m2paDefaultSctpNoDelay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, by default whether the 
+         Nagle algorithm should be applied to SCTP associations.  
+         The Nagle algorithm increases the size of the packets 
+         placed on the network at the expense of delaying the 
+         transmission of some data during congestion episodes.  
+         When set to true(1), the Nagle algorithm is suppressed; 
+         otherwise, set to false(2), the Nagle algorithm is in 
+         effect.
+         
+         The default default is true(1): send packets without 
+         delay.  The default default value is only application 
+         when never set by any management station.  When set, 
+         the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960"
+    DEFVAL      { true }
+    ::= { m2paScalars 1 }
+
+m2paDefaultSctpMaxseg OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..65536)
+    UNITS       "octets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default maximum SCTP 
+         payload size for outgoing packets.  Values greater than 
+         the association MTU are ignored and have no effect.  
+         The value determines the maximum size (in octets) above 
+         which SCCP will fragment larger DATA chunis into 
+         smaller DATA chunks, and beneath which SCTP will bundle 
+         DATA chunks into a single packate or combine smaller 
+         DATA chunks into larger DATA chunks.  Normally this 
+         value is the association MTU value must the size of the 
+         current IP and SCTP headers, minus the size of one DATA 
+         chunk header.  When set to a lower value, the lower 
+         value will be used.
+         
+         The default default allows the prevailing MTU to be 
+         controlling (65536 octets).  The default default value 
+         is only application when never set by any management 
+         station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE   
+        "RFC 4960"
+    DEFVAL      { 65536 }
+    ::= { m2paScalars 2 }
+
+m2paDefaultSctpHeartbeatItvl OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default time 
+         interval (in milliseconds) between successive HEARTBEAT 
+         messages used to probe destination transport addresses 
+         for RTT calculation and activity.  Valid values are 
+         zero (0) - do not heartbeat, or a value of 1 
+         millisecond or greater.
+         
+         In general this value determines the amount of time 
+         that it takes for an SCTP association to detect a 
+         failure on a association which has no data to transmit 
+         or retransmit.  M2PA, however, is used by MTP Level 3 
+         which generates a test message every T2, where T2 is 
+         defined in ITU-T Rec. Q.707 (1993) or ANSI T1.111.7 
+         (2000) to have a range from 4 to 12 seconds.  
+         Therefore, for M2PA, unless the SCTP heartbeat interval 
+         is set below Q.707-T2, it will only have effect on 
+         multihomed associations for checking the status of 
+         non-primary or non-CMT destinations.
+         
+         Reducing this value will reduce the amount of time 
+         taken to detect primary and non-primary, non-CMT path, 
+         interface and destination failures, but may only affect 
+         primary destinations if reduced below the coresponding 
+         Q.707-T2 value.
+         
+         The default default value is that recommended by RFC 
+         4960 (6000 centiseconds, or 60 seconds).  The default 
+         default value is only application when never set by any 
+         management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. HB.interval, ITU-T Rec. Q.707 (1993), ANIS 
+         T1.111.7 (2000)."
+    DEFVAL      { 6000 }
+    ::= { m2paScalars 3 }
+
+m2paDefaultSctpHeartbeat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, by default whether 
+         HEARBEAT messages used to probe destination transport 
+         addresses for RTT calculation and activity will be sent 
+         periodically.
+         
+         Disabling the heart beat mechanism reduces the 
+         protocol's repsonsiveness in detection of failures and 
+         redirection of traffic away from failed paths and 
+         interfaces, particularly, for M2PA, failed non-primary 
+         and non-CMT destinations in an multi-homed association.  
+         This scalar should normally be left at its default 
+         value.
+         
+         The default default value from RFC 4960 is true(1).  
+         The default default value is only application when 
+         never set by any management station.  When set, the 
+         scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960"
+    ::= { m2paScalars 4 }
+
+m2paDefaultSctpRtoInitial OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default initial time 
+         interval (in milliseconds) that will be used as an 
+         intial RTO (retransmission time out) value when sending 
+         packets to a destination for the first time.  Valid 
+         values are zero or greater but must be within the range 
+         m2paDefaultSctpRtoMin to m2paDefaultSctpRtoMax.
+         
+         Note that, in general, the default RTO initial values 
+         should not be less than the peer's maximum SACK delay, 
+         otherwise, excessive retransmission might occur while 
+         the peer is delaying acknowledgements.  That is, this 
+         value should be greater than the corresponding 
+         m2paDefaultSctpSackDelay at the peer.
+         
+         The default default value is that value recommended by 
+         RFC 4960 (3000 milliseconds, or 3 seconds).  The 
+         default default value is only application when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. RTO.Initial"
+    DEFVAL      { 300 }
+    ::= { m2paScalars 5 }
+
+m2paDefaultSctpRtoMin OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default minmum time 
+         interval (in milliseconds) that will be used as an RTO 
+         (retransmission time out) value when sending packets to 
+         a destination transport address and expecting 
+         acknowledgements.  Valid values are zero or greater but 
+         must be less than or equal to m2paDefaultSctpRtoInitial 
+         and strictly less than m2paDefaultSctpRtoMax.
+         
+         Note that, in general, the RTO minimum should not be 
+         less thatn the peer's maximum SACK delay, otherwise, 
+         excessive retransmissions might occur while the peer is 
+         delaying acknowledgements.  That is, this value should 
+         not be less than the corresponding 
+         m2paDefaultSctpSackDelay at the peer.
+         
+         The default default value is the value recommended by 
+         RFC 4960 (1000 milliseconds, or 1 second).  The default 
+         default value is only application when never set by any 
+         management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. RTO.Min"
+    DEFVAL      { 100 }
+    ::= { m2paScalars 6 }
+
+m2paDefaultSctpRtoMax OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default maximum time 
+         interval (in milliseconds) that will be used as an RTO 
+         (retransmission timeout) value when sending packets t a 
+         destination transport address and expecting 
+         acknowledgements.  Valid values are zero or greater but 
+         must be greater than or equal to m2paSctpRtoInitial and 
+         strictly greater than m2paSctpRtoMin.
+         
+         The default default value is the value recommended by 
+         RFC 4960 (60000 milliseconds, or 60 seconds).  The 
+         default default value is only application when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. RTO.Max"
+    DEFVAL      { 6000 }
+    ::= { m2paScalars 7 }
+
+m2paDefaultSctpPathMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default number of 
+         times that SCTP will attempt retransmitting a packet to 
+         a given detination transport address before it 
+         considers that destination transport address inactive.  
+         Valid values are zero or greater.
+         
+         Adjusting this value has an effect on th period of time 
+         taken to fail-over between destinations for multi-homed 
+         connections.  Lower values (including zero) will yield 
+         faster fail-over response times.  Lower values, 
+         however, may cause thrashing between destinations 
+         contributing to congestion in the network.  Default 
+         default values are applicable to Internet applications.
+         
+         The default default value is the value recommended in 
+         RFC 4960 (5 retransmissions).  The default default 
+         value is only application when never set by any 
+         management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Path.Max.Retrans"
+    DEFVAL      { 5 }
+    ::= { m2paScalars 8 }
+
+m2paDefaultSctpCookieLife OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default time 
+         interval (in milliseconds) in conjunction with 
+         m2paSctpCookieInc beyond which a COOKIE-ECHO received 
+         with a cookie sent in an INIT-ACK will no longer be 
+         accepted.  For SCTP, this also limits the maximum time 
+         interval for which the HMAC secret key for the cookie 
+         will be valid.  Valid values are zero or greater.  
+         Values of zero will  be converted to a system clock 
+         tick.
+         
+         Reducing this value will increase the probability that 
+         passive connection attempts will fail due to expired 
+         cookies.  Increasing the value will reduce the overall 
+         security of the system by permitting attackers an 
+         increased interval within which to crack HMACs and 
+         guess verification tags.  This value may be adjusted in 
+         conjunction with m2paSctpCookieInc to meet most 
+         objectives for successful passive connection attempts 
+         with the best security afforded by smaller values of 
+         m2paSctpCookieLife.
+         
+         Unfortunately, the m2paSctpCookieLife and 
+         m2paSctpCookieInc must be adjusted to accomodate the 
+         slowest peer on the slowest connection.  The default 
+         setting is adequate for Internet applications.
+         
+         The default default value is the value recommended by 
+         RFC 4960 (6,000 centiseconds, or 60 seconds).  The 
+         default default value is only application when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Valid.Cookie.Life"
+    DEFVAL      { 6000 }
+    ::= { m2paScalars 9 }
+
+m2paDefaultSctpCookieInc OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default time 
+         increment (in milliseconds) that will be added to the 
+         lifespan of the cookie in an INIT-ACK if the recieved 
+         INIT requests cookie preservative to lengthen the 
+         lifespan of the cookie.  Valid values are zero or 
+         greater.
+         
+         This value can be adjusted in conjunction with 
+         m2paSctpCookieLife to meet objectives of successful 
+         passive connection attempts and security.
+         
+         The default default value is the value recommended in 
+         RFC 4960 5.2.6 (100 centiseconds, or 1 second).  The 
+         default default setting is adequate for Internet 
+         applications.  The default default value is only 
+         application when never set by any management station.  
+         When set, the scalar value must persist across system 
+         reboots."
+    REFERENCE   
+        "RFC 4960, 5.2.6, 3)"
+    DEFVAL      { 100 }
+    ::= { m2paScalars 10 }
+
+m2paDefaultSctpMaxInitRetries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "retries"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default number of 
+         times that an INIT or COOKIE-ECHO will be resent to a 
+         given destination before abandoning an active open 
+         attempt.  Value values are zero or greater.
+         
+         The default default value is the value recommended by 
+         RFC 4960 (8 retries).  The default default value is 
+         only application when never set by any management 
+         station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Max.Init.Retransmits"
+    DEFVAL      { 8 }
+    ::= { m2paScalars 11 }
+
+m2paDefaultSctpMaxBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "MTUs"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default maximum 
+         number of MTUs of new data chunks that will be sent in 
+         a burst in accordance with SCTP Specification Errata 
+         and Issues, RFC 4460 and RFC 4960.
+         
+         The default default value is the value recommended in 
+         RFC 4960 (4 MTUs).  The default default value is only 
+         application when never set by any management station.  
+         When set, the scalar value must persist across system 
+         reboots."
+    REFERENCE   
+        "RFC 4960 15. Max.Burst"
+    DEFVAL      { 4 }
+    ::= { m2paScalars 12 }
+
+m2paDefaultSctpAssocMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default number of 
+         times that the sending endpoint will attempt 
+         retransmitting a packet on any active destination 
+         transport address before it aborts the association.  
+         Value values are zero or greater.
+         
+         This value should be larger than sum of the default 
+         path maximum number of retransmission values of each of 
+         the destinations.
+         
+         Setting this value to less than the sum of the default 
+         path maximum retransmission values for all of the 
+         destinations has the interesting effect of permitting a 
+         connection to persist even when all destinations have 
+         been deemed inactive.
+         
+         The default default value is the value recommended in 
+         RFC 4960 (10 retransmissions).  The default default 
+         value is only application when never set by any 
+         management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Association.Max.Retrans"
+    DEFVAL      { 10 }
+    ::= { m2paScalars 13 }
+
+m2paDefaultSctpSackDelay OBJECT-TYPE
+    SYNTAX      TimeInterval (0..50)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default interval of 
+         time (in milliseconds) that will be used as an RTO 
+         (retransmission time out) value when sending packets to 
+         a destination transport address.  Valid values are zero 
+         or to 500 milliseconds (RFC 4960 forbids setting this 
+         value larger than 500 milliseconds).
+         
+         The default default value is the value recommended in 
+         RFC 4960 (200 milliseconds).  The default default value 
+         is only application when never set by any management 
+         station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE   
+        "RFC 4960 15. 6.2"
+    DEFVAL      { 20 }
+    ::= { m2paScalars 14 }
+
+m2paDefaultSctpLifetime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for M2PA, the default life time 
+         assigned to user data to be sent on the association.
+         
+         The default default value is only application when 
+         never set by any management station.  When set, the 
+         scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 10.1 E)"
+    DEFVAL      { 0 }
+    ::= { m2paScalars 15 }
+
+m2paNotifs OBJECT IDENTIFIER
+    ::= { m2paObjects 3 }
+
+m2paOids OBJECT IDENTIFIER
+    ::= { m2paObjects 4 }
 
 m2paConformance OBJECT IDENTIFIER
     ::= { m2paMIB 2 }
@@ -2169,7 +2198,16 @@ m2paProvingPackage OBJECT-GROUP
                   m2paProvingAttempts }
     STATUS      current
     DESCRIPTION 
-        "A collection of objects that implements a proving package."
+        "A collection of objects that implements a proving package.
+         
+         The proving package provides the ability to specify whether 
+         proving is performed during signalling link alignment 
+         procedures and the number of proving attempts that will be 
+         peformed.  Because the proving characteristics of the 
+         signalling link may be dictated by the pertinent SS7 signalling 
+         link protocol variant, this is a mandatory package."
+    REFERENCE   
+        "RFC 4165, RFC 4960"
     ::= { m2paGroups 5 }
 
 m2paBufferMechanismPackage OBJECT-GROUP
@@ -2260,7 +2298,15 @@ m2paCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
         "A compliance profile for implementations that implement 
-         some of the feaures of this module."
+         some of the feaures of this module.
+         
+         The proving package provides the ability to specify 
+         whether proving is performed during signalling link 
+         alignment procedures and the number of proving attempts 
+         that will be peformed.  Because the proving 
+         characteristics of the signalling link may be dictated 
+         by the pertinent SS7 signalling link protocol variant, 
+         this is a mandatory package."
 
     MODULE      -- this module
 
@@ -2268,20 +2314,12 @@ m2paCompliance MODULE-COMPLIANCE
                   m2paBasicSS7TransmitCongestionPackage, 
                   m2paBasicSCTPGroup, m2paProvingPackage }
 
--- The proving package provides the ability to specify whether 
--- proving is performed during signalling link alignment 
--- procedures and the number of proving attempts that will be 
--- peformed.  Because the proving characteristics of the 
--- signalling link may be dictated by the pertinent SS7 
--- signalling link protocol variant, this is a mandatory 
--- package.
-
         GROUP   m2paBufferMechanismPackage
         DESCRIPTION   
-              "The buffer mechanism package provides for a 
-               number of congestion levels in contrast to the 
-               single congestion level of ITU-T international 
-               SS7 signalling variants.
+              "The buffer mechanism package provides for a number 
+               of congestion levels in contrast to the single 
+               congestion level of ITU-T international SS7 
+               signalling variants.
                
                This group is required when the implementation 
                supports congestion based on buffer occupancy."
@@ -2289,28 +2327,27 @@ m2paCompliance MODULE-COMPLIANCE
         GROUP   m2paCongestionHandlingPackage
         DESCRIPTION   
               "The congestion handling package provides a 
-               mechanism for transmit buffer congestion 
-               handling.  It specifies the basis (octets, 
-               messages or both) on which congestion is counted 
-               and specifies on what basis congestion is 
-               reported.  This group is required when the MTP 
-               Level 3 protocol requires congestion handling."
+               mechanism for transmit buffer congestion handling.  
+               It specifies the basis (octets, messages or both) 
+               on which congestion is counted and specifies on 
+               what basis congestion is reported.  This group is 
+               required when the MTP Level 3 protocol requires 
+               congestion handling."
 
         GROUP   m2paMultipleTransmissionCongestionStatesPackage
         DESCRIPTION   
               "When this package is present and in use for the 
-               M2PA instance, neither the thresholds for 
-               multiple congestion levels package nor the 
-               thresholds for multiple congestion levels with 
-               message priorities packages can be in use for the 
-               same M2PA instance.
+               M2PA instance, neither the thresholds for multiple 
+               congestion levels package nor the thresholds for 
+               multiple congestion levels with message priorities 
+               packages can be in use for the same M2PA instance.
                
                When present a in use, this group provides timers 
                x and y, the number of congestion states and the 
                initial level of congestion.  Support for this 
-               group is required when the implementation 
-               supports the multiple transmission congestion 
-               states feature of SS7."
+               group is required when the implementation supports 
+               the multiple transmission congestion states 
+               feature of SS7."
 
         GROUP   m2paReceiveCongestionLevelPackage
         DESCRIPTION   
@@ -2346,198 +2383,327 @@ m2paCompliance MODULE-COMPLIANCE
         DESCRIPTION   
               "When this package is present and in use for the 
                M2PA instances, the M2PA thresholds for multiple 
-               congestion levels package must also be present 
-               and in use for the M2PA isntance.
+               congestion levels package must also be present and 
+               in use for the M2PA isntance.
                
                When present and in use this group provides 
                transmit buffer occupancy discard thresholds for 
-               levels one, two and three.  Support for this 
-               group is required when the implementation 
-               supports the multiple congestion levels with 
-               message priorities feature of SS7."
+               levels one, two and three.  Support for this group 
+               is required when the implementation supports the 
+               multiple congestion levels with message priorities 
+               feature of SS7."
 
         -- m2paBasicSS7Group
         OBJECT  m2paLoopDelayLower
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA< the minimum access for the 
+               m2paLoopDelayLower column is read-write.  This 
+               value is only used to categorize M2PA links and 
+               therefore must be writable."
 
         OBJECT  m2paLoopDelayUpper
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access for the 
+               m2paLoopDelayUpper column is read-write.  This 
+               value is only used to categorize M2PA links and 
+               therefore must be writable."
 
         OBJECT  m2paTransmissionRateIntervalLower
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access is read-write for the 
+               column, m2paTransmissionRateIntervalLower.  This 
+               value is necessary to categorize M2PA links and 
+               therefore must be writable."
 
         OBJECT  m2paTransmissionRateIntervalUpper
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access is read-write for the 
+               column, m2paTransmissionRateIntervalUpper.  This 
+               value is necessary to categorize M2PA links and 
+               therefore must be writable."
 
         OBJECT  m2paTimerT1
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access is read-write for the 
+               column, m2paTimerT1.  This value is necessary to 
+               manage M2PA link characteristics and must be 
+               writable."
 
         OBJECT  m2paTimerT2
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access is read-write for the 
+               column, m2paTimerT2.  This value is necessary to 
+               manage M2PA link characteristics and must be 
+               writable."
 
         OBJECT  m2paTimerT2L
         MIN-ACCESS  not-accessible
         DESCRIPTION   
-              ""
+              "When SS7 link capability is provided using M2PA, 
+               the minimum access is not-accessible for the 
+               column, m2paTimerT2L.  This timer is only defined 
+               for a deprecated automatic allocation of 
+               signalling data links and data terminals technique 
+               and is never used on modern systems."
 
         OBJECT  m2paTimerT2H
         MIN-ACCESS  not-accessible
         DESCRIPTION   
-              ""
+              "When SS7 link capability is provided using M2PA, 
+               the minimum access is not-accessible for the 
+               column, m2paTimerT2H.  This timer is only defined 
+               for a deprecated automatic allocation of 
+               signalling data links and data terminals technique 
+               and is never used on modern systems."
 
         OBJECT  m2paTimerT3
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access is read-write for the 
+               column, m2paTimerT3.  This value is necessary to 
+               manage M2PA link characteristics and must be 
+               writable."
 
         OBJECT  m2paTimerT4N
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access is read-write for the 
+               column, m2paTimerT4N.  This value is necessary to 
+               manage M2PA link characteristics and must be 
+               writable."
 
         OBJECT  m2paTimerT4E
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access is read-write for the 
+               column, m2paTimerT4E.  This value is necessary to 
+               manage M2PA link characteristics and must be 
+               writable."
 
         OBJECT  m2paTimerT6
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access is read-write for the 
+               column, m2paTimerT6.  This value is necessary to 
+               manage M2PA link characteristics and must be 
+               writable."
 
         OBJECT  m2paTimerT7
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provided using 
+               M2PA, the minimum access is read-write for the 
+               column, m2paTimerT7.  This value is necessary to 
+               manage M2PA link characteristics and must be 
+               writable."
 
         -- m2paBasicSS7TransmitCongestionPackage
-        OBJECT  m2paCongestionCounting
-        MIN-ACCESS  not-accessible
-        DESCRIPTION   
-              ""
-
-        OBJECT  m2paCongestionReportingBaseObject
-        MIN-ACCESS  not-accessible
-        DESCRIPTION   
-              ""
-
+--      OBJECT  m2paCongestionCounting
+--      MIN-ACCESS  not-accessible
+--      DESCRIPTION   
+--            ""
+--
+--      OBJECT  m2paCongestionReportingBaseObject
+--      MIN-ACCESS  not-accessible
+--      DESCRIPTION   
+--            ""
+--
         OBJECT  m2paTransCongThresholdAbatementL1Messages
         MIN-ACCESS  not-accessible
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provideed using 
+               M2PA, and the protocol variant provides single or 
+               multiple congestion levels with or without message 
+               priorities, the object must be writable, 
+               m2paTransCongThresholdAbatementL1Messages."
 
         OBJECT  m2paTransCongThresholdAbatementL1Octets
         MIN-ACCESS  not-accessible
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provideed using 
+               M2PA, and the protocol variant provides single or 
+               multiple congestion levels with or without message 
+               priorities, the object must be writable, 
+               m2paTransCongThresholdAbatementL1Octets."
 
         OBJECT  m2paTransCongThresholdOnsetL1Messages
         MIN-ACCESS  not-accessible
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provideed using 
+               M2PA, and the protocol variant provides single or 
+               multiple congestion levels with or without message 
+               priorities, the object must be writable, 
+               m2paTransCongThresholdOnsetL1Messages."
 
         OBJECT  m2paTransCongThresholdOnsetL1Octets
         MIN-ACCESS  not-accessible
         DESCRIPTION   
-              ""
+              "When basic SS7 link capability is provideed using 
+               M2PA, and the protocol variant provides single or 
+               multiple congestion levels with or without message 
+               priorities, the object must be writable, 
+               m2paTransCongThresholdOnsetL1Octets."
 
         -- m2paBasicSCTPGroup
         OBJECT  m2paSctpNoDelay
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpNoDelay is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         OBJECT  m2paSctpMaxseg
         MIN-ACCESS  read-only
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter m2paMaxseg 
+               is read-only.  This value is necessary to 
+               characterize the SCTP association for M2PA but 
+               need only be read and not necessarily written."
 
         OBJECT  m2paSctpHeartbeatItvl
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpHeartbeatItvl is read-write.  This value 
+               is necessary to characterize the SCTP association 
+               for M2PA and must be writable."
 
         OBJECT  m2paSctpHeartbeat
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpHeartbeat is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         OBJECT  m2paSctpRtoInitial
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpRtoInitial is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         OBJECT  m2paSctpRtoMin
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpRtoMin is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         OBJECT  m2paSctpRtoMax
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpRtoMax is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         OBJECT  m2paSctpPathMaxRetrans
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpPathMaxRetrans is read-write.  This value 
+               is necessary to characterize the SCTP association 
+               for M2PA and must be writable."
 
         OBJECT  m2paSctpCookieLife
         MIN-ACCESS  read-only
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpCookieLife is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         OBJECT  m2paSctpCookieInc
         MIN-ACCESS  read-only
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpCookieInc is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         OBJECT  m2paSctpMaxInitRetries
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpMaxInitRetries is read-write.  This value 
+               is necessary to characterize the SCTP association 
+               for M2PA and must be writable."
 
         OBJECT  m2paSctpMaxBurst
         MIN-ACCESS  read-only
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpMaxBurst is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         OBJECT  m2paSctpAssocMaxRetrans
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpAssocMaxRetrans is read-write.  This value 
+               is necessary to characterize the SCTP association 
+               for M2PA and must be writable."
 
         OBJECT  m2paSctpSackDelay
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpSackDelay is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         OBJECT  m2paSctpLifetime
         MIN-ACCESS  read-only
         DESCRIPTION   
-              ""
+              "When basic SS7 operation is provided using M2PA, 
+               the minimum access for SCTP parameter 
+               m2paSctpLifetime is read-write.  This value is 
+               necessary to characterize the SCTP association for 
+               M2PA and must be writable."
 
         -- m2paProvingPackage OBJECT-GROUP
         OBJECT  m2paN1
         MIN-ACCESS  read-only
         DESCRIPTION   
-              "It is not required that the implementation 
-               support setting of the number of proving messages 
-               sent during the proving period, but it is 
-               required that the implementation report the 
-               setting.
+              "It is not required that the implementation support 
+               setting of the number of proving messages sent 
+               during the proving period, but it is required that 
+               the implementation report the setting.
                
                Where proving is performed on a timer basis (T4), 
                this is the number of messages that would be 
@@ -2548,18 +2714,16 @@ m2paCompliance MODULE-COMPLIANCE
         OBJECT  m2paProving
         MIN-ACCESS  read-only
         DESCRIPTION   
-              "It is not required that the implementation 
-               support selection of proving, but it is required 
-               that the implementation report the current 
-               setting."
+              "It is not required that the implementation support 
+               selection of proving, but it is required that the 
+               implementation report the current setting."
 
         OBJECT  m2paManagementProvingState
         MIN-ACCESS  read-only
         DESCRIPTION   
-              "It is not required that the implementation 
-               support setting of proving state, but it is 
-               required that the implementation report the 
-               current settings."
+              "It is not required that the implementation support 
+               setting of proving state, but it is required that 
+               the implementation report the current settings."
 
         OBJECT  m2paProvingAttempts
         MIN-ACCESS  read-only
@@ -2580,10 +2744,10 @@ m2paCompliance MODULE-COMPLIANCE
         MIN-ACCESS  read-only
         DESCRIPTION   
               "When the m2paCongestionHandlingPackage is 
-               provided, this object is available.  However, 
-               some implementation may implement this as a 
-               read-only object, and the implementation might 
-               only one value."
+               provided, this object is available.  However, some 
+               implementation may implement this as a read-only 
+               object, and the implementation might only one 
+               value."
 
         OBJECT  m2paCongestionReportingBaseObject
         MIN-ACCESS  not-accessible
@@ -2597,116 +2761,193 @@ m2paCompliance MODULE-COMPLIANCE
         OBJECT  m2paTimerTx
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operation using M2PA, protocol 
+               variants that perform multiple transmission 
+               congestion states without transmission priorities 
+               requires that the m2paTimerTx object can be 
+               written."
 
         OBJECT  m2paTimerTy
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operation using M2PA, protocol 
+               variants that perform multiple transmission 
+               congestion states without transmission priorities 
+               requires that the m2paTimerTy object can be 
+               written."
 
         OBJECT  m2paNumberOfCongestionStates
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operation using M2PA, protocol 
+               variants that perform multiple transmission 
+               congestion states without transmission priorities 
+               requires that the m2paNumberOfCongestionStates 
+               object can be written."
 
         OBJECT  m2paInitialLevelOfCongestion
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operation using M2PA, protocol 
+               variants that perform multiple transmission 
+               congestion states without transmission priorities 
+               requires that the m2paInitialLevelOfCongestion 
+               object can be written."
 
         -- m2paReceiveCongestionLevelPackage OBJECT-GROUP
         OBJECT  m2paReceiveCongestionThresholdAbatement
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operation using M2PA, proper 
+               operation of receive congestion requires that the 
+               m2paReceiveCongestionThresholdAbatement object can 
+               be written."
 
         OBJECT  m2paReceiveCongestionThresholdOnset
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operation using M2PA, proper 
+               operation of receive congestion requires that the 
+               m2paReceiveCongestionThresholdOnset object can 
+               be written."
 
         OBJECT  m2paReceiveCongestionThresholdDiscard
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operation using M2PA, proper 
+               operation of receive congestion requires that the 
+               m2paReceiveCongestionThresholdDiscard object can 
+               be written."
 
         -- m2paProtocolProfileNamePackage OBJECT-GROUP
         OBJECT  m2paProtocolProfileName
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operation, characterizing M2PA links 
+               requires that the m2paProtocolProfileName object 
+               be written."
 
         -- m2paThresholdsForMultCongLevelsPackage OBJECT-GROUP
         OBJECT  m2paTransCongThresholdAbatementL2Messages
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with or 
+               without message priorities requires that the 
+               m2paTransCongThresholdAbatementL2Messages object 
+               be writable."
 
         OBJECT  m2paTransCongThresholdAbatementL2Octets
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with or 
+               without message priorities requires that the 
+               m2paTransCongThresholdAbatementL2Octets object 
+               be writable."
 
         OBJECT  m2paTransCongThresholdOnsetL2Messages
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with or 
+               without message priorities requires that the 
+               m2paTransCongThresholdOnsetL2Messages object 
+               be writable."
 
         OBJECT  m2paTransCongThresholdOnsetL2Octets
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with or 
+               without message priorities requires that the 
+               m2paTransCongThresholdOnsetL2Octets object 
+               be writable."
 
         OBJECT  m2paTransCongThresholdAbatementL3Messages
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with or 
+               without message priorities requires that the 
+               m2paTransCongThresholdAbatementL3Messages object 
+               be writable."
 
         OBJECT  m2paTransCongThresholdAbatementL3Octets
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with or 
+               without message priorities requires that the 
+               m2paTransCongThresholdAbatementL3Octets object 
+               be writable."
 
         OBJECT  m2paTransCongThresholdOnsetL3Messages
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with or 
+               without message priorities requires that the 
+               m2paTransCongThresholdOnsetL3Messages object 
+               be writable."
 
         OBJECT  m2paTransCongThresholdOnsetL3Octets
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with or 
+               without message priorities requires that the 
+               m2paTransCongThresholdOnsetL3Octets object 
+               be writable."
 
         -- m2paThresholdsForMultCongLevelsWithPrioPackage OBJECT-GROUP
         OBJECT  m2paTransCongThresholdDiscardL1Messages
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with message 
+               priorities requires that the object be writable,
+               m2paTransCongThresholdDiscardL1Messages."
 
         OBJECT  m2paTransCongThresholdDiscardL1Octets
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with message 
+               priorities requires that the object be writable,
+               m2paTransCongThresholdDiscardL1Octets."
 
         OBJECT  m2paTransCongThresholdDiscardL2Messages
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with message 
+               priorities requires that the object be writable,
+               m2paTransCongThresholdDiscardL2Messages."
 
         OBJECT  m2paTransCongThresholdDiscardL2Octets
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with message 
+               priorities requires that the object be writable,
+               m2paTransCongThresholdDiscardL2Octets."
 
         OBJECT  m2paTransCongThresholdDiscardL3Messages
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with message 
+               priorities requires that the object be writable,
+               m2paTransCongThresholdDiscardL3Messages."
 
         OBJECT  m2paTransCongThresholdDiscardL3Octets
         MIN-ACCESS  read-write
         DESCRIPTION   
-              ""
+              "For basic SS7 operations, protocol variants that 
+               require multiple congestion levels with message 
+               priorities requires that the object be writable,
+               m2paTransCongThresholdDiscardL3Octets."
 
     ::= { m2paCompliances 2 }
 
@@ -2812,5 +3053,3 @@ m2paMultipleCongestionLeveslWithMessagePriorityCompliance MODULE-COMPLIANCE
     ::= { m2paCompliances 6 }
 
 END -- end of module OPENSS7-M2PA-MIB.
-
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

@@ -1,4 +1,4 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-SMI.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-06-09 12:58:32 $
@@ -63,7 +63,7 @@
 -- Revision 1.1.2.2  2010-06-09 12:58:32  brian
 -- - updated mibs
 --
--- Revision 1.1.2.1  2009-06-21 11:39:32  brian
+-- Revision 1.1.2.1  2011-06-21 11:39:32  brian
 -- - added files to new distro
 --
 -- =============================================================================
@@ -75,7 +75,7 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 openss7 MODULE-IDENTITY
-    LAST-UPDATED "200812092224Z"
+    LAST-UPDATED "201106250302Z"
     ORGANIZATION 
         "OpenSS7 Corporation"
     CONTACT-INFO 
@@ -89,14 +89,71 @@ openss7 MODULE-IDENTITY
          Mob: +1 780 953 0557
          E-Mail: bidulock@openss7.org"
     DESCRIPTION 
-        "Top level OpenSS7 MIB Module."
-    REVISION	"200812092224Z"
-    DESCRIPTION
-	"Added arc for Q.752 based MIBs."
+        "Top level OpenSS7 MIB Module.
+
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+
+         All Rights Reserved.
+
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control.
+
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+
+         All Rights Reserved.
+
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106250302Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted with smidump."
+    REVISION    "200812092224Z"
+    DESCRIPTION 
+        "Added arc for Q.752 based MIBs."
     REVISION    "200709250000Z"
     DESCRIPTION 
         "First revision of this MIB."
-    ::= { enterprises 29591 } -- 29591 assigned by IANA
+    ::= { enterprises 29591 }
 
 -- Uppermost arcs of the OpenSS7 tree.
 
@@ -120,6 +177,18 @@ openss7Capabilities OBJECT-IDENTITY
          registered."
     ::= { openss7 2 }
 
+openss7G OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T G-Series Specs."
+    ::= { openss7 7 }
+
+openss7G774 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T G.774 and G.774.X Specs."
+    ::= { openss7G 774 }
+
 openss7Ms OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
@@ -138,18 +207,6 @@ openss7MsSmi OBJECT-IDENTITY
         "Management Systems System Management Information."
     ::= { openss7Ms 3 }
 
-openss7G OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T G-Series Specs."
-    ::= { openss7 7 }
-
-openss7G774 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T G.774 and G.774.X Specs."
-    ::= { openss7G 774 }
-
 openss7M OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
@@ -162,76 +219,70 @@ openss7Q OBJECT-IDENTITY
         "ITU-T Q-Series Specs."
     ::= { openss7 17 }
 
-openss7X OBJECT-IDENTITY
+openss7Q700 OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        "ITU-T X-Series Specs."
-    ::= { openss7 24 }
-
-openss7Q700 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.700 and ANSI T1.111.0 Specs."
+        "ITU-T Q.700 and ANSI T1.111.0 Specs."
     ::= { openss7Q 700 }
 
 openss7Q701 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.701 and ANSI T1.111.1 Specs."
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q.701 and ANSI T1.111.1 Specs."
     ::= { openss7Q 701 }
 
 openss7Q702 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.702 and ANSI T1.111.2 Specs."
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q.702 and ANSI T1.111.2 Specs."
     ::= { openss7Q 702 }
 
 openss7Q703 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.703 and ANSI T1.111.3 Specs."
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q.703 and ANSI T1.111.3 Specs."
     ::= { openss7Q 703 }
 
 openss7Q704 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.704 and ANSI T1.111.4 Specs."
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q.704 and ANSI T1.111.4 Specs."
     ::= { openss7Q 704 }
 
 openss7Q711 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.711 and ANSI T1.112 Specs."
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q.711 and ANSI T1.112 Specs."
     ::= { openss7Q 711 }
 
 openss7Q751 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.751 and ANSI T1.116 Specs."
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q.751 and ANSI T1.116 Specs."
     ::= { openss7Q 751 }
 
-openss7Q7511 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.751.1 and ANSI T1.116.1 Specs."
-    ::= { openss7Q751 1 }
+-- openss7Q7511 OBJECT-IDENTITY
+--     STATUS      current
+--     DESCRIPTION 
+--         "ITU-T Q.751.1 and ANSI T1.116.1 Specs."
+--     ::= { openss7Q751 1 }
 
-openss7Q7512 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.751.2 and ANSI T1.116.2 Specs."
-    ::= { openss7Q751 2 }
+-- openss7Q7512 OBJECT-IDENTITY
+--     STATUS      current
+--     DESCRIPTION 
+--         "ITU-T Q.751.2 and ANSI T1.116.2 Specs."
+--     ::= { openss7Q751 2 }
 
 openss7Q752 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.752 and ANSI T1.116 Specs."
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q.752 and ANSI T1.116 Specs."
     ::= { openss7Q 752 }
 
 openss7Q771 OBJECT-IDENTITY
-    STATUS	current
-    DESCRIPTION
-	"ITU-T Q.771 and ANSI T1.114 Specs."
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T Q.771 and ANSI T1.114 Specs."
     ::= { openss7Q 771 }
 
 openss7Q825 OBJECT-IDENTITY
@@ -240,6 +291,10 @@ openss7Q825 OBJECT-IDENTITY
         "ITU-T Q.825 Specs."
     ::= { openss7Q 825 }
 
-END -- end of module OPENSS7-SMI.
+openss7X OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "ITU-T X-Series Specs."
+    ::= { openss7 24 }
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+END -- end of module OPENSS7-SMI.

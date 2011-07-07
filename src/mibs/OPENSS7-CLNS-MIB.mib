@@ -97,15 +97,42 @@ cLNS-MIB MODULE-IDENTITY
 		 Mob: +1 780 953 0557
 		 mailto:bidulock@openss7.org"
 	DESCRIPTION
-		"This MIB provides configuration and status information 
-		 of an OSI CLNS subsystem, where the CLNS is in 
-		 accordance with ITU-T Rec. X.233 | ISO/IEC 8473-1, 
-		 ISO/IEC 8473-2, ITU-T Rec. X.622 | ISO/IEC 8473-3, 
-		 ITU-T Rec. X.623 | ISO/IEC 8473-4 and also ES-IS in 
-		 accordance with ISO/IEC 9542, IS-IS in accordance with 
-		 ISO/IEC 10589 and IDRP in accordance with ISO/IEC 
-		 10747.  Accordingly, the CLNS can be provided by an 
-		 IEEE 802.2 subnetwork, X.25 PLP, or an OSI datalink."
+	"This MIB provides configuration and status information 
+	 of an OSI CLNS subsystem, where the CLNS is in 
+	 accordance with ITU-T Rec. X.233 | ISO/IEC 8473-1, 
+	 ISO/IEC 8473-2, ITU-T Rec. X.622 | ISO/IEC 8473-3, 
+	 ITU-T Rec. X.623 | ISO/IEC 8473-4 and also ES-IS in 
+	 accordance with ISO/IEC 9542, IS-IS in accordance with 
+	 ISO/IEC 10589 and IDRP in accordance with ISO/IEC 
+	 10747.  Accordingly, the CLNS can be provided by an 
+	 IEEE 802.2 subnetwork, X.25 PLP, or an OSI datalink.
+
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+
+         All Rights Reserved.
+
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
 	REVISION
 		"200711270218Z"
 	 DESCRIPTION "First release of this module."

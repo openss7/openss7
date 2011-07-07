@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -4580,14 +4580,14 @@ var_simpleUsageMeteringControlTable(struct variable *vp, oid * name, size_t *len
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) CREATIONTRIGGERLIST:	/* ReadWrite */
+	case (u_char) CREATIONTRIGGERLIST:	/* Create */
 		*write_method = write_creationTriggerList;
 		if (!StorageTmp)
 			break;
 		*var_len = StorageTmp->creationTriggerListLen;
 		rval = (u_char *) StorageTmp->creationTriggerList;
 		break;
-	case (u_char) SIMPLEUSAGEMETERINGCONTROLENTRYSTATUS:	/* ReadWrite */
+	case (u_char) SIMPLEUSAGEMETERINGCONTROLENTRYSTATUS:	/* Create */
 		*write_method = write_simpleUsageMeteringControlEntryStatus;
 		if (!StorageTmp)
 			break;
@@ -6559,9 +6559,9 @@ write_creationTriggerList(int action, u_char *var_val, u_char var_val_type, size
 		}
 		if (var_val_type == ASN_OCTET_STR) {
 			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to creationTriggerList: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to creationTriggerList: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -6710,9 +6710,9 @@ write_configurationMask(int action, u_char *var_val, u_char var_val_type, size_t
 		}
 		if (var_val_type == ASN_OCTET_STR) {
 			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to configurationMask: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to configurationMask: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -7009,7 +7009,7 @@ write_timesOfDay(int action, u_char *var_val, u_char var_val_type, size_t var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to timesOfDay: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value */
+		/* Note: default value \"\" */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((string = malloc(var_val_len + 1)) == NULL)
@@ -7233,10 +7233,10 @@ write_configurationR2Mask(int action, u_char *var_val, u_char var_val_type, size
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_type == ASN_BIT_STR) {
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to configurationR2Mask: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to configurationR2Mask: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
 		}
 		if (var_val_type == ASN_OCTET_STR) {
 			if (var_val_len > SPRINT_MAX_LEN) {

@@ -273,6 +273,8 @@ oid ss7ProtocolPnoc1996_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1
 oid ss7ProtocolPnoc2000_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1, 8, 2000 };
 oid ss7ProtocolPnoc2004_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1, 8, 2004 };
 oid ss7ProtocolPnoc2008_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 1, 4, 1, 8, 2008 };
+oid ss7GeneralCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 2, 1, 1 };
+oid ss7Package_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 751, 0, 2, 2, 1 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -963,12 +965,11 @@ write_ss7NetworkProtocolVariant(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to ss7NetworkProtocolVariant not ASN_OBJECT_ID\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		/* Note: ranges 14..15 */
-		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid) || ((14 * sizeof(oid) > var_val_len || var_val_len > 15 * sizeof(oid)))) {
+		if (MIN_OID_LEN * sizeof(oid) > var_val_len || var_val_len > MAX_OID_LEN * sizeof(oid)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to ss7NetworkProtocolVariant: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { ss7ProtocolAnsi2000 } */
+		/* Note: default value ss7ProtocolAnsi2000 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)

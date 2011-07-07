@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-X25-PLP-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:33 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -81,7 +81,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 x25-PLP-MIB MODULE-IDENTITY
-    LAST-UPDATED "200711252210Z"
+    LAST-UPDATED "201106280028Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -99,7 +99,37 @@ x25-PLP-MIB MODULE-IDENTITY
          X.25 PLP subsystem, where the X.25 PLP is in accordance with 
          ITU-T Rec.  X.25 | ISO/IEC 8208 and management information from 
          ITU-T Rec. X.283 | ISO/IEC 
-         10733."
+         10733.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106280028Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted with smidump."
     REVISION    "200711252210Z"
     DESCRIPTION 
         "First release of this module."
@@ -107,36 +137,43 @@ x25-PLP-MIB MODULE-IDENTITY
 
 
 DTEAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the DTE address."
     SYNTAX      OCTET STRING (SIZE(0..15))
 
 LogicalChannelNumber ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-0"
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the logical channel number.  Logical channel numbers 
+         in X.25 can be between zero (0) and 4095, inclusive."
     SYNTAX      Integer32 (0..4095)
 
 Throughput ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-0"
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the throughput associated with a virtual call as a 
+         ordinal value between zero (0) and 15, inclusive."
     SYNTAX      Integer32 (0..15)
 
 RedirectReason ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d-0"
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the redirect reason for redirection of a virtual call.  
+         The redirect reason is coded as an integer between zero (0) and 
+         127, inclusive."
     SYNTAX      Integer32 (0..127)
 
 NetworkAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an CONS OSI network address for use the the X.25 
+         address extension."
     SYNTAX      OCTET STRING (SIZE(0..20))
 
 x25PLPNotifications OBJECT IDENTIFIER
@@ -716,7 +753,7 @@ x25PLEProfileName OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "A simple name index for this PLE profile."
     ::= { x25PLEProfileEntry 1 }
 
 x25PLEProfileLocalDTEAddress OBJECT-TYPE
@@ -1283,7 +1320,8 @@ x25PLEStatsIndex OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "A simple name that provides an index for the PLE to which the 
+         statistics in this row correspond."
     ::= { x25PLEStatsEntry 1 }
 
 x25PLEStatsOctetsSentCounter OBJECT-TYPE
@@ -1503,7 +1541,8 @@ x25VCConfigTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of virtual call configurations for each of the 
+         VCs that correspond to an X.25 interface."
     ::= { x25VCConfig 1 }
 
 x25VCConfigEntry OBJECT-TYPE
@@ -1511,7 +1550,9 @@ x25VCConfigEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in the x25VCConfigTable provides the configuration for 
+         a single logical channel for each of the VCs that correspond to 
+         an X.25 interface."
     INDEX       { x25VCConfigId, x25VCConfigChannel }
     ::= { x25VCConfigTable 1 }
 
@@ -1531,7 +1572,8 @@ x25VCConfigId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Identifies and indexes the X.25 interface using a simple name 
+         type."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10742."
     ::= { x25VCConfigEntry 1 }
@@ -1541,7 +1583,8 @@ x25VCConfigChannel OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Identifies and indexes the channel associated with the VC using 
+         a logical channel number type."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10742."
     ::= { x25VCConfigEntry 2 }
@@ -1636,7 +1679,10 @@ x25VCProfileTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This table provides the values of various parameters to be 
+         applied to a virtual call.  When a virtual call is to be 
+         established, the values of all the parameters to be used can be 
+         identified by specifying an instance of this MOC."
     REFERENCE   
         "ISO/IEC 10733 : virtualCall."
     ::= { x25VCProfile 1 }
@@ -1646,7 +1692,7 @@ x25VCProfileEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        "This managed objecte exsts in order to permit the values of 
+        "This managed object exsts in order to permit the values of 
          various parameters of a virtual call to be specified in advance 
          by management.  When a virtual call is to be established, the 
          values of all the parameters to be used can be identified by 
@@ -1686,7 +1732,8 @@ x25VCProfileId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a name and index for the VC profile as a simple name 
+         type."
     REFERENCE   
         "ISO/IEC 10733."
     ::= { x25VCProfileEntry 1 }
@@ -1944,7 +1991,8 @@ x25VCStatsTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of current statistics for a Virtual Call by 
+         simple name type and channel number."
     REFERENCE   
         "ISO/IEC 10733."
     ::= { x25VCStats 1 }
@@ -1954,7 +2002,9 @@ x25VCStatsEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each entry in the x25VCStatsTable contains the current values 
+         of the statistics within the current interval for a single 
+         virtual call or permanent virtual channel."
     REFERENCE   
         "ISO/IEC 10733."
     INDEX       { x25VCStatsIndex, x25VCStatsChannel }
@@ -1985,7 +2035,8 @@ x25VCStatsIndex OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an index into the x25VCStatsTable as a simple name 
+         type."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733."
     ::= { x25VCStatsEntry 1 }
@@ -1995,7 +2046,8 @@ x25VCStatsChannel OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Identifies the channel associated with the virtual call for 
+         which statistics are being collected."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733."
     ::= { x25VCStatsEntry 2 }
@@ -2005,7 +2057,8 @@ x25VCStatsOctetsSentCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the count within the current interval of the number 
+         of octets sent."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733."
     ::= { x25VCStatsEntry 3 }
@@ -2015,7 +2068,8 @@ x25VCStatsOctetsReceivedCounter OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the count within the current interval of the number 
+         of octets received."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10733."
     ::= { x25VCStatsEntry 4 }
@@ -2171,7 +2225,8 @@ x25PVCConfigTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table containing each PVC (Permanent Virtual 
+         Circuit) that is defined for an X.25 interface."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10742."
     ::= { x25PVCConfig 1 }
@@ -2217,7 +2272,8 @@ x25PVCConfigId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an identification of the X.25 interface for which the 
+         PVC configuration applies as a simple name type."
     ::= { x25PVCConfigEntry 1 }
 
 x25PVCConfigChannel OBJECT-TYPE
@@ -2225,7 +2281,8 @@ x25PVCConfigChannel OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides identification of the X.25 PVC for which the PVC 
+         configuration applies as a logical channel number."
     ::= { x25PVCConfigEntry 2 }
 
 x25PVCConfigRowStatus OBJECT-TYPE
@@ -2233,7 +2290,14 @@ x25PVCConfigRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete conceptual rows from the x25PVCConfigTable.  Addition of 
+         a row configures a logical channel number on an interface for 
+         PVC operation.  Removing a row removes a PVC from service.  PVC 
+         can be activated and deactivated without removing the row.  
+         This column uses the RowStatus textual convention."
+    REFERENCE   
+        "SNMPv2-TC"
     ::= { x25PVCConfigEntry 3 }
 
 x25SVCConfig OBJECT IDENTIFIER
@@ -2244,7 +2308,8 @@ x25SVCConfigTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table containing each SVC (Switched Virtual Call) 
+         that is defined for an X.25 interface."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10742."
     ::= { x25SVCConfig 1 }
@@ -2254,7 +2319,18 @@ x25SVCConfigEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in the x25SVCConfigTable provides information for a 
+         single SVC on a single X.25 interface.  It contains the 
+         particulars about the call, its logical channel number 
+         assignment, incoming or outgoing direction, remote DTE address, 
+         throughput class, redirect reason, originally called adderess, 
+         calling address extensions and called address extension.
+         
+         Rows are added and removed from this table by the agent as 
+         calls are created and destroyed.  Management stations have no 
+         control over the SVC via this table: the call lifecycle is 
+         controlled by the internal interface between the X.25 packet 
+         layer and the X.25 user."
     REFERENCE   
         "ITU-T Rec. X.283 | ISO/IEC 10742."
     INDEX       { x25SVCConfigId, x25SVCConfigChannel }
@@ -2277,7 +2353,8 @@ x25SVCConfigId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Identifies and indexes the X.25 interface using a simple name 
+         type."
     ::= { x25SVCConfigEntry 1 }
 
 x25SVCConfigChannel OBJECT-TYPE
@@ -2285,7 +2362,8 @@ x25SVCConfigChannel OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Identifies and indexes the channel of the SVC using a logical 
+         channel number type."
     ::= { x25SVCConfigEntry 2 }
 
 x25SVCConfigDirection OBJECT-TYPE
@@ -2575,5 +2653,3 @@ x25PLPBasicCompliance MODULE-COMPLIANCE
     ::= { x25PLPCompliances 1 }
 
 END -- end of module OPENSS7-X25-PLP-MIB.
-
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

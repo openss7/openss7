@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -479,7 +479,7 @@ m2paMIB_create(void)
 	DEBUGMSGTL(("m2paMIB", "m2paMIB_create: creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
-		StorageNew->m2paDefaultSctpNoDelay = 1;
+		StorageNew->m2paDefaultSctpNoDelay = TV_TRUE;
 		StorageNew->m2paDefaultSctpMaxseg = 65536;
 		StorageNew->m2paDefaultSctpHeartbeatItvl = 6000;
 		StorageNew->m2paDefaultSctpHeartbeat = 0;
@@ -830,7 +830,7 @@ m2paProtocolProfileTable_create(void)
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->m2paN1 = 1000;
-		StorageNew->m2paProving = 1;
+		StorageNew->m2paProving = TV_TRUE;
 		StorageNew->m2paManagementProvingState = 0;
 		StorageNew->m2paLoopDelayLower = 0;
 		StorageNew->m2paLoopDelayUpper = 0;
@@ -1815,7 +1815,7 @@ write_m2paProving(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paProving: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 1 */
+		/* Note: default value true */
 		switch (set_value) {
 		case TV_TRUE:
 		case TV_FALSE:
@@ -5888,7 +5888,7 @@ write_m2paDefaultSctpNoDelay(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpNoDelay: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 1 */
+		/* Note: default value true */
 		switch (set_value) {
 		case TV_TRUE:
 		case TV_FALSE:
