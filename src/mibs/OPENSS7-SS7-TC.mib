@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-SS7-TC.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:32 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -68,7 +68,7 @@
 OPENSS7-SS7-TC DEFINITIONS ::= BEGIN
 
 IMPORTS
-    openss7, openss7Q, openss7Q700
+    openss7Q700
         FROM OPENSS7-SMI
     MODULE-IDENTITY
         FROM SNMPv2-SMI
@@ -76,7 +76,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 ss7TC MODULE-IDENTITY
-    LAST-UPDATED "200709260000Z"
+    LAST-UPDATED "201106250328Z"
     ORGANIZATION 
         "OpenSS7 Corporation"
     CONTACT-INFO 
@@ -90,7 +90,37 @@ ss7TC MODULE-IDENTITY
          Mob: +1 780 953 0557
          E-mail: bidulock@openss7.org"
     DESCRIPTION 
-        "Textual Conventions for SS7."
+        "Textual Conventions for SS7.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106250327Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted with smidump."
     REVISION    "200709260000Z"
     DESCRIPTION 
         "First release of this module."
@@ -174,22 +204,22 @@ NetworkPointCode ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1d:1d-"
     STATUS      current
     DESCRIPTION 
-	"This is a network referenced signalling point code that 
-	 uniquely identifies both the national or international SS7 
-	 network (point code numbering space) to which the point code 
-	 belongs as well as the point code within the network.  The 
-	 first octet is a network identifier that identifies the larger 
-	 national or international SS7 network; the second octet is the 
-	 'network' portion of the signalling point code as defined in 
-	 Q.704; the third, the 'cluster'; and, the fourth and last, the 
-	 'member'.  This is displayed with a colon separating the 
-	 network number and the normal numbers and dashes notation for 
-	 the signalling point code: e.g. 1:5-1-1.  Note that an ITU-T 
-	 signalling point code is unpacked by network, cluster and 
-	 member into separate octets.  Also note that when the first 
-	 octet is zero (0) it does not specify a global larger network 
-	 and thus the network point code applies only to a locally 
-	 defined network."
+        "This is a network referenced signalling point code that 
+         uniquely identifies both the national or international SS7 
+         network (point code numbering space) to which the point code 
+         belongs as well as the point code within the network.  The 
+         first octet is a network identifier that identifies the larger 
+         national or international SS7 network; the second octet is the 
+         'network' portion of the signalling point code as defined in 
+         Q.704; the third, the 'cluster'; and, the fourth and last, the 
+         'member'.  This is displayed with a colon separating the 
+         network number and the normal numbers and dashes notation for 
+         the signalling point code: e.g. 1:5-1-1.  Note that an ITU-T 
+         signalling point code is unpacked by network, cluster and 
+         member into separate octets.  Also note that when the first 
+         octet is zero (0) it does not specify a global larger network 
+         and thus the network point code applies only to a locally 
+         defined network."
     SYNTAX      OCTET STRING (SIZE(4))
 
 MtpLinkFailureReason ::= TEXTUAL-CONVENTION
@@ -236,8 +266,8 @@ MtpUserPart ::= TEXTUAL-CONVENTION
          management messages; other values may be assigned to user 
          parts."
     SYNTAX      INTEGER { snmm(0), sntm(1), snsm(2), sccp(3), tup(4), 
-                    isup(5), dup1(6), dup2(7), mtup(8), b-isup(9), 
-		    siup(10) }
+                    isup(5), dup1(6), dup2(7), mtup(8), bisup(9), 
+                    siup(10) }
 
 Ss7ProtocolVariant ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -255,5 +285,3 @@ Ss7ProtocolVariant ::= TEXTUAL-CONVENTION
     SYNTAX      OBJECT IDENTIFIER
 
 END -- end of module OPENSS7-SS7-TC.
-
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-SS7-OM-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:32 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -68,124 +68,192 @@
 OPENSS7-SS7-OM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, TEXTUAL-CONVENTION, enterprises
-	FROM SNMPv2-SMI
-    MODULE-COMPLIANCE
-	FROM SNMPv2-TC
+    openss7Q752
+        FROM OPENSS7-SMI
+    tmnObjectInstance, tmnPerceivedSeverity, tmnProbableCause
+        FROM OPENSS7-SMI-MIB
     NetworkPointCode
-	FROM OPENSS7-SS7-MIB
-    openss7, openss7Q, openss7Q752
-	FROM OPENSS7-SMI;
+        FROM OPENSS7-SS7-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE
+        FROM SNMPv2-SMI;
 
 ss7OmMIB MODULE-IDENTITY
-    LAST-UPDATED "200812201153Z"
-    ORGANIZATION "The OpenSS7 Project"
-    CONTACT-INFO
-	"Brian Bidulock
-	 OpenSS7 Corporation
-	 1469 Jefferys Crescent
-	 Edmonton, Alberta  T6L 6T1
-	 CANADA
-	 Tel: +1 780 490 1141
-	 Fax: +1 780 490 1241
-	 Mob: +1 780 953 0557
-	 mailto:bidulock@openss7.org"
-    DESCRIPTION
-	"The purpose of this MIB is to provide SNMP support for the 
-	 common operational measurements provided in ITU-T Q.752 and 
-	 ANSI T1.116.  There exists a draft GDMO specification for ANSI 
-	 T1.116.1 from which this MIB is based.  Strangely enough, no 
-	 GDMO is standardized for SS7 operational measurements.
-
-	 The objective of this MIB is to support both the reporting of 
-	 statistics obtained from Operational Measurements as well as 
-	 providing a mechanism to activate and report the results of OM 
-	 studies.
-
-	 This is one of a set of MIB modules that support SS7 
-	 operational measurements.  This MIB module provides the common 
-	 defintions necessary for the MIB modules for each of the 
-	 protocol layers."
-    REVISION "200812201153Z"
-    DESCRIPTION
-	"Additional workup."
-    REVISION "200812141308Z"
-    DESCRIPTION
-	"This is the initial revision of this MIB."
+    LAST-UPDATED "201106250529Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta  T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         mailto:bidulock@openss7.org"
+    DESCRIPTION 
+        "The purpose of this MIB is to provide SNMP support for the 
+         common operational measurements provided in ITU-T Q.752 and 
+         ANSI T1.116.  There exists a draft GDMO specification for ANSI 
+         T1.116.1 from which this MIB is based.  Strangely enough, no 
+         GDMO is standardized for SS7 operational measurements.
+         
+         The objective of this MIB is to support both the reporting of 
+         statistics obtained from Operational Measurements as well as 
+         providing a mechanism to activate and report the results of OM 
+         studies.
+         
+         This is one of a set of MIB modules that support SS7 
+         operational measurements.  This MIB module provides the common 
+         defintions necessary for the MIB modules for each of the 
+         protocol layers.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106250529Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted using smidump."
+    REVISION    "200812201153Z"
+    DESCRIPTION 
+        "Additional workup."
+    REVISION    "200812141308Z"
+    DESCRIPTION 
+        "This is the initial revision of this MIB."
     ::= { openss7Q752 0 }
 
- -- top level organization of the MIB
 
-ss7OmNotifications	OBJECT IDENTIFIER ::= { ss7OmMIB	 0 }
-ss7OmObjects		OBJECT IDENTIFIER ::= { ss7OmMIB	 1 }
-ss7OmConformance	OBJECT IDENTIFIER ::= { ss7OmMIB	 2 }
+ss7OmNotifications OBJECT IDENTIFIER
+    ::= { ss7OmMIB 0 }
 
-ss7OmTables		OBJECT IDENTIFIER ::= { ss7OmObjects	 1 }
-ss7OmScalars		OBJECT IDENTIFIER ::= { ss7OmObjects	 2 }
-ss7OmNotifs		OBJECT IDENTIFIER ::= { ss7OmObjects	 3 }
-ss7OmOids		OBJECT IDENTIFIER ::= { ss7OmObjects	 4 }
+ss7OmObjects OBJECT IDENTIFIER
+    ::= { ss7OmMIB 1 }
 
-ss7OmCompliance		OBJECT IDENTIFIER ::= { ss7OmConformance 1 }
-ss7OmGroups		OBJECT IDENTIFIER ::= { ss7OmConformance 2 }
-ss7OmCapabilities	OBJECT IDENTIFIER ::= { ss7OmConformance 3 }
+ss7OmTables OBJECT IDENTIFIER
+    ::= { ss7OmObjects 1 }
+
+ss7OmScalars OBJECT IDENTIFIER
+    ::= { ss7OmObjects 2 }
+
+ss7OmNotifs OBJECT IDENTIFIER
+    ::= { ss7OmObjects 3 }
 
 pointCode OBJECT-TYPE
-    SYNTAX NetworkPointCode
-    MAX-ACCESS accessible-for-notify
-    STATUS current
-    DESCRIPTION
-	"Provides a notification paramter for use with the mtpRestarting 
-	 notification."
+    SYNTAX      NetworkPointCode
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides a notification paramter for use with the mtpRestarting 
+         notification."
     ::= { ss7OmNotifs 1 }
 
+ss7OmOids OBJECT IDENTIFIER
+    ::= { ss7OmObjects 4 }
+
+ss7OmConformance OBJECT IDENTIFIER
+    ::= { ss7OmMIB 2 }
+
+ss7OmCompliance OBJECT IDENTIFIER
+    ::= { ss7OmConformance 1 }
+
+ss7OmGroups OBJECT IDENTIFIER
+    ::= { ss7OmConformance 2 }
+
+ss7OmCapabilities OBJECT IDENTIFIER
+    ::= { ss7OmConformance 3 }
+
 mtpRestarting NOTIFICATION-TYPE
-    OBJECTS {
-	pointCode
-    }
-    STATUS current
-    DESCRIPTION
-	"This notification is use to indicate that a given MTP is 
-	 restarting."
+    OBJECTS     { pointCode }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is use to indicate that a given MTP is 
+         restarting."
     ::= { ss7OmNotifications 1 }
 
 ss7OnOccEvent NOTIFICATION-TYPE
-    OBJECTS {
-	tmnObjectInstance,
-	tmnProbableCause,
-	-- specificProblems,
-	tmnPerceivedSeverity
-	-- notificationIdentifier
-	-- correlatedNotifications
-	-- additionalText
-	-- additionalInformation
-    }
-    STATUS current
-    DESCRIPTION
-	"This notification type is used to report when an SS7 object 
-	 encounter the first event within an interval for an operational 
-	 measurement that is activated for first-and-interval operation.
-
-	 This notification is used to report the T1.116.2 on-occurence 
-	 measurement results and other MTP events, that are not reported 
-	 as a communication alarm.
-
-	 First-and-interval operation is when a notification is given of 
-	 the first event to occur within a collection period and then 
-	 the first and remaining events are counted within the interval.  
-	 The first event in the next collection period with then be 
-	 reported, and so on.
-
-	 This notification type is used to generate the reports.  Note 
-	 that many of these first-and-interval events also have a TMN 
-	 communicationsAlarm or qualityOfService alarm defined for them, 
-	 but this notification is used for generating the indication to 
-	 an operational measurements subsystem of the manager instead of 
-	 the maintenance subsystem."
-    REFERENCE
-	"ITU-T Rec. Q.752 (1993) ss7OnOccEvent NOTIFICATION.
-	 ANSI T1.116.1/2000 ss7OnOccEvent NOTIFICATION."
+    OBJECTS     { tmnObjectInstance, tmnProbableCause, 
+                  tmnPerceivedSeverity }
+    STATUS      current
+    DESCRIPTION 
+        "This notification type is used to report when an SS7 object 
+         encounter the first event within an interval for an operational 
+         measurement that is activated for first-and-interval operation.
+         
+         This notification is used to report the T1.116.2 on-occurence 
+         measurement results and other MTP events, that are not reported 
+         as a communication alarm.
+         
+         First-and-interval operation is when a notification is given of 
+         the first event to occur within a collection period and then 
+         the first and remaining events are counted within the interval.  
+         The first event in the next collection period with then be 
+         reported, and so on.
+         
+         This notification type is used to generate the reports.  Note 
+         that many of these first-and-interval events also have a TMN 
+         communicationsAlarm or qualityOfService alarm defined for them, 
+         but this notification is used for generating the indication to 
+         an operational measurements subsystem of the manager instead of 
+         the maintenance subsystem."
+    REFERENCE   
+        "ITU-T Rec. Q.752 (1993) ss7OnOccEvent NOTIFICATION.
+         ANSI T1.116.1/2000 ss7OnOccEvent NOTIFICATION."
     ::= { ss7OmNotifications 2 }
 
-END -- OPENSS7-SS7-OM-MIB
+ss7OmPackage OBJECT-GROUP
+    OBJECTS     { pointCode }
+    STATUS      current
+    DESCRIPTION 
+        "This provides, for now, a single object group of all 
+         conformance applicable objects."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000)"
+    ::= { ss7OmGroups 1 }
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+ss7OmEvents NOTIFICATION-GROUP
+    NOTIFICATIONS { mtpRestarting, ss7OnOccEvent }
+    STATUS      current
+    DESCRIPTION 
+        "This provides, for now, a single notification group of all 
+         conformance applicable objects."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000)"
+    ::= { ss7OmGroups 2 }
+
+ss7OmGeneralCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "This provides basic compliance for this module."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { ss7OmPackage, ss7OmEvents }
+
+    ::= { ss7OmCompliance 1 }
+
+END -- end of module OPENSS7-SS7-OM-MIB.

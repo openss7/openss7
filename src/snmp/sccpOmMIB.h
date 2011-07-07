@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -107,17 +107,17 @@ extern int sa_request;			/* request number for per-request actions */
 /* our storage structure(s) */
 struct sccpOmMIB_data {
 	uint sccpOmMIB_request;
-	oid *sccpOm1stAndIntervalActivate;	/* WriteOnly */
+	oid *sccpOm1stAndIntervalActivate;	/* ReadWrite */
 	size_t sccpOm1stAndIntervalActivateLen;
-	oid *sccpOm1stAndIntervalDeactivate;	/* WriteOnly */
+	oid *sccpOm1stAndIntervalDeactivate;	/* ReadWrite */
 	size_t sccpOm1stAndIntervalDeactivateLen;
-	oid *sccpOm5MinActivate;	/* WriteOnly */
+	oid *sccpOm5MinActivate;	/* ReadWrite */
 	size_t sccpOm5MinActivateLen;
-	oid *sccpOm5MinDeaActivate;	/* WriteOnly */
+	oid *sccpOm5MinDeaActivate;	/* ReadWrite */
 	size_t sccpOm5MinDeaActivateLen;
-	oid *sccpOm15MinActivate;	/* WriteOnly */
+	oid *sccpOm15MinActivate;	/* ReadWrite */
 	size_t sccpOm15MinActivateLen;
-	oid *sccpOm15MinDeaActivate;	/* WriteOnly */
+	oid *sccpOm15MinDeaActivate;	/* ReadWrite */
 	size_t sccpOm15MinDeaActivateLen;
 	long sccpOmDiscontinuityTime;	/* ReadOnly */
 	long sccpOmTimeStamp;		/* ReadOnly */
@@ -130,7 +130,8 @@ struct sccpOmMIB_data {
 struct sccpOmErrorsTable_data {
 	uint sccpOmErrorsTable_request;
 	uint sccpOmErrorsTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
+	size_t sccpNetworkEntityIdLen;
 	long sccpOmNoTranslatorForAddress;	/* ReadOnly */
 	long sccpOmNoRuleForAddress;	/* ReadOnly */
 	long sccpOmPointCodeNotAvailable;	/* ReadOnly */
@@ -158,7 +159,8 @@ struct sccpOmErrorsTable_data {
 struct sccpOmMessageTable_data {
 	uint sccpOmMessageTable_request;
 	uint sccpOmMessageTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
+	size_t sccpNetworkEntityIdLen;
 	long sccpOmTotalMessagesHandled;	/* ReadOnly */
 	long sccpOmTotalMessagesLocal;	/* ReadOnly */
 	long sccpOmTotalMessagesGTT;	/* ReadOnly */
@@ -188,7 +190,8 @@ struct sccpOmMessageTable_data {
 struct sccpOmAccessibilityTable_data {
 	uint sccpOmAccessibilityTable_request;
 	uint sccpOmAccessibilityTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
+	size_t sccpNetworkEntityIdLen;
 	long sccpOmSSCMessageReceived;	/* ReadOnly */
 	long sccpOmSSPMessageReceived;	/* ReadOnly */
 	ulong sccpOmSccpUnavailableDuration;	/* ReadOnly */
@@ -198,8 +201,9 @@ struct sccpOmAccessibilityTable_data {
 struct sccpOmUtilizationTable_data {
 	uint sccpOmUtilizationTable_request;
 	uint sccpOmUtilizationTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	long sccpOmSsn;			/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
+	size_t sccpNetworkEntityIdLen;
+	long sccpOmSsn;			/* NoAccess */
 	long sccpOmLXUDTMessagesOrigClass0;	/* ReadOnly */
 	long sccpOmLXUDTMessagesOrigClass1;	/* ReadOnly */
 	long sccpOmLXUDTMessagesTermClass0;	/* ReadOnly */
@@ -217,7 +221,8 @@ struct sccpOmUtilizationTable_data {
 struct sccpOm5MinHistoryTable_data {
 	uint sccpOm5MinHistoryTable_request;
 	uint sccpOm5MinHistoryTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
+	size_t sccpNetworkEntityIdLen;
 	long sccpOmInterval;		/* NoAccess */
 	long sccpOm5MinNoTranslatorForAddress;	/* ReadOnly */
 	long sccpOm5MinNoRuleForAddress;	/* ReadOnly */
@@ -269,7 +274,8 @@ struct sccpOm5MinHistoryTable_data {
 struct sccpOm15MinHistoryTable_data {
 	uint sccpOm15MinHistoryTable_request;
 	uint sccpOm15MinHistoryTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
+	size_t sccpNetworkEntityIdLen;
 	long sccpOmInterval;		/* NoAccess */
 	long sccpOm15MinNoTranslatorForAddress;	/* ReadOnly */
 	long sccpOm15MinNoRuleForAddress;	/* ReadOnly */
@@ -320,8 +326,9 @@ struct sccpOm15MinHistoryTable_data {
 struct sccpOm5MinSsnHistoryTable_data {
 	uint sccpOm5MinSsnHistoryTable_request;
 	uint sccpOm5MinSsnHistoryTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	long sccpOmSsn;			/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
+	size_t sccpNetworkEntityIdLen;
+	long sccpOmSsn;			/* NoAccess */
 	long sccpOmInterval;		/* NoAccess */
 	long sccpOm5MinLXUDTMessagesOrigClass0;	/* ReadOnly */
 	long sccpOm5MinLXUDTMessagesOrigClass1;	/* ReadOnly */
@@ -338,8 +345,9 @@ struct sccpOm5MinSsnHistoryTable_data {
 struct sccpOm15MinSsnHistoryTable_data {
 	uint sccpOm15MinSsnHistoryTable_request;
 	uint sccpOm15MinSsnHistoryTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	long sccpOmSsn;			/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* Notify */
+	size_t sccpNetworkEntityIdLen;
+	long sccpOmSsn;			/* NoAccess */
 	long sccpOmInterval;		/* NoAccess */
 	long sccpOm15MinLXUDTMessagesOrigClass0;	/* ReadOnly */
 	long sccpOm15MinLXUDTMessagesOrigClass1;	/* ReadOnly */
@@ -385,8 +393,8 @@ extern oid sccpOm5minSsnReport_oid[12];
 extern oid sccpOm15minSsnReport_oid[12];
 
 /* scalars accessible only for notify */
+extern oid sccpOmSsnParm_oid[13];
 extern oid sccpOmDuration_oid[13];
-extern oid sccpOmSsn_oid[13];
 extern oid sccpOmSyntaxErrorType_oid[13];
 
 /* object id definitions */
@@ -405,6 +413,8 @@ extern oid sccpOmSccpManagementGroup_oid[13];
 extern oid sccpOmGTTGroup_oid[13];
 extern oid sccpOmNonObligatoryGroup_oid[13];
 extern oid sccpOmSccpUnavailableGroup_oid[13];
+extern oid sccpOmOtherGroup_oid[13];
+extern oid sccpOmOtherNotifications_oid[13];
 
 /* function prototypes */
 /* trap function prototypes */

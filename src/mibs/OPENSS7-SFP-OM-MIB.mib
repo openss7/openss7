@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-SFP-OM-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2010-06-09 12:58:31 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -68,985 +68,1020 @@
 OPENSS7-SFP-OM-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    openss7G774
-	FROM OPENSS7-SMI
+    HCPerfValidIntervals
+        FROM HC-PerfHist-TC-MIB
     sfpModuleId
-	FROM OPENSS7-SFP-MIB
-    PerfCurrentCount, PerfIntervalCount
-	FROM PerfHist-TC-MIB
-    HCPerfIntervalThreshold, HCPerfValidIntervals
-	FROM HC-PerfHist-TC-MIB
-    SnmpAdminString
-	FROM SNMP-FRAMEWORK-MIB
+        FROM OPENSS7-SFP-MIB
+    openss7G774
+        FROM OPENSS7-SMI
+    ObjectInstance
+        FROM OPENSS7-SMI-MIB
+    PerfIntervalCount
+        FROM PerfHist-TC-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
-	FROM SNMPv2-CONF
-    Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
-    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero
-	FROM SNMPv2-SMI
-    AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
-    TimeInterval, TruthValue, TimeStamp, InstancePointer, Counter
-	FROM SNMPv2-TC;
+        FROM SNMPv2-CONF
+    Gauge32, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    TimeInterval, TimeStamp
+        FROM SNMPv2-TC;
 
 sfpOmMIB MODULE-IDENTITY
-    LAST-UPDATED "201004180733Z"
-    ORGANIZATION
-	"The OpenSS7 Project"
-    CONTACT-INFO
-	"Brian Bidulock
-	 OpenSS7 Corporation
-	 1469 Jefferys Crescent
-	 Edmonton, Alberta T6L 6T1
-	 CANADA
-	 Tel: +1 780 490 1141
-	 Fax: +1 780 490 1241
-	 Mob: +1 780 953 0557
-	 E-mail: bidulock@openss7.org"
+    LAST-UPDATED "201106270909Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
     DESCRIPTION 
-	"This is a MIB providing access to the management information 
-	 associated with SFP Modules.
-	 
-	 SFF-8053, Gigabit Interface Converter (GBIC).
-	 INF-8074i, SFP (Small Formfactor Pluggable) Transceiver.
-	 SFF-8079, SFP Rate and Application Selection.
-	 SFF-8089, Rate and Application Codes.
-	 SFF-8431, Enhanced Small Form Factor Pluggable Module SFP+.
-	 SFF-8472, Diagnostic Monitoring Interface for Optical 
-	     Transceivers.
-	 ITU-T Recommendation G.774, Synchronous Digital Hierarchy 
-	     (SDH), Management Information Model for the Network Element 
-	    View, 02/2001.
-	 ITU-T Recommendation G.774.1, Synchronous Digital Hierarchy 
-	     (SDH), Bidirectional Performance Monitoring for the Network 
-	     Element View, 02/2001.
-	 "
-    REVISION "201004180733Z"
-    DESCRIPTION
-	"First release of this module."
+        "This is a MIB providing access to the management information 
+         associated with SFP Modules.
+         
+         SFF-8053, Gigabit Interface Converter (GBIC).
+         INF-8074i, SFP (Small Formfactor Pluggable) Transceiver.
+         SFF-8079, SFP Rate and Application Selection.
+         SFF-8089, Rate and Application Codes.
+         SFF-8431, Enhanced Small Form Factor Pluggable Module SFP+.
+         SFF-8472, Diagnostic Monitoring Interface for Optical 
+             Transceivers.
+         ITU-T Recommendation G.774, Synchronous Digital Hierarchy 
+             (SDH), Management Information Model for the Network Element 
+            View, 02/2001.
+         ITU-T Recommendation G.774.1, Synchronous Digital Hierarchy 
+             (SDH), Bidirectional Performance Monitoring for the Network 
+             Element View, 02/2001.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106270909Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted with smidump."
+    REVISION    "201004180733Z"
+    DESCRIPTION 
+        "First release of this module."
     ::= { openss7G774 12 }
 
-sfpOmNotifications	OBJECT IDENTIFIER ::= { sfpOmMIB	 0 }
-sfpOmObjects		OBJECT IDENTIFIER ::= { sfpOmMIB	 1 }
-sfpOmConformance	OBJECT IDENTIFIER ::= { sfpOmMIB	 2 }
 
-sfpOmTables		OBJECT IDENTIFIER ::= { sfpOmObjects	 1 }
-sfpOmScalars		OBJECT IDENTIFIER ::= { sfpOmObjects	 2 }
-sfpOmNotifs		OBJECT IDENTIFIER ::= { sfpOmObjects	 3 }
-sfpOmOids		OBJECT IDENTIFIER ::= { sfpOmObjects	 4 }
+sfpOmNotifications OBJECT IDENTIFIER
+    ::= { sfpOmMIB 0 }
 
-sfpOmCompliance		OBJECT IDENTIFIER ::= { sfpOmConformance 1 }
-sfpOmGroups		OBJECT IDENTIFIER ::= { sfpOmConformance 2 }
+sfpOmObjects OBJECT IDENTIFIER
+    ::= { sfpOmMIB 1 }
 
-sfpOmDefaults		OBJECT IDENTIFIER ::= { sfpOmScalars	 1 }
+sfpOmTables OBJECT IDENTIFIER
+    ::= { sfpOmObjects 1 }
 
-sfpOmProbableCauses	OBJECT IDENTIFIER ::= { sfpOmOids	 1 }
-sfpOmSpecificProblems	OBJECT IDENTIFIER ::= { sfpOmOids	 2 }
-sfpOmSpecificExtensions	OBJECT IDENTIFIER ::= { sfpOmOids	 3 }
-sfpOmProbableCauses2	OBJECT IDENTIFIER ::= { sfpOmOids	 4 }
-
-sfpOmActual		OBJECT IDENTIFIER ::= { sfpOmTables	 1 }
-sfpOmCurrent		OBJECT IDENTIFIER ::= { sfpOmTables	 2 }
-sfpOm5MinHistory	OBJECT IDENTIFIER ::= { sfpOmTables	 3 }
-sfpOm15MinHistory	OBJECT IDENTIFIER ::= { sfpOmTables	 4 }
-
-
--- ==========================================================
--- Notifications
--- ==========================================================
-
-sfpOm5minReport NOTIFICATION-TYPE
-    OBJECTS {
-	sfpOmDiscontinuityTime,
-	sfpOmTimeStamp,
-	sfpOmDuration,
-	sfpOmPollingInterval,
-	sfpModuleId,
-	sfpOm5MinTempMarkHi,
-	sfpOm5MinTempMarkLo,
-	sfpOm5MinVoltMarkHi,
-	sfpOm5MinVoltMarkLo,
-	sfpOm5MinBiasMarkHi,
-	sfpOm5MinBiasMarkLo,
-	sfpOm5MinTxPowerMarkHi,
-	sfpOm5MinTxPowerMarkLo,
-	sfpOm5MinRxPowerMarkHi,
-	sfpOm5MinRxPowermarkLo
-    }
-    STATUS current
-    DESCRIPTION
-	"This notification provides 5-minute interval reports of 
-	 measurements collected by this module.  Only measurements that 
-	 have been activated for 5-minute collection are included in the 
-	 report notification."
-    ::= { sfpOmNotifications 1 }
-
-sfpOm15minReport NOTIFICATION-TYPE
-    OBJECTS {
-	sfpOmDiscontinuityTime,
-	sfpOmTimeStamp,
-	sfpOmDuration,
-	sfpOmPollingInterval,
-	sfpModuleId,
-	sfpOm15MinTempMarkHi,
-	sfpOm15MinTempMarkLo,
-	sfpOm15MinVoltMarkHi,
-	sfpOm15MinVoltMarkLo,
-	sfpOm15MinBiasMarkHi,
-	sfpOm15MinBiasMarkLo,
-	sfpOm15MinTxPowerMarkHi,
-	sfpOm15MinTxPowerMarkLo,
-	sfpOm15MinRxPowerMarkHi,
-	sfpOm15MinRxPowermarkLo
-    }
-    STATUS current
-    DESCRIPTION
-	"This notification provides 15-minute interval reports of 
-	 measurements collected by this module.  Only measurements that 
-	 have been activated for 15-minute collection are included in 
-	 the report notification."
-    ::= { sfpOmNotifications 2 }
-
--- ==========================================================
--- Scalars
--- ==========================================================
-
-sfpOm5MinActivate OBJECT-TYPE
-    SYNTAX InstancePointer
-    MAX-ACCESS write-only
-    STATUS current
-    DESCRIPTION
-	"Measurements in this MIB that are to be collected on a 5-minute 
-	 basis require activation.  Writing the instance pointer of the 
-	 columnar object corresponding to the Counter or Gauge for the 
-	 measurement will activate the 5-minute measurement if not 
-	 already activated.  When the object cannot be activated, an 
-	 SNMP error will be returned.
-
-	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
-	 textual conventions will return an error if the particular 
-	 columnar object is not activated (the data collected is invalid 
-	 or missing)."
-    ::= { sfpOmScalars 1 }
-
-sfpOm5MinDeactivate OBJECT-TYPE
-    SYNTAX InstancePointer
-    MAX-ACCESS write-only
-    STATUS current
-    DESCRIPTION
-	"Measurements in this MIB that are to be collected on a 5-minute 
-	 basis require activation.  Writing the instance pointer of the 
-	 columnar object corresponding to the Counter or Gauge for the 
-	 measurement will deactivate the 5-minute measurement if not 
-	 already deactivated.  When the object cannot be deactivated, an 
-	 SNMP error will be returned.
-
-	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
-	 textual conventions will return an error if the particular 
-	 columnar object is not activated (the data collected is invalid 
-	 or missing)."
-    ::= { sfpOmScalars 2 }
-
-sfpOm15MinActivate OBJECT-TYPE
-    SYNTAX InstancePointer
-    MAX-ACCESS write-only
-    STATUS current
-    DESCRIPTION
-	"Measurements in this MIB that are to be collected on a 15-minute 
-	 basis require activation.  Writing the instance pointer of the 
-	 columnar object corresponding to the Counter or Gauge for the 
-	 measurement will activate the 15-minute measurement if not 
-	 already activated.  When the object cannot be activated, an 
-	 SNMP error will be returned.
-
-	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
-	 textual conventions will return an error if the particular 
-	 columnar object is not activated (the data collected is invalid 
-	 or missing)."
-    ::= { sfpOmScalars 3 }
-
-sfpOm15MinDeactivate OBJECT-TYPE
-    SYNTAX InstancePointer
-    MAX-ACCESS write-only
-    STATUS current
-    DESCRIPTION
-	"Measurements in this MIB that are to be collected on a 15-minute 
-	 basis require activation.  Writing the instance pointer of the 
-	 columnar object corresponding to the Counter or Gauge for the 
-	 measurement will deactivate the 15-minute measurement if not 
-	 already deactivated.  When the object cannot be deactivated, an 
-	 SNMP error will be returned.
-
-	 The activation state of a measurement can be determined by 
-	 attempting to read its PerfCurrentValue.  This is because these 
-	 textual conventions will return an error if the particular 
-	 columnar object is not activated (the data collected is invalid 
-	 or missing)."
-    ::= { sfpOmScalars 4 }
-
-sfpOmInterval OBJECT-TYPE
-    SYNTAX Integer32 (1..672)
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	"A historical data collection interval for use as an index.  
-	 Specifies the historical data collection interval as a 
-	 time-sequence with the lowest ordinal value '1' representing 
-	 the newest data collected and the highest ordinal value 
-	 (typically '96') being the oldest data collected."
-    ::= { sfpOmScalars 5 }
-
-sfpOmDiscontinuityTime OBJECT-TYPE
-    SYNTAX TimeStamp
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The time of the last discontinuity."
-    ::= { sfpOmScalars 6 }
-
-sfpOmTimeStamp OBJECT-TYPE
-    SYNTAX TimeStamp
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The time stamp of the beginning of the last completed 15-minute 
-	 time interval when read, the beginning of an interval report 
-	 for notifications."
-    ::= { sfpOmScalars 7 }
-
-sfpOm5MinMaxIntervals OBJECT-TYPE
-    SYNTAX Unsigned32 (0..288)
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-	"Indicates the maximum number of historical 5-minute intervals 
-	 that will be collected.  This is in the range from zero (0), no 
-	 historical data collected, to 288, 1 day of historical 5-minute 
-	 data collected.  Some implementations may support longer 
-	 periods of time, or some, a more restricted range.  The default 
-	 value that should be supported by all managed systems by 
-	 element configuration is 96, or 8 hours of historical 5-minute 
-	 data.
-
-	 Increasing or decreasing this value may increase or decrease 
-	 respectively the local storage demands of the agent.  
-	 Decreasing this value may or may not cause historical interval 
-	 data beyond the maximum to be discarded.  Increasing this value 
-	 might not restore valid intervals beyond the point to which 
-	 this maximum was previously decreased.
-
-	 Therefore, the setting of this value must be retained in 
-	 permanent storage and should be altered only infrequently, if 
-	 at all, by management stations."
-    DEFVAL { 96 }
-    ::= { sfpOmScalars 8 }
-
-sfpOm15MinMaxIntervals OBJECT-TYPE
-    SYNTAX Unsigned32 (0..672)
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-	"Indicates and specifies the maximum number of historical 
-	 15-minute intervals that will be collected.  This is in the 
-	 range from zero (0), no historical data collected, to 672, 
-	 7-days of historical 15-minute data collected.  Some 
-	 implementations may support longer periods of time, or some, a 
-	 more restricted range.  The default value that should be 
-	 supported by all managed systems by element configuration is 
-	 96, or 24 hours of historical 15-minute data.
-
-	 Increasing or decreasing this value may increase or decrease 
-	 respectively the local storage demands of the agent.  
-	 Decreasing this value may or may not cause historical interval 
-	 data beyond the new maximum to be discarded.  Increasing this 
-	 value might not restore valid intervals beyond the point to 
-	 which this maximum was previously decreased.
-
-	 Therefore, the setting of this value must be retained in 
-	 permanent storage and should be altered only infrequently, if 
-	 at all, by management stations."
-    DEFVAL { 96 }
-    ::= { sfpOmScalars 9 }
-
-sfpOmPollingInterval OBJECT-TYPE
-    SYNTAX TimeInterval
-    UNITS "Seconds"
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-	"Diagnostic Monitoring Interface information is provided only on 
-	 a demand basis and requires polling to determine high and low 
-	 water marks within an interval.  This object set the polling 
-	 interval at which the agent polls the SFP/SFP+ optical 
-	 transceiver locally to determine high and low water marks.
-	 
-	 A setting of zero (0) disables polling altogether.  In this 
-	 case, the 5-minute and 15-minute high and low water marks are 
-	 determined from a single sample taken at the end of the period.  
-	 The high and low water marks will, therefore, be identical.
-	 
-	 A setting of greater than 15 minutes (90,000 centiseconds) is 
-	 not usable and will generate indetermnate readings.
-	 
-	 In practice, this value should not be set below 5 seconds (500 
-	 centiseconds) and should not be set above 60 seconds (6000 
-	 centiseconds).  The agent may enfore this or a more restricted 
-	 range of settings."
-    DEFVAL { 2000 } -- 20 seconds
-    ::= { sfpOmScalars 10 }
-
-
--- ==========================================================
--- Notification Parameters
--- ==========================================================
-
-sfpOmDuration OBJECT-TYPE
-    SYNTAX TimeInterval
-    MAX-ACCESS accessible-for-notify
-    STATUS current
-    DESCRIPTION
-	"The duration of an interval, for use in interval reports for 
-	 notifications."
-    ::= { sfpOmNotifs 1 }
-
--- ====================================================================
+sfpOmActual OBJECT IDENTIFIER
+    ::= { sfpOmTables 1 }
 
 sfpOmActualTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF SfpOmActualEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
+    SYNTAX      SEQUENCE OF SfpOmActualEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table provides actual values that are determined at the 
+         time that they are read."
     ::= { sfpOmActual 1 }
 
 sfpOmActualEntry OBJECT-TYPE
-    SYNTAX SfpOmActualEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    INDEX {
-	sfpModuleId -- shared index
-    }
+    SYNTAX      SfpOmActualEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry in the sfpOmActualTable table represents a set of 
+         readings that are read from the underlying device at the time 
+         that the entry is read.  Each entry provides:
+         
+         - sfpOmTemp: the actual temperature of the SFP/SFP+ optical 
+           transceiver at the time it is read, in degrees Celsius.
+         
+         - sfpOmVolt: the actual supply voltage to the SFP/SFP+ optical 
+           transceiver at the time it is read, in mircovolts.
+         
+         - sfpOmBias: the actual transmitter bias current of the 
+           SFP/SFP+ optical transceiver at the time it is read, in 
+           microamperes.
+         
+         - sfpOmTxPower: the actual transmit power of the SFP/SFP+ 
+           optical transceiver at the time it is read, in microwatts.
+         
+         - sfpOmRxPower: the actual receive power of the SFP/SFP+ 
+           optical transceiver at the time it is read, in microwatts.
+         
+         The row can be read to determine the settings of these 
+         parameters at a given point in time."
+    INDEX       { sfpModuleId }
     ::= { sfpOmActualTable 1 }
 
 SfpOmActualEntry ::= SEQUENCE {
-    sfpOmTemp
-	Gauge32,
-    sfpOmVolt
-	Gauge32,
-    sfpOmBias
-	Gauge32,
-    sfpOmTxPower
-	Gauge32,
-    sfpOmRxPower
-	Gauge32
+    sfpOmTemp       Gauge32,
+    sfpOmVolt       Gauge32,
+    sfpOmBias       Gauge32,
+    sfpOmTxPower    Gauge32,
+    sfpOmRxPower    Gauge32
 }
 
 sfpOmTemp OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Degrees Celsius"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the actual temperature of the SFP/SFP+ optical 
-	 transceiver at the time it is read."
+    SYNTAX      Gauge32
+    UNITS       "Degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the actual temperature of the SFP/SFP+ optical 
+         transceiver at the time it is read."
     ::= { sfpOmActualEntry 1 }
 
 sfpOmVolt OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microvolts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the actual supply voltage to the SFP/SFP+ optical 
-	 transceiver at the time it is read."
+    SYNTAX      Gauge32
+    UNITS       "Microvolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the actual supply voltage to the SFP/SFP+ optical 
+         transceiver at the time it is read."
     ::= { sfpOmActualEntry 2 }
 
 sfpOmBias OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microamperes"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Proivdes the actual transmitter bias current of the SFP/SFP+ 
-	 optical transceiver at the time it is read."
+    SYNTAX      Gauge32
+    UNITS       "Microamperes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the actual transmitter bias current of the SFP/SFP+ 
+         optical transceiver at the time it is read."
     ::= { sfpOmActualEntry 3 }
 
 sfpOmTxPower OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the actual transmit power of the SFP/SFP+ optical 
-	 transceiver at the time it is read."
+    SYNTAX      Gauge32
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the actual transmit power of the SFP/SFP+ optical 
+         transceiver at the time it is read."
     ::= { sfpOmActualEntry 4 }
 
 sfpOmRxPower OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the actual receive power of the SFP/SFP+ optical 
-	 transceiver at the time it is read."
+    SYNTAX      Gauge32
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the actual receive power of the SFP/SFP+ optical 
+         transceiver at the time it is read."
     ::= { sfpOmActualEntry 5 }
 
-
--- ====================================================================
+sfpOmCurrent OBJECT IDENTIFIER
+    ::= { sfpOmTables 2 }
 
 sfpOmCurrentTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF SfpOmCurrentEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
+    SYNTAX      SEQUENCE OF SfpOmCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The SFP/SFP+ OM Current table contains various statistics being 
+         collected for the current 5- and 15-minute intervals."
     ::= { sfpOmCurrent 1 }
 
 sfpOmCurrentEntry OBJECT-TYPE
-    SYNTAX SfpOmCurrentEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    INDEX {
-	sfpModuleId -- shared index
-    }
+    SYNTAX      SfpOmCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry in the sfpOmCurrentTable represents a set of 
+         statistics that are being collected for the current 5- and 
+         15-minute intervals for a specific SFP/SFP+ module as 
+         indexed by the sfpModuleId."
+    INDEX       { sfpModuleId }
     ::= { sfpOmCurrentTable 1 }
 
-SfpOmCurrentEntry ::=
-    SEQUENCE {
-	sfpOmTempMarkHi
-	    Gauge32,
-	sfpOmTempMarkLo
-	    Gauge32,
-	sfpOmVoltMarkHi
-	    Gauge32,
-	sfpOmVoltMarkLo
-	    Gauge32,
-	sfpOmBiasMarkHi
-	    Gauge32,
-	sfpOmBiasMarkLo
-	    Gauge32,
-	sfpOmTxPowerMarkHi
-	    Gauge32,
-	sfpOmTxPowerMarkLo
-	    Gauge32,
-	sfpOmRxPowerMarkHi
-	    Gauge32,
-	sfpOmRxPowerMarkLo
-	    Gauge32,
-	sfpOm5MinValidIntervals
-	    HCPerfValidIntervals,
-	sfpOm15MinValidIntervals
-	    HCPerfValidIntervals
-    }
+SfpOmCurrentEntry ::= SEQUENCE {
+    sfpOmTempMarkHi             Gauge32,
+    sfpOmTempMarkLo             Gauge32,
+    sfpOmVoltMarkHi             Gauge32,
+    sfpOmVoltMarkLo             Gauge32,
+    sfpOmBiasMarkHi             Gauge32,
+    sfpOmBiasMarkLo             Gauge32,
+    sfpOmTxPowerMarkHi          Gauge32,
+    sfpOmTxPowerMarkLo          Gauge32,
+    sfpOmRxPowerMarkHi          Gauge32,
+    sfpOmRxPowerMarkLo          Gauge32,
+    sfpOm5MinValidIntervals     HCPerfValidIntervals,
+    sfpOm15MinValidIntervals    HCPerfValidIntervals
+}
 
 sfpOmTempMarkHi OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Degrees Celsius"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The temperature high water mark for the current interval."
+    SYNTAX      Gauge32
+    UNITS       "Degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The temperature high water mark for the current interval."
     ::= { sfpOmCurrentEntry 1 }
 
 sfpOmTempMarkLo OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Degrees Celsius"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The temperature low water mark for the current interval."
+    SYNTAX      Gauge32
+    UNITS       "Degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The temperature low water mark for the current interval."
     ::= { sfpOmCurrentEntry 2 }
 
 sfpOmVoltMarkHi OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microvolts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The supply voltage high water mark for the current interval."
+    SYNTAX      Gauge32
+    UNITS       "Microvolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The supply voltage high water mark for the current interval."
     ::= { sfpOmCurrentEntry 3 }
 
 sfpOmVoltMarkLo OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microvolts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The supply voltage low water mark for the current interval."
+    SYNTAX      Gauge32
+    UNITS       "Microvolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The supply voltage low water mark for the current interval."
     ::= { sfpOmCurrentEntry 4 }
 
 sfpOmBiasMarkHi OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microamperes"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The transmitter bias current high water mark for the current 
-	 interval."
+    SYNTAX      Gauge32
+    UNITS       "Microamperes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The transmitter bias current high water mark for the current 
+         interval."
     ::= { sfpOmCurrentEntry 5 }
 
 sfpOmBiasMarkLo OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microamperes"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The transmitter bias current low water mark for the current 
-	 interval."
+    SYNTAX      Gauge32
+    UNITS       "Microamperes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The transmitter bias current low water mark for the current 
+         interval."
     ::= { sfpOmCurrentEntry 6 }
 
 sfpOmTxPowerMarkHi OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The transmit power high water mark for the current interval."
+    SYNTAX      Gauge32
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The transmit power high water mark for the current interval."
     ::= { sfpOmCurrentEntry 7 }
 
 sfpOmTxPowerMarkLo OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The transmit power low water mark for the current interval."
+    SYNTAX      Gauge32
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The transmit power low water mark for the current interval."
     ::= { sfpOmCurrentEntry 8 }
 
 sfpOmRxPowerMarkHi OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The receive power high water mark for the current interval."
+    SYNTAX      Gauge32
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The receive power high water mark for the current interval."
     ::= { sfpOmCurrentEntry 9 }
 
 sfpOmRxPowerMarkLo OBJECT-TYPE
-    SYNTAX Gauge32
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"The receive power low water mark for the current interval."
+    SYNTAX      Gauge32
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The receive power low water mark for the current interval."
     ::= { sfpOmCurrentEntry 10 }
 
 sfpOm5MinValidIntervals OBJECT-TYPE
-    SYNTAX HCPerfValidIntervals
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Indicates the number of valid 5-minute intervals of historical 
-	 data that is collected in the corresponding history data table."
+    SYNTAX      HCPerfValidIntervals
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 5-minute intervals of historical 
+         data that is collected in the corresponding history data table."
     ::= { sfpOmCurrentEntry 11 }
 
 sfpOm15MinValidIntervals OBJECT-TYPE
-    SYNTAX HCPerfValidIntervals
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Indicates the number of valid 15-minute intervals of historical 
-	 data that is collected in the corresponding history data table."
+    SYNTAX      HCPerfValidIntervals
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 15-minute intervals of historical 
+         data that is collected in the corresponding history data table."
     ::= { sfpOmCurrentEntry 12 }
 
--- ====================================================================
+sfpOm5MinHistory OBJECT IDENTIFIER
+    ::= { sfpOmTables 3 }
 
 sfpOm5MinHistoryTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF ScpOm5MinHistoryEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
+    SYNTAX      SEQUENCE OF SfpOm5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The SFP/SFP+ 5-minute history table contains various statistics 
+         collected by each SFP/SFP+ module over the previous 24 hours of 
+         operation.  The past 24 hours are broken into 288 completed 
+         5-minute intervals."
     ::= { sfpOm5MinHistory 1 }
 
 sfpOm5MinHistoryEntry OBJECT-TYPE
-    SYNTAX ScpOm5MinHistoryEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    INDEX {
-	sfpModuleId,	-- shared index
-	sfpOmInterval	-- shared index
-    }
+    SYNTAX      SfpOm5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the sfpOm5MinHistoryTable represents one of 288 
+         5-minute intervals collected over the past 24-hour period.  
+         Each row represents one such interval (identified by its 
+         sfpOmInterval number) for one specific instance (identified by 
+         its sfpModuleId)."
+    INDEX       { sfpModuleId, sfpOmInterval }
     ::= { sfpOm5MinHistoryTable 1 }
 
-ScpOm5MinHistoryEntry ::= SEQUENCE {
-    sfpOm5MinTempMarkHi
-	PerfIntervalCount,
-    sfpOm5MinTempMarkLo
-	PerfIntervalCount,
-    sfpOm5MinVoltMarkHi
-	PerfIntervalCount,
-    sfpOm5MinVoltMarkLo
-	PerfIntervalCount,
-    sfpOm5MinBiasMarkHi
-	PerfIntervalCount,
-    sfpOm5MinBiasMarkLo
-	PerfIntervalCount,
-    sfpOm5MinTxPowerMarkHi
-	PerfIntervalCount,
-    sfpOm5MinTxPowerMarkLo
-	PerfIntervalCount,
-    sfpOm5MinRxPowerMarkHi
-	PerfIntervalCount,
-    sfpOm5MinRxPowerMarkLo
-	PerfIntervalCount
+SfpOm5MinHistoryEntry ::= SEQUENCE {
+    sfpOmInterval           Integer32,
+    sfpOm5MinTempMarkHi     PerfIntervalCount,
+    sfpOm5MinTempMarkLo     PerfIntervalCount,
+    sfpOm5MinVoltMarkHi     PerfIntervalCount,
+    sfpOm5MinVoltMarkLo     PerfIntervalCount,
+    sfpOm5MinBiasMarkHi     PerfIntervalCount,
+    sfpOm5MinBiasMarkLo     PerfIntervalCount,
+    sfpOm5MinTxPowerMarkHi  PerfIntervalCount,
+    sfpOm5MinTxPowerMarkLo  PerfIntervalCount,
+    sfpOm5MinRxPowerMarkHi  PerfIntervalCount,
+    sfpOm5MinRxPowerMarkLo  PerfIntervalCount
 }
 
-sfpOm5MinTempMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Degrees Celsius"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical temperature high water mark within the 
-	 indexed 5-minute interval."
+sfpOmInterval OBJECT-TYPE
+    SYNTAX      Integer32 (1..672)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A historical data collection interval for use as an index.  
+         Specifies the historical data collection interval as a 
+         time-sequence with the lowest ordinal value '1' representing 
+         the newest data collected and the highest ordinal value 
+         (typically '96') being the oldest data collected."
     ::= { sfpOm5MinHistoryEntry 1 }
 
-sfpOm5MinTempMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Degrees Celsius"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical temperature low water mark within the 
-	 indexed 5-minute interval."
+sfpOm5MinTempMarkHi OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical temperature high water mark within the 
+         indexed 5-minute interval."
     ::= { sfpOm5MinHistoryEntry 2 }
 
-sfpOm5MinVoltMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microvolts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical supply voltage high water mark within 
-	 the indexed 5-minute interval."
+sfpOm5MinTempMarkLo OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical temperature low water mark within the 
+         indexed 5-minute interval."
     ::= { sfpOm5MinHistoryEntry 3 }
 
-sfpOm5MinVoltMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microvolts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical supply voltage low water mark within 
-	 the indexed 5-minute interval."
+sfpOm5MinVoltMarkHi OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microvolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical supply voltage high water mark within 
+         the indexed 5-minute interval."
     ::= { sfpOm5MinHistoryEntry 4 }
 
-sfpOm5MinBiasMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microamperes"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical transmitter bias current high water 
-	 mark within the indexed 5-minute interval."
+sfpOm5MinVoltMarkLo OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microvolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical supply voltage low water mark within 
+         the indexed 5-minute interval."
     ::= { sfpOm5MinHistoryEntry 5 }
 
-sfpOm5MinBiasMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microamperes"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical transmitter bias current low water mark 
-	 within the indexed 5-minute interval."
+sfpOm5MinBiasMarkHi OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microamperes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical transmitter bias current high water 
+         mark within the indexed 5-minute interval."
     ::= { sfpOm5MinHistoryEntry 6 }
 
-sfpOm5MinTxPowerMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical transmit power high water mark within 
-	 the indexed 5-minute interval."
+sfpOm5MinBiasMarkLo OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microamperes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical transmitter bias current low water mark 
+         within the indexed 5-minute interval."
     ::= { sfpOm5MinHistoryEntry 7 }
 
-sfpOm5MinTxPowerMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical transmit power low water mark within 
-	 the indexed 5-minute interval."
+sfpOm5MinTxPowerMarkHi OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical transmit power high water mark within 
+         the indexed 5-minute interval."
     ::= { sfpOm5MinHistoryEntry 8 }
 
-sfpOm5MinRxPowerMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical receive power high water mark within 
-	 the indexed 5-minute interval."
+sfpOm5MinTxPowerMarkLo OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical transmit power low water mark within 
+         the indexed 5-minute interval."
     ::= { sfpOm5MinHistoryEntry 9 }
 
-sfpOm5MinRxPowerMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical receive power low water mark within the 
-	 indexed 5-minute interval."
+sfpOm5MinRxPowerMarkHi OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical receive power high water mark within 
+         the indexed 5-minute interval."
     ::= { sfpOm5MinHistoryEntry 10 }
 
--- ====================================================================
+sfpOm5MinRxPowerMarkLo OBJECT-TYPE
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical receive power low water mark within the 
+         indexed 5-minute interval."
+    ::= { sfpOm5MinHistoryEntry 11 }
+
+sfpOm15MinHistory OBJECT IDENTIFIER
+    ::= { sfpOmTables 4 }
 
 sfpOm15MinHistoryTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF ScpOm15MinHistoryEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
+    SYNTAX      SEQUENCE OF SfpOm15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The SFP/SFP+ 15-minute history table contains various 
+         statistics collected by each SFP/SFP+ module over the previous 
+         24 hours of operation.  The past 24 hours are broken into 96 
+         completed 15-minute intervals."
     ::= { sfpOm15MinHistory 1 }
 
 sfpOm15MinHistoryEntry OBJECT-TYPE
-    SYNTAX ScpOm15MinHistoryEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-	""
-    INDEX {
-	sfpModuleId,	-- shared index
-	sfpOmInterval	-- shared index
-    }
+    SYNTAX      SfpOm15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the sfpOm15MinHistoryTable represents one of 96 
+         15-minute intervals collected over the past 24-hour period.  
+         Each row represents one such interval (identified by its 
+         sfpOmInterval number) for one specific instance (identified by 
+         its sfpModuleId)."
+    INDEX       { sfpModuleId, sfpOmInterval }
     ::= { sfpOm15MinHistoryTable 1 }
 
-ScpOm15MinHistoryEntry ::= SEQUENCE {
-    sfpOm15MinTempMarkHi
-	PerfIntervalCount,
-    sfpOm15MinTempMarkLo
-	PerfIntervalCount,
-    sfpOm15MinVoltMarkHi
-	PerfIntervalCount,
-    sfpOm15MinVoltMarkLo
-	PerfIntervalCount,
-    sfpOm15MinBiasMarkHi
-	PerfIntervalCount,
-    sfpOm15MinBiasMarkLo
-	PerfIntervalCount,
-    sfpOm15MinTxPowerMarkHi
-	PerfIntervalCount,
-    sfpOm15MinTxPowerMarkLo
-	PerfIntervalCount,
-    sfpOm15MinRxPowerMarkHi
-	PerfIntervalCount,
-    sfpOm15MinRxPowerMarkLo
-	PerfIntervalCount
+SfpOm15MinHistoryEntry ::= SEQUENCE {
+    sfpOm15MinTempMarkHi        PerfIntervalCount,
+    sfpOm15MinTempMarkLo        PerfIntervalCount,
+    sfpOm15MinVoltMarkHi        PerfIntervalCount,
+    sfpOm15MinVoltMarkLo        PerfIntervalCount,
+    sfpOm15MinBiasMarkHi        PerfIntervalCount,
+    sfpOm15MinBiasMarkLo        PerfIntervalCount,
+    sfpOm15MinTxPowerMarkHi     PerfIntervalCount,
+    sfpOm15MinTxPowerMarkLo     PerfIntervalCount,
+    sfpOm15MinRxPowerMarkHi     PerfIntervalCount,
+    sfpOm15MinRxPowerMarkLo     PerfIntervalCount
 }
 
 sfpOm15MinTempMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Degrees Celsius"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical temperature high water mark within the 
-	 indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical temperature high water mark within the 
+         indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 1 }
 
 sfpOm15MinTempMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Degrees Celsius"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical temperature low water mark within the 
-	 indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Degrees Celsius"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical temperature low water mark within the 
+         indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 2 }
 
 sfpOm15MinVoltMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microvolts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical supply voltage high water mark within 
-	 the indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microvolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical supply voltage high water mark within 
+         the indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 3 }
 
 sfpOm15MinVoltMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microvolts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical supply voltage low water mark within 
-	 the indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microvolts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical supply voltage low water mark within 
+         the indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 4 }
 
 sfpOm15MinBiasMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microamperes"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical transmitter bias current high water 
-	 mark within the indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microamperes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical transmitter bias current high water 
+         mark within the indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 5 }
 
 sfpOm15MinBiasMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microamperes"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical transmitter bias current low water mark 
-	 within the indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microamperes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical transmitter bias current low water mark 
+         within the indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 6 }
 
 sfpOm15MinTxPowerMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical transmit power high water mark within 
-	 the indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical transmit power high water mark within 
+         the indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 7 }
 
 sfpOm15MinTxPowerMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical transmit power low water mark within 
-	 the indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical transmit power low water mark within 
+         the indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 8 }
 
 sfpOm15MinRxPowerMarkHi OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical receive power high water mark within 
-	 the indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical receive power high water mark within 
+         the indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 9 }
 
 sfpOm15MinRxPowerMarkLo OBJECT-TYPE
-    SYNTAX PerfIntervalCount
-    UNITS "Microwatts"
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"Provides the historical receive power low water mark within the 
-	 indexed 15-minute interval."
+    SYNTAX      PerfIntervalCount
+    UNITS       "Microwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical receive power low water mark within the 
+         indexed 15-minute interval."
     ::= { sfpOm15MinHistoryEntry 10 }
 
--- ====================================================================
+sfpOmScalars OBJECT IDENTIFIER
+    ::= { sfpOmObjects 2 }
 
+sfpOm5MinActivate OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Measurements in this MIB that are to be collected on a 5-minute 
+         basis require activation.  Writing the instance pointer of the 
+         columnar object corresponding to the Counter32 or Gauge for the 
+         measurement will activate the 5-minute measurement if not 
+         already activated.  When the object cannot be activated, an 
+         SNMP error will be returned.
+         
+         The activation state of a measurement can be determined by 
+         attempting to read its PerfCurrentValue.  This is because these 
+         textual conventions will return an error if the particular 
+         columnar object is not activated (the data collected is invalid 
+         or missing)."
+    ::= { sfpOmScalars 1 }
 
--- ====================================================================
--- CONFORMANCE OBJECT GROUPS
--- ====================================================================
+sfpOm5MinDeactivate OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Measurements in this MIB that are to be collected on a 5-minute 
+         basis require activation.  Writing the instance pointer of the 
+         columnar object corresponding to the Counter32 or Gauge for the 
+         measurement will deactivate the 5-minute measurement if not 
+         already deactivated.  When the object cannot be deactivated, an 
+         SNMP error will be returned.
+         
+         The activation state of a measurement can be determined by 
+         attempting to read its PerfCurrentValue.  This is because these 
+         textual conventions will return an error if the particular 
+         columnar object is not activated (the data collected is invalid 
+         or missing)."
+    ::= { sfpOmScalars 2 }
+
+sfpOm15MinActivate OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Measurements in this MIB that are to be collected on a 15-minute 
+         basis require activation.  Writing the instance pointer of the 
+         columnar object corresponding to the Counter32 or Gauge for the 
+         measurement will activate the 15-minute measurement if not 
+         already activated.  When the object cannot be activated, an 
+         SNMP error will be returned.
+         
+         The activation state of a measurement can be determined by 
+         attempting to read its PerfCurrentValue.  This is because these 
+         textual conventions will return an error if the particular 
+         columnar object is not activated (the data collected is invalid 
+         or missing)."
+    ::= { sfpOmScalars 3 }
+
+sfpOm15MinDeactivate OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Measurements in this MIB that are to be collected on a 15-minute 
+         basis require activation.  Writing the instance pointer of the 
+         columnar object corresponding to the Counter32 or Gauge for the 
+         measurement will deactivate the 15-minute measurement if not 
+         already deactivated.  When the object cannot be deactivated, an 
+         SNMP error will be returned.
+         
+         The activation state of a measurement can be determined by 
+         attempting to read its PerfCurrentValue.  This is because these 
+         textual conventions will return an error if the particular 
+         columnar object is not activated (the data collected is invalid 
+         or missing)."
+    ::= { sfpOmScalars 4 }
+
+sfpOmIntervalScalar OBJECT-TYPE
+    SYNTAX      Integer32 (1..672)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A historical data collection interval for use as an index.  
+         Specifies the historical data collection interval as a 
+         time-sequence with the lowest ordinal value '1' representing 
+         the newest data collected and the highest ordinal value 
+         (typically '96') being the oldest data collected."
+    ::= { sfpOmScalars 5 }
+
+sfpOmDiscontinuityTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The time of the last discontinuity."
+    ::= { sfpOmScalars 6 }
+
+sfpOmTimeStamp OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "The time stamp of the beginning of the last completed 15-minute 
+         time interval when read, the beginning of an interval report 
+         for notifications."
+    ::= { sfpOmScalars 7 }
+
+sfpOm5MinMaxIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..288)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the maximum number of historical 5-minute intervals 
+         that will be collected.  This is in the range from zero (0), no 
+         historical data collected, to 288, 1 day of historical 5-minute 
+         data collected.  Some implementations may support longer 
+         periods of time, or some, a more restricted range.  The default 
+         value that should be supported by all managed systems by 
+         element configuration is 96, or 8 hours of historical 5-minute 
+         data.
+         
+         Increasing or decreasing this value may increase or decrease 
+         respectively the local storage demands of the agent.  
+         Decreasing this value may or may not cause historical interval 
+         data beyond the maximum to be discarded.  Increasing this value 
+         might not restore valid intervals beyond the point to which 
+         this maximum was previously decreased.
+         
+         Therefore, the setting of this value must be retained in 
+         permanent storage and should be altered only infrequently, if 
+         at all, by management stations."
+    DEFVAL      { 96 }
+    ::= { sfpOmScalars 8 }
+
+sfpOm15MinMaxIntervals OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..672)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Indicates and specifies the maximum number of historical 
+         15-minute intervals that will be collected.  This is in the 
+         range from zero (0), no historical data collected, to 672, 
+         7-days of historical 15-minute data collected.  Some 
+         implementations may support longer periods of time, or some, a 
+         more restricted range.  The default value that should be 
+         supported by all managed systems by element configuration is 
+         96, or 24 hours of historical 15-minute data.
+         
+         Increasing or decreasing this value may increase or decrease 
+         respectively the local storage demands of the agent.  
+         Decreasing this value may or may not cause historical interval 
+         data beyond the new maximum to be discarded.  Increasing this 
+         value might not restore valid intervals beyond the point to 
+         which this maximum was previously decreased.
+         
+         Therefore, the setting of this value must be retained in 
+         permanent storage and should be altered only infrequently, if 
+         at all, by management stations."
+    DEFVAL      { 96 }
+    ::= { sfpOmScalars 9 }
+
+sfpOmPollingInterval OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "Seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Diagnostic Monitoring Interface information is provided only on 
+         a demand basis and requires polling to determine high and low 
+         water marks within an interval.  This object set the polling 
+         interval at which the agent polls the SFP/SFP+ optical 
+         transceiver locally to determine high and low water marks.
+         
+         A setting of zero (0) disables polling altogether.  In this 
+         case, the 5-minute and 15-minute high and low water marks are 
+         determined from a single sample taken at the end of the period.  
+         The high and low water marks will, therefore, be identical.
+         
+         A setting of greater than 15 minutes (90,000 centiseconds) is 
+         not usable and will generate indetermnate readings.
+         
+         In practice, this value should not be set below 5 seconds (500 
+         centiseconds) and should not be set above 60 seconds (6000 
+         centiseconds).  The agent may enfore this or a more restricted 
+         range of settings."
+    DEFVAL      { 2000 }
+    ::= { sfpOmScalars 10 }
+
+sfpOmNotifs OBJECT IDENTIFIER
+    ::= { sfpOmObjects 3 }
+
+sfpOmDuration OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "The duration of an interval, for use in interval reports for 
+         notifications."
+    ::= { sfpOmNotifs 1 }
+
+sfpOmOids OBJECT IDENTIFIER
+    ::= { sfpOmObjects 4 }
+
+sfpOmProbableCauses OBJECT IDENTIFIER
+    ::= { sfpOmOids 1 }
+
+sfpOmSpecificProblems OBJECT IDENTIFIER
+    ::= { sfpOmOids 2 }
+
+sfpOmSpecificExtensions OBJECT IDENTIFIER
+    ::= { sfpOmOids 3 }
+
+sfpOmProbableCauses2 OBJECT IDENTIFIER
+    ::= { sfpOmOids 4 }
+
+sfpOmConformance OBJECT IDENTIFIER
+    ::= { sfpOmMIB 2 }
+
+sfpOmCompliance OBJECT IDENTIFIER
+    ::= { sfpOmConformance 1 }
+
+sfpOmGroups OBJECT IDENTIFIER
+    ::= { sfpOmConformance 2 }
+
+sfpOm5minReport NOTIFICATION-TYPE
+    OBJECTS     { sfpOmDiscontinuityTime, sfpOmTimeStamp, sfpOmDuration, 
+                  sfpOmPollingInterval, sfpModuleId, sfpOm5MinTempMarkHi, 
+                  sfpOm5MinTempMarkLo, sfpOm5MinVoltMarkHi, 
+                  sfpOm5MinVoltMarkLo, sfpOm5MinBiasMarkHi, 
+                  sfpOm5MinBiasMarkLo, sfpOm5MinTxPowerMarkHi, 
+                  sfpOm5MinTxPowerMarkLo, sfpOm5MinRxPowerMarkHi, 
+                  sfpOm5MinRxPowerMarkLo }
+    STATUS      current
+    DESCRIPTION 
+        "This notification provides 5-minute interval reports of 
+         measurements collected by this module.  Only measurements that 
+         have been activated for 5-minute collection are included in the 
+         report notification."
+    ::= { sfpOmNotifications 1 }
+
+sfpOm15minReport NOTIFICATION-TYPE
+    OBJECTS     { sfpOmDiscontinuityTime, sfpOmTimeStamp, sfpOmDuration, 
+                  sfpOmPollingInterval, sfpModuleId, 
+                  sfpOm15MinTempMarkHi, sfpOm15MinTempMarkLo, 
+                  sfpOm15MinVoltMarkHi, sfpOm15MinVoltMarkLo, 
+                  sfpOm15MinBiasMarkHi, sfpOm15MinBiasMarkLo, 
+                  sfpOm15MinTxPowerMarkHi, sfpOm15MinTxPowerMarkLo, 
+                  sfpOm15MinRxPowerMarkHi, sfpOm15MinRxPowerMarkLo }
+    STATUS      current
+    DESCRIPTION 
+        "This notification provides 15-minute interval reports of 
+         measurements collected by this module.  Only measurements that 
+         have been activated for 15-minute collection are included in 
+         the report notification."
+    ::= { sfpOmNotifications 2 }
 
 sfpOmObligatoryGroup OBJECT-GROUP
-    OBJECTS {
-	sfpOmDiscontinuityTime, sfpOmTimeStamp, sfpOmPollingInterval, 
-	sfpOmInterval, sfpOm5MinMaxIntervals, sfpOm15MinMaxIntervals }
-    STATUS current
-    DESCRIPTION
-	""
+    OBJECTS     { sfpOmDiscontinuityTime, sfpOmTimeStamp, 
+                  sfpOmPollingInterval, sfpOm5MinMaxIntervals, 
+                  sfpOm15MinMaxIntervals }
+    STATUS      current
+    DESCRIPTION 
+        "Provides an obligatory group of objects that must be 
+         provided by all implementations."
     ::= { sfpOmGroups 1 }
 
 sfpOmWatermarksGroup OBJECT-GROUP
-    OBJECTS {
-	sfpOmTempMarkHi, sfpOmTempMarkLo, sfpOmVoltMarkHi, 
-	sfpOmVoltMarkLo, sfpOmBiasMarkHi, sfpOmBiasMarkLo, 
-	sfpOmTxPowerMarkHi, sfpOmTxPowerMarkLo, sfpOmRxPowerMarkHi, 
-	sfpOmRxPowerMarkLo, sfpOm5MinValidIntervals, 
-	sfpOm15MinValidIntervals }
-    STATUS current
-    DESCRIPTION
-	""
+    OBJECTS     { sfpOmTempMarkHi, sfpOmTempMarkLo, sfpOmVoltMarkHi, 
+                  sfpOmVoltMarkLo, sfpOmBiasMarkHi, sfpOmBiasMarkLo, 
+                  sfpOmTxPowerMarkHi, sfpOmTxPowerMarkLo, 
+                  sfpOmRxPowerMarkHi, sfpOmRxPowerMarkLo, 
+                  sfpOm5MinValidIntervals, sfpOm15MinValidIntervals }
+    STATUS      current
+    DESCRIPTION 
+        "Provides a watermarks group of objects that must be provided by 
+         all implementations providing water marks."
     ::= { sfpOmGroups 2 }
 
 sfpOmHistoryGroup OBJECT-GROUP
-    OBJECTS {
-	sfpOmDuration, sfpOm5MinTempMarkHi, sfpOm5MinTempMarkLo, 
-	sfpOm5MinVoltMarkHi, sfpOm5MinVoltMarkLo, sfpOm5MinBiasMarkHi, 
-	sfpOm5MinBiasMarkLo, sfpOm5MinTxPowerMarkHi, 
-	sfpOm5MinTxPowerMarkLo, sfpOm5MinRxPowerMarkHi, 
-	sfpOm5MinRxPowerMarkLo, sfpOm15MinTempMarkHi, 
-	sfpOm15MinTempMarkLo, sfpOm15MinVoltMarkHi, 
-	sfpOm15MinVoltMarkLo, sfpOm15MinBiasMarkHi, 
-	sfpOm15MinBiasMarkLo, sfpOm15MinTxPowerMarkHi, 
-	sfpOm15MinTxPowerMarkLo, sfpOm15MinRxPowerMarkHi, 
-	sfpOm15MinRxPowerMarkLo }
-    STATUS current
-    DESCRIPTION
-	""
+    OBJECTS     { sfpOmDuration, sfpOm5MinTempMarkHi, 
+                  sfpOm5MinTempMarkLo, sfpOm5MinVoltMarkHi, 
+                  sfpOm5MinVoltMarkLo, sfpOm5MinBiasMarkHi, 
+                  sfpOm5MinBiasMarkLo, sfpOm5MinTxPowerMarkHi, 
+                  sfpOm5MinTxPowerMarkLo, sfpOm5MinRxPowerMarkHi, 
+                  sfpOm5MinRxPowerMarkLo, sfpOm15MinTempMarkHi, 
+                  sfpOm15MinTempMarkLo, sfpOm15MinVoltMarkHi, 
+                  sfpOm15MinVoltMarkLo, sfpOm15MinBiasMarkHi, 
+                  sfpOm15MinBiasMarkLo, sfpOm15MinTxPowerMarkHi, 
+                  sfpOm15MinTxPowerMarkLo, sfpOm15MinRxPowerMarkHi, 
+                  sfpOm15MinRxPowerMarkLo }
+    STATUS      current
+    DESCRIPTION 
+        "Provides a group of historical objects that must be provided by 
+         all implementations that maintain historical operational 
+         measurements."
     ::= { sfpOmGroups 3 }
 
 sfpOmNotificationGroup NOTIFICATION-GROUP
-    NOTIFICATIONS {
-	sfpOm5minReport, sfpOm15minReport }
-    STATUS current
-    DESCRIPTION
-	"This is a group of obligatory notifications reporting 5-minute 
-	 and 15-minute interval data."
+    NOTIFICATIONS { sfpOm5minReport, sfpOm15minReport }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of obligatory notifications reporting 5-minute 
+         and 15-minute interval data."
     ::= { sfpOmGroups 4 }
 
+sfpOmActualGroup OBJECT-GROUP
+    OBJECTS     { sfpOmTemp, sfpOmVolt, sfpOmBias, sfpOmTxPower, 
+                  sfpOmRxPower }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of current actual values."
+    ::= { sfpOmGroups 5 }
+
+sfpOmActivationGroup OBJECT-GROUP
+    OBJECTS     { sfpOm5MinActivate, sfpOm5MinDeactivate, 
+                  sfpOm15MinActivate, sfpOm15MinDeactivate }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of activation controls."
+    ::= { sfpOmGroups 6 }
+
 sfpOmProfile MODULE-COMPLIANCE
-    STATUS current
-    DESCRIPTION
-	"Provides the module compliance requiremetns for the SFP/SFP+ 
-	 Operational Measurements."
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requiremetns for the SFP/SFP+ 
+         Operational Measurements."
 
-    MODULE -- this module
+    MODULE      -- this module
 
-    MANDATORY-GROUPS {
-	sfpOmObligatoryGroup
-    }
+        MANDATORY-GROUPS        { sfpOmObligatoryGroup }
 
-    OBJECT sfpOmPollingInterval
-    MIN-ACCESS read-only
-    DESCRIPTION
-	"Indicates the polling interval for sampling level data from the 
-	 SFP/SFP+ module.  This value may be fixed by the managed system 
-	 and not settable by the management station."
+        GROUP   sfpOmWatermarksGroup
+        DESCRIPTION   
+              "Mandatory if digital Diagnostic Monitoring Interface (DMI) for 
+               Optical Transceivers, SFF-8472, is supported by the managed 
+               system."
 
-    OBJECT sfpOm5MinMaxIntervals
-    MIN-ACCESS read-only
-    DESCRIPTION
-	"Indicates the maximum number of intervals of 5-minute 
-	 historical data collected in the 5-minute history tables.  This 
-	 value may be fixed by the managed system and not settable by 
-	 the management station."
+        GROUP   sfpOmHistoryGroup
+        DESCRIPTION   
+              "Mandatory when sfpOmWatermarkGroup is provided."
 
-    OBJECT sfpOm15MinMaxIntervals
-    MIN-ACCESS read-only
-    DESCRIPTION
-	"Indicates the maximum number of intervals of 15-minute 
-	 historical data collected in the 15-minute history tables.  This 
-	 value may be fixed by the managed system and not settable by 
-	 the management station."
+        GROUP   sfpOmNotificationGroup
+        DESCRIPTION   
+              "Mandatory when sfpOmHistoryGroup is provided."
 
-    GROUP sfpOmWatermarksGroup
-    DESCRIPTION
-	"Mandatory if digital Diagnostic Monitoring Interface (DMI) for 
-	 Optical Transceivers, SFF-8472, is supported by the managed 
-	 system."
+        GROUP   sfpOmActualGroup
+        DESCRIPTION   
+              "Mandatory when actual values are provided."
 
-    GROUP sfpOmHistoryGroup
-    DESCRIPTION
-	"Mandatory when sfpOmWatermarkGroup is provided."
+        GROUP   sfpOmActivationGroup
+        DESCRIPTION   
+              "Mandatory when activation of measurements is provided."
 
-    GROUP sfpOmNotificationGroup
-    DESCRIPTION
-	"Mandatory when sfpOmHistoryGroup is provided."
+        OBJECT  sfpOmPollingInterval
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "Indicates the polling interval for sampling level data from the 
+               SFP/SFP+ module.  This value may be fixed by the managed system 
+               and not settable by the management station."
+
+        OBJECT  sfpOm5MinMaxIntervals
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "Indicates the maximum number of intervals of 5-minute 
+               historical data collected in the 5-minute history tables.  This 
+               value may be fixed by the managed system and not settable by 
+               the management station."
+
+        OBJECT  sfpOm15MinMaxIntervals
+        MIN-ACCESS  read-only
+        DESCRIPTION   
+              "Indicates the maximum number of intervals of 15-minute 
+               historical data collected in the 15-minute history tables.  This 
+               value may be fixed by the managed system and not settable by 
+               the management station."
 
     ::= { sfpOmCompliance 1 }
 
-END -- OPENSS7-SFP-OM-MIB module
+END -- end of module OPENSS7-SFP-OM-MIB.

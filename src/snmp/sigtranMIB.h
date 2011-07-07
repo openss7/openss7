@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -160,6 +160,8 @@ extern struct header_complex_index *sigtranSctpProfileTableStorage;
 /* scalars accessible only for notify */
 
 /* object id definitions */
+extern oid sigtranPackage_oid[12];
+extern oid sigtranGeneralCompliance_oid[12];
 
 /* function prototypes */
 /* trap function prototypes */

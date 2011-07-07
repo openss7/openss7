@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -119,9 +119,9 @@ struct simpleUsageMeteringControlTable_data {
 	uint simpleUsageMeteringControlTable_refs;
 	uint8_t *controlObjectId;	/* NoAccess */
 	size_t controlObjectIdLen;
-	uint8_t *creationTriggerList;	/* ReadWrite */
+	uint8_t *creationTriggerList;	/* Create */
 	size_t creationTriggerListLen;
-	long simpleUsageMeteringControlEntryStatus;	/* ReadWrite */
+	long simpleUsageMeteringControlEntryStatus;	/* Create */
 };
 struct configurableSimpleUsageMeteringControlTable_data {
 	uint configurableSimpleUsageMeteringControlTable_request;

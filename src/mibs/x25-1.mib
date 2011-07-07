@@ -103,7 +103,7 @@ IMPORTS
     OBJECT-GROUP
 	FROM SNMPv2-CONF;
 
-x25PLPMIB MODULE-IDENTITY
+x25PLPMIB1 MODULE-IDENTITY
     LAST-UPDATED "200807121128Z"
     ORGANIZATION
 	"The OpenSS7 Project"
@@ -126,7 +126,7 @@ x25PLPMIB MODULE-IDENTITY
     REVISION	"200807121128Z"
     DESCRIPTION
 	"First release of this module."
-    ::= { openss7Modules 3 }
+    ::= { openss7Modules 103 }
 
 ProtocolVersion ::= TEXTUAL-CONVENTION
     STATUS	current
@@ -712,10 +712,10 @@ ThroughputClassSupport ::= TEXTUAL-CONVENTION
 		}
 
 x25PLPNotifications OBJECT IDENTIFIER
-    ::= { x25PLPMIB 0 }
+    ::= { x25PLPMIB1 0 }
 
 x25PLPObjects OBJECT IDENTIFIER
-    ::= { x25PLPMIB 1 }
+    ::= { x25PLPMIB1 1 }
 
 x25PLPTables OBJECT IDENTIFIER
     ::= { x25PLPObjects 1 }
@@ -8434,7 +8434,7 @@ x25PLPOids OBJECT IDENTIFIER
     ::= { x25PLPObjects 4 }
 
 x25PLPParameters OBJECT IDENTIFIER
-    ::= { x25PLPMIB 2 }
+    ::= { x25PLPMIB1 2 }
 
 notificationDataChannel OBJECT-TYPE
     SYNTAX	LogicalChannelNumber
@@ -8486,7 +8486,7 @@ notificationDataCauseCode OBJECT-TYPE
 
 
 x25PLPSpecificExtensions OBJECT IDENTIFIER
-    ::= { x25PLPMIB 3 }
+    ::= { x25PLPMIB1 3 }
 
 -- The x25PLE-P package imports the communicationsAlarm notification from Rec.  
 -- X.721 (1992) | ISO/IEC 10165-2. It is used to report the following x25PLE 
@@ -8967,7 +8967,7 @@ successfulConnectionEstablishment OBJECT-IDENTITY
 
 
 x25PLPConform OBJECT IDENTIFIER
-    ::= { x25PLPMIB 4 }
+    ::= { x25PLPMIB1 4 }
 
 x25PLPCompliances OBJECT IDENTIFIER
     ::= { x25PLPConform 1 }

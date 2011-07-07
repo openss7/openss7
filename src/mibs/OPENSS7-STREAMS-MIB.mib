@@ -5,7 +5,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -79,10 +79,10 @@ IMPORTS
         FROM SNMPv2-TC;
 
 strMIB MODULE-IDENTITY
-    LAST-UPDATED "200901161403Z"
-    ORGANIZATION
+    LAST-UPDATED "201106270546Z"
+    ORGANIZATION 
         "The OpenSS7 Project"
-    CONTACT-INFO
+    CONTACT-INFO 
         "Brian Bidulock
          OpenSS7 Corporation
          1469 Jefferys Crescent
@@ -92,32 +92,62 @@ strMIB MODULE-IDENTITY
          Fax: +1 780 490 1241
          Mob: +1 780 953 0557
          mailto:bidulock@openss7.org"
-    DESCRIPTION
+    DESCRIPTION 
         "This MIB provides configuration and status information 
-         for a STREAMS subsystem."
-    REVISION    "200710010804Z"
-    DESCRIPTION
-        "This is the first version of this MIB."
-    REVISION    "200810052305Z"
-    DESCRIPTION
-        "Corrected default values and spelling corrections."
+         for a STREAMS subsystem.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106270546Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted using smidump."
+    REVISION    "200901161403Z"
+    DESCRIPTION 
+        "Reindexed strMod tables on name instead of module id."
+    REVISION    "200901151746Z"
+    DESCRIPTION 
+        "Additional spelling corrections."
     REVISION    "200810070142Z"
-    DESCRIPTION
+    DESCRIPTION 
         "Made strStrhold a TruthValue.  Also more spelling 
          corrections."
-    REVISION    "200901151746Z"
-    DESCRIPTION
-        "Additional spelling corrections."
-    REVISION    "200901161403Z"
-    DESCRIPTION
-        "Reindexed strMod tables on name instead of module id."
+    REVISION    "200810052305Z"
+    DESCRIPTION 
+        "Corrected default values and spelling corrections."
+    REVISION    "200710010804Z"
+    DESCRIPTION 
+        "This is the first version of this MIB."
     ::= { openss7Modules 1 }
 
 
 StreamsModuleName ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1a"
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This textual convention describes a STREAMS module 
          name.  STREAMS module names can be restricted by some 
          implementations to as few as 8 characters in length.  
@@ -129,7 +159,7 @@ StreamsModuleName ::= TEXTUAL-CONVENTION
 StreamsModuleList ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1a"
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This textual convention describes a STREAMS module 
          list.  A STREAMS module list is a list of STREAMS 
          module names following the StreamsModuleName textual 
@@ -139,7 +169,7 @@ StreamsModuleList ::= TEXTUAL-CONVENTION
 
 StreamsModuleQueues ::= TEXTUAL-CONVENTION
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This textual convention describes the STREAMS module 
          queues to which a module_info or module_stats structure 
          applies.  STREAMS modules and drivers have an upper 
@@ -165,12 +195,12 @@ strModTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF StrModEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a table of modules and drivers that provides 
          some information about their initial packet sizes and 
          water marks as well as providing an index for an 
          auxillary statistics table."
-    REFERENCE
+    REFERENCE   
         "scls(8)"
     ::= { strMod 1 }
 
@@ -178,13 +208,13 @@ strModEntry OBJECT-TYPE
     SYNTAX      StrModEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "An entry in the STREAMS modules table for one driver or 
          module.  Each table entry is indexed by the module 
          identifier that is the STREAMS module identifier that 
          appears in the mi_idnum field of the module_info(9) 
          STREAMS structure."
-    REFERENCE
+    REFERENCE   
         "scls(8)"
     INDEX       { strModName }
     ::= { strModTable 1 }
@@ -201,7 +231,7 @@ strModName OBJECT-TYPE
     SYNTAX      StreamsModuleName
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the name of the STREAMS driver or module.  
          This is the module name that appears in the mi_idname 
          field of the module_info(9) STREAMS structure for the 
@@ -209,7 +239,7 @@ strModName OBJECT-TYPE
          textual convention as STREAMS module names are limited 
          to FMNAMESZ in length.  Once this object is created in 
          an entry, it becomes read-only until it is destroyed."
-    REFERENCE
+    REFERENCE   
         "scls(8)"
     ::= { strModEntry 1 }
 
@@ -217,14 +247,14 @@ strModIdnum OBJECT-TYPE
     SYNTAX      Unsigned32 (0..16383)
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the driver or module STREAMS module id.  The 
          STREAMS module id is unique within the entire system 
          and is used as an index to this and other tables.  This 
          is the module identifier that appears in the mi_idnum 
          field of the module_info(9) STREAMS structure for the 
          module or driver."
-    REFERENCE
+    REFERENCE   
         "scls(8)"
     ::= { strModEntry 2 }
 
@@ -232,13 +262,13 @@ strModType OBJECT-TYPE
     SYNTAX      INTEGER { module(1), driver(2) }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the type of the object, whether a STREAMS 
          driver(2) or module(1).  STREAMS modules and drivers 
          share a name space as well as a module identifier 
          space.  Once this object is created in an entry, it 
          becomes read-only until it is destroyed."
-    REFERENCE
+    REFERENCE   
         "scls(8)"
     ::= { strModEntry 3 }
 
@@ -246,12 +276,12 @@ strModMajor OBJECT-TYPE
     SYNTAX      Unsigned32 (0..16383)
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the major device number of a STREAMS driver 
          or zero (0) for a STREAMS module.  Once this object is 
          created in an entry, it becomes read-only until it is 
          destroyed."
-    REFERENCE
+    REFERENCE   
         "scls(8)"
     ::= { strModEntry 4 }
 
@@ -259,7 +289,7 @@ strModRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a mechanism whereby management stations, using 
          the RowStatus textual convention of the SNMPv2-TC 
          module, may create and delete conceptual rows in this 
@@ -277,7 +307,7 @@ strModRowStatus OBJECT-TYPE
          corresponding STREAMS driver or module.  If the 
          unloading of the module fails for any reason, the row 
          will not be destroyed and an error is returned."
-    REFERENCE
+    REFERENCE   
         "scls(8), modprobe(8), insmod(8), rmmod(8)"
     ::= { strModEntry 5 }
 
@@ -288,12 +318,12 @@ strModInfoTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF StrModInfoEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a side-table of STREAMS module information for 
          the strModTable.  This is information contained in one 
          or more module_info(9) structures associated with a 
          single STREAMS module or driver."
-    REFERENCE
+    REFERENCE   
         "module_info(9)"
     ::= { strModInfo 1 }
 
@@ -301,7 +331,7 @@ strModInfoEntry OBJECT-TYPE
     SYNTAX      StrModInfoEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides an entry in the STREAMS module parameters 
          table.  Each entry represents one unique parameters 
          collection for a queue.  Each STREAMS module can have 
@@ -358,7 +388,7 @@ strModInfoIndex OBJECT-TYPE
     SYNTAX      Unsigned32 (1..4)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides an index for the STREAMS information entry.  
          STREAMS module and non-multiplexing driver can have one 
          or two entries.  STREAMS multiplexing drivers can have 
@@ -371,7 +401,7 @@ strModInfoQueues OBJECT-TYPE
     SYNTAX      StreamsModuleQueues
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Identifies to which queues in the module the STREAMS 
          information applies.  module_info(9) structures can be 
          referenced by more than one qinit(9) structure, where 
@@ -379,7 +409,7 @@ strModInfoQueues OBJECT-TYPE
          read queue, rd(0), the upper write queue, wr(1), the 
          lower multiplex read queue, muxrq(2), or the lower 
          multiplex write queue, muxwq(3)."
-    REFERENCE
+    REFERENCE   
         "scls(8), sc(4), module_info(9)"
     ::= { strModInfoEntry 2 }
 
@@ -387,13 +417,13 @@ strModInfoMinpsz OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the minimum packet size associated with the 
          driver or module for the queues indicated in the 
          strModInfoQueues column.  This column has the same 
          value as the mi_minpsz field of the corresponding 
          module_info(9) structure."
-    REFERENCE
+    REFERENCE   
         "scls(8), sc(4), module_info(9)"
     ::= { strModInfoEntry 3 }
 
@@ -401,13 +431,13 @@ strModInfoMaxpsz OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum packet size associated with the 
          driver or module for the queues indicated in the 
          strModInfoQueues column.  This column has the same 
          value as the mi_maxpsz field of the corresponding 
          module_info(9) structure."
-    REFERENCE
+    REFERENCE   
         "scls(8), sc(4), module_info(9)"
     ::= { strModInfoEntry 4 }
 
@@ -415,13 +445,13 @@ strModInfoHiwat OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the high water mark associated with the 
          driver or module for the queues indicated in the 
          strModInfoQueues column.  This column has the same 
          value as the mi_hiwat field of the corresponding 
          module_info(9) structure."
-    REFERENCE
+    REFERENCE   
         "scls(8), sc(4), module_info(9)"
     ::= { strModInfoEntry 5 }
 
@@ -429,13 +459,13 @@ strModInfoLowat OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the low water mark associated with the driver 
          or module for the queues indicated in the 
          strModInfoQueues column.  This column has the same 
          value as the mi_lowat field of the corresponding 
          module_info(9) structure."
-    REFERENCE
+    REFERENCE   
         "scls(8), sc(4), module_info(9)"
     ::= { strModInfoEntry 6 }
 
@@ -443,12 +473,12 @@ strModInfoTraceLevel OBJECT-TYPE
     SYNTAX      Unsigned32 (0..255)
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the trace level associated with the driver or 
          module for the queues indicated in the strModInfoQueues 
          column.  This column does not correspond to a field in 
          the module_info(9) structure."
-    REFERENCE
+    REFERENCE   
         "scls(8), sc(4), module_info(9)"
     ::= { strModInfoEntry 7 }
 
@@ -459,12 +489,12 @@ strModStatTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF StrModStatEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a side-table of STREAMS module statistics for 
          the strModTable.  This is statistics contained in on or 
          more module_stat(9) structures associated with a single 
          STREAMS module or driver."
-    REFERENCE
+    REFERENCE   
         "module_stat(9)"
     ::= { strModStat 1 }
 
@@ -472,7 +502,7 @@ strModStatEntry OBJECT-TYPE
     SYNTAX      StrModStatEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides an entry in the STREAMS module statistics 
          table.  Each entry represents one unique statistics 
          collection for a queue.  Each STREAMS module can have 
@@ -524,12 +554,12 @@ strModStatIndex OBJECT-TYPE
     SYNTAX      Unsigned32 (1..4)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides an index for the STREAMS statistics entry.  
          STREAMS module and non-multiplexing drivers can have 
          zero, one or two entries.  STREAMS multiplexing drivers 
          can have zero to four entries."
-    REFERENCE
+    REFERENCE   
         "module_stat(9)"
     ::= { strModStatEntry 1 }
 
@@ -537,10 +567,10 @@ strModStatQueues OBJECT-TYPE
     SYNTAX      StreamsModuleQueues
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Identifies to which queues in the module the STREAMS 
          statistics applies."
-    REFERENCE
+    REFERENCE   
         "scls(8), sc(4), module_stat(9)"
     ::= { strModStatEntry 2 }
 
@@ -548,7 +578,7 @@ strModStatPcnt OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the statistics associated with queue put 
          procedure calls.  While this is typically the number of 
          times that the put procedure was called, the module may 
@@ -558,7 +588,7 @@ strModStatPcnt OBJECT-TYPE
          
          This count is associated with the ms_pcnt member of the 
          queue's module_stat structure."
-    REFERENCE
+    REFERENCE   
         "module_stat(9)"
     ::= { strModStatEntry 3 }
 
@@ -566,7 +596,7 @@ strModStatScnt OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the statistics associated with queue put 
          procedure calls.  While this is typically the number of 
          times that the put procedure was called, the module may 
@@ -576,7 +606,7 @@ strModStatScnt OBJECT-TYPE
          
          This count is associated with the ms_scnt member of the 
          queue's module_stat structure."
-    REFERENCE
+    REFERENCE   
         "module_stat(9)"
     ::= { strModStatEntry 4 }
 
@@ -584,7 +614,7 @@ strModStatOcnt OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the statistics associated with module open 
          routine calls.  While this is typically the number of 
          times that the module open routine was called, the 
@@ -594,7 +624,7 @@ strModStatOcnt OBJECT-TYPE
          
          This count is associated with the ms_ocnt member of the 
          queue's module_stat structure."
-    REFERENCE
+    REFERENCE   
         "module_stat(9)"
     ::= { strModStatEntry 5 }
 
@@ -602,7 +632,7 @@ strModStatCcnt OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the statistics assocaited with module close 
          routine calls.  While this is typically the number of 
          times that the module close routine was called, the 
@@ -612,7 +642,7 @@ strModStatCcnt OBJECT-TYPE
          
          This count is associated with the ms_ccnt member of the 
          queue's module_stat structure."
-    REFERENCE
+    REFERENCE   
         "module_stat(9)"
     ::= { strModStatEntry 6 }
 
@@ -620,7 +650,7 @@ strModStatAcnt OBJECT-TYPE
     SYNTAX      Counter32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the statistics associated with module admin 
          routine calls.  While this is typically the number of 
          times that the module admin routine was called, the 
@@ -630,7 +660,7 @@ strModStatAcnt OBJECT-TYPE
          
          This count is associated with the ms_acnt member of the 
          queue's module_stat structure."
-    REFERENCE
+    REFERENCE   
         "module_stat(9)"
     ::= { strModStatEntry 7 }
 
@@ -638,7 +668,7 @@ strModStatPrivate OBJECT-TYPE
     SYNTAX      OCTET STRING
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the private statistics associated with the 
          module.  The format of this area is not defined by 
          STREAMS.  See the specific module documentation for 
@@ -648,7 +678,7 @@ strModStatPrivate OBJECT-TYPE
          members of the queue's module_stat structure.  If no 
          such structure is provided, or, if ms_xsize is zero, 
          this will be a null string."
-    REFERENCE
+    REFERENCE   
         "module_stat(9)"
     ::= { strModStatEntry 8 }
 
@@ -656,7 +686,7 @@ strModStatFlags OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the boolean statistics associated with the 
          module in a 32-bit flags word.  The format of these 
          flags is not defined by STREAMS.  See the specific 
@@ -664,7 +694,7 @@ strModStatFlags OBJECT-TYPE
          
          This data is assocaited with the ms_flags member of the 
          queue's module_stat structure."
-    REFERENCE
+    REFERENCE   
         "module_stat(9)"
     ::= { strModStatEntry 9 }
 
@@ -675,12 +705,12 @@ strApshTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF StrApshEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the STREAMS autopush table.  The autopush 
          table provides the STREAMS modules that are configured 
          by the system to be autopushed on top of driver minor 
          devices."
-    REFERENCE
+    REFERENCE   
         "autopush(8)"
     ::= { strApsh 1 }
 
@@ -688,11 +718,11 @@ strApshEntry OBJECT-TYPE
     SYNTAX      StrApshEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides an entry in the STREAMS autopush table.  Each 
          entry is indexed by the driver name and the initial 
          minor device number to which the entry belongs."
-    REFERENCE
+    REFERENCE   
         "autopush(8)"
     INDEX       { strModName, strApshMinor, strApshLastMinor }
     ::= { strApshTable 1 }
@@ -709,10 +739,10 @@ strApshMajor OBJECT-TYPE
     SYNTAX      Unsigned32 (1..16383)
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the primary major device number associated 
          with the driver."
-    REFERENCE
+    REFERENCE   
         "autopush(8)"
     ::= { strApshEntry 1 }
 
@@ -720,13 +750,13 @@ strApshMinor OBJECT-TYPE
     SYNTAX      Unsigned32 (0..16383 | 4294967295)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the minor device number or the start of a 
          range of minor device numbers, to which the autopush 
          specification applies.  When specified as 'FFFFFFFF'X, 
          the specification applies to all minor device numbers 
          for this driver and LastMinor is ignored."
-    REFERENCE
+    REFERENCE   
         "autopush(8)"
     ::= { strApshEntry 2 }
 
@@ -734,13 +764,13 @@ strApshLastMinor OBJECT-TYPE
     SYNTAX      Unsigned32 (0..16383)
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the last minor device number in a range.  This 
          value is always zero (0) when the Minor number is 
          'FFFFFFFF'X.  The agent must ensure that the range 
          specified by this number does not overlap with other 
          ranges specified in this autopush specification entry."
-    REFERENCE
+    REFERENCE   
         "autopush(8)"
     ::= { strApshEntry 3 }
 
@@ -748,13 +778,13 @@ strApshModules OBJECT-TYPE
     SYNTAX      StreamsModuleList
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a STREAMS module list flowing the 
          StreamsModuleList textual convention.  This is a 
          space-separated list of Streams module names.  When 
          this entry is created, it is persistent accross agent 
          reboots, and might first be verified by the agent."
-    REFERENCE
+    REFERENCE   
         "autopush(8)"
     ::= { strApshEntry 4 }
 
@@ -762,11 +792,11 @@ strApshRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides management stations with the ability to add 
          rows to, or delete rows from, the STREAMS autopush 
          table."
-    REFERENCE
+    REFERENCE   
         "autopush(8)"
     ::= { strApshEntry 5 }
 
@@ -777,7 +807,7 @@ strStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF StrStatsEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "The STREAMS statistics table provides information about 
          the current number of allocated primary STREAMS data 
          structures as well as the high water mark since the 
@@ -788,7 +818,7 @@ strStatsEntry OBJECT-TYPE
     SYNTAX      StrStatsEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Each entry in the StrStatsTable represents the 
          allocation information for a given primary STREAMS data 
          structure.  These values are read-only."
@@ -808,7 +838,7 @@ strStatsStructure OBJECT-TYPE
                     dynModinfo(10), dynSynq(11), dynBuffers(12) }
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the type of dynamically allocated structure 
          for which current and high water mark allocations are 
          being presented.
@@ -861,7 +891,7 @@ strStatsCurrentAllocs OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the number of objects of the structure type 
          currently allocated."
     ::= { strStatsEntry 2 }
@@ -870,7 +900,7 @@ strStatsHighWaterMark OBJECT-TYPE
     SYNTAX      Gauge32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the maximum number of objects of the structure 
          type that were allocated at one time (the maximum 
          historical value of strStatsCurrentAlloc) since the 
@@ -888,7 +918,7 @@ strCltime OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the default time interval that a closing 
          Stream will linger for messages to clear its write 
          queues before finally closing.  Valid values are zero 
@@ -900,7 +930,7 @@ strCltime OBJECT-TYPE
          I_CLTIME(7), after the Stream is opened and before the 
          Stream is closed.  This value corresponds to the system 
          control sys.streams.cltime."
-    REFERENCE
+    REFERENCE   
         "sys.streams.cltime."
     DEFVAL      { 1500 }
     ::= { strTunables 1 }
@@ -910,7 +940,7 @@ strMaxApush OBJECT-TYPE
     UNITS       "modules"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum number of modules that can be 
          configured for autopush onto a STREAMS driver.  Valid 
          values are zero (0) or greater (MAXINT).  The default 
@@ -919,7 +949,7 @@ strMaxApush OBJECT-TYPE
          configurations.  Existing autopush configurations are 
          unchanged.  This value corresponds to the system 
          control sys.streams.max_apush."
-    REFERENCE
+    REFERENCE   
         "sys.streams.max_apush."
     DEFVAL      { 8 }
     ::= { strTunables 2 }
@@ -929,7 +959,7 @@ strMaxMblk OBJECT-TYPE
     UNITS       "message-data blocks (maximum)"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum number of combined message data 
          blocks that will be held on the per-CPU free list 
          between runs of runqueues(9).  Valid values are zero 
@@ -940,7 +970,7 @@ strMaxMblk OBJECT-TYPE
          this number may have a positive or negative performance 
          impact.  This value corresponds to the system control 
          sys.streams.max_mblk."
-    REFERENCE
+    REFERENCE   
         "sys.streams.max_mblk."
     DEFVAL      { 10 }
     ::= { strTunables 3 }
@@ -950,14 +980,14 @@ strMaxStramod OBJECT-TYPE
     UNITS       "autopush structures (maximum)"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum number of autopush structures 
          that will be defined for the entire system.  Valid 
          values are zero (0) or greater (MAXINT).  The default 
          value is eight (8).  This system control defines the 
          system-wide maximum.  This value corresponds to the 
          system control sys.streams.max_stramod."
-    REFERENCE
+    REFERENCE   
         "sys.streams.max_stramod."
     DEFVAL      { 8 }
     ::= { strTunables 4 }
@@ -967,7 +997,7 @@ strMaxStrdev OBJECT-TYPE
     UNITS       "STREAMS devices (maximum)"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum number of Streams devices.  This 
          is normally the maximum number of character devices 
          (MAX_CHRDEV).  Valid values are zero (0) or greater 
@@ -982,7 +1012,7 @@ strMaxStrdev OBJECT-TYPE
          static arrays.  Modern STREAMS subsystems use hashes 
          and linked lists and the number is limited by memory 
          rather than by index number as this value reflects."
-    REFERENCE
+    REFERENCE   
         "sys.streams.max_strdev."
     DEFVAL      { 16384 }
     ::= { strTunables 5 }
@@ -992,7 +1022,7 @@ strMaxStrmod OBJECT-TYPE
     UNITS       "STREAMS modules (maximum)"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum number of Streams modules.  This 
          is normally the maximum number of character devices 
          (MAX_CHRDEV).  Valid values are zero (0) or greater 
@@ -1007,7 +1037,7 @@ strMaxStrmod OBJECT-TYPE
          Modern STREAMS subsystems use hashes and linked lists 
          and the number is limited by memory rather than by 
          index number as this value reflects."
-    REFERENCE
+    REFERENCE   
         "sys.streams.max_strmod."
     DEFVAL      { 16384 }
     ::= { strTunables 6 }
@@ -1017,7 +1047,7 @@ strMsgPriority OBJECT-TYPE
     UNITS       "priority (maximum)"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies whether allocation priority will be honoured 
          or whether all allocations will be treated the same.  
          See allocb(9).  When true, allocation priority will be 
@@ -1027,9 +1057,9 @@ strMsgPriority OBJECT-TYPE
          the value may have a positive or negative impact on 
          system performance.  This value corresponds to the 
          system control sys.streams.msg_priority."
-    REFERENCE
+    REFERENCE   
         "sys.streams.msg_priority."
-    DEFVAL      { 2 } -- false
+    DEFVAL      { false }
     ::= { strTunables 7 }
 
 strNband OBJECT-TYPE
@@ -1037,14 +1067,14 @@ strNband OBJECT-TYPE
     UNITS       "queue bands (maximum)"
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the number of queue bands available.  Valid 
          values are zero (0) or greater (MAXINT).  The default 
          value is the traditional UNIX value of 256.  This 
          system control defines the system-wide value.  This 
          system control is read-only.  This value corresponds to 
          the system control sys.streams.nband."
-    REFERENCE
+    REFERENCE   
         "sys.streams.nband."
     DEFVAL      { 256 }
     ::= { strTunables 8 }
@@ -1054,7 +1084,7 @@ strNstrmsgs OBJECT-TYPE
     UNITS       "message-data blocks (maximum)"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum number of combined message data 
          blocks that will be allocated.  Valid values are zero 
          (0) or greater (MAXINT).  The default value is 2^12.  
@@ -1070,7 +1100,7 @@ strNstrmsgs OBJECT-TYPE
          
          The purpose of this limit is to keep buffer leaking 
          drivers from consuming all of the system resources."
-    REFERENCE
+    REFERENCE   
         "sys.streams.nstrmsgs."
     DEFVAL      { 4096 }
     ::= { strTunables 9 }
@@ -1080,7 +1110,7 @@ strNstrpush OBJECT-TYPE
     UNITS       "modules per Stream (maximum)"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum number of modules that can be 
          pushed on a Stream.  This includes both autopushed 
          modules and modules pushed using the I_PUSH(7) 
@@ -1092,7 +1122,7 @@ strNstrpush OBJECT-TYPE
          cause some validation tests to fail.  This value 
          corresponds to the system control 
          sys.streams.nstrpush."
-    REFERENCE
+    REFERENCE   
         "sys.streams.nstrpush."
     DEFVAL      { 64 }
     ::= { strTunables 10 }
@@ -1102,7 +1132,7 @@ strHiwat OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the default high water mark (in message 
          bytes) for the Stream head.  Valid values are zero (0) 
          or greater (MAXINT).  The default value is 5120.  This 
@@ -1112,7 +1142,7 @@ strHiwat OBJECT-TYPE
          module by sending an M_SETOPTS(9) message to the Stream 
          head.  This value corresponds to the system control 
          sys.streams.hiwat."
-    REFERENCE
+    REFERENCE   
         "sys.streams.hiwat"
     DEFVAL      { 5120 }
     ::= { strTunables 11 }
@@ -1122,7 +1152,7 @@ strLowat OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the default low water mark (in message bytes) 
          for the Stream head.  Valid values are zero (0) or 
          greater (MAXINT).  The default value is 1024.  This is 
@@ -1132,17 +1162,17 @@ strLowat OBJECT-TYPE
          sending an M_SETOPTS(9) message to the Stream head.  
          This value corresponds to the system control 
          sys.streams.lowat."
-    REFERENCE
+    REFERENCE   
         "sys.streams.lowat"
     DEFVAL      { 1024 }
     ::= { strTunables 12 }
 
 strMaxpsz OBJECT-TYPE
-    SYNTAX      Integer32(0..2147482648)
+    SYNTAX      Integer32 (0..2147482648)
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum packet size accepted (in message 
          bytes) for the Stream head.  Valid values are zero (0) 
          or greater (MAXINT).  The default value is 2^12.  This 
@@ -1173,17 +1203,17 @@ strMaxpsz OBJECT-TYPE
          POSIX conformance.  If the value is set beneath 4096, 
          POSIX conformance of pipes and FIFOs will be 
          abbrogated."
-    REFERENCE
+    REFERENCE   
         "sys.streams.maxpsz"
     DEFVAL      { 4096 }
     ::= { strTunables 13 }
 
 strMinpsz OBJECT-TYPE
-    SYNTAX      Integer32(0..2147482648)
+    SYNTAX      Integer32 (0..2147482648)
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the minimum packet size accepted (in message 
          bytes) for the Stream head.  Valid values are zero (0) 
          or greater (MAXINT).  The default value is zero (0).  
@@ -1210,7 +1240,7 @@ strMinpsz OBJECT-TYPE
          or FIFO.  pipes and FIFOs rely on the value of 0 for 
          POSIX conformance.  If the value is set above 0, POSIX 
          conformance of pipes and FIFOs will be abbrogated."
-    REFERENCE
+    REFERENCE   
         "sys.streams.minpsz"
     DEFVAL      { 0 }
     ::= { strTunables 14 }
@@ -1219,15 +1249,15 @@ strReuseFmodsw OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies whether fmodsw table entries will be reused.  
          When false, fmodsw table entries will not be reused.  
          When true, fmodsw table entries will be reused.  Valid 
          values are true or false.  The default value is false.  
          Corresponds to the control sys.streams.reuse_fmodsw."
-    REFERENCE
+    REFERENCE   
         "sys.streams.reuse_fmodsw"
-    DEFVAL      { 2 } -- false
+    DEFVAL      { false }
     ::= { strTunables 15 }
 
 strRtime OBJECT-TYPE
@@ -1235,7 +1265,7 @@ strRtime OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the time interval that the stream head will 
          wait to forward held messages when SNDHOLD is set for 
          the Stream head.  Valid values are zero (0) or greater 
@@ -1244,7 +1274,7 @@ strRtime OBJECT-TYPE
          Streams.  Changing this value may have a positive or 
          negative impact on system performance.  Corresponds to 
          the system control sys.streams.rtime."
-    REFERENCE
+    REFERENCE   
         "sys.streams.rtime"
     DEFVAL      { 1 }
     ::= { strTunables 16 }
@@ -1253,7 +1283,7 @@ strStrhold OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies whether the SNDHOLD feature is active or not.  
          When false, the SNDHOLD feature is deactivated.  When 
          true, the SNDHOLD feature is activated.  Valid values 
@@ -1263,9 +1293,9 @@ strStrhold OBJECT-TYPE
          and altered on an open Stream using the I_GWROPT and 
          I_SWROPT IO controls of streamio(7).  Corresponds to 
          the system control sys.streams.strhold."
-    REFERENCE
+    REFERENCE   
         "sys.streams.strhold"
-    DEFVAL      { 2 } -- false
+    DEFVAL      { false }
     ::= { strTunables 17 }
 
 strStrctlsz OBJECT-TYPE
@@ -1273,7 +1303,7 @@ strStrctlsz OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum STREAMS control part size.  Value 
          values are zero (0) to greater (MAXINT).  The default 
          value is 2^12.  This is the system wide maximum.  
@@ -1281,7 +1311,7 @@ strStrctlsz OBJECT-TYPE
          value.  Changing this value can have an impact on users 
          of putpmsg(2s).  Corresponds to the system control 
          sys.streams.strctlsz."
-    REFERENCE
+    REFERENCE   
         "sys.streams.strctlsz"
     DEFVAL      { 4096 }
     ::= { strTunables 18 }
@@ -1291,7 +1321,7 @@ strStrmsgsz OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum STREAMS message size.  Value 
          values are zero (0) or greater (MAXINT).  The default 
          value is 2^18.  This is the system wide maximum.  
@@ -1299,7 +1329,7 @@ strStrmsgsz OBJECT-TYPE
          value.  Changing this value can have an impact on users 
          of write(2s), writev(2s), and putpmsg(2s).  Corresponds 
          to the system control sys.streams.strmsgsz."
-    REFERENCE
+    REFERENCE   
         "sys.streams.strmsgsz"
     DEFVAL      { 262144 }
     ::= { strTunables 19 }
@@ -1309,7 +1339,7 @@ strStrthresh OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum amount of memory that will be 
          allocated for use by the STREAMS subsystem via 
          kmem_alloc(9) or kmem_zalloc(9), or indirectly using 
@@ -1324,7 +1354,7 @@ strStrthresh OBJECT-TYPE
          
          The purpose of this constraint is to keep memory 
          leaking drivers from consuming all system resources."
-    REFERENCE
+    REFERENCE   
         "sys.streams.strthresh"
     DEFVAL      { 0 }
     ::= { strTunables 20 }
@@ -1334,7 +1364,7 @@ strLowthresh OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the amount of total STREAMS memory allocation 
          above which low priority message allocations will fail.  
          Low priority message allocations are those which pass 
@@ -1343,7 +1373,7 @@ strLowthresh OBJECT-TYPE
          
          Setting this threshold to a low value may have a 
          negative impact on STREAMS performance."
-    REFERENCE
+    REFERENCE   
         "sys.streams.lowthresh"
     DEFVAL      { 0 }
     ::= { strTunables 21 }
@@ -1353,7 +1383,7 @@ strMedthresh OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the amount of total STREAMS memory allocation 
          above which medium priority message allocations will 
          fail.  Medium priority message allocations are those 
@@ -1363,7 +1393,7 @@ strMedthresh OBJECT-TYPE
          
          Setting this threshold to a low value may have a 
          negative impact on STREAMS performance."
-    REFERENCE
+    REFERENCE   
         "sys.streams.medthresh"
     DEFVAL      { 0 }
     ::= { strTunables 22 }
@@ -1373,7 +1403,7 @@ strIoctime OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the default time interval that a Stream will 
          await a response to an M_IOCTL message issued 
          downstream.  Valid values are zero (0) or greater 
@@ -1384,7 +1414,7 @@ strIoctime OBJECT-TYPE
          streamio(7) input-output control, after the Stream is 
          opened and before the Stream is closed.  This value 
          coresponds to the system control sys.streams.ioctime."
-    REFERENCE
+    REFERENCE   
         "sys.streams.ioctime"
     DEFVAL      { 1500 }
     ::= { strTunables 23 }
@@ -1413,7 +1443,7 @@ strTunablesMandatoryGroup OBJECT-GROUP
                   strMaxpsz, strMinpsz, strStrctlsz, strStrmsgsz, 
                   strIoctime }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of mandatory tunables that are expected to 
          be implemented by all STREAMS subsystem 
          implementations."
@@ -1423,7 +1453,7 @@ strMessagePoolsConditionalGroup OBJECT-GROUP
     OBJECTS     { strMsgPriority, strStrthresh, strLowthresh, 
                   strMedthresh }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects related to the priority message 
          pooling function not present in all modern STREAMS 
          implementations."
@@ -1432,7 +1462,7 @@ strMessagePoolsConditionalGroup OBJECT-GROUP
 strHoldConditionalGroup OBJECT-GROUP
     OBJECTS     { strRtime, strStrhold }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of tunables related to the Stream head 
          hold feature not present in all modern STREAMS 
          implementations."
@@ -1441,7 +1471,7 @@ strHoldConditionalGroup OBJECT-GROUP
 strTunablesOptionalGroup OBJECT-GROUP
     OBJECTS     { strMaxApush, strMaxMblk, strReuseFmodsw }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of optional tunables that are not expected 
          to be implemented by most STREAMS subsystems."
     ::= { strGroups 4 }
@@ -1449,7 +1479,7 @@ strTunablesOptionalGroup OBJECT-GROUP
 strApshTableMandatoryGroup OBJECT-GROUP
     OBJECTS     { strApshMajor, strApshModules }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing a 
          read-only strApshTable."
     ::= { strGroups 5 }
@@ -1457,16 +1487,16 @@ strApshTableMandatoryGroup OBJECT-GROUP
 strApshTableConditionalGroup OBJECT-GROUP
     OBJECTS     { strApshRowStatus }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing a 
          strApshTable that allows management stations to create 
          and delete entries."
     ::= { strGroups 6 }
 
 strModTableMandatoryGroup OBJECT-GROUP
-    OBJECTS     { strModName, strModType, strModMajor }
+    OBJECTS     { strModIdnum, strModType, strModMajor }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing a 
          read-only strModTable."
     ::= { strGroups 7 }
@@ -1474,7 +1504,7 @@ strModTableMandatoryGroup OBJECT-GROUP
 strModTableConditionalGroup OBJECT-GROUP
     OBJECTS     { strModRowStatus }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing a 
          strModTable that allows management stations to create 
          and delete entries."
@@ -1484,7 +1514,7 @@ strModInfoTableMandatoryGroup OBJECT-GROUP
     OBJECTS     { strModInfoQueues, strModInfoMinpsz, strModInfoMaxpsz, 
                   strModInfoHiwat, strModInfoLowat }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing a 
          strModInfoTable that provides STREAMS module 
          information."
@@ -1493,7 +1523,7 @@ strModInfoTableMandatoryGroup OBJECT-GROUP
 strModInfoTableConditionalGroup OBJECT-GROUP
     OBJECTS     { strModInfoTraceLevel }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing an 
          enhanced strModInfoTable that provides STREAMS module 
          information."
@@ -1503,7 +1533,7 @@ strModStatTableMandatoryGroup OBJECT-GROUP
     OBJECTS     { strModStatQueues, strModStatPcnt, strModStatScnt, 
                   strModStatOcnt, strModStatCcnt, strModStatAcnt }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing a 
          strModStatTable that provides STREAMS module 
          statistics."
@@ -1512,7 +1542,7 @@ strModStatTableMandatoryGroup OBJECT-GROUP
 strModStatTableConditionalGroup OBJECT-GROUP
     OBJECTS     { strModStatPrivate, strModStatFlags }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing an 
          enhanced strModStatTable that provides STREAMS module 
          statistics."
@@ -1521,7 +1551,7 @@ strModStatTableConditionalGroup OBJECT-GROUP
 strStatsTableMandatoryGroup OBJECT-GROUP
     OBJECTS     { strStatsCurrentAllocs }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing a 
          strStatsTable that provides STREAMS subsystem 
          statistics."
@@ -1530,263 +1560,261 @@ strStatsTableMandatoryGroup OBJECT-GROUP
 strStatsTableConditionalGroup OBJECT-GROUP
     OBJECTS     { strStatsHighWaterMark }
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "A collection of objects necessary for implementing a 
          strStatsTable that includes high water marks."
     ::= { strGroups 14 }
 
 strMIBCompliance MODULE-COMPLIANCE
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the module compliance requirements for the 
          STREAMS MIB."
 
     MODULE      -- this module
 
-    MANDATORY-GROUPS        { strTunablesMandatoryGroup, 
-              strModTableMandatoryGroup, 
-              strModInfoTableMandatoryGroup, 
-              strModStatTableMandatoryGroup, 
-              strApshTableMandatoryGroup, 
-              strStatsTableMandatoryGroup }
+        MANDATORY-GROUPS        { strTunablesMandatoryGroup, 
+                  strModTableMandatoryGroup, 
+                  strModInfoTableMandatoryGroup, 
+                  strModStatTableMandatoryGroup, 
+                  strApshTableMandatoryGroup, 
+                  strStatsTableMandatoryGroup }
 
         GROUP   strTunablesOptionalGroup
-        DESCRIPTION
-            "Optional tunables."
+        DESCRIPTION   
+              "Optional tunables."
 
         GROUP   strMessagePoolsConditionalGroup
-        DESCRIPTION
-            "Mandatory if the STREAMS implementation allocates 
-             priority messages from fixed size buffer pools."
+        DESCRIPTION   
+              "Mandatory if the STREAMS implementation allocates 
+               priority messages from fixed size buffer pools."
 
         GROUP   strHoldConditionalGroup
-        DESCRIPTION
-            "Mandatory if the Stream head hold feature is 
-             present in the STREAMS implementation."
+        DESCRIPTION   
+              "Mandatory if the Stream head hold feature is 
+               present in the STREAMS implementation."
 
         GROUP   strApshTableConditionalGroup
-        DESCRIPTION
-            "Mandatory when the STREAMS implementation is 
-             capable of adding entries to an autopush 
-             specification while the system is running and 
-             without rebooting."
+        DESCRIPTION   
+              "Mandatory when the STREAMS implementation is 
+               capable of adding entries to an autopush 
+               specification while the system is running and 
+               without rebooting."
 
         GROUP   strModTableConditionalGroup
-        DESCRIPTION
-            "Mandatory when the STREAMS implementation is 
-             capable of creating or destroying entries in the 
-             module or driver switch table while the system is 
-             running and without rebooting."
+        DESCRIPTION   
+              "Mandatory when the STREAMS implementation is 
+               capable of creating or destroying entries in the 
+               module or driver switch table while the system is 
+               running and without rebooting."
 
         GROUP   strModInfoTableConditionalGroup
-        DESCRIPTION
-            "Mandatory if the STREAMS implementation supports 
-             user settable trace levels for STREAMS modules."
+        DESCRIPTION   
+              "Mandatory if the STREAMS implementation supports 
+               user settable trace levels for STREAMS modules."
 
         GROUP   strModStatTableConditionalGroup
-        DESCRIPTION
-            "Mandatory if the STREAMS implementation supports 
-             more than one module_stat structure per module."
+        DESCRIPTION   
+              "Mandatory if the STREAMS implementation supports 
+               more than one module_stat structure per module."
 
         GROUP   strStatsTableConditionalGroup
-        DESCRIPTION
-            "Mandatory when the STREAMS implementation keeps 
-             track of high water marks."
+        DESCRIPTION   
+              "Mandatory when the STREAMS implementation keeps 
+               track of high water marks."
 
         OBJECT  strCltime
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strMaxApush
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strMaxMblk
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strMaxStramod
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strMsgPriority
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strNstrmsgs
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strNstrpush
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strHiwat
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strLowat
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strMaxpsz
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strMinpsz
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strRtime
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strStrhold
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strStrctlsz
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strStrmsgsz
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strIoctime
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strStrthresh
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strLowthresh
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strMedthresh
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this tunable as 
-             read-only where the STREAMS subsystem is incapable 
-             of changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this tunable as 
+               read-only where the STREAMS subsystem is incapable 
+               of changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strModInfoMinpsz
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this column as read-only 
-             where the STREAMS subsystem is incapable of 
-             changing it without exceptional action such as 
-             recomipiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this column as read-only 
+               where the STREAMS subsystem is incapable of 
+               changing it without exceptional action such as 
+               recomipiling the kernel."
 
         OBJECT  strModInfoMaxpsz
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this column as read-only 
-             where the STREAMS subsystem is incapable of 
-             changing it without exceptional action such as 
-             recomipiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this column as read-only 
+               where the STREAMS subsystem is incapable of 
+               changing it without exceptional action such as 
+               recomipiling the kernel."
 
         OBJECT  strModInfoHiwat
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this column as read-only 
-             where the STREAMS subsystem is incapable of 
-             changing it without exceptional action such as 
-             recompiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this column as read-only 
+               where the STREAMS subsystem is incapable of 
+               changing it without exceptional action such as 
+               recompiling the kernel."
 
         OBJECT  strModInfoLowat
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "It is permitted to provide this column as read-only 
-             where the STREAMS subsystem is incapable of 
-             changing it without exceptional action such as 
-             recomipiling the kernel."
+        DESCRIPTION   
+              "It is permitted to provide this column as read-only 
+               where the STREAMS subsystem is incapable of 
+               changing it without exceptional action such as 
+               recomipiling the kernel."
 
         OBJECT  strApshModules
         MIN-ACCESS  read-only
-        DESCRIPTION
-            "As it is optional to permit addition of rows to the 
-             strApshTable by management stations, this column 
-             may be implemented as read-only when the capability 
-             to add rows is not provided."
+        DESCRIPTION   
+              "As it is optional to permit addition of rows to the 
+               strApshTable by management stations, this column 
+               may be implemented as read-only when the capability 
+               to add rows is not provided."
 
     ::= { strCompliances 1 }
 
 END -- end of module OPENSS7-STREAMS-MIB.
-
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:-,\f\b\:· fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et

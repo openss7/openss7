@@ -203,6 +203,8 @@ extern oid ss7ProtocolPnoc1996_oid[15];
 extern oid ss7ProtocolPnoc2000_oid[15];
 extern oid ss7ProtocolPnoc2004_oid[15];
 extern oid ss7ProtocolPnoc2008_oid[15];
+extern oid ss7GeneralCompliance_oid[13];
+extern oid ss7Package_oid[13];
 
 /* function prototypes */
 /* trap function prototypes */

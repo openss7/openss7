@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-DL-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:30 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -85,7 +85,7 @@ IMPORTS
         FROM UCD-SNMP-MIB;
 
 dlMIB MODULE-IDENTITY
-    LAST-UPDATED "200712170903Z"
+    LAST-UPDATED "201106280801Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -102,7 +102,37 @@ dlMIB MODULE-IDENTITY
         "Provides a management information base for LAPB from 
          ITU-T Rec.  X.25 | ISO/IEC 8208, LLC1/LLC2 from IEEE 
          802.2 (ISO/IEC 8802-2) based on ITU-T Rec. X.282 | 
-         ISO/IEC 10742."
+         ISO/IEC 10742.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106280801Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted with smidump."
     REVISION    "200712170903Z"
     DESCRIPTION 
         "First release of this module."
@@ -110,90 +140,90 @@ dlMIB MODULE-IDENTITY
 
  -- top level organization of the MIB
  
--- osiNotifications	OBJECT IDENTIFIER ::= { dlMIB    0 }
--- osiObjects		OBJECT IDENTIFIER ::= { dlMIB    1 }
--- osiConformance	OBJECT IDENTIFIER ::= { dlMIB    2 }
+-- osiNotifications     OBJECT IDENTIFIER ::= { dlMIB    0 }
+-- osiObjects           OBJECT IDENTIFIER ::= { dlMIB    1 }
+-- osiConformance       OBJECT IDENTIFIER ::= { dlMIB    2 }
 
--- osiTables		OBJECT IDENTIFIER ::= { osiObjects   1 }
--- osiScalars		OBJECT IDENTIFIER ::= { osiObjects   2 }
--- osiNotifs		OBJECT IDENTIFIER ::= { osiObjects   3 }
--- osiOids		OBJECT IDENTIFIER ::= { osiObjects   4 }
+-- osiTables            OBJECT IDENTIFIER ::= { osiObjects   1 }
+-- osiScalars           OBJECT IDENTIFIER ::= { osiObjects   2 }
+-- osiNotifs            OBJECT IDENTIFIER ::= { osiObjects   3 }
+-- osiOids              OBJECT IDENTIFIER ::= { osiObjects   4 }
 
--- osiGroups		OBJECT IDENTIFIER ::= { osiConformance   1 }
--- osiCompliances	OBJECT IDENTIFIER ::= { osiConformance   2 }
+-- osiGroups            OBJECT IDENTIFIER ::= { osiConformance   1 }
+-- osiCompliances       OBJECT IDENTIFIER ::= { osiConformance   2 }
 
 -- ITU-T Rec. X.723 | ISO/IEC 10165-5 managed object classes
--- communicationsEntity	OBJECT IDENTIFIER ::= { osiTables    1 }
--- sap1			OBJECT IDENTIFIER ::= { osiTables    2 }
--- sap2			OBJECT IDENTIFIER ::= { osiTables    3 }
--- clProtocolMachine	OBJECT IDENTIFIER ::= { osiTables    4 }
--- coProtocolMachine	OBJECT IDENTIFIER ::= { osiTables    5 }
--- singlePeerConnection	OBJECT IDENTIFIER ::= { osiTables    6 }
+-- communicationsEntity OBJECT IDENTIFIER ::= { osiTables    1 }
+-- sap1                 OBJECT IDENTIFIER ::= { osiTables    2 }
+-- sap2                 OBJECT IDENTIFIER ::= { osiTables    3 }
+-- clProtocolMachine    OBJECT IDENTIFIER ::= { osiTables    4 }
+-- coProtocolMachine    OBJECT IDENTIFIER ::= { osiTables    5 }
+-- singlePeerConnection OBJECT IDENTIFIER ::= { osiTables    6 }
 
 -- ITU-T Rec. X.281 | ISO/IEC 13642 managed object classes
--- physicalEntity	OBJECT IDENTIFIER ::= { osiTables    7 }
--- physicalSAP		OBJECT IDENTIFIER ::= { osiTables    8 }
--- dataCircuit		OBJECT IDENTIFIER ::= { osiTables    9 }
--- physicalConnection	OBJECT IDENTIFIER ::= { osiTables   10 }
+-- physicalEntity       OBJECT IDENTIFIER ::= { osiTables    7 }
+-- physicalSAP          OBJECT IDENTIFIER ::= { osiTables    8 }
+-- dataCircuit          OBJECT IDENTIFIER ::= { osiTables    9 }
+-- physicalConnection   OBJECT IDENTIFIER ::= { osiTables   10 }
 
 -- ITU-T Rec. X.282 | ISO/IEC 10742 managed object classes
--- datalinkEntity	OBJECT IDENTIFIER ::= { osiTables   11 }
--- dLSAP		OBJECT IDENTIFIER ::= { osiTables   12 }
+-- datalinkEntity       OBJECT IDENTIFIER ::= { osiTables   11 }
+-- dLSAP                OBJECT IDENTIFIER ::= { osiTables   12 }
 
--- lAPBDLE		OBJECT IDENTIFIER ::= { osiTables   13 }
--- sLPPM		OBJECT IDENTIFIER ::= { osiTables   14 }
--- sLPConnection	OBJECT IDENTIFIER ::= { osiTables   15 }
--- sLPConnectionIVMO	OBJECT IDENTIFIER ::= { osiTables   16 }
+-- lAPBDLE              OBJECT IDENTIFIER ::= { osiTables   13 }
+-- sLPPM                OBJECT IDENTIFIER ::= { osiTables   14 }
+-- sLPConnection        OBJECT IDENTIFIER ::= { osiTables   15 }
+-- sLPConnectionIVMO    OBJECT IDENTIFIER ::= { osiTables   16 }
 
--- mACDLE		OBJECT IDENTIFIER ::= { osiTables   17 }
--- mAC			OBJECT IDENTIFIER ::= { osiTables   18 }
--- lLCDLE		OBJECT IDENTIFIER ::= { osiTables   19 }
--- lLCCLPM		OBJECT IDENTIFIER ::= { osiTables   20 }
--- lLCCOPM		OBJECT IDENTIFIER ::= { osiTables   21 }
+-- mACDLE               OBJECT IDENTIFIER ::= { osiTables   17 }
+-- mAC                  OBJECT IDENTIFIER ::= { osiTables   18 }
+-- lLCDLE               OBJECT IDENTIFIER ::= { osiTables   19 }
+-- lLCCLPM              OBJECT IDENTIFIER ::= { osiTables   20 }
+-- lLCCOPM              OBJECT IDENTIFIER ::= { osiTables   21 }
 
 -- IEEE 802.1 | ISO/IEC 8802-1 managed object class
--- resourceTypeId	OBJECT IDENTIFIER ::= { osiTables   22 }
+-- resourceTypeId       OBJECT IDENTIFIER ::= { osiTables   22 }
 
 -- IEEE 802.2 | ISO/IEC 8802-2 managed object classes
--- lLCStation		OBJECT IDENTIFIER ::= { osiTables   23 }
--- lLCSAP		OBJECT IDENTIFIER ::= { osiTables   24 }
--- rDESetup		OBJECT IDENTIFIER ::= { osiTables   25 }
--- rDEPair		OBJECT IDENTIFIER ::= { osiTables   26 }
+-- lLCStation           OBJECT IDENTIFIER ::= { osiTables   23 }
+-- lLCSAP               OBJECT IDENTIFIER ::= { osiTables   24 }
+-- rDESetup             OBJECT IDENTIFIER ::= { osiTables   25 }
+-- rDEPair              OBJECT IDENTIFIER ::= { osiTables   26 }
 
--- lLCConnectionLess	OBJECT IDENTIFIER ::= { osiTables   27 }
+-- lLCConnectionLess    OBJECT IDENTIFIER ::= { osiTables   27 }
 
--- lLCConnection2	OBJECT IDENTIFIER ::= { osiTables   28 }
--- lLCConnection2IVMO	OBJECT IDENTIFIER ::= { osiTables   29 }
+-- lLCConnection2       OBJECT IDENTIFIER ::= { osiTables   28 }
+-- lLCConnection2IVMO   OBJECT IDENTIFIER ::= { osiTables   29 }
 -- lLCConnectionlessAck    OBJECT IDENTIFIER ::= { osiTables   30 }
 -- lLCConnectionlessAckIVMO OBJECT IDENTIFIER ::= { osiTables  31 }
 
 -- ITU-T Rec. X.283 | ISO/IEC 10733 managed object classes
--- networkEntity	OBJECT IDENTIFIER ::= { osiTables   32 }
--- nSAP			OBJECT IDENTIFIER ::= { osiTables   33 }
--- cLNS			OBJECT IDENTIFIER ::= { osiTables   34 }
--- cLNSISIS		OBJECT IDENTIFIER ::= { osiTables   35 }
--- cLNSISISLevel2	OBJECT IDENTIFIER ::= { osiTables   36 }
--- linkage		OBJECT IDENTIFIER ::= { osiTables   37 }
--- cONS			OBJECT IDENTIFIER ::= { osiTables   38 }
--- networkConnection	OBJECT IDENTIFIER ::= { osiTables   39 }
--- x25PLE		OBJECT IDENTIFIER ::= { osiTables   40 }
--- x25PLE-DTE		OBJECT IDENTIFIER ::= { osiTables   41 }
--- x25PLE-DCE		OBJECT IDENTIFIER ::= { osiTables   42 }
--- x25PLEIVMO		OBJECT IDENTIFIER ::= { osiTables   43 }
--- x25PLEIVMO-DTE	OBJECT IDENTIFIER ::= { osiTables   44 }
--- x25PLEIVMO-DCE	OBJECT IDENTIFIER ::= { osiTables   45 }
--- virtualCall		OBJECT IDENTIFIER ::= { osiTables   46 }
--- virtualCircuit	OBJECT IDENTIFIER ::= { osiTables   47 }
--- virtualCircuit-DTE	OBJECT IDENTIFIER ::= { osiTables   48 }
--- virtualCircuit-DCE	OBJECT IDENTIFIER ::= { osiTables   49 }
+-- networkEntity        OBJECT IDENTIFIER ::= { osiTables   32 }
+-- nSAP                 OBJECT IDENTIFIER ::= { osiTables   33 }
+-- cLNS                 OBJECT IDENTIFIER ::= { osiTables   34 }
+-- cLNSISIS             OBJECT IDENTIFIER ::= { osiTables   35 }
+-- cLNSISISLevel2       OBJECT IDENTIFIER ::= { osiTables   36 }
+-- linkage              OBJECT IDENTIFIER ::= { osiTables   37 }
+-- cONS                 OBJECT IDENTIFIER ::= { osiTables   38 }
+-- networkConnection    OBJECT IDENTIFIER ::= { osiTables   39 }
+-- x25PLE               OBJECT IDENTIFIER ::= { osiTables   40 }
+-- x25PLE-DTE           OBJECT IDENTIFIER ::= { osiTables   41 }
+-- x25PLE-DCE           OBJECT IDENTIFIER ::= { osiTables   42 }
+-- x25PLEIVMO           OBJECT IDENTIFIER ::= { osiTables   43 }
+-- x25PLEIVMO-DTE       OBJECT IDENTIFIER ::= { osiTables   44 }
+-- x25PLEIVMO-DCE       OBJECT IDENTIFIER ::= { osiTables   45 }
+-- virtualCall          OBJECT IDENTIFIER ::= { osiTables   46 }
+-- virtualCircuit       OBJECT IDENTIFIER ::= { osiTables   47 }
+-- virtualCircuit-DTE   OBJECT IDENTIFIER ::= { osiTables   48 }
+-- virtualCircuit-DCE   OBJECT IDENTIFIER ::= { osiTables   49 }
 -- permanentVirtualCircuit OBJECT IDENTIFIER ::= { osiTables   50 }
 -- permanentVirtualCircuit-DTE OBJECT IDENTIFIER ::= { osiTables   51 }
 -- permanentVirtualCircuit-DCE OBJECT IDENTIFIER ::= { osiTables   52 }
--- virtualCallIVMO	OBJECT IDENTIFIER ::= { osiTables   53 }
--- switchedVirtualCall	OBJECT IDENTIFIER ::= { osiTables   54 }
--- virtualCall-DTE	OBJECT IDENTIFIER ::= { osiTables   55 }
--- virtualCall-DCE	OBJECT IDENTIFIER ::= { osiTables   56 }
--- dSeriesCounts	OBJECT IDENTIFIER ::= { osiTables   57 }
+-- virtualCallIVMO      OBJECT IDENTIFIER ::= { osiTables   53 }
+-- switchedVirtualCall  OBJECT IDENTIFIER ::= { osiTables   54 }
+-- virtualCall-DTE      OBJECT IDENTIFIER ::= { osiTables   55 }
+-- virtualCall-DCE      OBJECT IDENTIFIER ::= { osiTables   56 }
+-- dSeriesCounts        OBJECT IDENTIFIER ::= { osiTables   57 }
 
 -- ISO/IEC 10589 managed object classes
 -- adjacency       OBJECT IDENTIFIER ::= { osiTables   58 }
@@ -214,8 +244,13 @@ dlMIB MODULE-IDENTITY
 --
 -- Textual Conventions
 
-DummySyntax ::=
-    OCTET STRING
+DummySyntax ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
+    STATUS      current
+    DESCRIPTION 
+        "This textual convention is just a dummy syntax as a place 
+         holder for something more complex to be added later."
+    SYNTAX      OCTET STRING
 
 LLCServices ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -248,6 +283,7 @@ STRIndicator ::= TEXTUAL-CONVENTION
     SYNTAX      BITS { nsr(0), ste(1) }
 
 LSAP ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "This textual convention represents an LLC LSAP which consists 
@@ -260,6 +296,7 @@ LSAP ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(1))
 
 LSAPPairId ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "This textual convention represents an RDE Pair ID whcih 
@@ -273,6 +310,7 @@ LSAPPairId ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(0 | 14 | 18))
 
 RoutingInformationField ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "The routing information field varies in length up to 30 octets.  
@@ -299,6 +337,7 @@ SystemTypes ::= TEXTUAL-CONVENTION
     SYNTAX      BITS { eS(0), iS(1) }
 
 NAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "A network address."
@@ -307,6 +346,7 @@ NAddress ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(0..20))
 
 NAddresses ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "A set of network addresses.  Each network address is formatted 
@@ -359,6 +399,7 @@ OriginatingLSPBufferSize ::= TEXTUAL-CONVENTION
     SYNTAX      Integer32 (512..1492)
 
 AreaAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "An area address."
@@ -367,6 +408,7 @@ AreaAddress ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(0..20))
 
 AreaAddresses ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "A set of area addresses.  Each area address is formatted as a 
@@ -379,6 +421,7 @@ AreaAddresses ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING
 
 SNPAAddress ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "An Subnetwork Point of Attachment Address.  This is either a 
@@ -388,6 +431,7 @@ SNPAAddress ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(0..20))
 
 SNPAAddresses ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "A list of SNPA addresses.  Each address contained in the list 
@@ -424,6 +468,7 @@ MetricType ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER { internal(0), external(1) }
 
 AddressPrefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "Describes a network address prefix (or a complete network 
@@ -440,6 +485,7 @@ AddressPrefix ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(0..21))
 
 SNPAPrefix ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "Describes an SNPA prefix.  The prefix is formatted in octets, 
@@ -1167,7 +1213,7 @@ PhysicalSAPEntry ::= SEQUENCE {
 
 physicalSAPRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         "Provides a mechansim whereby mnagement stations, following the 
@@ -1320,7 +1366,7 @@ dataCircuitBitErrorsThreshold OBJECT-TYPE
     ::= { dataCircuitEntry 3 }
 
 dataCircuitType OBJECT-TYPE
-    SYNTAX      INTEGER { end-system(0), relay-system(1) }
+    SYNTAX      INTEGER { endSystem(0), relaySystem(1) }
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
@@ -1391,13 +1437,13 @@ dataCircuitTransmissionCoding OBJECT-TYPE
     ::= { dataCircuitEntry 9 }
 
 dataCircuitTransmissionMode OBJECT-TYPE
-    SYNTAX      INTEGER { simplex(0), duplex(1), half-duplex(2) }
+    SYNTAX      INTEGER { simplex(0), duplex(1), halfDuplex(2) }
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         "Indicates the transmission mode, either simplex(0), one-way 
          outgoing or one-way incoming, duplex(1), two-way simultaneous 
-         communications, or half-duplex(2), alternating two-way 
+         communications, or halfDuplex(2), alternating two-way 
          communications.  Normally the data link entity must know 
          whether the communications is full or half duplex and most data 
          link entities expect duplex instead of simplex operation.  When 
@@ -2418,11 +2464,10 @@ sLPConnectionSABMsSent OBJECT-TYPE
 
 sLPConnectionProtocolState OBJECT-TYPE
     SYNTAX      INTEGER { disconnectedPhase(0), 
-                    linkdisconnection-phase(1), link-set-up-phase(2), 
-                    information-Transfer-phase(3), 
-                    frame-Reject-condition(4), busy-condition(5), 
-                    sent-Reject-condition(6), 
-                    system-Parameters-and-error-recovery(7) }
+                    linkdisconnectionPhase(1), linkSetUpPhase(2), 
+                    informationTransferPhase(3), frameRejectCondition(4), 
+                    busyCondition(5), sentRejectCondition(6), 
+                    systemParametersAndErrorRecovery(7) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -5031,12 +5076,11 @@ lLCConnection2Violation OBJECT-TYPE
     ::= { lLCConnection2Entry 42 }
 
 lLCConnection2ProtocolState OBJECT-TYPE
-    SYNTAX      INTEGER { disconnectedPhase(0), 
-                    linkdiconnection-phase(1), link-set-up-phase(2), 
-                    information-Transfer-phase(3), 
-                    frame-Reject-condition(4), busy-condition(5), 
-                    sent-Reject-condition(6), 
-                    system-Parameters-and-error-recovery(7) }
+    SYNTAX      INTEGER { disconnectedPhase(0), linkdiconnectionPhase(1), 
+                    linkSetUpPhase(2), informationTransferPhase(3), 
+                    frameRejectCondition(4), busyCondition(5), 
+                    sentRejectCondition(6), 
+                    systemParametersAndErrorRecovery(7) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -6768,7 +6812,7 @@ cLNSISISauthenticationFailures OBJECT-TYPE
 
 cLNSISISRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -6885,7 +6929,7 @@ cLNSISISLevel2domainReceivePasswords OBJECT-TYPE
 
 cLNSISISLevel2RowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -7547,7 +7591,7 @@ linkageISISlanL2DesignatedIntermediteSystemChanges OBJECT-TYPE
 -- OBJECT-TYPE
 linkageRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -7700,7 +7744,7 @@ networkConnectionRemoteNSAPAddress OBJECT-TYPE
 
 networkConnectionRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -8186,7 +8230,7 @@ x25PLEregistrationPermitted OBJECT-TYPE
 
 x25PLERowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -9328,7 +9372,7 @@ x25PLEIVMOregistrationPermitted OBJECT-TYPE
 -- ISO 10733 only x25PLEIVMO-networkSubsystem name binding
 x25PLEIVMORowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -9721,7 +9765,7 @@ x25PLEIVMO-DTEregistrationPermitted OBJECT-TYPE
 --
 x25PLEIVMO-DTERowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -10430,7 +10474,7 @@ permanentVirtualCircuit-DTEwindowSizes OBJECT-TYPE
 
 permanentVirtualCircuit-DTERowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -10549,7 +10593,7 @@ permanentVirtualCircuit-DCEremoteLogicalChannel OBJECT-TYPE
 
 permanentVirtualCircuit-DCERowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -10792,7 +10836,7 @@ virtualCallIVMOrejectCount OBJECT-TYPE
 -- both
 virtualCallIVMORowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -11183,7 +11227,7 @@ virtualCall-DCErOASelection OBJECT-TYPE
 
 virtualCall-DCERowStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-only
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         ""
@@ -11539,7 +11583,7 @@ virtualAdjacencyMetric OBJECT-TYPE
         "ISO/IEC 10589 metric attribute."
     ::= { virtualAdjacencyEntry 2 }
 
-destination OBJECT IDENTIFIER
+destinationMOC OBJECT IDENTIFIER
     ::= { osiTables 60 }
 
 destinationTable OBJECT-TYPE
@@ -11552,7 +11596,7 @@ destinationTable OBJECT-TYPE
          destinationArea MO classes to be derived from it."
     REFERENCE   
         "ISO/IEC 10589 destination MOC."
-    ::= { destination 1 }
+    ::= { destinationMOC 1 }
 
 destinationEntry OBJECT-TYPE
     SYNTAX      DestinationEntry
@@ -14743,7 +14787,7 @@ osiObjectGroup OBJECT-GROUP
                   reachableAddressAdministrativeState, 
                   reachableAddressSNPAAddresses, 
                   reachableAddressSNPAMask, reachableAddressSNPAPrefix, 
-                  reachableAddressRowStatus }
+                  reachableAddressRowStatus, physicalSAPRowStatus }
     STATUS      current
     DESCRIPTION 
         "A collection of all accessible OSI objects in this module."
@@ -14769,5 +14813,3 @@ osiTotalCompliance MODULE-COMPLIANCE
     ::= { osiCompliances 1 }
 
 END -- end of module OPENSS7-DL-MIB.
-
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

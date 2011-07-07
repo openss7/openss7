@@ -204,12 +204,37 @@ oid tcapOmMIB_variables_oid[10] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4 };
 /*
  * Oids accessible only for notify defined in this MIB.
  */
-oid tcapOmMessageType_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 1, 3, 1 };
+oid tcapOmMessageTypeNotif_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 1, 3, 1 };
 
 /*
  * Other oids defined in this MIB.
  */
-
+oid tcapOmBasicCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 1, 1 };
+oid tcapOmActivationGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 1 };
+oid tcapOmNodeGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 2 };
+oid tcapOmNodeCurrentGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 3 };
+oid tcapOmNode5minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 4 };
+oid tcapOmNode15minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 5 };
+oid tcapOmMsgsGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 6 };
+oid tcapOmMsgsCurrentGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 7 };
+oid tcapOmMsgs5minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 8 };
+oid tcapOmMsgs15minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 9 };
+oid tcapOmAEGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 10 };
+oid tcapOmAECurrentGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 11 };
+oid tcapOmAE5minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 12 };
+oid tcapOmAE15minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 13 };
+oid tcapOmTcGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 14 };
+oid tcapOmTcCurrentGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 15 };
+oid tcapOmTc5minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 16 };
+oid tcapOmTc15minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 17 };
+oid tcapOmDevelRecvGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 18 };
+oid tcapOmDevelRecvCurrentGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 19 };
+oid tcapOmDevelRecv5minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 20 };
+oid tcapOmDevelRecv15minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 21 };
+oid tcapOmDevelSentGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 22 };
+oid tcapOmDevelSentCurrentGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 23 };
+oid tcapOmDevelSent5minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 24 };
+oid tcapOmDevelSent15minGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 4, 2, 2, 25 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -240,13 +265,13 @@ struct variable7 tcapOmMIB_variables[] = {
 #define   TCAPOMNODECURRENTCOMPONENTSRECV  10
 	{(u_char) TCAPOMNODECURRENTCOMPONENTSRECV, ASN_GAUGE, RONLY, var_tcapOmNodeCurrentTable, 6, {1, 1, 1, 2, 1, 4}},
 #define   TCAPOMNODE5MININTMESSAGESSENT  11
-	{(u_char) TCAPOMNODE5MININTMESSAGESSENT, ASN_GAUGE, RONLY, var_tcapOmNode5minIntTable, 6, {1, 1, 1, 3, 1, 1}},
+	{(u_char) TCAPOMNODE5MININTMESSAGESSENT, ASN_GAUGE, RONLY, var_tcapOmNode5minIntTable, 6, {1, 1, 1, 3, 1, 2}},
 #define   TCAPOMNODE5MININTMESSAGESRECV  12
-	{(u_char) TCAPOMNODE5MININTMESSAGESRECV, ASN_GAUGE, RONLY, var_tcapOmNode5minIntTable, 6, {1, 1, 1, 3, 1, 2}},
+	{(u_char) TCAPOMNODE5MININTMESSAGESRECV, ASN_GAUGE, RONLY, var_tcapOmNode5minIntTable, 6, {1, 1, 1, 3, 1, 3}},
 #define   TCAPOMNODE5MININTCOMPONENTSSENT  13
-	{(u_char) TCAPOMNODE5MININTCOMPONENTSSENT, ASN_GAUGE, RONLY, var_tcapOmNode5minIntTable, 6, {1, 1, 1, 3, 1, 3}},
+	{(u_char) TCAPOMNODE5MININTCOMPONENTSSENT, ASN_GAUGE, RONLY, var_tcapOmNode5minIntTable, 6, {1, 1, 1, 3, 1, 4}},
 #define   TCAPOMNODE5MININTCOMPONENTSRECV  14
-	{(u_char) TCAPOMNODE5MININTCOMPONENTSRECV, ASN_GAUGE, RONLY, var_tcapOmNode5minIntTable, 6, {1, 1, 1, 3, 1, 4}},
+	{(u_char) TCAPOMNODE5MININTCOMPONENTSRECV, ASN_GAUGE, RONLY, var_tcapOmNode5minIntTable, 6, {1, 1, 1, 3, 1, 5}},
 #define   TCAPOMNODE15MININTMESSAGESSENT  15
 	{(u_char) TCAPOMNODE15MININTMESSAGESSENT, ASN_GAUGE, RONLY, var_tcapOmNode15minIntTable, 6, {1, 1, 1, 4, 1, 1}},
 #define   TCAPOMNODE15MININTMESSAGESRECV  16
@@ -256,13 +281,13 @@ struct variable7 tcapOmMIB_variables[] = {
 #define   TCAPOMNODE15MININTCOMPONENTSRECV  18
 	{(u_char) TCAPOMNODE15MININTCOMPONENTSRECV, ASN_GAUGE, RONLY, var_tcapOmNode15minIntTable, 6, {1, 1, 1, 4, 1, 4}},
 #define   TCAPOMMSGSMESSAGESSENT  19
-	{(u_char) TCAPOMMSGSMESSAGESSENT, ASN_COUNTER, RONLY, var_tcapOmMsgsTable, 6, {1, 1, 2, 1, 1, 1}},
+	{(u_char) TCAPOMMSGSMESSAGESSENT, ASN_COUNTER, RONLY, var_tcapOmMsgsTable, 6, {1, 1, 2, 1, 1, 2}},
 #define   TCAPOMMSGSMESSAGESRECV  20
-	{(u_char) TCAPOMMSGSMESSAGESRECV, ASN_COUNTER, RONLY, var_tcapOmMsgsTable, 6, {1, 1, 2, 1, 1, 2}},
+	{(u_char) TCAPOMMSGSMESSAGESRECV, ASN_COUNTER, RONLY, var_tcapOmMsgsTable, 6, {1, 1, 2, 1, 1, 3}},
 #define   TCAPOMMSGS5MINVALIDINTERVALS  21
-	{(u_char) TCAPOMMSGS5MINVALIDINTERVALS, ASN_INTEGER, RONLY, var_tcapOmMsgsTable, 6, {1, 1, 2, 1, 1, 3}},
+	{(u_char) TCAPOMMSGS5MINVALIDINTERVALS, ASN_INTEGER, RONLY, var_tcapOmMsgsTable, 6, {1, 1, 2, 1, 1, 4}},
 #define   TCAPOMMSGS15MINVALIDINTERVALS  22
-	{(u_char) TCAPOMMSGS15MINVALIDINTERVALS, ASN_INTEGER, RONLY, var_tcapOmMsgsTable, 6, {1, 1, 2, 1, 1, 4}},
+	{(u_char) TCAPOMMSGS15MINVALIDINTERVALS, ASN_INTEGER, RONLY, var_tcapOmMsgsTable, 6, {1, 1, 2, 1, 1, 5}},
 #define   TCAPOMMSGSCURRENTMESSAGESSENT  23
 	{(u_char) TCAPOMMSGSCURRENTMESSAGESSENT, ASN_GAUGE, RONLY, var_tcapOmMsgsCurrentTable, 6, {1, 1, 2, 2, 1, 1}},
 #define   TCAPOMMSGSCURRENTMESSAGESRECV  24
@@ -1109,6 +1134,42 @@ parse_tcapOmMIB(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual scalars that are not persistent */
+	SNMP_FREE(StorageTmp->tcapOm1stAndIntervalActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->tcapOm1stAndIntervalActivate, &StorageTmp->tcapOm1stAndIntervalActivateLen);
+	if (StorageTmp->tcapOm1stAndIntervalActivate == NULL) {
+		config_perror("invalid specification for tcapOm1stAndIntervalActivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapOm1stAndIntervalDeactivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->tcapOm1stAndIntervalDeactivate, &StorageTmp->tcapOm1stAndIntervalDeactivateLen);
+	if (StorageTmp->tcapOm1stAndIntervalDeactivate == NULL) {
+		config_perror("invalid specification for tcapOm1stAndIntervalDeactivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapOm5MinActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->tcapOm5MinActivate, &StorageTmp->tcapOm5MinActivateLen);
+	if (StorageTmp->tcapOm5MinActivate == NULL) {
+		config_perror("invalid specification for tcapOm5MinActivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapOm5MinDeaActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->tcapOm5MinDeaActivate, &StorageTmp->tcapOm5MinDeaActivateLen);
+	if (StorageTmp->tcapOm5MinDeaActivate == NULL) {
+		config_perror("invalid specification for tcapOm5MinDeaActivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapOm15MinActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->tcapOm15MinActivate, &StorageTmp->tcapOm15MinActivateLen);
+	if (StorageTmp->tcapOm15MinActivate == NULL) {
+		config_perror("invalid specification for tcapOm15MinActivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapOm15MinDeaActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->tcapOm15MinDeaActivate, &StorageTmp->tcapOm15MinDeaActivateLen);
+	if (StorageTmp->tcapOm15MinDeaActivate == NULL) {
+		config_perror("invalid specification for tcapOm15MinDeaActivate");
+		return;
+	}
 	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->tcapOmDiscontinuityTime, &tmpsize);
 	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->tcapOmTimeStamp, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapOm5MinMaxIntervals, &tmpsize);
@@ -1142,6 +1203,12 @@ store_tcapOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		strcat(line, "tcapOmMIB ");
 		cptr = line + strlen(line);
 		/* XXX: remove individual scalars that are not persistent */
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->tcapOm1stAndIntervalActivate, &StorageTmp->tcapOm1stAndIntervalActivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->tcapOm1stAndIntervalDeactivate, &StorageTmp->tcapOm1stAndIntervalDeactivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->tcapOm5MinActivate, &StorageTmp->tcapOm5MinActivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->tcapOm5MinDeaActivate, &StorageTmp->tcapOm5MinDeaActivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->tcapOm15MinActivate, &StorageTmp->tcapOm15MinActivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->tcapOm15MinDeaActivate, &StorageTmp->tcapOm15MinDeaActivateLen);
 		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->tcapOmDiscontinuityTime, &tmpsize);
 		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->tcapOmTimeStamp, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapOm5MinMaxIntervals, &tmpsize);
@@ -1219,23 +1286,47 @@ var_tcapOmMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) TCAPOM1STANDINTERVALACTIVATE:	/* WriteOnly */
+	case (u_char) TCAPOM1STANDINTERVALACTIVATE:	/* ReadWrite */
 		*write_method = write_tcapOm1stAndIntervalActivate;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->tcapOm1stAndIntervalActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->tcapOm1stAndIntervalActivate;
 		break;
-	case (u_char) TCAPOM1STANDINTERVALDEACTIVATE:	/* WriteOnly */
+	case (u_char) TCAPOM1STANDINTERVALDEACTIVATE:	/* ReadWrite */
 		*write_method = write_tcapOm1stAndIntervalDeactivate;
+		if (!StorageTmp)
 		break;
-	case (u_char) TCAPOM5MINACTIVATE:	/* WriteOnly */
+		*var_len = StorageTmp->tcapOm1stAndIntervalDeactivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->tcapOm1stAndIntervalDeactivate;
+		break;
+	case (u_char) TCAPOM5MINACTIVATE:	/* ReadWrite */
 		*write_method = write_tcapOm5MinActivate;
+		if (!StorageTmp)
 		break;
-	case (u_char) TCAPOM5MINDEAACTIVATE:	/* WriteOnly */
+		*var_len = StorageTmp->tcapOm5MinActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->tcapOm5MinActivate;
+		break;
+	case (u_char) TCAPOM5MINDEAACTIVATE:	/* ReadWrite */
 		*write_method = write_tcapOm5MinDeaActivate;
+		if (!StorageTmp)
 		break;
-	case (u_char) TCAPOM15MINACTIVATE:	/* WriteOnly */
+		*var_len = StorageTmp->tcapOm5MinDeaActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->tcapOm5MinDeaActivate;
+		break;
+	case (u_char) TCAPOM15MINACTIVATE:	/* ReadWrite */
 		*write_method = write_tcapOm15MinActivate;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->tcapOm15MinActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->tcapOm15MinActivate;
 		break;
-	case (u_char) TCAPOM15MINDEAACTIVATE:	/* WriteOnly */
+	case (u_char) TCAPOM15MINDEAACTIVATE:	/* ReadWrite */
 		*write_method = write_tcapOm15MinDeaActivate;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->tcapOm15MinDeaActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->tcapOm15MinDeaActivate;
 		break;
 	case (u_char) TCAPOMDISCONTINUITYTIME:	/* ReadOnly */
 		if (!StorageTmp)
@@ -1289,7 +1380,8 @@ tcapOmNodeTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNodeTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		StorageNew->tcapOmNodeMessagesSent = 0;
 		StorageNew->tcapOmNodeMessagesRecv = 0;
 		StorageNew->tcapOmNodeComponentsSent = 0;
@@ -1344,6 +1436,8 @@ tcapOmNodeTable_destroy(struct tcapOmNodeTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNodeTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -1369,7 +1463,7 @@ tcapOmNodeTable_add(struct tcapOmNodeTable_data *thedata)
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		header_complex_add_data(&tcapOmNodeTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("tcapOmMIB", "registered an entry.\n"));
@@ -1428,7 +1522,12 @@ parse_tcapOmNodeTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmNodeMessagesSent, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmNodeMessagesRecv, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmNodeComponentsSent, &tmpsize);
@@ -1464,7 +1563,7 @@ store_tcapOmNodeTable(int majorID, int minorID, void *serverarg, void *clientarg
 			strcat(line, "tcapOmNodeTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmNodeMessagesSent, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmNodeMessagesRecv, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmNodeComponentsSent, &tmpsize);
@@ -1494,7 +1593,8 @@ tcapOmNodeCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNodeCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		StorageNew->tcapOmNodeCurrentMessagesSent = 0;
 		StorageNew->tcapOmNodeCurrentMessagesRecv = 0;
 		StorageNew->tcapOmNodeCurrentComponentsSent = 0;
@@ -1547,6 +1647,8 @@ tcapOmNodeCurrentTable_destroy(struct tcapOmNodeCurrentTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNodeCurrentTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -1572,7 +1674,7 @@ tcapOmNodeCurrentTable_add(struct tcapOmNodeCurrentTable_data *thedata)
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		header_complex_add_data(&tcapOmNodeCurrentTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("tcapOmMIB", "registered an entry.\n"));
@@ -1631,7 +1733,12 @@ parse_tcapOmNodeCurrentTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmNodeCurrentMessagesSent, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmNodeCurrentMessagesRecv, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmNodeCurrentComponentsSent, &tmpsize);
@@ -1665,7 +1772,7 @@ store_tcapOmNodeCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 			strcat(line, "tcapOmNodeCurrentTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmNodeCurrentMessagesSent, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmNodeCurrentMessagesRecv, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmNodeCurrentComponentsSent, &tmpsize);
@@ -1693,8 +1800,8 @@ tcapOmNode5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNode5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
-		StorageNew->tcapOmInterval = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		StorageNew->tcapOmNode5minIntMessagesSent = 0;
 		StorageNew->tcapOmNode5minIntMessagesRecv = 0;
 		StorageNew->tcapOmNode5minIntComponentsSent = 0;
@@ -1747,6 +1854,8 @@ tcapOmNode5minIntTable_destroy(struct tcapOmNode5minIntTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNode5minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -1772,7 +1881,7 @@ tcapOmNode5minIntTable_add(struct tcapOmNode5minIntTable_data *thedata)
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* tcapOmInterval */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->tcapOmInterval, sizeof(thedata->tcapOmInterval));
 		header_complex_add_data(&tcapOmNode5minIntTableStorage, vars, thedata);
@@ -1833,7 +1942,12 @@ parse_tcapOmNode5minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmNode5minIntMessagesSent, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmNode5minIntMessagesRecv, &tmpsize);
@@ -1868,7 +1982,7 @@ store_tcapOmNode5minIntTable(int majorID, int minorID, void *serverarg, void *cl
 			strcat(line, "tcapOmNode5minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmNode5minIntMessagesSent, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmNode5minIntMessagesRecv, &tmpsize);
@@ -1897,7 +2011,8 @@ tcapOmNode15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNode15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmNode15minIntMessagesSent = 0;
 		StorageNew->tcapOmNode15minIntMessagesRecv = 0;
@@ -1951,6 +2066,8 @@ tcapOmNode15minIntTable_destroy(struct tcapOmNode15minIntTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmNode15minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -1976,7 +2093,7 @@ tcapOmNode15minIntTable_add(struct tcapOmNode15minIntTable_data *thedata)
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* tcapOmInterval */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->tcapOmInterval, sizeof(thedata->tcapOmInterval));
 		header_complex_add_data(&tcapOmNode15minIntTableStorage, vars, thedata);
@@ -2037,7 +2154,12 @@ parse_tcapOmNode15minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmNode15minIntMessagesSent, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmNode15minIntMessagesRecv, &tmpsize);
@@ -2072,7 +2194,7 @@ store_tcapOmNode15minIntTable(int majorID, int minorID, void *serverarg, void *c
 			strcat(line, "tcapOmNode15minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmNode15minIntMessagesSent, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmNode15minIntMessagesRecv, &tmpsize);
@@ -2101,8 +2223,8 @@ tcapOmMsgsTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgsTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
-		StorageNew->tcapOmMessageType = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		StorageNew->tcapOmMsgsMessagesSent = 0;
 		StorageNew->tcapOmMsgsMessagesRecv = 0;
 		StorageNew->tcapOmMsgs5minValidIntervals = 0;
@@ -2155,6 +2277,8 @@ tcapOmMsgsTable_destroy(struct tcapOmMsgsTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgsTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -2180,7 +2304,7 @@ tcapOmMsgsTable_add(struct tcapOmMsgsTable_data *thedata)
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* tcapOmMessageType */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapOmMessageType, sizeof(thedata->tcapOmMessageType));
 		header_complex_add_data(&tcapOmMsgsTableStorage, vars, thedata);
@@ -2241,7 +2365,12 @@ parse_tcapOmMsgsTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapOmMessageType, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmMsgsMessagesSent, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmMsgsMessagesRecv, &tmpsize);
@@ -2276,7 +2405,7 @@ store_tcapOmMsgsTable(int majorID, int minorID, void *serverarg, void *clientarg
 			strcat(line, "tcapOmMsgsTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapOmMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmMsgsMessagesSent, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmMsgsMessagesRecv, &tmpsize);
@@ -2305,7 +2434,8 @@ tcapOmMsgsCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgsCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		StorageNew->tcapOmMessageType = 0;
 		StorageNew->tcapOmMsgsCurrentMessagesSent = 0;
 		StorageNew->tcapOmMsgsCurrentMessagesRecv = 0;
@@ -2357,6 +2487,8 @@ tcapOmMsgsCurrentTable_destroy(struct tcapOmMsgsCurrentTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgsCurrentTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -2382,7 +2514,7 @@ tcapOmMsgsCurrentTable_add(struct tcapOmMsgsCurrentTable_data *thedata)
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* tcapOmMessageType */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapOmMessageType, sizeof(thedata->tcapOmMessageType));
 		header_complex_add_data(&tcapOmMsgsCurrentTableStorage, vars, thedata);
@@ -2443,7 +2575,12 @@ parse_tcapOmMsgsCurrentTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapOmMessageType, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmMsgsCurrentMessagesSent, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmMsgsCurrentMessagesRecv, &tmpsize);
@@ -2476,7 +2613,7 @@ store_tcapOmMsgsCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 			strcat(line, "tcapOmMsgsCurrentTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapOmMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmMsgsCurrentMessagesSent, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmMsgsCurrentMessagesRecv, &tmpsize);
@@ -2503,7 +2640,8 @@ tcapOmMsgs5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgs5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		StorageNew->tcapOmMessageType = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmMsgs5minIntMessagesSent = 0;
@@ -2556,6 +2694,8 @@ tcapOmMsgs5minIntTable_destroy(struct tcapOmMsgs5minIntTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgs5minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -2581,7 +2721,7 @@ tcapOmMsgs5minIntTable_add(struct tcapOmMsgs5minIntTable_data *thedata)
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* tcapOmMessageType */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapOmMessageType, sizeof(thedata->tcapOmMessageType));
 		/* tcapOmInterval */
@@ -2644,7 +2784,12 @@ parse_tcapOmMsgs5minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapOmMessageType, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmMsgs5minIntMessagesSent, &tmpsize);
@@ -2678,7 +2823,7 @@ store_tcapOmMsgs5minIntTable(int majorID, int minorID, void *serverarg, void *cl
 			strcat(line, "tcapOmMsgs5minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapOmMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmMsgs5minIntMessagesSent, &tmpsize);
@@ -2706,7 +2851,8 @@ tcapOmMsgs15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgs15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->sccpNetworkEntityId = 0;
+		if ((StorageNew->sccpNetworkEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->sccpNetworkEntityIdLen = strlen("");
 		StorageNew->tcapOmMessageType = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmMsgs15minIntMessagesSent = 0;
@@ -2759,6 +2905,8 @@ tcapOmMsgs15minIntTable_destroy(struct tcapOmMsgs15minIntTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmMsgs15minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->sccpNetworkEntityId);
+		StorageDel->sccpNetworkEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -2784,7 +2932,7 @@ tcapOmMsgs15minIntTable_add(struct tcapOmMsgs15minIntTable_data *thedata)
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
 		/* sccpNetworkEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->sccpNetworkEntityId, sizeof(thedata->sccpNetworkEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->sccpNetworkEntityId, thedata->sccpNetworkEntityIdLen);
 		/* tcapOmMessageType */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapOmMessageType, sizeof(thedata->tcapOmMessageType));
 		/* tcapOmInterval */
@@ -2847,7 +2995,12 @@ parse_tcapOmMsgs15minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->sccpNetworkEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
+	if (StorageTmp->sccpNetworkEntityId == NULL) {
+		config_perror("invalid specification for sccpNetworkEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapOmMessageType, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmMsgs15minIntMessagesSent, &tmpsize);
@@ -2881,7 +3034,7 @@ store_tcapOmMsgs15minIntTable(int majorID, int minorID, void *serverarg, void *c
 			strcat(line, "tcapOmMsgs15minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sccpNetworkEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapOmMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmMsgs15minIntMessagesSent, &tmpsize);
@@ -2909,7 +3062,10 @@ tcapOmAETable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAETable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmAEMeasurementDeleted = 0;
 		StorageNew->tcapOmAENewTransactions = 0;
 		StorageNew->tcapOmAEMeanOpenTransactions = 0;
@@ -2967,6 +3123,10 @@ tcapOmAETable_destroy(struct tcapOmAETable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAETable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -2991,8 +3151,10 @@ tcapOmAETable_add(struct tcapOmAETable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAETable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		header_complex_add_data(&tcapOmAETableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("tcapOmMIB", "registered an entry.\n"));
@@ -3051,7 +3213,18 @@ parse_tcapOmAETable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmAEMeasurementDeleted, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmAENewTransactions, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmAEMeanOpenTransactions, &tmpsize);
@@ -3090,7 +3263,8 @@ store_tcapOmAETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			strcat(line, "tcapOmAETable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmAEMeasurementDeleted, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmAENewTransactions, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmAEMeanOpenTransactions, &tmpsize);
@@ -3123,7 +3297,10 @@ tcapOmAECurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAECurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmAECurrentMeasurementDeleted = 0;
 		StorageNew->tcapOmAECurrentNewTransactions = 0;
 		StorageNew->tcapOmAECurrentMeanOpenTransactions = 0;
@@ -3179,6 +3356,10 @@ tcapOmAECurrentTable_destroy(struct tcapOmAECurrentTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAECurrentTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -3203,8 +3384,10 @@ tcapOmAECurrentTable_add(struct tcapOmAECurrentTable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAECurrentTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		header_complex_add_data(&tcapOmAECurrentTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("tcapOmMIB", "registered an entry.\n"));
@@ -3263,7 +3446,18 @@ parse_tcapOmAECurrentTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmAECurrentMeasurementDeleted, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmAECurrentNewTransactions, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmAECurrentMeanOpenTransactions, &tmpsize);
@@ -3300,7 +3494,8 @@ store_tcapOmAECurrentTable(int majorID, int minorID, void *serverarg, void *clie
 			strcat(line, "tcapOmAECurrentTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmAECurrentMeasurementDeleted, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmAECurrentNewTransactions, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmAECurrentMeanOpenTransactions, &tmpsize);
@@ -3331,7 +3526,10 @@ tcapOmAE5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmAE5minIntMeasurementDeleted = 0;
 		StorageNew->tcapOmAE5minIntNewTransactions = 0;
@@ -3388,6 +3586,10 @@ tcapOmAE5minIntTable_destroy(struct tcapOmAE5minIntTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE5minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -3412,8 +3614,10 @@ tcapOmAE5minIntTable_add(struct tcapOmAE5minIntTable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE5minIntTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		/* tcapOmInterval */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->tcapOmInterval, sizeof(thedata->tcapOmInterval));
 		header_complex_add_data(&tcapOmAE5minIntTableStorage, vars, thedata);
@@ -3474,7 +3678,18 @@ parse_tcapOmAE5minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmAE5minIntMeasurementDeleted, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmAE5minIntNewTransactions, &tmpsize);
@@ -3512,7 +3727,8 @@ store_tcapOmAE5minIntTable(int majorID, int minorID, void *serverarg, void *clie
 			strcat(line, "tcapOmAE5minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmAE5minIntMeasurementDeleted, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmAE5minIntNewTransactions, &tmpsize);
@@ -3544,7 +3760,10 @@ tcapOmAE15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmAE15minIntMeasurementDeleted = 0;
 		StorageNew->tcapOmAE15minIntNewTransactions = 0;
@@ -3601,6 +3820,10 @@ tcapOmAE15minIntTable_destroy(struct tcapOmAE15minIntTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE15minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -3625,8 +3848,10 @@ tcapOmAE15minIntTable_add(struct tcapOmAE15minIntTable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmAE15minIntTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		/* tcapOmInterval */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->tcapOmInterval, sizeof(thedata->tcapOmInterval));
 		header_complex_add_data(&tcapOmAE15minIntTableStorage, vars, thedata);
@@ -3687,7 +3912,18 @@ parse_tcapOmAE15minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmAE15minIntMeasurementDeleted, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmAE15minIntNewTransactions, &tmpsize);
@@ -3725,7 +3961,8 @@ store_tcapOmAE15minIntTable(int majorID, int minorID, void *serverarg, void *cli
 			strcat(line, "tcapOmAE15minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmAE15minIntMeasurementDeleted, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmAE15minIntNewTransactions, &tmpsize);
@@ -3757,7 +3994,10 @@ tcapOmTcTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmTcPabortRecvUnrecTid = 0;
 		StorageNew->tcapOmTcPabortRecvResourceLim = 0;
 		StorageNew->tcapOmTcRejectRecvResourceLim = 0;
@@ -3820,6 +4060,10 @@ tcapOmTcTable_destroy(struct tcapOmTcTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -3844,8 +4088,10 @@ tcapOmTcTable_add(struct tcapOmTcTable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		header_complex_add_data(&tcapOmTcTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("tcapOmMIB", "registered an entry.\n"));
@@ -3904,7 +4150,18 @@ parse_tcapOmTcTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmTcPabortRecvUnrecTid, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmTcPabortRecvResourceLim, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmTcRejectRecvResourceLim, &tmpsize);
@@ -3948,7 +4205,8 @@ store_tcapOmTcTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			strcat(line, "tcapOmTcTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmTcPabortRecvUnrecTid, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmTcPabortRecvResourceLim, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmTcRejectRecvResourceLim, &tmpsize);
@@ -3986,7 +4244,10 @@ tcapOmTcCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmTcCurrentPabortRecvUnrecTid = 0;
 		StorageNew->tcapOmTcCurrentPabortRecvResourceLim = 0;
 		StorageNew->tcapOmTcCurrentRejectRecvResourceLim = 0;
@@ -4047,6 +4308,10 @@ tcapOmTcCurrentTable_destroy(struct tcapOmTcCurrentTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcCurrentTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -4071,8 +4336,10 @@ tcapOmTcCurrentTable_add(struct tcapOmTcCurrentTable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTcCurrentTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		header_complex_add_data(&tcapOmTcCurrentTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("tcapOmMIB", "registered an entry.\n"));
@@ -4131,7 +4398,18 @@ parse_tcapOmTcCurrentTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmTcCurrentPabortRecvUnrecTid, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmTcCurrentPabortRecvResourceLim, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmTcCurrentRejectRecvResourceLim, &tmpsize);
@@ -4173,7 +4451,8 @@ store_tcapOmTcCurrentTable(int majorID, int minorID, void *serverarg, void *clie
 			strcat(line, "tcapOmTcCurrentTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmTcCurrentPabortRecvUnrecTid, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmTcCurrentPabortRecvResourceLim, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmTcCurrentRejectRecvResourceLim, &tmpsize);
@@ -4209,7 +4488,10 @@ tcapOmTc5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmTc5minIntPabortRecvUnrecTid = 0;
 		StorageNew->tcapOmTc5minIntPabortRecvResourceLim = 0;
@@ -4271,6 +4553,10 @@ tcapOmTc5minIntTable_destroy(struct tcapOmTc5minIntTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc5minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -4295,8 +4581,10 @@ tcapOmTc5minIntTable_add(struct tcapOmTc5minIntTable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc5minIntTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		/* tcapOmInterval */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->tcapOmInterval, sizeof(thedata->tcapOmInterval));
 		header_complex_add_data(&tcapOmTc5minIntTableStorage, vars, thedata);
@@ -4357,7 +4645,18 @@ parse_tcapOmTc5minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmTc5minIntPabortRecvUnrecTid, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmTc5minIntPabortRecvResourceLim, &tmpsize);
@@ -4400,7 +4699,8 @@ store_tcapOmTc5minIntTable(int majorID, int minorID, void *serverarg, void *clie
 			strcat(line, "tcapOmTc5minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmTc5minIntPabortRecvUnrecTid, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmTc5minIntPabortRecvResourceLim, &tmpsize);
@@ -4437,7 +4737,10 @@ tcapOmTc15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmTc15minIntPabortRecvUnrecTid = 0;
 		StorageNew->tcapOmTc15minIntPabortRecvResourceLim = 0;
@@ -4499,6 +4802,10 @@ tcapOmTc15minIntTable_destroy(struct tcapOmTc15minIntTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc15minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -4523,8 +4830,10 @@ tcapOmTc15minIntTable_add(struct tcapOmTc15minIntTable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmTc15minIntTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		/* tcapOmInterval */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->tcapOmInterval, sizeof(thedata->tcapOmInterval));
 		header_complex_add_data(&tcapOmTc15minIntTableStorage, vars, thedata);
@@ -4585,7 +4894,18 @@ parse_tcapOmTc15minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmTc15minIntPabortRecvUnrecTid, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmTc15minIntPabortRecvResourceLim, &tmpsize);
@@ -4628,7 +4948,8 @@ store_tcapOmTc15minIntTable(int majorID, int minorID, void *serverarg, void *cli
 			strcat(line, "tcapOmTc15minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmTc15minIntPabortRecvUnrecTid, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmTc15minIntPabortRecvResourceLim, &tmpsize);
@@ -4665,7 +4986,10 @@ tcapOmDevelRecvTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmDevelRecvPabortMessageType = 0;
 		StorageNew->tcapOmDevelRecvPabortIncorrectTp = 0;
 		StorageNew->tcapOmDevelRecvPabortBadTp = 0;
@@ -4737,6 +5061,10 @@ tcapOmDevelRecvTable_destroy(struct tcapOmDevelRecvTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -4761,8 +5089,10 @@ tcapOmDevelRecvTable_add(struct tcapOmDevelRecvTable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		header_complex_add_data(&tcapOmDevelRecvTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("tcapOmMIB", "registered an entry.\n"));
@@ -4821,7 +5151,18 @@ parse_tcapOmDevelRecvTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmDevelRecvPabortMessageType, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmDevelRecvPabortIncorrectTp, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmDevelRecvPabortBadTp, &tmpsize);
@@ -4874,7 +5215,8 @@ store_tcapOmDevelRecvTable(int majorID, int minorID, void *serverarg, void *clie
 			strcat(line, "tcapOmDevelRecvTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmDevelRecvPabortMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmDevelRecvPabortIncorrectTp, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmDevelRecvPabortBadTp, &tmpsize);
@@ -4921,7 +5263,10 @@ tcapOmDevelRecvCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmDevelRecvCurrentPabortMessageType = 0;
 		StorageNew->tcapOmDevelRecvCurrentPabortIncorrectTp = 0;
 		StorageNew->tcapOmDevelRecvCurrentPabortBadTp = 0;
@@ -4991,6 +5336,10 @@ tcapOmDevelRecvCurrentTable_destroy(struct tcapOmDevelRecvCurrentTable_data **th
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvCurrentTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -5015,8 +5364,10 @@ tcapOmDevelRecvCurrentTable_add(struct tcapOmDevelRecvCurrentTable_data *thedata
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecvCurrentTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		header_complex_add_data(&tcapOmDevelRecvCurrentTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("tcapOmMIB", "registered an entry.\n"));
@@ -5075,7 +5426,18 @@ parse_tcapOmDevelRecvCurrentTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelRecvCurrentPabortMessageType, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelRecvCurrentPabortIncorrectTp, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelRecvCurrentPabortBadTp, &tmpsize);
@@ -5126,7 +5488,8 @@ store_tcapOmDevelRecvCurrentTable(int majorID, int minorID, void *serverarg, voi
 			strcat(line, "tcapOmDevelRecvCurrentTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelRecvCurrentPabortMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelRecvCurrentPabortIncorrectTp, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelRecvCurrentPabortBadTp, &tmpsize);
@@ -5171,7 +5534,10 @@ tcapOmDevelRecv5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmDevelRecv5minIntPabortMessageType = 0;
 		StorageNew->tcapOmDevelRecv5minIntPabortIncorrectTp = 0;
@@ -5242,6 +5608,10 @@ tcapOmDevelRecv5minIntTable_destroy(struct tcapOmDevelRecv5minIntTable_data **th
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv5minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -5266,8 +5636,10 @@ tcapOmDevelRecv5minIntTable_add(struct tcapOmDevelRecv5minIntTable_data *thedata
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv5minIntTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		/* tcapOmInterval */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->tcapOmInterval, sizeof(thedata->tcapOmInterval));
 		header_complex_add_data(&tcapOmDevelRecv5minIntTableStorage, vars, thedata);
@@ -5328,7 +5700,18 @@ parse_tcapOmDevelRecv5minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelRecv5minIntPabortMessageType, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelRecv5minIntPabortIncorrectTp, &tmpsize);
@@ -5380,7 +5763,8 @@ store_tcapOmDevelRecv5minIntTable(int majorID, int minorID, void *serverarg, voi
 			strcat(line, "tcapOmDevelRecv5minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelRecv5minIntPabortMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelRecv5minIntPabortIncorrectTp, &tmpsize);
@@ -5426,7 +5810,10 @@ tcapOmDevelRecv15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		StorageNew->tcapApplicationEntityId = 0;
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
+		if ((StorageNew->tcapApplicationEntityId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationEntityIdLen = strlen("");
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmDevelRecv15minIntPabortMessageType = 0;
 		StorageNew->tcapOmDevelRecv15minIntPabortIncorrectTp = 0;
@@ -5497,6 +5884,10 @@ tcapOmDevelRecv15minIntTable_destroy(struct tcapOmDevelRecv15minIntTable_data **
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv15minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
+		SNMP_FREE(StorageDel->tcapApplicationEntityId);
+		StorageDel->tcapApplicationEntityIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -5521,8 +5912,10 @@ tcapOmDevelRecv15minIntTable_add(struct tcapOmDevelRecv15minIntTable_data *theda
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelRecv15minIntTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapApplicationEntityId */
-		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapApplicationEntityId, sizeof(thedata->tcapApplicationEntityId));
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationEntityId, thedata->tcapApplicationEntityIdLen);
 		/* tcapOmInterval */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_INTEGER, (u_char *) &thedata->tcapOmInterval, sizeof(thedata->tcapOmInterval));
 		header_complex_add_data(&tcapOmDevelRecv15minIntTableStorage, vars, thedata);
@@ -5583,7 +5976,18 @@ parse_tcapOmDevelRecv15minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->tcapApplicationEntityId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
+	if (StorageTmp->tcapApplicationEntityId == NULL) {
+		config_perror("invalid specification for tcapApplicationEntityId");
+		return;
+	}
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelRecv15minIntPabortMessageType, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelRecv15minIntPabortIncorrectTp, &tmpsize);
@@ -5635,7 +6039,8 @@ store_tcapOmDevelRecv15minIntTable(int majorID, int minorID, void *serverarg, vo
 			strcat(line, "tcapOmDevelRecv15minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapApplicationEntityId, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelRecv15minIntPabortMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelRecv15minIntPabortIncorrectTp, &tmpsize);
@@ -5681,6 +6086,8 @@ tcapOmDevelSentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
 		StorageNew->tcapTcUserId = 0;
 		StorageNew->tcapOmDevelSentPabortMessageType = 0;
 		StorageNew->tcapOmDevelSentPabortIncorrectTp = 0;
@@ -5753,6 +6160,8 @@ tcapOmDevelSentTable_destroy(struct tcapOmDevelSentTable_data **thedata)
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -5777,6 +6186,8 @@ tcapOmDevelSentTable_add(struct tcapOmDevelSentTable_data *thedata)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapTcUserId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapTcUserId, sizeof(thedata->tcapTcUserId));
 		header_complex_add_data(&tcapOmDevelSentTableStorage, vars, thedata);
@@ -5837,6 +6248,12 @@ parse_tcapOmDevelSentTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapTcUserId, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmDevelSentPabortMessageType, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->tcapOmDevelSentPabortIncorrectTp, &tmpsize);
@@ -5890,6 +6307,7 @@ store_tcapOmDevelSentTable(int majorID, int minorID, void *serverarg, void *clie
 			strcat(line, "tcapOmDevelSentTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapTcUserId, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmDevelSentPabortMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->tcapOmDevelSentPabortIncorrectTp, &tmpsize);
@@ -5937,6 +6355,8 @@ tcapOmDevelSentCurrentTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentCurrentTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
 		StorageNew->tcapTcUserId = 0;
 		StorageNew->tcapOmDevelSentCurrentPabortMessageType = 0;
 		StorageNew->tcapOmDevelSentCurrentPabortIncorrectTp = 0;
@@ -6007,6 +6427,8 @@ tcapOmDevelSentCurrentTable_destroy(struct tcapOmDevelSentCurrentTable_data **th
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentCurrentTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -6031,6 +6453,8 @@ tcapOmDevelSentCurrentTable_add(struct tcapOmDevelSentCurrentTable_data *thedata
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSentCurrentTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapTcUserId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapTcUserId, sizeof(thedata->tcapTcUserId));
 		header_complex_add_data(&tcapOmDevelSentCurrentTableStorage, vars, thedata);
@@ -6091,6 +6515,12 @@ parse_tcapOmDevelSentCurrentTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapTcUserId, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelSentCurrentPabortMessageType, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelSentCurrentPabortIncorrectTp, &tmpsize);
@@ -6142,6 +6572,7 @@ store_tcapOmDevelSentCurrentTable(int majorID, int minorID, void *serverarg, voi
 			strcat(line, "tcapOmDevelSentCurrentTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapTcUserId, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelSentCurrentPabortMessageType, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelSentCurrentPabortIncorrectTp, &tmpsize);
@@ -6187,6 +6618,8 @@ tcapOmDevelSent5minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent5minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
 		StorageNew->tcapTcUserId = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmDevelSent5minIntPabortMessageType = 0;
@@ -6258,6 +6691,8 @@ tcapOmDevelSent5minIntTable_destroy(struct tcapOmDevelSent5minIntTable_data **th
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent5minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -6282,6 +6717,8 @@ tcapOmDevelSent5minIntTable_add(struct tcapOmDevelSent5minIntTable_data *thedata
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent5minIntTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapTcUserId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapTcUserId, sizeof(thedata->tcapTcUserId));
 		/* tcapOmInterval */
@@ -6344,6 +6781,12 @@ parse_tcapOmDevelSent5minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapTcUserId, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelSent5minIntPabortMessageType, &tmpsize);
@@ -6396,6 +6839,7 @@ store_tcapOmDevelSent5minIntTable(int majorID, int minorID, void *serverarg, voi
 			strcat(line, "tcapOmDevelSent5minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapTcUserId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelSent5minIntPabortMessageType, &tmpsize);
@@ -6442,6 +6886,8 @@ tcapOmDevelSent15minIntTable_create(void)
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent15minIntTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		if ((StorageNew->tcapApplicationSubsystemId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->tcapApplicationSubsystemIdLen = strlen("");
 		StorageNew->tcapTcUserId = 0;
 		StorageNew->tcapOmInterval = 0;
 		StorageNew->tcapOmDevelSent15minIntPabortMessageType = 0;
@@ -6513,6 +6959,8 @@ tcapOmDevelSent15minIntTable_destroy(struct tcapOmDevelSent15minIntTable_data **
 
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent15minIntTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->tcapApplicationSubsystemId);
+		StorageDel->tcapApplicationSubsystemIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
@@ -6537,6 +6985,8 @@ tcapOmDevelSent15minIntTable_add(struct tcapOmDevelSent15minIntTable_data *theda
 	DEBUGMSGTL(("tcapOmMIB", "tcapOmDevelSent15minIntTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* tcapApplicationSubsystemId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->tcapApplicationSubsystemId, thedata->tcapApplicationSubsystemIdLen);
 		/* tcapTcUserId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->tcapTcUserId, sizeof(thedata->tcapTcUserId));
 		/* tcapOmInterval */
@@ -6599,6 +7049,12 @@ parse_tcapOmDevelSent15minIntTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->tcapApplicationSubsystemId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
+	if (StorageTmp->tcapApplicationSubsystemId == NULL) {
+		config_perror("invalid specification for tcapApplicationSubsystemId");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->tcapTcUserId, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->tcapOmInterval, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->tcapOmDevelSent15minIntPabortMessageType, &tmpsize);
@@ -6651,6 +7107,7 @@ store_tcapOmDevelSent15minIntTable(int majorID, int minorID, void *serverarg, vo
 			strcat(line, "tcapOmDevelSent15minIntTable ");
 			cptr = line + strlen(line);
 			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapTcUserId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapOmInterval, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->tcapOmDevelSent15minIntPabortMessageType, &tmpsize);

@@ -190,7 +190,9 @@ oid pointCode_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 0, 1, 3, 1 };
 /*
  * Other oids defined in this MIB.
  */
-
+oid ss7OmGeneralCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 0, 2, 1, 1 };
+oid ss7OmPackage_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 0, 2, 2, 1 };
+oid ss7OmEvents_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 0, 2, 2, 2 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 

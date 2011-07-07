@@ -5,7 +5,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -70,20 +70,19 @@ OPENSS7-STREAMS-EXT-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     openss7Modules
         FROM OPENSS7-SMI
-    MODULE-COMPLIANCE, OBJECT-GROUP
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
-    MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Integer32, 
-    Unsigned32
+    Counter64, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+    OBJECT-TYPE, Unsigned32
         FROM SNMPv2-SMI
-    TEXTUAL-CONVENTION, DateAndTime, RowStatus, TimeInterval, 
-    TruthValue, TimeStamp
+    DateAndTime, RowStatus, TEXTUAL-CONVENTION, TimeStamp, TruthValue
         FROM SNMPv2-TC;
 
 strExtMIB MODULE-IDENTITY
     LAST-UPDATED "200901191032Z"
-    ORGANIZATION
+    ORGANIZATION 
         "The OpenSS7 Project"
-    CONTACT-INFO
+    CONTACT-INFO 
         "Brian Bidulock
          OpenSS7 Corporation
          1469 Jefferys Crescent
@@ -93,24 +92,52 @@ strExtMIB MODULE-IDENTITY
          Fax: +1 780 490 1241
          Mob: +1 780 953 0557
          mailto:bidulock@openss7.org"
-    DESCRIPTION
+    DESCRIPTION 
         "This MIB provides extended configuration and status 
          information for a STREAMS subsystem.  Additional 
          information over the OPENSS7-STREAMS-MIB is provided 
          largely in support of the strlog(9) function and 
-         strerr(8) and strace(8) utilities."
+         strerr(8) and strace(8) utilities.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
     REVISION    "200901191032Z"
-    DESCRIPTION
+    DESCRIPTION 
         "Enhancements to provide for console, error and trace 
          logging control."
     REVISION    "200810110500Z"
-    DESCRIPTION
+    DESCRIPTION 
         "This is the first version of this MIB."
     ::= { openss7Modules 1000 }
 
+
 StrlogFlags ::= TEXTUAL-CONVENTION
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This textual convention describes the flags associated 
          with a STREAMS log entry.  This multi-valued type can 
          be used both to generate log entries as well as to 
@@ -118,112 +145,35 @@ StrlogFlags ::= TEXTUAL-CONVENTION
          were generated.  They determine both the class of the 
          log entry as well as the options associated with the 
          log entry.  Possible values are as follows:
-
+         
          - slError(0), the entry has syslog(3) class LOG_CRIT.
-
+         
          - slTrace(1), the entry has syslog(3) class LOG_DEBUG.
-
+         
          - slNotify(2), the entry was also emailed to the system 
            administrator.
-
+         
          - slConsole(3), the entry has syslog(3) class LOG_INFO.
-
+         
          - slFatal(4), the entry has syslog(3) class LOG_CRIT.
-
+         
          - slWarn(5), the entry has syslog(3) class LOG_WARNING.
-
+         
          - slNote(6), the entry has syslog(3) class LOG_NOTICE.
-
+         
          - slNoputbuf(7), the entry was not placed in the put 
            buffer (buffer used for strlog messages).
-
+         
          Only one of slFatal, slError, slWarn, slNote, slConsole 
          or slTrace should be set.  If multiple settings are 
          present, the highest priority syslog(3) class prevails."
-    REFERENCE
+    REFERENCE   
         "syslog(3), strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
-    SYNTAX      BITS {
-                    slError(0),
-                    slTrace(1),
-                    slNotify(2),
-                    slConsole(3),
-                    slFatal(4),
-                    slWarn(5),
-                    slNote(6),
-                    slNoputbuf(7)
-                }
+    SYNTAX      BITS { slError(0), slTrace(1), slNotify(2), slConsole(3), 
+                    slFatal(4), slWarn(5), slNote(6), slNoputbuf(7) }
 
 strExtNotifications OBJECT IDENTIFIER
     ::= { strExtMIB 0 }
-
-strStrlogRecord NOTIFICATION-TYPE
-    OBJECTS {
-        strExtStrlogIndex,
-        strExtStrlogSeqNo,
-        strExtStrlogDateAndTime,
-        strExtStrlogTimeStamp,
-        strExtStrlogMid,
-        strExtStrlogSid,
-        strExtStrlogLevel,
-        strExtStrlogFlags,
-        strExtStrlogFmtString
-        -- The following are optional:
-        --  strExtStrlogInteger
-        --  strExtStrlogUnsigned
-        --  strExtStrlogString
-        --  strExtStrlogIndex
-    }
-    STATUS current
-    DESCRIPTION
-        "This notification type is used to report strlog(3) or 
-         strlog(9) log entries.  The notification consists of 
-         the following:
-         
-         - strExtStrlogIndex: provides the index of the strlog 
-           entry.
-
-         - strExtStrlogTimeStamp: provides the timestamp of the 
-           strlog entry.  This is the time that the entry was 
-           added to the logs not the time that the event 
-           generating the log report occurred.
-
-         - strExtStrlogMid: provides the STREAMS module 
-           identifier for the Stream generating the log report.
-
-         - strExtStrlogSid: provides the STREAMS minor device 
-           number or STREAMS instance number of the Stream 
-           generating the log report.
-
-         - strExtStrlogLevel: provides the prioirty level of the 
-           strlog record.
-
-         - strExtStrlogFlags: provides the class and options 
-           flags of the strlog record.
-
-         - strExtStrlogFmtString: provides a printf(3)-style 
-           format string.  Supported conversion specifiers are: 
-           %c, %s, %p, %%, %o, %X, %x, %d, %i and %u.
-
-         The following are optional and are only present when a 
-         promotable value was present in the format string using 
-         one fo the specifiers.  They may be included in the 
-         notification zero or more times.  The order of these 
-         parameters is the same as the order of the 
-         corresponding conversion specifiers in the format 
-         string.
-
-         - strExtStrlogInteger: the value is an integer (or 
-           promotes to an integer).
-
-         - strExtStrlogUnsigned: the value is an unsigned 
-           integer (or promotes to an unsigned integer).
-
-         - strExtStrlogString: the value is a string.
-
-         "
-    REFERENCE
-        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
-    ::= { strExtNotifications 1 }
 
 strExtObjects OBJECT IDENTIFIER
     ::= { strExtMIB 1 }
@@ -238,73 +188,62 @@ strExtStrlogRecordNextIndex OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the next ordinal index value for the strlog 
          record table.  The value returned may be created by the 
          SNMP manager, or simply indicates one more than the 
          current value of the index."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecord 1 }
 
 strExtStrlogRecordTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF StrExtStrlogRecord
+    SYNTAX      SEQUENCE OF StrExtStrlogRecordEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object provides a conceptual table that contains 
          strlog records."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecord 2 }
 
 strExtStrlogRecordEntry OBJECT-TYPE
-    SYNTAX      StrExtStrlogRecord
+    SYNTAX      StrExtStrlogRecordEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    INDEX       { strExtStrlogRecordIndex }
-    DESCRIPTION
+    DESCRIPTION 
         "This object provides a conceptual row in the strlog 
          record table.  Each conceptual row represents a strlog 
          record entry."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    INDEX       { strExtStrlogRecordIndex }
     ::= { strExtStrlogRecordTable 1 }
 
-StrExtStrlogRecord ::=
-    SEQUENCE {
-        strExtStrlogRecordIndex
-            Unsigned32,
-        strExtStrlogRecordSeqNo
-            Integer32,
-        strExtStrlogRecordDateAndTime
-            DateAndTime,
-        strExtStrlogRecordTimeStamp
-            TimeStamp,
-        strExtStrlogRecordMid
-            Unsigned32,
-        strExtStrlogRecordSid
-            Unsigned32,
-        strExtStrlogRecordLevel
-            Unsigned32,
-        strExtStrlogRecordFlags
-            StrlogFlags,
-        strExtStrlogRecordMsgString
-            OCTET STRING,
-        strExtStrlogRecordRowStatus
-            RowStatus
-    }
+StrExtStrlogRecordEntry ::= SEQUENCE {
+    strExtStrlogRecordIndex         Unsigned32,
+    strExtStrlogRecordSeqNo         Integer32,
+    strExtStrlogRecordDateAndTime   DateAndTime,
+    strExtStrlogRecordTimeStamp     TimeStamp,
+    strExtStrlogRecordMid           Unsigned32,
+    strExtStrlogRecordSid           Unsigned32,
+    strExtStrlogRecordLevel         Unsigned32,
+    strExtStrlogRecordFlags         StrlogFlags,
+    strExtStrlogRecordMsgString     OCTET STRING,
+    strExtStrlogRecordRowStatus     RowStatus
+}
 
 strExtStrlogRecordIndex OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides an index into the strlog record table.  The 
          index is a monotoniclaly increasing value starting with 
          one (1) that may also be created by a management 
          station."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 1 }
 
@@ -312,7 +251,7 @@ strExtStrlogRecordSeqNo OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the sequence number associated with the strlog 
          record entry.  This is the sequence number of the entry 
          that was assigned when the entry was generated on the 
@@ -326,7 +265,7 @@ strExtStrlogRecordSeqNo OBJECT-TYPE
          
          This field will be established by the STREAMS logger 
          when an entry is created by a management station."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 2 }
 
@@ -334,7 +273,7 @@ strExtStrlogRecordDateAndTime OBJECT-TYPE
     SYNTAX      DateAndTime
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the date and time associated with the strlog 
          record entry.  This is the time that the entry was 
          generated and not necessarily the time that the event 
@@ -342,7 +281,7 @@ strExtStrlogRecordDateAndTime OBJECT-TYPE
          
          This field will be established by the STREAMS logger 
          when an entry is created by a management station."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 3 }
 
@@ -350,7 +289,7 @@ strExtStrlogRecordTimeStamp OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the time stamp associated with the strlog 
          record entry.  This is the time that the entry was 
          generated and not necessarily the time that the event 
@@ -358,43 +297,43 @@ strExtStrlogRecordTimeStamp OBJECT-TYPE
          
          This field will be established by the STREAMS logger 
          when an entry is created by a management station."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 4 }
 
 strExtStrlogRecordMid OBJECT-TYPE
-    SYNTAX      Unsigned32(0..16383)
+    SYNTAX      Unsigned32 (0..16383)
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the STREAMS module identifier associated with 
          the Stream that generated the log record."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 5 }
 
 strExtStrlogRecordSid OBJECT-TYPE
-    SYNTAX      Unsigned32(0..16383)
+    SYNTAX      Unsigned32 (0..16383)
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the STREAMS sub-identifier associated with the 
          Stream that generated the log record.  This is the 
          STREAMS minor device number or module instance number."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 6 }
 
 strExtStrlogRecordLevel OBJECT-TYPE
-    SYNTAX      Unsigned32(0..255)
+    SYNTAX      Unsigned32 (0..255)
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the priority level associated with the log 
          record.  Priority levels determine the priority of the 
          log record with respect to other log records in the 
          same class."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 7 }
 
@@ -402,23 +341,23 @@ strExtStrlogRecordFlags OBJECT-TYPE
     SYNTAX      StrlogFlags
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the flags associated with the log record.  
          Flags determine the class of the log record and a 
          number of other optional characteristics of the record 
          according to the StrlogFlags textual convention."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 8 }
 
 strExtStrlogRecordMsgString OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..255))
+    SYNTAX      OCTET STRING (SIZE(0..255))
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the fully formatted message associated with 
          the log record."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 9 }
 
@@ -426,13 +365,13 @@ strExtStrlogRecordRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a mechanism whereby management stations may 
          create or delete rows from this table.  Deleting rows 
          from this table makes the log records unavailable for 
          subsequent retrieval.  Creating rows in this table 
          generates new log records."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtStrlogRecordEntry 10 }
 
@@ -440,10 +379,10 @@ strExtTraceTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF StrExtTraceEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This table provides specification of trace filters for 
          a STREAMS trace logger as described in strace(8)."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strace(8)"
     ::= { strExtTables 2 }
 
@@ -451,80 +390,72 @@ strExtTraceEntry OBJECT-TYPE
     SYNTAX      StrExtTraceEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Each entry in this table consists of one trace logger 
          (strace(8)) trace filter specfication.  The value of 
          minus one (-1) for any of the specificaiton arguments 
          (mid, sid, level) indicates that all value of the 
          corresponding argument in trace logged messages will be 
          delivered."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strace(8)"
-    INDEX {
-        strExtTraceId
-    }
+    INDEX       { strExtTraceId }
     ::= { strExtTraceTable 1 }
 
-StrExtTraceEntry ::=
-    SEQUENCE {
-        strExtTraceId
-            Unsigned32,
-        strExtTraceMid
-            Integer32,
-        strExtTraceSid
-            Integer32,
-        strExtTraceLevel
-            Integer32,
-        strExtTraceRowStatus
-            RowStatus
-    }
+StrExtTraceEntry ::= SEQUENCE {
+    strExtTraceId           Unsigned32,
+    strExtTraceMid          Integer32,
+    strExtTraceSid          Integer32,
+    strExtTraceLevel        Integer32,
+    strExtTraceRowStatus    RowStatus
+}
 
 strExtTraceId OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a simple ordinal index valud enumerating the 
          entries in this table.  The order of entries is not 
          significant."
     ::= { strExtTraceEntry 1 }
 
 strExtTraceMid OBJECT-TYPE
-    SYNTAX      Integer32 (-1|0..16383)
+    SYNTAX      Integer32 (-1..16383)
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the STREAMS module identification number 
          (from the streamtab(5) entry) for which trace messages 
          are to be logged.  A value of minus one (-1) specifies 
          any module identifier."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strace(8)"
     ::= { strExtTraceEntry 2 }
 
 strExtTraceSid OBJECT-TYPE
-    SYNTAX      Integer32 (-1|0..16383)
+    SYNTAX      Integer32 (-1..16383)
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the sub-identification number (often 
          corresponding to a minor device, module instance, or 
          Stream).  A value of minus one (-1) specifies any 
          sub-identifier."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strace(8)"
     ::= { strExtTraceEntry 3 }
 
 strExtTraceLevel OBJECT-TYPE
-    SYNTAX      Integer32 (-1|0..255)
+    SYNTAX      Integer32 (-1..255)
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies a tracing priority level.  Trace messages are 
          logged that have a level equal to or less than the 
          value specified here.  A value of minus one (-1) 
          specifies any trace level."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strace(8)"
     ::= { strExtTraceEntry 4 }
 
@@ -532,16 +463,15 @@ strExtTraceRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a mechanism whereby management stations may 
          add and delete rows in this table.  Adding a row to the 
          table adds a new trace-logger specification (see 
          strace(8)).  Deleting a row removes a trace-logger 
          specification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strace(8)"
     ::= { strExtTraceEntry 5 }
-
 
 strExtScalars OBJECT IDENTIFIER
     ::= { strExtObjects 2 }
@@ -550,7 +480,7 @@ strNlogargs OBJECT-TYPE
     SYNTAX      Unsigned32 (0..64)
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object indicates the maximum number of arguments 
          that can be associated with a strlog format string and 
          the maximum number of conversion specifiers.  This is 
@@ -560,7 +490,7 @@ strNlogargs OBJECT-TYPE
          Setting this value too high may have an negative impact 
          on performance.  Setting this value too low may 
          truncate valuable or necessary log information."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     DEFVAL      { 20 }
     ::= { strExtScalars 1 }
@@ -569,7 +499,7 @@ strExtLogMsgSize OBJECT-TYPE
     SYNTAX      Unsigned32 (256..4096)
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object indicates the maximum length of a STREAMS 
          log formatted message string."
     DEFVAL      { 1024 }
@@ -579,11 +509,11 @@ strExtConsoleLog OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object indicates and specifies whether the STREAMS 
          console logger (see strlog(4) and strerr(8)) is active 
          and logging messages as SNMP traps."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strerr(8), strlog(9) UNIX Manual 
              Pages"
     DEFVAL      { false }
@@ -593,11 +523,11 @@ strExtErrorLog OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object indicates and specifies whether the STREAMS 
          error logger (see strlog(4) and strerr(8)) is active 
          and logging messages as SNMP traps."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strerr(8), strlog(9) UNIX Manual 
              Pages"
     DEFVAL      { false }
@@ -607,11 +537,11 @@ strExtTraceLog OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object indicates and specifies whether the STREAMS 
          trace logger (see strlog(4) and strace(8)) is active 
          and logging messages as SNMP traps."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strace(8), strlog(9) UNIX Manual 
              Pages"
     DEFVAL      { false }
@@ -635,13 +565,13 @@ strExtStrlogIndex OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record has an entry in the 
          strStrlogRecordTable.  This object indicates the index 
          of the log record in the strStrlogRecordTable as a 
          parameter to the strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 1 }
 
@@ -649,13 +579,13 @@ strExtStrlogSeqNo OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record has a sequence 
          number.  This object indicates the sequence number of 
          the log record as a parameter to the strStrlogRecord 
          notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 2 }
 
@@ -663,13 +593,13 @@ strExtStrlogDateAndTime OBJECT-TYPE
     SYNTAX      DateAndTime
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record has a date and time.  
          This object indicates the number of seconds since epoch 
          (January 1, 1970) as a parameter to the strStrlogRecord 
          notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 3 }
 
@@ -678,12 +608,12 @@ strExtStrlogTimeStamp OBJECT-TYPE
     UNITS       "ticks"
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record has a time stamp.  
          This object indicates the system time as a parameter to 
          the strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 4 }
 
@@ -691,13 +621,13 @@ strExtStrlogMid OBJECT-TYPE
     SYNTAX      Unsigned32 (0..16383)
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record has a STREAMS module 
          identifier.  This object indicates the STREAMS module 
          identifier as a parameter to the strStrlogRecord 
          notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 5 }
 
@@ -705,13 +635,13 @@ strExtStrlogSid OBJECT-TYPE
     SYNTAX      Unsigned32 (0..16383)
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record has a STREAMS minor 
          device or instance number sub-identifier.  This object 
          indicates the STREAMS minor device or instance number 
          as a parameter to the strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 6 }
 
@@ -719,7 +649,7 @@ strExtStrlogLevel OBJECT-TYPE
     SYNTAX      Unsigned32 (0..255)
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record has a priority 
          level.  The priority field indicates the priority of 
@@ -727,7 +657,7 @@ strExtStrlogLevel OBJECT-TYPE
          of the smae class.  This object indicates the logging 
          priority level of the record as a parameter to the 
          strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 7 }
 
@@ -735,7 +665,7 @@ strExtStrlogFlags OBJECT-TYPE
     SYNTAX      StrlogFlags
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record has flags.  The flags 
          indicate the class of the strlog record as well as 
@@ -743,15 +673,15 @@ strExtStrlogFlags OBJECT-TYPE
          flags of the record as a parameter to the 
          strStrlogRecord notifications using the StrlogFlags 
          textual convention."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 8 }
 
 strExtStrlogFmtString OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..255))
+    SYNTAX      OCTET STRING (SIZE(0..255))
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record has a printf(3) 
          style format string.  This object indicates the 
@@ -761,7 +691,7 @@ strExtStrlogFmtString OBJECT-TYPE
          strStrlogRecord format strings support the following 
          printf(3)-style conversion specifiers: %c, %s, %p, %%, 
          %o, %X, %x, %d, %i and %u."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 9 }
 
@@ -769,7 +699,7 @@ strExtStrlogInteger OBJECT-TYPE
     SYNTAX      Integer32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record may optionally have 
          a list of arguments to the printf(3)-style format 
@@ -778,7 +708,7 @@ strExtStrlogInteger OBJECT-TYPE
          communicated using this parameter.  This object 
          indicates the integer valued parameter of the 
          strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 10 }
 
@@ -786,7 +716,7 @@ strExtStrlogUnsigned OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record may optionally have 
          a list of arguments to the printf(3)-style format 
@@ -795,15 +725,15 @@ strExtStrlogUnsigned OBJECT-TYPE
          they are communicated using this parameter.  This 
          object indicates the unsigned integer valued parameter 
          of the strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 11 }
 
 strExtStrlogString OBJECT-TYPE
-    SYNTAX      OCTET STRING(SIZE(0..255))
+    SYNTAX      OCTET STRING (SIZE(0..255))
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strog record may optionally have a 
          list of arguments to the printf(3)-style format string.  
@@ -811,7 +741,7 @@ strExtStrlogString OBJECT-TYPE
          communicated using this parameter.  This object 
          indicates the string valued parameter of the 
          strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 12 }
 
@@ -819,7 +749,7 @@ strExtStrlogInteger64 OBJECT-TYPE
     SYNTAX      Integer64
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record may optionally have 
          a list of arguments to the printf(3)-style format 
@@ -827,7 +757,7 @@ strExtStrlogInteger64 OBJECT-TYPE
          they are communicated using this parameter.  This 
          object indicates the 64-bit integer valued parameter of 
          the strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 13 }
 
@@ -835,7 +765,7 @@ strExtStrlogUnsigned64 OBJECT-TYPE
     SYNTAX      Unsigned64
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record may optionally have 
          a list of arguments to the printf(3)-style format 
@@ -843,15 +773,15 @@ strExtStrlogUnsigned64 OBJECT-TYPE
          provided, they are communicated using this parameter.  
          This object indicates the 64-bit unsigned integer 
          valued parameter of the strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 14 }
 
 strExtStrlogInteger128 OBJECT-TYPE
-    SYNTAX      Opaque(SIZE(0..16))
+    SYNTAX      Opaque (SIZE(0..16))
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record may optionally have 
          a list of arguments to the printf(3)-style format 
@@ -859,15 +789,15 @@ strExtStrlogInteger128 OBJECT-TYPE
          they are communicated using this parameter.  This 
          object indicates the 128-bit integer valued parameter of 
          the strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 15 }
 
 strExtStrlogUnsigned128 OBJECT-TYPE
-    SYNTAX      Opaque(SIZE(0..16))
+    SYNTAX      Opaque (SIZE(0..16))
     MAX-ACCESS  accessible-for-notify
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object is for use with the strStrlogRecord 
          notification.  Each strlog record may optionally have 
          a list of arguments to the printf(3)-style format 
@@ -875,7 +805,7 @@ strExtStrlogUnsigned128 OBJECT-TYPE
          provided, they are communicated using this parameter.  
          This object indicates the 128-bit unsigned integer 
          valued parameter of the strStrlogRecord notification."
-    REFERENCE
+    REFERENCE   
         "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
     ::= { strExtNotifsStrlog 16 }
 
@@ -891,6 +821,102 @@ strExtGroups OBJECT IDENTIFIER
 strExtCompliances OBJECT IDENTIFIER
     ::= { strExtConformance 2 }
 
-END -- end module OPENSS7-STREAMS-EXT-MIB
+strStrlogRecord NOTIFICATION-TYPE
+    OBJECTS     { strExtStrlogIndex, strExtStrlogSeqNo, 
+                  strExtStrlogDateAndTime, strExtStrlogTimeStamp, 
+                  strExtStrlogMid, strExtStrlogSid, strExtStrlogLevel, 
+                  strExtStrlogFlags, strExtStrlogFmtString }
+    STATUS      current
+    DESCRIPTION 
+        "This notification type is used to report strlog(3) or 
+         strlog(9) log entries.  The notification consists of 
+         the following:
+         
+         - strExtStrlogIndex: provides the index of the strlog 
+           entry.
+         
+         - strExtStrlogTimeStamp: provides the timestamp of the 
+           strlog entry.  This is the time that the entry was 
+           added to the logs not the time that the event 
+           generating the log report occurred.
+         
+         - strExtStrlogMid: provides the STREAMS module 
+           identifier for the Stream generating the log report.
+         
+         - strExtStrlogSid: provides the STREAMS minor device 
+           number or STREAMS instance number of the Stream 
+           generating the log report.
+         
+         - strExtStrlogLevel: provides the prioirty level of the 
+           strlog record.
+         
+         - strExtStrlogFlags: provides the class and options 
+           flags of the strlog record.
+         
+         - strExtStrlogFmtString: provides a printf(3)-style 
+           format string.  Supported conversion specifiers are: 
+           %c, %s, %p, %%, %o, %X, %x, %d, %i and %u.
+         
+         The following are optional and are only present when a 
+         promotable value was present in the format string using 
+         one fo the specifiers.  They may be included in the 
+         notification zero or more times.  The order of these 
+         parameters is the same as the order of the 
+         corresponding conversion specifiers in the format 
+         string.
+         
+         - strExtStrlogInteger: the value is an integer (or 
+           promotes to an integer).
+         
+         - strExtStrlogUnsigned: the value is an unsigned 
+           integer (or promotes to an unsigned integer).
+         
+         - strExtStrlogString: the value is a string."
+    REFERENCE   
+        "strlog(3), strlog(4), strlog(9) UNIX Manual Pages"
+    ::= { strExtNotifications 1 }
 
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:-,\f\b\:· fo+=tcqlornw tw=64 nocin nosi sts=4 sw=4 et
+strExtNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { strStrlogRecord }
+    STATUS      current
+    DESCRIPTION 
+        "This a place holder that contains all notifications."
+    ::= { strExtGroups 1 }
+
+strExtMandatoryGroup OBJECT-GROUP
+    OBJECTS     { strExtStrlogIndex, strExtStrlogSeqNo, 
+                  strExtStrlogDateAndTime, strExtStrlogTimeStamp, 
+                  strExtStrlogMid, strExtStrlogSid, strExtStrlogLevel, 
+                  strExtStrlogFlags, strExtStrlogFmtString, 
+                  strExtStrlogRecordNextIndex, strExtStrlogRecordSeqNo, 
+                  strExtStrlogRecordDateAndTime, 
+                  strExtStrlogRecordTimeStamp, strExtStrlogRecordMid, 
+                  strExtStrlogRecordSid, strExtStrlogRecordLevel, 
+                  strExtStrlogRecordFlags, strExtStrlogRecordMsgString, 
+                  strExtStrlogRecordRowStatus, strExtTraceMid, 
+                  strExtTraceSid, strExtTraceLevel, strExtTraceRowStatus, 
+                  strNlogargs, strExtLogMsgSize, strExtConsoleLog, 
+                  strExtErrorLog, strExtTraceLog, strExtStrlogInteger, 
+                  strExtStrlogUnsigned, strExtStrlogString, 
+                  strExtStrlogInteger64, strExtStrlogUnsigned64, 
+                  strExtStrlogInteger128, strExtStrlogUnsigned128 }
+    STATUS      current
+    DESCRIPTION 
+        "This a place holder that contains all objects that can 
+         appear in a conformance clause."
+    ::= { strExtGroups 2 }
+
+strExtMIBCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requirements for the 
+         STREAMS Extension MIB."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { strExtMandatoryGroup, 
+                  strExtNotificationGroup }
+
+    ::= { strExtCompliances 1 }
+
+END -- end of module OPENSS7-STREAMS-EXT-MIB.

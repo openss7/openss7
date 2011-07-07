@@ -116,6 +116,9 @@ extern oid ss7OnOccEvent_oid[12];
 extern oid pointCode_oid[13];
 
 /* object id definitions */
+extern oid ss7OmGeneralCompliance_oid[13];
+extern oid ss7OmPackage_oid[13];
+extern oid ss7OmEvents_oid[13];
 
 /* function prototypes */
 /* trap function prototypes */
