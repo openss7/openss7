@@ -82,7 +82,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 smiMIB MODULE-IDENTITY
-    LAST-UPDATED "200901210441Z"
+    LAST-UPDATED "201106240832Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -100,7 +100,7 @@ smiMIB MODULE-IDENTITY
          objects based on TMN (ITU-T Rec. X.721 (1992) | ISO/IEC 
          10165-2 : 1992)"
     REVISION    "201106240832Z"
-    DESCRIPTION
+    DESCRIPTION 
         "Passes smilint."
     REVISION    "200901210441Z"
     DESCRIPTION 
@@ -2722,7 +2722,8 @@ logTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a logging table following the ISO management 
+         object class."
     ::= { log 1 }
 
 logEntry OBJECT-TYPE
@@ -3233,7 +3234,9 @@ eventLogRecordEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each entry in the eventLogRecordTable represents one 
+         line of information stored in the log as a result of 
+         receiving notifications or incoming event reports."
     INDEX       { logId, logRecordId }
     ::= { eventLogRecordTable 1 }
 
@@ -3253,7 +3256,8 @@ managedObjectClass OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Identifies the managed object class (i.e. table) 
+         belonging to the report."
     ::= { eventLogRecordEntry 1 }
 
 managedObjectInstance OBJECT-TYPE
@@ -3261,7 +3265,9 @@ managedObjectInstance OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Identifies the instance within a managed object class.  
+         This identifies a row in the table for the managed 
+         object class."
     ::= { eventLogRecordEntry 2 }
 
 eventType OBJECT-TYPE
@@ -3269,7 +3275,7 @@ eventType OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the event type."
     ::= { eventLogRecordEntry 3 }
 
 eventTimes OBJECT-TYPE
@@ -3277,7 +3283,7 @@ eventTimes OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the event times."
     ::= { eventLogRecordEntry 4 }
 
 eventNotificationIdentifier OBJECT-TYPE
@@ -3285,7 +3291,7 @@ eventNotificationIdentifier OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the notificaiton identifier."
     ::= { eventLogRecordEntry 5 }
 
 eventCorrelatedNotifications OBJECT-TYPE
@@ -3293,7 +3299,7 @@ eventCorrelatedNotifications OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Identifies correlated notifications."
     ::= { eventLogRecordEntry 6 }
 
 eventAdditionalText OBJECT-TYPE
@@ -3301,7 +3307,8 @@ eventAdditionalText OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an additional text description of the 
+         notification."
     ::= { eventLogRecordEntry 7 }
 
 eventAdditionalInformation OBJECT-TYPE
@@ -3309,7 +3316,7 @@ eventAdditionalInformation OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides additional textual information."
     ::= { eventLogRecordEntry 8 }
 
 alarmRecordTable OBJECT-TYPE
@@ -3354,7 +3361,7 @@ alarmRecordProbableCause OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Probable Cause parameter of a notification."
     ::= { alarmRecordEntry 1 }
 
 alarmRecordPerceivedSeverity OBJECT-TYPE
@@ -3362,7 +3369,7 @@ alarmRecordPerceivedSeverity OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Perceived Severity parameter of a notification."
     ::= { alarmRecordEntry 2 }
 
 alarmRecordSpecificProblems OBJECT-TYPE
@@ -3370,7 +3377,7 @@ alarmRecordSpecificProblems OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specific Problems parameter of a notification."
     DEFVAL      { zeroDotZero }
     ::= { alarmRecordEntry 3 }
 
@@ -3379,7 +3386,7 @@ alarmRecordBackedUpStatus OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Backed Up Status parameter of a notification."
     DEFVAL      { none }
     ::= { alarmRecordEntry 4 }
 
@@ -3388,7 +3395,8 @@ alarmRecordBackUpObject OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the Back Up Object associated with this 
+         entry."
     DEFVAL      { zeroDotZero }
     ::= { alarmRecordEntry 5 }
 
@@ -3397,7 +3405,7 @@ alarmRecordTrendIndication OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the trend."
     DEFVAL      { lessSevere }
     ::= { alarmRecordEntry 6 }
 
@@ -3406,7 +3414,7 @@ alarmRecordThresholdInfo OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "The alarm threshold information."
     DEFVAL      { "" }
     ::= { alarmRecordEntry 7 }
 
@@ -3415,7 +3423,7 @@ alarmRecordStateChangeDefinition OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "State Change definition."
     DEFVAL      { "" }
     ::= { alarmRecordEntry 8 }
 
@@ -6577,53 +6585,68 @@ smiCompliance MODULE-COMPLIANCE
 
         GROUP   smiOptionalParametersGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
 
         GROUP   smiOptionalNotificationsGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
 
         GROUP   smiEventLogRecordGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
 
         GROUP   smiAlarmRecordGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
 
         GROUP   smiAttributeValueChangeRecordGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
 
         GROUP   smiObjectCreationRecordGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
 
         GROUP   smiObjectDeletionRecordGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
 
         GROUP   smiRelationshipChangeRecordGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
 
         GROUP   smiSecurityAlarmReportRecordGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
 
         GROUP   smiStateChangeRecordGroup
         DESCRIPTION   
-              "Optional iterms when some alarms are implemented 
+              "Optional items when some alarms are implemented 
                and logged."
+
+        GROUP   createDeleteNotificationsPackage
+        DESCRIPTION   
+              "Optional items when notifications of deletion are 
+               implemented and logged."
+
+        GROUP   attributeValueChangeNotificationPackage
+        DESCRIPTION   
+              "Optional items when notifications of change are 
+               implemented and logged."
+
+        GROUP   communicationsAlarmPackage
+        DESCRIPTION   
+              "Optional items when alarm notifications are 
+               implemented and logged."
 
     ::= { smiCompliances 1 }
 
