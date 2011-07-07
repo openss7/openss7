@@ -119,6 +119,9 @@ tmnMIB MODULE-IDENTITY
     DESCRIPTION
 	"This is a basic MIB module providing definitions of 
 	 objects based on the TMN (ITU-T Rec. X.721 (1992))."
+    REVISION	"200801011353Z"
+    DESCRIPTION
+	"Initial revision of this MIB."
     ::= { openss7MsSmi 1 }
 
 --

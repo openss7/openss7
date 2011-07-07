@@ -237,6 +237,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/man/Makefile
 		 doc/manual/Makefile
 		 doc/papers/Makefile
+		 doc/papers/xcode/Makefile
 		 doc/papers/optranex/Makefile
 		 doc/papers/chan/Makefile
 		 doc/papers/inet/Makefile
@@ -278,6 +279,7 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/wan/Makefile
 		 doc/specs/xcc/Makefile
 		 doc/specs/xmap/Makefile
+		 doc/specs/xgcp/Makefile
 		 doc/suites/Makefile
 		 intl/Makefile
 		 lib32/Makefile

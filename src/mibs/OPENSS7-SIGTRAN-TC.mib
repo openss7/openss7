@@ -68,7 +68,7 @@
 OPENSS7-SIGTRAN-TC DEFINITIONS ::= BEGIN
 
 IMPORTS
-	MODULE-IDENTITY
+	MODULE-IDENTITY, OBJECT-IDENTITY
 		FROM SNMPv2-SMI
 	TEXTUAL-CONVENTION
 		FROM SNMPv2-TC
@@ -93,6 +93,10 @@ sigtranTC MODULE-IDENTITY
 	DESCRIPTION
 		"Provides textual conventions for common SIGTRAN 
 		 subtypes."
+	REVISION
+		"200709300514Z"
+	DESCRIPTION
+		"First revision of this MIB."
 	::= { openss7Modules 10 }
 
 sigtranTrafficMode		OBJECT IDENTIFIER ::= { sigtranTC	 1 }
@@ -356,7 +360,7 @@ AspIdPolicy ::= TEXTUAL-CONVENTION
 			unknown(1),
 			permitted(2),
 			required(3),
-			forbidden(4),
+			forbidden(4)
 		}
 
 AssociationPolicy ::= TEXTUAL-CONVENTION

@@ -6,7 +6,7 @@
 %
 % =========================================================================
 %
-% Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+% Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 % Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 % Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 %
@@ -110,7 +110,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 @cite{@value{MANUAL_TITLE} @value{MANUAL_TYPE}}, for Version @value{PACKAGE_VERSION}
 Release @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}.
 
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2001  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -164,7 +164,7 @@ THIS DOCUMENT OR THE PERFORMANCE OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 @sp 0.2
 @subtitle Distributed with Package @value{PACKAGE}-@value{VERSION}
 @sp 2
-@subtitle Copyright @copyright{} 2008-2009 Monavacon Limited
+@subtitle Copyright @copyright{} 2008-2011 Monavacon Limited
 @subtitle All Rights Reserved.
 @sp 4
 @quotation
@@ -193,7 +193,7 @@ Edmonton, Alberta  T6L 6T1 @*
 Canada @*
 
 @noindent
-Copyright @copyright{} 2008-2009  @uref{http://www.monavacon.com/, Monavacon Limited} @*
+Copyright @copyright{} 2008-2011  @uref{http://www.monavacon.com/, Monavacon Limited} @*
 Copyright @copyright{} 2001-2008  @uref{http://www.openss7.com/, OpenSS7 Corporation} @*
 Copyright @copyright{} 1997-2000  @email{bidulock@@openss7.org, Brian F. G. Bidulock} @*
 
@@ -462,12 +462,14 @@ addition to user-space libraries and applications.  @cite{OpenSS7} provides a ra
 @acronym{STREAMS} multiplexing drivers, pseudo-device drivers and pushable modules that complement
 the primary MG multiplexing driver.
 
-@figref{1} illustrates the @acronym{STREAMS} multiplexing drivers, pseudo-device drivers, and
+@figref{4} illustrates the @acronym{STREAMS} multiplexing drivers, pseudo-device drivers, and
 pushable modules, and their organization.  The modules and drivers toward the top of the diagram are
 associated with media gateway control and do not form part of the primary MG suite, but are
 discussed in more detail in the VOIP suite.
 
-@figuresized{mg01,1,Media Gateway Drivers and Modules,5.0in}
+@figuresized{mg04,4,Media Gateway Drivers and Modules,3.5in}
+@figuresized{mg05,5,Media Gateway Drivers and Modules,3.5in}
+@figuresized{mg06,6,Media Gateway Drivers and Modules,3.5in}
 
 @node Drivers
 @section Drivers
@@ -475,12 +477,12 @@ discussed in more detail in the VOIP suite.
 @subsection MG --- Media Gateway Multiplexing Driver
 
 To provide for synchronization and load balancing, the MG driver uses a timing slot approach.
-This is illustrated in @figref{2}.
+This is illustrated in @figref{3}.
 The fundamental timing source is a 1 millisecond pulse.  This timing pulse is both divided and
 distributed in single stage.  The timing pulse is divided to 10 milliseconds using 10 action lists.
 Each action list has a pulse once every 10 milliseconds.
 
-@figuresized{mg03,2,Timing Slots,2.5in}
+@figuresized{mg03,3,Timing Slots,2.5in}
 
 This can be modelled using action trees.  The root of the tree is an action list node that executes
 each of its sublists each millisecond.  The root node typically contains a single sublist that
@@ -519,6 +521,125 @@ real-time per channel, per processor.
 
 @subsection RTP --- Real-Time Transport Protocol (RTP) Driver
 
+@subsection CH-MUX -- Channel Multiplexing Device Driver
+
+@figuresized{mg07,7,Media Gateway Drivers and Modules,2.5in}
+
+@figref{7} illustrates the relationship between the CH-MUX driver and lower level drivers.
+
+The CH multipelxing (CH-MUX) driver is a multiplexing driver that provides a switching nexus for the
+purpose of multipexing and demultiplexing channels from upper and lower Streams.  Typically, there
+is a single upper multipex Stream that uses the multi-stream CHI interface.  Each of these
+multi-stream channels in the upper multiplex Stream may have different codec needs and will be
+passed to a different lower multiplex stream depending on the codec in play.  When redundant RTP
+streams are used, using different codecs, upper multiplex channel data may be duplicated and passed
+to severay lower multiplex streams, each to perform the coding for a different RTP payload format.
+
+The single multi-stream CHI upper multiplex Stream would typically be linked under the MG driver.
+
+Requests for cross-connect must be passed down all the way to the bottom of the RTP-MUX driver
+(where the non-media-aware cross-connection function resides).  For latching support and source
+address filtering, connection indications from the lowest level UDP driver needs to be passed all
+the way to the top.
+
+Because the RTP payload format being used on a given media stream might change during the course of
+a call, the upper multiplex of the CH-MUX driver and the lower multiple of the RTP-MUX driver must
+be informed of the dynamic RTP payload mapping for a given media stream.  This is performed as a
+part of termination point establishment: using CHI primitives that are passed down to the upper
+multiplex of the RTP-MUX driver.
+
+The CH-MUX driver might also be devised with two upper multi-stream CHI Streams: one for PCMU and
+another for PCMA.  This would allow the prenence of an L16 final stage at the lower multiplex stream
+and perform the L16 (well 12- or 14-bits actually) to PCMU or PCMA conversion at the upper stream,
+depending on the Stream.  This would allow the MG driver above to perform conversionless
+cross-connect.  The MG driver would signal the required native format by opening the termination
+point on the appropriate lower stream (one for PCMU, the other for PCMA).
+
+This would be handy because may of the more complex codecs actually require PCMU or PCMA to L16
+conversion before the data is passed to the codec.  Also, the result of decoding is also often L16.
+
+Because the major fast-path activity of a Media Gateway is media stream cross-connect, the CH-MUX
+driver is also capable for matrix switching (or cross-connect) under the control of either the MG
+module above or under the control of a user-space application.  This permits the channel data
+received on one lower stream on the multiplex to be sent on another, directly, and without MG driver
+or user-space application intervention in the media stream.  Some basic functions should also be
+provided in the cross-connection (i.e. PCMU to PCMA conversion, digital padding, mixing, agc,
+conferencing, DTMF and tone substitution, half-echo suppression, etc).
+
+@subsection RTP-MUX -- Real-Time Transport Protocol (RTP) Multiplexing (MUX) Driver
+
+@figref{7} illustrates the relationship between the RTP-MUX driver and upper and lower level
+drivers.
+
+The RTP Multiplexing (RTP-MUX) driver is a multiplexing driver that provides a switching nexus for
+the purpose of forwarding (cross-connecting) non-media-aware RTP streams as well as providing upper
+multiple stream selection for transcoding.  Messages entering the lower multiplex are demultiplexed
+into STUN, RTP and RTCP messages.  If non-media-aware cross-connect is to be performed, RTP and RTCP
+packets are IP address and port translated and sent back down (passed to the write side of the lower
+multiplex queue pair).  STUN packets are always sent upstream on a dedicated STUN stream opened on
+the upper multiplex so that a separate STUN application can deal with these packets outside of the
+normal data stream.  If transcoding or media termination is to be performed, RTP and RTCP packets
+are processed for adaptive jitter buffering and full RTP/RTCP stream termination and sent upward on
+an appropriate stream.  The upper multiplex stream is selected based on the transcoding that needs
+to be performed.  The upper multiplex stream does not perform the transcoding itself: the
+transcoding is provided by modules that are pushed (or autopushed) over the upper multiplex stream.
+This ensures that transcoding is performed in batches for maximum instruction cache efficiency.
+Also, complex codecs can be broken into any suitable number of stages, each stage implemented as
+another pushed module.  Some upper multiplex streams with such modules pushed might be
+unidirectional or biderctional.  That is, some may only transcode in one direction, whereas, others
+may transcode in both directions.  Transcoding is always performed from the native payload format to
+G.711 mu-law (PCMU) or G.711 A-law (PCMA).
+
+DTMF digits using the DTMF digits and tones RTP payload format are also translated to PCMU or PCMA
+by a transcoding module stack.  Should the end-to-end transcoding require separate DTMF and tone RTP
+streams at both ends of the sessions, RTP payloads formats for DTMF are non-media-aware
+cross-connected instead of being transcoded.  The same is true for comfort noise.
+
+Handling of redundant RTP media streams is a little more complex.  Redundant media streams that use
+the same payload format are pruned at the lower multiplex where RTP adaptive jitter buffering is
+being performed.  Redundant media streams that use different payloads, might require taking separate
+paths thru different upper multiplex Streams to perform the separate transcoding required on
+redundant information.
+
+Upper multiplex Streams provide a CH interface instead of the NPI interface used by the lower
+multiplex.  The upper multiple Streams use the multi-stream CH interface (the normal CHI interface
+with 64-bit tags prefixed onto each and every message).
+
+A simple multiplexing driver used to merge the CHI streams from below back into a single
+multi-stream CHI Stream can be used.  Such a multiplexing driver can also performed the
+demultiplexing required in the downward direction to again select the appropriate transcoding for
+the contained PCMU or PCMA media stream.
+
+The RTP-MUX driver performs the following functions at the lower queue pair:
+
+@itemize @bullet
+@item Accepts and queues RTP, RTCP and STUN packets from the multi-stream NPI interface from below
+(at the lower service interface boundary).
+
+@item Demultiplexes the RTP, RTCP and STUN packets in the lower multiplex read queue service
+procedure and passes those packets through the appropriate upper multiplex queue pairs.  Note that
+there is one upper multiplex queue pair for each payload format.
+
+@item Accepts RTP, RTCP and STUN packets from upper multiplex streams and passes them downstream to
+the UDP driver below the lower multiplex service interface.
+
+@item Accepts RTP, RTCP and STUN packets over the multi-stream NPI interface from below (at the
+lower service interface boundary).
+
+@item Where transcoding of RTP and RTCP packets received from below are required, performs any
+necessary adaptive or non-adaptive jitter buffering and rate adaption.
+
+Note, however, that adaptive or non-adaptive jitter buffering is not necessary in all cases.  For
+example, when transcoding 50ms G.729 packets to G.711 (PCMU), each G.729 packet can be transcoded
+into 10 x 10ms G.711 (PCMU) packets without buffering.
+
+@item Passes STUN packets received from below to a specialized STUN upper multiplex stream for
+processing by upper layer applications.
+
+@item Accepts RTP, RTCP and STUN packets from above and passes those packets down to the UDP driver
+beneath the lower service interface.
+@end itemize
+
 @subsection RSW --- RTP Switch (RSW) Driver
 
 The RTP Switch (RSW) driver is a multiplexing driver that provides a switching matrix of multiplex
@@ -533,8 +654,19 @@ lower channel, this acts as a general purpose multiplexing driver.  Typical use 
 independent upper Stream for each AVT profile payload type and push an RTP module over each Stream
 to perform jitter buffering and other RTP/RTCP termination functions.
 
-
 @subsection UDP --- User Datagram Protocol (UDP) Driver
+
+@figref{7} illustrates the relationship between the UDP driver and upper level modules and drivers.
+Directly above the UDP driver is the RTP-MUX driver.  The UDP driver performs the following
+functions:
+
+@itemize @bullet
+@item Terminates UDP packets and passes them upstream.
+@item Accepts UDP packets from upstream and sends them out of a UDP termination.
+@item Cross-connects incoming UDP packets to outgoing UDP packets with IP address and port
+translation.
+@item Implements a multi-stream NPI interface at the upper service interface boundary.
+@end itemize
 
 The User Datagram Protocol (UDP) driver is a pseudo-device driver that provides access to the Linux
 UDP subsystem for the purpose of supporting Real-Time Transport Protocol (RTP).  This pseudo-device
@@ -556,6 +688,70 @@ send on the Stream.
 
 @node Modules
 @section Modules
+
+@subsection XC --- Transcoding (XC) Module
+
+A number of transcoding modules are used, one set for each possible codec in a stack.  When more
+than one module is stacked, each module in the stack performs one stage of the codec calculations
+and passed the packet or intermediate results along the stack.
+
+Transcoding modules use the multi-stream CHI interface on both the upper and lower interfaces.
+
+Transcoding modules perform the following functions:
+@itemize @bullet
+@item Accept data for encoding from above.  Data from above is not necessarily in sequence and may
+be lossy.  If the encoding algorithm requires block sequencing of input data, a stage of adaptive
+transparent jitter buffering may be required to accumulate sufficient amounts of data within a block
+and to detect loss events.  (See below for notes about transparent adaptive jitter buffering.) Data
+accepted from above should always be in PCMU, PCMA or L16 payload formats.
+@item Encode data.
+@item Pass encoded data packets to RTP drivers below.
+@item Accept packets for decoding from below.
+@item Decode packets.
+@item Pass decoded data upstream.  Decoded data does not necessarily have to be in sequence and may
+be lossy.  It is expected that, if upper layers require data in sequence and detection of loss
+events, that a stage of transparent adaptive jitter buffering be performed at or before the point
+that sequencing is required.  (See below for notes about transparent adaptive jitter buffering.)
+Data passed downstream should always be in native (transcoded) payload format.
+@end itemize
+
+At several stages in the transcoding modules, there is a need for sequencing of media chunks into
+blocks for encoding.  It should be noted that this resequencing of data is not jitter buffering in
+the traditional sense and this is why it is referred to as `transparent' jitter buffering.  In a
+normal jitter buffering, packets are played out at a constant rate in accordance with an interval
+clock.  That is not the case for `transparent' jitter buffering where packets are played out as soon
+as a block of them become available.  Normal jitter buffering will declare loss events and
+play-through the missing packet.  `Transparent' jitter buffering plays-around missing packets and
+can therefore, wait for a much longer period of time before declaring them lost (leaving the
+decision whether to play-through up to the terminating jitter buffer).  When a block with a gap
+reaches a maximum age (or where the number of retained gap blocks exceeds a maximum allocation), the
+block is discarded (or a loss packet generated).  The block-size is the number of packets of
+transcoded media that is generated from one incoming packet.  When the block-size is greater than or
+equal to one, and is an integral number, no resequencing is required, and each packet simply results
+in the generation of block-size (one or more) transcoded packets.  If the block-size is less than
+one or non-integral (e.g. one 1.67 30ms G.711 packets are required to generate one 50ms G.729
+packet), `transparent' adaptive jitter buffering is required.
+
+Where it is possible to generate packets with a varying amount of payload up to a potentially
+maximum size, transcoding is more efficient when it uses a outgoing payload size (milliseconds) that
+is equal to the incoming packet payload size (milliseconds).  When an adjacent incoming packet or
+packets is awaiting the received packet to form a block, the maximum contiguous block size should be
+used: that which is available considering the waiting packets and permitted given the payload format
+and session information.
+
+The degree of `transparent' adaptive jitter buffering that is performed is highly dependent on the
+available payload sizes and characteristic maximums as set for the session in the SDP Offer/Answer
+exchange.
+
+@subsection UDP-SW --- User Datagram Protocol (UDP) Switching (SW) Module
+
+The UDP switching module is pushed over the UDP multi-stream driver.  The UDP switching module is
+responsible for performing non-media-aware switching between two lower streams in the UDP
+multi-stream, performing IP address and port translation in the process.  The UDP switching module
+is also responsible for demultiplexing STUN packets from RTP and RTCP and passing the STUN packets
+upstream instead of switching them.  Unfortunately this type of module would be wasteful of state
+resources should the majority of RTP streams be simply passed from beneath to above (and visa
+versa), so this function is integrated into the lower queues of the RTP-MUX driver instead.
 
 @subsection RTP --- Real-Time Transport Protocol (RTP) Module
 

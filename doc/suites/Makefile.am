@@ -202,6 +202,10 @@ FIG_FIGS		= \
 			mg01.fig \
 			mg02.fig \
 			mg03.fig \
+			mg04.fig \
+			mg05.fig \
+			mg06.fig \
+			mg07.fig \
 			voip01.fig \
 			voip02.fig
 
