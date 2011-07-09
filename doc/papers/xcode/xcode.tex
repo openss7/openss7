@@ -193,6 +193,16 @@ obscured.  This has created a need for simple forwarding of RTP packets with IP
 address and port number translation so that the VAR's customers do not see the
 IP addresses of the VAR's wholesaler.
 
+\subsubsection{Gateway Forwarding}
+
+Although there is a demand for forwarding to accommodate IP address
+obfuscation, there is a basic requirement for forwarding that is required by
+a regular Media Gateway (one that converts from TDM to IP).  The ability to
+rapidly marshal G.711 encoded audio samples from the TDM interface to RTP
+payload is a basic requirement of such a media gateway.  Therefore, any
+development performed for the purpose of a forwarding IP-IP gateway, can be
+reused in a normal TDM-IP gateway.
+
 \subsection{Demand for Transcoding}
 
 Wireless LTE (Long Term Evolution) and WiMAX networks use primarily VoIP to
@@ -206,13 +216,23 @@ on-the-air interface, LTE and WiMAX network operators use low-bit-rate codecs
 such as G.729 Annex A with Annex B comfort noise.  This creates a demand for
 media gateways that support G.729 and other low-bit-rate codecs.  However, PSTN
 carriers primarily use G.711 codecs for transport of voice calls.  Many
-installed media gateways lack the abilty to provide G.729 and would required
+installed media gateways lack the ability to provide G.729 and would required
 significant investment in DSP add-on equipment.  Further compounding matters is
 that existing MGs have primarily been purchased on grey markets and do not have
 the warranty support necessary for upgrade to G.729.
 
 This generates a market demand for transcoding equipment.  This demand will
 continue to increase as additional WiMAX and LTE networks are rolled out.
+
+\subsubsection{Gateway Transcoding}
+
+Although there is a demand for transcoding to accommodate LTE/WiMAX network
+evolution, there is a basic requirement for transcoding that is requried by a
+regular Media Gateway (one that converts from TDM to IP).  The ability to
+rapidly transcode G.711 encoded audio samples from the TDM interface to RTP
+payloads other than G.711 is a basic requirement of such a media gateway.
+Therefore, any development performed for the purpose of a transcoding IP-IP
+gateway, can be reused in a normal TDM-IP gateway.
 
 %Something \cite[]{Ritchie84} is illustrated in \textsl{Figure \ref{figure:xc01}}.
 %\begin{figure}[htp]
@@ -708,34 +728,41 @@ poorer performance than is possible.
 \subsubsection{SIP Implementation}
 \label{section:sip}
 
-The SIP implementation used is the {\sl sofia} SIP stack.  The {\sl sofia}
-SIP implementation is principally a shared-object library that is used in a
-main event loop by an application program that implements the SIP state
-machine.  Several performance improvements have (or will) be made to the {\sl
+The SIP implementation intended on being used is the {\sl sofia} SIP stack.
+The {\sl sofia} SIP implementation is principally a shared-object library that
+is used in a main event loop by an application program that implements the SIP
+state machine.  Several performance improvements need to be made to the {\sl
 sofia} libraries as follows:
 
 \begin{enumerate}
 
 \item The {\sl sofia} code base does not version its symbols.  Proper library
-versioning has been added.
+versioning needs to be added.
 
 \item The {\sl sofia} code base does not address cancellation points for
 threaded programs.  Proper cancellation treatment for asynchronous thread
-cancellation has been added.
+cancellation needs to be added.
 
 \item The {\sl sofia} code base does not organize functions by code heat.
-Functions have been organized by code heat.
+Functions need to be organized by code heat.
 
 \item The {\sl sofia} code base compiles without profiling.  The code base
-has been profiled and branch prediction included in the code base.
+needs to be profiled and branch prediction included in the code base.
 
 \item The {\sl sofia} code base uses {\sl Linux} sockets for UDP, TCP and
 SCTP.  The OpenSS7 {\sl STREAMS} implementations of these are more efficient
 and provide a performance increase due to batching and reduced context
-switching.  The sockets interface to UDP and SCTP has been substituted for
+switching.  The sockets interface to UDP and SCTP need to be substituted for
 {\sl XTI} interface to the OpenSS7 {\sl STREAMS} implementations of these.
 
 \end{enumerate}
+
+Unfortunately, the {\sl libsofia-sip} libraries have been added to recent
+major distributions (such as Debian, Mageia, Fedora), largely in support of
+the {\sl telepathy} package.  This means that there is little opportunity to
+properly repackage the library.  On the other hand, it may be possible to
+repackage the library as a different implementation of the same interface with
+proper library versioning.
 
 Note that the {\sl sofia} SIP implementation is not a full blown application,
 but is, rather, a set of libraries and event handlers that can be used to
@@ -876,7 +903,7 @@ address and port associated with the RTCP packet stream may be different from
 the recommendations of RFC
 3550.\footnote{RFC 3550 states that the RTCP port number should be odd and one
 higher than the corresponding RTP port number, and with the same IP address.
-This is not necessarily the case when NAT and NAPT middleboxes exist in the
+This is not necessarily the case when NAT and NAPT middle-boxes exist in the
 path.}
 
 There are two ways to handle NAT/NAPT: ICE \cite{ICE} (using STUN \cite{STUN})
@@ -971,8 +998,9 @@ performing an IP takeover (gratuitous ARP) or APS fail-over between nodes.
 Barring the availability of an H.248 interface to the D-SBG (primarily due to
 the lack of a suitable stack), a custom protocol can be implemented between
 mated D-SBG.  SCTP could also be used for transport of this protocol.  The
-protocol sould be a simple transaction update, where a checkpoint state is
-transmitted between MG implementations.  The MG implementation used,
+protocol could be a simple transaction update, where a checkpoint state is
+transmitted between MG implementations.  It could also be a simple transport
+of the MGI interface from one machine to another.  The MG implementation used,
 illustrated in blue in {\sl Figure \ref{figure:xc09}}, is the {\sl OpenSS7} MG
 Driver.  This is a kernel-space {\sl STREAMS} implementation.
 
