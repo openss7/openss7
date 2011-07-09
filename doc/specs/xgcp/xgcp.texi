@@ -481,8 +481,8 @@ they eventually merged to form MGCP.
 @section Overview
 
 The XOM Gateway Control Protocol Programming Interface (abbreviated XGCP) defines an Application
-Program Interface (API) to gateway control application services.  It is referred to as @dfn{the
-interface} throughout this specification.
+Program Interface (API) to gateway control services.  It is referred to as @dfn{the interface}
+throughout this specification.
 
 The interface is designed to offer services that are consistent with, but not limited to, the
 Telcordia, Level 3 and Cisco RFC 2705 MGCP Version 1.0, the IETF MEGACO Version 2.0, the ITU-T
@@ -531,9 +531,9 @@ while the `C' language binding conventions are described in @ref{C Language Bind
 @subsection Relationship to GCP Protocols
 
 The interaction between gateway control programs acting in a gateway control entity role are
-realized through the exchange of gateway control application service information.  The general
-communications service for gateway control is the @dfn{Gateway Control Protocol}.  GCP defines the
-following operations:
+realized through the exchange of gateway control service information.  The general communications
+service for gateway control is the @dfn{Gateway Control Protocol}.  GCP defines the following
+operations:
 
 @multitable @columnfractions .5 .5
 @item @b{Service} @tab @b{Type}
@@ -550,14 +550,14 @@ automatic transaction handling.  The interface is designed not to restrict the s
 those of specific service packages of the H.248 protocol or any given profile of packages.
 
 The interface defined in this specification is ``symmetrical'' in the sense that it can be used to
-implement gateway control application programs acting in any of the GCP producer or consumer roles
-(e.g. MGC, MG, CA, S-SBG, D-SBG).  The interface supports:
+implement gateway control programs acting in any of the GCP producer or consumer roles (e.g. MGC,
+MG, CA, S-SBG, D-SBG).  The interface supports:
 
 @itemize
-@item a gateway control application program acting as a consumer of gateway control services.  This
-is done by submitting service operation requests and receiving service operation responses.
-@item a gateway control application program acting as a producer of gateway control services.  This
-is done be receiving service operation requests and sending back service operation responses.
+@item a gateway control program acting as a consumer of gateway control services.  This is done by
+submitting service operation requests and receiving service operation responses.
+@item a gateway control program acting as a producer of gateway control services.  This is done be
+receiving service operation requests and sending back service operation responses.
 @end itemize
 
 The interface provides the ability to send @dfn{requests} on the consumer side and to receive
@@ -574,7 +574,7 @@ gateway control protocol service information.  Thus this API does not preclude a
 the use of either the MGCP pre-standard protocol or the MEGACO/H.248 standard protocol (of any
 version).
 
-The XGCP API offers three abstract gateway control application service views: that of MGCP Version
+The XGCP API offers three abstract gateway control service views: that of MGCP Version
 1.0, MEGACO Version 2.0, and H.248 GCP Version 3.0.
 
 The contents of the MGCP messages are described in RFC 2705.  These messages implicitly define MGCP
@@ -936,13 +936,13 @@ headers in that order, and at least one of the @file{<xgcp_mgcp.h>}, @file{<xgcp
 
 The interface comprises a number of functions together with many OM classes and OM objects that are
 used as the arguments and results of the functions.  Both the functions and the OM objects are based
-closely on the @dfn{Abstract Service} that is specified in the Standards (references MGCP, MEGACO
-and H.248).
+closely on the @dfn{Abstract Service} that is specified in the Standards (references @b{MGCP},
+@b{MEGACO} and @b{H.248}).
 
-The interface models gateway control application interactions as service requests made through a
-number of interface @dfn{functions}, that take a number of input @dfn{arguments}.  Each valid
-request causes an @dfn{operation} within the producer that eventually returns a @dfn{status} and any
-@dfn{result} of the operation.
+The interface models gateway control interactions as service requests made through a number of
+interface @dfn{functions}, that take a number of input @dfn{arguments}.  Each valid request causes
+an @dfn{operation} within the producer that eventually returns a @dfn{status} and any @dfn{result}
+of the operation.
 
 All interactions between a Consumer and a Producer belong to a @dfn{session}, that is represented by
 an OM object passed as the first argument to most interface functions.
@@ -1012,9 +1012,9 @@ use the workspace as required.  It can create and manipulate OM objects using th
 can start one or more gateway control sessions using @i{Bind()}.@footnote{@xref{Bind}.}  All the
 sessions on a given workspace share the same features.
 
-Eventually, when it has completed its tasks, terminated all its gateway control application sessions
-using @i{Unbind()}, and released all its OM objects using @i{OM-Delete()}, the application should
-ensure that resources associated with the interface are freed by calling @i{Shutdown()}.
+Eventually, when it has completed its tasks, terminated all its gateway control sessions using
+@i{Unbind()}, and released all its OM objects using @i{OM-Delete()}, the application should ensure
+that resources associated with the interface are freed by calling @i{Shutdown()}.
 
 A miscellaneous error arise if an attempt is made to use an unavailable feature.  If an instance of
 a class that is not in an available package is supplied as a function argument, the @b{bad-class}
@@ -1023,8 +1023,8 @@ error arises.
 @node Names
 @subsection Names, Addresses and Titles
 
-To address a wide variety of gateway control application transport protocols the interface is
-capable of accepting various forms of object names, system addresses and program or system titles.
+To address a wide variety of gateway control transport protocols the interface is capable of
+accepting various forms of object names, system addresses and program or system titles.
 
 @itemize @bullet
 
@@ -1076,19 +1076,22 @@ boundary, the implementation will resolve the Name to the appropriate Title or A
 * AAM Enabled Session::
 * AAM Disabled Session::
 * Associated Session::
+* AMH Enabled Session::
+* AMH Disabled Session::
+* Message Session::
 * ATH Enabled Session::
 * ATH Disabled Session::
 * Transaction Session::
 @end menu
 
-A session identifies to which gateway control application entity a particular operation will be
-sent.  It contains some @b{Bind-Arguments}, such as the name of the consumer.  The session is passed
-as the first argument to most interface functions.
+A session identifies to which gateway control entity a particular operation will be sent.  It
+contains some @b{Bind-Arguments}, such as the name of the consumer.  The session is passed as the
+first argument to most interface functions.
 
 A session is described by an OM object of OM class @b{Session}.  It is created, and appropriate
 parameter values may be set, using the OSI-Abstract-Data Manipulation functions.  A gateway control
-application session is then started with @i{Bind()}@footnote{@xref{Bind}.} and later is terminated
-with @i{Unbind()}.  A session with default parameters can be started by passing the constant
+session is then started with @i{Bind()}@footnote{@xref{Bind}.} and later is terminated with
+@i{Unbind()}.  A session with default parameters can be started by passing the constant
 @b{Default-Session} (@samp{(OM_object)GCP_DEFAULT_SESSION}) as the @b{Session} argument to
 @i{Bind()}.
 
@@ -1098,13 +1101,13 @@ session is to be started.
 
 The interface supports multiple concurrent sessions, so that an application implemented as a single
 process, such as a service in a client-service model, can interface with the Gateway Control
-Application Services using several identities; and so that a process can interact directly and
-concurrently with different gateway control application services.
+Services using several identities; and so that a process can interact directly and concurrently with
+different gateway control services.
 
 Detailed specifications of the OM class @b{Session} are given in @ref{Interface Class Definitions}.
 
 A session can be used either acting as a consumer of gateway control services, or acting as a
-producer of gateway control application services, or both.
+producer of gateway control services, or both.
 
 A session can be restricted for use only with a designated program called the responder.  When the
 responder is omitted and automatic association management is sued, the session can be used to
@@ -1135,14 +1138,13 @@ Finally, @i{Unbind()} is used to terminate the session, after which the paramete
 and a new session started using the same instance, if required.  Multiple concurrent sessions can be
 run, by using multiple instances of this OM class.
 
-A session allows a requesting program (the requester) to exchange gateway controll application
-information with another program designated (the responder) or by default to all programs.
+A session allows a requesting program (the requester) to exchange gateway control information with
+another program designated (the responder) or by default to all programs.
 
-An @dfn{AAM enabled} session thus allows a gateway control application entity to access either a
-portion of the gateway control services (that is, that are accessible via the designated responder)
-or all gateway control application services.  In the later case, the producer gateway control
-application entity resolution is performed by the Gateway Control Service provider, according to the
-gateway control application services invoked.
+An @dfn{AAM enabled} session thus allows a gateway control entity to access either a portion of the
+gateway control services (that is, that are accessible via the designated responder) or all gateway
+control services.  In the later case, the producer gateway control entity resolution is performed by
+the Gateway Control Service provider, according to the gateway control services invoked.
 
 This type of session object can not be used to receive or send ACSE related primitives or operations
 explicitly.  To use ACSE explicitly, see @ref{AAM Disabled Session}.
@@ -1153,8 +1155,8 @@ explicitly.  To use ACSE explicitly, see @ref{AAM Disabled Session}.
 A session object can have Automatic Association Management disabled when it belongs to a workspace
 that has Automatic Association Management disabled vai @i{Negotiate()}, which allows the user to
 explicitly send and receive underlying transport operations to build and tear down associations.  It
-gives explicit control over associations to the user.  The Gateway Control Application Service
-provider does no underlying transport operations on behalf of the user.
+gives explicit control over associations to the user.  The Gateway Control Service provider does no
+underlying transport operations on behalf of the user.
 
 When the user creates and binds a session object in a workspace with AAM disabled, only the
 following attributes within the session object can be specified:
@@ -1187,11 +1189,11 @@ The other attributes that relate to the underlying transport are specified withi
 Once a user has created a bound session that has AAM disabled, an association can be created.  An
 association is represented by an @dfn{associated} or @dfn{partially associated} session object.  An
 @dfn{associated} session is returned as the result of building a new association.  The associated
-session is used, like a bound session, by sending an receiving gateway control application
-transaction handling or service operations.  The major difference is that an associated session
-object can only be used to send and receive operations to, or from, a single remote gateway control
-entity.  After a session is associated, the user can abort the association, which implicitly unbinds
-the associated, or partially associated, session.
+session is used, like a bound session, by sending an receiving gateway control transaction handling
+or service operations.  The major difference is that an associated session object can only be used
+to send and receive operations to, or from, a single remote gateway control entity.  After a session
+is associated, the user can abort the association, which implicitly unbinds the associated, or
+partially associated, session.
 
 The precedence rules for common parameters within the @b{Session} and the @b{Context} objects are
 different for associated session objects.  Once a session is in the associated state; the
@@ -1201,12 +1203,65 @@ To terminate this type of session, the user should either abort the session, whi
 unbinds the session.  If the user unbinds the associated session prior to aborting the association,
 the service provider will abort the association.
 
+@node AMH Enabled Session
+@subsection AMH Enabled Session
+
+The AMH enabled session allows a gateway control entity to invoke and respond to gateway control
+services requests and indications without regard for message handling.  The Gateway Control Services
+provider provides all message handling.
+
+This type of session cannot be used to send messages explicitly.  To dispatch messages explicitly,
+see @ref{AMH Disabled Session}.
+
+@node AMH Disabled Session
+@subsection AMH Disabled Session
+
+A session object can have Automatic Message Handling disabled when it belongs to a workspace that
+has Automatic Message Handling disabled using the @i{Negotiate()} function.  This allows the user to
+explicitly send and receive message handling operations to establish, group and dispatch messages.
+it gives explicit control over messages to the user.  The Gateway Control Service provider does no
+message handling operations on behalf of the user.
+
+Oncee the session object is bound (AAM enabled) or associated (AAM disabled) and has AMH disabled,
+the session must explicitly issue message handling operations for each gateway control services
+transaction.  This bound or associated session can only be used to send message handling primitives.
+The following can be sent/received using this type of bound or associated session:
+
+@itemize
+@item @i{Receive()} (@command{gcp_receive()}/@samp{GCP_MESSAGE_IND})
+@item @i{Send()} (@command{gcp_send()}/@samp{GCP_MESSAGE_REQ})
+@end itemize
+
+The other attributes that relate to message handling are specified within the @b{Send-Argument} or
+@b{Message-Result} objects that are passed to, or returned from, @i{Send()} or @i{Receive()}.
+
+@node Message Session
+@subsection Message Session
+
+Once a user has created a bound or associated session that has AMH disabled, a message can be
+created.  A message is represented by a @dfn{fully formed}, or @dfn{partially formed} @dfn{message},
+session obejct.  A @dfn{message} session is returned as the result of building a new message.  The
+message session is used, like a bound or associated session, by sending and receiving gateway
+control service operations.  The major difference is that a message session object can only be used
+to send and receive operations within a single message with a single remote gateway control entity.
+After a session forms a message, the user can close or abort the message, which returns the session
+to the bound or associated state.
+
+The precedence rules for common parameters within the @b{Session} and the @b{Context} objects are
+different for message session objects.  Once a session has formed a message, the message related
+argument, @var{application-Context-Name}, cannot be overridden by the context object.
+
+To terminate this type of session, the user should either abort or close the message, which
+implicitly unbinds the session.  If the user unbinds the message session prior to either closing or
+aborting the message, the service provider will first attempt to close the message, and if that is
+rejected, will abort the message.
+
 @node ATH Enabled Session
 @subsection ATH Enabled Session
 
 The ATH enabled session allows a gateway control entity to invoke and respond to gateway control
-application services requests and indications without regards for transaction handling.  The Gateway
-Control Application Services provider provides all transaction handling.
+services requests and indications without regards for transaction handling.  The Gateway Control
+Services provider provides all transaction handling.
 
 This type of session cannot be used to send transaction handling primitives or operations
 explicitly.  To use transaction handling explicitly, see @ref{ATH Disabled Session}.
@@ -1218,13 +1273,12 @@ A session object can have Automatic Transaction Handling disabled when it belong
 that has Automatic Transaction Handling disabled using the @i{Negotiate()} function.  This allows 
 the user to explicitly send and receive transaction handling operations to establish, group and
 dispatch transactions.  It gives explicit control over transactions to the user.  The Gateway
-Control Application Service provider does no transaction handling operations on behalf of the user.
+Control Service provider does no transaction handling operations on behalf of the user.
 
 Once the session object is bound (AAM enabled) or associated (AAM disabled) and has ATH disabled,
-the session must explicitly issued transaction handling operations for each gateway control
-application services request or response.  This bound or associated session can only be used to send
-transaction handling primitives.  The following can be sent/received using this type of bound or
-associated session:
+the session must explicitly issue transaction handling operations for each gateway control services
+request or response.  This bound or associated session can only be used to send transaction handling
+primitives.  The following can be sent/received using this type of bound or associated session:
 
 @itemize
 @item @i{Receive()} (@command{gcp_receive()}/@samp{GCP_OPEN_IND})
@@ -1246,15 +1300,14 @@ Once a user has created a bound or associated session that has ATH disabled, a t
 created.  A transaction is represented by a @dfn{fully formed}, or @dfn{partially formed}
 @dfn{transaction}, session object.  A @dfn{transaction} session is returned as the result of
 building a new transaction.  The transaction session is used, like a bound or associated session, by
-sending and receiving gateway control application service operations.  The major difference is that
-a dialog session object can only be used to send and receive operations within a single dialog with
-a single remote gateway control application entity.  After a session forms a transaction, the user
-can close or abort the transaction, which returns the session to the bound or associated state.
+sending and receiving gateway control service operations.  The major difference is that a
+transaction session object can only be used to send and receive operations within a single
+transaction with a single remote gateway control entity.  After a session forms a transaction, the
+user can close or abort the transaction, which returns the session to the bound or associated state.
 
 The precedence rules for common parameters within the @b{Session} and the @b{Context} objects are
 different for transaction session objects.  Once a session has formed a transaction, the transaction
 related argument, @var{application-Context-Name}, cannot be overridden by the context object.
-
 
 To terminate this type of session, the user should either abort or close the transaction, which
 implicitly unbinds the session.  If the user unbinds the transaction session prior to either closing
@@ -1264,20 +1317,19 @@ if that is rejected, will abort the transaction.
 @node Context Description
 @section Context
 
-The context defines the characteristics of the gateway control application interaction that are
-specific to a particular gateway control application operation, but are often used unchanged for
-many operations.  Since the parameters are presumed to be relatively static for a given user during
-a particular gateway control application interaction, these arguments are collected into an OM
-object of OM class @b{Context}, which is supplied as the second argument of each gateway control
-application operation.  This services to reduce the number of arguments passed to each function.
+The context defines the characteristics of the gateway control interaction that are specific to a
+particular gateway control operation, but are often used unchanged for many operations.  Since the
+parameters are presumed to be relatively static for a given user during a particular gateway control
+interaction, these arguments are collected into an OM object of OM class @b{Context}, which is
+supplied as the second argument of each gateway control operation.  This serves to reduce the number
+of arguments passed to each function.
 
 
 The context includes various administrative details, such as the @i{mode} defined in the Abstract
-Service, which affects the processing of each gateway control application operation.  These include
-a number of @i{Service Controls} and @i{Local Controls} that allow control over some aspects of the
-operation.
-The @i{Service Controls} include @b{mode}, @b{responder-Address}, and @b{responder-Title}.
-The @i{Local Controls} include @b{asynchronous}, @b{reply-Limit}, @b{time-Limit}.  Each of these is
+Service, which affects the processing of each gateway control operation.  These include a number of
+@i{Service Controls} and @i{Local Controls} that allow control over some aspects of the operation.
+The @i{Service Controls} include @b{mode}, @b{responder-Address}, and @b{responder-Title}.  The
+@i{Local Controls} include @b{asynchronous}, @b{reply-Limit}, @b{time-Limit}.  Each of these is
 mapped onto an OM attribute in the @b{Context}, and they are detailed in @ref{Interface Class
 Definitions}.
 
@@ -1599,8 +1651,8 @@ function.  Features defined by this specification are described and assigned Obj
 @subsection Automatic Association Management
 
 When the Gateway Control Services provider makes use of association oriented communication services,
-such as SCTP, the Gateway Control Service provider implementations are assumed to provide automatic
-handling of the association between gateway control entities, establishing and releasing
+such as TCP or SCTP, the Gateway Control Service provider implementations are assumed to provide
+automatic handling of the association between gateway control entities, establishing and releasing
 associations at its discretion.  Such management is intended to bring benefits such as reduced
 communication charges.  To allow this flexibility to the implementation, the interface does not
 specify when communication takes place.  Automatic Association Management (AAM) may be enabled or
@@ -1618,10 +1670,22 @@ does not specify when communication takes place.  Automatic Transaction Handling
 enabled or disabled on a per-workspace basis using the @i{Negotiate()} function.@footnote{Note that
 Automatic Transaction Handling is an independent concept from Automatic Association Management.}
 
+Under MEGACO and H.248, transactions are used to provide for sequencing of a set of commands.
+Commands that are contained within separate transactions provide no guarantees whatsoever of
+ordering.  When ordering of commands is required, either the commands must be placed into the same
+transaction, or the result of each command must be awaited before issuing the subsequent command.
+Due to the possibility of message loss and the delays associated with retransmission of the lost
+messages, the later approach (awaiting the result of the previous command before issuing the current
+command) can introduce inter-command delays that may or may not be acceptable.  On the other hand,
+preparing the full sequence of commands in advance may not be possible, as the next command chosen
+may depend on the results of a previous command.  In general; however, grouping multiple commands
+into a transaction can serve to provide a limited set of compound commands from short sequences of
+simple commands.
+
 @node Automatic Performer Resolution
 @subsection Automatic Performer Resolution
 
-The performer of an invoked operation my be explicitly designated by the responder name and
+The performer of an invoked operation may be explicitly designated by the responder name and
 responder address parameters of the bound session used.
 
 However, in the case where the responder is specified as a wildcard, the Gateway Control Service
@@ -1830,7 +1894,7 @@ This includes any @i{Wait()} request on that session.
 @item Session (Object(Session))
 The associated (or partially associated) session against which this operation is perfomed.  This
 must be a private object previously returned as part of an @b{Accept-Result} or @b{Open-Argument},
-or returned explicitly from an asyncrhonously called @i{Open()}.  This session object must have AAM
+or returned explicitly from an asynchronously called @i{Open()}.  This session object must have AAM
 disabled.
 @item Context (Object(Context))
 The management context to be used for this operation.  This argument must be a private object.  Once
@@ -2657,7 +2721,7 @@ The following Features are defined and registered by this specification:
 @itemize
 @item @b{Gateway Control Packages} @*
 The GSM Gateway Control package and the ANSI Gateway Control package are specified in
-@ref{Interface Class Definitions}.  Additional Gateway Control packages may be sepcified in the
+@ref{Interface Class Definitions}.  Additional Gateway Control packages may be specified in the
 future.
 Note that multiple Gateway Control Packages can be activated within the same workspace.
 
@@ -2671,7 +2735,7 @@ This Object-Identifier is represented by the constant @samp{GCP_AUTOMATIC_ASSOCI
 Automatic Association Management is enabled by default.
 
 @item @b{Automatic Dialog Handling}
-This feature provides for automatic establishment and release of the unerlying protocol dialog(s)
+This feature provides for automatic establishment and release of the underlying protocol dialog(s)
 (if any); refer to @ref{Automatic Dialog Handling}.
 The Object-Identifier associated with this feature is @samp{@{ iso(1) org(3) dod(6) internet(1)
 private(4) enterprises(1) openss7(29591) xom-packages(1) xmap(1) common(1)
@@ -2692,7 +2756,7 @@ Gateway Control Services packages are also negotiated as part of the Feature-Lis
 Services packages may be defined by the OpenSS7 Project, by standards organizations or consortia, by
 vendors, or by users.
 
-Registerd Object Identifiers representing future features and vendor extensions may also be included
+Registered Object Identifiers representing future features and vendor extensions may also be included
 in the Feature-List for negotiation.
 @item Workspace
 The handle to the workspace for which features are negotiated.
@@ -2763,7 +2827,7 @@ for (i = 0; i < 6; i++)
 @section Open()
 @table @b
 @item NAME
-@b{Open} --  Resquest estblishment of a Gateway Control Services association (dialogue).
+@b{Open} --  Request establishment of a Gateway Control Services association (transaction).
 @item SYNOPSIS
 @format
 @verbatim
@@ -2775,12 +2839,12 @@ GCP_status gcp_open(
         OM_private_obect        context,
         OM_object               argument,
         OM_private_object       *result_return,
-        OM_sint32               *dialog_id_return
+        OM_sint32               *transaction_id_return
 );
 @end verbatim
 @end format
 @item DESCRIPTION
-This function is used to request the creation of a gateway control entity association (dialogue).
+This function is used to request the creation of a gateway control entity association (transaction).
 The service is defined as a confirmed service: a reply is expected.
 
 This operation may be called in asynchronous mode.  Note that when operating in this mode, results
@@ -2790,8 +2854,8 @@ asynchronous calls.
 @table @i
 @item Session (Object(Session))
 The gateway control session against which this operation is performed.  This must be a private
-object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}  This session must also have ADH
-(Automatic Dialog Handling) disabled.
+object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}  This session must also have ATH
+(Automatic Transaction Handling) disabled.
 @item Context (Object(Context))
 The gateway control context to be used for this operation.  This argument must be a private
 object.
@@ -2804,25 +2868,26 @@ connected @b{Session} object is returned in the Result of this function.
 @table @i
 @item Status (Status)
 If the function is called syncrhonously, the value @b{success} indicated that the action was
-completed.  If called asyncrhonously, it indicates that the operation was initiated.
+completed.  If called asynchronously, it indicates that the operation was initiated.
 @item Result (Object(*))
 Upon successful completion of a synchronous call, the results is one of the following:
 @itemize
 @item When the @i{Open} request has been accepted by the remote peer, one instance of the OM class
 @b{Accept-Result} Object is returned.  This @b{Accept-Result} object contains a @var{session}
-attribute that returns a @b{Session} object for which a dialog has been fully formed.  The
-@b{Accept-Result} object also contains the final negotiated dialog parameters for the new
-dialog.
+attribute that returns a @b{Session} object for which a transaction has been fully formed.  The
+@b{Accept-Result} object also contains the final negotiated transaction parameters for the new
+transaction.
 @item When the @i{Open} request has been refused by the remote peer, one instance of the OM class
 @b{Refuse-Result} Object is returned.  This @b{Refuse-Result} object contains information as to why
-the dialog was refused.  No @var{session} attribute is present in this result and no dialog session
+the transaction was refused.  No @var{session} attribute is present in this result and no
+transaction session
 is formed.
 @item When the @i{Open} request has been aborted by the remote peer or by the provider, one instance
 of the OM class @b{Abort-Argument} is returned.  This @b{Abort-Argument} object contains information
-pertaining to the abort.  No @var{session} attribute is present in this result and no dialog session
+pertaining to the abort.  No @var{session} attribute is present in this result and no transaction session
 is formed.
 @end itemize
-Upon successful completion of an asynchronous call, a partially formed dialog @b{Session} object is
+Upon successful completion of an asynchronous call, a partially formed transaction @b{Session} object is
 returned in the @i{Result}.
 
 @table @b
@@ -2831,8 +2896,8 @@ The original @b{Session} object passed to this function is unaffected and still 
 the bound or associated state.  This session object can still be used in additional concurrent
 @i{Open()} or @i{Receive()} function calls.
 @end table
-@item Dialog-ID (Integer)
-The returned @b{Dialog-ID} of the management operation when used asyncrhonously.
+@item Transaction-ID (Integer)
+The returned @b{Transaction-ID} of the management operation when used asynchronously.
 @end table
 @item ERRORS
 This function can return one of the following @b{Library-Errors}: bad argument, bad-class,

@@ -1577,7 +1577,7 @@ Handling is an independent concept from Automatic Association Management.}
 @node Automatic Performer Resolution
 @subsection Automatic Performer Resolution
 
-The performer of an invoked operation my be explicitly designated by the responder name and
+The performer of an invoked operation may be explicitly designated by the responder name and
 responder address parameters of the bound session used.
 
 However, in the case where the responder is specified as a wildcard, the Mobile Application Service
@@ -1779,7 +1779,7 @@ This includes any @i{Wait()} request on that session.
 @item Session (Object(Session))
 The associated (or partially associated) session against which this operation is perfomed.  This
 must be a private object previously returned as part of an @b{Accept-Result} or @b{Open-Argument},
-or returned explicitly from an asyncrhonously called @i{Open()}.  This session object must have AAM
+or returned explicitly from an asynchronously called @i{Open()}.  This session object must have AAM
 disabled.
 @item Context (Object(Context))
 The management context to be used for this operation.  This argument must be a private object.  Once
@@ -2607,7 +2607,7 @@ The following Features are defined and registered by this specification:
 @itemize
 @item @b{Mobile Application Packages} @*
 The GSM Mobile Application package and the ANSI Mobile Application package are specified in
-@ref{Interface Class Definitions}.  Additional Mobile Application packages may be sepcified in the
+@ref{Interface Class Definitions}.  Additional Mobile Application packages may be specified in the
 future.
 Note that multiple Mobile Application Packages can be activated within the same workspace.
 
@@ -2621,7 +2621,7 @@ This Object-Identifier is represented by the constant @samp{MAP_AUTOMATIC_ASSOCI
 Automatic Association Management is enabled by default.
 
 @item @b{Automatic Dialog Handling}
-This feature provides for automatic establishment and release of the unerlying protocol dialog(s)
+This feature provides for automatic establishment and release of the underlying protocol dialog(s)
 (if any); refer to @ref{Automatic Dialog Handling}.
 The Object-Identifier associated with this feature is @samp{@{ iso(1) org(3) dod(6) internet(1)
 private(4) enterprises(1) openss7(29591) xom-packages(1) xmap(1) common(1)
@@ -2642,7 +2642,7 @@ Mobile Application Services packages are also negotiated as part of the Feature-
 Application Services packages may be defined by the OpenSS7 Project, by standards organizations or
 consortia, by vendors, or by users.
 
-Registerd Object Identifiers representing future features and vendor extensions may also be included
+Registered Object Identifiers representing future features and vendor extensions may also be included
 in the Feature-List for negotiation.
 @item Workspace
 The handle to the workspace for which features are negotiated.
@@ -2713,7 +2713,7 @@ for (i = 0; i < 6; i++)
 @section Open()
 @table @b
 @item NAME
-@b{Open} --  Resquest estblishment of a Mobile Application Services association (dialogue).
+@b{Open} --  Request establishment of a Mobile Application Services association (dialogue).
 @item SYNOPSIS
 @format
 @verbatim
@@ -2754,7 +2754,7 @@ connected @b{Session} object is returned in the Result of this function.
 @table @i
 @item Status (Status)
 If the function is called syncrhonously, the value @b{success} indicated that the action was
-completed.  If called asyncrhonously, it indicates that the operation was initiated.
+completed.  If called asynchronously, it indicates that the operation was initiated.
 @item Result (Object(*))
 Upon successful completion of a synchronous call, the results is one of the following:
 @itemize
@@ -2782,7 +2782,7 @@ the bound or associated state.  This session object can still be used in additio
 @i{Open()} or @i{Receive()} function calls.
 @end table
 @item Dialog-ID (Integer)
-The returned @b{Dialog-ID} of the management operation when used asyncrhonously.
+The returned @b{Dialog-ID} of the management operation when used asynchronously.
 @end table
 @item ERRORS
 This function can return one of the following @b{Library-Errors}: bad argument, bad-class,
