@@ -1799,6 +1799,91 @@ Operation indication received in a gateway control service interaction.
 * Wait(): Wait.
 @end menu
 
+@node Send
+@section Send()
+
+@table @b
+@item NAME
+@b{Send} -- send a gateway control message.
+@item SYNOPSIS
+@format
+@verbatim
+#include <xom..h>
+#include <xgcp.h>
+
+GCP_status gcp_send(
+        OM_private_object   session,
+        OM_private_object   context,
+        OM_object           argument,
+        OM_private_object   *result_return,
+        OM_sint32           *message_id-return
+);
+@end verbatim
+@end format
+@item DESCRIPTION
+This function is used to send a gateway control message when @i{Automatic Message Handling} is
+disabled on a session.
+@item ARGUMENTS
+@table @i
+@item Session (Object(Session))
+The gateway control session on which to send the message.  This must be a private object previously
+returned from @i{Bind()} or @i{Open()}.
+@item Context (Object(Context))
+The gateway control context to be used for this operation.  This argument must be a private object
+or the constant @b{Default-Context} (@samp{GCP_DEFAULT_CONTEXT}).
+
+The service may be requested in a confirmed mode or a non-confirmed mode.  In confirmed mode, a
+reply is expected.
+@item Argument (Object(Message))
+The information supplied as the argument of a gateway control message is an instance of a subclass
+of the OM class @b{Message}.  Normally, concrete subclasses of this class are defined in Gateway
+Control Services packages.  For example, the @b{H248-Message} subclass of @b{Message} is defined in
+the H.248 Services package is defined in the H.248 Services package (@pxref{H.248 Package}) and may
+be used as an argument to this function.
+@end table
+@item RESULTS
+@table @i
+@item Status (Status)
+When the function is called synchronously, the values @b{success} indicates that the action was
+completed.  If called asynchronously, it indicates that the operation was initiated.
+@item Result (Object(*))
+Upon successful completion of a syncrhonous call, when the operation was requested in a confirmed
+mode, the result is one of the following:
+@itemize @bullet
+@item When the service is requested in a non-confirmed mode, no results are expected and the
+constant @b{Absent-Object} (@samp{GCP_ABSENT_OBJECT}) is returned as the result.
+@item When a confirmed mode service is requested, this is indicated by an instance of the OM class
+@b{Message-Result} or @b{Message-Error}, or when multiple replies are provided, an instance of OM
+class @b{Multiple-Reply}, which contains a set of instances of the OM class
+@b{Message-Linked-Reply}.  Each @b{Message-Linked-Reply} contains exactly one of the following OM
+attributes:
+@itemize ---
+@item message-Result
+@item message-Error
+@item processing-Failure
+@end itemize
+@end itemize
+@item Message-ID (Integer)
+The @b{Message-Id} of the initiated gateway control message when invoked asynchronously.  It is
+significant in the case of a confirmed mode request only.
+@end table
+@item ERRORS
+This function can return a @b{System-Error} or one of the following @b{Library-Errors}:
+bad-argument, bad-class, bad-context, bad-session, miscellaneous not-supported, session-terminated,
+reply-limit-exceeded, time-limit-exceeded.
+
+This function can return a @b{Communications-Error}.
+
+This function can also return the error constants, @perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION}, @perr{GCP_INSUFFICIENT_RESOURCES}.
+@item SEE ALSO
+@i{Abandon()},@footnote{@xref{Abandon}.}
+@i{Response()}.@footnote{@xref{Response}.}
+@item CORESPONDENCE
+This function corresponds to the H248Message of ITU-T Recommendation H.248.1.
+@end table
+
+@page
 @node Abandon
 @section Abandon()
 
@@ -2075,10 +2160,18 @@ GCP_status gcp_assoc_req(
 @end verbatim
 @end format
 @item DESCRIPTION
-This function is used to request the establishment of a gateway control association.  The service
-is defined as a non-confirmed service.  No reply is expected.
+This function is used to request the immediate establishment of a gateway control association when
+@i{Automatic Association Management} is not used.  Note that association establishment only
+performs end-to-end communication for underlying transports that are connection-oriented for MGCP,
+MEGACO and H.248; such as, TCP and SCTP.  When the underlying transport is connectionless (such as
+UDP), the association establishment can be an operation that is local to the GCP service provider.
+
+The service is defined as a non-confirmed service.  No reply is expected.
 
 This operation may only be called in synchronous mode.
+
+When @i{Automatic Association Management} is used for a gateway control session, this function is
+not used.  @xref{Open}.
 @item ARGUMENTS
 @table @i
 @item Session (Object(Session))
@@ -2091,7 +2184,7 @@ object.
 @item Argument (Object(Assoc-Argument))
 The information supplied as an argument of an @b{Assoc} operation.  This is an @b{Assoc-Argument}
 object with optional ACSE information contained within it.  An associated @b{Session} object is
-returned in the Result of this function.
+returned in the @i{Result} of this function.
 @end table
 @item RESULTS
 @table @i
@@ -2105,7 +2198,7 @@ contains a @b{Session} object in an associated state, and contains the final neg
 parameters for the new association.
 @end table
 @item ERRORS
-This functoin can return one of the following @b{Library-Errors}: bad-argument, bad-class,
+This function can return one of the following @b{Library-Errors}: bad-argument, bad-class,
 bad-context, bad-session, miscellaneous, missing-type, session-terminated, reply-limit-exceeded,
 time-limit-exceeded.
 
@@ -2827,7 +2920,7 @@ for (i = 0; i < 6; i++)
 @section Open()
 @table @b
 @item NAME
-@b{Open} --  Request establishment of a Gateway Control Services association (transaction).
+@b{Open} --  Request establishment of a Gateway Control Services association
 @item SYNOPSIS
 @format
 @verbatim
@@ -2844,18 +2937,18 @@ GCP_status gcp_open(
 @end verbatim
 @end format
 @item DESCRIPTION
-This function is used to request the creation of a gateway control entity association (transaction).
-The service is defined as a confirmed service: a reply is expected.
+This function is used to request the creation of a gateway control entity association.  The service
+is defined as a confirmed service: a reply is expected.
 
 This operation may be called in asynchronous mode.  Note that when operating in this mode, results
-may not only be locally discarded (when @b{Abandon()} is used), as may be done with outer
+may not only be locally discarded (when @b{Abandon()} is used), as may be done with other
 asynchronous calls.
 @item ARGUMENTS
 @table @i
 @item Session (Object(Session))
 The gateway control session against which this operation is performed.  This must be a private
-object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}  This session must also have ATH
-(Automatic Transaction Handling) disabled.
+object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}  This session must also have AMH
+(Automatic Message Handling) disabled.
 @item Context (Object(Context))
 The gateway control context to be used for this operation.  This argument must be a private
 object.
@@ -3948,48 +4041,267 @@ The Common GCP package introduces some additional OM syntaxes that are derivatio
 @i{String(Octet)} syntax.  These additional OM syntaxes are used to represent digit strings for
 telephony numbers and SCCP addresses.
 
-@node Transaction-Pending
-@subsection Transaction-Pending
+@node Message
+@subsection Message
+
+An instance of OM class @var{Message} represents the base information that is supplied as an
+argument to the @i{Send()} function (@pxref{Send()}) or is returned by the @i{Receive()} function
+(@pxref{Receive()}) when Automatic Message Handling is disabled on a @b{Session}.
+
+This OM class is an abstract class containing several defined subclasses:
+@b{MGCP-Message}, @b{MEGACO-Message} and @b{H248-Message}.
+
+An instance of this OM class has the OM attributes of its super-classes, @b{Object}, and
+additionally the OM attributes listed in @tabref{21}.
+
+@tabfig{xgcp_tab021,21,OM Attributes of OM class @b{Message}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item message-ID
+@item transactions
+One ore more transactions of OM class @b{Transaction} or derived classes.
+@end vtable
+
+@node Transaction
+@subsection Transaction
+
+An instance of OM class @var{Transaction} represents the base information that is supplied as an
+argument to the @i{Request()}, @i{Pending()} or @i{Response()} functions, or is returned by the
+@i{Receive()} function (@pxref{Receive()}) when Automatic Message Handling is enabled on a
+@i{Session}.
+
+This OM class is an abstract class containing several defined subclasses:
+@b{Transaction-Request}, @b{Transaction-Pending} and @b{Transaction-Response}.
+
+An instance of this OM class has the OM attributes of its super-classes, @i{Object}, and
+additionally the OM attributes listed in @tabref{22}.
+
+@tabfig{xgcp_tab022,22,OM Attributes of OM class @b{Transaction}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item transaction-ID
+@end vtable
+
+@node Action
+@subsection Action
+
+An instance of OM class @var{Action} represents an action, that is a sequence of commands, pending
+notifications or responses that are applied to a gateway control context.  This OM class is an
+abstract class containing several defined subclasses: @b{Action-Request} and @b{Action-Response}.
+An instance of this OM class has the OM attributes of its super-classes, @b{Object}, and
+additionally the OM attributes listed in @tabref{23}.
+
+@tabfig{xgcp_tab023,23,OM Attributes of OM class @b{Action}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item context-ID
+@end vtable
+
+@node Action-Request
+@subsection Action-Request
+
+An instance of OM class @var{Action-Request} represents an action that is a sequence of commands
+that are applied to a gateway control context.  This OM class is an abstract class containing
+several defined classes: @b{MGCP-Action-Request}, @b{MEGACO-Action-Request} and
+@b{H248-Action-Request}.  An instance of this OM class has the OM attributes of its super-classes,
+@b{Object} and @b{Action}, and additionally the OM attributes listed in @tabref{24}.
+
+@tabfig{xgcp_tab024,24,OM Attributes of OM class @b{Action-Request}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item commands
+One or more commands of OM class @b{Command} or derived classes, that are applicable to the context
+of the action.
+@end vtable
+
+@node Action-Response
+@subsection Action-Response
+
+An instance of OM class @var{Action-Response} represents the response to an action that is a
+sequence of responses that result from commands applied to a gateway control context.  This OM class
+is an abstract class containing several defined classes: @b{MGCP-Action-Response},
+@b{MEGACO-Action-Response} and @b{H248-Action-Response}.  An instance of this OM class has the OM
+attributes of its super-classes, @b{Object} and @b{Action}, and additionally the OM attributes
+listed in @tabref{25}.
+
+@tabfig{xgcp_tab025,25,OM Attributes of OM class @b{Action-Response}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item responses
+One ore more responses of OM class @b{Response} or derived classes, that are applicable to the
+context of the action.
+@end vtable
+
+@node Command
+@subsection Command
+
+An instance of OM class @var{Command} represents a command issued for gateway control.  This OM
+class is an abstract class containing a number of defined classes: @b{MGCP-Command},
+@b{MEGACO-Command} and @b{H248-Command}.  An instance of this OM class has the OM attributes of its
+super-classes, @b{Object}.  This OM class does not have any defined class-specific attributes.
+
+@node Response
+@subsection Response
+
+An instance of OM class @var{Response} represents the response to a gateway control command.  This
+OM class is an abstract class containing a number of defined classes: @b{MGCP-Response},
+@b{MEGACO-Response} and @b{H248-Response}.  An instance of this OM class has the OM attribuges of
+its super-classes, @b{Object}.  This OM class does not have any defined class-specific attributes.
+
 
 @node Transaction-Request
 @subsection Transaction-Request
 
 An instance of OM class @var{Transaction-Request} represents the base information that is supplied
-as an argument to the @i{Transaction-req()} function (@pxref{Transaction-req()}) or is returned by
-the @i{Receive()} function (@pxref{Receive}) for a transaction indication.
-
-This OM class is an abstract class containing several defined subclasses:
-@b{MGCP-Transaction-Request}, @b{MEGACO-Transaction-Request} and @b{H248-Transaction-Request}.
-
-An instance of this OM class has the OM attributes of its super-classes, @i{Object}, and
-additionally the OM attribute list in @tabref{20}.
+as an argument to the @i{Request()} function (@pxref{Request()}) or is returned by the @i{Receive()}
+function (@pxref{Receive}) for a transaction indication.  This OM class is an abstract class
+containing several defined subclasses: @b{MGCP-Transaction-Request}, @b{MEGACO-Transaction-Request}
+and @b{H248-Transaction-Request}.  An instance of this OM class has the OM attributes of its
+super-classes, @i{Object} and @i{Transaction}, and additionally the OM attributes listed in
+@tabref{20}.
 
 @tabfig{xgcp_tab020,20,OM Attributes of OM class @b{Transaction-Request}}
 
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item transaction-ID
-@item responder-Address
-@item responder-Title
-@item requesting-Title
+@item requests
+One or more requests of OM class @b{Action-Request} or derived classes.
 @end vtable
+
+@node Transaction-Pending
+@subsection Transaction-Pending
+
+An instance of OM class @var{Transaction-Pending} represents the base information that is supplied
+as an argument to the @i{Pending()} function (@pxref{Pending()}) or is returned by the @i{Receive()}
+function (@pxref{Receive()}) for a transaction indication.  This OM class is an abstract class
+containing several defined subclasses: @b{MGCP-Transaction-Pending}, @b{MEGACO-Transaction-Pending}
+and @b{H248-Transaction-Pending}.  An instance of this OM class has the OM attributes of its
+super-classes, @i{Object} and @i{Transaction}.  This OM class does not have any defined
+class-specific OM attributes.
 
 @node Transaction-Response
 @subsection Transaction-Response
 
 An instance of OM class @var{Transaction-Response} represents the base information that is supplied
-as an argument to the @i{Transaction-rsp()} fnction (@pxref{Transaction-rsp()}) or is returned by
-the @i{Receive()} function (@pxref{Receive}) for a transaction confirmation.
+as an argument to the @i{Response()} fnction (@pxref{Response()}) or is returned by the
+@i{Receive()} function (@pxref{Receive}) for a transaction confirmation.  This OM class is an
+abstract class containing several defined subclasses: @b{MGCP-Transaction-Response},
+@b{MEGACO-Transaction-Response} and @b{H248-Transaction-Response}.  An instance of this OM class has
+the OM attributes of its super-classes, @i{Object} and @i{Transaction}, and additionally the OM
+attributes listed in @tabref{26}.
 
-This OM class is an abstract class containing several defined subclasses:
-@b{MGCP-Transaction-Response}, @b{MEGACO-Transaction-Response} and @b{H248-Transaction-Response}.
+@tabfig{xgcp_tab026,26,OM Attributes of OM class @b{Transaction-Response}}
 
-An instance of this OM class has the OM attributes of its super-classes, @i{Object}.  As the error
-codes are Gateway Control package specific, this OM class defines no attributes of its own.
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item responses
+One or more responses of OM class @b{Action-Response} or derived classes.
+@end vtable
 
 @node MGCP Package
 @section MGCP Package
+
+@node MGCP-Message
+@subsection MGCP-Message
+
+@node MGCP-Transaction-Request
+@subsection MGCP-Transaction-Request
+
+@node MGCP-Transaction-Response
+@subsection MGCP-Transaction-Response
+
+@node MGCP-Action-Request
+@subsection MGCP-Action-Request
+
+@node MGCP-Action-Response
+@subsection MGCP-Action-Response
+
+@node MGCP-Command
+@subsection MGCP-Command
+
+@vtable @var
+@item mgcp-command-Verb
+@item mgcp-transaction-ID
+@item mgcp-endpoint-Name
+@item mgcp-version
+@item 
+@end vtable
+
+@node MGCP-Response
+@subsection MGCP-Response
+
+@vtable @var
+@item mgcp-response-Code
+@item mgcp-transaction-ID
+@item mgcp-response-String
+@end vtable
+
+@node MGCP-Endpoint-Configuration-Request
+@subsection MGCP-Endpoint-Configuration-Request
+
+@node MGCP-Endpoint-Configuration-Response
+@subsection MGCP-Endpoint-Configuration-Response
+
+@node MGCP-Create-Connection-Request
+@subsection MGCP-Create-Connection-Request
+
+@node MGCP-Create-Connection-Response
+@subsection MGCP-Create-Connection-Response
+
+@node MGCP-Modify-Connection-Request
+@subsection MGCP-Modify-Connection-Request
+
+@node MGCP-Modify-Connection-Response
+@subsection MGCP-Modify-Connection-Response
+
+@node MGCP-Delete-Connection-Request
+@subsection MGCP-Delete-Connection-Request
+
+@node MGCP-Delete-Connection-Response
+@subsection MGCP-Delete-Connection-Response
+
+@node MGCP-Notification-Request
+@subsection MGCP-Notification-Request
+
+@node MGCP-Notification-Response
+@subsection MGCP-Notification-Response
+
+@node MGCP-Notify-Request
+@subsection MGCP-Notify-Request
+
+@node MGCP-Notify-Response
+@subsection MGCP-Notify-Response
+
+@node MGCP-Audit-Endpoint-Request
+@subsection MGCP-Audit-Endpoint-Request
+
+@node MGCP-Audit-Endpoint-Response
+@subsection MGCP-Audit-Endpoint-Response
+
+@node MGCP-Audit-Connection-Request
+@subsection MGCP-Audit-Connection-Request
+
+@node MGCP-Audit-Connection-Response
+@subsection MGCP-Audit-Connection-Response
+
+@node MGCP-Restart-In-Progress-Request
+@subsection MGCP-Restart-In-Progress-Request
+
+@node MGCP-Restart-In-Progress-Response
+@subsection MGCP-Restart-In-Progress-Response
+
 
 @node MGCP Extension Packages
 @section MGCP Extension Packages
@@ -4027,6 +4339,79 @@ The following outlines the OM Class Hierarchy for the H.248 package:
 @itemize ---
 @item @i{Object} (defined in the XOM Specification: see reference @b{XOM})
 @end itemize
+
+@node H248-Message
+@subsection H248-Message
+
+@node H248-Transaction-Request
+@subsection H248-Transaction-Request
+
+@node H248-Transaction-Pending
+@subsection H248-Transaction-Pending
+
+@node H248-Transaction-Response
+@subsection H248-Transaction-Response
+
+@node H248-Action-Request
+@subsection H248-Action-Request
+
+@node H248-Action-Response
+@subsection H248-Action-Response
+
+@node H248-Command
+@subsection H248-Command
+
+@node H248-Response
+@subsection H248-Response
+
+@node H248-Add-Command
+@subsection H248-Add-Command
+
+@node H248-Add-Response
+@subsection H248-Add-Response
+
+@node H248-Modify-Command
+@subsection H248-Modify-Command
+
+@node H248-Modify-Response
+@subsection H248-Modify-Response
+
+@node H248-Subtract-Command
+@subsection H248-Subtract-Command
+
+@node H248-Subtract-Response
+@subsection H248-Subtract-Response
+
+@node H248-Move-Command
+@subsection H248-Move-Command
+
+@node H248-Move-Response
+@subsection H248-Move-Response
+
+@node H248-Audit-Value-Command
+@subsection H248-Audit-Value-Command
+
+@node H248-Audit-Value-Response
+@subsection H248-Audit-Value-Response
+
+@node H248-Audit-Capability-Command
+@subsection H248-Audit-Capability-Command
+
+@node H248-Audit-Capability-Response
+@subsection H248-Audit-Capability-Response
+
+@node H248-Notify-Command
+@subsection H248-Notify-Command
+
+@node H248-Notify-Response
+@subsection H248-Notify-Response
+
+@node H248-Service-Change-Command
+@subsection H248-Service-Change-Command
+
+@node H248-Service-Change-Response
+@subsection H248-Service-Change-Response
+
 
 @node H.248 Extension Packages
 @section H.248 Extension Packages
