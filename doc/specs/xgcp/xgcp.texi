@@ -1727,6 +1727,9 @@ Operation indication received in a gateway control service interaction.
 * Service-rsp(): Service-rsp.
 * Service-parameter(): Service-parameter.
 * Shutdown(): Shutdown.
+* Transaction-pnd(): Transaction-pnd.
+* Transaction-req(): Transaction-req.
+* Transaction-rsp(): Transaction-rsp.
 * Unbind(): Unbind.
 * Validate-object(): Validate-object.
 * Wait(): Wait.
@@ -3155,7 +3158,7 @@ This function is used to request gateway control service.
 @item ARGUMENTS
 @table @i
 @item Session (Object(Session))
-The gateway control session against which this operation is performed.  THis must be a private
+The gateway control session against which this operation is performed.  This must be a private
 object previously returned from @i{Bind()}.
 @item Context (Object(Context))
 The gateway control context to be used for this operation.  This argument must be a private
@@ -3176,12 +3179,12 @@ defined in Gateway Control Services packages.  For example, the @b{MO-Forward-SM
 If the function is called synchronously, the values @b{success} indicated that the action was
 completed.  If called asynchronously, it indicates that the operation was initiated.
 @item Result (Object(*))
-Upon successful completion of a syncrhonous coall, when the operation was requested in a confirmed
+Upon successful completion of a synchronous call, when the operation was requested in a confirmed
 mode, the result is one of the following:
 @itemize
 @item When the service is requested in a non-confirmed mode, no results are expected and the constant
 @b{Absent-Object} (@samp{GCP_ABSENT_OBJECT}) is returned as the result.
-@item When a confirmed mode services is requested, this is indicated by on instance of the OM class
+@item When a confirmed mode services is requested, this is indicated by an instance of the OM class
 @b{Service-Result}, or @b{Service-Error},
 or when multiple replies are provided, an instance of OM
 class @b{Multiple-Reply}, which contains a set of instances of the OM class
@@ -3381,6 +3384,101 @@ if ((status = gcp_shutdown(workspace)) != GCP_SUCCESS)
 exit(0);
 @end verbatim
 @end smallformat
+@end table
+
+@page
+@node Transaction-pnd
+@section Transaction-pnd()
+@table @b
+@item NAME
+@b{Transaction-pnd} --- notify of a pending requested gateway control transaction.
+@item SYNOPSIS
+@item DESCRIPTION
+@item ARGUMENTS
+@item RESULTS
+@item ERRORS
+@end table
+
+@page
+@node Transaction-req
+@section Transaction-req()
+@table @b
+@item NAME
+@b{Transaction-req} --- request a gateway control transaction.
+@item SYNOPSIS
+@format
+@verbatim
+#include <xom.h>
+#include <xgcp.h>
+
+GCP_status gcp_transaction_req(
+        OM_private_object   session,
+        OM_private_object   context,
+        OM_object           argument,
+        OM_private_object   *result_return,
+        OM_sint32           *transaction_id-return
+);
+@end verbatim
+@end format
+@item DESCRIPTION
+This function is sued to request a gateway control transaction.
+@item ARGUMENTS
+@table @i
+@item Session (Object(Session))
+The gateway control session against which this transaction is issued.  This must be a private object
+previously returned from @i{Bind()}.
+@item Context (Object(Context))
+The gateway control context to be used for this transaction (not to be confused with a ``Context''
+in the MEGACO/H.248 protocol).  This argument must be a private object or the constant
+@b{Default-Context} (@samp{GCP_DEFAULT_CONTEXT}).
+
+The transaction may be requested in a confirmed mode or a non-confirmed mode.  In confirmed mode, a
+reply is expected.
+@item Argument (Object(Transaction-Request))
+The information supplied as the argument of a gateway control transaction request is an instance of
+a subclass of the OM class @b{Transaction-Request}.  Normally, concrete subclasses of this class are
+defined in Gateway Control packages.  For example, the @b{H248-Transaction-Request} subclass of
+@b{Transaction-Request} is defined in the H.248 package (@pxref{H248-Transaction-Request}) and may
+be used as an argument to this function.
+@end table
+@item RESULTS
+@table @i
+@item Status (Status)
+If the function is called synchronously, the values @b{success} indicated that the action was
+completed.  If called asynchronously, it indicates that the operation was initiated.
+@item Result (Object(*))
+Upon successful completion of a synchronous call, when the transaction was requested in a confirmed
+mode, the result is one of the following:
+@itemize
+@item When the transaction is requested in a non-confirmed mode, no results are expected and the
+constant @b{Absent-Object} (@samp{GCP_ABSENT_OBJECT}) is returned as the result.
+@item When a confirmed mode transaction is requested, this is indicated by an instance of the OM
+class @b{Transaction-Response} or @b{Transaction-Error},
+or when multiple replies are provided, an instance of OM class @b{Multiple-Reply}, that contains a
+set of instances of the OM class @b{Service-Linked-Reply}, which contains a set of instances of the
+OM class @b{Transaction-Segmented-Reply}.  Each @b{Transaction-Linked-Reply-Argument} contains
+exactly one of the following OM attributes:
+@itemize ---
+@item transaction-Result
+@item transaction-Error
+@item processing-Failure
+@end itemize
+@end itemize
+@end table
+@item ERRORS
+@end table
+
+@page
+@node Transaction-rsp
+@section Transaction-rsp()
+@table @b
+@item NAME
+@b{Transaction-rsp} --- reply to a requested gateway control transaction.
+@item SYNOPSIS
+@item DESCRIPTION
+@item ARGUMENTS
+@item RESULTS
+@item ERRORS
 @end table
 
 @page
@@ -3635,6 +3733,238 @@ for (;;) {
 
 @node Interface Class Definitions
 @chapter Interface Class Definitions
+
+@menu
+* Global Call Hierarchy::
+* Common GCP Package::
+* MGCP Package::
+* MGCP Extension Packages::
+* MEGACO Package::
+* MEGACO Extension Packages::
+* H.248 Package::
+* H.248 Extension Packages::
+@end menu
+
+This chapter defines, in alphabetical order, the OM classes that constitute the Common GCP package
+(COMMON), the MGCP package (MGCP), the MEGACO package (MEGACO), and the H.248 package (H248).  The
+common errors are defined in the Common GCP package, while the variant specific errors are defined
+in the MGCP, MEGACO and H.248 packages.
+
+The Object-Identifier associated with the Common GCP package is:
+
+@quotation
+@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591) xom-packages(1) xgcp(2) common(1) @}
+@end quotation
+
+This Object-Identifier is represented by the constant @b{Common-Package} (@samp{GCP_COMMON_PKG}).
+
+The Object-Identifier associated with the MGCP package is:
+
+@quotation
+@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591) xom-packages(1) xgcp(2) mgcp(2) @}
+@end quotation
+
+This Object-Identifier is represented by the constant @b{MGCP-Package} (@samp{GCP_MGCP_PKG}).
+
+The Object-Identifier associated with the MEGACO package is:
+
+@quotation
+@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591) xom-packages(1) xgcp(2) megaco(3) @}
+@end quotation
+
+This Object-Identifier is represented by the constant @b{MEGACO-Package} (@samp{GCP_MEGACO_PKG}).
+
+The Object-Identifier associated with the H.248 package is:
+
+@quotation
+@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591) xom-packages(1) xgcp(2) h248(4) @}
+@end quotation
+
+This Object-Identifier is represented by the constant @b{H248-Package} (@samp{GCP_H248_PKG}).
+
+The XGCP API may also make use of Gateway Control Services packages.  These optional packages define
+OM classes that are additional to those in the Gateway Control packages, to extend the capabilities
+of the interface.
+
+The concepts of OSI-Abstract-Data Manipulation are briefly described in @ref{Relationship to Data
+Abstraction Services}.  The notation is introduced below.  Both are fully explained in the XOM
+Specification (see reference XOM). 
+
+Each OM class is described in a separate section, which identifies the OM attributes specific to
+that OM class.  The OM classes are listed in alphabetic order; the OM attributes for each OM class
+are listed in the order in which they occur in corresponding ASN.1 definitions.  The OM attributes
+that may be found in an instance of an OM class are those OM attributes specific to that OM class
+and those inherited from each of its super-classes.  The OM class-specific OM attributes are defined
+in a table.  The table gives the name of each OM attribute, the syntax of each of its values, any
+restrictions upon the length (in bits, octets (bytes), or characters) of each value, any
+restrictions upon the number of values, and the value, if any, the @i{OM-Create()} function
+supplies.
+
+@subheading Vendor Extensions
+
+Vendors may provide additional OM attributes in their implementation of particular OM classes and
+their individual documentation will give details of the specification and usage of these.
+Extensions must be negotiated through use of the @i{Negotiate()} function.
+
+All such OM attributes have default values which lead to the behaviour described in this
+specification.
+
+@node Global Call Hierarchy
+@section Global Call Hierarchy
+
+@menu
+* Interface Common Objects::
+* Interface Common Error Definitions::
+* MGCP Package Objects::
+* MEGACO Package Objects::
+* H248 Package Objects::
+@end menu
+
+This section depicts the hierarchical organization of the OM classes defined in this chapter, and
+thus shows which OM classes inherit additional OM attributes from their super-classes.
+Sub-classification is indicated by indentation, and the names of abstract OM classes are rendered in
+italics.  Thus, for example, the concrete class @b{SCTP-Address} is an immediate subclass of the
+abstract class @i{Address} which in turn is an immediate subclass of the abstract class @i{Object}.
+The @i{Create()} function applies to all concrete OM classes.
+
+The application is not permitted to create or modify instances of some OM classes, because these OM
+classes are only returned by the interface and never supplied to it (for example, some subclasses of
+@i{Error}).
+
+@itemize
+@item @i{Object} (defined in the XOM Specification: see reference @b{XOM})
+@end itemize
+
+@node Interface Common Objects
+@subsection Interface Common Objects
+
+@itemize
+@item @i{Object} (defined in the XOM Specification: see reference @b{XOM})
+@end itemize
+
+@node Interface Common Error Definitions
+@subsection Interface Common Error Definitions
+
+@itemize
+@item @i{Object} (defined in the XOM Specification: see reference @b{XOM})
+@end itemize
+
+@node MGCP Package Objects
+@subsection MGCP Package Objects
+
+@itemize
+@item @i{Object} (defined in the XOM Specification: see reference @b{XOM})
+@end itemize
+
+@node MEGACO Package Objects
+@subsection MEGACO Package Objects
+
+@itemize
+@item @i{Object} (defined in the XOM Specification: see reference @b{XOM})
+@end itemize
+
+@node H248 Package Objects
+@subsection H248 Package Objects
+
+@itemize
+@item @i{Object} (defined in the XOM Specification: see reference @b{XOM})
+@end itemize
+
+@node Common GCP Package
+@section Common GCP Package
+
+@menu
+* Transaction-Pending::
+* Transaction-Request::
+* Transaction-Response::
+@end menu
+
+The Common GCP package introduces some additional OM syntaxes that are derivations of the
+@i{String(Octet)} syntax.  These additional OM syntaxes are used to represent digit strings for
+telephony numbers and SCCP addresses.
+
+@node Transaction-Pending
+@subsection Transaction-Pending
+
+@node Transaction-Request
+@subsection Transaction-Request
+
+An instance of OM class @var{Transaction-Request} represents the base information that is supplied
+as an argument to the @i{Transaction-req()} function (@pxref{Transaction-req()}) or is returned by
+the @i{Receive()} function (@pxref{Receive}) for a transaction indication.
+
+This OM class is an abstract class containing several defined subclasses:
+@b{MGCP-Transaction-Request}, @b{MEGACO-Transaction-Request} and @b{H248-Transaction-Request}.
+
+An instance of this OM class has the OM attributes of its super-classes, @i{Object}, and
+additionally the OM attribute list in @tabref{20}.
+
+@tabfig{xgcp_tab020,20,OM Attributes of OM class @b{Transaction-Request}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item transaction-ID
+@item responder-Address
+@item responder-Title
+@item requesting-Title
+@end vtable
+
+@node Transaction-Response
+@subsection Transaction-Response
+
+An instance of OM class @var{Transaction-Response} represents the base information that is supplied
+as an argument to the @i{Transaction-rsp()} fnction (@pxref{Transaction-rsp()}) or is returned by
+the @i{Receive()} function (@pxref{Receive}) for a transaction confirmation.
+
+This OM class is an abstract class containing several defined subclasses:
+@b{MGCP-Transaction-Response}, @b{MEGACO-Transaction-Response} and @b{H248-Transaction-Response}.
+
+An instance of this OM class has the OM attributes of its super-classes, @i{Object}.  As the error
+codes are Gateway Control package specific, this OM class defines no attributes of its own.
+
+@node MGCP Package
+@section MGCP Package
+
+@node MGCP Extension Packages
+@section MGCP Extension Packages
+
+@node MEGACO Package
+@section MEGACO Package
+
+@node MEGACO Extension Packages
+@section MEGACO Extension Packages
+
+@node H.248 Package
+@section H.248 Package
+
+The H.248 package provides specialization of the argument and result objects of the Common GCP
+package to provide for the services under the H.248 GCP as described in ITU-T Recommendation
+H.248.1.  This package is organized as a separate OM package that can be negotiated using the
+@i{Negotiate()} function.@footnote{@xref{Negotiate}.}
+
+The Object-Identifier associated with the H.248 package is:
+@smallformat
+@verbatim
+{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+  xom-packages(1) xgcp(2) h248(4) }
+@end verbatim
+@end smallformat
+This Object-Identifier is represented by the constant @b{H248-Package} (@samp{GCP_H248_PKG}).  This
+constant can be used to negotiate support for the package using the @i{Negotiate()} function.
+
+The H.248 GCP package introduces some additional OM syntaxes that are derivations of the
+@i{String(Octet)} syntax.  These additional OM syntaxes are used to represent digit strings and
+telephony  numbers. @xref{String(Address)}.
+
+The following outlines the OM Class Hierarchy for the H.248 package:
+
+@itemize ---
+@item @i{Object} (defined in the XOM Specification: see reference @b{XOM})
+@end itemize
+
+@node H.248 Extension Packages
+@section H.248 Extension Packages
 
 Commands:
 

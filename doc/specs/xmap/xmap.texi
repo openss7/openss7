@@ -3618,7 +3618,7 @@ The Object-Identifier associated with the GSM MAP package is:
 
 This Object-Identifier is represented by the constant @b{GSM-Package} (@samp{MAP_GSM_PKG}).
 
-The Object-Identifier associated wtih the ANSI MAP package is:
+The Object-Identifier associated with the ANSI MAP package is:
 
 @quotation
 @{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591) xom-packages(1) xmap(1) ansi(3) @}
@@ -3646,7 +3646,7 @@ Each OM class is described in a separate section, which identifies the OM attrib
 that OM class.  The OM classes are listed in alphabetic order; the OM attributes for each OM class
 are listed in the order in which they occur in corresponding ASN.1 definitions.  The OM attributes
 that may be found in an instance of an OM class are those OM attributes specific to that OM class
-and those inherited from each of its superclasses.  The OM class-specific OM attributs are defined
+and those inherited from each of its super-classes.  The OM class-specific OM attributes are defined
 in a table.  The table gives the name of each OM attribute, the syntax of each of its values, any
 restrictions upon the length (in bits, octets (bytes), or characters) of each value, any
 restrictions upon the number of values, and the value, if any, the @i{OM-Create()} function
@@ -3671,12 +3671,12 @@ specification.
 * ANSI MAP Package Objects::
 @end menu
 
-This section depicts the hierarchical organizatino of the OM classes defined in this chapter, and
-thus shows which OM classes inherit additional OM attributes from their superclasses.
-Subclassification is indicated by indentation, and the names of abstract OM classes are rendered in
-italics.  Thus, for example, the concrete class @b{Itut-SCCP-Address} is an immediate subclass of the
-abstract class @i{Address} which in turn is an immediate subclass of the abstract class @i{Object}.
-The @i{Create()} function applies to all concrete OM classes.
+This section depicts the hierarchical organization of the OM classes defined in this chapter, and
+thus shows which OM classes inherit additional OM attributes from their super-classes.
+Sub-classification is indicated by indentation, and the names of abstract OM classes are rendered in
+italics.  Thus, for example, the concrete class @b{Itut-SCCP-Address} is an immediate subclass of
+the abstract class @i{Address} which in turn is an immediate subclass of the abstract class
+@i{Object}.  The @i{Create()} function applies to all concrete OM classes.
 
 The application is not permitted to create or modify instances of some OM classes, because these OM
 classes are only returned by the interface and never supplied to it (for example, some subclasses of
@@ -4807,7 +4807,7 @@ This Object-Identifier is represented by the constant @b{GSM-Package} (@samp{MAP
 constant can be used to negotiate support for the package using the @i{Negotiate()} function.
 
 GSM MAP package introduces some additional OM syntaxes that are derivations of the @i{String(Octet)}
-syntax.  These additional OM syntaxes are used to represent digit strings and telphony numbers.
+syntax.  These additional OM syntaxes are used to represent digit strings and telephony numbers.
 @xref{String(Address)}.
 
 The following outlines the OM Class Hierarchy for the GSM MAP package:
@@ -4893,7 +4893,7 @@ one or more octets, consisting of:
 
 @itemize
 @item one octet for nature of address and numbering plan indicator;
-@item digits of an addres encoded as String(TBCD).
+@item digits of an address encoded as String(TBCD).
 @end itemize
 
 The first octet includes a one bit extension indicator, 3-bit nature of address indicator, and 4-bit
