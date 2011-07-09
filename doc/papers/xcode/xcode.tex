@@ -968,8 +968,16 @@ purpose.  This synchronization results in a switching matrix with the mated
 D-SBGs that is identical.  To handle D-SBG node failures, then, consists of
 performing an IP takeover (gratuitous ARP) or APS fail-over between nodes.
 
+Barring the availability of an H.248 interface to the D-SBG (primarily due to
+the lack of a suitable stack), a custom protocol can be implemented between
+mated D-SBG.  SCTP could also be used for transport of this protocol.  The
+protocol sould be a simple transaction update, where a checkpoint state is
+transmitted between MG implementations.  The MG implementation used,
+illustrated in blue in {\sl Figure \ref{figure:xc09}}, is the {\sl OpenSS7} MG
+Driver.  This is a kernel-space {\sl STREAMS} implementation.
+
 To maintain S-SBG synchronization, a custom protocol can be implemented between
-mated S-SBG. SCTP could also be used for transport of this protocol.  The
+mated S-SBG.  SCTP could also be used for transport of this protocol.  The
 protocol would be a simple transaction update, where a checkpoint state is
 transmitted between SIP implementations.  The SIP implementation used,
 illustrated in red in {\sl Figure \ref{figure:xc09}}, is the {\sl sofia} SIP
