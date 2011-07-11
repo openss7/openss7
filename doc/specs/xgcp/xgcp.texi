@@ -1074,15 +1074,9 @@ boundary, the implementation will resolve the Name to the appropriate Title or A
 @section Session
 
 @menu
-* AAM Enabled Session::
-* AAM Disabled Session::
-* Associated Session::
-* AMH Enabled Session::
-* AMH Disabled Session::
-* Message Session::
-* ADH Enabled Session::
-* ADH Disabled Session::
-* Dialog Session::
+* Association Management::
+* Message Handling::
+* Dialog Handling::
 @end menu
 
 A session identifies to which gateway control entity a particular operation will be sent.  It
@@ -1091,12 +1085,12 @@ first argument to most interface functions.
 
 A session is described by an OM object of OM class @b{Session}.@footnote{@xref{Session}.}  It is
 created, and appropriate parameter values may be set, using the OSI-Abstract-Data Manipulation
-functions.  A gateway control session is then started with @i{Bind()}@footnote{@xref{Bind}.} and
-later is terminated with @i{Unbind()}.  A session with default parameters can be started by passing
-the constant @b{Default-Session} (@samp{(OM_object)GCP_DEFAULT_SESSION}) as the @b{Session} argument
-to @i{Bind()}.  @i{Bind()} must be called before the @b{Session} can be used as an argument to any
-other function in the interface.  After @i{Unbind()} has been called, @i{Bind()} must be called
-again if another session is to be started.
+functions.  A gateway control session is then started with @i{Bind()} (@pxref{Bind}) and later is
+terminated with @i{Unbind()} (@pxref{Unbind}).  A session with default parameters can be started by
+passing the constant @b{Default-Session} (@samp{(OM_object)GCP_DEFAULT_SESSION}) as the @b{Session}
+argument to @i{Bind()}.  @i{Bind()} must be called before the @b{Session} can be used as an argument
+to any other function in the interface.  After @i{Unbind()} has been called, @i{Bind()} must be
+called again if another session is to be started using the same session object.
 
 The interface supports multiple concurrent sessions, so that an application implemented as a single
 process, such as a service in a client-service model, can interface with the Gateway Control
@@ -1128,8 +1122,17 @@ There are three aspects of session objects, as follows:
 
 These aspects are described in sub-sections below.
 
+@node Association Management
+@subsection Association Management
+
+@menu
+* AAM Enabled Session::
+* AAM Disabled Session::
+* Associated Session::
+@end menu
+
 @node AAM Enabled Session
-@subsection AAM Enabled Session
+@subsubsection AAM Enabled Session
 
 The @b{Session} collects together all the information that described a particular gateway control
 interaction.  The parameters that are to control such a session are set up in an instance of this OM
@@ -1156,7 +1159,7 @@ This type of session object can not be used to receive or send ACSE related prim
 explicitly.  To use ACSE explicitly, see @ref{AAM Disabled Session}.
 
 @node AAM Disabled Session
-@subsection AAM Disabled Session
+@subsubsection AAM Disabled Session
 
 A session object can has @dfn{Automatic Association Management (AAM)} disabled when it belongs to a
 workspace that has had @dfn{AAM} disabled with @i{Negotiate()}.  Disabling @dfn{AAM} allows the user
@@ -1199,7 +1202,7 @@ The other attributes that relate to the underlying transport are specified withi
 @i{Assoc-rsp()}, or @i{Receive()}.
 
 @node Associated Session
-@subsection Associated Session
+@subsubsection Associated Session
 
 Once a user has created a bound session that has AAM disabled, an association can be created.  An
 association is represented by an @dfn{associated} or @dfn{partially associated} session object.  An
@@ -1218,8 +1221,17 @@ To terminate this type of session, the user should either abort the session, whi
 unbinds the session.  If the user unbinds the associated session prior to aborting the association,
 the service provider will abort the association.
 
+@node Message Handling
+@subsection Message Handling
+
+@menu
+* AMH Enabled Session::
+* AMH Disabled Session::
+* Message Session::
+@end menu
+
 @node AMH Enabled Session
-@subsection AMH Enabled Session
+@subsubsection AMH Enabled Session
 
 The AMH enabled session allows a gateway control entity to invoke and respond to gateway control
 services requests and indications without regard for message handling.  The Gateway Control Services
@@ -1229,7 +1241,7 @@ This type of session cannot be used to send messages explicitly.  To dispatch me
 see @ref{AMH Disabled Session}.
 
 @node AMH Disabled Session
-@subsection AMH Disabled Session
+@subsubsection AMH Disabled Session
 
 A session object can have @dfn{Automatic Message Handling} disabled when it belongs to a workspace
 that has @dfn{Automatic Message Handling} disabled using the @i{Negotiate()} function.  This allows
@@ -1251,7 +1263,7 @@ The other attributes that relate to message handling are specified within the @b
 @b{Message-Result} objects that are passed to, or returned from, @i{Send()} or @i{Receive()}.
 
 @node Message Session
-@subsection Message Session
+@subsubsection Message Session
 
 Once a user has created a bound or associated session that has AMH disabled, a message can be
 created.  A message is represented by a @dfn{fully formed}, or @dfn{partially formed} @dfn{message},
@@ -1271,21 +1283,72 @@ implicitly unbinds the session.  If the user unbinds the message session prior t
 aborting the message, the service provider will first attempt to close the message, and if that is
 rejected, will abort the message.
 
+@node Dialog Handling
+@subsection Dialog Handling
+
+@menu
+* ADH Enabled Session::
+* ADH Disabled Session::
+* Dialog Session::
+@end menu
+
+MGCP only permits one service request or response per message.  For MGCP dialog handling is trivial
+and can be handled automatically by the Gateway Control Service provider.
+
+MEGACO and H.248, on the other hand, permit multiple commands within multiple communications
+contexts per transaction (where each transaction is essentially a dialogue).  Actions or commands
+that are send within a transaction are executed in sequential order, where the first action or
+command must be completed before the next action or command is initiated.  There is no guarantee of
+synchronization or timing between actions or commands that are placed in separate transactions.
+Therefore, for actions or commands that must be executed in order, there are two approaches from an
+API perspective:
+
+@enumerate
+
+@item Issue the commands or actions in separate transactions; however, do not issue a subsequent
+action or command until the response to the preceding action or command has been received.  Actions
+or commands can be issued synchronously or asynchronously, without affecting the sequence of events,
+just allowing the calling process to proceed and do other things awaiting message receipt.
+
+@item Collect the commands or actions into a single transaction.
+
+@end enumerate
+
+Note that the first method is the only method applicable to MGCP because MGCP does not permit
+actions or commands to be grouped into transactions: there is imply one action per message.  This
+does not cause any logical difficulties for MGCP with the minor exception that if a message is lost,
+a noticeable delay might occur between actions or commands.@footnote{In practise, MGC and MG
+equipment is often collocated or not very distant and is connected by clean, high bandwidth
+connections.}
+
+In general, the Gateway Control Services provider acting on behalf of a service invoker can select
+the mosts appropriate approach from those outlined above and made possible by the Standards;
+however, the XGCP interface requires a mechanism for communicating which actions or commands depend
+upon which others, and whether the remainder of the sequence be encountered should an error be
+encountered for one of the actions or commands in the sequence.
+
+To distinguish groupings of actions or commands, actions or commands can be grouped into dialogues.
+Dialogues are a sequence of operations the form a unit.  They are directly related to
+`transactions' in ITU-T Recommendation H.248.1 (09/2005).
+
 @node ADH Enabled Session
-@subsection ADH Enabled Session
+@subsubsection ADH Enabled Session
 
-The ADH enabled session allows a gateway control entity to invoke and respond to gateway control
-services requests and indications without regards for transaction handling.  The Gateway Control
-Services provider provides all transaction handling.
+A session object has @dfn{Automatic Dialog Handling (ADH)} enabled by default, or when it belongs to
+a workspace that has had @dfn{ADH} disabled using the @i{Negotiate()} function.  The @dfn{ADH}
+enabled session allows a gateway control entity to invoke and respond to gateway control services
+requests and indications without regards for dialog handling.  The Gateway Control Services
+provider provides all dialog handling.
 
-This type of session cannot be used to send transaction handling primitives or operations
-explicitly.  To use transaction handling explicitly, see @ref{ADH Disabled Session}.
+This type of session cannot be used to send dialog handling primitives or operations explicitly.  To
+use dialog handling explicitly, see @ref{ADH Disabled Session}.
 
 @node ADH Disabled Session
-@subsection ADH Disabled Session
+@subsubsection ADH Disabled Session
 
-A session object can have @dfn{Automatic Dialog Handling} disabled when it belongs to a
-workspace that has @dfn{Automatic Dialog Handling} disabled using the @i{Negotiate()} function.
+A session object has @dfn{Automatic Dialog Handling (ADH)} disabled when it belongs to a workspace
+that has had @dfn{ADH} disabled using the @i{Negotiate()} function.
+
 This allows the user to explicitly send and receive transaction handling operations to establish,
 group and dispatch transactions.  It gives explicit control over transactions to the user.  The
 Gateway Control Service provider does no transaction handling operations on behalf of the user.
@@ -1299,9 +1362,9 @@ primitives.  The following can be sent/received using this type of bound or asso
 @item @i{Receive()} (@command{gcp_receive()}/@samp{GCP_OPEN_IND})
 @item @i{Receive()} (@command{gcp_receive()}/@samp{GCP_ACCEPT_CNF})
 @item @i{Receive()} (@command{gcp_receive()}/@samp{GCP_REFUSE_CNF})
-@item @i{Open()} (@command{gcp_open()})
-@item @i{Accept()} (@command{gcp_accept()})
-@item @i{Refuse()} (@command{gcp_refuse()})
+@item @i{Open()} (@command{gcp_open()}) @xref{Open}.
+@item @i{Accept()} (@command{gcp_accept()}) @xref{Accept}.
+@item @i{Refuse()} (@command{gcp_refuse()}) @xref{Refuse}.
 @end itemize
 
 The other attributes that relate to transaction handling are specified within the @b{Open-Argument},
@@ -1309,7 +1372,7 @@ The other attributes that relate to transaction handling are specified within th
 @i{Accept()}, @i{Refuse()}, or @i{Receive()}.
 
 @node Dialog Session
-@subsection Dialog Session
+@subsubsection Dialog Session
 
 Once a user has created a bound or associated session that has ADH disabled, a transaction can be
 created.  A transaction is represented by a @dfn{fully formed}, or @dfn{partially formed}
@@ -2790,7 +2853,7 @@ object or the constant @b{Default-Context} (@samp{GCP_DEFAULT_CONTEXT}).
 @item Dialog-ID (Integer)
 The @b{Dialog-ID} of the requested dialog on which to issue accumulated service requests and
 responses.  This @b{Dialog-ID} must have been returned from a call to
-@i{Open()}@footnote{@xref{Open}.} or @i{Receive()}@footnote{@xref{Receive}} for the corresponding
+@i{Open()}@footnote{@xref{Open}.} or @i{Receive()}@footnote{@xref{Receive}.} for the corresponding
 association for which pending service requests and responses are being issued.
 @end table
 @item RESULTS
@@ -4114,6 +4177,9 @@ classes are only returned by the interface and never supplied to it (for example
 @section Common GCP Package
 
 @menu
+* Abort-Argument::
+* Abort-Result::
+* Accept-Result::
 * Acse-Args::
 * Action::
 * Action-Request::
@@ -4122,14 +4188,31 @@ classes are only returned by the interface and never supplied to it (for example
 * Application-Context-List::
 * Assoc-Argument::
 * Assoc-Result::
+* Close-Argument::
 * Command::
 * Context::
 * Extension::
+* Generic-Service-Argument::
+* Generic-Service-Result::
 * Gcp-Assoc-Args::
+* Notice-Result::
 * Message::
+* Open-Argument::
+* Operation-Argument::
+* Operation-Error::
+* Operation-Reject::
+* Operation-Result::
+* P-Abort-Result::
 * Presentation-Context::
 * Presentation-Layer-Args::
+* Refuse-Result::
+* Release-Argument::
+* Release-Result::
 * Response::
+* Service-Argument::
+* Service-Error::
+* Service-Reject::
+* Service-Result::
 * Session::
 * Title::
 * Transaction-Request::
@@ -4141,6 +4224,66 @@ classes are only returned by the interface and never supplied to it (for example
 The Common GCP package introduces some additional OM syntaxes that are derivations of the
 @i{String(Octet)} syntax.  These additional OM syntaxes are used to represent digit strings for
 telephony numbers and SCCP addresses.
+
+@node Abort-Argument
+@subsection Abort-Argument
+@vindex Abort-Argument
+
+An instance of abstract OM class @i{Abort-Argument} represents the base information passed as the
+@i{Argument} argument to the @i{Abort()} function (@pxref{Abort}) or returned from the @i{Receive()}
+function (@pxref{Receive}) in the @i{Result-Or-Argument} result for a user abort indication.
+
+This OM class is an abstract class with several defined concrete subclasses:
+@b{MGCP-Abort-Argument}, @b{MEGACO-Abort-Argument} and @b{H248-Abort-Argument}.  An instance of this
+OM class has the OM attributes of its super-classes, @i{Object} and @i{Error}.  It does not define
+any attributes of its own.  Because abort causes are Gateway Control package specific, this abstract
+OM class does not define any of the values for the @var{problem} or @var{parameter} attributes of
+the @i{Error} super-class.
+
+@node Abort-Result
+@subsection Abort-Result
+@vindex Abort-Result
+
+An instance of abstract OM class @i{Abort-Result} represents the base information passed as the
+@i{Argument} argument to the @i{Abort-req()} function (@pxref{Abort-req}) or returned from the
+@i{Receive()} function (@pxref{Receive}) in the @i{Result-Or-Argument} result for an association
+abort indication.
+
+This OM class is an abstract class with several defined concrete subclasses: @b{MGCP-Abort-Result},
+@b{MEGACO-Abort-Result} and @b{H248-Abort-Result}.  An instance of this OM class has the OM
+attributes of its super-classes: @i{Object} and @i{Error}.  It does not define any attributes of its
+own.  Because abort result error codes are Gateway Control package specific, this abstract class
+does not define any of the @var{problem} or @var{parameter} syntaxes of the @i{Error} super-class.
+
+@node Accept-Result
+@subsection Accept-Result
+@vindex Accept-Result
+
+An instance of abstract OM class @i{Accept-Result} represents the base information passed as the
+@i{Response} argument to the @i{Accept()} function (@pxref{Accept}) or returned from the
+@i{Receive()} function (@pxref{Receive}) in the @i{Result-Or-Argument} result for an accept
+indication.  This OM class is an abstract class with several defined concrete subclasses:
+@b{MGCP-Accept-Result}, @b{MEGAGO-Accept-Result} and @b{H248-Accept-Result}.
+
+An instance of this OM class has the OM attributes of it super-classes, @i{Object}, and additionally
+the OM attributes listed in @tabref{39}.
+
+@tabfig{xgcp_tab039,39,OM Attributes of OM class @i{Accept-Result}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+
+@item session
+Used to return to the user a fully formed dialog session object.  This object may be used for all
+future interface calls pertaining to this new dialog.
+
+@end vtable
+
+When this object is received as a @i{Result-Or-Argument} result in a call to @i{Receive()}
+(@pxref{Receive}), the @i{Get-Assoc-Info()} interface function can be used to retrieve additional
+details concerning the association.  @xref{Get-Assoc-Info}.
+
 
 @node Acse-Args
 @subsection Acse-Args
@@ -4368,6 +4511,20 @@ Used to return to the user an associated session object.  This object may be use
 interface calls pertaining to this new association.
 @end vtable
 
+@node Close-Argument
+@subsection Close-Argument
+@vindex Close-Argument
+
+An instance of abstract OM class @i{Close-Argument} represents the base information that is supplied
+as the @i{Argument} argument to the @i{Close()} interface function (@pxref{Close}) or is returned by
+the @i{Receive()} function (@pxref{Receive}) in the @i{Result-Or-Argument} result for a close
+indication.
+
+This OM class is an abstract class with several defined concrete subclasses:
+@b{MGCP-Close-Argument}, @b{MEGACO-Close-Argument} and @b{H248-Close-Argument}.  An instance of this
+abstract OM class has the OM attributes of its super-classes, @i{Object}.  It does not define any OM
+attributes of its own.
+
 @node Command
 @subsection Command
 @vindex Command
@@ -4426,6 +4583,72 @@ This OM class contains the following class-specific attributes:
 This attribute is a syntax that represents the ASN.1 encoding of the extension complete with tags.
 @end vtable
 
+@node Generic-Service-Argument
+@subsection Generic-Service-Argument
+@vindex Generic-Service-Argument
+
+An instance of OM class @b{Generic-Service-Argument} represents a generic service request
+independent of a defined Gateway Control Services package.  This object is used to support service
+requests that have not been defined in a Gateway Control Services package, or for a Gateway Control
+Services package that is not supported by the implementation workspace.
+
+An instance of this OM class has the attributes of its super-classes, @i{Service-Request}, and
+additionally the OM attributes listed in @tabref{41}.
+
+@tabfig{xgcp_tab041,41,OM Attributes of OM class @b{Generic-Service-Argument}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+
+@item confirmation
+This attribute is a boolean value that specifies whether the operation is performed in the confirmed
+or unconfirmed mode.  When performed in a confirmed mode, a response is expected.  When performed in
+an unconfirmed mode, no response is expected.  This attribute determines which operations class will
+be used for the underlying invoke operation.
+
+@item operation
+This attribute specifies the ROSE/TCAP operation code associated with the service request as either
+an integer or object identifier.  Whether an integer or object identifier is used depends upon the
+underlying ROSE/TCAP provider and may differ depending on the Gateway Control package in use. 
+
+@item arguments
+This attribute specifies the parameters of the operation invocation as one or more instances of OM
+class @i{Encoding}.  This encoding class will be encapsulated in a Parameter Sequence by the
+underlying ROSE/TCAP provider.
+
+@end vtable
+
+@node Generic-Service-Result
+@subsection Generic-Service-Result
+@vindex Generic-Service-Result
+
+An instance of OM class @b{Generic-Service-Result} represents a generic service response independent
+of a defined Gateway Control Services package.  This object is used to support service responses
+that have not been defined in a Gateway Control Services package, or for a Gateway Control Services
+package that is not supported by the implementation workspace.
+
+An instance of this OM class has the attributes of its super-classes, @i{Service-Result}, and
+additionally the OM attributes listed in @tabref{42}.
+
+@tabfig{xgcp_tab042,42,OM Attributes of OM class @b{Generic-Service-Result}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+
+@item operation
+This attribute specifies the ROSE/TCAP operation code associated with the service request as either
+an integer or an object identifier.  Whether an integer or object identifier is used depends upon
+the underlying ROSE/TCAP provider and may differ depending on the Gateway Control package in use.
+
+@item response
+This attribute specifies the parameters of the operation invocation as one or more instances of OM
+class @i{Encoding}.  This encoding class will be encapsulated in a Parameter Sequence by the
+underlying ROSE/TCAP provider.
+
+@end vtable
+
 @node Gcp-Assoc-Args
 @subsection Gcp-Assoc-Args
 @vindex Gcp-Assoc-Args
@@ -4444,6 +4667,18 @@ This OM class contains the following class-specific OM attributes:
 @item application-Context-List
 @item version-List
 @end vtable
+
+@node Notice-Result
+@subsection Notice-Result
+@vindex Notice-Result
+
+An instance of abstract OM class @i{Notice-Result} represents the base information that is returned
+in the @i{Result-Or-Argument} result by the @i{Receive()} function (@pxref{Receive}) for a notice
+indication.
+
+This OM class is an abstract class with several defined concrete subclasses: @b{MGCP-Notice-Result},
+@b{MEGACO-Notice-Result} and @b{H248-Notice-Result}.  An instance of this OM class has the OM
+attributes of its super-classes, @i{Object}.  It does not define any OM attributes of its own.
 
 @node Message
 @subsection Message
@@ -4468,6 +4703,86 @@ This OM class contains the following class-specific OM attributes:
 @item transactions
 One ore more transactions of OM class @b{Transaction} or derived classes.
 @end vtable
+
+@node Open-Argument
+@subsection Open-Argument
+@vindex Open-Argument
+
+An instance of abstract OM class @i{Open-Argument} represents the base information that is supplied
+as an argument to the @i{Open()} function (@pxref{Open}) or is returned by the @i{Receive()}
+function (@pxref{Receive}) for an open indication.
+
+This OM class is an abstract class with several defined concrete subclasses: @b{MGCP-Open-Argument},
+@b{MEGACO-Open-Argument} and @b{H248-Open-Argument}.  An instance of this OM class has the OM
+attributes of its super-classes, @i{Object}, and additionally the OM attributes listed in
+@tabref{40}.
+
+@tabfig{xgcp_tab040,40,OM Attributes of OM abstract class @i{Open-Argument}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+
+@item responder-Address
+Specifies the responder address (the address of the remote gateway control entity) for a bound
+session object with @dfn{Automatic Association Management (AAM)} enabled.  This address takes
+precedence over any @var{responder-Address} contained in the @b{Context} or @b{Session} objects.
+For an associated session object, the precedence rules are different and the @i{Open-Argument}
+object cannot be used to override the @var{responder-Address} contained in the @b{Session} object.
+
+@item responder-Title
+Specifies the responder title.  This title takes precedence over any @var{responder-Title} contained
+in the @b{Context} or @b{Session} objects.  When not specified by any object, the Gateway Control
+Service provider will not include a responder title in the open request.
+
+@item requesting-Address
+The @var{requesting-Address} contained in the @i{Open-Argument} cannot be used to override any
+requesting address contained in the @b{Session} object.
+
+@item requesting-Title
+Specifies the requesting title.  This title takes precedence over any @var{requesting-Title}
+contained in the @b{Context} or @b{Session} objects.  When not specified by any object, the Gateway
+Control Service provider will not include a requesting title.
+
+@item session
+Used to return a partially formed dialog @b{Session} object.  This attribute must be empty when
+@i{Open()} is called, and is supplied as a @i{Result} parameter by the Gateway Control Service
+provider upon return from that call.  The partially formed dialog session can either be aborted with
+a call to @i{Abort()} (@pxref{Abort}), or can become a fully formed dialog session with a call to
+@i{Accept()} (@pxref{Accept}).  To abort the partially formed dialog session, call @i{Abort()} using
+the new partially formed dialog session object.  To accept or refuse the new dialog, call
+@i{Accept()} or @i{Refuse()} using the session object that received the association indication.
+
+@end vtable
+
+@node Operation-Argument
+@subsection Operation-Argument
+@vindex Operation-Argument
+
+@node Operation-Error
+@subsection Operation-Error
+@vindex Operation-Error
+
+@node Operation-Reject
+@subsection Operation-Reject
+@vindex Operation-Reject
+
+@node Operation-Result
+@subsection Operation-Result
+@vindex Operation-Result
+
+@node P-Abort-Result
+@subsection P-Abort-Result
+@vindex P-Abort-Result
+
+An instance of OM abstract class @i{P-Abort-Result} represents the base information returned in the
+@i{Result-Or-Argument} result from the @i{Receive()} function (@pxref{Receive}) for a provider abort
+indication.
+
+This OM class is an abstract class with several defined concrete subclasses:
+@b{MGCP-P-Abort-Result}, @b{MEGACO-P-Abort-Result} and @b{H248-Abort-Result}.  An instance of this
+OM class has the OM attributes of its super-classes, @i{Object} and @i{Error}.  It does not defined
+any OM attributes of its own.
 
 @node Presentation-Context
 @subsection Presentation-Context
@@ -4531,6 +4846,28 @@ specified in the @var{requester-Address} or @var{requester-Title}, the
 for remote Gateway Control Service indications.  There are two well-known ports defined: one for
 binary encoding and another for text encoding.
 
+@node Refuse-Result
+@subsection Refuse-Result
+@vindex Refuse-Result
+
+An instance of abstract OM class @i{Refuse-Result} represents the base information that is supplied
+as the @i{Response} argument to the @i{Refuse()} function (@pxref{Refuse}) or is returned by the
+@i{Receive()} function (@pxref{Receive}) in the @i{Result-Or-Argument} result for a refuse
+indication.
+
+This OM class is an abstract class with several defined concrete subclasses: @b{MGCP-Refuse-Result},
+@b{MEGACO-Refuse-Result} and @b{H248-Refuse-Result}.
+An instance of this OM class has the OM attributes of its super-classes, @i{Object}.  It does not
+define any OM attributes of its own.
+
+@node Release-Argument
+@subsection Release-Argument
+@vindex Release-Argument
+
+@node Release-Result
+@subsection Release-Result
+@vindex Release-Result
+
 @node Response
 @subsection Response
 @vindex Response
@@ -4539,6 +4876,90 @@ An instance of OM class @var{Response} represents the response to a gateway cont
 OM class is an abstract class containing a number of defined classes: @b{MGCP-Response},
 @b{MEGACO-Response} and @b{H248-Response}.  An instance of this OM class has the OM attribuges of
 its super-classes, @b{Object}.  This OM class does not have any defined class-specific attributes.
+
+@node Service-Argument
+@subsection Service-Argument
+@vindex Service-Argument
+
+An instance of abstract OM class @i{Service-Argument} represents the base information that is
+supplied as an argument to the @i{Service-req()} function (@pxref{Service-req}) or is returned by
+the @i{Receive()} function (@pxref{Receive}) for a service indication.
+
+This OM class is an abstract class containing several defined subclasses: @b{MGCP-Service-Argument},
+@b{MEGACO-Service-Argument} and @b{H248-Service-Argument}.  An instance of this OM class has the OM
+attributes of its super-classes, @i{Object}, and additionally the OM attributes listed in
+@tabref{43}.
+
+@tabfig{xgcp_tab043,43,OM Attributes of OM Class @i{Service-Argument}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+
+@item responder-Address
+
+@item responder-Title
+
+@item requesting-Address
+
+@item requesting-Title
+
+@end vtable
+
+@node Service-Error
+@subsection Service-Error
+@vindex Service-Error
+
+An instance of abstract OM class @i{Service-Error} represents the base information that is supplied
+in response to a service operation, supplied as the @i{Argument} argument to the @i{Service-rsp()}
+function (@pxref{Service-rsp}) or is returned as a @i{Result-Or-Argument} result by the
+@i{Receive()} function (@pxref{Receive}) for a service confirmation.
+
+This OM class is an abstract class containing several defined subclasses: @b{MGCP-Service-Error},
+@b{MEGACO-Service-Error} and @b{H248-Service-Error}.  An instance of this OM class has the OM
+attributes of its super-classes, @i{Object} and @i{Error}.  As the @var{problem} values and
+@var{parameter} syntaxes are Gateway Control package specific, this OM class defines no attributes
+or error values of its own.
+
+@node Service-Reject
+@subsection Service-Reject
+@vindex Service-Reject
+
+An instance of abstract OM class @i{Service-Reject} represents the base information that is supplied
+in response to a service operation, supplied as the @i{Argument} argument to the @i{Service-rsp()}
+function (@pxref{Service-rsp}) or is returned as @i{Result-Or-Argument} result by the @i{Receive()}
+function (@pxref{Receive}) for a service confirmation.
+
+This OM class is an abstract class containing several defined subclasses: @b{MGCP-Service-Reject},
+@b{MEGACO-Service-Reject} and @b{H248-Service-Reject}.  An instance of this OM class has the OM
+attributes of its super-classes, @i{Object} and @i{Error}.  As the @var{problem} values and
+@var{parameter} syntaxes are Gateway Control package specific, this OM class defines no attributes
+or error values of its own.
+
+Note that when @dfn{Automatic Association Management (AAM)} or @dfn{Automatic Dialog Handling (ADH)}
+are enabled on a session for which a concrete subclass of the @i{Service-Reject} is used as a
+response, the @i{Service-Reject} object also represents the errors that would otherwise be reported
+using a concrete subclass of @i{Abort-Argument}, @i{P-Abort-Result} (were @dfn{ADH} to be disabled)
+or @i{Refuse-Result} or @i{Abort-Result} (were @dfn{AAM} to be disabled).  Therefore, when @dfn{ADH}
+is enabled on a session, the @var{problem} and @var{parameter} attributes of the @i{Error}
+super-class may also contain any of the error values defined for the corresponding
+@i{Abort-Argument} or @i{P-Abort-Result} subclasses.  When @dfn{AAM} is enabled on a session, the
+@var{problem} and @var{parameter} attributes of the @i{Error} super-class may also contain any of
+the error values defined for the corresponding @i{Refuse-Result} or @i{Abort-Result} subclasses.
+
+@node Service-Result
+@subsection Service-Result
+@vindex Service-Result
+
+An instance of abstract OM class @i{Service-Result} represents the base information that is supplied
+as an argument to the @i{Service-rsp()} function (@pxref{Service-rsp}) or is returned as a
+@i{Result-Or-Argument} result by the @i{Receive()} function (@pxref{Receive}) for a service
+confirmation.
+
+This OM class is an abstract class containing several defined subclasses: @b{MGCP-Service-Result},
+@b{MEGACO-Service-Result} and @b{H248-Service-Result}.  An instance of this OM class has the OM
+attributes of its super-classes, @i{Object}.  As the error codes are Gateway Control package
+specific, this OM class defines not attributes of its own.
 
 @node Session
 @subsection Session
