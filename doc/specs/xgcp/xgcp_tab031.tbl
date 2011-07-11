@@ -35,6 +35,10 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-response-List:Object(Response):\(em:1-more:\(em
+responder-Address:Object(Address):\(em:0-1:\(em
+responder-Title:Object(Title):\(em:0-1:\(em
+application-Context:Integer or String(Object-Identifier):\(em:0-1:\(em
+security-Context:Integer or String(Object-Identifier):\(em:0-1:\(em
+authentication-Information:Object(Authentication-Information):\(em:0-1:\(em
 _
 .TE

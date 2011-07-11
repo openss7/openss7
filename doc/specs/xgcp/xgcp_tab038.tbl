@@ -35,6 +35,6 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-response-List:Object(Response):\(em:1-more:\(em
+extension:any:\(em:1:\(em
 _
 .TE

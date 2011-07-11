@@ -114,7 +114,19 @@ TBL_TBLS		= \
 			  xgcp_tab023.tbl \
 			  xgcp_tab024.tbl \
 			  xgcp_tab025.tbl \
-			  xgcp_tab026.tbl
+			  xgcp_tab026.tbl \
+			  xgcp_tab027.tbl \
+			  xgcp_tab028.tbl \
+			  xgcp_tab029.tbl \
+			  xgcp_tab030.tbl \
+			  xgcp_tab031.tbl \
+			  xgcp_tab032.tbl \
+			  xgcp_tab033.tbl \
+			  xgcp_tab034.tbl \
+			  xgcp_tab035.tbl \
+			  xgcp_tab036.tbl \
+			  xgcp_tab037.tbl \
+			  xgcp_tab038.tbl
 
 ## PKG_BUILD_INDEP
 endif

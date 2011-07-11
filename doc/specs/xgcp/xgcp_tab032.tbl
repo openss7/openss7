@@ -35,6 +35,6 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-response-List:Object(Response):\(em:1-more:\(em
+internet-Address:String(Internet-Address):4-16:1:\(em
 _
 .TE

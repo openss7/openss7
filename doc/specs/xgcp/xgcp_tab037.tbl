@@ -35,6 +35,18 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-response-List:Object(Response):\(em:1-more:\(em
+\fICommon Arguments\fP
+extensions:Object(Extension):\(em:0-more:\(em
+_
+\fIService Controls\fP
+mode:Enum(Mode):\(em:0-1:\(em
+application-Context:Integer or String(Object-Identifier):\(em:0-1:\(em
+responder-Address:Object(Address):\(em:0-1:\(em
+responder-Title:Object(Title):\(em:0-1:\(em
+_
+\fILocal Controls\fP
+asynchronous:Boolean:\(em:1:false
+reply-Limit:Integer:\(em:0-1:\(em
+time-Limit:Integer:\(em:0-1:\(em
 _
 .TE

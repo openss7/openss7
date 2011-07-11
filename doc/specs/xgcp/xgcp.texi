@@ -545,9 +545,10 @@ This communication may be accomplished using the MGCP, MEGACO or H.248 protocol.
 @subsection XGCP and the GCP Provider
 
 The XGCP interface provides access to the GCP service provider, which offers all of the facilities
-defined in the Standards.  It also provides facilities such as automatic association management and
-automatic transaction handling.  The interface is designed not to restrict the services offered to
-those of specific service packages of the H.248 protocol or any given profile of packages.
+defined in the Standards.  It also provides facilities such as @dfn{Automatic Association
+Management}, @dfn{Automatic Message Handling} and @dfn{Automatic Dialog Handling}.  The
+interface is designed not to restrict the services offered to those of specific service packages of
+the H.248 protocol or any given profile of packages.
 
 The interface defined in this specification is ``symmetrical'' in the sense that it can be used to
 implement gateway control programs acting in any of the GCP producer or consumer roles (e.g. MGC,
@@ -690,8 +691,8 @@ interface functions.
 
 The default values of some OM attributes on OM object @b{Session} are locally administered.
 
-This API assumes the provision of automatic association management and automatic transaction
-handling by the GCP provider.
+This API assumes the provision of @dfn{Automatic Association Management}, @dfn{Automatic Message
+Handling} and @dfn{Automatic Dialog Handling} by the GCP provider.
 
 The interface enables negotiation of the use of the various defined features of the GCP provider and
 those of the interface.
@@ -720,7 +721,7 @@ see also @ref{Glossary}.
 
 @multitable @columnfractions .1 .9
 @item API @tab Application Program Interface
-@item ANS.1 @tab Abstract Syntax Notation One
+@item ASN.1 @tab Abstract Syntax Notation One
 @item ANSI @tab American National Standards Institute
 @c @item AVA @tab Attribute Value Assertion
 @item BER @tab Basic Encoding Rules
@@ -758,7 +759,7 @@ A @i{Function()} is indicated as shown.
 
 A @pval{CONSTANT} is in Roman font.
 
-The names of @perr{[ERRORS]} and other return codes are surrounded by square brackets.
+The names of @perr{ERRORS} and other return codes are surrounded by square brackets.
 
 The definitions of the C identifiers appear in four headers:
 
@@ -1054,8 +1055,8 @@ the following precedence rules:
 @item A default Title or Address may be supplied as parameters to a bound ``session''.  If both are
 provided, the implementation will verify that the Title resolves to the Address.
 
-@item If automatic association management is used, a provider Title or Address may be supplied as
-parameters within the ``context'' or a specific operation request.  If both are provided, the
+@item If @dfn{Automatic Association Management} is used, a provider Title or Address may be supplied
+as parameters within the ``context'' or a specific operation request.  If both are provided, the
 implementation will verify that the Title resolves to the Address.  The ``context'' Title or Address
 take precedence over the ``session'' Title or Address.  The ``context'' Title or Address takes
 precedence over the ``session'' Title or Address for unassociated session objects.
@@ -1079,38 +1080,36 @@ boundary, the implementation will resolve the Name to the appropriate Title or A
 * AMH Enabled Session::
 * AMH Disabled Session::
 * Message Session::
-* ATH Enabled Session::
-* ATH Disabled Session::
-* Transaction Session::
+* ADH Enabled Session::
+* ADH Disabled Session::
+* Dialog Session::
 @end menu
 
 A session identifies to which gateway control entity a particular operation will be sent.  It
 contains some @b{Bind-Arguments}, such as the name of the consumer.  The session is passed as the
 first argument to most interface functions.
 
-A session is described by an OM object of OM class @b{Session}.  It is created, and appropriate
-parameter values may be set, using the OSI-Abstract-Data Manipulation functions.  A gateway control
-session is then started with @i{Bind()}@footnote{@xref{Bind}.} and later is terminated with
-@i{Unbind()}.  A session with default parameters can be started by passing the constant
-@b{Default-Session} (@samp{(OM_object)GCP_DEFAULT_SESSION}) as the @b{Session} argument to
-@i{Bind()}.
-
-@i{Bind()} must be called before the @b{Session} can be used as an argument to any other function in
-the interface.  After @i{Unbind()} has been called, @i{Bind()} must be called again if another
-session is to be started.
+A session is described by an OM object of OM class @b{Session}.@footnote{@xref{Session}.}  It is
+created, and appropriate parameter values may be set, using the OSI-Abstract-Data Manipulation
+functions.  A gateway control session is then started with @i{Bind()}@footnote{@xref{Bind}.} and
+later is terminated with @i{Unbind()}.  A session with default parameters can be started by passing
+the constant @b{Default-Session} (@samp{(OM_object)GCP_DEFAULT_SESSION}) as the @b{Session} argument
+to @i{Bind()}.  @i{Bind()} must be called before the @b{Session} can be used as an argument to any
+other function in the interface.  After @i{Unbind()} has been called, @i{Bind()} must be called
+again if another session is to be started.
 
 The interface supports multiple concurrent sessions, so that an application implemented as a single
 process, such as a service in a client-service model, can interface with the Gateway Control
 Services using several identities; and so that a process can interact directly and concurrently with
 different gateway control services.
 
-Detailed specifications of the OM class @b{Session} are given in @ref{Interface Class Definitions}.
+Detailed specifications of the OM class @b{Session} are given in @ref{Session}.
 
 A session can be used either acting as a consumer of gateway control services, or acting as a
 producer of gateway control services, or both.
 
 A session can be restricted for use only with a designated program called the responder.  When the
-responder is omitted and automatic association management is sued, the session can be used to
+responder is omitted and @dfn{Automatic Association Management} is used, the session can be used to
 exchange gateway control service information with all processes.
 
 The responder (title and address) parameters of an opened session, if present, specifies the
@@ -1120,12 +1119,19 @@ described in @ref{Names}.
 Other OM attributes (vendors' implementation extensions) may be included to specify characteristics
 of the underlying protocol used.
 
-There are three types of session objects:
+There are three aspects of session objects, as follows:
+@enumerate
+@item A session can have @dfn{Automatic Association Management} enabled or disabled.
+@item A session can have @dfn{Automatic Dialog Handling} enabled or disabled.
+@item A session can have @dfn{Automatic Message Handling} enabled or disabled.
+@end enumerate
+
+These aspects are described in sub-sections below.
 
 @node AAM Enabled Session
 @subsection AAM Enabled Session
 
-The @b{Session} collects together all the information that described a particular management
+The @b{Session} collects together all the information that described a particular gateway control
 interaction.  The parameters that are to control such a session are set up in an instance of this OM
 class, which is then passed as an argument to @i{Bind()}.@footnote{@xref{Bind}.}  This sets the OM
 attributes that describe the actual characteristics of the session, and starts the session.  Such a
@@ -1152,19 +1158,28 @@ explicitly.  To use ACSE explicitly, see @ref{AAM Disabled Session}.
 @node AAM Disabled Session
 @subsection AAM Disabled Session
 
-A session object can have Automatic Association Management disabled when it belongs to a workspace
-that has Automatic Association Management disabled vai @i{Negotiate()}, which allows the user to
-explicitly send and receive underlying transport operations to build and tear down associations.  It
-gives explicit control over associations to the user.  The Gateway Control Service provider does no
-underlying transport operations on behalf of the user.
+A session object can has @dfn{Automatic Association Management (AAM)} disabled when it belongs to a
+workspace that has had @dfn{AAM} disabled with @i{Negotiate()}.  Disabling @dfn{AAM} allows the user
+to explicitly send and receive underlying transport operations to build and tear down associations.
+It gives explicit control over associations to the user.  The Gateway Control Service provider does
+not automatically perform any underlying transport operations on behalf of the user.
 
-When the user creates and binds a session object in a workspace with AAM disabled, only the
+When the user creates and binds a session object in a workspace with @dfn{AAM} disabled, only the
 following attributes within the session object can be specified:
 
 @itemize
-@item @i{requestor-Address}
-@item @i{requestor-Title}
-@c @item @i{role}
+
+@item @var{requester-Address} --- the address (IP address) used by the local gateway control entity to
+communicate with remote gateway control entities.  When not specified for MGC entities, the
+@var{requester-Title} must resolve to an address (i.e. using DNS).
+
+@item @var{requester-Title} --- the title (host name) used by the local gateway control entity to
+communicate with remote gateway control entities.  When not specified for MGC entities, the
+@var{requester-Address} must be specified.
+
+@item @var{role} -- the role of the local gateway control entity to be taken in communications with
+associated entities.  This can either identify the MGC role or the MG role.
+
 @end itemize
 
 The session object is then passed as an argument to the @i{Bind()},@footnote{@xref{Bind}.} that
@@ -1216,11 +1231,11 @@ see @ref{AMH Disabled Session}.
 @node AMH Disabled Session
 @subsection AMH Disabled Session
 
-A session object can have Automatic Message Handling disabled when it belongs to a workspace that
-has Automatic Message Handling disabled using the @i{Negotiate()} function.  This allows the user to
-explicitly send and receive message handling operations to establish, group and dispatch messages.
-it gives explicit control over messages to the user.  The Gateway Control Service provider does no
-message handling operations on behalf of the user.
+A session object can have @dfn{Automatic Message Handling} disabled when it belongs to a workspace
+that has @dfn{Automatic Message Handling} disabled using the @i{Negotiate()} function.  This allows
+the user to explicitly send and receive message handling operations to establish, group and dispatch
+messages.  it gives explicit control over messages to the user.  The Gateway Control Service
+provider does no message handling operations on behalf of the user.
 
 Oncee the session object is bound (AAM enabled) or associated (AAM disabled) and has AMH disabled,
 the session must explicitly issue message handling operations for each gateway control services
@@ -1256,26 +1271,26 @@ implicitly unbinds the session.  If the user unbinds the message session prior t
 aborting the message, the service provider will first attempt to close the message, and if that is
 rejected, will abort the message.
 
-@node ATH Enabled Session
-@subsection ATH Enabled Session
+@node ADH Enabled Session
+@subsection ADH Enabled Session
 
-The ATH enabled session allows a gateway control entity to invoke and respond to gateway control
+The ADH enabled session allows a gateway control entity to invoke and respond to gateway control
 services requests and indications without regards for transaction handling.  The Gateway Control
 Services provider provides all transaction handling.
 
 This type of session cannot be used to send transaction handling primitives or operations
-explicitly.  To use transaction handling explicitly, see @ref{ATH Disabled Session}.
+explicitly.  To use transaction handling explicitly, see @ref{ADH Disabled Session}.
 
-@node ATH Disabled Session
-@subsection ATH Disabled Session
+@node ADH Disabled Session
+@subsection ADH Disabled Session
 
-A session object can have Automatic Transaction Handling disabled when it belongs to a workspace
-that has Automatic Transaction Handling disabled using the @i{Negotiate()} function.  This allows 
-the user to explicitly send and receive transaction handling operations to establish, group and
-dispatch transactions.  It gives explicit control over transactions to the user.  The Gateway
-Control Service provider does no transaction handling operations on behalf of the user.
+A session object can have @dfn{Automatic Dialog Handling} disabled when it belongs to a
+workspace that has @dfn{Automatic Dialog Handling} disabled using the @i{Negotiate()} function.
+This allows the user to explicitly send and receive transaction handling operations to establish,
+group and dispatch transactions.  It gives explicit control over transactions to the user.  The
+Gateway Control Service provider does no transaction handling operations on behalf of the user.
 
-Once the session object is bound (AAM enabled) or associated (AAM disabled) and has ATH disabled,
+Once the session object is bound (AAM enabled) or associated (AAM disabled) and has ADH disabled,
 the session must explicitly issue transaction handling operations for each gateway control services
 request or response.  This bound or associated session can only be used to send transaction handling
 primitives.  The following can be sent/received using this type of bound or associated session:
@@ -1293,10 +1308,10 @@ The other attributes that relate to transaction handling are specified within th
 @b{Accept-Result} or @b{Refuse-Result} objects that are passed to, or returned from, @i{Open()},
 @i{Accept()}, @i{Refuse()}, or @i{Receive()}.
 
-@node Transaction Session
-@subsection Transaction Session
+@node Dialog Session
+@subsection Dialog Session
 
-Once a user has created a bound or associated session that has ATH disabled, a transaction can be
+Once a user has created a bound or associated session that has ADH disabled, a transaction can be
 created.  A transaction is represented by a @dfn{fully formed}, or @dfn{partially formed}
 @dfn{transaction}, session object.  A @dfn{transaction} session is returned as the result of
 building a new transaction.  The transaction session is used, like a bound or associated session, by
@@ -1388,9 +1403,9 @@ values of type @samp{ANY}, or any OM-Attribute values in a Gateway Control Servi
 @item The encoding and decoding functionality can be provided internally with the XGCP API, without
 requiring the application to invoke any encoding or decoding functions.  This option allows the
 application to be free from any knowledge of encoding rules.  In this case, the OM class and
-attribute type and corresponding representation are defined in a gateway control application or
-services package.  The XGCP API uses the package definition to attempt encoding or decoding; if
-automatic decoding fails, an OM String(Encoding) is used.
+attribute type and corresponding representation are defined in a gateway control services package.
+The XGCP API uses the package definition to attempt encoding or decoding; if automatic decoding
+fails, an OM String(Encoding) is used.
 
 @item The application can perform encoding and decoding itself.  This option gives the application
 responsibility and control over the encoding and decoding of OM attributes.  In this case, all OM
@@ -1402,14 +1417,14 @@ The encoding and decoding alternative to be used is negotiated through the @i{Ne
 @xref{Negotiate}.
 
 The XGCP API does not specify the use of OM-Encode or OM-Decode for the OM classes defined in this
-specification, or in gateway control application or services packages used with this specification.
+specification, or in gateway control services packages used with this specification.
 
 To ensure interoperability, the sender and receiver must follow the same encoding rules when
 converting between OM syntax and encoded syntax.  If an algorithm is used to generate OM packages,
 then the algorithm must ensure that the generated OM syntax is consistent with the input abstract
 syntax (that is, the same encoded values must result from applying the encoding rules to either
 representation).  The encoding rules used with MGCP, MEGACO and H.248 packages defined by this
-specification are ANS.1 BER.  This does not imply that other encoding rules cannot be used with
+specification are ASN.1 BER.  This does not imply that other encoding rules cannot be used with
 other packages defined in the future.
 
 For the API to encode and decode the OM attribute values according to the ASN.1 standard scheme,
@@ -1457,34 +1472,34 @@ or an instance of the @b{H248-Service-Result}, @b{H248-Linked-Reply-Argument} @b
 @section Function Results
 
 @menu
-* Transaction-ID: Transaction-ID Discussion.
+* Dialog-ID: Dialog-ID Discussion.
 * Result: Result Discussion.
 * Status: Status Discussion.
 @end menu
 
-All functions return a @b{Status} (which is the C function result).  Most return an @b{Transaction-ID}
+All functions return a @b{Status} (which is the C function result).  Most return an @b{Dialog-ID}
 which identifies the particular invocation.  The confirmed operations each return a @b{Result}.
-(The @b{Transaction-ID} and @b{Result} are returned using pointers that are supplied as arguments of
+(The @b{Dialog-ID} and @b{Result} are returned using pointers that are supplied as arguments of
 the C function).  These three kinds of function results are introduced below.
 
 All OM objects returned by interface functions (results and errors) will be private objects in the
 workspace associated with the session private object.
 
-@node Transaction-ID Discussion
-@subsection Transaction-ID
+@node Dialog-ID Discussion
+@subsection Dialog-ID
 
 All interface functions that invoke a gateway control service operation return an
-@b{Transaction-ID}; an integer that identifies the particular invocation of an operation.  The
-@b{Transaction-ID} is only relevant for asynchronous confirmed operations and may be used later to
-receive the @b{Status} and @b{Result}, or to abandon them.  The @b{Transaction-ID} is also used to
+@b{Dialog-ID}; an integer that identifies the particular invocation of an operation.  The
+@b{Dialog-ID} is only relevant for asynchronous confirmed operations and may be used later to
+receive the @b{Status} and @b{Result}, or to abandon them.  The @b{Dialog-ID} is also used to
 respond to a previously requested confirmed operation.  Asynchronous operations are fully described
 in @ref{Synchronous and Asynchronous Operation}.  The interface functions that can be used to start
 them are the @i{Service-req()} function.
 
-The numerical value of the @b{Transaction-ID} returned from a call that successfully invoke an
+The numerical value of the @b{Dialog-ID} returned from a call that successfully invoke an
 asynchronous confirmed operation is guaranteed to be unique amongst all outstanding operations in
-given session.  Transaction IDs used by XGCP are not necessarily those that are actually sent via an
-underlying protocol such as H.248.  Transaction IDs may be mapped or altered by the Gateway Control
+given session.  Dialog IDs used by XGCP are not necessarily those that are actually sent via an
+underlying protocol such as H.248.  Dialog IDs may be mapped or altered by the Gateway Control
 Service provider.
 
 The value returned for a synchronous operation or an asynchronous non-confirmed operation is
@@ -1581,12 +1596,12 @@ any particular order.  The functions that can execute asynchronously are the @i{
 function.  This corresponds to the gateway control services of the Standards that operate in a
 confirmed mode.  Moreover, only confirmed operations return service results.
 
-An asynchronous function call of a confirmed service returns a @b{Transaction-ID} of the operation
-to the application.  The same @b{Transaction-ID} will be returned by @i{Receive()} on the
+An asynchronous function call of a confirmed service returns a @b{Dialog-ID} of the operation
+to the application.  The same @b{Dialog-ID} will be returned by @i{Receive()} on the
 corresponding result.
 
-A @b{Transaction-ID} is also returned by @i{Receive()} on an indication of an invoked gateway
-control service operation.  The same @b{Transaction-ID} will be used to respond to this operation.
+A @b{Dialog-ID} is also returned by @i{Receive()} on an indication of an invoked gateway
+control service operation.  The same @b{Dialog-ID} will be used to respond to this operation.
 
 Implementations of the interface are free to return from asynchronous function calls as soon as
 possible or may wait until the operation has been submitted to the underlying Gateway Control
@@ -1627,7 +1642,8 @@ application.  It is strongly recommended that @i{Receive()} is called repeatedly
 
 @menu
 * Automatic Association Management::
-* Automatic Transaction Handling::
+* Automatic Message Handling::
+* Automatic Dialog Handling::
 * Automatic Performer Resolution::
 * Responder Versatility::
 * Automatic Name to Address Resolution::
@@ -1655,20 +1671,34 @@ such as TCP or SCTP, the Gateway Control Service provider implementations are as
 automatic handling of the association between gateway control entities, establishing and releasing
 associations at its discretion.  Such management is intended to bring benefits such as reduced
 communication charges.  To allow this flexibility to the implementation, the interface does not
-specify when communication takes place.  Automatic Association Management (AAM) may be enabled or
-disabled on a per-workspace basis using the @i{Negotiate()} function. 
+specify when communication takes place.  @dfn{Automatic Association Management (AAM)} may be enabled
+or disabled on a per-workspace basis using the @i{Negotiate()} function. 
 
-@node Automatic Transaction Handling
-@subsection Automatic Transaction Handling
+@node Automatic Message Handling
+@subsection Automatic Message Handling
+
+When the Gateway Control Services provider makes use of message oriented communication services,
+such as that provided by H.248, the Gateway Control Service provider implementations are assume to
+provide automatic handling of messages between gateway control entities, grouping transactions into
+messages at its discretion.  Such handling is intended to bring benefits such as reduced
+communication overheads.  To allow this flexibility to the implementation, the interface does not
+specify which transactions are packed into which messages.  @dfn{Automatic Message Handling (AMH)}
+may be enabled or disabled on a per-workspace basis using the @i{Negotiate()}
+function.@footnote{Note that @dfn{Automatic Message Handling} is an independent concept from
+@dfn{Automatic Association Management}.}
+
+@node Automatic Dialog Handling
+@subsection Automatic Dialog Handling
 
 When the Gateway Control Services provider makes use of transaction oriented communication services,
 such as that provided by H.248, the Gateway Control Service provider implementations are assumed to
 provide automatic handling of transactions between gateway control entities, establishing and
-releasing transactions at its discretion.  Such management is intended to bring benefits such as
+releasing transactions at its discretion.  Such handling is intended to bring benefits such as
 reduced communication overheads.  To allow this flexibility to the implementation, the interface
-does not specify when communication takes place.  Automatic Transaction Handling (ATH) may be
+does not specify when communication takes place.  @dfn{Automatic Dialog Handling (ADH)} may be
 enabled or disabled on a per-workspace basis using the @i{Negotiate()} function.@footnote{Note that
-Automatic Transaction Handling is an independent concept from Automatic Association Management.}
+@dfn{Automatic Dialog Handling} is an independent concept from @dfn{Automatic Association
+Management}.}
 
 Under MEGACO and H.248, transactions are used to provide for sequencing of a set of commands.
 Commands that are contained within separate transactions provide no guarantees whatsoever of
@@ -1737,7 +1767,7 @@ The general rules to follow are:
 @item Open one or several sessions (@samp{gcp_bind()})
 
 @item Perform gateway control service interactions (operations) using the offered interface
-functions.  An interaction is identified by its @b{Transaction-Id}.
+functions.  An interaction is identified by its @b{Dialog-Id}.
 
 @item Close the opened sessions (@samp{gcp_unbind()})
 
@@ -1919,11 +1949,11 @@ This function can only be called in synchronous mode.
 The gateway control session in which the confirmed operation was requested.  This must be a
 private object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}
 
-@item Transaction-ID (Integer)
+@item Dialog-ID (Integer)
 Selects the specific outstanding asynchronous operation submitted via the @b{Session} to be
 terminated.  The outstanding operation may be a non-confirmed service.  In that case the abandon is
-without effect.  The value of @b{Transaction-ID} must be that which was returned by the function call
-that initiated the asynchronous management operation that is now to be abandoned.
+without effect.  The value of @b{Dialog-ID} must be that which was returned by the function call
+that initiated the asynchronous gateway control operation that is now to be abandoned.
 @end table
 @item RESULTS
 @table @i
@@ -1939,8 +1969,8 @@ This function can return a @b{Communications-Error}.
 Note that the abandon function is successful even if the operation to be abandoned does not exist
 (any longer) or is not confirmed.  The abandon is then without effect.
 
-The function can also return the error constants @perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and @perr{[GCP_INSUFFICIENT_RESOURCE]}.
+The function can also return the error constants @perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and @perr{GCP_INSUFFICIENT_RESOURCE}.
 @end table
 
 @page
@@ -1963,9 +1993,9 @@ GCP_status gcp_abort(
 @end verbatim
 @end format
 @item DESCRIPTION
-This function is one of a group of dialogue handling functions: @i{Open()}, @i{Accept()},
-@i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage the MAP dialogue
-when AAM is disabled on a session.  When AAM is enabled on a session, this dialogue handling
+This function is one of a group of dialog handling functions: @i{Open()}, @i{Accept()},
+@i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage the MAP dialog
+when AAM is disabled on a session.  When AAM is enabled on a session, this dialog handling
 function is neither necessary nor permitted.
 
 This function is used to abort a gateway control session that is either associated or partially
@@ -1982,7 +2012,7 @@ must be a private object previously returned as part of an @b{Accept-Result} or 
 or returned explicitly from an asynchronously called @i{Open()}.  This session object must have AAM
 disabled.
 @item Context (Object(Context))
-The management context to be used for this operation.  This argument must be a private object.  Once
+The gateway control context to be used for this operation.  This argument must be a private object.  Once
 a session is connected or partially connected, the precedence rules for common parameters within the
 @b{Session} and the @b{Context} objects are different.  Once connected, the responder address and
 responder title cann not be overriden by the @b{Context} object.  (See also @ref{Names}.)
@@ -1996,8 +2026,8 @@ This function can return a @b{Communications-Error}, or one of the following @b{
 bad-argument, bad-class, bad-context, bad-session, miscellaneous, missing-type, session-terminated,
 reply-limit-exceeded, time-limit-edceeded.
 
-The function can also return the error constants @perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and @perr{[GCP_INSUFFICIENT_RESOURCES]}.
+The function can also return the error constants @perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and @perr{GCP_INSUFFICIENT_RESOURCES}.
 @item CORRESPONDENCE
 This function corresponds to the @var{MAP-U-ABORT} request primitive of 3GPP TS 29.002 Section 7.
 @end table
@@ -2056,9 +2086,9 @@ bad-argument, bad-class, bad-context, bad-session, miscellaneous, missing-type, 
 reply-limit-exceeded, time-limit-exceeded.
 
 This function can also return the error constants
-@perr{[MP_NO_WORKSPACE]},
-@perr{[MP_INVALID_SESSION]} or
-@perr{[MP_INSUFFICIENT_RESOURCES]}.
+@perr{MP_NO_WORKSPACE},
+@perr{MP_INVALID_SESSION} or
+@perr{MP_INSUFFICIENT_RESOURCES}.
 @end table
 
 @page
@@ -2083,9 +2113,9 @@ GCP_status gcp_accept(
 @end verbatim
 @end format
 @item DESCRIPTION
-This function is one of a group of dialogue handling functions: @i{Open()}, @i{Accept()},
-@i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage the MAP dialogue
-when AAM is disabled on a session.  When AAM is enabled on a session, this dialogue handling
+This function is one of a group of dialog handling functions: @i{Open()}, @i{Accept()},
+@i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage the MAP dialog
+when AAM is disabled on a session.  When AAM is enabled on a session, this dialog handling
 function is neither necessary nor permitted.
 
 This function is used to accept a previously indicated @b{Open} operation.  This function can only
@@ -2131,9 +2161,9 @@ session-terminated.
 This function can return a @b{Communications-Error}.
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @item CORRESPONDENCE
 This function corresponds to the @var{MAP-OPEN} response primitive (with a parameter indicating
 acceptance) of 3GPP TS 29.002 Section 7.
@@ -2161,14 +2191,15 @@ GCP_status gcp_assoc_req(
 @end format
 @item DESCRIPTION
 This function is used to request the immediate establishment of a gateway control association when
-@i{Automatic Association Management} is not used.  Note that association establishment only
-performs end-to-end communication for underlying transports that are connection-oriented for MGCP,
-MEGACO and H.248; such as, TCP and SCTP.  When the underlying transport is connectionless (such as
-UDP), the association establishment can be an operation that is local to the GCP service provider.
+@i{Automatic Association Management} is not used.  Note that association establishment performs
+end-to-end communication for all underlying transports, regardless of whether they are
+connection-oriented or connectionless.  When the underlying transport is connectionless (such as
+UDP), the association establishment operation still includes the exchange of ServiceChange messages
+intended on initiating the association.
 
-The service is defined as a non-confirmed service.  No reply is expected.
+The service is defined as a confirmed service.  A reply is expected.
 
-This operation may only be called in synchronous mode.
+This operation may be called in synchronous or asynchronous modes.
 
 When @i{Automatic Association Management} is used for a gateway control session, this function is
 not used.  @xref{Open}.
@@ -2176,8 +2207,8 @@ not used.  @xref{Open}.
 @table @i
 @item Session (Object(Session))
 The gateway control session against which this operation is performed.  This must be a private
-object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}  This session must also have AAM
-(Automatic Association Management) disabled.
+object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}  This session must also have
+@dfn{Automatic Association Management (AAM)} disabled.
 @item Context (Object(Context))
 The gateway control context to be used for this operation.  This argument must be a private
 object.
@@ -2205,9 +2236,9 @@ time-limit-exceeded.
 This function can return a @b{Communications-Error}.
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} or
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} or
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @item SEE ALSO
 @i{Assoc-rsp()}.@footnote{@xref{Assoc-rsp}.}
 @end table
@@ -2235,7 +2266,7 @@ GCP_status gcp_assoc_rsp(
 @item DESCRIPTION
 This function is used to reply to a previously invoked @var{Assoc} operation.
 
-This function can only be called in syncrhonous mode.
+This function can only be called in synchronous mode.
 @item ARGUMENTS
 @table @i
 @item Session (Object(Session))
@@ -2279,8 +2310,10 @@ session-terminated.
 @node Bind
 @section Bind()
 @table @b
+
 @item NAME
 @b{Bind} --- open a gateway control session.
+
 @item SYNOPSIS
 @format
 @verbatim
@@ -2294,37 +2327,51 @@ GCP_status gcp_bind(
 );
 @end verbatim
 @end format
+
 @item DESCRIPTION
 This function opens a gateway control session.  It creates a @b{Session} OM object describing the
 session suitable for supplying to other XGCP functions.  A session must be opened before any
 gateway control service interactions can take place.
 
-If the OM attribute @b{requestor-Title} is specified, only one unconnected session can be opened
+If the OM attribute @b{requester-Title} is specified, only one unconnected session can be opened
 with the same value of the OM attribute.  There can be multiple connected or partially connected
-session objects with the same @b{requestor-Title}.
+session objects with the same @b{requester-Title}.
 
-To allow for the implementation of automatic association management, it is undefined as to whether
-@i{Bind()} causes any communication with the remote management entity.
+To allow for the implementation of @dfn{Automatic Association Management}, it is undefined as to
+whether @i{Bind()} causes any communication with the remote gateway control entity.
+
 @item ARGUMENTS
+
 @table @i
+
 @item Session (Object(Session))
 Specifies a program together with other details of the service required.  This argument may be
 either a public object or a private object.  The constant @b{Default-Session}
-(@samp{GCP_DEFAULT_SESSION}) may also be used as the value of this argument, causing a new session to
-be created with default values for all its OM attributes.
+(@samp{GCP_DEFAULT_SESSION}) may also be used as the value of this argument, causing a new session
+to be created with default values for all its OM attributes.
+
 @item Workspace (Workspace)
-Sepcifies the workspace (obtained from a call to @i{Initialize()}) which is to be associated with
+Specifies the workspace (obtained from a call to @i{Initialize()}) which is to be associated with
 the session.  All function results from gateway control operations using this session will be
 returned as private objects in this workspace.  If the Session argument is a private object, it must
 be a private object in this workspace.
+
+Whether the resulting session uses @dfn{Automatic Association Management (AAM)} or not depends upon
+the negotiation of this feature (using the @i{Netogiate()} interface function) for the workspace
+supplied as an argument.
+
 @end table
+
 @item RESULTS
+
 @table @i
+
 @item Status (Status)
 Indicates whether or not the function completed successfully.
+
 @item Bound-Session (Object(Session))
-Upon successful compltion, contains an instance of a gateway control session that may be used as
-an argument to other functions (e.g. @i{Service-req()}).  This will be a new private object if the
+Upon successful completion, contains an instance of a gateway control session that may be used as an
+argument to other functions (e.g. @i{Service-req()}).  This will be a new private object if the
 value of @b{Session} was @b{Default-Session} or a public object, otherwise, it will be that supplied
 as an argument.  In the later case, the session provided should not be already in use.  The function
 will supply default values for any of the OM attribute that were not present in the @b{Session}
@@ -2332,10 +2379,12 @@ instance supplied as an argument.  It will also set the value of the @b{File-Des
 attribute (the value will be @b{No-Valid-File-Descriptor} (@samp{GCP_NO_VALID_FILE_DESCRIPTOR}) if
 the functionality is not supported).
 
-When AAM is disabled with @i{Negotiate()}, any session bound using @i{Bind()} is unconnected and may
-only be used to receive and send ACSE-related primitives, (i.e. it cannot be used for Gateway
-Control Service operations).
+When @dfn{Automatic Association Management (AAM)} is disabled for the @i{Workspace} with
+@i{Negotiate()}, any session bound using @i{Bind()} is unconnected and may only be used to receive
+and send ACSE-related primitives, (i.e. it cannot be used for Gateway Control Service operations).
+
 @end table
+
 @item ERRORS
 This function can return a @b{System-Error} or one of the following @b{Library-Errors}: bad-address,
 bad-session, bad-title, miscellaneous, not-supported, too-many-sessions.
@@ -2343,12 +2392,14 @@ bad-session, bad-title, miscellaneous, not-supported, too-many-sessions.
 This function can return a @b{Communications-Error}.
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and
+@perr{GCP_INSUFFICIENT_RESOURCES}.
+
 @item SEE ALSO
 @i{Unbind()},@footnote{@xref{Unbind}.}
 @i{Negotiate()}.@footnote{@xref{Negotiate}.}
+
 @end table
 
 @page
@@ -2380,7 +2431,7 @@ This operation may only be called in synchronous mode.
 @item Session (Object(Session))
 The connected session against which this operation is performed.  This must be a private object
 previously returned as part of an @b{Accept-Result} or @b{Open-Argument}.  This session object must
-have AAM diabled, and it must be in a connected state.
+have @dfn{Automatic Association Management (AAM)} disabled, and it must be in a connected state.
 @item Context (Object(Context))
 The gateway control context to be used for this operation.  This argument must be a private
 object.
@@ -2402,9 +2453,9 @@ bad-argument, bad-class, bad-context, bad-session, miscellaneous, missing-type, 
 reply-limit-exceeded, time-limit-exceeded.
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @item SEE ALSO
 @i{Abort()}.@footnote{@xref{Abort}.}
 @item CORRESPONDENCE
@@ -2481,19 +2532,16 @@ GCP_status gcp_get_assoc_info(
 @end format
 @item DESCRIPTION
 This function returns the negotiated association values corresponding to an incoming
-@i{Result-Or-Argument} object previously supplied by @i{Receive()}.  The caller provides a
+@b{Result-Or-Argument} object previously supplied by @i{Receive()}.  The caller provides a
 @b{request_mask} to identify which values are to be returned in result objects.
 
-This function may be used with automatic association management enabled or disabled or with
-automatic dialog handling enabled or disabled.  In any case, the values returned are those
-associated with the underlying association or dialog within which the incoming
-@i{Result-Or-Argument} arrived.
-@ignore
+This function may be used with @dfn{Automatic Association Management} enabled or disabled or with
+@dfn{Automatic Message Handling} enabled or disabled.  In any case, the values returned are those
+associated with the underlying association within which the incoming @b{Result-Or-Argument} arrived.
 In connectionless environments, the values returned are those associated with the incoming
-@b{receive-result-or-argument} message (for example, @b{Responder-Address}).
-@end ignore
+@b{Result-Or-Argument} object (for example, @b{Responder-Address}).
 
-Certain reqeusted values may not be available for the input object (that is, inappropriate for the
+Certain requested values may not be available for the input object (that is, inappropriate for the
 underlying protocol) and may therefore be absent from the result.  The values actually returned are
 indicated by the function result.
 @item ARGUMENTS
@@ -2535,14 +2583,16 @@ This mask has the same structure as the @i{Request-Mask} argument.  All bits @em
 indicates no values were available for the input object.
 @item Pres-Layer-Args (Object(Presentation-Layer-Args))
 Upon completion of this function, this object contains the negotiated values associated with the
-@b{Result-Or-Argument} object.  This object is returned only when one of the following @b{Result-Mask} bits is set @emph{on}:
+@b{Result-Or-Argument} object.  This object is returned only when one of the following
+@i{Result-Mask} bits is set @emph{on}:
 @itemize
 @item @samp{GCP_T_PRESENTATION_CONTEXT_LIST}
 @end itemize
-Otherwise, @perr{[GCP_ABSENT_OBJECT]} is returned for this object.
+Otherwise, @perr{GCP_ABSENT_OBJECT} is returned for this object.
 @item Acse-Args (Object(Acse-Args))
 Upon completion of this function, this object contains the negotiated values associated with the
-@i{Result-Or-Argument} object.  This object is returned only when one of the following @b{Result-Mask} bits is set @emph{on}:
+@b{Result-Or-Argument} object.  This object is returned only when one of the following
+@i{Result-Mask} bits is set @emph{on}:
 @itemize
 @item @samp{GCP_T_RESPONDER_ADDRESS}
 @item @samp{GCP_T_RESPONDER_TITLE}
@@ -2550,28 +2600,29 @@ Upon completion of this function, this object contains the negotiated values ass
 @c @item @samp{GCP_T_SECURITY_CONTEXT}
 @c @item @samp{GCP_T_AUTHENTICATION_INFORMATION}
 @end itemize
-Otherwise, @perr{[GCP_ABSENT_OBJECT]} is returned for this object.
+Otherwise, @perr{GCP_ABSENT_OBJECT} is returned for this object.
 @item Gcp-Assoc-Args (Object(Gcp-Assoc-Args))
 Upon completion of this function, this object contains the negotiated values associated with the
-@i{Result-Or-Argument} object.  This object is returned only when the one of the following @b{Result-Mask} bits is set @emph{on}:
+@b{Result-Or-Argument} object.  This object is returned only when the one of the following
+@i{Result-Mask} bits is set @emph{on}:
 @itemize
 @item @samp{GCP_T_APPLICATION_CONTEXT_LIST}
 @item @samp{GCP_T_VERSION_LIST}
 @end itemize
-otherwise, @perr{[GCP_ABSENT_OBJECT]} is returned for this object.
+otherwise, @perr{GCP_ABSENT_OBJECT} is returned for this object.
 @ignore
 @item Standard-Externals (Object(Standard-Externals))
 Upon completion of this function, this object contains the negotiated connection values associated
 with the @b{Result-Or-Argument} object.  This object is returned only when the
-@b{Result-Mask} bit @samp{GCP_T_SMASE_USER_DATA} is set on; otherwise, @perr{[GCP_ABSENT_OBJECT]} is
-returned for this object.
+@i{Result-Mask} bit @samp{GCP_T_SMASE_USER_DATA} is set on; otherwise, @perr{GCP_ABSENT_OBJECT}
+is returned for this object.
 @end ignore
 @end table
 @item ERRORS
 This function can return error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} or
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} or
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @end table
 
 @page
@@ -2597,10 +2648,10 @@ GCP_status gcp_get_last_error(
 This function is used to return additional error information related to the last function call that
 returned a status of:
 @itemize
-@item @perr{[GCP_E_COMMUNICATIONS_PROBLEM]}
-@item @perr{[GCP_E_BROKEN_SESSION]}
-@item @perr{[GCP_E_INVALID_CONNECTION_ID]}
-@item @perr{[GCP_E_SYSTEM]}
+@item @perr{GCP_E_COMMUNICATIONS_PROBLEM}
+@item @perr{GCP_E_BROKEN_SESSION}
+@item @perr{GCP_E_INVALID_CONNECTION_ID}
+@item @perr{GCP_E_SYSTEM}
 @end itemize
 The returned integer value is implementation dependent.
 
@@ -2627,8 +2678,8 @@ error.
 @end table
 @item ERRORS
 This function can return error constants
-@perr{[GCP_NO_WORKSPACE]} or
-@perr{[GCP_INVALID_SESSION]}.
+@perr{GCP_NO_WORKSPACE} or
+@perr{GCP_INVALID_SESSION}.
 @end table
 
 @page
@@ -2660,7 +2711,7 @@ None.
 @item Workspace (Workspace)
 Upon successful completion, contains a handle to a workspace in which OM objects can be created and
 manipulated.  Objects created in this workspace, and only such objects, may be used as arguments to
-the other management interface functions.  This function returns NULL if it fails.
+the other gateway control interface functions.  This function returns NULL if it fails.
 @end table
 @item ERRORS
 None.
@@ -2699,42 +2750,48 @@ GCP_status gcp_issue(
 @end verbatim
 @end format
 @item DESCRIPTION
-This function is one of a group of dialogue handling functions: @i{Open()}, @i{Accept()},
-@i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage GCP dialogues
-when AAM is disabled on a session.  When AAM is enabed on a session, this dialogue hanglin function
-is neither necessary nor permitted.
+This function is one of a group of dialog handling functions: @i{Open()}, @i{Accept()},
+@i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage GCP dialog
+when @dfn{Automatic Association Management (AAM)} is disabled on a session.  When @dfn{AAM} is
+enabled on a session, this dialog handling function is neither necessary nor permitted.
 
 This function is used to issue pending gateway control service requests and responses.  The
 function can only be called in synchronous mode.
 
 When an @i{Open()}, @i{Accept()} or @i{Refuse()} function is called, the underlying Gateway Control
-Service provider might not issue the corresponding TCAP transactions immediately, but may wait for
-the accumulation of gateway control service requests or responses to combine with the dialogue.  The
-@i{Issue()} function tells the underlying Gateway Control Service provider to release pending
-dialogue handling primitives with the service requests and responses currently accumulated.
+Service provider might not issue the corresponding MGCP, MEGACO or H.248 transactions immediately,
+but may wait for the accumulation of gateway control service requests or responses to combine with
+the dialog.  The @i{Issue()} function tells the underlying Gateway Control Service provider to
+release pending dialog handling primitives with the service requests and responses currently
+accumulated.
 
-One typical order of dialogue handling function calls would be as follows:
-@itemize
+One typical order of dialog handling function calls would be as follows:
+@enumerate
 @item @i{Bind()} --- bind the session.
-@item @i{Open()} --- open the dialogue.
+@item @i{Open()} --- open the dialog.
 @item @i{Service-req()} --- generate one or more service requests.
-@item @i{Issue()} -- issue pending dialogue handing and accumulated service requests or responses.
+@item @i{Issue()} -- issue pending dialog handing and accumulated service requests or responses.
 @item @i{Service-req()} --- generate one or more service requests.
-@item @i{Close()} --- close the dialogue (also issuing any pending dialogue handling and accumulated
+@item @i{Close()} --- close the dialog (also issuing any pending dialog handling and accumulated
 service requests or responses).
-@end itemize
+@end enumerate
+
+Note that MGCP only permits one transaction (and, therefore, one service request or response) per
+message.  MEGACO and H.248 support multiple transactions per message, and multiple service requests
+or responses per transaction.
 @item ARGUMENTS
 @table @i
 @item Session (Object(Session))
-The gateway control session against which this operation is to be performed.  This must be a
-private object previously reutrned from @i{Bind()}.@footnote{@xref{Bind}.}
+The gateway control session against which this operation is to be performed.  This must be a private
+object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}
 @item Context (Object(Context))
 The gateway control context to be used for this operation.  This argument must be a private
 object or the constant @b{Default-Context} (@samp{GCP_DEFAULT_CONTEXT}).
 @item Dialog-ID (Integer)
-The @b{Dialog-ID} of the requested dialog to which the reply applies.  This @b{Dialog-ID} must have
-been returned from a call to @i{Receive()} for the corresponding association for which pending
-service requests and responses are being issued.
+The @b{Dialog-ID} of the requested dialog on which to issue accumulated service requests and
+responses.  This @b{Dialog-ID} must have been returned from a call to
+@i{Open()}@footnote{@xref{Open}.} or @i{Receive()}@footnote{@xref{Receive}} for the corresponding
+association for which pending service requests and responses are being issued.
 @end table
 @item RESULTS
 @table @i
@@ -2749,9 +2806,9 @@ session-terminated.
 This function can return a @b{Communications-Error}.
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @item CORRESPONDENCE
 This function corresponds to the @var{GCP-DELIM} request primitive of 3GPP TS 29.002 Section 7.
 @end table
@@ -2813,34 +2870,44 @@ typedef struct {
 The following Features are defined and registered by this specification:
 @itemize
 @item @b{Gateway Control Packages} @*
-The GSM Gateway Control package and the ANSI Gateway Control package are specified in
-@ref{Interface Class Definitions}.  Additional Gateway Control packages may be specified in the
-future.
-Note that multiple Gateway Control Packages can be activated within the same workspace.
+The GSM Gateway Control package and the ANSI Gateway Control package are specified in @ref{Interface
+Class Definitions}.  Additional Gateway Control packages may be specified in the future.  Note that
+multiple Gateway Control Packages can be activated within the same workspace.
 
 @item @b{Automatic Association Management} @*
 This feature provides for automatic establishment and release of the underlying protocol
-associations(s) (if any); refer to @ref{Automatic Association Management}.
-The Object-Identifier associated with this feature is @samp{@{ iso(1) org(3) dod(6) internet(1)
-private(4) enterprises(1) openss7(29591) xom-packages(1) xmap(1) common(1)
-automatic-association-management(1) @}}.
-This Object-Identifier is represented by the constant @samp{GCP_AUTOMATIC_ASSOCIATION_MANAGEMENT}.
+associations.@footnote{@xref{Automatic Association Management}.} The Object-Identifier
+associated with this feature is @samp{@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1)
+openss7(29591) xom-packages(1) xgcp(2) common(1) automatic-association-management(1) @}}.  This
+Object-Identifier is represented by the constant @*
+@samp{GCP_AUTOMATIC_ASSOCIATION_MANAGEMENT}.
+
 Automatic Association Management is enabled by default.
 
-@item @b{Automatic Dialog Handling}
-This feature provides for automatic establishment and release of the underlying protocol dialog(s)
-(if any); refer to @ref{Automatic Dialog Handling}.
-The Object-Identifier associated with this feature is @samp{@{ iso(1) org(3) dod(6) internet(1)
-private(4) enterprises(1) openss7(29591) xom-packages(1) xmap(1) common(1)
-automatic-dialog-handling(2) @}}.
-This Object-Identifier is represented by the constant @samp{GCP_AUTOMATIC_DIALOG_HANDLING}.
+@item @b{Automatic Message Handling} @*
+This feature provides for automatic establishment and release of the underlying protocol
+messages.@footnote{@xref{Automatic Message Handling}.} The Object-Identifier associated with this
+feature is @samp{@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+xom-packages(1) xgcp(2) common(1) automatic-message-handling(2) @}}.  This Object-Identifier is
+represented by the constant @*
+@samp{GCP_AUTOMATIC_DIALOG_HANDLING}.
+
+@item @b{Automatic Dialog Handling} @*
+This feature provides for automatic establishment and release of the underlying protocol
+transaction.@footnote{@xref{Automatic Dialog Handling}.} The Object-Identifier associated with
+this feature is @samp{@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+xom-packages(1) xgcp(2) common(1) automatic-transaction-handling(3) @}}.  This Object-Identifier is
+represented by the constant @*
+@samp{GCP_AUTOMATIC_TRANSACTION_HANDLING}.
 
 @item @b{Automatic ASN.1 BER Encoding and Decoding} @*
 This feature provides for automatic encoding and decoding of OM class and attribute types using
-ASN.1 BER;refer to @ref{Encoding and Decoding}.  The Object-Identifier associated with this feature
-is @samp{@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
-xom-packages(1) xmap(1) common(1) automatic-decoding(3) @}}.
-This Object-Identifier is reprsented by the constant @samp{GCP_AUTOMATIC_DECODING}.
+ASN.1 BER.@footnote{@xref{Encoding and Decoding}.}  The Object-Identifier associated with this
+feature is @samp{@{ iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+xom-packages(1) xgcp(2) common(1) automatic-decoding(4) @}}.  This Object-Identifier is represented
+by the constant @*
+@samp{GCP_AUTOMATIC_DECODING}.
+
 Automatic ASN.1 BER Encoding and Decoding is enabled by default.
 
 @end itemize
@@ -2883,8 +2950,8 @@ This function can return a @b{System-Error} or @b{Library-Error} ``miscellaneous
 
 This function does not return a @b{Communications-Error}, nor any gateway control errors.
 
-The function can also return the error constants @perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and @perr{[GCP_INSUFFICIENT_RESOURCE]}.
+The function can also return the error constants @perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and @perr{GCP_INSUFFICIENT_RESOURCE}.
 @item EXAMPLE
 @sp 1
 @smallformat
@@ -2920,7 +2987,7 @@ for (i = 0; i < 6; i++)
 @section Open()
 @table @b
 @item NAME
-@b{Open} --  Request establishment of a Gateway Control Services association
+@b{Open} --  Request establishment of a Gateway Control Services dialog.
 @item SYNOPSIS
 @format
 @verbatim
@@ -2932,13 +2999,13 @@ GCP_status gcp_open(
         OM_private_obect        context,
         OM_object               argument,
         OM_private_object       *result_return,
-        OM_sint32               *transaction_id_return
+        OM_sint32               *dialog_id_return
 );
 @end verbatim
 @end format
 @item DESCRIPTION
-This function is used to request the creation of a gateway control entity association.  The service
-is defined as a confirmed service: a reply is expected.
+This function is used to request the creation of a gateway control entity association dialog.  The
+service is defined as a confirmed service: a reply is expected.
 
 This operation may be called in asynchronous mode.  Note that when operating in this mode, results
 may not only be locally discarded (when @b{Abandon()} is used), as may be done with other
@@ -2947,8 +3014,8 @@ asynchronous calls.
 @table @i
 @item Session (Object(Session))
 The gateway control session against which this operation is performed.  This must be a private
-object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}  This session must also have AMH
-(Automatic Message Handling) disabled.
+object previously returned from @i{Bind()}.@footnote{@xref{Bind}.}  This session must also have
+ADH@footnote{@xref{Automatic Dialog Handling}.} disabled.
 @item Context (Object(Context))
 The gateway control context to be used for this operation.  This argument must be a private
 object.
@@ -2960,7 +3027,7 @@ connected @b{Session} object is returned in the Result of this function.
 @item RESULTS
 @table @i
 @item Status (Status)
-If the function is called syncrhonously, the value @b{success} indicated that the action was
+If the function is called synchronously, the value @b{success} indicated that the action was
 completed.  If called asynchronously, it indicates that the operation was initiated.
 @item Result (Object(*))
 Upon successful completion of a synchronous call, the results is one of the following:
@@ -2989,8 +3056,8 @@ The original @b{Session} object passed to this function is unaffected and still 
 the bound or associated state.  This session object can still be used in additional concurrent
 @i{Open()} or @i{Receive()} function calls.
 @end table
-@item Transaction-ID (Integer)
-The returned @b{Transaction-ID} of the management operation when used asynchronously.
+@item Dialog-ID (Integer)
+The returned @b{Dialog-ID} of the gateway control operation when used asynchronously.
 @end table
 @item ERRORS
 This function can return one of the following @b{Library-Errors}: bad argument, bad-class,
@@ -3000,9 +3067,9 @@ time-limit-exceeded.
 This function can return a @b{Communications-Error}.
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @item SEE ALSO
 @i{Abort()},@footnote{@xref{Abort}.}
 @i{Assoc-rsp()},
@@ -3152,7 +3219,7 @@ For @b{Completion-Flag} values of @b{completed} or @b{partial}, the @b{Result-or
 is valid only if the @b{Operation-Status} contains the value @b{success}.  The parameter is not
 valid for @b{Completion-Flag} values of @b{nothing} or @b{outstanding}.
 @item Invoke-or-Dialog-ID (Integer)
-The Transaction-ID or Dialog-ID of the operation whose error, result or argument is being returned.
+The Dialog-ID or Dialog-ID of the operation whose error, result or argument is being returned.
 
 This result is only valid of the @b{Status} has the value @b{success} and @b{Completion-Flag} has
 the value @b{completed}, @b{partial} or @b{incoming}.
@@ -3166,9 +3233,9 @@ errors related to the completed asynchronous operation is reported in @b{Operati
 described above.)
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @end table
 
 @page
@@ -3192,9 +3259,9 @@ GCP_status gcp_refuse(
 @end verbatim
 @end format
 @item DESCRIPTION
-This function is one of a group of dialogue handling functions: @i{Open()}, @i{Accept()},
-@i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage the GCP dialogue
-when AAM is disabled on a session.  When AAM is enabled on a session, this dialogue handling
+This function is one of a group of dialog handling functions: @i{Open()}, @i{Accept()},
+@i{Refuse()}, @i{Issue()}, @i{Close()}, @i{Abort()}, @i{Receive()}, used to manage the GCP dialog
+when AAM is disabled on a session.  When AAM is enabled on a session, this dialog handling
 function is neither necessary nor permitted.
 
 This function is used to refuse a previously indicated @b{Open} operation.  This function can only
@@ -3230,9 +3297,9 @@ session-terminated.
 This function can return a @b{Communications-Error}.
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @item CORRESPONDENCE
 This function corresponds to the @var{GCP-OPEN} response primitive (with a parameter indicating
 refusal) of 3GPP TS 29.002 Section 7.
@@ -3354,8 +3421,8 @@ the following OM attributes:
 @item processing-Failure
 @end itemize
 @end itemize
-@item Transaction-ID (Integer)
-The @b{Transaction-ID} of the initiated gateway control service operation when invoked asynchronously.
+@item Dialog-ID (Integer)
+The @b{Dialog-ID} of the initiated gateway control service operation when invoked asynchronously.
 It is significant in the case of a confirmed mode request only.
 @end table
 @item ERRORS
@@ -3366,9 +3433,9 @@ reply-limit-exceeded, time-limit-exceeded.
 This function can return a @b{Communications-Error}.
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} or
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} or
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @item SEE ALSO
 @i{Abandon()},@footnote{@xref{Abandon}.}
 @i{Service-rsp()}.@footnote{@xref{Service-rsp}.}
@@ -3431,9 +3498,9 @@ The final ``empty'' @i{Service-rsp()} call includes a response that contains onl
 @end itemize
 For more details about the OM classes and OM attributes mentioned above, refer to @ref{Interface
 Class Definitions}.
-@item Transaction-ID (Integer)
-The @b{Transaction-ID} of the requested operation to which the reply applies.  This is the
-@b{Transaction-ID}
+@item Dialog-ID (Integer)
+The @b{Dialog-ID} of the requested operation to which the reply applies.  This is the
+@b{Dialog-ID}
 that was returned from a call to @i{Receive()} that indicated the service request to which this
 service response corresponds.
 @end table
@@ -3450,9 +3517,9 @@ not-supported, session-terminated.
 This function can return a @b{Communications-Error}.
 
 This function can also return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} or
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} or
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @item SEE ALSO
 @i{Receive()},@footnote{@xref{Receive}.}
 @i{Service-req()}.@footnote{@xref{Service-req}.}
@@ -3521,8 +3588,8 @@ Inidcates whether or not the shutdown function succeeded.
 @end table
 @item ERRORS
 This function can return the error constants
-@perr{[GCP_NO_WORKSPACE]} or
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE} or
+@perr{GCP_INSUFFICIENT_RESOURCES}.
 @item SEE ALSO
 @i{Initialize()}.@footnote{@xref{Initialize}.}
 @item EXAMPLE
@@ -3642,10 +3709,14 @@ exactly one of the following OM attributes:
 @page
 @node Unbind
 @section Unbind()
+
 @table @b
+
 @item NAME
 @b{Unbind} --- unbind from a gateway control session.
+
 @item SYNOPSIS
+
 @format
 @verbatim
 #include <xom.h>
@@ -3656,34 +3727,43 @@ GCP_status gcp_unbind(
 );
 @end verbatim
 @end format
+
 @item DESCRIPTION
 This function terminates the given gateway control session, and makes the argument unavailable
 for use with other interface functions (except @i{Bind()}).
 
-Note that this means the results of any outstanding asynchronous operations that were intiiated
-uinsg the given @b{Session} can no longer be received.  Any such operations may be terminated
+Note that this means the results of any outstanding asynchronous operations that were initiated
+using the given @b{Session} can no longer be received.  Any such operations may be terminated
 prematurely.  For this reason it is recommended that all outstanding asynchronous operations are
 processed using @i{Receive()} before @i{Unbind()} is called.
 
-The unbound session may be used again as an argument to @i{Bind()} possible after modification by
+The unbound session may be used again as an argument to @i{Bind()} possibly after modification by
 the XOM functions (reference @b{XOM}).  When it is no longer required, it must be deleted using the
 XOM functions.
 
 The @b{Library-Error} ``session-terminated'' will be returned as the error value to a synchronous
-function call using the terminated session.
+function call using a terminated session.
+
 @item ARGUMENTS
+
 @table @i
+
 @item Session (Object(Session))
-The management session that is to be unbound.  This must be a private object previously returned by
+The gateway control session that is to be unbound.  This must be a private object previously returned by
 @i{Bind()}.  The value of the @b{File-Descriptor} OM attribute will be @b{No-Valid-File-Descriptor}
 (@samp{GCP_NO_VALID_FILE_DESCRIPTOR}) if the function succeeds.  The other OM attributes will be
 unchanged.
+
 @end table
+
 @item RESULTS
 @table @i
+
 @item Status (Status)
 Takes the value @b{success} if @b{Session} was unbound, and take an error value if not.
+
 @end table
+
 @item ERRORS
 This function can return a @b{System-Error} or one of the following @b{Library-Errors}: bad-class,
 bad-session, miscellaneous, session-terminated.
@@ -3691,11 +3771,13 @@ bad-session, miscellaneous, session-terminated.
 This function does not return a @b{Communications-Error} or any gateway control errors.
 
 This function can return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} or
-@perr{[GCP_INSUFFICIENT_RESOURCES]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} or
+@perr{GCP_INSUFFICIENT_RESOURCES}.
+
 @item SEE ALSO
 @i{Bind()}.@footnote{@xref{Bind}.}
+
 @end table
 
 @page
@@ -3720,7 +3802,7 @@ GCP_status gcp_validate_obejct(
 @item DESCRIPTION
 This function is used to analyze any OM-Object to validate its structure.  It may be used as a debug
 tool prior to issuing other XGCP function calls.  It may also be used after XGCP function calls that
-return @perr{[GCP_E_BAD_ARGUMENT]}.
+return @perr{GCP_E_BAD_ARGUMENT}.
 
 It is not the intention of this function to be able to validate all OM objects in all packages.  Its
 purpose is to validate only those primary OM objects that may be validly passed as arguments to
@@ -3735,24 +3817,24 @@ success will be returned.  That is, the function does not analyze the contents o
 The OM-Object to analyze and validate.
 @item Workspace (Workspace)
 Specifies the workspace (obtained from a call to @i{Initialize()}, in which @b{Bad-Argument} OM
-object will be created if the return status is @perr{[GCP_E_BAD_ARGUMENT]}.  Test-Objects does not
+object will be created if the return status is @perr{GCP_E_BAD_ARGUMENT}.  Test-Objects does not
 need to be from this workspace.
 @end table
 @item RESULTS
 @table @i
 @item Status (Status)
-Indicates whether or not the validation was successful.  A value of @perr{[GCP_E_BAD_ARGUMENT]}
+Indicates whether or not the validation was successful.  A value of @perr{GCP_E_BAD_ARGUMENT}
 indicates a validation failure and problem details are in the @b{Bad-Argument} parameter.
 @item Bad-Argument (Object(Bad-Argument))
-When Status is @perr{[GCP_E_BAD_ARGUMENT]}, the result is one instance of the OM class
+When Status is @perr{GCP_E_BAD_ARGUMENT}, the result is one instance of the OM class
 @b{Bad-Argument}.
 @end table
 @item ERRORS
 This function can return the error constants
-@perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INSUFFICIENT_RESOURCES]},
-@perr{[GCP_E_SYSTEM]} or
-@perr{[GCP_E_BAD_ARGUMENT]}.
+@perr{GCP_NO_WORKSPACE},
+@perr{GCP_INSUFFICIENT_RESOURCES},
+@perr{GCP_E_SYSTEM} or
+@perr{GCP_E_BAD_ARGUMENT}.
 @item EXAMPLE
 Following is a @samp{C} binding example of validating a user-generated public object from the GSM
 MAP Short Message services package:
@@ -3818,7 +3900,7 @@ An ordered sequence of gateway control sessions to wait upon.  The last value mu
 NULL.
 @item Workspace (Workspace)
 Specifies the workspace (obtained from a call to @i{Initialize()}, in which a @type{GCP_status}
-object will be created if the return status is other than @perr{[GCP_SUCCESS]}.  Session(s)
+object will be created if the return status is other than @perr{GCP_SUCCESS}.  Session(s)
 specified in the @b{bound-session-list} do no need to be from this workspace.
 @item Timeout (Integer)
 The maximum number of milliseconds to suspend before returning when there are no messages from the
@@ -3852,8 +3934,8 @@ typedef struct {
 This function can return one of the following @b{Library-Errors}: bad-address, bad-session,
 bad-workspace, miscellaneous, session-terminated.
 
-The function can also return the error constants @perr{[GCP_NO_WORKSPACE]},
-@perr{[GCP_INVALID_SESSION]} and @perr{[GCP_INSUFFICIENT_RESOURCE]}.
+The function can also return the error constants @perr{GCP_NO_WORKSPACE},
+@perr{GCP_INVALID_SESSION} and @perr{GCP_INSUFFICIENT_RESOURCE}.
 @item SEE ALSO
 @i{Initialize()},@footnote{@xref{Initialize}.}
 @i{Receive()},@footnote{@xref{Receive}.}
@@ -4032,17 +4114,340 @@ classes are only returned by the interface and never supplied to it (for example
 @section Common GCP Package
 
 @menu
-* Transaction-Pending::
+* Acse-Args::
+* Action::
+* Action-Request::
+* Action-Response::
+* Address::
+* Application-Context-List::
+* Assoc-Argument::
+* Assoc-Result::
+* Command::
+* Context::
+* Extension::
+* Gcp-Assoc-Args::
+* Message::
+* Presentation-Context::
+* Presentation-Layer-Args::
+* Response::
+* Session::
+* Title::
 * Transaction-Request::
 * Transaction-Response::
+* Transaction-Pending::
+* Version-List::
 @end menu
 
 The Common GCP package introduces some additional OM syntaxes that are derivations of the
 @i{String(Octet)} syntax.  These additional OM syntaxes are used to represent digit strings for
 telephony numbers and SCCP addresses.
 
+@node Acse-Args
+@subsection Acse-Args
+@vindex Acse-Args
+
+An instance of OM class @b{Acse-Args} identifies ACSE specific arguments that will be used during
+association establishment to a remote peer entity.  These can be specified in the @b{Session} object
+if @dfn{Automatic Association Management (AAM)} is enabled, or in the @b{Assoc-Argument} or
+@b{Assoc-Result} object if @dfn{AAM} is disabled.  An instance of this OM class has the OM
+attributes of its super-classes, @i{Object}, and additionally the OM attributes listed in
+@tabref{31}.
+
+@tabfig{xgcp_tab031,31,OM Attributes of OM class @b{Acse-Args}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item responder-Address
+Indicates the address of the responding program named by @var{responder-Title}.
+@item responder-Title
+Indicates the name of the program which will be used to service gateway control requests.  It may be
+a distinguished name (instance of OM class Form1) or a registered name (instance of OM class Form2)
+which is used in name/network address resolution phased to get the application process title, the
+application entity qualifier and the presentation address.  It may also be the Entity-Name of the
+responding program.
+@item application-Context
+The application context name proposed by the user to be used on the gateway control association.
+When automatic dialog handling is enabled on the session, the application context will be selected
+by the Gateway Control Service provider consistent with the Gateway Control Service request or
+indication.  Gateway Control Service packages define a set of security contexts that are applicable
+to the service package.
+@item security-Context
+The security context name proposed by the user to be used on the gateway control association.  By
+default the security context is not present.  Gateway Control Service packages define a set of
+security contexts that are applicable to the service package, defined as integers (Form 1 local
+values) or Object-Identifiers (Form 2 global values), for use as the value of this object.  For
+example, for H.248 Version 3 there are four possibilities:
+@itemize
+@item ESP header in accordance with Section 5 of RFC 2406, for IP version 6.
+@item AH header in accordance with Section 5 of RFC 2402, for IP version 6.
+@item ESP or AH header as above, but tunnelling IP version 6 over IP version 4, or vise verse.
+@item The interim AH scheme described in ITU-T Recommendation H.248.1 (09/2005) Clause 10.2.
+@end itemize
+@item authentication-Information
+Provides authentication information for use with the security context (if any).
+@end vtable
+
+Note that, although this OM attribute is named after ACSE (Association Control Service Execution),
+which is an OSI layer, none of MGCP, MEGACO nor H.248 provide an ACSE layer.  Nevertheless, MGCP,
+MEGACO and ACSE support the concept of an association and requires equivalent arguments as would the
+OSI or SS7 ACSE layer.
+
+@node Action
+@subsection Action
+@vindex Action
+
+An instance of OM class @var{Action} represents an action, that is a sequence of commands, pending
+notifications or responses that are applied to a gateway control context.  This OM class is an
+abstract class containing several defined subclasses: @b{Action-Request} and @b{Action-Response}.
+An instance of this OM class has the OM attributes of its super-classes, @b{Object}, and
+additionally the OM attributes listed in @tabref{23}.
+
+@tabfig{xgcp_tab023,23,OM Attributes of OM class @b{Action}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+
+@item context
+Provides the Gateway Control Service context, which is the context as defined by the Standards,
+rather than the Context supplied as an argument to most XGCP interface functions.
+
+@end vtable
+
+@node Action-Request
+@subsection Action-Request
+@vindex Action-Request
+
+An instance of OM class @var{Action-Request} represents an action that is a sequence of commands
+that are applied to a gateway control context.  This OM class is an abstract class containing
+several defined classes: @b{MGCP-Action-Request}, @b{MEGACO-Action-Request} and
+@b{H248-Action-Request}.  An instance of this OM class has the OM attributes of its super-classes,
+@b{Object} and @b{Action}, and additionally the OM attributes listed in @tabref{24}.
+
+@tabfig{xgcp_tab024,24,OM Attributes of OM class @b{Action-Request}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item command-List
+One or more commands of OM class @b{Command} or derived classes, that are applicable to the context
+of the action.
+@end vtable
+
+@node Action-Response
+@subsection Action-Response
+@vindex Action-Response
+
+An instance of OM class @var{Action-Response} represents the response to an action that is a
+sequence of responses that result from commands applied to a gateway control context.  This OM class
+is an abstract class containing several defined classes: @b{MGCP-Action-Response},
+@b{MEGACO-Action-Response} and @b{H248-Action-Response}.  An instance of this OM class has the OM
+attributes of its super-classes, @b{Object} and @b{Action}, and additionally the OM attributes
+listed in @tabref{25}.
+
+@tabfig{xgcp_tab025,25,OM Attributes of OM class @b{Action-Response}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item response-List
+One ore more responses of OM class @b{Response} or derived classes, that are applicable to the
+context of the action.
+@end vtable
+
+@node Address
+@subsection Address
+@vindex Address
+
+An instance of OM class Address represents the address of a particular gateway control entity.  It
+is used to define the specific location to contact a particular gateway control entity.  An instance
+of this OM class has all of the attributes of its super-classes, @i{Object}, and additionally the OM
+attributes listed in @tabref{32}.
+
+@tabfig{xgcp_tab032,32,OM Attributed of OM class @b{Address}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item internet-Address
+The address is represented using an octet string that contains the encoding of an IP version 4 or IP
+version 6 address (@pxref{String(Internet-Address)}) with the following considerations:
+@itemize @bullet
+@item The encoded address @emph{shall} have both an IP address and port number.
+@item The encoded address @emph{shall} not have a host name in the address.
+@item The encoded address will distinguish between IP version 4 format and IP version 6 format using
+the address family indicator.
+@end itemize
+@end vtable
+
+@node Application-Context-List
+@subsection Application-Context-List
+@vindex Application-Context-List
+
+An instance of OM class @b{Application-Context-List} represents a list of application context names.
+An instance of this OM class has the OM attributes of its super-classes, @i{Object}, and
+additionally the OM attributes listed in @tabref{35}.
+
+@tabfig{xgcp_tab035,35,OM Attributes of OM class @b{Application-Context-List}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item application-Context-Name
+This attribute is one or more instances of an application context name consisting of an integer
+syntax or an object-identifier syntax.  The integer syntax is only applicable to some Gateway
+Control packages (e.g. the H.248 service package).
+@end vtable
+
+@node Assoc-Argument
+@subsection Assoc-Argument
+@vindex Assoc-Argument
+
+An instance of OM class @b{Assoc-Argument} is the information supplied as an argument of an ACSE
+Association operation to be performed.  This object is passed to @i{Assoc-req()} or returned from
+@i{Receive()}.  An instance of this OM class has the OM attributes of its super-classes, @i{Object},
+and additionally the OM attributes listed in @tabref{27}.
+
+@tabfig{xgcp_tab027,27,OM Attributes of OM class @b{Assoc-Argument}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item presentation-Layer-Args
+Indicates any presentation layer arguments needed during association establishment.  If none are
+supplied, the Gateway Control Service provider will supply defaults if required.
+Presentation layer arguments are not required for MGCP.  For MEGACO and H.248; however, the
+presentation layer arguments specify whether the ASN.1 BER binary encoding of ITU-T Recommendation
+H.248.1 (09/2005) Annex A or the text encoding of Annex B is used on the association.
+@item acse-Args
+Indicates ACSE related arguments that will be used during association establishment.  If none are
+supplied, the Gateway Control Service provider will supply defaults if required.
+@item gcp-Assoc-Args
+Indicates GCP related arguments that will be used during association establishment.  If none are
+supplied, the Gateway Control Service provider will supply defaults if required.
+@item session
+Used to return an associated @b{Session} object.  This attribute must be empty when @i{Assoc-req()}
+is called, and is supplied as a @b{Result} parameter by the Gateway Control Service provider upon
+return from that call.  When the object is returned from @i{Receive()}, this attribute is a
+partially associated @b{Session} object.  Partially associated session objects can be aborted by
+calling @i{Abort-req()} using the new partially associated session object.  Partially associated
+session objects can become fully associated by calling @i{Assoc-rsp()}.  To accept or refuse the new
+association, call @i{Assoc-rsp()} using the new partially associated session object that was
+returned by @i{Receive()} for the association indication.
+@end vtable
+
+@node Assoc-Result
+@subsection Assoc-Result
+@vindex Assoc-Result
+
+An instance of OM class @b{Assoc-Result} is the information supplied as a response of an ACSE
+Associate operation to be performed.  This object is passed to @i{Assoc-rsp()} or returned from
+@i{Receive()}.  An instance of this OM class has the OM attributes of its super-classes, @i{Object},
+and additionally the OM attributes listed in @tabref{28}.
+
+@tabfig{xgcp_tab028,28,OM Attributes of OM class @b{Assoc-Result}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item presentation-Layer-Args
+Indicates any presentation layer arguments needed during association establishment.  If none are
+supplied, the Gateway Control Service provider will supply defaults when required.
+Presentation layer arguments are not required for MGCP.  For MEGACO and H.248; however, the
+presentation layer arguments specify whether the ASN.1 BER binary encoding of Annex B or the text
+encoding of Annex C is used on the association.
+@item acse-Args
+Indicates ACSE related arguments that will be used during association establishment.  If none are
+supplied, the Gateway Control Service provider will supply defaults when required.
+@item gcp-Assoc-Args
+Indicates GCP related arguments that will be used during association establishment.  If none are
+supplied, the Gateway Control Service provider will supply defaults when required.
+@item session
+Used to return to the user an associated session object.  This object may be used for all future
+interface calls pertaining to this new association.
+@end vtable
+
+@node Command
+@subsection Command
+@vindex Command
+
+An instance of OM class @var{Command} represents a command issued for gateway control.  This OM
+class is an abstract class containing a number of defined classes: @b{MGCP-Command},
+@b{MEGACO-Command} and @b{H248-Command}.  An instance of this OM class has the OM attributes of its
+super-classes, @b{Object}.  This OM class does not have any defined class-specific attributes.
+
+@node Context
+@subsection Context
+@vindex Context
+
+An instance of OM class @b{Context} comprises per operation arguments that are accepted by most of
+the interface functions.  An instance of this OM class has the OM attributes of its super-classes,
+@i{Object}, and additionally the OM attributes listed in @tabref{37}.
+
+@tabfig{xgcp_tab037,37,OM Attributes of OM class @b{Context}}
+
+This OM class contains the following class-specific OM attributes:
+@table @var
+@item Common Arguments
+@vtable @var
+@item extensions
+@end vtable
+@item Service Controls
+@vtable @var
+@item mode
+@item application-Context
+@item responder-Address
+@item responder-Title
+@end vtable
+@item Local Controls
+@vtable @var
+@item asynchronous
+@item reply-Limit
+@item time-Limit
+@end vtable
+@end table
+
+@node Extension
+@subsection Extension
+@vindex Extension
+
+An instance of OM class @b{Extension} represents an extension to ASN.1 syntax.  This object is coded
+using the @dfn{any} syntax.  The particular syntax of the extension is dependent upon the object
+within which an instance of this extension object is contained.  An instance of this OM class has
+the OM attributes of its super-classes, @i{Object}, and additionally the OM attributes listed in
+@tabref{38}.
+
+@tabfig{xgcp_tab038,38,OM Attributes of OM class @b{Extension}}
+
+This OM class contains the following class-specific attributes:
+@vtable @var
+@item extension
+This attribute is a syntax that represents the ASN.1 encoding of the extension complete with tags.
+@end vtable
+
+@node Gcp-Assoc-Args
+@subsection Gcp-Assoc-Args
+@vindex Gcp-Assoc-Args
+
+An instance of OM class @b{Gcp-Assoc-Args} represents the GCP association arguments that are
+optionally supplied by the @b{Session}, @b{Assoc-Argument} or @b{Assoc-Result} objects and can be
+interrogated with the @i{Get-Assoc-Info()} function.  An instance of this OM class has the OM
+attributes of its super-classes, @i{Object}, and additionally the OM attributes listed in
+@tabref{34}.
+
+@tabfig{xgcp_tab034,34,OM Attributes of OM class @b{Gcp-Assoc-Args}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item application-Context-List
+@item version-List
+@end vtable
+
 @node Message
 @subsection Message
+@vindex Message
 
 An instance of OM class @var{Message} represents the base information that is supplied as an
 argument to the @i{Send()} function (@pxref{Send()}) or is returned by the @i{Receive()} function
@@ -4064,8 +4469,197 @@ This OM class contains the following class-specific OM attributes:
 One ore more transactions of OM class @b{Transaction} or derived classes.
 @end vtable
 
+@node Presentation-Context
+@subsection Presentation-Context
+@vindex Presentation-Context
+
+An instance of OM class @b{Presentation-Context} lists the presentation contexts for association
+establishment.  An instance of this OM class has the OM attributes of its super-classes, @i{Object},
+and additionally the OM attributes listed in @tabref{30}.
+
+@tabfig{xgcp_tab030,30,OM Attributes of OM class @b{Presentation-Context}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+
+@item presentation-Id
+The integer user identification of the presentation context.
+
+@item presentation-Abstract
+Identifies the abstract syntax.  If no value is supplied, by default the abstract syntax name is
+provided by the Gateway Control package.
+
+@end vtable
+
+MGCP only supports a single presentation context: text encoding, and in the case of MGCP, no
+@var{presentation-Abstract} need be specified.  The MGCP services package does, however, define an
+Object-Identifier used to specify the default text encoding.  MEGACO/H.248 (all versions), on the
+other hand, supports both ITU-T Recommendation H.248.1 (09/2005) Annex A binary encoding (ASN.1
+BER), as well as text encoding.  The MEGACO/H.248 services packages specify the  Object-Identifiers
+to use with the @var{presentation-Abstract} OM attribute.
+
+@node Presentation-Layer-Args
+@subsection Presentation-Layer-Args
+@vindex Presentation-Layer-Args
+
+An instance of OM class @b{Presentation-Layer-Args} identifies the presentation layer arguments that
+will be used during association establishment.  These can be specified in the session object if AAM
+is enabled, or in the @b{Assoc-Argument} or @b{Assoc-Result} object if AAM is disabled.  An instance
+of this OM class has the OM attributes of its super-classes, @i{Object}, and additionally the OM
+attributes listed in @tabref{29}.
+
+@tabfig{xgcp_tab029,29,OM Attributes of OM class @b{Presentation-Layer-Args}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+
+@item presentation-Context-List
+The list of presentation contexts.
+
+@end vtable
+
+MGCP only supports a single presentation context: text encoding, and in the case of MGCP, no
+presentation-Layer-Args need be specified.  On the other hand, MEGACO and H.248 (all versions) may
+support ITU-T Recommendation H.248.1 (09/2005) Annex A binary encoding (ASN.1 BER), or Annex B text
+encoding, or both.
+
+When used on an ``invoker-role'' session (MGC) and the transport address port number is not
+specified in the @var{requester-Address} or @var{requester-Title}, the
+@var{presentation-Context-List} specifies which well-known ports on which the invoker will listen
+for remote Gateway Control Service indications.  There are two well-known ports defined: one for
+binary encoding and another for text encoding.
+
+@node Response
+@subsection Response
+@vindex Response
+
+An instance of OM class @var{Response} represents the response to a gateway control command.  This
+OM class is an abstract class containing a number of defined classes: @b{MGCP-Response},
+@b{MEGACO-Response} and @b{H248-Response}.  An instance of this OM class has the OM attribuges of
+its super-classes, @b{Object}.  This OM class does not have any defined class-specific attributes.
+
+@node Session
+@subsection Session
+@vindex Session
+
+An instance of OM class @b{Session} identifies a particular communications link from the application
+program to the Gateway Control Service provider or to a remote gateway control entity depending upon
+the state of the session object.  Session objects can be created with @dfn{Automatic Association
+Management (AAM)} enabled or disabled.  If @dfn{AAM} is enabled, then all of the ACSE connection
+management, needed to deliver a gateway control service operation, is done by the Gateway Control
+Service provider.  If @dfn{AAM} is disabled, the ACSE connection management is done by the user
+before issuing or receiving Gateway Control Service operations.
+The use and rules for the session object are different depending upon whether @dfn{AAM} is enabled
+or disabled.  @dfn{AAM} is specified as part of @i{Negotiate()}.@footnote{@xref{Negotiate}.}
+An instance of this OM class has the OM attributes of its super-classes, @i{Object}, and
+additionally the OM attributes listed in @tabref{36}.
+
+@tabfig{xgcp_tab036,36,OM Attributes of OM class @b{Session}}
+
+For a description of the three types of @b{Session} object: @dfn{AAM} Enabled Session, @dfn{AAM}
+Disabled Session, and Connected Session, @pxref{Session}.
+The OM attributes of a @b{Session} are:
+
+@vtable @var
+
+@item requester-Address
+Indicates the address of the requesting program named by @var{requester-Title}.  If both the
+@var{requester-Address} and @var{requester-Title} are not specified, the service provider will
+supply a default @var{requester-Address}.
+
+@item requester-Title
+Indicates the name of the requesting program, user of this session.  It may be a distinguished name
+(instance of OM class @b{Form1}) or a registered name (instance of OM class @b{Form2}) which is used
+in the name/network address resolution phase to get the application process title, the application
+entity qualifier and the presentation address.  It may also be the entity-name of the requesting
+program.
+
+@item role
+Indicates the roles acted by the requester.  The role value is specified by OR-ing none, one, or
+more of the following values:
+
+@table @b
+
+@item performer-role
+(@samp{GCP_T_PERFORMER_ROLE}) Responder and performer of gateway control service operations.  Unless
+this role is set or implied, no indications will be returned by calls to @i{Receive()} (only
+confirmations and notifications) and the Gateway Control Service provider does not need to provide
+indications to the bound session user.  In the terms of the Standards, the performer role is that of
+the @dfn{Media Gateway (MG)}.
+
+@item invoker-role
+(@samp{GCP_T_INVOKER_ROLE}) Requester and invoker of gateway control service operations.  If
+@b{performer-role} is set and @b{invoker-role} is clear, the Gateway Control Service provider does
+not need to honor operation or service requests (other than @b{Notify-Request}) from the bound
+session user.  In terms of the Standards, the invoker role is that of the @dfn{Media Gateway
+Controller (MGC)}.
+
+@end table
+
+When both role flags are clear, or this attribute is not present in the session, the Gateway Control
+Service provider will still honor operation and service requests.  Implementations of this interface
+are not required to permit the performer and invoker roles simultaneously.
+
+@item file-Descriptor
+Indicates the file descriptor associated with the session.  The file descriptor may be used by
+implementations of the @i{Wait()} function.  The file descriptor may be used in subsequent calls to
+vendor-specific system facilities to suspend the process (for example, System V @manref{poll(2s)} or
+BSD @manref{select(2)}.  Its use for any other purpose is unspecified.  If the implementation does
+not define any suitable suspension facilities, or if the session is not started, the value is
+@b{No-Valid-File-Descriptor} (@samp{-1} or @samp{GCP_NO_VALID_FILE_DESCRIPTOR}).
+
+@item presentation-Layer-Args
+Indicates any presentation layer arguments needed during association establishment.  If none are
+supplied, the Gateway Control Service providers will supply defaults when required.
+
+When the session supports the @b{invoker-role}, the @var{presentation-Layer-Args} specifies which
+encodings the invoker supports, and determines which well-known port numbers upon which the invoker
+will listen for association indications.
+
+@item acse-Args
+Indicates the ACSE related arguments that will be used during association establishment.  If none
+are supplied, the Gateway Control Service provider will supply defaults when required.
+
+@item gcp-Assoc-Args
+Indicates the GCP association related arguments that will be used during association establishment.
+If none are supplied, the Gateway Control Services provider will supply defaults when required.
+
+@end vtable
+
+@node Title
+@subsection Title
+@vindex Title
+
+An instance of OM class @b{Title} represents the title of a particular gateway control service
+entity.  It contains various subclass types used to define the specific gateway control process or
+system name responsible for a gateway control service entity.  An instances of this OM class has all
+of the attributes of its super-classes, @i{Object}, and additionally the OM attributes listed in
+@tabref{33}.
+
+@tabfig{xgcp_tab033,33,OM Attributes of OM class @b{Title}}
+
+This OM class contains the following class-specific OM attributes:
+
+@vtable @var
+@item internet-Address
+The title is represented using an octet string that contains the encoding of an internet address,
+either IP version 4 or IP version 6 address (@pxref{String(Internet-Address)}) with the following
+considerations:
+@itemize @bullet
+@item The encoded address @emph{may} have either an IP address or a port number, or both, in the
+address.
+@item The encoded address @emph{shall} have a host name in the address (the host name indicated
+@emph{shall not} be null).
+@item The encoded address will distinguish between IP version 4 format and IP version 6 format using
+the address family indicator.
+@end itemize
+@end vtable
+
 @node Transaction
 @subsection Transaction
+@vindex Transaction
 
 An instance of OM class @var{Transaction} represents the base information that is supplied as an
 argument to the @i{Request()}, @i{Pending()} or @i{Response()} functions, or is returned by the
@@ -4086,81 +4680,13 @@ This OM class contains the following class-specific OM attributes:
 @item transaction-ID
 @end vtable
 
-@node Action
-@subsection Action
-
-An instance of OM class @var{Action} represents an action, that is a sequence of commands, pending
-notifications or responses that are applied to a gateway control context.  This OM class is an
-abstract class containing several defined subclasses: @b{Action-Request} and @b{Action-Response}.
-An instance of this OM class has the OM attributes of its super-classes, @b{Object}, and
-additionally the OM attributes listed in @tabref{23}.
-
-@tabfig{xgcp_tab023,23,OM Attributes of OM class @b{Action}}
-
-This OM class contains the following class-specific OM attributes:
-
 @vtable @var
 @item context-ID
 @end vtable
 
-@node Action-Request
-@subsection Action-Request
-
-An instance of OM class @var{Action-Request} represents an action that is a sequence of commands
-that are applied to a gateway control context.  This OM class is an abstract class containing
-several defined classes: @b{MGCP-Action-Request}, @b{MEGACO-Action-Request} and
-@b{H248-Action-Request}.  An instance of this OM class has the OM attributes of its super-classes,
-@b{Object} and @b{Action}, and additionally the OM attributes listed in @tabref{24}.
-
-@tabfig{xgcp_tab024,24,OM Attributes of OM class @b{Action-Request}}
-
-This OM class contains the following class-specific OM attributes:
-
-@vtable @var
-@item commands
-One or more commands of OM class @b{Command} or derived classes, that are applicable to the context
-of the action.
-@end vtable
-
-@node Action-Response
-@subsection Action-Response
-
-An instance of OM class @var{Action-Response} represents the response to an action that is a
-sequence of responses that result from commands applied to a gateway control context.  This OM class
-is an abstract class containing several defined classes: @b{MGCP-Action-Response},
-@b{MEGACO-Action-Response} and @b{H248-Action-Response}.  An instance of this OM class has the OM
-attributes of its super-classes, @b{Object} and @b{Action}, and additionally the OM attributes
-listed in @tabref{25}.
-
-@tabfig{xgcp_tab025,25,OM Attributes of OM class @b{Action-Response}}
-
-This OM class contains the following class-specific OM attributes:
-
-@vtable @var
-@item responses
-One ore more responses of OM class @b{Response} or derived classes, that are applicable to the
-context of the action.
-@end vtable
-
-@node Command
-@subsection Command
-
-An instance of OM class @var{Command} represents a command issued for gateway control.  This OM
-class is an abstract class containing a number of defined classes: @b{MGCP-Command},
-@b{MEGACO-Command} and @b{H248-Command}.  An instance of this OM class has the OM attributes of its
-super-classes, @b{Object}.  This OM class does not have any defined class-specific attributes.
-
-@node Response
-@subsection Response
-
-An instance of OM class @var{Response} represents the response to a gateway control command.  This
-OM class is an abstract class containing a number of defined classes: @b{MGCP-Response},
-@b{MEGACO-Response} and @b{H248-Response}.  An instance of this OM class has the OM attribuges of
-its super-classes, @b{Object}.  This OM class does not have any defined class-specific attributes.
-
-
 @node Transaction-Request
 @subsection Transaction-Request
+@vindex Transaction-Request
 
 An instance of OM class @var{Transaction-Request} represents the base information that is supplied
 as an argument to the @i{Request()} function (@pxref{Request()}) or is returned by the @i{Receive()}
@@ -4179,19 +4705,9 @@ This OM class contains the following class-specific OM attributes:
 One or more requests of OM class @b{Action-Request} or derived classes.
 @end vtable
 
-@node Transaction-Pending
-@subsection Transaction-Pending
-
-An instance of OM class @var{Transaction-Pending} represents the base information that is supplied
-as an argument to the @i{Pending()} function (@pxref{Pending()}) or is returned by the @i{Receive()}
-function (@pxref{Receive()}) for a transaction indication.  This OM class is an abstract class
-containing several defined subclasses: @b{MGCP-Transaction-Pending}, @b{MEGACO-Transaction-Pending}
-and @b{H248-Transaction-Pending}.  An instance of this OM class has the OM attributes of its
-super-classes, @i{Object} and @i{Transaction}.  This OM class does not have any defined
-class-specific OM attributes.
-
 @node Transaction-Response
 @subsection Transaction-Response
+@vindex Transaction-Response
 
 An instance of OM class @var{Transaction-Response} represents the base information that is supplied
 as an argument to the @i{Response()} fnction (@pxref{Response()}) or is returned by the
@@ -4209,6 +4725,23 @@ This OM class contains the following class-specific OM attributes:
 @item responses
 One or more responses of OM class @b{Action-Response} or derived classes.
 @end vtable
+
+@node Transaction-Pending
+@subsection Transaction-Pending
+@vindex Transaction-Pending
+
+An instance of OM class @var{Transaction-Pending} represents the base information that is supplied
+as an argument to the @i{Pending()} function (@pxref{Pending()}) or is returned by the @i{Receive()}
+function (@pxref{Receive()}) for a transaction indication.  This OM class is an abstract class
+containing several defined subclasses: @b{MGCP-Transaction-Pending}, @b{MEGACO-Transaction-Pending}
+and @b{H248-Transaction-Pending}.  An instance of this OM class has the OM attributes of its
+super-classes, @i{Object} and @i{Transaction}.  This OM class does not have any defined
+class-specific OM attributes.
+
+@node Version-List
+@subsection Version-List
+@vindex Version-List
+
 
 @node MGCP Package
 @section MGCP Package

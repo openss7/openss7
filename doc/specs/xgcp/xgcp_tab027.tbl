@@ -35,6 +35,9 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-response-List:Object(Response):\(em:1-more:\(em
+presentation-Layer-Args:Object(Presentation-Layer-Args):\(em:0-1:\(em
+acse-Args:Object(Acse-args):\(em:0-1:\(em
+gcp-Assoc-Args:Object(GCP-Assoc-Args):\(em:0-1:\(em
+session:Object(Session):\(em:0-1:\(em
 _
 .TE
