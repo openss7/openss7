@@ -35,5 +35,6 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
+command-List:Object(Command):\(em:1-more:\(em
 _
 .TE
