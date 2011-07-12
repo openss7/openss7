@@ -1,0 +1,529 @@
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=8 et
+MEGACO-TONES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, 
+    mib-2
+        FROM SNMPv2-SMI
+    DisplayString, RowStatus, TestAndIncr
+        FROM SNMPv2-TC;
+
+megacoTonesMIB MODULE-IDENTITY
+    LAST-UPDATED "200102141200Z"
+    ORGANIZATION 
+        "IETF"
+    CONTACT-INFO 
+        "
+         Name:      Stacy Doyle
+         eMail:     sad@nortelnetworks.com
+         phone:     919.905.2687 "
+    DESCRIPTION 
+        "The MEGACO TONES MIB module."
+    REVISION    "200102141200Z"
+    DESCRIPTION 
+        "This is the initial Draft version of this MIB."
+    ::= { mib-2 1001 }
+
+-- *****************************************************************
+--
+-- OID and Group Definitions
+--
+-- *****************************************************************
+
+-- OID for the MIB Objects...
+
+megacoTonesMIBObjects OBJECT IDENTIFIER
+    ::= { megacoTonesMIB 1 }
+
+
+-- The Megaco Tones MIB contains 2 (object) groups.
+
+megTonesCapabilities OBJECT IDENTIFIER
+    ::= { megacoTonesMIBObjects 1 }
+
+--******************************************************************
+--
+-- MEGACO TONES MIB ....
+--
+-- The MEGACO TONES MIB module consists of two tables
+-- defined as megTonesToneTable and megTonesGroupTable.
+-- Multiple tonesets are represented through the megTonesToneTable.
+-- The tonesets share the data contained in the megTonesGroupTable
+-- megTonesToneTable
+-- The megTonesToneTable provides a list of the tones available on a
+-- Media Gateway. The megTonesTable consists of five columns;
+-- Column 1 (index): megTonesToneSetId - a number indicating a _
+--                   unique toneset; this number represents a
+--                   toneset (for a given market) available on a
+--                   Media Gateway.
+-- Column 2 (index): megTonesToneId - a number indicating a unique
+--                   Tone Id value; this number represents a Tone Id
+--                   available on a Media Gateway.
+-- Column 3: megTonesToneGroupId - a number indicating a unique Tone
+--           Group Id that is associated with a megTonesToneId. This
+--           number is also an index into the megTonesGroupTable.
+-- Column 4: megTonesTone Name - this is a character string
+--           indicating the Tone Name. (The Tone Name could be
+--           represented by the text that gets passed in the
+--           Signal Descriptor; i.e., the Package Id, Signal Id and
+--           possible parameters.)
+-- Column 5: megTonesToneTimeout - this value indicates when the
+--           tone times out, expressed in milliseconds. This value
+--           is used as the primary means to determine when the tone
+--           times out; if the tone group duration(s) is greater
+--           than the tone timeout value, the tone is finished
+--           when the tone timeout occurs. A value of 0 signifies no
+--           timeout.
+-- Column 6: megTonesRowStatus - this is used to create new rows in
+--           this table, modify existing rows, and to delete
+--           existing rows.
+-- megTonesGroupTable
+-- The megTonesGroupTable provides the components that comprise
+-- the various Group Ids.
+-- The megTonesGroupTable is indexed by the megTonesToneGroupId
+-- (from the megTonesTable) and the megTonesGroupIndex.
+--
+-- The columns of the megTonesGroupTable are as follows:
+-- Column 1 (index): megTonesToneGroupId - a number indicating a
+--                   unique Tone Group Id value. This value is from
+--                   the megTonesToneTable.
+-- Column 2 (index): megTonesGroupIndex - a number indicating the
+--                   component number of a tone group. If the tone
+--                   group contains only one component then this
+--                   value is 1; if the tone group contains multiple
+--                   components then this value starts at 1 and
+--                   increases by one sequentially for each
+--                   component.
+-- Column 3: megTonesGroupRef- a number indicating an existing tone
+--           group Id value.
+-- Column 4: megTonesGroupLink - a number indicating the linkage, if
+--           any, between components of the group as follows:
+--           (1) SEQ: the next component follows sequentially in
+--           time.
+--           (2) MIX: the next component is to be mixed with the
+--           current component and is simultaneous with it.
+--           (3) MOD-AMP: the next component is amplitude modulated
+--           with the current component. This is accomplished by
+--           encoding information onto a carrier waveform by varying
+--           the amplitude of the [sinusoidal] carrier.
+--           Mathematically, this is expressed as:
+--           y(t) = x(t)*cos(wc*t).  In the context of the Tones
+--           MIB, this refers to two signals (tones), one of which
+--           is usually a simple sinusoid, whose sample values, at
+--           any given instant in time, are multiplied together.
+--           (4) MOD-FREQ: the next component is frequency modulated
+--           with the current component. This is accomplished by
+--           encoding information onto a carrier waveform by
+--           varying the frequency of the [sinusoidal] carrier.
+--           Mathematically, this is expressed as:
+--           y(t) = ac*cos(x(t)).  In the context of the Tones MIB,
+--           this refers to a sinusoidal signal (tone) whose
+--           instantaneous phase is given by a second signal.
+--           (5) PCM: the current component indicated is Pulse Code
+--           Modulation. In the context of the Tones MIB, it means
+--           that incoming PCM (voice, for example) is passed
+--           straight through, instead of having a signal (tone,
+--           silence, etc.) applied.
+-- Column 5: megTonesGroupFrequency - a number indicating the
+--           frequency in hertz of a tone; The range is decimal 0 to
+--           4000.
+-- Column 6: megTonesGroupLevel - a number indicating the amplitude
+--           in dBmo of a tone; The range is decimal -128 to 0.
+-- Column 7: megTonesGroupDuration - a number indicating the
+--           duration expressed in milliseconds of a tone; The range
+--           is decimal 0 to 32767. If the tone duration is less
+--           than the timeout value specified for that tone, the
+--           tone is finished when the duration is reached.
+-- Column 8: megTonesGroupRepeatCount - a number indicating the
+--           repeat count of a tone; the range is decimal 0 to
+--           32767, with a 0 value indicating infinite repeating.
+-- Column 9: megTonesGroupRowStatus - This is used to create new
+--           rows in this table, modify existing rows, and to delete
+--           rows.
+
+
+-- MEGACO TONES MIB RULES:
+-- (1) A megTonesToneGroupId MUST NOT be deleted if it is referenced
+--     by another existing megTonesToneGroupId.
+-- (2) A megTonesToneGroupId value MUST NOT be the same value as a
+--     megTonesGroupRef value for the same table row.
+-- (3) A megTonesGroupRef value MUST be a previously defined
+--     megTonesToneGroupId value.
+-- (4) A megTonesGroupFrequency value REQUIRES a megTonesGroupLevel
+--     value.
+-- (5) The megTonesGroupRef field, the megTonesGroupFrequency field
+--     and the megTonesGroupLink field with a value of PCM, MUST all
+--     be mutually exclusive to each other.
+-- (6) Every row MUST have a megTonesGroupLink equal to PCM, a
+--     megTonesGroupRef OR megTonesGroupFrequency associated with
+--     it.
+-- (7) The megTonesGroupLink field is only valid for
+--     megTonesGroupIndex equal to a value of 1.
+-- (8) megTonesGroupRepeatCount is REQUIRED:
+--          - if the megTonesGroupLink value is SEQ and (vice versa)
+--          - AND if megTonesGroupIndex equal to a value of 1.
+-- (9) Each row of a sequence MUST have a megTonesGroupDuration
+--     unless:
+--          - The row contains a megTonesGroupRef which points to a
+--            megTonesToneGroupId which represents a sequence with
+--            a finite megTonesGroupRepeatCount.
+-- (10) megTonesGroupDuration is only valid within rows forming a
+--      sequence.
+-- (11) A megTonesToneId which references a megTonesToneGroupId not
+--      based upon a finite repeat count sequence will have its
+--      duration defined in the megTonesToneTimeout field.
+-- (12) A megTonesToneId which references a megTonesToneGroupId that
+--      directly or indirectly consists of a sequence group with a
+--      finite repeat count SHALL have the duration defined by the
+--      megTonesToneTimeout field or the duration of the sequence
+--      (whichever is smaller).
+-- (13) If a megTonesGroupLink of MIX, MOD-FREQ or MOD-AMP contains
+--      one or more infinite duration components and a single finite
+--      duration component, the resultant group MUST have a finite
+--      duration equal to that of the finite duration component.
+-- (14) If a megTonesGroupLink of MIX, MOD-FREQ or MOD-AMP contains
+--      multiple components with different finite durations, those
+--      components whose durations are less than the maximum finite
+--      duration MUST be padded with silence to make them equal to
+--      the maximum finite duration.
+
+-- NOTE: An example of a Megaco/H.248 Generic Package Define Tone
+--       signal/command along with a populated MEGACO TONES MIB is
+--       located at the end of the MEGACO TONES MIB module
+--       specification.  While the example complies with the above
+--       rules, other valid interpretations are possible.
+
+
+--  Tone Table
+
+megTonesToneTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MegTonesToneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains a list of the various Tone 
+         Ids available on a Media Gateway. Each row of 
+         the table contains a field to indicate the Tone 
+         Id value (column 1), a field to indicate the 
+         Tone Group Id (column 2 ) associated with the 
+         Tone Id, a field to hold a name for the tone 
+         (column 3), a field to hold a Timeout value for 
+         the Tone Id (column 4), and a field to indicate 
+         the status of the table row (column 5)."
+    ::= { megTonesCapabilities 1 }
+
+megTonesToneEntry OBJECT-TYPE
+    SYNTAX      MegTonesToneEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This entry contains objects that indicate the 
+         Tone Id value, the Tone Group Id value, the 
+         Tone Name, and the status of the row.  The 
+         indices for an entry are the megTonesToneSetId 
+         and the megTonesToneId, and a manager creates 
+         a row in this table to define a Tone. Thus, a 
+         toneSet consists of a list of Tones (toneIds)"
+    INDEX       { megTonesToneSetId, megTonesToneId }
+    ::= { megTonesToneTable 1 }
+
+MegTonesToneEntry ::= SEQUENCE {
+    megTonesToneSetId       Unsigned32,
+    megTonesToneId          Unsigned32,
+    megTonesToneGroupId     Unsigned32,
+    megTonesToneName        DisplayString,
+    megTonesToneTimeout     Integer32,
+    megTonesToneRowStatus   RowStatus
+}
+
+megTonesToneSetId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This Row's unique toneSet identity."
+    ::= { megTonesToneEntry 1 }
+
+megTonesToneId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate a unique tone identity."
+    ::= { megTonesToneEntry 2 }
+
+megTonesToneGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the entry in the 
+         MegTonesGroupTable that defines this tone, it 
+         is an Index into that table"
+    ::= { megTonesToneEntry 3 }
+
+megTonesToneName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A string to indicate a unique tone identity."
+    ::= { megTonesToneEntry 4 }
+
+megTonesToneTimeout OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate when the tone times out, 
+         expressed in milliseconds. This value is used 
+         as the primary means to determine when the tone 
+         is stopped; if the tone group duration(s) is 
+         greater than the tone timeout value, the tone 
+         is stopped when the tone timeout occurs.  A 
+         value of 0 indicates no timeout (the tone will 
+         play until explicitly stopped)."
+    ::= { megTonesToneEntry 5 }
+
+megTonesToneRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "used to create new rows in this table, 
+         modify existing rows, and to delete rows."
+    ::= { megTonesToneEntry 6 }
+
+-- Next Group Id
+
+megTonesNextGroupId OBJECT-TYPE
+    SYNTAX      TestAndIncr
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "The Next Group Id value available for a Media 
+         Gateway. Assists the manager in selecting a 
+         value for megTonesToneGroupId. A manager will 
+         'lock' this variable to ensure single access."
+    ::= { megTonesCapabilities 3 }
+
+-- Group Table
+
+megTonesGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MegTonesGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table contains a list of the various tone 
+         groups.  This table is recursively accessed in 
+         order to completely define a tone."
+    ::= { megTonesCapabilities 4 }
+
+megTonesGroupEntry OBJECT-TYPE
+    SYNTAX      MegTonesGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This entry contains objects that describe the 
+         tone characteristics.  The indices for an entry 
+         are the megTonesToneGroupId and 
+         megTonesGroupIndex.  megTonesToneGroupId is a 
+         field from the megTonesToneTable"
+    INDEX       { megTonesToneGroupId, megTonesGroupIndex }
+    ::= { megTonesGroupTable 1 }
+
+MegTonesGroupEntry ::= SEQUENCE {
+    megTonesGroupIndex          Unsigned32,
+    megTonesGroupRef            Integer32,
+    megTonesGroupGroupLink      INTEGER,
+    megTonesGroupFrequency      Integer32,
+    megTonesGroupLevel          Integer32,
+    megTonesGroupDuration       Integer32,
+    megTonesGroupRepeatCount    Integer32,
+    megTonesGroupRowStatus      RowStatus
+}
+
+megTonesGroupIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A value used to access all the entries in the 
+         table that correspond to a particular Group Id. 
+         This value also serves to order the entries for 
+         the Group Index."
+    ::= { megTonesGroupEntry 1 }
+
+megTonesGroupRef OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value used to recursively enter the 
+         megTonesGroupTable. It indicates that this 
+         portion of the group is a reference to a 
+         different GroupId in the table."
+    ::= { megTonesGroupEntry 2 }
+
+megTonesGroupGroupLink OBJECT-TYPE
+    SYNTAX      INTEGER { seq(1), mix(2), modAmp(3), modFreq(4), pcm(5) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value used to indicate how the entries for a 
+         Group Id are related.
+         
+         - seq(1), next component follows sequentially in time
+         - mix(2), next component is to be mixed with the current 
+           and is simultaneous with it.
+         - modAmp(3), next component is amplitude modulated with the 
+           current component.
+         - modFreq(4), next component is frequency modulated with 
+           the current component.
+         - pcm(5), the current component in the tone is PCM."
+    ::= { megTonesGroupEntry 3 }
+
+megTonesGroupFrequency OBJECT-TYPE
+    SYNTAX      Integer32 (0..4000)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the frequency in hertz of a 
+         tone. The range is decimal 0 to 4000."
+    ::= { megTonesGroupEntry 4 }
+
+megTonesGroupLevel OBJECT-TYPE
+    SYNTAX      Integer32 (-128..0)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the amplitude expressed in 
+         dBm0 of a tone.  The range is decimal -32 to 
+         0."
+    ::= { megTonesGroupEntry 5 }
+
+megTonesGroupDuration OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the duration expressed in 
+         milliseconds of a tone.  The range is decimal 0 
+         to 32767. A value of 0 indicates no duration is 
+         defined."
+    ::= { megTonesGroupEntry 6 }
+
+megTonesGroupRepeatCount OBJECT-TYPE
+    SYNTAX      Integer32 (0..32767)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A value to indicate the repeat count of a tone. 
+         The range is decimal 0 to 32767, with value 0 
+         Indicating infinite repeating"
+    ::= { megTonesGroupEntry 7 }
+
+megTonesGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This is used to create new rows in this table, 
+         modify existing rows, and to delete rows."
+    ::= { megTonesGroupEntry 8 }
+
+megTonesProperties OBJECT IDENTIFIER
+    ::= { megacoTonesMIBObjects 2 }
+
+
+-- *****************************************************************
+--
+-- Megaco Profile Property
+--
+-- OIDs that define the Properties that a Termination can support.
+-- The MEDIA-GATEWAY-MIB supports a Property Profile Table, in which
+-- a Manager
+-- defines a Property Profile by defining a list of properties that
+-- a that a termination supports.
+--
+-- These properties are OIDs, defined in each "Package".
+--******************************************************************
+
+megTonesProperty OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "Tones Property Package"
+    ::= { megTonesProperties 1 }
+
+
+-- *****************************************************************
+--
+-- Megaco-Tones-MIB Notification Definitions
+--
+-- There Are No Notifications at this time
+--
+-- *****************************************************************
+
+megacoTonesMIBNotifications OBJECT IDENTIFIER
+    ::= { megacoTonesMIB 2 }
+
+megTonesNotifPrefix OBJECT IDENTIFIER
+    ::= { megacoTonesMIBNotifications 0 }
+
+megTonesNotifObjects OBJECT IDENTIFIER
+    ::= { megacoTonesMIBNotifications 1 }
+
+-- *****************************************************************
+--
+-- Conformance for the Megaco-Tones-MIB
+--
+--
+-- *****************************************************************
+
+megacoTonesConformance OBJECT IDENTIFIER
+    ::= { megacoTonesMIB 3 }
+
+megTonesCompliances OBJECT IDENTIFIER
+    ::= { megacoTonesConformance 1 }
+
+megTonesConfGroups OBJECT IDENTIFIER
+    ::= { megacoTonesConformance 2 }
+
+-- Units of Conformance
+
+megTonesToneSetGrp OBJECT-GROUP
+    OBJECTS     { megTonesToneGroupId, megTonesToneName, 
+                  megTonesToneTimeout, megTonesToneRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Objects which implement ToneSet Definition"
+    ::= { megTonesConfGroups 1 }
+
+megTonesGroupGrp OBJECT-GROUP
+    OBJECTS     { megTonesNextGroupId, megTonesGroupRef, 
+                  megTonesGroupGroupLink, megTonesGroupFrequency, 
+                  megTonesGroupLevel, megTonesGroupDuration, 
+                  megTonesGroupRepeatCount, megTonesGroupRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "objects which implement Tone-ToneGroup Characteristics 
+         Definition"
+    ::= { megTonesConfGroups 2 }
+
+-- Compliance
+
+megTonesCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Compliance statement for entities which implement 
+         the Megaco Tones Package MIB."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { megTonesToneSetGrp, megTonesGroupGrp }
+
+    ::= { megTonesCompliances 1 }
+
+END -- end of module MEGACO-TONES-MIB.

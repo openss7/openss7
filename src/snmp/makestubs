@@ -64,6 +64,9 @@ export MIBFILES
 all: simple storage openss7 master
 
 dump: \
+	megacoRingingMIB.mib \
+	megacoTonesMIB.mib \
+	megacoMib.mib \
 	rtpswMIB.mib \
 	rtpswOmMIB.mib \
 	sfpMIB.mib \
@@ -105,6 +108,15 @@ dump: \
 	x25MIB.mib \
 	x400pMIB.mib \
 	x400pMIB.mib
+
+megacoRingingMIB.mib: ../mibs/MEGACO-RINGING-MIB.mib
+	smidump -k MEGACO-RINGING-MIB >$@ || :
+
+megacoTonesMIB.mib: ../mibs/MEGACO-TONES-MIB.mib
+	smidump -k MEGACO-TONES-MIB >$@ || :
+
+megacoMib.mib: ../mibs/MEGACO-MIB.mib
+	smidump -k MEGACO-MIB >$@ || :
 
 rtpswMIB.mib: ../mibs/OPENSS7-RTPSW-MIB.mib
 	smidump -k OPENSS7-RTPSW-MIB >$@ || :
@@ -230,6 +242,9 @@ x400pMIB.mib: ../mibs/OPENSS7-X400P-MIB.mib
 #	smidump -k OPENSS7-X400-MX-MIB >$@ || :
 
 lint: \
+	megacoRingingMIB.lint \
+	megacoTonesMIB.lint \
+	megacoMib.lint \
 	rtpswMIB.lint \
 	rtpswOmMIB.lint \
 	sfpMIB.lint \
@@ -271,6 +286,15 @@ lint: \
 	x25MIB.lint \
 	x400pMIB.lint \
 	x400pMIB.lint
+
+megacoRingingMIB.lint: ../mibs/MEGACO-RINGING-MIB.mib
+	smilint -ms MEGACO-RINGING-MIB >$@ 2>&1 || :
+
+megacoTonesMIB.lint: ../mibs/MEGACO-TONES-MIB.mib
+	smilint -ms MEGACO-TONES-MIB >$@ 2>&1 || :
+
+megacoMib.lint: ../mibs/MEGACO-MIB.mib
+	smilint -ms MEGACO-MIB >$@ 2>&1 || :
 
 rtpswMIB.lint: ../mibs/OPENSS7-RTPSW-MIB.mib
 	smilint -ms OPENSS7-RTPSW-MIB >$@ 2>&1 || :
@@ -1305,6 +1329,12 @@ x400pCardTable.c x400pCardTable.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-X400
 	indent -nhnl x400pCardTable.[ch]
 
 clean:
+	rm -f megacoRingingMIB.mib
+	rm -f megacoRingingMIB.lint
+	rm -f megacoTonesMIB.mib
+	rm -f megacoTonesMIB.lint
+	rm -f megacoMib.mib
+	rm -f megacoMib.lint
 	rm -f rtpswMIB_openss7.[ch]
 	rm -f rtpswMIB_openss7.[ch]~
 	rm -f rtpswMIB_simple.[ch]
