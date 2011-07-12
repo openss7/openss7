@@ -1,4 +1,4 @@
-.\" vim: ft=groff
+.\" vim: ft=groff nocin
 .ie '\*(.T'ps' \{\
 \X'ps: pagesize letter'
 .in 0.0i
@@ -26,7 +26,6 @@
 .nr HM 0.0i
 .nr FM 0.0i
 .\}
-.\" Move Response parameters (same as Add, Modify and Subtract Response)
 .TS
 center expand tab(:);
 lblblblblb
@@ -42,9 +41,7 @@ mux-Descriptor:Object(Mux-Descriptor):\(em:0-1:\(em
 events-Descriptor:Object(Events-Descriptor):\(em:0-1:\(em
 signals-Descriptor:Object(Signals-Descriptor):\(em:0-1:\(em
 digit-Map-Descriptor:Object(Digit-Map-Descriptor):\(em:0-1:\(em
-observed-Events-Descriptor:Object(Observed-Events-Descriptor):\(em:0-1:\(em
-event-Buffer-Descriptor:Object(Event-Buffer-Descriptor):\(em:0-1:\(em
+audit-Descriptor:Object(Audit-Descriptor):\(em:0-1:\(em
 statistics-Descriptor:Object(Statistics-Descriptor):\(em:0-1:\(em
-packages-Descriptor:Object(Packages-Descriptor):\(em:0-1:\(em
 _
 .TE

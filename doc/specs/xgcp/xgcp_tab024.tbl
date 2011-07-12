@@ -35,6 +35,9 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-command-List:Object(Command):\(em:1-more:\(em
+context-Id:Object(Context-ID):\(em:1:\(em
+context-Request:Object(Context-Request):\(em:0-1:\(em
+context-Attr-Audit-Req:Object(Context-Attr-Audit-Req):\(em:0-1:\(em
+command-Requests:Object(Command-Request):\(em:1-more:\(em
 _
 .TE
