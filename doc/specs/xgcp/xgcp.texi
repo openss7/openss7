@@ -296,6 +296,7 @@ This is Edition @value{PACKAGE_RELEASE}@value{PACKAGE_PATCHLEVEL}, last updated 
 * Introduction::
 * C Language Binding::
 * Description::
+* Packages::
 * Interface Functions::
 * Interface Class Definitions::
 * Errors::
@@ -1172,8 +1173,8 @@ following attributes within the session object can be specified:
 
 @itemize
 
-@item @var{requester-Address} --- the address (IP address) used by the local gateway control entity to
-communicate with remote gateway control entities.  When not specified for MGC entities, the
+@item @var{requester-Address} --- the address (IP address) used by the local gateway control entity
+to communicate with remote gateway control entities.  When not specified for MGC entities, the
 @var{requester-Title} must resolve to an address (i.e. using DNS).
 
 @item @var{requester-Title} --- the title (host name) used by the local gateway control entity to
@@ -1185,7 +1186,7 @@ associated entities.  This can either identify the MGC role or the MG role.
 
 @end itemize
 
-The session object is then passed as an argument to the @i{Bind()},@footnote{@xref{Bind}.} that
+The session object is then passed as an argument to the @i{Bind()} function (@pxref{Bind}) that
 binds the session.  This bound session can only used to send underlying transport related operations
 and to receive underlying transport related primitives.  The following can be sent/received using
 this type of bound session.
@@ -1856,6 +1857,207 @@ Outstanding operation requested in a gateway control service interaction.
 @item OPIND
 Operation indication received in a gateway control service interaction.
 @end table
+
+@node Packages
+@chapter Packages
+
+@node Feature Packages
+@section Feature Packages
+
+@node Common GCP Feature Package
+@subsection Common GCP Package
+
+The Object-Identifier associated with the Common GCP package is:
+
+@format
+@verbatim
+  { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+    xom-packages(1) xgcp(2) common(1) }
+@end verbatim
+@end format
+
+This Object-Identifier is represented by the constant @b{Common-Package} (@samp{GCP_COMMON_PKG}).
+
+@node MGCP Feature Package
+@subsection MGCP Package
+
+The Object-Identifier associated with the MGCP package is:
+
+@format
+@verbatim
+  { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+    xom-packages(1) xgcp(2) mgcp(2) }
+@end verbatim
+@end format
+
+This Object-Identifier is represented by the constant @b{MGCP-Package} (@samp{GCP_MGCP_PKG}).
+
+@node MEGACO Feature Packages
+@subsection MEGACO Package
+
+The Object-Identifier associated with the MEGACO package is:
+
+@format
+@verbatim
+  { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+    xom-packages(1) xgcp(2) megaco(3) }
+@end verbatim
+@end format
+
+This Object-Identifier is represented by the constant @b{MEGACO-Package} (@samp{GCP_MEGACO_PKG}).
+
+The Object-Identifiers associated with the MEGACO package for various versions of the protocol are:
+
+@format
+@verbatim
+  { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+    xom-packages(1) xgcp(2) megaco(3) v1(1) }
+  { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+    xom-packages(1) xgcp(2) megaco(3) v2(2) }
+  { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) openss7(29591)
+    xom-packages(1) xgcp(2) megaco(3) v3(3) }
+@end verbatim
+@end format
+
+This Object-Identifiers are represented by the constants
+@b{MEGACO-V1-Package} (@samp{GCP_MEGACO_V1_PKG}),
+@b{MEGACO-V1-Package} (@samp{GCP_MEGACO_V2_PKG}) and
+@b{MEGACO-V1-Package} (@samp{GCP_MEGACO_V3_PKG}), respectively.
+
+@node H.248 Feature Packages
+@subsection H.248 Package
+
+The Object-Identifier associated with the H.248 package is:
+
+@format
+@verbatim
+  { itu-t(0) recommendation(0) h(8) h248(248) part1(1) }
+@end verbatim
+@end format
+
+This Object-Identifier is represented by the constant @b{H248-Package} (@samp{GCP_H248_PKG}).
+
+The Object-Identifiers associated with the H.248.1 package for various versions of the protocol are:
+
+@format
+@verbatim
+  { itu-t(0) recommendation(0) h(8) h248(248) part1(1) version1(1) }
+  { itu-t(0) recommendation(0) h(8) h248(248) part1(1) version1(2) }
+  { itu-t(0) recommendation(0) h(8) h248(248) part1(1) version1(3) }
+@end verbatim
+@end format
+
+This Object-Identifiers are represented by the constants
+@b{MEGACO-V1-Package} (@samp{GCP_H248_V1_PKG}),
+@b{MEGACO-V2-Package} (@samp{GCP_H248_V2_PKG}) and
+@b{MEGACO-V3-Package} (@samp{GCP_H248_V3_PKG}), respectively.
+
+@node H.248 Extension Feature Packages
+@subsection H.248 Extension Packages
+
+ITU-T Recommendation H.248.1 (09/2005) provides for its own extension package concept.  Each
+extension package is in a part of the H.248 suite of specifications.  There are over 50 of these
+extension packages defined and the list is too long to repeat here and the list would contain too
+much redundant information (see ITU-T Recommendations Series H Supplement 2 (07/2010) for a guide to
+the ITU-T H.248.x sub-series packages).  Therefore, these recommendations and extension packages are
+identified by an Object-Identifier of the general form: @t{@{ itu-t(0) recommendation(0) h(8)
+h248(248) partX(X) versionY(Y) @}}, where, @samp{X} is the part number in the H.248 suite (for
+example, for H.248.12, @samp{X} is @samp{12}); and, @samp{Y} is the GCP protocol version (for
+example, for GCP Version 3, @samp{Y} is @samp{3}).  The `C' language binding of these
+Object-Identifiers are @b{H248-X-VY-Package} (@samp{GCP_H248_X_VY_PKG}).  To refer to the extension
+package without specifying the version, use @t{@{ itu-t(0) recommendation(0) h(8) h248(248) partX(X)
+@}} only.  The `C' language binding of these Object-Identifiers are @b{H248-X-Package}
+(@samp{GCP_H248_X_PKG}).
+
+@sp
+
+@multitable @columnfractions .26 .74
+@item ITU-T H.248.1 Annex E  @tab Basic packages.
+@item ITU-T H.248.2          @tab Facsimile, text, conversation and call discrimination packages.
+@item ITU-T H.248.3          @tab User interface elements and actions package.
+@item ITU-T H.248.6          @tab Dynamic tone definition package.
+@item ITU-T H.248.7          @tab Generic announcement package.
+@item ITU-T H.248.9          @tab Advanced media server packages.
+@item ITU-T H.248.10         @tab Media gateway resource congestion handling package.
+@item ITU-T H.248.11         @tab Media gateway overload control package.
+@item ITU-T H.248.12         @tab H.248.1 packages for H.323 and H.324 interworking.
+@item ITU-T H.248.12 Annex A @tab Extended H.324, H.245 command and H.245 indication packages.
+@item ITU-T H.248.13         @tab Quality alert ceasing package.
+@item ITU-T H.248.14         @tab Inactivity timer package.
+@item ITU-T H.248.15         @tab SDP H.248 package attribute.
+@item ITU-T H.248.16         @tab Enhanced digit collection packages and procedures.
+@item ITU-T H.248.17         @tab Line test packages.
+@item ITU-T H.248.18         @tab Package for support of multiple profiles.
+@item ITU-T H.248.19         @tab Decomposed MCU, audio, video and data conferencing packages.
+@item ITU-T H.248.20         @tab Local and remote descriptors with H.221/H.223 multiplexing.
+@item ITU-T H.248.21         @tab Semi-permanent connection handling package.
+@item ITU-T H.248.22         @tab Shared risk group package.
+@item ITU-T H.248.23         @tab Enhanced alerting packages.
+@item ITU-T H.248.24         @tab MF tone generation and detection packages.
+@item ITU-T H.248.25         @tab Basic CAS packages.
+@item ITU-T H.248.26         @tab Enhanced analogue lines package.
+@item ITU-T H.248.27         @tab Supplemental tones packages.
+@item ITU-T H.248.28         @tab International CAS packages.
+@item ITU-T H.248.29         @tab International CAS compelled register signalling packages.
+@item ITU-T H.248.30         @tab RTCP extended performance metrics package.
+@item ITU-T H.248.31         @tab Adaptive jitter buffer package.
+@item ITU-T H.248.32         @tab Detailed congestion reporting package.
+@item ITU-T H.248.33         @tab PCM frame spare bit package.
+@item ITU-T H.248.34         @tab Stimulus analogue line package.
+@item ITU-T H.248.35         @tab Coin-operated phone control package.
+@item ITU-T H.248.36         @tab Hanging termination detection package.
+@item ITU-T H.248.37         @tab IP NAPT traversal package.
+@item ITU-T H.248.38         @tab Base context package.
+@item ITU-T H.248.39         @tab SDP parameter identification and wildcarding.
+@item ITU-T H.248.40         @tab Application data inactivity detection package.
+@item ITU-T H.248.41         @tab IP domain connection package.
+@item ITU-T H.248.42         @tab DCME interworking package.
+@item ITU-T H.248.43         @tab Gate management packages.
+@item ITU-T H.248.44         @tab Multi-level precedence and pre-emption package.
+@item ITU-T H.248.45         @tab MGC information package.
+@item ITU-T H.248.46         @tab Connection capability control package.
+@item ITU-T H.248.47         @tab Statistic conditional reporting package.
+@item ITU-T H.248.48         @tab RTCP XR block reporting package.
+@item ITU-T H.248.49         @tab SDP RFC packages.
+@item ITU-T H.248.50         @tab NAT traversal toolkit packages.
+@item ITU-T H.248.51         @tab Termination connection model package.
+@item ITU-T H.248.52         @tab Quality of service packages.
+@item ITU-T H.248.53         @tab Traffic management packages.
+@item ITU-T H.248.54         @tab MPLS support package.
+@item ITU-T H.248.55         @tab Generic pull mode package.
+@item ITU-T H.248.56         @tab Virtual private network packages.
+@item ITU-T H.248.57         @tab RTP control protocol package.
+@item ITU-T H.248.58         @tab Package for application of level H.248 statistics.
+@item ITU-T H.248.59         @tab Event timestamp notification package.
+@item ITU-T H.248.60         @tab Identification of content of communication package.
+@item ITU-T H.248.61         @tab Packages for network level H.248 statistics.
+@item ITU-T H.248.62         @tab Re-answer package.
+@item ITU-T H.248.63         @tab Resource management package.
+@item ITU-T H.248.64         @tab IP router packages.
+@item ITU-T H.248.65         @tab Support of the resource reservation protocol.
+@item ITU-T H.248.66         @tab Packages for RTSP and H.248 interworking.
+@item ITU-T H.248.67         @tab GCP transport mode indication package.
+@item ITU-T H.248.68         @tab Package for removal of digits and tones.
+@item ITU-T H.248.69         @tab Packages for interworking between MSRP and H.248.
+@item ITU-T H.248.70         @tab Dialling method information packages.
+@item ITU-T H.248.71         @tab RTCP support packages.
+@item ITU-T H.248.72         @tab ITU-T H.248 support for MONA.
+@item ITU-T H.248.73         @tab MSCML and ITU-T H.248 interworking.
+@item ITU-T H.248.74         @tab Media resource control enhancement package.
+@item ITU-T H.248.75         @tab Package identifier publishing and application package.
+@item ITU-T H.248.76         @tab Filter group package and guidelines.
+@item ITU-T H.248.77         @tab SRTP package and procedures.
+@item ITU-T H.248.78         @tab Bearer-level application level gateway.
+@item ITU-T H.248.80         @tab Usage of the revised SDP offer/answer model with H.248.
+@end multitable
+
+@node Feature Profiles
+@section Feature Profiles
+
+The Standards provide for a wide range of ITU-T Recommendation H.248 extension packages.  Many
+standards bodies have defined profiles of extension packages that define the activation of sets of
+feature packages.  These profiles are defined here.  Activation of a given H.248 profile results in
+the activation deactivation of corresponding feature packages.
 
 @node Interface Functions
 @chapter Interface Functions
@@ -4177,19 +4379,20 @@ classes are only returned by the interface and never supplied to it (for example
 @section Common GCP Package
 
 @menu
+* Basic GCP Types::
 * Abort-Argument::
 * Abort-Result::
 * Accept-Result::
 * Acse-Args::
 * Action::
 * Action-Request::
-* Action-Response::
+* Action-Reply::
 * Address::
 * Application-Context-List::
 * Assoc-Argument::
 * Assoc-Result::
 * Close-Argument::
-* Command::
+* Command-Request::
 * Context::
 * Extension::
 * Generic-Service-Argument::
@@ -4208,7 +4411,7 @@ classes are only returned by the interface and never supplied to it (for example
 * Refuse-Result::
 * Release-Argument::
 * Release-Result::
-* Response::
+* Command-Reply::
 * Service-Argument::
 * Service-Error::
 * Service-Reject::
@@ -4224,6 +4427,180 @@ classes are only returned by the interface and never supplied to it (for example
 The Common GCP package introduces some additional OM syntaxes that are derivations of the
 @i{String(Octet)} syntax.  These additional OM syntaxes are used to represent digit strings for
 telephony numbers and SCCP addresses.
+
+@node Basic GCP Types
+@subsection Basic GCP Types
+
+@menu
+* Auth-Data::
+* Authentication-Header::
+* Context-ID::
+* Domain-Name::
+* Error-Code::
+* Error-Text::
+* IP4-Address::
+* IP6-Address::
+* Message-ID::
+* MTP-Address::
+* Path-Name::
+* Port-Number::
+* Security-Parm-Index::
+* Sequence-Num::
+@end menu
+
+@node Auth-Data
+@subsubsection Auth-Data
+@vindex Auth-Data
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item auth-Data
+A @i{String(Octet)} of 12 to 32 octets in length.
+@end vtable
+
+@node Authentication-Header
+@subsubsection Authentication-Header
+@vindex Authentication-Header
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item sec-Parm-Index
+A @b{Security-Parm-Index} object.
+@item seg-Num
+A @b{Sequence-Num} object.
+@item ad
+A @b{Auth-Data} object.
+@end vtable
+
+@node Context-ID
+@subsubsection Context-ID
+@vindex Context-ID
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item context-ID
+An integer value between 0 and 4294967295 (inclusive).  The following values are significant:
+@table @b
+@item 0
+The @i{NULL}  context value.
+@item 0xFFFFFFFE
+The @i{CHOOSE} context value.
+@item 0xFFFFFFFF
+The @i{ALL} context value.
+@end table
+@end vtable
+
+@node Domain-Name
+@subsubsection Domain-Name
+@vindex Domain-Name
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item name
+An IA5 string containing a properly formated domain name.
+@item port-Number
+A optional @b{Port-Number} object.
+@end vtable
+
+@node Error-Code
+@subsubsection Error-Code
+@vindex Error-Code
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item error-Code
+An integer value between 0 and 65535 inclusive.
+@end vtable
+
+@node Error-Text
+@subsubsection Error-Text
+@vindex Error-Text
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item error-Text
+An IA5 string containing the human readable error text.
+@end vtable
+
+@node IP4-Address
+@subsubsection IP4-Address
+@vindex IP4-Address
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item address
+A 4-octet octet string containing the IP version 4 address.
+@item port-Number
+An optional @b{Port-Number} object.
+@end vtable
+
+@node IP6-Address
+@subsubsection IP6-Address
+@vindex IP6-Address
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item address
+A 16-octet octet string containing the IP version 6 address.
+@item port-Number
+An optional @b{Port-Number} object.
+@end vtable
+
+@node Message-ID
+@subsubsection Message-ID
+@vindex Message-ID
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MTP-Address
+@subsubsection MTP-Address
+@vindex MTP-Address
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node Path-Name
+@subsubsection Path-Name
+@vindex Path-Name
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item path-Name
+An IA5 string between 1 and 64 octets long (inclusive).
+@end vtable
+
+@node Port-Number
+@subsubsection Port-Number
+@vindex Port-Number
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item port-Number
+An integer between 0 and 65535, inclusive.  The value zero (0) has special meaning.
+@end vtable
+
+@node Security-Parm-Index
+@subsubsection Security-Parm-Index
+@vindex Security-Parm-Index
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item security-Parm-Index
+A 4-octet octet string.
+@end vtable
+
+@node Sequence-Num
+@subsubsection Sequence-Num
+@vindex Sequence-Num
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item sequence-Num
+A 4-octet octet string.
+@end vtable
 
 @node Abort-Argument
 @subsection Abort-Argument
@@ -4342,7 +4719,7 @@ OSI or SS7 ACSE layer.
 
 An instance of OM class @var{Action} represents an action, that is a sequence of commands, pending
 notifications or responses that are applied to a gateway control context.  This OM class is an
-abstract class containing several defined subclasses: @b{Action-Request} and @b{Action-Response}.
+abstract class containing several defined subclasses: @b{Action-Request} and @b{Action-Reply}.
 An instance of this OM class has the OM attributes of its super-classes, @b{Object}, and
 additionally the OM attributes listed in @tabref{23}.
 
@@ -4373,30 +4750,108 @@ several defined classes: @b{MGCP-Action-Request}, @b{MEGACO-Action-Request} and
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item command-List
-One or more commands of OM class @b{Command} or derived classes, that are applicable to the context
-of the action.
+@item context-Id
+A @b{Context-ID} object providing the MEGACO context identifier to which the commands in this action
+apply.
+@item context-Request
+An optional @b{Context-Request} object specifying some of the attributes requested to be assigned to
+a context or set of contexts.
+@item context-Attr-Audit-Req
+An optional @b{Context-Attr-Audit-Req} object that, when present, requests the audit of some of the
+characteristics associated with the context or a selected set of contexts.
+@item command-Requests
+One or more commands of OM class @b{Command-Request} or derived classes, that are applicable to the
+context of the action.
 @end vtable
 
-@node Action-Response
-@subsection Action-Response
-@vindex Action-Response
+@node Context-Request
+@subsection Context-Request
+@vindex Context-Request
 
-An instance of OM class @var{Action-Response} represents the response to an action that is a
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item priority
+An optional call priority.
+@item emergency
+An optional boolean value indicating an emergency call.
+@item topology-Req
+Zero or more @b{Topology-Request} objects describing the topology of the context.
+@item ieps-Call-Ind
+An optional boolean value indicating an IEPS call.
+@item context-Prop
+Zero or more @b{Property-Parm} object providing property parameters for the context.
+@item context-List
+Zero or more @b{Context-ID} objects representing a list of contexts.
+@end vtable
+
+@node Context-Attr-Audit-Request
+@subsection Context-Attr-Audit-Request
+@vindex Context-Attr-Audit-Request
+
+An instance of OM class @b{Context-Attr-Audit-Request} represents a request to audit attributes of a
+context or set of contexts.  This OM class contains the attributes of its super-classes, @i{Object},
+plus the additional OM attributes listed in @tabref{67}.
+
+@tabfig{xgcp_tab067,67,OM Attributes of OM class @b{Context-Attr-Audit-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item topology
+An boolean value that, when TRUE, specifies that the topology of the context is requested.
+@item emergency
+An boolean value that, when TRUE, specifies that the emergency status of the context is requested.
+@item priority
+An boolean value that, when TRUE, specifies that the priority of the context is requested.
+@item ieps-Call-Ind
+An boolean value that, when TRUE, specifies that the IEPS call indicator of the context is requested.
+@item context-Prop-Aud
+Zero or more @b{Ind-Aud-Property-Parm} objects, each specifying that the context property is
+requested.
+@item select-Priority
+An optional @b{Priority} object that specifies which value of priority to audit.
+@item select-Emergency
+An optional @b{Emergency} object that specifies which emergency settings to audit.
+@item select-Ieps-Call-Ind
+An optional @b{Ieps-Call-Ind} object that specifies which IEPS call indicators to audit.
+@item select-Logic
+An enumerated value specifying what logical operation to perform across selections.  The value can
+be one of the following:
+@table @b
+@item and-audit-select
+The audit selection items must all be met for the context to be selected for audit.
+@item or-audit-select
+Only one audit selection item must be met for the context to be selected for audit.
+@end table
+When not specified, the default is @b{and-audit-select}.
+@end vtable
+
+@node Action-Reply
+@subsection Action-Reply
+@vindex Action-Reply
+
+An instance of OM class @var{Action-Reply} represents the response to an action that is a
 sequence of responses that result from commands applied to a gateway control context.  This OM class
-is an abstract class containing several defined classes: @b{MGCP-Action-Response},
-@b{MEGACO-Action-Response} and @b{H248-Action-Response}.  An instance of this OM class has the OM
+is an abstract class containing several defined classes: @b{MGCP-Action-Reply},
+@b{MEGACO-Action-Reply} and @b{H248-Action-Reply}.  An instance of this OM class has the OM
 attributes of its super-classes, @b{Object} and @b{Action}, and additionally the OM attributes
 listed in @tabref{25}.
 
-@tabfig{xgcp_tab025,25,OM Attributes of OM class @b{Action-Response}}
+@tabfig{xgcp_tab025,25,OM Attributes of OM class @b{Action-Reply}}
 
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item response-List
-One ore more responses of OM class @b{Response} or derived classes, that are applicable to the
-context of the action.
+@item context-Id
+An object of OM class @b{Context-ID} that specifies the primary context to which this action reply
+corresponds.
+@item error-Descriptor
+An optional object of OM class @b{Error-Descriptor} that is used to describe an error situation.
+@item context-Reply
+An optional object of OM class @b{Context-Request} that is used to return requested audit properties
+of the context.
+@item command-Reply
+One or more command replies of OM class @b{Command-Reply} or derived classes, that are applicable to
+the context of the action.
 @end vtable
 
 @node Address
@@ -4525,14 +4980,21 @@ This OM class is an abstract class with several defined concrete subclasses:
 abstract OM class has the OM attributes of its super-classes, @i{Object}.  It does not define any OM
 attributes of its own.
 
-@node Command
-@subsection Command
-@vindex Command
+@node Command-Request
+@subsection Command-Request
+@vindex Command-Request
 
-An instance of OM class @var{Command} represents a command issued for gateway control.  This OM
-class is an abstract class containing a number of defined classes: @b{MGCP-Command},
-@b{MEGACO-Command} and @b{H248-Command}.  An instance of this OM class has the OM attributes of its
+An instance of OM class @var{Command-Request} represents a command issued for gateway control.  This OM
+class is an abstract class containing a number of defined classes: @b{MGCP-Command-Request},
+@b{MEGACO-Command-Request} and @b{H248-Command-Request}.  An instance of this OM class has the OM attributes of its
 super-classes, @b{Object}.  This OM class does not have any defined class-specific attributes.
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item command
+@item optional
+@item wildcard-Return
+@end vtable
 
 @node Context
 @subsection Context
@@ -4868,13 +5330,13 @@ define any OM attributes of its own.
 @subsection Release-Result
 @vindex Release-Result
 
-@node Response
-@subsection Response
-@vindex Response
+@node Command-Reply
+@subsection Command-Reply
+@vindex Command-Reply
 
-An instance of OM class @var{Response} represents the response to a gateway control command.  This
-OM class is an abstract class containing a number of defined classes: @b{MGCP-Response},
-@b{MEGACO-Response} and @b{H248-Response}.  An instance of this OM class has the OM attribuges of
+An instance of OM class @var{Command-Reply} represents the response to a gateway control command.  This
+OM class is an abstract class containing a number of defined classes: @b{MGCP-Command-Reply},
+@b{MEGACO-Command-Reply} and @b{H248-Command-Reply}.  An instance of this OM class has the OM attribuges of
 its super-classes, @b{Object}.  This OM class does not have any defined class-specific attributes.
 
 @node Service-Argument
@@ -5098,7 +5560,7 @@ additionally the OM attributes listed in @tabref{22}.
 This OM class contains the following class-specific OM attributes:
 
 @vtable @var
-@item transaction-ID
+@item transaction-Id
 @end vtable
 
 @vtable @var
@@ -5144,7 +5606,7 @@ This OM class contains the following class-specific OM attributes:
 
 @vtable @var
 @item responses
-One or more responses of OM class @b{Action-Response} or derived classes.
+One or more responses of OM class @b{Action-Reply} or derived classes.
 @end vtable
 
 @node Transaction-Pending
@@ -5163,99 +5625,226 @@ class-specific OM attributes.
 @subsection Version-List
 @vindex Version-List
 
+@node Common GCP Data Objects
+@subsection Common GCP Data Objects
+
+@menu
+* Audit-Descriptor::
+* Digit-Map-Descriptor::
+* Error-Descriptor::
+* Event-Buffer-Descriptor::
+* Events-Descriptor::
+* Media-Descriptor::
+* Modem-Descriptor::
+* Mux-Descriptor::
+* Observed-Events-Descriptor::
+* Packages-Descriptor::
+* Service-Change-Descriptor::
+* Signals-Descriptor::
+* Statistics-Descriptor::
+* Transaction-ID-Or-List::
+@end menu
+
+@node Audit-Descriptor
+@subsubsection Audit-Descriptor
+@vindex Audit-Descriptor
+
+@node Digit-Map-Descriptor
+@subsubsection Digit-Map-Descriptor
+@vindex Digit-Map-Descriptor
+
+@node Error-Descriptor
+@subsubsection Error-Descriptor
+@vindex Error-Descriptor
+
+@node Event-Buffer-Descriptor
+@subsubsection Event-Buffer-Descriptor
+@vindex Event-Buffer-Descriptor
+
+@node Events-Descriptor
+@subsubsection Events-Descriptor
+@vindex Events-Descriptor
+
+@node Media-Descriptor
+@subsubsection Media-Descriptor
+@vindex Media-Descriptor
+
+@node Modem-Descriptor
+@subsubsection Modem-Descriptor
+@vindex Modem-Descriptor
+
+@node Mux-Descriptor
+@subsubsection Mux-Descriptor
+@vindex Mux-Descriptor
+
+@node Observed-Events-Descriptor
+@subsubsection Observed-Events-Descriptor
+@vindex Observed-Events-Descriptor
+
+@node Packages-Descriptor
+@subsubsection Packages-Descriptor
+@vindex Packages-Descriptor
+
+@node Service-Change-Descriptor
+@subsubsection Service-Change-Descriptor
+@vindex Service-Change-Descriptor
+
+@node Signals-Descriptor
+@subsubsection Signals-Descriptor
+@vindex Signals-Descriptor
+
+@node Statistics-Descriptor
+@subsubsection Statistics-Descriptor
+@vindex Statistics-Descriptor
+
+@node Transaction-ID-Or-List
+@subsubsection Transaction-ID-Or-List
+@vindex Transaction-ID-Or-List
 
 @node MGCP Package
 @section MGCP Package
 
-@node MGCP-Message
-@subsection MGCP-Message
-
-@node MGCP-Transaction-Request
-@subsection MGCP-Transaction-Request
-
-@node MGCP-Transaction-Response
-@subsection MGCP-Transaction-Response
+@menu
+* MGCP-Action-Request::
+* MGCP-Action-Reply::
+* MGCP-Audit-Connection-Request::
+* MGCP-Audit-Connection-Response::
+* MGCP-Audit-Endpoint-Request::
+* MGCP-Audit-Endpoint-Response::
+* MGCP-Command-Request::
+* MGCP-Create-Connection-Request::
+* MGCP-Create-Connection-Response::
+* MGCP-Delete-Connection-Request::
+* MGCP-Delete-Connection-Response::
+* MGCP-Endpoint-Configuration-Request::
+* MGCP-Endpoint-Configuration-Response::
+* MGCP-Message::
+* MGCP-Modify-Connection-Request::
+* MGCP-Modify-Connection-Response::
+* MGCP-Notification-Request::
+* MGCP-Notification-Response::
+* MGCP-Notify-Request::
+* MGCP-Notify-Reply::
+* MGCP-Command-Reply::
+* MGCP-Restart-In-Progress-Request::
+* MGCP-Restart-In-Progress-Response::
+* MGCP-Transaction-Request::
+* MGCP-Transaction-Response::
+@end menu
 
 @node MGCP-Action-Request
 @subsection MGCP-Action-Request
+@vindex MGCP-Action-Request
 
-@node MGCP-Action-Response
-@subsection MGCP-Action-Response
+@node MGCP-Action-Reply
+@subsection MGCP-Action-Reply
+@vindex MGCP-Action-Reply
 
-@node MGCP-Command
-@subsection MGCP-Command
+@node MGCP-Audit-Connection-Request
+@subsection MGCP-Audit-Connection-Request
+@vindex MGCP-Audit-Connection-Request
+
+@node MGCP-Audit-Connection-Response
+@subsection MGCP-Audit-Connection-Response
+@vindex MGCP-Audit-Connection-Response
+
+@node MGCP-Audit-Endpoint-Request
+@subsection MGCP-Audit-Endpoint-Request
+@vindex MGCP-Audit-Endpoint-Request
+
+@node MGCP-Audit-Endpoint-Response
+@subsection MGCP-Audit-Endpoint-Response
+@vindex MGCP-Audit-Endpoint-Response
+
+@node MGCP-Command-Request
+@subsection MGCP-Command-Request
+@vindex MGCP-Command-Request
 
 @vtable @var
 @item mgcp-command-Verb
-@item mgcp-transaction-ID
+@item mgcp-transaction-Id
 @item mgcp-endpoint-Name
 @item mgcp-version
 @item 
 @end vtable
 
-@node MGCP-Response
-@subsection MGCP-Response
-
-@vtable @var
-@item mgcp-response-Code
-@item mgcp-transaction-ID
-@item mgcp-response-String
-@end vtable
-
-@node MGCP-Endpoint-Configuration-Request
-@subsection MGCP-Endpoint-Configuration-Request
-
-@node MGCP-Endpoint-Configuration-Response
-@subsection MGCP-Endpoint-Configuration-Response
-
 @node MGCP-Create-Connection-Request
 @subsection MGCP-Create-Connection-Request
+@vindex MGCP-Create-Connection-Request
 
 @node MGCP-Create-Connection-Response
 @subsection MGCP-Create-Connection-Response
-
-@node MGCP-Modify-Connection-Request
-@subsection MGCP-Modify-Connection-Request
-
-@node MGCP-Modify-Connection-Response
-@subsection MGCP-Modify-Connection-Response
+@vindex MGCP-Create-Connection-Response
 
 @node MGCP-Delete-Connection-Request
 @subsection MGCP-Delete-Connection-Request
+@vindex MGCP-Delete-Connection-Request
 
 @node MGCP-Delete-Connection-Response
 @subsection MGCP-Delete-Connection-Response
+@vindex MGCP-Delete-Connection-Response
+
+@node MGCP-Endpoint-Configuration-Request
+@subsection MGCP-Endpoint-Configuration-Request
+@vindex MGCP-Endpoint-Configuration-Request
+
+@node MGCP-Endpoint-Configuration-Response
+@subsection MGCP-Endpoint-Configuration-Response
+@vindex MGCP-Endpoint-Configuration-Response
+
+@node MGCP-Message
+@subsection MGCP-Message
+@vindex MGCP-Message
+
+@node MGCP-Modify-Connection-Request
+@subsection MGCP-Modify-Connection-Request
+@vindex MGCP-Modify-Connection-Request
+
+@node MGCP-Modify-Connection-Response
+@subsection MGCP-Modify-Connection-Response
+@vindex MGCP-Modify-Connection-Response
 
 @node MGCP-Notification-Request
 @subsection MGCP-Notification-Request
+@vindex MGCP-Notification-Request
 
 @node MGCP-Notification-Response
 @subsection MGCP-Notification-Response
+@vindex MGCP-Notification-Response
 
 @node MGCP-Notify-Request
 @subsection MGCP-Notify-Request
+@vindex MGCP-Notify-Request
 
-@node MGCP-Notify-Response
-@subsection MGCP-Notify-Response
+@node MGCP-Notify-Reply
+@subsection MGCP-Notify-Reply
+@vindex MGCP-Notify-Reply
 
-@node MGCP-Audit-Endpoint-Request
-@subsection MGCP-Audit-Endpoint-Request
+@node MGCP-Command-Reply
+@subsection MGCP-Command-Reply
+@vindex MGCP-Command-Reply
 
-@node MGCP-Audit-Endpoint-Response
-@subsection MGCP-Audit-Endpoint-Response
-
-@node MGCP-Audit-Connection-Request
-@subsection MGCP-Audit-Connection-Request
-
-@node MGCP-Audit-Connection-Response
-@subsection MGCP-Audit-Connection-Response
+@vtable @var
+@item mgcp-response-Code
+@item mgcp-transaction-Id
+@item mgcp-response-String
+@end vtable
 
 @node MGCP-Restart-In-Progress-Request
 @subsection MGCP-Restart-In-Progress-Request
+@vindex MGCP-Restart-In-Progress-Request
 
 @node MGCP-Restart-In-Progress-Response
 @subsection MGCP-Restart-In-Progress-Response
+@vindex MGCP-Restart-In-Progress-Response
 
+@node MGCP-Transaction-Request
+@subsection MGCP-Transaction-Request
+@vindex MGCP-Transaction-Request
+
+@node MGCP-Transaction-Response
+@subsection MGCP-Transaction-Response
+@vindex MGCP-Transaction-Response
 
 @node MGCP Extension Packages
 @section MGCP Extension Packages
@@ -5263,11 +5852,351 @@ class-specific OM attributes.
 @node MEGACO Package
 @section MEGACO Package
 
+@menu
+* MEGACO-Action-Request::
+* MEGACO-Action-Reply::
+* MEGACO-Add-Request::
+* MEGACO-Add-Reply::
+* MEGACO-Audit-Request::
+* MEGACO-Audit-Reply::
+* MEGACO-Audit-Capability-Request::
+* MEGACO-Audit-Capability-Reply::
+* MEGACO-Audit-Value-Request::
+* MEGACO-Audit-Value-Reply::
+* MEGACO-Command::
+* MEGACO-Message::
+* MEGACO-Modify-Request::
+* MEGACO-Modify-Reply::
+* MEGACO-Move-Request::
+* MEGACO-Move-Reply::
+* MEGACO-Notify-Request::
+* MEGACO-Notify-Reply::
+* MEGACO-Command-Reply::
+* MEGACO-Service-Change-Request::
+* MEGACO-Service-Change-Reply::
+* MEGACO-Subtract-Request::
+* MEGACO-Subtract-Reply::
+* MEGACO-Transaction-Pending::
+* MEGACO-Transaction-Request::
+* MEGACO-Transaction-Response::
+@end menu
+
+@node MEGACO-Action-Request
+@subsection MEGACO-Action-Request
+@vindex MEGACO-Action-Request
+
+@node MEGACO-Action-Reply
+@subsection MEGACO-Action-Reply
+@vindex MEGACO-Action-Reply
+
+@node MEGACO-Add-Request
+@subsection MEGACO-Add-Request
+@vindex MEGACO-Add-Request
+
+An instance of OM class @b{MEGACO-Add-Request} represents the Add Request command of MEGACO (RFC
+3705).  This OM class contains the attributes of its super-classes: @i{MEGACO-Amm-Request}.  It does
+not define any OM attributes of its own. @xref{MEGACO-Amm-Request}.
+
+@c This OM class has the attributes of its super-classes: @i{MEGACO-Service-Request}; plus the additional OM
+@c attributes listed in @tabref{2}.
+@c 
+@c @tabfig{xgcp_tab002,2,OM Attributes of OM class @var{MEGACO-Add-Request}}
+@c 
+@c This OM class contains the following class-specific OM attributes:
+@c @vtable @var
+@c @end vtable
+
+@node MEGACO-Add-Reply
+@subsection MEGACO-Add-Reply
+@vindex MEGACO-Add-Reply
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Result}; plus the additional
+OM attributes listed in @tabref{1}.
+
+@tabfig{xgcp_tab001,1,OM Attributes of OM class @var{MEGACO-Add-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Audit-Request
+@subsection MEGACO-Audit-Request
+@vindex MEGACO-Audit-Request
+
+An instance of a subclass of this abstract OM class represents either an Audit Capability command
+request or an Audit Value command request.  This is an abstract class that defines several derived
+subclasses: @b{MEGACO-Audit-Capability-Request} and @b{MEGACO-Audit-Value-Request}.  This OM class
+contains the OM attributes of its super-classes: @i{MEGACO-Command-Request}; plus the additional OM
+attributes listed in @tabref{72}.
+
+@tabfig{xgcp_tab072,72,OM Attributes of OM class @i{MEGACO-Audit-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item audit-Descriptor
+A single instance of OM class @b{Audit-Descriptor}.
+@end vtable
+
+@node MEGACO-Audit-Reply
+@subsection MEGACO-Audit-Reply
+@vindex MEGACO-Audit-Reply
+
+@node MEGACO-Audit-Capability-Request
+@subsection MEGACO-Audit-Capability-Request
+@vindex MEGACO-Audit-Capability-Request
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Request}; plus the additional OM
+attributes listed in @tabref{12}.
+
+@tabfig{xgcp_tab012,12,OM Attributes of OM class @var{MEGACO-Audit-Capabilities-Command}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Audit-Capability-Reply
+@subsection MEGACO-Audit-Capability-Reply
+@vindex MEGACO-Audit-Capability-Reply
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Result}; plus the additional
+OM attributes listed in @tabref{11}.
+
+@tabfig{xgcp_tab011,11,OM Attributes of OM class @var{MEGACO-Audit-Capabilities-Response}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Audit-Value-Request
+@subsection MEGACO-Audit-Value-Request
+@vindex MEGACO-Audit-Value-Request
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Request}; plus the additional OM
+attributes listed in @tabref{10}.
+
+@tabfig{xgcp_tab010,10,OM Attributes of OM class @var{MEGACO-Audit-Value-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Audit-Value-Reply
+@subsection MEGACO-Audit-Value-Reply
+@vindex MEGACO-Audit-Value-Reply
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Result}; plus the additional
+OM attributes listed in @tabref{9}.
+
+@tabfig{xgcp_tab009,9,OM Attributes of OM class @var{MEGACO-Audit-Value-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Command-Request
+@subsection MEGACO-Command-Request
+@vindex MEGACO-Command-Request
+
+@node MEGACO-Message
+@subsection MEGACO-Message
+@vindex MEGACO-Message
+
+@node MEGACO-Modify-Request
+@subsection MEGACO-Modify-Request
+@vindex MEGACO-Modify-Request
+
+An instance of OM class @b{MEGACO-Modify-Request} represents the Modify Request command of MEGACO
+(RFC 3705).  This OM class contains the attributes of its super-classes: @i{MEGACO-Amm-Request}.  It
+does not define any OM attributes of its own. @xref{MEGACO-Amm-Request}.
+
+@c This OM class has the attributes of its super-classes: @i{MEGACO-Service-Request}; plus the additional OM
+@c attributes listed in @tabref{4}.
+@c 
+@c @tabfig{xgcp_tab004,4,OM Attributes of OM class @var{MEGACO-Modify-Request}}
+@c 
+@c This OM class contains the following class-specific OM attributes:
+@c @vtable @var
+@c @end vtable
+
+@node MEGACO-Modify-Reply
+@subsection MEGACO-Modify-Reply
+@vindex MEGACO-Modify-Reply
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Result}; plus the additional
+OM attributes listed in @tabref{3}.
+
+@tabfig{xgcp_tab003,3,OM Attributes of OM class @var{MEGACO-Modify-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Move-Request
+@subsection MEGACO-Move-Request
+@vindex MEGACO-Move-Request
+
+An instance of OM class @b{MEGACO-Move-Request} represents the Move Request command of MEGACO (RFC
+3705).  This OM class contains the attributes of its super-classes: @i{MEGACO-Amm-Request}.  It does
+not define any OM attributes of its own. @xref{MEGACO-Amm-Request}.
+
+@c This OM class has the attributes of its super-classes: @i{MEGACO-Service-Request}; plus the additional OM
+@c attributes listed in @tabref{8}.
+@c 
+@c @tabfig{xgcp_tab008,8,OM Attributes of OM class @var{MEGACO-Move-Request}}
+@c 
+@c This OM class contains the following class-specific OM attributes:
+@c @vtable @var
+@c @end vtable
+
+@node MEGACO-Move-Reply
+@subsection MEGACO-Move-Reply
+@vindex MEGACO-Move-Reply
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Result}; plus the additional
+OM attributes listed in @tabref{7}.
+
+@tabfig{xgcp_tab007,7,OM Attributes of OM class @var{MEGACO-Move-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Notify-Request
+@subsection MEGACO-Notify-Request
+@vindex MEGACO-Notify-Request
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Command-Request}; plus the
+additional OM attributes listed in @tabref{14}.
+
+@tabfig{xgcp_tab014,14,OM Attributes of OM class @var{MEGACO-Notify-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item observed-Events-Descriptor
+One instance of OM class @b{Observed-Events-Descriptor}.
+@item error-Descriptor
+An optional instance of OM class @b{Error-Descriptor}.
+@end vtable
+
+@node MEGACO-Notify-Reply
+@subsection MEGACO-Notify-Reply
+@vindex MEGACO-Notify-Reply
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Result}; plus the additional
+OM attributes listed in @tabref{13}.
+
+@tabfig{xgcp_tab013,13,OM Attributes of OM class @var{MEGACO-Notify-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Command-Reply
+@subsection MEGACO-Command-Reply
+@vindex MEGACO-Command-Reply
+
+@node MEGACO-Service-Change-Request
+@subsection MEGACO-Service-Change-Request
+@vindex MEGACO-Service-Change-Request
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Request}; plus the additional OM
+attributes listed in @tabref{16}.
+
+@tabfig{xgcp_tab016,16,OM Attributes of OM class @var{MEGACO-Service-Change-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Service-Change-Reply
+@subsection MEGACO-Service-Change-Reply
+@vindex MEGACO-Service-Change-Reply
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Result}; plus the additional
+OM attributes listed in @tabref{15}.
+
+@tabfig{xgcp_tab015,15,OM Attributes of OM class @var{MEGACO-Service-Change-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Subtract-Request
+@subsection MEGACO-Subtract-Request
+@vindex MEGACO-Subtract-Request
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Command-Request}; plus the additional OM
+attributes listed in @tabref{6}.
+
+@tabfig{xgcp_tab006,6,OM Attributes of OM class @var{MEGACO-Subtract-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Subtract-Reply
+@subsection MEGACO-Subtract-Reply
+@vindex MEGACO-Subtract-Reply
+
+This OM class has the attributes of its super-classes: @i{MEGACO-Service-Result}; plus the additional
+OM attributes listed in @tabref{5}.
+
+@tabfig{xgcp_tab005,5,OM Attributes of OM class @var{MEGACO-Subtract-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node MEGACO-Transaction-Pending
+@subsection MEGACO-Transaction-Pending
+@vindex MEGACO-Transaction-Pending
+
+@node MEGACO-Transaction-Request
+@subsection MEGACO-Transaction-Request
+@vindex MEGACO-Transaction-Request
+
+@node MEGACO-Transaction-Response
+@subsection MEGACO-Transaction-Response
+@vindex MEGACO-Transaction-Response
+
 @node MEGACO Extension Packages
 @section MEGACO Extension Packages
 
 @node H.248 Package
 @section H.248 Package
+
+@menu
+* H248-Action-Request::
+* H248-Action-Reply::
+* H248-Add-Request::
+* H248-Add-Reply::
+* H248-Audit-Request::
+* H248-Audit-Reply::
+* H248-Audit-Capability-Request::
+* H248-Audit-Capability-Reply::
+* H248-Audit-Value-Request::
+* H248-Audit-Value-Reply::
+* H248-Command-Request::
+* H248-Command-Reply::
+* H248-Message::
+* H248-Modify-Request::
+* H248-Modify-Reply::
+* H248-Move-Request::
+* H248-Move-Reply::
+* H248-Notify-Request::
+* H248-Notify-Reply::
+* H248-Service-Change-Request::
+* H248-Service-Change-Reply::
+* H248-Service-Request::
+* H248-Service-Result::
+* H248-Service-Error::
+* H248-Service-Reject::
+* H248-Subtract-Request::
+* H248-Subtract-Reply::
+* H248-Transaction-Pending::
+* H248-Transaction-Request::
+* H248-Transaction-Response::
+@end menu
 
 The H.248 package provides specialization of the argument and result objects of the Common GCP
 package to provide for the services under the H.248 GCP as described in ITU-T Recommendation
@@ -5294,78 +6223,514 @@ The following outlines the OM Class Hierarchy for the H.248 package:
 @item @i{Object} (defined in the XOM Specification: see reference @b{XOM})
 @end itemize
 
-@node H248-Message
-@subsection H248-Message
+@node H248-Amm-Request
+@subsection H248-Amm-Request
+@vindex H248-Amm-Request
 
-@node H248-Transaction-Request
-@subsection H248-Transaction-Request
+This OM class contains the OM attributes of its super-classes, @i{H248-Command-Request}, plus the
+additional OM attributes listed in @tabref{68}.
 
-@node H248-Transaction-Pending
-@subsection H248-Transaction-Pending
+@tabfig{xgcp_tab068,68,OM Attributes of OM class @i{H248-Amm-Request}}
 
-@node H248-Transaction-Response
-@subsection H248-Transaction-Response
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item descriptors
+An object of OM class @b{Amm-Descriptors}.
+@end vtable
+
+@node Amm-Descriptors
+@subsection Amm-Descriptors
+@vindex Amm-Descriptors
+
+An instance of the abstract @i{Amm-Descriptors} OM class represents the descriptors that can be
+included with an Add, Move or Modify command.  This OM class contains the attributes of its
+super-classes, @i{Object}, plus the additional attributes listed in @tabref{69}.
+
+@tabfig{xgcp_tab069,69,OM Attributes of OM class @i{Amm-Descriptors}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item media-Descriptor
+An optional instance of OM class @b{Media-Descriptor}.
+@item modem-Descriptor
+An optional instance of OM class @b{Modem-Descriptor}.
+@item mux-Descriptor
+An optional instance of OM class @b{Mux-Descriptor}.
+@item events-Descriptor
+An optional instance of OM class @b{Events-Descriptor}.
+@item signals-Descriptor
+An optional instance of OM class @b{Signals-Descriptor}.
+@item digit-Map-Descriptor
+An optional instance of OM class @b{Digits-Descriptor}.
+@item audit-Descriptor
+An optional instance of OM class @b{Audit-Descriptor}.
+@item statistics-Descriptor
+An optional instance of OM class @b{Statistics-Descriptor}.
+@end vtable
+
+@node H248-Amms-Reply
+@subsection H248-Amms-Reply
+@vindex H248-Amms-Reply
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
 
 @node H248-Action-Request
 @subsection H248-Action-Request
+@vindex H248-Action-Request
 
-@node H248-Action-Response
-@subsection H248-Action-Response
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
 
-@node H248-Command
-@subsection H248-Command
+@node H248-Action-Reply
+@subsection H248-Action-Reply
+@vindex H248-Action-Reply
 
-@node H248-Response
-@subsection H248-Response
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
 
-@node H248-Add-Command
-@subsection H248-Add-Command
+@node H248-Add-Request
+@subsection H248-Add-Request
+@vindex H248-Add-Request
 
-@node H248-Add-Response
-@subsection H248-Add-Response
+An instance of the OM clss @b{H248-Add-Request} represents the Add Request command of ITU-T
+Recommendation H.248.1 (09/2005).  This OM class has the attributes of its super-classes:
+@i{H248-Amm-Request}.  It does not define any OM attributes of its own. @xref{H248-Amm-Request}.
 
-@node H248-Modify-Command
-@subsection H248-Modify-Command
+@c This OM class has the attributes of its super-classes: @i{H248-Service-Request}; plus the additional
+@c OM attributes listed in @tabref{52}.
+@c 
+@c @tabfig{xgcp_tab052,52,OM Attributes of OM class @var{H248-Add-Request}}
+@c 
+@c This OM class contains the following class-specific OM attributes:
+@c @vtable @var
+@c @item media-Descriptor
+@c @item modem-Descriptor
+@c @item mux-Descriptor
+@c @item events-Descriptor
+@c @item event-Buffer-Descriptor
+@c @item signals-Descriptor
+@c @item digit-Map-Descriptor
+@c @item audit-Descriptor
+@c @item statistics-Descriptor
+@c @end vtable
 
-@node H248-Modify-Response
-@subsection H248-Modify-Response
+@node H248-Add-Reply
+@subsection H248-Add-Reply
+@vindex H248-Add-Reply
 
-@node H248-Subtract-Command
-@subsection H248-Subtract-Command
+This OM class has the attributes of its super-classes: @i{H248-Service-Result}; plus the additional
+OM attributes listed in @tabref{51}.
 
-@node H248-Subtract-Response
-@subsection H248-Subtract-Response
+@tabfig{xgcp_tab051,51,OM Attributes of OM class @var{H248-Add-Reply}}
 
-@node H248-Move-Command
-@subsection H248-Move-Command
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item media-Descriptor
+@item modem-Descriptor
+@item mux-Descriptor
+@item events-Descriptor
+@item signals-Descriptor
+@item digit-Map-Descriptor
+@item observed-Events-Descriptor
+@item event-Buffer-Descriptor
+@item statistics-Descriptor
+@item packages-Descriptor
+@end vtable
 
-@node H248-Move-Response
-@subsection H248-Move-Response
+@node H248-Audit-Request
+@subsection H248-Audit-Request
+@vindex H248-Audit-Request
 
-@node H248-Audit-Value-Command
-@subsection H248-Audit-Value-Command
+An instance of a subclass of this abstract OM class represents either an Audit Capability Request
+command or an Audit Value Request command.  This is an abstract class that defines several derived
+subclasses: @b{H248-Audit-Capability-Request} and @b{H248-Audit-Value-Request}.  This OM class
+contains the OM attributes of its super-classes: @i{H248-Command-Request}; plus the additional OM
+attributes listed in @tabref{71}.
 
-@node H248-Audit-Value-Response
-@subsection H248-Audit-Value-Response
+@tabfig{xgcp_tab071,71,OM Attributes of OM class @i{H248-Audit-Request}}
 
-@node H248-Audit-Capability-Command
-@subsection H248-Audit-Capability-Command
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item audit-Descriptor
+A single instance of OM class @b{Audit-Descriptor}.
+@end vtable
 
-@node H248-Audit-Capability-Response
-@subsection H248-Audit-Capability-Response
+@node H248-Audit-Reply
+@subsection H248-Audit-Reply
+@vindex H248-Audit-Reply
 
-@node H248-Notify-Command
-@subsection H248-Notify-Command
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
 
-@node H248-Notify-Response
-@subsection H248-Notify-Response
+@node H248-Audit-Capability-Request
+@subsection H248-Audit-Capability-Request
+@vindex H248-Audit-Capability-Request
 
-@node H248-Service-Change-Command
-@subsection H248-Service-Change-Command
+An instance of OM class @b{H248-Audit-Capability-Request} represents an Audit Capability command
+request of ITU-T Recommendation H.248.1 (09/2005).
+This OM class contains the attributes of its super-classes: @i{H248-Audit-Request}; it does not
+define any OM attributes of its own.
 
-@node H248-Service-Change-Response
-@subsection H248-Service-Change-Response
+@c This OM class has the attributes of its super-classes: @i{H248-Service-Request}; plus the additional
+@c OM attributes listed in @tabref{62}.
+@c 
+@c @tabfig{xgcp_tab062,62,OM Attributes of OM class @var{H248-Audit-Capabilities-Command}}
+@c 
+@c This OM class contains the following class-specific OM attributes:
+@c @vtable @var
+@c @item audit-Descriptor
+@c @end vtable
 
+@node H248-Audit-Capability-Reply
+@subsection H248-Audit-Capability-Reply
+@vindex H248-Audit-Capability-Reply
+
+This OM class has the attributes of its super-classes: @i{H248-Service-Result}; plus the additional
+OM attributes listed in @tabref{61}.
+
+@tabfig{xgcp_tab061,61,OM Attributes of OM class @var{H248-Audit-Capabilities-Response}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item media-Descriptor
+@item modem-Descriptor
+@item mux-Descriptor
+@item events-Descriptor
+@item signals-Descriptor
+@item observed-Events-Descriptor
+@item event-Buffer-Descriptor
+@item statistics-Descriptor
+@end vtable
+
+@node H248-Audit-Value-Request
+@subsection H248-Audit-Value-Request
+@vindex H248-Audit-Value-Request
+
+An instance of OM class @b{H248-Audit-Value-Request} represents an Audit Value command request of
+ITU-T Recommendation H.248.1 (09/2005).
+This OM class contains the attributes of its super-classes: @i{H248-Audit-Request}; it does not
+define any OM attributes of its own.
+
+@c This OM class has the attributes of its super-classes: @i{H248-Service-Request}; plus the additional
+@c OM attributes listed in @tabref{60}.
+@c 
+@c @tabfig{xgcp_tab060,60,OM Attributes of OM class @var{H248-Audit-Value-Request}}
+@c 
+@c This OM class contains the following class-specific OM attributes:
+@c @vtable @var
+@c @item audit-Descriptor
+@c @end vtable
+
+@node H248-Audit-Value-Reply
+@subsection H248-Audit-Value-Reply
+@vindex H248-Audit-Value-Reply
+
+This OM class has the attributes of its super-classes: @i{H248-Service-Result}; plus the additional
+OM attributes listed in @tabref{59}.
+
+@tabfig{xgcp_tab059,59,OM Attributes of OM class @var{H248-Audit-Value-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item media-Descriptor
+@item modem-Descriptor
+@item mux-Descriptor
+@item events-Descriptor
+@item signals-Descriptor
+@item digit-Map-Descriptor
+@item observed-Events-Descriptor
+@item event-Buffer-Descriptor
+@item statistics-Descriptor
+@item packages-Descriptor
+@end vtable
+
+@node H248-Command-Request
+@subsection H248-Command-Request
+@vindex H248-Command-Request
+
+An instance of a concrete subclass of this abstract OM class represents an ITU-T Recommendation
+H.248.1 (09/2005) CommandRequest.  This abstract OM class defines several abstract and concrete
+subclasses: @i{H248-Amm-Request}, @b{H248-Subtract-Request}, @i{H248-Audit-Request},
+@b{H248-Notify-Request} and @b{H248-Service-Change-Request}.
+
+This abstract OM class has the attributes of its super-classes, @i{Command-Request}, plus the
+additional OM attributes listed in @tabref{70}.
+
+@tabfig{xgcp_tab070,70,OM Attributes of OM class @i{H248-Command-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item termination-Id
+An instance of OM class @b{Termination-ID} that specifies the termination to which the command
+request applies.
+@end vtable
+
+@node H248-Command-Reply
+@subsection H248-Command-Reply
+@vindex H248-Command-Reply
+
+An instance of a concrete subclass of this abstract OM class represents an ITU-T Recommendation
+H.248.1 (09/2005) CommandReply.  This abstract OM class defines several abstract and concrete
+subclasses: @i{H248-Amms-Reply}, @i{H248-Audit-Reply}, @b{H248-Notify-Reply} and
+@b{H248-Service-Change-Reply}.
+
+This abstract OM class has the attributes of its super-classes, @i{Command-Reply}, plus the
+additional OM attributes listed in @tabref{73}.
+
+@tabfig{xgcp_tab073,73,OM Attributes of OM class @i{H248-Command-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item termination-Id
+An instance of OM class @b{Termination-ID} that specifies the termination to which the command
+reply applies.
+@end vtable
+
+@node H248-Service-Change-Request
+@subsection H248-Service-Change-Request
+@vindex H248-Service-Change-Request
+
+This OM class has the attributes of its super-classes: @i{H248-Service-Request}; plus the additional
+OM attributes listed in @tabref{66}.
+
+@tabfig{xgcp_tab066,66,OM Attributes of OM class @var{H248-Service-Change-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item service-Change-Descriptor
+@end vtable
+
+@node H248-Message
+@subsection H248-Message
+@vindex H248-Message
+
+@node H248-Modify-Request
+@subsection H248-Modify-Request
+@vindex H248-Modify-Request
+
+An instance of OM class @b{H248-Modify-Request} represents the Modify Request command of ITU-T
+Recommendation H.248.1 (09/2005). This OM class contains the attributes of its super-classes:
+@i{H248-Amm-Request}.  It does not define any attributes of its own. @xref{H248-Amm-Request}.
+
+@c This OM class has the attributes of its super-classes: @i{H248-Service-Request}; plus the additional
+@c OM attributes listed in @tabref{54}.
+@c 
+@c @tabfig{xgcp_tab054,54,OM Attributes of OM class @var{H248-Modify-Request}}
+@c 
+@c This OM class contains the following class-specific OM attributes:
+@c @vtable @var
+@c @item media-Descriptor
+@c @item modem-Descriptor
+@c @item mux-Descriptor
+@c @item events-Descriptor
+@c @item event-Buffer-Descriptor
+@c @item signals-Descriptor
+@c @item digit-Map-Descriptor
+@c @item audit-Descriptor
+@c @item statistics-Descriptor
+@c @end vtable
+
+@node H248-Modify-Reply
+@subsection H248-Modify-Reply
+@vindex H248-Modify-Reply
+
+This OM class has the attributes of its super-classes: @i{H248-Service-Result}; plus the additional
+OM attributes listed in @tabref{53}.
+
+@tabfig{xgcp_tab053,53,OM Attributes of OM class @var{H248-Modify-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item media-Descriptor
+@item modem-Descriptor
+@item mux-Descriptor
+@item events-Descriptor
+@item signals-Descriptor
+@item digit-Map-Descriptor
+@item observed-Events-Descriptor
+@item event-Buffer-Descriptor
+@item statistics-Descriptor
+@item packages-Descriptor
+@end vtable
+
+@node H248-Move-Request
+@subsection H248-Move-Request
+@vindex H248-Move-Request
+
+An instance of OM class @b{H248-Move-Request} represents the Move Request command of ITU-T
+Recommendation H.248.1 (09/2005). This OM class contains the attributes of its super-classes:
+@i{H248-Amm-Request}.  It does not define any attributes of its own. @xref{H248-Amm-Request}.
+
+@c This OM class has the attributes of its super-classes: @i{H248-Service-Request}; plus the additional
+@c OM attributes listed in @tabref{58}.
+@c 
+@c @tabfig{xgcp_tab058,58,OM Attributes of OM class @var{H248-Move-Request}}
+@c 
+@c This OM class contains the following class-specific OM attributes:
+@c @vtable @var
+@c @item media-Descriptor
+@c @item modem-Descriptor
+@c @item mux-Descriptor
+@c @item events-Descriptor
+@c @item event-Buffer-Descriptor
+@c @item signals-Descriptor
+@c @item digit-Map-Descriptor
+@c @item audit-Descriptor
+@c @item statistics-Descriptor
+@c @end vtable
+
+@node H248-Move-Reply
+@subsection H248-Move-Reply
+@vindex H248-Move-Reply
+
+This OM class has the attributes of its super-classes: @i{H248-Service-Result}; plus the additional
+OM attributes listed in @tabref{57}.
+
+@tabfig{xgcp_tab057,57,OM Attributes of OM class @var{H248-Move-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item media-Descriptor
+@item modem-Descriptor
+@item mux-Descriptor
+@item events-Descriptor
+@item signals-Descriptor
+@item digit-Map-Descriptor
+@item observed-Events-Descriptor
+@item event-Buffer-Descriptor
+@item statistics-Descriptor
+@item packages-Descriptor
+@end vtable
+
+@node H248-Notify-Request
+@subsection H248-Notify-Request
+@vindex H248-Notify-Request
+
+This OM class has the attributes of its super-classes: @i{H248-Service-Request}; plus the additional
+OM attributes listed in @tabref{64}.
+
+@tabfig{xgcp_tab064,64,OM Attributes of OM class @var{H248-Notify-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item observed-Events-Descriptor
+@item error-Descriptor
+@end vtable
+
+@node H248-Notify-Reply
+@subsection H248-Notify-Reply
+@vindex H248-Notify-Reply
+
+This OM class has the attributes of its super-classes: @i{H248-Service-Result}; plus the additional
+OM attributes listed in @tabref{63}.
+
+@tabfig{xgcp_tab063,63,OM Attributes of OM class @var{H248-Notify-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node H248-Service-Change-Reply
+@subsection H248-Service-Change-Reply
+@vindex H248-Service-Change-Reply
+
+This OM class has the attributes of its super-classes: @i{H248-Service-Result}; plus the additional
+OM attributes listed in @tabref{65}.
+
+@tabfig{xgcp_tab065,65,OM Attributes of OM class @var{H248-Service-Change-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item service-Change-Descriptor
+@end vtable
+
+@node H248-Service-Request
+@subsection H248-Service-Request
+@vindex H248-Service-Request
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item termination-Id
+@end vtable
+
+@node H248-Service-Result
+@subsection H248-Service-Result
+@vindex H248-Service-Result
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item termination-Id
+@end vtable
+
+@node H248-Service-Error
+@subsection H248-Service-Error
+@vindex H248-Service-Error
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node H248-Service-Reject
+@subsection H248-Service-Reject
+@vindex H248-Service-Reject
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@end vtable
+
+@node H248-Subtract-Request
+@subsection H248-Subtract-Request
+@vindex H248-Subtract-Request
+
+This OM class has the attributes of its super-classes: @i{H248-Command-Request}; plus the additional
+OM attributes listed in @tabref{56}.
+
+@tabfig{xgcp_tab056,56,OM Attributes of OM class @var{H248-Subtract-Request}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item audit-Descriptor
+@end vtable
+
+@node H248-Subtract-Reply
+@subsection H248-Subtract-Reply
+@vindex H248-Subtract-Reply
+
+This OM class has the attributes of its super-classes: @i{H248-Service-Result}; plus the additional
+OM attributes listed in @tabref{55}.
+
+@tabfig{xgcp_tab055,55,OM Attributes of OM class @var{H248-Subtract-Reply}}
+
+This OM class contains the following class-specific OM attributes:
+@vtable @var
+@item media-Descriptor
+@item modem-Descriptor
+@item mux-Descriptor
+@item events-Descriptor
+@item signals-Descriptor
+@item digit-Map-Descriptor
+@item observed-Events-Descriptor
+@item event-Buffer-Descriptor
+@item statistics-Descriptor
+@item packages-Descriptor
+@end vtable
+
+@node H248-Transaction-Pending
+@subsection H248-Transaction-Pending
+@vindex H248-Transaction-Pending
+
+@node H248-Transaction-Request
+@subsection H248-Transaction-Request
+@vindex H248-Transaction-Request
+
+@node H248-Transaction-Response
+@subsection H248-Transaction-Response
+@vindex H248-Transaction-Response
 
 @node H.248 Extension Packages
 @section H.248 Extension Packages
@@ -5394,38 +6759,6 @@ of the MG.  The MGC may announce a handover to the MG by sending it a service ch
 MGC may also use the service change command to instruct the MG to take a termination or group of
 terminations in or out of service.
 @end itemize
-
-@tabfig{xgcp_tab001,1,OM Attributes of OM class @var{Add-Response}}
-
-@tabfig{xgcp_tab002,2,OM Attributes of OM class @var{Add-Request}}
-
-@tabfig{xgcp_tab003,3,OM Attributes of OM class @var{Modify-Response}}
-
-@tabfig{xgcp_tab004,4,OM Attributes of OM class @var{Modify-Request}}
-
-@tabfig{xgcp_tab005,5,OM Attributes of OM class @var{Subtract-Response}}
-
-@tabfig{xgcp_tab006,6,OM Attributes of OM class @var{Subtract-Request}}
-
-@tabfig{xgcp_tab007,7,OM Attributes of OM class @var{Move-Response}}
-
-@tabfig{xgcp_tab008,8,OM Attributes of OM class @var{Move-Request}}
-
-@tabfig{xgcp_tab009,9,OM Attributes of OM class @var{Audit-Value-Response}}
-
-@tabfig{xgcp_tab010,10,OM Attributes of OM class @var{Audit-Value-Request}}
-
-@tabfig{xgcp_tab011,11,OM Attributes of OM class @var{Audit-Capabilities-Response}}
-
-@tabfig{xgcp_tab012,12,OM Attributes of OM class @var{Audit-Capabilities-Request}}
-
-@tabfig{xgcp_tab013,13,OM Attributes of OM class @var{Notify-Response}}
-
-@tabfig{xgcp_tab014,14,OM Attributes of OM class @var{Notify-Request}}
-
-@tabfig{xgcp_tab015,15,OM Attributes of OM class @var{Service-Change-Response}}
-
-@tabfig{xgcp_tab016,16,OM Attributes of OM class @var{Service-Change-Request}}
 
 @node Errors
 @chapter Errors

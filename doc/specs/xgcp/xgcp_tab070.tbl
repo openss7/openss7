@@ -1,4 +1,4 @@
-.\" vim: ft=groff
+.\" vim: ft=groff nocin
 .ie '\*(.T'ps' \{\
 \X'ps: pagesize letter'
 .in 0.0i
@@ -26,7 +26,6 @@
 .nr HM 0.0i
 .nr FM 0.0i
 .\}
-.\" AuditValue Request parameters (same as Subtract Request)
 .TS
 center expand tab(:);
 lblblblblb
@@ -36,6 +35,6 @@ _
 :Value:Value:Value:Value
 OM Attribute:Syntax:Length:Number:Initially
 =
-audit-Descriptor:Object(Audit-Descriptor):\(em:0-1:\(em
+termination-Id:Object(Termination-ID-List):\(em:1:\(em
 _
 .TE
