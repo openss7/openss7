@@ -67,6 +67,8 @@ OPENSS7-GCP-MIB DEFINITIONS ::= BEGIN
 IMPORTS
     openss7Modules
         FROM OPENSS7-SMI
+    NetworkPointCode
+        FROM OPENSS7-SS7-MIB
     AdministrativeState, AvailabilityStatus, OperationalState, 
     ProceduralStatus, StandbyStatus, UsageState
         FROM OPENSS7-SMI-MIB
@@ -791,15 +793,33 @@ gcpMgEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        ""
+        "Each row in the gcpMgTable represents a Media Gateway (MG) that 
+         is known to the managed system.  This includes both Media 
+         Gateways that are part of the managed systems, as well as Media 
+         Gateways that are external to the managed system.  Media 
+         Gateways are present in this table when:
+         
+         1. The managed system is a system of Media Gateways and the 
+            Media Gateway in question is one of the MGs contained within 
+            the managed system.
+            
+         2. The managed system is a system of Media Gateways and the 
+            Media Gateway in question is not one of the MGs contained 
+            within the managed system but is backing up or is backed up 
+            by a Media Gateway within the managed system.
+            
+         3. The managed system is a system of Media Gateway Controllers 
+            and the Media Gateway in question is an MG that is allowed 
+            to communicate with one of the MGC within the managed 
+            system."
     INDEX       { gcpMgId }
     ::= { gcpMgTable 1 }
 
 GcpMgEntry ::= SEQUENCE {
     gcpMgId                 Unsigned32,
-    gcpMgAddressType        TransportAddressType,
-    gcpMgServerAddress      TransportAddress,
-    gcpMgClientAddress      TransportAddress,
+    gcpMgDomainName         SnmpAdminString,
+    gcpMgDeviceName         SnmpAdminString,
+    gcpMgMtpAddress         NetworkPointCode,
     gcpMgAdminState         AdministrativeState,
     gcpMgOperState          OperationalState,
     gcpMgUsageState         UsageState,
@@ -815,43 +835,45 @@ gcpMgId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
-        "Provides a non-zero ordinal index into the gcpMgTable."
+        "Provides a non-zero ordinal index into the gcpMgTable.  This 
+         value may also be used as an identifier of a row (MG) in this 
+         table."
     ::= { gcpMgEntry 1 }
 
-gcpMgAddressType OBJECT-TYPE
-    SYNTAX      TransportAddressType
+gcpMgDomainName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Specifies the type of transport addresses that are specified in 
-         the gcpMgServerAddress and gcpMgClientAddress in the same 
-         conceptual row as this object.  This follows the 
-         TransportAddressType textual convention of the 
-         TRANSPORT-ADDRESS-MIB.  For IPv4 this is udpIpv4(1), tcpIpv4(3) 
-         or sctpIpv4(5)."
+        "Specifies the domain name that will be reported by the 
+         MG in H.248/MEGACO messages on communications linkages 
+         that select domainName(2) in the gcpLinkageMgIdent 
+         column of the gcpLinkageTable."
     ::= { gcpMgEntry 2 }
 
-gcpMgServerAddress OBJECT-TYPE
-    SYNTAX      TransportAddress
+gcpMgDeviceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Specifies the transport address for the server (Media Gateway).  
-         Note that, at an MGC, an IPv4 address can be specified as 
-         0.0.0.0 to represent that the Media Gateway is permitted to 
-         communicate with the MGC from any IP address.  The port number 
-         can also be specified as zero (0) to represent that the MG is 
-         permitted to communicate with the MGC from any port."
+        "Specifies the device name that will be reported by the 
+         MG in H.248/MEGACO messages on communications linkages 
+         that select deviceName(3) in the gcpLinkageMgIdent 
+         column of the gcpLinkageTable."
     ::= { gcpMgEntry 3 }
 
-gcpMgClientAddress OBJECT-TYPE
-    SYNTAX      TransportAddress
+gcpMgMtpAddress OBJECT-TYPE
+    SYNTAX      NetworkPointCode
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Specifies the transport address for the client (Media Gateway 
-         Controller).  Note that, at an MG, an IPv4 address can be  "
-    ::= { gcpMgEntry 3 }
+        "Specifies the MTP address (point code) that will be 
+         reported by the MG in H.248/MEGACO messages on 
+         communications linkages that select mtpAddress(4) in 
+         the gcpLinkageMgIdent column of the gcpLinkageTable."
+    REFERENCE
+        "OPENSS7-SS7-MIB:NewtorkPointCode"
+    ::= { gcpMgEntry 4 }
 
 gcpMgAdminState OBJECT-TYPE
     SYNTAX      AdministrativeState
@@ -885,7 +907,7 @@ gcpMgAdminState OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                administrativeState attribute."
-    ::= { gcpMgEntry 4 }
+    ::= { gcpMgEntry 5 }
 
 gcpMgOperState OBJECT-TYPE
     SYNTAX      OperationalState
@@ -906,7 +928,7 @@ gcpMgOperState OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                operationalState attribute."
-    ::= { gcpMgEntry 5 }
+    ::= { gcpMgEntry 6 }
 
 gcpMgUsageState OBJECT-TYPE
     SYNTAX      UsageState
@@ -933,7 +955,7 @@ gcpMgUsageState OBJECT-TYPE
                Attribute-ASN1Module.UsageState.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.1.2."
-    ::= { gcpMgEntry 6 }
+    ::= { gcpMgEntry 7 }
 
 
 gcpMgAvailStatus OBJECT-TYPE
@@ -990,7 +1012,7 @@ gcpMgAvailStatus OBJECT-TYPE
            degraded in some respect, such as in speed or operating 
            capacity.  Failure of a test or an unacceptable performance 
            measurement has established that some or all services are not 
-           functions or are degraded due to presence of a defect.  
+           functional or are degraded due to the presence of a defect.  
            However, the Media Gateway remains available for service, 
            either because some services are satisfactory or because 
            degraded service is preferable to no service at all.  The 
@@ -1011,7 +1033,7 @@ gcpMgAvailStatus OBJECT-TYPE
                Attribute-ASN1Module.AvailabilityStatus
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.3."
-    ::= { gcpMgEntry 7 }
+    ::= { gcpMgEntry 8 }
 
 gcpMgProcStatus OBJECT-TYPE
     SYNTAX      ProceduralStatus
@@ -1024,34 +1046,58 @@ gcpMgProcStatus OBJECT-TYPE
          procedural status can have zero or more of the following 
          conditions:
          
-         - initializationRequired(0),
-         - notInitialized(1),
-         - initializing(2),
-         - reporting(3),
-         - terminating(4),"
+         - initializationRequired(0), the MG requires initialization to 
+           be invoked by the manager before it can perform its normal 
+           functions, and this procedure has not been initiated.  The 
+           management may be able to invoke such a initialization 
+           through an action.  The terminating(4) condition may also be 
+           present.  The operational state is disabled.
+           
+         - notInitialized(1), the MG requires initialization before it 
+           can perform its normal functions, and this procedure has not 
+           been initiated.  The MG initializes itself autonomously.  The 
+           operational state is disabled.
+           
+         - initializing(2), the MG requires initialization before it can 
+           perform its normal functions, and this procedure has been 
+           initiated, but is not yet complete.  When this condition is 
+           present, the initializationRequred(0) and notInitialized(1) 
+           conditions are absent.  The operational state is disabled.
+           
+         - reporting(3), the MG has failed and is reporting failure.
+           
+         - terminating(4), the MG is in a termination phase.  If the MG 
+           does not reinitialize itself autonomously, the 
+           intializationRequired(0) condition is also present and the 
+           operational state is disabled; otherwise, the operational 
+           state is disabled.
+           
+         Note that when the MG in question is remote to the managed 
+         system, this is the view of the procedural status of the MG as 
+         discerned by the managed system and depends on the procedural 
+         status of the communications linkage to the MG."
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                Attribute-ASN1Module.ProceduralStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.2."
-    ::= { gcpMgEntry 8 }
+    ::= { gcpMgEntry 9 }
 
 gcpMgPg OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "Specifies the protection group corresponding to this Media 
-         Gateway as an index into the protectionGroupTable of the 
-         protection group that is protecting this Media Gateway.  The 
-         value is the value of the protectionGroupId that indexes 
-         a specific protection group within the protectionGroupTable.  
-         When there is no protection group associated with the Media 
-         Gateway, this value is zero (0)."
+        "Specifies the protection group to which this Media Gateway 
+         belongs as an index into the protectionGroupTable.  The value 
+         is the value of the protectionGroupId that indexes a specific 
+         protection group within the protectionGroupTable.  When there 
+         is no protection group associated with the Media Gateway, this 
+         value is zero (0)."
     REFERENCE
         "ITU-T Rec. M.3100 (2005) : protectionGroupR2 MOC
          ITU-T Rec. G.744.3 : protectionGroupR1 MOC" 
-    ::= { gcpMgEntry 9 }
+    ::= { gcpMgEntry 10 }
 
 gcpMgStandbyStatus OBJECT-TYPE
     SYNTAX      StandbyStatus
@@ -1071,7 +1117,7 @@ gcpMgStandbyStatus OBJECT-TYPE
            activity, and will contain the same information as the MG 
            being backed up.  The operational state during this status is 
            enabled(0) and the administrative state is unlocked(0).  The 
-           availability status is offline();
+           availability status is offLine(3);
          
          - coldStandby(1), the Media Gateway is to back-up another MG 
            (perhaps on another host), but is not synchronized with that 
@@ -1086,13 +1132,18 @@ gcpMgStandbyStatus OBJECT-TYPE
          - providingService(2), the back-up Media Gateway is providing 
            service and is backing up another MG (perhaps on a different 
            host).  The administrative state is unlocked(1); availability 
-           status is online()."
+           status is online().
+           
+         This status is only meaningful when gcpMgPg is non-zero: that 
+         is, the MG belongs to a protection group.  When the gcpMgPg is 
+         zero (the MG is unprotected), this object will always report 
+         providingService(2)."
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                Attribute-ASN1Module.StandbyStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.5."
-    ::= { gcpMgEntry 10 }
+    ::= { gcpMgEntry 11 }
 
 gcpMgRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -1103,7 +1154,7 @@ gcpMgRowStatus OBJECT-TYPE
          delete rows in this table."
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
-    ::= { gcpMgEntry 11 }
+    ::= { gcpMgEntry 12 }
 
 
 gcpMgc OBJECT IDENTIFIER
@@ -1125,6 +1176,375 @@ gcpMgcTable OBJECT-TYPE
          backing up an MGC within the managed system, or that an MGC 
          within the manged system might be backing up."
     ::= { gcpMgc 1 }
+
+gcpMgcEntry OBJECT-TYPE
+    SYNTAX      GcpMgcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row in the gcpMgcTable represents a Media Gateway 
+         Controller (MGC) that is known to the managed system.  This 
+         include both internal and external MGC.  MGC are present in 
+         this table when:
+         
+         1. The managed system is a system of Media Gateway Controllers 
+            and the MGC in question is one of the MGC contained within 
+            the managed system.
+            
+         2. The managed system is a system of Media Gateway Controllers 
+            and the MGC in quest is not one of the MGC contained within 
+            the managed system, but is backing up or is backed up by 
+            a Media Gateway Controller within the managed system.
+            
+         3. The managed system is a system of Media Gateways and the MGC 
+            in question is an MGC with which one of the Media Gateways 
+            communicates."
+    INDEX       { gcpMgcId }
+    ::= { gcpMgcTable 1 }
+
+GcpMgcEntry ::= SEQUENCE {
+    gcpMgcId            Unsigned32,
+    gcpMgcDomainName    SnmpAdminString,
+    gcpMgcDeviceName    SnmpAdminString,
+    gcpMgcMtpAddress    NetworkPointCode,
+    gcpMgcAdminState    AdministrativeState,
+    gcpMgcOperState     OperationalState,
+    gcpMgcUsageState    UsageState,
+    gcpMgcAvailStatus   AvailabilityStatus,
+    gcpMgcProcStatus    ProceduralStatus,
+    gcpMgcPg            Unsigned32,
+    gcpMgcStandbyStatus StandbyStatus,
+    gcpMgcRowStatus     RowStatus
+}
+
+gcpMgcId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides a non-zero ordinal index into the gcpMgcTable.  This 
+         value may also be used as an identifier of a row (MGC) in this 
+         table."
+    ::= { gcpMgcEntry 1 }
+
+gcpMgcDomainName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the domain name that will be reported by the 
+         MGC in H.248/MEGACO message on communications linkages 
+         that select domainName(2) in the gcpLinkageMgcIdent 
+         column of the gcpLinkageTable."
+    ::= { gcpMgcEntry 2 }
+
+gcpMgcDeviceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the device name that will be reported by the 
+         MG in H.248/MEGACO messages on communications linkages 
+         that select deviceName(3) in the gcpLinkageMgcIdent 
+         column of the gcpLinkageTable."
+    ::= { gcpMgcEntry 3 }
+
+gcpMgcMtpAddress OBJECT-TYPE
+    SYNTAX      NetworkPointCode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the MTP address (point code) that will be 
+         reported by the MG in H.248/MEGACO messages on 
+         communications linkages that select mtpAddress(4) in 
+         the gcpLinkageMgcIdent column of the gcpLinkageTable."
+    REFERENCE
+        "OPENSS7-SS7-MIB:NetworkPointCode"
+    ::= { gcpMgcEntry 4 }
+
+gcpMgcAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This attribute represents the adminstrative capability of the 
+         Media Gateway Controller to perform its function.  The 
+         following administrative states are defined:
+         
+         - locked(0), use of the Media Gateway Controller has been 
+           prohibited by a management station; setting the value to 
+           locked(0) results in the immediate and disruptive withdrawa 
+           from service of the Media Gateway Controller.
+           
+         - unlocked(1), use of the Media Gateway Controller has been 
+           permitted by a management station;
+           
+         - shuttingDown(2), use of the Media Gateway Controller has been 
+           administratively permitted to existing instances of use only.  
+           While the system remains in the shutting down state, the 
+           management station may at any time cause the Media Gateway 
+           Controller to revert to the unlocked(1) state.  Setting the 
+           Media Gateway Controller to shuttingDown(2) results in the 
+           graceful withdrawal from service of the Media Gateway 
+           Controller.  Once all users of the Media Gateway Controller 
+           have withdrawn, the state will change autonomously to 
+           locked(0).
+         
+         Whenever the administrative state of a Media Gateway Controller 
+         is changed, a state change notification is generated."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               administrativeState attribute."
+    ::= { gcpMgcEntry 5 }
+
+gcpMgcOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides the operational state of the Media Gateway Controller 
+         in accordance with the OperationalState textual convention and 
+         ITU-T Rec. X.721 | ISO/IEC 10165-2.  The defined states are:
+         
+         - enabled(0), the Media Gateway Controller is operational and 
+           ready for use;
+         - disabled(1), the Media Gateway Controller is not available 
+           for use.
+           
+         A change in operational state shall generate a state change 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState attribute."
+    ::= { gcpMgcEntry 6 }
+
+gcpMgcUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides the usage state of the Media Gateway Controller in 
+         accordance with the UsageState textual convention and ITU-T 
+         Rec. X.721 | ISO/IEC 10165-2.  This object is single-valued and 
+         read only.  The defined states are:
+         
+         - idle(0), the Media Gateway Controller is not currently in 
+           used;
+           
+         - active(1), the Media Gateway Controller is in use, and has 
+           sufficient spare operating capacity to provide for additional 
+           users simultaneously;
+           
+         - busy(2), the Media Gateway Controller is in use, but it has 
+           no spare operating capacity to provide for additional users 
+           at this instant."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.UsageState.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.1.2."
+    ::= { gcpMgcEntry 7 }
+
+gcpMgcAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the availability status of the Media Gateway 
+         Controller in accordance with the AvailabilityStatus textual 
+         convention and ITU-T Rec. X.721 | ISO/IEC 10165-2.  This object 
+         is set-valued and read-only and can report any set of the 
+         following conditions:
+         
+         - inTest(0), the Media Gateway Controller is undergoing a test 
+           procedure.  If the administrative state is locked(0), or 
+           shuttingDown(2), then normal users are precluded from using 
+           the MGC and the control status attribute has the value 
+           reserved for test.  Tests that do not exclude additional 
+           users can be present in any operational or administrative 
+           state but the reserved for test condition should not be 
+           present.
+           
+         - failed(1), the Media Gateway Controller has an internal fault 
+           that prevents it from operating.  The operational state is 
+           disabled.
+           
+         - powerOff(2), the Media Gateway Controller requires power to 
+           be applied and is not powered on.  The operational state is 
+           disabled.
+           
+         - offLine(3), the Media Gateway Controller requires a routing 
+           operation to be performed to place it online and make it 
+           available for use.  The operation may be manual or automatic 
+           or both.  The operational state is disabled.
+           
+         - offDuty(4), the Media Gateway Controller has been made 
+           inactive by an internal control process in accordance with 
+           a predetermined time schedule.  Under normal conditions the 
+           control process can be expected to reactivate the Media 
+           Gateway Controller at some scheduled time, and it is 
+           therefore considered to be optional.  The operational state 
+           is either enabled or disable.
+           
+         - dependency(5), the Media Gateway Controller cannot operatre 
+           because some other resource on which it depends is 
+           unavailable.  The operational state is disabled.
+           
+         - degraded(6), the service available from the Media Gateway 
+           Controller is degraded in some respect, such as in speed or 
+           operating capacity.  Failure of a test or an unacceptable 
+           performance measurement has established that some or all 
+           services are not functional or are degraded due to the 
+           presence of a defect.  However, the Media Gateway Controller 
+           remains available for service, either because some services 
+           are satisfactory or because degraded service is preferable to 
+           no service at all.  The operational state is enabled.
+           
+         - notInstalled(7), the Media Gateway Controller is not present, 
+           or is incomplete.  The operational state is disabled.
+           
+         - logFull(8), this indicates a log full condition, the 
+           semantics of which are defined in ITU-T Rec. X.735.
+
+         Note that these semantics are from the viewpoint of the managed 
+         system.  When the MGC is external to the managed system, this 
+         is the external view; where internal, the internal view.  Note 
+         also that when the view is external that this is the view of 
+         the MGC and not the availability status of the communications 
+         linkage (which is handled by the gcpLinkageAvailStatus column 
+         of the gcpLinkageTable)."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.AvailabilityStatus
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.3."
+    ::= { gcpMgcEntry 8 }
+
+gcpMgcProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the procedural status of the Media Gateway Controller 
+         in accordance with the ProceduralStatus textual convention of 
+         the OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  
+         The procedural status can report any set of the following 
+         conditions:
+         
+         - initializationRequired(0), the MGC requires initialization to 
+           be invoked by the manager before it can perform its normal 
+           functions, and this procedure has not been initiated.  The 
+           management may be able to invoke such an initialization 
+           through an action.  The terminating(4) condition may also be 
+           present.  The operational state is disabled.
+           
+         - notInitialized(1), the MGC requires initialization before it 
+           can perform its normal functions, and this procedure has not 
+           been initiated.  The MGC initializes itself autonomously.  
+           The operational state is disabled.
+
+         - initializing(2), the MGC requires initialization before it can 
+           perform its normal functions, and this procedure has been 
+           initiated, but is not yet complete.  When this condition is 
+           present, the initializationRequired(0) and notInitialized(1) 
+           conditions are absent, since initialization has already 
+           begun.  The operational state is disabled.
+           
+         - reporting(3), the MGC has failed and is reporting failure.
+           
+         - terminating(4), the MGC is in a termination phase.  If the 
+           MGC does not reinitialize itself autonomously, the 
+           initializationRequired(0) condition is also present and the 
+           operational state is disabled; otherwise, the operational 
+           state is disabled.
+           
+         Note that when the MGC in question is remote to the managed 
+         system, this is the view of the procedural status of the remote 
+         MGC as discerned by the managed system and depends on the 
+         procedural status of the communications linkage to the MGC."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.ProceduralStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.2."
+    ::= { gcpMgcEntry 9 }
+
+gcpMgcPg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the protection group corresponding to which this 
+         Media Gateway Controller belongs as an index into the 
+         protectionGroupTable.  The value is the value of the 
+         protectionGroupId that indexes a specific protection group 
+         within the protectionGroupTable.  When there is no protection 
+         group associated with the Media Gateway Controller, this value 
+         is zero (0)."
+    REFERENCE
+        "ITU-T Rec. M.3100 (2005) : protectionGroupR2 MOC
+         ITU-T Rec. G.744.3 : protectionGroupR1 MOC" 
+    ::= { gcpMgcEntry 10 }
+
+gcpMgcStandbyStatus OBJECT-TYPE
+    SYNTAX      StandbyStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides the standby status of the Media Gateway Controller, in 
+         accordance with the StandbyStatus textual convention and ITU-T 
+         Rec. X.721 | ISO/IEC 10165-2.  This entry is used to indicate 
+         MGC sparing arrangements such as those described in ITU-T Rec. 
+         H.248.1.  The type is single-valued and can assume one of the 
+         following defined conditions:
+         
+         - hotStandby(0), the MGC is not providing service, but is 
+           operating in synchronism with another MGC (on another host) 
+           that is to be backed-up.  A Media Gateway Controller with 
+           a hot standby status will be immediately able to take over 
+           the role of the MGC to be backed up, without the need for 
+           initialization activity, and will contain the same 
+           information as the MGC being backed up.  The operational 
+           state during this status is enabled(0) and the administrative 
+           state is unlocked(0).  The availability status is offLine(3).
+           
+         - coldStandby(1), the MGC is to back-up another MGC (on another 
+           host), but is not synchronized with that resource.  An MGC 
+           with a cold standby status will not immediately be able to 
+           take over the role of the MGC to be backed up, and will 
+           require some initialization activity.  The operational state 
+           is enabled(0) or disabled(1); the administrative state is 
+           locked(0) or unlocked(1); the procedural status contains 
+           notInitialized(1) or initializationRequired(0); availability 
+           status is offLine(3).
+           
+         - providingService(2), the back-up MGC is providing service and 
+           is backing up another MGC (on a different host).  The 
+           administrative state is unlocked(1); availability status is 
+           online.
+           
+         This status is only meaningful when gcpMgcPg is non-zero: that 
+         is, the MGC belongs to a protection group.  When the gcpMgcPg 
+         is zero (the MGC is unprotected), this object will always 
+         report providingService(2)."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.StandbyStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.5."
+    ::= { gcpMgcEntry 11 }
+
+gcpMgcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides a mechanism whereby management stations may create or 
+         delete rows in this table."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpMgcEntry 12 }
+
 
 gcpLinkage OBJECT IDENTIFIER
     ::= { gcpTables 3 }
@@ -1369,7 +1789,7 @@ gcpLinkageProcStatus OBJECT-TYPE
         "Provides the procedural status of the communications linkage in 
          accordance with the ProceduralStatus textual convention of the 
          OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  The 
-         procedural status can contain zero or more of the following 
+         procedural status can report any set of the following 
          conditions:
          
          - initializationRequired(0), the communications linkage 
@@ -2262,6 +2682,21 @@ gcpSctpRowStatus OBJECT-TYPE
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
     ::= { gcpSctpProfileEntry 17 }
+
+gcpProtGroup OBJECT IDENTIFIER
+    ::= { gcpTables 7 }
+
+gcpProtGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpProtGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpProtGroup 1 }
+
+
+gcpProtUnit OBJECT IDENTIFIER
+    ::= { gcpTables 8 }
 
 
 gcpOids OBJECT IDENTIFIER
