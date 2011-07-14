@@ -79,7 +79,7 @@ IMPORTS
 	FROM SNMPv2-TC;
 
 openss7TC MODULE-IDENTITY
-    LAST-UPDATED "200709220000Z"
+    LAST-UPDATED "201107142145Z"
     ORGANIZATION 
 	"OpenSS7 Corporation"
     CONTACT-INFO 
@@ -122,6 +122,9 @@ openss7TC MODULE-IDENTITY
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201107142145Z"
+    DESCRIPTION
+	"Added ActionOrResult."
     REVISION    "200709220000Z"
     DESCRIPTION 
 	"First release of this document."
@@ -211,6 +214,16 @@ CircuitCode ::= TEXTUAL-CONVENTION
 	 which uniquely identifies a circuit within the managed 
 	 switching element."
     SYNTAX      OCTET STRING (SIZE(4))
+
+ActionOrResult ::= TEXTUAL-CONVENTION
+    STATUS	current
+    DESCRIPTION
+	"Models an CMIB action command and result.  When used in the 
+	 syntax clause of an object, the maximum access clause should 
+	 be read-write.  Writing any value results in the invocation of 
+	 the action.  Reading the value provides the current result of 
+	 the invocation of the action."
+    SYNTAX      INTEGER { success(0), pending(1), failure(2), timeout(3), preempted(4) }
 
 END -- end of module OPENSS7-TC.
 
