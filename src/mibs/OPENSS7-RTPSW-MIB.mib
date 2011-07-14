@@ -237,7 +237,7 @@ rptswInterfaceAdminState OBJECT-TYPE
          
          - locked(0), use of the interface for RTP switching has 
            been prohibited by a management station; setting the 
-           value to locked(1) results in the immediate and 
+           value to locked(0) results in the immediate and 
            disruptive withdrawal from service of the interface.
          
          - unlocked(1), use of the interface for RTP switching 

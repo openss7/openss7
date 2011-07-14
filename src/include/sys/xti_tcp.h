@@ -101,7 +101,7 @@
 /** @} */
 
 #define T_TCP_MSS		536
-#define T_TCP_MAXWIN		65525
+#define T_TCP_MAXWIN		65535
 #define T_TCP_MAX_WINSHIFT	14
 
 /**
