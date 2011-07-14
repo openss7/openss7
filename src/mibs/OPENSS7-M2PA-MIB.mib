@@ -417,7 +417,7 @@ m2paSctpNoDelay OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpNoDelay."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 9 }
 
 m2paSctpMaxseg OBJECT-TYPE
@@ -430,9 +430,9 @@ m2paSctpMaxseg OBJECT-TYPE
          outgoing packets.  Values greater than the association 
          MTU are ignored and have no effect.  The value 
          determines the maximum size (in octets) above which 
-         SCCP will fragment larger DATA chunis into smaller DATA 
+         SCCP will fragment larger DATA chunks into smaller DATA 
          chunks, and beneath which SCTP will bundle DATA chunks 
-         into a single packate or combine smaller DATA chunks 
+         into a single packet or combine smaller DATA chunks 
          into larger DATA chunks.  Normally this value is the 
          association MTU value must the size of the current IP 
          and SCTP headers, minus the size of one DATA chunk 
@@ -442,7 +442,7 @@ m2paSctpMaxseg OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpMaxseg."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 10 }
 
 m2paSctpHeartbeatItvl OBJECT-TYPE
@@ -460,7 +460,7 @@ m2paSctpHeartbeatItvl OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultHeartbeatItvl."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 11 }
 
 m2paSctpHeartbeat OBJECT-TYPE
@@ -471,7 +471,7 @@ m2paSctpHeartbeat OBJECT-TYPE
         "This column determines whether HEARTBEAT messages used 
          to probe destination transport addresses for RTT 
          calculation and activity will be sent periodically.  
-         The default value from RFC 2960 is true(1).
+         The default value from RFC 4960 is true(1).
          
          Disabling heartbeats reduces the protocol's 
          responsiveness in detection of failures and redirection 
@@ -481,7 +481,7 @@ m2paSctpHeartbeat OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpHeartbeat."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 12 }
 
 m2paSctpRtoInitial OBJECT-TYPE
@@ -496,18 +496,18 @@ m2paSctpRtoInitial OBJECT-TYPE
          a destination for the first time.  Valid values are 
          zero or greater but must be within the range 
          m2paSctpRtoMin to m2paSctpRtoMax.  The default value is 
-         the value recommended by RFC 2960 and RFC 4960 (1000 
+         the value recommended by RFC 4960 and RFC 4960 (1000 
          milliseconds, or 1 second).
          
          Note that, in general, the RTO initial should not be 
          less than the peer's maximum SACK delay, otherwise, 
-         excessive retransmission migh occur while the peer is 
+         excessive retransmission might occur while the peer is 
          delaying acknowledgements.
          
          The default value is determined by the setting of 
          m2paDefaultSctpRtoInitial."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 13 }
 
 m2paSctpRtoMin OBJECT-TYPE
@@ -518,23 +518,23 @@ m2paSctpRtoMin OBJECT-TYPE
     DESCRIPTION 
         "This column defines the minimum timer interval (in 
          milliseconds) that will be used as an RTO 
-         (retranmission timeout) value when sending packets to a 
+         (retransmission timeout) value when sending packets to a 
          destination transport address and expecting 
          acknowledgements.  Valid values are zero or greater and 
          must be less than or equal to m2paSctpRtoInitial and 
          strictly less than and m2paSctpRtoMax.  The default 
-         value is the value recommended by RFC 2960 and RFC 4960 
+         value is the value recommended by RFC 4960 and RFC 4960 
          (1000 milliseconds, or 1 second).
          
          Note that, in general, the RTO minimum should not be 
          less than the peer's maximum SACK delay, otherwise, 
-         excessive retransmission migh occur while the peer is 
+         excessive retransmission might occur while the peer is 
          delaying acknowledgements.
          
          The default value is determined by the setting of 
          m2paDefaultSctpRtoMin."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 14 }
 
 m2paSctpRtoMax OBJECT-TYPE
@@ -550,18 +550,18 @@ m2paSctpRtoMax OBJECT-TYPE
          acknowledgements.  Valid values are zero or greater but 
          must be greater than or equal to m2paSctpRtoInitial and 
          strictly greater than m2paSctpRtoMin.  The default 
-         value is the value recommended by RFC 2960 and RFC 4960 
+         value is the value recommended by RFC 4960 and RFC 4960 
          (60000 milliseconds, or 60 seconds).
          
          Note that, in general, the RTO maximum should not be 
          less than the peer's maximum SACK delay, otherwise, 
-         excessive retransmission migh occur while the peer is 
+         excessive retransmission might occur while the peer is 
          delaying acknowledgements.
          
          The default value is determined by the setting of 
          m2paDefaultSctpRtoMax."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 15 }
 
 m2paSctpPathMaxRetrans OBJECT-TYPE
@@ -571,24 +571,24 @@ m2paSctpPathMaxRetrans OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This column defines the number of times that SCTP will 
-         attempt retransmitting a packet to a given detination 
+         attempt retransmitting a packet to a given destination 
          transport address before it considers that destination 
          transport address inactive.  Valid values are zero or 
          greater.  The default value is the value recommended in 
-         RFC 2960 (5 retransmissions).
+         RFC 4960 (5 retransmissions).
          
          Adjusting this value has an effect on th period of time 
          taken to fail-over between destinations for multi-homed 
          connections.  Lower values (including zero) will yield 
          faster fail-over response times.  Lower values, 
          however, may cause thrashing between destinations 
-         contributing to congestion in the network.  Deafult 
-         values are applicable to Internet applicaions.
+         contributing to congestion in the network.  Default 
+         values are applicable to Internet applications.
          
          The default value is determined by the setting of 
          m2paDefaultSctpPathMaxRetrans."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 16 }
 
 m2paSctpCookieLife OBJECT-TYPE
@@ -605,7 +605,7 @@ m2paSctpCookieLife OBJECT-TYPE
          for the cookie will be valid.  Valid values are zero or 
          greater.  Values of zero will  be converted to a system 
          clock tick.  The default value is the value recommended 
-         by RFC 2960 (60,000 milliseconds, or 60 seconds).
+         by RFC 4960 (60,000 milliseconds, or 60 seconds).
          
          Reducing this value will increase the probability that 
          passive connection attempts will fail due to expired 
@@ -619,14 +619,14 @@ m2paSctpCookieLife OBJECT-TYPE
          m2paSctpCookieLife.
          
          Unfortunately, the m2paSctpCookieLife and 
-         m2paSctpCookieInc must be adjusted to accomodate the 
+         m2paSctpCookieInc must be adjusted to accommodate the 
          slowest peer on the slowest connection.  The default 
          setting is adequate for Internet applications.
          
          The default value is determined by the setting of 
          m2paDefaultSctpCookieLife."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 17 }
 
 m2paSctpCookieInc OBJECT-TYPE
@@ -637,11 +637,11 @@ m2paSctpCookieInc OBJECT-TYPE
     DESCRIPTION 
         "This column defines the time increment (in 
          milliseconds) that will be added to the lifespan of the 
-         cookie in an INIT-ACK if the recieved INIT requests 
+         cookie in an INIT-ACK if the received INIT requests 
          cookie preservative to lengthen the lifespan of the 
          cookie.  Valid values are zero or greater.  The default 
          value is the value recommended in RFC 
-         2960 5.2.6 (1000 milliseconds, or 1 second).
+         4960 5.2.6 (1000 milliseconds, or 1 second).
          
          This value can be adjusted in conjunction with 
          m2paSctpCookieLife to meet objectives of successful 
@@ -651,7 +651,7 @@ m2paSctpCookieInc OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpCookieInc."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 18 }
 
 m2paSctpMaxInitRetries OBJECT-TYPE
@@ -664,12 +664,12 @@ m2paSctpMaxInitRetries OBJECT-TYPE
          COOKIE-ECHO will be resent to a given destination 
          before abandoning an active open attempt.  Value values 
          are zero or greater.  The default value is the value 
-         recommended by RFC 2960 (8 retries).
+         recommended by RFC 4960 (8 retries).
          
          The default value is determined by the setting of 
          m2paDefaultSctpMaxInitRetries."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 19 }
 
 m2paSctpMaxBurst OBJECT-TYPE
@@ -687,7 +687,7 @@ m2paSctpMaxBurst OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultSctpMaxBurst."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 20 }
 
 m2paSctpAssocMaxRetrans OBJECT-TYPE
@@ -701,7 +701,7 @@ m2paSctpAssocMaxRetrans OBJECT-TYPE
          on any active destination transport address before it 
          aborts the association.  Value values are zero or 
          greater.  The default value is the value recommended in 
-         RFC 2960 (10 retransmissions).
+         RFC 4960 (10 retransmissions).
          
          This value should be larger  than sum of the path 
          maximum number of retransmission values of each of the 
@@ -716,7 +716,7 @@ m2paSctpAssocMaxRetrans OBJECT-TYPE
          The default value is determined by the setting of 
          m2paDefaultAssocMaxRetrans."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 21 }
 
 m2paSctpSackDelay OBJECT-TYPE
@@ -729,15 +729,15 @@ m2paSctpSackDelay OBJECT-TYPE
          milliseconds) that will be used as an RTO 
          (retransmission timeout) value when sending packets to 
          a destination transport address.  Valid values are zero 
-         or to 500 milliseconds (RFC 2960 forbits setting this 
+         or to 500 milliseconds (RFC 4960 forbits setting this 
          value larger than 500 milliseconds).  The default value 
-         is the value recommended in RFC 2960 (200 
+         is the value recommended in RFC 4960 (200 
          milliseconds).
          
          The default value is determined by the setting of 
          m2paDefaultSctpSackDelay."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     DEFVAL      { 20 }
     ::= { m2paProtocolProfileEntry 22 }
 
@@ -750,7 +750,7 @@ m2paSctpLifetime OBJECT-TYPE
         "The default value is determined by the setting of 
          m2paDefaultSctpLifetime."
     REFERENCE   
-        "RFC 4096"
+        "RFC 4960"
     ::= { m2paProtocolProfileEntry 23 }
 
 m2paTimerT1 OBJECT-TYPE
@@ -983,7 +983,7 @@ m2paTransCongThresholdAbatementL1Messages OBJECT-TYPE
         "If the number of messages AND the number of octets in 
          the transmission buffer or transmission queue fall 
          below the values of the corresponding components of 
-         this attribute, the coresponding link is no longer in 
+         this attribute, the corresponding link is no longer in 
          congestion level 1.  If the congestion control method 
          used supports multiple congestion levels without 
          congestion priorities, then the new congestion level is 
@@ -1010,7 +1010,7 @@ m2paTransCongThresholdAbatementL1Octets OBJECT-TYPE
         "If the number of messages AND the number of octets in 
          the transmission buffer or transmission queue fall 
          below the values of the corresponding components of 
-         this attribute, the coresponding link is no longer in 
+         this attribute, the corresponding link is no longer in 
          congestion level 1.  If the congestion control method 
          used supports multiple congestion levels without 
          congestion priorities, then the new congestion level is 
@@ -1678,7 +1678,7 @@ m2paDefaultSctpNoDelay OBJECT-TYPE
          effect.
          
          The default default is true(1): send packets without 
-         delay.  The default default value is only application 
+         delay.  The default default value is only applicable 
          when never set by any management station.  When set, 
          the scalar value must persist across system reboots."
     REFERENCE   
@@ -1696,9 +1696,9 @@ m2paDefaultSctpMaxseg OBJECT-TYPE
          payload size for outgoing packets.  Values greater than 
          the association MTU are ignored and have no effect.  
          The value determines the maximum size (in octets) above 
-         which SCCP will fragment larger DATA chunis into 
+         which SCCP will fragment larger DATA chunks into 
          smaller DATA chunks, and beneath which SCTP will bundle 
-         DATA chunks into a single packate or combine smaller 
+         DATA chunks into a single packet or combine smaller 
          DATA chunks into larger DATA chunks.  Normally this 
          value is the association MTU value must the size of the 
          current IP and SCTP headers, minus the size of one DATA 
@@ -1707,7 +1707,7 @@ m2paDefaultSctpMaxseg OBJECT-TYPE
          
          The default default allows the prevailing MTU to be 
          controlling (65536 octets).  The default default value 
-         is only application when never set by any management 
+         is only applicable when never set by any management 
          station.  When set, the scalar value must persist 
          across system reboots."
     REFERENCE   
@@ -1737,22 +1737,22 @@ m2paDefaultSctpHeartbeatItvl OBJECT-TYPE
          (2000) to have a range from 4 to 12 seconds.  
          Therefore, for M2PA, unless the SCTP heartbeat interval 
          is set below Q.707-T2, it will only have effect on 
-         multihomed associations for checking the status of 
+         multi-homed associations for checking the status of 
          non-primary or non-CMT destinations.
          
          Reducing this value will reduce the amount of time 
          taken to detect primary and non-primary, non-CMT path, 
          interface and destination failures, but may only affect 
-         primary destinations if reduced below the coresponding 
+         primary destinations if reduced below the corresponding 
          Q.707-T2 value.
          
          The default default value is that recommended by RFC 
          4960 (6000 centiseconds, or 60 seconds).  The default 
-         default value is only application when never set by any 
+         default value is only applicable when never set by any 
          management station.  When set, the scalar value must 
          persist across system reboots."
     REFERENCE   
-        "RFC 4960 15. HB.interval, ITU-T Rec. Q.707 (1993), ANIS 
+        "RFC 4960 15. HB.interval, ITU-T Rec. Q.707 (1993), ANSI 
          T1.111.7 (2000)."
     DEFVAL      { 6000 }
     ::= { m2paScalars 3 }
@@ -1763,12 +1763,12 @@ m2paDefaultSctpHeartbeat OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "This scalar defines, for M2PA, by default whether 
-         HEARBEAT messages used to probe destination transport 
+         HEARTBEAT messages used to probe destination transport 
          addresses for RTT calculation and activity will be sent 
          periodically.
          
          Disabling the heart beat mechanism reduces the 
-         protocol's repsonsiveness in detection of failures and 
+         protocol's responsiveness in detection of failures and 
          redirection of traffic away from failed paths and 
          interfaces, particularly, for M2PA, failed non-primary 
          and non-CMT destinations in an multi-homed association.  
@@ -1776,11 +1776,12 @@ m2paDefaultSctpHeartbeat OBJECT-TYPE
          value.
          
          The default default value from RFC 4960 is true(1).  
-         The default default value is only application when 
+         The default default value is only applicable when 
          never set by any management station.  When set, the 
          scalar value must persist across system reboots."
     REFERENCE   
         "RFC 4960"
+    DEFVAL      { true }
     ::= { m2paScalars 4 }
 
 m2paDefaultSctpRtoInitial OBJECT-TYPE
@@ -1791,7 +1792,7 @@ m2paDefaultSctpRtoInitial OBJECT-TYPE
     DESCRIPTION 
         "This scalar defines, for M2PA, the default initial time 
          interval (in milliseconds) that will be used as an 
-         intial RTO (retransmission time out) value when sending 
+         initial RTO (retransmission time out) value when sending 
          packets to a destination for the first time.  Valid 
          values are zero or greater but must be within the range 
          m2paDefaultSctpRtoMin to m2paDefaultSctpRtoMax.
@@ -1805,7 +1806,7 @@ m2paDefaultSctpRtoInitial OBJECT-TYPE
          
          The default default value is that value recommended by 
          RFC 4960 (3000 milliseconds, or 3 seconds).  The 
-         default default value is only application when never 
+         default default value is only applicable when never 
          set by any management station.  When set, the scalar 
          value must persist across system reboots."
     REFERENCE   
@@ -1819,7 +1820,7 @@ m2paDefaultSctpRtoMin OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "This scalar defines, for M2PA, the default minmum time 
+        "This scalar defines, for M2PA, the default minimum time 
          interval (in milliseconds) that will be used as an RTO 
          (retransmission time out) value when sending packets to 
          a destination transport address and expecting 
@@ -1828,7 +1829,7 @@ m2paDefaultSctpRtoMin OBJECT-TYPE
          and strictly less than m2paDefaultSctpRtoMax.
          
          Note that, in general, the RTO minimum should not be 
-         less thatn the peer's maximum SACK delay, otherwise, 
+         less than the peer's maximum SACK delay, otherwise, 
          excessive retransmissions might occur while the peer is 
          delaying acknowledgements.  That is, this value should 
          not be less than the corresponding 
@@ -1836,7 +1837,7 @@ m2paDefaultSctpRtoMin OBJECT-TYPE
          
          The default default value is the value recommended by 
          RFC 4960 (1000 milliseconds, or 1 second).  The default 
-         default value is only application when never set by any 
+         default value is only applicable when never set by any 
          management station.  When set, the scalar value must 
          persist across system reboots."
     REFERENCE   
@@ -1852,7 +1853,7 @@ m2paDefaultSctpRtoMax OBJECT-TYPE
     DESCRIPTION 
         "This scalar defines, for M2PA, the default maximum time 
          interval (in milliseconds) that will be used as an RTO 
-         (retransmission timeout) value when sending packets t a 
+         (retransmission timeout) value when sending packets to a 
          destination transport address and expecting 
          acknowledgements.  Valid values are zero or greater but 
          must be greater than or equal to m2paSctpRtoInitial and 
@@ -1860,7 +1861,7 @@ m2paDefaultSctpRtoMax OBJECT-TYPE
          
          The default default value is the value recommended by 
          RFC 4960 (60000 milliseconds, or 60 seconds).  The 
-         default default value is only application when never 
+         default default value is only applicable when never 
          set by any management station.  When set, the scalar 
          value must persist across system reboots."
     REFERENCE   
@@ -1876,7 +1877,7 @@ m2paDefaultSctpPathMaxRetrans OBJECT-TYPE
     DESCRIPTION 
         "This scalar defines, for M2PA, the default number of 
          times that SCTP will attempt retransmitting a packet to 
-         a given detination transport address before it 
+         a given destination transport address before it 
          considers that destination transport address inactive.  
          Valid values are zero or greater.
          
@@ -1890,7 +1891,7 @@ m2paDefaultSctpPathMaxRetrans OBJECT-TYPE
          
          The default default value is the value recommended in 
          RFC 4960 (5 retransmissions).  The default default 
-         value is only application when never set by any 
+         value is only applicable when never set by any 
          management station.  When set, the scalar value must 
          persist across system reboots."
     REFERENCE   
@@ -1926,13 +1927,13 @@ m2paDefaultSctpCookieLife OBJECT-TYPE
          m2paSctpCookieLife.
          
          Unfortunately, the m2paSctpCookieLife and 
-         m2paSctpCookieInc must be adjusted to accomodate the 
+         m2paSctpCookieInc must be adjusted to accommodate the 
          slowest peer on the slowest connection.  The default 
          setting is adequate for Internet applications.
          
          The default default value is the value recommended by 
          RFC 4960 (6,000 centiseconds, or 60 seconds).  The 
-         default default value is only application when never 
+         default default value is only applicable when never 
          set by any management station.  When set, the scalar 
          value must persist across system reboots."
     REFERENCE   
@@ -1948,7 +1949,7 @@ m2paDefaultSctpCookieInc OBJECT-TYPE
     DESCRIPTION 
         "This scalar defines, for M2PA, the default time 
          increment (in milliseconds) that will be added to the 
-         lifespan of the cookie in an INIT-ACK if the recieved 
+         lifespan of the cookie in an INIT-ACK if the received 
          INIT requests cookie preservative to lengthen the 
          lifespan of the cookie.  Valid values are zero or 
          greater.
@@ -1961,7 +1962,7 @@ m2paDefaultSctpCookieInc OBJECT-TYPE
          RFC 4960 5.2.6 (100 centiseconds, or 1 second).  The 
          default default setting is adequate for Internet 
          applications.  The default default value is only 
-         application when never set by any management station.  
+         applicable when never set by any management station.  
          When set, the scalar value must persist across system 
          reboots."
     REFERENCE   
@@ -1982,7 +1983,7 @@ m2paDefaultSctpMaxInitRetries OBJECT-TYPE
          
          The default default value is the value recommended by 
          RFC 4960 (8 retries).  The default default value is 
-         only application when never set by any management 
+         only applicable when never set by any management 
          station.  When set, the scalar value must persist 
          across system reboots."
     REFERENCE   
@@ -2003,7 +2004,7 @@ m2paDefaultSctpMaxBurst OBJECT-TYPE
          
          The default default value is the value recommended in 
          RFC 4960 (4 MTUs).  The default default value is only 
-         application when never set by any management station.  
+         applicable when never set by any management station.  
          When set, the scalar value must persist across system 
          reboots."
     REFERENCE   
@@ -2035,7 +2036,7 @@ m2paDefaultSctpAssocMaxRetrans OBJECT-TYPE
          
          The default default value is the value recommended in 
          RFC 4960 (10 retransmissions).  The default default 
-         value is only application when never set by any 
+         value is only applicable when never set by any 
          management station.  When set, the scalar value must 
          persist across system reboots."
     REFERENCE   
@@ -2058,7 +2059,7 @@ m2paDefaultSctpSackDelay OBJECT-TYPE
          
          The default default value is the value recommended in 
          RFC 4960 (200 milliseconds).  The default default value 
-         is only application when never set by any management 
+         is only applicable when never set by any management 
          station.  When set, the scalar value must persist 
          across system reboots."
     REFERENCE   
@@ -2075,7 +2076,7 @@ m2paDefaultSctpLifetime OBJECT-TYPE
         "This scalar defines, for M2PA, the default life time 
          assigned to user data to be sent on the association.
          
-         The default default value is only application when 
+         The default default value is only applicable when 
          never set by any management station.  When set, the 
          scalar value must persist across system reboots."
     REFERENCE   

@@ -1,0 +1,2358 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile$ $Name$($Revision$) $Date$
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date$ by $Author$
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log$
+-- =============================================================================
+
+OPENSS7-GCP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, AvailabilityStatus, OperationalState, 
+    ProceduralStatus, StandbyStatus, UsageState
+        FROM OPENSS7-SMI-MIB
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, RowPointer, 
+    AutonomousType
+        FROM SNMPv2-SMI
+    RowStatus, TEXTUAL-CONVENTION, TimeInterval
+        FROM SNMPv2-TC
+    TransportAddress, TransportAddressType
+        FROM TRANSPORT-ADDRESS-MIB;
+
+gcpMIB MODULE-IDENTITY
+    LAST-UPDATED "201107130452Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201107130452Z"
+    DESCRIPTION 
+        "Initial version of this mib."
+    ::= { openss7Modules 600 }
+
+MegacoIdentSelection ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a selection of the form of the label that 
+         a MEGACO entity uses in send messages, or is expected 
+         to use in received messages.  The options are:
+         
+         - ipAddress(1), the MEGACO entity will identify itself 
+           by its IPv4 or IPv6 address and transport port;
+           
+         - domainName(2), the MEGACO entity will identify itself 
+           by its domain name;
+           
+         - deviceName(3), the MEGACO entity will identify itself 
+           by its device path;
+           
+         - mtpAddress(4), the MEGACO entity will identify itself 
+           by its MTP Point Code.
+           
+         This selection is specific to ITU-T Recommendation 
+         H.248.1 (MEGACO) operation only."
+    REFERENCE
+        "ITU-T Recommendation H.248.1 (09/2005), Annex A, Mid 
+               CHOICE."
+    SYNTAX      INTEGER { ipAddress(1), domainName(2), deviceName(3), mtpAddress(4) }
+
+gcpNotifications OBJECT IDENTIFIER
+    ::= { gcpMIB 0 }
+
+gcpNotifs OBJECT IDENTIFIER
+    ::= { gcpMIB 1 }
+
+gcpScalars OBJECT IDENTIFIER
+    ::= { gcpMIB 2 }
+
+gcpDefaults OBJECT IDENTIFIER
+    ::= { gcpScalars 1 }
+
+gcpMgcoDefaults OBJECT IDENTIFIER
+    ::= { gcpDefaults 1 }
+
+gcpDefaultMgcoIdent OBJECT-TYPE
+    SYNTAX      MegacoIdentSelection
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Specifies the default default value that will be used in tables 
+         where MEGACO identity selection is made.  The options are:
+         
+         - ipAddress(1), identified by IP address;
+         - domainName(2), identified by domain name;
+         - deviceName(3), identified by device path;
+         - mtpAddress(4), identified by MTP Point Code.
+         
+         The default default value is ipAddress(1): identify by IP 
+         address and port number.  The default default value is only 
+         applicable when never set by any management station.  When set, 
+         the scalar value must persist across system reboots."
+    DEFVAL      { ipAddress }
+    ::= { gcpMgcoDefaults 1 }
+
+gcpUdpDefaults OBJECT IDENTIFIER
+    ::= { gcpDefaults 2 }
+
+gcpDefaultUdpChecksum OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for GCP, by default whether UDP checksums 
+         are used.  Application of UDP checksums increases the 
+         computational load on both the sending and receiving systems 
+         and does not provide any additional coverage on clean links.
+         
+         The default default value is false(2): do no calculate 
+         checksums.  The default default value is only applicable when 
+         never set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    ::= { gcpUdpDefaults 1 }
+
+gcpTcpDefaults OBJECT IDENTIFIER
+    ::= { gcpDefaults 3 }
+
+gcpDefaultTcpNoDelay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defined, for GCP, by default whether the Nagle 
+         algorithm should be applied to TCP connections.  The Nagle 
+         algorithm increases the size of the packets placed on the 
+         network at the expense of delaying the transmission of some 
+         data during congestion episodes.  When set to true(1), the 
+         Nagle algorithm is suppressed; otherwise, set to false(2), the 
+         Nagle algorithm is in effect.
+         
+         The default default is false(2): use the Nagle algorithm.  The 
+         default default value is only applicable when never set by any 
+         management station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE
+        "RFC 793, RFC 1122, XNS 5.2"
+    DEFVAL      { false }
+    ::= { gcpTcpDefaults 1 }
+
+gcpDefaultTcpMaxseg OBJECT-TYPE
+    SYNTAX      Unsigned32 (536..65536)
+    UNITS       "octets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for GCP, the default maximum TCP segment 
+         size for outgoing packets.  Values greater than the path MTU 
+         are ignored and have no effect.  The value determines the 
+         maximum size (in octets) above which TCP will fragment larger 
+         segments into smaller ones, and beneath which TCP will combine 
+         smaller segments into a larger one.  Normally this value is the 
+         path MTU value minus the size of the current IP and TCP 
+         headers.  When set to a lower value, the lower value will be 
+         used.
+         
+         The default default allows the prevailing MTU to be controlling 
+         (65536 octets).  The default default value is only applicable 
+         when never set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE
+        "RFC 793, RFC 1122, XNS 5.2"
+    DEFVAL      { 65536 }
+    ::= { gcpTcpDefaults 2 }
+
+gcpDefaultTcpKeepAlive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "This scalar defines, for GCP, by default whether keep-alive 
+         messages used to probe destination transport addresses for RTT 
+         calculation and activity will be send periodically.
+         
+         Enabling keep-alive increases the protocol's responsiveness in 
+         detection of failure and redirection of traffic away from 
+         failed paths and interfaces.  However, TCP connections are far 
+         less robust on noisy or congested links with keep-alive 
+         enabled.  This scalar should normally be left at its default 
+         value.
+         
+         The default default value is the value recommended by RFC 793, 
+         which is false(2): do not send keep-alive probes.  The default 
+         default value is only applicable when never set by any 
+         management station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE
+        "RFC 793, RFC 1122, XNS 5.2"
+    DEFVAL      { false }
+    ::= { gcpTcpDefaults 3 }
+
+gcpDefaultTcpKeepIdle OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Defines, for GCP, by default the period of time that the 
+         connection must remain idle before a keep-alive probe are 
+         initiated.  No minimum is signified by the value zero (0).
+         
+         The default default is 7200 seconds: (2 hours).  The default 
+         default is only applicable when never set by any management 
+         station.  When set, the scalar value must persist across system 
+         reboots."
+    REFERENCE
+        "RFC 793, RFC 1122, XNS 5.2"
+    DEFVAL      { 72000 }
+    ::= { gcpTcpDefaults 4 }
+
+gcpDefaultTcpKeepAliveItvl OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies, for GCP, the default interval between keep-alive 
+         probes on idle connections.
+         
+         When keep-alive is enabled (see gcpDefaultTcpKeepAlive), this 
+         value determines the rate at which keep-alive probes are sent 
+         before a response is received or the connection is deemed dead.
+         
+         The default default is the minimum period of time recommended 
+         by RFC 1122: 120 seconds (2 minutes).  Note that Linux uses 75 
+         seconds (1.25 minutes). The default default value is only 
+         applicable when never set by any management station.  When set, 
+         the scalar value must persist across system reboots."
+    REFERENCE
+        "RFC 793, RFC 1122"
+    DEFVAL      { 1200 }
+    ::= { gcpTcpDefaults 5 }
+
+gcpDefaultTcpKeepCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies, for GCP, the default maximum number of keep-alive 
+         probes that will be sent without a response before the 
+         connection is deemed failed.
+         
+         The default default is 9 attempts.  The default default value 
+         is only applicable when never set by any management station.  
+         When set, the scalar value must persist across system reboots."
+    REFERENCE
+        "RFC 793, RFC 1122"
+    DEFVAL      { 9 }
+    ::= { gcpTcpDefaults 6 }
+
+gcpDefaultTcpSynRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "RFC 793, RFC 1122"
+    DEFVAL      { 5 }
+    ::= { gcpTcpDefaults 7 }
+
+gcpDefaultTcpWindowClamp OBJECT-TYPE
+    SYNTAX      Unsigned32 (536..65536)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "RFC 793, RFC 1122, XNS 5.2"
+    DEFVAL      { 65536 }
+    ::= { gcpTcpDefaults 8 }
+
+
+gcpSctpDefaults OBJECT IDENTIFIER
+    ::= { gcpDefaults 4 }
+
+gcpDefaultSctpNoDelay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, by default whether the Nagle 
+         algorithm should be applied to SCTP associations.  The Nagle 
+         algorithm increases the size of the packets placed on the 
+         network at the expense of delaying the transmission of some 
+         data during congestion episodes.  When set to true(1), the 
+         Nagle algorithm is suppressed; otherwise, set to false(2), the 
+         Nagle algorithm is in effect.
+         
+         The default default is true(1): send packets without delay.  
+         The default default value is only applicable when never set by 
+         any management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960"
+    DEFVAL      { true }
+    ::= { gcpSctpDefaults 1 }
+
+gcpDefaultSctpMaxseg OBJECT-TYPE
+    SYNTAX      Unsigned32 (536..65536)
+    UNITS       "octets"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default maximum SCTP payload 
+         size for outgoing packets.  Values greater than the association 
+         MTU are ignored and have no effect.  The value determines the 
+         maximum size (in octets) above which SCCP will fragment larger 
+         DATA chunks into smaller DATA chunks, and beneath which SCTP 
+         will bundle DATA chunks into a single packet or combine smaller 
+         DATA chunks into larger DATA chunks.  Normally this value is 
+         the association MTU value minus the size of the current IP and 
+         SCTP headers, minus the size of one DATA chunk header.  When 
+         set to a lower value, the lower value will be used.
+         
+         The default default allows the prevailing MTU to be controlling 
+         (65536 octets).  The default default value is only applicable 
+         when never set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE
+        "RFC 4960"
+    DEFVAL      { 65536 }
+    ::= { gcpSctpDefaults 2 }
+
+gcpDefaultSctpHeartbeatItvl OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default time interval (in 
+         milliseconds) between successive HEARTBEAT messages used to 
+         probe destination transport addresses for RTT calculation and 
+         activity.  Valid values are zero (0), do not heartbeat, or 
+         a value of 1 millisecond or greater.
+         
+         In general this value determines the amount of time that it 
+         takes for an SCTP association to detect a failure on 
+         a association which has no data to transmit or retransmit.
+         
+         M2PA, however, is used by MTP Level 3 which generates a test 
+         message every T2, where T2 is defined in ITU-T Rec. Q.707 
+         (1993) or ANSI T1.111.7 (2000) to have a range from 4 to 12 
+         seconds.  Therefore, for M2PA, unless the SCTP heartbeat 
+         interval is set below Q.707-T2, it will only have effect on 
+         multi-homed associations for checking the status of non-primary 
+         or non-CMT destinations.
+         
+         Reducing this value will reduce the amount of time taken to 
+         detect primary and non-primary, non-CMT path, interface and 
+         destination failures, but may only affect primary destinations 
+         if reduced below the corresponding Q.707-T2 value.
+         
+         The default default value is that recommended by RFC 4960 (6000 
+         centiseconds, or 60 seconds).  The default default value is 
+         only applicable when never set by any management station.  When 
+         set, the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. HB.interval, ITU-T Rec. Q.707 (1993), ANSI 
+             T1.111.7 (2000)."
+    DEFVAL      { 6000 }
+    ::= { gcpSctpDefaults 3 }
+
+gcpDefaultSctpHearbeat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, by default whether HEARTBEAT 
+         messages used to probe destination transport addresses for RTT 
+         calculation and activity will be sent periodically.
+         
+         Disabling the heart beat mechanism reduces the protocol's 
+         responsiveness in detection of failures and redirection of 
+         traffic away from failed paths and interfaces, particularly, 
+         for GCP, failed non-primary and non-CMT destinations in an 
+         multi-homed association.  This scalar should normally be left 
+         at its default value.
+         
+         The default default value from RFC 4960 is true(1).  The 
+         default default value is only applicable when never set by any 
+         management station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE   
+        "RFC 4960"
+    DEFVAL      { true }
+    ::= { gcpSctpDefaults 4 }
+
+gcpDefaultSctpRtoInitial OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default initial time interval 
+         (in milliseconds) that will be used as an initial RTO 
+         (retransmission time out) value when sending packets to 
+         a destination for the first time.  Valid values are zero or 
+         greater but must be within the range gcpDefaultSctpRtoMin to 
+         gcpDefaultSctpRtoMax.
+         
+         Note that, in general, the default RTO initial values should 
+         not be less than the peer's maximum SACK delay, otherwise, 
+         excessive retransmission might occur while the peer is delaying 
+         acknowledgements.  That is, this value should be greater than 
+         the corresponding gcpDefaultSctpSackDelay at the peer.
+         
+         The default default value is that value recommended by RFC 4960 
+         (3000 milliseconds, or 3 seconds).  The default default value 
+         is only applicable when never set by any management station.  
+         When set, the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. RTO.Initial"
+    DEFVAL      { 300 }
+    ::= { gcpSctpDefaults 5 }
+
+gcpDefaultSctpRtoMin OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default minimum time interval 
+         (in milliseconds) that will be used as an RTO (retransmission 
+         time out) value when sending packets to a destination transport 
+         address and expecting acknowledgements.  Valid values are zero 
+         or greater but must be less than or equal to 
+         gcpDefaultSctpRtoInitial and strictly less than 
+         gcpDefaultSctpRtoMax.
+         
+         Note that, in general, the RTO minimum should not be less than 
+         the peer's maximum SACK delay, otherwise, excessive 
+         retransmissions might occur while the peer is delaying 
+         acknowledgements.  That is, this value should not be less than 
+         the corresponding gcpDefaultSctpSackDelay at the peer.
+         
+         The default default value is the value recommended by RFC 4960 
+         (1000 milliseconds, or 1 second).  The default default value is 
+         only applicable when never set by any management station.  When 
+         set, the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. RTO.Min"
+    DEFVAL      { 100 }
+    ::= { gcpSctpDefaults 6 }
+
+gcpDefaultSctpRtoMax OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default maximum time interval 
+         (in milliseconds) that will be used as an RTO (retransmission 
+         timeout) value when sending packets to a destination transport 
+         address and expecting acknowledgements.  Valid values are zero 
+         or greater but must be greater than or equal to 
+         gcpSctpRtoInitial and strictly greater than gcpSctpRtoMin.
+         
+         The default default value is the value recommended by RFC 4960 
+         (60000 milliseconds, or 60 seconds).  The default default value 
+         is only applicable when never set by any management station.  
+         When set, the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. RTO.Max"
+    DEFVAL      { 6000 }
+    ::= { gcpSctpDefaults 7 }
+
+gcpDefaultSctpPathMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default number of times that 
+         SCTP will attempt retransmitting a packet to a given 
+         destination transport address before it considers that 
+         destination transport address inactive.  Valid values are zero 
+         or greater.
+         
+         Adjusting this value has an effect on th period of time taken 
+         to fail-over between destinations for multi-homed connections.  
+         Lower values (including zero) will yield faster fail-over 
+         response times.  Lower values, however, may cause thrashing 
+         between destinations contributing to congestion in the network.  
+         Default default values are applicable to Internet applications.
+         
+         The default default value is the value recommended in RFC 4960 
+         (5 retransmissions).  The default default value is only 
+         applicable when never set by any management station.  When set, 
+         the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Path.Max.Retrans"
+    DEFVAL      { 5 }
+    ::= { gcpSctpDefaults 8 }
+
+gcpDefaultSctpCookieLife OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default time interval (in 
+         milliseconds) in conjunction with gcpSctpCookieInc beyond which 
+         a COOKIE-ECHO received with a cookie sent in an INIT-ACK will 
+         no longer be accepted.  For SCTP, this also limits the maximum 
+         time interval for which the HMAC secret key for the cookie will 
+         be valid.  Valid values are zero or greater.  Values of zero 
+         will  be converted to a system clock tick.
+         
+         Reducing this value will increase the probability that passive 
+         connection attempts will fail due to expired cookies.  
+         Increasing the value will reduce the overall security of the 
+         system by permitting attackers an increased interval within 
+         which to crack HMACs and guess verification tags.  This value 
+         may be adjusted in conjunction with gcpSctpCookieInc to meet 
+         most objectives for successful passive connection attempts with 
+         the best security afforded by smaller values of 
+         gcpSctpCookieLife.
+         
+         Unfortunately, the gcpSctpCookieLife and gcpSctpCookieInc must 
+         be adjusted to accommodate the slowest peer on the slowest 
+         connection.  The default setting is adequate for Internet 
+         applications.
+         
+         The default default value is the value recommended by RFC 4960 
+         (6,000 centiseconds, or 60 seconds).  The default default value 
+         is only applicable when never set by any management station.  
+         When set, the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Valid.Cookie.Life"
+    DEFVAL      { 6000 }
+    ::= { gcpSctpDefaults 9 }
+
+gcpDefaultSctpCookieInc OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default time increment (in 
+         milliseconds) that will be added to the lifespan of the cookie 
+         in an INIT-ACK if the received INIT requests cookie 
+         preservative to lengthen the lifespan of the cookie.  Valid 
+         values are zero or greater.
+         
+         This value can be adjusted in conjunction with 
+         gcpSctpCookieLife to meet objectives of successful passive 
+         connection attempts and security.
+         
+         The default default value is the value recommended in RFC 4960 
+         5.2.6 (100 centiseconds, or 1 second).  The default default 
+         setting is adequate for Internet applications.  The default 
+         default value is only applicable when never set by any 
+         management station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE   
+        "RFC 4960, 5.2.6, 3)"
+    DEFVAL      { 100 }
+    ::= { gcpSctpDefaults 10 }
+
+gcpDefaultSctpMaxInitRetries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "retries"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default number of times that 
+         an INIT or COOKIE-ECHO will be resent to a given destination 
+         before abandoning an active open attempt.  Value values are 
+         zero or greater.
+         
+         The default default value is the value recommended by RFC 4960 
+         (8 retries).  The default default value is only applicable when 
+         never set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Max.Init.Retransmits"
+    DEFVAL      { 8 }
+    ::= { gcpSctpDefaults 11 }
+
+gcpDefaultSctpMaxBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "MTUs"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default maximum number of 
+         MTUs of new data chunks that will be sent in a burst in 
+         accordance with SCTP Specification Errata and Issues, RFC 4460 
+         and RFC 4960.
+         
+         The default default value is the value recommended in RFC 4960 
+         (4 MTUs).  The default default value is only applicable when 
+         never set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Max.Burst"
+    DEFVAL      { 4 }
+    ::= { gcpSctpDefaults 12 }
+
+gcpDefaultSctpAssocMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default number of times that 
+         the sending endpoint will attempt retransmitting a packet on 
+         any active destination transport address before it aborts the 
+         association.  Value values are zero or greater.
+         
+         This value should be larger than sum of the default path 
+         maximum number of retransmission values of each of the 
+         destinations.
+         
+         Setting this value to less than the sum of the default path 
+         maximum retransmission values for all of the destinations has 
+         the interesting effect of permitting a connection to persist 
+         even when all destinations have been deemed inactive.
+         
+         The default default value is the value recommended in RFC 4960 
+         (10 retransmissions).  The default default value is only 
+         applicable when never set by any management station.  When set, 
+         the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. Association.Max.Retrans"
+    DEFVAL      { 10 }
+    ::= { gcpSctpDefaults 13 }
+
+gcpDefaultSctpSackDelay OBJECT-TYPE
+    SYNTAX      TimeInterval (0..50)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default interval of time (in 
+         milliseconds) that will be used as an RTO (retransmission time 
+         out) value when sending packets to a destination transport 
+         address.  Valid values are zero or to 500 milliseconds (RFC 
+         4960 forbids setting this value larger than 500 milliseconds).
+         
+         The default default value is the value recommended in RFC 4960 
+         (200 milliseconds).  The default default value is only 
+         applicable when never set by any management station.  When set, 
+         the scalar value must persist across system reboots."
+    REFERENCE   
+        "RFC 4960 15. 6.2"
+    DEFVAL      { 20 }
+    ::= { gcpSctpDefaults 14 }
+
+gcpDefaultSctpLifetime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This scalar defines, for GCP, the default life time assigned to 
+         user data to be sent on the association.
+         
+         The default default value is only applicable when never set by 
+         any management station.  When set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
+        "RFC 4960 10.1 E)"
+    DEFVAL      { 0 }
+    ::= { gcpSctpDefaults 15 }
+
+
+gcpTables OBJECT IDENTIFIER
+    ::= { gcpMIB 3 }
+
+gcpMg OBJECT IDENTIFIER
+    ::= { gcpTables 1 }
+
+gcpMgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpMgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table lists all of the Media Gateway devices known to this 
+         managed system.  When the management view is that of a managed 
+         system containing Media Gateway Controllers, this table 
+         characterizes all of the MG with which a Media Gateway 
+         Controller in the managed system might communicate or 
+         reference.  When the management view is that of a managed 
+         system containing Media Gateways, this table characterizes all 
+         of the MG in the managed system as well as all of the MG that 
+         might be backing up an MG within the managed system, or that an 
+         MG within the managed system might be backing up."
+    ::= { gcpMg 1 }
+
+gcpMgEntry OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpMgcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    INDEX       { gcpMgId }
+    ::= { gcpMgTable 1 }
+
+GcpMgEntry ::= SEQUENCE {
+    gcpMgId                 Unsigned32,
+    gcpMgAddressType        TransportAddressType,
+    gcpMgServerAddress      TransportAddress,
+    gcpMgClientAddress      TransportAddress,
+    gcpMgAdminState         AdministrativeState,
+    gcpMgOperState          OperationalState,
+    gcpMgUsageState         UsageState,
+    gcpMgAvailStatus        AvailabilityStatus,
+    gcpMgProcStatus         ProceduralStatus,
+    gcpMgPg                 Unsigned32,
+    gcpMgStandbyStatus      StandbyStatus,
+    gcpMgRowStatus          RowStatus
+}
+
+gcpMgId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides a non-zero ordinal index into the gcpMgTable."
+    ::= { gcpMgEntry 1 }
+
+gcpMgAddressType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of transport addresses that are specified in 
+         the gcpMgServerAddress and gcpMgClientAddress in the same 
+         conceptual row as this object.  This follows the 
+         TransportAddressType textual convention of the 
+         TRANSPORT-ADDRESS-MIB.  For IPv4 this is udpIpv4(1), tcpIpv4(3) 
+         or sctpIpv4(5)."
+    ::= { gcpMgEntry 2 }
+
+gcpMgServerAddress OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the transport address for the server (Media Gateway).  
+         Note that, at an MGC, an IPv4 address can be specified as 
+         0.0.0.0 to represent that the Media Gateway is permitted to 
+         communicate with the MGC from any IP address.  The port number 
+         can also be specified as zero (0) to represent that the MG is 
+         permitted to communicate with the MGC from any port."
+    ::= { gcpMgEntry 3 }
+
+gcpMgClientAddress OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the transport address for the client (Media Gateway 
+         Controller).  Note that, at an MG, an IPv4 address can be  "
+    ::= { gcpMgEntry 3 }
+
+gcpMgAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This attribute represents the administrative capability of the 
+         Media Gateway to perform its function.  The following 
+         administrative states are defined:
+         
+         - locked(0), use of the Media Gateway has been prohibited by 
+           a management station; setting the value to locked(0) results 
+           in the immediate and disruptive withdrawal from service of 
+           the Media Gateway.
+           
+         - unlocked(1), use of the Media Gateway has been permitted by 
+           a management station;
+           
+         - shuttingDown(2), use of the Media Gateway is administratively 
+           permitted to existing instances of use only.  While the 
+           system remains in the shutting down state, the management 
+           station may at any time cause the Media Gateway to revert to 
+           the unlocked(1) state; setting the Media Gateway to 
+           shuttingDown(2) results in the graceful withdrawal from 
+           service of the Media Gateway; once all users of the Media 
+           Gateway have withdrawn, the state will change autonomously to 
+           locked(0).
+           
+         Whenever the administrative state of a Media Gateway is 
+         changed, a state change notification is generated."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               administrativeState attribute."
+    ::= { gcpMgEntry 4 }
+
+gcpMgOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the operational state of the Media Gateway in 
+         accordance with the OperationalState textual convention and 
+         ITU-T Rec.  X.721 | ISO/IEC 10165-2.  The defined states are:
+         
+         - enabled(0), the Media Gateway is operational and ready for 
+           use;
+           
+         - disable(1), the Media Gateway is not available for use.
+           
+         A change in operational state shall generate a state change 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState attribute."
+    ::= { gcpMgEntry 5 }
+
+gcpMgUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the usage state of the Media Gateway in accordance 
+         with the UsageState textual convention and ITU-T Rec. X.721 
+         | ISO/IEC 10165-2.  This object is single-valued and read only.  
+         It can have one of the following values:
+         
+         - idle(0), the Media Gateway is not currently in use;
+         
+         - active(1), the Media Gateway is in use, and has sufficient 
+           spare operating capacity to provide for additional users 
+           simultaneously;
+           
+         - busy(2), the Media Gateway is in use, but it has no spare 
+           operating capacity to provide for additional users at this 
+           instant.
+           "
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.UsageState.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.1.2."
+    ::= { gcpMgEntry 6 }
+
+
+gcpMgAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This is the availability status of the Media Gateway in 
+         accordance with the AvailabiltiyStatus textual convention and 
+         ITU-T Rec. X.721 | ISO/IEC 10165-2.  This object is set-valued 
+         and read-only and can have zero or more of the values that 
+         follow.  When the value of this attribute is empty, this 
+         implies that none of the status conditions described below are 
+         present.
+         
+         - inTest(0), the Media Gateway is undergoing a test procedure.  
+           If the administrative state is locked or shutting down, then 
+           normal users are precluded from using the resource and the 
+           control status attribute has the value reserved for test.  
+           Tests that do not exclude additional users can be present in 
+           any operational or administrative state but the reserved for 
+           test condition should not be present.
+           
+         - failed(1), the Media Gateway has an internal fault that 
+           prevents it from operating.  The operational state is 
+           disabled.
+           
+         - powerOff(2), the Media Gateway requires power to be applied 
+           and is not powered on.  For example, a fuse or other 
+           protection device is known to have removed power or a low 
+           voltage condition has been detected.  The operational state 
+           is disabled.
+           
+         - offLine(3), the Media Gateway requires a routing operation to 
+           be performed to place it online and make it available for 
+           use.  The operation may be manual or automatic or both.  The 
+           operational state is disabled.
+           
+         - offDuty(4), the Media Gateway has been made inactive by an 
+           internal control process in accordance with a predetermined 
+           time schedule.  Under normal conditions the control process 
+           can be expected to reactivate the Media Gateway at some 
+           scheduled time, and it is therefore considered to be 
+           optional.  The operational state is either enabled or 
+           disabled.
+           
+         - dependency(5), the Media Gateway cannot operate because some 
+           other resource on which it depends is (i.e, a resource not 
+           represented by the same managed object) unavailable.  For 
+           example, a device is not accessible because its controller is 
+           powered off.  The operational state is disabled.
+           
+         - degraded(6), the service available from the Media Gateway is 
+           degraded in some respect, such as in speed or operating 
+           capacity.  Failure of a test or an unacceptable performance 
+           measurement has established that some or all services are not 
+           functions or are degraded due to presence of a defect.  
+           However, the Media Gateway remains available for service, 
+           either because some services are satisfactory or because 
+           degraded service is preferable to no service at all.  The 
+           operational state is enabled.
+           
+         - notInstalled(7), the managed object representing the Media 
+           Gateway is not present, or is incomplete.  For example, 
+           a plug-in module is missing, a cable is disconnected or 
+           a software module is not loaded.  The operational state is 
+           disabled.
+           
+         - logFull(8), this indicates a log full condition, the 
+           semantics of which are defined in ITU-T Rec. X.735.
+           
+        "
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.AvailabilityStatus
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.3."
+    ::= { gcpMgEntry 7 }
+
+gcpMgProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the procedural status of the Media Gateway in 
+         accordance with the ProceduralStatus textual convention of the 
+         OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  The 
+         procedural status can have zero or more of the following 
+         conditions:
+         
+         - initializationRequired(0),
+         - notInitialized(1),
+         - initializing(2),
+         - reporting(3),
+         - terminating(4),"
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.ProceduralStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.2."
+    ::= { gcpMgEntry 8 }
+
+gcpMgPg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the protection group corresponding to this Media 
+         Gateway as an index into the protectionGroupTable of the 
+         protection group that is protecting this Media Gateway.  The 
+         value is the value of the protectionGroupId that indexes 
+         a specific protection group within the protectionGroupTable.  
+         When there is no protection group associated with the Media 
+         Gateway, this value is zero (0)."
+    REFERENCE
+        "ITU-T Rec. M.3100 (2005) : protectionGroupR2 MOC
+         ITU-T Rec. G.744.3 : protectionGroupR1 MOC" 
+    ::= { gcpMgEntry 9 }
+
+gcpMgStandbyStatus OBJECT-TYPE
+    SYNTAX      StandbyStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides the standby status of the Media Gateway.  This entry 
+         is used to indicate MG mirroring arrangements such as IP 
+         takeover.  The type is single-valued and read-only and can 
+         assume the following values:
+         
+         - hotStandby(0), the Media Gateway is not providing service but 
+           is operating in synchronism with another MG (on another host) 
+           that is to be backed-up.  A Media Gateway  with a hot standby 
+           status will be immediately able to take over the role of the 
+           MG to be backed up, without the need for initialization 
+           activity, and will contain the same information as the MG 
+           being backed up.  The operational state during this status is 
+           enabled(0) and the administrative state is unlocked(0).  The 
+           availability status is offline();
+         
+         - coldStandby(1), the Media Gateway is to back-up another MG 
+           (perhaps on another host), but is not synchronized with that 
+           resource.  A Media Gateway with a cold standby status will 
+           not immediately be able to take over the role of a resource 
+           to be backed up, and will require some initialization 
+           activity.  The operational state is enabled(0) or 
+           disabled(1); the administrative state is locked(0) or 
+           unlocked(1); procedural status contains not initialized or 
+           initialization required; availability status is offLine(3);
+         
+         - providingService(2), the back-up Media Gateway is providing 
+           service and is backing up another MG (perhaps on a different 
+           host).  The administrative state is unlocked(1); availability 
+           status is online()."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.StandbyStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.5."
+    ::= { gcpMgEntry 10 }
+
+gcpMgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides a mechanism whereby management stations may create or 
+         delete rows in this table."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpMgEntry 11 }
+
+
+gcpMgc OBJECT IDENTIFIER
+    ::= { gcpTables 2 }
+
+gcpMgcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpMgcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table lists all of the Media Gateway Controller devices 
+         known to this managed system.  When the management view is that 
+         of a managed system containing Media Gateways, this table 
+         characterizes all of the MGC with which a Media Gateway in the 
+         managed system might communicate or reference.  When the 
+         management view is that of a managed system containing Media 
+         Gateway Controllers, this table characterizes all of the MGC in 
+         the managed system as well as all of the MGC that might be 
+         backing up an MGC within the managed system, or that an MGC 
+         within the manged system might be backing up."
+    ::= { gcpMgc 1 }
+
+gcpLinkage OBJECT IDENTIFIER
+    ::= { gcpTables 3 }
+
+gcpLinkageTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpLinkageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides a view of the communications association 
+         between MG and MGC entities as viewed by the managed system.  
+         This table provides configuration information for managed 
+         system that have either MGC or MG contained within the managed 
+         system.  For a managed system of media gateways, this provides 
+         the media gateway view of the communications link to each MGC 
+         from each MG within the managed system, or MG that is backing 
+         up or backed up by an MG within the managed system.."
+    ::= { gcpLinkage 1 }
+
+gcplLinkageEntry OBJECT-TYPE
+    SYNTAX      GcpLinkageEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the gcpLinkageTable represents a communications 
+         association between a media gateway and a media gateway 
+         controller.  The managed system will not form an active 
+         communications association between an MG and MGC that is not 
+         listed in this table."
+    INDEX       { gcpMgId, gcpMgcId }
+    ::= { gcpLinkageTable 1 }
+
+GcpLinkageEntry ::= SEQUENCE {
+    gcpLinkageType              TransportAddressType,
+    gcpLinkageMgcAddress        TransportAddress,
+    gcpLinkageMgAddress         TransportAddress,
+    gcpLinkageMgcIdent          MegacoIdentSelection,
+    gcpLinkageMgIdent           MegacoIdentSelection,
+    gcpLinkageProfile           RowPointer,
+    gcpLinkageProtocol          AutonomousType,
+    gcpLinkageEncoding          INTEGER,
+    gcpLinkageAuthAccess        BITS,
+    gcpLinkageAdminState        AdministrativeState,
+    gcpLinkageProcStatus        ProceduralStatus,
+    gcpLinkageOperState         OperationalState,
+    gcpLinkageAvailStatus       AvailabilityStatus,
+    gcpLinkageAuthentication    INTEGER,
+    gcpLinkageRowStatus         RowStatus
+}
+
+gcpLinkageType OBJECT-TYPE
+    SYNTAX      TransportAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the type of transport addresses used in this 
+         communications linkage in accordance with the 
+         TransportAddressType textual convention of the 
+         TRANSPORT-ADDRESS-MIB."
+    ::= { gcpLinkageEntry 1 }
+
+gcpLinkageMgcAddress OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpLinkageEntry 2 }
+
+gcpLinkageMgAddress OBJECT-TYPE
+    SYNTAX      TransportAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpLinkageEntry 3 }
+
+gcpLinkageMgcIdent OBJECT-TYPE
+    SYNTAX      MegacoIdentSelection
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies how a local MGC will identify itself, or how 
+         a remote MGC is expected to identify itself, in H.248 
+         messages.  One of:
+         
+         - ipAddress(1), the MGC will identify itself by its 
+           IPv4 or IPv6 address and transport port;
+           
+         - domainName(2), the MGC will identify itself by its 
+           domain name;
+           
+         - deviceName(3), the MGC will identify itself by its 
+           device path;
+           
+         - mtpAddress(4), the MGC will identify itself by its 
+           M3UA MTP Point Code.
+           
+         The setting of this value has no effect on protocols 
+         other than H.248.  The default value is determined by 
+         the setting of gcpDefaultMgcoIdent."
+    REFERENCE
+        "ITU-T Recommendation H.248.1 (09/2005), Annex A, Mid 
+               CHOICE."
+    ::= { gcpLinkageEntry 3 }
+
+gcpLinkageMgIdent OBJECT-TYPE
+    SYNTAX      MegacoIdentSelection
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpLinkageEntry 3 }
+
+gcpLinkageProfile OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpLinkageEntry 4 }
+
+gcpLinkageProtocol OBJECT-TYPE
+    SYNTAX      AutonomousType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpLinkageEntry 5 }
+
+gcpLinkageEncoding OBJECT-TYPE
+    SYNTAX      INTEGER { unspecified(0), binary(1), text(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the encoding to use.  This object is single-valued 
+         and can assume one of the following values:
+         
+         - unspecified(0), the encoding is not specified by the managed 
+           system and must be determined by means other than 
+           provisioning (e.g. well-known port number or negotiation).
+           
+         - binary(1), the binary encoding, such as that specified by 
+           ITU-T Recommendation H.248.1 (09/2005) Annex A and Annex C is 
+           to be used on the link.
+           
+         - text(2), the text encoding, such as that specified by ITU-T 
+           Recommendation H.248.1 (09/2005) Annex B and Annex C is to be  
+           used on the link.
+           
+         A change in the value of this object while the link is 
+         operational will not be effective until the link is cycled."
+    ::= { gcpLinkageEntry 6 }
+
+gcpLinkageAuthAccess OBJECT-TYPE
+    SYNTAX      BITS { none(0), interim(1), tls(2), ah(3), esp(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the authentication methods that will be accepted from 
+         the remote entity on the linkage.  This object is set-valued 
+         and can contain zero or more of the following:
+         
+         - none(0), association is permitted without authentication.
+           
+         - interm(1), the interim (IPv4) approach of ITU-T 
+           Recommendation H.248.1 (09/2005) Clause 10 is permitted.
+           
+         - tls(2), transport layer security is permitted.
+           
+         - ah(3), IPv6 authentication header is permitted.
+           
+         - esp(4), IPv6 encapsulated security payload is permitted.
+           
+         When a value is included in the set, it specifies that the 
+         corresponding authentication method is permitted."
+    ::= { gcpLinkageEntry 7 }
+
+gcpLinkageAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object represents the administrative capability of the 
+         linkage to support communication.  The following administrative 
+         states are defined:
+         
+         - locked(0), use of the linkage for communications has been 
+           prohibited by a management station; setting the value to 
+           locked(0) results in the immediate and disruptive termination 
+           of the association;
+           
+         - unlocked(1), use of the linkage for communications has been 
+           permitted by a management station;
+           
+         - shuttingDown(2), use of the linkage for communication is 
+           administratively permitted to existing instances of use only.  
+           While the system remains in the shutting down state, the 
+           management station may at any time cause the linkage to 
+           revert to the unlocked(1) state; setting the linkage to 
+           shuttingDown(2) results in the graceful withdrawal from 
+           service of the communications linkage; once all users of the 
+           linkage have withdrawn, the state will change autonomously to 
+           locked(0).
+           
+         Whenever the administrative state of a linkage is changed, 
+         a state change notification is generated."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               administrativeState attribute."
+    ::= { gcpLinkageEntry 8 }
+
+gcpLinkageOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Provides the operational state of the linkage in accordance 
+         with the OperationalState textual convention and ITU-T Rec. 
+         X.721 | ISO/IEC 10165-2.  The defined states are:
+         
+         - enabled(0), the linkage is operational and is ready to 
+           support communication between MG and MGC;
+           
+         - disabled(1), the linkage is not available for use and no 
+           communication can be exchanged between MG and MGC on this 
+           linkage.
+           
+         Note that a change in the operational state shall generate 
+         a state change notification; also, a change to the disabled(1) 
+         state may generate a communications error notification."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState attribute."
+    ::= { gcpLinkageEntry 9 }
+
+gcpLinkageProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides the procedural status of the communications linkage in 
+         accordance with the ProceduralStatus textual convention of the 
+         OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  The 
+         procedural status can contain zero or more of the following 
+         conditions:
+         
+         - initializationRequired(0), the communications linkage 
+           requires initialization to be invoked by the manager before 
+           it can perform its normal functions, and this procedure has 
+           not been initiated.  The management may be able to invoke 
+           such initialization through an action.  The terminating 
+           condition may also be present.  The operational state is 
+           disabled.
+           
+         - notInitialized(1), the communications linkage requires 
+           initialization before it can perform its normal functions, 
+           and this procedure has not been initiated.  The 
+           communications linkage initializes itself autonomously.  The 
+           operational state is disabled.
+           
+         - initializing(2), the communications linkage requires 
+           initialization before it can perform its normal functions, 
+           and this procedure has been initiated, but is not yet 
+           complete.  When this condition is present, the initialization 
+           required condition is absent, since initialization has 
+           already begun.  The operational state is disabled.
+           
+         - reporting(3), the communications linkage has failed and is 
+           reporting failure.
+           
+         - terminating(4), the communications linkage is in 
+           a termination phase.  If the linkage does not reinitialize 
+           itself autonomously, the initialization required condition is 
+           also present and the operational state is disabled; 
+           otherwise, the operational state is disabled.
+           
+         Communications linkages use only the notInitialized(1), 
+         initializing(1) and terminating(4) conditions.  Whenever any 
+         of these three conditions are present, the operational state is 
+         disabled."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.ProceduralStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.2."
+    ::= { gcpLinkageEntry 10 }
+
+gcpLinkageAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the availability status of the communications linkage 
+         in accordance with the AvailabilityStatus textual convention of 
+         the OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  
+         This object is set-valued and can contain zero or more of the 
+         following conditions:
+         
+         - inTest(0), the communications linkage is undergoing a test 
+           procedure.  When the administrative state is locked(0) or 
+           shuttingDown(2), then normal users are precluded from using 
+           the resource and the control status attribute has the value 
+           reserved for test.  Test that do not exclude additional users 
+           can be present in any operational or administrative state but 
+           the reserved for test condition should not be present.
+           
+         - failed(1), the communications linkage has an internal fault 
+           that prevents it from operating.  The operational state is 
+           disabled.
+           
+         - powerOff(2), the communications linkage requires power to be 
+           applied and is not powered on.  The operational state is 
+           disabled.
+           
+         - offLine(3), the communications linkage requires a routing 
+           operation to be performed to place it online and make it 
+           available for use.  The operation may be manual or automatic 
+           or both.  The operational state is disabled.
+           
+         - offDuty(4), the communications linkage has been made inactive 
+           by an internal control process in accordance with 
+           a predetermined time schedule.  Under normal conditions the 
+           control process can be expected to reactivate the linkage at 
+           some scheduled time, and it is therefore considered to be 
+           optional.  The operational state is either enabled or 
+           disabled.
+           
+         - dependency(5), the communications linkage cannot operate 
+           because some other resource on which it depends is 
+           unavailable.  The operational state is disabled.
+           
+         - degraded(6), the communications linkage is degraded in some 
+           respect, such as in speed or operating capacity.  Failure of 
+           a test or an unacceptable performance measurement has 
+           established that some or all services are not functional or 
+           are degraded due to the presence of a defect.  However, the 
+           linkage remains available for service, either because some 
+           services are satisfactory or because degraded service is 
+           preferable to no service at all.  The operational state is 
+           enabled.
+           
+         - notInstalled(7), the communications linkage is not present, 
+           or is incomplete.  The operational state is disabled.
+           
+         - logFull(8), this indicates a log full condition, the 
+           semantics of which are defined in ITU-T Rec. X.735.
+         "
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.AvailabilityStatus
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.3."
+    ::= { gcpLinkageEntry 11 }
+
+gcpLinkageAuthentication OBJECT-TYPE
+    SYNTAX      INTEGER { none(0), interim(1), tls(2), ah(3), esp(4) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates the authentication methods that is currently in 
+         effect on an operational association.  This object is 
+         single-values and can assume one of the following values:
+         
+         - none(0), no authentication is in effect.
+           
+         - interm(1), the interim (IPv4) approach of ITU-T 
+           Recommendation H.248.1 (09/2005) Clause 10 is in effect.
+           
+         - tls(2), transport layer security is in effect.
+           
+         - ah(3), IPv6 authentication header is in effect.
+           
+         - esp(4), IPv6 encapsulated security payload is in effect.
+           
+         When the association is not operational, this value will always 
+         read the value of the lass successful association, or none(0) 
+         when not association was every formed."
+    ::= { gcpLinkageEntry 12 }
+
+gcpLinkageRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides a mechanism whereby management stations may create and 
+         destroy row in this table.  Note that the linkage must be 
+         non-operational for a change in some values to take effect 
+         (such as a transport address address)."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpLinkageEntry 13 }
+
+gcpUdpProfile OBJECT IDENTIFIER
+    ::= { gcpTables 4 }
+
+gcpUdpProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpUdpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides a table of UDP transport protocol profiles (settings 
+         of communications parameters) for reference by entries in the 
+         gcpLinkageTable."
+    ::= { gcpUdpProfile 1 }
+
+gcpUdpProfileEntry OBJECT-TYPE
+    SYNTAX      GcpUdpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the gcpUdpProfileTable provides one set of UDP 
+         communications parameters that are to be used on 
+         a communications linkage that references the profile.  The 
+         following rules must be observed:
+         
+         1. Entries in this table cannot be deleted while they are 
+            referenced by an entry in column gcpLinkageProfile of table 
+            gcpLinkageTable that references the entry.
+            
+         2. Changes to the values for a given profile entry are 
+            effective immediately for operational communications 
+            linkages that refer to this profile; non-operational 
+            linkages will adopt the new values on the next cycle.
+        "
+    INDEX       { gcpUdpProfileId }
+    ::= { gcpUdpProfileTable 1 }
+
+GcpUdpProfileEntry ::= SEQUENCE {
+    gcpUdpProfileId     SimpleNameType,
+    gcpUdpChecksum      TruthValue,
+    gcpUdpRowStatus     RowStatus
+}
+
+gcpUdpProfileId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpUdpProfileEntry 1 }
+
+gcpUdpChecksum OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpUdpProfileEntry 2 }
+
+gcpUdpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpUdpProfileEntry 3 }
+
+
+gcpTcpProfile OBJECT IDENTIFIER
+    ::= { gcpTables 5 }
+
+gcpTcpProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpTcpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides a table of TCP transport protocol profiles (settings 
+         of communications parameters) for reference by entries in the 
+         gcpLinkageTable."
+    ::= { gcpTcpProfile 1 }
+
+gcpTcpProfileEntry OBJECT-TYPE
+    SYNTAX      GcpTcpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the gcpTcpProfileTable provides one set of TCP 
+         communications parameters that are to be used on 
+         a communications linkage that references the profile.  The 
+         following rules must be observed:
+         
+         1. Entries in this table cannot be deleted while they are 
+            referenced by an entry in column gcpLinkageProfile of table 
+            gcpLinkageTable that references the entry.
+            
+         2. Changes to the values for a given profile entry are 
+            effective immediately for operational communications 
+            linkages that refer to this profile; non-operational 
+            linkages will adopt the new values on the next cycle.
+        "
+    INDEX       { gcpTcpProfileId }
+    ::= { gcpTcpProfileTable 1 }
+
+GcpTcpProfileEntry ::= SEQUENCE {
+    gcpTcpProfileId     SimpleNameType,
+    gcpTcpNoDelay       TruthValue,
+    gcpTcpMaxseg        Unsigned32,
+    gcpTcpKeepAlive     TruthValue,
+    gcpTcpKeepIdle      TimeInterval,
+    gcpTcpKeepAliveItvl TimeInterval,
+    gcpTcpKeepCount     Unsigned32,
+    gcpTcpSynRetrans    Unsigned32,
+    gcpTcpWindowClamp   Unsigned32,
+    gcpTcpRowStatus     RowStatus
+}
+
+gcpTcpProfileId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides an index into the gcpTcpProfileTable following the 
+         SimpleNameType textual convention.  This value of this string 
+         can be used to identify an entry in this table."
+    ::= { gcpTcpProfileEntry 1 }
+
+gcpTcpNoDelay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines whether the Nagle algorithm should be 
+         applied to TCP connections formed under this profile.  The 
+         Nagle algorithm increases the size of the packets placed on the 
+         network at the expense of delaying the transmission of some 
+         data during congestion episodes.  When set to true(1), the 
+         Nagle algorithm is suppressed; otherwise, set to false(2), the 
+         Nagle algorithm is in effect.
+         
+         Under most circumstances, TCP sends data as soon as it is 
+         presented.  When outstanding data has not yet been 
+         acknowledged, it gathers small amounts of output to be sent in 
+         a single packet once an acknowledgement is received.  For 
+         a small number of clients, such as a window system (for 
+         example, MIT X Window System) that send a stream of mouse 
+         events which receive no replies, this packetisation may cause 
+         significant delays.  This object is used to defeat this 
+         algorithm.  Valid values are true(1) and false(2).
+         
+         The default value is determined by the setting of 
+         gcpDefaultTcpNoDelay."
+    REFERENCE
+        "RFC 793, RFC 1122, XNS 5.2"
+    ::= { gcpTcpProfileEntry 2 }
+
+gcpTcpMaxseg OBJECT-TYPE
+    SYNTAX      Unsigned32 (536..65536)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the maximum TCP segment size for outgoing 
+         packets.  Values greater than the association MTU are ignored 
+         and have no effect.  The value determines the maximum size (in 
+         octets) above which TCP will fragment larger segments into 
+         smaller ones, and beneath which TCP will combine segments into 
+         a single one.  Normally this value is the MTU value minus the 
+         size of the current IP and TCP headers.  When set to a lower 
+         value, the lower value will be used.
+         
+         This column determines the maximum segment size for outgoing 
+         packets.  Values greater than the association MTU are ignored 
+         and have no effect.  The value determines the maximum size (in 
+         octets) above which TCP will fragment larger data segments into 
+         smaller ones.  Normally this value is the connection MTU value 
+         minus the size of the current IP and TCP headers.  When set to 
+         a lower value, the lower value will be used; however, the value 
+         cannot be set to less than 536 minus the current IP and TCP 
+         headers, also, the value cannot be set larger than the 
+         connection MTU minus the size of the current IP and TCP 
+         headers.
+         
+         The default value is determined by the setting of 
+         gcpDefaultTcpMaxseg."
+    REFERENCE
+        "RFC 793, RFC 1122, XNS 5.2"
+    ::= { gcpTcpProfileEntry 3 }
+
+gcpTcpKeepAlive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column determines whether keep-alive messages used to 
+         probe the destination transport address will be sent 
+         periodically.  The default default value is the value 
+         recommended by RFC 793, which is false(2).
+         
+         When true(1), a keep-alive timer is activated to monitor idle 
+         connections that might no longer exist.  If a connection has 
+         been idle since the last keep-alive timeout, a keep-alive 
+         packet is sent to check if the connection is still alive or 
+         broken.
+         
+         Keep-alive packets are not an explicit feature of TCP, and this 
+         practise is not universally accepted.  According to RFC 1122 
+         ``a keep-alive mechanism should only be invoked in service 
+         applications that might otherwise hang indefinitely and consume 
+         resources unnecessarily if a client crashes or aborts 
+         a connection during a network failure.''
+         
+         Enabling keep-alive increases the protocol's responsiveness in 
+         detection of failure and redirection of traffic away from 
+         failed paths and interfaces.  However, TCP connections are far 
+         less robust on noisy or congested links with keep-alive 
+         enabled.  This column should normally be left at its default 
+         value.
+         
+         The default value is determined by the setting of 
+         gcpDefaultTcpKeepAlive."
+    REFERENCE
+        "RFC 793, RFC 1122, XNS 5.2"
+    ::= { gcpTcpProfileEntry 4 }
+
+gcpTcpKeepIdle OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the minimum period of time that the connection must 
+         remain idle before a keep-alive check is made.  No minimum is 
+         signified by the value zero (0).  The default default value is 
+         7200 seconds (2 hours).  An idle connection is terminated after 
+         approximately an additional 11 minues (9 probes at an interval 
+         of 75 seconds apart) when keep-alive is enabled.
+         
+         The default value is determined by the setting of 
+         gcpDefaultTcpKeepIdle."
+    ::= { gcpTcpProfileEntry 5 }
+
+gcpTcpKeepAliveItvl OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum interval between keep-alive attempts on 
+         idle connections.
+         
+         When keep-alive is enabled (see gcpTcpKeepAlive), this value 
+         determines the default keep-alive timeout.  The default default 
+         value is the minimum recommended by RFC 1122 of 120 seconds (2 
+         minutes).
+         
+         The default value is determined by the setting of 
+         gcpDefaultTcpKeepAliveItvl."
+    ::= { gcpTcpProfileEntry 6 }
+
+gcpTcpKeepCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "attempts"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum number of keep-alive probes that must 
+         fail before the connection is deemed failed.
+         
+         The default default values is 9 attempts.
+         
+         The default value is determined by the setting of 
+         gcpDefaultTcpKeepCount."
+    ::= { gcpTcpProfileEntry 7 }
+
+gcpTcpSynRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum number of times that a SYN will be 
+         retransmitted when attempting to establish a connection.  Valid 
+         values are zero or greater.  The default default value is 5, 
+         which corresponds to 180 seconds.  Valid values are zero to 
+         255.
+         
+         The default value is determined by the setting of 
+         gcpDefaultTcpSynRetrans."
+    ::= { gcpTcpProfileEntry 8 }
+
+gcpTcpWindowClamp OBJECT-TYPE
+    SYNTAX      Unsigned32 (536..65536)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the maximum receive window that will be advertised.
+         
+         The default value is determined by the setting of 
+         gcpDefaultTcpWindowClamp."
+    ::= { gcpTcpProfileEntry 9 }
+
+gcpTcpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides a mechanism whereby management stations, following the 
+         RowStatus textual convention from the SNMPv2-TC module, may 
+         create or destroy conceptual rows in this table.
+         
+         Note that profiles in this table cannot be deleted while they 
+         are referenced from an entry in the gcpLinkageTable.  Changes 
+         made to values in a profile will be effective immediately on 
+         operational communication linkages that reference the profile 
+         from the gcpLinkageTable."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpTcpProfileEntry 10 }
+
+
+
+gcpSctpProfile OBJECT IDENTIFIER
+    ::= { gcpTables 6 }
+
+gcpSctpProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpSctpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides a table of SCTP transport protocol profiles (settings 
+         of communications parameters) for reference by entries in the 
+         gcpLinkageTable."
+    ::= { gcpSctpProfile 1 }
+
+gcpSctpProfileEntry OBJECT-TYPE
+    SYNTAX      GcpSctpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry in the gcpSctpProfileTable provides one set of SCTP 
+         communications parameters that are to be used on 
+         a communications linkage that references the profile.  The 
+         following rules must be observed:
+         
+         1. Entries in this table cannot be deleted while they are 
+            referenced by an entry in column gcpLinkageProfile of table 
+            gcpLinkageTable that references the entry.
+            
+         2. Changes to the values for a given profile entry are 
+            effective immediately for operational communications 
+            linkages that refer to this profile; non-operational 
+            linkages will adopt the new values on the next cycle.
+        "
+    INDEX       { gcpSctpProfileId }
+    ::= { gcpSctpProfileTable 1 }
+
+GcpSctpProfileEntry ::= SEQUENCE {
+    gcpSctpProfileId        SimpleNameType,
+    gcpSctpNoDelay          TruthValue,
+    gcpSctpMaxseg           Unsigned32,
+    gcpSctpHeartbeatItvl    TimeInterval,
+    gcpSctpHearbeat         TruthValue,
+    gcpSctpRtoInitial       TimeInterval,
+    gcpSctpRtoMin           TimeInterval,
+    gcpSctpRtoMax           TimeInterval,
+    gcpSctpPathMaxRetrans   Unsigned32,
+    gcpSctpCookieLife       TimeInterval,
+    gcpSctpCookieInc        TimeInterval,
+    gcpSctpMaxInitRetries   Unsigned32,
+    gcpSctpMaxBurst         Unsigned32,
+    gcpSctpAssocMaxRetrans  Unsigned32,
+    gcpSctpSackDelay        TimeInterval,
+    gcpSctpLifetime         TimeInterval,
+    gcpSctpRowStatus        RowStatus
+}
+
+gcpSctpProfileId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Identifies a gcpSctpProfileEntry instance within the managed 
+         switching element; this is an attribute type whose 
+         distinguished value can be used as an RDN when naming an 
+         instance of the gcpSctpProfileEntry."
+    ::= { gcpSctpProfileEntry 1 }
+
+gcpSctpNoDelay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines whether the Nagle algorithm should be 
+         applied to SCTP associations formed under this profile.  The 
+         Nagle algorithm increases the size of the packets placed on the 
+         network at the expense of delaying the transmission of some 
+         data during congestion episodes.  When set to true(1), the 
+         Nagle algorithm is suppressed; otherwise, set to false(2), the 
+         Nagle algorithm is in effect.
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpNoDelay."
+    REFERENCE
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 2 }
+
+gcpSctpMaxseg OBJECT-TYPE
+    SYNTAX      Unsigned32 (536..65536)
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the maximum SCTP payload size for outgoing 
+         packets.  Values greater than the association MTU are ignored 
+         and have no effect.  The value determines the maximum size (in 
+         octets) above which SCCP will fragment larger DATA chunks into 
+         smaller DATA chunks, and beneath which SCTP will bundle DATA 
+         chunks into a single packet or combine smaller DATA chunks into 
+         larger DATA chunks.  Normally this value is the association MTU 
+         value must the size of the current IP and SCTP headers, minus 
+         the size of one DATA chunk header.  When set to a lower value, 
+         the lower value will be used.
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpMaxseg."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 3 }
+
+gcpSctpHeartbeatItvl OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the time interval (in milliseconds) between 
+         successive HEARTBEAT messages used to probe destination 
+         transport addresses for RTT calculation and activity.  Valid 
+         values are zero (0) - do not heartbeat, or a value of 
+         1 millisecond or greater.
+         
+         The default value is determined by the setting of 
+         gcpDefaultHeartbeatItvl."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 4 }
+
+gcpSctpHearbeat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column determines whether HEARTBEAT messages used to probe 
+         destination transport addresses for RTT calculation and 
+         activity will be sent periodically.  The default default value 
+         is the value recommended from RFC 4960 is true(1).
+         
+         Disabling heartbeats reduces the protocol's responsiveness in 
+         detection of failures and redirection of traffic away from 
+         failed paths and interfaces.  This column should normally be 
+         left at its default value.
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpHeartbeat."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 5 }
+
+gcpSctpRtoInitial OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the initial time interval (in milliseconds) 
+         that will be used as an initial RTO (retransmission timeout) 
+         value when sending packets to a destination for the first time.  
+         Valid values are zero or greater but must be within the range 
+         gcpSctpRtoMin to gcpSctpRtoMax.  The default default value is 
+         the value recommended by RFC 2960 and RFC 4960 (1000 
+         milliseconds, or 1 second).
+         
+         Note that, in general, the RTO initial should not be less than 
+         the peer's maximum SACK delay, otherwise, excessive 
+         retransmission might occur while the peer is delaying 
+         acknowledgements.
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpRtoInitial."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 6 }
+
+gcpSctpRtoMin OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the minimum timer interval (in 
+         milliseconds) that will be used as an RTO (retransmission 
+         timeout) value when sending packets to a destination transport 
+         address and expecting acknowledgements.  Valid values are zero 
+         or greater and must be less than or equal to gcpSctpRtoInitial 
+         and strictly less than and gcpSctpRtoMax.  The default default 
+         value is the value recommended by RFC 2960 and RFC 4960 (1000 
+         milliseconds, or 1 second).
+         
+         Note that, in general, the RTO minimum should not be less than 
+         the peer's maximum SACK delay, otherwise, excessive 
+         retransmission might occur while the peer is delaying 
+         acknowledgements.
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpRtoMin."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 7 }
+
+gcpSctpRtoMax OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the maximum time interval (in milliseconds) 
+         that will be used as an RTO (retransmission timeout) value when 
+         sending packets t a destination transport address and expecting 
+         acknowledgements.  Valid values are zero or greater but must be 
+         greater than or equal to gcpSctpRtoInitial and strictly 
+         greater than gcpSctpRtoMin.  The default default value is the 
+         value recommended by RFC 2960 and RFC 4960 (60000 milliseconds, 
+         or 60 seconds).
+         
+         Note that, in general, the RTO maximum should not be less than 
+         the peer's maximum SACK delay, otherwise, excessive 
+         retransmission might occur while the peer is delaying 
+         acknowledgements.
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpRtoMax."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 8 }
+
+gcpSctpPathMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the number of times that SCTP will attempt 
+         retransmitting a packet to a given destination transport 
+         address before it considers that destination transport address 
+         inactive.  Valid values are zero or greater.  The default 
+         default value is the value recommended in RFC 4960 (5 
+         retransmissions).
+         
+         Adjusting this value has an effect on the period of time taken 
+         to fail-over between destinations for multi-homed connections.  
+         Lower values (including zero) will yield faster fail-over 
+         response times.  Lower values, however, may cause thrashing 
+         between destinations contributing to congestion in the network.  
+         Default values are applicable to Internet applications.
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpPathMaxRetrans."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 9 }
+
+gcpSctpCookieLife OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the time interval (in milliseconds) in 
+         conjunction with gcpSctpCookieInc beyond which a COOKIE-ECHO 
+         received with a cookie sent in an INIT-ACK will no longer be 
+         accepted.  For SCTP, this also limits the maximum time interval 
+         for which the HMAC secret key for the cookie will be valid.  
+         Valid values are zero or greater.  Values of zero will  be 
+         converted to a system clock tick.  The default default value is 
+         the value recommended by RFC 4960 (60,000 milliseconds, or 60 
+         seconds).
+         
+         Reducing this value will increase the probability that passive 
+         connection attempts will fail due to expired cookies.  
+         Increasing the value will reduce the overall security of the 
+         system by permitting attackers an increased interval within 
+         which to crack HMACs and guess verification tags.  This value 
+         may be adjusted in conjunction with gcpSctpCookieInc to meet 
+         most objectives for successful passive connection attempts with 
+         the best security afforded by smaller values of 
+         gcpSctpCookieLife.
+         
+         Unfortunately, the gcpSctpCookieLife and 
+         gcpSctpCookieInc must be adjusted to accommodate the slowest 
+         peer on the slowest connection.  The default setting is 
+         adequate for Internet applications.
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpCookieLife."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 10 }
+
+gcpSctpCookieInc OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the time increment (in milliseconds) that 
+         will be added to the lifespan of the cookie in an INIT-ACK if 
+         the received INIT requests cookie preservative to lengthen the 
+         lifespan of the cookie.  Valid values are zero or greater.  The 
+         default default value is the value recommended in RFC 4960 
+         5.2.6 (1000 milliseconds, or 1 second).
+         
+         This value can be adjusted in conjunction with 
+         gcpSctpCookieLife to meet objectives of successful passive 
+         connection attempts and security.  The default setting is 
+         adequate for Internet applications.
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpCookieInc."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 11 }
+
+gcpSctpMaxInitRetries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "retries"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the number of times that an INIT or 
+         COOKIE-ECHO will be resent to a given destination before 
+         abandoning an active open attempt.  Valid values are zero or 
+         greater.  The default default value is the value recommended by 
+         RFC 4960 (8 retries).
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpMaxInitRetries."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 12 }
+
+gcpSctpMaxBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "MTUs"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the maximum number of MTUs of new data 
+         chunks that will be sent in a burst in accordance with SCTP 
+         Specification Errata and Issues, RFC 4460 and RFC 4960.  The 
+         default default value is the value recommended in RFC 4960 (4 
+         MTUs).
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpMaxBurst."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 13 }
+
+gcpSctpAssocMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "retransmissions"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the number of times that the sending 
+         endpoint will attempt retransmitting a packet on any active 
+         destination transport address before it aborts the association.  
+         Value values are zero or greater.  The default default value is 
+         the value recommended in RFC 4960 (10 retransmissions).
+         
+         This value should be larger  than sum of the path maximum 
+         number of retransmission values of each of the destinations.
+         
+         Setting this value to less than the sum of the path maximum 
+         retransmission values for all of the destinations has the 
+         interesting effect of permitting a connection to persist even 
+         when all destinations have been deemed inactive.
+         
+         The default value is determined by the setting of 
+         gcpDefaultAssocMaxRetrans."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 14 }
+
+gcpSctpSackDelay OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This column defines the interval of time (in milliseconds) that 
+         will be used as an RTO (retransmission timeout) value when 
+         sending packets to a destination transport address.  Valid 
+         values are zero or to 500 milliseconds (RFC 4960 forbids 
+         setting this value larger than 500 milliseconds).  The default 
+         default value is the value recommended in RFC 4960 (200 
+         milliseconds).
+         
+         The default value is determined by the setting of 
+         gcpDefaultSctpSackDelay."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 15 }
+
+gcpSctpLifetime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The default value is determined by the setting of 
+         gcpDefaultSctpLifetime."
+    REFERENCE   
+        "RFC 4960"
+    ::= { gcpSctpProfileEntry 16 }
+
+gcpSctpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Provides a mechanism whereby management stations, following the 
+         RowStatus textual convention from the SNMPv2-TC module, may 
+         create or destroy conceptual rows in this table.
+         
+         Note that profiles in this table cannot be deleted while they 
+         are referenced from an entry in the gcpLinkageTable.  Changes 
+         made to values in a profile will be effected immediately on 
+         operational communication linkages that reference the profile 
+         in the gcpLinkageTable."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpSctpProfileEntry 17 }
+
+
+gcpOids OBJECT IDENTIFIER
+    ::= { gcpMIB 4 }
+
+gcpGroups OBJECT IDENTIFIER
+    ::= { gcpMIB 5 }
+
+gcpObjectGroup OBJECT-GROUP
+    OBJECTS     { gcpDefaultSctpNoDelay }
+    STATUS      current
+        "A collection of all of the accessible objects in this 
+         module."
+    ::= { gcpGroups 1 }
+
+gcpSctpObjectGroup OBJECT-GROUP
+    OBJECTS     { gcpDefaultSctpNoDelay, gcpDefaultSctpMaxseg, 
+                  gcpDefaultSctpHeartbeatItvl, 
+                  gcpDefaultSctpHearbeat, 
+                  gcpDefaultSctpRtoInitial, 
+                  gcpDefaultSctpRtoMin, gcpDefaultSctpRtoMax, 
+                  gcpDefaultSctpPathMaxRetrans, 
+                  gcpDefaultSctpCookieLife, 
+                  gcpDefaultSctpCookieInc, 
+                  gcpDefaultSctpMaxInitRetries, 
+                  gcpDefaultSctpMaxBurst, 
+                  gcpDefaultSctpAssocMaxRetrans, 
+                  gcpDefaultSctpSackDelay, 
+                  gcpDefaultSctpLifetime, gcpSctpNoDelay, 
+                  gcpSctpMaxseg, gcpSctpHeartbeatItvl, 
+                  gcpSctpHearbeat, gcpSctpRtoInitial, 
+                  gcpSctpRtoMin, gcpSctpRtoMax, 
+                  gcpSctpPathMaxRetrans, gcpSctpCookieLife, 
+                  gcpSctpCookieInc, gcpSctpMaxInitRetries, 
+                  gcpSctpMaxBurst, gcpSctpAssocMaxRetrans, 
+                  gcpSctpSackDelay, gcpSctpLifetime, 
+                  gcpSctpRowStatus }
+    STATUS      current
+        "A collection of all of the accessible objects necessary to 
+         support SCTP as a transport for GCP."
+    ::= { gcpGroups 2 }
+
+gcpCompliance OBJECT IDENTIFIER
+    ::= { gcpMIB 6 }
+
+gcpMgcCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Provides a compliance profile that provides mandatory and 
+         optional compliance items for a Media Gateway Controller."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { gcpMgcMandatoryGroup }
+
+        GROUP   gcpMgcOptionalGroup
+        DESCRIPTION
+            "Groups that provide optional capabilities."
+
+    ::= { gcpCompliances 1 }
+
+gcpMgCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Provides a complicance profile that provides mandatory and 
+         optional compliance items for a Media Gateway."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { gcpMgMandatoryGroup }
+
+        GROUP   gcpMgOptionalGroup
+        DESCRIPTION
+            "Groups that provide optional capabilities."
+
+    ::= { gcpCompliances 2 }
+
+gcpFullCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Provides a compliance profile that provides full compliance to 
+         this mib."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { gcpMandatoryGroup }
+
+        GROUP   gcpOptionalGroup
+        DESCRIPTION
+            "Groups that provide optional capabilities."
+
+    ::= { gcpCompliacnes 3 }
+
+END -- end of module OPENSS7-GCP-MIB
