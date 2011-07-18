@@ -1,3 +1,98 @@
+2011-07-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/papers/Makefile.am: added xcode documentation
+	* doc/papers/xcode/Makefile.am: added xcode documentation
+	* doc/papers/xcode/Makefile.in: added xcode documentation
+	* doc/papers/xcode/org.css: added xcode documentation
+	* doc/papers/xcode/xc01.fig: added xcode documentation
+	* doc/papers/xcode/xc02.fig: added xcode documentation
+	* doc/papers/xcode/xc03.fig: added xcode documentation
+	* doc/papers/xcode/xc04.fig: added xcode documentation
+	* doc/papers/xcode/xc05.fig: added xcode documentation
+	* doc/papers/xcode/xc06.fig: added xcode documentation
+	* doc/papers/xcode/xc07.fig: added xcode documentation
+	* doc/papers/xcode/xc08.fig: added xcode documentation
+	* doc/papers/xcode/xc08.txt: added xcode documentation
+	* doc/papers/xcode/xc09.fig: added xcode documentation
+	* doc/papers/xcode/xc10.fig: added xcode documentation
+	* doc/papers/xcode/xcode.bib: added xcode documentation
+	* doc/papers/xcode/xcode.tex: added xcode documentation
+	* doc/specs/Makefile.am: added xgcp documentation
+	* doc/specs/xgcp/Makefile.am: added xgcp documentation
+	* doc/specs/xgcp/Makefile.in: added xgcp documentation
+	* doc/specs/xgcp/xgcp.texi: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab001.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab002.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab003.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab004.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab005.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab006.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab007.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab008.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab009.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab010.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab011.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab012.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab013.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab014.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab015.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab016.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab020.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab021.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab022.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab023.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab024.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab025.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab026.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab027.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab028.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab029.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab030.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab031.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab032.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab033.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab034.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab035.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab036.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab037.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab038.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab039.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab040.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab041.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab042.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab043.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab051.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab052.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab053.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab054.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab055.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab056.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab057.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab058.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab059.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab060.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab061.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab062.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab063.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab064.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab065.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab066.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab067.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab068.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab069.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab070.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab071.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab072.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab073.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tabxxx.tbl: added xgcp documentation
+	* doc/specs/xmap/xmap.texi: updated xmap documentation
+	* doc/suites/MG.texi: added figures to MG suite
+	* doc/suites/Makefile.am: added figures to MG suite
+	* doc/suites/mg04.fig: added figures to MG suite
+	* doc/suites/mg05.fig: added figures to MG suite
+	* doc/suites/mg06.fig: added figures to MG suite
+	* doc/suites/mg07.fig: added figures to MG suite
+
 2011-06-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* mageia-1-x86_64-config.cache: new build caches

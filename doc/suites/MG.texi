@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: MG.texi,v 1.1.2.3 2011-02-07 02:21:49 brian Exp $
+% @(#) $Id: MG.texi,v 1.1.2.4 2011-07-18 19:42:15 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2011-02-07 02:21:49 $ by $Author: brian $
+% Last Modified $Date: 2011-07-18 19:42:15 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -386,6 +386,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: MG.texi,v $
+Revision 1.1.2.4  2011-07-18 19:42:15  brian
+- added documentation
+
 Revision 1.1.2.3  2011-02-07 02:21:49  brian
 - updated manuals
 
