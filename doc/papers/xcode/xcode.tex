@@ -1011,6 +1011,335 @@ transmitted between SIP implementations.  The SIP implementation used,
 illustrated in red in {\sl Figure \ref{figure:xc09}}, is the {\sl sofia} SIP
 stack.  This is a user-space SIP implementation.
 
+\subsubsection{Redundancy Architecture}
+
+{\sl Figure \ref{figure:xc10}} illustrates the basic redundancy architecture.
+
+\begin{figure}[htp]
+\center\includegraphics[width=3.2in]{xc10}
+\caption{Redundancy Architecture}
+\label{figure:xc10}
+\end{figure}
+
+\paragraph{MG Features.}
+
+The redundancy architecture has the following MG features:
+
+Virtual MGs (VMG) have a working copy on one physical MG, and a redundant copy
+on zero or more other physical MGs.
+A Proxy MGC/MG (MG Cluster Controller, or MGCC) is used either collocated with
+a physical MG or physical MGC.  The MGCC is responsible for acting like a
+single, reliable, MG toward an MGC, and replicating state across the redundant
+copies.
+Virtual MG (VMG) copies normally communicate through the MGCC on the primary
+(working) physical MG, for that VMG.
+
+MGCs have a working copy on one physical MGC, and a redundant copy on zero or
+more other physical MGCs.  This need not be a full virtual MGC, but can be a
+partition within the working MGC for the physical MGC.
+When a physical MG fails, its redundant copy on another physical MG will
+eventually detect the loss of communications with the working physical MG.
+Because it loses communication, it attempts to first contact the MGCC at the
+working MGC.  When the communications attempt is successful, the working MGC
+MGCC will have more information concerning the health of the working physical
+MG because it either communicates with it or not.
+When a protect VMG looses communication with the working VMG's MGCC and cannot
+communicate with the working MGC, it fails over to attempting communications
+with the protect MGC.  Again, the protect MGC will have more information
+concerning th health of the physical MG containing the working VMG because it
+either communicates with it or not.
+
+\paragraph{MGC Features.}
+
+The redundancy architecture has the following MGC features:
+
+Each MGC cluster has a working copy on one physical MGC, and a redundant copy
+on zero or more other physical MGC.  This need not be a full virtual MGC, but
+can be a partition within the working MGC for the physical MGC.
+Working and Protect MGC partitions do not necessarily communicate direct with
+each other.  Some mechanism (such a HACMP IP takeover) is used for switchover
+of call control sessions (e.g. SIP messaging); however, MEGACO/H.248 service
+ports are different.
+
+Communications linkages between MGC and MG use SCTP (Stream Control
+Transmission Protocol) for best link failure detection, multi-homing, flow
+control, and CMT.  Communications linkages between all necessary entities are
+maintained at all times.  This provides an indication of the health of
+physical MGC/MG entities at the other end of the SCTP association, and some
+indication of the health of other entities.
+
+MGC do not necessarily have to provide any means for direct state sharing
+between the on-line (Working) and off-line (Protect) copies of the MGC.
+Because the MGCs cannot function correctly (except to simply release calls)
+without a functional MG anyway, MGC checkpoint state is saved on the VMG
+images using the MGC information package.\cite[]{H24845}.
+      
+Unfortunately, the MGC information package will only store 128 octets per
+termination, meaning that complete session state information (aside from what
+information is already stored on the MG) must be contained within 256 octets.
+Also, 128 octets of information can be saved on the root termination.  This
+information could contain information about the last active VMG.
+
+\subparagraph{MGC Failover.}
+
+When the Working MGC failure is detected by the Protection MGC, the MGC
+perform whatever IP takeover is necessary to acquire all of the SIP
+communications that was destined for the old system.  In addition, the Protect
+MGC begins to initiate actions necessary to assume control of the associated
+VMG.
+
+Because each MGC expects to have SCTP associations formed for communications
+at all times (regardless of the {\tt ServiceChange} state of the MG), the
+Protection MGC can easily determine whether the various VMG images are
+accessible.  Further, when a VMG registers with the Protection MGC, additional
+information can be determined from the {\tt ServiceChangeMethod}, which is one
+of:
+
+\begin{itemize}
+
+\item{\it Graceful:} indicates that the specified terminations will be taken
+out of service after the specified service change delay; established
+connections are not yet affected, but the MGC should refrain from establishing
+new connections and should attempt to gracefully tear down existing
+connections on the termination(s) affected by the service change command.  The
+MG should set the termination's service state at the expiry of the service
+change delay or the removal of the termination from the active context
+(whichever is first), to ``out of service.''
+
+\item{\it Forced:} indicates that the specified terminations were taken
+abruptly out of service and any established connections associated with them
+may be lost.  For non-Root terminations, the MGC is responsible for cleaning
+up the context (if any) with which the failed termination is associated.  At a
+minimum, the terminations shall be subtracted from the context.  The
+termination's service state should be ``out of service''.  For the root
+termination, the MGC can assume that all connections are lost on the MG and
+thus can consider that all terminations have been subtracted.
+
+\item{\it Restart:} Indicates that service will be restored on the specified
+terminations after expiration of the service change delay.  The service state
+should be set to in-service upon expiry of the service change delay.
+
+\item{\it Disconnected:} always applied with the root termination identifier,
+indicates that the MG lost communication with the MGC, but it was subsequently
+restored to the same MGC (possibly after trying other MGCs on a
+pre-provisioned) list).  Since MG state may have changed, the MGC may wish to
+use the Audit command to resynchronize its state with the MG's.
+
+\item{\it Handoff:} sent from the MGC to the MG, this reason indicates that the
+MGC is going out of service and a new MGC association must be established.
+Sent from the MG to the MGC, this indicates that the MG is attempting to
+establish a new association in accordance with a Handoff received from the MGC
+with which it was previously associated.
+
+\item{\it Failover:} sent from the MG to MGC to indicates the primary MG is
+out of service and  secondary MG is taking over.  This service change method
+is also sent from the MG to the MGC when the MG detects that MGC has failed.
+
+\item{\it (Other mutually understood value):}
+
+\end{itemize}
+
+\paragraph{Change-over of VMG:}
+
+H.248.1\cite[]{H2481} says that an MG will attempt to contact the primary MGC,
+and then the secondary list in turn until it registers with an MGC.  This is
+not a good way to provide carrier grade redundancy.  The VMGs will attempt to
+register with {\b all} MGCs, and will maintain registration with each.  If
+communications should be lost with an MGC, the VMG will attempt to reestablish
+communications until it is successful.  If it should receive a hand-off from
+an MGC, it will still maintain communications with that MGC.  The MG will
+persist in forming SCTP associations with all MGC.  The inability to form an
+SCTP association between an MG and any of the MGCs will be deemed a failure of
+the MGC.
+
+\subparagraph{Cold Start:}
+
+The following steps are taken by an MGC upon registration with an MG:
+
+\begin{enumerate}
+
+\item Each MGC image will alway accept establishment of a control association
+with each of the VMG images.
+
+\item On an intial (cold start) of a VMG, the  VMG will register with service
+change method `{\it Restart}.'  When the MGC is the active MGC image, and there
+is an active VMG image registered, the MGC will begin synchronizing state with
+the cold starting VMG image to bring it from cold-standby to hot-standby.  The
+standby status of the VMG remains cold-standby until this process completes,
+and then it moves to hot-standby.  When the MGC is a protecting image, no
+further action is taken.
+
+\item If a VMG should become disconnected from an MGC, it will reconnect and
+register with service change method `{\it Disconnected}'.  When the MGC is the
+active MGC image, the MGC will begin synchronizing state between the MGC and
+the MG by applying all updates that occurred during the period of loss of
+communication (typically only the release of sessions that could not be
+released during the control association outage).  This is the case regardless
+of whether the VMG image was active or standby.  During the resynchronization
+process, the standby status of a protection VMG is cold-standby.  After
+synchronization the protecting VMG moves to hot-standby status.  If the VMG
+was active and is still the active image, it will be marked with an
+availability status of degraded.  When the MGC is a protecting image, no
+further action is taken.
+
+\end{enumerate}
+
+\subparagraph{Fail Over:}
+
+When the MG detects a failure, the MG can send service changes on the root
+terminations to indicate the failure as follows:
+
+\begin{enumerate}
+
+\item The MG, when it detects the failure of the active MG, will send a
+service change on the root termination with method `{\it Failover}' to the
+active MGC.  The service change address will identify the failed MG.  The MGC
+may have already detected failure of the identified MG through other means
+(e.g. the loss of an SCTP association or control association to the identified
+MG).  If the VMG was in cold-standby (active synchronization), the VMG will
+move on-line with a degraded availability status.
+
+\item The MG, when it detects the failure of the active MGC, will send a
+service change on the root termination with method `{\it Failover}' to the
+standby MGC.  The service change address will identify the failed MGC.  The
+MGC may have already detected failure of the identified MGC through other
+means (e.g. HACMP hearbeat).  The MGC will begin state synchronization with
+the MG to recover MGC state with the VMG.  When the VMG is a standby VMG, the
+MGC will prefer to synchronize with the active VMG image instead of its
+standby images.  The standby status of the MGC will be cold-standby prior to
+this event, and will move to providing-service.
+
+\end{enumerate}
+
+\subparagraph{Switch Over:}
+\label{section:switchover}
+
+Manual or forced switch-over from an active MG to a protecting MG is performed
+for a number of reasons.  The most common reason is for maintenance activity
+on the working MG, such as hardware or software upgrades.  Manual switch-over
+from an active MG is performed local to the element (at the EMS), or from a
+management station (NMS).  The {\sl Optranex10G} supports both.  Switch over
+invoked by NMS is performed using SNMP.
+
+A given physical MG will typically be provisioned with working VMG images as
+well as protection VMG images.  Switch-over is only applicable to the working
+images, whereas, lock-out is applicable to the protection images, (see {\sl
+Section \ref{section:lockout}}).
+
+Although all control associations are established and maintained at all times,
+the MG can send service changes on the root termination to indicate
+switch-over conditions as follows:
+
+\begin{enumerate}
+
+\item When a manual or forced switch-over is invoked on an active VMG, the
+active VMG will send a service change on the root termination with service
+method `{\it Handoff}' and the service change address of the MG to which the
+switchover should occur.  The MGC may accept or refuse the switch-over by its
+response (error or success).  Some reasons for refusing the switch-over are:
+the VMG to which to switch has a cold-standby standby status instead of
+hot-standby (it is in the process of being synchronized); or, the VMG is not
+currently accessible to the MGC.
+
+\end{enumerate}
+
+\subparagraph{Lock Out:}
+\label{section:lockout}
+
+Lock out is a condition that is used instead of switch-over for a protecting
+VMG.  That is, to lock out an off-line, protection VMG image.  The locked out
+condition keep other VMG and MGC from switching to the protection VMG image.
+Again, the most common reason for lock out is for maintenance activity on the
+protection MG, such as hardware or software upgrades.  Lock out of a standby
+MG is performed local to the element (at the EMS), or from a management
+station (NMS).  The {\sl Optranex10G} supports both; however, the local EMS
+uses the same SNMP interface as the management station (NMS).
+
+A given physical MG will typically be provisioned with working VMG images as
+well as protection VMG images.  Lock out is only applicable to the protection
+images, whereas, switch-over is applicable to the working images, (see {\sl
+Section \ref{section:switchover}}).
+
+To indicate that it is requesting lock-out, an MG may send a service change on
+the root termination to the MGC to indicate lock-out conditions as follows:
+
+\begin{enumerate}
+
+\item When a manual or forced lock-out is invoked on an active VMG, the active
+VMG will send a service change on the root termination with service method
+`{\it Handoff}' and the service change address of the active MG (if it is
+known, otherwise no service change address).  The MGC may accept or refuse the
+lock-out by its response (error or success).  Some reasons for refusing the
+switch-over are:  the VMG to be locked out is the only VMG that is
+synchronized with the MGC; or, no other VMG is accessible.
+
+\end{enumerate}
+
+\subparagraph{Shut Down:}
+
+At some times it may be necessary to shut down parts or all of a VMG.  This
+can be invoked at the MG using local EMS or remotely via NMS.  A service
+change command is sent to all MGC to indicate the shut down condition as
+follows:
+
+\begin{enumerate}
+
+\item Shutdown of part of all of a VMG (all images) is performed using the
+administrative state of the terminations invoked.  Shutting down the entire
+VMG (all images) can be graceful or forced.\footnote{Graceful shutdown is
+performed by setting the administrative state to {\it shutting-down}; forced
+shutdown is performed by setting the administrative state to {\it locked}.}
+
+\item For a abortive shutdown of all or part of the VMG (all images), a
+service change on the appropriate terminations with service change method
+`{\it Forced}' is performed.  For a graceful shutdown of all or part of the
+VMG (all images), a service change on the appropriate terminations with
+service change method `{\it Graceful}' is performed.
+
+\end{enumerate}
+
+\paragraph{Change-over of MGC:}
+
+\paragraph{Partitioned systems.}
+
+Difficulties can, of course, occur with a completely partitioned system.  That
+is, if the system in {\sl Figure \ref{figure:xc10}} has its communications
+network severed vertically down the middle.  Therefore, some reliable
+mechanism must be provided to maintain reliable communication across the
+vertical that will indicate the health of each partition to the other.
+
+\subsection{MEGACO/H.248 Considerations}
+
+A MEGAGO/H.248 stack\cite[]{H2481} is implemented in accordance with ITU-T
+Recommendation H.248.1 (09/2005) and a number of packages.  The basic profile
+is the D-SBG profile specified by ETSI\cite[]{BGF} and the MSF:\cite[]{MSF09}
+ETSI ES 283 018 version 2.6.7.
+
+\subsubsection{Ephemeral Termination Points}
+
+The SBG is an IP-IP gateway.  Ephemeral termination points are normally chosen
+by the D-SBG.  The S-SBG only specifies the IP realm or group (e.g.
+`{\tt ip/<group>/\$}'); however, for redundancy purposes, it is necessary for
+the MG cluster controller to be able to synchronize context state in redundant
+Virtual MGs.  Therefore, ephemeral terminations will by given an orderly
+naming that specifies the IP interface, address and port combination.  The SBG
+profile requires that DSB label terminations
+`{\tt ip/<group>/<interface>/<id>}', so for our purposes, termination points
+will be labelled `{\tt ip/<realm>/<interface>/<addrindex>/<port>}'.  This way
+the S-SBG can request `{\tt ip/<realm>/\$}', or simply `{\tt \$}' with a `{\tt
+ipr=<realm>}' in the termination point descriptor.  Once the active D-SBG
+image chooses an IP address and port number, it returns the termination point
+identifier `{\tt ip/<realm>/<interface>/<addrindex>/<port>}' which can be used
+to establish the identical context on the protecting D-SBG images.
+
+\subsection{Invoking Forwarding vs. Transcoding}
+
+As illustrated in {\sl Figure \ref{figure:xc04}} and {\ref{figure:xc07}}, RTP
+forwarding is performed at a different level in the OpenSS7 media stack than
+RTP transcoding.  This is because RTP forward is media-unaware,
+media-transparent and media-neutral; does not require termination of RTP
+media streams, an can most efficiently be handled directly at the UDP driver.
+
 \subsection{Usage Record Collection}
 
 For usage record collection for billing, it likely that the carrier's existing
