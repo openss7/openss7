@@ -68,16 +68,26 @@ IMPORTS
     openss7Modules
         FROM OPENSS7-SMI
     AdministrativeState, AvailabilityStatus, OperationalState, 
-    ProceduralStatus, StandbyStatus, UsageState
+    ProceduralStatus, SimpleNameType, StandbyStatus, UsageState, 
+    attributeValueChangeNotificationPackage, communicationsAlarmPackage, 
+    createDeleteNotificationsPackage, tmnObjectInstance, 
+    tmnPerceivedSeverity, tmnProbableCause
         FROM OPENSS7-SMI-MIB
+    NetworkPointCode
+        FROM OPENSS7-SS7-MIB
+    ActionOrResult, CommonLanguageName
+        FROM OPENSS7-TC
+    ProtectionStatus, ProtectionUnits
+        FROM OPENSS7-TMN-SMI
     SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB
-    MODULE-COMPLIANCE, OBJECT-GROUP
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
-    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, RowPointer, 
-    AutonomousType
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
+    Unsigned32
         FROM SNMPv2-SMI
-    RowStatus, TEXTUAL-CONVENTION, TimeInterval
+    AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
+    TimeInterval, TruthValue
         FROM SNMPv2-TC
     TransportAddress, TransportAddressType
         FROM TRANSPORT-ADDRESS-MIB;
@@ -86,7 +96,7 @@ gcpMIB MODULE-IDENTITY
     LAST-UPDATED "201107130452Z"
     ORGANIZATION 
         "The OpenSS7 Project"
-    CONTACT-INFO
+    CONTACT-INFO 
         "Brian Bidulock
          OpenSS7 Corporation
          1469 Jefferys Crescent
@@ -130,6 +140,7 @@ gcpMIB MODULE-IDENTITY
         "Initial version of this mib."
     ::= { openss7Modules 600 }
 
+
 MegacoIdentSelection ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION 
@@ -151,16 +162,117 @@ MegacoIdentSelection ::= TEXTUAL-CONVENTION
            
          This selection is specific to ITU-T Recommendation 
          H.248.1 (MEGACO) operation only."
-    REFERENCE
+    REFERENCE   
         "ITU-T Recommendation H.248.1 (09/2005), Annex A, Mid 
                CHOICE."
-    SYNTAX      INTEGER { ipAddress(1), domainName(2), deviceName(3), mtpAddress(4) }
+    SYNTAX      INTEGER { ipAddress(1), domainName(2), deviceName(3), 
+                    mtpAddress(4) }
 
 gcpNotifications OBJECT IDENTIFIER
     ::= { gcpMIB 0 }
 
 gcpNotifs OBJECT IDENTIFIER
     ::= { gcpMIB 1 }
+
+gcpOldProtectionStatus OBJECT-TYPE
+    SYNTAX      ProtectionStatus
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the old protection status for 
+         gcpProtectionSwitchReport notifications."
+    ::= { gcpNotifs 1 }
+
+gcpOldRequestSource OBJECT-TYPE
+    SYNTAX      INTEGER { local(0), remote(1) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the request source of the old protection status."
+    ::= { gcpNotifs 2 }
+
+gcpOldSwitchStatus OBJECT-TYPE
+    SYNTAX      INTEGER { pending(0), completed(1), operateFailed(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the switch status of the old protection status."
+    ::= { gcpNotifs 3 }
+
+gcpOldSwitchDirection OBJECT-TYPE
+    SYNTAX      INTEGER { from(1), to(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the switch direction of the old protection status."
+    ::= { gcpNotifs 4 }
+
+gcpOldRelatedUnit OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the related unit of the old protection status."
+    ::= { gcpNotifs 5 }
+
+gcpOldAutoSwitchReason OBJECT-TYPE
+    SYNTAX      INTEGER { waitToRestore(0), signalDegrade(1), 
+                    signalFail(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the auto-switch reason for the old protection status."
+    ::= { gcpNotifs 6 }
+
+gcpNewProtectionStatus OBJECT-TYPE
+    SYNTAX      ProtectionStatus
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the new protection status for 
+         gcpProtectionSwitchReport notifications."
+    ::= { gcpNotifs 7 }
+
+gcpNewRequestSource OBJECT-TYPE
+    SYNTAX      INTEGER { local(0), remote(1) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the request source of the new protection status."
+    ::= { gcpNotifs 8 }
+
+gcpNewSwitchStatus OBJECT-TYPE
+    SYNTAX      INTEGER { pending(0), completed(1), operateFailed(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the switch status of the new protection status."
+    ::= { gcpNotifs 9 }
+
+gcpNewSwitchDirection OBJECT-TYPE
+    SYNTAX      INTEGER { from(1), to(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the switch direction of the new protection status."
+    ::= { gcpNotifs 10 }
+
+gcpNewRelatedUnit OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the related unit of the new protection status."
+    ::= { gcpNotifs 11 }
+
+gcpNewAutoSwitchReason OBJECT-TYPE
+    SYNTAX      INTEGER { waitToRestore(0), signalDegrade(1), 
+                    signalFail(2) }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION 
+        "Provides the auto-switch reason for the new protection status."
+    ::= { gcpNotifs 12 }
 
 gcpScalars OBJECT IDENTIFIER
     ::= { gcpMIB 2 }
@@ -175,7 +287,7 @@ gcpDefaultMgcoIdent OBJECT-TYPE
     SYNTAX      MegacoIdentSelection
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the default default value that will be used in tables 
          where MEGACO identity selection is made.  The options are:
          
@@ -230,7 +342,7 @@ gcpDefaultTcpNoDelay OBJECT-TYPE
          default default value is only applicable when never set by any 
          management station.  When set, the scalar value must persist 
          across system reboots."
-    REFERENCE
+    REFERENCE   
         "RFC 793, RFC 1122, XNS 5.2"
     DEFVAL      { false }
     ::= { gcpTcpDefaults 1 }
@@ -255,7 +367,7 @@ gcpDefaultTcpMaxseg OBJECT-TYPE
          (65536 octets).  The default default value is only applicable 
          when never set by any management station.  When set, the scalar 
          value must persist across system reboots."
-    REFERENCE
+    REFERENCE   
         "RFC 793, RFC 1122, XNS 5.2"
     DEFVAL      { 65536 }
     ::= { gcpTcpDefaults 2 }
@@ -281,7 +393,7 @@ gcpDefaultTcpKeepAlive OBJECT-TYPE
          default value is only applicable when never set by any 
          management station.  When set, the scalar value must persist 
          across system reboots."
-    REFERENCE
+    REFERENCE   
         "RFC 793, RFC 1122, XNS 5.2"
     DEFVAL      { false }
     ::= { gcpTcpDefaults 3 }
@@ -300,7 +412,7 @@ gcpDefaultTcpKeepIdle OBJECT-TYPE
          default is only applicable when never set by any management 
          station.  When set, the scalar value must persist across system 
          reboots."
-    REFERENCE
+    REFERENCE   
         "RFC 793, RFC 1122, XNS 5.2"
     DEFVAL      { 72000 }
     ::= { gcpTcpDefaults 4 }
@@ -323,7 +435,7 @@ gcpDefaultTcpKeepAliveItvl OBJECT-TYPE
          seconds (1.25 minutes). The default default value is only 
          applicable when never set by any management station.  When set, 
          the scalar value must persist across system reboots."
-    REFERENCE
+    REFERENCE   
         "RFC 793, RFC 1122"
     DEFVAL      { 1200 }
     ::= { gcpTcpDefaults 5 }
@@ -340,7 +452,7 @@ gcpDefaultTcpKeepCount OBJECT-TYPE
          The default default is 9 attempts.  The default default value 
          is only applicable when never set by any management station.  
          When set, the scalar value must persist across system reboots."
-    REFERENCE
+    REFERENCE   
         "RFC 793, RFC 1122"
     DEFVAL      { 9 }
     ::= { gcpTcpDefaults 6 }
@@ -350,8 +462,15 @@ gcpDefaultTcpSynRetrans OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE
+        "Specifies the maximum number of times that a SYN will be 
+         retransmitted when attempting to establish a TCP connection.  
+         Valid values are zero or greater.
+         
+         The default default value is 5, which corresponds to 180 
+         seconds.  The default default value is only applicable when 
+         never set by any management station.  Once set, the scalar 
+         value must persist across system reboots."
+    REFERENCE   
         "RFC 793, RFC 1122"
     DEFVAL      { 5 }
     ::= { gcpTcpDefaults 7 }
@@ -361,12 +480,16 @@ gcpDefaultTcpWindowClamp OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE
+        "Specifies the maximum receive window that will be advertised.
+         
+         The default default value is 65636: defeating the window clamp.  
+         The default default value is only applicable when never set by 
+         any management station.  Once set, the scalar value must 
+         persist across system reboots."
+    REFERENCE   
         "RFC 793, RFC 1122, XNS 5.2"
     DEFVAL      { 65536 }
     ::= { gcpTcpDefaults 8 }
-
 
 gcpSctpDefaults OBJECT IDENTIFIER
     ::= { gcpDefaults 4 }
@@ -375,7 +498,7 @@ gcpDefaultSctpNoDelay OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, by default whether the Nagle 
          algorithm should be applied to SCTP associations.  The Nagle 
          algorithm increases the size of the packets placed on the 
@@ -398,7 +521,7 @@ gcpDefaultSctpMaxseg OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default maximum SCTP payload 
          size for outgoing packets.  Values greater than the association 
          MTU are ignored and have no effect.  The value determines the 
@@ -414,7 +537,7 @@ gcpDefaultSctpMaxseg OBJECT-TYPE
          (65536 octets).  The default default value is only applicable 
          when never set by any management station.  When set, the scalar 
          value must persist across system reboots."
-    REFERENCE
+    REFERENCE   
         "RFC 4960"
     DEFVAL      { 65536 }
     ::= { gcpSctpDefaults 2 }
@@ -424,7 +547,7 @@ gcpDefaultSctpHeartbeatItvl OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default time interval (in 
          milliseconds) between successive HEARTBEAT messages used to 
          probe destination transport addresses for RTT calculation and 
@@ -454,7 +577,7 @@ gcpDefaultSctpHeartbeatItvl OBJECT-TYPE
          set, the scalar value must persist across system reboots."
     REFERENCE   
         "RFC 4960 15. HB.interval, ITU-T Rec. Q.707 (1993), ANSI 
-             T1.111.7 (2000)."
+               T1.111.7 (2000)."
     DEFVAL      { 6000 }
     ::= { gcpSctpDefaults 3 }
 
@@ -462,7 +585,7 @@ gcpDefaultSctpHearbeat OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, by default whether HEARTBEAT 
          messages used to probe destination transport addresses for RTT 
          calculation and activity will be sent periodically.
@@ -488,7 +611,7 @@ gcpDefaultSctpRtoInitial OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default initial time interval 
          (in milliseconds) that will be used as an initial RTO 
          (retransmission time out) value when sending packets to 
@@ -516,7 +639,7 @@ gcpDefaultSctpRtoMin OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default minimum time interval 
          (in milliseconds) that will be used as an RTO (retransmission 
          time out) value when sending packets to a destination transport 
@@ -545,7 +668,7 @@ gcpDefaultSctpRtoMax OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default maximum time interval 
          (in milliseconds) that will be used as an RTO (retransmission 
          timeout) value when sending packets to a destination transport 
@@ -567,7 +690,7 @@ gcpDefaultSctpPathMaxRetrans OBJECT-TYPE
     UNITS       "retransmissions"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default number of times that 
          SCTP will attempt retransmitting a packet to a given 
          destination transport address before it considers that 
@@ -595,7 +718,7 @@ gcpDefaultSctpCookieLife OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default time interval (in 
          milliseconds) in conjunction with gcpSctpCookieInc beyond which 
          a COOKIE-ECHO received with a cookie sent in an INIT-ACK will 
@@ -633,7 +756,7 @@ gcpDefaultSctpCookieInc OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default time increment (in 
          milliseconds) that will be added to the lifespan of the cookie 
          in an INIT-ACK if the received INIT requests cookie 
@@ -660,7 +783,7 @@ gcpDefaultSctpMaxInitRetries OBJECT-TYPE
     UNITS       "retries"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default number of times that 
          an INIT or COOKIE-ECHO will be resent to a given destination 
          before abandoning an active open attempt.  Value values are 
@@ -680,7 +803,7 @@ gcpDefaultSctpMaxBurst OBJECT-TYPE
     UNITS       "MTUs"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default maximum number of 
          MTUs of new data chunks that will be sent in a burst in 
          accordance with SCTP Specification Errata and Issues, RFC 4460 
@@ -700,7 +823,7 @@ gcpDefaultSctpAssocMaxRetrans OBJECT-TYPE
     UNITS       "retransmissions"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default number of times that 
          the sending endpoint will attempt retransmitting a packet on 
          any active destination transport address before it aborts the 
@@ -729,7 +852,7 @@ gcpDefaultSctpSackDelay OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default interval of time (in 
          milliseconds) that will be used as an RTO (retransmission time 
          out) value when sending packets to a destination transport 
@@ -750,7 +873,7 @@ gcpDefaultSctpLifetime OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-write
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This scalar defines, for GCP, the default life time assigned to 
          user data to be sent on the association.
          
@@ -762,7 +885,6 @@ gcpDefaultSctpLifetime OBJECT-TYPE
     DEFVAL      { 0 }
     ::= { gcpSctpDefaults 15 }
 
-
 gcpTables OBJECT IDENTIFIER
     ::= { gcpMIB 3 }
 
@@ -773,7 +895,7 @@ gcpMgTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpMgEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This table lists all of the Media Gateway devices known to this 
          managed system.  When the management view is that of a managed 
          system containing Media Gateway Controllers, this table 
@@ -787,77 +909,122 @@ gcpMgTable OBJECT-TYPE
     ::= { gcpMg 1 }
 
 gcpMgEntry OBJECT-TYPE
-    SYNTAX      SEQUENCE OF GcpMgcEntry
+    SYNTAX      GcpMgEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-        ""
+    DESCRIPTION 
+        "Each row in the gcpMgTable represents a Media Gateway (MG) that 
+         is known to the managed system.  This includes both Media 
+         Gateways that are part of the managed systems, as well as Media 
+         Gateways that are external to the managed system.  Media 
+         Gateways are present in this table when:
+         
+         1. The MG is internal to the managed system.
+            
+         2. The MG is external to the managed system but is allowed to 
+            communicate with an MGC internal to the managed system.
+            
+         3. The MG is external to the managed system but backs up or is 
+            backed up by an MG internal to the managed system."
     INDEX       { gcpMgId }
     ::= { gcpMgTable 1 }
 
 GcpMgEntry ::= SEQUENCE {
-    gcpMgId                 Unsigned32,
-    gcpMgAddressType        TransportAddressType,
-    gcpMgServerAddress      TransportAddress,
-    gcpMgClientAddress      TransportAddress,
-    gcpMgAdminState         AdministrativeState,
-    gcpMgOperState          OperationalState,
-    gcpMgUsageState         UsageState,
-    gcpMgAvailStatus        AvailabilityStatus,
-    gcpMgProcStatus         ProceduralStatus,
-    gcpMgPg                 Unsigned32,
-    gcpMgStandbyStatus      StandbyStatus,
-    gcpMgRowStatus          RowStatus
+    gcpMgId             Unsigned32,
+    gcpMgLocation       INTEGER,
+    gcpMgName           CommonLanguageName,
+    gcpMgDomainName     SnmpAdminString,
+    gcpMgDeviceName     SnmpAdminString,
+    gcpMgMtpAddress     NetworkPointCode,
+    gcpMgAdminState     AdministrativeState,
+    gcpMgOperState      OperationalState,
+    gcpMgUsageState     UsageState,
+    gcpMgAvailStatus    AvailabilityStatus,
+    gcpMgProcStatus     ProceduralStatus,
+    gcpMgPg             Unsigned32,
+    gcpMgStandbyStatus  StandbyStatus,
+    gcpMgRowStatus      RowStatus
 }
 
 gcpMgId OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-        "Provides a non-zero ordinal index into the gcpMgTable."
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the gcpMgTable.  This 
+         value may also be used as an identifier of a row (MG) in this 
+         table."
     ::= { gcpMgEntry 1 }
 
-gcpMgAddressType OBJECT-TYPE
-    SYNTAX      TransportAddressType
+gcpMgLocation OBJECT-TYPE
+    SYNTAX      INTEGER { internal(1), external(2) }
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
-        "Specifies the type of transport addresses that are specified in 
-         the gcpMgServerAddress and gcpMgClientAddress in the same 
-         conceptual row as this object.  This follows the 
-         TransportAddressType textual convention of the 
-         TRANSPORT-ADDRESS-MIB.  For IPv4 this is udpIpv4(1), tcpIpv4(3) 
-         or sctpIpv4(5)."
+    DESCRIPTION 
+        "Specifies the location of the MG.  The MG can be located:
+         
+         - internal(1), the MG is internal to the managed system; the 
+           managed system has direct control of the MG entity (the MG 
+           entity lives and dies with the managed system);
+           
+         - external(2), the MG is external to the managed system; the 
+           managed system only has control of the MG using 
+           a communications linkage and protocol.
+           
+         Note that a managed system does not need to consist of just MG 
+         or just MGC, but can be a mixture of the two.  Also, not all 
+         configurations will have external MG entities in this table 
+         (communication may be between internal GCP entities only)."
     ::= { gcpMgEntry 2 }
 
-gcpMgServerAddress OBJECT-TYPE
-    SYNTAX      TransportAddress
+gcpMgName OBJECT-TYPE
+    SYNTAX      CommonLanguageName
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
-        "Specifies the transport address for the server (Media Gateway).  
-         Note that, at an MGC, an IPv4 address can be specified as 
-         0.0.0.0 to represent that the Media Gateway is permitted to 
-         communicate with the MGC from any IP address.  The port number 
-         can also be specified as zero (0) to represent that the MG is 
-         permitted to communicate with the MGC from any port."
+    DESCRIPTION 
+        "Provides a COMMON LANGUAGE NAME for this MG."
     ::= { gcpMgEntry 3 }
 
-gcpMgClientAddress OBJECT-TYPE
-    SYNTAX      TransportAddress
+gcpMgDomainName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
-        "Specifies the transport address for the client (Media Gateway 
-         Controller).  Note that, at an MG, an IPv4 address can be  "
-    ::= { gcpMgEntry 3 }
+    DESCRIPTION 
+        "Specifies the domain name that will be reported by the 
+         MG in H.248/MEGACO messages on communications linkages 
+         that select domainName(2) in the gcpLinkageMgIdent 
+         column of the gcpLinkageTable."
+    ::= { gcpMgEntry 4 }
+
+gcpMgDeviceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the device name that will be reported by the 
+         MG in H.248/MEGACO messages on communications linkages 
+         that select deviceName(3) in the gcpLinkageMgIdent 
+         column of the gcpLinkageTable."
+    ::= { gcpMgEntry 5 }
+
+gcpMgMtpAddress OBJECT-TYPE
+    SYNTAX      NetworkPointCode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the MTP address (point code) that will be 
+         reported by the MG in H.248/MEGACO messages on 
+         communications linkages that select mtpAddress(4) in 
+         the gcpLinkageMgIdent column of the gcpLinkageTable."
+    REFERENCE   
+        "OPENSS7-SS7-MIB:NewtorkPointCode"
+    ::= { gcpMgEntry 6 }
 
 gcpMgAdminState OBJECT-TYPE
     SYNTAX      AdministrativeState
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This attribute represents the administrative capability of the 
          Media Gateway to perform its function.  The following 
          administrative states are defined:
@@ -885,13 +1052,13 @@ gcpMgAdminState OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                administrativeState attribute."
-    ::= { gcpMgEntry 4 }
+    ::= { gcpMgEntry 7 }
 
 gcpMgOperState OBJECT-TYPE
     SYNTAX      OperationalState
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the operational state of the Media Gateway in 
          accordance with the OperationalState textual convention and 
          ITU-T Rec.  X.721 | ISO/IEC 10165-2.  The defined states are:
@@ -906,13 +1073,13 @@ gcpMgOperState OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                operationalState attribute."
-    ::= { gcpMgEntry 5 }
+    ::= { gcpMgEntry 8 }
 
 gcpMgUsageState OBJECT-TYPE
     SYNTAX      UsageState
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the usage state of the Media Gateway in accordance 
          with the UsageState textual convention and ITU-T Rec. X.721 
          | ISO/IEC 10165-2.  This object is single-valued and read only.  
@@ -933,14 +1100,13 @@ gcpMgUsageState OBJECT-TYPE
                Attribute-ASN1Module.UsageState.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.1.2."
-    ::= { gcpMgEntry 6 }
-
+    ::= { gcpMgEntry 9 }
 
 gcpMgAvailStatus OBJECT-TYPE
     SYNTAX      AvailabilityStatus
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This is the availability status of the Media Gateway in 
          accordance with the AvailabiltiyStatus textual convention and 
          ITU-T Rec. X.721 | ISO/IEC 10165-2.  This object is set-valued 
@@ -990,7 +1156,7 @@ gcpMgAvailStatus OBJECT-TYPE
            degraded in some respect, such as in speed or operating 
            capacity.  Failure of a test or an unacceptable performance 
            measurement has established that some or all services are not 
-           functions or are degraded due to presence of a defect.  
+           functional or are degraded due to the presence of a defect.  
            However, the Media Gateway remains available for service, 
            either because some services are satisfactory or because 
            degraded service is preferable to no service at all.  The 
@@ -1004,60 +1170,83 @@ gcpMgAvailStatus OBJECT-TYPE
            
          - logFull(8), this indicates a log full condition, the 
            semantics of which are defined in ITU-T Rec. X.735.
-           
-        "
+           "
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                Attribute-ASN1Module.AvailabilityStatus
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.3."
-    ::= { gcpMgEntry 7 }
+    ::= { gcpMgEntry 10 }
 
 gcpMgProcStatus OBJECT-TYPE
     SYNTAX      ProceduralStatus
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the procedural status of the Media Gateway in 
          accordance with the ProceduralStatus textual convention of the 
          OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  The 
          procedural status can have zero or more of the following 
          conditions:
          
-         - initializationRequired(0),
-         - notInitialized(1),
-         - initializing(2),
-         - reporting(3),
-         - terminating(4),"
+         - initializationRequired(0), the MG requires initialization to 
+           be invoked by the manager before it can perform its normal 
+           functions, and this procedure has not been initiated.  The 
+           management may be able to invoke such a initialization 
+           through an action.  The terminating(4) condition may also be 
+           present.  The operational state is disabled.
+           
+         - notInitialized(1), the MG requires initialization before it 
+           can perform its normal functions, and this procedure has not 
+           been initiated.  The MG initializes itself autonomously.  The 
+           operational state is disabled.
+           
+         - initializing(2), the MG requires initialization before it can 
+           perform its normal functions, and this procedure has been 
+           initiated, but is not yet complete.  When this condition is 
+           present, the initializationRequred(0) and notInitialized(1) 
+           conditions are absent.  The operational state is disabled.
+           
+         - reporting(3), the MG has failed and is reporting failure.
+           
+         - terminating(4), the MG is in a termination phase.  If the MG 
+           does not reinitialize itself autonomously, the 
+           intializationRequired(0) condition is also present and the 
+           operational state is disabled; otherwise, the operational 
+           state is disabled.
+           
+         Note that when the MG in question is remote to the managed 
+         system, this is the view of the procedural status of the MG as 
+         discerned by the managed system and depends on the procedural 
+         status of the communications linkage to the MG."
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                Attribute-ASN1Module.ProceduralStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.2."
-    ::= { gcpMgEntry 8 }
+    ::= { gcpMgEntry 11 }
 
 gcpMgPg OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
-        "Specifies the protection group corresponding to this Media 
-         Gateway as an index into the protectionGroupTable of the 
-         protection group that is protecting this Media Gateway.  The 
-         value is the value of the protectionGroupId that indexes 
-         a specific protection group within the protectionGroupTable.  
-         When there is no protection group associated with the Media 
-         Gateway, this value is zero (0)."
-    REFERENCE
+    DESCRIPTION 
+        "Specifies the protection group to which this Media Gateway 
+         belongs as an index into the protectionGroupTable.  The value 
+         is the value of the protectionGroupId that indexes a specific 
+         protection group within the protectionGroupTable.  When there 
+         is no protection group associated with the Media Gateway, this 
+         value is zero (0)."
+    REFERENCE   
         "ITU-T Rec. M.3100 (2005) : protectionGroupR2 MOC
-         ITU-T Rec. G.744.3 : protectionGroupR1 MOC" 
-    ::= { gcpMgEntry 9 }
+         ITU-T Rec. G.744.3 : protectionGroupR1 MOC"
+    ::= { gcpMgEntry 12 }
 
 gcpMgStandbyStatus OBJECT-TYPE
     SYNTAX      StandbyStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the standby status of the Media Gateway.  This entry 
          is used to indicate MG mirroring arrangements such as IP 
          takeover.  The type is single-valued and read-only and can 
@@ -1071,7 +1260,7 @@ gcpMgStandbyStatus OBJECT-TYPE
            activity, and will contain the same information as the MG 
            being backed up.  The operational state during this status is 
            enabled(0) and the administrative state is unlocked(0).  The 
-           availability status is offline();
+           availability status is offLine(3);
          
          - coldStandby(1), the Media Gateway is to back-up another MG 
            (perhaps on another host), but is not synchronized with that 
@@ -1086,25 +1275,29 @@ gcpMgStandbyStatus OBJECT-TYPE
          - providingService(2), the back-up Media Gateway is providing 
            service and is backing up another MG (perhaps on a different 
            host).  The administrative state is unlocked(1); availability 
-           status is online()."
+           status is online().
+           
+         This status is only meaningful when gcpMgPg is non-zero: that 
+         is, the MG belongs to a protection group.  When the gcpMgPg is 
+         zero (the MG is unprotected), this object will always report 
+         providingService(2)."
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                Attribute-ASN1Module.StandbyStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.5."
-    ::= { gcpMgEntry 10 }
+    ::= { gcpMgEntry 13 }
 
 gcpMgRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a mechanism whereby management stations may create or 
          delete rows in this table."
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
-    ::= { gcpMgEntry 11 }
-
+    ::= { gcpMgEntry 14 }
 
 gcpMgc OBJECT IDENTIFIER
     ::= { gcpTables 2 }
@@ -1113,7 +1306,7 @@ gcpMgcTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpMgcEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This table lists all of the Media Gateway Controller devices 
          known to this managed system.  When the management view is that 
          of a managed system containing Media Gateways, this table 
@@ -1126,6 +1319,400 @@ gcpMgcTable OBJECT-TYPE
          within the manged system might be backing up."
     ::= { gcpMgc 1 }
 
+gcpMgcEntry OBJECT-TYPE
+    SYNTAX      GcpMgcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the gcpMgcTable represents a Media Gateway 
+         Controller (MGC) that is known to the managed system.  This 
+         include both internal and external MGC.  MGC are present in 
+         this table when:
+         
+         1. The MGC is internal to the managed system.
+            
+         2. The MGC is external to the managed system but an MG internal 
+            to the managed system is configured to communicate with it.
+            
+         3. The MGC is external to the managed system but backs up or is 
+            backed up by an MGC internal to the managed system."
+    INDEX       { gcpMgcId }
+    ::= { gcpMgcTable 1 }
+
+GcpMgcEntry ::= SEQUENCE {
+    gcpMgcId                Unsigned32,
+    gcpMgcLocation          INTEGER,
+    gcpMgcName              CommonLanguageName,
+    gcpMgcDomainName        SnmpAdminString,
+    gcpMgcDeviceName        SnmpAdminString,
+    gcpMgcMtpAddress        NetworkPointCode,
+    gcpMgcAdminState        AdministrativeState,
+    gcpMgcOperState         OperationalState,
+    gcpMgcUsageState        UsageState,
+    gcpMgcAvailStatus       AvailabilityStatus,
+    gcpMgcProcStatus        ProceduralStatus,
+    gcpMgcPg                Unsigned32,
+    gcpMgcStandbyStatus     StandbyStatus,
+    gcpMgcRowStatus         RowStatus
+}
+
+gcpMgcId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the gcpMgcTable.  This 
+         value may also be used as an identifier of a row (MGC) in this 
+         table."
+    ::= { gcpMgcEntry 1 }
+
+gcpMgcLocation OBJECT-TYPE
+    SYNTAX      INTEGER { internal(1), external(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the location of the MGC.  The MGC can be located:
+         
+         - internal(1), the MGC is internal to the managed system; the 
+           managed system has direct control of the MGC entity (the MGC 
+           entity lives and dies with the managed system);
+           
+         - external(2), the MGC is external to the managed system; the 
+           managed system only has control of the MGC using 
+           a communications linkage and protocol.
+           
+         Note that a managed system does not need to consist of just MGC 
+         or just MGC, but can be a mixture of the two.  Also, not all 
+         configurations will have external MGC entities in this table 
+         (communication may be between internal GCP entities only)."
+    ::= { gcpMgcEntry 2 }
+
+gcpMgcName OBJECT-TYPE
+    SYNTAX      CommonLanguageName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a COMMON LANGUAGE NAME for this MG."
+    ::= { gcpMgcEntry 3 }
+
+gcpMgcDomainName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the domain name that will be reported by the 
+         MGC in H.248/MEGACO message on communications linkages 
+         that select domainName(2) in the gcpLinkageMgcIdent 
+         column of the gcpLinkageTable."
+    ::= { gcpMgcEntry 4 }
+
+gcpMgcDeviceName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the device name that will be reported by the 
+         MG in H.248/MEGACO messages on communications linkages 
+         that select deviceName(3) in the gcpLinkageMgcIdent 
+         column of the gcpLinkageTable."
+    ::= { gcpMgcEntry 5 }
+
+gcpMgcMtpAddress OBJECT-TYPE
+    SYNTAX      NetworkPointCode
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the MTP address (point code) that will be 
+         reported by the MG in H.248/MEGACO messages on 
+         communications linkages that select mtpAddress(4) in 
+         the gcpLinkageMgcIdent column of the gcpLinkageTable."
+    REFERENCE   
+        "OPENSS7-SS7-MIB:NetworkPointCode"
+    ::= { gcpMgcEntry 6 }
+
+gcpMgcAdminState OBJECT-TYPE
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This attribute represents the adminstrative capability of the 
+         Media Gateway Controller to perform its function.  The 
+         following administrative states are defined:
+         
+         - locked(0), use of the Media Gateway Controller has been 
+           prohibited by a management station; setting the value to 
+           locked(0) results in the immediate and disruptive withdrawa 
+           from service of the Media Gateway Controller.
+           
+         - unlocked(1), use of the Media Gateway Controller has been 
+           permitted by a management station;
+           
+         - shuttingDown(2), use of the Media Gateway Controller has been 
+           administratively permitted to existing instances of use only.  
+           While the system remains in the shutting down state, the 
+           management station may at any time cause the Media Gateway 
+           Controller to revert to the unlocked(1) state.  Setting the 
+           Media Gateway Controller to shuttingDown(2) results in the 
+           graceful withdrawal from service of the Media Gateway 
+           Controller.  Once all users of the Media Gateway Controller 
+           have withdrawn, the state will change autonomously to 
+           locked(0).
+         
+         Whenever the administrative state of a Media Gateway Controller 
+         is changed, a state change notification is generated."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               administrativeState attribute."
+    ::= { gcpMgcEntry 7 }
+
+gcpMgcOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the Media Gateway Controller 
+         in accordance with the OperationalState textual convention and 
+         ITU-T Rec. X.721 | ISO/IEC 10165-2.  The defined states are:
+         
+         - enabled(0), the Media Gateway Controller is operational and 
+           ready for use;
+         - disabled(1), the Media Gateway Controller is not available 
+           for use.
+           
+         A change in operational state shall generate a state change 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState attribute."
+    ::= { gcpMgcEntry 8 }
+
+gcpMgcUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the usage state of the Media Gateway Controller in 
+         accordance with the UsageState textual convention and ITU-T 
+         Rec. X.721 | ISO/IEC 10165-2.  This object is single-valued and 
+         read only.  The defined states are:
+         
+         - idle(0), the Media Gateway Controller is not currently in 
+           used;
+           
+         - active(1), the Media Gateway Controller is in use, and has 
+           sufficient spare operating capacity to provide for additional 
+           users simultaneously;
+           
+         - busy(2), the Media Gateway Controller is in use, but it has 
+           no spare operating capacity to provide for additional users 
+           at this instant."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.UsageState.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.1.2."
+    ::= { gcpMgcEntry 9 }
+
+gcpMgcAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the availability status of the Media Gateway 
+         Controller in accordance with the AvailabilityStatus textual 
+         convention and ITU-T Rec. X.721 | ISO/IEC 10165-2.  This object 
+         is set-valued and read-only and can report any set of the 
+         following conditions:
+         
+         - inTest(0), the Media Gateway Controller is undergoing a test 
+           procedure.  If the administrative state is locked(0), or 
+           shuttingDown(2), then normal users are precluded from using 
+           the MGC and the control status attribute has the value 
+           reserved for test.  Tests that do not exclude additional 
+           users can be present in any operational or administrative 
+           state but the reserved for test condition should not be 
+           present.
+           
+         - failed(1), the Media Gateway Controller has an internal fault 
+           that prevents it from operating.  The operational state is 
+           disabled.
+           
+         - powerOff(2), the Media Gateway Controller requires power to 
+           be applied and is not powered on.  The operational state is 
+           disabled.
+           
+         - offLine(3), the Media Gateway Controller requires a routing 
+           operation to be performed to place it online and make it 
+           available for use.  The operation may be manual or automatic 
+           or both.  The operational state is disabled.
+           
+         - offDuty(4), the Media Gateway Controller has been made 
+           inactive by an internal control process in accordance with 
+           a predetermined time schedule.  Under normal conditions the 
+           control process can be expected to reactivate the Media 
+           Gateway Controller at some scheduled time, and it is 
+           therefore considered to be optional.  The operational state 
+           is either enabled or disable.
+           
+         - dependency(5), the Media Gateway Controller cannot operatre 
+           because some other resource on which it depends is 
+           unavailable.  The operational state is disabled.
+           
+         - degraded(6), the service available from the Media Gateway 
+           Controller is degraded in some respect, such as in speed or 
+           operating capacity.  Failure of a test or an unacceptable 
+           performance measurement has established that some or all 
+           services are not functional or are degraded due to the 
+           presence of a defect.  However, the Media Gateway Controller 
+           remains available for service, either because some services 
+           are satisfactory or because degraded service is preferable to 
+           no service at all.  The operational state is enabled.
+           
+         - notInstalled(7), the Media Gateway Controller is not present, 
+           or is incomplete.  The operational state is disabled.
+           
+         - logFull(8), this indicates a log full condition, the 
+           semantics of which are defined in ITU-T Rec. X.735.
+         
+         Note that these semantics are from the viewpoint of the managed 
+         system.  When the MGC is external to the managed system, this 
+         is the external view; where internal, the internal view.  Note 
+         also that when the view is external that this is the view of 
+         the MGC and not the availability status of the communications 
+         linkage (which is handled by the gcpLinkageAvailStatus column 
+         of the gcpLinkageTable)."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.AvailabilityStatus
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.3."
+    ::= { gcpMgcEntry 10 }
+
+gcpMgcProcStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of the Media Gateway Controller 
+         in accordance with the ProceduralStatus textual convention of 
+         the OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  
+         The procedural status can report any set of the following 
+         conditions:
+         
+         - initializationRequired(0), the MGC requires initialization to 
+           be invoked by the manager before it can perform its normal 
+           functions, and this procedure has not been initiated.  The 
+           management may be able to invoke such an initialization 
+           through an action.  The terminating(4) condition may also be 
+           present.  The operational state is disabled.
+           
+         - notInitialized(1), the MGC requires initialization before it 
+           can perform its normal functions, and this procedure has not 
+           been initiated.  The MGC initializes itself autonomously.  
+           The operational state is disabled.
+         
+         - initializing(2), the MGC requires initialization before it can 
+           perform its normal functions, and this procedure has been 
+           initiated, but is not yet complete.  When this condition is 
+           present, the initializationRequired(0) and notInitialized(1) 
+           conditions are absent, since initialization has already 
+           begun.  The operational state is disabled.
+           
+         - reporting(3), the MGC has failed and is reporting failure.
+           
+         - terminating(4), the MGC is in a termination phase.  If the 
+           MGC does not reinitialize itself autonomously, the 
+           initializationRequired(0) condition is also present and the 
+           operational state is disabled; otherwise, the operational 
+           state is disabled.
+           
+         Note that when the MGC in question is remote to the managed 
+         system, this is the view of the procedural status of the remote 
+         MGC as discerned by the managed system and depends on the 
+         procedural status of the communications linkage to the MGC."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.ProceduralStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.2."
+    ::= { gcpMgcEntry 11 }
+
+gcpMgcPg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the protection group corresponding to which this 
+         Media Gateway Controller belongs as an index into the 
+         protectionGroupTable.  The value is the value of the 
+         protectionGroupId that indexes a specific protection group 
+         within the protectionGroupTable.  When there is no protection 
+         group associated with the Media Gateway Controller, this value 
+         is zero (0)."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (2005) : protectionGroupR2 MOC
+         ITU-T Rec. G.744.3 : protectionGroupR1 MOC"
+    ::= { gcpMgcEntry 12 }
+
+gcpMgcStandbyStatus OBJECT-TYPE
+    SYNTAX      StandbyStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the standby status of the Media Gateway Controller, in 
+         accordance with the StandbyStatus textual convention and ITU-T 
+         Rec. X.721 | ISO/IEC 10165-2.  This entry is used to indicate 
+         MGC sparing arrangements such as those described in ITU-T Rec. 
+         H.248.1.  The type is single-valued and can assume one of the 
+         following defined conditions:
+         
+         - hotStandby(0), the MGC is not providing service, but is 
+           operating in synchronism with another MGC (on another host) 
+           that is to be backed-up.  A Media Gateway Controller with 
+           a hot standby status will be immediately able to take over 
+           the role of the MGC to be backed up, without the need for 
+           initialization activity, and will contain the same 
+           information as the MGC being backed up.  The operational 
+           state during this status is enabled(0) and the administrative 
+           state is unlocked(0).  The availability status is offLine(3).
+           
+         - coldStandby(1), the MGC is to back-up another MGC (on another 
+           host), but is not synchronized with that resource.  An MGC 
+           with a cold standby status will not immediately be able to 
+           take over the role of the MGC to be backed up, and will 
+           require some initialization activity.  The operational state 
+           is enabled(0) or disabled(1); the administrative state is 
+           locked(0) or unlocked(1); the procedural status contains 
+           notInitialized(1) or initializationRequired(0); availability 
+           status is offLine(3).
+           
+         - providingService(2), the back-up MGC is providing service and 
+           is backing up another MGC (on a different host).  The 
+           administrative state is unlocked(1); availability status is 
+           online.
+           
+         This status is only meaningful when gcpMgcPg is non-zero: that 
+         is, the MGC belongs to a protection group.  When the gcpMgcPg 
+         is zero (the MGC is unprotected), this object will always 
+         report providingService(2)."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.StandbyStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.5."
+    ::= { gcpMgcEntry 13 }
+
+gcpMgcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete rows in this table."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpMgcEntry 14 }
+
 gcpLinkage OBJECT IDENTIFIER
     ::= { gcpTables 3 }
 
@@ -1133,7 +1720,7 @@ gcpLinkageTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpLinkageEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This table provides a view of the communications association 
          between MG and MGC entities as viewed by the managed system.  
          This table provides configuration information for managed 
@@ -1144,11 +1731,11 @@ gcpLinkageTable OBJECT-TYPE
          up or backed up by an MG within the managed system.."
     ::= { gcpLinkage 1 }
 
-gcplLinkageEntry OBJECT-TYPE
+gcpLinkageEntry OBJECT-TYPE
     SYNTAX      GcpLinkageEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Each entry in the gcpLinkageTable represents a communications 
          association between a media gateway and a media gateway 
          controller.  The managed system will not form an active 
@@ -1168,8 +1755,8 @@ GcpLinkageEntry ::= SEQUENCE {
     gcpLinkageEncoding          INTEGER,
     gcpLinkageAuthAccess        BITS,
     gcpLinkageAdminState        AdministrativeState,
-    gcpLinkageProcStatus        ProceduralStatus,
     gcpLinkageOperState         OperationalState,
+    gcpLinkageProcStatus        ProceduralStatus,
     gcpLinkageAvailStatus       AvailabilityStatus,
     gcpLinkageAuthentication    INTEGER,
     gcpLinkageRowStatus         RowStatus
@@ -1179,7 +1766,7 @@ gcpLinkageType OBJECT-TYPE
     SYNTAX      TransportAddressType
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the type of transport addresses used in this 
          communications linkage in accordance with the 
          TransportAddressType textual convention of the 
@@ -1190,7 +1777,7 @@ gcpLinkageMgcAddress OBJECT-TYPE
     SYNTAX      TransportAddress
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         ""
     ::= { gcpLinkageEntry 2 }
 
@@ -1198,7 +1785,7 @@ gcpLinkageMgAddress OBJECT-TYPE
     SYNTAX      TransportAddress
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         ""
     ::= { gcpLinkageEntry 3 }
 
@@ -1206,7 +1793,7 @@ gcpLinkageMgcIdent OBJECT-TYPE
     SYNTAX      MegacoIdentSelection
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies how a local MGC will identify itself, or how 
          a remote MGC is expected to identify itself, in H.248 
          messages.  One of:
@@ -1226,40 +1813,40 @@ gcpLinkageMgcIdent OBJECT-TYPE
          The setting of this value has no effect on protocols 
          other than H.248.  The default value is determined by 
          the setting of gcpDefaultMgcoIdent."
-    REFERENCE
+    REFERENCE   
         "ITU-T Recommendation H.248.1 (09/2005), Annex A, Mid 
                CHOICE."
-    ::= { gcpLinkageEntry 3 }
+    ::= { gcpLinkageEntry 4 }
 
 gcpLinkageMgIdent OBJECT-TYPE
     SYNTAX      MegacoIdentSelection
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         ""
-    ::= { gcpLinkageEntry 3 }
+    ::= { gcpLinkageEntry 5 }
 
 gcpLinkageProfile OBJECT-TYPE
     SYNTAX      RowPointer
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         ""
-    ::= { gcpLinkageEntry 4 }
+    ::= { gcpLinkageEntry 6 }
 
 gcpLinkageProtocol OBJECT-TYPE
     SYNTAX      AutonomousType
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         ""
-    ::= { gcpLinkageEntry 5 }
+    ::= { gcpLinkageEntry 7 }
 
 gcpLinkageEncoding OBJECT-TYPE
     SYNTAX      INTEGER { unspecified(0), binary(1), text(2) }
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the encoding to use.  This object is single-valued 
          and can assume one of the following values:
          
@@ -1277,13 +1864,13 @@ gcpLinkageEncoding OBJECT-TYPE
            
          A change in the value of this object while the link is 
          operational will not be effective until the link is cycled."
-    ::= { gcpLinkageEntry 6 }
+    ::= { gcpLinkageEntry 8 }
 
 gcpLinkageAuthAccess OBJECT-TYPE
     SYNTAX      BITS { none(0), interim(1), tls(2), ah(3), esp(4) }
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the authentication methods that will be accepted from 
          the remote entity on the linkage.  This object is set-valued 
          and can contain zero or more of the following:
@@ -1301,13 +1888,13 @@ gcpLinkageAuthAccess OBJECT-TYPE
            
          When a value is included in the set, it specifies that the 
          corresponding authentication method is permitted."
-    ::= { gcpLinkageEntry 7 }
+    ::= { gcpLinkageEntry 9 }
 
 gcpLinkageAdminState OBJECT-TYPE
     SYNTAX      AdministrativeState
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This object represents the administrative capability of the 
          linkage to support communication.  The following administrative 
          states are defined:
@@ -1335,13 +1922,13 @@ gcpLinkageAdminState OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                administrativeState attribute."
-    ::= { gcpLinkageEntry 8 }
+    ::= { gcpLinkageEntry 10 }
 
 gcpLinkageOperState OBJECT-TYPE
     SYNTAX      OperationalState
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the operational state of the linkage in accordance 
          with the OperationalState textual convention and ITU-T Rec. 
          X.721 | ISO/IEC 10165-2.  The defined states are:
@@ -1359,17 +1946,17 @@ gcpLinkageOperState OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                operationalState attribute."
-    ::= { gcpLinkageEntry 9 }
+    ::= { gcpLinkageEntry 11 }
 
 gcpLinkageProcStatus OBJECT-TYPE
     SYNTAX      ProceduralStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides the procedural status of the communications linkage in 
          accordance with the ProceduralStatus textual convention of the 
          OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  The 
-         procedural status can contain zero or more of the following 
+         procedural status can report any set of the following 
          conditions:
          
          - initializationRequired(0), the communications linkage 
@@ -1411,13 +1998,13 @@ gcpLinkageProcStatus OBJECT-TYPE
                Attribute-ASN1Module.ProceduralStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.2."
-    ::= { gcpLinkageEntry 10 }
+    ::= { gcpLinkageEntry 12 }
 
 gcpLinkageAvailStatus OBJECT-TYPE
     SYNTAX      AvailabilityStatus
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the availability status of the communications linkage 
          in accordance with the AvailabilityStatus textual convention of 
          the OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  
@@ -1471,20 +2058,19 @@ gcpLinkageAvailStatus OBJECT-TYPE
            or is incomplete.  The operational state is disabled.
            
          - logFull(8), this indicates a log full condition, the 
-           semantics of which are defined in ITU-T Rec. X.735.
-         "
+           semantics of which are defined in ITU-T Rec. X.735."
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                Attribute-ASN1Module.AvailabilityStatus
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.3."
-    ::= { gcpLinkageEntry 11 }
+    ::= { gcpLinkageEntry 13 }
 
 gcpLinkageAuthentication OBJECT-TYPE
     SYNTAX      INTEGER { none(0), interim(1), tls(2), ah(3), esp(4) }
     MAX-ACCESS  read-only
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Indicates the authentication methods that is currently in 
          effect on an operational association.  This object is 
          single-values and can assume one of the following values:
@@ -1503,20 +2089,20 @@ gcpLinkageAuthentication OBJECT-TYPE
          When the association is not operational, this value will always 
          read the value of the lass successful association, or none(0) 
          when not association was every formed."
-    ::= { gcpLinkageEntry 12 }
+    ::= { gcpLinkageEntry 14 }
 
 gcpLinkageRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a mechanism whereby management stations may create and 
          destroy row in this table.  Note that the linkage must be 
          non-operational for a change in some values to take effect 
          (such as a transport address address)."
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
-    ::= { gcpLinkageEntry 13 }
+    ::= { gcpLinkageEntry 15 }
 
 gcpUdpProfile OBJECT IDENTIFIER
     ::= { gcpTables 4 }
@@ -1525,7 +2111,7 @@ gcpUdpProfileTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpUdpProfileEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a table of UDP transport protocol profiles (settings 
          of communications parameters) for reference by entries in the 
          gcpLinkageTable."
@@ -1535,7 +2121,7 @@ gcpUdpProfileEntry OBJECT-TYPE
     SYNTAX      GcpUdpProfileEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Each entry in the gcpUdpProfileTable provides one set of UDP 
          communications parameters that are to be used on 
          a communications linkage that references the profile.  The 
@@ -1548,8 +2134,7 @@ gcpUdpProfileEntry OBJECT-TYPE
          2. Changes to the values for a given profile entry are 
             effective immediately for operational communications 
             linkages that refer to this profile; non-operational 
-            linkages will adopt the new values on the next cycle.
-        "
+            linkages will adopt the new values on the next cycle."
     INDEX       { gcpUdpProfileId }
     ::= { gcpUdpProfileTable 1 }
 
@@ -1563,7 +2148,7 @@ gcpUdpProfileId OBJECT-TYPE
     SYNTAX      SimpleNameType
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         ""
     ::= { gcpUdpProfileEntry 1 }
 
@@ -1571,7 +2156,7 @@ gcpUdpChecksum OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         ""
     ::= { gcpUdpProfileEntry 2 }
 
@@ -1579,12 +2164,11 @@ gcpUdpRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         ""
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
     ::= { gcpUdpProfileEntry 3 }
-
 
 gcpTcpProfile OBJECT IDENTIFIER
     ::= { gcpTables 5 }
@@ -1593,7 +2177,7 @@ gcpTcpProfileTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpTcpProfileEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a table of TCP transport protocol profiles (settings 
          of communications parameters) for reference by entries in the 
          gcpLinkageTable."
@@ -1603,7 +2187,7 @@ gcpTcpProfileEntry OBJECT-TYPE
     SYNTAX      GcpTcpProfileEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Each entry in the gcpTcpProfileTable provides one set of TCP 
          communications parameters that are to be used on 
          a communications linkage that references the profile.  The 
@@ -1616,29 +2200,28 @@ gcpTcpProfileEntry OBJECT-TYPE
          2. Changes to the values for a given profile entry are 
             effective immediately for operational communications 
             linkages that refer to this profile; non-operational 
-            linkages will adopt the new values on the next cycle.
-        "
+            linkages will adopt the new values on the next cycle."
     INDEX       { gcpTcpProfileId }
     ::= { gcpTcpProfileTable 1 }
 
 GcpTcpProfileEntry ::= SEQUENCE {
-    gcpTcpProfileId     SimpleNameType,
-    gcpTcpNoDelay       TruthValue,
-    gcpTcpMaxseg        Unsigned32,
-    gcpTcpKeepAlive     TruthValue,
-    gcpTcpKeepIdle      TimeInterval,
-    gcpTcpKeepAliveItvl TimeInterval,
-    gcpTcpKeepCount     Unsigned32,
-    gcpTcpSynRetrans    Unsigned32,
-    gcpTcpWindowClamp   Unsigned32,
-    gcpTcpRowStatus     RowStatus
+    gcpTcpProfileId         SimpleNameType,
+    gcpTcpNoDelay           TruthValue,
+    gcpTcpMaxseg            Unsigned32,
+    gcpTcpKeepAlive         TruthValue,
+    gcpTcpKeepIdle          TimeInterval,
+    gcpTcpKeepAliveItvl     TimeInterval,
+    gcpTcpKeepCount         Unsigned32,
+    gcpTcpSynRetrans        Unsigned32,
+    gcpTcpWindowClamp       Unsigned32,
+    gcpTcpRowStatus         RowStatus
 }
 
 gcpTcpProfileId OBJECT-TYPE
     SYNTAX      SimpleNameType
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides an index into the gcpTcpProfileTable following the 
          SimpleNameType textual convention.  This value of this string 
          can be used to identify an entry in this table."
@@ -1648,7 +2231,7 @@ gcpTcpNoDelay OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines whether the Nagle algorithm should be 
          applied to TCP connections formed under this profile.  The 
          Nagle algorithm increases the size of the packets placed on the 
@@ -1669,7 +2252,7 @@ gcpTcpNoDelay OBJECT-TYPE
          
          The default value is determined by the setting of 
          gcpDefaultTcpNoDelay."
-    REFERENCE
+    REFERENCE   
         "RFC 793, RFC 1122, XNS 5.2"
     ::= { gcpTcpProfileEntry 2 }
 
@@ -1678,7 +2261,7 @@ gcpTcpMaxseg OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the maximum TCP segment size for outgoing 
          packets.  Values greater than the association MTU are ignored 
          and have no effect.  The value determines the maximum size (in 
@@ -1702,7 +2285,7 @@ gcpTcpMaxseg OBJECT-TYPE
          
          The default value is determined by the setting of 
          gcpDefaultTcpMaxseg."
-    REFERENCE
+    REFERENCE   
         "RFC 793, RFC 1122, XNS 5.2"
     ::= { gcpTcpProfileEntry 3 }
 
@@ -1710,7 +2293,7 @@ gcpTcpKeepAlive OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column determines whether keep-alive messages used to 
          probe the destination transport address will be sent 
          periodically.  The default default value is the value 
@@ -1738,7 +2321,7 @@ gcpTcpKeepAlive OBJECT-TYPE
          
          The default value is determined by the setting of 
          gcpDefaultTcpKeepAlive."
-    REFERENCE
+    REFERENCE   
         "RFC 793, RFC 1122, XNS 5.2"
     ::= { gcpTcpProfileEntry 4 }
 
@@ -1747,7 +2330,7 @@ gcpTcpKeepIdle OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the minimum period of time that the connection must 
          remain idle before a keep-alive check is made.  No minimum is 
          signified by the value zero (0).  The default default value is 
@@ -1764,7 +2347,7 @@ gcpTcpKeepAliveItvl OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum interval between keep-alive attempts on 
          idle connections.
          
@@ -1782,7 +2365,7 @@ gcpTcpKeepCount OBJECT-TYPE
     UNITS       "attempts"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum number of keep-alive probes that must 
          fail before the connection is deemed failed.
          
@@ -1797,11 +2380,11 @@ gcpTcpSynRetrans OBJECT-TYPE
     UNITS       "retransmissions"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum number of times that a SYN will be 
-         retransmitted when attempting to establish a connection.  Valid 
-         values are zero or greater.  The default default value is 5, 
-         which corresponds to 180 seconds.  Valid values are zero to 
+         retransmitted when attempting to establish a TCP connection.  
+         Valid values are zero or greater.  The default default value is 
+         5, which corresponds to 180 seconds.  Valid values are zero to 
          255.
          
          The default value is determined by the setting of 
@@ -1813,7 +2396,7 @@ gcpTcpWindowClamp OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Specifies the maximum receive window that will be advertised.
          
          The default value is determined by the setting of 
@@ -1824,7 +2407,7 @@ gcpTcpRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a mechanism whereby management stations, following the 
          RowStatus textual convention from the SNMPv2-TC module, may 
          create or destroy conceptual rows in this table.
@@ -1838,8 +2421,6 @@ gcpTcpRowStatus OBJECT-TYPE
         "STD 58, SNMPv2-TC RowStatus."
     ::= { gcpTcpProfileEntry 10 }
 
-
-
 gcpSctpProfile OBJECT IDENTIFIER
     ::= { gcpTables 6 }
 
@@ -1847,7 +2428,7 @@ gcpSctpProfileTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpSctpProfileEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a table of SCTP transport protocol profiles (settings 
          of communications parameters) for reference by entries in the 
          gcpLinkageTable."
@@ -1857,7 +2438,7 @@ gcpSctpProfileEntry OBJECT-TYPE
     SYNTAX      GcpSctpProfileEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Each entry in the gcpSctpProfileTable provides one set of SCTP 
          communications parameters that are to be used on 
          a communications linkage that references the profile.  The 
@@ -1870,8 +2451,7 @@ gcpSctpProfileEntry OBJECT-TYPE
          2. Changes to the values for a given profile entry are 
             effective immediately for operational communications 
             linkages that refer to this profile; non-operational 
-            linkages will adopt the new values on the next cycle.
-        "
+            linkages will adopt the new values on the next cycle."
     INDEX       { gcpSctpProfileId }
     ::= { gcpSctpProfileTable 1 }
 
@@ -1899,7 +2479,7 @@ gcpSctpProfileId OBJECT-TYPE
     SYNTAX      SimpleNameType
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Identifies a gcpSctpProfileEntry instance within the managed 
          switching element; this is an attribute type whose 
          distinguished value can be used as an RDN when naming an 
@@ -1910,7 +2490,7 @@ gcpSctpNoDelay OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines whether the Nagle algorithm should be 
          applied to SCTP associations formed under this profile.  The 
          Nagle algorithm increases the size of the packets placed on the 
@@ -1921,7 +2501,7 @@ gcpSctpNoDelay OBJECT-TYPE
          
          The default value is determined by the setting of 
          gcpDefaultSctpNoDelay."
-    REFERENCE
+    REFERENCE   
         "RFC 4960"
     ::= { gcpSctpProfileEntry 2 }
 
@@ -1930,7 +2510,7 @@ gcpSctpMaxseg OBJECT-TYPE
     UNITS       "octets"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the maximum SCTP payload size for outgoing 
          packets.  Values greater than the association MTU are ignored 
          and have no effect.  The value determines the maximum size (in 
@@ -1953,7 +2533,7 @@ gcpSctpHeartbeatItvl OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the time interval (in milliseconds) between 
          successive HEARTBEAT messages used to probe destination 
          transport addresses for RTT calculation and activity.  Valid 
@@ -1970,7 +2550,7 @@ gcpSctpHearbeat OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column determines whether HEARTBEAT messages used to probe 
          destination transport addresses for RTT calculation and 
          activity will be sent periodically.  The default default value 
@@ -1992,7 +2572,7 @@ gcpSctpRtoInitial OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the initial time interval (in milliseconds) 
          that will be used as an initial RTO (retransmission timeout) 
          value when sending packets to a destination for the first time.  
@@ -2017,7 +2597,7 @@ gcpSctpRtoMin OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the minimum timer interval (in 
          milliseconds) that will be used as an RTO (retransmission 
          timeout) value when sending packets to a destination transport 
@@ -2043,7 +2623,7 @@ gcpSctpRtoMax OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the maximum time interval (in milliseconds) 
          that will be used as an RTO (retransmission timeout) value when 
          sending packets t a destination transport address and expecting 
@@ -2069,7 +2649,7 @@ gcpSctpPathMaxRetrans OBJECT-TYPE
     UNITS       "retransmissions"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the number of times that SCTP will attempt 
          retransmitting a packet to a given destination transport 
          address before it considers that destination transport address 
@@ -2095,7 +2675,7 @@ gcpSctpCookieLife OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the time interval (in milliseconds) in 
          conjunction with gcpSctpCookieInc beyond which a COOKIE-ECHO 
          received with a cookie sent in an INIT-ACK will no longer be 
@@ -2132,7 +2712,7 @@ gcpSctpCookieInc OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the time increment (in milliseconds) that 
          will be added to the lifespan of the cookie in an INIT-ACK if 
          the received INIT requests cookie preservative to lengthen the 
@@ -2156,7 +2736,7 @@ gcpSctpMaxInitRetries OBJECT-TYPE
     UNITS       "retries"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the number of times that an INIT or 
          COOKIE-ECHO will be resent to a given destination before 
          abandoning an active open attempt.  Valid values are zero or 
@@ -2174,7 +2754,7 @@ gcpSctpMaxBurst OBJECT-TYPE
     UNITS       "MTUs"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the maximum number of MTUs of new data 
          chunks that will be sent in a burst in accordance with SCTP 
          Specification Errata and Issues, RFC 4460 and RFC 4960.  The 
@@ -2192,7 +2772,7 @@ gcpSctpAssocMaxRetrans OBJECT-TYPE
     UNITS       "retransmissions"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the number of times that the sending 
          endpoint will attempt retransmitting a packet on any active 
          destination transport address before it aborts the association.  
@@ -2218,7 +2798,7 @@ gcpSctpSackDelay OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "This column defines the interval of time (in milliseconds) that 
          will be used as an RTO (retransmission timeout) value when 
          sending packets to a destination transport address.  Valid 
@@ -2238,7 +2818,7 @@ gcpSctpLifetime OBJECT-TYPE
     UNITS       "centiseconds"
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "The default value is determined by the setting of 
          gcpDefaultSctpLifetime."
     REFERENCE   
@@ -2249,7 +2829,7 @@ gcpSctpRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a mechanism whereby management stations, following the 
          RowStatus textual convention from the SNMPv2-TC module, may 
          create or destroy conceptual rows in this table.
@@ -2263,6 +2843,1288 @@ gcpSctpRowStatus OBJECT-TYPE
         "STD 58, SNMPv2-TC RowStatus."
     ::= { gcpSctpProfileEntry 17 }
 
+gcpProtGroup OBJECT IDENTIFIER
+    ::= { gcpTables 7 }
+
+gcpProtGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpProtGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table is used for representing a protect system.  The 
+         gcpProtGroupInvokeProtection action switches always from 
+         protected unit to protecting unit.  Either all or none of the 
+         protection unit instances within a protection group shall have 
+         a priority assigned.  It is to be noted that, before the 
+         creation of the protection group, the supported-by-object-lists 
+         (sbol) attribute of a reliable resource may pint to an 
+         unreliable resource.  But, once the protection group is 
+         created, the sbol attribute would start pointing to the 
+         protection group object."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (2005) : protectionGroupR2 MOC
+         ITU-T Rec. G.744.3 : protectionGroupR1 MOC"
+    ::= { gcpProtGroup 1 }
+
+gcpProtGroupEntry OBJECT-TYPE
+    SYNTAX      GcpProtGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the gcpProtGroup table manages a protection group 
+         of H.248 GCP entities.  A protection group is a group of 
+         protecting and protection unis and the policies and 
+         configuration of switchover within the protection group.  
+         A separate side table (the gcpProtUnitTable) contains specifics 
+         abouot the protection units themselves.  The rows of the 
+         gcpProtGroupTable are indexed by the gcpProtGroupId that 
+         identifies the protection group.  Values of the gcpProtGroupId 
+         can be used to refer to an entry in this table."
+    REFERENCE   
+        "ITU-T Rec. G.744.3 : protectionGroup MOC"
+    INDEX       { gcpProtGroupId }
+    ::= { gcpProtGroupTable 1 }
+
+GcpProtGroupEntry ::= SEQUENCE {
+    gcpProtGroupId                      Unsigned32,
+    gcpProtGroupOperState               OperationalState,
+    gcpProtGroupAvailStatus             AvailabilityStatus,
+    gcpProtGroupType                    INTEGER,
+    gcpProtGroupRevertive               TruthValue,
+    gcpProtGroupSBOLNumber              Unsigned32,
+    gcpProtGroupWaitToRestoreTime       TimeInterval,
+    gcpProtGroupSettingWindowTime       TimeInterval,
+    gcpProtGroupReleaseingWindowTime    TimeInterval,
+    gcpProtGroupHitsCount               Unsigned32,
+    gcpProtGroupSwitchType              INTEGER,
+    gcpProtGroupProtectedUnits          ProtectionUnits,
+    gcpProtGroupProtectingUnits         ProtectionUnits,
+    gcpProtGroupInvokeProtection        ActionOrResult,
+    gcpProtGroupReleaseProtection       ActionOrResult,
+    gcpProtGroupRowStatus               RowStatus
+}
+
+gcpProtGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the gcpPrtoGroupTable.  
+         This unsigned integer uniquely identifies the protection group 
+         within the managed system."
+    ::= { gcpProtGroupEntry 1 }
+
+gcpProtGroupOperState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the protection group in 
+         accordance with the OperationalState textual convention of the 
+         OPENSS7-SMI-MIB and ITU-T Rec. X.721 | ISO/IEC 10165-2.  This 
+         object is single-value and read-only.  It can assume on of the 
+         following defined states:
+         
+         - enabled(0), the protection group is operational an ready for 
+           use;
+           
+         - disabled(1), the protection group is not available for use.
+           
+         A change in operational state shall generate a state change 
+         notification."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               operationalState attribute."
+    ::= { gcpProtGroupEntry 2 }
+
+gcpProtGroupAvailStatus OBJECT-TYPE
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "This attribute reflects the availability status of the 
+         protection group in accordance with the AvailabilityStatus 
+         textual convention of the OPENSS7-SMI-MIB and ITU-T Rec. X.721 
+         | ISO/IEC 10165-2.  The object is single-valued and read-only.  
+         It can assume one of the following defined values:
+         
+         - inTest(0): the protection group is undergoing a test 
+           procedure;
+         
+         - failed(1): the protection group has an internal fault that 
+           prevents it from operating; the operational state is 
+           disabled(1);
+         
+         - powerOff(2): not used;
+         
+         - offLine(3): the protection group is off line; the operational 
+           state is disabled(1);
+         
+         - offDuty(4): the protection group has been made inactive by an 
+           internal control process in accordance with a predetermined 
+           schedule;
+         
+         - dependency(5): the protection group cannot operate because 
+           some other resource upon which it depends is unavailable; the 
+           operational state is disabled(0);
+         
+         - degraded(6): the redundancy (or capacity) provided by the 
+           protection group is degraded; however, the protection group 
+           remains available for service, either because some services 
+           are satisfactory or because degraded service is preferable to 
+           no service at all; the operational state is enabled(1);
+         
+         - notInstalled(7): not used;
+         
+         - logFull(8): not used.
+         
+         No state change notification is generated when this attribute 
+         chages value."
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               availabilityStatus attribute."
+    ::= { gcpProtGroupEntry 3 }
+
+gcpProtGroupType OBJECT-TYPE
+    SYNTAX      INTEGER { plus(0), colon(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This attribute specifies whether the protection scheme used is 
+         1 + 1 (plus) or M:N (colon). M:N includes the cases where 
+         M = 1 and/or N = 1.  Note that plus(0) tends to be 
+         a hotStandby(0) scenario, whereas colon(1) tends to be 
+         a coldStandby(1) scenario."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 : protectionGroupType ATTRIBUTE"
+    ::= { gcpProtGroupEntry 4 }
+
+gcpProtGroupRevertive OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This attribute specifies whether the protection scheme is 
+         revertive or not.
+         
+         - true(1), the traffic is returned to the protected 
+           gcpProtUnitId instance that initiated the switch after the 
+           fault clears and the gcpProtGroupWaitToRestoreTime interval 
+           (if any) has expired.
+           
+         - false(2), then after the fault has cleared, traffic does not 
+           revert to the gcpProtUnitId that initiated the switch."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 : revertive ATTRIBUTE"
+    ::= { gcpProtGroupEntry 5 }
+
+gcpProtGroupSBOLNumber OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "protection units"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The supported-by object list is an attribute type whose value 
+         identifies a set of object instances which are capable of 
+         directly affecting a given managed object.  The object 
+         instances include both physical and logical objects. This 
+         attribute does not force internal details to be specified, but 
+         only the necessary level of detail required for management. If 
+         the object instances supporting the managed object are unknown 
+         to that object, then this attribute is an empty set.
+         
+         The list is provided in the gcpSbolTable indexed by the 
+         gcpProtGroupId and the gcpSbolId that identifies a member of 
+         the group.  This object reports the length of the list.  When 
+         this value is zero (0), there are no entries in the 
+         gcpSbolTable side-table fro this gcpProtGroupId."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (1992) : supportedByObjectList 
+               ATTRIBUTE"
+    ::= { gcpProtGroupEntry 6 }
+
+gcpProtGroupWaitToRestoreTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This attribute specifies the amount of time, in seconds, to 
+         wait after a fault clears before restoring traffic to the 
+         protected protection unit that initiated the switching.  Note 
+         that this time only has an effect when gcpProtGroupRevertive is 
+         true(1)."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 : waitToRestoreTime ATTRIBUTE"
+    ::= { gcpProtGroupEntry 7 }
+
+gcpProtGroupSettingWindowTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This read-write attribute specifies the criteria of the 
+         locked-in condition. The criteria includes the automatic 
+         protection switching (APS) rate and the associated setting and 
+         releasing time windows. If the number of APS of a Protection 
+         Unit reaches the value specified in the hitsCount 
+         (rtpswPgHitsCount) field within a moving time window of 
+         specified length, the Protection Unit will enter the locked-in 
+         condition.  Each switch to protection and its subsequent 
+         release is considered as one hit. The length of the time window 
+         for entering the locked-in condition is specified in the 
+         settingWindowTime (gcpProtGroupSettingWindowTime) field.  Once 
+         a Protection Unit is in the locked-in condition, future request 
+         of APS will be denied until the locked-in condition is 
+         released.  The release criterion is no APS request within 
+         another moving time window.  The length of this time window is 
+         specified in the releasingWindowTime 
+         (gcpProtGroupReleasingWindowTime) field."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 : lockedInCondition ATTRIBUTE"
+    ::= { gcpProtGroupEntry 8 }
+
+gcpProtGroupReleaseingWindowTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This read-write attribute specifies the criteria of the 
+         locked-in condition. The criteria includes the automatic 
+         protection switching (APS) rate and the associated setting and 
+         releasing time windows. If the number of APS of a Protection 
+         Unit reaches the value specified in the hitsCount 
+         (gcpProtGroupHitsCount) field within a moving time window of 
+         specified length, the Protection Unit will enter the locked-in 
+         condition.  Each switch to protection and its subsequent 
+         release is considered as one hit. The length of the time window 
+         for entering the locked-in condition is specified in the 
+         settingWindowTime (gcpProtGroupSettingWindowTime) field.  Once 
+         a Protection Unit is in the locked-in condition, future request 
+         of APS will be denied until the locked-in condition is 
+         released.  The release criterion is no APS request within 
+         another moving time window.  The length of this time window is 
+         specified in the releasingWindowTime 
+         (gcpProtGroupReleasingWindowTime) field."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 : lockedInCondition ATTRIBUTE"
+    ::= { gcpProtGroupEntry 9 }
+
+gcpProtGroupHitsCount OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This read-write attribute specifies the criteria of the 
+         locked-in condition. The criteria includes the automatic 
+         protection switching (APS) rate and the associated setting and 
+         releasing time windows. If the number of APS of a Protection 
+         Unit reaches the value specified in the hitsCount 
+         (gcpProtGroupHitsCount) field within a moving time window of 
+         specified length, the Protection Unit will enter the locked-in 
+         condition.  Each switch to protection and its subsequent 
+         release is considered as one hit. The length of the time window 
+         for entering the locked-in condition is specified in the 
+         settingWindowTime (gcpProtGroupSettingWindowTime) field.  Once 
+         a Protection Unit is in the locked-in condition, future request 
+         of APS will be denied until the locked-in condition is 
+         released.  The release criterion is no APS request within 
+         another moving time window.  The length of this time window is 
+         specified in the releasingWindowTime 
+         (gcpProtGroupReleasingWindowTime) field."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 : lockedInCondition ATTRIBUTE"
+    ::= { gcpProtGroupEntry 10 }
+
+gcpProtGroupSwitchType OBJECT-TYPE
+    SYNTAX      INTEGER { manual(0), forced(1), lockout(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The invoke and release protection actions can be used to 
+         request a lockout, a forced switch, or a manual (i.e. normal 
+         switch) on one or more protection unit instances contained in 
+         the protection group.
+          
+         - manual(0): peforms a manual protection invocation (from 
+           a protected unit to a protecting unit); or a manual 
+           protection release (from a protecting unit to a protected 
+           unit);
+          
+         - forced(1): performs a forced protection invocation (from 
+           a protected unit to a protecting unit); or a forced 
+           protection release (from a protecting unit to a protected 
+           unit);
+          
+         - lockout(2): performs a lockout invocation (applying lockout 
+           to protected and protecting units); or a lockout release 
+           (removing lockout from protected and protecting units).
+          
+         This object is written with the switch type applicable to an 
+         action before writting the gcpProtGroupInvokeProtection or 
+         gcpProtGroupReleaseProtection objects to invoke the action.
+          "
+    REFERENCE   
+        "ITU-T Rec. G.774.3 (2001) 
+               : InvokeProtectionArgs.SwitchType
+         ITU-T Rec. G.774.3 (2001) 
+               : ReleaseProtectionArgs.SwitchType"
+    ::= { gcpProtGroupEntry 11 }
+
+gcpProtGroupProtectedUnits OBJECT-TYPE
+    SYNTAX      ProtectionUnits
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies and indicates a list of protection units acting as 
+         protected units within this protection group, using the 
+         ProtectedUnits textual convention.
+          
+         When read, this object returns a list of all the protection 
+         units in the protection group that are protected units.
+          
+         When written, this object accepts a list of zero or more 
+         protection units in the protection group to be applied as the 
+         protected units to either a concurrent or subsequent 
+         invokeProtection or releaseProtection action.
+          
+         The value read from this object may not necessarily be the same 
+         as the value last written.
+          
+         This object is written with the protected units applicable to 
+         an action before writting the gcpProtGroupInvokeProtection or 
+         gcpProtGroupReleaseProtection objects to invoke the action.
+          "
+    REFERENCE   
+        "ITU-T Rec. G.774.3 (2001) 
+               : InvokeProtectionArgs.ProtectionEntity
+         ITU-T Rec. G.774.3 (2001) 
+               : ReleaseProtectionArgs.ProtectionEntity"
+    ::= { gcpProtGroupEntry 12 }
+
+gcpProtGroupProtectingUnits OBJECT-TYPE
+    SYNTAX      ProtectionUnits
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies and indicates a list of protection units acting as 
+         protecting units within this protection group, using the 
+         ProtectedUnits textual convention.
+          
+         When read, this object returns a list of all the protection 
+         units in the protection group that are protecting units.
+          
+         When written, this object accepts a list of zero or more 
+         protection units in the protection group to be applied as the 
+         protecting units to either a concurrent or subsequent 
+         invokeProtection or releaseProtection action.
+          
+         The value read from this object may not necessarily be the same 
+         as the value last written.
+          
+         This object is written with the protecting units applicable to 
+         an action before writting the gcpProtGroupInvokeProtection or 
+         gcpProtGroupReleaseProtection objects to invoke the action.
+          "
+    REFERENCE   
+        "ITU-T Rec. G.774.3 (2001) 
+               : InvokeProtectionArgs.ProtectionEntity
+         ITU-T Rec. G.774.3 (2001) 
+               : ReleaseProtectionArgs.ProtectionEntity"
+    ::= { gcpProtGroupEntry 13 }
+
+gcpProtGroupInvokeProtection OBJECT-TYPE
+    SYNTAX      ActionOrResult
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The invokeProtection action can be used to request a lockout, 
+         a forced switch, or a manual (i.e. normal switch) on one or 
+         more protectionUnit instances contained in the protectionGroup 
+         object.  The action argument contains a request (Forced Switch, 
+         Manual Switch, or Lockout) and indications of the protected and 
+         protecting units to which the request applies.  If a protecting 
+         unit is identified in the protectedUnits field, or if 
+         a protected unit is identified in the protectingUnits field, 
+         the action fails.  If the request is Forced Switch or Manual 
+         Switch, the protectedUnits field shall identify one or more 
+         protection units.  If only one unit is identified in the 
+         protectedUnits field, and there is only one protecting unit in 
+         the protection group, the protectingUnits field may be omitted.  
+         If the protectingUnits field is present, it shall identify the 
+         same number of units as the protectedUnits field.  If the 
+         request is Lockout, the protectionEntity field may be absent, 
+         indicating that the request applies to all contained protection 
+         units.  If the protectionEntity field is present, any number of 
+         protection units may be identified in the protectedUnits and/or 
+         protectingUnits field, and either field may be absent.  For 
+         a Lockout request, the specified protected units and/or 
+         protecting units are locked out.  For requests that cannot be 
+         completed, either because the request is the protecting unit is 
+         serving a request of higher priority (in the error parameter of 
+         the CMIP APDU, reason: pre-empted), or failure occurs 
+         (failure), or timeout occurs (timeout), the reply shall 
+         indicate why the request could not be completed, and the 
+         request shall not be made pending.  The CMIP error APDU 
+         contains the failure reasons.
+         
+         Any write to this object invokes the protection for the 
+         associated protection group.  The gcpProtGroupSwitchType is 
+         used as the type of invocation; the last write to 
+         gcpProtGroupgProtectedUnits specifies the list of protected 
+         units; gcpProtGroupgProtectingUnits, protecting units.
+         
+         A read from this object returns the result of the last action 
+         invoked.  It may have one of the following values:
+         
+         - success(0): indicates that the last action was successful;
+           
+         - pending(1): indicates that the action is pending;
+           
+         - failure(2): indicates that the last action failed;
+           
+         - timeout(3): indicates that the last action timed out; and,
+           
+         - preempted(4): indicates that the last action was prempted by 
+           an operation of higher priority."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 (2001) : invokeProtection ACTION"
+    ::= { gcpProtGroupEntry 14 }
+
+gcpProtGroupReleaseProtection OBJECT-TYPE
+    SYNTAX      ActionOrResult
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The releaseProtection action can be used to release a lockout, 
+         a forced switch, or a manual (i.e. normal switch) on one or 
+         more protectionUnit instances contained in the protectionGroup 
+         object. The action argument contains a request (Forced Switch, 
+         Manual Switch, or Lockout) and indications of the protected and 
+         protecting units to which the request applies. If a protecting 
+         unit is identified in the protectedUnits field, or if 
+         a protected unit is identified in the protectingUnits field, 
+         the action fails. If the request is Forced Switch or Manual 
+         Switch, the protectedUnits field shall identify one or more 
+         protection units, and the protectingUnits field shall be 
+         omitted. For each identified protected unit, if it is not 
+         switched to a protecting unit, the action fails. If the request 
+         is Lockout, the protectionEntity field may be absent, 
+         indicating that the request applies to all contained protection 
+         units. If the protectionEntity field is present, any number of 
+         protection units may be identified in the protectedUnits and/or 
+         protectingUnits field, and either field may be absent. For 
+         a Lockout request, the specified protected units and/or 
+         protecting units are no longer locked out. That is, the 
+         protected units are now under protection and the protecting 
+         units are now capable of providing protection. For release 
+         requests which cannot be completed, the reply shall indicate 
+         why the request could not be completed.
+         
+         Any write to this object invokes the request for the associated 
+         protection group.  The gcpProtGroupSwitchType is used as the 
+         type of release; the last write to gcpProtGroupProtectedUnits 
+         specifies the list of protected units; 
+         gcpProtGroupProtectingUnits, protecting units.
+         
+         A read from this object returns the result of the last action 
+         invoked.  It may have one of the following values:
+         
+         - success(0): indicates that the last action was successful;
+         
+         - pending(1): indicates that an action is pending;
+         
+         - failure(2): indicates that the last action failed; and,
+         
+         - timeout(3): indicates that the last action timed out."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 (2001) : releaseProtection ACTION"
+    ::= { gcpProtGroupEntry 15 }
+
+gcpProtGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create and 
+         delete entries in this table.  Rows may also be created and 
+         deleted by the managed system as a part of system operation.
+         
+         If the name package is supported, a create request with a value 
+         for the name attribute that is already used by another instance 
+         of the same object class will be rejected."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpProtGroupEntry 16 }
+
+gcpSbolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpSbolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Proivdes a side-table for listing multiple suppported-by 
+         objects in a list."
+    ::= { gcpProtGroup 2 }
+
+gcpSbolEntry OBJECT-TYPE
+    SYNTAX      GcpSbolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the table is indexed by the protection group 
+         identifier (value of gcpProtGroupId) as well as an ordinal 
+         supported-by object list index (gcpSbolId).  This second index 
+         ranges is a positive non-zero ordinal that ranges from 1 to the 
+         number of supported-by object provided in the 
+         gcpProtGroupSBOLNumber column of the master table 
+         (gcpProtGroupTable).  The contents of the row is the RowPointer 
+         identifying the supported-by object at this ordinal."
+    INDEX       { gcpProtGroupId, gcpSbolId }
+    ::= { gcpSbolTable 1 }
+
+GcpSbolEntry ::= SEQUENCE {
+    gcpSbolId       Unsigned32,
+    gcpSbolObject   RowPointer,
+    gcpSbolStatus   RowStatus
+}
+
+gcpSbolId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index that identifies the position 
+         with the supported-by object list of a particular object.  It 
+         ranges from 1 to the protGroupSBOLNumber column value for the 
+         corresponding protGroupId value in the protectionGroupTable."
+    ::= { gcpSbolEntry 1 }
+
+gcpSbolObject OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Identifies one supported-by object in the supported-by object 
+         list for the indexed gcpProtGroupId, using the RowPointer 
+         textual convention."
+    ::= { gcpSbolEntry 2 }
+
+gcpSbolStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may add or 
+         remove rows from this table.  Removing an object from the 
+         interior ordinal of a sub-list results in the renumbering of 
+         the indices of subsequent objects.  Requesting creation of an 
+         object that already exists and has different values than the 
+         existing entry can be viewed as an insert by the managed 
+         system, resulting in the renumbering of the indices of 
+         subsequent objects."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpSbolEntry 3 }
+
+gcpProtUnit OBJECT IDENTIFIER
+    ::= { gcpTables 8 }
+
+gcpProtUnitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpProtUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A protection unit object represents a protected (i.e.  working, 
+         regular, or preferred) unit or a protecting (i.e. backup or 
+         standby) unit.  For a protecting protection unit, the attribute 
+         protecting shall have the value TRUE.  For a protectd 
+         protection unit, the attribute protecting shall have the value 
+         FALSE.  The value of the unreliableResourcePointer attribute 
+         points to an unreliable resource (e.g. equipment hardware or 
+         termination point) that is associated with the protectionUnit 
+         instance.  The value of the reliableResourcePointer attribute 
+         points to a reliable resource (e.g. termination point) that is 
+         associated with the protectionUnit instance.
+         
+         If the attributeValueChangeNotificationPackage is present, then 
+         changes to the unreliableResourcePointer or the 
+         reliableResourcePointer attribute shall cause an 
+         attributeValueChange notification to be emitted.
+         
+         The protectionUnitR1 managed object class is used to manage the 
+         protected (i.e. working, regular or preferred) or protecting 
+         (i.e. backup or standby) resource in a protection system.  It 
+         relates the resources (e.g. circuit packs) invokved in the 
+         protection system and keeps track of the protection switching 
+         status of the resources."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (2005) : protectionUnitR1 MOC
+         ITU-T Rec. G.774.3 : protectionUnit MOC"
+    ::= { gcpProtUnit 1 }
+
+gcpProtUnitEntry OBJECT-TYPE
+    SYNTAX      GcpProtUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Instances of the protectionUnitR1 managed object class may be 
+         automatically created in the agent, e.g., immediately following 
+         the initialization of the NE resources (e.g. such as circuit 
+         pack) involved in the protection system, according to the 
+         make-up and mode of the NE.  Instances of this entity may be 
+         deleted by the agent, e.g. upon the deletion of the 
+         corresponding resource objects.  The agent may also create and 
+         delete instances of this object class to reflect local 
+         modifications in the protection schemes.
+         
+         (Instances of this object class may also be created or deleted 
+         as the result of management operations to the 
+         protectionCoordinator object (defined in ITU-T Rec.  G.774.9) 
+         of an NE, such as the establishProtection, dismissProtection 
+         and modifyProtection actions.)
+         
+         Two or more instances of the protectUnitR1 object may exist 
+         within an instance of the protectionGroupR2 object.
+         
+         An instance of the protectionUnitR1 object could contain an 
+         instance of the protectionCurrentData object (defined in ITU-T 
+         Rec. G.774.1).
+         
+         A protectionUnitR1 instance is related to instances of resource 
+         entities (e.g. Circuit Pack) via the unreliableReourcePointer 
+         attribute.  If the funciton of the resource entities (e.g. 
+         timing function, transport termination point function, etc.) is 
+         explicitly modelled as object instances in the NE, then 
+         a protectionUnitR1 instance is also related to instances of the 
+         modelled function entity via the reliableResourcePointer 
+         attribute.
+         
+         This object class has the following attributes:
+         
+         - gcpProtUnitProtectionStatus: Protection Status R1.  This 
+           read-only attribute indicates the status of the protection 
+           switch in a Protection Unit object.  The following behaviour 
+           applies to this attribute:
+           
+           - This attribute must be capable of indicating pending as 
+             well as active switching requests relative to the 
+             protection unit.  However, only one of the values lockout, 
+             forced switch, or manual switch can be present at the same 
+             time.
+             
+           - A protection system may support only a subset of the 
+             allowable values of this attribute.  The subset of values 
+             to be supported by a system is implementation-specific.
+             
+           - The syntax of this attribute indicates a subfield 
+             'relatedUnit' that is of ASN.1 CHOICE of 
+             'fromProtectionUnitNumber' and 'toProtectionUnitNumber'.  
+             This subfield is used to indicate on which unit the service 
+             is carried.
+             
+             - For a protected PU, both the fromProtectionUnitNumber 
+               (fromPU#) and the toProtectionUnitNumber (toPU#) hold the 
+               ID of the related protecting PU.  When switching to the 
+               protecting PU (i.e. service will be carried by the 
+               protecting PU), the toProtectionUnitNumber choice is 
+               used.  When switching back to the protected PU (service 
+               will be carried by the protected PU), the 
+               fromProtectionUnitNumber choice is used.
+               
+             - For a protecting PU, both the fromProtectionUnitNumber 
+               (fromPU#) and the toProtectionUnitNumber (toPU#) hold the 
+               ID of the related protected PU.  When switching to the 
+               protected PU (i.e. service will be carried by the 
+               protected PU), the toProtectionUnitNumber choice is used.  
+               When swtiching to the protecting PU (service will be 
+               carried by the protecting PU), the 
+               fromProtectionUnitNumber choice is used.
+               
+           - If a system can support protection switching due to 
+             Resource Degrade (RD) besides Resource Fail (RF), 
+             protection switching of RD is similar to that in the 
+             subsequent description for RF.
+             
+           - The following allowable Protection Status values are 
+             associated with each protected Protection Unit (PU).
+             
+             - No Request: No switch request is present on the unit.  In 
+               this case, services is on the protected PU, status syntax 
+               is noRequest.  For non-revertive system, the status 
+               syntax of the related protecting PU is also noRequest.
+               
+             - Manual Switch to Protecting Unit Complete: The unit has 
+               completed a Manual Switch.  In this case, service is on 
+               the related protecting PU, status suntax of the protected 
+               PU is manualSwitch (switchStatus: completed; relatedUnit 
+               toPU#).  Status syntax of the related protecting PU is 
+               manualSwitch (switchStatus: completed; relatedUnit: 
+               fromPU#).
+               
+             - Release Faild: A time-out occurs while waiting for 
+               a release.  In this case, service is still on the 
+               protecting PU, status syntax is releaseFailed plus the 
+               previous status, such as manualSwitch (switchStatus: 
+               completed, relatedUnit: toPU#).  Status syntax of the 
+               related protecting PU is still the previous status, such 
+               as manualSwitch (switchStatus: completed; relatedUnit: 
+               fromPU#).
+               
+             - Automatic Switch (RF) Pending: The unit has a Fail 
+               condition present and the protecting unit is unavailable.  
+               In this case, service is still on the protected PU, 
+               status syntax is autoSwitch (switchStatus: pending; 
+               relatedUnit: toPU#; reason: RF). Status syntax of the 
+               related protecting PU is autoSwitch (switchStatus: 
+               pending, relatedUnit: fromPU#; reason: RF) plus its 
+               previous status.
+               
+             - Automatic Swtich (RF) Complete: The unit has completed an 
+               Automatic Switch to the protecting unit due to an 
+               Equipment Fail condition.  In this case, service is on 
+               the related protecting PU, status syntax of the protected 
+               PU is autoSwitch (switchStatus: completed; relatedUnit: 
+               toPU#; reason: RF).  Status syntax of the related 
+               protecting PU is autoSwitch (switchStatus: completed; 
+               relatedUnit: fromPU#; reason: RF).
+               
+             - Automatic Switch (RF) Present, Operate failed: An 
+               automatic switch (RF) request is in progress and 
+               a time-out occurs while waiting for completion.  In this 
+               case, service is still on the protected PU, status syntax 
+               is autoSwitch (switchStatus: failed; relatedUnit: toPU#; 
+               reason: RF).  Status syntax of the related protecting PU 
+               is autoSwitch (switchStatus: pending;  relatedUnit: 
+               fromPU#; reason: RF) plus its previous status."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (2005) : protectionUnitR1 MOC
+         ITU-T Rec. G.774.3 : protectionUnit MOC"
+    INDEX       { gcpProtUnitId }
+    ::= { gcpProtUnitTable 1 }
+
+GcpProtUnitEntry ::= SEQUENCE {
+    gcpProtUnitId                           Unsigned32,
+    gcpProtUnitProtecting                   TruthValue,
+    gcpProtUnitReliableResourcePointer      RowPointer,
+    gcpProtUnitUnreliableResourcePointer    RowPointer,
+    gcpProtUnitProtectionStatus             ProtectionStatus,
+    gcpProtUnitRequestSource                INTEGER,
+    gcpProtUnitSwitchStatus                 INTEGER,
+    gcpProtUnitSwitchDirection              INTEGER,
+    gcpProtUnitRelatedUnit                  Unsigned32,
+    gcpProtUnitAutoSwitchReason             INTEGER,
+    gcpProtUnitLockoutReleaseFailed         TruthValue,
+    gcpProtUnitPriority                     Unsigned32,
+    gcpProtUnitRowStatus                    RowStatus
+}
+
+gcpProtUnitId OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides an index into the protection unit table.  A maximum of 
+         255 protection units are allowed per protection group.
+         
+         Protection Unit Id.  This read-only attribute provides a unique 
+         name for the protection unit instance within the containing 
+         protection group object."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 : protectionUnitId ATTRIBUTE"
+    ::= { gcpProtUnitEntry 1 }
+
+gcpProtUnitProtecting OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This attribute specifies the type of the protectionUnit. 
+         A value of TRUE indicates that the protectionUnit is 
+         a protecting (i.e. backup or standby) unit.  A value of FALSE 
+         indicates that the protectionUnit is a protected (i.e. 
+         a regular, working, or preferred) unit.
+         
+         This read-only attribute identifies whether or not the 
+         protection unit is associated with a resource providing 
+         a protecting (true) or protected (false) role in the protection 
+         system."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 : protecting ATTRIBUTE"
+    ::= { gcpProtUnitEntry 2 }
+
+gcpProtUnitReliableResourcePointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value of the reliableResourcePointerR1 attribute points to 
+         the reliable resource(s) (e.g. the functional objects) that 
+         is/are associated with the Protection Unit instance.
+         
+         Unreliable Resource Pointer.  This read-only attribute 
+         identifies the unreliable resource (e.g. circuit pack entity) 
+         associated with the protection unit object (e.g. the actual 
+         protected or protecting resource).  The syntax of this 
+         attribute is set-valued and could point to multiple instances 
+         of unreliable resources when a set of resources forms an atomic 
+         unit in the protection system."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (2005) : reliableResourcePointer 
+               ATTRIBUTE"
+    ::= { gcpProtUnitEntry 3 }
+
+gcpProtUnitUnreliableResourcePointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "The value of the unreliableResourcePointerR1 attribute points 
+         to the unreliable resource(s) (e.g. circuit pack) that is/are 
+         associated with the Protection Unit instance.
+         
+         Reliable Resource Pointer: This read-only attribute identifies 
+         the reliable resource (i.e. the functional entity), if there is 
+         any, associated with the protection unit.  The value of this 
+         attribute of a protection unit (PU) will change when the PU is 
+         involved in a protection switch or release.  For a protected 
+         PU, when it is not switched, this attribute points to NULL.  
+         For a protecting PU, when it is not switched, this attribute is 
+         pointer to NULL, and when it is switched, this attribute is 
+         point to the associated reliable resource (i.e. the functional 
+         object).  The syntax of this attribute is set-valued and could 
+         point to multiple instances of reliable resource when a set of 
+         functional objects form an atomic unit in the protection 
+         system.  Examples of usage of this attribute are provided in 
+         M.3100 (2005) E.3."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (2005) : unreliableResourcePointer 
+               ATTRIBUTE"
+    ::= { gcpProtUnitEntry 4 }
+
+gcpProtUnitProtectionStatus OBJECT-TYPE
+    SYNTAX      ProtectionStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "
+         - noRequest(0),
+           
+         - doNotRevert(1), the protection unit is providing service and 
+           the protection group semantics does not allow revertive 
+           behaviour; the switch status is completed(2);
+           
+         - manualSwitch(2), when this condition is present, the 
+           gcpProtUnitSwitchStatus indicates the current switching 
+           status and the gcpProtUnitRequestSource indicates the source 
+           of the switching request; the gcpProtUnitRelatedUnit 
+           indicates the related (switched to or switched from) unit, 
+           and the gcpProtUnitSwitchDirection indicates the direction of 
+           switching;
+           
+         - autoSwitch(3), when this condition is present, the 
+           gcpProtUnitSwitchStatus indicates the current switching 
+           status and the gcpProtUnitRequestSource indicates the source 
+           of the switching request; the gcpProtUnitRelatedUnit 
+           indicates the related (switched to or switched from) unit, 
+           and the gcpProtUnitSwitchDirection indicates the direction of 
+           switching;
+           
+         - forcedSwitch(4), when this condition is present, the 
+           gcpProtUnitSwitchStatus indicates the current switching 
+           status and the gcpProtUnitRequestSource indicates the source 
+           of the switching request; the gcpProtUnitRelatedUnit 
+           indicates the related (switched to or switched from) unit, 
+           and the gcpProtUnitSwitchDirection indicates the direction of 
+           switching;
+           
+         - lockout(5), the protection unit is locked out by management 
+           action; when this condition is present, the 
+           gcpProtUnitSwitchStatus indicates the current switching 
+           status and the gcpProtUnitRequestSource indicates the source 
+           of the lockout request;
+           
+         - releaseFailed(6), the protection unit is a protecting unit 
+           and release to the protected unit has failed;
+           
+         - resourceFailed(7), the protection unit has failed;
+           
+         - lockedIn(8), the unit has reached its maximum number of APS 
+           hits for the time window and is currently locked-in.
+         
+         This attribute is used to indicate the status of the protection 
+         switch in a protectionUnit instance. This attribute is 
+         set-valued because some requests are allowed to be pending.
+         
+         The following rule shall be followed:
+         
+         Only one of the values lockout, forcedSwitch, or manualSwitch 
+         can be present at the same time, either local or remote. It is 
+         also possible to have two or more pending automatic switch 
+         requests.
+         
+         The protectionStatus attribute of a protection Unit which 
+         provides protection is used to hold the protection request 
+         which is actually performed on that protectionUnit. Locally 
+         invoked management operations (e.g. manual, forced, lockout 
+         switch completions) can be overridden at the near end or the 
+         far end, but may only be released at the near end. Single-ended 
+         systems keep the status of local and far-end switch requests as 
+         separate entities in the protectionStatus attribute.
+         
+         The remainder of this behaviour provides the allowable 
+         protectionStatus attribute values for protected and protecting 
+         units for both revertive and non-revertive systems.
+         
+         The following allowable protectionStatus values are associated 
+         with each protected unit:
+         
+         - No Request: No switch request is present on the unit.
+           
+         - Manual Switch to Protecting Complete: The unit has completed 
+           a Manual Switch. Release failed A switch has been released or 
+           pre-empted and a timeout occurs while waiting for a release 
+           of associated bridges, or the near-end switch.
+           
+         - Automatic Switch (SF) Pending: The unit has a Signal Fail 
+           condition present and the protecting unit is unavailable.
+           
+         - Automatic Switch (SD) Pending: The unit has a Signal Degrade 
+           condition present and the protecting unit is unavailable.
+           
+         - Automatic Switch (SF) Complete: The unit has completed an 
+           Automatic Switch to the protecting unit due to a Signal Fail 
+           condition.
+           
+         - Automatic Switch (SD) Complete: The unit has completed an 
+           Automatic Switch to the protecting unit due to a Signal 
+           Degrade condition.
+           
+         - Automatic Switch (SF) Present, Operate failed: An automatic 
+           switch (SF) request is in progress and a time-out occurs 
+           while waiting for completion.
+           
+         - Automatic Switch (SD) Present, Operate failed: An automatic 
+           switch (SD) request is in progress and a time-out occurs 
+           while waiting for completion. Force Switch Complete,
+           
+         - Automatic Switch (SF) Pending: The unit has completed a Force 
+           Switch. Additionally, the unit has an automatic switch (SF) 
+           pending.
+           
+         - Force Switch Complete, Automatic Switch (SD) Pending: The 
+           unit has completed a Force Switch. Additionally, the unit has 
+           an automatic switch (SD) pending.
+           
+         - Automatic Switch Complete, Wait-to-Restore: The unit has 
+           completed an Automatic Switch to the protecting unit.
+           
+         - Force Switch Complete: The unit has completed a Force Switch 
+           to the protecting unit.
+           
+         - Protected Unit Lockout Completed: The unit has been locked 
+           out from the protecting unit.
+           
+         - Protected Unit Lockout complete, Operate Failed: The unit has 
+           been locked out from the protecting unit, and, the previously 
+           completed switch could not be released within the expected 
+           time-out. When the switch is released, the operate failed 
+           status is removed. Additionally, the non-revertive protected 
+           protection unit has the following status values: Do Not 
+           Revert The protected unit has been switched to the protecting 
+           unit and the request to do so has been released. The switch 
+           to the protecting unit is maintained.
+           
+         - Manual Switch to Protected Unit Complete: The unit has 
+           completed a Manual Switch from the protecting unit to the 
+           protected unit.
+           
+         - Force Switch to Protected Unit Complete: The unit has 
+           completed a Force Switch from the protecting unit to the 
+           protected unit.
+           
+         - Automatic Switch (SF) to Protected Unit Complete: The 
+           protecting unit has a Signal Fail condition present and 
+           traffic is now being carried on the protected unit.
+           
+         - Automatic Switch (SD) to Protected Unit Complete: The 
+           protecting unit has a Signal Degrade condition present and 
+           traffic is now being carried on the protected unit.
+           
+         - Automatic Switch (SD) to Protected Unit Complete, Signal 
+           Degrade Present: The protecting unit has a Signal Degrade 
+           condition present and traffic is now being carried on the 
+           protected unit.  Additionally, the protected unit has 
+           a Signal Degrade condition present.
+           
+         - Automatic Switch (SF) to Protected Unit Complete, Signal 
+           Degrade Present: The protecting unit has a Signal Fail 
+           condition present and traffic is now being carried on the 
+           protected unit.  Additionally, the protected unit has 
+           a Signal Degrade condition present.
+           
+         - Force Switch from Protecting Unit Complete, Automatic Switch 
+           (SF) Pending: The unit has completed a Force Switch from the 
+           protecting unit to the protected unit. Additionally, the 
+           protected unit has an automatic switch (SF) condition 
+           present.
+           
+         - Force Switch from Protecting Unit Complete, Automatic Switch 
+           (SD) Pending: The unit has completed a Force Switch from the 
+           protecting unit to the protected unit. Additionally, the 
+           protected unit has an automatic switch (SD) condition 
+           present. The following allowable protectionStatus values are 
+           associated with each protecting unit: No Request No request 
+           is present on the protecting unit.
+           
+         - Manual Switch to Protecting Unit Complete: The protected unit 
+           has completed a Manual Switch.
+           
+         - Automatic Switch Complete (SF) to Protecting Unit: The 
+           protected unit has completed an automatic switch (SF) to the 
+           protecting unit.
+           
+         - Automatic Switch Complete (SD) to Protecting Unit: The 
+           protected unit has completed an automatic switch (SD) to the 
+           protecting unit.
+           
+         - Automatic Switch Complete (SD) to Protecting Unit, Protecting 
+           Unit Signal Degraded: The protected unit has completed an 
+           automatic switch to the protecting unit.  Additionally, the 
+           protecting unit has a Signal Degrade condition present. This 
+           applies to 1:n systems only.
+           
+         - Automatic Switch Complete (SF) to Protecting Unit, Protecting 
+           Unit Signal Degraded: The protected unit has completed an 
+           automatic switch to the protecting unit.  Additionally, the 
+           protecting unit has a Signal Degrade condition present. This 
+           applies to 1:n systems only.
+           
+         - Protecting Unit SD Present: The protecting unit has a Signal 
+           Degrade condition present.  This state may also be a result 
+           of invalid or toggling APS byte values. This applies to 1:n 
+           systems only.
+           
+         - Protecting Unit SF Present: The protecting unit has a Signal 
+           Fail condition present.  This state may also be a result of 
+           invalid or toggling APS byte values.  This applies to 1:n 
+           systems only.
+           
+         - Force Switch Complete to Protecting Unit: The unit has 
+           completed a Force Switch of a protected unit to the 
+           protecting unit.
+           
+         - Force Switch Complete to Protecting Unit, SD Present on 
+           Protecting Unit: The unit has completed a Force Switch of 
+           a protected unit to the protecting unit.  Additionally, there 
+           is a Signal Degrade present on the protecting unit.
+           
+         - Force Switch Complete to Protecting, SF Present on Protecting 
+           Unit: The unit has completed a Force Switch of a protected 
+           unit to the protecting unit.  Additionally, there is a Signal 
+           Fail (1 + 1 unidirectional systems only) present on the 
+           protecting unit.
+           
+         - Protecting Unit Locked Out: The protecting unit has been 
+           locked out.
+           
+         - Protecting Unit Locked Out, Release Failed: A release of 
+           a lockout is in progress and a timeout occurs waiting for the 
+           lockout condition to clear.  Additionally, the non-revertive 
+           protecting unit has the following values: Do Not Revert The 
+           protected unit has been switched to the protecting unit and 
+           the request to do so has been released. The switch to the 
+           protecting unit is maintained.
+           
+         - Manual Switch to Protected Unit Complete: The unit has 
+           completed a Manual Switch from the protecting unit to the 
+           protected unit.
+           
+         - Force Switch to Protected Unit Complete: The protecting unit 
+           has completed a forced switch to the protected unit.
+           
+         - Force Switch to Protected Unit Complete, Protecting Unit 
+           Signal Degraded: The protecting unit has completed a forced 
+           switch to the protected unit.  Additionally, there is 
+           a Signal Degrade condition on the protecting unit.
+           
+         - Force Switch to Protected Unit Complete, Protecting Unit 
+           Signal Failed: The protecting unit shows a forced switch to 
+           the protected unit.  Additionally, there is a Signal Fail 
+           condition on the protecting unit.
+           
+         - Automatic Switch (SF) to Protected Unit Complete: The 
+           protecting unit has a Signal Fail condition present and 
+           traffic is now being carried on the protected unit.
+           
+         - Automatic Switch (SD) to Protected Unit Complete: The 
+           protecting unit has a Signal Degrade condition present and 
+           traffic is now being carried on the protected unit.
+           
+         - Automatic Switch Complete (SD) to Protecting, Automatic 
+           Switch (SD) to Protected Unit Pending: The protected unit has 
+           completed an automatic switch to the protecting unit.  
+           Additionally, the protecting unit has a Signal Degrade 
+           condition present.
+           
+         - Automatic Switch Complete (SF) to Protecting, Automatic 
+           Switch (SD) to Protected Unit Pending: The protected unit has 
+           completed an automatic switch to the protecting unit.  
+           Additionally, the protecting unit has a Signal Degrade 
+           condition present.
+           
+         APS timeout detected by the exerciser, or, during an attempt to 
+         invoke a manual or forced switch will not be indicated as APS 
+         failure (operate or release fail) in the protectionStatus 
+         attribute. Instead, the actionReply for the invoked action will 
+         report this.  Additionally, attribute lastAttemptResult will 
+         provide a record of the failure, until a successful exercise or 
+         protection switch causes this attribute to be cleared."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (2005) : protectionStatusR1 
+               ATTRIBUTE"
+    ::= { gcpProtUnitEntry 5 }
+
+gcpProtUnitRequestSource OBJECT-TYPE
+    SYNTAX      INTEGER { local(0), remote(1) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the source of a switching request when the protection 
+         status is manualSwitch(2), autoSwitch(3), forcedSwitch(4) or 
+         lockout(5).  The value indicates whether the source of the 
+         request was local or remote.
+         
+         - local(0), when indicated for a manual or lockout switching 
+           operation, the request was local to the system (e.g, from 
+           a local EMS); when indicated for an automatic protection 
+           switch, the detection of failure or degradation was detected 
+           locally.
+           
+         - remote(1), when indicated for a manual or lockout switching 
+           operation, the request was remote from the system (e.g, from 
+           an NMS or a remote GCP entity); when indicated for an 
+           automatic protection switch, the detection of failure or 
+           degradation was detected remotely.
+           
+           "
+    REFERENCE   
+        "ITU-T Rec. G.774.3 SDHProtASN1:RequestSource"
+    ::= { gcpProtUnitEntry 6 }
+
+gcpProtUnitSwitchStatus OBJECT-TYPE
+    SYNTAX      INTEGER { pending(0), completed(1), operateFailed(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the status of the current protection switch 
+         when gcpProtUnitProtectionStatus contains manualSwitch(2), 
+         autoSwitch(3), forcedSwitch(4) or lockout(5).  The switch 
+         status has the following defined states:
+         
+         - pending(0), the protection switch has been initiated but is 
+           still pending;
+           
+         - completed(1), the protection switch has completed;
+           
+         - operateFailed(2), the protection switch has failed and the 
+           switched-from protection unit is still the unit providing 
+           service."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 SDHProtASN1:SwitchStatus"
+    ::= { gcpProtUnitEntry 7 }
+
+gcpProtUnitSwitchDirection OBJECT-TYPE
+    SYNTAX      INTEGER { from(1), to(2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the last protection switch resulting in the 
+         current protection status was from the protection unit 
+         specified in gcpProtUnitRelatedUnit, or to that unit.  This 
+         value is only significant when the switching status is 
+         manualSwitch(2), autoSwitch(3) or forcedSwitch(4)."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 SDHProtASN1:FromAndToProtectionUnit"
+    ::= { gcpProtUnitEntry 8 }
+
+gcpProtUnitRelatedUnit OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the related unit when the switching status is 
+         manualSwitch(2), autoSwitch(3) or forcedSwitch(4). This is the 
+         index of the protection unit in the protection group that was 
+         switched from or switched to.  When the current row is the unit 
+         that was switched from, this value indicates the protection 
+         unit that was switched to; otherwise, it indicates the unit 
+         that was switched from.  The direction of protection switching 
+         is indicated in the gcpProtUnitSwitchDirection column."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 SDHProtASN1:FromAndToProtectionUnit"
+    ::= { gcpProtUnitEntry 9 }
+
+gcpProtUnitAutoSwitchReason OBJECT-TYPE
+    SYNTAX      INTEGER { waitToRestore(0), signalDegrade(1), 
+                    signalFail(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the reason for the APS when the protection status is 
+         autoSwitch(3). The reason can be one of the following defined 
+         reasons:
+         
+         - waitToRestore(0),
+         - signalDegrade(1),
+         - signalFail(2),"
+    REFERENCE   
+        "ITU-T Rec. G.774.3 SDHProtASN1:AutoSwitchReason"
+    ::= { gcpProtUnitEntry 10 }
+
+gcpProtUnitLockoutReleaseFailed OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { gcpProtUnitEntry 11 }
+
+gcpProtUnitPriority OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This attribute specifies the priority of the service (e.g.  
+         traffic) carried on the resource associated with the protected 
+         protectionUnit instance. Valid values for this attribute are 
+         integers, where the value 1 indicates the highest priority, and 
+         a larger value indicates a lower priority. For a protecting 
+         protectionUnit, the value of this attribute indicates the 
+         priority of choice of the protecting protectionUnit relative to 
+         other available protecting protectionUnit(s) within the same 
+         protectionGroup.  The lower the value, the more preferred the 
+         protectionUnit is relative to other protectionUnits.
+         
+         This read-write attribute specifies the priority of the service 
+         carried on the resource associated with the protection unit 
+         instance. Valid values for this attribute are integers, where 
+         the value 1 indicates the highest priority, and a larger value 
+         indicates a lower priority."
+    REFERENCE   
+        "ITU-T Rec. G.774.3 : priority ATTRIBUTE"
+    ::= { gcpProtUnitEntry 12 }
+
+gcpProtUnitRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may create or 
+         delete entries in this table.  Rows may also be created and 
+         deleted by the managed system as part of system operations."
+    REFERENCE   
+        "STD 58, SNMPv2-TC RowStatus."
+    ::= { gcpProtUnitEntry 13 }
 
 gcpOids OBJECT IDENTIFIER
     ::= { gcpMIB 4 }
@@ -2270,89 +4132,154 @@ gcpOids OBJECT IDENTIFIER
 gcpGroups OBJECT IDENTIFIER
     ::= { gcpMIB 5 }
 
-gcpObjectGroup OBJECT-GROUP
-    OBJECTS     { gcpDefaultSctpNoDelay }
-    STATUS      current
-        "A collection of all of the accessible objects in this 
-         module."
-    ::= { gcpGroups 1 }
-
-gcpSctpObjectGroup OBJECT-GROUP
-    OBJECTS     { gcpDefaultSctpNoDelay, gcpDefaultSctpMaxseg, 
-                  gcpDefaultSctpHeartbeatItvl, 
-                  gcpDefaultSctpHearbeat, 
-                  gcpDefaultSctpRtoInitial, 
-                  gcpDefaultSctpRtoMin, gcpDefaultSctpRtoMax, 
-                  gcpDefaultSctpPathMaxRetrans, 
-                  gcpDefaultSctpCookieLife, 
-                  gcpDefaultSctpCookieInc, 
-                  gcpDefaultSctpMaxInitRetries, 
-                  gcpDefaultSctpMaxBurst, 
-                  gcpDefaultSctpAssocMaxRetrans, 
-                  gcpDefaultSctpSackDelay, 
-                  gcpDefaultSctpLifetime, gcpSctpNoDelay, 
-                  gcpSctpMaxseg, gcpSctpHeartbeatItvl, 
-                  gcpSctpHearbeat, gcpSctpRtoInitial, 
-                  gcpSctpRtoMin, gcpSctpRtoMax, 
-                  gcpSctpPathMaxRetrans, gcpSctpCookieLife, 
-                  gcpSctpCookieInc, gcpSctpMaxInitRetries, 
-                  gcpSctpMaxBurst, gcpSctpAssocMaxRetrans, 
-                  gcpSctpSackDelay, gcpSctpLifetime, 
-                  gcpSctpRowStatus }
-    STATUS      current
-        "A collection of all of the accessible objects necessary to 
-         support SCTP as a transport for GCP."
-    ::= { gcpGroups 2 }
-
 gcpCompliance OBJECT IDENTIFIER
     ::= { gcpMIB 6 }
 
-gcpMgcCompliance MODULE-COMPLIANCE
+gcpProtectionSwitchReport NOTIFICATION-TYPE
+    OBJECTS     { tmnObjectInstance, gcpOldProtectionStatus, 
+                  gcpOldRequestSource, gcpOldSwitchStatus, 
+                  gcpOldSwitchDirection, gcpOldRelatedUnit, 
+                  gcpOldAutoSwitchReason, gcpNewProtectionStatus, 
+                  gcpNewRequestSource, gcpNewSwitchStatus, 
+                  gcpNewSwitchDirection, gcpNewRelatedUnit, 
+                  gcpNewAutoSwitchReason }
     STATUS      current
-    DESCRIPTION
-        "Provides a compliance profile that provides mandatory and 
-         optional compliance items for a Media Gateway Controller."
+    DESCRIPTION 
+        "Provides a notification of a protection switching event.  The 
+         tnmObjectInstance identifies the protect unit by object 
+         identifier (a RowPointer to the row in the gcpProtUnitTable for 
+         which the protection switch occurred.  The additional 
+         information includes both the old protection status and the new 
+         protection status."
+    ::= { gcpNotifications 1 }
 
-    MODULE      -- this module
-
-        MANDATORY-GROUPS        { gcpMgcMandatoryGroup }
-
-        GROUP   gcpMgcOptionalGroup
-        DESCRIPTION
-            "Groups that provide optional capabilities."
-
-    ::= { gcpCompliances 1 }
-
-gcpMgCompliance MODULE-COMPLIANCE
+gcpNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { gcpProtectionSwitchReport }
     STATUS      current
-    DESCRIPTION
-        "Provides a complicance profile that provides mandatory and 
-         optional compliance items for a Media Gateway."
+    DESCRIPTION 
+        "A collection of all of the accessible notifications in this 
+         module."
+    ::= { gcpGroups 1 }
 
-    MODULE      -- this module
+gcpObjectGroup OBJECT-GROUP
+    OBJECTS     { gcpOldProtectionStatus, gcpOldRequestSource, 
+                  gcpOldSwitchStatus, gcpOldSwitchDirection, 
+                  gcpOldRelatedUnit, gcpOldAutoSwitchReason, 
+                  gcpNewProtectionStatus, gcpNewRequestSource, 
+                  gcpNewSwitchStatus, gcpNewSwitchDirection, 
+                  gcpNewRelatedUnit, gcpNewAutoSwitchReason, 
+                  gcpDefaultMgcoIdent, gcpDefaultUdpChecksum, 
+                  gcpDefaultTcpNoDelay, gcpDefaultTcpMaxseg, 
+                  gcpDefaultTcpKeepAlive, gcpDefaultTcpKeepIdle, 
+                  gcpDefaultTcpKeepAliveItvl, gcpDefaultTcpKeepCount, 
+                  gcpDefaultTcpSynRetrans, gcpDefaultTcpWindowClamp, 
+                  gcpMgLocation, gcpMgName, gcpMgDomainName, 
+                  gcpMgDeviceName, gcpMgMtpAddress, gcpMgAdminState, 
+                  gcpMgOperState, gcpMgUsageState, gcpMgAvailStatus, 
+                  gcpMgProcStatus, gcpMgPg, gcpMgStandbyStatus, 
+                  gcpMgRowStatus, gcpMgcLocation, gcpMgcName, 
+                  gcpMgcDomainName, gcpMgcDeviceName, gcpMgcMtpAddress, 
+                  gcpMgcAdminState, gcpMgcOperState, gcpMgcUsageState, 
+                  gcpMgcAvailStatus, gcpMgcProcStatus, gcpMgcPg, 
+                  gcpMgcStandbyStatus, gcpMgcRowStatus, gcpLinkageType, 
+                  gcpLinkageMgcAddress, gcpLinkageMgAddress, 
+                  gcpLinkageMgcIdent, gcpLinkageMgIdent, 
+                  gcpLinkageProfile, gcpLinkageProtocol, 
+                  gcpLinkageEncoding, gcpLinkageAuthAccess, 
+                  gcpLinkageAdminState, gcpLinkageOperState, 
+                  gcpLinkageProcStatus, gcpLinkageAvailStatus, 
+                  gcpLinkageAuthentication, gcpLinkageRowStatus, 
+                  gcpUdpChecksum, gcpUdpRowStatus, gcpTcpNoDelay, 
+                  gcpTcpMaxseg, gcpTcpKeepAlive, gcpTcpKeepIdle, 
+                  gcpTcpKeepAliveItvl, gcpTcpKeepCount, gcpTcpSynRetrans, 
+                  gcpTcpWindowClamp, gcpTcpRowStatus, 
+                  gcpDefaultSctpNoDelay, gcpDefaultSctpMaxseg, 
+                  gcpDefaultSctpHeartbeatItvl, gcpDefaultSctpHearbeat, 
+                  gcpDefaultSctpRtoInitial, gcpDefaultSctpRtoMin, 
+                  gcpDefaultSctpRtoMax, gcpDefaultSctpPathMaxRetrans, 
+                  gcpDefaultSctpCookieLife, gcpDefaultSctpCookieInc, 
+                  gcpDefaultSctpMaxInitRetries, gcpDefaultSctpMaxBurst, 
+                  gcpDefaultSctpAssocMaxRetrans, gcpDefaultSctpSackDelay, 
+                  gcpDefaultSctpLifetime, gcpSctpNoDelay, gcpSctpMaxseg, 
+                  gcpSctpHeartbeatItvl, gcpSctpHearbeat, 
+                  gcpSctpRtoInitial, gcpSctpRtoMin, gcpSctpRtoMax, 
+                  gcpSctpPathMaxRetrans, gcpSctpCookieLife, 
+                  gcpSctpCookieInc, gcpSctpMaxInitRetries, 
+                  gcpSctpMaxBurst, gcpSctpAssocMaxRetrans, 
+                  gcpSctpSackDelay, gcpSctpLifetime, gcpSctpRowStatus, 
+                  gcpProtGroupOperState, gcpProtGroupAvailStatus, 
+                  gcpProtGroupType, gcpProtGroupRevertive, 
+                  gcpProtGroupSBOLNumber, gcpProtGroupWaitToRestoreTime, 
+                  gcpProtGroupSettingWindowTime, 
+                  gcpProtGroupReleaseingWindowTime, 
+                  gcpProtGroupHitsCount, gcpProtGroupSwitchType, 
+                  gcpProtGroupProtectedUnits, 
+                  gcpProtGroupProtectingUnits, 
+                  gcpProtGroupInvokeProtection, 
+                  gcpProtGroupReleaseProtection, gcpProtGroupRowStatus, 
+                  gcpSbolObject, gcpSbolStatus, gcpProtUnitProtecting, 
+                  gcpProtUnitReliableResourcePointer, 
+                  gcpProtUnitUnreliableResourcePointer, 
+                  gcpProtUnitProtectionStatus, gcpProtUnitRequestSource, 
+                  gcpProtUnitSwitchStatus, gcpProtUnitSwitchDirection, 
+                  gcpProtUnitRelatedUnit, gcpProtUnitAutoSwitchReason, 
+                  gcpProtUnitLockoutReleaseFailed, gcpProtUnitPriority, 
+                  gcpProtUnitRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of all of the accessible objects in this 
+         module."
+    ::= { gcpGroups 2 }
 
-        MANDATORY-GROUPS        { gcpMgMandatoryGroup }
-
-        GROUP   gcpMgOptionalGroup
-        DESCRIPTION
-            "Groups that provide optional capabilities."
-
-    ::= { gcpCompliances 2 }
+gcpSctpObjectGroup OBJECT-GROUP
+    OBJECTS     { gcpDefaultSctpNoDelay, gcpDefaultSctpMaxseg, 
+                  gcpDefaultSctpHeartbeatItvl, gcpDefaultSctpHearbeat, 
+                  gcpDefaultSctpRtoInitial, gcpDefaultSctpRtoMin, 
+                  gcpDefaultSctpRtoMax, gcpDefaultSctpPathMaxRetrans, 
+                  gcpDefaultSctpCookieLife, gcpDefaultSctpCookieInc, 
+                  gcpDefaultSctpMaxInitRetries, gcpDefaultSctpMaxBurst, 
+                  gcpDefaultSctpAssocMaxRetrans, gcpDefaultSctpSackDelay, 
+                  gcpDefaultSctpLifetime, gcpSctpNoDelay, gcpSctpMaxseg, 
+                  gcpSctpHeartbeatItvl, gcpSctpHearbeat, 
+                  gcpSctpRtoInitial, gcpSctpRtoMin, gcpSctpRtoMax, 
+                  gcpSctpPathMaxRetrans, gcpSctpCookieLife, 
+                  gcpSctpCookieInc, gcpSctpMaxInitRetries, 
+                  gcpSctpMaxBurst, gcpSctpAssocMaxRetrans, 
+                  gcpSctpSackDelay, gcpSctpLifetime, gcpSctpRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of all of the accessible objects necessary to 
+         support SCTP as a transport for GCP."
+    ::= { gcpGroups 3 }
 
 gcpFullCompliance MODULE-COMPLIANCE
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "Provides a compliance profile that provides full compliance to 
          this mib."
 
     MODULE      -- this module
 
-        MANDATORY-GROUPS        { gcpMandatoryGroup }
+        MANDATORY-GROUPS        { gcpNotificationGroup, gcpObjectGroup }
 
-        GROUP   gcpOptionalGroup
-        DESCRIPTION
-            "Groups that provide optional capabilities."
+        GROUP   gcpSctpObjectGroup
+        DESCRIPTION   
+              "Groups that provide optional capabilities."
 
-    ::= { gcpCompliacnes 3 }
+    MODULE OPENSS7-SMI-MIB
 
-END -- end of module OPENSS7-GCP-MIB
+        GROUP   attributeValueChangeNotificationPackage
+        DESCRIPTION   
+              "PRESENT IF the attributeValueChangeNotification defined in 
+               'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992' is supported 
+               by an instance of this class."
+
+        GROUP   createDeleteNotificationsPackage
+        DESCRIPTION   
+              "PRESENT IF the objectCreation and objectDeletion notifications 
+               defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 are 
+               supported by an instance of this class."
+
+    ::= { gcpCompliance 1 }
+
+END -- end of module OPENSS7-GCP-MIB.

@@ -4904,6 +4904,19 @@ ProtectionUnits ::= TEXTUAL-CONVENTION
                : ReleaseProtectionArgs.ProtectionEntity"
     SYNTAX      OCTET STRING (SIZE(0..255))
 
+ProtectionStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies the protection status of a protection unit."
+    REFERENCE
+        "ITU-T Rec. M.3100 (2005) : protectionStatusR1 
+               ATTRIBUTE"
+    SYNTAX      BITS { noRequest(0), doNotRevert(1), 
+                    manualSwitch(2), autoSwitch(3), 
+                    forcedSwitch(4), lockout(5), 
+                    releaseFailed(6), resourceFailed(7), 
+                    lockedIn(8) }
+
 protectionGroup OBJECT IDENTIFIER
     ::= { tmnTables 8 }
 
@@ -5431,7 +5444,6 @@ protGroupReleaseProtection OBJECT-TYPE
          "
     REFERENCE
         "ITU-T Rec. G.774.3 (2001) : releaseProtection ACTION"
-        ""
     ::= { protectionGroupEntry 15 }
 
 protGroupRowStatus OBJECT-TYPE
@@ -5828,12 +5840,7 @@ pUnitUnreliableResourcePointer OBJECT-TYPE
     ::= { protectionUnitEntry 4 }
 
 pUnitProtectionStatus OBJECT-TYPE
---  SYNTAX      ProtectionStatus
-    SYNTAX      BITS { noRequest(0), doNotRevert(1), 
-                    manualSwitch(2), autoSwitch(3), 
-                    forcedSwitch(4), lockout(5), 
-                    releaseFailed(6), resourceFailed(7), 
-                    lockedIn(8) }
+    SYNTAX      ProtectionStatus
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION

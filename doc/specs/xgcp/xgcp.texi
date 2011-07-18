@@ -454,7 +454,7 @@ efforts and productive software of the @url{http://www.fsf.org/,Free Software Fo
 * Relationship to MGCP and MEGACO/H.248 GCP::
 * Relationship to Data Abstraction Services::
 * Mandatory and Optional Features::
-* Packages::
+* Interface Packages::
 * Terminology::
 * Abbreviations::
 @end menu
@@ -701,12 +701,12 @@ those of the interface.
 @node Packages
 @section Packages
 
-The specification defines several Gateway Control packages (Common GCP package, MGCP package,
-MEGACO package, and H.248 package), @ref{Interface Class Definitions}.  These packages define the OM
-classes required by the interface functions to perform GCP services.  The common GCP package, which
-also includes the errors defined (@pxref{Errors}), is mandatory.  The MGCP, MEGACO and H.248
-packages are optional, but at least one of them must be supported by the implementation.  The
-different service views assume the support of the corresponding GCP package by the implementation.
+The specification defines several Gateway Control packages (Common GCP package, MGCP package, MEGACO
+package, and H.248 package), @ref{Interface Packages}.  These packages define the OM classes
+required by the interface functions to perform GCP services.  The common GCP package, which also
+includes the errors defined (@pxref{Errors}), is mandatory.  The MGCP, MEGACO and H.248 packages are
+optional, but at least one of them must be supported by the implementation.  The different service
+views assume the support of the corresponding GCP package by the implementation.
 
 The use of the optional packages is negotiated using the @command{Negotiate()} function.
 
@@ -1858,8 +1858,8 @@ Outstanding operation requested in a gateway control service interaction.
 Operation indication received in a gateway control service interaction.
 @end table
 
-@node Packages
-@chapter Packages
+@node Interface Packages
+@chapter Interface Packages
 
 @node Feature Packages
 @section Feature Packages
@@ -1876,7 +1876,7 @@ The Object-Identifier associated with the Common GCP package is:
 @end verbatim
 @end format
 
-This Object-Identifier is represented by the constant @b{Common-Package} (@samp{GCP_COMMON_PKG}).
+This Object-Identifier is represented by the constant @b{Common-Package} (@samp{GCP_@-COMMON_@-PKG}).
 
 @node MGCP Feature Package
 @subsection MGCP Package
@@ -1890,7 +1890,7 @@ The Object-Identifier associated with the MGCP package is:
 @end verbatim
 @end format
 
-This Object-Identifier is represented by the constant @b{MGCP-Package} (@samp{GCP_MGCP_PKG}).
+This Object-Identifier is represented by the constant @b{MGCP-Package} (@samp{GCP_@-MGCP_@-PKG}).
 
 @node MEGACO Feature Packages
 @subsection MEGACO Package
@@ -1904,7 +1904,7 @@ The Object-Identifier associated with the MEGACO package is:
 @end verbatim
 @end format
 
-This Object-Identifier is represented by the constant @b{MEGACO-Package} (@samp{GCP_MEGACO_PKG}).
+This Object-Identifier is represented by the constant @b{MEGACO-Package} (@samp{GCP_@-MEGACO_@-PKG}).
 
 The Object-Identifiers associated with the MEGACO package for various versions of the protocol are:
 
@@ -1920,9 +1920,9 @@ The Object-Identifiers associated with the MEGACO package for various versions o
 @end format
 
 This Object-Identifiers are represented by the constants
-@b{MEGACO-V1-Package} (@samp{GCP_MEGACO_V1_PKG}),
-@b{MEGACO-V1-Package} (@samp{GCP_MEGACO_V2_PKG}) and
-@b{MEGACO-V1-Package} (@samp{GCP_MEGACO_V3_PKG}), respectively.
+@b{MEGACO-V1-Package} (@samp{GCP_@-MEGACO_@-V1_@-PKG}),
+@b{MEGACO-V1-Package} (@samp{GCP_@-MEGACO_@-V2_@-PKG}) and
+@b{MEGACO-V1-Package} (@samp{GCP_@-MEGACO_@-V3_@-PKG}), respectively.
 
 @node H.248 Feature Packages
 @subsection H.248 Package
@@ -1935,7 +1935,7 @@ The Object-Identifier associated with the H.248 package is:
 @end verbatim
 @end format
 
-This Object-Identifier is represented by the constant @b{H248-Package} (@samp{GCP_H248_PKG}).
+This Object-Identifier is represented by the constant @b{H248-Package} (@samp{GCP_@-H248_@-PKG}).
 
 The Object-Identifiers associated with the H.248.1 package for various versions of the protocol are:
 
@@ -1948,12 +1948,15 @@ The Object-Identifiers associated with the H.248.1 package for various versions 
 @end format
 
 This Object-Identifiers are represented by the constants
-@b{MEGACO-V1-Package} (@samp{GCP_H248_V1_PKG}),
-@b{MEGACO-V2-Package} (@samp{GCP_H248_V2_PKG}) and
-@b{MEGACO-V3-Package} (@samp{GCP_H248_V3_PKG}), respectively.
+@b{MEGACO-V1-Package} (@samp{GCP_@-H248_@-V1_@-PKG}),
+@b{MEGACO-V2-Package} (@samp{GCP_@-H248_@-V2_@-PKG}) and
+@b{MEGACO-V3-Package} (@samp{GCP_@-H248_@-V3_@-PKG}), respectively.
 
 @node H.248 Extension Feature Packages
 @subsection H.248 Extension Packages
+
+@node H.248.x Sub-series Extension Packages
+@subsubsection H.248.x Sub-series Extension Packages
 
 ITU-T Recommendation H.248.1 (09/2005) provides for its own extension package concept.  Each
 extension package is in a part of the H.248 suite of specifications.  There are over 50 of these
@@ -1964,13 +1967,15 @@ identified by an Object-Identifier of the general form: @t{@{ itu-t(0) recommend
 h248(248) partX(X) versionY(Y) @}}, where, @samp{X} is the part number in the H.248 suite (for
 example, for H.248.12, @samp{X} is @samp{12}); and, @samp{Y} is the GCP protocol version (for
 example, for GCP Version 3, @samp{Y} is @samp{3}).  The `C' language binding of these
-Object-Identifiers are @b{H248-X-VY-Package} (@samp{GCP_H248_X_VY_PKG}).  To refer to the extension
+Object-Identifiers are @b{H248-X-VY-Package} (@samp{GCP_@-H248_@-X_@-VY_@-PKG}).  To refer to the extension
 package without specifying the version, use @t{@{ itu-t(0) recommendation(0) h(8) h248(248) partX(X)
 @}} only.  The `C' language binding of these Object-Identifiers are @b{H248-X-Package}
-(@samp{GCP_H248_X_PKG}).
+(@samp{GCP_@-H248_@-X_@-PKG}).
 
-@sp
+The ITU-T Recommendation H.248.x sub-series extension packages are itemized in @tabref{100},
+@tabref{101}, @tabref{102} and @tabref{103}.
 
+@float Table,Table 100
 @multitable @columnfractions .26 .74
 @item ITU-T H.248.1 Annex E  @tab Basic packages.
 @item ITU-T H.248.2          @tab Facsimile, text, conversation and call discrimination packages.
@@ -1989,6 +1994,11 @@ package without specifying the version, use @t{@{ itu-t(0) recommendation(0) h(8
 @item ITU-T H.248.17         @tab Line test packages.
 @item ITU-T H.248.18         @tab Package for support of multiple profiles.
 @item ITU-T H.248.19         @tab Decomposed MCU, audio, video and data conferencing packages.
+@end multitable
+@caption{@emph{ITU-T Rec. H.248.x Packages (1--19)}}
+@end float
+@float Table,Table 101
+@multitable @columnfractions .26 .74
 @item ITU-T H.248.20         @tab Local and remote descriptors with H.221/H.223 multiplexing.
 @item ITU-T H.248.21         @tab Semi-permanent connection handling package.
 @item ITU-T H.248.22         @tab Shared risk group package.
@@ -2009,6 +2019,11 @@ package without specifying the version, use @t{@{ itu-t(0) recommendation(0) h(8
 @item ITU-T H.248.37         @tab IP NAPT traversal package.
 @item ITU-T H.248.38         @tab Base context package.
 @item ITU-T H.248.39         @tab SDP parameter identification and wildcarding.
+@end multitable
+@caption{@emph{ITU-T Rec. H.248.x Packages (20--39)}}
+@end float
+@float Table,Table 102
+@multitable @columnfractions .26 .74
 @item ITU-T H.248.40         @tab Application data inactivity detection package.
 @item ITU-T H.248.41         @tab IP domain connection package.
 @item ITU-T H.248.42         @tab DCME interworking package.
@@ -2029,6 +2044,11 @@ package without specifying the version, use @t{@{ itu-t(0) recommendation(0) h(8
 @item ITU-T H.248.57         @tab RTP control protocol package.
 @item ITU-T H.248.58         @tab Package for application of level H.248 statistics.
 @item ITU-T H.248.59         @tab Event timestamp notification package.
+@end multitable
+@caption{@emph{ITU-T Rec. H.248.x Packages (40--59)}}
+@end float
+@float Table,Table 103
+@multitable @columnfractions .26 .74
 @item ITU-T H.248.60         @tab Identification of content of communication package.
 @item ITU-T H.248.61         @tab Packages for network level H.248 statistics.
 @item ITU-T H.248.62         @tab Re-answer package.
@@ -2050,6 +2070,53 @@ package without specifying the version, use @t{@{ itu-t(0) recommendation(0) h(8
 @item ITU-T H.248.78         @tab Bearer-level application level gateway.
 @item ITU-T H.248.80         @tab Usage of the revised SDP offer/answer model with H.248.
 @end multitable
+@caption{@emph{ITU-T Rec. H.248.x Packages (60--80)}}
+@end float
+
+@node Q.1950 Annex A Extension Packages
+@subsubsection Q.1950 Annex A Extension Packages
+
+ITU-T Recommendation Q.1950 (12/2002) and ITU-T Recommendation Q.1950 Amendment 1 (01/2006) provide
+for additional H.248 extension packages that are numbered separately from H.248.x sub-series
+packages.  These recommendations and extension packages are identified by an Object-Identifier of
+the general form: @t{@{ itu-t(0) recommendation(0) q(17) q1950(1950) AnnexY(Y) PartX(X) @}}, where,
+@samp{Y} is the annex number (for example, for Q.1950 Annex A, @samp{Y} is @samp{1}); @samp{X} is
+the part number in the Q.1950 suite (for example, for Q.1950 Annex A.6, @samp{X} is @samp{6}), but
+is only specified when there is a part of the Annex.  The `C' language binding of these
+Object-Identifiers is @b{CBC-AnnexY-X-Package} (@samp{GCP_@-CBC_@-ANNEXY_@-X_@-PKG}).  To refer to
+the complete set of CBC extensions without reference to a specific part, use @t{@{ itu-t(0)
+recommendation(0) q(17) q1950(1950) @}} only.  The `C` language binding of these Object-Identifiers
+are @b{CBC-Package} (@samp{GCP_@-CBC_@-PKG}).
+
+The ITU-T Recommendation Q.1950 extension packages are itemized in @tabref{104}.
+
+@float Table,Table 104
+@multitable @columnfractions .26 .74
+@item ITU-T Q.1950/A.3  @tab Bearer characteristics package.
+@item ITU-T Q.1950/A.4  @tab Bearer network connection cut through package.
+@item ITU-T Q.1950/A.5  @tab Reuse idle package.
+@item ITU-T Q.1950/A.6  @tab Generic bearer connection package.
+@item ITU-T Q.1950/A.7  @tab Bearer control tunnelling package.
+@item ITU-T Q.1950/A.8  @tab Basic call progress tones generator with directionality.
+@item ITU-T Q.1950/A.9  @tab Expanded call progress tones generator package.
+@item ITU-T Q.1950/A.10 @tab Basic services tones generation package.
+@item ITU-T Q.1950/A.11 @tab Expanded services tones generation package.
+@item ITU-T Q.1950/A.12 @tab Intrusion tones generation package.
+@item ITU-T Q.1950/A.13 @tab Business tones generation package.
+@item ITU-T Q.1950/B    @tab CBC continuity test. NOTE 1.
+@item ITU-T Q.1950/C    @tab CBC BIWF congestion handling. NOTE 2.
+@item ITU-T Q.1950/D    @tab CBC N x 64k package.
+@item ITU-T Q.1950/E    @tab CBC extensions for access networks that support BICC.
+@item ITU-T Q.1950/F    @tab CBC emergency call indication.
+@item ITU-T Q.1950/G    @tab CBC international emergency preference scheme.
+@end multitable
+NOTES:
+@enumerate
+@item This package requires the H.248.1 Basic continuity test control package.
+@item This package requires the H.248.10 Media Gateway resource congestion handling package.
+@end enumerate
+@caption{@emph{ITU-T Rec. Q.1950 (12/2002) Packages}}
+@end float
 
 @node Feature Profiles
 @section Feature Profiles
