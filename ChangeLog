@@ -1,5 +1,19 @@
 2011-07-18  Brian Bidulock  <bidulock@openss7.org>
 
+	* src/mibs/MEGACO-MIB.mib: added new mibs
+	* src/mibs/MEGACO-RINGING-MIB.mib: added new mibs
+	* src/mibs/MEGACO-TONES-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-GCP-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-MG-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-RTPSW-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-RTPSW-OM-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-RTPXC-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-RTPXC-OM-MIB.mib: added new mibs
+	* src/snmp/sfpMIB.c: added new mibs
+	* src/snmp/sfpMIB.h: added new mibs
+	* src/snmp/sfpOmMIB.c: added new mibs
+	* src/snmp/sfpOmMIB.h: added new mibs
+
 	* doc/papers/Makefile.am: added xcode documentation
 	* doc/papers/xcode/Makefile.am: added xcode documentation
 	* doc/papers/xcode/Makefile.in: added xcode documentation
