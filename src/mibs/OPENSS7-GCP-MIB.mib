@@ -65,13 +65,15 @@
 OPENSS7-GCP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
     openss7Modules
         FROM OPENSS7-SMI
-    AdministrativeState, AvailabilityStatus, OperationalState, 
-    ProceduralStatus, SimpleNameType, StandbyStatus, UsageState, 
-    attributeValueChangeNotificationPackage, communicationsAlarmPackage, 
-    createDeleteNotificationsPackage, tmnObjectInstance, 
-    tmnPerceivedSeverity, tmnProbableCause
+    AdministrativeState, AlarmStatus, AvailabilityStatus, 
+    OperationalState, ProceduralStatus, SimpleNameType, StandbyStatus, 
+    UsageState, attributeValueChangeNotificationPackage, 
+    communicationsAlarmPackage, createDeleteNotificationsPackage, 
+    tmnObjectInstance, tmnPerceivedSeverity, tmnProbableCause
         FROM OPENSS7-SMI-MIB
     NetworkPointCode
         FROM OPENSS7-SS7-MIB
@@ -83,8 +85,8 @@ IMPORTS
         FROM SNMP-FRAMEWORK-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
-    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE, 
-    Unsigned32
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY, 
+    OBJECT-TYPE, Unsigned32, zeroDotZero
         FROM SNMPv2-SMI
     AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
     TimeInterval, TruthValue
@@ -167,6 +169,94 @@ MegacoIdentSelection ::= TEXTUAL-CONVENTION
                CHOICE."
     SYNTAX      INTEGER { ipAddress(1), domainName(2), deviceName(3), 
                     mtpAddress(4) }
+
+MegacoEncoding ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a selection of the message encoding that 
+         MEGACO entities use.  An object using this textual 
+         convention in its syntax clause is single-valued and 
+         can assume one of the following values:
+         
+         - unspecified(0), the encoding is not specified by the 
+           managed system and must be determined by means other 
+           than provisioning (e.g, well-known port number or 
+           negotiation).
+           
+         - binary(1), the binary encoding, such as that 
+           specified by ITU-T Recommendation H.248.1 (09/2005) 
+           Annex A and Annex C is to be used.
+           
+         - text(2), the text encoding, such as that specified by 
+           ITU-T Recommendation H.248.1 (09/2005) Annex B and 
+           Annex C is to be used.
+           
+         A changed in the value of an object using this textual 
+         convention in its syntax clause will not necessarily be 
+         effective until the communications facility is cycled."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005), Annex A, B."
+    SYNTAX      INTEGER { unspecified(0), binary(1), text(2) }
+
+MegacoAuthenticatedAccess ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a set of the authenticated access methods that 
+         will be used or accepted in H.248/MEGACO communications 
+         between MG and MGC.  Objects using this textual 
+         convention in they SYNTAX clause are set-valued and can 
+         contain zero or more of the following methods:
+         
+         - none(0), association is permitted or attempted 
+           without authentication;
+           
+         - interim(1), the interim (IPv4) approach of ITU-T 
+           Recommendation H.248.1 (09/2005) Clause 10.2 is 
+           permitted or attempted;
+           
+         - tls(2), transport layer security is permitted or 
+           attempted;
+           
+         - ah(3), IPv6 authentication header is permitted or 
+           attempted;
+           
+         - esp(4), IPv6 encapsulated security payload is 
+           permitted or attempted.
+           
+         When a value is included in the set, it specifies that 
+         the corresponding authentication method is permitted or 
+         attempted."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005), Clause 10."
+    SYNTAX      BITS { none(0), interim(1), tls(2), ah(3), esp(4) }
+
+MegacoAuthentication ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a selection of the authenticated access 
+         methods that may be used in H.248/MEGACO communications 
+         between MG and MGC.  Objects using this textual 
+         convention in they SYNTAX clause are single-valued and 
+         can assume one of the following values:
+         
+         - none(0), no authentication is in effect;
+           
+         - interim(1), the interim (IPv4) approach of ITU-T 
+           Recommendation H.248.1 (09/2005) Clause 10.2 is in 
+           effect;
+           
+         - tls(2), transport layer security is in effect;
+           
+         - ah(3), IPv6 authentication header is in effect;
+           
+         - esp(4), IPv6 encapsulated security payload is in 
+           effect.
+           
+         When the association is not operational, this value 
+         will alway read the value of the last successful 
+         association, or none(0) when no association was ever 
+         formed."
+    SYNTAX      INTEGER { none(0), interim(1), tls(2), ah(3), esp(4) }
 
 gcpNotifications OBJECT IDENTIFIER
     ::= { gcpMIB 0 }
@@ -302,6 +392,93 @@ gcpDefaultMgcoIdent OBJECT-TYPE
          the scalar value must persist across system reboots."
     DEFVAL      { ipAddress }
     ::= { gcpMgcoDefaults 1 }
+
+gcpDefaultMgcoExecutionTime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the default interval within which the MG or MGC should 
+         expect a response from the other to any transaction (exclusive 
+         of network delay)."
+    REFERENCE
+        "ITU-T Recommendation H.248.1 (09/2005), E.2.1.3 and E.2.1.4."
+    DEFVAL      { 400 } -- provisional
+    ::= { gcpMgcoDefaults 2 }
+
+gcpDefaultMgcoProvRespTimer OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the default time within which the MG or MGC should 
+         expect a Pending response from the other if a transaction cannot 
+         be completed sooner."
+    REFERENCE
+        "ITU-T Recommendation H.248.1 (09/2005), E.2.1.5 and E.2.1.6."
+    DEFVAL      { 400 } -- provisional
+    ::= { gcpMgcoDefaults 2 }
+
+gcpDefaultMgcpPendingLimit OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the default maximum number of transaction pending 
+         messages that can be received for a given transaction.  Once 
+         this limit is exceeded, the entity should issue a transaction 
+         reply with Error 506 (Number of TransactionPendings Exceeded); 
+         otherwise, the entity can assume the transaction to be in error."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005), E.2.1.7 and E.2.1.8."
+    DEFVAL      { 5 } -- provisional
+    ::= { gcpMgcoDefaults 3 }
+
+gcpDefaultMgcoLongTimer OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { gcpMgcoDefaults 2 }
+
+gcpDefaultMgcoRtoInit OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005), Annex D.1.3, Computing 
+               retransmission timers."
+    ::= { gcpMgcoDefaults 3 }
+
+gcpDefaultMgcoRtoMin OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005), Annex D.1.3, Computing 
+               retransmission timers."
+    ::= { gcpMgcoDefaults 4 }
+
+gcpDefaultMgcoRtoMax OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION 
+        "
+         The default default value is 400: 4 seconds.  The default 
+         default value is only applicable when never set by any 
+         management station.  When set, the scalar value must persist 
+         across system reboots."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005), Annex D.1.3, Computing 
+               retransmission timers."
+    DEFVAL      { 400 }
+    ::= { gcpMgcoDefaults 5 }
 
 gcpUdpDefaults OBJECT IDENTIFIER
     ::= { gcpDefaults 2 }
@@ -888,8 +1065,285 @@ gcpDefaultSctpLifetime OBJECT-TYPE
 gcpTables OBJECT IDENTIFIER
     ::= { gcpMIB 3 }
 
-gcpMg OBJECT IDENTIFIER
+gcpMs OBJECT IDENTIFIER
     ::= { gcpTables 1 }
+
+gcpMsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpMsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The Managed Switching Element represents, for 
+         management purposes, an exchange, i.e. the aggregate of 
+         traffic carrying devices, switching stages, controlling 
+         and signalling means at a network node that enables 
+         subscriber lines to be interconnected and packets to be 
+         forwarded as required by individual users.
+         
+         The Managed Element object class is a class of managed 
+         objects representing telecommunications equipment or 
+         TMN entities (either groups or parts) within the 
+         telecommunications network that performs managed 
+         element functions, i.e.  provides support and/or 
+         service to the subscriber. Managed elements may or may 
+         not additionally perform mediation/OS functions. 
+         A managed element communicates with the manager 
+         (directly or indirectly) over one or more standard 
+         Q-interfaces for the purpose of being monitored and/or 
+         controlled. A managed element contains equipment that 
+         may or may not be geographically distributed.  When the 
+         attribute value change notification package is present, 
+         the attributeValueChange notification defined in 
+         Recommendation X.721 shall be emitted when the value of 
+         one of the following attribute changes: alarm status, 
+         user label, version, location name and current problem 
+         list. For the above attributes that are in conditional 
+         packages, the behaviour for emitting the attribute 
+         value change notification applies only when the 
+         corresponding conditional packages are present in the 
+         managed object. When the state change notification 
+         package is present, the stateChangeNotification defined 
+         in Recommendation X.721 shall be emitted if the value 
+         of administrative state or operational state or usage 
+         state changes."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1996) managedSwitchingElement MOC.
+         ANSI T1.116.1/2000 managedSwitchingElement MOC.
+         ITU-T Rec. M.3100 (1995) managedElementR2 MOC."
+    ::= { gcpMs 1 }
+
+gcpMsEntry OBJECT-TYPE
+    SYNTAX      GcpMsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry in the gcpMsTable represents a Managed Switching 
+         Element.  See gcpMsTable for more information."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1996) managedSwitchingElement MO.
+         ANSI T1.116.1/2000 managedSwitchingElement MO.
+         ITU-T Rec. M.3100 (1995) managedElementR2 MO."
+    INDEX       { gcpMsId }
+    ::= { gcpMsTable 1 }
+
+GcpMsEntry ::= SEQUENCE {
+    gcpMsId                     Unsigned32,
+    gcpMsName                   SnmpAdminString,
+    gcpMsAlarmStatus            AlarmStatus,
+    gcpMsOperationalState       OperationalState,
+    gcpMsUsageState             UsageState,
+    gcpMsManagedElementType     SnmpAdminString,
+    gcpMsModelCode              SnmpAdminString,
+    gcpMsVendorName             SnmpAdminString,
+    gcpMsUserLabel              SnmpAdminString,
+    gcpMsVersion                SnmpAdminString,
+    gcpMsAsaProfilePointer      RowPointer,
+    gcpMsNetworkElementAliases  SnmpAdminString,
+    gcpMsRowStatus              RowStatus
+}
+
+gcpMsId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This attribute is used for naming instances.  Provides 
+         a Managed Switching Element identifier used to name 
+         managed objects in this table."
+    ::= { gcpMsEntry 1 }
+
+gcpMsName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides an optional administrative name for this 
+         managed switching element.  It is typical to use the 
+         common language name assigned to the element (e.g. 
+         EDTNAB01DS1)."
+    ::= { gcpMsEntry 2 }
+
+gcpMsAlarmStatus OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the alarm status of the GCP managed switching 
+         element following the AlarmStatus textual convention 
+         and ITU-T Rec.  X.721 (1992) | ISO/IEC 10165-2 : 1992.
+         
+         - underRepair(0), the managed switching element is 
+           currently being repaired; the operational state is 
+           either disabled or enabled;
+           
+         - critical(1), one or more  critical alarms indicating 
+           a fault have been detected in the managed switching 
+           element and have not been cleared; the operational 
+           state is either disabled or enabled;
+           
+         - major(2), one ore more major alarms indicating 
+           a fault have been detected in the managed switching 
+           element, and have not been cleared; the operational 
+           state is enabled or disabled;
+           
+         - minor(3), one or more minor alarms indicating a fault 
+           have been detected in the managed switching element, 
+           and have not yet been cleared; the operational state 
+           is enabled or disabled;
+           
+         - alarmOutstanding(4), one or more alarms have been 
+           detected in the resource, the condition of which may 
+           or may not be disabling.
+           
+         The presence of the above alarm state conditions do not 
+         suppress the generation of future fault-related 
+         notifications.
+         
+         Values that can be added to the set by a management 
+         station includes only the underRepair(0) condition.  
+         Values that can be removed from the set are 
+         critical(1), major(2), minor(3), and 
+         alarmOutstanding(4).  Removing conditions from the set 
+         are for performing manual alarm clearing from 
+         a management station."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) 
+               : alarmStatus attribute.
+         ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.AlarmStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.1."
+    ::= { gcpMsEntry 3 }
+
+gcpMsOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the operational state of the GCP managed 
+         switching element following the OperationalState 
+         textual convention and ITU-T Rec. X.721 | ISO/IEC 
+         10165-2.
+         
+          - disabled(0),
+          - enabled(1),"
+    REFERENCE   
+        "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.OperationalState.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.1.1.
+         ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+               operationalState attribute."
+    ::= { gcpMsEntry 4 }
+
+gcpMsUsageState OBJECT-TYPE
+    SYNTAX      UsageState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the usage state of the GCP managed switching 
+         element following the UsageState textual convention and 
+         ITU-T Rec.  X.721 | ISO/IEC 10165-2.
+         
+          - idle(0),
+          - active(1),
+          - busy(2),"
+    REFERENCE   
+        "ITU-T Rec. X.721 | ISO/IEC 10165-2 usageState 
+               attribute."
+    ::= { gcpMsEntry 5 }
+
+gcpMsManagedElementType OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the managed switching element type in 
+         accordance with the SnmpAdminString textual 
+         convention."
+    ::= { gcpMsEntry 6 }
+
+gcpMsModelCode OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the managed switching element model code in 
+         accordance with the SnmpAdminString textual 
+         convention."
+    ::= { gcpMsEntry 7 }
+
+gcpMsVendorName OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the managed switching element vendor name."
+    ::= { gcpMsEntry 8 }
+
+gcpMsUserLabel OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the managed switching element user label.  
+         This value can be set to any string by management 
+         stations and the agent or managed device will not 
+         restrict the management station's ability to set this 
+         value."
+    ::= { gcpMsEntry 9 }
+
+gcpMsVersion OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the managed switching element version."
+    ::= { gcpMsEntry 10 }
+
+gcpMsAsaProfilePointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a pointer to an alarm severity assignment 
+         profile to be used for alarms generated by this managed 
+         switching element, or zeroDotZero to use the default 
+         mapping associated with the media gateway as described 
+         in this MIB."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+               alarmSeverityAssignmentProfilePointer attribute."
+    DEFVAL      { zeroDotZero }
+    ::= { gcpMsEntry 11 }
+
+gcpMsNetworkElementAliases OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the managed switching element network element 
+         aliases. This value can be set to any string by 
+         management stations and the agent or managed device 
+         will not restrict the management station's ability to 
+         set this value."
+    ::= { gcpMsEntry 12 }
+
+gcpMsRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create and delete entries in this table.  Entries 
+         created by management stations survive agent reboot."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (1995) managedElement-network NAME 
+               BINDING."
+    ::= { gcpMsEntry 13 }
+
+gcpMg OBJECT IDENTIFIER
+    ::= { gcpTables 2 }
 
 gcpMgTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpMgEntry
@@ -905,7 +1359,52 @@ gcpMgTable OBJECT-TYPE
          system containing Media Gateways, this table characterizes all 
          of the MG in the managed system as well as all of the MG that 
          might be backing up an MG within the managed system, or that an 
-         MG within the managed system might be backing up."
+         MG within the managed system might be backing up.
+         
+         A physical Media Gateway may be partitioned into one or more 
+         Virtual MGs (VMGs).  A Virtual MG consists of a set of 
+         statically partitioned physical terminations and/or sets of 
+         ephemeral terminations.  A physical termination is controlled by 
+         one MGC.  The model does not require that other resources be 
+         statically allocated, just terminations.  The mechanism for 
+         allocating terminations to Virtual MGs is managed by this MIB.  
+         Each of the virtual MGs appears to the MGC as a complete MG 
+         client.
+         
+         A physical MG may have only one network interface, which must be 
+         shared across virtual MGs.  In such a case, the packet/cell side 
+         termination is shared.  It should be noted, however, that in 
+         use, such interfaces require an ephemeral instance of the 
+         termination to be created per flow, and thus sharing the 
+         termination is straightforward.  This mechanism does lead to 
+         a complication, namely that the MG must always know which of its 
+         controlling MGCs should be notified if an event occurs on the 
+         interface.
+         
+         In normal operation, the virtual MG will be instructed by the 
+         MGC to create network flows (if it is the originating side), or 
+         to expect flow requests (if it is the terminating side), and no 
+         confusion will arise.  However, if an unexpected event occurs, 
+         the virtual MG must know what to do with respect to the physical 
+         resources it is controlling.
+         
+         If recovering from the event requires manipulation of a physical 
+         interface's state, only one MGC should do so.  These issues are 
+         resolved by allowing any of the MGCs to create Event Descriptors 
+         to be notified of such events, but only one MGC can have 
+         read/write access to the physical interface properties; all 
+         other MGCs have read-only access.  The management mechanism is 
+         used to designate which MGC has read/write capability, and is 
+         designated the Master MGC.
+         
+         Each virtual MG has its own Root Termination.  In most cases, 
+         the values for the properties of the Root Termination are 
+         independently settable by each MGC.  Where there can only be one 
+         value, the parameter is read-only to all but the Master MGC.
+         
+         ServiceChange may only be applied to a termination or set of 
+         terminations partitioned to the Virtual MG or created (in the 
+         case of ephemeral terminations) by that Virtual MG."
     ::= { gcpMg 1 }
 
 gcpMgEntry OBJECT-TYPE
@@ -926,24 +1425,26 @@ gcpMgEntry OBJECT-TYPE
             
          3. The MG is external to the managed system but backs up or is 
             backed up by an MG internal to the managed system."
-    INDEX       { gcpMgId }
+    INDEX       { gcpMsId, gcpMgId }
     ::= { gcpMgTable 1 }
 
 GcpMgEntry ::= SEQUENCE {
-    gcpMgId             Unsigned32,
-    gcpMgLocation       INTEGER,
-    gcpMgName           CommonLanguageName,
-    gcpMgDomainName     SnmpAdminString,
-    gcpMgDeviceName     SnmpAdminString,
-    gcpMgMtpAddress     NetworkPointCode,
-    gcpMgAdminState     AdministrativeState,
-    gcpMgOperState      OperationalState,
-    gcpMgUsageState     UsageState,
-    gcpMgAvailStatus    AvailabilityStatus,
-    gcpMgProcStatus     ProceduralStatus,
-    gcpMgPg             Unsigned32,
-    gcpMgStandbyStatus  StandbyStatus,
-    gcpMgRowStatus      RowStatus
+    gcpMgId                 Unsigned32,
+    gcpMgLocation           INTEGER,
+    gcpMgName               CommonLanguageName,
+    gcpMgDomainName         SnmpAdminString,
+    gcpMgDeviceName         SnmpAdminString,
+    gcpMgMtpAddress         NetworkPointCode,
+    gcpMgAdminState         AdministrativeState,
+    gcpMgOperState          OperationalState,
+    gcpMgAlarmStatus        AlarmStatus,
+    gcpMgAsaProfilePointer  RowPointer,
+    gcpMgUsageState         UsageState,
+    gcpMgAvailStatus        AvailabilityStatus,
+    gcpMgProcStatus         ProceduralStatus,
+    gcpMgPg                 Unsigned32,
+    gcpMgStandbyStatus      StandbyStatus,
+    gcpMgRowStatus          RowStatus
 }
 
 gcpMgId OBJECT-TYPE
@@ -1075,6 +1576,73 @@ gcpMgOperState OBJECT-TYPE
                operationalState attribute."
     ::= { gcpMgEntry 8 }
 
+gcpMgAlarmStatus OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the alarm status of the MG following the 
+         AlarmStatus textual convention and ITU-T Rec. X.721 
+         (1992) | ISO/IEC 10165-2 : 1992.  This object is 
+         set-valued and can report the following conditions:
+         
+         - underRepair(0), the MG is being repaired; the 
+           operational state is disabled or enabled;
+           
+         - critical(1), one or more critical alarms indicating 
+           a fault have been detected in the MG and have not 
+           been cleared; the operational state is either 
+           disabled or enabled;
+           
+         - major(2), one or more major alarms indicating a fault 
+           have been detected in the MG, and have not been 
+           cleared; the operational state is enabled or 
+           disabled;
+           
+         - minor(3), one or more minor alarms indicating a fault 
+           have been detected in the MG element, and have not 
+           yet been cleared; 
+           
+         - alarmOutstanding(4), one or more alarms have been 
+           detected in the resource, the condition of which may 
+           or may not be disabling.
+           
+         The presence of the above alarm state conditions do not 
+         suppress the generation of future fault-related 
+         notifications.
+         
+         Values that can be added to the set by a management 
+         station includes only the underRepair(0) condition.  
+         Values that can be removed from the set are 
+         critical(1), major(2), minor(3) and 
+         alarmOutstanding(4).  Removing conditions from the set 
+         are for performing manual alarm clearing from 
+         a management station."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) 
+               : alarmStatus attribute.
+         ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.AlarmStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.1."
+    ::= { gcpMgEntry 9 }
+
+gcpMgAsaProfilePointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a pointer to an alarm severity assignment 
+         profile to be used for alarms generated by this 
+         media gateway, or zeroDotZero to use the default 
+         mapping associated with the media gateway as described 
+         in this MIB."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+               alarmSeverityAssignmentProfilePointer attribute."
+    DEFVAL      { zeroDotZero }
+    ::= { gcpMgEntry 10 }
+
 gcpMgUsageState OBJECT-TYPE
     SYNTAX      UsageState
     MAX-ACCESS  read-only
@@ -1100,7 +1668,7 @@ gcpMgUsageState OBJECT-TYPE
                Attribute-ASN1Module.UsageState.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.1.2."
-    ::= { gcpMgEntry 9 }
+    ::= { gcpMgEntry 11 }
 
 gcpMgAvailStatus OBJECT-TYPE
     SYNTAX      AvailabilityStatus
@@ -1176,7 +1744,7 @@ gcpMgAvailStatus OBJECT-TYPE
                Attribute-ASN1Module.AvailabilityStatus
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.3."
-    ::= { gcpMgEntry 10 }
+    ::= { gcpMgEntry 12 }
 
 gcpMgProcStatus OBJECT-TYPE
     SYNTAX      ProceduralStatus
@@ -1224,7 +1792,7 @@ gcpMgProcStatus OBJECT-TYPE
                Attribute-ASN1Module.ProceduralStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.2."
-    ::= { gcpMgEntry 11 }
+    ::= { gcpMgEntry 13 }
 
 gcpMgPg OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1240,7 +1808,7 @@ gcpMgPg OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. M.3100 (2005) : protectionGroupR2 MOC
          ITU-T Rec. G.744.3 : protectionGroupR1 MOC"
-    ::= { gcpMgEntry 12 }
+    ::= { gcpMgEntry 14 }
 
 gcpMgStandbyStatus OBJECT-TYPE
     SYNTAX      StandbyStatus
@@ -1286,7 +1854,7 @@ gcpMgStandbyStatus OBJECT-TYPE
                Attribute-ASN1Module.StandbyStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.5."
-    ::= { gcpMgEntry 13 }
+    ::= { gcpMgEntry 15 }
 
 gcpMgRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -1297,10 +1865,10 @@ gcpMgRowStatus OBJECT-TYPE
          delete rows in this table."
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
-    ::= { gcpMgEntry 14 }
+    ::= { gcpMgEntry 16 }
 
 gcpMgc OBJECT IDENTIFIER
-    ::= { gcpTables 2 }
+    ::= { gcpTables 3 }
 
 gcpMgcTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpMgcEntry
@@ -1336,24 +1904,26 @@ gcpMgcEntry OBJECT-TYPE
             
          3. The MGC is external to the managed system but backs up or is 
             backed up by an MGC internal to the managed system."
-    INDEX       { gcpMgcId }
+    INDEX       { gcpMsId, gcpMgcId }
     ::= { gcpMgcTable 1 }
 
 GcpMgcEntry ::= SEQUENCE {
-    gcpMgcId                Unsigned32,
-    gcpMgcLocation          INTEGER,
-    gcpMgcName              CommonLanguageName,
-    gcpMgcDomainName        SnmpAdminString,
-    gcpMgcDeviceName        SnmpAdminString,
-    gcpMgcMtpAddress        NetworkPointCode,
-    gcpMgcAdminState        AdministrativeState,
-    gcpMgcOperState         OperationalState,
-    gcpMgcUsageState        UsageState,
-    gcpMgcAvailStatus       AvailabilityStatus,
-    gcpMgcProcStatus        ProceduralStatus,
-    gcpMgcPg                Unsigned32,
-    gcpMgcStandbyStatus     StandbyStatus,
-    gcpMgcRowStatus         RowStatus
+    gcpMgcId                    Unsigned32,
+    gcpMgcLocation              INTEGER,
+    gcpMgcName                  CommonLanguageName,
+    gcpMgcDomainName            SnmpAdminString,
+    gcpMgcDeviceName            SnmpAdminString,
+    gcpMgcMtpAddress            NetworkPointCode,
+    gcpMgcAdminState            AdministrativeState,
+    gcpMgcOperState             OperationalState,
+    gcpMgcAlarmStatus           AlarmStatus,
+    gcpMgcAsaProfilePointer     RowPointer,
+    gcpMgcUsageState            UsageState,
+    gcpMgcAvailStatus           AvailabilityStatus,
+    gcpMgcProcStatus            ProceduralStatus,
+    gcpMgcPg                    Unsigned32,
+    gcpMgcStandbyStatus         StandbyStatus,
+    gcpMgcRowStatus             RowStatus
 }
 
 gcpMgcId OBJECT-TYPE
@@ -1486,6 +2056,73 @@ gcpMgcOperState OBJECT-TYPE
                operationalState attribute."
     ::= { gcpMgcEntry 8 }
 
+gcpMgcAlarmStatus OBJECT-TYPE
+    SYNTAX      AlarmStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the alarm status of the MGC following the 
+         AlarmStatus textual convention and ITU-T Rec. X.721 
+         (1992) | ISO/IEC 10165-2 : 1992.  This object is 
+         set-valued and can report the following conditions:
+         
+         - underRepair(0), the MGC is being repaired; the 
+           operational state is disabled or enabled;
+           
+         - critical(1), one or more critical alarms indicating 
+           a fault have been detected in the MGC and have not 
+           been cleared; the operational state is either 
+           disabled or enabled;
+           
+         - major(2), one or more major alarms indicating a fault 
+           have been detected in the MGC, and have not been 
+           cleared; the operational state is enabled or 
+           disabled;
+           
+         - minor(3), one or more minor alarms indicating a fault 
+           have been detected in the MGC element, and have not 
+           yet been cleared; 
+           
+         - alarmOutstanding(4), one or more alarms have been 
+           detected in the resource, the condition of which may 
+           or may not be disabling.
+           
+         The presence of the above alarm state conditions do not 
+         suppress the generation of future fault-related 
+         notifications.
+         
+         Values that can be added to the set by a management 
+         station includes only the underRepair(0) condition.  
+         Values that can be removed from the set are 
+         critical(1), major(2), minor(3) and 
+         alarmOutstanding(4).  Removing conditions from the set 
+         are for performing manual alarm clearing from 
+         a management station."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) 
+               : alarmStatus attribute.
+         ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
+               Attribute-ASN1Module.AlarmStatus.
+         ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
+               Section 8.1.2.1."
+    ::= { gcpMgcEntry 9 }
+
+gcpMgcAsaProfilePointer OBJECT-TYPE
+    SYNTAX      RowPointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a pointer to an alarm severity assignment 
+         profile to be used for alarms generated by this media 
+         gateway controller, or zeroDotZero to use the default 
+         mapping associated with the media gateway controller as 
+         described in this MIB."
+    REFERENCE   
+        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
+               alarmSeverityAssignmentProfilePointer attribute."
+    DEFVAL      { zeroDotZero }
+    ::= { gcpMgcEntry 10 }
+
 gcpMgcUsageState OBJECT-TYPE
     SYNTAX      UsageState
     MAX-ACCESS  read-create
@@ -1511,7 +2148,7 @@ gcpMgcUsageState OBJECT-TYPE
                Attribute-ASN1Module.UsageState.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.1.2."
-    ::= { gcpMgcEntry 9 }
+    ::= { gcpMgcEntry 11 }
 
 gcpMgcAvailStatus OBJECT-TYPE
     SYNTAX      AvailabilityStatus
@@ -1586,7 +2223,7 @@ gcpMgcAvailStatus OBJECT-TYPE
                Attribute-ASN1Module.AvailabilityStatus
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.3."
-    ::= { gcpMgcEntry 10 }
+    ::= { gcpMgcEntry 12 }
 
 gcpMgcProcStatus OBJECT-TYPE
     SYNTAX      ProceduralStatus
@@ -1635,7 +2272,7 @@ gcpMgcProcStatus OBJECT-TYPE
                Attribute-ASN1Module.ProceduralStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.2."
-    ::= { gcpMgcEntry 11 }
+    ::= { gcpMgcEntry 13 }
 
 gcpMgcPg OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1652,7 +2289,7 @@ gcpMgcPg OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. M.3100 (2005) : protectionGroupR2 MOC
          ITU-T Rec. G.744.3 : protectionGroupR1 MOC"
-    ::= { gcpMgcEntry 12 }
+    ::= { gcpMgcEntry 14 }
 
 gcpMgcStandbyStatus OBJECT-TYPE
     SYNTAX      StandbyStatus
@@ -1700,7 +2337,7 @@ gcpMgcStandbyStatus OBJECT-TYPE
                Attribute-ASN1Module.StandbyStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.5."
-    ::= { gcpMgcEntry 13 }
+    ::= { gcpMgcEntry 15 }
 
 gcpMgcRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -1711,10 +2348,10 @@ gcpMgcRowStatus OBJECT-TYPE
          delete rows in this table."
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
-    ::= { gcpMgcEntry 14 }
+    ::= { gcpMgcEntry 16 }
 
 gcpLinkage OBJECT IDENTIFIER
-    ::= { gcpTables 3 }
+    ::= { gcpTables 4 }
 
 gcpLinkageTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpLinkageEntry
@@ -1741,24 +2378,26 @@ gcpLinkageEntry OBJECT-TYPE
          controller.  The managed system will not form an active 
          communications association between an MG and MGC that is not 
          listed in this table."
-    INDEX       { gcpMgId, gcpMgcId }
+    INDEX       { gcpMsId, gcpMgId, gcpMsId, gcpMgcId }
     ::= { gcpLinkageTable 1 }
 
 GcpLinkageEntry ::= SEQUENCE {
     gcpLinkageType              TransportAddressType,
+    gcpLinkageMgcMaster         INTEGER,
     gcpLinkageMgcAddress        TransportAddress,
     gcpLinkageMgAddress         TransportAddress,
     gcpLinkageMgcIdent          MegacoIdentSelection,
     gcpLinkageMgIdent           MegacoIdentSelection,
     gcpLinkageProfile           RowPointer,
     gcpLinkageProtocol          AutonomousType,
-    gcpLinkageEncoding          INTEGER,
-    gcpLinkageAuthAccess        BITS,
+    gcpLinkageEncoding          MegacoEncoding,
+    gcpLinkageAuthAccess        MegacoAuthenticatedAccess,
     gcpLinkageAdminState        AdministrativeState,
     gcpLinkageOperState         OperationalState,
     gcpLinkageProcStatus        ProceduralStatus,
     gcpLinkageAvailStatus       AvailabilityStatus,
-    gcpLinkageAuthentication    INTEGER,
+    gcpLinkageAuthentication    MegacoAuthentication,
+    gcpLinkageMit               TimeInterval,
     gcpLinkageRowStatus         RowStatus
 }
 
@@ -1773,42 +2412,106 @@ gcpLinkageType OBJECT-TYPE
          TRANSPORT-ADDRESS-MIB."
     ::= { gcpLinkageEntry 1 }
 
+gcpLinkageMgcMaster OBJECT-TYPE
+    SYNTAX      INTEGER { master(1), slave(2) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether the MGC in this control association is 
+         a Master MGC for the physical MG; that is, whether the MGC is 
+         permitted to modify shared physical interfaces.  When master(1), 
+         the MGC is a Master; slave(2), otherwise.  Only one protection 
+         group of MGCs can be designated as master(1) for a given host.  
+         Setting a different protection group of MGCs to master(1) will 
+         cause all other protection groups of MGCs to be set to slave(2).  
+         Setting one MGC in a protection group to master(1) will result 
+         in all other MGC in the protect group to be set to master(1).  
+         The same is true for a slave(2) setting.  Both rules are in 
+         effect when the setting defaults to msater(1), or when 
+         protection groups are formed or severed.  An MGC; however, can 
+         be master(1) for one set of virtual MGs, and slave(2) for 
+         another.
+         
+         A physical MG that is partitioned into multiple Virtual MGs that 
+         are controlled by different MGC must always know which of its 
+         controlling MGCs should be notified if an event occurs on the 
+         interface.  Manipulation of a physical interface shared by the 
+         virtual MGs should only be performed by one MGC.  Any of the 
+         MGCs is allowed to create Events Descriptors to be notified of 
+         shared events, but only one MGC can have read/write access to 
+         the physical interface properties; all other MGCs have read-only 
+         access.  The MGC with the read/write access is designated the 
+         Master MGC."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005), Clause 11.1, Multiple 
+               Virtual MGs."
+    DEFVAL      { master }
+    ::= { gcpLinkageEntry 2 }
+
 gcpLinkageMgcAddress OBJECT-TYPE
     SYNTAX      TransportAddress
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    ::= { gcpLinkageEntry 2 }
+        "Specifies the transport address of the MGC entity in 
+         the transport address domain specified by 
+         gcpLinkageType in accordance with the TransportAddress 
+         textual convention of the TRANSPORT-ADDRESS-MIB.
+         
+         Where the MGC is internal to the managed system, this 
+         address represents one of the transport addresses on 
+         which the MGC will listen for connections from MG that 
+         it controls.  Where the MGC is external to the managed 
+         system, this is the transport address to which the 
+         corresponding MG will attempt to connect.
+         
+         Both IP address and port number must be fully 
+         specified."
+    ::= { gcpLinkageEntry 3 }
 
 gcpLinkageMgAddress OBJECT-TYPE
     SYNTAX      TransportAddress
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    ::= { gcpLinkageEntry 3 }
+        "Specifies the transport address of the MG entity in the 
+         transport address domain specified by gcpLinkageType in 
+         accordance with the TransportAddress textual convention 
+         of the TRANSPORT-ADDRESS-MIB.
+         
+         Where the MG is internal to the managed system, this 
+         address represents the address from which the MG will 
+         attempt to connect to the MGC.  Where the MGC is 
+         internal to the managed system, this is a specification 
+         of the transport address from which the MGC expects to 
+         be contacted by the MG.
+         
+         Where the IPv4 address is 0.0.0.0, it specifies that 
+         the MG can use any IP address.  Where the transport 
+         port number is zero (0), it specifies that the MG can 
+         use any port number."
+    ::= { gcpLinkageEntry 4 }
 
 gcpLinkageMgcIdent OBJECT-TYPE
     SYNTAX      MegacoIdentSelection
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        "Specifies how a local MGC will identify itself, or how 
-         a remote MGC is expected to identify itself, in H.248 
-         messages.  One of:
+        "Specifies how a local MGC will identify itself and 
+         other MGC, or how a remote MGC is expected to identify 
+         itself and other MGC, in H.248 messages.  One of:
          
-         - ipAddress(1), the MGC will identify itself by its 
-           IPv4 or IPv6 address and transport port;
+         - ipAddress(1), the MGC will identify itself and other 
+           MGC by IPv4 or IPv6 address and transport port;
            
-         - domainName(2), the MGC will identify itself by its 
-           domain name;
+         - domainName(2), the MGC will identify itself and other 
+           MGC by domain name;
            
-         - deviceName(3), the MGC will identify itself by its 
-           device path;
+         - deviceName(3), the MGC will identify itself and other 
+           MGC by device path;
            
-         - mtpAddress(4), the MGC will identify itself by its 
-           M3UA MTP Point Code.
+         - mtpAddress(4), the MGC will identify itself and other 
+           MGC by MTP Point Code.
            
          The setting of this value has no effect on protocols 
          other than H.248.  The default value is determined by 
@@ -1816,34 +2519,68 @@ gcpLinkageMgcIdent OBJECT-TYPE
     REFERENCE   
         "ITU-T Recommendation H.248.1 (09/2005), Annex A, Mid 
                CHOICE."
-    ::= { gcpLinkageEntry 4 }
+    ::= { gcpLinkageEntry 5 }
 
 gcpLinkageMgIdent OBJECT-TYPE
     SYNTAX      MegacoIdentSelection
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    ::= { gcpLinkageEntry 5 }
+        "Specifies how a local MG will identify itself, or how 
+         a remote MG is expected to identify itself, in H.248 
+         messages.  One of:
+         
+         - ipAddress(1), the MG will identify itself by its IPv4 
+           or IPv6 address and transport port;
+         
+         - domainName(2), the MG will identify itself by its 
+           domain name;
+           
+         - deviceName(3), the MG will identify itself by its 
+           device name;
+           
+         - mtpAddress(4), the MG will identify itself by its MTP 
+           Point Code."
+    ::= { gcpLinkageEntry 6 }
 
 gcpLinkageProfile OBJECT-TYPE
     SYNTAX      RowPointer
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    ::= { gcpLinkageEntry 6 }
+        "Provides a pointer to a transport parameters profile to 
+         be used for this communications linkage.  This can be 
+         a profile from the gcpUdpProfileTable, 
+         gcpTcpProfileTable or gcpSctpProfileTable, or any other 
+         table of profile parameters known to the managed 
+         system.
+         
+         When unspecified (set to zeroDotZero), the protocol 
+         parameters from the corresponding set of default 
+         scalars (e.g, gcpDefaultSctpNoDelay) are used instead 
+         of a profile.
+         
+         Changes made to this profile might not be effective 
+         until the communications linkage is cycled."
+    DEFVAL      { zeroDotZero }
+    ::= { gcpLinkageEntry 7 }
 
 gcpLinkageProtocol OBJECT-TYPE
     SYNTAX      AutonomousType
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    ::= { gcpLinkageEntry 7 }
+        "Specifies the protocol variant and version to be used 
+         on the association.  This is an autonomous type and any 
+         value that is known to the managed system can be 
+         specified.  Note that, as far as version is concerned, 
+         this is the ``preferred'' version.  That is, this is 
+         the version that the MG will attempt to negotiate, and 
+         the maximum version that the MGC will offer in support."
+    ::= { gcpLinkageEntry 8 }
 
 gcpLinkageEncoding OBJECT-TYPE
-    SYNTAX      INTEGER { unspecified(0), binary(1), text(2) }
+    SYNTAX      MegacoEncoding
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
@@ -1864,10 +2601,10 @@ gcpLinkageEncoding OBJECT-TYPE
            
          A change in the value of this object while the link is 
          operational will not be effective until the link is cycled."
-    ::= { gcpLinkageEntry 8 }
+    ::= { gcpLinkageEntry 9 }
 
 gcpLinkageAuthAccess OBJECT-TYPE
-    SYNTAX      BITS { none(0), interim(1), tls(2), ah(3), esp(4) }
+    SYNTAX      MegacoAuthenticatedAccess
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
@@ -1877,8 +2614,9 @@ gcpLinkageAuthAccess OBJECT-TYPE
          
          - none(0), association is permitted without authentication.
            
-         - interm(1), the interim (IPv4) approach of ITU-T 
-           Recommendation H.248.1 (09/2005) Clause 10 is permitted.
+         - interim(1), the interim (IPv4) approach of ITU-T 
+           Recommendation H.248.1 (09/2005) Clause 10.2 is 
+           permitted.
            
          - tls(2), transport layer security is permitted.
            
@@ -1888,7 +2626,7 @@ gcpLinkageAuthAccess OBJECT-TYPE
            
          When a value is included in the set, it specifies that the 
          corresponding authentication method is permitted."
-    ::= { gcpLinkageEntry 9 }
+    ::= { gcpLinkageEntry 10 }
 
 gcpLinkageAdminState OBJECT-TYPE
     SYNTAX      AdministrativeState
@@ -1922,7 +2660,7 @@ gcpLinkageAdminState OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                administrativeState attribute."
-    ::= { gcpLinkageEntry 10 }
+    ::= { gcpLinkageEntry 11 }
 
 gcpLinkageOperState OBJECT-TYPE
     SYNTAX      OperationalState
@@ -1946,7 +2684,7 @@ gcpLinkageOperState OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
                operationalState attribute."
-    ::= { gcpLinkageEntry 11 }
+    ::= { gcpLinkageEntry 12 }
 
 gcpLinkageProcStatus OBJECT-TYPE
     SYNTAX      ProceduralStatus
@@ -1998,7 +2736,7 @@ gcpLinkageProcStatus OBJECT-TYPE
                Attribute-ASN1Module.ProceduralStatus.
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.2."
-    ::= { gcpLinkageEntry 12 }
+    ::= { gcpLinkageEntry 13 }
 
 gcpLinkageAvailStatus OBJECT-TYPE
     SYNTAX      AvailabilityStatus
@@ -2064,10 +2802,10 @@ gcpLinkageAvailStatus OBJECT-TYPE
                Attribute-ASN1Module.AvailabilityStatus
          ITU-T Rec. X.731 (1992) | ISO/IEC 10164-2 : 1993, 
                Section 8.1.2.3."
-    ::= { gcpLinkageEntry 13 }
+    ::= { gcpLinkageEntry 14 }
 
 gcpLinkageAuthentication OBJECT-TYPE
-    SYNTAX      INTEGER { none(0), interim(1), tls(2), ah(3), esp(4) }
+    SYNTAX      MegacoAuthentication
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -2077,8 +2815,9 @@ gcpLinkageAuthentication OBJECT-TYPE
          
          - none(0), no authentication is in effect.
            
-         - interm(1), the interim (IPv4) approach of ITU-T 
-           Recommendation H.248.1 (09/2005) Clause 10 is in effect.
+         - interim(1), the interim (IPv4) approach of ITU-T 
+           Recommendation H.248.1 (09/2005) Clause 10.2 is in 
+           effect.
            
          - tls(2), transport layer security is in effect.
            
@@ -2087,9 +2826,54 @@ gcpLinkageAuthentication OBJECT-TYPE
          - esp(4), IPv6 encapsulated security payload is in effect.
            
          When the association is not operational, this value will always 
-         read the value of the lass successful association, or none(0) 
-         when not association was every formed."
-    ::= { gcpLinkageEntry 14 }
+         read the value of the last successful association, or none(0) 
+         when no association was every formed."
+    ::= { gcpLinkageEntry 15 }
+
+gcpLinkageMit OBJECT-TYPE
+    SYNTAX      TimeInterval (0..65535)
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "A maximum inactivity time value of zero (0) disabled inactivity 
+         timing.
+         
+         An MGC that supports the ITU-T Rec. H.248.14 inactivity timer 
+         package may detect whether or not the MG supports the package by 
+         auditing it.  The MGC will set this maximum inactivity time on 
+         the ROOT termination for the MG.  The MGC on the control 
+         association should, regardless, ensure that the time between 
+         messages sent to the MG never exceeds this period.  The MGC 
+         ensures this by sending any message as a test or keep-alive 
+         message (such as an empty Audit of ROOT) whenever no other 
+         message is needed within the period.
+         
+         The MG will monitor incoming messages for periods of silence 
+         exceeding this maximum inactivity time value.  On the detection 
+         of an excessive period of silence, a Notify with the observed 
+         event of inactivity timeout will be generated.  If the MGC has 
+         failed, the event will not receive a reply.  If no reply is 
+         received the MG will consider the MGC to have failed and will 
+         follow the procedures of ITU-T Rec. H.248.1/11.5.
+         
+         The MG that detects the inactivity timeout will generate the 
+         notification.
+         
+         Note that only SCTP is capable of monitoring communications 
+         linkages without this mechanism; however, an active SCTP 
+         association does not necessarily mean that an active MGC-MG 
+         control association exists (the application on either end of the 
+         SCTP association could have failed).
+         
+         Note that this value may be changed autonomously by the managed 
+         system.  For example, the value can be changed at the MG by the 
+         MGC by setting the Maximum Inactivity Timer property of the ROOT 
+         termination at the MG."
+    REFERENCE   
+        "ITU-T Recommendation H.248.14 (03/2002), Maximum Inactivity 
+               Time."
+    ::= { gcpLinkageEntry 16 }
 
 gcpLinkageRowStatus OBJECT-TYPE
     SYNTAX      RowStatus
@@ -2102,10 +2886,10 @@ gcpLinkageRowStatus OBJECT-TYPE
          (such as a transport address address)."
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
-    ::= { gcpLinkageEntry 15 }
+    ::= { gcpLinkageEntry 17 }
 
 gcpUdpProfile OBJECT IDENTIFIER
-    ::= { gcpTables 4 }
+    ::= { gcpTables 5 }
 
 gcpUdpProfileTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpUdpProfileEntry
@@ -2145,11 +2929,14 @@ GcpUdpProfileEntry ::= SEQUENCE {
 }
 
 gcpUdpProfileId OBJECT-TYPE
-    SYNTAX      SimpleNameType
+    SYNTAX      SimpleNameType (SIZE(1..32))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an index into the gcpUdpProfileTable following 
+         the SimpleNameType textual convention.  The value of 
+         this string can be used to identify an entry in this 
+         table."
     ::= { gcpUdpProfileEntry 1 }
 
 gcpUdpChecksum OBJECT-TYPE
@@ -2157,7 +2944,14 @@ gcpUdpChecksum OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "This column defines whether a UDP checksum will be 
+         generated to cover the contents of the UDP payload.  
+         When set to true(1), a UDP checksum will be generated; 
+         when false(2), no UDP checksum will be generated.  The 
+         default default value is false(2).
+         
+         The default value is determined by the setting of 
+         gcpDefaultUdpChecksum."
     ::= { gcpUdpProfileEntry 2 }
 
 gcpUdpRowStatus OBJECT-TYPE
@@ -2165,13 +2959,23 @@ gcpUdpRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations, 
+         following the RowStatus textual convention from the 
+         SNMPv2-TC module, may create or destroy conceptual rows 
+         in this table.
+         
+         Note that profiles in this table cannot be deleted 
+         while they are referenced from an entry in the 
+         gcpLinkageTable.  Changes made to values in a profile 
+         will be effective immediately on operational 
+         communications linkages that reference the profile from 
+         the gcpLinkageTable."
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
     ::= { gcpUdpProfileEntry 3 }
 
 gcpTcpProfile OBJECT IDENTIFIER
-    ::= { gcpTables 5 }
+    ::= { gcpTables 6 }
 
 gcpTcpProfileTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpTcpProfileEntry
@@ -2218,12 +3022,12 @@ GcpTcpProfileEntry ::= SEQUENCE {
 }
 
 gcpTcpProfileId OBJECT-TYPE
-    SYNTAX      SimpleNameType
+    SYNTAX      SimpleNameType (SIZE(1..32))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
         "Provides an index into the gcpTcpProfileTable following the 
-         SimpleNameType textual convention.  This value of this string 
+         SimpleNameType textual convention.  The value of this string 
          can be used to identify an entry in this table."
     ::= { gcpTcpProfileEntry 1 }
 
@@ -2422,7 +3226,7 @@ gcpTcpRowStatus OBJECT-TYPE
     ::= { gcpTcpProfileEntry 10 }
 
 gcpSctpProfile OBJECT IDENTIFIER
-    ::= { gcpTables 6 }
+    ::= { gcpTables 7 }
 
 gcpSctpProfileTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpSctpProfileEntry
@@ -2476,7 +3280,7 @@ GcpSctpProfileEntry ::= SEQUENCE {
 }
 
 gcpSctpProfileId OBJECT-TYPE
-    SYNTAX      SimpleNameType
+    SYNTAX      SimpleNameType (SIZE(1..32))
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
@@ -2844,7 +3648,7 @@ gcpSctpRowStatus OBJECT-TYPE
     ::= { gcpSctpProfileEntry 17 }
 
 gcpProtGroup OBJECT IDENTIFIER
-    ::= { gcpTables 7 }
+    ::= { gcpTables 8 }
 
 gcpProtGroupTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpProtGroupEntry
@@ -3427,7 +4231,7 @@ gcpSbolStatus OBJECT-TYPE
     ::= { gcpSbolEntry 3 }
 
 gcpProtUnit OBJECT IDENTIFIER
-    ::= { gcpTables 8 }
+    ::= { gcpTables 9 }
 
 gcpProtUnitTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF GcpProtUnitEntry
@@ -3561,7 +4365,7 @@ gcpProtUnitEntry OBJECT-TYPE
                manualSwitch (switchStatus: completed; relatedUnit: 
                fromPU#).
                
-             - Release Faild: A time-out occurs while waiting for 
+             - Release Failed: A time-out occurs while waiting for 
                a release.  In this case, service is still on the 
                protecting PU, status syntax is releaseFailed plus the 
                previous status, such as manualSwitch (switchStatus: 
@@ -3707,49 +4511,55 @@ gcpProtUnitProtectionStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "
-         - noRequest(0),
+         - noRequest(0), no switch request is present for the 
+           protection unit;
            
-         - doNotRevert(1), the protection unit is providing service and 
-           the protection group semantics does not allow revertive 
-           behaviour; the switch status is completed(2);
+         - doNotRevert(1), the protection unit is providing 
+           service and the protection group semantics does not 
+           allow revertive behaviour; the switch status is 
+           completed(2);
            
          - manualSwitch(2), when this condition is present, the 
-           gcpProtUnitSwitchStatus indicates the current switching 
-           status and the gcpProtUnitRequestSource indicates the source 
-           of the switching request; the gcpProtUnitRelatedUnit 
-           indicates the related (switched to or switched from) unit, 
-           and the gcpProtUnitSwitchDirection indicates the direction of 
+           gcpProtUnitSwitchStatus indicates the current 
+           switching status and the gcpProtUnitRequestSource 
+           indicates the source of the switching request; the 
+           gcpProtUnitRelatedUnit indicates the related 
+           (switched to or switched from) unit, and the 
+           gcpProtUnitSwitchDirection indicates the direction of 
            switching;
            
          - autoSwitch(3), when this condition is present, the 
-           gcpProtUnitSwitchStatus indicates the current switching 
-           status and the gcpProtUnitRequestSource indicates the source 
-           of the switching request; the gcpProtUnitRelatedUnit 
-           indicates the related (switched to or switched from) unit, 
-           and the gcpProtUnitSwitchDirection indicates the direction of 
+           gcpProtUnitSwitchStatus indicates the current 
+           switching status and the gcpProtUnitRequestSource 
+           indicates the source of the switching request; the 
+           gcpProtUnitRelatedUnit indicates the related 
+           (switched to or switched from) unit, and the 
+           gcpProtUnitSwitchDirection indicates the direction of 
            switching;
            
          - forcedSwitch(4), when this condition is present, the 
-           gcpProtUnitSwitchStatus indicates the current switching 
-           status and the gcpProtUnitRequestSource indicates the source 
-           of the switching request; the gcpProtUnitRelatedUnit 
-           indicates the related (switched to or switched from) unit, 
-           and the gcpProtUnitSwitchDirection indicates the direction of 
+           gcpProtUnitSwitchStatus indicates the current 
+           switching status and the gcpProtUnitRequestSource 
+           indicates the source of the switching request; the 
+           gcpProtUnitRelatedUnit indicates the related 
+           (switched to or switched from) unit, and the 
+           gcpProtUnitSwitchDirection indicates the direction of 
            switching;
            
-         - lockout(5), the protection unit is locked out by management 
-           action; when this condition is present, the 
-           gcpProtUnitSwitchStatus indicates the current switching 
-           status and the gcpProtUnitRequestSource indicates the source 
-           of the lockout request;
+         - lockout(5), the protection unit is locked out by 
+           management action; when this condition is present, 
+           the gcpProtUnitSwitchStatus indicates the current 
+           switching status and the gcpProtUnitRequestSource 
+           indicates the source of the lockout request;
            
-         - releaseFailed(6), the protection unit is a protecting unit 
-           and release to the protected unit has failed;
+         - releaseFailed(6), the protection unit is a protecting 
+           unit and release to the protected unit has failed;
            
          - resourceFailed(7), the protection unit has failed;
            
-         - lockedIn(8), the unit has reached its maximum number of APS 
-           hits for the time window and is currently locked-in.
+         - lockedIn(8), the unit has reached its maximum number 
+           of APS hits for the time window and is currently 
+           locked-in.
          
          This attribute is used to indicate the status of the protection 
          switch in a protectionUnit instance. This attribute is 
@@ -4067,7 +4877,7 @@ gcpProtUnitRelatedUnit OBJECT-TYPE
 gcpProtUnitAutoSwitchReason OBJECT-TYPE
     SYNTAX      INTEGER { waitToRestore(0), signalDegrade(1), 
                     signalFail(2) }
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
         "Specifies the reason for the APS when the protection status is 
@@ -4083,10 +4893,17 @@ gcpProtUnitAutoSwitchReason OBJECT-TYPE
 
 gcpProtUnitLockoutReleaseFailed OBJECT-TYPE
     SYNTAX      TruthValue
-    MAX-ACCESS  read-create
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "This column is only significant when the 
+         gcpProtUnitProtectionStatus is lockout(5) and a release 
+         of the lockout(5) condition failed, leaving the 
+         protection unit in the locked out condition.  For all 
+         other conditions, this column reads false(2)."
+    REFERENCE   
+        "ITU-T Rec. M.3100 (2005) 
+               ASN1DefinedTypesModule:ProtectionStatusR1"
     ::= { gcpProtUnitEntry 11 }
 
 gcpProtUnitPriority OBJECT-TYPE
@@ -4126,8 +4943,446 @@ gcpProtUnitRowStatus OBJECT-TYPE
         "STD 58, SNMPv2-TC RowStatus."
     ::= { gcpProtUnitEntry 13 }
 
+
+gcpRealm OBJECT IDENTIFIER
+    ::= { gcpTables 10 }
+
+gcpRealmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpRealmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE
+        "ITU-T Recommendation H.248.41 (05/2006) IP domain 
+               connection package.
+         RFC 2663, NAT Terminology and Considerations."
+    ::= { gcpRealm 1 }
+
+gcpRealmEntry OBJECT-TYPE
+    SYNTAX      GcpRealmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "IP Address Realm is defined in RFC 2663, clause 2.1, as 
+         a network domain in which the network addresses are 
+         uniquely assigned to entities such that datagrams can 
+         be routed to them.  Routing protocols used within the 
+         network domain are responsible for findng routes to 
+         entities given their network addresses.
+         
+         The value of the IP realm identifier property is 
+         a string, which may be in a domain name format, such as 
+         `mynet.net', or any other string format.
+         
+         The IP realm identifier should be provisioned between 
+         the MGC and the MG.  Each of the different IP realms 
+         possibly interconnecting with an MG should have 
+         a different identifier.  The MGC and the MG can 
+         provisino a default IP realm and configure it on the 
+         MG.  If the MGC sends a command to the MG to create an 
+         IP-based H.248 termination without the IP realm 
+         identifier property, the MG will consider it as 
+         indicating the default realm.
+         
+         If the value of the IP realm identifier property sent 
+         by the MGC cannot be recognized by the MG, the MG will 
+         fail to create the IP-based H.248 termination and 
+         return the corresponding error code to the MGC: 449 
+         (Unsupported or Unknown Parameter or Property Value)."
+    REFERENCE
+        "ITU-T Recommendation H.248.41 (05/2006) IP domain 
+               connection package.
+         RFC 2663, NAT Terminology and Considerations."
+    INDEX       { gcpMsId, gcpMgId, gcpRealmId }
+    ::= { gcpRealmTable 1 }
+
+GcpRealmEntry ::= SEQUENCE {
+    gcpRealmId              Unsigned32,
+    gcpRealmString          SnmpAdminString,
+    gcpRealmTermsMax        Unsigned32,
+    gcpRealmTermsCurrent    Gauge32,
+    gcpRealmTermsHiWat      Gauge32,
+    gcpRealmTermsLoWat      Gauge32,
+    gcpRealmRowStatus       RowStatus
+}
+
+gcpRealmId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero ordinal index into the 
+         gcpRealmTable.  The index one (1) has significant 
+         meaning, it is the default realm that will be used if 
+         a realm identifier property is not specified during the 
+         formation of an ephemeral termination."
+    ::= { gcpRealmEntry 1 }
+
+gcpRealmString OBJECT-TYPE
+    SYNTAX      SnmpAdminString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies an IP address realm for use in the realm 
+         identifier when creating ephemerial terminations."
+    REFERENCE
+        "ITU-T Recommendation H.248.41 (05/2006) IP domain 
+               connection package.
+         RFC 2663, NAT Terminology and Considerations."
+    ::= { gcpRealmEntry 2 }
+
+gcpRealmTermsMax OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the maximum number of ephemeral terminations 
+         available in this IP address realm."
+    ::= { gcpRealmEntry 3 }
+
+gcpRealmTermsCurrent OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of current ephemeral terminations 
+         in use in this realm."
+    ::= { gcpRealmEntry 4 }
+
+gcpRealmTermsHiWat OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the high water mark of ephemeral terminations 
+         in use since the last reset of this object.  The object 
+         is reset by setting it to zero."
+    DEFVAL      { 0 }
+    ::= { gcpRealmEntry 5 }
+
+gcpRealmTermsLoWat OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the low water mark of ephemeral terminations 
+         in use since the last reset of this object.  The object 
+         is reset by setting it gcpRealmTermsMax or higher."
+    DEFVAL      { 4294967295 }
+    ::= { gcpRealmEntry 6 }
+
+gcpRealmRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create or destroy conceptual rows in this table."
+    ::= { gcpRealmEntry 7 }
+
+gcpInterface OBJECT IDENTIFIER
+    ::= { gcpTables 11 }
+
+gcpInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Recommendation H.248.64 (12/2009)"
+    ::= { gcpInterface 1 }
+
+gcpInterfaceEntry OBJECT-TYPE
+    SYNTAX      GcpInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "ITU-T Recommendation H.248.64 (12/2009)"
+    INDEX       { gcpMsId, gcpInterfaceId }
+    ::= { gcpInterfaceTable 1 }
+
+GcpInterfaceEntry ::= SEQUENCE {
+    gcpInterfaceId              Unsigned32,
+    gcpInterfaceIfindex         Unsigned32,
+    gcpInterfaceMgId            Unsigned32,
+    gcpInterfaceType            INTEGER,
+    gcpInterfaceRealm           Unsigned32,
+    gcpInterfaceTermId          MegacoTerminationId,
+    gcpInterfaceTermPath        MegacoTerminationPath,
+    gcpInterfaceRowStatus       RowStatus
+}
+
+gcpInterfaceId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a non-zero oridinal sub-index into the 
+         gcpInterfaceTable, identifying an L2 interface within 
+         a managed switching element (host)."
+    ::= { gcpInterfaceEntry 1 }
+
+gcpInterfaceIfindex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the interface index (value of ifIndex) of the 
+         associated L2 interface.  Only one entry in this table 
+         is permitted to assumed the value of a given interface.  
+         The interface index must exist."
+    ::= { gcpInterfaceEntry 2 }
+
+gcpInterfaceMgId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the virtual MG to which this interface is 
+         assigned.  This gcpMsId and gcpMgId combination must 
+         exist in the gcpMgTable."
+    ::= { gcpInterfaceEntry 3 }
+
+gcpInterfaceType OBJECT-TYPE
+    SYNTAX      INTEGER { b2b(1), iipr(2), ripr(3), nipr(4) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "
+         - b2b(1), back-to-back IP host mode;
+           
+         - iipr(2), interface IPR context type of IP router 
+           mode;
+           
+         - ripr(3), route IPR context type of IP router mode;
+           
+         - nipr(4), NAT IPR context type of IP router mode."
+    REFERENCE   
+        "ITU-T Recommendation H.248.64 (12/2009), 10.1.1."
+    ::= { gcpInterfaceEntry 4 }
+
+gcpInterfaceRealm OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { gcpInterfaceEntry 5 }
+
+gcpInterfaceTermId OBJECT-TYPE
+    SYNTAX      MegacoTerminationId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { gcpInterfaceEntry 6 }
+
+gcpInterfaceTermPath OBJECT-TYPE
+    SYNTAX      MegacoTerminationPath
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { gcpInterfaceEntry 7 }
+
+gcpInterfaceRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { gcpInterfaceEntry 8 }
+
+
+gcpAddress OBJECT IDENTIFIER
+    ::= { gcpTables 12 }
+
+gcpAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GcpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { gcpAddress 1 }
+
+gcpAddressEntry OBJECT-TYPE
+    SYNTAX      GcpAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { gcpMsId, gcpMgId, gcpRealmId, gcpInterfaceId, gcpAddressId }
+    ::= { gcpAddressTable 1 }
+
+GcpAddressEntry ::= SEQUENCE {
+    gcpAddressId            Unsigned32,
+    gcpAddressInterface     Unsigned32,
+    gcpAddressType          InetAddressType,
+    gcpAddressAddr          InetAddress,
+    gcpAddressPortRanges    InetAddressPortRanges,
+    gcpAddressRowStatus     RowStatus
+}
+
+gcpAddressId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides a non-zero ordinal index into this table."
+    ::= { gcpAddressEntry 1 }
+
+gcpAddressInterface OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpAddressEntry 3 }
+
+gcpAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the address type in accordance with the 
+         InetAddressType textual convention of the 
+         INET-ADDRESS-MIB.  This dictates the type of address 
+         that is contained in the gcpAddressAddr column."
+    REFERENCE
+        "RFC 4001, INET-ADDRESS-MIB:InetAddressType."
+    ::= { gcpAddressEntry 4 }
+
+gcpAddressAddr OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the address, which is of type gcpAddressType, 
+         in accordance with the InetAddress textual convention 
+         of the INET-ADDRESS-MIB."
+    REFERENCE
+        "RFC 4001, INET-ADDRESS-MIB:InetAddress."
+    ::= { gcpAddressEntry 5 }
+
+gcpAddressPortRanges OBJECT-TYPE
+    SYNTAX      InetAddressPortRanges
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpAddressEntry 6 }
+
+gcpAddressRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { gcpAddressEntry 7 }
+
+
 gcpOids OBJECT IDENTIFIER
     ::= { gcpMIB 4 }
+
+gcpProtocols OBJECT IDENTIFIER
+    ::= { gcpOids 1 }
+
+gcpProtocolSgcp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The SGCP protocol."
+    ::= { gcpProtocols 1 }
+
+gcpProtocolIdcp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The IDCP protocol."
+    ::= { gcpProtocols 2 }
+
+gcpProtocolMgcp OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The MGCP protocol as described in RFC 2705."
+    REFERENCE   
+        "RFC 2705"
+    ::= { gcpProtocols 3 }
+
+gcpProtocolMegaco OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The MEGACO/H.248 protocol as described in RFCs."
+    ::= { gcpProtocols 4 }
+
+gcpProtocolMegacoV1 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The MEGACO protocol Version 1."
+    ::= { gcpProtocolMegaco 1 }
+
+gcpProtocolMegacoV2 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The MEGACO protocol Version 2."
+    ::= { gcpProtocolMegaco 2 }
+
+gcpProtocolMegacoV3 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The MEGACO protocol Version 3."
+    ::= { gcpProtocolMegaco 3 }
+
+gcpProtocolH248 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The MEGACO/H.248 protocol as described in ITU-T Rec. 
+         H.248.1."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005)"
+    ::= { gcpProtocols 5 }
+
+gcpProtocolH248v1 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The H.248 protocol Version 1."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005)"
+    ::= { gcpProtocolH248 1 }
+
+gcpProtocolH248v2 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The H.248 protocol Version 2."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005)"
+    ::= { gcpProtocolH248 2 }
+
+gcpProtocolH248v3 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The H.248 protocol Version 3."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005)"
+    ::= { gcpProtocolH248 3 }
+
+gcpProtocolCbc OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The CBC protocol as described in ITU-T Rec. Q.1950."
+    REFERENCE   
+        "ITU-T Recommendation Q.1950."
+    ::= { gcpProtocols 6 }
+
+gcpProtocolBgc OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The BGC protocol as described in ETSI ES 283 018."
+    REFERENCE   
+        "ETSI ES 283 018 V2.7.2 (2010-01)."
+    ::= { gcpProtocols 7 }
 
 gcpGroups OBJECT IDENTIFIER
     ::= { gcpMIB 5 }
@@ -4153,8 +5408,197 @@ gcpProtectionSwitchReport NOTIFICATION-TYPE
          protection status."
     ::= { gcpNotifications 1 }
 
+gcpMgFailure NOTIFICATION-TYPE
+    OBJECTS     { tmnObjectInstance }
+    STATUS      current
+    DESCRIPTION 
+        "The object instance reported in the this failure notification is 
+         the RowPointer to the entry of the media gateway that failed, or 
+         is failing, in the gcpMgTable.
+         
+         If an MG fails, but is capable of sending a message to the MGC, 
+         it sends a ServiceChange with an appropriate method (Graceful or 
+         Forced) and specifies the Root TerminationID.  When it returns 
+         to service, it sends a ServiceChange with a ``Restart'' 
+         ServiceChangeMethod.
+         
+         Allowing the MGC to send duplicate messages to both MGs 
+         accommodates pairs of MGs that are capable of redundant fail-over 
+         of one of the MGs.  Only the Working MG shall accept or reject 
+         transactions.  Upon fail-over, the primary MG sends 
+         a ServiceChange Command with a ``Failover'' method and a ``MG 
+         Impending Failure'' reason.  The MGC then uses the secondary MG 
+         as the active MG.  When the error condition is repaired, the 
+         working MG can send a ``ServiceChange'' with a ``Restart'' 
+         ServiceChangeMethod.
+         
+         NOTE -- that redundant failover MGs require a reliable transport, 
+         because the protocol provides no means for a secondary MG 
+         running ALF to acknowledge messages sent from the MGC."
+    REFERENCE
+        "ITU-T Recommendation H.248.1 (09/2005), Clause 11.4, Failure of 
+               a MG."
+    ::= { gcpNotifications 2 }
+
+gcpMgcFailure NOTIFICATION-TYPE
+    OBJECTS     { tmnObjectInstance }
+    STATUS      current
+    DESCRIPTION 
+        "If the MG detects a failure of its controlling MGC, it attempts to 
+         contact the next MGC on its pre-provisioned list.  It starts its 
+         attempts at the beginning (primary MGC), unless that was the MGC that 
+         failed, in which case it starts at its first secondary MGC.  It sends 
+         a ServiceChange message with a ``Failover'' method and a ``MGC 
+         Impending Failure'' reason.  If the MG is unable to establish a control 
+         relationship with any MGC, it shall wait a random amount of time as 
+         described in ITU-T Rec.  H.248.1/9.2 and then start again contacting 
+         its primary, and (if necessary) its secondary MGCs.  When contacting 
+         its previous controlling MGC, the MG sends the ServiceChagne message 
+         with ``Disconnected'' method.
+         
+         In partial failure, or for manual maintenance reasons, an MGC may wish 
+         to direct its controlled MGs to use a different MGC.  To do so, it 
+         sends a ServiceChange method to the MG with a ``Handoff'' method, and 
+         its designated replacement in ServiceChangeMgcID.  If ``Handoff'' is 
+         supported, the MGC shall send a ServiceChange message with 
+         a ``Handoff'' method and a ``MGC directed change'' reason to the 
+         designated MGC.  If it fails to get a rely from the designated MGC, the 
+         MG shall behave as if its MGC failed, and start contacting secondary 
+         MGCs as specified in the previous paragraph.  If the MG is unabled to 
+         establish a control relationship with any MGC, it shall wait a random 
+         amount of time as described in ITU-T Rec.  H.248.1/9.2 and then start 
+         contacting its primary, and if necessary, its secondary MGCs again.
+         
+         No recommendation is made on how the MGCs invoked in the hand-off 
+         maintain state information; this is considered to be out of scope of 
+         this Recommendation.  The MGC and MG may take the following steps when 
+         hand-off occurs.  When the MGC iinitiates a hand-off, the handover should 
+         be transparent to operations on the Media Gateway.  Transactions can be 
+         executed in any order, and could be in progress when the ServiceChange 
+         is executed.  Accordingly, commands in progress continue and replies to 
+         all commands from the original MGC must be sent to the transport 
+         address from which they were sent.  If the service relationship with 
+         the sending MGC has ended, the replies should be discarded.  The MG may 
+         receive outstanding transaction replies from the new MGC.  No new 
+         messages shall be sent to the new MGC until the control association is 
+         established.  Repeated transaction requests shall be directed to the 
+         new MGC.  The MG shall maintain the state of all terminations and 
+         contexts.
+         
+         It is possible that the MGC could be implemented in such a way that 
+         a failed MGC is replaced by a working MGC where the identity of the new 
+         MGC is the same as the failed one.  In such a case, the 
+         ServiceChangeMgcID would be specified with the previous value and the 
+         MG shall behave as if the value was changed, and send a ServiceChange 
+         message as above.
+         
+         Pairs of MGCs that are capable of redundant fail-over can notify the 
+         controlled MGCs of the fail-over by the above mechanism. "
+    REFERENCE
+        "ITU-T Recommendation H.248.1 (09/2005), Clause 11.5, Failure of 
+               an MGC."
+    ::= { gcpNotifications 3 }
+
+gcpLinkageFailure NOTIFICATION-TYPE
+    OBJECTS     { tmnObjectInstance }
+    STATUS      current
+    DESCRIPTION 
+        "Monitoring the MGC-MG control association is essential for high 
+         availability networks.  This may be realized by continuously checking 
+         the MGC-MG interconnection (link state).  Many transports provide this 
+         functionality, so a mandatory protocol mechanism is unnecessary.
+         
+         For those transports transports that do not provide link state 
+         monitoring, this functionality can be acheived in the H.248 protocol by 
+         utilizing the existing messaging.  In the absence of any H.248 
+         messaging, the MGC may use an AuditValue Command on Root with an empty 
+         AuditDescriptor to detect the loss of communications with the MG.  The 
+         MG can detect the communications loss itself through the use of the 
+         Inactivity Timer Package (ITU-T Rec. H.248.14)."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005), Clause 11.6, MGC-MG control 
+               associaiton monitoring.
+         ITU-T Recommendation H.248.14."
+    ::= { gcpNotifications 4 }
+
+gcpInactivityTimeout NOTIFICATION-TYPE
+    OBJECTS     { tmnObjectInstance, gcpLinkageMit }
+    STATUS      current
+    DESCRIPTION 
+        "This notification is generated by an MG when it detects 
+         inactivity from and MGC on a control association.  It is 
+         generated regardless of whether the MGC will reply to any 
+         resulting Notify command sent to the MGC as a result of the 
+         timeout.
+         
+         This notification is generated by an MGC when it receives 
+         a Notify with an observed event of `Inactivity Timeout' from the 
+         associated MG, in accordance with the procedures of ITU-T Rec. 
+         H.248.14.
+         
+         The parameters of the notification are the RowPointer indexing 
+         the entry in the gcpLinkageTable for which the inactivity was 
+         detected, and the setting of gcpLinkageMit that was in effect 
+         when the inactivity was detected."
+    REFERENCE   
+        "ITU-T Recommendation H.248.14 (03/2002), Inactivity Timer 
+               Package, Clause 5.5, Procedures.
+         ITU-T Recommendation H.248.1 (09/2005), Clause 11.5, Failure of 
+               an MGC."
+    ::= { gcpNotifications 5 }
+
+gcpMgColdStart NOTIFICATION-TYPE
+    OBJECTS     { tmnObjectInstance }
+    STATUS      current
+    DESCRIPTION 
+        "Provides a notification when an MG initiates a cold start or an 
+         MGC detects that at attached MG is cold starting.
+         
+         A MG is pre-provisioned with a primary (protected) and 
+         optionally an ordered list of secondary (protecting) MGCs.  
+         Upon a cold start of the MG, it will issue a ServiceChange 
+         Command with a ``Restart'' method, on the Root Termination to 
+         its primary MGC.  If the MGC accepts the MG, it sends 
+         a TransactionReply not including a ServiceChangeMgcID parameter.  
+         If the MGC does not accept the MG's registration, it sends 
+         a TransactionReply, providing the address of an alternate MGC to 
+         be contacted by including a ServiceChangeMgcID parameter.
+         
+         If the MG receives a TransactionReply that includes 
+         a ServiceChangeMgcID parameter, it sends a ServiceChange to the 
+         MGC specified in the ServiceChangeMgcID.  It continues this 
+         process until it gets a controlling MGC to accept its 
+         registration, or it fails to get a reply.  Upon failure to 
+         obtain a reply, either from the primary MGC, or a designated 
+         successor, the MG tries its pre-provisioned secondary MGCs, in 
+         order.  If the MGC is unable to establish a control relationship 
+         with any MGC, it shall wait a random amount of time as described 
+         in ITU-T Rec. H.248.1/9.2 and then start contacting its primary, 
+         and if necessary, its secondary MGCs again.
+         
+         It is possible that the reply to a ServiceChange with Restart 
+         will be lost, and a command will be received by the MG prior to 
+         the receipt of the ServiceChange response.  The MG shall issue 
+         Error Code 505 (TransactionRequest Received before 
+         a SericeChange Reply has been received)."
+    REFERENCE   
+        "ITU-T Recommendation H.248.1 (09/2005), Clause 11.2, Cold 
+               start."
+    ::= { gcpNotifications 6 }
+
+gcpOnOccEvent NOTIFICATION-TYPE
+    OBJECTS     { tmnObjectInstance, tmnProbableCause, 
+                  tmnPerceivedSeverity }
+    STATUS      current
+    DESCRIPTION 
+        "Provides a notification that is used for MG or MGC 
+         on-occurrence events that do not use the communicationsAlarm 
+         notification."
+    ::= { gcpNotifications 7 }
+
 gcpNotificationGroup NOTIFICATION-GROUP
-    NOTIFICATIONS { gcpProtectionSwitchReport }
+    NOTIFICATIONS { gcpProtectionSwitchReport, gcpMgColdStart, 
+                  gcpOnOccEvent }
     STATUS      current
     DESCRIPTION 
         "A collection of all of the accessible notifications in this 
@@ -4173,26 +5617,33 @@ gcpObjectGroup OBJECT-GROUP
                   gcpDefaultTcpKeepAlive, gcpDefaultTcpKeepIdle, 
                   gcpDefaultTcpKeepAliveItvl, gcpDefaultTcpKeepCount, 
                   gcpDefaultTcpSynRetrans, gcpDefaultTcpWindowClamp, 
+                  gcpMsName, gcpMsAlarmStatus, gcpMsOperationalState, 
+                  gcpMsUsageState, gcpMsManagedElementType, 
+                  gcpMsModelCode, gcpMsVendorName, gcpMsUserLabel, 
+                  gcpMsVersion, gcpMsAsaProfilePointer, 
+                  gcpMsNetworkElementAliases, gcpMsRowStatus, 
                   gcpMgLocation, gcpMgName, gcpMgDomainName, 
                   gcpMgDeviceName, gcpMgMtpAddress, gcpMgAdminState, 
-                  gcpMgOperState, gcpMgUsageState, gcpMgAvailStatus, 
-                  gcpMgProcStatus, gcpMgPg, gcpMgStandbyStatus, 
-                  gcpMgRowStatus, gcpMgcLocation, gcpMgcName, 
-                  gcpMgcDomainName, gcpMgcDeviceName, gcpMgcMtpAddress, 
-                  gcpMgcAdminState, gcpMgcOperState, gcpMgcUsageState, 
-                  gcpMgcAvailStatus, gcpMgcProcStatus, gcpMgcPg, 
-                  gcpMgcStandbyStatus, gcpMgcRowStatus, gcpLinkageType, 
-                  gcpLinkageMgcAddress, gcpLinkageMgAddress, 
-                  gcpLinkageMgcIdent, gcpLinkageMgIdent, 
-                  gcpLinkageProfile, gcpLinkageProtocol, 
-                  gcpLinkageEncoding, gcpLinkageAuthAccess, 
-                  gcpLinkageAdminState, gcpLinkageOperState, 
-                  gcpLinkageProcStatus, gcpLinkageAvailStatus, 
-                  gcpLinkageAuthentication, gcpLinkageRowStatus, 
-                  gcpUdpChecksum, gcpUdpRowStatus, gcpTcpNoDelay, 
-                  gcpTcpMaxseg, gcpTcpKeepAlive, gcpTcpKeepIdle, 
-                  gcpTcpKeepAliveItvl, gcpTcpKeepCount, gcpTcpSynRetrans, 
-                  gcpTcpWindowClamp, gcpTcpRowStatus, 
+                  gcpMgOperState, gcpMgAlarmStatus, 
+                  gcpMgAsaProfilePointer, gcpMgUsageState, 
+                  gcpMgAvailStatus, gcpMgProcStatus, gcpMgPg, 
+                  gcpMgStandbyStatus, gcpMgRowStatus, gcpMgcLocation, 
+                  gcpMgcName, gcpMgcDomainName, gcpMgcDeviceName, 
+                  gcpMgcMtpAddress, gcpMgcAdminState, gcpMgcOperState, 
+                  gcpMgcAlarmStatus, gcpMgcAsaProfilePointer, 
+                  gcpMgcUsageState, gcpMgcAvailStatus, gcpMgcProcStatus, 
+                  gcpMgcPg, gcpMgcStandbyStatus, gcpMgcRowStatus, 
+                  gcpLinkageType, gcpLinkageMgcAddress, 
+                  gcpLinkageMgAddress, gcpLinkageMgcIdent, 
+                  gcpLinkageMgIdent, gcpLinkageProfile, 
+                  gcpLinkageProtocol, gcpLinkageEncoding, 
+                  gcpLinkageAuthAccess, gcpLinkageAdminState, 
+                  gcpLinkageOperState, gcpLinkageProcStatus, 
+                  gcpLinkageAvailStatus, gcpLinkageAuthentication, 
+                  gcpLinkageRowStatus, gcpUdpChecksum, gcpUdpRowStatus, 
+                  gcpTcpNoDelay, gcpTcpMaxseg, gcpTcpKeepAlive, 
+                  gcpTcpKeepIdle, gcpTcpKeepAliveItvl, gcpTcpKeepCount, 
+                  gcpTcpSynRetrans, gcpTcpWindowClamp, gcpTcpRowStatus, 
                   gcpDefaultSctpNoDelay, gcpDefaultSctpMaxseg, 
                   gcpDefaultSctpHeartbeatItvl, gcpDefaultSctpHearbeat, 
                   gcpDefaultSctpRtoInitial, gcpDefaultSctpRtoMin, 
@@ -4278,6 +5729,12 @@ gcpFullCompliance MODULE-COMPLIANCE
         DESCRIPTION   
               "PRESENT IF the objectCreation and objectDeletion notifications 
                defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 are 
+               supported by an instance of this class."
+
+        GROUP   communicationsAlarmPackage
+        DESCRIPTION   
+              "PRESENT IF the communicationsAlarm notification defined 
+               in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is 
                supported by an instance of this class."
 
     ::= { gcpCompliance 1 }

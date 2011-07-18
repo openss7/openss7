@@ -70,7 +70,7 @@ all: simple storage openss7 master
 dump: \
 	megacoRingingMIB.mib \
 	megacoTonesMIB.mib \
-	megacoMib.mib \
+	megacoMIB.mib \
 	gcpMIB.mib \
 	rtpswMIB.mib \
 	rtpswOmMIB.mib \
@@ -120,7 +120,7 @@ megacoRingingMIB.mib: ../mibs/MEGACO-RINGING-MIB.mib
 megacoTonesMIB.mib: ../mibs/MEGACO-TONES-MIB.mib
 	smidump -k MEGACO-TONES-MIB >$@ || :
 
-megacoMib.mib: ../mibs/MEGACO-MIB.mib
+megacoMIB.mib: ../mibs/MEGACO-MIB.mib
 	smidump -k MEGACO-MIB >$@ || :
 
 gcpMIB.mib: ../mibs/OPENSS7-GCP-MIB.mib
@@ -252,7 +252,7 @@ x400pMIB.mib: ../mibs/OPENSS7-X400P-MIB.mib
 lint: \
 	megacoRingingMIB.lint \
 	megacoTonesMIB.lint \
-	megacoMib.lint \
+	megacoMIB.lint \
 	gcpMIB.lint \
 	rtpswMIB.lint \
 	rtpswOmMIB.lint \
@@ -302,7 +302,7 @@ megacoRingingMIB.lint: ../mibs/MEGACO-RINGING-MIB.mib
 megacoTonesMIB.lint: ../mibs/MEGACO-TONES-MIB.mib
 	smilint -ms MEGACO-TONES-MIB >$@ 2>&1 || :
 
-megacoMib.lint: ../mibs/MEGACO-MIB.mib
+megacoMIB.lint: ../mibs/MEGACO-MIB.mib
 	smilint -ms MEGACO-MIB >$@ 2>&1 || :
 
 gcpMIB.lint: ../mibs/OPENSS7-GCP-MIB.mib
@@ -431,7 +431,10 @@ x400pMIB.lint: ../mibs/OPENSS7-X400P-MIB.mib
 #x400pMIB.lint: ../mibs/OPENSS7-X400P-MX-MIB.mib
 #	smilint -ms OPENSS7-X400-MX-MIB >$@ 2>&1 || :
 
-check: \
+tree check: \
+	megacoRingingMIB.tree \
+	megacoTonesMIB.tree \
+	megacoMIB.tree \
 	gcpMIB.tree \
 	rtpswMIB.tree \
 	rtpswOmMIB.tree \
@@ -474,6 +477,15 @@ check: \
 	x25MIB.tree \
 	x400pMIB.tree \
 	x400pMIB.tree
+
+megacoRingingMIB.tree: ../mibs/MEGACO-RINGING-MIB.mib
+	snmptranslate -Tp MEGACO-RINGING-MIB::megacoRingingMIB >megacoRingingMIB.tree
+
+megacoTonesMIB.tree: ../mibs/MEGACO-TONES-MIB.mib
+	snmptranslate -Tp MEGACO-TONES-MIB::megacoTonesMIB >megacoTonesMIB.tree
+
+megacoMIB.tree: ../mibs/MEGACO-MIB.mib
+	snmptranslate -Tp MEGACO-MIB::megacoMIB >megacoMIB.tree
 
 gcpMIB.tree: ../mibs/OPENSS7-GCP-MIB.mib
 	snmptranslate -Tp OPENSS7-GCP-MIB::gcpMIB >gcpMIB.tree
@@ -625,6 +637,9 @@ x400pMIB.tree: ../mibs/OPENSS7-X400P-MIB.mib
 #	snmptranslate -Tp OPENSS7-X400P-MX-MIB::x400pMIB >x400pMIB.tree
 
 simple: \
+	megacoRingingMIB_simple.c megacoRingingMIB_simple.h \
+	megacoTonesMIB_simple.c megacoTonesMIB_simple.h \
+	megacoMIB_simple.c megacoMIB_simple.h \
 	gcpMIB_simple.c gcpMIB_simple.h \
 	rtpswMIB_simple.c rtpswMIB_simple.h \
 	rtpswOmMIB_simple.c rtpswOmMIB_simple.h \
@@ -663,6 +678,18 @@ simple: \
 	tcapOmMIB_simple.c tcapOmMIB_simple.h \
 	x25MIB_simple.c x25MIB_simple.h \
 	x400pMIB_simple.c x400pMIB_simple.h
+
+megacoRingingMIB_simple.c megacoRingingMIB_simple.h: mib2c mib2c.conf ../mibs/MEGACO-RINGING-MIB.mib
+	./mib2c -c ./mib2c.conf -f megacoRingingMIB_simple megacoRingingMIB
+	indent -nhnl megacoRingingMIB_simple.[ch]
+
+megacoTonesMIB_simple.c megacoTonesMIB_simple.h: mib2c mib2c.conf ../mibs/MEGACO-TONES-MIB.mib
+	./mib2c -c ./mib2c.conf -f megacoTonesMIB_simple megacoTonesMIB
+	indent -nhnl megacoTonesMIB_simple.[ch]
+
+megacoMIB_simple.c megacoMIB_simple.h: mib2c mib2c.conf ../mibs/MEGACO-MIB.mib
+	./mib2c -c ./mib2c.conf -f megacoMIB_simple megacoMIB
+	indent -nhnl megacoMIB_simple.[ch]
 
 gcpMIB_simple.c gcpMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-GCP-MIB.mib
 	./mib2c -c ./mib2c.conf -f gcpMIB_simple gcpMIB
@@ -849,6 +876,9 @@ x400pMIB_simple.c x400pMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-X400P-MIB.
 #	indent -nhnl x400pMIB_simple.[ch]
 
 storage: \
+	megacoRingingMIB_storage.c megacoRingingMIB_storage.h \
+	megacoTonesMIB_storage.c megacoTonesMIB_storage.h \
+	megacoMIB_storage.c megacoMIB_storage.h \
 	gcpMIB_storage.c gcpMIB_storage.h \
 	rtpswMIB_storage.c rtpswMIB_storage.h \
 	rtpswOmMIB_storage.c rtpswOmMIB_storage.h \
@@ -886,6 +916,18 @@ storage: \
 	tcapOmMIB_storage.c tcapOmMIB_storage.h \
 	x25MIB_storage.c x25MIB_storage.h \
 	x400pMIB_storage.c x400pMIB_storage.h
+
+megacoRingingMIB_storage.c megacoRingingMIB_storage.h: mib2c mib2c.storage.conf ../mibs/MEGACO-RINGING-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f megacoRingingMIB_storage megacoRingingMIB
+	indent -nhnl megacoRingingMIB_storage.[ch]
+
+megacoTonesMIB_storage.c megacoTonesMIB_storage.h: mib2c mib2c.storage.conf ../mibs/MEGACO-TONES-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f megacoTonesMIB_storage megacoTonesMIB
+	indent -nhnl megacoTonesMIB_storage.[ch]
+
+megacoMIB_storage.c megacoMIB_storage.h: mib2c mib2c.storage.conf ../mibs/MEGACO-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f megacoMIB_storage megacoMIB
+	indent -nhnl megacoMIB_storage.[ch]
 
 gcpMIB_storage.c gcpMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-GCP-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f gcpMIB_storage gcpMIB
@@ -1077,6 +1119,9 @@ x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-
 #	indent -nhnl x400pMIB_storage.[ch]
 
 openss7: \
+	megacoRingingMIB_openss7.c megacoRingingMIB_openss7.h \
+	megacoTonesMIB_openss7.c megacoTonesMIB_openss7.h \
+	megacoMIB_openss7.c megacoMIB_openss7.h \
 	gcpMIB_openss7.c gcpMIB_openss7.h \
 	rtpswMIB_openss7.c rtpswMIB_openss7.h \
 	rtpswOmMIB_openss7.c rtpswOmMIB_openss7.h \
@@ -1115,6 +1160,18 @@ openss7: \
 	tcapOmMIB_openss7.c tcapOmMIB_openss7.h \
 	x25MIB_openss7.c x25MIB_openss7.h \
 	x400pMIB_openss7.c x400pMIB_openss7.h
+
+megacoRingingMIB_openss7.c megacoRingingMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/MEGACO-RINGING-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f megacoRingingMIB_openss7 megacoRingingMIB
+	indent -nhnl megacoRingingMIB_openss7.[ch]
+
+megacoTonesMIB_openss7.c megacoTonesMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/MEGACO-TONES-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f megacoTonesMIB_openss7 megacoTonesMIB
+	indent -nhnl megacoTonesMIB_openss7.[ch]
+
+megacoMIB_openss7.c megacoMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/MEGACO-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f megacoMIB_openss7 megacoMIB
+	indent -nhnl megacoMIB_openss7.[ch]
 
 gcpMIB_openss7.c gcpMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-GCP-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f gcpMIB_openss7 gcpMIB
@@ -1360,12 +1417,33 @@ x400pCardTable.c x400pCardTable.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-X400
 	indent -nhnl x400pCardTable.[ch]
 
 clean:
+	rm -f megacoRingingMIB_openss7.[ch]
+	rm -f megacoRingingMIB_openss7.[ch]~
+	rm -f megacoRingingMIB_simple.[ch]
+	rm -f megacoRingingMIB_simple.[ch]~
+	rm -f megacoRingingMIB_storage.[ch]
+	rm -f megacoRingingMIB_storage.[ch]~
 	rm -f megacoRingingMIB.mib
 	rm -f megacoRingingMIB.lint
+	rm -f megacoRingingMIB.tree
+	rm -f megacoTonesMIB_openss7.[ch]
+	rm -f megacoTonesMIB_openss7.[ch]~
+	rm -f megacoTonesMIB_simple.[ch]
+	rm -f megacoTonesMIB_simple.[ch]~
+	rm -f megacoTonesMIB_storage.[ch]
+	rm -f megacoTonesMIB_storage.[ch]~
 	rm -f megacoTonesMIB.mib
 	rm -f megacoTonesMIB.lint
-	rm -f megacoMib.mib
-	rm -f megacoMib.lint
+	rm -f megacoTonesMIB.tree
+	rm -f megacoMIB_openss7.[ch]
+	rm -f megacoMIB_openss7.[ch]~
+	rm -f megacoMIB_simple.[ch]
+	rm -f megacoMIB_simple.[ch]~
+	rm -f megacoMIB_storage.[ch]
+	rm -f megacoMIB_storage.[ch]~
+	rm -f megacoMIB.mib
+	rm -f megacoMIB.lint
+	rm -f megacoMIB.tree
 	rm -f gcpMIB_openss7.[ch]
 	rm -f gcpMIB_openss7.[ch]~
 	rm -f gcpMIB_simple.[ch]
@@ -1743,7 +1821,7 @@ clean:
 	rm -f x400pSyncTable.[ch]~
 	rm -f x400p*Table.[ch]
 
-.PHONY: all clean dump lint check openss7 simple storage
+.PHONY: all clean dump lint tree check openss7 simple storage
 # =============================================================================
 #
 # $Log: makestubs,v $

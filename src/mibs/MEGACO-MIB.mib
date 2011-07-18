@@ -21,7 +21,7 @@ IMPORTS
     TimeStamp
         FROM SNMPv2-TC;
 
-megacoMib MODULE-IDENTITY
+megacoMIB MODULE-IDENTITY
     LAST-UPDATED "200304181200Z"
     ORGANIZATION 
         "IETF"
@@ -90,7 +90,7 @@ MediaGatewayTermId ::= TEXTUAL-CONVENTION
 -- *****************************************************************
 
 mediaGatewayMIBObjects OBJECT IDENTIFIER
-    ::= { megacoMib 1 }
+    ::= { megacoMIB 1 }
 
 -- *****************************************************************
 --
@@ -164,7 +164,7 @@ medGwyConfiguration OBJECT IDENTIFIER
 --
 --   If this table isn't implemented, the manager would be
 --   responsible for providing the (unique) nextId (via retaining
---   used id's, hashing, etc)
+--   used id's, hashing, etc.)
 --
 -- *****************************************************************
 
@@ -281,7 +281,7 @@ medGwyGatewayLinkId OBJECT-TYPE
     DESCRIPTION 
         "The unique link id which identifies the signalling 
          link that this gateway uses to communicate with the 
-         Gateway Controller(s)."
+         Gateway Controllers."
     ::= { medGwyGatewayConfigEntry 2 }
 
 medGwyGatewayLinkName OBJECT-TYPE
@@ -310,7 +310,7 @@ medGwyGatewayPort OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "TCP/UDP port number that the Media Gateway Controller will 
-         use to communiacte with the Media Gateway. The value 
+         use to communicate with the Media Gateway. The value 
          0 is returned if the entry is invalid."
     DEFVAL      { 2944 }
     ::= { medGwyGatewayConfigEntry 5 }
@@ -560,7 +560,7 @@ medGwyGatewayControllerOperStatus OBJECT-TYPE
          medGwyGatewayControllerOperStatus should be down(2). If 
          medGwyGatewayControllerAdminStatus is changed to up(1) then 
          medGwyGatewayControllerOperStatus should change to up(1) 
-         if the gateway contoller is ready to transmit and receive 
+         if the gateway controller is ready to transmit and receive 
          signalling traffic; it should remain in the down(2) state if 
          and only if there is a fault that prevents it from going to 
          the up(1) state"
@@ -671,7 +671,7 @@ medGwyGatewayNumTimerRecovery OBJECT-TYPE
          statistics was last reset. This reflects all protocol 
          timers that are supported (For Megaco, T - start timer, 
          S - short timer, L - long timer, and Z - long duration 
-         timer etc)"
+         timer, etc.)"
     ::= { medGwyGatewayStatsEntry 6 }
 
 medGwyGatewayTransportNumLosses OBJECT-TYPE
@@ -742,7 +742,7 @@ medGwyGatewayLastStatisticsReset OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "The value of sysUpTime at the time when the 
-         statistics were reset. If the reset occured prior to 
+         statistics were reset. If the reset occurred prior to 
          the last re-initialization of the local network 
          management subsystem, this object contains a zero 
          value."
@@ -766,7 +766,7 @@ medGwyConnections OBJECT IDENTIFIER
 --       MediaGateway.
 --   (2) If this table isn't implemented, the manager would be
 --       responsible for providing the (unique) nextId (via retaining
---       used id's, hashing, etc)
+--       used id's, hashing, etc.)
 --
 -- *****************************************************************
 
@@ -872,7 +872,7 @@ medGwyTerminationName OBJECT-TYPE
     DESCRIPTION 
         "A descriptive name that would describe this termination 
          and its use. For example, 'emergency-ds0-1' indicating 
-         that this termination is reserved as an emergencey DS0 
+         that this termination is reserved as an emergency DS0 
          channel"
     ::= { medGwyTerminationsEntry 2 }
 
@@ -953,8 +953,8 @@ medGwyTerminationRowStatus OBJECT-TYPE
 --   (1) There are 'N' entries for each Gateway-PropertyProfile
 --   (2) Each entry is a supported property, thus this table gives a list
 --       of supported properties for each specified Profile.
---   (3) Each Property is defined as an Object Identifer in the various
---       Package Mibs (like MEGACO-TONES-MIB etc).
+--   (3) Each Property is defined as an Object Identifier in the various
+--       Package Mibs (like MEGACO-TONES-MIB, etc.).
 --   (4) That OID is used to identify the particular Package, and if the
 --       Termination supports the property, this Package OID is included
 --       in its list.
@@ -1017,7 +1017,7 @@ medGwyPropertyProfileIndex OBJECT-TYPE
     DESCRIPTION 
         "This is the index to the PropertyProfile This is just 
          a 'counter' through the medGwyPropertyProfile Table.  
-         ie, property=1 property=2 etc."
+         ie, property=1 property=2, etc."
     ::= { medGwyPropertyProfileEntry 2 }
 
 medGwyPropertyProfileProperty OBJECT-TYPE
@@ -1028,7 +1028,7 @@ medGwyPropertyProfileProperty OBJECT-TYPE
         "The Property supported by this Profile.  
          This is an Object ID (OID) defined in a package MIB 
          to identify a Particular property (such as AnalogLines, 
-         Tones etc)."
+         Tones, etc.)."
     ::= { medGwyPropertyProfileEntry 3 }
 
 medGwyTermPropertyProfileStatus OBJECT-TYPE
@@ -1072,7 +1072,7 @@ medGwyProperties OBJECT IDENTIFIER
 --    changes from inService to out-of-Service or to testing.
 --
 -- o medGwyGatewayHandoff
---    This trap is sent whenever there is a handoff (due to a failure of
+--    This trap is sent whenever there is a hand-off (due to a failure of
 --    the MGC or enforced by the MGC) in a gateway
 --
 -- o medGwyProtocolError
@@ -1083,7 +1083,7 @@ medGwyProperties OBJECT IDENTIFIER
 -- *****************************************************************
 
 mediaGatewayMIBNotifications OBJECT IDENTIFIER
-    ::= { megacoMib 2 }
+    ::= { megacoMIB 2 }
 
 medGwyNotifPrefix OBJECT IDENTIFIER
     ::= { mediaGatewayMIBNotifications 0 }
@@ -1105,7 +1105,7 @@ medGwyReceivedElement OBJECT-TYPE
     ::= { medGwyNotifObjects 1 }
 
 mediaGatewayConformance OBJECT IDENTIFIER
-    ::= { megacoMib 3 }
+    ::= { megacoMIB 3 }
 
 -- *****************************************************************
 --
@@ -1250,7 +1250,7 @@ medGwyGWControllerGroup OBJECT-GROUP
          Media Gateway Controller. This group is mandatory for any 
          implementation managing a media gateway controller or a group of 
          media gateway controllers. It is also mandatory for implementations 
-         managing media gateway(s)"
+         managing media gateways"
     ::= { medGwyConfGroups 3 }
 
 medGwyNextIdGroup OBJECT-GROUP
@@ -1273,7 +1273,7 @@ medGwyNotificationsGroup NOTIFICATION-GROUP
     STATUS      current
     DESCRIPTION 
         "This group contains notifications that an entity implementing 
-         the Media Gateway(s) will send. This group is mandatory for 
+         the Media Gateways will send. This group is mandatory for 
          all implementations that are managing a media gateway or a group 
          of media gateways"
     ::= { medGwyConfGroups 5 }
@@ -1319,9 +1319,9 @@ medGwyCompliance MODULE-COMPLIANCE
 
         GROUP   medGwyNotificationsGroup
         DESCRIPTION   
-              "This group is mandatory for all the 
-               implementations, which .  are fault tolerant. 
-               This group contains all the notifications"
+	      "This group is mandatory for all the implementations, 
+	       which are fault tolerant.  This group contains all the 
+	       notifications"
 
 	GROUP	medGwyTerminationGroup
 	DESCRIPTION   
