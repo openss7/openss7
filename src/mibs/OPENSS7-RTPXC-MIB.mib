@@ -409,7 +409,7 @@ RtpLossRate ::= TEXTUAL-CONVENTION
          tirggers a discard."
     REFERENCE
         "RFC 3611, Section 4.7.1"
-    SYNTAX      Integer32 (0..255)
+    SYNTAX      INTEGER (0..255)
 
 RtpDiscardRate ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -429,7 +429,7 @@ RtpDiscardRate ::= TEXTUAL-CONVENTION
          avoid overflow), and taking the integral part."
     REFERENCE
         "RFC 3611, Section 4.7.1"
-    SYNTAX      Integer32 (0..255)
+    SYNTAX      INTEGER (0..255)
 
 RtpBurstDensity ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -451,7 +451,7 @@ RtpBurstDensity ::= TEXTUAL-CONVENTION
          received."
     REFERENCE
         "RFC 3611, Section 4.7.2"
-    SYNTAX      Integer32 (0..255)
+    SYNTAX      INTEGER (0..255)
 
 RtpGapDensity ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -470,7 +470,7 @@ RtpGapDensity ::= TEXTUAL-CONVENTION
          set to zero if no packets have been received."
     REFERENCE
         "RFC 3611, Section 4.7.2"
-    SYNTAX      Integer32 (0..255)
+    SYNTAX      INTEGER (0..255)
 
 
 RtpBurstDuration ::= TEXTUAL-CONVENTION
@@ -490,7 +490,7 @@ RtpBurstDuration ::= TEXTUAL-CONVENTION
          burst duration value MUST be zero."
     REFERENCE
         "RFC 3611, Section 4.7.2"
-    SYNTAX      Integer32 (0..65535)
+    SYNTAX      INTEGER (0..65535)
 
 RtpGapDuration ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -517,7 +517,7 @@ RtpGapDuration ::= TEXTUAL-CONVENTION
          duration value MUST be zero."
     REFERENCE
         "RFC 3611, Section 4.7.2"
-    SYNTAX      Integer32 (0..65535)
+    SYNTAX      INTEGER (0..65535)
 
 RtpRoundTripDelay ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -539,7 +539,7 @@ RtpRoundTripDelay ::= TEXTUAL-CONVENTION
          as soon as a delay estimate is available."
     REFERENCE
         "RFC 3611, Section 4.7.3"
-    SYNTAX      Integer32 (0..65535)
+    SYNTAX      INTEGER (0..65535)
 
 
 RtpEndSystemDelay ::= TEXTUAL-CONVENTION
@@ -557,7 +557,7 @@ RtpEndSystemDelay ::= TEXTUAL-CONVENTION
          unable to provide the data, the value 0 MUST be used."
     REFERENCE
         "RFC 3611, Section 4.7.3"
-    SYNTAX      Integer32 (0..65535)
+    SYNTAX      INTEGER (0..65535)
 
 
 RtpSignalLevel ::= TEXTUAL-CONVENTION
@@ -583,7 +583,7 @@ RtpSignalLevel ::= TEXTUAL-CONVENTION
          noise ratio."
     REFERENCE
         "RFC 3611, Section 4.7.4"
-    SYNTAX      Integer32 (0..255)
+    SYNTAX      INTEGER (0..255)
 
 RtpNoiseLevel ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -603,7 +603,7 @@ RtpNoiseLevel ::= TEXTUAL-CONVENTION
          noise ratio."
     REFERENCE
         "RFC 3611, Section 4.7.4"
-    SYNTAX      Integer32 (0..255)
+    SYNTAX      INTEGER (0..255)
 
 RtpRedidualEchoReturnLoss ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -684,7 +684,7 @@ RtpRedidualEchoReturnLoss ::= TEXTUAL-CONVENTION
             (127)."
     REFERENCE
         "RFC 3611, Section 4.7.4"
-    SYNTAX      Integer32 (0..255)
+    SYNTAX      INTEGER (0..255)
 
 RtpRFactor ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -724,7 +724,7 @@ RtpRFactor ::= TEXTUAL-CONVENTION
         "RFC 3611, Section 4.7.5.
          ITU-T Recommendation G.107.
          ETSI TS 101 329-5."
-    SYNTAX      Integer32 (0..100 | 127)
+    SYNTAX      INTEGER (0..100 | 127)
 
 RtpExternalRFactor ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -766,7 +766,7 @@ RtpExternalRFactor ::= TEXTUAL-CONVENTION
         "RFC 3611, Section 4.7.5.
          ITU-T Recommendation G.107.
          ETSI TS 101 329-5."
-    SYNTAX      Integer32 (0..100 | 127)
+    SYNTAX      INTEGER (0..100 | 127)
 
 RtpMosLq ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -790,7 +790,7 @@ RtpMosLq ::= TEXTUAL-CONVENTION
         "RFC 3611, Section 4.7.5.
          ETS TS 101 329-5.
          ITU-T Recommendation G.107."
-    SYNTAX      Integer32 (1..5 | 127)
+    SYNTAX      INTEGER (1..5 | 127)
 
 RtpMosCq ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -814,7 +814,7 @@ RtpMosCq ::= TEXTUAL-CONVENTION
         "RFC 3611, Section 4.7.5.
          ITU-T Recommendation G.107.
          ETSI TS 101 329-5."
-    SYNTAX      Integer32 (10..50 | 127)
+    SYNTAX      INTEGER (10..50 | 127)
 
 RtpGmin ::= TEXTUAL-CONVENTION
     DISPLAY-HINT    "1d"
@@ -843,7 +843,7 @@ RtpGmin ::= TEXTUAL-CONVENTION
         "RFC 3611, Section 4.7.6.
          ITU-T Recommendation G.107.
          ETSI TS 101 329-5."
-    SYNTAX      Integer32 (0..255)
+    SYNTAX      INTEGER (0..255)
 
 RtpPacketLossConcealment ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -905,7 +905,7 @@ RtpJitterBufferRate ::= TEXTUAL-CONVENTION
          implementation."
     REFERENCE
         "RFC 3611, Section 4.7.6."
-    SYNTAX      Integer32 (0..15)
+    SYNTAX      INTEGER (0..15)
 
 RtpJitterBufferNominalDelay ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -919,7 +919,7 @@ RtpJitterBufferNominalDelay ::= TEXTUAL-CONVENTION
          adaptive jitter buffer implementations."
     REFERENCE
         "RFC 3611, Section 4.7.7."
-    SYNTAX      Integer32 (0..65535)
+    SYNTAX      INTEGER (0..65535)
 
 RtpJitterBufferMaximumDelay ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -936,7 +936,7 @@ RtpJitterBufferMaximumDelay ::= TEXTUAL-CONVENTION
          and adaptive jitter buffer implementations."
     REFERENCE
         "RFC 3611, Section 4.7.7."
-    SYNTAX      Integer32 (0..65535)
+    SYNTAX      INTEGER (0..65535)
 
 RtpJitterBufferAbsoluteMaximumDelay ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -952,10 +952,10 @@ RtpJitterBufferAbsoluteMaximumDelay ::= TEXTUAL-CONVENTION
          for fixed jitter buffer implementations."
     REFERENCE
         "RFC 3611, Section 4.7.7."
-    SYNTAX      Integer32 (0..65535)
+    SYNTAX      INTEGER (0..65535)
 
 
-RtpDiscardRate ::= TEXTUAL-CONVENTION
+-- RtpDiscardRate ::= TEXTUAL-CONVENTION
 
 rtpxcNotifications OBJECT IDENTIFIER
     ::= { rtpxcMIB 0 }

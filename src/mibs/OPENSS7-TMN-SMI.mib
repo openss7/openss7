@@ -5068,8 +5068,8 @@ protGroupAvailStatus OBJECT-TYPE
 
 protGroupType OBJECT-TYPE
     SYNTAX      INTEGER { plus(0), colon(1) }
-    MAX-ACCESS  not-accessible
-    STATUS      read-create
+    MAX-ACCESS  read-create
+    STATUS      current
     DESCRIPTION
         "This attribute specifies whether the protection scheme 
          used is 1 + 1 (plus) or M:N (colon). M:N includes the 
