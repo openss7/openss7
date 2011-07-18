@@ -70,7 +70,8 @@ FIG_FIGS = \
 	xc06.fig \
 	xc07.fig \
 	xc08.fig \
-	xc09.fig
+	xc09.fig \
+	xc10.fig
 
 PLOT_DATS =
 
@@ -94,6 +95,7 @@ EXTRA_DIST += \
 	xc07.fig \
 	xc08.fig \
 	xc09.fig \
+	xc10.fig \
 	org.css
 
 # =============================================================================
