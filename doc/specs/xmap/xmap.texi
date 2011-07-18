@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: xmap.texi,v 1.1.2.2 2011-02-07 02:21:48 brian Exp $
+% @(#) $Id: xmap.texi,v 1.1.2.3 2011-07-18 19:42:14 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2011-02-07 02:21:48 $ by $Author: brian $
+% Last Modified $Date: 2011-07-18 19:42:14 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -385,6 +385,9 @@ changes in the design of any techniques, or procedures embodied, described, or r
 @smallexample
 @verbatim
 $Log: xmap.texi,v $
+Revision 1.1.2.3  2011-07-18 19:42:14  brian
+- added documentation
+
 Revision 1.1.2.2  2011-02-07 02:21:48  brian
 - updated manuals
 

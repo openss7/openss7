@@ -1,7 +1,7 @@
 -- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\- fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-METRIC-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:30 $
+-- @(#) $RCSfile: OPENSS7-METRIC-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:19 $
 --
 -- -----------------------------------------------------------------------------
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-06-21 11:39:30 $ by $Author: brian $
+-- Last Modified $Date: 2011-07-18 19:42:19 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-METRIC-MIB.mib,v $
+-- Revision 1.1.2.2  2011-07-18 19:42:19  brian
+-- - added documentation
+--
 -- Revision 1.1.2.1  2009-06-21 11:39:30  brian
 -- - added files to new distro
 --
