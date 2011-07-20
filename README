@@ -1,4 +1,4 @@
-OpenSS7 -- read me first file.  2011-06-04
+OpenSS7 -- read me first file.  2011-06-17
 $Id: README,v 1.1.2.28 2011-06-09 11:30:53 brian Exp $
 Copyright (c) 2008-2011  Monavacon Limited. <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation. <http://www.openss7.com/>
@@ -8,7 +8,7 @@ See the end for copying conditions (for this file).
  OpenSS7
 ========
 
-Package openss7-1.1.1.20110510 was released under AGPLv3 2011-06-04.
+Package openss7-1.1.1.20110510 was released under AGPLv3 2011-06-17.
 
 This is the `OpenSS7' package.  It contains all of the OpenSS7 Project
 release code.  This is the only package released by the OpenSS7 Project.
@@ -50,7 +50,7 @@ should build and install for other architectures as well.
  Release
 --------
 
-This is the `openss7-1.1.1.20110510' package, released 2011-06-04.  This
+This is the `openss7-1.1.1.20110510' package, released 2011-06-17.  This
 `1.1.1.20110510' release, and the latest version, can be obtained from
 the download area (http://www.openss7.org/download.html) of The OpenSS7
 Project website using a command such as:
@@ -99,6 +99,9 @@ can be udpated simply with (one of):
      RHEL:     $> sudo yum update openss7
      OpenSUSE: $> sudo zypper update openss7
      SLES:     $> sudo zypper update openss7
+     Mageia:   $> sudo uprmi openss7
+     Mandriva: $> sudo urpmi openss7
+     MES:      $> sudo urpmi openss7
      Ubuntu:   $> sudo aptitude install openss7
      Debian:   $> sudo aptitude install openss7
 
@@ -112,6 +115,9 @@ access for RPM-based systems:
      RHEL:     $> SUBDIR=redhat/6.0/$(uname -m)/RPMS/noarch
      OpenSUSE: $> SUBDIR=opensuse/11.3/$(uname -m)/RPMS/noarch
      SUSE:     $> SUBDIR=suse/11.1/$(uname -m)/RPMS/noarch
+     Mageia:   $> SUBDIR=mageia/1/$(uname -m)/RPMS/noarch
+     Mandriva: $> SUBDIR=mandriva/2010.2/$(uname -m)/RPMS-noarch
+     MES:      $> SUBDIR=mes/5.2/$(uname -m)/RPMS/noarch
                $> sudo rpm -Uhv $REPO/$SUBDIR/openss7-repo.noarch.rpm
 
 For DPKG-based systems, one of the following command sequences will
@@ -140,12 +146,18 @@ For `yum(8)' based systems, caches should be refreshed with:
      CentOS:   $> sudo yum makecache
      RHEL:     $> sudo yum makecache
 
-For `zypper(8)' base systems, caches should be refreshed with:
+For `zypper(8)' based systems, caches should be refreshed with:
 
      OpenSUSE: $> sudo zypper refresh-services
      OpenSUSE: $> sudo zypper refresh
      SLES:     $> sudo zypper refresh-services
      SLES:     $> sudo zypper refresh
+
+For `urpmi(8)' based systems, caches should be refreshed with:
+
+     Mageia:   $> sudo urpmi.update
+     Mandriva: $> sudo urpmi.update
+     MES:      $> sudo urpmi.update
 
 For `apt(8)' base systems, caches should be refreshed with:(2)
 
@@ -160,6 +172,9 @@ install using (one of):
      RHEL:     $> sudo yum install openss7
      OpenSUSE: $> sudo zypper install openss7
      SLES:     $> sudo zypper install openss7
+     Mageia:   $> sudo uprmi openss7
+     Mandriva: $> sudo urpmi openss7
+     MES:      $> sudo urpmi openss7
      Debian:   $> aptitude install openss7
      Ubuntu:   $> aptitude install openss7
 
@@ -170,6 +185,9 @@ The entire process can be undone with:
      RHEL:     $> sudo yum remove openss7 openss7-repo
      OpenSUSE: $> sudo zypper remove openss7 openss7-repo
      SLES:     $> sudo zypper remove openss7 openss7-repo
+     Mageia:   $> sudo uprme openss7
+     Mandriva: $> sudo urpme openss7
+     MES:      $> sudo urpme openss7
      Debian:   $> sudo aptitude remove openss7 openss7-repo
      Ubuntu:   $> sudo aptitude remove openss7 openss7-repo
 
