@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-02-22 14:48:40 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-07-18 19:42:11 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,7 +48,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-02-22 14:48:40 $ by $Author: brian $
+# Last Modified $Date: 2011-07-18 19:42:11 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -57,7 +57,7 @@ include ../../am/openss7.am
 if PKG_BUILD_INDEP
 ## PKG_BUILD_INDEP
 
-SUBDIRS = optranex chan inet sctp sigtran streams
+SUBDIRS = xcode inet sctp sigtran streams # optranex chan
 
 ## PKG_BUILD_INDEP
 endif
@@ -65,6 +65,9 @@ endif
 # =============================================================================
 #
 # $Log: Makefile.am,v $
+# Revision 1.1.2.3  2011-07-18 19:42:11  brian
+# - added documentation
+#
 # Revision 1.1.2.2  2010-02-22 14:48:40  brian
 # - added documentation files to build
 #

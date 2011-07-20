@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 # =============================================================================
 # 
-# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 13:44:39 $
+# @(#) $RCSfile: Makefile.am,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-07-18 19:42:12 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,17 +48,20 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-11-28 13:44:39 $ by $Author: brian $
+# Last Modified $Date: 2011-07-18 19:42:12 $ by $Author: brian $
 #
 # =============================================================================
 
 include ../../am/openss7.am
 
-SUBDIRS = cci cdi chi dlpi lli mapi mtpi mxi mgi nli npi sccpi sdli sdti sli tci tpi tri wan xcc xmap
+SUBDIRS = cci cdi chi dlpi lli mapi mtpi mxi mgi nli npi sccpi sdli sdti sli tci tpi tri wan xcc xmap xgcp
 
 ## =============================================================================
 ##
 ## $Log: Makefile.am,v $
+## Revision 1.1.2.3  2011-07-18 19:42:12  brian
+## - added documentation
+##
 ## Revision 1.1.2.2  2010-11-28 13:44:39  brian
 ## - update makefiles
 ##

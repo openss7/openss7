@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
--- @(#) $RCSfile: OPENSS7-CDR2-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:39:30 $
+-- @(#) $RCSfile: OPENSS7-CDR2-MIB.mib,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:17 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -55,11 +55,14 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Last Modified $Date: 2009-06-21 11:39:30 $ by $Author: brian $
+-- Last Modified $Date: 2011-07-18 19:42:17 $ by $Author: brian $
 --
 -- -----------------------------------------------------------------------------
 --
 -- $Log: OPENSS7-CDR2-MIB.mib,v $
+-- Revision 1.1.2.2  2011-07-18 19:42:17  brian
+-- - added documentation
+--
 -- Revision 1.1.2.1  2009-06-21 11:39:30  brian
 -- - added files to new distro
 --
@@ -86,7 +89,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 cdr2MIB MODULE-IDENTITY
-    LAST-UPDATED "200801110032Z"
+    LAST-UPDATED "201106280733Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -102,7 +105,37 @@ cdr2MIB MODULE-IDENTITY
     DESCRIPTION 
         "This is an enhanced MIB module providing definition of a wide 
          array of CDR data objects within the IUT-T Rec. Q.825 (1998) 
-         Call Detail Recording framework."
+         Call Detail Recording framework.
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: nonwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106280733Z"
+    DESCRIPTION 
+        "Passes smilint and reformatted with smidump."
     REVISION    "200801110032Z"
     DESCRIPTION 
         "First release of this module."
@@ -153,7 +186,7 @@ Number ::= TEXTUAL-CONVENTION
             bits 765: numbering plan indicator
              000 spare
              001 ISDN (Telephony) Number Plan (ITU-T Rec. 
-         	 E.164)
+                 E.164)
              010 spare
              011 data numbering plan (ITU-T Rec. X.121)
              100 telex numbering plan (ITU-T Rec. F.69)
@@ -171,15 +204,16 @@ Number ::= TEXTUAL-CONVENTION
              to represent dig its from 0 through 9, *, #, a, b, c, two 
              digits per octet, each digit encoded 0000 to 1001 (0 to 9), 
              1010 (*) 1011(#), 1100 (a), 1101 (b) or 1110 (c); 1111 (end 
-         	  of pulsing signal-ST); 0000 is used as a filler when 
-         	  there is an odd number of digits.  The most 
-         	  significant address signal is sent first. Subsequent 
-         	  address signals are sent in successive 4-bit fields."
+                  of pulsing signal-ST); 0000 is used as a filler when 
+                  there is an odd number of digits.  The most 
+                  significant address signal is sent first. Subsequent 
+                  address signals are sent in successive 4-bit fields."
     REFERENCE   
         "ITU-T Rec. Q.825, Q825-CDR-ASN1Module.Number."
     SYNTAX      OCTET STRING (SIZE(1..15))
 
 DialledDigits ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "This type is used to represent digits input by the subscriber.  
@@ -188,8 +222,8 @@ DialledDigits ::= TEXTUAL-CONVENTION
          a) one octet for odd/even indicator:
          
             bits 8: Odd/even indicator
-         	0 even number of address signals
-         	1 odd number of address signals
+                0 even number of address signals
+                1 odd number of address signals
          
          b) digits of the address encoded as TBCD String
             The following octets representing the received digits 
@@ -211,6 +245,7 @@ DialledDigits ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(1..18))
 
 BearerServiceCapability ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1d"
     STATUS      current
     DESCRIPTION 
         "The first octet in the string indicates the bearer service 
@@ -312,7 +347,7 @@ UserIdentifier ::= TEXTUAL-CONVENTION
             bits 765: numbering plan indicator
              000 E.212 (IMSEI)
              001 ISDN (Telephony) Number Plan (ITU-T Rec. 
-         	 E.164)
+                 E.164)
              010 spare
              011 spare
              100 spare
@@ -334,6 +369,7 @@ UserIdentifier ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(1..10))
 
 AccountCode ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "This type is used to represent information, which is provided 
@@ -371,6 +407,7 @@ AccountCode ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(1..18))
 
 ChargingInformation ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "The first octet determines the contents of the remaining 
@@ -391,6 +428,7 @@ ChargingInformation ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING
 
 ProgressAndLocation ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "Provides a specification of progress.
@@ -421,6 +459,7 @@ ProgressAndLocation ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(2))
 
 UserToUserInformation ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "1x"
     STATUS      current
     DESCRIPTION 
         "The octet string is a group of 1..3 groups representing the 
@@ -448,6 +487,7 @@ UserToUserInformation ::= TEXTUAL-CONVENTION
     SYNTAX      OCTET STRING (SIZE(0..54))
 
 GeneralizedTime ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "16t"
     STATUS      current
     DESCRIPTION 
         "Generalized machine local time zone time formatted as a visible 
@@ -859,7 +899,7 @@ creationTriggerList OBJECT-TYPE
     SYNTAX      BITS { seizure(0), firstDigitReceived(1), aCMReceived(2), 
                     aNMReceived(3), supplementaryServiceInvocation(4), 
                     supplementaryServiceInput(5) }
-    MAX-ACCESS  read-write
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         "This attribute consists of a list of values that specify the 
@@ -928,7 +968,7 @@ creationTriggerList OBJECT-TYPE
 
 simpleUsageMeteringControlEntryStatus OBJECT-TYPE
     SYNTAX      RowStatus
-    MAX-ACCESS  read-write
+    MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
         "Managment stations may delete entries in this table but may not 
@@ -1267,7 +1307,7 @@ timesOfDay OBJECT-TYPE
     REFERENCE   
         "ITU-T Recommneation Q.825 (1998) timesOfDay attribute.
          ITU-T Rec. Q.825 (1998), Q825-CDR-ASN1Module.TimesOfDay."
-    DEFVAL      { }
+    DEFVAL      { "" }
     ::= { fileGeneratingLogEntry 1 }
 
 periodicTrigger OBJECT-TYPE
@@ -4168,9 +4208,10 @@ callDetailRecordNotificationR2 NOTIFICATION-TYPE
     ::= { cdr2Notifications 5 }
 
 cdrParameterGroup OBJECT-GROUP
-    OBJECTS     { fileName, reasonForOutput, sequenceNumber, callRecord, 
-                  exchangeInfo, recordType, bearerService, 
-                  participantServiceUser, callIdentificationNumber }
+    OBJECTS     { callDetailDataId, fileName, reasonForOutput, 
+                  sequenceNumber, callRecord, exchangeInfo, recordType, 
+                  bearerService, participantServiceUser, 
+                  callIdentificationNumber }
     STATUS      current
     DESCRIPTION 
         "A set of parameters for notificaitons."
@@ -4340,5 +4381,3 @@ cdr2Conformances MODULE-COMPLIANCE
     ::= { cdr2Groups 11 }
 
 END -- end of module OPENSS7-CDR2-MIB.
-
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

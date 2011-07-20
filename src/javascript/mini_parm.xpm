@@ -1,0 +1,23 @@
+/* XPM */
+static char * mini_parm_xpm[] = {
+"16 16 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"                ",
+"         aa     ",
+"       aabba    ",
+"     aabbbbaa   ",
+"   aabbbcbbba   ",
+" aabbbcbbbbbaa  ",
+" abbcbbbbcbbba  ",
+" aabbbbcbbbbbaa ",
+"  abbcbbbbcbbba ",
+"  aabbbbcbbbaacc",
+"   abbcbbbaaccc ",
+"   aabbbaaccc   ",
+"    abaaccc     ",
+"    aaccc       ",
+"     cc         ",
+"                "};

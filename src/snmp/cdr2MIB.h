@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: cdr2MIB.h,v 1.1.2.2 2010-11-28 14:22:09 brian Exp $
+ @(#) $Id: cdr2MIB.h,v 1.1.2.3 2011-07-18 19:42:23 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:09 $ by $Author: brian $
+ Last Modified $Date: 2011-07-18 19:42:23 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdr2MIB.h,v $
+ Revision 1.1.2.3  2011-07-18 19:42:23  brian
+ - added documentation
+
  Revision 1.1.2.2  2010-11-28 14:22:09  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -119,9 +122,9 @@ struct simpleUsageMeteringControlTable_data {
 	uint simpleUsageMeteringControlTable_refs;
 	uint8_t *controlObjectId;	/* NoAccess */
 	size_t controlObjectIdLen;
-	uint8_t *creationTriggerList;	/* ReadWrite */
+	uint8_t *creationTriggerList;	/* Create */
 	size_t creationTriggerListLen;
-	long simpleUsageMeteringControlEntryStatus;	/* ReadWrite */
+	long simpleUsageMeteringControlEntryStatus;	/* Create */
 };
 struct configurableSimpleUsageMeteringControlTable_data {
 	uint configurableSimpleUsageMeteringControlTable_request;

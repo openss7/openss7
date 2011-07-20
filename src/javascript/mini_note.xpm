@@ -1,0 +1,23 @@
+/* XPM */
+static char * mini_note_xpm[] = {
+"16 16 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"                ",
+"                ",
+"                ",
+" aaaaaaaaaaaaa  ",
+" abbbbbbaaaabac ",
+" abbbbbbabbabac ",
+" abbbbbbaaaabac ",
+" abbbbbbbbbbbac ",
+" abcccccbccbbac ",
+" abccbbcccccbac ",
+" abbbbbbbbbbbac ",
+" aaaaaaaaaaaaac ",
+"  ccccccccccccc ",
+"                ",
+"                ",
+"                "};

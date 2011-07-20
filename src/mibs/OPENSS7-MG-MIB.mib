@@ -1,0 +1,1030 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=73 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-MG-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-07-18 19:45:06 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2011-07-18 19:45:06 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-MG-MIB.mib,v $
+-- Revision 1.1.2.1  2011-07-18 19:45:06  brian
+-- - added new MIBs
+--
+-- =============================================================================
+
+OPENSS7-MG-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    openss7Modules
+        FROM OPENSS7-SMI
+    AdministrativeState, AlarmStatus, AvailabilityStatus, 
+    OperationalState, ProceduralStatus, SimpleNameType, StandbyStatus, 
+    UsageState, attributeValueChangeNotificationPackage, 
+    communicationsAlarmPackage, createDeleteNotificationPackage, 
+    tmnObjectInstance, tmnPerceivedSeverity, tmnProbableCause
+        FROM OPENSS7-SMI-MIB
+    NetworkPointCode
+        FROM OPENSS7-SS7-MIB
+    ActionOrResult, CommonLanguageName
+        FROM OPENSS7-TC
+    ProtectionStatus, ProtectionUnits
+        FROM OPENSS7-TMN-SMI
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY, 
+    OBJECT-TYPE, Unsigned32, zeroDotZero
+        FROM SNMPv2-SMI
+    AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
+    TimeInterval, TruthValue
+        FROM SNMPv2-TC
+    TransportAddress, TransportAddressType
+        FROM TRANSPORT-ADDRESS-MIB;
+
+mgMIB MODULE-IDENTITY
+    LAST-UPDATED "201107160526Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201107160526Z"
+    DESCRIPTION 
+        "Initial version of this mib."
+    ::= { openss7Modules 601 }
+
+mgNotifications OBJECT IDENTIFIER
+    ::= { mgMIB 0 }
+
+mgNotifs OBJECT IDENTIFIER
+    ::= { mgMIB 1 }
+
+mgScalars OBJECT IDENTIFIER
+    ::= { mgMIB 2 }
+
+mgTables OBJECT IDENTIFIER
+    ::= { mgMIB 3 }
+
+mgMg OBJECT IDENTIFIER
+    ::= { mgTables 1 }
+
+mgMgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgMgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgMg 1 }
+
+mgMgEntry OBJECT-TYPE
+    SYNTAX      MgMgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgMgId }
+    ::= { mgMgTable 1 }
+
+MgEntry ::= SEQUENCE {
+    mgMgId                    Unsigned32,
+    mgMgLocation              INTEGER,
+    mgMgName                  CommonLanguageName,
+    mgMgDomainName            SnmpAdminString,
+    mgMgDeviceName            SnmpAdminString,
+    mgMgMtpAddress            NetworkPointCode,
+    mgMgAdminState            AdministrativeState,
+    mgMgOperState             OperationalState,
+    mgMgAlarmStatus           AlarmStatus,
+    mgMgAsaProfilePointer     RowPointer,
+    mgMgUsageState            UsageState,
+    mgMgAvailStatus           AvailabilityStatus,
+    mgMgProcStatus            ProceduralStatus,
+    mgMgProtectionGroup       Unsigned32,
+    mgMgProtectionUnit        Unsigned32,
+    mgMgStandbyStatus         StandbyStatus,
+    mgMgRowStatus             RowStatus
+}
+
+mgMgc OBJECT IDENTIFIER
+    ::= { mgTables 2 }
+
+mgMgcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF mgMgcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgMgc 1 }
+
+mgMgcEntry OBJECT-TYPE
+    SYNTAX      MgMgcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgMgcTable 1 }
+
+MgMgcEntry ::= SEQUENCE {
+    mgMgcId                 Unsigned32,
+    mgMgcLocation           INTEGER,
+    mgMgcName               CommonLanguageName,
+    mgMgcDomainName         SnmpAdminString,
+    mgMgcDeviceName         SnmpAdminString,
+    mgMgcMtpAddress         NetworkPointCode,
+    mgMgcAdminState         AdministrativeState,
+    mgMgcOperState          OperationalState,
+    mgMgcAlarmStatus        AlarmStatus,
+    mgMgcAsaProfilePointer  RowPointer,
+    mgMgcUsageState         UsageState,
+    mgMgcAvailStatus        AvailabilityStatus,
+    mgMgcProcStatus         ProceduralStatus,
+    mgMgcProtectionGroup    Unsigned32,
+    mgMgcProtectionUnit     Unsigned32,
+    mgMgcStandbyStatus      StandbyStatus,
+    mgMgcRowStatus          RowStatus
+}
+
+mgMgLink OBJECT IDENTIFIER
+    ::= { mgTables 3 }
+
+mgMgLinkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgMgLink 1 }
+
+mgMgLinkEntry OBJECT-TYPE
+    SYNTAX      MgLinkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgMgId, mgMgcId }
+    ::= { mgMgLinkTable 1 }
+
+MgLinkEntry ::= SEQUENCE {
+    mgMgLinkType              TransportAddressType,
+    mgMgLinkMgcMaster         INTEGER,
+    mgMgLinkMgcAddress        TransportAddress,
+    mgMgLinkMgAddress         TransportAddress,
+    mgMgLinkMgcIdent          MegacoIdentSelection,
+    mgMgLinkMgIdent           MegacoIdentSelection,
+    mgMgLinkTransportProfile  RowPointer,
+    mgMgLinkProtocol          AutonomousType,
+    mgMgLinkEncoding          MecagoEncoding,
+    mgMgLinkAuthAccess        MegagoAuthenticatedAccess,
+    mgMgLinkAdminState        AdministrativeState,
+    mgMgLinkOperState         OperationalState,
+    mgMgLinkProcStatus        ProceduralStatus,
+    mgMgLinkAvailStatus       AvailabilityStatus,
+    mgMgLinkAuthentication    MegacoAuthentication,
+    mgMgLinkMit               TimeInterval,
+    mgMgLinkRowStatus         RowStatus
+}
+
+mgMgcLink OBJECT IDENTIFIER
+    ::= { mgTables 3 }
+
+mgProtGroup OBJECT IDENTIFIER
+    ::= { mgTables 4 }
+
+mgProtGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgProtGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgProtGroup 1 }
+
+mgProtGroupEntry OBJECT-TYPE
+    SYNTAX      MgProtGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgProtGroupId }
+    ::= { mgProtGroupTable 1 }
+
+MgProtGroupEntry ::= SEQUENCE {
+    mgProtGroupId                       Unsigned32,
+    mgProtGroupOperState                OperationalState,
+    mgProtGroupAvailStatus              AvailabilityStatus,
+    mgProtGroupType                     INTEGER,
+    mgProtGroupRevertive                TruthValue,
+    mgProtGroupSbolNumber               Unsigned32,
+    mgProtGroupWaitToRestoreTime        TimeInterval,
+    mgProtGroupSettingWindowTime        TimeInterval,
+    mgProtGroupReleaseingWindowTime     TimeInterval,
+    mgProtGroupHitsCount                Unsigned32,
+    mgProtGroupSwitchType               INTEGER,
+    mgProtGroupProtectedUnits           ProtectionUnits,
+    mgProtGroupProtectingUnits          ProtectionUnits,
+    mgProtGroupInvokeProtection         ActionOrResult,
+    mgProtGroupReleaseProtection        ActionOrResult,
+    mgProtGroupRowStatus                RowStatus
+}
+
+mgProtUnit OBJECT IDENTIFIER
+    ::= { mgTables 5 }
+
+mgProtUnitTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgProtUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgProtUnit 1 }
+
+mgProtUnitEntry OBJECT-TYPE
+    SYNTAX      MgProtUnitEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX   { mgProtGroupId, mgProtUnitId }
+    ::= { mgProtUnitTable 1 }
+
+MgProtUnitEntry ::= SEQUENCE {
+    mgProtUnitId                        Unsigned32,
+    mgProtUnitProtecting                TruthValue,
+    mgProtUnitReliableResourcePointer   RowPointer,
+    mgProtUnitUnreliableResourcePointer RowPointer,
+    mgProtUnitProtectionStatus          ProtectionStatus,
+    mgProtUnitRequestSource             INTEGER,
+    mgProtUnitSwitchStatus              INTEGER,
+    mgProtUnitSwitchDirection           INTEGER,
+    mgProtUnitRelatedUnit               Unsigned32,
+    mgProtUnitAutoSwitchReason          INTEGER,
+    mgProtUnitLockoutReleaseFailed      TruthValue,
+    mgProtUnitPriority                  Unsigned32,
+    mgProtUnitRowStatus                 RowStatus
+}
+
+mgMgcCluster OBJECT IDENTIFIER
+    ::= { mgTables 6 }
+
+mgMgcClusterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgMgcClusterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgMgcCluster 1 }
+
+mgMgcClusterEntry OBJECT-TYPE
+    SYNTAX      MgMgcClusterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgMgId }
+    ::= { mgMgcClusterTable 1 }
+
+MgMgcClusterEntry ::= SEQUENCE {
+    mgMgcClusterProtectionGroup         Unsigned32,
+    mgMgcClusterRowStatus               RowStatus
+}
+
+mgMgCluster OBJECT IDENTIFIER
+    ::= { mgTables 7 }
+
+mgMgClusterTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgMgClusterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgMgCluster 1 }
+
+mgMgClusterEntry OBJECT-TYPE
+    SYNTAX      MgMgClusterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgMgClusterId }
+    ::= { mgMgClusterTable 1 }
+
+MgMgClusterEntry ::= SEQUENCE {
+    mgMgClusterId               Unsigned32,
+    mgMgClusterAdminState       AdministrativeState,
+    mgMgClusterRowStatus        RowStatus
+}
+
+mgCtrlAssoc OBJECT IDENTIFIER
+    ::= { mtpTables 7 }
+
+mgCtrlAssocTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgCtrlAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This table describes the reliable control association between an 
+         MG Cluster and an MGC Cluster.  The status of the reliable 
+         control association is an aggregate of the status of its 
+         constituent communications links."
+    :: { mgCtrlAssoc 1 }
+
+mgCtrlAssocEntry OBJECT-TYPE
+    SYNTAX      MgCtrlAssocEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgMgClusterId, mgMgcClusterId }
+    :: { mgCtrlAssocTable 1 }
+
+MgCtrlAssocEntry ::= SEQUENCE {
+    mgCtrlAssocAdminState   AdministrativeState,
+    mgCtrlAssocOperState    OperationalState,
+    mgCtrlAssocUsageState   UsageState,
+    mgCtrlAssocAvailStatus  AvailabilityStatus,
+    mgCtrlAssocProcStatus   ProceduralStatus,
+    mgCtrlAssocActiveMg     Unsigned32,
+    mgCtrlAssocActiveMgc    Unsigned32,
+    mgCtrlAssocRowStatus    RowStatus
+}
+
+mgRealm OBJECT IDENTIFIER
+    ::= { mtpTables 8 }
+
+mgRealmTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgRealmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgRealm 1 }
+
+mgRealmEntry OBJECT-TYPE
+    SYNTAX      MgRealmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgMgId, mgRealmId }
+    ::= { mgRealmTable 1 }
+
+MgRealmEntry ::= SEQUENCE {
+    gcpRealmId          Unsigned32,
+    gcpRealmString      SnmpAdminString,
+    gcpRealmAdminState  AdministrativeState,
+    gcpRealmUsageState  UsageState,
+    gcpRealmTermsMax    Gauge32,
+    gcpRealmTermsHiWat  Gauge32,
+    gcpRealmTermsLoWat  Gauge32,
+    gcpRealmRowStatus   RowStatus
+}
+
+mgInterface OBJECT IDENTIFIER
+    ::= { mgTables 9 }
+
+mgInterfaceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgInterface 1 }
+
+mgInterfaceEntry OBJECT-TYPE
+    SYNTAX      MgInterfaceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgMgId, mgRealmId, mgInterfaceId }
+    ::= { mgInterface 1 }
+
+MgInterfaceEntry ::= SEQUENCE { 
+    mgInterfaceId           Unsigned32,
+    mgInterfaceRowStatus    RowStatus
+}
+
+
+mgAddress OBJECT IDENTIFIER
+    ::= { mgTables 10 }
+
+mgAddressTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgAddress 1 }
+
+mgAddressEntry OBJECT-TYPE
+    SYNTAX      MgAddressEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgMgClusterId, mgAddressId }
+    ::= { mgAddressTable 1 }
+
+MgAddressEntry ::= SEQUENCE {
+    mgAddressId             Unsigned32,
+    mgAddressRealm          Unsigned32,
+    mgAddressInterface      Unsigned32,
+    mgAddressType           InetAddressType,
+    mgAddressAddr           InetAddress,
+    mgAddressPortRanges     InetAddressPortRanges,
+    mgAddressRowStatus      RowStatus
+}
+
+
+mgProfiles OBJECT IDENTIFIER
+    ::= { mgTables 10 }
+
+mgUdpProfile OBJECT IDENTIFIER
+    ::= { mgProfiles 1 }
+
+mgUdpProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgUdpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgUdpProfile 1 }
+
+mgUdpProfileEntry OBJECT-TYPE
+    SYNTAX      MgUdpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgUdpProfileId }
+    ::= { mgUdpProfileTable 1 }
+
+MgUdpProfileEntry ::= SEQUENCE {
+    mgUdpProfileId      SimpleNameType,
+    mgUdpChecksum       TruthValue,
+    mgUdpRowStatus      RowStatus
+}
+
+
+mgTcpProfile OBJECT IDENTIFIER
+    ::= { mgProfiles 2 }
+
+mgTcpProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgTcpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgTcpProfile 1 }
+
+mgTcpProfileEntry OBJECT-TYPE
+    SYNTAX      MgTcpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgTcpProfileId }
+    ::= { mgTcpProfileTable 1 }
+
+MgTcpProfileEntry ::= SEQUENCE {
+    mgTcpProfileId      SimpleNameType,
+    mgTcpNoDelay        TruthValue,
+    mgTcpMaxseg         Unsigned32,
+    mgTcpKeepAlive      TruthValue,
+    mgTcpKeepIdle       TimeInterval,
+    mgTcpKeepAliveItvl  TimeInterval,
+    mgTcpKeepCount      Unsigned32,
+    mgTcpSynRetrans     Unsigned32,
+    mgTcpWindowClamp    Unsigned32,
+    mgTcpRowStatus      RowStatus
+}
+
+
+mgSctpProfile OBJECT IDENTIFIER
+    ::= { mgProfiles 3 }
+
+mgSctpProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgSctpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a table of SCTP transport protocol profiles (settings 
+         of communications parameters) for reference by entries in the 
+         mgLinkTable."
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfile 1 }
+
+mgSctpProfileEntry OBJECT-TYPE
+    SYNTAX      MgSctpProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry in the mgSctpProfileTable provides one set of SCTP 
+         communications parameters that are to be used on 
+         a communications linkage that references the profile.  The 
+         following rules must be observed:
+         
+         1. Entries in this table cannot be deleted while they are 
+            referenced by an entry in column mgLinkProfile of table 
+            mgLinkTable that references the entry.
+            
+         2. Changes to the values for a given profile entry are effective 
+            immediately for operational communications linkages that 
+            refer to this profile; non-operational linkages will adopt 
+            the new values on the next cycle."
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    INDEX       { mgSctpProfileId }
+    ::= { mgSctpProfileTable 1 }
+
+MgSctpProfileEntry ::= SEQUENCE {
+    mgSctpProfileId         SimpleNameType,
+    mgSctpNoDelay           TruthValue,
+    mgSctpMaxseg            Unsigned32,
+    mgSctpHeartbeatItvl     TimeInterval,
+    mgSctpHeartbeat         TruthValue,
+    mgSctpRtoInitial        TimeInterval,
+    mgSctpRtoMin            TimeInterval,
+    mgSctpRtoMax            TimeInterval,
+    mgSctpPathMaxRetrans    Unsigned32,
+    mgSctpCookieLife        TimeInterval,
+    mgSctpCookieInc         TimeInterval,
+    mgSctpMaxInitRetries    Unsigned32,
+    mgSctpMaxBurst          Unsigned32,
+    mgSctpAssocMaxRetrans   Unsigned32,
+    mgSctpSackDelay         TimeInterval,
+    mgSctpLifetime          TimeInterval,
+    mgSctpRowStatus         RowStatus
+}
+
+mgSctpProfileId OBJECT-TYPE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Provides a naming index that identifies a mgSctpProfileEntry 
+         instance;  this index can be used to identify or reference the 
+         profile."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpNoDelay OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines whether the Nagle algorithm should be 
+         applied to SCTP associations formed under this profile.  The 
+         Nagle algorithm increases the size of the packets placed on the 
+         network at the expense of delaying the transmission of some data 
+         during congestion episodes.  It can be set to one of the 
+         following values:
+         
+         - true(1), the Nagle algorithm is suppressed;
+           
+         - false(2), the Nagle algorithm is not suppressed.
+           
+         The default value is determined by the setting of 
+         mgDefaultSctpNodelay."
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpMaxseg OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "octets"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the maximum SCTP payload size for outgoing 
+         packets.  Values greater than the association MTU are ignored 
+         and have no effect.  The value determines the maximum size (in 
+         octets) above which SCTP will fragment larger DATA chunks into 
+         smaller DATA chunks, and beneath which SCTP will bundle DATA 
+         chunks into a single packet or combine smaller DATA chunks into 
+         larger DATA chunks.  Normally this value is associated with the 
+         MTU value minus the size of the current IP and SCTP headers, 
+         minus the size of one DATA chunk header.  When set to a lower 
+         value, the lower value is used.   This setting is not an 
+         absolute requirement and may be negotiated up or down by the 
+         SCTP implementation.
+         
+         The default value is determined by the setting of 
+         mgDefaultSctpMaxseg."
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpHeartbeatItvl OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defined the time interval (in 1/100ths of a second) 
+         between successive HEARTBEAT messages used to probe destination 
+         transport addresses for RTT calculation and activity.  Valid 
+         values are zero (0) - do not heartbeat, or a value of 10 
+         milliseconds or greater.
+         
+         In general, this value determines the amount of time that it 
+         takes for an SCTP association to detect a failure on an 
+         association which has no data to transmit or retransmit.
+         
+         ITU-T Rec. H.248.14 inactivity timers, however, generate 
+         a message once every maximum inactivity time.  The recommended 
+         maximum inactivity time is 4 seconds.  Therefore, for H.248, 
+         unless the SCTP heartbeat interval is set below the H.248.14 mit 
+         value, it will only have an effect on multi-homed associations 
+         for checking the status of non-primary or non-CMT destinations.
+         
+         Reducing this value will reduce the amount of time taken to 
+         detect primary and non-primary, non-CMT path, interface and 
+         destination failures, but may only affect primary destinations 
+         if reduced below the corresponding H.248.14 Maximum Inactivity 
+         Time.
+         
+         The default value is determined by the setting of 
+         mgDefaultSctpHeartbeatItvl."
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol, Section 15, 
+               HB.interval.
+         ITU-T Recommendation H.248.14 (03/2002), GCP inactivity timer 
+               package, mit."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpHeartbeat OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column determines whether HEARTBEAT messages used to probe 
+         destination transport addresses for RTT calculations and 
+         activity will be sent periodically.
+         
+         Disabling the hear beat mechanism reduces the protocol's 
+         responsiveness in detection of failures and redirection of 
+         traffic away from failed paths and interfaces, particularly for 
+         H.248/MEGACO, failed non-primary and non-CMT destinations in 
+         a multi-homed association.  This value should normally be left 
+         at its default default value.
+         
+         The default default value is the value from RFC 4960 is true(1): 
+         perform heartbeats.  The default value is determined by the 
+         setting of mgDefaultSctpHeartbeat."
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpRtoInitial OBJECT-TYPE
+    SYNTAX      TimeInterval
+    UNITS       "centiseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "This column defines the initial time interval (in 1/100ths of 
+         a second) that will be used as an initial RTO (retransmission 
+         timeout) value when sending packets to a destination for the 
+         first time.  Value values are zero or greater but must be within 
+         the range mgSctpRtoMib to mgSctpRtoMax.
+         
+         Note that, in general, the default RTO initial values should not 
+         be less than the peer's maximum SACK delay, otherwise, excessive 
+         retransmission might occur while the peer is delaying 
+         acknowledgements.  That is, this value should be greater than 
+         the corresponding mgSctpSackDelay at the peer.
+         
+         The default default value is that value recommended by RFC 4960 
+         (300 1/100th of a second, or 3 seconds).  The default value is 
+         determined by the setting of mgDefaultSctpRtoInitial."
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpRtoMin OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpRtoMax OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpPathMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpCookieLife OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpCookieInc OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpMaxInitRetries OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpMaxBurst OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpAssocMaxRetrans OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpSackDelay OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpLifetime OBJECT-TYPE
+    SYNTAX      TimeInterval
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+mgSctpRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        ""
+    REFERENCE   
+        "RFC 4960, Stream Control Transmission Protocol."
+    ::= { mgSctpProfileEntry 1 }
+
+
+mgM3uaProfile OBJECT IDENTIFIER
+    ::= { mgProfiles 4 }
+
+mgM3uaProfileTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MgM3uaProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    ::= { mgM3uaProfile 1 }
+
+mgM3uaProfileEntry OBJECT-TYPE
+    SYNTAX      MgM3uaProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        ""
+    INDEX       { mgM3uaProfileId }
+    ::= { mgM3uaProfileTable 1 }
+
+MgM3uaProfileEntry ::= SEQUENCE {
+    mgM3uaProfileId     SimpleNameType,
+    mgM3uaRowStatus     RowStatus
+}
+
+mgOids OBJECT IDENTIFIER
+    ::= { mgMIB 4 }
+
+mgGroups OBJECT IDENTIFIER
+    ::= { mgMIB 5 }
+
+mgCompliance OBJECT IDENTIFIER
+    ::= { mgMIB 6 }
+
+mgNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { }
+    STATUS      current
+    DESCRIPTION
+        "A collection of all the notifications in this module."
+    ::= { mgGroups 1 }
+
+mgObjectGroup OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of all the accessible objects in this module."
+    ::= { mgGroups 2 }
+
+mgUdpObjectGroup OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of objects supporting UDP transport."
+    ::= { mgGroups 3 }
+
+mgTcpObjectGroup OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of groups supporting TCP transport."
+    ::= { mgGroups 4 }
+
+mgSctpObjectGroup OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of groups supporting SCTP transport."
+    ::= { mgGroups 5 }
+
+mgM3uaObjectGroup OBJECT-GROUP
+    OBJECTS     { }
+    STATUS      current
+    DESCRIPTION 
+        "A collection of groups supporting M3UA transport."
+    ::= { mgGroups 6 }
+
+mgFullCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides a compliance profile that provides full compliance to 
+         this mib."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { mgNotificationGroup, gcpObjectGroup }
+
+        GROUP   gcpUdpObjectGroup
+        DESCRIPTION
+            "Group that provides for UDP transport."
+
+        GROUP   gcpTcpObjectGroup
+        DESCRIPTION
+            "Group that provides for TCP transport."
+
+        GROUP   gcpSctpObjectGroup
+        DESCRIPTION
+            "Group that provides for SCTP transport."
+
+        GROUP   sctpM3uaObjectGroup
+        DESCRIPTION
+            "Group that provides for M3UA transport."
+
+    MODULE OPENSS7-SMI-MIB
+
+        GROUP   attributeValueChangeNotificationPackage
+        DESCRIPTION   
+              "PRESENT IF the attributeValueChangeNotification defined in 
+               'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992' is supported 
+               by an instance of this class."
+
+        GROUP   createDeleteNotificationsPackage
+        DESCRIPTION   
+              "PRESENT IF the objectCreation and objectDeletion notifications 
+               defined in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 are 
+               supported by an instance of this class."
+
+        GROUP   communicationsAlarmPackage
+        DESCRIPTION   
+              "PRESENT IF the communicationsAlarm notification defined 
+               in ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992 is 
+               supported by an instance of this class."
+
+    ::= { mgCompliance 1 }
+
+
+END -- end of module OPENSS7-MG-MIB.
+

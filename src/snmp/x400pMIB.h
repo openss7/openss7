@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: x400pMIB.h,v 1.1.2.2 2010-11-28 14:22:21 brian Exp $
+ @(#) $Id: x400pMIB.h,v 1.1.2.3 2011-07-18 19:42:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:21 $ by $Author: brian $
+ Last Modified $Date: 2011-07-18 19:42:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x400pMIB.h,v $
+ Revision 1.1.2.3  2011-07-18 19:42:28  brian
+ - added documentation
+
  Revision 1.1.2.2  2010-11-28 14:22:21  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -202,7 +205,7 @@ struct x400pCardTable_data {
 	long x400pCardSyncTransitions;	/* ReadOnly */
 	uint8_t *x400pCardName;		/* ReadOnly */
 	size_t x400pCardNameLen;
-	long x400pCardStatus;		/* ReadOnly */
+	long x400pCardStatus;		/* Create */
 };
 struct x400pSpanTable_data {
 	uint x400pSpanTable_request;
@@ -858,6 +861,7 @@ extern oid x400pNearEndTotalGroup_oid[12];
 extern oid x400pFarEndCurrentGroup_oid[12];
 extern oid x400pFarEndIntervalGroup_oid[12];
 extern oid x400pFarEndTotalGroup_oid[12];
+extern oid x400pDrivGroup_oid[12];
 extern oid x400pBasicCompliance_oid[12];
 extern oid x400pEnhancedCompliance_oid[12];
 
@@ -1001,6 +1005,7 @@ WriteMethod write_x400pCardSyncGroup;
 WriteMethod write_x400pCardAdministrativeState;
 WriteMethod write_x400pCardAlarmStatus;
 WriteMethod write_x400pCardControlStatus;
+WriteMethod write_x400pCardStatus;
 WriteMethod write_x400pSpanName;
 WriteMethod write_x400pSpanDevice;
 WriteMethod write_x400pSpanEquipmentId;

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ss7MIB.h,v 1.1.2.2 2010-11-28 14:22:17 brian Exp $
+ @(#) $Id: ss7MIB.h,v 1.1.2.3 2011-07-18 19:42:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:17 $ by $Author: brian $
+ Last Modified $Date: 2011-07-18 19:42:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7MIB.h,v $
+ Revision 1.1.2.3  2011-07-18 19:42:27  brian
+ - added documentation
+
  Revision 1.1.2.2  2010-11-28 14:22:17  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -203,6 +206,8 @@ extern oid ss7ProtocolPnoc1996_oid[15];
 extern oid ss7ProtocolPnoc2000_oid[15];
 extern oid ss7ProtocolPnoc2004_oid[15];
 extern oid ss7ProtocolPnoc2008_oid[15];
+extern oid ss7GeneralCompliance_oid[13];
+extern oid ss7Package_oid[13];
 
 /* function prototypes */
 /* trap function prototypes */
