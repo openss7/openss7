@@ -382,7 +382,8 @@ configuration of the system for which a test case failed, will be collected in t
 @file{testsuite.log} file can then be attached as part of the problem report and provides rich
 details to maintainers of the package.  See also @xrefman{Problem Reports}, below.
 
-Typical steps for invoking and installed @command{testsuite} standalone are shown in
+@anchor{Invoking an Installed Testsuite}
+Typical steps for invoking an installed @command{testsuite} standalone are shown in
 @ref{testsuite:ex4}.
 
 @cartouche
