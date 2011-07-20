@@ -169,13 +169,13 @@ following commands will establish repository access for RPM-based systems:
 
 @example
           $> REPO=http://www.openss7.org/repo/rpms
-Fedora:   $> SUBDIR=fedora/14/$(uname -m)/RPMS/noarch
-CentOS:   $> SUBDIR=centos/5.5/$(uname -m)/RPMS/noarch
+Fedora:   $> SUBDIR=fedora/15/$(uname -m)/RPMS/noarch
+CentOS:   $> SUBDIR=centos/5.6/$(uname -m)/RPMS/noarch
 RHEL:     $> SUBDIR=redhat/6.0/$(uname -m)/RPMS/noarch
-OpenSUSE: $> SUBDIR=opensuse/11.3/$(uname -m)/RPMS/noarch
+OpenSUSE: $> SUBDIR=opensuse/11.4/$(uname -m)/RPMS/noarch
 SUSE:     $> SUBDIR=suse/11.1/$(uname -m)/RPMS/noarch
 Mageia:   $> SUBDIR=mageia/1/$(uname -m)/RPMS/noarch
-Mandriva: $> SUBDIR=mandriva/2010.2/$(uname -m)/RPMS-noarch
+Mandriva: $> SUBDIR=mandriva/2011.0/$(uname -m)/RPMS-noarch
 MES:      $> SUBDIR=mes/5.2/$(uname -m)/RPMS/noarch
           $> sudo rpm -Uhv $REPO/$SUBDIR/openss7-repo.noarch.rpm
 @end example

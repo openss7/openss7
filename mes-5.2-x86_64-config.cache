@@ -1,12 +1,14 @@
 bld_cv_pkg_cmd_BIBTEX=${bld_cv_pkg_cmd_BIBTEX='urpmi tetex'}
 bld_cv_pkg_cmd_BZIP2_CMD=${bld_cv_pkg_cmd_BZIP2_CMD='urpmi bzip2'}
 bld_cv_pkg_cmd_CHKCONFIG=${bld_cv_pkg_cmd_CHKCONFIG='urpmi chkconfig'}
+bld_cv_pkg_cmd_CONVERT=${bld_cv_pkg_cmd_CONVERT='urpmi imagemagick'}
 bld_cv_pkg_cmd_DEPMOD=${bld_cv_pkg_cmd_DEPMOD='urpmi module-init-tools'}
 bld_cv_pkg_cmd_DOXYGEN=${bld_cv_pkg_cmd_DOXYGEN='urpmi doxygen'}
 bld_cv_pkg_cmd_DVI2PS=${bld_cv_pkg_cmd_DVI2PS='urpmi tetex-dvips'}
 bld_cv_pkg_cmd_DVIPDF=${bld_cv_pkg_cmd_DVIPDF='urpmi ghostscript-dvipdf'}
 bld_cv_pkg_cmd_EPSTOPDF=${bld_cv_pkg_cmd_EPSTOPDF='urpmi tetex'}
 bld_cv_pkg_cmd_EXTERN_H=${bld_cv_pkg_cmd_EXTERN_H='urpmi perl-devel'}
+bld_cv_pkg_cmd_FIG2DEV=${bld_cv_pkg_cmd_FIG2DEV='urpmi transfig'}
 bld_cv_pkg_cmd_GCJDBTOOL=${bld_cv_pkg_cmd_GCJDBTOOL='urpmi gcj-tools'}
 bld_cv_pkg_cmd_GCJH=${bld_cv_pkg_cmd_GCJH='urpmi gcj-tools'}
 bld_cv_pkg_cmd_GCJ_CNI_H=${bld_cv_pkg_cmd_GCJ_CNI_H='urpmi lib64gcj-devel'}
@@ -38,18 +40,21 @@ bld_cv_pkg_cmd_RPM=${bld_cv_pkg_cmd_RPM='urpmi rpm'}
 bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='urpmi coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='urpmi coreutils'}
 bld_cv_pkg_cmd_SYMVERS_2_6_33_7_SERVER_2MNB_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_33_7_SERVER_2MNB_GZ='urpmi kernel-2.6.33-server-2.6.33.7-2mnb'}
+bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='urpmi lib64tcl-devel'}
 bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H='urpmi lib64net-snmp-devel'}
 bld_cv_pkg_cmd_XZ_CMD=${bld_cv_pkg_cmd_XZ_CMD='urpmi xz'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='urpmi zip'}
 bld_cv_pkg_name_BIBTEX=${bld_cv_pkg_name_BIBTEX=tetex}
 bld_cv_pkg_name_BZIP2_CMD=${bld_cv_pkg_name_BZIP2_CMD=bzip2}
 bld_cv_pkg_name_CHKCONFIG=${bld_cv_pkg_name_CHKCONFIG=chkconfig}
+bld_cv_pkg_name_CONVERT=${bld_cv_pkg_name_CONVERT=imagemagick}
 bld_cv_pkg_name_DEPMOD=${bld_cv_pkg_name_DEPMOD=module-init-tools}
 bld_cv_pkg_name_DOXYGEN=${bld_cv_pkg_name_DOXYGEN=doxygen}
 bld_cv_pkg_name_DVI2PS=${bld_cv_pkg_name_DVI2PS=tetex-dvips}
 bld_cv_pkg_name_DVIPDF=${bld_cv_pkg_name_DVIPDF=ghostscript-dvipdf}
 bld_cv_pkg_name_EPSTOPDF=${bld_cv_pkg_name_EPSTOPDF=tetex}
 bld_cv_pkg_name_EXTERN_H=${bld_cv_pkg_name_EXTERN_H=perl-devel}
+bld_cv_pkg_name_FIG2DEV=${bld_cv_pkg_name_FIG2DEV=transfig}
 bld_cv_pkg_name_GCJDBTOOL=${bld_cv_pkg_name_GCJDBTOOL=gcj-tools}
 bld_cv_pkg_name_GCJH=${bld_cv_pkg_name_GCJH=gcj-tools}
 bld_cv_pkg_name_GCJ_CNI_H=${bld_cv_pkg_name_GCJ_CNI_H=lib64gcj-devel}
@@ -81,6 +86,7 @@ bld_cv_pkg_name_RPM=${bld_cv_pkg_name_RPM=rpm}
 bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
 bld_cv_pkg_name_SYMVERS_2_6_33_7_SERVER_2MNB_GZ=${bld_cv_pkg_name_SYMVERS_2_6_33_7_SERVER_2MNB_GZ=kernel-2.6.33-server-2.6.33.7-2mnb}
+bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=lib64tcl-devel}
 bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=lib64net-snmp-devel}
 bld_cv_pkg_name_XZ_CMD=${bld_cv_pkg_name_XZ_CMD=xz}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
@@ -88,16 +94,19 @@ bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib/perl5/5.10.0/x86_64
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/libgcj-4.3.2/gcj/cni.h}
 bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/lib/modules/2.6.33.7-server-2mnb/build/Module.symvers}
 bld_cv_pkg_path_SYMVERS_2_6_33_7_SERVER_2MNB_GZ=${bld_cv_pkg_path_SYMVERS_2_6_33_7_SERVER_2MNB_GZ=/boot/symvers-2.6.33.7-server-2mnb.gz}
+bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl8.5.4/generic/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/net-snmp/ucd-snmp/ucd-snmp-config.h}
 bld_cv_pkg_prog_AUTOM4TE=${bld_cv_pkg_prog_AUTOM4TE=autom4te}
 bld_cv_pkg_prog_BIBTEX=${bld_cv_pkg_prog_BIBTEX=bibtex}
 bld_cv_pkg_prog_BZIP2_CMD=${bld_cv_pkg_prog_BZIP2_CMD=bzip2}
 bld_cv_pkg_prog_CHKCONFIG=${bld_cv_pkg_prog_CHKCONFIG=chkconfig}
+bld_cv_pkg_prog_CONVERT=${bld_cv_pkg_prog_CONVERT=convert}
 bld_cv_pkg_prog_DEPMOD=${bld_cv_pkg_prog_DEPMOD=depmod}
 bld_cv_pkg_prog_DOXYGEN=${bld_cv_pkg_prog_DOXYGEN=doxygen}
 bld_cv_pkg_prog_DVI2PS=${bld_cv_pkg_prog_DVI2PS=dvips}
 bld_cv_pkg_prog_DVIPDF=${bld_cv_pkg_prog_DVIPDF=dvipdf}
 bld_cv_pkg_prog_EPSTOPDF=${bld_cv_pkg_prog_EPSTOPDF=epstopdf}
+bld_cv_pkg_prog_FIG2DEV=${bld_cv_pkg_prog_FIG2DEV=fig2dev}
 bld_cv_pkg_prog_GCJDBTOOL=${bld_cv_pkg_prog_GCJDBTOOL=gcj-dbtool}
 bld_cv_pkg_prog_GCJH=${bld_cv_pkg_prog_GCJH=gcjh}
 bld_cv_pkg_prog_GENHDLIST=${bld_cv_pkg_prog_GENHDLIST=genhdlist2}
@@ -140,12 +149,14 @@ bld_cv_pkg_prog_ZIP=${bld_cv_pkg_prog_ZIP=zip}
 bld_cv_pkg_ver_BIBTEX=${bld_cv_pkg_ver_BIBTEX=3.0}
 bld_cv_pkg_ver_BZIP2_CMD=${bld_cv_pkg_ver_BZIP2_CMD=1.0.5}
 bld_cv_pkg_ver_CHKCONFIG=${bld_cv_pkg_ver_CHKCONFIG=1.3.37}
+bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.4.2.10}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.5}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.5.9}
 bld_cv_pkg_ver_DVI2PS=${bld_cv_pkg_ver_DVI2PS=3.0}
 bld_cv_pkg_ver_DVIPDF=${bld_cv_pkg_ver_DVIPDF=8.63}
 bld_cv_pkg_ver_EPSTOPDF=${bld_cv_pkg_ver_EPSTOPDF=3.0}
 bld_cv_pkg_ver_EXTERN_H=${bld_cv_pkg_ver_EXTERN_H=5.10.0}
+bld_cv_pkg_ver_FIG2DEV=${bld_cv_pkg_ver_FIG2DEV=3.2.5}
 bld_cv_pkg_ver_GCJDBTOOL=${bld_cv_pkg_ver_GCJDBTOOL=4.3.2}
 bld_cv_pkg_ver_GCJH=${bld_cv_pkg_ver_GCJH=4.3.2}
 bld_cv_pkg_ver_GCJ_CNI_H=${bld_cv_pkg_ver_GCJ_CNI_H=4.3.2}
@@ -177,6 +188,7 @@ bld_cv_pkg_ver_RPM=${bld_cv_pkg_ver_RPM=4.4.2.3}
 bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=6.12}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=6.12}
 bld_cv_pkg_ver_SYMVERS_2_6_33_7_SERVER_2MNB_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_33_7_SERVER_2MNB_GZ=1}
+bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.5.4}
 bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.4.2}
 bld_cv_pkg_ver_XZ_CMD=${bld_cv_pkg_ver_XZ_CMD=5.0.0}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=3.0}
