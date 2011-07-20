@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: tcapOmMIB.h,v 1.1.2.2 2010-11-28 14:22:20 brian Exp $
+ @(#) $Id: tcapOmMIB.h,v 1.1.2.3 2011-07-18 19:42:28 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:20 $ by $Author: brian $
+ Last Modified $Date: 2011-07-18 19:42:28 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcapOmMIB.h,v $
+ Revision 1.1.2.3  2011-07-18 19:42:28  brian
+ - added documentation
+
  Revision 1.1.2.2  2010-11-28 14:22:20  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -104,17 +107,17 @@ extern int sa_request;			/* request number for per-request actions */
 /* our storage structure(s) */
 struct tcapOmMIB_data {
 	uint tcapOmMIB_request;
-	oid *tcapOm1stAndIntervalActivate;	/* WriteOnly */
+	oid *tcapOm1stAndIntervalActivate;	/* ReadWrite */
 	size_t tcapOm1stAndIntervalActivateLen;
-	oid *tcapOm1stAndIntervalDeactivate;	/* WriteOnly */
+	oid *tcapOm1stAndIntervalDeactivate;	/* ReadWrite */
 	size_t tcapOm1stAndIntervalDeactivateLen;
-	oid *tcapOm5MinActivate;	/* WriteOnly */
+	oid *tcapOm5MinActivate;	/* ReadWrite */
 	size_t tcapOm5MinActivateLen;
-	oid *tcapOm5MinDeaActivate;	/* WriteOnly */
+	oid *tcapOm5MinDeaActivate;	/* ReadWrite */
 	size_t tcapOm5MinDeaActivateLen;
-	oid *tcapOm15MinActivate;	/* WriteOnly */
+	oid *tcapOm15MinActivate;	/* ReadWrite */
 	size_t tcapOm15MinActivateLen;
-	oid *tcapOm15MinDeaActivate;	/* WriteOnly */
+	oid *tcapOm15MinDeaActivate;	/* ReadWrite */
 	size_t tcapOm15MinDeaActivateLen;
 	long tcapOmDiscontinuityTime;	/* ReadOnly */
 	long tcapOmTimeStamp;		/* ReadOnly */
@@ -124,7 +127,8 @@ struct tcapOmMIB_data {
 struct tcapOmNodeTable_data {
 	uint tcapOmNodeTable_request;
 	uint tcapOmNodeTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	long tcapOmNodeMessagesSent;	/* ReadOnly */
 	long tcapOmNodeMessagesRecv;	/* ReadOnly */
 	long tcapOmNodeComponentsSent;	/* ReadOnly */
@@ -135,7 +139,8 @@ struct tcapOmNodeTable_data {
 struct tcapOmNodeCurrentTable_data {
 	uint tcapOmNodeCurrentTable_request;
 	uint tcapOmNodeCurrentTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	long tcapOmNodeCurrentMessagesSent;	/* ReadOnly */
 	long tcapOmNodeCurrentMessagesRecv;	/* ReadOnly */
 	long tcapOmNodeCurrentComponentsSent;	/* ReadOnly */
@@ -144,7 +149,8 @@ struct tcapOmNodeCurrentTable_data {
 struct tcapOmNode5minIntTable_data {
 	uint tcapOmNode5minIntTable_request;
 	uint tcapOmNode5minIntTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmNode5minIntMessagesSent;	/* ReadOnly */
 	long tcapOmNode5minIntMessagesRecv;	/* ReadOnly */
@@ -154,7 +160,8 @@ struct tcapOmNode5minIntTable_data {
 struct tcapOmNode15minIntTable_data {
 	uint tcapOmNode15minIntTable_request;
 	uint tcapOmNode15minIntTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmNode15minIntMessagesSent;	/* ReadOnly */
 	long tcapOmNode15minIntMessagesRecv;	/* ReadOnly */
@@ -164,8 +171,9 @@ struct tcapOmNode15minIntTable_data {
 struct tcapOmMsgsTable_data {
 	uint tcapOmMsgsTable_request;
 	uint tcapOmMsgsTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	ulong tcapOmMessageType;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
+	ulong tcapOmMessageType;	/* NoAccess */
 	long tcapOmMsgsMessagesSent;	/* ReadOnly */
 	long tcapOmMsgsMessagesRecv;	/* ReadOnly */
 	long tcapOmMsgs5minValidIntervals;	/* ReadOnly */
@@ -174,16 +182,18 @@ struct tcapOmMsgsTable_data {
 struct tcapOmMsgsCurrentTable_data {
 	uint tcapOmMsgsCurrentTable_request;
 	uint tcapOmMsgsCurrentTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	ulong tcapOmMessageType;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
+	ulong tcapOmMessageType;	/* NoAccess */
 	long tcapOmMsgsCurrentMessagesSent;	/* ReadOnly */
 	long tcapOmMsgsCurrentMessagesRecv;	/* ReadOnly */
 };
 struct tcapOmMsgs5minIntTable_data {
 	uint tcapOmMsgs5minIntTable_request;
 	uint tcapOmMsgs5minIntTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	ulong tcapOmMessageType;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
+	ulong tcapOmMessageType;	/* NoAccess */
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmMsgs5minIntMessagesSent;	/* ReadOnly */
 	long tcapOmMsgs5minIntMessagesRecv;	/* ReadOnly */
@@ -191,8 +201,9 @@ struct tcapOmMsgs5minIntTable_data {
 struct tcapOmMsgs15minIntTable_data {
 	uint tcapOmMsgs15minIntTable_request;
 	uint tcapOmMsgs15minIntTable_refs;
-	ulong sccpNetworkEntityId;	/* NoAccess */
-	ulong tcapOmMessageType;	/* Notify */
+	uint8_t *sccpNetworkEntityId;	/* NoAccess */
+	size_t sccpNetworkEntityIdLen;
+	ulong tcapOmMessageType;	/* NoAccess */
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmMsgs15minIntMessagesSent;	/* ReadOnly */
 	long tcapOmMsgs15minIntMessagesRecv;	/* ReadOnly */
@@ -200,7 +211,10 @@ struct tcapOmMsgs15minIntTable_data {
 struct tcapOmAETable_data {
 	uint tcapOmAETable_request;
 	uint tcapOmAETable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmAEMeasurementDeleted;	/* ReadOnly */
 	long tcapOmAENewTransactions;	/* ReadOnly */
 	long tcapOmAEMeanOpenTransactions;	/* ReadOnly */
@@ -214,7 +228,10 @@ struct tcapOmAETable_data {
 struct tcapOmAECurrentTable_data {
 	uint tcapOmAECurrentTable_request;
 	uint tcapOmAECurrentTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmAECurrentMeasurementDeleted;	/* ReadOnly */
 	long tcapOmAECurrentNewTransactions;	/* ReadOnly */
 	long tcapOmAECurrentMeanOpenTransactions;	/* ReadOnly */
@@ -226,7 +243,10 @@ struct tcapOmAECurrentTable_data {
 struct tcapOmAE5minIntTable_data {
 	uint tcapOmAE5minIntTable_request;
 	uint tcapOmAE5minIntTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmAE5minIntMeasurementDeleted;	/* ReadOnly */
 	long tcapOmAE5minIntNewTransactions;	/* ReadOnly */
@@ -239,7 +259,10 @@ struct tcapOmAE5minIntTable_data {
 struct tcapOmAE15minIntTable_data {
 	uint tcapOmAE15minIntTable_request;
 	uint tcapOmAE15minIntTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmAE15minIntMeasurementDeleted;	/* ReadOnly */
 	long tcapOmAE15minIntNewTransactions;	/* ReadOnly */
@@ -252,7 +275,10 @@ struct tcapOmAE15minIntTable_data {
 struct tcapOmTcTable_data {
 	uint tcapOmTcTable_request;
 	uint tcapOmTcTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmTcPabortRecvUnrecTid;	/* ReadOnly */
 	long tcapOmTcPabortRecvResourceLim;	/* ReadOnly */
 	long tcapOmTcRejectRecvResourceLim;	/* ReadOnly */
@@ -271,7 +297,10 @@ struct tcapOmTcTable_data {
 struct tcapOmTcCurrentTable_data {
 	uint tcapOmTcCurrentTable_request;
 	uint tcapOmTcCurrentTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmTcCurrentPabortRecvUnrecTid;	/* ReadOnly */
 	long tcapOmTcCurrentPabortRecvResourceLim;	/* ReadOnly */
 	long tcapOmTcCurrentRejectRecvResourceLim;	/* ReadOnly */
@@ -288,7 +317,10 @@ struct tcapOmTcCurrentTable_data {
 struct tcapOmTc5minIntTable_data {
 	uint tcapOmTc5minIntTable_request;
 	uint tcapOmTc5minIntTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmTc5minIntPabortRecvUnrecTid;	/* ReadOnly */
 	long tcapOmTc5minIntPabortRecvResourceLim;	/* ReadOnly */
@@ -306,7 +338,10 @@ struct tcapOmTc5minIntTable_data {
 struct tcapOmTc15minIntTable_data {
 	uint tcapOmTc15minIntTable_request;
 	uint tcapOmTc15minIntTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmTc15minIntPabortRecvUnrecTid;	/* ReadOnly */
 	long tcapOmTc15minIntPabortRecvResourceLim;	/* ReadOnly */
@@ -324,7 +359,10 @@ struct tcapOmTc15minIntTable_data {
 struct tcapOmDevelRecvTable_data {
 	uint tcapOmDevelRecvTable_request;
 	uint tcapOmDevelRecvTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmDevelRecvPabortMessageType;	/* ReadOnly */
 	long tcapOmDevelRecvPabortIncorrectTp;	/* ReadOnly */
 	long tcapOmDevelRecvPabortBadTp;	/* ReadOnly */
@@ -352,7 +390,10 @@ struct tcapOmDevelRecvTable_data {
 struct tcapOmDevelRecvCurrentTable_data {
 	uint tcapOmDevelRecvCurrentTable_request;
 	uint tcapOmDevelRecvCurrentTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmDevelRecvCurrentPabortMessageType;	/* ReadOnly */
 	long tcapOmDevelRecvCurrentPabortIncorrectTp;	/* ReadOnly */
 	long tcapOmDevelRecvCurrentPabortBadTp;	/* ReadOnly */
@@ -378,7 +419,10 @@ struct tcapOmDevelRecvCurrentTable_data {
 struct tcapOmDevelRecv5minIntTable_data {
 	uint tcapOmDevelRecv5minIntTable_request;
 	uint tcapOmDevelRecv5minIntTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmDevelRecv5minIntPabortMessageType;	/* ReadOnly */
 	long tcapOmDevelRecv5minIntPabortIncorrectTp;	/* ReadOnly */
@@ -405,7 +449,10 @@ struct tcapOmDevelRecv5minIntTable_data {
 struct tcapOmDevelRecv15minIntTable_data {
 	uint tcapOmDevelRecv15minIntTable_request;
 	uint tcapOmDevelRecv15minIntTable_refs;
-	ulong tcapApplicationEntityId;	/* NoAccess */
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
+	uint8_t *tcapApplicationEntityId;	/* NoAccess */
+	size_t tcapApplicationEntityIdLen;
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmDevelRecv15minIntPabortMessageType;	/* ReadOnly */
 	long tcapOmDevelRecv15minIntPabortIncorrectTp;	/* ReadOnly */
@@ -432,6 +479,8 @@ struct tcapOmDevelRecv15minIntTable_data {
 struct tcapOmDevelSentTable_data {
 	uint tcapOmDevelSentTable_request;
 	uint tcapOmDevelSentTable_refs;
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
 	ulong tcapTcUserId;		/* NoAccess */
 	long tcapOmDevelSentPabortMessageType;	/* ReadOnly */
 	long tcapOmDevelSentPabortIncorrectTp;	/* ReadOnly */
@@ -460,6 +509,8 @@ struct tcapOmDevelSentTable_data {
 struct tcapOmDevelSentCurrentTable_data {
 	uint tcapOmDevelSentCurrentTable_request;
 	uint tcapOmDevelSentCurrentTable_refs;
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
 	ulong tcapTcUserId;		/* NoAccess */
 	long tcapOmDevelSentCurrentPabortMessageType;	/* ReadOnly */
 	long tcapOmDevelSentCurrentPabortIncorrectTp;	/* ReadOnly */
@@ -486,6 +537,8 @@ struct tcapOmDevelSentCurrentTable_data {
 struct tcapOmDevelSent5minIntTable_data {
 	uint tcapOmDevelSent5minIntTable_request;
 	uint tcapOmDevelSent5minIntTable_refs;
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
 	ulong tcapTcUserId;		/* NoAccess */
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmDevelSent5minIntPabortMessageType;	/* ReadOnly */
@@ -513,6 +566,8 @@ struct tcapOmDevelSent5minIntTable_data {
 struct tcapOmDevelSent15minIntTable_data {
 	uint tcapOmDevelSent15minIntTable_request;
 	uint tcapOmDevelSent15minIntTable_refs;
+	uint8_t *tcapApplicationSubsystemId;	/* NoAccess */
+	size_t tcapApplicationSubsystemIdLen;
 	ulong tcapTcUserId;		/* NoAccess */
 	long tcapOmInterval;		/* NoAccess */
 	long tcapOmDevelSent15minIntPabortMessageType;	/* ReadOnly */
@@ -570,9 +625,35 @@ extern struct header_complex_index *tcapOmDevelSent15minIntTableStorage;
 /* notifications */
 
 /* scalars accessible only for notify */
-extern oid tcapOmMessageType_oid[13];
+extern oid tcapOmMessageTypeNotif_oid[13];
 
 /* object id definitions */
+extern oid tcapOmBasicCompliance_oid[13];
+extern oid tcapOmActivationGroup_oid[13];
+extern oid tcapOmNodeGroup_oid[13];
+extern oid tcapOmNodeCurrentGroup_oid[13];
+extern oid tcapOmNode5minGroup_oid[13];
+extern oid tcapOmNode15minGroup_oid[13];
+extern oid tcapOmMsgsGroup_oid[13];
+extern oid tcapOmMsgsCurrentGroup_oid[13];
+extern oid tcapOmMsgs5minGroup_oid[13];
+extern oid tcapOmMsgs15minGroup_oid[13];
+extern oid tcapOmAEGroup_oid[13];
+extern oid tcapOmAECurrentGroup_oid[13];
+extern oid tcapOmAE5minGroup_oid[13];
+extern oid tcapOmAE15minGroup_oid[13];
+extern oid tcapOmTcGroup_oid[13];
+extern oid tcapOmTcCurrentGroup_oid[13];
+extern oid tcapOmTc5minGroup_oid[13];
+extern oid tcapOmTc15minGroup_oid[13];
+extern oid tcapOmDevelRecvGroup_oid[13];
+extern oid tcapOmDevelRecvCurrentGroup_oid[13];
+extern oid tcapOmDevelRecv5minGroup_oid[13];
+extern oid tcapOmDevelRecv15minGroup_oid[13];
+extern oid tcapOmDevelSentGroup_oid[13];
+extern oid tcapOmDevelSentCurrentGroup_oid[13];
+extern oid tcapOmDevelSent5minGroup_oid[13];
+extern oid tcapOmDevelSent15minGroup_oid[13];
 
 /* function prototypes */
 /* trap function prototypes */

@@ -1,0 +1,23 @@
+/* XPM */
+static char * mini_ind5_xpm[] = {
+"16 16 4 1",
+" 	c None",
+"a	c black",
+"b	c green",
+"c	c green4",
+"                ",
+"   aaaaaaa      ",
+"   abbbbbaa     ",
+"   abcccbaba    ",
+"   abbbaaaaaa   ",
+"   abccaabccac  ",
+"   abbbbbbbbac  ",
+"   abcaaaccbac  ",
+"   abbbaabbbac  ",
+"   abccaaccbac  ",
+"   abbbaabbbac  ",
+"   abccaaacbac  ",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  ",
+"                "};

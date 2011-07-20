@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: ss7OmMIB.h,v 1.1.2.2 2010-11-28 14:22:17 brian Exp $
+ @(#) $Id: ss7OmMIB.h,v 1.1.2.3 2011-07-18 19:42:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:17 $ by $Author: brian $
+ Last Modified $Date: 2011-07-18 19:42:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ss7OmMIB.h,v $
+ Revision 1.1.2.3  2011-07-18 19:42:27  brian
+ - added documentation
+
  Revision 1.1.2.2  2010-11-28 14:22:17  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -116,6 +119,9 @@ extern oid ss7OnOccEvent_oid[12];
 extern oid pointCode_oid[13];
 
 /* object id definitions */
+extern oid ss7OmGeneralCompliance_oid[13];
+extern oid ss7OmPackage_oid[13];
+extern oid ss7OmEvents_oid[13];
 
 /* function prototypes */
 /* trap function prototypes */

@@ -1,10 +1,10 @@
 /*****************************************************************************
 
- @(#) $Id: sigtranMIB.h,v 1.1.2.2 2010-11-28 14:22:16 brian Exp $
+ @(#) $Id: sigtranMIB.h,v 1.1.2.3 2011-07-18 19:42:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:16 $ by $Author: brian $
+ Last Modified $Date: 2011-07-18 19:42:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sigtranMIB.h,v $
+ Revision 1.1.2.3  2011-07-18 19:42:26  brian
+ - added documentation
+
  Revision 1.1.2.2  2010-11-28 14:22:16  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -160,6 +163,8 @@ extern struct header_complex_index *sigtranSctpProfileTableStorage;
 /* scalars accessible only for notify */
 
 /* object id definitions */
+extern oid sigtranPackage_oid[12];
+extern oid sigtranGeneralCompliance_oid[12];
 
 /* function prototypes */
 /* trap function prototypes */

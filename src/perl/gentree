@@ -1,0 +1,337 @@
+#!/usr/bin/perl
+#
+if (!eval { require SNMP; }) {
+	print STDERR<<EOF;
+ERROR: You do not have the SNMP perl module installed.  Please obtain
+this by getting the latest source release of the ucd-snmp toolkit from
+http://www.net-snmp.org/download/ .  The perl module is contained in
+the perl/SNMP directory.  See the INSTALL file there for instructions.
+EOF
+	exit;
+} else {
+	eval { import SNMP; }
+}
+
+use Carp;
+use SNMP;
+
+$SNMP::auto_init_mib = 1;
+$SNMP::verbose = 1;
+$SNMP::use_long_names = 0;
+$SNMP::use_sprint_value = 0;
+$SNMP::use_enums = 1;
+$SNMP::use_numeric = 0;
+$SNMP::best_guess = 2;
+$SNMP::non_increasing = 0;
+$SNMP::save_descriptions = 1;
+
+SNMP::initMib();
+SNMP::loadModules('ALL');
+
+sub guard {
+	my ($msg,@args) = @_;
+	$msg =~ s/([ ]|\t)*\n+([ ]|\t)*/ /sg;
+	return $msg;
+}
+
+sub reformat {
+	my ($msg,@args) = @_;
+	my @lines;
+	my @result;
+	# remove indent from blank lines
+	$msg =~ s/\n([ ]|\t)+\n/\n\n/sg;
+	#printf STDERR "\nMessage after indent removal:\n".$msg;
+	if ($msg =~ /([ ]|\t)\n([ ]|\t)*/s) {
+		#printf STDERR "Trailing blanks indicate paragraphs.\n";
+		# trailing blanks indicate paragraphs
+		$msg =~ s/([ ]|\t)\n([ ]|\t)*/ /sg;
+		# remove blank lines between stanzas
+		$msg =~ s/\n\n+/\n/sg;
+		#printf STDERR "\nMessage after preprocessing:\n".$msg;
+		# split em up
+		@lines = split(/\n/,$msg);
+	} elsif ($msg =~ /\n\n/s) {
+		#printf STDERR "Blank lines indicate paragraphs.\n";
+		# blank line indicates paragraphs
+		# interior lines ending in a period need an extra blank
+		$msg =~ s/\.\n(?!\n)/. \n/sg;
+		# interior lines need a blank
+		$msg =~ s/\n(?!\n)/ \n/sg;
+		# remove space from blank lines
+		$msg =~ s/\n([ ]|\t)+\n/\n\n/sg;
+		# interior lines are joined
+		$msg =~ s/([ ]|\t)\n([ ]|\t)*/ /sg;
+		# remove blank lines between stanzas
+		$msg =~ s/\n\n+/\n/sg;
+		#printf STDERR "\nMessage after preprocessing:\n".$msg;
+		# split em up
+		@lines = split(/\n/,$msg);
+	} else {
+		#printf STDERR "No way to indicate paragraphs.\n";
+		$msg =~ s/\.\n/. \n/sg;
+		$msg =~ s/\n([ ]|\t)*/ /sg;
+		#printf STDERR "\nMessage after preprocessing:\n".$msg;
+		# FIXME - check for lead change
+		@lines = split(/\n/,$msg);
+	}
+	# calculate the minimum indent
+	my $first = 1;
+	my $mindent = 100;
+	@result = ();
+	foreach my $line (@lines) {
+		unless ($line =~ /^([ ]|\t)*$/) {
+			unless ($first) {
+				if ($line =~ /^\t/) { $line =~ s/\t/        /g; }
+				$line =~ /^(([ ]|\t)*)/;
+				my $indent = length($1);
+				if ($indent < $mindent) {
+					$mindent = $indent;
+				}
+			}
+			push @result, $line;
+		}
+		$first = 0;
+	}
+	@lines = @result;
+	@result = ();
+	if ($mindent == 100) { $mindent = 0; }
+	# strip the minimum indent of all lines but the first
+	$first = 1;
+	foreach my $line (@lines) {
+		unless ($first) {
+			if ($line =~ /^(([ ]|\t)+)/) {
+				my $lead = '';
+				$lead = $1 if $line =~ s/^(([ ]|\t)+)//;
+				$lead = substr($lead,$mindent);
+				$line = $lead.$line;
+			}
+		}
+		push @result, $line;
+		$first = 0;
+	}
+	@lines = @result;
+	@result = ();
+	# convert paragraphs and list items
+	my @list = ();
+	my @indents = ();
+	foreach my $line (@lines) {
+		my $lead = '';
+		$lead = $1 if $line =~ s/^(([ ]|\t)+)//;
+		if ($line =~ s/^(([0-9]+\.|-|·)([ ]|\t)+)//) {
+			my $item = $1;
+			my $type;
+			if ($item =~ /^[0-9]/) {
+				$type = 'ol';
+			} else {
+				$type = 'ul';
+			}
+			while ($#list >= 0 && $indents[-1] > length($lead)) {
+				my $ltype = pop @list;
+				push @result, '</'.$ltype.'>';
+				pop @indents;
+			}
+			if ($#list < 0 || length($lead) > $indents[-1]) {
+				# start a new list
+				push @list, $type;
+				push @indents, length($lead);
+				push @result, '<'.$type.'>';
+			}
+			push @result, '<li>'.$line.'</li>';
+		} else {
+			while (my $ltype = pop @list) {
+				push @result, '</'.$ltype.'>';
+				pop @indents;
+			}
+			push @result, '<p>'.$line.'</p>';
+		}
+	}
+	$msg = join("",@result);
+	$msg =~ s/\n//sg;  # can't have any line breaks in result
+	return $msg;
+}
+
+my %tcs = {};
+
+sub showMib {
+	my $mib = shift;
+	my $level = shift;
+	my $recurse = shift;
+	my $copy = {};
+	foreach (qw/objectID label subID moduleID type access status syntax textualConvention TCDescription units hint enums ranges description reference defaultValue indexes parent children augments/) {
+		$copy->{$_} = $mib->{$_} if defined $mib->{$_};
+	}
+	my $oid = $copy->{'objectID'}; $oid =~ s/^\.//;
+	my $label = $copy->{'label'};
+	my $sid = $copy->{'subID'};
+	my $mid = $copy->{'moduleID'};
+	my $mtype = $copy->{'type'};
+	my $access = $copy->{'access'};
+	my $status = $copy->{'status'};
+	my $syntax = $copy->{'syntax'};
+	my $desc = $copy->{'description'};
+	$desc = reformat($desc) if $desc;
+	my $refs = $copy->{'reference'};
+	$refs = reformat($refs) if $refs;
+	my $image = 'objs';
+	my $color = '';
+	my $state = 'c';
+	my $type = '';
+	if (defined $copy->{'indexes'} && @{$copy->{'indexes'}}) {
+		$type = 'MyConceptualRow';
+		$image = 'rows';
+		$color = '';
+		$state = 'c';
+	} elsif ($copy->{'parent'} && @{$copy->{'parent'}->{'indexes'}}) {
+		my $found = 0;
+		foreach (@{$copy->{'parent'}->{'indexes'}}) {
+			if ($copy->{'label'} eq $_) {
+				$found = 1;
+				last;
+			}
+		}
+		if (!$found) {
+			$type = 'MyConceptualColumn';
+			$image = 'cols';
+			$color = '';
+			$state = 'c';
+		} else {
+			$type = 'MyConceptualIndex';
+			$image = 'inds';
+			$color = '';
+			$state = 'c';
+		}
+	} elsif (defined $copy->{'children'} && @{$copy->{'children'}} && $copy->{'children'}->[0]->{'indexes'} && @{$copy->{'children'}->[0]->{'indexes'}}) {
+		$type = 'MyConceptualTable';
+		$image = 'docs';
+		$color = '';
+		$state = 'c';
+	} elsif (defined $copy->{'children'} && @{$copy->{'children'}}) {
+		if ($copy->{'syntax'}) {
+			$type = 'MyObjectType';
+			$image = 'objs';
+			$color = '-blu';
+			$state = 'c';
+		} elsif ($copy->{'description'}) {
+			if ($copy->{'parent'} && $copy->{'parent'}->{'moduleID'} eq $copy->{'moduleID'}) {
+				$type = 'MyObjectIdentity';
+				$image = 'book';
+				$color = '-blu';
+				$state = 'c';
+			} else {
+				$type = 'MyModuleIdentity';
+				$image = 'book';
+				$color = '-blu';
+				$state = 'c';
+			}
+		} else {
+			$type = 'MyObjectIdentifier';
+			$image = 'book';
+			$color = '';
+			$state = 'c';
+		}
+	} elsif ($copy->{'type'} && $copy->{'type'} eq 'NOTIF') {
+		$type = 'MyNotification';
+		$image = 'note';
+		$color = '';
+		$state = 'c';
+	} elsif ($copy->{'access'} && $copy->{'access'} eq 'Notify') {
+		$type = 'MyNotifyParameter';
+		$image = 'parm';
+		$color = '';
+		$state = 'c';
+	} elsif ($copy->{'syntax'}) {
+		$type = 'MyObjectType';
+		$image = 'objs';
+		$color = '';
+		$state = 'c';
+	} elsif ($copy->{'description'}) {
+		$type = 'MyObjectIdentity';
+		$image = 'objs';
+		$color = '-blu';
+		$state = 'c';
+	} else {
+		$type = 'MyLeaf';
+		$image = 'objs';
+		$color = '';
+		$state = 'c';
+	}
+	my $superior;
+	if ($level > 0) { $superior = "obj".($level-1); } else { $superior = "null"; }
+	print "obj".$level." = new Mib(\"".$oid."\", \"".$label."\", \"".$sid."\", \"".$mid."\", \"".$mtype."\", \"".$access."\", \"".$status."\", \"".$syntax."\", \"".$desc."\", \"".$refs."\", \"".$image."\", \"".$color."\", ".$superior.");\n";
+	#if ($copy->{'parent'}) { print "obj".$level.".SNMP.parent = \"".$copy->{'parent'}->{'label'}."(".$copy->{'parent'}->{'objectID'}.")"."\";\n"; }
+	#if ($copy->{'objectID'}) { print "obj".$level.".SNMP.objectID = \"".$copy->{'objectID'}."\";\n"; }
+	#if ($copy->{'label'}) { print "obj".$level.".SNMP.label = \"".$copy->{'label'}."\";\n"; }
+	#if ($copy->{'subID'}) { print "obj".$level.".SNMP.subID = \"".$copy->{'subID'}."\";\n"; }
+	#if ($copy->{'moduleID'}) { print "obj".$level.".SNMP.moduleID = \"".$copy->{'moduleID'}."\";\n"; }
+	#if ($copy->{'type'}) { print "obj".$level.".SNMP.type = \"".$copy->{'type'}."\";\n"; }
+	#if ($copy->{'access'}) { print "obj".$level.".SNMP.access = \"".$copy->{'access'}."\";\n"; }
+	#if ($copy->{'status'}) { print "obj".$level.".SNMP.status = \"".$copy->{'status'}."\";\n"; }
+	#if ($copy->{'syntax'}) { print "obj".$level.".SNMP.syntax = \"".$copy->{'syntax'}."\";\n"; }
+	if ($copy->{'textualConvention'}) {
+		print "obj".$level.".SNMP.textualConvention = \"".$copy->{'textualConvention'}."\";\n";
+		unless (exists $tcs{$copy->{'textualConvention'}}) {
+			$tcs{$copy->{'textualConvention'}} = reformat($copy->{'TCDescription'});
+			print "tcdesc = \"".$tcs{$copy->{'textualConvention'}}."\";\n";
+			print "tcsobj = new MyTextualConvention(\"".$copy->{'textualConvention'}."\", tcdesc);\n";
+		}
+	}
+	#my $tcdescription = reformat($copy->{'TCDescription'});
+	#if ($tcdescription) { print "obj".$level.".SNMP.TCDescription = \"".$tcdescription."\";\n"; }
+	if ($copy->{'units'}) { print "obj".$level.".SNMP.units = \"".guard($copy->{'units'})."\";\n"; }
+	if ($copy->{'hint'}) { print "obj".$level.".SNMP.hint = \"".guard($copy->{'hint'})."\";\n"; }
+	if ($copy->{'augments'}) { print "obj".$level.".SNMP.augments = \"".$copy->{'augments'}."\";\n"; }
+	my $enums = undef;
+	foreach (sort { $copy->{'enums'}{$a} <=> $copy->{'enums'}{$b}; } keys %{$copy->{'enums'}}) {
+		$enums .= ", " if $enums;
+		$enums .= "$_($copy->{'enums'}{$_})";
+	}
+	if ($enums) { print "obj".$level.".SNMP.enums = \"".$enums."\";\n"; }
+	my $size = '';
+	$size = 'SIZE' if ($copy->{'type'} eq 'OCTETSTR' || $copy->{'type'} eq 'OBJECTID');
+	my $ranges = undef;
+	foreach (@{$copy->{'ranges'}}) {
+		$ranges .= ", " if $ranges;
+		if ($_->{'low'} == $_->{'high'}) {
+			$ranges .= $size."($_->{'low'})";
+		} else {
+			$ranges .= $size."($_->{'low'}..$_->{'high'})";
+		}
+	}
+	if ($ranges) { print "obj".$level.".SNMP.ranges = \"".$ranges."\";\n"; }
+	#my $children = undef;
+	#foreach (@{$copy->{'children'}}) {
+	#	$children .= ", " if $children;
+	#	$children .= $_->{'label'};
+	#}
+	#if ($children) { print "obj".$level.".SNMP.children = \"".$children."\";\n"; }
+	my $indexes = undef;
+	foreach (@{$copy->{'indexes'}}) {
+		$indexes .= ", " if $indexes;
+		$indexes .= $_;
+	}
+	if ($indexes) { print "obj".$level.".SNMP.indexes = \"".$indexes."\";\n"; }
+	if ($copy->{'defaultValue'}) { print "obj".$level.".SNMP.defaultValue = \"".guard($copy->{'defaultValue'})."\";\n"; }
+	#my $description = reformat($copy->{'description'});
+	#if ($description) { print "obj".$level.".SNMP.description = \"".$description."\";\n"; }
+	#my $reference = reformat($copy->{'reference'});
+	#if ($reference) { print "obj".$level.".SNMP.reference = \"".$reference."\";\n"; }
+	if ($recurse) {
+#		if (defined $copy->{'indexes'} && @{$copy->{'indexes'}}) {
+#			foreach (@{$copy->{'indexes'}}) {
+#				if (exists $SNMP::MIB{$_}) {
+#					showMib($SNMP::MIB{$_},$level+1,0);
+#				}
+#			}
+#		}
+		if (defined $copy->{'children'} && @{$copy->{'children'}}) {
+			foreach (sort { $a->{'subID'} <=> $b->{'subID'}; } @{$copy->{'children'}}) {
+				showMib($_,$level+1,1);
+			}
+		}
+	}
+}
+
+#my $mib = $SNMP::MIB{'.1.3.6.1.4.1.29591'};
+my $mib = $SNMP::MIB{'.1.3.6.1'};
+
+showMib($mib,0,1);

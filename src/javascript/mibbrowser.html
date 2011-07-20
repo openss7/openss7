@@ -1,0 +1,18 @@
+<HTML>
+<HEAD>
+	<TITLE>SNMP MIB Browswer</TITLE>
+	<SCRIPT src="mibbrowser.js"></SCRIPT>
+	<SCRIPT src="mibdata.js"></SCRIPT>
+</HEAD>
+<FRAMESET cols="400,*" onResize="if (navigator.family == 'nn4') window.location.reload()">
+	<FRAME src="mibmenu.html" name="menuframe">
+	<FRAMESET rows="50%,50%">
+		<FRAME src="mibdata.html" name="dataframe">
+		<FRAME src="about:blank" name="valuframe">
+	</FRAMESET>
+</FRAMESET>
+<NOFRAMES>
+	You need frames to use this webpage.
+</NOFRAMES>
+</BODY>
+</HTML>

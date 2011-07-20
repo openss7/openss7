@@ -1,0 +1,23 @@
+/* XPM */
+static char * mini_doc5_xpm[] = {
+"16 16 4 1",
+" 	c None",
+"a	c black",
+"b	c white",
+"c	c gray50",
+"                ",
+"   aaaaaaa      ",
+"   abbbbbaa     ",
+"   abcccbaba    ",
+"   abbbbbaaaa   ",
+"   abccccbccac  ",
+"   abbbbbbbbac  ",
+" aaaaaaaaaaaaaa ",
+" abaccccccccacac",
+" ababbbbbbbbacac",
+" aaaaaaaaaaaaaac",
+"   abccccccbaccc",
+"   abbbbbbbbac  ",
+"   aaaaaaaaaac  ",
+"    cccccccccc  "
+"                "};

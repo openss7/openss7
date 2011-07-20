@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: smiMIB.h,v 1.1.2.2 2010-11-28 14:22:17 brian Exp $
+ @(#) $Id: smiMIB.h,v 1.1.2.3 2011-07-18 19:42:27 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:17 $ by $Author: brian $
+ Last Modified $Date: 2011-07-18 19:42:27 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: smiMIB.h,v $
+ Revision 1.1.2.3  2011-07-18 19:42:27  brian
+ - added documentation
+
  Revision 1.1.2.2  2010-11-28 14:22:17  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -163,7 +166,7 @@ struct logRecordTable_data {
 	uint8_t *logRecordId;		/* NoAccess */
 	size_t logRecordIdLen;
 	long loggingTime;		/* ReadOnly */
-	long logRecordEntryStatus;	/* ReadWrite */
+	long logRecordEntryStatus;	/* Create */
 };
 struct eventLogRecordTable_data {
 	uint eventLogRecordTable_request;
@@ -627,6 +630,53 @@ extern oid corruptDataGnm_oid[13];
 extern oid outOfCPUCycles_oid[13];
 extern oid sfwrEnvironmentProblem_oid[13];
 extern oid sfwrDownloadFailure_oid[13];
+extern oid opticalSTM1SPICI_oid[13];
+extern oid opticalSTM4SPICI_oid[13];
+extern oid opticalSTM16SPICI_oid[13];
+extern oid electricalSTM1SPICI_oid[13];
+extern oid rsSTM1SPICI_oid[13];
+extern oid rsSTM4SPICI_oid[13];
+extern oid rsSTM16SPICI_oid[13];
+extern oid msSTM1SPICI_oid[13];
+extern oid msSTM4SPICI_oid[13];
+extern oid msSTM16SPICI_oid[13];
+extern oid au3TU3VC3CI_oid[13];
+extern oid au4VC4CI_oid[13];
+extern oid tu11VC11CI_oid[13];
+extern oid tu12VC12CI_oid[13];
+extern oid tu2CV2CI_oid[13];
+extern oid tu12VC11CI_oid[13];
+extern oid vpCI_oid[13];
+extern oid vcCI_oid[13];
+extern oid e0CI_oid[13];
+extern oid e1CI_oid[13];
+extern oid e2CI_oid[13];
+extern oid e3CI_oid[13];
+extern oid e4CI_oid[13];
+extern oid e5_565M_oid[13];
+extern oid sts3c_and_VC4_1c_oid[13];
+extern oid sts12c_and_VC4_4c_oid[13];
+extern oid sts48c_and_VC4_16c_oid[13];
+extern oid sts192c_and_VC4_64c_oid[13];
+extern oid section_OC1_STS1_and_RS_STM0_oid[13];
+extern oid section_OC192_STS192_and_RS_STM64_oid[13];
+extern oid line_OC1_STS1_and_MS_STM0_oid[13];
+extern oid line_OC192_STS192_and_MS_STM64_oid[13];
+extern oid fc_12_133M_oid[13];
+extern oid fc_25_266M_oid[13];
+extern oid fc_50_531M_oid[13];
+extern oid fc_100_1063M_oid[13];
+extern oid fddi_oid[13];
+extern oid fast_Ethernet_oid[13];
+extern oid gigabit_Ethernet_oid[13];
+extern oid isdn_BRI_oid[13];
+extern oid dsr_OC192_and_STM64_oid[13];
+extern oid dsr_OC768_and_STM256_oid[13];
+extern oid section_OC24_STS24_and_RS_STM8_oid[13];
+extern oid line_OC24_STS24_and_MS_STM8_oid[13];
+extern oid section_OC768_STS768_and_RS_STM256_oid[13];
+extern oid line_OC768_STS768_and_MS_STM256_oid[13];
+extern oid tenGigabit_Ethernet_oid[13];
 extern oid smiMandatoryParametersGroup_oid[12];
 extern oid smiConditionalParametersGroup_oid[12];
 extern oid smiOptionalParametersGroup_oid[12];

@@ -1,7 +1,7 @@
 #!/usr/bin/make -f
 # =============================================================================
 #
-# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-06-09 12:58:33 $
+# @(#) $RCSfile: makestubs,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-07-18 19:42:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,11 +47,11 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2010-06-09 12:58:33 $ by $Author: brian $
+# Last Modified $Date: 2011-07-18 19:42:26 $ by $Author: brian $
 #
 # =============================================================================
 
-MIBDIRS=../mibs:/usr/share/snmp/mibs
+MIBDIRS=../mibs:/usr/share/snmp/mibs:/usr/share/mibs/iana:/usr/share/mibs/ietf:/usr/share/mibs/netsnmp
 MIBFILES=
 #MIBFILES=../mibs/OPENSS7-DL-MIB.mib:../mibs/OPENSS7-LAPB-MIB.mib:../mibs/OPENSS7-LLC2-MIB.mib:../mibs/OPENSS7-M2PA-MIB.mib:../mibs/OPENSS7-M2UA-ASP-MIB.mib:../mibs/OPENSS7-M2UA-MIB.mib:../mibs/OPENSS7-M3UA-ASP-MIB.mib:../mibs/OPENSS7-M3UA-SGP-MIB.mib:../mibs/OPENSS7-METRIC-MIB.mib:../mibs/OPENSS7-SIGTRAN-MIB.mib:../mibs/OPENSS7-SIGTRAN-TC.mib:../mibs/OPENSS7-SMI-MIB.mib:../mibs/OPENSS7-STREAMS-EXT-MIB.mib:../mibs/OPENSS7-STREAMS-MIB.mib:../mibs/OPENSS7-TMN-TC.mib
 #MIBS=+OPENSS7-DL-MIB:OPENSS7-LAPB-MIB:OPENSS7-LLC2-MIB:OPENSS7-M2PA-MIB:OPENSS7-M2UA-ASP-MIB:OPENSS7-M2UA-MIB:OPENSS7-M3UA-ASP-MIB:OPENSS7-M3UA-SGP-MIB:OPENSS7-METRIC-MIB:OPENSS7-SIGTRAN-MIB:OPENSS7-SIGTRAN-TC:OPENSS7-SMI-MIB:OPENSS7-SMI-MIB:OPENSS7-SMI-MIB:OPENSS7-STREAMS-EXT-MIB:OPENSS7-STREAMS-MIB:OPENSS7-TMN-TC:OPENSS7-X25-PLP-MIB:OPENSS7-X25-PLP-MIB
@@ -61,9 +61,383 @@ export MIBS
 export MIBDIRS
 export MIBFILES
 
+SMIPATH=:../mibs:/usr/share/snmp/mibs:/usr/share/mibs/iana:/usr/share/mibs/ietf:/usr/share/mib/netsnmp
+
+export SMIPATH
+
 all: simple storage openss7 master
 
-check: \
+dump: \
+	megacoRingingMIB.mib \
+	megacoTonesMIB.mib \
+	megacoMIB.mib \
+	gcpMIB.mib \
+	rtpswMIB.mib \
+	rtpswOmMIB.mib \
+	sfpMIB.mib \
+	sfpOmMIB.mib \
+	isupMIB.mib \
+	cdr2MIB.mib \
+	dlMIB.mib \
+	ds0Bundle.mib \
+	ds0.mib \
+	ds1EXT.mib \
+	ds1EXT.mib \
+	ds1.mib \
+	gmiMIB.mib \
+	lapbMIB.mib \
+	llcMIB.mib \
+	m2paMIB.mib \
+	m2uaAspMIB.mib \
+	m2uaMIB.mib \
+	m3uaAspMIB.mib \
+	m3uaSgpMIB.mib \
+	metricMIB.mib \
+	mtpMIB.mib \
+	mtpOmMIB.mib \
+	mxMIB.mib \
+	mxMIB.mib \
+	phyMIB.mib \
+	sccpMIB.mib \
+	sccpOmMIB.mib \
+	sigtranMIB.mib \
+	slMIB.mib \
+	smiMIB.mib \
+	ss7MIB.mib \
+	ss7OmMIB.mib \
+	strExtMIB.mib \
+	strMIB.mib \
+	acseMIB.mib \
+	tcapMIB.mib \
+	tcapOmMIB.mib \
+	x25MIB.mib \
+	x400pMIB.mib \
+	x400pMIB.mib
+
+megacoRingingMIB.mib: ../mibs/MEGACO-RINGING-MIB.mib
+	smidump -k MEGACO-RINGING-MIB >$@ || :
+
+megacoTonesMIB.mib: ../mibs/MEGACO-TONES-MIB.mib
+	smidump -k MEGACO-TONES-MIB >$@ || :
+
+megacoMIB.mib: ../mibs/MEGACO-MIB.mib
+	smidump -k MEGACO-MIB >$@ || :
+
+gcpMIB.mib: ../mibs/OPENSS7-GCP-MIB.mib
+	smidump -k OPENSS7-GCP-MIB >$@ || :
+
+rtpswMIB.mib: ../mibs/OPENSS7-RTPSW-MIB.mib
+	smidump -k OPENSS7-RTPSW-MIB >$@ || :
+
+rtpswOmMIB.mib: ../mibs/OPENSS7-RTPSW-OM-MIB.mib
+	smidump -k OPENSS7-RTPSW-OM-MIB >$@ || :
+
+sfpMIB.mib: ../mibs/OPENSS7-SFP-MIB.mib
+	smidump -k OPENSS7-SFP-MIB >$@ || :
+
+sfpOmMIB.mib: ../mibs/OPENSS7-SFP-MIB.mib
+	smidump -k OPENSS7-SFP-OM-MIB >$@ || :
+
+isupMIB.mib: ../mibs/OPENSS7-ISUP-MIB.mib
+	smidump -k OPENSS7-ISUP-MIB >$@ || :
+
+cdr2MIB.mib: ../mibs/OPENSS7-CDR2-MIB.mib
+	smidump -k OPENSS7-CDR2-MIB >$@ || :
+
+dlMIB.mib: ../mibs/OPENSS7-DL-MIB.mib ../mibs/OPENSS7-SMI-MIB.mib ../mibs/OPENSS7-TMN-TC.mib
+	smidump -k OPENSS7-DL-MIB >$@ || :
+
+ds0Bundle.mib: ../mibs/RFC2494-EXT-MIB.mib
+	smidump -k DS0BUNDLE-MIB >$@ || :
+
+ds0.mib: ../mibs/RFC2494-MIB.txt
+	smidump -k DS0-MIB >$@ || :
+
+ds1EXT.mib: ../mibs/RFC4805-EXT-MIB.mib
+	smidump -k DS1-EXT-MIB >$@ || :
+
+#ds1EXT.mib: ../mibs/RFC4805-MIB.txt
+#	smidump -k DS1-EXT-MIB >$@ || :
+
+ds1.mib: ../mibs/RFC4805-MIB.txt
+	smidump -k DS1-MIB >$@ || :
+
+gmiMIB.mib: ../mibs/OPENSS7-GMI-MIB.mib
+	smidump -k OPENSS7-GMI-MIB >$@ || :
+
+lapbMIB.mib: ../mibs/OPENSS7-LAPB-MIB.mib ../mibs/OPENSS7-SMI-MIB.mib ../mibs/OPENSS7-TMN-TC.mib
+	smidump -k OPENSS7-LAPB-MIB >$@ || :
+
+llcMIB.mib: ../mibs/OPENSS7-LLC2-MIB.mib ../mibs/OPENSS7-SMI-MIB.mib ../mibs/OPENSS7-TMN-TC.mib
+	smidump -k OPENSS7-LLC2-MIB >$@ || :
+
+m2paMIB.mib: ../mibs/OPENSS7-M2PA-MIB.mib
+	smidump -k OPENSS7-M2PA-MIB >$@ || :
+
+m2uaAspMIB.mib: ../mibs/OPENSS7-M2UA-ASP-MIB.mib
+	smidump -k OPENSS7-M2UA-ASP-MIB >$@ || :
+
+m2uaMIB.mib: ../mibs/OPENSS7-M2UA-MIB.mib
+	smidump -k OPENSS7-M2UA-MIB >$@ || :
+
+m3uaAspMIB.mib: ../mibs/OPENSS7-M3UA-ASP-MIB.mib
+	smidump -k OPENSS7-M3UA-ASP-MIB >$@ || :
+
+m3uaSgpMIB.mib: ../mibs/OPENSS7-M3UA-SGP-MIB.mib
+	smidump -k OPENSS7-M3UA-SGP-MIB >$@ || :
+
+metricMIB.mib: ../mibs/OPENSS7-METRIC-MIB.mib
+	smidump -k OPENSS7-METRIC-MIB >$@ || :
+
+mtpMIB.mib: ../mibs/OPENSS7-MTP-MIB.mib
+	smidump -k OPENSS7-MTP-MIB >$@ || :
+
+mtpOmMIB.mib: ../mibs/OPENSS7-MTP-OM-MIB2.mib
+	smidump -k OPENSS7-MTP-OM-MIB >$@ || :
+
+mxMIB.mib: ../mibs/OPENSS7-MX-MIB.mib
+	smidump -k OPENSS7-MX-MIB >$@ || :
+
+#mxMIB.mib: ../mibs/OPENSS7-MX-MIB.mib
+#	smidump -k OPENSS7-MX-MIB >$@ || :
+
+phyMIB.mib: ../mibs/OPENSS7-PHY-MIB.mib
+	smidump -k OPENSS7-PHY-MIB >$@ || :
+
+sccpMIB.mib: ../mibs/OPENSS7-SCCP-MIB.mib
+	smidump -k OPENSS7-SCCP-MIB >$@ || :
+
+sccpOmMIB.mib: ../mibs/OPENSS7-SCCP-OM-MIB.mib
+	smidump -k OPENSS7-SCCP-OM-MIB >$@ || :
+
+sigtranMIB.mib: ../mibs/OPENSS7-SIGTRAN-MIB.mib
+	smidump -k OPENSS7-SIGTRAN-MIB >$@ || :
+
+slMIB.mib: ../mibs/OPENSS7-SL-MIB.mib
+	smidump -k OPENSS7-SL-MIB >$@ || :
+
+smiMIB.mib: ../mibs/OPENSS7-SMI-MIB.mib
+	smidump -k OPENSS7-SMI-MIB >$@ || :
+
+ss7MIB.mib: ../mibs/OPENSS7-SS7-MIB.mib
+	smidump -k OPENSS7-SS7-MIB >$@ || :
+
+ss7OmMIB.mib: ../mibs/OPENSS7-SS7-OM-MIB.mib
+	smidump -k OPENSS7-SS7-OM-MIB >$@ || :
+
+strExtMIB.mib: ../mibs/OPENSS7-STREAMS-EXT-MIB.mib
+	smidump -k OPENSS7-STREAMS-EXT-MIB >$@ || :
+
+strMIB.mib: ../mibs/OPENSS7-STREAMS-MIB.mib
+	smidump -k OPENSS7-STREAMS-MIB >$@ || :
+
+acseMIB.mib: ../mibs/OPENSS7-ACSE-MIB.mib
+	smidump -k OPENSS7-ACSE-MIB >$@ || :
+
+tcapMIB.mib: ../mibs/OPENSS7-TCAP-MIB.mib
+	smidump -k OPENSS7-TCAP-MIB >$@ || :
+
+tcapOmMIB.mib: ../mibs/OPENSS7-TCAP-OM-MIB.mib
+	smidump -k OPENSS7-TCAP-OM-MIB >$@ || :
+
+x25MIB.mib: ../mibs/OPENSS7-X25-PLP-MIB.mib
+	smidump -k OPENSS7-X25-PLP-MIB >$@ || :
+
+x400pMIB.mib: ../mibs/OPENSS7-X400P-MIB.mib
+	smidump -k OPENSS7-X400P-MIB >$@ || :
+
+#x400pMIB.mib: ../mibs/OPENSS7-X400P-MX-MIB.mib
+#	smidump -k OPENSS7-X400-MX-MIB >$@ || :
+
+lint: \
+	megacoRingingMIB.lint \
+	megacoTonesMIB.lint \
+	megacoMIB.lint \
+	gcpMIB.lint \
+	rtpswMIB.lint \
+	rtpswOmMIB.lint \
+	sfpMIB.lint \
+	sfpOmMIB.lint \
+	isupMIB.lint \
+	cdr2MIB.lint \
+	dlMIB.lint \
+	ds0Bundle.lint \
+	ds0.lint \
+	ds1EXT.lint \
+	ds1EXT.lint \
+	ds1.lint \
+	gmiMIB.lint \
+	lapbMIB.lint \
+	llcMIB.lint \
+	m2paMIB.lint \
+	m2uaAspMIB.lint \
+	m2uaMIB.lint \
+	m3uaAspMIB.lint \
+	m3uaSgpMIB.lint \
+	metricMIB.lint \
+	mtpMIB.lint \
+	mtpOmMIB.lint \
+	mxMIB.lint \
+	mxMIB.lint \
+	phyMIB.lint \
+	sccpMIB.lint \
+	sccpOmMIB.lint \
+	sigtranMIB.lint \
+	slMIB.lint \
+	smiMIB.lint \
+	ss7MIB.lint \
+	ss7OmMIB.lint \
+	strExtMIB.lint \
+	strMIB.lint \
+	acseMIB.lint \
+	tcapMIB.lint \
+	tcapOmMIB.lint \
+	x25MIB.lint \
+	x400pMIB.lint \
+	x400pMIB.lint
+
+megacoRingingMIB.lint: ../mibs/MEGACO-RINGING-MIB.mib
+	smilint -ms MEGACO-RINGING-MIB >$@ 2>&1 || :
+
+megacoTonesMIB.lint: ../mibs/MEGACO-TONES-MIB.mib
+	smilint -ms MEGACO-TONES-MIB >$@ 2>&1 || :
+
+megacoMIB.lint: ../mibs/MEGACO-MIB.mib
+	smilint -ms MEGACO-MIB >$@ 2>&1 || :
+
+gcpMIB.lint: ../mibs/OPENSS7-GCP-MIB.mib
+	smilint -ms OPENSS7-GCP-MIB >$@ 2>&1 || :
+
+rtpswMIB.lint: ../mibs/OPENSS7-RTPSW-MIB.mib
+	smilint -ms OPENSS7-RTPSW-MIB >$@ 2>&1 || :
+
+rtpswOmMIB.lint: ../mibs/OPENSS7-RTPSW-OM-MIB.mib
+	smilint -ms OPENSS7-RTPSW-OM-MIB >$@ 2>&1 || :
+
+sfpMIB.lint: ../mibs/OPENSS7-SFP-MIB.mib
+	smilint -ms OPENSS7-SFP-MIB >$@ 2>&1 || :
+
+sfpOmMIB.lint: ../mibs/OPENSS7-SFP-MIB.mib
+	smilint -ms OPENSS7-SFP-OM-MIB >$@ 2>&1 || :
+
+isupMIB.lint: ../mibs/OPENSS7-ISUP-MIB.mib
+	smilint -ms OPENSS7-ISUP-MIB >$@ 2>&1 || :
+
+cdr2MIB.lint: ../mibs/OPENSS7-CDR2-MIB.mib
+	smilint -ms OPENSS7-CDR2-MIB >$@ 2>&1 || :
+
+dlMIB.lint: ../mibs/OPENSS7-DL-MIB.mib ../mibs/OPENSS7-SMI-MIB.mib ../mibs/OPENSS7-TMN-TC.mib
+	smilint -ms OPENSS7-DL-MIB >$@ 2>&1 || :
+
+ds0Bundle.lint: ../mibs/RFC2494-EXT-MIB.mib
+	smilint -ms DS0BUNDLE-MIB >$@ 2>&1 || :
+
+ds0.lint: ../mibs/RFC2494-MIB.txt
+	smilint -ms DS0-MIB >$@ 2>&1 || :
+
+ds1EXT.lint: ../mibs/RFC4805-EXT-MIB.mib
+	smilint -ms DS1-EXT-MIB >$@ 2>&1 || :
+
+#ds1EXT.lint: ../mibs/RFC4805-MIB.txt
+#	smilint -ms DS1-EXT-MIB >$@ 2>&1 || :
+
+ds1.lint: ../mibs/RFC4805-MIB.txt
+	smilint -ms DS1-MIB >$@ 2>&1 || :
+
+gmiMIB.lint: ../mibs/OPENSS7-GMI-MIB.mib
+	smilint -ms OPENSS7-GMI-MIB >$@ 2>&1 || :
+
+lapbMIB.lint: ../mibs/OPENSS7-LAPB-MIB.mib ../mibs/OPENSS7-SMI-MIB.mib ../mibs/OPENSS7-TMN-TC.mib
+	smilint -ms OPENSS7-LAPB-MIB >$@ 2>&1 || :
+
+llcMIB.lint: ../mibs/OPENSS7-LLC2-MIB.mib ../mibs/OPENSS7-SMI-MIB.mib ../mibs/OPENSS7-TMN-TC.mib
+	smilint -ms OPENSS7-LLC2-MIB >$@ 2>&1 || :
+
+m2paMIB.lint: ../mibs/OPENSS7-M2PA-MIB.mib
+	smilint -ms OPENSS7-M2PA-MIB >$@ 2>&1 || :
+
+m2uaAspMIB.lint: ../mibs/OPENSS7-M2UA-ASP-MIB.mib
+	smilint -ms OPENSS7-M2UA-ASP-MIB >$@ 2>&1 || :
+
+m2uaMIB.lint: ../mibs/OPENSS7-M2UA-MIB.mib
+	smilint -ms OPENSS7-M2UA-MIB >$@ 2>&1 || :
+
+m3uaAspMIB.lint: ../mibs/OPENSS7-M3UA-ASP-MIB.mib
+	smilint -ms OPENSS7-M3UA-ASP-MIB >$@ 2>&1 || :
+
+m3uaSgpMIB.lint: ../mibs/OPENSS7-M3UA-SGP-MIB.mib
+	smilint -ms OPENSS7-M3UA-SGP-MIB >$@ 2>&1 || :
+
+metricMIB.lint: ../mibs/OPENSS7-METRIC-MIB.mib
+	smilint -ms OPENSS7-METRIC-MIB >$@ 2>&1 || :
+
+mtpMIB.lint: ../mibs/OPENSS7-MTP-MIB.mib
+	smilint -ms OPENSS7-MTP-MIB >$@ 2>&1 || :
+
+mtpOmMIB.lint: ../mibs/OPENSS7-MTP-OM-MIB2.mib
+	smilint -ms OPENSS7-MTP-OM-MIB >$@ 2>&1 || :
+
+mxMIB.lint: ../mibs/OPENSS7-MX-MIB.mib
+	smilint -ms OPENSS7-MX-MIB >$@ 2>&1 || :
+
+#mxMIB.lint: ../mibs/OPENSS7-MX-MIB.mib
+#	smilint -ms OPENSS7-MX-MIB >$@ 2>&1 || :
+
+phyMIB.lint: ../mibs/OPENSS7-PHY-MIB.mib
+	smilint -ms OPENSS7-PHY-MIB >$@ 2>&1 || :
+
+sccpMIB.lint: ../mibs/OPENSS7-SCCP-MIB.mib
+	smilint -ms OPENSS7-SCCP-MIB >$@ 2>&1 || :
+
+sccpOmMIB.lint: ../mibs/OPENSS7-SCCP-OM-MIB.mib
+	smilint -ms OPENSS7-SCCP-OM-MIB >$@ 2>&1 || :
+
+sigtranMIB.lint: ../mibs/OPENSS7-SIGTRAN-MIB.mib
+	smilint -ms OPENSS7-SIGTRAN-MIB >$@ 2>&1 || :
+
+slMIB.lint: ../mibs/OPENSS7-SL-MIB.mib
+	smilint -ms OPENSS7-SL-MIB >$@ 2>&1 || :
+
+smiMIB.lint: ../mibs/OPENSS7-SMI-MIB.mib
+	smilint -ms OPENSS7-SMI-MIB >$@ 2>&1 || :
+
+ss7MIB.lint: ../mibs/OPENSS7-SS7-MIB.mib
+	smilint -ms OPENSS7-SS7-MIB >$@ 2>&1 || :
+
+ss7OmMIB.lint: ../mibs/OPENSS7-SS7-OM-MIB.mib
+	smilint -ms OPENSS7-SS7-OM-MIB >$@ 2>&1 || :
+
+strExtMIB.lint: ../mibs/OPENSS7-STREAMS-EXT-MIB.mib
+	smilint -ms OPENSS7-STREAMS-EXT-MIB >$@ 2>&1 || :
+
+strMIB.lint: ../mibs/OPENSS7-STREAMS-MIB.mib
+	smilint -ms OPENSS7-STREAMS-MIB >$@ 2>&1 || :
+
+acseMIB.lint: ../mibs/OPENSS7-ACSE-MIB.mib
+	smilint -ms OPENSS7-ACSE-MIB >$@ 2>&1 || :
+
+tcapMIB.lint: ../mibs/OPENSS7-TCAP-MIB.mib
+	smilint -ms OPENSS7-TCAP-MIB >$@ 2>&1 || :
+
+tcapOmMIB.lint: ../mibs/OPENSS7-TCAP-OM-MIB.mib
+	smilint -ms OPENSS7-TCAP-OM-MIB >$@ 2>&1 || :
+
+x25MIB.lint: ../mibs/OPENSS7-X25-PLP-MIB.mib
+	smilint -ms OPENSS7-X25-PLP-MIB >$@ 2>&1 || :
+
+x400pMIB.lint: ../mibs/OPENSS7-X400P-MIB.mib
+	smilint -ms OPENSS7-X400P-MIB >$@ 2>&1 || :
+
+#x400pMIB.lint: ../mibs/OPENSS7-X400P-MX-MIB.mib
+#	smilint -ms OPENSS7-X400-MX-MIB >$@ 2>&1 || :
+
+tree check: \
+	megacoRingingMIB.tree \
+	megacoTonesMIB.tree \
+	megacoMIB.tree \
+	gcpMIB.tree \
+	rtpswMIB.tree \
+	rtpswOmMIB.tree \
 	sfpMIB.tree \
 	sfpOmMIB.tree \
 	isupMIB.tree \
@@ -97,11 +471,30 @@ check: \
 	ss7OmMIB.tree \
 	strExtMIB.tree \
 	strMIB.tree \
+	acseMIB.tree \
 	tcapMIB.tree \
 	tcapOmMIB.tree \
 	x25MIB.tree \
 	x400pMIB.tree \
 	x400pMIB.tree
+
+megacoRingingMIB.tree: ../mibs/MEGACO-RINGING-MIB.mib
+	snmptranslate -Tp MEGACO-RINGING-MIB::megacoRingingMIB >megacoRingingMIB.tree
+
+megacoTonesMIB.tree: ../mibs/MEGACO-TONES-MIB.mib
+	snmptranslate -Tp MEGACO-TONES-MIB::megacoTonesMIB >megacoTonesMIB.tree
+
+megacoMIB.tree: ../mibs/MEGACO-MIB.mib
+	snmptranslate -Tp MEGACO-MIB::megacoMIB >megacoMIB.tree
+
+gcpMIB.tree: ../mibs/OPENSS7-GCP-MIB.mib
+	snmptranslate -Tp OPENSS7-GCP-MIB::gcpMIB >gcpMIB.tree
+
+rtpswMIB.tree: ../mibs/OPENSS7-RTPSW-MIB.mib
+	snmptranslate -Tp OPENSS7-RTPSW-MIB::rtpswMIB >rtpswMIB.tree
+
+rtpswOmMIB.tree: ../mibs/OPENSS7-RTPSW-OM-MIB.mib
+	snmptranslate -Tp OPENSS7-RTPSW-OM-MIB::rtpswOmMIB >rtpswOmMIB.tree
 
 sfpMIB.tree: ../mibs/OPENSS7-SFP-MIB.mib
 	snmptranslate -Tp OPENSS7-SFP-MIB::sfpMIB >sfpMIB.tree
@@ -220,6 +613,10 @@ strExtMIB.tree: ../mibs/OPENSS7-STREAMS-EXT-MIB.mib
 strMIB.tree: ../mibs/OPENSS7-STREAMS-MIB.mib
 	snmptranslate -Tp OPENSS7-STREAMS-MIB::strMIB >$@
 
+#acseMIB.tree: MIBS+=OPENSS7-ACSE-MIB:OPENSS7-TC
+acseMIB.tree: ../mibs/OPENSS7-ACSE-MIB.mib
+	snmptranslate -Tp OPENSS7-ACSE-MIB::acseMIB >acseMIB.tree
+
 #tcapMIB.tree: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
 tcapMIB.tree: ../mibs/OPENSS7-TCAP-MIB.mib
 	snmptranslate -Tp OPENSS7-TCAP-MIB::tcapMIB >tcapMIB.tree
@@ -240,6 +637,12 @@ x400pMIB.tree: ../mibs/OPENSS7-X400P-MIB.mib
 #	snmptranslate -Tp OPENSS7-X400P-MX-MIB::x400pMIB >x400pMIB.tree
 
 simple: \
+	megacoRingingMIB_simple.c megacoRingingMIB_simple.h \
+	megacoTonesMIB_simple.c megacoTonesMIB_simple.h \
+	megacoMIB_simple.c megacoMIB_simple.h \
+	gcpMIB_simple.c gcpMIB_simple.h \
+	rtpswMIB_simple.c rtpswMIB_simple.h \
+	rtpswOmMIB_simple.c rtpswOmMIB_simple.h \
 	sfpMIB_simple.c sfpMIB_simple.h \
 	sfpOmMIB_simple.c sfpOmMIB_simple.h \
 	isupMIB_simple.c isupMIB_simple.h \
@@ -265,14 +668,40 @@ simple: \
 	sccpOmMIB_simple.c sccpOmMIB_simple.h \
 	sigtranMIB_simple.c sigtranMIB_simple.h \
 	slMIB_simple.c slMIB_simple.h \
+	smiMIB_simple.c smiMIB_simple.h \
 	ss7MIB_simple.c ss7MIB_simple.h \
 	ss7OmMIB_simple.c ss7OmMIB_simple.h \
 	strExtMIB_simple.c strExtMIB_simple.h \
 	strMIB_simple.c strMIB_simple.h \
+	acseMIB_simple.c acseMIB_simple.h \
 	tcapMIB_simple.c tcapMIB_simple.h \
 	tcapOmMIB_simple.c tcapOmMIB_simple.h \
 	x25MIB_simple.c x25MIB_simple.h \
 	x400pMIB_simple.c x400pMIB_simple.h
+
+megacoRingingMIB_simple.c megacoRingingMIB_simple.h: mib2c mib2c.conf ../mibs/MEGACO-RINGING-MIB.mib
+	./mib2c -c ./mib2c.conf -f megacoRingingMIB_simple megacoRingingMIB
+	indent -nhnl megacoRingingMIB_simple.[ch]
+
+megacoTonesMIB_simple.c megacoTonesMIB_simple.h: mib2c mib2c.conf ../mibs/MEGACO-TONES-MIB.mib
+	./mib2c -c ./mib2c.conf -f megacoTonesMIB_simple megacoTonesMIB
+	indent -nhnl megacoTonesMIB_simple.[ch]
+
+megacoMIB_simple.c megacoMIB_simple.h: mib2c mib2c.conf ../mibs/MEGACO-MIB.mib
+	./mib2c -c ./mib2c.conf -f megacoMIB_simple megacoMIB
+	indent -nhnl megacoMIB_simple.[ch]
+
+gcpMIB_simple.c gcpMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-GCP-MIB.mib
+	./mib2c -c ./mib2c.conf -f gcpMIB_simple gcpMIB
+	indent -nhnl gcpMIB_simple.[ch]
+
+rtpswMIB_simple.c rtpswMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-RTPSW-MIB.mib
+	./mib2c -c ./mib2c.conf -f rtpswMIB_simple rtpswMIB
+	indent -nhnl rtpswMIB_simple.[ch]
+
+rtpswOmMIB_simple.c rtpswOmMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-RTPSW-OM-MIB.mib
+	./mib2c -c ./mib2c.conf -f rtpswOmMIB_simple rtpswOmMIB
+	indent -nhnl rtpswOmMIB_simple.[ch]
 
 #sfpMIB_simple.c sfpMIB_simple.h: MIBS+=OPENSS7-SFP-MIB:OPENSS7-TC
 sfpMIB_simple.c sfpMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SFP-MIB.mib
@@ -394,6 +823,11 @@ slMIB_simple.c slMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SL-MIB.mib
 	./mib2c -c ./mib2c.conf -f slMIB_simple slMIB
 	indent -nhnl slMIB_simple.[ch]
 
+#smiMIB_simple.c smiMIB_simple.h: MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+smiMIB_simple.c smiMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SMI-MIB.mib
+	./mib2c -c ./mib2c.conf -f smiMIB_simple smiMIB
+	indent -nhnl smiMIB_simple.[ch]
+
 #ss7MIB_simple.c ss7MIB_simple.h: MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
 ss7MIB_simple.c ss7MIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-SS7-MIB.mib
 	./mib2c -c ./mib2c.conf -f ss7MIB_simple ss7MIB
@@ -411,6 +845,11 @@ strExtMIB_simple.c strExtMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-STREAMS-
 strMIB_simple.c strMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.conf -f strMIB_simple strMIB
 	indent -nhnl strMIB_simple.[ch]
+
+#acseMIB_simple.c acseMIB_simple.h: MIBS+=OPENSS7-ACSE-MIB:OPENSS7-TC
+acseMIB_simple.c acseMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-ACSE-MIB.mib
+	./mib2c -c ./mib2c.conf -f acseMIB_simple acseMIB
+	indent -nhnl acseMIB_simple.[ch]
 
 #tcapMIB_simple.c tcapMIB_simple.h: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
 tcapMIB_simple.c tcapMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-TCAP-MIB.mib
@@ -437,6 +876,12 @@ x400pMIB_simple.c x400pMIB_simple.h: mib2c mib2c.conf ../mibs/OPENSS7-X400P-MIB.
 #	indent -nhnl x400pMIB_simple.[ch]
 
 storage: \
+	megacoRingingMIB_storage.c megacoRingingMIB_storage.h \
+	megacoTonesMIB_storage.c megacoTonesMIB_storage.h \
+	megacoMIB_storage.c megacoMIB_storage.h \
+	gcpMIB_storage.c gcpMIB_storage.h \
+	rtpswMIB_storage.c rtpswMIB_storage.h \
+	rtpswOmMIB_storage.c rtpswOmMIB_storage.h \
 	sfpMIB_storage.c sfpMIB_storage.h \
 	sfpOmMIB_storage.c sfpOmMIB_storage.h \
 	isupMIB_storage.c isupMIB_storage.h \
@@ -463,12 +908,38 @@ storage: \
 	sigtranMIB_storage.c sigtranMIB_storage.h \
 	slMIB_storage.c slMIB_storage.h \
 	smiMIB_storage.c smiMIB_storage.h \
+	smiMIB_storage.c smiMIB_storage.h \
 	ss7OmMIB_storage.c ss7OmMIB_storage.h \
 	strExtMIB_storage.c strExtMIB_storage.h \
+	acseMIB_storage.c acseMIB_storage.h \
 	tcapMIB_storage.c tcapMIB_storage.h \
 	tcapOmMIB_storage.c tcapOmMIB_storage.h \
 	x25MIB_storage.c x25MIB_storage.h \
 	x400pMIB_storage.c x400pMIB_storage.h
+
+megacoRingingMIB_storage.c megacoRingingMIB_storage.h: mib2c mib2c.storage.conf ../mibs/MEGACO-RINGING-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f megacoRingingMIB_storage megacoRingingMIB
+	indent -nhnl megacoRingingMIB_storage.[ch]
+
+megacoTonesMIB_storage.c megacoTonesMIB_storage.h: mib2c mib2c.storage.conf ../mibs/MEGACO-TONES-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f megacoTonesMIB_storage megacoTonesMIB
+	indent -nhnl megacoTonesMIB_storage.[ch]
+
+megacoMIB_storage.c megacoMIB_storage.h: mib2c mib2c.storage.conf ../mibs/MEGACO-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f megacoMIB_storage megacoMIB
+	indent -nhnl megacoMIB_storage.[ch]
+
+gcpMIB_storage.c gcpMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-GCP-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f gcpMIB_storage gcpMIB
+	indent -nhnl gcpMIB_storage.[ch]
+
+rtpswMIB_storage.c rtpswMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-RTPSW-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f rtpswMIB_storage rtpswMIB
+	indent -nhnl rtpswMIB_storage.[ch]
+
+rtpswOmMIB_storage.c rtpswOmMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-RTPSW-OM-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f rtpswOmMIB_storage rtpswOmMIB
+	indent -nhnl rtpswOmMIB_storage.[ch]
 
 #sfpMIB_storage.c sfpMIB_storage.h: MIBS+=OPENSS7-isup-MIB:OPENSS7-TC
 sfpMIB_storage.c sfpMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-SFP-MIB.mib
@@ -618,6 +1089,11 @@ strMIB_storage.c strMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-STRE
 	./mib2c -c ./mib2c.storage.conf -f strMIB_storage strMIB
 	indent -nhnl strMIB_storage.[ch]
 
+#acseMIB_storage.c acseMIB_storage.h: MIBS+=OPENSS7-ACSE-MIB:OPENSS7-TC
+acseMIB_storage.c acseMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-ACSE-MIB.mib
+	./mib2c -c ./mib2c.storage.conf -f acseMIB_storage acseMIB
+	indent -nhnl acseMIB_storage.[ch]
+
 #tcapMIB_storage.c tcapMIB_storage.h: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
 tcapMIB_storage.c tcapMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-TCAP-MIB.mib
 	./mib2c -c ./mib2c.storage.conf -f tcapMIB_storage tcapMIB
@@ -643,22 +1119,71 @@ x400pMIB_storage.c x400pMIB_storage.h: mib2c mib2c.storage.conf ../mibs/OPENSS7-
 #	indent -nhnl x400pMIB_storage.[ch]
 
 openss7: \
+	megacoRingingMIB_openss7.c megacoRingingMIB_openss7.h \
+	megacoTonesMIB_openss7.c megacoTonesMIB_openss7.h \
+	megacoMIB_openss7.c megacoMIB_openss7.h \
+	gcpMIB_openss7.c gcpMIB_openss7.h \
+	rtpswMIB_openss7.c rtpswMIB_openss7.h \
+	rtpswOmMIB_openss7.c rtpswOmMIB_openss7.h \
 	sfpMIB_openss7.c sfpMIB_openss7.h \
 	sfpOmMIB_openss7.c sfpOmMIB_openss7.h \
 	isupMIB_openss7.c isupMIB_openss7.h \
 	cdr2MIB_openss7.c cdr2MIB_openss7.h \
 	dlMIB_openss7.c dlMIB_openss7.h \
+	ds0Bundle_openss7.c ds0Bundle_openss7.h \
+	ds0_openss7.c ds0_openss7.h \
+	ds1EXT_openss7.c ds1EXT_openss7.h \
+	ds1_openss7.c ds1_openss7.h \
+	lapbMIB_openss7.c lapbMIB_openss7.h \
+	llcMIB_openss7.c llcMIB_openss7.h \
 	m2paMIB_openss7.c m2paMIB_openss7.h \
 	m2uaAspMIB_openss7.c m2uaAspMIB_openss7.h \
 	m2uaMIB_openss7.c m2uaMIB_openss7.h \
 	m3uaAspMIB_openss7.c m3uaAspMIB_openss7.h \
 	m3uaSgpMIB_openss7.c m3uaSgpMIB_openss7.h \
 	metricMIB_openss7.c metricMIB_openss7.h \
+	mtpMIB_openss7.c mtpMIB_openss7.h \
+	mtpOmMIB_openss7.c mtpOmMIB_openss7.h \
 	mxMIB_openss7.c mxMIB_openss7.h \
+	phyMIB_openss7.c phyMIB_openss7.h \
+	sccpMIB_openss7.c sccpMIB_openss7.h \
+	sccpOmMIB_openss7.c sccpOmMIB_openss7.h \
 	sigtranMIB_openss7.c sigtranMIB_openss7.h \
+	slMIB_openss7.c slMIB_openss7.h \
+	smiMIB_openss7.c smiMIB_openss7.h \
 	ss7MIB_openss7.c ss7MIB_openss7.h \
+	ss7OmMIB_openss7.c ss7OmMIB_openss7.h \
+	strExtMIB_openss7.c strExtMIB_openss7.h \
 	strMIB_openss7.c strMIB_openss7.h \
-	x25MIB_openss7.c x25MIB_openss7.h
+	acseMIB_openss7.c acseMIB_openss7.h \
+	tcapMIB_openss7.c tcapMIB_openss7.h \
+	tcapOmMIB_openss7.c tcapOmMIB_openss7.h \
+	x25MIB_openss7.c x25MIB_openss7.h \
+	x400pMIB_openss7.c x400pMIB_openss7.h
+
+megacoRingingMIB_openss7.c megacoRingingMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/MEGACO-RINGING-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f megacoRingingMIB_openss7 megacoRingingMIB
+	indent -nhnl megacoRingingMIB_openss7.[ch]
+
+megacoTonesMIB_openss7.c megacoTonesMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/MEGACO-TONES-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f megacoTonesMIB_openss7 megacoTonesMIB
+	indent -nhnl megacoTonesMIB_openss7.[ch]
+
+megacoMIB_openss7.c megacoMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/MEGACO-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f megacoMIB_openss7 megacoMIB
+	indent -nhnl megacoMIB_openss7.[ch]
+
+gcpMIB_openss7.c gcpMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-GCP-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f gcpMIB_openss7 gcpMIB
+	indent -nhnl gcpMIB_openss7.[ch]
+
+rtpswMIB_openss7.c rtpswMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-RTPSW-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f rtpswMIB_openss7 rtpswMIB
+	indent -nhnl rtpswMIB_openss7.[ch]
+
+rtpswOmMIB_openss7.c rtpswOmMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-RTPSW-OM-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f rtpswOmMIB_openss7 rtpswOmMIB
+	indent -nhnl rtpswOmMIB_openss7.[ch]
 
 #sfpMIB_openss7.c sfpMIB_openss7.h: MIBS+=OPENSS7-SFP-MIB:OPENSS7-TC
 sfpMIB_openss7.c sfpMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-SFP-MIB.mib
@@ -780,6 +1305,11 @@ slMIB_openss7.c slMIB_openss7.h:mib2c mib2c.openss7.conf ../mibs/OPENSS7-SL-MIB.
 	./mib2c -c ./mib2c.openss7.conf -f slMIB_openss7 slMIB
 	indent -nhnl slMIB_openss7.[ch]
 
+#smiMIB_openss7.c smiMIB_openss7.h:MIBS+=OPENSS7-SL-MIB:OPENSS7-TC:PerfHist-TC-MIB:HC-PerfHist-TC-MIB
+smiMIB_openss7.c smiMIB_openss7.h:mib2c mib2c.openss7.conf ../mibs/OPENSS7-SMI-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f smiMIB_openss7 smiMIB
+	indent -nhnl smiMIB_openss7.[ch]
+
 #ss7MIB_openss7.c ss7MIB_openss7.h:MIBS+=OPENSS7-SS7-MIB:OPENSS7-TC
 ss7MIB_openss7.c ss7MIB_openss7.h:mib2c mib2c.openss7.conf ../mibs/OPENSS7-SS7-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f ss7MIB_openss7 ss7MIB
@@ -797,6 +1327,11 @@ strExtMIB_openss7.c strExtMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS
 strMIB_openss7.c strMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-STREAMS-MIB.mib
 	./mib2c -c ./mib2c.openss7.conf -f strMIB_openss7 strMIB
 	indent -nhnl strMIB_openss7.[ch]
+
+#acseMIB_openss7.c acseMIB_openss7.h: MIBS+=OPENSS7-ACSE-MIB:OPENSS7-TC
+acseMIB_openss7.c acseMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-ACSE-MIB.mib
+	./mib2c -c ./mib2c.openss7.conf -f acseMIB_openss7 acseMIB
+	indent -nhnl acseMIB_openss7.[ch]
 
 #tcapMIB_openss7.c tcapMIB_openss7.h: MIBS+=OPENSS7-TCAP-MIB:OPENSS7-TC
 tcapMIB_openss7.c tcapMIB_openss7.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-TCAP-MIB.mib
@@ -882,12 +1417,68 @@ x400pCardTable.c x400pCardTable.h: mib2c mib2c.openss7.conf ../mibs/OPENSS7-X400
 	indent -nhnl x400pCardTable.[ch]
 
 clean:
+	rm -f megacoRingingMIB_openss7.[ch]
+	rm -f megacoRingingMIB_openss7.[ch]~
+	rm -f megacoRingingMIB_simple.[ch]
+	rm -f megacoRingingMIB_simple.[ch]~
+	rm -f megacoRingingMIB_storage.[ch]
+	rm -f megacoRingingMIB_storage.[ch]~
+	rm -f megacoRingingMIB.mib
+	rm -f megacoRingingMIB.lint
+	rm -f megacoRingingMIB.tree
+	rm -f megacoTonesMIB_openss7.[ch]
+	rm -f megacoTonesMIB_openss7.[ch]~
+	rm -f megacoTonesMIB_simple.[ch]
+	rm -f megacoTonesMIB_simple.[ch]~
+	rm -f megacoTonesMIB_storage.[ch]
+	rm -f megacoTonesMIB_storage.[ch]~
+	rm -f megacoTonesMIB.mib
+	rm -f megacoTonesMIB.lint
+	rm -f megacoTonesMIB.tree
+	rm -f megacoMIB_openss7.[ch]
+	rm -f megacoMIB_openss7.[ch]~
+	rm -f megacoMIB_simple.[ch]
+	rm -f megacoMIB_simple.[ch]~
+	rm -f megacoMIB_storage.[ch]
+	rm -f megacoMIB_storage.[ch]~
+	rm -f megacoMIB.mib
+	rm -f megacoMIB.lint
+	rm -f megacoMIB.tree
+	rm -f gcpMIB_openss7.[ch]
+	rm -f gcpMIB_openss7.[ch]~
+	rm -f gcpMIB_simple.[ch]
+	rm -f gcpMIB_simple.[ch]~
+	rm -f gcpMIB_storage.[ch]
+	rm -f gcpMIB_storage.[ch]~
+	rm -f gcpMIB.mib
+	rm -f gcpMIB.lint
+	rm -f gcpMIB.tree
+	rm -f rtpswMIB_openss7.[ch]
+	rm -f rtpswMIB_openss7.[ch]~
+	rm -f rtpswMIB_simple.[ch]
+	rm -f rtpswMIB_simple.[ch]~
+	rm -f rtpswMIB_storage.[ch]
+	rm -f rtpswMIB_storage.[ch]~
+	rm -f rtpswMIB.mib
+	rm -f rtpswMIB.lint
+	rm -f rtpswMIB.tree
+	rm -f rtpswOmMIB_openss7.[ch]
+	rm -f rtpswOmMIB_openss7.[ch]~
+	rm -f rtpswOmMIB_simple.[ch]
+	rm -f rtpswOmMIB_simple.[ch]~
+	rm -f rtpswOmMIB_storage.[ch]
+	rm -f rtpswOmMIB_storage.[ch]~
+	rm -f rtpswOmMIB.mib
+	rm -f rtpswOmMIB.lint
+	rm -f rtpswOmMIB.tree
 	rm -f sfpMIB_openss7.[ch]
 	rm -f sfpMIB_openss7.[ch]~
 	rm -f sfpMIB_simple.[ch]
 	rm -f sfpMIB_simple.[ch]~
 	rm -f sfpMIB_storage.[ch]
 	rm -f sfpMIB_storage.[ch]~
+	rm -f sfpMIB.mib
+	rm -f sfpMIB.lint
 	rm -f sfpMIB.tree
 	rm -f sfpOmMIB_openss7.[ch]
 	rm -f sfpOmMIB_openss7.[ch]~
@@ -895,6 +1486,8 @@ clean:
 	rm -f sfpOmMIB_simple.[ch]~
 	rm -f sfpOmMIB_storage.[ch]
 	rm -f sfpOmMIB_storage.[ch]~
+	rm -f sfpOmMIB.mib
+	rm -f sfpOmMIB.lint
 	rm -f sfpOmMIB.tree
 	rm -f isupMIB_openss7.[ch]
 	rm -f isupMIB_openss7.[ch]~
@@ -902,6 +1495,8 @@ clean:
 	rm -f isupMIB_simple.[ch]~
 	rm -f isupMIB_storage.[ch]
 	rm -f isupMIB_storage.[ch]~
+	rm -f isupMIB.mib
+	rm -f isupMIB.lint
 	rm -f isupMIB.tree
 	rm -f cdr2MIB_openss7.[ch]
 	rm -f cdr2MIB_openss7.[ch]~
@@ -909,6 +1504,8 @@ clean:
 	rm -f cdr2MIB_simple.[ch]~
 	rm -f cdr2MIB_storage.[ch]
 	rm -f cdr2MIB_storage.[ch]~
+	rm -f cdr2MIB.mib
+	rm -f cdr2MIB.lint
 	rm -f cdr2MIB.tree
 	rm -f chand_master.[ch]
 	rm -f chand_master.[ch]~
@@ -918,6 +1515,8 @@ clean:
 	rm -f dlMIB_simple.[ch]~
 	rm -f dlMIB_storage.[ch]
 	rm -f dlMIB_storage.[ch]~
+	rm -f dlMIB.mib
+	rm -f dlMIB.lint
 	rm -f dlMIB.tree
 	rm -f ds0Bundle_openss7.[ch]
 	rm -f ds0Bundle_openss7.[ch]~
@@ -925,6 +1524,8 @@ clean:
 	rm -f ds0Bundle_simple.[ch]~
 	rm -f ds0Bundle_storage.[ch]
 	rm -f ds0Bundle_storage.[ch]~
+	rm -f ds0Bundle.mib
+	rm -f ds0Bundle.lint
 	rm -f ds0Bundle.tree
 	rm -f ds0_openss7.[ch]
 	rm -f ds0_openss7.[ch]~
@@ -932,6 +1533,8 @@ clean:
 	rm -f ds0_simple.[ch]~
 	rm -f ds0_storage.[ch]
 	rm -f ds0_storage.[ch]~
+	rm -f ds0.mib
+	rm -f ds0.lint
 	rm -f ds0.tree
 	rm -f ds1EXT_openss7.[ch]
 	rm -f ds1EXT_openss7.[ch]~
@@ -939,6 +1542,8 @@ clean:
 	rm -f ds1EXT_simple.[ch]~
 	rm -f ds1EXT_storage.[ch]
 	rm -f ds1EXT_storage.[ch]~
+	rm -f ds1EXT.mib
+	rm -f ds1EXT.lint
 	rm -f ds1EXT.tree
 	rm -f ds1_openss7.[ch]
 	rm -f ds1_openss7.[ch]~
@@ -946,6 +1551,8 @@ clean:
 	rm -f ds1_simple.[ch]~
 	rm -f ds1_storage.[ch]
 	rm -f ds1_storage.[ch]~
+	rm -f ds1.mib
+	rm -f ds1.lint
 	rm -f ds1.tree
 	rm -f gmiMIB_openss7.[ch]
 	rm -f gmiMIB_openss7.[ch]~
@@ -953,6 +1560,8 @@ clean:
 	rm -f gmiMIB_simple.[ch]~
 	rm -f gmiMIB_storage.[ch]
 	rm -f gmiMIB_storage.[ch]~
+	rm -f gmiMIB.mib
+	rm -f gmiMIB.lint
 	rm -f gmiMIB.tree
 	rm -f lapbMIB_openss7.[ch]
 	rm -f lapbMIB_openss7.[ch]~
@@ -960,6 +1569,8 @@ clean:
 	rm -f lapbMIB_simple.[ch]~
 	rm -f lapbMIB_storage.[ch]
 	rm -f lapbMIB_storage.[ch]~
+	rm -f lapbMIB.mib
+	rm -f lapbMIB.lint
 	rm -f lapbMIB.tree
 	rm -f llc2_openss7.[ch]
 	rm -f llc2_openss7.[ch]~
@@ -973,6 +1584,8 @@ clean:
 	rm -f llcMIB_simple.[ch]~
 	rm -f llcMIB_storage.[ch]
 	rm -f llcMIB_storage.[ch]~
+	rm -f llcMIB.mib
+	rm -f llcMIB.lint
 	rm -f llcMIB.tree
 	rm -f m2paMIB_openss7.[ch]
 	rm -f m2paMIB_openss7.[ch]~
@@ -980,6 +1593,8 @@ clean:
 	rm -f m2paMIB_simple.[ch]~
 	rm -f m2paMIB_storage.[ch]
 	rm -f m2paMIB_storage.[ch]~
+	rm -f m2paMIB.mib
+	rm -f m2paMIB.lint
 	rm -f m2paMIB.tree
 	rm -f m2uaAspMIB_openss7.[ch]
 	rm -f m2uaAspMIB_openss7.[ch]~
@@ -987,6 +1602,8 @@ clean:
 	rm -f m2uaAspMIB_simple.[ch]~
 	rm -f m2uaAspMIB_storage.[ch]
 	rm -f m2uaAspMIB_storage.[ch]~
+	rm -f m2uaAspMIB.mib
+	rm -f m2uaAspMIB.lint
 	rm -f m2uaAspMIB.tree
 	rm -f m2uaMIB_openss7.[ch]
 	rm -f m2uaMIB_openss7.[ch]~
@@ -994,6 +1611,8 @@ clean:
 	rm -f m2uaMIB_simple.[ch]~
 	rm -f m2uaMIB_storage.[ch]
 	rm -f m2uaMIB_storage.[ch]~
+	rm -f m2uaMIB.mib
+	rm -f m2uaMIB.lint
 	rm -f m2uaMIB.tree
 	rm -f m3uaAspMIB_openss7.[ch]
 	rm -f m3uaAspMIB_openss7.[ch]~
@@ -1001,6 +1620,8 @@ clean:
 	rm -f m3uaAspMIB_simple.[ch]~
 	rm -f m3uaAspMIB_storage.[ch]
 	rm -f m3uaAspMIB_storage.[ch]~
+	rm -f m3uaAspMIB.mib
+	rm -f m3uaAspMIB.lint
 	rm -f m3uaAspMIB.tree
 	rm -f m3uaSgpMIB_openss7.[ch]
 	rm -f m3uaSgpMIB_openss7.[ch]~
@@ -1008,6 +1629,8 @@ clean:
 	rm -f m3uaSgpMIB_simple.[ch]~
 	rm -f m3uaSgpMIB_storage.[ch]
 	rm -f m3uaSgpMIB_storage.[ch]~
+	rm -f m3uaSgpMIB.mib
+	rm -f m3uaSgpMIB.lint
 	rm -f m3uaSgpMIB.tree
 	rm -f metricMIB_openss7.[ch]
 	rm -f metricMIB_openss7.[ch]~
@@ -1015,6 +1638,8 @@ clean:
 	rm -f metricMIB_simple.[ch]~
 	rm -f metricMIB_storage.[ch]
 	rm -f metricMIB_storage.[ch]~
+	rm -f metricMIB.mib
+	rm -f metricMIB.lint
 	rm -f metricMIB.tree
 	rm -f mtpMIB_openss7.[ch]
 	rm -f mtpMIB_openss7.[ch]~
@@ -1022,6 +1647,8 @@ clean:
 	rm -f mtpMIB_simple.[ch]~
 	rm -f mtpMIB_storage.[ch]
 	rm -f mtpMIB_storage.[ch]~
+	rm -f mtpMIB.mib
+	rm -f mtpMIB.lint
 	rm -f mtpMIB.tree
 	rm -f mtpOmMIB_openss7.[ch]
 	rm -f mtpOmMIB_openss7.[ch]~
@@ -1029,6 +1656,8 @@ clean:
 	rm -f mtpOmMIB_simple.[ch]~
 	rm -f mtpOmMIB_storage.[ch]
 	rm -f mtpOmMIB_storage.[ch]~
+	rm -f mtpOmMIB.mib
+	rm -f mtpOmMIB.lint
 	rm -f mtpOmMIB.tree
 	rm -f mxMIB_openss7.[ch]
 	rm -f mxMIB_openss7.[ch]~
@@ -1036,6 +1665,8 @@ clean:
 	rm -f mxMIB_simple.[ch]~
 	rm -f mxMIB_storage.[ch]
 	rm -f mxMIB_storage.[ch]~
+	rm -f mxMIB.mib
+	rm -f mxMIB.lint
 	rm -f mxMIB.tree
 	rm -f phyMIB_openss7.[ch]
 	rm -f phyMIB_openss7.[ch]~
@@ -1043,6 +1674,8 @@ clean:
 	rm -f phyMIB_simple.[ch]~
 	rm -f phyMIB_storage.[ch]
 	rm -f phyMIB_storage.[ch]~
+	rm -f phyMIB.mib
+	rm -f phyMIB.lint
 	rm -f phyMIB.tree
 	rm -f sccpMIB_openss7.[ch]
 	rm -f sccpMIB_openss7.[ch]~
@@ -1050,6 +1683,8 @@ clean:
 	rm -f sccpMIB_simple.[ch]~
 	rm -f sccpMIB_storage.[ch]
 	rm -f sccpMIB_storage.[ch]~
+	rm -f sccpMIB.mib
+	rm -f sccpMIB.lint
 	rm -f sccpMIB.tree
 	rm -f sccpOmMIB_openss7.[ch]
 	rm -f sccpOmMIB_openss7.[ch]~
@@ -1057,6 +1692,8 @@ clean:
 	rm -f sccpOmMIB_simple.[ch]~
 	rm -f sccpOmMIB_storage.[ch]
 	rm -f sccpOmMIB_storage.[ch]~
+	rm -f sccpOmMIB.mib
+	rm -f sccpOmMIB.lint
 	rm -f sccpOmMIB.tree
 	rm -f sigtrand_master.[ch]
 	rm -f sigtrand_master.[ch]~
@@ -1066,6 +1703,8 @@ clean:
 	rm -f sigtranMIB_simple.[ch]~
 	rm -f sigtranMIB_storage.[ch]
 	rm -f sigtranMIB_storage.[ch]~
+	rm -f sigtranMIB.mib
+	rm -f sigtranMIB.lint
 	rm -f sigtranMIB.tree
 	rm -f slMIB_openss7.[ch]
 	rm -f slMIB_openss7.[ch]~
@@ -1073,6 +1712,8 @@ clean:
 	rm -f slMIB_simple.[ch]~
 	rm -f slMIB_storage.[ch]
 	rm -f slMIB_storage.[ch]~
+	rm -f slMIB.mib
+	rm -f slMIB.lint
 	rm -f slMIB.tree
 	rm -f smiMIB_openss7.[ch]
 	rm -f smiMIB_openss7.[ch]~
@@ -1080,6 +1721,8 @@ clean:
 	rm -f smiMIB_simple.[ch]~
 	rm -f smiMIB_storage.[ch]
 	rm -f smiMIB_storage.[ch]~
+	rm -f smiMIB.mib
+	rm -f smiMIB.lint
 	rm -f smiMIB.tree
 	rm -f ss7confd_master.[ch]
 	rm -f ss7confd_master.[ch]~
@@ -1089,6 +1732,8 @@ clean:
 	rm -f ss7MIB_simple.[ch]~
 	rm -f ss7MIB_storage.[ch]
 	rm -f ss7MIB_storage.[ch]~
+	rm -f ss7MIB.mib
+	rm -f ss7MIB.lint
 	rm -f ss7MIB.tree
 	rm -f ss7OmMIB_openss7.[ch]
 	rm -f ss7OmMIB_openss7.[ch]~
@@ -1096,6 +1741,8 @@ clean:
 	rm -f ss7OmMIB_simple.[ch]~
 	rm -f ss7OmMIB_storage.[ch]
 	rm -f ss7OmMIB_storage.[ch]~
+	rm -f ss7OmMIB.mib
+	rm -f ss7OmMIB.lint
 	rm -f ss7OmMIB.tree
 	rm -f streamsd_master.[ch]
 	rm -f streamsd_master.[ch]~
@@ -1105,6 +1752,8 @@ clean:
 	rm -f strExtMIB_simple.[ch]~
 	rm -f strExtMIB_storage.[ch]
 	rm -f strExtMIB_storage.[ch]~
+	rm -f strExtMIB.mib
+	rm -f strExtMIB.lint
 	rm -f strExtMIB.tree
 	rm -f strMIB_openss7.[ch]
 	rm -f strMIB_openss7.[ch]~
@@ -1112,15 +1761,28 @@ clean:
 	rm -f strMIB_simple.[ch]~
 	rm -f strMIB_storage.[ch]
 	rm -f strMIB_storage.[ch]~
+	rm -f strMIB.mib
+	rm -f strMIB.lint
 	rm -f strMIB.tree
 	rm -f *Table.[ch]
 	rm -f *Table.[ch]~
+	rm -f acseMIB_openss7.[ch]
+	rm -f acseMIB_openss7.[ch]~
+	rm -f acseMIB_simple.[ch]
+	rm -f acseMIB_simple.[ch]~
+	rm -f acseMIB_storage.[ch]
+	rm -f acseMIB_storage.[ch]~
+	rm -f acseMIB.mib
+	rm -f acseMIB.lint
+	rm -f acseMIB.tree
 	rm -f tcapMIB_openss7.[ch]
 	rm -f tcapMIB_openss7.[ch]~
 	rm -f tcapMIB_simple.[ch]
 	rm -f tcapMIB_simple.[ch]~
 	rm -f tcapMIB_storage.[ch]
 	rm -f tcapMIB_storage.[ch]~
+	rm -f tcapMIB.mib
+	rm -f tcapMIB.lint
 	rm -f tcapMIB.tree
 	rm -f tcapOmMIB_openss7.[ch]
 	rm -f tcapOmMIB_openss7.[ch]~
@@ -1128,6 +1790,8 @@ clean:
 	rm -f tcapOmMIB_simple.[ch]~
 	rm -f tcapOmMIB_storage.[ch]
 	rm -f tcapOmMIB_storage.[ch]~
+	rm -f tcapOmMIB.mib
+	rm -f tcapOmMIB.lint
 	rm -f tcapOmMIB.tree
 	rm -f x25MIB_openss7.[ch]
 	rm -f x25MIB_openss7.[ch]~
@@ -1135,6 +1799,8 @@ clean:
 	rm -f x25MIB_simple.[ch]~
 	rm -f x25MIB_storage.[ch]
 	rm -f x25MIB_storage.[ch]~
+	rm -f x25MIB.mib
+	rm -f x25MIB.lint
 	rm -f x25MIB.tree
 	rm -f x400pCardTable.[ch]
 	rm -f x400pCardTable.[ch]~
@@ -1146,6 +1812,8 @@ clean:
 	rm -f x400pMIB_simple.[ch]~
 	rm -f x400pMIB_storage.[ch]
 	rm -f x400pMIB_storage.[ch]~
+	rm -f x400pMIB.mib
+	rm -f x400pMIB.lint
 	rm -f x400pMIB.tree
 	rm -f x400pSpanTable.[ch]
 	rm -f x400pSpanTable.[ch]~
@@ -1153,10 +1821,13 @@ clean:
 	rm -f x400pSyncTable.[ch]~
 	rm -f x400p*Table.[ch]
 
-.PHONY: all clean check openss7 simple storage
+.PHONY: all clean dump lint tree check openss7 simple storage
 # =============================================================================
 #
 # $Log: makestubs,v $
+# Revision 1.1.2.4  2011-07-18 19:42:26  brian
+# - added documentation
+#
 # Revision 1.1.2.3  2010-06-09 12:58:33  brian
 # - updated mibs
 #

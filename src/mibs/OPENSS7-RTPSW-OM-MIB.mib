@@ -1,0 +1,1653 @@
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
+-- =============================================================================
+-- 
+-- @(#) $RCSfile: OPENSS7-RTPSW-OM-MIB.mib,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-07-18 19:45:07 $
+--
+-- -----------------------------------------------------------------------------
+--
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+-- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+--
+-- All Rights Reserved.
+--
+-- This program is free software; you can redistribute it and/or modify it under 
+-- the terms of the GNU Affero General Public License as published by the Free 
+-- Software Foundation; version 3 of the License.
+--
+-- This program is distributed in the hope that it will be useful, but WITHOUT 
+-- ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or  
+-- FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License 
+-- for more details.
+--
+-- You should have received a copy of the GNU Affero General Public License 
+-- along with this program.  If not, see <http://www.gnu.org/licenses/>, or 
+-- write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 
+-- 02139, USA.
+--
+-- -----------------------------------------------------------------------------
+--
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
+-- modifications under the OpenSS7 project's enterprise object identifier arc: 
+-- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
+-- identifier arc under your control.
+--
+-- -----------------------------------------------------------------------------
+--
+-- U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+-- behalf of the U.S. Government ("Government"), the following provisions apply
+-- to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+-- is classified as "Commercial Computer Software" under paragraph 252.227-7014
+-- of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+-- successor regulations) and the Government is acquiring only the license rights
+-- granted herein (the license rights customarily provided to non-Government
+-- users).  If the Software is supplied to any unit or agency of the Government
+-- other than DoD, it is classified as "Restricted Computer Software" and the
+-- Government's rights in the Software are defined in paragraph 52.227-19 of the
+-- Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+-- the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+-- (or any successor regulations).
+--
+-- -----------------------------------------------------------------------------
+--
+-- Commercial licensing and support of this software is available from OpenSS7
+-- Corporation at a fee.  See http://www.openss7.com/
+--
+-- -----------------------------------------------------------------------------
+--
+-- Last Modified $Date: 2011-07-18 19:45:07 $ by $Author: brian $
+--
+-- -----------------------------------------------------------------------------
+--
+-- $Log: OPENSS7-RTPSW-OM-MIB.mib,v $
+-- Revision 1.1.2.1  2011-07-18 19:45:07  brian
+-- - added new MIBs
+--
+-- =============================================================================
+
+OPENSS7-RTPSW-OM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    HCPerfIntervalCount, HCPerfValidIntervals
+        FROM HC-PerfHist-TC-MIB
+    rtpswIfAddrId, rtpswInterfaceId, rtpswCallId
+        FROM OPENSS7-RTPSW-MIB
+    openss7Modules
+        FROM OPENSS7-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter64, Integer32, MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI;
+
+rtpswOmMIB MODULE-IDENTITY
+    LAST-UPDATED "201106291622Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
+        "
+         
+         Copyright (c) 2008-2011  Monavacon Limited
+         Copyright (c) 2001-2008  OpenSS7 Corporation
+         Copyright (c) 1997-2001  Brian F. G. Bidulock
+         
+         All Rights Reserved.
+         
+         This program is free software; you can redistribute it and/or 
+         modify it under the terms of the GNU Affero General Public 
+         License as published by the Free Software Foundation; version 3 
+         of the License.
+         
+         This program is distributed in the hope that it will be useful, 
+         but WITHOUT ANY WARRANTY; without even the implied warranty of 
+         MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
+         GNU Affero General Public License for more details.
+         
+         You should have received a copy of the GNU Affero General 
+         Public License along with this program.  If not, see 
+         <http://www.gnu.org/licenses/>, or write to the Free Software 
+         Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+         
+         Note well: notwithstanding this AGPL license, you are not 
+         permitted to make modifications under the OpenSS7 project's 
+         enterprise object identifier arc: 1.3.6.1.4.1.29591.  
+         Modifications must be made only within an object identifier arc 
+         under your control."
+    REVISION    "201106291622Z"
+    DESCRIPTION 
+        "Initial version of this mib."
+    ::= { openss7Modules 501 }
+
+
+rtpswOmNotifications OBJECT IDENTIFIER
+    ::= { rtpswOmMIB 0 }
+
+rtpswOmNotifs OBJECT IDENTIFIER
+    ::= { rtpswOmMIB 1 }
+
+rtpswOmScalars OBJECT IDENTIFIER
+    ::= { rtpswOmMIB 2 }
+
+rtpswOmCurrent OBJECT IDENTIFIER
+    ::= { rtpswOmScalars 1 }
+
+rtpswOmOctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching octets sent 
+         during the current interval.  Counts include UDP, IP 
+         and MAC headers."
+    ::= { rtpswOmCurrent 1 }
+
+rtpswOmOctetsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching octets received 
+         during the current interval.  Counts include UDP, IP 
+         and MAC headers."
+    ::= { rtpswOmCurrent 2 }
+
+rtpswOmPacketsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching packets sent 
+         during the current interval.  Counts include STUN 
+         packets."
+    ::= { rtpswOmCurrent 3 }
+
+rtpswOmPacketsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching packets received 
+         during the current interval.  Counts include STUN 
+         packets."
+    ::= { rtpswOmCurrent 4 }
+
+rtpswOmStunPacketsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching STUN packets 
+         sent during the current interval."
+    ::= { rtpswOmCurrent 5 }
+
+rtpswOmStunPacketsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching STUN packets 
+         received during the current interval."
+    ::= { rtpswOmCurrent 6 }
+
+rtpswOm5minValidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfValidIntervals
+    UNITS       "5-min Intervals"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 5-minute intervals of 
+         historical data that is collected in the corresponding 
+         history data table."
+    ::= { rtpswOmCurrent 7 }
+
+rtpswOm15minValidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfValidIntervals
+    UNITS       "15-min Intervals"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 15-minute intervals of 
+         historical data that is collected in the corresponding 
+         history data table."
+    ::= { rtpswOmCurrent 8 }
+
+rtpswForwCurrent OBJECT IDENTIFIER
+    ::= { rtpswOmScalars 2 }
+
+rtpswForwOmOctetsFor OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching octets 
+         transferred in the forward direction (from calling to 
+         called) on the cross-connection during the current 
+         interval.  Counts do not include UDP headers."
+    ::= { rtpswForwCurrent 1 }
+
+rtpswForwOmOctetsRev OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching octets 
+         transferred in the reverse direction (from called to 
+         calling) on the cross-connection during the current 
+         interval.  Counts do not include UDP headers."
+    ::= { rtpswForwCurrent 2 }
+
+rtpswForwOmPacketsFor OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching packets 
+         transferred in the forward direction (from calling to 
+         called) on the cross-connection during the current 
+         interval.  Counts exclude STUN packets."
+    ::= { rtpswForwCurrent 3 }
+
+rtpswForwOmPacketsRev OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching packets 
+         transferred in the reverse direction (from called to 
+         calling) on the cross-connection during the current 
+         interval.  Counts exclude STUN packets."
+    ::= { rtpswForwCurrent 4 }
+
+rtpswForwOm5minValidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfValidIntervals
+    UNITS       "5-minute Intervals"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 5-minute intervals of 
+         historical data that is collected in the corresponding 
+         history data table."
+    ::= { rtpswForwCurrent 5 }
+
+rtpswForwOm15minValidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfValidIntervals
+    UNITS       "15-minute Intervals"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 15-minute intervals of 
+         historical data that is collected in the corresponding 
+         history data table."
+    ::= { rtpswForwCurrent 6 }
+
+rtpswOmTables OBJECT IDENTIFIER
+    ::= { rtpswOmMIB 3 }
+
+rtpswOm5MinHistory OBJECT IDENTIFIER
+    ::= { rtpswOmTables 1 }
+
+rtpswOm5MinHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswOm5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The 5-minute history table contains various statistics 
+         collected for the host over the pervious 24 hours of 
+         operation.  The past 24 hours are broken into 288 
+         completed 5-minute intervals."
+    ::= { rtpswOm5MinHistory 1 }
+
+rtpswOm5MinHistoryEntry OBJECT-TYPE
+    SYNTAX      RtpswOm5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswOm5MinHistoryTable represents one 
+         of 288 5-minute intervals collected over the past 
+         24-hour period.  Each row represents one ssuch interval 
+         (identified by its rtpswOm5MinInterval)."
+    INDEX       { rtpswOm5MinInterval }
+    ::= { rtpswOm5MinHistoryTable 1 }
+
+RtpswOm5MinHistoryEntry ::= SEQUENCE {
+    rtpswOm5MinOctetsSent       Counter64,
+    rtpswOm5MinOctetsRecv       Counter64,
+    rtpswOm5MinPacketsSent      Counter64,
+    rtpswOm5MinPacketsRecv      Counter64,
+    rtpswOm5MinStunPktsSent     Counter64,
+    rtpswOm5MinStunPktsRecv     Counter64
+}
+
+rtpswOm5MinOctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent octets within the 
+         indexed 5-minute interval."
+    ::= { rtpswOm5MinHistoryEntry 1 }
+
+rtpswOm5MinOctetsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received octets within 
+         the indexed 5-minute interval."
+    ::= { rtpswOm5MinHistoryEntry 2 }
+
+rtpswOm5MinPacketsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent packets 
+         (including STUN packets) within the indexed 5-minute 
+         interval."
+    ::= { rtpswOm5MinHistoryEntry 3 }
+
+rtpswOm5MinPacketsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received packets 
+         (including STUN packets) within the indexed 5-minute 
+         interval."
+    ::= { rtpswOm5MinHistoryEntry 4 }
+
+rtpswOm5MinStunPktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent STUN packets 
+         within the indexed 5-minute interval."
+    ::= { rtpswOm5MinHistoryEntry 5 }
+
+rtpswOm5MinStunPktsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received STUN packets 
+         within the indexed 5-minute interval."
+    ::= { rtpswOm5MinHistoryEntry 6 }
+
+rtpswOm15MinHistory OBJECT IDENTIFIER
+    ::= { rtpswOmTables 2 }
+
+rtpswOm15MinHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswOm15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The 15-minute history table contains various statistics 
+         collected over the previous 24 hours of operation.  The 
+         past 25 hours are broken into 96 completed 15-minute 
+         intervals."
+    ::= { rtpswOm15MinHistory 1 }
+
+rtpswOm15MinHistoryEntry OBJECT-TYPE
+    SYNTAX      RtpswOm15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswOm15MinHistoryTable represents one 
+         of 96 15-minute intervals collected over the past 
+         24-hour period.  Each row represents one such interval 
+         (identified by its rtpswOm15MinInterval number)."
+    INDEX       { rtpswOm15MinInterval }
+    ::= { rtpswOm15MinHistoryTable 1 }
+
+RtpswOm15MinHistoryEntry ::= SEQUENCE {
+    rtpswOm15MinOctetsSent      Counter64,
+    rtpswOm15MinOctetsRecv      Counter64,
+    rtpswOm15MinPacketsSent     Counter64,
+    rtpswOm15MinPacketsRecv     Counter64,
+    rtpswOm15MinStunPktsSent    Counter64,
+    rtpswOm15MinStunPktsRecv    Counter64
+}
+
+rtpswOm15MinOctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent octets within the 
+         indexed 15-minute interval."
+    ::= { rtpswOm15MinHistoryEntry 1 }
+
+rtpswOm15MinOctetsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received octets within 
+         the indexed 15-minute interval."
+    ::= { rtpswOm15MinHistoryEntry 2 }
+
+rtpswOm15MinPacketsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent packets 
+         (including STUN packets) within the indexed 15-minute 
+         interval."
+    ::= { rtpswOm15MinHistoryEntry 3 }
+
+rtpswOm15MinPacketsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received packets 
+         (including STUN packets) within the indexed 15-minute 
+         interval."
+    ::= { rtpswOm15MinHistoryEntry 4 }
+
+rtpswOm15MinStunPktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent STUN packets 
+         within the indexed 15-minute interval."
+    ::= { rtpswOm15MinHistoryEntry 5 }
+
+rtpswOm15MinStunPktsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received STUN packets 
+         within the indexed 15-minute interval."
+    ::= { rtpswOm15MinHistoryEntry 6 }
+
+rtpswInterfaceCurrent OBJECT IDENTIFIER
+    ::= { rtpswOmTables 3 }
+
+rtpswInterfaceCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswInterfaceCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The interface current table contains various statistics 
+         being collected for the current 5- and 15-minute 
+         intervals."
+    ::= { rtpswInterfaceCurrent 1 }
+
+rtpswInterfaceCurrentEntry OBJECT-TYPE
+    SYNTAX      RtpswInterfaceCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry in the rtpswInterfaceCurrentTable represents 
+         a set of statistics that are being collected for the 
+         current 5- and 15-minute intervals for a specific 
+         interface as indexed by the rtpswInterfaceId."
+    INDEX       { rtpswInterfaceId }
+    ::= { rtpswInterfaceCurrentTable 1 }
+
+RtpswInterfaceCurrentEntry ::= SEQUENCE {
+    rtpswIfOmOctetsSent             Counter64,
+    rtpswIfOmOctetsRecv             Counter64,
+    rtpswIfOmPacketsSent            Counter64,
+    rtpswIfOmPacketsRecv            Counter64,
+    rtpswIfOmStunPktsSent           Counter64,
+    rtpswIfOmStunPktsRecv           Counter64,
+    rtpswIfOm5minValidIntervals     HCPerfValidIntervals,
+    rtpswIfOm15minValidIntervals    HCPerfValidIntervals
+}
+
+rtpswIfOmOctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching octets sent on 
+         the interface during the current interval.  Counts do 
+         not include UDP headers."
+    ::= { rtpswInterfaceCurrentEntry 1 }
+
+rtpswIfOmOctetsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching octets received 
+         on the interface during the current interval.  Counts 
+         do not include UDP headers."
+    ::= { rtpswInterfaceCurrentEntry 2 }
+
+rtpswIfOmPacketsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching packets sent on 
+         the interface during the current interval.  Counts 
+         include STUN packets."
+    ::= { rtpswInterfaceCurrentEntry 3 }
+
+rtpswIfOmPacketsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching packets received 
+         on the interface during the current interval.  Counts 
+         include STUN packets."
+    ::= { rtpswInterfaceCurrentEntry 4 }
+
+rtpswIfOmStunPktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "STUN Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching STUN packets 
+         sent on the interface during the current interval."
+    ::= { rtpswInterfaceCurrentEntry 5 }
+
+rtpswIfOmStunPktsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "STUN Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching STUN packets 
+         received on the interface during the current interval."
+    ::= { rtpswInterfaceCurrentEntry 6 }
+
+rtpswIfOm5minValidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfValidIntervals
+    UNITS       "5-min Intervals"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 5-minute intervals of 
+         historical data that is collected in the corresponding 
+         history data table."
+    ::= { rtpswInterfaceCurrentEntry 7 }
+
+rtpswIfOm15minValidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfValidIntervals
+    UNITS       "15-min Intervals"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 15-minute intervals of 
+         historical data that is collected in the corresponding 
+         history data table."
+    ::= { rtpswInterfaceCurrentEntry 8 }
+
+rtpswInterface5MinHistory OBJECT IDENTIFIER
+    ::= { rtpswOmTables 4 }
+
+rtpswInterface5MinHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswInterface5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The interface 5-minute history table contains various 
+         statistics collected for each interface over the 
+         previous 24 hours of operation.  The past 24 hours are 
+         broken into 288 completed 5-minute intervals."
+    ::= { rtpswInterface5MinHistory 1 }
+
+rtpswInterface5MinHistoryEntry OBJECT-TYPE
+    SYNTAX      RtpswInterface5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswInterface5MinHistoryTable 
+         represents one of 288 5-minute intervals collected over 
+         the past 24-hour period.  Each row represents one such 
+         interval (identified by its rtpswOm5MinInterval number) for 
+         one specific instance (identified by its 
+         rtpswInterfaceId)."
+    INDEX       { rtpswInterfaceId, rtpswOm5MinInterval }
+    ::= { rtpswInterface5MinHistoryTable 1 }
+
+RtpswInterface5MinHistoryEntry ::= SEQUENCE {
+    rtpswOm5MinInterval         Integer32,
+    rtpswIfOm5MinOctetsSent     HCPerfIntervalCount,
+    rtpswIfOm5MinOctetsRecv     HCPerfIntervalCount,
+    rtpswIfOm5MinPacketsSent    HCPerfIntervalCount,
+    rtpswIfOm5MinPacketsRecv    HCPerfIntervalCount,
+    rtpswIfOm5MinStunPktsSent   HCPerfIntervalCount,
+    rtpswIfOm5MinStunPktsRecv   HCPerfIntervalCount
+}
+
+rtpswOm5MinInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..288)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A historical data collection interval for use as an 
+         index.  Specifies the historical data collection 
+         interval as a time-sequence with the lowest ordinal 
+         value '1' representing the newest data collected and 
+         the highest ordinal value '288' being the oldest data 
+         collected."
+    ::= { rtpswInterface5MinHistoryEntry 1 }
+
+rtpswIfOm5MinOctetsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent octets on the 
+         interface within the indexed 5-minute interval."
+    ::= { rtpswInterface5MinHistoryEntry 2 }
+
+rtpswIfOm5MinOctetsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received octets on the 
+         interface within the indexed 5-minute interval."
+    ::= { rtpswInterface5MinHistoryEntry 3 }
+
+rtpswIfOm5MinPacketsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent packets 
+         (including STUN packets) on the interface within the 
+         indexed 5-minute interval."
+    ::= { rtpswInterface5MinHistoryEntry 4 }
+
+rtpswIfOm5MinPacketsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received packets 
+         (including STUN packets) on the interface within the 
+         indexed 5-minute interval."
+    ::= { rtpswInterface5MinHistoryEntry 5 }
+
+rtpswIfOm5MinStunPktsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent STUN packets on 
+         the interface within the indexed 5-minute interval."
+    ::= { rtpswInterface5MinHistoryEntry 6 }
+
+rtpswIfOm5MinStunPktsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received STUN packets 
+         on the interface within the indexed 5-minute interval."
+    ::= { rtpswInterface5MinHistoryEntry 7 }
+
+rtpswInterface15MinHistory OBJECT IDENTIFIER
+    ::= { rtpswOmTables 5 }
+
+rtpswInterface15MinHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswInterface15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The interface 15-minute history table contains various 
+         statistics collected for each interface over the 
+         previous 24 hours of operation.  The past 25 hours are 
+         broken into 96 completed 15-minute intervals."
+    ::= { rtpswInterface15MinHistory 1 }
+
+rtpswInterface15MinHistoryEntry OBJECT-TYPE
+    SYNTAX      RtpswInterface15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswInterface15MinHistoryTable 
+         represents one of 96 15-minute intervals collected over 
+         the past 24-hour period.  Each row represents one such 
+         interval (identified by its rtpswOm15MinInterval number) for 
+         one specific instance (identified by its 
+         rtpswInterfaceId)."
+    INDEX       { rtpswInterfaceId, rtpswOm15MinInterval }
+    ::= { rtpswInterface15MinHistoryTable 1 }
+
+RtpswInterface15MinHistoryEntry ::= SEQUENCE {
+    rtpswOm15MinInterval        Integer32,
+    rtpswIfOm15MinOctetsSent    HCPerfIntervalCount,
+    rtpswIfOm15MinOctetsRecv    HCPerfIntervalCount,
+    rtpswIfOm15MinPacketsSent   HCPerfIntervalCount,
+    rtpswIfOm15MinPacketsRecv   HCPerfIntervalCount,
+    rtpswIfOm15MinStunPktsSent  HCPerfIntervalCount,
+    rtpswIfOm15MinStunPktsRecv  HCPerfIntervalCount
+}
+
+rtpswOm15MinInterval OBJECT-TYPE
+    SYNTAX      Integer32 (0..96)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "A historical data collection interval for use as an 
+         index.  Specifies the historical data collection 
+         interval as a time-sequence with the lowest ordinal 
+         value '1' representing the newest data collected and 
+         the highest ordinal value '96' being the oldest data 
+         collected."
+    ::= { rtpswInterface15MinHistoryEntry 1 }
+
+rtpswIfOm15MinOctetsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent octets on the 
+         interface within the indexed 15-minute interval."
+    ::= { rtpswInterface15MinHistoryEntry 2 }
+
+rtpswIfOm15MinOctetsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received octets on the 
+         interface within the indexed 15-minute interval."
+    ::= { rtpswInterface15MinHistoryEntry 3 }
+
+rtpswIfOm15MinPacketsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent packets 
+         (including STUN packets) on the interface within the 
+         indexed 15-minute interval."
+    ::= { rtpswInterface15MinHistoryEntry 4 }
+
+rtpswIfOm15MinPacketsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received packets 
+         (including STUN packets) on the interface within the 
+         indexed 15-minute interval."
+    ::= { rtpswInterface15MinHistoryEntry 5 }
+
+rtpswIfOm15MinStunPktsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent STUN packets on 
+         the interface within the indexed 15-minute interval."
+    ::= { rtpswInterface15MinHistoryEntry 6 }
+
+rtpswIfOm15MinStunPktsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received STUN packets 
+         on the interface within the indexed 15-minute interval."
+    ::= { rtpswInterface15MinHistoryEntry 7 }
+
+rtpswIfAddrCurrent OBJECT IDENTIFIER
+    ::= { rtpswOmTables 6 }
+
+rtpswIfAddrCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswIfAddrCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The IP address current table contains various 
+         statistics being collected for the current 5- and 
+         15-minute intervals."
+    ::= { rtpswIfAddrCurrent 1 }
+
+rtpswIfAddrCurrentEntry OBJECT-TYPE
+    SYNTAX      RtpswIfAddrCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry in the rtpswIfAddrCurrentTable represents 
+         a set of statistics that are being collected for the 
+         current 5- and 15-minute intervals for a specific 
+         IP address as indexed by the rtpswIfAddrId."
+    INDEX       { rtpswIfAddrId }
+    ::= { rtpswIfAddrCurrentTable 1 }
+
+RtpswIfAddrCurrentEntry ::= SEQUENCE {
+    rtpswIfAddrOmOctetsSent             Counter64,
+    rtpswIfAddrOmOctetsRecv             Counter64,
+    rtpswIfAddrOmPacketsSent            Counter64,
+    rtpswIfAddrOmPacketsRecv            Counter64,
+    rtpswIfAddrOmStunPktsSent           Counter64,
+    rtpswIfAddrOmStunPktsRecv           Counter64,
+    rtpswIfAddrOm5minValidIntervals     HCPerfValidIntervals,
+    rtpswIfAddrOm15minValidIntervals    HCPerfValidIntervals
+}
+
+rtpswIfAddrOmOctetsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching octets sent on 
+         the IP address during the current interval.  Counts do 
+         not include UDP headers."
+    ::= { rtpswIfAddrCurrentEntry 1 }
+
+rtpswIfAddrOmOctetsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching octets received 
+         on the IP address during the current interval.  Counts 
+         do not include UDP headers."
+    ::= { rtpswIfAddrCurrentEntry 2 }
+
+rtpswIfAddrOmPacketsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching packets sent on 
+         the IP address during the current interval.  Counts 
+         include STUN packets."
+    ::= { rtpswIfAddrCurrentEntry 3 }
+
+rtpswIfAddrOmPacketsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching packets received 
+         on the IP address during the current interval.  Counts 
+         include STUN packets."
+    ::= { rtpswIfAddrCurrentEntry 4 }
+
+rtpswIfAddrOmStunPktsSent OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching STUN packets 
+         sent on the IP address during the current interval."
+    ::= { rtpswIfAddrCurrentEntry 5 }
+
+rtpswIfAddrOmStunPktsRecv OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "A count of the number of RTP switching STUN packets 
+         received on the IP address during the current interval."
+    ::= { rtpswIfAddrCurrentEntry 6 }
+
+rtpswIfAddrOm5minValidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfValidIntervals
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 5-minute intervals of 
+         historical data that is collected in the corresponding 
+         history data table."
+    ::= { rtpswIfAddrCurrentEntry 7 }
+
+rtpswIfAddrOm15minValidIntervals OBJECT-TYPE
+    SYNTAX      HCPerfValidIntervals
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of valid 15-minute intervals of 
+         historical data that is collected in the corresponding 
+         history data table."
+    ::= { rtpswIfAddrCurrentEntry 8 }
+
+rtpswIfAddr5MinHistory OBJECT IDENTIFIER
+    ::= { rtpswOmTables 7 }
+
+rtpswIfAddr5MinHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswIfAddr5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The interface 5-minute history table contains various 
+         statistics collected for each IP address over the 
+         previous 24 hours of operation.  The past 24 hours are 
+         broken into 288 completed 5-minute intervals."
+    ::= { rtpswIfAddr5MinHistory 1 }
+
+rtpswIfAddr5MinHistoryEntry OBJECT-TYPE
+    SYNTAX      RtpswIfAddr5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswInterface5MinHistoryTable 
+         represents one of 288 5-minute intervals collected over 
+         the past 24-hour period.  Each row represents one such 
+         interval (identified by its rtpswOm5MinInterval number) for 
+         one specific instance (identified by its 
+         rtpswIfAddrId)."
+    INDEX       { rtpswIfAddrId, rtpswOm5MinInterval }
+    ::= { rtpswIfAddr5MinHistoryTable 1 }
+
+RtpswIfAddr5MinHistoryEntry ::= SEQUENCE {
+    rtpswIfAddrOm5MinOctetsSent     HCPerfIntervalCount,
+    rtpswIfAddrOm5MinOctetsRecv     HCPerfIntervalCount,
+    rtpswIfAddrOm5MinPacketsSent    HCPerfIntervalCount,
+    rtpswIfAddrOm5MinPacketsRecv    HCPerfIntervalCount,
+    rtpswIfAddrOm5MinStunPktsSent   HCPerfIntervalCount,
+    rtpswIfAddrOm5MinStunPktsRecv   HCPerfIntervalCount
+}
+
+rtpswIfAddrOm5MinOctetsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent octets on the 
+         IP address within the indexed 5-minute interval."
+    ::= { rtpswIfAddr5MinHistoryEntry 1 }
+
+rtpswIfAddrOm5MinOctetsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received octets on the 
+         IP address within the indexed 5-minute interval."
+    ::= { rtpswIfAddr5MinHistoryEntry 2 }
+
+rtpswIfAddrOm5MinPacketsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent packets 
+         (including STUN packets) on the IP address within the 
+         indexed 5-minute interval."
+    ::= { rtpswIfAddr5MinHistoryEntry 3 }
+
+rtpswIfAddrOm5MinPacketsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received packets 
+         (including STUN packets) on the IP address within the 
+         indexed 5-minute interval."
+    ::= { rtpswIfAddr5MinHistoryEntry 4 }
+
+rtpswIfAddrOm5MinStunPktsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent STUN packets on 
+         the IP address within the indexed 5-minute interval."
+    ::= { rtpswIfAddr5MinHistoryEntry 5 }
+
+rtpswIfAddrOm5MinStunPktsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received STUN packets 
+         on the IP address within the indexed 5-minute interval."
+    ::= { rtpswIfAddr5MinHistoryEntry 6 }
+
+rtpswIfAddr15MinHistory OBJECT IDENTIFIER
+    ::= { rtpswOmTables 8 }
+
+rtpswIfAddr15MinHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswIfAddr15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The interface 15-minute history table contains various 
+         statistics collected for each IP address over the 
+         previous 24 hours of operation.  The past 25 hours are 
+         broken into 96 completed 15-minute intervals."
+    ::= { rtpswIfAddr15MinHistory 1 }
+
+rtpswIfAddr15MinHistoryEntry OBJECT-TYPE
+    SYNTAX      RtpswIfAddr15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswInterface15MinHistoryTable 
+         represents one of 96 15-minute intervals collected over 
+         the past 24-hour period.  Each row represents one such 
+         interval (identified by its rtpswOm15MinInterval 
+         number) for one specific instance (identified by its 
+         rtpswIfAddrId)."
+    INDEX       { rtpswIfAddrId, rtpswOm15MinInterval }
+    ::= { rtpswIfAddr15MinHistoryTable 1 }
+
+RtpswIfAddr15MinHistoryEntry ::= SEQUENCE {
+    rtpswIfAddrOm15MinOctetsSent    HCPerfIntervalCount,
+    rtpswIfAddrOm15MinOctetsRecv    HCPerfIntervalCount,
+    rtpswIfAddrOm15MinPacketsSent   HCPerfIntervalCount,
+    rtpswIfAddrOm15MinPacketsRecv   HCPerfIntervalCount,
+    rtpswIfAddrOm15MinStunPktsSent  HCPerfIntervalCount,
+    rtpswIfAddrOm15MinStunPktsRecv  HCPerfIntervalCount
+}
+
+rtpswIfAddrOm15MinOctetsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent octets on the 
+         IP address within the indexed 15-minute interval."
+    ::= { rtpswIfAddr15MinHistoryEntry 1 }
+
+rtpswIfAddrOm15MinOctetsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received octets on the 
+         IP address within the indexed 15-minute interval."
+    ::= { rtpswIfAddr15MinHistoryEntry 2 }
+
+rtpswIfAddrOm15MinPacketsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent packets 
+         (including STUN packets) on the IP address within the 
+         indexed 15-minute interval."
+    ::= { rtpswIfAddr15MinHistoryEntry 3 }
+
+rtpswIfAddrOm15MinPacketsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received packets 
+         (including STUN packets) on the IP address within the 
+         indexed 15-minute interval."
+    ::= { rtpswIfAddr15MinHistoryEntry 4 }
+
+rtpswIfAddrOm15MinStunPktsSent OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of sent STUN packets on 
+         the IP address within the indexed 15-minute interval."
+    ::= { rtpswIfAddr15MinHistoryEntry 5 }
+
+rtpswIfAddrOm15MinStunPktsRecv OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of received STUN packets 
+         on the IP address within the indexed 15-minute interval."
+    ::= { rtpswIfAddr15MinHistoryEntry 6 }
+
+rtpswForw5MinHistory OBJECT IDENTIFIER
+    ::= { rtpswOmTables 9 }
+
+rtpswForw5MinHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswForw5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The forwarding 5-minute history table contains various 
+         statistics collected for all cross-connections over the 
+         previous 24 hours of operation.  The past 24 hours are 
+         broken into 288 completed 5-minute intervals."
+    ::= { rtpswForw5MinHistory 1 }
+
+rtpswForw5MinHistoryEntry OBJECT-TYPE
+    SYNTAX      RtpswForw5MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswForw5MinHistoryTable represents 
+         one of 288 5-minute intervals collected over the past 
+         24-hour period.  Each row represents one such interval 
+         (identified by its rtpswOm5MinInterval number)."
+    INDEX       { rtpswOm5MinInterval }
+    ::= { rtpswForw5MinHistoryTable 1 }
+
+RtpswForw5MinHistoryEntry ::= SEQUENCE {
+    rtpswForwOm5MinOctetsFor    HCPerfIntervalCount,
+    rtpswForwOm5MinOctetsRev    HCPerfIntervalCount,
+    rtpswForwOm5MinPacketsFor   HCPerfIntervalCount,
+    rtpswForwOm5MinPacketsRev   HCPerfIntervalCount
+}
+
+rtpswForwOm5MinOctetsFor OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of octets transferred in 
+         the forward direction (calling to called) within the 
+         indexed 5-minute interval."
+    ::= { rtpswForw5MinHistoryEntry 1 }
+
+rtpswForwOm5MinOctetsRev OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of octets transferred in 
+         the reverse direction (called to calling) within the 
+         indexed 5-minute interval."
+    ::= { rtpswForw5MinHistoryEntry 2 }
+
+rtpswForwOm5MinPacketsFor OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of packets transferred in 
+         the forward direction (calling to called) within the 
+         indexed 5-minute interval."
+    ::= { rtpswForw5MinHistoryEntry 3 }
+
+rtpswForwOm5MinPacketsRev OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of packets transferred in 
+         the reverse direction (called to calling) within the 
+         indexed 5-minute interval."
+    ::= { rtpswForw5MinHistoryEntry 4 }
+
+rtpswForw15MinHistory OBJECT IDENTIFIER
+    ::= { rtpswOmTables 10 }
+
+rtpswForw15MinHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswForw15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The forwarding 15-minute history table contains various 
+         statistics collected for all cross-connections over the 
+         previous 24 hours of operation.  The past 24 hours are 
+         broken into 96 completed 15-minute intervals."
+    ::= { rtpswForw15MinHistory 1 }
+
+rtpswForw15MinHistoryEntry OBJECT-TYPE
+    SYNTAX      RtpswForw15MinHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswForw15MinHistoryTable represents 
+         one of 96 15-minute intervals collected over the past 
+         24-hour period.  Each row represents one such interval 
+         (identified by its rtpswOm15MinInterval number)."
+    INDEX       { rtpswOm15MinInterval }
+    ::= { rtpswForw15MinHistoryTable 1 }
+
+RtpswForw15MinHistoryEntry ::= SEQUENCE {
+    rtpswForwOm15MinOctetsFor   HCPerfIntervalCount,
+    rtpswForwOm15MinOctetsRev   HCPerfIntervalCount,
+    rtpswForwOm15MinPacketsFor  HCPerfIntervalCount,
+    rtpswForwOm15MinPacketsRev  HCPerfIntervalCount
+}
+
+rtpswForwOm15MinOctetsFor OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of octets transferred in 
+         the forward direction (calling to called) within the 
+         indexed 15-minute interval."
+    ::= { rtpswForw15MinHistoryEntry 1 }
+
+rtpswForwOm15MinOctetsRev OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of octets transferred in 
+         the reverse direction (called to calling) within the 
+         indexed 15-minute interval."
+    ::= { rtpswForw15MinHistoryEntry 2 }
+
+rtpswForwOm15MinPacketsFor OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of packets transferred in 
+         the forward direction (calling to called) within the 
+         indexed 15-minute interval."
+    ::= { rtpswForw15MinHistoryEntry 3 }
+
+rtpswForwOm15MinPacketsRev OBJECT-TYPE
+    SYNTAX      HCPerfIntervalCount
+    UNITS       "Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the historical count of packets transferred in 
+         the reverse direction (called to calling) within the 
+         indexed 15-minute interval."
+    ::= { rtpswForw15MinHistoryEntry 4 }
+
+rtpswOmTermPointCurrent OBJECT IDENTIFIER
+    ::= { rtpswOmTables 11 }
+
+rtpswOmTermPointCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswOmTermPointCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RTP switching current termination point table 
+         contains various statistical and even timestamp 
+         information concerning termination points that are 
+         currently engaged in a session."
+    ::= { rtpswOmTermPointCurrent 1 }
+
+rtpswOmTermPointCurrentEntry OBJECT-TYPE
+    SYNTAX      RtpswOmTermPointCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswOmTermPointCurrentTable represents 
+         the statistics and event timestamps associated with 
+         a specific ongoing session.  Rows are indexed by 
+         rtpswTermPointId."
+    INDEX       { rtpswTermPointId }
+    ::= { rtpswOmTermPointCurrentTable 1 }
+
+RtpswOmTermPointCurrentEntry ::= SEQUENCE {
+    rtpswOmTpMediaAware             TruthValue,
+    rtpswOmRtpPacketsSent           Counter32,
+    rtpswOmRtpPacketsRecv           Counter32,
+    rtpswOmRtcpPacketsSent          Counter32,
+    rtpswOmRtcpPacketsRecv          Counter32,
+    rtpswOmStunPacketsSent          Counter32,
+    rtpswOmStunPacketsRecv          Counter32,
+    rtpswOmRtpOctetsSent            Counter32,
+    rtpswOmRtpOctetsRecv            Counter32,
+    rtpswOmRtpPacketsLost           Counter32,
+    rtpswOmRtpJitter                Counter32,
+    rtpswOmRtpDelay                 Counter32
+}
+
+rtpswOmTpMediaAware OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates whether the termination point is media-aware 
+         in the current session."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmRtpPacketsSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of RTP packets sent from the 
+         termination point in the current or most recent 
+         session."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmRtpPacketsRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of RTP packets received on the 
+         termination point in the current or most recent 
+         session."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmRtcpPacketsSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTCP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of RTCP packets send from the 
+         termination point in the current or most recent 
+         session."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmRtcpPacketsRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTCP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of RTCP packets received on the 
+         termination point in the current or most receint 
+         session."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmStunPacketsSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "STUN Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Inidcates the number of STUN packets sent from the 
+         termination point in the current or most recent 
+         session."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmStunPacketsRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "STUN Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of STUN packets received from the 
+         termination point in the current or most recent 
+         session."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmRtpOctetsSent OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of RTP payload octets sent from 
+         the termination point in the current or most recent 
+         session.  Only media-aware sessions cause this count to 
+         increase from zero."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmRtpOctetsRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "Octets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of RTP payload octets received on 
+         the termination point in the current or most recent 
+         session.  Only media-aware sessions cause this count to 
+         increase from zero."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmRtpPacketsLost OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP Packets"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of RTP packets lost in the current 
+         or most recent session.  Only media-aware sessions 
+         cause this count to increase from zero."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmRtpJitter OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP Timestamp Intervals"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the jitter as a number of timestamp 
+         (quantization) intervals deviated experienced on the 
+         current or most recent session."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+rtpswOmRtpDelay OBJECT-TYPE
+    SYNTAX      Counter32
+    UNITS       "RTP Timestamp Intervals"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the delay (average latency) as a number of 
+         timestamp (quantization) intervals experienced on the 
+         most recent session.  Only media-aware sessions cause 
+         this count to increase from zero."
+    ::= { rtpswOmTermPointCurrentEntry 1 }
+
+
+rtpswOmCallCurrent OBJECT IDENTIFIER
+    ::= { rtpswOmTables 12 }
+
+rtpswOmCallCurrentTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF RtpswOmCallCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "The RTP switching current call statistics table 
+         contains various statistical and event timestamp 
+         information concerning calls that are currently in 
+         progress."
+    ::= { rtpswOmCallCurrent 1 }
+
+rtpswOmCallCurrentEntry OBJECT-TYPE
+    SYNTAX      RtpswOmCallCurrentEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in the rtpswOmCallCurrentTable represents the 
+         statistics and event timestamps associated with 
+         a specific ongoing call.  Rows are indexed by 
+         rtpswCallId."
+    INDEX       { rtpswCallId }
+    ::= { rtpswOmCallCurrentTable 1 }
+
+RtpswOmCallCurrentEntry ::= SEQUENCE {
+    rtpswOmCallStartTime            DateAndTime,
+    rtpswOmIpOctetsCallerSent       Counter32,
+    rtpswOmIpOctetsCallerRecv       Counter32,
+    rtpswOmIpOctetsCalleeSent       Counter32,
+    rtpswOmIpOctetsCalleeRecv       Counter32,
+    rtpswOmIpPacketsCallerSent      Counter32,
+    rtpswOmIpPacketsCallerRecv      Counter32,
+    rtpswOmIpPacketsCalleeSent      Counter32,
+    rtpswOmIpPacketsCalleeRecv      Counter32,
+    rtpswOmRtpOctetsCallerSent      Counter32,
+    rtpswOmRtpOctetsCallerRecv      Counter32,
+    rtpswOmRtpOctetsCalleeSent      Counter32,
+    rtpswOmRtpOctetsCalleeRecv      Counter32,
+    rtpswOmRtpPacketsCallerSent     Counter32,
+    rtpswOmRtpPacketsCallerRecv     Counter32,
+    rtpswOmRtpPacketsCalleeSent     Counter32,
+    rtpswOmRtpPacketsCalleeRecv     Counter32,
+    rtpswOmRtcpPacketsCallerSent    Counter32,
+    rtpswOmRtcpPacketsCallerRecv    Counter32,
+    rtpswOmRtcpPacketsCalleeSent    Counter32,
+    rtpswOmRtcpPacketsCalleeRecv    Counter32,
+    rtpswOmRtpStunPcktsCallerSent   Counter32,
+    rtpswOmRtpStunPcktsCallerRecv   Counter32,
+    rtpswOmRtpStunPcktsCalleeSent   Counter32,
+    rtpswOmRtpStunPcktsCalleeRecv   Counter32
+}
+
+
+rtpswOmCallHistory OBJECT IDENTIFIER
+    ::= { rtpswOmTables 12 }
+
+rtpswOmOids OBJECT IDENTIFIER
+    ::= { rtpswOmMIB 4 }
+
+rtpswOmGroups OBJECT IDENTIFIER
+    ::= { rtpswOmMIB 5 }
+
+rtpswOmCompliance OBJECT IDENTIFIER
+    ::= { rtpswOmMIB 6 }
+
+rtpswOmMandatoryGroup OBJECT-GROUP
+    OBJECTS     { rtpswOmOctetsSent, rtpswOmOctetsRecv, 
+                  rtpswOmPacketsSent, rtpswOmPacketsRecv, 
+                  rtpswOmStunPacketsSent, rtpswOmStunPacketsRecv, 
+                  rtpswOm15minValidIntervals, rtpswOm15MinOctetsSent, 
+                  rtpswOm15MinOctetsRecv, rtpswOm15MinPacketsSent, 
+                  rtpswOm15MinPacketsRecv, rtpswOm15MinStunPktsSent, 
+                  rtpswOm15MinStunPktsRecv, rtpswIfOmOctetsSent, 
+                  rtpswIfOmOctetsRecv, rtpswIfOmPacketsSent, 
+                  rtpswIfOmPacketsRecv, rtpswIfOmStunPktsSent, 
+                  rtpswIfOmStunPktsRecv, rtpswIfOm15minValidIntervals, 
+                  rtpswIfOm15MinOctetsSent, rtpswIfOm15MinOctetsRecv, 
+                  rtpswIfOm15MinPacketsSent, rtpswIfOm15MinPacketsRecv, 
+                  rtpswIfOm15MinStunPktsSent, rtpswIfOm15MinStunPktsRecv, 
+                  rtpswIfAddrOmOctetsSent, rtpswIfAddrOmOctetsRecv, 
+                  rtpswIfAddrOmPacketsSent, rtpswIfAddrOmPacketsRecv, 
+                  rtpswIfAddrOmStunPktsSent, rtpswIfAddrOmStunPktsRecv, 
+                  rtpswIfAddrOm15minValidIntervals, 
+                  rtpswIfAddrOm15MinOctetsSent, 
+                  rtpswIfAddrOm15MinOctetsRecv, 
+                  rtpswIfAddrOm15MinPacketsSent, 
+                  rtpswIfAddrOm15MinPacketsRecv, 
+                  rtpswIfAddrOm15MinStunPktsSent, 
+                  rtpswIfAddrOm15MinStunPktsRecv, rtpswForwOmOctetsFor, 
+                  rtpswForwOmOctetsRev, rtpswForwOmPacketsFor, 
+                  rtpswForwOmPacketsRev, rtpswForwOm5minValidIntervals, 
+                  rtpswForwOm15minValidIntervals, 
+                  rtpswForwOm5MinOctetsFor, rtpswForwOm5MinOctetsRev, 
+                  rtpswForwOm5MinPacketsFor, rtpswForwOm5MinPacketsRev, 
+                  rtpswForwOm15MinOctetsFor, rtpswForwOm15MinOctetsRev, 
+                  rtpswForwOm15MinPacketsFor, rtpswForwOm15MinPacketsRev }
+    STATUS      current
+    DESCRIPTION 
+        "A group that provides all of the mandatory compliance 
+         objects."
+    ::= { rtpswOmGroups 1 }
+
+-- rtpswOmMandatoryNotifications NOTIFICATION-GROUP
+--     NOTIFICATIONS {
+--     }
+--     STATUS      current
+--     DESCRIPTION
+--         "A group that provides all of the mandatory compliance 
+--          notifications"
+--     ::= { rtpswOmGroups 2 }
+-- 
+rtpswOmOptionsGroup OBJECT-GROUP
+    OBJECTS     { rtpswOm5minValidIntervals, rtpswOm5MinOctetsSent, 
+                  rtpswOm5MinOctetsRecv, rtpswOm5MinPacketsSent, 
+                  rtpswOm5MinPacketsRecv, rtpswOm5MinStunPktsSent, 
+                  rtpswOm5MinStunPktsRecv, rtpswIfOm5minValidIntervals, 
+                  rtpswIfOm5MinOctetsSent, rtpswIfOm5MinOctetsRecv, 
+                  rtpswIfOm5MinPacketsSent, rtpswIfOm5MinPacketsRecv, 
+                  rtpswIfOm5MinStunPktsSent, rtpswIfOm5MinStunPktsRecv, 
+                  rtpswIfAddrOm5minValidIntervals, 
+                  rtpswIfAddrOm5MinOctetsSent, 
+                  rtpswIfAddrOm5MinOctetsRecv, 
+                  rtpswIfAddrOm5MinPacketsSent, 
+                  rtpswIfAddrOm5MinPacketsRecv, 
+                  rtpswIfAddrOm5MinStunPktsSent, 
+                  rtpswIfAddrOm5MinStunPktsRecv }
+    STATUS      current
+    DESCRIPTION 
+        "A group that provides all of the optional compliance 
+         objects."
+    ::= { rtpswOmGroups 3 }
+
+-- rtpswOmOptionalNotifications NOTIFICATION-GROUP
+--     NOTIFICATIONS {
+--     }
+--     STATUS      current
+--     DESCRIPTION
+--         "A group that provides all of the optional compliance 
+--          notifications."
+--     ::= { rtpswOmGroups 4 }
+-- 
+
+rtpswOmFullCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "A compliance profile for full compliance to this MIB."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { rtpswOmMandatoryGroup }
+
+        GROUP   rtpswOmOptionsGroup
+        DESCRIPTION   
+              "Objects that are optional in this MIB."
+
+    ::= { rtpswOmCompliance 1 }
+
+END -- end of module OPENSS7-RTPSW-OM-MIB.

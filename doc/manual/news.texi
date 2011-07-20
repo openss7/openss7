@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: news.texi,v 1.1.2.6 2011-02-28 19:51:29 brian Exp $
+@c @(#) $Id: news.texi,v 1.1.2.7 2011-07-18 19:42:10 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-02-28 19:51:29 $ by $Author: brian $
+@c Last Modified $Date: 2011-07-18 19:42:10 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -126,6 +126,37 @@ Major features since the last release are as follows:
 @item
 Support for @file{repomd} repository.
 
+@item
+Updated GNU build chain to m4-1.4.16, autoconf-2.69, automake 1.11.1, libtool 2.4, gettext 0.18.1,
+flex 2.5.35, bison 2.5, swig 2.0.4, autobuild 5.3.
+
+@item
+Support for Ubuntu 10.04.2 LTS.
+
+@item
+Support for Mageia 1 (2.6.38.7-desktop-1.mga).
+
+@item
+Support for Mandriva 2010.2.
+
+@item
+Support for Mandriva Linux Enterprise Server 5.2 (2.6.33.7-server-2mnb).
+
+@item
+Support for Scientific Linux 6.0.
+
+@item
+Support for SuSE Linux Enterprise Server 11 SP1.
+
+@item
+Support for OpernSUSE 11.4.
+
+@item
+Support for Fedora 15.
+
+@item
+Support for Red Hat Enterprise Linux Server 6.0.
+
 @end itemize
 
 @node Release @value{PACKAGE}-1.1.1.20110111
@@ -147,7 +178,7 @@ support for compiling with gcc 4.4.
 Support for CentOS 5.5 on a 2.6.18-194.25.1.el5 kernel.
 
 @item
-Updated GNU build chain to m4-1.4.15, autoconf-2.69, automake 2.11.1, libtool 2.4, gettext 0.18.1,
+Updated GNU build chain to m4-1.4.15, autoconf-2.69, automake 1.11.1, libtool 2.4, gettext 0.18.1,
 flex 2.5.35, bison 2.4.3, swig 2.0.1, autobuild 5.3.
 
 @item

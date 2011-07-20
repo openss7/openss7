@@ -2,7 +2,7 @@
 #!/usr/bin/perl -w
 # =============================================================================
 #
-# @(#) $RCSfile: mib2c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:42:33 $
+# @(#) $RCSfile: mib2c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-07-18 19:42:26 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -48,11 +48,14 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:42:33 $ by $Author: brian $
+# Last Modified $Date: 2011-07-18 19:42:26 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: mib2c,v $
+# Revision 1.1.2.2  2011-07-18 19:42:26  brian
+# - added documentation
+#
 # Revision 1.1.2.1  2009-06-21 11:42:33  brian
 # - added files to new distro
 #
@@ -145,10 +148,18 @@ if ($havesnmp) {
 use FileHandle;
 
 #use strict 'vars';
-$SNMP::save_descriptions=1;
-$SNMP::use_long_names=1;
-$SNMP::use_enums=1;
+$SNMP::auto_init_mib = 0;
+$SNMP::verbose = 1;
+$SNMP::use_long_names = 1;
+$SNMP::use_sprint_value = 0;
+$SNMP::use_enums = 1;
+$SNMP::use_numeric = 0;
+$SNMP::best_guess = 2;
+$SNMP::non_increasing = 0;
+$SNMP::save_descriptions = 1;
+$SNMP::debugging = 1;
 SNMP::initMib();
+#SNMP::loadModules('ALL');
 
 $configfile="mib2c.conf";
 $debug=0;
@@ -230,7 +241,7 @@ sub defval {
 	    $ret = "StorageNew->${name} = 0;\n";
 	} elsif ($defval =~ /^[-+]?[0-9]+$/) {
 	    $ret = "StorageNew->${name} = $defval;\n";
-	} elsif ($defval =~ /^'([0-9a-fA-F]*)'X$/) {
+	} elsif ($defval =~ /^'([0-9a-fA-F]*)'[XHh]$/) {
 	    $ret = "StorageNew->${name} = 0x$1;\n";
 	} elsif ($defval =~ /^'[01]+'B$/) {
 	    while ($defval =~ s/^'([01])/'/) {
@@ -267,7 +278,7 @@ sub defval {
 	    $ret = "StorageNew->${name} = (struct counter64) { 0, 0 };\n";
 	} elsif ($defval =~ /^[-+]?[0-9]+$/) {
 	    $ret = "StorageNew->${name} = (struct counter64) { (long) ((uint64_t) $defval >> 32), (long) ($defval) };\n";
-	} elsif ($defval =~ /^'([0-9a-fA-F]*)'X$/) {
+	} elsif ($defval =~ /^'([0-9a-fA-F]*)'[XHh]$/) {
 	    $ret = "StorageNew->${name} = 0x$1;\n";
 	    $ret = "StorageNew->${name} = (struct counter64) { (long) ((uint64_t) 0x$1 >> 32), (long) (0x$1) };\n";
 	} elsif ($defval =~ /^'[01]+'B$/) {
@@ -322,7 +333,7 @@ sub defval {
 	if ($defval =~ /^$/) {
 	    $ret = "if ((StorageNew->${name} = (uint8_t *) strdup(\"\")) != NULL)\n";
 	    $ret .= "StorageNew->${name}Len = strlen(\"\");\n";
-	} elsif ($defval =~ /^'[0-9a-fA-F]+'X$/) {
+	} elsif ($defval =~ /^'[0-9a-fA-F]+'[XHh]$/) {
 	    my $value;
 	    $len = ((length($defval) - 3) % 2) * 4;
 	    while ($defval =~ s/^'([0-9a-fA-F])/'/) {
@@ -359,12 +370,45 @@ sub defval {
 	    $len = ($len + 7) >> 3;
 	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
 	    $ret .= "StorageNew->${name}Len = $len;\n";
-	} elsif ($defval =~ /^\"[^"]*\"$/) {
-	    $ret = "StorageNew->${name} = (uint8_t *) strdup($defval);\n";
-	    $ret .= "StorageNew->${name}Len = strlen($defval);\n";
+	} elsif ($defval =~ /^"([^"]*)"$/) {
+	    my $val = $1;
+	    if ($val =~ /\\x[0-9a-fA-F]+/ || $val =~ /\\0/) {
+		my $string = $val;
+		$string =~ s/\\x[0-9a-fA-F][0-9a-fA-F]/./sg;
+		$string =~ s/\\0/./sg;
+		my $len = length($string);
+		$ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+		$ret .= "StorageNew->${name}Len = $len;\n";
+	    } else {
+		$ret = "if ((StorageNew->${name} = (uint8_t *) strdup(\"$val\")) != NULL)\n";
+		$ret .= "StorageNew->${name}Len = strlen(\"$val\");\n";
+	    }
+	} elsif ($defval =~ /^\\"([^"]*)\\"$/) {
+	    my $val = $1;
+	    if ($val =~ /\\x[0-9a-fA-F]+/ || $val =~ /\\0/) {
+		my $string = $val;
+		$string =~ s/\\x[0-9a-fA-F][0-9a-fA-F]/./sg;
+		$string =~ s/\\0/./sg;
+		my $len = length($string);
+		$ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+		$ret .= "StorageNew->${name}Len = $len;\n";
+	    } else {
+		$ret = "if ((StorageNew->${name} = (uint8_t *) strdup(\"$val\")) != NULL)\n";
+		$ret .= "StorageNew->${name}Len = strlen(\"$val\");\n";
+	    }
 	} elsif ($defval =~ /^'([^'"]*)'$/) {
-	    $ret = "StorageNew->${name} = (uint8_t *) strdup(\"$1\");\n";
-	    $ret .= "StorageNew->${name}Len = strlen(\"$1\");\n";
+	    my $val = $1;
+	    if ($val =~ /\\x[0-9a-fA-F]+/ || $val =~ /\\0/) {
+		my $string = $val;
+		$string =~ s/\\x[0-9a-fA-F][0-9a-fA-F]/./sg;
+		$string =~ s/\\0/./sg;
+		my $len = length($string);
+		$ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
+		$ret .= "StorageNew->${name}Len = $len;\n";
+	    } else {
+		$ret = "if ((StorageNew->${name} = (uint8_t *) strdup(\"$val\")) != NULL)\n";
+		$ret .= "StorageNew->${name}Len = strlen(\"$val\");\n";
+	    }
 	} else {
 	    $ret = "/* StorageNew->${name} = (uint8_t *) strdup($defval); */ /* DEFVAL $mib->{'defaultValue'} */\n";
 	    $ret .= "/* StorageNew->${name}Len = strlen($defval); */ /* DEFVAL $mib->{'defaultValue'} */\n";
@@ -379,6 +423,34 @@ sub defval {
 	    $len = 2;
 	    $ret = "if ((StorageNew->${name} = snmp_duplicate_objid(zeroDotZero_oid, $len)))\n";
 	    $ret .= "StorageNew->${name}Len = $len;\n";
+	} elsif ($defval =~ /^[a-zA-Z][a-zA-Z0-9_-]+$/) {
+	    my @subids = ();
+	    if ($defval eq "zeroDotZero") {
+		push @subids, 0;
+		push @subids, 0;
+	    } else {
+		my $mymib = $SNMP::MIB{$defval};
+		if ($mymib->{'label'} eq "mib-2") {
+		    push @subids, $defval;
+		} else {
+		    my $oid = $mymib->{'objectID'};
+		    $oid =~ s/^\.//;
+		    foreach my $s (split(/\./,$oid)) {
+			push @subids, $s;
+		    }
+		}
+	    }
+	    $len = scalar @subids;
+	    $val = join(",", @subids);
+	    $val = "{ $val }";
+	    if ($val eq "{ 0,0 }") {
+		$ret = "if ((StorageNew->${name} = snmp_duplicate_objid(zeroDotZero_oid, $len)))\n";
+		$ret .= "StorageNew->${name}Len = $len;\n";
+	    } else {
+		$ret = "{\nstatic oid tmpoid[$len] = $val;\n";
+		$ret .= "if ((StorageNew->${name} = snmp_duplicate_objid(tmpoid, $len)))\n";
+		$ret .= "StorageNew->${name}Len = $len;\n}\n";
+	    }
 	} elsif ($defval =~ /^{( ([a-zA-Z][a-zA-Z0-9_:-]*(\([0-9]+\))?|[0-9]+))+ }$/) {
 	    $defval =~ s/^{ //;
 	    $defval =~ s/ }$//;
@@ -420,7 +492,7 @@ sub defval {
 	$ret .= "/* StorageNew->${name} = 0; */ /* DEFVAL $mib->{'defaultValue'} */\n";
 	$defval =~ s/\s*\(\s*/(/g;
 	$defval =~ s/\s*\)/)/g;
-	if ($defval =~ /^$/) {
+	if ($defval =~ /^$/ || $defval =~ /^{\s*}$/) {
 	    foreach my $k (keys(%{$mib->{'enums'}})) {
 		if ($len < $mib->{'enums'}{$k}) {
 		    $len = $mib->{'enums'}{$k};
@@ -489,7 +561,7 @@ sub defval {
 	    $len = (($len + 7) >> 3);
 	    $ret = "if (memdup((u_char **) \&StorageNew->${name}, (u_char *) \"$val\", $len) == SNMPERR_SUCCESS)\n";
 	    $ret .= "StorageNew->${name}Len = $len;\n";
-	} elsif ($defval =~ /^'([0-9a-fA-f]*)'X$/) {
+	} elsif ($defval =~ /^'([0-9a-fA-f]*)'[XHh]$/) {
 	    my $value;
 	    my $length;
 	    foreach my $k (keys %{$mib->{'enums'}}) {
@@ -582,13 +654,13 @@ sub defval {
     return $ret;
 }
 
-$mib = $SNMP::MIB{$oid};
-if ($mib->{'label'} eq "mib-2") {
+my $mymib = $SNMP::MIB{$oid};
+if ($mymib->{'label'} eq "mib-2") {
     print STDERR "Couldn\'t find mib node $oid\n";
     print STDERR "(Note, this should be a MIB object, not a file)\n";
     exit(1);
 }
-$_ = $commaoid = $fulloid = $mib->{'objectID'};
+$_ = $commaoid = $fulloid = $mymib->{'objectID'};
 if (!defined ($fulloid)) {
     print STDERR "Couldn\'t find mib reference: $oid\n";
     exit(1);
@@ -597,11 +669,11 @@ s/[^.]//g;
 $commaoid =~ s/\./,/g;
 $commaoid =~ s/^,//g;
 
-$mibName = $mib->{'label'};
+$mibName = $mymib->{'label'};
 $mibName =~ s/-/_/g;
 $MIBNAME = uc($mibName);
 $mibname = lc($mibName);
-$outputName = $mib->{'label'} if (!defined($outputName));
+$outputName = $mymib->{'label'} if (!defined($outputName));
 $OUTPUTNAME = uc($outputName);
 $outputbase = $outputName;
 $outputbase =~ s/_.*$//;
@@ -647,7 +719,7 @@ print "outputting to $outputName.c and $outputName.h ...\n";
 #
 #============================================
 $count = 0;
-$depth = loadMib($mib,0)-1;
+$depth = loadMib($mymib,0)-1;
 
 #  Determine which 'variableN' structure is needed
 for($varlen = 0; $varlen <= $#varLengths; $varlen++) {
@@ -711,13 +783,20 @@ print "      You will have to modify it in order to make it work properly.\n";
 sub loadMib {
     my $mib = shift;
     my $i;
+    my $c;
     my $depth = shift;
     $depth = $depth + 1;
     my $name = $mib->{'label'};
     $name =~ s/-/_/g;
     my $NAME = uc($name);
     print "doing $mib->{label} : $mib->{objectID}\n" if $debug;
-    $variables{$name}{'oidlen'} = (scalar split(/\./,$mib->{'objectID'})) - 1;
+    if ($debug) {
+	for $c (@{$mib->{'children'}}) {
+	    print "child: ".$c->{'label'}."\n";
+	}
+    }
+    my @elements = split(/\./,$mib->{'objectID'});
+    $variables{$name}{'oidlen'} = (scalar @elements) - 1;
     if (defined($mib->{'access'})) {
 	if ($mib->{'access'} =~ /Read|Write|Create/) {
 	    $count = $count + 1;
@@ -761,19 +840,22 @@ sub loadMib {
     my $children = $$mib{'children'}; 
     my $i;
     my $j;
+    print "processing (".scalar(@{$children})." children): $name\n" if $debug;
     foreach $i (@{$children}) {
 	foreach $j (@{$mib->{'indexes'}}) {
 	    if ($j eq $i->{'label'}) {
 		$variables{$vroutine}{$j}{'ismyindex'} = 1;
 	    }
 	}
-	if ($i->{'textualConvention'} eq "RowStatus") {
-		$variables{$vroutine}{'rowstatus'} = $i->{'label'};
-		$variables{$vroutine}{'rowstatus'} =~ s/-/_/g;
-	}
-	if ($i->{'textualConvention'} eq "StorageType") {
-		$variables{$vroutine}{'storagetype'} = $i->{'label'};
-		$variables{$vroutine}{'storagetype'} =~ s/-/_/g;
+	if ($i->{'textualConvention'}) {
+	    if ($i->{'textualConvention'} eq "RowStatus") {
+		    $variables{$vroutine}{'rowstatus'} = $i->{'label'};
+		    $variables{$vroutine}{'rowstatus'} =~ s/-/_/g;
+	    }
+	    if ($i->{'textualConvention'} eq "StorageType") {
+		    $variables{$vroutine}{'storagetype'} = $i->{'label'};
+		    $variables{$vroutine}{'storagetype'} =~ s/-/_/g;
+	    }
 	}
     }
     foreach $j (@{$mib->{'indexes'}}) {

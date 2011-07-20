@@ -1,3 +1,267 @@
+2011-07-18  Brian Bidulock  <bidulock@openss7.org>
+
+	* doc/projects/mg/mgarch.fig: added diagram
+
+	* src/javascript/back.gif: added javascript mib browser
+	* src/javascript/back.xpm: added javascript mib browser
+	* src/javascript/back_grey.gif: added javascript mib browser
+	* src/javascript/back_grey.xpm: added javascript mib browser
+	* src/javascript/diffDoc.gif: added javascript mib browser
+	* src/javascript/diffDoc.xpm: added javascript mib browser
+	* src/javascript/diffFolder.gif: added javascript mib browser
+	* src/javascript/diffFolder.xpm: added javascript mib browser
+	* src/javascript/forward.gif: added javascript mib browser
+	* src/javascript/forward.xpm: added javascript mib browser
+	* src/javascript/forward_grey.gif: added javascript mib browser
+	* src/javascript/forward_grey.xpm: added javascript mib browser
+	* src/javascript/ftv2blank.gif: added javascript mib browser
+	* src/javascript/ftv2blank.xpm: added javascript mib browser
+	* src/javascript/ftv2doc.gif: added javascript mib browser
+	* src/javascript/ftv2doc.xpm: added javascript mib browser
+	* src/javascript/ftv2folderclosed.gif: added javascript mib browser
+	* src/javascript/ftv2folderclosed.xpm: added javascript mib browser
+	* src/javascript/ftv2folderopen.gif: added javascript mib browser
+	* src/javascript/ftv2folderopen.xpm: added javascript mib browser
+	* src/javascript/ftv2lastnode.gif: added javascript mib browser
+	* src/javascript/ftv2lastnode.xpm: added javascript mib browser
+	* src/javascript/ftv2link.gif: added javascript mib browser
+	* src/javascript/ftv2link.xpm: added javascript mib browser
+	* src/javascript/ftv2mlastnode.gif: added javascript mib browser
+	* src/javascript/ftv2mlastnode.xpm: added javascript mib browser
+	* src/javascript/ftv2mnode.gif: added javascript mib browser
+	* src/javascript/ftv2mnode.xpm: added javascript mib browser
+	* src/javascript/ftv2node.gif: added javascript mib browser
+	* src/javascript/ftv2node.xpm: added javascript mib browser
+	* src/javascript/ftv2plastnode.gif: added javascript mib browser
+	* src/javascript/ftv2plastnode.xpm: added javascript mib browser
+	* src/javascript/ftv2pnode.gif: added javascript mib browser
+	* src/javascript/ftv2pnode.xpm: added javascript mib browser
+	* src/javascript/ftv2vertline.gif: added javascript mib browser
+	* src/javascript/ftv2vertline.xpm: added javascript mib browser
+	* src/javascript/menuBcm.js: added javascript mib browser
+	* src/javascript/menuTitle.js: added javascript mib browser
+	* src/javascript/menuTree.js: added javascript mib browser
+	* src/javascript/mibbrowser.html: added javascript mib browser
+	* src/javascript/mibbrowser.js: added javascript mib browser
+	* src/javascript/mibdata.html: added javascript mib browser
+	* src/javascript/mibdata.js: added javascript mib browser
+	* src/javascript/mibmenu.html: added javascript mib browser
+	* src/javascript/mibvalu.html: added javascript mib browser
+	* src/javascript/mini_blank.gif: added javascript mib browser
+	* src/javascript/mini_blank.xpm: added javascript mib browser
+	* src/javascript/mini_book1.gif: added javascript mib browser
+	* src/javascript/mini_book1.xpm: added javascript mib browser
+	* src/javascript/mini_book2.gif: added javascript mib browser
+	* src/javascript/mini_book2.xpm: added javascript mib browser
+	* src/javascript/mini_book3.gif: added javascript mib browser
+	* src/javascript/mini_book3.xpm: added javascript mib browser
+	* src/javascript/mini_book4.gif: added javascript mib browser
+	* src/javascript/mini_book4.xpm: added javascript mib browser
+	* src/javascript/mini_book5.gif: added javascript mib browser
+	* src/javascript/mini_book5.xpm: added javascript mib browser
+	* src/javascript/mini_book6.gif: added javascript mib browser
+	* src/javascript/mini_book6.xpm: added javascript mib browser
+	* src/javascript/mini_closed.gif: added javascript mib browser
+	* src/javascript/mini_closed.xpm: added javascript mib browser
+	* src/javascript/mini_closed_first.gif: added javascript mib browser
+	* src/javascript/mini_closed_first.xpm: added javascript mib browser
+	* src/javascript/mini_closed_last.gif: added javascript mib browser
+	* src/javascript/mini_closed_last.xpm: added javascript mib browser
+	* src/javascript/mini_closed_only.gif: added javascript mib browser
+	* src/javascript/mini_closed_only.xpm: added javascript mib browser
+	* src/javascript/mini_col1.gif: added javascript mib browser
+	* src/javascript/mini_col1.xpm: added javascript mib browser
+	* src/javascript/mini_col2.gif: added javascript mib browser
+	* src/javascript/mini_col2.xpm: added javascript mib browser
+	* src/javascript/mini_col3.gif: added javascript mib browser
+	* src/javascript/mini_col3.xpm: added javascript mib browser
+	* src/javascript/mini_col4.gif: added javascript mib browser
+	* src/javascript/mini_col4.xpm: added javascript mib browser
+	* src/javascript/mini_col5.gif: added javascript mib browser
+	* src/javascript/mini_col5.xpm: added javascript mib browser
+	* src/javascript/mini_col6.gif: added javascript mib browser
+	* src/javascript/mini_col6.xpm: added javascript mib browser
+	* src/javascript/mini_cont.gif: added javascript mib browser
+	* src/javascript/mini_cont.xpm: added javascript mib browser
+	* src/javascript/mini_cont_last.gif: added javascript mib browser
+	* src/javascript/mini_cont_last.xpm: added javascript mib browser
+	* src/javascript/mini_doc1.gif: added javascript mib browser
+	* src/javascript/mini_doc1.xpm: added javascript mib browser
+	* src/javascript/mini_doc2.gif: added javascript mib browser
+	* src/javascript/mini_doc2.xpm: added javascript mib browser
+	* src/javascript/mini_doc3.gif: added javascript mib browser
+	* src/javascript/mini_doc3.xpm: added javascript mib browser
+	* src/javascript/mini_doc4.gif: added javascript mib browser
+	* src/javascript/mini_doc4.xpm: added javascript mib browser
+	* src/javascript/mini_doc5.gif: added javascript mib browser
+	* src/javascript/mini_doc5.xpm: added javascript mib browser
+	* src/javascript/mini_doc6.gif: added javascript mib browser
+	* src/javascript/mini_doc6.xpm: added javascript mib browser
+	* src/javascript/mini_host1.gif: added javascript mib browser
+	* src/javascript/mini_host1.xpm: added javascript mib browser
+	* src/javascript/mini_host2.gif: added javascript mib browser
+	* src/javascript/mini_host2.xpm: added javascript mib browser
+	* src/javascript/mini_host3.gif: added javascript mib browser
+	* src/javascript/mini_host3.xpm: added javascript mib browser
+	* src/javascript/mini_host4.gif: added javascript mib browser
+	* src/javascript/mini_host4.xpm: added javascript mib browser
+	* src/javascript/mini_host5.gif: added javascript mib browser
+	* src/javascript/mini_host5.xpm: added javascript mib browser
+	* src/javascript/mini_host6.gif: added javascript mib browser
+	* src/javascript/mini_host6.xpm: added javascript mib browser
+	* src/javascript/mini_ind1.gif: added javascript mib browser
+	* src/javascript/mini_ind1.xpm: added javascript mib browser
+	* src/javascript/mini_ind2.gif: added javascript mib browser
+	* src/javascript/mini_ind2.xpm: added javascript mib browser
+	* src/javascript/mini_ind3.gif: added javascript mib browser
+	* src/javascript/mini_ind3.xpm: added javascript mib browser
+	* src/javascript/mini_ind4.gif: added javascript mib browser
+	* src/javascript/mini_ind4.xpm: added javascript mib browser
+	* src/javascript/mini_ind5.gif: added javascript mib browser
+	* src/javascript/mini_ind5.xpm: added javascript mib browser
+	* src/javascript/mini_ind6.gif: added javascript mib browser
+	* src/javascript/mini_ind6.xpm: added javascript mib browser
+	* src/javascript/mini_none.gif: added javascript mib browser
+	* src/javascript/mini_none.xpm: added javascript mib browser
+	* src/javascript/mini_none_first.gif: added javascript mib browser
+	* src/javascript/mini_none_first.xpm: added javascript mib browser
+	* src/javascript/mini_none_last.gif: added javascript mib browser
+	* src/javascript/mini_none_last.xpm: added javascript mib browser
+	* src/javascript/mini_none_only.gif: added javascript mib browser
+	* src/javascript/mini_none_only.xpm: added javascript mib browser
+	* src/javascript/mini_note.gif: added javascript mib browser
+	* src/javascript/mini_note.xpm: added javascript mib browser
+	* src/javascript/mini_obj1.gif: added javascript mib browser
+	* src/javascript/mini_obj1.xpm: added javascript mib browser
+	* src/javascript/mini_obj2.gif: added javascript mib browser
+	* src/javascript/mini_obj2.xpm: added javascript mib browser
+	* src/javascript/mini_obj3.gif: added javascript mib browser
+	* src/javascript/mini_obj3.xpm: added javascript mib browser
+	* src/javascript/mini_obj4.gif: added javascript mib browser
+	* src/javascript/mini_obj4.xpm: added javascript mib browser
+	* src/javascript/mini_open.gif: added javascript mib browser
+	* src/javascript/mini_open.xpm: added javascript mib browser
+	* src/javascript/mini_open_first.gif: added javascript mib browser
+	* src/javascript/mini_open_first.xpm: added javascript mib browser
+	* src/javascript/mini_open_last.gif: added javascript mib browser
+	* src/javascript/mini_open_last.xpm: added javascript mib browser
+	* src/javascript/mini_open_only.gif: added javascript mib browser
+	* src/javascript/mini_open_only.xpm: added javascript mib browser
+	* src/javascript/mini_parm.gif: added javascript mib browser
+	* src/javascript/mini_parm.xpm: added javascript mib browser
+	* src/javascript/myTree.js: added javascript mib browser
+	* src/javascript/streams_icon.gif: added javascript mib browser
+	* src/javascript/streams_icon.xpm: added javascript mib browser
+	* src/perl/gentree: added javascript mib browser
+	* src/perl/testformat: added javascript mib browser
+
+	* src/mibs/MEGACO-MIB.mib: added new mibs
+	* src/mibs/MEGACO-RINGING-MIB.mib: added new mibs
+	* src/mibs/MEGACO-TONES-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-GCP-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-MG-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-RTPSW-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-RTPSW-OM-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-RTPXC-MIB.mib: added new mibs
+	* src/mibs/OPENSS7-RTPXC-OM-MIB.mib: added new mibs
+	* src/snmp/sfpMIB.c: added new mibs
+	* src/snmp/sfpMIB.h: added new mibs
+	* src/snmp/sfpOmMIB.c: added new mibs
+	* src/snmp/sfpOmMIB.h: added new mibs
+
+	* doc/papers/Makefile.am: added xcode documentation
+	* doc/papers/xcode/Makefile.am: added xcode documentation
+	* doc/papers/xcode/Makefile.in: added xcode documentation
+	* doc/papers/xcode/org.css: added xcode documentation
+	* doc/papers/xcode/xc01.fig: added xcode documentation
+	* doc/papers/xcode/xc02.fig: added xcode documentation
+	* doc/papers/xcode/xc03.fig: added xcode documentation
+	* doc/papers/xcode/xc04.fig: added xcode documentation
+	* doc/papers/xcode/xc05.fig: added xcode documentation
+	* doc/papers/xcode/xc06.fig: added xcode documentation
+	* doc/papers/xcode/xc07.fig: added xcode documentation
+	* doc/papers/xcode/xc08.fig: added xcode documentation
+	* doc/papers/xcode/xc08.txt: added xcode documentation
+	* doc/papers/xcode/xc09.fig: added xcode documentation
+	* doc/papers/xcode/xc10.fig: added xcode documentation
+	* doc/papers/xcode/xcode.bib: added xcode documentation
+	* doc/papers/xcode/xcode.tex: added xcode documentation
+	* doc/specs/Makefile.am: added xgcp documentation
+	* doc/specs/xgcp/Makefile.am: added xgcp documentation
+	* doc/specs/xgcp/Makefile.in: added xgcp documentation
+	* doc/specs/xgcp/xgcp.texi: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab001.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab002.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab003.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab004.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab005.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab006.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab007.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab008.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab009.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab010.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab011.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab012.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab013.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab014.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab015.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab016.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab020.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab021.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab022.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab023.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab024.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab025.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab026.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab027.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab028.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab029.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab030.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab031.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab032.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab033.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab034.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab035.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab036.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab037.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab038.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab039.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab040.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab041.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab042.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab043.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab051.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab052.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab053.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab054.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab055.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab056.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab057.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab058.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab059.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab060.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab061.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab062.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab063.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab064.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab065.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab066.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab067.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab068.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab069.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab070.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab071.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab072.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tab073.tbl: added xgcp documentation
+	* doc/specs/xgcp/xgcp_tabxxx.tbl: added xgcp documentation
+	* doc/specs/xmap/xmap.texi: updated xmap documentation
+	* doc/suites/MG.texi: added figures to MG suite
+	* doc/suites/Makefile.am: added figures to MG suite
+	* doc/suites/mg04.fig: added figures to MG suite
+	* doc/suites/mg05.fig: added figures to MG suite
+	* doc/suites/mg06.fig: added figures to MG suite
+	* doc/suites/mg07.fig: added figures to MG suite
+
 2011-06-09  Brian Bidulock  <bidulock@openss7.org>
 
 	* mageia-1-x86_64-config.cache: new build caches

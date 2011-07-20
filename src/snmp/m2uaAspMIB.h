@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $Id: m2uaAspMIB.h,v 1.1.2.2 2010-11-28 14:22:12 brian Exp $
+ @(#) $Id: m2uaAspMIB.h,v 1.1.2.3 2011-07-18 19:42:26 brian Exp $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:12 $ by $Author: brian $
+ Last Modified $Date: 2011-07-18 19:42:26 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2uaAspMIB.h,v $
+ Revision 1.1.2.3  2011-07-18 19:42:26  brian
+ - added documentation
+
  Revision 1.1.2.2  2010-11-28 14:22:12  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -132,7 +135,8 @@ struct m2uaSgTable_data {
 	uint8_t *m2uaSgProceduralStatus;	/* ReadOnly */
 	size_t m2uaSgProceduralStatusLen;
 	long m2uaSgStandbyStatus;	/* ReadOnly */
-	ulong m2uaSgPrimarySg;		/* ReadOnly */
+	uint8_t *m2uaSgPrimarySg;	/* ReadOnly */
+	size_t m2uaSgPrimarySgLen;
 	long m2uaSgAspState;		/* Create */
 	long m2uaSgUsageState;		/* ReadOnly */
 	long m2uaSgVersion;		/* Create */
@@ -154,8 +158,7 @@ struct m2uaAspSgTable_data {
 	size_t m2uaAspIdLen;
 	uint8_t *m2uaSgId;		/* NoAccess */
 	size_t m2uaSgIdLen;
-	long m2uaAspSgAdminstrativeState;	/* Create */
-	long m2uaAspSgOperationalState;	/* ReadOnly */
+	long m2uaAspSgAdministrativeState;	/* Create */
 	uint8_t *m2uaAspSgProceduralStatus;	/* ReadOnly */
 	size_t m2uaAspSgProceduralStatusLen;
 	long m2uaAspSgUsageState;	/* ReadOnly */
@@ -207,6 +210,7 @@ struct m2uaAsIfTable_data {
 	size_t m2uaAsIdLen;
 	uint8_t *m2uaIfId;		/* NoAccess */
 	size_t m2uaIfIdLen;
+	long m2uaAsIfEntryRowStatus;	/* Create */
 };
 struct m2uaSgAsTable_data {
 	uint m2uaSgAsTable_request;
@@ -217,7 +221,6 @@ struct m2uaSgAsTable_data {
 	size_t m2uaAsIdLen;
 	ulong m2uaSgAsOrdering;		/* Create */
 	long m2uaSgAsAdministrativeState;	/* Create */
-	long m2uaSgAsOperationalState;	/* ReadOnly */
 	uint8_t *m2uaSgAsProceduralStatus;	/* ReadOnly */
 	size_t m2uaSgAsProceduralStatusLen;
 	long m2uaSgAsUsageState;	/* ReadOnly */
@@ -360,12 +363,9 @@ extern struct header_complex_index *m2uaAspSgAsTableStorage;
 #define M2UASGREGISTRATIONPOLICY_PERMITTED       3
 #define M2UASGREGISTRATIONPOLICY_REQUIRED        4
 
-#define M2UAASPSGADMINSTRATIVESTATE_LOCKED       0
-#define M2UAASPSGADMINSTRATIVESTATE_UNLOCKED     1
-#define M2UAASPSGADMINSTRATIVESTATE_SHUTTINGDOWN 2
-
-#define M2UAASPSGOPERATIONALSTATE_DISABLED       0
-#define M2UAASPSGOPERATIONALSTATE_ENABLED        1
+#define M2UAASPSGADMINISTRATIVESTATE_LOCKED      0
+#define M2UAASPSGADMINISTRATIVESTATE_UNLOCKED    1
+#define M2UAASPSGADMINISTRATIVESTATE_SHUTTINGDOWN 2
 
 #define M2UAASPSGPROCEDURALSTATUS_INITIALIZATIONREQUIRED 0
 #define M2UAASPSGPROCEDURALSTATUS_NOTINITIALIZED 1
@@ -434,9 +434,6 @@ extern struct header_complex_index *m2uaAspSgAsTableStorage;
 #define M2UASGASADMINISTRATIVESTATE_UNLOCKED     1
 #define M2UASGASADMINISTRATIVESTATE_SHUTTINGDOWN 2
 
-#define M2UASGASOPERATIONALSTATE_DISABLED        0
-#define M2UASGASOPERATIONALSTATE_ENABLED         1
-
 #define M2UASGASPROCEDURALSTATUS_INITIALIZATIONREQUIRED 0
 #define M2UASGASPROCEDURALSTATUS_NOTINITIALIZED  1
 #define M2UASGASPROCEDURALSTATUS_INITIALIZING    2
@@ -489,6 +486,14 @@ extern struct header_complex_index *m2uaAspSgAsTableStorage;
 #define M2UAASPASUSAGESTATE_ACTIVE               1
 #define M2UAASPASUSAGESTATE_BUSY                 2
 
+#define M2UAASPASASSTATE_DOWN                    1
+#define M2UAASPASASSTATE_INITIALIZING            2
+#define M2UAASPASASSTATE_TERMINATING             3
+#define M2UAASPASASSTATE_INACTIVE                4
+#define M2UAASPASASSTATE_ACTIVATING              5
+#define M2UAASPASASSTATE_DEACTIVATING            6
+#define M2UAASPASASSTATE_ACTIVE                  7
+
 #define M2UAASPSGASADMINISTRATIVESTATE_LOCKED    0
 #define M2UAASPSGASADMINISTRATIVESTATE_UNLOCKED  1
 #define M2UAASPSGASADMINISTRATIVESTATE_SHUTTINGDOWN 2
@@ -523,6 +528,8 @@ extern struct header_complex_index *m2uaAspSgAsTableStorage;
 /* scalars accessible only for notify */
 
 /* object id definitions */
+extern oid m2uaAspFullCompliance_oid[12];
+extern oid m2uaAspFullGroup_oid[12];
 
 /* function prototypes */
 /* trap function prototypes */
@@ -635,7 +642,7 @@ WriteMethod write_m2uaSgPrimaryIpAddress;
 WriteMethod write_m2uaSgMinOstreams;
 WriteMethod write_m2uaSgMaxIstreams;
 WriteMethod write_m2uaSgRowStatus;
-WriteMethod write_m2uaAspSgAdminstrativeState;
+WriteMethod write_m2uaAspSgAdministrativeState;
 WriteMethod write_m2uaAspSgAspState;
 WriteMethod write_m2uaAspSgAspIdPolicy;
 WriteMethod write_m2uaAspSgAspId;
@@ -654,6 +661,7 @@ WriteMethod write_m2uaIfAsIndex;
 WriteMethod write_m2uaIfIdentifier;
 WriteMethod write_m2uaIfName;
 WriteMethod write_m2uaIfRowStatus;
+WriteMethod write_m2uaAsIfEntryRowStatus;
 WriteMethod write_m2uaSgAsOrdering;
 WriteMethod write_m2uaSgAsAdministrativeState;
 WriteMethod write_m2uaSgAsRowStatus;

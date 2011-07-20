@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.16 $) $Date: 2011-05-31 09:46:02 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.17 $) $Date: 2011-07-18 19:42:16 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-05-31 09:46:02 $ by $Author: brian $
+# Last Modified $Date: 2011-07-18 19:42:16 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,7 +147,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: modpost.awk,v 1.1.2.16 2011-05-31 09:46:02 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.17 2011-07-18 19:42:16 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [MODULE ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -274,7 +274,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.16 2011-05-31 09:46:02 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.17 2011-07-18 19:42:16 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -297,7 +297,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.16 2011-05-31 09:46:02 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.17 2011-07-18 19:42:16 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -2015,7 +2015,10 @@ BEGIN {
 	    command = cat_command("/boot/System.map-" kversion ".bz2")
 	    if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
 	    else {
-	    print_error("r: systemmap, file not found") } } }
+	    command = cat_command("/lib/modules/" kversion "/build/System.map")
+	    if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
+	    else {
+	    print_error("r: systemmap, file not found") } } } }
 	}
 	if (("infile" in values) && values["infile"]) {
 	    command = cat_command(values["infile"])
@@ -2083,6 +2086,9 @@ END {
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.17  2011-07-18 19:42:16  brian
+# - added documentation
+#
 # Revision 1.1.2.16  2011-05-31 09:46:02  brian
 # - new distros
 #
