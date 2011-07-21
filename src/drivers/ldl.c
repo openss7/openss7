@@ -1940,7 +1940,7 @@ eth_8022_want(struct dl *dl, unsigned char *fr, int len)
 	/* 
 	 * Check the registered multicast address list ...
 	 */
-#ifdef netdev_for_each_mc_addr
+#ifdef netdev_hw_addr_list_for_each
 	{
 		struct netdev_hw_addr *ha;
 		netdev_for_each_mc_addr(ha, dl->ndev->dev) {
