@@ -3644,7 +3644,7 @@ CLEAN_LOCAL += clean-org_openss7_xti
 my_tcap_JAVAFILES = \
 	org/openss7/tcap/SccpAddress.java \
 	org/openss7/tcap/sccp_addr_t.java \
-	org/openss7/tcap/SWIGTYPE_p___std__listT_tci__TcapOption_t.java \
+	org/openss7/tcap/SWIGTYPE_p_std__listT_tci__TcapOption_t.java \
 	org/openss7/tcap/TcapAbort.java \
 	org/openss7/tcap/TcapAccept.java \
 	org/openss7/tcap/TcapAllow.java \
@@ -3677,7 +3677,7 @@ my_tcap_JAVAFILES = \
 my_tcap_CLASSFILES = \
 	org/openss7/tcap/SccpAddress.class \
 	org/openss7/tcap/sccp_addr_t.class \
-	org/openss7/tcap/SWIGTYPE_p___std__listT_tci__TcapOption_t.class \
+	org/openss7/tcap/SWIGTYPE_p_std__listT_tci__TcapOption_t.class \
 	org/openss7/tcap/TcapAbort.class \
 	org/openss7/tcap/TcapAccept.class \
 	org/openss7/tcap/TcapAllow.class \
