@@ -238,8 +238,6 @@ AC_CONFIG_FILES([Makefile
 		 doc/manual/Makefile
 		 doc/papers/Makefile
 		 doc/papers/xcode/Makefile
-		 doc/papers/optranex/Makefile
-		 doc/papers/chan/Makefile
 		 doc/papers/inet/Makefile
 		 doc/papers/sctp/Makefile
 		 doc/papers/sigtran/Makefile
