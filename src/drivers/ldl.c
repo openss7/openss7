@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-06-01 03:00:19 $
+ @(#) $RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-07-21 04:35:58 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-06-01 03:00:19 $ by $Author: brian $
+ Last Modified $Date: 2011-07-21 04:35:58 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl.c,v $
+ Revision 1.1.2.6  2011-07-21 04:35:58  brian
+ - builds on CentOS 6.0
+
  Revision 1.1.2.5  2011-06-01 03:00:19  brian
  - added back ldl support
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-06-01 03:00:19 $";
+static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-07-21 04:35:58 $";
 
 #define _SVR4_SOURCE
 
@@ -99,7 +102,7 @@ static char const ident[] = "$RCSfile: ldl.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 #define LDL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LDL_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-06-01 03:00:19 $"
+#define LDL_REVISION	"LfS $RCSfile: ldl.c,v $ $Name:  $ ($Revision: 1.1.2.6 $) $Date: 2011-07-21 04:35:58 $"
 #define LDL_DEVICE	"SVR 4.2 MP STREAMS INET DLPI Drivers (NET4)"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"
