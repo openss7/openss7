@@ -8264,7 +8264,7 @@ write_tcapTransferSyntaxRowStatus(int action, u_char *var_val, u_char var_val_ty
 			memdup((void *) &StorageNew->tcapApplicationEntityId, vp->val.string, vp->val_len);
 			StorageNew->tcapApplicationEntityIdLen = vp->val_len;
 			vp = vp->next_variable;
-			memdup((void *) &StorageNew->tcapTransferSyntaxId, (uint8_t *) vp->val.oid, vp->val_len);
+			memdup((void *) &StorageNew->tcapTransferSyntaxId, (uint8_t *) vp->val.objid, vp->val_len);
 			StorageNew->tcapTransferSyntaxIdLen = vp->val_len;
 			vp = vp->next_variable;
 			header_complex_add_data(&tcapTransferSyntaxTableStorage, vars, StorageNew);	/* frees vars */
