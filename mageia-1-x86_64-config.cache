@@ -46,7 +46,6 @@ bld_cv_pkg_cmd_SYMVERS_2_6_38_7_DESKTOP_1_MGA_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_38
 bld_cv_pkg_cmd_TBL=${bld_cv_pkg_cmd_TBL='urpmi groff-for-man'}
 bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='urpmi libtcl-devel'}
 bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H='urpmi lib64net-snmp-devel'}
-bld_cv_pkg_cmd_XZ_CMD=${bld_cv_pkg_cmd_XZ_CMD='urpmi xz'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='urpmi zip'}
 bld_cv_pkg_name_BIBTEX=${bld_cv_pkg_name_BIBTEX=texlive}
 bld_cv_pkg_name_BZIP2_CMD=${bld_cv_pkg_name_BZIP2_CMD=bzip2}
@@ -96,7 +95,6 @@ bld_cv_pkg_name_SYMVERS_2_6_38_7_DESKTOP_1_MGA_GZ=${bld_cv_pkg_name_SYMVERS_2_6_
 bld_cv_pkg_name_TBL=${bld_cv_pkg_name_TBL=groff-for-man}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=libtcl-devel}
 bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=lib64net-snmp-devel}
-bld_cv_pkg_name_XZ_CMD=${bld_cv_pkg_name_XZ_CMD=xz}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib/perl5/5.12.3/x86_64-linux-thread-multi/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/libgcj-4.5.2/gcj/cni.h}
@@ -204,5 +202,4 @@ bld_cv_pkg_ver_SYMVERS_2_6_38_7_DESKTOP_1_MGA_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_38
 bld_cv_pkg_ver_TBL=${bld_cv_pkg_ver_TBL=1.20.1}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.6}
 bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.6.1}
-bld_cv_pkg_ver_XZ_CMD=${bld_cv_pkg_ver_XZ_CMD=5.0.2}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=3.0}
