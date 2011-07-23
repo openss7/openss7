@@ -904,7 +904,7 @@ MY_PHONY		+= repo-sign $(REPO_SIGN)
 #!     `release-clean' target at the end of removal of distribution packages.
 #!
 repo-clean: $(REPO_CLEAN)
-	list="$(REPOCLEANFILES)" ; $(am__list_remove)
+	@list="$(REPOCLEANFILES)" ; $(am__list_remove)
 
 MY_PHONY		+= repo-clean $(REPO_CLEAN)
 
