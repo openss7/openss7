@@ -354,7 +354,8 @@ STRIP_KERNEL_MODULES	= $(STRIP) --strip-debug
 # and strips if required.  We use libtool to install even though these are not .la libraries but
 # just objects.  We set kernel module stripping as above.  Note that we do not strip kernel modules
 # if rpm is going to perform stripping; however, an execute flag must be set on the modules to get
-# RH rpms to strip them.
+# RH rpms to strip them.  Note that when generating debug-information for RPM we must process kernel
+# modules before they are compressed (on Mageia and Mandriva) or debuginfo will not be generated.
 ##
 install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -362,22 +363,38 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
 	$(mkinstalldirs) $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)
 	some=no ; \
-	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| $(kpre)|g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext) |g'` ; for p in $$list ; do \
-		if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
+	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| $(kpre)|g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext) |g'` ; \
+	if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
+		for p in $$list ; do \
 			$(ECHO) "$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 			$(LIBTOOL) --mode=install $(INSTALL) -m 644 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
 			$(ECHO) "$(STRIP_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 			$(STRIP_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
-		else \
+			some=yes ; \
+		done ; \
+	else \
+		for p in $$list ; do \
 			$(ECHO) "$(LIBTOOL) --mode=install $(INSTALL) -m 744 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 			$(LIBTOOL) --mode=install $(INSTALL) -m 744 $$p $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
-		fi ; \
+			some=yes ; \
+		done ; \
 		if test -n "$(COMPRESS_KERNEL_MODULES)" ; then \
+			if test -n "$(RPM_BUILD_DIR)" -a -n "$(RPM_PACKAGE_NAME)" -a -n "$(RPM_PACKAGE_VERSION)" ; then \
+				x=/usr/lib/rpm/mageia/find-debuginfo.sh ; \
+				test -x $$x || x=/usr/lib/rpm/mandriva/find-debuginfo.sh ; \
+				test -x $$x || x=/usr/lib/rpm/find-debuginfo.sh ; \
+				if test -x $$x ; then \
+					$$x $(RPM_BUILD_DIR)/$(RPM_PACKAGE_NAME)-$(RPM_PACKAGE_VERSION) || : ; \
+				fi ; \
+			fi ; \
+		fi ; \
+	fi ; \
+	if test -n "$(COMPRESS_KERNEL_MODULES)" ; then \
+		for p in $$list ; do \
 			$(ECHO) "$(COMPRESS_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p" ; \
 			$(COMPRESS_KERNEL_MODULES) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)/$$p ; \
-		fi ; \
-		some=yes ; \
-	done ; \
+		done ; \
+	fi ; \
 	if test :"$$some" = :yes ; then \
 		list='$(KERNEL_AUX_FILES)' ; for f in $$list ; do \
 			if test -f $$f ; then \
