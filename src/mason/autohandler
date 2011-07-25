@@ -17,13 +17,15 @@
 <%perl>
     $m->call_next unless (
 	    $page eq 'OPENSS7credentials' or
-	    $page eq 'openss7.repo'       or
-	    $page eq 'mirrorlist'         or
+	    $page eq 'netrc.openss7'	  or
+	    $page eq 'openss7.repo'	  or
+	    $page eq 'mirrorlist'	  or
 	    $page eq 'openss7.list'	  or
 	    $page eq 'repoindex.xml'	  or
+	    $page eq 'media.cfg'	  or
 	    $page eq 'OPENSS7.service' );
 
-    my ($fd,$url,$distro,$relver,$osarch,$branch,$subrep);
+    my ($fd,$url,$distro,$relver,$osarch,$media,$branch,$subrep);
     my ($username,$userpass,$usergrps,$useraccs,$usercred,$userdata,$userinfo,$userauth,$userdflt,$date);
     my ($hostname,$hostpass,$hostgrps,$hostaccs,$hostcred,$hostdata,$hostinfo,$hostauth,$testpass);
 
@@ -37,31 +39,43 @@
     if ( $page eq 'openss7.repo'	or
 	 $page eq 'mirrorlist'		or
 	 $page eq 'OPENSS7credentials'	or
-	 $page eq 'openss7.list' )
+	 $page eq 'netrc.openss7'	or
+	 $page eq 'openss7.list'	or
+	 $page eq 'media.cfg'		)
     {
 	$distro = $ARGS{'distro'};
 	$relver = $ARGS{'relver'};
 	$osarch = $ARGS{'osarch'};
 
-	if ( $page eq 'openss7.repo' and (!$distro or !$relver or !$osarch))
-	{
-	    if ( $r->uri !~ m,/repo/rpms/(([^/].*)/)?repodata/(.*)$, ) {
-		$r->log_reason("file is out of place", $r->filename);
-		$m->abort(404);
-	    }
-	    $url = $2;
-	}
-	if ( $page eq 'openss7.list' and (!$distro or !$relver or !$osarch))
-	{
-	    if ( $r->uri !~ m,/repo/debs/(([^/].*)/)?(.*)$, ) {
-		$r->log_reason("file is out of place", $r->filename);
-		$m->abort(404);
-	    }
-	    $url = $2;
-	}
-	if ( ($page eq 'openss7.repo' or $page eq 'openss7.list') and
+	if ( ($page eq 'openss7.repo'	or
+	      $page eq 'openss7.list'	or
+	      $page eq 'media.cfg'	) and
 	     (!$distro or !$relver or !$osarch) )
 	{
+	    if ( $page eq 'openss7.repo' )
+	    {
+		if ( $r->uri !~ m,/repo/rpms/(([^/].*)/)?repodata/(.*)$, ) {
+		    $r->log_reason("file is out of place", $r->filename);
+		    $m->abort(404);
+		}
+		$url = $2;
+	    }
+	    elsif ( $page eq 'openss7.list' )
+	    {
+		if ( $r->uri !~ m,/repo/debs/(([^/].*)/)?(.*)$, ) {
+		    $r->log_reason("file is out of place", $r->filename);
+		    $m->abort(404);
+		}
+		$url = $2;
+	    }
+	    elsif ( $page eq 'media.cfg' )
+	    {
+		if ( $r->uri !~ m,/repo/rpms/(([^/].*)/)?media/media_info/(.*)$, ) {
+		    $r->log_reason("file is out of place", $r->filename);
+		    $m->abort(404);
+		}
+		$url = $2;
+	    }
 	    if ($url) {
 		my @fields = split(/\//,$url);
 
@@ -176,9 +190,11 @@
 	$userpass = $userinfo->{'REMOTE_PASS'} if ( exists $userinfo->{'REMOTE_PASS'} );
     }
 
-    if ( $page eq 'OPENSS7credentials' or
-	 $page eq 'openss7.repo' or
-	 $page eq 'openss7.list' )
+    if ( $page eq 'OPENSS7credentials'	or
+	 $page eq 'netrc.openss7'	or
+	 $page eq 'openss7.repo'	or
+	 $page eq 'openss7.list'	or
+	 $page eq 'media.cfg'		)
     {
 	unless ($hn) {
 	    $r->log_reason("hn argument required", $r->uri.'?'.scalar($r->args));
@@ -205,7 +221,10 @@
 		chomp $hostname;
 		$hostname =~ s/-//g;
 	    }
-	    $hostname = substr($hostname,0,24) if ( $page eq 'openss7.repo' or $page eq 'openss7.list' );
+	    $hostname = substr($hostname,0,24) if ( $page eq 'openss7.repo'	or
+						    $page eq 'openss7.list'	or
+						    $page eq 'netrc.openss7'	or
+						    $page eq 'media.cfg'	);
 
 	    $hostauth = $userauth;
 
@@ -233,7 +252,10 @@
 		    chomp $hostpass;
 		    $hostpass =~ s/-//g;
 		}
-		$hostpass = substr($hostpass,0,24) if ( $page eq 'openss7.repo' or $page eq 'openss7.list' );
+		$hostpass = substr($hostpass,0,24) if ( $page eq 'openss7.repo'	 or
+							$page eq 'openss7.list'	 or
+							$page eq 'netrc.openss7' or
+							$page eq 'media.cfg'	 );
 
 		$hostcred = `htpasswd -nbm $hostname $hostpass`; chomp $hostcred;
 		$hostcred =~ s/^[^:]*://;
@@ -292,7 +314,9 @@
 	$userinfo->{'REPO_LAST_COUNT'}		 = $count;
 	$userinfo->{'REPO_LAST_ACCESS'}		 = $date;
 	$userinfo->{'REPO_LAST_ACCFILE'}	 = $page;
-	$userinfo->{'REPO_ACCESS_STATUS'}	 = 'accessed' if ( $page eq 'OPENSS7credentials' or $page eq 'repoindex.xml' );
+	$userinfo->{'REPO_ACCESS_STATUS'}	 = 'accessed' if ( $page eq 'OPENSS7credentials' or 
+								   $page eq 'netrc.openss7'	 or
+								   $page eq 'repoindex.xml'	 );
 	$userinfo->{'REPO_LAST_HTTP_HOST'}	 = $ENV{'HTTP_HOST'};
 	$userinfo->{'REPO_LAST_HTTP_USER_AGENT'} = $ENV{'HTTP_USER_AGENT'};
 	$userinfo->{'REPO_LAST_REMOTE_ADDR'}	 = $ENV{'REMOTE_ADDR'};
@@ -331,7 +355,8 @@
 	$hostinfo->{'REPO_LAST_COUNT'}		 = $count;
 	$hostinfo->{'REPO_LAST_ACCESS'}		 = $date;
 	$hostinfo->{'REPO_LAST_ACCFILE'}	 = $page;
-	$hostinfo->{'REPO_ACCESS_STATUS'}	 = 'accessed' if ( $page eq 'mirrorlist' or $page eq 'repoindex.xml' );
+	$hostinfo->{'REPO_ACCESS_STATUS'}	 = 'accessed' if ( $page eq 'mirrorlist'    or
+								   $page eq 'repoindex.xml' );
 	$hostinfo->{'REPO_LAST_HTTP_HOST'}	 = $ENV{'HTTP_HOST'};
 	$hostinfo->{'REPO_LAST_HTTP_USER_AGENT'} = $ENV{'HTTP_USER_AGENT'};
 	$hostinfo->{'REPO_LAST_REMOTE_ADDR'}	 = $ENV{'REMOTE_ADDR'};
@@ -345,6 +370,7 @@
 	    push @hostgrps, 'zypp-hosts' if ( $page eq 'OPENSS7credentials' );
 	    push @hostgrps, 'yum-hosts'  if ( $page eq 'openss7.repo' );
 	    push @hostgrps, 'apt-hosts'  if ( $page eq 'openss7.list' );
+	    push @hostgrps, 'urpm-hosts' if ( $page eq 'netrc.openss7' );
 	    foreach my $g ( split(/,/,$usergrps) ) {
 		push @hostgrps, $g.'-hosts';
 	    }
@@ -373,7 +399,17 @@ username=<% $hostname %>
 password=<% $hostpass %>
 <%perl>
     }
-    elsif ( $page eq 'openss7.repo' or $page eq 'OPENSS7.service' or $page eq 'openss7.list' )
+    elsif ( $page eq 'netrc.openss7' )
+    {
+	$r->content_type('text/plain');
+</%perl>
+machine www.openss7.org login <% $hostname %> password <% $hostpass %>
+<%perl>
+    }
+    elsif ( $page eq 'openss7.repo'	or
+	    $page eq 'OPENSS7.service'	or
+	    $page eq 'openss7.list'	or
+	    $page eq 'media.cfg'	)
     {
 	my @brarepos = ( 'base', 'extras', 'updates', 'testing' );
 	my @subrepos = ( 'full', 'main', 'debug', 'devel', 'source' );
@@ -384,26 +420,31 @@ password=<% $hostpass %>
 	my $emptyrepo = 0;
 	$emptyrepo = 1 if ( -e $ENV{'DOCUMENT_ROOT'}.'/repo/rpms/repodata/repomd.xml' );
 	$emptyrepo = 0 if ( $page eq 'openss7.list' );
+	$emptyrepo = 0 if ( $page eq 'media.cfg' );
 
 	my $toenable;
+
+	if ( $page eq 'media.cfg' ) {
+<%/perl>
+[media_info]
+version=1.1.2
+mediacfg_version=2
+branch=Release
+arch=<% $osarch %>
+xml-info=1
+
+<%perl>
+	}
 
 	for $branch ( @brarepos )
 	{
 	    for $subrep ( @subrepos )
 	    {
-		my $manage;
-		$manage = 'yum';
-		$manage = 'zypp' if ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ );
-		$manage = 'apt'  if ( $distro =~ m/^(debian|ubuntu|mint|knoppix|pclinux)$/ );
-
-		my $enterp;
-		$enterp = 'community';
-		$enterp = 'enterprise' if ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ );
+		my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
+		   $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
+		my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes)$/ ) ? 'enterprise' : 'community';
 		# FIXME: need to handle ubuntu LTS
-
-		my $server;
-		$server = 'desktop';
-		$server = 'server' if ( $osarch !~ m/^i[3456]86$/ );
+		my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
 		my $reason = '';
 
@@ -589,6 +630,92 @@ password=<% $hostpass %>
 
 <%perl>
 		}
+		elsif ( $page eq 'media.cfg' )
+		{
+		    next if ( !$offerred );
+
+		    # do not even advertize 'testing', 'extras' or 'source'-containing repos
+		    next if ( !$allowed and $branch eq 'testing' );
+		    next if ( !$allowed and $subrep eq 'full'    );
+		    next if ( !$allowed and $subrep eq 'source'  );
+
+		    $url = 'repo/rpms';
+		    $url .= "/$distro" if ($distro);
+		    $url .= "/$relver";
+		    $url .= "/$osarch";
+		    $url .= "/media";
+		    $url .= "/$branch" if ($branch ne 'base');
+		    $url .= "/$subrep" if ($subrep ne 'full');
+
+		    my $present = 0;
+		    $present = 1 if ( -e $ENV{'DOCUMENT_ROOT'}.$url.'/media_info/hdlist.cz' );
+
+		    my $pre = '';
+		    $pre = '#' if ( !$present and !$emptyrepo );
+
+		    my $s;
+		    if ($subrep eq 'full')
+		    { if ($branch eq 'base') { $s = ''; } else { $s = $branch; } } else
+		    { if ($branch eq 'base') { $s = $subrep; } else { $s = $branch.'/'.$subrep; } }
+		    my $r;
+		    if    ($subrep eq 'full')	{ $r = 'Full';	 }
+		    elsif ($subrep eq 'main')	{ $r = 'Main';	 }
+		    elsif ($subrep eq 'debug')	{ $r = 'Debug';	 }
+		    elsif ($subrep eq 'devel')	{ $r = 'Devel';	 }
+		    elsif ($subrep eq 'source')	{ $r = 'Source'; }
+		    else			{ $r = $subrep;	 }
+		    my $b;
+		    if	  ($branch eq 'base')	 { $b = 'Core';	   }
+		    elsif ($branch eq 'updates') { $b = 'Updates'; }
+		    elsif ($branch eq 'extras')	 { $b = 'Extras';  }
+		    elsif ($branch eq 'testing') { $b = 'Testing'; }
+		    else			 { $b = $branch;   }
+		    my $n = $r.' '.$b;
+		    my $t = 'release:'.$branch.':'.$subrep;
+
+		    if ( !$allowed ) {
+			$enabled = 0;
+			$pre = '#' unless ( $emptyrepo );
+			if ( $hostaccs =~ /,guests-hosts,/ ) {
+</%perl>
+<% $pre %># This repository is not authorized by default.
+<% $pre %># To activate this repository, contact &lt;sales@openss7.com&gt;.
+<%perl>
+			} else {
+</%perl>
+<% $pre %># This repository is currently not authorized to host <% $hostname %>.
+<% $pre %># <% $reason %>.
+<% $pre %># To activate this repository, contact your software provider [<% $username %>].
+<%perl>
+			}
+		    }
+</%perl>
+<% $pre %>[<% $s %>]
+<% $pre %>name=<% $n %>
+<% $pre %>media_type=<% $t %>
+<%perl>
+		if ( $subrep eq 'source' ) {
+		    my $b = 'main';
+		    $b = $branch.'/'.$b if ($branch ne 'full');
+</%perl>
+<% $pre %>rpms=<% $b %>
+<%perl>
+		} else {
+		    my $b = 'source';
+		    $b = $branch.'/'.$b if ($branch ne 'full');
+</%perl>
+<% $pre %>srpms=<% $b %>
+<%perl>
+		}
+		    if ( !$enabled ) {
+</%perl>
+<% $pre %>noauto=1
+<%perl>
+		    }
+</%perl>
+
+<%perl>
+		}
 		elsif ( $page eq 'OPENSS7.service' )
 		{
 		    $toenable = "$toenable OPENSS7:$name" if ($enabled);
@@ -646,7 +773,8 @@ repostoenable =<% $toenable %>
 	    ($distro,$relver,$osarch,$branch,$subrep) = @fields;
 
 	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
-	    my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ ) ? 'enterprise' : 'community';
+	       $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
+	    my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes)$/ ) ? 'enterprise' : 'community';
 	    my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
 	    my $reason = '';
@@ -715,7 +843,8 @@ repostoenable =<% $toenable %>
 	$subrep = 'full' if ($subrep eq '');
 
 	my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
-	my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos)$/ ) ? 'enterprise' : 'community';
+	   $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
+	my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes)$/ ) ? 'enterprise' : 'community';
 	my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
 	my $allowed = 1;
