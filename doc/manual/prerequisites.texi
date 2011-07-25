@@ -94,10 +94,10 @@ Prerequisites for building @value{PACKAGE_TITLE} package are as follows:
 
 @enumerate 1
 @item
-@cite{Linux} distribution, somewhat @cite{Linux Standards Base} compliant, with a 2.4 or 2.6 kernel
-and the appropriate tool chain for compiling out-of-tree kernel modules.  Most recent @cite{Linux}
-distributions are usable out of the box, but some development packages must be installed.  For more
-information, see @refman{Compatibility}.
+@cite{Linux} distribution, somewhat @cite{Linux Standards Base} compliant, with a 2.4, 2.6 or 3.x
+kernel and the appropriate tool chain for compiling out-of-tree kernel modules.  Most recent
+@cite{Linux} distributions are usable out of the box, but some development packages must be
+installed.  For more information, see @refman{Compatibility}.
 
 @multitable @columnfractions 0.05 0.95
 @item @tab @minus{}

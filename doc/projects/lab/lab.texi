@@ -2649,8 +2649,8 @@ physical nodes.
 
 @subsection Operating System Software
 
-OpenSS7 protocol software will operation on almost any 2.4 or 2.6 kernel Linux distribution.  The
-selected GNU/Linux distribution should meet the following criteria:
+OpenSS7 protocol software will operation on almost any 2.4, 2.6 or 3.x kernel Linux distribution.
+The selected GNU/Linux distribution should meet the following criteria:
 
 If the compute platforms are provided by UNT or a third party hardware vendor, the GNU/Linux
 distribution selected should be one that is supported for the selected hardware.  Suggested
