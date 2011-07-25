@@ -757,7 +757,7 @@ packages that contain kernel modules will contain a @file{core} subpackage.}
 The @file{@value{PACKAGE}-@-info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
-kernels and is not necessary and not built for 2.6 series kernels.} contains the
+kernels and is not necessary and not built for 2.6 or 3.x series kernels.} contains the
 module symbol version information for the @file{core} subpackage, above.  It is
 possible to load this subpackage and compile modules that use the exported
 symbols without loading the actual kernel modules (from the @file{core}
@@ -949,7 +949,7 @@ packages that contain kernel modules will contain a @file{core} subpackage.}
 The @file{@value{PACKAGE}-@-info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
-kernels and is not necessary and not built for 2.6 series kernels.} contains the
+kernels and is not necessary and not built for 2.6 or 3.x series kernels.} contains the
 module symbol version information for the @file{core} subpackage, above.  It is
 possible to load this subpackage and compile modules that use the exported
 symbols without loading the actual kernel modules (from the @file{core}
@@ -1017,7 +1017,7 @@ download the following source RPM.
 @table @asis
 @item @uref{http://www.openss7.org/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
 This is the source RPM for the package.  From this source RPM it is possible to build binary RPM for
-any supported architecture and for any 2.4 or 2.6 kernel,
+any supported architecture and for any 2.4, 2.6 or 3.x kernel,
 for either @cite{Linux STREAMS} or @cite{Linux Fast-@-STREAMS}.
 @end table
 
@@ -1038,7 +1038,7 @@ download the following Debian DSC.
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc,, @value{PACKAGE}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}@-.dsc}
 @itemx @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz,, @value{PACKAGE}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}@-.tar@-.gz}
 This is the Debian DSC for the package.  From this Debian DSC it is possible to build binary DEB for
-any supported architecture and for any 2.4 or 2.6 kernel,
+any supported architecture and for any 2.4, 2.6 or 3.x kernel,
 for either @cite{Linux STREAMS} or @cite{Linux Fast-@-STREAMS}.
 @end table
 
@@ -2734,8 +2734,9 @@ Generate kernel symbols command, @manref{genksyms(8)}.  This is used for generat
 versions during build.  By default, @file{configure} will search for this tool.
 
 @item KGENKSYMS
-Linux 2.6 generate kernel symbols command, @manref{genksyms(8)}.  This is used for generating module
-symbol version during build.  By default, @file{configure} will search for this tool.
+Linux 2.6 and 3.x generate kernel symbols command, @manref{genksyms(8)}.  This is used for
+generating module symbol version during build.  By default, @file{configure} will search for this
+tool.
 
 @item OBJDUMP
 Object dumping command, @manref{objdump(1)}.  This is used for listing information about object

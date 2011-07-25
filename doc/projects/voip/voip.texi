@@ -2330,18 +2330,20 @@ systems that provide an @dfn{SVR 4.2 ES/MP STREAMS} facility.
 @section Linux Operating System
 @cindex Linux
 
-The OpenSS7 @acronym{STREAMS} releases and stacks currently support the 2.4 Linux Kernel.  A Linux
-kernel version greater than or equal to 2.4.18 is recommended.  The Linux 2.5 and 2.6 kernel series
-are not yet supported.  The Linux 2.5 series will likely not ever be supported.  Linux 2.6 kernel
-series will be supported once the kernel releases stabilize.  Linux 2.4 kernels released by popular
-distributions are supported.  These include kernel.org releases, RedHat (7.2, 9, EL3), WhiteBox EL3,
-Fedora Core 1 (FC1), Debian Woody, SuSE 8.2.  Currently our preferred distribution is Fedora Core 1
-with all updates applied.
-@cindex RedHat
-@cindex WhiteBox EL3
-@cindex Debian
-@cindex SuSE
-@cindex Fedora
+The OpenSS7 @acronym{STREAMS} releases and stacks currently support the 2.4, 2.6 and 3.x Linux
+Kernel.  A Linux kernel version greater than or equal to 2.4.18 is recommended for 2.4 kernels.  The
+Linux 2.5 series kernels are not supported.  A Linux kernel version greater than or equal to 2.6.9
+is recommended for 2.6 kernels.  Any kernel beginning with 3.0 in the 3.x kernel series is
+acceptable.  Linux 2.4, 2.6 and 3.x kernels released by popular distributions are supported.  These
+include kernel.org releases, RedHat (7.2, 9, EL3, AS/EL4, AS/EL5), WhiteBox (EL3, EL4), Fedora Core
+(FC1-FC7), Debian (Woody-Etch), Ubuntu (6.10-7.10), SuSE (8.2-10.2 OSS), CentOS(4 and 5), Lineox (4
+and 5).  Currently our preferred distribution is CentOS 5 with all updates applied.
+
+Although OpenSS7 @acronym{STREAMS} SS7 and SIGTRAN stacks are tested primarily on ix86 hardware, the
+stacks compile and install on PPC (MPC 8260, Freescale 440), HPPA, and other processor architectures
+supported by the Linux 2.4, 2.6 and 3.x kernels.
+
+For the current project, RedHat AS/EL5 or CentOS 5 is recommended.
 
 @node STREAMS Facility
 @section STREAMS Facility
