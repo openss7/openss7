@@ -258,6 +258,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		    (ubuntu)
 			rpm_cv_dist_extra=".ubuntu${dist_cv_host_release}"
 			;;
+		    (lts)
+			rpm_cv_dist_extra=".lts${dist_cv_host_release}"
+			;;
 		esac
 		;;
 	    (*)
@@ -366,6 +369,9 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		    (ubuntu)
 			rpm_cv_dist_extra2=".ubuntu${dist_cv_host_release}"
 			;;
+		    (lts)
+			rpm_cv_dist_extra2=".lts${dist_cv_host_release}"
+			;;
 		esac
 		;;
 	    (*)
@@ -383,7 +389,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 		rpm_cv_dist_topdir='/usr/src/packages'	;;
 	    (mandrake|mandriva|manbo|mageia|mes)
 		rpm_cv_dist_topdir='/usr/src/RPM'	;;
-	    (debian|ubuntu)
+	    (debian|ubuntu|lts)
 		rpm_cv_dist_topdir='/usr/src/rpm'	;;
 	    (*)
 		rpm_cv_dist_topdir="$ac_abs_top_buiddir" ;;

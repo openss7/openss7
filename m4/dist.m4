@@ -220,6 +220,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	(*SuSE*|*SUSE*|*Novell*|*NOVELL*)		echo 'suse'	  ;;
 	(*Debian*|*DEBIAN*)				echo 'debian'	  ;;
 	(*Ubuntu*|*UBUNTU*)				echo 'ubuntu'	  ;;
+	(*Ubuntu*LTS*|*UBUNTU*LTS*)			echo 'lts'	  ;;
     esac])
     AC_CACHE_CHECK([for dist build flavor], [dist_cv_build_flavor], [dnl
 	if test -z "$dist_cv_build_flavor" -a ":${dist_cv_build_rel_file:-no}" != :no ; then
@@ -271,7 +272,7 @@ dnl AC_MSG_WARN([checking for vendor in $[1]])
 	(fedora|redhat|rhel)		echo 'redhat'	  ;;
 	(suse|sle|sles|sled|opensuse)	echo 'suse'	  ;;
 	(debian)			echo 'debian'	  ;;
-	(ubuntu)			echo 'ubuntu'	  ;;
+	(ubuntu|lts)			echo 'ubuntu'	  ;;
 	(unknown)			echo 'pc'	  ;;
 	(*)				echo "$[1]"	  ;;
     esac])
@@ -342,6 +343,7 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 	(sles)		echo 'SUSE Linux Enterprise Server' ;;
 	(sled)		echo 'SUSE Linux Enterprise Desktop' ;;
 	(debian)	echo 'Debian GNU/Linux' ;;
+	(lts)		echo 'Ubuntu LTS' ;;
 	(ubuntu)	echo 'Ubuntu' ;;
 	(unknown)	echo 'Unknown Linux' ;;
 	(*)		echo 'Linux' ;;
@@ -412,7 +414,7 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,\..*[$],,'` ;;
 	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat)
 		dist_tmp="${dist_cv_build_release}" ;;
-	    (debian|ubuntu|*)
+	    (debian|ubuntu|lts|*)
 		dist_tmp="${dist_cv_build_codename}" ;;
 	esac
 	dist_cv_build_edition=`echo "$dist_tmp" | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
@@ -630,7 +632,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,\..*[$],,'` ;;
 	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat)
 		dist_tmp="${dist_cv_host_release}" ;;
-	    (debian|ubuntu|*)
+	    (debian|ubuntu|lts|*)
 		dist_tmp="${dist_cv_host_codename}" ;;
 	esac
 	dist_cv_host_edition=`echo "$dist_tmp" | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,'`
@@ -645,7 +647,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 		elif test -x /usr/bin/dpkg-architecture ; then
 		    case "$dist_cv_host_flavor" in
 			# debian needs the -gnu stripped, ubuntu does not
-			(ubuntu)
+			(ubuntu|lts)
 			    dist_tmp="$host_os"
 			    ;;
 			(debian|*)
@@ -684,7 +686,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     case "$build_vendor" in
 	(centos|lineox|whitebox|scientific|redhat|suse|debian)  
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
-	(mandrake|mandriva|manbo|mageia|mes|ubuntu)  
+	(mandrake|mandriva|manbo|mageia|mes|ubuntu|lts)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
     esac
     build_distro="${dist_cv_build_distro:-unknown}"
@@ -707,7 +709,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$host_vendor" in
 	    (centos|lineox|whitebox|scientific|redhat|suse|debian)  
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
-	    (mandrake|mandriva|manbo|mageia|mes|ubuntu)  
+	    (mandrake|mandriva|manbo|mageia|mes|ubuntu|lts)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
 	esac
 	host_distro="${dist_cv_host_distro:-unknown}"
@@ -729,7 +731,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$target_vendor" in
 	    (centos|lineox|whitebox|scientific|redhat|suse|debian)  
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
-	    (mandrake|mandriva|manbo|mageia|mes|ubuntu)  
+	    (mandrake|mandriva|manbo|mageia|mes|ubuntu|lts)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;
 	esac
     fi

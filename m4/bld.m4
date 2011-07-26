@@ -165,7 +165,7 @@ dnl These use rpm
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
 dnl These use dpkg
-	    (debian|ubuntu|mint)
+	    (debian|ubuntu|lts|mint)
 dnl		dlocate is much faster than dpkg and dpkg-query
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
@@ -192,7 +192,7 @@ dnl These use rpm
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
 dnl These use dpkg
-	    (debian|ubuntu|mint)
+	    (debian|ubuntu|lts|mint)
 dnl		dlocate is much faster than dpkg and dpkg-query
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
@@ -231,7 +231,7 @@ dnl		dlocate is much faster than dpkg and dpkg-query
 	    (mandrake|mandriva|manbo|mageia|mes)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"urpmi \$tmp_result\""
 		;;
-	    (debian|ubuntu|mint)
+	    (debian|ubuntu|lts|mint)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"aptitude install \$tmp_result\""
 		;;
 	    (*)
@@ -276,7 +276,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
-	    (debian|ubuntu|mint)
+	    (debian|ubuntu|lts|mint)
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
 		else dlocate=dpkg;    term=
@@ -300,7 +300,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
-	    (debian|ubuntu|mint)
+	    (debian|ubuntu|lts|mint)
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
 		else dlocate=dpkg;    term=
@@ -338,7 +338,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 	    (mandrake|mandriva|manbo|mageia|mes)
 		eval "bld_cv_pkg_cmd_${tmp_pn}=\"urpmi \$tmp_result\""
 		;;
-	    (debian|ubuntu|mint)
+	    (debian|ubuntu|lts|mint)
 		eval "bld_cv_pkg_cmd_${tmp_pn}=\"aptitude install \$tmp_result\""
 		;;
 	    (*)
@@ -383,7 +383,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
-	    (debian|ubuntu|mint)
+	    (debian|ubuntu|lts|mint)
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
 		else dlocate=dpkg;    term=
@@ -407,7 +407,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
-	    (debian|ubuntu|mint)
+	    (debian|ubuntu|lts|mint)
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
 		else dlocate=dpkg;    term=
@@ -445,7 +445,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
 	    (mandrake|mandriva|manbo|mageia|mes)
 		eval "bld_cv_pkg_cmd_${tmp_fn}=\"urpmi \$tmp_result\""
 		;;
-	    (debian|ubuntu|mint)
+	    (debian|ubuntu|lts|mint)
 		eval "bld_cv_pkg_cmd_${tmp_fn}=\"aptitude install \$tmp_result\""
 		;;
 	    (*)
