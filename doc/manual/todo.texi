@@ -630,15 +630,16 @@ Provide support for RT kernels.
 @item
 Per cpu data:- I am still using the older approach of using cache line aligned arrays for per-cpu
 data.  This, of course, does not fully utilize NUMA architectures.  For NUMA architectures we need
-to use the per-cpu utilities provided by the 2.6 kernel.  I haven't touched converting this yet.
+to use the per-cpu utilities provided by the 2.6 and 3.x kernel.  I haven't touched converting this
+yet.
 
 Also, there are several NUMA supporting STREAMS utility functions (allocb_node, etc.) that need to
 be supported yet.
 
 @table @emph
 @item TODO:
-Convert cacheline aligned arrays to NUMA per-cpu data on 2.6 kernels.  Complete NUMA supporting
-STREAMS facilities.
+Convert cacheline aligned arrays to NUMA per-cpu data on 2.6 and 3.x kernels.  Complete NUMA
+supporting STREAMS facilities.
 @end table
 
 @item
@@ -714,9 +715,9 @@ Implement @manpage{I_EGETSIG(7)} and @manpage{I_ESETSIG(7)}.
 
 @ignore
 @item
-It is possible on 2.6 kernels to use the ability to determine the module that owns a function to
-perform module reference counting for @manref{esballoc(9)} callback functions.  That is, when
-@manpage{esballoc(9)} (and friends) are called, the module owning the callback function has its
+It is possible on 2.6 and 3.x kernels to use the ability to determine the module that owns a
+function to perform module reference counting for @manref{esballoc(9)} callback functions.  That is,
+when @manpage{esballoc(9)} (and friends) are called, the module owning the callback function has its
 module reference count incremented.  When the block is freed and the callback function returns, the
 module has its module reference count decremented.  The pertinent kernel function is
 module_text_address() that returns the module in which a text address resides.
@@ -793,8 +794,8 @@ rationalize specfs to devfs and udev
 @end table
 
 @item
-Have the STREAMS subsystem register a panic notifier on 2.6 kernels to be able to recover from
-panics caused by misbehaving STREAMS modules or drivers.
+Have the STREAMS subsystem register a panic notifier on 2.6 and 3.x kernels to be able to recover
+from panics caused by misbehaving STREAMS modules or drivers.
 
 @table @emph
 @item TODO:
@@ -913,22 +914,22 @@ The following four situations require the specfs.
 
 @enumerate a
 @item 2.4 kernel without devfs
-@item 2.6 kernel without devfs
+@item 2.6 or 3.x kernel without devfs
 @item 2.4 kernel with devfs but without devfsd
-@item 2.6 kernel with devfs but without devfsd
+@item 2.6 or 3.x kernel with devfs but without devfsd
 @end enumerate
 
 The following two situations could use devfs instead of specfs.
 
 @enumerate e
 @item 2.4 kernel with devfs and with devfsd
-@item 2.6 kernel with devfs and with devfsd
+@item 2.6 or 3.x kernel with devfs and with devfsd
 @end enumerate
 
 The following one situation could use udev instead of devfs or specfs.
 
 @enumerate g
-@item 2.6 kernel with udev
+@item 2.6 or 3.x kernel with udev
 @end enumerate
 
 To get this to work requires that there be an independent layer between the file system providing
@@ -962,10 +963,10 @@ Tested.
 @end ignore
 
 @item
-Kernel objects are another thing.  For 2.6 kernels, we need to hold our data structures in the
-kobject manner so that the /sys file system is usable.  This requires another adaptation layer
-because 2.4 kernels do this in a completely different way.  Much of our /proc file system stuff needs
-to move into /sys for 2.6 kernels but stay the same for 2.4 kernels.
+Kernel objects are another thing.  For 2.6 or 3.x kernels, we need to hold our data structures in
+the kobject manner so that the /sys file system is usable.  This requires another adaptation layer
+because 2.4 kernels do this in a completely different way.  Much of our /proc file system stuff
+needs to move into /sys for 2.6 or 3.x kernels but stay the same for 2.4 kernels.
 
 The /sys file system does not really do much for STREAMS.  The /dev/streams specfs file system does
 more for us.

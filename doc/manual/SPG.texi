@@ -909,7 +909,7 @@ provides an @cite{SVR 4.2 MP}
 @cindex SVR 4.2 MP
 compatible @acronym{STREAMS} implementation for @b{Linux}
 @cindex Linux
-2.4 and 2.6 series kernels.
+2.4, 2.6 and 3.x series kernels.
 
 @node Background
 @section Background
@@ -10599,7 +10599,8 @@ on character device minor numbers), @cite{@value{PACKAGE_TITLE}} has the option 
 @b{Linux} system FIFOs @acronym{STREAMS}-based.
 @cite{@value{PACKAGE_TITLE}} also supports the @cite{System V Release 3.0} approach
 of associating FIFOs with @acronym{STREAMS} devices.  The limitation of minor device number is not so
-severe for @b{Linux} 2.6 kernels, or 2.4 kernels with expanded minor and major device numbers.
+severe for @b{Linux} 2.6 and 3.x kernels, or 2.4 kernels with expanded minor and major device
+numbers.
 
 @cite{@value{PACKAGE_TITLE}} overrides the @manref{pipe(2s)} system call
 with a library function as part of the @file{libstreams} library.
@@ -13761,7 +13762,7 @@ device name and instance number without concern for major device numbers.
 * Asynchronous Callouts::	MP STREAMS Asynchronous Callouts
 @end menu
 
-The @b{Linux} 2.6 kernel is multi-threaded to make effective use of symmetric shared-memory
+The @b{Linux} 2.6 and 3.x kernel is multi-threaded to make effective use of symmetric shared-memory
 multiprocessor computers.  All parts of the kernel, including @acronym{STREAMS} modules and drivers,
 must ensure data integrity in a multiprocessing environment.  For the most part, developers must
 ensure that concurrently running kernel threads do not attempt to manipulate the same data at the
@@ -17961,7 +17962,7 @@ At this priority level, software and hardware interrupts are enabled and the ker
 with preemption enabled.  This means that the currently executing kernel thread could preempt and
 sleep in favour of another thread of kernel execution.
 
-This priority level only exists on preemptive (mostly 2.6) kernels.
+This priority level only exists on preemptive (mostly 2.6 and 3.x) kernels.
 
 @item Non-Preemptive
 
@@ -18757,9 +18758,9 @@ device number mapping.@footnote{@cite{The Magic Garden Explained}}
 
 Versions of the @b{Linux} kernel in the 2.4 kernel series and prior to 2.6 also provided an 8 bit
 major device number and an 8 bit minor device number grouped into a 16-bit combined device number.
-Linux 2.6 kernels (and some patched 2.4 kernels) now have larger device numbers.  These extended
-device numbers are 12 bits for major device number and 20 bits for minor device number, with 32 bits
-for the combined device number.
+Linux 2.6 and 3.x kernels (and some patched 2.4 kernels) now have larger device numbers.  These
+extended device numbers are 12 bits for major device number and 20 bits for minor device number,
+with 32 bits for the combined device number.
 
 @subsubheading @value{PACKAGE_TITLE} Device Numbering
 
@@ -18773,12 +18774,12 @@ In earlier versions of @dfn{@value{PACKAGE_TITLE}}, the internal device numberin
 device number and 16-bits for minor device number.  This will soon be changed to 12-bits for major
 device number and 20-bits for minor device number to accommodate the newer @b{Linux} scheme.
 
-On 2.6 @b{Linux} kernels that support the newer extended device numbers, external device numbers and
-internal device numbers will be the same.  On 2.4 @b{Linux} kernels with the older 16-bit device
-numbers, external device number and internal device numbers will differ.  In some situations, an
-internal device number can exists with no corresponding external device number (accessed only via a
-clone device or direct access to the mounted @file{specfs} shadow special character device
-file system).
+On 2.6 and 3.x @b{Linux} kernels that support the newer extended device numbers, external device
+numbers and internal device numbers will be the same.  On 2.4 @b{Linux} kernels with the older
+16-bit device numbers, external device number and internal device numbers will differ.  In some
+situations, an internal device number can exists with no corresponding external device number
+(accessed only via a clone device or direct access to the mounted @file{specfs} shadow special
+character device file system).
 
 @multitable @columnfractions .30 .70
 @item @manpage{etoimajor(9)} @tab change external to internal major device number
