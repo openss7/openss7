@@ -5294,7 +5294,7 @@ two or more CPUs concurrently executing the operating system
 
 @end table
 
-The @b{Linux} 2.6 kernel is multi-threaded to make effective use of symmetric shared-memory
+The @b{Linux} 2.6 and 3.x kernel is multi-threaded to make effective use of symmetric shared-memory
 multiprocessor computers.  All parts of the kernel, including @acronym{STREAMS} modules and drivers,
 must ensure data integrity in a multiprocessing environment.  For the most part, developers must
 ensure that concurrently running kernel threads do not attempt to manipulate the same data at the
@@ -5750,8 +5750,9 @@ with the exception of references to the free routine provided to @manref{esballo
 responsible for incrementing their own module counts upon the call to @manref{esballoc(9)} and
 decrementing them when the @member{free_rtn} function exits.@footnote{It is only true for Linux 2.4
 kernels that it is necessary for the module to keep track of these things.  Under recent Linux 2.6
-kernels, it is possible for the @acronym{STREAMS} executive to determine the module owner of the
-callback function and @cite{Linux Fast-STREAMS} performs the necessary module reference counting.}
+and 3.x kernels, it is possible for the @acronym{STREAMS} executive to determine the module owner of
+the callback function and @cite{Linux Fast-STREAMS} performs the necessary module reference
+counting.}
 
 @node MP Locking
 @subsection MP Locking
@@ -6175,7 +6176,7 @@ At this priority level, software and hardware interrupts are enabled and the ker
 with preemption enabled.  This means that the currently executing kernel thread could preempt and
 sleep in favour of another thread of kernel execution.
 
-This priority level only exists on preemptive (mostly 2.6) kernels.
+This priority level only exists on preemptive (mostly 2.6 or 3.x) kernels.
 
 @item Non-Preemptive
 
@@ -6998,9 +6999,9 @@ device number mapping.@footnote{@cite{The Magic Garden Explained}}
 
 Versions of the @b{Linux} kernel in the 2.4 kernel series and prior to 2.6 also provided an 8 bit
 major device number and an 8 bit minor device number grouped into a 16-bit combined device number.
-Linux 2.6 kernels (and some patched 2.4 kernels) now have larger device numbers.  These extended
-device numbers are 12 bits for major device number and 20 bits for minor device number, with 32 bits
-for the combined device number.
+Linux 2.6 and 3.x kernels (and some patched 2.4 kernels) now have larger device numbers.  These
+extended device numbers are 12 bits for major device number and 20 bits for minor device number,
+with 32 bits for the combined device number.
 
 @subsection @value{PACKAGE_TITLE} Device Numbering
 
@@ -7014,12 +7015,12 @@ In earlier versions of @dfn{@value{PACKAGE_TITLE}}, the internal device numberin
 device number and 16-bits for minor device number.  This will soon be changed to 12-bits for major
 device number and 20-bits for minor device number to accommodate the newer @b{Linux} scheme.
 
-On 2.6 @b{Linux} kernels that support the newer extended device numbers, external device numbers and
-internal device numbers will be the same.  On 2.4 @b{Linux} kernels with the older 16-bit device
-numbers, external device number and internal device numbers will differ.  In some situations, an
-internal device number can exists with no corresponding external device number (accessed only via a
-clone device or direct access to the mounted @file{specfs} shadow special character device
-file system).
+On 2.6 and 3.x @b{Linux} kernels that support the newer extended device numbers, external device
+numbers and internal device numbers will be the same.  On 2.4 @b{Linux} kernels with the older
+16-bit device numbers, external device number and internal device numbers will differ.  In some
+situations, an internal device number can exists with no corresponding external device number
+(accessed only via a clone device or direct access to the mounted @file{specfs} shadow special
+character device file system).
 
 @multitable @columnfractions .30 .70
 @item @manpage{etoimajor(9)} @tab change external to internal major device number

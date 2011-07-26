@@ -1,7 +1,7 @@
 @c -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 @c =========================================================================
 @c
-@c @(#) $Id: install.texi,v 1.1.2.11 2011-07-18 19:42:10 brian Exp $
+@c @(#) $Id: install.texi,v 1.1.2.12 2011-07-21 04:35:57 brian Exp $
 @c
 @c =========================================================================
 @c
@@ -80,7 +80,7 @@
 @c 
 @c =========================================================================
 @c
-@c Last Modified $Date: 2011-07-18 19:42:10 $ by $Author: brian $
+@c Last Modified $Date: 2011-07-21 04:35:57 $ by $Author: brian $
 @c
 @c =========================================================================
 
@@ -576,11 +576,10 @@ For assistance with specific RPMs, see @ref{Downloading the Binary RPM}.
 @cindex repositories, yast
 @cindex yast
 
-For distributions that support @cite{YaST}, such as @cite{SUSE Linux Enterprise
-Server}, and @cite{OpenSUSE}, @cite{YaST} repositories are built coexistent with
-@cite{repo-md} repositories.  Setting up the installation source as a @cite{YaST}
-installation source instead of @cite{repo-md} can provide the additional features
-associated with @cite{YaST} install sources.
+For distributions that support @cite{YaST}, such as @cite{SUSE Linux Enterprise Server}, and
+@cite{OpenSUSE}, @cite{YaST} repositories are built coexistent with @cite{repo-md} repositories.
+Setting up the installation source as a @cite{YaST} installation source instead of @cite{repo-md}
+can provide the additional features associated with @cite{YaST} install sources.
 
 @menu
 Setting up YAST::			setting up repository access with YAST
@@ -603,11 +602,10 @@ $> sudo zypper addrepo --type yast2 $REPODIR openss7
 @cindex repositories, urpmi
 @cindex urpmi
 
-For distributions that support @manpage{urmpi(8)}, such as @cite{Mageia},
-@cite{Mandriva} and @cite{MES}, @manpage{urpmi(8)} repositories are built.  Setting up
-the installation source as a @manpage{urpmi(8)} installation source instead of
-@cite{repo-md} can provide the additional features associated with @manpage{urpmi(8)}
-install sources.
+For distributions that support @manpage{urmpi(8)}, such as @cite{Mageia}, @cite{Mandriva} and
+@cite{MES}, @manpage{urpmi(8)} repositories are built.  Setting up the installation source as a
+@manpage{urpmi(8)} installation source instead of @cite{repo-md} can provide the additional features
+associated with @manpage{urpmi(8)} install sources.
 
 @menu
 Setting up URPMI::			setting up repository access with URPMI
@@ -620,9 +618,9 @@ URPMI Kernel Updates::			updating kernels with UPRMI
 @cindex setup, urpmi
 @cindex urpmi
 
-To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{urpmi} repositories
-using @manpage{urpmi(8)}, you will need to install the @file{@value{PACKAGE}-repo} RPM
-on your system as follows:
+To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{urpmi} repositories using
+@manpage{urpmi(8)}, you will need to install the @file{@value{PACKAGE}-repo} RPM on your system as
+follows:
 
 @cartouche
 @smallexample
@@ -635,20 +633,19 @@ $> Password: *******
 @end smallexample
 @end cartouche
 
-The example, above, assumes that the distribution is @samp{mageia} and the
-distribution release is @samp{1} and the required architecture is @samp{x86_64}.
-Another exmpale would be @file{$REPO/mes/5.2/x86_64/RPMS/noarch}, for using
-@manpage{urpmi(8)} with MES (Mandriva Enterprise Server).
+The example, above, assumes that the distribution is @samp{mageia} and the distribution release is
+@samp{1} and the required architecture is @samp{x86_64}.  Another example would be
+@file{$REPO/mes/5.2/x86_64/RPMS/noarch}, for using @manpage{urpmi(8)} with MES (Mandriva Enterprise
+Server).
 
-To obtain access to the respository at the level to which you are entitled, you will
-have to respond to the @samp{Username:} query with the user name with which you are
-registered with @uref{http://www.openss7.org/}, and to the @samp{Password:} query with
-your repository access password.@footnote{Note that your repository access password is
-separate and distinct from your web access or mailing list password.}
+To obtain access to the respository at the level to which you are entitled, you will have to respond
+to the @samp{Username:} query with the user name with which you are registered with
+@uref{http://www.openss7.org/}, and to the @samp{Password:} query with your repository access
+password.@footnote{Note that your repository access password is separate and distinct from your web
+access or mailing list password.}
 
-You can test whether the @manpage{urpmi(8)} repository is properly set up by
-refreshing the repository with @manpage{urpmi.update(8)} and by listing the packages
-with @manpage{urpmq(8)}:
+You can test whether the @manpage{urpmi(8)} repository is properly set up by refreshing the
+repository with @manpage{urpmi.update(8)} and by listing the packages with @manpage{urpmq(8)}:
 
 @cartouche
 @smallexample
@@ -664,10 +661,10 @@ Note that only the packages to which you are entitled will be listed.
 @subsubsection Using the URPMI Repository
 @cindex urpmi
 
-Once the repository is set up, @cite{@value{PACKAGE_TITLE}} include a number of
-virtual package and package group definitions that ease the installation and removal
-of kernel modules, libriaries and utilities.  Downloading, configuring, building and
-installation for a single-kernel distribution is as easy as (one of):
+Once the repository is set up, @cite{@value{PACKAGE_TITLE}} include a number of virtual package and
+package group definitions that ease the installation and removal of kernel modules, libriaries and
+utilities.  Downloading, configuring, building and installation for a single-kernel distribution is
+as easy as (one of):
 
 @cartouche
 @smallexample
@@ -683,9 +680,9 @@ $> sudo urpme @value{PACKAGE}
 @end smallexample
 @end cartouche
 
-To install the development packages for developing STREAMS modules and drivers, or
-applications that use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the
-development packages using (one of):
+To install the development packages for developing STREAMS modules and drivers, or applications that
+use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the development packages using (one
+of):
 
 @cartouche
 @smallexample
@@ -693,20 +690,19 @@ $> sudo urpmi @value{PACKAGE}-devel
 @end smallexample
 @end cartouche
 
-Of course, you are welcome to use a GUI based package manager, such as
-@manpage{rpmdrake(8)}.
+Of course, you are welcome to use a GUI based package manager, such as @manpage{rpmdrake(8)}.
 
 @node URPMI Kernel Updates
 @subsubsection URPMI Kernel Updates
 @cindex urpmi
 
-The @cite{@value{PACKAGE_TITLE}} @manpage{urpmi(8)} repository definitions support the
-automatic updating of kernel modules when kernels are updated.  When the system is
-updated, using @samp{urpmi}, openss7 packages that are available for an updated kernel
-will be installed automatically.  @cite{@value{PACKAGE_TITLE}} kernel module packages
-also support weak updates and when kernels are updated to compatible kernels (e.g.
-for security updates, or normally for any update within an Enterprise distribution),
-kernel modules are automatically applied against the updated kernel.
+The @cite{@value{PACKAGE_TITLE}} @manpage{urpmi(8)} repository definitions support the automatic
+updating of kernel modules when kernels are updated.  When the system is updated, using
+@samp{urpmi}, openss7 packages that are available for an updated kernel will be installed
+automatically.  @cite{@value{PACKAGE_TITLE}} kernel module packages also support weak updates and
+when kernels are updated to compatible kernels (e.g.  for security updates, or normally for any
+update within an Enterprise distribution), kernel modules are automatically applied against the
+updated kernel.
 
 @node Repositories for APT
 @subsection Repositories for APT
@@ -725,9 +721,9 @@ APT Kernel Updates::			updating kernels with APT
 @subsubsection Setting up APT
 @cindex apt
 
-To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{apt} repositories
-using @manpage{apt(8)}, you will need to install the @file{@value{PACKAGE}-repo} DEB on
-your system, as follows:
+To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{apt} repositories using
+@manpage{apt(8)}, you will need to install the @file{@value{PACKAGE}-repo} DEB on your system, as
+follows:
 
 @cartouche
 @smallexample
@@ -1303,7 +1299,7 @@ packages that contain kernel modules will contain a @file{core} subpackage.}
 The @file{@value{PACKAGE}-@-info} package@footnote{Note that only release packages
 that contain kernel modules and that export versioned symbols will contain a
 @file{info} subpackage.  Also, this subpackage is only applicable to 2.4 series
-kernels and is not necessary and not built for 2.6 series kernels.} contains the
+kernels and is not necessary and not built for 2.6 or 3.x series kernels.} contains the
 module symbol version information for the @file{core} subpackage, above.  It is
 possible to load this subpackage and compile modules that use the exported
 symbols without loading the actual kernel modules (from the @file{core}
@@ -1331,7 +1327,7 @@ download the following source RPM.
 @table @asis
 @item @uref{https://www.openss7.org/repo/rpms/SRPMS/@value{PACKAGE}-@value{VERSION}-@value{PACKAGE_RPMRELEASE}.src.rpm,, @value{PACKAGE}-@-@value{VERSION}-@-@value{PACKAGE_RPMRELEASE}@-.src@-.rpm}
 This is the source RPM for the package.  From this source RPM it is possible to build binary RPM for
-any supported architecture and for any 2.4 or 2.6 kernel.
+any supported architecture and for any 2.4, 2.6 or 3.x kernel.
 @end table
 
 @subsubheading Configuration
@@ -1351,7 +1347,7 @@ download the following Debian DSC.
 @item @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.dsc,, @value{PACKAGE}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}@-.dsc}
 @itemx @uref{http://www.openss7.org/debian/@value{PACKAGE}_@value{VERSION}-@value{PACKAGE_DEBRELEASE}.tar.gz,, @value{PACKAGE}_@value{VERSION}-@-@value{PACKAGE_DEBRELEASE}@-.tar@-.gz}
 This is the Debian DSC for the package.  From this Debian DSC it is possible to build binary DEB for
-any supported architecture and for any 2.4 or 2.6 kernel.
+any supported architecture and for any 2.4, 2.6 or 3.x kernel.
 @end table
 
 @subsubheading Configuration
@@ -2930,8 +2926,9 @@ Generate kernel symbols command, @manref{genksyms(8)}.  This is used for generat
 versions during build.  By default, @file{configure} will search for this tool.
 
 @item KGENKSYMS
-Linux 2.6 generate kernel symbols command, @manref{genksyms(8)}.  This is used for generating module
-symbol version during build.  By default, @file{configure} will search for this tool.
+Linux 2.6 and 3.x generate kernel symbols command, @manref{genksyms(8)}.  This is used for
+generating module symbol version during build.  By default, @file{configure} will search for this
+tool.
 
 @item OBJDUMP
 Object dumping command, @manref{objdump(1)}.  This is used for listing information about object

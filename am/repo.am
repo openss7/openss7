@@ -159,6 +159,11 @@ post-yum:
 #CLEANFILES			+= $(PACKAGE).yum.repo
 #POST_INSTALL_AM		+= post-yum
 
+if MAINTAINER_MODE
+#ALL_LOCAL			+= $(PACKAGE)-local.yum.repo
+#CLEANFILES			+= $(PACKAGE)-local.yum.repo
+endif
+
 MY_PHONY			+= install-yum uninstall-yum post-zypp
 
 ##
@@ -551,22 +556,253 @@ if WITH_INSTALL_SOURCE_URPMI
 ## WITH_INSTALL_SOURCE_URPMI
 
 $(PACKAGE).media.cfg: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	( \
+		$(ECHO) "[media_info]" ; \
+		$(ECHO) "version=$(target_edition)" ; \
+		$(ECHO) "mediacfg_version=2" ; \
+		$(ECHO) "branch=OpenSS7" ; \
+		$(ECHO) "arch=$(target_cpu)" ; \
+		$(ECHO) "xml-info=1" ; \
+		$(ECHO) "" ; \
+		for branch in $$rlist ; do \
+			b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+			for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+				r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+				d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+				if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
+				stem=`echo "$$s" | sed 's,[^a-zA-Z0-9_],_,g'` ; \
+				bran=`echo "$$r" | sed 's,main,Main,;t;s,debug,Debug,;t;s,devel,Devel,;t;s,source,Source,;t;s,^$$,Full,'` ; \
+				$(ECHO) "[$$s]" ; \
+				$(ECHO) "hdlist=hdlist_$$stem.cz" >/dev/null ; \
+				$(ECHO) "synthesis=synthesis.hdlist_$$stem.cz" > /dev/null ; \
+				$(ECHO) "info=info_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "changelog=changelog_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "name=$${branch} $${bran}" ; \
+				case "$$r" in \
+				(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
+				(*)      $(ECHO) "srpms=$${b+$$b/}source" ;; \
+				esac ; \
+				$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
+				case "$$b:$$r" in \
+				(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
+				esac ; \
+				$(ECHO) "" ; \
+			done ; \
+		done ; \
+	) >$@
 
+INSTALL_URPMI_REPOS = $(PACKAGE).media.cfg
+		
 $(PACKAGE).url: Makefile
+	$(ECHO) "$(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)" >$@
+
+INSTALL_URPMI_REPOS += $(PACKAGE).url
 
 $(PACKAGE).mirrorlist: Makefile
+	$(ECHO) "" >$@
+
+INSTALL_URPMI_REPOS += $(PACKAGE).mirrorlist
 
 if MAINTAINER_MODE
 ## MAINTAINER_MODE
 
 $(PACKAGE)-local.media.cfg: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	repodir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	tardir='$(tardir)'; test '$(REPODIR)' = '$(DISTDIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	( \
+		$(ECHO) "[media_info]" ; \
+		$(ECHO) "version=$(target_edition)" ; \
+		$(ECHO) "mediacfg_version=2" ; \
+		$(ECHO) "branch=OpenSS7-local" ; \
+		$(ECHO) "arch=$(target_cpu)" ; \
+		$(ECHO) "xml-info=1" ; \
+		$(ECHO) "" ; \
+		for branch in $$rb ; do \
+			b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+			if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(topdir)' ; then \
+				test "$$b" = '$(repobranch)' -o "/$$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+			for repo in '' 'Main' 'Debug' 'Devel' 'Source' ; do \
+				r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+				d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+				if test -z "$$s" ; then l="$$r" ; else l="$$s$${r:+/$$r}" ; fi ; \
+				stem=`echo "$$l" | sed 's,[^a-zA-Z0-9_],_,g'` ; \
+				bran=`echo "$$r" | sed 's,main,Main,;t;s,debug,Debug,;t;s,devel,Devel,;t;s,source,Source,;t;s,^$$,Full,'` ; \
+				$(ECHO) "[$$l]" ; \
+				$(ECHO) "hdlist=hdlist_$$stem.cz" >/dev/null ; \
+				$(ECHO) "synthesis=synthesis.hdlist_$$stem.cz" >/dev/null ; \
+				$(ECHO) "info=info_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "changelog=changelog_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "name=$${branch} $${bran}" ; \
+				case "$$r" in \
+				(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
+				(*)      $(ECHO) "srpms=$${b:+$$b/}source" ;; \
+				esac ; \
+				$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
+				case "$$b:$$r" in \
+				(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
+				esac ; \
+				$(ECHO) "" ; \
+			done ; \
+		done ; \
+	) >$@
+
+INSTALL_URPMI_REPOS += $(PACKAGE)-local.media.cfg
 
 $(PACKAGE)-local.url: Makefile
+	repodir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	$(ECHO) "file://$$repodir" >$@
+
+INSTALL_URPMI_REPOS += $(PACKAGE)-local.url
+	$(ECHO) "" >$@
 
 $(PACKAGE)-local.mirrorlist: Makefile
 
+INSTALL_URPMI_REPOS += $(PACKAGE)-local.mirrorlist
+
 ## MAINTAINER_MODE
 endif
+
+install-urpmi: $(INSTALL_URPMI_REPOS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(urpmirepodir)" ; then \
+		d='$(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)' ; \
+		test -d -- $$d || { $(ECHO) " $(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+		for f in 'media.cfg' 'url' 'mirrorlist' ; do \
+			$(ECHO) " $(INSTALL_DATA) $(PACKAGE).$$f '$$d/$$f'" ; \
+			$(INSTALL_DATA) $(PACKAGE).$$f "$$d/$$f" ; \
+		done ; \
+	fi
+	@if test -n "$(rpmgpgdir)" ; then \
+		d='$(DESTDIR)$(rpmgpgdir)' ; \
+		test -d -- $$d || { $(ECHO) " $(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$$d/RPM-GPG-KEY-$(PACKAGE_UCNAME)'" ; \
+		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$$d/RPM-GPG-KEY-$(PACKAGE_UCNAME)" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(urpmirepodir)" ; then \
+		d='$(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu)' ; \
+		test -d -- $$d || { $(ECHO) " $(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+		for f in 'media.cfg' 'url' 'mirrorlist' ; do \
+			$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.$$f '$$d/$$f'" ; \
+			$(INSTALL_DATA) $(PACKAGE)-local.$$f "$$d/$$f" ; \
+		done ; \
+	fi
+endif
+
+uninstall-urpmi:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)/media.cfg
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)/url
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)/mirrorlist
+	rmdir -- $(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu) 2>/dev/null || :
+	rm -f -- $(DESTDIR)$(rpmgpgdir)/RPM-GPG-KEY-$(PACKAGE_UCNAME)
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu)/media.cfg
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu)/url
+	rm -f -- $(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu)/mirrorlist
+	rmdir -- $(DESTDIR)$(urpmirepodir)/OpenSS7-local-$(target_edition)-$(target_cpu) 2>/dev/null || :
+endif
+
+#ALL_LOCAL		+= $(PACKAGE).media.cfg $(PACKAGE).url $(PACKAGE).mirrorlist
+#INSTALL_DATA_LOCAL	+= install-urpmi
+#UNINSTALL_LOCAL	+= uninstall-urpmi
+#CLEANFILES		+= $(PACKAGE).media.cfg $(PACKAGE).url $(PACKAGE).mirrorlist
+
+if MAINTAINER_MODE
+#ALL_LOCAL		+= $(PACKAGE)-local.media.cfg $(PACKAGE)-local.url $(PACKAGE)-local.mirrorlist
+#CLEANFILES		+= $(PACKAGE)-local.media.cfg $(PACKAGE)-local.url $(PACKAGE)-local.mirrorlist
+endif
+
+MY_PHONY		+= install-urpmi uninstall-urpmi
+
+##
+# Install a urpmi installation source for both remote and local repositories.  This involves
+# downloading the remote media.cfg file, installing the local media.cfg file, and performing a
+# urpmi.update.
+##
+
+repo-install-urpmi:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@d='$(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)' ; \
+	test -d "$$d" || { $(ECHO) "$(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+	d='$(DESTDIR)$(urpmiconfdir)' ; \
+	test -d "$$d" || { $(ECHO) "$(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; } ; \
+	( \
+		umask 600 ; \
+		cd '$(DESTDIR)$(urpmiconfdir)' ; \
+		un=; pw=; o=; f='netrc.$(PACKAGE)' ; \
+		for s in '' '.rpmsave' '.rpmnew' ; do \
+			o="$$f$$s" ; \
+			if test -e $$o ; then \
+				un=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\1,p;t end;b;: end q' $$o` ; \
+				pw=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\2,p;t end;b;: end q' $$o` ; \
+				test -n "$$un" -a -n "$$pw" || continue ; \
+				break ; \
+			fi ; \
+		done ; \
+		test "$$o" != "$$f" || { $(ECHO) "mv -f -- $$f $$f.rpmsave" ; mv -f -- $$f $$f.rpmsave ; } ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
+		url='$(reposerv)://'"$${un:+$$un$$(pw+:$$pw}@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+		$(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				$(ECHO) 'Authorization required for repository access.' >/dev/tty ; \
+				u='anonymous' ; p= ; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty ; u=$${u:-anonymous} ; \
+				if test "$$u" != 'anonymous' ; then \
+				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
+				echo '' >/dev/tty ; \
+				fi ; \
+				url='$(reposerv)://'"$${u:+$$u:$$p@}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					test "$$o" != "$$f" || { $(ECHO) "mv -f -- $$f.rpmsave $$f" ; mv -f -- $$f.rpmsave $$f ; } ; \
+					$(ECHO) 'Authorization failed.' >/dev/tty ; \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+		if test -e "$$f" ; then chmod go-rw $$f ; else \
+			test "$$o" != "$$f" -o ! -e "$$f.rpmsave" || { $(ECHO) "mv -f -- $$f.rpmsave $$f" ; mv -f -- $$f.rpmsave $$f ; } ; \
+			exit 1 ; \
+		fi ; \
+	) || exit 1 ; \
+	( \
+		cd '$(urpmiconfdir)' ; \
+		un=; pw=; f='netrc.$(PACKAGE)' ; \
+		if test -e "$$f" ; then \
+			un=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\1,p;t end;b;: end q' $$o` ; \
+			pw=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$$,\2,p;t end;b;: end q' $$o` ; \
+		fi ; \
+		test -n "$$un" -a -n "$$pw" || exit 1 ; \
+		cd '$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)' ; \
+		f='media.cfg' ; \
+		test ! -e "$$f" || { $(ECHO) "mv -f -- $$f $$f.rpmsave" ; mv -f -- $$f $$f.rpmsave ; } ; \
+		url='$(reposerv)://'"$${un:+$$un$${pw:+:$$pw}@}"'$(repobase)/$(reporoot)/$(reposubdir)/media/media_info/'"$$f" ; \
+		$(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; \
+		if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+			test ! -e $$f.rpmsave || { $(ECHO) "mv -f -- $$f.rpmsave $$f" ; mv -f -- $$f.rpmsave $$f ; } ; \
+			exit 1 ; \
+		fi ; \
+		if test ! -e $$f ; then \
+			test ! -e $$f.rpmsave || { $(ECHO) "mv -f -- $$f.rpmsave $$f" ; mv -f -- $$f.rpmsave $$f ; } ; \
+			exit 1 ; \
+		fi ; \
+		echo '$(reposerv)://$(repobase)/$(reporoot)/$(reposubdir)' >url ; \
+		$(ECHO) "rm -f -- mirrorlist" ; rm -f -- mirrorlist ; \
+	) || exit 1
+	@if test -z '$(DESTDIR)$(rootdir)' ; then \
+		$(ECHO) 'urpmi.update -a' ; \
+		urpmi.update -a || : ; \
+	fi
 
 ## WITH_INSTALL_SOURCE_URPMI
 endif

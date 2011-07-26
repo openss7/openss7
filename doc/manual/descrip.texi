@@ -125,7 +125,7 @@ companites that originated them.}
 @item @tab @bullet{} Dialogic Open System Release 6.1
 @end multitable
 
-This distribution is applicable to both @cite{Linux} 2.4 and 2.6 kernels as was
-targeted at @code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64}
-architectures, but should build and install for other architectures as well.
+This distribution is applicable to @cite{Linux} 2.4, 2.6 and 3.x kernels as was targeted at
+@code{ix86}, @code{x86_64}, @code{ppc} and @code{ppc64} architectures, but should build and install
+for other architectures as well.
 

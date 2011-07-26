@@ -572,7 +572,7 @@ function fileversion(module,			pfx,kversion)
     pfx = "r: filevers,  "
     kversion = ""
     if (system("test -r \"" module "\"") == 0) {
-	command = "strings " module " | grep -m 1 '^vermagic='"
+	command = "zcat " module " | strings | grep -m 1 '^vermagic='"
 	while((command | getline) == 1) { sub(/=/, " "); kversion = $2 }
 	close(command)
 	if (!kversion) print_error(pfx "no vermagic for " module)
@@ -637,7 +637,7 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     if (dirs != "") {
 	print_vinfo(2, pfx "dirs = " dirs)
 	h = 0; l = 0; u = 0; ph = 0; pl = 0
-	command = "find " dirs " -name '*.ko' 2>/dev/null"
+	command = "find " dirs " -name '*.ko' -o -name '*.ko.gz' 2>/dev/null"
 	while ((command | getline file) == 1) {
 	    #if (file~/\/lib\/modules\/[^\/]*\/kernel\//) continue
 	    name = file; sub(/^.*\//, "", name)
@@ -885,12 +885,33 @@ function readsymver(kversion, file,
     return n
 }
 function readkernel(kversion,
-		    pfx,fmt,n,m,pm,s,ps,find,command,module,SECTION,string,char,sym,crc)
+		    pfx,fmt,n,m,pm,s,ps,find,command,module,SECTION,string,char,sym,crc,find,file,dir,tmpdir,dirs)
 {
     pfx = "r: kernel,    "
     fmt = "%04d modules, %05d symbols"
     print_vinfo(2, pfx "version = " kversion)
-    command = "find /lib/modules/" kversion "/kernel -type f -name '*.ko' 2>/dev/null | xargs -r objdump -j __versions -s"
+    tmpdir = "/var/tmp/" me "." PROCINFO["pid"] ".modules"
+    system_command("mkdir -p -- " tmpdir)
+    find = "find /lib/modules/" kversion "/kernel -type f \\( -name '*.ko' -o -name '*.ko.gz' \\) 2>/dev/null"
+    system_command("rm -f -- " tmpdir "/modules.list 2>/dev/null")
+    while ((find | getline file) == 1) {
+	if (file~/\.ko\.gz$/) {
+	    dir = tmpdir "/" file
+	    sub(/\/[^\/]*$/, "", dir)
+	    if (!(dir in dirs)) {
+		system_command("mkdir -p -- " dir)
+		dirs[dir] = 1
+	    }
+	    sub(/\.ko\.gz$/, ".ko", file)
+	    system_command("gzip -dc " file ".gz >" tmpdir "/" file)
+	    print tmpdir "/" file >> tmpdir "/modules.list"
+	} else {
+	    print file >> tmpdir "/modules.list"
+	}
+    }
+    close(find)
+    close(tmpdir "/modules.list")
+    command = "cat " tmpdir "/modules.list | xargs -r objdump -j __versions -s"
     SECTION = ""; string = ""; module = ""
     n = 0; m = 0; s = 0; pm = 0; ps = 0
     print_vmore(2, pfx sprintf(fmt, m, s))
@@ -957,10 +978,15 @@ function readkernel(kversion,
 		    }
 		}
 		module = $0
+		if (module~"^" tmpdir "/") {
+		    sub("^" tmpdir "/", "", module)
+		    module = module ".gz"
+		}
 	    }
 	}
     }
     close(command)
+    system_command("rm -rf-- " tmpdir)
     print_vinfo(2, pfx sprintf(fmt, m, s))
     if (n == 0) print_warns(pfx "no symbol versions for kernel " kversion ", from kernel modules")
     if (m == 0) print_warns(pfx "no kernel  modules for kernel " kversion)
@@ -1100,6 +1126,9 @@ function getsysinfo(kversion,
 	    usesysmap[kversion] = usesysmap[krunning]
 	} else
 	if (values["style"] == "debian") {
+	    usesysmap[kversion] = usesysmap[krunning]
+	} else
+	if (values["style"] == "mandriva") {
 	    usesysmap[kversion] = usesysmap[krunning]
 	} else {
 	    usesysmap[kversion] = usesysmap[krunning]
@@ -1248,7 +1277,8 @@ function getmodule(module,
 	h = 0; r = 0; w = 0; l = 0; a = 0
 	fmt = "%04d needs,  %04d wants,  %04d links,  %04d weaks,  %s"
 	print_vmore(3, pfx sprintf(fmt, r, w, l, a, module))
-	command = "objdump -t -j '*ABS*' -j '*UND*' -j '__versions' -j '__weak_versions' -j '__weak_absolute' -j '.modinfo' -s " module
+	#command = "objdump -t -j '*ABS*' -j '*UND*' -j '__versions' -j '__weak_versions' -j '__weak_absolute' -j '.modinfo' -s " module
+	command = "f='" module "'; case $f in (*.ko) echo $f ;; (*.ko.gz) gzip -dc $f >/var/tmp/`basename $f .gz` ; echo /var/tmp/`basename $f .gz` ;; esac | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j '__versions' -j '__weak_versions' -j '__weak_absolute' -j '.modinfo' -s "
 	SECTION = ""; string = ""
 	while ((result = (command | getline)) != -1) {
 	    if (SECTION == "__versions" || SECTION == "__weak_versions" || SECTION == "__weak_absolute") {
@@ -1328,7 +1358,7 @@ function getmodule(module,
 	    if (!SECTION) {
 		if (result==1&&!/^$/&&!sub(/^Contents of section /,"")&&!/SYMBOL TABLE:/) {
 		    if (sub(/:.*file format/,"")) {
-			module = $1
+			#module = $1 # we only get one module at a time here...
 			format = $2
 			SECTION = ""
 			string = ""
@@ -1347,6 +1377,7 @@ function getmodule(module,
 		break
 	}
 	close(command)
+	system("rm -f -- /var/tmp/*.ko")
 	print_vmore(2, pfx sprintf(fmt, r, w, l, a, module))
 	if ((module,"vermagic") in modinfos) {
 	    modfver[module] = modinfos[module,"vermagic"]; sub(/ .*$/, "", modfver[module])
@@ -2031,7 +2062,7 @@ function changelinks(kversion, kver, name,
     }
 }
 function relinklinks(kversion, kver, name,
-		     pfx,n,m,module,file,syms,s,sym,add,old)
+		     pfx,n,m,module,file,syms,s,sym,add,old,gzip,source)
 {
     pfx = "w: relink,    "
     n = 0; m = 0
@@ -2054,15 +2085,28 @@ function relinklinks(kversion, kver, name,
 	    print text > script
 	    print_debug(3,pfx gensub(/\n/, "\n" me ": D: " pfx, "g", text))
 	    close(script)
+	    if (file~/\.ko\.gz$/) {
+		gzip = ".gz"
+		source = file
+		sub(/\.ko\.gz$/, ".ko", source)
+		doit("gzip -dc " file " >" source)
+	    } else {
+		gzip = ""
+		source = file
+	    }
 	    kmod = file; sub(/\/[^\/]*$/, "/", kmod)
 	    kmod = kmod me "." PROCINFO["pid"] ".ko"
 	    print_action("relinking", module, " in ", kversion)
-	    if (doit("ld -r -o " kmod " " file " " script) == 0) {
-		doit("mv -f -- " kmod " " file)
+	    if (doit("ld -r -o " kmod " " source " " script) == 0) {
+		if (gzip) {
+		    doit("rm -f -- " source)
+		    doit("gzip -f9 " kmod)
+		}
+		doit("mv -f -- " kmod gzip " " file)
 	    } else {
-		print_error(pfx "relinking failed for " weakmod)
+		print_error(pfx "relinking failed for " file)
 		print_action("removing", module, "from", kversion)
-		doit("rm -f -- " kmod " " file)
+		doit("rm -f -- " kmod " " file " " source)
 	    }
 	    system_command("rm -f -- " script)
 	}
@@ -2482,7 +2526,7 @@ function modlink(kversion, reloads,
     }
 }
 function modload(kversion, symbols, weakmod, module,
-		pfx,script,pair,pairs,sym,add,file,text)
+		pfx,script,pair,pairs,sym,add,file,text,gzip,source)
 {
     pfx = "w: modload,   "
     script = me "." PROCINFO["pid"] ".lds"
@@ -2490,15 +2534,28 @@ function modload(kversion, symbols, weakmod, module,
     print text > script
     print_debug(3,pfx gensub(/\n/, "\n" me ": D: " pfx, "g", text))
     close(script)
+    if (weakmod~/\.ko\.gz$/) {
+	gzip = ".gz"
+	source = weakmod
+	sub(/\.ko\.gz$/, ".ko", source)
+	doit("gzip -dc " weakmod " >" source)
+    } else {
+	gzip = ""
+	source = weakmod
+    }
     file = weakmod; sub(/\/[^\/]*$/, "/", file)
     file = file me "." PROCINFO["pid"] ".ko"
     print_action("relinking", module, " in ", kversion)
-    if (doit("ld -r -o " file " " weakmod " " script) == 0) {
-	doit("mv -f -- " file " " weakmod)
+    if (doit("ld -r -o " file " " source " " script) == 0) {
+	if (gzip) {
+	    doit("rpm -f -- " source)
+	    doit("gzip -f9 " file)
+	}
+	doit("mv -f -- " file gzip " " weakmod)
     } else {
 	print_error(pfx "relinking failed for " weakmod)
 	print_action("removing", module, "from", kversion)
-	doit("rm -f -- " file " " weakmod)
+	doit("rm -f -- " file " " weakmod " " source)
     }
     system_command("rm -f -- " script)
 }
@@ -2548,8 +2605,8 @@ function testwstyle(		pfx,command,result)
 	    { values["weakdir"] = "updates" }
 	}
     } else
-    if (values["style"] !~ /^(debian|ubuntu|redhat|suse10|suse11)$/) {
-	print_error(pfx "style is '" values["style"] "' but must be one of {debian|ubuntu|redhat|suse10|suse11}")
+    if (values["style"] !~ /^(debian|ubuntu|redhat|suse10|suse11|mandriva)$/) {
+	print_error(pfx "style is '" values["style"] "' but must be one of {debian|ubuntu|redhat|suse10|suse11|mandriva}")
 	usage(stderr)
 	exit 2
     }
@@ -2883,7 +2940,7 @@ BEGIN {
     longopts["symver"        ] = "S:" ; defaults["symver"        ] = d["symver"  ]	; descrips["symver"        ] = "system version file (compressed) (search when unspec.)"
     longopts["symabi"        ] = "Y:" ; defaults["symabi"        ] = d["symabi"  ]	; descrips["symabi"        ] = "system version file (ubuntu abi) (search when unspec.)"
     longopts["package"       ] = "P:" ; defaults["package"       ] = d["package" ]	; descrips["package"       ] = "package name (used to find subdirectories)"
-    longopts["style"         ] = "s:" ; defaults["style"         ] = d["style"   ]	; descrips["style"         ] = "style of weak-updates (detect when unspec.)"						; longargs["style"         ] = "{debian|redhat|suse10|suse11|ubuntu}"
+    longopts["style"         ] = "s:" ; defaults["style"         ] = d["style"   ]	; descrips["style"         ] = "style of weak-updates (detect when unspec.)"						; longargs["style"         ] = "{debian|redhat|suse10|suse11|ubuntu|mandriva}"
     longopts["initscripts"   ] = "i::"; defaults["initscripts"   ] = d["inits"   ]	; descrips["initscripts"   ] = "comma-separated list of init scripts to run"						; longargs["initscripts"   ] = "[SCRIPT[,SCRIPT]...]"
     longopts["delete-modules"] = "d"  ; defaults["delete-modules"] = 0			; descrips["delete-modules"] = "delete modules for specified kernel version"
     longopts["depmodx"       ] = "x"  ; defaults["depmodx"       ] = 0			; descrips["depmodx"       ] = "depmod supports -E option (detect when unspec.)"

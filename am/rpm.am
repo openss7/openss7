@@ -1909,63 +1909,352 @@ if BUILD_REPO_URPMI
 ## The following build urpmi repositories.
 ##
 
-RELEASE_DIRECTORIES	+= $(mediadir) $(mediafulldir) $(mediamaindir) $(mediadebgdir) $(mediadevldir) $(mediasrcsdir)
+RELEASE_DIRECTORIES	+= $(mediadir) $(mediamaindir) $(mediadebgdir) $(mediadevldir) $(mediasrcsdir)
 
 urpmi_cfgs	= $(mediadir)/media.cfg
 
-urpmi_keys	= $(mediadir)/pubkey \
-		  $(mediafulldir)/pubkey \
-		  $(mediamaindir)/pubkey \
+urpmi_keys	= $(mediamaindir)/pubkey \
 		  $(mediadebgdir)/pubkey \
 		  $(mediadevldir)/pubkey \
 		  $(mediasrcsdir)/pubkey
 
-urpmi_filelists	= $(mediadir)/files.xml.lzma \
-		  $(mediafulldir)/files.xml.lzma \
-		  $(mediamaindir)/files.xml.lzma \
+urpmi_sums	= $(mediadir)/MD5SUM \
+		  $(mediamaindir)/MD5SUM \
+		  $(mediadebgdir)/MD5SUM \
+		  $(mediadevldir)/MD5SUM \
+		  $(mediasrcsdir)/MD5SUM
+
+urpmi_filelists	= $(mediamaindir)/files.xml.lzma \
 		  $(mediadebgdir)/files.xml.lzma \
 		  $(mediadevldir)/files.xml.lzma \
 		  $(mediasrcsdir)/files.xml.lzma
 
-urpmi_infolists	= $(mediadir)/info.xml.lzma \
-		  $(mediafulldir)/info.xml.lzma \
-		  $(mediamaindir)/info.xml.lzma \
+urpmi_infolists	= $(mediamaindir)/info.xml.lzma \
 		  $(mediadebgdir)/info.xml.lzma \
 		  $(mediadevldir)/info.xml.lzma \
 		  $(mediasrcsdir)/info.xml.lzma
 
-urpmi_changelogs = $(mediadir)/changelogs.xml.lzma \
-		  $(mediafulldir)/changelogs.xml.lzma \
-		  $(mediamaindir)/changelogs.xml.lzma \
-		  $(mediadebgdir)/changelogs.xml.lzma \
-		  $(mediadevldir)/changelogs.xml.lzma \
-		  $(mediasrcsdir)/changelogs.xml.lzma
+urpmi_changelogs = $(mediamaindir)/changelog.xml.lzma \
+		  $(mediadebgdir)/changelog.xml.lzma \
+		  $(mediadevldir)/changelog.xml.lzma \
+		  $(mediasrcsdir)/changelog.xml.lzma
 
-urpmi_hdlists	= $(mediadir)/hdlist.cz \
-		  $(mediafulldir)/hdlist.cz \
-		  $(mediamaindir)/hdlist.cz \
+urpmi_hdlists	= $(mediamaindir)/hdlist.cz \
 		  $(mediadebgdir)/hdlist.cz \
 		  $(mediadevldir)/hdlist.cz \
 		  $(mediasrcsdir)/hdlist.cz
 
-urpmi_synthesis	= $(mediadir)/synthesis.hdlist.cz \
-		  $(mediafulldir)/synthesis.hdlist.cz \
-		  $(mediamaindir)/synthesis.hdlist.cz \
+urpmi_synthesis	= $(mediamaindir)/synthesis.hdlist.cz \
 		  $(mediadebgdir)/synthesis.hdlist.cz \
 		  $(mediadevldir)/synthesis.hdlist.cz \
 		  $(mediasrcsdir)/synthesis.hdlist.cz
 
-urpmi_compsss	= $(mediadir)/compss \
-		  $(mediafulldir)/compss \
-		  $(mediamaindir)/compss \
+urpmi_compsss	= $(mediamaindir)/compss \
 		  $(mediadebgdir)/compss \
 		  $(mediadevldir)/compss \
 		  $(mediasrcsdir)/compss
 
+urpmi_files	= $(urpmi_cfgs) $(urpmi_filelists) $(urpmi_infolists) $(urpmi_changelogs) \
+		  $(urpmi_hdlists) $(urpmi_synthesis) $(urpmi_compsss) $(urpmi_keys) $(urpmi_sums) \
+		  $(mediadir)/hdlist*.cz \
+		  $(mediadir)/synthesis.hdlist*.cz \
+		  $(mediadir)/pubkey* \
+		  $(mediadir)/hdlists
+
+repo-link-urpmi: $(RELEASE_DIRECTORIES)
+	( cd $(topdir)/RPMS ; rm -f -- src ; ln -sf ../SRPMS src )
+
+RELEASE_LINKS		+= repo-link-urpmi
+
+$(urpmi_cfgs):
+	( \
+		$(ECHO) "[media_info]" ; \
+		$(ECHO) "version=$(target_edition)" ; \
+		$(ECHO) "mediacfg_version=2" ; \
+		$(ECHO) "branch=OpenSS7" ; \
+		$(ECHO) "arch=$(target_cpu)" ; \
+		$(ECHO) "xml-info=1" ; \
+		$(ECHO) "" ; \
+		find '$(DISTDIR)' -follow -type d -name 'media_info' | sort -u | while read d ; do \
+			s=`echo $$d | sed 's,^$(DISTDIR)/,,;s,/media_info$$,,;t;s,/data$$,,'` ; \
+			s=`echo $$s | sed 's,rpms/,,;s,\.[0-9][0-9]*,,'` ; \
+			s=`echo $$s | sed -r 's,^([^/]*/[^/]*/[^/]*)/(.*)$$,\2,;t;s,.*,,'` ; \
+			s=`echo $$s | sed 's,^media,,;s,^Mandrake,,;s,^/,,'` ; \
+			test -n "$$s" || continue ; \
+			case "$$s" in \
+			(main|debug|devel|source) \
+				b= ; \
+				r="$$s" ;; \
+			(updates/*|extras/*|testing/*|*/*) \
+				b=`echo "$$s" | sed 's,/.*$$,,'` ; \
+				r=`echo "$$s" | sed 's,^[^/]*/,,'` ;; \
+			esac ; \
+			$(ECHO) "[$$s]" ; \
+			stem=`echo "$$s" | sed 's,[^a-zA-Z0-9_],_,g'` ; \
+			$(ECHO) "hdlist=hdlist_$$stem.cz" >/dev/null ; \
+			$(ECHO) "synthesis=synthesis.hdlist_$$stem.cz" >/dev/null ; \
+			$(ECHO) "info=info_$$stem.xml.lzma" >/dev/null ; \
+			$(ECHO) "changelog=changelog_$$stem.xml.lzma" >/dev/null ; \
+			$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
+			$(ECHO) "pubkey=pubkey_$$stem" >/dev/null ; \
+			repo=`echo "$$b" | sed 's,^$$,Base,;t;s,updates,Updates,;t;s,extras,Extras,;t;s,testing,Testing,'` ; \
+			bran=`echo "$$r" | sed 's,^$$,Full,;t;s,main,Main,;t;s,debug,Debug,;t;s,devel,Devel,;t;s,source,Source,'` ; \
+			$(ECHO) "name=$${repo} $${bran}" ; \
+			case "$$r" in \
+			(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
+			(*)	 $(ECHO) "srpms=$${b:+$$b/}source" ;; \
+			esac ; \
+			$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
+			case "$$b:$$r" in \
+			(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
+			esac ; \
+			$(ECHO) "" ; \
+		done ; \
+	) >$@
+
+GPGEXPORTKEY = \
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
+	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+
+$(urpmi_keys)::
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGEXPORTKEY)
+
+repo-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_cfgs)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@( cd $(mediamaindir)/.. ; \
+		rb='$(repobranch)' ; rpms="../../$${rb:+..$$rb/}RPMS" ; \
+		find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' \
+		| sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
+	)
+	@( cd $(mediadebgdir)/.. ; \
+		rb='$(repobranch)' ; rpms="../../$${rb:+..$$rb/}RPMS" ; \
+		find $$rpms -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' \
+		| sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
+	)
+	@( cd $(mediadevldir)/.. ; \
+		rb='$(repobranch)' ; rpms="../../$${rb:+..$$rb/}RPMS" ; \
+		find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' \
+		| sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
+	)
+	@( cd $(mediasrcsdir)/.. ; \
+		rb='$(repobranch)' ; rpms="../../$${rb:+..$$rb/}RPMS" ; \
+		find $$rpms -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' \
+		| sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
+	)
+	$(GENDISTRIB) --blind --clean $(rpmdistdir)
+
+repo-sign-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_keys)
+
+repo-clean-urpmi:
+	@$(ECHO_V) "Making $@ in `pwd`"
+	@find $(mediadir)/.. -name '*.rpm' | sed 's,/[^/][^/]*/\.\./,/,' | while read f ; do \
+		if test -L $$f ; then \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
 
 
+REPO			+= repo-urpmi
+REPO_SIGN		+= repo-sign-urpmi
+REPO_CLEAN		+= repo-clean-urpmi
+REPOCLEANFILES		+= $(urpmi_files)
+
+RELEASE			+= repo-urpmi
+RELEASE_SIGN		+= repo-sign-urpmi
+RELEASE_CLEAN_LOCAL	+= repo-clean-urpmi
+RELEASECLEANFILES	+= $(urpmi_files)
+
+UPDATE			+= repo-urpmi
+UPDATE_SIGN		+= repo-sign-urpmi
+UPDATE_CLEAN_LOCAL	+= repo-clean-urpmi
+UPDATECLEANFILES	+=
+
+release-copy-urpmi:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files='$(urpmi_keys) $(rpm_source_files) $(rpm_binary_files)' ; \
+	for f in $$files ; do \
+		test -f $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		if test ! -f $$t -o \( ":$(FORCE)" = :force -a $$f -nt $$t \) ; then \
+			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
+			install -T -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+release-remove-urpmi:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files=`echo ' $(rpm_source_files) $(rpm_binary_files) ' | sed -e 's, $(DISTDIR), $(REPODIR),g;s,^ ,,;s, $$,,'` ; \
+	for f in $$files ; do \
+		test -f $$f || continue ; \
+		$(ECHO) "  rm -f -- $$f" ; \
+		rm -f -- $$f ; \
+	done
+
+release-update-urpmi:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
+	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
+	for b in '' updates extras testing $$rb ; do \
+		dir="$${repodir}/media$${b:+/$$b}" ; \
+		test -d $$dir || { $(ECHO) "mkdir -p $$dir" ; mkdir -p $$dir ; } ; \
+		if test -z "`find $$dir/SRPMS -name '*.rpm' 2>/dev/null" ; then \
+			if test -L $$dir/RPMS/src ; then \
+				$(ECHO) "rm -f -- $$dir/RPMS/src" ; \
+				rm -f -- $$dir/RPMS/src ; \
+			fi ; \
+			if test -d $$dir/SRPMS ; then \
+				$(ECHO) "rmdir -p -- $$dir/SRPMS" ; \
+				rmdir -p -- $$dir/SRPMS 2>/dev/null || : ; \
+			fi ; \
+		else \
+			test -d $$dir/RPMS || { $(ECHO) "mkdir -p $$dir/RPMS"; mkdir -p $$dir/RPMS ; } ; \
+			if test ! -L $$dir/RPMS/src ; then \
+				$(ECHO) "( cd $$dir/RPMS; ln -sf -- ../SRPMS src )" ; \
+				( cd $$dir/RPMS; ln -sf -- ../SRPMS src ) ; \
+			fi ; \
+		fi ; \
+		if test -z "`find $$dir/RPMS -name '*.rpm' 2>/dev/null`" ; then \
+			if test -d $$dir/RPMS ; then \
+				$(ECHO) "rmdir -p -- $$dir/RPMS" ; \
+				rmdir -p -- $$dir/RPMS 2>/dev/null || : ; \
+			fi ; \
+		fi ; \
+		for r in main debug devel source ; do \
+			dir="$${repodir}/media$${b:+/$$b}$${r:+/$$r}" ; \
+			test -d $$dir/media_info || { $(ECHO) "mkdir -p -- $$dir/media_info" ; mkdir -p -- $$dir/media_info ; } ; \
+			find $$dir -name '*.rpm' | while read f ; do \
+				if test -L $$f ; then \
+					$(ECHO) "rm -f -- $$f" ; \
+					rm -f -- $$f ; \
+				fi ; \
+			done ; \
+			rpms="../$${r:+../}$${b:+../$$b/}RPMS" ; \
+			case "$${r:-base}" in \
+			(main) ( cd $$dir ; \
+				find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' \
+				| sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
+				) ;; \
+			(debug) ( cd $$dir ; \
+				find $$rpms -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' \
+				| sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
+				) ;; \
+			(devel) ( cd $$dir ; \
+				find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' \
+				| sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
+				) ;; \
+			(source) ( cd $$dir ; \
+				find $$rpms -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' \
+				| sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
+				) ;; \
+			(base) ( cd $$dir ; \
+				find $$rpms -follow -name '*.rpm' \
+				| sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
+				) ;; \
+			esac ; \
+		done ; \
+	done ; \
+	m=$${repodir}/media/media_info ; \
+	test -d $$m || { $(ECHO) "mkdir -p -- $$m" ; mkdir -p -- $$m ; } ; \
+	( \
+		$(ECHO) "[media_info]" ; \
+		$(ECHO) "version=$(target_edition)" ; \
+		$(ECHO) "mediacfg_version=2" ; \
+		$(ECHO) "branch=OpenSS7" ; \
+		$(ECHO) "arch=$(target_cpu)" ; \
+		$(ECHO) "xml-info=1" ; \
+		$(ECHO) "" ; \
+		for b in '' updates extras testing $$rb ; do \
+			repo=`echo "$$b" | sed 's,^$$,Base,;t;s,updates,Updates,;t;s,extras,Extras,;t;s,testing,Testing,'` ; \
+			t=`echo "$$b" | sed 's,^$$,base,'` ; \
+			for r in main debug devel source ; do \
+				if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
+				stem=`echo "$$s" | sed 's,[^a-zA-Z0-9_],_,g'` ; \
+				bran=`echo "$$r" | sed 's,main,Main,;t;s,debug,Debug,;t;s,devel,Devel,;t;s,source,Source,;t;s,^$$,Full,'` ; \
+				$(ECHO) "[$$s]" ; \
+				$(ECHO) "hdlist=hdlist_$$stem.cz" >/dev/null ; \
+				$(ECHO) "synthesis=synthesis.hdlist_$$stem.cz" >/dev/null ; \
+				$(ECHO) "info=info_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "changelog=changelog_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
+				$(ECHO) "name=$${repo} $${bran}" ; \
+				case "$$r" in \
+				(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
+				(*) 	 $(ECHO) "srpms=$${b:+$$b/}source" ;; \
+				esac ; \
+				$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
+				case "$$b:$$r" in \
+				(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
+				esac ; \
+				$(ECHO) "" ; \
+			done ; \
+		done ; \
+	) >>$$m/media.cfg ; \
+	$(ECHO) "$(GENDISTRIB) --blind --clean $${repodir}" ; \
+	$(GENDISTRIB) --blind --clean $${repodir}
 
 
+MY_PHONY		+= release-copy-urpmi release-remove-urpmi release-update-urpmi
+
+##
+# Copy rpms from the distribution directory to the release directory and
+# rebuild the urpmi metafiles in the release directory.
+##
+release-install-urpmi: release-copy-urpmi release-update-urpmi
+
+##
+# Remove rpms from the release directory that are present in the distribution
+# directory and rebuild the urpmi metafiles in the release directory.
+##
+release-uninstall-urpmi: release-remove-urpmi release-update-urpmi
+
+RELEASE_INSTALL		+= release-install-urpmi
+RELEASE_UNINSTALL	+= release-uninstall-urpmi
+
+##
+# Copy update rpms from the distribution directory to the release directory and
+# rebuild the urpmi metafiles in the release directory.
+##
+update-install-urpmi:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@\
+	if test '$(DISTDIR)' != '$(REPODIR)' ; then \
+		files='$(rpm_source_files) $(rpm_binary_files)' ; \
+		for f  in $$files ; do \
+			test -f $$f || continue ; \
+			t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+			if test ! -f $$f -o \( ":$(FORCE)" = :force -a $$f -nt $$t \) ; then \
+				$(ECHO) "  install -T -C -D -p -- $$f $$t" ; \
+				install -T -C -D -p -- $$f $$t ; \
+			fi ; \
+		done ;  \
+	fi
+
+##
+# Remove update rpms from the release directory that are present in the
+# distribution directory and rebuild the urpmi metafiles in the release
+# directory.
+##
+update-uninstall-urpmi:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@\
+	if test '$(DISTDIR)' != '$(REPODIR)' ; then \
+		files=`echo ' $(rpm_source_files) $(rpm_binary_files) ' | sed -e 's, $(DISTDIR), $(REPODIR),g;s,^ ,,;s, $$,,'` ; \
+		for f in $$files ; do \
+			test -f $$f || continue ; \
+			$(ECHO) "  rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		done ; \
+	fi
+
+UPDATE_INSTALL		+= update-install-urpmi
+UPDATE_UNINSTALL	+= update-uninstall-urpmi
 
 ## BUILD_REPO_URPMI
 endif
