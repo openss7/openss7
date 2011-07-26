@@ -1964,14 +1964,14 @@ urpmi_files	= $(urpmi_cfgs) $(urpmi_filelists) $(urpmi_infolists) $(urpmi_change
 repo-link-urpmi: $(RELEASE_DIRECTORIES)
 	( cd $(topdir)/RPMS ; rm -f -- src ; ln -sf ../SRPMS src )
 
-RELEASE_LINKS		+= repo-link-uprmi
+RELEASE_LINKS		+= repo-link-urpmi
 
 $(urpmi_cfgs):
 	( \
 		$(ECHO) "[media_info]" ; \
-		$(ECHO) "version=$(VERSION)" ; \
+		$(ECHO) "version=$(target_edition)" ; \
 		$(ECHO) "mediacfg_version=2" ; \
-		$(ECHO) "branch=Release" ; \
+		$(ECHO) "branch=OpenSS7" ; \
 		$(ECHO) "arch=$(target_cpu)" ; \
 		$(ECHO) "xml-info=1" ; \
 		$(ECHO) "" ; \
@@ -1997,14 +1997,14 @@ $(urpmi_cfgs):
 			$(ECHO) "changelog=changelog_$$stem.xml.lzma" >/dev/null ; \
 			$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
 			$(ECHO) "pubkey=pubkey_$$stem" >/dev/null ; \
-			repo=`echo "$$b" | sed 's,^$$,Core,;t;s,updates,Updates,;t;s,extras,Extras,;t;s,testing,Testing,'` ; \
+			repo=`echo "$$b" | sed 's,^$$,Base,;t;s,updates,Updates,;t;s,extras,Extras,;t;s,testing,Testing,'` ; \
 			bran=`echo "$$r" | sed 's,^$$,Full,;t;s,main,Main,;t;s,debug,Debug,;t;s,devel,Devel,;t;s,source,Source,'` ; \
 			$(ECHO) "name=$${repo} $${bran}" ; \
 			case "$$r" in \
 			(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
 			(*)	 $(ECHO) "srpms=$${b:+$$b/}source" ;; \
 			esac ; \
-			$(ECHO) "media_type=release:$${b:-core}:$${r:-full}" ; \
+			$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
 			case "$$b:$$r" in \
 			(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
 			esac ; \
@@ -2164,15 +2164,15 @@ release-update-urpmi:
 	test -d $$m || { $(ECHO) "mkdir -p -- $$m" ; mkdir -p -- $$m ; } ; \
 	( \
 		$(ECHO) "[media_info]" ; \
-		$(ECHO) "version=$(VERSION)" ; \
+		$(ECHO) "version=$(target_edition)" ; \
 		$(ECHO) "mediacfg_version=2" ; \
-		$(ECHO) "branch=Release" ; \
+		$(ECHO) "branch=OpenSS7" ; \
 		$(ECHO) "arch=$(target_cpu)" ; \
 		$(ECHO) "xml-info=1" ; \
 		$(ECHO) "" ; \
 		for b in '' updates extras testing $$rb ; do \
-			repo=`echo "$$b" | sed 's,^$$,Core,;t;s,updates,Updates,;t;s,extras,Extras,;t;s,testing,Testing,'` ; \
-			t=`echo "$$b" | sed 's,^$$,core,'` ; \
+			repo=`echo "$$b" | sed 's,^$$,Base,;t;s,updates,Updates,;t;s,extras,Extras,;t;s,testing,Testing,'` ; \
+			t=`echo "$$b" | sed 's,^$$,base,'` ; \
 			for r in main debug devel source ; do \
 				if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
 				stem=`echo "$$s" | sed 's,[^a-zA-Z0-9_],_,g'` ; \
@@ -2188,7 +2188,7 @@ release-update-urpmi:
 				(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
 				(*) 	 $(ECHO) "srpms=$${b:+$$b/}source" ;; \
 				esac ; \
-				$(ECHO) "media_type=release:$${b:-core}:$${r:-full}" ; \
+				$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
 				case "$$b:$$r" in \
 				(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
 				esac ; \
@@ -2204,7 +2204,7 @@ MY_PHONY		+= release-copy-urpmi release-remove-urpmi release-update-urpmi
 
 ##
 # Copy rpms from the distribution directory to the release directory and
-# rebuild the uprmi metafiles in the release directory.
+# rebuild the urpmi metafiles in the release directory.
 ##
 release-install-urpmi: release-copy-urpmi release-update-urpmi
 

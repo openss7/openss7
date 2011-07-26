@@ -177,6 +177,7 @@
 
 %global HAVE_yumrepo        %(if (rpm -q --whatprovides yum >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 %global HAVE_zypprepo       %(if (rpm -q --whatprovides zypper >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%global HAVE_urpmirepo      %(if (rpm -q --whatprovides urpmi >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 # when _reposubdir is not defined we cannot build a repo package
 %{!?_reposubdir:            %{expand: %%global HAVE_yumrepo 0}}
 
@@ -384,11 +385,15 @@
 %global FILES_mkvars        %{HAVE_mkvars}
 %global FILES_yumrepo       %{HAVE_yumrepo}
 %global FILES_zypprepo      %{HAVE_zypprepo}
+%global FILES_urpmirepo     %{HAVE_urpmirepo}
 %global FILES_repo          0
 %if %{FILES_yumrepo}
 %global FILES_repo          1
 %endif
 %if %{FILES_zypprepo}
+%global FILES_repo          1
+%endif
+%if %{FILES_urpmirepo}
 %global FILES_repo          1
 %endif
 
@@ -598,6 +603,8 @@
 %{!?_zyppcreddir:       %{expand: %%global _zyppcreddir     %%{_sysconfdir}/zypp/credentials.d}}
 %{!?_zyppservdir:       %{expand: %%global _zyppservdir     %%{_sysconfdir}/zypp/services.d}}
 %{!?_rpmgpgdir:         %{expand: %%global _rpmgpgdir       %%{_sysconfdir}/pki/rpm-gpg}}
+%{!?_urpmirepodir:      %{expand: %%global _urpmirepodir    %%{_sysconfdir}/urpmi/mediacfg.d}}
+%{!?_urpmiconfdir:      %{expand: %%global _urpmiconfdir    %%{_sysconfdir}/urpmi}}
 
 %{!?_repobase:          %{expand: %%global _repobase        @repobase@}}
 %{!?_reporoot:          %{expand: %%global _reporoot        @reporoot@}}
@@ -715,6 +722,7 @@
 %global FILES_manpages      0
 %global FILES_yumrepo       0
 %global FILES_zypprepo      0
+%global FILES_urpmirepo     0
 %global FILES_repo          0
 %global FILES_kupdate       0
 %global FILES_wmscripts     0
@@ -885,11 +893,17 @@
 %if %{HAVE_zypprepo}
 %global NEED_repo       1
 %endif
+%if %{HAVE_urpmirepo}
+%global NEED_repo       1
+%endif
 
 %if %{FILES_yumrepo}
 %global WANT_repo       1
 %endif
 %if %{FILES_zypprepo}
+%global WANT_repo       1
+%endif
+%if %{FILES_urpmirepo}
 %global WANT_repo       1
 %endif
 
@@ -1717,6 +1731,9 @@
 %if %{FILES_zypprepo}
 %global files_zypprepo      %{nil}
 %endif
+%if %{FILES_urpmirepo}
+%global files_urpmirepo     %{nil}
+%endif
 %if %{FILES_repo}
 %global files_repo          %{nil}
 %endif
@@ -1823,7 +1840,11 @@ Epoch:          @PACKAGE_RPMEPOCH@
 Version:        @VERSION@
 Release:        %{rpmrelease}
 License:        %{license}
+%if HAVE_urpmirepo
+Group:          System/Kernel and hardware
+%else
 Group:          System Environment/Kernel
+%endif
 %{?url:URL:     %{url}}
 %{?_xpm_icon:Icon: %{_xpm_icon}}
 %{?_gif_icon:Icon: %{_gif_icon}}
@@ -2462,7 +2483,11 @@ cp -p src/python/yum-plugins/*.conf $d
 # ---------------------------------------------------------------------------
 
 Summary:            %{title} repository setup package.
+%if %{HAVE_urpmirepo}
+Group:              System/Configuration/Packaging
+%else
 Group:              System Environment/Kernel
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -2477,6 +2502,9 @@ Prefix:             %{_yumconfdir}
 
 %if %{FILES_zypprepo}
 #refix:             %{_zypprepodir}
+%endif
+%if %{FILES_urpmirepo}
+#refix:             %{_urpmirepodir}
 %endif
 
 %if %{FILES_yumrepo}
@@ -2496,6 +2524,15 @@ Requires(prereq):   zypper
 #equires(preun):    zypper
 #equires(post):     zypper
 #equires(postun):   zypper
+%endif
+
+%if %{FILES_urpmirepo}
+Requires:           urpmi
+Requires(prereq):   urpmi
+#equires(pre):      urpmi
+#equires(preun):    urpmi
+#equires(post):     urpmi
+#equires(postun):   urpmi
 %endif
 
 %if %{FILES_repo}
@@ -2535,7 +2572,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 		break
 	    fi
 	done
-	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.rpmsave
+	[ ":$oldfile" != ":$file" -a -e $file ] || mv -f -- $file $file.rpmsave
 	ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
 	ext="$ext"`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
 	key=; [ -z "$un" ] || key="${un}${pw:+:}${pw}@"
@@ -2561,7 +2598,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 	    fi
 	fi
 	if [ ! -e $file ] ; then
-	    [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
+	    [ ":$oldfile" != ":$file" -a -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
 	    exit 1
 	fi
     ) || exit 1
@@ -2579,7 +2616,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 		break
 	    fi
 	done
-	[ ":$oldfile" != ":$file" ] || mv -f -- $file $file.rpmsave
+	[ ":$oldfile" != ":$file" -a -e $file ] || mv -f -- $file $file.rpmsave
 	ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=$un}${pw:+&pw=$pw}"
 	ext="$ext"`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
 	url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
@@ -2603,7 +2640,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 	    fi
 	fi
 	if [ -e $file ] ; then chmod go-rw $file; else
-	    [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
+	    [ ":$oldfile" != ":$file" -a -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
 	    exit 1
 	fi
     ) || exit 1
@@ -2628,6 +2665,75 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 	    [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
 	    exit 1
 	fi
+    ) || exit 1
+%endif
+%if %{FILES_urpmirepo}
+    (
+        umask 600
+        cd '%{_urpmiconfdir}'
+        un=; pw=; oldfile=; file='netrc.@PACKAGE@'
+        for s in '' '.rpmsave' '.rpmnew' ; do
+            oldfile="$file$s"
+            if [ -e $oldfile ] ; then
+                un=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\1,p;t end;b;: end q' $oldfile
+                pw=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\2,p;t end;b;: end q' $oldfile
+                [ -n "$un" -a -n "$pw" ] || continue
+                break
+            fi
+        done
+        [ ":$oldfile" != ":$file" -a -e $file ] || mv -f -- $file $file.rpmsave
+        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw}${pw}"
+        ext="$ext"`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
+        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
+        rm -f -- $file
+        if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
+            if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
+                echo 'Authorization required for repository access.' >/dev/tty
+                u='anonymous'; p=
+                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-anonymous}
+                if [ "$u" != 'anonymous' ] ; then
+                read -es -p 'Password: ' p </dev/tty >/dev/tty
+                echo '' >/dev/tty
+                fi
+                url='%{_reposerv}://'"${u:+$u:$p@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
+                rm -f -- $file
+                if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
+                    [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
+                    echo 'Authorization failed.' >/dev/tty
+                    exit 1
+                fi
+            fi
+        fi
+        if [ -e $file ] ; then chmod go-rw $file ; else
+            [ ":$oldfile" != ":$file" -a -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
+            exit 1
+        fi
+    ) || exit 1
+    (
+        cd '%{_urpmiconfdir}'
+        un=; pw=; file='netrc.@PACKAGE@'
+        if [ -e $file ] ; then
+            un=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\1,p;t end;b;: end q' $oldfile
+            pw=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\2,p;t end;b;: end q' $oldfile
+        fi
+        [ -n "$un" -a -n "$pw" ] || exit 1
+        cd '%{_urpmirepodir}'
+        [ -d '@PACKAGE_STITLE@' ] || mkdir -p -- '@PACKAGE_STITLE@'
+        cd '@PACKAGE_STITLE@'
+        file='media.cfg'
+        [ ! -e $file ] || mv -f -- $file $file.rpmsave
+        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/%{_reposubdir}/media/media_info/'"$file"
+        rm -f -- $file
+        if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
+            [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
+            exit 1
+        fi
+        if [ ! -e $file ] ; then
+            [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
+            exit 1
+        fi
+        echo '%{_reposerv}://%{_repobase}/%{_reporoot}/%{_reposubdir}' >url
+        rm -f -- mirrorlist
     ) || exit 1
 %endif
 fi
@@ -2659,6 +2765,8 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 	fi
     done
 %endif
+%if %{FILES_urpmirepo}
+%endif
 fi
 
 %preun -p /bin/bash repo
@@ -2677,6 +2785,8 @@ if [ $1 -eq 0 ] ; then : # final removal
     rm -rf -- %{_localstatedir}/cache/zypp/packages/@PACKAGE_UCNAME@\:@PACKAGE@*
     rm -rf -- %{_localstatedir}/cache/zypp/raw/@PACKAGE_UCNAME@\:@PACKAGE@*
     rm -rf -- %{_localstatedir}/cache/zypp/solv/@PACKAGE_UCNAME@\:@PACKAGE@*
+%endif
+%if %{FILES_urpmirepo}
 %endif
 fi
 
@@ -2705,6 +2815,8 @@ if [ $1 -eq 0 ] ; then : # final removal
 	rm -f -- $f.rpmsave
     done
 %endif
+%if %{FILES_urpmirepo}
+%endif
 fi
 
 %if %{PACKAGE_repo}
@@ -2728,7 +2840,11 @@ fi
 # ---------------------------------------------------------------------------
 
 Summary:            %{title} base support package.
+%if %{HAVE_urpmirepo}
+Group:              System/Base
+%else
 Group:              System Environment/Kernel
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -3261,7 +3377,11 @@ fi
 # ---------------------------------------------------------------------------
 
 Summary:            %{title} developer and programmer documentation.
+%if %{HAVE_urpmirepo}
+Group:              Development/Documentation
+%else
 Group:              Development/System
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -3442,7 +3562,11 @@ fi
 # ---------------------------------------------------------------------------
 
 Summary:            %{title} run-time libraries and utilities.
+%if %{HAVE_urpmirepo}
+Group:              System/Libraries
+%else
 Group:              System Environment/Libraries
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -4019,7 +4143,11 @@ fi
 # ---------------------------------------------------------------------------
 
 Summary:            %{title} 32-bit run-time libraries and utilities.
+%if %{HAVE_urpmirepo}
+Group:              System/Libraries
+%else
 Group:              System Environment/Libraries
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -4100,7 +4228,11 @@ fi
 %package devel
 
 Summary:            %{title} configured headers, static libraries and debug info.
+%if %{HAVE_urpmirepo}
+Group:              Development/Libraries
+%else
 Group:              Development/System
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -4209,7 +4341,11 @@ fi
 %package debuginfo
 
 Summary:            %{title} debugging symbols.
+%if %{HAVE_urpmirepo}
+Group:              Development/Other
+%else
 Group:              Development/System
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -4250,7 +4386,11 @@ package.
 %package debugsource
 
 Summary:            %{title} debugging source.
+%if %{HAVE_urpmirepo}
+Group:              Development/Other
+%else
 Group:              Development/System
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -4324,7 +4464,11 @@ this package.
 #
 
 Summary:            %{title} kernel modules.
+%if %{HAVE_urpmirepo}
+Group:              System/Kernel and hardware
+%else
 Group:              System Environment/Kernel
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -4739,7 +4883,11 @@ fi
 # ---------------------------------------------------------------------------
 
 Summary:            %{title} kernel module symbol versions and debug info.
+%if %{HAVE_urpmirepo}
 Group:              Development/Kernel
+%else
+Group:              Development/Kernel
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -4872,7 +5020,11 @@ fi
 %package -n %{kernel_buginfo}
 
 Summary:            %{title} kernel module debugging information.
+%if %{HAVE_urpmirepo}
 Group:              Development/Kernel
+%else
+Group:              Development/Kernel
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -4932,7 +5084,11 @@ package or when debugging this package.
 %package -n %{kernel_bugsrce}
 
 Summary:            %{title} kernel module debugging source.
+%if %{HAVE_urpmirepo}
 Group:              Development/Kernel
+%else
+Group:              Development/Kernel
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -4990,7 +5146,11 @@ package or when debugging this package.
 # -----------------------------------------------------------------------------
 
 Summary:            %{title} source configured for kernel.
+%if %{HAVE_urpmirepo}
 Group:              Development/Kernel
+%else
+Group:              Development/Kernel
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -5063,7 +5223,11 @@ that are not present in the %{name}-devel-kernel package.
 %package java
 
 Summary:            %{title} Java modules and native libraries.
+%if %{HAVE_urpmirepo}
+Group:              Development/Java
+%else
 Group:              System Environment/Libraries
+%endif
 %{?_xpm:Icon:       %_xpm}
 %{?_gif:Icon:       %_gif}
 Autoreq:            true
@@ -5241,7 +5405,11 @@ fi
 %package javadoc
 
 Summary:        %{title} Javadoc.
+%if %{HAVE_urpmirepo}
+Group:          Development/Java
+%else
 Group:          Development/System
+%endif
 %{?_xpm:Icon:   %_xpm}
 %{?_gif:Icon:   %_gif}
 Autoreq:        true
