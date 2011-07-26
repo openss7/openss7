@@ -901,6 +901,7 @@ function read_modobject(command, dir, own, src,
 		}
 		print_debug(1,pfx "module = " $0)
 		sub(/(\.mod)?\.(k)?o(\.gz)?$/, "")
+		sub("^" me "." PROCINFO["pid"] ".modules/", "")
 		if (own == values["pkgdirectory"]) {
 		    sub(/.*\//, "")
 		    $0 = values["pkgdirectory"] "/" $0
@@ -1140,15 +1141,68 @@ function read_dumpfiles(command, own, src)
     close(command)
     print_vinfo(1,"r: dumpfiles, syms " count_syms ", unds " count_unds)
 }
-function read_moduledir(directory, src,	    dir,command)
+function read_moduledir(directory, src,	    dir,command,find,file,tmpdir,dirs,written)
 {
     print_vinfo(1,"r: moduledir, directory = \"" directory "\"")
+    tmpdir = me "." PROCINFO["pid"] ".modules"
+    system_command("mkdir -p -- " tmpdir)
     dir = "kernel"
-    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
-    read_modobject(command, dir, "kernel", src)
+    find = "find " directory "/" dir " -type f \\( -name '*.ko' -o -name '*.ko.gz' \\) 2>/dev/null"
+    if (system("test -d " directory "/" dir) == 0) {
+	system_command("rm -f -- " tmpdir "/modules.list 2>/dev/null")
+	written = 0
+	while ((find | getline file) == 1) {
+	    if (file~/\.ko\.gz$/) {
+		dir = tmpdir "/" file
+		sub(/\/[^\/]*$/, "", dir)
+		if (!(dir in dirs)) {
+		    system_command("mkdir -p -- " dir)
+		    dirs[dir] = 1
+		}
+		sub(/\.ko\.gz$/, ".ko", file)
+		system_command("gzip -dc " file ".gz >" tmpdir "/" file)
+		print tmpdir "/" file >> tmpdir "/modules.list"
+	    } else {
+		print file >> tmpdir "/modules.list"
+	    }
+	    written = 1
+	}
+	close(find)
+	if (written) {
+	    close(tmpdir "/modules.list")
+	    command = "cat " tmpdir "/modules.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+	    read_modobject(command, dir, "kernel", src)
+	}
+    }
     dir = values["pkgdirectory"]
-    command = "find " directory "/" dir " -type f -name '*.ko' 2>/dev/null | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
-    read_modobject(command, dir, values["pkgdirectory"], "pkgdirectory")
+    find = "find " directory "/" dir " -type f \\( -name '*.ko' -o -name '*.ko.gz' \\) 2>/dev/null"
+    if (system("test -d " directory "/" dir) == 0) {
+	system_command("rm -f -- " tmpdir "/modules.list 2>/dev/null")
+	written = 0
+	while ((find | getline file) == 1) {
+	    if (file~/\.ko\.gz$/) {
+		dir = tmpdir "/" file
+		sub(/\/[^\/]*$/, "", dir)
+		if (!(dir in dirs)) {
+		    system_command("mkdir -p -- " dir)
+		    dirs[dir] = 1
+		}
+		sub(/\.ko\.gz$/, ".ko", file)
+		system_command("gzip -dc " file ".gz >" tmpdir "/" file)
+		print tmpdir "/" file >> tmpdir "/modules.list"
+	    } else {
+		print file >> tmpdir "/modules.list"
+	    }
+	    written = 1
+	}
+	close(find)
+	if (written) {
+	    close("modules.list")
+	    command = "cat modules.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+	    read_modobject(command, dir, values["pkgdirectory"], "pkgdirectory")
+	}
+    }
+    system_command("rm -rf -- " tmpdir)
 }
 function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
     fmt = "r: mymodules, %-20s: %14s; %-30s"
@@ -1156,9 +1210,11 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
     for (i = 1; i in modules; i++)
 	print modules[i] > "modvers.list"
     close("modvers.list")
-    command = "cat modvers.list | xargs objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+    #command = "cat modvers.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+    command = "cat modvers.list | while read f ; do case $f in (*.ko) echo $f ;; (*.ko.gz) gzip -dc $f >/var/tmp/`basename $f .gz` ; echo /var/tmp/`basename $f .gz` ;; esac ; done | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
     read_modobject(command, ".", values["pkgdirectory"], src)
     system("rm -f modvers.list")
+    system("rm -f /var/tmp/*.ko")
     # double check
     for (pair in mod_unds) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]; base = name; gsub(/^.*\//, "", base)
