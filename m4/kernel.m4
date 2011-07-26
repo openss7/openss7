@@ -749,7 +749,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		esac
 		linux_cv_k_base=`echo "$kversion" | sed -r -e s/-$linux_cv_k_boot$//`
 		;;
-	    (debian|ubuntu)
+	    (debian|ubuntu|lts)
 		case "${kversion}" in
 		    # debian boot kernels
 		    (*)		    linux_cv_k_boot=		;;
@@ -1304,7 +1304,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 		    case "$target_vendor" in
 			(mandrake|mandriva|manbo|mageia|mes)
 			    ;;
-			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			(redhat|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1420,7 +1420,7 @@ dnl				image name approach with the Redhat kernel version number in the
 dnl				kernel image name approach to yeild reliable system map files.
 dnl
 				;;
-			    (redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			    (redhat|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
 dnl
 dnl				Unfortunately the redhat system map files are unreliable because the
 dnl				are not unique for each architecture.  The system map file has to be
@@ -1521,7 +1521,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 		if test ${linux_cv_k_versions:-no} != no -a ${linux_cv_k_modversions:-no} != no ; then
 		    case "$target_vendor" in
 			# debian based systems do not have this file
-			(debian:*|ubuntu:*|mint:*)
+			(debian:*|ubuntu:*|lts:*|mint:*)
 			    ;;
 			(centos|lineox|whitebox|scientific|fedora|redhat|rhel|suse|sle|sles|sled|opensuse)
 			    tmp_fn="symvers-${kversion}.gz"
@@ -1563,7 +1563,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 		    case "$target_vendor" in
 			(mandrake|mandriva|manbo|mageia|mes)
 			    ;;
-			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			(redhat|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1649,7 +1649,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
 		    case "$target_vendor" in
 			(mandrake|mandriva|manbo|mageia|mes)
 			    ;;
-			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			(redhat|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1724,7 +1724,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 *** ])
 			    ;;
 			# debian and some rpm based systems do not have this file
-			(debian:*|ubuntu:*|mint:*|mandrake:*|mandriva:*|manbo:*|mageia:*|mes:*|*)
+			(debian:*|ubuntu:*|lts:*|mint:*|mandrake:*|mandriva:*|manbo:*|mageia:*|mes:*|*)
 			    ;;
 		    esac
 		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_k_symsets --without-k-symsets\""
@@ -1742,7 +1742,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 		    case "$target_vendor" in
 			(mandrake|mandriva|manbo|mageia|mes)
 			    ;;
-			(redhat|centos|whitebox|scientific|debian|ubuntu|suse|*)
+			(redhat|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -2410,12 +2410,12 @@ dnl
     fi
     AC_SUBST([krelease])
     case "$target_vendor-$kmajor.$kminor" in
-	(debian-2.4|ubuntu-2.4)
+	(debian-2.4|ubuntu-2.4|lts-2.4)
 	    kernel_image="kernel-image-${kversion}"
 	    kernel_source="kernel-source-${kmajor}-${kminor}"
 	    kernel_headers="kernel-headers-${kmajor}-${kminor}"
 	    ;;
-	(debian-2.6|ubuntu-2.6)
+	(debian-2.6|ubuntu-2.6|lts-2.6)
 	    kernel_image="linux-image-${kversion}"
 	    kernel_source="linux-source-${kmajor}.${kminor}"
 	    kernel_headers="linux-headers-${kmajor}.${kminor}"
@@ -2437,7 +2437,7 @@ dnl
 dnl		Mandrakelinux is built correctly.
 dnl
 		;;
-	    (debian|ubuntu)
+	    (debian|ubuntu|lts)
 dnl
 dnl		Debian can have a mismatch in kernel version.
 dnl
