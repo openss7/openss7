@@ -427,9 +427,9 @@ machine www.openss7.org login <% $hostname %> password <% $hostpass %>
 	if ( $page eq 'media.cfg' ) {
 <%/perl>
 [media_info]
-version=1.1.2
+version=<% $relver %>
 mediacfg_version=2
-branch=Release
+branch=OpenSS7
 arch=<% $osarch %>
 xml-info=1
 
@@ -665,7 +665,7 @@ xml-info=1
 		    elsif ($subrep eq 'source')	{ $r = 'Source'; }
 		    else			{ $r = $subrep;	 }
 		    my $b;
-		    if	  ($branch eq 'base')	 { $b = 'Core';	   }
+		    if	  ($branch eq 'base')	 { $b = 'Base';	   }
 		    elsif ($branch eq 'updates') { $b = 'Updates'; }
 		    elsif ($branch eq 'extras')	 { $b = 'Extras';  }
 		    elsif ($branch eq 'testing') { $b = 'Testing'; }

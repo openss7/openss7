@@ -383,6 +383,48 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
 	    AC_MSG_CHECKING([for urpmi media directory])
 	fi
     ])
+    AC_CACHE_CHECK([for urpmi config directory], [repo_cv_urpmi_confdir], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${rootdir}${sysconfdir}/urpmi
+	    ${DESTDIR}${rootdir}$/etc/urpmi
+	    ${DESTDIR}${sysconfdir}/urpmi
+	    ${DESTDIR}/etc/urpmi\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for urpmi config directory... $repo_dir])
+	    if test -d "$repo_dir" ; then
+		repo_cv_urpmi_confdir="$repo_dir"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_urpmi_confdir" || repo_cv_urpmi_confdir=no
+	AC_MSG_CHECKING([for urpmi config directory])
+    ])
+    AC_CACHE_CHECK([for urpmi config file], [repo_cv_uprmi_config], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${rootdir}${sysconfdir}/urpmi/urpmi.cfg
+	    ${DESTDIR}${rootdir}/etc/urmpi/urpmi.cfg
+	    ${DESTDIR}${sysconfdir}/urmpi/urpmi.cfg
+	    ${DESTDIR}/etc/urmpi/urpmi.cfg\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for urpmi config file... $repo_dir])
+	    if test -f "$repo_dir" ; then
+		repo_cv_urpmi_config="$repo_dir"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_urpmi_config" || repo_cv_urpmi_config=no
+	AC_MSG_CHECKING([for urpmi config file])
+    ])
 ])# _REPO_SETUP_URPMI
 # =============================================================================
 
@@ -512,11 +554,24 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
     fi
     AC_SUBST([zyppconfig])dnl
     urpmirepodir=
+    urpmimediadir=
     if test :"${repo_cv_urpmi_repodir:-no}" != :no ; then
 	urpmirepodir="$repo_cv_urpmi_repodir"
+	urpmimediadir="$repo_cv_urpmi_repodir/OpenSS7-${target_edition}-${target_cpu}"
     fi
     AC_SUBST([urpmirepodir])dnl
+    AC_SUBST([urpmimediadir])dnl
     AM_CONDITIONAL([WITH_INSTALL_SOURCE_URPMI], [test :"${repo_cv_urpmi_repodir:-no}" != :no])
+    urpmiconfig=
+    if test :"${repo_cv_urpmi_config:-no}" != :no ; then
+	urpmiconfig="$repo_cv_urpmi_config"
+    fi
+    AC_SUBST([urpmiconfig])
+    urpmiconfdir=
+    if test :$"{repo_cv_urpmi_confdir:-no}" != :no ; then
+	urpmiconfdir="$repo_cv_urpmi_confdir"
+    fi
+    AC_SUBST([urpmiconfdir])dnl
     aptrepodir=
     if test :"${repo_cv_apt_repodir:-no}" != :no ; then
 	aptrepodir="$repo_cv_apt_repodir"
