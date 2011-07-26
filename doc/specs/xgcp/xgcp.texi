@@ -772,25 +772,28 @@ The definitions of the C identifiers appear in four headers:
 This header file contains definitions for the associated OM interface.
 @item <xgcp.h>
 This header file contains common definitions for the access to the Gateway Control Protocol service
-(see @ref{Interface Functions}, and @ref{Common MAP Package}).  A listing of this header file is
-provided in @ref{xgcp.h}.
+(see @ref{Interface Functions}, and @ref{Common GCP Package}).
+@c A listing of this header file is provided in @ref{xgcp.h}.
 @item <xmap_mgcp.h>
 This header file contains specific definitions that reflect the Abstract Services of the MGCP
 Gateway Control Services along with the ASN.1 productions of the related protocol (MGCP),
 @xref{MGCP Package}.
-A listing of this header file is provided in @ref{xmap_mgcp.h}.
+@c A listing of this header file is provided in @ref{xmap_mgcp.h}.
 @item <xmap_megaco.h>
 This header file contains specific definitions that reflect the Abstract Services of the MEGACO
 Gateway Control Services along with the ASN.1 productions of the related protocol (MEGACO),
-@xref{MEGACO Package}.  A listing of this header file is provided in @ref{xmap_megaco.h}.
+@xref{MEGACO Package}.
+@c A listing of this header file is provided in @ref{xmap_megaco.h}.
 @item <xmap_h248.h>
 This header file contains specific definitions that reflect the Abstract Services of the H.248
 Gateway Control Services along with the ASN.1 productions of the related protocol (H.248),
-@xref{H.248 Package}.  A listing of this header file is provided in @ref{xmap_h248.h}.
+@xref{H.248 Package}.
+@c A listing of this header file is provided in @ref{xmap_h248.h}.
 @item <xmap_gsm_sm.h>
 This header file contains specific definitions that reflect the Short Message GSM services along
 with ASN.1 productions of the related services (GSM MAP Short Message services), @xref{GSM Short
-Message Service Package}.  A listing of this header file is provided in @ref{xmap_gsm_sm.h}.
+Message Service Package}.
+@c A listing of this header file is provided in @ref{xmap_gsm_sm.h}.
 @end ftable
 
 @node C Naming Conventions
@@ -2243,7 +2246,8 @@ This function can also return the error constants, @perr{GCP_NO_WORKSPACE},
 @perr{GCP_INVALID_SESSION}, @perr{GCP_INSUFFICIENT_RESOURCES}.
 @item SEE ALSO
 @i{Abandon()},@footnote{@xref{Abandon}.}
-@i{Response()}.@footnote{@xref{Response}.}
+@i{Response()}.
+@c @footnote{@xref{Response}.}
 @item CORESPONDENCE
 This function corresponds to the H248Message of ITU-T Recommendation H.248.1.
 @end table
@@ -3729,9 +3733,10 @@ reply is expected.
 @item Argument (Object(Service-Argument))
 The information supplied as the argument of a gateway control service request is an instance of a
 subclass of the OM class @b{Service-Argument}.  Normally, concrete subclasses of this class are
-defined in Gateway Control Services packages.  For example, the @b{MO-Forward-SM-Arg} subclass of
-@b{Service-Argument} is defined in the GSM Short Message Services package
-(@pxref{MO-Forward-SM-Arg}) and may be used as an argument to this function.
+defined in Gateway Control Services packages.
+@c For example, the @b{MO-Forward-SM-Arg} subclass of
+@c @b{Service-Argument} is defined in the GSM Short Message Services package
+@c (@pxref{MO-Forward-SM-Arg}) and may be used as an argument to this function.
 @end table
 @item RESULTS
 @table @i
@@ -4940,7 +4945,9 @@ This OM class contains the following class-specific OM attributes:
 @vtable @var
 @item internet-Address
 The address is represented using an octet string that contains the encoding of an IP version 4 or IP
-version 6 address (@pxref{String(Internet-Address)}) with the following considerations:
+version 6 address
+@c (@pxref{String(Internet-Address)})
+with the following considerations:
 @itemize @bullet
 @item The encoded address @emph{shall} have both an IP address and port number.
 @item The encoded address @emph{shall} not have a host name in the address.
@@ -5217,8 +5224,8 @@ attributes of its super-classes, @i{Object}.  It does not define any OM attribut
 @vindex Message
 
 An instance of OM class @var{Message} represents the base information that is supplied as an
-argument to the @i{Send()} function (@pxref{Send()}) or is returned by the @i{Receive()} function
-(@pxref{Receive()}) when Automatic Message Handling is disabled on a @b{Session}.
+argument to the @i{Send()} function (@pxref{Send}) or is returned by the @i{Receive} function
+(@pxref{Receive}) when Automatic Message Handling is disabled on a @b{Session}.
 
 This OM class is an abstract class containing several defined subclasses:
 @b{MGCP-Message}, @b{MEGACO-Message} and @b{H248-Message}.
@@ -5598,8 +5605,9 @@ This OM class contains the following class-specific OM attributes:
 @vtable @var
 @item internet-Address
 The title is represented using an octet string that contains the encoding of an internet address,
-either IP version 4 or IP version 6 address (@pxref{String(Internet-Address)}) with the following
-considerations:
+either IP version 4 or IP version 6 address
+@c (@pxref{String(Internet-Address)})
+with the following considerations:
 @itemize @bullet
 @item The encoded address @emph{may} have either an IP address or a port number, or both, in the
 address.
@@ -5642,7 +5650,7 @@ This OM class contains the following class-specific OM attributes:
 @vindex Transaction-Request
 
 An instance of OM class @var{Transaction-Request} represents the base information that is supplied
-as an argument to the @i{Request()} function (@pxref{Request()}) or is returned by the @i{Receive()}
+as an argument to the @i{Request()} function (@pxref{Request}) or is returned by the @i{Receive()}
 function (@pxref{Receive}) for a transaction indication.  This OM class is an abstract class
 containing several defined subclasses: @b{MGCP-Transaction-Request}, @b{MEGACO-Transaction-Request}
 and @b{H248-Transaction-Request}.  An instance of this OM class has the OM attributes of its
@@ -5663,7 +5671,7 @@ One or more requests of OM class @b{Action-Request} or derived classes.
 @vindex Transaction-Response
 
 An instance of OM class @var{Transaction-Response} represents the base information that is supplied
-as an argument to the @i{Response()} fnction (@pxref{Response()}) or is returned by the
+as an argument to the @i{Response()} function (@pxref{Response}) or is returned by the
 @i{Receive()} function (@pxref{Receive}) for a transaction confirmation.  This OM class is an
 abstract class containing several defined subclasses: @b{MGCP-Transaction-Response},
 @b{MEGACO-Transaction-Response} and @b{H248-Transaction-Response}.  An instance of this OM class has
@@ -5835,7 +5843,6 @@ class-specific OM attributes.
 @item mgcp-transaction-Id
 @item mgcp-endpoint-Name
 @item mgcp-version
-@item 
 @end vtable
 
 @node MGCP-Create-Connection-Request
@@ -5965,7 +5972,8 @@ class-specific OM attributes.
 
 An instance of OM class @b{MEGACO-Add-Request} represents the Add Request command of MEGACO (RFC
 3705).  This OM class contains the attributes of its super-classes: @i{MEGACO-Amm-Request}.  It does
-not define any OM attributes of its own. @xref{MEGACO-Amm-Request}.
+not define any OM attributes of its own.
+@c @xref{MEGACO-Amm-Request}.
 
 @c This OM class has the attributes of its super-classes: @i{MEGACO-Service-Request}; plus the additional OM
 @c attributes listed in @tabref{2}.
@@ -6077,7 +6085,8 @@ This OM class contains the following class-specific OM attributes:
 
 An instance of OM class @b{MEGACO-Modify-Request} represents the Modify Request command of MEGACO
 (RFC 3705).  This OM class contains the attributes of its super-classes: @i{MEGACO-Amm-Request}.  It
-does not define any OM attributes of its own. @xref{MEGACO-Amm-Request}.
+does not define any OM attributes of its own.
+@c @xref{MEGACO-Amm-Request}.
 
 @c This OM class has the attributes of its super-classes: @i{MEGACO-Service-Request}; plus the additional OM
 @c attributes listed in @tabref{4}.
@@ -6107,7 +6116,8 @@ This OM class contains the following class-specific OM attributes:
 
 An instance of OM class @b{MEGACO-Move-Request} represents the Move Request command of MEGACO (RFC
 3705).  This OM class contains the attributes of its super-classes: @i{MEGACO-Amm-Request}.  It does
-not define any OM attributes of its own. @xref{MEGACO-Amm-Request}.
+not define any OM attributes of its own.
+@c @xref{MEGACO-Amm-Request}.
 
 @c This OM class has the attributes of its super-classes: @i{MEGACO-Service-Request}; plus the additional OM
 @c attributes listed in @tabref{8}.
@@ -6285,7 +6295,8 @@ constant can be used to negotiate support for the package using the @i{Negotiate
 
 The H.248 GCP package introduces some additional OM syntaxes that are derivations of the
 @i{String(Octet)} syntax.  These additional OM syntaxes are used to represent digit strings and
-telephony  numbers. @xref{String(Address)}.
+telephony  numbers.
+@c @xref{String(Address)}.
 
 The following outlines the OM Class Hierarchy for the H.248 package:
 
