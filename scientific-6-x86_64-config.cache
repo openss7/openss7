@@ -43,7 +43,6 @@ bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='yum install coreutils'}
 bld_cv_pkg_cmd_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ='yum install kernel'}
 bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='yum install tcl-devel'}
 bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H='yum install net-snmp-devel'}
-bld_cv_pkg_cmd_XZ_CMD=${bld_cv_pkg_cmd_XZ_CMD='yum install xz'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='yum install zip'}
 bld_cv_pkg_name_BIBTEX=${bld_cv_pkg_name_BIBTEX=texlive}
 bld_cv_pkg_name_BZIP2_CMD=${bld_cv_pkg_name_BZIP2_CMD=bzip2}
@@ -90,7 +89,6 @@ bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
 bld_cv_pkg_name_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=${bld_cv_pkg_name_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=kernel}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl-devel}
 bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=net-snmp-devel}
-bld_cv_pkg_name_XZ_CMD=${bld_cv_pkg_name_XZ_CMD=xz}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib64/perl5/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.4.4/gcj/cni.h}
@@ -197,5 +195,4 @@ bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=8.4}
 bld_cv_pkg_ver_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=2.6.32}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.5.7}
 bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.5}
-bld_cv_pkg_ver_XZ_CMD=${bld_cv_pkg_ver_XZ_CMD=4.999.9}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=3.0}

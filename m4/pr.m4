@@ -113,6 +113,7 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 	    (sle)	 ap_cv_distribution="SLE$dist_cv_host_release"	    ;;
 	    (debian)	 ap_cv_distribution="Debian$dist_cv_host_release"   ;;
 	    (ubuntu)	 ap_cv_distribution="Ubuntu$dist_cv_host_release"   ;;
+	    (lts)	 ap_cv_distribution="LTS$dist_cv_host_release"	    ;;
 	    (montavista) ap_cv_distribution="MontaVista"		    ;;
 	    (bluecat)	 ap_cv_distribution="BlueCat"			    ;;
 	    (yellowdog)	 ap_cv_distribution="YellowDog"			    ;;
