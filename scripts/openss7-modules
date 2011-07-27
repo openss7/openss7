@@ -885,7 +885,7 @@ function readsymver(kversion, file,
     return n
 }
 function readkernel(kversion,
-		    pfx,fmt,n,m,pm,s,ps,find,command,module,SECTION,string,char,sym,crc,find,file,dir,tmpdir,dirs)
+		    pfx,fmt,n,m,pm,s,ps,find,command,module,SECTION,string,char,sym,crc,find,file,dir,tmpdir,dirs,written)
 {
     pfx = "r: kernel,    "
     fmt = "%04d modules, %05d symbols"
@@ -893,7 +893,12 @@ function readkernel(kversion,
     tmpdir = "/var/tmp/" me "." PROCINFO["pid"] ".modules"
     system_command("mkdir -p -- " tmpdir)
     find = "find /lib/modules/" kversion "/kernel -type f \\( -name '*.ko' -o -name '*.ko.gz' \\) 2>/dev/null"
+    if (system("test -d /lib/modules/" kversion "/kernel") != 0) {
+	system_command("rm -rf-- " tmpdir)
+	return
+    }
     system_command("rm -f -- " tmpdir "/modules.list 2>/dev/null")
+    written = 0
     while ((find | getline file) == 1) {
 	if (file~/\.ko\.gz$/) {
 	    dir = tmpdir "/" file
@@ -908,8 +913,13 @@ function readkernel(kversion,
 	} else {
 	    print file >> tmpdir "/modules.list"
 	}
+	written = 1
     }
     close(find)
+    if (written == 0) {
+	system_command("rm -rf-- " tmpdir)
+	return
+    }
     close(tmpdir "/modules.list")
     command = "cat " tmpdir "/modules.list | xargs -r objdump -j __versions -s"
     SECTION = ""; string = ""; module = ""
@@ -1377,7 +1387,7 @@ function getmodule(module,
 		break
 	}
 	close(command)
-	system("rm -f -- /var/tmp/*.ko")
+	system("rm -f -- /var/tmp/`basename " module " .gz`")
 	print_vmore(2, pfx sprintf(fmt, r, w, l, a, module))
 	if ((module,"vermagic") in modinfos) {
 	    modfver[module] = modinfos[module,"vermagic"]; sub(/ .*$/, "", modfver[module])
@@ -2106,7 +2116,7 @@ function relinklinks(kversion, kver, name,
 	    } else {
 		print_error(pfx "relinking failed for " file)
 		print_action("removing", module, "from", kversion)
-		doit("rm -f -- " kmod " " file " " source)
+		doit("rm -f -- " kmod " " kmod gzip " " file " " source)
 	    }
 	    system_command("rm -f -- " script)
 	}
@@ -2555,7 +2565,7 @@ function modload(kversion, symbols, weakmod, module,
     } else {
 	print_error(pfx "relinking failed for " weakmod)
 	print_action("removing", module, "from", kversion)
-	doit("rm -f -- " file " " weakmod " " source)
+	doit("rm -f -- " file " " file gzip " " weakmod " " source)
     }
     system_command("rm -f -- " script)
 }
