@@ -113,6 +113,7 @@ function get_manpages(s,    numb, page, find) {
 	sub(/.*\//, "", page)
 	sub(/\.gz$/, "", page)
 	sub(/\.bz2$/, "", page)
+	sub(/\.lzma$/, "", page)
 	sub(/\.xz$/, "", page)
 	numb = page
 	sub(/\.[^\.]*$/, "", page)
@@ -140,6 +141,7 @@ function get_srcpages(s,    numb, page, find) {
 	sub(/.*\//, "", page)
 	sub(/\.gz$/, "", page)
 	sub(/\.bz2$/, "", page)
+	sub(/\.lzma$/, "", page)
 	sub(/\.xz$/, "", page)
 	numb = page
 	sub(/\.[^\.]*$/, "", page)
@@ -917,16 +919,28 @@ BEGIN {
 			close(file)
 		    }
 		    if (ok == 1) {
-			filegz = file ".gz"
-			if ((getline < filegz) == 1)
+			filez = file ".gz"
+			if ((getline < filez) == 1)
 			    ok = 0
-			close(filegz)
+			close(filez)
 		    }
 		    if (ok == 1) {
-			filebz2 = file ".bz2"
-			if ((getline < filebz2) == 1)
+			filez = file ".bz2"
+			if ((getline < filez) == 1)
 			    ok = 0
-			close(filebz2)
+			close(filez)
+		    }
+		    if (ok == 1) {
+			filez = file ".lzma"
+			if ((getline < filez) == 1)
+			    ok = 0
+			close(filez)
+		    }
+		    if (ok == 1) {
+			filez = file ".xz"
+			if ((getline < filez) == 1)
+			    ok = 0
+			close(filez)
 		    }
 		    if (ok == 0)
 			print_e(page " conflicts with " file)
