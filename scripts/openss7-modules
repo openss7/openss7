@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7-modules,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-31 09:46:02 $
+# @(#) $RCSfile: openss7-modules,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-07-27 07:52:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-05-31 09:46:02 $ by $Author: brian $
+# Last Modified $Date: 2011-07-27 07:52:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -148,7 +148,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: openss7-modules,v 1.1.2.7 2011-05-31 09:46:02 brian Exp $\n\
+  $Id: openss7-modules,v 1.1.2.8 2011-07-27 07:52:20 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [mode] [" longargs["kernels"] "]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -275,7 +275,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: openss7-modules,v 1.1.2.7 2011-05-31 09:46:02 brian Exp $\n\
+$Id: openss7-modules,v 1.1.2.8 2011-07-27 07:52:20 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -298,7 +298,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: openss7-modules,v 1.1.2.7 2011-05-31 09:46:02 brian Exp $\n\
+$Id: openss7-modules,v 1.1.2.8 2011-07-27 07:52:20 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -3079,6 +3079,9 @@ END {
 # =============================================================================
 #
 # $Log: openss7-modules,v $
+# Revision 1.1.2.8  2011-07-27 07:52:20  brian
+# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
+#
 # Revision 1.1.2.7  2011-05-31 09:46:02  brian
 # - new distros
 #

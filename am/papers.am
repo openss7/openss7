@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: papers.am,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-07-18 19:42:10 $
+# @(#) $RCSfile: papers.am,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-07-27 07:52:11 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-07-18 19:42:10 $ by $Author: brian $
+## Last Modified $Date: 2011-07-27 07:52:11 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -523,6 +523,9 @@ MY_PHONY		+= tex-am bibs-am dats-am plots-am figs-am pss-am pngs-am
 ## =============================================================================
 ##
 ## $Log: papers.am,v $
+## Revision 1.1.2.6  2011-07-27 07:52:11  brian
+## - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
+##
 ## Revision 1.1.2.5  2011-07-18 19:42:10  brian
 ## - added documentation
 ##

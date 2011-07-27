@@ -1,7 +1,7 @@
 % -*- texinfo -*- vim: ft=texinfo tw=100 nocin nosi noai
 % =========================================================================
 %
-% @(#) $Id: SPG.texi,v 1.1.2.2 2011-02-07 02:21:33 brian Exp $
+% @(#) $Id: SPG.texi,v 1.1.2.3 2011-07-27 07:52:12 brian Exp $
 %
 % =========================================================================
 %
@@ -80,7 +80,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2011-02-07 02:21:33 $ by $Author: brian $
+% Last Modified $Date: 2011-07-27 07:52:12 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -645,6 +645,9 @@ package.
 @smallexample
 @verbatim
 $Log: SPG.texi,v $
+Revision 1.1.2.3  2011-07-27 07:52:12  brian
+- work to support Mageia/Mandriva compressed kernel modules and URPMI repo
+
 Revision 1.1.2.2  2011-02-07 02:21:33  brian
 - updated manuals
 

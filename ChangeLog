@@ -1,3 +1,52 @@
+2011-07-27  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian-lenny-i686-config.cache: auto updated cache file
+	* debian-squeeze-i686-config.cache: auto updated cache file
+	* mageia-1-x86_64-config.cache: auto updated cache file
+	* scientific-6-x86_64-config.cache: auto updated cache file
+	* ubuntu-lucid-x86_64-config.cache: auto updated cache file
+
+	* openss7.spec.in: handle urpmi for Mageia and Mandriva
+	* am/kernel.am: when building RPMs for Mageia/Mandriva, debugging
+	  information must be stripped from kernel modules before installing.
+	* am/openss7.am: teeny fixup
+	* am/papers.am: added .toc to cleanfiles
+	* am/repo.am: added install-repo targets for URPMI
+	* am/rpm.am: build URPMI release repository
+	* doc/manual/SPG.texi: update kernel series statements
+	* doc/manual/SPG2.texi: update kernel series statements
+	* doc/manual/descrip.texi: update kernel series statements
+	* doc/manual/install.texi: update kernel series statements
+	* doc/manual/porting.texi: update kernel series statements
+	* doc/manual/prerequisites.texi: update kernel series statements
+	* doc/manual/todo.texi: update kernel series statements
+	* doc/projects/carrier/carrier.texi: update kernel series statements
+	* doc/projects/cnam/cnam.texi: update kernel series statements
+	* doc/projects/hlr/hlr.texi: update kernel series statements
+	* doc/projects/lab/lab.texi: update kernel series statements
+	* doc/projects/mg/mg.texi: update kernel series statements
+	* doc/projects/sg/sg.texi: update kernel series statements
+	* doc/projects/sgp/sgp.texi: update kernel series statements
+	* doc/projects/ssg/ssg.texi: update kernel series statements
+	* doc/projects/voip/voip.texi: update kernel series statements
+	* doc/specs/xgcp/xgcp.texi: update kernel series statements
+	* m4/bld.m4: add lts tag
+	* m4/deb.m4: add lts tag
+	* m4/dist.m4: add lts tag
+	* m4/genksyms.m4: add lts tag
+	* m4/kernel.m4: add lts tag
+	* m4/pr.m4: add lts tag
+	* m4/repo.m4: add lts tag
+	* m4/rpm.m4: add lts tag
+	* scripts/modpost.awk: handle compressed kernel modules for
+	  Mageia/Mandriva
+	* scripts/openss7-modules: handle compressed kernel modules for
+	  Mageia/Mandriva
+	* scripts/texi/compat.texi: update kernel series statements
+	* scripts/texi/install.texi: update kernel series statements
+	* src/mason/.htaccess: add urpmi repo files
+	* src/mason/autohandler: add urpmi repo files
+
 2011-07-21  Brian Bidulock  <bidulock@openss7.org>
 
 	* centos-6-x86_64-config.cache: added new cache file
