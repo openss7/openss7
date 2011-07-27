@@ -2,6 +2,7 @@ bld_cv_pkg_cmd_BIBTEX=${bld_cv_pkg_cmd_BIBTEX='urpmi texlive'}
 bld_cv_pkg_cmd_BZIP2_CMD=${bld_cv_pkg_cmd_BZIP2_CMD='urpmi bzip2'}
 bld_cv_pkg_cmd_CHKCONFIG=${bld_cv_pkg_cmd_CHKCONFIG='urpmi chkconfig'}
 bld_cv_pkg_cmd_CONVERT=${bld_cv_pkg_cmd_CONVERT='urpmi imagemagick'}
+bld_cv_pkg_cmd_CREATEREPO=${bld_cv_pkg_cmd_CREATEREPO='urpmi createrepo'}
 bld_cv_pkg_cmd_DEPMOD=${bld_cv_pkg_cmd_DEPMOD='urpmi module-init-tools'}
 bld_cv_pkg_cmd_DOXYGEN=${bld_cv_pkg_cmd_DOXYGEN='urpmi doxygen'}
 bld_cv_pkg_cmd_DVI2PS=${bld_cv_pkg_cmd_DVI2PS='urpmi texlive'}
@@ -30,6 +31,7 @@ bld_cv_pkg_cmd_LSMOD=${bld_cv_pkg_cmd_LSMOD='urpmi module-init-tools'}
 bld_cv_pkg_cmd_LSOF=${bld_cv_pkg_cmd_LSOF='urpmi lsof'}
 bld_cv_pkg_cmd_LZMA_CMD=${bld_cv_pkg_cmd_LZMA_CMD='urpmi xz'}
 bld_cv_pkg_cmd_MD5SUM=${bld_cv_pkg_cmd_MD5SUM='urpmi coreutils'}
+bld_cv_pkg_cmd_MODIFYREPO=${bld_cv_pkg_cmd_MODIFYREPO='urpmi createrepo'}
 bld_cv_pkg_cmd_MODPROBE=${bld_cv_pkg_cmd_MODPROBE='urpmi module-init-tools'}
 bld_cv_pkg_cmd_MODULE_SYMVERS=${bld_cv_pkg_cmd_MODULE_SYMVERS='urpmi kernel-desktop-devel-2.6.38.7-1.mga'}
 bld_cv_pkg_cmd_PIC=${bld_cv_pkg_cmd_PIC='urpmi groff'}
@@ -51,6 +53,7 @@ bld_cv_pkg_name_BIBTEX=${bld_cv_pkg_name_BIBTEX=texlive}
 bld_cv_pkg_name_BZIP2_CMD=${bld_cv_pkg_name_BZIP2_CMD=bzip2}
 bld_cv_pkg_name_CHKCONFIG=${bld_cv_pkg_name_CHKCONFIG=chkconfig}
 bld_cv_pkg_name_CONVERT=${bld_cv_pkg_name_CONVERT=imagemagick}
+bld_cv_pkg_name_CREATEREPO=${bld_cv_pkg_name_CREATEREPO=createrepo}
 bld_cv_pkg_name_DEPMOD=${bld_cv_pkg_name_DEPMOD=module-init-tools}
 bld_cv_pkg_name_DOXYGEN=${bld_cv_pkg_name_DOXYGEN=doxygen}
 bld_cv_pkg_name_DVI2PS=${bld_cv_pkg_name_DVI2PS=texlive}
@@ -79,6 +82,7 @@ bld_cv_pkg_name_LSMOD=${bld_cv_pkg_name_LSMOD=module-init-tools}
 bld_cv_pkg_name_LSOF=${bld_cv_pkg_name_LSOF=lsof}
 bld_cv_pkg_name_LZMA_CMD=${bld_cv_pkg_name_LZMA_CMD=xz}
 bld_cv_pkg_name_MD5SUM=${bld_cv_pkg_name_MD5SUM=coreutils}
+bld_cv_pkg_name_MODIFYREPO=${bld_cv_pkg_name_MODIFYREPO=createrepo}
 bld_cv_pkg_name_MODPROBE=${bld_cv_pkg_name_MODPROBE=module-init-tools}
 bld_cv_pkg_name_MODULE_SYMVERS=${bld_cv_pkg_name_MODULE_SYMVERS=kernel-desktop-devel-2.6.38.7-1.mga}
 bld_cv_pkg_name_PIC=${bld_cv_pkg_name_PIC=groff}
@@ -107,6 +111,7 @@ bld_cv_pkg_prog_BIBTEX=${bld_cv_pkg_prog_BIBTEX=bibtex}
 bld_cv_pkg_prog_BZIP2_CMD=${bld_cv_pkg_prog_BZIP2_CMD=bzip2}
 bld_cv_pkg_prog_CHKCONFIG=${bld_cv_pkg_prog_CHKCONFIG=chkconfig}
 bld_cv_pkg_prog_CONVERT=${bld_cv_pkg_prog_CONVERT=convert}
+bld_cv_pkg_prog_CREATEREPO=${bld_cv_pkg_prog_CREATEREPO=createrepo}
 bld_cv_pkg_prog_DEPMOD=${bld_cv_pkg_prog_DEPMOD=depmod}
 bld_cv_pkg_prog_DOXYGEN=${bld_cv_pkg_prog_DOXYGEN=doxygen}
 bld_cv_pkg_prog_DVI2PS=${bld_cv_pkg_prog_DVI2PS=dvips}
@@ -136,6 +141,7 @@ bld_cv_pkg_prog_LSOF=${bld_cv_pkg_prog_LSOF=lsof}
 bld_cv_pkg_prog_LZMA_CMD=${bld_cv_pkg_prog_LZMA_CMD=xz}
 bld_cv_pkg_prog_MAKEWHATIS=${bld_cv_pkg_prog_MAKEWHATIS=makewhatis}
 bld_cv_pkg_prog_MD5SUM=${bld_cv_pkg_prog_MD5SUM=md5sum}
+bld_cv_pkg_prog_MODIFYREPO=${bld_cv_pkg_prog_MODIFYREPO=modifyrepo}
 bld_cv_pkg_prog_MODPROBE=${bld_cv_pkg_prog_MODPROBE=modprobe}
 bld_cv_pkg_prog_PDFLATEX=${bld_cv_pkg_prog_PDFLATEX=pdftex}
 bld_cv_pkg_prog_PDFTEX=${bld_cv_pkg_prog_PDFTEX=pdftex}
@@ -158,6 +164,7 @@ bld_cv_pkg_ver_BIBTEX=${bld_cv_pkg_ver_BIBTEX=20100722}
 bld_cv_pkg_ver_BZIP2_CMD=${bld_cv_pkg_ver_BZIP2_CMD=1.0.6}
 bld_cv_pkg_ver_CHKCONFIG=${bld_cv_pkg_ver_CHKCONFIG=1.3.37}
 bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.6.6.10}
+bld_cv_pkg_ver_CREATEREPO=${bld_cv_pkg_ver_CREATEREPO=0.9.9}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.6}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.7.3}
 bld_cv_pkg_ver_DVI2PS=${bld_cv_pkg_ver_DVI2PS=20100722}
@@ -186,6 +193,7 @@ bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.6}
 bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.84}
 bld_cv_pkg_ver_LZMA_CMD=${bld_cv_pkg_ver_LZMA_CMD=5.0.2}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=8.8}
+bld_cv_pkg_ver_MODIFYREPO=${bld_cv_pkg_ver_MODIFYREPO=0.9.9}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.6}
 bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=1}
 bld_cv_pkg_ver_PIC=${bld_cv_pkg_ver_PIC=1.20.1}
