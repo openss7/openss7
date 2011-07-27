@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2011-06-09 11:30:54 $
+# @(#) $RCSfile: kernel.m4,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2011-07-27 07:52:18 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-06-09 11:30:54 $ by $Author: brian $
+# Last Modified $Date: 2011-07-27 07:52:18 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -3665,6 +3665,9 @@ AC_DEFUN([_LINUX_KERNEL_], [dnl
 # =============================================================================
 #
 # $Log: kernel.m4,v $
+# Revision 1.1.2.15  2011-07-27 07:52:18  brian
+# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
+#
 # Revision 1.1.2.14  2011-06-09 11:30:54  brian
 # - support mageia and mes
 #

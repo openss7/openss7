@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 # 
-# @(#) $RCSfile: openss7-modules,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-31 09:46:02 $
+# @(#) $RCSfile: openss7-modules,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-07-27 07:52:20 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-05-31 09:46:02 $ by $Author: brian $
+# Last Modified $Date: 2011-07-27 07:52:20 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -148,7 +148,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: openss7-modules,v 1.1.2.7 2011-05-31 09:46:02 brian Exp $\n\
+  $Id: openss7-modules,v 1.1.2.8 2011-07-27 07:52:20 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [mode] [" longargs["kernels"] "]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -275,7 +275,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: openss7-modules,v 1.1.2.7 2011-05-31 09:46:02 brian Exp $\n\
+$Id: openss7-modules,v 1.1.2.8 2011-07-27 07:52:20 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -298,7 +298,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: openss7-modules,v 1.1.2.7 2011-05-31 09:46:02 brian Exp $\n\
+$Id: openss7-modules,v 1.1.2.8 2011-07-27 07:52:20 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -885,7 +885,7 @@ function readsymver(kversion, file,
     return n
 }
 function readkernel(kversion,
-		    pfx,fmt,n,m,pm,s,ps,find,command,module,SECTION,string,char,sym,crc,find,file,dir,tmpdir,dirs)
+		    pfx,fmt,n,m,pm,s,ps,find,command,module,SECTION,string,char,sym,crc,find,file,dir,tmpdir,dirs,written)
 {
     pfx = "r: kernel,    "
     fmt = "%04d modules, %05d symbols"
@@ -893,7 +893,12 @@ function readkernel(kversion,
     tmpdir = "/var/tmp/" me "." PROCINFO["pid"] ".modules"
     system_command("mkdir -p -- " tmpdir)
     find = "find /lib/modules/" kversion "/kernel -type f \\( -name '*.ko' -o -name '*.ko.gz' \\) 2>/dev/null"
+    if (system("test -d /lib/modules/" kversion "/kernel") != 0) {
+	system_command("rm -rf-- " tmpdir)
+	return
+    }
     system_command("rm -f -- " tmpdir "/modules.list 2>/dev/null")
+    written = 0
     while ((find | getline file) == 1) {
 	if (file~/\.ko\.gz$/) {
 	    dir = tmpdir "/" file
@@ -908,8 +913,13 @@ function readkernel(kversion,
 	} else {
 	    print file >> tmpdir "/modules.list"
 	}
+	written = 1
     }
     close(find)
+    if (written == 0) {
+	system_command("rm -rf-- " tmpdir)
+	return
+    }
     close(tmpdir "/modules.list")
     command = "cat " tmpdir "/modules.list | xargs -r objdump -j __versions -s"
     SECTION = ""; string = ""; module = ""
@@ -1377,7 +1387,7 @@ function getmodule(module,
 		break
 	}
 	close(command)
-	system("rm -f -- /var/tmp/*.ko")
+	system("rm -f -- /var/tmp/`basename " module " .gz`")
 	print_vmore(2, pfx sprintf(fmt, r, w, l, a, module))
 	if ((module,"vermagic") in modinfos) {
 	    modfver[module] = modinfos[module,"vermagic"]; sub(/ .*$/, "", modfver[module])
@@ -2106,7 +2116,7 @@ function relinklinks(kversion, kver, name,
 	    } else {
 		print_error(pfx "relinking failed for " file)
 		print_action("removing", module, "from", kversion)
-		doit("rm -f -- " kmod " " file " " source)
+		doit("rm -f -- " kmod " " kmod gzip " " file " " source)
 	    }
 	    system_command("rm -f -- " script)
 	}
@@ -2555,7 +2565,7 @@ function modload(kversion, symbols, weakmod, module,
     } else {
 	print_error(pfx "relinking failed for " weakmod)
 	print_action("removing", module, "from", kversion)
-	doit("rm -f -- " file " " weakmod " " source)
+	doit("rm -f -- " file " " file gzip " " weakmod " " source)
     }
     system_command("rm -f -- " script)
 }
@@ -3079,6 +3089,9 @@ END {
 # =============================================================================
 #
 # $Log: openss7-modules,v $
+# Revision 1.1.2.8  2011-07-27 07:52:20  brian
+# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
+#
 # Revision 1.1.2.7  2011-05-31 09:46:02  brian
 # - new distros
 #
