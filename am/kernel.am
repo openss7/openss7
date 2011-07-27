@@ -60,6 +60,8 @@ if PKG_BUILD_USER
 dist_sbin_SCRIPTS		+= scripts/openss7-modules
 dist_sbin_SCRIPTS		+= src/util/openss7-update
 
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT	+= src/util/openss7-update
+
 if WITH_KO_MODULES
 ## WITH_KO_MODULES
 if KERNEL_UPDATES
