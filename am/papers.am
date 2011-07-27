@@ -314,7 +314,7 @@ clean-html:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@( echo "$(HTMLS) index.html internals.pl labels.pl WARNINGS $(htmls:%.html=%.css)" | tr ' ' '\n'; \
 	   list='$(CSSS)'; for b in $$list ; do if test ! $$b -ef $(srcdir)/$$b; then echo "$$b" ; fi ; done ; \
-	   d=images; echo "$$d.aux $$d.bbl $$d.blg $$d.glo $$d.log $$d.pl $$d.tex img*.png" | tr ' ' '\n' ) \
+	   d=images; echo "$$d.aux $$d.bbl $$d.blg $$d.glo $$d.log $$d.pl $$d.tex $$d.toc img*.png" | tr ' ' '\n' ) \
 	| $(am__base_remove)
 
 CLEAN_LOCAL	+= clean-html
@@ -385,7 +385,7 @@ clean-latexs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list='$(LATEXS)'; for f in $$list; do \
 		d=`echo $$f | sed 's,\.tex,,'`; \
-		echo -e "$$d.aux\n$$d.bbl\n$$d.blg\n$$d.glo\n$$d.log\n$$d.pl\n$$d.css\n$$d.dvi\n$$d.ps\n$$d.pdf\n$$d.html" ; \
+		echo -e "$$d.aux\n$$d.bbl\n$$d.blg\n$$d.glo\n$$d.log\n$$d.pl\n$$d.toc\n$$d.css\n$$d.dvi\n$$d.ps\n$$d.pdf\n$$d.html" ; \
 		b=`echo $$f | sed 's,.*/,,'`; \
 		if test ! $$b -ef $(srcdir)/$$b; then echo "$$b" ; fi ; \
 	done | $(am__base_remove)
