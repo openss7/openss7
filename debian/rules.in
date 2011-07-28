@@ -361,11 +361,15 @@ pkgincludedir	= $(includedir)/@PACKAGE@
 control		+= debian/@PACKAGE@-debuginfo.install
 
 @WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-debuginfo.install:
-@WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)/debug'	] || echo '$(debtmpdir)$(lib32dir)/debug/*' ; \
+@WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] ||	find '$(debtmpdir)$(lib32dir)/debug' -type f \! -name '*.ko' \! -name '*.ko.debug' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] || { find '$(debtmpdir)$(lib32dir)/debug' -type l | while read f ; do \
+@WITH_32BIT_LIBS_TRUE@							case `readlink $$f` in (*.ko|*.ko.debug) ;; (*) echo "$$f" ;; esac ; done ; } ; \
 @WITH_32BIT_LIBS_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
 @WITH_32BIT_LIBS_FALSE@debian/@PACKAGE@-debuginfo.install:
-@WITH_32BIT_LIBS_FALSE@	( [ ! -d '$(debtmpdir)$(libdir)/debug'		] || echo '$(debtmpdir)$(libdir)/debug/*' ; \
+@WITH_32BIT_LIBS_FALSE@	( [ ! -d '$(debtmpdir)$(libdir)/debug'	 ] ||	find '$(debtmpdir)$(libdir)/debug' -type f \! -name '*.ko' \! -name '*.ko.debug' ; \
+@WITH_32BIT_LIBS_FALSE@	  [ ! -d '$(debtmpdir)$(libdir)/debug'	 ] || { find '$(debtmpdir)$(libdir)/debug' -type l | while read f ; do \
+@WITH_32BIT_LIBS_FALSE@							case `readlink $$f` in (*.ko|*.ko.debug) ;; (*) echo "$$f" ;; esac ; done ; } ; \
 @WITH_32BIT_LIBS_FALSE@	) $(am__debian_install_format) | sort -u > $@
 
 ##
@@ -461,11 +465,15 @@ control		+= debian/@PACKAGE@-$(kversion)-devel.install
 control		+= debian/@PACKAGE@-$(kversion)-debuginfo.install
 
 @WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-$(kversion)-debuginfo.install:
-@WITH_32BIT_LIBS_TRUE@	( [ ! -d $(debtmpdir)$(lib32dir)/debug ] || echo '$(debtmpdir)$(lib32dir)/debug/*' ; \
+@WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] ||	find '$(debtmpdir)$(lib32dir)/debug' -type f \( -name '*.ko' -o -name '*.ko.debug' \) ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] || { find '$(debtmpdir)$(lib32dir)/debug' -type l | while read f ; do \
+@WITH_32BIT_LIBS_TRUE@							case `readlink $$f` in (*.ko|*.ko.debug) echo "$$f" ;; esac ; done ; } ; \
 @WITH_32BIT_LIBS_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
 @WITH_32BIT_LIBS_FALSE@debian/@PACKAGE@-$(kversion)-debuginfo.install:
-@WITH_32BIT_LIBS_FALSE@	( [ ! -d $(debtmpdir)$(libdir)/debug ] || echo '$(debtmpdir)$(libdir)/debug/*' ; \
+@WITH_32BIT_LIBS_FALSE@	( [ ! -d '$(debtmpdir)$(libdir)/debug'	 ] ||	find '$(debtmpdir)$(libdir)/debug' -type f \( -name '*.ko' -o -name '*.ko.debug' \) ; \
+@WITH_32BIT_LIBS_FALSE@	  [ ! -d '$(debtmpdir)$(libdir)/debug'	 ] || { find '$(debtmpdir)$(libdir)/debug' -type l | while read f ; do \
+@WITH_32BIT_LIBS_FALSE@							case `readlink $$f` in (*.ko|*.ko.debug) echo "$$f" ;; esac ; done ; } ; \
 @WITH_32BIT_LIBS_FALSE@	) $(am__debian_install_format) | sort -u > $@
 
 ##
@@ -578,11 +586,11 @@ install-autoconf:
 	dh_prep
 	[ -d $(debtmpdir) ] || mkdir -p -- $(debtmpdir)
 	$(MAKE) DESTDIR=`pwd`/$(debtmpdir) install
-	if [ -x /usr/lib/rpm/find-debuginfo.sh ] ; then
+	if [ -x /usr/lib/rpm/find-debuginfo.sh ] ; then \
 		RPM_BUILD_ROOT=`pwd`/$(debtmpdir) \
 		RPM_BUILD_DIR=`pwd` \
 		/bin/bash /usr/lib/rpm/find-debuginfo.sh \
-			-p 'lib/modules/.*\.ko\>' -o kmodinfo.list
+			-p 'lib/modules/.*\.ko\>' -o kmodinfo.list ; \
 	fi
 	echo "`date`" > $(debtmpdir)/stamp-debian
 	d=$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion) ; \
@@ -622,8 +630,8 @@ install: install-autoconf
 	dh_installinit -n --name=@PACKAGE@.sh -- start 35 S . stop 35 0 6 .
 	dh_installman --language=C
 	dh_installinfo
-	if [ ! -x /usr/lib/rpm/find-debuginfo.sh ] ; then
-		dh_strip --dbg-package=@PACKAGE@-debuginfo
+	if [ ! -x /usr/lib/rpm/find-debuginfo.sh ] ; then \
+		dh_strip --dbg-package=@PACKAGE@-debuginfo ; \
 	fi
 	dh_link
 	dh_compress -X@PACKAGE@.macros -X@PACKAGE@.refs
