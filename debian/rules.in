@@ -590,8 +590,7 @@ install-autoconf:
 		pwd=`pwd` ; \
 		RPM_BUILD_ROOT=$$pwd/$(debtmpdir) \
 		RPM_BUILD_DIR=`dirname $$pwd` \
-		/bin/bash /usr/lib/rpm/find-debuginfo.sh \
-			-p 'lib/modules/.*\.ko\>' -o kmodinfo.list ; \
+		/bin/bash /usr/lib/rpm/find-debuginfo.sh $$pwd ; \
 	fi
 	echo "`date`" > $(debtmpdir)/stamp-debian
 	d=$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion) ; \
