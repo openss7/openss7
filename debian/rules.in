@@ -587,8 +587,9 @@ install-autoconf:
 	[ -d $(debtmpdir) ] || mkdir -p -- $(debtmpdir)
 	$(MAKE) DESTDIR=`pwd`/$(debtmpdir) install
 	if [ -x /usr/lib/rpm/find-debuginfo.sh ] ; then \
-		RPM_BUILD_ROOT=`pwd`/$(debtmpdir) \
-		RPM_BUILD_DIR=`pwd` \
+		pwd=`pwd` ; \
+		RPM_BUILD_ROOT=$$pwd/$(debtmpdir) \
+		RPM_BUILD_DIR=`dirname $$pwd` \
 		/bin/bash /usr/lib/rpm/find-debuginfo.sh \
 			-p 'lib/modules/.*\.ko\>' -o kmodinfo.list ; \
 	fi
