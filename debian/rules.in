@@ -563,25 +563,11 @@ build:
 	$(MAKE)
 	$(MAKE) check check-clean
 	chmod +x debian/rules
-@WITH_K_PACKAGE_TRUE@	mkdir -p $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@
-@WITH_K_PACKAGE_TRUE@	tar cf - --exclude=$(debtmpdir) --exclude=@PACKAGE@-@VERSION@ . | \
-@WITH_K_PACKAGE_TRUE@		gzip -c > $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz
-
-clean:
-	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	dh_testdir
-	dh_testroot
-	rm -fr @PACKAGE@-@VERSION@
-	[ ! -f Makefile ] || $(MAKE) distclean
-	rm -f $(control)
-	rm -fr $(debtmpdir)
-	dh_clean -k
-
-install-autoconf:
-	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	if [ -f $(debtmpdir)/stamp-debian ]; then exit 0; fi
-	dh_testdir
-	dh_testroot
+	if [ -z '@WITH_K_PACKAGE_TRUE@' ] ; then \
+		mkdir -p $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@ ; \
+		tar cf - --exclude=$(debtmpdir) --exclude=@PACKAGE@-@VERSION@ . | \
+			gzip -c > $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz ; \
+	fi
 	dh_clean -k
 	dh_prep
 	[ -d $(debtmpdir) ] || mkdir -p -- $(debtmpdir)
@@ -592,7 +578,6 @@ install-autoconf:
 		RPM_BUILD_DIR=`dirname $$pwd` \
 		/bin/bash /usr/lib/rpm/find-debuginfo.sh $$pwd ; \
 	fi
-	echo "`date`" > $(debtmpdir)/stamp-debian
 	d=$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion) ; \
 		mkdir -p $$d ; \
 		b=$(debtmpdir)/boot ; \
@@ -613,7 +598,17 @@ install-autoconf:
 	echo "3.0 (native)" > debian/source/format
 	$(MAKE) -f debian/rules $(control)
 
-install: install-autoconf
+clean:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	dh_testdir
+	dh_testroot
+	rm -fr @PACKAGE@-@VERSION@
+	[ ! -f Makefile ] || $(MAKE) distclean
+	rm -f $(control)
+	rm -fr $(debtmpdir)
+	dh_clean -k
+
+install:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	dh_testdir
 	dh_testroot
