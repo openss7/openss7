@@ -1,3 +1,9 @@
+2011-07-28  Brian Bidulock  <bidulock@openss7.org>
+
+	* debian/rules.in: better build and debug info splitting
+	* scripts/check: handle xz and lzma compressed manpages
+	* scripts/openss7-modules: tweaks to compressed kernel modules
+
 2011-07-27  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian-lenny-i686-config.cache: auto updated cache file
