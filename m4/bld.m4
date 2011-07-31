@@ -159,7 +159,7 @@ AC_DEFUN([_BLD_PROG_CHECK],
     if test -n "$tmp_cmd" ; then
 	case "$build_distro" in
 dnl These use rpm
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	    (puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -186,7 +186,7 @@ dnl		dlocate is much faster than dpkg and dpkg-query
     if test -n "$tmp_cmd" ; then
 	case "$build_distro" in
 dnl These use rpm
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	    (puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -219,7 +219,7 @@ dnl		dlocate is much faster than dpkg and dpkg-query
     eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_cn}\""
     if test -n "$tmp_result" ; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|rhel)
+	    (puias|centos|lineox|whitebox|scientific|fedora|rhel)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"yum install \$tmp_result\""
 		;;
 	    (suse|sle)
@@ -271,7 +271,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     tmp_result=
     if test -n "$tmp_path"; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	    (puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -295,7 +295,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     tmp_result=
     if test -n "$tmp_path" ; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	    (puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -326,7 +326,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
     if test -n "$tmp_result" ; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|rhel)
+	    (puias|centos|lineox|whitebox|scientific|fedora|rhel)
 		eval "bld_cv_pkg_cmd_${tmp_pn}=\"yum install \$tmp_result\""
 		;;
 	    (suse|sle)
@@ -378,7 +378,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
     tmp_result=
     if test -n "$tmp_file"; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	    (puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -402,7 +402,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
     tmp_result=
     if test -n "$tmp_file" ; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	    (puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
 		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
@@ -433,7 +433,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
     eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_fn}\""
     if test -n "$tmp_result" ; then
 	case "$build_distro" in
-	    (centos|lineox|whitebox|scientific|fedora|rhel)
+	    (puias|centos|lineox|whitebox|scientific|fedora|rhel)
 		eval "bld_cv_pkg_cmd_${tmp_fn}=\"yum install \$tmp_result\""
 		;;
 	    (suse|sle)

@@ -73,6 +73,7 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
     AC_CACHE_CHECK([for send-pr distribution], [ap_cv_distribution], [dnl
 	case "$dist_cv_host_flavor" in
 	    (scientific) ap_cv_distribution="SL$dist_cv_host_release"	    ;;
+	    (puias)	 ap_cv_distribution="PUIAS$dist_cv_host_release"	    ;;
 	    (centos)	 ap_cv_distribution="COS$dist_cv_host_release"	    ;;
 	    (lineox)	 ap_cv_distribution="LEL$dist_cv_host_release"	    ;;
 	    (whitebox)	 ap_cv_distribution="WBEL$dist_cv_host_release"	    ;;
