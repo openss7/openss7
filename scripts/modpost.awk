@@ -1210,8 +1210,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
     for (i = 1; i in modules; i++)
 	print modules[i] > "modvers.list"
     close("modvers.list")
-    #command = "cat modvers.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
-    command = "cat modvers.list | while read f ; do case $f in (*.ko) echo $f ;; (*.ko.gz) gzip -dc $f >/var/tmp/`basename $f .gz` ; echo /var/tmp/`basename $f .gz` ;; esac ; done | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+    command = "cat modvers.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
     read_modobject(command, ".", values["pkgdirectory"], src)
     system("rm -f modvers.list")
     system("rm -f /var/tmp/*.ko")
