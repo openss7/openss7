@@ -116,6 +116,7 @@ bld_cv_pkg_prog_GZIP_CMD=${bld_cv_pkg_prog_GZIP_CMD=gzip}
 bld_cv_pkg_prog_JAR=${bld_cv_pkg_prog_JAR=gjar}
 bld_cv_pkg_prog_JARSIGNER=${bld_cv_pkg_prog_JARSIGNER=gjarsigner}
 bld_cv_pkg_prog_JAVAC=${bld_cv_pkg_prog_JAVAC=gcj}
+bld_cv_pkg_prog_JAVADOC=${bld_cv_pkg_prog_JAVADOC=sinjdoc}
 bld_cv_pkg_prog_JAVAH=${bld_cv_pkg_prog_JAVAH=gcjh}
 bld_cv_pkg_prog_KEYTOOL=${bld_cv_pkg_prog_KEYTOOL=gkeytool}
 bld_cv_pkg_prog_KGENKSYMS=${bld_cv_pkg_prog_KGENKSYMS=genksyms}
