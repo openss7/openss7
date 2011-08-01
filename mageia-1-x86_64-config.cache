@@ -2,9 +2,16 @@ bld_cv_pkg_cmd_BIBTEX=${bld_cv_pkg_cmd_BIBTEX='urpmi texlive'}
 bld_cv_pkg_cmd_BZIP2_CMD=${bld_cv_pkg_cmd_BZIP2_CMD='urpmi bzip2'}
 bld_cv_pkg_cmd_CHKCONFIG=${bld_cv_pkg_cmd_CHKCONFIG='urpmi chkconfig'}
 bld_cv_pkg_cmd_CONVERT=${bld_cv_pkg_cmd_CONVERT='urpmi imagemagick'}
+bld_cv_pkg_cmd_COUNTPKGLIST=${bld_cv_pkg_cmd_COUNTPKGLIST='urpmi apt'}
 bld_cv_pkg_cmd_CREATEREPO=${bld_cv_pkg_cmd_CREATEREPO='urpmi createrepo'}
 bld_cv_pkg_cmd_DEPMOD=${bld_cv_pkg_cmd_DEPMOD='urpmi module-init-tools'}
 bld_cv_pkg_cmd_DOXYGEN=${bld_cv_pkg_cmd_DOXYGEN='urpmi doxygen'}
+bld_cv_pkg_cmd_DPKG=${bld_cv_pkg_cmd_DPKG='urpmi dpkg'}
+bld_cv_pkg_cmd_DPKG_BUILDPACKAGE=${bld_cv_pkg_cmd_DPKG_BUILDPACKAGE='urpmi dpkg'}
+bld_cv_pkg_cmd_DPKG_DEB=${bld_cv_pkg_cmd_DPKG_DEB='urpmi dpkg'}
+bld_cv_pkg_cmd_DPKG_SCANPACKAGES=${bld_cv_pkg_cmd_DPKG_SCANPACKAGES='urpmi dpkg'}
+bld_cv_pkg_cmd_DPKG_SCANSOURCES=${bld_cv_pkg_cmd_DPKG_SCANSOURCES='urpmi dpkg'}
+bld_cv_pkg_cmd_DPKG_SOURCE=${bld_cv_pkg_cmd_DPKG_SOURCE='urpmi dpkg'}
 bld_cv_pkg_cmd_DVI2PS=${bld_cv_pkg_cmd_DVI2PS='urpmi texlive'}
 bld_cv_pkg_cmd_DVIPDF=${bld_cv_pkg_cmd_DVIPDF='urpmi ghostscript-dvipdf'}
 bld_cv_pkg_cmd_EXTERN_H=${bld_cv_pkg_cmd_EXTERN_H='urpmi perl-devel'}
@@ -12,8 +19,11 @@ bld_cv_pkg_cmd_FIG2DEV=${bld_cv_pkg_cmd_FIG2DEV='urpmi transfig'}
 bld_cv_pkg_cmd_GCJDBTOOL=${bld_cv_pkg_cmd_GCJDBTOOL='urpmi gcj-tools'}
 bld_cv_pkg_cmd_GCJH=${bld_cv_pkg_cmd_GCJH='urpmi gcj-tools'}
 bld_cv_pkg_cmd_GCJ_CNI_H=${bld_cv_pkg_cmd_GCJ_CNI_H='urpmi lib64gcj-devel'}
+bld_cv_pkg_cmd_GENBASEDIR=${bld_cv_pkg_cmd_GENBASEDIR='urpmi apt'}
 bld_cv_pkg_cmd_GENDISTRIB=${bld_cv_pkg_cmd_GENDISTRIB='urpmi rpmtools'}
 bld_cv_pkg_cmd_GENHDLIST=${bld_cv_pkg_cmd_GENHDLIST='urpmi genhdlist2'}
+bld_cv_pkg_cmd_GENPKGLIST=${bld_cv_pkg_cmd_GENPKGLIST='urpmi apt'}
+bld_cv_pkg_cmd_GENSRCLIST=${bld_cv_pkg_cmd_GENSRCLIST='urpmi apt'}
 bld_cv_pkg_cmd_GNUPLOT=${bld_cv_pkg_cmd_GNUPLOT='urpmi gnuplot'}
 bld_cv_pkg_cmd_GPG=${bld_cv_pkg_cmd_GPG='urpmi gnupg'}
 bld_cv_pkg_cmd_GROFF=${bld_cv_pkg_cmd_GROFF='urpmi groff-for-man'}
@@ -53,9 +63,16 @@ bld_cv_pkg_name_BIBTEX=${bld_cv_pkg_name_BIBTEX=texlive}
 bld_cv_pkg_name_BZIP2_CMD=${bld_cv_pkg_name_BZIP2_CMD=bzip2}
 bld_cv_pkg_name_CHKCONFIG=${bld_cv_pkg_name_CHKCONFIG=chkconfig}
 bld_cv_pkg_name_CONVERT=${bld_cv_pkg_name_CONVERT=imagemagick}
+bld_cv_pkg_name_COUNTPKGLIST=${bld_cv_pkg_name_COUNTPKGLIST=apt}
 bld_cv_pkg_name_CREATEREPO=${bld_cv_pkg_name_CREATEREPO=createrepo}
 bld_cv_pkg_name_DEPMOD=${bld_cv_pkg_name_DEPMOD=module-init-tools}
 bld_cv_pkg_name_DOXYGEN=${bld_cv_pkg_name_DOXYGEN=doxygen}
+bld_cv_pkg_name_DPKG=${bld_cv_pkg_name_DPKG=dpkg}
+bld_cv_pkg_name_DPKG_BUILDPACKAGE=${bld_cv_pkg_name_DPKG_BUILDPACKAGE=dpkg}
+bld_cv_pkg_name_DPKG_DEB=${bld_cv_pkg_name_DPKG_DEB=dpkg}
+bld_cv_pkg_name_DPKG_SCANPACKAGES=${bld_cv_pkg_name_DPKG_SCANPACKAGES=dpkg}
+bld_cv_pkg_name_DPKG_SCANSOURCES=${bld_cv_pkg_name_DPKG_SCANSOURCES=dpkg}
+bld_cv_pkg_name_DPKG_SOURCE=${bld_cv_pkg_name_DPKG_SOURCE=dpkg}
 bld_cv_pkg_name_DVI2PS=${bld_cv_pkg_name_DVI2PS=texlive}
 bld_cv_pkg_name_DVIPDF=${bld_cv_pkg_name_DVIPDF=ghostscript-dvipdf}
 bld_cv_pkg_name_EXTERN_H=${bld_cv_pkg_name_EXTERN_H=perl-devel}
@@ -63,8 +80,11 @@ bld_cv_pkg_name_FIG2DEV=${bld_cv_pkg_name_FIG2DEV=transfig}
 bld_cv_pkg_name_GCJDBTOOL=${bld_cv_pkg_name_GCJDBTOOL=gcj-tools}
 bld_cv_pkg_name_GCJH=${bld_cv_pkg_name_GCJH=gcj-tools}
 bld_cv_pkg_name_GCJ_CNI_H=${bld_cv_pkg_name_GCJ_CNI_H=lib64gcj-devel}
+bld_cv_pkg_name_GENBASEDIR=${bld_cv_pkg_name_GENBASEDIR=apt}
 bld_cv_pkg_name_GENDISTRIB=${bld_cv_pkg_name_GENDISTRIB=rpmtools}
 bld_cv_pkg_name_GENHDLIST=${bld_cv_pkg_name_GENHDLIST=genhdlist2}
+bld_cv_pkg_name_GENPKGLIST=${bld_cv_pkg_name_GENPKGLIST=apt}
+bld_cv_pkg_name_GENSRCLIST=${bld_cv_pkg_name_GENSRCLIST=apt}
 bld_cv_pkg_name_GNUPLOT=${bld_cv_pkg_name_GNUPLOT=gnuplot}
 bld_cv_pkg_name_GPG=${bld_cv_pkg_name_GPG=gnupg}
 bld_cv_pkg_name_GROFF=${bld_cv_pkg_name_GROFF=groff-for-man}
@@ -111,17 +131,27 @@ bld_cv_pkg_prog_BIBTEX=${bld_cv_pkg_prog_BIBTEX=bibtex}
 bld_cv_pkg_prog_BZIP2_CMD=${bld_cv_pkg_prog_BZIP2_CMD=bzip2}
 bld_cv_pkg_prog_CHKCONFIG=${bld_cv_pkg_prog_CHKCONFIG=chkconfig}
 bld_cv_pkg_prog_CONVERT=${bld_cv_pkg_prog_CONVERT=convert}
+bld_cv_pkg_prog_COUNTPKGLIST=${bld_cv_pkg_prog_COUNTPKGLIST=countpkglist}
 bld_cv_pkg_prog_CREATEREPO=${bld_cv_pkg_prog_CREATEREPO=createrepo}
 bld_cv_pkg_prog_DEPMOD=${bld_cv_pkg_prog_DEPMOD=depmod}
 bld_cv_pkg_prog_DOXYGEN=${bld_cv_pkg_prog_DOXYGEN=doxygen}
+bld_cv_pkg_prog_DPKG=${bld_cv_pkg_prog_DPKG=dpkg}
+bld_cv_pkg_prog_DPKG_BUILDPACKAGE=${bld_cv_pkg_prog_DPKG_BUILDPACKAGE=dpkg-buildpackage}
+bld_cv_pkg_prog_DPKG_DEB=${bld_cv_pkg_prog_DPKG_DEB=dpkg-deb}
+bld_cv_pkg_prog_DPKG_SCANPACKAGES=${bld_cv_pkg_prog_DPKG_SCANPACKAGES=dpkg-scanpackages}
+bld_cv_pkg_prog_DPKG_SCANSOURCES=${bld_cv_pkg_prog_DPKG_SCANSOURCES=dpkg-scansources}
+bld_cv_pkg_prog_DPKG_SOURCE=${bld_cv_pkg_prog_DPKG_SOURCE=dpkg-source}
 bld_cv_pkg_prog_DVI2PS=${bld_cv_pkg_prog_DVI2PS=dvips}
 bld_cv_pkg_prog_DVIPDF=${bld_cv_pkg_prog_DVIPDF=dvipdf}
 bld_cv_pkg_prog_EPSTOPDF=${bld_cv_pkg_prog_EPSTOPDF=epstopdf.pl}
 bld_cv_pkg_prog_FIG2DEV=${bld_cv_pkg_prog_FIG2DEV=fig2dev}
 bld_cv_pkg_prog_GCJDBTOOL=${bld_cv_pkg_prog_GCJDBTOOL=gcj-dbtool}
 bld_cv_pkg_prog_GCJH=${bld_cv_pkg_prog_GCJH=gcjh}
+bld_cv_pkg_prog_GENBASEDIR=${bld_cv_pkg_prog_GENBASEDIR=genbasedir}
 bld_cv_pkg_prog_GENDISTRIB=${bld_cv_pkg_prog_GENDISTRIB=gendistrib}
 bld_cv_pkg_prog_GENHDLIST=${bld_cv_pkg_prog_GENHDLIST=genhdlist2}
+bld_cv_pkg_prog_GENPKGLIST=${bld_cv_pkg_prog_GENPKGLIST=genpkglist}
+bld_cv_pkg_prog_GENSRCLIST=${bld_cv_pkg_prog_GENSRCLIST=gensrclist}
 bld_cv_pkg_prog_GNUPLOT=${bld_cv_pkg_prog_GNUPLOT=gnuplot}
 bld_cv_pkg_prog_GPG=${bld_cv_pkg_prog_GPG=gpg}
 bld_cv_pkg_prog_GROFF=${bld_cv_pkg_prog_GROFF=groff}
@@ -164,9 +194,16 @@ bld_cv_pkg_ver_BIBTEX=${bld_cv_pkg_ver_BIBTEX=20100722}
 bld_cv_pkg_ver_BZIP2_CMD=${bld_cv_pkg_ver_BZIP2_CMD=1.0.6}
 bld_cv_pkg_ver_CHKCONFIG=${bld_cv_pkg_ver_CHKCONFIG=1.3.37}
 bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.6.6.10}
+bld_cv_pkg_ver_COUNTPKGLIST=${bld_cv_pkg_ver_COUNTPKGLIST=0.5.15lorg3.94}
 bld_cv_pkg_ver_CREATEREPO=${bld_cv_pkg_ver_CREATEREPO=0.9.9}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.6}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.7.3}
+bld_cv_pkg_ver_DPKG=${bld_cv_pkg_ver_DPKG=1.16.0.1}
+bld_cv_pkg_ver_DPKG_BUILDPACKAGE=${bld_cv_pkg_ver_DPKG_BUILDPACKAGE=1.16.0.1}
+bld_cv_pkg_ver_DPKG_DEB=${bld_cv_pkg_ver_DPKG_DEB=1.16.0.1}
+bld_cv_pkg_ver_DPKG_SCANPACKAGES=${bld_cv_pkg_ver_DPKG_SCANPACKAGES=1.16.0.1}
+bld_cv_pkg_ver_DPKG_SCANSOURCES=${bld_cv_pkg_ver_DPKG_SCANSOURCES=1.16.0.1}
+bld_cv_pkg_ver_DPKG_SOURCE=${bld_cv_pkg_ver_DPKG_SOURCE=1.16.0.1}
 bld_cv_pkg_ver_DVI2PS=${bld_cv_pkg_ver_DVI2PS=20100722}
 bld_cv_pkg_ver_DVIPDF=${bld_cv_pkg_ver_DVIPDF=9.02}
 bld_cv_pkg_ver_EXTERN_H=${bld_cv_pkg_ver_EXTERN_H=5.12.3}
@@ -174,8 +211,11 @@ bld_cv_pkg_ver_FIG2DEV=${bld_cv_pkg_ver_FIG2DEV=3.2.5d}
 bld_cv_pkg_ver_GCJDBTOOL=${bld_cv_pkg_ver_GCJDBTOOL=4.5.2}
 bld_cv_pkg_ver_GCJH=${bld_cv_pkg_ver_GCJH=4.5.2}
 bld_cv_pkg_ver_GCJ_CNI_H=${bld_cv_pkg_ver_GCJ_CNI_H=4.5.2}
+bld_cv_pkg_ver_GENBASEDIR=${bld_cv_pkg_ver_GENBASEDIR=0.5.15lorg3.94}
 bld_cv_pkg_ver_GENDISTRIB=${bld_cv_pkg_ver_GENDISTRIB=6.0}
 bld_cv_pkg_ver_GENHDLIST=${bld_cv_pkg_ver_GENHDLIST=6.0}
+bld_cv_pkg_ver_GENPKGLIST=${bld_cv_pkg_ver_GENPKGLIST=0.5.15lorg3.94}
+bld_cv_pkg_ver_GENSRCLIST=${bld_cv_pkg_ver_GENSRCLIST=0.5.15lorg3.94}
 bld_cv_pkg_ver_GNUPLOT=${bld_cv_pkg_ver_GNUPLOT=4.4.3}
 bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=1.4.11}
 bld_cv_pkg_ver_GROFF=${bld_cv_pkg_ver_GROFF=1.20.1}

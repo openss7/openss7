@@ -656,6 +656,7 @@ AC_DEFUN([_RPM_REPO_SETUP], [dnl
     _RPM_REPO_SETUP_YUM
     _RPM_REPO_SETUP_YAST
     _RPM_REPO_SETUP_URPMI
+    _RPM_REPO_SETUP_APT
 ])# _RPM_REPO_SETUP
 # =============================================================================
 
@@ -802,6 +803,12 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
 	[AS_HELP_STRING([--disable-repo-urpmi],
 	    [urpmi repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_urpmi=yes])
+    AC_ARG_VAR([GENDISTRIB],
+	       [Generate urpmi distribution command. @<:@default=gendistrib@:>@])
+    _BLD_PATH_PROG([GENDISTRIB], [gendistrib], [${am_missing3_run}gendistrib], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    AC_MSG_WARN([Cannot find 'gendistrib' program in PATH.])
+	fi])
     AC_ARG_VAR([GENHDLIST],
 	       [Generate urpmi repository command. @<:@default=genhdlist@:>@])
     _BLD_PATH_PROGS([GENHDLIST], [genhdlist2 genhdlist], [${am_missing3_run}genhdlist2], [$tmp_path], [dnl
@@ -823,35 +830,7 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
 *** assumption that --disable-repo-urpmi was specified.
 *** ])
 		    ;;
-		(*)
-		    AC_MSG_WARN([Cannot find 'genhdlist' program in PATH.])
-		    ;;
-	    esac
-	fi
-	enable_repo_urpmi=no])
-    AC_ARG_VAR([GENDISTRIB],
-	       [Generate urpmi distribution command. @<:@default=gendistrib@:>@])
-    _BLD_PATH_PROG([GENDISTRIB], [gendistrib], [${am_missing3_run}gendistrib], [$tmp_path], [dnl
-	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
-	    case "${target_vendor:-none}" in
-		(mandrake|mandriva|manbo|mageia|mes)
-		    _BLD_INSTALL_WARN([GENDISTRIB], [
-*** 
-*** Configure could not find a suitable tool for generating the media
-*** info for a URPMI repository.  This program is part of the rpm-tools
-*** package on MandrivaLinux based distributions.
-*** ], [
-*** On Mandriva based distributions, try 'urpmi rpm-tools'.
-***
-*** Mandriva 2010.2: 'urpmi rpm-tools'], [
-*** 
-*** Atlernatively, you can reconfigure with --disable-repo-urpmi to
-*** disable generation of URPMI repositories.  Proceeding under the
-*** assumption that --disable-repo-urpmi was specified.
-*** ])
-		    ;;
-		(*)
-		    AC_MSG_WARN([Cannot find 'gendistrib' program in PATH.])
+		(*) AC_MSG_WARN([Cannot find 'genhdlist' program in PATH.])
 		    ;;
 	    esac
 	fi
@@ -873,6 +852,107 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
     mediasrcsdir='$(rpmdistdir)/media$(repobranch)/source/media_info'
     AC_SUBST([mediasrcsdir])dnl
 ])# _RPM_REPO_SETUP_URPMI
+# =============================================================================
+
+# =============================================================================
+# _RPM_REPO_SETUP_APT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_RPM_REPO_SETUP_APT], [dnl
+    AC_REQUIRE([_OPENSS7_MISSING3])
+    tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
+    AC_ARG_ENABLE([repo-apt-rpm],
+	[AS_HELP_STRING([--disable-repo-apt-rpm],
+	    [apt-rpm repo construction @<:@defulat=auto@:>@])],
+	[], [enable_repo_apt_rpm=yes])
+dnl 
+dnl genbasedir is not really necessary: it is a script and our makefiles perform the functions
+dnl themselves.
+dnl
+    AC_ARG_VAR([GENBASEDIR],
+	       [Generate apt-rpm repository command. @<:@default=genbasedir@:>@])
+    _BLD_PATH_PROGS([GENBASEDIR], [genbasedir], [${am_missing3_run}genbasedir], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    AC_MSG_WARN([Cannot find 'genbasedir' program in PATH.])
+	fi])
+    AC_ARG_VAR([GENSRCLIST],
+	       [Generate apt-rpm repository sources command. @<:@default=gensrclist@:>@])
+    _BLD_PATH_PROGS([GENSRCLIST], [gensrclist], [${am_missing3_run}gensrclist], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(mandrake|mandriva|mes|mageia)
+		    _BLD_INSTALL_WARN([GENSRCLIST], [
+*** 
+*** Configure could not find a suitable tool for creating APT for RPM
+*** source repository metadata.  This program is part of the 'apt'
+*** package on Mandriva based distributions.
+*** ], [
+*** On Mandriva based distributions, try 'urpmi apt'.
+***
+*** Mageia 1:	'urpmi apt'], [
+*** 
+*** Alternatively, you can reconfigure with --disable-repo-apt-rpm to
+*** disable generation of APT for RPM repositories.  Proceeding under
+*** the assumption that --disable-repo-apt-rpm was specified.
+*** ])
+		    ;;
+		(*) AC_MSG_WARN([Cannot find 'gensrclist' program in PATH.]) ;;
+	    esac
+	else enable_repo_apt_rpm=no ; fi])
+    AC_ARG_VAR([GENPKGLIST],
+	       [Generate apt-rpm repository packages command.  @<:@default=genpkglist@:>@])
+    _BLD_PATH_PROGS([GENPKGLIST], [genpkglist], [${am_missing3_run}genpkglist], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    case "${target_vendor:-none}" in
+		(mandrake|mandriva|mes|mageia)
+		    _BLD_INSTALL_WARN([GENPKGLIST], [
+*** 
+*** Configure could not find a suitable tool for creating APT for RPM
+*** package repository metadata.  This program is part of the 'apt'
+*** package on Mandriva based distributions.
+*** ], [
+*** On Mandriva based distributions, try 'urmpi apt'.
+***
+*** Mageia 1:	'urpmi apt'], [
+*** 
+*** Alternatively, you can reconfigure with --disable-repo-apt-rpm to
+*** disable generation of APT for RPM repositories.  Proceeding under
+*** the assumption that --disable-repo-apt-rpm was specified.
+*** ])
+		    ;;
+		(*) AC_MSG_WARN([Cannot find 'genpkglist' program in PATH.]) ;;
+	    esac
+	else enable_repo_apt_rpm=no ; fi])
+dnl
+dnl countpkglist is not really necessary: it is a binary, but it is easy to emulate with strings,
+dnl grep and wc.
+dnl
+    AC_ARG_VAR([COUNTPKGLIST],
+	       [Count packages in apt-rpm package lists command. @<:@default=countpkglist@:>@])
+    _BLD_PATH_PROGS([COUNTPKGLIST], [countpkglist], [${am_missing3_run}countpkglist], [$tmp_path], [dnl
+	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
+	    AC_MSG_WARN([Cannot find 'countpkglist' program in PATH.])
+	fi])
+    AC_CACHE_CHECK([for rpm apt repo construction], [rpm_cv_repo_apt], [dnl
+	rpm_cv_repo_apt=${enable_repo_apt_rpm:-no}
+    ])
+    AM_CONDITIONAL([BUILD_REPO_APT_RPM], [test ":$rpm_cv_repo_apt" = :yes])dnl
+    aptrdir='$(topdir)'
+    AC_SUBST([aptrdir])dnl
+    aptrbasedir='$(aptrdir)'/base
+    AC_SUBST([aptrbasedir])dnl
+    aptrfulldir='$(aptrdir)/RPMS.full'
+    AC_SUBST([aptrfulldir])dnl
+    aptrmaindir='$(aptrdir)/RPMS.main'
+    AC_SUBST([aptrmaindir])dnl
+    aptrdebgdir='$(aptrdir)/RPMS.debug'
+    AC_SUBST([aptrdebgdir])dnl
+    aptrdevldir='$(aptrdir)/RPMS.devel'
+    AC_SUBST([aptrdevldir])dnl
+    aptrsrcsdir='$(aptrdir)/RPMS.source'
+    AC_SUBST([aptrsrcsdir])dnl
+    aptrsrpmdir='$(aptrdir)/SRPMS.source'
+    AC_SUBST([aptrsrpmdir])dnl
+])# _RPM_REPO_SETUP_APT
 # =============================================================================
 
 # =============================================================================
