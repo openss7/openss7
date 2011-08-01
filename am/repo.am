@@ -141,10 +141,8 @@ if MAINTAINER_MODE
 	rm -f -- $(DESTDIR)$(yumrepodir)/$(PACKAGE)-local.repo
 endif
 
-##
-# When the stuff is installed go looking for the configuration file for the
-# yum-kmod or yum-fedorakmod plugin and change the 'pinkernels' and
-# 'installforallkernels' options.
+## When the stuff is installed go looking for the configuration file for the yum-kmod or
+## yum-fedorakmod plugin and change the 'pinkernels' and 'installforallkernels' options.
 ##
 post-yum:
 	if test -n "$(yumkmodconf)" -a -f "$(DESTDIR)/$(yumkmodconf)" ; then \
@@ -166,10 +164,9 @@ endif
 
 MY_PHONY			+= install-yum uninstall-yum post-zypp
 
-##
-# Install a yum installation source for both remote and local repositories.  This involves
-# downloading the @PACKAGE@.repo file, installing the @PACKAGE@-local.repo file, and performing yum
-# makecache.
+## Install a yum installation source for both remote and local repositories.  This involves
+## downloading the @PACKAGE@.repo file, installing the @PACKAGE@-local.repo file, and performing yum
+## makecache.
 ##
 repo-install-yum:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -254,7 +251,6 @@ repo-install-yum:
 		yum makecache || : ; \
 	fi
 
-##
 ## To remove a yum install source, first remove any changes that were made to the (fedora)kmod.conf
 ## file.  The original (fedora)kmod.conf file is saved before changes in (fedora)kmod.conf.rpmsave
 ## (when changes were actually made).  Restore (fedora)kmod.conf.rpmsave to (fedora)kmod.conf.
@@ -340,7 +336,6 @@ INSTALL_ZYPP_REPOS = $(PACKAGE).zypp.repo
 if MAINTAINER_MODE
 ## MAINTAINER_MODE
 
-##
 ## The only purpose for making this file in the build directory before installing it is for
 ## debugging.  This data really needs to be split into 3 files for them to be installed directly
 ## into /etc/zypp/repos.d/.  Otherwise, they really need to be formatted identical to a yum .repo
@@ -402,9 +397,8 @@ if MAINTAINER_MODE
 	rm -f -- $(DESTDIR)$(zypprepodir)/$(PACKAGE)-local.repo
 endif
 
-##
-# When multiversion is set in the zypp.conf file, we need to make sure that it is set to
-# multiversion = provides:multiversion(kernel).
+## When multiversion is set in the zypp.conf file, we need to make sure that it is set to
+## multiversion = provides:multiversion(kernel).
 ##
 post-zypp:
 	if test -n "$(zyppconfig)" - a -f "$(DESTDIR)/$(zyppconfig)" ; then \
@@ -422,12 +416,11 @@ post-zypp:
 
 MY_PHONY			+= install-zypp uninstall-zypp post-zypp
 
-##
-## Install zypp installation sources for both remote and local repositories.
-## Install a zypp installation source for both remote and local repositories.
-## This involves downloading the @PACKAGE_UCNAME@credentials file, activating the
-## @PACKAGE@ service, and creating the @PACKAGE@-local.repo file.  Aside from the
-## credentials file, this can be accomplished with zypper commands alone.
+## Install zypp installation sources for both remote and local repositories.  Install a zypp
+## installation source for both remote and local repositories.  This involves downloading the
+## @PACKAGE_UCNAME@credentials file, activating the @PACKAGE@ service, and creating the
+## @PACKAGE@-local.repo file.  Aside from the credentials file, this can be accomplished with zypper
+## commands alone.
 ##
 repo-install-zypp:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -520,7 +513,6 @@ repo-install-zypp:
 		zypper refresh || : ; \
 	fi
 
-##
 ## To remove a zypper install source, first remove any changes that we made to the zypp.conf file.
 ## The original zypp.conf file is saved before making changes in zypp.conf.rpmsave (when changes
 ## were actually made).  Restore zypp.conf.rpmsave to zypp.conf.  Copy the
@@ -722,12 +714,10 @@ endif
 
 MY_PHONY		+= install-urpmi uninstall-urpmi
 
+## Install a urpmi installation source for both remote and local repositories.  This involves
+## downloading the remote media.cfg file, installing the local media.cfg file, and performing a
+## urpmi.update.
 ##
-# Install a urpmi installation source for both remote and local repositories.  This involves
-# downloading the remote media.cfg file, installing the local media.cfg file, and performing a
-# urpmi.update.
-##
-
 repo-install-urpmi:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@d='$(DESTDIR)$(urpmirepodir)/OpenSS7-$(target_edition)-$(target_cpu)' ; \
@@ -807,6 +797,9 @@ repo-install-urpmi:
 ## WITH_INSTALL_SOURCE_URPMI
 endif
 
+if BUILD_DPKG
+## BUILD_DPKG
+
 if WITH_INSTALL_SOURCE_APT
 ## WITH_INSTALL_SOURCE_APT
 
@@ -818,11 +811,27 @@ $(PACKAGE).sources.list: Makefile
 		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
 			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
-			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
-				$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
-			$(ECHO) 'deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
-			if test "$$repo" = 'Source' ; then \
-				$(ECHO) '#deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+			if test -z '@BUILD_REPO_APT_TRUE@' ; then \
+				if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+					$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+				$(ECHO) 'deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+				if test "$$repo" = 'Source' ; then \
+					$(ECHO) '#deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+				fi ; \
+			elif test -z '@BUILD_REPO_YUM_TRUE@' ; then \
+				if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+					$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+				$(ECHO) 'repomd $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+			elif test -z '@BUILD_REPO_URPMI_TRUE@' ; then \
+				if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+					$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+					$(ECHO) 'urpm $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media'$${b:+/$$b}$${d:+/$$d}'/ media_info/hdlist'$${b:+_}$${b}$${d:+_}$${d} ; \
+				if test "$$repo" = 'Source' ; then \
+					$(ECHO) '#urpm-src $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media'$${b:+/$$b}$${d:+/$$d}'/ media_info/synthesis.hdlist$${b+_}$${b}$${d:+_}$${d}' ; \
+				fi ; \
+			elif test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
+				if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+					$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
 			fi ; \
 		done ; \
 	done >$@
@@ -888,27 +897,28 @@ if MAINTAINER_MODE
 endif
 
 post-apt:
-	aptitude refresh
+	apt-cache gencaches
 
 #ALL_LOCAL			+= $(PACKAGE).sources.list
+#CLEANFILES			+= $(PACKAGE).sources.list
 #INSTALL_DATA_LOCAL		+= install-apt
 #UNINSTALL_LOCAL		+= uninstall-apt
-#CLEANFILES			+= $(PACKAGE).sources.list
 #POST_INSTALL_AM		+= post-apt
+
+if MAINTAINER_MODE
+#ALL_LOCAL			+= $(PACKAGE)-local.sources.list
+#CLEANFILES			+= $(PACKAGE)-local.sources.list
+endif
 
 MY_PHONY			+= install-apt uninstall-apt post-apt
 
-##
-# Install an apt installation source for both remote and local repositories.  This involves
-# downloading the @PACKAGE@.list file, installing the @PACKAGE@-local.list file, and performing
-# aptitude refresh.
+## Install an apt installation source for both remote and local repositories.  This involves
+## downloading the @PACKAGE@.list file, installing the @PACKAGE@-local.list file, and performing
+## apt-cache gencaches.
 ##
 repo-install-apt:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@if test ! -d '$(DESTDIR)$(aptrepodir)' ; then \
-		$(ECHO) "$(MKDIR_P) $(DESTDIR)$(aptrepodir)" ; \
-		$(MKDIR_P) $(DESTDIR)$(aptrepodir) ; \
-	fi
+	@d='$(DESTDIR)$(aptrepodir)' ; test -d $$d || { $(ECHO) "$(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; }
 	@( \
 		cd $(DESTDIR)$(aptrepodir) ; \
 		un=; pw=; o=; f='$(PACKAGE).list' ; \
@@ -929,8 +939,7 @@ repo-install-apt:
 		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'` ; \
 		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
 		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
-		$(ECHO) "rm -f -- $$f" ; \
-		rm -f -- $$f ; \
+		$(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; \
 		if ! echo "$$url" | wget -i - -O $$f >/dev/null ; then \
 			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
 				echo 'Authorization required for repository access.' >/dev/tty ; \
@@ -971,11 +980,10 @@ repo-install-apt:
 					if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'deb-src file://'$$d' /' ; \
 					fi ; \
 				done ; \
-			done \
-		) >$(PACKAGE)-local.list \
+			done ; \
+		) >$(PACKAGE)-local.list ; \
 	) || exit 1
 
-##
 ## To remove an apt install source, disable and copy the @PACKAGE@.list file to
 ## @PACKAGE@.list.dpkg-old so that the credentials will be maintained even when the repository has
 ## been removed.  Next remove the @PACKAGE@.list and @PACKAGE@-local.list repositories and refresh
@@ -1001,6 +1009,228 @@ REPO_INSTALL			+= repo-install-apt
 REPO_UNINSTALL			+= repo-uninistall-apt
 
 ## WITH_INSTALL_SOURCE_APT
+endif
+
+## BUILD_DPKG
+else
+## !BUILD_DPKG
+
+if BUILD_RPMS
+## BUILD_RPMS
+
+if WITH_INSTALL_SOURCE_APT
+## WITH_INSTALL_SOURCE_APT
+
+$(PACKAGE).sources.list: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
+	for branch in $$rlist ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
+				$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+			if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
+				$(ECHO) 'rpm $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+				if test "$$repo" = 'Source' ; then \
+					$(ECHO) '#rpm-src $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
+				fi ; \
+			fi ; \
+			if test -z '@BUILD_REPO_YUM_TRUE@' ; then \
+				$(ECHO) 'repomd $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+:/$$b}$${d:+/$$d} ; \
+			fi ; \
+		done ; \
+	done >$@
+
+INSTALL_APT_REPOS = $(PACKAGE).sources.list
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+$(PACKAGE)-local.sources.list: Makefile
+	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
+	rpmdistdir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || rpmdistdir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	for branch in $$rb ; do \
+		b=`echo "$$branch" | sed 's,Base,,;t;s,Updates,updates,;t;s,Extras,extras,;t;s,Testing,testing,'` ; \
+		if test -n '$(repobranch)' -a '$(rpmdistdir)' = '$(rpmdir)' ; then \
+			test "$$b" = '$(repobranch)' -o "/$b" = '$(repobranch)' || continue ; s= ; else s="$$b" ; fi ; \
+		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
+			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
+			if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
+				$(ECHO) 'rpm file://'$${rpmdistdir}$${b:+/$$b}$${d:+/$$d}' /' ; \
+				if test "$$repo" = 'Source' ; then \
+					$(ECHO) 'rpm-src file://'$${rpmdistdir}$${b:+/$$b}$${d:+/$$d}' /' ; \
+				fi ; \
+			fi ; \
+			it test -z '@BUILD_REPO_YUM_TRUE@' ; then \
+				$(ECHO) 'repomd file://'$${rpmdistdir}$${b:+/$$b}$${d:+/$$d} ; \
+			fi ; \
+		done ; \
+	done >$@
+
+INSTALL_APT_REPOS += $(PACKAGE)-local.sources.list
+
+## MAINTAINER_MODE
+endif
+
+install-apt-rpm: $(INSTALL_APT_REPOS)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_INSTALL)
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
+		$(INSTALL_DATA) $(PACKAGE).sources.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
+	fi
+	@if test -n "$(aptgpgdir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptgpgdir)'" ; \
+		$(MKDIR_P) "$(DESTDIR)$(aptgpgdir)" ; \
+		$(ECHO) " $(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY '$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc'" ; \
+		$(INSTALL_DATA) $(srcdir)/scripts/OPENSS7-GPG-KEY "$(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc" ; \
+	fi
+if MAINTAINER_MODE
+	@if test -n "$(aptrepodir)" ; then \
+		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
+		$(MKDIR_P) '$(DESTDIR)$(aptrepodir)' ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list' ; \
+	fi
+endif
+
+uninstall-apt-rpm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@$(NORMAL_UNINSTALL)
+	rm -f -- $(DESTDIR)$(aptgpgdir)/gpg-pubkey-$(PACKAGE).asc
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE).list
+if MAINTAINER_MODE
+	rm -f -- $(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list
+endif
+
+post-apt-rpm:
+	apt-cache gencaches
+
+#ALL_LOCAL		+= $(PACKAGE).sources.list
+#CLEANFILES		+= $(PACKAGE).sources.list
+#INSTALL_DATA_LOCAL	+= install-apt-rpm
+#UNINSTALL_LOCAL	+= uninstall-apt-rpm
+#POST_INSTALL_AM	+= post-apt-rpm
+
+if MAINTAINER_MODE
+#ALL_LOCAL		+= $(PACKAGE)-local.sources.list
+#CLEANFILES		+= $(PACKAGE)-local.sources.list
+endif
+
+MY_PHONY		+= install-apt-rpm uninstall-apt-rpm post-apt-rpm
+
+## Install an apt-rpm installation source for both remote and local repositories.  This involves
+## downloading the @PACKAGE@.list file, installing the @PACKAGE@-local.list file, and performing
+## apt-cache gencaches.
+##
+repo-install-apt-rpm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@d='$(DESTDIR)$(aptrepodir)' ; test -d $$d || { $(ECHO) "$(MKDIR_P) '$$d'" ; $(MKDIR_P) "$$d" ; }
+	@( \
+		cd $(DESTDIR)$(aptrepodir) ; \
+		un=; pw=; o=; f='$(PACKAGE).list' ; \
+		for s in '' '.rpmnew' '.rpmsave' ; do \
+			o="$$f$$s" ; \
+			if test -e $$o ; then \
+				un=`sed -n -r 's,^[#]?(rpm(-src)?|repomd)[[:space:]].*[[:space:]]http[s]?://([^@:]*)(:([^@]*))@.*$$,\2,p;t end;b;: end q' $$o` ; \
+				pw=`sed -n -r 's,^[#]?(rpm(-src)?|repomd)[[:space:]].*[[:space:]]http[s]?://([^@:]*)(:([^@]*))@.*$$,\4,p;t end;b;: end q' $$o` ; \
+				test -n "$$un" -a -n "$$pw" || continue ; \
+				break ; \
+			fi ; \
+		done ; \
+		if test -f "$$f" -a "$$o" != "$$f" ; then \
+			$(ECHO) "mv -f -- $$f $$f.rpmsave" ; \
+			mv -f -- $$f $$f.rpmsave || : ; \
+		fi ; \
+		ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`$${un:+&un=}$${un}$${pw:+&pw=}$${pw}" ; \
+		ext="$$ext"`echo '/$(reposubdir)' | sed 's,//,/,g;s,/,\&distro=,;s;,/,\&relver=,;s;,/,\&osarch=,'` ; \
+		key=; test -z "$$un" || key="$${un}$${pw:+:}$${pw}@" ; \
+		url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+		$(ECHO) "rm -f -- $$f" ; rm -f -- $f ; \
+		if ! echo "$$url" | wget -i - -O $$f >/dev/null ; then \
+			if echo "$$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then \
+				echo 'Authorization required for repository access.' >/dev/tty ; \
+				u='anonymous'; p= ; \
+				read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=$${u:-anonymous} ; \
+				if test "$$u" != 'anonymous' ; then \
+				read -es -p 'Password: ' p </dev/tty >/dev/tty ; \
+				echo '' >/dev/tty ; \
+				fi ; \
+				key=; test -z "$$u" || key="$${u}:$${p}@" ; \
+				url='$(reposerv)://'"$${key}"'$(repobase)/$(reporoot)/'"$$f$$ext" ; \
+				$(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; \
+				if ! echo "$$url" | wget -i - -O $$f 2>/dev/null ; then \
+					test "$$o" != "$$f" || mv -f -- $$f.rpmsave $$f ; \
+					echo 'Authorization failed.' >/dev/tty ; \
+					exit 1 ; \
+				fi ; \
+			fi ; \
+		fi ; \
+		if test ! -e $$f ; then \
+			if test "$$o" != "$$f" ; then \
+				$(ECHO) "mv -f -- $$f.rpmsave $$f" ; \
+				mv -f -- $$f.rpmsave $$f ; \
+			fi ; \
+			exit 1 ; \
+		fi ; \
+		rpmdistdir='$(rpmdistdir)' ; test '$(DISTDIR)' = '$(REPODIR)' || rpmdistdir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		tardir='$(tardir)' ; test '$(DISTDIR)' = '$(REPODIR)' || tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		( \
+			rb='$(repobranch)'; case "$${rb:-base}" in (base|updates|extras|testing) rb=;; esac ; \
+			for b in '' updates extras testing $$rb ; do \
+				d="$${rpmdistdir}$${b:+/$$b}" ; \
+				for r in main debug devel source '' ; do \
+					d="$${rpmdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
+					if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
+						if test ! -f $$d/pkglist then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'rpm     file://'$$d' /' ; \
+						if test -z "$$r" -o "$$r" = 'source' ; then \
+						if test ! -f $$d/srclist then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'rpm-src file://'$$d' /' ; \
+						fi ; \
+					fi ; \
+					if test -z '@BUILD_REPO_YUM_TRUE@' ; then \
+						if test ! -f $$d/repodata/repomd.xml then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'repomd  file://'$$d ; \
+					fi ; \
+				done ; \
+			done ; \
+		) >$(PACKAGE)-local.list ; \
+	) || exit 1
+
+## To remove an apt-rpm install source, disable and copy the @PACKAGE@.list file to
+## @PACKAGE@.list.rpmsave so that the credentials will be maintained even when the repository has
+## been removed.  Next remove the @PACKAGE@.list and @PACKAGE@-local.list repositories and refresh
+## apt-rpm.
+##
+repo-uninstall-apt-rpm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@f='$(DESTDIR)$(aptrepodir)/$(PACKAGE).list' ; \
+	if test -f $$f ; then \
+	$(ECHO) "sed 's,^rpm,#rpm,;s,^repomd,#repomd,' $$f >$$f.rpmsave" ; \
+	sed 's,^rpm,#rpm,;s,^repomd,#repomd,' $$f >$$f.rpmsave
+	@for s in '' '-local' ; do \
+		f='$(DESTDIR)$(aptrepodir)/$(PACKAGE)'$$s'.list' ; \
+		if test -f $$f ; then \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
+	@$(ECHO) "apt-cache gencaches" ; \
+	apt-cache gencaches || :
+
+REPO_INSTALL			+= repo-install-apt-rpm
+REPO_UNINSTALL			+= repo-uninstall-apt-rpm
+
+## WITH_INSTALL_SOURCE_APT
+endif
+
+## BUILD_RPMS
+endif
+
+## !BUILD_DPKG
 endif
 
 ## PKG_BUILD_INDEP

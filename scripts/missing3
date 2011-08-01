@@ -130,6 +130,18 @@ case $1 in
 	      dpkg-scanpackages		    create appropriate output
 	      dpkg-scansources		    create appropriate output
 	
+	  Apt for RPM repository commands:
+	      genbasedir		    create appropriate output
+	      genpkglist		    touch the output file
+	      gensrclist		    touch the output file
+	      countpkglist		    create appropriate output
+	
+	  Urpmi repository commands:
+	      gendistrib		    create appropriate output
+	      genhdlist			    create appropriate output
+	      genhdlist2		    create appropriate output
+	      genhdlist-old		    create appropriate output
+	
 	Send problem reports to <bugs@openss7.org>.
 	EOF
 	exit 0
@@ -213,10 +225,10 @@ elif test ":$2" = ":--version" -o ":$2" = ":--help" ; then
 fi
 
 case $program in
-    (create_directory.yast|create_md5sums|create_package_desc|create_repo_for_patch.sh|create_update_source.sh|creatpatch|mk_listings)
+    (create_directory.yast|create_md5sums|create_package_desc|create_repo_for_patch.sh|create_update_source.sh|creatpatch|mk_listings|genbasedir|genpkglist|gensrclist|countpkglist)
 	# do not handle --version or --help
 	;;
-    (createrepo|modifyrepo|apt-ftparchive|dpkg-scanpackages|dpkg-scansources|*)
+    (createrepo|modifyrepo|apt-ftparchive|dpkg-scanpackages|dpkg-scansources|gendistrib|genhdlist|genhdlist-old|genhdlist2|*)
 	if test -z "$run" && ($program --version) >/dev/null 2>&1 ; then
 	    # it exists, but it failed.
 	    exit 1
@@ -325,6 +337,7 @@ case $program in
 	*** On RPM  distributions, try 'yum install createrepo'
 	*** On DEB  distributions, try 'apt-get install createrepo'
 	*** On SuSE distributions, try 'zypper install createrepo'
+	*** On URPM distributions, try 'urpmi createrepo'
 	***
 	*** Alternately, you can specify an equivalent command with the
 	*** CREATEREPO environment variable when running \`configure'.
@@ -334,6 +347,7 @@ case $program in
 	*** CentOS 5.x:	 \`yum install createrepo'
 	*** RHEL 5,6.0:	 \`yum install createrepo'
 	*** SLES 10, 11: \`zypper install createrepo'
+	*** Mandriva:	 \`urpmi createrepo'
 	EOF
 	;;
     (modifyrepo)
@@ -347,6 +361,7 @@ case $program in
 	*** On RPM  distributions, try 'yum install createrepo'
 	*** On DEB  distributions, try 'apt-get install createrepo'
 	*** on SuSE distributions, tru 'zypper install createrepo'
+	*** On URPM distributions, try 'urpmi createrepo'
 	***
 	*** Alternately, you can specify an equivalent command with the
 	*** MODIFYREPO environment variable when running \`configure'.
@@ -356,6 +371,45 @@ case $program in
 	*** CentOS 5.x:	 \`yum install createrepo'
 	*** RHEL 5,6.0:	 \`yum install createrepo'
 	*** SLES 10, 11: \`zypper install createrepo'
+	*** Mandriva:	 \`urpmi createrepo'
+	EOF
+	;;
+    (genbasedir|genpkglist|gensrclist|countpkglist)
+	environvar=`echo $program | sed 'y,abcdefghijklmnopqrstuvwxyz,abcdefghijklmnopqrstuvwxyz,'`
+	cat 1>&2 <<-EOF
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  you need an appropriate version of the
+	*** \`$program' program to create APT for RPM repository metadata files.
+	*** You can normally get \`$program' as part of many popular GNU/Linux
+	*** distributions.
+	***
+	*** On SuSE distributions, try 'zypper install apt'
+	*** On URPM distributions, try 'urpmi apt'
+	***
+	*** Alternately, you can specify an equivalent command with the
+	*** \`$environvar' environment variable when running \`configure'.
+	***
+	*** Mandriva 1:	  \`urpmi apt'
+	EOF
+	;;
+    (gendistrib|genhdlist2|genhdlist|genhdlist-old)
+	environvar=`echo $program | sed 's,genhdlist.*,genhdlist,;y,abcdefghijklmnopqrstuvwxyz,ABCDEFGHIJKLMNOPQRSTUVWXYZ,'`
+	cat 1>&2 <<-EOF
+	*** It is straightforward to emulate \`$program'; however, emulation is
+	*** not currently supported by \`$scriptname'.
+	***
+	*** You might have modified some files without having the proper tools
+	*** for further handling of them.  You need an appropriate version of
+	*** the \`$program' program to generate urpm metadata files.  You can
+	*** normally get \`$program' as part of many popular GNU/Linux
+	*** distributions.
+	***
+	*** On URPM distributsion, try 'urpmi genhdlist2'
+	***
+	*** Alternatively, you can specify an equivalent command with the
+	*** \`$environvar' environment vairable when running \`configure'.
+	***
+	*** Mandriva 1:	    \`urpmi genhdlist2'
 	EOF
 	;;
     (*)
@@ -395,6 +449,22 @@ case $program in
 	exit 1
 	;;
     (dpkg|dpkg-deb)
+	exit 1
+	;;
+    (genbasedir|genpkglist|gensrclist)
+	exit 1
+	;;
+    (countpkglist)
+	args="$@"
+	test $# -ge 1 || exit 1
+	for arg in $args ; do
+	    comp=`echo "$arg" | sed 's,.*\.,,'`
+	    if test -r $arg ; then 
+		strings $arg | grep "RPMS\.$comp"
+	    else echo "Cannot read $arg." >&2 ; exit 1 ; fi
+	done | wc -l
+	;;
+    (gendistrib|genhdlist|genhdlist2|genhdlist-old)
 	exit 1
 	;;
     (*)

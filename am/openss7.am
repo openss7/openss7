@@ -1007,25 +1007,37 @@ MY_REVERSIVE_TARGETS	+= release-clean-reversive
 MY_PHONY		+= release-clean-ma release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
 
 #! release-install:
-#! 	Installs release rpms or debs into the release directory
-#! 	@REPODIR@ and updates any required repository
-#! 	metafiles.  It is intended on being used with REPODIR specified on the
-#! 	command line or during configure.  The directory defaults to the
-#! 	distribution directory.
+#! 	Installs release rpms or debs into the release directory $(REPODIR) and
+#! 	updates any required repository metafiles.  It is intended on being used
+#! 	with REPODIR specified on the command line or during configure.  The
+#! 	directory defaults to the distribution directory.  Note that when
+#! 	REPODIR is not specified, this target does nothing.
+#!
+#! forced-release-install:
+#! 	The `release-install' target will not install any release rpms or debs
+#! 	that already exists in the package repository directory.  This forced
+#! 	target will.
 #!
 release-install: $(RELEASE_INSTALL)
 
+FORCED_TARGETS		+= forced-release-install
 MY_PHONY		+= release-install $(RELEASE_INSTALL)
 
 #! release-uninstall:
-#! 	Removes release rpms or debs from the release directory
-#! 	@REPODIR@ and updates any required repository
-#! 	metafiles.  It is intended on being used with REPODIR specified on the
-#! 	command line or during configure.  The directory defaults to the
-#! 	distribution directory.
+#! 	Removes release rpms or debs from the release directory $(REPODIR) and
+#! 	updates any required repository metafiles.  It is intended on being used
+#! 	with REPODIR specified on the command line or during configure.  The
+#! 	directory defaults to the distribution directory.  Note that when
+#! 	REPODIR is not specified, this target does nothing.
+#!
+#! forced-release-uninstall:
+#! 	The `release-uninstall' target will not remove any release rpms or debs
+#! 	that already exist in the package repository directory and were not
+#! 	created by us.  This forced target will.
 #!
 release-uninstall: $(RELEASE_UNINSTALL)
 
+FORCED_TARGETS		+= forced-release-uninstall
 MY_PHONY		+= release-uninstall $(RELEASE_UNINSTALL)
 
 $(UPDATE_DIRECTORIES)::
@@ -1111,27 +1123,41 @@ MY_REVERSIVE_TARGETS 	+= update-clean-reversive
 MY_PHONY		+= update-clean-ma update-clean-local update-clean $(UPDATE_CLEAN_LOCAL)
 
 #! update-install:
-#! 	Installs updated rpms or debs into the release directory
-#! 	@REPODIR@ and updates any required repository
-#! 	metafiles.  It is intended on being used with REPODIR specified on the
-#! 	command line or during configure.  The directory defaults to the
-#! 	distribution directory.  This differs from the release-install target in
-#! 	that it only affects updated rpms or debs.
+#! 	Installs updated rpms or debs into the release directory $(REPODIR) and
+#! 	updates any required repository metafiles.  It is intended on being used
+#! 	with REPODIR specified on the command line or during configure.  The
+#! 	directory defaults to the distribution directory.  Note that when
+#! 	REPODIR is not specified, this target does nothing.  This differs from
+#! 	the release-install target in that it only affects updated rpms or debs
+#! 	(e.g. new kmod packages).
+#!
+#! forced-update-install:
+#! 	The `update-install' target will not install any update rpms or debs
+#! 	that already exist in the package repository directory.  This forced
+#! 	target will.
 #!
 update-install: $(UPDATE_INSTALL)
 
+FORCED_TARGETS		+= forced-update-install
 MY_PHONY		+= update-install $(UPDATE_INSTALL)
 
 #! update-uninstall:
-#! 	Removes updated rpms or debs from the release directory
-#! 	@REPODIR@ and updates any required repository
-#! 	metafiles.  It is intended on being used with REPODIR specified on the
-#! 	command line or during configure.  The directory defaults to the
-#! 	distribution directory.  This differs from the release-uninstall target
-#! 	in that it only affects updated rpms or debs.
+#! 	Removes updated rpms or debs from the release directory $(REPODIR) and
+#! 	updates any required repository metafiles.  It is intended on being used
+#! 	with REPODIR specified on the command line or during configure.  The
+#! 	directory defaults to the distribution directory.  Note that when
+#! 	REPODIR is not specified, this target does nothing.  This differs from
+#! 	the release-uninstall target in that it only affects updated rpms or
+#! 	debs (e.g. new kmod packages).
+#!
+#! forced-update-uninstall:
+#! 	The `update-uninstall' target will not remove any update rpms or debs
+#! 	that already exist in the package repository directory and were not
+#! 	created by us.  This forced target will. 
 #!
 update-uninstall: $(UPDATE_UNINSTALL)
 
+FORCED_TARGETS		+= forced-update-uninstall
 MY_PHONY		+= update-uninstall $(UPDATE_UNINSTALL)
 
 ##

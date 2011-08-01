@@ -432,6 +432,27 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
 # _REPO_SETUP_APT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_SETUP_APT], [dnl
+    AC_CACHE_CHECK([for apt directory], [repo_cv_apt_dir], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${rootdir}${sysconfdir}/apt
+	    ${DESTDIR}${rootdir}/etc/apt
+	    ${DESTDIR}${sysconfdir}/apt
+	    ${DESTDIR}/etc/apt\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for apt directory... $repo_dir])
+	    if test -d "$repo_dir" ; then
+		repo_cv_apt_dir="$repo_dir"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_apt_dir" || repo_cv_apt_dir=no
+	AC_MSG_CHECKING([for apt directory])
+    ])
     AC_CACHE_CHECK([for apt sources directory], [repo_cv_apt_repodir], [dnl
 	case "${with_install_source_apt:-search}" in
 	    (no) repo_cv_apt_repodir=no ;;
@@ -461,6 +482,56 @@ AC_DEFUN([_REPO_SETUP_APT], [dnl
 	    test -n "$repo_cv_apt_repodir" || repo_cv_apt_repodir=no
 	    AC_MSG_CHECKING([for apt sources directory])
 	fi
+    ])
+dnl
+dnl The Connectiva apt-rpm distribution does not come equipped with a source directory, just a
+dnl sources list.
+dnl
+    AC_CACHE_CHECK([for apt sources list], [repo_cv_apt_srclist], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${rootdir}${sysconfdir}/apt
+	    ${DESTDIR}${rootdir}/etc/apt
+	    ${DESTDIR}${sysconfdir}/apt
+	    ${DESTDIR}/etc/apt\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for apt sources list... $repo_dir/sources.list])
+	    if test -f "$repo_dir/sources.list" ; then
+		repo_cv_apt_srclist="$repo_dir/sources.list"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_apt_srclist" || repo_cv_apt_srclist=no
+	AC_MSG_CHECKING([for apt sources list])
+    ])
+dnl 
+dnl The Connectiva apt-rpm distribution diverged from Debian apt on the means for handling GPG keys:
+dnl it uses /etc/apt/vendors.list to identify the keys.
+dnl 
+    AC_CACHE_CHECK([for apt vendors list], [repo_cv_apt_vndlist], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${rootdir}${sysconfdir}/apt
+	    ${DESTDIR}${rootdir}/etc/apt
+	    ${DESTDIR}${sysconfdir}/apt
+	    ${DESTDIR}/etc/apt\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for apt vendors list... $repo_dir/vendors.list])
+	    if test -f "$repo_dir/vendors.list" ; then
+		repo_cv_apt_vndlist="$repo_dir/vendors.list"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_apt_vndlist" || repo_cv_apt_vndlist=no
+	AC_MSG_CHECKING([for apt vendors list])
     ])
     AC_CACHE_CHECK([for apt gpg directory], [repo_cv_apt_gpgdir], [dnl
 	eval "repo_search_path=\"
@@ -572,12 +643,27 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	urpmiconfdir="$repo_cv_urpmi_confdir"
     fi
     AC_SUBST([urpmiconfdir])dnl
+    aptconfdir=
+    if test :"${repo_cv_apt_dir:-no}" != :no ; then
+	aptconfdir="$repo_cv_apt_dir"
+    fi
+    AC_SUBST([aptconfdir])
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_APT], [test :"${repo_cv_apt_dir:-no}" != :no])
     aptrepodir=
     if test :"${repo_cv_apt_repodir:-no}" != :no ; then
 	aptrepodir="$repo_cv_apt_repodir"
     fi
     AC_SUBST([aptrepodir])dnl
-    AM_CONDITIONAL([WITH_INSTALL_SOURCE_APT], [test :"${repo_cv_apt_repodir:-no}" != :no])
+    aptsrclist=
+    if test :"${repo_cv_apt_srclist:-no}" != :no ; then
+	aptsrclist="$repo_cv_apt_srclist"
+    fi
+    AC_SUBST([aptsrclist])dnl
+    aptvndlist=
+    if test :"${repo_cv_apt_vndlist:-no}" != :no ; then
+	aptvndlist="$repo_cv_apt_vndlist"
+    fi
+    AC_SUBST([aptvndlist])dnl
     aptgpgdir=
     if test :"${repo_cv_apt_gpgdir:-no}" != :no ; then
 	aptgpgdir="$repo_cv_apt_gpgdir"

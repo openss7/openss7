@@ -66,11 +66,11 @@
 #! top build directory `@abs_builddir@'.
 #!
 ##
-# This one rule is always included.  This is because even though debian/rules.in is set as
-# executable, config.status does not make an executable debian/rules.  This is a sad problem with
-# autoconf.  However, we use this dist-hook to check the situtation just before the distribution is
-# archived.  We always need this rule because the archive could be used later to build debian
-# packages.
+## This one rule is always included.  This is because even though debian/rules.in is set as
+## executable, config.status does not make an executable debian/rules.  This is a sad problem with
+## autoconf.  However, we use this dist-hook to check the situtation just before the distribution is
+## archived.  We always need this rule because the archive could be used later to build debian
+## packages.
 ##
 deb-rules-check:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -81,15 +81,15 @@ deb-rules-check:
 
 DIST_HOOK		+= deb-rules-check
 
-##
-# This is a stab at making all distribution archives in one blow without
-# overriding the dist target.
+
+## This is a stab at making all distribution archives in one blow without overriding the dist
+## target.
 ##
 dist-best: distdir
-	@WITH_BZIP2_TRUE@tardir=$(distdir) && ( $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz )
-	tardir=$(distdir) && ( $(am__tar) | bzip2 -9 -c >$(distdir).tar.bz2 )
-	@WITH_LZMA_TRUE@tardir=$(distdir) && ( $(am__tar) | lzma -9 -c >$(distdir).tar.lzma )
-	@WITH_XZ_TRUE@tardir=$(distdir) && ( $(am__tar) | xz -c >$(distdir).tar.xz )
+	@WITH_BZIP2_TRUE@tardir=$(distdir) && ( $(am__tar) | GZIP=$(GZIP_ENV) $(GZIP_CMD) $(GZIP) -c >$(distdir).tar.gz )
+	tardir=$(distdir) && ( $(am__tar) | $(BZIP2_CMD) $(BZIP) -c >$(distdir).tar.bz2 )
+	@WITH_LZMA_TRUE@tardir=$(distdir) && ( $(am__tar) | $(LZMA_CMD) $(LZMA) -c >$(distdir).tar.lzma )
+	@WITH_XZ_TRUE@tardir=$(distdir) && ( $(am__tar) | $(XZ_CMD) $(XZ) -c >$(distdir).tar.xz )
 	$(am__remove_distdir)
 
 
@@ -143,16 +143,14 @@ endif
 
 archive_keys		= $(tardir)/OPENSS7-GPG-KEY
 
-##
-# creates the package directory
+## creates the package directory
 ##
 RELEASE_DIRECTORIES	+= $(DISTDIR) $(tardir)
 
-##
-# Note that sometimes the package distribution directory is the current build directory.  This is
-# true when we are doing local release tests on a package.  In that case, this rule will not run.
-# Otherwise, we will not move files into the release directory if they already exist there unless
-# force has been specified or a force release target has been invoked.
+## Note that sometimes the package distribution directory is the current build directory.  This is
+## true when we are doing local release tests on a package.  In that case, this rule will not run.
+## Otherwise, we will not move files into the release directory if they already exist there unless
+## force has been specified or a force release target has been invoked.
 ##
 $(archive_files)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -166,13 +164,12 @@ $(archive_files)::
 		$(ECHO) "cp -f -- $$d$$f $@"; \
 		cp -f -- $$d$$f $@; }
 
-##
-# How to make an archive if we ask for one.  We do not make archives on demand if they already
-# exist.
+## How to make an archive if we ask for one.  We do not make archives on demand if they already
+## exist.
 ##
 $(DIST_ARCHIVES):: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test ":$(FORCE)" != :force -a -f "$@" || $(MAKE) $(AM_MAKEFLAGS) dist-best
+	@test ":$(FORCE)" != :force -a -s $@ || $(MAKE) $(AM_MAKEFLAGS) dist-best
 
 #! release-archives:
 #!     This target creates the distribution archive files if they have not
@@ -188,15 +185,14 @@ $(DIST_ARCHIVES):: $(CONFIG_CLEAN_FILES) Makefile $(DISTFILES)
 #!     option to 'configure'.  See './configure --help' for more details on
 #!     options.
 #!
-##
-# Triggers make dist and signing if necessary.
+## Triggers make dist and signing if necessary.
 ##
 release-archives: $(archive_files)
-##
-# This is a suffix rule for signing anything.  First we check if the signature file exists and has
-# a correct signature.  If it does, we merely touch the signature file.  Otherwise we use gpg to
-# generate a detached signature.  Redirect output to avoid gpg problems with existing files.  We
-# pipe in an environment variable for automated builds.
+
+## This is a suffix rule for signing anything.  First we check if the signature file exists and has
+## a correct signature.  If it does, we merely touch the signature file.  Otherwise we use gpg to
+## generate a detached signature.  Redirect output to avoid gpg problems with existing files.  We
+## pipe in an environment variable for automated builds.
 ##
 $(archive_signs):: %.asc : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -271,12 +267,9 @@ UPDATECLEANFILES	+= $(DIST_ARCHIVES) \
 			   $(distdir).tar.lzma \
 			   $(distdir).tar.xz
 
-##
-## Provide updates to tarballs.
-##
-## If the tarball does not exist, create it.  If the tarball exists, was created
-## after the update stamp, and force is applied, remove and recreate the
-## tarball.  This applies to each tarball type.
+## Provide updates to tarballs.  If the tarball does not exist, create it.  If the tarball exists,
+## was created after the update stamp, and force is applied, remove and recreate the tarball.  This
+## applies to each tarball type.
 ##
 update-tar:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -292,12 +285,9 @@ update-tar:
 		fi; \
 	done
 
-##
-## Provide updates to tarball signatures.
-##
-## If the signature does not exist, create it.  If the signature exists, was
-## created after the update stamp, and force is applied, remove and recreate the
-## signature.  This applies to each signature type.
+## Provide updates to tarball signatures.  If the signature does not exist, create it.  If the
+## signature exists, was created after the update stamp, and force is applied, remove and recreate
+## the signature.  This applies to each signature type.
 ##
 update-sign-tar:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -320,11 +310,8 @@ update-sign-tar:
 		fi; \
 	done
 
-##
-## Clean updates to tarballs and signatures.
-##
-## If the signature or tarball exists and was created after the update stamp,
-## remove it.
+## Clean updates to tarballs and signatures.  If the signature or tarball exists and was created
+## after the update stamp, remove it.
 ##
 update-clean-tar:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -408,36 +395,36 @@ $(tardir)/SHA1SUMS.meta: $(tardir)/SHA1SUMS
 
 $(tardir)/ls-lR.gz:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@( cd `dirname $@`; $(ECHO) "ls -lR | gzip -c >$@"; ls -lR | gzip -c >$@ )
+	@( cd `dirname $@`; $(ECHO) "ls -lR | $(GZIP_CMD) $(GZIP) -c >$@"; ls -lR | $(GZIP_CMD) $(GZIP) -c >$@ )
 
 $(tardir)/INDEX.gz:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@( cd `dirname $@`; $(ECHO) "ls -A1 | gzip -c >$@"; ls -A1 | gzip -c >$@ )
+	@( cd `dirname $@`; $(ECHO) "ls -A1 | $(GZIP_CMD) $(GZIP) -c >$@"; ls -A1 | $(GZIP_CMD) $(GZIP) -c >$@ )
 
 $(tardir)/ARCHIVE.gz:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(ECHO) "(" >&2 ; \
-	@find $(tardir) -follow -maxdepth 1 -type f | LANG= sort | sed 's,^$(tardir)/,,' | while read f ; do \
+	find $(tardir) -follow -maxdepth 1 -type f | LANG= sort | sed 's,^$(tardir)/,,' | while read f ; do \
 		case "$$f" in \
 			(*.tar) \
 				$(ECHO) "  $(AMTAR) tvvf $(tardir)/$$f | sed \"s,^,$$f:=,\" ;" >&2 ; \
 				$(AMTAR) tvvf $(tardir)/$$f | sed "s,^,$$f:=," || : \
 				;; \
 			(*.tgz|*.tar.gz|*.tar.[zZ]) \
-				$(ECHO) "  gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
-				gzip -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+				$(ECHO) "  $(GZIP_CMD) -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				$(GZIP_CMD) -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 				;; \
 			(*.tbz2|*.tar.bz2) \
-				$(ECHO) "  bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
-				bzip2 -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+				$(ECHO) "  $(BZIP2_CMD) -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				$(BZIP2_CMD) -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 				;; \
 			(*.tlzma|*.tar.lzma) \
-				$(ECHO) "  lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
-				lzma -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+				$(ECHO) "  $(LZMA_CMD) -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				$(LZMA_CMD) -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 				;; \
 			(*.txz|*.tar.xz) \
-				$(ECHO) "  xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
-				xz -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+				$(ECHO) "  $(XZ_CMD) -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+				$(XZ_CMD) -dc $(tardir)/$$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 				;; \
 			(*.t[zZ]|*.tar.[zZ]) \
 				$(ECHO) "  uncompress -c $(tardir)/$$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
@@ -466,8 +453,8 @@ $(tardir)/ARCHIVE.gz:
 			(*) \
 				;; \
 		esac; \
-	done | tr '=' '\t' | gzip -c >$@ ; \
-	$(ECHO) ") | tr '=' '\t' | gzip -c >$@" >&2
+	done | tr '=' '\t' | $(GZIP_CMD) $(GZIP) -c >$@ ; \
+	$(ECHO) ") | tr '=' '\t' | $(GZIP_CMD) $(GZIP) -c >$@" >&2
 
 #! repo-tar:
 #!     This target is also invoked by the `repo' and `release' targets.  It
@@ -508,30 +495,54 @@ UPDATE_SIGN		+= repo-sign-tar
 UPDATE_CLEAN_LOCAL	+= repo-tar repo-sign-tar
 UPDATECLEANFILES	+=
 
+## Copy release archives into the repository.  Existing files in the repository are not overwritten
+## unless force is specified and the new file is newer than the existing file.
+##
 release-copy-tar:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@files='$(archive_files) $(archive_signs) $(archive_keys)' ; \
 	for f in $$files ; do \
-		test -f $$f || continue ; \
-		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test $$f -ef $$t && continue ; \
 		if test ! -f $$t -o \( :$(FORCE) = :force -a $$t -nt $$f \) ; then \
 			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
 			install -T -D -p -- $$f $$t ; \
 		fi ; \
 	done
 
+## Remove release archives from the repository.  Files that have a different timestamp than that in
+## the repository are not removed unless force is specified.
+##
 release-remove-tar:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files=`echo ' $(archive_files) $(archive_signs) $(archive_keys)' | sed -e 's, $(DISTDIR), $(REPODIR),g;s,^ ,,;s, $$,,'` ; \
+	@files='$(archive_files) $(archive_signs) $(archive_keys)' ; \
 	for f in $$files ; do \
-		test -f $$f || continue ; \
-		$(ECHO) "  rm -f -- $$f" ; \
-		rm -f -- $$f ; \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test -f $$t || continue ; \
+		if test -f $$t -a \( "$(FORCE)" = force -o \( ! \( $$f -nt $$t \) -a ! \( $$f -ot $$t \) \) \) ; then \
+			$(ECHO) "  rm -f -- $$t" ; \
+			rm -f -- $$t ; \
+		fi ; \
+	done ; \
+	for f in $$files ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+		echo "`dirname $$t`" ; \
+	done | LANG= sort -u | while read d ; do \
+		if test -d $$d ; then \
+			$(ECHO) "  rmdir -p -- $$d" ; \
+			rmdir -p -- $$d 2>/dev/null || : ; \
+		fi ; \
 	done
 
 
+## The necessary release archives have either been copied into the repository or removed from the
+## repository.  Update the archive repository metadata as necessary.
+##
 release-update-tar:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
@@ -616,20 +627,20 @@ release-update-tar:
 					$(AMTAR) tvvf $$f | sed "s,^,$$f:=," || : \
 					;; \
 				(*.tgz|*.tar.gz|*.tar.[zZ]) \
-					$(ECHO) "  gzip -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
-					gzip -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+					$(ECHO) "  $(GZIP_CMD) -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					$(GZIP_CMD) -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 					;; \
 				(*.tbz2|*.tar.bz2) \
-					$(ECHO) "  bzip2 -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
-					bzip2 -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+					$(ECHO) "  $(BZIP2_CMD) -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					$(BZIP2_CMD) -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 					;; \
 				(*.tlzma|*.tar.lzma) \
-					$(ECHO) "  lzma -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
-					lzma -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+					$(ECHO) "  $(LZMA_CMD) -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					$(LZMA_CMD) -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 					;; \
 				(*.txz|*.tar.xz) \
-					$(ECHO) "  xz -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
-					xz -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
+					$(ECHO) "  $(XZ_CMD) -dc $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
+					$(XZ_CMD) -dc $$f | $(AMTAR) tvvf - | sed "s,^,$$f:=," || : \
 					;; \
 				(*.t[zZ]|*.tar.[zZ]) \
 					$(ECHO) "  uncompress -c $$f | $(AMTAR) tvvf - | sed \"s,^,$$f:=,\" ;" >&2 ; \
@@ -658,10 +669,10 @@ release-update-tar:
 				(*) \
 					;; \
 			esac; \
-		done | tr '=' '\t' | gzip -c >ARCHIVE.gz ; \
-		$(ECHO) ") | tr '=' '\t' | gzip -c >ARCHIVE.gz" ; \
-		ls -A1 | gzip -c >INDEX.gz ; \
-		ls -lR | gzip -c >ls-lR.gz ; \
+		done | tr '=' '\t' | $(GZIP_CMD) $(GZIP) -c >ARCHIVE.gz ; \
+		$(ECHO) ") | tr '=' '\t' | $(GZIP_CMD) $(GZIP) -c >ARCHIVE.gz" ; \
+		ls -A1 | $(GZIP_CMD) $(GZIP) -c >INDEX.gz ; \
+		ls -lR | $(GZIP_CMD) $(GZIP) -c >ls-lR.gz ; \
 		if ( $(SHA1SUM) --version >/dev/null 2>&1 ); then \
 			$(ECHO) "(" ; \
 			find . -maxdepth 1 -type f | LANG= sort | \
@@ -691,27 +702,8 @@ release-update-tar:
 	)
 
 
-MY_PHONY		+= release-copy-tar release-remove-tar release-update-tar
-
-release-install-tar: release-copy-tar release-update-tar
-
-release-uninstall-tar: release-remove-tar release-update-tar
-
-RELEASE_INSTALL		+= release-install-tar
-RELEASE_UNINSTALL	+= release-uninstall-tar
-
-update-copy-tar:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-
-update-remove-tar:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-
-update-install-tar: update-copy-tar release-update-tar
-
-update-uninstall-tar: update-remove-tar release-update-tar
-
-UPDATE_INSTALL		+= update-install-tar
-UPDATE_UNINSTALL	+= update-uninstall-tar
+RELEASE_INSTALL		+= release-copy-tar release-update-tar
+RELEASE_UNINSTALL	+= release-remove-tar release-update-tar
 
 endif
 ## BUILD_REPO_TAR
