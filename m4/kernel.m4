@@ -1805,7 +1805,8 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KABI], [dnl
 *** ], [
 *** RHEL 6.x:   'yum install kabi-whitelist'
 *** CentOS 6.x: 'yum install kabi-whitelist'
-*** SL 6.x:     'yum install kabi-whitelist'], [
+*** SL 6.x:     'yum install kabi-whitelist'
+*** PUIAS 6.x:  (copy from RHEL or other clone)], [
 ***
 *** Repeat after loading the correct package, specifying the correct
 *** file using configure argument --with-kabi-whitelist=WHITELIST,

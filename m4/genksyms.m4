@@ -242,6 +242,10 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
 	ksyms_cv_modpost_ksymsets="$ksymsets"])
     MODPOST_KSYMSETS="$ksyms_cv_modpost_ksymsets"
     AC_SUBST([MODPOST_KSYMSETS])dnl
+    AC_CACHE_CHECK([for modpost whitelist file], [ksyms_cv_modpost_whitelist], [dnl
+	ksyms_cv_modpost_whitelist="$kabiwhitelist"])
+    MODPOST_WHITELIST="$ksyms_cv_modpost_whitelist"
+    AC_SUBST([MODPOST_WHITELIST])dnl
     MODPOST_SYMSETS="symsets-${kversion}.tar.gz"
     AC_SUBST([MODPOST_SYMSETS])dnl
 dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
@@ -299,7 +303,7 @@ dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
     AC_SUBST([MODPOST_INPUTS])dnl
     AC_CONFIG_COMMANDS([modpost], [dnl
 	AC_MSG_NOTICE([creating $MODPOST_SYSVER from $MODPOST_SYSMAP, $MODPOST_MODDIR and $MODPOST_KMODVER])
-	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR}${MODPOST_KMODVER:+ -i $MODPOST_KMODVER}${MODPOST_KSYMSETS:+ -K $MODPOST_KSYMSETS} -s $MODPOST_SYSVER" 2>&1 | \
+	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR}${MODPOST_KMODVER:+ -i $MODPOST_KMODVER}${MODPOST_KSYMSETS:+ -K $MODPOST_KSYMSETS}${MODPOST_WHITELIST:+ -L $MODPOST_WHITELIST} -s $MODPOST_SYSVER" 2>&1 | \
 	while read line ; do
 	    echo "$as_me:$LINENO: $line" >&5
 	    echo "$as_me: $line" >&2
@@ -319,6 +323,7 @@ MODPOST_CACHE="$MODPOST_CACHE"
 MODPOST_OPTIONS="$MODPOST_OPTIONS"
 MODPOST_INPUTS="$MODPOST_INPUTS"
 MODPOST_KSYMSETS="$MODPOST_KSYMSETS"
+MODPOST_WHITELIST="$MODPOST_WHITELIST"
     ])
 ])# _KSYMS_OUTPUT_MODPOST_CONFIG
 # =============================================================================
