@@ -1380,9 +1380,35 @@ function read_symsets(file, own, src,	n,tar,fname,set,hash,pos,lineno,ssym,scrc,
 	    set_symset(set, hash, pos, ssym, scrc, own, src, "syssymset")
 	}
 	# TODO: revalidate the hash by regenerating it
+	close(tar)
     }
     print_vinfo(1,"r: syssymset, syms " count_syms ", sets " count_sets)
-    close(tar)
+    return n
+}
+# read and process kabi_whitelist_<cpu> file
+function read_whitelist(file, own, src,	    n, command, list, count_lists)
+{
+    count_syms = 0; count_lists = 0
+    print_vinfo(1,"r: whitelist, file = \"" file "\"")
+    n = 0
+    if (system("test -r " file) == 0) {
+	command = cat_command(file)
+	while ((command | getline) == 1) {
+	    if ($1~/^[[][^][]*[]]$/) {
+		list = $1
+		sub(/^[[]/,"",list)
+		sub(/[]]$/,"",list)
+		count_lists = count_lists + 1
+		continue
+	    } else {
+		set_symbol($1, "", "", "", "", 0, "", src ":" list, 1, own)
+		kabi[$1] = 1
+		n++
+	    }
+	}
+	close(command)
+    }
+    print_vinfo(1,"r: whitelist, syms " count_syms ", lists " count_lists)
     return n
 }
 function path_symvers(path,	n,files,file,i)
@@ -1928,6 +1954,7 @@ BEGIN {
     }
     if ("kversion" in ENVIRON) { kversion = ENVIRON["kversion"] }
     else                       { kversion = getline_command("uname -r") }
+    cpu = getline_command("uname -m")
     # MODPOST_SYSVER  contains all the system  defined symbol versions
     # MODPOST_MODVER  contains all the package defined symbol versions
     # MODPOST_SYMSETS contains the new symbol sets (jltz)
@@ -1944,6 +1971,7 @@ BEGIN {
     longopts["pkgabi"       ] = "P:" ; environs["pkgabi"       ] = "MODPOST_PKGABI"		 ; defaults["pkgabi"       ] = "package.abi"					; descrips["pkgabi"       ] = "input file containing package ABI definitions"
     longopts["symsets"      ] = "S:" ; environs["symsets"      ] = "MODPOST_SYMSETS"		 ; defaults["symsets"      ] = "symsets-openss7-" kversion ".tar.gz"		; descrips["symsets"      ] = "output file for symsets"
     longopts["ksymsets"     ] = "K:" ; environs["ksymsets"     ] = "MODPOST_KSYMSETS"		 ; defaults["ksymsets"     ] = "/boot/symsets-" kversion ".tar.gz"		; descrips["ksymsets"     ] = "input system symsets file"
+    longopts["whitelist"    ] = "L:" ; environs["whitelist"    ] = "MODPOST_WHITELIST"		 ; defaults["whitelist"    ] = "/lib/modules/kabi/kabi_whitelist_" cpu		; descrips["whitelist"    ] = "input kabi whitelist file"
     longopts["missing"      ] = "g"  ;								   defaults["missing"      ] = 0						; descrips["missing"      ] = "create missing system symsets (ksyms missing from kabi)"
     longopts["rip-symbols"  ] = "r"  ;								   defaults["rip-symbols"  ] = 1						; descrips["rip-symbols"  ] = "attempt to rip undefined symbols from system map (requires -F, implies -U)"
     longopts["rip-weak"     ] = "R"  ;								   defaults["rip-weak"     ] = 1						; descrips["rip-weak"     ] = "attempt to rip weak undefined symbols from system map (requires -F, implies -U)"
@@ -1995,7 +2023,7 @@ BEGIN {
     values["silent"       ] = defaults["silent"       ]
     values["debug"        ] = defaults["debug"        ]
     values["verbose"      ] = defaults["verbose"      ]
-    optstring = "M:c:k:d:F:i:o:s:*P:K:S:grRbUwWHf:umaxp:enqD::v::hVC"
+    optstring = "M:c:k:d:F:i:o:s:*P:K:L:S:grRbUwWHf:umaxp:enqD::v::hVC"
     optind = 0
     #opts = ""; for (i=1;i<ARGC;i++) { if (i == 1) { opts = ARGV[i] } else { opts = opts " " ARGV[i] } }
     #print me ": D: o: command line: " opts > stderr; written[stderr] = 1
@@ -2004,7 +2032,7 @@ BEGIN {
 	c = getopt_long(ARGC, ARGV, optstring, longopts)
 	#if (c != -1) { print me ": D: o: option -" c ", longopt --" option ", optset = " optset ", optarg = " optarg > stderr; written[stderr] = 1 }
 	if (c == -1) break
-	else if (c ~ /[MckdFiosPKSfp]/)			{ values[option] = optarg }
+	else if (c ~ /[MckdFiosPKLSfp]/)		{ values[option] = optarg }
 	else if (c ~ /[grRbUwWHumaxenq]/)		{ values[option] = optset }
 	else if (c~/[Dv]/) { if (optarg != "")		{ values[option] = optarg } else { if (optset)  { values[option]++ } else { values[option] = optset } } }
 	else if (c~/[hVC]/)	{ command = option }
@@ -2096,16 +2124,24 @@ BEGIN {
 	    else
 		print_error("r: moduledir, directory not found")
 	}
+	values["kabi"] = 0
 	if (("ksymsets" in values) && values["ksymsets"])
 	    values["kabi"] = read_symsets(values["ksymsets"], "kabi", "syssymset")
 	else {
-	    values["kabi"] = 0
 	    file = "symsets-" kversion ".tar.gz"
 	    if (system("test -r /boot/" file) == 0) {
 		values["kabi"] = values["kabi"] + read_symsets("/boot/" file, "kabi", "syssymset")
 	    }
 	    if (system("test -r /lib/modules/" kversion "/build/" file) == 0) {
 		values["kabi"] = values["kabi"] + read_symsets("/lib/modules/" kversion "/build/" file, "kabi", "syssymset")
+	    }
+	}
+	if (("whitelist" in values) && values["whitelist"])
+	    values["kabi"] = read_whitelist(values["whitelist"], "kabi", "whitelist")
+	else {
+	    file = "kabi_whitelist_" cpu
+	    if (system("test -r /lib/modules/kabi/" file) == 0) {
+		values["kabi"] = read_whitelist("/lib/modules/kabi/" file, "kabi", "whitelist")
 	    }
 	}
     }
