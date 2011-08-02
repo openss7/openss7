@@ -897,7 +897,8 @@ dnl
 		    ;;
 		(*) AC_MSG_WARN([Cannot find 'gensrclist' program in PATH.]) ;;
 	    esac
-	else enable_repo_apt_rpm=no ; fi])
+	fi
+	enable_repo_apt_rpm=no])
     AC_ARG_VAR([GENPKGLIST],
 	       [Generate apt-rpm repository packages command.  @<:@default=genpkglist@:>@])
     _BLD_PATH_PROGS([GENPKGLIST], [genpkglist], [${am_missing3_run}genpkglist], [$tmp_path], [dnl
@@ -921,7 +922,8 @@ dnl
 		    ;;
 		(*) AC_MSG_WARN([Cannot find 'genpkglist' program in PATH.]) ;;
 	    esac
-	else enable_repo_apt_rpm=no ; fi])
+	fi
+	enable_repo_apt_rpm=no])
 dnl
 dnl countpkglist is not really necessary: it is a binary, but it is easy to emulate with strings,
 dnl grep and wc.
