@@ -1863,31 +1863,46 @@ UPDATE_SIGN		+= repo-sign-ris
 UPDATE_CLEAN_LOCAL	+= repo-clean-ris
 UPDATECLEANFILES	+= 
 
-## Rebuild the repository index service files in the release directory.
-##
-release-install-ris:
+release-update-ris:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	$(AM_V_GEN)\
+	t=$(REPODIR)/repoindex.xml ; \
+	( \
+		$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
+		$(ECHO) '<repoindex>' ; \
+		find '$(REPODIR)' -follow -type f -name 'repomd.xml' | LANG= sort -u | while read f ; do \
+			path=`echo $$f | sed 's,^$(REPODIR)/,,;s,/repomd.xml$$,,;s,/repodata$$,,'` ; \
+			targ=`echo $$path | sed 's,rpms/,,;y,/,-,;s,\.[0-9][0-9]*,,'` ; \
+			subd=`echo $$targ | sed -r 's,^([^-]*-[^-]*-[^-]*)-(.*)$$,\2,;t;s,.*,,'` ; \
+			targ=`echo $$targ | sed -r 's,^([^-]*-[^-]*-[^-]*)-(.*)$$,\1,'` ; \
+			repo=`echo $$subd | sed -r 'y,-, ,;s,\<main\>,Main,;s,\<debug\>,Debug,;s,\<devel\>,Devel,;s,\<source\>,Source,;s,\<udates\>,Updates,;s,\<extras\>,Extras,;s,\<testing\>,Testing,'` ; \
+			name="$(PACKAGE_UCNAME)$${subd:+-$$subd}$${targ:+-$$targ}" ; \
+			desc="$(PACKAGE_TITLE)$${repo:+ $$repo}$${targ:+ ($$targ)}" ; \
+			$(ECHO) "  <repo name=\"$$name\"" ; \
+			$(ECHO) "        description=\"$$desc\"" ; \
+			$(ECHO) "        distro_target=\"$$targ\"" ; \
+			$(ECHO) "        path=\"$$path\"" ; \
+			$(ECHO) "        priority=\"0\"" ; \
+			$(ECHO) "        pub=\"0\" />" ; \
+		done ; \
+		$(ECHO) '</repoindex>' ; \
+	) >$$t ; \
+	if test ! -f $$t.asc || ! $(GPG) --verify -- $$t.asc >/dev/null 2>&1; then \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$t >$$t.asc 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$t >$$t.asc 2>/dev/null"; \
+	fi
 
-## Rebuild the repository index service files in the release directory.
-##
-release-uninstall-ris:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
 
-RELEASE_INSTALL		+= release-install-ris
-RELEASE_UNINSTALL	+= release-uninstall-ris
+RELEASE_INSTALL		+= release-update-ris
+RELEASE_UNINSTALL	+= release-update-ris
 
-## Rebuild the repository index service files in the release directory.
-##
-update-install-ris:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-
-## Rebuild the repository index service files in the release directory.
-##
-update-uninstall-ris:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-
-UPDATE_INSTALL		+= update-install-ris
-UPDATE_UNINSTALL	+= update-uninstall-ris
+UPDATE_INSTALL		+= release-update-ris
+UPDATE_UNINSTALL	+= release-update-ris
 
 if BUILD_REPO_URPMI
 ## BUILD_REPO_URPMI
