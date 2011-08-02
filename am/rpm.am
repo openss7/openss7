@@ -1696,8 +1696,8 @@ $(yastdir)/media.1/media:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@p=`$(RPM) --showrc | grep '\<packager\>' | sed 's,.*\<packager\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
 	if test -z "$$p"; then p='Unknown'; fi; \
-	$(ECHO) "( echo \"$$p\"; date +%Y%m%d%H%M%S; echo '1') >>$@"; \
-	( $(ECHO) "$$p"; date +%Y%m%d%H%M%S; echo '1') >>$@
+	$(ECHO) "( echo \"$$p\"; date +%Y%m%d%H%M%S; echo '1') >$@"; \
+	( $(ECHO) "$$p"; date +%Y%m%d%H%M%S; echo '1') >$@
 
 $(yastdir)/content:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -1717,7 +1717,7 @@ $(yastdir)/content:
 		$(ECHO) "DEFAULTBASE i586"; \
 		$(ECHO) "DESCRDIR setup/descr"; \
 		$(ECHO) "DATADIR RPMS"; \
-	) >>$@
+	) >$@
 
 $(yastdir)/content.asc:: \
 $(yastdir)/content
@@ -1798,6 +1798,65 @@ UPDATECLEANFILES	+=
 ##
 release-update-yast:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	yastdir=`echo '$(yastdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	for dir in $$yastdir $$yastdir/media.1 $$yastdir/setup/descr ; do \
+		test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
+	done ; \
+	packager=`$(RPM) --showrc | grep '\<packager\>' | sed 's,.*\<packager\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+	if test -z "$$packager"; then packager='Unknown'; fi; \
+	f=$$yastdir/media.1/media ; \
+	$(ECHO) "( echo \"$$packager\"; date +%Y%m%d%H%M%S; echo '1') >$$f"; \
+	( $(ECHO) "$$packager"; date +%Y%m%d%H%M%S; echo '1') >$$f ; \
+	vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed -r 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+	test -n "$$vendor" || vendor='Unknown' ; \
+	f=$$yastdir/content ; \
+	( \
+		$(ECHO) "PRODUCT $(PACKAGE_TITLE)"; \
+		$(ECHO) "VERSION $(VERSION)"; \
+		$(ECHO) "RELEASE $(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)"; \
+		$(ECHO) "VENDOR $$vendor"; \
+		$(ECHO) "LABEL $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))"; \
+		$(ECHO) "NAME $(PACKAGE_NAME)"; \
+		$(ECHO) "RELNOTESURL $(reposerv)://$(repobase)/codefiles/$(PACKAGE)-$(VERSION)/NEWS"; \
+		$(ECHO) "ARCH.i686 i686 i586 i486 i386 noarch"; \
+		$(ECHO) "ARCH.i586 i586 i486 i386 noarch"; \
+		$(ECHO) "ARCH.x86_64 x86_64 noarch"; \
+		$(ECHO) "DEFAULTBASE i586"; \
+		$(ECHO) "DESCRDIR setup/descr"; \
+		$(ECHO) "DATADIR RPMS"; \
+	) >$$f ; \
+	if test ! -f $$f.asc || ! $(GPG) --verify -- $$f.asc >/dev/null 2>&1 ; then \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.asc 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.asc 2>/dev/null"; \
+	fi ; \
+	if test ! -f $$f.key ; then \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key"; \
+		$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key ; \
+	fi ; \
+	$(ECHO) "( cd $$yastdir ; $(CREATE_PACKAGE_DESC) -Z -V -C -K -F -B -d RPMS/ )" ; \
+	( cd $$yastdir ; $(CREATE_PACKAGE_DESC) -Z -V -C -K -F -B -d RPMS/ ) ; \
+	dir=`(cd $$yastdir; pwd)` ; \
+	find $$dir -follow -type d | while read d ; do \
+		p=`echo "$$d" | sed 's,.*/,,'` ; \
+		case "$$p" in (RCS|CVS|.*) continue;; esac ; \
+		( \
+			$(ECHO_V) "cd -- \"$$d\"" ; \
+			cd -- "$$d" ; \
+			$(ECHO_V) "ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast"; \
+			ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast; \
+			$(ECHO_V) "ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >ls-lR.gz"; \
+			ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >ls-lR.gz; \
+			$(ECHO_V) "ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >INDEX.gz"; \
+			ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >INDEX.gz; \
+		) ; \
+	done
 
 RELEASE_INSTALL		+= release-update-yast
 RELEASE_UNINSTALL	+= release-update-yast
