@@ -842,10 +842,16 @@ if BUILD_RPMS
 release-copy-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(rpm_source_files) $(rpm_binary_files)' ; \
+	@files='$(rpm_source_files) $(rpm_src_file) $(rpm_binary_files)' ; \
 	rpms= ; \
 	for f in $$files ; do \
-		if $(RPM) -K -- $$f 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then :; else \
+		test -s $$f || continue ; \
+		case "$$f" in (*.rpm) ;; (*) continue ;; esac ; \
+		$(ECHO) " $(RPM) -K -- $$f" ; \
+		if $(RPM) -K -- $$f 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1 ; then \
+			$(ECHO) "  gpg OK  $$f" ; \
+		else \
+			$(ECHO) "  gpg BAD $$f" ; \
 			rpms="$${rpms:+$$rpms }$$f" ; \
 		fi ; \
 	done ; \
@@ -864,7 +870,14 @@ release-copy-rpms:
 			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
 			install -T -D -p -- $$f $$t ; \
 		fi ; \
-	done
+	done ; \
+	lf=`echo '$(rpm_link_file)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; $(ECHO_V) "D: lf=$$lf" ; \
+	sf=`echo '$(rpm_src_file)'  | sed 's,^$(DISTDIR),$(REPODIR),'` ; $(ECHO_V) "D: sf=$$sf" ; \
+	if test -f "$$sf" ; then \
+		test -d `dirname $$lf` || { $(ECHO) "$(MKDIR_P) --`dirname $$lf`" ; $(MKDIR_P) -- `dirname $$lf` ; } ; \
+		$(ECHO) "cp -f --link $$sf $$lf" ; \
+		cp -f --link $$sf $$lf ; \
+	fi
 
 MY_PHONY		+= release-copy-rpms
 
@@ -876,7 +889,7 @@ MY_PHONY		+= release-copy-rpms
 release-remove-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(rpm_source_files) $(rpm_binary_files)' ; \
+	@files='$(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_binary_files)' ; \
 	for f in $$files ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
@@ -906,33 +919,35 @@ release-update-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@repodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
-	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
-	for b in '' updates extras testing $$rb ; do \
-		dir="$${repodir}$${b:+/$$b}" ; \
-		test -d $$dir || continue ; \
-		if test -z "`find $$dir/SRPMS -name '*.rpm' 2>/dev/null'" ; then \
-			if test -L $$dir/RPMS/src ; then \
-				$(ECHO) "rm -f -- $$dir/RPMS/src" ; \
-				rm -f -- $$dir/RPMS/src ; \
-			fi ; \
-			if test -d $$dir/SRPMS ; then \
-				$(ECHO) "rmdir -p -- $$dir/SRPMS" ; \
-				rmdir -p -- $$dir/SRPMS 2>/dev/null || : ; \
-			fi ; \
-		else \
-			test -d $$dir/RPMS || { $(ECHO) "mkdir -p $$dir/RPMS" ; mkdir -p $$dir/RPMS ; } ; \
-			if test ! -L $$dir/RPMS/src ; then \
-				$(ECHO) "( cd $$dir/RPMS ; ln -sf ../SRPMS src)" ; \
-				( cd $$dir/RPMS ; ln -sf ../SRPMS src ) ; \
-			fi ; \
+	b=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
+	dir="$${repodir}$${b:+/$$b}" ; \
+	test -d $$dir || exit 0 ; \
+	$(ECHO_V) "D: find $$dir/SRPMS -name '*.rpm'" ; \
+	if test -z "`find $$dir/SRPMS -name '*.rpm' 2>/dev/null`" ; then \
+		$(ECHO_V) "D: did not find any rpms" ; \
+		if test -L $$dir/RPMS/src ; then \
+			$(ECHO) "rm -f -- $$dir/RPMS/src" ; \
+			rm -f -- $$dir/RPMS/src ; \
 		fi ; \
-		if test -z "`find $$dir/RPMS -name '*.rpm' 2>/dev/null`" ; then \
-			if test -d $$dir/RPMS ; then \
-				$(ECHO) "rmdir -p -- $$dir/RPMS" ; \
-				rmdir -p -- $$dir/RPMS 2>/dev/null || : ; \
-			fi ; \
+		if test -d $$dir/SRPMS ; then \
+			$(ECHO) "rmdir -p -- $$dir/SRPMS" ; \
+			rmdir -p -- $$dir/SRPMS 2>/dev/null || : ; \
 		fi ; \
-	done
+	else \
+		test -d $$dir/RPMS || { $(ECHO) "$(MKDIR_P) $$dir/RPMS" ; $(MKDIR_P) $$dir/RPMS ; } ; \
+		if test ! -L $$dir/RPMS/src ; then \
+			$(ECHO) "( cd $$dir/RPMS ; ln -sf ../SRPMS src)" ; \
+			( cd $$dir/RPMS ; ln -sf ../SRPMS src ) ; \
+		fi ; \
+	fi ; \
+	$(ECHO_V) "D: find $$dir/RPMS -name '*.rpm'" ; \
+	if test -z "`find $$dir/RPMS -name '*.rpm' 2>/dev/null`" ; then \
+		$(ECHO_V) "D: did not find any rpms" ; \
+		if test -d $$dir/RPMS ; then \
+			$(ECHO) "rmdir -p -- $$dir/RPMS" ; \
+			rmdir -p -- $$dir/RPMS 2>/dev/null || : ; \
+		fi ; \
+	fi
 
 MY_PHONY		+= release-update-rpms
 
@@ -1198,31 +1213,31 @@ GENERATESUSEDATA = \
 $(repofulldir)/susedata.xml.gz: $(repofulldir)/primary.xml.gz
 	@$(AM_V_GEN)\
 	rpms=`find $$(dirname $(repofulldir))/RPMS -follow -name '*.rpm' | LANG= sort -u` ; \
-	numb=`find $$(dirname $(repofulldir))/RPMS -follow -name '*.rpm' | wc -l` ; \
+	numb=`echo "$$rpms" | wc -l` ; \
 	$(GENERATESUSEDATA)
 
 $(repomaindir)/susedata.xml.gz: $(repomaindir)/primary.xml.gz
 	@$(AM_V_GEN)\
 	rpms=`find $$(dirname $(repomaindir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' | LANG= sort -u` ; \
-	numb=`find $$(dirname $(repomaindir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' | wc -l` ; \
+	numb=`echo "$$rpms" | wc -l` ; \
 	$(GENERATESUSEDATA)
 
 $(repodebgdir)/susedata.xml.gz: $(repodebgdir)/primary.xml.gz
 	@$(AM_V_GEN)\
 	rpms=`find $$(dirname $(repodebgdir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' | LANG= sort -u` ; \
-	numb=`find $$(dirname $(repodebgdir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' | wc -l` ; \
+	numb=`echo "$$rpms" | wc -l` ; \
 	$(GENERATESUSEDATA)
 
 $(repodevldir)/susedata.xml.gz: $(repodevldir)/primary.xml.gz
 	@$(AM_V_GEN)\
 	rpms=`find $$(dirname $(repodevldir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' | LANG= sort -u` ; \
-	numb=`find $$(dirname $(repodevldir))/RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' | wc -l` ; \
+	numb=`echo "$$rpms" | wc -l` ; \
 	$(GENERATESUSEDATA)
 
 $(reposrcsdir)/susedata.xml.gz: $(reposrcsdir)/primary.xml.gz
 	@$(AM_V_GEN)\
 	rpms=`find $$(dirname $(reposrcsdir))/RPMS -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' | LANG= sort -u` ; \
-	numb=`find $$(dirname $(reposrcsdir))/RPMS -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' | wc -l` ; \
+	numb=`echo "$$rpms" | wc -l` ; \
 	$(GENERATESUSEDATA)
 
 
@@ -1463,46 +1478,32 @@ release-update-yum:
 	@repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
 	for b in '' updates extras testing $$rb; do \
-		for r in main debug devel source '' ; do \
+		for r in '' main debug devel source ; do \
 			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
-			test -d $$dir || continue ; \
-			test -d $$dir/RPMS || ( cd $$dir; ln -sf -- ../RPMS RPMS ) ; \
-			test -d $$dir/repodata || mkdir -p -- $$dir/repodata ; \
+			$(ECHO_V) "D: processing directory $$dir" ; \
+			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
+			test -d $$repodir$${b:+/$$b}/RPMS || continue ; \
+			test -d $$dir/RPMS || ( $(ECHO) "cd $$dir" ; $(ECHO) "ln -sf -- ../RPMS RPMS" ; cd $$dir; ln -sf -- ../RPMS RPMS ) ; \
+			test -d $$dir/repodata || { $(ECHO) "$(MKDIR_P) -- $$dir/repodata" ; $(MKDIR_P) -- $$dir/repodata ; } ; \
 			f=comps.xml ; d=`pwd`/scripts/ ; \
 			test -f $$d/$$f || d=`(cd $(srcdir); pwd)`/scripts/ ; \
 			g=; test ! -f $$d/$$f || g="-g $$d$$f" ; \
-			case "$${r:-base}" in \
-				(main)	rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' | LANG= sort -u`" ; \
-					numb="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' | wc -l`" ; \
-					if test -n "$$rpms" ; then ( cd $$dir ; test -d repodata || mkdir -- repodata ; \
-						find ./RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' \
-						| LANG= sort -u | sed 's,^\./,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . \
-					) ; fi ;; \
-				(debug)	rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' | LANG= sort -u`" ; \
-					numb="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' | wc -l`" ; \
-					if test -n "$$rpms" ; then ( cd $$dir ; test -d repodata || mkdir -- repodata ; \
-						find ./RPMS -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' \
-						| LANG= sort -u | sed 's,^\./,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . \
-					) ; fi ;; \
-				(devel)	rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' | LANG= sort -u`" ; \
-					numb="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' | wc -l`" ; \
-					if test -n "$$rpms" ; then ( cd $$dir ; test -d repodata || mkdir -- repodata ; \
-						find ./RPMS -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' \
-						| LANG= sort -u | sed 's,^\./,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . \
-					) ; fi ;; \
-				(source) rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | grep -- '\(source-\|\.src\.rpm$$\)' | LANG= sort -u`" ; \
-					 numb="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | grep -- '\(source-\|\.src\.rpm$$\)' | wc -l`" ; \
-					if test -n "$$rpms" ; then ( cd $$dir ; test -d repodata || mkdir -- repodata ; \
-						find ./RPMS -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' \
-						| LANG= sort -u | sed 's,^\./,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . \
-					) ; fi ;; \
-				(base)	rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | LANG= sort -u`" ; \
-					numb="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | wc -l`" ; \
-					if test -n "$$rpms" ; then ( cd $$dir ; test -d repodata || mkdir -- repodata ; \
-						find ./RPMS -follow -name '*.rpm' \
-						| LANG= sort -u | sed 's,^\./,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . \
-					) ; fi ;; \
-			esac ; \
+			rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | LANG= sort -u | \
+				case \"$${r:-base}\" in \
+				(main)	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
+				(debug)	 grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
+				(devel)	 grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
+				(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
+				(base)	 cat ;; \
+				esac`" ; \
+			if test -n "$$rpms" ; then \
+				( \
+					$(ECHO) "cd $$dir" ; cd $$dir ; \
+					test -d repodata || { $(ECHO) "$(MKDIR_P) -- repodata" ; $(MKDIR_P) -- repodata ; } ; \
+					$(ECHO) "echo \"$$rpms\" | sed 's,^'$$dir'/,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g ." ; \
+					echo "$$rpms" | sed 's,^'$$dir'/,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . ; \
+				) ; \
+			fi ; \
 			if test -z "$$rpms" ; then \
 				if test -n "$$r" ; \
 				then $(ECHO) "rm    -f -- $$dir/RPMS" ; rm    -f -- $$dir/RPMS 2>/dev/null || : ; \
@@ -1531,7 +1532,9 @@ release-update-yum:
 						$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k; \
 					fi ; \
 				fi ; \
-				(	$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
+				( \
+					numb="`echo "$$rpms" | wc -l`" ; \
+					$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
 					$(ECHO) '<susedata packages="'"$$numb"'">' ; \
 					for f in $$rpms ; do \
 						$(ECHO) $(ECHO_N) '  <package ' ; \
@@ -2022,7 +2025,7 @@ repo-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_cfgs)
 	cd $(mediasrcsdir)/.. ; \
 	find $$rpms -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
-	$(GENDISTRIB) --blind --clean $(rpmdistdir)
+	$(GENDISTRIB) $(rpmdistdir)
 
 repo-sign-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_keys)
 
@@ -2060,43 +2063,42 @@ release-update-urpmi:
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 	for b in '' updates extras testing $$rb ; do \
-		for r in main debug devel source '' ; do \
+		for r in '' main debug devel source ; do \
 			dir="$${repodir}/media$${b:+/$$b}$${r:+/$$r}" ; \
-			test -d $$dir/media_info || { $(ECHO) "mkdir -p -- $$dir/media_info" ; mkdir -p -- $$dir/media_info ; } ; \
+			$(ECHO_V) "D: processing directory $$dir" ; \
+			test -d $$dir/media_info || { $(ECHO) "$(MKDIR_P) -- $$dir/media_info" ; $(MKDIR_P) -- $$dir/media_info ; } ; \
+			test -f $$dir/media_info/pubkey || { \
+				$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/media_info/pubkey"; \
+				$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/media_info/pubkey ; \
+			} ; \
 			find $$dir -name '*.rpm' | while read f ; do \
 				if test -L $$f ; then \
 					$(ECHO) "rm -f -- $$f" ; \
 					rm -f -- $$f ; \
 				fi ; \
 			done ; \
-			rpms="../$${r:+../}$${b:+../$$b/}RPMS" ; \
-			case "$${r:-base}" in \
-			(main) ( cd $$dir ; \
-				find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' \
-				| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
-				) ;; \
-			(debug) ( cd $$dir ; \
-				find $$rpms -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' \
-				| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
-				) ;; \
-			(devel) ( cd $$dir ; \
-				find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' \
-				| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
-				) ;; \
-			(source) ( cd $$dir ; \
-				find $$rpms -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' \
-				| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
-				) ;; \
-			(base) ( cd $$dir ; \
-				find $$rpms -follow -name '*.rpm' \
-				| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
-				) ;; \
-			esac ; \
+			( \
+				$(ECHO_V) "D: cd $$dir" ; cd $$dir ; \
+				rpms="../$${r:+../}$${b:+../$$b/}RPMS" ; \
+				$(ECHO_V) "D: test -d $$rpms" ; \
+				test -d $$rpms || continue ; \
+				$(ECHO) "find $$rpms -follow -name '*.rpm'" ; \
+				find "$$rpms" -follow -name '*.rpm' | \
+				case "$${r:-base}" in \
+				(main) 	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
+				(debug)  grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
+				(devel)  grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
+				(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
+				(base)   cat ;; \
+				esac | LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
+			) ; \
 		done ; \
 	done ; \
 	m=$${repodir}/media/media_info ; \
-	test -d $$m || { $(ECHO) "mkdir -p -- $$m" ; mkdir -p -- $$m ; } ; \
+	test -d $$m || { $(ECHO) "$(MKDIR_P) -- $$m" ; $(MKDIR_P) -- $$m ; } ; \
 	( \
 		$(ECHO) "[media_info]" ; \
 		$(ECHO) "version=$(target_edition)" ; \
@@ -2130,9 +2132,9 @@ release-update-urpmi:
 				$(ECHO) "" ; \
 			done ; \
 		done ; \
-	) >>$$m/media.cfg ; \
-	$(ECHO) "$(GENDISTRIB) --blind --clean $${repodir}" ; \
-	$(GENDISTRIB) --blind --clean $${repodir}
+	) >$$m/media.cfg ; \
+	$(ECHO) "$(GENDISTRIB) $${repodir}" ; \
+	$(GENDISTRIB) $${repodir}
 
 
 RELEASE_INSTALL		+= release-update-urpmi
@@ -2310,6 +2312,14 @@ $(aptr_xzips): %.xz : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	cat $< | $(XZ_CMD) $(xz) -c >$@
 
+GENCOMPRESSEDDATA = \
+	$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
+	$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
+	$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
+	$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
+	$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
+	$(XZ_CMD) $(XZ) -c $$f >$$f.xz
+
 $(aptr_releases): $(aptr_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@ext=`echo "$@" | sed 's,.*\.,,'` ; \
@@ -2449,13 +2459,16 @@ UPDATECLEANFILES	+=
 ##
 release-update-aptrpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@repodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed 's,^//*,,'` ; \
 	changed_one= ; \
 	for b in '' updates extras testing $$rb ; do \
 		for f in main debug devel source '' ; do \
+			$(ECHO_V) "D: processing directory $$dir" ; \
 			dir="$${repodir}/RPMS.$${b:-base}_$${r:-full}" ; \
-			test -d $$dir || continue ; \
+			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
+			$(ECHO_V) "D: find $$dir -name '*.rpm'" ; \
 			find $$dir -name '*.rpm' | while read f ; do \
 				if test -L $$f ; then \
 					link=`readlink $$f` ; \
@@ -2468,16 +2481,17 @@ release-update-aptrpm:
 				fi ; \
 			done ; \
 			( \
-				cd $$dir ; \
+				$(ECHO_V) "D: cd $$dir" ; cd $$dir ; \
+				$(ECHO_V) "D: find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null" ; \
 				find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null | \
 				case "$${r:-full}" in \
-					(main)	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;;
-					(debug)	 grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;;
-					(devel)	 grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;;
-					(source) grep -- '\(source-\|\.src\.rpm$$\)' ;;
-					(full)	 cat ;;
+					(main)	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
+					(debug)	 grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
+					(devel)	 grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
+					(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
+					(full)	 cat ;; \
 				esac | LANG= sort -u | while read rpm ; do \
-					if test ! -e `basename $$rpm` ; then \
+					if test -L `basename $$rpm` ; then :; else \
 						$(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; \
 						changed_one=yes ; \
 					fi ; \
@@ -2485,9 +2499,9 @@ release-update-aptrpm:
 			) ; \
 		done ; \
 	done ; \
-	test $${changed_one:-no} = yes || exit 0 ; \
+	$(ECHO_V) "D: test $${changed_one:-no} = yes || exit 0" ; \
 	( \
-		test -d $$repodir/base || { $(ECHO) "$(MKDIR_P) -- $$repodir/base" ; $(MKDIR_P) -- $$repodir/base ; \
+		test -d $$repodir/base || { $(ECHO) "$(MKDIR_P) -- $$repodir/base" ; $(MKDIR_P) -- $$repodir/base ; } ; \
 		cd $$repodir/base ; \
 		for b in '' updates extras testing $$rb ; do \
 			for r in main debug devel source '' ; do \
@@ -2495,12 +2509,7 @@ release-update-aptrpm:
 				$(ECHO) "$(GENPKGLIST) --index srpm_idx --meta '$$comp' --bloat '$$repodir' '$$comp'" ; \
 				$(GENPKGLIST) --index srpm_idx --meta "$$comp" --bloat "$$repodir" "$$comp" ; \
 				f=pkglist.$$comp ; if test -s $$f ; then \
-					$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
-					$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
-					$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
-					$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
-					$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
-					$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
+					$(GENCOMPRESSEDDATA) ; \
 				fi ; \
 			done ; \
 		done ; \
@@ -2510,12 +2519,7 @@ release-update-aptrpm:
 				$(ECHO) "$(GENSRCLIST) --flat --meta '$$comp' '$$repodir' '$$comp' srpm_indx" ; \
 				$(GENSRCLIST) --flat --meta "$$comp" "$$repodir" "$$comp" srpm_indx ; \
 				f=srclist.$$comp ; if test -s $$f ; then \
-					$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
-					$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
-					$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
-					$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
-					$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
-					$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
+					$(GENCOMPRESSEDDATA) ; \
 				fi ; \
 			done ; \
 		done ; \
@@ -2542,12 +2546,7 @@ release-update-aptrpm:
 					fi ; \
 				) >release.$$comp ; \
 				f=release.$$comp ; if test -s $$f ; then \
-					$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
-					$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
-					$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
-					$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
-					$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
-					$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
+					$(GENCOMPRESSEDDATA) ; \
 				fi ; \
 			done ; \
 		done ; \
@@ -2612,9 +2611,11 @@ release-update-aptrpm:
 			for comp in $$list ; do \
 				if test -d $${repodir}/RPMS.$$comp ; then \
 					for r in $${repodir}/RPMS.$$comp/*.rpm ; do \
+						case "$$r" in (*-source-*|*-doc-*|*-base-*|*-javadoc-*) continue ;; esac ; \
 						test -s $$r || continue ; \
 						name=`rpm -ql --qf '%NAME\n' -p $$r 2>/dev/null` ; \
 						test -n "$$name" || continue ; \
+						$(ECHO) "rpm -qlp $$r" >&2 ; \
 						rpm -qlp $$r 2>/dev/null | while read f ; do \
 							$(ECHO) -e "$$f\t$$name" ; \
 						done ; \
@@ -2623,12 +2624,7 @@ release-update-aptrpm:
 			done | LANG= sort -u ; \
 		) >contents_index ; \
 		f=contents_index ; if test -s $$f ; then \
-			$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
-			$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
-			$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
-			$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
-			$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
-			$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
+			$(GENCOMPRESSEDDATA) ; \
 		fi ; \
 	)
 
