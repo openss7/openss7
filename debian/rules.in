@@ -552,12 +552,12 @@ build:
 	dh_auto_configure -- \
 		CONFIG_SITE='$(csite_file)' \
 		MODPOST_CACHE='$(mpost_file)' \
+		$(PACKAGE_DEBOPTIONS) \
 		--cache-file='$(cache_file)' \
 		--disable-maintainer-mode \
-		--disable-dependency-tracking \
+		--enable-dependency-tracking \
 		--with-gnu-ld \
 		--with-k-release=$(kversion) \
-		$(PACKAGE_DEBOPTIONS) \
 		$(BUILD_CFGOPTIONS) \
 		|| { rm -f $(cache_file) $(csite_file) $(mpost_file) ; exit 1 ; }
 	$(MAKE)
