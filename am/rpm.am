@@ -1752,11 +1752,11 @@ repo-yast-listings:
 		case "$$p" in (RCS|CVS|.*) continue;; esac; \
 		( $(ECHO_V) "cd -- \"$$d\""; \
 		  cd -- "$$d"; \
-			$(ECHO_V) "ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast"; \
+			$(ECHO) "ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast"; \
 			ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast; \
-			$(ECHO_V) "ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >ls-lR.gz"; \
+			$(ECHO) "ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >ls-lR.gz"; \
 			ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >ls-lR.gz; \
-			$(ECHO_V) "ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >INDEX.gz"; \
+			$(ECHO) "ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >INDEX.gz"; \
 			ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >INDEX.gz; \
 		); \
 	done
@@ -1849,11 +1849,11 @@ release-update-yast:
 		( \
 			$(ECHO_V) "cd -- \"$$d\"" ; \
 			cd -- "$$d" ; \
-			$(ECHO_V) "ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast"; \
+			$(ECHO) "ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast"; \
 			ls -AF1 | egrep -v '$(am__yast_skipfiles)$$' >directory.yast; \
-			$(ECHO_V) "ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >ls-lR.gz"; \
+			$(ECHO) "ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >ls-lR.gz"; \
 			ls -lR  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >ls-lR.gz; \
-			$(ECHO_V) "ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >INDEX.gz"; \
+			$(ECHO) "ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >INDEX.gz"; \
 			ls -A1  | egrep -v '$(am__yast_skipfiles)$$' | $(GZIP_CMD) $(GZIP) -c >INDEX.gz; \
 		) ; \
 	done
