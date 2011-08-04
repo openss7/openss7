@@ -286,8 +286,8 @@ clean-manmacros:
 	else \
 		macros='$(man_MACROS)' ; for macro in $$macros ; do \
 			if test -e $$macro.in ; then \
-				$(ECHO) "mv -f -- $$macros.in $$macros" ; \
-				mv -f -- $$macros.in $$macros ; \
+				$(ECHO) "mv -f -- $$macro.in $$macro" ; \
+				mv -f -- $$macro.in $$macro ; \
 			fi ; \
 		done ; \
 	fi
