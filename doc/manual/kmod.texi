@@ -239,10 +239,10 @@ modules are appropriately updated before the @cite{STREAMS} subsystem is loaded.
 
 @subsubsection RedHat Systems
 
-On recent @cite{RedHat} distributions and clones (e.g., @cite{Fedora}, @cite{RHEL}, @cite{CentOS}),
-this can be accomplished without building an RPM, by simply installing the kernel modules into
-@file{/lib/modules/$(uname -r)/extra}, where @file{$(uname -r)} is the name of the kernel for which
-the modules were compiled.
+On recent @cite{RedHat} distributions and clones (e.g., @cite{Fedora}, @cite{RHEL}, @cite{CentOS},
+@cite{PUIAS}, @cite{Scientific}, @cite{Oracle}), this can be accomplished without building an RPM,
+by simply installing the kernel modules into @file{/lib/modules/$(uname -r)/extra}, where
+@file{$(uname -r)} is the name of the kernel for which the modules were compiled.
 
 When the kernel is updated, the script @file{/sbin/weak-modules} will be run and will examine
 modules contained in the @file{extra} sub-directory for other kernel versions and determine whether

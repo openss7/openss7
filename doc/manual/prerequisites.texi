@@ -140,6 +140,19 @@ The following will meet most additional prerequisites for a CentOS/RHEL 5.5 buil
 @end example
 
 @noindent
+The following will meet most additional prerequisites for a CentOS/RHEL 6.0 build host:
+
+@example
+#> yum install bzip2 chkconfig coreutils createrepo doxygen \
+	gcc-java ghostscript glibc gnuplot groff gzip ImageMagick \
+	java-1.6.0-openjdk-devel java-1.6.0-openjdk-javadoc \
+	kabi-whitelists kernel kernel-devel latex2html libgcj \
+	libgcj-devel lsof module-init-tools net-snmp-devel \
+	perl-devel rpm rpm-build tcl-devel texlive texlive-dvips \
+	texlive-latex texlive-utils transfig xz zip
+@end example
+
+@noindent
 The following will meet most additional prerequisites for a SuSE Linux Enterprise 11 build host:
 
 @example
