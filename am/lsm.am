@@ -71,22 +71,31 @@ $(tardir)/$(PACKAGE)-$(VERSION).lsm:
 		$(ECHO_V) "cp -f -- $$d$$f $@" ; \
 		cp -f -- $$d$$f $@ ; }
 
-release-lsm: $(tardir)/$(PACKAGE)-$(VERSION).lsm
-
 ALL_LOCAL		+= LSM $(PACKAGE)-$(VERSION).lsm
-RELEASE			+= all-release-lsm
 CLEANFILES		+= LSM $(PACKAGE)-$(VERSION).lsm
 DISTCLEANFILES		+= $(PACKAGE_TARNAME).lsm
-RELEASECLEANFILES	+= $(tardir)/$(PACKAGE)-$(VERSION).lsm \
-			   LSM $(PACKAGE)-$(VERSION).lsm
 MAINTAINERCLEANFILES	+= $(srcdir)/$(PACKAGE)-$(VERSION).lsm \
-			   $(srcdir)/LSM $(srcdir)/$(PACKAGE_TARNAME).lsm
+			   $(srcdir)/$(PACKAGE_TARNAME).lsm \
+			   $(srcdir)/LSM
+
+release-lsm: $(tardir)/$(PACKAGE)-$(VERSION).lsm
+
+release-clean-lsm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test -d '$(tardir)' || { $(ECHO_V) "D: $@ missing $(tardir)" ; exit 0 ; } ; \
+	case "`(cd '$(tardir)'; pwd)`" in ("`pwd`"*) ;; (*) test '$(FORCE)' = force || { $(ECHO_V) "D: $@ skipping $(tardir) (force is '$(FORCE)')" ; exit 0 ; } ;; esac ; \
+	reverse='$(tardir)/$(PACKAGE)-$(VERSION).lsm' ; \
+	list=; for f in $$reverse; do \
+		list="$$f$${list:+ $$list}" ; \
+	done ; $(am__list_remove)
+
+RELEASE			+= all-release-lsm
+RELEASE_CLEAN_LOCAL	+= release-clean-lsm
+RELEASECLEANFILES	+= LSM \
+			   $(PACKAGE_TARNAME).lsm \
+			   $(PACKAGE)-$(VERSION).lsm
 
 ALL_RECURSIVE_TARGETS	+= all-release-lsm
-
-UPDATE			+= all-update-lsm
-UPDATE_CLEAN_LOCAL	+= update-clean-lsm
-UPDATECLEANFILES	+= LSM
 
 ##
 ## Provides updates to lsm files.
@@ -125,6 +134,52 @@ update-clean-lsm:
 
 MY_PHONY		+= update-lsm
 ALL_RECURSIVE_TARGETS	+= all-update-lsm
+
+UPDATE			+= all-update-lsm
+UPDATE_CLEAN_LOCAL	+= update-clean-lsm
+UPDATECLEANFILES	+= LSM \
+			   $(PACKAGE_TARNAME).lsm \
+			   $(PACKAGE)-$(VERSION).lsm
+
+release-install-lsm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files='$(tardir)/$(PACKAGE)-$(VERSION).lsm' ; \
+	for f in $$files ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		if test ! -f $$t -o \( '$(FORCE)' = force -a $$f -nt $$t \) ; then \
+			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
+			install -T -D -p -- $$f $$t ; \
+		fi ; \
+	done
+
+release-uninstall-lsm:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@files='$(tardir)/$(PACKAGE)-$(VERSION).lsm' ; \
+	for f in $$files ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		test -s $$t || continue ; \
+		if test -f $$t -a \( "$(FORCE)" = force -o \( ! $$f -nt $$t -a !  $$f -ot $$t \) \) ; then \
+			$(ECHO) "  rm -f -- $$t" ; \
+			rm -f -- $$t ; \
+		fi ; \
+	done ; \
+	for f in $$files ; do \
+		test -s $$f || continue ; \
+		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+		echo "`dirname $$t`" ; \
+	done | LANG= sort -u | while read d ; do \
+		if test -d $$d ; then \
+			$(ECHO) "  rmdir -p -- $$d" ; \
+			rmdir -p -- $$d 2>/dev/null || : ; \
+		fi ; \
+	done
+
+RELEASE_INSTALL		+= release-install-lsm
+RELEASE_UNINSTALL	+= release-uninstall-lsm
 
 ## MAINTAINER_MODE
 endif
