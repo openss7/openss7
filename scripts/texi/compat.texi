@@ -105,9 +105,10 @@ release.}
 @item CentOS Enterprise Linux 5.3 (centos53)
 @item CentOS Enterprise Linux 5.4 (centos54)
 @item CentOS Enterprise Linux 5.5 (centos55)
-@item CentOS Enterprise Linux 5.6 (centos56) (untested)
-@item CentOS Enterprise Linux 5.7 (centos56) (untested)
-@item CentOS Enterprise Linux 6.0 (centos60) (untested)
+@item CentOS Enterprise Linux 5.6 (centos56)
+@item CentOS Enterprise Linux 5.7 (centos57) (untested)
+@item CentOS Enterprise Linux 6.0 (centos60)
+@item CentOS Enterprise Linux 6.1 (centos61) (untested)
 @item Debian 3.0r2 Woody (deb3.0) TBD
 @item Debian 3.1r0a Sarge (deb3.1) TBD
 @item Debian 4.0r1 Etch (deb4.0)
@@ -143,14 +144,34 @@ release.}
 @item Mandriva One (untested)
 @item Mandriva 2010.2 (MDV2010)
 @item Mandriva Enterprise Server 5.2 (MES52)
+@item Oracle Linux Server 5.4 (OLS5)
+@item Oracle Linux Server 5.5 (OLS5)
+@item Oracle Linux Server 5.6 (OLS5)
+@item Oracle Linux Server 5.7 (OLS5)
+@item Oracle Linux Server 6.0 (OLS6)
+@item Oracle Linux Server 6.1 (OLS6)
+@item PUIAS Linux 5.4 (PUIAS5)
+@item PUIAS Linux 5.5 (PUIAS5)
+@item PUIAS Linux 5.6 (PUIAS5)
+@item PUIAS Linux 5.7 (PUIAS5)
+@item PUIAS Linux 6.0 (PUIAS6)
+@item PUIAS Linux 6.1 (PUIAS6)
+@item RedHat Enterprise Linux 3.0 (EL3) TBD
+@item RedHat Enterprise Linux 4 (EL4) TBD
+@item RedHat Enterprise Linux 5 (EL5)
+@item RedHat Enterprise Linux 5.1 (EL5)
+@item RedHat Enterprise Linux 5.2 (EL5)
+@item RedHat Enterprise Linux 5.3 (EL5)
+@item RedHat Enterprise Linux 5.4 (EL5)
+@item RedHat Enterprise Linux 5.5 (EL5)
+@item RedHat Enterprise Linux 5.6 (EL5)
+@item RedHat Enterprise Linux 5.7 (EL5)
+@item RedHat Enterprise Linux 6 (EL6)
+@item RedHat Enterprise Linux 6.1 (EL6)
 @item RedHat Linux 7.2 (RH7)
 @item RedHat Linux 7.3 (RH7)
 @item RedHat Linux 8.0 (RH8) TBD
 @item RedHat Linux 9 (RH9) TBD
-@item RedHat Enterprise Linux 3.0 (EL3) TBD
-@item RedHat Enterprise Linux 4 (EL4) TBD
-@item RedHat Enterprise Linux 5 (EL5)
-@item RedHat Enterprise Linux 6 (EL6)
 @item Scientific Linux 5 (SL5)
 @item Scientific Linux 5.1 (SL5)
 @item Scientific Linux 5.2 (SL5)
@@ -158,7 +179,9 @@ release.}
 @item Scientific Linux 5.4 (SL5)
 @item Scientific Linux 5.5 (SL5)
 @item Scientific Linux 5.6 (SL5)
+@item Scientific Linux 5.7 (SL5)
 @item Scientific Linux 6.0 (SL6)
+@item Scientific Linux 6.1 (SL6)
 @item SuSE 8.0 Professional (SuSE8.0) TBD
 @item SuSE 9.1 Personal (SuSE9.1) TBD
 @item SuSE 9.2 Professional (SuSE9.2) TBD
@@ -192,6 +215,7 @@ release.}
 @item Ubuntu 9.10 (ubu9.10)
 @item Ubuntu 10.04 (ubu10.04)
 @item Ubuntu 10.04.2 LTS (ubu10.04)
+@item Ubuntu 10.04.3 LTS (ubu10.04)
 @item Ubuntu 10.10 (ubu10.10)
 @item Ubuntu 11.04 (ubu11.04)
 @item WhiteBox Enterprise Linux 3.0 (WBEL3) TBD
