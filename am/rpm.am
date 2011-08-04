@@ -187,7 +187,7 @@ rpm_update_files	= $(rpmdir)/*/$(rpm_module0_file) \
 			  $(rpmdir)/*/$(rpm_module6_file)
 rpm_binary_files	= $(rpmdir)/*/$(rpm_base_file) \
 			  $(rpmdir)/*/$(rpm_binary_file) \
-			  $(rpmdir)/*/$(rpm_update_files)
+			  $(rpm_update_files)
 rpm_cache_files		= $(rpmbuilddir)/*config.cache \
 			  $(rpmbuilddir)/*config.site \
 			  $(rpmbuilddir)/*modpost.cache

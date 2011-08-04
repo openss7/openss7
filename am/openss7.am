@@ -208,8 +208,10 @@ REPO_UNINSTALL		=
 FORCED_TARGETS		=
 FORCE			=
 
-$(FORCED_TARGETS): FORCE = force
-$(FORCED_TARGETS): forced-% : %
+$(FORCED_TARGETS):
+	@target=`echo "$@" | sed 's,^forced-,,'` ; \
+	$(ECHO_V) "$(MAKE) FORCE=force $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target" ; \
+	$(MAKE) FORCE=force $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- $$target
 
 MY_PHONY		+= $(FORCED_TARGETS)
 
@@ -896,8 +898,8 @@ FORCED_TARGETS		+= forced-repo forced-repo.log
 #!
 repo-sign: $(REPO_DIRECTORIES) $(REPO_SIGN)
 
-FORCED_TARGETS		+= forced-repo-sign forced-repo-sign.log
 MY_PHONY		+= repo-sign $(REPO_SIGN)
+FORCED_TARGETS		+= forced-repo-sign forced-repo-sign.log
 
 #! repo-clean:
 #!     The targets invoked by this target are also invoked by the
@@ -907,6 +909,7 @@ repo-clean: $(REPO_CLEAN)
 	@list="$(REPOCLEANFILES)" ; $(am__list_remove)
 
 MY_PHONY		+= repo-clean $(REPO_CLEAN)
+FORCED_TARGETS		+= forced-repo-clean
 
 #! repo-install:
 #! 	Installs the repository definitions necessary for an install source on
@@ -917,6 +920,7 @@ MY_PHONY		+= repo-clean $(REPO_CLEAN)
 repo-install: $(REPO_INSTALL)
 
 MY_PHONY		+= repo-install $(REPO_INSTALL)
+FORCED_TARGETS		+= forced-repo-install
 
 #! repo-uninstall:
 #! 	Removes the repository definitions necessary for an install source on
@@ -927,6 +931,7 @@ MY_PHONY		+= repo-install $(REPO_INSTALL)
 repo-uninstall: $(REPO_UNINSTALL)
 
 MY_PHONY		+= repo-uninstall $(REPO_UNINSTALL)
+FORCED_TARGETS		+= forced-repo-uninstall
 
 $(RELEASE_DIRECTORIES)::
 	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
@@ -1005,6 +1010,7 @@ release-clean-local:
 
 MY_REVERSIVE_TARGETS	+= release-clean-reversive
 MY_PHONY		+= release-clean-ma release-clean-local release-clean $(RELEASE_CLEAN_LOCAL)
+FORCED_TARGETS		+= forced-release-clean
 
 #! release-install:
 #! 	Installs release rpms or debs into the release directory $(REPODIR) and
@@ -1020,8 +1026,8 @@ MY_PHONY		+= release-clean-ma release-clean-local release-clean $(RELEASE_CLEAN_
 #!
 release-install: $(RELEASE_INSTALL)
 
-FORCED_TARGETS		+= forced-release-install
 MY_PHONY		+= release-install $(RELEASE_INSTALL)
+FORCED_TARGETS		+= forced-release-install
 
 #! release-uninstall:
 #! 	Removes release rpms or debs from the release directory $(REPODIR) and
@@ -1037,8 +1043,8 @@ MY_PHONY		+= release-install $(RELEASE_INSTALL)
 #!
 release-uninstall: $(RELEASE_UNINSTALL)
 
-FORCED_TARGETS		+= forced-release-uninstall
 MY_PHONY		+= release-uninstall $(RELEASE_UNINSTALL)
+FORCED_TARGETS		+= forced-release-uninstall
 
 $(UPDATE_DIRECTORIES)::
 	$(AM_V_GEN)test -d $@ || { $(ECHO_V) " $(mkdir_p) $@"; $(mkdir_p) $@; }
@@ -1076,8 +1082,8 @@ $(USTAMP)::
 #!
 update: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE)
 
-FORCED_TARGETS		+= forced-update
 MY_PHONY		+= update $(UPDATE)
+FORCED_TARGETS		+= forced-update
 
 #! update-sign:
 #!     Standard input will be prompted for a password, unless you specify it to
@@ -1091,8 +1097,8 @@ MY_PHONY		+= update $(UPDATE)
 #!
 update-sign: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE_SIGN)
 
-FORCED_TARGETS		+= forced-update-sign
 MY_PHONY		+= update-sign $(UPDATE_SIGN)
+FORCED_TARGETS		+= forced-update-sign
 
 #! update-clean:
 #!     This target will remove all update files for the current package from the
@@ -1121,6 +1127,7 @@ update-clean-local:
 
 MY_REVERSIVE_TARGETS 	+= update-clean-reversive
 MY_PHONY		+= update-clean-ma update-clean-local update-clean $(UPDATE_CLEAN_LOCAL)
+FORCED_TARGETS		+= forced-update-clean
 
 #! update-install:
 #! 	Installs updated rpms or debs into the release directory $(REPODIR) and
@@ -1138,8 +1145,8 @@ MY_PHONY		+= update-clean-ma update-clean-local update-clean $(UPDATE_CLEAN_LOCA
 #!
 update-install: $(UPDATE_INSTALL)
 
-FORCED_TARGETS		+= forced-update-install
 MY_PHONY		+= update-install $(UPDATE_INSTALL)
+FORCED_TARGETS		+= forced-update-install
 
 #! update-uninstall:
 #! 	Removes updated rpms or debs from the release directory $(REPODIR) and
@@ -1157,8 +1164,8 @@ MY_PHONY		+= update-install $(UPDATE_INSTALL)
 #!
 update-uninstall: $(UPDATE_UNINSTALL)
 
-FORCED_TARGETS		+= forced-update-uninstall
 MY_PHONY		+= update-uninstall $(UPDATE_UNINSTALL)
+FORCED_TARGETS		+= forced-update-uninstall
 
 ##
 ## Some logging targets for the head makefile targets.

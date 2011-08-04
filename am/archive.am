@@ -237,7 +237,6 @@ distclean-archives:
 	$(am__remove_distdir)
 
 DISTCLEAN_LOCAL		+= distclean-archives
-
 DISTCLEANFILES		+= $(DIST_ARCHIVES) \
 			   $(distdir).tar.lzma \
 			   $(distdir).tar.xz
@@ -245,37 +244,34 @@ DISTCLEANFILES		+= $(DIST_ARCHIVES) \
 #! release-clean-archives:
 #!     This target will clean the release archives and signature files from the
 #!     package distribution directory @tardir@.
+#!     However, when the distribution directory is remote from the build
+#!     directory, force must be specified to effect removal.
 #!
 release-clean-archives: distclean-archives
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test -d '$(tardir)' || { $(ECHO_V) "D: $@ missing $(tardir)" ; exit 0 ; } ; \
+	case "`(cd '$(tardir)'; pwd)`" in ("`pwd`"*) ;; (*) test '$(FORCE)' = force || { $(ECHO_V) "D: $@ skipping $(tardir) (force is '$(FORCE)')" ; exit 0 ; } ;; esac ; \
+	reverse='$(archive_files) $(archive_signs) $(archive_keys)'; \
+	list=; for f in $$reverse; do \
+		list="$$f$${list:+ $$list}" ; \
+	done ; $(am__list_remove)
 
 RELEASE_CLEAN_LOCAL	+= release-clean-archives
-
 RELEASECLEANFILES	+= $(DIST_ARCHIVES) \
-			   $(archive_files) \
-			   $(archive_signs) \
-			   $(archive_keys) \
 			   $(distdir).tar.lzma \
 			   $(distdir).tar.xz
 
 ALL_RECURSIVE_TARGETS	+= all-dist all-release-archives all-release-sign-archives
 
-UPDATE			+= all-update-tar
-UPDATE_SIGN		+= all-update-sign-tar
-UPDATE_DIRECTORIES	+=
-UPDATE_CLEAN_LOCAL	+= update-clean-tar
-UPDATECLEANFILES	+= $(DIST_ARCHIVES) \
-			   $(distdir).tar.lzma \
-			   $(distdir).tar.xz
-
 ## Provide updates to tarballs.  If the tarball does not exist, create it.  If the tarball exists,
 ## was created after the update stamp, and force is applied, remove and recreate the tarball.  This
 ## applies to each tarball type.
 ##
-update-tar:
+update-archives:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(archive_suffixes)"; for a in $$list; do \
 		f="$(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}"; \
-		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
+		if test ! -e "$$f" -o \( '$(FORCE)' = force -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
 			$(ECHO) "D: $@: rebuild $$f"; \
 			$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
@@ -289,14 +285,14 @@ update-tar:
 ## signature exists, was created after the update stamp, and force is applied, remove and recreate
 ## the signature.  This applies to each signature type.
 ##
-update-sign-tar:
+update-sign-archives:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(archive_suffixes)"; for a in $$list; do \
 		t="$(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}"; f="$${t}.asc"; \
 		if test ! -e "$$t"; then \
 			$(ECHO) "D: $@: rebuild $$t"; \
-			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- update-tar"; \
-			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- update-tar; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- update-archives"; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- update-archives; \
 		else \
 			$(ECHO) "D: $@: current $$t"; \
 		fi; \
@@ -313,7 +309,7 @@ update-sign-tar:
 ## Clean updates to tarballs and signatures.  If the signature or tarball exists and was created
 ## after the update stamp, remove it.
 ##
-update-clean-tar:
+update-clean-archives:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(archive_suffixes)"; for a in $$list; do \
 		files="$(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}.asc $(tardir)/$(PACKAGE)-$(VERSION).tar.$${a}"; for f in $$files; do \
@@ -326,9 +322,16 @@ update-clean-tar:
 		done; \
 	done
 
-MY_PHONY		+= update-tar update-sign-tar
-ALL_RECURSIVE_TARGETS	+= all-update-tar all-update-sign-tar
+MY_PHONY		+= update-archives update-sign-archives
+ALL_RECURSIVE_TARGETS	+= all-update-archives all-update-sign-archives
 
+UPDATE			+= all-update-archives
+UPDATE_SIGN		+= all-update-sign-archives
+UPDATE_DIRECTORIES	+=
+UPDATE_CLEAN_LOCAL	+= update-clean-archives
+UPDATECLEANFILES	+= $(DIST_ARCHIVES) \
+			   $(distdir).tar.lzma \
+			   $(distdir).tar.xz
 
 if BUILD_REPO_TAR
 
@@ -456,49 +459,58 @@ $(tardir)/ARCHIVE.gz:
 	done | tr '=' '\t' | $(GZIP_CMD) $(GZIP) -c >$@ ; \
 	$(ECHO) ") | tr '=' '\t' | $(GZIP_CMD) $(GZIP) -c >$@" >&2
 
-#! repo-tar:
+#! repo-archives:
 #!     This target is also invoked by the `repo' and `release' targets.  It
 #!     creates (or recreates) the meta-data files for a tarball repository in
 #!     the package distribution directory, @tardir@/.
 #!     When executed with root privilege, it will also associate a local
 #!     installation source with the archives.
 #!
-repo-tar: $(tar_files)
+repo-archives: $(tar_files)
 
-#! repo-sign-tar:
+#! repo-sign-archives:
 #!     This target is also invoked by the `repo-sign' and `release-sign'
 #!     targets.  This target is not used to signing tarballs themselves, but for
 #!     signing the metadata files on the archive.  If the meta-data files do not
-#!     exist to be signed, the `repo-tar' target will be invoked automatically.
+#!     exist to be signed, the `repo-archives' target will be invoked
+#!     automatically.
 #!
-repo-sign-tar:
+repo-sign-archives:
 
-#! repo-clean-tar:
+#! repo-clean-archives:
 #!     This target is also invoked by the `repo-clean' and `release-clean'
 #!     targets.  Cleans the meta-data files for a tarball repository from the
 #!     package distribution directory, @tardir@/.
+#!     However, when the distribution directory is remote from the build
+#!     directory, force must be specified to effect removal.
 #!
-repo-clean-tar:
+repo-clean-archives:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test -d '$(tardir)' || { $(ECHO_V) "D: $@ missing $(tardir)" ; exit 0 ; } ; \
+	case "`(cd '$(tardir)'; pwd)`" in ("`pwd`"*) ;; (*) test '$(FORCE)' = force || { $(ECHO_V) "D: $@ skipping $(tardir) (force is '$(FORCE)')" ; exit 0 ; } ;; esac ; \
+	reverse='$(tar_files)'; list=; for f in $$reverse; do \
+		list="$$f$${list:+ $$list}" ; \
+	done ; $(am__list_remove)
 
-REPO			+= repo-tar
-REPO_SIGN		+= repo-sign-tar
-REPO_CLEAN		+= repo-clean-tar
-REPOCLEANFILES		+= $(tar_files)
+REPO			+= repo-archives
+REPO_SIGN		+= repo-sign-archives
+REPO_CLEAN		+= repo-clean-archives
+REPOCLEANFILES		+=
 
-RELEASE			+= repo-tar
-RELEASE_SIGN		+= repo-sign-tar
-RELEASE_CLEAN_LOCAL	+= repo-clean-tar
-RELEASECLEANFILES	+= $(tar_files)
+RELEASE			+= repo-archives
+RELEASE_SIGN		+= repo-sign-archives
+RELEASE_CLEAN_LOCAL	+= repo-clean-archives
+RELEASECLEANFILES	+=
 
-UPDATE			+= repo-tar
-UPDATE_SIGN		+= repo-sign-tar
-UPDATE_CLEAN_LOCAL	+= repo-tar repo-sign-tar
+UPDATE			+= repo-archives
+UPDATE_SIGN		+= repo-sign-archives
+UPDATE_CLEAN_LOCAL	+= repo-archives repo-sign-archives
 UPDATECLEANFILES	+=
 
 ## Copy release archives into the repository.  Existing files in the repository are not overwritten
 ## unless force is specified and the new file is newer than the existing file.
 ##
-release-copy-tar:
+release-copy-archives:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@files='$(archive_files) $(archive_signs) $(archive_keys)' ; \
@@ -515,7 +527,7 @@ release-copy-tar:
 ## Remove release archives from the repository.  Files that have a different timestamp than that in
 ## the repository are not removed unless force is specified.
 ##
-release-remove-tar:
+release-remove-archives:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@files='$(archive_files) $(archive_signs) $(archive_keys)' ; \
@@ -543,7 +555,7 @@ release-remove-tar:
 ## The necessary release archives have either been copied into the repository or removed from the
 ## repository.  Update the archive repository metadata as necessary.
 ##
-release-update-tar:
+release-update-archives:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@tardir=`echo '$(tardir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
@@ -702,8 +714,8 @@ release-update-tar:
 	)
 
 
-RELEASE_INSTALL		+= release-copy-tar release-update-tar
-RELEASE_UNINSTALL	+= release-remove-tar release-update-tar
+RELEASE_INSTALL		+= release-copy-archives release-update-archives
+RELEASE_UNINSTALL	+= release-remove-archives release-update-archives
 
 endif
 ## BUILD_REPO_TAR
