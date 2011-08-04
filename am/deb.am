@@ -103,7 +103,8 @@ debtop_tar_file		= $(debdir)/source/$(debianpkg).tar.gz
 debtop_dsc_file		= $(debdir)/source/$(debianpkg).dsc
 debtop_sig_file		= $(debdir)/source/$(debianpkg).dsc.sig
 debtop_source_files	= $(debtop_tar_file) $(debtop_dsc_file) $(debtop_sig_file)
-debtop_change_files	= $(debdir)/$(debianpkg)_*.changes $(debdir)/$(debianpkg)_*.changes.asc
+debtop_change_files	= $(debdir)/$(debianpkg)_*.changes $(debdir)/$(debianpkg)_*.changes.asc \
+			  $(debdir)/*/$(debianpkg)_*.changes $(debdir)/$(debianpkg)_*.changes.asc
 debtop_update_files	= $(debdir)/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb \
 			  $(debdir)/*/$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_*[ud.]deb
 debtop_binary_files	= $(debdir)/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
@@ -716,11 +717,11 @@ apt_content_xzips	= $(aptfulldir)/Contents.xz \
 			  $(aptdevldir)/Contents.xz \
 			  $(aptsrcsdir)/Contents.xz
 
-apt_md5sums		= $(aptfulldir)/md5sum.txt \
-			  $(aptmaindir)/md5sum.txt \
-			  $(aptdebgdir)/md5sum.txt \
-			  $(aptdevldir)/md5sum.txt \
-			  $(aptsrcsdir)/md5sum.txt
+apt_md5sums		= $(aptfulldir)/md5sums.txt \
+			  $(aptmaindir)/md5sums.txt \
+			  $(aptdebgdir)/md5sums.txt \
+			  $(aptdevldir)/md5sums.txt \
+			  $(aptsrcsdir)/md5sums.txt
 
 apt_releases		= $(aptfulldir)/Release \
 			  $(aptmaindir)/Release \
@@ -820,7 +821,7 @@ $(apt_xzips): %.xz : %
 
 $(apt_md5sums):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	find `dirname $@` -type f | egrep -v '(md5sum.txt|Release)' | xargs $(MD5SUM) | sed 's, $(aptfulldir)/, ,' > $@
+	find `dirname $@` -type f | egrep -v '(md5sums.txt|Release)' | xargs $(MD5SUM) | sed 's, $(aptfulldir)/, ,' > $@
 
 $(apt_releases): $(apt_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -961,8 +962,8 @@ release-update-apt:
 				done ; \
 			fi ; \
 			if test -n "`find $$dir -name 'Packages' -o -name 'Sources' -o -name 'Contents' 2>/dev/null`" ; then \
-				$(ECHO) "  find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sum.txt" ; \
-				find $$dir -type f | egrep -v '(md5sum.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sum.txt ; \
+				$(ECHO) "  find $$dir -type f | egrep -v '(md5sums.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt" ; \
+				find $$dir -type f | egrep -v '(md5sums.txt|Release)' | xargs -r $(MD5SUM) | sed 's, '$${repodir}'/, ,' >$$dir/md5sums.txt ; \
 				rm -f -- $$dir/Release $$dir/Release.gz $$dir/Release.bz2 $$dir/Release.xz ; \
 				$(ECHO) "  $(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release.$$$$" ; \
 				$(APT_FTPARCHIVE) release  $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Release.$$$$ ; \
@@ -980,9 +981,9 @@ release-update-apt:
 					cat $$dir/Release | $(XZ_CMD) $(XZ) -c > $$dir/Release.xz ; \
 				fi ; \
 			else \
-				if test -f $$dir/md5sum.txt ; then \
-					$(ECHO) "  rm -f -- $$dir/md5sum.txt" ; \
-					rm -f -- $$dir/md5sum.txt ; \
+				if test -f $$dir/md5sums.txt ; then \
+					$(ECHO) "  rm -f -- $$dir/md5sums.txt" ; \
+					rm -f -- $$dir/md5sums.txt ; \
 				fi ; \
 				for ext in '' '.gz' '.bz2' '.xz' ; do \
 					if test -f $$dir/Release$$ext ; then \
