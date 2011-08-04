@@ -3059,12 +3059,27 @@ endif
 ##
 ## Build cache files for intelligent warnings.
 ##
-EXTRA_DIST			+= centos-5-x86_64-config.cache \
-				   debian-lenny-i386-config.cache \
-				   debian-squeeze-i386-config.cache \
-				   rhel-6-x86_64-config.cache \
-				   redhat-7.2-i686-config.cache \
-				   sle-11-x86_64-config.cache
+EXTRA_DIST			+= cache/centos-5-x86_64-config.cache \
+				   cache/centos-5.5-x86_64-config.cache \
+				   cache/centos-6-x86_64-config.cache \
+				   cache/debian-lenny-i386-config.cache \
+				   cache/debian-lenny-i686-config.cache \
+				   cache/debian-squeeze-i386-config.cache \
+				   cache/debian-squeeze-i686-config.cache \
+				   cache/debian-squeeze-x86_64-config.cache \
+				   cache/fedora-15-x86_64-config.cache \
+				   cache/mageia-1-x86_64-config.cache \
+				   cache/mandriva-2010.2-i686-config.cache \
+				   cache/mes-5.2-x86_64-config.cache \
+				   cache/oracle-6-x86_64-config.cache \
+				   cache/puias-6-x86_64-config.cache \
+				   cache/redhat-6.0-x86_64-config.cache \
+				   cache/redhat-7.2-i686-config.cache \
+				   cache/rhel-6-x86_64-config.cache \
+				   cache/scientific-6-x86_64-config.cache \
+				   cache/sle-11-x86_64-config.cache \
+				   cache/suse-11-x86_64-config.cache \
+				   cache/ubuntu-lucid-x86_64-config.cache
 
 MAINTAINERCLEANFILES		+= $(top_srcdir)/aclocal.m4 \
 				   $(top_srcdir)/config.h.in \
