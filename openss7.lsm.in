@@ -9,10 +9,10 @@ Description:		@PACKAGE_TITLE@.
 			STREAMS implementation called Linux Fast-STREAMS as 
 			well as a collection of STREAMS protocol stacks for 
 			IP, OSI and SS7.
-			This distribution is currently applicable to Linux 2.4 
-			and 2.6 kernels and was targetted at ix86, x86_64, ppc 
-			and ppc64 architectures, but should build and install 
-			for other architectures as well.
+			This distribution is currently applicable to Linux 2.4, 
+			2.6 and 3.x kernels and was targetted at ix86, x86_64, 
+			ppc and ppc64 architectures, but should build and 
+			install for other architectures as well.
 			Supports a wide range of new and old Linux 
 			distributions and production kernels without kernel 
 			patching.
@@ -21,12 +21,12 @@ Keywords:		STREAMS, SVR 4.2 MP, SCTP, SS7, SIGTRAN, VoIP, ISDN
 Author:			bidulock@openss7.org (Brian Bidulock)
 Maintained-by:		bidulock@openss7.org (Brian Bidulock)
 Primary-site:		http://www.openss7.org/ repos/tarballs/
-			29M @PACKAGE@-@VERSION@.tar.bz2
+			30M @PACKAGE@-@VERSION@.tar.bz2
 			14M @PACKAGE@-@VERSION@.tar.xz
 Alternate-site:		http://www.openss7.org/ repos/rpms/SRPMS/
-			29M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
+			30M @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.src.rpm
 Original-site:		
 Platforms:		Linux
-			Requires: Linux kernel 2.4 or 2.6
+			Requires: Linux kernel 2.4, 2.6 or 3.x
 Copying-policy:		AGPL
 End
