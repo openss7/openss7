@@ -545,8 +545,7 @@ update-clean-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(ECHO) "rm -rf $(rpm_dir)"; \
 	rm -rf $(rpm_dir) ; \
-	list="$(rpm_tar_file) $(rpm_source_files) $(rpm_src_file) $(rpm_sig_file) $(rpm_binary_files)"; \
-	for f in $$list; do \
+	for f in $(rpm_tar_file) $(rpm_source_files) $(rpm_src_file) $(rpm_sig_file) $(rpm_binary_files) ; do \
 		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
 			$(ECHO) "D: $@: removed $$f"; \
 			$(ECHO) "rm -f -- \"$$f\""; \
@@ -842,9 +841,8 @@ if BUILD_RPMS
 release-copy-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(rpm_source_files) $(rpm_src_file) $(rpm_binary_files)' ; \
-	rpms= ; \
-	for f in $$files ; do \
+	@rpms= ; \
+	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_binary_files) ; do \
 		test -s $$f || continue ; \
 		case "$$f" in (*.rpm) ;; (*) continue ;; esac ; \
 		$(ECHO) " $(RPM) -K -- $$f" ; \
@@ -862,7 +860,7 @@ release-copy-rpms:
 		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$rpms" ; \
 		eval "$$pass $(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$rpms" || :; \
 	fi ; \
-	for f in $$files ; do \
+	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_binary_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test $$f -ef $$t && continue ; \
@@ -889,18 +887,20 @@ MY_PHONY		+= release-copy-rpms
 release-remove-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_binary_files)' ; \
-	for f in $$files ; do \
-		test -s $$f || continue ; \
+	@$(ECHO) "D: $@: removing rpms" ; \
+	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_binary_files) ; do \
+		test -e $$f || { $(ECHO) "D: $@: missing $$f" ; continue ; } ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
-		test -f $$t || continue ; \
+		test -f $$t || { $(ECHO) "D: $@: missing $$t" ; continue ; } ; \
 		if test -f $$t -a \( "$(FORCE)" = force -o \( ! \( $$f -nt $$t \) -a ! \( $$f -ot $$t \) \) \) ; then \
 			$(ECHO) "  rm -f -- $$t" ; \
 			rm -f -- $$t ; \
+		else \
+			$(ECHO) "D: $@: not removing $$t" ; \
 		fi ; \
 	done ; \
-	for f in $$files ; do \
-		test -s $$f || continue ; \
+	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_binary_files) ; do \
+		test -e $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		echo "`dirname $$t`" ; \
 	done | LANG= sort -u | while read d ; do \
@@ -922,9 +922,9 @@ release-update-rpms:
 	b=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
 	dir="$${repodir}$${b:+/$$b}" ; \
 	test -d $$dir || exit 0 ; \
-	$(ECHO_V) "D: find $$dir/SRPMS -name '*.rpm'" ; \
+	$(ECHO) "D: find $$dir/SRPMS -name '*.rpm'" ; \
 	if test -z "`find $$dir/SRPMS -name '*.rpm' 2>/dev/null`" ; then \
-		$(ECHO_V) "D: did not find any rpms" ; \
+		$(ECHO) "D: did not find any rpms" ; \
 		if test -L $$dir/RPMS/src ; then \
 			$(ECHO) "rm -f -- $$dir/RPMS/src" ; \
 			rm -f -- $$dir/RPMS/src ; \
@@ -940,9 +940,9 @@ release-update-rpms:
 			( cd $$dir/RPMS ; ln -sf ../SRPMS src ) ; \
 		fi ; \
 	fi ; \
-	$(ECHO_V) "D: find $$dir/RPMS -name '*.rpm'" ; \
+	$(ECHO) "D: find $$dir/RPMS -name '*.rpm'" ; \
 	if test -z "`find $$dir/RPMS -name '*.rpm' 2>/dev/null`" ; then \
-		$(ECHO_V) "D: did not find any rpms" ; \
+		$(ECHO) "D: did not find any rpms" ; \
 		if test -d $$dir/RPMS ; then \
 			$(ECHO) "rmdir -p -- $$dir/RPMS" ; \
 			rmdir -p -- $$dir/RPMS 2>/dev/null || : ; \
@@ -972,8 +972,7 @@ RELEASE_UNINSTALL	+= release-uninstall-rpms
 update-copy-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(rpm_update_files)' ; \
-	for f in $$files ; do \
+	@for f in $(rpm_update_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \) ; then \
@@ -992,8 +991,7 @@ MY_PHONY		+= update-copy-rpms
 update-remove-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(rpm_update_files)' ; \
-	for f in $$files ; do \
+	@for f in $(rpm_update_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test -s $$t || continue ; \
@@ -1002,7 +1000,7 @@ update-remove-rpms:
 			rm -f -- $$t ; \
 		fi ; \
 	done ; \
-	for f in $$files ; do \
+	for f in $(rpm_update_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		echo "`dirname $$t`" ; \
@@ -1480,21 +1478,21 @@ release-update-yum:
 	for b in '' updates extras testing $$rb; do \
 		for r in '' main debug devel source ; do \
 			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
-			$(ECHO_V) "D: processing directory $$dir" ; \
+			$(ECHO) "D: $@: processing directory $$dir" ; \
 			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
-			test -d $$repodir$${b:+/$$b}/RPMS || continue ; \
+			test -d $$repodir$${b:+/$$b}/RPMS || { $(ECHO) "D: $@: skipping $$dir" ; continue ; } ; \
 			test -d $$dir/RPMS || ( $(ECHO) "cd $$dir" ; $(ECHO) "ln -sf -- ../RPMS RPMS" ; cd $$dir; ln -sf -- ../RPMS RPMS ) ; \
 			test -d $$dir/repodata || { $(ECHO) "$(MKDIR_P) -- $$dir/repodata" ; $(MKDIR_P) -- $$dir/repodata ; } ; \
 			f=comps.xml ; d=`pwd`/scripts/ ; \
 			test -f $$d/$$f || d=`(cd $(srcdir); pwd)`/scripts/ ; \
 			g=; test ! -f $$d/$$f || g="-g $$d$$f" ; \
 			rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | LANG= sort -u | \
-				case \"$${r:-base}\" in \
+				case \"$${r:-full}\" in \
 				(main)	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
 				(debug)	 grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
 				(devel)	 grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
 				(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
-				(base)	 cat ;; \
+				(full)	 cat ;; \
 				esac`" ; \
 			if test -n "$$rpms" ; then \
 				( \
@@ -1509,7 +1507,7 @@ release-update-yum:
 				then $(ECHO) "rm    -f -- $$dir/RPMS" ; rm    -f -- $$dir/RPMS 2>/dev/null || : ; \
 				else $(ECHO) "rmdir -p -- $$dir/RPMS" ; rmdir -p -- $$dir/RPMS 2>/dev/null || : ; \
 				fi ; \
-				for p in '*repomd' '*comps' '*primary' '*filelists' '*other' '*susedata' '*patterns' '*products' '*product' '$(PACKAGE_LCNAME)*' ; do \
+				for p in '*repomd' '*comps' '*primary' '*filelists' '*other' '*susedata' '*patterns' '*products' '*product' '$(PACKAGE_LCNAME)*' '$(PACKAGE)*' ; do \
 					for e in .xml .xml.gz .xml.asc .xml.key .repo ; do \
 						for f in $$dir/repodata/$${p}$${e} ; do \
 							if test -f $$f ; then $(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; fi ; \
@@ -1532,6 +1530,7 @@ release-update-yum:
 						$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k; \
 					fi ; \
 				fi ; \
+				$(ECHO) "D: $@: generating $$dir/repodata/susedata.xml" ; \
 				( \
 					numb="`echo "$$rpms" | wc -l`" ; \
 					$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
@@ -1565,6 +1564,7 @@ release-update-yum:
 				( cd $$dir/repodata ; ls -t *-susedata.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f susedata.xml ; fi ) ; \
 				$(ECHO) "rm -f -- susedata.xml" ; \
 				rm -f -- susedata.xml ; \
+				$(ECHO) "D: $@: generating $$dir/repodata/product.xml" ; \
 				( \
 					if test -f scripts/product$${b:+-$$b}.xml ; then \
 						cat scripts/product$${b:+-$$b}.xml ; \
@@ -1619,6 +1619,7 @@ release-update-yum:
 				( cd $$dir/repodata ; ls -t *-product.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f product.xml ; fi ) ; \
 				$(ECHO) "rm -f -- product.xml" ; \
 				rm -f -- product.xml ; \
+				$(ECHO) "D: $@: generating $$dir/repodata/products.xml" ; \
 				( \
 					if test -f scripts/products$${b:+-$$b}.xml ; then \
 						cat scripts/products$${b:+-$$b}.xml ; \
@@ -1668,6 +1669,45 @@ release-update-yum:
 				( cd $$dir/repodata ; ls -t *-products.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f products.xml ; fi ) ; \
 				$(ECHO) "rm -f -- products.xml" ; \
 				rm -f -- products.xml ; \
+				if test "$${r:-full}" = full ; then \
+					tardir=`echo '$(tardir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+					$(ECHO) "D: $@: generating $$dir/repodata/$(PACKAGE).repo" ; \
+					for bb in '' updates extras testing $$rb ; do \
+						test "$${b:-base}" = base -o "$$b" = "$$bb" || continue ; \
+						bran=`echo "$${bb:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+						for rr in main debug devel source '' ; do \
+							repo=`echo "$${rr:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+							$(ECHO) "[$(PACKAGE)$${bb:+-$$bb}$${rr:+-$$rr}]" ; \
+							if test \( -z "$$bb" -o "$$bb" = updates \) -a \( -z "$$rr" -o "$$rr" = main \) ; then \
+								$(ECHO) "enabled = 1"; else $(ECHO) "enabled = 0"; fi ; \
+							$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))"; \
+							$(ECHO) "baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${bb:+/$$bb}$${rr:+/$$rr}"; \
+							$(ECHO) "gpgkey = $(reposerv)://$(repobase)/pubkey.asc"; \
+							$(ECHO) "gpgcheck = 1"; \
+							$(ECHO) "repo_gpgcheck = 0"; \
+							$(ECHO) ""; \
+						done ; \
+					done >$$dir/repodata/$(PACKAGE).repo ; \
+					$(ECHO) "D: $@: generating $$dir/repodata/$(PACKAGE)-local.repo" ; \
+					for bb in '' updates extras testing $$rb ; do \
+						test "$${b:-base}" = base -o "$$b" = "$$bb" || continue ; \
+						bran=`echo "$${bb:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+						for rr in main debug devel source '' ; do \
+							repo=`echo "$${rr:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+							$(ECHO) "[$(PACKAGE)$${bb:+-$$bb}$${rr:+-$$rr}]" ; \
+							if test \( -z "$$bb" -o "$$bb" = updates \) -a \( -z "$$rr" -o -n "$$rb" \) ; then \
+								$(ECHO) "enabled = 1"; else $(ECHO) "enabled = 0"; fi ; \
+							$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))" ; \
+							$(ECHO) "baseurl = file://$$repodir$${bb:+/$$bb}$${rr:+/$$rr}" ; \
+							$(ECHO) "gpgkey = file://$$tardir/OPENSS7-GPG-KEY" ; \
+							$(ECHO) "gpgcheck = 1" ; \
+							$(ECHO) "repo_gpgcheck = 0" ; \
+							$(ECHO) ""; \
+						done ; \
+					done >$$dir/repodata/$(PACKAGE)-local.repo; \
+				else \
+					$(ECHO) "D: $@: skipping repo build for $$dir" ; \
+				fi ; \
 			fi ; \
 		done ; \
 	done
@@ -2060,7 +2100,7 @@ $(urpmi_cfgs):
 			$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
 			$(ECHO) "pubkey=pubkey_$$stem" >/dev/null ; \
 			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-			repo=`echo "$${r:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 			$(ECHO) "name=$${bran} $${repo}" ; \
 			case "$$r" in \
 			(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
@@ -2142,7 +2182,7 @@ release-update-urpmi:
 	for b in '' updates extras testing $$rb ; do \
 		for r in '' main debug devel source ; do \
 			dir="$${repodir}/media$${b:+/$$b}$${r:+/$$r}" ; \
-			$(ECHO_V) "D: processing directory $$dir" ; \
+			$(ECHO) "D: processing directory $$dir" ; \
 			test -d $$dir/media_info || { $(ECHO) "$(MKDIR_P) -- $$dir/media_info" ; $(MKDIR_P) -- $$dir/media_info ; } ; \
 			test -f $$dir/media_info/pubkey || { \
 				$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/media_info/pubkey"; \
@@ -2161,12 +2201,12 @@ release-update-urpmi:
 				test -d $$rpms || continue ; \
 				$(ECHO) "find $$rpms -follow -name '*.rpm'" ; \
 				find "$$rpms" -follow -name '*.rpm' | \
-				case "$${r:-base}" in \
+				case "$${r:-full}" in \
 				(main) 	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
 				(debug)  grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
 				(devel)  grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
 				(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
-				(base)   cat ;; \
+				(full)   cat ;; \
 				esac | LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
 			) ; \
 		done ; \
@@ -2539,7 +2579,7 @@ release-update-aptrpm:
 	changed_one= ; \
 	for b in '' updates extras testing $$rb ; do \
 		for f in main debug devel source '' ; do \
-			$(ECHO_V) "D: processing directory $$dir" ; \
+			$(ECHO) "D: processing directory $$dir" ; \
 			dir="$${repodir}/RPMS.$${b:-base}_$${r:-full}" ; \
 			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
 			$(ECHO_V) "D: find $$dir -name '*.rpm'" ; \
