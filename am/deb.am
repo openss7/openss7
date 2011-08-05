@@ -402,9 +402,12 @@ update-dscs:
 	@list="$(debtop_dsc_file)"; for f in $$list; do \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
 			g=`$(ECHO) "$$f" | sed 's,^$(debdir),$(debian_dir),'`; \
+			$(ECHO) "D: $@: rebuild $$f" ; \
 			$(ECHO) "rm -f -- \"$$f\" \"$$g\""; rm -f -- "$$f" "$$g"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- \"$$f\""; \
 			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f"; \
+		else \
+			$(ECHO) "D: $@: skipped $$f" ; \
 		fi; \
 	done
 
