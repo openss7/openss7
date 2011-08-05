@@ -197,13 +197,17 @@ release-archives: $(archive_files)
 $(archive_signs):: %.asc : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+		test ! -f $@ || $(ECHO) "D: gpg BAD $@" ; \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) "$$pipe" |}"; \
 		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< > $@ 2>/dev/null"; \
-	else touch "$@"; fi
+	else \
+		$(ECHO) "D: gpg OK  $@" ; \
+		touch "$@"; \
+	fi
 
 $(archive_keys):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -513,8 +517,28 @@ UPDATECLEANFILES	+=
 release-copy-archives:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(archive_files) $(archive_signs) $(archive_keys)' ; \
-	for f in $$files ; do \
+	@tars= ; \
+	for f in $(archive_files) $(archive_signs) $(archive_keys) ; do \
+		case "$$f" in (*.asc) ;; (*) continue ;; esac ; \
+		a=`echo "$$f" | sed 's,\.asc$$,,'` ; \
+		if test -f $$a ; then \
+			if ! $(GPG) --verify $$f >/dev/null 2>&1 ; then \
+				$(ECHO) "D: gpg BAD $$f" ; \
+				user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+				home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+				pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+				pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) "$$pipe" |}"; \
+				$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$a >$$f 2>/dev/null"; \
+				eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$a >$$f 2>/dev/null"; \
+			else \
+				$(ECHO) "D: gpg OK  $$f" ; \
+			fi ; \
+		else \
+			$(ECHO) "rm -f -- $$f" ; \
+			rm -f -- $$f ; \
+		fi ; \
+	done
+	@for f in $(archive_files) $(archive_signs) $(archive_keys) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test $$f -ef $$t && continue ; \
@@ -546,8 +570,8 @@ release-remove-archives:
 		echo "`dirname $$t`" ; \
 	done | LANG= sort -u | while read d ; do \
 		if test -d $$d ; then \
-			$(ECHO) "  rmdir -p -- $$d" ; \
-			rmdir -p -- $$d 2>/dev/null || : ; \
+			$(ECHO) "  rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || : ; \
 		fi ; \
 	done
 
@@ -579,8 +603,10 @@ release-update-archives:
 				rm -f -- $$tardir/$$f ; \
 			fi ; \
 		done ; \
-		$(ECHO) "rmdir -p -- $$tardir" ; \
-		rmdir -p -- $$tardir 2>/dev/null || : ; \
+		if test -d $$tardir ; then \
+			$(ECHO) "rmdir -pv -- $$tardir" ; \
+			rmdir -pv -- $$tardir || : ; \
+		fi ; \
 		exit 0 ; \
 	fi ; \
 	found_one=no ; \
@@ -590,12 +616,15 @@ release-update-archives:
 				a=`echo "$$f" | sed -e 's,\.asc$$,,'` ; \
 				if test -f $$a ; then \
 					if ! $(GPG) --verify $$f >/dev/null 2>&1; then \
+						$(ECHO) "D: gpg BAD $$f" ; \
 						user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 						home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 						pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 						pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) "$$pipe" |}"; \
 						$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$a >$$f 2>/dev/null"; \
 						eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$a >$$f 2>/dev/null"; \
+					else \
+						$(ECHO) "D: gpg OK  $$f" ; \
 					fi ; \
 				else \
 					$(ECHO) "rm -f -- $$f" ; \
@@ -606,12 +635,15 @@ release-update-archives:
 			(*.tar|*.tgz|*.tar.gz|*.tar.[zZ]|*.tbz2|*.tar.bz2|*.tlzma|*.tar.lzma|*.txz|*.tar.xz|*.t[zZ]|*.tar.[zZ]|*.rpm|*.deb|*.udeb|*.ddeb|*.cpi|*.cpio|*.shar.gz|*.zip) \
 				a="$$f.asc" ; \
 				if test ! -f $$a || ! $(GPG) --verify $$a >/dev/null 2>&1; then \
+					test ! -f $$a || $(ECHO) "D: gpg BAD $$a" ; \
 					user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 					home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 					pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 					pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) "$$pipe" |}"; \
 					$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
 					eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+				else \
+					$(ECHO) "D: gpg OK  $$a" ; \
 				fi ; \
 				found_one=yes ; \
 				;; \
