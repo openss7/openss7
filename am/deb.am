@@ -117,6 +117,8 @@ debtop_binary_files	= $(debdir)/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEA
 ##
 AM_DEBXOPTS	= -d
 
+ARCH		= $(target)
+
 #!
 #! Debian Build Targets:
 #! ---------------------
@@ -198,7 +200,8 @@ AM_BINARY_TARGET = binary-arch
 ##
 each-deb: $(debian_dir_stamp)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
+	rm -f -- $(debian_dir_stamp)
+	$(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
 	( cd $(debian_dir); BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
 #	( cd $(debian_dir); dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" $(AM_BINARY_TARGET) )
 
@@ -214,10 +217,10 @@ one-deb: BUILD_CFGOPTIONS = --disable-indep
 one-deb: AM_BINARY_TARGET = binary-arch
 one-deb: each-deb
 
-one-t-deb: BUILD_MOREOPTIONS = --without-modules
+one-t-deb: BUILD_MOREOPTIONS = --disable-modules
 one-t-deb: one-deb
 
-one-k-deb: BUILD_MOREOPTIONS = --without-tools
+one-k-deb: BUILD_MOREOPTIONS = --disable-tools
 one-k-deb: one-deb
 
 all-deb: AM_DEBBOPTS = -b
@@ -324,8 +327,8 @@ reupload:
 			debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_$$a.*deb' 2>/dev/null`"; \
 			if test -z "$$debs" -o -n '$(FORCE)'; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
-				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" one-deb"; \
-				$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" one-deb || :; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" one-k-deb"; \
+				$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" one-k-deb || :; \
 			else \
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
@@ -333,8 +336,8 @@ reupload:
 		debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_$$a.*deb' 2>/dev/null`"; \
 		if test -z "$$debs" -o -n '$(FORCE)'; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
-			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" one-deb"; \
-			$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" one-deb|| :; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" one-t-deb"; \
+			$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" one-t-deb|| :; \
 		else \
 			$(ECHO) "D: $@: skipped $$a"; \
 		fi; \
@@ -398,7 +401,7 @@ UPDATECLEANFILES	+= $(debian_dir_stamp) \
 update-dscs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@list="$(debtop_dsc_file)"; for f in $$list; do \
-		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \); then \
+		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \) ; then \
 			g=`$(ECHO) "$$f" | sed 's,^$(debdir),$(debian_dir),'`; \
 			$(ECHO) "D: $@: rebuild $$f" ; \
 			$(ECHO) "rm -f -- \"$$f\" \"$$g\""; rm -f -- "$$f" "$$g"; \
@@ -456,8 +459,8 @@ update-debs:
 			done; \
 			if test ":$$rebuild" = :yes; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
-				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" one-deb"; \
-				$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" one-deb || :; \
+				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion=\"$$k\" ARCH=\"$$t\" one-k-deb"; \
+				$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' kversion="$$k" ARCH="$$t" one-k-deb || :; \
 				rebuilt=yes; \
 			else \
 				$(ECHO) "D: $@: skipped $$k"; \
@@ -473,8 +476,8 @@ update-debs:
 		done; \
 		if test ":$$rebuild" = :yes; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
-			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" one-deb"; \
-			$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" one-deb|| :; \
+			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH=\"$$t\" one-t-deb"; \
+			$(MAKE) $(AM_MAKEFLAGS) AM_DEBXOPTS='$(AM_DEBXOPTS) $(BUILD_CFGOPTIONS)' ARCH="$$t" one-t-deb|| :; \
 			rebuilt=yes; \
 		else \
 			$(ECHO) "D: $@: skipped $$a"; \
