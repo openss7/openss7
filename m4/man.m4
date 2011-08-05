@@ -222,8 +222,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 	else
 	    MANDBFLAGS=
 	fi])
-    AC_ARG_VAR([GZIP], [Gzip default compression options @<:@default=-f9v@:>@])
-    test -n "$GZIP" || GZIP='-f9v'
+    AC_ARG_VAR([GZIP], [Gzip default compression options @<:@default=-f9@:>@])
+    test -n "$GZIP" || GZIP='-f9'
     AC_ARG_VAR([GZIP_CMD], [Gzip compression command @<:@default=gzip@:>@])
     _BLD_PATH_PROG([GZIP_CMD], [gzip], [], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([GZIP_CMD], [
@@ -242,8 +242,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** To get rid of this warning, load the 'gzip' package, or specify the
 *** location with the GZIP_CMD environment variable to 'configure'.
 *** ])])
-    AC_ARG_VAR([BZIP2], [Bzip2 default compression options @<:@default=-f9v@:>@])
-    test -n "$BZIP2" || BZIP2='-f9v'
+    AC_ARG_VAR([BZIP2], [Bzip2 default compression options @<:@default=-f9@:>@])
+    test -n "$BZIP2" || BZIP2='-f9'
     AC_ARG_VAR([BZIP2_CMD], [Bzip2 compression command @<:@default=bzip2@:>@])
     _BLD_PATH_PROG([BZIP2_CMD], [bzip2], [], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([BZIP2_CMD], [
@@ -263,8 +263,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** To get rid of this warning, load the 'bzip2' package, or specify the
 *** location with the BZIP2_CMD environment variable to 'configure'.
 *** ])])
-    AC_ARG_VAR([LZMA], [Lzma default compression options @<:@default=-f9v@:>@])
-    test -n "$LZMA" || LZMA='-f9v'
+    AC_ARG_VAR([LZMA], [Lzma default compression options @<:@default=-f9@:>@])
+    test -n "$LZMA" || LZMA='-f9'
     AC_ARG_VAR([LZMA_CMD], [Lzma compression command @<:@default=lzma@:>@])
     _BLD_PATH_PROG([LZMA_CMD], [lzma], [], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([LZMA_CMD], [
@@ -284,8 +284,8 @@ AC_DEFUN([_MAN_CONVERSION_SETUP], [dnl
 *** To get rid of this warning, load the 'lzma' package or specify the
 *** location with the LZMA_CMD environment variable to 'configure'.
 *** ])])
-    AC_ARG_VAR([XZ], [Xz default compression options @<:@default=-c@:>@])
-    test -n "$XZ" || XZ='-c'
+    AC_ARG_VAR([XZ], [Xz default compression options @<:@default=-f9@:>@])
+    test -n "$XZ" || XZ='-f9'
     AC_ARG_VAR([XZ_CMD], [Xz compression command @<:@default=xz@:>@])
     _BLD_PATH_PROG([XZ_CMD], [xz], [], [$tmp_path], [dnl
 	_BLD_INSTALL_WARN([XZ_CMD], [
