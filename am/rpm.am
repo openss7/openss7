@@ -861,6 +861,7 @@ release-copy-rpms:
 		eval "$$pass $(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$rpms" || :; \
 	fi ; \
 	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_binary_files) ; do \
+		case "$$f" in (*/src/*) continue ;; (*) ;; esac ; \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test $$f -ef $$t && continue ; \
@@ -905,8 +906,8 @@ release-remove-rpms:
 		echo "`dirname $$t`" ; \
 	done | LANG= sort -u | while read d ; do \
 		if test -d $$d ; then \
-			$(ECHO) "  rmdir -p -- $$d" ; \
-			rmdir -p -- $$d 2>/dev/null || : ; \
+			$(ECHO) "  rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || : ; \
 		fi ; \
 	done
 
@@ -925,27 +926,26 @@ release-update-rpms:
 	$(ECHO) "D: find $$dir/SRPMS -name '*.rpm'" ; \
 	if test -z "`find $$dir/SRPMS -name '*.rpm' 2>/dev/null`" ; then \
 		$(ECHO) "D: did not find any rpms" ; \
-		if test -L $$dir/RPMS/src ; then \
-			$(ECHO) "rm -f -- $$dir/RPMS/src" ; \
-			rm -f -- $$dir/RPMS/src ; \
-		fi ; \
+		test -L $$dir/RPMS/src && { $(ECHO) "rm -fv  -- $$dir/RPMS/src" ; rm -fv  -- $$dir/RPMS/src ; } ; \
+		test -d $$dir/RPMS/src && { $(ECHO) "rm -fvr -- $$dir/RPMS/src" ; rm -fvr -- $$dir/RPMS/src ; } ; \
 		if test -d $$dir/SRPMS ; then \
-			$(ECHO) "rmdir -p -- $$dir/SRPMS" ; \
-			rmdir -p -- $$dir/SRPMS 2>/dev/null || : ; \
+			$(ECHO) "rmdir -pv -- $$dir/SRPMS" ; \
+			rmdir -pv -- $$dir/SRPMS || : ; \
 		fi ; \
 	else \
 		test -d $$dir/RPMS || { $(ECHO) "$(MKDIR_P) $$dir/RPMS" ; $(MKDIR_P) $$dir/RPMS ; } ; \
 		if test ! -L $$dir/RPMS/src ; then \
-			$(ECHO) "( cd $$dir/RPMS ; ln -sf ../SRPMS src)" ; \
-			( cd $$dir/RPMS ; ln -sf ../SRPMS src ) ; \
+			test -d $$dir/RPMS/src && { $(ECHO) "rm -fvr -- $$dir/RPMS/src" ; rm -fvr -- $$dir/RPMS/src ; } ; \
+			$(ECHO) "( cd $$dir/RPMS ; rm -f src ; ln -sf ../SRPMS src)" ; \
+			( cd $$dir/RPMS ; rm -f src ; ln -sf ../SRPMS src ) ; \
 		fi ; \
 	fi ; \
 	$(ECHO) "D: find $$dir/RPMS -name '*.rpm'" ; \
 	if test -z "`find $$dir/RPMS -name '*.rpm' 2>/dev/null`" ; then \
 		$(ECHO) "D: did not find any rpms" ; \
 		if test -d $$dir/RPMS ; then \
-			$(ECHO) "rmdir -p -- $$dir/RPMS" ; \
-			rmdir -p -- $$dir/RPMS 2>/dev/null || : ; \
+			$(ECHO) "rmdir -pv -- $$dir/RPMS" ; \
+			rmdir -pv -- $$dir/RPMS || : ; \
 		fi ; \
 	fi
 
@@ -1006,8 +1006,8 @@ update-remove-rpms:
 		echo "`dirname $$t`" ; \
 	done | LANG= sort -u | while read d ; do \
 		if test -d $$d ; then \
-			$(ECHO) "  rmdir -p -- $$d" ; \
-			rmdir -p -- $$d 2>/dev/null || : ; \
+			$(ECHO) "  rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || : ; \
 		fi ; \
 	done
 
@@ -1094,14 +1094,16 @@ $(repofulldir)/$(PACKAGE).repo::
 		bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 		for r in main debug devel source '' ; do \
 			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-			$(ECHO) "[$(PACKAGE)$${b:+-$$b}$${r:+-$$r}]" ; \
 			if test \( -z "$$b" -o "$$b" = updates \) -a \( -z "$$r" -o "$$r" = main \) ; then \
-				$(ECHO) "enabled = 1"; else $(ECHO) "enabled = 0"; fi ; \
+				enabled=1 ; else enabled=0 ; fi ; \
+			$(ECHO) "[$(PACKAGE)$${b:+-$$b}$${r:+-$$r}]" ; \
 			$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))"; \
-			$(ECHO) "baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			$(ECHO) "#baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}" ; \
+			$(ECHO) "mirrorlist = $(reposerv)://$(repobase)/mirrorlist?distro=$(target_distro)&relver=\$$releasever&osarch=\$$basearch$${b:+&branch=$$b}$${r:+&subrep=$$r}" ; \
 			$(ECHO) "gpgkey = $(reposerv)://$(repobase)/pubkey.asc"; \
 			$(ECHO) "gpgcheck = 1"; \
 			$(ECHO) "repo_gpgcheck = 0"; \
+			$(ECHO) "enabled = $$enabled" ; \
 			$(ECHO) ""; \
 		done ; \
 	done >$@
@@ -1113,14 +1115,14 @@ $(repofulldir)/$(PACKAGE)-local.repo::
 		bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 		for r in main debug devel source '' ; do \
 			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-			$(ECHO) "[$(PACKAGE)$${b:+-$$b}$${r:+-$$r}]" ; \
-			if test \( -z "$$b" -o "$$b" = updates \) -a \( -z "$$r" -o -n "$$rb" \) ; then \
-				$(ECHO) "enabled = 1"; else $(ECHO) "enabled = 0"; fi ; \
+			if test -d $(rpmdistdir)/$${b:+/$$b}/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
+			$(ECHO) "[$(PACKAGE)-local$${b:+-$$b}$${r:+-$$r}]" ; \
 			$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))" ; \
 			$(ECHO) "baseurl = file://$(rpmdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			$(ECHO) "gpgkey = file://$(tardir)/OPENSS7-GPG-KEY" ; \
 			$(ECHO) "gpgcheck = 1" ; \
 			$(ECHO) "repo_gpgcheck = 0" ; \
+			$(ECHO) "enabled = $$enabled" ; \
 			$(ECHO) "" ; \
 		done ; \
 	done >$@
@@ -1133,14 +1135,16 @@ $(repodir)/$(PACKAGE).repo::
 		bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 		for r in main debug devel source '' ; do \
 			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-			$(ECHO) "[$(PACKAGE)$${b:+-$$b}$${r:+-$$r}]" ; \
 			if test \( -z "$$b" -o "$$b" = updates \) -a \( -z "$$r" -o "$$r" = main \) ; then \
-				$(ECHO) "enabled = 1"; else $(ECHO) "enabled = 0"; fi ; \
+				enabled=1 ; else enabled=0 ; fi ; \
+			$(ECHO) "[$(PACKAGE)$${b:+-$$b}$${r:+-$$r}]" ; \
 			$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))"; \
-			$(ECHO) "baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}"; \
+			$(ECHO) "#baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}"; \
+			$(ECHO) "mirrorlist = $(reposerv)://$(repobase)/mirrorlist?distro=$(target_distro)&relver=\$$releasever&osarch=\$$basearch$${b:+&branch=$$b}$${r:+&subrep=$$r}" ; \
 			$(ECHO) "gpgkey = $(reposerv)://$(repobase)/pubkey.asc"; \
 			$(ECHO) "gpgcheck = 1"; \
 			$(ECHO) "repo_gpgcheck = 0"; \
+			$(ECHO) "enabled = $$enabled" ; \
 			$(ECHO) ""; \
 		done ; \
 	done >$@
@@ -1154,14 +1158,14 @@ $(repodir)/$(PACKAGE)-local.repo::
 		bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 		for r in main debug devel source '' ; do \
 			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-			$(ECHO) "[$(PACKAGE)$${b:+-$$b}$${r:+-$$r}]" ; \
-			if test \( -z "$$b" -o "$$b" = updates \) -a \( -z "$$r" -o -n "$$rb" \) ; then \
-				$(ECHO) "enabled = 1"; else $(ECHO) "enabled = 0"; fi ; \
+			if test -d $(rpmdistdir)/$${b:+/$$b}/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
+			$(ECHO) "[$(PACKAGE)-local$${b:+-$$b}$${r:+-$$r}]" ; \
 			$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))" ; \
 			$(ECHO) "baseurl = file://$(rpmdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			$(ECHO) "gpgkey = file://$(tardir)/OPENSS7-GPG-KEY" ; \
 			$(ECHO) "gpgcheck = 1" ; \
 			$(ECHO) "repo_gpgcheck = 0" ; \
+			$(ECHO) "enabled = $$enabled" ; \
 			$(ECHO) ""; \
 		done ; \
 	done >$@
@@ -1411,13 +1415,17 @@ $(reposrcsdir)/repomd.xml:
 
 GPGVERIFYSIGN = \
 	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+		test ! -f $@ || $(ECHO) "D: gpg BAD $@" ; \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
 		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-	else touch "$@"; fi
+	else \
+		$(ECHO) "D: gpg OK  $@" ; \
+		touch "$@"; \
+	fi
 
 $(repomd_signs):: %.asc : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -1474,52 +1482,60 @@ release-update-yum:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
-	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
-	for b in '' updates extras testing $$rb; do \
+	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; built_one= ; \
+	for b in '' updates extras testing $$rb ; do \
 		for r in '' main debug devel source ; do \
 			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
 			$(ECHO) "D: $@: processing directory $$dir" ; \
 			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
-			test -d $$repodir$${b:+/$$b}/RPMS || { $(ECHO) "D: $@: skipping $$dir" ; continue ; } ; \
-			test -d $$dir/RPMS || ( $(ECHO) "cd $$dir" ; $(ECHO) "ln -sf -- ../RPMS RPMS" ; cd $$dir; ln -sf -- ../RPMS RPMS ) ; \
-			test -d $$dir/repodata || { $(ECHO) "$(MKDIR_P) -- $$dir/repodata" ; $(MKDIR_P) -- $$dir/repodata ; } ; \
-			f=comps.xml ; d=`pwd`/scripts/ ; \
-			test -f $$d/$$f || d=`(cd $(srcdir); pwd)`/scripts/ ; \
-			g=; test ! -f $$d/$$f || g="-g $$d$$f" ; \
-			rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | LANG= sort -u | \
-				case \"$${r:-full}\" in \
-				(main)	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
-				(debug)	 grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
-				(devel)	 grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
-				(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
-				(full)	 cat ;; \
-				esac`" ; \
-			if test -n "$$rpms" ; then \
-				( \
-					$(ECHO) "cd $$dir" ; cd $$dir ; \
-					test -d repodata || { $(ECHO) "$(MKDIR_P) -- repodata" ; $(MKDIR_P) -- repodata ; } ; \
-					$(ECHO) "echo \"$$rpms\" | sed 's,^'$$dir'/,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g ." ; \
-					echo "$$rpms" | sed 's,^'$$dir'/,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . ; \
-				) ; \
+			if test -d $$repodir$${b:+/$$b}/RPMS ; then \
+				test -d $$dir/RPMS || ( $(ECHO) "cd $$dir" ; $(ECHO) "rm -f -- RPMS ; ln -sf -- ../RPMS RPMS" ; cd $$dir; rm -f -- RPMS ; ln -sf -- ../RPMS RPMS ) ; \
+				f=comps.xml ; d=`pwd`/scripts/ ; \
+				test -f $$d/$$f || d=`(cd $(srcdir); pwd)`/scripts/ ; \
+				g=; test ! -f $$d/$$f || g="-g $$d$$f" ; \
+				rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | LANG= sort -u | \
+					case \"$${r:-full}\" in \
+					(main)	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
+					(debug)	 grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
+					(devel)	 grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
+					(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
+					(full)	 cat ;; \
+					esac`" ; \
+				if test -n "$$rpms" ; then \
+					built_one=yes ; \
+					( \
+						$(ECHO) "cd $$dir" ; cd $$dir ; \
+						test -d repodata || { $(ECHO) "$(MKDIR_P) -- repodata" ; $(MKDIR_P) -- repodata ; } ; \
+						$(ECHO) "echo \"$$rpms\" | sed 's,^'$$dir'/,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g ." ; \
+						echo "$$rpms" | sed 's,^'$$dir'/,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . ; \
+					) ; \
+				fi ; \
+			else \
+				rpms= ; \
 			fi ; \
 			if test -z "$$rpms" ; then \
-				if test -n "$$r" ; \
-				then $(ECHO) "rm    -f -- $$dir/RPMS" ; rm    -f -- $$dir/RPMS 2>/dev/null || : ; \
-				else $(ECHO) "rmdir -p -- $$dir/RPMS" ; rmdir -p -- $$dir/RPMS 2>/dev/null || : ; \
-				fi ; \
-				for p in '*repomd' '*comps' '*primary' '*filelists' '*other' '*susedata' '*patterns' '*products' '*product' '$(PACKAGE_LCNAME)*' '$(PACKAGE)*' ; do \
-					for e in .xml .xml.gz .xml.asc .xml.key .repo ; do \
-						for f in $$dir/repodata/$${p}$${e} ; do \
-							if test -f $$f ; then $(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; fi ; \
+				test -L $$dir/RPMS && { $(ECHO) "rm    -fv -- $$dir/RPMS" ; rm    -fv -- $$dir/RPMS || : ; } ; \
+				test -d $$dir/RPMS && { $(ECHO) "rmdir -pv -- $$dir/RPMS" ; rmdir -pv -- $$dir/RPMS || : ; } ; \
+				if test -d $$dir/repodata ; then \
+					for p in '*repomd' '*comps' '*primary' '*filelists' '*other' '*susedata' '*patterns' '*products' '*product' '$(PACKAGE_LCNAME)*' '$(PACKAGE)*' ; do \
+						for e in .xml .xml.gz .xml.asc .xml.key .repo ; do \
+							for f in $$dir/repodata/$${p}$${e} ; do \
+								if test -f $$f ; then $(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; fi ; \
+							done ; \
 						done ; \
 					done ; \
-				done ; \
-				$(ECHO) "rm -p -- $$dir/repodata" ; \
-				rmdir -p -- $$dir/repodata 2>/dev/null || : ; \
+					$(ECHO) "rmdir -pv -- $$dir/repodata" ; \
+					rmdir -pv -- $$dir/repodata || : ; \
+				fi ; \
+				if test -d $$dir ; then \
+					$(ECHO) "rmdir -pv -- $$dir" ; \
+					rmdir -pv -- $$dir || : ; \
+				fi ; \
 			else \
 				f="$$dir/repodata/repomd.xml" ; \
 				if test -f $$f ; then a="$$f.asc" ; k="$$f.key" ; \
 					if test ! -f $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1 ; then \
+						test ! -f $$a || $(ECHO) "D: gpg BAD $$a" ; \
 						user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 						home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 						pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
@@ -1528,6 +1544,8 @@ release-update-yum:
 						eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
 						$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
 						$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k; \
+					else \
+						$(ECHO) "D: gpg OK  $$a" ; \
 					fi ; \
 				fi ; \
 				$(ECHO) "D: $@: generating $$dir/repodata/susedata.xml" ; \
@@ -1677,14 +1695,16 @@ release-update-yum:
 						bran=`echo "$${bb:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 						for rr in main debug devel source '' ; do \
 							repo=`echo "$${rr:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-							$(ECHO) "[$(PACKAGE)$${bb:+-$$bb}$${rr:+-$$rr}]" ; \
 							if test \( -z "$$bb" -o "$$bb" = updates \) -a \( -z "$$rr" -o "$$rr" = main \) ; then \
-								$(ECHO) "enabled = 1"; else $(ECHO) "enabled = 0"; fi ; \
+								enabled=1 ; else enabled=0 ; fi ; \
+							$(ECHO) "[$(PACKAGE)$${bb:+-$$bb}$${rr:+-$$rr}]" ; \
 							$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))"; \
-							$(ECHO) "baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${bb:+/$$bb}$${rr:+/$$rr}"; \
+							$(ECHO) "#baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${bb:+/$$bb}$${rr:+/$$rr}"; \
+							$(ECHO) "mirrorlist = $(reposerv)://$(repobase)/mirrorlist?distro=$(target_distro)&relver=\$$releasever&osarch=\$$basearch$${bb:+&branch=$$bb}$${rr:+&subrep=$$rr}" ; \
 							$(ECHO) "gpgkey = $(reposerv)://$(repobase)/pubkey.asc"; \
 							$(ECHO) "gpgcheck = 1"; \
 							$(ECHO) "repo_gpgcheck = 0"; \
+							$(ECHO) "enabled = $$enabled" ; \
 							$(ECHO) ""; \
 						done ; \
 					done >$$dir/repodata/$(PACKAGE).repo ; \
@@ -1694,14 +1714,14 @@ release-update-yum:
 						bran=`echo "$${bb:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 						for rr in main debug devel source '' ; do \
 							repo=`echo "$${rr:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-							$(ECHO) "[$(PACKAGE)$${bb:+-$$bb}$${rr:+-$$rr}]" ; \
-							if test \( -z "$$bb" -o "$$bb" = updates \) -a \( -z "$$rr" -o -n "$$rb" \) ; then \
-								$(ECHO) "enabled = 1"; else $(ECHO) "enabled = 0"; fi ; \
+							if test -d $$repodir$${bb:+/$$bb}/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
+							$(ECHO) "[$(PACKAGE)-local$${bb:+-$$bb}$${rr:+-$$rr}]" ; \
 							$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))" ; \
 							$(ECHO) "baseurl = file://$$repodir$${bb:+/$$bb}$${rr:+/$$rr}" ; \
 							$(ECHO) "gpgkey = file://$$tardir/OPENSS7-GPG-KEY" ; \
 							$(ECHO) "gpgcheck = 1" ; \
 							$(ECHO) "repo_gpgcheck = 0" ; \
+							$(ECHO) "enabled = $$enabled" ; \
 							$(ECHO) ""; \
 						done ; \
 					done >$$dir/repodata/$(PACKAGE)-local.repo; \
@@ -1711,6 +1731,7 @@ release-update-yum:
 			fi ; \
 		done ; \
 	done
+
 
 RELEASE_INSTALL		+= release-update-yum
 RELEASE_UNINSTALL	+= release-update-yum
@@ -1867,12 +1888,15 @@ release-update-yast:
 		$(ECHO) "DATADIR RPMS"; \
 	) >$$f ; \
 	if test ! -f $$f.asc || ! $(GPG) --verify -- $$f.asc >/dev/null 2>&1 ; then \
+		test ! -f $$f.asc || $(ECHO) "D: gpg BAD $$f.asc" ; \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
 		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.asc 2>/dev/null"; \
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.asc 2>/dev/null"; \
+	else \
+		$(ECHO) "D: gpg OK  $$f.asc" ; \
 	fi ; \
 	if test ! -f $$f.key ; then \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
@@ -1965,8 +1989,8 @@ UPDATECLEANFILES	+=
 release-update-ris:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	$(AM_V_GEN)\
-	t=$(REPODIR)/repoindex.xml ; \
+	@t=$(REPODIR)/repoindex.xml ; \
+	$(ECHO) "D: $@: generating $$t" ; \
 	( \
 		$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
 		$(ECHO) '<repoindex>' ; \
@@ -1988,12 +2012,15 @@ release-update-ris:
 		$(ECHO) '</repoindex>' ; \
 	) >$$t ; \
 	if test ! -f $$t.asc || ! $(GPG) --verify -- $$t.asc >/dev/null 2>&1; then \
+		test ! -f $$t.asc || $(ECHO) "D: gpg BAD $$t.asc" ; \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
 		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$t >$$t.asc 2>/dev/null"; \
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$t >$$t.asc 2>/dev/null"; \
+	else \
+		$(ECHO) "D: gpg OK  $$t.asc" ; \
 	fi
 
 
@@ -2522,13 +2549,17 @@ $(aptr_sigs): %.sig: %
 
 GPGVERIFYSIGN = \
 	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+		test ! -f $@ || $(ECHO) "D: gpg BAD $@" ; \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
 		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
 		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
-	else touch "$@"; fi
+	else \
+		$(ECHO) "D: gpg OK  $@" ; \
+		touch "$@"; \
+	fi
 
 $(aptr_signs): %.gpg : %
 	@$(ECHO_V) "D: Making $@ in `pwd`"
