@@ -543,7 +543,7 @@ build:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	dh_testdir
 	rm -fr @PACKAGE@-@VERSION@
-	[ ! -f Makefile ] || $(MAKE) distclean
+	[ ! -f Makefile ] || $(MAKE) clean
 	rm -f $(control)
 	case " $(BUILD_CFGOPTIONS) " in \
 		(*" --disable-arch "*) ;; \
@@ -583,7 +583,7 @@ build:
 	esac
 	case " $(BUILD_CFGOPTIONS) " in \
 	(*" --disable-arch "*) ;; \
-	(*" --without-modules "*) ;; \
+	(*" --disable-modules "*) ;; \
 	(*)	d=$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion) ; \
 		mkdir -p $$d ; \
 		b=$(debtmpdir)/boot ; \
@@ -610,7 +610,7 @@ clean:
 	dh_testdir
 	dh_testroot
 	rm -fr @PACKAGE@-@VERSION@
-	[ ! -f Makefile ] || $(MAKE) distclean
+	[ ! -f Makefile ] || $(MAKE) clean
 	rm -f $(control)
 	rm -fr $(debtmpdir)
 	dh_clean -k
@@ -673,7 +673,7 @@ binary-arch: install
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	DH_OPTIONS= ; \
 	case " $(BUILD_CFGOPTIONS) " in \
-	(*" --without-tools "*) ;; \
+	(*" --disable-tools "*) ;; \
 	(*) \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-lib" ; \
 		if test -z "@WITH_32BIT_LIBS_TRUE@"; then \
@@ -686,7 +686,7 @@ binary-arch: install
 		;; \
 	esac ; \
 	case " $(BUILD_CFGOPTIONS) " in \
-	(*" --without-modules "*) ;; \
+	(*" --disable-modules "*) ;; \
 	(*) \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)" ; \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-devel" ; \
