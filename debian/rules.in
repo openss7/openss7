@@ -86,17 +86,20 @@ am__debian_install_format = | sed -r -e 's,^($(debtmpdir)/(.*))$$,\2 \2,;s,/[^/]
 am__debian_conffil_format = | sed -r -e 's,^$(debtmpdir),,'
 
 control		=
+control_n	=
+control_t	=
+control_k	=
 
 ##
 ## Repo package:
 ##
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-repo.postinst
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-repo.postrm
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-repo.preinst
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-repo.prerm
+control_n	+= debian/@PACKAGE@-repo.postinst
+control_n	+= debian/@PACKAGE@-repo.postrm
+control_n	+= debian/@PACKAGE@-repo.preinst
+control_n	+= debian/@PACKAGE@-repo.prerm
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-repo.conffiles
+control_n	+= debian/@PACKAGE@-repo.conffiles
 
 debian/@PACKAGE@-repo.conffiles:
 	( [ ! -d '$(debtmpdir)$(aptsourceslistdir)' ] || find '$(debtmpdir)$(aptsourceslistdir)' -type f -name '*.list' ; \
@@ -105,7 +108,7 @@ debian/@PACKAGE@-repo.conffiles:
 sysconfdir	= @sysconfdir@
 aptsourceslistdir = ${sysconfdir}/apt/sources.list.d
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-repo.install
+control_n	+= debian/@PACKAGE@-repo.install
 
 debian/@PACKAGE@-repo.install:
 	( [ ! -d '$(debtmpdir)$(aptsourceslistdir)' ] || find '$(debtmpdir)$(aptsourceslistdir)' -type f -name '*.list' ; \
@@ -115,7 +118,7 @@ debian/@PACKAGE@-repo.install:
 ## Base virtual package:
 ##
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@.docs
+control_n	+= debian/@PACKAGE@.docs
 
 debian/@PACKAGE@.docs:
 	( echo AUTHORS ; \
@@ -153,12 +156,12 @@ debian/@PACKAGE@.docs:
 ## Base configuration and scripts package:
 ##
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.postinst
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.postrm
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.preinst
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.prerm
+control_n	+= debian/@PACKAGE@-base.postinst
+control_n	+= debian/@PACKAGE@-base.postrm
+control_n	+= debian/@PACKAGE@-base.preinst
+control_n	+= debian/@PACKAGE@-base.prerm
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.conffiles
+control_n	+= debian/@PACKAGE@-base.conffiles
 
 debian/@PACKAGE@-base.conffiles:
 	( [ ! -d '$(debtmpdir)$(sysconfdir)'				] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
@@ -170,11 +173,11 @@ snmpmibdir	= @snmpmibdir@
 libexecdir	= @libexecdir@
 pkglibexecdir	= $(libexecdir)/@PACKAGE@
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.specfs.sh.init
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.streams.sh.init
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.strerr.sh.init
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.strace.sh.init
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.openss7.sh.init
+control_n	+= debian/@PACKAGE@-base.specfs.sh.init
+control_n	+= debian/@PACKAGE@-base.streams.sh.init
+control_n	+= debian/@PACKAGE@-base.strerr.sh.init
+control_n	+= debian/@PACKAGE@-base.strace.sh.init
+control_n	+= debian/@PACKAGE@-base.openss7.sh.init
 
 debian/@PACKAGE@-base.specfs.sh.init \
 debian/@PACKAGE@-base.streams.sh.init \
@@ -184,11 +187,11 @@ debian/@PACKAGE@-base.@PACKAGE@.sh.init: \
 debian/@PACKAGE@-base.%.init: $(debtmpdir)$(initrddir)/%
 	cp -f -- $< $@
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.specfs.sh.default
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.streams.sh.default
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.strerr.sh.default
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.strace.sh.default
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.@PACKAGE@.sh.default
+control_n	+= debian/@PACKAGE@-base.specfs.sh.default
+control_n	+= debian/@PACKAGE@-base.streams.sh.default
+control_n	+= debian/@PACKAGE@-base.strerr.sh.default
+control_n	+= debian/@PACKAGE@-base.strace.sh.default
+control_n	+= debian/@PACKAGE@-base.@PACKAGE@.sh.default
 
 configdir	= @configdir@
 
@@ -200,7 +203,7 @@ debian/@PACKAGE@-base.@PACKAGE@.sh.default: \
 debian/@PACKAGE@-base.%.sh.default: $(debtmpdir)$(configdir)/%
 	cp -f -- $< $@
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.install
+control_n	+= debian/@PACKAGE@-base.install
 
 debian/@PACKAGE@-base.install:
 	( [ ! -d '$(debtmpdir)$(sysconfdir)'					] || find '$(debtmpdir)$(sysconfdir)' -type f -name '*.conf' ; \
@@ -218,7 +221,7 @@ debian/@PACKAGE@-base.install:
 	  [ ! -f '$(debtmpdir)$(mandir)/@PACKAGE@.macros'			] || echo '$(debtmpdir)$(mandir)/@PACKAGE@.macros' ; \
 	) $(am__debian_install_format) | sort -u > $@
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-base.manpages
+control_n	+= debian/@PACKAGE@-base.manpages
 
 mandir		= @mandir@
 
@@ -230,12 +233,12 @@ debian/@PACKAGE@-base.manpages:
 ## Documentation package
 ##
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-doc.postinst
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-doc.postrm
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-doc.preinst
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-doc.prerm
+control_n	+= debian/@PACKAGE@-doc.postinst
+control_n	+= debian/@PACKAGE@-doc.postrm
+control_n	+= debian/@PACKAGE@-doc.preinst
+control_n	+= debian/@PACKAGE@-doc.prerm
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-doc.docs
+control_n	+= debian/@PACKAGE@-doc.docs
 
 debian/@PACKAGE@-doc.docs:
 	( [ ! -d '$(debtmpdir)$(docdir)/@PACKAGE@-@VERSION@'	] || find '$(debtmpdir)$(docdir)/@PACKAGE@-@VERSION@' -type f -name '*.txt' ; \
@@ -247,13 +250,13 @@ debian/@PACKAGE@-doc.docs:
 	  [ ! -d '$(debtmpdir)$(htmldir)/@PACKAGE@-@VERSION@'	] || find '$(debtmpdir)$(htmldir)/@PACKAGE@-@VERSION@' -type f -name '*.css' ; \
 	) | sort -u > $@
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-doc.info
+control_n	+= debian/@PACKAGE@-doc.info
 
 debian/@PACKAGE@-doc.info:
 	( [ !-d '$(debtmpdir)$(infodir)' ] || find '$(debtmpdir)$(infodir)' -type f -name '*.info*' ; \
 	) | sort -u > $@
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-doc.manpages
+control_n	+= debian/@PACKAGE@-doc.manpages
 
 debian/@PACKAGE@-doc.manpages:
 	( [ ! -d '$(debtmpdir)$(mandir)' ] || find '$(debtmpdir)$(mandir)' \( -type f -or -type l \) -name '*.[2379]*' ; \
@@ -263,11 +266,11 @@ debian/@PACKAGE@-doc.manpages:
 ## Library package:
 ##
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-lib.postinst
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-lib.postrm
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-lib.preinst
+control_t	+= debian/@PACKAGE@-lib.postinst
+control_t	+= debian/@PACKAGE@-lib.postrm
+control_t	+= debian/@PACKAGE@-lib.preinst
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-lib.conffiles
+control_t	+= debian/@PACKAGE@-lib.conffiles
 
 snmpconfdir	= ${sysconfdir}/snmp
 
@@ -286,7 +289,7 @@ pkgtcllibdir	= ${tcllibdir}/$(PACKAGE_NAME)$(PACKAGE_VERSION)
 localedir	= @localedir@
 snmpdlmoddir	= @snmpdlmoddir@
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-lib.install
+control_t	+= debian/@PACKAGE@-lib.install
 
 debian/@PACKAGE@-lib.install:
 	( [ ! -d '$(debtmpdir)$(snmpconfdir)'				] || find '$(debtmpdir)$(snmpconfdir)' \( -type f -o -type l \) ; \
@@ -321,10 +324,10 @@ debian/@PACKAGE@-lib.install:
 lib32dir	= @lib32dir@
 pkglibexec32dir	= @pkglibexec32dir@
 
-@WITH_32BIT_LIBS_TRUE@control		+= debian/@PACKAGE@-compat.postinst \
+@WITH_32BIT_LIBS_TRUE@control_t	+= debian/@PACKAGE@-compat.postinst \
 @WITH_32BIT_LIBS_TRUE@		   debian/@PACKAGE@-compat.postrm \
 @WITH_32BIT_LIBS_TRUE@
-@WITH_32BIT_LIBS_TRUE@control		+= debian/@PACKAGE@-compat.install
+@WITH_32BIT_LIBS_TRUE@control_t	+= debian/@PACKAGE@-compat.install
 @WITH_32BIT_LIBS_TRUE@
 @WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-compat.install:
 @WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)'		] || echo '$(debtmpdir)$(lib32dir)/*.so*' ; \
@@ -336,9 +339,9 @@ pkglibexec32dir	= @pkglibexec32dir@
 ## Development package:
 ##
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-devel.preinst
+control_t	+= debian/@PACKAGE@-devel.preinst
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-devel.install
+control_t	+= debian/@PACKAGE@-devel.install
 
 includedir	= @includedir@
 pkgincludedir	= $(includedir)/@PACKAGE@
@@ -358,7 +361,7 @@ pkgincludedir	= $(includedir)/@PACKAGE@
 ## Debugging information package:
 ##
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-debuginfo.install
+control_t	+= debian/@PACKAGE@-debuginfo.install
 
 @WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-debuginfo.install:
 @WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] ||	find '$(debtmpdir)$(lib32dir)/debug' -type f \! -name '*.ko' \! -name '*.ko.debug' ; \
@@ -376,7 +379,7 @@ pkgincludedir	= $(includedir)/@PACKAGE@
 ## Debugging source package:
 ##
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-debugsource.install
+control_t	+= debian/@PACKAGE@-debugsource.install
 
 debian/@PACKAGE@-debugsource.install:
 	( [ ! -d '$(debtmpdir)/usr/src/debug'	] || echo '$(debtmpdir)/usr/src/debug/*' ; \
@@ -386,10 +389,10 @@ debian/@PACKAGE@-debugsource.install:
 ## Kernel module package:
 ##
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_KERNEL_TRUE@control		+= debian/@PACKAGE@-$(kversion).postinst
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_KERNEL_TRUE@control		+= debian/@PACKAGE@-$(kversion).postrm
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_KERNEL_TRUE@control		+= debian/@PACKAGE@-$(kversion).preinst
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_KERNEL_TRUE@control		+= debian/@PACKAGE@-$(kversion).prerm
+control_k	+= debian/@PACKAGE@-$(kversion).postinst
+control_k	+= debian/@PACKAGE@-$(kversion).postrm
+control_k	+= debian/@PACKAGE@-$(kversion).preinst
+control_k	+= debian/@PACKAGE@-$(kversion).prerm
 
 debian/@PACKAGE@-$(kversion).postinst \
 debian/@PACKAGE@-$(kversion).postrm \
@@ -398,7 +401,7 @@ debian/@PACKAGE@-$(kversion).prerm: \
 debian/@PACKAGE@-$(kversion).%: debian/@PACKAGE@-kernel.%
 	cp -fv $< $@
 
-@WITH_KO_MODULES_FALSE@control		+= debian/@PACKAGE@-$(kversion).conffiles
+@WITH_KO_MODULES_FALSE@control_k	+= debian/@PACKAGE@-$(kversion).conffiles
 
 @WITH_KO_MODULES_FALSE@debian/@PACKAGE@-$(kversion).conffiles:
 @WITH_KO_MODULES_FALSE@	( [ ! -f $(debtmpdir)$(kmoduledir)/modules.@PACKAGE@ ] || echo '$(debtmpdir)$(kmoduledir)/modules.@PACKAGE@'; \
@@ -407,7 +410,7 @@ debian/@PACKAGE@-$(kversion).%: debian/@PACKAGE@-kernel.%
 kmoduledir	= @kmoduledir@
 ksubdir		= @ksubdir@
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_KERNEL_TRUE@control		+= debian/@PACKAGE@-$(kversion).install
+control_k	+= debian/@PACKAGE@-$(kversion).install
 
 @WITH_KO_MODULES_TRUE@debian/@PACKAGE@-$(kversion).install:
 @WITH_KO_MODULES_TRUE@	( [ ! -d $(debtmpdir)$(kmoduledir)/$(ksubdir) ] || echo '$(debtmpdir)$(kmoduledir)/$(ksubdir)/*.ko' ; \
@@ -426,7 +429,7 @@ ksubdir		= @ksubdir@
 ## Kernel development package:
 ##
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_KERNEL_TRUE@control		+= debian/@PACKAGE@-$(kversion)-devel.install
+control_k	+= debian/@PACKAGE@-$(kversion)-devel.install
 
 @WITH_KO_MODULES_TRUE@debian/@PACKAGE@-$(kversion)-devel.install:
 @WITH_KO_MODULES_TRUE@	( [ ! -f '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@-$(PACKAGE_DEBRELEASE)/$(kversion)/Module.mkvars' ] || \
@@ -462,7 +465,7 @@ ksubdir		= @ksubdir@
 ## Kernel debugging information package:
 ##
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_KERNEL_TRUE@control		+= debian/@PACKAGE@-$(kversion)-debuginfo.install
+control_k	+= debian/@PACKAGE@-$(kversion)-debuginfo.install
 
 @WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-$(kversion)-debuginfo.install:
 @WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)/debug' ] ||	find '$(debtmpdir)$(lib32dir)/debug' -type f \( -name '*.ko' -o -name '*.ko.debug' \) ; \
@@ -480,7 +483,7 @@ ksubdir		= @ksubdir@
 ## Kernel debugging source package:
 ##
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_KERNEL_TRUE@control		+= debian/@PACKAGE@-$(kversion)-debugsource.install
+control_k	+= debian/@PACKAGE@-$(kversion)-debugsource.install
 
 debian/@PACKAGE@-$(kversion)-debugsource.install:
 	( [ ! -d $(debtmpdir)/usr/src/debug ] || echo '$(debtmpdir)/usr/src/debug/*' ; \
@@ -490,7 +493,7 @@ debian/@PACKAGE@-$(kversion)-debugsource.install:
 ## Kernel source package:
 ##
 
-@WITH_K_PACKAGE_TRUE@control		+= debian/@PACKAGE@-$(kversion)-source.install
+@WITH_K_PACKAGE_TRUE@control_k	+= debian/@PACKAGE@-$(kversion)-source.install
 
 @WITH_K_PACKAGE_TRUE@debian/@PACKAGE@-$(kversion)-source.install:
 @WITH_K_PACKAGE_TRUE@	( [ ! -f $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz ] || echo '$(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz' ; \
@@ -500,11 +503,11 @@ debian/@PACKAGE@-$(kversion)-debugsource.install:
 ## Java package:
 ##
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-java.postinst
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-java.postrm
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-java.preinst
+control_t	+= debian/@PACKAGE@-java.postinst
+control_t	+= debian/@PACKAGE@-java.postrm
+control_t	+= debian/@PACKAGE@-java.preinst
 
-@PKG_BUILD_ARCH_TRUE@@PKG_BUILD_USER_TRUE@control		+= debian/@PACKAGE@-java.install
+control_t	+= debian/@PACKAGE@-java.install
 
 jnidir		= @jnidir@
 pkggcjdir	= ${libdir}/gcj/@PACKAGE@
@@ -522,7 +525,7 @@ debian/@PACKAGE@-java.install:
 ## Java documentation package:
 ##
 
-@PKG_BUILD_INDEP_TRUE@control		+= debian/@PACKAGE@-javadoc.docs
+control_t	+= debian/@PACKAGE@-javadoc.docs
 
 javadocdir	= @javadocdir@
 pkgjavadocdir	= ${javadocdir}/@PACKAGE@
@@ -534,6 +537,8 @@ debian/@PACKAGE@-javadoc.docs:
 ##
 ## Building the package:
 ##
+
+control		= $(control_n) $(control_t) $(control_k)
 
 cache_file	= $(debbuilddir)/$(DEB_HOST_GNU_TYPE)-$(kversion)-config.cache
 csite_file	= $(debbuilddir)/$(DEB_HOST_GNU_TYPE)-config.site
@@ -603,7 +608,23 @@ build:
 	esac
 	mkdir -p debian/source
 	echo "3.0 (native)" > debian/source/format
-	$(MAKE) -f debian/rules $(control)
+	@case " $(BUILD_CFGOPTIONS) " in \
+		(*" --disable-indep "*) ;; \
+		(*) echo "$(MAKE) -f debian rules $(control_n)" ; \
+		    $(MAKE) -f debian/rules $(control_n) ;; \
+	esac
+	@case " $(BUILD_CFG_OPTIONS) " in \
+		(*" --disable-arch "*) ;; \
+		(*" --disable-tools "*) ;; \
+		(*) echo "$(MAKE) -f debian/rules $(control_t)" ; \
+		    $(MAKE) -f debian/rules $(control_t) ;; \
+	esac
+	@case " $(BUILD_CFG_OPTIONS) " in \
+		(*" --disable-arch "*) ;; \
+		(*" --disable-modules "*) ;; \
+		(*) echo "$(MAKE) -f debian/rules $(control_k)" ; \
+		    $(MAKE) -f debian/rules $(control_k) ;; \
+	esac
 
 clean:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
