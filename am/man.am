@@ -239,6 +239,7 @@ $(man9_MANS): %.9: %.man
 # them anyway.  The clean target will move them back.
 ##
 all-manmacros:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@macros='$(man_MACROS)' ; for macro in $$macros ; do \
 		if test ! -e $$macro -o $(srcdir)/$$macro -nt $$macro ; then \
 			$(ECHO_Q) "  GEN   " $$macro ; \

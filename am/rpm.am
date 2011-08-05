@@ -192,7 +192,9 @@ rpm_cache_files		= $(rpmbuilddir)/*config.cache \
 			  $(rpmbuilddir)/*config.site \
 			  $(rpmbuilddir)/*modpost.cache
 
+REPO_DIRECTORIES	+= $(topdir)
 RELEASE_DIRECTORIES	+= $(topdir)
+UPDATE_DIRECTORIES	+= $(topdir)
 
 ## For the master build package it is sometime necessary to pass extra options down to configured
 ## subdirectories for a master build.  These options will contain the passed down options from the
@@ -447,9 +449,10 @@ else
 if BUILD_SRPMS
 ## BUILD_SRPMS
 
+RELEASE_DIRECTORIES	+= $(rpm_directories)
 RELEASE			+= all-srpm
 RELEASE_SIGN		+= all-sign all-resign
-RELEASE_DIRECTORIES	+= $(rpm_directories)
+RELEASE_CLEAN_LOCAL	+= release-clean-rpm
 
 if BUILD_RPMS
 ## BUILD_RPMS
@@ -464,6 +467,13 @@ endif
 
 ## !BUILD_DPKG
 endif
+
+RELEASECLEANFILES	+= $(rpm_dir_stamp) \
+			   $(rpm_source_files) \
+			   $(rpm_src_file) \
+			   $(rpm_sig_file) \
+			   $(rpm_binary_files) \
+			   $(rpm_link_file)
 
 ## Because the build directory is in the autoconf top build directory on the local machine, it needs
 ## to be cleaned when a distclean is performed.  We use rpm to do this for us, and rpm will complain
@@ -503,24 +513,6 @@ release-clean-rpm: distclean-rpm
 		$(RPMBUILD) $(SRPMFLAGS) --rmsource --rmspec $(RPMBOPTS) $(RPMXOPTS) $(AM_RPMBOPTS) $(AM_SRPMFLAGS) --target $(RPMTARGET) -- $(rpm_spec_file) || :; \
 	fi
 
-if BUILD_DPKG
-else
-## !BUILD_DPKG
-
-if BUILD_SRPMS
-RELEASE_CLEAN_LOCAL	+= release-clean-rpm
-endif
-
-## !BUILD_DPKG
-endif
-
-RELEASECLEANFILES	+= $(rpm_dir_stamp) \
-			   $(rpm_source_files) \
-			   $(rpm_src_file) \
-			   $(rpm_sig_file) \
-			   $(rpm_binary_files) \
-			   $(rpm_link_file)
-
 MY_PHONY		+= srpm rpms \
 			   each-rpm \
 			   one-k-rpm \
@@ -555,10 +547,17 @@ update-clean-rpm:
 		fi; \
 	done
 
+if BUILD_DPKG
+else
+## !BUILD_DPKG
+
 if BUILD_SRPMS
 ## BUILD_SRPMS
 
+UPDATE_DIRECTORIES	+= $(rpm_directories)
 UPDATE			+= all-update-srpm
+UPDATE_SIGN		+= all-update-sign-srpm all-update-sign-rpms
+UPDATE_CLEAN_LOCAL	+= update-clean-rpm
 
 if BUILD_RPMS
 ## BUILD_RPMS
@@ -568,11 +567,10 @@ UPDATE			+= update-all-rpms
 ## BUILD_RPMS
 endif
 
-UPDATE_SIGN		+= all-update-sign-srpm all-update-sign-rpms
-UPDATE_DIRECTORIES	+=
-UPDATE_CLEAN_LOCAL	+= update-clean-rpm
-
 ## BUILD_SRPMS
+endif
+
+## !BUILD_DPKG
 endif
 
 UPDATECLEANFILES	+= $(rpm_dir_stamp)
@@ -1033,8 +1031,6 @@ if BUILD_REPO_YUM
 ## The following builds repomd repositories.
 ##
 
-RELEASE_DIRECTORIES	+= $(repodir) $(repofulldir) $(repomaindir) $(repodebgdir) $(repodevldir) $(reposrcsdir)
-
 repomd_heads		= $(repofulldir)/repomd.xml \
 			  $(repomaindir)/repomd.xml \
 			  $(repodebgdir)/repomd.xml \
@@ -1460,16 +1456,19 @@ repo-clean-yum:
 		done ; \
 	done
 
+REPO_DIRECTORIES	+= $(repodir) $(repofulldir) $(repomaindir) $(repodebgdir) $(repodevldir) $(reposrcsdir)
 REPO			+= repo-yum repo-suse
 REPO_SIGN		+= repo-sign-yum
 REPO_CLEAN		+= repo-clean-yum
 REPOCLEANFILES		+= $(repomd_files)
 
+RELEASE_DIRECTORIES	+= $(repodir) $(repofulldir) $(repomaindir) $(repodebgdir) $(repodevldir) $(reposrcsdir)
 RELEASE			+= repo-yum repo-suse
 RELEASE_SIGN		+= repo-sign-yum
 RELEASE_CLEAN_LOCAL	+= repo-clean-yum
 RELEASECLEANFILES	+= $(repomd_files)
 
+UPDATE_DIRECTORIES	+= $(repodir) $(repofulldir) $(repomaindir) $(repodebgdir) $(repodevldir) $(reposrcsdir)
 UPDATE			+= repo-yum repo-suse
 UPDATE_SIGN		+= repo-sign-yum
 UPDATE_CLEAN_LOCAL	+= repo-clean-yum
@@ -1749,10 +1748,6 @@ if BUILD_REPO_YAST
 ## The following builds yast repositories.
 ##
 
-RELEASE_DIRECTORIES	+= $(yastdir) \
-			   $(yastdir)/media.1 \
-			   $(yastdir)/setup/descr
-
 $(yastdir)/media.1/media:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@p=`$(RPM) --showrc | grep '\<packager\>' | sed 's,.*\<packager\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
@@ -1839,16 +1834,19 @@ repo-sign-yast: $(yast_sign_files) repo-yast
 
 repo-clean-yast:
 
+REPO_DIRECTORIES	+= $(yastdir) $(yastdir)/media.1 $(yastdir)/setup/descr
 REPO			+= repo-yast
 REPO_SIGN		+= repo-sign-yast
 REPO_CLEAN		+= repo-clean-yast repo-yast-listings-clean
 REPOCLEANFILES		+= $(yast_meta_files) $(yast_desc_files) $(yast_sign_files)
 
+RELEASE_DIRECTORIES	+= $(yastdir) $(yastdir)/media.1 $(yastdir)/setup/descr
 RELEASE			+= repo-yast
 RELEASE_SIGN		+= repo-sign-yast
 RELEASE_CLEAN_LOCAL	+= repo-clean-yast repo-yast-listings-clean
 RELEASECLEANFILES	+= $(yast_meta_files) $(yast_desc_files) $(yast_sign_files)
 
+UPDATE_DIRECTORIES	+= $(yastdir) $(yastdir)/media.1 $(yastdir)/setup/descr
 UPDATE			+= repo-yast
 UPDATE_SIGN		+= repo-sign-yast
 UPDATE_CLEAN_LOCAL	+= repo-yast repo-sign-yast
@@ -2037,8 +2035,6 @@ if BUILD_REPO_URPMI
 ## The following build urpmi repositories.
 ##
 
-RELEASE_DIRECTORIES	+= $(mediadir) $(mediamaindir) $(mediadebgdir) $(mediadevldir) $(mediasrcsdir)
-
 urpmi_cfgs	= $(mediadir)/media.cfg
 
 urpmi_keys	= $(mediamaindir)/pubkey \
@@ -2181,16 +2177,19 @@ repo-clean-urpmi:
 	rm -f -- $(mediadir)/../../VERSION
 
 
+REPO_DIRECTORIES	+= $(mediadir) $(mediamaindir) $(mediadebgdir) $(mediadevldir) $(mediasrcsdir)
 REPO			+= repo-urpmi
 REPO_SIGN		+= repo-sign-urpmi
 REPO_CLEAN		+= repo-clean-urpmi
 REPOCLEANFILES		+= $(urpmi_files)
 
+RELEASE_DIRECTORIES	+= $(mediadir) $(mediamaindir) $(mediadebgdir) $(mediadevldir) $(mediasrcsdir)
 RELEASE			+= repo-urpmi
 RELEASE_SIGN		+= repo-sign-urpmi
 RELEASE_CLEAN_LOCAL	+= repo-clean-urpmi
 RELEASECLEANFILES	+= $(urpmi_files)
 
+UPDATE_DIRECTORIES	+= $(mediadir) $(mediamaindir) $(mediadebgdir) $(mediadevldir) $(mediasrcsdir)
 UPDATE			+= repo-urpmi
 UPDATE_SIGN		+= repo-sign-urpmi
 UPDATE_CLEAN_LOCAL	+= repo-clean-urpmi
@@ -2293,8 +2292,6 @@ if BUILD_REPO_APT_RPM
 ##
 ## The following builds apt-for-rpm repositories.
 ##
-
-RELEASE_DIRECTORIES 	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir)
 
 aptr_packages		= $(aptrbasedir)/pkglist.full \
 			  $(aptrbasedir)/pkglist.main \
@@ -2584,16 +2581,19 @@ repo-clean-aptrpm:
 	rm -f -- $(aptrbasedir)/srpm_idx
 
 
+REPO_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir)
 REPO			+= repo-aptrpm
 REPO_SIGN		+= repo-sign-aptrpm
 REPO_CLEAN		+= repo-clean-aptrpm
 REPOCLEANFILES		+= $(aptr_files)
 
+RELEASE_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir)
 RELEASE			+= repo-aptrpm
 RELEASE_SIGN		+= repo-sign-aptrpm
 RELEASE_CLEAN_LOCAL	+= repo-clean-aptrpm
 RELEASECLEANFILES	+= $(aptr_files)
 
+UPDATE_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir)
 UPDATE			+= repo-aptrpm
 UPDATE_SIGN		+= repo-sign-aptrpm
 UPDATE_CLEAN_LOCAL	+= repo-clean-aptrpm
