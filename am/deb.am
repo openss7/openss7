@@ -111,9 +111,6 @@ debtop_binary_files	= $(debdir)/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEA
 			  $(debdir)/*/$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb \
 			  $(debtop_update_files)
 
-RELEASE_DIRECTORIES	+= $(aptdir) $(aptfulldir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
-UPDATE_DIRECTORIES	+= $(aptdir) $(aptfulldir)
-
 ## For the master build package it is sometime necessary to pass extra options down to configured
 ## subdirectories for a master build.  These options will contain the passed down options from the
 ## environment in that case.  See the recursive build targets below.
@@ -360,9 +357,9 @@ DISTCLEANFILES		+= $(debian_cache_files) \
 
 release-clean-deb: distclean-deb
 
+RELEASE_DIRECTORIES	+= $(aptdir) $(aptfulldir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
 RELEASE			+= all-dsc all-all-deb all-chg-deb
 RELEASE_SIGN		+= all-sigs all-csig
-RELEASE_DIRECTORIES	+= 
 RELEASE_CLEAN_LOCAL	+= release-clean-deb
 RELEASECLEANFILES	+= $(debian_dir_stamp) \
 			   $(debian_source_files) \
@@ -385,6 +382,7 @@ update-clean-deb:
 		fi; \
 	done | $(am__base_remove)
 
+UPDATE_DIRECTORIES	+= $(aptdir) $(aptfulldir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
 UPDATE			+= all-update-dscs all-update-debs all-update-chgs
 UPDATE_SIGN		+= all-update-csig all-update-sigs
 UPDATE_DIRECTORIES	+=

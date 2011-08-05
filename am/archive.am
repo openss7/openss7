@@ -143,10 +143,6 @@ endif
 
 archive_keys		= $(tardir)/OPENSS7-GPG-KEY
 
-## creates the package directory
-##
-RELEASE_DIRECTORIES	+= $(DISTDIR) $(tardir)
-
 ## Note that sometimes the package distribution directory is the current build directory.  This is
 ## true when we are doing local release tests on a package.  In that case, this rule will not run.
 ## Otherwise, we will not move files into the release directory if they already exist there unless
@@ -233,10 +229,6 @@ $(archive_keys):
 #!
 release-sign-archives: $(archive_signs) $(archive_keys)
 
-RELEASE			+= all-release-archives
-RELEASE_SIGN		+= all-release-sign-archives
-RELEASE_DIRECTORIES	+= 
-
 distclean-archives:
 	$(am__remove_distdir)
 
@@ -260,12 +252,15 @@ release-clean-archives: distclean-archives
 		list="$$f$${list:+ $$list}" ; \
 	done ; $(am__list_remove)
 
+ALL_RECURSIVE_TARGETS	+= all-dist all-release-archives all-release-sign-archives
+
+RELEASE_DIRECTORIES	+= $(DISTDIR) $(tardir)
+RELEASE			+= all-release-archives
+RELEASE_SIGN		+= all-release-sign-archives
 RELEASE_CLEAN_LOCAL	+= release-clean-archives
 RELEASECLEANFILES	+= $(DIST_ARCHIVES) \
 			   $(distdir).tar.lzma \
 			   $(distdir).tar.xz
-
-ALL_RECURSIVE_TARGETS	+= all-dist all-release-archives all-release-sign-archives
 
 ## Provide updates to tarballs.  If the tarball does not exist, create it.  If the tarball exists,
 ## was created after the update stamp, and force is applied, remove and recreate the tarball.  This
@@ -329,9 +324,9 @@ update-clean-archives:
 MY_PHONY		+= update-archives update-sign-archives
 ALL_RECURSIVE_TARGETS	+= all-update-archives all-update-sign-archives
 
+UPDATE_DIRECTORIES	+= $(DISTDIR) $(tardir)
 UPDATE			+= all-update-archives
 UPDATE_SIGN		+= all-update-sign-archives
-UPDATE_DIRECTORIES	+=
 UPDATE_CLEAN_LOCAL	+= update-clean-archives
 UPDATECLEANFILES	+= $(DIST_ARCHIVES) \
 			   $(distdir).tar.lzma \
