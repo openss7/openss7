@@ -2508,7 +2508,7 @@ dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile fr
 dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_cflags="`${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} cflag-check | tail -1`"
+	linux_cv_k_cflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck ${linux_tmp:+$linux_tmp }srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} cflag-check | tail -1)`"
 	linux_cv_k_cflags_orig="$linux_cv_k_cflags"])
 	linux_cflags=
 	AC_ARG_WITH([k-optimize],
@@ -2694,7 +2694,7 @@ dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile fr
 dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_cppflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} cppflag-check | tail -1`"
+	linux_cv_k_cppflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} cppflag-check | tail -1)`"
 	linux_cv_k_cppflags_orig="$linux_cv_k_cppflags"])
 	linux_cv_k_cppflags="-nostdinc -isystem `$KCC -print-file-name=include` -iwithprefix include -DLINUX $linux_cv_k_cppflags"
 dnl
@@ -2757,7 +2757,7 @@ dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile fr
 dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_modflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} modflag-check | tail -1`"
+	linux_cv_k_modflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} modflag-check | tail -1)`"
 	linux_cv_k_modflags_orig="$linux_cv_k_modflags"])
 dnl
 dnl	Unfortunately we need to rip the module flags from the kernel source
@@ -2795,7 +2795,7 @@ dnl	Added in KBUILD_EXTMOD because on newer makefiles this keeps the makefile fr
 dnl	rebuild intermediate makefiles not necessary for an external module build.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_bldflags="`${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} bldflag-check | tail -1`"
+	linux_cv_k_bldflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} bldflag-check | tail -1)`"
 	linux_cv_k_bldflags_orig="$linux_cv_k_bldflags"])
 dnl
 dnl	As of 2.6.16+ the KBUILD_BASENAME is stringified on the command line and is no longer
@@ -2826,7 +2826,7 @@ dnl	performed on them).  The target modnameflag-check was added to cflagcheck to
 dnl	from the makefile.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_mnflags="`${srcdir}/scripts/cflagcheck modname=phony srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} mnflag-check | tail -1`"
+	linux_cv_k_mnflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck modname=phony srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} mnflag-check | tail -1)`"
 	linux_cv_k_mnflags_orig="$linux_cv_k_mnflags"])
 	case "$linux_cv_k_mnflags" in
 	    (*KBUILD_MODNAME*)
@@ -2855,7 +2855,7 @@ dnl	debugflag-check was added to cflagcheck to rip these flags from the makefile
 dnl	copyright on the hash.c program, RedHat is responsible for this commerical idiocy.
 dnl
 	linux_builddir=`pwd`
-	linux_cv_k_dhflags="`${srcdir}/scripts/cflagcheck modname=phony srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} dhflag-check | tail -1`"
+	linux_cv_k_dhflags="`(export -n ARCH; ${srcdir}/scripts/cflagcheck modname=phony srctree=${ksrcdir} objtree=${kbuilddir} KERNELRELEASE=${kversion} KERNEL_CONFIG=${kconfig} SPEC_CFLAGS='-g' KERNEL_TOPDIR=${ksrcdir} TOPDIR=${ksrcdir} KBUILD_SRC=${ksrcdir} KBUILD_OUTPUT=${kbuilddir} KBUILD_EXTMOD=${linux_builddir} -I${ksrcdir} -I${khdrdir} -I${kbuilddir} dhflag-check | tail -1)`"
 	linux_cv_k_dhflags_orig="$linux_cv_k_dhflags"])
 	case "$linux_cv_k_dhflags" in
 	    (*DEBUG_HASH*)

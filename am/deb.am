@@ -560,8 +560,7 @@ release-install-debs:
 			eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f" || : ; \
 		fi ; \
 	done ; \
-	files='$(debtop_source_files) $(debtop_change_files) $(debtop_binary_files)' ; \
-	for f in $$files ; do \
+	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test $$f -ef $$t && continue ; \
@@ -579,8 +578,8 @@ release-install-debs:
 release-uninstall-debs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(debtop_source_files) $(debtop_change_files) $(debtop_binary_files)' ; \
-	for f in $$files ; do \
+	@$(ECHO) "D: $@: removing debs" ; \
+	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test -s $$t || continue ; \
@@ -589,14 +588,14 @@ release-uninstall-debs:
 			rm -f -- $$t ; \
 		fi ; \
 	done ; \
-	for f in $$files ; do \
+	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		echo "`dirname $$t`" ; \
 	done | LANG= sort -u | while read d ; do \
 		if test -d $$d ; then \
-			$(ECHO) "  rmdir -p -- $$d" ; \
-			rmdir -p -- $$d 2>/dev/null || : ; \
+			$(ECHO) "  rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || : ; \
 		fi ; \
 	done
 
@@ -612,8 +611,7 @@ RELEASE_UNINSTALL	+= release-uninstall-debs
 update-install-debs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(debtop_update_files)' ; \
-	for f in $$files ; do \
+	@for f in $(debtop_update_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \) ; then \
@@ -630,8 +628,7 @@ update-install-debs:
 update-uninstall-debs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@files='$(debtop_update_files)' ; \
-	for f in $$files ; do \
+	@for f in $(debtop_update_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test -s $$t || continue ; \
@@ -640,14 +637,14 @@ update-uninstall-debs:
 			rm -f -- $$t ; \
 		fi ; \
 	done ; \
-	for f in $$files ; do \
+	for f in $(debtop_update_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		echo "`dirname $$t`" ; \
 	done | LANG= sort -u | while read d ; do \
 		if test -d $$d ; then \
-			$(ECHO) "  rmdir -p -- $$d" ; \
-			rmdir -p -- $$d 2>/dev/null || : ; \
+			$(ECHO) "  rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || : ; \
 		fi ; \
 	done
 
@@ -893,7 +890,10 @@ release-update-apt:
 		for r in main debug devel source '' ; do \
 			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
 			test -d $$dir || continue ; \
-			if test -n "`find $$dir -name '*.deb' 2>/dev/null`" ; then \
+			$(ECHO) "D: $@: processing directory $$dir" ; \
+			debs="`find $$dir -name '*.deb' 2>/dev/null`" ; \
+			dscs="`find $$dir -name '*.dsc' 2>/dev/null`" ; \
+			if test -n "$$debs" ; then \
 				rm -f -- $$dir/Packages $$dir/Packages.gz $$dir/Packages.bz2 $$dir/Packages.xz ; \
 				$(ECHO) "  $(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Packages" ; \
 				$(APT_FTPARCHIVE) packages $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Packages ; \
@@ -917,7 +917,7 @@ release-update-apt:
 					fi ; \
 				done ; \
 			fi ; \
-			if test -n "`find $$dir -name '*.dsc' 2>/dev/null`" ; then \
+			if test -n "$$dscs" ; then \
 				rm -f -- $$dir/Sources $$dir/Sources.gz $$dir/Sources.bz2 $$dir/Sources.xz ; \
 				$(ECHO) "  $(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Sources" ; \
 				$(APT_FTPARCHIVE) sources  $$dir /dev/null | sed 's, '$${repodir}'/, ,' >$$dir/Sources ; \
@@ -941,7 +941,7 @@ release-update-apt:
 					fi ; \
 				done ; \
 			fi ; \
-			if test -n "`find $$dir -name '*.deb' 2>/dev/null`" ; then \
+			if test -n "$$debs" ; then \
 				rm -f -- $$dir/Contents $$dir/Contents.gz $$dir/Contents.bz2 $$dir/Contents.xz ; \
 				$(ECHO) "  $(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents" ; \
 				$(APT_FTPARCHIVE) contents $$dir | sed 's, '$${repodir}'/, ,' >$$dir/Contents ; \
@@ -1014,8 +1014,8 @@ release-update-apt:
 					$(ECHO) "  rm -f -- $$dir/Release.key" ; \
 					rm -f -- $$dir/Release.key ; \
 				fi ; \
-				$(ECHO) "  rmdir -p $$dir" ; \
-				rmdir -p -- $$dir 2>/dev/null || : ; \
+				$(ECHO) "  rmdir -pv $$dir" ; \
+				rmdir -pv -- $$dir || : ; \
 			fi ; \
 		done ; \
 	done

@@ -1486,9 +1486,9 @@ release-update-yum:
 		for r in '' main debug devel source ; do \
 			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
 			$(ECHO) "D: $@: processing directory $$dir" ; \
-			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
+			test -d $$dir || { $(ECHO) "  $(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
 			if test -d $$repodir$${b:+/$$b}/RPMS ; then \
-				test -d $$dir/RPMS || ( $(ECHO) "cd $$dir" ; $(ECHO) "rm -f -- RPMS ; ln -sf -- ../RPMS RPMS" ; cd $$dir; rm -f -- RPMS ; ln -sf -- ../RPMS RPMS ) ; \
+				test -d $$dir/RPMS || ( $(ECHO) "  cd $$dir" ; $(ECHO) "  rm -f -- RPMS ; ln -sf -- ../RPMS RPMS" ; cd $$dir; rm -f -- RPMS ; ln -sf -- ../RPMS RPMS ) ; \
 				f=comps.xml ; d=`pwd`/scripts/ ; \
 				test -f $$d/$$f || d=`(cd $(srcdir); pwd)`/scripts/ ; \
 				g=; test ! -f $$d/$$f || g="-g $$d$$f" ; \
@@ -1503,9 +1503,9 @@ release-update-yum:
 				if test -n "$$rpms" ; then \
 					built_one=yes ; \
 					( \
-						$(ECHO) "cd $$dir" ; cd $$dir ; \
-						test -d repodata || { $(ECHO) "$(MKDIR_P) -- repodata" ; $(MKDIR_P) -- repodata ; } ; \
-						$(ECHO) "echo \"$$rpms\" | sed 's,^'$$dir'/,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g ." ; \
+						$(ECHO) "  cd $$dir" ; cd $$dir ; \
+						test -d repodata || { $(ECHO) "    $(MKDIR_P) -- repodata" ; $(MKDIR_P) -- repodata ; } ; \
+						$(ECHO) "    echo \"$$rpms\" | sed 's,^'$$dir'/,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g ." ; \
 						echo "$$rpms" | sed 's,^'$$dir'/,,' | $(CREATEREPO) -i /dev/stdin -p $(REPOFLAGS) $$g . ; \
 					) ; \
 				fi ; \
@@ -1513,41 +1513,41 @@ release-update-yum:
 				rpms= ; \
 			fi ; \
 			if test -z "$$rpms" ; then \
-				test -L $$dir/RPMS && { $(ECHO) "rm    -fv -- $$dir/RPMS" ; rm    -fv -- $$dir/RPMS || : ; } ; \
-				test -d $$dir/RPMS && { $(ECHO) "rmdir -pv -- $$dir/RPMS" ; rmdir -pv -- $$dir/RPMS || : ; } ; \
+				test -L $$dir/RPMS && { $(ECHO) "  rm    -fv -- $$dir/RPMS" ; rm    -fv -- $$dir/RPMS || : ; } ; \
+				test -d $$dir/RPMS && { $(ECHO) "  rmdir -pv -- $$dir/RPMS" ; rmdir -pv -- $$dir/RPMS || : ; } ; \
 				if test -d $$dir/repodata ; then \
 					for p in '*repomd' '*comps' '*primary' '*filelists' '*other' '*susedata' '*patterns' '*products' '*product' '$(PACKAGE_LCNAME)*' '$(PACKAGE)*' ; do \
 						for e in .xml .xml.gz .xml.asc .xml.key .repo ; do \
 							for f in $$dir/repodata/$${p}$${e} ; do \
-								if test -f $$f ; then $(ECHO) "rm -f -- $$f" ; rm -f -- $$f ; fi ; \
+								if test -f $$f ; then $(ECHO) "  rm -f -- $$f" ; rm -f -- $$f ; fi ; \
 							done ; \
 						done ; \
 					done ; \
-					$(ECHO) "rmdir -pv -- $$dir/repodata" ; \
+					$(ECHO) "  rmdir -pv -- $$dir/repodata" ; \
 					rmdir -pv -- $$dir/repodata || : ; \
 				fi ; \
 				if test -d $$dir ; then \
-					$(ECHO) "rmdir -pv -- $$dir" ; \
+					$(ECHO) "  rmdir -pv -- $$dir" ; \
 					rmdir -pv -- $$dir || : ; \
 				fi ; \
 			else \
 				f="$$dir/repodata/repomd.xml" ; \
 				if test -f $$f ; then a="$$f.asc" ; k="$$f.key" ; \
 					if test ! -f $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1 ; then \
-						test ! -f $$a || $(ECHO) "D: gpg BAD $$a" ; \
+						test ! -f $$a || $(ECHO) "  D: gpg BAD $$a" ; \
 						user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 						home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 						pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
 						pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
-						$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+						$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
 						eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
-						$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
+						$(ECHO) "  $(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
 						$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k; \
 					else \
-						$(ECHO) "D: gpg OK  $$a" ; \
+						$(ECHO) "  D: gpg OK  $$a" ; \
 					fi ; \
 				fi ; \
-				$(ECHO) "D: $@: generating $$dir/repodata/susedata.xml" ; \
+				$(ECHO) "  D: $@: generating $$dir/repodata/susedata.xml" ; \
 				( \
 					numb="`echo "$$rpms" | wc -l`" ; \
 					$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
@@ -1571,17 +1571,17 @@ release-update-yum:
 					done ; \
 					$(ECHO) '</susedata>' \
 				) >susedata.xml ; \
-				$(ECHO) "rm -f -- $$dir/repodata/susedata.xml" ; \
+				$(ECHO) "    rm -f -- $$dir/repodata/susedata.xml" ; \
 				rm -f -- $$dir/repodata/susedata.xml ; \
-				$(ECHO) "rm -f -- $$dir/repodata/*-susedata.xml" ; \
+				$(ECHO) "    rm -f -- $$dir/repodata/*-susedata.xml" ; \
 				rm -f -- $$dir/repodata/*-susedata.xml 2>/dev/null || : ; \
-				$(ECHO) "$(MODIFYREPO) susedata.xml $$dir/repodata" ; \
+				$(ECHO) "    $(MODIFYREPO) susedata.xml $$dir/repodata" ; \
 				$(MODIFYREPO) susedata.xml $$dir/repodata ; \
-				$(ECHO) "( cd $$dir/repodata ; ls -t *-susedata.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f susedata.xml ; fi )" ; \
+				$(ECHO) "    ( cd $$dir/repodata ; ls -t *-susedata.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f susedata.xml ; fi )" ; \
 				( cd $$dir/repodata ; ls -t *-susedata.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f susedata.xml ; fi ) ; \
-				$(ECHO) "rm -f -- susedata.xml" ; \
+				$(ECHO) "    rm -f -- susedata.xml" ; \
 				rm -f -- susedata.xml ; \
-				$(ECHO) "D: $@: generating $$dir/repodata/product.xml" ; \
+				$(ECHO) "  D: $@: generating $$dir/repodata/product.xml" ; \
 				( \
 					if test -f scripts/product$${b:+-$$b}.xml ; then \
 						cat scripts/product$${b:+-$$b}.xml ; \
@@ -1626,17 +1626,17 @@ release-update-yum:
 						$(ECHO) '</product>' ; \
 					fi ; \
 				) >product.xml ; \
-				$(ECHO) "rm -f -- $$dir/repodata/product.xml" ; \
+				$(ECHO) "    rm -f -- $$dir/repodata/product.xml" ; \
 				rm -f -- $$dir/repodata/product.xml ; \
-				$(ECHO) "rm -f -- $$dir/repodata/*-product.xml" ; \
+				$(ECHO) "    rm -f -- $$dir/repodata/*-product.xml" ; \
 				rm -f -- $$dir/repodata/*-product.xml 2>/dev/null || : ; \
-				$(ECHO) "$(MODIFYREPO) product.xml $$dir/repodata" ; \
+				$(ECHO) "    $(MODIFYREPO) product.xml $$dir/repodata" ; \
 				$(MODIFYREPO) product.xml $$dir/repodata ; \
-				$(ECHO) "( cd $$dir/repodata ; ls -t *-product.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f product.xml ; fi )" ; \
+				$(ECHO) "    ( cd $$dir/repodata ; ls -t *-product.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f product.xml ; fi )" ; \
 				( cd $$dir/repodata ; ls -t *-product.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f product.xml ; fi ) ; \
-				$(ECHO) "rm -f -- product.xml" ; \
+				$(ECHO) "    rm -f -- product.xml" ; \
 				rm -f -- product.xml ; \
-				$(ECHO) "D: $@: generating $$dir/repodata/products.xml" ; \
+				$(ECHO) "  D: $@: generating $$dir/repodata/products.xml" ; \
 				( \
 					if test -f scripts/products$${b:+-$$b}.xml ; then \
 						cat scripts/products$${b:+-$$b}.xml ; \
@@ -1676,19 +1676,19 @@ release-update-yum:
 						$(ECHO) '</products>' ; \
 					fi ; \
 				) >products.xml ; \
-				$(ECHO) "rm -f -- $$dir/repodata/products.xml" ; \
+				$(ECHO) "    rm -f -- $$dir/repodata/products.xml" ; \
 				rm -f -- $$dir/repodata/products.xml ; \
-				$(ECHO) "rm -f -- $$dir/repodata/*-products.xml" ; \
+				$(ECHO) "    rm -f -- $$dir/repodata/*-products.xml" ; \
 				rm -f -- $$dir/repodata/*-products.xml 2>/dev/null || : ; \
-				$(ECHO) "$(MODIFYREPO) products.xml $$dir/repodata" ; \
+				$(ECHO) "    $(MODIFYREPO) products.xml $$dir/repodata" ; \
 				$(MODIFYREPO) products.xml $$dir/repodata ; \
-				$(ECHO) "( cd $$dir/repodata ; ls -t *-products.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f products.xml ; fi )" ; \
+				$(ECHO) "    ( cd $$dir/repodata ; ls -t *-products.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f products.xml ; fi )" ; \
 				( cd $$dir/repodata ; ls -t *-products.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f products.xml ; fi ) ; \
-				$(ECHO) "rm -f -- products.xml" ; \
+				$(ECHO) "    rm -f -- products.xml" ; \
 				rm -f -- products.xml ; \
 				if test "$${r:-full}" = full ; then \
 					tardir=`echo '$(tardir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
-					$(ECHO) "D: $@: generating $$dir/repodata/$(PACKAGE).repo" ; \
+					$(ECHO) "  D: $@: generating $$dir/repodata/$(PACKAGE).repo" ; \
 					for bb in '' updates extras testing $$rb ; do \
 						test "$${b:-base}" = base -o "$$b" = "$$bb" || continue ; \
 						bran=`echo "$${bb:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
@@ -1707,7 +1707,7 @@ release-update-yum:
 							$(ECHO) ""; \
 						done ; \
 					done >$$dir/repodata/$(PACKAGE).repo ; \
-					$(ECHO) "D: $@: generating $$dir/repodata/$(PACKAGE)-local.repo" ; \
+					$(ECHO) "  D: $@: generating $$dir/repodata/$(PACKAGE)-local.repo" ; \
 					for bb in '' updates extras testing $$rb ; do \
 						test "$${b:-base}" = base -o "$$b" = "$$bb" || continue ; \
 						bran=`echo "$${bb:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
@@ -1725,7 +1725,7 @@ release-update-yum:
 						done ; \
 					done >$$dir/repodata/$(PACKAGE)-local.repo; \
 				else \
-					$(ECHO) "D: $@: skipping repo build for $$dir" ; \
+					$(ECHO) "  D: $@: skipping repo build for $$dir" ; \
 				fi ; \
 			fi ; \
 		done ; \
