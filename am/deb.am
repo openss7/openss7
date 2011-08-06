@@ -200,8 +200,7 @@ AM_BINARY_TARGET = binary-arch
 ##
 each-deb: $(debian_dir_stamp)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	rm -f -- $(debian_dir_stamp)
-	$(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
+	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
 	( cd $(debian_dir); BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
 #	( cd $(debian_dir); dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" $(AM_BINARY_TARGET) )
 

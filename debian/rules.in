@@ -552,7 +552,7 @@ build:
 	rm -f $(control)
 	case " $(BUILD_CFGOPTIONS) " in \
 		(*" --disable-arch "*) ;; \
-		(*) rm -f $(cache_file) $(csite_file) $(mpost_file) ;; \
+		(*) echo "rm -f $(cache_file) $(csite_file) $(mpost_file)" ;; \
 	esac
 	dh_auto_configure -- \
 		CONFIG_SITE='$(csite_file)' \
@@ -566,7 +566,10 @@ build:
 		$(BUILD_CFGOPTIONS) \
 		|| { rm -f $(cache_file) $(csite_file) $(mpost_file) ; exit 1 ; }
 	$(MAKE)
-	$(MAKE) check check-clean
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --diasble-arch "*|*" --disable-indep "*|*" --disable-tools "*|*" --disable-modules "*) ;; \
+	(*) $(MAKE) check check-clean ;; \
+	esac
 	chmod +x debian/rules
 	if [ -z '@WITH_K_PACKAGE_TRUE@' ] ; then \
 		mkdir -p $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@ ; \
