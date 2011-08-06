@@ -679,22 +679,28 @@ binary-common:
 #  binary packages and not the indep binary packages.
 #
 binary-indep: DH_OPTIONS = -i
-binary-indep: install
-	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	DH_OPTIONS= ; \
-	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-repo" ; \
-	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@" ; \
-	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-base" ; \
-	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-doc" ; \
-	DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-javadoc" ; \
-	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" binary-common
-
-binary-arch: DH_OPTIONS = -s
-binary-arch: install
+binary-indep:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	DH_OPTIONS= ; \
 	case " $(BUILD_CFGOPTIONS) " in \
-	(*" --disable-tools "*) ;; \
+	(*" --disable-indep "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-repo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-base" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-doc" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-javadoc" ; \
+		;; \
+	esac ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" install ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" binary-common
+
+binary-arch: DH_OPTIONS = -s
+binary-arch:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	DH_OPTIONS= ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-tools "*) ;; \
 	(*) \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-lib" ; \
 		if test -z "@WITH_32BIT_LIBS_TRUE@"; then \
@@ -707,7 +713,7 @@ binary-arch: install
 		;; \
 	esac ; \
 	case " $(BUILD_CFGOPTIONS) " in \
-	(*" --disable-modules "*) ;; \
+	(*" --disable-arch "*|*" --disable-modules "*) ;; \
 	(*) \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)" ; \
 		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-devel" ; \
@@ -718,26 +724,64 @@ binary-arch: install
 		fi ; \
 		;; \
 	esac ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" install ; \
 	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" binary-common
 
 binary: DH_OPTIONS = -i -s
-binary: install
+binary:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	$(MAKE) -f debian/rules binary-indep
-	$(MAKE) -f debian/rules binary-arch
+	DH_OPTIONS= ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-indep "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-repo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-base" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-doc" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-javadoc" ; \
+		;; \
+	esac ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-tools "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-lib" ; \
+		if test -z "@WITH_32BIT_LIBS_TRUE@"; then \
+			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-compat" ; \
+		fi ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-devel" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-debuginfo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-debugsource" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-java" ; \
+		;; \
+	esac ; \
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-modules "*) ;; \
+	(*) \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-devel" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debuginfo" ; \
+		DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-debugsource" ; \
+		if test -z "@WITH_K_PACKAGE_TRUE@" ; then \
+			DH_OPTIONS="$${DH_OPTIONS}$${DH_OPTIONS:+ }-p@PACKAGE@-$(kversion)-source" ; \
+		fi ; \
+		;; \
+	esac ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" install ; \
+	$(MAKE) -f debian/rules DH_OPTIONS="$${DH_OPTIONS}" binary-common
 
 #
 #   Another way that we can be invoked is with a specific package name.
 #
 binary-@PACKAGE@-%: DH_OPTIONS = -p@PACKAGE@-$*
-binary-@PACKAGE@-%: install
+binary-@PACKAGE@-%:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$* install
 	$(MAKE) -f debian/rules DH_OPTIONS=-p@PACKAGE@-$* binary-common
 
 get-orig-source:
 	wget https://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.bz2
 
-.PHONY: build clean install \
+.PHONY: build clean install binary-common \
 	binary-indep binary-arch binary \
 	get-orig-source
 
