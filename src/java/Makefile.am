@@ -3707,8 +3707,7 @@ my_tcap_CLASSFILES = \
 	org/openss7/tcap/TC_info_ack_t.class \
 	org/openss7/tcap/t_opthdr.class
 my_tcap_SOURCEFILES = \
-	org/openss7/tcap/tcap_wrap.cxx \
-	org/openss7/tcap/tcap.hh
+	org/openss7/tcap/tcap_wrap.cxx
 
 #nodist_lib_org_openss7_tcap_la_SOURCES = org-openss7-tcap.jar
 lib_org_openss7_tcap_la_SOURCES	       = $(my_tcap_JAVAFILES)
@@ -3731,6 +3730,7 @@ MY_SECONDARY		+= $(my_xti_CLASSFILES)
 my_jar_CLASSFILES	+= $(my_xti_CLASSFILES)
 
 nodist_libopenss7TcapJNI_la_SOURCES = $(my_tcap_SOURCEFILES)
+libopenss7TcapJNI_la_SOURCES 	    = org/openss7/tcap/tcap.hh
 ## Note: SWIG is really bad at using aliasing in Java JNI files.
 libopenss7TcapJNI_la_CPPFLAGS	    = -I$(builddir)/org/openss7/tcap -I$(srcdir)/org/openss7/tcap $(GCJLIB_INCLUDES) -DJNICALL=
 libopenss7TcapJNI_la_CFLAGS	    = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-aliasing
