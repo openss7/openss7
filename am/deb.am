@@ -198,11 +198,11 @@ AM_BINARY_TARGET = binary-arch
 ## This is the type of thing that needs to be included in the master makefile to build debs for the
 ## current target, we also build any defined AM_DEBTARGETS
 ##
-each-deb: $(debian_dir_stamp)
+each-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
-	( cd $(debian_dir); BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
-#	( cd $(debian_dir); dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- "BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)'" $(AM_BINARY_TARGET) )
+	( cd $(debian_dir); eval "`dpkg-buildflags --export=sh`"; dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' build $(AM_BINARY_TARGET) )
+#	( cd $(debian_dir); BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
 
 noa-deb: AM_DEBBOPTS = -A
 noa-deb: AM_DEBXOPTS = -d
@@ -222,11 +222,17 @@ one-t-deb: one-deb
 one-k-deb: BUILD_MOREOPTIONS = --disable-tools
 one-k-deb: one-deb
 
+full-deb: $(debian_dir_stamp)
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
+	( cd $(debian_dir); BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' kversion='$(kversion)' debbuilddir='$(debbuilddir)' $(DPKG_BUILDPACKAGE) $(AM_DEBBOPTS) -rfakeroot -uc $(AM_DEBXOPTS) -nc )
+#	( cd $(debian_dir); dpkg-architecture -c fakeroot $(MAKE) $(AM_MAKEFLAGS) -f debian/rules -- BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(BUILD_MOREOPTIONS)' $(AM_BINARY_TARGET) )
+
 all-deb: AM_DEBBOPTS = -b
 all-deb: AM_DEBXOPTS = -d
 all-deb: BUILD_CFGOPTIONS =
 all-deb: AM_BINARY_TARGET = binary
-all-deb: each-deb
+all-deb: full-deb
 
 chg-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -371,7 +377,7 @@ RELEASECLEANFILES	+= $(debian_dir_stamp) \
 			   $(debtop_change_files) \
 			   $(debtop_binary_files)
 
-MY_PHONY		+= dsc debs each-deb one-t-deb one-k-deb one-deb noa-deb all-deb sigs csig reupload
+MY_PHONY		+= dsc debs full-deb each-deb one-t-deb one-k-deb one-deb noa-deb all-deb sigs csig reupload
 ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-t-deb all-one-k-deb all-one-deb all-noa-deb all-all-deb all-chg-deb all-sigs all-csig all-reupload
 
 update-clean-deb:

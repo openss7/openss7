@@ -202,6 +202,31 @@ Description: user library and program debugging source.
  information is useful when developing applications that use
  this package or when debugging this package.
 
+Package: @PACKAGE_LCNAME@-java
+Architecture: any
+Section: java
+Priority: optional
+Depends: @PACKAGE_LCNAME@-lib (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Suggests: @PACKAGE_LCNAME@-javadoc (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Description: java class libraries and jar files.
+ The @PACKAGE_LCNAME@-java binary package contains JAIN implementations
+ for @PACKAGE_TITLE@.  It includes jar files, JNI and CNI libraries, and
+ gcj native compile libraries.  It also includes SWIG
+ implementations of Java interfaces for @PACKAGE_TITLE@ API libraries.
+
+Package: @PACKAGE_LCNAME@-javadoc
+Architecture: all
+Section: javadoc
+Priority: optional
+Depends: @PACKAGE_LCNAME@ (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Suggests: @PACKAGE_LCNAME@-java (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
+Description: javadoc documentation.
+ The @PACKAGE_LCNAME@-javadoc binary package contains Javadoc
+ documentation for @PACKAGE_TITLE@.  Install this binary package if you
+ are interested in developing JAIN applications or resource
+ adaptors.  This package is not normally required on other than a
+ development system.
+
 Package: @PACKAGE_LCNAME@-@kversion@
 Architecture: any
 Section: kernel
@@ -283,29 +308,4 @@ Description: kernel module debugging source for @kversion@.
 @WITH_K_PACKAGE_TRUE@ use the tarball release.  Load this package if you need some
 @WITH_K_PACKAGE_TRUE@ files from the build that are not present in the
 @WITH_K_PACKAGE_TRUE@ @PACKAGE_LCNAME@-@kversion@-devel package.
-
-Package: @PACKAGE_LCNAME@-java
-Architecture: any
-Section: java
-Priority: optional
-Depends: @PACKAGE_LCNAME@-lib (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
-Suggests: @PACKAGE_LCNAME@-javadoc (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
-Description: java class libraries and jar files.
- The @PACKAGE_LCNAME@-java binary package contains JAIN implementations
- for @PACKAGE_TITLE@.  It includes jar files, JNI and CNI libraries, and
- gcj native compile libraries.  It also includes SWIG
- implementations of Java interfaces for @PACKAGE_TITLE@ API libraries.
-
-Package: @PACKAGE_LCNAME@-javadoc
-Architecture: all
-Section: javadoc
-Priority: optional
-Depends: @PACKAGE_LCNAME@ (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
-Suggests: @PACKAGE_LCNAME@-java (= @PACKAGE_DEBEPOCH@:@VERSION@-@PACKAGE_DEBRELEASE@)
-Description: javadoc documentation.
- The @PACKAGE_LCNAME@-javadoc binary package contains Javadoc
- documentation for @PACKAGE_TITLE@.  Install this binary package if you
- are interested in developing JAIN applications or resource
- adaptors.  This package is not normally required on other than a
- development system.
 
