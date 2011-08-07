@@ -567,7 +567,7 @@ build:
 		|| { rm -f $(cache_file) $(csite_file) $(mpost_file) ; exit 1 ; }
 	$(MAKE)
 	case " $(BUILD_CFGOPTIONS) " in \
-	(*" --diasble-arch "*|*" --disable-indep "*|*" --disable-tools "*|*" --disable-modules "*) ;; \
+	(*" --disable-arch "*|*" --disable-indep "*|*" --disable-tools "*|*" --disable-modules "*) ;; \
 	(*) $(MAKE) check check-clean ;; \
 	esac
 	chmod +x debian/rules
