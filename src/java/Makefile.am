@@ -3707,7 +3707,8 @@ my_tcap_CLASSFILES = \
 	org/openss7/tcap/TC_info_ack_t.class \
 	org/openss7/tcap/t_opthdr.class
 my_tcap_SOURCEFILES = \
-	org/openss7/tcap/tcap_wrap.cxx
+	org/openss7/tcap/tcap_wrap.cxx \
+	org/openss7/tcap/tcap.hh
 
 #nodist_lib_org_openss7_tcap_la_SOURCES = org-openss7-tcap.jar
 lib_org_openss7_tcap_la_SOURCES	       = $(my_tcap_JAVAFILES)
