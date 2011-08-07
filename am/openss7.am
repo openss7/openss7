@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-07-27 07:52:11 $
+# @(#) $RCSfile: openss7.am,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2011-08-07 11:14:24 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-07-27 07:52:11 $ by $Author: brian $
+## Last Modified $Date: 2011-08-07 11:14:24 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -1250,6 +1250,9 @@ DISTCLEANFILES		+= $(CONFIG_BLDREQ)
 ## =============================================================================
 ##
 ## $Log: openss7.am,v $
+## Revision 1.1.2.14  2011-08-07 11:14:24  brian
+## - mostly mandriva and ubuntu build updates
+##
 ## Revision 1.1.2.13  2011-07-27 07:52:11  brian
 ## - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
 ##

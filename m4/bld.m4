@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-07-27 07:52:18 $
+# @(#) $RCSfile: bld.m4,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-08-07 11:14:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-07-27 07:52:18 $ by $Author: brian $
+# Last Modified $Date: 2011-08-07 11:14:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -721,6 +721,9 @@ AC_DEFUN([_BLD_], [dnl
 # =============================================================================
 #
 # $Log: bld.m4,v $
+# Revision 1.1.2.10  2011-08-07 11:14:37  brian
+# - mostly mandriva and ubuntu build updates
+#
 # Revision 1.1.2.9  2011-07-27 07:52:18  brian
 # - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
 #

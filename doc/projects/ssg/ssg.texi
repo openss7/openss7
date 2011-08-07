@@ -2,7 +2,7 @@
 % vim: ft=texinfo nosmartindent nocindent noautoindent tw=100
 % =========================================================================
 %
-% @(#) $Id: ssg.texi,v 1.1.2.3 2011-07-27 07:52:17 brian Exp $
+% @(#) $Id: ssg.texi,v 1.1.2.4 2011-08-07 11:14:30 brian Exp $
 %
 % =========================================================================
 %
@@ -82,7 +82,7 @@
 % 
 % =========================================================================
 %
-% Last Modified $Date: 2011-07-27 07:52:17 $ by $Author: brian $
+% Last Modified $Date: 2011-08-07 11:14:30 $ by $Author: brian $
 %
 % =========================================================================
 
@@ -458,6 +458,9 @@ Project} website for a current version.
 @smallexample
 @verbatim
 $Log: ssg.texi,v $
+Revision 1.1.2.4  2011-08-07 11:14:30  brian
+- mostly mandriva and ubuntu build updates
+
 Revision 1.1.2.3  2011-07-27 07:52:17  brian
 - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
 
