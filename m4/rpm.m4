@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2011-07-27 07:52:19 $
+# @(#) $RCSfile: rpm.m4,v $ $Name:  $($Revision: 1.1.2.15 $) $Date: 2011-08-07 11:14:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-07-27 07:52:19 $ by $Author: brian $
+# Last Modified $Date: 2011-08-07 11:14:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -1007,6 +1007,9 @@ AC_DEFUN([_RPM_], [dnl
 # =============================================================================
 #
 # $Log: rpm.m4,v $
+# Revision 1.1.2.15  2011-08-07 11:14:37  brian
+# - mostly mandriva and ubuntu build updates
+#
 # Revision 1.1.2.14  2011-07-27 07:52:19  brian
 # - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
 #

@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.13 $) $Date: 2011-07-27 07:52:18 $
+# @(#) $RCSfile: genksyms.m4,v $ $Name:  $($Revision: 1.1.2.14 $) $Date: 2011-08-07 11:14:37 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-07-27 07:52:18 $ by $Author: brian $
+# Last Modified $Date: 2011-08-07 11:14:37 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -503,6 +503,9 @@ AC_DEFUN([_KSYMS_], [dnl
 # =============================================================================
 #
 # $Log: genksyms.m4,v $
+# Revision 1.1.2.14  2011-08-07 11:14:37  brian
+# - mostly mandriva and ubuntu build updates
+#
 # Revision 1.1.2.13  2011-07-27 07:52:18  brian
 # - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
 #
