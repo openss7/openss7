@@ -87,7 +87,7 @@ DIST_HOOK		+= deb-rules-check
 ##
 dist-best: distdir
 	@WITH_BZIP2_TRUE@tardir=$(distdir) && ( $(am__tar) | GZIP=$(GZIP_ENV) $(GZIP_CMD) $(GZIP) -c >$(distdir).tar.gz )
-	tardir=$(distdir) && ( $(am__tar) | $(BZIP2_CMD) $(BZIP) -c >$(distdir).tar.bz2 )
+	tardir=$(distdir) && ( $(am__tar) | $(BZIP2_CMD) $(BZIP2) -c >$(distdir).tar.bz2 )
 	@WITH_LZMA_TRUE@tardir=$(distdir) && ( $(am__tar) | $(LZMA_CMD) $(LZMA) -c >$(distdir).tar.lzma )
 	@WITH_XZ_TRUE@tardir=$(distdir) && ( $(am__tar) | $(XZ_CMD) $(XZ) -c >$(distdir).tar.xz )
 	$(am__remove_distdir)

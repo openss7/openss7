@@ -571,14 +571,28 @@ build:
 	(*) $(MAKE) check check-clean ;; \
 	esac
 	chmod +x debian/rules
+
+clean:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	dh_testdir
+	dh_testroot
+	rm -fr @PACKAGE@-@VERSION@
+	[ ! -f Makefile ] || $(MAKE) clean
+	rm -f $(control)
+	rm -fr $(debtmpdir)
+
+install:
+	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
+	dh_testdir
+	dh_testroot
+	dh_prep
+	rm -fr $(debtmpdir)
 	if [ -z '@WITH_K_PACKAGE_TRUE@' ] ; then \
 		mkdir -p $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@ ; \
 		tar cf - --exclude=$(debtmpdir) --exclude=@PACKAGE@-@VERSION@ . | \
 			gzip -c > $(debtmpdir)/usr/src/@PACKAGE@-@VERSION@.tar.gz ; \
 	fi
-	dh_clean -k
-	dh_prep
-	[ -d $(debtmpdir) ] || mkdir -p -- $(debtmpdir)
+	mkdir -p $(debtmpdir)
 	$(MAKE) DESTDIR=`pwd`/$(debtmpdir) install
 	case " $(BUILD_CFGOPTIONS) " in \
 	(*" --disable-arch "*) ;; \
@@ -629,17 +643,7 @@ build:
 		    $(MAKE) -f debian/rules $(control_k) ;; \
 	esac
 
-clean:
-	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	dh_testdir
-	dh_testroot
-	rm -fr @PACKAGE@-@VERSION@
-	[ ! -f Makefile ] || $(MAKE) clean
-	rm -f $(control)
-	rm -fr $(debtmpdir)
-	dh_clean -k
-
-install:
+binary-common:
 	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
 	dh_testdir
 	dh_testroot
@@ -666,11 +670,6 @@ install:
 	dh_shlibdeps -X.ko -X.o -L @PACKAGE@-lib -l `pwd`/debian/@PACKAGE@-lib/usr/lib
 	dh_installdeb
 	dh_perl
-
-binary-common:
-	@echo "Target $@ invoked in `pwd` with DH_OPTIONS='$(DH_OPTIONS)'"
-	dh_testdir
-	dh_testroot
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
