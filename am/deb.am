@@ -149,7 +149,9 @@ $(debian_dir_stamp): $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 ##
 $(debian_dsc_file) $(debian_tar_file):: $(debian_dir_stamp)
 	[ -d $(debian_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(debian_dir)
-	( cd $(debian_dir); BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(AM_DEBXOPTS) )
+	( cd $(debian_dir); [ -d debian/source ] || $(MKDIR_P) -- debian/source ; \
+	  $(ECHO) "3.0 (native)" >debian/source/format ; \
+	  BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS)' $(DPKG_BUILDPACKAGE) -S -rfakeroot -us -uc $(AM_DEBXOPTS) )
 #	(cd "$(debbuilddir)"; $(DPKG_SOURCE) -b -sn $(debian_dir))
 
 $(debtop_dsc_file) $(debtop_tar_file)::
@@ -405,7 +407,7 @@ UPDATECLEANFILES	+= $(debian_dir_stamp) \
 ##
 update-dscs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@list="$(debtop_dsc_file)"; for f in $$list; do \
+	@list="$(debtop_dsc_file) $(debtop_tar_file)"; for f in $$list; do \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \) ; then \
 			g=`$(ECHO) "$$f" | sed 's,^$(debdir),$(debian_dir),'`; \
 			$(ECHO) "D: $@: rebuild $$f" ; \
@@ -496,6 +498,27 @@ update-debs:
 		$(ECHO) "D: $@: skipped changes"; \
 	fi
 
+## Provide updates to debian binary package changes.
+##
+update-chgs:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@( \
+		cd $(debian_dir) ; \
+		eval "`dpkg-architecture`" ; \
+		{ \
+			cat ../control | sed '/^$$/,$$d' ; \
+			$(ECHO) "" ; \
+			for f in $(debian_binary_files) ; do \
+				test -s $$f || continue ; \
+				$(ECHO) "  $(DPKG) --info $$f | sed -n '/^ Package/,$$s,^ ,,p' | egrep -v '^(Version|Installed)'" >&2 ; \
+				$(DPKG) --info $$f | sed -n '/^ Package/,$$s,^ ,,p' | \
+					sed '/^Architecture/s,'$$DEB_HOST_ARCH',any,' | \
+					egrep -v '^(Version|Installed|Source|Origin|Bugs|Maintainer)' ; \
+				$(ECHO) "" ; \
+			done ; \
+		} >$(debian_dir)/debian/control ; \
+		dpkg-genchanges -b >../$(debianpkg)_$${DEB_HOST_ARCH}.changes ; \
+	)
 
 ## Provide updates to debian source package signatures.
 ##
@@ -530,10 +553,6 @@ update-csig:
 			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) -- "$$f" "$$s"; \
 		fi; \
 	done
-
-## Provide updates to debian binary package changes.
-##
-update-chgs:
 
 MY_PHONY		+= update-dscs update-debs update-chgs update-csig update-sigs
 ALL_RECURSIVE_TARGETS	+= all-update-dscs all-update-debs all-update-chgs all-update-csig all-update-sigs
