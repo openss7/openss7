@@ -980,6 +980,8 @@ dnl
     AC_SUBST([aptrsrcsdir])dnl
     aptrsrpmdir='$(aptrdir)/SRPMS.source'
     AC_SUBST([aptrsrpmdir])dnl
+    aptrfsrcdir='$(aptrdir)/SRPMS.full'
+    AC_SUBST([aptrfsrcdir])dnl
 ])# _RPM_REPO_SETUP_APT
 # =============================================================================
 
