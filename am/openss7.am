@@ -1052,7 +1052,7 @@ $(UPDATE_DIRECTORIES)::
 #! Update Targets:
 #! ---------------
 #!
-#! The following are tagets used to update complete releases into and existing
+#! The following are targets used to update complete releases into and existing
 #! package distribution directory.  These are good for unattended NFS builds,
 #! which is what I use them for.  Also, when building from atop multiple
 #! packages, these targets also recurse down through each package.  They may

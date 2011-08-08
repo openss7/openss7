@@ -630,13 +630,13 @@ install:
 		(*) echo "$(MAKE) -f debian rules $(control_n)" ; \
 		    $(MAKE) -f debian/rules $(control_n) ;; \
 	esac
-	@case " $(BUILD_CFG_OPTIONS) " in \
+	@case " $(BUILD_CFGOPTIONS) " in \
 		(*" --disable-arch "*) ;; \
 		(*" --disable-tools "*) ;; \
 		(*) echo "$(MAKE) -f debian/rules $(control_t)" ; \
 		    $(MAKE) -f debian/rules $(control_t) ;; \
 	esac
-	@case " $(BUILD_CFG_OPTIONS) " in \
+	@case " $(BUILD_CFGOPTIONS) " in \
 		(*" --disable-arch "*) ;; \
 		(*" --disable-modules "*) ;; \
 		(*) echo "$(MAKE) -f debian/rules $(control_k)" ; \
@@ -673,6 +673,23 @@ binary-common:
 	dh_gencontrol
 	dh_md5sums
 	dh_builddeb
+	case " $(BUILD_CFGOPTIONS) " in \
+	(*" --disable-arch "*|*" --disable-indep "*|*" --disable-tools "*|*" --disable-modules "*) \
+		{ \
+			cat debian/control | sed '/^$$/,$$d' ; \
+			echo "" ; \
+			for f in ../*[ud.]deb ; do \
+				test -s $$f || continue ; \
+				echo "  dpkg --info $$f" >&2 ; \
+				dpkg --info $$f | sed -n '/^ Package/,$$s,^ ,,p' | \
+					sed '/^Architecture/s,'$$DEB_HOST_ARCH',any,' | \
+					egrep -v '^(Version|Installed|Source|Origin|Bugs|Maintainer)' ; \
+				echo "" ; \
+			done ; \
+		} >debian/control.new ; \
+		mv -f -- debian/control.new debian/control ; \
+		;; \
+	esac
 
 #
 #  dkpg-buildpackage invoke this makefile in one of two ways: with the -b flag,

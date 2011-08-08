@@ -324,11 +324,11 @@ rpms:
 	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion='$(kversion)' RPMTARGET='$(RPMTARGET)' one-t-rpm || :
 
 ## Another sneaky trick
-all-one-k-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-one-t-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-one-rpm:   ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-noa-rpm:   ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
-all-rpms:      ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+all-one-k-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-one-t-rpm: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-one-rpm:   ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-noa-rpm:   ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
+all-rpms:      ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 
 #! sign srpm-sign:
 #!     These two targets are the same.  When invoked, they will add a signature
@@ -362,13 +362,13 @@ rpmsort = sed 's,-,..,' | sort -n '-t.' -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 -k7,
 #!     architectures and kernels that do not already exist in the package
 #!     distribution directory.
 #!
-rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 rebuild:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 	if test -z "$$rpms" -o -n '$(FORCE)'; then \
 		$(ECHO) "D: $@: rebuild noarch"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="noarch" noa-rpm || :; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET="noarch" noa-rpm || :; \
 	else \
 		$(ECHO) "D: $@: skipped noarch"; \
 	fi; \
@@ -390,7 +390,7 @@ rebuild:
 			rpms="`( find $(rpmdir)/$$a -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' | egrep -- "$$ks"'.*\.'"$$a"'\.rpm$$' ) 2>/dev/null`"; \
 			if test -z "$$rpms" -o -n '$(FORCE)'; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
-				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$$k" RPMTARGET="$$t" one-k-rpm || :; \
+				$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" RPMTARGET="$$t" one-k-rpm || :; \
 			else \
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
@@ -398,7 +398,7 @@ rebuild:
 		rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
 		if test -z "$$rpms" -o -n '$(FORCE)'; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
-			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="$$t" one-t-rpm || :; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET="$$t" one-t-rpm || :; \
 		else \
 			$(ECHO) "D: $@: skipped $$a"; \
 		fi; \
@@ -411,7 +411,7 @@ rebuild:
 #!     password.  Automated or unattended builds can be acheived with the
 #!     `emake' expect script located here: `@abs_srcdir@/scripts/emake'.
 #!
-resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 resign: sign
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' 2>/dev/null`; \
@@ -591,10 +591,14 @@ update-srpm:
 		fi; \
 	done
 
+## Update one architecture independent rpm.  Don't create a new rpm unless there the rpm is missing
+## from both the distribution directory and the repository.
+##
 update-n-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	rebuild=yes; \
-	rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
+	repodir=`echo '$(rpmdir)' | sed 's,^$(DISTDIR),$(REPODIR),'`; \
+	rpms=`(find $(rpmdir)/noarch $$repodir/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' | LANG= sort -u) 2>/dev/null`; \
 	for f in $$rpms; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
@@ -603,25 +607,25 @@ update-n-rpm:
 	done; \
 	if test ":$$rebuild" = :yes; then \
 		$(ECHO) "D: $@: rebuild noarch"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="noarch" noa-rpm || :; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET="noarch" noa-rpm || :; \
 	else \
 		$(ECHO) "D: $@: skipped noarch"; \
 	fi
 
+## Update one kernel module rpm.  Don't create a new rpm unless the rpm is missing from both the
+## distribution directory and the repository.
+##
 update-k-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	a=`echo '$(RPMTARGET)' | sed 's,-.*$$,,'`; \
 	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
 	test -e $(DESTDIR)$(rootdir)/lib/modules/$(kversion)/build || exit 0; \
 	test -e $(DESTDIR)$(rootdir)/boot/System.map-$(kversion) || exit 0; \
-	if test -z '$(DESTDIR)'; then \
-		if ! $(RPM) -q --whatprovides /lib/modules/$(kversion)/build >/dev/null 2>&1; then \
-			exit 0; \
-		fi; \
-	fi; \
+	test -n '$(DESTDIR)' || $(RPM) -q --whatprovides /lib/modules/$(kversion)/build >/dev/null 2>&1 || exit 0; \
 	rebuild=yes; \
 	ks=`echo '$(kversion)' | sed -rn 's,^(.*)-([a-zA-Z][a-zA-Z0-9]*)$$,\2.*\1,;t good;s,^(.*)$$,.*\1,;: good s,[_-],.,g;s,^,-,p'`; \
-	rpms="`( find $(rpmdir)/$$a -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' | egrep -- "$$ks"'.*\.'"$$a"'\.rpm$$' ) 2>/dev/null`"; \
+	repodir=`echo '$(rpmdir)' | sed 's,^$(DISTDIR),$(REPODIR),'`; \
+	rpms="`(find $(rpmdir)/$$a $$repodir/$$a -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' | egrep -- "$$ks"'.*\.'"$$a"'\.rpm$$' | LANG= sort -u) 2>/dev/null`"; \
 	for f in $$rpms; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
@@ -630,17 +634,21 @@ update-k-rpm:
 	done; \
 	if test ":$$rebuild" = :yes; then \
 		$(ECHO) "D: $@: rebuild $(kversion)"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" one-k-rpm || :; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$(kversion)" RPMTARGET="$(RPMTARGET)" one-k-rpm || :; \
 	else \
 		$(ECHO) "D: $@: skipped $(kversion)"; \
 	fi
 
+## Update one tools rpm.  Don't create a new rpm unless the rpm is missing from both the
+## distribution directory and the repository.
+##
 update-t-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	a=`echo '$(RPMTARGET)' | sed 's,-.*$$,,'`; \
 	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
 	rebuild=yes; \
-	rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
+	repodir=`echo '$(rpmdir)' | sed 's,^$(DISTDIR),$(REPODIR),'`; \
+	rpms=`(find $(rpmdir)/$$a $$repodir/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' | LANG= sort -u) 2>/dev/null`; \
 	for f in $$rpms; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
@@ -649,15 +657,16 @@ update-t-rpm:
 	done; \
 	if test ":$$rebuild" = :yes; then \
 		$(ECHO) "D: $@: rebuild $$a"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET='$(RPMTARGET)' one-t-rpm || :; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET='$(RPMTARGET)' one-t-rpm || :; \
 	else \
 		$(ECHO) "D: $@: skipped $$a"; \
 	fi
 
+update-all-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 update-all-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	$(ECHO) "D: $@: rebuild noarch"; \
-	$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="noarch" all-update-n-rpm || :; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET="noarch" all-update-n-rpm || :; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; \
 	for t in $$targets; do \
 		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
@@ -666,16 +675,12 @@ update-all-rpms:
 		for k in $$kernels; do \
 			k=`basename $$k`; \
 			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
-			if test -z '$(DESTDIR)'; then \
-				if ! $(RPM) -q --whatprovides /lib/modules/$$k/build >/dev/null 2>&1; then \
-					continue; \
-				fi; \
-			fi; \
+			test -n '$(DESTDIR)' || $(RPM) -q --whatprovides /lib/modules/$$k/build >/dev/null 2>&1 || continue; \
 			$(ECHO) "D: $@: rebuild $$k"; \
-			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$$k" RPMTARGET="$$t" all-update-k-rpm || :; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" RPMTARGET="$$t" all-update-k-rpm || :; \
 		done; \
 		$(ECHO) "D: $@: rebuild $$a"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="$$t" all-update-t-rpm || :; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET="$$t" all-update-t-rpm || :; \
 	done
 
 MY_PHONY		+= update-n-rpm update-k-rpm update-t-rpm update-all-rpms
@@ -685,23 +690,12 @@ ALL_RECURSIVE_TARGETS	+= all-update-n-rpm all-update-k-rpm all-update-t-rpm
 ## in the set exist, were created after the update stamp, and force is applied, recreate the RPM
 ## set.
 ##
-update-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)'
+update-rpms: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 update-rpms:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@rebuild=yes; \
-	rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
-	for f in $$rpms; do \
-		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
-			$(ECHO) "D: $@: leaving $$f"; \
-			rebuild=no; \
-		fi; \
-	done; \
-	if test ":$$rebuild" = :yes; then \
-		$(ECHO) "D: $@: rebuild noarch"; \
-		$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="noarch" noa-rpm || :; \
-	else \
-		$(ECHO) "D: $@: skipped noarch"; \
-	fi; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	$(ECHO) "D: $@: testing RPMS/noarch"; \
+	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET=noarch update-n-rpm"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET=noarch update-n-rpm || :; \
 	targets="$(RPMTARGET) $(AM_RPMTARGETS)"; \
 	for t in $$targets; do \
 		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
@@ -709,43 +703,13 @@ update-rpms:
 		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -type d \( -name '2.[46].*' -o -name '3.*' \) | $(rpmsort) ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
-			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
-			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || continue; \
-			if test -z '$(DESTDIR)'; then \
-				if ! $(RPM) -q --whatprovides /lib/modules/$$k/build >/dev/null 2>&1; then \
-					continue; \
-				fi; \
-			fi; \
-			rebuild=yes; \
-			ks=`echo "$$k" | sed -rn 's,^(.*)-([a-zA-Z][a-zA-Z0-9]*)$$,\2.*\1,;t good;s,^(.*)$$,.*\1,;: good s,[_-],.,g;s,^,-,p'`; \
-			rpms="`( find $(rpmdir)/$$a -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' | egrep -- "$$ks"'.*\.'"$$a"'\.rpm$$' ) 2>/dev/null`"; \
-			for f in $$rpms; do \
-				if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
-					$(ECHO) "D: $@: leaving $$f"; \
-					rebuild=no; \
-				fi; \
-			done; \
-			if test ":$$rebuild" = :yes; then \
-				$(ECHO) "D: $@: rebuild $$k"; \
-				$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' kversion="$$k" RPMTARGET="$$t" one-k-rpm || :; \
-			else \
-				$(ECHO) "D: $@: skipped $$k"; \
-			fi; \
+			$(ECHO) "D: $@: testing RPMS/$$a $$k"; \
+			$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion=\"$$k\" RPMTARGET=\"$$t\" update-k-rpm"; \
+			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" RPMTARGET="$$t" update-k-rpm || :; \
 		done; \
-		rebuild=yes; \
-		rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
-		for f in $$rpms; do \
-			if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
-				$(ECHO) "D: $@: leaving $$f"; \
-				rebuild=no; \
-			fi; \
-		done; \
-		if test ":$$rebuild" = :yes; then \
-			$(ECHO) "D: $@: rebuild $$a"; \
-			$(MAKE) $(AM_MAKEFLAGS) RPMXOPTS='$(RPMXOPTS)' RPMTARGET="$$t" one-t-rpm || :; \
-		else \
-			$(ECHO) "D: $@: skipped $$a"; \
-		fi; \
+		$(ECHO) "D: $@: testing RPMS/$$a"; \
+		$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET=\"$$t\" update-t-rpm"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET="$$t" update-t-rpm || :; \
 	done
 
 ## Provide updates to srpm signatures.  If the SRPM signature does not exist, create it.  If the
@@ -753,8 +717,8 @@ update-rpms:
 ## Care must be taken when signing SRPMs to restore the original file times.
 ##
 update-sign-srpm:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@list="$(rpm_src_file) $(rpm_link_file)"; for f in $$list; do \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	list="$(rpm_src_file) $(rpm_link_file)"; for f in $$list; do \
 		if test ! -e "$$f"; then \
 			$(ECHO) "D: $@: rebuild update-rpm"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-srpm"; \
@@ -786,8 +750,8 @@ update-sign-srpm:
 ## Care must be taken when signing RPMs to restore the original file times.
 ##
 update-sign-rpms:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' 2>/dev/null`; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' 2>/dev/null`; \
 	if test -z "$$rpms"; then \
 		$(ECHO) "D: $@: rebuild update-rpm"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-rpms"; \
@@ -837,9 +801,9 @@ if BUILD_RPMS
 ## existing file.  Rebuilding of repository metadata is performed by other targets.
 ##
 release-copy-rpms:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@rpms= ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	rpms= ; \
 	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_binary_files) ; do \
 		test -s $$f || continue ; \
 		case "$$f" in (*.rpm) ;; (*) continue ;; esac ; \
@@ -884,9 +848,9 @@ MY_PHONY		+= release-copy-rpms
 ## targets.
 ##
 release-remove-rpms:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@$(ECHO) "D: $@: removing rpms" ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	$(ECHO) "D: $@: removing rpms" ; \
 	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_binary_files) ; do \
 		test -e $$f || { $(ECHO) "D: $@: missing $$f" ; continue ; } ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
@@ -915,8 +879,8 @@ MY_PHONY		+= release-remove-rpms
 ## file symbolic links and directory structure as required.
 ##
 release-update-rpms:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
 	@repodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 	b=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
 	dir="$${repodir}$${b:+/$$b}" ; \
@@ -968,9 +932,9 @@ RELEASE_UNINSTALL	+= release-uninstall-rpms
 ## Rebuilding of repository metadata is performed by other targets.
 ##
 update-copy-rpms:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@for f in $(rpm_update_files) ; do \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	for f in $(rpm_update_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \) ; then \
@@ -987,9 +951,9 @@ MY_PHONY		+= update-copy-rpms
 ## targets.
 ##
 update-remove-rpms:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@for f in $(rpm_update_files) ; do \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	for f in $(rpm_update_files) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test -s $$t || continue ; \
@@ -1073,8 +1037,8 @@ repo-link-yum: $(RELEASE_DIRECTORIES)
 RELEASE_LINKS		+= repo-link-yum
 
 $(repomd_group)::
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@f=`$(ECHO) "$@" | sed 's|^.*/||'`; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	f=`$(ECHO) "$@" | sed 's|^.*/||'`; \
 	d=; test -f $$f || d='$(srcdir)/'; \
 	test -f "$$d$$f" || { \
 		touch $$f; exit 0; }; \
@@ -1442,8 +1406,8 @@ repo-yum: $(RELEASE_DIRECTORIES) $(repomd_repos) $(repomd_heads)
 repo-sign-yum: $(repomd_signs) $(repomd_keys)
 
 repo-clean-yum:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@for d in $(repofulldir) $(repomaindir) $(repodebgdir) $(repodevldir) $(reposrcsdir) ; do \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	for d in $(repofulldir) $(repomaindir) $(repodebgdir) $(repodevldir) $(reposrcsdir) ; do \
 		for f in primary filelists other susedata patterns products product comps ; do \
 			for e in xml xml.gz sqlite.bz2 ; do \
 				for file in $$d/*$$f.$$e ; do \
@@ -1478,9 +1442,9 @@ UPDATECLEANFILES	+=
 ## metadata for the repository.
 ##
 release-update-yum:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; built_one= ; \
 	for b in '' updates extras testing $$rb ; do \
 		for r in '' main debug devel source ; do \
@@ -1749,15 +1713,15 @@ if BUILD_REPO_YAST
 ##
 
 $(yastdir)/media.1/media:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@p=`$(RPM) --showrc | grep '\<packager\>' | sed 's,.*\<packager\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	p=`$(RPM) --showrc | grep '\<packager\>' | sed 's,.*\<packager\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
 	if test -z "$$p"; then p='Unknown'; fi; \
 	$(ECHO) "( echo \"$$p\"; date +%Y%m%d%H%M%S; echo '1') >$@"; \
 	( $(ECHO) "$$p"; date +%Y%m%d%H%M%S; echo '1') >$@
 
 $(yastdir)/content:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed -r 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed -r 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
 	test -n "$$vendor" || vendor='Unknown' ; \
 	( \
 		$(ECHO) "PRODUCT $(PACKAGE_TITLE)"; \
@@ -1801,8 +1765,8 @@ yast_desc_files		= $(yastdir)/setup/descr/packages \
 am__yast_skipfiles = (^|/)(\.[^/][^/]*|directory\.yast|INDEX\.gz|ARCHIVE\.gz|ls-lR\.gz|MD5SUMS(\.meta)?|SHA1SUMS(\.meta)?|md5sum\.txt)
 
 repo-yast-listings:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@dir=`(cd $(yastdir); pwd)`; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	dir=`(cd $(yastdir); pwd)`; \
 	find $$dir -follow -type d | while read d; do \
 		p=`$(ECHO) "$$d" | sed 's,.*/,,'`; \
 		case "$$p" in (RCS|CVS|.*) continue;; esac; \
@@ -1818,8 +1782,8 @@ repo-yast-listings:
 	done
 
 repo-yast-listings-clean:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test -n '$(yastdir)' || exit 1; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test -n '$(yastdir)' || exit 1; \
 	find $(yastdir) -follow \
 		-name 'directory.yast' -o \
 		-name 'ls-lR.gz' -o \
@@ -1856,8 +1820,8 @@ UPDATECLEANFILES	+=
 ## metadata for the repository.
 ##
 release-update-yast:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
 	yastdir=`echo '$(yastdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 	for dir in $$yastdir $$yastdir/media.1 $$yastdir/setup/descr ; do \
 		test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
@@ -1985,9 +1949,9 @@ UPDATE_CLEAN_LOCAL	+= repo-clean-ris
 UPDATECLEANFILES	+= 
 
 release-update-ris:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@t=$(REPODIR)/repoindex.xml ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	t=$(REPODIR)/repoindex.xml ; \
 	$(ECHO) "D: $@: generating $$t" ; \
 	( \
 		$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
@@ -2148,8 +2112,8 @@ $(urpmi_keys)::
 	$(AM_V_GEN)$(GPGEXPORTKEY)
 
 repo-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_cfgs)
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@rb='$(repobranch)' ; rpms="../../$${rb:+..$$rb/}RPMS" ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	rb='$(repobranch)' ; rpms="../../$${rb:+..$$rb/}RPMS" ; \
 	cd $(mediamaindir)/.. ; \
 	find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
@@ -2167,8 +2131,8 @@ repo-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_cfgs)
 repo-sign-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_keys)
 
 repo-clean-urpmi:
-	@$(ECHO_V) "Making $@ in `pwd`"
-	@find $(mediadir)/../.. -name '*.rpm' | sed 's,/[^/][^/]*/\.\./,/,' | while read f ; do \
+	@$(ECHO_V) "Making $@ in `pwd`"; \
+	find $(mediadir)/../.. -name '*.rpm' | sed 's,/[^/][^/]*/\.\./,/,' | while read f ; do \
 		if test -L $$f ; then \
 			$(ECHO) "rm -f -- $$f" ; \
 			rm -f -- $$f ; \
@@ -2199,9 +2163,9 @@ UPDATECLEANFILES	+=
 ## metadata for the repository.
 ##
 release-update-urpmi:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
 	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
@@ -2402,8 +2366,8 @@ aptr_keys		= $(aptr_release_keys) $(aptr_md5sum_keys)
 aptr_sigs		= $(aptr_release_sigs)
 
 repo-aptrpm-directories: $(RELEASE_DIRECTORIES)
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@rb='$(repobranch)' ; rpms="../$${rb:+..$$rb/}RPMS" ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	rb='$(repobranch)' ; rpms="../$${rb:+..$$rb/}RPMS" ; \
 	$(ECHO) "cd $(aptrmaindir)" ; cd $(aptrmaindir) ; \
 	find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
@@ -2423,16 +2387,16 @@ repo-aptrpm-directories: $(RELEASE_DIRECTORIES)
 MY_PHONY		+= repo-aptrpm-directories
 
 $(aptr_packages): repo-aptrpm-directories
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@comp=`echo "$@" | sed -e 's,.*\.,,'` ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	comp=`echo "$@" | sed -e 's,.*\.,,'` ; \
 	( cd '$(aptrbasedir)' ; \
 	  $(ECHO) "$(GENPKGLIST) --index srpm_idx --meta '$$comp' --bloat '$(aptrdir)' '$$comp'" ; \
 	  $(GENPKGLIST) --index srpm_idx --meta "$$comp" --bloat '$(aptrdir)' "$$comp" ; \
 	)
 
 $(aptr_sources): repo-aptrpm-directories
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@comp=`echo "$@" | sed -e 's,.*\.,,'` ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	comp=`echo "$@" | sed -e 's,.*\.,,'` ; \
 	( cd '$(aptrbasedir)' ; \
 	  $(ECHO) "$(GENSRCLIST) --flat --meta '$$comp' '$(aptrdir)' '$$comp' srpm_idx" ; \
 	  $(GENSRCLIST) --flat --meta "$$comp" '$(aptrdir)' "$$comp" srpm_idx ; \
@@ -2459,8 +2423,8 @@ GENCOMPRESSEDDATA = \
 	$(XZ_CMD) $(XZ) -c $$f >$$f.xz
 
 $(aptr_releases): $(aptr_nonrel_files)
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@ext=`echo "$@" | sed 's,.*\.,,'` ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	ext=`echo "$@" | sed 's,.*\.,,'` ; \
 	b=`echo "$$ext" | awk '{sub(/_/," ");print$$1}'` ; \
 	r=`echo "$$ext" | awk '{sub(/_/," ");print$$2}'` ; \
 	bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
@@ -2603,9 +2567,9 @@ UPDATECLEANFILES	+=
 ## metadata for the repository.
 ##
 release-update-aptrpm:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@repodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`"; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	repodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed 's,^//*,,'` ; \
 	changed_one= ; \
 	for b in '' updates extras testing $$rb ; do \
