@@ -171,6 +171,23 @@ rpm_root_dir		= $(rpmbuildrootdir)/$(PACKAGE)-$(VERSION)
 ## $$(foo)-kmod[-$$(flavor)]
 ## $$(vendor)-$$(driver)-kmp[-$$(flavor)]
 ##
+## RedHat:
+##
+## %{name}-kmod%{kernel_flavor}[-subpackage]-%{kbaseversion}-%{kbaserelease}.%{arch}.rpm
+## %{name}=$(PACKAGE)
+## %{kernel_flavor}=%(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*,,')
+## %{kbaseversion}=$(VERSION)
+## %{kbaserelease}=$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)
+## %{arch}=x86_64 (for example)
+##
+## SuSE:
+##
+## %{name}-kmp%{kernel_flavor}[-subpackage]-%{kbaseversion}-%{kbaserelease}.%{arch}.rpm
+## %{name}=$(PACKAGE)
+## %{kernel_flavor}=%(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*,,')
+## %{kbaseversion}=$(VERSION)_%(echo '_%{kernel_source}' | sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
+##
+##
 rpm_module0_file	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 rpm_module1_file	= kernel-module-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
 rpm_module2_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
