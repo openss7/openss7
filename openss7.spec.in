@@ -461,7 +461,7 @@
 %global WITH_tools          1
 %global WITH_noarch         1
 %global WITH_arch           1
-%global WITH_source         1
+%global WITH_source         0
 %global WITH_snmp           1
 %global WITH_java           1
 %global WITH_mibs           1
