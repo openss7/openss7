@@ -2593,12 +2593,13 @@ release-update-aptrpm:
 	rb=`echo '$(repobranch)' | sed 's,^//*,,'` ; \
 	changed_one= ; \
 	for b in '' updates extras testing $$rb ; do \
-		for f in main debug devel source '' ; do \
-			$(ECHO) "D: processing directory $$dir" ; \
+		for r in main debug devel source '' ; do \
 			dir="$${repodir}/RPMS.$${b:-base}_$${r:-full}" ; \
+			$(ECHO) "D: $@: processing directory $$dir" ; \
 			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
-			$(ECHO_V) "D: find $$dir -name '*.rpm'" ; \
-			find $$dir -name '*.rpm' | while read f ; do \
+			$(ECHO_V) "D: $@: find $$dir -name '*.rpm'" ; \
+			rpms=`find $$dir -name '*.rpm' 2>/dev/null` ; \
+			for f in $$rpms; do \
 				if test -L $$f ; then \
 					link=`readlink $$f` ; \
 					case "$$link" in (/*) ;; (*) link="$$dir/$$link" ;; esac ; \
@@ -2612,16 +2613,50 @@ release-update-aptrpm:
 			( \
 				$(ECHO_V) "D: cd $$dir" ; cd $$dir ; \
 				$(ECHO_V) "D: find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null" ; \
-				find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null | \
-				case "$${r:-full}" in \
+				rpms="`find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null | LANG= sort -u | \
+					case \"$${r:-full}\" in \
 					(main)	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
 					(debug)	 grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
 					(devel)	 grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
-					(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
-					(full)	 cat ;; \
-				esac | LANG= sort -u | while read rpm ; do \
-					if test -L `basename $$rpm` ; then :; else \
-						$(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; \
+					(source) grep -- 'source-' ;; \
+					(full)	 grep -v -- '\.src\.rpm$$' ;; \
+					esac`" ; \
+				for f in $$rpms ; do \
+					if test -L `basename $$f` ; then :; else \
+						$(ECHO) " ln -sf $$f `pwd`" ; \
+						ln -sf $$f . ; \
+						changed_one=yes ; \
+					fi ; \
+				done ; \
+			) ; \
+		done ; \
+	done ; \
+	for b in '' updates extras testing $$rb ; do \
+		for r in source '' ; do \
+			dir="$${repodir}/SRPMS.$${b:-base}_$${r:-full}" ; \
+			$(ECHO) "D: $@: processing directory $$dir" ; \
+			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
+			$(ECHO_V) "D: $@: find $$dir -name '*.rpm'" ; \
+			rpms=`find $$dir -name '*.rpm' 2>/dev/null` ; \
+			for f in $$rpms; do \
+				if test -L $$f ; then \
+					link=`readlink $$f` ; \
+					case "$$link" in (/*) ;; (*) link="$$dir/$$link" ;; esac ; \
+					if test ! -e "$$link" ; then \
+						$(ECHO) " rm -f -- $$f" ; \
+						rm -f -- $$f ; \
+						changed_one=yes ; \
+					fi ; \
+				fi ; \
+			done ; \
+			( \
+				$(ECHO_V) "D: cd $$dir" ; cd $$dir ; \
+				$(ECHO_V) "D: find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null" ; \
+				rpms="`find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.src.rpm' 2>/dev/null | LANG= sort -u`" ; \
+				for f in $$rpms ; do \
+					if test -L `basename $$f` ; then :; else \
+						$(ECHO) " ln -sf $$f `pwd`" ; \
+						ln -sf $$f . ; \
 						changed_one=yes ; \
 					fi ; \
 				done ; \
@@ -2643,10 +2678,10 @@ release-update-aptrpm:
 			done ; \
 		done ; \
 		for b in '' updates extras testing $$rb ; do \
-			for r in main debug devel source '' ; do \
+			for r in source '' ; do \
 				comp="$${b:-base}_$${r:-full}" ; \
-				$(ECHO) "$(GENSRCLIST) --flat --meta '$$comp' '$$repodir' '$$comp' srpm_indx" ; \
-				$(GENSRCLIST) --flat --meta "$$comp" "$$repodir" "$$comp" srpm_indx ; \
+				$(ECHO) "$(GENSRCLIST) --flat --meta '$$comp' '$$repodir' '$$comp' srpm_idx" ; \
+				$(GENSRCLIST) --flat --meta "$$comp" "$$repodir" "$$comp" srpm_idx ; \
 				f=srclist.$$comp ; if test -s $$f ; then \
 					$(GENCOMPRESSEDDATA) ; \
 				fi ; \
