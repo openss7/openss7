@@ -363,28 +363,26 @@ csig:
 reupload: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 reupload:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@debs="`find $(debdir) -name '$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_all.*deb' 2>/dev/null`"; \
+	@debs="`(find $(debdir) -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep '_all\..deb$$') 2>/dev/null`"; \
 	if test -z "$$debs" -o -n '$(FORCE)'; then \
-		$(ECHO) "D: $@: rebuild noarch"; \
+		$(ECHO) "D: $@: rebuild binary-indep"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"noarch\" noa-deb"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH="noarch" noa-deb || :; \
 	else \
-		$(ECHO) "D: $@: skipped noarch"; \
+		$(ECHO) "D: $@: skipped binary-indep"; \
 	fi; \
-	targets="$(ARCH) $(AM_DEBTARGETS)"; for t in $$targets;  do \
+	targets="$(ARCH) $(AM_DEBTARGETS)"; \
+	for t in $$targets;  do \
 		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
 		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
-		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -type d \( -name '2.[46].*' -o -name '3.*' \) | LANG= sort -r ) 2>/dev/null`"; \
+		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -maxdepth 1 -type d \( -name '2.[46].[0-9]*' -o -name '3.[0-9]*' \) | $(rpmsort) ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
-			test -f $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
-			if test -z '$(DESTDIR)'; then \
-				if ! $(DPKG) -S /lib/modules/$$k/build >/dev/null 2>&1; then \
-					continue; \
-				fi; \
-			fi; \
+			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
+			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || continue; \
+			test -n '$(DESTDIR)' || $(DPKG) -S /lib/modules/$$k/build >/dev/null 2>&1 || continue; \
 			ks=`echo $$k | sed 's,-,.,g;s,_,.,g'`; \
-			debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)*-$(VERSION)_$(krelease)_$$a.*deb' 2>/dev/null`"; \
+			debs="`(find $(debdir) -name '$(PACKAGE_LCNAME)-$$k*_$(VERSION)-$(PACKAGE_DEBRELEASE)_*[ud.]deb' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
 			if test -z "$$debs" -o -n '$(FORCE)'; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
 				$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion=\"$$k\" ARCH=\"$$t\" one-k-deb"; \
@@ -393,7 +391,7 @@ reupload:
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
 		done; \
-		debs="`find $(debdir)/binary-$$a -name '$(PACKAGE_LCNAME)*_$(VERSION)-$(PACKAGE_DEBRELEASE)_$$a.*deb' 2>/dev/null`"; \
+		debs="`(find $(debdir) -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
 		if test -z "$$debs" -o -n '$(FORCE)'; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=\"$$t\" one-t-deb"; \
@@ -402,10 +400,8 @@ reupload:
 			$(ECHO) "D: $@: skipped $$a"; \
 		fi; \
 	done; \
-	if test -z "$$debs" -o -n '$(FORCE)'; then \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) chg-deb"; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) chg-deb || :; \
-	fi
+	$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) chg-deb"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) chg-deb || :
 
 distclean-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -478,12 +474,15 @@ update-dscs:
 update-n-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@rebuild=yes; \
-	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR)'` ; \
-	debs=`(find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep '_all\..*deb$$') 2>/dev/null`; \
+	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	$(ECHO) "find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep '_all\..*deb$$'"; \
+	debs="`(find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep '_all\..*deb$$') 2>/dev/null`"; \
 	for f in $$debs; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
 			rebuild=no; \
+		else \
+			$(ECHO) "D: $@: rebuild $$f"; \
 		fi; \
 	done; \
 	if test "$$rebuild" = yes; then \
@@ -506,12 +505,15 @@ update-k-deb:
 	test -n '$(DESTDIR)' || $(DPKG) -S /lib/modules/$(kversion)/build >/dev/null 2>&1 || exit 0; \
 	rebuild=yes; \
 	ks=`echo '$(kversion)' | sed 's,-,.,g;s,_,.,g'`; \
-	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR)'` ; \
-	debs=`(find $(debdir) $$repodir -name '$(deb_module_file)' | LANG= sort -u | grep '_$$a\..*deb$$') 2>/dev/null`; \
+	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	$(ECHO) "D: $@: find $(debdir) $$repodir -name '$(deb_module_file)' | LANG= sort -u | grep -v '_all\..*deb$$'" ; \
+	debs="`(find $(debdir) $$repodir -name '$(deb_module_file)' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
 	for f in $$debs; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
 			rebuild=no; \
+		else \
+			$(ECHO) "D: $@: rebuild $$f"; \
 		fi; \
 	done; \
 	if test "$$rebuild" = yes; then \
@@ -530,12 +532,15 @@ update-t-deb:
 	@a=`echo '$(ARCH)' | sed 's,-.*$$,,'`; \
 	test \( "$$a" != noarch -a "$$a" != all \) || exit 0; \
 	rebuild=yes; \
-	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR)'` ; \
-	debs=`(find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep '_$$a\..*deb$$') 2>/dev/null`; \
+	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	$(ECHO) "D: $@: find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep -v '_all\..*deb$$'"; \
+	debs="`(find $(debdir) $$repodir -name '$(deb_base_file)' -o -name '$(deb_binary_file)' | LANG= sort -u | grep -v '_all\..*deb$$') 2>/dev/null`"; \
 	for f in $$debs; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
 			rebuild=no; \
+		else \
+			$(ECHO) "D: $@: rebuild $$f"; \
 		fi; \
 	done; \
 	if test "$$rebuild" = yes; then \
