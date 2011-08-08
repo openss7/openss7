@@ -6,8 +6,11 @@ bld_cv_pkg_cmd_CREATEREPO=${bld_cv_pkg_cmd_CREATEREPO='aptitude install createre
 bld_cv_pkg_cmd_DEPMOD=${bld_cv_pkg_cmd_DEPMOD='aptitude install module-init-tools'}
 bld_cv_pkg_cmd_DOXYGEN=${bld_cv_pkg_cmd_DOXYGEN='aptitude install doxygen'}
 bld_cv_pkg_cmd_DPKG=${bld_cv_pkg_cmd_DPKG='aptitude install dpkg'}
+bld_cv_pkg_cmd_DPKG_ARCHITECTURE=${bld_cv_pkg_cmd_DPKG_ARCHITECTURE='aptitude install dpkg-dev'}
+bld_cv_pkg_cmd_DPKG_BUILDFLAGS=${bld_cv_pkg_cmd_DPKG_BUILDFLAGS='aptitude install dpkg-dev'}
 bld_cv_pkg_cmd_DPKG_BUILDPACKAGE=${bld_cv_pkg_cmd_DPKG_BUILDPACKAGE='aptitude install dpkg-dev'}
 bld_cv_pkg_cmd_DPKG_DEB=${bld_cv_pkg_cmd_DPKG_DEB='aptitude install dpkg'}
+bld_cv_pkg_cmd_DPKG_GENCHANGES=${bld_cv_pkg_cmd_DPKG_GENCHANGES='aptitude install dpkg-dev'}
 bld_cv_pkg_cmd_DPKG_SCANPACKAGES=${bld_cv_pkg_cmd_DPKG_SCANPACKAGES='aptitude install dpkg-dev'}
 bld_cv_pkg_cmd_DPKG_SCANSOURCES=${bld_cv_pkg_cmd_DPKG_SCANSOURCES='aptitude install dpkg-dev'}
 bld_cv_pkg_cmd_DPKG_SOURCE=${bld_cv_pkg_cmd_DPKG_SOURCE='aptitude install dpkg-dev'}
@@ -63,8 +66,11 @@ bld_cv_pkg_name_CREATEREPO=${bld_cv_pkg_name_CREATEREPO=createrepo}
 bld_cv_pkg_name_DEPMOD=${bld_cv_pkg_name_DEPMOD=module-init-tools}
 bld_cv_pkg_name_DOXYGEN=${bld_cv_pkg_name_DOXYGEN=doxygen}
 bld_cv_pkg_name_DPKG=${bld_cv_pkg_name_DPKG=dpkg}
+bld_cv_pkg_name_DPKG_ARCHITECTURE=${bld_cv_pkg_name_DPKG_ARCHITECTURE=dpkg-dev}
+bld_cv_pkg_name_DPKG_BUILDFLAGS=${bld_cv_pkg_name_DPKG_BUILDFLAGS=dpkg-dev}
 bld_cv_pkg_name_DPKG_BUILDPACKAGE=${bld_cv_pkg_name_DPKG_BUILDPACKAGE=dpkg-dev}
 bld_cv_pkg_name_DPKG_DEB=${bld_cv_pkg_name_DPKG_DEB=dpkg}
+bld_cv_pkg_name_DPKG_GENCHANGES=${bld_cv_pkg_name_DPKG_GENCHANGES=dpkg-dev}
 bld_cv_pkg_name_DPKG_SCANPACKAGES=${bld_cv_pkg_name_DPKG_SCANPACKAGES=dpkg-dev}
 bld_cv_pkg_name_DPKG_SCANSOURCES=${bld_cv_pkg_name_DPKG_SCANSOURCES=dpkg-dev}
 bld_cv_pkg_name_DPKG_SOURCE=${bld_cv_pkg_name_DPKG_SOURCE=dpkg-dev}
@@ -127,8 +133,11 @@ bld_cv_pkg_prog_CREATEREPO=${bld_cv_pkg_prog_CREATEREPO=createrepo}
 bld_cv_pkg_prog_DEPMOD=${bld_cv_pkg_prog_DEPMOD=depmod}
 bld_cv_pkg_prog_DOXYGEN=${bld_cv_pkg_prog_DOXYGEN=doxygen}
 bld_cv_pkg_prog_DPKG=${bld_cv_pkg_prog_DPKG=dpkg}
+bld_cv_pkg_prog_DPKG_ARCHITECTURE=${bld_cv_pkg_prog_DPKG_ARCHITECTURE=dpkg-architecture}
+bld_cv_pkg_prog_DPKG_BUILDFLAGS=${bld_cv_pkg_prog_DPKG_BUILDFLAGS=dpkg-buildflags}
 bld_cv_pkg_prog_DPKG_BUILDPACKAGE=${bld_cv_pkg_prog_DPKG_BUILDPACKAGE=dpkg-buildpackage}
 bld_cv_pkg_prog_DPKG_DEB=${bld_cv_pkg_prog_DPKG_DEB=dpkg-deb}
+bld_cv_pkg_prog_DPKG_GENCHANGES=${bld_cv_pkg_prog_DPKG_GENCHANGES=dpkg-genchanges}
 bld_cv_pkg_prog_DPKG_SCANPACKAGES=${bld_cv_pkg_prog_DPKG_SCANPACKAGES=dpkg-scanpackages}
 bld_cv_pkg_prog_DPKG_SCANSOURCES=${bld_cv_pkg_prog_DPKG_SCANSOURCES=dpkg-scansources}
 bld_cv_pkg_prog_DPKG_SOURCE=${bld_cv_pkg_prog_DPKG_SOURCE=dpkg-source}
@@ -185,8 +194,11 @@ bld_cv_pkg_ver_CREATEREPO=${bld_cv_pkg_ver_CREATEREPO=0.4.11-1}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.12-1}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.7.1-2}
 bld_cv_pkg_ver_DPKG=${bld_cv_pkg_ver_DPKG=1.15.8.7}
+bld_cv_pkg_ver_DPKG_ARCHITECTURE=${bld_cv_pkg_ver_DPKG_ARCHITECTURE=1.15.8.7}
+bld_cv_pkg_ver_DPKG_BUILDFLAGS=${bld_cv_pkg_ver_DPKG_BUILDFLAGS=1.15.8.7}
 bld_cv_pkg_ver_DPKG_BUILDPACKAGE=${bld_cv_pkg_ver_DPKG_BUILDPACKAGE=1.15.8.7}
 bld_cv_pkg_ver_DPKG_DEB=${bld_cv_pkg_ver_DPKG_DEB=1.15.8.7}
+bld_cv_pkg_ver_DPKG_GENCHANGES=${bld_cv_pkg_ver_DPKG_GENCHANGES=1.15.8.7}
 bld_cv_pkg_ver_DPKG_SCANPACKAGES=${bld_cv_pkg_ver_DPKG_SCANPACKAGES=1.15.8.7}
 bld_cv_pkg_ver_DPKG_SCANSOURCES=${bld_cv_pkg_ver_DPKG_SCANSOURCES=1.15.8.7}
 bld_cv_pkg_ver_DPKG_SOURCE=${bld_cv_pkg_ver_DPKG_SOURCE=1.15.8.7}
