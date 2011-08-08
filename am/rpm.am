@@ -898,7 +898,7 @@ MY_PHONY		+= release-remove-rpms
 release-update-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
-	@repodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	repodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 	b=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
 	dir="$${repodir}$${b:+/$$b}" ; \
 	test -d $$dir || exit 0 ; \
@@ -1498,7 +1498,7 @@ release-update-yum:
 				test -d $$dir/RPMS && { $(ECHO) "  rmdir -pv -- $$dir/RPMS" ; rmdir -pv -- $$dir/RPMS || : ; } ; \
 				if test -d $$dir/repodata ; then \
 					for p in '*repomd' '*comps' '*primary' '*filelists' '*other' '*susedata' '*patterns' '*products' '*product' '$(PACKAGE_LCNAME)*' '$(PACKAGE)*' ; do \
-						for e in .xml .xml.gz .xml.asc .xml.key .repo ; do \
+						for e in .xml .xml.gz .xml.asc .xml.key .repo .sqlite .sqlite.bz2 ; do \
 							for f in $$dir/repodata/$${p}$${e} ; do \
 								if test -f $$f ; then $(ECHO) "  rm -f -- $$f" ; rm -f -- $$f ; fi ; \
 							done ; \
@@ -2186,6 +2186,7 @@ release-update-urpmi:
 	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
 	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	made_list=no; \
 	for b in '' updates extras testing $$rb ; do \
 		for r in '' main debug devel source ; do \
 			dir="$${repodir}/media$${b:+/$$b}$${r:+/$$r}" ; \
@@ -2195,67 +2196,103 @@ release-update-urpmi:
 				$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/media_info/pubkey"; \
 				$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$dir/media_info/pubkey ; \
 			} ; \
-			find $$dir -name '*.rpm' | while read f ; do \
+			rpms=`find $$dir -name '*.rpm'` ; \
+			for f in $$rpms ; do \
 				if test -L $$f ; then \
-					$(ECHO) "rm -f -- $$f" ; \
-					rm -f -- $$f ; \
+					link=`readlink $$f` ; \
+					case "$$link" in (/*) ;; (*) link="$$dir/$$link" ;; esac ; \
+					if test ! -e "$$link" ; then \
+						$(ECHO) "rm -f -- $$f" ; \
+						rm -f -- $$f ; \
+					fi ; \
 				fi ; \
 			done ; \
 			( \
-				$(ECHO_V) "D: cd $$dir" ; cd $$dir ; \
-				rpms="../$${r:+../}$${b:+../$$b/}RPMS" ; \
-				$(ECHO_V) "D: test -d $$rpms" ; \
-				test -d $$rpms || continue ; \
-				$(ECHO) "find $$rpms -follow -name '*.rpm'" ; \
-				find "$$rpms" -follow -name '*.rpm' | \
-				case "$${r:-full}" in \
-				(main) 	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
-				(debug)  grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
-				(devel)  grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
-				(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
-				(full)   cat ;; \
-				esac | LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`" ; ln -sf $$rpm . ; done ; \
+				$(ECHO_V) "D: cd $$dir" ; \
+				cd $$dir ; \
+				rpms=; \
+				if test -d ../$${r:+../}$${b:+../$$b/}RPMS ; then \
+					rpms="`(find ../$${r:+../}$${b:+../$$b/}RPMS -follow -name '*.rpm' | LANG= sort -u | \
+						case \"$${r:-full}\" in \
+						(main) 	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
+						(debug)  grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
+						(devel)  grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
+						(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
+						(full)   cat ;; \
+						esac) 2>/dev/null`"; \
+				fi ; \
+				if test -n "$$rpms" ; then \
+					for f in $$rpms ; do \
+						if test -L `basename $$f` ; then :; else \
+							$(ECHO) " ln -sf $$f `pwd`" ; \
+							ln -sf $$rpm . ; \
+						fi ; \
+					done ; \
+					made_list=yes ; \
+				else \
+					$(ECHO) "rmdir -pv -- $$dir"; \
+					rmdir -pv -- $$dir; \
+				fi ; \
 			) ; \
 		done ; \
 	done ; \
-	m=$${repodir}/media/media_info ; \
-	test -d $$m || { $(ECHO) "$(MKDIR_P) -- $$m" ; $(MKDIR_P) -- $$m ; } ; \
-	( \
-		$(ECHO) "[media_info]" ; \
-		$(ECHO) "version=$(target_edition)" ; \
-		$(ECHO) "mediacfg_version=2" ; \
-		$(ECHO) "branch=OpenSS7" ; \
-		$(ECHO) "arch=$(target_cpu)" ; \
-		$(ECHO) "xml-info=1" ; \
-		$(ECHO) "" ; \
+	if test "$${made_list:-no}" = yes ; then \
+		m=$${repodir}/media/media_info ; \
+		test -d $$m || { $(ECHO) "$(MKDIR_P) -- $$m" ; $(MKDIR_P) -- $$m ; } ; \
+		( \
+			$(ECHO) "[media_info]" ; \
+			$(ECHO) "version=$(target_edition)" ; \
+			$(ECHO) "mediacfg_version=2" ; \
+			$(ECHO) "branch=OpenSS7" ; \
+			$(ECHO) "arch=$(target_cpu)" ; \
+			$(ECHO) "xml-info=1" ; \
+			$(ECHO) "" ; \
+			for b in '' updates extras testing $$rb ; do \
+				bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+				t=`echo "$$b" | sed 's,^$$,base,'` ; \
+				for r in main debug devel source ; do \
+					if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
+					stem=`echo "$$s" | sed 's,[^a-zA-Z0-9_],_,g'` ; \
+					repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+					$(ECHO) "[$$s]" ; \
+					$(ECHO) "hdlist=hdlist_$$stem.cz" >/dev/null ; \
+					$(ECHO) "synthesis=synthesis.hdlist_$$stem.cz" >/dev/null ; \
+					$(ECHO) "info=info_$$stem.xml.lzma" >/dev/null ; \
+					$(ECHO) "changelog=changelog_$$stem.xml.lzma" >/dev/null ; \
+					$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
+					$(ECHO) "name=$${bran} $${repo}" ; \
+					case "$$r" in \
+					(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
+					(*) 	 $(ECHO) "srpms=$${b:+$$b/}source" ;; \
+					esac ; \
+					$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
+					case "$$b:$$r" in \
+					(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
+					esac ; \
+					$(ECHO) "" ; \
+				done ; \
+			done ; \
+		) >$$m/media.cfg ; \
+		$(ECHO) "$(GENDISTRIB) $${repodir}" ; \
+		$(GENDISTRIB) $${repodir} ; \
+	else \
+		comps= ; \
 		for b in '' updates extras testing $$rb ; do \
-			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-			t=`echo "$$b" | sed 's,^$$,base,'` ; \
-			for r in main debug devel source ; do \
-				if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
-				stem=`echo "$$s" | sed 's,[^a-zA-Z0-9_],_,g'` ; \
-				repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-				$(ECHO) "[$$s]" ; \
-				$(ECHO) "hdlist=hdlist_$$stem.cz" >/dev/null ; \
-				$(ECHO) "synthesis=synthesis.hdlist_$$stem.cz" >/dev/null ; \
-				$(ECHO) "info=info_$$stem.xml.lzma" >/dev/null ; \
-				$(ECHO) "changelog=changelog_$$stem.xml.lzma" >/dev/null ; \
-				$(ECHO) "files=files_$$stem.xml.lzma" >/dev/null ; \
-				$(ECHO) "name=$${bran} $${repo}" ; \
-				case "$$r" in \
-				(source) $(ECHO) "rpms=$${b:+$$b/}main" ;; \
-				(*) 	 $(ECHO) "srpms=$${b:+$$b/}source" ;; \
-				esac ; \
-				$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
-				case "$$b:$$r" in \
-				(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
-				esac ; \
-				$(ECHO) "" ; \
+			for r in main debug devel source '' ; do \
+				dir="$${repodir}/media$${b:+/$$b}$${r:+/$$r}/" ; \
+				if test -d $$dir/media_info ; then \
+					$(ECHO) " rm -frv -- $$dir/media_info" ; \
+					rm -frv -- $$dir/media_info 2>/dev/null || :; \
+				fi ;  \
+				if test -f $$repodir/VERSION ; then \
+					$(ECHO) " rm -f -- $$repodir/VERSION" ; \
+					rm -f -- $$repodir/VERSION ; \
+				fi ; \
+				$(ECHO) "rmdir -pv -- $$dir" ; \
+				rmdir -pv -- $$dir || :; \
 			done ; \
 		done ; \
-	) >$$m/media.cfg ; \
-	$(ECHO) "$(GENDISTRIB) $${repodir}" ; \
-	$(GENDISTRIB) $${repodir}
+	fi
 
 
 RELEASE_INSTALL		+= release-update-urpmi
@@ -2591,7 +2628,6 @@ release-update-aptrpm:
 	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
 	repodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed 's,^//*,,'` ; \
-	changed_one= ; \
 	for b in '' updates extras testing $$rb ; do \
 		for r in main debug devel source '' ; do \
 			dir="$${repodir}/RPMS.$${b:-base}_$${r:-full}" ; \
@@ -2606,7 +2642,6 @@ release-update-aptrpm:
 					if test ! -e "$$link" ; then \
 						$(ECHO) " rm -f -- $$f" ; \
 						rm -f -- $$f ; \
-						changed_one=yes ; \
 					fi ; \
 				fi ; \
 			done ; \
@@ -2621,13 +2656,17 @@ release-update-aptrpm:
 					(source) grep -- 'source-' ;; \
 					(full)	 grep -v -- '\.src\.rpm$$' ;; \
 					esac`" ; \
-				for f in $$rpms ; do \
-					if test -L `basename $$f` ; then :; else \
-						$(ECHO) " ln -sf $$f `pwd`" ; \
-						ln -sf $$f . ; \
-						changed_one=yes ; \
-					fi ; \
-				done ; \
+				if test -n "$$rpms" ; then \
+					for f in $$rpms ; do \
+						if test -L `basename $$f` ; then :; else \
+							$(ECHO) " ln -sf $$f `pwd`" ; \
+							ln -sf $$f . ; \
+						fi ; \
+					done ; \
+				else \
+					$(ECHO) " rmdir -pv -- $$dir"; \
+					rmdir -pv -- $$dir || :; \
+				fi ; \
 			) ; \
 		done ; \
 	done ; \
@@ -2645,7 +2684,6 @@ release-update-aptrpm:
 					if test ! -e "$$link" ; then \
 						$(ECHO) " rm -f -- $$f" ; \
 						rm -f -- $$f ; \
-						changed_one=yes ; \
 					fi ; \
 				fi ; \
 			done ; \
@@ -2653,142 +2691,186 @@ release-update-aptrpm:
 				$(ECHO_V) "D: cd $$dir" ; cd $$dir ; \
 				$(ECHO_V) "D: find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null" ; \
 				rpms="`find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.src.rpm' 2>/dev/null | LANG= sort -u`" ; \
-				for f in $$rpms ; do \
-					if test -L `basename $$f` ; then :; else \
-						$(ECHO) " ln -sf $$f `pwd`" ; \
-						ln -sf $$f . ; \
-						changed_one=yes ; \
-					fi ; \
-				done ; \
+				if test -n "$$rpms" ; then \
+					for f in $$rpms ; do \
+						if test -L `basename $$f` ; then :; else \
+							$(ECHO) " ln -sf $$f `pwd`" ; \
+							ln -sf $$f . ; \
+						fi ; \
+					done ; \
+				else \
+					$(ECHO) " rmdir -pv -- $$dir"; \
+					rmdir -pv -- $$dir || :; \
+				fi ; \
 			) ; \
 		done ; \
 	done ; \
-	$(ECHO_V) "D: test $${changed_one:-no} = yes || exit 0" ; \
 	( \
+		made_list=no ; \
 		test -d $$repodir/base || { $(ECHO) "$(MKDIR_P) -- $$repodir/base" ; $(MKDIR_P) -- $$repodir/base ; } ; \
 		cd $$repodir/base ; \
 		for b in '' updates extras testing $$rb ; do \
 			for r in main debug devel source '' ; do \
 				comp="$${b:-base}_$${r:-full}" ; \
-				$(ECHO) "$(GENPKGLIST) --index srpm_idx --meta '$$comp' --bloat '$$repodir' '$$comp'" ; \
-				$(GENPKGLIST) --index srpm_idx --meta "$$comp" --bloat "$$repodir" "$$comp" ; \
-				f=pkglist.$$comp ; if test -s $$f ; then \
-					$(GENCOMPRESSEDDATA) ; \
+				if test -d "$${repodir}/RPMS.$$comp" ; then \
+					$(ECHO) "$(GENPKGLIST) --index srpm_idx --meta '$$comp' --bloat '$$repodir' '$$comp'" ; \
+					$(GENPKGLIST) --index srpm_idx --meta "$$comp" --bloat "$$repodir" "$$comp" ; \
+					f=pkglist.$$comp ; if test -s $$f ; then \
+						$(GENCOMPRESSEDDATA) ; \
+					fi ; \
+					made_list=yes; \
+				else \
+					for f in pkglist.$$comp; do \
+						for e in '' .gz .bz2 .lzma .xz; do \
+							test -e $$f$$e || continue ; \
+							$(ECHO) " rm -f -- $$f$$e"; \
+							rm -f -- $$f$$e; \
+						done ; \
+					done ; \
 				fi ; \
 			done ; \
 		done ; \
 		for b in '' updates extras testing $$rb ; do \
 			for r in source '' ; do \
 				comp="$${b:-base}_$${r:-full}" ; \
-				$(ECHO) "$(GENSRCLIST) --flat --meta '$$comp' '$$repodir' '$$comp' srpm_idx" ; \
-				$(GENSRCLIST) --flat --meta "$$comp" "$$repodir" "$$comp" srpm_idx ; \
-				f=srclist.$$comp ; if test -s $$f ; then \
-					$(GENCOMPRESSEDDATA) ; \
-				fi ; \
-			done ; \
-		done ; \
-		for b in '' updates extras testing $$rb ; do \
-			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-			for r in main debug devel source '' ; do \
-				comp="$${b:-base}_$${r:-full}" ; \
-				repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-				( \
-					vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
-					test -n "$$vendor" || vendor=Unknown ; \
-					$(ECHO) "Archive: $(PACKAGE_TITLE) $$bran $$repo" ; \
-					$(ECHO) "Component: $${b:-base}/$${r:-full}" ; \
-					$(ECHO) "Version: $(VERSION)" ; \
-					$(ECHO) "Origin: $$vendor" ; \
-					$(ECHO) "Label: $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))" ; \
-					$(ECHO) "Architecture: $(target_cpu)" ; \
-					$(ECHO) "NotAutomatic: false" ; \
-					if test -s pkglist.$$comp ; then \
-						$(ECHO) "PackageCount: `$(COUNTPKGLIST) pkglist.$$comp`" ; \
+				if test -d "$${repodir}/SRPMS.$$comp" ; then \
+					$(ECHO) "$(GENSRCLIST) --flat --meta '$$comp' '$$repodir' '$$comp' srpm_idx" ; \
+					$(GENSRCLIST) --flat --meta "$$comp" "$$repodir" "$$comp" srpm_idx ; \
+					f=srclist.$$comp ; if test -s $$f ; then \
+						$(GENCOMPRESSEDDATA) ; \
 					fi ; \
-					if test -s srclist.$$comp ; then \
-						$(ECHO) "SourceCount: `$(COUNTPKGLIST) srclist.$$comp`" ; \
-					fi ; \
-				) >release.$$comp ; \
-				f=release.$$comp ; if test -s $$f ; then \
-					$(GENCOMPRESSEDDATA) ; \
-				fi ; \
-			done ; \
-		done ; \
-		user='$(GNUPGUSER)'; user="$${user:+ -u }$$user" ; \
-		home='$(GNUPGHOME)'; home="$${home:+ --homedir }$$home" ; \
-		pass='$(GNUPGPASS)'; pass="$${pass:+ --batch }" ; \
-		pipe='$(GNUPGPASS)'; pipe="$${pipe:+$(ECHO) $$pipe |}" ; \
-		comps= ; \
-		for b in '' updates extras testing $$rb ; do \
-			for r in main debug devel source '' ; do \
-				comps="$${comps:+$$comps }$${b:-base}/$${r:-full}" ; \
-			done ; \
-		done ; \
-		( \
-			vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
-			test -n "$$vendor" || vendor=Unknown ; \
-			$(ECHO) "Origin: $$vendor" ; \
-			$(ECHO) "Label: $(VERSION)" ; \
-			$(ECHO) "Suite: $(PACKAGE)" ; \
-			$(ECHO) "Codename: $(PACKAGE_NAME)" ; \
-			$(ECHO) "Date: `date -R`" ; \
-			$(ECHO) "Architectures: $(target_cpu) noarch" ; \
-			$(ECHO) "Components: $$comps" ; \
-			$(ECHO) "Description: $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))" ; \
-			$(ECHO) "MD5Sum:" ; \
-			list=`echo "$$comps" | sed 's,/,_,g'` ; \
-			for comp in $$list ; do \
-				for fn in pkglist srclist release ; do \
-					for ext in '' '.gz' '.bz2' '.xz' ; do \
-						f="$$fn.$$comp$$ext" ; \
-						test -s $$f || continue ; \
-						$(ECHO) " `md5sum $$f | awk '{print$$1}'` `wc -c $$f | awk '{print$$1}'` base/$$f" ; \
-					done ; \
-				done ; \
-			done ; \
-		) >release ; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- release >release.gpg 2>/dev/null" ; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- release >release.gpg 2>/dev/null" ; \
-		cat release.gpg >>release ; \
-		touch release.gpg ; \
-		$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >release.key" ; \
-		$(GPG) -a$$user$$home --export $(GNUPGUSER) >release.key ; \
-		( \
-			$(ECHO) "MD5SUM:" ; \
-			list=`echo "$$comps" | sed 's,/,_,g'` ; \
-			for comp in $$list ; do \
-				for fn in pkglist srclist release ; do \
-					for ext in '' '.gz' '.bz2' '.xz' ; do \
-						f="$$fn.$$comp$$ext" ; \
-						test -s $$f || continue ; \
-						$(ECHO) " `md5sum $$f | awk '{print$$1}'` `wc -c $$f | awk '{print$$1}'` base/$$f" ; \
-					done ; \
-				done ; \
-			done ; \
-		) >hashfile ; \
-		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- hashfile >hashfile.gpg 2>/dev/null" ; \
-		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- hashfile >hashfile.gpg 2>/dev/null" ; \
-		$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >hashfile.key" ; \
-		$(GPG) -a$$user$$home --export $(GNUPGUSER) >hashfile.key ; \
-		( \
-			list=`echo "$$comps" | sed 's,/,_,g'` ; \
-			for comp in $$list ; do \
-				if test -d $${repodir}/RPMS.$$comp ; then \
-					for r in $${repodir}/RPMS.$$comp/*.rpm ; do \
-						case "$$r" in (*-source-*|*-doc-*|*-base-*|*-javadoc-*) continue ;; esac ; \
-						test -s $$r || continue ; \
-						name=`rpm -ql --qf '%NAME\n' -p $$r 2>/dev/null` ; \
-						test -n "$$name" || continue ; \
-						$(ECHO) "rpm -qlp $$r" >&2 ; \
-						rpm -qlp $$r 2>/dev/null | while read f ; do \
-							$(ECHO) -e "$$f\t$$name" ; \
+					made_list=yes; \
+				else \
+					for f in srclist.$$comp; do \
+						for e in '' .gz .bz2 .lzma .xz; do \
+							test -e $$f$$e || continue ; \
+							$(ECHO) " rm -f -- $$f$$e"; \
+							rm -f -- $$f$$e; \
 						done ; \
 					done ; \
 				fi ; \
-			done | LANG= sort -u ; \
-		) >contents_index ; \
-		f=contents_index ; if test -s $$f ; then \
-			$(GENCOMPRESSEDDATA) ; \
+			done ; \
+		done ; \
+		if test "$${made_list:-no}" = yes; then \
+			for b in '' updates extras testing $$rb ; do \
+				bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+				for r in main debug devel source '' ; do \
+					comp="$${b:-base}_$${r:-full}" ; \
+					repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+					( \
+						vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+						test -n "$$vendor" || vendor=Unknown ; \
+						$(ECHO) "Archive: $(PACKAGE_TITLE) $$bran $$repo" ; \
+						$(ECHO) "Component: $${b:-base}/$${r:-full}" ; \
+						$(ECHO) "Version: $(VERSION)" ; \
+						$(ECHO) "Origin: $$vendor" ; \
+						$(ECHO) "Label: $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))" ; \
+						$(ECHO) "Architecture: $(target_cpu)" ; \
+						$(ECHO) "NotAutomatic: false" ; \
+						if test -s pkglist.$$comp ; then \
+							$(ECHO) "PackageCount: `$(COUNTPKGLIST) pkglist.$$comp`" ; \
+						fi ; \
+						if test -s srclist.$$comp ; then \
+							$(ECHO) "SourceCount: `$(COUNTPKGLIST) srclist.$$comp`" ; \
+						fi ; \
+					) >release.$$comp ; \
+					f=release.$$comp ; if test -s $$f ; then \
+						$(GENCOMPRESSEDDATA) ; \
+					fi ; \
+				done ; \
+			done ; \
+			user='$(GNUPGUSER)'; user="$${user:+ -u }$$user" ; \
+			home='$(GNUPGHOME)'; home="$${home:+ --homedir }$$home" ; \
+			pass='$(GNUPGPASS)'; pass="$${pass:+ --batch }" ; \
+			pipe='$(GNUPGPASS)'; pipe="$${pipe:+$(ECHO) $$pipe |}" ; \
+			comps= ; \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					comps="$${comps:+$$comps }$${b:-base}/$${r:-full}" ; \
+				done ; \
+			done ; \
+			( \
+				vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+				test -n "$$vendor" || vendor=Unknown ; \
+				$(ECHO) "Origin: $$vendor" ; \
+				$(ECHO) "Label: $(VERSION)" ; \
+				$(ECHO) "Suite: $(PACKAGE)" ; \
+				$(ECHO) "Codename: $(PACKAGE_NAME)" ; \
+				$(ECHO) "Date: `date -R`" ; \
+				$(ECHO) "Architectures: $(target_cpu) noarch" ; \
+				$(ECHO) "Components: $$comps" ; \
+				$(ECHO) "Description: $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))" ; \
+				$(ECHO) "MD5Sum:" ; \
+				list=`echo "$$comps" | sed 's,/,_,g'` ; \
+				for comp in $$list ; do \
+					for fn in pkglist srclist release ; do \
+						for ext in '' '.gz' '.bz2' '.xz' ; do \
+							f="$$fn.$$comp$$ext" ; \
+							test -s $$f || continue ; \
+							$(ECHO) " `md5sum $$f | awk '{print$$1}'` `wc -c $$f | awk '{print$$1}'` base/$$f" ; \
+						done ; \
+					done ; \
+				done ; \
+			) >release ; \
+			$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- release >release.gpg 2>/dev/null" ; \
+			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- release >release.gpg 2>/dev/null" ; \
+			cat release.gpg >>release ; \
+			touch release.gpg ; \
+			$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >release.key" ; \
+			$(GPG) -a$$user$$home --export $(GNUPGUSER) >release.key ; \
+			( \
+				$(ECHO) "MD5SUM:" ; \
+				list=`echo "$$comps" | sed 's,/,_,g'` ; \
+				for comp in $$list ; do \
+					for fn in pkglist srclist release ; do \
+						for ext in '' '.gz' '.bz2' '.xz' ; do \
+							f="$$fn.$$comp$$ext" ; \
+							test -s $$f || continue ; \
+							$(ECHO) " `md5sum $$f | awk '{print$$1}'` `wc -c $$f | awk '{print$$1}'` base/$$f" ; \
+						done ; \
+					done ; \
+				done ; \
+			) >hashfile ; \
+			$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- hashfile >hashfile.gpg 2>/dev/null" ; \
+			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- hashfile >hashfile.gpg 2>/dev/null" ; \
+			$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >hashfile.key" ; \
+			$(GPG) -a$$user$$home --export $(GNUPGUSER) >hashfile.key ; \
+			( \
+				list=`echo "$$comps" | sed 's,/,_,g'` ; \
+				for comp in $$list ; do \
+					if test -d $${repodir}/RPMS.$$comp ; then \
+						for r in $${repodir}/RPMS.$$comp/*.rpm ; do \
+							case "$$r" in (*-source-*|*-doc-*|*-base-*|*-javadoc-*) continue ;; esac ; \
+							test -s $$r || continue ; \
+							name=`rpm -ql --qf '%NAME\n' -p $$r 2>/dev/null` ; \
+							test -n "$$name" || continue ; \
+							$(ECHO) "rpm -qlp $$r" >&2 ; \
+							rpm -qlp $$r 2>/dev/null | while read f ; do \
+								$(ECHO) -e "$$f\t$$name" ; \
+							done ; \
+						done ; \
+					fi ; \
+				done | LANG= sort -u ; \
+			) >contents_index ; \
+			f=contents_index ; if test -s $$f ; then \
+				$(GENCOMPRESSEDDATA) ; \
+			fi ; \
+		else \
+			files=; \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					files="$${files:+$$files }release.$${b:-base}_$${r:-full}"; \
+				done ; \
+			done ; \
+			for f in $$files release hashfile contents_index srpm_idx; do \
+				for e in '' .gz .bz2 .lzma .xz .key .gpg .asc; do \
+					test -e $$f$$e || continue ; \
+					$(ECHO) " rm -f -- $$f$$e"; \
+					rm -f -- $$f$$e; \
+				done ; \
+			done ; \
+			$(ECHO) "rmdir -pv -- $$repodir/base" ; \
+			rmdir -pv -- $$repodir/base || :; \
 		fi ; \
 	)
 
