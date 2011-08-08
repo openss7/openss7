@@ -8,7 +8,7 @@
 	ForceType "text/plain"
 </FilesMatch>
 # All repo files are controlled by the autohandler
-<FilesMatch "^(OPENSS7credentials|netrc.openss7|openss7.repo|openss7.list|media.cfg)$">
+<FilesMatch "^(OPENSS7credentials|openss7.repo|openss7.list|netrc.openss7|media.cfg)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
