@@ -300,16 +300,28 @@ dnl AC_ARG_VAR([DEB_HOST_GNU_TYPE], [Debian host/target alias])
 dnl
 dnl These commands are needed to perform DPKG package builds.
 dnl
+dnl Note that even if one could coax a non-debian system to build
+dnl debs and dscs, they would not be useful.  Usually dpkg tools
+dnl are just there for examining deb packages.
+dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
     tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([debs],
 	[AS_HELP_STRING([--disable-debs],
 	    [build debs @<:@default=auto@:>@])],
-	[], [enable_debs=yes])
+	[], [dnl
+	case "$target_vendor" in
+	    (debian|ubuntu|lts|mint)	enable_debs=yes ;;
+	    (*)				enabel_debs=no	;;
+	esac])
     AC_ARG_ENABLE([dscs],
 	[AS_HELP_STRING([--disable-dscs],
 	    [build dscs @<:@default=auto@:>@])],
-	[], [enable_dscs=yes])
+	[], [dnl
+	case "$target_vendor" in
+	    (debian|ubuntu|lts|mint)	enable_dscs=yes	;;
+	    (*)				enable_dscs=no	;;
+	esac])
     AC_ARG_VAR([DPKG],
 	       [dpkg command. @<:@default=dpkg@:>@])
     _BLD_PATH_PROG([DPKG], [dpkg], [${am_missing3_run}dpkg], [$tmp_path], [dnl

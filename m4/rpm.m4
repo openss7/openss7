@@ -616,16 +616,28 @@ dnl AC_ARG_VAR([PKG_CONFIG_PATH], [RPM configuration path.])
 dnl
 dnl These commands are needed to perform RPM package builds.
 dnl
+dnl Note that even if one could coax a debian system to build
+dnl srpms and rpms, they would not be useful.  Usually rpm tools
+dnl are just there for examining rpm packages.
+dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
     tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
     AC_ARG_ENABLE([rpms],
 	[AS_HELP_STRING([--disable-rpms],
 	    [build rpms @<:@default=auto@:>@])],
-	[], [enable_rpms=yes])
+	[], [dnl
+	case "$target_vendor" in
+	    (debian|ubuntu|lts|mint)	enable_rpms=no	;;
+	    (*)				enable_rpms=yes	;;
+	esac])
     AC_ARG_ENABLE([srpms],
 	[AS_HELP_STRING([--disable-srpms],
 	    [build srpms @<:@default=auto@:>@])],
-	[], [enable_srpms=yes])
+	[], [dnl
+	case "$target_vendor" in
+	    (debian|ubuntu|lts|mint)	enable_srpms=no	 ;;
+	    (*)				enable_srpms=yes ;;
+	esac])
     AC_ARG_VAR([RPM],
 	       [Rpm command. @<:@default=rpm@:>@])
     _BLD_PATH_PROG([RPM], [rpm], [${am_missing3_run}rpm], [$tmp_path], [dnl
