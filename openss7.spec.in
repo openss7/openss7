@@ -1897,7 +1897,8 @@ Group:          System Environment/Kernel
 ExclusiveArch:  %{ix86} k6 x86_64 s390 s390x ppc ppciseries ppcpseries ppc64 arm armv4l sh mips mipsel noarch
 ExclusiveOs:    Linux
 #Source:         %{name}-%{baseversion}.tar.bz2
-Source:         http://www.openss7.org/tarballs/%{name}-%{baseversion}.tar.bz2
+%{?__xz:Source:         http://www.openss7.org/tarballs/%{name}-%{baseversion}.tar.xz}
+%{!?__xz:Source:         http://www.openss7.org/tarballs/%{name}-%{baseversion}.tar.bz2}
 %{!?buildroot:BuildRoot: %{_tmppath}/%{name}-%{baseversion}-%{specrelease}-root}
 Autoreq:        true
 Autoprov:       true

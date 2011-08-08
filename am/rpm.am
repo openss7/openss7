@@ -2399,6 +2399,9 @@ repo-aptrpm-directories: $(RELEASE_DIRECTORIES)
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
 	$(ECHO) "cd $(aptrsrpmdir)" ; cd $(aptrsrpmdir) ; \
 	find $$rpms -follow -name '*.rpm' | grep -- '\.src\.rpm$$' \
+		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm .  ; done ; \
+	$(ECHO) "cd $(aptrfsrcdir)" ; cd $(aptrfsrcdir) ; \
+	find $$rpms -follow -name '*.rpm' | grep -- '\.src\.rpm$$' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm .  ; done
 
 MY_PHONY		+= repo-aptrpm-directories
@@ -2562,19 +2565,19 @@ repo-clean-aptrpm:
 	rm -f -- $(aptrbasedir)/srpm_idx
 
 
-REPO_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir)
+REPO_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir) $(aptrfsrcdir)
 REPO			+= repo-aptrpm
 REPO_SIGN		+= repo-sign-aptrpm
 REPO_CLEAN		+= repo-clean-aptrpm
 REPOCLEANFILES		+= $(aptr_files)
 
-RELEASE_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir)
+RELEASE_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir) $(aptrfsrcdir)
 RELEASE			+= repo-aptrpm
 RELEASE_SIGN		+= repo-sign-aptrpm
 RELEASE_CLEAN_LOCAL	+= repo-clean-aptrpm
 RELEASECLEANFILES	+= $(aptr_files)
 
-UPDATE_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir)
+UPDATE_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir) $(aptrfsrcdir)
 UPDATE			+= repo-aptrpm
 UPDATE_SIGN		+= repo-sign-aptrpm
 UPDATE_CLEAN_LOCAL	+= repo-clean-aptrpm

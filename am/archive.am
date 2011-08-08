@@ -537,7 +537,7 @@ release-copy-archives:
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test $$f -ef $$t && continue ; \
-		if test ! -f $$t -o \( :$(FORCE) = :force -a $$t -nt $$f \) ; then \
+		if test ! -f $$t -o \( :$(FORCE) = :force -a $$f -nt $$t \) ; then \
 			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
 			install -T -D -p -- $$f $$t ; \
 		fi ; \

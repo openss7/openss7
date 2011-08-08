@@ -141,6 +141,74 @@ UPDATECLEANFILES	+= LSM \
 			   $(PACKAGE_TARNAME).lsm \
 			   $(PACKAGE)-$(VERSION).lsm
 
+repo_html_files		= src/mason/.htaccess \
+			  src/mason/auth.pl \
+			  src/mason/autohandler
+
+repo_need_files		= mirrorlist \
+			  $(PACKAGE_UCNAME)credentials \
+			  $(PACKAGE).list \
+			  $(PACKAGE).repo \
+			  $(PACKAGE_UCNAME).service \
+			  repoindex.xml
+
+EXTRA_DIST		+= $(repo_html_files)
+
+release-install-repo:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@for f in $(repo_html_files); do \
+		t="$(REPODIR)/`basename $$f`"; \
+		d=; test -f $$f || d='$(srcdir)/'; \
+		if test ! -e "$$t" -o '$(FORCE)' = force -o "$$t" -ot "$$d$$f" ; then \
+			$(ECHO) "  install -T -D -p -- $$d$$f $$t"; \
+			install -T -D -p -- $$d$$f $$t; \
+		else \
+			$(ECHO) "  not installing older $$d$$f"; \
+		fi ; \
+	done
+	@for f in $(repo_need_files); do \
+		t="$(REPODIR)/$$f"; \
+		if test ! -e "$$t" -o '$(FORCE)' = force ; then \
+			$(ECHO) "  touch $$t"; \
+			touch $$t; \
+		fi ; \
+	done
+
+release-uninstall-repo:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+
+RELEASE_INSTALL		+= release-install-repo
+RELEASE_UNINSTALL	+= update-uninstall-repo
+
+update-install-repo:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+	@for f in $(repo_html_files); do \
+		t="$(REPODIR)/`basename $$f`"; \
+		if test ! -e "$$t" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$t" -ot '$(USTAMP)' \) \); then \
+			$(ECHO) "  install -T -D -p -- $$d$$f $$t"; \
+			install -T -D -p -- $$d$$f $$t; \
+		else \
+			$(ECHO) "  not installing older $$d$$f"; \
+		fi ; \
+	done
+	@for f in $(repo_need_files); do \
+		t="$(REPODIR)/$$f"; \
+		if test ! -e "$$t" -o '$(FORCE)' = force ; then \
+			$(ECHO) "  touch $$t"; \
+			touch $$t; \
+		fi ; \
+	done
+
+update-uninstall-repo:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
+
+UPDATE_INSTALL		+= update-install-repo
+UPDATE_UNINSTALL	+= update-uninstall-repo
+
 release-install-lsm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
