@@ -175,11 +175,44 @@
 %endif
 
 
-%global HAVE_yumrepo        %(if (rpm -q --whatprovides yum >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
-%global HAVE_zypprepo       %(if (rpm -q --whatprovides zypper >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
-%global HAVE_urpmirepo      %(if (rpm -q --whatprovides urpmi >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%global HAVE_yumrepo        %(if (rpm -q --whatprovides yum     >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%global HAVE_aptrepo        %(if (rpm -q --whatprovides apt-get >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%global HAVE_urpmirepo      %(if (rpm -q --whatprovides urpmi   >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%global HAVE_zypprepo       %(if (rpm -q --whatprovides zypper  >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+
 # when _reposubdir is not defined we cannot build a repo package
-%{!?_reposubdir:            %{expand: %%global HAVE_yumrepo 0}}
+%{!?_reposubdir:            %{expand: %%global HAVE_yumrepo   0}}
+%{!?_reposubdir:            %{expand: %%global HAVE_aptrepo   0}}
+%{!?_reposubdir:            %{expand: %%global HAVE_urpmirepo 0}}
+%{!?_reposubdir:            %{expand: %%global HAVE_zypprepo  0}}
+
+%if %{HAVE_zypprepo}
+%global HAVE_yumrepo        0
+%global HAVE_aptrepo        0
+%global HAVE_urpmirepo      0
+%global HAVE_zypprepo       1
+%endif
+
+%if %{HAVE_urpmirepo}
+%global HAVE_yumrepo        0
+%global HAVE_aptrepo        0
+%global HAVE_urpmirepo      1
+%global HAVE_zypprepo       0
+%endif
+
+%if %{HAVE_aptrepo}
+%global HAVE_yumrepo        0
+%global HAVE_aptrepo        1
+%global HAVE_urpmirepo      0
+%global HAVE_zypprepo       0
+%endif
+
+%if %{HAVE_yumrepo}
+%global HAVE_yumrepo        1
+%global HAVE_aptrepo        0
+%global HAVE_urpmirepo      0
+%global HAVE_zypprepo       0
+%endif
 
 %global HAVE_devscripts     0
 %if %{HAVE_mknods}
@@ -386,6 +419,7 @@
 %global FILES_yumrepo       %{HAVE_yumrepo}
 %global FILES_zypprepo      %{HAVE_zypprepo}
 %global FILES_urpmirepo     %{HAVE_urpmirepo}
+%global FILES_aptrepo       %{HAVE_aptrepo}
 %global FILES_repo          0
 %if %{FILES_yumrepo}
 %global FILES_repo          1
@@ -394,6 +428,9 @@
 %global FILES_repo          1
 %endif
 %if %{FILES_urpmirepo}
+%global FILES_repo          1
+%endif
+%if %{FILES_aptrepo}
 %global FILES_repo          1
 %endif
 
@@ -605,6 +642,8 @@
 %{!?_rpmgpgdir:         %{expand: %%global _rpmgpgdir       %%{_sysconfdir}/pki/rpm-gpg}}
 %{!?_urpmirepodir:      %{expand: %%global _urpmirepodir    %%{_sysconfdir}/urpmi/mediacfg.d}}
 %{!?_urpmiconfdir:      %{expand: %%global _urpmiconfdir    %%{_sysconfdir}/urpmi}}
+%{!?_aptrepodir         %{expand: %%global _aptrepodir      %%{_sysconfdir}/apt}}
+%{!?_aptconfdir         %{expand: %%global _aptconfdir      %%{_sysconfdir}/apt}}
 
 %{!?_repobase:          %{expand: %%global _repobase        @repobase@}}
 %{!?_reporoot:          %{expand: %%global _reporoot        @reporoot@}}
@@ -723,6 +762,7 @@
 %global FILES_yumrepo       0
 %global FILES_zypprepo      0
 %global FILES_urpmirepo     0
+%global FILES_aptrepo       0
 %global FILES_repo          0
 %global FILES_kupdate       0
 %global FILES_wmscripts     0
@@ -904,6 +944,9 @@
 %global WANT_repo       1
 %endif
 %if %{FILES_urpmirepo}
+%global WANT_repo       1
+%endif
+%if %{FILES_aptrepo}
 %global WANT_repo       1
 %endif
 
@@ -1734,6 +1777,9 @@
 %if %{FILES_urpmirepo}
 %global files_urpmirepo     %{nil}
 %endif
+%if %{FILES_aptrepo}
+%global files_aptrepo       %{nil}
+%endif
 %if %{FILES_repo}
 %global files_repo          %{nil}
 %endif
@@ -2506,6 +2552,9 @@ Prefix:             %{_yumconfdir}
 %if %{FILES_urpmirepo}
 #refix:             %{_urpmirepodir}
 %endif
+%if %{FILES_aptrepo}
+#refix:             %{_aptrepodir}
+%endif
 
 %if %{FILES_yumrepo}
 Requires:           yum
@@ -2533,6 +2582,15 @@ Requires(prereq):   urpmi
 #equires(preun):    urpmi
 #equires(post):     urpmi
 #equires(postun):   urpmi
+%endif
+
+%if %{FILES_aptrepo}
+Requires:           apt
+Requires(prereq):   apt
+#equires(pre):      apt
+#equires(preun):    apt
+#equires(post):     apt
+#equires(postun):   apt
 %endif
 
 %if %{FILES_repo}
@@ -2769,6 +2827,111 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 %endif
 fi
 
+%triggerin -p /bin/bash repo -- apt
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # apt is being installed or upgraded with repo present (or vise versa)
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+fi
+
+%triggerin -p /bin/bash repo -- yum
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # yum is being installed or upgraded with repo present (or vise versa)
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+fi
+
+%triggerin -p /bin/bash repo -- urpmi
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # urpm is being installed or upgraded with repo present (or vise versa)
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+fi
+
+%triggerun -p /bin/bash repo -- apt
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if   [ $1 -eq 0 ] ; then : # repo being removed with apt present
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+elif [ $2 -eq 0 ] ; then : # apt being removed with repo present
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+fi
+
+%triggerun -p /bin/bash repo -- yum
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if   [ $1 -eq 0 ] ; then : # repo being removed with yum present
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+elif [ $2 -eq 0 ] ; then : # yum being removed with repo present
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+fi
+
+%triggerun -p /bin/bash repo -- urpmi
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if   [ $1 -eq 0 ] ; then : # repo being removed with urpm present
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+elif [ $2 -eq 0 ] ; then : # urpm being removed with repo present
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+fi
+
 %preun -p /bin/bash repo
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 0 ] ; then : # final removal
@@ -2817,7 +2980,45 @@ if [ $1 -eq 0 ] ; then : # final removal
 %endif
 %if %{FILES_urpmirepo}
 %endif
+%if %{FILES_aptrepo}
+%endif
 fi
+
+%triggerpostun -p /bin/bash repo -- apt
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# apt was removed with repo present
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+
+%triggerpostun -p /bin/bash repo -- yum
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# yum was removed with repo present
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
+
+%triggerpostun -p /bin/bash repo -- urpm
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# urpm was removed with repo present
+%if %{FILES_yumrepo}
+%endif
+%if %{FILES_zypprepo}
+%endif
+%if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
+%endif
 
 %if %{PACKAGE_repo}
 %files repo
@@ -2828,6 +3029,8 @@ fi
 #{?files_zypprepo:%config(noreplace) %{_zypprepodir}/*}
 %{?files_yumrepo:%{_yumplugdir}/*.py*}
 %{?files_yumrepo:%config(noreplace) %{_yumconfdir}/*.conf}
+#{?files_urpmirepo:%config(noreplace) %{_urpmirepodir}/*}
+#{?files_aptrepo:%config(noreplace) %{_aptrepodir}/*}
 %endif
 
 # ===========================================================================
