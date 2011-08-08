@@ -112,6 +112,15 @@ case $1 in
 	  --run		    try to run PROGRAM, and emulate if it fails
 	
 	Supported PROGRAM values:
+	  Dpkg tools:
+	      dpkg			    fail
+	      dpkg-deb			    fail
+	      dpkg-architecture		    create appropriate output
+	      dpkg-buildflags		    create appropriate output
+	      dpkg-genchanges		    create appropriate output
+	      dpkg-source		    create appropriate output
+	      dpkg-buildpackage		    cteate appropriate output
+
 	  RedHat/Fedora repository commands:
 	      createrepo		    touch the output file
 	      modifyrepo		    touch the output file
@@ -326,6 +335,21 @@ case $program in
 	*** 
 	EOF
 	;;
+    (dpkg-architecture|dpkg-buildflags|dpkg-genchanges|dpkg-source|dpkg-buildpackage)
+	cat 1>&2 <<-EOF
+	*** It is straightforward to emulate \`$program'; however, emulation is
+	*** not currently supported by \`$scriptname'.
+	*** 
+	*** You might have modified some files without having the proper tools
+	*** for further handling them.  Check the \`README' file, it often tells
+	*** you about the needed prerequisites for installing this package.  You
+	*** may also peek at any GNU archive site, in case some other package
+	*** would contain this missing \`$program' program.
+	***
+	*** Debian 5.0:	 \`apt-get install dpkg-dev'
+	*** Ubuntu:	 \`apt-get install dpkg-dev'
+	EOF
+	;;
     (createrepo)
 	cat 1>&2 <<-EOF
 	*** You might have modified some files without having the proper tools
@@ -449,6 +473,9 @@ case $program in
 	exit 1
 	;;
     (dpkg|dpkg-deb)
+	exit 1
+	;;
+    (dpkg-architecture|dpkg-buildflags|dpkg-genchanges|dpkg-source|dpkg-buildpackage)
 	exit 1
 	;;
     (genbasedir|genpkglist|gensrclist)

@@ -318,6 +318,30 @@ dnl
 		AC_MSG_WARN([Cannot find dpkg program in PATH.]) ;;
 	    (*) enable_debs=no; enable_dscs=no ;;
 	esac])
+    AC_ARG_VAR([DPKG_ARCHITECTURE],
+	       [dpkg-architecture command. @<:@default=dpkg-architecture@:>@])
+    _BLD_PATH_PROG([DPKG_ARCHITECTURE], [dpkg-architecture], [${am_missing3_run}dpkg-architecture], [$tmp_path], [dnl
+	case "$target_vendor" in
+	    (debian|ubuntu|lts|mint)
+		AC_MSG_WARN([Cannot find dpkg-architecture program in PATH.]) ;;
+	    (*) enable_debs=no; enable_dscs=no ;;
+	esac])
+    AC_ARG_VAR([DPKG_BUILDFLAGS],
+	       [dpkg-buildflags command. @<:@default=dpkg-buildflags@:>@])
+    _BLD_PATH_PROG([DPKG_BUILDFLAGS], [dpkg-buildflags], [${am_missing3_run}dpkg-buildflags], [$tmp_path], [dnl
+	case "$target_vendor" in
+	    (debian|ubuntu|lts|mint)
+		AC_MSG_WARN([Cannot find dpkg-buildflags program in PATH.]) ;;
+	    (*) enable_debs=no; enable_dscs=no ;;
+	esac])
+    AC_ARG_VAR([DPKG_GENCHANGES],
+	       [dpkg-genchanges command. @<:@default=dpkg-genchanges@:>@])
+    _BLD_PATH_PROG([DPKG_GENCHANGES], [dpkg-genchanges], [${am_missing3_run}dpkg-genchanges], [$tmp_path], [dnl
+	case "$target_vendor" in
+	    (debian|ubuntu|lts|mint)
+		AC_MSG_WARN([Cannot find dpkg-genchanges program in PATH.]) ;;
+	    (*) enable_debs=no; enable_dscs=no ;;
+	esac])
     AC_ARG_VAR([DPKG_SOURCE],
 	       [dpkg-source command. @<:@default=dpkg-source@:>@])
     _BLD_PATH_PROG([DPKG_SOURCE], [dpkg-source], [${am_missing3_run}dpkg-source], [$tmp_path], [dnl
