@@ -1887,6 +1887,7 @@ dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_COMPILER], [dnl
     AC_CACHE_CHECK([for kernel compiler], [linux_cv_k_compiler_match], [dnl
+	linux_cv_k_compiler=
 	if test :"$linux_cv_k_running" = :yes
 	then
 dnl
@@ -1904,37 +1905,38 @@ dnl
 	    eval "linux_dirs=\"${khdrdir} ${kbuilddir} ${ksrcdir}\""
 	    for linux_dir in $linux_dirs
 	    do
-		linux_file="$linux_dir/include/linux/compile.h"
-		if test -f $linux_file
-		then
-		    linux_cv_k_compiler=`grep LINUX_COMPILER $linux_file | sed -e 's,^.*gcc version,gcc version,;s,"[[^"]]*[$],,' 2>/dev/null`
-		    break
-		else
-		    eval "linux_dir=\"$kmoduledir/kernel/arch\""
-		    if test -d $linux_dir
+		for linux_file in $linux_dir/include/{linux,generated}/compile.h
+		do
+		    if test -f $linux_file
 		    then
-			linux_mods=`find $linux_dir -type f -name '*'$kext$kzip 2>/dev/null`
-			for linux_mod in $linux_mods
-			do
-			    if test -f $linux_mod
-			    then
-				if echo "$linux_mod" | grep '\.gz[$]' >/dev/null 2>&1
-				then
-				    linux_com=`gunzip -dc $linux_mod | strings | grep '^GCC: (GNU) ' | head -1 2>/dev/null`
-				else
-				    linux_com=`cat $linux_mod | strings | grep '^GCC: (GNU) '  | head -1 2>/dev/null`
-				fi
-				if echo "$linux_com" | grep '^GCC: (GNU) ' >/dev/null 2>&1
-				then
-				    linux_cv_k_compiler=`echo "$linux_com" | sed -e 's,^GCC: (GNU) ,gcc version ,'`
-				    break
-				fi
-			    fi
-			done
-			if test :"${linux_cv_k_compiler:+set}" = :set
+			linux_cv_k_compiler=`grep LINUX_COMPILER $linux_file | sed -e 's,^.*gcc version,gcc version,;s,"[[^"]]*[$],,' 2>/dev/null`
+			break 2
+		    fi
+		done
+		eval "linux_dir=\"$kmoduledir/kernel/arch\""
+		if test -d $linux_dir
+		then
+		    linux_mods=`find $linux_dir -type f -name '*'$kext$kzip 2>/dev/null`
+		    for linux_mod in $linux_mods
+		    do
+			if test -f $linux_mod
 			then
-			    break
+			    if echo "$linux_mod" | grep '\.gz[$]' >/dev/null 2>&1
+			    then
+				linux_com=`gunzip -dc $linux_mod | strings | grep '^GCC: (GNU) ' | head -1 2>/dev/null`
+			    else
+				linux_com=`cat $linux_mod | strings | grep '^GCC: (GNU) '  | head -1 2>/dev/null`
+			    fi
+			    if echo "$linux_com" | grep '^GCC: (GNU) ' >/dev/null 2>&1
+			    then
+				linux_cv_k_compiler=`echo "$linux_com" | sed -e 's,^GCC: (GNU) ,gcc version ,'`
+				break
+			    fi
 			fi
+		    done
+		    if test :"${linux_cv_k_compiler:+set}" = :set
+		    then
+			break
 		    fi
 		fi
 	    done
