@@ -154,7 +154,7 @@ bld_cv_pkg_ver_BZIP2_CMD=${bld_cv_pkg_ver_BZIP2_CMD=1.0.6}
 bld_cv_pkg_ver_CHKCONFIG=${bld_cv_pkg_ver_CHKCONFIG=1.3.52}
 bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.6.5.10}
 bld_cv_pkg_ver_CREATEREPO=${bld_cv_pkg_ver_CREATEREPO=0.9.9}
-bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.12}
+bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.16}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.7.4}
 bld_cv_pkg_ver_DVI2PS=${bld_cv_pkg_ver_DVI2PS=2007}
 bld_cv_pkg_ver_DVIPDF=${bld_cv_pkg_ver_DVIPDF=9.02}
@@ -175,14 +175,14 @@ bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=1.6.0.0}
 bld_cv_pkg_ver_JAVAH=${bld_cv_pkg_ver_JAVAH=4.6.0}
 bld_cv_pkg_ver_KEYTOOL=${bld_cv_pkg_ver_KEYTOOL=4.6.0}
 bld_cv_pkg_ver_LATEX2HTML=${bld_cv_pkg_ver_LATEX2HTML=2008}
-bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.13.90}
-bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.12}
+bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.14}
+bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.16}
 bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.84}
 bld_cv_pkg_ver_LZMA_CMD=${bld_cv_pkg_ver_LZMA_CMD=5.0.1}
 bld_cv_pkg_ver_MAKEWHATIS=${bld_cv_pkg_ver_MAKEWHATIS=2.5.9}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=8.10}
 bld_cv_pkg_ver_MODIFYREPO=${bld_cv_pkg_ver_MODIFYREPO=0.9.9}
-bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.12}
+bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.16}
 bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=2.6.38.6}
 bld_cv_pkg_ver_PACKAGE_LIST=${bld_cv_pkg_ver_PACKAGE_LIST=1.6.0.0}
 bld_cv_pkg_ver_PS2EPSI=${bld_cv_pkg_ver_PS2EPSI=9.02}
