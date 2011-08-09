@@ -122,7 +122,7 @@ public class CauseInd implements java.io.Serializable {
         return m_codingStandard;
     }
     /** Sets the Coding Standard field of the parameter.
-        @param aCodingStandard  The coding standard value, range 0 to 3, see
+        @param codingStandard  The coding standard value, range 0 to 3, see
         CauseInd().
         @exception ParameterRangeInvalidException  Thrown if the sub-field is out of
         range.
@@ -185,7 +185,7 @@ public class CauseInd implements java.io.Serializable {
         return m_ext2;
     }
     /** Sets the ext2 field of the parameter.
-        @param ext1  The Ext1 value, see CauseInd().
+        @param ext2  The Ext1 value, see CauseInd().
       */
     public void setExt2(boolean ext2) {
         m_ext2 = ext2;

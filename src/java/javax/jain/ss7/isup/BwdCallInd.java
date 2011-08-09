@@ -256,7 +256,7 @@ public abstract class BwdCallInd implements java.io.Serializable {
         return m_isdnAccessIndicator ;
     }
     /** Sets the ISDN Access Indicator field of the parameter.
-      * @param aISDNAccessIndicatorthe  ISDNAccessIndicator value, see BwdCallInd().  */
+      * @param aISDNAccessIndicator the ISDNAccessIndicator value, see BwdCallInd().  */
     public void setISDNAccessInd(boolean aISDNAccessIndicator) {
         m_isdnAccessIndicator = aISDNAccessIndicator;
     }

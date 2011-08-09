@@ -137,8 +137,8 @@ public class SccpErrorNotification extends OamErrorNotification {
       * @param source
       * the source of the error
       *
-      * @param sequenceNumberThe
-      * notification sequence number within the source object.
+      * @param sequenceNumber
+      * The notification sequence number within the source object.
       *
       * @param errorType
       * one of the defined Error Types.

@@ -109,7 +109,7 @@ public abstract class InformationEvent extends IsupEvent {
     }
     /** Sets the Information Indicators parameter of the message.
         Refer to InfoInd parameter for greater details.
-        @param infomationInd  Information Indicators parameter.
+        @param informationInd  Information Indicators parameter.
       */
     public void setInfoInd(InfoInd informationInd) {
         m_informationInd = informationInd;
@@ -125,7 +125,7 @@ public abstract class InformationEvent extends IsupEvent {
         throw new ParameterNotSetException("CallingPartyNumber not set.");
     }
     /** Sets the Calling Party Number parameter of the message.
-        @param callingPartyNumthe  Calling Party Number parameter of the event.
+        @param callingPartyNum The Calling Party Number parameter of the event.
       */
     public void setCallingPartyNumber(CallingPartyNumber callingPartyNum) {
         m_callingPartyNum = callingPartyNum;

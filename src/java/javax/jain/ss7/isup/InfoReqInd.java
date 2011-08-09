@@ -74,7 +74,7 @@ public class InfoReqInd implements java.io.Serializable {
       * @param in_callingAddrReqInd  The calling party address request indicator; <ul>
       * <li>CPARI_CALLING_PARTY_ADDRESS_NOT_REQUESTED and
       * <li>CPARI_CALLING_PARTY_ADDRESS_REQUESTED. </ul>
-      * @param in_holdInd  The holding indicator; <ul> <li>HPI_HOLD_NOT_REQUESTED and
+      * @param in_holdingInd  The holding indicator; <ul> <li>HPI_HOLD_NOT_REQUESTED and
       * <li>HPI_HOLD_REQUESTED. </ul>
       * @param in_callingCatReqInd  The calling party's category request indicator;
       * <ul> <li>CPCRI_CALLING_PARTY_CATEGORY_NOT_REQUESTED and
@@ -110,7 +110,7 @@ public class InfoReqInd implements java.io.Serializable {
         return m_holdingInd;
     }
     /** Sets the Holding Indicator field of the parameter.
-      * @param holdingIndicator  The Holding Indicator value, see InfoReqInd().  */
+      * @param holdingInd  The Holding Indicator value, see InfoReqInd().  */
     public void setHoldingInd(boolean holdingInd) {
         m_holdingInd = holdingInd;
     }

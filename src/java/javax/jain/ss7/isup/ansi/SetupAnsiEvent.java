@@ -59,8 +59,6 @@ public class SetupAnsiEvent extends SetupEvent {
     /** Constructs a new SetupAnsiEvent, with only the JAIN ISUP Mandatory parameters
         being supplied to the constructor, using the super class's constructor.
         @param source  The source of this event.
-        @param primitive  Primitive value for StartResetInd is ISUP_PRIMITIVE_SETUP. Refer
-        to IsupEvent class for more details.
         @param dpc  The destination point code.
         @param opc  The origination point code.
         @param sls  The signaling link selection.
@@ -233,7 +231,7 @@ public class SetupAnsiEvent extends SetupEvent {
     }
     /** Sets the Circuit Assign Map parameter of the message.
         Refer to CircuitAssignMapAnsi parameter for greater details.
-        @param usi  Circuit Assign Map parameter.
+        @param cam  Circuit Assign Map parameter.
       */
     public void setCircuitAssignMap(CircuitAssignMapAnsi cam) {
         m_cam = cam;
@@ -335,7 +333,7 @@ public class SetupAnsiEvent extends SetupEvent {
     }
     /** Sets the Information Request Indicators parameter of the message.
         Refer to InfoReqIndAnsi parameter for greater details.
-        @param infomationReqIndAnsi  Information Request Indicators parameter.
+        @param informationReqIndAnsi  Information Request Indicators parameter.
       */
     public void setInfoReqInd(InfoReqIndAnsi informationReqIndAnsi) {
             m_informationReqIndAnsi = informationReqIndAnsi;

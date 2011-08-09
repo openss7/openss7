@@ -60,8 +60,6 @@ public class CallProgressItuEvent extends CallProgressEvent {
     /** Constructs a new CallProgressItuEvent, with only the JAIN ISUP Mandatory
         parameters by calling the super class constructor.
         @param source  The source of this event.
-        @param primitive  Primitive value is ISUP_PRIMITIVE_ALERT.  Refer to IsupEvent
-        class for more details.
         @param dpc  The destination point code.
         @param opc  The origination point code.
         @param sls  The signaling link selection.

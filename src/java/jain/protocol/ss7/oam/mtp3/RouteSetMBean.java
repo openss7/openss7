@@ -85,7 +85,7 @@ public abstract interface RouteSetMBean extends Mtp3ManagedObjectMBean {
     /**
       * Sets whether or not this Routeset supports Load Sharing.
       *
-      * @oaram loadSharing
+      * @param loadSharing
       * either: <ul>
       * <li>true enables Load Sharing.
       * <li>false disables Load Sharing </ul>

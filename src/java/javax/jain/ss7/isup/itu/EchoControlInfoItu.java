@@ -179,7 +179,7 @@ public class EchoControlInfoItu implements java.io.Serializable {
     }
     /** Sets the Incoming Half Echo Control Device Request Indicator field of the
         parameter.
-        @param aIcHalfEchoControlDevRespInd  The Incoming Half Echo Control Device Request
+        @param aIcHalfEchoControlDevReqInd  The Incoming Half Echo Control Device Request
         Indicator value, range 0 to 3, see EchoControlInfoItu().
         @exception ParameterRangeInvalidException  Thrown when the sub-field is out of the
         specified range.

@@ -167,7 +167,7 @@ public final class IsupUserAddress implements SS7Address, java.io.Serializable {
       * the specified user address.  That is, the CIC range in the specified user
       * address is contained in the CIC range in this user address.  Start CIC in the
       * specified ISUP user address should be less than the end CIC.
-      * @param The User Address to be compared.
+      * @param isupUA The User Address to be compared.
       * @return True if the CIC range in isupUA is a (strict) subset of the CIC range
       * in this user address, false otherwise.  Note that if equals() returns true,
       * isSupersetOf() returns false for the same pair of objects.  */

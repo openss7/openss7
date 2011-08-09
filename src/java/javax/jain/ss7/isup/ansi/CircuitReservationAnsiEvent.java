@@ -103,7 +103,7 @@ public class CircuitReservationAnsiEvent extends IsupEvent {
     }
     /** Sets the Event Information parameter of the message.
       * Refer to NatureConnInd parameter class for more information.
-      * @param in_natureConnIndthe  Nature of Connection Indicator parameter of the event.  */
+      * @param in_natureConnInd  The Nature of Connection Indicator parameter of the event.  */
     public void setNatureConnInd(NatureConnInd in_natureConnInd) {
         m_natureConnInd = in_natureConnInd;
     }

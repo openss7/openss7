@@ -68,7 +68,7 @@ public class CircuitValidationRespAnsiEvent extends IsupEvent {
       * getCongestionPriority method in IsupEvent class for more details.
       * @param in_circuitValResp  Circuit Validation Response, 0 validation successful ;
       * 1 validation failure.
-      * @param in_circuitGrpCharacteristicsInd  Circuit Group Characteristics Indicators.
+      * @param in_circuitGrpCharacteristicsIndAnsi  Circuit Group Characteristics Indicators.
       * Refer to CircuitGrpCharacteristicsInd class for more details.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     public CircuitValidationRespAnsiEvent(java.lang.Object source, SignalingPointCode dpc,
@@ -121,7 +121,7 @@ public class CircuitValidationRespAnsiEvent extends IsupEvent {
     }
     /** Sets the Circuit Group Characteristics Indicator parameter of the message.
       * Refer to CircuitGrpCharacteristicsInd parameter class for more information.
-      * @param in_natureConnIndthe  Circuit Group Characteristics Indicator parameter of
+      * @param in_circuitGrpCharacteristicsIndAnsi  Circuit Group Characteristics Indicator parameter of
       * the event.  */
     public void setCircuitGrpCharacteristicsInd(CircuitGrpCharacteristicsIndAnsi in_circuitGrpCharacteristicsIndAnsi) {
         m_circuitGrpCharacteristicsIndAnsi = in_circuitGrpCharacteristicsIndAnsi;

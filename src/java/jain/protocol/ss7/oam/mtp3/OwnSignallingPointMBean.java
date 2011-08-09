@@ -95,7 +95,7 @@ public abstract interface OwnSignallingPointMBean extends Mtp3ManagedObjectMBean
       * @param index
       * the index position of the element in the array
       *
-      * @param routeset
+      * @param routeSet
       * the ObjectName of the RouteSetMBean to be added.
       *
       * @exception TooManyInstancesException
@@ -107,7 +107,7 @@ public abstract interface OwnSignallingPointMBean extends Mtp3ManagedObjectMBean
     /**
       * Sets all of the RouteSetMBeans associated with this OwnSignallingPointMBean.
       *
-      * @param routesets
+      * @param routeSets
       * An array of all the ObjectNames of the RouteSetMBeans associated with this
       * OwnSignallingPointMBean.
       *

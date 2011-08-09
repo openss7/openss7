@@ -229,7 +229,7 @@ public class SignalingPointCode implements java.io.Serializable {
     /**
       * Separates a Signaling Point Code out into the three fields
       * member, cluster, and zone.
-      * @param bitcode
+      * @param bitCode
       * The Signaling Point Code stored as a bitfield.
       * @param variant
       * The stack specification of the signaling point code to be

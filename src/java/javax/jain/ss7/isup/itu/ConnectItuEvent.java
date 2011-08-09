@@ -109,7 +109,7 @@ public class ConnectItuEvent extends IsupEvent {
     }
     /** Sets the BackwarCallIndicators parameter of the message.
         Refer to BwdItuCallInd parameter for greater details.
-        @param bcithe  BackwarCallIndicators parameter of the event.
+        @param bci  BackwarCallIndicators parameter of the event.
       */
     public void setBwdCallInd(BwdCallIndItu bci) {
         m_bci = bci;

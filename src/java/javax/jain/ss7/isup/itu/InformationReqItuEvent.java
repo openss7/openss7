@@ -67,7 +67,7 @@ public class InformationReqItuEvent extends InformationReqEvent {
       * @param congestionPriority  Priority of the ISUP message which may be used in the
       * optional national congestion control procedures at MTP3. Refer to
       * getCongestionPriority method in IsupEvent class for more details.
-      * @param in_infoInd  Information indicators.
+      * @param in_infoReqInd  Information indicators.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
     public InformationReqItuEvent(java.lang.Object source, SignalingPointCode dpc,

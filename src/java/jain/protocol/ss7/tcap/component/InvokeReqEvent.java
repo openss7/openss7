@@ -80,7 +80,7 @@ public final class InvokeReqEvent extends ComponentReqEvent {
       * an INVOKE_L component the InvokeLastEvent parameter must be set
       * to true. NOTE: This field is not used by ITU implementation,
       * however it is mandatory for ANSI.
-      * @param lastInvoke
+      * @param lastInvokeEvent
       * True if this is an INVOKE_L Event, false if this is an INVOKE_NL
       * Event.  */
     public void setLastInvokeEvent(boolean lastInvokeEvent) {

@@ -67,7 +67,7 @@ public class OptionalBwdCallIndItu extends OptionalBwdCallInd {
     public OptionalBwdCallIndItu() {
     }
     /** Constructs a OptionalBwdIndItu class from the input parameters specified.
-      * @param in_inbanInfoInd  The in-band information indicator, see
+      * @param in_inbandInfoInd  The in-band information indicator, see
       * OptionalBwdCallInd().
       * @param in_callDivInd  The call division may occur indicator. <ul>
       * <li>CDI_NO_INDICATION and <li>CDI_CALL_DIVERSION_MAY_OCCUR. </ul>

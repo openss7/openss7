@@ -89,7 +89,7 @@ public class RedirectingNumber extends NumberParameter {
         return m_addressPresentationRestrictedIndicator;
     }
     /** Sets the Address Presentation Restricted Ind field of the parameter.
-      * @param addrPresRestInd  Address presentation restriction indicator value, see
+      * @param addressPresentationRestrictedIndicator  Address presentation restriction indicator value, see
       * RedirectingNumber().  */
     public void setAddrPresRestInd(byte addressPresentationRestrictedIndicator)
         throws ParameterRangeInvalidException {

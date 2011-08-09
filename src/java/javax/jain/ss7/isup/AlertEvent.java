@@ -72,7 +72,7 @@ public abstract class AlertEvent extends IsupEvent {
       * @param congestionPriority  Priority of the ISUP message which may be used in
       * the optional national congestion control procedures at MTP3. Refer to
       * getCongestionPriority method in IsupEvent class for more details.
-      * @param bwdCallInd  Backward call indicators.
+      * @param bci  Backward call indicators.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     protected AlertEvent(java.lang.Object source, SignalingPointCode dpc,
             SignalingPointCode opc, byte sls, int cic, byte congestionPriority,
@@ -108,7 +108,7 @@ public abstract class AlertEvent extends IsupEvent {
     }
     /** Sets the BackwarCallIndicators parameter of the message. Refer to BwdCallInd
       * parameter for greater details.
-      * @param bcithe  BackwarCallIndicators parameter of the event.  */
+      * @param bci the BackwarCallIndicators parameter of the event.  */
     public void setBwdCallInd(BwdCallInd bci) {
         m_bci = bci;
     }

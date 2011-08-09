@@ -197,7 +197,7 @@ public interface JainTcapStack {
       * A string describing the Stack Name.  */
     public java.lang.String getStackName();
     /** Sets the name of the stack as a string.
-      * @param stackProtocol
+      * @param stackName
       * The new Stack Name value.  */
     public void setStackName(java.lang.String stackName);
     /** Returns the Vendor's name for this stack.

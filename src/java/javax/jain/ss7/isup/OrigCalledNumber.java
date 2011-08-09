@@ -88,7 +88,7 @@ public class OrigCalledNumber extends NumberParameter {
         return m_addressPresentationRestrictionIndicator;
     }
     /** Sets the Address Presentation Restricted Ind field of the parameter.
-      * @param addrPresRestInd  Address presentation restriction indicator value,range
+      * @param addressPresentationRestrictedIndicator  Address presentation restriction indicator value,range
       * 0 to 3, see OrigCalledNumber().  */
     public void setAddrPresRestInd(byte addressPresentationRestrictedIndicator)
         throws ParameterRangeInvalidException {

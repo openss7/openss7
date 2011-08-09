@@ -228,7 +228,7 @@ public abstract interface GlobalTitleEntryMBean extends SccpManagedObjectMBean {
     /**
       * Sets the Numbering Plan of this Global Title Entry.
       *
-      * @return
+      * @param numberingPlan
       * one of the Numbering Plan constants: <ul>
       * <li>NP_UNKOWN Indicates an unkown Numbering Plan
       * <li>NP_ISDN_TELIndicates ISDN/Telephony Numbering Plan

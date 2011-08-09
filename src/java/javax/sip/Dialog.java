@@ -187,7 +187,6 @@ public interface Dialog extends java.io.Serializable {
         MUST be placed into the CSeq header field. If the local sequence number is empty, an initial
         value MUST be chosen.
         @return The integer value of the local sequence number, returns zero if not set.
-        @see getLocalSeqNumber()
       */
     public int getLocalSequenceNumber();
     /**
@@ -218,7 +217,6 @@ public interface Dialog extends java.io.Serializable {
         sequence number of the request is greater than the remote sequence number, the request is in
         order.
         @return The integer value of the remote sequence number, return zero if not set.
-        @see getRemoteSeqNumber()
       */
     public int getRemoteSequenceNumber();
     /**

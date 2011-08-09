@@ -60,8 +60,6 @@ public class AnswerItuEvent extends AnswerEvent {
     /** Constructs a new AnswerItuEvent, with only the JAIN ISUP Mandatory parameters
         being supplied to the constructor.
         @param source  The source of this event.
-        @param primitive  Primitive value for StartResetInd is ISUP_PRIMITIVE_ANSWER.
-        Refer to IsupEvent class for more details.
         @param dpc  The destination point code.
         @param opc  The origination point code.
         @param sls  The signaling link selection.

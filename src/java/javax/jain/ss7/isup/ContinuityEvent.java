@@ -99,7 +99,7 @@ public class ContinuityEvent extends IsupEvent {
     /** Sets the Continuity Indicator parameter of the message.
         @param in_continuityInd  The ContinuityInd parameter of the event 1 if continuity
         check successful 0 otherwise.
-        @return ParameterRangeInvalidException  Thrown when value is out of range.
+        @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
     public void setContinuityInd(byte in_continuityInd)
         throws ParameterRangeInvalidException {

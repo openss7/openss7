@@ -67,7 +67,7 @@ public class BwdCallIndAnsi extends BwdCallInd {
       * @param in_chargeInd  The charge indicator, range 0-3, see BwdCallInd.
       * @param in_calledStatusInd  The called party's status indicator, range 0-3, see
       * BwdCallInd.
-      * @param in_calledCateInd  The called party's category indicator, range 0-3, see
+      * @param in_calledCatInd  The called party's category indicator, range 0-3, see
       * BwdCallInd.
       * @param in_eteMethodInd  The end-to-end method indicator, range 0-3, see
       * BwdCallInd.

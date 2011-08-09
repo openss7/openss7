@@ -97,12 +97,12 @@ public class CircuitIdNameAnsi implements java.io.Serializable {
         m_clliCodeA = in_clliCodeA;
     }
     /** Gets the CLLICodeB field of CircuitIdName parameter.
-      * @return CLLICodeB, range.  */
+      * @return CLLICodeB range.  */
     public CommonLangLocationIdAnsi getCLLICodeB() {
         return m_clliCodeB;
     }
     /** Sets the CLLICodeB field of CircuitIdName parameter.
-      * @param in_clliCodeB,  The CLLICodeB value, range.  */
+      * @param in_clliCodeB  The CLLICodeB value, range.  */
     public void setCLLICodeB(CommonLangLocationIdAnsi in_clliCodeB) {
         m_clliCodeB = in_clliCodeB;
     }

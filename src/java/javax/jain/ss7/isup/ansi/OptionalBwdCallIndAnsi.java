@@ -67,11 +67,11 @@ public class OptionalBwdCallIndAnsi extends OptionalBwdCallInd {
     public OptionalBwdCallIndAnsi() {
     }
     /** Constructs a OptionalBwdInd class from the input parameters specified.
-        @param in_inbanInfoInd - The in-band information indicator, see
+        @param in_inbandInfoInd - The in-band information indicator, see
         OptionalBwdCallInd().
         @param in_callFwdInd - The call forwarding indicator.  <ul> <li>CFI_NO_INDICATION
         and <li>CFI_CALL_FORWARDING_MAY_OCCUR. </ul>
-        @param in_nwExcessiveDelayInd - The network excessive delay indicator.  <ul>
+        @param in_nwExcessDelayInd - The network excessive delay indicator.  <ul>
         <li>NEDI_NO_INDICATION and <li>NEDI_NETWORK_EXCESSIVE_DELAY_ENCOUNTERED. </ul>
         @param in_userNwInteractionInd - The user network interaction indicatior.  <ul>
         <li>UNII_NO_INDICATION and <li>UNII_USER_NETWORK_INTERACTION_OCCURS. </ul>

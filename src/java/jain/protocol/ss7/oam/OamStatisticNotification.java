@@ -115,9 +115,9 @@ public abstract class OamStatisticNotification extends javax.management.Notifica
       */
     public static final int CATEGORY_PERFORMANCE = 3;
     /**
-      * Returns the category of this OamStatisticNotification.
+      * Sets the category of this OamStatisticNotification.
       *
-      * @return
+      * @param category
       * one of the following: <ul>
       * <li>CATEGORY_FAULT
       * <li>CATEGORY_CONFIGURATION

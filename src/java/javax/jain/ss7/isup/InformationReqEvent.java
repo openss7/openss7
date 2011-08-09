@@ -109,7 +109,7 @@ public abstract class InformationReqEvent extends IsupEvent {
     }
     /** Sets the Information Request Indicators parameter of the message.
         Refer to InfoReqInd parameter for greater details.
-        @param infomationReqInd  Information Request Indicators parameter.
+        @param informationReqInd  Information Request Indicators parameter.
       */
     public void setInfoReqInd(InfoReqInd informationReqInd) {
         m_informationReqInd = informationReqInd;

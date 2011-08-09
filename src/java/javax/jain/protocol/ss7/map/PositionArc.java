@@ -125,7 +125,7 @@ public class PositionArc extends PositionPoint {
     }
     /**
       * Get the parameter specifying the inner radius of the arc.
-      * @return
+      * @return float inner radius.
       */
     public float getInnerRadius() {
         float radius = 0;

@@ -65,8 +65,6 @@ public class ChargeNumberAnsi extends NumberParameter {
       * see NumberParameter().
       * @param numberingPlanIndicator  The numbering plan indicator, range 0-7, see
       * NumberParameter().
-      * @param addressPresentationRestrictedIndicator  The address presentation
-      * restricted indicator, range 0-3, see NumberParameter().
       * @param addressSignal  The address signal.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     public ChargeNumberAnsi(byte natureOfAddressIndicator, byte numberingPlanIndicator, byte[] addressSignal)

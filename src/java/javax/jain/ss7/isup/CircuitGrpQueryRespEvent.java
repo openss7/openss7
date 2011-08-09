@@ -144,7 +144,7 @@ public class CircuitGrpQueryRespEvent extends CircuitGrpCommonEvent {
     /** Sets the Circuit State Indicator parameter of the message.
         Each octet of the Circuit State Indicator corresponds to the status of one
         circuit. The status is as given in the respective ITU and ANSI specifications.
-        @param CircuitStateIndthe - Circuit State Indicator parameter of the event.
+        @param circuitStateInd - The Circuit State Indicator parameter of the event.
       */
     public void setCircuitStateInd(byte[] circuitStateInd) {
         m_circuitStateInd = circuitStateInd;

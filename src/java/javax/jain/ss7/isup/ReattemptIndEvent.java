@@ -62,7 +62,7 @@ public class ReattemptIndEvent extends IsupEvent {
     public static final int ISUP_RR_DUAL_SEIZURE = 1;
     public static final int ISUP_RR_BAD_RESPONSE_FOR_IAM = 2;
     /** Constructor for initializing the ReattemptInd event.
-      * @param sourcethe  Source of this event.
+      * @param source  The Source of this event.
       * @param dpc  The destination point code.
       * @param opc  The origination point code.
       * @param sls  Not used as it is a locally generated event.

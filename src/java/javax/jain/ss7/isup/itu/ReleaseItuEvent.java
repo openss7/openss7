@@ -66,7 +66,7 @@ public class ReleaseItuEvent extends ReleaseEvent {
       * @param congestionPriority  Priority of the ISUP message which may be used in the
       * optional national congestion control procedures at MTP3. Refer to
       * getCongestionPriority method in IsupEvent class for more details.
-      * @param causeIndicator  Cause indicators.
+      * @param cai  Cause indicators.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
     public ReleaseItuEvent(java.lang.Object source, SignalingPointCode dpc,
@@ -255,7 +255,7 @@ public class ReleaseItuEvent extends ReleaseEvent {
         throw new ParameterNotSetException("SignalingPointCode not set.");
     }
     /** Sets the SignalingPointCode of the message.
-      * @param spcthe  SignalingPointCode parameter of the event, which is in JAIN ISUP
+      * @param spc  SignalingPointCode parameter of the event, which is in JAIN ISUP
       * Signaling Point Code format.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */

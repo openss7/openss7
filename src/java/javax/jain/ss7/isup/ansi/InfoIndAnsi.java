@@ -63,7 +63,7 @@ public class InfoIndAnsi extends InfoInd {
     public InfoIndAnsi() {
     }
     /** Constructs an ANSI InfoInd class from the input parameters specified.
-        @param in_callingAddrResInd  The calling party address response indicator, range
+        @param in_callingAddrRespInd  The calling party address response indicator, range
         0 to 3, see InfoInd().
         @param in_holdInd  The hold provided indicator, see InfoInd().
         @param in_callingCatResInd  The calling party's category response indicator, see

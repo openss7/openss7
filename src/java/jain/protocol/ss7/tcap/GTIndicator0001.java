@@ -135,8 +135,8 @@ public final class GTIndicator0001 extends GlobalTitle {
         return numberingPlanPresent;
     }
     /** @deprecated
-      * Gets the Numbering Plan of this Global Title Indicator-0001.
-      * @return
+      * Sets the Numbering Plan of this Global Title Indicator-0001.
+      * @param numberingPlan
       * The Numbering Plan <ul>
       * <li>NP_UNKOWN Indicates an unknown Numbering Plan
       * <li>NP_ISDN_TELIndicates ISDN/Telephony Numbering Plan

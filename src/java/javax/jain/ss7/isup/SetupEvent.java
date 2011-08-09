@@ -265,7 +265,7 @@ public abstract class SetupEvent extends IsupEvent {
         throw new ParameterNotSetException("CallingPartyNumber not set");
     }
     /** Sets the Calling Party Number parameter of the message.
-      * @param callingPartyNumthe  Calling Party Number parameter of the event.
+      * @param callingPartyNum  The Calling Party Number parameter of the event.
       */
     public void setCallingPartyNumber(CallingPartyNumber callingPartyNum) {
         m_callingPartyNum = callingPartyNum;
@@ -313,7 +313,7 @@ public abstract class SetupEvent extends IsupEvent {
     }
     /** Sets the Generic Digits parameter of the message.
       * Refer to GenericDigits parameter class for more information.
-      * @param nci  The Generic Digits parameter of the event.
+      * @param gd  The Generic Digits parameter of the event.
       */
     public void setGenericDigits(GenericDigits gd) {
         m_gd = gd;
@@ -358,7 +358,7 @@ public abstract class SetupEvent extends IsupEvent {
     }
     /** Sets the Original Called Number parameter of the message.
       * Refer to OrigCalledNumber parameter class for more information.
-      * @param ocnthe  Original Called Number parameter of the event.
+      * @param ocn  The Original Called Number parameter of the event.
       */
     public void setOrigCalledNumber(OrigCalledNumber ocn) {
         m_ocn = ocn;
@@ -408,7 +408,7 @@ public abstract class SetupEvent extends IsupEvent {
     }
     /** Sets the Redirecting Number parameter of the message.
       * Refer to RedirectingNumber parameter class for more information.
-      * @param nci  The Redirecting Number parameter of the event.
+      * @param rn  The Redirecting Number parameter of the event.
       */
     public void setRedirectingNumber(RedirectingNumber rn) {
         m_rn = rn;

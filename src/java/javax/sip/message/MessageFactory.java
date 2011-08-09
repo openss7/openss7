@@ -70,7 +70,6 @@ public interface MessageFactory {
         @param via The new List object of the ViaHeaders of this Message.
         @param contentType The new ContentTypeHeader object of the
         @param content Type value of this Message.
-        @param content The new Object of the body content value of this Message.
         @return The newly created Request object.
         @exception java.text.ParseException Thrown when an error was found while parsing the method
         or the body.

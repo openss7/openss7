@@ -159,8 +159,8 @@ public abstract interface Mtp3LayerManagerMBean extends OamLayerManagerMBean, Mt
       * @param destinationSignallingPoint
       * The destination OwnSignallingPointMBean of this RouteMBean.
       *
-      * @param linksetsan
-      * Array of ObjectNames of the LinksetMBeans that make up this RouteMBean.
+      * @param linkSets
+      * An Array of ObjectNames of the LinksetMBeans that make up this RouteMBean.
       *
       * @return
       * The ObjectName of the newly created RouteMBean.
@@ -255,22 +255,9 @@ public abstract interface Mtp3LayerManagerMBean extends OamLayerManagerMBean, Mt
       * Creates a new Mtp3 Service Access Point MBean (representing a Remote Signalling
       * Point)
       *
-      * @param pointCode
-      * the signalling point code
+      * @param signallingPoint
+      * the signalling point
       *
-      * @param type
-      * one of the following: <ul>
-      * <li>Mtp3SapMBean.TYPE_SEP - a Signalling End Point.
-      * <li>Mtp3SapMBean.TYPE_STP - a Signalling Transfer Point.
-      * <li>Mtp3SapMBean.TYPE_STEP - a Signalling Transfer End Point. </ul>
-
-      * @param networkInd
-      * one of the following Network Indicator constants: <ul>
-      * <li>Mtp3SapMBean.NI_INTERNATIONAL_00
-      * <li>Mtp3SapMBean.NI_INTERNATIONAL_01
-      * <li>Mtp3SapMBean.NI_NATIONAL_10 
-      * <li>Mtp3SapMBean.NI_NATIONAL_11  </ul>
-
       * @param serviceIndicator
       * one of the following Service Indicator constants: <ul>
       * <li>Mtp3SapMBean.SI_BROADBAND_ISUP
@@ -298,7 +285,7 @@ public abstract interface Mtp3LayerManagerMBean extends OamLayerManagerMBean, Mt
     /**
       * Creates a new Screening Table Managed Bean (ScreeningTableMBean).
       *
-      * @param screeningType
+      * screeningType
       * either: <ul>
       * <li>ScreeningTableMBean.SCR_TYPE_INCOMING_LS_TO_DPC - To inhibit/allow STP access
       * by a combination of designated incoming link sets to designated DPCs.

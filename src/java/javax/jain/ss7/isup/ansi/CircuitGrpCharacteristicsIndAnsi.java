@@ -126,7 +126,7 @@ public class CircuitGrpCharacteristicsIndAnsi implements java.io.Serializable {
     }
     /** Sets the DoubleSeizingControlInd field of CircuitGrpCharacteristicsInd
       * parameter.
-      * @param in_doubleSeizingControlInd,  The DoubleSeizingControlInd value, range
+      * @param in_doubleSeizingControlInd  The DoubleSeizingControlInd value, range
       * 0-3, see CircuitGrpCharacteristicsIndAnsi().
       * @exception ParameterRangeInvalidException  Thrown when the sub-field is out of
       * the range specified.  */

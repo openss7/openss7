@@ -94,10 +94,10 @@ public interface JccConnectionEvent extends JccCallEvent {
       * @since 1.0b */
     public static int CONNECTION_FAILED = 108;
     /** This event indicates that the state of the JcpConnection object
-      * has changed to {@link JccConnection#INPROGRESS}.  */
+      * has changed to INPROGRESS.  */
     public static int CONNECTION_INPROGRESS = 109;
     /** This event indicates that the state of the JccConnection object
-      * has changed to {@link JccConnection#UNKNOWN}. 
+      * has changed to UNKNOWN. 
       * @since 1.0b */
     public static int CONNECTION_UNKNOWN = 110;
 }

@@ -172,7 +172,7 @@ public abstract interface ScreeningTableMBean extends Mtp3ManagedObjectMBean {
       * The type of Object that is supplied in the Object array (identified from the array
       * of ObjectNames) is dependent on the screening type option. 0
       *
-      * @oaram authorisedList
+      * @param authorisedList
       * an array of ObjectNames identifing the authorised list for the Destination Point
       * Code, either: <ul>
       * <li>any array of the allowed Linksets if the screening type is either: <ul>
@@ -182,7 +182,7 @@ public abstract interface ScreeningTableMBean extends Mtp3ManagedObjectMBean {
       * <li>an array of the allowed Originating Signalling Points if the screening type is: <ul>
       *     <li>SCR_TYPE_OPC_TO_DPC </ul> </ul>
       *
-      * @oaram destSignallingPoint
+      * @param destSignallingPoint
       * an ObjectName identifing the destination Signalling Point for which the allowed
       * list is to be returned.
       *

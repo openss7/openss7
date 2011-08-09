@@ -171,7 +171,7 @@ public class JainTcapStackImpl implements JainTcapStack {
       *
       * <i>Note to developers:</i><br> The implementation of this method
       * should add the newly created <CODE>JainTcapProvider</CODE> to
-      * the {@link JainTcapStack.html#getProviderList()} once the
+      * the {@link JainTcapStack#getProviderList} once the
       * <CODE>JainTcapProvider</CODE> has been successfully created and
       * set the JainTcapStack reference in the newly create
       * <code>JainTcapProvider</code> to <b>this</b> object. <p>
@@ -239,7 +239,7 @@ public class JainTcapStackImpl implements JainTcapStack {
       *
       * <i>Note to developers:</i><br> The implementation of this method
       * should remove the specified Peer JAIN TCAP Provider from the
-      * {@link * #getProviderList()}. <p>
+      * {@link #getProviderList}. <p>
       *
       * <b>Example:-</b> <BR>
       * <b>public void</b> deleteProvider(JainTcapProvider providerToBeDeleted) <b>throws</b>
@@ -333,7 +333,7 @@ public class JainTcapStackImpl implements JainTcapStack {
     /**
       * Sets the name of the stack as a string
       *
-      * @param stackProtocol
+      * @param stackName
       * The new Stack Name value
       */
     public void setStackName(java.lang.String stackName) {

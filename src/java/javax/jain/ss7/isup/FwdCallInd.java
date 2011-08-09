@@ -111,7 +111,7 @@ public abstract class FwdCallInd implements java.io.Serializable {
       * <li>SMI_CONNECTIONLESS_METHOD_AVAILABLE
       * <li>SMI_CONNECTION_METHOD_AVAILABLE
       * <li>SMI_CONNECTIONLESS_AND_CONNECTION_METHOD_AVAILABLE</ul>
-      * @param typeOfCall  The national/international call indicator.<ul>
+      * @param typeOfCallInd  The national/international call indicator.<ul>
       * <li>NICI_NATIONAL_CALL
       * <li>NICI_INTERNATIONAL_CALL</ul>
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.

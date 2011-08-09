@@ -124,7 +124,7 @@ public final class GTIndicator0001 extends GlobalTitle {
       * parameters.
       * @param translationType
       * The new translation type supplied to the constructor.
-      * @param numberingPlam
+      * @param numberingPlan
       * The new numbering Plan supplied to the constructor.
       * @param encodingScheme
       * The new encoding scheme supplied to the constructor.

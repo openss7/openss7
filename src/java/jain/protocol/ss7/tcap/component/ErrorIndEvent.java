@@ -82,7 +82,7 @@ public final class ErrorIndEvent extends ComponentIndEvent {
     }
     /** Sets the Parameters' parameter of the ERROR indication
       * Component.
-      * @param params
+      * @param parameters
       * The new Parameters value.  */
     public void setParameters(Parameters parameters) {
         m_parameters = parameters;

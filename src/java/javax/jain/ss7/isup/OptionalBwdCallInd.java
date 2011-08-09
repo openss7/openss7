@@ -61,7 +61,7 @@ public abstract class OptionalBwdCallInd implements java.io.Serializable {
     protected OptionalBwdCallInd() {
     }
     /** Constructs a OptionalBwdInd class from the input parameters specified.
-      * @param in_inbanInfoInd  The in-band information indicator. <ul>
+      * @param in_inbandInfoInd  The in-band information indicator. <ul>
       * <li>III_NO_INDICATION and <li>III_INBAND_INFORMATION_OR_PATTERN_AVAILABLE. </ul>
       */
     protected OptionalBwdCallInd(boolean in_inbandInfoInd) {
