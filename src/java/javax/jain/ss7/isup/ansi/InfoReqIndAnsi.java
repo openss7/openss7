@@ -65,7 +65,7 @@ public class InfoReqIndAnsi extends InfoReqInd {
     /** Constructs an ANSI InfoReqInd class from the input parameters specified.
         @param in_callingAddrReqInd  The calling party address request indicator, see
         InfoReqInd().
-        @param in_holdInd  The holding indicator, see InfoReqInd().
+        @param in_holdingInd  The holding indicator, see InfoReqInd().
         @param in_callingCatReqInd  The calling party's category request indicator, see
         InfoReqInd().
         @param in_chargeInfoReqInd  The charge information request indicator, see

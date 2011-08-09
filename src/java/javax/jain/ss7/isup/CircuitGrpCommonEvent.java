@@ -99,7 +99,7 @@ public abstract class CircuitGrpCommonEvent extends IsupEvent {
     }
     /** Sets the Range and Status fields of circuits parameter of the message.
       * Refer to Range And Status parameter class for more information.
-      * @param in_rangeAndStatusthe  Range and Status of the event.  */
+      * @param in_rangeAndStatus The Range and Status of the event.  */
     public void setRangeAndStatus(RangeAndStatus in_rangeAndStatus) {
         m_rangeAndStatus = in_rangeAndStatus;
     }

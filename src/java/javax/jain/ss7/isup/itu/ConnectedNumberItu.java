@@ -96,7 +96,7 @@ public class ConnectedNumberItu extends NumberParameter {
         return m_addressPresentationRestrictedIndicator;
     }
     /** Sets the Address Presentation Restricted Ind field of the parameter.
-        @param addrPresRestInd  Address presentation restriction indicator value, range 0
+        @param addressPresentationRestrictedIndicator  Address presentation restriction indicator value, range 0
         to 3, see ConnectedNumberItu().
       */
     public void setAddrPresRestInd(byte addressPresentationRestrictedIndicator)

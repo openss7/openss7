@@ -254,7 +254,7 @@ public class SS7Number extends SS7Parameter {
     /**
       * Compares this SS7 Number with another.
       *
-      * @param e164 E.164 Number to be compared with this E.164 Number.
+      * @param object E.164 Number to be compared with this E.164 Number.
       * @return True if equal, otherwise false.
       */
     public boolean equals(java.lang.Object object) {

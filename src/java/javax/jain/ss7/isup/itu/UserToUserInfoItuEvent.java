@@ -73,7 +73,7 @@ public class UserToUserInfoItuEvent extends IsupEvent {
       * @param congestionPriority  Priority of the ISUP message which may be used in the
       * optional national congestion control procedures at MTP3. Refer to
       * getCongestionPriority method in IsupEvent class for more details.
-      * @param userToUserInfo  User to User information.
+      * @param in_userToUserInfo  User to User information.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
     public UserToUserInfoItuEvent(java.lang.Object source, SignalingPointCode dpc,

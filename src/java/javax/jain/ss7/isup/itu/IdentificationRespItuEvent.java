@@ -121,7 +121,7 @@ public class IdentificationRespItuEvent extends IsupEvent {
         throw new ParameterNotSetException("CallingPartyNumber is not set.");
     }
     /** Sets the Calling Party Number parameter of the message.
-      * @param callingPartyNumItuthe  Calling Party Number parameter of the event.
+      * @param callingPartyNumItu  Calling Party Number parameter of the event.
       */
     public void setCallingPartyNumber(CallingPartyNumberItu callingPartyNumItu) {
         m_callingPartyNum = callingPartyNumItu;

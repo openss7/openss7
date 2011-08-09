@@ -74,10 +74,10 @@ public class SetupItuEvent extends SetupEvent {
       * be backed off by the ISUP stack. And in the reverse case, when the glare control
       * flag is not set, then the outgoing call is released and a Reattempt indication
       * event is sent to the application for retrying the call on another CIC.
-      * @param natureConInd  Nature of connection indicators.
-      * @param forwardCallInd  Forward call indicators.
-      * @param calledPartyNum  Called party number.
-      * @param callingCategory  Calling party category.
+      * @param nci  Nature of connection indicators.
+      * @param fci  Forward call indicators.
+      * @param cpn  Called party number.
+      * @param cat  Calling party category.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
     public SetupItuEvent(java.lang.Object source, SignalingPointCode dpc,
@@ -105,7 +105,7 @@ public class SetupItuEvent extends SetupEvent {
         return m_tmr;
     }
     /** Sets the transmission medium requirement parameter in SetupEvent.
-      * @param tmrthe  Transmission medium requirement parameter of the event.
+      * @param tmr  Transmission medium requirement parameter of the event.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
     public void setTransmissionMediumReq(byte tmr)
@@ -336,7 +336,7 @@ public class SetupItuEvent extends SetupEvent {
     }
     /** Sets the transmission medium Requirement Prime parameter in SetupEvent, range
       * between 0 - 10.
-      * @param tmrpthe  Transmission Medium Requirement Prime parameter of the event.
+      * @param tmrp  Transmission Medium Requirement Prime parameter of the event.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
     public void setTransmissionMediumReqPrime(byte tmrp)

@@ -173,7 +173,7 @@ public class FacilityAcceptItuEvent extends IsupEvent {
         m_pci = pci;
     }
     /** Indicates if the ParamCompatibilityInfoItu parameter is present in this Event.
-        @Return True if the parameter is set.
+        @return True if the parameter is set.
       */
     public boolean isParamCompatibilityInfoPresent() {
         return (m_pci != null);

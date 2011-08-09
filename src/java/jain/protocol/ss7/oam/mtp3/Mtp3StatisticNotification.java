@@ -167,8 +167,8 @@ public class Mtp3StatisticNotification extends OamStatisticNotification {
       * @param source
       * The MTP3 Layer Manager that emitted this Notification.
       *
-      * @param sequenceNumberThe
-      * Notification sequence number within the source object.
+      * @param sequenceNumber
+      * The Notification sequence number within the source object.
       *
       * @param category
       * The priority of this Mtp3StatisticNotification. This may be any of the inherited

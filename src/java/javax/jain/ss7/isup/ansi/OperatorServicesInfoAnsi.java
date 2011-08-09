@@ -112,7 +112,7 @@ public class OperatorServicesInfoAnsi implements java.io.Serializable {
         <li>IT_ORIGINAL_ACCESS_PREFIX, <li>IT_BILL_TO_INFORMATION_ENTRY_HANDELING,
         <li>IT_BILL_TO_TYPE, <li>IT_BILL_TO_SPECIFIC_INFORMATION, <li>IT_SPECIAL_HANDELING
         and <li>IT_ACCESS_SIGNALING. </ul>
-        @param in_infoValue  The information value, range 0-15.  <ul> <li>IV_IT1_UNKNOWN,
+        @param in_infoValu  The information value, range 0-15.  <ul> <li>IV_IT1_UNKNOWN,
         <li>IV_IT1_1_001, <li>IV_IT1_0_01, <li>IV_IT1_0,
         <li>IV_IT2_ENTRY_UNKNOWN_HANDELING_UNKNOWN,
         <li>IV_IT2_ENTRY_MANUAL_BY_OPERATOR_STATION_HANDELING,

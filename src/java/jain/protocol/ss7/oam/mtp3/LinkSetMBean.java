@@ -130,8 +130,7 @@ public abstract interface LinkSetMBean extends Mtp3ManagedObjectMBean {
     /**
       * Activates or deactivates all the Links in this Linkset.
       *
-      * @param
-      * Active - either: <ul>
+      * @param active - either: <ul>
       *
       * <li>true This activates all the Links in this Linkset.
       * <li>false This deactivates all the Links in this Linkset. </ul>
@@ -274,7 +273,7 @@ public abstract interface LinkSetMBean extends Mtp3ManagedObjectMBean {
       * @param index
       * The index position of the element in the array.
       *
-      * @param linkset
+      * @param linkSet
       * The linkset to be combined with this linkset.
       *
       * @exception TooManyInstancesException
@@ -286,7 +285,7 @@ public abstract interface LinkSetMBean extends Mtp3ManagedObjectMBean {
     /**
       * Sets the combined Linkset of this linkset
       *
-      * @param linksets
+      * @param linkSets
       * The Signalling linksets to be combined with this linkset.
       *
       * @exception TooManyInstancesException

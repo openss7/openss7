@@ -212,7 +212,7 @@ public class E164Number extends SS7Parameter {
     /**
       * Get the whole E.164 Number (CC+NDC+SN) as a java.lang.String.
       *
-      * @overrides toString in class Object
+      * overrides toString in class Object
       *
       * @return java.lang.String containing the E.164 Number.
       */
@@ -226,8 +226,9 @@ public class E164Number extends SS7Parameter {
     /**
       * Compares this E.164 Number with another.
       *
-      * @override equals in class Object
-      * @param e164 E.164 Number to be compared with this E.164
+      * overrides equals in class Object
+      *
+      * @param object E.164 Number to be compared with this E.164
       *	    Number.
       * @return True if equal, otherwise false.
       */

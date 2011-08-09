@@ -109,7 +109,7 @@ public abstract class CallProgressEvent extends IsupEvent {
     }
     /** Sets the CallProgress Event Information parameter of the message.
         Refer to EventInformation parameter class for more information.
-        @param eventInformationthe  Event Information parameter of the event.
+        @param eventInformation the Event Information parameter of the event.
       */
     public void setEventInformation(EventInformation eventInformation) {
         m_eventInformation = eventInformation;
@@ -151,7 +151,7 @@ public abstract class CallProgressEvent extends IsupEvent {
     }
     /** Sets the BackwarCallIndicators parameter of the message.
         Refer to BwdCallInd parameter for greater details.
-        @param bcithe  BackwarCallIndicators parameter of the event.
+        @param bci the BackwarCallIndicators parameter of the event.
       */
     public void setBwdCallInd(BwdCallInd bci) {
         m_bci = bci;

@@ -59,8 +59,6 @@ public class InformationAnsiEvent extends InformationEvent {
     /** Constructs a new InformationAnsiEvent, with only the JAIN ISUP Mandatory
         parameters being supplied to the constructor, using the super class's constructor.
         @param source  The source of this event.
-        @param primitive  Primitive value is ISUP_PRIMITIVE_INFORMATION. Refer to
-        IsupEvent class for more details.
         @param dpc  The destination point code.
         @param opc  The origination point code.
         @param sls  The signaling link selection.
@@ -210,7 +208,7 @@ public class InformationAnsiEvent extends InformationEvent {
     }
     /** Sets the Redirecting Number parameter of the message.
         Refer to RedirectingNumber parameter class for more information.
-        @param ncithe  Redirecting Number parameter of the event.
+        @param rn  Redirecting Number parameter of the event.
       */
     public void setRedirectingNumber(RedirectingNumber rn) {
         m_rn = rn;

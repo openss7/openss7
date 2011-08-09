@@ -197,8 +197,6 @@ public interface JccCall {
       * method's pre-conditions. 
       * @throws InvalidArgumentException
       * The given release cause code is invalid.
-      * @version 1.2.2
-      * @author Monavacon Limited
       * @since 1.0a */
     public void release(int causeCode)
         throws PrivilegeViolationException, ResourceUnavailableException, InvalidStateException,
@@ -399,7 +397,7 @@ public interface JccCall {
       * @param originatingAddress
       * Specifies the address of the originating (calling) party for this leg of the call. This is optional and can be
       * set to null.
-      * @param originalCalledAddress
+      * @param originalDestinationAddress
       * Specifies the initial destination address to which this leg of the call was initiated. This is optional and can
       * be set to null.
       * @param redirectingAddress

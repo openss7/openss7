@@ -73,7 +73,7 @@ public class InfoInd implements java.io.Serializable {
     public InfoInd() {
     }
     /** Constructs an InfoInd class from the input parameters specified.
-        @param in_callingAddrResInd  The calling party address response
+        @param in_callingAddrRespInd The calling party address response
         indicator, range 0 to 3. <ul> <li>CIRI_CHARGE_INFORMATION_NOT_INCLUDED
         and <li>CIRI_CHARGE_INFORMATION_INCLUDED. </ul>
         @param in_holdInd  The hold provided indicator. <ul>

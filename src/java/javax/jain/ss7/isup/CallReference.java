@@ -59,7 +59,7 @@ public class CallReference implements java.io.Serializable {
     public CallReference() {
     }
     /** Constructs a CallReference class from the input parameters specified.
-      * @param in_callInd  The call identity.
+      * @param in_callId  The call identity.
       * @param in_spc  Point code in the JAIN ISUP Signaling Point Code format.
       * @exception ParameterRangeInvalidException  Thrown when value is out of range.  */
     public CallReference(int in_callId, SignalingPointCode in_spc)

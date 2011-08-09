@@ -73,7 +73,7 @@ public class FwdCallIndAnsi extends FwdCallInd {
         @param isdnAccessIndicator - The ISDN access indicator, see FwdCallInd().
         @param sccpMethodIndicator - The SCCP method indicator, range 0-3, see
         FwdCallInd().
-        @param typeOfCall - The national/international call indicator, see FwdCallInd().
+        @param typeOfCallInd - The national/international call indicator, see FwdCallInd().
         @param iamSegmentationIndicator - The IAM Segmentation Indicator. <ul>
         <li>ISI_NO_IAM_SEGMENTATION_IND and <li>ISI_IAM_SEGMENTATION_USED. </ul>
         @exception ParameterRangeInvalidException - Thrown when value is out of range.

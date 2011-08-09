@@ -130,7 +130,7 @@ public abstract interface SccpRoutingControlMBean extends SccpManagedObjectMBean
       * Sets the local Signalling Point (identified by the specified ObjectName) governed
       * by this routing control.
       *
-      * @param OwnSignallingPoint
+      * @param ownSignallingPoint
       * the ObjectName of the local Signalling Point
       */
     public void setOwnSignallingPoint(ObjectName ownSignallingPoint);
@@ -174,8 +174,8 @@ public abstract interface SccpRoutingControlMBean extends SccpManagedObjectMBean
     /**
       * Sets the list of Global Title Entries associated with this Routing Control.
       *
-      * @param gtEntriesthe
-      * ObjectName of the Global Titles to be added.
+      * @param gtEntries
+      * The ObjectName of the Global Titles to be added.
       *
       * @exception TooManyInstancesException
       * if the size of gtEntries is greater than the number of Global Title Entries

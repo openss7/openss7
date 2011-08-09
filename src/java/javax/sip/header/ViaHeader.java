@@ -174,7 +174,7 @@ public interface ViaHeader extends Parameters, Header {
     /**
         Sets the value of the protocol parameter. This parameter specifies which protocol is used,
         for example "SIP/2.0".
-        @param Protocol New value for the protocol parameter.
+        @param protocol New value for the protocol parameter.
         @exception java.text.ParseException Thrown when an error was found while parsing the
         protocol value.
       */

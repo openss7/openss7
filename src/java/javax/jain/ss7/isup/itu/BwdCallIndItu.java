@@ -66,7 +66,7 @@ public class BwdCallIndItu extends BwdCallInd {
         @param in_chargeInd  The charge indicator, range 0-3, see BwdCallInd.
         @param in_calledStatusInd  The called party's status indicator, range 0-3, see
         BwdCallInd.
-        @param in_calledCateInd  The called party's category indicator, range 0-3, see
+        @param in_calledCatInd  The called party's category indicator, range 0-3, see
         BwdCallInd.
         @param in_eteMethodInd  The end-to-end method indicator, range 0-3, see
         BwdCallInd.
@@ -85,7 +85,7 @@ public class BwdCallIndItu extends BwdCallInd {
     public BwdCallIndItu(byte in_chargeInd, byte in_calledStatusInd, byte in_calledCatInd,
             byte in_eteMethodInd, boolean in_iwInd, boolean in_isupInd,
             boolean in_holdInd, boolean in_isdnAccessInd, boolean in_echoDevInd,
-            byte in_sccpMethodInd, boolean in_eteInfoInd)
+            byte in_sccpMethodInd, boolean in_iamSegInd, boolean in_eteInfoInd)
         throws ParameterRangeInvalidException {
         super(in_chargeInd, in_calledStatusInd, in_calledCatInd, in_eteMethodInd,
                 in_iwInd, in_isupInd, in_holdInd, in_isdnAccessInd, in_echoDevInd,

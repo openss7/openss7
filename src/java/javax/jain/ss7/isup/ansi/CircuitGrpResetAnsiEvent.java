@@ -60,8 +60,6 @@ public class CircuitGrpResetAnsiEvent extends CircuitGrpResetEvent {
       * parameters being supplied to the constructor, using the super class's
       * constructor.
       * @param source  The source of this event.
-      * @param primitive  Primitive value is ISUP_PRIMITIVE_CIRCUIT_GRP_RESET. Refer to
-      * IsupEvent class for more details.
       * @param dpc  The destination point code.
       * @param opc  The origination point code.
       * @param sls  The signaling link selection.

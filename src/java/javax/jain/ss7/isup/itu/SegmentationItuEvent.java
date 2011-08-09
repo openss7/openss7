@@ -121,7 +121,7 @@ public class SegmentationItuEvent extends IsupEvent {
     }
     /** sets the Generic Digits parameter of the message.
       * Refer to GenericDigits parameter class for more information.
-      * @param nci  The Generic Digits parameter of the event.
+      * @param gd  The Generic Digits parameter of the event.
       */
     public void setGenericDigits(GenericDigits gd) {
         m_gd = gd;

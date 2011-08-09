@@ -109,7 +109,7 @@ public class UserTeleserviceInfoItu implements java.io.Serializable {
       * <li>CS_STANDARD_FOR_NETWORK. </ul>
       * @param in_highLayerCharacteristicsIdPresent  The high layer characteristics
       * identification <ul> <li>EI_NEXT_OCTET_EXIST and <li>EI_LAST_OCTET. </ul>
-      * @param highLayerCharacteristicsId  The high layer characteristics Id, range 0-128
+      * @param in_highLayerCharacteristicsId  The high layer characteristics Id, range 0-128
       * <ul> <li>HLCI_TELEPHONY, <li>HLCI_FASCIMILE_GROUP_2_3, <li>HLCI_FACSIMILE_GROUP_4,
       * <li>HLCI_FACSIMILE_SERVICE_GROUP_4, <li>HLCI_SYNTAX_BASED_VIDEOTEX,
       * <li>HLCI_INTERNATIONLA_VIDEOTEX_INTERWORKING, <li>HLCI_TELEX_SERVICE,

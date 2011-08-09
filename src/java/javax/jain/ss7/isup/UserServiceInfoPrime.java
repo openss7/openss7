@@ -88,8 +88,8 @@ public class UserServiceInfoPrime extends UserServiceInfoCommon {
       * <li>STRUCTURE_UNSTRUCTURED. </ul>
       * @param in_ext2a  The extension 2a; <ul> <li>EI_NEXT_OCTET_EXIST and
       * <li>EI_LAST_OCTET. </ul>
-      * @param in_infoTransferRateDestToOrig  The information transfer.
-      * @param rate from Destination to Origination, range 0 to 31
+      * @param in_infoTransferRateDestToOrig  The information transfer
+      * rate from Destination to Origination, range 0 to 31
       * @param in_symmetry  The symmetry, range 0 to 3; <ul>
       * <li>SYMMETRY_BIDIRECTIONAL_SYMMETRIC. </ul>
       * @param in_ext2b  The extension 2b; <ul> <li>EI_NEXT_OCTET_EXIST and
@@ -159,10 +159,10 @@ public class UserServiceInfoPrime extends UserServiceInfoCommon {
       * <li>EI_LAST_OCTET. </ul>
       * @param in_parity  The Parity, range 0 to 7; <ul> <li>PI_ODD, <li>PI_EVEN,
       * <li>PI_NONE, <li>PI_FORCED_TO_0 and <li>PI_FORCED_TO_1. </ul>
-      * @param in_numOfDataBits  The number of data bits excluding parity, range 0 to
+      * @param in_numDataBits  The number of data bits excluding parity, range 0 to
       * 3; <ul> <li>NDBEP_NOT_USED, <li>NDBEP_5_BIT, <li>NDBEP_7_BIT and
       * <li>NDBEP_8_BIT. </ul>
-      * @param in_numOfStopBits  The number of stop bits, range 0 to 3; <ul>
+      * @param in_numStopBits  The number of stop bits, range 0 to 3; <ul>
       * <li>NSB_NOT_USED, <li>NSB_1_bit, <li>NSB_1DOT5_bit and <li>NSB_2_bit. </ul>
       * @param in_ext3c  The extension 3c; <ul> <li>EI_NEXT_OCTET_EXIST and
       * <li>EI_LAST_OCTET. </ul>
@@ -174,7 +174,6 @@ public class UserServiceInfoPrime extends UserServiceInfoCommon {
       * @param in_userInfoLayer2  The user information layer 2 protocol, range 0 to
       * 31; <ul> <li>UIL2P_Q921_I441 (ITU only), <li>UIL2P_T1DOT602 (ANSI only),
       * <li>UIL2P_X25 and <li>UIL2P_LAN_LOGIC_CONTROL (ITU only). </ul>
-      * @param in_layer1Id  The layer 1 identification, range 0 to 3.
       * @param in_layer2Id  The layer 2 identification, range 0 to 3.
       * @param in_ext4  The extension 4; <ul> <li>EI_NEXT_OCTET_EXIST and
       * <li>EI_LAST_OCTET. </ul>
@@ -184,7 +183,7 @@ public class UserServiceInfoPrime extends UserServiceInfoCommon {
       * @param in_layer3Id  The layer 3 identification, range 0 to 3.
       * @param in_ext5  The extension 5.  <ul> <li>EI_NEXT_OCTET_EXIST and
       * <li>EI_LAST_OCTET. </ul>
-      * @exceptions ParameterRangeInvalidException  Thrown when value is out of range.
+      * @exception ParameterRangeInvalidException  Thrown when value is out of range.
       * */
     public UserServiceInfoPrime(byte in_infoTransferCap, byte in_codingStd,
             boolean in_ext1, byte in_infoTransferRate, byte in_transferMode,

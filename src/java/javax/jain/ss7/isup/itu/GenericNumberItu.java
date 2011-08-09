@@ -103,7 +103,7 @@ public class GenericNumberItu extends GenericNumber {
         return m_numberIncompleteIndicator;
     }
     /** Sets the Calling Party Number Incomplete Indicator field of the parameter.
-      * @param numberIncompleteInd  The CallingParty Number Incomplete Indicator value,
+      * @param numberIncompleteIndicator  The CallingParty Number Incomplete Indicator value,
       * see GenericNumber().
       */
     public void setNumberIncompleteInd(boolean numberIncompleteIndicator) {
@@ -117,7 +117,7 @@ public class GenericNumberItu extends GenericNumber {
     }
     /** Sets the Screening Ind field of the parameter.
       * @param screeningIndicator  Screening indicator, range 0 to 3, see GenericNumber().
-      * @return ParameterRangeInvalidException  Thrown when the value is out of range.
+      * @exception ParameterRangeInvalidException  Thrown when the value is out of range.
       */
     public void setScreeningInd(byte screeningIndicator)
         throws ParameterRangeInvalidException {

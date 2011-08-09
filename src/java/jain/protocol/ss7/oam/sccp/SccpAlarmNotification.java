@@ -308,8 +308,8 @@ public class SccpAlarmNotification extends OamAlarmNotification {
       * @param source
       * The Managed MBean that emitted this Notification.
       *
-      * @param sequenceNumberThe
-      * notification sequence number within the source object.
+      * @param sequenceNumber
+      * The notification sequence number within the source object.
       *
       * @param priority
       * The priority of this SccpAlarmNotification.  This may be either (in increasing

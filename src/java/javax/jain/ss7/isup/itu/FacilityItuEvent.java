@@ -66,8 +66,6 @@ public class FacilityItuEvent extends FacilityEvent {
     /** Constructs a new FacilityItuEvent, with only the JAIN ISUP Mandatory parameters
         being supplied to the constructor.
         @param source  The source of this event.
-        @param primitive  Primitive value for StartResetInd is ISUP_PRIMITIVE_FACILITY.
-        Refer to IsupEvent class for more details.
         @param dpc  The destination point code.
         @param opc  The origination point code.
         @param sls  The signaling link selection.
@@ -96,7 +94,7 @@ public class FacilityItuEvent extends FacilityEvent {
     }
     /** Sets the Parameter Compatibility Information parameter of the message.
         Refer to Parameter Compatibility Information parameter for greater details.
-        @param in_paramCompInfoItu  The Parameter Compatibility Information parameter of
+        @param in_paramCompInfo  The Parameter Compatibility Information parameter of
         the event.
       */
     public void setParamCompatibilityInfo(ParamCompatibilityInfoItu in_paramCompInfo) {

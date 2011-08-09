@@ -97,7 +97,7 @@ public class CallingPartyNumberItu extends CallingPartyNumber {
         return m_numberIncompleteIndicator;
     }
     /** Sets the Calling Party Number Incomplete Indicator field of the parameter.
-        @param numberIncompleteInd  The CallingParty Number Incomplete Indicator value,
+        @param numberIncompleteIndicator  The CallingParty Number Incomplete Indicator value,
         see CallingPartyNumberItu().
       */
     public void setNumberIncompleteInd(boolean numberIncompleteIndicator) {

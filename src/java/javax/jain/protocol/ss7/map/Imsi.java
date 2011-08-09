@@ -123,7 +123,7 @@ public class Imsi extends SS7Parameter {
     }
     /**
       * Change the value of the Mobile Network Code (MNC).
-      * @param java.lang.String with 2 or 3 digits MNC.
+      * @param mnc java.lang.String with 2 or 3 digits MNC.
       */
     public void setMobileNetworkCode(java.lang.String mnc) throws SS7InvalidParamException {
         int len = mnc.length();
@@ -196,7 +196,7 @@ public class Imsi extends SS7Parameter {
     }
     /**
       * Compares this IMSI with another.
-      * @param imsi IMSI to be compared with this IMSI.
+      * @param object IMSI to be compared with this IMSI.
       * @return True if equal, otherwise false.
       */
     public boolean equals(java.lang.Object object) {

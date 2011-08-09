@@ -96,7 +96,7 @@ public class CallingPartyNumber extends NumberParameter {
         return m_addressPresentationRestrictedIndicator;
     }
     /** Sets the Address Presentation Restricted Ind field of the parameter.
-      * @param addrPresRestInd  Address presentation restriction indicator value,
+      * @param addressPresentationRestrictedIndicator Address presentation restriction indicator value,
       * range 0 to 3, see CallingPartyNumber().  */
     public void setAddrPresRestInd(byte addressPresentationRestrictedIndicator)
         throws ParameterRangeInvalidException {

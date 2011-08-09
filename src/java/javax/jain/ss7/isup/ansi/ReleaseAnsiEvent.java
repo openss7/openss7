@@ -60,8 +60,6 @@ public class ReleaseAnsiEvent extends ReleaseEvent {
         Mandatory parameters using the super class constructor.
 
         @param source  The source of this event.
-        @param primitive  Primitive value for StartResetInd is ISUP_PRIMITIVE_RELEASE.
-        Refer to IsupEvent class for more details.
         @param dpc  The destination point code.
         @param opc  The origination point code.
         @param sls  The signaling link selection.
@@ -69,7 +67,7 @@ public class ReleaseAnsiEvent extends ReleaseEvent {
         @param congestionPriority  Priority of the ISUP message which may be used in the
         optional national congestion control procedures at MTP3. Refer to
         getCongestionPriority method in IsupEvent class for more details.
-        @param causeIndicator  Cause indicators.
+        @param cai  Cause indicators.
         @exception ParameterRangeInvalidException  Thrown when value is out of range.
       */
     public ReleaseAnsiEvent(java.lang.Object source, SignalingPointCode dpc,

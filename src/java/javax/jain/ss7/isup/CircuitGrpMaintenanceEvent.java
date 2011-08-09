@@ -78,7 +78,7 @@ public class CircuitGrpMaintenanceEvent extends CircuitGrpCommonEvent {
         @param in_rangeAndStatus  Gives the range and status of the affected circuits. IN
         THIS EVENT, THE STATUS FIELD IS NOT PRESENT ONLY WHEN THE RANGE IS 0. Refer to
         RangeAndStatus class for more details.
-        @param in_circuitGrpSupervisionMsgTypeIndindicates  Whether the circuit should be
+        @param in_circuitGrpSupervisionMsgTypeInd Indicates whether the circuit should be
         released immediately before the maintenance activity is to be performed (value 1)
         or is maintenance activity is to be performed without circuit release (value 0).
         NOTE : For ANSI, the range is 0-23 and for ITU the range is 0-31.

@@ -58,8 +58,8 @@ import javax.jain.*;
 public class MsIsdn extends E164Number implements MsNumber {
     /**
       * The constructor.
-      * @param cc, Country Code (1-3 digits)
-      * @param sn, Subscriber Number (limited by format rule)
+      * @param cc - Country Code (1-3 digits)
+      * @param sn - Subscriber Number (limited by format rule)
       * @exception SS7InvalidParamException Thrown if parameter(s) are invalid or out of range.
       */
     public MsIsdn(java.lang.String cc, java.lang.String sn) throws SS7InvalidParamException {

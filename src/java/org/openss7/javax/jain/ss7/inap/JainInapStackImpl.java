@@ -65,11 +65,11 @@ import javax.jain.*;
   * <li>JainInapStack Interface is referred to as JainInapStackImpl. </ul>
   *
   * An application may create a JainInapStackImpl by invoking the
-  * {@link javax.jain.ss7.JainSS7Factory#createSS7Object()} method on
+  * {@link javax.jain.ss7.JainSS7Factory#createSS7Object} method on
   * the JainSS7Factory object. The <b>PathName</b> of the vendor
   * specific implementation of which you want to instantiate needs to be
   * set on the JainSS7Factory object using the
-  * {@link javax.jain.ss7.JainSS7Factory#setPathName()} method before
+  * {@link javax.jain.ss7.JainSS7Factory#setPathName} method before
   * calling the createSS7Object method.
   */
 public class JainInapStackImpl implements JainInapStack {
