@@ -328,7 +328,7 @@ all-rpm: each-rpm
 #!
 #!     where the stars indicate the subpackage and the architecture.  Both the
 #!     architecture specific subpackages (binary objects) and the architecture
-#!     independent (.noarch) subpackages will be built unless the the former was
+#!     independent (.noarch) subpackages will be built unless the former was
 #!     disabled with the option `--disable-arch', or the later with the option
 #!     `--disable-indep', passed to `configure'.
 #!
@@ -351,7 +351,7 @@ all-rpms:      ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 #!     These two targets are the same.  When invoked, they will add a signature
 #!     to the source rpm file, provided that the file does not already have a
 #!     signature.  You will be prompted for a password if a signature is
-#!     required.  Automated or unattended builds can be acheived by using
+#!     required.  Automated or unattended builds can be achieved by using
 #!     the `emake' expect script, included in `@abs_srcdir@/scripts/emake'.
 #!
 sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
@@ -425,7 +425,7 @@ rebuild:
 #!     This target will search out and sign, with a GPG signature, the source
 #!     rpm, and all of the binary rpms for this package that can be found in the
 #!     package distribution directory.  This target will prompt for a GPG
-#!     password.  Automated or unattended builds can be acheived with the
+#!     password.  Automated or unattended builds can be achieved with the
 #!     `emake' expect script located here: `@abs_srcdir@/scripts/emake'.
 #!
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
