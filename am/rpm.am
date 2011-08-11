@@ -2207,33 +2207,33 @@ release-update-urpmi:
 					fi ; \
 				fi ; \
 			done ; \
-			( \
-				$(ECHO_V) "D: cd $$dir" ; \
-				cd $$dir ; \
-				rpms=; \
-				if test -d ../$${r:+../}$${b:+../$$b/}RPMS ; then \
-					rpms="`(find ../$${r:+../}$${b:+../$$b/}RPMS -follow -name '*.rpm' | LANG= sort -u | \
-						case \"$${r:-full}\" in \
-						(main) 	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
-						(debug)  grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
-						(devel)  grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
-						(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
-						(full)   cat ;; \
-						esac) 2>/dev/null`"; \
-				fi ; \
-				if test -n "$$rpms" ; then \
-					for f in $$rpms ; do \
-						if test -L `basename $$f` ; then :; else \
-							$(ECHO) " ln -sf $$f `pwd`" ; \
-							ln -sf $$rpm . ; \
-						fi ; \
-					done ; \
-					made_list=yes ; \
-				else \
-					$(ECHO) "rmdir -pv -- $$dir"; \
-					rmdir -pv -- $$dir; \
-				fi ; \
-			) ; \
+			$(ECHO_V) "D: pushd $$dir" ; \
+			pushd $$dir ; \
+			rpms=; \
+			if test -d ../$${r:+../}$${b:+../$$b/}RPMS ; then \
+				rpms="`(find ../$${r:+../}$${b:+../$$b/}RPMS -follow -name '*.rpm' | LANG= sort -u | \
+					case \"$${r:-full}\" in \
+					(main) 	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
+					(debug)  grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
+					(devel)  grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' ;; \
+					(source) grep -- '\(source-\|\.src\.rpm$$\)' ;; \
+					(full)   cat ;; \
+					esac) 2>/dev/null`"; \
+			fi ; \
+			if test -n "$$rpms" ; then \
+				for f in $$rpms ; do \
+					if test -L `basename $$f` ; then :; else \
+						$(ECHO) " ln -sf $$f `pwd`" ; \
+						ln -sf $$rpm . ; \
+					fi ; \
+				done ; \
+				made_list=yes ; \
+			else \
+				$(ECHO) "rmdir -pv -- $$dir"; \
+				rmdir -pv -- $$dir; \
+			fi ; \
+			$(ECHO_V) "D: popd" ; \
+			popd ; \
 		done ; \
 	done ; \
 	if test "$${made_list:-no}" = yes ; then \

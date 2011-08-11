@@ -2620,6 +2620,7 @@ in the set.
 if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 %if %{FILES_yumrepo}
     (
+        umask 0077
 	cd '%{_yumrepodir}'
 	un=; pw=; oldfile=; file='@PACKAGE@.repo'
 	for s in '' '.rpmsave' '.rpmnew' ; do
@@ -2664,17 +2665,20 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 %endif
 %if %{FILES_zypprepo}
     (
+        umask 0077
 	cd '%{_zyppcreddir}'
 	un=; pw=; oldfile=; file='@PACKAGE_UCNAME@credentials'
-	for s in '@PACKAGE_UCNAME@' 'NCC' ; do
-	    oldfile="${s}credentials"
-	    if [ -e $oldfile ] ; then
-		un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $file`
-		pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $file`
-		[ -n "$un" -a -n "$pw" ] || continue
-		break
-	    fi
-	done
+        for s in '' '.rpmsave' '.rpmnew' ; do
+            for p in '@DESTDIR@/' '@PACKAGE_UCNAME@' 'NCC' ; do
+                oldfile="${p}credentials$s"
+                if [ -e $oldfile ] ; then
+                    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $oldfile`
+                    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $oldfile`
+                    [ -n "$un" -a -n "$pw" ] || continue
+                    break 2
+                fi
+            done
+        done
 	[ ":$oldfile" != ":$file" -a -e $file ] || mv -f -- $file $file.rpmsave
 	ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=$un}${pw:+&pw=$pw}"
 	ext="$ext"`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
@@ -2716,11 +2720,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 	[ ! -e $file ] || mv -f -- $file $file.rpmsave
 	url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file"
 	rm -f -- $file
-	if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-	    [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
-	    exit 1
-	fi
-	if [ ! -e $file ] ; then
+	if ! echo "$url" | wget -i - -O $file 2>/dev/null || [ ! -e $file ] ; then
 	    [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
 	    exit 1
 	fi
@@ -2728,7 +2728,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
 %endif
 %if %{FILES_urpmirepo}
     (
-        umask 600
+        umask 0077
         cd '%{_urpmiconfdir}'
         un=; pw=; oldfile=; file='netrc.@PACKAGE@'
         for s in '' '.rpmsave' '.rpmnew' ; do
