@@ -203,6 +203,7 @@ REPO_SIGN		=
 REPO_CLEAN		=
 REPO_DIRECTORIES	=
 REPO_INSTALL		=
+REPO_INSTALL_LOCAL	=
 REPO_UNINSTALL		=
 
 FORCED_TARGETS		=
@@ -738,9 +739,9 @@ cscope-files-recursive:
 	done
 
 #! cscope:
-#!     cscope(1) is a powerful tool for crossreferencing function calls and
+#!     cscope(1) is a powerful tool for cross-referencing function calls and
 #!     declarations in C source files.  This target generates the necessary
-#!     cscope auxillary files in each subdirectory necessary to use cscope from
+#!     cscope auxiliary files in each subdirectory necessary to use cscope from
 #!     any point the package in the same manner as tags files above.  Try:
 #!
 #!     $> make cscope; cscope
@@ -876,23 +877,24 @@ $(REPO_DIRECTORIES)::
 #! only needs to be invoked from the topmost package.
 #!
 #! repo:
-#!     Build (or rebuild) all of the auxilliary and meta-data files in the
-#!     package distribution directory necessary to create repomd, yast, yum, apt
-#!     and tar repositories as appropriate for the current distribution.  The
-#!     targets invoked by this target are also invoked by the `release' target
-#!     at the end of packaging the distribution directory.
+#!     Build (or rebuild) all of the auxiliary and meta-data files in the
+#!     package distribution directory necessary to create repomd, yast, yum,
+#!     apt, urpmi, apt-rpm and tar repositories as appropriate for the current
+#!     distribution.  The targets invoked by this target are also invoked by the
+#!     `release' target at the end of packaging the distribution directory.
+#!
 repo: $(REPO_DIRECTORIES) $(REPO)
 
 MY_PHONY		+= repo $(REPO)
 FORCED_TARGETS		+= forced-repo forced-repo.log
 
 #! repo-sign:
-#!     Sign all of the auxillary and meta-data files in the package distribution
+#!     Sign all of the auxiliary and meta-data files in the package distribution
 #!     directory necessary to authenticate the meta-data for the repomd, yast,
-#!     yum, apt and tar repositories as appropriate for the current
-#!     distribution.  Should the auxillary or meta-data files not yet exist,
-#!     they will be created by invoking the `repo' target automatically.  The
-#!     targets invoked by this target are also invoked by the `release-sign'
+#!     yum, apt, urpmi, apt-rpm and tar repositories as appropriate for the
+#!     current distribution.  Should the auxiliary or meta-data files not yet
+#!     exist, they will be created by invoking the `repo' target automatically.
+#!     The targets invoked by this target are also invoked by the `release-sign'
 #!     target at the end of packaging the distribution directory and signing
 #!     packages.
 #!
@@ -913,20 +915,37 @@ FORCED_TARGETS		+= forced-repo-clean
 
 #! repo-install:
 #! 	Installs the repository definitions necessary for an install source on
-#! 	the build machine.  This may include installing APT, YUM, ZYPPER or YaST
-#! 	repository definitions.  This is primarily for testing repository
-#! 	definitions and installation procedures.  Must be executed as root.
+#! 	the build machine.  This may include installing APT, YUM, ZYPPER, YaST,
+#! 	URPMI or APT-RPM repository definitions.  This is primarily for testing
+#! 	repository definitions and installation procedures.  Must be executed as
+#! 	root.  This target is different from repo-install-local in that it only
+#! 	installs remote (@reposerv@://) repository sources.
 #!
 repo-install: $(REPO_INSTALL)
 
 MY_PHONY		+= repo-install $(REPO_INSTALL)
 FORCED_TARGETS		+= forced-repo-install
 
+#! repo-install-local:
+#! 	Installs the repository definitions necessary for an install source on
+#! 	the build machine.  This may include installing APT, YUM, ZYPPER, YaST,
+#! 	URPMI or APT-RPM repository definitions.  This is primarily for testing
+#! 	repository definitions and installation procedures.  Must be executed as
+#! 	root.  This target is different from repo-install in that it only
+#! 	installs local (file://) repository sources.
+#!
+repo-install-local: $(REPO_INSTALL_LOCAL)
+
+MY_PHONY		+= repo-install-local $(REPO_INSTALL_LOCAL)
+FORCED_TARGETS		+= forced-repo-install-local
+
 #! repo-uninstall:
 #! 	Removes the repository definitions necessary for an install source on
-#! 	the build machine.  This may include removing APT, YUM, ZYPPER or YaST
-#! 	repository definitions.  This is primarily for testing repository
-#! 	definitions and removal procedures.  Must be exectued as root.
+#! 	the build machine.  This may include removing APT, YUM, ZYPPER, YaST,
+#! 	URPMI or APT-RPM repository definitions.  This is primarily for testing
+#! 	repository definitions and removal procedures.  Must be executed as
+#! 	root.  This target removes installation sources added both by
+#! 	repo-install and repo-install-local targets.
 #!
 repo-uninstall: $(REPO_UNINSTALL)
 
@@ -944,7 +963,7 @@ $(RELEASE_DIRECTORIES)::
 #! distribution directory.  These are good for unattended and NFS builds, which
 #! is what I use them for.  Also, when building from atop multiple packages,
 #! these targets also recurse down through each package.  They may also be used
-#! from within the individual subpackage.
+#! from within the individual sub-package.
 #!
 #! release:
 #!     Build all of the things necessary to generate a release.  On an rpm
@@ -1056,7 +1075,7 @@ $(UPDATE_DIRECTORIES)::
 #! package distribution directory.  These are good for unattended NFS builds,
 #! which is what I use them for.  Also, when building from atop multiple
 #! packages, these targets also recurse down through each package.  They may
-#! also be used from within the individual subpackage.  The difference between
+#! also be used from within the individual sub-package.  The difference between
 #! these targets and the Release Targets is that these targets will not disrupt
 #! the existing distribution.
 #!
@@ -1072,7 +1091,7 @@ $(USTAMP)::
 #!     for generating kernel module binary packages for a newly released kernel.
 #!     In these instances, no source packages are changed and only binary
 #!     packages corresponding to the new kernel are affected.  Nevertheless, if
-#!     source packages do not exist for the newly released subpackage, they will
+#!     source packages do not exist for the newly released sub-package, they will
 #!     be created.
 #!
 #! forced-update:

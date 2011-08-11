@@ -147,9 +147,8 @@ AC_DEFUN([_REPO_SETUP_URL], [dnl
 AC_DEFUN([_REPO_SETUP_RPM], [dnl
     AC_CACHE_CHECK([for rpm gpg directory], [repo_cv_rpm_gpgdir], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${rootdir}${sysconfdir}/pki/rpm-gpg
-	    ${DESTDIR}${rootdir}/etc/pki/rpm-gpg
 	    ${DESTDIR}${sysconfdir}/pki/rpm-gpg
+	    ${DESTDIR}${rootdir}/etc/pki/rpm-gpg
 	    ${DESTDIR}/etc/pki/rpm-gpg\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
@@ -183,9 +182,8 @@ AC_DEFUN([_REPO_SETUP_YUM], [dnl
 	esac
 	if test -z "$repo_cv_yum_repodir" ; then
 	    eval "repo_search_path=\"
-		${DESTDIR}${rootdir}${sysconfdir}/yum.repos.d
-		${DESTDIR}${rootdir}/etc/yum.repos.d
 		${DESTDIR}${sysconfdir}/yum.repos.d
+		${DESTDIR}${rootdir}/etc/yum.repos.d
 		${DESTDIR}/etc/yum.repos.d\""
 	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	    AC_MSG_RESULT([searching])
@@ -205,12 +203,10 @@ AC_DEFUN([_REPO_SETUP_YUM], [dnl
     ])
     AC_CACHE_CHECK([for yum kmod config file], [repo_cv_yum_kmodconf], [dnl
 	eval "repo_search_path=\"
-		${DESTDIR}${rootdir}${sysconfdir}/yum/pluginconf.d/kmod.conf
-		${DESTDIR}${rootdir}${sysconfdir}/yum/pluginconf.d/fedorakmod.conf
-		${DESTDIR}${rootdir}/etc/yum/pluginconf.d/kmod.conf
-		${DESTDIR}${rootdir}/etc/yum/pluginconf.d/fedorakmod.conf
 		${DESTDIR}${sysconfdir}/yum/pluginconf.d/kmod.conf
 		${DESTDIR}${sysconfdir}/yum/pluginconf.d/fedorakmod.conf
+		${DESTDIR}${rootdir}/etc/yum/pluginconf.d/kmod.conf
+		${DESTDIR}${rootdir}/etc/yum/pluginconf.d/fedorakmod.conf
 		${DESTDIR}/etc/yum/pluginconf.d/kmod.conf
 		${DESTDIR}/etc/yum/pluginconf.d/fedorakmod.conf\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
@@ -245,9 +241,8 @@ AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
 	esac
 	if test -z "$repo_cv_zypp_creddir" ; then
 	    eval "repo_search_path=\"
-		${DESTDIR}${rootdir}${sysconfdir}/zypp/credentials.d
-		${DESTDIR}${rootdir}/etc/zypp/credentials.d
 		${DESTDIR}${sysconfdir}/zypp/credentials.d
+		${DESTDIR}${rootdir}/etc/zypp/credentials.d
 		${DESTDIR}/etc/zypp/credentials.d\""
 	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	    AC_MSG_RESULT([searching])
@@ -275,9 +270,8 @@ AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
 	esac
 	if test -z "$repo_cv_zypp_servdir" ; then
 	    eval "repo_search_path=\"
-		${DESTDIR}${rootdir}${sysconfdir}/zypp/services.d
-		${DESTDIR}${rootdir}/etc/zypp/services.d
 		${DESTDIR}${sysconfdir}/zypp/services.d
+		${DESTDIR}${rootdir}/etc/zypp/services.d
 		${DESTDIR}/etc/zypp/services.d\""
 	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	    AC_MSG_RESULT([searching])
@@ -305,9 +299,8 @@ AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
 	esac
 	if test -z "$repo_cv_zypp_repodir" ; then
 	    eval "repo_search_path=\"
-		${DESTDIR}${rootdir}${sysconfdir}/zypp/repos.d
-		${DESTDIR}${rootdir}/etc/zypp/repos.d
 		${DESTDIR}${sysconfdir}/zypp/repos.d
+		${DESTDIR}${rootdir}/etc/zypp/repos.d
 		${DESTDIR}/etc/zypp/repos.d\""
 	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	    AC_MSG_RESULT([searching])
@@ -327,9 +320,8 @@ AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
     ])
     AC_CACHE_CHECK([for zypp config file], [repo_cv_zypp_config], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${rootdir}${sysconfdir}/zypp/zypp.conf
-	    ${DESTDIR}${rootdir}/etc/zypp/zypp.conf
 	    ${DESTDIR}${sysconfdir}/zypp/zypp.conf
+	    ${DESTDIR}${rootdir}/etc/zypp/zypp.conf
 	    ${DESTDIR}/etc/zypp/zypp.conf\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
@@ -363,9 +355,8 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
 	esac
 	if test -z "$repo_cv_urpmi_repodir" ; then
 	    eval "repo_search_path=\"
-		${DESTDIR}${rootdir}${sysconfdir}/urpmi/mediacfg.d
-		${DESTDIR}${rootdir}/etc/urpmi/mediacfg.d
 		${DESTDIR}${sysconfdir}/urpmi/mediacfg.d
+		${DESTDIR}${rootdir}/etc/urpmi/mediacfg.d
 		${DESTDIR}/etc/urpmi/mediacfg.d\""
 	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	    AC_MSG_RESULT([searching])
@@ -385,9 +376,8 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
     ])
     AC_CACHE_CHECK([for urpmi config directory], [repo_cv_urpmi_confdir], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${rootdir}${sysconfdir}/urpmi
-	    ${DESTDIR}${rootdir}$/etc/urpmi
 	    ${DESTDIR}${sysconfdir}/urpmi
+	    ${DESTDIR}${rootdir}$/etc/urpmi
 	    ${DESTDIR}/etc/urpmi\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
@@ -406,9 +396,8 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
     ])
     AC_CACHE_CHECK([for urpmi config file], [repo_cv_uprmi_config], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${rootdir}${sysconfdir}/urpmi/urpmi.cfg
-	    ${DESTDIR}${rootdir}/etc/urmpi/urpmi.cfg
 	    ${DESTDIR}${sysconfdir}/urmpi/urpmi.cfg
+	    ${DESTDIR}${rootdir}/etc/urmpi/urpmi.cfg
 	    ${DESTDIR}/etc/urmpi/urpmi.cfg\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
@@ -434,9 +423,8 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
 AC_DEFUN([_REPO_SETUP_APT], [dnl
     AC_CACHE_CHECK([for apt directory], [repo_cv_apt_dir], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${rootdir}${sysconfdir}/apt
-	    ${DESTDIR}${rootdir}/etc/apt
 	    ${DESTDIR}${sysconfdir}/apt
+	    ${DESTDIR}${rootdir}/etc/apt
 	    ${DESTDIR}/etc/apt\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
@@ -463,9 +451,8 @@ AC_DEFUN([_REPO_SETUP_APT], [dnl
 	esac
 	if test -z "$repo_cv_apt_repodir" ; then
 	    eval "repo_search_path=\"
-		${DESTDIR}${rootdir}${sysconfdir}/apt/sources.list.d
-		${DESTDIR}${rootdir}/etc/apt/sources.list.d
 		${DESTDIR}${sysconfdir}/apt/sources.list.d
+		${DESTDIR}${rootdir}/etc/apt/sources.list.d
 		${DESTDIR}/etc/apt/sources.list.d\""
 	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	    AC_MSG_RESULT([searching])
@@ -489,9 +476,8 @@ dnl sources list.
 dnl
     AC_CACHE_CHECK([for apt sources list], [repo_cv_apt_srclist], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${rootdir}${sysconfdir}/apt
-	    ${DESTDIR}${rootdir}/etc/apt
 	    ${DESTDIR}${sysconfdir}/apt
+	    ${DESTDIR}${rootdir}/etc/apt
 	    ${DESTDIR}/etc/apt\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
@@ -514,9 +500,8 @@ dnl it uses /etc/apt/vendors.list to identify the keys.
 dnl 
     AC_CACHE_CHECK([for apt vendors list], [repo_cv_apt_vndlist], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${rootdir}${sysconfdir}/apt
-	    ${DESTDIR}${rootdir}/etc/apt
 	    ${DESTDIR}${sysconfdir}/apt
+	    ${DESTDIR}${rootdir}/etc/apt
 	    ${DESTDIR}/etc/apt\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
@@ -535,9 +520,8 @@ dnl
     ])
     AC_CACHE_CHECK([for apt gpg directory], [repo_cv_apt_gpgdir], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${rootdir}${sysconfdir}/apt/trusted.gpg.d
-	    ${DESTDIR}${rootdir}/etc/apt/trusted.gpg.d
 	    ${DESTDIR}${sysconfdir}/apt/trusted.gpg.d
+	    ${DESTDIR}${rootdir}/etc/apt/trusted.gpg.d
 	    ${DESTDIR}/etc/apt/trusted.gpg.d\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
@@ -652,6 +636,10 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
     aptrepodir=
     if test :"${repo_cv_apt_repodir:-no}" != :no ; then
 	aptrepodir="$repo_cv_apt_repodir"
+    elif test :"${repo_cv_apt_srclist:-no}" != :no ; then
+	atprepodir="$repo_cv_apt_srclist.d"
+    elif test :"${repo_cv_apt_dir:-no}" != :no ; then
+	aptrepodir="$repo_cv_apt_dir/sources.list.d"
     fi
     AC_SUBST([aptrepodir])dnl
     aptsrclist=
