@@ -1085,7 +1085,7 @@ if BUILD_DPKG
 if WITH_INSTALL_SOURCE_APT
 ## WITH_INSTALL_SOURCE_APT
 
-$(PACKAGE).sources.list: Makefile
+$(PACKAGE).list: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
 	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
 	for branch in $$rlist ; do \
@@ -1118,12 +1118,12 @@ $(PACKAGE).sources.list: Makefile
 		done ; \
 	done >$@
 
-INSTALL_APT_SRCES = $(PACKAGE).sources.list
+INSTALL_APT_SRCES = $(PACKAGE).list
 
 if MAINTAINER_MODE
 ## MAINTAINER_MODE
 
-$(PACKAGE)-local.sources.list: Makefile
+$(PACKAGE)-local.list: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
 	debdistdir='$(debdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || debdistdir=`echo '$(debdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 	for branch in $$rb ; do \
@@ -1140,7 +1140,7 @@ $(PACKAGE)-local.sources.list: Makefile
 		done ; \
 	done >$@
 
-INSTALL_APT_SRCES += $(PACKAGE)-local.sources.list
+INSTALL_APT_SRCES += $(PACKAGE)-local.list
 
 ## MAINTAINER_MODE
 endif
@@ -1151,8 +1151,8 @@ install-apt: $(INSTALL_APT_SRCES)
 	@if test -n "$(aptrepodir)" ; then \
 		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
 		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
-		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
-		$(INSTALL_DATA) $(PACKAGE).sources.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
+		$(INSTALL_DATA) $(PACKAGE).list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
 	fi
 	@if test -n "$(aptgpgdir)" ; then \
 		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptgpgdir)'" ; \
@@ -1164,8 +1164,8 @@ if MAINTAINER_MODE
 	@if test -n "$(aptrepodir)" ; then \
 		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
 		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
-		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list'" ; \
-		$(INSTALL_DATA) $(PACKAGE)-local.sources.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list" ; \
 	fi
 endif
 
@@ -1181,15 +1181,15 @@ endif
 post-apt:
 	apt-cache gencaches
 
-#ALL_LOCAL			+= $(PACKAGE).sources.list
-#CLEANFILES			+= $(PACKAGE).sources.list
+#ALL_LOCAL			+= $(PACKAGE).list
+#CLEANFILES			+= $(PACKAGE).list
 #INSTALL_DATA_LOCAL		+= install-apt
 #UNINSTALL_LOCAL		+= uninstall-apt
 #POST_INSTALL_AM		+= post-apt
 
 if MAINTAINER_MODE
-#ALL_LOCAL			+= $(PACKAGE)-local.sources.list
-#CLEANFILES			+= $(PACKAGE)-local.sources.list
+#ALL_LOCAL			+= $(PACKAGE)-local.list
+#CLEANFILES			+= $(PACKAGE)-local.list
 endif
 
 MY_PHONY			+= install-apt uninstall-apt post-apt
@@ -1284,17 +1284,15 @@ repo-install-local-apt:
 	test ! -e $$f || { $(ECHO) "mv -f $$f $$f.dpkg-old" ; mv -f $$f $$f.dpkg-old ; } ; \
 	rb='$(repobranch)'; case "$${rb:-base}" in (base|updates|extras|testing) rb=;; esac ; \
 	$(ECHO) "  GEN   $$(basename $$f)" ; \
-	{ \
-		for b in '' updates extras testing $$rb ; do \
-			for r in main debug devel source '' ; do \
-				d="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
-				test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-				$(ECHO) "deb         file://$(REPODIR)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
-				test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-				$(ECHO) "deb-src     file://$(REPODIR)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
-			done ; \
+	for b in '' updates extras testing $$rb ; do \
+		for r in main debug devel source '' ; do \
+			d="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
+			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb         file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+			$(ECHO) 'deb-src     file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 		done ; \
-	} >$$f
+	done >$$f ; \
 	@if test -z '$(DESTDIR)$(rootdir)' ; then \
 		$(ECHO) "apt-get update" ; \
 		if apt-get update ; then \
@@ -1341,7 +1339,7 @@ if BUILD_RPMS
 if WITH_INSTALL_SOURCE_APT
 ## WITH_INSTALL_SOURCE_APT
 
-$(PACKAGE).sources.list: Makefile
+$(PACKAGE).list: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
 	if test "$$rb" = 'Base' ; then rlist='Base Updates Extras Testing' ; else rlist="$$rb" ; fi ; \
 	for branch in $$rlist ; do \
@@ -1363,12 +1361,12 @@ $(PACKAGE).sources.list: Makefile
 		done ; \
 	done >$@
 
-INSTALL_APT_REPOS = $(PACKAGE).sources.list
+INSTALL_APT_REPOS = $(PACKAGE).list
 
 if MAINTAINER_MODE
 ## MAINTAINER_MODE
 
-$(PACKAGE)-local.sources.list: Makefile
+$(PACKAGE)-local.list: Makefile
 	rb=`echo '$(repobranch)' | sed -r 's,^[/]?$$,Base,;t;s,[/]?base,Base,;t;s,[/]?updates,Updates,;t;s,[/]?extras,Extras,;t;s,[/]?testing,Testing,;t;s,^[/]?,,;y,/, ,'` ; \
 	rpmdistdir='$(rpmdistdir)'; test '$(REPODIR)' = '$(DISTDIR)' || rpmdistdir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 	for branch in $$rb ; do \
@@ -1390,7 +1388,7 @@ $(PACKAGE)-local.sources.list: Makefile
 		done ; \
 	done >$@
 
-INSTALL_APT_REPOS += $(PACKAGE)-local.sources.list
+INSTALL_APT_REPOS += $(PACKAGE)-local.list
 
 ## MAINTAINER_MODE
 endif
@@ -1401,8 +1399,8 @@ install-apt-rpm: $(INSTALL_APT_REPOS)
 	@if test -n "$(aptrepodir)" ; then \
 		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
 		$(MKDIR_P) "$(DESTDIR)$(aptrepodir)" ; \
-		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
-		$(INSTALL_DATA) $(PACKAGE).sources.list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE).list '$(DESTDIR)$(aptrepodir)/$(PACKAGE).list'" ; \
+		$(INSTALL_DATA) $(PACKAGE).list "$(DESTDIR)$(aptrepodir)/$(PACKAGE).list" ; \
 	fi
 	@if test -n "$(aptgpgdir)" ; then \
 		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptgpgdir)'" ; \
@@ -1414,8 +1412,8 @@ if MAINTAINER_MODE
 	@if test -n "$(aptrepodir)" ; then \
 		$(ECHO) " $(MKDIR_P) '$(DESTDIR)$(aptrepodir)'" ; \
 		$(MKDIR_P) '$(DESTDIR)$(aptrepodir)' ; \
-		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list'" ; \
-		$(INSTALL_DATA) $(PACKAGE)-local.sources.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list' ; \
+		$(ECHO) " $(INSTALL_DATA) $(PACKAGE)-local.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list'" ; \
+		$(INSTALL_DATA) $(PACKAGE)-local.list '$(DESTDIR)$(aptrepodir)/$(PACKAGE)-local.list' ; \
 	fi
 endif
 
@@ -1431,15 +1429,15 @@ endif
 post-apt-rpm:
 	apt-cache gencaches
 
-#ALL_LOCAL		+= $(PACKAGE).sources.list
-#CLEANFILES		+= $(PACKAGE).sources.list
+#ALL_LOCAL		+= $(PACKAGE).list
+#CLEANFILES		+= $(PACKAGE).list
 #INSTALL_DATA_LOCAL	+= install-apt-rpm
 #UNINSTALL_LOCAL	+= uninstall-apt-rpm
 #POST_INSTALL_AM	+= post-apt-rpm
 
 if MAINTAINER_MODE
-#ALL_LOCAL		+= $(PACKAGE)-local.sources.list
-#CLEANFILES		+= $(PACKAGE)-local.sources.list
+#ALL_LOCAL		+= $(PACKAGE)-local.list
+#CLEANFILES		+= $(PACKAGE)-local.list
 endif
 
 MY_PHONY		+= install-apt-rpm uninstall-apt-rpm post-apt-rpm

@@ -120,7 +120,7 @@ debtop_binary_files	= $(debdir)/$(deb_binary_file) $(debdir)/*/$(deb_binary_file
 ##
 AM_DEBXOPTS	= -d
 
-ARCH		= $(target)
+ARCH		= $(target_arch)
 
 #!
 #! Debian Build Targets:
@@ -269,12 +269,12 @@ chg-deb:
 debs:
 	@$(ECHO) "D: $@: rebuild binary-indep"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH="noarch" noa-deb || :
-	@$(ECHO) "D: $@: rebuild binary-$(ARCH) $(kversion)"; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(ARCH)' one-k-deb || :
-	@$(ECHO) "D: $@: rebuild binary-$(ARCH)"; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(ARCH)' one-t-deb || :
+	@$(ECHO) "D: $@: rebuild binary-$(target_arch) $(kversion)"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' one-k-deb || :
+	@$(ECHO) "D: $@: rebuild binary-$(target_arch)"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' one-t-deb || :
 	@$(ECHO) "D: $@: rebuild changes"; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(ARCH)' chg-deb || :
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' chg-deb || :
 
 chgs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -371,7 +371,7 @@ reupload:
 	else \
 		$(ECHO) "D: $@: skipped binary-indep"; \
 	fi; \
-	targets="$(ARCH) $(AM_DEBTARGETS)"; \
+	targets="$(target_arch) $(AM_DEBTARGETS)"; \
 	for t in $$targets;  do \
 		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
 		test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || continue; \
@@ -498,7 +498,7 @@ update-n-deb:
 ##
 update-k-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@a=`echo '$(ARCH)' | sed 's,-.*$$,,'`; \
+	@a=`echo '$(target_arch)' | sed 's,-.*$$,,'`; \
 	test \( "$$a" != noarch -a "$$a" != all \) || exit 0; \
 	test -e $(DESTDIR)$(rootdir)/lib/modules/$(kversion)/build || exit 0; \
 	test -e $(DESTDIR)$(rootdir)/boot/System.map-$(kversion) || exit 0; \
@@ -518,8 +518,8 @@ update-k-deb:
 	done; \
 	if test "$$rebuild" = yes; then \
 		$(ECHO) "D: $@: rebuild binary-$(kversion)"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(ARCH)' one-k-deb"; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(ARCH)' one-k-deb || :; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' one-k-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion='$(kversion)' ARCH='$(target_arch)' one-k-deb || :; \
 	else \
 		$(ECHO) "D: $@: skipped binary-$(kversion)"; \
 	fi
@@ -529,7 +529,7 @@ update-k-deb:
 ##
 update-t-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@a=`echo '$(ARCH)' | sed 's,-.*$$,,'`; \
+	@a=`echo '$(target_arch)' | sed 's,-.*$$,,'`; \
 	test \( "$$a" != noarch -a "$$a" != all \) || exit 0; \
 	rebuild=yes; \
 	repodir=`echo '$(debdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
@@ -545,8 +545,8 @@ update-t-deb:
 	done; \
 	if test "$$rebuild" = yes; then \
 		$(ECHO) "D: $@: rebuild binary-$$a"; \
-		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(ARCH)' one-t-deb"; \
-		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(ARCH)' one-t-deb || :; \
+		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' one-t-deb"; \
+		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' one-t-deb || :; \
 	else \
 		$(ECHO) "D: $@: skipped binary-$$a"; \
 	fi
@@ -577,7 +577,7 @@ update-all-debs:
 	@$(ECHO) "D: $@: rebuild binary-indep"; \
 	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=noarch all-update-n-deb"; \
 	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=noarch all-update-n-deb || :; \
-	targets="$(ARCH) $(AM_DEBTARGETS)"; \
+	targets="$(target_arch) $(AM_DEBTARGETS)"; \
 	for t in $$targets; do \
 		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
 		test \( "$$a" != noarch -a "$$a" != all \) || continue; \
@@ -595,8 +595,8 @@ update-all-debs:
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH="$$t" all-update-t-deb || :; \
 	done; \
 	$(ECHO) "D: $@: rebuild changes"; \
-	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(ARCH)' all-update-c-deb"; \
-	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(ARCH)' all-update-c-deb || :
+	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' all-update-c-deb"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' all-update-c-deb || :
 
 MY_PHONY		+= update-n-deb update-k-deb update-t-deb update-all-debs
 ALL_RECURSIVE_TARGETS	+= all-update-n-deb all-update-k-deb all-update-t-deb
@@ -611,7 +611,7 @@ update-debs:
 	@$(ECHO) "D: $@: testing binary-indep"; \
 	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=noarch update-n-deb"; \
 	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH=noarch update-n-deb || :; \
-	targets="$(ARCH) $(AM_DEBTARGETS)"; \
+	targets="$(target_arch) $(AM_DEBTARGETS)"; \
 	for t in $$targets; do \
 		a=`$(ECHO) "$$t" | sed 's,-.*$$,,'`; \
 		test \( "$$a" != noarch -a "$$a" != all \) || continue; \
@@ -627,8 +627,8 @@ update-debs:
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH="$$t" update-t-deb || :; \
 	done; \
 	$(ECHO) "D: $@: testing changes"; \
-	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(ARCH)' update-c-deb"; \
-	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(ARCH)' update-c-deb || :
+	$(ECHO) "  $(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' update-c-deb"; \
+	$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) ARCH='$(target_arch)' update-c-deb || :
 
 ## Provide updates to debian binary package changes.
 ##
@@ -937,8 +937,8 @@ apt_release_keys	= $(aptfulldir)/Release.key \
 			  $(aptdevldir)/Release.key \
 			  $(aptsrcsdir)/Release.key
 
-apt_sources_lists	= $(repodir)/$(PACKAGE).list \
-			  $(repodir)/$(PACKAGE)-local.list \
+apt_sources_lists	= $(debdistdir)/$(PACKAGE).list \
+			  $(debdistdir)/$(PACKAGE)-local.list \
 			  $(aptfulldir)/$(PACKAGE).list \
 			  $(aptfulldir)/$(PACKAGE)-local.list
 
@@ -1014,37 +1014,37 @@ $(apt_releases): $(apt_nonrel_files)
 	$(ECHO) "mv -f -- $@.$$$$ $@" ; \
 	mv -f -- $@.$$$$ $@
 
-$(aptfulldir)/$(PACKAGE).list::
+$(aptfulldir)/$(PACKAGE).list:: Makefile
 	$(AM_V_GEN)\
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
 	for b in "$$rb" ; do \
 		for r in main debug devel source '' ; do \
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) "deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			if test $${r:-full} = full -o $${r:-full} = source ; then \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) "deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			fi ; \
 		done ; \
 	done >$@
 
-$(aptfulldir)/$(PACKAGE)-local.list::
+$(aptfulldir)/$(PACKAGE)-local.list:: Makefile
 	$(AM_V_GEN)\
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
 	for b in "$$rb" ; do \
 		for r in main debug devel source '' ; do \
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) "deb         file://$(DISTDIR)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			if test $${r:-full} = full -o $${r:-full} = source ; then \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) "deb-src     file://$(DISTDIR)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			fi ; \
 		done ; \
 	done >$@
 
-$(repodir)/$(PACKAGE).list::
+$(debdistdir)/$(PACKAGE).list:: Makefile
 	$(AM_V_GEN)\
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
 	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
@@ -1052,15 +1052,15 @@ $(repodir)/$(PACKAGE).list::
 		for r in main debug devel source '' ; do \
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) "deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			if test $${r:-full} = full -o $${r:-full} = source ; then \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) "deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			fi ; \
 		done ; \
 	done >$@
 
-$(repodir)/$(PACKAGE)-local.list:
+$(debdistdir)/$(PACKAGE)-local.list:: Makefile
 	$(AM_V_GEN)\
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
 	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
@@ -1068,10 +1068,10 @@ $(repodir)/$(PACKAGE)-local.list:
 		for r in main debug devel source '' ; do \
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) "deb         file://$(DISTDIR)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			if test $${r:-full} = full -o $${r:-full} = source ; then \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) "deb-src     file://$(DISTDIR)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			fi ; \
 		done ; \
 	done >$@
@@ -1220,45 +1220,65 @@ release-update-apt:
 				empty_repo=no ; \
 			fi ; \
 		done ; \
+		dir="$$repodir$${b:+/$$b}" ; \
+		f="$$dir/$(PACKAGE)" ; \
+		$(ECHO) "rm -f -- $$f.list $$f-local.list" ; \
+		rm -f -- $$f.list $$f-local.list ; \
+		if test $${empty_subrepo:-yes} = no ; then \
+			$(ECHO) "  GEN   $$(basename $$f.list)" ; \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
+				$(ECHO) 'deb      $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				if test $${r:-full} = full -o $${r:-full} = source ; then \
+				if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
+				$(ECHO) 'deb-src  $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				fi ; \
+			done >$$f.list ; \
+			$(ECHO) "  GEN   $$(basename $$f-local.list)" ; \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
+				$(ECHO) 'deb      file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				if test $${r:-full} = full -o $${r:-full} = source ; then \
+				if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
+				$(ECHO) 'deb-src  file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				fi ; \
+			done >$$f-local.list ; \
+		else \
+			$(ECHO) "  rmdir -pv $$dir" ; \
+			rmdir -pv -- $$dir || : ; \
+		fi ; \
 	done ; \
-	f="$$repodir/$(PACKAGE).list ; \
-	$(ECHO) "rm -f -- $$f" ; \
+	f="$$repodir/$(PACKAGE)" ; \
+	$(ECHO) "rm -f -- $$f.list $$f-local.list" ; \
+	rm -f -- $$f.list $$f-local.list ; \
 	if test $${empty_repo:-yes} = no ; then \
-		$(ECHO) "  GEN   $$(basename $$f)" ; \
-		{ \
-			for b in '' updates extras testing $$rb ; do \
-				for r in main debug devel source '' ; do \
-					d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
-					if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-					$(ECHO) "deb      $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
-					if test $${r:-full} = full -o $${r:-full} = source ; then \
-					if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-					$(ECHO) "deb-src  $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
-					fi ; \
-				done ; \
+		$(ECHO) "  GEN   $$(basename $$f.list)" ; \
+		for b in '' updates extras testing $$rb ; do \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
+				$(ECHO) 'deb      $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				if test $${r:-full} = full -o $${r:-full} = source ; then \
+				if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
+				$(ECHO) 'deb-src  $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				fi ; \
 			done ; \
-		} >$$f ; \
-	fi ; \
-	f="$$repodir/$(PACKAGE)-local.list ; \
-	$(ECHO) "rm -f -- $$f" ; \
-	rm -f -- $$f ; \
-	if test $${empty_repo:-yes} = no ; then \
-		$(ECHO) "  GEN   $$(basename $$f)" ; \
-		{ \
-			for b in '' updates extras testing $$rb ; do \
-				for r in main debug devel source '' ; do \
-					d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
-					if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-					$(ECHO) "deb      file://$(REPODIR)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
-					if test $${r:-full} = full -o $${r:-full} = source ; then \
-					if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-					$(ECHO) "deb-src  file://$(REPODIR)/debs/$(target_distro)/\$$(VERSION)/\$$(ARCH)$${b:+/$$b}$${r:+/$$r} /" ; \
-					fi ; \
-				done ; \
+		done >$$f.list ; \
+		$(ECHO) "  GEN   $$(basename $$f-local.list)" ; \
+		for b in '' updates extras testing $$rb ; do \
+			for r in main debug devel source '' ; do \
+				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+				if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
+				$(ECHO) 'deb      file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				if test $${r:-full} = full -o $${r:-full} = source ; then \
+				if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
+				$(ECHO) 'deb-src  file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				fi ; \
 			done ; \
-		} >$$f ; \
-	fi ; \
-	if test $${empty_repo:-yes} = yes ; then \
+		done >$$f-local.list ; \
+	else \
 		$(ECHO) "  rmdir -pv $$repodir" ; \
 		rmdir -pv -- $$repodir || : ; \
 	fi

@@ -451,6 +451,19 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	# cannot get the cpu from the compiler
 	if test -z "$dist_cv_build_cpu" ; then dist_cv_build_cpu=$build_cpu ; fi
     ])
+    AC_CACHE_CHECK([for dist build arch], [dist_cv_build_arch], [dnl
+	if "`basename ${dist_cv_build_rel_file:-no}`" = debian_version ; then
+	    if test -z "$dist_cv_build_arch" -a :${DEB_BUILD_ARCH+set} = :set ; then
+		dist_cv_build_arch="$DEB_BUILD_ARCH"
+	    fi
+	    if test -z "$dist_cv_build_arch" -a -x "`which dpkg-architecture`" ; then
+		dist_cv_build_arch="`dpkg-architecture -f -qDEB_BUILD_ARCH 2>/dev/null`"
+	    fi
+	fi
+	if test -z "$dist_cv_build_arch" ; then
+	    dist_cv_build_arch="$dist_cv_build_cpu"
+	fi
+    ])
     AC_CACHE_CHECK([for dist host lsb release file], [dist_cv_host_lsb_file], [dnl
 	eval "dist_search_path=\"
 	    ${DESTDIR}${sysconfdir}/lsb-release\""
@@ -685,6 +698,19 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	# cannot get the cpu from the compiler
 	if test -z "$dist_cv_host_cpu" ; then dist_cv_host_cpu=$host_cpu ; fi
     ])
+    AC_CACHE_CHECK([for dist host arch], [dist_cv_host_arch], [dnl
+	if "`basename ${dist_cv_host_rel_file:-no}`" = debian_version ; then
+	    if test -z "$dist_cv_host_arch" -a :${DEB_HOST_ARCH+set} = :set ; then
+		dist_cv_host_arch="$DEB_HOST_ARCH"
+	    fi
+	    if test -z "$dist_cv_host_arch" -a -x "`which dpkg-architecture`" ; then
+		dist_cv_host_arch="`dpkg-architecture -f -qDEB_HOST_ARCH 2>/dev/null`"
+	    fi
+	fi
+	if test -z "$dist_cv_host_arch" ; then
+	    dist_cv_host_arch="$dist_cv_host_cpu"
+	fi
+    ])
 ])# _DISTRO_SETUP
 # =============================================================================
 
@@ -701,11 +727,13 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	(mandrake|mandriva|manbo|mageia|mes|ubuntu|lts)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
     esac
+    build_arch="${dist_cv_build_arch:-unknown}"
+    AC_SUBST([build_arch])dnl
     build_distro="${dist_cv_build_distro:-unknown}"
-    build_edition="${dist_cv_build_edition:-unknown}"
-    build_distos="${build_distro}-${build_edition}-${build_cpu}"
     AC_SUBST([build_distro])dnl
+    build_edition="${dist_cv_build_edition:-unknown}"
     AC_SUBST([build_edition])dnl
+    build_distos="${build_distro}-${build_edition}-${build_arch}"
     AC_SUBST([build_distos])dnl
     build="${build_cpu}-${build_vendor}-${build_os}"
     AC_MSG_RESULT([$build ($build_distos)])
@@ -714,6 +742,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	host_cpu="$build_cpu"
 	host_vendor="$build_vendor"
 	host_os="$build_os"
+	host_arch="$build_arch"
 	host_distro="$build_distro"
 	host_edition="$build_edition"
     else
@@ -724,13 +753,15 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	    (mandrake|mandriva|manbo|mageia|mes|ubuntu|lts)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
 	esac
+	host_arch="${dist_cv_host_arch:-unknown}"
 	host_distro="${dist_cv_host_distro:-unknown}"
 	host_edition="${dist_cv_host_edition:-unknown}"
     fi
+    AC_SUBST([host_arch])dnl
     AC_SUBST([host_distro])dnl
     AC_SUBST([host_edition])dnl
     AC_SUBST([host_distos])dnl
-    host_distos="${host_distro}-${host_edition}-${host_cpu}"
+    host_distos="${host_distro}-${host_edition}-${host_arch}"
     host="${host_cpu}-${host_vendor}-${host_os}"
     AC_MSG_RESULT([$host ($host_distos)])
     AC_MSG_CHECKING([target system type])
@@ -747,11 +778,13 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;
 	esac
     fi
+    target_arch="$host_arch"
+    AC_SUBST([target_arch])dnl
     target_distro="$host_distro"
-    target_edition="$host_edition"
-    target_distos="${target_distro}-${target_edition}-${target_cpu}"
     AC_SUBST([target_distro])dnl
+    target_edition="$host_edition"
     AC_SUBST([target_edition])dnl
+    target_distos="${target_distro}-${target_edition}-${target_arch}"
     AC_SUBST([target_distos])dnl
     target="${target_cpu}-${target_vendor}-${target_os}"
     AC_MSG_RESULT([$target ($target_distos)])
