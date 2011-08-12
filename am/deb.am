@@ -1021,10 +1021,10 @@ $(aptfulldir)/$(PACKAGE).list:: Makefile
 		for r in main debug devel source '' ; do \
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			if test $${r:-full} = full -o $${r:-full} = source ; then \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			fi ; \
 		done ; \
 	done >$@
@@ -1036,10 +1036,10 @@ $(aptfulldir)/$(PACKAGE)-local.list:: Makefile
 		for r in main debug devel source '' ; do \
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			if test $${r:-full} = full -o $${r:-full} = source ; then \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			fi ; \
 		done ; \
 	done >$@
@@ -1052,10 +1052,10 @@ $(debdistdir)/$(PACKAGE).list:: Makefile
 		for r in main debug devel source '' ; do \
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			if test $${r:-full} = full -o $${r:-full} = source ; then \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			fi ; \
 		done ; \
 	done >$@
@@ -1068,10 +1068,10 @@ $(debdistdir)/$(PACKAGE)-local.list:: Makefile
 		for r in main debug devel source '' ; do \
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			if test $${r:-full} = full -o $${r:-full} = source ; then \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			fi ; \
 		done ; \
 	done >$@
@@ -1228,21 +1228,21 @@ release-update-apt:
 			$(ECHO) "  GEN   $$(basename $$f.list)" ; \
 			for r in main debug devel source '' ; do \
 				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
-				if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-				$(ECHO) 'deb      $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb      $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 				if test $${r:-full} = full -o $${r:-full} = source ; then \
-				if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-				$(ECHO) 'deb-src  $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb-src  $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 				fi ; \
 			done >$$f.list ; \
 			$(ECHO) "  GEN   $$(basename $$f-local.list)" ; \
 			for r in main debug devel source '' ; do \
 				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
-				if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-				$(ECHO) 'deb      file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb      file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 				if test $${r:-full} = full -o $${r:-full} = source ; then \
-				if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-				$(ECHO) 'deb-src  file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb-src  file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 				fi ; \
 			done >$$f-local.list ; \
 		else \
@@ -1258,11 +1258,11 @@ release-update-apt:
 		for b in '' updates extras testing $$rb ; do \
 			for r in main debug devel source '' ; do \
 				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
-				if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-				$(ECHO) 'deb      $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb      $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 				if test $${r:-full} = full -o $${r:-full} = source ; then \
-				if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-				$(ECHO) 'deb-src  $(reposerv)://$(repobase)/$(reporoot)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb-src  $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 				fi ; \
 			done ; \
 		done >$$f.list ; \
@@ -1270,11 +1270,11 @@ release-update-apt:
 		for b in '' updates extras testing $$rb ; do \
 			for r in main debug devel source '' ; do \
 				d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
-				if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-				$(ECHO) 'deb      file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb      file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 				if test $${r:-full} = full -o $${r:-full} = source ; then \
-				if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
-				$(ECHO) 'deb-src  file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+				test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'deb-src  file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 				fi ; \
 			done ; \
 		done >$$f-local.list ; \
