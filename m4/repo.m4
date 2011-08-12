@@ -136,7 +136,7 @@ AC_DEFUN([_REPO_SETUP_URL], [dnl
     repo_cv_reposervice="${with_repo_service:-https}"
     AC_MSG_RESULT(["$repo_cv_reposervice"])
     AC_MSG_CHECKING([for repo subdirectory])
-    repo_cv_dist_subdir="${host_distro}/${host_edition}/${host_cpu}"
+    repo_cv_dist_subdir="${host_distro}/${host_edition}/${host_arch}"
     AC_MSG_RESULT(["$repo_cv_dist_subdir"])
 ])# _REPO_SETUP_URL
 # =============================================================================
@@ -612,7 +612,7 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
     urpmimediadir=
     if test :"${repo_cv_urpmi_repodir:-no}" != :no ; then
 	urpmirepodir="$repo_cv_urpmi_repodir"
-	urpmimediadir="$repo_cv_urpmi_repodir/OpenSS7-${target_edition}-${target_cpu}"
+	urpmimediadir="$repo_cv_urpmi_repodir/OpenSS7-${target_edition}-${target_arch}"
     fi
     AC_SUBST([urpmirepodir])dnl
     AC_SUBST([urpmimediadir])dnl

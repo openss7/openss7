@@ -163,8 +163,8 @@ The architecture of the release.  Example , @file{x86_64}.
 
 So, for example, the @cite{CentOS 5.5} distribution for @file{x86_64} is located under
 @uref{http://@-www.@-openss7.@-org/@-repos/@-rpms/@-centos/@-5.5/@-x86_64/}; the @cite{Debian
-Squeeze} distribution for @file{i686} is located under
-@uref{http://@-www.@-openss7.@-org/@-repos/@-debs/@-debian/@-squeeze/@-i686/}; the tarball
+Squeeze} distribution for @file{i386} is located under
+@uref{http://@-www.@-openss7.@-org/@-repos/@-debs/@-debian/@-squeeze/@-i386/}; the tarball
 distribution is located under @uref{http://@-www.@-openss7.@-org/@-repos/@-tarballs}.
 
 @node Repositories for YUM

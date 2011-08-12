@@ -186,8 +186,8 @@ DPKG-based systems:
 
 @example
           $> REPO=http://www.openss7.org/repo/debs/
-Debian:   $> SUBDIR=debian/squeeze/$(uname -m)/main
-Ubuntu:   $> SUBDIR=ubuntu/10.04/$(uname -m)/main
+Debian:   $> SUBDIR=debian/squeeze/$(dpkg-architecture -a -qDEB_HOST_ARCH)/main
+Ubuntu:   $> SUBDIR=ubuntu/10.04/$(dpkg-architecture -a -qDEB_HOST_ARCH)/main
           $> wget $REPO/$SUBDIR/openss7-repo_all.deb
           $> dpkg -i -D010077 openss7-repo_all.deb
 @end example

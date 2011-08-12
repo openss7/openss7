@@ -168,13 +168,13 @@ The identifier of the distrbution.  Example, @file{centos}, @file{debian}.
 @item release
 The release of the distribution.  Example, @file{5.5}, @file{squeeze}.
 @item arch
-The architecture of the release.  Example , @file{x86_64}.
+The architecture of the release.  Example , @file{x86_64}, @file{amd64}.
 @end table
 
 So, for example, the @cite{CentOS 5.5} distribution for @file{x86_64} is located under
 @uref{https://@-www.@-openss7.@-org/@-repo/@-rpms/@-centos/@-5.5/@-x86_64/}; the @cite{Debian
-Squeeze} distribution for @file{i686} is located under
-@uref{https://@-www.@-openss7.@-org/@-repo/@-debs/@-debian/@-squeeze/@-i686/}; the tarball
+Squeeze} distribution for @file{i386} is located under
+@uref{https://@-www.@-openss7.@-org/@-repo/@-debs/@-debian/@-squeeze/@-i386/}; the tarball
 distribution is located under @uref{https://@-www.@-openss7.@-org/@-repo/@-tarballs}.
 
 Note that repository access is restricted.  You may download the @file{repo} packages without
@@ -730,8 +730,11 @@ For assistance with specific DEBs, see @ref{Downloading the Debian DEB}.
 
 @menu
 Setting up APT::			setting up repository access with APT
-Using the APT Repository::		using the respository with APT
+Using the APT Repository::		using the repository with APT
 APT Kernel Updates::			updating kernels with APT
+Setting up APT-RPM::			setting up repository access with APT-RPM
+Using the APT-RPM Repository::		using the repository with APT-RPM
+APT-RPM Kernel Updates::		updating kernels with APT-RPM
 @end menu
 
 @node Setting up APT
@@ -744,8 +747,8 @@ follows:
 
 @cartouche
 @smallexample
-$> REPO="https://user@@www.openss7.org/repo/rpms"
-$> REPONOARCH="$REPO/debian/squeeze/x86_64"
+$> REPO="https://user@@www.openss7.org/repo/debs"
+$> REPONOARCH="$REPO/debian/squeeze/amd64"
 $> REPODEB="$REPONOARCH/@value{PACKAGE}-repo_all.deb"
 $> wget $REPODEB
 $> dpkg -i -D010077 @value{PACKAGE}-repo_all.deb
@@ -755,11 +758,11 @@ $> Password: ********
 @end cartouche
 
 The example, above, assumes that the distribution is @samp{debian} and the distribution release is
-@samp{squeeze} and the required architecture is @samp{x86_64}.@footnote{Note that this is the
+@samp{squeeze} and the required architecture is @samp{amd64}.@footnote{Note that this is the
 @samp{$(uname -m)} style architecture and not the Debian sytle architecture.}  Another example would
-be @file{$REPO/ubuntu/10.04/x86_64}, for using @manpage{apt(8)} with Ubuntu.
+be @file{$REPO/ubuntu/10.04/amd64}, for using @manpage{apt(8)} with Ubuntu.
 
-To obtain access to the repository at the leve to which you are entitled, you will have to respond
+To obtain access to the repository at the level to which you are entitled, you will have to respond
 to the @samp{Username:} query with the user name with which you are registered with
 @uref{https://www.openss7.org/}, and to the @samp{Password:} query with your repository access
 password.@footnote{Note that your repository access password is separate and distinct from your web
@@ -794,7 +797,7 @@ Once the repository is set up, @cite{@value{PACKAGE_TITLE}} includes a number of
 and packages recommendations that ease the installation and removal of kernel modules, libraries and
 utilities.  Downloading, configuring, building and installation for a single-kernel distribution is
 as easy as:@footnote{Note that using @manpage{aptitude(8)} in this way relies upon recommendations
-being treated as strong dependencies.  This is normaly the case for default @manpage{apt(8)}
+being treated as strong dependencies.  This is normally the case for default @manpage{apt(8)}
 configuration files (particularly when @command{synaptic} is installed); however, it is not
 necessarily the case.  If you are not getting recommended packages being automatically installed,
 add @option{--with-recommends} to the command line.}
@@ -833,12 +836,121 @@ Of course, you are welcome to use a GUI based package manager, such as
 @cindex kernel updates
 
 The @cite{@value{PACKAGE_TITLE}} @manpage{apt(8)} repository definitions support the automatic
-updating of kernel modules when kenrels are updated.  When the system is updated, using
+updating of kernel modules when kernels are updated.  When the system is updated, using
 @samp{apt-get upgrade}, @cite{@value{PACKAGE_TITLE}} packages that are available for an updated
-kernel will be installed automatically.  @cite{@value{PACKAGE_TITLE}} kernel module packages also
-support weak updates and when kernels are updated to compatible kernels (e.g. for security upgrades,
-or normally for any updated within an Enterprise (LTS) distribution), kernel modules are
-automatically applied against the updated kernel.
+kernel will be installed automatically.
+
+@cite{@value{PACKAGE_TITLE}} kernel module packages also support weak updates and when kernels are
+updated to compatible kernels (e.g. for security upgrades, or normally for any updated within an
+Enterprise (LTS) distribution), kernel modules are automatically applied against the updated kernel.
+
+@node Setting up APT-RPM
+@subsubsection Setting up APT-RPM
+@cindex apt-rpm
+
+To install or upgrade from the @cite{@value{PACKAGE_TITLE}} @file{apt-rpm} repositories using
+@manpage{apt(8)}, you will need to install the @file{@value{PACKAGE}-repo} RPM on your system, as
+follows:
+
+@cartouche
+@smallexample
+$> REPO="https://user@@www.openss7.org/repo/rpms"
+$> REPONOARCH="$REPO/mageia/1/x86_64/RPMS/noarch"
+$> REPORPM="$REPONOARCH/@value{PACKAGE}-repo.noarch.rpm"
+$> wget $REPORPM
+$> sudo rpm -Uhv $REPORPM
+$> Username: anonymous
+$> Password: *******
+@end smallexample
+@end cartouche
+
+The example, above, assumes that the distribution is @samp{mageia} and the distribution release is
+@samp{1} and the required architecture is @samp{x86_64}.  Another example would be
+@file{$REPO/mes/5.2/x86_64/RPMS/noarch}, for using @manpage{apt(8)} with MES (Mandriva Enterprise
+Server).
+
+To obtain access to the repository at the level to which you are entitled, you will have to respond
+to the @samp{Username:} query with the user name with which you are registered with
+@uref{https://www.openss7.org/}, and to the @samp{Password:} query with your repository access
+password.@footnote{Note that your repository access password is separate and distinct from your web
+access password.}
+
+@manpage{apt(8)} does not do a very good job of importing GPG signatures.  When @command{apt-get} is
+reporting that there are no keys for the DEBs being installed, the key can be imported directly into
+APT as follows:
+
+@cartouche
+@smallexample
+$> wget https://www.openss7.org/pubkey.asc
+$> sudo apt-key add pubkey.asc
+@end smallexample
+@end cartouche
+
+You can test whether the @manpage{apt(8)} repository is properly set up by refreshing the repository
+and by listing the packages.
+
+@cartouche
+@smallexample
+$> sudo apt-get update
+$> sudo apt-cache gencaches
+$> apt-cache search openss7
+@end smallexample
+@end cartouche
+
+@node Using the APT-RPM Repository
+@subsubsection Using the APT-RPM Repository
+@cindex apt-rpm
+
+Once the repository is set up, @cite{@value{PACKAGE_TITLE}} includes a number of virtual packages
+and packages recommendations that ease the installation and removal of kernel modules, libraries and
+utilities.  Downloading, configuring, building and installation for a single-kernel distribution is
+as easy as:@footnote{Note that using @manpage{apt-get(8)} in this way relies upon recommendations
+being treated as strong dependencies.  This is normally the case for default @manpage{apt(8)}
+configuration files (particularly when @command{synaptic} is installed); however, it is not
+necessarily the case.  If you are not getting recommended packages being automatically installed,
+add @option{--install-recommends} to the command line.}
+
+@cartouche
+@smallexample
+$> sudo apt-get install @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+Removing the package is as easy as:
+
+@cartouche
+@smallexample
+$> sudo apt-get remove @value{PACKAGE}
+$> sudo apt-get purge @value{PACKAGE}
+@end smallexample
+@end cartouche
+
+To install the development packages for developing @cite{STREAMS} modules and drivers, or
+applications that use the @cite{@value{PACKAGE_TITLE} Protocol Suites}, install the development
+packages using:
+
+@cartouche
+@smallexample
+$> sudo apt-get install @value{PACKAGE}-devel
+@end smallexample
+@end cartouche
+
+Of course, you are welcome to use a GUI based package manager, such as
+@manpage{synaptic(8)}.
+
+@node APT-RPM Kernel Updates
+@subsubsection APT-RPM Kernel Updates
+@cindex apt-rpm
+@cindex kernel updates
+
+The @cite{@value{PACKAGE_TITLE}} @manpage{apt(8)} repository definitions support the automatic
+updating of kernel modules when kernels are updated.  When the system is updated, using
+@samp{apt-get upgrade}, @cite{@value{PACKAGE_TITLE}} packages that are available for an updated
+kernel will be installed automatically.
+
+@cite{@value{PACKAGE_TITLE}} kernel module packages also support weak updates and when kernels are
+updated to compatible kernels (e.g. for security upgrades, or normally for any updated within an
+Enterprise (LTS) distribution), kernel modules are automatically applied against the updated kernel.
 
 
 @c ----------------------------------------------------------------------------
@@ -933,9 +1045,10 @@ installing.
 
 Once the repository definitions have been established, downloading DEBs with @manref{apt(8)} is
 automatic.  See @refman{Setting up APT}, for instructions on downloading the repository DEB and
-using it to set up for @manref{apt(8)}, and @refman{Installing with APT}, for instructions on
-installing subsequent packages.  See @manref{apt(8)} for more information on downloading without
-installing.
+using it to set up for @manref{apt(8)}.  See @refman{Setting up APT-RPM}, for instructions on
+downloading the repository RPM and using it to set up for @manref{apt(8)}.  See @refman{Installing
+with APT}, for instructions on installing subsequent packages.  See @manref{apt(8)} for more
+information on downloading without installing.
 
 @c ----------------------------------------------------------------------------
 
@@ -3541,7 +3654,8 @@ The repository includes groups (patterns) and virtual packages that ease the ins
 removal of kernel modules, libraries and utilities.
 
 To install the @cite{@value{PACKAGE_TITLE}} run-time components for a single-kernel distribution
-installation, use (one of):
+installation, use (one of):@footnote{Note that @manref{aptitude(8)} is not always available on
+systems supporting APT-RPM.}
 
 @cartouche
 @smallexample
