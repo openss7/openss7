@@ -1094,26 +1094,22 @@ $(PACKAGE).list: Makefile
 			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			if test -z '@BUILD_REPO_APT_TRUE@' ; then \
-				if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
-					$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+				test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; \
 				$(ECHO) 'deb $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
 				if test "$$repo" = 'Source' ; then \
 					$(ECHO) '#deb-src $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
 				fi ; \
 			elif test -z '@BUILD_REPO_YUM_TRUE@' ; then \
-				if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
-					$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+				test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; \
 				$(ECHO) 'repomd $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
 			elif test -z '@BUILD_REPO_URPMI_TRUE@' ; then \
-				if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
-					$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
-					$(ECHO) 'urpm $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media'$${b:+/$$b}$${d:+/$$d}'/ media_info/hdlist'$${b:+_}$${b}$${d:+_}$${d} ; \
+				test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'urpm $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media'$${b:+/$$b}$${d:+/$$d}'/ media_info/hdlist'$${b:+_}$${b}$${d:+_}$${d} ; \
 				if test "$$repo" = 'Source' ; then \
 					$(ECHO) '#urpm-src $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media'$${b:+/$$b}$${d:+/$$d}'/ media_info/synthesis.hdlist$${b+_}$${b}$${d:+_}$${d}' ; \
 				fi ; \
 			elif test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
-				if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
-					$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+				test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; 
 			fi ; \
 		done ; \
 	done >$@
@@ -1258,9 +1254,11 @@ repo-install-apt:
 				d="$${debdistdir}$${b:+/$$b}" ; \
 				for r in main debug devel source '' ; do \
 					d="$${debdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
-					if test ! -f $$d/Packages ; then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'deb     file://'$$d' /' ; \
+					test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'deb     file://'$$d' /' ; \
 					if test -z "$$r" -o "$$r" = 'source'; then \
-					if test ! -f $$d/Sources  ; then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'deb-src file://'$$d' /' ; \
+					test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'deb-src file://'$$d' /' ; \
 					fi ; \
 				done ; \
 			done ; \
@@ -1288,9 +1286,9 @@ repo-install-local-apt:
 		for r in main debug devel source '' ; do \
 			d="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb         file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb         file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
-			$(ECHO) 'deb-src     file://$(REPODIR)/debs/$(target_distro)/$$(VERSION)/$$(ARCH)'"$${b:+/$$b}$${r:+/$$r} /" ; \
+			$(ECHO) 'deb-src     file://$(REPODIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
 		done ; \
 	done >$$f ; \
 	@if test -z '$(DESTDIR)$(rootdir)' ; then \
@@ -1347,8 +1345,7 @@ $(PACKAGE).list: Makefile
 		for repo in 'Main' 'Debug' 'Devel' 'Source' ; do \
 			r=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
 			d=`echo "$$repo" | sed 's,Main,main,;t;s,Debug,debug,;t;s,Devel,devel,;t;s,Source,source,'` ; \
-			if test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) ; then \
-				$(ECHO) $(ECHO_N) ''; else $(ECHO) $(ECHO_N) '#'; fi ; \
+			test \( "$$branch" = 'Base' -o "$$branch" = 'Updates' \) -a \( -z "$$repo" -o "$$repo" = 'Main' \) || $(ECHO) $(ECHO_N) '#' ; \
 			if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
 				$(ECHO) 'rpm $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)'$${b:+/$$b}$${d:+/$$d}' /' ; \
 				if test "$$repo" = 'Source' ; then \
@@ -1494,13 +1491,16 @@ repo-install-apt-rpm:
 				for r in main debug devel source '' ; do \
 					d="$${rpmdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
 					if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then \
-						if test ! -f $$d/pkglist then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'rpm     file://'$$d' /' ; \
+						test -f $$d/pkglist || $(ECHO) $(ECHO_N) '#'; \
+						$(ECHO) 'rpm     file://'$$d' /' ; \
 						if test -z "$$r" -o "$$r" = 'source' ; then \
-						if test ! -f $$d/srclist then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'rpm-src file://'$$d' /' ; \
+						test -f $$d/srclist || $(ECHO) $(ECHO_N) '#'; \
+						$(ECHO) 'rpm-src file://'$$d' /' ; \
 						fi ; \
 					fi ; \
 					if test -z '@BUILD_REPO_YUM_TRUE@' ; then \
-						if test ! -f $$d/repodata/repomd.xml then $(ECHO) $(ECHO_N) '#'; fi ; $(ECHO) 'repomd  file://'$$d ; \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#'; \
+						$(ECHO) 'repomd  file://'$$d ; \
 					fi ; \
 				done ; \
 			done ; \
@@ -1525,10 +1525,10 @@ repo-install-local-apt-rpm:
 			for b in '' updates extras testing $$rb ; do \
 				for r in main debug devel source '' ; do \
 					d="$$rpmdistdir/media$${b:+/$$b}$${r:+/$$r}" ; \
-					if test ! -f $$d/media_info/hdlist.cz ; then $(ECHO) $(ECHO_N) '#'; fi ; \
+					test -f $$d/media_info/hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'urpm        file://'$$d' media_info/synthesis.hdlist /' ; \
 					if test $${r:-full} = full -o $${r:-full} = source ; then \
-					if test ! -f $$d/media_info/hdlist.cz ; then $(ECHO) $(ECHO_N) '#'; fi ; \
+					test -f $$d/media_info/hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'urpm-src    file://'$$d' media_info/synthesis.hdlist /' ; \
 					fi ; \
 					$(ECHO) '' ; \
@@ -1541,10 +1541,10 @@ repo-install-local-apt-rpm:
 			for b in '' updates extras testing $$rb ; do \
 				for r in main debug devel source '' ; do \
 					d="$${rpmdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
-					if test ! -f $$d/repodata/repomd.xml then $(ECHO) $(ECHO_N) '#'; fi ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) "repomd      file://$(REPODIR) rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
 					if test $${r:-full} = full -o $${r:-full} = source ; then \
-					if test ! -f $$d/repodata/repomd.xml then $(ECHO) $(ECHO_N) '#'; fi ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) "repomd-src  file://$(REPODIR) rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
 					fi ; \
 					$(ECHO) '' ; \
@@ -1557,10 +1557,10 @@ repo-install-local-apt-rpm:
 			for b in '' updates extras testing $$rb ; do \
 				for r in main debug devel source '' ; do \
 					d="$${rpmdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
-					if test ! -f $$d/pkglist ; then $(ECHO) $(ECHO_N) '#'; fi ; \
+					test -f $$d/pkglist || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'rpm         file://'$$d' /' ; \
 					if test $${r:-full} = full -o $${r:-full} = source ; then \
-					if test ! -f $$d/srclist ; then $(ECHO) $(ECHO_N) '#'; fi ; \
+					test -f $$d/srclist || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'rpm-src     file://'$$d' /' ; \
 					fi ; \
 					$(ECHO) '' ; \
@@ -1573,7 +1573,7 @@ repo-install-local-apt-rpm:
 			for b in '' updates extras testing $$rb ; do \
 				for r in main debug devel source '' ; do \
 					d="$${rpmdistdir}/media$${b:+/$$b}$${r:+/$$r}" ; \
-					it test ! -f $$d/media_info/hdlist.cz ; then $(ECHO) $(ECHO_N) '#' ; fi ; \
+					test -f $$d/media_info/hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'rpm-dir     file://'$$d' /' ; \
 					if test $${r:-full} = full -o $${r:-full} = source ; then \
 					$(ECHO) 'rpm-src-dir file://'$$d' / ' ; \
