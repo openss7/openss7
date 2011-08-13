@@ -246,7 +246,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			;;
 		    (mageia)
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
-			rpm_cv_dist_extra=".${rpm_tmp}mga"
+			rpm_cv_dist_extra=".mga${rpm_tmp}"
 			;;
 		    (mes)
 			case $dist_cv_host_release in
@@ -371,7 +371,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			;;
 		    (mageia)
 			rpm_tmp=`echo "$dist_cv_host_release" | sed 's|\.||g'`
-			rpm_cv_dist_extra2=".${rpm_tmp}mga"
+			rpm_cv_dist_extra2=".mga${rpm_tmp}"
 			;;
 		    (mes)
 			case $dist_cv_host_release in

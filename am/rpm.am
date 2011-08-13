@@ -155,7 +155,8 @@ rpm_dir			= $(rpmbuilddir)/$(PACKAGE)-$(VERSION)
 rpm_dir_stamp		= $(rpmbuilddir)/stamp-$(PACKAGE)-$(VERSION)
 rpm_src_file		= $(srcrpmdir)/$(rpmpkg).src.rpm
 rpm_sig_file		= $(srcrpmdir)/$(rpmpkg).src.rpm
-rpm_tar_file		= $(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2
+rpm_tar_file		= $(sourcedir)/$(PACKAGE)-$(VERSION).tar.bz2 \
+			  $(sourcedir)/$(PACKAGE)-$(VERSION).tar.xz
 rpm_spec_file		= $(specdir)/$(PACKAGE)-$(VERSION).spec
 rpm_img_files		= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
 rpm_source_files	= $(rpm_spec_file) $(rpm_img_files) $(rpm_tar_file)
@@ -279,7 +280,7 @@ $(rpm_src_file):: $(rpm_source_files)
 ##
 ## This rule must come after the one above.
 ##
-$(rpm_link_file)::
+$(rpm_link_file):: $(rpm_src_file)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=$(srcrpmdir)/`$(ECHO) "$@" | sed 's|^.*/||'`; \
 	test ":$(FORCE)" != :force -a \( -f "$@" -o -f "$$f" \) || { \
@@ -396,13 +397,9 @@ rebuild:
 		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -type d \( -name '2.[46].*' -o -name '3.*' \) | $(rpmsort) ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
-			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
-			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || continue; \
-			if test -z '$(DESTDIR)'; then \
-				if ! $(RPM) -q --whatprovides /lib/modules/$$k/build >/dev/null 2>&1; then \
-					continue; \
-				fi; \
-			fi; \
+			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || { $(ECHO) "D: $@: skipping $$k (no build directory)"; continue; }; \
+			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skipping $$k (no system map)"; continue; }; \
+			test -n '$(DESTDIR)' || $(RPM) -q --whatprovides /lib/modules/$$k/build/Makefile >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $$k (no build provides)"; continue; }; \
 			ks=`echo "$$k" | sed -rn 's,^(.*)-([a-zA-Z][a-zA-Z0-9]*)$$,\2.*\1,;t good;s,^(.*)$$,.*\1,;: good s,[_-],.,g;s,^,-,p'`; \
 			rpms="`( find $(rpmdir)/$$a -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' | egrep -- "$$ks"'.*\.'"$$a"'\.rpm$$' ) 2>/dev/null`"; \
 			if test -z "$$rpms" -o -n '$(FORCE)'; then \
@@ -554,7 +551,7 @@ update-clean-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(ECHO) "rm -rf $(rpm_dir)"; \
 	rm -rf $(rpm_dir) ; \
-	for f in $(rpm_tar_file) $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_sig_file) $(rpm_binary_files) ; do \
+	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_sig_file) $(rpm_binary_files) ; do \
 		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
 			$(ECHO) "D: $@: removed $$f"; \
 			$(ECHO) "rm -f -- \"$$f\""; \
@@ -636,9 +633,9 @@ update-k-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	a=`echo '$(RPMTARGET)' | sed 's,-.*$$,,'`; \
 	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
-	test -e $(DESTDIR)$(rootdir)/lib/modules/$(kversion)/build || exit 0; \
-	test -e $(DESTDIR)$(rootdir)/boot/System.map-$(kversion) || exit 0; \
-	test -n '$(DESTDIR)' || $(RPM) -q --whatprovides /lib/modules/$(kversion)/build >/dev/null 2>&1 || exit 0; \
+	test -e $(DESTDIR)$(rootdir)/lib/modules/$(kversion)/build || { $(ECHO) "D: $@: skipping $(kversion) (no build directory)"; exit 0; }; \
+	test -e $(DESTDIR)$(rootdir)/boot/System.map-$(kversion) || { $(ECHO) "D: $@: skipping $(kversion) (no system map)"; exit 0; }; \
+	test -n '$(DESTDIR)' || $(RPM) -q --whatprovides /lib/modules/$(kversion)/build/Makefile >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $(kversion) (no build provides)"; exit 0; }; \
 	rebuild=yes; \
 	ks=`echo '$(kversion)' | sed -rn 's,^(.*)-([a-zA-Z][a-zA-Z0-9]*)$$,\2.*\1,;t good;s,^(.*)$$,.*\1,;: good s,[_-],.,g;s,^,-,p'`; \
 	repodir=`echo '$(rpmdir)' | sed 's,^$(DISTDIR),$(REPODIR),'`; \
@@ -691,8 +688,9 @@ update-all-rpms:
 		kernels="`( find $(DESTDIR)$(rootdir)/lib/modules -type d \( -name '2.[46].*' -o -name '3.*' \) | $(rpmsort) ) 2>/dev/null`"; \
 		for k in $$kernels; do \
 			k=`basename $$k`; \
-			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || continue; \
-			test -n '$(DESTDIR)' || $(RPM) -q --whatprovides /lib/modules/$$k/build >/dev/null 2>&1 || continue; \
+			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || { $(ECHO) "D: $@: skipping $$k (no build directory)"; continue; }; \
+			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skipping $$k (no system map)"; continue; }; \
+			test -n '$(DESTDIR)' || $(RPM) -q --whatprovides /lib/modules/$$k/build/Makefile >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $$k (no build provides)"; continue; }; \
 			$(ECHO) "D: $@: rebuild $$k"; \
 			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" RPMTARGET="$$t" all-update-k-rpm || :; \
 		done; \

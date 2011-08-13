@@ -10,10 +10,11 @@ ulimit -c 0
 args=("$@")
 script=$(basename $0)
 where=`(cd $(dirname $0); pwd)`
+vendor=`(rpm --showrc | grep ' _host_vendor' | awk '{print$3}') 2>/dev/null`
 
 which_tool() {
     old_PATH="$PATH"
-    PATH="$PATH:$where:$where/find-provides.d:/usr/lib/rpm/redhat/find-provides.d:/usr/lib/rpm"
+    PATH="$PATH:$where:$where/find-provides.d:/usr/lib/rpm/${vendor:-redhat}/find-provides.d:/usr/lib/rpm/${vendor:-redhat}:/usr/lib/rpm"
     which $1
     PATH="$old_PATH"
 }
@@ -43,7 +44,7 @@ while read f ; do
 	    perllist=("${perllist[@]}" "$f")
 	    continue
 	    ;;
-	(*.ko)
+	(*.ko|*.ko.gz)
 	    kmodlist=("${kmodlist[@]}" "$f")
 	    continue
 	    ;;
@@ -177,6 +178,12 @@ if [ -n "$kmodlist" ] ; then
 	printf "%s\n" "${kmodlist[@]}" | \
 	$tool "${args[@]}"
     else
+	tool=$(which_tool "kmod.prov")
+	if [ -n "$tool" -a -x "$tool" ] ; then
+	    echo "D: Executing: $tool" >&2
+	    printf "%s\n" "${kmodlist[@]}" | \
+	    $tool "${args[@]}"
+	fi
 	tool=$(which_tool "find-provides.ksyms")
 	if [ -n "$tool" -a -x "$tool" ] ; then
 	    echo "D: Executing: $tool" >&2
@@ -216,7 +223,7 @@ exit 0
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
