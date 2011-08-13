@@ -194,6 +194,7 @@ RELEASE_UNINSTALL	=
 
 UPDATE			=
 UPDATE_SIGN		=
+UPDATE_LINKS		=
 UPDATE_DIRECTORIES	=
 UPDATE_INSTALL		=
 UPDATE_UNINSTALL	=
@@ -201,6 +202,7 @@ UPDATE_UNINSTALL	=
 REPO			=
 REPO_SIGN		=
 REPO_CLEAN		=
+REPO_LINKS		=
 REPO_DIRECTORIES	=
 REPO_INSTALL		=
 REPO_INSTALL_LOCAL	=
@@ -883,7 +885,7 @@ $(REPO_DIRECTORIES)::
 #!     distribution.  The targets invoked by this target are also invoked by the
 #!     `release' target at the end of packaging the distribution directory.
 #!
-repo: $(REPO_DIRECTORIES) $(REPO)
+repo: $(REPO_DIRECTORIES) $(REPO_LINKS) $(REPO)
 
 MY_PHONY		+= repo $(REPO)
 FORCED_TARGETS		+= forced-repo forced-repo.log
@@ -898,7 +900,7 @@ FORCED_TARGETS		+= forced-repo forced-repo.log
 #!     target at the end of packaging the distribution directory and signing
 #!     packages.
 #!
-repo-sign: $(REPO_DIRECTORIES) $(REPO_SIGN)
+repo-sign: $(REPO_DIRECTORIES) $(REPO_LINKS) $(REPO_SIGN)
 
 MY_PHONY		+= repo-sign $(REPO_SIGN)
 FORCED_TARGETS		+= forced-repo-sign forced-repo-sign.log
@@ -1099,7 +1101,7 @@ $(USTAMP)::
 #!     the package distribution directory that were created by this update run.
 #!     This forced target will.
 #!
-update: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE)
+update: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE_LINKS) $(UPDATE)
 
 MY_PHONY		+= update $(UPDATE)
 FORCED_TARGETS		+= forced-update
@@ -1114,7 +1116,7 @@ FORCED_TARGETS		+= forced-update
 #!     already exist in the package distribution directory or have already been
 #!     signed.  This forced target will both regenerate and resign.
 #!
-update-sign: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE_SIGN)
+update-sign: $(USTAMP) $(UPDATE_DIRECTORIES) $(UPDATE_LINKS) $(UPDATE_SIGN)
 
 MY_PHONY		+= update-sign $(UPDATE_SIGN)
 FORCED_TARGETS		+= forced-update-sign

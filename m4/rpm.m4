@@ -964,23 +964,23 @@ dnl
 	rpm_cv_repo_apt=${enable_repo_apt_rpm:-no}
     ])
     AM_CONDITIONAL([BUILD_REPO_APT_RPM], [test ":$rpm_cv_repo_apt" = :yes])dnl
-    aptrdir='$(topdir)'
+    aptrdir='$(rpmdistdir)'
     AC_SUBST([aptrdir])dnl
-    aptrbasedir='$(aptrdir)'/base
+    aptrbasedir='$(topdir)/base'
     AC_SUBST([aptrbasedir])dnl
-    aptrfulldir='$(aptrdir)/RPMS.full'
+    aptrfulldir='$(topdir)/RPMS.full'
     AC_SUBST([aptrfulldir])dnl
-    aptrmaindir='$(aptrdir)/RPMS.main'
+    aptrmaindir='$(topdir)/RPMS.main'
     AC_SUBST([aptrmaindir])dnl
-    aptrdebgdir='$(aptrdir)/RPMS.debug'
+    aptrdebgdir='$(topdir)/RPMS.debug'
     AC_SUBST([aptrdebgdir])dnl
-    aptrdevldir='$(aptrdir)/RPMS.devel'
+    aptrdevldir='$(topdir)/RPMS.devel'
     AC_SUBST([aptrdevldir])dnl
-    aptrsrcsdir='$(aptrdir)/RPMS.source'
+    aptrsrcsdir='$(topdir)/RPMS.source'
     AC_SUBST([aptrsrcsdir])dnl
-    aptrsrpmdir='$(aptrdir)/SRPMS.source'
+    aptrsrpmdir='$(topdir)/SRPMS.source'
     AC_SUBST([aptrsrpmdir])dnl
-    aptrfsrcdir='$(aptrdir)/SRPMS.full'
+    aptrfsrcdir='$(topdir)/SRPMS.full'
     AC_SUBST([aptrfsrcdir])dnl
 ])# _RPM_REPO_SETUP_APT
 # =============================================================================

@@ -637,7 +637,7 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
     if test :"${repo_cv_apt_repodir:-no}" != :no ; then
 	aptrepodir="$repo_cv_apt_repodir"
     elif test :"${repo_cv_apt_srclist:-no}" != :no ; then
-	atprepodir="$repo_cv_apt_srclist.d"
+	aptrepodir="$repo_cv_apt_srclist.d"
     elif test :"${repo_cv_apt_dir:-no}" != :no ; then
 	aptrepodir="$repo_cv_apt_dir/sources.list.d"
     fi

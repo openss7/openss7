@@ -1527,10 +1527,9 @@ repo-install-local-apt-rpm:
 					d="$$rpmdistdir/media$${b:+/$$b}$${r:+/$$r}" ; \
 					test -f $$d/media_info/hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'urpm        file://'$$d' media_info/synthesis.hdlist /' ; \
-					if test $${r:-full} = full -o $${r:-full} = source ; then \
+					test $${r:-full} = full -o $${r:-full} = source || continue ; \
 					test -f $$d/media_info/hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'urpm-src    file://'$$d' media_info/synthesis.hdlist /' ; \
-					fi ; \
 					$(ECHO) '' ; \
 				done ; \
 				$(ECHO) '' ; \
@@ -1543,10 +1542,9 @@ repo-install-local-apt-rpm:
 					d="$${rpmdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
 					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) "repomd      file://$(REPODIR) rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
-					if test $${r:-full} = full -o $${r:-full} = source ; then \
+					test $${r:-full} = full -o $${r:-full} = source || continue ; \
 					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) "repomd-src  file://$(REPODIR) rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
-					fi ; \
 					$(ECHO) '' ; \
 				done ; \
 				$(ECHO) '' ; \
@@ -1559,10 +1557,9 @@ repo-install-local-apt-rpm:
 					d="$${rpmdistdir}$${b:+/$$b}$${r:+/$$r}" ; \
 					test -f $$d/pkglist || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'rpm         file://'$$d' /' ; \
-					if test $${r:-full} = full -o $${r:-full} = source ; then \
+					test $${r:-full} = full -o $${r:-full} = source || continue ; \
 					test -f $$d/srclist || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'rpm-src     file://'$$d' /' ; \
-					fi ; \
 					$(ECHO) '' ; \
 				done ; \
 				$(ECHO) '' ; \
@@ -1575,9 +1572,8 @@ repo-install-local-apt-rpm:
 					d="$${rpmdistdir}/media$${b:+/$$b}$${r:+/$$r}" ; \
 					test -f $$d/media_info/hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
 					$(ECHO) 'rpm-dir     file://'$$d' /' ; \
-					if test $${r:-full} = full -o $${r:-full} = source ; then \
+					test $${r:-full} = full -o $${r:-full} = source || continue ; \
 					$(ECHO) 'rpm-src-dir file://'$$d' / ' ; \
-					fi ; \
 					$(ECHO) '' ; \
 				done ; \
 				$(ECHO) '' ; \

@@ -114,6 +114,13 @@ debtop_update_files	= $(debdir)/$(deb_module_file) $(debdir)/*/$(deb_module_file
 debtop_binary_files	= $(debdir)/$(deb_binary_file) $(debdir)/*/$(deb_binary_file) \
 			  $(debtop_update_files)
 
+## aptdir = $(debdistdir)
+## aptfulldir = $(debdir)
+## aptmaindir = $(debdir)/main
+## aptdebgdir = $(debdir)/debug
+## aptdevldir = $(debdir)/devel
+## aptsrcsdir = $(debdir)/source
+
 ## For the master build package it is sometime necessary to pass extra options down to configured
 ## subdirectories for a master build.  These options will contain the passed down options from the
 ## environment in that case.  See the recursive build targets below.
@@ -444,7 +451,6 @@ update-clean-deb:
 UPDATE_DIRECTORIES	+= $(aptdir) $(aptfulldir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
 UPDATE			+= all-update-dscs all-update-debs all-update-chgs
 UPDATE_SIGN		+= all-update-csig all-update-sigs
-UPDATE_DIRECTORIES	+=
 UPDATE_CLEAN_LOCAL	+= update-clean-deb
 UPDATECLEANFILES	+= $(debian_dir_stamp) \
 			   $(debian_source_files) \
@@ -937,10 +943,10 @@ apt_release_keys	= $(aptfulldir)/Release.key \
 			  $(aptdevldir)/Release.key \
 			  $(aptsrcsdir)/Release.key
 
-apt_sources_lists	= $(debdistdir)/$(PACKAGE).list \
-			  $(debdistdir)/$(PACKAGE)-local.list \
-			  $(aptfulldir)/$(PACKAGE).list \
-			  $(aptfulldir)/$(PACKAGE)-local.list
+apt_sources_lists	= $(aptfulldir)/$(PACKAGE).list \
+			  $(aptfulldir)/$(PACKAGE)-local.list \
+			  $(debdistdir)/$(PACKAGE).list \
+			  $(debdistdir)/$(PACKAGE)-local.list
 
 apt_gzips		= $(apt_package_gzips) \
 			  $(apt_source_gzips) \
@@ -1022,10 +1028,9 @@ $(aptfulldir)/$(PACKAGE).list:: Makefile
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
 			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
-			if test $${r:-full} = full -o $${r:-full} = source ; then \
+			test $${r:-full} = full -o $${r:-full} = source || continue ; \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
 			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
-			fi ; \
 		done ; \
 	done >$@
 
@@ -1037,10 +1042,9 @@ $(aptfulldir)/$(PACKAGE)-local.list:: Makefile
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
 			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
-			if test $${r:-full} = full -o $${r:-full} = source ; then \
+			test $${r:-full} = full -o $${r:-full} = source || continue ; \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
 			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
-			fi ; \
 		done ; \
 	done >$@
 
@@ -1053,10 +1057,9 @@ $(debdistdir)/$(PACKAGE).list:: Makefile
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
 			$(ECHO) 'deb         $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
-			if test $${r:-full} = full -o $${r:-full} = source ; then \
+			test $${r:-full} = full -o $${r:-full} = source || continue ; \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
 			$(ECHO) 'deb-src     $(reposerv)://$(repobase)/$(reporoot)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
-			fi ; \
 		done ; \
 	done >$@
 
@@ -1069,10 +1072,9 @@ $(debdistdir)/$(PACKAGE)-local.list:: Makefile
 			d="$(debdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			test -f $$d/Packages || $(ECHO) $(ECHO_N) '#' ; \
 			$(ECHO) 'deb         file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
-			if test $${r:-full} = full -o $${r:-full} = source ; then \
+			test $${r:-full} = full -o $${r:-full} = source || continue ; \
 			test -f $$d/Sources  || $(ECHO) $(ECHO_N) '#' ; \
 			$(ECHO) 'deb-src     file://$(DISTDIR)/debs/$(reposubdir)'"$${b:+/$$b}$${r:+/$$r} /" ; \
-			fi ; \
 		done ; \
 	done >$@
 
@@ -1100,12 +1102,13 @@ $(apt_release_keys):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	$(AM_V_GEN)$(GPGEXPORTKEY)
 
-repo-apt: $(apt_files)
+repo-apt: $(RELEASE_DIRECTORIES) $(apt_files)
 
-repo-sign-apt: $(apt_signs) $(apt_keys)
+repo-sign-apt: $(RELEASE_DIRECTORIES) $(apt_signs) $(apt_keys)
 
 repo-clean-apt:
 
+REPO_DIRECTORIES	+= $(aptdir) $(aptfulldir) $(aptmaindir) $(aptdebgdir) $(aptdevldir) $(aptsrcsdir)
 REPO			+= repo-apt
 REPO_SIGN		+= repo-sign-apt
 REPO_CLEAN		+= repo-clean-apt
@@ -1139,10 +1142,10 @@ GENRECOMPRESSDATA = \
 ## metadata for the repository.
 ##
 release-update-apt:
-	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
-	@empty_repo=yes ; \
-	repodir=` echo '$(debdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0 ; \
+	empty_repo=yes ; \
+	repodir=`echo '$(debdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
 	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
 	for b in '' updates extras testing $$rb; do \
 		dir="$${repodir}$${b:+/$$b}" ; \
