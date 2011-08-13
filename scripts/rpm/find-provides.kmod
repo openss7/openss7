@@ -70,12 +70,16 @@ BEGIN {
     }
     close(find)
 }
-/\.ko$/ {
+/\.ko(\.gz)?$/ {
     section = 0
     delete lines
     string = ""
-    file = $1
-    module = $1
+    source = $1
+    file = source
+    if (sub(/\.gz$/,"",file)) {
+	system("gzip -dc " file ".gz >" file)
+    }
+    module = file
     sub(/\.ko$/, "", module)
     sub(/.*\//, "", module)
     modinfo = "objdump -j .modinfo -s " file
@@ -170,7 +174,14 @@ BEGIN {
     } else {
 	provides[vermagic, modalias] = 1
     }
-    nm = "objdump -t " $1 " 2>/dev/null"
+    kmod = "kmod(" module ")"
+    if (version) {
+	provides[vermagic, kmod " = " version] = 1
+	provides[vermagic, kmod] = 0
+    } else {
+	provides[vermagic, kmod] = 1
+    }
+    nm = "objdump -t " file " 2>/dev/null"
     while ((nm | getline)) {
 	if (($3~/\*ABS\*/) && ($5~/^_?__crc_[^[:space:]]+/)) {
 	    sub(/^0*/, "", $1)
@@ -180,6 +191,9 @@ BEGIN {
 	}
     }
     close(nm)
+    if (source~/\.gz$/) {
+	system("rm -f -- " file)
+    }
 }
 END {
     j = 1
