@@ -554,7 +554,7 @@ update-clean-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(ECHO) "rm -rf $(rpm_dir)"; \
 	rm -rf $(rpm_dir) ; \
-	for f in $(rpm_tar_file) $(rpm_source_files) $(rpm_src_file) $(rpm_sig_file) $(rpm_binary_files) ; do \
+	for f in $(rpm_tar_file) $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_sig_file) $(rpm_binary_files) ; do \
 		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
 			$(ECHO) "D: $@: removed $$f"; \
 			$(ECHO) "rm -f -- \"$$f\""; \
@@ -597,7 +597,7 @@ UPDATECLEANFILES	+= $(rpm_dir_stamp)
 ##
 update-srpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@list="$(rpm_spec_file) $(rpm_img_files) $(rpm_src_file)"; for f in $$list; do \
+	@list="$(rpm_spec_file) $(rpm_img_files) $(rpm_src_file) $(rpm_link_file)"; for f in $$list; do \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
 			$(ECHO) "D: $@: rebuild $$f"; \
 			$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
@@ -1036,10 +1036,10 @@ repomd_group		= $(repofulldir)/comps.xml \
 			  $(repodevldir)/comps.xml \
 			  $(reposrcsdir)/comps.xml
 
-repomd_repos		= $(repodir)/$(PACKAGE).repo \
-			  $(repodir)/$(PACKAGE)-local.repo \
-			  $(repofulldir)/$(PACKAGE).repo \
-			  $(repofulldir)/$(PACKAGE)-local.repo
+repomd_repos		= $(repofulldir)/$(PACKAGE).repo \
+			  $(repofulldir)/$(PACKAGE)-local.repo \
+			  $(rpmdistdir)/$(PACKAGE).repo \
+			  $(rpmdistdir)/$(PACKAGE)-local.repo
 
 repomd_files		= $(repomd_heads) $(repomd_signs) $(repomd_keys) \
 			  $(repomd_group) $(repomd_repos)
@@ -1052,6 +1052,8 @@ repo-link-yum: $(RELEASE_DIRECTORIES)
 	( cd $(reposrcsdir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
 
 RELEASE_LINKS		+= repo-link-yum
+UPDATE_LINKS		+= repo-link-yum
+REPO_LINKS		+= repo-link-yum
 
 $(repomd_group)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
@@ -1064,8 +1066,9 @@ $(repomd_group)::
 		$(ECHO) "cp -f -- $$d$$f $@"; \
 		cp -f -- $$d$$f $@; }
 
-$(repofulldir)/$(PACKAGE).repo::
+$(repofulldir)/$(PACKAGE).repo: Makefile
 	$(AM_V_GEN)\
+	d=`dirname $@` ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
 	for b in "$$rb" ; do \
 		bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
@@ -1085,8 +1088,9 @@ $(repofulldir)/$(PACKAGE).repo::
 		done ; \
 	done >$@
 
-$(repofulldir)/$(PACKAGE)-local.repo::
+$(repofulldir)/$(PACKAGE)-local.repo: Makefile
 	$(AM_V_GEN)\
+	d=`dirname $@` ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
 	for b in "$$rb" ; do \
 		bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
@@ -1094,7 +1098,7 @@ $(repofulldir)/$(PACKAGE)-local.repo::
 			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 			if test -d $(rpmdistdir)/$${b:+/$$b}/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
 			$(ECHO) "[$(PACKAGE)-local$${b:+-$$b}$${r:+-$$r}]" ; \
-			$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))" ; \
+			$(ECHO) "name = $(PACKAGE_TITLE) Local $${bran} $${repo} ($(target_distos))" ; \
 			$(ECHO) "baseurl = file://$(rpmdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			$(ECHO) "gpgkey = file://$(tardir)/OPENSS7-GPG-KEY" ; \
 			$(ECHO) "gpgcheck = 1" ; \
@@ -1104,8 +1108,9 @@ $(repofulldir)/$(PACKAGE)-local.repo::
 		done ; \
 	done >$@
 
-$(repodir)/$(PACKAGE).repo::
+$(rpmdistdir)/$(PACKAGE).repo: Makefile
 	$(AM_V_GEN)\
+	d=`dirname $@` ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
 	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
 	for b in '' updates extras testing $$rb ; do \
@@ -1127,8 +1132,9 @@ $(repodir)/$(PACKAGE).repo::
 	done >$@
 
 
-$(repodir)/$(PACKAGE)-local.repo::
+$(rpmdistdir)/$(PACKAGE)-local.repo: Makefile
 	$(AM_V_GEN)\
+	d=`dirname $@` ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
 	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
 	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
 	for b in '' updates extras testing $$rb ; do \
@@ -1137,7 +1143,7 @@ $(repodir)/$(PACKAGE)-local.repo::
 			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 			if test -d $(rpmdistdir)/$${b:+/$$b}/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
 			$(ECHO) "[$(PACKAGE)-local$${b:+-$$b}$${r:+-$$r}]" ; \
-			$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))" ; \
+			$(ECHO) "name = $(PACKAGE_TITLE) Local $${bran} $${repo} ($(target_distos))" ; \
 			$(ECHO) "baseurl = file://$(rpmdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
 			$(ECHO) "gpgkey = file://$(tardir)/OPENSS7-GPG-KEY" ; \
 			$(ECHO) "gpgcheck = 1" ; \
@@ -1338,6 +1344,12 @@ $(reposrcsdir) $(reposrcsdir)/repomd.xml $(reposrcsdir)/susedata.xml.gz
 		$(MAKE) $(AM_MAKEFLAGS) $(repomaindir)/patterns.xml.gz ; \
 	fi
 
+
+if WITH_INSTALL_SOURCE_APT
+## apt-rpm in mageia 1 is too old for this F10 fix that handles checksummed filenames
+REPOFLAGS		= --simple-md-filenames
+endif
+
 ## Note: only put the groups file (comp.xml) in the base and main sub-repo.
 $(repofulldir)/repomd.xml:
 	$(AM_V_GEN)\
@@ -1426,7 +1438,7 @@ repo-clean-yum:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	for d in $(repofulldir) $(repomaindir) $(repodebgdir) $(repodevldir) $(reposrcsdir) ; do \
 		for f in primary filelists other susedata patterns products product comps ; do \
-			for e in xml xml.gz sqlite.bz2 ; do \
+			for e in xml xml.gz sqlite sqlite.bz2 ; do \
 				for file in $$d/*$$f.$$e ; do \
 					if test -f $$file -o -L $$file ; then \
 						$(ECHO) "rm -f -- $$file" ; \
@@ -1461,9 +1473,16 @@ UPDATECLEANFILES	+=
 release-update-yum:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+	pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+	empty_repo=yes; \
 	repodir=`echo '$(rpmdistdir)' | sed -e 's,$(DISTDIR),$(REPODIR),'` ; \
-	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; built_one= ; \
+	tardir=`echo '$(tardir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	rb=`echo '$(repobranch)' | sed -e 's,^//*,,'` ; \
 	for b in '' updates extras testing $$rb ; do \
+		empty_subrepo=yes; \
 		for r in '' main debug devel source ; do \
 			dir="$${repodir}$${b:+/$$b}$${r:+/$$r}" ; \
 			$(ECHO) "D: $@: processing directory $$dir" ; \
@@ -1482,7 +1501,8 @@ release-update-yum:
 					(full)	 cat ;; \
 					esac`" ; \
 				if test -n "$$rpms" ; then \
-					built_one=yes ; \
+					empty_repo=no ; \
+					empty_subrepo=no ; \
 					( \
 						$(ECHO) "  cd $$dir" ; cd $$dir ; \
 						test -d repodata || { $(ECHO) "    $(MKDIR_P) -- repodata" ; $(MKDIR_P) -- repodata ; } ; \
@@ -1498,8 +1518,8 @@ release-update-yum:
 				test -d $$dir/RPMS && { $(ECHO) "  rmdir -pv -- $$dir/RPMS" ; rmdir -pv -- $$dir/RPMS || : ; } ; \
 				if test -d $$dir/repodata ; then \
 					for p in '*repomd' '*comps' '*primary' '*filelists' '*other' '*susedata' '*patterns' '*products' '*product' '$(PACKAGE_LCNAME)*' '$(PACKAGE)*' ; do \
-						for e in .xml .xml.gz .xml.asc .xml.key .repo .sqlite .sqlite.bz2 ; do \
-							for f in $$dir/repodata/$${p}$${e} ; do \
+						for e in xml xml.gz xml.asc xml.key repo sqlite sqlite.bz2 ; do \
+							for f in $$dir/$$p.$$e $$dir/repodata/$$p.$$e ; do \
 								if test -f $$f ; then $(ECHO) "  rm -f -- $$f" ; rm -f -- $$f ; fi ; \
 							done ; \
 						done ; \
@@ -1516,10 +1536,6 @@ release-update-yum:
 				if test -f $$f ; then a="$$f.asc" ; k="$$f.key" ; \
 					if test ! -f $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1 ; then \
 						test ! -f $$a || $(ECHO) "  D: gpg BAD $$a" ; \
-						user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
-						home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-						pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
-						pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
 						$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
 						eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
 						$(ECHO) "  $(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
@@ -1667,50 +1683,92 @@ release-update-yum:
 				( cd $$dir/repodata ; ls -t *-products.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f products.xml ; fi ) ; \
 				$(ECHO) "    rm -f -- products.xml" ; \
 				rm -f -- products.xml ; \
-				if test "$${r:-full}" = full ; then \
-					tardir=`echo '$(tardir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
-					$(ECHO) "  D: $@: generating $$dir/repodata/$(PACKAGE).repo" ; \
-					for bb in '' updates extras testing $$rb ; do \
-						test "$${b:-base}" = base -o "$$b" = "$$bb" || continue ; \
-						bran=`echo "$${bb:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-						for rr in main debug devel source '' ; do \
-							repo=`echo "$${rr:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-							if test \( -z "$$bb" -o "$$bb" = updates \) -a \( -z "$$rr" -o "$$rr" = main \) ; then \
-								enabled=1 ; else enabled=0 ; fi ; \
-							$(ECHO) "[$(PACKAGE)$${bb:+-$$bb}$${rr:+-$$rr}]" ; \
-							$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))"; \
-							$(ECHO) "#baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${bb:+/$$bb}$${rr:+/$$rr}"; \
-							$(ECHO) "mirrorlist = $(reposerv)://$(repobase)/mirrorlist?distro=$(target_distro)&relver=\$$releasever&osarch=\$$basearch$${bb:+&branch=$$bb}$${rr:+&subrep=$$rr}" ; \
-							$(ECHO) "gpgkey = $(reposerv)://$(repobase)/pubkey.asc"; \
-							$(ECHO) "gpgcheck = 1"; \
-							$(ECHO) "repo_gpgcheck = 0"; \
-							$(ECHO) "enabled = $$enabled" ; \
-							$(ECHO) ""; \
-						done ; \
-					done >$$dir/repodata/$(PACKAGE).repo ; \
-					$(ECHO) "  D: $@: generating $$dir/repodata/$(PACKAGE)-local.repo" ; \
-					for bb in '' updates extras testing $$rb ; do \
-						test "$${b:-base}" = base -o "$$b" = "$$bb" || continue ; \
-						bran=`echo "$${bb:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-						for rr in main debug devel source '' ; do \
-							repo=`echo "$${rr:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-							if test -d $$repodir$${bb:+/$$bb}/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
-							$(ECHO) "[$(PACKAGE)-local$${bb:+-$$bb}$${rr:+-$$rr}]" ; \
-							$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))" ; \
-							$(ECHO) "baseurl = file://$$repodir$${bb:+/$$bb}$${rr:+/$$rr}" ; \
-							$(ECHO) "gpgkey = file://$$tardir/OPENSS7-GPG-KEY" ; \
-							$(ECHO) "gpgcheck = 1" ; \
-							$(ECHO) "repo_gpgcheck = 0" ; \
-							$(ECHO) "enabled = $$enabled" ; \
-							$(ECHO) ""; \
-						done ; \
-					done >$$dir/repodata/$(PACKAGE)-local.repo; \
-				else \
-					$(ECHO) "  D: $@: skipping repo build for $$dir" ; \
-				fi ; \
 			fi ; \
 		done ; \
-	done
+		if test $${empty_subrepo:-yes} = no ; then \
+			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+			d="$$repodir$${b:+/$$b}" ; \
+			if test -d $$d/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
+			f="$$d/repodata/$(PACKAGE).repo" ; \
+			$(ECHO) "  GEN   $$(basename $$f)" ; \
+			for r in main debug devel source '' ; do \
+				repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+				$(ECHO) "[$(PACKAGE)$${b:+-$$b}$${r:+-$$r}]" ; \
+				$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))"; \
+				$(ECHO) "#baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}"; \
+				$(ECHO) "mirrorlist = $(reposerv)://$(repobase)/mirrorlist?distro=$(target_distro)&relver=\$$releasever&osarch=\$$basearch$${b:+&branch=$$b}$${r:+&subrep=$$r}" ; \
+				$(ECHO) "gpgkey = $(reposerv)://$(repobase)/pubkey.asc"; \
+				$(ECHO) "gpgcheck = 1"; \
+				$(ECHO) "repo_gpgcheck = 0"; \
+				$(ECHO) "enabled = $$enabled" ; \
+				$(ECHO) ""; \
+			done >$$f ; \
+			f="$$d/repodata/$(PACKAGE)-local.repo" ; \
+			$(ECHO) "  GEN   $$(basename $$f)" ; \
+			for r in main debug devel source '' ; do \
+				repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+				$(ECHO) "[$(PACKAGE)-local$${b:+-$$b}$${r:+-$$r}]" ; \
+				$(ECHO) "name = $(PACKAGE_TITLE) Local $${bran} $${repo} ($(target_distos))" ; \
+				$(ECHO) "baseurl = file://$$d$${r:+/$$r}" ; \
+				$(ECHO) "gpgkey = file://$$tardir/OPENSS7-GPG-KEY" ; \
+				$(ECHO) "gpgcheck = 1" ; \
+				$(ECHO) "repo_gpgcheck = 0" ; \
+				$(ECHO) "enabled = $$enabled" ; \
+				$(ECHO) ""; \
+			done >$$f ; \
+		else \
+			d="$$repodir$${b:+/$$b}/repodata" ; \
+			$(ECHO) "rm -f -- $$d/$(PACKAGE).repo $$d/$(PACKAGE)-local.repo" ; \
+			rm -f -- $$d/$(PACKAGE).repo $$d/$(PACKAGE)-local.repo ; \
+			$(ECHO) "rmdir -pv -- $$d" ; \
+			rmdir -pv -- $$d || :; \
+		fi ; \
+	done ; \
+	if test $${empty_repo:-yes} = no ; then \
+		f=$$repodir/$(PACKAGE).repo ; \
+		$(ECHO) "  GEN   $$(basename $$f)" ; \
+		for b in '' updates extras testing $$rb ; do \
+			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+			d="$$repodir/$${b:+/$$b}" ; \
+			if test -d $$d/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
+			for r in main debug devel source '' ; do \
+				repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+				$(ECHO) "[$(PACKAGE)$${b:+-$$b}$${r:+-$$r}]" ; \
+				$(ECHO) "name = $(PACKAGE_TITLE) $${bran} $${repo} ($(target_distos))"; \
+				$(ECHO) "#baseurl = $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)$${b:+/$$b}$${r:+/$$r}"; \
+				$(ECHO) "mirrorlist = $(reposerv)://$(repobase)/mirrorlist?distro=$(target_distro)&relver=\$$releasever&osarch=\$$basearch$${b:+&branch=$$b}$${r:+&subrep=$$r}" ; \
+				$(ECHO) "gpgkey = $(reposerv)://$(repobase)/pubkey.asc"; \
+				$(ECHO) "gpgcheck = 1"; \
+				$(ECHO) "repo_gpgcheck = 0"; \
+				$(ECHO) "enabled = $$enabled" ; \
+				$(ECHO) ""; \
+			done ; \
+		done >$$f  ; \
+		f=$$repodir/$(PACKAGE)-local.repo ; \
+		$(ECHO) "  GEN   $$(basename $$f)" ; \
+		for b in '' updates extras testing $$rb ; do \
+			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+			d="$$repodir/$${b:+/$$b}" ; \
+			if test -d $$d/RPMS ; then enabled=1 ; else enabled=0 ; fi ; \
+			for r in main debug devel source '' ; do \
+				repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+				$(ECHO) "[$(PACKAGE)-local$${b:+-$$b}$${r:+-$$r}]" ; \
+				$(ECHO) "name = $(PACKAGE_TITLE) Local $${bran} $${repo} ($(target_distos))" ; \
+				$(ECHO) "baseurl = file://$$d$${r:+/$$r}" ; \
+				$(ECHO) "gpgkey = file://$$tardir/OPENSS7-GPG-KEY" ; \
+				$(ECHO) "gpgcheck = 1" ; \
+				$(ECHO) "repo_gpgcheck = 0" ; \
+				$(ECHO) "enabled = $$enabled" ; \
+				$(ECHO) ""; \
+			done ; \
+		done >$$f  ; \
+	else \
+		d="$$repodir" ; \
+		$(ECHO) "rm -f -- $$d/$(PACKAGE).repo $$d/$(PACKAGE)-local.repo" ; \
+		rm -f -- $$d/$(PACKAGE).repo $$d/$(PACKAGE)-local.repo ; \
+		$(ECHO) "rmdir -pv -- $$d" ; \
+		rmdir -pv -- $$d || :; \
+	fi
 
 
 RELEASE_INSTALL		+= release-update-yum
@@ -2070,6 +2128,8 @@ repo-link-urpmi: $(RELEASE_DIRECTORIES)
 	( cd $(topdir)/RPMS ; rm -f -- src ; ln -sf ../SRPMS src )
 
 RELEASE_LINKS		+= repo-link-urpmi
+UPDATE_LINKS		+= repo-link-urpmi
+REPO_LINKS		+= repo-link-urpmi
 
 $(urpmi_cfgs):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -2388,6 +2448,11 @@ aptr_release_xzips	= $(aptrbasedir)/release.xz \
 			  $(aptrbasedir)/release.devel.xz \
 			  $(aptrbasedir)/release.source.xz
 
+aptr_sources_lists	= $(aptrbasedir)/$(PACKAGE).list \
+			  $(aptrbasedir)/$(PACKAGE)-local.list \
+			  $(rpmdistdir)/$(PACKAGE).list \
+			  $(rpmdistdir)/$(PACKAGE)-local.list
+
 aptr_gzips		= $(aptr_package_gzips) \
 			  $(aptr_source_gzips) \
 			  $(aptr_content_gzips) \
@@ -2413,20 +2478,25 @@ aptr_nonrel_files	= $(aptr_package_files) $(aptr_source_files) $(aptr_content_fi
 aptr_files		= $(aptr_nonrel_files) \
 			  $(aptr_release_files) \
 			  $(aptr_release) \
-			  $(aptr_md5sums)
+			  $(aptr_md5sums) \
+			  $(aptr_sources_lists)
 
 aptr_signs		= $(aptr_release_gpgs) $(aptr_md5sum_gpgs)
 aptr_keys		= $(aptr_release_keys) $(aptr_md5sum_keys)
 aptr_sigs		= $(aptr_release_sigs)
 
-repo-aptrpm-directories: $(RELEASE_DIRECTORIES)
+repo-link-aptrpm: $(RELEASE_DIRECTORIES) repo-link-yum $(rpm_link_file)
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
-	rb='$(repobranch)' ; rpms="../$${rb:+..$$rb/}RPMS" ; \
+	rb='$(repobranch)' ; \
+	rpms="../$${rb:+..$$rb/}RPMS" ; \
+	$(ECHO) "cd $(aptrfulldir)" ; cd $(aptrfulldir) ; \
+	find $$rpms -follow -name '*.rpm' | grep -v -- '\.src\.rpm$$' \
+		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
 	$(ECHO) "cd $(aptrmaindir)" ; cd $(aptrmaindir) ; \
 	find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
 	$(ECHO) "cd $(aptrdebgdir)" ; cd $(aptrdebgdir) ; \
-		find $$rpms -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' \
+	find $$rpms -follow -name '*.rpm' | grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
 	$(ECHO) "cd $(aptrdevldir)" ; cd $(aptrdevldir) ; \
 	find $$rpms -follow -name '*.rpm' | grep -v -- '\(-debug\|source-\|\.src\.rpm$$\)' | grep -- '-devel' \
@@ -2434,29 +2504,32 @@ repo-aptrpm-directories: $(RELEASE_DIRECTORIES)
 	$(ECHO) "cd $(aptrsrcsdir)" ; cd $(aptrsrcsdir) ; \
 	find $$rpms -follow -name '*.rpm' | grep -v -- '\.src\.rpm$$' | grep -- 'source-' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
+	srpms="../$${rb:+..$$rb/}SRPMS" ; \
 	$(ECHO) "cd $(aptrsrpmdir)" ; cd $(aptrsrpmdir) ; \
-	find $$rpms -follow -name '*.rpm' | grep -- '\.src\.rpm$$' \
+	find $$srpms -follow -name '*.rpm' | grep -- '\.src\.rpm$$' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm .  ; done ; \
 	$(ECHO) "cd $(aptrfsrcdir)" ; cd $(aptrfsrcdir) ; \
-	find $$rpms -follow -name '*.rpm' | grep -- '\.src\.rpm$$' \
+	find $$srpms -follow -name '*.rpm' | grep -- '\.src\.rpm$$' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm .  ; done
 
-MY_PHONY		+= repo-aptrpm-directories
+RELEASE_LINKS		+= repo-link-aptrpm
+UPDATE_LINKS		+= repo-link-aptrpm
+REPO_LINKS		+= repo-link-aptrpm
 
-$(aptr_packages): repo-aptrpm-directories
+$(aptr_packages):
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	comp=`echo "$@" | sed -e 's,.*\.,,'` ; \
 	( cd '$(aptrbasedir)' ; \
-	  $(ECHO) "$(GENPKGLIST) --index srpm_idx --meta '$$comp' --bloat '$(aptrdir)' '$$comp'" ; \
-	  $(GENPKGLIST) --index srpm_idx --meta "$$comp" --bloat '$(aptrdir)' "$$comp" ; \
+	  $(ECHO) "$(GENPKGLIST) --index srpm_idx --meta '$$comp' --bloat '$(topdir)' '$$comp'" ; \
+	  $(GENPKGLIST) --index srpm_idx --meta "$$comp" --bloat '$(topdir)' "$$comp" ; \
 	)
 
-$(aptr_sources): repo-aptrpm-directories
+$(aptr_sources):
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	comp=`echo "$@" | sed -e 's,.*\.,,'` ; \
 	( cd '$(aptrbasedir)' ; \
-	  $(ECHO) "$(GENSRCLIST) --flat --meta '$$comp' '$(aptrdir)' '$$comp' srpm_idx" ; \
-	  $(GENSRCLIST) --flat --meta "$$comp" '$(aptrdir)' "$$comp" srpm_idx ; \
+	  $(ECHO) "$(GENSRCLIST) --flat --meta '$$comp' '$(topdir)' '$$comp' srpm_idx" ; \
+	  $(GENSRCLIST) --flat --meta "$$comp" '$(topdir)' "$$comp" srpm_idx ; \
 	)
 
 $(aptr_gzips): %.gz : %
@@ -2472,12 +2545,14 @@ $(aptr_xzips): %.xz : %
 	cat $< | $(XZ_CMD) $(xz) -c >$@
 
 GENCOMPRESSEDDATA = \
-	$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
-	$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
-	$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
-	$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
-	$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
-	$(XZ_CMD) $(XZ) -c $$f >$$f.xz
+	if test -s $$f ; then \
+		$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
+		$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
+		$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
+		$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
+		$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
+		$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
+	fi
 
 $(aptr_releases): $(aptr_nonrel_files)
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
@@ -2524,9 +2599,9 @@ $(aptr_release): $(aptr_releases)
 		d='$(aptrbasedir)' ; \
 		for comp in $$comps ; do \
 			for fn in pkglist srclist release ; do \
-				for ext in '' '.gz' '.bz2' '.xz' ; do \
+				for ext in '' .gz .bz2 .lzma .xz ; do \
 					f="$$fn.$$comp$$ext" ; \
-					test -f "$$d/$$f" || continue ; \
+					test -s $$d/$$f || continue ; \
 					$(ECHO) " `md5sum $$d/$$f | awk '{print$$1}'` `wc -c $$d/$$f | awk '{print$$1}'` base/$$f" ; \
 				done ; \
 			done ; \
@@ -2535,10 +2610,10 @@ $(aptr_release): $(aptr_releases)
 
 $(aptr_contents):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	$(AM_V_GEN)( \
+	$(AM_V_GEN){ \
 		comps="main debug devel source" ; \
 		for comp in $$comps ; do \
-			d=$(aptrdir)/RPMS.$$comp ; \
+			d=$(topdir)/RPMS.$$comp ; \
 			if test -d $$d ; then \
 				for r in $$d/*.rpm ; do \
 					case "$$r" in (*-source-*|*-doc-*|*-base-*|*-javadoc-*) continue ;; esac ; \
@@ -2552,7 +2627,244 @@ $(aptr_contents):
 				done ; \
 			fi ; \
 		done | LANG= sort -u ; \
-	) >$@
+	} >$@
+
+$(aptr_md5sums):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN){ \
+		comps="main debug devel source" ; \
+		$(ECHO) "MD5SUM:" ; \
+		d='$(aptrbasedir)' ; \
+		for comp in $$comps ; do \
+			for fn in pkglist srclist release ; do \
+				for ext in '' .gz .bz2 .lzma .xz ; do \
+					f="$$fn.$$comp$$ext" ; \
+					test -s $$d/$$f || continue ; \
+					$(ECHO) " `md5sum $$d/$$f | awk '{print$$1}'` `wc -c $$d/$$f | awk '{print$$1}'` base/$$f" ; \
+				done ; \
+			done ; \
+		done ; \
+	} >$@
+
+$(aptrbasedir)/$(PACKAGE).list: Makefile
+	$(AM_V_GEN)\
+	d=`dirname $@` ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	{ \
+		if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then :; \
+			for b in "$$rb" ; do \
+				d="$(rpmdistdir)$${b:+/$$b}/base" ; \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					test -f $$d/pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "rpm         $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b} $$comp" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "rpm-src     $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b} $$comp" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		if test -z '@BUILD_REPO_URPMI_TRUE@' ; then :; \
+			for b in "$$rb" ; do \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					d="$(rpmdistdir)/media$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "urpm        $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r} media_info/synthesis.hdlist /" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "urpm-src    $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r} media_info/synthesis.hdlist /" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		if test -z '@BUILD_REPO_YUM_TRUE@' ; then :; \
+			for b in "$$rb" ; do \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					d="$(rpmdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd      $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd-src  $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+	} >$@
+
+$(aptrbasedir)/$(PACKAGE)-local.list: Makefile
+	$(AM_V_GEN)\
+	d=`dirname $@` ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	{ \
+		if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then :; \
+			for b in "$$rb" ; do \
+				d="$(rpmdistdir)$${b:+/$$b}/base" ; \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					test -f $$d/pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "rpm         file://$(DISTDIR)/rpms $(reposubdir)$${b:+/$$b} $$comp" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "rpm-src     file://$(DISTDIR)/rpms $(reposubdir)$${b:+/$$b} $$comp" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		if test -z '@BUILD_REPO_URPMI_TRUE@' ; then :; \
+			for b in "$$rb" ; do \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					d="$(rpmdistdir)/media$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "urpm        file://$$d media_info/synthesis.hdlist /" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "urpm-src    file://$$d media_info/synthesis.hdlist /" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		if test -z '@BUILD_REPO_YUM_TRUE@' ; then :; \
+			for b in "$$rb" ; do \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					d="$(rpmdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd      file://$(DISTDIR)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd-src  file://$(DISTDIR)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		for b in "$$rb" ; do \
+			d="$(rpmdistdir)$${b:+/$$b}/base" ; \
+			for r in main debug devel source '' ; do \
+				comp=$${r:-full} ; \
+				test -f $$d/pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'rpm-dir     file://$(DISTDIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+				test $$comp = full -o $$comp = source || continue ; \
+				test -f $$d/srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'rpm-src-dir file://$(DISTDIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+			done ; \
+		done ; \
+	} >$@
+
+$(rpmdistdir)/$(PACKAGE).list: Makefile
+	$(AM_V_GEN)\
+	d=`dirname $@` ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	{ \
+		if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then :; \
+			for b in '' updates extras testing $$rb ; do \
+				d="$(rpmdistdir)$${b:+/$$b}/base" ; \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					test -f $$d/pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm         $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm-src     $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		if test -z '@BUILD_REPO_URPMI_TRUE@' ; then :; \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					d="$(rpmdistdir)/media$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "urpm        $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r} media_info/synthesis.hdlist /" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "urpm-src    $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r} media_info/synthesis.hdlist /" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		if test -z '@BUILD_REPO_YUM_TRUE@' ; then :; \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					d="$(rpmdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd      $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd-src  $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+	} >$@
+
+$(rpmdistdir)/$(PACKAGE)-local.list: Makefile
+	$(AM_V_GEN)\
+	d=`dirname $@` ; test -d $$d || { $(ECHO) "$(MKDIR_P) $$d" ; $(MKDIR_P) $$d ; } ; \
+	rb=`echo '$(repobranch)' | sed 'y,ABCDEFGHIJKLMNOPQRSTUVWXYZ,abcdefghijklmnopqrstuvwxyz,;s,^/*,,'` ; \
+	case "$$rb" in (updates|extras|testing) rb= ;; esac ; \
+	{ \
+		if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then :; \
+			for b in '' updates extras testing $$rb ; do \
+				d="$(rpmdistdir)$${b:+/$$b}/base" ; \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					test -f $$d/pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm         file://$(DISTDIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm-src     file://$(DISTDIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		if test -z '@BUILD_REPO_URPMI_TRUE@' ; then :; \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					d="$(rpmdistdir)/media$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "urpm        file://$$d media_info/synthesis.hdlist /" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "urpm-src    file://$$d media_info/synthesis.hdlist /" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		if test -z '@BUILD_REPO_YUM_TRUE@' ; then :; \
+			for b in '' updates extras testing $$rb ; do \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					d="$(rpmdistdir)$${b:+/$$b}$${r:+/$$r}" ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd      file://$(DISTDIR)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) "repomd-src  file://$(DISTDIR)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+				done ; \
+			done ; \
+			$(ECHO) ''; \
+		fi ; \
+		for b in '' updates extras testing $$rb ; do \
+			d="$(rpmdistdir)$${b:+/$$b}/base" ; \
+			for r in main debug devel source '' ; do \
+				comp=$${r:-full} ; \
+				test -f $$d/pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'rpm-dir     file://$(DISTDIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+				test $$comp = full -o $$comp = source || continue ; \
+				test -f $$d/srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+				$(ECHO) 'rpm-src-dir file://$(DISTDIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+			done ; \
+		done ; \
+	} >$@
 
 $(aptr_sigs): %.sig: %
 	$(AM_V_GEN)\
@@ -2593,9 +2905,9 @@ $(aptr_keys):
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	$(AM_V_GEN)$(GPGEXPORTKEY)
 
-repo-aptrpm: $(RELEASE_DIRECTORIES) $(aptr_release)
+repo-aptrpm: $(RELEASE_DIRECTORIES) $(aptr_files)
 
-repo-sign-aptrpm: $(RELEASE_DIRECTORIES) $(aptr_keys) $(aptr_signs) $(aptr_sigs)
+repo-sign-aptrpm: $(RELEASE_DIRECTORIES) $(aptr_signs) $(aptr_keys) $(aptr_sigs)
 
 repo-clean-aptrpm:
 	@$(ECHO_V) "Making $@ in `pwd`"
@@ -2606,13 +2918,13 @@ REPO_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(ap
 REPO			+= repo-aptrpm
 REPO_SIGN		+= repo-sign-aptrpm
 REPO_CLEAN		+= repo-clean-aptrpm
-REPOCLEANFILES		+= $(aptr_files)
+REPOCLEANFILES		+= $(aptr_files) $(aptr_signs) $(aptr_keys) $(aptr_sigs)
 
 RELEASE_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir) $(aptrfsrcdir)
 RELEASE			+= repo-aptrpm
 RELEASE_SIGN		+= repo-sign-aptrpm
 RELEASE_CLEAN_LOCAL	+= repo-clean-aptrpm
-RELEASECLEANFILES	+= $(aptr_files)
+RELEASECLEANFILES	+= $(aptr_files) $(aptr_signs) $(aptr_keys) $(aptr_sigs)
 
 UPDATE_DIRECTORIES	+= $(aptrdir) $(aptrbasedir) $(aptrfulldir) $(aptrmaindir) $(aptrdebgdir) $(aptrdevldir) $(aptrsrcsdir) $(aptrsrpmdir) $(aptrfsrcdir)
 UPDATE			+= repo-aptrpm
@@ -2624,21 +2936,29 @@ UPDATECLEANFILES	+=
 ## metadata for the repository.
 ##
 release-update-aptrpm:
-	@$(ECHO_V) "D: Making $@ in `pwd`"; \
-	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
-	repodir=`echo '$(rpmdistdir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
-	rb=`echo '$(repobranch)' | sed 's,^//*,,'` ; \
+	@$(ECHO_V) "D: Making $@ in `pwd`" ; \
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0 ; \
+	user='$(GNUPGUSER)'; user="$${user:+ -u }$$user" ; \
+	home='$(GNUPGHOME)'; home="$${home:+ --homedir }$$home" ; \
+	pass='$(GNUPGPASS)'; pass="$${pass:+ --batch }" ; \
+	pipe='$(GNUPGPASS)'; pipe="$${pipe:+$(ECHO) $$pipe |}" ; \
+	empty_repo=yes; \
+	repodir=`echo '$(rpmdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	rb=`echo '$(repobranch)' | sed -e s',^//*,,'` ; \
 	for b in '' updates extras testing $$rb ; do \
+		dir="$${repodir}$${b:+/$$b}" ; \
+		test -d $$dir || continue ; \
 		for r in main debug devel source '' ; do \
-			dir="$${repodir}/RPMS.$${b:-base}_$${r:-full}" ; \
-			$(ECHO) "D: $@: processing directory $$dir" ; \
-			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
-			$(ECHO_V) "D: $@: find $$dir -name '*.rpm'" ; \
-			rpms=`find $$dir -name '*.rpm' 2>/dev/null` ; \
-			for f in $$rpms; do \
-				if test -L $$f ; then \
+			comp="$${r:-full}" ; \
+			sub="$${dir}/RPMS.$$comp" ; \
+			$(ECHO) "D: $@: processing directory $$sub" ; \
+			test -d $$sub || { $(ECHO) "$(MKDIR_P) -- $$sub" ; $(MKDIR_P) -- $$sub ; } ; \
+			$(ECHO_V) "D: $@: find $$sub -name '*.rpm'" ; \
+			rpms=`find $$sub -name '*.rpm' 2>/dev/null` ; \
+			for f in $$rpms ; do \
+				if test -L $$f ; then  \
 					link=`readlink $$f` ; \
-					case "$$link" in (/*) ;; (*) link="$$dir/$$link" ;; esac ; \
+					case "$$link" in (/*) ;; (*) link="$$sub/$$link" ;; esac ; \
 					if test ! -e "$$link" ; then \
 						$(ECHO) " rm -f -- $$f" ; \
 						rm -f -- $$f ; \
@@ -2646,9 +2966,9 @@ release-update-aptrpm:
 				fi ; \
 			done ; \
 			( \
-				$(ECHO_V) "D: cd $$dir" ; cd $$dir ; \
-				$(ECHO_V) "D: find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null" ; \
-				rpms="`find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null | LANG= sort -u | \
+				$(ECHO_V) "D: cd $$sub" ; cd $$sub ; \
+				$(ECHO_V) "D: find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null" ; \
+				rpms="`find $$dir/RPMS -follow -name '*.rpm' 2>/dev/null | LANG= sort -u | \
 					case \"$${r:-full}\" in \
 					(main)	 grep -v -- '\(-debug\|-devel\|source-\|\.src\.rpm$$\)' ;; \
 					(debug)	 grep -v -- '\(-devel\|source-\|\.src\.rpm$$\)' | grep -- '-debug' ;; \
@@ -2664,23 +2984,20 @@ release-update-aptrpm:
 						fi ; \
 					done ; \
 				else \
-					$(ECHO) " rmdir -pv -- $$dir"; \
-					rmdir -pv -- $$dir || :; \
+					$(ECHO) " rmdir -pv -- $$sub"; \
+					rmdir -pv -- $$sub || :; \
 				fi ; \
 			) ; \
-		done ; \
-	done ; \
-	for b in '' updates extras testing $$rb ; do \
-		for r in source '' ; do \
-			dir="$${repodir}/SRPMS.$${b:-base}_$${r:-full}" ; \
-			$(ECHO) "D: $@: processing directory $$dir" ; \
-			test -d $$dir || { $(ECHO) "$(MKDIR_P) -- $$dir" ; $(MKDIR_P) -- $$dir ; } ; \
-			$(ECHO_V) "D: $@: find $$dir -name '*.rpm'" ; \
-			rpms=`find $$dir -name '*.rpm' 2>/dev/null` ; \
-			for f in $$rpms; do \
+			test $$comp = full -o $$comp = source || continue ; \
+			sub="$$dir/SRPMS.$$comp" ; \
+			$(ECHO) "D: $@: processing directory $$sub" ; \
+			test -d $$sub || { $(ECHO) "$(MKDIR_P) -- $$sub" ; $(MKDIR_P) -- $$sub ; } ; \
+			$(ECHO_V) "D: $@: find $$sub -name '*.rpm'" ; \
+			rpms=`find $$sub -name '*.rpm' 2>/dev/Null` ; \
+			for f in $$rpms ; do \
 				if test -L $$f ; then \
 					link=`readlink $$f` ; \
-					case "$$link" in (/*) ;; (*) link="$$dir/$$link" ;; esac ; \
+					case "$$link" in (/*) ;; (*) link="$$sub/$$link" ;; esac ; \
 					if test ! -e "$$link" ; then \
 						$(ECHO) " rm -f -- $$f" ; \
 						rm -f -- $$f ; \
@@ -2688,9 +3005,9 @@ release-update-aptrpm:
 				fi ; \
 			done ; \
 			( \
-				$(ECHO_V) "D: cd $$dir" ; cd $$dir ; \
-				$(ECHO_V) "D: find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.rpm' 2>/dev/null" ; \
-				rpms="`find $${repodir}$${b:+/$$b}/RPMS -follow -name '*.src.rpm' 2>/dev/null | LANG= sort -u`" ; \
+				$(ECHO_V) "D: cd $$sub" ; cd $$sub ; \
+				$(ECHO_V) "D: find $$dir/SRPMS -follow -name '*.rpm' 2>/dev/null" ; \
+				rpms="`find $$dir/SRPMS -follow -name '*.rpm' 2>/dev/null | LANG= sort -u`" ; \
 				if test -n "$$rpms" ; then \
 					for f in $$rpms ; do \
 						if test -L `basename $$f` ; then :; else \
@@ -2699,97 +3016,89 @@ release-update-aptrpm:
 						fi ; \
 					done ; \
 				else \
-					$(ECHO) " rmdir -pv -- $$dir"; \
-					rmdir -pv -- $$dir || :; \
+					$(ECHO) " rmdir -pv -- $$sub"; \
+					rmdir -pv -- $$sub || :; \
 				fi ; \
 			) ; \
 		done ; \
-	done ; \
-	( \
-		made_list=no ; \
-		test -d $$repodir/base || { $(ECHO) "$(MKDIR_P) -- $$repodir/base" ; $(MKDIR_P) -- $$repodir/base ; } ; \
-		cd $$repodir/base ; \
-		for b in '' updates extras testing $$rb ; do \
+		empty_subrepo=yes ; \
+		base="$$dir/base" ; \
+		test -d $$base || { $(ECHO) "$(MKDIR_P) $$base" ; $(MKDIR_P) $$base ; } ; \
+		for r in main debug devel source '' ; do \
+			comp=$${r:-full} ; \
+			sub="$$dir/RPMS.$$comp" ; \
+			f=pkglist.$$comp ; \
+			if test -d $$sub ; then \
+				( \
+					$(ECHO) "cd $$base" ; cd $$base ; \
+					$(ECHO) "$(GENPKGLIST) --index srpm_idx --meta $$comp --bloat $$dir $$comp" ; \
+					$(GENPKGLIST) --index srpm_idx --meta $$comp --bloat $$dir $$comp ; \
+					$(GENCOMPRESSEDDATA) ; \
+				) ; \
+				empty_subrepo=no; \
+				empty_repo=no; \
+			else \
+				( \
+					$(ECHO) "cd $$base" ; cd $$base ; \
+					$(ECHO) "rm -f -- $$f $$f.gz $$f.bz2 $$f.lzma $$f.xz" ; \
+					rm -f -- $$f $$f.gz $$f.bz2 $$f.lzma $$f.xz ; \
+				) ; \
+			fi ; \
+		done ; \
+		for r in source '' ; do \
+			comp=$${r:-full} ; \
+			sub="$$dir/SRPMS.$$comp" ; \
+			f=srclist.$$comp ; \
+			if test -d $$sub ; then \
+				( \
+					$(ECHO) "cd $$base" ; cd $$base ; \
+					$(ECHO) "$(GENSRCLIST) --flat --meta $$comp $$dir $$comp srpm_idx" ; \
+					$(GENSRCLIST) --flat --meta $$comp $$dir $$comp srpm_idx ; \
+					$(GENCOMPRESSEDDATA) ; \
+				) ; \
+				empty_subrepo=no; \
+				empty_repo=no; \
+			else \
+				( \
+					$(ECHO) "cd $$base" ; cd $$base ; \
+					$(ECHO) "rm -f -- $$f $$f.gz $$f.bz2 $$f.lzma $$f.xz" ; \
+					rm -f -- $$f $$f.gz $$f.bz2 $$f.lzma $$f.xz ; \
+				) ; \
+			fi ; \
+		done ; \
+		if test $${empty_subrepo:-yes} = no ; then \
+		( \
+			$(ECHO) "cd $$base" ; cd $$base ; \
+			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+			comps=; \
 			for r in main debug devel source '' ; do \
-				comp="$${b:-base}_$${r:-full}" ; \
-				if test -d "$${repodir}/RPMS.$$comp" ; then \
-					$(ECHO) "$(GENPKGLIST) --index srpm_idx --meta '$$comp' --bloat '$$repodir' '$$comp'" ; \
-					$(GENPKGLIST) --index srpm_idx --meta "$$comp" --bloat "$$repodir" "$$comp" ; \
-					f=pkglist.$$comp ; if test -s $$f ; then \
-						$(GENCOMPRESSEDDATA) ; \
+				comp=$${r:-full} ; \
+				repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+				f=release.$$comp ; \
+				$(ECHO) "  GEN   $$(basename $$f)" ; \
+				{ \
+					vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
+					test -n "$$vendor" || vendor=Unknown ; \
+					$(ECHO) "Archive: $(PACKAGE_TITLE) $$bran $$repo" ; \
+					$(ECHO) "Component: $$comp" ; \
+					$(ECHO) "Version: $(VERSION)" ; \
+					$(ECHO) "Origin: $$vendor" ; \
+					$(ECHO) "Label: $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))" ; \
+					$(ECHO) "Architecture: $(target_arch)" ; \
+					$(ECHO) "NotAutomatic: false" ; \
+					if test -s pkglist.$$comp ; then \
+						$(ECHO) "PackageCount: `$(COUNTPKGLIST) pkglist.$$comp`" ; \
 					fi ; \
-					made_list=yes; \
-				else \
-					for f in pkglist.$$comp; do \
-						for e in '' .gz .bz2 .lzma .xz; do \
-							test -e $$f$$e || continue ; \
-							$(ECHO) " rm -f -- $$f$$e"; \
-							rm -f -- $$f$$e; \
-						done ; \
-					done ; \
-				fi ; \
-			done ; \
-		done ; \
-		for b in '' updates extras testing $$rb ; do \
-			for r in source '' ; do \
-				comp="$${b:-base}_$${r:-full}" ; \
-				if test -d "$${repodir}/SRPMS.$$comp" ; then \
-					$(ECHO) "$(GENSRCLIST) --flat --meta '$$comp' '$$repodir' '$$comp' srpm_idx" ; \
-					$(GENSRCLIST) --flat --meta "$$comp" "$$repodir" "$$comp" srpm_idx ; \
-					f=srclist.$$comp ; if test -s $$f ; then \
-						$(GENCOMPRESSEDDATA) ; \
+					if test -s srclist.$$comp ; then \
+						$(ECHO) "SourceCount: `$(COUNTPKGLIST) srclist.$$comp`" ; \
 					fi ; \
-					made_list=yes; \
-				else \
-					for f in srclist.$$comp; do \
-						for e in '' .gz .bz2 .lzma .xz; do \
-							test -e $$f$$e || continue ; \
-							$(ECHO) " rm -f -- $$f$$e"; \
-							rm -f -- $$f$$e; \
-						done ; \
-					done ; \
-				fi ; \
+				} >$$f ; \
+				$(GENCOMPRESSEDDATA) ; \
+				comps="$${comps:+$$comps }$$comp" ; \
 			done ; \
-		done ; \
-		if test "$${made_list:-no}" = yes; then \
-			for b in '' updates extras testing $$rb ; do \
-				bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-				for r in main debug devel source '' ; do \
-					comp="$${b:-base}_$${r:-full}" ; \
-					repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-					( \
-						vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
-						test -n "$$vendor" || vendor=Unknown ; \
-						$(ECHO) "Archive: $(PACKAGE_TITLE) $$bran $$repo" ; \
-						$(ECHO) "Component: $${b:-base}/$${r:-full}" ; \
-						$(ECHO) "Version: $(VERSION)" ; \
-						$(ECHO) "Origin: $$vendor" ; \
-						$(ECHO) "Label: $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))" ; \
-						$(ECHO) "Architecture: $(target_cpu)" ; \
-						$(ECHO) "NotAutomatic: false" ; \
-						if test -s pkglist.$$comp ; then \
-							$(ECHO) "PackageCount: `$(COUNTPKGLIST) pkglist.$$comp`" ; \
-						fi ; \
-						if test -s srclist.$$comp ; then \
-							$(ECHO) "SourceCount: `$(COUNTPKGLIST) srclist.$$comp`" ; \
-						fi ; \
-					) >release.$$comp ; \
-					f=release.$$comp ; if test -s $$f ; then \
-						$(GENCOMPRESSEDDATA) ; \
-					fi ; \
-				done ; \
-			done ; \
-			user='$(GNUPGUSER)'; user="$${user:+ -u }$$user" ; \
-			home='$(GNUPGHOME)'; home="$${home:+ --homedir }$$home" ; \
-			pass='$(GNUPGPASS)'; pass="$${pass:+ --batch }" ; \
-			pipe='$(GNUPGPASS)'; pipe="$${pipe:+$(ECHO) $$pipe |}" ; \
-			comps= ; \
-			for b in '' updates extras testing $$rb ; do \
-				for r in main debug devel source '' ; do \
-					comps="$${comps:+$$comps }$${b:-base}/$${r:-full}" ; \
-				done ; \
-			done ; \
-			( \
+			f=release ; \
+			$(ECHO) "  GEN   $$(basename $$f)" ; \
+			{ \
 				vendor=`$(RPM) --showrc | grep '\<vendor\>' | sed 's,.*\<vendor\>[[:space:]]*,,;s,[[:space:]]*$$,,' 2>/dev/null`; \
 				test -n "$$vendor" || vendor=Unknown ; \
 				$(ECHO) "Origin: $$vendor" ; \
@@ -2797,49 +3106,50 @@ release-update-aptrpm:
 				$(ECHO) "Suite: $(PACKAGE)" ; \
 				$(ECHO) "Codename: $(PACKAGE_NAME)" ; \
 				$(ECHO) "Date: `date -R`" ; \
-				$(ECHO) "Architectures: $(target_cpu) noarch" ; \
+				$(ECHO) "Architectures: $(target_arch) noarch" ; \
 				$(ECHO) "Components: $$comps" ; \
 				$(ECHO) "Description: $(PACKAGE_RPMDIST) ($(PACKAGE_NAME))" ; \
 				$(ECHO) "MD5Sum:" ; \
-				list=`echo "$$comps" | sed 's,/,_,g'` ; \
-				for comp in $$list ; do \
+				for comp in $$comps ; do \
 					for fn in pkglist srclist release ; do \
-						for ext in '' '.gz' '.bz2' '.xz' ; do \
+						for ext in '' .gz .bz2 .lzma .xz ; do \
 							f="$$fn.$$comp$$ext" ; \
 							test -s $$f || continue ; \
 							$(ECHO) " `md5sum $$f | awk '{print$$1}'` `wc -c $$f | awk '{print$$1}'` base/$$f" ; \
 						done ; \
 					done ; \
 				done ; \
-			) >release ; \
-			$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- release >release.gpg 2>/dev/null" ; \
-			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- release >release.gpg 2>/dev/null" ; \
-			cat release.gpg >>release ; \
-			touch release.gpg ; \
-			$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >release.key" ; \
-			$(GPG) -a$$user$$home --export $(GNUPGUSER) >release.key ; \
-			( \
+			} >$$f ; \
+			$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.gpg 2>/dev/null" ; \
+			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.gpg 2>/dev/null" ; \
+			cat $$f.gpg >>$$f ; \
+			touch $$f.gpg ; \
+			$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key" ; \
+			$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key ; \
+			f=hashfile ; \
+			$(ECHO) "  GEN   $$(basename $$f)" ; \
+			{ \
 				$(ECHO) "MD5SUM:" ; \
-				list=`echo "$$comps" | sed 's,/,_,g'` ; \
-				for comp in $$list ; do \
+				for comp in $$comps ; do \
 					for fn in pkglist srclist release ; do \
-						for ext in '' '.gz' '.bz2' '.xz' ; do \
+						for ext in '' .gz .bz2 .lzma .xz ; do \
 							f="$$fn.$$comp$$ext" ; \
 							test -s $$f || continue ; \
 							$(ECHO) " `md5sum $$f | awk '{print$$1}'` `wc -c $$f | awk '{print$$1}'` base/$$f" ; \
 						done ; \
 					done ; \
 				done ; \
-			) >hashfile ; \
-			$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- hashfile >hashfile.gpg 2>/dev/null" ; \
-			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- hashfile >hashfile.gpg 2>/dev/null" ; \
-			$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >hashfile.key" ; \
-			$(GPG) -a$$user$$home --export $(GNUPGUSER) >hashfile.key ; \
-			( \
-				list=`echo "$$comps" | sed 's,/,_,g'` ; \
-				for comp in $$list ; do \
-					if test -d $${repodir}/RPMS.$$comp ; then \
-						for r in $${repodir}/RPMS.$$comp/*.rpm ; do \
+			} >$$f ; \
+			$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.gpg 2>/dev/null" ; \
+			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$f.gpg 2>/dev/null" ; \
+			$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key" ; \
+			$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.key ; \
+			f=contents_index ; \
+			$(ECHO) "  GEN   $$(basename $$f)" ; \
+			{ \
+				for comp in $$comps ; do \
+					if test -d $$dir/RPMS.$$comp ; then \
+						for r in $$dir/RPMS.$$comp/*.rpm ; do \
 							case "$$r" in (*-source-*|*-doc-*|*-base-*|*-javadoc-*) continue ;; esac ; \
 							test -s $$r || continue ; \
 							name=`rpm -ql --qf '%NAME\n' -p $$r 2>/dev/null` ; \
@@ -2851,28 +3161,223 @@ release-update-aptrpm:
 						done ; \
 					fi ; \
 				done | LANG= sort -u ; \
-			) >contents_index ; \
-			f=contents_index ; if test -s $$f ; then \
-				$(GENCOMPRESSEDDATA) ; \
-			fi ; \
-		else \
-			files=; \
-			for b in '' updates extras testing $$rb ; do \
+			} >$$f ; \
+			$(GENCOMPRESSEDDATA) ; \
+			f=$(PACKAGE).list ; \
+			$(ECHO) "  GEN   $$(basename $$f)" ; \
+			{ \
+				if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then :; \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						test -f pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "rpm         $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b} $$comp" ; \
+						test $${r:-full} = full -o $${r:-full} = source || continue ; \
+						test -f srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "rpm-src     $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b} $$comp" ; \
+					done ; \
+					$(ECHO) ''; \
+				fi ; \
+				if test -z '@BUILD_REPO_URPMI_TRUE@' ; then :; \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						d="$$repodir/media$${b:+/$$b}$${r:+/$$r}" ; \
+						test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "urpm        $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r} media_info/synthesis.hdlist /" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "urpm-src    $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r} media_info/synthesis.hdlist /" ; \
+					done ; \
+					$(ECHO) ''; \
+				fi ; \
+				if test -z '@BUILD_REPO_YUM_TRUE@' ; then :; \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "repomd      $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "repomd-src  $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					done ; \
+				fi ; \
+			} >$$f ; \
+			f=$(PACKAGE)-local.list ; \
+			$(ECHO) "  GEN   $$(basename $$f)" ; \
+			{ \
+				if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then :; \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						test -f pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "rpm         file://$(REPODIR)/rpms $(reposubdir)$${b:+/$$b} $$comp" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "rpm-src     file://$(REPODIR)/rpms $(reposubdir)$${b:+/$$b} $$comp" ; \
+					done ; \
+					$(ECHO) ''; \
+				fi ; \
+				if test -z '@BUILD_REPO_URPMI_TRUE@' ; then :; \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						d="$$repodir/media$${b:+/$$b}$${r:+/$$r}" ; \
+						test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "urpm        file://$$d media_info/synthesis.hdlist /" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "urpm-src    file://$$d media_info/synthesis.hdlist /" ; \
+					done ; \
+					$(ECHO) ''; \
+				fi ; \
+				if test -z '@BUILD_REPO_YUM_TRUE@' ; then :; \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "repomd      file://$(REPODIR)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "repomd-src  file://$(REPODIR)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					done ; \
+					$(ECHO) ''; \
+				fi ; \
 				for r in main debug devel source '' ; do \
-					files="$${files:+$$files }release.$${b:-base}_$${r:-full}"; \
+					comp=$${r:-full} ; \
+					test -f pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm-dir     file://$(REPODIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm-src-dir file://$(REPODIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
 				done ; \
+			} >$$f ; \
+		) ; \
+		else \
+		( \
+			$(ECHO) "cd $$base" ; cd $$base ; \
+			files=; \
+			for r in main debug devel source '' ; do \
+				comp=$${r:-full} ; \
+				files="$${files:+$$files }release.$$comp" ; \
 			done ; \
-			for f in $$files release hashfile contents_index srpm_idx; do \
+			for f in $$files release hashfile contents_index srpm_idx $(PACKAGE).list $(PACKAGE)-local.list; do \
 				for e in '' .gz .bz2 .lzma .xz .key .gpg .asc; do \
 					test -e $$f$$e || continue ; \
-					$(ECHO) " rm -f -- $$f$$e"; \
-					rm -f -- $$f$$e; \
+					$(ECHO) " rm -f -- $$f$$e" ; \
+					rm -f -- $$f$$e ; \
 				done ; \
 			done ; \
-			$(ECHO) "rmdir -pv -- $$repodir/base" ; \
-			rmdir -pv -- $$repodir/base || :; \
+			$(ECHO) "rmdir -pv -- $$base" ; \
+			rmdir -pv -- $$base ; \
+		) ; \
 		fi ; \
-	)
+	done ; \
+	if test $${empty_repo:-yes} = no ; then \
+		f=$$repodir/$(PACKAGE).list ; \
+		$(ECHO) "  GEN   $$(basename $$f)" ; \
+		{ \
+			if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then :; \
+				for b in '' updates extras testing $$rb ; do \
+					d="$$repodir$${b:+/$$b}/base" ; \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						test -f $$d/pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) 'rpm         $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) 'rpm-src     $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+					done ; \
+				done ; \
+				$(ECHO) ''; \
+			fi ; \
+			if test -z '@BUILD_REPO_URPMI_TRUE@' ; then :; \
+				for b in '' updates extras testing $$rb ; do \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						d="$$repodir/media$${b:+/$$b}$${r:+/$$r}" ; \
+						test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "urpm        $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r} media_info/synthesis.hdlist /" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "urpm-src    $(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r} media_info/synthesis.hdlist /" ; \
+					done ; \
+				done ; \
+				$(ECHO) ''; \
+			fi ; \
+			if test -z '@BUILD_REPO_YUM_TRUE@' ; then :; \
+				for b in '' updates extras testing $$rb ; do \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "repomd      $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "repomd-src  $(reposerv)://$(repobase)/$(reporoot)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					done ; \
+				done ; \
+			fi ; \
+		} >$$f ; \
+		f=$$repodir/$(PACKAGE)-local.list ; \
+		$(ECHO) "  GEN   $$(basename $$f)" ; \
+		{ \
+			if test -z '@BUILD_REPO_APT_RPM_TRUE@' ; then :; \
+				for b in '' updates extras testing $$rb ; do \
+					d="$$repodir$${b:+/$$b}/base" ; \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						test -f $$d/pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) 'rpm         file://$(REPODIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) 'rpm-src     file://$(REPODIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+					done ; \
+				done ; \
+				$(ECHO) ''; \
+			fi ; \
+			if test -z '@BUILD_REPO_URPMI_TRUE@' ; then :; \
+				for b in '' updates extras testing $$rb ; do \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						d="$$repodir/media$${b:+/$$b}$${r:+/$$r}" ; \
+						test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "urpm        file://$$d media_info/synthesis.hdlist /" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/media_info/synthesis.hdlist.cz || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "urpm-src    file://$$d media_info/synthesis.hdlist /" ; \
+					done ; \
+				done ; \
+				$(ECHO) ''; \
+			fi ; \
+			if test -z '@BUILD_REPO_YUM_TRUE@' ; then :; \
+				for b in '' updates extras testing $$rb ; do \
+					for r in main debug devel source '' ; do \
+						comp=$${r:-full} ; \
+						d="$$repodir$${b:+/$$b}$${r:+/$$r}" ; \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "repomd      file://$(REPODIR)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+						test $$comp = full -o $$comp = source || continue ; \
+						test -f $$d/repodata/repomd.xml || $(ECHO) $(ECHO_N) '#' ; \
+						$(ECHO) "repomd-src  file://$(REPODIR)/rpms $(reposubdir)$${b:+/$$b}$${r:+/$$r}/" ; \
+					done ; \
+				done ; \
+				$(ECHO) ''; \
+			fi ; \
+			for b in '' updates extras testing $$rb ; do \
+				d="$$repodir$${b:+/$$b}/base" ; \
+				for r in main debug devel source '' ; do \
+					comp=$${r:-full} ; \
+					test -f $$d/pkglist.$$comp || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm-dir     file://$(REPODIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+					test $$comp = full -o $$comp = source || continue ; \
+					test -f $$d/srclist.$$comp  || $(ECHO) $(ECHO_N) '#' ; \
+					$(ECHO) 'rpm-src-dir file://$(REPODIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
+				done ; \
+			done ; \
+		} >$$f ; \
+	else \
+		$(ECHO) "rm -f -- $$repodir/$(PACKAGE).list $$repodir/$(PACKAGE)-local.list" ; \
+		rm -f -- $$repodir/$(PACKAGE).list $$repodir/$(PACKAGE)-local.list ; \
+		$(ECHO) "rmdir -pv -- $$repodir" ; \
+		rmdir -pv -- $$repodir || :; \
+	fi
 
 RELEASE_INSTALL		+= release-update-aptrpm
 RELEASE_UNINSTALL	+= release-update-aptrpm
