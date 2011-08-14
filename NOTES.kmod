@@ -704,6 +704,64 @@ Ubuntu:
     ABI[-FEATURES]- FLAVOR file will always contain the same symbol
     versions.
 
+Mageia, Mandriva:
+-----------------
+
+    Mandriva names its kernels kernel-FLAVOR-2.6.M.REL-ABI.KIND, where
+
+	FLAVOR	= kernel flavor from same source, e.g. desktop, server,
+		  xen-pvops, linus.
+	M.REL	= upstream kernel minor version numbers (the .REL
+		  component is always used).
+	ABI	= ABI for 2.6.M
+	KIND	= the kind of kernel, e.g. mga, mdv.
+
+    The kernel version number is typically just `1' and the release is
+    typically just 1.DIST, where
+
+	DIST	= distribution string which is a concatenation of distro
+		  and distro release version, e.g. mga1, mdv102.
+
+    The kernel requires kernel-firmware > DATE-SPIN.  The kernel
+    provides: kernel = 2.6.M.REL-ABI.DIST, kernel = 2.6.M,
+    kernel-FLAVOR, a bunch of kmod(MODULE) provides,
+    kernel-FLAVOR-2.6.M.REL-ABI.KIND = 1-1.DIST and
+    kernel-FLAVOR-2.6.M.REL-ABI.KIND(ARCH) = 1-1.DIST.
+
+    The uname -r provided by these kernels is 2.6.M.REL-FLAVOR-ABI.KIND.
+
+    Mandriva also provides a kernel virtual package named
+    kernel-FLAVOR-latest with an increasing version number that requires
+    kernel-FLAVOR-2.6.M.REL-ABI.KIND (name only) and
+    kernel-FLAVOR-2.6.M'.REL'-ABI'.KIND, where M'.REL'-ABI' is the
+    corresponding components of the next oldest kernel.
+
+    The kernel-FLAVOR-latest package provides kernel-FLAVOR-latest,
+    kernel-FLAVOR-latest(ARCH) = 2.6.M.REL-ABI.DIST, and also
+    kernel-FLAVOR-latest, kernel-FLAVOR-latest(ARCH) =
+    2.6.M'.REL'-ABI'.DIST, where M'.REL'-ABI' is the corresponding
+    components of the next oldest 'latest' package.
+
+    This is used to keep the version number in the name, but allow the
+    most recent version to be updated without special treatment.  It
+    also allows the urpme --auto-orphan function to collect redundant
+    kernel packages (older than the last two kernel versions). (Note
+    that this technique could also be used for debian and ubuntu.)  The
+    same approach is used for the -devel- and -source- packages.
+
+    It is possible to create an openss7-FLAVOR-latest virtual package
+    that requires a specific version of kernel-FLAVOR-latest package and
+    requires openss7-FLAVOR-2.6.M.REL-ABI.KIND and
+    openss7-FLAVOR-2.6.M'.REL'-ABI'.KIND.  In this way, the
+    kernel-FLAVOR-latest package cannot be upgraded without the
+    equivalent openss7-FLAVOR-latest package of the same version being
+    available.  However, the oldest kernel-FLAVOR-latest version
+    provided by the kernel-FLAVOR-latest package must specifically be
+    required.  This should stop an upgrade to a kernel for which there
+    is no support on the repository (i.e. any kernel-FLAVOR-latest
+    upgrade that bumps past the oldest kernel).  This should handle MES,
+    Mandriva and Mageia properly.
+
 
 -----
 

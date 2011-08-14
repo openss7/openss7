@@ -386,7 +386,7 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 				test -x $$x || x=/usr/lib/rpm/mandriva/find-debuginfo.sh ; \
 				test -x $$x || x=/usr/lib/rpm/find-debuginfo.sh ; \
 				if test -x $$x ; then \
-					$$x $(RPM_BUILD_DIR)/$(RPM_PACKAGE_NAME)-$(RPM_PACKAGE_VERSION) || : ; \
+					$$x $(RPM_BUILD_DIR)/$(PACKAGE)-$(VERSION) || : ; \
 				fi ; \
 			fi ; \
 		fi ; \
