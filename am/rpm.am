@@ -161,7 +161,16 @@ rpm_spec_file		= $(specdir)/$(PACKAGE)-$(VERSION).spec
 rpm_img_files		= $(sourcedir)/$(PACKAGE)-$(VERSION).gif $(sourcedir)/$(PACKAGE)-$(VERSION).xpm
 rpm_source_files	= $(rpm_spec_file) $(rpm_img_files) $(rpm_tar_file)
 rpm_base_file		= $(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE).*.rpm
-rpm_binary_file		= $(PACKAGE)-*$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
+rpm_binary0_file	= $(PACKAGE)-repo-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).noarch.rpm
+rpm_binary1_file	= $(PACKAGE)-base-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).noarch.rpm
+rpm_binary2_file	= $(PACKAGE)-doc-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).noarch.rpm
+rpm_binary3_file	= $(PACKAGE)-lib-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).$(target_cpu).rpm
+rpm_binary4_file	= $(PACKAGE)-compat-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).$(target_cpu).rpm
+rpm_binary5_file	= $(PACKAGE)-devel-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).$(target_cpu).rpm
+rpm_binary6_file	= $(PACKAGE)-debuginfo-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).$(target_cpu).rpm
+rpm_binary7_file	= $(PACKAGE)-debugsource-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).$(target_cpu).rpm
+rpm_binary8_file	= $(PACKAGE)-java-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).$(target_cpu).rpm
+rpm_binary9_file	= $(PACKAGE)-javadoc-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).noarch.rpm
 rpm_link_file		= $(topdir)/SRPMS/$(rpmpkg).src.rpm
 rpm_root_dir		= $(rpmbuildrootdir)/$(PACKAGE)-$(VERSION)
 ##
@@ -178,7 +187,7 @@ rpm_root_dir		= $(rpmbuildrootdir)/$(PACKAGE)-$(VERSION)
 ## %{name}=$(PACKAGE)
 ## %{kernel_flavor}=%(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*,,')
 ## %{kbaseversion}=$(VERSION)
-## %{kbaserelease}=$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)
+## %{kbaserelease}=$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2)
 ## %{arch}=x86_64 (for example)
 ##
 ## SuSE:
@@ -187,24 +196,44 @@ rpm_root_dir		= $(rpmbuildrootdir)/$(PACKAGE)-$(VERSION)
 ## %{name}=$(PACKAGE)
 ## %{kernel_flavor}=%(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*,,')
 ## %{kbaseversion}=$(VERSION)_%(echo '_%{kernel_source}' | sed -r -e 'y,-,_,;s,^(2\.6\.2[0-9]+)_,\\1.0_,')
+## %{kbaserelease}=$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2)
+##
+## Mandriva:
+##
+## %{name}%{kernel_flavor}[-subpackage]-%{kernel_latest}-%{kbaseversion}-%{kbaserelease}.%{arch}.rpm
+## %{kbaseversion}=$(VERSION)
+## %{kbaserelease}=$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2)
 ##
 ##
-rpm_module0_file	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-rpm_module1_file	= kernel-module-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-rpm_module2_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-rpm_module3_file	= openss7-$(PACKAGE)*-kmp-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-rpm_module4_file	= $(PACKAGE)-*-$(VERSION)_*-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).*.rpm
-rpm_module5_file	= $(PACKAGE)-*kernel*-$(VERSION)-$(PACKAGE_RPMRELEASE).*.rpm
-rpm_module6_file	= $(PACKAGE)-kmod*-$(VERSION)-$(PACKAGE_RPMRELEASE).*.rpm
+rpm_module0_file	= $(PACKAGE)-*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
+rpm_module1_file	= kernel-module-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
+rpm_module2_file	= kmod-$(PACKAGE)-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
+rpm_module3_file	= openss7-$(PACKAGE)*-kmp-*$(VERSION)*$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
+rpm_module4_file	= $(PACKAGE)-*-$(VERSION)_*-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
+rpm_module5_file	= $(PACKAGE)-*kernel*-$(VERSION)-$(PACKAGE_RPMRELEASE).$(target_cpu).rpm
+rpm_module6_file	= $(PACKAGE)-kmod*-$(VERSION)-$(PACKAGE_RPMRELEASE).$(target_cpu).rpm
+rpm_module7_file	= $(PACKAGE)-*-$(knumber)*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
+rpm_module8_file	= $(PACKAGE)-*-latest-$(VERSION).*-*$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
 rpm_update_files	= $(rpmdir)/*/$(rpm_module0_file) \
 			  $(rpmdir)/*/$(rpm_module1_file) \
 			  $(rpmdir)/*/$(rpm_module2_file) \
 			  $(rpmdir)/*/$(rpm_module3_file) \
 			  $(rpmdir)/*/$(rpm_module4_file) \
 			  $(rpmdir)/*/$(rpm_module5_file) \
-			  $(rpmdir)/*/$(rpm_module6_file)
+			  $(rpmdir)/*/$(rpm_module6_file) \
+			  $(rpmdir)/*/$(rpm_module7_file) \
+			  $(rpmdir)/*/$(rpm_module8_file)
 rpm_binary_files	= $(rpmdir)/*/$(rpm_base_file) \
-			  $(rpmdir)/*/$(rpm_binary_file) \
+			  $(rpmdir)/*/$(rpm_binary0_file) \
+			  $(rpmdir)/*/$(rpm_binary1_file) \
+			  $(rpmdir)/*/$(rpm_binary2_file) \
+			  $(rpmdir)/*/$(rpm_binary3_file) \
+			  $(rpmdir)/*/$(rpm_binary4_file) \
+			  $(rpmdir)/*/$(rpm_binary5_file) \
+			  $(rpmdir)/*/$(rpm_binary6_file) \
+			  $(rpmdir)/*/$(rpm_binary7_file) \
+			  $(rpmdir)/*/$(rpm_binary8_file) \
+			  $(rpmdir)/*/$(rpm_binary9_file) \
 			  $(rpm_update_files)
 rpm_cache_files		= $(rpmbuilddir)/*config.cache \
 			  $(rpmbuilddir)/*config.site \
@@ -383,7 +412,7 @@ rpmsort = sed 's,-,..,' | sort -n '-t.' -k1,1 -k2,2 -k3,3 -k4,4 -k5,5 -k6,6 -k7,
 rebuild: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 rebuild:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
+	@rpms=`find $(rpmdir)/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary0_file)' -o -name '$(rpm_binary1_file)' -o -name '$(rpm_binary2_file)' -o -name '$(rpm_binary3_file)' -o -name '$(rpm_binary4_file)' -o -name '$(rpm_binary5_file)' -o -name '$(rpm_binary6_file)' -o -name '$(rpm_binary7_file)' -o -name '$(rpm_binary8_file)' -o -name '$(rpm_binary9_file)' 2>/dev/null`; \
 	if test -z "$$rpms" -o -n '$(FORCE)'; then \
 		$(ECHO) "D: $@: rebuild noarch"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET="noarch" noa-rpm || :; \
@@ -400,8 +429,9 @@ rebuild:
 			test -e $(DESTDIR)$(rootdir)/lib/modules/$$k/build || { $(ECHO) "D: $@: skipping $$k (no build directory)"; continue; }; \
 			test -e $(DESTDIR)$(rootdir)/boot/System.map-$$k || { $(ECHO) "D: $@: skipping $$k (no system map)"; continue; }; \
 			test -n '$(DESTDIR)' || $(RPM) -q --whatprovides /lib/modules/$$k/build/Makefile >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $$k (no build provides)"; continue; }; \
-			ks=`echo "$$k" | sed -rn 's,^(.*)-([a-zA-Z][a-zA-Z0-9]*)$$,\2.*\1,;t good;s,^(.*)$$,.*\1,;: good s,[_-],.,g;s,^,-,p'`; \
-			rpms="`( find $(rpmdir)/$$a -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' | egrep -- "$$ks"'.*\.'"$$a"'\.rpm$$' ) 2>/dev/null`"; \
+			ks=`echo '$(kversion)' | sed -rn 's,^([^-]*)((-[[:alpha:]][[:alnum:]]*)*).*$$,\2.*\1,;t good;s,^(.*)-([a-zA-Z][a-zA-Z0-9]*)$$,\2.*\1,;t good;s,^(.*)$$,.*\1,;: good s,^-*,,;s,[_-],.,g;s,^,-,;p'`; \
+			$(ECHO) "D: $@: kversion is '$(kversion)', ks is '$$ks'" ; \
+			rpms="`( find $(rpmdir)/$$a -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' -o -name '$(rpm_module7_file)' -o -name '$(rpm_module8_file)' | egrep -- "$$ks"'.*\.'"$$a"'\.rpm$$' ) 2>/dev/null`"; \
 			if test -z "$$rpms" -o -n '$(FORCE)'; then \
 				$(ECHO) "D: $@: rebuild $$k"; \
 				$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) kversion="$$k" RPMTARGET="$$t" one-k-rpm || :; \
@@ -409,7 +439,7 @@ rebuild:
 				$(ECHO) "D: $@: skipped $$k"; \
 			fi; \
 		done; \
-		rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' 2>/dev/null`; \
+		rpms=`find $(rpmdir)/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary0_file)' -o -name '$(rpm_binary1_file)' -o -name '$(rpm_binary2_file)' -o -name '$(rpm_binary3_file)' -o -name '$(rpm_binary4_file)' -o -name '$(rpm_binary5_file)' -o -name '$(rpm_binary6_file)' -o -name '$(rpm_binary7_file)' -o -name '$(rpm_binary8_file)' -o -name '$(rpm_binary9_file)' 2>/dev/null`; \
 		if test -z "$$rpms" -o -n '$(FORCE)'; then \
 			$(ECHO) "D: $@: rebuild $$a"; \
 			$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) RPMTARGET="$$t" one-t-rpm || :; \
@@ -428,12 +458,12 @@ rebuild:
 resign: ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 resign: sign
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' 2>/dev/null`; \
+	@rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary0_file)' -o -name '$(rpm_binary1_file)' -o -name '$(rpm_binary2_file)' -o -name '$(rpm_binary3_file)' -o -name '$(rpm_binary4_file)' -o -name '$(rpm_binary5_file)' -o -name '$(rpm_binary6_file)' -o -name '$(rpm_binary7_file)' -o -name '$(rpm_binary8_file)' -o -name '$(rpm_binary9_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file) -o -name '$(rpm_module7_file) -o -name '$(rpm_module8_file)' 2>/dev/null`; \
 	if test -z "$$rpms"; then \
 		$(ECHO) "D: $@: rebuild rebuild"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) rebuild; \
-		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' 2>/dev/null`; \
+		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary0_file)' -o -name '$(rpm_binary1_file)' -o -name '$(rpm_binary2_file)' -o -name '$(rpm_binary3_file)' -o -name '$(rpm_binary4_file)' -o -name '$(rpm_binary5_file)' -o -name '$(rpm_binary6_file)' -o -name '$(rpm_binary7_file)' -o -name '$(rpm_binary8_file)' -o -name '$(rpm_binary9_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file) -o -name '$(rpm_module7_file) -o -name '$(rpm_module8_file)' 2>/dev/null`; \
 		if test -z "$$rpms"; then exit 1; fi; \
 	fi; \
 	rpms_to_sign=; \
@@ -612,7 +642,7 @@ update-n-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	rebuild=yes; \
 	repodir=`echo '$(rpmdir)' | sed 's,^$(DISTDIR),$(REPODIR),'`; \
-	rpms=`(find $(rpmdir)/noarch $$repodir/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' | LANG= sort -u) 2>/dev/null`; \
+	rpms=`(find $(rpmdir)/noarch $$repodir/noarch -name '$(rpm_base_file)' -o -name '$(rpm_binary0_file)' -o -name '$(rpm_binary1_file)' -o -name '$(rpm_binary2_file)' -o -name '$(rpm_binary3_file)' -o -name '$(rpm_binary4_file)' -o -name '$(rpm_binary5_file)' -o -name '$(rpm_binary6_file)' -o -name '$(rpm_binary7_file)' -o -name '$(rpm_binary8_file)' -o -name '$(rpm_binary9_file)' | LANG= sort -u) 2>/dev/null`; \
 	for f in $$rpms; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
@@ -637,9 +667,10 @@ update-k-rpm:
 	test -e $(DESTDIR)$(rootdir)/boot/System.map-$(kversion) || { $(ECHO) "D: $@: skipping $(kversion) (no system map)"; exit 0; }; \
 	test -n '$(DESTDIR)' || $(RPM) -q --whatprovides /lib/modules/$(kversion)/build/Makefile >/dev/null 2>&1 || { $(ECHO) "D: $@: skipping $(kversion) (no build provides)"; exit 0; }; \
 	rebuild=yes; \
-	ks=`echo '$(kversion)' | sed -rn 's,^(.*)-([a-zA-Z][a-zA-Z0-9]*)$$,\2.*\1,;t good;s,^(.*)$$,.*\1,;: good s,[_-],.,g;s,^,-,p'`; \
+	ks=`echo '$(kversion)' | sed -rn 's,^([^-]*)((-[[:alpha:]][[:alnum:]]*)*).*$$,\2.*\1,;t good;s,^(.*)-([a-zA-Z][a-zA-Z0-9]*)$$,\2.*\1,;t good;s,^(.*)$$,.*\1,;: good s,^-*,,;s,[_-],.,g;s,^,-,;p'`; \
+	$(ECHO) "D: $@: kversion is '$(kversion)', ks is '$$ks'" ; \
 	repodir=`echo '$(rpmdir)' | sed 's,^$(DISTDIR),$(REPODIR),'`; \
-	rpms="`(find $(rpmdir)/$$a $$repodir/$$a -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' | egrep -- "$$ks"'.*\.'"$$a"'\.rpm$$' | LANG= sort -u) 2>/dev/null`"; \
+	rpms="`(find $(rpmdir)/$$a $$repodir/$$a -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file) -o -name '$(rpm_module7_file) -o -name '$(rpm_module8_file)' | egrep -- "$$ks"'.*\.'"$$a"'\.rpm$$' | LANG= sort -u) 2>/dev/null`"; \
 	for f in $$rpms; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
@@ -662,7 +693,7 @@ update-t-rpm:
 	test \( "$$a" != 'noarch' -a "$$a" != 'all' \) || exit 0; \
 	rebuild=yes; \
 	repodir=`echo '$(rpmdir)' | sed 's,^$(DISTDIR),$(REPODIR),'`; \
-	rpms=`(find $(rpmdir)/$$a $$repodir/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' | LANG= sort -u) 2>/dev/null`; \
+	rpms=`(find $(rpmdir)/$$a $$repodir/$$a -name '$(rpm_base_file)' -o -name '$(rpm_binary0_file)' -o -name '$(rpm_binary1_file)' -o -name '$(rpm_binary2_file)' -o -name '$(rpm_binary3_file)' -o -name '$(rpm_binary4_file)' -o -name '$(rpm_binary5_file)' -o -name '$(rpm_binary6_file)' -o -name '$(rpm_binary7_file)' -o -name '$(rpm_binary8_file)' -o -name '$(rpm_binary9_file)' | LANG= sort -u) 2>/dev/null`; \
 	for f in $$rpms; do \
 		if test -z '$(FORCE)' -o \( -e '$(USTAMP)' -a '$(USTAMP)' -nt "$$f" \); then \
 			$(ECHO) "D: $@: leaving $$f"; \
@@ -766,12 +797,12 @@ update-sign-srpm:
 ##
 update-sign-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
-	rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' 2>/dev/null`; \
+	rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary0_file)' -o -name '$(rpm_binary1_file)' -o -name '$(rpm_binary2_file)' -o -name '$(rpm_binary3_file)' -o -name '$(rpm_binary4_file)' -o -name '$(rpm_binary5_file)' -o -name '$(rpm_binary6_file)' -o -name '$(rpm_binary7_file)' -o -name '$(rpm_binary8_file)' -o -name '$(rpm_binary9_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file) -o -name '$(rpm_module7_file) -o -name '$(rpm_module8_file)' 2>/dev/null`; \
 	if test -z "$$rpms"; then \
 		$(ECHO) "D: $@: rebuild update-rpm"; \
 		$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-rpms"; \
 		$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-rpms; \
-		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file)' 2>/dev/null`; \
+		rpms=`find $(rpmdir) -name '$(rpm_base_file)' -o -name '$(rpm_binary0_file)' -o -name '$(rpm_binary1_file)' -o -name '$(rpm_binary2_file)' -o -name '$(rpm_binary3_file)' -o -name '$(rpm_binary4_file)' -o -name '$(rpm_binary5_file)' -o -name '$(rpm_binary6_file)' -o -name '$(rpm_binary7_file)' -o -name '$(rpm_binary8_file)' -o -name '$(rpm_binary9_file)' -o -name '$(rpm_module0_file)' -o -name '$(rpm_module1_file)' -o -name '$(rpm_module2_file)' -o -name '$(rpm_module3_file)' -o -name '$(rpm_module4_file)' -o -name '$(rpm_module5_file)' -o -name '$(rpm_module6_file) -o -name '$(rpm_module7_file) -o -name '$(rpm_module8_file)' 2>/dev/null`; \
 	fi; if test -z "$$rpms"; then exit 0; fi; \
 	rpms_to_sign=; \
 	for f in $$rpms; do \
