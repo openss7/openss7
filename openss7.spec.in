@@ -4894,11 +4894,11 @@ Requires(preun):    lsof
 Requires(postun):   lsof
 
 # this is enough for the following
-Requires:           modutils
-Requires(pre):      modutils
-Requires(post):     modutils
-Requires(preun):    modutils
-Requires(postun):   modutils
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires:           %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(pre):      %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(post):     %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(preun):    %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_sbindir}/modprobe --qf "Requires(postun):   %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
 
 #Requires(pre):      @MODPROBE@
 #Requires(pre):      @LSMOD@
