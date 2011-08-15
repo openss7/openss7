@@ -91,9 +91,13 @@ if PKG_BUILD_USER
 ##
 ## These are for ptys and should be part of the strutil or strio package.
 ##
-bin_PROGRAMS			=
+syssbin_PROGRAMS		=
 
 sbin_PROGRAMS			=
+
+sysbin_PROGRAMS			=
+
+bin_PROGRAMS			=
 
 pkglibexec_PROGRAMS		=
 
@@ -1342,7 +1346,7 @@ strchg_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 strchg_LDFLAGS			= $(USER_LDFLAGS)
 strchg_LDADD			= libstreams.la
 
-bin_PROGRAMS			+= strchg
+sysbin_PROGRAMS			+= strchg
 
 ## =====================================================================
 
@@ -1352,7 +1356,7 @@ strconf_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 strconf_LDFLAGS			= $(USER_LDFLAGS)
 strconf_LDADD			= libstreams.la
 
-bin_PROGRAMS			+= strconf
+sysbin_PROGRAMS			+= strconf
 
 ## =====================================================================
 
@@ -1362,7 +1366,7 @@ strreset_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 strreset_LDFLAGS		= $(USER_LDFLAGS)
 strreset_LDADD			= libstreams.la
 
-bin_PROGRAMS			+= strreset
+sysbin_PROGRAMS			+= strreset
 
 ## =====================================================================
 #
@@ -1391,7 +1395,7 @@ strlog_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 strlog_LDFLAGS			= $(USER_LDFLAGS)
 strlog_LDADD			= -lrt
 
-bin_PROGRAMS			+= strlog
+sysbin_PROGRAMS			+= strlog
 
 ## =====================================================================
 
@@ -1401,7 +1405,7 @@ autopush_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 autopush_LDFLAGS		= $(USER_LDFLAGS)
 autopush_LDADD			= libstreams.la
 
-sbin_PROGRAMS			+= autopush
+syssbin_PROGRAMS		+= autopush
 
 ## =====================================================================
 
@@ -1411,7 +1415,7 @@ fattach_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 fattach_LDFLAGS			= $(USER_LDFLAGS)
 fattach_LDADD			= libstreams.la
 
-sbin_PROGRAMS			+= fattach
+syssbin_PROGRAMS		+= fattach
 
 ## =====================================================================
 
@@ -1421,7 +1425,7 @@ fdetach_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 fdetach_LDFLAGS			= $(USER_LDFLAGS)
 fdetach_LDADD			= libstreams.la
 
-sbin_PROGRAMS			+= fdetach
+syssbin_PROGRAMS		+= fdetach
 
 ## =====================================================================
 
@@ -1431,7 +1435,7 @@ insf_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 insf_LDFLAGS			= $(USER_LDFLAGS)
 insf_LDADD			= libstreams.la
 
-sbin_PROGRAMS			+= insf
+syssbin_PROGRAMS		+= insf
 
 ## =====================================================================
 
@@ -1609,7 +1613,7 @@ soconfig_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 soconfig_LDFLAGS		= $(USER_LDFLAGS)
 soconfig_LDADD			= libstreams.la
 
-sbin_PROGRAMS			+= soconfig
+syssbin_PROGRAMS		+= soconfig
 
 ## =====================================================================
 

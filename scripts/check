@@ -316,8 +316,12 @@ BEGIN {
 	ENVIRON["top_builddir"] = ""
     if (!("bin_PROGRAMS" in ENVIRON))
 	ENVIRON["bin_PROGRAMS"] = ""
+    if (!("sysbin_PROGRAMS" in ENVIRON))
+	ENVIRON["sysbin_PROGRAMS"] = ""
     if (!("sbin_PROGRAMS" in ENVIRON))
 	ENVIRON["sbin_PROGRAMS"] = ""
+    if (!("syssbin_PROGRAMS" in ENVIRON))
+	ENVIRON["syssbin_PROGRAMS"] = ""
     if (!("pkglibexec_PROGRAMS" in ENVIRON))
 	ENVIRON["pkglibexec_PROGRAMS"] = ""
     if (!("dist_bin_SCRIPTS" in ENVIRON))
@@ -330,6 +334,8 @@ BEGIN {
 	ENVIRON["PKG_HEADERS"] = ""
     if (!("lib_LTLIBRARIES" in ENVIRON))
 	ENVIRON["lib_LTLIBRARIES"] = ""
+    if (!("syslib_LTLIBRARIES" in ENVIRON))
+	ENVIRON["syslib_LTLIBRARIES"] = ""
     if (!("KERNEL_MODULES" in ENVIRON))
 	ENVIRON["KERNEL_MODULES"] = ""
     if (!("KERNEL_WRAPPER" in ENVIRON))
@@ -396,18 +402,36 @@ BEGIN {
 
     retval = 0
 
-    PROGRAMS = ENVIRON["bin_PROGRAMS"] " " ENVIRON["sbin_PROGRAMS"] " " ENVIRON["pkglibexec_PROGRAMS"]
+    PROGRAMS = \
+	ENVIRON["bin_PROGRAMS"] " " \
+	ENVIRON["sbin_PROGRAMS"] " " \
+	ENVIRON["sysbin_PROGRAMS"] " " \
+	ENVIRON["syssbin_PROGRAMS"] " " \
+	ENVIRON["pkglibexec_PROGRAMS"]
     n["programs"] = split(PROGRAMS, programs)
 
-    SCRIPTS = ENVIRON["dist_bin_SCRIPTS"] " " ENVIRON["dist_sbin_SCRIPTS"] " " ENVIRON["dist_pkglibexec_SCRIPTS"]
+    SCRIPTS = \
+	ENVIRON["dist_bin_SCRIPTS"] " " \
+	ENVIRON["dist_sbin_SCRIPTS"] " " \
+	ENVIRON["dist_pkglibexec_SCRIPTS"]
     n["scripts"] = split(SCRIPTS, scripts)
 
-    COMMANDS = ENVIRON["bin_PROGRAMS"] " " ENVIRON["dist_bin_SCRIPTS"]
+    COMMANDS = \
+	ENVIRON["bin_PROGRAMS"] " " \
+	ENVIRON["sysbin_PROGRAMS"] " " \
+	ENVIRON["dist_bin_SCRIPTS"]
     n["user"] = split(COMMANDS, commands)
     if (n["user"]) {
 	need[1] = 1 }
 
-    COMMANDS = ENVIRON["bin_PROGRAMS"] " " ENVIRON["dist_bin_SCRIPTS"] " " ENVIRON["sbin_PROGRAMS"] " " ENVIRON["pkglibexec_PROGRAMS"] " " ENVIRON["dist_sbin_SCRIPTS"]
+    COMMANDS = \
+	ENVIRON["bin_PROGRAMS"] " " \
+	ENVIRON["sysbin_PROGRAMS"] " " \
+	ENVIRON["dist_bin_SCRIPTS"] " " \
+	ENVIRON["sbin_PROGRAMS"] " " \
+	ENVIRON["syssbin_PROGRAMS"] " " \
+	ENVIRON["pkglibexec_PROGRAMS"] " " \
+	ENVIRON["dist_sbin_SCRIPTS"]
     n["commands"] = split(COMMANDS, commands)
     if (n["commands"] > n["user"]) {
 	need[8] = 1 }
@@ -419,7 +443,7 @@ BEGIN {
 
     needctags = 0
 
-    LIBRARIES = ENVIRON["lib_LTLIBRARIES"]
+    LIBRARIES = ENVIRON["lib_LTLIBRARIES"] " " ENVIRON["syslib_LTLIBRARIES"]
     n["libraries"] = split(LIBRARIES, libraries)
     if (n["libraries"]) {
 	need[2] = 1; need[3] = 1; needctags = 1 }

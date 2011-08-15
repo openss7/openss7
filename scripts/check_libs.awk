@@ -215,7 +215,7 @@ BEGIN {
 
     retval = 0
     if (ENVIRON["MAINTAINER_MODE"] != "no") {
-	LIBRARIES = ENVIRON["lib_LTLIBRARIES"]
+	LIBRARIES = ENVIRON["lib_LTLIBRARIES"] " " ENVIRON["syslib_LTLIBRARIES"]
 	if ((n = split(LIBRARIES, libraries))) {
 	    get_manpages("23")
 	    get_srcpages("23")

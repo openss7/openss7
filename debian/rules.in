@@ -169,6 +169,7 @@ debian/@PACKAGE@-base.conffiles:
 
 initrddir	= @initrddir@
 sbindir		= @sbindir@
+syssbindir	= @syssbindir@
 snmpmibdir	= @snmpmibdir@
 libexecdir	= @libexecdir@
 pkglibexecdir	= $(libexecdir)/@PACKAGE@
@@ -282,6 +283,7 @@ debian/@PACKAGE@-lib.conffiles:
 	) $(am__debian_conffil_format) | sort -u > $@
 
 bindir		= @bindir@
+sysbindir	= @sysbindir@
 libdir		= @libdir@
 syslibdir	= @syslibdir@
 perldir		= @perldir@
@@ -299,6 +301,8 @@ debian/@PACKAGE@-lib.install:
 	  [ ! -f '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@'	] || echo '$(debtmpdir)$(sysconfdir)/sock2path.d/@PACKAGE@' ; \
 	  [ ! -d '$(debtmpdir)$(bindir)'				] || echo '$(debtmpdir)$(bindir)/*' ; \
 	  [ ! -d '$(debtmpdir)$(sbindir)'				] || echo '$(debtmpdir)$(sbindir)/*' ; \
+	  [ ! -d '$(debtmpdir)$(sysbindir)'				] || echo '$(debtmpdir)$(sysbindir)/*' ; \
+	  [ ! -d '$(debtmpdir)$(syssbindir)'				] || echo '$(debtmpdir)$(syssbindir)/*' ; \
 	  [ ! -d '$(debtmpdir)$(libdir)'				] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
 	  [ ! -d '$(debtmpdir)$(libdir)'				] || echo '$(debtmpdir)$(libdir)/*.la' ; \
 	  [ ! -d '$(debtmpdir)$(syslibdir)'				] || echo '$(debtmpdir)$(syslibdir)/*.so*' ; \
