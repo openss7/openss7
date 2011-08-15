@@ -69,7 +69,7 @@ Xti_la_SOURCES		= xti/xti_wrap.c
 Xti_la_CPPFLAGS		= -I$(builddir)/xti -I$(srcdir)/xti $(PKG_INCLUDES) $(USER_CPPFLAGS) $(PERL_CPPFLAGS) -Dbool=char -DMODULE
 Xti_la_CFLAGS		= $(USER_CFLAGS) -Wno-unused -Wno-cast-qual -fno-strict-aliasing
 Xti_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-Xti_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared
+Xti_la_LDFLAGS		= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 if PKG_BUILD_USER
 if PKG_BUILD_ARCH

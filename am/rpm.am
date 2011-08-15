@@ -2200,9 +2200,6 @@ $(urpmi_cfgs):
 			(*)	 $(ECHO) "srpms=$${b:+$$b/}source" ;; \
 			esac ; \
 			$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
-			case "$$b:$$r" in \
-			(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
-			esac ; \
 			$(ECHO) "" ; \
 		done ; \
 	) >$@
@@ -2232,7 +2229,7 @@ repo-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_cfgs)
 	cd $(mediasrcsdir)/.. ; \
 	find $$rpms -follow -name '*.rpm' | grep -- '\(source-\|\.src\.rpm$$\)' \
 		| LANG= sort -u | while read rpm ; do $(ECHO) " ln -sf $$rpm `pwd`"; ln -sf $$rpm . ; done ; \
-	$(GENDISTRIB) $(rpmdistdir)
+	$(GENDISTRIB) --blind --clean $(rpmdistdir)
 
 repo-sign-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_keys)
 
@@ -2313,7 +2310,7 @@ release-update-urpmi:
 				for f in $$rpms ; do \
 					if test -L `basename $$f` ; then :; else \
 						$(ECHO) " ln -sf $$f `pwd`" ; \
-						ln -sf $$rpm . ; \
+						ln -sf $$f . ; \
 					fi ; \
 				done ; \
 				made_list=yes ; \
@@ -2355,15 +2352,12 @@ release-update-urpmi:
 					(*) 	 $(ECHO) "srpms=$${b:+$$b/}source" ;; \
 					esac ; \
 					$(ECHO) "media_type=release:$${b:-base}:$${r:-full}" ; \
-					case "$$b:$$r" in \
-					(*:debug|*:devel|*:source|testing:*) $(ECHO) "noauto=1" ;; \
-					esac ; \
 					$(ECHO) "" ; \
 				done ; \
 			done ; \
 		) >$$m/media.cfg ; \
-		$(ECHO) "$(GENDISTRIB) $${repodir}" ; \
-		$(GENDISTRIB) $${repodir} ; \
+		$(ECHO) "$(GENDISTRIB) --blind --clean $${repodir}" ; \
+		$(GENDISTRIB) --blind --clean $${repodir} ; \
 	else \
 		comps= ; \
 		for b in '' updates extras testing $$rb ; do \
@@ -3022,7 +3016,7 @@ release-update-aptrpm:
 			$(ECHO) "D: $@: processing directory $$sub" ; \
 			test -d $$sub || { $(ECHO) "$(MKDIR_P) -- $$sub" ; $(MKDIR_P) -- $$sub ; } ; \
 			$(ECHO_V) "D: $@: find $$sub -name '*.rpm'" ; \
-			rpms=`find $$sub -name '*.rpm' 2>/dev/Null` ; \
+			rpms=`find $$sub -name '*.rpm' 2>/dev/null` ; \
 			for f in $$rpms ; do \
 				if test -L $$f ; then \
 					link=`readlink $$f` ; \

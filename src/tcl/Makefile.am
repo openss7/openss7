@@ -76,7 +76,7 @@ xti_la_CPPFLAGS		= -I$(builddir)/xti -I$(srcdir)/xti $(PKG_INCLUDES) $(USER_CPPF
 xti_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 xti_la_CXXFLAGS		= $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 xti_la_LIBADD		= $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-xti_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared
+xti_la_LDFLAGS		= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 if PKG_BUILD_USER
 if PKG_BUILD_ARCH
@@ -92,7 +92,7 @@ streams_la_CPPFLAGS	= -I$(builddir)/streams -I$(srcdir)/streams $(PKG_INCLUDES) 
 streams_la_CFLAGS	= $(USER_CFLAGS) -Wno-unused $(USER_DFLAGS)
 streams_la_CXXFLAGS	= $(USER_CXXFLAGS) -Wno-unused $(USER_DXXFLAGS)
 streams_la_LIBADD	= $(top_builddir)/libstreams.la
-streams_la_LDFLAGS	= -module -export-dynamic -release $(VERSION) -shared
+streams_la_LDFLAGS	= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 if PKG_BUILD_USER
 if PKG_BUILD_ARCH
@@ -108,7 +108,7 @@ tcap_la_CPPFLAGS	= -I$(builddir)/tcap -I$(srcdir)/tcap $(PKG_INCLUDES) $(USER_CP
 tcap_la_CFLAGS		= $(USER_CFLAGS) -Wno-unused $(USER_DFLAGS)
 tcap_la_CXXFLAGS	= $(USER_CXXFLAGS) -Wno-unused $(USER_DXXFLAGS)
 tcap_la_LIBADD		= $(top_builddir)/libstreams.la
-tcap_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared
+tcap_la_LDFLAGS		= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 if PKG_BUILD_USER
 if PKG_BUILD_ARCH
