@@ -176,6 +176,28 @@
 %global HAVE_wrapper        0
 %endif
 
+%global HAVE_enhances       %(if (rpm -q --enhances     rpm >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%if %{HAVE_enhances}
+%global have_enhances       %{nil}
+%global Enhances            Enhances
+%else
+%global Enhances            Requires
+%endif
+%global HAVE_supplements    %(if (rpm -q --supplements  rpm >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%if %{HAVE_supplements}
+%global have_supplements    %{nil}
+%endif
+%global HAVE_recommends     %(if (rpm -q --recommends   rpm >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%if %{HAVE_recommends}
+%global have_recommends     %{nil}
+%global Recommends          Recommends
+%else
+%global Recommends          Requires
+%endif
+%global HAVE_suggests       %(if (rpm -q --suggests     rpm >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%if %{HAVE_suggests}
+%global have_suggests       %{nil}
+%endif
 
 %global HAVE_yumrepo        %(if (rpm -q --whatprovides yum     >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 %global HAVE_aptrepo        %(if (rpm -q --whatprovides apt-get >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
@@ -1996,7 +2018,7 @@
 
 %global kbaseversion %{baseversion}
 %global kspecversion %{baseversion}
-%global kversrequire = %{epoch}:%{baseversion}%{krelsrequire}
+%global kversrequire = %{baseversion}%{krelsrequire}
 
 # SuSE adds a mogrified kernel version string to the kmp version.
 %if %{HAVE_susekmps}
@@ -2008,7 +2030,7 @@
 %if %{HAVE_urpmkmps}
 %global kbaseversion %{baseversion}
 %global kspecversion %{baseversion}
-%global kversrequire = %{epoch}:%{baseversion}%{krelsrequire}
+%global kversrequire = %{baseversion}%{krelsrequire}
 %endif
 
 %global lbaseversion %{baseversion}
@@ -2228,15 +2250,15 @@ BuildRequires:    @BZIP2_CMD@
 # This is a virtual package that we want to pull in all the necessary
 # packages for a full run-time system.
 %if %{NEED_repo}
-Requires:           %{name}-repo
+%{Recommends}:      %{name}-repo
 %endif
 %if %{NEED_base}
-Requires:           %{name}-base    = %{epoch}:%{baseversion}
+Requires:           %{name}-base    = %{baseversion}
 %endif
 
-Provides:           %{name} = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name} = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name} = %{baseversion}-%{specrelease}
+Provides:           %{name} = %{baseversion}-%{baserelease}
+Provides:           %{name} = %{baseversion}-%{rpmrelease}
 
 # ---------------------------------------------------------------------------
 %description
@@ -2801,9 +2823,9 @@ Requires(pre):      %(which sed  2>/dev/null)
 Requires(pre):      %(which awk  2>/dev/null)
 %endif
 
-Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-repo    = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-repo    = %{baseversion}-%{specrelease}
+Provides:           %{name}-repo    = %{baseversion}-%{baserelease}
+Provides:           %{name}-repo    = %{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
 
@@ -3306,21 +3328,21 @@ Requires:           dev >= 3.3
 #endif
 
 %if %{HAVE_testfiles}
-Requires:           %{_pkglibexecdir}/test-streams
+%{Recommends}:      %{_pkglibexecdir}/test-streams
 %endif
 #if %{NEED_lib}
-#equires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
+#equires:           %{name}-lib     = %{baseversion}-%{baserelease}
 #endif
 %if %{HAVE_test32files}
-Requires:           %{_pkglibexec32dir}/test-streams
+%{Recommends}:      %{_pkglibexec32dir}/test-streams
 %endif
 #if %{NEED_compat}
-#equires:           %{name}-compat  = %{epoch}:%{baseversion}-%{baserelease}
+#equires:           %{name}-compat  = %{baseversion}-%{baserelease}
 #endif
 
-Provides:           %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-base = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-base = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-base = %{baseversion}-%{specrelease}
+Provides:           %{name}-base = %{baseversion}-%{baserelease}
+Provides:           %{name}-base = %{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
 
@@ -3834,9 +3856,9 @@ Requires:           %{_mandir}/%{manmacros}
 Requires:           %{_mandir}/%{manrefs}
 %endif
 
-Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-doc     = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-doc     = %{baseversion}-%{specrelease}
+Provides:           %{name}-doc     = %{baseversion}-%{baserelease}
+Provides:           %{name}-doc     = %{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
 
@@ -4030,12 +4052,12 @@ Requires(post):     %(which tclsh 2>/dev/null)
 
 # these libraries need some kernel modules to be useful
 %if %{NEED_kmod}
-Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{baserelease}
+%{Recommends}:      %{name}-kernel  = %{baseversion}-%{baserelease}
 %endif
 
-Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-lib     = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-lib     = %{baseversion}-%{specrelease}
+Provides:           %{name}-lib     = %{baseversion}-%{baserelease}
+Provides:           %{name}-lib     = %{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
 
@@ -4265,7 +4287,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 fi
 
 %if %{HAVE_initscripts}
-%triggerin -p /bin/bash lib -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+%triggerin -p /bin/bash lib -- %{name}-base = %{baseversion}-%{specrelease}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # both present install or upgrade
     initfiles='%{initfiles}'
@@ -4576,12 +4598,12 @@ Requires(postun):   /usr/bin/libtool
 
 # these libraries need some kernel modules to be useful
 %if %{NEED_kmod}
-Requires:           %{name}-kernel  = %{epoch}:%{baseversion}-%{baserelease}
+%{Recommends}:      %{name}-kernel  = %{baseversion}-%{baserelease}
 %endif
 
-Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-compat  = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-compat  = %{baseversion}-%{specrelease}
+Provides:           %{name}-compat  = %{baseversion}-%{baserelease}
+Provides:           %{name}-compat  = %{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
 
@@ -4661,12 +4683,12 @@ Conflicts:          texinfo < 3.11
 
 # development info is somewhat useless without kernel module develoment info
 %if %{NEED_kdev}
-Requires:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{baserelease}
+%{Recommends}:      %{name}-devel-kernel = %{baseversion}-%{baserelease}
 %endif
 
-Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-devel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-devel = %{baseversion}-%{specrelease}
+Provides:           %{name}-devel = %{baseversion}-%{baserelease}
+Provides:           %{name}-devel = %{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
 
@@ -4762,12 +4784,12 @@ Autoprov:           true
 
 # debugging info is somewhat useless without kernel module debugging info
 %if %{NEED_kbug}
-Requires:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{baserelease}
+%{Recommends}:      %{name}-debuginfo-kernel = %{baseversion}-%{baserelease}
 %endif
 
-Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debuginfo = %{baseversion}-%{specrelease}
+Provides:           %{name}-debuginfo = %{baseversion}-%{baserelease}
+Provides:           %{name}-debuginfo = %{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
 
@@ -4805,15 +4827,15 @@ Autoprov:           true
 %endif
 
 # debugging source is uesless without debugging info
-Requires:           %{name}-debuginfo = %{epoch}:%{baseversion}-%{baserelease}
+%{Recommends}:      %{name}-debuginfo = %{baseversion}-%{baserelease}
 # debugging source is somewhat useless without kernel module debugging source
 %if %{NEED_kbug}
-Requires:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{baserelease}
+%{Recommends}:      %{name}-debugsource-kernel = %{baseversion}-%{baserelease}
 %endif
 
-Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-debugsource = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debugsource = %{baseversion}-%{specrelease}
+Provides:           %{name}-debugsource = %{baseversion}-%{baserelease}
+Provides:           %{name}-debugsource = %{baseversion}-%{rpmrelease}
 
 Release:            %{specrelease}
 
@@ -4916,56 +4938,62 @@ Requires(postun):   lsof
 
 %if %{HAVE_weakmods}
 %if %{HAVE_rhatkmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_susekmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
+%if %{HAVE_urpmkmps}
+%else
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
+%endif
 %endif
 %endif
 %else
 %if %{HAVE_yumrepo}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_zypprepo}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%if %{HAVE_urpmirepo}
+%else
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%endif
 %endif
 %endif
 %endif
 
 %if %{NEED_base}
-Requires(prereq):   %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
-Requires(pre):      %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
-Requires(post):     %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
-Requires(preun):    %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
-Requires(postun):   %{name}-base    = %{epoch}:%{baseversion}-%{baserelease}
+Requires(prereq):   %{name}-base    = %{baseversion}-%{baserelease}
+Requires(pre):      %{name}-base    = %{baseversion}-%{baserelease}
+Requires(post):     %{name}-base    = %{baseversion}-%{baserelease}
+Requires(preun):    %{name}-base    = %{baseversion}-%{baserelease}
+Requires(postun):   %{name}-base    = %{baseversion}-%{baserelease}
 %endif
 
 %if %{NEED_lmod}
 %else
-Provides:           %{name}-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-kernel = %{baseversion}-%{rpmrelease}
 %endif
-Provides:           %{name}-%{_kversion} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-%{_kversion} = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-%{_kversion} = %{baseversion}-%{rpmrelease}
 
 %if %{HAVE_rhatkmps}
 Provides:           kernel-modules = %{_kversion}
-Provides:           kmod-%{name} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-kmod = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Provides:           kmod-%{name} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-kmod = %{kbaseversion}-%{kbaserelease}
 %endif
 
 %if %{HAVE_susekmps}
 Provides:           multiversion(kernel)
-Provides:           %{name}-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-kmp%{kernel_flavor} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-kmp = %{kbaseversion}-%{kbaserelease}
 %endif
 
 Version:            %{kbaseversion}
@@ -5133,7 +5161,7 @@ fi
 %endif
 
 %if %{FILES_modules}
-%triggerin -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+%triggerin -p /bin/bash -n %{kernel_package} -- %{name}-base = %{baseversion}-%{specrelease}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other present
 %if %{HAVE_weakmods}
@@ -5174,7 +5202,7 @@ fi
 %endif
 
 %if %{FILES_modules}
-%triggerun -p /bin/bash -n %{kernel_package} -- %{name}-base = %{epoch}:%{baseversion}-%{specrelease}
+%triggerun -p /bin/bash -n %{kernel_package} -- %{name}-base = %{baseversion}-%{specrelease}
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 0 ] ; then : # kernel modules being removed with base present
     delete_modules='--delete-modules'
@@ -5299,13 +5327,15 @@ Group:              System Environment/Kernel
 Autoreq:            false
 Autoprov:           false
 
-Requires:           kernel%{kernel_flavor}-latest = %{kernel_latest}
-Requires:           %{kernel_package} = %{epoch}:%{kbaseversion}-%{kbaserelease}
+%if %{HAVE_supplements}
+Supplements:        kernel%{kernel_flavor}-latest = %{kernel_latest}
+%endif
+Requires:           %{kernel_package} = %{kbaseversion}-%{kbaserelease}
 
-Provides:           %{name}-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-kernel = %{baseversion}-%{rpmrelease}
 
 Version:            %{lbaseversion}
 Release:            %{lbaserelease}
@@ -5359,43 +5389,46 @@ Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
 # /boot/System.map-%{_kversion} is available.  Also, the specific kernel
 # development package is also required.
 %if %{HAVE_rhatkmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}-%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_susekmps}
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
-%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%if %{HAVE_urpmkmps}
+%else
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %endif
 %endif
-%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%endif
+%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 
 # kernel develoment needs the kernel (it defines the symbols necessary for development)
 %if %{NEED_kmod}
-Requires:           %{name}-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
+%{Recommends}:           %{name}-kernel = %{kbaseversion}-%{kbaserelease}
 %endif
 
 %if %{NEED_ldev}
 %else
-Provides:           %{name}-devel-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-devel-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-devel-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-devel-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-devel-kernel = %{baseversion}-%{rpmrelease}
 %endif
-Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-devel-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-devel-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-devel-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-devel-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-devel-%{_kversion} = %{baseversion}-%{rpmrelease}
 
 %if %{HAVE_rhatkmps}
 Provides:           kernel-devel = %{_kversion}
-Provides:           kmod-%{name}-devel = %{epoch}:%{kspecversion}-%{kspecrelease}
-Provides:           %{name}-devel-kmod = %{epoch}:%{kspecversion}-%{kspecrelease}
+Provides:           kmod-%{name}-devel = %{kspecversion}-%{kspecrelease}
+Provides:           %{name}-devel-kmod = %{kspecversion}-%{kspecrelease}
 %endif
 
 %if %{HAVE_susekmps}
 Provides:           multiversion(kernel)
-Provides:           %{name}-devel-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-devel-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-devel-kmp%{kernel_flavor} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-devel-kmp = %{kbaseversion}-%{kbaserelease}
 %endif
 
 Version:            %{kbaseversion}
@@ -5477,13 +5510,15 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
-Requires:           kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
-Requires:           %{kernel_develop} = %{epoch}:%{kbaseversion}-%{kbaserelease}
+%if %{HAVE_supplements}
+Supplements:        kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
+%endif
+Requires:           %{kernel_develop} = %{kbaseversion}-%{kbaserelease}
 
-Provides:           %{name}-devel-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-devel-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-devel-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-devel-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-devel-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-devel-kernel = %{baseversion}-%{rpmrelease}
 
 Version:            %{lbaseversion}
 Release:            %{lbaserelease}
@@ -5521,31 +5556,31 @@ Autoprov:           true
 
 # kernel debug info is useless without the kernel modules it debugs
 %if %{NEED_kmod}
-Requires:           %{name}-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
+%{Enhances}:        %{kernel_package} = %{kbaseversion}-%{kbaserelease}
 %endif
 
 %if %{NEED_lbug}
 %else
-Provides:           %{name}-debuginfo-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debuginfo-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debuginfo-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-debuginfo-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-debuginfo-kernel = %{baseversion}-%{rpmrelease}
 %endif
-Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-debuginfo-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debuginfo-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debuginfo-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-debuginfo-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-debuginfo-%{_kversion} = %{baseversion}-%{rpmrelease}
 
 %if %{HAVE_rhatkmps}
 Provides:           kernel-debug = %{_kversion}
-Provides:           kmod-%{name}-debuginfo = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debuginfo-kmod = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Provides:           kmod-%{name}-debuginfo = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debuginfo-kmod = %{kbaseversion}-%{kbaserelease}
 %endif
 
 %if %{HAVE_susekmps}
 Provides:           multiversion(kernel)
-Provides:           %{name}-debuginfo-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debuginfo-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debuginfo-kmp%{kernel_flavor} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debuginfo-kmp = %{kbaseversion}-%{kbaserelease}
 %endif
 
 Version:            %{kbaseversion}
@@ -5581,13 +5616,15 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
-Requires:           kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
-Requires:           %{kernel_buginfo} = %{epoch}:%{kbaseversion}-%{kbaserelease}
+%if %{HAVE_supplements}
+Supplements:        kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
+%endif
+Requires:           %{kernel_buginfo} = %{kbaseversion}-%{kbaserelease}
 
-Provides:           %{name}-debuginfo-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-debuginfo-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debuginfo-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debuginfo-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-debuginfo-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-debuginfo-kernel = %{baseversion}-%{rpmrelease}
 
 Version:            %{lbaseversion}
 Release:            %{lbaserelease}
@@ -5623,30 +5660,30 @@ Autoprov:           true
 %endif
 
 # kernel debug source is useless without the kernel debug info
-Requires:           %{name}-debuginfo-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
+%{Enhances}:        %{kernel_buginfo} = %{kbaseversion}-%{kbaserelease}
 
 %if %{NEED_lbug}
 %else
-Provides:           %{name}-debugsource-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debugsource-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debugsource-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-debugsource-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-debugsource-kernel = %{baseversion}-%{rpmrelease}
 %endif
-Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-debugsource-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debugsource-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debugsource-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-debugsource-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-debugsource-%{_kversion} = %{baseversion}-%{rpmrelease}
 
 %if %{HAVE_rhatkmps}
 Provides:           kernel-debug = %{_kversion}
-Provides:           kmod-%{name}-debugsource = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debugsource-kmod = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Provides:           kmod-%{name}-debugsource = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debugsource-kmod = %{kbaseversion}-%{kbaserelease}
 %endif
 
 %if %{HAVE_susekmps}
 Provides:           multiversion(kernel)
-Provides:           %{name}-debugsource-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debugsource-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debugsource-kmp%{kernel_flavor} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debugsource-kmp = %{kbaseversion}-%{kbaserelease}
 %endif
 
 Version:            %{kbaseversion}
@@ -5681,13 +5718,15 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
-Requires:           kernel%{kernel_series}-source-latest = %{kernel_number}
-Requires:           %{kernel_bugsrce} = %{epoch}:%{kbaseversion}-%{kbaserelease}
+%if %{HAVE_supplements}
+Supplements:        kernel%{kernel_series}-source-latest = %{kernel_number}
+%endif
+Requires:           %{kernel_bugsrce} = %{kbaseversion}-%{kbaserelease}
 
-Provides:           %{name}-debugsource-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-debugsource-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-debugsource-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debugsource-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-debugsource-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-debugsource-kernel = %{baseversion}-%{rpmrelease}
 
 Version:            %{lbaseversion}
 Release:            %{lbaserelease}
@@ -5729,34 +5768,34 @@ Obsoletes:          kmod%{kernel_flavor}-source
 Obsoletes:          kernel-module-%{name}-source%{kernel_flavor}
 Obsoletes:          %{name}-source-kmod%{kernel_flavor}
 
-%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "Requires: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
+%((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%{Enhnaces}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 
 %if %{NEED_virt}
-Requires:           %{name} = %{epoch}:%{baseversion}-%{baserelease}
+Requires:           %{name} = %{baseversion}-%{baserelease}
 %endif
 
 %if %{NEED_lsrc}
 %else
-Provides:           %{name}-source-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-source-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-source-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-source-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-source-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-source-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-source-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-source-kernel = %{baseversion}-%{rpmrelease}
 %endif
-Provides:           %{name}-source-%{_kversion} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-source-%{_kversion} = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-source-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-source-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-source-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-source-%{_kversion} = %{baseversion}-%{rpmrelease}
 
 %if %{HAVE_rhatkmps}
 Provides:           kernel-source = %{_kversion}
-Provides:           kmod-%{name}-source = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-source-kmod = %{epoch}:%{baseversion}-%{specrelease}
+Provides:           kmod-%{name}-source = %{baseversion}-%{specrelease}
+Provides:           %{name}-source-kmod = %{baseversion}-%{specrelease}
 %endif
 
 %if %{HAVE_susekmps}
 Provides:           multiversion(kernel)
-Provides:           %{name}-source-kmp%{kernel_flavor} = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-source-kmp = %{epoch}:%{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-source-kmp%{kernel_flavor} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-source-kmp = %{kbaseversion}-%{kbaserelease}
 %endif
 
 Version:            %{kbaseversion}
@@ -5798,13 +5837,15 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
-Requires:           kernel%{kernel_series}-source-latest = %{kernel_number}
-Requires:           %{kernel_sourcep} = %{epoch}:%{kbaseversion}-%{kbaserelease}
+%if %{HAVE_supplements}
+Supplements:        kernel%{kernel_series}-source-latest = %{kernel_number}
+%endif
+Requires:           %{kernel_sourcep} = %{kbaseversion}-%{kbaserelease}
 
-Provides:           %{name}-source-kernel = %{epoch}:%{kbaseversion}-%{kbaserelease}
-Provides:           %{name}-source-kernel = %{epoch}:%{baseversion}-%{specrelease}
-Provides:           %{name}-source-kernel = %{epoch}:%{baseversion}-%{baserelease}
-Provides:           %{name}-source-kernel = %{epoch}:%{baseversion}-%{rpmrelease}
+Provides:           %{name}-source-kernel = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-source-kernel = %{baseversion}-%{specrelease}
+Provides:           %{name}-source-kernel = %{baseversion}-%{baserelease}
+Provides:           %{name}-source-kernel = %{baseversion}-%{rpmrelease}
 
 Version:            %{lbaseversion}
 Release:            %{lbaserelease}
@@ -5873,7 +5914,7 @@ Requires(postun):   /usr/bin/rebuild-jar-repository
 
 # Requirements will be automatic.
 #if %{NEED_lib}
-#equires:           %{name}-lib     = %{epoch}:%{baseversion}-%{baserelease}
+#equires:           %{name}-lib     = %{baseversion}-%{baserelease}
 #endif
 
 Release:            %{specrelease}
@@ -6022,7 +6063,7 @@ Prefix:         %{_pkgjavadocdir}
 %endif
 
 %if %{NEED_virt}
-Requires:           %{name}         = %{epoch}:%{baseversion}-%{baserelease}
+Requires:           %{name}         = %{baseversion}-%{baserelease}
 %endif
 
 Release:        %{specrelease}

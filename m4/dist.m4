@@ -452,7 +452,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	if test -z "$dist_cv_build_cpu" ; then dist_cv_build_cpu=$build_cpu ; fi
     ])
     AC_CACHE_CHECK([for dist build arch], [dist_cv_build_arch], [dnl
-	if "`basename ${dist_cv_build_rel_file:-no}`" = debian_version ; then
+	if test "`basename ${dist_cv_build_rel_file:-no}`" = debian_version ; then
 	    if test -z "$dist_cv_build_arch" -a :${DEB_BUILD_ARCH+set} = :set ; then
 		dist_cv_build_arch="$DEB_BUILD_ARCH"
 	    fi
@@ -699,7 +699,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	if test -z "$dist_cv_host_cpu" ; then dist_cv_host_cpu=$host_cpu ; fi
     ])
     AC_CACHE_CHECK([for dist host arch], [dist_cv_host_arch], [dnl
-	if "`basename ${dist_cv_host_rel_file:-no}`" = debian_version ; then
+	if test "`basename ${dist_cv_host_rel_file:-no}`" = debian_version ; then
 	    if test -z "$dist_cv_host_arch" -a :${DEB_HOST_ARCH+set} = :set ; then
 		dist_cv_host_arch="$DEB_HOST_ARCH"
 	    fi
