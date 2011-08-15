@@ -64,6 +64,11 @@ lib32_LTLIBRARIES		=
 syslib_LTLIBRARIES		=
 syslib32_LTLIBRARIES		=
 
+install_libs			= install-libLTLIBRARIES \
+				  install-lib32LTLIBRARIES
+
+$(install_libs): install-%LTLIBRARIES: install-sys%LTLIBRARIES
+
 pkglibexec32_PROGRAMS		=
 
 if PKG_BUILD_ARCH
