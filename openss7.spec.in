@@ -663,6 +663,8 @@
 %{!?_snmpconfdir:       %{expand: %%global _snmpconfdir     %%{_sysconfdir}/snmp}}
 %{!?_lib32dir:          %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
 %{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
+%{!?_syslib32dir:       %{expand: %%global _syslib32dir     /lib}}
+%{!?_syslibdir:         %{expand: %%global _syslibdir       %%(echo %%{_libdir} | sed 's,/usr,,')}}
 %{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
 %{!?_gcjdir:            %{expand: %%global _gcjdir          %%{_libdir}/gcj}}
 %{!?_pkggcjdir:         %{expand: %%global _pkggcjdir       %%{_gcjdir}/%%{name}}}
@@ -2250,7 +2252,7 @@ BuildRequires:    @BZIP2_CMD@
 # This is a virtual package that we want to pull in all the necessary
 # packages for a full run-time system.
 %if %{NEED_repo}
-%{Recommends}:      %{name}-repo
+Requires:           %{name}-repo
 %endif
 %if %{NEED_base}
 Requires:           %{name}-base    = %{baseversion}
@@ -3328,13 +3330,13 @@ Requires:           dev >= 3.3
 #endif
 
 %if %{HAVE_testfiles}
-%{Recommends}:      %{_pkglibexecdir}/test-streams
+Requires:           %{_pkglibexecdir}/test-streams
 %endif
 #if %{NEED_lib}
 #equires:           %{name}-lib     = %{baseversion}-%{baserelease}
 #endif
 %if %{HAVE_test32files}
-%{Recommends}:      %{_pkglibexec32dir}/test-streams
+Requires:           %{_pkglibexec32dir}/test-streams
 %endif
 #if %{NEED_compat}
 #equires:           %{name}-compat  = %{baseversion}-%{baserelease}
@@ -3343,6 +3345,10 @@ Requires:           dev >= 3.3
 Provides:           %{name}-base = %{baseversion}-%{specrelease}
 Provides:           %{name}-base = %{baseversion}-%{baserelease}
 Provides:           %{name}-base = %{baseversion}-%{rpmrelease}
+
+%if %{HAVE_suggests}
+Suggests:           %{name}-doc = %{baseversion}-%{baserelease}
+%endif
 
 Release:            %{specrelease}
 
@@ -4006,6 +4012,7 @@ Prefix:             %{_sbindir}
 %endif
 %if %{FILES_libraries}
 Prefix:             %{_libdir}
+Prefix:             %{_syslibdir}
 %endif
 #if %{FILES_lib32compat}
 #refix:             %{_lib32dir}
@@ -4052,12 +4059,16 @@ Requires(post):     %(which tclsh 2>/dev/null)
 
 # these libraries need some kernel modules to be useful
 %if %{NEED_kmod}
-%{Recommends}:      %{name}-kernel  = %{baseversion}-%{baserelease}
+Requires:           %{name}-kernel  = %{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-lib     = %{baseversion}-%{specrelease}
 Provides:           %{name}-lib     = %{baseversion}-%{baserelease}
 Provides:           %{name}-lib     = %{baseversion}-%{rpmrelease}
+
+%if %{HAVE_suggests}
+Suggests:           %{name}-doc     = %{baseversion}-%{baserelease}
+%endif
 
 Release:            %{specrelease}
 
@@ -4108,8 +4119,10 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 %if %{FILES_libraries}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
 	libtool --mode=finish %{_libdir} || :
+	libtool --mode=finish %{_syslibdir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_libdir} || :
+	ldconfig -n %{_syslibdir} || :
     fi
 %endif
 %if %{FILES_netconfig}
@@ -4315,8 +4328,10 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
 %if %{FILES_libraries}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
 	libtool --mode=finish %{_libdir} || :
+	libtool --mode=finish %{_syslibdir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_libdir} || :
+	ldconfig -n %{_syslibdir} || :
     fi
 %endif
 %if %{FILES_netconfig}
@@ -4538,6 +4553,8 @@ fi
 %{?files_sbinfiles:%{_sbindir}/*}
 %{?files_libraries:%{_libdir}/*.so*}
 %{?files_libraries:%{_libdir}/*.la}
+%{?files_libraries:%{_syslibdir}/*.so*}
+%{?files_libraries:%{_syslibdir}/*.la}
 #{?files_lib32compat:%{_lib32dir}/*.so*}
 #{?files_lib32compat:%{_lib32dir}/*.la}
 #{?files_netconfig:%config(noreplace) %{_sysconfdir}/netconfig.xnsl}
@@ -4581,6 +4598,7 @@ Autoprov:           true
 
 %if %{FILES_lib32compat}
 Prefix:             %{_lib32dir}
+Prefix:             %{_syslib32dir}
 %endif
 %if %{FILES_test32files}
 Prefix:             %{_pkglibexec32dir}
@@ -4598,12 +4616,16 @@ Requires(postun):   /usr/bin/libtool
 
 # these libraries need some kernel modules to be useful
 %if %{NEED_kmod}
-%{Recommends}:      %{name}-kernel  = %{baseversion}-%{baserelease}
+Requires:           %{name}-kernel  = %{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-compat  = %{baseversion}-%{specrelease}
 Provides:           %{name}-compat  = %{baseversion}-%{baserelease}
 Provides:           %{name}-compat  = %{baseversion}-%{rpmrelease}
+
+%if %{HAVE_suggests}
+Suggests:           %{name}-doc = %{baseversion}-%{baserelease}
+%endif
 
 Release:            %{specrelease}
 
@@ -4623,8 +4645,10 @@ developed for %{title}.  Also included are 32-bit test utilities for the
 if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     if   [ -x "`which libtool 2>/dev/null`" ]; then
 	libtool --mode=finish %{_lib32dir} || :
+	libtool --mode=finish %{_syslib32dir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_lib32dir} || :
+	ldconfig -n %{_syslib32dir} || :
     fi
 fi
 %endif
@@ -4635,8 +4659,10 @@ fi
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     if   [ -x "`which libtool 2>/dev/null`" ]; then
 	libtool --mode=finish %{_lib32dir} || :
+	libtool --mode=finish %{_syslib32dir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_lib32dir} || :
+	ldconfig -n %{_syslib32dir} || :
     fi
 fi
 %endif
@@ -4647,6 +4673,8 @@ fi
 %defattr(-,root,root)
 %{?files_lib32compat:%{_lib32dir}/*.so*}
 %{?files_lib32compat:%{_lib32dir}/*.la}
+%{?files_lib32compat:%{_syslib32dir}/*.so*}
+%{?files_lib32compat:%{_syslib32dir}/*.la}
 %{?files_test32files:%{_pkglibexec32dir}/%{testfiles}}
 %endif
 
@@ -4669,9 +4697,11 @@ Prefix:             %{_includedir}/%{name}
 %endif
 %if %{FILES_libstatic}
 Prefix:             %{_libdir}
+Prefix:             %{_syslibdir}
 %endif
 %if %{FILES_lib32static}
 Prefix:             %{_lib32dir}
+Prefix:             %{_syslib32dir}
 %endif
 #if %{FILES_debugfiles}
 #{?files_binaries:Prefix:               %{_usrsrc}/debug}
@@ -4683,12 +4713,18 @@ Conflicts:          texinfo < 3.11
 
 # development info is somewhat useless without kernel module develoment info
 %if %{NEED_kdev}
-%{Recommends}:      %{name}-devel-kernel = %{baseversion}-%{baserelease}
+Requires:           %{name}-devel-kernel = %{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-devel = %{baseversion}-%{specrelease}
 Provides:           %{name}-devel = %{baseversion}-%{baserelease}
 Provides:           %{name}-devel = %{baseversion}-%{rpmrelease}
+
+%if %{HAVE_suggests}
+Suggests:           %{name}-doc = %{baseversion}-%{baserelease}
+Suggests:           %{name}-debuginfo = %{baseversion}-%{baserelease}
+Suggests:           %{name}-debugsource = %{baseversion}-%{baserelease}
+%endif
 
 Release:            %{specrelease}
 
@@ -4737,7 +4773,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
             fi
         done
     }
-    for d in /lib /usr/lib /usr/local/lib %{_libdir} ; do
+    for d in /lib /usr/lib /usr/local/lib %{_libdir} %{_syslibdir} ; do
         for subdir in / /LiS/ /lis/ /streams/ /strxnet/ ; do
             if [ -d $d${subdir} ] ; then
                 pre_remove_warn_files $d${subdir}libLiS.a $d${subdir}libpLiS.a $d${subdir}libstreams.a $d${subdir}libxnet.a $d${subdir}libxti.a
@@ -4757,7 +4793,9 @@ fi
 %{?files_includes:%dir %{_includedir}/%{name}}
 %{?files_includes:%{_includedir}/%{name}/*}
 %{?files_libstatic:%{_libdir}/*.a}
+%{?files_libstatic:%{_syslibdir}/*.a}
 %{?files_lib32static:%{_lib32dir}/*.a}
+%{?files_lib32static:%{_syslib32dir}/*.a}
 #{?files_debugfiles:%{?files_binaries: %{_usrsrc}/debug}}
 #{?files_debugfiles:%{?files_binaries: %{?_lib32dir:%{_lib32dir}/debug}}}
 #{?files_debugfiles:%{?files_binaries: %{!?_lib32dir:%{_libdir}/debug}}}
@@ -4784,12 +4822,16 @@ Autoprov:           true
 
 # debugging info is somewhat useless without kernel module debugging info
 %if %{NEED_kbug}
-%{Recommends}:      %{name}-debuginfo-kernel = %{baseversion}-%{baserelease}
+Requires:           %{name}-debuginfo-kernel = %{baseversion}-%{baserelease}
 %endif
 
 Provides:           %{name}-debuginfo = %{baseversion}-%{specrelease}
 Provides:           %{name}-debuginfo = %{baseversion}-%{baserelease}
 Provides:           %{name}-debuginfo = %{baseversion}-%{rpmrelease}
+
+%if %{HAVE_suggests}
+Suggests:           %{name}-debugsource = %{baseversion}-%{baserelease}
+%endif
 
 Release:            %{specrelease}
 
@@ -4827,7 +4869,7 @@ Autoprov:           true
 %endif
 
 # debugging source is uesless without debugging info
-%{Recommends}:      %{name}-debuginfo = %{baseversion}-%{baserelease}
+Requires:           %{name}-debuginfo = %{baseversion}-%{baserelease}
 # debugging source is somewhat useless without kernel module debugging source
 %if %{NEED_kbug}
 %{Recommends}:      %{name}-debugsource-kernel = %{baseversion}-%{baserelease}
@@ -4904,11 +4946,11 @@ Autoprov:           true
 Prefix:             %{_kmoduledir}/%{_ksubdir}
 %endif
 
-Obsoletes:          %{name}-kernel
-Obsoletes:          %{name}-kmp%{kernel_flavor}
-Obsoletes:          kmod%{kernel_flavor}
-Obsoletes:          kernel-module-%{name}%{kernel_flavor}
-Obsoletes:          %{name}-kmod%{kernel_flavor}
+#bsoletes:          %{name}-kernel
+#bsoletes:          %{name}-kmp%{kernel_flavor}
+#bsoletes:          kmod%{kernel_flavor}
+#bsoletes:          kernel-module-%{name}%{kernel_flavor}
+#bsoletes:          %{name}-kmod%{kernel_flavor}
 
 # SuSE puts lsof in /usr/bin
 Requires(pre):      lsof
@@ -4964,12 +5006,16 @@ Requires(postun):   lsof
 %endif
 %endif
 
+%if %{HAVE_urpmirepo}
+# URPMI hates this dependency.  This is the circular dependency point.
+%else
 %if %{NEED_base}
 Requires(prereq):   %{name}-base    = %{baseversion}-%{baserelease}
 Requires(pre):      %{name}-base    = %{baseversion}-%{baserelease}
 Requires(post):     %{name}-base    = %{baseversion}-%{baserelease}
 Requires(preun):    %{name}-base    = %{baseversion}-%{baserelease}
 Requires(postun):   %{name}-base    = %{baseversion}-%{baserelease}
+%endif
 %endif
 
 %if %{NEED_lmod}
@@ -5379,11 +5425,11 @@ Prefix:             %{_includedir}/%{name}/%{kernel_version}
 #{?files_modules:%{!?_lib32dir:Prefix: %{_libdir}/debug}}
 #endif
 
-Obsoletes:          %{name}-devel-kernel
-Obsoletes:          %{name}-kmp%{kernel_flavor}-devel
-Obsoletes:          kmod%{kernel_flavor}-devel
-Obsoletes:          kernel-module-%{name}-devel%{kernel_flavor}
-Obsoletes:          %{name}-devel-kmod%{kernel_flavor}
+#bsoletes:          %{name}-devel-kernel
+#bsoletes:          %{name}-kmp%{kernel_flavor}-devel
+#bsoletes:          kmod%{kernel_flavor}-devel
+#bsoletes:          kernel-module-%{name}-devel%{kernel_flavor}
+#bsoletes:          %{name}-devel-kmod%{kernel_flavor}
 
 # The development package requires that the actual kernel be installed so that
 # /boot/System.map-%{_kversion} is available.  Also, the specific kernel
@@ -5429,6 +5475,10 @@ Provides:           %{name}-devel-kmod = %{kspecversion}-%{kspecrelease}
 Provides:           multiversion(kernel)
 Provides:           %{name}-devel-kmp%{kernel_flavor} = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-devel-kmp = %{kbaseversion}-%{kbaserelease}
+%endif
+
+%if %{HAVE_suggests}
+Suggests:           %{kernel_buginfo} = %{kbaseversion}-%{kbaserelease}
 %endif
 
 Version:            %{kbaseversion}
@@ -5581,6 +5631,10 @@ Provides:           %{name}-debuginfo-kmod = %{kbaseversion}-%{kbaserelease}
 Provides:           multiversion(kernel)
 Provides:           %{name}-debuginfo-kmp%{kernel_flavor} = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debuginfo-kmp = %{kbaseversion}-%{kbaserelease}
+%endif
+
+%if %{HAVE_suggests}
+Suggests:           %{kernel_bugsrce} = %{kbaseversion}-%{kbaserelease}
 %endif
 
 Version:            %{kbaseversion}
@@ -5762,11 +5816,11 @@ Prefix:             %{_usrsrc}/%{name}
 Prefix:             %{_usrsrc}/%{name}-%{baseversion}-%{specrelease}
 %endif
 
-Obsoletes:          %{name}-source-kernel
-Obsoletes:          %{name}-kmp%{kernel_flavor}-source
-Obsoletes:          kmod%{kernel_flavor}-source
-Obsoletes:          kernel-module-%{name}-source%{kernel_flavor}
-Obsoletes:          %{name}-source-kmod%{kernel_flavor}
+#bsoletes:          %{name}-source-kernel
+#bsoletes:          %{name}-kmp%{kernel_flavor}-source
+#bsoletes:          kmod%{kernel_flavor}-source
+#bsoletes:          kernel-module-%{name}-source%{kernel_flavor}
+#bsoletes:          %{name}-source-kmod%{kernel_flavor}
 
 %((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%{Enhnaces}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 
@@ -5916,6 +5970,11 @@ Requires(postun):   /usr/bin/rebuild-jar-repository
 #if %{NEED_lib}
 #equires:           %{name}-lib     = %{baseversion}-%{baserelease}
 #endif
+
+%if %{HAVE_suggests}
+Suggests:           %{name}-javadoc = %{baseversion}-%{baserelease}
+%endif
+
 
 Release:            %{specrelease}
 

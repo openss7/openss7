@@ -837,6 +837,7 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
     lib32dir="$libdir"
     pkglib32dir="$pkglibdir"
     pkglibexec32dir="$pkglibexecdir"
+    syslib32dir="$syslibdir"
     case $host_cpu in
 	(*64)
 	    lib64dir=`echo $libdir | sed -r -e 's|\<lib\>|lib64|g'`
@@ -844,6 +845,9 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
 	    libdir="$lib64dir"
 	    pkglib32dir='${lib32dir}/${PACKAGE}'
 	    pkglibexec32dir='${pkglibexecdir}/lib32'
+	    syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib64|g'`
+	    syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`
+	    syslibdir="$syslib64dir"
 	    have_32bit_libs=yes
 	    ;;
     esac
@@ -859,6 +863,7 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
     AC_SUBST([lib32dir])dnl
     AC_SUBST([pkglib32dir])dnl
     AC_SUBST([pkglibexec32dir])dnl
+    AC_SUBST([syslib32dir])dnl
 ])# _DISTRO_ADJUST_64BIT_LIBDIR
 # =============================================================================
 

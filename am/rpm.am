@@ -3136,9 +3136,9 @@ release-update-aptrpm:
 				for comp in $$comps ; do \
 					for fn in pkglist srclist release ; do \
 						for ext in '' .gz .bz2 .lzma .xz ; do \
-							f="$$fn.$$comp$$ext" ; \
-							test -s $$f || continue ; \
-							$(ECHO) " `md5sum $$f | awk '{print$$1}'` `wc -c $$f | awk '{print$$1}'` base/$$f" ; \
+							file="$$fn.$$comp$$ext" ; \
+							test -s $$file || continue ; \
+							$(ECHO) " `md5sum $$file | awk '{print$$1}'` `wc -c $$file | awk '{print$$1}'` base/$$file" ; \
 						done ; \
 					done ; \
 				done ; \
@@ -3178,8 +3178,8 @@ release-update-aptrpm:
 							name=`rpm -ql --qf '%NAME\n' -p $$r 2>/dev/null` ; \
 							test -n "$$name" || continue ; \
 							$(ECHO) "rpm -qlp $$r" >&2 ; \
-							rpm -qlp $$r 2>/dev/null | while read f ; do \
-								$(ECHO) -e "$$f\t$$name" ; \
+							rpm -qlp $$r 2>/dev/null | while read file ; do \
+								$(ECHO) -e "$$file\t$$name" ; \
 							done ; \
 						done ; \
 					fi ; \

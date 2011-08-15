@@ -283,6 +283,7 @@ debian/@PACKAGE@-lib.conffiles:
 
 bindir		= @bindir@
 libdir		= @libdir@
+syslibdir	= @syslibdir@
 perldir		= @perldir@
 tcllibdir	= @tcllibdir@
 pkgtcllibdir	= ${tcllibdir}/$(PACKAGE_NAME)$(PACKAGE_VERSION)
@@ -300,6 +301,8 @@ debian/@PACKAGE@-lib.install:
 	  [ ! -d '$(debtmpdir)$(sbindir)'				] || echo '$(debtmpdir)$(sbindir)/*' ; \
 	  [ ! -d '$(debtmpdir)$(libdir)'				] || echo '$(debtmpdir)$(libdir)/*.so*' ; \
 	  [ ! -d '$(debtmpdir)$(libdir)'				] || echo '$(debtmpdir)$(libdir)/*.la' ; \
+	  [ ! -d '$(debtmpdir)$(syslibdir)'				] || echo '$(debtmpdir)$(syslibdir)/*.so*' ; \
+	  [ ! -d '$(debtmpdir)$(syslibdir)'				] || echo '$(debtmpdir)$(syslibdir)/*.la' ; \
 	  [ ! -d '$(debtmpdir)$(perldir)/auto/Xti'			] || echo '$(debtmpdir)$(perldir)/auto/Xti/*' ; \
 	  [ ! -f '$(debtmpdir)$(pkgtcllibdir)/pkgIndex.tcl'		] || echo '$(debtmpdir)$(pkgtcllibdir)/pkgIndex.tcl' ; \
 	  [ ! -d '$(debtmpdir)$(pkgtcllibdir)/xti'			] || echo '$(debtmpdir)$(pkgtcllibdir)/xti/*.tcl' ; \
@@ -323,6 +326,7 @@ debian/@PACKAGE@-lib.install:
 
 lib32dir	= @lib32dir@
 pkglibexec32dir	= @pkglibexec32dir@
+syslib32dir	= @syslib32dir@
 
 @WITH_32BIT_LIBS_TRUE@control_t	+= debian/@PACKAGE@-compat.postinst \
 @WITH_32BIT_LIBS_TRUE@		   debian/@PACKAGE@-compat.postrm \
@@ -332,6 +336,8 @@ pkglibexec32dir	= @pkglibexec32dir@
 @WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-compat.install:
 @WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(lib32dir)'		] || echo '$(debtmpdir)$(lib32dir)/*.so*' ; \
 @WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(lib32dir)'		] || echo '$(debtmpdir)$(lib32dir)/*.la' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(syslib32dir)'		] || echo '$(debtmpdir)$(syslib32dir)/*.so*' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(syslib32dir)'		] || echo '$(debtmpdir)$(syslib32dir)/*.la' ; \
 @WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(pkglibexec32dir)'	] || echo '$(debtmpdir)$(pkglibexec32dir)/*test*' ; \
 @WITH_32BIT_LIBS_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
@@ -349,12 +355,15 @@ pkgincludedir	= $(includedir)/@PACKAGE@
 @WITH_32BIT_LIBS_TRUE@debian/@PACKAGE@-devel.install:
 @WITH_32BIT_LIBS_TRUE@	( [ ! -d '$(debtmpdir)$(pkgincludedir)'	] || echo '$(debtmpdir)$(pkgincludedir)/*' ; \
 @WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(libdir)'		] || echo '$(debtmpdir)$(libdir)/*.a' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(syslibdir)'		] || echo '$(debtmpdir)$(syslibdir)/*.a' ; \
 @WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(lib32dir)'		] || echo '$(debtmpdir)$(lib32dir)/*.a' ; \
+@WITH_32BIT_LIBS_TRUE@	  [ ! -d '$(debtmpdir)$(syslib32dir)'		] || echo '$(debtmpdir)$(syslib32dir)/*.a' ; \
 @WITH_32BIT_LIBS_TRUE@	) $(am__debian_install_format) | sort -u > $@
 
 @WITH_32BIT_LIBS_FALSE@debian/@PACKAGE@-devel.install:
 @WITH_32BIT_LIBS_FALSE@	( [ ! -d '$(debtmpdir)$(pkgincludedir)'	] || echo '$(debtmpdir)$(pkgincludedir)/*' ; \
 @WITH_32BIT_LIBS_FALSE@	  [ ! -d '$(debtmpdir)$(libdir)'		] || echo '$(debtmpdir)$(libdir)/*.a' ; \
+@WITH_32BIT_LIBS_FALSE@	  [ ! -d '$(debtmpdir)$(syslibdir)'		] || echo '$(debtmpdir)$(syslibdir)/*.a' ; \
 @WITH_32BIT_LIBS_FALSE@	) $(am__debian_install_format) | sort -u > $@
 
 ##
