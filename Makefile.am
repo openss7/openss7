@@ -106,6 +106,10 @@ lib_LTLIBRARIES			=
 
 lib32_LTLIBRARIES		=
 
+syslib_LTLIBRARIES		=
+
+syslib32_LTLIBRARIES		=
+
 snmpdlmod_LTLIBRARIES		=
 
 ## PKG_BUILD_USER
@@ -1051,7 +1055,7 @@ LIB_INCLUDES			= -I$(top_builddir)/src/lib -I$(top_srcdir)/src/lib $(PKG_INCLUDE
 
 ## =====================================================================
 
-lib_LTLIBRARIES			+= libstreams.la
+syslib_LTLIBRARIES		+= libstreams.la
 
 libstreams_la_SOURCES		= src/lib/testcancel.c \
 				  src/lib/putpmsg.c \

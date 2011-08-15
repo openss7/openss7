@@ -61,6 +61,8 @@ AM_CPPFLAGS = -I. -I$(top_builddir) -I$(srcdir)
 
 lib_LTLIBRARIES			=
 lib32_LTLIBRARIES		=
+syslib_LTLIBRARIES		=
+syslib32_LTLIBRARIES		=
 
 pkglibexec32_PROGRAMS		=
 
@@ -720,7 +722,7 @@ LIB_INCLUDES			= -I$(top_builddir)/src/lib -I$(top_srcdir)/src/lib $(PKG_INCLUDE
 
 ## =====================================================================
 
-lib32_LTLIBRARIES		+= libstreams.la
+syslib32_LTLIBRARIES		+= libstreams.la
 
 libstreams_la_SOURCES		= $(top_srcdir)/src/lib/testcancel.c \
 				  $(top_srcdir)/src/lib/putpmsg.c \

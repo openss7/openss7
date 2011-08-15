@@ -304,6 +304,12 @@ dnl
     AC_SUBST([tcllibdir])dnl
     if test :"${tclsrcdir+set}" != :set ; then tclsrcdir='${datarootdir}' ; fi
     AC_SUBST([tclsrcdir])dnl
+    if test :"${syslibdir+set}" != :set ; then syslibdir='${rootdir}/lib' ; fi
+    AC_SUBST([syslibdir])dnl
+    if test :"${sysbindir+set}" != :set ; then sysbindir='${rootdir}/bin' ; fi
+    AC_SUBST([sysbindir])dnl
+    if test :"${syssbindir+set}" != :set ; then syssbindir='${rootdir}/sbin' ; fi
+    AC_SUBST([syssbindir])dnl
 dnl
 dnl Need to check this before libtool gets done
 dnl
