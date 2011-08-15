@@ -112,6 +112,11 @@ syslib32_LTLIBRARIES		=
 
 snmpdlmod_LTLIBRARIES		=
 
+install_libs			= install-libLTLIBRARIES \
+				  install-lib32LTLIBRARIES
+
+$(install_libs): install-%LTLIBRARIES: install-sys%LTLIBRARIES
+
 ## PKG_BUILD_USER
 endif
 
