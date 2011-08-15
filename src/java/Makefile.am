@@ -329,7 +329,7 @@ CLEAN_LOCAL += clean-javax_jain
 
 nodist_lib_javax_jain_la_SOURCES = javax-jain.jar
 lib_javax_jain_la_LIBADD	 =
-lib_javax_jain_la_LDFLAGS	 = -module -export-dynamic -release $(VERSION) -shared
+lib_javax_jain_la_LDFLAGS	 = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_javax_jain_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -403,7 +403,7 @@ CLEAN_LOCAL += clean-javax_jain_ss7
 
 nodist_lib_javax_jain_ss7_la_SOURCES = javax-jain-ss7.jar
 lib_javax_jain_ss7_la_LIBADD	     =
-lib_javax_jain_ss7_la_LDFLAGS	     = -module -export-dynamic -release $(VERSION) -shared
+lib_javax_jain_ss7_la_LDFLAGS	     = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_javax_jain_ss7_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -468,7 +468,7 @@ CLEAN_LOCAL	+= clean-javax_jain_protocol_ss7
 
 nodist_lib_javax_jain_protocol_ss7_la_SOURCES = javax-jain-protocol-ss7.jar
 lib_javax_jain_protocol_ss7_la_LIBADD	      =
-lib_javax_jain_protocol_ss7_la_LDFLAGS	      = -export-dynamic -release $(VERSION) -shared
+lib_javax_jain_protocol_ss7_la_LDFLAGS	      = $(USER_LDFLAGS) -export-dynamic -release $(VERSION) -shared
 lib_javax_jain_protocol_ss7_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -533,7 +533,7 @@ CLEAN_LOCAL	+= clean-jain
 
 nodist_lib_jain_la_SOURCES = jain.jar
 lib_jain_la_LIBADD	   =
-lib_jain_la_LDFLAGS	   = -module -export-dynamic -release $(VERSION) -shared
+lib_jain_la_LDFLAGS	   = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_jain_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -612,7 +612,7 @@ CLEAN_LOCAL += clean-jain_protocol_ss7
 
 nodist_lib_jain_protocol_ss7_la_SOURCES	= jain-protocol-ss7.jar
 lib_jain_protocol_ss7_la_LIBADD		=
-lib_jain_protocol_ss7_la_LDFLAGS	= -module -export-dynamic -release $(VERSION) -shared
+lib_jain_protocol_ss7_la_LDFLAGS	= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_jain_protocol_ss7_la_GCJFLAGS	= $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -927,7 +927,7 @@ CLEAN_LOCAL += clean-javax_jain_ss7_isup
 
 nodist_lib_javax_jain_ss7_isup_la_SOURCES = javax-jain-ss7-isup.jar
 lib_javax_jain_ss7_isup_la_LIBADD	  =
-lib_javax_jain_ss7_isup_la_LDFLAGS	  = -module -export-dynamic -release $(VERSION) -shared
+lib_javax_jain_ss7_isup_la_LDFLAGS	  = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_javax_jain_ss7_isup_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -1568,7 +1568,7 @@ CLEAN_LOCAL += clean-javax_jain_ss7_inap
 
 nodist_lib_javax_jain_ss7_inap_la_SOURCES = javax-jain-ss7-inap.jar
 lib_javax_jain_ss7_inap_la_LIBADD	  =
-lib_javax_jain_ss7_inap_la_LDFLAGS	  = -module -export-dynamic -release $(VERSION) -shared
+lib_javax_jain_ss7_inap_la_LDFLAGS	  = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_javax_jain_ss7_inap_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -1755,7 +1755,7 @@ CLEAN_LOCAL += clean-javax_jain_protocol_ss7_map
 
 nodist_lib_javax_jain_protocol_ss7_map_la_SOURCES = javax-jain-protocol-ss7-map.jar
 lib_javax_jain_protocol_ss7_map_la_LIBADD	  =
-lib_javax_jain_protocol_ss7_map_la_LDFLAGS	  = -module -export-dynamic -release $(VERSION) -shared
+lib_javax_jain_protocol_ss7_map_la_LDFLAGS	  = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_javax_jain_protocol_ss7_map_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -2000,7 +2000,7 @@ CLEAN_LOCAL += clean-javax_sip
 
 nodist_lib_javax_sip_la_SOURCES	= javax-sip.jar
 lib_javax_sip_la_LIBADD		=
-lib_javax_sip_la_LDFLAGS	= -module -export-dynamic -release $(VERSION) -shared
+lib_javax_sip_la_LDFLAGS	= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_javax_sip_la_GCJFLAGS	= $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -2090,7 +2090,7 @@ CLEAN_LOCAL += clean-javax_csapi_cc_jcc
 
 nodist_lib_javax_csapi_cc_jcc_la_SOURCES = javax-csapi-cc-jcc.jar
 lib_javax_csapi_cc_jcc_la_LIBADD	 =
-lib_javax_csapi_cc_jcc_la_LDFLAGS	 = -module -export-dynamic -release $(VERSION) -shared
+lib_javax_csapi_cc_jcc_la_LDFLAGS	 = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_javax_csapi_cc_jcc_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -2163,7 +2163,7 @@ CLEAN_LOCAL += clean-javax_jcat
 
 nodist_lib_javax_jcat_la_SOURCES = javax-jcat.jar
 lib_javax_jcat_la_LIBADD	 =
-lib_javax_jcat_la_LDFLAGS	 = -module -export-dynamic -release $(VERSION) -shared
+lib_javax_jcat_la_LDFLAGS	 = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_javax_jcat_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -2298,7 +2298,7 @@ CLEAN_LOCAL += clean-jain_protocol_ss7_tcap
 
 nodist_lib_jain_protocol_ss7_tcap_la_SOURCES = jain-protocol-ss7-tcap.jar
 lib_jain_protocol_ss7_tcap_la_LIBADD	     =
-lib_jain_protocol_ss7_tcap_la_LDFLAGS	     = -module -export-dynamic -release $(VERSION) -shared
+lib_jain_protocol_ss7_tcap_la_LDFLAGS	     = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_jain_protocol_ss7_tcap_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -2441,7 +2441,7 @@ CLEAN_LOCAL += clean-jain_protocol_ss7_oam
 
 nodist_lib_jain_protocol_ss7_oam_la_SOURCES = jain-protocol-ss7-oam.jar
 lib_jain_protocol_ss7_oam_la_LIBADD	    =
-lib_jain_protocol_ss7_oam_la_LDFLAGS	    = -module -export-dynamic -release $(VERSION) -shared
+lib_jain_protocol_ss7_oam_la_LDFLAGS	    = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 lib_jain_protocol_ss7_oam_la_GCJFLAGS	    = $(AM_GCJFLAGS) $(CNIFLAGS)
 
 if PKG_BUILD_ARCH
@@ -2817,7 +2817,7 @@ lib_org_openss7_jain_protocol_ss7_oam_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_jain_protocol_ss7_oam_la_CXXFLAGS	= $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 lib_org_openss7_jain_protocol_ss7_oam_la_GCJFLAGS	= $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 lib_org_openss7_jain_protocol_ss7_oam_la_LIBADD		= 
-lib_org_openss7_jain_protocol_ss7_oam_la_LDFLAGS	= -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_jain_protocol_ss7_oam_la_LDFLAGS	= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(lib_org_openss7_jain_protocol_ss7_oam_la_OBJECTS): org-openss7-jain-protocol-ss7-oam.jar $(my_oam_INCLUDES)
 
@@ -2835,7 +2835,7 @@ libopenss7OamCNI_la_CFLAGS	 = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7OamCNI_la_CXXFLAGS	 = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 libopenss7OamCNI_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 libopenss7OamCNI_la_LIBADD	 = $(top_builddir)/libstreams.la
-libopenss7OamCNI_la_LDFLAGS	 = -module -export-dynamic -release $(VERSION) -shared
+libopenss7OamCNI_la_LDFLAGS	 = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(libopenss7OamCNI_la_OBJECTS): org-openss7-jain-protocol-ss7-oam.jar $(my_oam_INCLUDES)
 
@@ -2890,7 +2890,7 @@ lib_org_openss7_jain_protocol_ss7_tcap_la_CFLAGS	 = $(USER_CFLAGS) $(USER_DFLAGS
 lib_org_openss7_jain_protocol_ss7_tcap_la_CXXFLAGS	 = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 lib_org_openss7_jain_protocol_ss7_tcap_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 lib_org_openss7_jain_protocol_ss7_tcap_la_LIBADD	 = $(top_builddir)/libstreams.la
-lib_org_openss7_jain_protocol_ss7_tcap_la_LDFLAGS	 = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_jain_protocol_ss7_tcap_la_LDFLAGS	 = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(lib_org_openss7_jain_protocol_ss7_tcap_la_OBJECTS): org-openss7-jain-protocol-ss7-tcap.jar $(my_jtcap_INCLUDES)
 
@@ -2908,7 +2908,7 @@ libopenss7JtcapCNI_la_CFLAGS	   = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7JtcapCNI_la_CXXFLAGS	   = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 libopenss7JtcapCNI_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 libopenss7JtcapCNI_la_LIBADD	   = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7JtcapCNI_la_LDFLAGS	   = -module -export-dynamic -release $(VERSION) -shared
+libopenss7JtcapCNI_la_LDFLAGS	   = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(libopenss7JtcapCNI_la_OBJECTS): org-openss7-jain-protocol-ss7-tcap.jar $(my_jtcap_INCLUDES)
 
@@ -2963,7 +2963,7 @@ lib_org_openss7_javax_sip_la_CFLAGS	    = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_javax_sip_la_CXXFLAGS	    = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 lib_org_openss7_javax_sip_la_GCJFLAGS	    = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 lib_org_openss7_javax_sip_la_LIBADD	    = $(top_builddir)/libstreams.la
-lib_org_openss7_javax_sip_la_LDFLAGS	    = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_javax_sip_la_LDFLAGS	    = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(lib_org_openss7_javax_sip_la_OBJECTS): org-openss7-javax-sip.jar $(my_jsip_INCLUDES)
 
@@ -2981,7 +2981,7 @@ libopenss7JsipCNI_la_CFLAGS	  = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7JsipCNI_la_CXXFLAGS	  = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 libopenss7JsipCNI_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 libopenss7JsipCNI_la_LIBADD	  = $(top_builddir)/libstreams.la
-libopenss7JsipCNI_la_LDFLAGS	  = -module -export-dynamic -release $(VERSION) -shared
+libopenss7JsipCNI_la_LDFLAGS	  = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(libopenss7JsipCNI_la_OBJECTS): org-openss7-javax-sip.jar $(my_jsip_INCLUDES)
 
@@ -3035,7 +3035,7 @@ lib_org_openss7_javax_jcat_la_CFLAGS	     = $(USER_CFLAGS) $(USER_DFLAGS)
 lib_org_openss7_javax_jcat_la_CXXFLAGS	     = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 lib_org_openss7_javax_jcat_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 lib_org_openss7_javax_jcat_la_LIBADD	     = $(top_builddir)/libstreams.la
-lib_org_openss7_javax_jcat_la_LDFLAGS	     = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_javax_jcat_la_LDFLAGS	     = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(lib_org_openss7_javax_jcat_la_OBJECTS): org-openss7-javax-jcat.jar $(my_jcat_INCLUDES) $(my_jcat_DEPENDS)
 
@@ -3053,7 +3053,7 @@ libopenss7JcatCNI_la_CFLAGS	  = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7JcatCNI_la_CXXFLAGS	  = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 libopenss7JcatCNI_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 libopenss7JcatCNI_la_LIBADD	  = $(top_builddir)/libstreams.la
-libopenss7JcatCNI_la_LDFLAGS	  = -module -export-dynamic -release $(VERSION) -shared
+libopenss7JcatCNI_la_LDFLAGS	  = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(libopenss7JcatCNI_la_OBJECTS): org-openss7-javax-jcat.jar $(my_jcat_INCLUDES)
 
@@ -3108,7 +3108,7 @@ lib_org_openss7_javax_jain_ss7_isup_la_CFLAGS	      = $(USER_CFLAGS) $(USER_DFLA
 lib_org_openss7_javax_jain_ss7_isup_la_CXXFLAGS	      = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 lib_org_openss7_javax_jain_ss7_isup_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 lib_org_openss7_javax_jain_ss7_isup_la_LIBADD	      = $(top_builddir)/libstreams.la
-lib_org_openss7_javax_jain_ss7_isup_la_LDFLAGS	      = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_javax_jain_ss7_isup_la_LDFLAGS	      = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(lib_org_openss7_javax_jain_ss7_isup_la_OBJECTS): org-openss7-javax-jain-ss7-isup.jar $(my_jisup_INCLUDES)
 
@@ -3126,7 +3126,7 @@ libopenss7JisupCNI_la_CFLAGS	   = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7JisupCNI_la_CXXFLAGS	   = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 libopenss7JisupCNI_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 libopenss7JisupCNI_la_LIBADD	   = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7JisupCNI_la_LDFLAGS	   = -module -export-dynamic -release $(VERSION) -shared
+libopenss7JisupCNI_la_LDFLAGS	   = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(libopenss7JisupCNI_la_OBJECTS): org-openss7-javax-jain-ss7-isup.jar $(my_jisup_INCLUDES)
 
@@ -3181,7 +3181,7 @@ lib_org_openss7_javax_jain_ss7_inap_la_CFLAGS	      = $(USER_CFLAGS) $(USER_DFLA
 lib_org_openss7_javax_jain_ss7_inap_la_CXXFLAGS	      = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 lib_org_openss7_javax_jain_ss7_inap_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 lib_org_openss7_javax_jain_ss7_inap_la_LIBADD	      = $(top_builddir)/libstreams.la
-lib_org_openss7_javax_jain_ss7_inap_la_LDFLAGS	      = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_javax_jain_ss7_inap_la_LDFLAGS	      = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(lib_org_openss7_javax_jain_ss7_inap_la_OBJECTS): org-openss7-javax-jain-ss7-inap.jar $(my_jinap_INCLUDES)
 
@@ -3199,7 +3199,7 @@ libopenss7JinapCNI_la_CFLAGS	   = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7JinapCNI_la_CXXFLAGS	   = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 libopenss7JinapCNI_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 libopenss7JinapCNI_la_LIBADD	   = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7JinapCNI_la_LDFLAGS	   = -module -export-dynamic -release $(VERSION) -shared
+libopenss7JinapCNI_la_LDFLAGS	   = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(libopenss7JinapCNI_la_OBJECTS): org-openss7-javax-jain-ss7-inap.jar $(my_jinap_INCLUDES)
 
@@ -3282,7 +3282,7 @@ lib_org_openss7_javax_jain_protocol_ss7_map_la_CFLAGS	      = $(USER_CFLAGS) $(U
 lib_org_openss7_javax_jain_protocol_ss7_map_la_CXXFLAGS	      = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 lib_org_openss7_javax_jain_protocol_ss7_map_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 lib_org_openss7_javax_jain_protocol_ss7_map_la_LIBADD	      = $(top_builddir)/libstreams.la
-lib_org_openss7_javax_jain_protocol_ss7_map_la_LDFLAGS	      = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_javax_jain_protocol_ss7_map_la_LDFLAGS	      = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(lib_org_openss7_javax_jain_protocol_ss7_map_la_OBJECTS): org-openss7-javax-jain-protocol-ss7-map.jar $(my_jmap_INCLUDES)
 
@@ -3300,7 +3300,7 @@ libopenss7JmapCNI_la_CFLAGS	  = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7JmapCNI_la_CXXFLAGS	  = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 libopenss7JmapCNI_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 libopenss7JmapCNI_la_LIBADD	  = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7JmapCNI_la_LDFLAGS	  = -module -export-dynamic -release $(VERSION) -shared
+libopenss7JmapCNI_la_LDFLAGS	  = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(libopenss7JmapCNI_la_OBJECTS): org-openss7-javax-jain-protocol-ss7-map.jar $(my_jmap_INCLUDES)
 
@@ -3355,7 +3355,7 @@ lib_org_openss7_javax_csapi_cc_jcc_la_CFLAGS	     = $(USER_CFLAGS) $(USER_DFLAGS
 lib_org_openss7_javax_csapi_cc_jcc_la_CXXFLAGS	     = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 lib_org_openss7_javax_csapi_cc_jcc_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 lib_org_openss7_javax_csapi_cc_jcc_la_LIBADD	     = $(top_builddir)/libstreams.la
-lib_org_openss7_javax_csapi_cc_jcc_la_LDFLAGS	     = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_javax_csapi_cc_jcc_la_LDFLAGS	     = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(lib_org_openss7_javax_csapi_cc_jcc_la_OBJECTS): org-openss7-javax-csapi-cc-jcc.jar $(my_jcc_INCLUDES)
 
@@ -3373,7 +3373,7 @@ libopenss7JccCNI_la_CFLAGS	 = $(USER_CFLAGS) $(USER_DFLAGS)
 libopenss7JccCNI_la_CXXFLAGS	 = $(LIBGCJ_CXXFLAGS) $(USER_CXXFLAGS) $(USER_DXXFLAGS)
 libopenss7JccCNI_la_GCJFLAGS	 = $(AM_GCJFLAGS) $(CNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS)
 libopenss7JccCNI_la_LIBADD	 = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7JccCNI_la_LDFLAGS	 = -module -export-dynamic -release $(VERSION) -shared
+libopenss7JccCNI_la_LDFLAGS	 = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 $(libopenss7JccCNI_la_OBJECTS): org-openss7-javax-csapi-cc-jcc.jar $(my_jcc_INCLUDES)
 
@@ -3471,7 +3471,7 @@ lib_org_openss7_streams_la_CFLAGS	  = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-
 lib_org_openss7_streams_la_CXXFLAGS	  = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
 lib_org_openss7_streams_la_GCJFLAGS	  = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_streams_la_LIBADD	  = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-lib_org_openss7_streams_la_LDFLAGS	  = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_streams_la_LDFLAGS	  = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 objectlink_objects += ${lib_org_openss7_streams_la_OBJECTS}
 my_streams_LIBFILE = lib-org-openss7-streams.la
@@ -3491,7 +3491,7 @@ libopenss7StreamsJNI_la_CFLAGS	       = $(USER_CFLAGS) -Wno-unused $(USER_DFLAGS
 libopenss7StreamsJNI_la_CXXFLAGS       = $(USER_CXXFLAGS) -Wno-unused $(USER_DXXFLAGS) -fno-strict-aliasing
 libopenss7StreamsJNI_la_GCJFLAGS       = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 libopenss7StreamsJNI_la_LIBADD	       = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7StreamsJNI_la_LDFLAGS	       = -module -export-dynamic -release $(VERSION) -shared
+libopenss7StreamsJNI_la_LDFLAGS	       = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-streams.la
@@ -3583,7 +3583,7 @@ lib_org_openss7_xti_la_CFLAGS	      = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-
 lib_org_openss7_xti_la_CXXFLAGS	      = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
 lib_org_openss7_xti_la_GCJFLAGS	      = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_xti_la_LIBADD	      = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-lib_org_openss7_xti_la_LDFLAGS	      = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_xti_la_LDFLAGS	      = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 objectlink_objects += $(lib_org_openss7_xti_la_OBJECTS)
 my_xti_LIBFILE = lib-org-openss7-xti.la
@@ -3603,7 +3603,7 @@ libopenss7XtiJNI_la_CFLAGS	   = $(USER_CFLAGS) -fno-strict-aliasing
 libopenss7XtiJNI_la_CXXFLAGS	   = $(USER_CXXFLAGS) -fno-strict-aliasing
 libopenss7XtiJNI_la_GCJFLAGS	   = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) -fno-strict-aliasing
 libopenss7XtiJNI_la_LIBADD	   = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7XtiJNI_la_LDFLAGS	   = -module -export-dynamic -release $(VERSION) -shared
+libopenss7XtiJNI_la_LDFLAGS	   = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-xti.la
@@ -3716,7 +3716,7 @@ lib_org_openss7_tcap_la_CFLAGS	       = $(USER_CFLAGS) $(USER_DFLAGS) -fno-stric
 lib_org_openss7_tcap_la_CXXFLAGS       = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
 lib_org_openss7_tcap_la_GCJFLAGS       = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_tcap_la_LIBADD	       = $(top_builddir)/libstreams.la
-lib_org_openss7_tcap_la_LDFLAGS	       = -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_tcap_la_LDFLAGS	       = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 objectlink_objects += $(lib_org_openss7_tcap_la_OBJECTS)
 my_tcap_LIBFILE = lib-org-openss7-tcap.la
@@ -3737,7 +3737,7 @@ libopenss7TcapJNI_la_CFLAGS	    = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-alia
 libopenss7TcapJNI_la_CXXFLAGS	    = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
 libopenss7TcapJNI_la_GCJFLAGS	    = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 libopenss7TcapJNI_la_LIBADD	    = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7TcapJNI_la_LDFLAGS	    = -module -export-dynamic -release $(VERSION) -shared
+libopenss7TcapJNI_la_LDFLAGS	    = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-tcap.la
@@ -3816,7 +3816,7 @@ lib_org_openss7_xtcap_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-ali
 lib_org_openss7_xtcap_la_CXXFLAGS	= $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
 lib_org_openss7_xtcap_la_GCJFLAGS	= $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 lib_org_openss7_xtcap_la_LIBADD		= $(top_builddir)/libstreams.la
-lib_org_openss7_xtcap_la_LDFLAGS	= -module -export-dynamic -release $(VERSION) -shared
+lib_org_openss7_xtcap_la_LDFLAGS	= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 objectlink_objects += $(lib_org_openss7_xtcap_la_OBJECTS)
 my_xtcap_LIBFILE = lib-org-openss7-xtcap.la
@@ -3836,7 +3836,7 @@ libopenss7XtcapJNI_la_CFLAGS	     = $(USER_CFLAGS) $(USER_DFLAGS) -fno-strict-al
 libopenss7XtcapJNI_la_CXXFLAGS	     = $(USER_CXXFLAGS) $(USER_DXXFLAGS) -fno-strict-aliasing
 libopenss7XtcapJNI_la_GCJFLAGS	     = $(AM_GCJFLAGS) $(JNIFLAGS) $(USER_GCJFLAGS) $(USER_GCDFLAGS) -fno-strict-aliasing
 libopenss7XtcapJNI_la_LIBADD	     = $(top_builddir)/libstreams.la $(top_builddir)/libxnet.la
-libopenss7XtcapJNI_la_LDFLAGS	     = -module -export-dynamic -release $(VERSION) -shared
+libopenss7XtcapJNI_la_LDFLAGS	     = $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 if PKG_BUILD_ARCH
 gcjlib_LTLIBRARIES 	+= lib-org-openss7-xtcap.la

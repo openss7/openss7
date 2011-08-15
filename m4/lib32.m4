@@ -178,12 +178,8 @@ AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
 [AS_VAR_SET(ac_Flg, no)
  AS_VAR_SET(ac_Lib, no)
  AC_MSG_RESULT([searching])
- eval "syslibdir=\"$libdir\""
- syslibdir=`echo $syslibdir | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g;s,/usr/,/,g'`
  eval "ac_search_path=\"
-    ${DESTDIR}${rootdir}${syslibdir}
     ${DESTDIR}${syslibdir}
-    ${DESTDIR}${rootdir}${libdir}
     ${DESTDIR}${libdir}\""
  ac_search_path=`echo "$ac_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
  for ac_dir in $ac_search_path ; do
@@ -243,12 +239,8 @@ AC_LINK_IFELSE([AC_LANG_CALL([$6], [$2])],
 [AS_VAR_SET(ac_Flg, no)
  AS_VAR_SET(ac_Lib, no)
  AC_MSG_RESULT([searching])
- eval "syslib32dir=\"$lib32dir\""
- syslib32dir=`echo $syslib32dir | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g;s,/usr/,/,g'`
  eval "ac_search_path=\"
-    ${DESTDIR}${rootdir}${syslib32dir}
     ${DESTDIR}${syslib32dir}
-    ${DESTDIR}${rootdir}${lib32dir}
     ${DESTDIR}${lib32dir}\""
  ac_search_path=`echo "$ac_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
  for ac_dir in $ac_search_path ; do

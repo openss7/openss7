@@ -452,7 +452,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	if test -z "$dist_cv_build_cpu" ; then dist_cv_build_cpu=$build_cpu ; fi
     ])
     AC_CACHE_CHECK([for dist build arch], [dist_cv_build_arch], [dnl
-	if "`basename ${dist_cv_build_rel_file:-no}`" = debian_version ; then
+	if test "`basename ${dist_cv_build_rel_file:-no}`" = debian_version ; then
 	    if test -z "$dist_cv_build_arch" -a :${DEB_BUILD_ARCH+set} = :set ; then
 		dist_cv_build_arch="$DEB_BUILD_ARCH"
 	    fi
@@ -699,7 +699,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	if test -z "$dist_cv_host_cpu" ; then dist_cv_host_cpu=$host_cpu ; fi
     ])
     AC_CACHE_CHECK([for dist host arch], [dist_cv_host_arch], [dnl
-	if "`basename ${dist_cv_host_rel_file:-no}`" = debian_version ; then
+	if test "`basename ${dist_cv_host_rel_file:-no}`" = debian_version ; then
 	    if test -z "$dist_cv_host_arch" -a :${DEB_HOST_ARCH+set} = :set ; then
 		dist_cv_host_arch="$DEB_HOST_ARCH"
 	    fi
@@ -837,6 +837,7 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
     lib32dir="$libdir"
     pkglib32dir="$pkglibdir"
     pkglibexec32dir="$pkglibexecdir"
+    syslib32dir="$syslibdir"
     case $host_cpu in
 	(*64)
 	    lib64dir=`echo $libdir | sed -r -e 's|\<lib\>|lib64|g'`
@@ -844,6 +845,9 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
 	    libdir="$lib64dir"
 	    pkglib32dir='${lib32dir}/${PACKAGE}'
 	    pkglibexec32dir='${pkglibexecdir}/lib32'
+	    syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib64|g'`
+	    syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`
+	    syslibdir="$syslib64dir"
 	    have_32bit_libs=yes
 	    ;;
     esac
@@ -859,6 +863,7 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
     AC_SUBST([lib32dir])dnl
     AC_SUBST([pkglib32dir])dnl
     AC_SUBST([pkglibexec32dir])dnl
+    AC_SUBST([syslib32dir])dnl
 ])# _DISTRO_ADJUST_64BIT_LIBDIR
 # =============================================================================
 

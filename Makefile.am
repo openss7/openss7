@@ -106,6 +106,10 @@ lib_LTLIBRARIES			=
 
 lib32_LTLIBRARIES		=
 
+syslib_LTLIBRARIES		=
+
+syslib32_LTLIBRARIES		=
+
 snmpdlmod_LTLIBRARIES		=
 
 ## PKG_BUILD_USER
@@ -1051,7 +1055,7 @@ LIB_INCLUDES			= -I$(top_builddir)/src/lib -I$(top_srcdir)/src/lib $(PKG_INCLUDE
 
 ## =====================================================================
 
-lib_LTLIBRARIES			+= libstreams.la
+syslib_LTLIBRARIES		+= libstreams.la
 
 libstreams_la_SOURCES		= src/lib/testcancel.c \
 				  src/lib/putpmsg.c \
@@ -1066,7 +1070,7 @@ libstreams_la_SOURCES		= src/lib/testcancel.c \
 				  src/lib/streams.h
 libstreams_la_CPPFLAGS		= $(LIB_INCLUDES)
 libstreams_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
-libstreams_la_LDFLAGS		= -version-info 0:1:0 -export-dynamic \
+libstreams_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:1:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/streams.VERSION
 
 ## =====================================================================
@@ -1080,7 +1084,7 @@ libcdiapi_la_SOURCES		= src/lib/pthread.c \
 libcdiapi_la_CPPFLAGS		= $(LIB_INCLUDES)
 libcdiapi_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libcdiapi_la_LIBADD		= libstreams.la
-libcdiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libcdiapi_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/cdiapi.VERSION
 
 ## =====================================================================
@@ -1094,7 +1098,7 @@ libdlpiapi_la_SOURCES		= src/lib/pthread.c \
 libdlpiapi_la_CPPFLAGS		= $(LIB_INCLUDES)
 libdlpiapi_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libdlpiapi_la_LIBADD		= libstreams.la
-libdlpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libdlpiapi_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/dlpiapi.VERSION
 
 ## =====================================================================
@@ -1108,7 +1112,7 @@ libnpiapi_la_SOURCES		= src/lib/pthread.c \
 libnpiapi_la_CPPFLAGS		= $(LIB_INCLUDES)
 libnpiapi_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libnpiapi_la_LIBADD		= libstreams.la
-libnpiapi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libnpiapi_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/npiapi.VERSION
 
 ## =====================================================================
@@ -1122,7 +1126,7 @@ libdlpi_la_SOURCES		= src/lib/pthread.c \
 libdlpi_la_CPPFLAGS		= $(LIB_INCLUDES)
 libdlpi_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libdlpi_la_LIBADD		= libstreams.la
-libdlpi_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libdlpi_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/dlpi.VERSION
 
 ## =====================================================================
@@ -1135,7 +1139,7 @@ libxnet_la_SOURCES		= src/lib/pthread.c \
 libxnet_la_CPPFLAGS		= $(LIB_INCLUDES)
 libxnet_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libxnet_la_LIBADD		= libstreams.la
-libxnet_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libxnet_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/xnet.VERSION
 
 ## =====================================================================
@@ -1154,7 +1158,7 @@ libxnsl_la_SOURCES		= src/lib/pthread.c \
 libxnsl_la_CPPFLAGS		= $(LIB_INCLUDES)
 libxnsl_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libxnsl_la_LIBADD		= libstreams.la libxnet.la
-libxnsl_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libxnsl_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/xnsl.VERSION \
 				  -ldl
 
@@ -1169,7 +1173,7 @@ inetaddr_la_SOURCES		= src/lib/netdir_inet.c \
 inetaddr_la_CPPFLAGS		= $(LIB_INCLUDES) -DNETDIR_STRONG_DEFS
 inetaddr_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 inetaddr_la_LIBADD		= libstreams.la libxnet.la libxnsl.la
-inetaddr_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared
+inetaddr_la_LDFLAGS		= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 
 ## =====================================================================
 
@@ -1183,7 +1187,7 @@ libsockpath_la_SOURCES		= src/lib/pthread.c \
 libsockpath_la_CPPFLAGS		= $(LIB_INCLUDES)
 libsockpath_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libsockpath_la_LIBADD		= libstreams.la
-libsockpath_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libsockpath_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sockpath.VERSION
 
 ## =====================================================================
@@ -1196,7 +1200,7 @@ libsocket_la_SOURCES		= src/lib/pthread.c \
 libsocket_la_CPPFLAGS		= $(LIB_INCLUDES)
 libsocket_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libsocket_la_LIBADD		= libstreams.la
-libsocket_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libsocket_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socket.VERSION \
 				  -static -lc -shared
 
@@ -1210,7 +1214,7 @@ libsocklib_la_SOURCES		= src/lib/pthread.c \
 libsocklib_la_CPPFLAGS		= $(LIB_INCLUDES)
 libsocklib_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libsocklib_la_LIBADD		= libstreams.la libxnet.la libxnsl.la libsockpath.la
-libsocklib_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libsocklib_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/socklib.VERSION \
 				  -static -lc -shared
 
@@ -1227,7 +1231,7 @@ libsx25_la_SOURCES		= src/lib/padent.c \
 libsx25_la_CPPFLAGS		= $(LIB_INCLUDES)
 libsx25_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 libsx25_la_LIBADD		= libstreams.la
-libsx25_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
+libsx25_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 				  -Wl,--version-script -Wl,$(lib_abs_srcdir)/src/lib/sx25.VERSION
 
 ## =====================================================================
@@ -1243,7 +1247,7 @@ libsx25_la_LDFLAGS		= -version-info 0:0:0 -export-dynamic \
 ## xti_la_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(TCL_CPPFLAGS) -DMODULE
 ## xti_la_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 ## xti_la_LIBADD			= libstreams.la libxnet.la
-## xti_la_LDFLAGS			= -module -export-dynamic -release $(VERSION) -shared
+## xti_la_LDFLAGS			= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared
 ## 
 ## =====================================================================
 
@@ -1263,7 +1267,7 @@ strMIB_la_SOURCES		= src/snmp/strMIB.c \
 strMIB_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS) -DMODULE
 strMIB_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 strMIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
-strMIB_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared $(SNMP_LDFLAGS)
+strMIB_la_LDFLAGS		= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared $(SNMP_LDFLAGS)
 
 ## =====================================================================
 
@@ -1289,7 +1293,7 @@ mxMIB_la_SOURCES		= src/snmp/ds0Bundle.c \
 mxMIB_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS) -DMODULE
 mxMIB_la_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 mxMIB_la_LIBADD			= libstreams.la $(SNMP_LDADD)
-mxMIB_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared $(SNMP_LDFLAGS)
+mxMIB_la_LDFLAGS		= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared $(SNMP_LDFLAGS)
 
 ## =====================================================================
 
@@ -1319,7 +1323,7 @@ ss7MIB_la_SOURCES		= src/snmp/ss7MIB.c \
 ss7MIB_la_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS) -DMODULE
 ss7MIB_la_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 ss7MIB_la_LIBADD		= libstreams.la $(SNMP_LDADD)
-ss7MIB_la_LDFLAGS		= -module -export-dynamic -release $(VERSION) -shared $(SNMP_LDFLAGS)
+ss7MIB_la_LDFLAGS		= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) -shared $(SNMP_LDFLAGS)
 
 ## =====================================================================
 
@@ -1330,6 +1334,7 @@ UTIL_INCLUDES			= -I$(top_builddir)/src/util -I$(top_srcidr)/src/util $(PKG_INCL
 strchg_SOURCES			= src/util/strchg.c
 strchg_CPPFLAGS			= $(UTIL_INCLUDES)
 strchg_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strchg_LDFLAGS			= $(USER_LDFLAGS)
 strchg_LDADD			= libstreams.la
 
 bin_PROGRAMS			+= strchg
@@ -1339,6 +1344,7 @@ bin_PROGRAMS			+= strchg
 strconf_SOURCES			= src/util/strconf.c
 strconf_CPPFLAGS		= $(UTIL_INCLUDES)
 strconf_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strconf_LDFLAGS			= $(USER_LDFLAGS)
 strconf_LDADD			= libstreams.la
 
 bin_PROGRAMS			+= strconf
@@ -1348,6 +1354,7 @@ bin_PROGRAMS			+= strconf
 strreset_SOURCES		= src/util/strreset.c
 strreset_CPPFLAGS		= $(UTIL_INCLUDES)
 strreset_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strreset_LDFLAGS		= $(USER_LDFLAGS)
 strreset_LDADD			= libstreams.la
 
 bin_PROGRAMS			+= strreset
@@ -1357,6 +1364,7 @@ bin_PROGRAMS			+= strreset
 #asn_SOURCES			= src/util/asnyac.y src/util/asnlex.l asnyac.h
 #asn_CPPFLAGS			= $(UTIL_INCLUDES)
 #asn_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+#asn_LDFLAGS			= $(USER_LDFLAGS)
 #
 #EXTRA_PROGRAMS			+= asn
 ##bin_PROGRAMS			+= asn
@@ -1366,6 +1374,7 @@ bin_PROGRAMS			+= strreset
 gdmo_SOURCES			= src/util/gdmoyac.y src/util/gdmolex.l gdmoyac.h
 gdmo_CPPFLAGS			= $(UTIL_INCLUDES)
 gdmo_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+gdmo_LDFLAGS			= $(USER_LDFLAGS)
 
 bin_PROGRAMS			+= gdmo
 
@@ -1374,6 +1383,7 @@ bin_PROGRAMS			+= gdmo
 strlog_SOURCES			= src/util/strlog.c
 strlog_CPPFLAGS			= $(UTIL_INCLUDES)
 strlog_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strlog_LDFLAGS			= $(USER_LDFLAGS)
 strlog_LDADD			= -lrt
 
 bin_PROGRAMS			+= strlog
@@ -1383,6 +1393,7 @@ bin_PROGRAMS			+= strlog
 autopush_SOURCES		= src/util/autopush.c
 autopush_CPPFLAGS		= $(UTIL_INCLUDES)
 autopush_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+autopush_LDFLAGS		= $(USER_LDFLAGS)
 autopush_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= autopush
@@ -1392,6 +1403,7 @@ sbin_PROGRAMS			+= autopush
 fattach_SOURCES			= src/util/fattach.c
 fattach_CPPFLAGS		= $(UTIL_INCLUDES)
 fattach_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+fattach_LDFLAGS			= $(USER_LDFLAGS)
 fattach_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= fattach
@@ -1401,6 +1413,7 @@ sbin_PROGRAMS			+= fattach
 fdetach_SOURCES			= src/util/fdetach.c
 fdetach_CPPFLAGS		= $(UTIL_INCLUDES)
 fdetach_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+fdetach_LDFLAGS			= $(USER_LDFLAGS)
 fdetach_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= fdetach
@@ -1410,6 +1423,7 @@ sbin_PROGRAMS			+= fdetach
 insf_SOURCES			= src/util/insf.c
 insf_CPPFLAGS			= $(UTIL_INCLUDES)
 insf_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+insf_LDFLAGS			= $(USER_LDFLAGS)
 insf_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= insf
@@ -1419,6 +1433,7 @@ sbin_PROGRAMS			+= insf
 scls_SOURCES			= src/util/scls.c
 scls_CPPFLAGS			= $(UTIL_INCLUDES)
 scls_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+scls_LDFLAGS			= $(USER_LDFLAGS)
 scls_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= scls
@@ -1428,6 +1443,7 @@ sbin_PROGRAMS			+= scls
 strace_SOURCES			= src/util/strace.c
 strace_CPPFLAGS			= $(UTIL_INCLUDES)
 strace_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strace_LDFLAGS			= $(USER_LDFLAGS)
 strace_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= strace
@@ -1437,6 +1453,7 @@ sbin_PROGRAMS			+= strace
 ##strclean_SOURCES		= src/util/strclean.c
 ##strclean_CPPFLAGS		= $(UTIL_INCLUDES)
 ##strclean_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+##strclean_LDFLAGS		= $(USER_LDFLAGS)
 ##strclean_LDADD		= libstreams.la
 
 #sbin_PROGRAMS			+= strclean
@@ -1454,6 +1471,7 @@ dist_sbin_SCRIPTS		+= src/util/strclean
 strerr_SOURCES			= src/util/strerr.c
 strerr_CPPFLAGS			= $(UTIL_INCLUDES)
 strerr_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strerr_LDFLAGS			= $(USER_LDFLAGS)
 strerr_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= strerr
@@ -1463,6 +1481,7 @@ sbin_PROGRAMS			+= strerr
 strinfo_SOURCES			= src/util/strinfo.c
 strinfo_CPPFLAGS		= $(UTIL_INCLUDES)
 strinfo_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strinfo_LDFLAGS			= $(USER_LDFLAGS)
 strinfo_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= strinfo
@@ -1472,6 +1491,7 @@ sbin_PROGRAMS			+= strinfo
 ##strload_SOURCES		= src/util/strload.c
 ##strload_CPPFLAGS		= $(UTIL_INCLUDES)
 ##strload_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+##strload_LDFLAGS		= $(USER_LDFLAGS)
 ##strload_LDADD			= libstreams.la
 
 #sbin_PROGRAMS			+= strload
@@ -1489,6 +1509,7 @@ dist_sbin_SCRIPTS		+= src/util/strload
 ##strsetup_SOURCES		= src/util/strsetup.c
 ##strsetup_CPPFLAGS		= $(UTIL_INCLUDES)
 ##strsetup_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+##strsetup_LDFLAGS		= $(USER_LDFLAGS)
 ##strsetup_LDADD		= libstreams.la
 
 #sbin_PROGRAMS			+= strsetup
@@ -1506,6 +1527,7 @@ dist_sbin_SCRIPTS		+= src/util/strsetup
 strvf_SOURCES			= src/util/strvf.c
 strvf_CPPFLAGS			= $(UTIL_INCLUDES)
 strvf_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+strvf_LDFLAGS			= $(USER_LDFLAGS)
 strvf_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= strvf
@@ -1527,6 +1549,7 @@ dist_noinst_SCRIPTS		+= src/gdmo/asn1check
 @PACKAGE_TARNAME@_mknod_SOURCES		= src/util/@PACKAGE_TARNAME@_mknod.c
 @PACKAGE_TARNAME@_mknod_CPPFLAGS	= $(UTIL_INCLUDES)
 @PACKAGE_TARNAME@_mknod_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+@PACKAGE_TARNAME@_mknod_LDFLAGS		= $(USER_LDFLAGS)
 
 sbin_PROGRAMS			+= @PACKAGE_TARNAME@_mknod
 
@@ -1546,7 +1569,7 @@ streamsd_SOURCES		= src/snmp/streamsd.c \
 streamsd_CPPFLAGS		= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS)
 streamsd_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 streamsd_LDADD			= libstreams.la $(SNMP_LDADD)
-streamsd_LDFLAGS		= $(SNMP_LDFLAGS)
+streamsd_LDFLAGS		= $(USER_LDFLAGS) $(SNMP_LDFLAGS)
 
 if WITH_SNMP_AGENT
 sbin_PROGRAMS			+= streamsd
@@ -1558,6 +1581,7 @@ EXTRA_PROGRAMS			+= streamsd
 ldlconfig_SOURCES		= src/util/ldlconfig.c
 ldlconfig_CPPFLAGS		= $(UTIL_INCLUDES)
 ldlconfig_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+ldlconfig_LDFLAGS		= $(USER_LDFLAGS)
 ldlconfig_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ldlconfig
@@ -1567,6 +1591,7 @@ sbin_PROGRAMS			+= ldlconfig
 initsock_SOURCES		= src/util/initsock.c
 initsock_CPPFLAGS		= $(UTIL_INCLUDES)
 initsock_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+initsock_LDFLAGS		= $(USER_LDFLAGS)
 initsock_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= initsock
@@ -1576,6 +1601,7 @@ sbin_PROGRAMS			+= initsock
 soconfig_SOURCES		= src/util/soconfig.c
 soconfig_CPPFLAGS		= $(UTIL_INCLUDES)
 soconfig_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+soconfig_LDFLAGS		= $(USER_LDFLAGS)
 soconfig_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= soconfig
@@ -1602,7 +1628,7 @@ chand_SOURCES			= src/snmp/chand.c \
 chand_CPPFLAGS			= $(PKG_INCLUDES) $(USER_CPPFLAGS) $(SNMP_CPPFLAGS)
 chand_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 chand_LDADD			= libstreams.la $(SNMP_LDADD)
-chand_LDFLAGS			= $(SNMP_LDFLAGS)
+chand_LDFLAGS			= $(USER_LDFLAGS) $(SNMP_LDFLAGS)
 
 if WITH_SNMP_AGENT
 sbin_PROGRAMS			+= chand
@@ -1614,6 +1640,7 @@ EXTRA_PROGRAMS			+= chand
 ifrdlci_SOURCES			= src/util/ifrdlci.c
 ifrdlci_CPPFLAGS		= $(UTIL_INCLUDES)
 ifrdlci_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+ifrdlci_LDFLAGS			= $(USER_LDFLAGS)
 ifrdlci_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ifrdlci
@@ -1623,6 +1650,7 @@ sbin_PROGRAMS			+= ifrdlci
 ifrstat_SOURCES			= src/util/ifrstat.c
 ifrstat_CPPFLAGS		= $(UTIL_INCLUDES)
 ifrstat_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+ifrstat_LDFLAGS			= $(USER_LDFLAGS)
 ifrstat_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ifrstat
@@ -1632,6 +1660,7 @@ sbin_PROGRAMS			+= ifrstat
 ifrtune_SOURCES			= src/util/ifrtune.c
 ifrtune_CPPFLAGS		= $(UTIL_INCLUDES)
 ifrtune_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+ifrtune_LDFLAGS			= $(USER_LDFLAGS)
 ifrtune_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ifrtune
@@ -1641,6 +1670,7 @@ sbin_PROGRAMS			+= ifrtune
 ixemap_SOURCES			= src/util/ixemap.c
 ixemap_CPPFLAGS			= $(UTIL_INCLUDES)
 ixemap_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+ixemap_LDFLAGS			= $(USER_LDFLAGS)
 ixemap_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ixemap
@@ -1650,6 +1680,7 @@ sbin_PROGRAMS			+= ixemap
 ixetune_SOURCES			= src/util/ixetune.c
 ixetune_CPPFLAGS		= $(UTIL_INCLUDES)
 ixetune_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+ixetune_LDFLAGS			= $(USER_LDFLAGS)
 ixetune_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ixetune
@@ -1659,6 +1690,7 @@ sbin_PROGRAMS			+= ixetune
 linkadd_SOURCES			= src/util/linkadd.c
 linkadd_CPPFLAGS		= $(UTIL_INCLUDES)
 linkadd_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+linkadd_LDFLAGS			= $(USER_LDFLAGS)
 linkadd_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= linkadd
@@ -1668,6 +1700,7 @@ sbin_PROGRAMS			+= linkadd
 linkdel_SOURCES			= src/util/linkdel.c
 linkdel_CPPFLAGS		= $(UTIL_INCLUDES)
 linkdel_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+linkdel_LDFLAGS			= $(USER_LDFLAGS)
 linkdel_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= linkdel
@@ -1677,6 +1710,7 @@ sbin_PROGRAMS			+= linkdel
 linklist_SOURCES		= src/util/linklist.c
 linklist_CPPFLAGS		= $(UTIL_INCLUDES)
 linklist_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+linklist_LDFLAGS		= $(USER_LDFLAGS)
 linklist_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= linklist
@@ -1686,6 +1720,7 @@ sbin_PROGRAMS			+= linklist
 linkreset_SOURCES		= src/util/linkreset.c
 linkreset_CPPFLAGS		= $(UTIL_INCLUDES)
 linkreset_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+linkreset_LDFLAGS		= $(USER_LDFLAGS)
 linkreset_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= linkreset
@@ -1695,6 +1730,7 @@ sbin_PROGRAMS			+= linkreset
 linkstart_SOURCES		= src/util/linkstart.c
 linkstart_CPPFLAGS		= $(UTIL_INCLUDES)
 linkstart_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+linkstart_LDFLAGS		= $(USER_LDFLAGS)
 linkstart_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= linkstart
@@ -1704,6 +1740,7 @@ sbin_PROGRAMS			+= linkstart
 linkstate_SOURCES		= src/util/linkstate.c
 linkstate_CPPFLAGS		= $(UTIL_INCLUDES)
 linkstate_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+linkstate_LDFLAGS		= $(USER_LDFLAGS)
 linkstate_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= linkstate
@@ -1713,6 +1750,7 @@ sbin_PROGRAMS			+= linkstate
 linkstop_SOURCES		= src/util/linkstop.c
 linkstop_CPPFLAGS		= $(UTIL_INCLUDES)
 linkstop_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+linkstop_LDFLAGS		= $(USER_LDFLAGS)
 linkstop_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= linkstop
@@ -1722,6 +1760,7 @@ sbin_PROGRAMS			+= linkstop
 lltune_SOURCES			= src/util/lltune.c
 lltune_CPPFLAGS			= $(UTIL_INCLUDES)
 lltune_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+lltune_LDFLAGS			= $(USER_LDFLAGS)
 lltune_LDADD			= libstreams.la
 
 EXTRA_PROGRAMS			+= lltune
@@ -1732,6 +1771,7 @@ EXTRA_PROGRAMS			+= lltune
 mlptune_SOURCES			= src/util/mlptune.c
 mlptune_CPPFLAGS		= $(UTIL_INCLUDES)
 mlptune_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+mlptune_LDFLAGS			= $(USER_LDFLAGS)
 mlptune_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= mlptune
@@ -1741,6 +1781,7 @@ sbin_PROGRAMS			+= mlptune
 nuimap_SOURCES			= src/util/nuimap.c
 nuimap_CPPFLAGS			= $(UTIL_INCLUDES)
 nuimap_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+nuimap_LDFLAGS			= $(USER_LDFLAGS)
 nuimap_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= nuimap
@@ -1750,6 +1791,7 @@ sbin_PROGRAMS			+= nuimap
 pvcmap_SOURCES			= src/util/pvcmap.c
 pvcmap_CPPFLAGS			= $(UTIL_INCLUDES)
 pvcmap_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+pvcmap_LDFLAGS			= $(USER_LDFLAGS)
 pvcmap_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= pvcmap
@@ -1759,6 +1801,7 @@ sbin_PROGRAMS			+= pvcmap
 vcstat_SOURCES			= src/util/vcstat.c
 vcstat_CPPFLAGS			= $(UTIL_INCLUDES)
 vcstat_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+vcstat_LDFLAGS			= $(USER_LDFLAGS)
 vcstat_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= vcstat
@@ -1768,6 +1811,7 @@ sbin_PROGRAMS			+= vcstat
 wantune_SOURCES			= src/util/wantune.c
 wantune_CPPFLAGS		= $(UTIL_INCLUDES)
 wantune_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+wantune_LDFLAGS			= $(USER_LDFLAGS)
 wantune_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= wantune
@@ -1777,6 +1821,7 @@ sbin_PROGRAMS			+= wantune
 x25diags_SOURCES		= src/util/x25diags.c
 x25diags_CPPFLAGS		= $(UTIL_INCLUDES)
 x25diags_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+x25diags_LDFLAGS		= $(USER_LDFLAGS)
 x25diags_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= x25diags
@@ -1786,6 +1831,7 @@ sbin_PROGRAMS			+= x25diags
 x25file_SOURCES			= src/util/x25file.c
 x25file_CPPFLAGS		= $(UTIL_INCLUDES)
 x25file_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+x25file_LDFLAGS			= $(USER_LDFLAGS)
 x25file_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= x25file
@@ -1795,6 +1841,7 @@ sbin_PROGRAMS			+= x25file
 x25info_SOURCES			= src/util/x25info.c
 x25info_CPPFLAGS		= $(UTIL_INCLUDES)
 x25info_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+x25info_LDFLAGS			= $(USER_LDFLAGS)
 x25info_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= x25info
@@ -1804,6 +1851,7 @@ sbin_PROGRAMS			+= x25info
 x25netd_SOURCES			= src/util/x25netd.c
 x25netd_CPPFLAGS		= $(UTIL_INCLUDES)
 x25netd_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+x25netd_LDFLAGS			= $(USER_LDFLAGS)
 x25netd_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= x25netd
@@ -1813,6 +1861,7 @@ sbin_PROGRAMS			+= x25netd
 x25route_SOURCES		= src/util/x25route.c
 x25route_CPPFLAGS		= $(UTIL_INCLUDES)
 x25route_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+x25route_LDFLAGS		= $(USER_LDFLAGS)
 x25route_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= x25route
@@ -1822,6 +1871,7 @@ sbin_PROGRAMS			+= x25route
 x25stat_SOURCES			= src/util/x25stat.c
 x25stat_CPPFLAGS		= $(UTIL_INCLUDES)
 x25stat_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+x25stat_LDFLAGS			= $(USER_LDFLAGS)
 x25stat_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= x25stat
@@ -1831,6 +1881,7 @@ sbin_PROGRAMS			+= x25stat
 x25trace_SOURCES		= src/util/x25trace.c
 x25trace_CPPFLAGS		= $(UTIL_INCLUDES)
 x25trace_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+x25trace_LDFLAGS		= $(USER_LDFLAGS)
 x25trace_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= x25trace
@@ -1840,6 +1891,7 @@ sbin_PROGRAMS			+= x25trace
 x25tune_SOURCES			= src/util/x25tune.c
 x25tune_CPPFLAGS		= $(UTIL_INCLUDES)
 x25tune_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+x25tune_LDFLAGS			= $(USER_LDFLAGS)
 x25tune_LDADD			= libstreams.la
 
 EXTRA_PROGRAMS			+= x25tune
@@ -1850,6 +1902,7 @@ EXTRA_PROGRAMS			+= x25tune
 x32map_SOURCES			= src/util/x32map.c
 x32map_CPPFLAGS			= $(UTIL_INCLUDES)
 x32map_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+x32map_LDFLAGS			= $(USER_LDFLAGS)
 x32map_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= x32map
@@ -1859,6 +1912,7 @@ sbin_PROGRAMS			+= x32map
 ss7statsd_SOURCES		= src/util/ss7statsd.c
 ss7statsd_CPPFLAGS		= $(UTIL_INCLUDES)
 ss7statsd_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+ss7statsd_LDFLAGS		= $(USER_LDFLAGS)
 ss7statsd_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ss7statsd
@@ -1871,6 +1925,7 @@ slconfig_SOURCES		= src/util/slconf_yac.y \
 				  slconf_yac.h
 slconfig_CPPFLAGS		= $(UTIL_INCLUDES)
 slconfig_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+slconfig_LDFLAGS		= $(USER_LDFLAGS)
 slconfig_LDADD			= libstreams.la
 
 EXTRA_PROGRAMS			+= slconfig
@@ -1883,6 +1938,7 @@ mtpconfig_SOURCES		= src/util/mtpconf_yac.y \
 				  mtpconf_yac.h
 mtpconfig_CPPFLAGS		= $(UTIL_INCLUDES)
 mtpconfig_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+mtpconfig_LDFLAGS		= $(USER_LDFLAGS)
 mtpconfig_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= mtpconfig
@@ -1895,6 +1951,7 @@ x400config_SOURCES		= src/util/x400yac.y \
 				  x400yac.h
 x400config_CPPFLAGS		= $(UTIL_INCLUDES)
 x400config_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+x400config_LDFLAGS		= $(USER_LDFLAGS)
 x400config_LDADD		= libstreams.la
 
 sbin_PROGRAMS			+= x400config
@@ -1907,6 +1964,7 @@ sdlconfig_SOURCES		= src/util/sdlconf.c \
 				  sdlyac.h
 sdlconfig_CPPFLAGS		= $(UTIL_INCLUDES)
 sdlconfig_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+sdlconfig_LDFLAGS		= $(USER_LDFLAGS)
 sdlconfig_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= sdlconfig
@@ -1916,6 +1974,7 @@ sbin_PROGRAMS			+= sdlconfig
 slconfd_SOURCES			= src/util/slconfd.c
 slconfd_CPPFLAGS		= $(UTIL_INCLUDES)
 slconfd_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+slconfd_LDFLAGS			= $(USER_LDFLAGS)
 slconfd_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= slconfd
@@ -1925,6 +1984,7 @@ sbin_PROGRAMS			+= slconfd
 slmon_SOURCES			= src/util/slmon.c
 slmon_CPPFLAGS			= $(UTIL_INCLUDES)
 slmon_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+slmon_LDFLAGS			= $(USER_LDFLAGS)
 slmon_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= slmon
@@ -1934,6 +1994,7 @@ sbin_PROGRAMS			+= slmon
 ss7capd_SOURCES			= src/util/ss7capd.c
 ss7capd_CPPFLAGS		= $(UTIL_INCLUDES)
 ss7capd_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+ss7capd_LDFLAGS			= $(USER_LDFLAGS)
 ss7capd_LDADD			= libstreams.la
 
 sbin_PROGRAMS			+= ss7capd
@@ -1945,6 +2006,7 @@ m2paconfig_SOURCES		= src/util/m2payac.y \
 				  m2payac.h
 m2paconfig_CPPFLAGS		= $(UTIL_INCLUDES)
 m2paconfig_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+m2paconfig_LDFLAGS		= $(USER_LDFLAGS)
 m2paconfig_LDADD		= libstreams.la
 
 sbin_PROGRAMS			+= m2paconfig
@@ -1961,6 +2023,7 @@ TEST_INCLUDES			= -I$(top_builddir)/src/test -I$(top_srcdir)/src/test $(PKG_INCL
 test_clone_SOURCES		= src/test/test-clone.c
 test_clone_CPPFLAGS		= $(TEST_INCLUDES)
 test_clone_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_clone_LDFLAGS		= $(USER_LDFLAGS)
 test_clone_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-clone
@@ -1970,6 +2033,7 @@ pkglibexec_PROGRAMS		+= test-clone
 test_connld_SOURCES		= src/test/test-connld.c
 test_connld_CPPFLAGS		= $(TEST_INCLUDES)
 test_connld_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_connld_LDFLAGS		= $(USER_LDFLAGS)
 test_connld_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-connld
@@ -1979,6 +2043,7 @@ pkglibexec_PROGRAMS		+= test-connld
 test_echo_SOURCES		= src/test/test-echo.c
 test_echo_CPPFLAGS		= $(TEST_INCLUDES)
 test_echo_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_echo_LDFLAGS		= $(USER_LDFLAGS)
 test_echo_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-echo
@@ -1988,6 +2053,7 @@ pkglibexec_PROGRAMS		+= test-echo
 test_fifo_SOURCES		= src/test/test-fifo.c
 test_fifo_CPPFLAGS		= $(TEST_INCLUDES)
 test_fifo_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_fifo_LDFLAGS		= $(USER_LDFLAGS)
 test_fifo_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-fifo
@@ -1997,6 +2063,7 @@ pkglibexec_PROGRAMS		+= test-fifo
 test_log_SOURCES		= src/test/test-log.c
 test_log_CPPFLAGS		= $(TEST_INCLUDES)
 test_log_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+test_log_LDFLAGS		= $(USER_LDFLAGS)
 test_log_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-log
@@ -2006,6 +2073,7 @@ pkglibexec_PROGRAMS		+= test-log
 test_loop_SOURCES		= src/test/test-loop.c
 test_loop_CPPFLAGS		= $(TEST_INCLUDES)
 test_loop_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_loop_LDFLAGS		= $(USER_LDFLAGS)
 test_loop_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-loop
@@ -2015,6 +2083,7 @@ pkglibexec_PROGRAMS		+= test-loop
 test_nsdev_SOURCES		= src/test/test-nsdev.c
 test_nsdev_CPPFLAGS		= $(TEST_INCLUDES)
 test_nsdev_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_nsdev_LDFLAGS		= $(USER_LDFLAGS)
 test_nsdev_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-nsdev
@@ -2024,6 +2093,7 @@ pkglibexec_PROGRAMS		+= test-nsdev
 test_mux_SOURCES		= src/test/test-mux.c
 test_mux_CPPFLAGS		= $(TEST_INCLUDES)
 test_mux_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+test_mux_LDFLAGS		= $(USER_LDFLAGS)
 test_mux_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-mux
@@ -2033,6 +2103,7 @@ pkglibexec_PROGRAMS		+= test-mux
 test_nuls_SOURCES		= src/test/test-nuls.c
 test_nuls_CPPFLAGS		= $(TEST_INCLUDES)
 test_nuls_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_nuls_LDFLAGS		= $(USER_LDFLAGS)
 test_nuls_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-nuls
@@ -2042,6 +2113,7 @@ pkglibexec_PROGRAMS		+= test-nuls
 test_pipe_SOURCES		= src/test/test-pipe.c
 test_pipe_CPPFLAGS		= $(TEST_INCLUDES)
 test_pipe_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_pipe_LDFLAGS		= $(USER_LDFLAGS)
 test_pipe_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-pipe
@@ -2051,6 +2123,7 @@ pkglibexec_PROGRAMS		+= test-pipe
 perftest_SOURCES		= src/test/perftest.c
 perftest_CPPFLAGS		= $(TEST_INCLUDES)
 perftest_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+perftest_LDFLAGS		= $(USER_LDFLAGS)
 perftest_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= perftest
@@ -2060,6 +2133,7 @@ pkglibexec_PROGRAMS		+= perftest
 perftestn_SOURCES		= src/test/perftest.c
 perftestn_CPPFLAGS		= $(TEST_INCLUDES) -DNATIVE_PIPES
 perftestn_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+perftestn_LDFLAGS		= $(USER_LDFLAGS)
 
 pkglibexec_PROGRAMS		+= perftestn
 
@@ -2068,6 +2142,7 @@ pkglibexec_PROGRAMS		+= perftestn
 test_pipemod_SOURCES		= src/test/test-pipemod.c
 test_pipemod_CPPFLAGS		= $(TEST_INCLUDES)
 test_pipemod_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_pipemod_LDFLAGS		= $(USER_LDFLAGS)
 test_pipemod_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-pipemod
@@ -2077,6 +2152,7 @@ pkglibexec_PROGRAMS		+= test-pipemod
 test_sad_SOURCES		= src/test/test-sad.c
 test_sad_CPPFLAGS		= $(TEST_INCLUDES)
 test_sad_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sad_LDFLAGS		= $(USER_LDFLAGS)
 test_sad_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sad
@@ -2086,6 +2162,7 @@ pkglibexec_PROGRAMS		+= test-sad
 test_sc_SOURCES			= src/test/test-sc.c
 test_sc_CPPFLAGS		= $(TEST_INCLUDES)
 test_sc_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sc_LDFLAGS			= $(USER_LDFLAGS)
 test_sc_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sc
@@ -2095,6 +2172,7 @@ pkglibexec_PROGRAMS		+= test-sc
 test_streams_SOURCES		= src/test/test-streams.c
 test_streams_CPPFLAGS		= $(TEST_INCLUDES)
 test_streams_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_streams_LDFLAGS		= $(USER_LDFLAGS)
 test_streams_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-streams
@@ -2104,6 +2182,7 @@ pkglibexec_PROGRAMS		+= test-streams
 testlog_SOURCES			= src/test/testlog.c
 testlog_CPPFLAGS		= $(TEST_INCLUDES)
 testlog_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+testlog_LDFLAGS			= $(USER_LDFLAGS)
 testlog_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= testlog
@@ -2113,6 +2192,7 @@ pkglibexec_PROGRAMS		+= testlog
 test_tty_SOURCES		= src/test/test-tty.c
 test_tty_CPPFLAGS		= $(TEST_INCLUDES)
 test_tty_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+test_tty_LDFLAGS		= $(USER_LDFLAGS)
 test_tty_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-tty
@@ -2122,6 +2202,7 @@ pkglibexec_PROGRAMS		+= test-tty
 ldltest_SOURCES			= src/test/ldltest.c
 ldltest_CPPFLAGS		= $(TEST_INCLUDES)
 ldltest_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+ldltest_LDFLAGS			= $(USER_LDFLAGS)
 ldltest_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= ldltest
@@ -2131,6 +2212,7 @@ pkglibexec_PROGRAMS		+= ldltest
 test_np_ip_SOURCES		= src/test/test-np_ip.c
 test_np_ip_CPPFLAGS		= $(TEST_INCLUDES)
 test_np_ip_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_np_ip_LDFLAGS		= $(USER_LDFLAGS)
 test_np_ip_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-np_ip
@@ -2140,6 +2222,7 @@ pkglibexec_PROGRAMS		+= test-np_ip
 test_ip_SOURCES			= src/test/test-ip.c
 test_ip_CPPFLAGS		= $(TEST_INCLUDES)
 test_ip_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+test_ip_LDFLAGS			= $(USER_LDFLAGS)
 test_ip_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-ip
@@ -2149,6 +2232,7 @@ pkglibexec_PROGRAMS		+= test-ip
 test_tirdwr_SOURCES		= src/test/test-tirdwr.c
 test_tirdwr_CPPFLAGS		= $(TEST_INCLUDES)
 test_tirdwr_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_tirdwr_LDFLAGS		= $(USER_LDFLAGS)
 test_tirdwr_LDADD		= libstreams.la libxnet.la
 
 pkglibexec_PROGRAMS		+= test-tirdwr
@@ -2158,6 +2242,7 @@ pkglibexec_PROGRAMS		+= test-tirdwr
 test_timod_SOURCES		= src/test/test-timod.c
 test_timod_CPPFLAGS		= $(TEST_INCLUDES)
 test_timod_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_timod_LDFLAGS		= $(USER_LDFLAGS)
 test_timod_LDADD		= libstreams.la libxnet.la
 
 pkglibexec_PROGRAMS		+= test-timod
@@ -2167,6 +2252,7 @@ pkglibexec_PROGRAMS		+= test-timod
 test_xnet_SOURCES		= src/test/test-xnet.c
 test_xnet_CPPFLAGS		= $(TEST_INCLUDES)
 test_xnet_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_xnet_LDFLAGS		= $(USER_LDFLAGS)
 test_xnet_LDADD			= libstreams.la libxnet.la
 
 pkglibexec_PROGRAMS		+= test-xnet
@@ -2177,7 +2263,7 @@ test_xnet_thr_SOURCES		= src/test/test-xnet.c
 test_xnet_thr_CPPFLAGS		= $(TEST_INCLUDES) -D_REENTRANT
 test_xnet_thr_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 test_xnet_thr_LDADD		= libstreams.la libxnet.la
-test_xnet_thr_LDFLAGS		= -lpthread
+test_xnet_thr_LDFLAGS		= $(USER_LDFLAGS) -lpthread
 
 pkglibexec_PROGRAMS		+= test-xnet_thr
 
@@ -2186,6 +2272,7 @@ pkglibexec_PROGRAMS		+= test-xnet_thr
 test_xnsl_SOURCES		= src/test/test-xnsl.c
 test_xnsl_CPPFLAGS		= $(TEST_INCLUDES)
 test_xnsl_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_xnsl_LDFLAGS		= $(USER_LDFLAGS)
 test_xnsl_LDADD			= libstreams.la libxnet.la libxnsl.la
 
 pkglibexec_PROGRAMS		+= test-xnsl
@@ -2196,7 +2283,7 @@ test_xnsl_thr_SOURCES		= src/test/test-xnsl.c
 test_xnsl_thr_CPPFLAGS		= $(TEST_INCLUDES) -D_REENTRANT
 test_xnsl_thr_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
 test_xnsl_thr_LDADD		= libstreams.la libxnet.la libxnsl.la
-test_xnsl_thr_LDFLAGS		= -lpthread
+test_xnsl_thr_LDFLAGS		= $(USER_LDFLAGS) -lpthread
 
 pkglibexec_PROGRAMS		+= test-xnsl_thr
 
@@ -2205,6 +2292,7 @@ pkglibexec_PROGRAMS		+= test-xnsl_thr
 test_sockpath_SOURCES		= src/test/test-sockpath.c
 test_sockpath_CPPFLAGS		= $(TEST_INCLUDES)
 test_sockpath_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sockpath_LDFLAGS		= $(USER_LDFLAGS)
 test_sockpath_LDADD		= libstreams.la libsockpath.la
 
 pkglibexec_PROGRAMS		+= test-sockpath
@@ -2214,6 +2302,7 @@ pkglibexec_PROGRAMS		+= test-sockpath
 test_socket_SOURCES		= src/test/test-socket.c
 test_socket_CPPFLAGS		= $(TEST_INCLUDES)
 test_socket_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_socket_LDFLAGS		= $(USER_LDFLAGS)
 test_socket_LDADD		= libstreams.la libsocket.la
 
 pkglibexec_PROGRAMS		+= test-socket
@@ -2223,6 +2312,7 @@ pkglibexec_PROGRAMS		+= test-socket
 test_socklib_SOURCES		= src/test/test-socklib.c
 test_socklib_CPPFLAGS		= $(TEST_INCLUDES)
 test_socklib_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_socklib_LDFLAGS		= $(USER_LDFLAGS)
 test_socklib_LDADD		= libstreams.la libsocklib.la
 
 pkglibexec_PROGRAMS		+= test-socklib
@@ -2232,6 +2322,7 @@ pkglibexec_PROGRAMS		+= test-socklib
 test_sockmod_SOURCES		= src/test/test-sockmod.c
 test_sockmod_CPPFLAGS		= $(TEST_INCLUDES)
 test_sockmod_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sockmod_LDFLAGS		= $(USER_LDFLAGS)
 test_sockmod_LDADD		= libstreams.la libsocklib.la
 
 pkglibexec_PROGRAMS		+= test-sockmod
@@ -2241,6 +2332,7 @@ pkglibexec_PROGRAMS		+= test-sockmod
 test_socksys_SOURCES		= src/test/test-socksys.c
 test_socksys_CPPFLAGS		= $(TEST_INCLUDES)
 test_socksys_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_socksys_LDFLAGS		= $(USER_LDFLAGS)
 test_socksys_LDADD		= libstreams.la libsocket.la
 
 pkglibexec_PROGRAMS		+= test-socksys
@@ -2250,6 +2342,7 @@ pkglibexec_PROGRAMS		+= test-socksys
 test_inet_raw_SOURCES		= src/test/test-inet_raw.c
 test_inet_raw_CPPFLAGS		= $(TEST_INCLUDES)
 test_inet_raw_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_inet_raw_LDFLAGS		= $(USER_LDFLAGS)
 test_inet_raw_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-inet_raw
@@ -2259,6 +2352,7 @@ pkglibexec_PROGRAMS		+= test-inet_raw
 test_inet_udp_SOURCES		= src/test/test-inet_udp.c
 test_inet_udp_CPPFLAGS		= $(TEST_INCLUDES)
 test_inet_udp_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_inet_udp_LDFLAGS		= $(USER_LDFLAGS)
 test_inet_udp_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-inet_udp
@@ -2268,6 +2362,7 @@ pkglibexec_PROGRAMS		+= test-inet_udp
 test_inet_tcp_SOURCES		= src/test/test-inet_tcp.c
 test_inet_tcp_CPPFLAGS		= $(TEST_INCLUDES)
 test_inet_tcp_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_inet_tcp_LDFLAGS		= $(USER_LDFLAGS)
 test_inet_tcp_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-inet_tcp
@@ -2277,6 +2372,7 @@ pkglibexec_PROGRAMS		+= test-inet_tcp
 test_inet_sctp_SOURCES		= src/test/test-inet_sctp.c
 test_inet_sctp_CPPFLAGS		= $(TEST_INCLUDES)
 test_inet_sctp_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_inet_sctp_LDFLAGS		= $(USER_LDFLAGS)
 test_inet_sctp_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-inet_sctp
@@ -2286,6 +2382,7 @@ pkglibexec_PROGRAMS		+= test-inet_sctp
 test_sctp_SOURCES		= src/test/test-sctp.c
 test_sctp_CPPFLAGS		= $(TEST_INCLUDES)
 test_sctp_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sctp_LDFLAGS		= $(USER_LDFLAGS)
 test_sctp_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sctp
@@ -2295,6 +2392,7 @@ pkglibexec_PROGRAMS		+= test-sctp
 test_sctp_n_SOURCES		= src/test/test-sctp_n.c
 test_sctp_n_CPPFLAGS		= $(TEST_INCLUDES)
 test_sctp_n_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sctp_n_LDFLAGS		= $(USER_LDFLAGS)
 test_sctp_n_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sctp_n
@@ -2304,6 +2402,7 @@ pkglibexec_PROGRAMS		+= test-sctp_n
 test_sctp_n2_SOURCES		= src/test/test-sctp_n2.c
 test_sctp_n2_CPPFLAGS		= $(TEST_INCLUDES)
 test_sctp_n2_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sctp_n2_LDFLAGS		= $(USER_LDFLAGS)
 test_sctp_n2_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sctp_n2
@@ -2313,6 +2412,7 @@ pkglibexec_PROGRAMS		+= test-sctp_n2
 test_sctp_nc_SOURCES		= src/test/test-sctp_nc.c
 test_sctp_nc_CPPFLAGS		= $(TEST_INCLUDES)
 test_sctp_nc_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sctp_nc_LDFLAGS		= $(USER_LDFLAGS)
 test_sctp_nc_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sctp_nc
@@ -2322,6 +2422,7 @@ pkglibexec_PROGRAMS		+= test-sctp_nc
 test_sctp_ns_SOURCES		= src/test/test-sctp_ns.c
 test_sctp_ns_CPPFLAGS		= $(TEST_INCLUDES)
 test_sctp_ns_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sctp_ns_LDFLAGS		= $(USER_LDFLAGS)
 test_sctp_ns_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sctp_ns
@@ -2331,6 +2432,7 @@ pkglibexec_PROGRAMS		+= test-sctp_ns
 test_sctp_t_SOURCES		= src/test/test-sctp_t.c
 test_sctp_t_CPPFLAGS		= $(TEST_INCLUDES)
 test_sctp_t_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sctp_t_LDFLAGS		= $(USER_LDFLAGS)
 test_sctp_t_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sctp_t
@@ -2340,6 +2442,7 @@ pkglibexec_PROGRAMS		+= test-sctp_t
 test_etsi_n_SOURCES		= src/test/test-etsi_n.c
 test_etsi_n_CPPFLAGS		= $(TEST_INCLUDES)
 test_etsi_n_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_etsi_n_LDFLAGS		= $(USER_LDFLAGS)
 test_etsi_n_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-etsi_n
@@ -2349,6 +2452,7 @@ pkglibexec_PROGRAMS		+= test-etsi_n
 test_etsi_t_SOURCES		= src/test/test-etsi_t.c
 test_etsi_t_CPPFLAGS		= $(TEST_INCLUDES)
 test_etsi_t_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_etsi_t_LDFLAGS		= $(USER_LDFLAGS)
 test_etsi_t_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-etsi_t
@@ -2358,6 +2462,7 @@ pkglibexec_PROGRAMS		+= test-etsi_t
 test_interop_SOURCES		= src/test/test-interop.c
 test_interop_CPPFLAGS		= $(TEST_INCLUDES)
 test_interop_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_interop_LDFLAGS		= $(USER_LDFLAGS)
 test_interop_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-interop
@@ -2367,6 +2472,7 @@ pkglibexec_PROGRAMS		+= test-interop
 test_chan_SOURCES		= src/test/test-chan.c
 test_chan_CPPFLAGS		= $(TEST_INCLUDES)
 test_chan_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_chan_LDFLAGS		= $(USER_LDFLAGS)
 test_chan_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-chan
@@ -2376,6 +2482,7 @@ pkglibexec_PROGRAMS		+= test-chan
 test_isdn_SOURCES		= src/test/test-isdn.c
 test_isdn_CPPFLAGS		= $(TEST_INCLUDES)
 test_isdn_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_isdn_LDFLAGS		= $(USER_LDFLAGS)
 test_isdn_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-isdn
@@ -2385,6 +2492,7 @@ pkglibexec_PROGRAMS		+= test-isdn
 test_atm_SOURCES		= src/test/test-atm.c
 test_atm_CPPFLAGS		= $(TEST_INCLUDES)
 test_atm_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+test_atm_LDFLAGS		= $(USER_LDFLAGS)
 test_atm_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-atm
@@ -2394,6 +2502,7 @@ pkglibexec_PROGRAMS		+= test-atm
 test_sl_SOURCES			= src/test/test-sl.c
 test_sl_CPPFLAGS		= $(TEST_INCLUDES)
 test_sl_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sl_LDFLAGS			= $(USER_LDFLAGS)
 test_sl_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sl
@@ -2403,6 +2512,7 @@ pkglibexec_PROGRAMS		+= test-sl
 test_tcpc_SOURCES		= src/test/test-tcpc.c
 test_tcpc_CPPFLAGS		= $(TEST_INCLUDES)
 test_tcpc_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_tcpc_LDFLAGS		= $(USER_LDFLAGS)
 test_tcpc_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-tcpc
@@ -2412,6 +2522,7 @@ pkglibexec_PROGRAMS		+= test-tcpc
 test_tcps_SOURCES		= src/test/test-tcps.c
 test_tcps_CPPFLAGS		= $(TEST_INCLUDES)
 test_tcps_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_tcps_LDFLAGS		= $(USER_LDFLAGS)
 test_tcps_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-tcps
@@ -2421,6 +2532,7 @@ pkglibexec_PROGRAMS		+= test-tcps
 test_udpc_SOURCES		= src/test/test-udpc.c
 test_udpc_CPPFLAGS		= $(TEST_INCLUDES)
 test_udpc_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_udpc_LDFLAGS		= $(USER_LDFLAGS)
 test_udpc_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-udpc
@@ -2430,6 +2542,7 @@ pkglibexec_PROGRAMS		+= test-udpc
 test_udps_SOURCES		= src/test/test-udps.c
 test_udps_CPPFLAGS		= $(TEST_INCLUDES)
 test_udps_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_udps_LDFLAGS		= $(USER_LDFLAGS)
 test_udps_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-udps
@@ -2439,6 +2552,7 @@ pkglibexec_PROGRAMS		+= test-udps
 test_q784_SOURCES		= src/test/test-q784.c
 test_q784_CPPFLAGS		= $(TEST_INCLUDES)
 test_q784_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_q784_LDFLAGS		= $(USER_LDFLAGS)
 test_q784_LDADD			= libstreams.la
 
 EXTRA_PROGRAMS			+= test-q784
@@ -2449,6 +2563,7 @@ EXTRA_PROGRAMS			+= test-q784
 #perftest_SOURCES		= src/test/perftest.c
 #perftest_CPPFLAGS		= $(TEST_INCLUDES)
 #perftest_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+#perftest_LDFLAGS		= $(USER_LDFLAGS)
 #perftest_LDADD			= libstreams.la
 
 #pkglibexec_PROGRAMS		+= perftest
@@ -2458,6 +2573,7 @@ EXTRA_PROGRAMS			+= test-q784
 test_q781_SOURCES		= src/test/test-q781.c
 test_q781_CPPFLAGS		= $(TEST_INCLUDES)
 test_q781_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_q781_LDFLAGS		= $(USER_LDFLAGS)
 test_q781_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-q781
@@ -2467,6 +2583,7 @@ pkglibexec_PROGRAMS		+= test-q781
 test_q781_pipe_SOURCES		= src/test/test-q781-pipe.c
 test_q781_pipe_CPPFLAGS		= $(TEST_INCLUDES)
 test_q781_pipe_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_q781_pipe_LDFLAGS		= $(USER_LDFLAGS)
 test_q781_pipe_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-q781-pipe
@@ -2476,6 +2593,7 @@ pkglibexec_PROGRAMS		+= test-q781-pipe
 test_x100p_SOURCES		= src/test/test-x100p.c
 test_x100p_CPPFLAGS		= $(TEST_INCLUDES)
 test_x100p_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x100p_LDFLAGS		= $(USER_LDFLAGS)
 test_x100p_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x100p
@@ -2485,6 +2603,7 @@ pkglibexec_PROGRAMS		+= test-x100p
 test_x400p_SOURCES		= src/test/test-x400p.c
 test_x400p_CPPFLAGS		= $(TEST_INCLUDES)
 test_x400p_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x400p_LDFLAGS		= $(USER_LDFLAGS)
 test_x400p_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x400p
@@ -2494,6 +2613,7 @@ pkglibexec_PROGRAMS		+= test-x400p
 test_usage_SOURCES		= src/util/usage.c
 test_usage_CPPFLAGS		= $(UTIL_INCLUDES)
 test_usage_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_usage_LDFLAGS		= $(USER_LDFLAGS)
 test_usage_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-usage
@@ -2503,6 +2623,7 @@ pkglibexec_PROGRAMS		+= test-usage
 test_x400p_cap2_SOURCES		= src/test/test-x400p-cap2.c
 test_x400p_cap2_CPPFLAGS	= $(TEST_INCLUDES)
 test_x400p_cap2_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x400p_cap2_LDFLAGS		= $(USER_LDFLAGS)
 test_x400p_cap2_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x400p-cap2
@@ -2512,6 +2633,7 @@ pkglibexec_PROGRAMS		+= test-x400p-cap2
 test_x400p_cap_SOURCES		= src/test/test-x400p-cap.c
 test_x400p_cap_CPPFLAGS		= $(TEST_INCLUDES)
 test_x400p_cap_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x400p_cap_LDFLAGS		= $(USER_LDFLAGS)
 test_x400p_cap_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x400p-cap
@@ -2521,6 +2643,7 @@ pkglibexec_PROGRAMS		+= test-x400p-cap
 test_x400p_hsl_SOURCES		= src/test/test-x400p-hsl.c
 test_x400p_hsl_CPPFLAGS		= $(TEST_INCLUDES)
 test_x400p_hsl_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x400p_hsl_LDFLAGS		= $(USER_LDFLAGS)
 test_x400p_hsl_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x400p-hsl
@@ -2530,6 +2653,7 @@ pkglibexec_PROGRAMS		+= test-x400p-hsl
 test_x400p_perf_SOURCES		= src/test/test-x400p-perf.c
 test_x400p_perf_CPPFLAGS	= $(TEST_INCLUDES)
 test_x400p_perf_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x400p_perf_LDFLAGS		= $(USER_LDFLAGS)
 test_x400p_perf_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x400p-perf
@@ -2539,6 +2663,7 @@ pkglibexec_PROGRAMS		+= test-x400p-perf
 test_x400p_sdl_SOURCES		= src/test/test-x400p-sdl.c
 test_x400p_sdl_CPPFLAGS		= $(TEST_INCLUDES)
 test_x400p_sdl_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x400p_sdl_LDFLAGS		= $(USER_LDFLAGS)
 test_x400p_sdl_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x400p-sdl
@@ -2548,6 +2673,7 @@ pkglibexec_PROGRAMS		+= test-x400p-sdl
 test_x400p_sdt2_SOURCES		= src/test/test-x400p-sdt2.c
 test_x400p_sdt2_CPPFLAGS	= $(TEST_INCLUDES)
 test_x400p_sdt2_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x400p_sdt2_LDFLAGS		= $(USER_LDFLAGS)
 test_x400p_sdt2_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x400p-sdt2
@@ -2557,6 +2683,7 @@ pkglibexec_PROGRAMS		+= test-x400p-sdt2
 test_x400p_sdt_SOURCES		= src/test/test-x400p-sdt.c
 test_x400p_sdt_CPPFLAGS		= $(TEST_INCLUDES)
 test_x400p_sdt_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x400p_sdt_LDFLAGS		= $(USER_LDFLAGS)
 test_x400p_sdt_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x400p-sdt
@@ -2566,6 +2693,7 @@ pkglibexec_PROGRAMS		+= test-x400p-sdt
 test_x400p_sl_SOURCES		= src/test/test-x400p-sl.c
 test_x400p_sl_CPPFLAGS		= $(TEST_INCLUDES)
 test_x400p_sl_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_x400p_sl_LDFLAGS		= $(USER_LDFLAGS)
 test_x400p_sl_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-x400p-sl
@@ -2575,6 +2703,7 @@ pkglibexec_PROGRAMS		+= test-x400p-sl
 test_sigtran_SOURCES		= src/test/test-sigtran.c
 test_sigtran_CPPFLAGS		= $(TEST_INCLUDES)
 test_sigtran_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_sigtran_LDFLAGS		= $(USER_LDFLAGS)
 test_sigtran_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-sigtran
@@ -2584,6 +2713,7 @@ pkglibexec_PROGRAMS		+= test-sigtran
 test_m2pa_SOURCES		= src/test/test-m2pa.c
 test_m2pa_CPPFLAGS		= $(TEST_INCLUDES)
 test_m2pa_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_m2pa_LDFLAGS		= $(USER_LDFLAGS)
 test_m2pa_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-m2pa
@@ -2593,6 +2723,7 @@ pkglibexec_PROGRAMS		+= test-m2pa
 test_m2ua_as_SOURCES		= src/test/test-m2ua_as.c
 test_m2ua_as_CPPFLAGS		= $(TEST_INCLUDES)
 test_m2ua_as_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_m2ua_as_LDFLAGS		= $(USER_LDFLAGS)
 test_m2ua_as_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-m2ua_as
@@ -2602,6 +2733,7 @@ pkglibexec_PROGRAMS		+= test-m2ua_as
 test_m3ua_raw_SOURCES		= src/test/test-m3ua-raw.c
 test_m3ua_raw_CPPFLAGS		= $(TEST_INCLUDES)
 test_m3ua_raw_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_m3ua_raw_LDFLAGS		= $(USER_LDFLAGS)
 test_m3ua_raw_LDADD		= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-m3ua-raw
@@ -2611,6 +2743,7 @@ pkglibexec_PROGRAMS		+= test-m3ua-raw
 test_voip_SOURCES		= src/test/test-voip.c
 test_voip_CPPFLAGS		= $(TEST_INCLUDES)
 test_voip_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_voip_LDFLAGS		= $(USER_LDFLAGS)
 test_voip_LDADD			= libstreams.la
 
 pkglibexec_PROGRAMS		+= test-voip

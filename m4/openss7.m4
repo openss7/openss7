@@ -223,6 +223,7 @@ Corporation at a fee.  See http://www.openss7.com/
 	[AS_HELP_STRING([--with-optimize=HOW],
 	    [optimization: normal, size, speed or quick @<:@default=auto@:>@])])
     _OPENSS7_OPTIONS_CFLAGS
+    _OPENSS7_OPTIONS_LDFLAGS
     _OPENSS7_OPTIONS_CXXFLAGS
     _OPENSS7_OPTIONS_GCJFLAGS
     _OPENSS7_MISSING2
@@ -303,6 +304,12 @@ dnl
     AC_SUBST([tcllibdir])dnl
     if test :"${tclsrcdir+set}" != :set ; then tclsrcdir='${datarootdir}' ; fi
     AC_SUBST([tclsrcdir])dnl
+    if test :"${syslibdir+set}" != :set ; then syslibdir='${rootdir}/lib' ; fi
+    AC_SUBST([syslibdir])dnl
+    if test :"${sysbindir+set}" != :set ; then sysbindir='${rootdir}/bin' ; fi
+    AC_SUBST([sysbindir])dnl
+    if test :"${syssbindir+set}" != :set ; then syssbindir='${rootdir}/sbin' ; fi
+    AC_SUBST([syssbindir])dnl
 dnl
 dnl Need to check this before libtool gets done
 dnl
@@ -978,6 +985,27 @@ dnl	    USER_CFLAGS="${USER_CFLAGS:+$USER_CFLAGS }-Wdisabled-optimization"
     USER_DFLAGS=`echo "$USER_DFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
     AC_MSG_RESULT([${USER_CFLAGS} ${USER_DFLAGS} ${CFLAGS}])
 ])# _OPENSS7_OPTIONS_CFLAGS
+# =============================================================================
+
+# =============================================================================
+# _OPENSS7_OPTIONS_LDFLAGS
+# -----------------------------------------------------------------------------
+AC_DEFUN([_OPENSS7_OPTIONS_LDFLAGS], [dnl
+    AC_MSG_CHECKING([for user LDFLAGS])
+    AC_MSG_RESULT([${USER_LDFLAGS} ${LDFLAGS}])
+    AC_CACHE_CHECK([for user build id], [os7_cv_buildid], [dnl
+	if ${LD-ld} --build-id 2>&1 | grep 'unrecognized' >/dev/null 2>&1
+	then
+	    os7_cv_buildid=
+	else
+	    os7_cv_buildid='-Wl,--build-id'
+	fi
+    ])
+    AC_MSG_CHECKING([for user LDFLAGS])
+    USER_LDFLAGS="$LDFLAGS $USER_LDFLAGS $os7_cv_buildid"; LDFLAGS=
+    USER_LDFLAGS=`echo "$USER_LDFLAGS" | sed -e 's,^[[[:space:]]]*,,;s,[[[:space:]]]*$,,;s,[[[:space:]]][[[:space:]]]*, ,g'`
+    AC_MSG_RESULT([${USER_LDFLAGS}])
+])# _OPENSS7_OPTIONS_LDFLAGS
 # =============================================================================
 
 # =============================================================================

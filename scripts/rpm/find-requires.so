@@ -40,7 +40,7 @@ BEGIN {
     ldd = "ldd " file " 2>/dev/null"
     while ((ldd | getline)) {
 	if (/=>/) {
-	    if ($1 !~ /libNoVersion.so/ && $1 !~ /4[um]lib.so/ && $1 !~ /linux-gate.so/ && $1 !~ /libredhat-kernel.so/) {
+	    if ($1 !~ /libNoVersion.so/ && $1 !~ /4[um]lib.so/ && $1 !~ /linux-gate.so/ && $1 !~ /libredhat-kernel.so/ && $1 !~ /linux-vdso.so/) {
 		sub(".*/", "", $1)
 		requires[$1 lib64] = 1
 	    }
