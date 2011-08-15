@@ -69,24 +69,24 @@ pre-libraries:
 	@l=`basename $(libdir)` ; \
 	for dir in /$$l /usr/$$l /usr/local/$$l ; do \
 		test ! \( "$$dir" -ef "$(libdir)" \) || continue ; \
-		libs='$(lib_LTLIBRARIES)' ; for lib in $$libs ; do \
+		libs='$(lib_LTLIBRARIES) $(syslib_LTLIBRARIES)' ; for lib in $$libs ; do \
 			lib=`echo $$lib | sed 's|^.*/||;s|\.la$$||'` ; \
 			$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$$dir/$$lib.*" ; \
 			rm -f -- $(DESTDIR)$(rootdir)$$dir/$$lib.* ; \
 		done ; \
 	done ; \
-	make install-libLTLIBRARIES || :
+	make install-syslibLTLIBRARIES install-libLTLIBRARIES || :
 if WITH_32BIT_LIBS
 	@l=`basename $(lib32dir)` ; 
 	for dir in /$$l /usr/local/$$l /usr/local/$$l ; do \
 		test ! \( "$$dir" -ef "$(lib32dir)" \) || continue ; \
-		libs='$(lib32_LTLIBRARIES)' ; for lib in $$libs ; do \
+		libs='$(lib32_LTLIBRARIES) $(syslib32_LTLIBRARIES)' ; for lib in $$libs ; do \
 			lib=`echo $$lib | sed 's|^.*/||;s|\.la$$||'` ; \
 			$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)$$dir/$$lib.*" ; \
 			rm -f -- $(DESTDIR)$(rootdir)$$dir/$$lib.* ; \
 		done ; \
 	done ; \
-	make install-lib32LTLIBRARIES || :
+	make install-syslib32LTLIBRARIES install-lib32LTLIBRARIES || :
 endif
 
 PRE_INSTALL_AM		+= pre-libraries
@@ -144,6 +144,7 @@ if PERFORM_CHECKS
 ## PERFORM_CHECKS
 #dist_check_SCRIPTS 	+= $(top_srcdir)/scripts/check_libs
 TESTS_ENVIRONMENT 	+= lib_LTLIBRARIES='$(lib_LTLIBRARIES)' \
+			   syslib_LTLIBRARIES='$(syslib_LTLIBRARIES)' \
 			   PKG_MANPATH='$(PKG_MANPATH)' \
 			   mandir='$(mandir)'
 CLEANFILES		+= check_libs.log

@@ -129,7 +129,7 @@ then
 	# module or drier has some high level documentation.
 	#
 	echo_v "testing for manual pages for libraries"
-	for lib in $lib_LTLIBRARIES
+	for lib in $lib_LTLIBRARIES $syslib_LTLIBRARIES
 	do
 		myname=`echo $lib | sed -e 's|\.la$||;s|\.a$||;s|\.so$||'`
 		mcname=`echo $myname | sed -e 's|[^_[:alnum:]]|_|g'`
@@ -181,7 +181,7 @@ then
 	echo_v "generating exported symbols"
 	rm -f Libraries.map
 	libs=
-	for lib in $lib_LTLIBRARIES
+	for lib in $lib_LTLIBRARIES $syslib_LTLIBRARIES
 	do
 		echo_t "generating exported symbols for library $lib"
 		l=`basename $lib`

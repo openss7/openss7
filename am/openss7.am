@@ -336,9 +336,11 @@ TESTS_ENVIRONMENT	= srcdir='$(srcdir)' \
 			  MAINTAINER_MODE='$(MAINTAINER_MODE)' \
 			  bin_PROGRAMS='$(bin_PROGRAMS)' \
 			  dist_bin_SCRIPTS='$(dist_bin_SCRIPTS)' \
+			  sysbin_PROGRAMS='$(sysbin_PROGRAMS)' \
 			  sbin_PROGRAMS='$(sbin_PROGRAMS)' \
 			  pkglibexec_PROGRAMS='$(pkglibexec_PROGRAMS)' \
 			  dist_sbin_SCRIPTS='$(dist_sbin_SCRIPTS)' \
+			  syssbin_PROGRAMS='$(syssbin_PROGRAMS)' \
 			  dist_pkglibexec_SCRIPTS='$(dist_pkglibexec_SCRIPTS)' \
 			  dist_initrd_SCRIPTS='$(dist_initrd_SCRIPTS)' \
 			  dist_noinst_SCRIPTS='$(dist_noinst_SCRIPTS)' \

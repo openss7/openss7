@@ -70,6 +70,8 @@
 
 %global binfiles    %{nil}
 %global sbinfiles   %{nil}
+%global sysbinfiles %{nil}
+%global syssbinfiles %{nil}
 %global wrapper     wrapper
 %global modules     specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat
 %global nonrpmmods  LiS lis streams STREAMS strbcm strcompat strutil strtty strchan strxns strxnet strnsl strsock strinet strsctp strisdn strvoip strss7 sigtran stratm
@@ -130,9 +132,10 @@
 %global HAVE_makedev        %{?makedev:     1}%{!?makedev:     0}
 %global HAVE_mknods         %{?mknods:      1}%{!?mknods:      0}
 %global HAVE_rmnods         %{?rmnods:      1}%{!?rmnods:      0}
-%global HAVE_sbinfiles      %{?sbinfiles:   1}%{!?sbinfiles:   0}
 %global HAVE_binfiles       %{?binfiles:    1}%{!?binfiles:    0}
 %global HAVE_sbinfiles      %{?sbinfiles:   1}%{!?sbinfiles:   0}
+%global HAVE_sysbinfiles    %{?sysbinfiles: 1}%{!?sysbinfiles: 0}
+%global HAVE_syssbinfiles   %{?syssbinfiles: 1}%{!?syssbinfiles: 0}
 %global HAVE_preloads       %{?preloads:    1}%{!?preloads:    0}
 %global HAVE_wrapper        %{?wrapper:     1}%{!?wrapper:     0}
 %global HAVE_modules        %{?modules:     1}%{!?modules:     0}
@@ -390,6 +393,12 @@
 %if %{HAVE_sbinfiles}
 %global HAVE_binaries       1
 %endif
+%if %{HAVE_sysbinfiles}
+%global HAVE_binaries       1
+%endif
+%if %{HAVE_syssbinfiles}
+%global HAVE_binaries       1
+%endif
 %if %{HAVE_libraries}
 %global HAVE_binaries       1
 %endif
@@ -411,6 +420,8 @@
 
 %global FILES_binfiles      %{HAVE_binfiles}
 %global FILES_sbinfiles     %{HAVE_sbinfiles}
+%global FILES_sysbinfiles   %{HAVE_sysbinfiles}
+%global FILES_syssbinfiles  %{HAVE_syssbinfiles}
 %global FILES_preloads      %{HAVE_preloads}
 %global FILES_oldprel       %{HAVE_oldprel}
 %global FILES_newprel       %{HAVE_newprel}
@@ -665,6 +676,8 @@
 %{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
 %{!?_syslib32dir:       %{expand: %%global _syslib32dir     /lib}}
 %{!?_syslibdir:         %{expand: %%global _syslibdir       %%(echo %%{_libdir} | sed 's,/usr,,')}}
+%{!?_sysbindir:         %{expand: %%global _sysbindir       %%(echo %%{_bindir} | sed 's,/usr,,')}}
+%{!?_syssbindir:        %{expand: %%global _syssbindir      %%(echo %%{_sbindir} | sed 's,/usr,,')}}
 %{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
 %{!?_gcjdir:            %{expand: %%global _gcjdir          %%{_libdir}/gcj}}
 %{!?_pkggcjdir:         %{expand: %%global _pkggcjdir       %%{_gcjdir}/%%{name}}}
@@ -760,6 +773,8 @@
 %else
 %global FILES_binfiles      0
 %global FILES_sbinfiles     0
+%global FILES_sysbinfiles   0
+%global FILES_syssbinfiles  0
 %global FILES_includes      0
 %global FILES_libraries     0
 %global FILES_libstatic     0
@@ -820,6 +835,8 @@
 %else
 %global FILES_binfiles      0
 %global FILES_sbinfiles     0
+%global FILES_sysbinfiles   0
+%global FILES_syssbinfiles  0
 %global FILES_wrapper       0
 %global FILES_modules       0
 %global FILES_includes      0
@@ -912,6 +929,12 @@
 %global FILES_binaries      1
 %endif
 %if %{FILES_sbinfiles}
+%global FILES_binaries      1
+%endif
+%if %{FILES_sysbinfiles}
+%global FILES_binaries      1
+%endif
+%if %{FILES_syssbinfiles}
 %global FILES_binaries      1
 %endif
 %if %{FILES_libraries}
@@ -1197,6 +1220,12 @@
 %if %{HAVE_sbinfiles}
 %global NEED_lib        1
 %endif
+%if %{HAVE_sysbinfiles}
+%global NEED_lib        1
+%endif
+%if %{HAVE_syssbinfiles}
+%global NEED_lib        1
+%endif
 %if %{HAVE_libraries}
 %global NEED_lib        1
 %endif
@@ -1241,6 +1270,12 @@
 %global WANT_lib        1
 %endif
 %if %{FILES_sbinfiles}
+%global WANT_lib        1
+%endif
+%if %{FILES_sysbinfiles}
+%global WANT_lib        1
+%endif
+%if %{FILES_syssbinfiles}
 %global WANT_lib        1
 %endif
 %if %{FILES_libraries}
@@ -1794,6 +1829,12 @@
 %endif
 %if %{FILES_sbinfiles}
 %global files_sbinfiles     %{nil}
+%endif
+%if %{FILES_sysbinfiles}
+%global files_sysbinfiles   %{nil}
+%endif
+%if %{FILES_syssbinfiles}
+%global files_syssbinfiles  %{nil}
 %endif
 %if %{FILES_preloads}
 %global files_preloads      %{nil}
@@ -4010,6 +4051,12 @@ Prefix:             %{_bindir}
 %if %{FILES_sbinfiles}
 Prefix:             %{_sbindir}
 %endif
+%if %{FILES_sysbinfiles}
+Prefix:             %{_sysbindir}
+%endif
+%if %{FILES_syssbinfiles}
+Prefix:             %{_syssbindir}
+%endif
 %if %{FILES_libraries}
 Prefix:             %{_libdir}
 Prefix:             %{_syslibdir}
@@ -4551,6 +4598,8 @@ fi
 %defattr(-,root,root)
 %{?files_binfiles:%{_bindir}/*}
 %{?files_sbinfiles:%{_sbindir}/*}
+%{?files_sysbinfiles:%{_sysbindir}/*}
+%{?files_syssbinfiles:%{_syssbindir}/*}
 %{?files_libraries:%{_libdir}/*.so*}
 %{?files_libraries:%{_libdir}/*.la}
 %{?files_libraries:%{_syslibdir}/*.so*}

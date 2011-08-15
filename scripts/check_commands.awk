@@ -206,6 +206,8 @@ BEGIN {
 	PROGRAMS = \
 	    ENVIRON["bin_PROGRAMS"] " " \
 	    ENVIRON["sbin_PROGRAMS"] " " \
+	    ENVIRON["sysbin_PROGRAMS"] " " \
+	    ENVIRON["syssbin_PROGRAMS"] " " \
 	    ENVIRON["libexec_PROGRAMS"] " " \
 	    ENVIRON["pkglibexec_PROGRAMS"]
 	if ((n = split(PROGRAMS, programs))) {
@@ -237,12 +239,15 @@ BEGIN {
     if (ENVIRON["MAINTAINER_MODE"] != "no") {
 	COMMANDS = \
 	    ENVIRON["bin_PROGRAMS"] " " \
+	    ENVIRON["sysbin_PROGRAMS"] " " \
 	    ENVIRON["dist_bin_SCRIPTS"]
 	n1 = split(COMMANDS, commands)
 	COMMANDS = \
 	    ENVIRON["bin_PROGRAMS"] " " \
+	    ENVIRON["sysbin_PROGRAMS"] " " \
 	    ENVIRON["dist_bin_SCRIPTS"] " " \
 	    ENVIRON["sbin_PROGRAMS"] " " \
+	    ENVIRON["syssbin_PROGRAMS"] " " \
 	    ENVIRON["dist_sbin_SCRIPTS"] " " \
 	    ENVIRON["libexec_PROGRAMS"] " " \
 	    ENVIRON["pkglibexec_PROGRAMS"] " " \
