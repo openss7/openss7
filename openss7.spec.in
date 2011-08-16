@@ -5425,7 +5425,7 @@ Autoprov:           false
 %if %{HAVE_supplements}
 Supplements:        kernel%{kernel_flavor}-latest = %{kernel_latest}
 %endif
-Requires:           %{kernel_package} = %{kbaseversion}-%{kbaserelease}
+Requires:           %{kernel_package}
 
 Provides:           %{name}-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-kernel = %{baseversion}-%{specrelease}
@@ -5612,7 +5612,7 @@ Autoprov:           false
 %if %{HAVE_supplements}
 Supplements:        kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
 %endif
-Requires:           %{kernel_develop} = %{kbaseversion}-%{kbaserelease}
+Requires:           %{kernel_develop}
 
 Provides:           %{name}-devel-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-devel-kernel = %{baseversion}-%{specrelease}
@@ -5722,7 +5722,7 @@ Autoprov:           false
 %if %{HAVE_supplements}
 Supplements:        kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
 %endif
-Requires:           %{kernel_buginfo} = %{kbaseversion}-%{kbaserelease}
+Requires:           %{kernel_buginfo}
 
 Provides:           %{name}-debuginfo-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debuginfo-kernel = %{baseversion}-%{specrelease}
@@ -5824,7 +5824,7 @@ Autoprov:           false
 %if %{HAVE_supplements}
 Supplements:        kernel%{kernel_series}-source-latest = %{kernel_number}
 %endif
-Requires:           %{kernel_bugsrce} = %{kbaseversion}-%{kbaserelease}
+Requires:           %{kernel_bugsrce} 
 
 Provides:           %{name}-debugsource-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debugsource-kernel = %{baseversion}-%{specrelease}
@@ -5943,7 +5943,7 @@ Autoprov:           false
 %if %{HAVE_supplements}
 Supplements:        kernel%{kernel_series}-source-latest = %{kernel_number}
 %endif
-Requires:           %{kernel_sourcep} = %{kbaseversion}-%{kbaserelease}
+Requires:           %{kernel_sourcep}
 
 Provides:           %{name}-source-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-source-kernel = %{baseversion}-%{specrelease}
