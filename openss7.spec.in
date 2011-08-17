@@ -62,7 +62,6 @@
 %global mknods      /usr/sbin/@STRCONF_DEVICES@
 %global rmnods      /usr/sbin/@STRCONF_DEVICES@ --remove
 # all creation and removal of devices is now performed by init script
-%global epoch       @PACKAGE_RPMEPOCH@
 %global base        @PACKAGE_LCNAME@
 %global title       @PACKAGE_TITLE@
 %global stitle      @PACKAGE_SHORTTITLE@
@@ -2139,7 +2138,10 @@
 
 Summary:        %{title} for Linux
 Name:           @PACKAGE@
+# some depsolvers (such as urpmi) really hate when epoch is set to zero
+%if @PACKAGE_RPMEPOCH@
 Epoch:          @PACKAGE_RPMEPOCH@
+%endif
 Version:        @VERSION@
 Release:        %{rpmrelease}
 License:        %{license}
@@ -2731,13 +2733,13 @@ cp -p src/python/yum-plugins/*.conf $d
 
 %if %{HAVE_manrefs}
 # stupid mandrake spec-helper will compress our macros files otherwise
-#EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{manrefs}"
-#export EXCLUDE_FROM_COMPRESS
+EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{manrefs}"
+export EXCLUDE_FROM_COMPRESS
 %endif
 %if %{HAVE_manmacros}
 # stupid mandrake spec-helper will compress our macros files otherwise
-#EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{manmacros}"
-#export EXCLUDE_FROM_COMPRESS
+EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{manmacros}"
+export EXCLUDE_FROM_COMPRESS
 %endif
 
 # stupid suse check compresses everything (including our macro files)
