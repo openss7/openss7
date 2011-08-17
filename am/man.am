@@ -246,7 +246,7 @@ all-manmacros:
 			$(ECHO_V) "sed '\$$(MAN_SUBST_STRING)' $(srcdir)/$$macro >$$macro" ; \
 			sed '$(MAN_SUBST_STRING)' $(srcdir)/$$macro >$$macro ; \
 		elif test "`(cd $(srcdir); pwd)`" = "`pwd`" ; then \
-			if test -e $$macro && ! -e $$macro.in ; then \
+			if test -e $$macro -a ! -e $$macro.in ; then \
 				$(ECHO_V) "mv -f -- $$macro $$macro.in" ; \
 				mv -f -- $$macro $$macro.in ; \
 			fi ; \
