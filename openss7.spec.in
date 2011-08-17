@@ -123,9 +123,10 @@
 %global kernel_version %{_kversion}
 %global kernel_source %(echo %{_kversion} | sed -r -e 's,BOOT$,,;s,-?smp$,,;s,bigmem$,,;s,debug$,,;s,enterprise$,,;s,hugemem$,,;s,secure$,,;s,-i686-up-4GB$,,;s,-p3-smp-64GB$,,;s,-64GB-SMP,.SuSE,;s,-default$,,;s,-tmb-(desktop586|desktop|laptop|server)-,-tmb-,;s,-(netbook|server|desktop|desktop586)-,-,')
 %global kernel_number %(echo %{_kversion} | sed -e 's,-.*$,,')
+%global kernel_majnum %(echo %{kernel_number} | sed -e 's,\.[^\.]*$,,')
 %global kernel_flavor %(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*-tmb-desktop-.*,-tmb-desktop,;t;s,.*-tmb-desktop586-.*,-tmb-desktop586,;t;s,-tmb-laptop-.*,-tmb-laptop,;t;s,.*-tmb-server-.*,-tmb-server,;t;s,.*-vserver-.*,-vserver,;t;s,.*-xen-pvops-.*,-xen-pvops,;t;s,.*-desktop-.*,-desktop,;t;s,.*-desktop586-.*,-desktop586,;t;s,.*-server-.*,-server,;t;s,.*-netbook-.*,-netbook,;t;s,.*-linus-.*,-linus,;t;s,.*,,')
-%global kernel_latest %(echo %{_kversion} | sed -e 's,%{kernel_flavor},,')
 %global kernel_symsets symsets-%{_kversion}.tar.gz
+%global kernel_latest %((LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{_kversion}/kernel | grep -v 'not owned' | sed -r -n 's,.*-([23]\..*),\\1,;T;s,^([^-]*-[0-9]*)\.[^\.]*(\..*)$,\\1\\2,p') 2>/dev/null)
 %global kernel_series %(echo %{_kversion} | sed -r -e 's,.*-tmb-(desktop|desktop586|laptop|server)-.*,-tmb,;t;s,.*-vserver-.*,-vserver,;t;s,.*-linus-.*,-linus,;t;s,.*-xen-pvops-.*,-vserver,;t;s,.*-(desktop|desktop586|netbook|server)-.*,,;t;s,.*,,')
 
 %global HAVE_devices        %{?majbase:     1}%{!?majbase:     0}
@@ -2102,16 +2103,17 @@
 %global kernel_sourcep %{name}-kmp%{kernel_flavor}-source
 %endif
 %if %{HAVE_urpmkmps}
-%global kernel_package %{name}%{kernel_flavor}-%{kernel_latest}
-%global kernel_buginfo %{name}%{kernel_flavor}-debuginfo-%{kernel_latest}
-%global kernel_bugsrce %{name}%{kernel_flavor}-debugsource-%{kernel_latest}
-%global kernel_develop %{name}%{kernel_flavor}-devel-%{kernel_latest}
-%global kernel_sourcep %{name}%{kernel_flavor}-source-%{kernel_latest}
-%global latest_package %{name}%{kernel_flavor}-latest
-%global latest_buginfo %{name}%{kernel_flavor}-debuginfo-latest
-%global latest_bugsrce %{name}%{kernel_flavor}-debugsource-latest
-%global latest_develop %{name}%{kernel_flavor}-devel-latest
-%global latest_sourcep %{name}%{kernel_flavor}-source-latest
+# URPM is built to expect -kernel-2\. in the name of kmods
+%global kernel_package %{name}-kernel-%{_kversion}
+%global kernel_buginfo %{name}-debuginfo-kernel-%{_kversion}
+%global kernel_bugsrce %{name}-debugsource-kernel-%{_kversion}
+%global kernel_develop %{name}-devel-kernel-%{_kversion}
+%global kernel_sourcep %{name}-source-kernel-%{_kversion}
+%global latest_package %{name}-latest%{kernel_flavor}
+%global latest_buginfo %{name}-debuginfo-latest%{kernel_flavor}
+%global latest_bugsrce %{name}-debugsource-latest%{kernel_flavor}
+%global latest_develop %{name}-devel-latest%{kernel_flavor}
+%global latest_sourcep %{name}-source-latest%{kernel_flavor}
 %endif
 %else
 %global kernel_package %{name}-%{_kversion}
@@ -5035,6 +5037,7 @@ Requires(postun):   lsof
 %((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_urpmkmps}
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}\\n" | grep -v 'not owned') 2>/dev/null)
 %endif
@@ -5048,6 +5051,7 @@ Requires(postun):   lsof
 %((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_urpmirepo}
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel | grep -v 'not owned' | sed -r -n 's,.*-([23]\..*),\\1,;T;s,^([^-]*-[0-9]*)\.[^\.]*(\..*)$,%{Enhances}: kernel = \\1\\2,p') 2>/dev/null)
 %else
 %((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %endif
@@ -5055,9 +5059,9 @@ Requires(postun):   lsof
 %endif
 %endif
 
-%if %{HAVE_urpmirepo}
+#if %{HAVE_urpmirepo}
 # URPMI hates this dependency.  This is the circular dependency point.
-%else
+#else
 %if %{NEED_base}
 Requires(prereq):   %{name}-base    = %{baseversion}-%{baserelease}
 Requires(pre):      %{name}-base    = %{baseversion}-%{baserelease}
@@ -5065,9 +5069,13 @@ Requires(post):     %{name}-base    = %{baseversion}-%{baserelease}
 Requires(preun):    %{name}-base    = %{baseversion}-%{baserelease}
 Requires(postun):   %{name}-base    = %{baseversion}-%{baserelease}
 %endif
-%endif
+#endif
 
 %if %{NEED_lmod}
+Provides:           %{name}-kernel-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-kernel-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-kernel-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-kernel-%{_kversion} = %{baseversion}-%{rpmrelease}
 %else
 Provides:           %{name}-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-kernel = %{baseversion}-%{specrelease}
@@ -5422,9 +5430,7 @@ Group:              System Environment/Kernel
 Autoreq:            false
 Autoprov:           false
 
-%if %{HAVE_supplements}
-Supplements:        kernel%{kernel_flavor}-latest = %{kernel_latest}
-%endif
+Requires:           kernel%{kernel_flavor}-latest = %{kernel_latest}
 Requires:           %{kernel_package}
 
 Provides:           %{name}-kernel = %{kbaseversion}-%{kbaserelease}
@@ -5490,6 +5496,7 @@ Prefix:             %{_includedir}/%{name}/%{kernel_version}
 %((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME}_%{ARCH} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %if %{HAVE_urpmkmps}
+%((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %else
 %((LANG_ALL="C" rpm -q --whatprovides %{_kmoduledir}/kernel --qf "%{Enhances}: %{NAME} = %{VERSION}-%{RELEASE}\\n" | grep -v 'not owned') 2>/dev/null)
 %endif
@@ -5503,6 +5510,10 @@ Prefix:             %{_includedir}/%{name}/%{kernel_version}
 %endif
 
 %if %{NEED_ldev}
+Provides:           %{name}-devel-kernel-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-devel-kernel-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-devel-kernel-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-devel-kernel-%{_kversion} = %{baseversion}-%{rpmrelease}
 %else
 Provides:           %{name}-devel-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-devel-kernel = %{baseversion}-%{specrelease}
@@ -5609,9 +5620,7 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
-%if %{HAVE_supplements}
-Supplements:        kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
-%endif
+Requires:           kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
 Requires:           %{kernel_develop}
 
 Provides:           %{name}-devel-kernel = %{kbaseversion}-%{kbaserelease}
@@ -5659,6 +5668,10 @@ Autoprov:           true
 %endif
 
 %if %{NEED_lbug}
+Provides:           %{name}-debuginfo-kernel-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debuginfo-kernel-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-debuginfo-kernel-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-debuginfo-kernel-%{_kversion} = %{baseversion}-%{rpmrelease}
 %else
 Provides:           %{name}-debuginfo-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debuginfo-kernel = %{baseversion}-%{specrelease}
@@ -5719,9 +5732,7 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
-%if %{HAVE_supplements}
-Supplements:        kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
-%endif
+Requires:           kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
 Requires:           %{kernel_buginfo}
 
 Provides:           %{name}-debuginfo-kernel = %{kbaseversion}-%{kbaserelease}
@@ -5766,6 +5777,10 @@ Autoprov:           true
 %{Enhances}:        %{kernel_buginfo} = %{kbaseversion}-%{kbaserelease}
 
 %if %{NEED_lbug}
+Provides:           %{name}-debugsource-kernel-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-debugsource-kernel-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-debugsource-kernel-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-debugsource-kernel-%{_kversion} = %{baseversion}-%{rpmrelease}
 %else
 Provides:           %{name}-debugsource-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-debugsource-kernel = %{baseversion}-%{specrelease}
@@ -5821,9 +5836,7 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
-%if %{HAVE_supplements}
-Supplements:        kernel%{kernel_series}-source-latest = %{kernel_number}
-%endif
+Requires:           kernel%{kernel_series}-source-latest = %{kernel_number}
 Requires:           %{kernel_bugsrce} 
 
 Provides:           %{name}-debugsource-kernel = %{kbaseversion}-%{kbaserelease}
@@ -5878,6 +5891,10 @@ Requires:           %{name} = %{baseversion}-%{baserelease}
 %endif
 
 %if %{NEED_lsrc}
+Provides:           %{name}-source-kernel-%{_kversion} = %{kbaseversion}-%{kbaserelease}
+Provides:           %{name}-source-kernel-%{_kversion} = %{baseversion}-%{specrelease}
+Provides:           %{name}-source-kernel-%{_kversion} = %{baseversion}-%{baserelease}
+Provides:           %{name}-source-kernel-%{_kversion} = %{baseversion}-%{rpmrelease}
 %else
 Provides:           %{name}-source-kernel = %{kbaseversion}-%{kbaserelease}
 Provides:           %{name}-source-kernel = %{baseversion}-%{specrelease}
@@ -5940,9 +5957,7 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
-%if %{HAVE_supplements}
-Supplements:        kernel%{kernel_series}-source-latest = %{kernel_number}
-%endif
+Requires:           kernel%{kernel_series}-source-latest = %{kernel_number}
 Requires:           %{kernel_sourcep}
 
 Provides:           %{name}-source-kernel = %{kbaseversion}-%{kbaserelease}
