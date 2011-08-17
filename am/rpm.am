@@ -213,7 +213,7 @@ rpm_module4_file	= $(PACKAGE)-*-$(VERSION)_*-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPME
 rpm_module5_file	= $(PACKAGE)-*kernel*-$(VERSION)-$(PACKAGE_RPMRELEASE).$(target_cpu).rpm
 rpm_module6_file	= $(PACKAGE)-kmod*-$(VERSION)-$(PACKAGE_RPMRELEASE).$(target_cpu).rpm
 rpm_module7_file	= $(PACKAGE)-*-$(knumber)*-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
-rpm_module8_file	= $(PACKAGE)-*-latest-$(VERSION).*-*$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
+rpm_module8_file	= $(PACKAGE)-*latest*-$(VERSION).*-*$(PACKAGE_RPMEXTRA2).$(target_cpu).rpm
 rpm_update_files	= $(rpmdir)/*/$(rpm_module0_file) \
 			  $(rpmdir)/*/$(rpm_module1_file) \
 			  $(rpmdir)/*/$(rpm_module2_file) \
@@ -3156,9 +3156,9 @@ release-update-aptrpm:
 				for comp in $$comps ; do \
 					for fn in pkglist srclist release ; do \
 						for ext in '' .gz .bz2 .lzma .xz ; do \
-							f="$$fn.$$comp$$ext" ; \
-							test -s $$f || continue ; \
-							$(ECHO) " `md5sum $$f | awk '{print$$1}'` `wc -c $$f | awk '{print$$1}'` base/$$f" ; \
+							file="$$fn.$$comp$$ext" ; \
+							test -s $$file || continue ; \
+							$(ECHO) " `md5sum $$file | awk '{print$$1}'` `wc -c $$file | awk '{print$$1}'` base/$$file" ; \
 						done ; \
 					done ; \
 				done ; \
