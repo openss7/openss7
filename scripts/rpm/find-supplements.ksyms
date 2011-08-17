@@ -69,8 +69,6 @@ grep '\.ko$' | xargs -r strings -n 7 | awk '
 	sub("^version=", "")
 	gsub(" ", "_")
 	VERSION = $0
-	if (VERSION~/^0:/)
-	    sub(/^0:/,"",VERSION)
 	next
     }
     /^vermagic=/ {
