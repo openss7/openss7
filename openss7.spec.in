@@ -2033,11 +2033,11 @@
 %{?disturl:%{!?url:%{expand: %%global url %{disturl}}}}
 %global rpmrelease @PACKAGE_RPMRELEASE@
 # specrelease is the specific release (e.g. 1.centos5)
-%{?extrarelease:  %{expand: %%global specrelease @PACKAGE_RPMRELEASE@%%{extrarelease}}}
-%{!?extrarelease: %{expand: %%global specrelease @PACKAGE_RPMRELEASE@}}
+%{!?extrarelease: %{expand: %%global extrarelease %%{nil}}}
+%global specrelease %{rpmrelease}%{extrarelease}
 # basrelease is the base release (e.g. 1.el5)
-%{?extrarelease2:  %{expand: %%global baserelease @PACKAGE_RPMRELEASE@%%{extrarelease2}}}
-%{!?extrarelease2: %{expand: %%global baserelease @PACKAGE_RPMRELEASE@}}
+%{!?extrarelease2: %{expand: %%global extrarelease2 %%{nil}}}
+%global baserelease %{rpmrelease}%{extrarelease2}
 
 # Mandriva and others add a mogrified kernel version string to the kmp name.
 # (Mandriva also has a virtual package with 'latest' where the version string
@@ -2048,7 +2048,7 @@
 
 # RedHat adds a mogrified kernel version string to the kmp release (or commonly not at all).
 %if %{HAVE_rhatkmps}
-%global kbaserelease %{rpmrelease}%(echo '.%{_kversion}' | sed -e 'y,-,.,')
+%global kbaserelease %{rpmrelease}%(echo '.%{_kversion}' | sed -e 'y,-,.,;s,\.%{arch}$,,')
 %global kspecrelease %{baserelease}
 %global krelsrequire %{nil}
 %endif
@@ -2083,7 +2083,7 @@
 # avoid inserting a - into either
 %if %{HAVE_urpmkmps}
 %global lbaseversion %{baseversion}%(echo '.%{kernel_latest}' | sed -e 's,-.*,,')
-%global lbaserelease %(echo '.%{kernel_latest}' | sed -e 's,.*-,,;s,\.[^\.]*$,,')%{?extrarelease2:%{extrarelease2}}
+%global lbaserelease %(echo '.%{kernel_latest}' | sed -e 's,.*-,,;s,\.[^\.]*$,,')%{extrarelease2}
 %endif
 
 %if %{HAVE_weakmods}
