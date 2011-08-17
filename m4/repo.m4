@@ -377,7 +377,7 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
     AC_CACHE_CHECK([for urpmi config directory], [repo_cv_urpmi_confdir], [dnl
 	eval "repo_search_path=\"
 	    ${DESTDIR}${sysconfdir}/urpmi
-	    ${DESTDIR}${rootdir}$/etc/urpmi
+	    ${DESTDIR}${rootdir}/etc/urpmi
 	    ${DESTDIR}/etc/urpmi\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
