@@ -5862,7 +5862,7 @@ The %{latest_bugsrce} binary package is a virtual package that requires
 the latest kernel%{kernel_series}-source-latest package and the latest
 %{name} %{kernel_bugsrce} package.  It is used for automatic updating.
 
-%if %{PACKAGE_kbug}
+%if %{PACKAGE_lbug}
 %files -n %{latest_bugsrce}
 # ---------------------------------------------------------------------------
 %endif
