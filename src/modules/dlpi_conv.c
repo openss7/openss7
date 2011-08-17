@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.
 #include <sys/dlpi.h>
 
 #define DLPI_CONV_DESCRIP	"DLPI ENDIAN CONVERSION (DLPI-CONV) FOR LINUX FAST-STREAMS"
-#define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $"
 #define DLPI_CONV_DEVICE	"SVR 4.2 DLPI Endian Conversion (DLPI-CONV) for STREAMS"
 #define DLPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -100,8 +100,7 @@ MODULE_LICENSE(DLPI_CONV_LICENSE);
 MODULE_ALIAS("streams-dlpi-conv");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* MODULE */
 

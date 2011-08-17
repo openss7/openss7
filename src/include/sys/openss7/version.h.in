@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -75,6 +75,6 @@
  * #include "sys/@PACKAGE@/version.h".
  */
 
-#define @PACKAGE_UCNAME@_VERSION "@PACKAGE_RPMEPOCH@:@VERSION@-@PACKAGE_RPMRELEASE@"
+#define @PACKAGE_UCNAME@_VERSION "@PACKAGE_ENVR@"
 
 #endif				/* __SYS_@PACKAGE_UCNAME@_VERSION_H__ */

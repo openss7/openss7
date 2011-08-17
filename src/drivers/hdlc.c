@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -94,7 +94,7 @@ static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.2 $
 #define HDLC_DESCRIP	"HDLC STREAMS MULTIPLEXING DRIVER."
 #define HDLC_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $"
-#define HDLC_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define HDLC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports Linux HDLC devices."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define HDLC_LICENSE	"GPL"
@@ -118,8 +118,7 @@ MODULE_LICENSE(HDLC_LICENSE);
 MODULE_ALIAS("streams-hldc");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-		PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 

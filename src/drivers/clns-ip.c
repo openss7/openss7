@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -126,7 +126,7 @@ static char const ident[] = "$RCSfile: clns-ip.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define CLNS_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLNS_EXTRA	"Part of the OpenSS7 OSI stack for Linux Fast-STREAMS"
-#define CLNS_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define CLNS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CLNS_REVISION	"OpenSS7 $RCSfile: clns-ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $"
 #define CLNS_DEVICE	"SVR 4.2 MP STREAMS CLNS OSI ISO-IP (RFC 1070) Network Provider"
 #define CNLS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -150,8 +150,7 @@ MODULE_LICENSE(CLNS_LICENSE);
 MODULE_ALIAS("streams-clns-ip");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 

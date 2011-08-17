@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -89,7 +89,7 @@ static char const ident[] = "$RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.2 $
 
 #define LDL_DESCRIP	"SVR 4.2 DATA LINK DRIVER FOR LINUX FAST-STREAMS"
 #define LDL_EXTRA	"Part of the OpenSS7 X/Open Network Services for Linux Fast-STREAMS."
-#define LDL_COPYRIGHT	"Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved."
+#define LDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LDL_REVISION	"OpenSS7 $RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $"
 #define LDL_DEVICE	"SVR 4.2MP Data Link Driver (DL) for Linux Fast-STREAMS"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -127,8 +127,7 @@ MODULE_ALIAS("char-major-" __stringify(LDL_CMAJOR_0) "-0");
 MODULE_ALIAS("/dev/ldl");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 

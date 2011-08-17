@@ -435,6 +435,11 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	This defaults to automatic detection.])
     AC_DEFINE_UNQUOTED([PACKAGE_RPMEXTRA2], ["$PACKAGE_RPMEXTRA2"], [The RPM Extra Release string.
 	This defaults to automatic detection.])
+    PACKAGE_ENVR="$PACKAGE_EPOCH:$PACKAGE_VERSION.$PACKAGE_RELEASE$PACKAGE_PATCHLEVEL-$PACKAGE_RPMRELEASE$PACKAGE_RPMEXTRA2"
+    PACKAGE_ENVR=`echo "$PACKAGE_ENVR" | sed 's,^0:,,'`
+    AC_SUBST([PACKAGE_ENVR])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_ENVR], ["$PACKAGE_ENVR"], [The RPM epoch, name, version, release
+	string.  This defaults to automatic detection.])
 ])# _RPM_SPEC_SETUP_DIST
 # =============================================================================
 

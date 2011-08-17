@@ -112,6 +112,7 @@
 @set PACKAGE_TITLE @PACKAGE_TITLE@
 @set PACKAGE_UCNAME @PACKAGE_UCNAME@
 @set PACKAGE_VERSION @PACKAGE_VERSION@
+@set PACKAGE_ENVR @PACKAGE_ENVR@
 
 @set _bindir @prefix@/bin
 @set _datadir @prefix@/share

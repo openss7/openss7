@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -81,7 +81,7 @@ static char const ident[] = "$RCSfile: aal1.c,v $ $Name:  $($Revision: 1.1.2.2 $
 
 #define AAL1_DESCRIP	"MTP3B-AAL1 STREAMS MODULE."
 #define AAL1_REVISION	"OpenSS7 $RCSfile: aal1.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:00 $"
-#define AAL1_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define AAL1_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define AAL1_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL1 module."
 #define AAL1_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define AAL1_LICENSE	"GPL"
@@ -104,8 +104,7 @@ MODULE_LICENSE(AAL1_LICENSE);
 MODULE_ALIAS("streams-aal1");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 

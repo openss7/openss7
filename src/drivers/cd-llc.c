@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -78,7 +78,7 @@ static char const ident[] = "$RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.2
 
 #define LLC_DESCRIP	"SVR 4.2 CDI X.25 LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define LLC_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define LLC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LLC_REVISION	"OpenSS7 $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $"
 #define LLC_DEVICE	"SVR 4.2MP CDI Driver (CDI) for IEEE 802.2 LLC"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -122,8 +122,7 @@ MODULE_ALIAS("char-major-" __stringify(LLC_MAJOR_0) "-" __stringify(LLC_CMINOR))
 MODULE_ALIAS("/dev/llc");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* MODULE */
 #endif				/* LINUX */
