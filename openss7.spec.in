@@ -5430,7 +5430,9 @@ Group:              System Environment/Kernel
 Autoreq:            false
 Autoprov:           false
 
+%if %{HAVE_urpmirepo}
 Requires:           kernel%{kernel_flavor}-latest = %{kernel_latest}
+%endif
 Requires:           %{kernel_package}
 
 Provides:           %{name}-kernel = %{kbaseversion}-%{kbaserelease}
@@ -5620,7 +5622,9 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
+%if %{HAVE_urpmirepo}
 Requires:           kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
+%endif
 Requires:           %{kernel_develop}
 
 Provides:           %{name}-devel-kernel = %{kbaseversion}-%{kbaserelease}
@@ -5732,7 +5736,9 @@ Group:              Development/Kernel
 Autoreq:            false
 Autoprov:           false
 
+%if %{HAVE_urpmirepo}
 Requires:           kernel%{kernel_flavor}-devel-latest = %{kernel_latest}
+%endif
 Requires:           %{kernel_buginfo}
 
 Provides:           %{name}-debuginfo-kernel = %{kbaseversion}-%{kbaserelease}
