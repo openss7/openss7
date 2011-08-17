@@ -2108,11 +2108,6 @@
 %global kernel_bugsrce %{name}-debugsource-kernel-%{_kversion}
 %global kernel_develop %{name}-devel-kernel-%{_kversion}
 %global kernel_sourcep %{name}-source-kernel-%{_kversion}
-%global latest_package %{name}-latest%{kernel_flavor}
-%global latest_buginfo %{name}-debuginfo-latest%{kernel_flavor}
-%global latest_bugsrce %{name}-debugsource-latest%{kernel_flavor}
-%global latest_develop %{name}-devel-latest%{kernel_flavor}
-%global latest_sourcep %{name}-source-latest%{kernel_flavor}
 %endif
 %else
 %global kernel_package %{name}-%{_kversion}
@@ -2121,6 +2116,11 @@
 %global kernel_develop %{name}-devel-%{_kversion}
 %global kernel_sourcep %{name}-source-%{_kversion}
 %endif
+%global latest_package %{name}-latest%{kernel_flavor}
+%global latest_buginfo %{name}-debuginfo-latest%{kernel_flavor}
+%global latest_bugsrce %{name}-debugsource-latest%{kernel_flavor}
+%global latest_develop %{name}-devel-latest%{kernel_flavor}
+%global latest_sourcep %{name}-source-latest%{kernel_flavor}
 
 # a macro to [build] require one package of the same version as another (possibly virtual) package
 # use the arguments [Build]Requires: package1 [>]= package2
@@ -5061,9 +5061,10 @@ Requires(postun):   lsof
 %endif
 %endif
 
-#if %{HAVE_urpmirepo}
-# URPMI hates this dependency.  This is the circular dependency point.
-#else
+%if %{NEED_virt}
+Requires:           %{name} = %{baseversion}-%{baserelease}
+%endif
+
 %if %{NEED_base}
 Requires(prereq):   %{name}-base    = %{baseversion}-%{baserelease}
 Requires(pre):      %{name}-base    = %{baseversion}-%{baserelease}
@@ -5071,7 +5072,6 @@ Requires(post):     %{name}-base    = %{baseversion}-%{baserelease}
 Requires(preun):    %{name}-base    = %{baseversion}-%{baserelease}
 Requires(postun):   %{name}-base    = %{baseversion}-%{baserelease}
 %endif
-#endif
 
 %if %{NEED_lmod}
 Provides:           %{name}-kernel-%{_kversion} = %{kbaseversion}-%{kbaserelease}
