@@ -134,6 +134,8 @@ BEGIN {
 	version = srcversion
     if (!version)
 	version = vermagic
+    if (version~/^0:/)
+	sub(/^0:/,"",version)
     for (i = 1; i <= j; i++) {
 	if (lines[i]) {
 	    if (lines[i]~/^alias=/) {
