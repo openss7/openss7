@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -99,7 +99,7 @@ static char const ident[] = "$RCSfile: tpi_sccp.c,v $ $Name:  $($Revision: 1.1.2
 
 #define TPI_SCCP_DESCRIP	"SCCPI to TPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define TPI_SCCP_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
-#define TPI_SCCP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define TPI_SCCP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TPI_SCCP_REVISION	"OpenSS7 $RCSfile: tpi_sccp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:08 $"
 #define TPI_SCCP_DEVICE		"SVR 4.2MP SCCPI to TPI Conversion Module (TPI) for SCCP"
 #define TPI_SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -134,8 +134,7 @@ MODULE_ALIAS("streams-module-tpi-sccp");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_TPI_SCCP_MODID));
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif				/* MODULE_VERSION */
 #endif				/* MODULE */
 #endif				/* LINUX */

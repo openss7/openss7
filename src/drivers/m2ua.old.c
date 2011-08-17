@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -76,7 +76,7 @@ static char const ident[] = "$RCSfile: m2ua.old.c,v $ $Name:  $($Revision: 1.1.2
 
 #define M2UA_DESCRIP	"SS7 MTP2 USER ADAPTATION (M2UA) STREAMS MULTIPLEXING DRIVER."
 #define M2UA_REVISION	"LfS $RCSfile: m2ua.old.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:33 $"
-#define M2UA_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define M2UA_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2UA_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2UA_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define M2UA_LICENSE	"GPL"
@@ -97,8 +97,7 @@ MODULE_LICENSE(M2UA_LICENSE);
 MODULE_ALIAS("streams-m2ua");
 #endif
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 

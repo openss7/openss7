@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -265,7 +265,7 @@ static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 
 #define RSW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RSW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define RSW_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define RSW_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define RSW_REVISION	"OpenSS7 $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-03-26 04:28:47 $"
 #define RSW_DEVICE	"SVR 4.2 MP STREAMS RTP Switch Driver"
 #define RSW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -290,8 +290,7 @@ MODULE_LICENSE(RSW_LICENSE);
 MODULE_ALIAS("streams-rsw");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "."
-	       PACKAGE_RELEASE PACAKGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 

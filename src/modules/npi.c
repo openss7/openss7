@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -92,7 +92,7 @@ static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 
 #define NPI_DESCRIP	"NLI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define NPI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define NPI_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define NPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $"
 #define NPI_DEVICE	"SVR 4.2MP NLI to NPI Conversion Module (NPI) for X.25 CONS"
 #define NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -127,8 +127,7 @@ MODULE_ALIAS("streams-module-npi");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_SREAMS_NPI_MODID));
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* MODULE */
 #endif				/* LINUX */

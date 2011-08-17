@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -83,7 +83,7 @@ static char const ident[] = "$RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define CH_DESCRIP	"CH (Channel) STREAMS PIPE MODULE."
 #define CH_REVISION	"OpenSS7 $RCSfile: ch_pmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $"
-#define CH_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define CH_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CH_DEVICE	"Provides OpenSS7 CH pipe driver."
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CH_LICENSE	"GPL"
@@ -106,8 +106,7 @@ MODULE_LICENSE(CH_LICENSE);
 MODULE_ALIAS("streams-ch-pmod");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 

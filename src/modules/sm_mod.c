@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -70,7 +70,7 @@ static char const ident[] = "$RCSfile: sm_mod.c,v $ $Name:  $($Revision: 1.1.2.2
 
 #define SM_MOD_DESCRIP		"SIMPLE SINGLE LINK MTP."
 #define SM_MOD_REVISION		"LfS $RCSfile: sm_mod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $"
-#define SM_MOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define SM_MOD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SM_MOD_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SM_MOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SM_MOD_LICENSE		"GPL"
@@ -93,8 +93,7 @@ MODULE_LICENSE(SM_MOD_LICENSE);
 MODULE_ALIAS("streams-sm_mod");
 #endif
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -95,7 +95,7 @@ static char const ident[] = "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 1.1.2.2
 
 #define ZAP_MX_DESCRIP	"ZAPTEL MULTIPLEX (ZAP-MX) STREAMS MODULE."
 #define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:09 $"
-#define ZAP_MX_COPYRIGHT    "Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define ZAP_MX_COPYRIGHT    "Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ZAP_MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ZAP_MX_CONTACT	"Brian Biduock <bidulock@openss7.org>"
 #define ZAP_MX_LICENSE	"GPL"
@@ -118,8 +118,7 @@ MODULE_LICENSE(ZAP_MX_LICENSE);
 MODULE_ALIAS("streams-zap_mx");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 

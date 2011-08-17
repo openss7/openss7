@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -91,7 +91,7 @@ static char const ident[] = "$RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.3
 
 #define TDM_IP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TDM_IP_EXTRA		"Part of the OpenSS7 VoIP Stack for Linux Fast-STREAMS"
-#define TDM_IP_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define TDM_IP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TDM_IP_REVISION		"OpenSS7 $RCSfile: tdm_ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:07 $"
 #define TDM_IP_DEVICE		"SVR 4.2 MP STREAMS TDM-IP MODULE"
 #define TDM_IP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -116,8 +116,7 @@ MODULE_LICENSE(TDM_IP_LICENSE);
 MODULE_ALIAS("streams-tdm-ip");
 #endif				/* defined MODULE_ALIAS */
 #if defined MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif				/* defined MODULE_VERSION */
 #endif				/* defined LINUX */
 

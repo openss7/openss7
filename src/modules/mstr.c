@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -73,7 +73,7 @@ static char const ident[] = "$RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.1 $
 #include <sys/os7/compat.h>
 
 #define MSTR_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
-#define MSTR_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define MSTR_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MSTR_REVISION	"OpenSS7 $RCSfile: mstr.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2010-12-19 00:26:46 $"
 #define MSTR_DEVICE	"SVR 4.2 MP STREAMS Multi-Stream Module"
 #define MSTR_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
@@ -94,8 +94,7 @@ MODULE_SUPPORTED_DEVICE(MSTR_DEVICE);
 MODULE_LICENSE(MSTR_LICENSE);
 #endif				/* MODULE_LICENSE */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif				/* MODULE_VERSION */
 #endif				/* CONFIG_STREAMS_MSTR_MODULE */
 

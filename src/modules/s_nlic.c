@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -80,7 +80,7 @@ static char const ident[] = "$RCSfile: s_nlic.c,v $ $Name:  $($Revision: 1.1.2.2
 
 #define S_NLIC_DESCRIP		"SPIDER X25 ADMIN COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
 #define S_NLIC_EXTRA		"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
-#define S_NLIC_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define S_NLIC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define S_NLIC_REVISION		"OpenSS7 $RCSfile: s_nlic.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $"
 #define S_NLIC_DEVICE		"SVR 4.2MP CDI CD_HDLC Devices"
 #define S_NLIC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -115,8 +115,7 @@ MODULE_ALIAS("streams-module-s_nlic");
 MODULE_ALIAS("streams-modid-" __stringify(CONFIG_STREAMS_S_NLIC_MODID));
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* MODULE */
 #endif				/* LINUX */

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -121,7 +121,7 @@ static char const ident[] = "$RCSfile: chmux.c,v $ $Name:  $($Revision: 1.1.2.2 
 
 #define CH_MUX_DESCRIP		"CH MULTIPLEX (CH-MUX) STREAMS MULTIPLEXING DRIVER"
 #define CH_MUX_REVISION		"OpenSS7 $RCSfile: chmux.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $"
-#define CH_MUX_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define CH_MUX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CH_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CH_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define CH_MUX_LICENSE		"GPL"
@@ -152,8 +152,7 @@ MODULE_LICENSE(CH_MUX_LICENSE);
 MODULE_ALIAS("streams-ch-mux");
 #endif				/* defined MODULE_ALIAS */
 #if defined MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif				/* defined MODULE_VERSION */
 #endif				/* defined LINUX */
 

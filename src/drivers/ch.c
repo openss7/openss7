@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -86,7 +86,7 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.2 $) 
 #define CHMUX_DESCRIP	"CH (Channel) STREAMS MULTIPLEXING DRIVER."
 #define CHMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define CHMUX_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $"
-#define CHMUX_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define CHMUX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define CHMUX_DEVICE	"Supports MX devices."
 #define CHMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CHMUX_LICENSE	"GPL"
@@ -110,8 +110,7 @@ MODULE_LICENSE(CHMUX_LICENSE);
 MODULE_ALIAS("streams-ch");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRELEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif				/* LINUX */
 

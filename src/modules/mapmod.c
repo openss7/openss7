@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -94,7 +94,7 @@ static char const ident[] = "$RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.2
 
 #define MCMOD_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MCMOD_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define MCMOD_COPYRIGHT	"Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved."
+#define MCMOD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MCMOD_REVISION		"Monavacon $RCSfile: mapmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:03 $"
 #define MCMOD_DEVICE		"GSM 29.002 MAP Common Services module for ITU-T Q.771 TC"
 #define MCMOD_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
@@ -119,8 +119,7 @@ MODULE_LICENSE(MCMOD_LICENSE);
 MODULE_ALIAS("streams-mcmod");
 #endif				/* MODULE_ALIAS */
 #ifdef MODULE_VERSION
-MODULE_VERSION(__stringify(PACKAGE_RPMEPOCH) ":" PACKAGE_VERSION "." PACKAGE_RELEASE
-	       PACKAGE_PATCHLEVEL "-" PACKAGE_RPMRLEASE PACKAGE_RPMEXTRA2);
+MODULE_VERSION(PACKAGE_ENVR);
 #endif				/* MODULE_VERSION */
 #endif				/* LINUX */
 
