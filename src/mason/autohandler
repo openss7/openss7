@@ -880,8 +880,14 @@ xml-info=1
 		    $url = '/repo';
 		    $url .= "/$artype";
 		    $url .= "/$distro" if ($distro);
-		    $url .= '/$RELEASE';
-		    $url .= '/$ARCH';
+		    # mageia can't handle substitutions yet
+		    if ($distro eq 'mageia') {
+			$url .= "/$relver";
+			$url .= "/$osarch";
+		    } else {
+			$url .= '/$RELEASE';
+			$url .= '/$ARCH';
+		    }
 
 		    my $sub = 'media';
 		    $sub .= "/$branch" if ($branch ne 'base');
@@ -904,7 +910,7 @@ xml-info=1
 		    elsif ($branch eq 'extras')	 { $b = 'Extras';  }
 		    elsif ($branch eq 'testing') { $b = 'Testing'; }
 		    else			 { $b = $branch;   }
-		    my $n = $r.'\ '.$b.'\ (openss7'.$numb.')';
+		    my $n = 'OpenSS7\ '.$r.'\ '.$b.'\ (openss7'.$numb.')';
 
 		    $numb = $numb + 1;
 
@@ -925,7 +931,7 @@ xml-info=1
 			}
 		    }
 </%perl>
-<% $n %> https://www.openss7.org<% $url %> {
+<% $n %>  {
 <%perl>
 		    if ( !$enabled ) {
 </%perl>
@@ -939,6 +945,7 @@ xml-info=1
 		    }
 </%perl>
   key-ids: 5a3fe379
+  mirrorlist: https://www.openss7.org<% $url %>
   with-dir: <% $sub %>
 }
 

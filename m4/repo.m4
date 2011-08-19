@@ -184,8 +184,11 @@ AC_DEFUN([_REPO_SETUP_YUM], [dnl
 	if test -z "$repo_cv_yum_repodir" ; then
 	    eval "repo_search_path=\"
 		${DESTDIR}${sysconfdir}/yum.repos.d
+		${DESTDIR}${sysconfdir}/yum/repos.d
 		${DESTDIR}${rootdir}/etc/yum.repos.d
-		${DESTDIR}/etc/yum.repos.d\""
+		${DESTDIR}${rootdir}/etc/yum/repos.d
+		${DESTDIR}/etc/yum.repos.d
+		${DESTDIR}/etc/yum/repos.d\""
 	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	    AC_MSG_RESULT([searching])
 	    for repo_dir in $repo_search_path ; do
@@ -397,9 +400,9 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
     ])
     AC_CACHE_CHECK([for urpmi config file], [repo_cv_uprmi_config], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/urmpi/urpmi.cfg
-	    ${DESTDIR}${rootdir}/etc/urmpi/urpmi.cfg
-	    ${DESTDIR}/etc/urmpi/urpmi.cfg\""
+	    ${DESTDIR}${sysconfdir}/urpmi/urpmi.cfg
+	    ${DESTDIR}${rootdir}/etc/urpmi/urpmi.cfg
+	    ${DESTDIR}/etc/urpmi/urpmi.cfg\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
@@ -638,7 +641,7 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
     AC_SUBST([urpmirepodir])dnl
     AC_SUBST([urpmimediadir])dnl
     AM_CONDITIONAL([WITH_INSTALL_SOURCE_URPMI], [test :"${repo_cv_urpmi_repodir:-no}" != :no])
-    urpmiconfig='${DESTDIR}${rootdir}/etc/urmpi/urpmi.cfg'
+    urpmiconfig='${DESTDIR}${rootdir}/etc/urpmi/urpmi.cfg'
     if test :"${repo_cv_urpmi_config:-no}" != :no ; then
 	urpmiconfig="$repo_cv_urpmi_config"
     fi
