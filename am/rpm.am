@@ -887,8 +887,8 @@ release-copy-rpms:
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test $$f -ef $$t && continue ; \
 		if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \) ; then \
-			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
-			install -T -D -p -- $$f $$t ; \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$f $$t" ; \
+			$(INSTALL_DATA) -T -D -p -- $$f $$t ; \
 		fi ; \
 	done ; \
 	lf=`echo '$(rpm_link_file)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; $(ECHO_V) "D: lf=$$lf" ; \
@@ -997,8 +997,8 @@ update-copy-rpms:
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		if test ! -f $$t -o \( "$(FORCE)" = force -a $$f -nt $$t \) ; then \
-			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
-			install -T -D -p -- $$f $$t ; \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$f $$t" ; \
+			$(INSTALL_DATA) -T -D -p -- $$f $$t ; \
 		fi ; \
 	done
 
@@ -2226,7 +2226,7 @@ $(urpmi_config):
 	$(AM_V_GEN)( \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p`" ; \
+		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p'`" ; \
 		numb=1 ; \
 		url='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
 		mirrors= ; \
@@ -2244,6 +2244,8 @@ $(urpmi_config):
 				b=`echo "$$s" | sed 's,/.*$$,,'` ; \
 				r=`echo "$$s" | sed 's,^[^/]*/,,'` ;; \
 			esac ; \
+			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 			$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)$$numb) $$url {" ; \
 			$(ECHO) "  ignore" >/dev/null ; \
 			test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
@@ -2260,7 +2262,7 @@ $(urpmi_local):
 	$(AM_V_GEN)( \
 		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
-		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p`" ; \
+		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p'`" ; \
 		numb=1 ; \
 		url='file:/$(DISTDIR)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
 		mirrors= ; \
@@ -2278,6 +2280,8 @@ $(urpmi_local):
 				b=`echo "$$s" | sed 's,/.*$$,,'` ; \
 				r=`echo "$$s" | sed 's,^[^/]*/,,'` ;; \
 			esac ; \
+			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 			$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)-local$$numb) $$url {" ; \
 			$(ECHO) "  ignore" >/dev/null ; \
 			test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
@@ -2441,7 +2445,7 @@ release-update-urpmi:
 				done ; \
 			done ; \
 		) >$$m/media.cfg ; \
-		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p`" ; \
+		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p'`" ; \
 		( \
 			numb=1 ; \
 			url='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
