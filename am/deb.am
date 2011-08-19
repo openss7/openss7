@@ -103,6 +103,7 @@ debian_change_files	= $(debbuilddir)/$(deb_change_file) $(debbuilddir)/$(deb_cha
 debian_update_files	= $(debbuilddir)/$(deb_module_file)
 debian_binary_files	= $(debbuilddir)/$(deb_binary_file) \
 			  $(debian_update_files)
+debian_product_file	= $(debbuilddir)/product
 
 debtop_tar_file		= $(debdir)/source/$(debianpkg).tar.gz
 debtop_dsc_file		= $(debdir)/source/$(debianpkg).dsc
@@ -113,6 +114,7 @@ debtop_change_files	= $(debdir)/$(deb_change_file) $(debdir)/$(deb_change_file).
 debtop_update_files	= $(debdir)/$(deb_module_file) $(debdir)/*/$(deb_module_file)
 debtop_binary_files	= $(debdir)/$(deb_binary_file) $(debdir)/*/$(deb_binary_file) \
 			  $(debtop_update_files)
+debtop_product_file	= $(debdir)/product
 
 ## aptdir = $(debdistdir)
 ## aptfulldir = $(debdir)
@@ -149,6 +151,17 @@ $(debian_dir_stamp): $(tardir)/$(PACKAGE)-$(VERSION).tar.bz2
 		$(am__mv) -- $(debbuilddir)/$(PACKAGE)-$(VERSION) $(debian_dir); \
 	fi
 	touch $(debian_dir_stamp)
+
+$(debian_product_file):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)(\
+		$(ECHO) 'distro=$(target_distro)' ; \
+		$(ECHO) 'relvel=$(target_edition)' ; \
+		$(ECHO) 'osarch=$(target_arch)' ; \
+		$(ECHO)	'repotype=debs' ; \
+		$(ECHO) 'username=' ; \
+		$(ECHO) 'password=' ; \
+	) >$@
 
 ## Approach to signing dsc files taken from dpkg-buildpackage:  A signed .dsc file is merely a
 ## signed cleartext armoured version of the original .dsc file with the same filename.  The tar file
@@ -249,7 +262,7 @@ all-deb: full-deb
 chg-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test "$(debdir)" != "$(debbuilddir)"; then \
-		list="$(debian_binary_files) $(debian_change_files)"; for f in $$list; do \
+		list="$(debian_binary_files) $(debian_change_files) $(debian_product_file)"; for f in $$list; do \
 			test -f $$f || continue; \
 			s= ; \
 			case `basename $$f` in \
@@ -419,7 +432,8 @@ DISTCLEANFILES		+= $(debian_cache_files) \
 			   $(debian_dir_stamp) \
 			   $(debian_source_files) \
 			   $(debian_change_files) \
-			   $(debian_binary_files)
+			   $(debian_binary_files) \
+			   $(debian_product_file)
 
 release-clean-deb: distclean-deb
 
@@ -431,9 +445,11 @@ RELEASECLEANFILES	+= $(debian_dir_stamp) \
 			   $(debian_source_files) \
 			   $(debian_change_files) \
 			   $(debian_binary_files) \
+			   $(debian_product_file) \
 			   $(debtop_source_files) \
 			   $(debtop_change_files) \
-			   $(debtop_binary_files)
+			   $(debtop_binary_files) \
+			   $(debtop_product_file)
 
 MY_PHONY		+= dsc debs full-deb each-deb one-t-deb one-k-deb one-deb noa-deb all-deb chg-deb chgs sigs csig reupload
 ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-t-deb all-one-k-deb all-one-deb all-noa-deb all-all-deb all-chg-deb all-chgs all-sigs all-csig all-reupload
@@ -441,7 +457,7 @@ ALL_RECURSIVE_TARGETS	+= all-dsc all-debs all-one-t-deb all-one-k-deb all-one-de
 update-clean-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	rm -rf $(debian_dir)
-	@list="$(debtop_source_files) $(debtop_change_files) $(debtop_binary_files)"; \
+	@list="$(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) $(debtop_product_file)"; \
 	for f in $$list; do \
 		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
 			echo "$$f"; \
@@ -455,7 +471,8 @@ UPDATE_CLEAN_LOCAL	+= update-clean-deb
 UPDATECLEANFILES	+= $(debian_dir_stamp) \
 			   $(debian_source_files) \
 			   $(debian_change_files) \
-			   $(debian_binary_files)
+			   $(debian_binary_files) \
+			   $(debian_product_file)
 
 ## Provide updates to debian source packages.  If the DSC does not exist, create it.  If the DSC
 ## exists, was created after the update stamp, and force is applied, remove and recreate the DSC.
@@ -560,7 +577,7 @@ update-t-deb:
 update-c-deb:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@if test "$(debdir)" != "$(debbuilddir)"; then \
-		list="$(debian_binary_files) $(debian_change_files)"; for f in $$list; do \
+		list="$(debian_binary_files) $(debian_change_files) $(debian_product_file)"; for f in $$list; do \
 			test -f $$f || continue; \
 			s= ; \
 			case `basename $$f` in \
@@ -744,7 +761,7 @@ release-install-debs:
 			eval "$$pipe $(GPG) --clearsign -a --passphrase-fd 0$$user$$home$$pass -- $$f" || : ; \
 		fi ; \
 	done ; \
-	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) ; do \
+	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) $(debtop_product_file) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test $$f -ef $$t && continue ; \
@@ -763,7 +780,7 @@ release-uninstall-debs:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@test '$(DISTDIR)' != '$(REPODIR)' || exit 0
 	@$(ECHO) "D: $@: removing debs" ; \
-	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) ; do \
+	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) $(debtop_product_file) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test -s $$t || continue ; \
@@ -772,7 +789,7 @@ release-uninstall-debs:
 			rm -f -- $$t ; \
 		fi ; \
 	done ; \
-	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) ; do \
+	for f in $(debtop_source_files) $(debtop_change_files) $(debtop_binary_files) $(debtop_product_file) ; do \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		echo "`dirname $$t`" ; \

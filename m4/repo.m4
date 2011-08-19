@@ -494,6 +494,26 @@ dnl
 	test -n "$repo_cv_apt_srclist" || repo_cv_apt_srclist=no
 	AC_MSG_CHECKING([for apt sources list])
     ])
+    AC_CACHE_CHECK([for apt vendors directory], [repo_cv_apt_venddir], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${sysconfdir}/apt/vendors.list.d
+	    ${DESTDIR}${rootdir}/etc/apt/vendors.list.d
+	    ${DESTDIR}/etc/apt/vendors.list.d\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for apt vendors directory... $repo_dir])
+	    if test -d "$repo_dir" ; then
+		repo_cv_apt_venddir="$repo_dir"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_apt_venddir" || repo_cv_apt_venddir=no
+	AC_MSG_CHECKING([for apt vendors directory])
+    ])
 dnl 
 dnl The Connectiva apt-rpm distribution diverged from Debian apt on the means for handling GPG keys:
 dnl it uses /etc/apt/vendors.list to identify the keys.
@@ -647,6 +667,15 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	aptsrclist="$repo_cv_apt_srclist"
     fi
     AC_SUBST([aptsrclist])dnl
+    aptvenddir=
+    if test :"${repo_cv_apt_venddir:-no}" != :no  ; then
+	aptvenddir="$repo_cv_apt_venddir"
+    elif test :"${repo_cv_apt_vndlist:-no}" != :no ; then
+	aptvenddir="$repo_cv_apt_vndlist.d"
+    elif test :"${repo_cv_apt_dir:-no}" != :no ; then
+	aptvenddir="$repo_cv_apt_dir/vendors.list.d"
+    fi
+    AC_SUBST([aptvenddir])
     aptvndlist=
     if test :"${repo_cv_apt_vndlist:-no}" != :no ; then
 	aptvndlist="$repo_cv_apt_vndlist"
