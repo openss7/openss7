@@ -2453,10 +2453,12 @@ release-update-urpmi:
 				done ; \
 			done ; \
 		) >$$m/media.cfg ; \
+		$(ECHO) "$(GENDISTRIB) --blind --clean $${repodir}" ; \
+		$(GENDISTRIB) --blind --clean $${repodir} ; \
 		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p'`" ; \
 		( \
 			numb=1 ; \
-			if test '$(target_distro)' = 'mageia'; then
+			if test '$(target_distro)' = 'mageia'; then \
 				mirrors='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)' ; \
 			else \
 				mirrors='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
@@ -2469,7 +2471,7 @@ release-update-urpmi:
 					if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
 					repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 					$(ECHO) "$(PACKAGE_NAME)\\ $${bran}\\ $${repo}\\ ($(PACKAGE)$$numb) $$url {" ; \
-					test -r $(DISTDIR)/repo/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r}/media_info/hdlist.cz || $(ECHO) "  ignore" ; \
+					test -e $(REPODIR)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r}/media_info/hdlist.cz || $(ECHO) "  ignore" ; \
 					test "$$b" != updates || $(ECHO) "  update" ; \
 					test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
 					test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
@@ -2482,10 +2484,10 @@ release-update-urpmi:
 		) >$$m/urpmi.cfg ; \
 		( \
 			numb=1 ; \
-			if test '$(target_distro)' = 'mageia'; then
-				mirrors='file:/$(DISTDIR)/rpms/$(reposubdir)' ; \
+			if test '$(target_distro)' = 'mageia'; then \
+				mirrors='file:/$(REPODIR)/rpms/$(reposubdir)' ; \
 			else \
-				mirrors='file:/$(DISTDIR)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
+				mirrors='file:/$(REPODIR)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
 			fi ; \
 			url= ; \
 			for b in '' updates extras testing $$rb ; do \
@@ -2495,7 +2497,7 @@ release-update-urpmi:
 					if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
 					repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 					$(ECHO) "$(PACKAGE_NAME)\\ $${bran}\\ $${repo}\\ ($(PACKAGE)-local$$numb) $$url {" ; \
-					test -r $(DISTDIR)/repo/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r}/media_info/hdlist.cz || $(ECHO) "  ignore" ; \
+					test -e $(REPODIR)/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r}/media_info/hdlist.cz || $(ECHO) "  ignore" ; \
 					test "$$b" != updates || $(ECHO) "  update" ; \
 					test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
 					test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
@@ -2506,8 +2508,6 @@ release-update-urpmi:
 				done ; \
 			done ; \
 		) >$$m/urpmi-local.cfg ; \
-		$(ECHO) "$(GENDISTRIB) --blind --clean $${repodir}" ; \
-		$(GENDISTRIB) --blind --clean $${repodir} ; \
 	else \
 		comps= ; \
 		for b in '' updates extras testing $$rb ; do \
