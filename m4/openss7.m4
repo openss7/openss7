@@ -254,7 +254,7 @@ dnl differences between autoconf 2.59 and autoconf 2.60 and 2.61.
 dnl
     if test :"$sysconfdir" = :'${prefix}/etc' ; then sysconfdir='${rootdir}/etc' ; fi
     if test :"$localstatedir" = :'${prefix}/var' ; then localstatedir='${rootdir}/var' ; fi
-    if test :"$sharedstatedir" = :'${prefix}/com' ; then localstatedir='${rootdir}/com' ; fi
+    if test :"$sharedstatedir" = :'${prefix}/com' ; then sharedstatedir='${rootdir}/com' ; fi
     if test :"${newprefix#$rootdir}" = : ; then
 	if test :"${datarootdir+set}" != :set ; then datarootdir='${prefix}/usr/share' ; fi
 	if test :"$datarootdir" = :'${prefix}/share' ; then datarootdir='${prefix}/usr/share' ; fi

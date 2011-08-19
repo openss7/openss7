@@ -17,6 +17,7 @@
 <%perl>
     $m->call_next unless (
 	    $page eq 'OPENSS7credentials' or
+	    $page eq 'credentials'	  or
 	    $page eq 'netrc.openss7'	  or
 	    $page eq 'openss7.repo'	  or
 	    $page eq 'mirrorlist'	  or
@@ -39,6 +40,7 @@
     if ( $page eq 'openss7.repo'	or
 	 $page eq 'mirrorlist'		or
 	 $page eq 'OPENSS7credentials'	or
+	 $page eq 'credentials'		or
 	 $page eq 'netrc.openss7'	or
 	 $page eq 'openss7.list'	or
 	 $page eq 'media.cfg'		)
@@ -191,6 +193,7 @@
     }
 
     if ( $page eq 'OPENSS7credentials'	or
+	 $page eq 'credentials'		or
 	 $page eq 'netrc.openss7'	or
 	 $page eq 'openss7.repo'	or
 	 $page eq 'openss7.list'	or
@@ -314,7 +317,8 @@
 	$userinfo->{'REPO_LAST_COUNT'}		 = $count;
 	$userinfo->{'REPO_LAST_ACCESS'}		 = $date;
 	$userinfo->{'REPO_LAST_ACCFILE'}	 = $page;
-	$userinfo->{'REPO_ACCESS_STATUS'}	 = 'accessed' if ( $page eq 'OPENSS7credentials' or 
+	$userinfo->{'REPO_ACCESS_STATUS'}	 = 'accessed' if ( $page eq 'OPENSS7credentials' or
+								   $page eq 'credentials'	 or
 								   $page eq 'netrc.openss7'	 or
 								   $page eq 'repoindex.xml'	 );
 	$userinfo->{'REPO_LAST_HTTP_HOST'}	 = $ENV{'HTTP_HOST'};
@@ -392,6 +396,14 @@
     #
 
     if ( $page eq 'OPENSS7credentials' )
+    {
+	$r->content_type('text/plain');
+</%perl>
+username=<% $hostname %>
+password=<% $hostpass %>
+<%perl>
+    }
+    elsif ( $page eq 'credentials' )
     {
 	$r->content_type('text/plain');
 </%perl>

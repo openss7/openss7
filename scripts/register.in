@@ -1,0 +1,1043 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+
+PACKAGE="@PACKAGE@"
+PACKAGE_UCNAME="@PACKAGE_UCNAME@"
+PACKAGE_NAME="@PACKAGE_NAME@"
+
+DISTDIR=
+rootdir=
+
+target_distro="@target_distro@"
+target_edition="@target_edition@"
+target_arch="@target_arch@"
+
+distro="@target_distro@"
+relver="@target_edition@"
+osarch="@target_arch@"
+
+rpmgpgdir="@rpmgpgdir@"
+
+aptconfdir="@aptconfdir@"
+aptgpgdir="@aptgpgdir@"
+aptsrclist="@aptsrclist@"
+aptrepodir="@aptrepodir@"
+aptvndlist="@aptvndlist@"
+aptvenddir="@aptvenddir@"
+
+urpmiconfdir="@urpmiconfdir@"
+urpmirepodir="@urpmirepodir@"
+urpmimediadir="@urpmimediadir@"
+
+yumdir="${DESTDIR}${rootdir}/etc/yum"
+yumrepodir="@yumrepodir@"
+yumconfdir="${DESTDIR}${rootdir}/etc/yum/pluginconf.d"
+yumplugdir="${DESTDIR}${rootdir}/usr/lib/yum-plugins"
+yumkmodconf="@yumkmodconf@"
+
+zyppconfig="@zyppconfig@"
+zypprepodir="@zypprepodir@"
+zyppcreddir="@zyppcreddir@"
+zyppservdir="@zyppservdir@"
+
+localstatedir="@localstatedir@"
+pkgstatedir="$localstatedir/lib/$PACKAGE"
+
+reposerv="@reposerv@"
+repobase="@repobase@"
+reporoot="@reporoot@"
+repotype="@repotype@"
+[ -e /etc/debian_version ] && repotype=debs || repotype=rpms
+
+TMPDIR=$localstatedir/tmp
+
+ECHO='echo'
+SHELL='/bin/bash'
+SED='sed'
+
+# Check that we have a woring $ECHO.
+if [ "X$1" = X--no-reexec ]; then
+    # Discard the --no-reexec flag, and continue
+    shift
+elif [ "X`(echo '\t') 2>/dev/null`" = 'X\t' ]; then
+    :
+else
+    exec $SHELL "$0" --no-reexec ${1+"$@"}
+fi
+
+if [ "X$1" = X--fallback-echo ]; then
+    shift
+    cat <<EOF
+$*
+EOF
+    exit 0
+fi
+
+program=`$ECHO "$0" | $SED -e 's,^.*/,,'`
+modename="$program"
+
+ident='$RCSfile$ $Name$($Revision$) $Date$'
+
+# Sed substitution that helps us do robust quoting.  It backslashifies
+# metacharacters that are still active within double-quoted strings.
+Xsed="$SED"' -e 1s/^X//'
+sed_quote_subst='s/\([\\`\\"$\\\\]\)/\\\1/g'
+# test EBCDIC or ASCII
+case `$ECHO A | od -x` in
+    *[Cc]1*) # EBCDIC based system
+	SP2NL="tr '\100' '\n'"
+	NL2SP="tr '\r\n' '\100\100'"
+	;;
+    *) # Assume ASCII based system
+	SP2NL="tr '\040' '\012'"
+	NL2SP="tr '\015\012' '\040\040'"
+	;;
+esac
+
+# NLS nuisances.
+# Only set LANG and LC_ALL to C if already set.
+# These must not be set unconditionally because not all systems understand
+# e.g. LANG=C (notably SCO).
+# We save the old values to restore during execute mode.
+if [ "${LC_ALL+set}" = set ]; then
+    save_LC_ALL="$LC_ALL"; LC_ALL=C; export LC_ALL
+fi
+if [ "${LANG+set}" = set ]; then
+    save_LANG="$LANG"; LANG=C; export LANG
+fi
+
+# Make sure IFS has a sensible default
+: ${IFS=" 	"}
+
+# Defaults
+
+command=
+DISTDIR="@DISTDIR@"
+config=$pkgstatedir/project
+clean=
+remote=yes
+rlocal=no
+nolock=
+debug=0
+verbose=1
+run=
+u_all=yes
+u_apt=
+u_yum=
+u_zypp=
+u_urpmi=
+
+doit () {
+    local c
+    c="$1"
+    shift
+    if [ ${run:-yes} = no ]; then
+        echo "X: $c $@"
+    else
+        eval "$c $@" || return $?
+    fi
+    return 0
+}
+
+version () {
+    if [ ${show:-yes} = no ]; then
+	return
+    fi
+    cat <<EOF
+$ident
+Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved.
+Distributed under AGPL Version 3, included here by reference.
+See \`$program --copying' for copying permissions.
+EOF
+}
+
+usage () {
+    if [ ${show:-yes} = no ]; then
+	return
+    fi
+    cat <<EOF
+Usage:
+    $program [options] [{-u,--update}]
+    $program [options] {-r,--register}
+    $program [options] {-R,--reregister}
+    $program {-h|--help}
+    $program {-V|--version}
+    $program {-C|--copying}
+EOF
+}
+
+help () {
+    if [ ${show:-yes} = no ]; then
+	return
+    fi
+    usage
+    cat <<EOF
+Command Options:
+    -u, --update
+        update installation sources
+    -e, --erase
+        erase installation sources
+    -r, --register
+        register for host credentials
+    -R, --reregister
+        reregister for new host credentials
+Options:
+    -a, --apt
+        update apt installation sources [${u_apt:-no}]
+    -i, --urpmi
+        update urpmi installation sources [${u_urpmi:-no}]
+    -y, --yum
+        update yum installation sources [${u_yum:-no}]
+    -z, --zypper
+        update zypper installation sources [${u_zypp:-no}]
+    -d, --distdir DIRECTORY
+        consider distribution directory [$DISTDIR]
+    -g, --config FILE
+        use specified configuration file [$config]
+    -c, --clean
+        clean out everything when erasing [${clean:-no}]
+    -l, --local
+        local installation sources [${rlocal:-no}]
+    -N, --nolock
+        do not use locking commands [${nolock:-no}]
+    -n, --dryrun
+        don't perform the actions, just check them
+    -Q, --quiet
+        suppress normal output
+    -D, --debug [LEVEL]
+        increase or set debugging verbosity [$debug]
+    -v, --verbose [LEVEL]
+        increase or set output verbosity [$verbose]
+    -h, --help
+        prints this usage information and exits
+    -V, --version
+        prints the version and exits
+    -C, --copying
+        prints copying permissions and exits
+EOF
+    if [ ${verbose:-0} -gt 1 ]; then
+        cat <<EOF
+Configuration:
+    PACKAGE="$PACKAGE"
+    PACKAGE_UCNAME="$PACKAGE_UCNAME"
+    PACKAGE_NAME="$PACKAGE_NAME"
+
+    distro="$distro"
+    relver="$relver"
+    osarch="$osarch"
+
+    rpmgpgdir="$rpmgpgdir"
+
+    aptconfdir="$aptconfdir"
+    aptgpgdir="$aptgpgdir"
+    aptsrclist="$aptsrclist"
+    aptrepodir="$aptrepodir"
+    aptvndlist="$aptvndlist"
+    aptvenddir="$aptvenddir"
+
+    urpmiconfdir="$urpmiconfdir"
+    urpmirepodir="$urpmirepodir"
+    urpmimediadir="$urpmimediadir"
+
+    yumdir="$yumdir"
+    yumrepodir="$yumrepodir"
+    yumconfdir="$yumconfdir"
+    yumplugdir="$yumplugdir"
+    yumkmodconf="$yumkmodconf"
+
+    zyppconfig="$zyppconfig"
+    zypprepodir="$zypprepodir"
+    zyppcreddir="$zyppcreddir"
+    zyppservdir="$zyppservdir"
+
+    localstatedir="$localstatedir"
+    pkgstatedir="$pkgstatedir"
+
+    reposerv="$reposerv"
+    repobase="$repobase"
+    reporoot="$reporoot"
+    repotype="$repotype"
+
+    TMPDIR="$TMPDIR"
+EOF
+    fi
+}
+
+copying () {
+    if [ ${show:-yes} = no ]; then
+	return
+    fi
+    cat <<EOF
+--------------------------------------------------------------------------------
+$ident
+--------------------------------------------------------------------------------
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com>
+Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>
+Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+
+All Rights Reserved.
+--------------------------------------------------------------------------------
+This program is  free  software;  you can redistribute it and/or modify it under
+the terms of the GNU  Affero  General  Public  License  as published by the Free
+Software Foundation; Version 3 of the License.
+
+This program is distributed in the hope that it will be useful, but  WITHOUT ANY
+WARRANTY; without even the implied warranty of  MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the  GNU Affero General Public License  along
+with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the
+Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+--------------------------------------------------------------------------------
+U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf
+of the U.S. Government ("Government"), the following provisions apply to you. If
+the Software is supplied by the  Department of Defense ("DoD"), it is classified
+as "Commercial  Computer  Software"  under  paragraph  252.227-7014  of the  DoD
+Supplement  to the  Federal Acquisition Regulations  ("DFARS") (or any successor
+regulations) and the  Government  is acquiring  only the  license rights granted
+herein (the license rights customarily provided to non-Government users). If the
+Software is supplied to any unit or agency of the Government  other than DoD, it
+is  classified as  "Restricted Computer Software" and the Government's rights in
+the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition
+Regulations ("FAR")  (or any successor regulations) or, in the cases of NASA, in
+paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor
+regulations).
+--------------------------------------------------------------------------------
+Commercial  licensing  and  support of this  software is  available from OpenSS7
+Corporation at a fee.  See http://www.openss7.com/
+--------------------------------------------------------------------------------
+EOF
+}
+
+syntax_error () {
+    if [ ${verbose:-0} -gt 0 ]; then
+	$ECHO "$program: syntax error -- $1" >&2
+	( usage ) >&2
+    fi
+    exit 2
+}
+
+option_unrec () {
+    local opt
+    opt=`$ECHO -n "X$1" | $Xsed -e 's,=.*,,'`
+    syntax_error "\`$opt' unrecognized"
+}
+
+option_noarg () {
+    local opt
+    opt=`$ECHO -n "X$1" | $Xsed -e 's,=.*,,'`
+    syntax_error "\`$opt' does not accept an argument"
+}
+
+option_needarg () {
+    syntax_error "\`$1' requires an argument"
+}
+
+option_after () {
+    syntax_error "\`$1' cannot occur after \`$2'"
+}
+
+option_with () {
+    syntax_error "\`$1' cannot occur with \`$2'"
+}
+
+# Parse our command line options once, thoroughly.
+while [ "$#" -gt 0 -o ":$more" != ":" ]; do
+    if [ ":$more" != ":" ]; then arg="-$more"; more=; else arg="$1"; shift; fi
+    # check for attached option argument
+    case $arg in
+        --distdir=* | --config=* )
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's,[-_a-zA-Z0-9]*=,,'` ;;
+	--*=*)
+	    option_noarg $arg ;;
+	-[uerRaiyzclNnQDvhVC])
+	    optarg= ;;
+	-[uerRaiyzclNnQDvhVC]*)
+	    optarg=
+	    more=`$ECHO "X$arg" | $Xsed -e 's,-[uerRaiyzclNnQDvhVC],,'`
+	    eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's,$more,,'\`"
+	    ;;
+	-[dg])
+	    optarg= ;;
+	-[dg]*)
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's,-[dg],,'` ;;
+	*)
+	    optarg= ;;
+    esac
+    # check for optional or required option argument
+    if [ -n "$prev" ]; then
+	case $arg in
+	    -*) # optional arguments not forthcoming
+		case $prev in
+		    debug | verbose) eval "(($prev++))" ;;
+		    # the rest have required arguments
+		    DISTDIR | config)
+			option_needarg $prevopt ;;
+		esac
+		prev=; prevopt=
+		;;
+	    *) # if the previous option needs an argument, assign it.
+		eval "$prev=\"\$arg\""
+		prev=; prevopt=
+		continue
+		;;
+	esac
+    fi
+    # Have we seen a non-optional argument yet?
+    case $arg in
+	--help | --h | --Help | --H | -h | -H | -\? | --\?)
+            if [ :$command  != : -a :$command != :help ]; then option_after $arg --$command; fi
+            command=help
+	    ;;
+	--version | --versio | --versi | --vers | -V)
+            if [ :$command  != : -a :$command != :version ]; then option_after $arg --$command; fi
+            command=version
+	    ;;
+	--copying | --copyin | --copyi | --copy | --cop | --co | --c | -C)
+            if [ :$command  != : -a :$command != :copying ]; then option_after $arg --$command; fi
+            command=copying
+	    ;;
+	--verbose | --verbos | --verbo | --verb)
+	    prevopt="$arg"
+	    prev=verbose
+	    ;;
+	-v)
+	    ((verbose++))
+	    ;;
+	--verbose=* | --verbos=* | --verbo=* | --verb=*)
+	    verbose="$optarg"
+	    ;;
+	--debug | --debu | --deb)
+	    prevopt="$arg"
+	    prev=debug
+	    ;;
+	-D)
+	    $ECHO "$program: enabling shell trace mode" 1>&2
+	    set -x
+	    ;;
+	--debug=* | --debu=* | --deb=*)
+	    debug="$optarg"
+	    ;;
+	--dry-run | --dryrun | --n | -n)
+	    run=no
+	    ;;
+	--quiet | --silent | -Q)
+	    show=no
+	    verbose=0
+	    debug=0
+	    ;;
+        --distdir | --distdi | --distd | --dist | --dis | --di | --d | -d)
+            prevopt="$arg"
+            prev=DISTDIR
+            ;;
+        --distdir=* | --distdi=* | --distd=* | --dist=* | --dis=* | --di=* | --d=* | -d*)
+            DISTDIR="$optarg"
+            ;;
+        --config | --confi | --conf | --con | --co | --c | -g)
+            prevopt="$arg"
+            prev=config
+            ;;
+        --config=* | --confi=* | --conf=* | --con=* | --co=* | --c=* | -c*)
+            config="$optarg"
+            ;;
+        --clean | --clea | --cle | --cl | --c | -c)
+            clean=yes
+            ;;
+        --local | --loca | --loc | --lo | --l | -l)
+            rlocal=yes
+            remote=no
+            ;;
+        --update | --updat | --upda | --upd | --up | --u | -u)
+            if [ :$command  != : -a :$command != :update ]; then option_after $arg --$command; fi
+            command=update
+            ;;
+        --erase | --eras | --era | --er | --e | -e)
+            if [ :$command != : -a :$command != :erase ]; then option_after $arg --$command; fi
+            command=erase
+            ;;
+        --register | --registe | --regist | --regis | --regi | --reg | --re | --r | -r)
+            if [ :$command  != : -a :$command != :register ]; then option_after $arg --$command; fi
+            command=register
+            ;;
+        --reregister | --reregiste | --reregist | --reregis | --reregi | --rereg | --rere | --rer | -R)
+            if [ :$command  != : -a :$command != :reregister ]; then option_after $arg --$command; fi
+            command=reregister
+            ;;
+        --apt | --ap | --a | -a)
+            u_all=; u_apt=yes
+            ;;
+        --urpmi | --urpm | --urp | --ur | --u | -i)
+            u_all=; u_urpmi=yes
+            ;;
+        --yum | --yu | --y | -y)
+            u_all=; u_yum=yes
+            ;;
+        --zypper | --zyppe | --zypp | --zyp | --zy | --z | -z)
+            u_all=; u_zypp=yes
+            ;;
+        --nolock | --noloc | --nolck | --nolo | --no | -N)
+            nolock=yes
+            ;;
+	--)
+	    # end of options
+	    break
+	    ;;
+	-*)
+	    option_unrec $arg
+	    ;;
+	*)
+	    nonopt="${nonopt}${nonopt:+ }'$arg'"
+	    ;;
+    esac
+done
+
+# hit end of list wanting arguments
+case $prev in
+    # these have optional arguments
+    debug | verbose) eval "(($prev++))" ;;
+    # the rest have required arguments
+    DISTDIR | config)
+	option_needarg $prevopt ;;
+esac
+
+if [ x"$nonopt${nonopt:+ }${1+$@}" != "x" ]; then
+    eval "files=($nonopt${nonopt:+ }${1+$@})"
+else
+    files=
+fi
+
+# assign all defaults
+if [ ":$command" = ":" ]; then
+    command=update
+fi
+
+if [ ${u_all:-no} = yes ]; then
+    u_yum=yes
+    u_zypp=yes
+    u_urpmi=yes
+    u_apt=yes
+fi
+
+case "$command" in
+    (help|version|copying)
+        eval "$command"; exit 0 ;;
+esac
+
+case "$PACKAGE" in
+    (@*@)
+        echo "Cannot execute .in version." >&2
+        exit 1
+        ;;
+esac
+
+if [ ${run:-yes} = yes -a "`id -ru`" != "0" ]; then
+    $ECHO "Only root can do that." >&2
+    exit 2
+fi
+
+[ -x "`which apt 2>/dev/null`"    -a -d "$aptsrclist"   ] && HAVE_aptrepo=yes
+[ -x "`which urpmi 2>/dev/null`"  -a -d "$urpmirepodir" ] && HAVE_urpmirepo=yes
+[ -x "`which yum 2>/dev/null`"    -a -d "$yumdir"       ] && HAVE_yumrepo=yes
+[ -x "`which zypper 2>/dev/null`" -a -f "$zyppconfig"   ] && HAVE_zypprepo=yes
+
+write_credentials () {
+    local t
+    if [ -n "$username" -a -n "$password" ]; then
+        t=$pkgstatedir/credentials
+        if [ "$f" != "$t" ]; then
+            [ -d $pkgstatedir ] || doit mkdir -p -- $pkgstatedir
+            [ -e $t ] || ( umask 0077; doit "cat /dev/null >$t" )
+            if [ ${run:-yes} = yes ]; then
+                { echo "username=$username"
+                  echo "password=$password"
+                } >$t
+            fi
+        fi
+        return 0
+    fi
+    return 1
+}
+
+find_credentials () {
+    local s p d f t
+    for s in '' .rpmsave .dpkg-old .rpmnew .dpkg-new ; do
+        for p in product credentials; do
+            for d in $pkgstatedir $DISTDIR; do
+                f=$d$p$s
+                if [ -r $f ]; then
+                    username=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $f`
+                    password=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $f`
+                    if [ -n "$username" -a -n "$password" ]; then break 3; fi
+                fi
+            done
+        done
+        for p in $PACKAGE_UCNAME NCC; do
+            f=$zyppcreddir/${p}credentials$s
+            if [ -r $f ]; then
+                username=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $f`
+                password=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $f`
+                if [ -n "$username" -a -n "$password" ]; then break 2; fi
+            fi
+        done
+        f=$yumrepodir/$PACKAGE.repo$s
+        if [ -r $f ]; then
+            username=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $f`
+            password=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $f`
+            if [ -n "$username" -a -n "$password" ]; then break 1; fi
+        fi
+        f=$urpmiconfdir/netrc$s
+        if [ -r $f ]; then
+            username=`sed -n -r 's,^machine[[:space:]]*'$repobase'[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\1,p;t end;b;: end q' $f`
+            password=`sed -n -r 's,^machine[[:space:]]*'$repobase'[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\2,p;t end;b;: end q' $f`
+            if [ -n "$username" -a -n "$password" ]; then break 1; fi
+        fi
+        for p in $PACKAGE sources; do
+            for d in $aptrepodir $aptconfdir; do
+                f=$d$p.list$s
+                if [ -r $f ]; then
+                    username=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
+                    password=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
+                    if [ -n "$username" -a -n "$password" ]; then break 3; fi
+                fi
+            done
+        done
+    done
+    write_credentials || return $?
+    return 1
+}
+
+get_ext () {
+    local hn ip ext
+    hn="`hostname -f`"
+    ip="`hostname -i | sed 'y/ /,/'`"
+    ext="?hn=$hn"
+    ext="$ext${ip:+&ip=}${ip}"
+    ext="$ext${username:+&username=}${username}"
+    ext="$ext${password:+&password=}${password}"
+    ext="$ext${distro:+&distro=}${distro}"
+    ext="$ext${relver:+&relver=}${relver}"
+    ext="$ext${osarch:+&osarch=}${osarch}"
+    echo "$ext"
+    return 0
+}
+
+get_key () {
+    local key
+    key="${username:+$username${password:+:$password}@}"
+    echo "$key"
+    return 0
+}
+
+get_url () {
+    local f n d t url
+    f="$1"
+    n="`basename $f`"; [ -n "$n" ] || return 1
+    d="`dirname  $f`"; [ -n "$d" ] || d=.
+    [ -d "$d" ] || doit mkdir -p -- "$d"
+    t=${TMPDIR:-/var/tmp}/$n.$$
+    rm -f -- $t
+    url="$reposerv://`get_key`$repobase/$reporoot/$n`get_ext`"
+    if ! echo "$url" | wget -i - -O $t 2>/dev/null; then
+        if ! echo "$url" | wget -i - -O /dev/null 2>&1 | grep -i '401 Authorization Required' >/dev/null 2>&1; then
+            rm -f -- $t; return 2
+        fi
+        rm -f -- $t; return 1
+    fi
+    doit cp -fp -- $t $f; rm -f -- $t
+    return 0
+}
+
+get_local () {
+    local f n d file 
+    f="$1"
+    n="`basename $f`"; [ -n "$n" ] || return 1
+    d="`dirname  $f`"; [ -n "$d" ] || d=.
+    [ -d "$d" ] || doit mkdir -p -- "$d"
+    file="$DISTDIR/$reporoot/$repotype/$distro/$relver/$osarch"
+    case "$n" in
+        product)
+            file="$file/$n" ;;
+        *.repo)
+            file="$file/repodata/$n" ;;
+        *.service)
+            file="$file/$n" ;;
+        *.cfg|url|mirrorlist)
+            file="$file/media/media_info/$n" ;;
+        *.list)
+            file="$file/$n" ;;
+        *)
+            file="$file/$n" ;;
+    esac
+    if [ ! -r "$file" ]; then
+        return 1
+    fi
+    doit cp -fp -- $file $f
+    return 0
+}
+
+get_file () {
+    if [ ${rlocal:-no} = yes ]; then
+        get_local $@
+    else
+        get_url $@
+    fi
+    return $?
+}
+
+update_credentials () {
+    local u p m t
+    t=$pkgstatedir/credentials
+    [ ${rlocal:-no} = no ] || return 0
+    if ! get_file $t; then
+        if [ $? -eq 2 ]; then
+            u=anonymous; p=
+            m='Authorization required for repository access.'
+            if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                zenity --info --text="$m" --no-wrap || return 1
+                while true; do
+                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || return 1
+                while true; do
+                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || return 1
+                while true; do
+                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            else
+                echo "$m" >/dev/tty
+                while true; do
+                    d="$u"
+                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
+                    [ "$u" != anonymous ] || break
+                    read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
+                    echo '' >/dev/tty
+                    [ -z "$p" ] || break
+                done
+            fi
+            username="$u"
+            password="$p"
+            if ! get_file $t; then
+                m='Authorization failed.'
+                if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                    zenity --error --text="$m" --no-wrap
+                elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                    whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty
+                elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                    dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty
+                else
+                    echo "$m" >/dev/tty
+                fi
+                return 1
+            fi
+        else
+            return 1
+        fi
+    fi
+    write_credentials || return $?
+    return 0
+}
+
+refresh_yum () {
+    if [ ${nolock:-no} != yes -a -x "`which yum 2>/dev/null`" ]; then
+        doit yum makecache
+    fi
+}
+
+refresh_zypp () {
+    if [ ${nolock:-no} != yes -a -x "`which zypper 2>/dev/null`" ]; then
+        doit zypper refresh
+    fi
+}
+
+refresh_urpmi () {
+    if [ ${nolock:-no} != yes -a -x "`which urpmi.update 2>/dev/null`" ]; then
+        doit urpmi.update -a -f
+    fi
+}
+
+refresh_apt () {
+    if [ ${nolock:-no} != yes -a -x "`which apt-get 2>/dev/null`" ]; then
+        doit apt-get update
+    fi
+    if [ ${nolock:-no} != yes -a -x "`which apt-cache 2>/dev/null`" ]; then
+        doit apt-cache gencaches
+    fi
+}
+
+erase_yum () {
+    local s
+    for s in $PACKAGE $PACKAGE-local; do
+        doit rm -f -- $yumrepodir/$s.repo
+    done
+}
+
+erase_zypp () {
+    local s f
+    for s in $PACKAGE_UCNAME $PACKAGE_UCNAME-local; do
+        if [ ${nolock:-no} != yes -a -x "`which zypper 2>/dev/null`" ]; then
+            doit zypper removeservice $s
+        else
+            doit rm -f -- $zyppservdir/$s.service
+            doit rm -f -- $zyppcreddir/${s}credentials
+            find $localstatedir/cache/zypp -name $s':'$PACKAGE'*' 2>/dev/null | \
+            while read f; do if -d "$f"; then doit rm -fr -- "$f"; else doit rm -f -- "$f"; fi; done
+        fi
+    done
+}
+
+erase_urpmi () {
+    local s f t
+    for s in $PACKAGE $PACKAGE-local; do
+        if [ ${nolock:-no} != yes -a -x "`which urpmi.removemedia 2>/dev/null`" ]; then
+            doit urpmi.removemedia -y $s
+        else
+            f=$urpmiconfdir/urpmi.cfg
+            if [ -r $f ]; then
+                t=${TMPDIR:-/var/tmp}/urpmi.cfg.$$
+                rm -f -- $t
+                cat /dev/null >$t
+                sed '/^.*('$s'[0-9]*).*{/,/}/d' $f | cat -s >$t
+                doit cp -fp -- $t $f; rm -f -- $t
+            fi
+            find $localstatedir/lib/urpmi -name '*('$s'[0-9]*)*' 2>/dev/null | \
+            while read f; do if -d "$f"; then doit rm -fr -- "$f"; else doit rm -f -- "$f"; fi; done
+        fi
+    done
+    f=$urpmiconfdir/netrc
+    if [ -r $f ]; then
+        t=${TMPDIR:-/var/tmp}/netrc.$$
+        rm -f -- $t
+        ( umask 0077; cat /dev/null >$t )
+        sed '/^machine[[:space:]]*'$repobase'/d' $f >>$t
+        doit cp -fp -- $t $f; rm -f -- $t
+    fi
+    rm -fr -- $urpmimediadir
+}
+
+erase_apt () {
+    local s f
+    for s in $PACKAGE $PACKAGE-local; do
+        doit rm -f -- $aptrepodir/$s.list
+        doit rm -f -- $aptvenddir/$s.vendor.list
+    done
+    if [ ${nolock:-no} = yes -o ! -x "`which apt-get 2>/dev/null`" ]; then
+        for s in $repobase $DISTDIR; do
+            s=`echo "$s" | sed -r 's,[^a-zA-Z0-9\._],?,g'`
+            find $localstatedir/lib/apt -name $s'*' 2>/dev/null | \
+            while read f; do if -d "$f"; then doit rm -fr -- "$f"; else doit rm -f -- "$f"; fi; done
+        done
+    fi
+}
+
+update_yum () {
+    local s
+    if [ ${rlocal:-no} = yes ] ; then
+        s=$PACKAGE-local
+    else
+        s=$PACKAGE
+    fi
+    get_file $yumrepodir/$s.repo || return 1
+    return 0
+}
+
+update_zypp () {
+    local s
+    if [ ${rlocal:-no} = yes ] ; then
+        s=$PACKAGE_UCNAME-local
+    else
+        s=$PACKAGE_UCNAME
+    fi
+    get_file $zyppservdir/$s.service || return 1
+    if [ ${rlocal:-no} = no ]; then
+        [ -d $zyppcreddir ] || doit mkdir -p -- $zyppcreddir
+        ( umask 0077; echo -e "username=$username\npassword=$password" >$zyppcreddir/${s}credentials )
+    fi
+    return 0
+}
+
+update_urpmi () {
+    local s m c t f
+    if [ ${nolock:-no} != yes -a -x "`which uprmi.addmedia 2>/dev/null`" ]; then
+        urpmi.addmedia --distrib ${PACKAGE} \
+            "$reposerv://`get_key`$repobase/$reporoot/rpms/$distro/$relver/$osarch"
+    else
+        t=${TMPDIR:-/var/tmp}/netrc.$$
+        f=$urpmiconfdir/netrc
+        if [ ${rlocal:=no} = yes ] ; then
+            s=$PACKAGE-local
+            m=media.cfg
+            c=urpmi-local.cfg
+        else
+            s=$PACKAGE
+            m=media.cfg
+            c=urpmi.cfg
+        fi
+        rm -f -- $t
+        ( umask 0077; cat /dev/null >$t )
+        {   if [ -r $f ]; then cat $f; fi
+            echo "machine $repobase login $username password $password"
+        } >>$t
+        get_file $urpmimediadir/$m || return 1
+        get_file $urpmimediadir/$c || return 1
+        echo "$reposerv://$repobase/$reporoot/rpms/$distro/$relver/$osarch" >$urpmimediadir/url
+        echo "$reposerv://$repobase/$reporoot/rpms/$distro/$relver/$osarch" >$urpmimediadir/mirrorlist
+        t=${TMPDIR:-/var/tmp}/$c.$$
+        s=$urpmimediadir/$c
+        f=$urpmiconfdir/$c
+        {
+            if [ -r $f ]; then
+                sed -n '/^{/,/^}/p' $f
+            fi
+            cat $s
+            if [ -r $f ]; then
+                sed '/^{/,/^}/d;/^.*('$s'[0-9]*).*{/,/}/d' $f
+            fi
+        } | cat -s >$t
+    fi
+    return 0
+}
+
+update_apt () {
+    local s
+    if [ ${rlocal:-no} = yes ] ; then
+        s=$PACKAGE-local
+    else
+        s=$PACKAGE
+    fi
+    get_file $aptrepodir/$s.list || return 1
+    if [ ! -e /etc/debian_version ]; then
+        get_file $aptvenddir/${PACKAGE}.vendor.list || return 1
+    fi
+}
+
+erase () {
+    erase_yum || :
+    refresh_yum || :
+    erase_zypp || :
+    refresh_zypp || :
+    erase_urpmi || :
+    refresh_urpmi || :
+    erase_apt || :
+    refresh_apt || :
+    return 0
+}
+
+update () {
+    username=
+    password=
+    find_credentials || return $?
+    if [ ${u_yum:-no} = yes ]; then
+        erase_yum || :
+        update_yum || :
+        refresh_yum || :
+    fi
+    if [ ${u_zypp:-no} = yes ]; then
+        erase_zypp || :
+        update_zypp || :
+        refresh_zypp || :
+    fi
+    if [ ${u_urpmi:-no} = yes ]; then
+        erase_urpmi || :
+        update_urpmi || :
+        refresh_urpmi || :
+    fi
+    if [ ${u_apt:-no} = yes ]; then
+        erase_apt || :
+        update_apt || :
+        refresh_apt || :
+    fi
+    return 0
+}
+
+register () {
+    username=
+    password=
+    find_credentials || :
+    update_credentials || return $?
+    update || return $?
+    return 0
+}
+
+reregister () {
+    username=
+    password=
+    update_credentials || return $?
+    update || return $?
+    return 0
+}
+
+case "$command" in
+    (update|erase|register|reregister)
+        eval "$command"; exit 0 ;;
+esac
+
+exit 2
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 et nocin nosi

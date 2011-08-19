@@ -148,9 +148,13 @@ repo_html_files		= src/mason/.htaccess \
 repo_need_files		= mirrorlist \
 			  $(PACKAGE_UCNAME)credentials \
 			  $(PACKAGE).list \
+			  $(PACKAGE).vendor.list \
 			  $(PACKAGE).repo \
 			  $(PACKAGE_UCNAME).service \
-			  repoindex.xml
+			  repoindex.xml \
+			  credentials \
+			  media.cfg \
+			  urpmi.cfg
 
 EXTRA_DIST		+= $(repo_html_files)
 
