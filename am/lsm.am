@@ -161,8 +161,8 @@ release-install-repo:
 		t="$(REPODIR)/`basename $$f`"; \
 		d=; test -f $$f || d='$(srcdir)/'; \
 		if test ! -e "$$t" -o '$(FORCE)' = force -o "$$t" -ot "$$d$$f" ; then \
-			$(ECHO) "  install -T -D -p -- $$d$$f $$t"; \
-			install -T -D -p -- $$d$$f $$t; \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$d$$f $$t"; \
+			$(INSTALL_DATA) -T -D -p -- $$d$$f $$t; \
 		else \
 			$(ECHO) "  not installing older $$d$$f"; \
 		fi ; \
@@ -188,8 +188,8 @@ update-install-repo:
 	@for f in $(repo_html_files); do \
 		t="$(REPODIR)/`basename $$f`"; \
 		if test ! -e "$$t" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$t" -ot '$(USTAMP)' \) \); then \
-			$(ECHO) "  install -T -D -p -- $$d$$f $$t"; \
-			install -T -D -p -- $$d$$f $$t; \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$d$$f $$t"; \
+			$(INSTALL_DATA) -T -D -p -- $$d$$f $$t; \
 		else \
 			$(ECHO) "  not installing older $$d$$f"; \
 		fi ; \
@@ -217,8 +217,8 @@ release-install-lsm:
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		if test ! -f $$t -o \( '$(FORCE)' = force -a $$f -nt $$t \) ; then \
-			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
-			install -T -D -p -- $$f $$t ; \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$f $$t" ; \
+			$(INSTALL_DATA) -T -D -p -- $$f $$t ; \
 		fi ; \
 	done
 

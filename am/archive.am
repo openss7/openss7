@@ -538,8 +538,8 @@ release-copy-archives:
 		t=`echo "$$f" | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test $$f -ef $$t && continue ; \
 		if test ! -f $$t -o \( :$(FORCE) = :force -a $$f -nt $$t \) ; then \
-			$(ECHO) "  install -T -D -p -- $$f $$t" ; \
-			install -T -D -p -- $$f $$t ; \
+			$(ECHO) "  $(INSTALL_DATA) -T -D -p -- $$f $$t" ; \
+			$(INSTALL_DATA) -T -D -p -- $$f $$t ; \
 		fi ; \
 	done
 
