@@ -16,17 +16,19 @@
 </%args>
 <%perl>
     $m->call_next unless (
-	    $page eq 'OPENSS7credentials' or
-	    $page eq 'credentials'	  or
-	    $page eq 'netrc.openss7'	  or
-	    $page eq 'openss7.repo'	  or
-	    $page eq 'mirrorlist'	  or
-	    $page eq 'openss7.list'	  or
-	    $page eq 'repoindex.xml'	  or
-	    $page eq 'media.cfg'	  or
-	    $page eq 'OPENSS7.service' );
+	    $page eq 'OPENSS7credentials'   or
+	    $page eq 'credentials'	    or
+	    $page eq 'netrc.openss7'	    or
+	    $page eq 'openss7.repo'	    or
+	    $page eq 'mirrorlist'	    or
+	    $page eq 'openss7.list'	    or
+	    $page eq 'openss7.vendor.list'  or
+	    $page eq 'repoindex.xml'	    or
+	    $page eq 'media.cfg'	    or
+	    $page eq 'urpmi.cfg'	    or
+	    $page eq 'OPENSS7.service'	    );
 
-    my ($fd,$url,$distro,$relver,$osarch,$media,$branch,$subrep);
+    my ($fd,$url,$artype,$distro,$relver,$osarch,$media,$branch,$subrep);
     my ($username,$userpass,$usergrps,$useraccs,$usercred,$userdata,$userinfo,$userauth,$userdflt,$date);
     my ($hostname,$hostpass,$hostgrps,$hostaccs,$hostcred,$hostdata,$hostinfo,$hostauth,$testpass);
 
@@ -43,40 +45,50 @@
 	 $page eq 'credentials'		or
 	 $page eq 'netrc.openss7'	or
 	 $page eq 'openss7.list'	or
-	 $page eq 'media.cfg'		)
+	 $page eq 'openss7.vendor.list'	or
+	 $page eq 'media.cfg'		or
+	 $page eq 'urpmi.cfg'		)
     {
+	$artype = $ARGS{'artype'};
 	$distro = $ARGS{'distro'};
 	$relver = $ARGS{'relver'};
 	$osarch = $ARGS{'osarch'};
 
-	if ( ($page eq 'openss7.repo'	or
-	      $page eq 'openss7.list'	or
-	      $page eq 'media.cfg'	) and
+	if ( ($page eq 'openss7.repo'		or
+	      $page eq 'openss7.list'		or
+	      $page eq 'openss7.vendor.list'	or
+	      $page eq 'media.cfg'		or
+	      $page eq 'urpmi.cfg'		) and
 	     (!$distro or !$relver or !$osarch) )
 	{
 	    if ( $page eq 'openss7.repo' )
 	    {
-		if ( $r->uri !~ m,/repo/rpms/(([^/].*)/)?repodata/(.*)$, ) {
+		if ( $r->uri !~ m,/repo/(rpms)/(([^/].*)/)?repodata/(.*)$, ) {
 		    $r->log_reason("file is out of place", $r->filename);
 		    $m->abort(404);
 		}
-		$url = $2;
+		$artype = $1;
+		$url = $3;
 	    }
-	    elsif ( $page eq 'openss7.list' )
+	    elsif ( $page eq 'openss7.list'	    or
+		    $page eq 'openss7.vendor.list'  )
 	    {
-		if ( $r->uri !~ m,/repo/debs/(([^/].*)/)?(.*)$, ) {
+		if ( $r->uri !~ m,/repo/(rpms|debs)/(([^/].*)/)?(.*)$, ) {
 		    $r->log_reason("file is out of place", $r->filename);
 		    $m->abort(404);
 		}
-		$url = $2;
+		$artype = $1;
+		$url = $3;
 	    }
-	    elsif ( $page eq 'media.cfg' )
+	    elsif ( $page eq 'media.cfg'    or
+		    $page eq 'urpmi.cfg'    )
 	    {
-		if ( $r->uri !~ m,/repo/rpms/(([^/].*)/)?media/media_info/(.*)$, ) {
+		if ( $r->uri !~ m,/repo/(rpms)/(([^/].*)/)?media/media_info/(.*)$, ) {
 		    $r->log_reason("file is out of place", $r->filename);
 		    $m->abort(404);
 		}
-		$url = $2;
+		$artype = $1;
+		$url = $3;
 	    }
 	    if ($url) {
 		my @fields = split(/\//,$url);
@@ -107,6 +119,22 @@
 	{
 	    $branch = $ARGS{'branch'}; $branch = 'base' unless ($branch);
 	    $subrep = $ARGS{'subrep'}; $subrep = 'full' unless ($subrep);
+	}
+	if ( $page eq 'openss7.repo'	    or
+	     $page eq 'mirrorlist'	    or
+	     $page eq 'OPENSS7credentials'  or
+	     $page eq 'netrc.openss7'	    or
+	     $page eq 'media.cfg'	    or
+	     $page eq 'urpmi.cfg'	    )
+	{
+	    $artype = $ARGS{'artype'}	unless ($artype);
+	    $artype = 'rpms'		unless ($artype);
+	}
+	elsif ( $page eq 'openss7.list'		or
+		$page eq 'openss7.vendor.list'	)
+	{
+	    $artype = $ARGS{'artype'}						     unless ($artype);
+	    $artype = ( $distro =~ m/^(debian|ubuntu|mint|lts)$/ ) ? 'debs' : 'rpms' unless ($artype);
 	}
     }
 
@@ -197,7 +225,8 @@
 	 $page eq 'netrc.openss7'	or
 	 $page eq 'openss7.repo'	or
 	 $page eq 'openss7.list'	or
-	 $page eq 'media.cfg'		)
+	 $page eq 'media.cfg'		or
+	 $page eq 'urpmi.cfg'		)
     {
 	unless ($hn) {
 	    $r->log_reason("hn argument required", $r->uri.'?'.scalar($r->args));
@@ -223,11 +252,8 @@
 		$hostname = `uuidgen`;
 		chomp $hostname;
 		$hostname =~ s/-//g;
+		$hostname = substr($hostname,0,24);
 	    }
-	    $hostname = substr($hostname,0,24) if ( $page eq 'openss7.repo'	or
-						    $page eq 'openss7.list'	or
-						    $page eq 'netrc.openss7'	or
-						    $page eq 'media.cfg'	);
 
 	    $hostauth = $userauth;
 
@@ -254,11 +280,8 @@
 		    $hostpass = `uuidgen`;
 		    chomp $hostpass;
 		    $hostpass =~ s/-//g;
+		    $hostpass = substr($hostpass,0,24);
 		}
-		$hostpass = substr($hostpass,0,24) if ( $page eq 'openss7.repo'	 or
-							$page eq 'openss7.list'	 or
-							$page eq 'netrc.openss7' or
-							$page eq 'media.cfg'	 );
 
 		$hostcred = `htpasswd -nbm $hostname $hostpass`; chomp $hostcred;
 		$hostcred =~ s/^[^:]*://;
@@ -273,13 +296,13 @@
     } else {
 	$distro = $hostinfo->{'REPO_DISTRO'} if ( exists $hostinfo->{'REPO_DISTRO'} );
 	$hostinfo->{'REPO_DISTRO'} = $distro;
-	    }
+    }
     if ( $relver and exists $hostinfo->{'REPO_RELVER'} and $relver ne $hostinfo->{'REPO_RELVER'} ) {
 	$hostinfo->{'REPO_RELVER'} = $relver;
     } else {
 	$relver = $hostinfo->{'REPO_RELVER'} if ( exists $hostinfo->{'REPO_RELVER'} );
 	$hostinfo->{'REPO_RELVER'} = $relver;
-	}
+    }
     if ( $osarch and exists $hostinfo->{'REPO_OSARCH'} and $osarch ne $hostinfo->{'REPO_OSARCH'} ) {
 	$r->log_reason("osarch cannot change to $osarch from ".$hostinfo->{'REPO_OSARCH'}, $r->uri.'?'.scalar($r->args));
 	$m->abort(403);
@@ -368,13 +391,17 @@
 
 	unless ( $hostgrps ) 
 	{
+	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
+	       $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
+	       $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
 	    my @hostgrps = ( 'hosts' );
 	    push @hostgrps, $username.'-hosts';
 	    push @hostgrps, $distro.'-'.$osarch.'-host';  # note 'host' instead of 'hosts'
-	    push @hostgrps, 'zypp-hosts' if ( $page eq 'OPENSS7credentials' );
-	    push @hostgrps, 'yum-hosts'  if ( $page eq 'openss7.repo' );
-	    push @hostgrps, 'apt-hosts'  if ( $page eq 'openss7.list' );
-	    push @hostgrps, 'urpm-hosts' if ( $page eq 'netrc.openss7' );
+	    push @hostgrps, 'zypp-hosts' if ( $page eq 'OPENSS7credentials' or $manage eq 'zypp'    );
+	    push @hostgrps, 'yum-hosts'  if ( $page eq 'openss7.repo'	    or $manage eq 'yum'	    );
+	    push @hostgrps, 'urpm-hosts' if ( $page eq 'netrc.openss7'	    or $manage eq 'urpm'    );
+	    push @hostgrps, 'apt-hosts'  if ( $page eq 'openss7.list'	    or $manage eq 'apt'	    );
+	    push @hostgrps, 'apt-hosts'  if ( $page eq 'credentials'	    or $manage ne 'apt'	    );
 	    foreach my $g ( split(/,/,$usergrps) ) {
 		push @hostgrps, $g.'-hosts';
 	    }
@@ -421,7 +448,8 @@ machine www.openss7.org login <% $hostname %> password <% $hostpass %>
     elsif ( $page eq 'openss7.repo'	or
 	    $page eq 'OPENSS7.service'	or
 	    $page eq 'openss7.list'	or
-	    $page eq 'media.cfg'	)
+	    $page eq 'media.cfg'	or
+	    $page eq 'urpmi.cfg'	)
     {
 	my @brarepos = ( 'base', 'extras', 'updates', 'testing' );
 	my @subrepos = ( 'full', 'main', 'debug', 'devel', 'source' );
@@ -433,11 +461,13 @@ machine www.openss7.org login <% $hostname %> password <% $hostpass %>
 	$emptyrepo = 1 if ( -e $ENV{'DOCUMENT_ROOT'}.'/repo/rpms/repodata/repomd.xml' );
 	$emptyrepo = 0 if ( $page eq 'openss7.list' );
 	$emptyrepo = 0 if ( $page eq 'media.cfg' );
+	$emptyrepo = 0 if ( $page eq 'urpmi.cfg' );
 
 	my $toenable;
+	my $numb = 1;
 
 	if ( $page eq 'media.cfg' ) {
-<%/perl>
+</%perl>
 [media_info]
 version=<% $relver %>
 mediacfg_version=2
@@ -454,17 +484,17 @@ xml-info=1
 	    {
 		my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
 		   $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
-		my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes)$/ ) ? 'enterprise' : 'community';
-		# FIXME: need to handle ubuntu LTS
+		   $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
+		my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes|puias|oracle|scientific|lts)$/ ) ? 'enterprise' : 'community';
 		my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
 		my $reason = '';
 
 		my $offerred = 1;
-		if ($offerred) {
-		    $offerred = 0 if ($hostaccs !~ /,(opt-)?$manage-hosts,/);
-		    unless ($offerred) { $reason = "Host $hostname not in group '(opt-)?$manage-hosts'"; }
-		}
+#		if ($offerred) {
+#		    $offerred = 0 if ($hostaccs !~ /,(opt-)?$manage-hosts,/);
+#		    unless ($offerred) { $reason = "Host $hostname not in group '(opt-)?$manage-hosts'"; }
+#		}
 		if ($offerred) {
 		    $offerred = 0;
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-$osarch-hosts,/);
@@ -485,10 +515,10 @@ xml-info=1
 		}
 
 		my $allowed = 1;
-		if ($allowed) {
-		    $allowed = 0 if ($hostaccs !~ /,$manage-hosts,/);
-		    unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'"; }
-		}
+#		if ($allowed) {
+#		    $allowed = 0 if ($hostaccs !~ /,$manage-hosts,/);
+#		    unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'"; }
+#		}
 		if ($allowed) {
 		    $allowed = 0;
 		    $allowed = 1 if ($hostaccs =~ /,$distro-$osarch-hosts,/);
@@ -525,9 +555,9 @@ xml-info=1
 		    next if ( !$offerred );
 
 		    # do not even advertize 'testing', 'extras' or 'source'-containing repos
-		    next if ( !$allowed and $branch eq 'testing' );
 		    next if ( !$allowed and $subrep eq 'full'    );
-		    next if ( !$allowed and $subrep eq 'source'  );
+		    #next if ( !$allowed and $branch eq 'testing' );
+		    #next if ( !$allowed and $subrep eq 'source'  );
 			
 		    $desc = 'OpenSS7';
 		    $desc .= ' '.$bdesc if ($bdesc ne 'Base');
@@ -543,7 +573,8 @@ xml-info=1
 		    $repostr .= '&branch='.$branch if ($branch ne 'base');
 		    $repostr .= '&subrep='.$subrep if ($subrep ne 'full');
 
-		    $url = '/repo/rpms';
+		    $url = '/repo';
+		    $url .= "/$artype";
 		    $url .= "/$distro" if ($distro);
 		    $url .= "/$relver";
 		    $url .= "/$osarch";
@@ -556,7 +587,8 @@ xml-info=1
 		    my $pre = '';
 		    $pre = '#' if ( !$present and !$emptyrepo );
 
-		    $url = '/repo/rpms';
+		    $url = '/repo';
+		    $url .= "/$artype";
 		    $url .= "/$distro" if ($distro);
 		    $url .= '/$releasever';
 		    $url .= '/$basearch';
@@ -596,62 +628,155 @@ xml-info=1
 		    next if ( !$offerred );
 
 		    # do not even advertize 'testing', 'extras' or 'source'-containing repos
-		    next if ( !$allowed and $branch eq 'testing' );
 		    next if ( !$allowed and $subrep eq 'full'    );
-		    next if ( !$allowed and $subrep eq 'source'  );
+		    #next if ( !$allowed and $branch eq 'testing' );
+		    #next if ( !$allowed and $subrep eq 'source'  );
 
 		    my $rcreds = $hostname.':'.$hostpass.'@';
 
-		    $url = '/repo/debs';
-		    $url .= "/$distro" if ($distro);
-		    $url .= "/$relver";
-		    $url .= "/$osarch";
-		    $url .= "/$branch" if ($branch ne 'base');
-		    $url .= "/$subrep" if ($subrep ne 'full');
+		    my $present;
+		    my ($pkgtype,$srctype);
+		    my @pkgtypes = ( 'deb', 'rpm', 'urpm', 'repomd' );
 
-		    my $present = 0;
-		    $present = 1 if ( -e $ENV{'DOCUMENT_ROOT'}.$url.'/Release' );
+		    for $pkgtype ( @pkgtypes )
+		    {
+			$srctype = "$pkgtype-src";
 
-		    my $pre = '';
-		    $pre = '#' if ( !$present and !$emptyrepo );
+			if ( $pkgtype eq 'deb' )
+			{
+			    next if ( $artype ne 'debs' );
 
-		    if ( !$allowed ) {
-			$pre = '#';
-			if ( $hostaccs =~ /,guests-hosts,/ ) {
+			    $url = '/repo';
+			    $url .= "/$artype";
+			    $url .= "/$distro" if ($distro);
+			    $url .= "/$relver";
+			    $url .= "/$osarch";
+			    $url .= "/$branch" if ($branch ne 'base');
+			    $url .= "/$subrep" if ($subrep ne 'full');
+
+			    $present = ( -e $ENV{'DOCUMENT_ROOT'}.$url.'/Release' ) ? 1 : 0;
+
+			    $url = '/repo';
+			    $url .= "/$artype";
+			    $url .= "/$distro" if ($distro);
+			    $url .= '/$(VERSION)';
+			    $url .= '/$(ARCH)';
+			    $url .= "/$branch" if ($branch ne 'base');
+			    $url .= "/$subrep" if ($subrep ne 'full');
+			    $url .= ' /';
+			}
+			else
+			{
+			    next if ( $artype ne 'rpms' );
+
+			    if ( $pkgtype eq 'rpm' )
+			    {
+				$url = '/repo';
+				$url .= "/$artype";
+				$url .= "/$distro" if ($distro);
+				$url .= "/$relver";
+				$url .= "/$osarch";
+				$url .= "/$branch" if ($branch ne 'base');
+
+				$present = ( -e $ENV{'DOCUMENT_ROOT'}.$url.'/base/release.'.$subrep ) ? 1 : 0;
+
+				$url = '/repo';
+				$url .= "/$artype";
+				$url .= " $distro" if ($distro);
+				$url .= '/$(VERSION)';
+				$url .= '/$(ARCH)';
+				$url .= "/$branch" if ($branch ne 'base');
+				$url .= " $subrep";
+			    }
+			    elsif ( $pkgtype eq 'urpm' )
+			    {
+				$url = '/repo';
+				$url .= "/$artype";
+				$url .= "/$distro" if ($distro);
+				$url .= "/$relver";
+				$url .= "/$osarch";
+				$url .= "/$branch" if ($branch ne 'base');
+				$url .= "/$subrep" if ($subrep ne 'full');
+
+				$present = ( -e $ENV{'DOCUMENT_ROOT'}.$url.'/media_info/synthesis.hdlist.cz') ? 1 : 0;
+				next if ( !$present );
+
+				$url = '/repo';
+				$url .= "/$artype";
+				$url .= "/$distro" if ($distro);
+				$url .= '/$(VERSION)';
+				$url .= '/$(ARCH)';
+				$url .= "/$branch" if ($branch ne 'base');
+				$url .= "/$subrep" if ($subrep ne 'full');
+				$url .= ' media_info/synthesis.hdlist /';
+			    }
+			    elsif ( $pkgtype eq 'repomd' )
+			    {
+				$url = '/repo';
+				$url .= "/$artype";
+				$url .= "/$distro" if ($distro);
+				$url .= "/$relver";
+				$url .= "/$osarch";
+				$url .= "/$branch" if ($branch ne 'base');
+				$url .= "/$subrep" if ($subrep ne 'full');
+				$url .= '/';
+
+				$present = ( -e $ENV{'DOCUMENT_ROOT'}.$url.'repodata/repomd.xml' ) ? 1 : 0;
+				next if ( !$present );
+
+				$url = '/repo';
+				$url .= "/$artype";
+				$url .= "/$distro" if ($distro);
+				$url .= '/$(VERSION)';
+				$url .= '/$(ARCH)';
+				$url .= "/$branch" if ($branch ne 'base');
+				$url .= "/$subrep" if ($subrep ne 'full');
+				$url .= '/';
+			    }
+			}
+
+			my $pre = '';
+			$pre = '#' if ( !$present and !$emptyrepo );
+
+			if ( !$allowed ) {
+			    $pre = '#';
+			    if ( $hostaccs =~ /,guests-hosts,/ ) {
 </%perl>
 <% $pre %># This repository is not authorized by default.
 <% $pre %># To active this repository, contact &lt;sales@openss7.com&gt;.
 <%perl>
-			} else {
+			    } else {
 </%perl>
 <% $pre %># This repository is currently not authorized to host <% $hostname %>.
 <% $pre %># <% $reason %>.
 <% $pre %># To activate this repository, contact your software provider [<% $username %>].
 <%perl>
+			    }
 			}
-		    }
 </%perl>
-<% $pre %>deb https://<% $rcreds %>www.openss7.org<% $url %> /
+<% $pre %><% $pkgtype %> https://<% $rcreds %>www.openss7.org<% $url %>
 <%perl>
-		    if ( $subrep eq 'source' ) {
+			if ( $subrep eq 'source' ) {
 </%perl>
-<% $pre %>deb-src https://<% $rcreds %>www.openss7.org<% $url %> /
+<% $pre %><% $srctype %> https://<% $rcreds %>www.openss7.org<% $url %>
 <%perl>
-		    }
+			}
 </%perl>
 
 <%perl>
+		    }
 		}
 		elsif ( $page eq 'media.cfg' )
 		{
 		    next if ( !$offerred );
 
 		    # do not even advertize 'testing', 'extras' or 'source'-containing repos
-		    next if ( !$allowed and $branch eq 'testing' );
 		    next if ( !$allowed and $subrep eq 'full'    );
-		    next if ( !$allowed and $subrep eq 'source'  );
+		    #next if ( !$allowed and $branch eq 'testing' );
+		    #next if ( !$allowed and $subrep eq 'source'  );
 
-		    $url = 'repo/rpms';
+		    $url = '/repo';
+		    $url .= "/$artype";
 		    $url .= "/$distro" if ($distro);
 		    $url .= "/$relver";
 		    $url .= "/$osarch";
@@ -728,6 +853,97 @@ xml-info=1
 
 <%perl>
 		}
+		elsif ( $page eq 'urpmi.cfg' )
+		{
+		    next if ( !$offerred );
+
+		    # do not even advertize 'testing', 'extras' or 'source'-containing repos
+		    next if ( !$allowed and $subrep eq 'full'    );
+		    #next if ( !$allowed and $branch eq 'testing' );
+		    #next if ( !$allowed and $subrep eq 'source'  );
+
+		    $url = '/repo';
+		    $url .= "/$artype";
+		    $url .= "/$distro" if ($distro);
+		    $url .= "/$relver";
+		    $url .= "/$osarch";
+		    $url .= "/media";
+		    $url .= "/$branch" if ($branch ne 'base');
+		    $url .= "/$subrep" if ($subrep ne 'full');
+
+		    my $present = 0;
+		    $present = 1 if ( -e $ENV{'DOCUMENT_ROOT'}.$url.'/media_info/hdlist.cz' );
+
+		    my $pre = '';
+		    $pre = '#' if ( !$present and !$emptyrepo );
+
+		    $url = '/repo';
+		    $url .= "/$artype";
+		    $url .= "/$distro" if ($distro);
+		    $url .= '/$RELEASE';
+		    $url .= '/$ARCH';
+
+		    my $sub = 'media';
+		    $sub .= "/$branch" if ($branch ne 'base');
+		    $sub .= "/$subrep" if ($subrep ne 'full');
+
+		    my $s;
+		    if ($subrep eq 'full')
+		    { if ($branch eq 'base') { $s = ''; } else { $s = $branch; } } else
+		    { if ($branch eq 'base') { $s = $subrep; } else { $s = $branch.'/'.$subrep; } }
+		    my $r;
+		    if    ($subrep eq 'full')	{ $r = 'Full';	 }
+		    elsif ($subrep eq 'main')	{ $r = 'Main';	 }
+		    elsif ($subrep eq 'debug')	{ $r = 'Debug';	 }
+		    elsif ($subrep eq 'devel')	{ $r = 'Devel';	 }
+		    elsif ($subrep eq 'source')	{ $r = 'Source'; }
+		    else			{ $r = $subrep;	 }
+		    my $b;
+		    if	  ($branch eq 'base')	 { $b = 'Base';	   }
+		    elsif ($branch eq 'updates') { $b = 'Updates'; }
+		    elsif ($branch eq 'extras')	 { $b = 'Extras';  }
+		    elsif ($branch eq 'testing') { $b = 'Testing'; }
+		    else			 { $b = $branch;   }
+		    my $n = $r.'\ '.$b.'\ (openss7'.$numb.')';
+
+		    $numb = $numb + 1;
+
+		    if ( !$allowed ) {
+			$enabled = 0;
+			$pre = '#' unless ( $emptyrepo );
+			if ( $hostaccs =~ /,guests-hosts,/ ) {
+</%perl>
+<% $pre %># This repository is not authorized by default.
+<% $pre %># To activate this repository, contact &lt;sales@openss7.com&gt;.
+<%perl>
+			} else {
+</%perl>
+<% $pre %># This repository is currently not authorized to host <% $hostname %>.
+<% $pre %># <% $reason %>.
+<% $pre %># To activate this repository, contact your software provider [<% $username %>].
+<%perl>
+			}
+		    }
+</%perl>
+<% $n %> https://www.openss7.org<% $url %> {
+<%perl>
+		    if ( !$enabled ) {
+</%perl>
+  ignore
+<%perl>
+		    }
+		    if ( $branch eq 'updates' ) {
+</%perl>
+  update
+<%perl>
+		    }
+</%perl>
+  key-ids: 5a3fe379
+  with-dir: <% $sub %>
+}
+
+<%perl>
+		}
 		elsif ( $page eq 'OPENSS7.service' )
 		{
 		    $toenable = "$toenable OPENSS7:$name" if ($enabled);
@@ -786,15 +1002,16 @@ repostoenable =<% $toenable %>
 
 	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
 	       $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
-	    my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes)$/ ) ? 'enterprise' : 'community';
+	       $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
+	    my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes|puias|oracle|scientific|lts)$/ ) ? 'enterprise' : 'community';
 	    my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
 	    my $reason = '';
 	    my $allowed = 1;
-	    if ($allowed) {
-		$allowed = 0  if ($hostaccs !~ /,$manage-hosts,/);
-		unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'"; }
-	    }
+#	    if ($allowed) {
+#		$allowed = 0  if ($hostaccs !~ /,$manage-hosts,/);
+#		unless ($allowed) { $reason = "Host $hostname not in group '$manage-hosts'"; }
+#	    }
 	    if ($allowed) {
 		$allowed = 0;
 		$allowed = 1 if ($hostaccs =~ /,$distro-$osarch-hosts,/);
@@ -856,13 +1073,14 @@ repostoenable =<% $toenable %>
 
 	my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
 	   $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
-	my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes)$/ ) ? 'enterprise' : 'community';
+	   $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
+	my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes|puias|oracle|scientific|lts)$/ ) ? 'enterprise' : 'community';
 	my $server = ( $osarch !~ m/^i[3456]86$/ ) ? 'server' : 'desktop';
 
 	my $allowed = 1;
-	if ($allowed) {
-	    $allowed = 0  if ($hostaccs !~ /,$manage-hosts,/);
-	}
+#	if ($allowed) {
+#	    $allowed = 0  if ($hostaccs !~ /,$manage-hosts,/);
+#	}
 	if ($allowed) {
 	    $allowed = 0;
 	    $allowed = 1 if ($hostaccs =~ /,$distro-$osarch-hosts,/);
@@ -880,7 +1098,8 @@ repostoenable =<% $toenable %>
 	    $allowed = 1 if ($hostaccs =~ /,$branch-hosts,/ and $hostaccs =~ /,$subrep-hosts,/);
 	}
 
-	$url = 'repo/rpms';
+	$url = '/repo';
+	$url .= "/$artype";
 	$url .= "/$distro" if ($distro);
 	$url .= "/$relver";
 	$url .= "/$osarch";
@@ -891,7 +1110,8 @@ repostoenable =<% $toenable %>
 
 	my $rcreds = $hostname.':'.$hostpass.'@';
 
-	$url = '/repo/rpms'; # the empty repository
+	$url = '/repo';
+	$url .= "/$artype"; # the empty repository
 	if ( $allowed) {
 	    $url .= "/$distro" if ($distro);
 	    $url .= '/$releasever';

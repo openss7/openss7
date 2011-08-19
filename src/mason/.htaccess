@@ -8,7 +8,7 @@
 	ForceType "text/plain"
 </FilesMatch>
 # All repo files are controlled by the autohandler
-<FilesMatch "^(OPENSS7credentials|credentials|openss7.repo|openss7.list|netrc.openss7|media.cfg)$">
+<FilesMatch "^(OPENSS7credentials|credentials|openss7.repo|openss7.list|netrc.openss7)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
@@ -22,7 +22,7 @@
 	SetHandler perl-script
 	PerlHandler HTML::Mason::ApacheHandler
 </FilesMatch>
-<Files "OPENSS7.service">
+<FilesMatch "^(OPENSS7.service|openss7.vendor.list|media.cfg|urpmi.cfg)$">
 	Order allow,deny
 	Allow from all
 	SSLRequireSSL
@@ -35,7 +35,7 @@
 	ForceType "text/plain"
 	SetHandler perl-script
 	PerlHandler HTML::Mason::ApacheHandler
-</Files>
+</FilesMatch>
 <Files "mirrorlist">
 	Order allow,deny
 	Allow from all
