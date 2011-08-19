@@ -171,6 +171,7 @@ nolock=
 debug=0
 verbose=1
 run=
+root=
 u_all=yes
 u_apt=
 u_yum=
@@ -184,6 +185,26 @@ doit () {
     if [ ${run:-yes} = no ]; then
         echo "X: $c $@"
     else
+        if [ ${debug:-0} -gt 0 ]; then
+            echo "D: $c $@" >&2
+        fi
+        eval "$c $@" || return $?
+    fi
+    return 0
+}
+
+doroot () {
+    local c
+    c="$1"
+    shift
+    if [ ${run:-yes} = no ]; then
+        echo "X: $c $@"
+    elif [ ${root:-yes} = no ]; then
+        echo "X: $c $@"
+    else
+        if [ ${debug:-0} -gt 0 ]; then
+            echo "D: $c $@" >&2
+        fi
         eval "$c $@" || return $?
     fi
     return 0
@@ -580,9 +601,14 @@ case "$PACKAGE" in
         ;;
 esac
 
-if [ ${run:-yes} = yes -a "`id -ru`" != "0" ]; then
-    $ECHO "Only root can do that." >&2
-    exit 2
+if [ "`id -ru`" = "0" ]; then
+    root=yes
+else
+    root=no
+fi
+
+if [ ${run:-yes} = yes -a ${root:-yes} = no ]; then
+    $ECHO "Only root can do some things." >&2
 fi
 
 [ -x "`which apt 2>/dev/null`"    -a -d "$aptsrclist"   ] && HAVE_aptrepo=yes
@@ -590,29 +616,11 @@ fi
 [ -x "`which yum 2>/dev/null`"    -a -d "$yumdir"       ] && HAVE_yumrepo=yes
 [ -x "`which zypper 2>/dev/null`" -a -f "$zyppconfig"   ] && HAVE_zypprepo=yes
 
-write_credentials () {
-    local t
-    if [ -n "$username" -a -n "$password" ]; then
-        t=$pkgstatedir/credentials
-        if [ "$f" != "$t" ]; then
-            [ -d $pkgstatedir ] || doit mkdir -p -- $pkgstatedir
-            [ -e $t ] || ( umask 0077; doit "cat /dev/null >$t" )
-            if [ ${run:-yes} = yes ]; then
-                { echo "username=$username"
-                  echo "password=$password"
-                } >$t
-            fi
-        fi
-        return 0
-    fi
-    return 1
-}
-
 find_credentials () {
     local s p d f t
     for s in '' .rpmsave .dpkg-old .rpmnew .dpkg-new ; do
         for p in product credentials; do
-            for d in $pkgstatedir $DISTDIR; do
+            for d in $pkgstatedir/ $DISTDIR/; do
                 f=$d$p$s
                 if [ -r $f ]; then
                     username=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $f`
@@ -652,8 +660,8 @@ find_credentials () {
             done
         done
     done
-    write_credentials || return $?
-    return 1
+    [ -n "$username" -a -n "$password" ] || return 1
+    return 0
 }
 
 get_ext () {
@@ -662,8 +670,8 @@ get_ext () {
     ip="`hostname -i | sed 'y/ /,/'`"
     ext="?hn=$hn"
     ext="$ext${ip:+&ip=}${ip}"
-    ext="$ext${username:+&username=}${username}"
-    ext="$ext${password:+&password=}${password}"
+    ext="$ext${username:+&un=}${username}"
+    ext="$ext${password:+&pw=}${password}"
     ext="$ext${distro:+&distro=}${distro}"
     ext="$ext${relver:+&relver=}${relver}"
     ext="$ext${osarch:+&osarch=}${osarch}"
@@ -671,29 +679,47 @@ get_ext () {
     return 0
 }
 
+keyuser=
+keypass=
+
 get_key () {
-    local key
-    key="${username:+$username${password:+:$password}@}"
+    local key ku kp
+    ku=${keyuser:-$username}
+    kp=${keypass:-$password}
+    key="${ku:+$ku${kp:+:$kp}@}"
     echo "$key"
     return 0
 }
 
-get_url () {
-    local f n d t url
-    f="$1"
-    n="`basename $f`"; [ -n "$n" ] || return 1
-    d="`dirname  $f`"; [ -n "$d" ] || d=.
-    [ -d "$d" ] || doit mkdir -p -- "$d"
-    t=${TMPDIR:-/var/tmp}/$n.$$
+get_temp () {
+    local n t url e
+    t="$1"
+    n="`basename $t`"; [ -n "$n" ] || return 1
+    t="$t.$$"
     rm -f -- $t
     url="$reposerv://`get_key`$repobase/$reporoot/$n`get_ext`"
     if ! echo "$url" | wget -i - -O $t 2>/dev/null; then
-        if ! echo "$url" | wget -i - -O /dev/null 2>&1 | grep -i '401 Authorization Required' >/dev/null 2>&1; then
-            rm -f -- $t; return 2
+        e=$(echo "$url" | wget -i - -O /dev/null 2>&1)
+        [ ${debug:-0} -eq 0 ] || echo "$e" >&2
+        [ ${debug:-0} -ne 0 ] || rm -f -- $t
+        if echo "$e" | grep -i '401 Authorization Required' >/dev/null 2>&1; then
+            return 2
         fi
-        rm -f -- $t; return 1
+        return 1
     fi
-    doit cp -fp -- $t $f; rm -f -- $t
+    return 0
+}
+
+get_url () {
+    local f n d t
+    f="$1"
+    n="`basename $f`"; [ -n "$n" ] || return 1
+    d="`dirname  $f`"; [ -n "$d" ] || d=.
+    [ -d "$d" ] || doroot mkdir -p -- "$d"
+    t=${TMPDIR:-/var/tmp}/$n
+    get_temp $t || return $?
+    doroot cp -fp -- $t.$$ $f
+    [ ${debug:-0} -ne 0 ] || rm -f -- $t.$$
     return 0
 }
 
@@ -702,10 +728,10 @@ get_local () {
     f="$1"
     n="`basename $f`"; [ -n "$n" ] || return 1
     d="`dirname  $f`"; [ -n "$d" ] || d=.
-    [ -d "$d" ] || doit mkdir -p -- "$d"
+    [ -d "$d" ] || doroot mkdir -p -- "$d"
     file="$DISTDIR/$reporoot/$repotype/$distro/$relver/$osarch"
     case "$n" in
-        product)
+        product|credentials)
             file="$file/$n" ;;
         *.repo)
             file="$file/repodata/$n" ;;
@@ -721,129 +747,169 @@ get_local () {
     if [ ! -r "$file" ]; then
         return 1
     fi
-    doit cp -fp -- $file $f
+    doroot cp -fp -- $file $f
     return 0
 }
 
 get_file () {
-    if [ ${rlocal:-no} = yes ]; then
-        get_local $@
-    else
-        get_url $@
-    fi
+    if [ ${rlocal:-no} = yes ]; then get_local $@; else get_url $@; fi
     return $?
 }
 
+write_credentials () {
+    local f t
+    f="$1"
+    if [ -n "$username" -a -n "$password" ]; then
+        t=$pkgstatedir/credentials
+        if [ "$f" != "$t" ]; then
+            [ -d $pkgstatedir ] || doroot mkdir -p -- $pkgstatedir
+            [ -e $t ] || ( umask 0077; doroot "cat /dev/null >$t" )
+            if [ ${run:-yes} = yes -a ${root:-yes} = yes ]; then
+                { echo "username=$username"
+                  echo "password=$password"
+                } >$t
+            fi
+        fi
+        if [ -n "$DISTDIR" -a -d "$DISTDIR" ]; then
+            t=$DISTDIR/credentials
+            if [ "$f" != "$t" ]; then
+                [ -e $t ] || doit "cat /dev/null >$t"
+                if [ ${run:-yes} = yes ]; then
+                    ( echo "username=$username"
+                      echo "password=$password"
+                    ) >$t
+                fi
+            fi
+        fi
+        return 0
+    fi
+    return 1
+}
+
 update_credentials () {
-    local u p m t
-    t=$pkgstatedir/credentials
+    local u p m t r
+    t=${TMPDIR:-/var/tmp}/credentials
     [ ${rlocal:-no} = no ] || return 0
-    if ! get_file $t; then
-        if [ $? -eq 2 ]; then
-            u=anonymous; p=
-            m='Authorization required for repository access.'
+    keyuser=
+    keypass=
+    get_temp $t; r=$?
+    if [ $r -eq 1 ]; then
+        return 1
+    fi
+    if [ $r -eq 2 ]; then
+        u=anonymous; p=
+        m='Authorization required for repository access.'
+        if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+            zenity --info --text="$m" --no-wrap || return 1
+            while true; do
+                u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-anonymous}
+                [ "$u" != anonymous ] || break
+                p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
+                [ -z "$p" ] || break
+            done
+        elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+            whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || return 1
+            while true; do
+                u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
+                [ "$u" != anonymous ] || break
+                p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                [ -z "$p" ] || break
+            done
+        elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+            dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || return 1
+            while true; do
+                u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
+                [ "$u" != anonymous ] || break
+                p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                [ -z "$p" ] || break
+            done
+        else
+            echo "$m" >/dev/tty
+            while true; do
+                d="$u"
+                read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
+                [ "$u" != anonymous ] || break
+                read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
+                echo '' >/dev/tty
+                [ -z "$p" ] || break
+            done
+        fi
+        keyuser="$u"
+        keypass="$p"
+        if ! get_temp $t; then
+            m='Authorization failed.'
             if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
-                zenity --info --text="$m" --no-wrap || return 1
-                while true; do
-                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-anonymous}
-                    [ "$u" != anonymous ] || break
-                    p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
-                    [ -z "$p" ] || break
-                done
+                zenity --error --text="$m" --no-wrap
             elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
-                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || return 1
-                while true; do
-                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
-                    [ "$u" != anonymous ] || break
-                    p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
-                    [ -z "$p" ] || break
-                done
+                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty
             elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
-                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || return 1
-                while true; do
-                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
-                    [ "$u" != anonymous ] || break
-                    p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
-                    [ -z "$p" ] || break
-                done
+                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty
             else
                 echo "$m" >/dev/tty
-                while true; do
-                    d="$u"
-                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
-                    [ "$u" != anonymous ] || break
-                    read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
-                    echo '' >/dev/tty
-                    [ -z "$p" ] || break
-                done
             fi
-            username="$u"
-            password="$p"
-            if ! get_file $t; then
-                m='Authorization failed.'
-                if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
-                    zenity --error --text="$m" --no-wrap
-                elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
-                    whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty
-                elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
-                    dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty
-                else
-                    echo "$m" >/dev/tty
-                fi
-                return 1
-            fi
-        else
-            return 1
+            keyuser=
+            keypass=
+            return 2
         fi
+        keyuser=
+        keypass=
     fi
-    write_credentials || return $?
+    [ -r $t.$$ ] || return 1
+    username=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $t.$$`
+    password=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $t.$$`
+    [ ${debug:-0} -ne 0 ] || rm -f -- $t.$$
+    [ -n "$username" -a -n "$password" ] || return 1
+    write_credentials '' || return $?
     return 0
 }
 
 refresh_yum () {
     if [ ${nolock:-no} != yes -a -x "`which yum 2>/dev/null`" ]; then
-        doit yum makecache
+        doroot yum makecache
     fi
 }
 
 refresh_zypp () {
     if [ ${nolock:-no} != yes -a -x "`which zypper 2>/dev/null`" ]; then
-        doit zypper refresh
+        doroot zypper refresh
     fi
 }
 
 refresh_urpmi () {
     if [ ${nolock:-no} != yes -a -x "`which urpmi.update 2>/dev/null`" ]; then
-        doit urpmi.update -a -f
+        doroot urpmi.update -a -f
     fi
 }
 
 refresh_apt () {
     if [ ${nolock:-no} != yes -a -x "`which apt-get 2>/dev/null`" ]; then
-        doit apt-get update
+        doroot apt-get update
     fi
     if [ ${nolock:-no} != yes -a -x "`which apt-cache 2>/dev/null`" ]; then
-        doit apt-cache gencaches
+        doroot apt-cache gencaches
     fi
 }
 
 erase_yum () {
-    local s
+    local s t
     for s in $PACKAGE $PACKAGE-local; do
-        doit rm -f -- $yumrepodir/$s.repo
+        t=$yumrepodir/$s.repooo
+        [ ! -e $t ] || doroot rm -f -- $t
     done
 }
 
 erase_zypp () {
-    local s f
+    local s t f
     for s in $PACKAGE_UCNAME $PACKAGE_UCNAME-local; do
         if [ ${nolock:-no} != yes -a -x "`which zypper 2>/dev/null`" ]; then
-            doit zypper removeservice $s
+            doroot zypper removeservice $s
         else
-            doit rm -f -- $zyppservdir/$s.service
-            doit rm -f -- $zyppcreddir/${s}credentials
+            t=$zyppservdir/$s.service
+            [ ! -e $t ] || doroot rm -f -- $t
+            t=$zyppcreddir/${s}credentials
+            [ ! -e $t ] || doroot rm -f -- $t
             find $localstatedir/cache/zypp -name $s':'$PACKAGE'*' 2>/dev/null | \
-            while read f; do if -d "$f"; then doit rm -fr -- "$f"; else doit rm -f -- "$f"; fi; done
+            while read f; do if -d "$f"; then doroot rm -fr -- "$f"; else doroot rm -f -- "$f"; fi; done
         fi
     done
 }
@@ -852,7 +918,7 @@ erase_urpmi () {
     local s f t
     for s in $PACKAGE $PACKAGE-local; do
         if [ ${nolock:-no} != yes -a -x "`which urpmi.removemedia 2>/dev/null`" ]; then
-            doit urpmi.removemedia -y $s
+            doroot urpmi.removemedia -y $s
         else
             f=$urpmiconfdir/urpmi.cfg
             if [ -r $f ]; then
@@ -860,10 +926,11 @@ erase_urpmi () {
                 rm -f -- $t
                 cat /dev/null >$t
                 sed '/^.*('$s'[0-9]*).*{/,/}/d' $f | cat -s >$t
-                doit cp -fp -- $t $f; rm -f -- $t
+                doroot cp -fp -- $t $f
+                [ ${debug:-0} -ne 0 ] || rm -f -- $t
             fi
             find $localstatedir/lib/urpmi -name '*('$s'[0-9]*)*' 2>/dev/null | \
-            while read f; do if -d "$f"; then doit rm -fr -- "$f"; else doit rm -f -- "$f"; fi; done
+            while read f; do if -d "$f"; then doroot rm -fr -- "$f"; else doroot rm -f -- "$f"; fi; done
         fi
     done
     f=$urpmiconfdir/netrc
@@ -872,22 +939,25 @@ erase_urpmi () {
         rm -f -- $t
         ( umask 0077; cat /dev/null >$t )
         sed '/^machine[[:space:]]*'$repobase'/d' $f >>$t
-        doit cp -fp -- $t $f; rm -f -- $t
+        doroot cp -fp -- $t $f
+        [ ${debug:-0} -ne 0 ] || rm -f -- $t
     fi
     rm -fr -- $urpmimediadir
 }
 
 erase_apt () {
-    local s f
+    local s t f
     for s in $PACKAGE $PACKAGE-local; do
-        doit rm -f -- $aptrepodir/$s.list
-        doit rm -f -- $aptvenddir/$s.vendor.list
+        t=$aptrepodir/$s.list
+        [ ! -e $t ] || doroot rm -f -- $t
+        t=$aptvenddir/$s.vendor.list
+        [ ! -e $t ] || doroot rm -f -- $t
     done
     if [ ${nolock:-no} = yes -o ! -x "`which apt-get 2>/dev/null`" ]; then
         for s in $repobase $DISTDIR; do
             s=`echo "$s" | sed -r 's,[^a-zA-Z0-9\._],?,g'`
             find $localstatedir/lib/apt -name $s'*' 2>/dev/null | \
-            while read f; do if -d "$f"; then doit rm -fr -- "$f"; else doit rm -f -- "$f"; fi; done
+            while read f; do if -d "$f"; then doroot rm -fr -- "$f"; else doroot rm -f -- "$f"; fi; done
         done
     fi
 }
@@ -912,8 +982,10 @@ update_zypp () {
     fi
     get_file $zyppservdir/$s.service || return 1
     if [ ${rlocal:-no} = no ]; then
-        [ -d $zyppcreddir ] || doit mkdir -p -- $zyppcreddir
-        ( umask 0077; echo -e "username=$username\npassword=$password" >$zyppcreddir/${s}credentials )
+        [ -d $zyppcreddir ] || doroot mkdir -p -- $zyppcreddir
+        if [ ${run:-yes} = yes -a ${root:-yes} = yes ]; then
+            ( umask 0077; echo -e "username=$username\npassword=$password" >$zyppcreddir/${s}credentials )
+        fi
     fi
     return 0
 }
@@ -921,8 +993,7 @@ update_zypp () {
 update_urpmi () {
     local s m c t f
     if [ ${nolock:-no} != yes -a -x "`which uprmi.addmedia 2>/dev/null`" ]; then
-        urpmi.addmedia --distrib ${PACKAGE} \
-            "$reposerv://`get_key`$repobase/$reporoot/rpms/$distro/$relver/$osarch"
+        doroot "urpmi.addmedia --distrib ${PACKAGE} '$reposerv://`get_key`$repobase/$reporoot/rpms/$distro/$relver/$osarch'"
     else
         t=${TMPDIR:-/var/tmp}/netrc.$$
         f=$urpmiconfdir/netrc
@@ -940,22 +1011,28 @@ update_urpmi () {
         {   if [ -r $f ]; then cat $f; fi
             echo "machine $repobase login $username password $password"
         } >>$t
+        doroot cp -fp -- $t $f
+        [ ${debug:-0} -ne 0 ] || rm -f -- $t
         get_file $urpmimediadir/$m || return 1
         get_file $urpmimediadir/$c || return 1
-        echo "$reposerv://$repobase/$reporoot/rpms/$distro/$relver/$osarch" >$urpmimediadir/url
-        echo "$reposerv://$repobase/$reporoot/rpms/$distro/$relver/$osarch" >$urpmimediadir/mirrorlist
-        t=${TMPDIR:-/var/tmp}/$c.$$
+        doroot "echo '$reposerv://$repobase/$reporoot/rpms/$distro/$relver/$osarch' >$urpmimediadir/url"
+        doroot "echo '$reposerv://$repobase/$reporoot/rpms/$distro/$relver/$osarch' >$urpmimediadir/mirrorlist"
+        t=${TMPDIR:-/var/tmp}/$c.edit.$$
         s=$urpmimediadir/$c
         f=$urpmiconfdir/$c
         {
             if [ -r $f ]; then
                 sed -n '/^{/,/^}/p' $f
             fi
-            cat $s
+            if [ -r $s ]; then
+                cat $s
+            fi
             if [ -r $f ]; then
                 sed '/^{/,/^}/d;/^.*('$s'[0-9]*).*{/,/}/d' $f
             fi
         } | cat -s >$t
+        doroot cp -fp -- $t $f
+        [ ${debug:-0} -ne 0 ] || rm -f -- $t
     fi
     return 0
 }
@@ -986,9 +1063,9 @@ erase () {
 }
 
 update () {
-    username=
-    password=
-    find_credentials || return $?
+    if [ -z "$username" -o -z "$password" ]; then
+        find_credentials || return $?
+    fi
     if [ ${u_yum:-no} = yes ]; then
         erase_yum || :
         update_yum || :
@@ -1013,8 +1090,6 @@ update () {
 }
 
 register () {
-    username=
-    password=
     find_credentials || :
     update_credentials || return $?
     update || return $?
@@ -1022,12 +1097,13 @@ register () {
 }
 
 reregister () {
-    username=
-    password=
     update_credentials || return $?
     update || return $?
     return 0
 }
+
+username=
+password=
 
 case "$command" in
     (update|erase|register|reregister)
