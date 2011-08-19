@@ -699,8 +699,9 @@
 %{!?_rpmgpgdir:         %{expand: %%global _rpmgpgdir       %%{_sysconfdir}/pki/rpm-gpg}}
 %{!?_urpmirepodir:      %{expand: %%global _urpmirepodir    %%{_sysconfdir}/urpmi/mediacfg.d}}
 %{!?_urpmiconfdir:      %{expand: %%global _urpmiconfdir    %%{_sysconfdir}/urpmi}}
-%{!?_aptrepodir         %{expand: %%global _aptrepodir      %%{_sysconfdir}/apt}}
 %{!?_aptconfdir         %{expand: %%global _aptconfdir      %%{_sysconfdir}/apt}}
+%{!?_aptrepodir         %{expand: %%global _aptrepodir      %%{_aptconfdir}/sources.list.d}}
+%{!?_aptvnddir          %{expand: %%global _aptvnddir       %%{_aptconfdir}/vendors.list.d}}
 
 %{!?_repobase:          %{expand: %%global _repobase        @repobase@}}
 %{!?_reporoot:          %{expand: %%global _reporoot        @reporoot@}}
@@ -2015,6 +2016,7 @@
 
 # ---------------------------------------------------------------------------
 
+# these are defaults, change these in ~/.rpmmacros if necessary
 #global _missing_build_ids_terminate_build 1
 #global _unpackaged_files_terminate_build 0
 #global _missing_doc_files_terminate_build 0

@@ -172,6 +172,7 @@ rpm_binary7_file	= $(PACKAGE)-debugsource-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACK
 rpm_binary8_file	= $(PACKAGE)-java-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).$(target_cpu).rpm
 rpm_binary9_file	= $(PACKAGE)-javadoc-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA).noarch.rpm
 rpm_link_file		= $(topdir)/SRPMS/$(rpmpkg).src.rpm
+rpm_product_file	= $(topdir)/product
 rpm_root_dir		= $(rpmbuildrootdir)/$(PACKAGE)-$(VERSION)
 ##
 ## There are several forms (currently) for automatic loadable module files:
@@ -263,6 +264,17 @@ RPMTARGET		= $(target)
 #! options.  We always use release number 1.  You can use release numbers
 #! above 1.
 #!
+$(rpm_product_file):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)( \
+		$(ECHO) 'distro=$(target_distro)' ; \
+		$(ECHO) 'relver=$(target_edition)' ; \
+		$(ECHO) 'osarch=$(target_arch)' ; \
+		$(ECHO) 'repotype=rpms' ; \
+		$(ECHO) 'username=' ; \
+		$(ECHO) 'password=' ; \
+	) >$@
+
 $(rpm_tar_file)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@f=`$(ECHO) "$@" | sed 's|^.*/||'`; \
@@ -325,7 +337,7 @@ $(rpm_link_file):: $(rpm_src_file)
 #!     This target generates the source rpm for the package (without signing the
 #!     source rpm).  The source rpm will be named: @PACKAGE@-@VERSION@-@PACKAGE_RPMRELEASE@.srpm
 #!
-srpm: $(rpm_src_file) $(rpm_link_file)
+srpm: $(rpm_src_file) $(rpm_link_file) $(rpm_product_file)
 
 ## This is the type of thing that needs to be included in the master makefile to build rpms for the
 ## current target, we also build any defined AM_RPMTARGETS
@@ -384,7 +396,7 @@ all-rpms:      ALL_EXPORT_OPTS = RPMXOPTS='$(RPMXOPTS)' DEBXOPTS='$(DEBXOPTS)'
 #!     required.  Automated or unattended builds can be achieved by using
 #!     the `emake' expect script, included in `@abs_srcdir@/scripts/emake'.
 #!
-sign srpm-sign: $(rpm_src_file) $(rpm_link_file)
+sign srpm-sign: $(rpm_src_file) $(rpm_link_file) $(rpm_product_file)
 	@if ! $(RPM) -K -- $< 2>&1 | grep -q ' gpg OK' >/dev/null 2>&1; then \
 		user="$(GNUPGUSER)"; user="$${user:+ --define \"_gpg_name $$user\"}"; \
 		home="$(GNUPGHOME)"; home="$${home:+ --define \"_gpg_path $$home\"}"; \
@@ -517,7 +529,8 @@ RELEASECLEANFILES	+= $(rpm_dir_stamp) \
 			   $(rpm_src_file) \
 			   $(rpm_sig_file) \
 			   $(rpm_binary_files) \
-			   $(rpm_link_file)
+			   $(rpm_link_file) \
+			   $(rpm_product_file)
 
 ## Because the build directory is in the autoconf top build directory on the local machine, it needs
 ## to be cleaned when a distclean is performed.  We use rpm to do this for us, and rpm will complain
@@ -581,7 +594,7 @@ update-clean-rpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(ECHO) "rm -rf $(rpm_dir)"; \
 	rm -rf $(rpm_dir) ; \
-	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_sig_file) $(rpm_binary_files) ; do \
+	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_sig_file) $(rpm_binary_files) $(rpm_product_file) ; do \
 		if test -e $$f -a \( ! -f '$(USTAMP)' -o $$f -nt '$(USTAMP)' \); then \
 			$(ECHO) "D: $@: removed $$f"; \
 			$(ECHO) "rm -f -- \"$$f\""; \
@@ -624,7 +637,7 @@ UPDATECLEANFILES	+= $(rpm_dir_stamp)
 ##
 update-srpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@list="$(rpm_spec_file) $(rpm_img_files) $(rpm_src_file) $(rpm_link_file)"; for f in $$list; do \
+	@list="$(rpm_spec_file) $(rpm_img_files) $(rpm_src_file) $(rpm_link_file) $(rpm_product_file)"; for f in $$list; do \
 		if test ! -e "$$f" -o \( -n '$(FORCE)' -a \( ! -e '$(USTAMP)' -o "$$f" -nt '$(USTAMP)' \) \); then \
 			$(ECHO) "D: $@: rebuild $$f"; \
 			$(ECHO) "rm -f -- \"$$f\""; rm -f -- "$$f"; \
@@ -764,7 +777,7 @@ update-rpms:
 ##
 update-sign-srpm:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
-	list="$(rpm_src_file) $(rpm_link_file)"; for f in $$list; do \
+	list="$(rpm_src_file) $(rpm_link_file) $(rpm_product_file)"; for f in $$list; do \
 		if test ! -e "$$f"; then \
 			$(ECHO) "D: $@: rebuild update-rpm"; \
 			$(ECHO) "$(MAKE) $(AM_MAKEFLAGS) $(ALL_EXPORT_OPTS) update-srpm"; \
@@ -868,7 +881,7 @@ release-copy-rpms:
 		$(ECHO) "$(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$rpms" ; \
 		eval "$$pass $(RPM) --addsign $(RPMFLAGS) `echo '$(RPMKOPTS)'` $$user$$home -- $$rpms" || :; \
 	fi ; \
-	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_binary_files) ; do \
+	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_binary_files) $(rpm_product_file) ; do \
 		case "$$f" in (*/src/*) continue ;; (*) ;; esac ; \
 		test -s $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
@@ -897,7 +910,7 @@ release-remove-rpms:
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	test '$(DISTDIR)' != '$(REPODIR)' || exit 0; \
 	$(ECHO) "D: $@: removing rpms" ; \
-	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_binary_files) ; do \
+	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_binary_files) $(rpm_product_file) ; do \
 		test -e $$f || { $(ECHO) "D: $@: missing $$f" ; continue ; } ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		test -f $$t || { $(ECHO) "D: $@: missing $$t" ; continue ; } ; \
@@ -908,7 +921,7 @@ release-remove-rpms:
 			$(ECHO) "D: $@: not removing $$t" ; \
 		fi ; \
 	done ; \
-	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_binary_files) ; do \
+	for f in $(rpm_source_files) $(rpm_src_file) $(rpm_link_file) $(rpm_binary_files) $(rpm_product_file) ; do \
 		test -e $$f || continue ; \
 		t=`echo "$$f" | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
 		echo "`dirname $$t`" ; \
@@ -2105,6 +2118,10 @@ if BUILD_REPO_URPMI
 
 urpmi_cfgs	= $(mediadir)/media.cfg
 
+urpmi_config	= $(mediadir)/urpmi.cfg
+urpmi_local	= $(mediadir)/urpmi-local.cfg
+urpmi_configs	= $(urpmi_config) $(urpmi_local)
+
 urpmi_keys	= $(mediamaindir)/pubkey \
 		  $(mediadebgdir)/pubkey \
 		  $(mediadevldir)/pubkey \
@@ -2146,7 +2163,7 @@ urpmi_compsss	= $(mediamaindir)/compss \
 		  $(mediadevldir)/compss \
 		  $(mediasrcsdir)/compss
 
-urpmi_files	= $(urpmi_cfgs) $(urpmi_filelists) $(urpmi_infolists) $(urpmi_changelogs) \
+urpmi_files	= $(urpmi_cfgs) $(urpmi_configs) $(urpmi_filelists) $(urpmi_infolists) $(urpmi_changelogs) \
 		  $(urpmi_hdlists) $(urpmi_synthesis) $(urpmi_compsss) $(urpmi_keys) $(urpmi_sums) \
 		  $(mediadir)/hdlist*.cz \
 		  $(mediadir)/synthesis.hdlist*.cz \
@@ -2204,6 +2221,74 @@ $(urpmi_cfgs):
 		done ; \
 	) >$@
 
+$(urpmi_config):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)( \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p`" ; \
+		numb=1 ; \
+		url='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
+		mirrors= ; \
+		find '$(DISTDIR)' -follow -type d -name 'media_info' | LANG= sort -u | while read d ; do \
+			s=`echo $$d | sed 's,^$(DISTDIR)/,,;s,/media_info$$,,;t;s,/data$$,,'` ; \
+			s=`echo $$s | sed 's,rpms/,,;s,\.[0-9][0-9]*,,'` ; \
+			s=`echo $$s | sed -r 's,^([^/]*/[^/]*/[^/]*)/(.*)$$,\2,;t;s,.*,,'` ; \
+			s=`echo $$s | sed 's,^media,,;s,^Mandrake,,;s,^/,,'` ; \
+			test -n "$$s" || continue ; \
+			case "$$s" in \
+			(main|debug|devel|source) \
+				b= ; \
+				r="$$s" ;; \
+			(updates/*|extras/*|testing/*|*/*) \
+				b=`echo "$$s" | sed 's,/.*$$,,'` ; \
+				r=`echo "$$s" | sed 's,^[^/]*/,,'` ;; \
+			esac ; \
+			$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)$$numb) $$url {" ; \
+			$(ECHO) "  ignore" >/dev/null ; \
+			test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
+			test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
+			$(ECHO) "  with-dir: media/$$s" ; \
+			$(ECHO) "}" ; \
+			$(ECHO) "" ; \
+			((numb++)) ; \
+		done ; \
+	) >$@
+
+$(urpmi_local):
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	$(AM_V_GEN)( \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p`" ; \
+		numb=1 ; \
+		url='file:/$(DISTDIR)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
+		mirrors= ; \
+		find '$(DISTDIR)' -follow -type d -name 'media_info' | LANG= sort -u | while read d ; do \
+			s=`echo $$d | sed 's,^$(DISTDIR)/,,;s,/media_info$$,,;t;s,/data$$,,'` ; \
+			s=`echo $$s | sed 's,rpms/,,;s,\.[0-9][0-9]*,,'` ; \
+			s=`echo $$s | sed -r 's,^([^/]*/[^/]*/[^/]*)/(.*)$$,\2,;t;s,.*,,'` ; \
+			s=`echo $$s | sed 's,^media,,;s,^Mandrake,,;s,^/,,'` ; \
+			test -n "$$s" || continue ; \
+			case "$$s" in \
+			(main|debug|devel|source) \
+				b= ; \
+				r="$$s" ;; \
+			(updates/*|extras/*|testing/*|*/*) \
+				b=`echo "$$s" | sed 's,/.*$$,,'` ; \
+				r=`echo "$$s" | sed 's,^[^/]*/,,'` ;; \
+			esac ; \
+			$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)-local$$numb) $$url {" ; \
+			$(ECHO) "  ignore" >/dev/null ; \
+			test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
+			test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
+			$(ECHO) "  with-dir: media/$$s" ; \
+			$(ECHO) "}" ; \
+			$(ECHO) "" ; \
+			((numb++)) ; \
+		done ; \
+	) >$@
+
 GPGEXPORTKEY = \
 	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
 	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
@@ -2214,7 +2299,7 @@ $(urpmi_keys)::
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	$(AM_V_GEN)$(GPGEXPORTKEY)
 
-repo-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_cfgs)
+repo-urpmi: $(RELEASE_DIRECTORIES) $(urpmi_cfgs) $(urpmi_configs)
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	rb='$(repobranch)' ; rpms="../../$${rb:+..$$rb/}RPMS" ; \
 	cd $(mediamaindir)/.. ; \
@@ -2356,6 +2441,49 @@ release-update-urpmi:
 				done ; \
 			done ; \
 		) >$$m/media.cfg ; \
+		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p`" ; \
+		( \
+			numb=1 ; \
+			url='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
+			mirrors= ; \
+			for b in '' updates extras testing $$rb ; do \
+				bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+				t=`echo "$$b" | sed 's,^$$,base,'` ; \
+				for r in main debug devel source ; do \
+					if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
+					repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+					$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)$$numb) $$url {" ; \
+					$(ECHO) "  ignore" >/dev/null ; \
+					test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
+					test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
+					$(ECHO) "  with-dir: media/$$s" ; \
+					$(ECHO) "}" ; \
+					$(ECHO) "" ; \
+					((numb++)) ; \
+				done ; \
+			done ; \
+		) >$$m/urpmi.cfg ; \
+		( \
+			numb=1 ; \
+			url='file:/$(DISTDIR)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
+			mirrors= ; \
+			for b in '' updates extras testing $$rb ; do \
+				bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+				t=`echo "$$b" | sed 's,^$$,base,'` ; \
+				for r in main debug devel source ; do \
+					if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
+					repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
+					$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)-local$$numb) $$url {" ; \
+					$(ECHO) "  ignore" >/dev/null ; \
+					test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
+					test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
+					$(ECHO) "  with-dir: media/$$s" ; \
+					$(ECHO) "}" ; \
+					$(ECHO) "" ; \
+					((numb++)) ; \
+				done ; \
+			done ; \
+		) >$$m/urpmi-local.cfg ; \
 		$(ECHO) "$(GENDISTRIB) --blind --clean $${repodir}" ; \
 		$(GENDISTRIB) --blind --clean $${repodir} ; \
 	else \
