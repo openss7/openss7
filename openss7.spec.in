@@ -2734,13 +2734,13 @@ cp -p src/python/yum-plugins/*.conf $d
 %endif
 
 %if %{HAVE_manrefs}
-# stupid mandrake spec-helper will compress our macros files otherwise
-EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{manrefs}"
+# stupid mandrake spec-helper will compress our macros files otherwise (perl regex)
+EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS|}%{manrefs}"
 export EXCLUDE_FROM_COMPRESS
 %endif
 %if %{HAVE_manmacros}
-# stupid mandrake spec-helper will compress our macros files otherwise
-EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS }%{manmacros}"
+# stupid mandrake spec-helper will compress our macros files otherwise (perl regex)
+EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS|}%{manmacros}"
 export EXCLUDE_FROM_COMPRESS
 %endif
 
