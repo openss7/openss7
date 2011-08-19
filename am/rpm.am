@@ -2228,8 +2228,12 @@ $(urpmi_config):
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p'`" ; \
 		numb=1 ; \
-		url='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
-		mirrors= ; \
+		if test '$(target_distro)' = 'mageia' ; then \
+			mirrors='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)' ; \
+		else \
+			mirrors='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
+		fi ; \
+		url= ; \
 		find '$(DISTDIR)' -follow -type d -name 'media_info' | LANG= sort -u | while read d ; do \
 			s=`echo $$d | sed 's,^$(DISTDIR)/,,;s,/media_info$$,,;t;s,/data$$,,'` ; \
 			s=`echo $$s | sed 's,rpms/,,;s,\.[0-9][0-9]*,,'` ; \
@@ -2246,7 +2250,7 @@ $(urpmi_config):
 			esac ; \
 			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-			$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)$$numb) $$url {" ; \
+			$(ECHO) "$(PACKAGE_NAME)\\ $${bran}\\ $${repo}\\ ($(PACKAGE)$$numb) $$url {" ; \
 			$(ECHO) "  ignore" >/dev/null ; \
 			test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
 			test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
@@ -2264,8 +2268,12 @@ $(urpmi_local):
 		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
 		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p'`" ; \
 		numb=1 ; \
-		url='file:/$(DISTDIR)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
-		mirrors= ; \
+		if test '$(target_distro)' = 'mageia' ; then \
+			mirrors='file:/$(DISTDIR)/rpms/$(reposubdir)' ; \
+		else \
+			mirrors='file:/$(DISTDIR)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
+		fi ; \
+		url= ; \
 		find '$(DISTDIR)' -follow -type d -name 'media_info' | LANG= sort -u | while read d ; do \
 			s=`echo $$d | sed 's,^$(DISTDIR)/,,;s,/media_info$$,,;t;s,/data$$,,'` ; \
 			s=`echo $$s | sed 's,rpms/,,;s,\.[0-9][0-9]*,,'` ; \
@@ -2282,7 +2290,7 @@ $(urpmi_local):
 			esac ; \
 			bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 			repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-			$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)-local$$numb) $$url {" ; \
+			$(ECHO) "$(PACKAGE_NAME)\\ $${bran}\\ $${repo}\\ ($(PACKAGE)-local$$numb) $$url {" ; \
 			$(ECHO) "  ignore" >/dev/null ; \
 			test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
 			test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
@@ -2448,16 +2456,21 @@ release-update-urpmi:
 		keyid="`$(GPG) $$user$$home --list-keys $(GNUPGUSER) 2>/dev/null | sed -n 's,^pub[^/]*/,,;T;s,[[:space:]].*$$,,;y,ABCDEF,abcdef,;p'`" ; \
 		( \
 			numb=1 ; \
-			url='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
-			mirrors= ; \
+			if test '$(target_distro)' = 'mageia'; then
+				mirrors='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(reposubdir)' ; \
+			else \
+				mirrors='$(reposerv)://$(repobase)/$(reporoot)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
+			fi ; \
+			url= ; \
 			for b in '' updates extras testing $$rb ; do \
 				bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 				t=`echo "$$b" | sed 's,^$$,base,'` ; \
 				for r in main debug devel source ; do \
 					if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
 					repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-					$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)$$numb) $$url {" ; \
-					$(ECHO) "  ignore" >/dev/null ; \
+					$(ECHO) "$(PACKAGE_NAME)\\ $${bran}\\ $${repo}\\ ($(PACKAGE)$$numb) $$url {" ; \
+					test -r $(DISTDIR)/repo/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r}/media_info/hdlist.cz || $(ECHO) "  ignore" ; \
+					test "$$b" != updates || $(ECHO) "  update" ; \
 					test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
 					test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
 					$(ECHO) "  with-dir: media/$$s" ; \
@@ -2469,16 +2482,21 @@ release-update-urpmi:
 		) >$$m/urpmi.cfg ; \
 		( \
 			numb=1 ; \
-			url='file:/$(DISTDIR)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
-			mirrors= ; \
+			if test '$(target_distro)' = 'mageia'; then
+				mirrors='file:/$(DISTDIR)/rpms/$(reposubdir)' ; \
+			else \
+				mirrors='file:/$(DISTDIR)/rpms/$(target_distro)/$$RELEASE/$$ARCH' ; \
+			fi ; \
+			url= ; \
 			for b in '' updates extras testing $$rb ; do \
 				bran=`echo "$${b:-base}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
 				t=`echo "$$b" | sed 's,^$$,base,'` ; \
 				for r in main debug devel source ; do \
 					if test -z "$$b" ; then s="$$r" ; else s="$$b$${r:+/$$r}" ; fi ; \
 					repo=`echo "$${r:-full}" | awk '{print toupper(substr($$0,1,1)) substr($$0,2)}'` ; \
-					$(ECHO) "$${bran}\\ $${repo}\\ ($(PACKAGE)-local$$numb) $$url {" ; \
-					$(ECHO) "  ignore" >/dev/null ; \
+					$(ECHO) "$(PACKAGE_NAME)\\ $${bran}\\ $${repo}\\ ($(PACKAGE)-local$$numb) $$url {" ; \
+					test -r $(DISTDIR)/repo/rpms/$(reposubdir)/media$${b:+/$$b}$${r:+/$$r}/media_info/hdlist.cz || $(ECHO) "  ignore" ; \
+					test "$$b" != updates || $(ECHO) "  update" ; \
 					test -z "$$keyid"   || $(ECHO) "  key-ids: $$keyid" ; \
 					test -z "$$mirrors" || $(ECHO) "  mirrorlist: $$mirrors" ; \
 					$(ECHO) "  with-dir: media/$$s" ; \
@@ -2605,8 +2623,10 @@ aptr_release_xzips	= $(aptrbasedir)/release.xz \
 
 aptr_sources_lists	= $(aptrbasedir)/$(PACKAGE).list \
 			  $(aptrbasedir)/$(PACKAGE)-local.list \
+			  $(aptrbasedir)/$(PACKAGE).vendor.list \
 			  $(rpmdistdir)/$(PACKAGE).list \
-			  $(rpmdistdir)/$(PACKAGE)-local.list
+			  $(rpmdistdir)/$(PACKAGE)-local.list \
+			  $(rpmdistdir)/$(PACKAGE).vendor.list
 
 aptr_gzips		= $(aptr_package_gzips) \
 			  $(aptr_source_gzips) \
@@ -2908,6 +2928,17 @@ $(aptrbasedir)/$(PACKAGE)-local.list: Makefile
 				$(ECHO) 'rpm-src-dir file://$(DISTDIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
 			done ; \
 		done ; \
+	} >$@
+
+$(rpmdistdir)/$(PACKAGE).vendor.list \
+$(aptrbasedir)/$(PACKAGE).vendor.list: Makefile
+	$(AM_V_GEN)\
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	{ \
+		$(ECHO) 'simple-key "$(PACKAGE_NAME)" {' ; \
+		$(GPG) $$user$$home --fingerprint $(GNUPGUSER) | sed -r -n '/Key fingerprint/{s,^.*Key fingerprint = ,,;s, ,,g;s,^,\tFingerprint ",;s,$$,";,;p};/^uid/{s,^uid *,,;s, *$$,,;s,^,\tName ",;s,$$,";,;p}' ; \
+		$(ECHO) '}' ; \
 	} >$@
 
 $(rpmdistdir)/$(PACKAGE).list: Makefile
@@ -3403,6 +3434,13 @@ release-update-aptrpm:
 					$(ECHO) 'rpm-src-dir file://$(REPODIR)/rpms $(reposubdir)'"$${b:+/$$b} $$comp" ; \
 				done ; \
 			} >$$f ; \
+			f=$(PACKAGE).vendor.list ;  \
+			$(ECHO) "  GEN   $$(basename $$f)" ; \
+			{ \
+				$(ECHO) 'simple-key "$(PACKAGE_NAME)" {' ; \
+				$(GPG) $$user$$home --fingerprint $(GNUPGUSER) | sed -r -n '/Key fingerprint/{s,^.*Key fingerprint = ,,;s, ,,g;s,^,\tFingerprint ",;s,$$,";,;p};/^uid/{s,^uid *,,;s, *$$,,;s,^,\tName ",;s,$$,";,;p}' ; \
+				$(ECHO) '}' ; \
+			} >$$f ; \
 		) ; \
 		else \
 		( \
@@ -3412,7 +3450,7 @@ release-update-aptrpm:
 				comp=$${r:-full} ; \
 				files="$${files:+$$files }release.$$comp" ; \
 			done ; \
-			for f in $$files release hashfile contents_index srpm_idx $(PACKAGE).list $(PACKAGE)-local.list; do \
+			for f in $$files release hashfile contents_index srpm_idx $(PACKAGE).list $(PACKAGE)-local.list $(PACKAGE).vendor.list; do \
 				for e in '' .gz .bz2 .lzma .xz .key .gpg .asc; do \
 					test -e $$f$$e || continue ; \
 					$(ECHO) " rm -f -- $$f$$e" ; \
@@ -3527,9 +3565,23 @@ release-update-aptrpm:
 				done ; \
 			done ; \
 		} >$$f ; \
+		f=$$repodir/$(PACKAGE).vendor.list ; \
+		$(ECHO) "  GEN   $$(basename $$f)" ; \
+		{ \
+			$(ECHO) 'simple-key "$(PACKAGE_NAME)" {' ; \
+			$(GPG) $$user$$home --fingerprint $(GNUPGUSER) | sed -r -n '/Key fingerprint/{s,^.*Key fingerprint = ,,;s, ,,g;s,^,\tFingerprint ",;s,$$,";,;p};/^uid/{s,^uid *,,;s, *$$,,;s,^,\tName ",;s,$$,";,;p}' ; \
+			$(ECHO) '}' ; \
+		} >$$f ; \
+		f=$(REPODIR)/$(PACKAGE).vendor.list ; \
+		$(ECHO) "  GEN   $$(basename $$f)" ; \
+		{ \
+			$(ECHO) 'simple-key "$(PACKAGE_NAME)" {' ; \
+			$(GPG) $$user$$home --fingerprint $(GNUPGUSER) | sed -r -n '/Key fingerprint/{s,^.*Key fingerprint = ,,;s, ,,g;s,^,\tFingerprint ",;s,$$,";,;p};/^uid/{s,^uid *,,;s, *$$,,;s,^,\tName ",;s,$$,";,;p}' ; \
+			$(ECHO) '}' ; \
+		} >$$f ; \
 	else \
-		$(ECHO) "rm -f -- $$repodir/$(PACKAGE).list $$repodir/$(PACKAGE)-local.list" ; \
-		rm -f -- $$repodir/$(PACKAGE).list $$repodir/$(PACKAGE)-local.list ; \
+		$(ECHO) "rm -f -- $$repodir/$(PACKAGE).list $$repodir/$(PACKAGE)-local.list $$repodir/$(PACKAGE).vendor.list $(REPODIR)/$(PACKAGE).vendor.list" ; \
+		rm -f -- $$repodir/$(PACKAGE).list $$repodir/$(PACKAGE)-local.list $$repodir/$(PACKAGE).vendor.list $(REPODIR)/$(PACKAGE).vendor.list ; \
 		$(ECHO) "rmdir -pv -- $$repodir" ; \
 		rmdir -pv -- $$repodir || :; \
 	fi
