@@ -116,6 +116,7 @@ AC_DEFUN([_REPO_SETUP], [dnl
     _REPO_SETUP_ZYPP
     _REPO_SETUP_URPMI
     _REPO_SETUP_APT
+    AC_CONFIG_FILES([scripts/register])
 ])# _REPO_SETUP
 # =============================================================================
 
@@ -591,69 +592,69 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	reposubdir="$repo_cv_dist_subdir"
     fi
     AC_SUBST([reposubdir])dnl
-    yumrepodir=
+    yumrepodir='${DESTDIR}${rootdir}/etc/yum.repos.d'
     if test :"${repo_cv_yum_repodir:-no}" != :no ; then
 	yumrepodir="$repo_cv_yum_repodir"
     fi
     AC_SUBST([yumrepodir])dnl
     AM_CONDITIONAL([WITH_INSTALL_SOURCE_YUM], [test :"${repo_cv_yum_repodir:-no}" != :no])
-    yumkmodconf=
-    if test "${repo_cv_yum_kmodconf:-no}" != :no ; then
+    yumkmodconf='${DESTDIR}${rootdir}/etc/yum/pluginconf.d/kmod.conf'
+    if test :"${repo_cv_yum_kmodconf:-no}" != :no ; then
 	yumkmodconf="$repo_cv_yum_kmodconf"
     fi
     AC_SUBST([yumkmodconf])dnl
-    rpmgpgdir=
+    rpmgpgdir='${DESTDIR}${rootdir}/etc/pki/rpm-gpg'
     if test :"${repo_cv_rpm_gpgdir:-no}" != :no ; then
 	rpmgpgdir="$repo_cv_rpm_gpgdir"
     fi
     AC_SUBST([rpmgpgdir])dnl
-    zyppcreddir=
+    zyppcreddir='${DESTDIR}${rootdir}/etc/zypp/credentials.d'
     if test :"${repo_cv_zypp_creddir:-no}" != :no ; then
 	zyppcreddir="$repo_cv_zypp_creddir"
     fi
     AC_SUBST([zyppcreddir])dnl
-    zyppservdir=
+    zyppservdir='${DESTDIR}${rootdir}/etc/zypp/services.d'
     if test :"${repo_cv_zypp_servdir:-no}" != :no ; then
 	zyppservdir="$repo_cv_zypp_servdir"
     fi
     AC_SUBST([zyppservdir])dnl
-    zypprepodir=
+    zypprepodir='${DESTDIR}${rootdir}/etc/zypp/repos.d'
     if test :"${repo_cv_zypp_repodir:-no}" != :no ; then
 	zypprepodir="$repo_cv_zypp_repodir"
     fi
     AC_SUBST([zypprepodir])dnl
     AM_CONDITIONAL([WITH_INSTALL_SOURCE_ZYPP], [test :"${repo_cv_zypp_repodir:-no}" != :no])
-    zyppconfig=
+    zyppconfig='${DESTDIR}${rootdir}/etc/zypp/zypp.conf'
     if test :"${repo_cv_zypp_config:-no}" != :no ; then
 	zyppconfig="$repo_cv_zypp_config"
     fi
     AC_SUBST([zyppconfig])dnl
-    urpmirepodir=
-    urpmimediadir=
+    urpmirepodir='${DESTDIR}${rootdir}/etc/urpmi/mediacfg.d'
+    urpmimediadir='${urpmirepodir}/${PACKAGE_NAME}-${target_edition}-${target_arch}'
     if test :"${repo_cv_urpmi_repodir:-no}" != :no ; then
 	urpmirepodir="$repo_cv_urpmi_repodir"
-	urpmimediadir="$repo_cv_urpmi_repodir/OpenSS7-${target_edition}-${target_arch}"
+	urpmimediadir="$repo_cv_urpmi_repodir/${PACKAGE_NAME}-${target_edition}-${target_arch}"
     fi
     AC_SUBST([urpmirepodir])dnl
     AC_SUBST([urpmimediadir])dnl
     AM_CONDITIONAL([WITH_INSTALL_SOURCE_URPMI], [test :"${repo_cv_urpmi_repodir:-no}" != :no])
-    urpmiconfig=
+    urpmiconfig='${DESTDIR}${rootdir}/etc/urmpi/urpmi.cfg'
     if test :"${repo_cv_urpmi_config:-no}" != :no ; then
 	urpmiconfig="$repo_cv_urpmi_config"
     fi
     AC_SUBST([urpmiconfig])
-    urpmiconfdir=
-    if test :$"{repo_cv_urpmi_confdir:-no}" != :no ; then
+    urpmiconfdir='${DESTDIR}${rootdir}/etc/urpmi'
+    if test :"${repo_cv_urpmi_confdir:-no}" != :no ; then
 	urpmiconfdir="$repo_cv_urpmi_confdir"
     fi
     AC_SUBST([urpmiconfdir])dnl
-    aptconfdir=
+    aptconfdir='${DESTDIR}${rootdir}/etc/apt'
     if test :"${repo_cv_apt_dir:-no}" != :no ; then
 	aptconfdir="$repo_cv_apt_dir"
     fi
     AC_SUBST([aptconfdir])
     AM_CONDITIONAL([WITH_INSTALL_SOURCE_APT], [test :"${repo_cv_apt_dir:-no}" != :no])
-    aptrepodir=
+    aptrepodir='${DESTDIR}${rootdir}/etc/apt/sources.list.d'
     if test :"${repo_cv_apt_repodir:-no}" != :no ; then
 	aptrepodir="$repo_cv_apt_repodir"
     elif test :"${repo_cv_apt_srclist:-no}" != :no ; then
@@ -662,12 +663,12 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	aptrepodir="$repo_cv_apt_dir/sources.list.d"
     fi
     AC_SUBST([aptrepodir])dnl
-    aptsrclist=
+    aptsrclist='${DESTDIR}${rootdir}/etc/apt/sources.list'
     if test :"${repo_cv_apt_srclist:-no}" != :no ; then
 	aptsrclist="$repo_cv_apt_srclist"
     fi
     AC_SUBST([aptsrclist])dnl
-    aptvenddir=
+    aptvenddir='${DESTDIR}${rootdir}/etc/apt/vendors.list.d'
     if test :"${repo_cv_apt_venddir:-no}" != :no  ; then
 	aptvenddir="$repo_cv_apt_venddir"
     elif test :"${repo_cv_apt_vndlist:-no}" != :no ; then
@@ -676,12 +677,12 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	aptvenddir="$repo_cv_apt_dir/vendors.list.d"
     fi
     AC_SUBST([aptvenddir])
-    aptvndlist=
+    aptvndlist='${DESTDIR}${rootdir}/etc/apt/vendors.list'
     if test :"${repo_cv_apt_vndlist:-no}" != :no ; then
 	aptvndlist="$repo_cv_apt_vndlist"
     fi
     AC_SUBST([aptvndlist])dnl
-    aptgpgdir=
+    aptgpgdir='${DESTDIR}${rootdir}/etc/apt/trusted.gpg.d'
     if test :"${repo_cv_apt_gpgdir:-no}" != :no ; then
 	aptgpgdir="$repo_cv_apt_gpgdir"
     fi
