@@ -65,8 +65,9 @@ datarootdir=@datarootdir@
 #	configuration files that were altered by the installation.  Short
 #	circuited for now.
 #
-prerm_repo () { :; return
-    d="@sysconfdir@/apt/sources.list.d"
+prerm_repo () { :
+    local d f
+    d=$aptrepodir
     for f in openss7.list; do
 	f="$d/$f"
 	if [ -r $f ]; then

@@ -675,9 +675,9 @@
 %{!?_lib32dir:          %{expand: %%global _lib32dir        %%{_exec_prefix}/lib}}
 %{!?_pkglibexec32dir:   %{expand: %%global _pkglibexec32dir %%{_pkglibexecdir}/lib32}}
 %{!?_syslib32dir:       %{expand: %%global _syslib32dir     /lib}}
-%{!?_syslibdir:         %{expand: %%global _syslibdir       %%(echo %%{_libdir} | sed 's,/usr,,')}}
-%{!?_sysbindir:         %{expand: %%global _sysbindir       %%(echo %%{_bindir} | sed 's,/usr,,')}}
-%{!?_syssbindir:        %{expand: %%global _syssbindir      %%(echo %%{_sbindir} | sed 's,/usr,,')}}
+%{!?_syslibdir:         %{expand: %%global _syslibdir       %(echo %{_libdir} | sed 's,/usr,,')}}
+%{!?_sysbindir:         %{expand: %%global _sysbindir       %(echo %{_bindir} | sed 's,/usr,,')}}
+%{!?_syssbindir:        %{expand: %%global _syssbindir      %(echo %{_sbindir} | sed 's,/usr,,')}}
 %{!?_snmpdlmod32dir:    %{expand: %%global _snmpdlmod32dir  %%{_lib32dir}/snmp/dlmod}}
 %{!?_gcjdir:            %{expand: %%global _gcjdir          %%{_libdir}/gcj}}
 %{!?_pkggcjdir:         %{expand: %%global _pkggcjdir       %%{_gcjdir}/%%{name}}}
@@ -689,7 +689,7 @@
 %{!?_tclsrcdir:         %{expand: %%global _tclsrcdir       %%{_datadir}}}
 %{!?_pkgtcllibdir:      %{expand: %%global _pkgtcllibdir    %%{_tcllibdir}/@PACKAGE_NAME@@PACKAGE_VERSION@}}
 %{!?_perldir:           %{expand: %%global _perldir         %(eval "`perl -V:installvendorarch`"; echo $installvendorarch | sed -e 's,//*$,,')}}
-%{!?_yumrepodir:        %{expand: %%global _yumrepodir      %%{_sysconfdir}/yum.repos.d}}
+%{!?_yumrepodir:        %{expand: %%global _yumrepodir      %(if test -d %{_sysconfdir}/yum/repos.d; then echo %{_sysconfdir}/yum/repos.d; else echo %{_sysconfdir}/yum.repos.d; fi)}}
 %{!?_yumplugdir:        %{expand: %%global _yumplugdir      %%{_libdir}/yum-plugins}}
 %{!?_yumdir:            %{expand: %%global _yumdir          %%{_sysconfdir}/yum}}
 %{!?_yumconfdir:        %{expand: %%global _yumconfdir      %%{_sysconfdir}/yum/pluginconf.d}}
@@ -701,7 +701,7 @@
 %{!?_urpmiconfdir:      %{expand: %%global _urpmiconfdir    %%{_sysconfdir}/urpmi}}
 %{!?_aptconfdir         %{expand: %%global _aptconfdir      %%{_sysconfdir}/apt}}
 %{!?_aptrepodir         %{expand: %%global _aptrepodir      %%{_aptconfdir}/sources.list.d}}
-%{!?_aptvnddir          %{expand: %%global _aptvnddir       %%{_aptconfdir}/vendors.list.d}}
+%{!?_aptvenddir         %{expand: %%global _aptvenddir      %%{_aptconfdir}/vendors.list.d}}
 
 %{!?_repobase:          %{expand: %%global _repobase        @repobase@}}
 %{!?_reporoot:          %{expand: %%global _reporoot        @reporoot@}}
@@ -2711,7 +2711,7 @@ cp -p %{_builddir}/%{mpost_file} $d
 
 %if %{FILES_sourcefiles}
 # remove include2 symbolic link
-rm -fr include2
+rm -rf include2
 # punch rpm release to Custom
 echo '.Custom.1'  > .rpmextra
 # create configured source directory for source package
@@ -2889,183 +2889,140 @@ in the set.
 %pre -p /bin/bash repo
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
-%if %{FILES_yumrepo}
-    (
-        umask 0077
-	cd '%{_yumrepodir}'
-	un=; pw=; oldfile=; file='@PACKAGE@.repo'
-	for s in '' '.rpmsave' '.rpmnew' ; do
-	    oldfile="$file$s"
-	    if test -e $oldfile ; then
-		un=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $oldfile`
-		pw=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $oldfile`
-		[ -n "$un" -a -n "$pw" ] || continue
-		break
-	    fi
-	done
-	[ ":$oldfile" != ":$file" -a -e $file ] || mv -f -- $file $file.rpmsave
-	ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
-	ext="$ext"`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
-	key=; [ -z "$un" ] || key="${un}${pw:+:}${pw}@"
-	url='%{_reposerv}://'"${key}"'%{_repobase}/%{_reporoot}/rpms/repodata/'"$file$ext"
-	rm -f -- $file
-	if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-	    if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
-		echo 'Authorization required for repository access.' >/dev/tty
-		u='anonymous'; p=
-		read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-anonymous}
-		if [ "$u" != 'anonymous' ] ; then
-		read -es -p 'Password: ' p </dev/tty >/dev/tty
-		echo '' >/dev/tty
-		fi
-		key=; [ -z "$u" ] || key="${u}:${p}@"
-		url='%{_reposerv}://'"${key}"'%{_repobase}/%{_reporoot}/rpms/repodata/'"$file$ext"
-		rm -f -- $file
-		if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-		    [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
-		    echo 'Authorization failed.' >/dev/tty
-		    exit 1
-		fi
-	    fi
-	fi
-	if [ ! -e $file ] ; then
-	    [ ":$oldfile" != ":$file" -a -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
-	    exit 1
-	fi
-    ) || exit 1
-%endif
+    un=; pw=; o=
+    for s in '' .rpmsave .rpmnew; do
+    for p in credentials; do
+    for d in %{_localstatedir}/lib/%{name}/; do
+        o=$d$p$s
+        [ -r $o ] || continue
+        un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
+        pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
 %if %{FILES_zypprepo}
-    (
-        umask 0077
-	cd '%{_zyppcreddir}'
-	un=; pw=; oldfile=; file='@PACKAGE_UCNAME@credentials'
-        for s in '' '.rpmsave' '.rpmnew' ; do
-            for p in '@DESTDIR@/' '@PACKAGE_UCNAME@' 'NCC' ; do
-                oldfile="${p}credentials$s"
-                if [ -e $oldfile ] ; then
-                    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $oldfile`
-                    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $oldfile`
-                    [ -n "$un" -a -n "$pw" ] || continue
-                    break 2
-                fi
-            done
-        done
-	[ ":$oldfile" != ":$file" -a -e $file ] || mv -f -- $file $file.rpmsave
-	ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=$un}${pw:+&pw=$pw}"
-	ext="$ext"`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
-	url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
-	rm -f -- $file
-	if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-	    if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
-		echo 'Authorization required for repository access.' >/dev/tty
-		u='anonymous'; p=
-		read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-anonymous}
-		if [ "$u" != 'anonymous' ] ; then
-		read -es -p 'Password: ' p </dev/tty >/dev/tty
-		echo '' >/dev/tty
-		fi
-		url='%{_reposerv}://'"${u:+$u:$p@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
-		rm -f -- $file
-		if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-		    [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
-		    echo 'Authorization failed.' >/dev/tty
-		    exit 1
-		fi
-	    fi
-	fi
-	if [ -e $file ] ; then chmod go-rw $file; else
-	    [ ":$oldfile" != ":$file" -a -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
-	    exit 1
-	fi
-    ) || exit 1
-    (
-	cd '%{_zyppcreddir}'
-	un=; pw=; file='@PACKAGE_UCNAME@credentials'
-	if [ -e $file ] ; then
-	    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $file`
-	    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $file`
-	fi
-	[ -n "$un" -a -n "$pw" ] || exit 1
-	cd '%{_zyppservdir}'
-	file='OPENSS7.service';
-	[ ! -e $file ] || mv -f -- $file $file.rpmsave
-	url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file"
-	rm -f -- $file
-	if ! echo "$url" | wget -i - -O $file 2>/dev/null || [ ! -e $file ] ; then
-	    [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
-	    exit 1
-	fi
-    ) || exit 1
+    for p in @PACKAGE_UCNAME@ NCC; do
+    for d in %{_zyppcreddir}/; do
+        o=$d${p}credentials$s
+        [ -r $o ] || continue
+        un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
+        pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
+%endif
+%if %{FILES_yumrepo}
+    for p in @PACKAGE@.repo; do
+    for d in %{_yumrepodir}/; do
+        o=$d$p$s
+        [ -r $o ] || continue
+        un=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $o`
+        pw=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
 %endif
 %if %{FILES_urpmirepo}
-    (
-        umask 0077
-        cd '%{_urpmiconfdir}'
-        un=; pw=; oldfile=; file='netrc.@PACKAGE@'
-        for s in '' '.rpmsave' '.rpmnew' ; do
-            oldfile="$file$s"
-            if [ -e $oldfile ] ; then
-                un=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\1,p;t end;b;: end q' $oldfile
-                pw=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\2,p;t end;b;: end q' $oldfile
-                [ -n "$un" -a -n "$pw" ] || continue
-                break
-            fi
-        done
-        [ ":$oldfile" != ":$file" -a -e $file ] || mv -f -- $file $file.rpmsave
-        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw}${pw}"
-        ext="$ext"`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
-        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
-        rm -f -- $file
-        if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-            if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
-                echo 'Authorization required for repository access.' >/dev/tty
-                u='anonymous'; p=
-                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-anonymous}
-                if [ "$u" != 'anonymous' ] ; then
-                read -es -p 'Password: ' p </dev/tty >/dev/tty
-                echo '' >/dev/tty
-                fi
-                url='%{_reposerv}://'"${u:+$u:$p@}"'%{_repobase}/%{_reporoot}/'"$file$ext"
-                rm -f -- $file
-                if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-                    [ ":$oldfile" != ":$file" ] || mv -f -- $file.rpmsave $file
-                    echo 'Authorization failed.' >/dev/tty
-                    exit 1
-                fi
-            fi
-        fi
-        if [ -e $file ] ; then chmod go-rw $file ; else
-            [ ":$oldfile" != ":$file" -a -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
-            exit 1
-        fi
-    ) || exit 1
-    (
-        cd '%{_urpmiconfdir}'
-        un=; pw=; file='netrc.@PACKAGE@'
-        if [ -e $file ] ; then
-            un=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\1,p;t end;b;: end q' $oldfile
-            pw=`sed -n -r 's,^machine[[:space:]]*www.openss7.org[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\2,p;t end;b;: end q' $oldfile
-        fi
-        [ -n "$un" -a -n "$pw" ] || exit 1
-        cd '%{_urpmirepodir}'
-        [ -d '@PACKAGE_STITLE@' ] || mkdir -p -- '@PACKAGE_STITLE@'
-        cd '@PACKAGE_STITLE@'
-        file='media.cfg'
-        [ ! -e $file ] || mv -f -- $file $file.rpmsave
-        url='%{_reposerv}://'"${un:+$un${pw:+:$pw}@}"'%{_repobase}/%{_reporoot}/%{_reposubdir}/media/media_info/'"$file"
-        rm -f -- $file
-        if ! echo "$url" | wget -i - -O $file 2>/dev/null ; then
-            [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
-            exit 1
-        fi
-        if [ ! -e $file ] ; then
-            [ ! -e $file.rpmsave ] || mv -f -- $file.rpmsave $file
-            exit 1
-        fi
-        echo '%{_reposerv}://%{_repobase}/%{_reporoot}/%{_reposubdir}' >url
-        rm -f -- mirrorlist
-    ) || exit 1
+    for p in netrc netrc.@PACKAGE@; do
+    for d in %{_urpmiconfdir}/; do
+        o=$d$p$s
+        [ -r $o ] || continue
+        un=`sed -n -r 's,^machine[[:space:]]*%{_repobase}[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\1,p;t end;b;: end q' $o`
+        pw=`sed -n -r 's,^machine[[:space:]]*%{_repobase}[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\2,p;t end;b;: end q' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
 %endif
+%if %{FILES_aptrepo}
+    for p in @PACKAGE@ sources; do
+    for d in %{_aptrepodir}/ %{_aptconfdir}/; do
+        o=$d$p.list$s
+        [ -r $o ] || continue
+        un=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
+        pw=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\5,p;t end;b;: end q' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
+%endif
+    done
+    [ -n "$un" -a -n "$pw" ] || { un=; pw=; }
+    d=%{_localstatedir}/lib/%{name}; n=credentials
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
+    ext="$ext`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    key="${un:+${un}${pw:+:}${pw}@}"
+    url='%{_reposerv}://'"${key}"'%{_repobase}/%{_reporoot}/'"`basename $f`$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
+        if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
+            u='anonymous'; p=
+            m='Authorization required for repository access.'
+            if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                zenity --info --text="$m" --no-wrap || exit 1
+                while true; do
+                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || exit 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || exit 1
+                while true; do
+                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || exit 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || exit 1
+                while true; do
+                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || exit 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            else
+                echo "$m" >/dev/tty
+                while true; do
+                    d="$u"
+                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; exit 1; }; u=${u:-$d}
+                    [ "$u" != anonymous ] || break
+                    read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
+                    echo '' >/dev/tty
+                    [ -z "$p" ] || break
+                done
+            fi
+            key="${u:+${u}${p:+:}${p}@}"
+            url='%{_reposerv}://'"${key}"'%{_repobase}/%{_reporoot}/'"`basename $f`$ext"
+            rm -f -- $f
+            if ! echo "$url" | wget -i - -O $f 2>/dev/null; then
+                rm -f -- $f
+                m='Authorization failed.'
+                if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                    zenity --error --text="$m" --no-wrap
+                elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                    whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty
+                elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                    dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty
+                else
+                    echo "$m" >/dev/tty
+                fi
+                [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+                exit 1
+            fi
+        fi
+    fi
+    if [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        exit 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    chmod 0600 $f
 fi
 
 %post -p /bin/bash repo
@@ -3074,155 +3031,183 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 %if %{FILES_yumrepo}
     d=%{_sysconfdir}/yum/pluginconf.d
     for f in kmod.conf fedorakmod.conf ; do f="$d/$f"
-	if [ -f $f ] ; then
-	    mv -f -- $f $f.rpmsave
-	    sed -r -e 's,^pinkernels.*$,pinkernels = 1,;s,^installforallkernels.*$,installforallkernels = 1,' $f.rpmsave >$f
-	    if ! diff $f.rpmsave $f >/dev/null 2>&1 ; then
-		mv -f -- $f.rpmsave $f
-	    fi
-	fi
+        if [ -f $f ] ; then
+            mv -f -- $f $f.rpmsave
+            sed -r -e 's,^pinkernels.*$,pinkernels = 1,;s,^installforallkernels.*$,installforallkernels = 1,' $f.rpmsave >$f
+            if ! diff $f.rpmsave $f >/dev/null 2>&1 ; then
+                mv -f -- $f.rpmsave $f
+            fi
+        fi
     done
 %endif
 %if %{FILES_zypprepo}
     d=%{_sysconfdir}/zypp
     for f in zypp.conf ; do f="$d/$f"
-	if [ -f $f ] ; then
-	    mv -f -- $f $f.rpmsave
-	    sed -r -e 's,^multiversion.*$,multiversion = provides:multiversion(kernel),' $f.rpmsave >$f
-	    if ! diff $f.rpmsave $f >/dev/null 2>&1 ; then
-		mv -f -- $f.rpmsave $f
-	    fi
-	fi
+        if [ -f $f ] ; then
+            mv -f -- $f $f.rpmsave
+            sed -r -e 's,^multiversion.*$,multiversion = provides:multiversion(kernel),' $f.rpmsave >$f
+            if ! diff $f.rpmsave $f >/dev/null 2>&1 ; then
+                mv -f -- $f.rpmsave $f
+            fi
+        fi
     done
 %endif
 %if %{FILES_urpmirepo}
+%endif
+%if %{FILES_aptrepo}
 %endif
 fi
 
 %triggerin -p /bin/bash repo -- apt
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # apt is being installed or upgraded with repo present (or vise versa)
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
-fi
-
-%triggerin -p /bin/bash repo -- yum
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # yum is being installed or upgraded with repo present (or vise versa)
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
+    [ -e %{_libdir}/apt/methods/%{_reposerv} ] || exit 0
+    c=%{_localstatedir}/lib/%{name}/credentials
+    [ -r $c ] || exit 1
+    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $c`
+    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $c`
+    [ -n "$un" -a -n "$pw" ] || exit 1
+    key="${un:+${un}${pw:+:$pw}@}"
+    ext="`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    d=%{_aptrepodir}; n=@PACKAGE@.list
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        exit 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    d=%{_aptvenddir}; n=@PACKAGE@.vendor.list
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
 fi
 
 %triggerin -p /bin/bash repo -- urpmi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # urpm is being installed or upgraded with repo present (or vise versa)
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
+    c=%{_localstatedir}/lib/%{name}/credentials
+    [ -r $c ] || exit 1
+    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $c`
+    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $c`
+    [ -n "$un" -a -n "$pw" ] || exit 1
+    key="${un:+${un}${pw:+:$pw}@}"
+    ext="`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    d="`echo '%{_reposubdir}' | sed 's,^[^/]*/,@PACKAGE_NAME@-,;y,/,-,'`"
+    d="%{_urpmirepodir}/$d"; n=media.cfg
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        exit 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    echo '%{_reposerv}://%{_repobase}/%{_reporoot}/rpms/%{_reposubdir}' >$d/url
+    echo '%{_reposerv}://%{_repobase}/%{_reporoot}/rpms/%{_reposubdir}' >$d/mirrorlist
+    f=%{_urpmiconfdir}/netrc
+    [ ! -e $f ] || mv -f -- $f $f.$$
+    ( umask 0077; cat /dev/null >$f )
+    [ ! -r $f.$$ ] || sed '/^machine[[:space:]]*%{_repobase}/d' $f.$$ >>$f
+    echo "machine %{_repobase} login $un password $pw" >>$f
+    rm -f -- $f.$$
+fi
+
+%triggerin -p /bin/bash repo -- yum
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # yum is being installed or upgraded with repo present (or vise versa)
+    c=%{_localstatedir}/lib/%{name}/credentials
+    [ -r $c ] || exit 1
+    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $c`
+    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $c`
+    [ -n "$un" -a -n "$pw" ] || exit 1
+    key="${un:+${un}${pw:+:$pw}@}"
+    ext="`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    d=%{_yumrepodir}; n=@PACKAGE@.repo
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        exit 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+fi
+
+%triggerin -p /bin/bash repo -- zypper
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # urpm is being installed or upgraded with repo present (or vise versa)
+    c=%{_localstatedir}/lib/%{name}/credentials
+    [ -r $c ] || exit 1
+    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $c`
+    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $c`
+    [ -n "$un" -a -n "$pw" ] || exit 1
+    key="${un:+${un}${pw:+:$pw}@}"
+    ext="`echo '/%{_reposubdir}' | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    d=%{_zyppservdir}; n=@PACKAGE_UCNAME@.service
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        exit 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    f=%{_zyppcreddir}/@PACKAGE_UCNAME@credentials
+    [ -f $f ] || ( umask 0077; echo -e "username=$un\npassword=$pw" >$f )
 fi
 
 %triggerun -p /bin/bash repo -- apt
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if   [ $1 -eq 0 ] ; then : # repo being removed with apt present
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
+    rm -f -- %{_aptrepodir}/@PACKAGE@.list
+    rm -f -- %{_atpvenddir}/@PACKAGE@.vendor.list
+    rm -rf -- %{_localstatedir}/lib/apt/%{_repobase}*
 elif [ $2 -eq 0 ] ; then : # apt being removed with repo present
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
-fi
-
-%triggerun -p /bin/bash repo -- yum
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if   [ $1 -eq 0 ] ; then : # repo being removed with yum present
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
-elif [ $2 -eq 0 ] ; then : # yum being removed with repo present
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
 fi
 
 %triggerun -p /bin/bash repo -- urpmi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if   [ $1 -eq 0 ] ; then : # repo being removed with urpm present
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
+    f=%{_urpmiconfdir}/urpmi.cfg
+    if [ -f $f ]; then
+        sed '/^.*(@PACKAGE@[0-9]*).*{/,/}/d' $f | cat -s >$f.$$
+        mv -f -- $f.$$ $f
+    fi
+    f=%{_urpmiconfdir}/netrc
+    if [ -f $f ]; then
+        ( umask 0077; cat /dev/null >$f.$$ )
+        sed '/^machine[[:space:]]*%{_repobase}/d' $f >>$f.$$
+        mv -f -- $f.$$ $f
+    fi
+    d="`echo '%{_reposubdir}' | sed 's,^[^/]*/,@PACKAGE_NAME@-,;y,/,-,'`"
+    rm -rf -- %{_urpmirepodir}/$d
+    rm -rf -- %{_localstatedir}/lib/urpmi/*'(@PACKAGE@'[0-9]*')'*
 elif [ $2 -eq 0 ] ; then : # urpm being removed with repo present
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
 fi
 
-%preun -p /bin/bash repo
+%triggerun -p /bin/bash repo -- yum
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if [ $1 -eq 0 ] ; then : # final removal
-%if %{FILES_yumrepo}
-    f='%{_yumrepodir}/@PACKAGE@.repo'
-    if [ -r $f ] ; then
-	sed 's,^enabled[[:space:]]*=[[:space:]]*1[[:space:]]*$,enabled = 0,' $f >$f.rpmsave
-	mv -f -- $f.rpmsave $f
-    fi
-%endif
-%if %{FILES_zypprepo}
+if   [ $1 -eq 0 ] ; then : # repo being removed with yum present
+    rm -f -- %{_yumrepodir}/@PACKAGE@.repo
+elif [ $2 -eq 0 ] ; then : # yum being removed with repo present
+fi
+
+%triggerun -p /bin/bash repo -- zypper
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+if   [ $1 -eq 0 ] ; then : # repo being removed with zypp present
+    rm -f -- %{_zyppcreddir}/@PACKAGE_UCNAME@credentials
     rm -f -- %{_zyppservdir}/@PACKAGE_UCNAME@.service
     rm -f -- %{_zypprepodir}/@PACKAGE_UCNAME@\:@PACKAGE@*.repo
     rm -rf -- %{_localstatedir}/cache/zypp/packages/@PACKAGE_UCNAME@\:@PACKAGE@*
     rm -rf -- %{_localstatedir}/cache/zypp/raw/@PACKAGE_UCNAME@\:@PACKAGE@*
     rm -rf -- %{_localstatedir}/cache/zypp/solv/@PACKAGE_UCNAME@\:@PACKAGE@*
-%endif
-%if %{FILES_urpmirepo}
-%endif
+elif [ $2 -eq 0 ] ; then : # zypp being removed with repo present
 fi
 
 %postun -p /bin/bash repo
@@ -3231,71 +3216,37 @@ if [ $1 -eq 0 ] ; then : # final removal
 %if %{FILES_yumrepo}
     d=%{_sysconfdir}/yum/pluginconf.d
     for f in kmod.conf fedorakmod.conf ; do f="$d/$f"
-	if [ -f $f -a -f $f.rpmsave ] ; then
-	    if ! diff $f $f.rpmsave >/dev/null 2>&1 ; then
-		mv -f -- $f.rpmsave $f
-	    fi
-	fi
-	rm -f -- $f.rpmsave
+        if [ -f $f -a -f $f.rpmsave ] ; then
+            if ! diff $f $f.rpmsave >/dev/null 2>&1 ; then
+                mv -f -- $f.rpmsave $f
+            fi
+        fi
+        rm -f -- $f.rpmsave
     done
 %endif
 %if %{FILES_zypprepo}
     d=%{_sysconfdir}/zypp
     for f in zypp.conf ; do f="$d/$f"
-	if [ -f $f -a -f $f.rpmsave ] ; then
-	    if ! diff $f $f.rpmsave >/dev/null 2>&1 ; then
-		mv -f -- $f.rpmsave $f
-	    fi
-	fi
-	rm -f -- $f.rpmsave
+        if [ -f $f -a -f $f.rpmsave ] ; then
+            if ! diff $f $f.rpmsave >/dev/null 2>&1 ; then
+                mv -f -- $f.rpmsave $f
+            fi
+        fi
+        rm -f -- $f.rpmsave
     done
 %endif
 %if %{FILES_urpmirepo}
 %endif
 %if %{FILES_aptrepo}
 %endif
+    fi
 fi
-
-%triggerpostun -p /bin/bash repo -- apt
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# apt was removed with repo present
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
-
-%triggerpostun -p /bin/bash repo -- yum
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# yum was removed with repo present
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
-
-%triggerpostun -p /bin/bash repo -- urpm
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# urpm was removed with repo present
-%if %{FILES_yumrepo}
-%endif
-%if %{FILES_zypprepo}
-%endif
-%if %{FILES_urpmirepo}
-%endif
-%if %{FILES_aptrepo}
-%endif
 
 %if %{PACKAGE_repo}
 %files repo
 # ---------------------------------------------------------------------------
 %defattr(-,root,root)
+%dir %{_localstatedir}/lib/%{name}
 #{?files_yumrepo:%config(noreplace) %{_yumrepodir}/*}
 #{?files_yumrepo:%{_rpmgpgdir}/*}
 #{?files_zypprepo:%config(noreplace) %{_zypprepodir}/*}
