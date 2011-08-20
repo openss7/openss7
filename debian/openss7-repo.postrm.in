@@ -67,8 +67,9 @@ datarootdir=@datarootdir@
 #	common configuration files that were altered by the installation.  Short
 #	circuited for now.
 #
-postrm_repo () { :; return
-    local d="@sysconfdir@/apt/sources.list.d"
+postrm_repo () { :
+    local d f
+    d=$aptrepodir
     for f in openss7.list ; do f="$d/$f"
         if [ -f $f -a -f $f.dpkg-old ] ; then
             if ! diff $f $f.dpkg-old >/dev/null 2>&1 ; then

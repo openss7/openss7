@@ -243,9 +243,7 @@ usage () {
     fi
     cat <<EOF
 Usage:
-    $program [options] [{-u,--update}]
-    $program [options] {-r,--register}
-    $program [options] {-R,--reregister}
+    $program [options] [command option]
     $program {-h|--help}
     $program {-V|--version}
     $program {-C|--copying}
@@ -263,6 +261,10 @@ Command Options:
         update installation sources
     -e, --erase
         erase installation sources
+    -p, --post
+        perform post-installation actions
+    -P, --preun
+        perform pre-removal actions
     -r, --register
         register for host credentials
     -R, --reregister
@@ -440,11 +442,11 @@ while [ "$#" -gt 0 -o ":$more" != ":" ]; do
 	    optarg=`$ECHO "X$arg" | $Xsed -e 's,[-_a-zA-Z0-9]*=,,'` ;;
 	--*=*)
 	    option_noarg $arg ;;
-	-[uerRaiyzclNFnQDvhVC])
+	-[uepPrRaiyzclNFnQDvhVC])
 	    optarg= ;;
-	-[uerRaiyzclNFnQDvhVC]*)
+	-[uepPrRaiyzclNFnQDvhVC]*)
 	    optarg=
-	    more=`$ECHO "X$arg" | $Xsed -e 's,-[uerRaiyzclNFnQDvhVC],,'`
+	    more=`$ECHO "X$arg" | $Xsed -e 's,-[uepPrRaiyzclNFnQDvhVC],,'`
 	    eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's,$more,,'\`"
 	    ;;
 	-[dg])
@@ -544,6 +546,14 @@ while [ "$#" -gt 0 -o ":$more" != ":" ]; do
         --erase | --eras | --era | --er | --e | -e)
             if [ :$command != : -a :$command != :erase ]; then option_after $arg --$command; fi
             command=erase
+            ;;
+        --post | --pos | --po | -p)
+            if [ :$command != : -a :$command != :post ]; then option_after $arg -- $command; fi
+            command=post
+            ;;
+        --preun | --preu | --pre | --pr | -P)
+            if [ :$command != : -a :$command != :preun ]; then option_after $arg -- $command; fi
+            command=preun
             ;;
         --register | --registe | --regist | --regis | --regi | --reg | --re | --r | -r)
             if [ :$command  != : -a :$command != :register ]; then option_after $arg --$command; fi
@@ -680,8 +690,8 @@ find_credentials () {
             for d in $aptrepodir $aptconfdir; do
                 f=$d$p.list$s
                 if [ -r $f ]; then
-                    username=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
-                    password=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
+                    username=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $f`
+                    password=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\5,p;t end;b;: end q' $f`
                     if [ -n "$username" -a -n "$password" ]; then break 3; fi
                 fi
             done
@@ -887,7 +897,7 @@ update_credentials () {
     [ -r $t.$$ ] || return 1
     username=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $t.$$`
     password=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $t.$$`
-    [ ${debug:-0} -ne 0 ] || rm -f -- $t.$$
+    [ ${debug:-0} -ne 0 ] || doany rm -f -- $t.$$
     [ -n "$username" -a -n "$password" ] || return 1
     write_credentials '' || return $?
     return 0
@@ -948,6 +958,8 @@ erase_zypp () {
             [ ! -e $t ] || doroot rm -f -- $t
             t=$zyppcreddir/${s}credentials
             [ ! -e $t ] || doroot rm -f -- $t
+            find $zypprepodir -name $s':'$PACKAGE'*.repo' 2>/dev/null | \
+            while read f; do if [ -d "$f" ]; then doroot "rm -fr -- \"$f\""; else doroot "rm -f -- \"$f\""; fi; done
             find $localstatedir/cache/zypp -name $s':'$PACKAGE'*' 2>/dev/null | \
             while read f; do if [ -d "$f" ]; then doroot "rm -fr -- \"$f\""; else doroot "rm -f -- \"$f\""; fi; done
         fi
@@ -1048,7 +1060,7 @@ update_urpmi () {
         doany "( umask 0077; cat /dev/null >$t )"
         doany "{ if [ -r $f ]; then cat $f; fi; echo "machine $repobase login $username password $password"; } >>$t"
         doroot cp -fp -- $t $f
-        [ ${debug:-0} -ne 0 ] || rm -f -- $t
+        [ ${debug:-0} -ne 0 ] || doany rm -f -- $t
         get_file $urpmimediadir/$m || return 1
         get_file $urpmimediadir/$c || return 1
         doroot "echo '$reposerv://$repobase/$reporoot/rpms/$distro/$relver/$osarch' >$urpmimediadir/url"
@@ -1076,15 +1088,132 @@ update_apt () {
     fi
 }
 
+post_yum () {
+    local d p f t
+    d=$yumconfdir
+    t=${TMPDIR:-/var/tmp}/kmod.conf.$$
+    for p in kmod.conf fedorakmod.conf; do
+        f=$d/$p
+        [ -r $f ] || continue
+        doany "sed -r -e 's,^pinkernels.*$,pinkernels = 1,;s,^installforallkernels.*$,installforallkernels = 1,' $f >$t"
+        if ! diff $f $t >/dev/null 2>&1; then
+            doroot mv -f -- $f $f.rpmsave
+            doroot cp -f -- $t $f
+        fi
+        [ ${debug:-0} -ne 0 ] || doany rm -f -- $t
+    done
+}
+
+post_zypp () {
+    local d p f t
+    d=`dirname $zyppconfig`
+    t=${TMPDIR:-/var/tmp}/`basename $zyppconfig`.$$
+    for p in `basename $zyppconfig`; do
+        f=$d/$p
+        [ -r $f ] || continue
+        doany "sed -r -e 's,^multiversion.*$,multiversion = provides:multiversion(kernel),' $f >$t"
+        if ! diff $f $t >/dev/null 2>&1; then
+            doroot mv -f -- $f $f.rpmsave
+            doroot cp -f -- $t $f
+        fi
+        [ ${debug:-0} -ne 0 ] || doany rm -f -- $t
+    done
+}
+
+post_urpmi () {
+    return 0
+}
+
+post_apt () {
+    return 0
+}
+
+preun_yum () {
+    local d p f t
+    d=$yumconfdir
+    for p in kmod.conf fedorakmod.conf; do
+        f=$d/$p
+        if [ -f $f -a -f $f.rpmsave ]; then
+            if ! diff $f $f.rpmsave >/dev/null 2>&1; then
+                doroot mv -f -- $f.rpmsave $f
+            fi
+        fi
+        [ ! -f $f.rpmsave ] || doroot rm -f -- $f.rpmsave
+    done
+}
+
+preun_zypp () {
+    local d p f t
+    d=`dirname $zyppconfig`
+    for p in `basename $zyppconfig`; do
+        f=$d/$p
+        if [ -f $f -a -f $f.rpmsave ]; then
+            if ! diff $f $f.rpmsave >/dev/null 2>&1; then
+                doroot mv -f -- $f.rpmsave $f
+            fi
+        fi
+        [ ! -f $f.rpmsave ] || doroot rm -f -- $f.rpmsave
+    done
+    return 0
+}
+
+preun_urpmi () {
+    return 0
+}
+
+preun_apt () {
+    return 0
+}
+
+post () {
+    if [ ${u_yum:-no} = yes ]; then
+        post_yum || :
+    fi
+    if [ ${u_zypp:-no} = yes ]; then
+        post_zypp || :
+    fi
+    if [ ${u_urpmi:-no} = yes ]; then
+        post_urpmi || :
+    fi
+    if [ ${u_apt:-no} = yes ]; then
+        post_apt || :
+    fi
+    return 0
+}
+
+preun () {
+    if [ ${u_yum:-no} = yes ]; then
+        preun_yum || :
+    fi
+    if [ ${u_zypp:-no} = yes ]; then
+        preun_zypp || :
+    fi
+    if [ ${u_uprmi:-no} = yes ]; then
+        preun_urpm || :
+    fi
+    if [ ${u_apt:-no} = yes ]; then
+        preun_apt || :
+    fi
+    return 0
+}
+
 erase () {
-    erase_yum || :
-    refresh_yum || :
-    erase_zypp || :
-    refresh_zypp || :
-    erase_urpmi || :
-    refresh_urpmi || :
-    erase_apt || :
-    refresh_apt || :
+    if [ ${u_yum:-no} = yes ]; then
+        erase_yum || :
+        refresh_yum || :
+    fi
+    if [ ${u_zypp:-no} = yes ]; then
+        erase_zypp || :
+        refresh_zypp || :
+    fi
+    if [ ${u_urpmi:-no} = yes ]; then
+        erase_urpmi || :
+        refresh_urpmi || :
+    fi
+    if [ ${u_apt:-no} = yes ]; then
+        erase_apt || :
+        refresh_apt || :
+    fi
     return 0
 }
 
@@ -1132,7 +1261,7 @@ username=
 password=
 
 case "$command" in
-    (update|erase|register|reregister)
+    (update|erase|post|preun|register|reregister)
         eval "$command"; exit 0 ;;
 esac
 

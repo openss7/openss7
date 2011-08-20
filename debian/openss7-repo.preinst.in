@@ -70,51 +70,125 @@ datarootdir=@datarootdir@
 #   also see the same machine credentials.
 #
 preinst_repo () { :
-    local d un pw o f s ext
-    d="@sysconfdir@/apt/sources.list.d"
-    [ -d $d ] || return 1
-    (
-	cd "$d"
-	un=; pw=; o=; f="@PACKAGE@.list"
-	for s in '' '.dpkg-old' '.dpkg-new'; do
-	    o="$f$s"
-	    if [ -r $o ]; then
-		un=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
-		pw=`sed -n -r 's,^[#]?deb(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
-                [ -n "$un" -a -n "$pw" ] || continue
-                break
-	    fi
-	done
-	[ ":$o" != ":$f" ] || mv -f -- $f $f.dpkg-old
-        ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
-        ext="$ext"`echo '/@reposubdir@' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`
-	key=; [ -z "$un" ] || key="$un${pw:+:}${pw}@"
-        url="@reposerv@://${key}@repobase@/@reporoot@/debs/$f$ext"
-        rm -f -- $f
-        if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
-            if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
-                echo 'Authorization required for repository access.' >/dev/tty
-                u='anonymous'; p=
-                read -e  -p 'Username: ' u </dev/tty >/dev/tty; u=${u:-anonymous}
-                if [ "$u" != 'anonymous' ] ; then
-                read -es -p 'Password: ' p </dev/tty >/dev/tty
-                echo '' >/dev/tty
-                fi
-		key=; [ -z "$u" ] || key="${u}:${p}@"
-                url="@reposerv@://${key}@repobase@/@reporoot@/debs/$f$ext"
+    local d un pw o f s ext u p m
+    for s in '' .dpkg-old .dpkg-new; do
+    for p in credentials; do
+    for d in $localstatedir/lib/$name/; do
+        o=$d$p$s
+        [ -r $o ] || continue
+        un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
+        pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
+    for p in $PACKAGE sources; do
+    for d in $aptrepodir/ $aptconfdir/; do
+        o=$d$p.list$s
+        [ -r $o ] || continue
+        un=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
+        pw=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\5,p;t end;b;: end q' $o`
+        [ -n "$un" -a -n "$pw" ] || continue
+        break 3
+    done
+    done
+    done
+    [ -n "$un" -a -n "$pw" ] || { un=; pw=; }
+    d=$localstatedir/lib/$name; n=credentials
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
+    ext="$ext`echo /$reposubdir | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    key="${un:+${un}${pw:+:}${pw}@}"
+    url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
+        if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
+            u='anonymous'; p=
+            m='Authorization required for repository access.'
+            if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                zenity --info --text="$m" --no-wrap || return 1
+                while true; do
+                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || return 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || return 1
+                while true; do
+                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || return 1
+                while true; do
+                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || return 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            else
+                echo "$m" >/dev/tty
+                while true; do
+                    d="$u"
+                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; return 1; }; u=${u:-$d}
+                    [ "$u" != anonymous ] || break
+                    read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
+                    echo '' >/dev/tty
+                    [ -z "$p" ] || break
+                done
+            fi
+            key="${u:+${u}${p:+:}${p}@}"
+            url="$reposerv://$key$repobase/$reporoot/`basename $f`$ext"
+            rm -f -- $f
+            if ! echo "$url" | wget -i - -O $f 2>/dev/null; then
                 rm -f -- $f
-                if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
-                    [ ":$o" != ":$f" ] || mv -f -- $f.dpkg-old $f
-                    echo 'Authorization failed.' >/dev/tty
-		    return 1
+                m='Authorization failed.'
+                if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                    zenity --error --text="$m" --no-wrap
+                elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                    whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty
+                elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                    dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty
+                else
+                    echo "$m" >/dev/tty
                 fi
+                [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+                return 1
             fi
         fi
-        if [ ! -e $f ] ; then
-            [ ":$o" != ":$f" ] || mv -f -- $f.dpkg-old $f
-	    return 1
-        fi
-    ) || return 1
+    fi
+    if [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        return 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    chmod 0600 $f
+    [ -e $libdir/apt/methods/$reposerv ] || return 0
+    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $f`
+    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $f`
+    [ -n "$un" -a -n "$pw" ] || return 1
+    key="${un:+${un}${pw:+:$pw}@}"
+    ext="`echo /$reposubdir | sed 's,//,/,g;s,/,?distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    d=$aptrepodir; n=$PACKAGE.list
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url="$reposerv://$key$repobase/$reporoot/$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        return 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    d=$aptvenddir; n=$PACKAGE.vendor.list
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url="$reposerv://$key$repobase/$reporoot/$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
     return 0
 }
 # -----------------------------------------------------------------------------
