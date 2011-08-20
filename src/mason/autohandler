@@ -726,7 +726,7 @@ xml-info=1
 
 				$url = '/repo';
 				$url .= "/$artype";
-				$url .= "/$distro" if ($distro);
+				$url .= " $distro" if ($distro);
 				$url .= '/$(VERSION)';
 				$url .= '/$(ARCH)';
 				$url .= "/$branch" if ($branch ne 'base');
