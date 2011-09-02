@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $
+ @(#) $RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:34 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:35  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:21:34  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $";
+static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:35 $";
 
 /*
  * This is a multiplexing driver that converts between the Network Layer
@@ -78,7 +81,7 @@ static char const ident[] = "$RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 #define NPI_DESCRIP	"NLI TO NPI CONVERSION FOR LINUX FAST STREAMS"
 #define NPI_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define NPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $"
+#define NPI_REVISION	"OpenSS7 $RCSfile: npi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:35 $"
 #define NPI_DEVICE	"SVR 4.2MP NLI to NPI Conversion (NPI) for X.25 CONS"
 #define NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_LICENSE	"GPL"

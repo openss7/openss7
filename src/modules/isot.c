@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-18 16:55:52 $
+ @(#) $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-18 16:55:52 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: isot.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:52  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-01-18 16:55:52  brian
  - added stub drivers and modules
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-18 16:55:52 $";
+static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:52 $";
 
 
 /*
@@ -102,7 +105,7 @@ static char const ident[] = "$RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.4 $
 #define ISOT_DESCRIP	"SVR 4.2 ISO TRANSPORT OVER TCP FOR LINUX FAST-STREAMS"
 #define ISOT_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define ISOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-18 16:55:52 $"
+#define ISOT_REVISION	"OpenSS7 $RCSfile: isot.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:52 $"
 #define ISOT_DEVICE	"SVR 4.2 MP STREAMS ISOT Module for RFC 1006 and RFC 2126"
 #define ISOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define ISOT_LICENSE	"GPL"

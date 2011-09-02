@@ -1,7 +1,7 @@
 ## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
 ## =============================================================================
 ## 
-# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.18 $) $Date: 2011-08-07 11:14:25 $
+# @(#) $RCSfile: rpm.am,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2011-09-02 08:46:28 $
 ##
 ## -----------------------------------------------------------------------------
 ##
@@ -48,7 +48,7 @@
 ##
 ## -----------------------------------------------------------------------------
 ##
-## Last Modified $Date: 2011-08-07 11:14:25 $ by $Author: brian $
+## Last Modified $Date: 2011-09-02 08:46:28 $ by $Author: brian $
 ##
 ## =============================================================================
 
@@ -3658,6 +3658,9 @@ dist_noinst_SCRIPTS	+= scripts/rpm/check-files \
 ## =============================================================================
 ##
 ## $Log: rpm.am,v $
+## Revision 1.1.2.19  2011-09-02 08:46:28  brian
+## - sync up lots of repo and build changes from git
+##
 ## Revision 1.1.2.18  2011-08-07 11:14:25  brian
 ## - mostly mandriva and ubuntu build updates
 ##

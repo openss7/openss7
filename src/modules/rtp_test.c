@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rtp_test.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-01-11 23:40:11 $
+ @(#) $RCSfile: rtp_test.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,17 +47,20 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-11 23:40:11 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rtp_test.c,v $
+ Revision 1.1.2.2  2011-09-02 08:46:54  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.1  2011-01-11 23:40:11  brian
  - added new files
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: rtp_test.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-01-11 23:40:11 $";
+static char const ident[] = "$RCSfile: rtp_test.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:54 $";
 
 /** @file
   * This is the RTP-TEST module.  This is a pushable STREAMS module that can be
@@ -76,7 +79,7 @@ static char const ident[] = "$RCSfile: rtp_test.c,v $ $Name:  $($Revision: 1.1.2
 #include <sys/npi_udp.h>
 
 #define RTPT_DESCRIP	"RTP-TEST STREAMS MODULE."
-#define RTPT_REVISION	"OpenSS7 $RCSfile: rtp_test.c,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2011-01-11 23:40:11 $"
+#define RTPT_REVISION	"OpenSS7 $RCSfile: rtp_test.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-02 08:46:54 $"
 #define RTPT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limitied.  All Rights Reserved."
 #define RTPT_DEVICE	"Provides OpenSS7 RTP Test driver."
 #define RTPT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

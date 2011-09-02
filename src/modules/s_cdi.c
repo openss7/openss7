@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $
+ @(#) $RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-18 16:55:53 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: s_cdi.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:54  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-01-18 16:55:53  brian
  - added stub drivers and modules
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $";
+static char const ident[] = "$RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $";
 
 /*
  * S_CDI is a simple conversion module that converts between a CDI Stream
@@ -80,7 +83,7 @@ static char const ident[] = "$RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.3 
 #include <sys/os7/compat.h>
 
 #define S_CDI_DESCRIP	"S_CDI STREAMS MODULE"
-#define S_CDI_REVISION	"OpenSS7 $RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $"
+#define S_CDI_REVISION	"OpenSS7 $RCSfile: s_cdi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $"
 #define S_CDI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define S_CDI_DEVICE	"Provides OpenSS7 SpiderWAN to CDI (S_CDI)"
 #define S_CDI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

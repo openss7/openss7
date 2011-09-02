@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $
+ @(#) $RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-18 16:55:52 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cmot.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:52  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-01-18 16:55:52  brian
  - added stub drivers and modules
 
@@ -64,7 +67,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $";
+    "$RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $";
 
 /*
  *  CMISE over TCP (CMOT and CMIP).
@@ -81,7 +84,7 @@ static char const ident[] =
 #define CMOT_DESCRIP	"CMOT STREAMS MODULE"
 #define CMOT_EXTRA      "Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define CMOT_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define CMOT_REVISION	"OpenSS7 $RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:52 $"
+#define CMOT_REVISION	"OpenSS7 $RCSfile: cmot.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define CMOT_DEVICE	"SVR 4.2MP CMISE over TCP (CMOT)"
 #define CMOT_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CMOT_LICENSE	"GPL"

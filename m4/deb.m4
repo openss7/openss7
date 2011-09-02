@@ -3,7 +3,7 @@
 # BEGINNING OF SEPARATE COPYRIGHT MATERIAL
 # =============================================================================
 # 
-# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-07-27 07:52:18 $
+# @(#) $RCSfile: deb.m4,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-02 08:46:29 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -49,7 +49,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-07-27 07:52:18 $ by $Author: brian $
+# Last Modified $Date: 2011-09-02 08:46:29 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -588,6 +588,9 @@ AC_DEFUN([_DEB_], [dnl
 # =============================================================================
 #
 # $Log: deb.m4,v $
+# Revision 1.1.2.10  2011-09-02 08:46:29  brian
+# - sync up lots of repo and build changes from git
+#
 # Revision 1.1.2.9  2011-07-27 07:52:18  brian
 # - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
 #

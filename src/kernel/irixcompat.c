@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $
+ @(#) $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:50 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:50 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: irixcompat.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:50  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-04-07 15:24:03  brian
  - weak reference corrections
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $";
+static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:50 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1
 
 #define IRIXCOMP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define IRIXCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $"
+#define IRIXCOMP_REVISION	"LfS $RCSfile: irixcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:50 $"
 #define IRIXCOMP_DEVICE		"IRIX 6.5.17 Compatibility"
 #define IRIXCOMP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define IRIXCOMP_LICENSE	"GPL"

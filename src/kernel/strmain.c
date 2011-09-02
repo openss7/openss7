@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:08 $
+ @(#) $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:51 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:08 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strmain.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:51  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-05-31 09:46:08  brian
  - new distros
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:08 $";
+static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:51 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
@@ -82,7 +85,7 @@ static char const ident[] = "$RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define STREAMS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define STREAMS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:08 $"
+#define STREAMS_REVISION	"LfS $RCSfile: strmain.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:51 $"
 #define STREAMS_DEVICE		"SVR 4.2 MP STREAMS Subsystem"
 #define STREAMS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define STREAMS_LICENSE		"GPL"

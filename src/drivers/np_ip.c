@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:05 $
+ @(#) $RCSfile: np_ip.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-02 08:46:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:05 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: np_ip.c,v $
+ Revision 1.1.2.10  2011-09-02 08:46:35  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.9  2011-05-31 09:46:05  brian
  - new distros
 
@@ -81,7 +84,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:05 $";
+static char const ident[] = "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-02 08:46:35 $";
 
 /*
  * This driver provides the functionality of an IP (Internet Protocol) hook similar to raw sockets,
@@ -144,7 +147,7 @@ static char const ident[] = "$RCSfile: np_ip.c,v $ $Name:  $($Revision: 1.1.2.9 
 #define NP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NP_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:05 $"
+#define NP_REVISION	"OpenSS7 $RCSfile: np_ip.c,v $ $Name:  $ ($Revision: 1.1.2.10 $) $Date: 2011-09-02 08:46:35 $"
 #define NP_DEVICE	"SVR 4.2 MP STREAMS NPI NP_IP Network Provider"
 #define NP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NP_LICENSE	"GPL"

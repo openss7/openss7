@@ -1,11 +1,418 @@
 2011-09-02  Brian Bidulock  <bidulock@openss7.org>
 
+	* Makefile.am: added user load flags and moved some
+	  files from /usr/lib to /lib.
+	* lib32/Makefile.am: same
+	* NOTES.kmod: notes on mandriva mageia kernel numbering
+	* acinclude.m4: manage user load flags
+	* openss7.spec.in: lots of repository and registration work
+	* am/archive.am: correction to installed file mode
+	* am/deb.am: lots of debian repository build work
+	* am/kernel.am: RPM_PACKAGE_NAME and RPM_PACKAGE_VERSION can
+	  sometimes be in error; used PACKAGE and VERSION instead.
+	* am/libraries.am: manage /lib as well as /usr/lib.
+	* am/lsm.am: put LSMs in the repository properly
+	* am/man.am: long standing syntax error fixed
+	* am/openss7.am: properly update repo links
+
 	* cache/debian-squeeze-amd64-config.cache
 	* cache/mandriva-2011.0-x86_64-config.cache
 	* cache/ubuntu-lucid-amd64-config.cache:
 	  added build caches
 	* scripts/register.in:
 	  added test registration script
+	* am/repo.am: repo registration testing targets
+	* am/rpm.am: handle binaries better for update, more repo build work
+	* cache/debian-squeeze-i386-config.cache: updates for recent build
+	* cache/debian-squeeze-i686-config.cache: updates for recent build
+	* cache/debian-squeeze-x86_64-config.cache: updates for recent build
+	* cache/fedora-15-x86_64-config.cache: updates for recent build
+	* cache/mageia-1-x86_64-config.cache: updates for recent build
+	* cache/ubuntu-lucid-x86_64-config.cache: updates for recent build
+	* debian/mscript_header.in: add apt directories
+	* debian/openss7-repo.postrm.in: minor correction
+	* debian/openss7-repo.preinst.in: repo registration work
+	* debian/openss7-repo.prerm.in: minor correction
+	* debian/rules.in: manage /lib as well as /usr/lib
+	* doc/manual/install.texi: documentation updates
+	* doc/papers/xcode/Makefile.in: removed, should be ignored
+	* doc/specs/xgcp/Makefile.in: removed, should be ignored
+	* m4/deb.m4: do not build dpkgs on non-deb systems.
+	* m4/dist.m4: separate {build,host,target}_arch from
+	  {build,host,target}_cpu so that debian systems use amd64
+	  instead of x86_64, i386 instead of i686
+	* m4/kernel.m4: handle kernel compiler better
+	* m4/lib32.m4: manage /lib as well as /usr/lib
+	* m4/openss7.m4: handle user load flags
+	* m4/repo.m4: better repo directory determination
+	* m4/rpm.m4: better repo directory handling for apt-rpm
+	* scripts/check: handle /bin and /lib as well as /usr/bin and /usr/lib
+	* scripts/check_commands: handle /bin and /lib as well as /usr/bin and /usr/lib
+	* scripts/check_commands.awk: handle /bin and /lib as well as /usr/bin and /usr/lib
+	* scripts/check_libs: handle /bin and /lib as well as /usr/bin and /usr/lib
+	* scripts/check_libs.awk: handle /bin and /lib as well as /usr/bin and /usr/lib
+	* scripts/missing3: handle missing dpkg-utility commands
+	* scripts/openss7-modules: fix duplicated local variable
+	* scripts/rpm/find-provides: handle gzipped kernel modules (mandriva, mageia)
+	* scripts/rpm/find-provides.kmod: handle gzipped kernel modules (mandriva, mageia)
+	* scripts/rpm/find-provides.so: wider shared library handling
+	* scripts/rpm/find-requires.so: wider shared library handling
+	* scripts/texi/args.texi.in: add distro arguments
+	* scripts/texi/install.texi: correct build_arch vs build_cpu
+	* scripts/texi/quick.texi: correct build_arch vs build_cpu
+	* src/java/Makefile.am: handle user load flags
+	* src/mason/.htaccess: handle apt-rpm and urpmi
+	* src/mason/autohandler: handle apt-rpm and urpmi
+	* src/perl/Makefile.am: handle user load flags
+	* src/tcl/Makefile.am: handle user load flags
+
+	* (PACKAGE_ENVR): some rpms don't like explicit epoch 0.
+	* src/drivers/atm.c: use PACKAGE_EVNR
+	* src/drivers/cd-llc.c: use PACKAGE_EVNR
+	* src/drivers/cd.c: use PACKAGE_EVNR
+	* src/drivers/cd.other.c: use PACKAGE_EVNR
+	* src/drivers/cddev.c: use PACKAGE_EVNR
+	* src/drivers/ch.c: use PACKAGE_EVNR
+	* src/drivers/chmux.c: use PACKAGE_EVNR
+	* src/drivers/clns-ip.c: use PACKAGE_EVNR
+	* src/drivers/clns.c: use PACKAGE_EVNR
+	* src/drivers/clone.c: use PACKAGE_EVNR
+	* src/drivers/dl-llc.c: use PACKAGE_EVNR
+	* src/drivers/dl.c: use PACKAGE_EVNR
+	* src/drivers/dl2.c: use PACKAGE_EVNR
+	* src/drivers/dl_ip.c: use PACKAGE_EVNR
+	* src/drivers/dl_lapd.c: use PACKAGE_EVNR
+	* src/drivers/dl_master.c: use PACKAGE_EVNR
+	* src/drivers/dlpi.c: use PACKAGE_EVNR
+	* src/drivers/echo.c: use PACKAGE_EVNR
+	* src/drivers/fifo.c: use PACKAGE_EVNR
+	* src/drivers/h225.c: use PACKAGE_EVNR
+	* src/drivers/hdlc.c: use PACKAGE_EVNR
+	* src/drivers/inet.c: use PACKAGE_EVNR
+	* src/drivers/ip.c: use PACKAGE_EVNR
+	* src/drivers/ip_to_dlpi.c: use PACKAGE_EVNR
+	* src/drivers/isdn.c: use PACKAGE_EVNR
+	* src/drivers/isua_as.c: use PACKAGE_EVNR
+	* src/drivers/isup.c: use PACKAGE_EVNR
+	* src/drivers/lcd.c: use PACKAGE_EVNR
+	* src/drivers/ldl.c: use PACKAGE_EVNR
+	* src/drivers/ldl2.c: use PACKAGE_EVNR
+	* src/drivers/llc.c: use PACKAGE_EVNR
+	* src/drivers/log.c: use PACKAGE_EVNR
+	* src/drivers/loop.c: use PACKAGE_EVNR
+	* src/drivers/m2ua.c: use PACKAGE_EVNR
+	* src/drivers/m2ua.old.c: use PACKAGE_EVNR
+	* src/drivers/m2ua_as.c: use PACKAGE_EVNR
+	* src/drivers/m3ua.c: use PACKAGE_EVNR
+	* src/drivers/m3ua_as.c: use PACKAGE_EVNR
+	* src/drivers/m3ua_as.old.c: use PACKAGE_EVNR
+	* src/drivers/m3ua_sg.c: use PACKAGE_EVNR
+	* src/drivers/matrix.c: use PACKAGE_EVNR
+	* src/drivers/mcmux.c: use PACKAGE_EVNR
+	* src/drivers/mg.c: use PACKAGE_EVNR
+	* src/drivers/mtp.c: use PACKAGE_EVNR
+	* src/drivers/mtp_min.c: use PACKAGE_EVNR
+	* src/drivers/mtp_mux.c: use PACKAGE_EVNR
+	* src/drivers/mux.c: use PACKAGE_EVNR
+	* src/drivers/mx.c: use PACKAGE_EVNR
+	* src/drivers/mx_mux.c: use PACKAGE_EVNR
+	* src/drivers/mxmux.c: use PACKAGE_EVNR
+	* src/drivers/nf.c: use PACKAGE_EVNR
+	* src/drivers/np.c: use PACKAGE_EVNR
+	* src/drivers/np_ip.c: use PACKAGE_EVNR
+	* src/drivers/np_rtp.c: use PACKAGE_EVNR
+	* src/drivers/np_udp.c: use PACKAGE_EVNR
+	* src/drivers/npi.c: use PACKAGE_EVNR
+	* src/drivers/nsdev.c: use PACKAGE_EVNR
+	* src/drivers/nuls.c: use PACKAGE_EVNR
+	* src/drivers/otk6.c: use PACKAGE_EVNR
+	* src/drivers/pipe.c: use PACKAGE_EVNR
+	* src/drivers/pty.c: use PACKAGE_EVNR
+	* src/drivers/rawip.c: use PACKAGE_EVNR
+	* src/drivers/rsw.c: use PACKAGE_EVNR
+	* src/drivers/rtp.c: use PACKAGE_EVNR
+	* src/drivers/sad.c: use PACKAGE_EVNR
+	* src/drivers/sccp.c: use PACKAGE_EVNR
+	* src/drivers/sctp.c: use PACKAGE_EVNR
+	* src/drivers/sctp2.c: use PACKAGE_EVNR
+	* src/drivers/sdl_acb56.c: use PACKAGE_EVNR
+	* src/drivers/sdl_x400p.c: use PACKAGE_EVNR
+	* src/drivers/sdlm.c: use PACKAGE_EVNR
+	* src/drivers/sdt_acb56.c: use PACKAGE_EVNR
+	* src/drivers/sdt_x400p.c: use PACKAGE_EVNR
+	* src/drivers/sdtmux.c: use PACKAGE_EVNR
+	* src/drivers/sfx.c: use PACKAGE_EVNR
+	* src/drivers/sl_min.c: use PACKAGE_EVNR
+	* src/drivers/sl_mux.c: use PACKAGE_EVNR
+	* src/drivers/sl_mux.new.c: use PACKAGE_EVNR
+	* src/drivers/sl_v400p.c: use PACKAGE_EVNR
+	* src/drivers/sl_x100p.c: use PACKAGE_EVNR
+	* src/drivers/sl_x400p.c: use PACKAGE_EVNR
+	* src/drivers/sl_x400p.curr.c: use PACKAGE_EVNR
+	* src/drivers/slm.c: use PACKAGE_EVNR
+	* src/drivers/socksys.c: use PACKAGE_EVNR
+	* src/drivers/spx.c: use PACKAGE_EVNR
+	* src/drivers/sscop.c: use PACKAGE_EVNR
+	* src/drivers/sscop_ip.c: use PACKAGE_EVNR
+	* src/drivers/sscop_n.c: use PACKAGE_EVNR
+	* src/drivers/sscop_n2.c: use PACKAGE_EVNR
+	* src/drivers/sscop_t.c: use PACKAGE_EVNR
+	* src/drivers/sua.c: use PACKAGE_EVNR
+	* src/drivers/sua_as.c: use PACKAGE_EVNR
+	* src/drivers/tali.c: use PACKAGE_EVNR
+	* src/drivers/tc.c: use PACKAGE_EVNR
+	* src/drivers/tcap.c: use PACKAGE_EVNR
+	* src/drivers/tcp.c: use PACKAGE_EVNR
+	* src/drivers/testdrv_mps.c: use PACKAGE_EVNR
+	* src/drivers/tl.c: use PACKAGE_EVNR
+	* src/drivers/tp.c: use PACKAGE_EVNR
+	* src/drivers/tr.c: use PACKAGE_EVNR
+	* src/drivers/trmux.c: use PACKAGE_EVNR
+	* src/drivers/tua.c: use PACKAGE_EVNR
+	* src/drivers/tua_as.c: use PACKAGE_EVNR
+	* src/drivers/ua.c: use PACKAGE_EVNR
+	* src/drivers/ua_as.c: use PACKAGE_EVNR
+	* src/drivers/udp.c: use PACKAGE_EVNR
+	* src/drivers/v401p.c: use PACKAGE_EVNR
+	* src/drivers/vf.c: use PACKAGE_EVNR
+	* src/drivers/x100p-ss7.c: use PACKAGE_EVNR
+	* src/drivers/x25-lapb.c: use PACKAGE_EVNR
+	* src/drivers/x25-llc.c: use PACKAGE_EVNR
+	* src/drivers/x25-llc2.c: use PACKAGE_EVNR
+	* src/drivers/x25-plp.c: use PACKAGE_EVNR
+	* src/drivers/x25-plp.other.c: use PACKAGE_EVNR
+	* src/drivers/x400p-ss7.c: use PACKAGE_EVNR
+	* src/drivers/x400p.c: use PACKAGE_EVNR
+	* src/drivers/x400p_mx.c: use PACKAGE_EVNR
+	* src/include/sys/openss7/version.h.in: use PACKAGE_EVNR
+
+	* src/java/jain/protocol/ss7/GTIndicator0001.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/SignalingPointCode.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/OamStatisticNotification.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/mtp3/LinkSetMBean.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/mtp3/Mtp3LayerManagerMBean.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/mtp3/Mtp3StatisticNotification.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/mtp3/OwnSignallingPointMBean.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/mtp3/RouteSetMBean.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/mtp3/ScreeningTableMBean.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/sccp/GlobalTitleEntryMBean.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/sccp/SccpAlarmNotification.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/sccp/SccpErrorNotification.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/sccp/SccpRoutingControlMBean.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/oam/tcap/TcapErrorNotification.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/tcap/GTIndicator0001.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/tcap/JainTcapStack.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/tcap/component/ErrorIndEvent.java: correct javadoc syntax errors
+	* src/java/jain/protocol/ss7/tcap/component/InvokeReqEvent.java: correct javadoc syntax errors
+	* src/java/javax/csapi/cc/jcc/JccCall.java: correct javadoc syntax errors
+	* src/java/javax/csapi/cc/jcc/JccConnectionEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/protocol/ss7/E164Number.java: correct javadoc syntax errors
+	* src/java/javax/jain/protocol/ss7/SS7Number.java: correct javadoc syntax errors
+	* src/java/javax/jain/protocol/ss7/map/Imsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/protocol/ss7/map/MsIsdn.java: correct javadoc syntax errors
+	* src/java/javax/jain/protocol/ss7/map/PositionArc.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/GTIndicator0001.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/SignalingPointCode.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/AlertEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/BwdCallInd.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/CallProgressEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/CallReference.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/CallingPartyNumber.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/CauseInd.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/CircuitGrpCommonEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/CircuitGrpMaintenanceEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/CircuitGrpQueryRespEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ContinuityEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/FwdCallInd.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/GenericNumber.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/InfoInd.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/InfoReqInd.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/InformationEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/InformationReqEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/IsupUserAddress.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/OptionalBwdCallInd.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/OrigCalledNumber.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ReattemptIndEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/RedirectingNumber.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ReleaseEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/SetupEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/UserServiceInfo.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/UserServiceInfoCommon.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/UserServiceInfoPrime.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/BwdCallIndAnsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/ChargeNumberAnsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/CircuitGrpCharacteristicsIndAnsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/CircuitGrpResetAnsiEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/CircuitIdNameAnsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/CircuitReservationAnsiEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/CircuitValidationRespAnsiEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/FwdCallIndAnsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/InfoIndAnsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/InfoReqIndAnsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/InformationAnsiEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/InformationReqAnsiEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/OperatorServicesInfoAnsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/OptionalBwdCallIndAnsi.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/ReleaseAnsiEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/ansi/SetupAnsiEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/AlertItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/AnswerItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/BwdCallIndItu.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/CallProgressItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/CallingPartyNumberItu.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/ConnectItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/ConnectedNumberItu.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/EchoControlInfoItu.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/FacilityAcceptItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/FacilityItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/GenericNumberItu.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/IdentificationRespItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/InformationReqItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/LocationNumberItu.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/OptionalBwdCallIndItu.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/ReleaseItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/SegmentationItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/SetupItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/UserTeleserviceInfoItu.java: correct javadoc syntax errors
+	* src/java/javax/jain/ss7/isup/itu/UserToUserInfoItuEvent.java: correct javadoc syntax errors
+	* src/java/javax/sip/Dialog.java: correct javadoc syntax errors
+	* src/java/javax/sip/header/ViaHeader.java: correct javadoc syntax errors
+	* src/java/javax/sip/message/MessageFactory.java: correct javadoc syntax errors
+	* src/java/org/openss7/jain/protocol/ss7/tcap/JainTcapStackImpl.java: correct javadoc syntax errors
+	* src/java/org/openss7/javax/jain/ss7/inap/JainInapStackImpl.java: correct javadoc syntax errors
+
+	* src/kernel/aixcompat.c: use PACKAGE_ENVR
+	* src/kernel/hpuxcompat.c: use PACKAGE_ENVR
+	* src/kernel/irixcompat.c: use PACKAGE_ENVR
+	* src/kernel/maccompat.c: use PACKAGE_ENVR
+	* src/kernel/mpscompat.c: use PACKAGE_ENVR
+	* src/kernel/os7compat.c: use PACKAGE_ENVR
+	* src/kernel/osfcompat.c: use PACKAGE_ENVR
+	* src/kernel/strmain.c: use PACKAGE_ENVR
+	* src/kernel/strspecfs.c: use PACKAGE_ENVR
+	* src/kernel/suncompat.c: use PACKAGE_ENVR
+	* src/kernel/svr3compat.c: use PACKAGE_ENVR
+	* src/kernel/svr4compat.c: use PACKAGE_ENVR
+	* src/kernel/uw7compat.c: use PACKAGE_ENVR
+	* src/kernel/wrapper.c: use PACKAGE_ENVR
+	* src/modules/aal1.c: use PACKAGE_EVNR
+	* src/modules/aal2.c: use PACKAGE_EVNR
+	* src/modules/aal5.c: use PACKAGE_EVNR
+	* src/modules/apmod.c: use PACKAGE_EVNR
+	* src/modules/bufmod.c: use PACKAGE_EVNR
+	* src/modules/cd.c: use PACKAGE_EVNR
+	* src/modules/cd_daed.c: use PACKAGE_EVNR
+	* src/modules/cd_hdlc.c: use PACKAGE_EVNR
+	* src/modules/cd_old.c: use PACKAGE_EVNR
+	* src/modules/cdi_conv.c: use PACKAGE_EVNR
+	* src/modules/cdi_mod.c: use PACKAGE_EVNR
+	* src/modules/cdpmod.c: use PACKAGE_EVNR
+	* src/modules/ch.c: use PACKAGE_EVNR
+	* src/modules/ch_pmod.c: use PACKAGE_EVNR
+	* src/modules/ch_x400p.c: use PACKAGE_EVNR
+	* src/modules/cmot.c: use PACKAGE_EVNR
+	* src/modules/connld.c: use PACKAGE_EVNR
+	* src/modules/dl_sl.c: use PACKAGE_EVNR
+	* src/modules/dlaix.c: use PACKAGE_EVNR
+	* src/modules/dlpi_conv.c: use PACKAGE_EVNR
+	* src/modules/hdlc.c: use PACKAGE_EVNR
+	* src/modules/hdlc.old.c: use PACKAGE_EVNR
+	* src/modules/iax.c: use PACKAGE_EVNR
+	* src/modules/ip_strm_mod.c: use PACKAGE_EVNR
+	* src/modules/isos.c: use PACKAGE_EVNR
+	* src/modules/isot.c: use PACKAGE_EVNR
+	* src/modules/itos.c: use PACKAGE_EVNR
+	* src/modules/itot.c: use PACKAGE_EVNR
+	* src/modules/lapb.c: use PACKAGE_EVNR
+	* src/modules/lapb.other.c: use PACKAGE_EVNR
+	* src/modules/lapd.c: use PACKAGE_EVNR
+	* src/modules/lapf.c: use PACKAGE_EVNR
+	* src/modules/ldterm.c: use PACKAGE_EVNR
+	* src/modules/lpp.c: use PACKAGE_EVNR
+	* src/modules/m2pa_dl.c: use PACKAGE_EVNR
+	* src/modules/m2pa_sl.c: use PACKAGE_EVNR
+	* src/modules/m2tp.c: use PACKAGE_EVNR
+	* src/modules/m2ua_as.c: use PACKAGE_EVNR
+	* src/modules/m3ua_as.c: use PACKAGE_EVNR
+	* src/modules/mapmod.c: use PACKAGE_EVNR
+	* src/modules/momod.c: use PACKAGE_EVNR
+	* src/modules/mstr.c: use PACKAGE_EVNR
+	* src/modules/mtp3b.c: use PACKAGE_EVNR
+	* src/modules/mtp_mod.c: use PACKAGE_EVNR
+	* src/modules/mtp_npi.c: use PACKAGE_EVNR
+	* src/modules/mtp_tpi.c: use PACKAGE_EVNR
+	* src/modules/mx_pmod.c: use PACKAGE_EVNR
+	* src/modules/mx_sdl.c: use PACKAGE_EVNR
+	* src/modules/mx_x400p.c: use PACKAGE_EVNR
+	* src/modules/npi.c: use PACKAGE_EVNR
+	* src/modules/npi_conv.c: use PACKAGE_EVNR
+	* src/modules/npi_sccp.c: use PACKAGE_EVNR
+	* src/modules/nullmod.c: use PACKAGE_EVNR
+	* src/modules/pckt.c: use PACKAGE_EVNR
+	* src/modules/phys.c: use PACKAGE_EVNR
+	* src/modules/pipemod.c: use PACKAGE_EVNR
+	* src/modules/ptem.c: use PACKAGE_EVNR
+	* src/modules/rtp_ch.c: use PACKAGE_EVNR
+	* src/modules/rtp_test.c: use PACKAGE_EVNR
+	* src/modules/s_cdi.c: use PACKAGE_EVNR
+	* src/modules/s_lli.c: use PACKAGE_EVNR
+	* src/modules/s_llic.c: use PACKAGE_EVNR
+	* src/modules/s_nli.c: use PACKAGE_EVNR
+	* src/modules/s_nlic.c: use PACKAGE_EVNR
+	* src/modules/s_wan.c: use PACKAGE_EVNR
+	* src/modules/s_wanc.c: use PACKAGE_EVNR
+	* src/modules/sc.c: use PACKAGE_EVNR
+	* src/modules/sccp_mod.c: use PACKAGE_EVNR
+	* src/modules/sccp_npi.c: use PACKAGE_EVNR
+	* src/modules/sccp_tpi.c: use PACKAGE_EVNR
+	* src/modules/sccp_tpi_old.c: use PACKAGE_EVNR
+	* src/modules/sdl.c: use PACKAGE_EVNR
+	* src/modules/sdl_cd.c: use PACKAGE_EVNR
+	* src/modules/sdl_ch.c: use PACKAGE_EVNR
+	* src/modules/sdl_pmod.c: use PACKAGE_EVNR
+	* src/modules/sdl_sctp.c: use PACKAGE_EVNR
+	* src/modules/sdt.c: use PACKAGE_EVNR
+	* src/modules/sdt_cd.c: use PACKAGE_EVNR
+	* src/modules/sdt_pmod.c: use PACKAGE_EVNR
+	* src/modules/sdt_sctp.c: use PACKAGE_EVNR
+	* src/modules/sdt_tpi.c: use PACKAGE_EVNR
+	* src/modules/sl.c: use PACKAGE_EVNR
+	* src/modules/sl.new.c: use PACKAGE_EVNR
+	* src/modules/sl_dl.c: use PACKAGE_EVNR
+	* src/modules/sl_tpi.c: use PACKAGE_EVNR
+	* src/modules/slpmod.c: use PACKAGE_EVNR
+	* src/modules/sm_mod.c: use PACKAGE_EVNR
+	* src/modules/sockmod.c: use PACKAGE_EVNR
+	* src/modules/spm.c: use PACKAGE_EVNR
+	* src/modules/sscop-mod.c: use PACKAGE_EVNR
+	* src/modules/sscop.c: use PACKAGE_EVNR
+	* src/modules/sscop2.c: use PACKAGE_EVNR
+	* src/modules/sscopmce.c: use PACKAGE_EVNR
+	* src/modules/sth.c: use PACKAGE_EVNR
+	* src/modules/sua_as.c: use PACKAGE_EVNR
+	* src/modules/tc_mod.c: use PACKAGE_EVNR
+	* src/modules/tcpns.c: use PACKAGE_EVNR
+	* src/modules/tdm_ip.c: use PACKAGE_EVNR
+	* src/modules/testmod.c: use PACKAGE_EVNR
+	* src/modules/testmod_mps.c: use PACKAGE_EVNR
+	* src/modules/timod.c: use PACKAGE_EVNR
+	* src/modules/tirdwr.c: use PACKAGE_EVNR
+	* src/modules/tp0.c: use PACKAGE_EVNR
+	* src/modules/tpi_conv.c: use PACKAGE_EVNR
+	* src/modules/tpi_sccp.c: use PACKAGE_EVNR
+	* src/modules/tpiperf.c: use PACKAGE_EVNR
+	* src/modules/tr_mod.c: use PACKAGE_EVNR
+	* src/modules/trmod.c: use PACKAGE_EVNR
+	* src/modules/tstmod.c: use PACKAGE_EVNR
+	* src/modules/ttcompat.c: use PACKAGE_EVNR
+	* src/modules/tua_as.c: use PACKAGE_EVNR
+	* src/modules/vtoip.c: use PACKAGE_EVNR
+	* src/modules/xos.c: use PACKAGE_EVNR
+	* src/modules/xot.c: use PACKAGE_EVNR
+	* src/modules/xx25.c: use PACKAGE_EVNR
+	* src/modules/xx25.old.c: use PACKAGE_EVNR
+	* src/modules/zaptel-mod.c: use PACKAGE_EVNR
+	* src/modules/zaptel.c: use PACKAGE_EVNR
 
 2011-07-28  Brian Bidulock  <bidulock@openss7.org>
 

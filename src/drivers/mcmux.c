@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $
+ @(#) $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:34 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mcmux.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:34  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2010-11-28 14:21:34  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $";
+static char const ident[] = "$RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $";
 
 /*
  * This is MCMUX, a GSM MAP Common Services (MC) driver implementing the MAPI
@@ -85,7 +88,7 @@ static char const ident[] = "$RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.3 
 #define MCMUX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MCMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define MCMUX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define MCMUX_REVISION	"Monavacon $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $"
+#define MCMUX_REVISION	"Monavacon $RCSfile: mcmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $"
 #define MCMUX_DEVICE	"SVR 4.2 MP STREAMS 3GPP TS 29.002 MAP Common Services (MC) Driver"
 #define MCMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MCMUX_LICENSE	"GPL"
