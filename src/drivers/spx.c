@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:06 $
+ @(#) $RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:06 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: spx.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:37  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-05-31 09:46:06  brian
  - new distros
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:06 $";
+static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
@@ -86,7 +89,7 @@ static char const ident[] = "$RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 
 #define SPX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SPX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:06 $"
+#define SPX_REVISION	"LfS $RCSfile: spx.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $"
 #define SPX_DEVICE	"SVR 4.2 MP STREAMS Pipe Driver"
 #define SPX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SPX_LICENSE	"GPL"

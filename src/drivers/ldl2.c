@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $
+ @(#) $RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:32 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ldl2.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:33  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:21:32  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $";
+static char const ident[] = "$RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $";
 
 /*
  * This is a complete rewrite (reimplementation) of the Linux Data Link driver.  There are a
@@ -90,7 +93,7 @@ static char const ident[] = "$RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.2 $
 #define LDL_DESCRIP	"SVR 4.2 DATA LINK DRIVER FOR LINUX FAST-STREAMS"
 #define LDL_EXTRA	"Part of the OpenSS7 X/Open Network Services for Linux Fast-STREAMS."
 #define LDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define LDL_REVISION	"OpenSS7 $RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $"
+#define LDL_REVISION	"OpenSS7 $RCSfile: ldl2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $"
 #define LDL_DEVICE	"SVR 4.2MP Data Link Driver (DL) for Linux Fast-STREAMS"
 #define LDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LDL_LICENSE	"GPL"

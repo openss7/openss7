@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:09 $
+ @(#) $RCSfile: zaptel.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:09 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: zaptel.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:57  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:09  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:09 $";
+static char const ident[] = "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $";
 
 
 /*
@@ -94,7 +97,7 @@ static char const ident[] = "$RCSfile: zaptel.c,v $ $Name:  $($Revision: 1.1.2.2
 #include <ss7/zap_ioctl.h>
 
 #define ZAP_MX_DESCRIP	"ZAPTEL MULTIPLEX (ZAP-MX) STREAMS MODULE."
-#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:09 $"
+#define ZAP_MX_REVISION	"LfS $RCSfile: zaptel.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:57 $"
 #define ZAP_MX_COPYRIGHT    "Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define ZAP_MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define ZAP_MX_CONTACT	"Brian Biduock <bidulock@openss7.org>"

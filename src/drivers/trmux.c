@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:40 $
+ @(#) $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:40 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: trmux.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:37  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2010-11-28 14:21:40  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:40 $";
+static char const ident[] = "$RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:37 $";
 
 /*
  * This is TRMUX, a TCAP Translaction Sublayer (TR) driver implementing the TRI
@@ -85,7 +88,7 @@ static char const ident[] = "$RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.3 
 #define TRMUX_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TRMUX_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TRMUX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define TRMUX_REVISION	"Monavacon $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:40 $"
+#define TRMUX_REVISION	"Monavacon $RCSfile: trmux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:37 $"
 #define TRMUX_DEVICE	"SVR 4.2 MP STREAMS Q.771 Transaction Sublayer (TR) Driver"
 #define TRMUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TRMUX_LICENSE	"GPL"

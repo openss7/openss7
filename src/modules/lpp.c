@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $
+ @(#) $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-18 16:55:53 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lpp.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:53  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-01-18 16:55:53  brian
  - added stub drivers and modules
 
@@ -64,7 +67,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $";
+    "$RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $";
 
 /*
  *  Lightweight Presentation Protocol (LPP) module
@@ -77,7 +80,7 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define LPP_DESCRIP	"LPP STREAMS MODULE"
-#define LPP_REVISION	"OpenSS7 $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $"
+#define LPP_REVISION	"OpenSS7 $RCSfile: lpp.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define LPP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LPP_DEVICE	"Provides OpenSS7 Lightweight Presentation Protocol (LPP)"
 #define LPP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

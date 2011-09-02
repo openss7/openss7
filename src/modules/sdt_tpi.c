@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $
+ @(#) $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:55 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:33 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_tpi.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:55  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-01-12 04:10:33  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $";
+static char const ident[] = "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:55 $";
 
 
 /*
@@ -102,7 +105,7 @@ static char const ident[] = "$RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define SDT_TPI_DESCRIP	"SS7/IP SIGNALLING DATA TERMINAL (SDT) STREAMS MODULE."
 #define SDT_TPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:33 $"
+#define SDT_TPI_REVISION	"OpenSS7 $RCSfile: sdt_tpi.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:55 $"
 #define SDT_TPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SDT_TPI_LICENSE	"GPL"

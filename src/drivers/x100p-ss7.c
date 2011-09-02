@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:30 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:38 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:30 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x100p-ss7.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:38  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-01-12 04:10:30  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:30 $";
+static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:38 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -102,7 +105,7 @@ static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-01-12 04:10:30 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:38 $"
 #define X100P_COPYRIGHT		"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $
+ @(#) $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-02-07 04:54:44 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdi_conv.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:52  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-02-07 04:54:44  brian
  - code updates for new distro support
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $";
+static char const ident[] = "$RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $";
 
 /*
  *  CDI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts service
@@ -79,7 +82,7 @@ static char const ident[] = "$RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 1.1.2
 
 #define CDI_CONV_DESCRIP	"CDI ENDIAN CONVERSION (CDI-CONV) FOR LINUX FAST-STREAMS"
 #define CDI_CONV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define CDI_CONV_REVISION	"OpenSS7 $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $"
+#define CDI_CONV_REVISION	"OpenSS7 $RCSfile: cdi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define CDI_CONV_DEVICE		"SVR 4.2 CDI Endian Conversion (CDI-CONV) for STREAMS"
 #define CDI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDI_CONV_LICENSE	"GPL"

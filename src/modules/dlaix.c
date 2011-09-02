@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlaix.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $
+ @(#) $RCSfile: dlaix.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:01 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlaix.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:52  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:01  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dlaix.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $";
+static char const ident[] = "$RCSfile: dlaix.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $";
 
 /*
  * This is a DLPI module that is pushed over a CD-HDLC stream to form
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile: dlaix.c,v $ $Name:  $($Revision: 1.1.2.2 
 #define DLAIX_DESCRIP	"LAPB OVER HDLC MODULE FOR LINUX FAST-STREAMS"
 #define DLAIX_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define DLAIX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define DLAIX_REVISION	"OpenSS7 $RCSfile: dlaix.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $"
+#define DLAIX_REVISION	"OpenSS7 $RCSfile: dlaix.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"
 #define DLAIX_DEVICE	"SVR 4.2MP LAPB over HDLC Module (LAPB) for X.25"
 #define DLAIX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLAIX_LICENSE	"GPL"

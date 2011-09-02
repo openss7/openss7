@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $
+ @(#) $RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:36 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.new.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:36  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:21:36  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $";
+static char const ident[] = "$RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $";
 
 /*
  *  This is a Signalling Link (SL) multiplexor that provides a convenient way of organizing various
@@ -94,7 +97,7 @@ static char const ident[] = "$RCSfile: sl_mux.new.c,v $ $Name:  $($Revision: 1.1
 #include <ss7/sli.h>
 
 #define SL_MUX_DESCRIP		"SS7/IP SIGNALLING LINK (SL) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:36 $"
+#define SL_MUX_REVISION		"LfS $RCSname$ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:36 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

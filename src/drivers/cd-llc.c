@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $
+ @(#) $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:31 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cd-llc.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:32  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:21:31  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $";
+static char const ident[] = "$RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $";
 
 /*
  * This is a driver for the IEEE 802.2 Logical Link Control (LLC).  It
@@ -79,7 +82,7 @@ static char const ident[] = "$RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.2
 #define LLC_DESCRIP	"SVR 4.2 CDI X.25 LLC DRIVER FOR LINUX FAST-STREAMS"
 #define LLC_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LLC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define LLC_REVISION	"OpenSS7 $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $"
+#define LLC_REVISION	"OpenSS7 $RCSfile: cd-llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
 #define LLC_DEVICE	"SVR 4.2MP CDI Driver (CDI) for IEEE 802.2 LLC"
 #define LLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LLC_LICENSE	"GPL"

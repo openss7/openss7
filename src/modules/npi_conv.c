@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $
+ @(#) $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-02-07 04:54:45 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: npi_conv.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:54  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-02-07 04:54:45  brian
  - code updates for new distro support
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $";
+static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $";
 
 
 /*
@@ -80,7 +83,7 @@ static char const ident[] = "$RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2
 
 #define NPI_CONV_DESCRIP	"NPI ENDIAN CONVERSION (NPI-CONV) FOR LINUX FAST-STREAMS"
 #define NPI_CONV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $"
+#define NPI_CONV_REVISION	"OpenSS7 $RCSfile: npi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:54 $"
 #define NPI_CONV_DEVICE		"SVR 4.2 NPI Endian Conversion (NPI-CONV) for STREAMS"
 #define NPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NPI_CONV_LICENSE	"GPL"

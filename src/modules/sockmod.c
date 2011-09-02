@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $
+ @(#) $RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:55 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-02-07 04:54:45 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sockmod.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:55  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-02-07 04:54:45  brian
  - code updates for new distro support
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $";
+static char const ident[] = "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:55 $";
 
 
 /*
@@ -140,7 +143,7 @@ static char const ident[] = "$RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define SMOD_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SMOD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:45 $"
+#define SMOD_REVISION	"OpenSS7 $RCSfile: sockmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:55 $"
 #define SMOD_DEVICE	"SVR 3.2 STREAMS Socket Module for TPI Devices (SOCKMOD)"
 #define SMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SMOD_LICENSE	"GPL"

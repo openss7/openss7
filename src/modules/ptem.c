@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $
+ @(#) $RCSfile: ptem.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:11 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ptem.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:54  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-05-31 09:46:11  brian
  - new distros
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ptem.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $";
+static char const ident[] = "$RCSfile: ptem.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:54 $";
 
 
 /*
@@ -122,7 +125,7 @@ References
 
 #define PTEM_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PTEM_COPYRIGHT		"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $"
+#define PTEM_REVISION		"OpenSS7 $RCSfile: ptem.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:54 $"
 #define PTEM_DEVICE		"SVR 4.2 MP STREAMS Pseudo-Terminal Emulation Module (PTEM)"
 #define PTEM_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define PTEM_LICENSE		"GPL"

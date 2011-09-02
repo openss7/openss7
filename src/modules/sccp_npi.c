@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $
+ @(#) $RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:05 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp_npi.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:54  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:05  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $";
+static char const ident[] = "$RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $";
 
 /*
  * This is a pushable STREAMS module that converts between the SCCPI (Signalling Connection Control
@@ -98,7 +101,7 @@ static char const ident[] = "$RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2
 #define SCCP_NPI_DESCRIP	"SCCPI to NPI CONVERSION MODULE FOR LINUX FAST-STREAMS"
 #define SCCP_NPI_EXTRA		"Part of the OpenSS7 SS7 Stack for Linux Fast-STREAMS"
 #define SCCP_NPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SCCP_NPI_REVISION	"OpenSS7 $RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $"
+#define SCCP_NPI_REVISION	"OpenSS7 $RCSfile: sccp_npi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"
 #define SCCP_NPI_DEVICE		"SVR 4.2MP SCCPI to NPI Conversion Module (NPI) for SCCP"
 #define SCCP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_NPI_LICENSE	"GPL"

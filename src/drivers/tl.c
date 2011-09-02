@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:06 $
+ @(#) $RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:06 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tl.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:37  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-05-31 09:46:06  brian
  - new distros
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:06 $";
+static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $";
 
 /*
  *  This driver provides transport interface loopback streams TICLTS, TICOTS
@@ -107,7 +110,7 @@ static char const ident[] = "$RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.4 $) 
 #define TI_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TI_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:06 $"
+#define TI_REVISION	"OpenSS7 $RCSfile: tl.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $"
 #define TI_DEVICE	"SVR 4.2 MP STREAMS TI Driver"
 #define TI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TI_LICENSE	"GPL"

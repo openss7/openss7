@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $
+ @(#) $RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:32 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: hdlc.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:32  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:21:32  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $";
+static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $";
 
 /*
  *  This is a multiplexing driver used to support linking CD HDLC streams.  When CD streams are
@@ -93,7 +96,7 @@ static char const ident[] = "$RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.2 $
 
 #define HDLC_DESCRIP	"HDLC STREAMS MULTIPLEXING DRIVER."
 #define HDLC_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:32 $"
+#define HDLC_REVISION	"OpenSS7 $RCSfile: hdlc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
 #define HDLC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define HDLC_DEVICE	"Supports Linux HDLC devices."
 #define HDLC_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

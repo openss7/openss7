@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:03 $
+ @(#) $RCSfile: m2tp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:03 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2tp.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:53  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:03  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:03 $";
+static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $";
 
 
 /*
@@ -84,7 +87,7 @@ static char const ident[] = "$RCSfile: m2tp.c,v $ $Name:  $($Revision: 1.1.2.2 $
 //#include <ss7/m2tp_ioctl.h>
 
 #define M2TP_DESCRIP	"M2TP/SCTP MTP2 TUNNELING PROTOCOL (SL) STREAMS MODULE."
-#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Data$"
+#define M2TP_REVISION	"OpenSS7 $RCSfile: m2tp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Data$"
 #define M2TP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2TP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M2TP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

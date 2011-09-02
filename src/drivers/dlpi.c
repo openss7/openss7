@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $
+ @(#) $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:31 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:32  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:21:31  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $";
+static char const ident[] = "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $";
 
 /*
  * Welcome to the final interation of the Linux DL driver.  This driver opens
@@ -105,7 +108,7 @@ static char const ident[] = "$RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.2 $
 #define DLPI_DESCRIP	"UNIX SVR 4.2 DLPI DRIVER FOR LINUX FAST-STREAMS"
 #define DLPI_EXTRA	"Part of the OpenSS7 Protocol Stacks for Linux Fast-STREAMS"
 #define DLPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define DLPI_REVISION	"OpenSS7 $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:31 $"
+#define DLPI_REVISION	"OpenSS7 $RCSfile: dlpi.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:32 $"
 #define DLPI_DEVICE	"SVR 4.2MP DLPI Driver (DLPI)"
 #define DLPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLPI_LICENSE	"GPL"

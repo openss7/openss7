@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:07 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:07 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:56  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:07  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:07 $";
+static char const ident[] = "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $";
 
 
 /*
@@ -135,7 +138,7 @@ static char const ident[] = "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.2
 /* ======================= */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MODULE."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:07 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

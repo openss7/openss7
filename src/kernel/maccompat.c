@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $
+ @(#) $RCSfile: maccompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:56 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:51 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: maccompat.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:51  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:21:56  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $";
+static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -82,7 +85,7 @@ static char const ident[] = "$RCSfile: maccompat.c,v $ $Name:  $($Revision: 1.1.
 
 #define MACCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MACCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:56 $"
+#define MACCOMP_REVISION	"LfS $RCSfile: maccompat.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $"
 #define MACCOMP_DEVICE		"Mac OpenTransport Version 1.5r2 Compatibility"
 #define MACCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define MACCOMP_LICENSE		"GPL"

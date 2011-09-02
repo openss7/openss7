@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:42 $
+ @(#) $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:42 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x25-plp.other.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:39  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2010-11-28 14:21:42  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:42 $";
+static char const ident[] = "$RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $";
 
 /*
  * This is an X.25 PLP (LLC2, XOT, SLP and MLP) (CONS) driver per X.223.  It can be used with the
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 
 #define PLP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define PLP_EXTRA	"Part of the OpenSS7 OSI Stack for Linux Fast-STREAMS"
 #define PLP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:42 $"
+#define PLP_REVISION	"OpenSS7 $RCSfile: x25-plp.other.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:39 $"
 #define PLP_DEVICE	"SVR 4.2 MP STREAMS X.25 PLP (ISO 8208) Network Provider"
 #define PLP_CONTACT	"Brian BIdulock <bidulock@openss7.org>"
 #define PLP_LICENSE	"GPL"

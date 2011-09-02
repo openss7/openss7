@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $
+ @(#) $RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-04-07 15:24:03 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop_n.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:37  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-04-07 15:24:03  brian
  - weak reference corrections
 
@@ -66,12 +69,12 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $";
+static char const ident[] = "$RCSfile: sscop_n.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $";
 
 #include <sys/os7/compat.h>
 
 #define SSCOP_NPI_DESCRIP	"SSCOP/IP STREAMS DRIVER."
-#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-04-07 15:24:03 $"
+#define SSCOP_NPI_REVISION	"OpenSS7 $RCSfile: sscop_n.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $"
 #define SSCOP_NPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SSCOP_NPI_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SSCOP_NPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

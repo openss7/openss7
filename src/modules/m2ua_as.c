@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:11 $
+ @(#) $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:11 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2ua_as.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:53  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-05-31 09:46:11  brian
  - new distros
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:11 $";
+static char const ident[] = "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $";
 
 
 /*
@@ -131,7 +134,7 @@ static char const ident[] = "$RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.
 /* ======================= */
 
 #define M2UA_AS_DESCRIP		"M2UA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-05-31 09:46:11 $"
+#define M2UA_AS_REVISION	"OpenSS7 $RCSfile: m2ua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define M2UA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

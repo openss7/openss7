@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $
+ @(#) $RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_master.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:32  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-01-12 04:10:29  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $";
+static char const ident[] = "$RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $";
 
 #include <sys/os7/compat.h>
 #include <linux/kmod.h>
@@ -73,8 +76,8 @@ static char const ident[] = "$RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.
  *  obviates the need for this driver.
  */
 
-#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 1.1.2.3 $)"
-#define DL_REVISION	"OpenSS7 $RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $"
+#define DL_DESCRIP	"Data Link (DL) STREAMS MULTIPLEXING DRIVER ($Revision: 1.1.2.4 $)"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl_master.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define DL_DEVICE	"OpenSS7 CDI Devices."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

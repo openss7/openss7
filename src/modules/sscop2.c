@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $
+ @(#) $RCSfile: sscop2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:06 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop2.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:56  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:06  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $";
+static char const ident[] = "$RCSfile: sscop2.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $";
 
 
 #include <sys/os7/compat.h>

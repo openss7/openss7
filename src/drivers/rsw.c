@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-03-26 04:28:47 $
+ @(#) $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-03-26 04:28:47 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: rsw.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:35  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-03-26 04:28:47  brian
  - updates to build process
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-03-26 04:28:47 $";
+static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $";
 
 /*
  * This is the RTP-SW multiplexing driver.  It s purpose is to allo a single
@@ -266,7 +269,7 @@ static char const ident[] = "$RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.3 $)
 #define RSW_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define RSW_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define RSW_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define RSW_REVISION	"OpenSS7 $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-03-26 04:28:47 $"
+#define RSW_REVISION	"OpenSS7 $RCSfile: rsw.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $"
 #define RSW_DEVICE	"SVR 4.2 MP STREAMS RTP Switch Driver"
 #define RSW_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define RSW_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $
+ @(#) $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:01 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cdpmod.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:52  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:01  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $";
+static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $";
 
 /*
  * This is a CD pipe module.  It pushes over one side of a STREAMS-based pipe
@@ -77,7 +80,7 @@ static char const ident[] = "$RCSfile: cdpmod.c,v $ $Name:  $($Revision: 1.1.2.2
 #define CDPMOD_DESCRIP	"HDLC PIPE MODULE FOR LINUX FAST-STREAMS"
 #define CDPMOD_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define CDPMOD_COPYRIGHT "Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define CDPMOD_REVISION	"OpenSS7 $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $"
+#define CDPMOD_REVISION	"OpenSS7 $RCSfile: cdpmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"
 #define CDPMOD_DEVICE	"SVR 4.2MP CD PIPE Module (CDPMOD) for HDLC"
 #define CDPMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDPMOD_LICENSE	"GPL"

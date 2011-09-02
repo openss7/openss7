@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $
+ @(#) $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:56 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:11 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:56 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tpiperf.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:56  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-05-31 09:46:11  brian
  - new distros
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $";
+static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:56 $";
 
 
 /*
@@ -87,7 +90,7 @@ static char const ident[] = "$RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define TPIPERF_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TPIPERF_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:11 $"
+#define TPIPERF_REVISION	"OpenSS7 $RCSfile: tpiperf.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:56 $"
 #define TPIPERF_DEVICE		"SVR 4.2 MP STREAMS TPI Performance Module (TPIPERF)"
 #define TPIPERF_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define TPIPERF_LICENSE		"GPL"

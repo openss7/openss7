@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $
+ @(#) $RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:05 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp_tpi_old.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:54  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:05  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $";
+static char const ident[] = "$RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $";
 
 /*
  * This is a TPI module that can be pushed over an SCCPI (Signalling Connection Control Part
@@ -98,7 +101,7 @@ static char const ident[] = "$RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1
 #define SCCP_TPI_DESCRIP	"SS7 Signalling Connection Control Part (SCCP) TPI STREAMS MODULE."
 #define SCCP_TPI_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_TPI_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SCCP_TPI_REVISION	"OpenSS7 $RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $"
+#define SCCP_TPI_REVISION	"OpenSS7 $RCSfile: sccp_tpi_old.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"
 #define SCCP_TPI_DEVICE		"SVR 4.2MP SCCPI to TPI Conversion Module (TPI) for SCCP"
 #define SCCP_TPI_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SCCP_TPI_LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $
+ @(#) $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:05 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdl_pmod.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:55  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:05  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $";
+static char const ident[] = "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $";
 
 
 /*
@@ -96,7 +99,7 @@ static char const ident[] = "$RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 1.1.2
 #undef unfreezestr
 
 #define SDL_DESCRIP	"SS7/SDL: (Signalling Data Link) STREAMS PIPE MODULE."
-#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:05 $"
+#define SDL_REVISION	"OpenSS7 $RCSfile: sdl_pmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $"
 #define SDL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SDL_DEVICE	"Provides OpenSS7 SDL pipe driver."
 #define SDL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

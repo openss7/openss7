@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $
+ @(#) $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:01 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_sl.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:52  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:01  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $";
+static char const ident[] = "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $";
 
 /*
  *  This is a simple conversion module that converts between the OpenSS7 Signalling Link Interface
@@ -70,7 +73,7 @@ static char const ident[] = "$RCSfile: dl_sl.c,v $ $Name:  $($Revision: 1.1.2.2 
 #include <sys/os7/compat.h>
 
 #define DL_SL_DESCRIP	"DLPI/SLI CONVERSION STREAMS MODULE."
-#define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:01 $"
+#define DL_SL_REVISION	"OpenSS7 $RCSfile: dl_sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:52 $"
 #define DL_SL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define DL_SL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define DL_SL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

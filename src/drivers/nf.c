@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $
+ @(#) $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:34 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: nf.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:35  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2010-11-28 14:21:34  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $";
+static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $";
 
 /*
  *  This pseudo-device driver implements a range of netfilter hooks for
@@ -106,7 +109,7 @@ static char const ident[] = "$RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
 #define NF_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define NF_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define NF_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:34 $"
+#define NF_REVISION	"OpenSS7 $RCSfile: nf.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:35 $"
 #define NF_DEVICE	"SVR 4.2 MP STREAMS NETFILTER Driver"
 #define NF_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define NF_LICENSE	"GPL"

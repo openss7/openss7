@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:03 $
+ @(#) $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:03 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: clone.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:32  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-05-31 09:46:03  brian
  - new distros
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:03 $";
+static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
@@ -86,7 +89,7 @@ static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.4 
 
 #define CLONE_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CLONE_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:03 $"
+#define CLONE_REVISION	"LfS $RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $"
 #define CLONE_DEVICE	"SVR 4.2 MP STREAMS CLONE Driver"
 #define CLONE_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CLONE_LICENSE	"GPL"

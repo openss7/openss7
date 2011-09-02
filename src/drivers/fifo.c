@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-31 09:46:03 $
+ @(#) $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:03 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: fifo.c,v $
+ Revision 1.1.2.7  2011-09-02 08:46:32  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.6  2011-05-31 09:46:03  brian
  - new distros
 
@@ -72,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-31 09:46:03 $";
+static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:32 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>
@@ -99,7 +102,7 @@ static char const ident[] = "$RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.6 $
 
 #define FIFO_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define FIFO_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-05-31 09:46:03 $"
+#define FIFO_REVISION	"LfS $RCSfile: fifo.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-02 08:46:32 $"
 #define FIFO_DEVICE	"SVR 4.2 MP STREAMS-based FIFOs"
 #define FIFO_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define FIFO_LICENSE	"GPL"

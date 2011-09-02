@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:33 $
+ @(#) $RCSfile: llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:33 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:33 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: llc.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:33  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:21:33  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:33 $";
+static char const ident[] = "$RCSfile: llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $";
 
 /*
  * This is a DL driver for LLC1, LLC2 and LLC3 connections over 802.2.  It
@@ -77,7 +80,7 @@ static char const ident[] = "$RCSfile: llc.c,v $ $Name:  $($Revision: 1.1.2.2 $)
 #include <sys/dlpi.h>
 
 #define DL_DESCRIP	"Data Link (DL) for IEEE 802.2 LLC STREAMS DRIVER."
-#define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:33 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: llc.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:33 $"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define DL_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

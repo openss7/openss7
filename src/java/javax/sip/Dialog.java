@@ -1,5 +1,5 @@
 /*
- @(#) $RCSfile: Dialog.java,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 03:23:45 $ <p>
+ @(#) $RCSfile: Dialog.java,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:49 $ <p>
  
  Copyright &copy; 2008-2011  Monavacon Limited <a href="http://www.monavacon.com/">&lt;http://www.monavacon.com/&gt;</a>. <br>
  Copyright &copy; 2001-2008  OpenSS7 Corporation <a href="http://www.openss7.com/">&lt;http://www.openss7.com/&gt;</a>. <br>
@@ -40,7 +40,7 @@
  Corporation at a fee.  See
  <a href="http://www.openss7.com/">http://www.openss7.com/</a> <p>
  
- Last Modified $Date: 2011-01-12 03:23:45 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:49 $ by $Author: brian $
  */
 
 package javax.sip;

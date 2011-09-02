@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $
+ @(#) $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:06 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:55 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sdt_sctp.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:55  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:06  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $";
+static char const ident[] = "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $";
 
 
 #define _SUN_SOURCE	1
@@ -80,7 +83,7 @@ static char const ident[] = "$RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 1.1.2
 #include <ss7/sdti_ioctl.h>
 
 #define SDT_SCTP_DESCRIP	"SS7/SCTP SIGNALLING DATA LINK (SDT) STREAMS MODULE."
-#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:06 $"
+#define SDT_SCTP_REVISION	"OpenSS7 $RCSfile: sdt_sctp.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:55 $"
 #define SDT_SCTP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SDT_SCTP_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SDT_SCTP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

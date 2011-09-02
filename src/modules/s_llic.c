@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: s_llic.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $
+ @(#) $RCSfile: s_llic.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:04 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: s_llic.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:54  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:04  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: s_llic.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $";
+static char const ident[] = "$RCSfile: s_llic.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $";
 
 /*
  * This is s_llic, a pushable STREAMS module that interprets the SpiderX25
@@ -81,7 +84,7 @@ static char const ident[] = "$RCSfile: s_llic.c,v $ $Name:  $($Revision: 1.1.2.2
 #define S_LLIC_DESCRIP		"SPIDER LLI ADMIN COMPATIBILITY MODULE FOR LINUX FAST-STREAMS"
 #define S_LLIC_EXTRA		"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define S_LLIC_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define S_LLIC_REVISION		"OpenSS7 $RCSfile: s_llic.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:04 $"
+#define S_LLIC_REVISION		"OpenSS7 $RCSfile: s_llic.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"
 #define S_LLIC_DEVICE		"SVR 4.2MP DLPI Devices"
 #define S_LLIC_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define S_LLIC_LICENSE		"GPL"

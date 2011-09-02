@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $
+ @(#) $RCSfile: mx.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:34 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mx.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:34  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:21:34  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mx.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $";
+static char const ident[] = "$RCSfile: mx.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $";
 
 /*
  *  This is an MX multiplexing driver.  Its purpose is to allow a single device
@@ -154,7 +157,7 @@ static char const ident[] = "$RCSfile: mx.c,v $ $Name:  $($Revision: 1.1.2.2 $) 
 #include <ss7/chi_ioctl.h>
 
 #define MX_DESCRIP	"MX (MX) STREAMS MULTIPLEXING DRIVER."
-#define MX_REVISION	"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:21:34 $"
+#define MX_REVISION	"LfS $RCSfile: mx.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $"
 #define MX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MX_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:05 $
+ @(#) $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:05 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mux.c,v $
+ Revision 1.1.2.5  2011-09-02 08:46:34  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.4  2011-05-31 09:46:05  brian
  - new distros
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:05 $";
+static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:34 $";
 
 /*
  *  This driver provides a multiplexing driver as an example and a test program.
@@ -96,7 +99,7 @@ static char const ident[] = "$RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.4 $)
 
 #define MUX_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define MUX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-05-31 09:46:05 $"
+#define MUX_REVISION	"LfS $RCSfile: mux.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:34 $"
 #define MUX_DEVICE	"SVR 4.2 MP STREAMS Multiplexing Driver (MUX)"
 #define MUX_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define MUX_LICENSE	"GPL"

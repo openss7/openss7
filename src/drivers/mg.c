@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $
+ @(#) $RCSfile: mg.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-12 04:10:29 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: mg.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:34  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-01-12 04:10:29  brian
  - code updates for 2.6.32 kernel and gcc 4.4
 
@@ -105,7 +108,7 @@
  */
 
 static char const ident[] =
-    "$RCSfile: mg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $";
+    "$RCSfile: mg.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $";
 
 #include <sys/os7/compat.h>
 
@@ -117,7 +120,7 @@ static char const ident[] =
 #include <ss7/mgi_ioctl.h>
 
 #define MG_DESCRIP	"SS7 MEDIA GATEWAY (MG) STREAMS MULTIPLEXING DRIVER."
-#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-12 04:10:29 $"
+#define MG_REVISION	"LfS $RCSfile: mg.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:34 $"
 #define MG_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define MG_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define MG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

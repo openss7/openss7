@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $
+ @(#) $RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-18 16:55:53 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapd.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:53  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-01-18 16:55:53  brian
  - added stub drivers and modules
 
@@ -64,7 +67,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $";
+    "$RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $";
 
 /*
  *  LAPD module
@@ -77,7 +80,7 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define LAPD_DESCRIP	"LAPD STREAMS MODULE"
-#define LAPD_REVISION	"OpenSS7 $RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $"
+#define LAPD_REVISION	"OpenSS7 $RCSfile: lapd.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:53 $"
 #define LAPD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define LAPD_DEVICE	"Provides OpenSS7 Link Access Protocol D-Channel (LAPD)"
 #define LAPD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

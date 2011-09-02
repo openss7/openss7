@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $
+ @(#) $RCSfile: lapb.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:02 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:53 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: lapb.c,v $
+ Revision 1.1.2.3  2011-09-02 08:46:53  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.2  2010-11-28 14:22:02  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -60,7 +63,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: lapb.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $";
+static char const ident[] = "$RCSfile: lapb.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $";
 
 /*
  * This is a LAPB module that pushes over a stream implementing an HDLC
@@ -80,7 +83,7 @@ static char const ident[] = "$RCSfile: lapb.c,v $ $Name:  $($Revision: 1.1.2.2 $
 #define LAPB_DESCRIP	"LAPB OVER HDLC MODULE FOR LINUX FAST-STREAMS"
 #define LAPB_EXTRA	"Part of the OpenSS7 X.25 Stack for Linux Fast-STREAMS"
 #define LAPB_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2010-11-28 14:22:02 $"
+#define LAPB_REVISION	"OpenSS7 $RCSfile: lapb.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $"
 #define LAPB_DEVICE	"SVR 4.2MP LAPB over HDLC Module (LAPB) for X.25"
 #define LAPB_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LAPB_LICENSE	"GPL"

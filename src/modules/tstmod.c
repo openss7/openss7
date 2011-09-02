@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tstmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $
+ @(#) $RCSfile: tstmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-01-18 16:55:53 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:57 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tstmod.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:57  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-01-18 16:55:53  brian
  - added stub drivers and modules
 
@@ -64,7 +67,7 @@
  *****************************************************************************/
 
 static char const ident[] =
-    "$RCSfile: tstmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $";
+    "$RCSfile: tstmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $";
 
 /*
  *  TSTMOD module
@@ -77,7 +80,7 @@ static char const ident[] =
 #include <sys/os7/compat.h>
 
 #define TSTMOD_DESCRIP	"TSTMOD STREAMS MODULE"
-#define TSTMOD_REVISION	"OpenSS7 $RCSfile: tstmod.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-01-18 16:55:53 $"
+#define TSTMOD_REVISION	"OpenSS7 $RCSfile: tstmod.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:57 $"
 #define TSTMOD_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TSTMOD_DEVICE	"Provides OpenSS7 Test Module (TSTMOD)"
 #define TSTMOD_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $
+ @(#) $RCSfile: dl_ip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:31 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dl_ip.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:32  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2010-11-28 14:21:31  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $";
+static char const ident[] = "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $";
 
 /*
  *  This is a DLPI driver for the IP subsystem.  The purpose of the driver is to directly access the
@@ -90,7 +93,7 @@ static char const ident[] = "$RCSfile: dl_ip.c,v $ $Name:  $($Revision: 1.1.2.3 
 #define DL_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define DL_EXTRA	"Part of the OpenSS7 stack for Linux Fast-STREAMS"
 #define DL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $"
+#define DL_REVISION	"OpenSS7 $RCSfile: dl_ip.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
 #define DL_DEVICE	"SVR 4.2 MP STREAMS DLPI DL_IP Data Link Provider"
 #define DL_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DL_LICENSE	"GPL"

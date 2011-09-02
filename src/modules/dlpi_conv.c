@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $
+ @(#) $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-02-07 04:54:44 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: dlpi_conv.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:52  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2011-02-07 04:54:44  brian
  - code updates for new distro support
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $";
+static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $";
 
 /*
  *  DLPI-CONV is a simple endian conversion module for use with the RMUX driver.  It converts
@@ -79,7 +82,7 @@ static char const ident[] = "$RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.
 
 #define DLPI_CONV_DESCRIP	"DLPI ENDIAN CONVERSION (DLPI-CONV) FOR LINUX FAST-STREAMS"
 #define DLPI_CONV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-02-07 04:54:44 $"
+#define DLPI_CONV_REVISION	"OpenSS7 $RCSfile: dlpi_conv.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define DLPI_CONV_DEVICE	"SVR 4.2 DLPI Endian Conversion (DLPI-CONV) for STREAMS"
 #define DLPI_CONV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define DLPI_CONV_LICENSE	"GPL"

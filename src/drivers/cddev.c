@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $
+ @(#) $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:21:31 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: cddev.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:32  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2010-11-28 14:21:31  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $";
+static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $";
 
 /*
  * This is a multiplexing driver used for providing access to devices that
@@ -87,7 +90,7 @@ static char const ident[] = "$RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.3 
 #define CDDEV_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CDDEV_EXTRA	"Part of the OpenSS7 X/Open Networking Serivces for Linux Fast-STREAMS"
 #define CDDEV_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define CDDEV_REVISION	"OpenSS7 $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:21:31 $"
+#define CDDEV_REVISION	"OpenSS7 $RCSfile: cddev.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:32 $"
 #define CDDEV_DEVICE	"SVR 4.2 MP STREAMS CDI Communication Device Interface Provider"
 #define CDDEV_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CDDEV_LICENSE	"GPL"

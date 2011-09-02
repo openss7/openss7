@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:01 $
+ @(#) $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2010-11-28 14:22:01 $ by $Author: brian $
+ Last Modified $Date: 2011-09-02 08:46:52 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: ch.c,v $
+ Revision 1.1.2.4  2011-09-02 08:46:52  brian
+ - sync up lots of repo and build changes from git
+
  Revision 1.1.2.3  2010-11-28 14:22:01  brian
  - remove #ident, protect _XOPEN_SOURCE
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:01 $";
+static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $";
 
 /*
  *  This is a CH module.  The purpose of the module is for it to be pushed over a (circuit-based) MX
@@ -102,7 +105,7 @@ static char const ident[] = "$RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.3 $) 
 
 #define CH_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define CH_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define CH_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2010-11-28 14:22:01 $"
+#define CH_REVISION	"OpenSS7 $RCSfile: ch.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:52 $"
 #define CH_DEVICE	"SVR 4.2 MP STREAMS Channel Module (CH)"
 #define CH_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define CH_LICENSE	"GPL"
