@@ -885,7 +885,7 @@ function readsymver(kversion, file,
     return n
 }
 function readkernel(kversion,
-		    pfx,fmt,n,m,pm,s,ps,find,command,module,SECTION,string,char,sym,crc,find,file,dir,tmpdir,dirs,written)
+		    pfx,fmt,n,m,pm,s,ps,find,command,module,SECTION,string,char,sym,crc,file,dir,tmpdir,dirs,written)
 {
     pfx = "r: kernel,    "
     fmt = "%04d modules, %05d symbols"
