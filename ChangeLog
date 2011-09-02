@@ -1,3 +1,12 @@
+2011-09-02  Brian Bidulock  <bidulock@openss7.org>
+
+	* cache/debian-squeeze-amd64-config.cache
+	* cache/mandriva-2011.0-x86_64-config.cache
+	* cache/ubuntu-lucid-amd64-config.cache:
+	  added build caches
+	* scripts/register.in:
+	  added test registration script
+
 2011-07-28  Brian Bidulock  <bidulock@openss7.org>
 
 	* debian/rules.in: better build and debug info splitting
