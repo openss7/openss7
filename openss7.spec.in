@@ -2733,6 +2733,11 @@ mkdir -p $d
 cp -p src/python/yum-plugins/*.conf $d
 %endif
 
+%if %{WANT_repo}
+d=%{buildroot}%{_localstatedir}/lib/%{name}
+mkdir -p $d
+%endif
+
 %if %{HAVE_manrefs}
 # stupid mandrake spec-helper will compress our macros files otherwise (perl regex)
 EXCLUDE_FROM_COMPRESS="${EXCLUDE_FROM_COMPRESS:+$EXCLUDE_FROM_COMPRESS|}%{manrefs}"
@@ -3239,7 +3244,6 @@ if [ $1 -eq 0 ] ; then : # final removal
 %endif
 %if %{FILES_aptrepo}
 %endif
-    fi
 fi
 
 %if %{PACKAGE_repo}
@@ -3433,7 +3437,7 @@ if [ $1 -eq 1 ] ; then : # fresh install
 	    case " $modules " in (*" $b "*) modl_mods="$modl_mods${modl_mods:+ }$m" ;; esac
 	done
 	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
-	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set -o xtrace,p;t;s,xtrace[[:space:]]*off,set +o xtrace,p;t'`
 	    set +x
 	    dep=
             while read line; do
@@ -3633,7 +3637,7 @@ if [ $1 -eq 1 ] ; then : # kernel is being installed or upgraded with base prese
         if [ -e /var/run/%{name}-base.post ]; then
             rm -f -- /var/run/%{name}-base.post
         else
-            v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+            v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
             %{_sbindir}/%{name}-modules -- $v -e \
                 --update-kernel || :
         fi
@@ -3759,7 +3763,7 @@ if [ -x %{_sbindir}/%{name}-modules ]; then
         fi
     done
     if [ -n "$kernels" ]; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
         %{_sbindir}/%{name}-modules -- $v -e \
             --remove-kernel $kernels || :
     fi
@@ -4122,8 +4126,9 @@ fi
 if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
 %if %{FILES_libraries}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-	libtool --mode=finish %{_libdir} || :
-	libtool --mode=finish %{_syslibdir} || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	libtool --mode=finish $v %{_libdir} || :
+	libtool --mode=finish $v %{_syslibdir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_libdir} || :
 	ldconfig -n %{_syslibdir} || :
@@ -4230,6 +4235,7 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     fi
     if [ -s $snmp_fil ]; then
         if ! grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
+            [ -d $snmp_dir ] || mkdir -p -- $snmp_dir
             cp -f -b --suffix=.rpmsave -- $snmp_fil $snmp_lcl
         fi
     fi
@@ -4313,7 +4319,7 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # both present install or upgrade
 	[ -f %_initrddir/$i ] || continue
 	[ ! -e /var/lock/subsys/$i ] || continue
 	n=`echo "$i" | sed -e 's,\.sh$,,'`
-	grep '^#[[:space:]]*pidfile:[[:space:]]*/var/run/'"$n"'.pid[[:space:]]*$' %_initrddir/$i >/dev/null 2>&1 || continue
+	grep '^#[[:space:]]*pidfile:[[:space:]]*/var/run/'"$n"'.pid[[:space:]]*$' %_initrddir/$i >/dev/null 2>&1 || break
 	start=no
 	for l in %_initrddir/../rc$r.d/S[0-9][0-9]$i %_initrddir/rc$r.d/S[0-9][0-9]$i; do
 	    if [ -L $l ]; then start=yes; break; fi
@@ -4331,8 +4337,9 @@ fi
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
 %if %{FILES_libraries}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-	libtool --mode=finish %{_libdir} || :
-	libtool --mode=finish %{_syslibdir} || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	libtool --mode=finish $v %{_libdir} || :
+	libtool --mode=finish $v %{_syslibdir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_libdir} || :
 	ldconfig -n %{_syslibdir} || :
@@ -4469,6 +4476,7 @@ if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     fi
     if [ -s $snmp_fil ]; then
         if grep '^# Generated from snmp.d' $snmp_fil >/dev/null 2>&1; then
+            [ -d $snmp_dir ] || mkdir -p -- $snmp_dir
             cp -f -b --suffix=.rpmsave -- $snmp_fil $snmp_lcl
         fi
     fi
@@ -4650,8 +4658,9 @@ developed for %{title}.  Also included are 32-bit test utilities for the
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # fresh install or upgrade
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-	libtool --mode=finish %{_lib32dir} || :
-	libtool --mode=finish %{_syslib32dir} || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	libtool --mode=finish $v %{_lib32dir} || :
+	libtool --mode=finish $v %{_syslib32dir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_lib32dir} || :
 	ldconfig -n %{_syslib32dir} || :
@@ -4664,8 +4673,9 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-	libtool --mode=finish %{_lib32dir} || :
-	libtool --mode=finish %{_syslib32dir} || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	libtool --mode=finish $v %{_lib32dir} || :
+	libtool --mode=finish $v %{_syslib32dir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_lib32dir} || :
 	ldconfig -n %{_syslib32dir} || :
@@ -5110,7 +5120,7 @@ if [ $1 -eq 1 ]; then : # fresh install
     modules='%{modules}'
     for dir in %{_kmoduledir}; do
 	[ -d $dir ] || continue
-        xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+        xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set -o xtrace,p;t;s,xtrace[[:space:]]*off,set +o xtrace,p;t'`
         set +x
 	modl_mods=
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
@@ -5120,7 +5130,7 @@ if [ $1 -eq 1 ]; then : # fresh install
 	done
         eval "$xtrace"
 	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
-	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set -o xtrace,p;t;s,xtrace[[:space:]]*off,set +o xtrace,p;t'`
 	    set +x
 	    dep=
             while read line ; do
@@ -5225,7 +5235,7 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # install either or upgrade either w/ other
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
         scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
         if [ -n "$scripts" ] ; then
             %{_sbindir}/%{name}-modules -- $v -e \
                 --initscripts="$scripts" \
@@ -5271,7 +5281,7 @@ if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # one being removed with other present
 %if %{HAVE_weakmods}
     if [ -x %{_sbindir}/%{name}-modules ]; then
         scripts="`echo '%{initfiles}' | sed -e 's/ /,/g'`"
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
         if [ -n "$scripts" ] ; then
             %{_sbindir}/%{name}-modules -- $v -e \
                 --initscripts="$scripts" \
@@ -6034,14 +6044,16 @@ fi
 if [ $1 -eq 1 ] ; then : # fresh install
 %if %{FILES_jnilibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-	libtool --mode=finish %{_jnidir} || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	libtool --mode=finish $v %{_jnidir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig %{_jnidir} || :
     fi
 %endif
 %if %{FILES_gcjlibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-	libtool --mode=finish %{_pkggcjdir} || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	libtool --mode=finish $v %{_pkggcjdir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig %{_pkggcjdir} || :
     fi
@@ -6077,14 +6089,16 @@ fi
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
 %if %{FILES_jnilibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-	libtool --mode=finish %{_jnidir} || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	libtool --mode=finish $v %{_jnidir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_jnidir} || :
     fi
 %endif
 %if %{FILES_gcjlibs}
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-	libtool --mode=finish %{_pkggcjdir} || :
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	libtool --mode=finish $v %{_pkggcjdir} || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n %{_pkggcjdir} || :
     fi

@@ -176,79 +176,77 @@ build_options () {
 }
 
 modprobe_name () {
-    module=$1
-    shift
-    modname="kernel module $module"
-    case $module in
+    case "$1" in
     (specfs)
-	modname="Special Shadow Filesystem (specfs)"
+	echo 'Special Shadow Filesystem (specfs)'
 	;;
     (streams)
-	modname="SVR 4.2MP Linux Fast-STREAMS"
+	echo 'SVR 4.2MP Linux Fast-STREAMS'
 	;;
-    (streams-sth)
-	modname="SVR 4.2MP Linux Fast-STREAMS Stream Head"
+    (streams?sth)
+	echo 'SVR 4.2MP Linux Fast-STREAMS Stream Head'
 	;;
-    (streams-clone)
-	modname="SVR 4.2MP Linux Fast-STREAMS Clone Driver"
+    (streams?clone)
+	echo 'SVR 4.2MP Linux Fast-STREAMS Clone Driver'
 	;;
-    (streams-log)
-	modname="SVR 4.2MP Linux Fast-STREAMS Log Driver"
+    (streams?log)
+	echo 'SVR 4.2MP Linux Fast-STREAMS Log Driver'
 	;;
-    (streams-aixcompat)
-	modname="AIX(R) 5L Version 5.1 Portable STREAMS Environment"
+    (streams?aixcompat)
+	echo 'AIX(R) 5L Version 5.1 Portable STREAMS Environment'
 	;;
-    (streams-hpuxcompat)
-	modname="HP-UX(R) 11.0i v2 STREAMS/UX"
+    (streams?hpuxcompat)
+	echo 'HP-UX(R) 11.0i v2 STREAMS/UX'
 	;;
-    (streams-irixcompat)
-	modname="IRIX(R) 6.5.17"
+    (streams?irixcompat)
+	echo 'IRIX(R) 6.5.17'
 	;;
-    (streams-liscompat)
-	modname="Linux(R) STREAMS 2.18.4"
+    (streams?liscompat)
+	echo 'Linux(R) STREAMS 2.18.4'
 	;;
-    (streams-maccompat)
-	modname="Mac(R) OS 9 Open Transport"
+    (streams?maccompat)
+	echo 'Mac(R) OS 9 Open Transport'
 	;;
-    (streams-mpscompat)
-	modname="MPS(R) Mentat Portable Streams"
+    (streams?mpscompat)
+	echo 'MPS(R) Mentat Portable Streams'
 	;;
-    (streams-osfcompat)
-	modname="Digital(R) UNIX (OSF/1.2)"
+    (streams?osfcompat)
+	echo 'Digital(R) UNIX (OSF/1.2)'
 	;;
-    (streams-suncompat)
-	modname="Solaris(R) 9/SunOS(R) 5.9"
+    (streams?suncompat)
+	echo 'Solaris(R) 9/SunOS(R) 5.9'
 	;;
-    (streams-svr3compat)
-	modname="UNIX(R) System V Release 3.2"
+    (streams?svr3compat)
+	echo 'UNIX(R) System V Release 3.2'
 	;;
-    (streams-svr4compat)
-	modname="UNIX(R) System V Release 4.2"
+    (streams?svr4compat)
+	echo 'UNIX(R) System V Release 4.2'
 	;;
-    (streams-uw7compat)
-	modname="UnixWare(R) 7.1.3"
+    (streams?uw7compat)
+	echo 'UnixWare(R) 7.1.3'
+	;;
+    (*)
+	echo "kernel module $1"
 	;;
     esac
-    echo "$modname"
 }
 
 modprobe_action () {
-    module=$1
-    shift
-    modname=`modprobe_name $module`
-    action "Loading $modname:" \
-	modprobe -q -- $module
+    action "Loading `modprobe_name $1`:" \
+	modprobe -q -- $1
     RETVAL=$?
     return $RETVAL
 }
 
 modprobe_remove () {
-    module=$1
-    shift
-    modname=`modprobe_name $module`
-    action "Unloading $modname:" \
-	modprobe -q -r -- $module
-    RETVAL=$?
+    modrex=`echo $1 | sed -e 's,[-_],[-_],g'`
+    if grep "^$modrex[[:space:]]" /proc/modules >/dev/null 2>&1 ; then
+	action "Unloading `modprobe_name $1`:" \
+	    rmmod -- $1
+	RETVAL=$?
+    else
+	RETVAL=0
+    fi
     return $RETVAL
 }
 

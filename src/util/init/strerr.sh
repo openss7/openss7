@@ -329,7 +329,7 @@ pidfile="/var/run/$processname.pid"
 execfile="/usr/sbin/$processname"
 desc="the STREAMS error logger"
 
-if [ ! -x $execfile ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
+[ -x $execfile -o "$1" = "stop" ] || exit 5
 
 # Specify defaults
 
@@ -392,7 +392,11 @@ start () {
 }
 
 stop () {
-    daemon_stop $execfile || RETVAL=$?
+    if [ -r $pidfile ]; then
+	daemon_stop $execfile || RETVAL=$?
+    else
+	RETVAL=0
+    fi
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     return $RETVAL
 }

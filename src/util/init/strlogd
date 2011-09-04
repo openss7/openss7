@@ -144,7 +144,7 @@ processname="$name"
 pidfile="/var/run/$processname.pid"
 execfile="/usr/sbin/$processname"
 
-if [ ! -x $execfile ] ; then if [ "$1" = "stop" ] ; then exit 0 ; else exit 5 ; fi ; fi
+[ -x $execfile -o "$1" = "stop" ] || exit 5
 
 # Disable for the moment
 
@@ -199,8 +199,12 @@ start() {
 }
 
 stop() {
-    killproc $processname
-    RETVAL=$?
+    if [ -r $pidfile ]; then
+	killproc $processname
+	RETVAL=$?
+    else
+	RETVAL=0
+    fi
     [ $RETVAL -eq 0 ] && rm -f -- $lockfile
     RETVAL=$?
     return $RETVAL
