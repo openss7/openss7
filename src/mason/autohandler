@@ -228,14 +228,18 @@
 	 $page eq 'media.cfg'		or
 	 $page eq 'urpmi.cfg'		)
     {
-	unless ($hn) {
-	    $r->log_reason("hn argument required", $r->uri.'?'.scalar($r->args));
-	    $m->abort(403);
-	}
 	if ( $hostname ) {
 	    $un = $hostname;
 	    $pw = $hostpass;
 	} else {
+	    unless ($hn) {
+		$r->log_reason("hn argument required", $r->uri.'?'.scalar($r->args));
+		$m->abort(403);
+	    }
+	    unless ($ip) {
+		$r->log_reason("ip argument required", $r->uri.'?'.scalar($r->args));
+		$m->abort(403);
+	    }
 	    unless ($distro) {
 		$r->log_reason("distro required", $r->uri.'?'.scalar($r->args));
 		$m->abort(403);

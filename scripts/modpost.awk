@@ -1401,9 +1401,11 @@ function read_whitelist(file, own, src,	    n, command, list, count_lists)
 		count_lists = count_lists + 1
 		continue
 	    } else {
-		set_symbol($1, "", "", "", "", 0, "", src ":" list, 1, own)
-		kabi[$1] = 1
-		n++
+		if (!($1 in kabi)) {
+		    set_symbol($1, "", "", "", "", 0, "", src ":" list, 1, own)
+		    kabi[$1] = 1
+		    n++
+		}
 	    }
 	}
 	close(command)
@@ -2126,7 +2128,7 @@ BEGIN {
 	}
 	values["kabi"] = 0
 	if (("ksymsets" in values) && values["ksymsets"])
-	    values["kabi"] = read_symsets(values["ksymsets"], "kabi", "syssymset")
+	    values["kabi"] = values["kabi"] + read_symsets(values["ksymsets"], "kabi", "syssymset")
 	else {
 	    file = "symsets-" kversion ".tar.gz"
 	    if (system("test -r /boot/" file) == 0) {
@@ -2137,11 +2139,16 @@ BEGIN {
 	    }
 	}
 	if (("whitelist" in values) && values["whitelist"])
-	    values["kabi"] = read_whitelist(values["whitelist"], "kabi", "whitelist")
+	    values["kabi"] = values["kabi"] + read_whitelist(values["whitelist"], "kabi", "whitelist")
 	else {
+	    valuds["kabi"] = 0
+	    file = "kabi_whitelist"
+	    if (system("test -r /lib/modules/" kversion "/build/" file) == 0) {
+		values["kabi"] = values["kabi"] + read_whitelist("/lib/modules/" kversion "/build/" file, "kabi", "whitelist")
+	    }
 	    file = "kabi_whitelist_" cpu
 	    if (system("test -r /lib/modules/kabi/" file) == 0) {
-		values["kabi"] = read_whitelist("/lib/modules/kabi/" file, "kabi", "whitelist")
+		values["kabi"] = values["kabi"] + read_whitelist("/lib/modules/kabi/" file, "kabi", "whitelist")
 	    }
 	}
     }

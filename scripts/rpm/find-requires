@@ -10,10 +10,18 @@ ulimit -c 0
 args=("$@")
 script=$(basename $0)
 where=`(cd $(dirname $0); pwd)`
+vendor=`(rpm --showrc | grep ' _host_vendor' | awk '{print$3}') 2>/dev/null`
 
 which_tool() {
     old_PATH="$PATH"
-    PATH="$PATH:$where:/usr/lib/rpm/redhat:/usr/lib/rpm"
+    PATH="$PATH:$where:$where/find-requires.d:/usr/lib/rpm/${vendor:-redhat}/find-requires.d:/usr/lib/rpm/${vendor:-redhat}:/usr/lib/rpm"
+    which $1
+    PATH="$old_PATH"
+}
+
+what_tool() {
+    old_PATH="$PATH"
+    PATH="$PATH:/usr/lib/rpm/${vendor:-redhat}/find-requires.d:/usr/lib/rpm/${vendor:-redhat}:/usr/lib/rpm:$where/find-requires.d:$where"
     which $1
     PATH="$old_PATH"
 }
@@ -287,7 +295,7 @@ if [ -n "$kmodlist" ] ; then
     if [ -n "$tool" -a -x "$tool" ] ; then
 	echo "D: Executing: $tool" >&2
 	printf "%s\n" "${kmodlist[@]}" | \
-	$tool "${args[@]}"
+	$tool "${args[@]}" | remove_unprovided
     else
 	tool=$(which_tool "find-requires.ksyms")
 	if [ -n "$tool" -a -x "$tool" ] ; then

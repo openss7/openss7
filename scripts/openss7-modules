@@ -572,7 +572,10 @@ function fileversion(module,			pfx,kversion)
     pfx = "r: filevers,  "
     kversion = ""
     if (system("test -r \"" module "\"") == 0) {
-	command = "zcat " module " | strings | grep -m 1 '^vermagic='"
+	if (module~/\.gz/)
+	    command = "zcat " module " | strings | grep -m 1 '^vermagic='"
+	else
+	    command = "cat " module " | strings | grep -m 1 '^vermagic='"
 	while((command | getline) == 1) { sub(/=/, " "); kversion = $2 }
 	close(command)
 	if (!kversion) print_error(pfx "no vermagic for " module)
@@ -2807,7 +2810,7 @@ function add_kernels(kversion,
     pfx = "p: addkerns,  "
     if  (!kversion) {
 	command = "ls /lib/modules"
-	while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
+	while ((command | getline) == 1) { if (/^[23]\./) if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
 	close(command)
     }
     getstructure()
@@ -2859,7 +2862,7 @@ function link_modules(kversion,
     delete kinserts
     kversion = ""
     command = "ls /lib/modules"
-    while ((command | getline) == 1) { if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
+    while ((command | getline) == 1) { if (/^[23]\./) if (kversion) { kversion = kversion " " $0 } else { kversion = $0 } }
     close(command)
     link_kernels(kversion)
 }

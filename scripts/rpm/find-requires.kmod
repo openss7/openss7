@@ -40,11 +40,11 @@ BEGIN {
 	    if (set~/\/$/)
 		continue
 	    kernel = set
-	    sub("^symsets-", "", kernel)
+	    sub(/^symsets-/, "", kernel)
 	    sub(/\/.*/, "", kernel)
 	    # suse kernels need a 'flavor:' prefix in kernel() requires
 	    flavor = kernel
-	    gsub(".*-", "", flavor)
+	    gsub(/.*-/, "", flavor)
 	    if (flavor~/^(default|xen|ec2|trace)$/) {
 		flavor = flavor ":"
 	    } else {
@@ -58,11 +58,16 @@ BEGIN {
 	    sub(/^.*\./, "", hash)
 	    list = "tar -xzOf " file " " set
 	    while ((list | getline)) {
-		sub(/0x0*/, "", $1)
 		ksym = "ksym(" $2 ") = " $1
-		#if ((kernel, ksym) in symsets)
-		#    continue
 		symsets[kernel, ksym] = "kernel(" flavor class ") = " hash
+		ksym = "kernel(" $2 ") = " $1
+		symsets[kernel, ksym] = "kernel(" flavor class ") = " hash
+		if (sub(/0x0*/, "", $1)) {
+		    ksym = "ksym(" $2 ") = " $1
+		    symsets[kernel, ksym] = "kernel(" flavor class ") = " hash
+		    ksym = "kernel(" $2 ") = " $1
+		    symsets[kernel, ksym] = "kernel(" flavor class ") = " hash
+		}
 	    }
 	    close(list)
 	}
@@ -212,20 +217,25 @@ BEGIN {
 		lines[j] = lines[j] sprintf("%c", char)
 	}
     }
+    if (vermagic) { label = "kernel" } else { label = "ksym" }
     for (i = 1; i <= k; i++) {
 	if (lines[i]) {
-	    sub(/^0+/, "", lines[i])
 	    split(lines[i], fields, / /)
-	    ksym = "ksym(" fields[2] ") = " fields[1]
+	    ksym = label "(" fields[2] ") = 0x" fields[1]
+	    requires[vermagic, ksym] = 1
+	    sub(/^0+/, "", fields[1])
+	    ksym = label "(" fields[2] ") = " fields[1]
 	    requires[vermagic, ksym] = 1
 	}
     }
     nm = "objdump -t " $1 " 2>/dev/null"
     while ((nm | getline)) {
 	if (($3~/\*ABS\*/) && ($5~/^_?__crc_[^[:space:]]+/)) {
-	    sub("^0*", "", $1)
-	    sub("^_?__crc_", "", $5)
-	    ksym = "ksym(" $5 ") = " $1
+	    sub(/^_?__crc_/, "", $5)
+	    ksym = label "(" $5 ") = 0x" $1
+	    provides[vermagic, ksym] = 1
+	    sub(/^0+/, "", $1)
+	    ksym = label "(" $5 ") = " $1
 	    provides[vermagic, ksym] = 1
 	}
     }
@@ -269,7 +279,7 @@ END {
 	print "D: Kernel required due to use of non-kABI symbols" >"/dev/stderr"
 	for (kernel in kernels) {
 	    flavor = kernel
-	    gsub(".*-", "", flavor)
+	    gsub(/.*-/, "", flavor)
 	    if (flavor~/^(default|xen|ec2|trace)$/) {
 		flavor = "-" flavor
 	    } else {

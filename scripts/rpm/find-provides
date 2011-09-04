@@ -19,6 +19,13 @@ which_tool() {
     PATH="$old_PATH"
 }
 
+what_tool() {
+    old_PATH="$PATH"
+    PATH="$PATH:/usr/lib/rpm/${vendor:-redhat}/find-provides.d:/usr/lib/rpm/${vendor:-redhat}:/usr/lib/rpm:$where/find-provides.d:$where"
+    which $1
+    PATH="$old_PATH"
+}
+
 searchlist=($where /usr/lib/rpm /usr/lib/rpm/redhat)
 
 exelist=()

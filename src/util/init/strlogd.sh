@@ -51,7 +51,7 @@ pidfile="/var/run/$processname.pid"
 execfile="/usr/sbin/$processname"
 desc="the STREAMS error logger"
 
-[ -x $execfile ] || exit 0
+[ -x $execfile -o "$1" = "stop" ] || exit 5
 
 # Specify defaults
 
@@ -116,10 +116,14 @@ start() {
 }
 
 stop() {
-    echo -n "Stopping $desc: $name "
-    start-stop-daemon --stop --quiet --retry=1 --oknodo --pidfile $pidfile \
-	--exec $execfile
-    RETVAL=$?
+    if [ -r $pidfile ]; then
+	echo -n "Stopping $desc: $name "
+	start-stop-daemon --stop --quiet --retry=1 --oknodo --pidfile $pidfile \
+	    --exec $execfile
+	RETVAL=$?
+    else
+	RETVAL=0
+    fi
     if [ $RETVAL -eq 0 ] ; then
 	echo "."
     else
