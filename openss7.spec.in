@@ -124,6 +124,7 @@
 %global kernel_number %(echo %{_kversion} | sed -e 's,-.*$,,')
 %global kernel_majnum %(echo %{kernel_number} | sed -e 's,\.[^\.]*$,,')
 %global kernel_flavor %(echo %{_kversion} | sed -r -e 's,.*BOOT,-BOOT,;t;s,.*-?smp$,-smp,;t;s,.*bigmem$,-bigmem,;t;s,.*debug$,-debug,;t;s,.*kdump$,-kdump,;t;s,.*enterprise$,-enterprise,;t;s,.*hugemem$,-hugemem,;t;s,.*secure$,-secure,;t;s,.*-i686-up-4GB,-i686-up-4GB,;t;s,.*-p3-smp-4GB$,-p3-smp-4GB,;t;s,.*-64GB-SMP$,-64GB-SMP,;t;s,.*-default$,-default,;t;s,.*pae$,-pae,;t;s,.*PAE$,-PAE,;t;s,.*-tmb-desktop-.*,-tmb-desktop,;t;s,.*-tmb-desktop586-.*,-tmb-desktop586,;t;s,-tmb-laptop-.*,-tmb-laptop,;t;s,.*-tmb-server-.*,-tmb-server,;t;s,.*-vserver-.*,-vserver,;t;s,.*-xen-pvops-.*,-xen-pvops,;t;s,.*-desktop-.*,-desktop,;t;s,.*-desktop586-.*,-desktop586,;t;s,.*-server-.*,-server,;t;s,.*-netbook-.*,-netbook,;t;s,.*-linus-.*,-linus,;t;s,.*,,')
+%global kernel_symvers symvers-%{_kversion}.gz
 %global kernel_symsets symsets-%{_kversion}.tar.gz
 %global kernel_latest %((LANG_ALL="C" rpm -q --whatprovides /lib/modules/%{_kversion}/kernel | grep -v 'not owned' | sed -r -n 's,.*-([23]\..*),\\1,;T;s,^([^-]*-[0-9]*)\.[^\.]*(\..*)$,\\1\\2,p') 2>/dev/null)
 %global kernel_series %(echo %{_kversion} | sed -r -e 's,.*-tmb-(desktop|desktop586|laptop|server)-.*,-tmb,;t;s,.*-vserver-.*,-vserver,;t;s,.*-linus-.*,-linus,;t;s,.*-xen-pvops-.*,-vserver,;t;s,.*-(desktop|desktop586|netbook|server)-.*,,;t;s,.*,,')
@@ -347,9 +348,9 @@
 %endif
 
 %if %{HAVE_weakmods}
-%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
+%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/%{kernel_symvers} --qf "%%{NAME}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
 %else
-%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/symvers-%{_kversion}.gz --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
+%global target_kernel %((LANG_ALL="C" rpm -q --whatprovides /boot/%{kernel_symvers} --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
 %endif
 %global target_kdevel %((LANG_ALL="C" rpm -q --whatprovides `(cd %{_kmoduledir}/build; /bin/pwd)` --qf "%%{NAME} = %%{VERSION}-%%{RELEASE}\\n" | grep -v 'not owned' | tail -1) 2>/dev/null)
 
@@ -372,7 +373,7 @@
 %global HAVE_rhatkmps 0
 %endif
 
-%if %(if (rpm -q --whatprovides /boot/symvers-%{_kversion}.gz >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
+%if %(if (rpm -q --whatprovides /boot/%{kernel_symvers} >/dev/null 2>&1) ; then echo 1; else echo 0; fi)
 %global NEED_symvers        0
 %endif
 
@@ -2699,7 +2700,7 @@ cp -p System.symvers $d
 cp -p Module.symvers $d
 cp -p Modules.map $d
 # create symbol versions file
-cat System.symvers Module.symvers | gzip > $d/symvers-%{_kversion}.gz
+cat System.symvers Module.symvers | gzip > $d/%{kernel_symvers}
 # copy in symbol sets file
 cp -p %{kernel_symsets} $d
 # copy in symbol sets file to boot directory as well
@@ -5220,7 +5221,7 @@ if [ $1 -eq 1 -o $1 -eq 1 ] ; then : # fresh install or upgrade
 %endif
 %if %{NEED_symvers}
     f=%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers
-    t=/boot/symvers-%{_kversion}.gz
+    t=/boot/%{kernel_symvers}
     if [ ! -r $t -a -r $f ] ; then
 	gzip -c $f > $t || :
     fi
@@ -5379,6 +5380,7 @@ fi
 %{?files_newmods:%{_kmoduledir}/%{_ksubdir}/*.ko*}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.symvers}
+%{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symvers}}
 %endif
 
 # ===========================================================================
@@ -5567,6 +5569,7 @@ fi
 %{?files_mkvars:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{cache_file}}
 #{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/System.symvers}
 #{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Module.symvers}
+#{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symvers}}
 #{?files_symvers:/boot/%{kernel_symsets}}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/%{kernel_symsets}}
 %{?files_symvers:%{_usrsrc}/%{name}-%{baseversion}-%{specrelease}/%{_kversion}/Modules.map}

@@ -34,8 +34,6 @@ bld_cv_pkg_cmd_RPM=${bld_cv_pkg_cmd_RPM='zypper install rpm'}
 bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='zypper install coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='zypper install coreutils'}
 bld_cv_pkg_cmd_SOELIM=${bld_cv_pkg_cmd_SOELIM='zypper install groff'}
-bld_cv_pkg_cmd_SYMSETS_2_6_32_12_0_7_DEFAULT_TAR_GZ=${bld_cv_pkg_cmd_SYMSETS_2_6_32_12_0_7_DEFAULT_TAR_GZ='zypper install kernel-default-devel'}
-bld_cv_pkg_cmd_SYMVERS_2_6_32_12_0_7_DEFAULT_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_32_12_0_7_DEFAULT_GZ='zypper install kernel-default-base'}
 bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='zypper install tcl-devel'}
 bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H='zypper install net-snmp-devel'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='zypper install zip'}
@@ -75,16 +73,14 @@ bld_cv_pkg_name_RPM=${bld_cv_pkg_name_RPM=rpm}
 bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
 bld_cv_pkg_name_SOELIM=${bld_cv_pkg_name_SOELIM=groff}
-bld_cv_pkg_name_SYMSETS_2_6_32_12_0_7_DEFAULT_TAR_GZ=${bld_cv_pkg_name_SYMSETS_2_6_32_12_0_7_DEFAULT_TAR_GZ=kernel-default-devel}
-bld_cv_pkg_name_SYMVERS_2_6_32_12_0_7_DEFAULT_GZ=${bld_cv_pkg_name_SYMVERS_2_6_32_12_0_7_DEFAULT_GZ=kernel-default-base}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl-devel}
 bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=net-snmp-devel}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib/perl5/5.10.0/x86_64-linux-thread-multi/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.3/gcj/cni.h}
-bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/lib/modules/2.6.32.12-0.7-default/build/Module.symvers}
-bld_cv_pkg_path_SYMSETS_2_6_32_12_0_7_DEFAULT_TAR_GZ=${bld_cv_pkg_path_SYMSETS_2_6_32_12_0_7_DEFAULT_TAR_GZ=/boot/symsets-2.6.32.12-0.7-default.tar.gz}
-bld_cv_pkg_path_SYMVERS_2_6_32_12_0_7_DEFAULT_GZ=${bld_cv_pkg_path_SYMVERS_2_6_32_12_0_7_DEFAULT_GZ=/boot/symvers-2.6.32.12-0.7-default.gz}
+bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/lib/modules/2.6.32.27-0.2-default/build/Module.symvers}
+bld_cv_pkg_path_SYMSETS_2_6_32_27_0_2_DEFAULT_TAR_GZ=${bld_cv_pkg_path_SYMSETS_2_6_32_27_0_2_DEFAULT_TAR_GZ=/symsets-2.6.32.27-0.2-default.tar.gz}
+bld_cv_pkg_path_SYMVERS_2_6_32_27_0_2_DEFAULT_GZ=${bld_cv_pkg_path_SYMVERS_2_6_32_27_0_2_DEFAULT_GZ=/symvers-2.6.32.27-0.2-default.gz}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
 bld_cv_pkg_prog_AUTOM4TE=${bld_cv_pkg_prog_AUTOM4TE=autom4te}
@@ -158,7 +154,7 @@ bld_cv_pkg_ver_GZIP_CMD=${bld_cv_pkg_ver_GZIP_CMD=1.3.12}
 bld_cv_pkg_ver_JAR=${bld_cv_pkg_ver_JAR=0.95}
 bld_cv_pkg_ver_JARSIGNER=${bld_cv_pkg_ver_JARSIGNER=4.3.4_20091019}
 bld_cv_pkg_ver_KEYTOOL=${bld_cv_pkg_ver_KEYTOOL=4.3.4_20091019}
-bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=2.6.32.12}
+bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=2.6.32.27}
 bld_cv_pkg_ver_LATEX2HTML=${bld_cv_pkg_ver_LATEX2HTML=2002.2.1}
 bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.11.1}
 bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.11.1}
@@ -167,7 +163,7 @@ bld_cv_pkg_ver_MAKEWHATIS=${bld_cv_pkg_ver_MAKEWHATIS=2.5.2}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=6.12}
 bld_cv_pkg_ver_MODIFYREPO=${bld_cv_pkg_ver_MODIFYREPO=0.4.11}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.11.1}
-bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=2.6.32.12}
+bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=2.6.32.27}
 bld_cv_pkg_ver_PIC=${bld_cv_pkg_ver_PIC=1.18.1.1}
 bld_cv_pkg_ver_PS2EPSI=${bld_cv_pkg_ver_PS2EPSI=8.62}
 bld_cv_pkg_ver_PS2PDF=${bld_cv_pkg_ver_PS2PDF=8.62}
@@ -176,8 +172,6 @@ bld_cv_pkg_ver_RPM=${bld_cv_pkg_ver_RPM=4.4.2.3}
 bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=6.12}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=6.12}
 bld_cv_pkg_ver_SOELIM=${bld_cv_pkg_ver_SOELIM=1.18.1.1}
-bld_cv_pkg_ver_SYMSETS_2_6_32_12_0_7_DEFAULT_TAR_GZ=${bld_cv_pkg_ver_SYMSETS_2_6_32_12_0_7_DEFAULT_TAR_GZ=2.6.32.12}
-bld_cv_pkg_ver_SYMVERS_2_6_32_12_0_7_DEFAULT_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_32_12_0_7_DEFAULT_GZ=2.6.32.12}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.5.5}
 bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.4.2.1}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=2.32}
