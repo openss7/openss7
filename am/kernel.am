@@ -363,7 +363,7 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 	@$(ECHO_V) "D: Making $@ in `pwd`"
 	@$(NORMAL_INSTALL)
 	$(mkinstalldirs) $(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)
-	$(mkinstalldirs) $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)
+	$(mkinstalldirs) $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)/$(kversion)
 	some=no ; \
 	list=` $(ECHO) " $(KERNEL_MODULES) " | sed -r -e 's| [^[:space:]]*/| $(kpre)|g;s| lib[^[:space:]]*_a-| $(kpre)|g;s|\.(k)?o(\.gz)? |$(kext) |g'` ; \
 	if test -n "$(INSTALL_STRIP_FLAG)" -a -n "$(STRIP_KERNEL_MODULES)" ; then \
@@ -401,8 +401,8 @@ install-modules: $(KERNEL_MODULES) $(KERNEL_AUX_FILES)
 		list='$(KERNEL_AUX_FILES)' ; for f in $$list ; do \
 			if test -f $$f ; then \
 				b=`basename $$f` ; \
-				$(ECHO) "$(INSTALL) -m 644 $$f $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)/$$b" ; \
-				$(INSTALL) -m 644 $$f $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)/$$b ; \
+				$(ECHO) "$(INSTALL) -m 644 $$f $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)/$(kversion)/$$b" ; \
+				$(INSTALL) -m 644 $$f $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)/$(kversion)/$$b ; \
 			fi ; \
 		done ; \
 	fi
@@ -683,15 +683,15 @@ post-depmod:
 endif
 
 ##
-# Pull the trick of linking /usr/src/PACKAGE_TARNAME to the source directory on autoconf installs.
+# Pull the trick of linking /usr/src/PACKAGE to the source directory on autoconf installs.
 # For rpm and debian installs, $(DESTDIR)$(rootdir)/usr/src does not exist (yet) in the rpm build
 # directory, so this symbolic link is not made.
 ##
 post-source:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test -d $(DESTDIR)$(rootdir)/usr/src || exit 0 ; \
-	$(ECHO) "$(LN_S) -fn `(cd $(srcdir); pwd)` $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)" ; \
-	$(LN_S) -fn `(cd $(srcdir); pwd)` $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)
+	@test -z "$(DESTDIR)$(rootdir)" || exit 0 ; \
+	$(ECHO) "$(LN_S) -fn `(cd $(srcdir); pwd)` $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)" ; \
+	$(LN_S) -fn `(cd $(srcdir); pwd)` $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)
 
 ##
 # The post deprecated target checks for a configured target directory and the existence of the
@@ -741,10 +741,10 @@ uninstall-modules:
 	done
 	@list='$(KERNEL_AUX_FILES)' ; for f in $$list ; do \
 		b=`basename $$f` ; \
-		echo "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)/$$b" ; \
+		echo "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)/$(kversion)/$$b" ; \
 	done | $(am__base_remove)
 	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(kmoduledir)/$(KERNEL_SUBDIR)" || :
-	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)/$(kversion)" || : 
+	rmdir --ignore-fail-on-non-empty "$(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)/$(kversion)" || : 
 
 uninstall-modconf:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
@@ -858,9 +858,9 @@ endif
 
 postun-source:
 	@$(ECHO_V) "D: Making $@ in `pwd`"
-	@test -L $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME) || exit 0 ; \
-	$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)" ; \
-	rm -f -- $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE_TARNAME)
+	@test -L $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA) || exit 0 ; \
+	$(ECHO) "rm -f -- $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)" ; \
+	rm -f -- $(DESTDIR)$(rootdir)/usr/src/$(PACKAGE)-$(VERSION)-$(PACKAGE_RPMRELEASE)$(PACKAGE_RPMEXTRA)
 
 ##
 # If we moved the deprecated lksctp module on install, we move it back on uninstall.
