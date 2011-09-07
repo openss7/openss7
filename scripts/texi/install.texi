@@ -1164,6 +1164,7 @@ The build host requires the following GNU tools:
 @item @tab @bullet{} @command{bison 2.5}
 @item @tab @bullet{} @command{swig 2.0.4}
 @item @tab @bullet{} @command{autobuild 5.3}
+@item @tab @bullet{} @command{xz-5.0.3}
 @end multitable
 
 Most desktop development GNU/Linux distributions will have these tools; however, some non-development
@@ -1184,6 +1185,7 @@ software directory, and also at the following locations:
 @item @url{http://www.openss7.org/tarballs/bison-2.5.tar.bz2,bison-2.5}
 @item @url{http://www.openss7.org/tarballs/swig-2.0.4.tar.bz2,swig-2.0.4}
 @item @url{http://www.openss7.org/tarballs/autobuild-5.3.tar.gz,autobuild-5.3}
+@item @url{http://www.openss7.org/tarballs/xz-5.0.3.tar.bz2,xz-5.0.3}
 @end itemize
 
 It should be stressed that, in particular, the @manpage{autoconf(1)}, and @manpage{automake(1)},
