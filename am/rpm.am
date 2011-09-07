@@ -1574,18 +1574,6 @@ release-update-yum:
 					rmdir -pv -- $$dir || : ; \
 				fi ; \
 			else \
-				f="$$dir/repodata/repomd.xml" ; \
-				if test -f $$f ; then a="$$f.asc" ; k="$$f.key" ; \
-					if test ! -f $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1 ; then \
-						test ! -f $$a || $(ECHO) "  D: gpg BAD $$a" ; \
-						$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
-						eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
-						$(ECHO) "  $(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
-						$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k; \
-					else \
-						$(ECHO) "  D: gpg OK  $$a" ; \
-					fi ; \
-				fi ; \
 				$(ECHO) "  D: $@: generating $$dir/repodata/susedata.xml" ; \
 				( \
 					numb="`echo "$$rpms" | wc -l`" ; \
@@ -1725,6 +1713,18 @@ release-update-yum:
 				( cd $$dir/repodata ; ls -t *-products.xml 2>/dev/null | head -1 | if read f ; then ln -sf $$f products.xml ; fi ) ; \
 				$(ECHO) "    rm -f -- products.xml" ; \
 				rm -f -- products.xml ; \
+				f="$$dir/repodata/repomd.xml" ; \
+				if test -f $$f ; then a="$$f.asc" ; k="$$f.key" ; \
+					if test ! -f $$a || ! $(GPG) --verify -- $$a >/dev/null 2>&1 ; then \
+						test ! -f $$a || $(ECHO) "  D: gpg BAD $$a" ; \
+						$(ECHO) "  $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+						eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f >$$a 2>/dev/null"; \
+						$(ECHO) "  $(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k"; \
+						$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$k; \
+					else \
+						$(ECHO) "  D: gpg OK  $$a" ; \
+					fi ; \
+				fi ; \
 			fi ; \
 		done ; \
 		if test $${empty_subrepo:-yes} = no ; then \
