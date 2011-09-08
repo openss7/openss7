@@ -110,6 +110,7 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 		    (8|9|10)	ap_cv_distribution="SLES$dist_cv_host_release"	;;
 		    (*)		ap_cv_distribution="SuSE$dist_cv_host_release"	;;
 		esac ;;
+	    (openSUSE)	 ap_cv_distribution="openSUSE$dist_cv_host_release" ;;
 	    (sles)	 ap_cv_distribution="SLES$dist_cv_host_release"	    ;;
 	    (sled)	 ap_cv_distribution="SLED$dist_cv_host_release"	    ;;
 	    (sle)	 ap_cv_distribution="SLE$dist_cv_host_release"	    ;;

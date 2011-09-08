@@ -395,7 +395,7 @@
 
 	unless ( $hostgrps ) 
 	{
-	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
+	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|openSUSE)$/ ) ? 'zypp' : 'yum';
 	       $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
 	       $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
 	    my @hostgrps = ( 'hosts' );
@@ -486,7 +486,7 @@ xml-info=1
 	{
 	    for $subrep ( @subrepos )
 	    {
-		my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
+		my $manage = ( $distro =~ m/^(sle|sles|sled|suse|openSUSE)$/ ) ? 'zypp' : 'yum';
 		   $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
 		   $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
 		my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes|puias|oracle|scientific|lts)$/ ) ? 'enterprise' : 'community';
@@ -1012,7 +1012,7 @@ repostoenable =<% $toenable %>
 
 	    ($distro,$relver,$osarch,$branch,$subrep) = @fields;
 
-	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
+	    my $manage = ( $distro =~ m/^(sle|sles|sled|suse|openSUSE)$/ ) ? 'zypp' : 'yum';
 	       $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
 	       $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
 	    my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes|puias|oracle|scientific|lts)$/ ) ? 'enterprise' : 'community';
@@ -1083,7 +1083,7 @@ repostoenable =<% $toenable %>
 	$branch = 'base' if ($branch eq '');
 	$subrep = 'full' if ($subrep eq '');
 
-	my $manage = ( $distro =~ m/^(sle|sles|sled|suse|opensuse)$/ ) ? 'zypp' : 'yum';
+	my $manage = ( $distro =~ m/^(sle|sles|sled|suse|openSUSE)$/ ) ? 'zypp' : 'yum';
 	   $manage = ( $distro =~ m/^(mageia|mandriva|mandrake|mes)$/ ) ? 'urpm' : $manage;
 	   $manage = ( $distro =~ m/^(debian|ubuntu|lts|mint)$/ ) ? 'apt' : $manage;
 	my $enterp = ( $distro =~ m/^(sle|sles|sled|rhel|centos|mes|puias|oracle|scientific|lts)$/ ) ? 'enterprise' : 'community';

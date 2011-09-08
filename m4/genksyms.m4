@@ -343,13 +343,13 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
     AC_SUBST([UPDATES])dnl
     AC_CACHE_CHECK([for updates options], [ksyms_cv_updates_options], [dnl
 	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|fedora)
+	    (oracle|puias|centos|lineox|whitebox|scientific|redhat)
 		ksyms_cv_updates_options='--style=redhat' ;;
-	    (suse|opensuse|sles|sled)
+	    (suse)
 		ksyms_cv_updates_options='--style=suse11' ;;
-	    (ubuntu|lts)
+	    (ubuntu|mint)
 		ksyms_cv_updates_options='--style=ubuntu' ;;
-	    (debian|mandrake|mandriva|manbo|mageia|mes|*)
+	    (debian|mandrake|mandriva|mageia|*)
 		ksyms_cv_updates_options='--style=debian' ;;
 	esac])
     UPDATES_OPTIONS="${ksyms_cv_updates_options:+ $ksyms_cv_updates_options}"
@@ -399,7 +399,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 		    fi
 		    ksyms_cv_updates_directory=/etc/kernel
 		    ;;
-		(redhat|rhel|fedora|oracle|puias|centos|scientific|lineox|whitebox)
+		(redhat|oracle|puias|centos|scientific|lineox|whitebox)
 		    if test -z "${DESTDIR}${rootdir}" ; then
 			AC_MSG_WARN([
 ***
@@ -411,9 +411,9 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 		    fi
 		    ksyms_cv_updates_directory=/etc/kernel
 		    ;;
-		(sles|sled|sle|suse|opensuse)
+		(suse)
 		    ;;
-		(mandrake|mandriva|manbo|mageia|mes)
+		(mandrake|mandriva|mageia)
 		    ;;
 		(*) if test -x "${DESTDIR}${rootdir}/sbin/new-kernel-pkg" ; then
 			if test -z "${DESTDIR}${rootdir}" ; then

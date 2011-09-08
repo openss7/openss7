@@ -219,6 +219,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	(*Mageia*|*MAGEIA*)				echo 'mageia'	  ;;
 	(*Red?Hat?Enterprise*)				echo 'rhel'	  ;;
 	(*Red?Hat*|*RED?HAT*)				echo 'redhat'	  ;;
+	(*openSUSE*|*openSuSE*)				echo 'openSUSE'	  ;;
 	(*SUSE?Linux?Enterprise?Server*)		echo 'sles'	  ;;
 	(*SUSE?Linux?Enterprise?Desktop*)		echo 'sled'	  ;;
 	(*SUSE?Linux?Enterprise*)			echo 'sle'	  ;;
@@ -260,7 +261,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	fi
     ])
     AC_CACHE_CHECK([for build distro], [dist_cv_build_distro], [dnl
-	dist_cv_build_distro=`echo "${dist_cv_build_flavor:-unknown}" | sed -r 's,^sle[[ds]]$$,sle,;s,^opensuse$$,suse,'`
+	dist_cv_build_distro=`echo "${dist_cv_build_flavor:-unknown}" | sed -r 's,^sle[[ds]]$$,sle,'`
     ])
     AC_REQUIRE_SHELL_FN([dist_get_vendor],
 	[AS_FUNCTION_DESCRIBE([dist_get_vendor], [STRING], [Checks the string for linux distribution
@@ -277,7 +278,7 @@ dnl AC_MSG_WARN([checking for vendor in $[1]])
 	(mandriva|manbo|mes)		echo 'mandriva'	  ;;
 	(mageia)			echo 'mageia'	  ;;
 	(fedora|redhat|rhel)		echo 'redhat'	  ;;
-	(suse|sle|sles|sled|opensuse)	echo 'suse'	  ;;
+	(suse|sle|sles|sled|openSUSE)	echo 'suse'	  ;;
 	(debian)			echo 'debian'	  ;;
 	(ubuntu|lts)			echo 'ubuntu'	  ;;
 	(unknown)			echo 'pc'	  ;;
@@ -351,6 +352,7 @@ dnl AC_MSG_WARN([checking for distrib in $[1]])
 	(sle)		echo 'SUSE Linux Enterprise' ;;
 	(sles)		echo 'SUSE Linux Enterprise Server' ;;
 	(sled)		echo 'SUSE Linux Enterprise Desktop' ;;
+	(openSUSE)	echo 'openSUSE' ;;
 	(debian)	echo 'Debian GNU/Linux' ;;
 	(lts)		echo 'Ubuntu LTS' ;;
 	(ubuntu)	echo 'Ubuntu' ;;
@@ -421,7 +423,7 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
 	    (oracle|puias|centos|lineox|whitebox|scientific|rhel|sle)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,\..*[$],,'` ;;
-	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat)
+	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat|openSUSE)
 		dist_tmp="${dist_cv_build_release}" ;;
 	    (debian|ubuntu|lts|*)
 		dist_tmp="${dist_cv_build_codename}" ;;
@@ -559,7 +561,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	# cannot get host flavor using build system compiler
     ])
     AC_CACHE_CHECK([for host distro], [dist_cv_host_distro], [dnl
-	dist_cv_host_distro=`echo "${dist_cv_host_flavor:-unknown}" | sed -r 's,^sle[[ds]]$$,sle,;s,^opensuse$$,suse,'`
+	dist_cv_host_distro=`echo "${dist_cv_host_flavor:-unknown}" | sed -r 's,^sle[[ds]]$$,sle,'`
     ])
     AC_CACHE_CHECK([for dist host vendor], [dist_cv_host_vendor], [dnl
 	dist_cv_host_vendor=$(dist_get_vendor "${dist_cv_host_flavor:-unknown}")
@@ -655,7 +657,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
 	    (oracle|puias|centos|lineox|whitebox|scientific|rhel|sle)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,\..*[$],,'` ;;
-	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat)
+	    (fedora|mandrake|mandriva|manbo|mageia|mes|redhat|openSUSE)
 		dist_tmp="${dist_cv_host_release}" ;;
 	    (debian|ubuntu|lts|*)
 		dist_tmp="${dist_cv_host_codename}" ;;
@@ -724,7 +726,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     case "$build_vendor" in
 	(oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian)  
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
-	(mandrake|mandriva|manbo|mageia|mes|ubuntu|lts)  
+	(mandrake|mandriva|mageia|ubuntu)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
     esac
     build_arch="${dist_cv_build_arch:-unknown}"
@@ -750,7 +752,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$host_vendor" in
 	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian)  
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
-	    (mandrake|mandriva|manbo|mageia|mes|ubuntu|lts)  
+	    (mandrake|mandriva|mageia|ubuntu)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
 	esac
 	host_arch="${dist_cv_host_arch:-unknown}"
@@ -774,7 +776,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
 	case "$target_vendor" in
 	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian)  
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
-	    (mandrake|mandriva|manbo|mageia|mes|ubuntu|lts)  
+	    (mandrake|mandriva|mageia|ubuntu)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;
 	esac
     fi

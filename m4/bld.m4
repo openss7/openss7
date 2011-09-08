@@ -157,15 +157,15 @@ AC_DEFUN([_BLD_PROG_CHECK],
     test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
     tmp_result=
     if test -n "$tmp_cmd" ; then
-	case "$build_distro" in
+	case "$target_vendor" in
 dnl These use rpm
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
 		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
 dnl These use dpkg
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 dnl		dlocate is much faster than dpkg and dpkg-query
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
@@ -184,15 +184,15 @@ dnl		dlocate is much faster than dpkg and dpkg-query
     fi
     tmp_result=
     if test -n "$tmp_cmd" ; then
-	case "$build_distro" in
+	case "$target_vendor" in
 dnl These use rpm
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
 		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
 dnl These use dpkg
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 dnl		dlocate is much faster than dpkg and dpkg-query
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
@@ -222,7 +222,7 @@ dnl		dlocate is much faster than dpkg and dpkg-query
 	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|rhel)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"yum install \$tmp_result\""
 		;;
-	    (suse|sle)
+	    (suse|sle|openSUSE)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"zypper install \$tmp_result\""
 		;;
 	    (redhat)
@@ -270,13 +270,13 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     tmp_pn=`echo "$tmp_pn" | sed -e 's,[[^A-Z0-9_]],_,g'`
     tmp_result=
     if test -n "$tmp_path"; then
-	case "$build_distro" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	case "$target_vendor" in
+	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
 		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
 		else dlocate=dpkg;    term=
@@ -294,13 +294,13 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     fi
     tmp_result=
     if test -n "$tmp_path" ; then
-	case "$build_distro" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	case "$target_vendor" in
+	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
 		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
 		else dlocate=dpkg;    term=
@@ -329,7 +329,7 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|rhel)
 		eval "bld_cv_pkg_cmd_${tmp_pn}=\"yum install \$tmp_result\""
 		;;
-	    (suse|sle)
+	    (suse|sle|openSUSE)
 		eval "bld_cv_pkg_cmd_${tmp_pn}=\"zypper install \$tmp_result\""
 		;;
 	    (redhat)
@@ -377,13 +377,13 @@ AC_DEFUN([_BLD_FILE_CHECK],
     test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
     tmp_result=
     if test -n "$tmp_file"; then
-	case "$build_distro" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	case "$target_vendor" in
+	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
 		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
 		else dlocate=dpkg;    term=
@@ -401,13 +401,13 @@ AC_DEFUN([_BLD_FILE_CHECK],
     fi
     tmp_result=
     if test -n "$tmp_file" ; then
-	case "$build_distro" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|suse|sle|redhat|rhel|mandrake|mandriva|manbo|mageia|mes)
+	case "$target_vendor" in
+	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
 		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
 		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
 		;;
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		if which dlocate >/dev/null 2>&1
 		then dlocate=dlocate; term='$'
 		else dlocate=dpkg;    term=
@@ -436,7 +436,7 @@ AC_DEFUN([_BLD_FILE_CHECK],
 	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|rhel)
 		eval "bld_cv_pkg_cmd_${tmp_fn}=\"yum install \$tmp_result\""
 		;;
-	    (suse|sle)
+	    (suse|sle|openSUSE)
 		eval "bld_cv_pkg_cmd_${tmp_fn}=\"zypper install \$tmp_result\""
 		;;
 	    (redhat)

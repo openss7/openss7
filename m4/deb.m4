@@ -311,7 +311,7 @@ dnl
 	    [build debs @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)	enable_debs=yes ;;
+	    (debian|ubuntu|mint)	enable_debs=yes ;;
 	    (*)				enabel_debs=no	;;
 	esac])
     AC_ARG_ENABLE([dscs],
@@ -319,14 +319,14 @@ dnl
 	    [build dscs @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)	enable_dscs=yes	;;
+	    (debian|ubuntu|mint)	enable_dscs=yes	;;
 	    (*)				enable_dscs=no	;;
 	esac])
     AC_ARG_VAR([DPKG],
 	       [dpkg command. @<:@default=dpkg@:>@])
     _BLD_PATH_PROG([DPKG], [dpkg], [${am_missing3_run}dpkg], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg program in PATH.]) ;;
 	    (*) enable_debs=no; enable_dscs=no ;;
 	esac])
@@ -334,7 +334,7 @@ dnl
 	       [dpkg-architecture command. @<:@default=dpkg-architecture@:>@])
     _BLD_PATH_PROG([DPKG_ARCHITECTURE], [dpkg-architecture], [${am_missing3_run}dpkg-architecture], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-architecture program in PATH.]) ;;
 	    (*) enable_debs=no; enable_dscs=no ;;
 	esac])
@@ -342,7 +342,7 @@ dnl
 	       [dpkg-buildflags command. @<:@default=dpkg-buildflags@:>@])
     _BLD_PATH_PROG([DPKG_BUILDFLAGS], [dpkg-buildflags], [${am_missing3_run}dpkg-buildflags], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-buildflags program in PATH.]) ;;
 	    (*) enable_debs=no; enable_dscs=no ;;
 	esac])
@@ -350,7 +350,7 @@ dnl
 	       [dpkg-genchanges command. @<:@default=dpkg-genchanges@:>@])
     _BLD_PATH_PROG([DPKG_GENCHANGES], [dpkg-genchanges], [${am_missing3_run}dpkg-genchanges], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-genchanges program in PATH.]) ;;
 	    (*) enable_debs=no; enable_dscs=no ;;
 	esac])
@@ -358,7 +358,7 @@ dnl
 	       [dpkg-source command. @<:@default=dpkg-source@:>@])
     _BLD_PATH_PROG([DPKG_SOURCE], [dpkg-source], [${am_missing3_run}dpkg-source], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-source program in PATH.]) ;;
 	    (*) enable_dscs=no ;;
 	esac])
@@ -366,7 +366,7 @@ dnl
 	       [dpkg-buildpackage command. @<:@default=dpkg-buildpackage@:>@])
     _BLD_PATH_PROG([DPKG_BUILDPACKAGE], [dpkg-buildpackage], [${am_missing3_run}dpkg-buildpackage], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)
+	    (debian|ubuntu|mint)
 		AC_MSG_WARN([Cannot find dpkg-buildpackage program in PATH.]) ;;
 	    (*) enable_debs=no ;;
 	esac])
@@ -457,7 +457,7 @@ AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
     _BLD_PATH_PROG([APT_FTPARCHIVE], [apt-ftparchive], [${am_missing3_run}apt-ftparchive], [$tmp_path], [dnl
 	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(debian|ubuntu|lts|mint)
+		(debian|ubuntu|mint)
 		    _BLD_INSTALL_WARN([APT_FTPARCHIVE], [
 *** 
 *** Configure could not find a suitable tool for creating APT
@@ -481,7 +481,7 @@ AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
     _BLD_PATH_PROG([DPKG_SCANSOURCES], [dpkg-scansources], [${am_missing3_run}dpkg-scansources], [$tmp_path], [dnl
 	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(debian|ubuntu|lts|mint)
+		(debian|ubuntu|mint)
 		    _BLD_INSTALL_WARN([DPKG_SCANSOURCES], [
 *** 
 *** Configure could not find a suitable tool for creating APT source
@@ -505,7 +505,7 @@ AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
     _BLD_PATH_PROG([DPKG_SCANPACKAGES], [dpkg-scanpackages], [${am_missing3_run}dpkg-scanpackages], [$tmp_path], [dnl
 	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(debian|ubuntu|lts|mint)
+		(debian|ubuntu|mint)
 		    _BLD_INSTALL_WARN([DPKG_SCANPACKAGES], [
 *** 
 *** Configure could not find a suitable tool for creating APT binary
@@ -529,7 +529,7 @@ AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
     _BLD_PATH_PROG([DPKG_DEB], [dpkg-deb], [${am_missing3_run}dpkg-deb], [$tmp_path], [dnl
 	if test ":$deb_cv_debs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(debian|ubuntu|lts|mint)
+		(debian|ubuntu|mint)
 		    _BLD_INSTALL_ERROR([DPKG_DEB], [
 *** 
 *** Configure could not find a suitable tool for examining APT binary
