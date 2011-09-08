@@ -714,7 +714,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		esac
 		linux_cv_k_base=`echo "$kversion" | sed -r -e s/$linux_cv_k_boot$// -e s/-$//`
 		;;
-	    (mandriva|manbo|mageia|mes)
+	    (mandriva|mageia)
 		case "${kversion}" in
 		    # mandriva boot kernels (not needed for kernel.h)
 		    (*-rsbac-desktop586-*)  linux_cv_k_boot='rsbac-desktop586'	;;
@@ -749,7 +749,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		esac
 		linux_cv_k_base=`echo "$kversion" | sed -r -e s/-$linux_cv_k_boot$//`
 		;;
-	    (debian|ubuntu|lts)
+	    (debian|ubuntu|mint)
 		case "${kversion}" in
 		    # debian boot kernels
 		    (*)		    linux_cv_k_boot=		;;
@@ -881,7 +881,7 @@ dnl ***
 dnl *** ])
 dnl 			fi
 dnl 			;;
-dnl 		    (mandrake|mandriva|manbo|mageia|mes)
+dnl 		    (mandrake|mandriva|mageia)
 dnl 			;;
 dnl 		    (*)
 dnl 			;;
@@ -1302,9 +1302,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    case "$target_vendor" in
-			(mandrake|mandriva|manbo|mageia|mes)
+			(mandrake|mandriva|mageia)
 			    ;;
-			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
+			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1413,14 +1413,14 @@ dnl
 			;;
 		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
 			case "$target_vendor" in
-			    (mandrake|mandriva|manbo|mageia|mes)
+			    (mandrake|mandriva|mageia)
 dnl
 dnl				Mandrakelinux blends the debian architecture name in the kernel
 dnl				image name approach with the Redhat kernel version number in the
 dnl				kernel image name approach to yeild reliable system map files.
 dnl
 				;;
-			    (redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
+			    (redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 dnl
 dnl				Unfortunately the redhat system map files are unreliable because the
 dnl				are not unique for each architecture.  The system map file has to be
@@ -1521,9 +1521,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 		if test ${linux_cv_k_versions:-no} != no -a ${linux_cv_k_modversions:-no} != no ; then
 		    case "$target_vendor" in
 			# debian based systems do not have this file
-			(debian:*|ubuntu:*|lts:*|mint:*)
+			(debian|ubuntu|mint)
 			    ;;
-			(oracle|puias|centos|lineox|whitebox|scientific|fedora|redhat|rhel|suse|sle|sles|sled|opensuse)
+			(oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|*)
 			    tmp_fn="symvers-${kversion}.gz"
 			    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 			    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
@@ -1561,9 +1561,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    case "$target_vendor" in
-			(mandrake|mandriva|manbo|mageia|mes)
+			(mandrake|mandriva|mageia)
 			    ;;
-			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
+			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1611,7 +1611,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
 	    if test ${linux_cv_k_ko_modules:-no} != no ; then
 		if test ${linux_cv_k_versions:-no} != no -a ${linux_cv_k_modversions:-no} != no ; then
 		    case "$target_vendor:$target_edition" in
-			(redhat:[45]|oracle:[45]|puias:[45]|centos:[45]|whitebox:[45]|scientific:[45])
+			(redhat:[[45]]|oracle:[[45]]|puias:[[45]]|centos:[[45]]|whitebox:[[45]]|scientific:[[45]])
 			    _BLD_INSTALL_WARN([MODULE_KABI], [
 *** 
 *** Configure could not find the module kABI file for kernel version
@@ -1647,9 +1647,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODABI], [dnl
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    case "$target_vendor" in
-			(mandrake|mandriva|manbo|mageia|mes)
+			(mandrake|mandriva|mageia)
 			    ;;
-			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
+			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1698,8 +1698,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 	    if test ${linux_cv_k_ko_modules:-no} != no ; then
 		if test ${linux_cv_k_versions:-no} != no -a ${linux_cv_k_modversions:-no} != no ; then
 		    case "$target_vendor:$target_edition" in
-			(oracle:[345]:puias:[345]|centos:[345]|lineox:[345]|whitebox:[345]|scientific:[345]|fedora:*|redhat:[345]|rhel:[345]|\
-			 suse:9|suse:1[012]|sle:9|sle:1[012]|sles:9|sles:1[012]|sled:9|sled:1[012]|opensuse:9|opensuse:1[012])
+			(oracle:[[345]]:puias:[[345]]|centos:[[345]]|lineox:[[345]]|whitebox:[[345]]|scientific:[[345]]|redhat:[[345]]|suse:9*|suse:1[[012]]*)
 			    tmp_fn="symsets-${kversion}.tar.gz"
 			    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 			    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
@@ -1724,7 +1723,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 *** ])
 			    ;;
 			# debian and some rpm based systems do not have this file
-			(debian:*|ubuntu:*|lts:*|mint:*|mandrake:*|mandriva:*|manbo:*|mageia:*|mes:*|*)
+			(debian:*|ubuntu:*|mint:*|mandrake:*|mandriva:*|mageia:*|*)
 			    ;;
 		    esac
 		    PACKAGE_RPMOPTIONS="${PACKAGE_RPMOPTIONS:+$PACKAGE_RPMOPTIONS }--define \"_without_k_symsets --without-k-symsets\""
@@ -1740,9 +1739,9 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMSETS], [dnl
 		    ;;
 		(*/boot/*|*/usr/src/*|*/lib/modules/*)
 		    case "$target_vendor" in
-			(mandrake|mandriva|manbo|mageia|mes)
+			(mandrake|mandriva|mageia)
 			    ;;
-			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|lts|suse|*)
+			(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
 			    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
@@ -1787,7 +1786,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_KABI], [dnl
 	    ${DESTDIR}/lib/modules/kabi/kabi_whitelist_${karch}], [no], [dnl
 	if test ${with_kabi_whitelist:-search} != no ; then
 	    case "$target_vendor:$target_edition" in
-		(redhat:6|oracle:6|puias:6|centos:6|scientific:6)
+		(redhat:[[67]]*|oracle:[[67]]*|puias:[[67]]*|centos:[[67]]*|scientific:[[67]]*)
 		    tmp_fn="kabi_whitelist_${karch}"
 		    tmp_fn=`echo "$tmp_fn" | sed -e 'y/abcdefghijklmnopqrstuvwxyz/ABCDEFGHIJKLMNOPQRSTUVWXYZ/'`
 		    tmp_fn=`echo "$tmp_fn" | sed -e 's,[[^A-Z0-9_]],_,g'`
@@ -2414,12 +2413,12 @@ dnl
     fi
     AC_SUBST([krelease])
     case "$target_vendor-$kmajor.$kminor" in
-	(debian-2.4|ubuntu-2.4|lts-2.4)
+	(debian-2.4|ubuntu-2.4|mint-2.4)
 	    kernel_image="kernel-image-${kversion}"
 	    kernel_source="kernel-source-${kmajor}-${kminor}"
 	    kernel_headers="kernel-headers-${kmajor}-${kminor}"
 	    ;;
-	(debian-2.6|ubuntu-2.6|lts-2.6)
+	(debian-2.6|ubuntu-2.6|mint-2.6)
 	    kernel_image="linux-image-${kversion}"
 	    kernel_source="linux-source-${kmajor}.${kminor}"
 	    kernel_headers="linux-headers-${kmajor}.${kminor}"
@@ -2436,12 +2435,12 @@ dnl
     AC_CACHE_CHECK([for kernel file sanity], [linux_cv_kernel_sanity], [dnl
 	eval "linux_cv_files=\"$linux_cv_k_sysmap $linux_cv_k_build $linux_cv_k_source $linux_cv_k_config\""
 	case "$target_vendor" in
-	    (mandrake|mandriva|manbo|mageia|mes)
+	    (mandrake|mandriva|mageia)
 dnl
 dnl		Mandrakelinux is built correctly.
 dnl
 		;;
-	    (debian|ubuntu|lts)
+	    (debian|ubuntu|mint)
 dnl
 dnl		Debian can have a mismatch in kernel version.
 dnl

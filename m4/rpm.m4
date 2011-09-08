@@ -254,7 +254,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		rpm_cv_dist_extra="mdvmes${dist_cv_host_release}"   ;;
 			esac
 			;;
-		    (suse)
+		    (suse|openSUSE)
 			rpm_cv_dist_extra=".${dist_cv_host_release:-SuSE}"
 			;;
 		    (sle)
@@ -379,7 +379,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 			    (*)		rpm_cv_dist_extra2="mdvmes${dist_cv_host_release}"  ;;
 			esac
 			;;
-		    (suse)
+		    (suse|openSUSE)
 			rpm_cv_dist_extra2=".${dist_cv_host_release:-SuSE}"
 			;;
 		    (sle)
@@ -411,7 +411,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_DIST], [dnl
 	case "$dist_cv_host_distro" in
 	    (oracle|puias|centos|lineox|whitebox|scientific|fedora|redhat|rhel)
 		rpm_cv_dist_topdir='/usr/src/redhat'	;;
-	    (suse)
+	    (suse|openSUSE)
 		rpm_cv_dist_topdir='/usr/src/SuSE'	;;
 	    (sle)
 		rpm_cv_dist_topdir='/usr/src/packages'	;;
@@ -632,7 +632,7 @@ dnl
 	    [build rpms @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)	enable_rpms=no	;;
+	    (debian|ubuntu|mint)	enable_rpms=no	;;
 	    (*)				enable_rpms=yes	;;
 	esac])
     AC_ARG_ENABLE([srpms],
@@ -640,7 +640,7 @@ dnl
 	    [build srpms @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|lts|mint)	enable_srpms=no	 ;;
+	    (debian|ubuntu|mint)	enable_srpms=no	 ;;
 	    (*)				enable_srpms=yes ;;
 	esac])
     AC_ARG_VAR([RPM],
@@ -648,7 +648,7 @@ dnl
     _BLD_PATH_PROG([RPM], [rpm], [${am_missing3_run}rpm], [$tmp_path], [dnl
 	if test ":$enable_rpms" = :yes; then
 	    case "$target_vendor" in
-		(oracle|puias|centos|lineox|whitebox|scientific|fedora|mandrake|mandriva|manbo|mageia|mes|redhat|suse)
+		(oracle|puias|centos|lineox|whitebox|scientific|mandrake|mandriva|mageia|redhat|suse)
 		    AC_MSG_WARN([Cannot find rpm program in PATH.]) ;;
 		(*) enable_rpms=no ;;
 	    esac
@@ -708,7 +708,7 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
     _BLD_PATH_PROG([CREATEREPO], [createrepo], [${am_missing3_run}createrepo], [$tmp_path], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(redhat|rhel|whitebox|lineox|fedora|oracle|puias|centos|scientific)
+		(redhat|whitebox|lineox|oracle|puias|centos|scientific|suse)
 		    _BLD_INSTALL_WARN([CREATEREPO], [
 *** 
 *** Configure could not find a suitable  tool for creating REPOMD
@@ -734,7 +734,7 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
     _BLD_PATH_PROG([MODIFYREPO], [modifyrepo], [${am_missing3_run}modifyrepo], [$tmp_path], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(redhat|rhel|whitebox|lineox|fedora|oracle|puias|centos|scientific)
+		(redhat|whitebox|lineox|oracle|puias|centos|scientific|suse)
 		    _BLD_INSTALL_WARN([MODIFYREPO], [
 *** 
 *** Configure could not find a suitable tool for modifying REPOMD
@@ -790,7 +790,7 @@ AC_DEFUN([_RPM_REPO_SETUP_YAST], [dnl
     _BLD_PATH_PROG([CREATE_PACKAGE_DESCR], [create_package_descr], [${am_missing3_run}create_package_descr], [$tmp_path], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(suse|sle|sles|sled|opensuse)
+		(suse)
 		    _BLD_INSTALL_WARN([CREATE_PACKAGE_DESCR], [
 *** 
 *** Configure could not find a suitable tool for creating YaST package
@@ -845,7 +845,7 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
     _BLD_PATH_PROGS([GENHDLIST], [genhdlist2 genhdlist], [${am_missing3_run}genhdlist2], [$tmp_path], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(mandrake|mandriva|manbo|mageia|mes)
+		(mandrake|mandriva|mageia)
 		    _BLD_INSTALL_WARN([GENHDLIST], [
 *** 
 *** Configure could not find a suitable tool for generating the hdlists
@@ -910,7 +910,7 @@ dnl
     _BLD_PATH_PROGS([GENSRCLIST], [gensrclist], [${am_missing3_run}gensrclist], [$tmp_path], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(mandrake|mandriva|mes|mageia)
+		(mandrake|mandriva|mageia)
 		    _BLD_INSTALL_WARN([GENSRCLIST], [
 *** 
 *** Configure could not find a suitable tool for creating APT for RPM
@@ -935,7 +935,7 @@ dnl
     _BLD_PATH_PROGS([GENPKGLIST], [genpkglist], [${am_missing3_run}genpkglist], [$tmp_path], [dnl
 	if test ":$rpm_cv_rpms" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
 	    case "${target_vendor:-none}" in
-		(mandrake|mandriva|mes|mageia)
+		(mandrake|mandriva|mageia)
 		    _BLD_INSTALL_WARN([GENPKGLIST], [
 *** 
 *** Configure could not find a suitable tool for creating APT for RPM

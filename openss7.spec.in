@@ -3164,7 +3164,8 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # urpm is being installed or upgraded with 
         exit 1
     fi
     [ "$o" != "$f" ] || rm -f -- $o.$$
-    f=%{_zyppcreddir}/@PACKAGE_UCNAME@credentials
+    d=%{_zyppcreddir}; n=@PACKAGE_UCNAME@credentials
+    f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ -f $f ] || ( umask 0077; echo -e "username=$un\npassword=$pw" >$f )
 fi
 

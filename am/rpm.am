@@ -1211,12 +1211,17 @@ $(reposrcsdir)/primary.xml.gz:
 	$(MAKE) $(AM_MAKEFLAGS) $$(dirname $@)/repomd.xml
 
 GENERATESUSEDATA = \
+	if zgrep -q 'type="sha256"' $$(dirname $@)/*primary.xml* >/dev/null 2>&1 ; then cs=sha256 ; else cs=sha ; fi ; \
 	( \
 		$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
 		$(ECHO) "<susedata packages=\"$$numb\">"; \
 		for f in $$rpms ; do \
 			$(ECHO) $(ECHO_N) "  <package " ; \
-				$(ECHO) $(ECHO_N) "pkgid=\"`sha1sum $$f | awk '{print $$1}'`\" " ; \
+				if test "$$cs" = sha256 ; then \
+					$(ECHO) $(ECHO_N) "pkgid=\"`sha256sum $$f | awk '{print $$1}'`\" " ; \
+				else \
+					$(ECHO) $(ECHO_N) "pkgid=\"`sha1sum $$f | awk '{print $$1}'`\" " ; \
+				fi ; \
 				$(ECHO) $(ECHO_N) "name=\"`rpm -q --qf '%{NAME}' -p $$f`\" " ; \
 				case "$$(basename $$f)" in \
 				(*.src.rpm) $(ECHO) $(ECHO_N) "arch=\"src\"" ;; \
@@ -1224,7 +1229,10 @@ GENERATESUSEDATA = \
 				esac ; \
 				$(ECHO) ">" ; \
 			$(ECHO) $(ECHO_N) "    <version " ; \
-				$(ECHO) $(ECHO_N) "epoch=\"`rpm -q --qf '%{EPOCH}' -p $$f`\" " ; \
+				e="`rpm -q --qf '%{EPOCH}' -p $$f`" ; \
+				if test -n "$$e" -a "$$e" != '(none)' ; then \
+					$(ECHO) $(ECHO_N) "epoch=\"$$e\" " ; \
+				fi ; \
 				$(ECHO) $(ECHO_N) "ver=\"`rpm -q --qf '%{VERSION}' -p $$f`\" " ; \
 				$(ECHO) $(ECHO_N) "rel=\"`rpm -q --qf '%{RELEASE}' -p $$f`\" " ; \
 				$(ECHO) "/>" ; \
@@ -1575,13 +1583,18 @@ release-update-yum:
 				fi ; \
 			else \
 				$(ECHO) "  D: $@: generating $$dir/repodata/susedata.xml" ; \
+				if zgrep -q 'type="sha256"' $$dir/repodata/*primary.xml* >/dev/null 2>&1 ; then cs=sha256 ; else cs=sha ; fi ; \
 				( \
 					numb="`echo "$$rpms" | wc -l`" ; \
 					$(ECHO) '<?xml version="1.0" encoding="UTF-8"?>' ; \
 					$(ECHO) '<susedata packages="'"$$numb"'">' ; \
 					for f in $$rpms ; do \
 						$(ECHO) $(ECHO_N) '  <package ' ; \
-							$(ECHO) $(ECHO_N) 'pkgid="'`sha1sum $$f | awk '{print$$1}'`'" ' ; \
+							if test "$$cs" = sha256 ; then \
+								$(ECHO) $(ECHO_N) 'pkgid="'`sha256sum $$f | awk '{print$$1}'`'" ' ; \
+							else \
+								$(ECHO) $(ECHO_N) 'pkgid="'`sha1sum $$f | awk '{print$$1}'`'" ' ; \
+							fi ; \
 							$(ECHO) $(ECHO_N) 'name="'`rpm -q --qf '%{NAME}' -p $$f`'" ' ; \
 							case "$$(basename $$f)" in \
 							(*.src.rpm) 	$(ECHO) $(ECHO_N) 'arch="src"' ;; \
@@ -1589,7 +1602,10 @@ release-update-yum:
 							esac ; \
 							$(ECHO) '>' ; \
 						$(ECHO) $(ECHO_N) '    <version ' ; \
-							$(ECHO) $(ECHO_N) 'epoch="'`rpm -q --qf '%{EPOCH}' -p $$f`'" ' ; \
+							e="`rpm -q --qf '%{EPOCH}' -p $$f`" ; \
+							if test -n "$$e" -a "$$e" != '(none)'; then \
+								$(ECHO) $(ECHO_N) 'epoch="'$$e'" ' ; \
+							fi ;  \
 							$(ECHO) $(ECHO_N) 'ver="'`rpm -q --qf '%{VERSION}' -p $$f`'" ' ; \
 							$(ECHO) $(ECHO_N) 'rel="'`rpm -q --qf '%{RELEASE}' -p $$f`'" ' ; \
 							$(ECHO) '/>' ; \

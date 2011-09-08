@@ -179,7 +179,7 @@ sub check_distarch {
     my ($manage,$enterp,$server) = ( 'yum', 'community', 'desktop' );
 
     $manage = 'yum';
-    $manage = 'zypp' if ( $distro =~ m,^(sle|sles|sled|suse|opensuse)$, );
+    $manage = 'zypp' if ( $distro =~ m,^(sle|sles|sled|suse|openSUSE)$, );
     $manage = 'apt'  if ( $distro =~ m,^(debian|ubuntu|mint|mepis|knoppix|pclinux)$, );
 
     $enterp = 'community'; 
