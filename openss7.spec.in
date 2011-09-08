@@ -84,7 +84,7 @@
 %global jnilibs     %{nil}
 %global javadoc     %{nil}
 %global locales     %{nil}
-%global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo
+%global tools       ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes
 %global manuals     openss7 ATM carrier cci cdi chi cnam dlpi dlpi_porting FR hlr INET ISDN lab libxnet libxnsl lli mapi MG mg mtpi mxi nli npi npi_mtp npi_sccp OSI PHYS porting sbc sccpi sdli sdti sg sgp SIGTRAN sli SPG2 SPG SS7 ssg ss STREAMS_FAQ STREAMS tci tpi tpi_sccp tri TTY VOIP voip wan X25 x25_porting x400p xcc xmap XNS xti_sccp
 %global pngfiles    *.png
 %global cssfiles    *.css
@@ -3333,18 +3333,22 @@ Requires:           dev >= 3.3
 #equires(postun):   /usr/sbin/makewhatis
 #endif
 
+# zypper does not download filelists.xml and cannot find test-streams
+%if %{HAVE_zypprepo}
+%if %{NEED_lib}
+Requires:           %{name}-lib     = %{baseversion}-%{baserelease}
+%endif
+%if %{NEED_compat}
+Requires:           %{name}-compat  = %{baseversion}-%{baserelease}
+%endif
+%else
 %if %{HAVE_testfiles}
 Requires:           %{_pkglibexecdir}/test-streams
 %endif
-#if %{NEED_lib}
-#equires:           %{name}-lib     = %{baseversion}-%{baserelease}
-#endif
 %if %{HAVE_test32files}
 Requires:           %{_pkglibexec32dir}/test-streams
 %endif
-#if %{NEED_compat}
-#equires:           %{name}-compat  = %{baseversion}-%{baserelease}
-#endif
+%endif
 
 Provides:           %{name}-base = %{baseversion}-%{specrelease}
 Provides:           %{name}-base = %{baseversion}-%{baserelease}
@@ -3624,9 +3628,9 @@ fi
 if [ $1 -eq 1 ] ; then : # fresh install
 %if %{FILES_manpages}
     if   [ -x "`which mandb      2>/dev/null`" ]; then
-	LANGUAGE= LANG= mandb      -p %{_mandir} || :
+	LANGUAGE= LANG= mandb      -p %{_mandir} >/dev/null 2>&1 || :
     elif [ -x "`which makewhatis 2>/dev/null`" ]; then
-	LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+	LANGUAGE= LANG= makewhatis -u %{_mandir} >/dev/null 2>&1 || :
     fi
 %endif
 fi
@@ -3742,9 +3746,9 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
     if   [ -x "`which mandb      2>/dev/null`" ]; then
-        LANGUAGE= LANG= mandb      -p %{_mandir} || :
+        LANGUAGE= LANG= mandb      -p %{_mandir} >/dev/null 2>&1 || :
     elif [ -x "`which makewhatis 2>/dev/null`" ]; then
-        LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+        LANGUAGE= LANG= makewhatis -u %{_mandir} >/dev/null 2>&1 || :
     fi
 fi
 %endif
@@ -3926,9 +3930,9 @@ fi
 %if %{FILES_manpages}
 if [ $1 -eq 1 ] ; then : # fresh install
    if  [ -x "`which mandb      2>/dev/null`" ] ; then
-       LANGUAGE= LANG= mandb      -p %{_mandir} || :
+       LANGUAGE= LANG= mandb      -p %{_mandir} >/dev/null 2>&1 || :
    elif [ -x "`which makewhatis 2>/dev/null`" ] ; then
-       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+       LANGUAGE= LANG= makewhatis -u %{_mandir} >/dev/null 2>&1 || :
    fi
 fi
 %endif
@@ -3957,9 +3961,9 @@ fi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 if [ $1 -eq 0 -o $1 -eq 1 ] ; then : # final removal or upgrade
    if   [ "`which mandb      2>/dev/null`" ] ; then
-       LANGUAGE= LANG= mandb         %{_mandir} || :
+       LANGUAGE= LANG= mandb         %{_mandir} >/dev/null 2>&1 || :
    elif [ "`which makewhatis 2>/dev/null`" ] ; then
-       LANGUAGE= LANG= makewhatis -u %{_mandir} || :
+       LANGUAGE= LANG= makewhatis -u %{_mandir} >/dev/null 2>&1 || :
    fi
 fi
 %endif
