@@ -3114,6 +3114,22 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # urpm is being installed or upgraded with 
         exit 1
     fi
     [ "$o" != "$f" ] || rm -f -- $o.$$
+    n=urpmi.cfg
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        exit 1
+    fi
+    d=%{_urpmiconfdir}; n=urpmi.cfg
+    o=; t=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $t ] || { o=$t; mv -f -- $t $t.$$; }
+    {   if [ -e $t.$$ ]; then sed -n '/^{/,/}/p' $t.$$; fi
+        if [ -e $f ]; then echo ''; cat $f; fi
+        if [ -e $t.$$ ]; then sed '/^{/,/}/d' $t.$$; fi
+    } >$t
+    rm -f -- $t.$$
     echo '%{_reposerv}://%{_repobase}/%{_reporoot}/rpms/%{_reposubdir}' >$d/url
     echo '%{_reposerv}://%{_repobase}/%{_reporoot}/rpms/%{_reposubdir}' >$d/mirrorlist
     f=%{_urpmiconfdir}/netrc
