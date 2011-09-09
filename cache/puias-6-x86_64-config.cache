@@ -90,6 +90,7 @@ bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_C
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib64/perl5/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.4.5/gcj/cni.h}
+bld_cv_pkg_path_KABI_WHITELIST_X86_64=${bld_cv_pkg_path_KABI_WHITELIST_X86_64=/lib/modules/kabi/kabi_whitelist_x86_64}
 bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/src/kernels/2.6.32-131.6.1.el6.x86_64/Module.symvers}
 bld_cv_pkg_path_PACKAGE_LIST=${bld_cv_pkg_path_PACKAGE_LIST=/usr/share/javadoc/java-1.5.0-gcj/package-list}
 bld_cv_pkg_path_SYMVERS_2_6_32_131_6_1_EL6_X86_64_GZ=${bld_cv_pkg_path_SYMVERS_2_6_32_131_6_1_EL6_X86_64_GZ=/boot/symvers-2.6.32-131.6.1.el6.x86_64.gz}
