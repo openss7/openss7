@@ -40,7 +40,7 @@ bld_cv_pkg_cmd_RPM=${bld_cv_pkg_cmd_RPM='yum install rpm'}
 bld_cv_pkg_cmd_RPMBUILD=${bld_cv_pkg_cmd_RPMBUILD='yum install rpm-build'}
 bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='yum install coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='yum install coreutils'}
-bld_cv_pkg_cmd_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ='yum install kernel'}
+bld_cv_pkg_cmd_SYMVERS_2_6_32_131_12_1_EL6_X86_64_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_32_131_12_1_EL6_X86_64_GZ='yum install kernel'}
 bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='yum install tcl-devel'}
 bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H='yum install net-snmp-devel'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='yum install zip'}
@@ -86,16 +86,16 @@ bld_cv_pkg_name_RPM=${bld_cv_pkg_name_RPM=rpm}
 bld_cv_pkg_name_RPMBUILD=${bld_cv_pkg_name_RPMBUILD=rpm-build}
 bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
-bld_cv_pkg_name_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=${bld_cv_pkg_name_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=kernel}
+bld_cv_pkg_name_SYMVERS_2_6_32_131_12_1_EL6_X86_64_GZ=${bld_cv_pkg_name_SYMVERS_2_6_32_131_12_1_EL6_X86_64_GZ=kernel}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl-devel}
 bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=net-snmp-devel}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib64/perl5/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.4.4/gcj/cni.h}
 bld_cv_pkg_path_KABI_WHITELIST_X86_64=${bld_cv_pkg_path_KABI_WHITELIST_X86_64=/lib/modules/kabi/kabi_whitelist_x86_64}
-bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/src/kernels/2.6.32-131.2.1.el6.x86_64/Module.symvers}
+bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/src/kernels/2.6.32-131.12.1.el6.x86_64/Module.symvers}
 bld_cv_pkg_path_PACKAGE_LIST=${bld_cv_pkg_path_PACKAGE_LIST=/usr/share/javadoc/java-1.5.0-gcj/package-list}
-bld_cv_pkg_path_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=${bld_cv_pkg_path_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=/boot/symvers-2.6.32-131.2.1.el6.x86_64.gz}
+bld_cv_pkg_path_SYMVERS_2_6_32_131_12_1_EL6_X86_64_GZ=${bld_cv_pkg_path_SYMVERS_2_6_32_131_12_1_EL6_X86_64_GZ=/boot/symvers-2.6.32-131.12.1.el6.x86_64.gz}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
 bld_cv_pkg_prog_AUTOM4TE=${bld_cv_pkg_prog_AUTOM4TE=autom4te}
@@ -192,7 +192,7 @@ bld_cv_pkg_ver_RPM=${bld_cv_pkg_ver_RPM=4.8.0}
 bld_cv_pkg_ver_RPMBUILD=${bld_cv_pkg_ver_RPMBUILD=4.8.0}
 bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=8.4}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=8.4}
-bld_cv_pkg_ver_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_32_131_2_1_EL6_X86_64_GZ=2.6.32}
+bld_cv_pkg_ver_SYMVERS_2_6_32_131_12_1_EL6_X86_64_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_32_131_12_1_EL6_X86_64_GZ=2.6.32}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.5.7}
 bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.5}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=3.0}
