@@ -5419,7 +5419,11 @@ Autoreq:            false
 Autoprov:           false
 
 %if %{HAVE_urpmirepo}
+%if %(test '%{_vendor}' = 'Mandriva' && echo 1 || echo 0)
+Requires:           kernel%{kernel_flavor}-latest
+%else
 Requires:           kernel%{kernel_flavor}-latest = %{kernel_latest}
+%endif
 %endif
 Requires:           %{kernel_package}
 
