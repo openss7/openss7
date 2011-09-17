@@ -23,8 +23,8 @@ Description: virtual base package.
  modules, libraries, utilities, test programs, daemons, and
  development environment for the development and execution of
  @PACKAGE_TITLE@ drivers, components and applications for the STREAMS
- environment.  This distribution is currently applicable to 2.6
- kernels and is validated for ix86, x86_64, ppc and ppc64
+ environment.  This distribution is currently applicable to 2.6 and
+ 3.x kernels and is validated for ix86, x86_64, ppc and ppc64
  architectures, but should build and install well for other
  architectures.  This package includes the following binary
  packages:
