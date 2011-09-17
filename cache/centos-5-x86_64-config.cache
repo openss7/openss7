@@ -20,7 +20,7 @@ bld_cv_pkg_cmd_GZIP_CMD=${bld_cv_pkg_cmd_GZIP_CMD='yum install gzip'}
 bld_cv_pkg_cmd_JAR=${bld_cv_pkg_cmd_JAR='yum install libgcj'}
 bld_cv_pkg_cmd_JARSIGNER=${bld_cv_pkg_cmd_JARSIGNER='yum install libgcj'}
 bld_cv_pkg_cmd_JAVAC=${bld_cv_pkg_cmd_JAVAC='yum install gcc-java'}
-bld_cv_pkg_cmd_JAVADOC=${bld_cv_pkg_cmd_JAVADOC='yum install java-1.6.0-openjdk-devel'}
+bld_cv_pkg_cmd_JAVADOC=${bld_cv_pkg_cmd_JAVADOC='yum install gjdoc'}
 bld_cv_pkg_cmd_JAVAH=${bld_cv_pkg_cmd_JAVAH='yum install gcc-java'}
 bld_cv_pkg_cmd_KEYTOOL=${bld_cv_pkg_cmd_KEYTOOL='yum install libgcj'}
 bld_cv_pkg_cmd_KGENKSYMS=${bld_cv_pkg_cmd_KGENKSYMS='yum install kernel-devel'}
@@ -42,8 +42,8 @@ bld_cv_pkg_cmd_PSLATEX=${bld_cv_pkg_cmd_PSLATEX='yum install tetex-latex'}
 bld_cv_pkg_cmd_RPM=${bld_cv_pkg_cmd_RPM='yum install rpm'}
 bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='yum install coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='yum install coreutils'}
-bld_cv_pkg_cmd_SYMSETS_2_6_18_238_12_1_EL5_CENTOS_PLUS_TAR_GZ=${bld_cv_pkg_cmd_SYMSETS_2_6_18_238_12_1_EL5_CENTOS_PLUS_TAR_GZ='yum install kernel-devel'}
-bld_cv_pkg_cmd_SYMVERS_2_6_18_238_12_1_EL5_CENTOS_PLUS_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_18_238_12_1_EL5_CENTOS_PLUS_GZ='yum install kernel'}
+bld_cv_pkg_cmd_SYMSETS_2_6_18_274_EL5_TAR_GZ=${bld_cv_pkg_cmd_SYMSETS_2_6_18_274_EL5_TAR_GZ='yum install kernel-devel'}
+bld_cv_pkg_cmd_SYMVERS_2_6_18_274_EL5_GZ=${bld_cv_pkg_cmd_SYMVERS_2_6_18_274_EL5_GZ='yum install kernel'}
 bld_cv_pkg_cmd_TCL_H=${bld_cv_pkg_cmd_TCL_H='yum install tcl-devel'}
 bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_cmd_UCD_SNMP_UCD_SNMP_CONFIG_H='yum install net-snmp-devel'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='yum install zip'}
@@ -69,7 +69,7 @@ bld_cv_pkg_name_GZIP_CMD=${bld_cv_pkg_name_GZIP_CMD=gzip}
 bld_cv_pkg_name_JAR=${bld_cv_pkg_name_JAR=libgcj}
 bld_cv_pkg_name_JARSIGNER=${bld_cv_pkg_name_JARSIGNER=libgcj}
 bld_cv_pkg_name_JAVAC=${bld_cv_pkg_name_JAVAC=gcc-java}
-bld_cv_pkg_name_JAVADOC=${bld_cv_pkg_name_JAVADOC=java-1.6.0-openjdk-devel}
+bld_cv_pkg_name_JAVADOC=${bld_cv_pkg_name_JAVADOC=gjdoc}
 bld_cv_pkg_name_JAVAH=${bld_cv_pkg_name_JAVAH=gcc-java}
 bld_cv_pkg_name_KEYTOOL=${bld_cv_pkg_name_KEYTOOL=libgcj}
 bld_cv_pkg_name_KGENKSYMS=${bld_cv_pkg_name_KGENKSYMS=kernel-devel}
@@ -91,18 +91,18 @@ bld_cv_pkg_name_PSLATEX=${bld_cv_pkg_name_PSLATEX=tetex-latex}
 bld_cv_pkg_name_RPM=${bld_cv_pkg_name_RPM=rpm}
 bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
-bld_cv_pkg_name_SYMSETS_2_6_18_238_12_1_EL5_CENTOS_PLUS_TAR_GZ=${bld_cv_pkg_name_SYMSETS_2_6_18_238_12_1_EL5_CENTOS_PLUS_TAR_GZ=kernel-devel}
-bld_cv_pkg_name_SYMVERS_2_6_18_238_12_1_EL5_CENTOS_PLUS_GZ=${bld_cv_pkg_name_SYMVERS_2_6_18_238_12_1_EL5_CENTOS_PLUS_GZ=kernel}
+bld_cv_pkg_name_SYMSETS_2_6_18_274_EL5_TAR_GZ=${bld_cv_pkg_name_SYMSETS_2_6_18_274_EL5_TAR_GZ=kernel-devel}
+bld_cv_pkg_name_SYMVERS_2_6_18_274_EL5_GZ=${bld_cv_pkg_name_SYMVERS_2_6_18_274_EL5_GZ=kernel}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl-devel}
 bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=net-snmp-devel}
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib64/perl5/5.8.8/x86_64-linux-thread-multi/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.1.2/gcj/cni.h}
-bld_cv_pkg_path_MODULE_KABI=${bld_cv_pkg_path_MODULE_KABI=/usr/src/kernels/2.6.18-238.12.1.el5.centos.plus-x86_64/Module.kabi}
-bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/src/kernels/2.6.18-238.12.1.el5.centos.plus-x86_64/Module.symvers}
+bld_cv_pkg_path_MODULE_KABI=${bld_cv_pkg_path_MODULE_KABI=/usr/src/kernels/2.6.18-274.el5-x86_64/Module.kabi}
+bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/usr/src/kernels/2.6.18-274.el5-x86_64/Module.symvers}
 bld_cv_pkg_path_PACKAGE_LIST=${bld_cv_pkg_path_PACKAGE_LIST=/usr/share/javadoc/java-1.4.2-gcj-compat-1.4.2.0/package-list}
-bld_cv_pkg_path_SYMSETS_2_6_18_238_12_1_EL5_CENTOS_PLUS_TAR_GZ=${bld_cv_pkg_path_SYMSETS_2_6_18_238_12_1_EL5_CENTOS_PLUS_TAR_GZ=/usr/src/kernels/2.6.18-238.12.1.el5.centos.plus-x86_64/symsets-2.6.18-238.12.1.el5.centos.plus.tar.gz}
-bld_cv_pkg_path_SYMVERS_2_6_18_238_12_1_EL5_CENTOS_PLUS_GZ=${bld_cv_pkg_path_SYMVERS_2_6_18_238_12_1_EL5_CENTOS_PLUS_GZ=/boot/symvers-2.6.18-238.12.1.el5.centos.plus.gz}
+bld_cv_pkg_path_SYMSETS_2_6_18_274_EL5_TAR_GZ=${bld_cv_pkg_path_SYMSETS_2_6_18_274_EL5_TAR_GZ=/usr/src/kernels/2.6.18-274.el5-x86_64/symsets-2.6.18-274.el5.tar.gz}
+bld_cv_pkg_path_SYMVERS_2_6_18_274_EL5_GZ=${bld_cv_pkg_path_SYMVERS_2_6_18_274_EL5_GZ=/boot/symvers-2.6.18-274.el5.gz}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
 bld_cv_pkg_prog_AUTOM4TE=${bld_cv_pkg_prog_AUTOM4TE=autom4te}
@@ -126,7 +126,7 @@ bld_cv_pkg_prog_GZIP_CMD=${bld_cv_pkg_prog_GZIP_CMD=gzip}
 bld_cv_pkg_prog_JAR=${bld_cv_pkg_prog_JAR=fastjar}
 bld_cv_pkg_prog_JARSIGNER=${bld_cv_pkg_prog_JARSIGNER=gjarsigner}
 bld_cv_pkg_prog_JAVAC=${bld_cv_pkg_prog_JAVAC=gcj}
-bld_cv_pkg_prog_JAVADOC=${bld_cv_pkg_prog_JAVADOC=javadoc}
+bld_cv_pkg_prog_JAVADOC=${bld_cv_pkg_prog_JAVADOC=gjdoc}
 bld_cv_pkg_prog_JAVAH=${bld_cv_pkg_prog_JAVAH=gcjh}
 bld_cv_pkg_prog_KEYTOOL=${bld_cv_pkg_prog_KEYTOOL=gkeytool}
 bld_cv_pkg_prog_KGENKSYMS=${bld_cv_pkg_prog_KGENKSYMS=genksyms}
@@ -179,7 +179,7 @@ bld_cv_pkg_ver_GZIP_CMD=${bld_cv_pkg_ver_GZIP_CMD=1.3.5}
 bld_cv_pkg_ver_JAR=${bld_cv_pkg_ver_JAR=4.1.2}
 bld_cv_pkg_ver_JARSIGNER=${bld_cv_pkg_ver_JARSIGNER=4.1.2}
 bld_cv_pkg_ver_JAVAC=${bld_cv_pkg_ver_JAVAC=4.1.2}
-bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=1.6.0.0}
+bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=0.7.7}
 bld_cv_pkg_ver_JAVAH=${bld_cv_pkg_ver_JAVAH=4.1.2}
 bld_cv_pkg_ver_KEYTOOL=${bld_cv_pkg_ver_KEYTOOL=4.1.2}
 bld_cv_pkg_ver_KGENKSYMS=${bld_cv_pkg_ver_KGENKSYMS=2.6.18}
@@ -201,8 +201,8 @@ bld_cv_pkg_ver_PSLATEX=${bld_cv_pkg_ver_PSLATEX=3.0}
 bld_cv_pkg_ver_RPM=${bld_cv_pkg_ver_RPM=4.4.2.3}
 bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=5.97}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=5.97}
-bld_cv_pkg_ver_SYMSETS_2_6_18_238_12_1_EL5_CENTOS_PLUS_TAR_GZ=${bld_cv_pkg_ver_SYMSETS_2_6_18_238_12_1_EL5_CENTOS_PLUS_TAR_GZ=2.6.18}
-bld_cv_pkg_ver_SYMVERS_2_6_18_238_12_1_EL5_CENTOS_PLUS_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_18_238_12_1_EL5_CENTOS_PLUS_GZ=2.6.18}
+bld_cv_pkg_ver_SYMSETS_2_6_18_274_EL5_TAR_GZ=${bld_cv_pkg_ver_SYMSETS_2_6_18_274_EL5_TAR_GZ=2.6.18}
+bld_cv_pkg_ver_SYMVERS_2_6_18_274_EL5_GZ=${bld_cv_pkg_ver_SYMVERS_2_6_18_274_EL5_GZ=2.6.18}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.4.13}
 bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_ver_UCD_SNMP_UCD_SNMP_CONFIG_H=5.3.2.2}
 bld_cv_pkg_ver_ZIP=${bld_cv_pkg_ver_ZIP=2.31}

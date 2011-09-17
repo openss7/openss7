@@ -467,6 +467,8 @@ machine www.openss7.org login <% $hostname %> password <% $hostpass %>
 	$emptyrepo = 0 if ( $page eq 'media.cfg' );
 	$emptyrepo = 0 if ( $page eq 'urpmi.cfg' );
 
+	my $repo_gpgcheck = ( $distro=~m/(centos|rhel|puias|oracle|scientific)/ and $relver eq '5' ) ? 0 : 1;
+
 	my $toenable;
 	my $numb = 1;
 
@@ -624,7 +626,7 @@ xml-info=1
 <% $pre %>gpgkey = https://www.openss7.org/pubkey.asc
 <% $pre %>         https://www.openss7.org/repo/tarballs/OPENSS7-GPG-KEY
 <% $pre %>gpgcheck = 1
-<% $pre %>repo_gpgcheck = 1
+<% $pre %>repo_gpgcheck = <% $repo_gpgcheck %>
 
 <%perl>
 		}
