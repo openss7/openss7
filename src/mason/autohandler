@@ -626,9 +626,9 @@ xml-info=1
 <% $pre %>gpgkey = https://www.openss7.org/pubkey.asc
 <% $pre %>         https://www.openss7.org/repo/tarballs/OPENSS7-GPG-KEY
 <% $pre %>gpgcheck = 1
-<% $pre %>repo_gpgcheck = <% $repo_gpgcheck %>
 
 <%perl>
+#<% $pre %>repo_gpgcheck = <% $repo_gpgcheck %>
 		}
 		elsif ( $page eq 'openss7.list' )
 		{
