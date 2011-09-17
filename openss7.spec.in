@@ -332,10 +332,7 @@
 %global _ksubdir            extra/%{base}
 %endif
 
-%if %(if test -d %_sysconfdir/kernel ; then echo 0 ; else echo 1 ; fi)
-%global HAVE_kupdate        0
-%endif
-%if %(if test -x /sbin/new-kernel-pkg ; then echo 0 ; else echo 1 ; fi)
+%if %(if test -d %_sysconfdir/kernel -o -x /sbin/new-kernel-pkg ; then echo 0 ; else echo 1 ; fi)
 %global HAVE_kupdate        0
 %endif
 
@@ -2924,8 +2921,8 @@ if [ $1 -eq 1 -o $1 -eq 2 ] ; then : # first install or upgrade
     for d in %{_yumrepodir}/; do
         o=$d$p$s
         [ -r $o ] || continue
-        un=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\1,p;t end;b;: end q' $o`
-        pw=`sed -n -r 's,^.*baseurl[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
+        un=`sed -n -r 's,^.*(baseurl|include)[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
+        pw=`sed -n -r 's,^.*(baseurl|include)[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
         [ -n "$un" -a -n "$pw" ] || continue
         break 3
     done
@@ -3154,10 +3151,7 @@ if [ $1 -ge 1 -o $2 -ge 1 ] ; then : # yum is being installed or upgraded with r
     o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
     [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
     url='%{_reposerv}://'"$key"'%{_repobase}/%{_reporoot}/'"$n$ext"
-    if ! echo "$url" | wget -i - -O $f 2>/dev/null || [ ! -e $f ]; then
-        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
-        exit 1
-    fi
+    echo "include = $url" >$f
     [ "$o" != "$f" ] || rm -f -- $o.$$
 fi
 
@@ -3187,16 +3181,15 @@ fi
 
 %triggerun -p /bin/bash repo -- apt
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if   [ $1 -eq 0 ] ; then : # repo being removed with apt present
+if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # repo being removed with apt present (or visa versa)
     rm -f -- %{_aptrepodir}/@PACKAGE@.list
     rm -f -- %{_atpvenddir}/@PACKAGE@.vendor.list
     rm -rf -- %{_localstatedir}/lib/apt/%{_repobase}*
-elif [ $2 -eq 0 ] ; then : # apt being removed with repo present
 fi
 
 %triggerun -p /bin/bash repo -- urpmi
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if   [ $1 -eq 0 ] ; then : # repo being removed with urpm present
+if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # repo being removed with urpm present (or visa versa)
     f=%{_urpmiconfdir}/urpmi.cfg
     if [ -f $f ]; then
         sed '/^.*(@PACKAGE@[0-9]*).*{/,/}/d' $f | cat -s >$f.$$
@@ -3211,26 +3204,23 @@ if   [ $1 -eq 0 ] ; then : # repo being removed with urpm present
     d="`echo '%{_reposubdir}' | sed 's,^[^/]*/,@PACKAGE_NAME@-,;y,/,-,'`"
     rm -rf -- %{_urpmirepodir}/$d
     rm -rf -- %{_localstatedir}/lib/urpmi/*'(@PACKAGE@'[0-9]*')'*
-elif [ $2 -eq 0 ] ; then : # urpm being removed with repo present
 fi
 
 %triggerun -p /bin/bash repo -- yum
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if   [ $1 -eq 0 ] ; then : # repo being removed with yum present
+if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # repo being removed with yum present (or visa versa)
     rm -f -- %{_yumrepodir}/@PACKAGE@.repo
-elif [ $2 -eq 0 ] ; then : # yum being removed with repo present
 fi
 
 %triggerun -p /bin/bash repo -- zypper
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-if   [ $1 -eq 0 ] ; then : # repo being removed with zypp present
+if [ $1 -eq 0 -o $2 -eq 0 ] ; then : # repo being removed with zypp present (or visa versa)
     rm -f -- %{_zyppcreddir}/@PACKAGE_UCNAME@credentials
     rm -f -- %{_zyppservdir}/@PACKAGE_UCNAME@.service
     rm -f -- %{_zypprepodir}/@PACKAGE_UCNAME@\:@PACKAGE@*.repo
     rm -rf -- %{_localstatedir}/cache/zypp/packages/@PACKAGE_UCNAME@\:@PACKAGE@*
     rm -rf -- %{_localstatedir}/cache/zypp/raw/@PACKAGE_UCNAME@\:@PACKAGE@*
     rm -rf -- %{_localstatedir}/cache/zypp/solv/@PACKAGE_UCNAME@\:@PACKAGE@*
-elif [ $2 -eq 0 ] ; then : # zypp being removed with repo present
 fi
 
 %postun -p /bin/bash repo

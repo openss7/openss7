@@ -387,46 +387,57 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 	fi
 	if test :"${ksyms_cv_updates_directory:-no}" = :no -o ! -d "$ksyms_cv_updates_directory"
 	then
-	    case "$target_vendor" in
-		(debian|unbuntu|mint)
-		    if test -z "${DESTDIR}${rootdir}" ; then
-			AC_MSG_WARN([
+	    if test -x "${DESTDIR}${rootdir}/sbin/new-kernel-pkg" ; then
+		if test -z "${DESTDIR}${rootdir}" ; then
+		    AC_MSG_WARN([
+*** 
+*** Configure cannot find the kernel updates directory, /etc/kernel,
+*** even though the distribution supports /sbin/new-kernel-pkg.  This is
+*** likely simply because the DKMS package is not installed.  Proceeding
+*** under the assumption that --with-k-updates=/etc/kernel was intended.
+*** ])
+		fi
+		ksyms_cv_updates_directory=/etc/kernel
+	    else
+		case "$target_vendor" in
+		    (debian|unbuntu|mint)
+			if test -z "${DESTDIR}${rootdir}" ; then
+			    AC_MSG_WARN([
 ***
 *** Configure cannot find the kernel updates directory, /etc/kernel,
 *** even though the distribution supports it.  Proceeding under the
 *** assumption that that --with-k-updates=/etc/kernel was intended.
 *** ])
-		    fi
-		    ksyms_cv_updates_directory=/etc/kernel
-		    ;;
-		(redhat|oracle|puias|centos|scientific|lineox|whitebox)
-		    if test -z "${DESTDIR}${rootdir}" ; then
-			AC_MSG_WARN([
-***
-*** Configure cannot find the kernel updates directory, /etc/kernel,
-*** even though the distribution supports it.  This is likely because
-*** the DKMS package is not installed.  Proceeding under the assumption
-*** that that --with-k-updates=/etc/kernel was intended.
-*** ])
-		    fi
-		    ksyms_cv_updates_directory=/etc/kernel
-		    ;;
-		(suse)
-		    ;;
-		(mandrake|mandriva|mageia)
-		    ;;
-		(*) if test -x "${DESTDIR}${rootdir}/sbin/new-kernel-pkg" ; then
+			fi
+			ksyms_cv_updates_directory=/etc/kernel
+			;;
+		    (mes|fedora|redhat|oracle|puias|centos|scientific|lineox|whitebox)
 			if test -z "${DESTDIR}${rootdir}" ; then
+			    AC_MSG_WARN([
+***
+*** Configure cannot find the kernel updates directory, /etc/kernel, and
+*** the distribution does not support /sbin/new-kernel-pkg.  This is
+*** likely because the DKMS package is not installed.  Proceeding under
+*** the assumption that --with-k-updates=/etc/kernel was intended.
+*** ])
+			fi
+			;;
+		    (suse)
+			;;
+		    (mandrake|mandriva|mageia)
+			;;
+		    (*) if test -z "${DESTDIR}${rootdir}" ; then
 			    AC_MSG_WARN([
 ***
 *** Configure cannot find the kernel updates directory, /etc/kernel.
 *** This is likely because the DKMS package is not installed or
-*** supported and the distro does not provide /sbin/new-kernel-pkg.
+*** supported and the $target_vendor distro does not provide
+*** /sbin/new-kernel-pkg.
 *** ])
 			fi
-		    fi
-		    ;;
-	    esac
+			;;
+		esac
+	    fi
 	fi
 	AC_MSG_CHECKING([for updates directory])
     ])

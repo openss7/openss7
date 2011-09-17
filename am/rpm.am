@@ -2676,6 +2676,16 @@ aptr_signs		= $(aptr_release_gpgs) $(aptr_md5sum_gpgs)
 aptr_keys		= $(aptr_release_keys) $(aptr_md5sum_keys)
 aptr_sigs		= $(aptr_release_sigs)
 
+if BUILD_REPO_YUM
+else
+repo-link-yum: $(RELEASE_DIRECTORIES)
+	( cd $(repofulldir)/../RPMS ; rm -f -- src   ; ln -sf ../SRPMS src )
+	( cd $(repomaindir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
+	( cd $(repodebgdir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
+	( cd $(repodevldir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
+	( cd $(reposrcsdir)/..  ; rm -f -- RPMS  ; ln -sf ../RPMS  .   )
+endif
+
 repo-link-aptrpm: $(RELEASE_DIRECTORIES) repo-link-yum $(rpm_link_file)
 	@$(ECHO_V) "D: Making $@ in `pwd`"; \
 	rb='$(repobranch)' ; \
