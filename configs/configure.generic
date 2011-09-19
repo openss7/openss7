@@ -1,0 +1,9 @@
+#!/bin/bash
+set -x
+where=`dirname $0`
+srcdir=`(cd $where/..; pwd)`
+$srcdir/configure \
+	--with-pkg-distdir=/u6/repo \
+	--with-pkg-repodir=/u5/repo \
+	--enable-maintainer-mode \
+	2>&1 | tee configure.log
