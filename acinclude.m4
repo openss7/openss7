@@ -1128,6 +1128,7 @@ dnl----------------------------------------------------------------------------
 	struct files_struct.fdtab,
 	struct files_struct.max_fdset,
 	struct file_system_type.get_sb,
+	struct file_system_type.mount,
 	struct file_system_type.read_super,
 	struct fown_struct.pid_type,
 	struct rtable.u.dst,
@@ -2770,6 +2771,31 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS], [1], [Define if
 		function ip_route_output_key() takes 3 arguments.])
 	fi
+	AC_CACHE_CHECK([for kernel ip_route_output_key with rtable return],
+		       [linux_cv_ip_route_output_key_rtable_return], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include <linux/autoconf.h>
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/ip.h>
+#include <net/sock.h>
+#include <net/udp.h>
+#include <net/tcp.h>]],
+		    [[struct rtable *(*my_autoconf_function_pointer)(struct net *, struct flowi4 *)
+		    = &ip_route_output_key;]])
+		],
+		[linux_cv_ip_route_output_key_rtable_return='yes'],
+		[linux_cv_ip_route_output_key_rtable_return='no'])
+	])
+	if test :$linux_cv_ip_route_output_key_rtable_return = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN], [1], [Define if function
+		       ip_route-output_key() returns a pointer to struct rtable.])
+	fi
     ])
 dnl----------------------------------------------------------------------------
     _LINUX_KERNEL_ENV([dnl
@@ -2928,6 +2954,34 @@ dnl----------------------------------------------------------------------------
 	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS], [1], [Define if
 		function ip_route_connect takes 10 arguments which is the case
 		from 2.6.21.])
+	fi
+	AC_CACHE_CHECK([for kernel ip_route_connect rtable return], [linux_cv_have_ip_route_connect_rtable_return], [dnl
+	    AC_COMPILE_IFELSE([
+		AC_LANG_PROGRAM([[
+#ifdef NEED_LINUX_AUTOCONF_H
+#include <linux/autoconf.h>
+#endif
+#include <linux/version.h>
+#include <linux/types.h>
+#include <linux/net.h>
+#include <linux/in.h>
+#include <linux/inet.h>
+#include <net/ip.h>
+#include <net/icmp.h>
+#include <net/route.h>
+#include <net/inet_ecn.h>
+#include <linux/skbuff.h>
+#include <linux/netfilter.h>
+#include <linux/netfilter_ipv4.h>
+#include <linux/ip.h>]],
+		[[struct rtable *(*my_autoconf_function_pointer)(struct flowi4 *, __be32, __be32, u32, int, u8, __be16, __be16, struct sock *, bool) = &ip_route_connect;]]) ],
+		[linux_cv_have_ip_route_connect_rtable_return='yes'],
+		[linux_cv_have_ip_route_connect_rtable_return='no'])
+	])
+	if test :$linux_cv_have_ip_route_connect_rtable_return = :yes ; then
+	    AC_DEFINE([HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN], [1], [Define if function
+		ip_route_connect() returns a pointer to an rtable structure, which is the case from
+		3.0.0.])
 	fi
     ])
 dnl----------------------------------------------------------------------------

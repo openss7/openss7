@@ -446,7 +446,13 @@ typedef struct df {
 	SLIST_HEAD (dl, dl);		/* master list of dl (link) structures */
 } df_t;
 
+#ifdef RW_LOCK_UNLOCKED
 STATIC struct df master = {.lock = RW_LOCK_UNLOCKED, };
+#elif defined __RW_LOCK_UNLOCKED
+STATIC struct df master = {.lock = __RW_LOCK_UNLOCKED(&master.lock), };
+#else
+#error cannot initialize read-write locks
+#endif
 
 /*
  *  Logging.

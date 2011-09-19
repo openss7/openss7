@@ -110,7 +110,13 @@ MODULE_VERSION(PACKAGE_ENVR);
 #endif
 #endif
 
+#ifdef SPIN_LOCK_UNLOCKED
 static lock_t sleep_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+static lock_t sleep_lock = __SPIN_LOCK_UNLOCKED(&sleep_lock);
+#else
+#error cannot initialize spin locks
+#endif
 
 /**
  *  streams_get_sleep_lock: - acquire the global sleep lock

@@ -149,7 +149,13 @@ struct priv {
 	struct dl dll;
 };
 
+#ifdef RW_LOCK_UNLOCKED
 static rwlock_t a5_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+static rwlock_t a5_lock = __RW_LOCK_UNLOCKED(&a5_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 static caddr_t a5_opens;
 
 /*

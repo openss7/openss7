@@ -296,7 +296,13 @@ STATIC int pts_majors[PTS_CMAJORS] = { PTS_CMAJOR_0, };
 
 STATIC kmem_cachep_t ptc_priv_cachep = NULL;
 
+#ifdef RW_LOCK_UNLOCKED
 STATIC rwlock_t pty_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t pty_lock = __RW_LOCK_UNLOCKED(&pty_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 
 /**
  * ptc_alloc_priv - allocate a private structure for the open routine

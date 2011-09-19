@@ -6729,7 +6729,13 @@ mt_w_proto(queue_t *q, mblk_t *mp)
 	return (err);
 }
 
+#ifdef RW_LOCK_UNLOCKED
 static rwlock_t mt_mux_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+static rwlock_t mt_mux_lock = __RW_LOCK_UNLOCKED(&mt_mux_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 
 /*
  *  M_SIG, M_PCSIG Handling

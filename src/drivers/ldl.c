@@ -583,18 +583,36 @@ STATIC unsigned long ldl_debug_mask;
 
 #undef SPLSTR
 #undef SPLX
+#ifdef SPIN_LOCK_UNLOCKED
 STATIC spinlock_t ldl_spin_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t ldl_spin_lock = __SPIN_LOCK_UNLOCKED(&ldl_spin_lock);
+#else
+#error cannot initialize spin locks
+#endif
 
 #define SPLSTR(__psw) while(0){ (void)(__psw); spin_lock(&ldl_spin_lock);   }
 #define SPLX(__psw)   while(0){ (void)(__psw); spin_unlock(&ldl_spin_lock); }
 
 STATIC struct pt *first_pt = NULL;
+#ifdef SPIN_LOCK_UNLOCKED
 STATIC spinlock_t first_pt_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t first_pt_lock = __SPIN_LOCK_UNLOCKED(&first_pt_lock);
 STATIC struct ndev *first_ndev = NULL;
+#else
+#error cannot initialize spin locks
+#endif
 STATIC struct dl dl_dl[LDL_N_MINOR] = { {}, };
 
 STATIC struct dl *first_open = NULL;
+#ifdef SPIN_LOCK_UNLOCKED
 STATIC spinlock_t first_open_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t first_open_lock = __SPIN_LOCK_UNLOCKED(&first_open_lock);
+#else
+#error cannot initialize spin locks
+#endif
 
 STATIC int n_hangup = 0;
 STATIC int pt_n_alloc = 0;

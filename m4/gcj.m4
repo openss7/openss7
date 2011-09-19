@@ -523,7 +523,7 @@ dnl
 	[Java CNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([GCJHFLAGS],
 	[Java CNI header command flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([GCJH], [gcjh3 gcjh], [${am_missing4_run}gcjh], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([GCJH], [$GCJH gcjh3 gcjh], [${am_missing4_run}gcjh], [$tmp_path], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([GCJH], [
 ***
@@ -559,7 +559,7 @@ dnl
 	[Java JNI header command. @<:@default=gcjh@:>@])
     AC_ARG_VAR([JAVAHFLAGS],
 	[Java JNI header command flags. @<:@default=auto@:>@])
-    _BLD_PATH_PROGS([JAVAH], [gcjh3 gcjh gjavah javah], [${am_missing4_run}gcjh], [$tmp_path], [dnl
+    _BLD_PATH_PROGS([JAVAH], [$GCJH gcjh3 gcjh gcjnih gjavah javah], [${am_missing4_run}gcjh], [$tmp_path], [dnl
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
 	    _BLD_INSTALL_WARN([JAVAH], [
 ***

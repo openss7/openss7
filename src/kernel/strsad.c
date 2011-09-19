@@ -98,7 +98,13 @@ static char const ident[] = "$RCSfile: strsad.c,v $ $Name:  $($Revision: 1.1.2.3
 #undef makedevice
 #define makedevice(__maj,__min) ((((__maj)<<16)&0xffff0000)|(((__min)<<0)&0x0000ffff))
 
+#if defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t apush_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t apush_lock = __SPIN_LOCK_UNLOCKED(&apush_lock);
+#else
+#error cannot initialize spin locks
+#endif
 
 STATIC struct apinfo *
 __autopush_find(struct cdevsw *cdev, minor_t minor)

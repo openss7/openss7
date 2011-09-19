@@ -1867,7 +1867,13 @@ struct sctp_tcb {
 #define bh_lock_sctp(__sp) spin_lock_bh(&((__sp)->qlock))
 #define bh_unlock_sctp(__sp) spin_unlock_bh(&((__sp)->qlock))
 
+#ifdef RW_LOCK_UNLOCKED
 STATIC rwlock_t sctp_protolock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t sctp_protolock = __RW_LOCK_UNLOCKED(&sctp_protolock);
+#else
+#error cannot initialize read-write locks
+#endif
 
 /**
  * sctp_trylockq: - try to lock a private structure
@@ -5278,7 +5284,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0,
 					       IPPROTO_SCTP, sp->sport, sp->dport, NULL);
 #else
-#if defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS
+#if defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS || defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
 #if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 			err = ip_route_connect(&rt, sd->daddr, 0, RT_CONN_FLAGS(sp), 0,
 					       IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0);
@@ -5363,7 +5369,7 @@ sctp_update_routes(struct sctp *sp, int force_reselect)
 			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif,
 					      IPPROTO_SCTP, sp->sport, sp->dport, NULL))
 #else
-#if defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS
+#if defined HAVE_KFUNC_IP_ROUTE_CONNECT_10_ARGS || defined HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
 #if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 			if (!ip_route_connect(&rt2, rt->rt_dst, 0, RT_CONN_FLAGS(sp), sd->dif,
 					      IPPROTO_SCTP, sp->sport, sp->dport, NULL, 0))
@@ -14107,7 +14113,13 @@ sctp_get_port(struct sctp *sp, uint16_t port)
 	if (port == 0) {
 		/* This approach to selecting an available port number is identical to that used
 		   for TCP IPv4. We use the same port ranges.  */
+#ifdef SPIN_LOCK_UNLOCKED
 		static spinlock_t sctp_portalloc_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+		static spinlock_t sctp_portalloc_lock = __SPIN_LOCK_UNLOCKED(&sctp_portalloc_lock);
+#else
+#error cannot initialize spin lock
+#endif
                 int low, high, rem, rover;
                 inet_get_local_port_range(&low, &high);
 		rem = (high - low) + 1;

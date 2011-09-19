@@ -1298,6 +1298,27 @@ specfs_fill_super(struct super_block *sb, void *data, int silent)
 	return (err);
 }
 
+#ifdef HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_MOUNT
+STATIC struct dentry *
+specfs_fst_mount(struct file_system_type *fs_type, int flags, const char *dev_name, void *data)
+{
+	_ptrace(("reading superblock\n"));
+	return mount_single(fs_type, flags, data, specfs_fill_super);
+}
+STATIC void
+specfs_kill_sb(struct super_block *sb)
+{
+	_ptrace(("killing superblock %p\n", sb));
+	return kill_anon_super(sb);
+}
+
+struct file_system_type spec_fs_type = {
+	.owner = THIS_MODULE,
+	.name = "specfs",
+	.mount = specfs_fst_mount,
+	.kill_sb = specfs_kill_sb,
+};
+#else
 #ifdef HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB
 #ifdef HAVE_FILE_SYSTEM_TYPE_GET_SB_VFSMOUNT
 STATIC int
@@ -1347,7 +1368,8 @@ specfs_read_super(struct super_block *sb, void *data, int silent)
 
 STATIC DECLARE_FSTYPE(spec_fs_type, "specfs", specfs_read_super, FS_SINGLE);
 #else
-#error HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB or HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_READ_SUPER must be defined.
+#error HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_GET_SB, HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_READ_SUPER or HAVE_KMEMB_STRUCT_FILE_SYSTEM_TYPE_MOUNT must be defined.
+#endif
 #endif
 #endif
 

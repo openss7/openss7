@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -226,7 +226,13 @@ ss7_bufpool_init(struct ss7_bufpool *pool)
 		pool->head = NULL;
 		atomic_set(&pool->count, 0);
 		atomic_set(&pool->reserve, 0);
+#ifdef SPIN_LOCK_UNLOCKED
 		pool->lock = SPIN_LOCK_UNLOCKED;
+#elif defined spin_lock_init
+                spin_lock_init(&pool->lock);
+#else
+#error cannot initialize spin lock
+#endif
 		pool->initialized = 1;
 	} else
 		swerr();
