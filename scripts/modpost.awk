@@ -1459,6 +1459,8 @@ function write_syssymver(file,    sym,line,count_syms,mod)
     }
     if (count_syms)
 	close(file)
+    else
+	system_command("touch " file)
     print_vinfo(1,"w: syssymver, syms " count_syms)
 }
 function write_modsymver(file,    sym,line,count_syms,mod)
@@ -1485,6 +1487,8 @@ function write_modsymver(file,    sym,line,count_syms,mod)
     }
     if (count_syms)
 	close(file)
+    else
+	system_command("touch " file)
     print_vinfo(1,"w: modsymver, syms " count_syms)
 }
 function create_missing_symsets(	progress,count,count_syms,count_sets,sym,set,setmiss,n,symbols,hash,symfile,pos)
