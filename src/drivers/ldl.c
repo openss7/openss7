@@ -599,10 +599,10 @@ STATIC struct pt *first_pt = NULL;
 STATIC spinlock_t first_pt_lock = SPIN_LOCK_UNLOCKED;
 #elif defined __SPIN_LOCK_UNLOCKED
 STATIC spinlock_t first_pt_lock = __SPIN_LOCK_UNLOCKED(&first_pt_lock);
-STATIC struct ndev *first_ndev = NULL;
 #else
 #error cannot initialize spin locks
 #endif
+STATIC struct ndev *first_ndev = NULL;
 STATIC struct dl dl_dl[LDL_N_MINOR] = { {}, };
 
 STATIC struct dl *first_open = NULL;
