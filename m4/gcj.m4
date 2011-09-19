@@ -184,6 +184,12 @@ fi
 
 test -z "$GCJ" && AC_MSG_FAILURE([no acceptable GCJ compiler found in \$PATH])
 
+if test :${GCJ:-gcj} != :gcj; then
+    PACKAGE_RPMOPTIONS="GCJ=\"$GCJ\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
+    PACKAGE_DEBOPTIONS="GCJ=\"$GCJ\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
+    ac_configure_args="GCJ=\"$GCJ\"${ac_configure_args:+ $ac_configure_args}"
+fi
+
 # Provide some information about the compiler
 _AS_ECHO_LOG([checking for _AC_LANG compiler version])
 set X $ac_compile
@@ -248,6 +254,11 @@ if test -z "$GCJH"; then
     AC_CHECK_TOOLS(GCJH,
 	[m4_default([$1], [gcjh3 gcjh])],
 	gcjh)
+fi
+if test :${GCJH:-gcjh} != :gcjh; then
+    PACKAGE_RPMOPTIONS="GCJH=\"$GCJH\"${PACKAGE_RPMOPTIONS:+ $PACKAGE_RPMOPTIONS}"
+    PACKAGE_DEBOPTIONS="GCJH=\"$GCJH\"${PACKAGE_DEBOPTIONS:+ $PACKAGE_DEBOPTIONS}"
+    ac_configure_args="GCJH=\"$GCJH\"${ac_configure_args:+ $ac_configure_args}"
 fi
 # Provide some information about the compiler
 _AS_ECHO_LOG([checking for Javah compiler version])
