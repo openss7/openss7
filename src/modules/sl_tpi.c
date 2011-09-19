@@ -433,7 +433,13 @@ sl_esballoc(queue_t *q, unsigned char *base, size_t size, int prior, frtn_t *frt
  *  -------------------------------------------------------------------------
  */
 STATIC mblk_t *sl_bufpool = NULL;
+#ifdef SPIN_LOCK_UNLOCKED
 STATIC spinlock_t sl_bufpool_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t sl_bufpool_lock = __SPIN_LOCK_UNLOCKED(&sl_bufpool_lock);
+#else
+#error cannot initialize spin locks
+#endif
 
 /*
  *  FAST ALLOCB

@@ -157,7 +157,13 @@ struct dl {
 	dl_info_ack_t info;
 };
 
+#ifdef RW_LOCK_UNLOCKED
 rwlock_t atm_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+rwlock_t atm_lock = __RW_LOCK_UNLOCKED(&atm_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 caddr_t atm_opens;
 
 #define DL_PRIV(q) (struct dl *)(q->q_ptr)

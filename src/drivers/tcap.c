@@ -10188,7 +10188,13 @@ n_other_ind(struct sc *sc, queue_t *q, mblk_t *mp)
  *  =========================================================================
  */
 
+#ifdef RW_LOCK_UNLOCKED
 static rwlock_t tcap_mux_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+static rwlock_t tcap_mux_lock = __RW_LOCK_UNLOCKED(&tcap_mux_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 static wait_queue_head_t tcap_waitq;
 
 static void tcap_attach(struct tc *tc, struct te *te)

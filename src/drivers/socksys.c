@@ -846,7 +846,13 @@ ssys_free_priv(queue_t *q)
 
 STATIC int ssys_majors[CMAJORS] = { CMAJOR_0, };
 STATIC struct ssys *socksys_opens = NULL;
+#ifdef RW_LOCK_UNLOCKED
 STATIC rwlock_t socksys_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t socksys_lock = __RW_LOCK_UNLOCKED(&socksys_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 
 /**
  * socksys_qopen - SOCKSYS driver STREAMS open routine

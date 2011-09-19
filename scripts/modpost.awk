@@ -1124,12 +1124,13 @@ function read_dumpfiles_line(own, src)
 	print_error("oops NF = " NF)
 	return
     }
-    if (NF > 4 || (NF > 3 && $4 !~ /^EXPORT_.*SYMBOL/)) {
+    if (NF > 4 || (NF > 3 && $4 !~ /^EXPORT_.*SYMBOL/ && $4 !~ /^\(unknown\)/)) {
 	show_junk($0, 4)
 	return
     }
     if (NF < 3) $3 = "vmlinux"
     if (NF < 4) $4 = ""
+    if ($4 ~ /^\(unknown\)/) $4 = ""
     set_symbol($2, $3, $1, $4, "", 0, own, src, 0, "dumpfiles")
 }
 function read_dumpfiles(command, own, src)

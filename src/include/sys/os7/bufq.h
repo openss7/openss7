@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -82,10 +82,16 @@ typedef struct bufq {
 	size_t q_count;
 } bufq_t;
 
-__OS7_EXTERN_INLINE void
+static __inline__ void
 bufq_init(bufq_t * q)
 {
+#ifdef SPIN_LOCK_UNLOCKED
 	q->q_lock = SPIN_LOCK_UNLOCKED;
+#elif defined spin_lock_init
+        spin_lock_init(&q->q_lock);
+#else
+#error cannot initialize spin lock
+#endif
 	q->q_head = NULL;
 	q->q_tail = NULL;
 	q->q_msgs = 0;

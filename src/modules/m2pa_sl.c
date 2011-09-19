@@ -8273,7 +8273,13 @@ sl_put(struct sl *sl)
  */
 unsigned short modid = MOD_ID;
 STATIC struct sl *sl_list = NULL;
+#ifdef SPIN_LOCK_UNLOCKED
 STATIC spinlock_t sl_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t sl_lock = __SPIN_LOCK_UNLOCKED(&sl_lock);
+#else
+#error cannot initialize spin locks
+#endif
 STATIC int m2pa_instance = 0;
 STATIC streamscall int
 sl_open(queue_t *q, dev_t *devp, int flag, int sflag, cred_t *crp)

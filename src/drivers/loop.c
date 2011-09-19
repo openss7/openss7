@@ -206,7 +206,13 @@ typedef struct loop {
 } loop_t;
 
 STATIC struct loop *loop_opens = NULL;
+#ifdef SPIN_LOCK_UNLOCKED
 STATIC spinlock_t loop_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t loop_lock = __SPIN_LOCK_UNLOCKED(&loop_lock);
+#else
+#error cannot initialize spin locks
+#endif
 
 /*
  *  Locking

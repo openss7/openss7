@@ -260,7 +260,13 @@ struct df {
 };
 
 static struct df master = {
+#ifdef RW_LOCK_UNLOCKED
 	.lock = RW_LOCK_UNLOCKED,
+#elif defined __RW_LOCK_UNLOCKED
+	.lock = __RW_LOCK_UNLOCKED(&master.lock),
+#else
+#error cannot initialize read-write locks
+#endif
 };
 
 static struct df *
@@ -702,7 +708,13 @@ static uint sl_get_id(uint);
 			|TSF_WACK_DREQ10 \
 			|TSF_WACK_DREQ11)
 
+#ifdef RW_LOCK_UNLOCKED
 static rwlock_t mtp_mux_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+static rwlock_t mtp_mux_lock = __RW_LOCK_UNLOCKED(&mtp_mux_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 
 /*
  *  =========================================================================

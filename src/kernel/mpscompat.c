@@ -522,7 +522,14 @@ mi_prev_ptr(caddr_t ptr)
 
 EXPORT_SYMBOL(mi_prev_ptr);	/* mps/ddi.h, aix/ddi.h */
 
+#ifdef SPIN_LOCK_UNLOCKED
 static spinlock_t mi_list_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+static spinlock_t mi_list_lock = __SPIN_LOCK_UNLOCKED(&mi_list_lock);
+#else
+#error cannot initialize spin locks
+#endif
+
 
 /**
  * mi_open_link: - link a private structure into head list
@@ -1817,7 +1824,13 @@ mi_timer_alloc_MAC(queue_t *q, size_t size)
 		tb = (typeof(tb)) mp->b_rptr;
 		mp->b_rptr = (typeof(mp->b_rptr)) (tb + 1);
 		mp->b_wptr = mp->b_rptr + size;
+#ifdef SPIN_LOCK_UNLOCKED
 		tb->tb_lock = SPIN_LOCK_UNLOCKED;
+#elif defined spin_lock_init
+		spin_lock_init(&tb->tb_lock);
+#else
+#error cannot initialize spin locks
+#endif
 		tb->tb_state = TB_IDLE;
 		tb->tb_tid = (toid_t) (0);
 		tb->tb_time = (clock_t) (0);

@@ -637,7 +637,13 @@ static caddr_t ua_opens = NULL;		/* open list */
 static caddr_t ua_links = NULL;		/* link list */
 
 /* this lock protects lm_ctrl, ua_opens, ua_links, and lower mux q->q_ptr */
+#ifdef RW_LOCK_UNLOCKED
 static rwlock_t ua_mux_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+static rwlock_t ua_mux_lock = __RW_LOCK_UNLOCKED(&ua_mux_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 static DECLARE_WAIT_QUEUE_HEAD(ua_waitq);
 
 #if M2UA

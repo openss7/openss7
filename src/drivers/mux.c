@@ -217,7 +217,13 @@ static struct mux no_mux = {
 	.dev = 0,
 };
 
+#ifdef RW_LOCK_UNLOCKED
 static rwlock_t mux_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+static rwlock_t mux_lock = __RW_LOCK_UNLOCKED(&mux_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 static struct mux *mux_opens = NULL;
 static struct mux *mux_links = NULL;
 

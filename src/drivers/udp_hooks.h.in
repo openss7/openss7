@@ -321,9 +321,13 @@ extern int sysctl_local_port_range[2];
 #undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
 /* Define if function ip_route_output_key() takes 3 arguments. */
 #undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
+/* Define if function ip_route-output_key() returns a pointer to struct
+   rtable. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
 #if !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS && \
-    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
-#error Do no know how many arguments ip_route_output_key() takes.
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS && \
+    !defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+#error Do not know how many arguments ip_route_output_key() takes.
 #endif
 /* Symbol __ip_route_output_key is supported. */
 #undef HAVE___IP_ROUTE_OUTPUT_KEY_SUPPORT
@@ -332,12 +336,16 @@ extern int sysctl_local_port_range[2];
 extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
 #elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+extern struct rtable *__ip_route_output_key(struct net *, struct flowi4 *flp);
 #endif
 #else
 #if defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
 extern int __ip_route_output_key(struct rtable **rp, const struct flowi *flp);
 #elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 extern int __ip_route_output_key(struct net *, struct rtable **, const struct flowi *flp);
+#elif defined HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+extern struct rtable *__ip_route_output_key(struct net *, struct flowi4 *flp);
 #endif
 #endif
 #endif
@@ -374,9 +382,60 @@ dst_update_pmtu(struct dst_entry *dst, uint32_t mtu)
 #	define dst_pmtu dst_mtu
 #endif
 
+/* Define if function ip_route_connect() returns a pointer to an rtable
+   structure, which is the case from 3.0.0. */
+#undef HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+#ifdef HAVE_KFUNC_IP_ROUTE_CONNECT_RTABLE_RETURN
+#undef ip_route_connect
+static __inline__ int
+ip_route_connect_(struct rtale **rp, __be32 dst, __be32 src, u32 tos, int oif,
+		  u8 protocol, __be16 sport, __be16 dport, struct sock *sk, int flags)
+{
+	struct flowi4 fl4 = {
+		.flowi4_oif = oif,
+		.daddr = dst,
+		.saddr = src,
+		.flowi4_tos = tos,
+		.flowi4_proto = protocol,
+	};
+	struct rtable *rt;
+
+	rt = ip_route_connect(&fl4, dst, src, tos, oif, protocol, sport, dport, sk, 0);
+	if (IS_ERR(rt)) {
+		return PTR_ERR(rt);
+	}
+	if (rp != NULL) {
+		*rp = rt;
+	}
+	return (0);
+}
+#define ip_route_connect(rp,dst,src,tos,oif,protocol,sport,dport,sk,flags) ip_route_connect_(rp,dst,src,tos,oif,protocol,sport,dport,sk,flags)
+#endif
+
 /* Define to 1 if 'dev_base_head' is member of 'struct net'. */
 #undef HAVE_KMEMB_STRUCT_NET_DEV_BASE_HEAD
 
+/* Define if function ip_route-output_key() returns a pointer to struct
+   rtable. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+#ifdef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_RTABLE_RETURN
+#undef ip_route_output
+static __inline__ int
+ip_route_output_(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
+{
+        struct rtable *rt;
+
+        rt = ip_route_output(&init_net, daddr, saddr, tos, oif);
+        if (IS_ERR(rt)) {
+                return PTR_ERR(rt);
+        }
+        if (rp != NULL) {
+                *rp = rt;
+        }
+        return (0);
+}
+#define ip_route_output(rp,daddr,saddr,tos,oif) ip_route_output_(rp,daddr,saddr,tos,oif)
+#else
 /* Define if you have the explicit version of ip_route_output. */
 #undef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
 #ifndef HAVE_IP_ROUTE_OUTPUT_EXPLICIT
@@ -396,9 +455,16 @@ ip_route_output(struct rtable **rp, u32 daddr, u32 saddr, u32 tos, int oif)
 #ifdef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_3_ARGS
 	return ip_route_output_key(&init_net, rp, &fl);
 #else
+/* Define if function ip_route_output_key() takes 2 arguments. */
+#undef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
+#ifdef HAVE_KFUNC_IP_ROUTE_OUTPUT_KEY_2_ARGS
 	return ip_route_output_key(rp, &fl);
+#else
+#error Do not know how many arguments ip_route_output_key() takes.
+#endif
 #endif
 }
+#endif
 #endif
 
 /* Symbol __xfrm_policy_check is available. */

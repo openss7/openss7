@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -166,13 +166,19 @@ __SVR4_EXTERN int itoemajor(major_t imajor, int prevemaj);
 #ifdef LOCK_ALLOC
 #undef LOCK_ALLOC
 #endif
-__SVR4_EXTERN_INLINE lock_t *
+static __inline__ lock_t *
 LOCK_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag)
 {
 	lock_t *lockp;
 
 	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
+#ifdef SPIN_LOCK_UNLOCKED
 		*lockp = SPIN_LOCK_UNLOCKED;
+#elif defined spin_lock_init
+                spin_lock_init(lockp);
+#else
+#error cannot initialize spin lock
+#endif
 	return (lockp);
 }
 
@@ -236,7 +242,13 @@ RW_ALLOC(unsigned char hierarchy, pl_t min_pl, lkinfo_t * lkinfop, int flag)
 	rwlock_t *lockp;
 
 	if ((lockp = kmem_alloc(sizeof(*lockp), flag)))
+#ifdef RW_LOCK_UNLOCKED
 		*lockp = RW_LOCK_UNLOCKED;
+#elif defined rwlock_init
+                rwlock_init(lockp);
+#else
+#error cannot initialize spin locks
+#endif
 	return (lockp);
 }
 __SVR4_EXTERN_INLINE void

@@ -121,7 +121,13 @@ static char const ident[] = "$RCSfile: strreg.c,v $ $Name:  $($Revision: 1.1.2.4
  *  -------------------------------------------------------------------------
  */
 
+#if	defined RW_LOCK_UNLOCKED
 rwlock_t strreg_lock = RW_LOCK_UNLOCKED;
+#elif	defined __RW_LOCK_UNLOCKED
+rwlock_t strreg_lock = __RW_LOCK_UNLOCKED(&strreg_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 struct list_head strreg_list = LIST_HEAD_INIT(strreg_list);
 
 /**

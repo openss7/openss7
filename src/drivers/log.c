@@ -533,7 +533,13 @@ log_wput(queue_t *q, mblk_t *mp)
 	return (0);
 }
 
+#ifdef SPIN_LOCK_UNLOCKED
 static spinlock_t log_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+static spinlock_t log_lock = __SPIN_LOCK_UNLOCKED(&log_lock);
+#else
+#error cannot initialise spin locks
+#endif
 static struct log *log_list = NULL;
 
 static streamscall int

@@ -1670,7 +1670,13 @@ typedef struct sccp_msg {
  *
  *  =========================================================================
  */
+#ifdef RW_LOCK_UNLOCKED
 static rwlock_t sccp_mux_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+static rwlock_t sccp_mux_lock = __RW_LOCK_UNLOCKED(&sccp_mux_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 
 static bool
 sc_trylock(struct sc *sc, queue_t *q)

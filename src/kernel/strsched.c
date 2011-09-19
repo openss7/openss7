@@ -1421,7 +1421,13 @@ linkinfo_ctor(void *obj, kmem_cachep_t cachep, unsigned long flags)
 	if ((flags & (SLAB_CTOR_VERIFY | SLAB_CTOR_CONSTRUCTOR)) == SLAB_CTOR_CONSTRUCTOR)
 #endif
 	{
+#if	defined SPIN_LOCK_UNLOCKED
 		static spinlock_t link_index_lock = SPIN_LOCK_UNLOCKED;
+#elif	defined __SPIN_LOCK_UNLOCKED
+		static spinlock_t link_index_lock = __SPIN_LOCK_UNLOCKED(&link_index_lock);
+#else
+#error cannot initialize spin lock
+#endif
 		struct linkinfo *li = obj;
 		struct linkblk *l = &li->li_linkblk;
 
@@ -1550,7 +1556,13 @@ sq_alloc(void)
 }
 
 static struct syncq *elsewhere_list = NULL;
+#if	defined SPIN_LOCK_UNLOCKED
 static spinlock_t elsewhere_lock = SPIN_LOCK_UNLOCKED;
+#elif	defined __SPIN_LOCK_UNLOCKED
+static spinlock_t elsewhere_lock = __SPIN_LOCK_UNLOCKED(&elsewhere_lock);
+#else
+#error cannot initialize spin locks
+#endif
 
 BIG_STATIC streams_fastcall __unlikely struct syncq *
 sq_locate(const char *sq_info)
@@ -1705,7 +1717,13 @@ sq_release(struct syncq **sqp)
 #define EVENT_LIMIT (1<<16)
 #define EVENT_HASH_SIZE (1<<10)
 #define EVENT_HASH_MASK (EVENT_HASH_SIZE-1)
+#if	defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t event_hash_lock = SPIN_LOCK_UNLOCKED;
+#elif	defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t event_hash_lock = __SPIN_LOCK_UNLOCKED(&even_hash_lock);
+#else
+#error cannot initialize spin locks
+#endif
 STATIC struct strevent *event_hash[EVENT_HASH_SIZE] __cacheline_aligned;
 STATIC inline fastcall void
 event_insert(struct strevent **sep, struct strevent *se)
@@ -1989,7 +2007,13 @@ strsched_bufcall(struct strevent *se)
 	return (id);
 }
 
+#if defined SPIN_LOCK_UNLOCKED
 static spinlock_t timeout_list_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+static spinlock_t timeout_list_lock = __SPIN_LOCK_UNLOCKED(&timeout_list_lock );
+#else
+#error cannot initialize spin locks
+#endif
 
 /*
  *  timeout_function: - execute a linux kernel timer timeout

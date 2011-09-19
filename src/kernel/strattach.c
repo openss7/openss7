@@ -82,7 +82,9 @@ static char const ident[] = "$RCSfile: strattach.c,v $ $Name:  $($Revision: 1.1.
 #include <linux/init.h>
 
 #include <linux/slab.h>
+#ifdef HAVE_KINK_LINUX_SMP_LOCK_H
 #include <linux/smp_lock.h>
+#endif
 #include <linux/init.h>
 #include <linux/quotaops.h>
 #include <linux/acct.h>

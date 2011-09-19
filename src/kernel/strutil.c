@@ -153,7 +153,13 @@ static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.
 #define _WR(__rq) ((__rq) + 1)
 #define _RD(__wq) ((__wq) - 1)
 
+#if defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t db_ref_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t db_ref_lock = __SPIN_LOCK_UNLOCKED(&db_ref_lock );
+#else
+#error cannot initialized spin locks
+#endif
 
 //streams_noinline streams_fastcall __unlikely int
 STATIC streams_inline streams_fastcall __hot_get int
@@ -4129,7 +4135,13 @@ strqset(register queue_t *q, qfields_t what, register unsigned char band, long v
 
 EXPORT_SYMBOL(strqset);
 
+#if defined SPIN_LOCK_UNLOCKED
 STATIC spinlock_t str_err_lock = SPIN_LOCK_UNLOCKED;
+#elif defined __SPIN_LOCK_UNLOCKED
+STATIC spinlock_t str_err_lock = __SPIN_LOCK_UNLOCKED(&str_err_lock);
+#else
+#error cannot initialize spin locks
+#endif
 STATIC char str_err_buf[LOGMSGSZ];
 
 /*
@@ -4175,7 +4187,13 @@ vstrlog_default(short mid, short sid, char level, unsigned short flag, char *fmt
 	return (rval);
 }
 
+#if defined RW_LOCK_UNLOCKED
 STATIC rwlock_t strlog_reg_lock = RW_LOCK_UNLOCKED;
+#elif defined __RW_LOCK_UNLOCKED
+STATIC rwlock_t strlog_reg_lock = __RW_LOCK_UNLOCKED(&strlog_reg_lock);
+#else
+#error cannot initialize read-write locks
+#endif
 STATIC vstrlog_t vstrlog_hook = &vstrlog_default;
 
 /**
