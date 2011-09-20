@@ -7,6 +7,111 @@
 	* configs/configure.generic: added configs
 	* configs/configure.ubuntu-lucid: added configs
 
+	*  Makefile.am: added build caches
+	*  acinclude.m4: checks for 3.0.0 kernel
+	*  openss7.spec.in: final improvements
+	*  am/kernel.am: handle kernel components
+	*  am/rpm.am: handle release directories better
+	*  cache/centos-5-x86_64-config.cache: new caches
+	*  cache/fedora-15-x86_64-config.cache: new caches
+	*  cache/mageia-1-x86_64-config.cache: new caches
+	*  cache/mandriva-2011.0-x86_64-config.cache: new caches
+	*  cache/mes-5.2-x86_64-config.cache: new caches
+	*  cache/puias-6-x86_64-config.cache: new caches
+	*  cache/rhel-6-x86_64-config.cache: new caches
+	*  cache/scientific-6-x86_64-config.cache: new caches
+	*  cache/suse-11-x86_64-config.cache: new caches
+	*  cache/ubuntu-lucid-amd64-config.cache: new caches
+	*  debian/control.in: 3.x kernel
+	*  doc/manual/install.texi: add xz to tool chain
+	*  m4/bld.m4: use target vendor instead of build distro
+	*  m4/deb.m4: add lts build distro
+	*  m4/dist.m4: handle openSUSE
+	*  m4/gcj.m4: propagate env variable settings for GCJ
+	*  m4/genksyms.m4: better new-kernel-pkg handling
+	*  m4/kernel.m4: handle 3.x kernel and new distros
+	*  m4/pr.m4: handle openSUSE
+	*  m4/rpm.m4: handle more distros
+	*  scripts/modpost.awk: kabi improvements and dumb fedora kernels
+	*  scripts/openss7-modules: handle 3.x kernel
+	*  scripts/rpm/find-provides: better tool search
+	*  scripts/rpm/find-requires: better tool search
+	*  scripts/rpm/find-requires.kmod: corrections
+	*  scripts/texi/install.texi: add xz to tool chain
+	*  src/drivers/atm.c: changes for 3.x kernel
+	*  src/drivers/clns.c: changes for 3.x kernel
+	*  src/drivers/echo.c: changes for 3.x kernel
+	*  src/drivers/inet.c: changes for 3.x kernel
+	*  src/drivers/ip_hooks.h.in: changes for 3.x kernel
+	*  src/drivers/isua_as.c: changes for 3.x kernel
+	*  src/drivers/ldl.c: changes for 3.x kernel
+	*  src/drivers/log.c: changes for 3.x kernel
+	*  src/drivers/loop.c: changes for 3.x kernel
+	*  src/drivers/m2ua_as.c: changes for 3.x kernel
+	*  src/drivers/m3ua_as.c: changes for 3.x kernel
+	*  src/drivers/mtp.c: changes for 3.x kernel
+	*  src/drivers/mtp_min.c: changes for 3.x kernel
+	*  src/drivers/mux.c: changes for 3.x kernel
+	*  src/drivers/np_ip.c: changes for 3.x kernel
+	*  src/drivers/np_udp.c: changes for 3.x kernel
+	*  src/drivers/nuls.c: changes for 3.x kernel
+	*  src/drivers/pty.c: changes for 3.x kernel
+	*  src/drivers/rawip.c: changes for 3.x kernel
+	*  src/drivers/sccp.c: changes for 3.x kernel
+	*  src/drivers/sctp2.c: changes for 3.x kernel
+	*  src/drivers/sl_mux.c: changes for 3.x kernel
+	*  src/drivers/sl_x100p.c: changes for 3.x kernel
+	*  src/drivers/sl_x400p.c: changes for 3.x kernel
+	*  src/drivers/socksys.c: changes for 3.x kernel
+	*  src/drivers/spx.c: changes for 3.x kernel
+	*  src/drivers/sua_as.c: changes for 3.x kernel
+	*  src/drivers/tcap.c: changes for 3.x kernel
+	*  src/drivers/tcp.c: changes for 3.x kernel
+	*  src/drivers/tua_as.c: changes for 3.x kernel
+	*  src/drivers/ua_as.c: changes for 3.x kernel
+	*  src/drivers/udp.c: changes for 3.x kernel
+	*  src/drivers/udp_hooks.h.in: changes for 3.x kernel
+	*  src/drivers/x100p-ss7.c: changes for 3.x kernel
+	*  src/drivers/x400p-ss7.c: changes for 3.x kernel
+	*  src/include/sys/os7/bufpool.h: changes for 3.x kernel
+	*  src/include/sys/os7/bufq.h: changes for 3.x kernel
+	*  src/include/sys/svr4/ddi.h: changes for 3.x kernel
+	*  src/kernel/hpuxcompat.c: changes for 3.x kernel
+	*  src/kernel/mpscompat.c: changes for 3.x kernel
+	*  src/kernel/osfcompat.c: changes for 3.x kernel
+	*  src/kernel/strattach.c: changes for 3.x kernel
+	*  src/kernel/strlookup.c: changes for 3.x kernel
+	*  src/kernel/strpipe.c: changes for 3.x kernel
+	*  src/kernel/strreg.c: changes for 3.x kernel
+	*  src/kernel/strsad.c: changes for 3.x kernel
+	*  src/kernel/strsched.c: changes for 3.x kernel
+	*  src/kernel/strspecfs.c: changes for 3.x kernel
+	*  src/kernel/strutil.c: changes for 3.x kernel
+	*  src/mason/auth.pl: handle openSUSE
+	*  src/mason/autohandler: corrects and repo_gpgcheck
+	*  src/modules/aal1.c: changes for 3.x kernel
+	*  src/modules/aal2.c: changes for 3.x kernel
+	*  src/modules/aal5.c: changes for 3.x kernel
+	*  src/modules/m2pa_sl.c: changes for 3.x kernel
+	*  src/modules/phys.c: changes for 3.x kernel
+	*  src/modules/sl_tpi.c: changes for 3.x kernel
+	*  src/modules/sscop.c: changes for 3.x kernel
+	*  src/modules/sscopmce.c: changes for 3.x kernel
+	*  src/modules/sth.c: changes for 3.x kernel
+	*  src/snmp/tcapMIB.c: changes for 3.x kernel
+	*  src/util/init/openss7: init script improvements
+	*  src/util/init/openss7.sh: init script improvements
+	*  src/util/init/specfs: init script improvements
+	*  src/util/init/specfs.sh: init script improvements
+	*  src/util/init/strace: init script improvements
+	*  src/util/init/strace.sh: init script improvements
+	*  src/util/init/streams: init script improvements
+	*  src/util/init/streams.sh: init script improvements
+	*  src/util/init/strerr: init script improvements
+	*  src/util/init/strerr.sh: init script improvements
+	*  src/util/init/strlogd: init script improvements
+	*  src/util/init/strlogd.sh: init script improvements
+
 2011-09-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added user load flags and moved some

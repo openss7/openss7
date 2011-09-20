@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:37 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-20 09:51:42 $
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -481,7 +481,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-05-10 13:45:37 $
+# @(#) $RCSfile: strace.sh,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-20 09:51:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -527,11 +527,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-05-10 13:45:37 $ by $Author: brian $
+# Last Modified $Date: 2011-09-20 09:51:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strace.sh,v $
+# Revision 1.1.2.3  2011-09-20 09:51:42  brian
+# - updates from git
+#
 # Revision 1.1.2.2  2011-05-10 13:45:37  brian
 # - weak modules workup
 #

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $
+ @(#) $RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:37 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcap.c,v $
+ Revision 1.1.2.6  2011-09-20 09:51:37  brian
+ - updates from git
+
  Revision 1.1.2.5  2011-09-02 08:46:37  brian
  - sync up lots of repo and build changes from git
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $";
+static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $";
 
 /*
  *  This is a TCAP (Transaction Capabilities Application Part) multiplexing
@@ -118,7 +121,7 @@ static char const ident[] = "$RCSfile: tcap.c,v $ $Name:  $($Revision: 1.1.2.5 $
 
 #define TCAP_DESCRIP	"SS7 TRANSACTION CAPABILITIES APPLICATION PART (TCAP) STREAMS MULTIPLEXING DRIVER."
 #define TCAP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
-#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $"
+#define TCAP_REVISION	"OpenSS7 $RCSfile: tcap.c,v $ $Name:  $ ($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $"
 #define TCAP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define TCAP_DEVICE	"Supports OpenSS7 SCCP NPI Interface Pseudo-Device Drivers."
 #define TCAP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

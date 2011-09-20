@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $
+ @(#) $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:37 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: socksys.c,v $
+ Revision 1.1.2.6  2011-09-20 09:51:37  brian
+ - updates from git
+
  Revision 1.1.2.5  2011-09-02 08:46:37  brian
  - sync up lots of repo and build changes from git
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $";
+static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $";
 
 /*
  *  A Socket System (SOCKSYS) Driver.
@@ -116,7 +119,7 @@ static char const ident[] = "$RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.
 
 #define SOCKSYS_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SOCKSYS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:37 $"
+#define SOCKSYS_REVISION	"OpenSS7 $RCSfile: socksys.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:37 $"
 #define SOCKSYS_DEVICE		"SVR 4.2 MP STREAMS Socket System Driver (SOCKSYS)"
 #define SOCKSYS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define SOCKSYS_LICENSE		"GPL"

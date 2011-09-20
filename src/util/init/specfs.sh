@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-15 12:01:21 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:42 $
 # Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
@@ -976,7 +976,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-05-15 12:01:21 $
+# @(#) $RCSfile: specfs.sh,v $ $Name:  $($Revision: 1.1.2.8 $) $Date: 2011-09-20 09:51:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -1022,11 +1022,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-05-15 12:01:21 $ by $Author: brian $
+# Last Modified $Date: 2011-09-20 09:51:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: specfs.sh,v $
+# Revision 1.1.2.8  2011-09-20 09:51:42  brian
+# - updates from git
+#
 # Revision 1.1.2.7  2011-05-15 12:01:21  brian
 # - many build system refinements
 #

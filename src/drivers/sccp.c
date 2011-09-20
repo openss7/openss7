@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-02 08:46:35 $
+ @(#) $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:36 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:35 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:36 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sccp.c,v $
+ Revision 1.1.2.7  2011-09-20 09:51:36  brian
+ - updates from git
+
  Revision 1.1.2.6  2011-09-02 08:46:35  brian
  - sync up lots of repo and build changes from git
 
@@ -72,7 +75,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-02 08:46:35 $";
+static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:36 $";
 
 /*
  *  This is an SCCP (Signalling Connection Control Part) multiplexing driver which can have MTP
@@ -108,7 +111,7 @@ static char const ident[] = "$RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.6 $
 #include <sys/xti_sccp.h>
 
 #define SCCP_DESCRIP	"SS7 SIGNALLING CONNECTION CONTROL PART (SCCP) STREAMS MULTIPLEXING DRIVER."
-#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-02 08:46:35 $"
+#define SCCP_REVISION	"LfS $RCSfile: sccp.c,v $ $Name:  $($Revision: 1.1.2.7 $) $Date: 2011-09-20 09:51:36 $"
 #define SCCP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SCCP_DEVICE	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SCCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

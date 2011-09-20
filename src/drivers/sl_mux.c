@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:36 $
+ @(#) $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:36 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sl_mux.c,v $
+ Revision 1.1.2.5  2011-09-20 09:51:37  brian
+ - updates from git
+
  Revision 1.1.2.4  2011-09-02 08:46:36  brian
  - sync up lots of repo and build changes from git
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:36 $";
+static char const ident[] = "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $";
 
 /*
  *  This is a signalling link multiplexing driver for signalling link management.  The purpose of
@@ -107,7 +110,7 @@ static char const ident[] = "$RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.4
 #include <ss7/sl_mux.h>
 
 #define SL_MUX_DESCRIP		"SL-MUX: SS7/SL (Signalling Link) STREAMS MULTIPLEXING DRIVER."
-#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:36 $"
+#define SL_MUX_REVISION		"OpenSS7 $RCSfile: sl_mux.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $"
 #define SL_MUX_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SL_MUX_DEVICE		"Supports the OpenSS7 MTP2 and INET transport drivers."
 #define SL_MUX_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

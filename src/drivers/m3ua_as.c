@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $
+ @(#) $RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:34 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m3ua_as.c,v $
+ Revision 1.1.2.4  2011-09-20 09:51:35  brian
+ - updates from git
+
  Revision 1.1.2.3  2011-09-02 08:46:34  brian
  - sync up lots of repo and build changes from git
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $";
+static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:35 $";
 
 /*
  *  This is an M3UA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -158,7 +161,7 @@ static char const ident[] = "$RCSfile: m3ua_as.c,v $ $Name:  $($Revision: 1.1.2.
 /* ============================== */
 
 #define M3UA_AS_DESCRIP		"M3UA/SCTP AS MTP STREAMS MULTIPLEXING DRIVER."
-#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $ ($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:34 $"
+#define M3UA_AS_REVISION	"OpenSS7 $RCSfile: m3ua_as.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:35 $"
 #define M3UA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M3UA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define M3UA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $
+ @(#) $RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:41 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:56 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:41 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sscop.c,v $
+ Revision 1.1.2.4  2011-09-20 09:51:41  brian
+ - updates from git
+
  Revision 1.1.2.3  2011-09-02 08:46:56  brian
  - sync up lots of repo and build changes from git
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $";
+static char const ident[] = "$RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:41 $";
 
 /*
  * This is an SSCOPE module for use with MTP3b.  It can be pushed over an AAL5 Stream to provide the
@@ -82,7 +85,7 @@ static char const ident[] = "$RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.3 
 #include <sys/dlpi.h>
 
 #define SSCOP_DESCRIP	"MTP3B-SSCOP STREAMS MODULE."
-#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:56 $"
+#define SSCOP_REVISION	"OpenSS7 $RCSfile: sscop.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:41 $"
 #define SSCOP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SSCOP_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-SSCOP module."
 #define SSCOP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
