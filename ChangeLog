@@ -1,3 +1,12 @@
+2011-09-20  Brian Bidulock  <bidulock@openss7.org>
+	* cache/debian-wheezy-i386-config.cache: added build cache
+	* cache/mandriva-2010.2-i586-config.cache: added build cache
+	* cache/openSUSE-11.4-x86_64-config.cache: added build cache
+	* cache/scientific-5-x86_64-config.cache: added build cache
+	* configs/configure.debian-wheezy: added configs
+	* configs/configure.generic: added configs
+	* configs/configure.ubuntu-lucid: added configs
+
 2011-09-02  Brian Bidulock  <bidulock@openss7.org>
 
 	* Makefile.am: added user load flags and moved some
