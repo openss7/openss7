@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:37 $
+ @(#) $RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:37 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: sua_as.c,v $
+ Revision 1.1.2.5  2011-09-20 09:51:37  brian
+ - updates from git
+
  Revision 1.1.2.4  2011-09-02 08:46:37  brian
  - sync up lots of repo and build changes from git
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:37 $";
+static char const ident[] = "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $";
 
 /*
  *  This is an SUA multiplexing driver for the AS side of the ASP-SGP communications.  It works like
@@ -161,7 +164,7 @@ static char const ident[] = "$RCSfile: sua_as.c,v $ $Name:  $($Revision: 1.1.2.4
 /* ============================== */
 
 #define SUA_AS_DESCRIP		"SUA/SCTP AS SCCP STREAMS MULTIPLEXING DRIVER."
-#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:37 $"
+#define SUA_AS_REVISION		"OpenSS7 $RCSfile: sua_as.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:37 $"
 #define SUA_AS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define SUA_AS_DEVICE		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SUA_AS_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

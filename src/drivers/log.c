@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:33 $
+ @(#) $RCSfile: log.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:33 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:35 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: log.c,v $
+ Revision 1.1.2.6  2011-09-20 09:51:35  brian
+ - updates from git
+
  Revision 1.1.2.5  2011-09-02 08:46:33  brian
  - sync up lots of repo and build changes from git
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:33 $";
+static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $";
 
 /*
  *  This driver provides a STREAMS based error and trace logger for the STREAMS subsystem.  This is
@@ -114,7 +117,7 @@ static char const ident[] = "$RCSfile: log.c,v $ $Name:  $($Revision: 1.1.2.5 $)
 
 #define LOG_DESCRIP	"UNIX/SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define LOG_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:33 $"
+#define LOG_REVISION	"LfS $RCSfile: log.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:35 $"
 #define LOG_DEVICE	"SVR 4.2 MP STREAMS Log Driver (STRLOG)"
 #define LOG_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define LOG_LICENSE	"GPL"

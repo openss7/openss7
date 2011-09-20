@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:37 $
+ @(#) $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:37 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:37 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:37 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: tcp.c,v $
+ Revision 1.1.2.10  2011-09-20 09:51:37  brian
+ - updates from git
+
  Revision 1.1.2.9  2011-09-02 08:46:37  brian
  - sync up lots of repo and build changes from git
 
@@ -81,7 +84,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:37 $";
+static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:37 $";
 
 /*
  *  This driver provides a somewhat different approach to TCP than the inet
@@ -160,7 +163,7 @@ static char const ident[] = "$RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.9 $)
 #define TCP_DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define TCP_EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS"
 #define TCP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-09-02 08:46:37 $"
+#define TCP_REVISION	"OpenSS7 $RCSfile: tcp.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:37 $"
 #define TCP_DEVICE	"SVR 4.2 MP STREAMS TCP Driver"
 #define TCP_CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define TCP_LICENSE	"GPL"

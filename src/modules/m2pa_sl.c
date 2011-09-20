@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $
+ @(#) $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:53 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: m2pa_sl.c,v $
+ Revision 1.1.2.4  2011-09-20 09:51:40  brian
+ - updates from git
+
  Revision 1.1.2.3  2011-09-02 08:46:53  brian
  - sync up lots of repo and build changes from git
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $";
+static char const ident[] = "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $";
 
 
 #define _SVR4_SOURCE	1
@@ -94,7 +97,7 @@ static char const ident[] = "$RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 1.1.2.
 #include <ss7/sli_ioctl.h>
 
 #define M2PA_SL_DESCRIP		"M2PA/SCTP SIGNALLING LINK (SL) STREAMS MODULE."
-#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:53 $"
+#define M2PA_SL_REVISION	"OpenSS7 $RCSfile: m2pa_sl.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $"
 #define M2PA_SL_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define M2PA_SL_DEVICE		"Part of the OpenSS7 Stack for Linux Fast STREAMS."
 #define M2PA_SL_CONTACT		"Brian Bidulock <bidulock@openss7.org>"

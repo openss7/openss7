@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.30 $) $Date: 2011-09-02 08:46:26 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.31 $) $Date: 2011-09-20 09:51:31 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-09-02 08:46:26 $ by $Author: brian $
+# Last Modified $Date: 2011-09-20 09:51:31 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -6206,6 +6206,9 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
+# Revision 1.1.2.31  2011-09-20 09:51:31  brian
+# - updates from git
+#
 # Revision 1.1.2.30  2011-09-02 08:46:26  brian
 # - sync up lots of repo and build changes from git
 #

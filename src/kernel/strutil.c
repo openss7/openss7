@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:09 $
+ @(#) $RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:39 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-05-31 09:46:09 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: strutil.c,v $
+ Revision 1.1.2.10  2011-09-20 09:51:39  brian
+ - updates from git
+
  Revision 1.1.2.9  2011-05-31 09:46:09  brian
  - new distros
 
@@ -81,7 +84,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.9 $) $Date: 2011-05-31 09:46:09 $";
+static char const ident[] = "$RCSfile: strutil.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-20 09:51:39 $";
 
 #ifndef HAVE_KTYPE_BOOL
 #include <stdbool.h>		/* for bool, true and false */

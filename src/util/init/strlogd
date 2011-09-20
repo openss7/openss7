@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-# @(#) $RCSfile: strlogd,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
+# @(#) $RCSfile: strlogd,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-20 09:51:42 $
 # Copyright (c) 2001-2007  OpenSS7 Corporation <http://www.openss7.com>
 # Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 # All Rights Reserved.
@@ -276,7 +276,7 @@ esac
 
 # =============================================================================
 # 
-# @(#) $RCSfile: strlogd,v $ $Name:  $($Revision: 1.1.2.1 $) $Date: 2009-06-21 11:47:58 $
+# @(#) $RCSfile: strlogd,v $ $Name:  $($Revision: 1.1.2.2 $) $Date: 2011-09-20 09:51:42 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -321,11 +321,14 @@ esac
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2009-06-21 11:47:58 $ by $Author: brian $
+# Last Modified $Date: 2011-09-20 09:51:42 $ by $Author: brian $
 #
 # -----------------------------------------------------------------------------
 #
 # $Log: strlogd,v $
+# Revision 1.1.2.2  2011-09-20 09:51:42  brian
+# - updates from git
+#
 # Revision 1.1.2.1  2009-06-21 11:47:58  brian
 # - added files to new distro
 #

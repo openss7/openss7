@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: aal1.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $
+ @(#) $RCSfile: aal1.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:51 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: aal1.c,v $
+ Revision 1.1.2.4  2011-09-20 09:51:40  brian
+ - updates from git
+
  Revision 1.1.2.3  2011-09-02 08:46:51  brian
  - sync up lots of repo and build changes from git
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: aal1.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $";
+static char const ident[] = "$RCSfile: aal1.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $";
 
 /*
  * This is an ATM Adaptation Layer (AAL) Type 1 (AAL1) for passing packets of fixed length across
@@ -83,7 +86,7 @@ static char const ident[] = "$RCSfile: aal1.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <sys/dlpi.h>
 
 #define AAL1_DESCRIP	"MTP3B-AAL1 STREAMS MODULE."
-#define AAL1_REVISION	"OpenSS7 $RCSfile: aal1.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:51 $"
+#define AAL1_REVISION	"OpenSS7 $RCSfile: aal1.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $"
 #define AAL1_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define AAL1_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-AAL1 module."
 #define AAL1_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

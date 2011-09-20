@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-02 08:46:32 $
+ @(#) $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:34 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:32 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:34 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: inet.c,v $
+ Revision 1.1.2.11  2011-09-20 09:51:34  brian
+ - updates from git
+
  Revision 1.1.2.10  2011-09-02 08:46:32  brian
  - sync up lots of repo and build changes from git
 
@@ -84,7 +87,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-02 08:46:32 $";
+static char const ident[] = "$RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:34 $";
 
 /*
    This driver provides the functionality of IP (Internet Protocol) over a connectionless network
@@ -700,7 +703,7 @@ extern void tcp_set_skb_tso_factor(struct sk_buff *skb, unsigned int mss_std);
 #define SS__DESCRIP	"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define SS__EXTRA	"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
 #define SS__COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.10 $) $Date: 2011-09-02 08:46:32 $"
+#define SS__REVISION	"OpenSS7 $RCSfile: inet.c,v $ $Name:  $($Revision: 1.1.2.11 $) $Date: 2011-09-20 09:51:34 $"
 #define SS__DEVICE	"SVR 4.2 MP STREAMS INET Drivers (NET4)"
 #define SS__CONTACT	"Brian Bidulock <bidulock@openss7.org>"
 #define SS__LICENSE	"GPL"

@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $
+ @(#) $RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:54 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:40 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: phys.c,v $
+ Revision 1.1.2.4  2011-09-20 09:51:40  brian
+ - updates from git
+
  Revision 1.1.2.3  2011-09-02 08:46:54  brian
  - sync up lots of repo and build changes from git
 
@@ -63,7 +66,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $";
+static char const ident[] = "$RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $";
 
 
 /*
@@ -98,7 +101,7 @@ static char const ident[] = "$RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.3 $
 #include <sys/chi.h>
 
 #define PHYS_DESCRIP	"MTP3B-PHYS STREAMS MODULE."
-#define PHYS_REVISION	"OpenSS7 $RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-09-02 08:46:54 $"
+#define PHYS_REVISION	"OpenSS7 $RCSfile: phys.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-20 09:51:40 $"
 #define PHYS_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define PHYS_DEVICE	"Provides OpenSS7 MTP3B-I.432.3-PHYS module."
 #define PHYS_CONTACT	"Brian Bidulock <bidulock@openss7.org>"

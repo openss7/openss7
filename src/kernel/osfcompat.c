@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $
+ @(#) $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:39 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:51 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:39 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: osfcompat.c,v $
+ Revision 1.1.2.5  2011-09-20 09:51:39  brian
+ - updates from git
+
  Revision 1.1.2.4  2011-09-02 08:46:51  brian
  - sync up lots of repo and build changes from git
 
@@ -66,7 +69,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $";
+static char const ident[] = "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:39 $";
 
 /* 
  *  This is my solution for those who don't want to inline GPL'ed functions or
@@ -88,7 +91,7 @@ static char const ident[] = "$RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.
 
 #define OSFCOMP_DESCRIP		"UNIX SYSTEM V RELEASE 4.2 FAST STREAMS FOR LINUX"
 #define OSFCOMP_COPYRIGHT	"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
-#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.4 $) $Date: 2011-09-02 08:46:51 $"
+#define OSFCOMP_REVISION	"LfS $RCSfile: osfcompat.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-20 09:51:39 $"
 #define OSFCOMP_DEVICE		"OSF/1.2 Compatibility"
 #define OSFCOMP_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
 #define OSFCOMP_LICENSE		"GPL"

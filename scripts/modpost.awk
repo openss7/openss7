@@ -1,7 +1,7 @@
 #!/usr/bin/awk -f
 # =============================================================================
 #
-# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.19 $) $Date: 2011-08-07 11:14:38 $
+# @(#) $RCSfile: modpost.awk,v $ $Name:  $($Revision: 1.1.2.20 $) $Date: 2011-09-20 09:51:33 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-08-07 11:14:38 $ by $Author: brian $
+# Last Modified $Date: 2011-09-20 09:51:33 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -147,7 +147,7 @@ function usage(output)
 	return
     print "\
 " me ":\n\
-  $Id: modpost.awk,v 1.1.2.19 2011-08-07 11:14:38 brian Exp $\n\
+  $Id: modpost.awk,v 1.1.2.20 2011-09-20 09:51:33 brian Exp $\n\
 Usage:\n\
   [awk -f ]" me " -- [options] [MODULE ...]\n\
   [awk -f ]" me " -- -" gensub(/!/, "", 1, longopts["help"]) ", --help\n\
@@ -274,7 +274,7 @@ function version(output)
 	return
     print "\
 Version 2.1\n\
-$Id: modpost.awk,v 1.1.2.19 2011-08-07 11:14:38 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.20 2011-09-20 09:51:33 brian Exp $\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
 Copyright (c) 1997, 1998, 1999, 2000, 2001  Brian F. G. Bidulock.\n\
@@ -297,7 +297,7 @@ function copying(output)
 	return
     print "\
 --------------------------------------------------------------------------------\n\
-$Id: modpost.awk,v 1.1.2.19 2011-08-07 11:14:38 brian Exp $\n\
+$Id: modpost.awk,v 1.1.2.20 2011-09-20 09:51:33 brian Exp $\n\
 --------------------------------------------------------------------------------\n\
 Copyright (c) 2008, " allyears() "  Monavacon Limited.\n\
 Copyright (c) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008  OpenSS7 Corporation.\n\
@@ -2189,6 +2189,9 @@ END {
 # =============================================================================
 #
 # $Log: modpost.awk,v $
+# Revision 1.1.2.20  2011-09-20 09:51:33  brian
+# - updates from git
+#
 # Revision 1.1.2.19  2011-08-07 11:14:38  brian
 # - mostly mandriva and ubuntu build updates
 #

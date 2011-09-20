@@ -1,6 +1,6 @@
 /*****************************************************************************
 
- @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:38 $
+ @(#) $RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:38 $
 
  -----------------------------------------------------------------------------
 
@@ -47,11 +47,14 @@
 
  -----------------------------------------------------------------------------
 
- Last Modified $Date: 2011-09-02 08:46:38 $ by $Author: brian $
+ Last Modified $Date: 2011-09-20 09:51:38 $ by $Author: brian $
 
  -----------------------------------------------------------------------------
 
  $Log: x100p-ss7.c,v $
+ Revision 1.1.2.6  2011-09-20 09:51:38  brian
+ - updates from git
+
  Revision 1.1.2.5  2011-09-02 08:46:38  brian
  - sync up lots of repo and build changes from git
 
@@ -69,7 +72,7 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:38 $";
+static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:38 $";
 
 /*
  *  This is an SL (Signalling Link) kernel module which provides all of the
@@ -105,7 +108,7 @@ static char const ident[] = "$RCSfile: x100p-ss7.c,v $ $Name:  $($Revision: 1.1.
 
 #define X100P_DESCRIP		"E/T100P-SS7: SS7/SL (Signalling Link) STREAMS DRIVER."
 #define X100P_EXTRA		"Part of the OpenSS7 Stack for Linux Fast-STREAMS."
-#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:38 $"
+#define X100P_REVISION		"OpenSS7 $RCSfile: x100p-ss7.c,v $ $Name:  $ ($Revision: 1.1.2.6 $) $Date: 2011-09-20 09:51:38 $"
 #define X100P_COPYRIGHT		"Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved."
 #define X100P_DEVICE		"Supports the T/E100P-SS7 T1/E1 PCI boards."
 #define X100P_CONTACT		"Brian Bidulock <bidulock@openss7.org>"
