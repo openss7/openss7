@@ -1,7 +1,7 @@
 # vim: ft=spec sw=4 et tw=78 com=b\:#,fb\:- fo+=tcqlorn nocin nosi
 # =============================================================================
 #
-# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.31 $) $Date: 2011-09-20 09:51:31 $
+# @(#) $RCSfile: openss7.spec.in,v $ $Name:  $($Revision: 1.1.2.32 $) $Date: 2011-09-20 09:52:47 $
 #
 # -----------------------------------------------------------------------------
 #
@@ -47,7 +47,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Last Modified $Date: 2011-09-20 09:51:31 $ by $Author: brian $
+# Last Modified $Date: 2011-09-20 09:52:47 $ by $Author: brian $
 #
 # =============================================================================
 
@@ -6206,27 +6206,37 @@ not normally required on other than a development system.
 %changelog
 # -----------------------------------------------------------------------------
 # $Log: openss7.spec.in,v $
-# Revision 1.1.2.31  2011-09-20 09:51:31  brian
-# - updates from git
+# Revision 1.1.2.32  2011-09-20 09:52:47  brian
+# - update changelog
 #
-# Revision 1.1.2.30  2011-09-02 08:46:26  brian
-# - sync up lots of repo and build changes from git
-#
-# Revision 1.1.2.29  2011-07-27 07:52:10  brian
-# - work to support Mageia/Mandriva compressed kernel modules and URPMI repo
-#
-# Revision 1.1.2.28  2011-06-09 11:30:53  brian
-# - support mageia and mes
-#
-# Revision 1.1.2.27  2011-05-31 09:45:59  brian
-# - new distros
-#
-# Revision 1.1.2.26  2011-05-15 12:01:19  brian
-# - many build system refinements
-#
-# Revision 1.1.2.25  2011-05-10 13:45:30  brian
-# - weak modules workup
-#
+
+* Tue Sep 20 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.31  2011-09-20 09:51:31  brian
+- updates from git
+
+* Fri Sep  2 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.30  2011-09-02 08:46:26  brian
+- sync up lots of repo and build changes from git
+
+* Wed Jul 27 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.29  2011-07-27 07:52:10  brian
+- work to support Mageia/Mandriva compressed kernel modules and URPMI repo
+
+* Thu Jun  9 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.28  2011-06-09 11:30:53  brian
+- support mageia and mes
+
+* Tue May 31 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.27  2011-05-31 09:45:59  brian
+- new distros
+
+* Sun May 15 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.26  2011-05-15 12:01:19  brian
+- many build system refinements
+
+* Tue May 10 2011 Brian Bidulock <bidulock@openss7.org>
+- Revision 1.1.2.25  2011-05-10 13:45:30  brian
+- weak modules workup
 
 * Tue Apr 12 2011 Brian Bidulock <bidulock@openss7.org>
 - Revision 1.1.2.24  2011-04-12 06:33:26  brian
