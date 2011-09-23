@@ -325,6 +325,7 @@
 #	$userinfo->{'QUERY_STRING'}	  = $ENV{'QUERY_STRING'}    unless ( exists $userinfo->{'QUERY_STRING'} );
 #	$userinfo->{'REMOTE_ADDR'}	  = $ENV{'REMOTE_ADDR'}	    unless ( exists $userinfo->{'REMOTE_ADDR'} );
 #	$userinfo->{'REMOTE_HOST'}	  = $ENV{'REMOTE_HOST'}	    unless ( exists $userinfo->{'REMOTE_HOST'} );
+#	$userinfo->{'REPOTE_PORT'}	  = $ENV{'REPOTE_PORT'}	    unless ( exists $userinfo->{'REPOTE_PORT'} );
 #	$userinfo->{'REMOTE_PASS'}	  = $userpass		    unless ( exists $userinfo->{'REMOTE_PASS'} );
 #	$userinfo->{'REMOTE_USER'}	  = $ENV{'REMOTE_USER'}	    unless ( exists $userinfo->{'REMOTE_USER'} );
 #	$userinfo->{'REPO_STATUS'}	  = 'unverified'	    unless ( exists $userinfo->{'REPO_STATUS'} );
@@ -332,6 +333,8 @@
 #	$userinfo->{'REPO_AUTH_STATUS'}	  = $userauth		    unless ( exists $userinfo->{'REPO_AUTH_STATUS'} );
 #	$userinfo->{'REQUESTED_PASS'}	  = $pw;
 #	$userinfo->{'REQUESTED_USER'}	  = $un;
+#	$userinfo->{'REPO_HOST'}	  = $hn			    unless ( exists $userinfo->{'REPO_HOST'} );
+#	$userinfo->{'REPO_ADDR'}	  = $ip			    unless ( exists $userinfo->{'REPO_ADDR'} );
 #	$userinfo->{'REQUEST_URI'}	  = $ENV{'REQUEST_URI'}	    unless ( exists $userinfo->{'REQUEST_URI'} );
 #	$userinfo->{'SCRIPT_URI'}	  = $ENV{'SCRIPT_URI'}	    unless ( exists $userinfo->{'SCRIPT_URI'} );
 #	$userinfo->{'SCRIPT_URL'}	  = $ENV{'SCRIPT_URL'}	    unless ( exists $userinfo->{'SCRIPT_URL'} );
@@ -352,6 +355,7 @@
 	$userinfo->{'REPO_LAST_HTTP_USER_AGENT'} = $ENV{'HTTP_USER_AGENT'};
 	$userinfo->{'REPO_LAST_REMOTE_ADDR'}	 = $ENV{'REMOTE_ADDR'};
 	$userinfo->{'REPO_LAST_REMOTE_HOST'}	 = $ENV{'REMOTE_HOST'};
+	$userinfo->{'REPO_LAST_REMOTE_PORT'}	 = $ENV{'REMOTE_PORT'};
 
 	$userdata = encode_base64(nfreeze($userinfo));
 	$users{$username} = "$usercred:$usergrps:$userdata";
@@ -367,6 +371,7 @@
 	$hostinfo->{'QUERY_STRING'}	  = $ENV{'QUERY_STRING'}    unless ( exists $hostinfo->{'QUERY_STRING'} );
 	$hostinfo->{'REMOTE_ADDR'}	  = $ENV{'REMOTE_ADDR'}	    unless ( exists $hostinfo->{'REMOTE_ADDR'} );
 	$hostinfo->{'REMOTE_HOST'}	  = $ENV{'REMOTE_HOST'}	    unless ( exists $hostinfo->{'REMOTE_HOST'} );
+	$hostinfo->{'REMOTE_PORT'}	  = $ENV{'REMOTE_PORT'}	    unless ( exists $hostinfo->{'REMOTE_PORT'} );
 	$hostinfo->{'REMOTE_PASS'}	  = $hostpass		    unless ( exists $hostinfo->{'REMOTE_PASS'} );
 	$hostinfo->{'REMOTE_USER'}	  = $ENV{'REMOTE_USER'}	    unless ( exists $hostinfo->{'REMOTE_USER'} );
 	$hostinfo->{'REPO_STATUS'}	  = 'unverified'	    unless ( exists $hostinfo->{'REPO_STATUS'} );
@@ -374,6 +379,8 @@
 	$hostinfo->{'REPO_AUTH_STATUS'}	  = $hostauth		    unless ( exists $hostinfo->{'REPO_AUTH_STATUS'} );
 	$hostinfo->{'REQUESTED_PASS'}	  = $pw;
 	$hostinfo->{'REQUESTED_USER'}	  = $un;
+	$hostinfo->{'REPO_HOST'}	  = $hn			    unless ( exists $hostinfo->{'REPO_HOST'} );
+	$hostinfo->{'REPO_ADDR'}	  = $ip			    unless ( exists $hostinfo->{'REPO_ADDR'} );
 	$hostinfo->{'REQUEST_URI'}	  = $ENV{'REQUEST_URI'}	    unless ( exists $hostinfo->{'REQUEST_URI'} );
 	$hostinfo->{'SCRIPT_URI'}	  = $ENV{'SCRIPT_URI'}	    unless ( exists $hostinfo->{'SCRIPT_URI'} );
 	$hostinfo->{'SCRIPT_URL'}	  = $ENV{'SCRIPT_URL'}	    unless ( exists $hostinfo->{'SCRIPT_URL'} );
@@ -392,6 +399,7 @@
 	$hostinfo->{'REPO_LAST_HTTP_USER_AGENT'} = $ENV{'HTTP_USER_AGENT'};
 	$hostinfo->{'REPO_LAST_REMOTE_ADDR'}	 = $ENV{'REMOTE_ADDR'};
 	$hostinfo->{'REPO_LAST_REMOTE_HOST'}	 = $ENV{'REMOTE_HOST'};
+	$hostinfo->{'REPO_LAST_REMOTE_PORT'}	 = $ENV{'REMOTE_PORT'};
 
 	unless ( $hostgrps ) 
 	{
