@@ -504,13 +504,13 @@ xml-info=1
 		if ($offerred) {
 		    $offerred = 0;
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-$osarch-hosts,/);
-		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-hosts,/ and $hostaccs =~ /,(opt-)?$osarch-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-hosts,/ or $hostaccs =~ /,(opt-)?$osarch-hosts,/);
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-$server-hosts,/);
-		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-hosts,/ and $hostaccs =~ /,(opt-)?$server-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$distro-hosts,/ or $hostaccs =~ /,(opt-)?$server-hosts,/);
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-$osarch-hosts,/);
-		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-hosts,/ and $hostaccs =~ /,(opt-)?$osarch-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-hosts,/ or $hostaccs =~ /,(opt-)?$osarch-hosts,/);
 		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-$server-hosts,/);
-		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-hosts,/ and $hostaccs =~ /,(opt-)?$server-hosts,/);
+		    $offerred = 1 if ($hostaccs =~ /,(opt-)?$enterp-hosts,/ or $hostaccs =~ /,(opt-)?$server-hosts,/);
 		    unless ($offerred) { $reason = "Host $hostname not in groups '(opt-)?$enterp-hosts', '(opt-)?$server-hosts', '(opt-)?$distro-hosts' or '(opt-)?$osarch-hosts'"; }
 		}
 		if ($offerred) {
@@ -528,13 +528,13 @@ xml-info=1
 		if ($allowed) {
 		    $allowed = 0;
 		    $allowed = 1 if ($hostaccs =~ /,$distro-$osarch-hosts,/);
-		    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ or $hostaccs =~ /,$osarch-hosts,/);
 		    $allowed = 1 if ($hostaccs =~ /,$distro-$server-hosts,/);
-		    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ or $hostaccs =~ /,$server-hosts,/);
 		    $allowed = 1 if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
-		    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$osarch-hosts,/);
 		    $allowed = 1 if ($hostaccs =~ /,$enterp-$server-hosts,/);
-		    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$server-hosts,/);
 		    unless ($allowed) { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
 		}
 		if ($allowed) {
@@ -1029,13 +1029,13 @@ repostoenable =<% $toenable %>
 	    if ($allowed) {
 		$allowed = 0;
 		$allowed = 1 if ($hostaccs =~ /,$distro-$osarch-hosts,/);
-		$allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ or $hostaccs =~ /,$osarch-hosts,/);
 		$allowed = 1 if ($hostaccs =~ /,$distro-$server-hosts,/);
-		$allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ or $hostaccs =~ /,$server-hosts,/);
 		$allowed = 1 if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
-		$allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$osarch-hosts,/);
 		$allowed = 1 if ($hostaccs =~ /,$enterp-$server-hosts,/);
-		$allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+		$allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$server-hosts,/);
 		unless ($allowed) { $reason = "Host $hostname not in groups '$enterp-hosts', '$server-hosts', '$distro-hosts' or '$osarch-hosts'"; }
 	    }
 	    if ($allowed) {
@@ -1098,13 +1098,13 @@ repostoenable =<% $toenable %>
 	if ($allowed) {
 	    $allowed = 0;
 	    $allowed = 1 if ($hostaccs =~ /,$distro-$osarch-hosts,/);
-	    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ or $hostaccs =~ /,$osarch-hosts,/);
 	    $allowed = 1 if ($hostaccs =~ /,$distro-$server-hosts,/);
-	    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$distro-hosts,/ or $hostaccs =~ /,$server-hosts,/);
 	    $allowed = 1 if ($hostaccs =~ /,$enterp-$osarch-hosts,/);
-	    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$osarch-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$osarch-hosts,/);
 	    $allowed = 1 if ($hostaccs =~ /,$enterp-$server-hosts,/);
-	    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ and $hostaccs =~ /,$server-hosts,/);
+	    $allowed = 1 if ($hostaccs =~ /,$enterp-hosts,/ or $hostaccs =~ /,$server-hosts,/);
 	}
 	if ($allowed) {
 	    $allowed = 0;
