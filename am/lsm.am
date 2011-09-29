@@ -52,11 +52,11 @@
 ##
 ## =============================================================================
 
-if MAINTAINER_MODE
-## MAINTAINER_MODE
-
 LSM $(PACKAGE)-$(VERSION).lsm: $(PACKAGE_TARNAME).lsm
 	$(AM_V_GEN)cat $< > $@
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
 
 $(tardir)/$(PACKAGE)-$(VERSION).lsm:
 	@f=`$(ECHO) "$@" | sed 's|^.*/||'` ; \
