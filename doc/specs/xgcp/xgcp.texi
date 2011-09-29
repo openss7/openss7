@@ -508,13 +508,12 @@ explicitly considered.
 The interface is designed to be used and implemented in conjunction with the use and implementation
 of the general-purpose XOM API (reference @b{XOM}).
 
-A breif introduction to Gateway Control Services is given in @ref{Introductory Concepts}.
-Following this is an overview of the OSI-Abstract-DATA Manipulation OM, which provides the Data
-Abstraction service as defined in the XOM specification (reference @b{XOM}).  Then the optional
-features of this specification are described, and the chapter closes with a list of abbreviations.
-In all cases the reader should refer to the Standards (reference @b{MGCP}, reference @b{MEGACO},
-reference @b{H.248}), or to the XOM Specifications (reference @b{XOM}) for further authoritative
-details.
+A brief introduction to Gateway Control Services is given in @ref{Introductory Concepts}.  Following
+this is an overview of the OSI-Abstract-DATA Manipulation OM, which provides the Data Abstraction
+service as defined in the XOM specification (reference @b{XOM}).  Then the optional features of this
+specification are described, and the chapter closes with a list of abbreviations.  In all cases the
+reader should refer to the Standards (reference @b{MGCP}, reference @b{MEGACO}, reference
+@b{H.248}), or to the XOM Specifications (reference @b{XOM}) for further authoritative details.
 
 The structure of the remaining chapters and appendices are described in the @ref{Preface}.
 
