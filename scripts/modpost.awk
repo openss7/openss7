@@ -505,6 +505,23 @@ function show_junk(line, position,	number,fields,junk)
 	junk = junk " " fields[i]
     print_warns("got junk: " junk)
 }
+function nmb_command(file,	name, command)
+{
+    print_debug(2,"p: nmb file, file =\"" file "\"")
+    if (system("test -r \"" file "\"") == 0) {
+	command = "nm -Bs " file
+	name = "/var/tmp/." me "." PROCINFO["pid"] ".vmlinux"
+	if (file~/\.gz/)
+	    command = "( gzip -dc " file " >" name "; nm -Bs " name "; rm -f -- " name " ) 2>/dev/null"
+	if (file~/\.bz2/)
+	    command = "( bzip2 -dc " file " >" name "; nm -Bs " name "; rm -f -- " name " ) 2>/dev/null"
+	if (file~/\.xz/)
+	    command = "( xz -dc " file " >" name "; nm -Bs " name "; rm -f -- " name " ) 2>/dev/null"
+    } else {
+	print_warns("p: nmb file, file not found = \"" file "\"")
+    }
+    return command
+}
 function cat_command(files,    goodfiles,command,filenames,i,n,filename)
 {
     print_debug(2,"p: cat files, files =\"" files "\"")
@@ -1970,6 +1987,7 @@ BEGIN {
     longopts["kversion"     ] = "k:" ; environs["kversion"     ] = "kversion"			 ; defaults["kversion"     ] = kversion						; descrips["kversion"     ] = "kernel version KVERSION"
     longopts["moddir"       ] = "d:" ; environs["moddir"       ] = "MODPOST_MODDIR"		 ; defaults["moddir"       ] = "/lib/modules/" kversion				; descrips["moddir"       ] = "directory containing modules for which to generate symbols"
     longopts["filename"     ] = "F:" ; environs["filename"     ] = "MODPOST_SYSMAP"		 ; defaults["filename"     ] = "/boot/System.map-" kversion			; descrips["filename"     ] = "system map file"
+    longopts["vmlinux"      ] = "I:" ; environs["vmlinux"      ] = "MODPOST_VMLINUX"		 ; defaults["vmlinux"      ] = "/boot/vmlinux-" kversion ".gz"			; descrips["vmlinux"        ] = "kernel image file"
     longopts["infile"       ] = "i:" ; environs["infile"       ] = "MODPOST_INPUTS"		 ; defaults["infile"       ] = "/lib/modules/" kversion "/build/Module.symvers"	; descrips["infile"       ] = "input file (space separated)"
     longopts["outfile"      ] = "o:" ; environs["outfile"      ] = "MODPOST_MODVER"		 ; defaults["outfile"      ] = "Module.symvers"					; descrips["outfile"      ] = "output file for module symbols"
     longopts["sysfile"      ] = "s:" ; environs["sysfile"      ] = "MODPOST_SYSVER"		 ; defaults["sysfile"      ] = "System.symvers"					; descrips["sysfile"      ] = "output file for system symbols"
@@ -1980,8 +1998,8 @@ BEGIN {
     longopts["ksymsets"     ] = "K:" ; environs["ksymsets"     ] = "MODPOST_KSYMSETS"		 ; defaults["ksymsets"     ] = "/boot/symsets-" kversion ".tar.gz"		; descrips["ksymsets"     ] = "input system symsets file"
     longopts["whitelist"    ] = "L:" ; environs["whitelist"    ] = "MODPOST_WHITELIST"		 ; defaults["whitelist"    ] = "/lib/modules/kabi/kabi_whitelist_" cpu		; descrips["whitelist"    ] = "input kabi whitelist file"
     longopts["missing"      ] = "g"  ;								   defaults["missing"      ] = 0						; descrips["missing"      ] = "create missing system symsets (ksyms missing from kabi)"
-    longopts["rip-symbols"  ] = "r"  ;								   defaults["rip-symbols"  ] = 1						; descrips["rip-symbols"  ] = "attempt to rip undefined symbols from system map (requires -F, implies -U)"
-    longopts["rip-weak"     ] = "R"  ;								   defaults["rip-weak"     ] = 1						; descrips["rip-weak"     ] = "attempt to rip weak undefined symbols from system map (requires -F, implies -U)"
+    longopts["rip-symbols"  ] = "r"  ;								   defaults["rip-symbols"  ] = 1						; descrips["rip-symbols"  ] = "attempt to rip undefined symbols from system map (requires -F or -I, implies -U)"
+    longopts["rip-weak"     ] = "R"  ;								   defaults["rip-weak"     ] = 1						; descrips["rip-weak"     ] = "attempt to rip weak undefined symbols from system map (requires -F or -I, implies -U)"
     longopts["unres-weak"   ] = "b"  ;								   defaults["unres-weak"   ] = 1						; descrips["unres-weak"   ] = "allow unresolved weak symbols"
     longopts["unsupported"  ] = "U"  ;								   defaults["unsupported"  ] = 1						; descrips["unsupported"  ] = "permit use of (strong) unsupported (non-ABI) kernel exports"
     longopts["unused"       ] = "y"  ;								   defaults["unused"       ] = 1						; descrips["unused"       ] = "permit use of (strong) unused kernel exports"
@@ -2030,7 +2048,7 @@ BEGIN {
     values["silent"       ] = defaults["silent"       ]
     values["debug"        ] = defaults["debug"        ]
     values["verbose"      ] = defaults["verbose"      ]
-    optstring = "M:c:k:d:F:i:o:s:*P:K:L:S:grRbUwWHf:umaxp:enqD::v::hVC"
+    optstring = "M:c:k:d:F:I:i:o:s:*P:K:L:S:grRbUwWHf:umaxp:enqD::v::hVC"
     optind = 0
     #opts = ""; for (i=1;i<ARGC;i++) { if (i == 1) { opts = ARGV[i] } else { opts = opts " " ARGV[i] } }
     #print me ": D: o: command line: " opts > stderr; written[stderr] = 1
@@ -2039,7 +2057,7 @@ BEGIN {
 	c = getopt_long(ARGC, ARGV, optstring, longopts)
 	#if (c != -1) { print me ": D: o: option -" c ", longopt --" option ", optset = " optset ", optarg = " optarg > stderr; written[stderr] = 1 }
 	if (c == -1) break
-	else if (c ~ /[MckdFiosPKLSfp]/)		{ values[option] = optarg }
+	else if (c ~ /[MckdFIiosPKLSfp]/)		{ values[option] = optarg }
 	else if (c ~ /[grRbUwWHumaxenq]/)		{ values[option] = optset }
 	else if (c~/[Dv]/) { if (optarg != "")		{ values[option] = optarg } else { if (optset)  { values[option]++ } else { values[option] = optset } } }
 	else if (c~/[hVC]/)	{ command = option }
@@ -2093,22 +2111,45 @@ BEGIN {
     else {
 	if (("filename" in values) && values["filename"]) {
 	    command = cat_command(values["filename"])
-	    if (command) read_systemmap(command, "vmlinux", "kernel", "systemmap")
+	    if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
 	} else {
-	    print_vinfo(2,"r: systemmap, searching...")
-	    command = cat_command("/boot/System.map-" kversion)
-	    if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
-	    else {
-	    command = cat_command("/boot/System.map-" kversion ".gz")
-	    if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
-	    else {
-	    command = cat_command("/boot/System.map-" kversion ".bz2")
-	    if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
-	    else {
-	    command = cat_command("/lib/modules/" kversion "/build/System.map")
-	    if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
-	    else {
-	    print_error("r: systemmap, file not found") } } } }
+	    if (("vmlinux" in values) && values["vmlinux"]) {
+		command = nmb_command(values["vmlinux"])
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "vmlinux") }
+	    } else {
+		print_vinfo(2,"r: systemmap, searching...")
+		command = cat_command("/boot/System.map-" kversion)
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
+		else {
+		command = cat_command("/boot/System.map-" kversion ".gz")
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
+		else {
+		command = cat_command("/boot/System.map-" kversion ".bz2")
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
+		else {
+		command = cat_command("/boot/System.map-" kversion ".xz")
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
+		else {
+		command = cat_command("/lib/modules/" kversion "/build/System.map")
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "systemmap") }
+		else {
+		command = nmb_command("/boot/vmlinux-" kversion)
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "vmlinux") }
+		else {
+		command = nmb_command("/boot/vmlinux-" kversion ".gz")
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "vmlinux") }
+		else {
+		command = nmb_command("/boot/vmlinux-" kversion ".bz2")
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "vmlinux") }
+		else {
+		command = nmb_command("/boot/vmlinux-" kversion ".xz")
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "vmlinux") }
+		else {
+		command = nmb_command("/lib/modules/" kversion "/build/vmlinux")
+		if (command) { read_systemmap(command, "vmlinux", "kernel", "vmlinux") }
+		else {
+		print_error("r: systemmap, file not found") } } } } } } } } } }
+	    }
 	}
 	if (("infile" in values) && values["infile"]) {
 	    command = cat_command(values["infile"])

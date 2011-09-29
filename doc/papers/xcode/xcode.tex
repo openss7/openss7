@@ -201,7 +201,7 @@ a regular Media Gateway (one that converts from TDM to IP).  The ability to
 rapidly marshal G.711 encoded audio samples from the TDM interface to RTP
 payload is a basic requirement of such a media gateway.  Therefore, any
 development performed for the purpose of a forwarding IP-IP gateway, can be
-reused in a normal TDM-IP gateway.
+reused in a regular TDM-IP gateway.
 
 \subsection{Demand for Transcoding}
 
@@ -232,7 +232,7 @@ regular Media Gateway (one that converts from TDM to IP).  The ability to
 rapidly transcode G.711 encoded audio samples from the TDM interface to RTP
 payloads other than G.711 is a basic requirement of such a media gateway.
 Therefore, any development performed for the purpose of a transcoding IP-IP
-gateway, can be reused in a normal TDM-IP gateway.
+gateway, can be reused in a regular TDM-IP gateway.
 
 %Something \cite[]{Ritchie84} is illustrated in \textsl{Figure \ref{figure:xc01}}.
 %\begin{figure}[htp]
@@ -569,6 +569,7 @@ lower stream resources.}
 Software codecs and transcoding is not a new concept.  However, most software
 codec implementations do not perform well, and the vast majority of
 implementations are based on dedicated DSP (Digital Signal Processor) hardware.
+
 Product literature available on the web indicates that software codecs and
 transcoding can only accommodate a maximum of about 1000 channels, and even then
 only for the less complex or computationally intense codecs.  Even dedicated DSP
@@ -580,8 +581,38 @@ low.
 In fitting with the objective of providing transcoding support on a single host
 of between 10,000 and 500,000 simultaneous channels of G.729/G.711 transcoding,
 performance improvements over the approaches taken by other software transcoding
-implementations is necessary.  The disadvantages of other software transcoding
-approaches appear to be as follows:
+implementations is necessary.
+
+\subsubsection{Disadvantages of Current Approaches}
+The disadvantages of other software transcoding approaches appear to be as
+follows:
+
+\begin{enumerate}
+
+\item{\it Reference implementation.}  Many transcoding implementations
+actually use copies of the ITU-T Reference implementation {\tt C}-language
+code as their implementations.  The {\tt C}-language code reference
+implementations were written with correctness and off-line verification in
+mind and not any manner of performance.
+
+\item{\it Poor scheduling.}  Because reference implementations of codecs are
+designed for off-line verification, they are single-threaded.  This results
+in poor processor core utilization when used to attempt real-time processing
+of multiple channels.
+
+\item{\it Context switching.} Most software transcoding implementations are
+user-space implementations.  This causes additional context switches and
+scheduling difficulties for each packet transcoded.
+
+\item{\it Unpinned memory.}  As user space implementations base on the
+off-line reference implementation, most software transcoding implementations
+do not utilize pinned memory (locked memory) and a subject to the whims of
+memory swapping.
+
+\end{enumerate}
+
+\subsubsection{Advantages of the Proposed Approach}
+The advantages of the proposed approach are:
 
 \begin{enumerate}
 
@@ -614,7 +645,7 @@ This is described in more detail in {\sl Section \ref{section:sse}, page
 
 \end{enumerate}
 
-\subsubsection{Instruction Cache Acceleration} \label{section:ica}
+\paragraph{Instruction Cache Acceleration.} \label{section:ica}
 
 {\it Instruction Cache Acceleration} is a byproduct of the {\sl STREAMS}
 framework, provided that some design principles are followed when writing {\sl
@@ -672,33 +703,28 @@ as follows:
 
 \item {\it Always provide service procedures except for the most simple of
 modules.}
-
 Providing service procedures and using them wisely increases the performance
 through batch processing, improved instruction cache efficiency, and pipelining.
 
 \item {\it Always queue normal priority messages for processing by the service
 procedure.}
-
 Messages should always be queued quickly for processing by the service
 procedure.  The only exception is some messages that have to be responded to
 immediately (like {\tt M\_FLUSH}), and potentially some messages that terminate
 on the module and do not result in messages being passed up or down stream.
 
 \item {\it Always process fast-path messages out of the service procedure.}
-
 The data fast-path should always be processed out the service procedure for
 maximum performance and increased stability in the face of event showers.
 
 \item {\it Keep fast-path service loops within the service procedure small and
 tight.}
-
 Processing of data in the fast-path out of the service procedures should be
 small and tight as possible so that instruction cache efficiency can provide
 maximum benefits.
 
 \item {\it Break long compute-intensive tasks down into smaller units and
 pipeline them in a chain of modules.}
-
 Breaking larger tasks down into smaller and tighter units chained together in a
 stream of modules (pipelining) provides better instruction cache and data cache
 efficiency and provides more degrees of freedom and opportunities for multiple
@@ -706,10 +732,33 @@ processors to operate along different portions of the stream.
 
 \end{enumerate}
 
-\subsubsection{Pipelining}
+\paragraph{Pipelining.}
 \label{section:pipelining}
 
-\subsubsection{Super Scalar Execution}
+Pipelining can be achieved by proper organization and interconnection of
+{\sl STREAMS} drivers and modules.  In general, where functions performed on
+messages passed (upstream or downstream) differ, a separate {\it Stream}
+should be used for each function.
+
+For example, the IP driver intercepts packets that are bound for the D-SBG
+function.  Packets can be processed as media-aware transcoding, or
+media-agnostic forwarding.  Because these two functions utilize different
+fast-paths, the IP driver discriminates between the two and passes packets for
+transcoding to one upper {\it Stream} and packets for forwarding to another.
+
+As another example, the RTP module processes RTP packets for transcoding.  The
+transcoding is always performed between G.711 or 16-bit linear PCM.  Because
+the functions performed depends on the coding of the RTP payload, the RTP
+driver distinguishes between payloads and passed the packets to the
+appropriate upper module chain responsible for transcoding that specific
+payload.  This is illustrated in {\sl Figure \ref{figure:xc07}, page
+\pageref{figure:xc07}}.
+
+Pipelining in this fashion improves both instruction and data cache efficiency
+by batching together packets upon which like functions are performed in
+service procedures.
+
+\paragraph{Super Scalar Execution.}
 \label{section:sse}
 
 Super-scalar execution (SSE) and related processing approaches (MMX, etc.)
@@ -724,6 +773,20 @@ Although these approaches are well known, most software codec implementations
 simply utilize the off-line coded reference implementations of the codecs rather
 than attempting to optimize them in any way.  This, of course, leads to much
 poorer performance than is possible.
+
+It has been stated that one of the advantages of using DSP over general
+purpose RISC or CISC processors is that DSP can retrieve an entire block of
+data at the same time and perform operations on that data in parallel.  Some
+DSP are MIMD (Multiple Instruction Multiple Data) architectures.  By utilizing
+the SIMD (Single Instruction Multiple Data) capabilities of modern general
+purpose processors, and by utilizing pipelining (see {\sl Section
+\ref{section:pipelining}, page \pageref{section:pipelining}}), multiple cores
+can be invoked to achieve greater calculation performance than that achievable
+using DSPs.  This is because digital signal processors often have
+significantly lower clock and memory speeds and do not perform caching in the
+normal sense: therefore, DSP cannot take advantages of cache acceleration
+techniques such as those described under {\sl Instruction Cache Acceleration:
+Section \ref{section:ica}, page \pageref{section:ica}}.
 
 \subsubsection{SIP Implementation}
 \label{section:sip}
@@ -777,7 +840,7 @@ alleviate any out of sequence arrival or jitter between inter-arrival times for
 RTP packets.  The normal form of jitter buffering is only performed at the
 termination of an audio stream and is not as necessary within the network.
 
-For transcoding, most codec provide some constraints on the ordering of data
+For transcoding, most codecs provide some constraints on the ordering of data
 chunks in the stream and require all adjacent packets before transcoding a given
 segment can occur.  To accommodate transcoding, it is necessary to perform some
 resequencing and buffering of segments to perform the transcoding function.
@@ -789,7 +852,7 @@ terminating jitter buffering are not required.
 The actions of normal jitter buffering that do not need to be performed to
 accomplish transcoding are as follows:
 
-\begin{itemize}
+\begin{description}
 
 \item{\it Loss Detection:--} The transparent adaptive jitter buffer does not
 have to determine when packets are lost by imposing a maximum delay as is
@@ -808,37 +871,40 @@ larger payload (up to {\tt maxptime}) to more efficiently utilize the network.
 This can help with jitter reduction as well as compensating for network
 congestion upstream by reducing packet overheads downstream.
 
-\end{itemize}
+\end{description}
 
 Transparent adaptive jitter buffering works as follows:
 
-\begin{itemize}
+\begin{enumerate}
 
 \item Packet payloads are added to the buffer using an insertion sort.
 
 \item When the addition of a packet results in a contiguous segment sufficient
 for encoding, a maximally sized segment is struck from the buffer and encoded.
 
-\item when an excessive amount of segment fragments exist in the buffer, the
+\item When an excessive amount of segment fragments exist in the buffer, the
 oldest segment fragments that constitute the excess are struck.  Depending on
 the codec, loss reports might be generated for the struck segments.
 
 \item Where one incoming packet maps to an integral number of segments, the
 buffer is simply bypassed.
 
-\end{itemize}
+\end{enumerate}
 
 Transparent jitter buffering, therefore, has the following characteristics that
 are different from normal non-adaptive or adaptive jitter buffering:
 
-\begin{enumerate}
+\begin{itemize}
 
 \item Segments are delivered as soon as they become available.
 
 \item Jitter is maintained across the buffer to the greatest extent possible
 considering the ordering needs of the encoding.
 
-\end{enumerate}
+\end{itemize}
+
+Note that most implementations perform normal RTP termination instead of
+adaptive jitter-buffering.
 
 \subsection{RTCP Packets}
 
@@ -847,6 +913,12 @@ other UDP packets and are simply IP address and port translated and forwarded.
 Transcoding, on the other hand, is more complex and requires that RTCP packets
 be transcoded to some degree as well, particularly as regards SR (Sender Report)
 and XR (Extended Report) messages.
+
+In the same spirit as adaptive jitter-buffering, the D-SBG is transcoding the
+RTP stream and is not terminating it.  As a result, the adaptive jitter
+buffering is considered part of the network.  RTCP reports are not generated
+by the transcoding: transmitted RTCP packets are simply 1:1 translated
+versions of received RTCP packets.
 
 \subsection{DTMF Digits and Tones}
 
@@ -893,7 +965,7 @@ Tones, on the other hand, are more likely to originate from the PSTN and require
 delivery to the LTE/WiMAX network using out-of-band tones.  With SS7
 connectivity of the carrier's internal MGC/MG complex, however, the MGC should
 indicate most conditions using SIP signalling rather than attempting to indicate
-those with out-of-band tones.
+those with in-band tones.
 
 \subsection{Symmetric RTP}
 \label{section:symrtp}
@@ -1139,7 +1211,7 @@ is also sent from the MG to the MGC when the MG detects that MGC has failed.
 
 \end{itemize}
 
-\paragraph{Change-over of VMG:}
+\paragraph{Change-over of VMG.}
 
 H.248.1\cite[]{H2481} says that an MG will attempt to contact the primary MGC,
 and then the secondary list in turn until it registers with an MGC.  This is
@@ -1152,7 +1224,7 @@ persist in forming SCTP associations with all MGC.  The inability to form an
 SCTP association between an MG and any of the MGCs will be deemed a failure of
 the MGC.
 
-\subparagraph{Cold Start:}
+\subparagraph{Cold Start.}
 
 The following steps are taken by an MGC upon registration with an MG:
 
@@ -1184,7 +1256,7 @@ further action is taken.
 
 \end{enumerate}
 
-\subparagraph{Fail Over:}
+\subparagraph{Fail Over.}
 
 When the MG detects a failure, the MG can send service changes on the root
 terminations to indicate the failure as follows:
@@ -1211,7 +1283,7 @@ this event, and will move to providing-service.
 
 \end{enumerate}
 
-\subparagraph{Switch Over:}
+\subparagraph{Switch Over.}
 \label{section:switchover}
 
 Manual or forced switch-over from an active MG to a protecting MG is performed
@@ -1243,7 +1315,7 @@ currently accessible to the MGC.
 
 \end{enumerate}
 
-\subparagraph{Lock Out:}
+\subparagraph{Lock Out.}
 \label{section:lockout}
 
 Lock out is a condition that is used instead of switch-over for a protecting
@@ -1275,7 +1347,7 @@ synchronized with the MGC; or, no other VMG is accessible.
 
 \end{enumerate}
 
-\subparagraph{Shut Down:}
+\subparagraph{Shut Down.}
 
 At some times it may be necessary to shut down parts or all of a VMG.  This
 can be invoked at the MG using local EMS or remotely via NMS.  A service
@@ -1298,7 +1370,7 @@ service change method `{\it Graceful}' is performed.
 
 \end{enumerate}
 
-\paragraph{Change-over of MGC:}
+\paragraph{Change-over of MGC.}
 
 \paragraph{Partitioned systems.}
 
@@ -1323,7 +1395,7 @@ by the D-SBG.  The S-SBG only specifies the IP realm or group (e.g.
 the MG cluster controller to be able to synchronize context state in redundant
 Virtual MGs.  Therefore, ephemeral terminations will by given an orderly
 naming that specifies the IP interface, address and port combination.  The SBG
-profile requires that DSB label terminations
+profile requires that D-SBG label terminations
 `{\tt ip/<group>/<interface>/<id>}', so for our purposes, termination points
 will be labelled `{\tt ip/<realm>/<interface>/<addrindex>/<port>}'.  This way
 the S-SBG can request `{\tt ip/<realm>/\$}', or simply `{\tt \$}' with a `{\tt
@@ -1336,9 +1408,9 @@ to establish the identical context on the protecting D-SBG images.
 
 As illustrated in {\sl Figure \ref{figure:xc04}} and {\ref{figure:xc07}}, RTP
 forwarding is performed at a different level in the OpenSS7 media stack than
-RTP transcoding.  This is because RTP forward is media-unaware,
+RTP transcoding.  This is because RTP forwarding is media-unaware,
 media-transparent and media-neutral; does not require termination of RTP
-media streams, an can most efficiently be handled directly at the UDP driver.
+media streams, and can most efficiently be handled directly at the UDP driver.
 
 \subsection{Usage Record Collection}
 

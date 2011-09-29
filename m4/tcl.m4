@@ -93,6 +93,7 @@ AC_DEFUN([_TCL_EXTENSIONS], [dnl
 *** CentOS 5.x:      'yum install tcl-devel'
 *** openSUSE 11:     'zypper install tcl-devel'
 *** SLES 10:         'zypper install tcl-devel'
+*** ArchLinux:       'pacman -S tcl'
 *** RedHat 7.2:      'rpm install tcl-8.3.3-67'], [
 ***
 *** Otherwise, specify the location of the TCL headers with the

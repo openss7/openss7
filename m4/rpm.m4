@@ -87,6 +87,7 @@ AC_DEFUN([_RPM_SPEC_OPTIONS], [dnl
 # _RPM_OPTIONS_RPM_EPOCH
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_OPTIONS_RPM_EPOCH], [dnl
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_EPOCH])
     AC_MSG_CHECKING([for rpm epoch])
     AC_ARG_WITH([rpm-epoch],
 	[AS_HELP_STRING([--with-rpm-epoch=EPOCH],
@@ -94,7 +95,7 @@ AC_DEFUN([_RPM_OPTIONS_RPM_EPOCH], [dnl
 	    if test -r .rpmepoch; then d= ; else d="$srcdir/" ; fi
 	    if test -r ${d}.rpmepoch
 	    then with_rpm_epoch="`cat ${d}.rpmepoch`"
-	    else with_rpm_epoch=0
+	    else with_rpm_epoch="${with_pkg_epoch:-0}"
 	    fi])
     AC_MSG_RESULT([${with_rpm_epoch:-0}])
     PACKAGE_RPMEPOCH="${with_rpm_epoch:-0}"
@@ -108,6 +109,7 @@ AC_DEFUN([_RPM_OPTIONS_RPM_EPOCH], [dnl
 # _RPM_OPTIONS_RPM_RELEASE
 # -----------------------------------------------------------------------------
 AC_DEFUN([_RPM_OPTIONS_RPM_RELEASE], [dnl
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_RELEASE])
     AC_MSG_CHECKING([for rpm release])
     AC_ARG_WITH([rpm-release],
 	[AS_HELP_STRING([--with-rpm-release=RELEASE],
@@ -115,7 +117,7 @@ AC_DEFUN([_RPM_OPTIONS_RPM_RELEASE], [dnl
 	    if test -r .rpmrelease ; then d= ; else d="$srcdir/" ; fi
 	    if test -r ${d}.rpmrelease
 	    then with_rpm_release="`cat ${d}.rpmrelease`"
-	    else with_rpm_release=1
+	    else with_rpm_release="${with_pkg_release:-1}"
 	    fi])
     AC_MSG_RESULT([${with_rpm_release:-1}])
     PACKAGE_RPMRELEASE="${with_rpm_release:-1}"
@@ -521,7 +523,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
 	# build directory on the local machine
 	rpmbuildrootdir=`pwd`/BUILDROOT
     fi
-    AC_MSG_RESULT([$repbuildrootdir])
+    AC_MSG_RESULT([$rpmbuildrootdir])
     AC_SUBST([rpmbuildrootdir])dnl
     AC_MSG_CHECKING([for rpm RPMS directory])
     if test ":${rpmdir+set}" != :set ; then
@@ -632,7 +634,7 @@ dnl
 	    [build rpms @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|mint)	enable_rpms=no	;;
+	    (debian|ubuntu|mint|arch)	enable_rpms=no	;;
 	    (*)				enable_rpms=yes	;;
 	esac])
     AC_ARG_ENABLE([srpms],
@@ -640,7 +642,7 @@ dnl
 	    [build srpms @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|mint)	enable_srpms=no	 ;;
+	    (debian|ubuntu|mint|arch)	enable_srpms=no	 ;;
 	    (*)				enable_srpms=yes ;;
 	esac])
     AC_ARG_VAR([RPM],

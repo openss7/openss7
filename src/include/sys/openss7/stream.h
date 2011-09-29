@@ -87,6 +87,8 @@
 #include <linux/module.h>
 #include <linux/types.h>	/* for various types */
 
+#include "sys/openss7/config.h"	/* build specific configuration file */
+
 /* FIXME: Need to put these in autoconf */
 
 #ifndef uchar
@@ -131,8 +133,6 @@ typedef unsigned long __streams_dev_t;
 #else
 struct sk_buff;				/* good enough to declare it */
 #endif
-
-#include "sys/openss7/config.h"	/* build specific configuration file */
 
 #include <sys/strdebug.h>	/* for debugging assertions */
 
