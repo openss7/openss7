@@ -159,7 +159,8 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** Fedora 9:      'yum install texlive-latex'
 *** CentOS 5.x:    'yum install texex-latex'
 *** openSUSE 11:   'zypper install texlive-latex'
-*** SLES 10:       'configure --disable-texinfo-print'], [
+*** SLES 10:       'configure --disable-texinfo-print'
+*** ArchLinux:     'pacman -S texlive-bin'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the TEX environment variable to
@@ -186,7 +187,8 @@ AC_DEFUN([_INFO_SETUP], [dnl
 *** Fedora 9:      'yum install texlive-latex'
 *** CentOS 5.x:    'yum install texex-latex'
 *** openSUSE 11:   'zypper install texlive-latex'
-*** SLES 10:       'configure --disable-texinfo-print'], [
+*** SLES 10:       'configure --disable-texinfo-print'
+*** ArchLinux:     'pacman -S texlive-bin'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the PDFTEX environment variable to
@@ -271,7 +273,8 @@ dnl	fi])
 *** Fedora 9:      'yum install transfig'
 *** CentOS 5.x:    'yum install transfig'
 *** openSUSE 11:   'zypper install transfig'
-*** SLES 10:       'configure --disable-texinfo-html --disable-texinfo-print'], [
+*** SLES 10:       'configure --disable-texinfo-html --disable-texinfo-print'
+*** ArchLinux:     'pacman -S transfig'], [
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
 *** appropriate program with the FIG2DEV environment variable to
@@ -304,7 +307,8 @@ dnl	fi])
 *** Fedora 9:      'yum install ImageMagick'
 *** CentOS 5.x:    'yum install ImageMagick'
 *** openSUSE 11:   'zypper install ImageMagick'
-*** SLES 10:       'configure --disable-texinfo-html --disable-texinfo-print'], [
+*** SLES 10:       'configure --disable-texinfo-html --disable-texinfo-print'
+*** ArchLinux:     'pacman -S imagemagick'], [
 ***
 *** To get rid of this warning, load the 'latex2html' package, specify
 *** the appropriate program with the CONVERT environment variable to
@@ -345,7 +349,8 @@ dnl
 *** Fedora 9:      'yum install texlive-latex'
 *** CentOS 5.x:    'yum install texex-latex'
 *** openSUSE 11:   'zypper install texlive-latex'
-*** SLES 10:       'configure --disable-texinfo-print'], [
+*** SLES 10:       'configure --disable-texinfo-print'
+*** ArchLinux:     'pacman -S texlive-bin'], [
 ***
 *** To get rid of this warning, load the 'tex' package, specify the
 *** appropriate program with the DVI2PS environment variable to

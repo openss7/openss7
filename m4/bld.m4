@@ -157,25 +157,26 @@ AC_DEFUN([_BLD_PROG_CHECK],
     test -L "$tmp_cmd" && tmp_cmd=`readlink "$tmp_cmd"`
     tmp_result=
     if test -n "$tmp_cmd" ; then
-	case "$target_vendor" in
-dnl These use rpm
-	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
-		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
-		;;
-dnl These use dpkg
-	    (debian|ubuntu|mint)
-dnl		dlocate is much faster than dpkg and dpkg-query
-		if which dlocate >/dev/null 2>&1
-		then dlocate=dlocate; term='$'
-		else dlocate=dpkg;    term=
-		fi
-		tmp_result=`$dlocate -S "$tmp_cmd$term" 2>/dev/null | tail -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
-		;;
-	esac
+	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+	fi
+	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+dnl	    dlocate is much faster than dpkg and dpkg-query
+	    if which dlocate >/dev/null 2>&1
+	    then dlocate=dlocate; term='$'
+	    else dlocate=dpkg;    term=
+	    fi
+	    tmp_result=`$dlocate -S "$tmp_cmd$term" 2>/dev/null | tail -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
+	fi
+	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    tmp_result=`pacman -Q --owns $tmp_cmd 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
+	    tmp_result=`echo "$tmp_result" | awk '{print[$]5}'`
+	fi
     fi
     if test -n "$tmp_result" ; then
 	eval "bld_cv_pkg_name_${tmp_cn}=\"\$tmp_result\""
@@ -184,26 +185,27 @@ dnl		dlocate is much faster than dpkg and dpkg-query
     fi
     tmp_result=
     if test -n "$tmp_cmd" ; then
-	case "$target_vendor" in
-dnl These use rpm
-	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
-		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
-		;;
-dnl These use dpkg
-	    (debian|ubuntu|mint)
-dnl		dlocate is much faster than dpkg and dpkg-query
-		if which dlocate >/dev/null 2>&1
-		then dlocate=dlocate; term='$'
-		else dlocate=dpkg;    term=
-		fi
-		eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_cn}\""
-		if test -n "$tmp_result" ; then
-		    tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
-		fi
-		;;
-	esac
+	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_cmd 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+	fi
+	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+dnl	    dlocate is much faster than dpkg and dpkg-query
+	    if which dlocate >/dev/null 2>&1
+	    then dlocate=dlocate; term='$'
+	    else dlocate=dpkg;    term=
+	    fi
+	    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_cn}\""
+	    if test -n "$tmp_result" ; then
+		tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+	    fi
+	fi
+	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    tmp_result=`pacman -Q --owns $tmp_cmd 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
+	    tmp_result=`echo "$tmp_result" | awk '{print[$]6}'`
+	fi
     fi
     if test -n "$tmp_result" ; then
 	eval "bld_cv_pkg_ver_${tmp_cn}=\"\$tmp_result\""
@@ -233,6 +235,9 @@ dnl		dlocate is much faster than dpkg and dpkg-query
 		;;
 	    (debian|ubuntu|lts|mint)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"aptitude install \$tmp_result\""
+		;;
+	    (arch)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_cn}"
@@ -270,22 +275,25 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     tmp_pn=`echo "$tmp_pn" | sed -e 's,[[^A-Z0-9_]],_,g'`
     tmp_result=
     if test -n "$tmp_path"; then
-	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
-		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
-		;;
-	    (debian|ubuntu|mint)
-		if which dlocate >/dev/null 2>&1
-		then dlocate=dlocate; term='$'
-		else dlocate=dpkg;    term=
-		fi
-		tmp_result=`$dlocate -S "$tmp_path$term" 2>/dev/null | tail -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
-		;;
-	esac
+	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+	fi
+	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	    if which dlocate >/dev/null 2>&1
+	    then dlocate=dlocate; term='$'
+	    else dlocate=dpkg;    term=
+	    fi
+	    tmp_result=`$dlocate -S "$tmp_path$term" 2>/dev/null | tail -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
+	fi
+	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    tmp_result=`pacman -Q --owns $tmp_path 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
+	    tmp_result=`echo "$tmp_result" | awk '{print[$]5}'`
+	fi
     fi
     if test -n "$tmp_result" ; then
 	eval "bld_cv_pkg_name_${tmp_pn}=\"$tmp_result\""
@@ -294,23 +302,26 @@ PATH - Optional subdirectory and filename within directory])], [dnl
     fi
     tmp_result=
     if test -n "$tmp_path" ; then
-	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
-		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
-		;;
-	    (debian|ubuntu|mint)
-		if which dlocate >/dev/null 2>&1
-		then dlocate=dlocate; term='$'
-		else dlocate=dpkg;    term=
-		fi
-		eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
-		if test -n "$tmp_result" ; then
-		    tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
-		fi
-		;;
-	esac
+	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_path 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+	fi
+	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	    if which dlocate >/dev/null 2>&1
+	    then dlocate=dlocate; term='$'
+	    else dlocate=dpkg;    term=
+	    fi
+	    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_pn}\""
+	    if test -n "$tmp_result" ; then
+		tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+	    fi
+	fi
+	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    tmp_result=`pacman -Q --owns $tmp_path 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
+	    tmp_result=`echo "$tmp_result" | awk '{print[$]6}'`
+	fi
     fi
     if test -n "$tmp_result" ; then
 	eval "bld_cv_pkg_ver_${tmp_pn}=\"\$tmp_result\""
@@ -340,6 +351,9 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 		;;
 	    (debian|ubuntu|lts|mint)
 		eval "bld_cv_pkg_cmd_${tmp_pn}=\"aptitude install \$tmp_result\""
+		;;
+	    (arch)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_pn}"
@@ -377,22 +391,25 @@ AC_DEFUN([_BLD_FILE_CHECK],
     test -L "$tmp_file" && tmp_file=`readlink "$tmp_file"`
     tmp_result=
     if test -n "$tmp_file"; then
-	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
-		tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
-		;;
-	    (debian|ubuntu|mint)
-		if which dlocate >/dev/null 2>&1
-		then dlocate=dlocate; term='$'
-		else dlocate=dpkg;    term=
-		fi
-		tmp_result=`$dlocate -S "$tmp_file$term" 2>/dev/null | tail -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
-		;;
-	esac
+	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    tmp_result=`rpm -q --qf '[%{NAME}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+	fi
+	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	    if which dlocate >/dev/null 2>&1
+	    then dlocate=dlocate; term='$'
+	    else dlocate=dpkg;    term=
+	    fi
+	    tmp_result=`$dlocate -S "$tmp_file$term" 2>/dev/null | tail -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*not found.*||'`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|[[^:]]*$$||;s|:.*||;s|,||g'`
+	fi
+	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    tmp_result=`pacman -Q --owns $tmp_file 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
+	    tmp_result=`echo "$tmp_result" | awk '{print[$]5}'`
+	fi
     fi
     if test -n "$tmp_result" ; then
 	eval "bld_cv_pkg_name_${tmp_fn}=\"$tmp_result\""
@@ -401,23 +418,26 @@ AC_DEFUN([_BLD_FILE_CHECK],
     fi
     tmp_result=
     if test -n "$tmp_file" ; then
-	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|suse|redhat|mandrake|mandriva|mageia)
-		tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
-		tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
-		;;
-	    (debian|ubuntu|mint)
-		if which dlocate >/dev/null 2>&1
-		then dlocate=dlocate; term='$'
-		else dlocate=dpkg;    term=
-		fi
-		eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_fn}\""
-		if test -n "$tmp_result" ; then
-		    tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
-		fi
-		;;
-	esac
+	if test -z "$tmp_result" -a -x "`which rpm 2>/dev/null`" ; then
+	    tmp_result=`rpm -q --qf '[%{VERSION}]\n' --whatprovides $tmp_file 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.* is not .*||'`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*no package provides.*||'`
+	fi
+	if test -z "$tmp_result" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \) ; then
+	    if which dlocate >/dev/null 2>&1
+	    then dlocate=dlocate; term='$'
+	    else dlocate=dpkg;    term=
+	    fi
+	    eval "tmp_result=\"\$bld_cv_pkg_name_${tmp_fn}\""
+	    if test -n "$tmp_result" ; then
+		tmp_result=`$dlocate -s "$tmp_result" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || tmp_result=
+	    fi
+	fi
+	if test -z "$tmp_result" -a -x "`which pacman 2>/dev/null`" ; then
+	    tmp_result=`pacman -Q --owns $tmp_file 2>/dev/null | head -1`
+	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
+	    tmp_result=`echo "$tmp_result" | awk '{print[$]6}'`
+	fi
     fi
     if test -n "$tmp_result" ; then
 	eval "bld_cv_pkg_ver_${tmp_fn}=\"\$tmp_result\""
@@ -447,6 +467,9 @@ AC_DEFUN([_BLD_FILE_CHECK],
 		;;
 	    (debian|ubuntu|lts|mint)
 		eval "bld_cv_pkg_cmd_${tmp_fn}=\"aptitude install \$tmp_result\""
+		;;
+	    (arch)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_fn}"

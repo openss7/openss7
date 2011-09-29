@@ -175,16 +175,18 @@ AC_DEFUN([_KSYMS_OUTPUT_MODSYMS_CONFIG], [dnl
 	    fi
 	fi
     ])
+    AC_CACHE_CHECK([for modsyms vmlinux], [MODSYMS_VMLINUX], [MODSYMS_VMLINUX="$kvmlinux"])
     AC_CACHE_CHECK([for modsyms module dir], [MODSYMS_MODDIR], [MODSYMS_MODDIR="$kmoddir"])
     AC_SUBST([MODSYMS_SCRIPT])
     AC_SUBST([MODSYMS])
     AC_SUBST([MODSYMS_SYMVER])
     AC_SUBST([MODSYMS_SYSMAP])
+    AC_SUBST([MODSYMS_VMLINUX])
     AC_SUBST([MODSYMS_MODDIR])
     AC_CONFIG_COMMANDS([modsyms], [dnl
 	if test :${MODSYMS_SYMVER:+set} = :set ; then
-	    AC_MSG_NOTICE([creating $MODSYMS_SYMVER from $MODSYMS_SYSMAP and $MODSYMS_MODDIR])
-	    eval "$MODSYMS${MODSYMS_SYSMAP:+ -F $MODSYMS_SYSMAP}${MODSYMS_MODDIR:+ -d $MODSYMS_MODDIR} > $MODSYMS_SYMVER"
+	    AC_MSG_NOTICE([creating $MODSYMS_SYMVER from $MODSYMS_SYSMAP, $MODSYMS_VMLINUX and $MODSYMS_MODDIR])
+	    eval "$MODSYMS${MODSYMS_SYSMAP:+ -F $MODSYMS_SYSMAP}${MODSYMS_VMLINUX:+ -I $MODSYMS_VMLINUX}${MODSYMS_MODDIR:+ -d $MODSYMS_MODDIR} > $MODSYMS_SYMVER"
 	fi
     ], [dnl
 rootdir="$rootdir"
@@ -193,6 +195,7 @@ MODSYMS="$MODSYMS"
 MODSYMS_SCRIPT="$MODSYMS_SCRIPT"
 MODSYMS_SYMVER="$MODSYMS_SYMVER"
 MODSYMS_SYSMAP="$MODSYMS_SYSMAP"
+MODSYMS_VMLINUX="$MODSYMS_VMLINUX"
 MODSYMS_MODDIR="$MODSYMS_MODDIR"
     ])
 ])# _KSYMS_OUTPUT_MODSYMS_CONFIG
@@ -234,6 +237,10 @@ AC_DEFUN([_KSYMS_OUTPUT_MODPOST_CONFIG], [dnl
 	ksyms_cv_modpost_sysmap="$ksysmap"])
     MODPOST_SYSMAP="$ksyms_cv_modpost_sysmap"
     AC_SUBST([MODPOST_SYSMAP])dnl
+    AC_CACHE_CHECK([for modpost vmlinux], [ksyms_cv_modpost_vmlinux], [dnl
+	ksyms_cv_modpost_vmlinux="$kvmlinux"])
+    MODPOST_VMLINUX="$ksyms_cv_modpost_vmlinux"
+    AC_SUBST([MODPOST_VMLINUX])dnl
     AC_CACHE_CHECK([for modpost module dir], [ksyms_cv_modpost_moddir], [dnl
 	ksyms_cv_modpost_moddir="$kmoddir"])
     MODPOST_MODDIR="$ksyms_cv_modpost_moddir"
@@ -302,8 +309,8 @@ dnl AC_ARG_VAR([MODPOST_CACHE], [Cache file for modpost])
     MODPOST_INPUTS="$MODPOST_SYSVER $MODPOST_KMODVER"
     AC_SUBST([MODPOST_INPUTS])dnl
     AC_CONFIG_COMMANDS([modpost], [dnl
-	AC_MSG_NOTICE([creating $MODPOST_SYSVER from $MODPOST_SYSMAP, $MODPOST_MODDIR and $MODPOST_KMODVER])
-	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR}${MODPOST_KMODVER:+ -i $MODPOST_KMODVER}${MODPOST_KSYMSETS:+ -K $MODPOST_KSYMSETS}${MODPOST_WHITELIST:+ -L $MODPOST_WHITELIST} -s $MODPOST_SYSVER" 2>&1 | \
+	AC_MSG_NOTICE([creating $MODPOST_SYSVER from $MODPOST_SYSMAP, $MODPOST_VMLINUX, $MODPOST_MODDIR and $MODPOST_KMODVER])
+	eval "MODPOST_CACHE=$MODPOST_CACHE $MODPOST${MODPOST_OPTIONS:+ $MODPOST_OPTIONS}${MODPOST_SYSMAP:+ -F $MODPOST_SYSMAP}${MODPOST_VMLINUX:+ -I $MODPOST_VMLINUX}${MODPOST_MODDIR:+ -d $MODPOST_MODDIR}${MODPOST_KMODVER:+ -i $MODPOST_KMODVER}${MODPOST_KSYMSETS:+ -K $MODPOST_KSYMSETS}${MODPOST_WHITELIST:+ -L $MODPOST_WHITELIST} -s $MODPOST_SYSVER" 2>&1 | \
 	while read line ; do
 	    echo "$as_me:$LINENO: $line" >&5
 	    echo "$as_me: $line" >&2
@@ -318,6 +325,7 @@ MODPOST_SYMSETS="$MODPOST_SYMSETS"
 MODPOST_MODVER="$MODPOST_MODVER"
 MODPOST_KMODVER="$MODPOST_KMODVER"
 MODPOST_SYSMAP="$MODPOST_SYSMAP"
+MODPOST_VMLINUX="$MODPOST_VMLINUX"
 MODPOST_MODDIR="$MODPOST_MODDIR"
 MODPOST_CACHE="$MODPOST_CACHE"
 MODPOST_OPTIONS="$MODPOST_OPTIONS"
@@ -349,7 +357,9 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 		ksyms_cv_updates_options='--style=suse11' ;;
 	    (ubuntu|mint)
 		ksyms_cv_updates_options='--style=ubuntu' ;;
-	    (debian|mandrake|mandriva|mageia|*)
+	    (mandrake|mandriva|mageia)
+		ksyms_cv_updates_options='--style=mandriva' ;;
+	    (arch|debian|*)
 		ksyms_cv_updates_options='--style=debian' ;;
 	esac])
     UPDATES_OPTIONS="${ksyms_cv_updates_options:+ $ksyms_cv_updates_options}"
@@ -421,6 +431,8 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 *** the assumption that --with-k-updates=/etc/kernel was intended.
 *** ])
 			fi
+			;;
+		    (arch)
 			;;
 		    (suse)
 			;;

@@ -99,6 +99,7 @@ AC_DEFUN([_AGENT_MSG_WARN],
 *** Ubuntu 8.04: 'aptitude install libsnmp-dev'
 *** CentOS 5.x:  'yum install net-snmp-devel'
 *** SLES 10:     'zypper install net-snmp-devel'
+*** ArchLinux:   'pacman -S net-snmp'
 *** RedHat 7.2:  'rpm -i ucd-snmp-devel-4.2.5-8.72.1'
 *** RedHat 7.3:  'rpm -i ucd-snmp-devel-4.2.5-8.73.1'
 ***

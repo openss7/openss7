@@ -275,6 +275,7 @@ AC_DEFUN([_LINUX_KERNEL_SETUP], [dnl
     _LINUX_CHECK_KERNEL_BUILDDIR
     _LINUX_CHECK_KERNEL_HDRDIR
     _LINUX_CHECK_KERNEL_SRCDIR
+    _LINUX_CHECK_KERNEL_VMLINUX
     _LINUX_CHECK_KERNEL_SYSMAP
     _LINUX_CHECK_KERNEL_KSYMS
     _LINUX_CHECK_KERNEL_KALLSYMS
@@ -1165,7 +1166,7 @@ dnl
 	    done
 	    if test -z "$linux_cv_k_hdrdir"
 	    then
-		linux_cv_k_hdrdir="$linux_cv_k_build"
+		linux_cv_k_hdrdir="$kbuilddir"
 	    fi
 	fi
 	AC_MSG_CHECKING([for kernel header directory])
@@ -1337,6 +1338,51 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODVER], [dnl
 # =========================================================================
 
 # =========================================================================
+# _LINUX_CHECK_KERNEL_VMLINUX
+# -------------------------------------------------------------------------
+# Some distros (like ArchLinux) are discarding the System.map file.
+# However, ArchLinux keeps the vmlinux image kicking around and we can just
+# do a nm -s on it when we need the system map file.
+# -------------------------------------------------------------------------
+AC_DEFUN([_LINUX_CHECK_KERNEL_VMLINUX], [dnl
+    AC_CACHE_CHECK([for kernel vmlinux image], [linux_cv_k_vmlinux], [dnl
+	AC_MSG_RESULT([searching...])
+	AC_ARG_WITH([k-vmlinux],
+	    [AS_HELP_STRING([--with-k-vmlinux=IMAGE],
+		[kernel vmlinux image @<:@default=K-BUILD-DIR/vmlinux@:>@])])
+	if test :"${with_k_vmlinux:-no}" != :no
+	then
+	    linux_cv_k_vmlinux="$with_k_vmlinux"
+	else
+	    eval "k_search_path=\"
+		${kbuilddir}/vmlinux
+		${DESTDIR}${rootdir}/boot/vmlinux
+		${DESTDIR}/boot/vmlinux\""
+	    k_search_path=`echo "$k_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    linux_cv_k_vmlinux=
+	    for linux_root in $k_search_path ; do
+		for linux_ver in "-${kversion}" "" ; do
+		    for linux_cmp in .xz .lzma .bz2 .gz "" ; do
+			linux_file="$linux_root$linux_ver$linux_cmp"
+			AC_MSG_CHECKING([for kernel vmlinux image... $linux_file])
+			if test -r $linux_file 
+			then
+			    linux_cv_k_vmlinux="$linux_file"
+			    AC_MSG_RESULT([yes])
+			    break 3
+			fi
+			AC_MSG_RESULT([no])
+		    done
+		done
+	    done
+	fi
+	AC_MSG_CHECKING([for kernel vmlinux image]) ])
+    kvmlinux="$linux_cv_k_vmlinux"
+    AC_SUBST([kvmlinux])dnl
+])# _LINUX_CHECK_KERNEL_VMLINUX
+# =========================================================================
+
+# =========================================================================
 # _LINUX_CHECK_KERNEL_SYSMAP
 # -------------------------------------------------------------------------
 # The linux kernel system map is only used for configuration and is not used
@@ -1381,28 +1427,31 @@ dnl	    different compilation.  For the running kernel use /proc/kallsyms for de
 dnl	    addresses instead.
 dnl
 	    eval "k_sysmap_search_path=\"
-		${kbuilddir}/System.map-${kversion}
 		${kbuilddir}/System.map
-		${DESTDIR}${rootdir}/boot/System.map-${kversion}
 		${DESTDIR}${rootdir}/boot/System.map
-		${DESTDIR}/boot/System.map-${kversion}
 		${DESTDIR}/boot/System.map\""
 	    k_sysmap_search_path=`echo "$k_sysmap_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
 	    linux_cv_k_sysmap=
-	    for linux_file in $k_sysmap_search_path ; do
-		AC_MSG_CHECKING([for kernel system map... $linux_file])
-		if test -r $linux_file 
-		then
-		    linux_cv_k_sysmap="$linux_file"
-		    AC_MSG_RESULT([yes])
-		    break
-		fi
-		AC_MSG_RESULT([no])
+	    for linux_root in $k_sysmap_search_path ; do
+		for linux_ver in "-${kversion}" "" ; do
+		    for linux_cmp in .xz .lzma .bz2 .gz "" ; do
+			linux_file="$linux_root$linux_ver$linux_cmp"
+			AC_MSG_CHECKING([for kernel system map... $linux_file])
+			if test -r $linux_file 
+			then
+			    linux_cv_k_sysmap="$linux_file"
+			    AC_MSG_RESULT([yes])
+			    break 3
+			fi
+			AC_MSG_RESULT([no])
+		    done
+		done
 	    done
 	fi
-	if test :${linux_cv_k_sysmap:-no} = :no
-	then
-	    AC_MSG_ERROR([
+	if test -z "$kvmlinux" ; then
+	    if test :${linux_cv_k_sysmap:-no} = :no
+	    then
+		AC_MSG_ERROR([
 *** 
 *** Configure could not find the system map file for kernel version
 *** "$kversion".  The locations searched were:
@@ -1412,35 +1461,35 @@ dnl
 *** Please specify the absolute location of your kernel system map
 *** file with option --with-k-sysmap before repeating.
 *** ])
-	else
-	    if test :$linux_cv_k_running != :yes
-	    then
-		case "$linux_cv_k_sysmap" in
-		    (*/usr/src/kernels/*)
-			;;
-		    (*/boot/*|*/usr/src/*|*/lib/modules/*)
-			case "$target_vendor" in
-			    (mandrake|mandriva|mageia)
-dnl
-dnl				Mandrakelinux blends the debian architecture name in the kernel
-dnl				image name approach with the Redhat kernel version number in the
-dnl				kernel image name approach to yeild reliable system map files.
-dnl
-				;;
-			    (redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
-dnl
-dnl				Unfortunately the redhat system map files are unreliable because the
-dnl				are not unique for each architecture.  The system map file has to be
-dnl				checked against the architecture for which we are building.
-dnl
-dnl				Unfortunately the debian system map files are unreliable because
-dnl				they are not unique by kernel version.  The system map file has to
-dnl				be checked against the kernel version for which we are building.
-dnl
-dnl				I don't really know how SuSE or others fair in this situation yet,
-dnl				but I assume it is like the rest.
-dnl
-				AC_MSG_WARN([
+	    else
+		if test :$linux_cv_k_running != :yes
+		then
+		    case "$linux_cv_k_sysmap" in
+			(*/usr/src/kernels/*)
+			    ;;
+			(*/boot/*|*/usr/src/*|*/lib/modules/*)
+			    case "$target_vendor" in
+				(mandrake|mandriva|mageia)
+    dnl
+    dnl				Mandrakelinux blends the debian architecture name in the kernel
+    dnl				image name approach with the Redhat kernel version number in the
+    dnl				kernel image name approach to yeild reliable system map files.
+    dnl
+				    ;;
+				(redhat|oracle|puias|centos|whitebox|scientific|debian|ubuntu|suse|*)
+    dnl
+    dnl				Unfortunately the redhat system map files are unreliable because the
+    dnl				are not unique for each architecture.  The system map file has to be
+    dnl				checked against the architecture for which we are building.
+    dnl
+    dnl				Unfortunately the debian system map files are unreliable because
+    dnl				they are not unique by kernel version.  The system map file has to
+    dnl				be checked against the kernel version for which we are building.
+    dnl
+    dnl				I don't really know how SuSE or others fair in this situation yet,
+    dnl				but I assume it is like the rest.
+    dnl
+				    AC_MSG_WARN([
 *** 
 *** Configuration information is being read from an unreliable source:
 *** 
@@ -1449,10 +1498,11 @@ dnl
 *** This may cause problems later if you have mismatches between the
 *** target kernel and the kernel symbols contained in that file.
 *** ])
-				;;
-			esac
-			;;
-		esac
+				    ;;
+			    esac
+			    ;;
+		    esac
+		fi
 	    fi
 	fi
 	AC_MSG_CHECKING([for kernel system map]) ])
@@ -2390,27 +2440,39 @@ dnl
 # -------------------------------------------------------------------------
 AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
     AC_CACHE_CHECK([for kernel package release], [linux_cv_k_version], [dnl
-	linux_cv_k_version=unknown
-	if test ":$deb_cv_debs:$deb_cv_dscs" = :yes:yes
-	then
-dnl
-dnl	    dlocate is much much faster than dpkg and dpkg-query
-dnl
-	    if which dlocate >/dev/null 2>&1
-	    then dlocate=dlocate; term='$'
-	    else dlocate=dpkg;    term=
+	linux_ver=
+	for linux_file in $ksysmap $kvmlinux ; do
+	    if test -z "$linux_ver" -a -x "`which rpm 2>/dev/null`"
+	    then
+		linux_ver=`rpm -q --qf "%{VERSION}" --whatprovides $linux_file 2>/dev/null | head -1`
+		linux_ver=`echo "$linux_ver" | sed -e 's|.* is not .*||'`
+		linux_ver=`echo "$linux_ver" | sed -e 's|.*no package provides.*||'`
 	    fi
-	    linux_pkg=`$dlocate -S "$linux_cv_k_sysmap$term" 2>/dev/null | cut -f1 -d:` || linux_pkg=
-	    if test -n "$linux_pkg" ; then
-		linux_ver=`$dlocate -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
-	    else
-		linux_ver=
+	    if test -z "$linux_ver" -a \( -x "`which dlocate 2>/dev/null`" -o -x "`which dpkg 2>/dev/null`" \)
+	    then
+    dnl
+    dnl	    dlocate is much much faster than dpkg and dpkg-query
+    dnl
+		if which dlocate >/dev/null 2>&1
+		then dlocate=dlocate; term='$'
+		else dlocate=dpkg;    term=
+		fi
+		linux_pkg=`$dlocate -S "$linux_file$term" 2>/dev/null | cut -f1 -d:` || linux_pkg=
+		if test -n "$linux_pkg" ; then
+		    linux_ver=`$dlocate -s "$linux_pkg" 2>/dev/null | grep '^Version:' | cut -f2 '-d '` || linux_ver=
+		fi
 	    fi
-	    linux_cv_k_version="${linux_ver:-unknown}"
-	else
-	    linux_ver=`rpm -q --qf "%{VERSION}" --whatprovides $linux_cv_k_sysmap 2>/dev/null`
-	    linux_cv_k_version="${linux_ver:-unknown}"
-	fi
+	    if test -z "$linux_ver" -a -x "`which pacman 2>/dev/null`"
+	    then
+		linux_ver=`pacman -Q --owns $linux_file 2>/dev/null | head -1`
+		linux_ver=`echo "$linux_ver" | sed -e 's|.*No package owns.*||'`
+		linux_ver=`echo "$linux_ver" | awk '{print[$]6}'`
+	    fi
+	    if test -n "$linux_ver" ; then
+		break
+	    fi
+	done
+	linux_cv_k_version="${linux_ver:-unknown}"
     ])
     if test :"${linux_cv_k_version:-unknown}" != :unknown
     then
@@ -2430,6 +2492,11 @@ dnl
 	    kernel_source="linux-source-${kmajor}.${kminor}"
 	    kernel_headers="linux-headers-${kmajor}.${kminor}"
 	    ;;
+	(debian-3.?|ubuntu-3.?|mint-3.?)
+	    kernel_image="linux-image-${kversion}"
+	    kernel_source="linux-source-${kmajor}.${kminor}"
+	    kernel_headers="linux-headers-${kmajor}.${kminor}"
+	    ;;
 	(*)
 	    kernel_image='kernel'
 	    kernel_source='kernel-sourcecode'
@@ -2440,7 +2507,7 @@ dnl
     AC_SUBST([kernel_source])
     AC_SUBST([kernel_headers])
     AC_CACHE_CHECK([for kernel file sanity], [linux_cv_kernel_sanity], [dnl
-	eval "linux_cv_files=\"$linux_cv_k_sysmap $linux_cv_k_build $linux_cv_k_source $linux_cv_k_config\""
+	eval "linux_cv_files=\"$ksysmap $kvmlinux $kbuilddir $ksrcdir $kconfig\""
 	case "$target_vendor" in
 	    (mandrake|mandriva|mageia)
 dnl
@@ -3409,11 +3476,26 @@ m4_define([_LINUX_KERNEL_SYMBOL_ADDR_BODY],
 AC_CACHE_CHECK([for kernel symbol $[]2 address], [linux_cv_$[]{2}_addr], [dnl
     linux_tmp=
     if test -z "$linux_tmp" -a -n "$ksyms" -a -r "$ksyms"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $ksyms | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"; fi
+	linux_tmp="`($EGREP '\<'${2}'\>' $ksyms | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+    fi
     if test -z "$linux_tmp" -a -n "$kallsyms" -a -r "$kallsyms"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"; fi
+	linux_tmp="`($EGREP '\<'${2}'\>' $kallsyms | head -1 | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+    fi
     if test -z "$linux_tmp" -a -n "$ksysmap" -a -r "$ksysmap"; then
-	linux_tmp="`($EGREP '\<'${2}'\>' $ksysmap | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"; fi
+	linux_tmp="`($EGREP '\<'${2}'\>' $ksysmap | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+    fi
+    if test -z "$linux_tmp" -a -n "$kvmlinux" -a -r "$kvmlinux"; then
+	case "$kvmlinux" in
+	    (*.gz)  linux_img="/var/tmp/.tmp.$$.`basename $kvmlinux .gz`"
+		    test -r $linux_img || gzip -dc $kvmlinux >$linux_img ;;
+	    (*.bz2) linux_img="/var/tmp/.tmp.$$.`basename $kvmlinux .bz2`"
+		    test -r $linux_img || bzip2 -dc $kvmlinux >$linux_img ;;
+	    (*.xz)  linux_img="/var/tmp/.tmp.$$.`basename $kvmlinux .xz`"
+		    test -r $linux_img || xz -dc $kvmlinux >$linux_img ;;
+	    (*)	    linux_img="$kvmlinux" ;;
+	esac
+	linux_tmp="`(nm -Bs $linux_img | $EGREP '\<'${2}'\>' | sed -e 's| .*||;s|^0[xX]||') 2>/dev/null`"
+    fi
     linux_tmp="${linux_tmp:+0x}$linux_tmp"
     AS_VAR_SET([linux_cv_$[]{2}_addr], ["${linux_tmp:-no}"]) ])
     AS_VAR_IF([linux_cv_$[]{2}_addr],[no],[],[dnl
@@ -3468,6 +3550,20 @@ AC_CACHE_CHECK([for kernel symbol $[]2 export], [linux_cv_$[]{2}_export],
     if test -z "$linux_tmp" -a -n "$ksysmap" -a -r "$ksysmap"; then
 	if ( $EGREP -q '\<__ksymtab_'${2}'\>' $ksysmap 2>/dev/null ); then
 	    linux_tmp="yes ($ksysmap)"; fi; fi
+    if test -z "$linux_tmp" -a -n "$kvmlinux" -a -r "$kvmlinux"; then
+	case "$kvmlinux" in
+	    (*.gz)  linux_img="/var/tmp/.tmp.$$.`basename $kvmlinux .gz`"
+		    test -r $linux_img || gzip -dc $kvmlinux >$linux_img ;;
+	    (*.bz2) linux_img="/var/tmp/.tmp.$$.`basename $kvmlinux .bz2`"
+		    test -r $linux_img || bzip2 -dc $kvmlinux >$linux_img ;;
+	    (*.xz)  linux_img="/var/tmp/.tmp.$$.`basename $kvmlinux .xz`"
+		    test -r $linux_img || xz -dc $kvmlinux >$linux_img ;;
+	    (*)	    linux_img="$kvmlinux" ;;
+	esac
+	if ( nm -Bs $linux_img | $EGREP -q '\<__ksymtab_'${2}'\>' 2>/dev/null ); then
+	    linux_tmp="yes ($kvmlinux)"
+	fi
+    fi
     if test -z "$linux_tmp" -a -n "$kmodver" -a -r "$kmodver"; then
 	if ( $EGREP -q '\<'${2}'\>' $kmodver 2>/dev/null ); then
 	    linux_tmp="yes ($kmodver)"; fi; fi
