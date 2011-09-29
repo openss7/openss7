@@ -572,10 +572,7 @@ function fileversion(module,			pfx,kversion)
     pfx = "r: filevers,  "
     kversion = ""
     if (system("test -r \"" module "\"") == 0) {
-	if (module~/\.gz/)
-	    command = "zcat " module " | strings | grep -m 1 '^vermagic='"
-	else
-	    command = "cat " module " | strings | grep -m 1 '^vermagic='"
+	command = catcommand(module) " | strings | grep -m 1 '^vermagic='"
 	while((command | getline) == 1) { sub(/=/, " "); kversion = $2 }
 	close(command)
 	if (!kversion) print_error(pfx "no vermagic for " module)
@@ -737,8 +734,8 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     }
     return n
 }
-function readsymmap(kversion, file, pfx, maps,
-		    fmt,n,pn,sym,c,pc,bads,d,pd,command)
+function readsymmap(kversion, file, command, pfx, maps,
+		    fmt,n,pn,sym,c,pc,bads,d,pd)
 {
     # read the symbol map for kernel "kversion"
     fmt = "%05d maps, %04d bads, %04d dups"
@@ -746,7 +743,6 @@ function readsymmap(kversion, file, pfx, maps,
     print_vinfo(2, pfx "file = " file)
     if (system("test -r " file) == 0) {
 	print_vmore(2, pfx sprintf(fmt, n, c, d))
-	command = "cat " file
 	while ((command | getline) == 1) {
 	    if (NF!=3) continue
 	    if (!($3 in maps)) {
@@ -781,13 +777,55 @@ function readsymmap(kversion, file, pfx, maps,
     print_vinfo(2, pfx sprintf(fmt, n, c, d))
     return n
 }
+function catcommand(file,
+		    command)
+{
+    command = "cat " file
+    if (file~/\.gz/)
+	command = "gzip -dc " file
+    if (file~/\.bz2/)
+	command = "bzip2 -dc " file
+    if (file~/\.xz/)
+	command = "xz -dc " file
+    return command
+}
+function nmbcommand(file,
+		    name,command)
+{
+    command = "nm -Bs " file
+    name = "/var/tmp/" me "." PROCINFO["pid"] ".vmlinux"
+    if (file~/\.gz/)
+	command = "( gzip -dc " file " >" name "; nm -Bs " name "; rm -f -- " name " ) 2>/dev/null"
+    if (file~/\.bz2/)
+	command = "( bzip2 -dc " file " >" name "; nm -Bs " name "; rm -f -- " name " ) 2>/dev/null"
+    if (file~/\.xz/)
+	command = "( xz -dc " file " >" name "; nm -Bs " name "; rm -f -- " name " ) 2>/dev/null"
+    return command
+}
 #global sysmaps[kversion,sym] = address
 #global counts["sysmap",kversion] = count
 function readsysmap(kversion, file,
-		    pfx,n,sym,add,maps)
+		    pfx,n,sym,add,maps,command)
 {
     pfx = "r: sysmap,    "
-    n = readsymmap(kversion, file, pfx, maps)
+    command = catcommand(file)
+    n = readsymmap(kversion, file, command, pfx, maps)
+    for (sym in maps) {
+	add = maps[sym]
+	sysmaps[kversion,sym] = add
+	if ((kversion,sym) in allsyms && allsyms[kversion,sym] != add) {
+	    print_warns(pfx "ksym(" kversion ":" sym ") = 0x" add " != 0x" allsyms[kversion,sym])
+	    usesysmap[kversion] = 0
+	}
+    }
+    return n
+}
+function readvmlinux(kversion, file,
+		     pfx,n,sym,add,maps,command)
+{
+    pfx = "r: vmlinux,   "
+    command = nmbcommand(file)
+    n = readsymmap(kversion, file, command, pfx, maps)
     for (sym in maps) {
 	add = maps[sym]
 	sysmaps[kversion,sym] = add
@@ -801,10 +839,11 @@ function readsysmap(kversion, file,
 #global allsyms[sym] = address
 #global counts["allsym",kversion] = count
 function readallsym(kversion, file,
-		    pfx,n,sym,add,maps)
+		    pfx,n,sym,add,maps,command)
 {
     pfx = "r: allsym,    "
-    n = readsymmap(kversion, file, pfx, maps)
+    command = catcommand(file)
+    n = readsymmap(kversion, file, command, pfx, maps)
     if (n == 0) usesysmap[kversion] = 0
     for (sym in maps) {
 	add = maps[sym]
@@ -825,10 +864,7 @@ function readsymabi(kversion, file,
     n = 0
     print_vinfo(2, pfx "file = " file)
     if (system("test -r " file) == 0) {
-	if (file~/\.gz/)
-	    command = "zcat " file
-	else
-	    command = "cat " file
+	command = catcommand(file)
 	while ((command | getline) == 1) {
 	    if (NF<4) continue
 	    if ($2 != "vmlinux") continue
@@ -857,10 +893,7 @@ function readsymver(kversion, file,
     n = 0; pn = 0
     print_vinfo(2, pfx "file = " file)
     if (system("test -r " file) == 0) {
-	if (file~/\.gz/)
-	    command = "zcat " file
-	else
-	    command = "cat " file
+	command = catcommand(file)
 	while ((command | getline) == 1) {
 	    if (NF<3) continue
 	    if ($3 != "vmlinux") continue
@@ -1027,6 +1060,28 @@ function getsysmap(kversion,
     print_vinfo(2, pfx "syms " n)
     return n
 }
+function getvmlinux(kversion,
+		    pfx,n,file)
+{
+    pfx = "r: vmlinux,   "
+    n = 0
+    print_vinfo(2, pfx "version = " kversion)
+    if (("vmlinux",kversion) in counts) {
+	n = counts["vmlinux",kversion]
+    } else {
+	file = values["vmlinux"]
+	gsub(/\$KVERSION/,kversion,file)
+	gsub(/\$PACKAGE/,values["package"],file)
+	if (values["basedir"] && system("test -r " values["basedir"] file) == 0)
+	    file = values["basedir"] file
+	else
+	    file = values["rootdir"] file
+	n = readvmlinux(kversion, file)
+	counts["vmlinux",kversion] = n
+    }
+    print_vinfo(2, pfx "syms " n)
+    return n
+}
 function getallsym(kversion,
 		   pfx,n,file)
 {
@@ -1119,7 +1174,8 @@ function getsysinfo(kversion,
 	if (s == 0) { return s }
 	print_vmore(3, pfx sprintf(fmt, s, n, e))
     }
-    n = getsysmap(kversion)
+    n = n + getsysmap(kversion)
+    n = n + getvmlinux(kversion)
     if (n == 0) { return n }
     print_vmore(3, pfx sprintf(fmt, s, n, e))
     e = getsysver(kversion)
@@ -2928,6 +2984,7 @@ BEGIN {
     d["weakdir" ] = "weak-updates"
     d["allsym"  ] = "/proc/kallsyms"
     d["sysmap"  ] = "/boot/System.map-$KVERSION"
+    d["vmlinux" ] = "/lib/modules/$KVERSION/build/vmlinux"
     d["sysver"  ] = "/lib/modules/$KVERSION/build/Module.symvers"
     d["symver"  ] = "/boot/symvers-$KVERSION.gz"
     d["symabi"  ] = "/boot/abi-$KVERSION"
@@ -2949,6 +3006,7 @@ BEGIN {
     longopts["weakdir"       ] = "w:" ; defaults["weakdir"       ] = d["weakdir" ]	; descrips["weakdir"       ] = "where to place weak update symbolic links\nabsolute or rel. to /lib/modules/$KVERSION)"	; longargs["weakdir"       ] = "PATH"
     longopts["allsym"        ] = "y:" ; defaults["allsym"        ] = d["allsym"  ]      ; descrips["allsym"        ] = "kernel symbols file (search when unspec.)"
     longopts["sysmap"        ] = "F:" ; defaults["sysmap"        ] = d["sysmap"  ]	; descrips["sysmap"        ] = "system map file (same as depmod) (search when unspec.)"
+    longopts["vmlinux"       ] = "I:" ; defaults["vmlinux"       ] = d["vmlinux" ]	; descrips["vmlinux"       ] = "kernel vmlinux image"
     longopts["sysver"        ] = "E:" ; defaults["sysver"        ] = d["sysver"  ]	; descrips["sysver"        ] = "system version file (same as depmod) (search when unspec.)"
     longopts["symver"        ] = "S:" ; defaults["symver"        ] = d["symver"  ]	; descrips["symver"        ] = "system version file (compressed) (search when unspec.)"
     longopts["symabi"        ] = "Y:" ; defaults["symabi"        ] = d["symabi"  ]	; descrips["symabi"        ] = "system version file (ubuntu abi) (search when unspec.)"
@@ -2974,6 +3032,7 @@ BEGIN {
     values["kversion"      ] = defaults["kversion"      ]
     values["allsym"        ] = defaults["allsym"        ]
     values["sysmap"        ] = defaults["sysmap"        ]
+    values["vmlinux"       ] = defaults["vmlinux"       ]
     values["sysver"        ] = defaults["sysver"        ]
     values["symver"        ] = defaults["symver"        ]
     values["symabi"        ] = defaults["symabi"        ]

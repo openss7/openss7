@@ -63,6 +63,7 @@ m4_include([m4/public.m4])
 m4_include([m4/archive.m4])
 m4_include([m4/rpm.m4])
 m4_include([m4/deb.m4])
+m4_include([m4/pkg.m4])
 m4_include([m4/repo.m4])
 
 m4_include([m4/man.m4])
@@ -99,6 +100,7 @@ AC_DEFUN([AC_OPENSS7], [dnl
     _ARCHIVE
     _RPM_SPEC
     _DEB_DPKG
+    _PAC_ARCH
     _MAN_CONVERSION
     _INFO
     _PAPERS

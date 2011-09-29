@@ -84,6 +84,7 @@ AC_DEFUN([_DEB_DPKG_OPTIONS], [dnl
 # _DEB_OPTIONS_DEB_EPOCH
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_OPTIONS_DEB_EPOCH], [dnl
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_EPOCH])
     AC_MSG_CHECKING([for deb epoch])
     AC_ARG_WITH([deb-epoch],
 	[AS_HELP_STRING([--with-deb-epoch=EPOCH],
@@ -92,7 +93,7 @@ AC_DEFUN([_DEB_OPTIONS_DEB_EPOCH], [dnl
 	    if test -r .debepoch; then d= ; else d="$srcdir/" ; fi
 	    if test -r ${d}.debepoch
 	    then with_deb_epoch="`cat ${d}.debepoch`"
-	    else with_deb_epoch=0
+	    else with_deb_epoch="${with_pkg_epoch:-0}"
 	    fi])
     AC_MSG_RESULT([${with_deb_epoch:-0}])
     PACKAGE_DEBEPOCH="${with_deb_epoch:-0}"
@@ -106,6 +107,7 @@ AC_DEFUN([_DEB_OPTIONS_DEB_EPOCH], [dnl
 # _DEB_OPTIONS_DEB_RELEASE
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_OPTIONS_DEB_RELEASE], [dnl
+    AC_REQUIRE([_OPENSS7_OPTIONS_PKG_RELEASE])
     AC_MSG_CHECKING([for deb release])
     AC_ARG_WITH([deb-release],
 	[AS_HELP_STRING([--with-deb-release=RELEASE],
@@ -114,7 +116,7 @@ AC_DEFUN([_DEB_OPTIONS_DEB_RELEASE], [dnl
 	    if test -r .debrelease ; then d= ; else d="$srcdir/" ; fi
 	    if test -r ${d}.debrelease
 	    then with_deb_release="`cat ${d}.debrelease`"
-	    else with_deb_release=0
+	    else with_deb_release="${with_pkg_release:-0}"
 	    fi])
     AC_MSG_RESULT([${with_deb_release:-0}])
     PACKAGE_DEBRELEASE="${with_deb_release:-0}"
@@ -231,7 +233,7 @@ AC_DEFUN([_DEB_DPKG_SETUP_TOPDIR], [dnl
 	# directory on the local machine
 	debbuilddir=`pwd`/debian
     fi
-    AC_MSG_RESULT([debbuilddir])
+    AC_MSG_RESULT([$debbuilddir])
     AC_SUBST([debbuilddir])dnl
 ])# _DEB_DPKG_SETUP_TOPDIR
 # =============================================================================
@@ -254,8 +256,9 @@ AC_DEFUN([_DEB_DPKG_SETUP_OPTIONS], [dnl
     for arg_part in $args ; do
 	if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
 	    if test -n "$arg" ; then
-		AC_MSG_CHECKING([for deb argument $arg])
-		if (echo $arg | egrep '^'"'"'(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+		eval "arg=$arg"
+		AC_MSG_CHECKING([for deb argument '$arg'])
+		if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
 		    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }$arg"
 		    AC_MSG_RESULT([yes])
 		else
@@ -269,8 +272,9 @@ AC_DEFUN([_DEB_DPKG_SETUP_OPTIONS], [dnl
 	fi
     done
     if test -n "$arg" ; then
+	eval "arg=$arg"
 	AC_MSG_CHECKING([for deb argument $arg])
-	if (echo $arg | egrep '^'"'"'(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
+	if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
 	    PACKAGE_DEBOPTIONS="${PACKAGE_DEBOPTIONS}${PACKAGE_DEBOPTIONS:+ }$arg"
 	    AC_MSG_RESULT([yes])
 	else
@@ -312,7 +316,7 @@ dnl
 	[], [dnl
 	case "$target_vendor" in
 	    (debian|ubuntu|mint)	enable_debs=yes ;;
-	    (*)				enabel_debs=no	;;
+	    (*)				enable_debs=no	;;
 	esac])
     AC_ARG_ENABLE([dscs],
 	[AS_HELP_STRING([--disable-dscs],

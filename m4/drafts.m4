@@ -280,6 +280,7 @@ dnl	fi])
 *** openSUSE 11: 'zypper install ghostscript-library'
 *** SLES 10:     'zypper install ghostscript-library'
 *** Mandriva 10: 'urpmi ghostscript-common'
+*** ArchLinux:   'pacman -S ghostscript'
 *** RedHat 7.2:  'rpm -i ghostscript-6.52-9.5'], [
 ***
 *** To get rid of this warning, load the 'ghostscript' package, specify
@@ -309,7 +310,8 @@ dnl	fi])
 *** CentOS 5.x:  'yum install transfig'
 *** openSUSE 11: 'zypper install transfig'
 *** SLES 10:     'configure --disable-drafts-print'
-*** Mandriva 10: 'urpmi transfig'], [
+*** Mandriva 10: 'urpmi transfig'
+*** ArchLinux:   'pacman -S transfig'], [
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
 *** appropriate program with the FIG2DEV environment variable to

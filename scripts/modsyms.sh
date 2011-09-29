@@ -5,7 +5,7 @@
 #
 # -----------------------------------------------------------------------------
 #
-# Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 # Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 # Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 #
@@ -122,16 +122,17 @@ modsyms_tokenize="$SED s%[^a-zA-Z0-9]%_%g"
 
 # defaults
 
-defaults="sysmap moddir"
+defaults="sysmap vmlinux moddir"
 
 default_sysmap=/boot/System.map-`uname -r`
+default_vmlinux=/lib/modules/`uname -r`/build/vmlinux
 default_moddir=/lib/modules/`uname -r`
 
 command=
 debug=0
 verbose=1
 
-function version()
+version ()
 {
     if test ${show:-yes} = no ; then
 	return
@@ -139,13 +140,13 @@ function version()
     cat <<EOF
 Version $version
 $ident
-Copyright (c) 2008-2009  Monavacon Limited.  All Rights Reserved.
+Copyright (c) 2008-2011  Monavacon Limited.  All Rights Reserved.
 Distributed under AGPL Version 3, included here by reference.
 See \`$program --copying' for copying permissions.
 EOF
 }
 
-function usage()
+usage ()
 {
     if test ${show:-yes} = no ; then
 	return
@@ -161,7 +162,7 @@ Usage:
 EOF
 }
 
-function help()
+help ()
 {
     if test ${show:-yes} = no ; then
 	return
@@ -179,6 +180,9 @@ Options:
     -F, --filename SYSMAP
         specify system map file
         ['$sysmap']
+    -I, --image VMLINUX
+        specify kernel image file
+        ['$vmlinux']
     -n, --dryrun
         don't perform the actions, just check them
     -q, --quiet
@@ -196,7 +200,7 @@ Options:
 EOF
 }
 
-function copying()
+copying ()
 {
     if test ${show:-yes} = no ; then
 	return
@@ -205,7 +209,7 @@ function copying()
 --------------------------------------------------------------------------------
 $ident
 --------------------------------------------------------------------------------
-Copyright (c) 2008-2009  OpenSS7 Corporation <http://www.openss7.com/>
+Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -243,7 +247,7 @@ Corporation at a fee.  See http://www.openss7.com/
 EOF
 }
 
-function syntax_error()
+syntax_error ()
 {
     if test ${verbose:-0} -gt 0 ; then
 	$ECHO "$program: syntax error -- $1" >&2
@@ -252,29 +256,29 @@ function syntax_error()
     exit 2
 }
 
-function option_unrec()
+option_unrec ()
 {
     opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
     syntax_error "\`$opt' unrecognized"
 }
 
-function option_noarg()
+option_noarg ()
 {
     opt=`$ECHO -n "X$1" | $Xsed -e 's|=.*||'`
     syntax_error "\`$opt' does not accept an argument"
 }
 
-function option_needarg()
+option_needarg ()
 {
     syntax_error "\`$1' requires an argument"
 }
 
-function option_after()
+option_after ()
 {
     syntax_error "\`$1' cannot occur after \`$2'"
 }
 
-function option_with()
+option_with ()
 {
     syntax_error "\`$1' cannot occur with \`$2'"
 }
@@ -286,6 +290,7 @@ do
     # check for attached option argument
     case $arg in
 	(--filename=* | --filenam=* | --filena=* | --filen=* | --file=* | --fil=* | --fi=* | --f=* | \
+	--image=* | --imag=* | --ima=* | --im=* | --i=* | \
 	--moddir=*  | --moddi=*  | --modd=*  | --mod=*  | --mo=*  | --m=*)
 	    optarg=`$ECHO "X$arg" | $Xsed -e 's/[-_a-zA-Z0-9]*=//'` ;;
 	(--*=*)
@@ -297,10 +302,10 @@ do
 	    more=`$ECHO "X$arg" | $Xsed -e 's|-[nqDvhVC]||'`
 	    eval "arg=\`$ECHO \"X$arg\" | $Xsed -e 's|$more||'\`"
 	    ;;
-	(-[fd])
+	(-[FId])
 	    optarg= ;;
-	(-[fd]*)
-	    optarg=`$ECHO "X$arg" | $Xsed -e 's|-[fd]||'` ;;
+	(-[FId]*)
+	    optarg=`$ECHO "X$arg" | $Xsed -e 's|-[FId]||'` ;;
 	(*)
 	    optarg= ;;
     esac
@@ -311,7 +316,7 @@ do
 		case $prev in
 		    (debug | verbose) eval "(($prev++))" ;;
 		    # the rest have required arguments
-		    (sysmap | moddir)
+		    (sysmap | vmlinux | moddir)
 			option_needarg $prevopt ;;
 		esac
 		prev= ; prevopt=
@@ -373,6 +378,13 @@ do
 	(--filename=* | --filenam=* | --filena=* | --filen=* | --file=* | --fil=* | --fi=* | --f=* | -F*)
 	    sysmap="$optarg"
 	    ;;
+	(--image | --imag | --ima | --im | --i | -I)
+	    prevopt="$arg"
+	    prev=vmlinux
+	    ;;
+	(--image=* | --imag=* | --ima=* | --im=* | --i=* | -I*)
+	    vmlinux="$optarg"
+	    ;;
 	(--moddir | --moddi | --modd | --mod | --mo | --m | -d)
 	    prevopt="$arg"
 	    prev=moddir
@@ -398,7 +410,7 @@ case $prev in
     # these have optional arguments
     (debug | verbose) eval "(($prev++))" ;;
     # the rest have required arguments
-    (sysmap | moddir)
+    (sysmap | vmlinux | moddir)
 	option_needarg $prevopt ;;
 esac
 
@@ -483,15 +495,37 @@ process_sysmap() {
 
 }
 
+process_vmlinux() {
+	vmlinux="$1"
+	shift
+	test -n "$vmlinux" -a -f "$vmlinux" || return 1
+	basename=`basename $vmlinux`
+	imgname=`basename $basename .gz`
+	test -n "$imgname" || return 1
+	if test :$basename != :$imgname ; then
+	    # shoot, we have a .gz ending
+	    file=".tmp.$$.$imgname"
+	    remv="$file"
+	    gzip -dc $vmlinux > $file
+	else
+	    file="$vmlinux"
+	    remv=
+	fi
+	command_info "processing vmlinux $vmlinux"
+	nm -s $file | egrep '\<(_)?__crc_' | process_map vmlinux
+	test -n "$remv" && rm -f -- $remv
+}
+
 process_command() {
     for mod in $modules ; do
 	    process_kobject $mod
     done
     process_sysmap $sysmap
+    process_vmlinux $vmlinux
 }
 
 
-function none_command()
+none_command ()
 {
     if test -n "$show_version$show_help$show_copying" ; then
 	if test ${verbose:-0} -gt 1 ; then
