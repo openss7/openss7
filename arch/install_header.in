@@ -1,0 +1,135 @@
+# =============================================================================
+# @configure_input@
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>
+# This software is licensed under the GNU Affero General Public License (AGPL)
+# Version 3, 19 November 2007, available at <http://www.gnu.org/licenses/>.
+# -----------------------------------------------------------------------------
+# This is pretty much the same as the debian/mscript_header.in.
+# -----------------------------------------------------------------------------
+set -e
+tmppath=/var/tmp
+PACKAGE=@PACKAGE@
+VERSION=@VERSION@
+base="@PACKAGE_LCNAME@"
+name="@PACKAGE_LCNAME@"
+rootdir=@rootdir@
+prefix=@prefix@
+exec_prefix=@exec_prefix@
+bindir=@bindir@
+sbindir=@sbindir@
+sysconfdir=@sysconfdir@
+datarootdir=@datarootdir@
+datadir=@datadir@
+pkgdatadir=@datadir@/@PACKAGE@
+includedir=@includedir@
+pkgincludedir=@includedir@/@PACKAGE@
+libdir=@libdir@
+pkglibdir=@libdir@/@PACKAGE@
+libexecdir=@libexecdir@
+pkglibexecdir=@libexecdir@/@PACKAGE@
+localstatedir=@localstatedir@
+sharedstatedir=@sharedstatedir@
+mandir=@mandir@
+infodir=@infodir@
+oldincludedir=@oldincludedir@
+initrddir=@initrddir@
+docdir=@docdir@
+htmldir=@htmldir@
+dvidir=@dvidir@
+pdfdir=@pdfdir@
+psdir=@psdir@
+localedir=@localedir@
+configdir=@configdir@
+modutildir=@modutildir@
+snmpmibdir=@snmpmibdir@
+snmpdlmoddir=@snmpdlmoddir@
+snmpconfdir=@sysconfdir@/snmp
+lib32dir=@lib32dir@
+pkglibexecdir=@pkglibexecdir@
+pkglibexec32dir=@pkglibexec32dir@
+snmpdlmod32dir=@lib32dir@/snmp/dlmod
+gcjdir=@libdir@/gcj
+pkggcjdir=@libdir@/gcj/@PACKAGE@
+jnidir=@jnidir@
+javadir=@javadir@
+javadocdir=@javadocdir@
+pkgjavadocdir=@javadocdir@/@PACKAGE@
+tcllibdir=@tcllibdir@
+tclsrcdir=@tclsrcdir@
+pkgtcllibdir="@tcllibdir@/@PACKAGE_NAME@@PACKAGE_VERSION@"
+perldir=@perldir@
+yumrepodir=@yumrepodir@
+yumplugdir="@libdir@/yum-plugins"
+yumdir="@sysconfdir@/yum"
+yumconfdir="@sysconfdir@/yum/pluginconf.d"
+zypprepodir=@zypprepodir@
+zyppcreddir=@zyppcreddir@
+zyppservdir=@zyppservdir@
+reposubdir=@reposubdir@
+rpmgpgdir=@rpmgpgdir@
+repobase=@repobase@
+repobranch=@repobranch@
+reporoot=@reporoot@
+reposerv=@reposerv@
+aptconfdir=@aptconfdir@
+aptgpgdir=@aptgpgdir@
+aptsrclist=@aptsrclist@
+aptrepodir=@aptrepodir@
+aptvndlist=@aptvndlist@
+aptvenddir=@aptvenddir@
+kversion=@kversion@
+kallsyms=@kallsyms@
+karch=@karch@
+kasmdir=@kasmdir@
+kbase=@kbase@
+kboot=@kboot@
+kbuilddir=@kbuilddir@
+kconfig=@kconfig@
+kernel_headers=@kernel_headers@
+kernel_image=@kernel_image@
+kernel_source=@kernel_source@
+kext=@kext@
+kextra=@kextra@
+kflavor=@kflavor@
+khdrarch=@khdrarch@
+khdrdir=@khdrdir@
+kmach=@kmach@
+kmachdir=@kmachdir@
+kmajor=@kmajor@
+kmarch=@kmarch@
+kminor=@kminor@
+kmodabi=@kmodabi@
+kmoddir=@kmoddir@
+kmoduledir=@kmoduledir@
+kmodver=@kmodver@
+knumber=@knumber@
+kpatch=@kpatch@
+krelease=@krelease@
+ksrcarch=@ksrcarch@
+ksrcdir=@ksrcdir@
+ksubdir=@ksubdir@
+ksyms=@ksyms@
+ksymsets=@ksymsets@
+ksymvers=@ksymvers@
+ksysmap=@ksysmap@
+kupdatedir=@kupdatedir@
+kzip=@kzip@
+KERNEL_MODCONF=@STRCONF_CONFMOD@
+KERNEL_SUBDIR=@PACKAGE_LCNAME@
+KMODCONF_EXT=@PACKAGE_LCNAME@
+kmodext=@PACKAGE_LCNAME@
+@WITH_KO_MODULES_TRUE@kpre='streams_';
+@WITH_KO_MODULES_FALSE@kpre='streams-';
+STRCONF_CONFMOD=@STRCONF_CONFMOD@
+STRCONF_MAJBASE=@STRCONF_MAJBASE@
+target_cpu="@target_cpu@"
+[ ":${subpkg:+'set'}" = ":set" ] || subpkg=
+package="@PACKAGE@${subpkg:+'-'}${subpkg}(@VERSION@-@PACKAGE_PACRELEASE@)"
+script="${0##*/}"
+# -----------------------------------------------------------------------------
+# vim: ft=sh sw=4 noet
+# @configure_input@
+# =============================================================================

@@ -2660,7 +2660,7 @@ dnl
 	esac
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
-dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wno-system-headers"
+	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wno-system-headers"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wundef"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wno-endif-labels"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wbad-function-cast"
