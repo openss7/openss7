@@ -2660,7 +2660,7 @@ dnl
 	esac
 	if test :"${USE_MAINTAINER_MODE:-no}" != :no
 	then
-	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wno-system-headers"
+dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wno-system-headers"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wundef"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wno-endif-labels"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wbad-function-cast"
@@ -2683,7 +2683,7 @@ dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wunreachable-code"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Winline"
 dnl	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wdisabled-optimization"
 	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Wp,-D_FORTIFY_SOURCE=2"
-	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Werror"
+	    linux_cflags="${linux_cflags}${linux_cflags:+ }-Werror${WFLAGS:+ }${WFLAGS}"
 	fi
 	AC_ARG_ENABLE([k-inline],
 	    [AS_HELP_STRING([--enable-k-inline],
