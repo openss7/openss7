@@ -177,6 +177,11 @@ dnl	    dlocate is much faster than dpkg and dpkg-query
 	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
 	    tmp_result=`echo "$tmp_result" | awk '{print[$]5}'`
 	fi
+	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
+	    tmp_cmd2=`echo "$tmp_cmd" | sed -e 's,^/,,'`
+	    tmp_result=`slackpkg file-search $tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-";OFS="-"}{NF=NF-3;print[$]0}'`
+	fi
     fi
     if test -n "$tmp_result" ; then
 	eval "bld_cv_pkg_name_${tmp_cn}=\"\$tmp_result\""
@@ -205,6 +210,11 @@ dnl	    dlocate is much faster than dpkg and dpkg-query
 	    tmp_result=`pacman -Q --owns $tmp_cmd 2>/dev/null | head -1`
 	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
 	    tmp_result=`echo "$tmp_result" | awk '{print[$]6}'`
+	fi
+	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
+	    tmp_cmd2=`echo "$tmp_cmd" | sed -e 's,^/,,'`
+	    tmp_result=`slackpkg file-search $tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-"}{print[$](NF-2)}'`
 	fi
     fi
     if test -n "$tmp_result" ; then
@@ -238,6 +248,9 @@ dnl	    dlocate is much faster than dpkg and dpkg-query
 		;;
 	    (arch)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
+		;;
+	    (slackware)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_cn}"
@@ -294,6 +307,11 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
 	    tmp_result=`echo "$tmp_result" | awk '{print[$]5}'`
 	fi
+	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
+	    tmp_path2=`echo "$tmp_path" | sed -e 's,^/,,'`
+	    tmp_result=`slackpkg file-search $tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-";OFS="-"}{NF=NF-3;print[$]0}'`
+	fi
     fi
     if test -n "$tmp_result" ; then
 	eval "bld_cv_pkg_name_${tmp_pn}=\"$tmp_result\""
@@ -321,6 +339,11 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 	    tmp_result=`pacman -Q --owns $tmp_path 2>/dev/null | head -1`
 	    tmp_result=`echo "$tmp_result" | sed -e 's|.*No package owns.*||'`
 	    tmp_result=`echo "$tmp_result" | awk '{print[$]6}'`
+	fi
+	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
+	    tmp_path2=`echo "$tmp_path" | sed -e 's,^/,,'`
+	    tmp_result=`slackpkg file-search $tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-"}{print[$](NF-2)}'`
 	fi
     fi
     if test -n "$tmp_result" ; then
@@ -354,6 +377,9 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 		;;
 	    (arch)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
+		;;
+	    (slackware)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_pn}"

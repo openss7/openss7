@@ -359,7 +359,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 		ksyms_cv_updates_options='--style=ubuntu' ;;
 	    (mandrake|mandriva|mageia)
 		ksyms_cv_updates_options='--style=mandriva' ;;
-	    (arch|debian|*)
+	    (arch|slackware|debian|*)
 		ksyms_cv_updates_options='--style=debian' ;;
 	esac])
     UPDATES_OPTIONS="${ksyms_cv_updates_options:+ $ksyms_cv_updates_options}"
@@ -432,7 +432,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 *** ])
 			fi
 			;;
-		    (arch)
+		    (arch|slackware)
 			;;
 		    (suse)
 			;;

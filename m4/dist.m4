@@ -153,6 +153,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     ])
     AC_CACHE_CHECK([for dist build release file], [dist_cv_build_rel_file], [dnl
 	eval "dist_search_path=\"
+	    /etc/slackware-version
 	    /etc/arch-release
 	    /etc/oracle-release
 	    /etc/puias-release
@@ -206,6 +207,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	 for some stupid reason).  Also expect Mandrake to change to Mandriva any day soon.])], [dnl
 dnl AC_MSG_WARN([checking for flavor in $[1]])
     case "$[1]" in
+	(*Slackware*)					echo 'slackware'  ;;
 	(*Arch?Linux*)					echo 'arch'	  ;;
 	(*Oracle*|*ORACLE*)				echo 'oracle'	  ;;
 	(*PUIAS*|*PU_IAS*|*PU-IAS*)			echo 'puias'	  ;;
@@ -270,6 +272,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	 vendor.])], [dnl
 dnl AC_MSG_WARN([checking for vendor in $[1]])
     case "$[1]" in
+	(slackware)			echo 'slackware'  ;;
 	(arch)				echo 'arch'	  ;;
 	(oracle)			echo 'oracle'	  ;;
 	(puias)				echo 'puias'	  ;;
@@ -337,6 +340,7 @@ dnl AC_MSG_WARN([checking for release in $[1]])
 	 distribution description.])], [dnl
 dnl AC_MSG_WARN([checking for distrib in $[1]])
     case "$[1]" in
+	(slackware)	echo 'Slackware Linux' ;;
 	(arch)		echo 'Arch Linux' ;;
 	(oracle)	echo 'Oracle Linux Server' ;;
 	(puias)		echo 'PUIAS Linux' ;;
@@ -382,7 +386,10 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 		    ;;
 		(:arch-release)
 		    # arch is rolling release
-		    dist_cv_build_codename='Rolling'
+		    dist_cv_build_codename='Release'
+		    ;;
+		(:slackware-version)
+		    dist_cv_build_codename='Release'
 		    ;;
 		(:SuSE-release)
 		    # SuSE never really had a codename, but now they put OSS on or openSUSE OpenSuSE
@@ -429,6 +436,8 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 	case "$dist_cv_build_distro" in
 	    (arch)
 		dist_tmp='os' ;;
+	    (slackware)
+		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^[([^\.]*(\.[^\.]*)?)(\.[^\.]*)*][$],\1,'` ;;
 	    (suse)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
 	    (oracle|puias|centos|lineox|whitebox|scientific|rhel|sle)
@@ -494,6 +503,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
     ])
     AC_CACHE_CHECK([for dist host release file], [dist_cv_host_rel_file], [dnl
 	eval "dist_search_path=\"
+	    ${DESTDIR}${sysconfdir}/slackware-version
 	    ${DESTDIR}${sysconfdir}/arch-release
 	    ${DESTDIR}${sysconfdir}/oracle-release
 	    ${DESTDIR}${sysconfdir}/puias-release
@@ -623,7 +633,11 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 		    ;;
 		(:arch-release)
 		    # arch is rolling release
-		    dist_cv_host_codename='Rolling'
+		    dist_cv_host_codename='Release'
+		    ;;
+		(:slackware-version)
+		    # arch is rolling release
+		    dist_cv_host_codename='Release'
 		    ;;
 		(:SuSE-release)
 		    # SuSE never really had a codename, but now they put OSS on or openSUSE OpenSuSE
@@ -670,6 +684,8 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	case "$dist_cv_host_distro" in
 	    (arch)
 		dist_tmp='os' ;;
+	    (slackware)
+		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^[([^\.]*(\.[^\.]*)?)(\.[^\.]*)*][$],\1,'` ;;
 	    (suse)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
 	    (oracle|puias|centos|lineox|whitebox|scientific|rhel|sle)
@@ -741,7 +757,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     AC_MSG_CHECKING([build system type])
     build_vendor="$dist_cv_build_vendor"
     case "$build_vendor" in
-	(oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian)  
+	(oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware)  
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
 	(arch|mandrake|mandriva|mageia|ubuntu)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
@@ -767,7 +783,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	host_vendor="$dist_cv_host_vendor"
 	case "$host_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian)  
+	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware)  
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
 	    (arch|mandrake|mandriva|mageia|ubuntu)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
@@ -791,7 +807,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	target_vendor="$dist_cv_host_vendor"
 	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian)  
+	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware)  
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
 	    (arch|mandrake|mandriva|mageia|ubuntu)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;

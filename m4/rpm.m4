@@ -634,16 +634,16 @@ dnl
 	    [build rpms @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|mint|arch)	enable_rpms=no	;;
-	    (*)				enable_rpms=yes	;;
+	    (debian|ubuntu|mint|arch|slackware)	enable_rpms=no	;;
+	    (*)					enable_rpms=yes	;;
 	esac])
     AC_ARG_ENABLE([srpms],
 	[AS_HELP_STRING([--disable-srpms],
 	    [build srpms @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (debian|ubuntu|mint|arch)	enable_srpms=no	 ;;
-	    (*)				enable_srpms=yes ;;
+	    (debian|ubuntu|mint|arch|slackware)	enable_srpms=no	 ;;
+	    (*)					enable_srpms=yes ;;
 	esac])
     AC_ARG_VAR([RPM],
 	       [Rpm command. @<:@default=rpm@:>@])

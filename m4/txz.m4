@@ -54,188 +54,188 @@
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH
+# _TXZ_SLACK
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH], [dnl
+AC_DEFUN([_TXZ_SLACK], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_TARDIR])
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_REQUIRE([_DISTRO])
     AC_REQUIRE([_REPO])
-    AC_MSG_NOTICE([+-----------------------+])
-    AC_MSG_NOTICE([| Pacman Archive Checks |])
-    AC_MSG_NOTICE([+-----------------------+])
-    _PAC_ARCH_OPTIONS
-    _PAC_ARCH_SETUP
-    _PAC_REPO_SETUP
-    _PAC_ARCH_OUTPUT
-])# _PAC_ARCH
+    AC_MSG_NOTICE([+-------------------------+])
+    AC_MSG_NOTICE([| Slackpkg Archive Checks |])
+    AC_MSG_NOTICE([+-------------------------+])
+    _TXZ_ARCH_OPTIONS
+    _TXZ_ARCH_SETUP
+    _TXZ_REPO_SETUP
+    _TXZ_ARCH_OUTPUT
+])# _TXZ_SLACK
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH_OPTIONS
+# _TXZ_ARCH_OPTIONS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH_OPTIONS], [dnl
-    _PAC_OPTIONS_PAC_EPOCH
-    _PAC_OPTIONS_PAC_RELEASE
-])# _PAC_ARCH_OPTIONS
+AC_DEFUN([_TXZ_ARCH_OPTIONS], [dnl
+    _TXZ_OPTIONS_TXZ_EPOCH
+    _TXZ_OPTIONS_TXZ_RELEASE
+])# _TXZ_ARCH_OPTIONS
 # =============================================================================
 
 # =============================================================================
-# _PAC_OPTIONS_PAC_EPOCH
+# _TXZ_OPTIONS_TXZ_EPOCH
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_OPTIONS_PAC_EPOCH], [dnl
+AC_DEFUN([_TXZ_OPTIONS_TXZ_EPOCH], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_EPOCH])
-    AC_MSG_CHECKING([for pac epoch])
-    AC_ARG_WITH([pac-epoch],
-	[AS_HELP_STRING([--with-pac-epoch=EPOCH],
-	    [pacman package EPOCH @<:@default=auto@:>@])],
+    AC_MSG_CHECKING([for txz epoch])
+    AC_ARG_WITH([txz-epoch],
+	[AS_HELP_STRING([--with-txz-epoch=EPOCH],
+	    [slackpkg package EPOCH @<:@default=auto@:>@])],
 	[], [dnl
-	    if test -r .pacepoch; then d= ; else d="$srcdir/" ; fi
-	    if test -r ${d}.pacepoch
-	    then with_pac_epoch="`cat ${d}.pacepoch`"
-	    else with_pac_epoch="${with_pkg_epoch:-0}"
+	    if test -r .txzepoch; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.txzepoch
+	    then with_txz_epoch="`cat ${d}.txzepoch`"
+	    else with_txz_epoch="${with_pkg_epoch:-0}"
 	    fi])
-    AC_MSG_RESULT([${with_pac_epoch:-0}])
-    PACKAGE_PACEPOCH="${with_pac_epoch:-0}"
+    AC_MSG_RESULT([${with_txz_epoch:-0}])
+    PACKAGE_PACEPOCH="${with_txz_epoch:-0}"
     AC_SUBST([PACKAGE_PACEPOCH])dnl
-    AC_DEFINE_UNQUOTED([PACKAGE_PACEPOCH], [$PACKAGE_PACEPOCH], [The Arch Epoch.
-			This defaults to 0.])
-])# _PAC_OPTIONS_PAC_EPOCH
+    AC_DEFINE_UNQUOTED([PACKAGE_PACEPOCH], [$PACKAGE_PACEPOCH], [The Slackware
+			Epoch.  This defaults to 0.])
+])# _TXZ_OPTIONS_TXZ_EPOCH
 # =============================================================================
 
 # =============================================================================
-# _PAC_OPTIONS_PAC_RELEASE
+# _TXZ_OPTIONS_TXZ_RELEASE
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_OPTIONS_PAC_RELEASE], [dnl
+AC_DEFUN([_TXZ_OPTIONS_TXZ_RELEASE], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_RELEASE])
-    AC_MSG_CHECKING([for pac release])
-    AC_ARG_WITH([pac-release],
-	[AS_HELP_STRING([--with-pac-release=RELEASE],
-	    [pacman package RELEASE @<:@default=auto@:>@])],
+    AC_MSG_CHECKING([for txz release])
+    AC_ARG_WITH([txz-release],
+	[AS_HELP_STRING([--with-txz-release=RELEASE],
+	    [slackpkg package RELEASE @<:@default=auto@:>@])],
 	[], [dnl
-	    if test -r .pacrelease ; then d= ; else d="$srcdir/" ; fi
-	    if test -r ${d}.pacrelease
-	    then with_pac_release="`cat ${d}.pacrelease`"
-	    else with_pac_release="${with_pkg_release:-1}"
+	    if test -r .txzrelease ; then d= ; else d="$srcdir/" ; fi
+	    if test -r ${d}.txzrelease
+	    then with_txz_release="`cat ${d}.txzrelease`"
+	    else with_txz_release="${with_pkg_release:-1}"
 	    fi])
-    AC_MSG_RESULT([${with_pac_release:-1}])
-    PACKAGE_PACRELEASE="${with_pac_release:-1}"
-    AC_SUBST([PACKAGE_PACRELEASE])dnl
-    AC_DEFINE_UNQUOTED([PACKAGE_PACRELEASE], [$PACKAGE_PACRELEASE], [The Arch
-			Release.  This defaults to 1.])
-])# _PAC_OPTIONS_PAC_RELEASE
+    AC_MSG_RESULT([${with_txz_release:-1}])
+    PACKAGE_TXZRELEASE="${with_txz_release:-1}"
+    AC_SUBST([PACKAGE_TXZRELEASE])dnl
+    AC_DEFINE_UNQUOTED([PACKAGE_TXZRELEASE], [$PACKAGE_TXZRELEASE], [The
+			Slackware Release.  This defaults to 1.])
+])# _TXZ_OPTIONS_TXZ_RELEASE
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH_SETUP
+# _TXZ_ARCH_SETUP
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH_SETUP], [dnl
-dnl _PAC_ARCH_SETUP_DIST
-dnl _PAC_ARCH_SETUP_ARCH
-dnl _PAC_ARCH_SETUP_INDEP
-    _PAC_ARCH_SETUP_TOPDIR
-    _PAC_ARCH_SETUP_OPTIONS
-    _PAC_ARCH_SETUP_BUILD
-])# _PAC_ARCH_SETUP
+AC_DEFUN([_TXZ_ARCH_SETUP], [dnl
+dnl _TXZ_ARCH_SETUP_DIST
+dnl _TXZ_ARCH_SETUP_ARCH
+dnl _TXZ_ARCH_SETUP_INDEP
+    _TXZ_ARCH_SETUP_TOPDIR
+    _TXZ_ARCH_SETUP_OPTIONS
+    _TXZ_ARCH_SETUP_BUILD
+])# _TXZ_ARCH_SETUP
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH_SETUP_DIST
+# _TXZ_ARCH_SETUP_DIST
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH_SETUP_DIST], [dnl
-])# _PAC_ARCH_SETUP_DIST
+AC_DEFUN([_TXZ_ARCH_SETUP_DIST], [dnl
+])# _TXZ_ARCH_SETUP_DIST
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH_SETUP_ARCH
+# _TXZ_ARCH_SETUP_ARCH
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH_SETUP_ARCH], [dnl
-])# _PAC_ARCH_SETUP_ARCH
+AC_DEFUN([_TXZ_ARCH_SETUP_ARCH], [dnl
+])# _TXZ_ARCH_SETUP_ARCH
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH_SETUP_INDEP
+# _TXZ_ARCH_SETUP_INDEP
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH_SETUP_INDEP], [dnl
-])# _PAC_ARCH_SETUP_INDEP
+AC_DEFUN([_TXZ_ARCH_SETUP_INDEP], [dnl
+])# _TXZ_ARCH_SETUP_INDEP
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH_SETUP_TOPDIR
+# _TXZ_ARCH_SETUP_TOPDIR
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH_SETUP_TOPDIR], [dnl
+AC_DEFUN([_TXZ_ARCH_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
-    AC_ARG_WITH([pac-distdir],
-	[AS_HELP_STRING([--with-pac-distdir=DIR],
-	    [pacman dist directory @<:@default=PKG-DISTDIR/arch/PKG-SUBDIR@:>@])],
-	[], [with_pac_distdir='$(DISTDIR)/arch/$(reposubdir)'])
-    AC_MSG_CHECKING([for pacman distribution directory])
-    if test ":${pacdistdir+set}" != :set ; then
-	case ":${with_pac_distdir:-no}" in
-	    (:no|:yes)	pacdistdir='$(DISTDIR)/arch/$(reposubdir)' ;;
-	    (*)		pacdistdir="$with_pac_distdir" ;;
+    AC_ARG_WITH([txz-distdir],
+	[AS_HELP_STRING([--with-txz-distdir=DIR],
+	    [slackpkg dist directory @<:@default=PKG-DISTDIR/slackware/PKG-SUBDIR@:>@])],
+	[], [with_txz_distdir='$(DISTDIR)/slackware/$(reposubdir)'])
+    AC_MSG_CHECKING([for slackpkg distribution directory])
+    if test ":${txzdistdir+set}" != :set ; then
+	case ":${with_txz_distdir:-no}" in
+	    (:no|:yes)	txzdistdir='$(DISTDIR)/slackware/$(reposubdir)' ;;
+	    (*)		txzdistdir="$with_txz_distdir" ;;
 	esac
     fi
-    AC_MSG_RESULT([$pacdistdir])
-    AC_SUBST([pacdistdir])dnl
-    AC_ARG_WITH([pac_topdir],
-	[AS_HELP_STRING([--with-pac-topdir=DIR],
-	    [pacman top directory @<:@default=PAC-DISTDIR/BRANCH@:>@])],
-	[], [with_pac_topdir='$(pacdistdir)$(repobranch)'])
-    AC_MSG_CHECKING([for pacman top build directory])
-    if test ":${pacdir+set}" != :set ; then
-	case ":${with_pac_topdir:-no}" in
-	    (:no|:yes)	pacdir='$(packdistdir)$(repobranch)' ;;
-	    (*)		pacdir="${with_pac_topdir}" ;;
+    AC_MSG_RESULT([$txzdistdir])
+    AC_SUBST([txzdistdir])dnl
+    AC_ARG_WITH([txz_topdir],
+	[AS_HELP_STRING([--with-txz-topdir=DIR],
+	    [slackpkg top directory @<:@default=TXZ-DISTDIR/BRANCH@:>@])],
+	[], [with_txz_topdir='$(txzdistdir)$(repobranch)'])
+    AC_MSG_CHECKING([for slackpkg top build directory])
+    if test ":${txzdir+set}" != :set ; then
+	case ":${with_txz_topdir:-no}" in
+	    (:no|:yes)	txzdir='$(txzkdistdir)$(repobranch)' ;;
+	    (*)		txzdir="${with_txz_topdir}" ;;
 	esac
     fi
-    AC_MSG_RESULT([$pacdir])
-    AC_SUBST([pacdir])dnl
-    pkgdir='$(pacdistdir)'
-    AC_SUBST([pkgdir])dnl
-    pkgfulldir='$(pacdir)'
-    AC_SUBST([pkgfulldir])dnl
-    pkgmaindir='$(pacdir)/main'
-    AC_SUBST([pkgmaindir])dnl
-    pkgdebgdir='$(pacdir)/debug'
-    AC_SUBST([pkgdebgdir])dnl
-    pkgdevldir='$(pacdir)/devel'
-    AC_SUBST([pkgdevldir])dnl
-    pkgsrcsdir='$(pacdir)/source'
-    AC_SUBST([pkgsrcsdir])dnl
-    AC_MSG_CHECKING([for pacman BUILD directory])
-    if test ":${mpkgtopdir+set}" != :set ; then
-	# mpkgtopdir needs to be absolute: always build in the top build
+    AC_MSG_RESULT([$txzdir])
+    AC_SUBST([txzdir])dnl
+    spkgdir='$(txzdistdir)'
+    AC_SUBST([spkgdir])dnl
+    spkgfulldir='$(txzdir)'
+    AC_SUBST([spkgfulldir])dnl
+    spkgmaindir='$(txzdir)/main'
+    AC_SUBST([spkgmaindir])dnl
+    spkgdebgdir='$(txzdir)/debug'
+    AC_SUBST([spkgdebgdir])dnl
+    spkgdevldir='$(txzdir)/devel'
+    AC_SUBST([spkgdevldir])dnl
+    spkgsrcsdir='$(txzdir)/source'
+    AC_SUBST([spkgsrcsdir])dnl
+    AC_MSG_CHECKING([for slackpkg BUILD directory])
+    if test ":${spkgtopdir+set}" != :set ; then
+	# spkgtopdir needs to be absolute: always build in the top build
 	# directory on the local machine
-	mpkgtopdir=`pwd`/arch
+	spkgtopdir=`pwd`/slackware
     fi
-    AC_MSG_RESULT([$mpkgtopdir])
-    AC_SUBST([mpkgtopdir])dnl
+    AC_MSG_RESULT([$spkgtopdir])
+    AC_SUBST([spkgtopdir])dnl
     AC_MSG_CHECKING([for makepkg source directory])
-    if test ":${mpkgsourcedir+set}" != :set ; then
-	mpkgsourcedir="${mpkgtopdir}/src"
+    if test ":${spkgsourcedir+set}" != :set ; then
+	spkgsourcedir="${spkgtopdir}/src"
     fi
-    AC_MSG_RESULT([$mpkgsourcedir])
-    AC_SUBST([mpkgsourcedir])dnl
+    AC_MSG_RESULT([$spkgsourcedir])
+    AC_SUBST([spkgsourcedir])dnl
     AC_MSG_CHECKING([for makepkg build directory])
-    if test ":${mpkgbuilddir+set}" != :set ; then
-	mpkgbuilddir="${mpkgtopdir}/bld"
+    if test ":${spkgbuilddir+set}" != :set ; then
+	spkgbuilddir="${spkgtopdir}/bld"
     fi
-    AC_MSG_RESULT([$mpkgbuilddir])
-    AC_SUBST([mpkgbuilddir])dnl
+    AC_MSG_RESULT([$spkgbuilddir])
+    AC_SUBST([spkgbuilddir])dnl
     AC_MSG_CHECKING([for makepkg install directory])
-    if test ":${mpkginstalldir+set}" != :set ; then
-	mpkginstalldir="${mpkgtopdir}/pkg"
+    if test ":${spkginstalldir+set}" != :set ; then
+	spkginstalldir="${spkgtopdir}/pkg"
     fi
-    AC_MSG_RESULT([$mpkginstalldir])
-    AC_SUBST([mpkginstalldir])dnl
-])# _PAC_ARCH_SETUP_TOPDIR
+    AC_MSG_RESULT([$spkginstalldir])
+    AC_SUBST([spkginstalldir])dnl
+])# _TXZ_ARCH_SETUP_TOPDIR
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH_SETUP_OPTIONS
+# _TXZ_ARCH_SETUP_OPTIONS
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH_SETUP_OPTIONS], [dnl
+AC_DEFUN([_TXZ_ARCH_SETUP_OPTIONS], [dnl
     args="$ac_configure_args"
     args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-maintainer-mode(.)? , ,g;s,^ *,,;s, *$,,'`
     args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-dependency-tracking(.)? , ,g;s,^ *,,;s, *$,,'`
@@ -251,7 +251,7 @@ AC_DEFUN([_PAC_ARCH_SETUP_OPTIONS], [dnl
 	if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
 	    if test -n "$arg" ; then
 		eval "arg=$arg"
-		AC_MSG_CHECKING([for pacman argument '$arg'])
+		AC_MSG_CHECKING([for slackpkg argument '$arg'])
 		if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
 		    PACKAGE_PACOPTIONS="${PACKAGE_PACOPTIONS}${PACKAGE_PACOPTIONS:+ }$arg"
 		    AC_MSG_RESULT([yes])
@@ -277,151 +277,103 @@ AC_DEFUN([_PAC_ARCH_SETUP_OPTIONS], [dnl
 	fi
     fi
     AC_SUBST([PACKAGE_PACOPTIONS])dnl
-])# _PAC_ARCH_SETUP_OPTIONS
+])# _TXZ_ARCH_SETUP_OPTIONS
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH_SETUP_BUILD
+# _TXZ_ARCH_SETUP_BUILD
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH_SETUP_BUILD], [dnl
+AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
   AC_REQUIRE([_OPENSS7_MISSING3])dnl
     tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
-    AC_ARG_ENABLE([pacman],
-	[AS_HELP_STRING([--disable-pacman],
-	    [build pacman @<:@default=auto@:>@])],
+    AC_ARG_ENABLE([slackpkg],
+	[AS_HELP_STRING([--disable-slackpkg],
+	    [build slackpkg @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (arch)	enable_pacman=yes ;;
-	    (*)		enable_pacman=no  ;;
+	    (slackware)	enable_slackpkg=yes ;;
+	    (*)		enable_slackpkg=no  ;;
 	esac])
-    AC_ARG_VAR([PACMAN],
-	       [pacman command. @<:@default=pacman@:>@])
-    _BLD_PATH_PROG([PACMAN], [pacman], [${am_missing3_run}pacman], [$tmp_path], [dnl
+    AC_ARG_VAR([SLACKPKG],
+	       [slackpkg command. @<:@default=slackpkg@:>@])
+    _BLD_PATH_PROG([SLACKPKG], [slackpkg], [${am_missing3_run}slackpkg], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (arch)
-		AC_MSG_WARN([Cannot find pacman program in PATH.]) ;;
-	    (*) enable_pacman=no ;;
+	    (slackware)
+		AC_MSG_WARN([Cannot find slackpkg program in PATH.]) ;;
+	    (*) enable_slackpkg=no ;;
 	esac])
     AC_ARG_VAR([MAKEPKG],
 	       [makepkg command. @<:@default=makepkg@:>@])
     _BLD_PATH_PROG([MAKEPKG], [makepkg], [${am_missing3_run}makepkg], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (arch)
+	    (slackware)
 		AC_MSG_WARN([Cannot find makepkg program in PATH.]) ;;
-	    (*) enable_pacman=no ;;
+	    (*) enable_slackpkg=no ;;
 	esac])
-    AC_CACHE_CHECK([for pkg building of pacman], [pac_cv_pkgs], [dnl
-	pac_cv_pkgs=${enable_pacman:-no}
+    AC_CACHE_CHECK([for pkg building of slackpkg], [txz_cv_pkgs], [dnl
+	txz_cv_pkgs=${enable_slackpkg:-no}
     ])
-    AM_CONDITIONAL([BUILD_PKGS], [test ":$pac_cv_pkgs" = :yes])dnl
-])# _PAC_ARCH_SETUP_BUILD
+    AM_CONDITIONAL([BUILD_TXZS], [test ":$txz_cv_pkgs" = :yes])dnl
+])# _TXZ_ARCH_SETUP_BUILD
 # =============================================================================
 
 # =============================================================================
-# _PAC_REPO_SETUP
+# _TXZ_REPO_SETUP
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_REPO_SETUP], [dnl
-    _PAC_REPO_SETUP_PACMAN
-])# _PAC_REPO_SETUP
+AC_DEFUN([_TXZ_REPO_SETUP], [dnl
+    _TXZ_REPO_SETUP_SLACKPKG
+])# _TXZ_REPO_SETUP
 # =============================================================================
 
 # =============================================================================
-# _PAC_REPO_SETUP_PACMAN
+# _TXZ_REPO_SETUP_SLACKPKG
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_REPO_SETUP_PACMAN], [dnl
+AC_DEFUN([_TXZ_REPO_SETUP_SLACKPKG], [dnl
     AC_REQUIRE([_OPENSS7_MISSING3])dnl
     tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
-    AC_ARG_ENABLE([repo-pacman],
-	[AS_HELP_STRING([--disable-repo-pacman],
-	    [arch repo construction @<:@default=auto@:>@])],
-	[], [enable_repo_pacman=yes])
-    AC_ARG_VAR([REPO_ADD],
-	       [repo-add command. @<:@default=repo-add@:>@])
-    _BLD_PATH_PROG([REPO_ADD], [repo-add], [${am_missing3_run}repo-add], [$tmp_path], [dnl
-	if test ":$pac_cv_pkgs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes ; then
-	    case "${target_vendor:-none}" in
-		(arch)
-		    _BLD_INSTALL_WARN([REPO_ADD], [
-*** 
-*** Configure could not find a suitable tool for creating Arch linux
-*** repository databases.  This program is part of the 'pacman' package
-*** on Arch based distributions.
-*** ], [
-*** on Arch base distributiones, try 'pacman --sync pacman'.
-***
-*** Arch Linux:	'pacman --sync pacman'], [
-*** 
-*** Alternatively, you can reconfigure with --disable-repo-pacman to
-*** disable generation of Arch databases.  Proceeding under the
-*** assumption that --disable-repo-pacman was specified.
-*** ])
-		    ;;
-		(*) AC_MSG_WARN([Cannot find 'repo-remove' program in PATH.]) ;;
-	    esac
-	else enable_repo_pacman=no; fi])
-    AC_ARG_VAR([REPO_REMOVE],
-	       [repo-remove command. @<:@default=repo-remove@:>@])
-    _BLD_PATH_PROG([REPO_REMOVE], [repo-remove], [${am_missing3_run}repo-remove], [$tmp_path], [dnl
-	if test ":$pac_cv_pkgs" = :yes -a ${USE_MAINTAINER_MODE:-no} = yes; then
-	    case "${target_vendor:-none}" in
-		(arch)
-		    _BLD_INSTALL_WARN([REPO_REMOVE], [
-*** 
-*** Configure could not find a suitable tool for creating Arch linux
-*** repository databases.  This program is part of the 'pacman' package
-*** on Arch based distributions.
-*** ], [
-*** on Arch base distributiones, try 'pacman --sync pacman'.
-***
-*** Arch Linux:	'pacman --sync pacman'], [
-*** 
-*** Alternatively, you can reconfigure with --disable-repo-pacman to
-*** disable generation of Arch databases.  Proceeding under the
-*** assumption that --disable-repo-pacman was specified.
-*** ])
-		    ;;
-		(*) AC_MSG_WARN([Cannot find 'repo-remove' program in PATH.]) ;;
-	    esac
-	else enable_repo_pacman=no; fi])
-    AC_CACHE_CHECK([for arch pacman repo construction], [pac_cv_repo_pacman], [dnl
-	pac_cv_repo_pacman=${enable_repo_pacman:-no}
+    AC_ARG_ENABLE([repo-slackpkg],
+	[AS_HELP_STRING([--disable-repo-slackpkg],
+	    [slackpkg repo construction @<:@default=auto@:>@])],
+	[], [enable_repo_slackpkg=yes])
+    AC_CACHE_CHECK([for slackpkg repo construction], [txz_cv_repo_slackpkg], [dnl
+	txz_cv_repo_slackpkg=${enable_repo_slackpkg:-no}
     ])
-    AM_CONDITIONAL([BUILD_REPO_PACMAN], [test ":$pac_cv_repo_pacman" = :yes])
-])# _PAC_REPO_SETUP_PACMAN
+    AM_CONDITIONAL([BUILD_REPO_SLACKPKG], [test ":$txz_cv_repo_slackpkg" = :yes])
+])# _TXZ_REPO_SETUP_SLACKPKG
 # =============================================================================
 
 # =============================================================================
-# _PAC_ARCH_OUTPUT
+# _TXZ_ARCH_OUTPUT
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_ARCH_OUTPUT], [dnl
+AC_DEFUN([_TXZ_ARCH_OUTPUT], [dnl
 dnl the conditional confuses automake forcing extra config.status runs.
 dnl if test ":${REPO_ADD:-no}" != :no -a ":${REPO_REMOVE:-no}" != :no; then
-	AC_CONFIG_FILES([arch/PKGBUILD
-			 arch/install_header])
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-repo.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-base.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-libs.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-compat.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-devel.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debuginfo.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debugsource.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-devel.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debuginfo.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debugsource.install)
-	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-source.install)
-	install_header="arch/install_header"
-	AC_SUBST_FILE([install_header])
+dnl	AC_CONFIG_FILES([arch/PKGBUILD
+dnl			 arch/install_header])
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-repo.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-base.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-libs.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-compat.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-devel.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debuginfo.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debugsource.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-devel.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debuginfo.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debugsource.install)
+dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-source.install)
+dnl	install_header="arch/install_header"
+dnl	AC_SUBST_FILE([install_header])
 dnl fi
-])# _PAC_ARCH_OUTPUT
+])# _TXZ_ARCH_OUTPUT
 # =============================================================================
 
 # =============================================================================
-# _PAC_
+# _TXZ_
 # -----------------------------------------------------------------------------
-AC_DEFUN([_PAC_], [dnl
-])# _PAC_
+AC_DEFUN([_TXZ_], [dnl
+])# _TXZ_
 # =============================================================================
 
 # =============================================================================
