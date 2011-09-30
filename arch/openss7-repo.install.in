@@ -1,0 +1,250 @@
+#!/bin/bash
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+subpkg=repo
+@openss7_header@
+datarootdir=@datarootdir@
+
+_pre() {
+    un=; pw=; o=
+    for s in '' .bak .new; do
+    for p in credentials; do
+    for d in ${_localstatedir}/lib/${_name}/; do
+	o=$d$p$s
+	[ -r $o ] || continue
+	un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
+	pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
+	[ -n "$un" -a -n "$pw" ] || continue
+	break 3
+    done
+    done
+    if -n "${_FILES_zypprepo}"; then
+	for o in @PACKAGE_UCNAME@ NCC; do
+	for d in ${_zyppcreddir}/; do
+	    o=$d${p}credentials$s
+	    [ -r $o ] || continue
+	    un=`awk 'BEGIN{FS="="}{if($1~/^username$/){print$2;exit}}' $o`
+	    pw=`awk 'BEGIN{FS="="}{if($1~/^password$/){print$2;exit}}' $o`
+	    [ -n "$un" -a -n "$pw" ] || continue
+	    break 3
+	done
+	done
+    fi
+    if -n "${_FILES_yumrepo}"; then
+	for p in @PACKAGE@.repo; do
+	for d in ${_yumrepodir}/; do
+	    o=$d$p$s
+	    [ -r $o ] || continue
+	    un=`sed -n -r 's,^.*(baseurl|include)[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\2,p;t end;b;: end q' $o`
+	    pw=`sed -n -r 's,^.*(baseurl|include)[[:space:]]*=[[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\4,p;t end;b;: end q' $o`
+	    [ -n "$un" -a -n "$pw" ] || continue
+	    break 3
+	done
+	done
+    fi
+    if -n "${_FILES_urpmirepo}"; then
+	for p in netrc netrc.@PACKAGE@; do
+	for d in ${_urpmiconfdir}/; do
+	    o=$d$p$s
+	    [ -r $o ] || continue
+	    un=`sed -n -r 's,^machine[[:space:]]*'${_repobase}'[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\1,p;t end;b;: end q' $o`
+	    pw=`sed -n -r 's,^machine[[:space:]]*'${_repobase}'[[:space:]]*login[[:space:]]*([^[:space:]]*)[[:space:]]*password[[:space:]]*([^[:space:]]*)[[:space:]]*.*$,\2,p;t end;b;: end q' $o`
+	    [ -n "$un" -a -n "$pw" ] || continue
+	    break 3
+	done
+	done
+    fi
+    if -n "${_FILES_aptrepo}"; then
+	for p in @PACKAGE@ sources; do
+	for d in ${_aptrepodir}/ ${_aptconfdir}/; do
+	    o=$d$p.list$s
+	    [ -r $o ] || continue
+	    un=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\3,p;t end;b;: end q' $o`
+	    pw=`sed -n -r 's,^[#]?(deb|rpm|urpm|repomd)(-src)?[[:space:]][[:space:]]*http[s]?://([^@:]*)(:([^@]*))@.*$,\5,p;t end;b;: end q' $o`
+	    [ -n "$un" -a -n "$pw" ] || continue
+	    break 3
+	done
+	done
+    fi
+    done
+    [ -n "$un" -a -n "$pw" ] || { un=; pw=; }
+    d=${_localstatedir}/lib/${_name}; n=credentials
+    o=; f=$d/$n; [ -d $d ] || mkdir -p -- $d
+    [ ! -e $f ] || { o=$f; mv -f -- $f $f.$$; }
+    ext="?hn=`hostname -f`&ip=`hostname -i | sed 'y/ /,/'`${un:+&un=}${un}${pw:+&pw=}${pw}"
+    ext="$ext`echo '/${_reposubdir}' | sed 's,//,/,g;s,/,\&distro=,;s,/,\&relver=,;s,/,\&osarch=,'`"
+    key="${un:+${un}${pw:+:}${pw}@}"
+    url='${_reposerv}://'"${key}"'${_repobase}/${_reporoot}/'"`basename $f`$ext"
+    if ! echo "$url" | wget -i - -O $f 2>/dev/null ; then
+        if echo "$url" | wget -i - -O /dev/null 2>&1 | grep '401 Authorization Required' >/dev/null 2>&1 ; then
+            u='anonymous'; p=
+            m='Authorization required for repository access.'
+            if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                zenity --info --text="$m" --no-wrap || exit 1
+                while true; do
+                    u=`zenity --entry --text='Username: ' --entry-text="$u" || exit 1` || exit 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`zenity --entry --text="Password for '$u': " --hide-text || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty || exit 1
+                while true; do
+                    u=`whiptail --inputbox 'Username: ' 8 40 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || exit 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`whiptail --passwordbox "Password for '$u': " 8 40 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty || exit 1
+                while true; do
+                    u=`dialog --inputbox 'Username: ' 0 0 "$u" 2>&1 >/dev/tty </dev/tty || exit 1` || exit 1; u=${u:-anonymous}
+                    [ "$u" != anonymous ] || break
+                    p=`dialog --passwordbox "Password for '$u': " 0 0 2>&1 >/dev/tty </dev/tty || exit 1` || continue
+                    [ -z "$p" ] || break
+                done
+            else
+                echo "$m" >/dev/tty
+                while true; do
+                    d="$u"
+                    read -e  -p "Username ($u): " u </dev/tty >/dev/tty || { echo '' >/dev/tty; exit 1; }; u=${u:-$d}
+                    [ "$u" != anonymous ] || break
+                    read -es -p "Password ($u): " p </dev/tty >/dev/tty || { echo '' >/dev/tty; continue; }
+                    echo '' >/dev/tty
+                    [ -z "$p" ] || break
+                done
+            fi
+            key="${u:+${u}${p:+:}${p}@}"
+            url='${_reposerv}://'"${key}"'${_repobase}/${_reporoot}/'"`basename $f`$ext"
+            rm -f -- $f
+            if ! echo "$url" | wget -i - -O $f 2>/dev/null; then
+                rm -f -- $f
+                m='Authorization failed.'
+                if [ -n "$DISPLAY" -a -x "`which zenity 2>/dev/null`" ]; then
+                    zenity --error --text="$m" --no-wrap
+                elif [ "${DISPLAY+set}" = set -a -x "`which whiptail 2>/dev/null`" ]; then
+                    whiptail --msgbox "$m" 7 50 >/dev/tty </dev/tty
+                elif [ "${DISPLAY+set}" = set -a -x "`which dialog 2>/dev/null`" ]; then
+                    dialog --msgbox "$m" 5 50 >/dev/tty </dev/tty
+                else
+                    echo "$m" >/dev/tty
+                fi
+                [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+                exit 1
+            fi
+        fi
+    fi
+    if [ ! -e $f ]; then
+        [ "$o" != "$f" -o ! -e $o.$$ ] || mv -f -- $o.$$ $o
+        exit 1
+    fi
+    [ "$o" != "$f" ] || rm -f -- $o.$$
+    chmod 0600 $f
+}
+
+_post() {
+    if -n "${_FILES_yumrepo}"; then :
+	d=${_sysconfdir}/yum/pluginconf.d
+	for f in kmod.conf fedorakmod.conf ; do f="$d/$f"
+	    if [ -f $f ] ; then
+		mv -f -- $f $f.rpmsave
+		sed -r -e 's,^pinkernels.*$,pinkernels = 1,;s,^installforallkernels.*$,installforallkernels = 1,' $f.rpmsave >$f
+		if ! diff $f.rpmsave $f >/dev/null 2>&1 ; then
+		    mv -f -- $f.rpmsave $f
+		fi
+	    fi
+	done
+    fi
+    if -n "${_FILES_zypprepo}"; then :
+	d=${_sysconfdir}/zypp
+	for f in zypp.conf ; do f="$d/$f"
+	    if [ -f $f ] ; then
+		mv -f -- $f $f.rpmsave
+		sed -r -e 's,^multiversion.*$,multiversion = provides:multiversion(kernel),' $f.rpmsave >$f
+		if ! diff $f.rpmsave $f >/dev/null 2>&1 ; then
+		    mv -f -- $f.rpmsave $f
+		fi
+	    fi
+	done
+    fi
+    if -n "${_FILES_urpmirepo}"; then :
+    fi
+    if -n "${_FILES_aptrepo}"; then :
+    fi
+}
+
+pre_install() {
+    _pre $*
+}
+
+post_install() {
+    _post $*
+}
+
+pre_upgrade() {
+    _pre $*
+}
+
+post_upgrade() {
+    _post $*
+}
+
+pre_remove() {
+}
+
+post_remove() {
+}
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================

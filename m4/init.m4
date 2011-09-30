@@ -235,7 +235,8 @@ dnl
 	init_cv_initrddir='no'
 	eval "init_search_path=\"
 	    ${DESTDIR}${sysconfdir}/rc.d/init.d
-	    ${DESTDIR}${sysconfdir}/init.d\""
+	    ${DESTDIR}${sysconfdir}/init.d
+	    ${DESTDIR}${sysconfdir}/rc.d\""
 	for init_tmp in $init_search_path ; do
 	    eval "init_dir=\"$init_tmp\""
 	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g'`
@@ -257,6 +258,7 @@ dnl
 	init_cv_configdir='no'
 	eval "init_search_path=\"
 	    ${DESTDIR}${sysconfdir}/sysconfig
+	    ${DESTDIR}${sysconfdir}/conf.d
 	    ${DESTDIR}${sysconfdir}/default\""
 	for init_tmp in $init_search_path ; do
 	    eval "init_dir=\"$init_tmp\""

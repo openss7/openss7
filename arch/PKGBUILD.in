@@ -1,0 +1,210 @@
+# vim: ft=sh
+
+pkgname=('@PACKAGE@'
+	 '@PACKAGE@-repo'
+	 '@PACKAGE@-base'
+	 '@PACKAGE@-lib'
+	 '@PACKAGE@-compat'
+	 '@PACKAGE@-devel'
+	 '@PACKAGE@-buginfo'
+	 '@PACKAGE@-bugsource'
+	 '@PACKAGE@-latest'
+	 '@PACKAGE@-kernel'
+	 '@PACKAGE@-kernel-devel'
+	 '@PACKAGE@-kernel-buginfo'
+	 '@PACKAGE@-kernel-bugsource'
+	 '@PACKAGE@-doc'
+	 '@PACKAGE@-java'
+	 '@PACKAGE@-javadoc')
+pkgver='@VERSION@'
+pkgrel='@PACKAGE_PACRELEASE@'
+pkgbase='@PACKAGE@'
+pkgdesc=""
+depends=()
+provides=()
+conflicts=()
+makedepends=()
+checkdepends=()
+arch=('any' 'i686' 'x86_64')
+license=('AGPL3' 'GPL3' 'BSD')
+url='http://www.openss7.org/'
+changelog='@PACKAGE@.changelog'
+
+_blddir=${srcdir}/_build
+_insdir=${srcdir}/_install
+
+source=(http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz)
+md5sums=('')
+
+build() {
+	mkdir -p ${_blddir}
+	cd ${_blddir}
+	_cache_file=${startdir}/${target_distos}-${_kversion}-config.cache
+	_csite_file=${startdir}/${target_distos}-config.site
+	_mpost_file=${startdir}/${target_distos}-${_kversion}-modpost.cache
+	${srcdir}/configure \
+		CONFIG_SITE=${_csite_file} \
+		MODPOST_CACHE=${_mpost_file} \
+		${PACKAGE_PACOPTIONS} \
+		--cache-file=${_cache_file} \
+		--disable-maintainer-mode \
+		--enable-dependency-tracking \
+		--with-gnu-ld \
+		--with-k-release=${_kversion} \
+		|| { rm -f ${_cache_file} ${_csite_file} ${_mpost_file} ; exit 1 ; }
+	make
+	mkdir -p ${_insdir}
+	make DESTDIR=${_insdir} install
+}
+
+check() {
+	cd ${_blddir}
+	make check check-clean
+}
+
+_install_files() {
+	cd ${_insdir}
+	while read f ; do
+		install -D $f ${pkgdir}/$f
+	done
+}
+
+package_@PACKAGE@() {
+	pkgver='@VERSION@'
+	pkgrel='@PACKAGE_PACRELEASE@'
+	pkgdesc=''
+	arch=('any')
+	license=('AGPL3')
+	groups=('blah')
+	depends=()
+	optdepends=()
+	provides=()
+	conflicts=()
+	replaces=()
+	backup=()
+	options=()
+	install='@PACKAGE@.install'
+	#changelog='@PACKAGE@.changelog'
+	( cd ${_insdir}
+	  echo AUTHORS
+	  [ ! -f ANNOUNCE  ] || echo ANNOUNCE
+	  [ ! -f ABOUT-NLS ] || echo ABOUT-NLS
+	  [ ! -f BUGS      ] || echo BUGS
+	  echo COPYING
+	  echo ChangeLog
+	  echo INSTALL
+	  echo INSTALL-@PACKAGE@
+	  [ ! -f LICENSES  ] || echo LICENSES
+	  echo LSM
+	  echo MANUAL
+	  echo NEWS
+	  [ ! -f NOTES       ] || echo NOTES
+	  [ ! -f NOTES.cos53 ] || echo NOTES.cos53
+	  [ ! -f NOTES.kmod  ] || echo NOTES.kmod
+	  [ ! -f NOTES.kmp   ] || echo NOTES.kmp
+	  [ ! -f NOTES.ksyms ] || echo NOTES.ksyms
+	  [ ! -f NOTES.repo  ] || echo NOTES.repo
+	  [ ! -f NOTES.rpm   ] || echo NOTES.rpm
+	  [ ! -f NOTES.sles  ] || echo NOTES.sles
+	  echo PROBLEMS
+	  echo README
+	  [ ! -f README-alpha ] || echo README-alpha
+	  echo README-cvs
+	  echo README-make
+	  [ ! -f RELEASE-NOTES ] || echo RELEASE-NOTES
+	  echo THANKS
+	  echo TODO
+	  echo @PACKAGE@-@VERSION@.lsm
+	) | _install_files
+}
+package_@PACKAGE@-repo() {
+	arch=('any')
+	backup=()
+	install='@PACKAGE@-repo.install'
+}
+package_@PACKAGE@-base() {
+	arch=('any')
+	backup=()
+	install='@PACKAGE@-base.install'
+}
+package_@PACKAGE@-lib() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-lib.install'
+	groups=('lib')
+	depends=()
+	optdepends=()
+	conflicts=()
+	provides=()
+	replaces=()
+	options=()
+}
+package_@PACKAGE@-compat() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-compat.install'
+	groups=('lib')
+}
+package_@PACKAGE@-devel() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-devel.install'
+	groups=('devel')
+}
+package_@PACKAGE@-buginfo() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-buginfo.install'
+	groups=('debug')
+}
+package_@PACKAGE@-bugsource() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-bugsource.install'
+	groups=('debug')
+}
+package_@PACKAGE@-latest() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-latest.install'
+}
+package_@PACKAGE@-kernel() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-kernel.install'
+}
+package_@PACKAGE@-kernel-devel() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-kernel-devel.install'
+	groups=('devel')
+}
+package_@PACKAGE@-kernel-buginfo() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-kernel-buginfo.install'
+	groups=('debug')
+}
+package_@PACKAGE@-kernel-bugsource() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-kernel-bugsource.install'
+	groups=('debug')
+}
+package_@PACKAGE@-doc() {
+	arch=('any')
+	backup=()
+	install='@PACKAGE@-doc.install'
+}
+package_@PACKAGE@-java() {
+	arch=('i686' 'x86_64')
+	backup=()
+	install='@PACKAGE@-java.install'
+	groups=('java')
+}
+package_@PACKAGE@-javadoc() {
+	arch=('any')
+	backup=()
+	install='@PACKAGE@-javadoc.install'
+	groups=('doc')
+}

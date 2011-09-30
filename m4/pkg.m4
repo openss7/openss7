@@ -396,22 +396,22 @@ AC_DEFUN([_PAC_REPO_SETUP_ARCH], [dnl
 AC_DEFUN([_PAC_ARCH_OUTPUT], [dnl
 dnl the conditional confuses automake forcing extra config.status runs.
 dnl if test ":${REPO_ADD:-no}" != :no -a ":${REPO_REMOVE:-no}" != :no; then
-	AC_CONFIG_FILES([pkg/PKGBUILD
-			 pkg/install_header])
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-repo.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-base.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-libs.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-compat.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-devel.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debuginfo.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debugsource.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-devel.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debuginfo.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debugsource.install)
-	AC_CONFIG_FILES(pkg/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-source.install)
-	install_header="pkg/install_header"
+	AC_CONFIG_FILES([arch/PKGBUILD
+			 arch/install_header])
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-repo.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-base.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-libs.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-compat.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-devel.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debuginfo.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debugsource.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-devel.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debuginfo.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debugsource.install)
+	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-source.install)
+	install_header="arch/install_header"
 	AC_SUBST_FILE([install_header])
 dnl fi
 ])# _PAC_ARCH_OUTPUT
