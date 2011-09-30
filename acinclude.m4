@@ -101,6 +101,7 @@ AC_DEFUN([AC_OPENSS7], [dnl
     _RPM_SPEC
     _DEB_DPKG
     _PAC_ARCH
+    _TXZ_SLACK
     _MAN_CONVERSION
     _INFO
     _PAPERS
