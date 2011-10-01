@@ -61,13 +61,17 @@ AC_DEFUN([_TXZ_SLACK], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_REQUIRE([_DISTRO])
     AC_REQUIRE([_REPO])
-    AC_MSG_NOTICE([+-------------------------+])
-    AC_MSG_NOTICE([| Slackpkg Archive Checks |])
-    AC_MSG_NOTICE([+-------------------------+])
-    _TXZ_ARCH_OPTIONS
-    _TXZ_ARCH_SETUP
-    _TXZ_REPO_SETUP
-    _TXZ_ARCH_OUTPUT
+    if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
+	AC_MSG_NOTICE([+-------------------------+])
+	AC_MSG_NOTICE([| Slackpkg Archive Checks |])
+	AC_MSG_NOTICE([+-------------------------+])
+	_TXZ_ARCH_OPTIONS
+	_TXZ_ARCH_SETUP
+	_TXZ_REPO_SETUP
+	_TXZ_ARCH_OUTPUT
+    fi
+    AM_CONDITIONAL([BUILD_TXZS], [test ":$txz_cv_pkgs" = :yes])dnl
+    AM_CONDITIONAL([BUILD_REPO_SLACKPKG], [test ":$txz_cv_repo_slackpkg" = :yes])
 ])# _TXZ_SLACK
 # =============================================================================
 
@@ -322,7 +326,6 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
     AC_CACHE_CHECK([for building of txzs], [txz_cv_pkgs], [dnl
 	txz_cv_pkgs=${enable_txzs:-no}
     ])
-    AM_CONDITIONAL([BUILD_TXZS], [test ":$txz_cv_pkgs" = :yes])dnl
 ])# _TXZ_ARCH_SETUP_BUILD
 # =============================================================================
 
@@ -355,7 +358,6 @@ AC_DEFUN([_TXZ_REPO_SETUP_SLACKPKG], [dnl
     AC_CACHE_CHECK([for slackpkg repo construction], [txz_cv_repo_slackpkg], [dnl
 	txz_cv_repo_slackpkg=${enable_repo_slackpkg:-no}
     ])
-    AM_CONDITIONAL([BUILD_REPO_SLACKPKG], [test ":$txz_cv_repo_slackpkg" = :yes])
 ])# _TXZ_REPO_SETUP_SLACKPKG
 # =============================================================================
 

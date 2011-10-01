@@ -8,4 +8,5 @@ $srcdir/configure \
 	--with-pkg-distdir=/u8/repo \
 	--with-pkg-repodir=/u5/repo \
 	--enable-maintainer-mode \
+	$* \
 	2>&1 | tee configure.log

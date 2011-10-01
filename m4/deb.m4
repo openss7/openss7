@@ -61,13 +61,17 @@ AC_DEFUN([_DEB_DPKG], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_REQUIRE([_DISTRO])
     AC_REQUIRE([_REPO])
-    AC_MSG_NOTICE([+-----------------------+])
-    AC_MSG_NOTICE([| Debian Archive Checks |])
-    AC_MSG_NOTICE([+-----------------------+])
-    _DEB_DPKG_OPTIONS
-    _DEB_DPKG_SETUP
-    _DEB_REPO_SETUP
-    _DEB_DPKG_OUTPUT
+    if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
+	AC_MSG_NOTICE([+-----------------------+])
+	AC_MSG_NOTICE([| Debian Archive Checks |])
+	AC_MSG_NOTICE([+-----------------------+])
+	_DEB_DPKG_OPTIONS
+	_DEB_DPKG_SETUP
+	_DEB_REPO_SETUP
+	_DEB_DPKG_OUTPUT
+    fi
+    AM_CONDITIONAL([BUILD_DPKG], [test ":$deb_cv_debs:$deb_cv_dscs" = :yes:yes])dnl
+    AM_CONDITIONAL([BUILD_REPO_APT], [test ":$deb_cv_repo_apt" = :yes])
 ])# _DEB_DPKG
 # =============================================================================
 
@@ -130,58 +134,11 @@ AC_DEFUN([_DEB_OPTIONS_DEB_RELEASE], [dnl
 # _DEB_DPKG_SETUP
 # -----------------------------------------------------------------------------
 AC_DEFUN([_DEB_DPKG_SETUP], [dnl
-dnl _DEB_DPKG_SETUP_DIST
-dnl _DEB_DPKG_SETUP_ARCH
-dnl _DEB_DPKG_SETUP_INDEP
     _DEB_DPKG_SETUP_TOPDIR
     _DEB_DPKG_SETUP_OPTIONS
     _DEB_DPKG_SETUP_BUILD
     _DEB_DPKG_SETUP_HELPER
 ])# _DEB_DPKG_SETUP
-# =============================================================================
-
-# =============================================================================
-# _DEB_DPKG_SETUP_DIST
-# -----------------------------------------------------------------------------
-AC_DEFUN([_DEB_DPKG_SETUP_DIST], [dnl
-])# _DEB_DPKG_SETUP_DIST
-# =============================================================================
-
-# =============================================================================
-# _DEB_DPKG_SETUP_ARCH
-# -----------------------------------------------------------------------------
-# Debian can build architecture dependent or architecture independent packages.
-# This option specifies whether architecture dependent packages are to be built
-# and installed.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_DEB_DPKG_SETUP_ARCH], [dnl
-    AC_MSG_CHECKING([for deb build/install of arch packages])
-    AC_ARG_ENABLE([arch],
-	[AS_HELP_STRING([--disable-arch],
-	    [arch components @<:@default=enabled@:>@])],
-	[], [enable_arch=yes])
-    AC_MSG_RESULT([${enable_arch:-yes}])
-    AM_CONDITIONAL([DEB_BUILD_ARCH], [test ":${enable_arch:-yes}" = :yes])dnl
-	
-])# _DEB_DPKG_SETUP_ARCH
-# =============================================================================
-
-# =============================================================================
-# _DEB_DPKG_SETUP_INDEP
-# -----------------------------------------------------------------------------
-# Debian can build architecture dependent or architecture independent packages.
-# This option specifies whether architecture independent packages are to be
-# built and installed.
-# -----------------------------------------------------------------------------
-AC_DEFUN([_DEB_DPKG_SETUP_INDEP], [dnl
-    AC_MSG_CHECKING([for deb build/install of indep packages])
-    AC_ARG_ENABLE([indep],
-	[AS_HELP_STRING([--disable-indep],
-	    [indep components @<:@default=enabled@:>@])],
-	[], [enable_indep=yes])
-    AC_MSG_RESULT([${enable_indep:-yes}])
-    AM_CONDITIONAL([DEB_BUILD_INDEP], [test ":${enable_indep:-yes}" = :yes])dnl
-])# _DEB_DPKG_SETUP_INDEP
 # =============================================================================
 
 # =============================================================================
@@ -381,7 +338,6 @@ dnl
     AC_CACHE_CHECK([for deb building of dscs], [deb_cv_dscs], [dnl
 	deb_cv_dscs=${enable_dscs:-no}
     ])
-    AM_CONDITIONAL([BUILD_DPKG], [test ":$deb_cv_debs:$deb_cv_dscs" = :yes:yes])dnl
 ])# _DEB_DPKG_SETUP_BUILD
 # =============================================================================
 
@@ -548,7 +504,6 @@ AC_DEFUN([_DEB_REPO_SETUP_APT], [dnl
     AC_CACHE_CHECK([for deb apt repo construction], [deb_cv_repo_apt], [dnl
 	deb_cv_repo_apt=${enable_repo_apt:-no}
     ])
-    AM_CONDITIONAL([BUILD_REPO_APT], [test ":$deb_cv_repo_apt" = :yes])
 ])# _DEB_REPO_SETUP_APT
 # =============================================================================
 

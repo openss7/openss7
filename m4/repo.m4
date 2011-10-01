@@ -58,12 +58,20 @@
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO], [dnl
     AC_REQUIRE([_DISTRO])dnl
-    AC_MSG_NOTICE([+--------------------+])
-    AC_MSG_NOTICE([| Repository Sources |])
-    AC_MSG_NOTICE([+--------------------+])
-    _REPO_OPTIONS
-    _REPO_SETUP
-    _REPO_OUTPUT
+    if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
+	AC_MSG_NOTICE([+--------------------+])
+	AC_MSG_NOTICE([| Repository Sources |])
+	AC_MSG_NOTICE([+--------------------+])
+	_REPO_OPTIONS
+	_REPO_SETUP
+	_REPO_OUTPUT
+    fi
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_YUM], [test :"${repo_cv_yum_repodir:-no}" != :no])
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_ZYPP], [test :"${repo_cv_zypp_repodir:-no}" != :no])
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_URPMI], [test :"${repo_cv_urpmi_repodir:-no}" != :no])
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_APT], [test :"${repo_cv_apt_dir:-no}" != :no])
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_SLAPT], [test :"${repo_cv_slapt_repodir}" != :no])
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_PACMAN], [test :"${repo_cv_pacman_repodir}" != :no])
 ])# _REPO
 # =============================================================================
 
@@ -742,7 +750,6 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	yumrepodir="$repo_cv_yum_repodir"
     fi
     AC_SUBST([yumrepodir])dnl
-    AM_CONDITIONAL([WITH_INSTALL_SOURCE_YUM], [test :"${repo_cv_yum_repodir:-no}" != :no])
     yumkmodconf='${DESTDIR}${rootdir}/etc/yum/pluginconf.d/kmod.conf'
     if test :"${repo_cv_yum_kmodconf:-no}" != :no ; then
 	yumkmodconf="$repo_cv_yum_kmodconf"
@@ -768,7 +775,6 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	zypprepodir="$repo_cv_zypp_repodir"
     fi
     AC_SUBST([zypprepodir])dnl
-    AM_CONDITIONAL([WITH_INSTALL_SOURCE_ZYPP], [test :"${repo_cv_zypp_repodir:-no}" != :no])
     zyppconfig='${DESTDIR}${rootdir}/etc/zypp/zypp.conf'
     if test :"${repo_cv_zypp_config:-no}" != :no ; then
 	zyppconfig="$repo_cv_zypp_config"
@@ -782,7 +788,6 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
     fi
     AC_SUBST([urpmirepodir])dnl
     AC_SUBST([urpmimediadir])dnl
-    AM_CONDITIONAL([WITH_INSTALL_SOURCE_URPMI], [test :"${repo_cv_urpmi_repodir:-no}" != :no])
     urpmiconfig='${DESTDIR}${rootdir}/etc/urpmi/urpmi.cfg'
     if test :"${repo_cv_urpmi_config:-no}" != :no ; then
 	urpmiconfig="$repo_cv_urpmi_config"
@@ -798,7 +803,6 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	aptconfdir="$repo_cv_apt_dir"
     fi
     AC_SUBST([aptconfdir])
-    AM_CONDITIONAL([WITH_INSTALL_SOURCE_APT], [test :"${repo_cv_apt_dir:-no}" != :no])
     aptrepodir='${DESTDIR}${rootdir}/etc/apt/sources.list.d'
     if test :"${repo_cv_apt_repodir:-no}" != :no ; then
 	aptrepodir="$repo_cv_apt_repodir"
@@ -837,7 +841,6 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	slaptrepodir="$repo_cv_slapt_repodir"
     fi
     AC_SUBST([slaptrepodir])dnl
-    AM_CONDITIONAL([WITH_INSTALL_SOURCE_SLAPT], [test :"${repo_cv_slapt_repodir}" != :no])
     slaptgetrc='${DESTDIR}${rootdir}/etc/slapt-get/slapt-getrc'
     if test :"${repo_cv_slapt_getrc:-no}" != :no ; then
 	slaptgetrc="$repo_cv_slapt_getrc"
@@ -853,7 +856,6 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	pacmanrepodir="$repo_cv_pacman_repodir"
     fi
     AC_SUBST([pacmanrepodir])dnl
-    AM_CONDITIONAL([WITH_INSTALL_SOURCE_PACMAN], [test :"${repo_cv_pacman_repodir}" != :no])
     pacmanconfig='${DESTDIR}${rootdir}/etc/pacman.conf'
     if test :"${repo_cv_pacman_config:-no}" != :no ; then
 	pacmanconfig="$repo_cv_pacman_config"

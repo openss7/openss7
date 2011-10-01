@@ -10,4 +10,5 @@ $srcdir/configure \
 	--without-snmp-agent \
 	--disable-32bit-libs \
 	--disable-papers-html \
+	$* \
 	2>&1 | tee configure.log

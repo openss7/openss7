@@ -61,13 +61,18 @@ AC_DEFUN([_PAC_ARCH], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_REQUIRE([_DISTRO])
     AC_REQUIRE([_REPO])
-    AC_MSG_NOTICE([+-----------------------+])
-    AC_MSG_NOTICE([| Pacman Archive Checks |])
-    AC_MSG_NOTICE([+-----------------------+])
-    _PAC_ARCH_OPTIONS
-    _PAC_ARCH_SETUP
-    _PAC_REPO_SETUP
-    _PAC_ARCH_OUTPUT
+    if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
+	AC_MSG_NOTICE([+-----------------------+])
+	AC_MSG_NOTICE([| Pacman Archive Checks |])
+	AC_MSG_NOTICE([+-----------------------+])
+	_PAC_ARCH_OPTIONS
+	_PAC_ARCH_SETUP
+	_PAC_REPO_SETUP
+	_PAC_ARCH_OUTPUT
+    fi
+    AM_CONDITIONAL([BUILD_PKGS], [test ":$pac_cv_pkgs" = :yes])dnl
+    AM_CONDITIONAL([BUILD_SPKG], [test ":$pac_cv_spkg" = :yes])dnl
+    AM_CONDITIONAL([BUILD_REPO_PACMAN], [test ":$pac_cv_repo_pacman" = :yes])
 ])# _PAC_ARCH
 # =============================================================================
 
@@ -322,11 +327,9 @@ AC_DEFUN([_PAC_ARCH_SETUP_BUILD], [dnl
     AC_CACHE_CHECK([for pacman building of pkgs], [pac_cv_pkgs], [dnl
 	pac_cv_pkgs=${enable_pkgs:-no}
     ])
-    AM_CONDITIONAL([BUILD_PKGS], [test ":$pac_cv_pkgs" = :yes])dnl
     AC_CACHE_CHECK([for pacman building of src pkgs], [pac_cv_spkg], [dnl
 	pac_cv_spkg=${enable_spkg:-no}
     ])
-    AM_CONDITIONAL([BUILD_SPKG], [test ":$pac_cv_spkg" = :yes])dnl
 ])# _PAC_ARCH_SETUP_BUILD
 # =============================================================================
 
@@ -399,7 +402,6 @@ AC_DEFUN([_PAC_REPO_SETUP_PACMAN], [dnl
     AC_CACHE_CHECK([for pacman repo construction], [pac_cv_repo_pacman], [dnl
 	pac_cv_repo_pacman=${enable_repo_pacman:-no}
     ])
-    AM_CONDITIONAL([BUILD_REPO_PACMAN], [test ":$pac_cv_repo_pacman" = :yes])
 ])# _PAC_REPO_SETUP_PACMAN
 # =============================================================================
 
