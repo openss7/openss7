@@ -86,7 +86,7 @@ AC_DEFUN([_INFO_ARGS], [dnl
     AC_ARG_ENABLE([texinfo],
 	[AS_HELP_STRING([--disable-texinfo],
 	    [info-formatted texinfo documents @<:@default=enabled@:>@])],
-	[], [enable_texinfo_print=yes])
+	[], [enable_texinfo=yes])
     AC_ARG_ENABLE([texinfo-html],
 	[AS_HELP_STRING([--disable-texinfo-html],
 	    [html-formatted texinfo documents @<:@default=enabled@:>@])],

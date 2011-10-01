@@ -61,15 +61,13 @@ AC_DEFUN([_PAC_ARCH], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_REQUIRE([_DISTRO])
     AC_REQUIRE([_REPO])
-    if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
-	AC_MSG_NOTICE([+-----------------------+])
-	AC_MSG_NOTICE([| Pacman Archive Checks |])
-	AC_MSG_NOTICE([+-----------------------+])
-	_PAC_ARCH_OPTIONS
-	_PAC_ARCH_SETUP
-	_PAC_REPO_SETUP
-	_PAC_ARCH_OUTPUT
-    fi
+    AC_MSG_NOTICE([+-----------------------+])
+    AC_MSG_NOTICE([| Pacman Archive Checks |])
+    AC_MSG_NOTICE([+-----------------------+])
+    _PAC_ARCH_OPTIONS
+    _PAC_ARCH_SETUP
+    _PAC_REPO_SETUP
+    _PAC_ARCH_OUTPUT
     AM_CONDITIONAL([BUILD_PKGS], [test ":$pac_cv_pkgs" = :yes])dnl
     AM_CONDITIONAL([BUILD_SPKG], [test ":$pac_cv_spkg" = :yes])dnl
     AM_CONDITIONAL([BUILD_REPO_PACMAN], [test ":$pac_cv_repo_pacman" = :yes])

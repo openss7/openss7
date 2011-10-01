@@ -64,15 +64,13 @@ AC_DEFUN([_RPM_SPEC], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_REQUIRE([_DISTRO])dnl
     AC_REQUIRE([_REPO])dnl
-    if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
-	AC_MSG_NOTICE([+------------------------+])
-	AC_MSG_NOTICE([| RPM Repository Support |])
-	AC_MSG_NOTICE([+------------------------+])
-	_RPM_SPEC_OPTIONS
-	_RPM_SPEC_SETUP
-	_RPM_REPO_SETUP
-	_RPM_SPEC_OUTPUT
-    fi
+    AC_MSG_NOTICE([+------------------------+])
+    AC_MSG_NOTICE([| RPM Repository Support |])
+    AC_MSG_NOTICE([+------------------------+])
+    _RPM_SPEC_OPTIONS
+    _RPM_SPEC_SETUP
+    _RPM_REPO_SETUP
+    _RPM_SPEC_OUTPUT
     AM_CONDITIONAL([BUILD_RPMS], [test ":$rpm_cv_rpms" = :yes])dnl
     AM_CONDITIONAL([BUILD_SRPMS], [test ":$rpm_cv_srpms" = :yes])dnl
     AM_CONDITIONAL([BUILD_REPO_YUM], [test ":$rpm_cv_repo_yum" = :yes])dnl

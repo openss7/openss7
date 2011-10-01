@@ -61,15 +61,13 @@ AC_DEFUN([_DEB_DPKG], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_REQUIRE([_DISTRO])
     AC_REQUIRE([_REPO])
-    if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
-	AC_MSG_NOTICE([+-----------------------+])
-	AC_MSG_NOTICE([| Debian Archive Checks |])
-	AC_MSG_NOTICE([+-----------------------+])
-	_DEB_DPKG_OPTIONS
-	_DEB_DPKG_SETUP
-	_DEB_REPO_SETUP
-	_DEB_DPKG_OUTPUT
-    fi
+    AC_MSG_NOTICE([+-----------------------+])
+    AC_MSG_NOTICE([| Debian Archive Checks |])
+    AC_MSG_NOTICE([+-----------------------+])
+    _DEB_DPKG_OPTIONS
+    _DEB_DPKG_SETUP
+    _DEB_REPO_SETUP
+    _DEB_DPKG_OUTPUT
     AM_CONDITIONAL([BUILD_DPKG], [test ":$deb_cv_debs:$deb_cv_dscs" = :yes:yes])dnl
     AM_CONDITIONAL([BUILD_REPO_APT], [test ":$deb_cv_repo_apt" = :yes])
 ])# _DEB_DPKG
