@@ -179,7 +179,7 @@ dnl	    dlocate is much faster than dpkg and dpkg-query
 	fi
 	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
 	    tmp_cmd2=`echo "$tmp_cmd" | sed -e 's,^/,,'`
-	    tmp_result=`slackpkg file-search $tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    tmp_result=`slackpkg file-search $tmp_cmd2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
 	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-";OFS="-"}{NF=NF-3;print[$]0}'`
 	fi
     fi
@@ -213,7 +213,7 @@ dnl	    dlocate is much faster than dpkg and dpkg-query
 	fi
 	if test -z "$tmp_result" -a -x "`which slackpkg 2>/dev/null`"; then
 	    tmp_cmd2=`echo "$tmp_cmd" | sed -e 's,^/,,'`
-	    tmp_result=`slackpkg file-search $tmp_path2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
+	    tmp_result=`slackpkg file-search $tmp_cmd2 2>/dev/null | grep '^[[[] installed []]]' | head -1 | awk '{print[$]NF}'`
 	    test -z "$tmp_result" || tmp_result=`echo "$tmp_result" | awk 'BEGIN{FS="-"}{print[$](NF-2)}'`
 	fi
     fi
