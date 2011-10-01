@@ -686,9 +686,9 @@ AC_DEFUN([_REPO_SETUP_SLAPT], [dnl
     ])
     AC_CACHE_CHECK([for slapt-src rc file], [repo_cv_slapt_srcrc], [dnl
 	eval "repo_search_path=\"
-	    ${DESTDIR}${sysconfdir}/slapt-src
-	    ${DESTDIR}${rootdir}/etc/slapt-src
-	    ${DESTDIR}/etc/slapt-src\""
+	    ${DESTDIR}${sysconfdir}/slapt-get
+	    ${DESTDIR}${rootdir}/etc/slapt-get
+	    ${DESTDIR}/etc/slapt-get\""
 	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
