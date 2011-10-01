@@ -23,6 +23,7 @@ bld_cv_pkg_cmd_LATEX=${bld_cv_pkg_cmd_LATEX='slackpkg install tetex'}
 bld_cv_pkg_cmd_LDCONFIG=${bld_cv_pkg_cmd_LDCONFIG='slackpkg install perl'}
 bld_cv_pkg_cmd_LSMOD=${bld_cv_pkg_cmd_LSMOD='slackpkg install module-init-tools'}
 bld_cv_pkg_cmd_LSOF=${bld_cv_pkg_cmd_LSOF='slackpkg install lsof'}
+bld_cv_pkg_cmd_LZMA_CMD=${bld_cv_pkg_cmd_LZMA_CMD='slackpkg install xz'}
 bld_cv_pkg_cmd_MAKEPKG=${bld_cv_pkg_cmd_MAKEPKG='slackpkg install pkgtools'}
 bld_cv_pkg_cmd_MD5SUM=${bld_cv_pkg_cmd_MD5SUM='slackpkg install coreutils'}
 bld_cv_pkg_cmd_MODPROBE=${bld_cv_pkg_cmd_MODPROBE='slackpkg install module-init-tools'}
@@ -67,6 +68,7 @@ bld_cv_pkg_name_LATEX=${bld_cv_pkg_name_LATEX=tetex}
 bld_cv_pkg_name_LDCONFIG=${bld_cv_pkg_name_LDCONFIG=glibc-solibs}
 bld_cv_pkg_name_LSMOD=${bld_cv_pkg_name_LSMOD=module-init-tools}
 bld_cv_pkg_name_LSOF=${bld_cv_pkg_name_LSOF=lsof}
+bld_cv_pkg_name_LZMA_CMD=${bld_cv_pkg_name_LZMA_CMD=xz}
 bld_cv_pkg_name_MAKEPKG=${bld_cv_pkg_name_MAKEPKG=pkgtools}
 bld_cv_pkg_name_MD5SUM=${bld_cv_pkg_name_MD5SUM=coreutils}
 bld_cv_pkg_name_MODPROBE=${bld_cv_pkg_name_MODPROBE=module-init-tools}
@@ -152,19 +154,19 @@ bld_cv_pkg_ver_GCJDBTOOL=${bld_cv_pkg_ver_GCJDBTOOL=4.5.2}
 bld_cv_pkg_ver_GCJH=${bld_cv_pkg_ver_GCJH=4.5.2}
 bld_cv_pkg_ver_GCJ_CNI_H=${bld_cv_pkg_ver_GCJ_CNI_H=4.5.2}
 bld_cv_pkg_ver_GNUPLOT=${bld_cv_pkg_ver_GNUPLOT=4.4.3}
-bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=1.4.11}
+bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=2.0.17}
 bld_cv_pkg_ver_GROFF=${bld_cv_pkg_ver_GROFF=1.21}
 bld_cv_pkg_ver_GZIP_CMD=${bld_cv_pkg_ver_GZIP_CMD=1.4}
 bld_cv_pkg_ver_JAR=${bld_cv_pkg_ver_JAR=4.5.2}
 bld_cv_pkg_ver_JARSIGNER=${bld_cv_pkg_ver_JARSIGNER=4.5.2}
 bld_cv_pkg_ver_JAVAC=${bld_cv_pkg_ver_JAVAC=4.5.2}
 bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=6u25}
+bld_cv_pkg_ver_JAVAH=${bld_cv_pkg_ver_JAVAH=4.5.2}
 bld_cv_pkg_ver_KEYTOOL=${bld_cv_pkg_ver_KEYTOOL=4.5.2}
 bld_cv_pkg_ver_LATEX=${bld_cv_pkg_ver_LATEX=3.0}
 bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.13}
 bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.12}
 bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.83}
-bld_cv_pkg_ver_LZMA_CMD=${bld_cv_pkg_ver_LZMA_CMD=5.0.2}
 bld_cv_pkg_ver_MAKEPKG=${bld_cv_pkg_ver_MAKEPKG=13.37}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=8.11}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.12}

@@ -1260,8 +1260,10 @@ libsx25_la_LDFLAGS		= $(USER_LDFLAGS) -version-info 0:0:0 -export-dynamic \
 ## 
 ## =====================================================================
 
+if WITH_SNMP
 if WITH_SNMP_AGENT
 snmpdlmod_LTLIBRARIES		+= strMIB.la
+endif
 endif
 
 strMIB_la_SOURCES		= src/snmp/strMIB.c \
@@ -1280,8 +1282,10 @@ strMIB_la_LDFLAGS		= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION)
 
 ## =====================================================================
 
+if WITH_SNMP
 if WITH_SNMP_AGENT
 snmpdlmod_LTLIBRARIES		+= mxMIB.la
+endif
 endif
 
 mxMIB_la_SOURCES		= src/snmp/ds0Bundle.c \
@@ -1306,8 +1310,10 @@ mxMIB_la_LDFLAGS		= $(USER_LDFLAGS) -module -export-dynamic -release $(VERSION) 
 
 ## =====================================================================
 
+if WITH_SNMP
 if WITH_SNMP_AGENT
 snmpdlmod_LTLIBRARIES		+= ss7MIB.la
+endif
 endif
 
 ss7MIB_la_SOURCES		= src/snmp/ss7MIB.c \
@@ -1580,8 +1586,10 @@ streamsd_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 streamsd_LDADD			= libstreams.la $(SNMP_LDADD)
 streamsd_LDFLAGS		= $(USER_LDFLAGS) $(SNMP_LDFLAGS)
 
+if WITH_SNMP
 if WITH_SNMP_AGENT
 sbin_PROGRAMS			+= streamsd
+endif
 endif
 EXTRA_PROGRAMS			+= streamsd
 
@@ -1639,8 +1647,10 @@ chand_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
 chand_LDADD			= libstreams.la $(SNMP_LDADD)
 chand_LDFLAGS			= $(USER_LDFLAGS) $(SNMP_LDFLAGS)
 
+if WITH_SNMP
 if WITH_SNMP_AGENT
 sbin_PROGRAMS			+= chand
+endif
 endif
 EXTRA_PROGRAMS			+= chand
 
@@ -3003,6 +3013,8 @@ endif
 
 dist_snmpmib_DATA		= 
 
+if WITH_SNMP
+## WITH_SNMP
 if WITH_SNMP_AGENT
 ## WITH_SNMP_AGENT
 dist_snmpmib_DATA		+= src/mibs/ALARM-MIB.mib \
@@ -3106,6 +3118,8 @@ dist_snmpmib_DATA		+= src/mibs/ALARM-MIB.mib \
 				   src/mibs/RS-232-MIB.mib
 
 ## WITH_SNMP_AGENT
+endif
+## WITH_SNMP
 endif
 
 ## PKG_BUILD_INDEP
