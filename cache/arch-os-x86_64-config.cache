@@ -36,6 +36,8 @@ bld_cv_pkg_cmd_PS2EPSI=${bld_cv_pkg_cmd_PS2EPSI='pacman --sync ghostscript'}
 bld_cv_pkg_cmd_PS2PDF=${bld_cv_pkg_cmd_PS2PDF='pacman --sync ghostscript'}
 bld_cv_pkg_cmd_PSLATEX=${bld_cv_pkg_cmd_PSLATEX='pacman --sync texlive-bin'}
 bld_cv_pkg_cmd_REFER=${bld_cv_pkg_cmd_REFER='pacman --sync groff'}
+bld_cv_pkg_cmd_REPO_ADD=${bld_cv_pkg_cmd_REPO_ADD='pacman --sync pacman'}
+bld_cv_pkg_cmd_REPO_REMOVE=${bld_cv_pkg_cmd_REPO_REMOVE='pacman --sync pacman'}
 bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='pacman --sync coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='pacman --sync coreutils'}
 bld_cv_pkg_cmd_SOELIM=${bld_cv_pkg_cmd_SOELIM='pacman --sync groff'}
@@ -83,6 +85,8 @@ bld_cv_pkg_name_PS2EPSI=${bld_cv_pkg_name_PS2EPSI=ghostscript}
 bld_cv_pkg_name_PS2PDF=${bld_cv_pkg_name_PS2PDF=ghostscript}
 bld_cv_pkg_name_PSLATEX=${bld_cv_pkg_name_PSLATEX=texlive-bin}
 bld_cv_pkg_name_REFER=${bld_cv_pkg_name_REFER=groff}
+bld_cv_pkg_name_REPO_ADD=${bld_cv_pkg_name_REPO_ADD=pacman}
+bld_cv_pkg_name_REPO_REMOVE=${bld_cv_pkg_name_REPO_REMOVE=pacman}
 bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
 bld_cv_pkg_name_SOELIM=${bld_cv_pkg_name_SOELIM=groff}
@@ -136,6 +140,8 @@ bld_cv_pkg_prog_PS2EPSI=${bld_cv_pkg_prog_PS2EPSI=ps2epsi}
 bld_cv_pkg_prog_PS2PDF=${bld_cv_pkg_prog_PS2PDF=ps2pdf12}
 bld_cv_pkg_prog_PSLATEX=${bld_cv_pkg_prog_PSLATEX=pslatex}
 bld_cv_pkg_prog_REFER=${bld_cv_pkg_prog_REFER=refer}
+bld_cv_pkg_prog_REPO_ADD=${bld_cv_pkg_prog_REPO_ADD=repo-add}
+bld_cv_pkg_prog_REPO_REMOVE=${bld_cv_pkg_prog_REPO_REMOVE=repo-remove}
 bld_cv_pkg_prog_SHA1SUM=${bld_cv_pkg_prog_SHA1SUM=sha1sum}
 bld_cv_pkg_prog_SHA256SUM=${bld_cv_pkg_prog_SHA256SUM=sha256sum}
 bld_cv_pkg_prog_SOELIM=${bld_cv_pkg_prog_SOELIM=soelim}
@@ -185,6 +191,8 @@ bld_cv_pkg_ver_PS2EPSI=${bld_cv_pkg_ver_PS2EPSI=9.04-5}
 bld_cv_pkg_ver_PS2PDF=${bld_cv_pkg_ver_PS2PDF=9.04-5}
 bld_cv_pkg_ver_PSLATEX=${bld_cv_pkg_ver_PSLATEX=2011.1-1}
 bld_cv_pkg_ver_REFER=${bld_cv_pkg_ver_REFER=1.21-1}
+bld_cv_pkg_ver_REPO_ADD=${bld_cv_pkg_ver_REPO_ADD=3.5.4-4}
+bld_cv_pkg_ver_REPO_REMOVE=${bld_cv_pkg_ver_REPO_REMOVE=3.5.4-4}
 bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=8.13-2}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=8.13-2}
 bld_cv_pkg_ver_SOELIM=${bld_cv_pkg_ver_SOELIM=1.21-1}
