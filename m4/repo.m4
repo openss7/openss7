@@ -58,14 +58,12 @@
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO], [dnl
     AC_REQUIRE([_DISTRO])dnl
-    if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
-	AC_MSG_NOTICE([+--------------------+])
-	AC_MSG_NOTICE([| Repository Sources |])
-	AC_MSG_NOTICE([+--------------------+])
-	_REPO_OPTIONS
-	_REPO_SETUP
-	_REPO_OUTPUT
-    fi
+    AC_MSG_NOTICE([+--------------------+])
+    AC_MSG_NOTICE([| Repository Sources |])
+    AC_MSG_NOTICE([+--------------------+])
+    _REPO_OPTIONS
+    _REPO_SETUP
+    _REPO_OUTPUT
     AM_CONDITIONAL([WITH_INSTALL_SOURCE_YUM], [test :"${repo_cv_yum_repodir:-no}" != :no])
     AM_CONDITIONAL([WITH_INSTALL_SOURCE_ZYPP], [test :"${repo_cv_zypp_repodir:-no}" != :no])
     AM_CONDITIONAL([WITH_INSTALL_SOURCE_URPMI], [test :"${repo_cv_urpmi_repodir:-no}" != :no])
