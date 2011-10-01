@@ -218,6 +218,8 @@ uninstall-snmp-conf:
 
 if INSTALL_INITSCRIPTS
 ## INSTALL_INITSCRIPTS
+if WITH_SNMP
+## WITH_SNMP
 if WITH_SNMP_AGENT
 ## WITH_SNMP_AGENT
 
@@ -230,6 +232,8 @@ UNINSTALL_LOCAL		+= uninstall-snmp-conf
 POST_UNINSTALL_MA	+= post-snmp-conf
 
 ## WITH_SNMP_AGENT
+endif
+## WITH_SNMP
 endif
 ## INSTALL_INITSCRIPTS
 endif
