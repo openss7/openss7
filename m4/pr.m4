@@ -121,6 +121,8 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 	    (bluecat)	 ap_cv_distribution="BlueCat"			    ;;
 	    (yellowdog)	 ap_cv_distribution="YellowDog"			    ;;
 	    (denx)	 ap_cv_distribution="ELDK"			    ;;
+	    (arch)	 ap_cv_distribution="Arch"			    ;;
+	    (slackware)	 ap_cv_distribution="Slackware$dist_cv_host_release";;
 	    (*)		 ap_cv_distribution='other'			    ;;
 	esac
 	])
