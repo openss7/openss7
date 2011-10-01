@@ -35,7 +35,9 @@ bld_cv_pkg_cmd_RPM=${bld_cv_pkg_cmd_RPM='slackpkg install rpm'}
 bld_cv_pkg_cmd_RPMBUILD=${bld_cv_pkg_cmd_RPMBUILD='slackpkg install rpm'}
 bld_cv_pkg_cmd_SHA1SUM=${bld_cv_pkg_cmd_SHA1SUM='slackpkg install coreutils'}
 bld_cv_pkg_cmd_SHA256SUM=${bld_cv_pkg_cmd_SHA256SUM='slackpkg install coreutils'}
+bld_cv_pkg_cmd_SLACKDTXT=${bld_cv_pkg_cmd_SLACKDTXT='slackpkg install slacktrack'}
 bld_cv_pkg_cmd_SLACKPKG=${bld_cv_pkg_cmd_SLACKPKG='slackpkg install slackpkg'}
+bld_cv_pkg_cmd_SLACKTRACK=${bld_cv_pkg_cmd_SLACKTRACK='slackpkg install slacktrack'}
 bld_cv_pkg_cmd_SOELIM=${bld_cv_pkg_cmd_SOELIM='slackpkg install groff'}
 bld_cv_pkg_cmd_TBL=${bld_cv_pkg_cmd_TBL='slackpkg install groff'}
 bld_cv_pkg_cmd_TEX=${bld_cv_pkg_cmd_TEX='slackpkg install tetex'}
@@ -79,7 +81,9 @@ bld_cv_pkg_name_RPM=${bld_cv_pkg_name_RPM=rpm}
 bld_cv_pkg_name_RPMBUILD=${bld_cv_pkg_name_RPMBUILD=rpm}
 bld_cv_pkg_name_SHA1SUM=${bld_cv_pkg_name_SHA1SUM=coreutils}
 bld_cv_pkg_name_SHA256SUM=${bld_cv_pkg_name_SHA256SUM=coreutils}
+bld_cv_pkg_name_SLACKDTXT=${bld_cv_pkg_name_SLACKDTXT=slacktrack}
 bld_cv_pkg_name_SLACKPKG=${bld_cv_pkg_name_SLACKPKG=slackpkg}
+bld_cv_pkg_name_SLACKTRACK=${bld_cv_pkg_name_SLACKTRACK=slacktrack}
 bld_cv_pkg_name_SOELIM=${bld_cv_pkg_name_SOELIM=groff}
 bld_cv_pkg_name_TBL=${bld_cv_pkg_name_TBL=groff}
 bld_cv_pkg_name_TCL_H=${bld_cv_pkg_name_TCL_H=tcl}
@@ -131,7 +135,9 @@ bld_cv_pkg_prog_RPM=${bld_cv_pkg_prog_RPM=rpm}
 bld_cv_pkg_prog_RPMBUILD=${bld_cv_pkg_prog_RPMBUILD=rpmbuild}
 bld_cv_pkg_prog_SHA1SUM=${bld_cv_pkg_prog_SHA1SUM=sha1sum}
 bld_cv_pkg_prog_SHA256SUM=${bld_cv_pkg_prog_SHA256SUM=sha256sum}
+bld_cv_pkg_prog_SLACKDTXT=${bld_cv_pkg_prog_SLACKDTXT=slackdtxt}
 bld_cv_pkg_prog_SLACKPKG=${bld_cv_pkg_prog_SLACKPKG=slackpkg}
+bld_cv_pkg_prog_SLACKTRACK=${bld_cv_pkg_prog_SLACKTRACK=slacktrack}
 bld_cv_pkg_prog_SOELIM=${bld_cv_pkg_prog_SOELIM=soelim}
 bld_cv_pkg_prog_SWIG=${bld_cv_pkg_prog_SWIG=swig}
 bld_cv_pkg_prog_TBL=${bld_cv_pkg_prog_TBL=tbl}
@@ -152,19 +158,19 @@ bld_cv_pkg_ver_GCJDBTOOL=${bld_cv_pkg_ver_GCJDBTOOL=4.5.2}
 bld_cv_pkg_ver_GCJH=${bld_cv_pkg_ver_GCJH=4.5.2}
 bld_cv_pkg_ver_GCJ_CNI_H=${bld_cv_pkg_ver_GCJ_CNI_H=4.5.2}
 bld_cv_pkg_ver_GNUPLOT=${bld_cv_pkg_ver_GNUPLOT=4.4.3}
-bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=1.4.11}
+bld_cv_pkg_ver_GPG=${bld_cv_pkg_ver_GPG=2.0.17}
 bld_cv_pkg_ver_GROFF=${bld_cv_pkg_ver_GROFF=1.21}
 bld_cv_pkg_ver_GZIP_CMD=${bld_cv_pkg_ver_GZIP_CMD=1.4}
 bld_cv_pkg_ver_JAR=${bld_cv_pkg_ver_JAR=4.5.2}
 bld_cv_pkg_ver_JARSIGNER=${bld_cv_pkg_ver_JARSIGNER=4.5.2}
 bld_cv_pkg_ver_JAVAC=${bld_cv_pkg_ver_JAVAC=4.5.2}
 bld_cv_pkg_ver_JAVADOC=${bld_cv_pkg_ver_JAVADOC=6u25}
+bld_cv_pkg_ver_JAVAH=${bld_cv_pkg_ver_JAVAH=4.5.2}
 bld_cv_pkg_ver_KEYTOOL=${bld_cv_pkg_ver_KEYTOOL=4.5.2}
 bld_cv_pkg_ver_LATEX=${bld_cv_pkg_ver_LATEX=3.0}
 bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.13}
 bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.12}
 bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.83}
-bld_cv_pkg_ver_LZMA_CMD=${bld_cv_pkg_ver_LZMA_CMD=5.0.2}
 bld_cv_pkg_ver_MAKEPKG=${bld_cv_pkg_ver_MAKEPKG=13.37}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=8.11}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.12}
@@ -177,7 +183,9 @@ bld_cv_pkg_ver_RPM=${bld_cv_pkg_ver_RPM=4.8.1}
 bld_cv_pkg_ver_RPMBUILD=${bld_cv_pkg_ver_RPMBUILD=4.8.1}
 bld_cv_pkg_ver_SHA1SUM=${bld_cv_pkg_ver_SHA1SUM=8.11}
 bld_cv_pkg_ver_SHA256SUM=${bld_cv_pkg_ver_SHA256SUM=8.11}
+bld_cv_pkg_ver_SLACKDTXT=${bld_cv_pkg_ver_SLACKDTXT=2.08}
 bld_cv_pkg_ver_SLACKPKG=${bld_cv_pkg_ver_SLACKPKG=2.82.0}
+bld_cv_pkg_ver_SLACKTRACK=${bld_cv_pkg_ver_SLACKTRACK=2.08}
 bld_cv_pkg_ver_SOELIM=${bld_cv_pkg_ver_SOELIM=1.21}
 bld_cv_pkg_ver_TBL=${bld_cv_pkg_ver_TBL=1.21}
 bld_cv_pkg_ver_TCL_H=${bld_cv_pkg_ver_TCL_H=8.5.9}

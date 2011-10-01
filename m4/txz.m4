@@ -311,7 +311,15 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 		AC_MSG_WARN([Cannot find makepkg program in PATH.]) ;;
 	    (*) enable_txzs=no ;;
 	esac])
-    AC_CACHE_CHECK([for makepkg building of txzs], [txz_cv_pkgs], [dnl
+    AC_ARG_VAR([SLACKTRACK],
+	       [slacktrack command. @<:@default=slacktrack@:>@])
+    _BLD_PATH_PROG([SLACKTRACK], [slacktrack], [${am_missing3_run}slacktrack], [$tmp_path], [dnl
+	case "$target_vendor" in
+	    (slackware)
+		AC_MSG_WARN([Cannot find slacktrack program in PATH.]) ;;
+	    (*) enable_txzs=no ;;
+	esac])
+    AC_CACHE_CHECK([for building of txzs], [txz_cv_pkgs], [dnl
 	txz_cv_pkgs=${enable_txzs:-no}
     ])
     AM_CONDITIONAL([BUILD_TXZS], [test ":$txz_cv_pkgs" = :yes])dnl
@@ -336,6 +344,14 @@ AC_DEFUN([_TXZ_REPO_SETUP_SLACKPKG], [dnl
 	[AS_HELP_STRING([--disable-repo-slackpkg],
 	    [slackpkg repo construction @<:@default=auto@:>@])],
 	[], [enable_repo_slackpkg=yes])
+    AC_ARG_VAR([SLACKDTXT],
+	       [slackdtxt command. @<:@default=slackdtxt@:>@])
+    _BLD_PATH_PROG([SLACKDTXT], [slackdtxt], [${am_missing3_run}slackdtxt], [$tmp_path], [dnl
+	case "$target_vendor" in
+	    (slackware)
+		AC_MSG_WARN([Cannot find slackdtxt program in PATH.]) ;;
+	    (*) enable_repo_slackpkg=no ;; # even though we can live without it
+	esac])
     AC_CACHE_CHECK([for slackpkg repo construction], [txz_cv_repo_slackpkg], [dnl
 	txz_cv_repo_slackpkg=${enable_repo_slackpkg:-no}
     ])

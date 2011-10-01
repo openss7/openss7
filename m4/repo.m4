@@ -87,6 +87,14 @@ AC_DEFUN([_REPO_OPTIONS], [dnl
 	[AS_HELP_STRING([--with-install-source-apt=@<:@SOURCESDIR@:>@],
 	    [APT sources directory @<:@default=search@:>@])],
 	[], [with_install_source_apt=search])
+    AC_ARG_WITH([install-source-pacman],
+	[AS_HELP_STRING([--with-install-source-pacman=@<:@PACMANDIR@:>@],
+	    [PACMAN sources directory @<:@default=search@:>@])],
+	[], [with_install_source_pacman=search])
+    AC_ARG_WITH([install-source-slapt],
+	[AS_HELP_STRING([--with-install-source-slapt=@<:@SLAPTDIR@:>@],
+	    [SLAPT sources directory @<:@default=search@:>@])],
+	[], [with_install_source_slapt=search])
     AC_ARG_WITH([repo-root],
 	[AS_HELP_STRING([--with-repo-root=@<:@REPOROOT@:>@],
 	    [repository root path @<:@default=repo@:>@])],
@@ -116,6 +124,8 @@ AC_DEFUN([_REPO_SETUP], [dnl
     _REPO_SETUP_ZYPP
     _REPO_SETUP_URPMI
     _REPO_SETUP_APT
+    _REPO_SETUP_PACMAN
+    _REPO_SETUP_SLAPT
     AC_CONFIG_FILES([scripts/register])
 ])# _REPO_SETUP
 # =============================================================================
@@ -566,6 +576,138 @@ dnl
 # =============================================================================
 
 # =============================================================================
+# _REPO_SETUP_PACMAN
+# -----------------------------------------------------------------------------
+AC_DEFUN([_REPO_SETUP_PACMAN], [dnl
+    AC_CACHE_CHECK([for pacman mirrors directory], [repo_cv_pacman_repodir], [dnl
+	case "${with_install_source_pacman:-search}" in
+	    (no) repo_cv_pacman_repodir=no ;;
+	    (yes|search) ;;
+	    (*) if test -d "$with_install_source_pacman" ; then
+		    repo_cv_pacman_repodir="$with_install_source_pacman"
+		fi ;;
+	esac
+	if test -z "$repo_cv_pacman_repodir" ; then
+	    eval "repo_search_path=\"
+		${DESTDIR}${sysconfdir}/pacman.d
+		${DESTDIR}${rootdir}/etc/pacman.d
+		${DESTDIR}/etc/pacman.d\""
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    AC_MSG_RESULT([searching])
+	    for repo_dir in $repo_search_path ; do
+		AC_MSG_CHECKING([for pacman mirrors directory... $repo_dir])
+		if test -d "$repo_dir" ; then
+		    repo_cv_pacman_repodir="$repo_dir"
+		    AC_MSG_RESULT([yes])
+		    break
+		else
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    test -n "$repo_cv_pacman_repodir" || repo_cv_pacman_repodir=no
+	    AC_MSG_CHECKING([for pacman mirrors directory])
+	fi
+    ])
+    AC_CACHE_CHECK([for pacman config file], [repo_cv_pacman_config], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${sysconfdir}/pacman.conf
+	    ${DESTDIR}${rootdir}/etc/pacman.conf
+	    ${DESTDIR}/etc/pacman.conf\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for pacman config file... $repo_dir])
+	    if test -f "$repo_dir" ; then
+		repo_cv_pacman_config="$repo_dir"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_pacman_config" || repo_cv_pacman_config=no
+	AC_MSG_CHECKING([for pacman config file])
+    ])
+])# _REPO_SETUP_PACMAN
+# =============================================================================
+
+# =============================================================================
+# _REPO_SETUP_SLAPT
+# -----------------------------------------------------------------------------
+AC_DEFUN([_REPO_SETUP_SLAPT], [dnl
+    AC_CACHE_CHECK([for slapt directory], [repo_cv_slapt_repodir], [dnl
+	case "${with_install_source_slapt:-search}" in
+	    (no) repo_cv_slapt_repodir=no ;;
+	    (yes|search) ;;
+	    (*) if test -d "$with_install_source_slapt" ; then
+		    repo_cv_slapt_repodir="$with_install_source_slapt"
+		fi ;;
+	esac
+	if test -z "$repo_cv_slapt_repodir" ; then
+	    eval "repo_search_path=\"
+		${DESTDIR}${sysconfdir}/slapt-get
+		${DESTDIR}${rootdir}/etc/slapt-get
+		${DESTDIR}/etc/slapt-get\""
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    AC_MSG_RESULT([searching])
+	    for repo_dir in $repo_search_path ; do
+		AC_MSG_CHECKING([for slapt directory... $repo_dir])
+		if test -d "$repo_dir" ; then
+		    repo_cv_slapt_repodir="$repo_dir"
+		    AC_MSG_RESULT([yes])
+		    break
+		else
+		    AC_MSG_RESULT([no])
+		fi
+	    done
+	    test -n "$repo_cv_slapt_repodir" || repo_cv_slapt_repodir=no
+	    AC_MSG_CHECKING([for slapt directory])
+	fi
+    ])
+    AC_CACHE_CHECK([for slapt-get rc file], [repo_cv_slapt_getrc], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${sysconfdir}/slapt-get
+	    ${DESTDIR}${rootdir}/etc/slapt-get
+	    ${DESTDIR}/etc/slapt-get\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for slapt-get rc file... $repo_dir/slapt-getrc])
+	    if test -f "$repo_dir/slapt-getrc" ; then
+		repo_cv_slapt_getrc="$repo_dir/slapt-getrc"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_slapt_getrc" || repo_cv_slapt_getrc=no
+	AC_MSG_CHECKING([for slapt-get rc file])
+    ])
+    AC_CACHE_CHECK([for slapt-src rc file], [repo_cv_slapt_srcrc], [dnl
+	eval "repo_search_path=\"
+	    ${DESTDIR}${sysconfdir}/slapt-get
+	    ${DESTDIR}${rootdir}/etc/slapt-get
+	    ${DESTDIR}/etc/slapt-get\""
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	AC_MSG_RESULT([searching])
+	for repo_dir in $repo_search_path ; do
+	    AC_MSG_CHECKING([for slapt-src rc file... $repo_dir/slapt-srcrc])
+	    if test -f "$repo_dir/slapt-srcrc" ; then
+		repo_cv_slapt_srcrc="$repo_dir/slapt-srcrc"
+		AC_MSG_RESULT([yes])
+		break
+	    else
+		AC_MSG_RESULT([no])
+	    fi
+	done
+	test -n "$repo_cv_slapt_srcrc" || repo_cv_slapt_srcrc=no
+	AC_MSG_CHECKING([for slapt-src rc file])
+    ])
+])# _REPO_SETUP_SLAPT
+# =============================================================================
+
+# =============================================================================
 # _REPO_OUTPUT
 # -----------------------------------------------------------------------------
 AC_DEFUN([_REPO_OUTPUT], [dnl
@@ -690,6 +832,33 @@ AC_DEFUN([_REPO_OUTPUT], [dnl
 	aptgpgdir="$repo_cv_apt_gpgdir"
     fi
     AC_SUBST([aptgpgdir])dnl
+    slaptrepodir='${DESTDIR}${rootdir}/etc/slapt-get'
+    if test :"${repo_cv_slapt_repodir:-no}" != :no ; then
+	slaptrepodir="$repo_cv_slapt_repodir"
+    fi
+    AC_SUBST([slaptrepodir])dnl
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_SLAPT], [test :"${repo_cv_slapt_repodir}" != :no])
+    slaptgetrc='${DESTDIR}${rootdir}/etc/slapt-get/slapt-getrc'
+    if test :"${repo_cv_slapt_getrc:-no}" != :no ; then
+	slaptgetrc="$repo_cv_slapt_getrc"
+    fi
+    AC_SUBST([slaptgetrc])dnl
+    slaptsrcrc='${DESTDIR}${rootdir}/etc/slapt-get/slapt-srcrc'
+    if test :"${repo_cv_slapt_srcrc:-no}" != :no ; then
+	slaptsrcrc="$repo_cv_slapt_srcrc"
+    fi
+    AC_SUBST([slaptsrcrc])dnl
+    pacmanrepodir='${DESTDIR}${rootdir}/etc/slapt-get'
+    if test :"${repo_cv_pacman_repodir:-no}" != :no ; then
+	pacmanrepodir="$repo_cv_pacman_repodir"
+    fi
+    AC_SUBST([pacmanrepodir])dnl
+    AM_CONDITIONAL([WITH_INSTALL_SOURCE_PACMAN], [test :"${repo_cv_pacman_repodir}" != :no])
+    pacmanconfig='${DESTDIR}${rootdir}/etc/pacman.conf'
+    if test :"${repo_cv_pacman_config:-no}" != :no ; then
+	pacmanconfig="$repo_cv_pacman_config"
+    fi
+    AC_SUBST([pacmanconfig])dnl
 ])# _REPO_OUTPUT
 # =============================================================================
 
