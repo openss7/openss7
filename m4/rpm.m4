@@ -64,13 +64,21 @@ AC_DEFUN([_RPM_SPEC], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_REQUIRE([_DISTRO])dnl
     AC_REQUIRE([_REPO])dnl
-    AC_MSG_NOTICE([+------------------------+])
-    AC_MSG_NOTICE([| RPM Repository Support |])
-    AC_MSG_NOTICE([+------------------------+])
-    _RPM_SPEC_OPTIONS
-    _RPM_SPEC_SETUP
-    _RPM_REPO_SETUP
-    _RPM_SPEC_OUTPUT
+    if test :"${USE_MAINTAINER_MODE:-no}" != :no ; then
+	AC_MSG_NOTICE([+------------------------+])
+	AC_MSG_NOTICE([| RPM Repository Support |])
+	AC_MSG_NOTICE([+------------------------+])
+	_RPM_SPEC_OPTIONS
+	_RPM_SPEC_SETUP
+	_RPM_REPO_SETUP
+	_RPM_SPEC_OUTPUT
+    fi
+    AM_CONDITIONAL([BUILD_RPMS], [test ":$rpm_cv_rpms" = :yes])dnl
+    AM_CONDITIONAL([BUILD_SRPMS], [test ":$rpm_cv_srpms" = :yes])dnl
+    AM_CONDITIONAL([BUILD_REPO_YUM], [test ":$rpm_cv_repo_yum" = :yes])dnl
+    AM_CONDITIONAL([BUILD_REPO_YAST], [test ":$rpm_cv_repo_yast" = :yes])dnl
+    AM_CONDITIONAL([BUILD_REPO_URPMI], [test ":$rpm_cv_repo_urpmi" = :yes])dnl
+    AM_CONDITIONAL([BUILD_REPO_APT_RPM], [test ":$rpm_cv_repo_apt" = :yes])dnl
 ])# _RPM_SPEC
 # =============================================================================
 
@@ -678,8 +686,6 @@ dnl
     AC_CACHE_CHECK([for rpm build srpms], [rpm_cv_srpms], [dnl
 	rpm_cv_srpms=${enable_srpms:-no}
     ])
-    AM_CONDITIONAL([BUILD_RPMS], [test ":$enable_rpms" = :yes])dnl
-    AM_CONDITIONAL([BUILD_SRPMS], [test ":$enable_srpms" = :yes])dnl
 ])# _RPM_SPEC_SETUP_BUILD
 # =============================================================================
 
@@ -760,7 +766,6 @@ AC_DEFUN([_RPM_REPO_SETUP_YUM], [dnl
     AC_CACHE_CHECK([for rpm yum repo construction], [rpm_cv_repo_yum], [dnl
 	rpm_cv_repo_yum=${enable_repo_yum:-no}
     ])
-    AM_CONDITIONAL([BUILD_REPO_YUM], [test ":$rpm_cv_repo_yum" = :yes])dnl
     repodir='$(rpmdistdir)/repodata'
     AC_SUBST([repodir])dnl
     repofulldir='$(topfulldir)/repodata'
@@ -819,7 +824,6 @@ AC_DEFUN([_RPM_REPO_SETUP_YAST], [dnl
     AC_CACHE_CHECK([for rpm yast repo construction], [rpm_cv_repo_yast], [dnl
 	rpm_cv_repo_yast=${enable_repo_yast:-no}
     ])
-    AM_CONDITIONAL([BUILD_REPO_YAST], [test ":$rpm_cv_repo_yast" = :yes])dnl
     yastdir="$topdir"
     AC_SUBST([yastdir])dnl
 ])# _RPM_REPO_SETUP_YAST
@@ -872,7 +876,6 @@ AC_DEFUN([_RPM_REPO_SETUP_URPMI], [dnl
     AC_CACHE_CHECK([for rpm urpmi repo construction], [rpm_cv_repo_urpmi], [dnl
 	rpm_cv_repo_urpmi=${enable_repo_urpmi:-no}
     ])
-    AM_CONDITIONAL([BUILD_REPO_URPMI], [test ":$rpm_cv_repo_urpmi" = :yes])dnl
     mediadir='$(rpmdistdir)/media/media_info'
     AC_SUBST([mediadir])dnl
     mediafulldir='$(rpmdistdir)/media$(repobranch)/media_info'
@@ -971,7 +974,6 @@ dnl
     AC_CACHE_CHECK([for rpm apt repo construction], [rpm_cv_repo_apt], [dnl
 	rpm_cv_repo_apt=${enable_repo_apt_rpm:-no}
     ])
-    AM_CONDITIONAL([BUILD_REPO_APT_RPM], [test ":$rpm_cv_repo_apt" = :yes])dnl
     aptrdir='$(rpmdistdir)'
     AC_SUBST([aptrdir])dnl
     aptrbasedir='$(topdir)/base'
