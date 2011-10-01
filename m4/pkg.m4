@@ -236,6 +236,7 @@ AC_DEFUN([_PAC_ARCH_SETUP_TOPDIR], [dnl
 # _PAC_ARCH_SETUP_OPTIONS
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PAC_ARCH_SETUP_OPTIONS], [dnl
+    arg=
     args="$ac_configure_args"
     args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-maintainer-mode(.)? , ,g;s,^ *,,;s, *$,,'`
     args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-dependency-tracking(.)? , ,g;s,^ *,,;s, *$,,'`

@@ -554,6 +554,7 @@ AC_DEFUN([_RPM_SPEC_SETUP_TOPDIR], [dnl
 # syntax Also, I don't know that even rpm 4.2 handles --with xxx=yyy
 # properly, so we use defines.
 AC_DEFUN([_RPM_SPEC_SETUP_OPTIONS], [dnl
+    arg=
     args="$ac_configure_args"
     args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-maintainer-mode(.)? , ,g;s,^ *,,;s, *$,,'`
     args=`echo " $args " | sed -r -e 's, (.)?--(en|dis)able-dependency-tracking(.)? , ,g;s,^ *,,;s, *$,,'`
