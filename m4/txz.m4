@@ -88,7 +88,7 @@ AC_DEFUN([_TXZ_OPTIONS_TXZ_EPOCH], [dnl
     AC_MSG_CHECKING([for txz epoch])
     AC_ARG_WITH([txz-epoch],
 	[AS_HELP_STRING([--with-txz-epoch=EPOCH],
-	    [slackpkg package EPOCH @<:@default=auto@:>@])],
+	    [txz package EPOCH @<:@default=auto@:>@])],
 	[], [dnl
 	    if test -r .txzepoch; then d= ; else d="$srcdir/" ; fi
 	    if test -r ${d}.txzepoch
@@ -111,7 +111,7 @@ AC_DEFUN([_TXZ_OPTIONS_TXZ_RELEASE], [dnl
     AC_MSG_CHECKING([for txz release])
     AC_ARG_WITH([txz-release],
 	[AS_HELP_STRING([--with-txz-release=RELEASE],
-	    [slackpkg package RELEASE @<:@default=auto@:>@])],
+	    [txz package RELEASE @<:@default=auto@:>@])],
 	[], [dnl
 	    if test -r .txzrelease ; then d= ; else d="$srcdir/" ; fi
 	    if test -r ${d}.txzrelease
@@ -167,9 +167,9 @@ AC_DEFUN([_TXZ_ARCH_SETUP_TOPDIR], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_DISTDIR])
     AC_ARG_WITH([txz-distdir],
 	[AS_HELP_STRING([--with-txz-distdir=DIR],
-	    [slackpkg dist directory @<:@default=PKG-DISTDIR/slackware/PKG-SUBDIR@:>@])],
+	    [txz dist directory @<:@default=PKG-DISTDIR/slackware/PKG-SUBDIR@:>@])],
 	[], [with_txz_distdir='$(DISTDIR)/slackware/$(reposubdir)'])
-    AC_MSG_CHECKING([for slackpkg distribution directory])
+    AC_MSG_CHECKING([for txz distribution directory])
     if test ":${txzdistdir+set}" != :set ; then
 	case ":${with_txz_distdir:-no}" in
 	    (:no|:yes)	txzdistdir='$(DISTDIR)/slackware/$(reposubdir)' ;;
@@ -180,9 +180,9 @@ AC_DEFUN([_TXZ_ARCH_SETUP_TOPDIR], [dnl
     AC_SUBST([txzdistdir])dnl
     AC_ARG_WITH([txz_topdir],
 	[AS_HELP_STRING([--with-txz-topdir=DIR],
-	    [slackpkg top directory @<:@default=TXZ-DISTDIR/BRANCH@:>@])],
+	    [txz top directory @<:@default=TXZ-DISTDIR/BRANCH@:>@])],
 	[], [with_txz_topdir='$(txzdistdir)$(repobranch)'])
-    AC_MSG_CHECKING([for slackpkg top build directory])
+    AC_MSG_CHECKING([for txz top build directory])
     if test ":${txzdir+set}" != :set ; then
 	case ":${with_txz_topdir:-no}" in
 	    (:no|:yes)	txzdir='$(txzkdistdir)$(repobranch)' ;;
@@ -203,7 +203,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_TOPDIR], [dnl
     AC_SUBST([spkgdevldir])dnl
     spkgsrcsdir='$(txzdir)/source'
     AC_SUBST([spkgsrcsdir])dnl
-    AC_MSG_CHECKING([for slackpkg BUILD directory])
+    AC_MSG_CHECKING([for makepkg BUILD directory])
     if test ":${spkgtopdir+set}" != :set ; then
 	# spkgtopdir needs to be absolute: always build in the top build
 	# directory on the local machine
@@ -252,7 +252,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_OPTIONS], [dnl
 	if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
 	    if test -n "$arg" ; then
 		eval "arg=$arg"
-		AC_MSG_CHECKING([for slackpkg argument '$arg'])
+		AC_MSG_CHECKING([for makepkg argument '$arg'])
 		if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
 		    PACKAGE_PACOPTIONS="${PACKAGE_PACOPTIONS}${PACKAGE_PACOPTIONS:+ }$arg"
 		    AC_MSG_RESULT([yes])
@@ -268,7 +268,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_OPTIONS], [dnl
     done
     if test -n "$arg" ; then
 	eval "arg=$arg"
-	AC_MSG_CHECKING([for deb argument $arg])
+	AC_MSG_CHECKING([for makepkg argument $arg])
 	if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
 	    PACKAGE_PACOPTIONS="${PACKAGE_PACOPTIONS}${PACKAGE_PACOPTIONS:+ }$arg"
 	    AC_MSG_RESULT([yes])
@@ -287,13 +287,13 @@ AC_DEFUN([_TXZ_ARCH_SETUP_OPTIONS], [dnl
 AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
   AC_REQUIRE([_OPENSS7_MISSING3])dnl
     tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
-    AC_ARG_ENABLE([slackpkg],
-	[AS_HELP_STRING([--disable-slackpkg],
-	    [build slackpkg @<:@default=auto@:>@])],
+    AC_ARG_ENABLE([txzs],
+	[AS_HELP_STRING([--disable-txzs],
+	    [build txzs @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (slackware)	enable_slackpkg=yes ;;
-	    (*)		enable_slackpkg=no  ;;
+	    (slackware)	enable_txzs=yes ;;
+	    (*)		enable_txzs=no  ;;
 	esac])
     AC_ARG_VAR([SLACKPKG],
 	       [slackpkg command. @<:@default=slackpkg@:>@])
@@ -301,7 +301,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	case "$target_vendor" in
 	    (slackware)
 		AC_MSG_WARN([Cannot find slackpkg program in PATH.]) ;;
-	    (*) enable_slackpkg=no ;;
+	    (*) enable_txzs=no ;;
 	esac])
     AC_ARG_VAR([MAKEPKG],
 	       [makepkg command. @<:@default=makepkg@:>@])
@@ -309,10 +309,10 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	case "$target_vendor" in
 	    (slackware)
 		AC_MSG_WARN([Cannot find makepkg program in PATH.]) ;;
-	    (*) enable_slackpkg=no ;;
+	    (*) enable_txzs=no ;;
 	esac])
-    AC_CACHE_CHECK([for pkg building of slackpkg], [txz_cv_pkgs], [dnl
-	txz_cv_pkgs=${enable_slackpkg:-no}
+    AC_CACHE_CHECK([for makepkg building of txzs], [txz_cv_pkgs], [dnl
+	txz_cv_pkgs=${enable_txzs:-no}
     ])
     AM_CONDITIONAL([BUILD_TXZS], [test ":$txz_cv_pkgs" = :yes])dnl
 ])# _TXZ_ARCH_SETUP_BUILD

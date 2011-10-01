@@ -85,7 +85,7 @@ AC_DEFUN([_PAC_ARCH_OPTIONS], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PAC_OPTIONS_PAC_EPOCH], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_EPOCH])
-    AC_MSG_CHECKING([for pac epoch])
+    AC_MSG_CHECKING([for pacman epoch])
     AC_ARG_WITH([pac-epoch],
 	[AS_HELP_STRING([--with-pac-epoch=EPOCH],
 	    [pacman package EPOCH @<:@default=auto@:>@])],
@@ -108,7 +108,7 @@ AC_DEFUN([_PAC_OPTIONS_PAC_EPOCH], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_PAC_OPTIONS_PAC_RELEASE], [dnl
     AC_REQUIRE([_OPENSS7_OPTIONS_PKG_RELEASE])
-    AC_MSG_CHECKING([for pac release])
+    AC_MSG_CHECKING([for pacman release])
     AC_ARG_WITH([pac-release],
 	[AS_HELP_STRING([--with-pac-release=RELEASE],
 	    [pacman package RELEASE @<:@default=auto@:>@])],
@@ -211,19 +211,19 @@ AC_DEFUN([_PAC_ARCH_SETUP_TOPDIR], [dnl
     fi
     AC_MSG_RESULT([$mpkgtopdir])
     AC_SUBST([mpkgtopdir])dnl
-    AC_MSG_CHECKING([for makepkg source directory])
+    AC_MSG_CHECKING([for pacman source directory])
     if test ":${mpkgsourcedir+set}" != :set ; then
 	mpkgsourcedir="${mpkgtopdir}/src"
     fi
     AC_MSG_RESULT([$mpkgsourcedir])
     AC_SUBST([mpkgsourcedir])dnl
-    AC_MSG_CHECKING([for makepkg build directory])
+    AC_MSG_CHECKING([for pacman build directory])
     if test ":${mpkgbuilddir+set}" != :set ; then
 	mpkgbuilddir="${mpkgtopdir}/bld"
     fi
     AC_MSG_RESULT([$mpkgbuilddir])
     AC_SUBST([mpkgbuilddir])dnl
-    AC_MSG_CHECKING([for makepkg install directory])
+    AC_MSG_CHECKING([for pacman install directory])
     if test ":${mpkginstalldir+set}" != :set ; then
 	mpkginstalldir="${mpkgtopdir}/pkg"
     fi
@@ -252,7 +252,7 @@ AC_DEFUN([_PAC_ARCH_SETUP_OPTIONS], [dnl
 	if (echo "$arg_part" | grep "^'" >/dev/null 2>&1) ; then
 	    if test -n "$arg" ; then
 		eval "arg=$arg"
-		AC_MSG_CHECKING([for pacman argument '$arg'])
+		AC_MSG_CHECKING([for makepkg argument '$arg'])
 		if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
 		    PACKAGE_PACOPTIONS="${PACKAGE_PACOPTIONS}${PACKAGE_PACOPTIONS:+ }$arg"
 		    AC_MSG_RESULT([yes])
@@ -268,7 +268,7 @@ AC_DEFUN([_PAC_ARCH_SETUP_OPTIONS], [dnl
     done
     if test -n "$arg" ; then
 	eval "arg=$arg"
-	AC_MSG_CHECKING([for deb argument $arg])
+	AC_MSG_CHECKING([for makepkg argument $arg])
 	if (echo $arg | egrep '^(--enable|--disable|--with|--without)' >/dev/null 2>&1) ; then
 	    PACKAGE_PACOPTIONS="${PACKAGE_PACOPTIONS}${PACKAGE_PACOPTIONS:+ }$arg"
 	    AC_MSG_RESULT([yes])
@@ -287,13 +287,21 @@ AC_DEFUN([_PAC_ARCH_SETUP_OPTIONS], [dnl
 AC_DEFUN([_PAC_ARCH_SETUP_BUILD], [dnl
   AC_REQUIRE([_OPENSS7_MISSING3])dnl
     tmp_path="${PATH:+$PATH:}/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/X11R6/bin";
-    AC_ARG_ENABLE([pacman],
-	[AS_HELP_STRING([--disable-pacman],
-	    [build pacman @<:@default=auto@:>@])],
+    AC_ARG_ENABLE([pkgs],
+	[AS_HELP_STRING([--disable-pkgs],
+	    [build pacman pkgs @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (arch)	enable_pacman=yes ;;
-	    (*)		enable_pacman=no  ;;
+	    (arch)	enable_pkgs=yes ;;
+	    (*)		enable_pkgs=no  ;;
+	esac])
+    AC_ARG_ENABLE([srcs],
+	[AS_HELP_STRING([--disable-spkg],
+	    [build packman src pkgs @<:@default=auto@:>@])],
+	[], [dnl
+	case "$target_vendor" in
+	    (arch)	enable_spkg=yes ;;
+	    (*)		enable_spkg=no  ;;
 	esac])
     AC_ARG_VAR([PACMAN],
 	       [pacman command. @<:@default=pacman@:>@])
@@ -301,7 +309,7 @@ AC_DEFUN([_PAC_ARCH_SETUP_BUILD], [dnl
 	case "$target_vendor" in
 	    (arch)
 		AC_MSG_WARN([Cannot find pacman program in PATH.]) ;;
-	    (*) enable_pacman=no ;;
+	    (*) enable_pkgs=no; enable_spkg=no ;;
 	esac])
     AC_ARG_VAR([MAKEPKG],
 	       [makepkg command. @<:@default=makepkg@:>@])
@@ -309,12 +317,16 @@ AC_DEFUN([_PAC_ARCH_SETUP_BUILD], [dnl
 	case "$target_vendor" in
 	    (arch)
 		AC_MSG_WARN([Cannot find makepkg program in PATH.]) ;;
-	    (*) enable_pacman=no ;;
+	    (*) enable_pkgs=no; enable_spkg=no ;;
 	esac])
-    AC_CACHE_CHECK([for pkg building of pacman], [pac_cv_pkgs], [dnl
-	pac_cv_pkgs=${enable_pacman:-no}
+    AC_CACHE_CHECK([for pacman building of pkgs], [pac_cv_pkgs], [dnl
+	pac_cv_pkgs=${enable_pkgs:-no}
     ])
     AM_CONDITIONAL([BUILD_PKGS], [test ":$pac_cv_pkgs" = :yes])dnl
+    AC_CACHE_CHECK([for pacman building of src pkgs], [pac_cv_spkg], [dnl
+	pac_cv_spkg=${enable_spkg:-no}
+    ])
+    AM_CONDITIONAL([BUILD_SPKG], [test ":$pac_cv_spkg" = :yes])dnl
 ])# _PAC_ARCH_SETUP_BUILD
 # =============================================================================
 
@@ -384,7 +396,7 @@ AC_DEFUN([_PAC_REPO_SETUP_PACMAN], [dnl
 		(*) AC_MSG_WARN([Cannot find 'repo-remove' program in PATH.]) ;;
 	    esac
 	else enable_repo_pacman=no; fi])
-    AC_CACHE_CHECK([for arch pacman repo construction], [pac_cv_repo_pacman], [dnl
+    AC_CACHE_CHECK([for pacman repo construction], [pac_cv_repo_pacman], [dnl
 	pac_cv_repo_pacman=${enable_repo_pacman:-no}
     ])
     AM_CONDITIONAL([BUILD_REPO_PACMAN], [test ":$pac_cv_repo_pacman" = :yes])
