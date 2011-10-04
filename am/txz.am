@@ -181,6 +181,30 @@ slack_manifests		= $(txzdistdir)/MANIFEST.bz2 \
 ##   SPEAK_INSTALL.TXT
 ##   Slackware-HOWTO
 ##   UPGRADE.TXT
+##
+## Slapt-get will also add (per package directory):
+##
+## Note that jaos.org hase the following structure:
+##
+##  source ->
+##    gslapt ->
+##    slapt-get ->
+##    slapt-src ->
+##  slackpacks ->
+##    13.37-x86_64 ->
+##    13.37 ->
+##    slackware-13.37 ->
+##    slackware64-13.37 ->
+##
+##  CHECKSUMS.md5
+##  CHECKSUMS.md5.asc
+##  CHECKSUMS.md5.gz
+##  CHECKSUMS.md5.gz.asc
+##  ChangeLog.txt
+##  ChangeLog.txt.gz
+##  GPG-KEY
+##  PACKAGES.TXT
+##  PACKAGES.TXT.gz
 ##   
 
 
