@@ -1,0 +1,302 @@
+#!/bin/bash
+# @configure_input@
+# =============================================================================
+# 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+#
+# -----------------------------------------------------------------------------
+#
+# Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+# Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+# Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+#
+# All Rights Reserved.
+#
+# This program is free software; you can redistribute it and/or modify it under
+# the terms of the GNU Affero General Public License as published by the Free
+# Software Foundation; version 3 of the License.
+#
+# This program is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+# FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+# details.
+#
+# You should have received a copy of the GNU Affero General Public License along
+# with this program.  If not, see <http://www.gnu.org/licenses/>, or write to
+# the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
+#
+# -----------------------------------------------------------------------------
+#
+# U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+# behalf of the U.S. Government ("Government"), the following provisions apply
+# to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+# is classified as "Commercial Computer Software" under paragraph 252.227-7014
+# of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+# successor regulations) and the Government is acquiring only the license rights
+# granted herein (the license rights customarily provided to non-Government
+# users).  If the Software is supplied to any unit or agency of the Government
+# other than DoD, it is classified as "Restricted Computer Software" and the
+# Government's rights in the Software are defined in paragraph 52.227-19 of the
+# Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+# the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+# (or any successor regulations).
+#
+# -----------------------------------------------------------------------------
+#
+# Commercial licensing and support of this software is available from OpenSS7
+# Corporation at a fee.  See http://www.openss7.com/
+#
+# -----------------------------------------------------------------------------
+#
+# Last Modified $Date$ by $Author$
+#
+# =============================================================================
+@openss7_header@
+datarootdir=@datarootdir@
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# preinst_preloads() - This is a fresh install of this version of the kernel
+#   modules package.  Remove any non-deb preloads from the kernel-specific
+#   preloads file.
+#
+preinst_preloads () {
+    local prel_old=@sysconfdir@/modules-@kversion@ \
+	  prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
+	  prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
+	  m
+    if [ -f $prel_old ]; then
+	cp -f -- $prel_old $prel_new
+	sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new >$prel_tmp
+	mv -f -- $prel_tmp $prel_new
+	for m in $modules $preloads; do
+	    sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new >$prel_tmp
+	    mv -f -- $prel_tmp $prel_new
+	done
+	if ! diff $prel_new $prel_old >/dev/null 2>&1; then
+	    echo "$script: warning: Removing non-deb lines from preload file, $prel_old" >&2
+	    cp -f -b --suffix=.dpkg-old -- $prel_new $prel_old
+	fi
+	rm -f -- $prel_new || :
+    fi
+}
+#
+# preinst_remove_depmods() - A little recursive function to delete all modules
+#   dependent on an initial module set (in our case "streams.o").  The function
+#   echos the list of modules to remove to stdout.
+#
+preinst_remove_depmods () {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+	prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	eval "preinst_remove_depmods \$$prereq"
+    done
+}
+#
+# preinst_modules() - This is a fresh install of this version of the kernel
+#   modules package.  Make sure that there are no tarball installed kernel
+#   modules hanging around for this kernel version.  Because kernel module
+#   packages are named differently for different kernels, it is important that
+#   this function not be too zealous and remove kernel modules from our other
+#   installed packages.
+#
+preinst_modules () { :
+    local dir m b modl_mods= line dep t target p prereq
+    for dir in @kmoduledir@; do
+	[ -d $dir ] || continue
+	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+		b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?,,'`
+		case " $modules " in (*" $b "*) ;; (*) continue ;; esac
+		modl_mods="$modl_mods${modl_mods:+ }$m"
+	done
+	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
+	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+	    set +x
+	    dep=
+	    while read line ; do
+		case $line in
+		    (*\\)   line="`echo $line | sed -e 's,\\$,,'`"
+			    dep="$dep${dep:+ }$line"; continue ;;
+		    (*)     dep="$dep${dep:+ }$line" ;;
+		esac
+		if [ -n "$dep" ]; then
+		    set -- $dep
+		    if [ $# -ge 2 ] ; then
+			t=`echo $1 | sed -e 's,:$,,'`
+			target=target_`echo $t | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			shift
+			for p in $@ ; do
+			    prereq=prereq_`echo $p | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			    eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
+			    eval "$target=\"\$$target\${$target:+ }$p\""
+			done
+		    fi
+		    dep=
+		fi
+	    done < $dir/modules.dep
+	    eval "$xtrace"
+	    for m in $modl_mods; do
+		echo "$script: warning: Removing non-deb kernel module, $m" >&2
+		rm -f -- "$m" 2>/dev/null || :
+		prereq=prereq_`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+		eval "preinst_remove_depends \$$prereq" | while read b; do
+		    echo "$script: warning: Removing non-deb dependent kernel module $b" >&2
+		    rm -f -- "$b" 2>/dev/null || :
+		done
+	    done
+	    unset ${!prereq_*}
+	    unset ${!target_*}
+	fi
+    done
+}
+#
+# preinst_kernel() - We are installing the kernel modules package for the first
+#   time.  Rout out any preloads from the kernel-specific preloads file and
+#   remove any conflicting kernel modules.
+#
+preinst_kernel () {
+    preinst_preloads || :
+    preinst_modules || :
+}
+
+# -----------------------------------------------------------------------------
+# Auxiliary functions:
+# -----------------------------------------------------------------------------
+#
+# postinst_preloads() - For old modules, ensure that our preloaded modules are
+#   in the appropriate kernel-specific preloads file.  Note that the prerm on
+#   upgrade removed the old package's preloads from the file so we only need to
+#   add ours.
+#
+if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
+postinst_preloads () {
+    local prel_old=@sysconfdir@/modules-@kversion@ \
+          prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
+          prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
+          p
+    if [ -f $prel_old ]; then cp -f -- $prel_old $prel_new; else touch $prel_new; fi
+    ( cat $prel_new; for p in ${preloads}; do echo "$p"; done ) >$prel_tmp
+    mv -f -- $prel_tmp $prel_new
+    if ! diff $prel_new $prel_old >/dev/null 2>&1; then
+        cp -f -- $prel_new $prel_old.new
+    fi
+    rm -f -- $prel_new
+}
+fi
+#
+# postinst_oldmods() - Perform a depmod when the kernel modules installed are
+#   for the running kernel.  This only applies to 2.4 module systems.  The
+#   openss7-modules script performs the comparable actions for 2.6 module
+#   systems.
+#
+if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
+postinst_oldmods () {
+    local sysmap=/boot/System.map-@kversion@
+    if [ -x "`which depmod 2>/dev/null`" ]; then
+        if [ "@kversion@" = "`uname -r`" ]; then
+            depmod -a || :
+        elif [ -r $sysmap ]; then
+            UNAME_MACHINE=@target_cpu@ \
+            depmod -ae -F $sysmap @kversion@ || :
+        fi
+    fi
+}
+fi
+#
+# postinst_symvers() - Install redhat-like symvers file in the /boot directory.
+#   Debian kernels do not create a symbol versions file.  This is a bit
+#   dangerous because it relies on the symbol versions not changing when the ABI
+#   number in the kernel version does not change.
+#
+if [ -z '@WITH_KO_MODULES_TRUE@' ]; then
+postinst_symvers () { :
+    local f t
+    f=/usr/src/${name}-@VERSION@-@PACKAGE_DEBRELEASE@/@kversion@/System.symvers
+    t=/boot/symvers-@kversion@.gz
+    if [ ! -r $t -a -r $f ] ; then
+        gzip -c $f >$t || :
+    fi
+}
+fi
+#
+# postinst_weakmods() - Perform weak-updates on modules, perform depmod, and
+#   signal init scripts when a relink is required on shutdown or reboot.  Note
+#   that dpkg is way smarter than rpm about installation order so the
+#   weak-updates script from the base package should already be installed.
+#
+if [ -z '@WITH_KO_MODULES_TRUE@' ]; then
+postinst_weakmods () {
+    local scripts v
+    if [ -x @sbindir@/${name}-modules ]; then
+        scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+        if [ -n "$scripts" ] ; then
+            @sbindir@/${name}-modules -- $v -e \
+                --initscripts="$scripts" \
+                --add-modules @kversion@ || :
+        else
+            @sbindir@/${name}-modules -- $v -e \
+                --add-modules @kversion@ || :
+        fi
+    fi
+}
+fi
+#
+# postinst_initscripts() - For old modules attempt to start init scripts when
+#   they are not already started and they are supposed to be started in the
+#   current run level.
+#
+if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
+postinst_initscripts () {
+    local r i start l
+    if [ "@kversion@" = "`uname -r`" ]; then
+        r="`runlevel | awk '{print$2}'`"
+        for i in ${initfiles}; do
+            [ -f @initrddir@/$i ] || continue
+            [ ! -e /var/lock/subsys/$i ] || continue
+            start=no
+            for l in @initrddir@/../rc${r}.d/S[0-9][0-9]$i @initrddir@/rc${r}.d/S[0-9][0-9]$i; do
+                if [ -L $l ]; then start=yes; break; fi
+            done
+            [ $start = yes ] || continue
+            [ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break; }
+            [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break; }
+            [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i start && continue || break; }
+        done
+    fi
+}
+fi
+
+#
+# postinst_kernel() - For old modules, make sure that the preloads are in the
+#   kernel-specific preloads file, perform a depmod on the kernel modules
+#   directory, start init scripts when they are to be started for the installed
+#   kernel modules.  For new modules, add the symvers file when possible ('cause
+#   debian doesn't have one) and invoke the weak-modules update script.  Note
+#   that the script will perform a depmod and start init scripts when necessary.
+#
+postinst_kernel () { :
+if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
+    postinst_preloads || :
+    postinst_oldmods  || :
+fi
+if [ -z '@WITH_KO_MODULES_TRUE@' ]; then
+    postinst_symvers  || :
+    postinst_weakmods || :
+fi
+if [ -z '@WITH_KO_MODULES_FALSE@' ]; then
+    postinst_initscripts || :
+fi
+}
+
+preinst_kernel
+postinst_kernel
+
+# =============================================================================
+#
+# $Log$
+# =============================================================================
+# vim: ft=sh sw=4 noet nocin nosi formatoptions+=tcqlorn

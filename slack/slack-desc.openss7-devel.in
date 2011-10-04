@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+             |-----handy-ruler------------------------------------------------------|
+openss7-devel: openss7-devel (OpenSS7 development files)
+openss7-devel:
+openss7-devel: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7-devel:
+openss7-devel: This subpackage contains static library archives and header files.
+openss7-devel: These static libraries and header files are required to compile
+openss7-devel: OpenSS7 applications programs.  This binary package does not contain
+openss7-devel: developer nor programmer documentation.  See the openss7-doc
+openss7-devel: subpackage for that information.
+openss7-devel:
+openss7-devel:

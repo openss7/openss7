@@ -87,7 +87,7 @@ case "$ARCH" in
     (*)		SLKCFLAGS="-O2 -g" ;;
 esac
 
-rm -rf $PKG
+rm -fr $PKG
 mkdir -p $TMP $PKG
 tar xvf $CWD/$PKGNAM-$VERSION.tar.?z || exit 1
 cd $PKGNAM-$VERSION || exit 1
@@ -183,10 +183,34 @@ install_doc_files() {
     done
 }
 
+install_install() {
+    for f in slack-desc slack-required slack-conflicts slack-suggests; do
+	(
+	    if [ -r $BLD/slack/$f ]; then
+		cat $BLD/slack/$f
+	    fi
+	    if [ -r $BLD/slack/$f.$SUBPKGNAM ]; then
+		cat $BLD/slack/$f.$SUBPKGNAM
+	    fi
+	) >install/$f
+    done
+    for f in doinst.sh; do
+	(
+	    if [ -r $BLD/slack/$f]; then
+		cat $BLD/slack/$f
+	    fi
+	    if [ -r $BLD/slack/$f-$SUBPKGNAM ]; then
+		cat $BLD/slack/$f-$SUBPKGNAM
+	    fi
+	) >install/$f
+    done
+}
+
 SUBPKG=$PKG/main
 SUBPKGNAME=$PKGNAM
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
+rm -fr install
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
 cat >install/slack-desc <<SBEOF
@@ -210,6 +234,7 @@ SBEOF
 cat >install/slack-suggests <<SBEOF
 openss7-base
 SBEOF
+install_install
 ( echo ${BLD}/AUTHORS
   [ ! -f ${BLD}/ANNOUNCE	] || echo ${BLD}/ANNOUNCE
   [ ! -f ${BLD}/ABOUT-NLS	] || echo ${BLD}/ABOUT-NLS
@@ -243,10 +268,11 @@ SBEOF
 
 SUBPKG=$PKG/repo
 SUBPKGNAM=$PKGNAM-repo
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 mkdir -p $SUBPKG
 cd $SUBPKG
 # copy files into the repo package
+rm -fr install
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
 cat >install/slack-desc <<SBEOF
@@ -278,7 +304,7 @@ aptsourceslistdir=${sysconfdir}/apt/sources.list.d
 
 SUBPKG=$PKG/base
 SUBPKGNAME=$PKGNAM-base
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -304,8 +330,7 @@ cat >install/slack-suggests <<SBEOF
 openss7-lib
 openss7-compat
 SBEOF
-cat >install/doinst.sh <<SBEOF
-SBEOF
+install_install
 ( [ ! -d ${INS}${sysconfdir}					] || find ${INS}${sysconfdir} -type f -name *.conf
 ) | install_conffiles
 ( [ ! -f ${INS}${sbindir}/${STRCONF_DEVICES}			] || echo ${INS}${sbindir}/${STRCONF_DEVICES}
@@ -323,9 +348,10 @@ SBEOF
   [ ! -d ${INS}${mandir} ] || find ${INS}${mandir} \( -type f -or -type l \) -name *.[1458]*
 ) | install_files
 
+
 SUBPKG=$PKG/doc
 SUBPKGNAME=$PKGNAM-doc
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -352,6 +378,7 @@ openss7-devel
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 ( [ ! -d ${INS}${docdir}/@PACKAGE@-@VERSION@	] || find ${INS}${docdir}/@PACKAGE@-@VERSION@ -type f -name *.txt
   [ ! -d ${INS}${dvidir}/@PACKAGE@-@VERSION@	] || find ${INS}${dvidir}/@PACKAGE@-@VERSION@ -type f -name *.dvi
   [ ! -d ${INS}${psdir}/@PACKAGE@-@VERSION@	] || find ${INS}${psdir}/@PACKAGE@-@VERSION@ -type f -name *.ps
@@ -365,7 +392,7 @@ SBEOF
 
 SUBPKG=$PKG/lib
 SUBPKGNAME=$PKGNAM-lib
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -393,6 +420,7 @@ openss7-compat
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 ( [ ! -d ${INS}${snmpconfdir}				] || find ${INS}${snmpconfdir} \( -type f -o -type l \)
   [ ! -f ${INS}${sysconfdir}/nslconfig.d/@PACKAGE@	] || echo ${INS}${sysconfdir}/nslconfig.d/@PACKAGE@
   [ ! -f ${INS}${sysconfdir}/sock2path			] || echo ${INS}${sysconfdir}/sock2path
@@ -426,7 +454,7 @@ SBEOF
 if [ -z '@WITH_32BIT_LIBS_TRUE@' ]; then
 SUBPKG=$PKG/compat
 SUBPKGNAME=$PKGNAM-compat
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -452,6 +480,7 @@ cat >install/slack-suggests <<SBEOF
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 includedir=@includedir@
 pkgincludedir=${includedir}/@PACKAGE@
 ( [ ! -d ${INS}${lib32dir}        ] || echo ${INS}${lib32dir}/*.so*
@@ -464,7 +493,7 @@ fi
 
 SUBPKG=$PKG/devel
 SUBPKGNAME=$PKGNAM-devel
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -491,6 +520,7 @@ openss7-kernel-devel
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 if [ -z '@WITH_32BIT_LIBS_TRUE@' ]; then
 ( [ ! -d ${INS}${pkgincludedir}	] || echo ${INS}${pkgincludedir}/*
   [ ! -d ${INS}${libdir}	] || echo ${INS}${libdir}/*.a
@@ -507,7 +537,7 @@ fi
 
 SUBPKG=$PKG/debuginfo
 SUBPKGNAME=$PKGNAM-debuginfo
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -534,6 +564,7 @@ openss7-kernel-debuginfo
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 if [ -z '@WITH_32BIT_LIBS_TRUE@' ]; then
 ( [ ! -d ${debtmpdir}${lib32dir}/debug	 ] ||	find ${debtmpdir}${lib32dir}/debug -type f \! -name *.ko \! -name *.ko.debug
   [ ! -d ${debtmpdir}${lib32dir}/debug	 ] || { find ${debtmpdir}${lib32dir}/debug -type l | while read f ; do
@@ -548,7 +579,7 @@ fi
 
 SUBPKG=$PKG/debugsource
 SUBPKGNAME=$PKGNAM-debugsource
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -575,12 +606,13 @@ openss7-kernel-debugsource
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 ( [ ! -d ${INS}/usr/src/debug	] || echo ${INS}/usr/src/debug/*
 ) | install_files
 
 SUBPKG=$PKG/kernel
 SUBPKGNAME=$PKGNAM-kernel
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -608,6 +640,7 @@ openss7-kernel-devel
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 if [ -z @WITH_KO_MODULES_TRUE@ ]; then
 ( [ ! -d ${INS}${kmoduledir}/${ksubdir} ] || echo ${INS}${kmoduledir}/${ksubdir}/*.ko
   [ ! -d ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/System.symvers ] || \
@@ -624,7 +657,7 @@ fi
 
 SUBPKG=$PKG/kernel-devel
 SUBPKGNAME=$PKGNAM-kernel-devel
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -652,6 +685,7 @@ openss7-kernel-debuginfo
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 if [ -z @WITH_KO_MODULES_TRUE@ ]; then
 ( [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Module.mkvars ] || \
     echo ${INS}/usr/src/@PACKAGE@-@VERSION@-${BUILD}/${kversion}/Module.mkvars
@@ -684,7 +718,7 @@ fi
 
 SUBPKG=$PKG/kernel-debuginfo
 SUBPKGNAME=$PKGNAM-kernel-debuginfo
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -712,6 +746,7 @@ openss7-kernel-debugsource
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 if [ -z '@WITH_32BIT_LIBS_TRUE@' ] ; then
 ( [ ! -d ${INS}${lib32dir}/debug ] ||	find ${INS}${lib32dir}/debug -type f \( -name '*.ko' -o -name '*.ko.debug' \)
   [ ! -d ${INS}${lib32dir}/debug ] || { find ${INS}${lib32dir}/debug -type l | while read f ; do
@@ -726,7 +761,7 @@ fi
 
 SUBPKG=$PKG/kernel-debugsource
 SUBPKGNAME=$PKGNAM-kernel-debugsource
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -754,13 +789,14 @@ openss7-kernel-source
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 ( [ ! -d ${INS}/usr/src/debug ] || echo ${INS}/usr/src/debug/*
 ) | install_files
 
 if [ -z '@WITH_K_PACKAGE_TRUE@' ] ; then
 SUBPKG=$PKG/kernel-source
 SUBPKGNAME=$PKGNAM-kernel-source
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -787,13 +823,14 @@ openss7-kernel
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 ( [ ! -f ${INS}/usr/src/@PACKAGE@-@VERSION@.tar.gz ] || echo ${INS}/usr/src/@PACKAGE@-@VERSION@.tar.gz
 ) | install_files
 fi
 
 SUBPKG=$PKG/java
 SUBPKGNAME=$PKGNAM-java
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -820,6 +857,7 @@ openss7-javadoc
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 ( [ ! -d ${INS}${jnidir}	] || echo ${INS}${jnidir}/*
   [ ! -d ${INS}${pkggcjdir}	] || echo ${INS}${pkggcjdir}/*.so
   [ ! -d ${INS}${pkggcjdir}	] || echo ${INS}${pkggcjdir}/*.la
@@ -829,7 +867,7 @@ SBEOF
 
 SUBPKG=$PKG/javadoc
 SUBPKGNAME=$PKGNAM-javadoc
-[ ! -d $SUBPKG ] || rm -rf $SUBPKG
+[ ! -d $SUBPKG ] || rm -fr $SUBPKG
 cd $SUBPKG
 mkdir install
 #         |-----handy-ruler------------------------------------------------------|
@@ -856,6 +894,7 @@ openss7-java
 SBEOF
 cat >install/doinst.sh <<SBEOF
 SBEOF
+install_install
 ( [ ! -d ${INS}${pkgjavadocdir} ] || find ${INS}${pkgjavadocdir} -type f
 ) | install_files
 

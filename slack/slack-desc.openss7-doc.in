@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+           |-----handy-ruler------------------------------------------------------|
+openss7-doc: openss7-doc (OpenSS7 documentation package)
+openss7-doc:
+openss7-doc: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7-doc:
+openss7-doc: This subpackage contains the documentation used in the development of
+openss7-doc: applications and programs that use the package.  It contains developer
+openss7-doc: and programmer manuals in info, pdf and html formats as well as
+openss7-doc: sections 2, 3, 7 and 9 of the manual pages.  Install this package if
+openss7-doc: you are interested in developing STREAMS drivers or modules or
+openss7-doc: applications programs for the protocol suites contained in the OpenSS7
+openss7-doc: package.

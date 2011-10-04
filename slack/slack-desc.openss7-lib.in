@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+           |-----handy-ruler------------------------------------------------------|
+openss7-lib: openss7-lib (OpenSS7 run-time shared object libraries)
+openss7-lib:
+openss7-lib: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7-lib:
+openss7-lib: This subpackage contains the run-time (shared object) libraries
+openss7-lib: necessary to run applications programs and utilities developed for
+openss7-lib: OpenSS7.  Also included are the libtool .la files describing the
+openss7-lib: shared object libraries.  The subpackage also provides administrative
+openss7-lib: and configuration test utilities and commands associated with the
+openss7-lib: OpenSS7 package.  Note that these uilities are needed for running the
+openss7-lib: validation test suites contained in the openss7-base subpackage.

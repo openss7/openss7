@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+            |-----handy-ruler------------------------------------------------------|
+openss7-repo: openss7-repo (OpenSS7 repository definitions)
+openss7-repo:
+openss7-repo: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7-repo:
+openss7-repo: This subpackage contains the repository source and package updater
+openss7-repo: information necessary to properly establish the OpenSS7 repository
+openss7-repo: definitions for installing the other subpackages in the set.
+openss7-repo:
+openss7-repo:
+openss7-repo:
+openss7-repo:

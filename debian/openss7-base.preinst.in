@@ -244,7 +244,7 @@ preinst_modules () {
 #
 preinst_remove_warn_file () {
     echo "$script: warning: Deleting non-deb manual $1 file $2" >&2
-    rm -f -- $2 2?dev/null || :
+    rm -f -- $2 2>/dev/null || :
 }
 #
 # preinst_manpages() - Old non-deb distribution puts some man pages in the wrong

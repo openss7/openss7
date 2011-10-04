@@ -532,6 +532,34 @@ dnl if test ":${DPKG_SOURCE:-no}" != :no -a ":${DPKG_BUILDPACKAGE:-no}" != :no ;
 	AC_SUBST_FILE([mscript_postinst])
 	AC_SUBST_FILE([mscript_prerm])
 	AC_SUBST_FILE([mscript_postrm])
+	AC_CONFIG_FILES([debian/]AC_PACKAGE_TARNAME[_header
+			 debian/]AC_PACKAGE_TARNAME[-base.postinst
+			 debian/]AC_PACKAGE_TARNAME[-base.postrm
+			 debian/]AC_PACKAGE_TARNAME[-base.preinst
+			 debian/]AC_PACKAGE_TARNAME[-base.prerm
+			 debian/]AC_PACKAGE_TARNAME[-compat.postinst
+			 debian/]AC_PACKAGE_TARNAME[-compat.postrm
+			 debian/]AC_PACKAGE_TARNAME[-devel.preinst
+			 debian/]AC_PACKAGE_TARNAME[-doc.postinst
+			 debian/]AC_PACKAGE_TARNAME[-doc.postrm
+			 debian/]AC_PACKAGE_TARNAME[-doc.preinst
+			 debian/]AC_PACKAGE_TARNAME[-doc.prerm
+			 debian/]AC_PACKAGE_TARNAME[-java.postinst
+			 debian/]AC_PACKAGE_TARNAME[-java.postrm
+			 debian/]AC_PACKAGE_TARNAME[-java.preinst
+			 debian/]AC_PACKAGE_TARNAME[-kernel.postinst
+			 debian/]AC_PACKAGE_TARNAME[-kernel.postrm
+			 debian/]AC_PACKAGE_TARNAME[-kernel.preinst
+			 debian/]AC_PACKAGE_TARNAME[-kernel.prerm
+			 debian/]AC_PACKAGE_TARNAME[-lib.postinst
+			 debian/]AC_PACKAGE_TARNAME[-lib.postrm
+			 debian/]AC_PACKAGE_TARNAME[-lib.preinst
+			 debian/]AC_PACKAGE_TARNAME[-repo.postinst
+			 debian/]AC_PACKAGE_TARNAME[-repo.postrm
+			 debian/]AC_PACKAGE_TARNAME[-repo.preinst
+			 debian/]AC_PACKAGE_TARNAME[-repo.prerm])
+	AC_PACKAGE_TARNAME[_header="debian/]AC_PACKAGE_TARNAME[_header"]
+	AC_SUBST_FILE(AC_PACKAGE_TARNAME[_header])
 dnl fi
 ])# _DEB_DPKG_OUTPUT
 # =============================================================================

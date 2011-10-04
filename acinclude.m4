@@ -108,37 +108,9 @@ AC_DEFUN([AC_OPENSS7], [dnl
     _DRAFTS
     _OS7_OPTIONS
     _INIT_SCRIPTS
-    AC_CONFIG_FILES([debian/openss7_header
-		     debian/openss7-base.postinst
-		     debian/openss7-base.postrm
-		     debian/openss7-base.preinst
-		     debian/openss7-base.prerm
-		     debian/openss7-compat.postinst
-		     debian/openss7-compat.postrm
-		     debian/openss7-devel.preinst
-		     debian/openss7-doc.postinst
-		     debian/openss7-doc.postrm
-		     debian/openss7-doc.preinst
-		     debian/openss7-doc.prerm
-		     debian/openss7-java.postinst
-		     debian/openss7-java.postrm
-		     debian/openss7-java.preinst
-		     debian/openss7-kernel.postinst
-		     debian/openss7-kernel.postrm
-		     debian/openss7-kernel.preinst
-		     debian/openss7-kernel.prerm
-		     debian/openss7-lib.postinst
-		     debian/openss7-lib.postrm
-		     debian/openss7-lib.preinst
-		     debian/openss7-repo.postinst
-		     debian/openss7-repo.postrm
-		     debian/openss7-repo.preinst
-		     debian/openss7-repo.prerm
-		     src/util/modutils/openss7
+    AC_CONFIG_FILES([src/util/modutils/openss7
 		     src/include/sys/openss7/version.h
 		     Module.mkvars])
-    openss7_header="debian/openss7_header"
-    AC_SUBST_FILE([openss7_header])
     AC_CONFIG_HEADERS([src/drivers/ip_hooks.h
 		       src/drivers/net_hooks.h
 		       src/drivers/sctp_hooks.h

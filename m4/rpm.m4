@@ -1007,8 +1007,8 @@ AC_DEFUN([_RPM_SPEC_OUTPUT], [dnl
 		     scripts/patterns.xml])
     speccommon="scripts/speccommon"
     AC_SUBST_FILE([speccommon])
-    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).spec)
-    AC_CONFIG_FILES(m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).lsm)
+    AC_CONFIG_FILES(AC_PACKAGE_TARNAME[.spec
+		   ]AC_PACKAGE_TARNAME[.lsm])
     if test ":${enable_public:-yes}" != :yes ; then
 	PACKAGE="${PACKAGE_TARNAME}"
 	VERSION="bin-${PACKAGE_VERSION}.${PACKAGE_RELEASE}${PACKAGE_PATCHLEVEL}"

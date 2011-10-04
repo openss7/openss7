@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+       |-----handy-ruler------------------------------------------------------|
+openss7: openss7 (Linux Fast-STREAMS and OpenSS7 protocol suites)
+openss7:
+openss7: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7:
+openss7: This package includes kernel modules, STREAMS drivers, modules,
+openss7: libraries, utilities, test programs, daemons, and development
+openss7: environment for the development and execution of OpenSS7 drivers,
+openss7: components and applications for the STREAMS environment.  This
+openss7: distribution is currently applicable to 2.4, 2.6 and 3.x kernels and
+openss7: is validated for ix86, x86_64, ppc and ppc64 architectures, but should
+openss7: build and install well for other architectures.
