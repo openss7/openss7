@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+            |-----handy-ruler------------------------------------------------------|
+openss7-base: openss7-base (OpenSS7 base scripts package)
+openss7-base:
+openss7-base: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7-base:
+openss7-base: This subpackage contains the init scripts, test scripts maintenance
+openss7-base: scripts and base system configuration files necessary for the
+openss7-base: operation of the protocol suites contained in the OpenSS7 package.  It
+openss7-base: contains user and administration documentation in INFO, PDF and HTML
+openss7-base: formats as well as sections 1, 4, 5 and 8 of the manual pages.  This
+openss7-base: binary package is required for any installation of the OpenSS7
+openss7-base: package.

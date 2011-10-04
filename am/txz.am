@@ -1,0 +1,392 @@
+## vim: ft=automake comments=b\:#,b\:##,b\:#\! formatoptions+=tcqlor
+## =============================================================================
+## 
+# @(#) $RCSfile$ $Name$($Revision$) $Date$
+##
+## -----------------------------------------------------------------------------
+##
+## Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
+## Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
+## Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
+##
+## All Rights Reserved.
+##
+## This program is free software; you can redistribute it and/or modify it under
+## the terms of the GNU Affero General Public License as published by the Free
+## Software Foundation; version 3 of the License.
+##
+## This program is distributed in the hope that it will be useful, but WITHOUT
+## ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+## FOR A PARTICULAR PURPOSE.  See the GNU Affero General Public License for more
+## details.
+##
+## You should have received a copy of the GNU Affero General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>, or
+## write to the Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA
+## 02139, USA.
+##
+## -----------------------------------------------------------------------------
+##
+## U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
+## behalf of the U.S. Government ("Government"), the following provisions apply
+## to you.  If the Software is supplied by the Department of Defense ("DoD"), it
+## is classified as "Commercial Computer Software" under paragraph 252.227-7014
+## of the DoD Supplement to the Federal Acquisition Regulations ("DFARS") (or any
+## successor regulations) and the Government is acquiring only the license rights
+## granted herein (the license rights customarily provided to non-Government
+## users).  If the Software is supplied to any unit or agency of the Government
+## other than DoD, it is classified as "Restricted Computer Software" and the
+## Government's rights in the Software are defined in paragraph 52.227-19 of the
+## Federal Acquisition Regulations ("FAR") (or any successor regulations) or, in
+## the cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the FAR
+## (or any successor regulations).
+##
+## -----------------------------------------------------------------------------
+##
+## Commercial licensing and support of this software is available from OpenSS7
+## Corporation at a fee.  See http://www.openss7.com/
+##
+## -----------------------------------------------------------------------------
+##
+## Last Modified $Date$ by $Author$
+##
+## =============================================================================
+
+
+if BUILD_TXZS
+## BUILD_TXZS
+
+if MAINTAINER_MODE
+## MAINTAINER_MODE
+
+#!
+#! Slackware Build Targets:
+#! ------------------------
+#!
+#! On slackware systems, or systems supporting slackware packaging tools, the
+#! following targets are used to generated slackware release packages.  The
+#! release number can be controlled by the contents of the .txzrelease file, or
+#! with the --with-txzrelease=RELEASENUMBER option to 'configure'.  See
+#! 'configure --help' for more information on options.
+#!
+
+#! src:
+#!      This target will build the slackware source package (.tar.xz file).  We
+#!      use build number 1 and the entire tarball is included in the file.  You
+#!      can use another build number for the same purposes.  The source file
+#!      will be named: @PACKAGE_LCNAME@.tar.xz
+#!
+
+#! txzs:
+#!      This target will build the slackware binary packages (.txz files) from
+#!      the source tarball created above.  (This target will also create the
+#!      .tar.xz if it has not been created already.)  The subpackage .txz files
+#!      will be named: @PACKAGE_LCNAME@-*.@VERSION@-@PACKAGE_TXZRELEASE@.*.txz, where the
+#!      starts indicate the subpackage and the architecture.
+#!
+
+#!
+#! remakepkg:
+#!      This target searches out a list of kernel names from the
+#!      @DESTDIR@/lib/modules directory and builds txzs form those kernels and
+#!      for each of a set of architectures gvien in the AM_TXZTARGETS variable
+#!      to make.  Tis is a convenience target for building a group of txzs on a
+#!      given build machine.
+#!
+
+
+if BUILD_REPO_SLACKPKG
+## BUILD_REPO_SLACKPKG
+
+
+slack_checksums		= $(txzdistdir)/CHECKSUMS.md5 \
+			  $(slackfulldir)/CHECKSUMS.md5 \
+			  $(slackmaindir)/CHECKSUMS.md5 \
+			  $(slackdebgdir)/CHECKSUMS.md5 \
+			  $(slackdevldir)/CHECKSUMS.md5 \
+			  $(slacksrcsdir)/CHECKSUMS.md5 \
+			  $(slacksrcedir)/CHECKSUMS.md5
+
+slack_keys		= $(txzdistdir)/GPG-KEY
+
+slack_signs		= $(txzdistdir)/CHECKSUMS.md5.asc \
+			  $(slackfulldir)/CHECKSUMS.md5.asc \
+			  $(slackmaindir)/CHECKSUMS.md5.asc \
+			  $(slackdebgdir)/CHECKSUMS.md5.asc \
+			  $(slackdevldir)/CHECKSUMS.md5.asc \
+			  $(slacksrcsdir)/CHECKSUMS.md5.asc \
+			  $(slacksrcedir)/CHECKSUMS.md5.asc
+
+slack_package_files	= $(txzdistdir)/PACKAGES.TXT \
+			  $(slackfulldir)/PACKAGES.TXT \
+			  $(slackmaindir)/PACKAGES.TXT \
+			  $(slackdebgdir)/PACKAGES.TXT \
+			  $(slackdevldir)/PACKAGES.TXT \
+			  $(slacksrcsdir)/PACKAGES.TXT \
+			  $(slacksrcedir)/PACKAGES.TXT
+
+slack_file_lists	= $(txzdistdir)/FILELIST.TXT \
+			  $(slackfulldir)/FILE_LIST \
+			  $(slackmaindir)/FILE_LIST \
+			  $(slackdebgdir)/FILE_LIST \
+			  $(slackdevldir)/FILE_LIST \
+			  $(slacksrcsdir)/FILE_LIST \
+			  $(slacksrcedir)/FILE_LIST
+
+slack_manifests		= $(txzdistdir)/MANIFEST.bz2 \
+			  $(slackfulldir)/MANIFEST.bz2 \
+			  $(slackmaindir)/MANIFEST.bz2 \
+			  $(slackdebgdir)/MANIFEST.bz2 \
+			  $(slackdevldir)/MANIFEST.bz2 \
+			  $(slacksrcsdir)/MANIFEST.bz2 \
+			  $(slacksrcedir)/MANIFEST.bz2
+
+
+##
+## The following builds regular slackbuild repositories.
+##
+
+##
+## Individual binary directories have the following files:
+##
+##   CHECKSUMS.md5
+##   CHECKSUMS.md5.asc
+##   FILE_LIST
+##   MANIFEST.bz2
+##   PACKAGES.TXT
+##   README.TXT
+##
+## In addition, the distribution directory has:
+##
+##   ANNOUNCE.13_37
+##   BOOTING.TXT
+##   CHANGES_AND_HINTS.TXT
+##   CHECKSUMS.md5
+##   CHECKSUMS.md5.asc
+##   COPYING
+##   COPYING3
+##   COPYRIGHT.TXT
+##   CRYPTO_NOTICE.TXT
+##   ChangeLog.txt
+##   FILELIST.TXT
+##   GPG-KEY
+##   PACKAGES.TXT
+##   README.initrd
+##   README_CRYPT.TXT
+##   README_LVM.TXT
+##   README_RAID.TXT
+##   README_DVD.TXT
+##   RELEASE_NOTES
+##   SPEAKUP_DOCS.TXT
+##   SPEAK_INSTALL.TXT
+##   Slackware-HOWTO
+##   UPGRADE.TXT
+##   
+
+
+$(slack_manifests):
+	( cd $$(dirname $@); \
+	  find . -name '*.txz' | sort -u | while read f; do \
+	  	echo "++========================================"; \
+	  	echo "||"; \
+		echo "||   Package:  $$f"; \
+	  	echo "||"; \
+	  	echo "++========================================"; \
+		TZ='UTC' tar tvf $$f; \
+		echo "";
+		echo "";
+	  done; \
+	) | bzip -c >$@
+
+$(slack_package_files):
+	cwd=`pwd`; \
+	( echo "PACKAGES.TXT;  `date`"; \
+	  echo ""; \
+	  echo "This file provides details on the Slackware packages found"; \
+	  echo "in the ./$(basename $$cwd)/ directory."; \
+	  echo ""; \
+	  echo "Total size of all packages (compressed): `find $$cwd -name '*.txz' | xargs du -ch | tail -1 | awk '{print$$1}'`"; \
+	  echo "Total size of all packages (uncompressed): "; \
+	  echo ""; \
+	  echo ""; \
+	  find $$cwd -name '*.txz' | sort -u | while read f; do \
+		echo "PACKAGE NAME:  $$(basename $$f)"; \
+		echo "PACKAGE LOCATION:  `echo $$(dirname $$f) | sed -e 's,^'$$cwd',./'$$(basename $$cwd)','`"; \
+		echo "PACKAGE SIZE (compressed):  "; \
+		echo "PACKAGE SIZE (uncompressed):  "; \
+		echo "PACKAGE DESCRIPTION:"; \
+		tar xf $$f -O install/slack-desc | egrep -v '^[#[:space:]]|^$$'; \
+		echo ""; \
+	  done; \
+	) >$@
+
+$(slack_file_lists):
+	( date; \
+	  echo ""; \
+	  echo "Here is the file list for this directory.  If you are using a"; \
+	  echo "mirror site and find missing or extra files in the disk"; \
+	  echo "subdirectories, please have the archive administrator refresh"; \
+	  echo "the mirror."; \
+	  echo ""; \
+	  cd $$(dirname $@); \
+	  find . | sort -u | TZ='UTC' xargs ls -ld; \
+	) >$@
+
+$(txzdistdir)/CHECKSUMS.md5:
+	( echo "These are the MD5 message disgests for the files in this directory."; \
+	  echo "If you want to test your files, use 'md5sum' and compare the values to"; \
+	  echo "the ones listed here."; \
+	  echo ""; \
+	  echo "To test all these files, use this command:"; \
+	  echo ""; \
+	  echo "md5sum -c CHECKSUMS.md5 | less"; \
+	  echo ""; \
+	  echo "'md5sum' can be found in the GNU coreutils package on ftp.gnu.org in"; \
+	  echo "/pub/gnu, or at any GNU mirror site."; \
+	  echo "";
+	  cd $$(dirname $@); \
+	  find . -type f | grep -v 'CHECKSUMS.md5' | xargs md5sum; \
+	) >$@
+
+$(txzdistdir)/CHECKSUMS.md5.gz: %.gz : %
+	gzip $< >$@
+
+GPGVERIFYSIGN = \
+	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+		test ! -f $@ || $(ECHO) "D: gpg BAD $@" ; \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
+	else \
+		$(ECHO) "D: gpg OK  $@" ; \
+		touch "$@"; \
+	fi
+
+$(slack_signs): %.asc : %
+	@$(ECHO_V) "Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
+
+GPGEXPORTKEY = \
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
+	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+
+$(slack_keys):
+	@$(ECHO_V) "Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGEXPORTKEY)
+
+## BUILD_REPO_SLACKPKG
+endif
+
+if BUILD_REPO_SLAPT_SRC
+## BUILD_REPO_SLAPT_SRC
+
+##
+## The following builds and slapt-src repositories.
+##
+
+$(txzdistdir)/$(PACKAGE)-srcrc:: Makefile
+
+$(txzdistdir)/$(PACKAGE)-local-srcrc:: Makefile
+
+
+## BUILD_REPO_SLAPT_SRC
+endif
+
+if BUILD_REPO_SLAPT_GET
+## BUILD_REPO_SLAPT_GET
+
+##
+## The following builds and slapt-get repositories.
+##
+
+$(txzdistdir)/$(PACKAGE)-getrc:: Makefile
+
+$(txzdistdir)/$(PACKAGE)-local-getrc:: Makefile
+
+GPGVERIFYSIGN = \
+	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
+		test ! -f $@ || $(ECHO) "D: gpg BAD $@" ; \
+		user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+		home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+		pass="$(GNUPGPASS)"; pass="$${pass:+ --batch }"; \
+		pipe="$(GNUPGPASS)"; pipe="$${pipe:+$(ECHO) $$pipe |}"; \
+		$(ECHO) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
+		eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $< >$@ 2>/dev/null"; \
+	else \
+		$(ECHO) "D: gpg OK  $@" ; \
+		touch "$@"; \
+	fi
+
+$(slapt_signs): %.asc : %
+	@$(ECHO_V) "Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGVERIFYSIGN)
+
+GPGEXPORTKEY = \
+	user="$(GNUPGUSER)"; user="$${user:+ -u }$$user"; \
+	home="$(GNUPGHOME)"; home="$${home:+ --homedir }$$home"; \
+	$(ECHO) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@"; \
+	$(GPG) -a$$user$$home --export $(GNUPGUSER) >$@
+
+$(slapt_keys):
+	@$(ECHO_V) "Making $@ in `pwd`"
+	$(AM_V_GEN)$(GPGEXPORTKEY)
+
+repo-slapt: $(RELEASE_DIRECTORIES) $(slapt_files)
+
+repo-sign-slapt: $(RELEASE_DIRECTORIES) $(slapt_signs) $(slapt_keys) $(slapt_sigs)
+
+repo-clean-slapt:
+	@$(ECHO_V) "Making $@ in `pwd`"
+
+REPO_DIRECTORIES	+= $(slaptdir) $(slaptbasedir) $(slaptfulldir) $(slaptmaindir) $(slaptdebgdir) $(slaptdevldir) $(slaptsrcsdir) $(slaptfsrcdir)
+REPO			+= repo-slapt
+REPO_SIGN		+= repo-sign-slapt
+REPO_CLEAN_LOCAL	+= repo-clean-slapt
+REPOCLEANFILES		+= $(slapt_files) $(slapt_signs) $(slapt_keys) $(slapt_sigs)
+
+RELEASE_DIRECTORIES	+= $(slaptdir) $(slaptbasedir) $(slaptfulldir) $(slaptmaindir) $(slaptdebgdir) $(slaptdevldir) $(slaptsrcsdir) $(slaptfsrcdir)
+RELEASE			+= repo-slapt
+RELEASE_SIGN		+= repo-sign-slapt
+RELEASE_CLEAN_LOCAL	+= repo-clean-slapt
+RELEASECLEANFILES	+= $(slapt_files) $(slapt_signs) $(slapt_keys) $(slapt_sigs)
+
+UPDATE_DIRECTORIES	+= $(slaptdir) $(slaptbasedir) $(slaptfulldir) $(slaptmaindir) $(slaptdebgdir) $(slaptdevldir) $(slaptsrcsdir) $(slaptfsrcdir)
+UPDATE			+= repo-slapt
+UPDATE_SIGN		+= repo-sign-slapt
+UPDATE_CLEAN_LOCAL	+= repo-clean-slapt
+UPDATECLEANFILES	+=
+
+## Release or update txzs have been added to or removed from the repository:
+## update the slapt-get metadata for the repository.
+##
+release-update-splapt:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+
+
+RELEASE_INSTALL		+= release-update-slapt
+RELEASE_UNINISTALL	+= release-update-slapt
+
+UPDATE_INSTALL		+= release-update-slapt
+UPDATE_UNINSTALL	+= release-update-slapt
+
+## BUILD_REPO_SLAPT_GET
+endif
+
+## MAINTAINER_MODE
+endif
+
+## BUILD_TXZS
+endif
+
+
+## =============================================================================
+##
+## $Log$
+## =============================================================================
+
+

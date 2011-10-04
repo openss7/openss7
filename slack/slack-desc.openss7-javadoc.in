@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+               |-----handy-ruler------------------------------------------------------|
+openss7-javadoc: openss7-javadoc (OpenSS7 Javadoc files)
+openss7-javadoc:
+openss7-javadoc: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7-javadoc:
+openss7-javadoc: This subpackage contains Javadoc documentation for OpenSS7.  Install
+openss7-javadoc: this subpackage if you are interested in developing JAIN applications
+openss7-javadoc: or resource adapters.  This package is not normally required on other
+openss7-javadoc: than a development system.
+openss7-javadoc:
+openss7-javadoc:
+openss7-javadoc:

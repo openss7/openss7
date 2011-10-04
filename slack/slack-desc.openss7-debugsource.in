@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+                   |-----handy-ruler------------------------------------------------------|
+openss7-debugsource: openss7-debugsource (OpenSS7 debugging source)
+openss7-debugsource:
+openss7-debugsource: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7-debugsource:
+openss7-debugsource: This subpackage contains source code for debugging libraries and
+openss7-debugsource: applications programs.  This subpackage provides debug information for
+openss7-debugsource: subpackage openss7-lib and openss7-compat.  Debug information is
+openss7-debugsource: useful when developing applications that use this package or when
+openss7-debugsource: debugging this package.  THIS SUBPACKAGE IS NEVER BUILT FOR SLACKWARE
+openss7-debugsource: LINUX AND ALL THE DEBUGGING INFORMATION (AND SOURCE) IS STRIPPED FROM
+openss7-debugsource: ALL BINARIES.

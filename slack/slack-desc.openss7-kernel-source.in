@@ -1,0 +1,19 @@
+# HOW TO EDIT THIS FILE:
+# The "handy ruler" below makes it easier to edit a package description.  Line
+# up the first '|' above the ':' following the base package name, and the '|' on
+# the right side marks the last column you can put a character in.  You must make
+# exactly 11 lines for the formatting to be correct.  It's also customary to
+# leave one space after the ':'.
+
+                     |-----handy-ruler------------------------------------------------------|
+openss7-kernel-source: openss7-kernel-source (OpenSS7 Slackware configured source code)
+openss7-kernel-source:
+openss7-kernel-source: OpenSS7 provides Linux Fast-STREAMS for Slackware Linux.
+openss7-kernel-source:
+openss7-kernel-source: This subpackage contains the source code necessary for building the
+openss7-kernel-source: OpenSS7 release for the kernel version @kversion@.  It also includes
+openss7-kernel-source: the autoconf configuration utilities necessary to create and
+openss7-kernel-source: distribute txz packages.  However, to develop on the package, it would
+openss7-kernel-source: be better to use the tarball release.  Load this package if you need
+openss7-kernel-source: some files from the build that are not present in the
+openss7-kernel-source: openss7-kernel-devel subpackage.

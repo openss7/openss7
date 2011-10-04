@@ -70,6 +70,8 @@ AC_DEFUN([_TXZ_SLACK], [dnl
     _TXZ_ARCH_OUTPUT
     AM_CONDITIONAL([BUILD_TXZS], [test ":$txz_cv_pkgs" = :yes])dnl
     AM_CONDITIONAL([BUILD_REPO_SLACKPKG], [test ":$txz_cv_repo_slackpkg" = :yes])
+    AM_CONDITIONAL([BUILD_REPO_SLAPT_GET], [test ":$txz_cv_repo_slapt_get" = :yes])
+    AM_CONDITIONAL([BUILD_REPO_SLAPT_SRC], [test ":$txz_cv_repo_slapt_src" = :yes])
 ])# _TXZ_SLACK
 # =============================================================================
 
@@ -332,6 +334,8 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 # -----------------------------------------------------------------------------
 AC_DEFUN([_TXZ_REPO_SETUP], [dnl
     _TXZ_REPO_SETUP_SLACKPKG
+    _TXZ_REPO_SETUP_SLAPT_GET
+    _TXZ_REPO_SETUP_SLAPT_SRC
 ])# _TXZ_REPO_SETUP
 # =============================================================================
 
@@ -356,7 +360,64 @@ AC_DEFUN([_TXZ_REPO_SETUP_SLACKPKG], [dnl
     AC_CACHE_CHECK([for slackpkg repo construction], [txz_cv_repo_slackpkg], [dnl
 	txz_cv_repo_slackpkg=${enable_repo_slackpkg:-no}
     ])
+    slackdir='$(txzdistdir)'
+    AC_SUBST([slackdir])dnl
+    slackfulldir='$(topdir)/full'
+    AC_SUBST([slackfulldir])dnl
+    slackmaindir='$(topdir)/main'
+    AC_SUBST([slackmaindir])dnl
+    slackdebgdir='$(topdir)/debug'
+    AC_SUBST([slackdebgdir])dnl
+    slackdevldir='$(topdir)/devel'
+    AC_SUBST([slackdevldir])dnl
+    slacksrcsdir='$(topdir)/source'
+    AC_SUBST([slacksrcsdir])dnl
+    slacksrcedir='$(topdir)/source'
+    AC_SUBST([slacksrcedir])dnl
+
 ])# _TXZ_REPO_SETUP_SLACKPKG
+# =============================================================================
+
+# =============================================================================
+# _TXZ_REPO_SETUP_SLAPT_GET
+# -----------------------------------------------------------------------------
+# These commands are needed to set up a slapt-get repository.  In fact there are
+# no special tools required to set up a slapt-get repository.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_TXZ_REPO_SETUP_SLAPT_GET], [dnl
+    AC_ARG_ENABLE([repo-slapt-get],
+	[AS_HELP_STRING([--disable-repo-slapt-get],
+	    [slapt-get repo construction @<:@default=auto@:>@])],
+	[], [enable_repo_slapt_get=yes])
+    AC_CACHE_CHECK([for slapt-get repo construction], [txz_cv_repo_slapt_get], [dnl
+	if test ${txz_cv_pkgs:-no} != no; then
+	    txz_cv_repo_slapt_get=${enable_repo_slapt_get:-no}
+	else
+	    txz_cv_repo_slapt_get=no
+	fi
+    ])
+])# _TXZ_REPO_SETUP_SLAPT_GET
+# =============================================================================
+
+# =============================================================================
+# _TXZ_REPO_SETUP_SLAPT_SRC
+# -----------------------------------------------------------------------------
+# These commands are needed to set up a slapt-src repository.  In fact there are
+# no special tools required to set up a slapt-src repository.
+# -----------------------------------------------------------------------------
+AC_DEFUN([_TXZ_REPO_SETUP_SLAPT_SRC], [dnl
+    AC_ARG_ENABLE([repo-slapt-src],
+	[AS_HELP_STRING([--disable-repo-slapt-src],
+	    [slapt-src repo construction @<:@default=auto@:>@])],
+	[], [enable_repo_slapt_src=yes])
+    AC_CACHE_CHECK([for slapt-src repo construction], [txz_cv_repo_slapt_src], [dnl
+	if test ${txz_cv_pkgs:-no} != no; then
+	    txz_cv_repo_slapt_src=${enable_repo_slapt_src:-no}
+	else
+	    txz_cv_repo_slapt_src=no
+	fi
+    ])
+])# _TXZ_REPO_SETUP_SLAPT_SRC
 # =============================================================================
 
 # =============================================================================
@@ -365,23 +426,33 @@ AC_DEFUN([_TXZ_REPO_SETUP_SLACKPKG], [dnl
 AC_DEFUN([_TXZ_ARCH_OUTPUT], [dnl
 dnl the conditional confuses automake forcing extra config.status runs.
 dnl if test ":${REPO_ADD:-no}" != :no -a ":${REPO_REMOVE:-no}" != :no; then
-dnl	AC_CONFIG_FILES([arch/PKGBUILD
-dnl			 arch/install_header])
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME]).install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-repo.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-base.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-libs.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-compat.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-devel.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debuginfo.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-debugsource.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-devel.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debuginfo.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-debugsource.install)
-dnl	AC_CONFIG_FILES(arch/m4_ifdef([AC_PACKAGE_TARNAME],[AC_PACKAGE_TARNAME])-kernel-source.install)
-dnl	install_header="arch/install_header"
-dnl	AC_SUBST_FILE([install_header])
+
+	AC_CONFIG_FILES([slack/]AC_PACKAGE_TARNAME[.SlackBuild
+			 slack/]AC_PACKAGE_TARNAME[.info
+			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-base
+			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-compat
+			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-devel
+			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-doc
+			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-java
+			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-kernel
+			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-lib
+			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-repo
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-base
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-compat
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-debuginfo
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-debugsource
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-devel
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-doc
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-java
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-javadoc
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-kernel-debuginfo
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-kernel-debugsource
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-kernel-devel
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-kernel-source
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-kernel
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-lib
+			 slack/slack-desc.]AC_PACKAGE_TARNAME[-repo
+			 slack/slack-desc.]AC_PACKAGE_TARNAME)
 dnl fi
 ])# _TXZ_ARCH_OUTPUT
 # =============================================================================
