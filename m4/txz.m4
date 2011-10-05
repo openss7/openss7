@@ -323,6 +323,22 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 		AC_MSG_WARN([Cannot find slacktrack program in PATH.]) ;;
 	    (*) enable_txzs=no ;;
 	esac])
+    AC_ARG_VAR([SPKG],
+	       [spkg command. @<:@default=spkg@:>@])
+    _BLD_PATH_PROG([SPKG], [spkg], [${am_missing3_run}spkg], [$tmp_path], [dnl
+	case "$target_vendor" in
+	    (slackware)
+		AC_MSG_WARN([Cannot find spkg program in PATH.]) ;;
+	    (*) enable_txzs=no ;;
+	esac])
+    AC_ARG_VAR([SLKBUILD],
+	       [slkbuild command. @<:@default=slkbuild@:>@])
+    _BLD_PATH_PROG([SLKBUILD], [slkbuild], [${am_missing3_run}slkbuild], [$tmp_path], [dnl
+	case "$target_vendor" in
+	    (slackware)
+		AC_MSG_WARN([Cannot find slkbuild program in PATH.]) ;;
+	    (*) enable_txsz=no ;;
+	esac])
     AC_CACHE_CHECK([for building of txzs], [txz_cv_pkgs], [dnl
 	txz_cv_pkgs=${enable_txzs:-no}
     ])

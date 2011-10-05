@@ -2747,11 +2747,14 @@ $(aptr_xzips): %.xz : %
 
 GENCOMPRESSEDDATA = \
 	if test -s $$f ; then \
-		$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
+		$(ECHO_Q) "  GEN   $$f.gz" ; \
+		$(ECHO_V) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
 		$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
-		$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
+		$(ECHO_Q) "  GEN   $$f.bz2" ; \
+		$(ECHO_V) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
 		$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
-		$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
+		$(ECHO_Q) "  GEN   $$f.xz" ; \
+		$(ECHO_V) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
 		$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
 	fi
 
