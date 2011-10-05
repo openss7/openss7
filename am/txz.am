@@ -98,48 +98,53 @@ if MAINTAINER_MODE
 if BUILD_REPO_SLACKPKG
 ## BUILD_REPO_SLACKPKG
 
+slack_dirs		= $(txzdistdir) \
+			  $(slackfulldir) \
+			  $(slackmaindir) \
+			  $(slackdebgdir) \
+			  $(slackdevldir) \
+			  $(slacksrcsdir) \
+			  $(slacksrcedir)
 
-slack_checksums		= $(txzdistdir)/CHECKSUMS.md5 \
-			  $(slackfulldir)/CHECKSUMS.md5 \
-			  $(slackmaindir)/CHECKSUMS.md5 \
-			  $(slackdebgdir)/CHECKSUMS.md5 \
-			  $(slackdevldir)/CHECKSUMS.md5 \
-			  $(slacksrcsdir)/CHECKSUMS.md5 \
-			  $(slacksrcedir)/CHECKSUMS.md5
+slack_checksums		= $(slack_dirs:%=%/CHECKSUMS.md5)
 
-slack_keys		= $(txzdistdir)/GPG-KEY
+slack_packages		= $(slack_dirs:%=%/PACKAGES.TXT)
 
-slack_signs		= $(txzdistdir)/CHECKSUMS.md5.asc \
-			  $(slackfulldir)/CHECKSUMS.md5.asc \
-			  $(slackmaindir)/CHECKSUMS.md5.asc \
-			  $(slackdebgdir)/CHECKSUMS.md5.asc \
-			  $(slackdevldir)/CHECKSUMS.md5.asc \
-			  $(slacksrcsdir)/CHECKSUMS.md5.asc \
-			  $(slacksrcedir)/CHECKSUMS.md5.asc
+slack_filelists		= $(txzdistdir)/FILELIST.TXT \
+			  $(slack_dirs:%=%/FILE_LIST)
 
-slack_package_files	= $(txzdistdir)/PACKAGES.TXT \
-			  $(slackfulldir)/PACKAGES.TXT \
-			  $(slackmaindir)/PACKAGES.TXT \
-			  $(slackdebgdir)/PACKAGES.TXT \
-			  $(slackdevldir)/PACKAGES.TXT \
-			  $(slacksrcsdir)/PACKAGES.TXT \
-			  $(slacksrcedir)/PACKAGES.TXT
+slack_manifests		= $(slack_dirs:%=%/MANIFEST.bz2)
 
-slack_file_lists	= $(txzdistdir)/FILELIST.TXT \
-			  $(slackfulldir)/FILE_LIST \
-			  $(slackmaindir)/FILE_LIST \
-			  $(slackdebgdir)/FILE_LIST \
-			  $(slackdevldir)/FILE_LIST \
-			  $(slacksrcsdir)/FILE_LIST \
-			  $(slacksrcedir)/FILE_LIST
+slack_changelogs	= $(slack_dirs:%=%/ChangeLog.txt)
 
-slack_manifests		= $(txzdistdir)/MANIFEST.bz2 \
-			  $(slackfulldir)/MANIFEST.bz2 \
-			  $(slackmaindir)/MANIFEST.bz2 \
-			  $(slackdebgdir)/MANIFEST.bz2 \
-			  $(slackdevldir)/MANIFEST.bz2 \
-			  $(slacksrcsdir)/MANIFEST.bz2 \
-			  $(slacksrcedir)/MANIFEST.bz2
+slack_gzips		= $(slack_changelogs:%=%.gz) \
+			  $(slack_packages:%=%.gz) \
+			  $(slack_filelists:%=%.gz) \
+			  $(slack_checksums:%=%.gz)
+
+slack_bzips		= $(slack_packages:%=%.bz2) \
+			  $(slack_filelists:%=%.bz2)
+
+slack_xzips		= $(slack_packages:%=%.xz) \
+			  $(slack_filelists:%=%.xz)
+
+slack_zips		= $(slack_gzips) \
+			  $(slack_bzips) \
+			  $(slack_xzips)
+
+slack_files		= $(slack_packages) \
+			  $(slack_manifests) \
+			  $(slack_changslogs) \
+			  $(slack_filelists) \
+			  $(slack_xzips) \
+			  $(slack_bzips) \
+			  $(slack_gzips) \
+			  $(slack_checksums)
+
+slack_keys		= $(slack_dirs:%=%/GPG-KEY)
+
+slack_signs		= $(slack_checksums:%=%.asc) \
+			  $(slack_checksums:%=%.gz.asc)
 
 
 ##
@@ -184,7 +189,7 @@ slack_manifests		= $(txzdistdir)/MANIFEST.bz2 \
 ##
 ## Slapt-get will also add (per package directory):
 ##
-## Note that jaos.org hase the following structure:
+## Note that jaos.org has the following structure:
 ##
 ##  source ->
 ##    gslapt ->
@@ -207,73 +212,100 @@ slack_manifests		= $(txzdistdir)/MANIFEST.bz2 \
 ##  PACKAGES.TXT.gz
 ##   
 
+$(slack_changelogs):
+	$(AM_V_GEN)( cd $$(dirname $@); \
+		TZ=UTC date; \
+		$(ECHO) "Repository update."; \
+		$(ECHO) ""; \
+		$(ECHO) "Have fun!"; \
+		if [ -s $@ ]; then \
+			$(ECHO) "+--------------------------+"; \
+			cat $@; \
+		fi; \
+	) >$@.new; \
+	mv -f -- $@.new $@
+
 
 $(slack_manifests):
-	( cd $$(dirname $@); \
-	  find . -name '*.txz' | sort -u | while read f; do \
-	  	echo "++========================================"; \
-	  	echo "||"; \
-		echo "||   Package:  $$f"; \
-	  	echo "||"; \
-	  	echo "++========================================"; \
-		TZ='UTC' tar tvf $$f; \
-		echo "";
-		echo "";
-	  done; \
+	$(AM_V_GEN)( cd $$(dirname $@); \
+		find . -name '*.txz' | sort -u | while read p; do \
+			$(ECHO) "++========================================"; \
+			$(ECHO) "||"; \
+			$(ECHO) "||   Package:  $$p"; \
+			$(ECHO) "||"; \
+			$(ECHO) "++========================================"; \
+			TZ='UTC' tar tvf $$p; \
+			$(ECHO) "";
+			$(ECHO) "";
+		done; \
 	) | bzip -c >$@
 
-$(slack_package_files):
-	cwd=`pwd`; \
-	( echo "PACKAGES.TXT;  `date`"; \
-	  echo ""; \
-	  echo "This file provides details on the Slackware packages found"; \
-	  echo "in the ./$(basename $$cwd)/ directory."; \
-	  echo ""; \
-	  echo "Total size of all packages (compressed): `find $$cwd -name '*.txz' | xargs du -ch | tail -1 | awk '{print$$1}'`"; \
-	  echo "Total size of all packages (uncompressed): "; \
-	  echo ""; \
-	  echo ""; \
-	  find $$cwd -name '*.txz' | sort -u | while read f; do \
-		echo "PACKAGE NAME:  $$(basename $$f)"; \
-		echo "PACKAGE LOCATION:  `echo $$(dirname $$f) | sed -e 's,^'$$cwd',./'$$(basename $$cwd)','`"; \
-		echo "PACKAGE SIZE (compressed):  "; \
-		echo "PACKAGE SIZE (uncompressed):  "; \
-		echo "PACKAGE DESCRIPTION:"; \
-		tar xf $$f -O install/slack-desc | egrep -v '^[#[:space:]]|^$$'; \
-		echo ""; \
-	  done; \
+$(slack_packages):
+	$(AM_V_GEN)( cd $$(dirname $@); \
+		$(ECHO) "PACKAGES.TXT;  `date`" >/dev/null; \
+		$(ECHO) "" >/dev/null; \
+		$(ECHO) "This file provides details on the Slackware packages found" >/dev/null; \
+		$(ECHO) "in the ./$$(basename $$(pwd))/ directory." >/dev/null; \
+		$(ECHO) "" >/dev/null; \
+		$(ECHO) "Total size of all packages (compressed):  $$(find $$(pwd) -name '*.txz' | xargs du -cbk | tail -1 | awk '{print$$1 \"K\"}')"; \
+		$(ECHO) "Total size of all packages (uncompressed):  $$(expr $$(find $$(pwd) -name '*.txz' | xargs xzcat | wc -c) / 1024) K"; \
+		$(ECHO) ""; \
+		$(ECHO) ""; \
+		find $$(pwd) -name '*.txz' | sort -u | while read p; do \
+			m=`echo "$$p" | sed 's,\.tgz$$,.meta,'`; \
+		{ \
+			$(ECHO) "PACKAGE NAME:  $$(basename $$p)"; \
+			$(ECHO) "PACKAGE LOCATION:  `echo $$(dirname $$p) | sed -e 's,^'$$(pwd)',./'$$(basename $$(pwd))','`"; \
+			$(ECHO) "PACKAGE SIZE (compressed):  $$(du -bk $$p | awk '{print$$1}') K"; \
+			$(ECHO) "PACKAGE SIZE (uncompressed):  $$(expr $$(xzcat $$p | wc -c) / 1024) K"; \
+			$(ECHO) "PACKAGE REQUIRED:  $$(tar xOf $$p install/slack-required 2>/dev/null|tr '\n' ','|sed 's/,$$//')"; \
+			$(ECHO) "PACKAGE CONFLICTS:  $$(tar xOf $$p install/slack-conflicts 2>/dev/null|tr '\n' ','|sed 's/,$$//')"; \
+			$(ECHO) "PACKAGE SUGGESTS:  $$(tar xOf $$p install/slack-suggests 2>/dev/null|tr '\n' ' '|sed 's/ $$//')"; \
+			$(ECHO) "PACKAGE DESCRIPTION:"; \
+			tar -xOf $$p install/slack-desc | egrep -v '^[#[:space:]]|^$$'; \
+			$(ECHO) ""; \
+		} |tee $$m; \
+		done; \
 	) >$@
 
-$(slack_file_lists):
-	( date; \
-	  echo ""; \
-	  echo "Here is the file list for this directory.  If you are using a"; \
-	  echo "mirror site and find missing or extra files in the disk"; \
-	  echo "subdirectories, please have the archive administrator refresh"; \
-	  echo "the mirror."; \
-	  echo ""; \
-	  cd $$(dirname $@); \
-	  find . | sort -u | TZ='UTC' xargs ls -ld; \
+$(slack_filelists): %/FILE_LIST : %/MANIFEST.bz2 %/PACKAGES.TXT
+	$(AM_V_GEN)( cd $$(dirname $@); \
+		date; \
+		$(ECHO) ""; \
+		$(ECHO) "Here is the file list for this directory.  If you are using a"; \
+		$(ECHO) "mirror site and find missing or extra files in the disk"; \
+		$(ECHO) "subdirectories, please have the archive administrator refresh"; \
+		$(ECHO) "the mirror."; \
+		$(ECHO) ""; \
+		find . | sort -u | TZ='UTC' xargs ls -ld; \
 	) >$@
 
-$(txzdistdir)/CHECKSUMS.md5:
-	( echo "These are the MD5 message disgests for the files in this directory."; \
-	  echo "If you want to test your files, use 'md5sum' and compare the values to"; \
-	  echo "the ones listed here."; \
-	  echo ""; \
-	  echo "To test all these files, use this command:"; \
-	  echo ""; \
-	  echo "md5sum -c CHECKSUMS.md5 | less"; \
-	  echo ""; \
-	  echo "'md5sum' can be found in the GNU coreutils package on ftp.gnu.org in"; \
-	  echo "/pub/gnu, or at any GNU mirror site."; \
-	  echo "";
-	  cd $$(dirname $@); \
-	  find . -type f | grep -v 'CHECKSUMS.md5' | xargs md5sum; \
+$(slack_checksums): %/CHECKSUMS.md5 : %/MANIFEST.bz2 %/ChangeLog.txt.gz \
+		    %/PACKAGES.TXT.gz %/PACKAGES.TXT.bz2 %/PACKAGES.TXT.xz \
+		    %/FILE_LIST.gz    %/FILE_LIST.bz2    %/FILE_LIST.xz
+	$(AM_V_GEN)( cd $$(dirname $@); \
+		$(ECHO) "These are the MD5 message disgests for the files in this directory."; \
+		$(ECHO) "If you want to test your files, use 'md5sum' and compare the values to"; \
+		$(ECHO) "the ones listed here."; \
+		$(ECHO) ""; \
+		$(ECHO) "To test all these files, use this command:"; \
+		$(ECHO) ""; \
+		$(ECHO) "md5sum -c CHECKSUMS.md5 | less"; \
+		$(ECHO) ""; \
+		$(ECHO) "'md5sum' can be found in the GNU coreutils package on ftp.gnu.org in"; \
+		$(ECHO) "/pub/gnu, or at any GNU mirror site."; \
+		$(ECHO) "";
+		find . -type f | grep -v 'CHECKSUMS.md5' | xargs md5sum; \
 	) >$@
 
-$(txzdistdir)/CHECKSUMS.md5.gz: %.gz : %
-	gzip $< >$@
+$(slack_gzips): %.gz : %
+	$(AM_V_GEN)$(GZIP_CMD) $(GZIP) -c $< >$@
+
+$(slack_bzips): %.bz2 : %
+	$(AM_V_GEN)$(BZIP2_CMD) $(BZIP2) -c $< >$@
+
+$(slack_xzips): %.xz : %
+	$(AM_V_GEN)$(XZ_CMD) $(XZ) -c $< >$@
 
 GPGVERIFYSIGN = \
 	if test ! -f $@ || ! $(GPG) --verify -- $@ >/dev/null 2>&1; then \
@@ -317,6 +349,279 @@ $(txzdistdir)/$(PACKAGE)-srcrc:: Makefile
 
 $(txzdistdir)/$(PACKAGE)-local-srcrc:: Makefile
 
+repo-slack: $(RELEASE_DIRECTORIES) $(slack_files)
+
+repo-sign-slack: $(RELEASE_DIRECTORIES) $(slack_signs) $(slack_keys) $(slack_sigs)
+
+repo-clean-slack:
+	@$(ECHO_V) "Making $@ in `pwd`"
+
+REPO_DIRECTORIES	+= $(txzdistdir) $(slackbasedir) $(slackfulldir) $(slackmaindir) $(slackdebgdir) $(slackdevldir) $(slacksrcsdir) $(slackfsrcdir)
+REPO			+= repo-slack
+REPO_SIGN		+= repo-sign-slack
+REPO_CLEAN_LOCAL	+= repo-clean-slack
+REPOCLEANFILES		+= $(slack_files) $(slack_signs) $(slack_keys) $(slack_sigs)
+
+RELEASE_DIRECTORIES	+= $(txzdistdir) $(slackbasedir) $(slackfulldir) $(slackmaindir) $(slackdebgdir) $(slackdevldir) $(slacksrcsdir) $(slackfsrcdir)
+RELEASE			+= repo-slack
+RELEASE_SIGN		+= repo-sign-slack
+RELEASE_CLEAN_LOCAL	+= repo-clean-slack
+RELEASECLEANFILES	+= $(slack_files) $(slack_signs) $(slack_keys) $(slack_sigs)
+
+UPDATE_DIRECTORIES	+= $(txzdistdir) $(slackbasedir) $(slackfulldir) $(slackmaindir) $(slackdebgdir) $(slackdevldir) $(slacksrcsdir) $(slackfsrcdir)
+UPDATE			+= repo-slack
+UPDATE_SIGN		+= repo-sign-slack
+UPDATE_CLEAN_LOCAL	+= repo-clean-slack
+UPDATECLEANFILES	+=
+
+GENCOMPRESSEDDATA = \
+	if test -s $$f ; then \
+		$(ECHO) " $(GZIP_CMD) $(GZIP) -c $$f >$$f.gz" ; \
+		$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz ; \
+		$(ECHO) " $(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2" ; \
+		$(BZIP2_CMD) $(BZIP2) -c $$f >$$f.bz2 ; \
+		$(ECHO) " $(XZ_CMD) $(XZ) -c $$f >$$f.xz" ; \
+		$(XZ_CMD) $(XZ) -c $$f >$$f.xz ; \
+	fi
+
+GENSIGNEDDATA = \
+	for s in '' .gz .bz2 .lzma .xz; do \
+		rm -f -- $$f$$s.asc ; \
+		test -s $$f$$s || continue ; \
+		if test ! -f $$f$$s || ! $(GPG) --verify -- $$f$$s >/dev/null 2>&1; then \
+			$(ECHO_Q) "  GEN   $$(basename $$f$$s)" ; \
+			$(ECHO_V) "$(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f$$s >$$f$$s.asc 2>/dev/null"; \
+			eval "$$pipe $(GPG) -ba --passphrase-fd 0$$user$$home$$pass -o- -- $$f$$s >$$f$$s.asc 2>/dev/null"; \
+		else \
+			$(ECHO) "D: gpg OK  $$f$$s.asc" ; \
+			touch "$$f$$s.asc" ; \
+		fi ; \
+	done
+
+## Release or update txzs have been added to or removed from the repository:
+## update the slackware metadata for the repository.
+##
+release-update-slack:
+	@$(ECHO_V) "D: Making $@ in `pwd`"
+	test '$(DISTDIR)' != '$(REPODIR)' || exit 0 ; \
+	user='$(GNUPGUSER)'; user="$${user:+ -u }$$user" ; \
+	home='$(GNUPGHOME)'; home="$${home:+ --homedir }$$home" ; \
+	pass='$(GNUPGPASS)'; pass="$${pass:+ --batch }" ; \
+	pipe='$(GNUPGPASS)'; pipe="$${pipe:+$(ECHO) $$pipe |}" ; \
+	empty_repo=yes; \
+	repodir=`echo '$(txzdistdir)' | sed -e 's,^$(DISTDIR),$(REPODIR),'` ; \
+	tardir=`echo '$(tardir)' | sed 's,^$(DISTDIR),$(REPODIR),'` ; \
+	rb=`echo '$(repobranch)' | sed -e s',^//*,,'` ; \
+	for b in '' updates extras testing $$rb ; do \
+		dir="$${repodir}$${b:+/$$b}" ; \
+		for r in main debug devel source '' ; do \
+			comp="$${r:-full}" ; \
+			sub="$${dir}/$$comp" ; \
+			$(ECHO) "D: $@: processing directory $$sub" ; \
+			test -d $$sub || { $(ECHO) "  $(MKDIR_P) -- $$sub" ; $(MKDIR_P) -- $$sub ; } ; \
+			$(ECHO_V) "D: $@: find $$sub -name '*.tgz'" ; \
+			tgzs=`find $$sub -name '*.tgz' 2>/dev/null` ; \
+			for f in $$tgzs ; do \
+				if test -L $$f ; then  \
+					link=`readlink $$f` ; \
+					case "$$link" in (/*) ;; (*) link="$$sub/$$link" ;; esac ; \
+					if test ! -e "$$link" ; then \
+						$(ECHO) " rm -f -- $$f" ; \
+						rm -f -- $$f ; \
+					fi ; \
+				fi ; \
+			done ; \
+			( \
+				$(ECHO_V) "D: cd $$sub" ; cd $$sub ; \
+				$(ECHO_V) "D: find $$dir/packages -follow -name '*.tgz' 2>/dev/null" ; \
+				tgzs="`find $$sub -follow -name '*.tgz' 2>/dev/null | LANG= sort -u | \
+					case \"$${r:-full}\" in \
+					(main)	 grep -v -- '\(-debug\|-devel\|source-\|\.tar\.xz$$\)' ;; \
+					(debug)	 grep -v -- '\(-devel\|source-\|\.tar\.xz$$\)' | grep -- '-debug' ;; \
+					(devel)	 grep -v -- '\(-debug\|source-\|\.tar\.xz$$\)' | grep -- '-devel' ;; \
+					(source) grep -- 'source-' ;; \
+					(full)	 grep -v -- '\.tar\.xz$$' ;; \
+					esac`" ; \
+				if test -n "$$tgzs" ; then \
+					for f in $$tgzs ; do \
+						if test -L `basename $$f` ; then :; else \
+							$(ECHO) " ln -sf $$f `pwd`" ; \
+							ln -sf $$f . ; \
+						fi ; \
+					done ; \
+				else \
+					$(ECHO) " rmdir -pv -- $$sub"; \
+					rmdir -pv -- $$sub || :; \
+				fi ; \
+			) ; \
+		done ; \
+		empty_subrepo=yes; \
+		base="$$dir/base" ; \
+		test -d $$base || { $(ECHO) "  $(MKDIR_P) $$base" ; $(MKDIR_P) $$base ; } ; \
+		for r in main debug devel source '' ; do \
+			comp=$${r:-full} ; \
+			sub="$$dir/$$comp" ; \
+			f=pkglist.$$comp ; \
+			if test -d $$sub ; then \
+				( \
+					$(ECHO) "cd $$base" ; cd $$base ; \
+					$(ECHO) "$(GENPKGLIST) --index srpm_idx --meta $$comp --bloat $$dir $$comp" ; \
+					$(GENPKGLIST) --index srpm_idx --meta $$comp --bloat $$dir $$comp ; \
+					$(GENCOMPRESSEDDATA) ; \
+				) ; \
+				empty_subrepo=no; \
+				empty_repo=no; \
+			else \
+				( \
+					$(ECHO) "cd $$base" ; cd $$base ; \
+					$(ECHO) "rm -f -- $$f $$f.gz $$f.bz2 $$f.lzma $$f.xz" ; \
+					rm -f -- $$f $$f.gz $$f.bz2 $$f.lzma $$f.xz ; \
+				) ; \
+			fi ; \
+		done ; \
+		if test $${empty_subrepo:-yes} = no ; then \
+		( \
+			$(ECHO) "cd $$base" ; cd $$base ; \
+			comps=; \
+			for r in main debug devel source '' ; do \
+				comp=$${r:-full} ; \
+				sub="$$dir/$$comp" ; \
+				$(ECHO) "cd $$base" ; cd $$base ; \
+				f=PACKAGES.TXT ; \
+				$(ECHO_Q) "  GEN   $$(basename $$f)" ; \
+				( \
+					$(ECHO) "$$f;  `date`"; \
+					$(ECHO) ""; \
+					$(ECHO) "This file provides details on the Slackware packages found"; \
+					$(ECHO) "in the ./$$(basename $$(pwd))/ directory."; \
+					$(ECHO) ""; \
+					$(ECHO) "Total size of all packages (compressed): `find $$(pwd) -name '*.txz' | xargs du -ch | tail -1 | awk '{print$$1}'`"; \
+					$(ECHO) "Total size of all packages (uncompressed): "; \
+					$(ECHO) ""; \
+					$(ECHO) ""; \
+					find $$(pwd) -name '*.txz' | sort -u | while read p; do \
+						m=`echo "$$p" | sed 's,\.tgz$$,.meta,'`; \
+						if test ! -r $$m -o $$p -nt $$m ; then \
+						{ \
+							$(ECHO) "PACKAGE NAME:  $$(basename $$p)"; \
+							$(ECHO) "PACKAGE LOCATION:  `echo $$(dirname $$p) | sed -e 's,^'$$(pwd)',./'$$(basename $$(pwd))','`"; \
+							$(ECHO) "PACKAGE SIZE (compressed):  $$(du -bk $$p | awk '{print$$1}') K"; \
+							$(ECHO) "PACKAGE SIZE (uncompressed):  $$(expr $$(xzcat $$p | wc -c) / 1024) K"; \
+							$(ECHO) "PACKAGE REQUIRED:  $$(tar xOf $$p install/slack-required 2>/dev/null|tr '\n' ','|sed 's/,$$//')"; \
+							$(ECHO) "PACKAGE CONFLICTS:  $$(tar xOf $$p install/slack-conflicts 2>/dev/null|tr '\n' ','|sed 's/,$$//')"; \
+							$(ECHO) "PACKAGE SUGGESTS:  $$(tar xOf $$p install/slack-suggests 2>/dev/null|tr '\n' ' '|sed 's/ $$//')"; \
+							$(ECHO) "PACKAGE DESCRIPTION:"; \
+							tar -xOf $$p install/slack-desc | egrep -v '^[#[:space:]]|^$$'; \
+							$(ECHO) ""; \
+						} 	|tee $$m; \
+						else \
+							cat $$m; \
+						fi ; \
+					done; \
+				) 	2>&1 >$$f.new; \
+				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
+				$(GENCOMPRESSEDDATA) ; \
+				f=MANIFEST ; \
+				$(ECHO_Q) "  GEN   $$(basename $$f)" ; \
+				( \
+					find . -name '*.tgz' | sort -u | while read p ; do \
+						$(ECHO) "++========================================"; \
+						$(ECHO) "||"; \
+						$(ECHO) "||   Package:  $$p"; \
+						$(ECHO) "||"; \
+						$(ECHO) "++========================================"; \
+						TZ='UTC' tar tvf $$p; \
+						$(ECHO) "";
+						$(ECHO) "";
+					done ; \
+				)	2>&1 >$$f.new ; 
+				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
+				$(GENCOMPRESSEDDATA) ; \
+				f=GPG-KEY ; \
+				$(ECHO_Q) "  GEN   $$(basename $$f)" ; \
+				$(ECHO_V) "$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.new" ; \
+				$(GPG) -a$$user$$home --export $(GNUPGUSER) >$$f.new ; \
+				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
+				f=CHECKSUMS.md5 ; \
+				$(ECHO_Q) "  GEN   $$(basename $$f)" ; \
+				( \
+					$(ECHO) "These are the MD5 message disgests for the files in this directory."; \
+					$(ECHO) "If you want to test your files, use 'md5sum' and compare the values to"; \
+					$(ECHO) "the ones listed here."; \
+					$(ECHO) ""; \
+					$(ECHO) "To test all these files, use this command:"; \
+					$(ECHO) ""; \
+					$(ECHO) "md5sum -c $$(basename $$f) | less"; \
+					$(ECHO) ""; \
+					$(ECHO) "'md5sum' can be found in the GNU coreutils package on ftp.gnu.org in"; \
+					$(ECHO) "/pub/gnu, or at any GNU mirror site."; \
+					$(ECHO) "";
+					find . -type f | grep -v $$f | xargs md5sum; \
+				)	2>&1 >$$f.new ; \
+				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
+				$(GENCOMPRESSEDDATA) ; \
+				$(GENSIGNEDDATA) ; \
+				f=FILE_LIST ; \
+				$(ECHO_Q) "  GEN  $$(basename $$f)" ; \
+				( \
+					date; \
+					$(ECHO) ""; \
+					$(ECHO) "Here is the file list for this directory.  If you are using a"; \
+					$(ECHO) "mirror site and find missing or extra files in the disk"; \
+					$(ECHO) "subdirectories, please have the archive administrator refresh"; \
+					$(ECHO) "the mirror."; \
+					$(ECHO) ""; \
+					find . | sort -u | TZ='UTC' xargs ls -ld; \
+				)	2>&1 >$$f.new ; \
+				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
+				$(ECHO_Q) "  GEN   $$(basename $$f.gz)" ; \
+				$(ECHO_V) "$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz.new" ; \
+				$(GZIP_CMD) $(GZIP) -c $$f >$$f.gz.new ; \
+				$(ECHO_V) "mv -f -- $$f.gz.new $$f.gz" ; mv -f -- $$f.gz.new $$f.gz ; \
+				f=CHECKSUMS.md5 ; \
+				$(ECHO_Q) "  GEN   $$(basename $$f)" ; \
+				( \
+					$(ECHO) "These are the MD5 message disgests for the files in this directory."; \
+					$(ECHO) "If you want to test your files, use 'md5sum' and compare the values to"; \
+					$(ECHO) "the ones listed here."; \
+					$(ECHO) ""; \
+					$(ECHO) "To test all these files, use this command:"; \
+					$(ECHO) ""; \
+					$(ECHO) "md5sum -c $$(basename $$f)) | less"; \
+					$(ECHO) ""; \
+					$(ECHO) "'md5sum' can be found in the GNU coreutils package on ftp.gnu.org in"; \
+					$(ECHO) "/pub/gnu, or at any GNU mirror site."; \
+					$(ECHO) "";
+					find . -type f | grep -v $$f | xargs md5sum; \
+				)	2>&1 >$$f.new ; \
+				$(ECHO_V) "mv -f -- $$f.new $$f" ; mv -f -- $$f.new $$f ; \
+				$(GENCOMPRESSEDDATA) ; \
+				$(GENSIGNEDDATA) ; \
+			done ; \
+		) ; \
+		else \
+		( \
+			$(ECHO_V) "cd $$base" ; cd $$base ; \
+			for f in CHECKSUMS.md5 FILELIST.TXT FILE_LIST PACKAGES.TXT MANIFEST ChangeLog.txt GPG-KEY; do \
+				for e in '' .gz .bz2 .lzma .xz .key .gpg .asc; do \
+					test -e $$f$$e || continue ; \
+					$(ECHO_V) " rm -f -- $$f$$e" ; \
+					rm -f -- $$f$$e ; \
+				done ; \
+			done ; \
+			$(ECHO_V) "rmdir -pv -- $$base" ; \
+			rmdir -pv -- $$base ; \
+			$(ECHO_V) "find $$sub -follow -name '*.meta' | xargs -r rm -f --" ; \
+			find $$sub -follow -name '*.meta' | xargs -r rm -fv -- ; \
+		) ; \
+		fi ; \
+	done
+
+RELEASE_INSTALL		+= release-update-slack
+RELEASE_UNINSTALL	+= release-update-slack
+
+UPDATE_INSTALL		+= release-update-slack
+UPDATE_UNINSTALL	+= release-update-slack
 
 ## BUILD_REPO_SLAPT_SRC
 endif
