@@ -273,7 +273,7 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
-	    isdn_search_path=`echo "$isdn_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    isdn_search_path=`echo "$isdn_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    isdn_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for isdn_dir in $isdn_search_path ; do
@@ -308,7 +308,7 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    eval "isdn_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    isdn_search_path=`echo "$isdn_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    isdn_search_path=`echo "$isdn_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for isdn_dir in $isdn_search_path ; do
 		if test -d "$isdn_dir" ; then
@@ -346,7 +346,7 @@ AC_DEFUN([_ISDN_CHECK_HEADERS], [dnl
 	    eval "isdn_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    isdn_search_path=`echo "$isdn_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    isdn_search_path=`echo "$isdn_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for isdn_dir in $isdn_search_path ; do
 		if test -d "$isdn_dir" ; then

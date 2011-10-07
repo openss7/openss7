@@ -89,7 +89,7 @@ dnl
 	init_cv_inittab='no'
 	eval "init_search_path=\"
 	    ${DESTDIR}${sysconfdir}/inittab\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	for init_tmp in $init_search_path ; do
 	    if test -f $init_tmp ; then
 		init_cv_inittab="$init_tmp"
@@ -104,7 +104,7 @@ dnl
 	init_cv_script='no'
 	if test :"$init_cv_inittab" != :no ; then
 	    init_tmp="$(< $init_cv_inittab | grep -c1 '^si::sysinit:' | sed -e 's|^si::sysinit:||;s|[[[:space:]]].*||')"
-	    init_tmp=`echo "${DESTDIR}${rootdir}$init_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    init_tmp=`echo "${DESTDIR}${rootdir}$init_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    if test -f "$init_tmp" ; then
 		init_cv_script="$init_tmp"
 	    fi
@@ -117,7 +117,7 @@ dnl
 	    eval "init_search_path=\"
 		${DESTDIR}${sysconfdir}/init.d/rcS
 		${DESTDIR}${sysconfdir}/rc.d/rc.sysinit\""
-	    init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    for init_tmp in $init_search_path ; do
 		AC_MSG_CHECKING([for init SysV script... $init_tmp])
 		if test -f $init_tmp ; then
@@ -137,7 +137,7 @@ dnl
 	    ${DESTDIR}${sysconfdir}/rcS.d
 	    ${sysconfdir}/rcS.d
 	    /etc/rcS.d\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	for init_tmp in $init_search_path ; do
 	    AC_MSG_CHECKING([for init SysV rcS.d directory... $init_tmp])
 	    if test -d $init_tmp ; then
@@ -153,7 +153,7 @@ dnl
 	init_cv_rc_dir='no'
 	eval "init_search_path=\"
 	    ${DESTDIR}${sysconfdir}/rc.d\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	for init_tmp in $init_search_path ; do
 	    if test -d $init_tmp ; then
 		init_cv_rc_dir="$init_tmp"
@@ -168,7 +168,7 @@ dnl
 	init_cv_rc_modules='no'
 	eval "init_search_path=\"
 	    ${DESTDIR}${sysconfdir}/rc.d/rc.modules\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	for init_tmp in $init_search_path ; do
 	    if test -f $init_tmp ; then
 		init_cv_rc_modules="$init_tmp"
@@ -183,7 +183,7 @@ dnl
 	init_cv_modules='no'
 	eval "init_search_path=\"
 	    ${DESTDIR}${sysconfdir}/modules\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	for init_tmp in $init_search_path ; do
 	    if test -f $init_tmp ; then
 		init_cv_modules="$init_tmp"
@@ -201,7 +201,7 @@ dnl
 	eval "init_search_path=\"
 	    ${DESTDIR}${sysconfdir}/rc.d/rc[[S0-6]].d
 	    ${DESTDIR}${sysconfdir}/rc[[S0-6]].d\""
-	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_search_path=`echo "$init_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	for init_tmp in $init_search_path ; do
 	    AC_MSG_CHECKING([for init SysV rcX.d directory... $init_tmp])
 	    if test -d $init_tmp ; then
@@ -239,7 +239,7 @@ dnl
 	    ${DESTDIR}${sysconfdir}/rc.d\""
 	for init_tmp in $init_search_path ; do
 	    eval "init_dir=\"$init_tmp\""
-	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_CHECKING([for init SysV init.d directory... $init_dir])
 	    if test -d $init_dir -a ! -L $init_dir ; then
 		init_cv_initrddir="$init_tmp"
@@ -262,7 +262,7 @@ dnl
 	    ${DESTDIR}${sysconfdir}/default\""
 	for init_tmp in $init_search_path ; do
 	    eval "init_dir=\"$init_tmp\""
-	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    init_dir=`echo "$init_dir" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_CHECKING([for init SysV config directory... $init_dir])
 	    if test -d $init_dir ; then
 		init_cv_configdir="$init_tmp"
@@ -290,7 +290,7 @@ dnl
 dnl initrddir is where we are going to put init scripts relative to DESTDIR
 dnl
     if test :"${init_cv_initrddir:-no}" != :no ; then
-	init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	initrddir="${init_cv_initrddir#$init_tmp}"
     else
 	if test :${init_cv_rcs_dir:-no} = :no ; then
@@ -306,7 +306,7 @@ dnl
 dnl configdir is where we are going to put init script default files relative to DESTDIR
 dnl
     if test :"${init_cv_configdir:-no}" != :no ; then
-	init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	init_tmp=`echo "${DESTDIR}" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	configdir="${init_cv_configdir#$init_tmp}"
     else
 	if test :${init_cv_rcs_dir:-no} = :no ; then

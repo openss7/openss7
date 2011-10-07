@@ -273,7 +273,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
-	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    sock_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for sock_dir in $sock_search_path ; do
@@ -308,7 +308,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    eval "sock_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for sock_dir in $sock_search_path ; do
 		if test -d "$sock_dir" ; then
@@ -346,7 +346,7 @@ AC_DEFUN([_SOCK_CHECK_HEADERS], [dnl
 	    eval "sock_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    sock_search_path=`echo "$sock_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for sock_dir in $sock_search_path ; do
 		if test -d "$sock_dir" ; then

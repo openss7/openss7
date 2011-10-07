@@ -138,7 +138,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
     AC_CACHE_CHECK([for dist build lsb release file], [dist_cv_build_lsb_file], [dnl
 	eval "dist_search_path=\"
 	    /etc/lsb-release\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
+	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
 	for dist_file in $dist_search_path
 	do
 	    if test -f "$dist_file"
@@ -171,7 +171,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	    /etc/system-release
 	    /etc/debian_version
 	    /etc/release\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
+	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
 	for dist_file in $dist_search_path
 	do
 	    if test -f "$dist_file"
@@ -188,7 +188,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 	eval "dist_search_path=\"
 	    /etc/issue
 	    /etc/issue.net\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
+	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
 	for dist_file in $dist_search_path
 	do
 	    if test -f "$dist_file"
@@ -488,7 +488,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
     AC_CACHE_CHECK([for dist host lsb release file], [dist_cv_host_lsb_file], [dnl
 	eval "dist_search_path=\"
 	    ${DESTDIR}${sysconfdir}/lsb-release\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
+	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
 	for dist_file in $dist_search_path
 	do
 	    if test -f "$dist_file"
@@ -521,7 +521,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	    ${DESTDIR}${sysconfdir}/system-release
 	    ${DESTDIR}${sysconfdir}/debian_version
 	    ${DESTDIR}${sysconfdir}/release\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
+	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
 	for dist_file in $dist_search_path
 	do
 	    if test -f "$dist_file"
@@ -538,7 +538,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	eval "dist_search_path=\"
 	    ${DESTDIR}${sysconfdir}/issue
 	    ${DESTDIR}${sysconfdir}/issue.net\""
-	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g')
+	dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
 	for dist_file in $dist_search_path
 	do
 	    if test -f "$dist_file"

@@ -443,7 +443,8 @@ AC_DEFUN([_TXZ_ARCH_OUTPUT], [dnl
 dnl the conditional confuses automake forcing extra config.status runs.
 dnl if test ":${REPO_ADD:-no}" != :no -a ":${REPO_REMOVE:-no}" != :no; then
 
-	AC_CONFIG_FILES([slack/]AC_PACKAGE_TARNAME[.SlackBuild
+	AC_CONFIG_FILES([slack/SLKBUILD
+			 slack/]AC_PACKAGE_TARNAME[.SlackBuild
 			 slack/]AC_PACKAGE_TARNAME[.info
 			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-base
 			 slack/doinst.sh-]AC_PACKAGE_TARNAME[-compat

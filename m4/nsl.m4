@@ -301,7 +301,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
-	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    nsl_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for nsl_dir in $nsl_search_path ; do
@@ -336,7 +336,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    eval "nsl_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for nsl_dir in $nsl_search_path ; do
 		if test -d "$nsl_dir" ; then
@@ -374,7 +374,7 @@ AC_DEFUN([_NSL_CHECK_HEADERS], [dnl
 	    eval "nsl_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    nsl_search_path=`echo "$nsl_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for nsl_dir in $nsl_search_path ; do
 		if test -d "$nsl_dir" ; then

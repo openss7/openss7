@@ -588,7 +588,7 @@ AC_DEFUN([_LIS_CHECK_HEADERS], [dnl
 		${DESTDIR}/usr/include/LiS
 		${DESTDIR}/usr/local/include/LiS
 		${DESTDIR}/usr/src/LiS/include\""
-	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    streams_cv_lis_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for streams_dir in $streams_search_path ; do
@@ -623,7 +623,7 @@ AC_DEFUN([_LIS_CHECK_HEADERS], [dnl
 	    eval "streams_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for streams_dir in $streams_search_path ; do
 		if test -d "$streams_dir" ; then
@@ -661,7 +661,7 @@ AC_DEFUN([_LIS_CHECK_HEADERS], [dnl
 	    eval "streams_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for streams_dir in $streams_search_path ; do
 		if test -d "$streams_dir" ; then
@@ -987,7 +987,7 @@ AC_DEFUN([_LFS_CHECK_HEADERS], [dnl
 		${DESTDIR}/usr/include/streams
 		${DESTDIR}/usr/local/include/streams
 		${DESTDIR}/usr/src/streams/include\""
-	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    streams_cv_lfs_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for streams_dir in $streams_search_path ; do
@@ -1022,7 +1022,7 @@ AC_DEFUN([_LFS_CHECK_HEADERS], [dnl
 	    eval "streams_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for streams_dir in $streams_search_path ; do
 		if test -d "$streams_dir" ; then
@@ -1060,7 +1060,7 @@ AC_DEFUN([_LFS_CHECK_HEADERS], [dnl
 	    eval "streams_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    streams_search_path=`echo "$streams_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for streams_dir in $streams_search_path ; do
 		if test -d "$streams_dir" ; then

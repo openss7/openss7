@@ -544,7 +544,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MODULES], [dnl
 	    eval "k_moddir_search_path=\"
 		${DESTDIR}${rootdir}/lib/modules/${kversion}
 		${DESTDIR}/lib/modules/${kversion}\""
-	    k_moddir_search_path=`echo "$k_moddir_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    k_moddir_search_path=`echo "$k_moddir_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    linux_cv_k_moddir=
 	    for linux_dir in $k_moddir_search_path
 	    do
@@ -781,7 +781,7 @@ dnl 	then
 dnl dnl	    not all combinations are valid
 dnl 	    kboot="$linux_cv_k_boot"
 dnl 	    eval "linux_tmp=\"$linux_cv_k_config_spec\""
-dnl 	    linux_tmp=`echo "$linux_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+dnl 	    linux_tmp=`echo "$linux_tmp" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 dnl 	    if test ! -f $linux_tmp
 dnl 	    then
 dnl 		if test -n "$kboot"
@@ -1046,7 +1046,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BUILDDIR], [dnl
 		${DESTDIR}/usr/src/linux-${knumber}
 		${DESTDIR}/usr/src/linux-${kmajor}.${kminor}
 		${DESTDIR}/usr/src/linux\""
-	    k_build_search_path=`echo "$k_build_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    k_build_search_path=`echo "$k_build_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    linux_cv_k_build=
 	    for linux_dir in $k_build_search_path ; do
 		AC_MSG_CHECKING([for kernel build directory... $linux_dir])
@@ -1150,7 +1150,7 @@ dnl
 		${DESTDIR}/usr/src/linux-headers-${knumber}-${kextra}
 		${DESTDIR}/usr/src/linux-headers-${knumber}-${kextra}-common
 		${DESTDIR}/usr/src/linux-headers-${knumber}-${kextra}-common-${kflavor}\""
-	    k_hdrdir_search_path=`echo "$k_hdrdir_search_path" | sed -e 's|\<NONE\>||g;s|/\./|/|g;s|//|/|g'`
+	    k_hdrdir_search_path=`echo "$k_hdrdir_search_path" | sed -e 's|\<NONE\>||g;s|/\./|/|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    linux_cv_k_hdrdir=
 	    for linux_dir in $k_hdrdir_search_path
 	    do
@@ -1227,7 +1227,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SRCDIR], [dnl
 		${DESTDIR}/usr/src/linux-headers-${kversion}
 		${DESTDIR}/usr/src/linux-headers-${knumber}
 		${DESTDIR}/usr/src/linux-headers-${knumber}-${kextra}\""
-	    k_source_search_path=`echo "$k_source_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g'`
+	    k_source_search_path=`echo "$k_source_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    linux_cv_k_source=
 dnl 
 dnl Look for a directory that contains kernel/sched.c.  If this file does
@@ -1359,7 +1359,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_VMLINUX], [dnl
 		${kbuilddir}/vmlinux
 		${DESTDIR}${rootdir}/boot/vmlinux
 		${DESTDIR}/boot/vmlinux\""
-	    k_search_path=`echo "$k_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    k_search_path=`echo "$k_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    linux_cv_k_vmlinux=
 	    for linux_root in $k_search_path ; do
 		for linux_ver in "-${kversion}" "" ; do
@@ -1431,20 +1431,22 @@ dnl
 		${kbuilddir}/System.map
 		${DESTDIR}${rootdir}/boot/System.map
 		${DESTDIR}/boot/System.map\""
-	    k_sysmap_search_path=`echo "$k_sysmap_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    k_sysmap_search_path=`echo "$k_sysmap_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    linux_cv_k_sysmap=
 	    for linux_root in $k_sysmap_search_path ; do
-		for linux_ver in "-${kversion}" "" ; do
-		    for linux_cmp in .xz .lzma .bz2 .gz "" ; do
-			linux_file="$linux_root$linux_ver$linux_cmp"
-			AC_MSG_CHECKING([for kernel system map... $linux_file])
-			if test -r $linux_file 
-			then
-			    linux_cv_k_sysmap="$linux_file"
-			    AC_MSG_RESULT([yes])
-			    break 3
-			fi
-			AC_MSG_RESULT([no])
+		for linux_boot in '-generic' '-huge' '' ; do
+		    for linux_ver in "-${kversion}" "" ; do
+			for linux_cmp in .xz .lzma .bz2 .gz "" ; do
+			    linux_file="$linux_root$linux_boot$linux_ver$linux_cmp"
+			    AC_MSG_CHECKING([for kernel system map... $linux_file])
+			    if test -r $linux_file 
+			    then
+				linux_cv_k_sysmap="$linux_file"
+				AC_MSG_RESULT([yes])
+				break 3
+			    fi
+			    AC_MSG_RESULT([no])
+			done
 		    done
 		done
 	    done
@@ -2203,7 +2205,7 @@ dnl
 		${ksrcdir}/include/asm-${khdrarch}
 		${khdrdir}/include/asm-${khdrarch}
 		${kbuilddir}/include/asm-${khdrarch}\""
-	    k_asmdir_search_path=`echo "$k_asmdir_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g'`
+	    k_asmdir_search_path=`echo "$k_asmdir_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    linux_cv_k_asmdir=
 	    for linux_dir in $k_asmdir_search_path
 	    do
@@ -2276,7 +2278,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_MACHDIR], [dnl
 		${ksrcdir}/arch/${ksrcarch}
 		${kbuilddir}/arch/${khdrarch}
 		${ksrcdir}/arch/${khdrarch}\""
-	    k_machdir_search_path=`echo "$k_machdir_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g'`
+	    k_machdir_search_path=`echo "$k_machdir_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g;s|/\./|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    linux_cv_k_machdir=no
 	    for linux_dir in $k_machdir_search_path
 	    do
@@ -2372,7 +2374,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_DOT_CONFIG], [dnl
 		    ${DESTDIR}/usr/src/linux-obj/.config
 		    ${ksrcdir}/.config\""
 	    fi
-	    k_config_search_path=`echo "$k_config_search_path" | sed -e 's|\<NONE\>||g;s|/\./|/|g;s|//|/|g'`
+	    k_config_search_path=`echo "$k_config_search_path" | sed -e 's|\<NONE\>||g;s|/\./|/|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 dnl
 dnl	If we are configuring for the running kernel and DESTDIR is null, we can check the
 dnl	/boot directories.  Otherwise this is dangerous.  Redhat puts different configuration files

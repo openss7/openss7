@@ -273,7 +273,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
-	    inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    inet_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for inet_dir in $inet_search_path ; do
@@ -308,7 +308,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    eval "inet_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for inet_dir in $inet_search_path ; do
 		if test -d "$inet_dir" ; then
@@ -346,7 +346,7 @@ AC_DEFUN([_INET_CHECK_HEADERS], [dnl
 	    eval "inet_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    inet_search_path=`echo "$inet_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for inet_dir in $inet_search_path ; do
 		if test -d "$inet_dir" ; then

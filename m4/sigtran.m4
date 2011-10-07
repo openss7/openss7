@@ -273,7 +273,7 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/ss7/include\""
 		    ;;
 	    esac
-	    sigtran_search_path=`echo "$sigtran_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    sigtran_search_path=`echo "$sigtran_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    sigtran_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for sigtran_dir in $sigtran_search_path ; do
@@ -308,7 +308,7 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    eval "sigtran_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    sigtran_search_path=`echo "$sigtran_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    sigtran_search_path=`echo "$sigtran_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for sigtran_dir in $sigtran_search_path ; do
 		if test -d "$sigtran_dir" ; then
@@ -346,7 +346,7 @@ AC_DEFUN([_SIGTRAN_CHECK_HEADERS], [dnl
 	    eval "sigtran_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    sigtran_search_path=`echo "$sigtran_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    sigtran_search_path=`echo "$sigtran_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for sigtran_dir in $sigtran_search_path ; do
 		if test -d "$sigtran_dir" ; then

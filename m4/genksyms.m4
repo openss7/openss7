@@ -359,7 +359,9 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 		ksyms_cv_updates_options='--style=ubuntu' ;;
 	    (mandrake|mandriva|mageia)
 		ksyms_cv_updates_options='--style=mandriva' ;;
-	    (arch|slackware|debian|*)
+	    (slackware)
+		ksyms_cv_updates_options='--style=slackware' ;;
+	    (arch|debian|*)
 		ksyms_cv_updates_options='--style=debian' ;;
 	esac])
     UPDATES_OPTIONS="${ksyms_cv_updates_options:+ $ksyms_cv_updates_options}"
@@ -375,7 +377,7 @@ AC_DEFUN([_KSYMS_OUTPUT_UPDATES_CONFIG], [dnl
 	    eval "k_updatedir_search_path=\"
 		${DESTDIR}${rootdir}/etc/kernel
 		${DESTDIR}/etc/kernel\""
-	    k_updatedir_search_path=`echo "$k_updatedir_search_path" | sed -e 's,\<NONE\>,,g;s,//,/,g'`
+	    k_updatedir_search_path=`echo "$k_updatedir_search_path" | sed -e 's,\<NONE\>,,g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    ksyms_cv_updates_directory=
 	    for ksyms_dir in $k_updatedir_search_path
 	    do

@@ -273,7 +273,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
-	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    strcomp_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for strcomp_dir in $strcomp_search_path ; do
@@ -308,7 +308,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    eval "strcomp_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for strcomp_dir in $strcomp_search_path ; do
 		if test -d "$strcomp_dir" ; then
@@ -346,7 +346,7 @@ AC_DEFUN([_STRCOMP_CHECK_HEADERS], [dnl
 	    eval "strcomp_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    strcomp_search_path=`echo "$strcomp_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for strcomp_dir in $strcomp_search_path ; do
 		if test -d "$strcomp_dir" ; then

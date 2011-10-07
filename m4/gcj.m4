@@ -642,7 +642,7 @@ dnl
 	    ${DESTDIR}/usr/share/javadoc
 	    ${DESTDIR}${docdir}
 	    ${DESTDIR}/usr/share/doc\""
-	gcj_search_path=`echo "$gcj_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	gcj_search_path=`echo "$gcj_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for gcj_dir in $gcj_search_path ; do
 	    if test -d "$gcj_dir" ; then
