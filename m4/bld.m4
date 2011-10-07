@@ -250,7 +250,11 @@ dnl	    dlocate is much faster than dpkg and dpkg-query
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
 		;;
 	    (slackware)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
+		if test -x "`which slapt-get 2>/dev/null`" -a "$tmp_result" != 'slapt-get'; then
+		    eval "bld_cv_pkg_cmd_${tmp_cn}=\"slapt-get --install \$tmp_result\""
+		else
+		    eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
+		fi
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_cn}"
@@ -379,7 +383,11 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
 		;;
 	    (slackware)
-		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
+		if test -x "`which slapt-get 2>/dev/null`" -a "$tmp_result" != 'slapt-get'; then
+		    eval "bld_cv_pkg_cmd_${tmp_cn}=\"slapt-get --install \$tmp_result\""
+		else
+		    eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
+		fi
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_pn}"
