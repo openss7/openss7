@@ -1,6 +1,7 @@
+#!/bin/bash
 #Maintainer: Brian Bidulock <bidulock@openss7.org>
 #Former Maintainer(s): none
-
+# @configure_input@
 #Mandatory
 # pkgname - package name, the name of the software.
 pkgname=@PACKAGE@
@@ -8,12 +9,12 @@ pkgname=@PACKAGE@
 pkgver=@VERSION@
 # pkgrel - package release, this is that number at the end of the tgz, including
 #	the initials of the packager.
-pkgrel=@PACKAGE_SLKRELEASE@bb
+pkgrel=@PACKAGE_TXZRELEASE@bb
 # arch - the architecture of the build, usually i486 or noarch, on some occaions
 #	i686.  From slkbuild-0.8.0 onwards, this not mandatory and will default
 #	to your system's architecture.  You'll still need to use it for "noarch"
 #	packages.
-arch='x86_64'
+arch=@target_arch@
 # source - These are all the files that will be used in the build.  You can
 #	either put a url which will be downloaded if it isn't found in the
 #	directory.  Or you can just put the file like the commented out one
@@ -21,11 +22,11 @@ arch='x86_64'
 #	add it to the array like this: source=("thing.tar.gz" "foo.patch"
 #	"bar.icon").  If you don't specify a url for a file, that file will be
 #	copied inside the package, in a /usr/src/$pkgname-$pkgver directory.
-source=("http://www.openss7.org/repo/tarballs/$pkgname-$pkgver.tar.xz")
+source=("http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz")
 # sourcetemplate - url location where SLKBUILD and build-name.sh can be
 #	downloaded.  Furthermore all files from source without url must be
 #	available at this location.
-sourcetemplate="http://www.openss7.org/repo/spkg/slackware/13.37/$arch/source/$pkgname/"
+sourcetemplate="http://www.openss7.org/repo/spkg/slackware/13.37/@target_arch@/source/@PACKAGE@/"
 # docs - put any of the docs that need to be copied over, readme install
 #	changelog, etc. are common ones.  Don't worry about case or path, it
 #	does a recursive case intensive search for them and moves them over when
@@ -33,10 +34,10 @@ sourcetemplate="http://www.openss7.org/repo/spkg/slackware/13.37/$arch/source/$p
 docs=\
 (
 	'AUTHORS' 'ANNOUNCE' 'ABOUT-NLS' 'BUGS' 'COPYING' 'CHANGELOG' 'INSTALL'
-	"INSTALL-$pkgname" 'LICENSES' 'LSM' 'MANUAL' 'NEWS' 'NOTES'
+	"INSTALL-@PACKAGE@" 'LICENSES' 'LSM' 'MANUAL' 'NEWS' 'NOTES'
 	'NOTES.cos53' 'NOTES.kmod' 'NOTES.kmp' 'NOTES.ksyms' 'NOTES.repo'
 	'NOTES.rpm' 'NOTES.sles' 'PROBLEMS' 'README' 'README-alpha' 'README-cvs'
-	'README-make' 'RELEASE-NOTES' 'THANKS' 'TODO' "$pkgname-$pkgver.lsm"
+	'README-make' 'RELEASE-NOTES' 'THANKS' 'TODO' "@PACKAGE@-@VERSION@.lsm"
 )
 # options - this is an array that allows you to control certain behaviours of
 #	the build script that is generated.  The options it takes are:
@@ -55,13 +56,15 @@ docs=\
 #	'tgz', 'tbz' and 'tlz' set the compression format for the resulting
 #	    package, the default is txz.  If you set more than one 'tgz', 'tbz'
 #	    and 'tlz', only the first one will be used.  whichever is that.
-options=('noautodotnew' 'nostrip' 'txz')
+options=('nostrip')
 # url - homepage or some other information url about the software
 url="http://www.openss7.org/"
 # dotnew - These are generally configuration files.  They will be renamed with a
 #	.new extension and the appropriate addition will be made to the
 #	doinst.sh to move them over if appropriate to do so during install.
-dotnew=(    'etc/netconfig')
+dotnew=\
+(
+)
 # CXXCFLAGS/CFLAGS - You can set these to override the default flags which are
 #	"-O2 -march=$arch -mtune=i686" where $arch is the variable you set in
 #	SLKBUILD.  Note that if you override it, you need to put all the flags.
@@ -104,27 +107,87 @@ slackdesc=\
 #	worrry about gzipping and strippping and all of that stuff, it is
 #	handled by the build script.  Also try to do "make || return 1" so that
 #	the build script stops if the compile fails.
-build() {
-	cd $startdir/src/$pkgname-$pkgver
-	./configure
+build() { :
+	cd $startdir/src/@PACKAGE@-@VERSION@
+	cache_file=../@target@-@kversion@-config.cache
+	csite_file=../@target@-config.site
+	mpost_file=../@target@-@kversion@-modpost.cache
+	env
+	./configure \
+	    ${CC:+CC="${CC}"} \
+	    ${CFLAGS+CFLAGS="${CFLAGS}"} \
+	    ${LD+LD="${LD}"} \
+	    ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
+	    ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
+	    ${CPP+CPP="${CPP}"} \
+	    ${CXX+CXX="${CXX:-$CC}"} \
+	    ${CXXFLAGS+CXXFLAGS="${CXXFLAGS}"} \
+	    ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
+	    CONFIG_SITE=${csite_file} \
+	    MODPOST_CACHE=${mpost_file} \
+	    --cache-file=${cache_file} \
+	    --prefix=/usr \
+	    --build=@build@ \
+	    --host=@host@ \
+	    --exec-prefix=/usr \
+	    --bindir=/usr/bin \
+	    --sbindir=/usr/sbin \
+	    --sysconfdir=/etc \
+	    --datadir=/usr/share \
+	    --includedir=/usr/include \
+	    --libdir=/usr/lib${LIBDIRSUFFIX} \
+	    --libexecdir=/usr/libexec \
+	    --localstatedir=/var \
+	    --sharedstatedir=/com \
+	    --mandir=/usr/man \
+	    --infodir=/usr/info \
+	    --datarootdir=/usr/share \
+	    --docdir=/usr/doc/@PACKAGE@-@VERSION@ \
+	    --htmldir=/usr/doc/@PACKAGE@-@VERSION@/html \
+	    --pdfdir=/usr/doc/@PACKAGE@-@VERSION@/pdf \
+	    --psdir=/usr/doc/@PACKAGE@-@VERSION@/ps \
+	    --localedir=/usr/share/locale \
+	    --disable-maintainer-mode \
+	    --with-k-release=@kversion@ \
+	    --with-k-modules=@kmoddir@ \
+	    --with-k-subdir=@ksubdir@ \
+	    --with-k-optimize=speed \
+	    --with-optimize=speed \
+	    --without-snmp \
+	    --without-snmp-agent \
+	    --disable-32bit-libs \
+	    --disable-papers-html \
+	    --with-gnu-ld \
+	    || { rm -f ${cache_file} ${csite_file} ${mpost_file} ; exit 1 ; }
 	make || return 1
-}
-
-check() {
 	make check || return 1
-}
-
-install() {
 	make DESTDIR=$startdir/pkg install-strip
+	d=$startdir/pkg/usr/src/@PACKAGE@-@VERSION@-@PACKAGE_TXZRELEASE@/@kversion@
+	mkdir -p $d
+	b=$startdir/pkg/boot
+	mkdir -p $b
+	cp -p Module.mkvars $d
+	cp -p ${csite_file} $d
+	cp -p ${cache_file} $d
+	cp -p System.symvers $d
+	cp -p Module.symvers $d
+	cat System.symvers Module.symvers | gzip -c >$d/symvers-@kversion@.gz
+	cp -p $d/symvers-@kversion@.gz $b
+	cat System.symvers Module.symvers | awk '{print$4"\t"$3"\t"$1"\t"$2}' > $d/abi-@kversion@
+	cp -p $d/abi-@kversion@ $b
+	cp -p ${mpost_file} $d
+	cp -p symsets-@kversion@.tar.gz $d
+	cp -p symsets-@kversion@.tar.gz $b
 }
 
 # doinst() - these are any of the commands (note dotnew stuff is taken care of
 #	so don't put that here) that you want run right after install that won't
 #	be added.
-doinst() {
+doinst() { :
 }
 
 
 
 
-# vim: se ft=sh sw=4 tw=80
+# @configure_input@
+# vim: ft=sh sw=4 tw=80

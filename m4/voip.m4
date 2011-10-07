@@ -273,7 +273,7 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
-	    voip_search_path=`echo "$voip_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    voip_search_path=`echo "$voip_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    voip_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for voip_dir in $voip_search_path ; do
@@ -308,7 +308,7 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    eval "voip_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    voip_search_path=`echo "$voip_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    voip_search_path=`echo "$voip_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for voip_dir in $voip_search_path ; do
 		if test -d "$voip_dir" ; then
@@ -346,7 +346,7 @@ AC_DEFUN([_VOIP_CHECK_HEADERS], [dnl
 	    eval "voip_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    voip_search_path=`echo "$voip_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    voip_search_path=`echo "$voip_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for voip_dir in $voip_search_path ; do
 		if test -d "$voip_dir" ; then

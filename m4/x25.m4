@@ -273,7 +273,7 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
-	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    x25_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for x25_dir in $x25_search_path ; do
@@ -308,7 +308,7 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 	    eval "x25_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for x25_dir in $x25_search_path ; do
 		if test -d "$x25_dir" ; then
@@ -346,7 +346,7 @@ AC_DEFUN([_X25_CHECK_HEADERS], [dnl
 	    eval "x25_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    x25_search_path=`echo "$x25_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for x25_dir in $x25_search_path ; do
 		if test -d "$x25_dir" ; then

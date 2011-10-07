@@ -10,8 +10,8 @@
 # -----------------------------------------------------------------------------
 KERNEL_MODULES="specfs streams streams-aixcompat streams-clone streams-connld streams-echo streams-fifo streams-hpuxcompat streams-log streams-nsdev streams-nuls streams-osfcompat streams-pipe streams-pipemod streams-sad streams-sc streams-sth streams-suncompat streams-svr4compat streams-uw7compat"
 KERNEL_PRELOADS="specfs streams streams-sth streams-clone"
-modules=`echo " ${KERNEL_MODULES} " | sed -r -e 's| [^[:space:]]*/| |g;s| streams-| '$kpre'|g;s| lib[^[:space:]]*_a-| '$kpre'|g;s|\.(k)?o(\.gz|\.bz2)? | |g'`
-preloads=`echo " ${KERNEL_PRELOADS} " | sed -r -e 's| [^[:space:]]*/| |g;s| streams-| '$kpre'|g;s| lib[^[:space:]]*_a-| '$kpre'|g;s|\.(k)?o(\.gz|\.bz2)? | |g'`
+modules=`echo " ${KERNEL_MODULES} " | sed -r -e 's, [^[:space:]]*/, ,g;s, streams-, '$kpre',g;s, lib[^[:space:]]*_a-, '$kpre',g;s,\.(k)?o(\.gz|\.bz2)? , ,g'`
+preloads=`echo " ${KERNEL_PRELOADS} " | sed -r -e 's, [^[:space:]]*/, ,g;s, streams-, '$kpre',g;s, lib[^[:space:]]*_a-, '$kpre',g;s,\.(k)?o(\.gz|\.bz2)? , ,g'`
 libraries="streams"
 tools="ldltest strtst thrtst timetst fattach fdetach ldlconfig oc pafd psfd rwf streams strmakenodes mkfifo"
 manuals="openss7 ATM carrier cci cdi chi cnam dlpi dlpi_porting FR hlr INET ISDN lab libxnet libxnsl lli mapi MG mg mtpi mxi nli npi npi_mtp npi_sccp OSI PHYS porting sbc sccpi sdli sdti sg sgp SIGTRAN sli SPG2 SPG SS7 ssg ss STREAMS_FAQ STREAMS tci tpi tpi_sccp tri TTY VOIP voip wan X25 x25_porting x400p xcc xmap XNS xti_sccp"

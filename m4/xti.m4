@@ -291,7 +291,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 			${DESTDIR}/usr/src/streams/include\""
 		    ;;
 	    esac
-	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g'`
+	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    xti_cv_includes=
 	    AC_MSG_RESULT([(searching)])
 	    for xti_dir in $xti_search_path ; do
@@ -326,7 +326,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    eval "xti_search_path=\"
 		${DESTDIR}${rootdir}${libdir}
 		${DESTDIR}${libdir}\""
-	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for xti_dir in $xti_search_path ; do
 		if test -d "$xti_dir" ; then
@@ -364,7 +364,7 @@ AC_DEFUN([_XTI_CHECK_HEADERS], [dnl
 	    eval "xti_search_path=\"
 		${DESTDIR}${rootdir}${lib32dir}
 		${DESTDIR}${lib32dir}\""
-	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g'`
+	    xti_search_path=`echo "$xti_search_path" | sed -e 's|\<NONE\>|'$ac_default_prefix'|g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([(searching)])
 	    for xti_dir in $xti_search_path ; do
 		if test -d "$xti_dir" ; then

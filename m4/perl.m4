@@ -179,7 +179,7 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
 	    ${DESTDIR}${libdir}
 	    ${DESTDIR}/usr/lib
 	    ${DESTDIR}/usr/local/lib\""
-	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	case "$host_cpu" in
 	    (*64) perl_targ=elf64 ;;
 	    (*)   perl_targ=elf32 ;;
@@ -243,7 +243,7 @@ AC_DEFUN([_PERL_LIBRARIES], [dnl
 	    ${DESTDIR}${libdir}
 	    ${DESTDIR}/usr/lib
 	    ${DESTDIR}/usr/local/lib\""
-	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	perl_search_path=`echo "$perl_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	case "$host_cpu" in
 	    (*64) perl_targ=elf64 ;;
 	    (*)   perl_targ=elf32 ;;

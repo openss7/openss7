@@ -1987,7 +1987,7 @@ BEGIN {
     longopts["kversion"     ] = "k:" ; environs["kversion"     ] = "kversion"			 ; defaults["kversion"     ] = kversion						; descrips["kversion"     ] = "kernel version KVERSION"
     longopts["moddir"       ] = "d:" ; environs["moddir"       ] = "MODPOST_MODDIR"		 ; defaults["moddir"       ] = "/lib/modules/" kversion				; descrips["moddir"       ] = "directory containing modules for which to generate symbols"
     longopts["filename"     ] = "F:" ; environs["filename"     ] = "MODPOST_SYSMAP"		 ; defaults["filename"     ] = "/boot/System.map-" kversion			; descrips["filename"     ] = "system map file"
-    longopts["vmlinux"      ] = "I:" ; environs["vmlinux"      ] = "MODPOST_VMLINUX"		 ; defaults["vmlinux"      ] = "/boot/vmlinux-" kversion ".gz"			; descrips["vmlinux"        ] = "kernel image file"
+    longopts["vmlinux"      ] = "I:" ; environs["vmlinux"      ] = "MODPOST_VMLINUX"		 ; defaults["vmlinux"      ] = "/boot/vmlinux-" kversion ".gz"			; descrips["vmlinux"      ] = "kernel image file"
     longopts["infile"       ] = "i:" ; environs["infile"       ] = "MODPOST_INPUTS"		 ; defaults["infile"       ] = "/lib/modules/" kversion "/build/Module.symvers"	; descrips["infile"       ] = "input file (space separated)"
     longopts["outfile"      ] = "o:" ; environs["outfile"      ] = "MODPOST_MODVER"		 ; defaults["outfile"      ] = "Module.symvers"					; descrips["outfile"      ] = "output file for module symbols"
     longopts["sysfile"      ] = "s:" ; environs["sysfile"      ] = "MODPOST_SYSVER"		 ; defaults["sysfile"      ] = "System.symvers"					; descrips["sysfile"      ] = "output file for system symbols"

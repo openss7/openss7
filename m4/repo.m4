@@ -167,7 +167,7 @@ AC_DEFUN([_REPO_SETUP_RPM], [dnl
 	    ${DESTDIR}${sysconfdir}/pki/rpm-gpg
 	    ${DESTDIR}${rootdir}/etc/pki/rpm-gpg
 	    ${DESTDIR}/etc/pki/rpm-gpg\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for rpm gpg directory... $repo_dir])
@@ -205,7 +205,7 @@ AC_DEFUN([_REPO_SETUP_YUM], [dnl
 		${DESTDIR}${rootdir}/etc/yum/repos.d
 		${DESTDIR}/etc/yum.repos.d
 		${DESTDIR}/etc/yum/repos.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for repo_dir in $repo_search_path ; do
 		AC_MSG_CHECKING([for yum repo directory... $repo_dir])
@@ -229,7 +229,7 @@ AC_DEFUN([_REPO_SETUP_YUM], [dnl
 		${DESTDIR}${rootdir}/etc/yum/pluginconf.d/fedorakmod.conf
 		${DESTDIR}/etc/yum/pluginconf.d/kmod.conf
 		${DESTDIR}/etc/yum/pluginconf.d/fedorakmod.conf\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for yum kmod config file... $repo_dir])
@@ -264,7 +264,7 @@ AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
 		${DESTDIR}${sysconfdir}/zypp/credentials.d
 		${DESTDIR}${rootdir}/etc/zypp/credentials.d
 		${DESTDIR}/etc/zypp/credentials.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for repo_dir in $repo_search_path ; do
 		AC_MSG_CHECKING([for zypp cred directory... $repo_dir])
@@ -293,7 +293,7 @@ AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
 		${DESTDIR}${sysconfdir}/zypp/services.d
 		${DESTDIR}${rootdir}/etc/zypp/services.d
 		${DESTDIR}/etc/zypp/services.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for repo_dir in $repo_search_path ; do
 		AC_MSG_CHECKING([for zypp serv directory... $repo_dir])
@@ -322,7 +322,7 @@ AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
 		${DESTDIR}${sysconfdir}/zypp/repos.d
 		${DESTDIR}${rootdir}/etc/zypp/repos.d
 		${DESTDIR}/etc/zypp/repos.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for repo_dir in $repo_search_path ; do
 		AC_MSG_CHECKING([for zypp repo directory... $repo_dir])
@@ -343,7 +343,7 @@ AC_DEFUN([_REPO_SETUP_ZYPP], [dnl
 	    ${DESTDIR}${sysconfdir}/zypp/zypp.conf
 	    ${DESTDIR}${rootdir}/etc/zypp/zypp.conf
 	    ${DESTDIR}/etc/zypp/zypp.conf\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for zypp config file... $repo_dir])
@@ -378,7 +378,7 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
 		${DESTDIR}${sysconfdir}/urpmi/mediacfg.d
 		${DESTDIR}${rootdir}/etc/urpmi/mediacfg.d
 		${DESTDIR}/etc/urpmi/mediacfg.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for repo_dir in $repo_search_path ; do
 		AC_MSG_CHECKING([for urpmi media directory... $repo_dir])
@@ -399,7 +399,7 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
 	    ${DESTDIR}${sysconfdir}/urpmi
 	    ${DESTDIR}${rootdir}/etc/urpmi
 	    ${DESTDIR}/etc/urpmi\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for urpmi config directory... $repo_dir])
@@ -419,7 +419,7 @@ AC_DEFUN([_REPO_SETUP_URPMI], [dnl
 	    ${DESTDIR}${sysconfdir}/urpmi/urpmi.cfg
 	    ${DESTDIR}${rootdir}/etc/urpmi/urpmi.cfg
 	    ${DESTDIR}/etc/urpmi/urpmi.cfg\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for urpmi config file... $repo_dir])
@@ -446,7 +446,7 @@ AC_DEFUN([_REPO_SETUP_APT], [dnl
 	    ${DESTDIR}${sysconfdir}/apt
 	    ${DESTDIR}${rootdir}/etc/apt
 	    ${DESTDIR}/etc/apt\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for apt directory... $repo_dir])
@@ -474,7 +474,7 @@ AC_DEFUN([_REPO_SETUP_APT], [dnl
 		${DESTDIR}${sysconfdir}/apt/sources.list.d
 		${DESTDIR}${rootdir}/etc/apt/sources.list.d
 		${DESTDIR}/etc/apt/sources.list.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for repo_dir in $repo_search_path ; do
 		AC_MSG_CHECKING([for apt sources directory... $repo_dir])
@@ -499,7 +499,7 @@ dnl
 	    ${DESTDIR}${sysconfdir}/apt
 	    ${DESTDIR}${rootdir}/etc/apt
 	    ${DESTDIR}/etc/apt\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for apt sources list... $repo_dir/sources.list])
@@ -519,7 +519,7 @@ dnl
 	    ${DESTDIR}${sysconfdir}/apt/vendors.list.d
 	    ${DESTDIR}${rootdir}/etc/apt/vendors.list.d
 	    ${DESTDIR}/etc/apt/vendors.list.d\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for apt vendors directory... $repo_dir])
@@ -543,7 +543,7 @@ dnl
 	    ${DESTDIR}${sysconfdir}/apt
 	    ${DESTDIR}${rootdir}/etc/apt
 	    ${DESTDIR}/etc/apt\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for apt vendors list... $repo_dir/vendors.list])
@@ -563,7 +563,7 @@ dnl
 	    ${DESTDIR}${sysconfdir}/apt/trusted.gpg.d
 	    ${DESTDIR}${rootdir}/etc/apt/trusted.gpg.d
 	    ${DESTDIR}/etc/apt/trusted.gpg.d\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for apt gpg directory... $repo_dir])
@@ -598,7 +598,7 @@ AC_DEFUN([_REPO_SETUP_PACMAN], [dnl
 		${DESTDIR}${sysconfdir}/pacman.d
 		${DESTDIR}${rootdir}/etc/pacman.d
 		${DESTDIR}/etc/pacman.d\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for repo_dir in $repo_search_path ; do
 		AC_MSG_CHECKING([for pacman mirrors directory... $repo_dir])
@@ -619,7 +619,7 @@ AC_DEFUN([_REPO_SETUP_PACMAN], [dnl
 	    ${DESTDIR}${sysconfdir}/pacman.conf
 	    ${DESTDIR}${rootdir}/etc/pacman.conf
 	    ${DESTDIR}/etc/pacman.conf\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for pacman config file... $repo_dir])
@@ -654,7 +654,7 @@ AC_DEFUN([_REPO_SETUP_SLAPT], [dnl
 		${DESTDIR}${sysconfdir}/slapt-get
 		${DESTDIR}${rootdir}/etc/slapt-get
 		${DESTDIR}/etc/slapt-get\""
-	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	    repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	    AC_MSG_RESULT([searching])
 	    for repo_dir in $repo_search_path ; do
 		AC_MSG_CHECKING([for slapt directory... $repo_dir])
@@ -675,7 +675,7 @@ AC_DEFUN([_REPO_SETUP_SLAPT], [dnl
 	    ${DESTDIR}${sysconfdir}/slapt-get
 	    ${DESTDIR}${rootdir}/etc/slapt-get
 	    ${DESTDIR}/etc/slapt-get\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for slapt-get rc file... $repo_dir/slapt-getrc])
@@ -695,7 +695,7 @@ AC_DEFUN([_REPO_SETUP_SLAPT], [dnl
 	    ${DESTDIR}${sysconfdir}/slapt-get
 	    ${DESTDIR}${rootdir}/etc/slapt-get
 	    ${DESTDIR}/etc/slapt-get\""
-	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g'`
+	repo_search_path=`echo "$repo_search_path" | sed -e 's,\<NONE\>,'$ac_default_prefix',g;s,//,/,g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}'`
 	AC_MSG_RESULT([searching])
 	for repo_dir in $repo_search_path ; do
 	    AC_MSG_CHECKING([for slapt-src rc file... $repo_dir/slapt-srcrc])
