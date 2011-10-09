@@ -172,11 +172,11 @@ AC_DEFUN([_TXZ_ARCH_SETUP_TOPDIR], [dnl
     AC_ARG_WITH([txz-distdir],
 	[AS_HELP_STRING([--with-txz-distdir=DIR],
 	    [txz dist directory @<:@default=PKG-DISTDIR/slackware/PKG-SUBDIR@:>@])],
-	[], [with_txz_distdir='$(DISTDIR)/slackware/$(reposubdir)'])
+	[], [with_txz_distdir='$(DISTDIR)/$(target_distro)/$(reposubdir)'])
     AC_MSG_CHECKING([for txz distribution directory])
     if test ":${txzdistdir+set}" != :set ; then
 	case ":${with_txz_distdir:-no}" in
-	    (:no|:yes)	txzdistdir='$(DISTDIR)/slackware/$(reposubdir)' ;;
+	    (:no|:yes)	txzdistdir='$(DISTDIR)/$(target_distro)/$(reposubdir)' ;;
 	    (*)		txzdistdir="$with_txz_distdir" ;;
 	esac
     fi
@@ -211,7 +211,7 @@ AC_DEFUN([_TXZ_ARCH_SETUP_TOPDIR], [dnl
     if test ":${spkgtopdir+set}" != :set ; then
 	# spkgtopdir needs to be absolute: always build in the top build
 	# directory on the local machine
-	spkgtopdir=`pwd`/slackware
+	spkgtopdir=`pwd`/$(target_distro)
     fi
     AC_MSG_RESULT([$spkgtopdir])
     AC_SUBST([spkgtopdir])dnl
@@ -296,14 +296,31 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	    [build txzs @<:@default=auto@:>@])],
 	[], [dnl
 	case "$target_vendor" in
-	    (slackware)	enable_txzs=yes ;;
-	    (*)		enable_txzs=no  ;;
+	    (slackware|salix)
+		enable_txzs=yes ;;
+	    (*)	enable_txzs=no  ;;
 	esac])
     AC_ARG_VAR([SLACKPKG],
 	       [slackpkg command. @<:@default=slackpkg@:>@])
     _BLD_PATH_PROG([SLACKPKG], [slackpkg], [${am_missing3_run}slackpkg], [$tmp_path], [dnl
 	case "$target_vendor" in
 	    (slackware)
+		_BLD_INSTALL_WARN([SLACKPKG], [
+***
+*** Configure could not find a suitable tool for testing Slackware
+*** packages.  This program is part of the slackpkg package on Slackware
+*** based distributions.
+*** ], [
+*** On Slackware based distributions, try 'slackpkg install slackpkg'.
+***
+*** Slackware 13.37: 'slackpkg install slackpkg'
+*** Salix 13.37:     'slapt-get --install slackpkg'], [
+*** 
+*** Alternatively, you can reconfigure with --disable-txzs to disable
+*** generation of txz repositories.
+*** ])
+		;;
+	    (salix)
 		AC_MSG_WARN([Cannot find slackpkg program in PATH.]) ;;
 	    (*) enable_txzs=no ;;
 	esac])
@@ -311,15 +328,30 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	       [makepkg command. @<:@default=makepkg@:>@])
     _BLD_PATH_PROG([MAKEPKG], [makepkg], [${am_missing3_run}makepkg], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (slackware)
-		AC_MSG_WARN([Cannot find makepkg program in PATH.]) ;;
+	    (slackware|salix)
+		_BLD_INSTALL_WARN([MAKEPKG], [
+*** 
+*** Configure could not find a suitable tool for making txz packages.
+*** This program is part of the pkgtools package on Slackware based
+*** distributions.
+*** ], [
+*** On Slackware based distributions, try 'slackpkg install pkgtools'.
+***
+*** Slackware 13.37: 'slackpkg install pkgtools'
+*** Salix 13.37:     'slapt-get --install pkgtools'], [
+*** Alternatively you can reconfigure with --disable-txzs to disable
+*** generation of txz repositories.  Proceeding under the assumption
+*** that --disable-txzs was specified.
+*** ])
+		enable_txzs=no ;;
 	    (*) enable_txzs=no ;;
-	esac])
+	esac
+	enable_txzs=no])
     AC_ARG_VAR([SLACKTRACK],
 	       [slacktrack command. @<:@default=slacktrack@:>@])
     _BLD_PATH_PROG([SLACKTRACK], [slacktrack], [${am_missing3_run}slacktrack], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (slackware)
+	    (slackware|salix)
 		AC_MSG_WARN([Cannot find slacktrack program in PATH.]) ;;
 	    (*) enable_txzs=no ;;
 	esac])
@@ -327,16 +359,18 @@ AC_DEFUN([_TXZ_ARCH_SETUP_BUILD], [dnl
 	       [spkg command. @<:@default=spkg@:>@])
     _BLD_PATH_PROG([SPKG], [spkg], [${am_missing3_run}spkg], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (slackware)
+	    (salix)
 		AC_MSG_WARN([Cannot find spkg program in PATH.]) ;;
+	    (slackware) ;;
 	    (*) enable_txzs=no ;;
 	esac])
     AC_ARG_VAR([SLKBUILD],
 	       [slkbuild command. @<:@default=slkbuild@:>@])
     _BLD_PATH_PROG([SLKBUILD], [slkbuild], [${am_missing3_run}slkbuild], [$tmp_path], [dnl
 	case "$target_vendor" in
-	    (slackware)
+	    (salix)
 		AC_MSG_WARN([Cannot find slkbuild program in PATH.]) ;;
+	    (slackware) ;;
 	    (*) enable_txsz=no ;;
 	esac])
     AC_CACHE_CHECK([for building of txzs], [txz_cv_pkgs], [dnl
@@ -371,6 +405,7 @@ AC_DEFUN([_TXZ_REPO_SETUP_SLACKPKG], [dnl
 	case "$target_vendor" in
 	    (slackware)
 		AC_MSG_WARN([Cannot find slackdtxt program in PATH.]) ;;
+	    (salix) ;;
 	    (*) enable_repo_slackpkg=no ;; # even though we can live without it
 	esac])
     AC_CACHE_CHECK([for slackpkg repo construction], [txz_cv_repo_slackpkg], [dnl

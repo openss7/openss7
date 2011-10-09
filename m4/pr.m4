@@ -123,6 +123,7 @@ AC_DEFUN([_AUTOPR_SETUP], [dnl
 	    (denx)	 ap_cv_distribution="ELDK"			    ;;
 	    (arch)	 ap_cv_distribution="Arch"			    ;;
 	    (slackware)	 ap_cv_distribution="Slackware$dist_cv_host_release";;
+	    (salix)	 ap_cv_distribution="Salix$dist_cv_host_release"    ;;
 	    (*)		 ap_cv_distribution='other'			    ;;
 	esac
 	])
