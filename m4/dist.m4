@@ -208,6 +208,7 @@ AC_DEFUN([_DISTRO_SETUP], [dnl
 dnl AC_MSG_WARN([checking for flavor in $[1]])
     case "$[1]" in
 	(*Slackware*)					echo 'slackware'  ;;
+	(*Salix*)					echo 'salix'	  ;;
 	(*Arch?Linux*)					echo 'arch'	  ;;
 	(*Oracle*|*ORACLE*)				echo 'oracle'	  ;;
 	(*PUIAS*|*PU_IAS*|*PU-IAS*)			echo 'puias'	  ;;
@@ -263,6 +264,12 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 	if test -z "$dist_cv_build_flavor" ; then
 	    dist_cv_build_flavor=$(dist_get_flavor "$(${CC-cc} $CFLAGS -v 2>&1 | grep 'gcc version')")
 	fi
+	# distinguish slackware from salix
+	if test "$dist_cv_build_flavor" = slackware; then
+	    if test "`find /var/log/packages -name 'salix*' 2>/dev/null | head -1`" != ""; then
+		dist_cv_build_flavor='salix'
+	    fi
+	fi
     ])
     AC_CACHE_CHECK([for build distro], [dist_cv_build_distro], [dnl
 	dist_cv_build_distro=`echo "${dist_cv_build_flavor:-unknown}" | sed -r 's,^sle[[ds]]$$,sle,'`
@@ -273,6 +280,7 @@ dnl AC_MSG_WARN([checking for flavor in $[1]])
 dnl AC_MSG_WARN([checking for vendor in $[1]])
     case "$[1]" in
 	(slackware)			echo 'slackware'  ;;
+	(salix)				echo 'salix'	  ;;
 	(arch)				echo 'arch'	  ;;
 	(oracle)			echo 'oracle'	  ;;
 	(puias)				echo 'puias'	  ;;
@@ -341,6 +349,7 @@ dnl AC_MSG_WARN([checking for release in $[1]])
 dnl AC_MSG_WARN([checking for distrib in $[1]])
     case "$[1]" in
 	(slackware)	echo 'Slackware Linux' ;;
+	(salix)		echo 'Salix Linux' ;;
 	(arch)		echo 'Arch Linux' ;;
 	(oracle)	echo 'Oracle Linux Server' ;;
 	(puias)		echo 'PUIAS Linux' ;;
@@ -436,7 +445,7 @@ dnl AC_MSG_WARN([checking for codename in $[1]])
 	case "$dist_cv_build_distro" in
 	    (arch)
 		dist_tmp='os' ;;
-	    (slackware)
+	    (slackware|salix)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^[([^\.]*(\.[^\.]*)?)(\.[^\.]*)*][$],\1,'` ;;
 	    (suse)
 		dist_tmp=`echo "${dist_cv_build_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
@@ -580,6 +589,14 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	    fi
 	fi
 	# cannot get host flavor using build system compiler
+	# distinguish slackware from salix
+	if test "$dist_cv_host_flavor" = slackware; then
+	    eval "dist_path=\"${DESTDIR}${localstatedir}/log/packages\""
+	    dist_path=$(echo "$dist_path" | sed 's|\<NONE\>||g;s|//|/|g')
+	    if test "`find $dist_path -name 'salix*' 2>/dev/null | head -1`" != ""; then
+		dist_cv_host_flavor='salix'
+	    fi
+	fi
     ])
     AC_CACHE_CHECK([for host distro], [dist_cv_host_distro], [dnl
 	dist_cv_host_distro=`echo "${dist_cv_host_flavor:-unknown}" | sed -r 's,^sle[[ds]]$$,sle,'`
@@ -684,7 +701,7 @@ dnl AC_MSG_WARN([checking for cpu in $[1]])
 	case "$dist_cv_host_distro" in
 	    (arch)
 		dist_tmp='os' ;;
-	    (slackware)
+	    (slackware|salix)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^[([^\.]*(\.[^\.]*)?)(\.[^\.]*)*][$],\1,'` ;;
 	    (suse)
 		dist_tmp=`echo "${dist_cv_host_release}" | sed -r 's,^(9|[[1-9]][[0-9]])\..*[$],\1,'` ;;
@@ -757,7 +774,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     AC_MSG_CHECKING([build system type])
     build_vendor="$dist_cv_build_vendor"
     case "$build_vendor" in
-	(oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware)  
+	(oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware|salix)  
 	    case "$build_os" in (*linux*) build_os='linux'     ;; esac ;;
 	(arch|mandrake|mandriva|mageia|ubuntu)  
 	    case "$build_os" in (*linux*) build_os='linux-gnu' ;; esac ;;
@@ -783,7 +800,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	host_vendor="$dist_cv_host_vendor"
 	case "$host_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware)  
+	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware|salix)  
 		case "$host_os" in (*linux*) host_os='linux'     ;; esac ;;
 	    (arch|mandrake|mandriva|mageia|ubuntu)  
 		case "$host_os" in (*linux*) host_os='linux-gnu' ;; esac ;;
@@ -807,7 +824,7 @@ AC_DEFUN([_DISTRO_OUTPUT], [dnl
     else
 	target_vendor="$dist_cv_host_vendor"
 	case "$target_vendor" in
-	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware)  
+	    (oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|debian|slackware|salix)  
 		case "$target_os" in (*linux*) target_os='linux'     ;; esac ;;
 	    (arch|mandrake|mandriva|mageia|ubuntu)  
 		case "$target_os" in (*linux*) target_os='linux-gnu' ;; esac ;;

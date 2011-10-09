@@ -764,7 +764,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_BOOT], [dnl
 		esac
 		linux_cv_k_base="$kversion"
 		;;
-	    (arch|slackware|*)
+	    (arch|slackware|salix|*)
 		linux_cv_k_boot=no
 		linux_cv_k_base="$kversion"
 		;;
@@ -1581,7 +1581,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_SYMVERS], [dnl
 		if test ${linux_cv_k_versions:-no} != no -a ${linux_cv_k_modversions:-no} != no ; then
 		    case "$target_vendor" in
 			# debian based systems do not have this file
-			(debian|ubuntu|mint|arch|slackware)
+			(debian|ubuntu|mint|arch|slackware|salix)
 			    ;;
 			(oracle|puias|centos|lineox|whitebox|scientific|redhat|suse|*)
 			    tmp_fn="symvers-${kversion}.gz"
@@ -2500,7 +2500,7 @@ AC_DEFUN([_LINUX_CHECK_KERNEL_FILES], [dnl
 	    kernel_source="linux-source-${kmajor}.${kminor}"
 	    kernel_headers="linux-headers-${kmajor}.${kminor}"
 	    ;;
-	(slackware-3.?)
+	(slackware-3.?|salix-3.?)
 	    kernel_image="kernel-gneric-${kversion}"
 	    kernel_source="kernel-source-${kversion}"
 	    kernel_headers="kernel-headers-${kversion}"
@@ -2556,7 +2556,7 @@ dnl
 		    linux_cv_archs="${linux_cv_archs:+$linux_cv_archs }'$linux_arch'"
 		done
 		;;
-	    (arch|slackware|*)
+	    (arch|slackware|salix|*)
 		;;
 	esac
 	linux_cv_kernel_sanity=ok

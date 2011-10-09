@@ -97,18 +97,16 @@ AC_DEFUN([_BLD_BUILD_REQ], [dnl
 	fi
     fi
     AC_SUBST([CONFIG_BLDREQ])dnl
-    if test "$no_create" = yes ; then
-	for config_bldreq in $CONFIG_BLDREQ ; do
-	    case "$config_bldreq" in
-		(/*) ;;
-		(*) config_bldreq="`pwd`/$config_bldreq" ;;
-	    esac
-	    if test -r "$config_bldreq" ; then
-		AC_MSG_NOTICE([reading cache file... $config_bldreq])
-		. "$config_bldreq"
-	    fi
-	done
-    fi
+    for config_bldreq in $CONFIG_BLDREQ ; do
+	case "$config_bldreq" in
+	    (/*) ;;
+	    (*) config_bldreq="`pwd`/$config_bldreq" ;;
+	esac
+	if test -r "$config_bldreq" ; then
+	    AC_MSG_NOTICE([reading cache file... $config_bldreq])
+	    . "$config_bldreq"
+	fi
+    done
     AC_CONFIG_COMMANDS([bldconfig], [dnl
 	if test -n "$CONFIG_BLDREQ" ; then
 	    for config_bldreq in $CONFIG_BLDREQ ; do
@@ -249,12 +247,11 @@ dnl	    dlocate is much faster than dpkg and dpkg-query
 	    (arch)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
 		;;
+	    (salix)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slapt-get --install \$tmp_result\""
+		;;
 	    (slackware)
-		if test -x "`which slapt-get 2>/dev/null`" -a "$tmp_result" != 'slapt-get'; then
-		    eval "bld_cv_pkg_cmd_${tmp_cn}=\"slapt-get --install \$tmp_result\""
-		else
-		    eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
-		fi
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_cn}"
@@ -382,12 +379,11 @@ PATH - Optional subdirectory and filename within directory])], [dnl
 	    (arch)
 		eval "bld_cv_pkg_cmd_${tmp_cn}=\"pacman --sync \$tmp_result\""
 		;;
+	    (salix)
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slapt-get --install \$tmp_result\""
+		;;
 	    (slackware)
-		if test -x "`which slapt-get 2>/dev/null`" -a "$tmp_result" != 'slapt-get'; then
-		    eval "bld_cv_pkg_cmd_${tmp_cn}=\"slapt-get --install \$tmp_result\""
-		else
-		    eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
-		fi
+		eval "bld_cv_pkg_cmd_${tmp_cn}=\"slackpkg install \$tmp_result\""
 		;;
 	    (*)
 		eval "unset bld_cv_pkg_cmd_${tmp_pn}"
