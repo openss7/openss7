@@ -156,13 +156,15 @@ AC_DEFUN([_SNMP_HEADERS], [dnl
 *** without this header.  If this is not what you want, load the
 *** development package and rerun configure.  Try:
 *** ], [
-*** Debian 5.0:  'aptitude install libsnmp-dev'
-*** Ubuntu 8.04: 'aptitude install libsnmp-dev'
-*** CentOS 5.x:  'yum install net-snmp-devel'
-*** SLES 10/11:  'zypper install net-snmp-devel'
-*** ArchLinux:   'pacman -S net-snmp'
-*** RedHat 7.2:  'rpm -i ucd-snmp-devel-4.2.5-8.72.1'
-*** RedHat 7.3:  'rpm -i ucd-snmp-devel-4.2.5-8.73.1'], [
+*** Debian 5.0:   'aptitude install libsnmp-dev'
+*** Ubuntu 8.04:  'aptitude install libsnmp-dev'
+*** CentOS 5.x:   'yum install net-snmp-devel'
+*** SLES 10/11:   'zypper install net-snmp-devel'
+*** ArchLinux:    'pacman -S net-snmp'
+*** Slack 13.37:  './configure --without-snmp'
+*** Salix 13.37:  './configure --without-snmp'
+*** RedHat 7.2:   'rpm -i ucd-snmp-devel-4.2.5-8.72.1'
+*** RedHat 7.3:   'rpm -i ucd-snmp-devel-4.2.5-8.73.1'], [
 *** 
 *** Repeat after loading the correct package or by specifying the
 *** configure argument --without-snmp: continuing under the assumption

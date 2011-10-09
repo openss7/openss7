@@ -359,7 +359,7 @@ AC_DEFUN([_PAPERS_SETUP], [dnl
 *** SLES 10:         'configure --disable-papers'
 *** ArchLinux:       'pacman -S imagemagick'], [
 ***
-*** To get rid of this warning, load the 'latex2html' package, specify
+*** To get rid of this warning, load the 'ImageMagick' package, specify
 *** the appropriate program with the CONVERT environment variable to
 *** 'configure', or specify the --disable-papers-print option to
 *** 'configure'.

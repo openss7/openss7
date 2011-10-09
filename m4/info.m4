@@ -310,7 +310,7 @@ dnl	fi])
 *** SLES 10:       'configure --disable-texinfo-html --disable-texinfo-print'
 *** ArchLinux:     'pacman -S imagemagick'], [
 ***
-*** To get rid of this warning, load the 'latex2html' package, specify
+*** To get rid of this warning, load the 'ImageMagick' package, specify
 *** the appropriate program with the CONVERT environment variable to
 *** 'configure', or specify the --disable-texinfo-html and
 *** --disable-texinfo-print options to 'configure'.

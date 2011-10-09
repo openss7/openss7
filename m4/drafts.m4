@@ -149,7 +149,9 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** Ubuntu 8.04: 'aptitude install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
-*** Mandriva 10: 'urpmi groff'], [
+*** Mandriva 10: 'urpmi groff'
+*** Slack 13.37: 'slackpkg install groff'
+*** Salix 13.37: 'slapt-get --install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the SOELIM environment variable to
@@ -173,7 +175,9 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** Ubuntu 8.04: 'aptitude install groff_ext'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
-*** Mandriva 10: 'urpmi groff'], [
+*** Mandriva 10: 'urpmi groff'
+*** Slack 13.37: 'slackpkg install groff'
+*** Salix 13.37: 'slapt-get --install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the REFER environment variable to
@@ -197,7 +201,9 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** Ubuntu 8.04: 'aptitude install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
-*** Mandriva 10: 'urpmi groff'], [
+*** Mandriva 10: 'urpmi groff'
+*** Slack 13.37: 'slackpkg install groff'
+*** Salix 13.37: 'slapt-get --install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the PIC environment variable to
@@ -221,7 +227,9 @@ AC_DEFUN([_DRAFTS_SETUP], [dnl
 *** Ubuntu 8.04: 'aptitude install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
-*** Mandriva 10: 'urpmi groff-for-man'], [
+*** Mandriva 10: 'urpmi groff-for-man'
+*** Slack 13.37: 'slackpkg install groff'
+*** Salix 13.37: 'slapt-get --install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the TBL environment variable to
@@ -250,7 +258,9 @@ dnl	fi])
 *** Ubuntu 8.04: 'aptitude install groff'
 *** CentOS 5.x:  'yum install groff'
 *** SLES 10:     'zypper install groff'
-*** Mandriva 10: 'urpmi groff-for-man'], [
+*** Mandriva 10: 'urpmi groff-for-man'
+*** Slack 13.37: 'slackpkg install groff'
+*** Salix 13.37: 'slapt-get --install groff'], [
 ***
 *** To get rid of this warning, load the 'groff' package, specify the
 *** appropriate program with the GROFF environment variable to
@@ -311,7 +321,9 @@ dnl	fi])
 *** openSUSE 11: 'zypper install transfig'
 *** SLES 10:     'configure --disable-drafts-print'
 *** Mandriva 10: 'urpmi transfig'
-*** ArchLinux:   'pacman -S transfig'], [
+*** ArchLinux:   'pacman -S transfig'
+*** Slack 13.37: 'slackpkg install transfig'
+*** Salix 13.37: 'slapt-get --install transfig'], [
 ***
 *** To get rid of this warning, load the 'transfig' package, specify the
 *** appropriate program with the FIG2DEV environment variable to
