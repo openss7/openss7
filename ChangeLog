@@ -1,3 +1,15 @@
+2011-10-07  gettextize  <bug-gnu-gettext@gnu.org>
+
+	* m4/gettext.m4: Upgrade to gettext-0.18.1.
+	* m4/iconv.m4: Upgrade to gettext-0.18.1.
+	* m4/lib-ld.m4: Upgrade to gettext-0.18.1.
+	* m4/lib-link.m4: Upgrade to gettext-0.18.1.
+	* m4/lib-prefix.m4: Upgrade to gettext-0.18.1.
+	* m4/nls.m4: Upgrade to gettext-0.18.1.
+	* m4/po.m4: Upgrade to gettext-0.18.1.
+	* m4/progtest.m4: Upgrade to gettext-0.18.1.
+	* configure.ac (AM_GNU_GETTEXT_VERSION): Bump to 0.18.1.
+
 2011-09-20  Brian Bidulock  <bidulock@openss7.org>
 	* cache/debian-wheezy-i386-config.cache: added build cache
 	* cache/mandriva-2010.2-i586-config.cache: added build cache

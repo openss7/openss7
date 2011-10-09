@@ -22,7 +22,10 @@ arch=@target_arch@
 #	add it to the array like this: source=("thing.tar.gz" "foo.patch"
 #	"bar.icon").  If you don't specify a url for a file, that file will be
 #	copied inside the package, in a /usr/src/$pkgname-$pkgver directory.
-source=("http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz")
+source=("http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz"
+	"@target@-@kversion@-config.cache"
+	"@target@-config.site"
+	"@target@-@kversion@-modpost.cache")
 # sourcetemplate - url location where SLKBUILD and build-name.sh can be
 #	downloaded.  Furthermore all files from source without url must be
 #	available at this location.
@@ -109,9 +112,9 @@ slackdesc=\
 #	the build script stops if the compile fails.
 build() { :
 	cd $startdir/src/@PACKAGE@-@VERSION@
-	cache_file=../@target@-@kversion@-config.cache
-	csite_file=../@target@-config.site
-	mpost_file=../@target@-@kversion@-modpost.cache
+	cache_file=../../@target@-@kversion@-config.cache
+	csite_file=../../@target@-config.site
+	mpost_file=../../@target@-@kversion@-modpost.cache
 	env
 	./configure \
 	    ${CC:+CC="${CC}"} \
@@ -160,8 +163,10 @@ build() { :
 	    --with-gnu-ld \
 	    || { rm -f ${cache_file} ${csite_file} ${mpost_file} ; exit 1 ; }
 	make || return 1
-	make check || return 1
+#	make pdf || return 1
+#	make check || return 1
 	make DESTDIR=$startdir/pkg install-strip
+#	make DESTDIR=$startdir/pkg install-pdf
 	d=$startdir/pkg/usr/src/@PACKAGE@-@VERSION@-@PACKAGE_TXZRELEASE@/@kversion@
 	mkdir -p $d
 	b=$startdir/pkg/boot
