@@ -2921,7 +2921,7 @@ if PKG_BUILD_USER
 SUBDIRS = src
 
 if PKG_BUILD_ARCH
-SUBDIRS += intl po
+SUBDIRS += po
 CLEANFILES += po/stamp-po
 endif
 

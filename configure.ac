@@ -147,7 +147,7 @@ LT_LANG([C++])
 LT_LANG([Java])
 AC_SUBST([LIBTOOL_DEPS])
 AM_GNU_GETTEXT_VERSION([0.18.1])
-AM_GNU_GETTEXT
+AM_GNU_GETTEXT([external])
 
 dnl
 dnl Checks for libraries.
@@ -279,7 +279,6 @@ AC_CONFIG_FILES([Makefile
 		 doc/specs/xmap/Makefile
 		 doc/specs/xgcp/Makefile
 		 doc/suites/Makefile
-		 intl/Makefile
 		 lib32/Makefile
 		 po/Makefile.in
 		 scripts/texi/args.texi
