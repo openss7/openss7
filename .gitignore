@@ -10,8 +10,8 @@
 ABOUT-NLS
 AUTHORS
 BUGS
-ChangeLog.git
 COPYING
+ChangeLog.git
 INSTALL
 LICENSES
 LSM
@@ -566,6 +566,7 @@ doc/drafts/tua07.pic
 hold.tar.bz2
 intl
 m4/codeset.m4
+m4/fcntl-o.m4
 m4/gettext.m4
 m4/glibc2.m4
 m4/glibc21.m4
@@ -594,6 +595,7 @@ m4/printf-posix.m4
 m4/progtest.m4
 m4/size_max.m4
 m4/stdint_h.m4
+m4/threadlib.m4
 m4/uintmax_t.m4
 m4/visibility.m4
 m4/wchar_t.m4
