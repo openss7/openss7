@@ -363,70 +363,70 @@ post-manpages:
 			if test -n "$$COMPRESS" -a -x "$$COMPRESS" ; then \
 				list="$(man_MANS)" ; for f in $$list ; do \
 					if test -f $(DESTDIR)$(mandir)/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man1_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man1/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man1/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man1/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man2_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man2/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man2/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man2/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man3_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man3/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man3/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man3/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man4_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man4/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man4/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man4/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man5_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man5/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man5/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man5/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man6_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man6/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man6/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man6/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man7_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man7/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man7/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man7/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man8_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man8/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man8/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man8/$$f" ; \
 					fi ; \
 				done ; \
 				list="$(man9_MANS)" ; for f in $$list ; do f=$$(basename $$f) ; \
 					if test -f $(DESTDIR)$(mandir)/man9/$$f ; then \
-						$(ECHO_Q) "  GEN   " $$f.$$ext ; \
+						$(ECHO_Q) "  GEN   " $$f$$ext ; \
 						$(ECHO_V) "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man9/$$f" ; \
 						eval "$$COMPRESS_ENV $$COMPRESS $(DESTDIR)$(mandir)/man9/$$f" ; \
 					fi ; \
