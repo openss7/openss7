@@ -736,14 +736,32 @@ BEGIN {
 	show_complete("checked", "module exports")
 	show_starting("indexing", "kernel exports")
 	sysmap = ENVIRON["DESTDIR"] ENVIRON["ksysmap"]
-	while ((getline < sysmap) == 1) {
-	    if (/^.*. _?__ksymtab_/) {
-		sub(/^.*. _?__ksymtab_/, "")
-		defined[$1] = 1
+	if (sysmap && command("test -r " sysmap)) {
+	    if (sysmap~/\.gz$/    ) { cmd = "zcat "  sysmap } else
+	    if (sysmap~/\.bz2$/   ) { cmd = "bzcat " sysmap } else
+	    if (sysmap~/\.lzma$/  ) { cmd = "lzcat " sysmap } else
+	    if (sysmap~/\.xz/     ) { cmd = "xzcat " sysmap } else
+				    { cmd = "cat "   sysmap }
+	} else {
+	vmlinux = ENVIRON["DESTDIR"] ENVIRON["kvmlinux"]
+	if (vmlinux && command("test -r " vmlinux)) {
+	    name = "/var/tmp/." me "." PROCINFO["pid"] ".vmlinux"
+	    if (vmlinux~/\.gz$/   ) { cmd = "zcat "  vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" } else
+	    if (vmlinux~/\.bz2$/  ) { cmd = "bzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" } else
+	    if (vmlinux~/\.lzma$/ ) { cmd = "lzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" } else
+	    if (vmlinux~/\.xz$/   ) { cmd = "xzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" } else
+				    { cmd = "cat "   vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+	} else { cmd = "" } }
+	if (cmd) {
+	    while ((cmd | getline) == 1) {
+		if (/^.*. _?__ksymtab_/) {
+		    sub(/^.*. _?__ksymtab_/, "")
+		    defined[$1] = 1
+		}
+		show_progress("indexed", "kernel exports", 1000)
 	    }
-	    show_progress("indexed", "kernel exports", 1000)
+	    close(cmd)
 	}
-	close(sysmap)
 	show_complete("indexed", "kernel exports")
 	show_starting("checking", "undefined module symbols")
 	for (symb in undefined) {

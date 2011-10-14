@@ -897,6 +897,7 @@ if PERFORM_CHECKS
 #dist_check_SCRIPTS	+= $(top_srcdir)/scripts/check_modules
 TESTS_ENVIRONMENT 	+= DESTDIR='$(DESTDIR)' \
 			   ksysmap='$(ksysmap)' \
+			   kvmlinux='$(kvmlinux)' \
 			   KERNEL_MODULES='$(KERNEL_MODULES)' \
 			   KERNEL_MODMAPS='$(KERNEL_MODMAPS)' \
 			   KERNEL_WRAPPER='$(KERNEL_WRAPPER)' \
