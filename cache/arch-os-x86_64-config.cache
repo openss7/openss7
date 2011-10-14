@@ -23,7 +23,7 @@ bld_cv_pkg_cmd_LATEX2HTML=${bld_cv_pkg_cmd_LATEX2HTML='pacman --sync latex2html'
 bld_cv_pkg_cmd_LATEX=${bld_cv_pkg_cmd_LATEX='pacman --sync texlive-bin'}
 bld_cv_pkg_cmd_LDCONFIG=${bld_cv_pkg_cmd_LDCONFIG='pacman --sync perl'}
 bld_cv_pkg_cmd_LSMOD=${bld_cv_pkg_cmd_LSMOD='pacman --sync module-init-tools'}
-bld_cv_pkg_cmd_LSOF=${bld_cv_pkg_cmd_LSOF='pacman --sync kernel26-lts-headers'}
+bld_cv_pkg_cmd_LSOF=${bld_cv_pkg_cmd_LSOF='pacman --sync linux-headers'}
 bld_cv_pkg_cmd_MAKEPKG=${bld_cv_pkg_cmd_MAKEPKG='pacman --sync pacman'}
 bld_cv_pkg_cmd_MAKEWHATIS=${bld_cv_pkg_cmd_MAKEWHATIS='pacman --sync man-db'}
 bld_cv_pkg_cmd_MD5SUM=${bld_cv_pkg_cmd_MD5SUM='pacman --sync coreutils'}
@@ -76,7 +76,7 @@ bld_cv_pkg_name_MAKEPKG=${bld_cv_pkg_name_MAKEPKG=pacman}
 bld_cv_pkg_name_MAKEWHATIS=${bld_cv_pkg_name_MAKEWHATIS=man-db}
 bld_cv_pkg_name_MD5SUM=${bld_cv_pkg_name_MD5SUM=coreutils}
 bld_cv_pkg_name_MODPROBE=${bld_cv_pkg_name_MODPROBE=module-init-tools}
-bld_cv_pkg_name_MODULE_SYMVERS=${bld_cv_pkg_name_MODULE_SYMVERS=kernel26-lts-headers}
+bld_cv_pkg_name_MODULE_SYMVERS=${bld_cv_pkg_name_MODULE_SYMVERS=linux-headers}
 bld_cv_pkg_name_PACMAN=${bld_cv_pkg_name_PACMAN=pacman}
 bld_cv_pkg_name_PDFLATEX=${bld_cv_pkg_name_PDFLATEX=texlive-bin}
 bld_cv_pkg_name_PDFTEX=${bld_cv_pkg_name_PDFTEX=texlive-bin}
@@ -97,7 +97,7 @@ bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_name_UCD_SNMP_UCD_SNMP_C
 bld_cv_pkg_name_ZIP=${bld_cv_pkg_name_ZIP=zip}
 bld_cv_pkg_path_EXTERN_H=${bld_cv_pkg_path_EXTERN_H=/usr/lib/perl5/core_perl/CORE/EXTERN.h}
 bld_cv_pkg_path_GCJ_CNI_H=${bld_cv_pkg_path_GCJ_CNI_H=/usr/include/c++/4.6.1/gcj/cni.h}
-bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/lib/modules/2.6.32-lts/build/Module.symvers}
+bld_cv_pkg_path_MODULE_SYMVERS=${bld_cv_pkg_path_MODULE_SYMVERS=/lib/modules/3.0-ARCH/build/Module.symvers}
 bld_cv_pkg_path_TCL_H=${bld_cv_pkg_path_TCL_H=/usr/include/tcl.h}
 bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=${bld_cv_pkg_path_UCD_SNMP_UCD_SNMP_CONFIG_H=/usr/include/ucd-snmp/ucd-snmp-config.h}
 bld_cv_pkg_prog_AUTOM4TE=${bld_cv_pkg_prog_AUTOM4TE=autom4te}
@@ -152,7 +152,7 @@ bld_cv_pkg_prog_XZ_CMD=${bld_cv_pkg_prog_XZ_CMD=xz}
 bld_cv_pkg_prog_ZIP=${bld_cv_pkg_prog_ZIP=zip}
 bld_cv_pkg_ver_BIBTEX=${bld_cv_pkg_ver_BIBTEX=2011.1-1}
 bld_cv_pkg_ver_BZIP2_CMD=${bld_cv_pkg_ver_BZIP2_CMD=1.0.6-2}
-bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.7.2.8-1}
+bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.7.3.0-1}
 bld_cv_pkg_ver_DEPMOD=${bld_cv_pkg_ver_DEPMOD=3.16-1}
 bld_cv_pkg_ver_DOXYGEN=${bld_cv_pkg_ver_DOXYGEN=1.7.5.1-1}
 bld_cv_pkg_ver_DVI2PS=${bld_cv_pkg_ver_DVI2PS=2011.1-1}
@@ -177,12 +177,12 @@ bld_cv_pkg_ver_LATEX2HTML=${bld_cv_pkg_ver_LATEX2HTML=2008-2}
 bld_cv_pkg_ver_LATEX=${bld_cv_pkg_ver_LATEX=2011.1-1}
 bld_cv_pkg_ver_LDCONFIG=${bld_cv_pkg_ver_LDCONFIG=2.14-6}
 bld_cv_pkg_ver_LSMOD=${bld_cv_pkg_ver_LSMOD=3.16-1}
-bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.84-3}
+bld_cv_pkg_ver_LSOF=${bld_cv_pkg_ver_LSOF=4.85-1}
 bld_cv_pkg_ver_MAKEPKG=${bld_cv_pkg_ver_MAKEPKG=3.5.4-4}
 bld_cv_pkg_ver_MAKEWHATIS=${bld_cv_pkg_ver_MAKEWHATIS=2.6.0.2-2}
 bld_cv_pkg_ver_MD5SUM=${bld_cv_pkg_ver_MD5SUM=8.13-2}
 bld_cv_pkg_ver_MODPROBE=${bld_cv_pkg_ver_MODPROBE=3.16-1}
-bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=2.6.32.46-1}
+bld_cv_pkg_ver_MODULE_SYMVERS=${bld_cv_pkg_ver_MODULE_SYMVERS=3.0.6-2}
 bld_cv_pkg_ver_PACMAN=${bld_cv_pkg_ver_PACMAN=3.5.4-4}
 bld_cv_pkg_ver_PDFLATEX=${bld_cv_pkg_ver_PDFLATEX=2011.1-1}
 bld_cv_pkg_ver_PDFTEX=${bld_cv_pkg_ver_PDFTEX=2011.1-1}

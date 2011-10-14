@@ -1,360 +1,73 @@
 # vim: ft=sh
+#
 
-# pkgname (array) - The name of the package.  This has to be a unix-friendly
-#	name as it will be used in package filenames.  Members of the array are
-#	not allowed to start with hyphens.
-pkgname=('@PACKAGE@'
-	 '@PACKAGE@-repo'
-	 '@PACKAGE@-base'
-	 '@PACKAGE@-lib'
-	 '@PACKAGE@-compat'
-	 '@PACKAGE@-devel'
-	 '@PACKAGE@-buginfo'
-	 '@PACKAGE@-bugsource'
-	 '@PACKAGE@-latest'
-	 '@PACKAGE@-kernel'
-	 '@PACKAGE@-kernel-devel'
-	 '@PACKAGE@-kernel-buginfo'
-	 '@PACKAGE@-kernel-bugsource'
-	 '@PACKAGE@-doc'
-	 '@PACKAGE@-java'
-	 '@PACKAGE@-javadoc')
-# pkgver - The version of the software as reelase from the author (e.g. 2.7.1).
-#	The variable is not allowed to contain colons or hyphens.
-pkgver='@VERSION@'
-# pkgrel - This is the release number specific to the Arch Linux release.  This
-#	allows package maintainers to make updates to the package's configure
-#	flags, for example.  A pkgrel of 1 is typically used for each upstream
-#	software release and is incremented for intermediate PKGBUILD updates.
-#	THe variable is not allowed to contain hyphens.
-pkgrel='@PACKAGE_PACRELEASE@'
-# epoch - Use to force the package to be seen as newer than any previous
-#	versions with a lower epoch, even if the version number would normally
-#	not trigger such an upgrade.  This value is required to be a positive
-#	integer; the default value if left unspecified is 0.  This is useful
-#	when the version numbering scheme of a package changes (or is
-#	alphanumeric), breaking normal version comparison logic.  See pacman(8)
-#	for more information on version comparisons.
-pkgbase='@PACKAGE@'
-pkgdesc=""
-depends=()
+# Maintainer: Brian Bidulock <bidulock@openss7.org>
+pkgname=@PACKAGE@
+pkgver=@VERSION@
+pkgrel=@PACKAGE_PACRELEASE@
+epoch=
+pkgdesc='OpenSS7 Linux Fast-STREAMS and Protocol Suites'
+arch=('i686' 'x86_64')
+url='http://www.openss7.org/'
+license=('AGPL3' 'GPL3' 'BSD')
+groups=('openss7')
+depends=(
+	"linux=$(pacman -Qi linux|grep -i '^version'|awk '{print$3}')"
+)
+makedepends=()
+checkdepends=()
+optdepends=(
+	'net-snmp: for SNMP agent support'
+)
 provides=()
 conflicts=()
-# makedepends (array) - An array of packages that this package depends on to
-#	build, but are not needed at runtime. Packages in this list follow the
-#	same format as depends.
-makedepends=()
-# checkdepends (array) - An array of packages that this package depends on to
-#	run its test suite, but are not needed at runtime.  Packages in this
-#	list follow the same format as depends. These dependencies are only
-#	considered when the check() function is present and is to be run by
-#	makepkg.
-checkdepends=()
-arch=('any' 'i686' 'x86_64')
-# license (array) - This field specifies the license(s) that apply to the
-#	package. Commonly-used licenses are found in /usr/share/licenses/common.
-#	If you see the package's license there, simply reference it in the
-#	license field (e.g.  license=('GPL')). If the package provides a license
-#	not found in /usr/share/licenses/common, then you should include the
-#	license in the package itself and set license=('custom') or
-#	license=('custom:LicenseName'). The license should be placed in
-#	$pkgdir/usr/share/licenses/$pkgname when building the package. If
-#	multiple licenses are applicable for a package, list all of them:
-#	license=('GPL' 'FDL').
-#
-license=('AGPL3' 'GPL3' 'BSD')
-# url - This field contains a URL that is associated with the software being
-#	packaged.  This is typically the project's website.
-url='http://www.openss7.org/'
-# changelog - Specifies a changelog file that is to be included in the package.
-#	This file should reside in the same directory as the PKGBUILD, and will
-#	be copied into the package by makepkg. It does not need to be included
-#	in the source array (e.g.  changelog=$pkgname.changelog).
-changelog='@PACKAGE@.changelog'
+replaces=()
+backup=()
+options=('!strip' '!docs' '!libtool' 'emptydirs' 'ccache' '!distcc' 'buildflags' '!makeflags')
+install=@PACKAGE@.install
+changelog=@PACKAGE@.changelog
+source=('http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz')
+noextract=()
+md5sums=() #generate with 'makepkg -g'
 
-_blddir=${srcdir}/_build
-_insdir=${srcdir}/_install
-
-# source (array) - An array of source files required to build the package.
-#	Source files must either reside in the same directory as the PKGBUILD
-#	file, or be a fully-qualified URL that makepkg will use to download the
-#	file. In order to make the PKGBUILD as useful as possible, use the
-#	$pkgname and $pkgver variables if possible when specifying the download
-#	location. Any files that are compressed will automatically be extracted,
-#	unless found in the noextract array listed below.
-#
-#	It is also possible to specify an optional filename, which is helpful
-#	with weird URLs and for handling multiple source files with the same
-#	name. The syntax is: source=('filename::url').
-source=(http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz)
-# noextract (array) - An array of filenames corresponding to those from the
-#	source array. Files listed here will not be extracted with the rest of
-#	the source files. This is useful for packages which use compressed data
-#	which is downloaded but not necessary to uncompress.
-#noextract=
-# md5sums (array) - This array contains an MD5 hash for every source file
-#	specified in the source array (in the same order).  makepkg will use
-#	this to verify source file integrity during subsequent builds. To easily
-#	generate md5sums, run "makepkg -g >> PKGBUILD". If desired, move the
-#	md5sums line to an appropriate location.
-md5sums=('')
-# sha1sums, sha256sums, sha384sums, sha512sums (arrays) - Alternative integrity
-#	checks that makepkg supports; these all behave similar to the md5sums
-#	option described above. To enable use and generation of these checksums,
-#	be sure to set up the INTEGRITY_CHECK option in makepkg.conf(5).
 build() {
-	mkdir -p ${_blddir}
-	cd ${_blddir}
-	_cache_file=${startdir}/${target_distos}-${_kversion}-config.cache
-	_csite_file=${startdir}/${target_distos}-config.site
-	_mpost_file=${startdir}/${target_distos}-${_kversion}-modpost.cache
-	${srcdir}/configure \
-		CONFIG_SITE=${_csite_file} \
-		MODPOST_CACHE=${_mpost_file} \
-		${PACKAGE_PACOPTIONS} \
-		--cache-file=${_cache_file} \
+	cd $srcdir/$pkgname-$pkgver
+	cache_file=../../@target@-@kversion@-config.cache
+	csite_file=../../@target@-config.site
+	mpost_file=../../@target@-@kversion@-modpost.cache
+	env
+	./configure \
+		${CC:+CC="${CC}"} \
+		${CFLAGS+CFLAGS="${CFLAGS}"} \
+		WFLAGS='-Wno-unused-but-set-variable -Wno-system-headers -Wno-endif-labels' \
+		${LD+LD="${LD}"} \
+		${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
+		${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
+		${CPP+CPP="${CPP}"} \
+		${CXX+CXX="${CXX:-$CC}"} \
+		${CXXFLAGS+CXXFLAGS="${CXXFLAGS}"} \
+		${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
+		CONFIG_SITE=${csite_file} \
+		MODPOST_CACHE=${mpost_file} \
+		--cache-file=${cache_file} \
 		--disable-maintainer-mode \
-		--enable-dependency-tracking \
+		--with-k-release=@kversion@ \
+		--with-k-modules=@kmoddir@ \
+		--with-k-subdir=@ksubdir@ \
+		--with-k-optimize=speed \
+		--with-optimize=speed \
 		--with-gnu-ld \
-		--with-k-release=${_kversion} \
-		|| { rm -f ${_cache_file} ${_csite_file} ${_mpost_file} ; exit 1 ; }
+		|| { rm -f ${cache_file} ${csite_file} ${mpost_file} ; exit 1 ; }
 	make
-	mkdir -p ${_insdir}
-	make DESTDIR=${_insdir} install
 }
 
 check() {
-	cd ${_blddir}
-	make check check-clean
+	cd $srcdir/$pkgname-$pkgver
+	make -k check
 }
 
-_install_files() {
-	cd ${_insdir}
-	while read f ; do
-		install -D $f ${pkgdir}/$f
-	done
+package() {
+	cd $srcdir/$pkgname-$pkgver
+	make DESTDIR=$pkgdir install-strip
 }
 
-package_@PACKAGE@() {
-	pkgver='@VERSION@'
-	pkgrel='@PACKAGE_PACRELEASE@'
-	pkgdesc=''
-# arch (array) - Defines on which architectures the given package is available
-#	(e.g.  arch=('i686' 'x86_64')). Packages that contain no architecture
-#	specific files may use arch=(any).
-	arch=('any')
-	license=('AGPL3')
-# groups (array) - An array of symbolic names that represent groups of packages,
-#	allowing you to install multiple packages by requesting a single target.
-#	For example, one could install all KDE packages by installing the kde
-#	group.
-	groups=('blah')
-# depends (array) - An array of packages that this package depends on to run.
-#	Packages in this list should be surrounded with single quotes and
-#	contain at least the package name. Entries can also include a version
-#	requirement of the form name<>version, where <> is one of five
-#	comparisons: >= (greater than or equal to), <= (less than or equal to),
-#	= (equal to), > (greater than), or < (less than).
-	depends=()
-# optdepends (array) - An array of packages (and accompanying reasons) that are
-#	not essential for base functionality, but may be necessary to make full
-#	use of the contents of this package. optdepends are currently for
-#	informational purposes only and are not utilized by pacman during
-#	dependency resolution. The format for specifying optdepends is:
-#	optdepends=('fakeroot: for makepkg usage as normal user')
-	optdepends=()
-# provides (array) - An array of "virtual provisions" that this package
-#	provides. This allows a package to provide dependencies other than its
-#	own package name. For example, the dcron package can provide cron, which
-#	allows packages to depend on cron rather than dcron OR fcron. Versioned
-#	provisions are also possible, in the name=version format. For example,
-#	dcron can provide cron=2.0 to satisfy the cron>=2.0 dependency of other
-#	packages.  Provisions involving the > and < operators are invalid as
-#	only specific versions of a package may be provided.
-	provides=()
-# conflicts (array) - An array of packages that will conflict with this package
-#	(i.e. they cannot both be installed at the same time). This directive
-#	follows the same format as depends. Versioned conflicts are also
-#	supported.
-	conflicts=()
-# replaces (array) - An array of packages that this package should replace, and
-#	can be used to handle renamed/combined packages.  For example, if the
-#	j2re package is renamed to jre, this directive allows future upgrades to
-#	continue as expected even though the package has moved. Sysupgrade is
-#	currently the only pacman operation that utilizes this field, a normal
-#	sync will not use its value.
-	replaces=()
-# backup (array) - A space-delimited array of filenames, without preceding
-#	slashes, that should be backed up if the package is removed or upgraded.
-#	This is commonly used for packages placing configuration files in /etc.
-#	See Handling Config Files in pacman(8) for more information.
-	backup=()
-# options (array) - This array allows you to override some of makepkg's default
-#	behavior when building packages. To set an option, just include the
-#	option name in the options array. To reverse the default behavior, place
-#	an "!" at the front of the option. Only specify the options you
-#	specifically want to override, the rest will be taken from
-#	makepkg.conf(5).  NOTE: force is a now-removed option in favor of the
-#	top level epoch variable.
-#
-#	strip - Strip symbols from binaries and libraries. If you frequently use
-#	    a debugger on programs or libraries, it may be helpful to disable
-#	    this option.
-#
-#	docs - Save doc directories. If you wish to delete doc directories,
-#	    specify !docs in the array.
-#
-#	libtool - Leave libtool (.la) files in packages. Specify !libtool to
-#	    remove them.
-#
-#	emptydirs - Leave empty directories in packages.
-#
-#	zipman - Compress man and info pages with gzip.
-#
-#	ccache - Allow the use of ccache during build. More useful in its
-#	    negative form !ccache with select packages that have problems
-#	    building with ccache.
-#
-#	distcc - Allow the use of distcc during build. More useful in its
-#	    negative form !distcc with select packages that have problems
-#	    building with distcc.
-#
-#	buildflags - Allow the use of user-specific buildflags (CFLAGS,
-#	    CXXFLAGS, LDFLAGS) during build as specified in makepkg.conf(5).
-#	    More useful in its negative form !buildflags with select packages
-#	    that have problems building with custom buildflags.
-#
-#	makeflags - Allow the use of user-specific makeflags during build as
-#	    specified in makepkg.conf(5). More useful in its negative form
-#	    !makeflags with select packages that have problems building with
-#	    custom makeflags such as -j2 (or higher).
-	options=()
-# install - Specifies a special install script that is to be included in the
-#	package. This file should reside in the same directory as the PKGBUILD,
-#	and will be copied into the package by makepkg. It does not need to be
-#	included in the source array (e.g.  install=pkgname.install).
-	install='@PACKAGE@.install'
-	#changelog='@PACKAGE@.changelog'
-	( cd ${_insdir}
-	  echo AUTHORS
-	  [ ! -f ANNOUNCE  ] || echo ANNOUNCE
-	  [ ! -f ABOUT-NLS ] || echo ABOUT-NLS
-	  [ ! -f BUGS      ] || echo BUGS
-	  echo COPYING
-	  echo ChangeLog
-	  echo INSTALL
-	  echo INSTALL-@PACKAGE@
-	  [ ! -f LICENSES  ] || echo LICENSES
-	  echo LSM
-	  echo MANUAL
-	  echo NEWS
-	  [ ! -f NOTES       ] || echo NOTES
-	  [ ! -f NOTES.cos53 ] || echo NOTES.cos53
-	  [ ! -f NOTES.kmod  ] || echo NOTES.kmod
-	  [ ! -f NOTES.kmp   ] || echo NOTES.kmp
-	  [ ! -f NOTES.ksyms ] || echo NOTES.ksyms
-	  [ ! -f NOTES.repo  ] || echo NOTES.repo
-	  [ ! -f NOTES.rpm   ] || echo NOTES.rpm
-	  [ ! -f NOTES.sles  ] || echo NOTES.sles
-	  echo PROBLEMS
-	  echo README
-	  [ ! -f README-alpha ] || echo README-alpha
-	  echo README-cvs
-	  echo README-make
-	  [ ! -f RELEASE-NOTES ] || echo RELEASE-NOTES
-	  echo THANKS
-	  echo TODO
-	  echo @PACKAGE@-@VERSION@.lsm
-	) | _install_files
-}
-package_@PACKAGE@-repo() {
-	arch=('any')
-	backup=()
-	install='@PACKAGE@-repo.install'
-}
-package_@PACKAGE@-base() {
-	arch=('any')
-	backup=()
-	install='@PACKAGE@-base.install'
-}
-package_@PACKAGE@-lib() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-lib.install'
-	groups=('lib')
-	depends=()
-	optdepends=()
-	conflicts=()
-	provides=()
-	replaces=()
-	options=()
-}
-package_@PACKAGE@-compat() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-compat.install'
-	groups=('lib')
-}
-package_@PACKAGE@-devel() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-devel.install'
-	groups=('devel')
-}
-package_@PACKAGE@-buginfo() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-buginfo.install'
-	groups=('debug')
-}
-package_@PACKAGE@-bugsource() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-bugsource.install'
-	groups=('debug')
-}
-package_@PACKAGE@-latest() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-latest.install'
-}
-package_@PACKAGE@-kernel() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-kernel.install'
-}
-package_@PACKAGE@-kernel-devel() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-kernel-devel.install'
-	groups=('devel')
-}
-package_@PACKAGE@-kernel-buginfo() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-kernel-buginfo.install'
-	groups=('debug')
-}
-package_@PACKAGE@-kernel-bugsource() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-kernel-bugsource.install'
-	groups=('debug')
-}
-package_@PACKAGE@-doc() {
-	arch=('any')
-	backup=()
-	install='@PACKAGE@-doc.install'
-}
-package_@PACKAGE@-java() {
-	arch=('i686' 'x86_64')
-	backup=()
-	install='@PACKAGE@-java.install'
-	groups=('java')
-}
-package_@PACKAGE@-javadoc() {
-	arch=('any')
-	backup=()
-	install='@PACKAGE@-javadoc.install'
-	groups=('doc')
-}
