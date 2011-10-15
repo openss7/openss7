@@ -2,31 +2,58 @@
 #
 
 # Maintainer: Brian Bidulock <bidulock@openss7.org>
-pkgname=@PACKAGE@
+
 # The version should be a concatenation of the package version and the kernel package version.
-_kernv="$(pacman -Qi linux|grep -i '^version'|awk '{print$3}')"
-_kv=$(echo "$_kernv" | sed -e 's,-.*$,,')
-_kr=$(echo "$_kernv" | sed -e 's,^.*-,,')
+_kvr="$(pacman -Qi linux|grep -i '^version'|awk '{print$3}')"
+_kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
+_kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
+
+pkgname=@PACKAGE@
 pkgver="@VERSION@.$_kv"
 pkgrel="@PACKAGE_PACRELEASE@.$_kr"
 epoch=
-pkgdesc='OpenSS7 Linux Fast-STREAMS and Protocol Suites'
-arch=('i686' 'x86_64')
+pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites'
+arch=(
+	'any'
+	'i686'
+	'x86_64'
+	)
 url='http://www.openss7.org/'
 license=('AGPL3' 'GPL3' 'BSD')
 groups=('openss7')
-depends=("linux=$_kernv")
+depends=(
+	"linux=$_kvr"
+	)
 makedepends=()
 checkdepends=()
-optdepends=('net-snmp: for SNMP agent support'
-	    'perl-tk: for graphical utilities'
-	    'gtkdialog: for graphical utilities'
-)
+optdepends=(
+	'net-snmp: for SNMP agent support'
+	'perl-tk: for graphical utilities'
+	'gtkdialog: for graphical utilities'
+	)
 provides=()
 conflicts=()
 replaces=()
-backup=()
-options=('!strip' '!docs' '!libtool' 'emptydirs' 'ccache' '!distcc' 'buildflags' '!makeflags')
+backup=(
+	'/etc/conf.d/openss7'
+	'/etc/conf.d/specfs'
+	'/etc/conf.d/strace'
+	'/etc/conf.d/streams'
+	'/etc/conf.d/strerr'
+	'/etc/nslconfig.d/openss7'
+	'/etc/openss7.conf'
+	'/etc/rc.d/openss7'
+	'/etc/rc.d/specfs'
+	'/etc/rc.d/strace'
+	'/etc/rc.d/streams'
+	'/etc/rc.d/strerr'
+	'/etc/snmp/snmp.d/01openss7'
+	'/etc/sock2path.d/openss7'
+	'/etc/streams.conf'
+	'/etc/strload.conf'
+	'/etc/strsetup.conf'
+	)
+options=('!strip' 'docs' 'libtool' 'emptydirs' 'ccache' '!distcc' 'buildflags' '!makeflags')
 install=@PACKAGE@.install
 changelog=@PACKAGE@.changelog
 source=('http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz')
@@ -34,14 +61,15 @@ noextract=()
 
 build() {
 	local cache_file csite_file mpost_file
-	cd $srcdir/@PACKAGE@-@VERSION@
+	mkdir $srcdir/_build
+	cd $srcdir/_build
 	cache_file=../../@target@-@kversion@-config.cache
 	csite_file=../../@target@-config.site
 	mpost_file=../../@target@-@kversion@-modpost.cache
-	./configure \
+	$srcdir/@PACKAGE@-@VERSION@/configure \
 		${CC:+CC="${CC}"} \
 		${CFLAGS+CFLAGS="${CFLAGS}"} \
-		WFLAGS='-Wno-unused-but-set-variable -Wno-system-headers -Wno-endif-labels' \
+		${WFLAGS+WFLAGS="${WFLAGS}"} \
 		${LD+LD="${LD}"} \
 		${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
 		${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
@@ -64,12 +92,12 @@ build() {
 }
 
 check() {
-	cd $srcdir/@PACKAGE@-@VERSION@
+	cd $srcdir/_build
 	make -k check || :
 }
 
 package() {
-	cd $srcdir/@PACKAGE@-@VERSION@
+	cd $srcdir/_build
 	make DESTDIR=$pkgdir install-strip
 }
 
