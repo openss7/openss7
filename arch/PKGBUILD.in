@@ -3,21 +3,24 @@
 
 # Maintainer: Brian Bidulock <bidulock@openss7.org>
 pkgname=@PACKAGE@
-pkgver=@VERSION@
-pkgrel=@PACKAGE_PACRELEASE@
+# The version should be a concatenation of the package version and the kernel package version.
+_kernv="$(pacman -Qi linux|grep -i '^version'|awk '{print$3}')"
+_kv=$(echo "$_kernv" | sed -e 's,-.*$,,')
+_kr=$(echo "$_kernv" | sed -e 's,^.*-,,')
+pkgver="@VERSION@.$_kv"
+pkgrel="@PACKAGE_PACRELEASE@.$_kr"
 epoch=
 pkgdesc='OpenSS7 Linux Fast-STREAMS and Protocol Suites'
 arch=('i686' 'x86_64')
 url='http://www.openss7.org/'
 license=('AGPL3' 'GPL3' 'BSD')
 groups=('openss7')
-depends=(
-	"linux=$(pacman -Qi linux|grep -i '^version'|awk '{print$3}')"
-)
+depends=("linux=$_kernv")
 makedepends=()
 checkdepends=()
-optdepends=(
-	'net-snmp: for SNMP agent support'
+optdepends=('net-snmp: for SNMP agent support'
+	    'perl-tk: for graphical utilities'
+	    'gtkdialog: for graphical utilities'
 )
 provides=()
 conflicts=()
@@ -28,14 +31,13 @@ install=@PACKAGE@.install
 changelog=@PACKAGE@.changelog
 source=('http://www.openss7.org/repo/tarballs/@PACKAGE@-@VERSION@.tar.xz')
 noextract=()
-md5sums=() #generate with 'makepkg -g'
 
 build() {
-	cd $srcdir/$pkgname-$pkgver
+	local cache_file csite_file mpost_file
+	cd $srcdir/@PACKAGE@-@VERSION@
 	cache_file=../../@target@-@kversion@-config.cache
 	csite_file=../../@target@-config.site
 	mpost_file=../../@target@-@kversion@-modpost.cache
-	env
 	./configure \
 		${CC:+CC="${CC}"} \
 		${CFLAGS+CFLAGS="${CFLAGS}"} \
@@ -62,12 +64,12 @@ build() {
 }
 
 check() {
-	cd $srcdir/$pkgname-$pkgver
-	make -k check
+	cd $srcdir/@PACKAGE@-@VERSION@
+	make -k check || :
 }
 
 package() {
-	cd $srcdir/$pkgname-$pkgver
+	cd $srcdir/@PACKAGE@-@VERSION@
 	make DESTDIR=$pkgdir install-strip
 }
 

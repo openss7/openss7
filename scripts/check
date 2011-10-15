@@ -108,6 +108,7 @@ function get_manpages(s,    numb, page, find) {
     find = "find " ENVIRON["top_builddir"] "/doc/man -follow -type f -name '*.[" s "]*' 2>/dev/null | sort -u"
     show_starting("indexing", "built manual pages")
     while ((find | getline) == 1) {
+	if (/\.man$/) continue
 	sub(ENVIRON["top_builddir"] "/doc/man/", "")
 	page = $0
 	sub(/.*\//, "", page)
@@ -134,9 +135,8 @@ function get_srcpages(s,    numb, page, find) {
     show_starting("indexing", "source manual pages")
     while ((find | getline) == 1) {
 	if (/\/CVS\//) continue
-	if (/^\./) continue
+	if (!sub(/\.man$/, "")) continue
 	sub(ENVIRON["top_srcdir"] "/doc/man/", "")
-	sub(/\.man$/, "")
 	page = $0
 	sub(/.*\//, "", page)
 	sub(/\.gz$/, "", page)
@@ -354,6 +354,8 @@ BEGIN {
 	ENVIRON["DESTDIR"] = ""
     if (!("ksysmap" in ENVIRON))
 	ENVIRON["ksysmap"] = ""
+    if (!("kvmlinux" in ENVIRON))
+	ENVIRON["kvmlinux"] = ""
     if (!("WARN_EXCESS" in ENVIRON))
 	ENVIRON["WARN_EXCESS"] = ""
     if (!("EXPOSED_SYMBOLS" in ENVIRON))
@@ -735,23 +737,25 @@ BEGIN {
 	}
 	show_complete("checked", "module exports")
 	show_starting("indexing", "kernel exports")
+	cmd = ""
 	sysmap = ENVIRON["DESTDIR"] ENVIRON["ksysmap"]
-	if (sysmap && command("test -r " sysmap)) {
-	    if (sysmap~/\.gz$/    ) { cmd = "zcat "  sysmap } else
-	    if (sysmap~/\.bz2$/   ) { cmd = "bzcat " sysmap } else
-	    if (sysmap~/\.lzma$/  ) { cmd = "lzcat " sysmap } else
-	    if (sysmap~/\.xz/     ) { cmd = "xzcat " sysmap } else
+	if (sysmap && system("test -r " sysmap) == 0) {
 				    { cmd = "cat "   sysmap }
+	    if (sysmap~/\.gz$/    ) { cmd = "zcat "  sysmap }
+	    if (sysmap~/\.bz2$/   ) { cmd = "bzcat " sysmap }
+	    if (sysmap~/\.lzma$/  ) { cmd = "lzcat " sysmap }
+	    if (sysmap~/\.xz/     ) { cmd = "xzcat " sysmap }
 	} else {
 	vmlinux = ENVIRON["DESTDIR"] ENVIRON["kvmlinux"]
-	if (vmlinux && command("test -r " vmlinux)) {
+	    if (vmlinux && system("test -r " vmlinux) == 0) {
 	    name = "/var/tmp/." me "." PROCINFO["pid"] ".vmlinux"
-	    if (vmlinux~/\.gz$/   ) { cmd = "zcat "  vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" } else
-	    if (vmlinux~/\.bz2$/  ) { cmd = "bzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" } else
-	    if (vmlinux~/\.lzma$/ ) { cmd = "lzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" } else
-	    if (vmlinux~/\.xz$/   ) { cmd = "xzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" } else
-				    { cmd = "cat "   vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
-	} else { cmd = "" } }
+					{ cmd = "( cat "   vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+		if (vmlinux~/\.gz$/   ) { cmd = "( zcat "  vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+		if (vmlinux~/\.bz2$/  ) { cmd = "( bzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+		if (vmlinux~/\.lzma$/ ) { cmd = "( lzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+		if (vmlinux~/\.xz$/   ) { cmd = "( xzcat " vmlinux " >" name "; nm -Bs " name "; rm -f -- " name ") 2>/dev/null" }
+	    }
+	}
 	if (cmd) {
 	    while ((cmd | getline) == 1) {
 		if (/^.*. _?__ksymtab_/) {
@@ -773,7 +777,7 @@ BEGIN {
 		if (symb in defined)
 		    print_s("module symbol " symb " is resolved")
 		else
-		    print_e("cannot resolve prelinked module symbol " symb)
+		    print_w("cannot resolve prelinked module symbol " symb)
 	    }
 	    show_progress("checked", "undefined module symbols", 1000)
 	}
@@ -855,6 +859,7 @@ BEGIN {
 	show_starting("indexing", "manpages")
 	while((command | getline) == 1) {
 	    sub(/^\.\//, "")
+	    if (/\.man$/) continue
 	    print_d("mans: " $1)
 	    mans[$1] = 1
 	    show_progress("indexed", "manpages", 1000)
