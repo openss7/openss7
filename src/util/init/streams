@@ -50,6 +50,7 @@ init_mode="standalone"
 elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
 elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
 elif [ -r /sbin/start-stop-daemon ] ; then                             init_mode="debian"    ;
+elif [ -r /etc/rc.d/functions     ] ; then . /etc/rc.d/functions     ; init_mode="archlinux" ;
 fi
 
 case "$init_mode" in
@@ -86,6 +87,11 @@ case "$init_mode" in
 	    return $RETVAL
 	}
 	;;
+    (archlinux)
+	action () {
+	    status "$@"
+	}
+	;;
     (standalone|*)
 	action () {
 	    echo -en "$1"
@@ -102,7 +108,7 @@ name='streams'
 script='streams'
 ucname="STREAMS"
 lockfile="/var/lock/subsys/$name"
-config="/etc/default/$name etc/sysconfig/$name"
+config="/etc/sysconfig/$name /etc/default/$name /etc/conf.d/$name"
 mkdev="${name}_mkdev"
 desc="the STREAMS subsystem"
 
