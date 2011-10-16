@@ -286,6 +286,7 @@ remove_depends () {
 #   manually invoked).
 #
 start_update () {
+    local marker command
     [ :${runlevel+set} = :set ] || runlevel=$RUNLEVEL
     [ :${previous+set} = :set ] || previous=${PREVLEVEL:-N}
     RETVAL=0
@@ -321,6 +322,7 @@ start_update () {
 #   (and not just switching run levels or manually invoked).
 #
 stop_update () {
+    local marker command
     RETVAL=0
     [ :${runlevel+set} = :set ] || runlevel=$RUNLEVEL
     [ :${previous+set} = :set ] || previous=${PREVLEVEL:-N}
