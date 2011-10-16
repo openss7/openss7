@@ -2400,7 +2400,8 @@ function chcksolution(kversion, kver,
 	if (altered) {
 	    # tell init script to correct on reboot
 	    print_warns(pfx "*** REBOOT REQUIRED ***")
-	    doit("touch /.openss7_update-" krunning)
+	    doit("mkdir -p -- /var/lib/openss7")
+	    doit("touch /var/lib/openss7/.openss7_update-" krunning)
 	    return 0
 	}
     }

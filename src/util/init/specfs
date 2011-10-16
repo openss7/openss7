@@ -288,8 +288,10 @@ remove_depends () {
 #
 start_update () {
     RETVAL=0
-    if [ ":$previous" = 'N' -a ":$runlevel" != ':' ] ; then
-	marker="/.openss7_update-`uname -r`"
+    [ :${runlevel+set} = :set ] || runlevel=$RUNLEVEL
+    [ :${previous+set} = :set ] || previous=${PREVLEVEL:-N}
+    if [ ":$previous" = ':N' -a ":$runlevel" != ':' ] ; then
+	marker="/var/lib/openss7/.openss7_update-`uname -r`"
 	if [ ":$SPECFS_KUPDATE" = ':yes' -a -e $marker ] ; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules ; do
 		if [ -x $command ] ; then
@@ -321,8 +323,10 @@ start_update () {
 #
 stop_update () {
     RETVAL=0
-    if [ ":$previous" != 'N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' \) ]; then
-	marker="/.openss7_update-`uname -r`"
+    [ :${runlevel+set} = :set ] || runlevel=$RUNLEVEL
+    [ :${previous+set} = :set ] || previous=${PREVLEVEL:-N}
+    if [ ":$previous" != ':N' -a \( ":$runlevel" = ':0' -o ":$runlevel" = ':6' \) ]; then
+	marker="/var/lib/openss7/.openss7_update-`uname -r`"
 	if [ ":$SPECFS_KUPDATE" = ':yes' -a -e $marker ]; then
 	    for command in /sbin/openss7-modules /usr/sbin/openss7-modules
 	    do
