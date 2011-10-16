@@ -232,6 +232,60 @@ case "$init_mode" in
 	    return $RETVAL
 	}
 	;;
+    (archlinux)
+	pidofproc () {
+	    [ -r $pidfile ] && cat $pidfile
+	}
+	killproc () {
+	    [ -r $pidfile ] && kill "$2" `cat $pidfile`
+	}
+	daemon_start () {
+	    local force= nicecmd= base=
+	    while [ "$1" != "${1##[-+]}" ] ; do
+		case $1 in
+		    (-f) force="--force"       ; shift 1 ;;
+		    (-n) nicecmd="nice -n $2"  ; shift 2 ;;
+		esac
+	    done
+	    base=`echo $1 | sed -e 's,.*/,,'`
+	    stat_busy "Starting $base daemon"
+	    eval "( $nicecmd \"\$@\" >/dev/null 2>&1 </dev/null & )"
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] \
+		&& { add_daemon $base; stat_done; } \
+		|| { stat_fail; }
+	    return $RETVAL
+	}
+	daemon_stop () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    stat_busy "Stopping $base daemon"
+	    if pidofproc $base >/dev/null 2>&1 ; then
+		RETVAL=0
+	    else
+		killproc $base "$@"
+		RETVAL=$?
+	    fi
+	    [ $RETVAL -eq 0 ] \
+		&& { rm_daemon $base; stat_done; } \
+		|| { stat_fail; }
+	    return $RETVAL
+	}
+	daemon_reload () {
+	    local base=
+	    base=`echo $1 | sed -e 's,.*/,,'`; shift 1
+	    stat_busy "Reloading $base daemon"
+	    killproc $base -HUP
+	    RETVAL=$?
+	    [ $RETVAL -eq 0 ] \
+		&& { add_daemon $base; stat_done; } \
+		|| { stat_fail; }
+	    return $RETVAL
+	}
+	action () {
+	    status "$@"
+	}
+	;;
     (standalone|*)
 	if [ -x /sbin/pidof ] ; then
 	    pidofproc () {
@@ -294,7 +348,7 @@ case "$init_mode" in
 		killproc $base "$@"
 		RETVAL=$?
 	    fi
-	    [ $RETVAL -eq 0 ] && log_success_msg || log_failure_msg
+	    [ $RETVAL -eq 0 ] && echo -en "\t...SUCCESS" || echo -en "\t....FAILED"
 	    return $RETVAL
 	}
 	daemon_reload () {
@@ -321,7 +375,7 @@ name='strerr'
 script='strerr'
 ucname="STRERR"
 lockfile="/var/lock/subsys/$name"
-config="/etc/sysconfig/$name /etc/default/$name"
+config="/etc/sysconfig/$name /etc/default/$name /etc/conf.d/$name"
 processname="$name"
 pidfile="/var/run/$processname.pid"
 execfile="/usr/sbin/$processname"
