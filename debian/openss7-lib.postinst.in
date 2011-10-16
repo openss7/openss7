@@ -63,8 +63,10 @@ datarootdir=@datarootdir@
 postinst_libraries () {
     if   [ -x "`which libtool 2>/dev/null`" ]; then
 	libtool --mode=finish @libdir@ || :
+	libtool --mode=finish @syslibdir@ || :
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n @libdir@ || :
+	ldconfig -n @syslibdir@ || :
     fi
 }
 #
@@ -77,7 +79,7 @@ postinst_libraries () {
 postinst_netconfig () {
     local netc_fil=@sysconfdir@/netconfig \
 	  netc_alt=@sysconfdir@/netconfig.xnsl \
-	  netc_dir=@sysconfidr@/nslconfig.d \
+	  netc_dir=@sysconfdir@/nslconfig.d \
 	  netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$ \
 	  found=no files="$netc_dir/*" f
     if [ -r $netc_fil ]; then

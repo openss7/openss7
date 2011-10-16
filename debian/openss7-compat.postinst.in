@@ -64,9 +64,11 @@ datarootdir=@datarootdir@
 postinst_libraries () {
     if   [ -x "`which libtool  2>/dev/null`" ]; then
 	libtool --mode=finish @lib32dir@ || :
+	libtool --mode=finish @syslib32dir@ || :
 
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
 	ldconfig -n @lib32dir@ || :
+	ldconfig -n @syslib32dir@ || :
     fi
 }
 #
