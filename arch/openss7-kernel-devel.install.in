@@ -51,28 +51,226 @@
 #
 # =============================================================================
 subpkg=kernel-devel
+_set_vars() {
 @openss7_header@
 datarootdir=@datarootdir@
+}
 
+_remove_warn_file() {
+    if [ -f "$2" ] ; then
+	echo ">>> WARNING: removing conflicting $1 file $2" >&2
+	rm -f -- "$2" 2>/dev/null || :
+    fi
+}
+_remove_warn_files() {
+    local f t
+    t="$1"
+    shift
+    for f in "$@" ; do
+	_remove_warn_file "$t" "$f"
+    done
+}
+_remove_warn_dir() {
+    if [ -d "$2" ] ; then
+	if [ "`(cd $2; pwd)`" != "/"  ] ; then
+	    if [ -L "$2" ] ; then
+		echo ">>> WARNING: removing conflicting $1 symbolic link $2" >&2
+		rm -f -- "$2"
+	    else
+		echo ">>> WARNING: removing conflicting $1 directory $2" >&2
+		rm -rf -- "$2"
+	    fi
+	fi
+    fi
+}
+_remove_warn_dirs() {
+    local d t
+    t="$1"
+    shift
+    for d in "$@" ; do
+	_remove_warn_dir "$t" "$d"
+    done
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# KERNEL SYMBOL VERSIONS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_kernel_symvers() - Install redhat-like symvers file in the /boot
+#   directory.  Debian kernels do not create a symbol versions file.  This is a
+#   bit dangerous because it relies on the symbol versions not changing when the
+#   ABI number in the kernel version does not change.
+#
+_post_kernel_symvers() {
+    local f t
+    [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
+    f=/usr/src/${name}-@VERSION@-@PACKAGE_PACRELEASE@/@kversion@/System.symvers
+    t=/boot/symvers-@kversion@.gz
+    if [ ! -r $t -a -r $f ] ; then
+        gzip -c $f >$t || :
+    fi
+    :
+}
+_post_install_kernel_symvers() {
+    _post_kernel_symvers	|| :
+}
+_post_upgrade_kernel_symvers() {
+    _post_kernel_symvers	|| :
+}
+# _post_remove_kernel_symvers() - On final removal, remove the symvers file that
+#   we added for debian.
+#
+_post_remove_kernel_symvers() {
+    [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
+    rm -f -- /boot/symvers-@kversion@.gz || :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# KERNEL MANUAL PAGES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_kernel_manpages() - Old tarball distribution puts some man pages
+#   in the wrong place, clean them out on a fresh install.
+#
+_pre_install_kernel_manpages () {
+    _remove_warn_files "manual page" @mandir@/man9/connld.9*
+    _remove_warn_files "manual page" @mandir@/man9/fifo.9*
+    _remove_warn_files "manual page" @mandir@/man9/pipemod.9*
+    rmdir -p @mandir@/man9 2>/dev/null || :
+}
+# _post_kernel_manpages() - Add our manual pages to the aprospros database.  one
+#   problem with doing this is that even the oldest of debian policies and
+#   debhelper implementations will implement the debhelper code to do this.
+#   Therefore, this function si shortcircuited for now.  (We install >3000
+#   manual pages and it takes forever anyway.)  Failing to do this altogether is
+#   not critical because most machines run an evening cron job to update these.
+#
+_post_kernel_manpages () {
+    if   [ -x "`which mandb      2>/dev/null`" ] ; then
+	LANGUAGE= LANG= mandb      -p @mandir@ || :
+    elif [ -x "`which makewhatis 2>/dev/null`" ] ; then
+	LANGUAGE= LANG= makewhatis -u @mandir@ || :
+    fi
+    echo ">>> Consider issuing 'mandb -c' or its equivalent." >&2
+}
+_post_install_kernel_manpages () {
+    _post_kernel_manpages	|| :
+}
+_post_upgrade_kernel_manpages () {
+    _post_kernel_manpages	|| :
+}
+_post_remove_kernel_manpages () {
+    _post_kernel_manpages	|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, pre_install needs to make any adjustments to the system that would
+# otherwise conflict with the installation.  These actions typically only need
+# to be performed once on initial installation.
+# -----------------------------------------------------------------------------
+_pre_install_kernel () {
+    _pre_install_kernel_manpages	|| :
+}
+# pre_install($new_version) - script is run right before files are extracted.
+#   One argument is passed: new pakage version.
+#
 pre_install() {
+    _set_vars
+    _pre_install_kernel			|| :
 }
+# -----------------------------------------------------------------------------
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_install needs to create or reconfigure any files that are
+# not simply installed.  In general, the same actions should be performed also
+# by the post_upgrade procedures.
+# -----------------------------------------------------------------------------
+_post_install_kernel() {
+    _post_install_kernel_symvers	|| :
+    _post_install_kernel_manpages	|| :
+}
+# post_install($new_version) - script is run right after files are extracted.
+#   One argument is passed: new package version.
+#
 post_install() {
+    _set_vars
+    _post_install_kernel		|| :
 }
+# -----------------------------------------------------------------------------
 
-pre_upgrade() {
-}
-
-post_upgrade() {
-}
-
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE REMOVE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, pre_remove needs to remove any files that we added or reconfigured
+# as a result of a post_install operation that pacman will not know about or
+# remove otherwise.  In general, the same actions should be performed also by
+# the pre_upgrade procedures.
+# -----------------------------------------------------------------------------
+# pre_remove($old_version) - script is run right before files are removed.  One
+#   argument is passed: old package version.
+#
 pre_remove() {
+    _set_vars
 }
+# -----------------------------------------------------------------------------
 
-post_remove() {
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST REMOVE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_remove needs to tidy up and remnants of the package that
+# might otherwise be left behind.  These actions typically are only performed
+# when the package is finally removed.
+# -----------------------------------------------------------------------------
+_post_remove_kernel() {
+    _post_remove_kernel_symvers		|| :
+    _post_remove_kernel_manpages	|| :
 }
+# post_remove($old_version) - script is run right after files are removed.  One
+#   argument is passed: old package version.
+#
+post_remove() {
+    _set_vars
+    _post_remove_kernel			|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE UPGRADE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# pre_upgrade($new_version,$old_version) - script is run right before files are
+#   extracted.  Two arguments are passed in the following order: new package
+#   version, old package version.  (I can't find documentation that states this,
+#   but I believe that the old package files are still in tree.)
+#
+pre_upgrade() {
+    _set_vars
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST UPGRADE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_post_upgrade_kernel() {
+    _post_upgrade_kernel_symvers	|| :
+    _post_upgrade_kernel_manpages	|| :
+}
+# post_upgrade($new_version,$old_version) - script is run right after files are
+#   extracted.  Two arguments are passed in the following order: new package
+#   version, old package version.  (I can't find documentation that states this,
+#   but I believe that the old package files have been removed.)
+#
+post_upgrade() {
+    _set_vars
+    _post_upgrade_kernel		|| :
+}
+# -----------------------------------------------------------------------------
 
 # =============================================================================
 #
 # $Log$
 # =============================================================================
+# vim: sw=4 tw=80

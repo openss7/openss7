@@ -51,28 +51,490 @@
 #
 # =============================================================================
 subpkg=kernel
+_set_vars() {
 @openss7_header@
 datarootdir=@datarootdir@
+}
 
+_remove_warn_file() {
+    if [ -f "$2" ] ; then
+	echo ">>> WARNING: removing conflicting $1 file $2" >&2
+	rm -f -- "$2" 2>/dev/null || :
+    fi
+}
+_remove_warn_files() {
+    local f t
+    t="$1"
+    shift
+    for f in "$@" ; do
+	_remove_warn_file "$t" "$f"
+    done
+}
+_remove_warn_dir() {
+    if [ -d "$2" ] ; then
+	if [ "`(cd $2; pwd)`" != "/"  ] ; then
+	    if [ -L "$2" ] ; then
+		echo ">>> WARNING: removing conflicting $1 symbolic link $2" >&2
+		rm -f -- "$2"
+	    else
+		echo ">>> WARNING: removing conflicting $1 directory $2" >&2
+		rm -rf -- "$2"
+	    fi
+	fi
+    fi
+}
+_remove_warn_dirs() {
+    local d t
+    t="$1"
+    shift
+    for d in "$@" ; do
+	_remove_warn_dir "$t" "$d"
+    done
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# OLD KERNEL MODULES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_kernel_oldmods() -   Perform a depmod on the kernel for which we have
+#   installed, upgraded or removed kernels modules.  This can only be performed
+#   for 2.4 module systems.  The debhelper scriptlets will perform this
+#   operation at an inopportune moment sot the dh_installmodules debhelpers are
+#   disabled.  The openss7-modules script performs the comparable actions for
+#   2.6 and 3.x kernel module systems.
+#
+_post_kernel_oldmods() {
+    local sysmap=/boot/System.map-@kversion@
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    if [ -x "`which depmod 2>/dev/null`" ]; then
+        if [ "@kversion@" = "`uname -r`" ]; then
+            depmod -a || :
+        elif [ -r $sysmap ]; then
+            UNAME_MACHINE=@target_cpu@ \
+            depmod -ae -F $sysmap @kversion@ || :
+        fi
+    fi
+}
+_post_install_kernel_oldmods() {
+    _post_kernel_oldmods	|| :
+}
+_post_upgrade_kernel_oldmods() {
+    _post_kernel_oldmods	|| :
+}
+_post_remove_kernel_oldmods() {
+    _post_kernel_oldmods	|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# MODULE PRELOADS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_kernel_preloads() - This is a fresh install of this version of
+#   the kernel modules package.  Remove any non-pkg preloads from the
+#   kernel-specific preloads file.
+#
+_pre_install_kernel_preloads() {
+    local prel_old=@sysconfdir@/modules-@kversion@ \
+	  prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
+	  prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
+	  m
+    if [ -f $prel_old ]; then
+	cp -f -- $prel_old $prel_new
+	sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new >$prel_tmp
+	mv -f -- $prel_tmp $prel_new
+	for m in $modules $preloads; do
+	    sed -e '\|^[[:space:]]*'"$m"'[[:space:]]*$|d' $prel_new >$prel_tmp
+	    mv -f -- $prel_tmp $prel_new
+	done
+	if ! diff $prel_new $prel_old >/dev/null 2>&1; then
+	    echo "$script: warning: Removing non-pkg lines from preload file, $prel_old" >&2
+	    cp -f -b --suffix=.pacold -- $prel_new $prel_old
+	fi
+	rm -f -- $prel_new || :
+    fi
+}
+# _post_kernel_preloads() - For old modules, ensure that our preloaded
+#   modules are in the appropriate kernel-specific preloads file.  Note that the
+#   prerm on upgrade removed the old package's preloads from the file so we only
+#   need to add ours.
+#
+_post_kernel_preloads() {
+    local prel_old=@sysconfdir@/modules-@kversion@ \
+          prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
+          prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
+          p
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    if [ -f $prel_old ]; then cp -f -- $prel_old $prel_new; else touch $prel_new; fi
+    ( cat $prel_new; for p in ${preloads}; do echo "$p"; done ) >$prel_tmp
+    mv -f -- $prel_tmp $prel_new
+    if ! diff $prel_new $prel_old >/dev/null 2>&1; then
+        cp -f -b --suffix=.pacold -- $prel_new $prel_old
+    fi
+    rm -f -- $prel_new
+}
+_post_install_kernel_preloads() {
+    _post_kernel_preloads	|| :
+}
+_post_upgrade_kernel_preloads() {
+    _post_kernel_preloads	|| :
+}
+# _pre_kernel_preloads() - On final removal or before upgrade, remove our
+#   preloads from the kernel-specific preloads file.
+#
+_pre_kernel_preloads() {
+    local prel_old=@sysconfdir@/modules-@kversion@ \
+	  prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
+	  prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
+	  included p
+    if [ -f $prel_old ]; then
+	cp -f -- $prel_old $prel_new
+	included=no
+	for p in ${preloads}; do
+	    if grep '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >/dev/null 2>&1; then
+		included=yes
+		break
+	    fi
+	done
+	if [ $included = yes ]; then
+	    for p in ${preloads}; do
+		grep -v '^[[:space:]]*'"$p"'[[:space:]]*$' $prel_new >$prel_tmp
+		mv -f -- $prel_tmp $prel_new
+	    done
+	    cp -f -b --suffix=.pacold -- $prel_new $prel_old
+	fi
+	rm -f -- $prel_new || :
+    fi
+}
+_pre_remove_kernel_preloads() {
+    _pre_kernel_preloads	|| :
+}
+_pre_upgrade_kernel_preloads() {
+    _pre_kernel_preloads	|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# KERNEL MODULES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _remove_depends() - A little recursive function to delete all modules
+#   dependent on an initial module set (in our case "streams.o").  The function
+#   echos the list of modules to remove to stdout.
+#
+_remove_depends() {
+    local t
+    [ $# -gt 0 ] || return 0
+    echo "$*"
+    for t in $@ ; do
+	prereq=prereq_`echo $t | sed -r -e 's|^.*/||;s|\.(k)?o(\.gz)?(:)?$||;s|[^a-zA-Z0-9_]|_|g'`
+	eval "_remove_depends \$$prereq"
+    done
+}
+# _pre_install_kernel_modules() - This is a fresh install of this version of the
+#   kernel modules package.  Make sure that there are no tarball installed
+#   kernel modules hanging around for this kernel version.  Because kernel
+#   module packages are named differently for different kernels, it is important
+#   that this function not be too zealous and remove kernel modules from our
+#   other installed packages.
+#
+#   Note that the kernel routine differs from the base routine of similar name
+#   and function.  THis kernel routine only removes modules from kernel-specific
+#   directories.  The _pre_install_base_modules() routine removes from
+#   non-kernel-specific directories.
+#
+_pre_install_kernel_modules() {
+    local dir m b modl_mods= line dep t target p prereq
+    for dir in @kmoduledir@; do
+	[ -d $dir ] || continue
+	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
+	    b=`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?,,'`
+	    case " $modules " in (*" $b "*) ;; (*) continue ;; esac
+	    modl_mods="$modl_mods${modl_mods:+ }$m"
+	done
+	if [ -n "$modl_mods" -a -f $dir/modules.dep ] ; then
+	    xtrace=`set -o | sed -n 's,xtrace[[:space:]]*on,set +o xtrace,p;t;s,xtrace[[:space:]]*off,set -o xtrace,p;t'`
+	    set +x
+	    dep=
+	    while read line ; do
+		case $line in
+		    (*\\)   line="`echo $line | sed -e 's,\\$,,'`"
+			    dep="$dep${dep:+ }$line"; continue ;;
+		    (*)     dep="$dep${dep:+ }$line" ;;
+		esac
+		if [ -n "$dep" ]; then
+		    set -- $dep
+		    if [ $# -ge 2 ] ; then
+			t=`echo $1 | sed -e 's,:$,,'`
+			target=target_`echo $t | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			shift
+			for p in $@ ; do
+			    prereq=prereq_`echo $p | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+			    eval "$prereq=\"\$$prereq\${$prereq:+ }$t\""
+			    eval "$target=\"\$$target\${$target:+ }$p\""
+			done
+		    fi
+		    dep=
+		fi
+	    done < $dir/modules.dep
+	    eval "$xtrace"
+	    for m in $modl_mods; do
+		echo ">>> WARNING: Removing conflicting kernel module, $m" >&2
+		rm -f -- "$m" 2>/dev/null || :
+		prereq=prereq_`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
+		eval "_remove_depends \$$prereq" | while read b; do
+		    echo ">>> WARNING: Removing conflicting dependent kernel module $b" >&2
+		    rm -f -- "$b" 2>/dev/null || :
+		done
+	    done
+	    unset ${!prereq_*}
+	    unset ${!target_*}
+	fi
+    done
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# INITSCRIPTS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_kernel_initscripts() - For old modules attempt to start init
+#   scripts when they are not already started and they are supposed to be
+#   started in the current run level.
+#
+_post_kernel_initscripts() {
+    local r i start l
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    if [ "@kversion@" = "`uname -r`" ]; then
+        r="`runlevel | awk '{print$2}'`"
+        for i in ${initfiles}; do
+            [ -f @initrddir@/$i ] || continue
+            [ ! -e /var/lock/subsys/$i ] || continue
+            start=no
+            for l in @initrddir@/../rc${r}.d/S[0-9][0-9]$i @initrddir@/rc${r}.d/S[0-9][0-9]$i; do
+                if [ -L $l ]; then start=yes; break; fi
+            done
+            [ $start = yes ] || continue
+            [ -x "`which service     2>/dev/null`" ] && { service     $i start && continue || break; }
+            [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i start && continue || break; }
+            [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i start && continue || break; }
+        done
+    fi
+}
+_post_install_kernel_initscripts() {
+    _post_kernel_initscripts	|| :
+}
+_post_upgrade_kernel_initscripts() {
+    _post_kernel_initscripts	|| :
+}
+# _post_remove_kernel_initscripts() - When old modules for the running kernel
+#   have been removed, stop the init scripts.  Note that dpkg is smarter than
+#   rpm about the installation and removal order of packages and the init
+#   scripts should still be present.
+#
+_post_remove_kernel_initscripts() {
+    local reverse i
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    if [ "@kversion@" = "`uname -r`" ]; then
+        reverse=
+        for i in $initfiles; do
+            reverse="$i${reverse:+ }$reverse"
+        done
+        for i in $reverse; do
+            if [ -f @initrddir@/$i ] ; then
+                [ -x "`which service     2>/dev/null`" ] && { service     $i stop && continue || :; }
+                [ -x "`which invoke-rc.d 2>/dev/null`" ] && { invoke-rc.d $i stop && continue || :; }
+                [ -x "@initrddir@/$i"                  ] && { @initrddir@/$i stop && continue || :; }
+            fi
+        done
+    fi
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# WEAK KERNEL MODULES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_kernel_weakmods() - Perform weak-updates on modules, perform depmod, and
+#   signal init scripts when a relink is required on shutdown or reboot.  Note
+#   that pacman is way smarter than rpm about installation order so the
+#   weak-updates script from the base package should already be installed.
+#
+_post_kernel_weakmods() {
+    local scripts v
+    [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
+    if [ -x @sbindir@/${name}-modules ]; then
+        scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+        if [ -n "$scripts" ] ; then
+            @sbindir@/${name}-modules -- $v -e \
+                --initscripts="$scripts" \
+                --add-modules @kversion@ || :
+        else
+            @sbindir@/${name}-modules -- $v -e \
+                --add-modules @kversion@ || :
+        fi
+    fi
+}
+_post_install_kernel_weakmods() {
+    _post_kernel_weakmods	|| :
+}
+_post_upgrade_kernel_weakmods() {
+    _post_kernel_weakmods	|| :
+}
+# _post_remove_kernel_weakmods() - When the kernel modules package was removed
+#   (base should be present because pacman is smarter than rpm on package
+#   ordering) delete the symbolic links of the other kernels to the about to be
+#   removed kernel modules.  The --delete-modules option to the openss7-modules
+#   awk script denotes that kernel modules are to be removed from
+#   @kmoduledir@/@ksubdir@ and --remove-modules denotes that weak links in any
+#   other subtree that point to or are relinked versions of the to be removed
+#   modules are to be removed as well.  After the removal, depmod is performed
+#   on the directories with removed links or modules to update dependencies.
+#
+_post_remove_kernel_weakmods() {
+    [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
+    if [ -x @sbindir@/${name}-modules ]; then
+        scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
+        if [ -n "$scripts" ]; then
+            @sbindir@/${name}-modules -- $v -e \
+                --initscripts="$scripts" \
+                --delete-modules \
+                --remove-modules @kversion@ || :
+        else
+            @sbindir@/${name}-modules -- $v -e \
+                --delete-modules \
+                --remove-modules @kversion@ || :
+        fi
+    fi
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, pre_install needs to make any adjustments to the system that would
+# otherwise conflict with the installation.  These actions typically only need
+# to be performed once on initial installation.
+# -----------------------------------------------------------------------------
+_pre_install_kernel() {
+    _pre_install_kernel_preloads	|| :
+    _pre_install_kernel_modules		|| :
+}
+# pre_install($new_version) - script is run right before files are extracted.
+#   One argument is passed: new pakage version.
+#
 pre_install() {
+    _set_vars
+    _pre_install_kernel			|| :
 }
+# -----------------------------------------------------------------------------
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_install needs to create or reconfigure any files that are
+# not simply installed.  In general, the same actions should be performed also
+# by the post_upgrade procedures.
+# -----------------------------------------------------------------------------
+# _post_install_kernel() - For old modules, make sure that the preloads are in
+#   the kernel-specific preloads file, perform a depmod on the kernel modules
+#   directory, start init scripts when they are to be started for the installed
+#   kernel modules.  For new modules, add the symvers file when possible ('cause
+#   debian doesn't have one) and invoke the weak-modules update script.  Note
+#   that the script will perform a depmod and start init scripts when necessary.
+#
+_post_install_kernel() {
+    _post_install_kernel_oldmods	|| :
+    _post_install_kernel_preloads	|| :
+    _post_install_kernel_initscripts	|| :
+    _post_install_kernel_weakmods	|| :
+}
+# post_install($new_version) - script is run right after files are extracted.
+#   One argument is passed: new package version.
+#
 post_install() {
+    _set_vars
+    _post_install_kernel		|| :
 }
+# -----------------------------------------------------------------------------
 
-pre_upgrade() {
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE REMOVE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, pre_remove needs to remove any files that we added or reconfigured
+# as a result of a post_install operation that pacman will not know about or
+# remove otherwise.  In general, the same actions should be performed also by
+# the pre_upgrade procedures.
+# -----------------------------------------------------------------------------
+_pre_remove_kernel() {
+    _pre_remove_kernel_preloads		|| :
 }
-
-post_upgrade() {
-}
-
+# pre_remove($old_version) - script is run right before files are removed.  One
+#   argument is passed: old package version.
+#
 pre_remove() {
+    _set_vars
+    _pre_remove_kernel			|| :
 }
+# -----------------------------------------------------------------------------
 
-post_remove() {
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST REMOVE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_remove needs to tidy up and remnants of the package that
+# might otherwise be left behind.  These actions typically are only performed
+# when the package is finally removed.
+# -----------------------------------------------------------------------------
+_post_remove_kernel() {
+    _post_remove_kernel_oldmods		|| :
+    _post_remove_kernel_initscripts	|| :
+    _post_remove_kernel_weakmods	|| :
 }
+# post_remove($old_version) - script is run right after files are removed.  One
+#   argument is passed: old package version.
+#
+post_remove() {
+    _set_vars
+    _post_remove_kernel			|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE UPGRADE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_pre_upgrade_kernel() {
+    _pre_upgrade_kernel_preloads	|| :
+}
+# pre_upgrade($new_version,$old_version) - script is run right before files are
+#   extracted.  Two arguments are passed in the following order: new package
+#   version, old package version.  (I can't find documentation that states this,
+#   but I believe that the old package files are still in tree.)
+#
+pre_upgrade() {
+    _set_vars
+    _pre_upgrade_kernel			|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST UPGRADE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_post_upgrade_kernel() {
+    _post_upgrade_kernel_oldmods	|| :
+    _post_upgrade_kernel_preloads	|| :
+    _post_upgrade_kernel_initscripts	|| :
+    _post_upgrade_kernel_weakmods	|| :
+}
+# post_upgrade($new_version,$old_version) - script is run right after files are
+#   extracted.  Two arguments are passed in the following order: new package
+#   version, old package version.  (I can't find documentation that states this,
+#   but I believe that the old package files have been removed.)
+#
+post_upgrade() {
+    _set_vars
+    _post_upgrade_kernel		|| :
+}
+# -----------------------------------------------------------------------------
 
 # =============================================================================
 #
 # $Log$
 # =============================================================================
+# vim: sw=4 tw=80
