@@ -1,4 +1,3 @@
-bld_cv_pkg_cmd_AUTOM4TE=${bld_cv_pkg_cmd_AUTOM4TE='slackpkg install autoconf'}
 bld_cv_pkg_cmd_BIBTEX=${bld_cv_pkg_cmd_BIBTEX='slackpkg install tetex'}
 bld_cv_pkg_cmd_BZIP2_CMD=${bld_cv_pkg_cmd_BZIP2_CMD='slackpkg install bzip2'}
 bld_cv_pkg_cmd_CONVERT=${bld_cv_pkg_cmd_CONVERT='slackpkg install imagemagick'}
@@ -10,16 +9,17 @@ bld_cv_pkg_cmd_FIG2DEV=${bld_cv_pkg_cmd_FIG2DEV='slackpkg install transfig'}
 bld_cv_pkg_cmd_GCJDBTOOL=${bld_cv_pkg_cmd_GCJDBTOOL='slackpkg install gcc-java'}
 bld_cv_pkg_cmd_GCJH=${bld_cv_pkg_cmd_GCJH='slackpkg install gcc-java'}
 bld_cv_pkg_cmd_GNUPLOT=${bld_cv_pkg_cmd_GNUPLOT='slackpkg install gnuplot'}
-bld_cv_pkg_cmd_GPG=${bld_cv_pkg_cmd_GPG='slackpkg install gnupg'}
+bld_cv_pkg_cmd_GPG=${bld_cv_pkg_cmd_GPG='slackpkg install gnupg2'}
 bld_cv_pkg_cmd_GROFF=${bld_cv_pkg_cmd_GROFF='slackpkg install groff'}
 bld_cv_pkg_cmd_GZIP_CMD=${bld_cv_pkg_cmd_GZIP_CMD='slackpkg install gzip'}
 bld_cv_pkg_cmd_JAR=${bld_cv_pkg_cmd_JAR='slackpkg install gcc-java'}
 bld_cv_pkg_cmd_JARSIGNER=${bld_cv_pkg_cmd_JARSIGNER='slackpkg install gcc-java'}
+bld_cv_pkg_cmd_JAVAC=${bld_cv_pkg_cmd_JAVAC='slackpkg install gcc-java'}
 bld_cv_pkg_cmd_JAVADOC=${bld_cv_pkg_cmd_JAVADOC='slackpkg install gcc-java'}
 bld_cv_pkg_cmd_JAVAH=${bld_cv_pkg_cmd_JAVAH='slackpkg install gcc-java'}
 bld_cv_pkg_cmd_KEYTOOL=${bld_cv_pkg_cmd_KEYTOOL='slackpkg install gcc-java'}
 bld_cv_pkg_cmd_LATEX=${bld_cv_pkg_cmd_LATEX='slackpkg install tetex'}
-bld_cv_pkg_cmd_LDCONFIG=${bld_cv_pkg_cmd_LDCONFIG='slackpkg install glibc-solibs'}
+bld_cv_pkg_cmd_LDCONFIG=${bld_cv_pkg_cmd_LDCONFIG='slackpkg install perl'}
 bld_cv_pkg_cmd_LSMOD=${bld_cv_pkg_cmd_LSMOD='slackpkg install module-init-tools'}
 bld_cv_pkg_cmd_LSOF=${bld_cv_pkg_cmd_LSOF='slackpkg install lsof'}
 bld_cv_pkg_cmd_MAKEPKG=${bld_cv_pkg_cmd_MAKEPKG='slackpkg install pkgtools'}
@@ -41,7 +41,6 @@ bld_cv_pkg_cmd_SOELIM=${bld_cv_pkg_cmd_SOELIM='slackpkg install groff'}
 bld_cv_pkg_cmd_TBL=${bld_cv_pkg_cmd_TBL='slackpkg install groff'}
 bld_cv_pkg_cmd_TEX=${bld_cv_pkg_cmd_TEX='slackpkg install tetex'}
 bld_cv_pkg_cmd_ZIP=${bld_cv_pkg_cmd_ZIP='slackpkg install infozip'}
-bld_cv_pkg_name_AUTOM4TE=${bld_cv_pkg_name_AUTOM4TE=autoconf}
 bld_cv_pkg_name_BIBTEX=${bld_cv_pkg_name_BIBTEX=tetex}
 bld_cv_pkg_name_BZIP2_CMD=${bld_cv_pkg_name_BZIP2_CMD=bzip2}
 bld_cv_pkg_name_CONVERT=${bld_cv_pkg_name_CONVERT=imagemagick}
@@ -55,11 +54,12 @@ bld_cv_pkg_name_GCJDBTOOL=${bld_cv_pkg_name_GCJDBTOOL=gcc-java}
 bld_cv_pkg_name_GCJH=${bld_cv_pkg_name_GCJH=gcc-java}
 bld_cv_pkg_name_GCJ_CNI_H=${bld_cv_pkg_name_GCJ_CNI_H=gcc-java}
 bld_cv_pkg_name_GNUPLOT=${bld_cv_pkg_name_GNUPLOT=gnuplot}
-bld_cv_pkg_name_GPG=${bld_cv_pkg_name_GPG=gnupg}
+bld_cv_pkg_name_GPG=${bld_cv_pkg_name_GPG=gnupg2}
 bld_cv_pkg_name_GROFF=${bld_cv_pkg_name_GROFF=groff}
 bld_cv_pkg_name_GZIP_CMD=${bld_cv_pkg_name_GZIP_CMD=gzip}
 bld_cv_pkg_name_JAR=${bld_cv_pkg_name_JAR=gcc-java}
 bld_cv_pkg_name_JARSIGNER=${bld_cv_pkg_name_JARSIGNER=gcc-java}
+bld_cv_pkg_name_JAVAC=${bld_cv_pkg_name_JAVAC=gcc-java}
 bld_cv_pkg_name_JAVADOC=${bld_cv_pkg_name_JAVADOC=jdk}
 bld_cv_pkg_name_JAVAH=${bld_cv_pkg_name_JAVAH=gcc-java}
 bld_cv_pkg_name_KEYTOOL=${bld_cv_pkg_name_KEYTOOL=gcc-java}
@@ -143,7 +143,6 @@ bld_cv_pkg_prog_TBL=${bld_cv_pkg_prog_TBL=tbl}
 bld_cv_pkg_prog_TEX=${bld_cv_pkg_prog_TEX=etex}
 bld_cv_pkg_prog_XZ_CMD=${bld_cv_pkg_prog_XZ_CMD=xz}
 bld_cv_pkg_prog_ZIP=${bld_cv_pkg_prog_ZIP=zip}
-bld_cv_pkg_ver_AUTOM4TE=${bld_cv_pkg_ver_AUTOM4TE=2.68}
 bld_cv_pkg_ver_BIBTEX=${bld_cv_pkg_ver_BIBTEX=3.0}
 bld_cv_pkg_ver_BZIP2_CMD=${bld_cv_pkg_ver_BZIP2_CMD=1.0.6}
 bld_cv_pkg_ver_CONVERT=${bld_cv_pkg_ver_CONVERT=6.6.6_10}
