@@ -315,6 +315,9 @@
 /* Symbol kill_proc_info_as_uid is available. */
 #undef HAVE_KILL_PROC_INFO_AS_UID_SYMBOL
 
+/* Define to 1 if you have the <generated/utsrelease.h> header file. */
+#undef HAVE_KINC_GENERATED_UTSRELEASE_H
+
 /* Define to 1 if you have the <linux/cred.h> header file. */
 #undef HAVE_KINC_LINUX_CRED_H
 
@@ -350,6 +353,9 @@
 
 /* Define to 1 if the system has the type 'uintptr_t'. */
 #undef HAVE_KTYPE_UINTPTR_T
+
+/* Define to 1 if you have the <stdint.h> header file. */
+#undef HAVE_STDINT_H
 
 /* This kmem_cache_t is deprecated in recent 2.6.20 kernels. When it is
    deprecated, define this to struct kmem_cache *. */
