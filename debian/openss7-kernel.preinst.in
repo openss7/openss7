@@ -140,7 +140,7 @@ preinst_modules () { :
 		echo "$script: warning: Removing non-deb kernel module, $m" >&2
 		rm -f -- "$m" 2>/dev/null || :
 		prereq=prereq_`echo $m | sed -r -e 's,^.*/,,;s,\.(k)?o(\.gz)?(:)?$,,;s,[^a-zA-Z0-9_],_,g'`
-		eval "preinst_remove_depends \$$prereq" | while read b; do
+		eval "preinst_remove_depmods \$$prereq" | while read b; do
 		    echo "$script: warning: Removing non-deb dependent kernel module $b" >&2
 		    rm -f -- "$b" 2>/dev/null || :
 		done
