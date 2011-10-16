@@ -51,28 +51,307 @@
 #
 # =============================================================================
 subpkg=devel
+_set_vars() {
 @openss7_header@
 datarootdir=@datarootdir@
+}
 
+_remove_warn_file() {
+    if [ -f "$2" ] ; then
+	echo ">>> WARNING: removing conflicting $1 file $2" >&2
+	rm -f -- "$2" 2>/dev/null || :
+    fi
+}
+_remove_warn_files() {
+    local f t
+    t="$1"
+    shift
+    for f in "$@" ; do
+	_remove_warn_file "$t" "$f"
+    done
+}
+_remove_warn_dir() {
+    if [ -d "$2" ] ; then
+	if [ "`(cd $2; pwd)`" != "/"  ] ; then
+	    if [ -L "$2" ] ; then
+		echo ">>> WARNING: removing conflicting $1 symbolic link $2" >&2
+		rm -f -- "$2"
+	    else
+		echo ">>> WARNING: removing conflicting $1 directory $2" >&2
+		rm -rf -- "$2"
+	    fi
+	fi
+    fi
+}
+_remove_warn_dirs() {
+    local d t
+    t="$1"
+    shift
+    for d in "$@" ; do
+	_remove_warn_dir "$t" "$d"
+    done
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# DEVELOPMENT STATIC LIBRARIES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_devel_libs() - This is an initial installation of the doc
+#   subpackage.  We need to check for non-deb installations on the host and
+#   remove any info entries that might later conflict with our entries.  We
+#   treat every fresh installation like an upgrade from non-deb install.
+#
+#   Check for old non-deb install static libraries and header files.  We are
+#   really the only distribution that has shipped static libraries for LiS, but
+#   we should go looking to clean them out in the usual places.
+#
+_pre_install_devel_libs() {
+    local d subdir
+    for d in /lib /usr/lib /usr/local/lib @libdir@ @syslibdir@; do
+	for subdir in / /LiS/ /lis/ /streams/ /strxnet/ ; do
+	    if [ -d $d${subdir} ] ; then
+		_remove_warn_files "library" \
+		    $d${subdir}libLiS.a     $d${subdir}libpLiS.a \
+		    $d${subdir}libstreams.a $d${subdir}libxnet.a \
+		    $d${subdir}libxti.a
+	    fi
+	done
+    done
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# DEVELOPMENT HEADERS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_devel_headers() - There are a lot of places that we and other
+#   distributions have placed header files.  We go and clean out all of them.
+#
+_pre_install_devel_headers() {
+    locald d
+    for d in /include /usr/include /usr/local/include @includedir@ @oldincludedir@ ; do
+	_remove_warn_dirs "header" \
+	    $d/LiS $d/streams $d/strxns $d/strinet $d/strxnet $d/strsctp \
+	    $d/strss7 $d/xnet $d/xti $d/ss7 $d/os7 $d/sctp
+    done
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# DOCUMENTATION INFO FILES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_pre_install_doc_infofiles() {
+    local n e
+    [ -x "`which install-info 2>/dev/null`" ] || return 0
+    for n in $manuals ; do
+	for e in '' '.gz' '.bz2' '.lzma' '.xz'; do
+	    [ -f @infodir@/$n.info$e ] || continue
+	    echo ">>> WARNING: Removing directory entry for conflicting info file, $n.info$e" >&2
+	    install-info --delete --info-dir=@infodir@ @infodir@/$n.info$e 2>&1 || :
+	    break
+	done
+    done
+}
+# _pre_doc_infofiles() - Recent debian policies will remove info files from the
+#   directories based on trigger directories.  However, performing this removal
+#   will not hurt them and is necessary for older policies.
+#
+_pre_doc_infofiles() {
+    local n e
+    [ -x "`which install-info 2>/dev/null`" ] || return 0
+    for n in $manuals ; do
+	for e in '' '.gz' '.bz2' '.lzma' '.xz'; do
+	    [ -f @infodir@/$n.info$e ] || continue
+	    install-info --delete --info-dir=@infodir@ @infodir@/$n.info$e 2>&1 || :
+	    break
+	done
+    done
+}
+_pre_upgrade_doc_infofiles() {
+    _pre_doc_infofiles		|| :
+}
+_pre_remove_doc_infofiles() {
+    _pre_doc_infofiles		|| :
+}
+# _post_doc_infofiles() - Add our info files to the info directory.  One problem
+#   with doing this is that even the oldest of debian policies and debhelper
+#   implementations will implement the debhelper code to do this.  Therefore,
+#   this function is shorcricuited for now.  Current debian policies will use
+#   trigger directories to perform this action.
+#
+_post_doc_infofiles() {
+    local n e
+    [ -x "`which install-info 2>/dev/null`" ] || return 0
+    for n in $manuals ; do
+	for e in '' '.gz' '.bz2' '.lzma' '.xz'; do
+	    [ -f @infodir@/$n.info$e ] || continue
+	    install-info --info-dir=@infodir@ @infodir@/$n.info$e 2>&1 || :
+	    break
+	done
+    done
+}
+_post_install_doc_infofiles() {
+    _post_doc_infofiles		|| :
+}
+_post_upgrade_doc_infofiles() {
+    _post_doc_infofiles		|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# DOCUMENTATION MANUAL PAGES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_doc_manpages() - Old tarball distribution puts some man pages in
+#   the wrong place, clean them out on a fresh install.
+#
+_pre_install_doc_manpages() { :
+    _remove_warn_files "manual page" @mandir@/man3/fattach.3*
+    _remove_warn_files "manual page" @mandir@/man3/detach.3*
+    _remove_warn_files "manual page" @mandir@/man3/isastream.3*
+    rmdir -p @mandir@/man3 2>/dev/null || :
+}
+# _post_doc_manpages() - Add our manual pages to the aprospros database.  One
+#   problem with doing this is that even the oldest of debian policies and
+#   debhelper implementations will implement the debhelper code to do this.
+#   Therefore, this function is shortcircuited for now.  (We install >3000
+#   manual pages and it takes forever anyway.)  Failing to do this altogether is
+#   not critical because most machines run an evening cron job to update these.
+#
+_post_doc_manpages() {
+    if   [ -x "`which mandb      2>/dev/null`" ] ; then
+	LANGUAGE= LANG= mandb      -p @mandir@ || :
+    elif [ -x "`which makewhatis 2>/dev/null`" ] ; then
+	LANGUAGE= LANG= makewhatis -u @mandir@ || :
+    fi
+    echo ">>> Consider issuing 'mandb -c' or its equivalent." >&2
+}
+_post_install_doc_manpages() {
+    _post_doc_manpages		|| :
+}
+_post_upgrade_doc_manpages() {
+    _post_doc_manpages		|| :
+}
+_post_remove_doc_manpages() {
+    _post_doc_manpages		|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, pre_install needs to make any adjustments to the system that would
+# otherwise conflict with the installation.  These actions typically only need
+# to be performed once on initial installation.
+# -----------------------------------------------------------------------------
+_pre_install_doc() {
+    _pre_install_doc_infofiles		|| :
+    _pre_install_doc_manpages		|| :
+}
+_pre_install_devel() {
+    _pre_install_devel_libs		|| :
+    _pre_install_devel_headers		|| :
+}
+# pre_install($new_version) - script is run right before files are extracted.
+#   One argument is passed: new pakage version.
+#
 pre_install() {
+    _pre_install_doc			|| :
+    _pre_install_devel			|| :
 }
+# -----------------------------------------------------------------------------
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_install needs to create or reconfigure any files that are
+# not simply installed.  In general, the same actions should be performed also
+# by the post_upgrade procedures.
+# -----------------------------------------------------------------------------
+_post_install_doc() {
+    _post_install_doc_infofiles		|| :
+    _post_install_doc_manpages		|| :
+}
+# post_install($new_version) - script is run right after files are extracted.
+#   One argument is passed: new package version.
+#
 post_install() {
+    _post_install_doc			|| :
 }
+# -----------------------------------------------------------------------------
 
-pre_upgrade() {
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE REMOVE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, pre_remove needs to remove any files that we added or reconfigured
+# as a result of a post_install operation that pacman will not know about or
+# remove otherwise.  In general, the same actions should be performed also by
+# the pre_upgrade procedures.
+# -----------------------------------------------------------------------------
+_pre_remove_doc() {
+    _pre_remove_doc_infofiles		|| :
 }
-
-post_upgrade() {
-}
-
+# pre_remove($old_version) - script is run right before files are removed.  One
+#   argument is passed: old package version.
+#
 pre_remove() {
+    _pre_remove_doc			|| :
 }
+# -----------------------------------------------------------------------------
 
-post_remove() {
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST REMOVE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_remove needs to tidy up and remnants of the package that
+# might otherwise be left behind.  These actions typically are only performed
+# when the package is finally removed.
+# -----------------------------------------------------------------------------
+_post_remove_doc() {
+    _post_remove_doc_manpages		|| :
 }
+# post_remove($old_version) - script is run right after files are removed.  One
+#   argument is passed: old package version.
+#
+post_remove() {
+    _post_remove_doc			|| :
+}
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE UPGRADE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_pre_upgrade_doc() { :
+    _pre_upgrade_doc_infofiles		|| :
+}
+# pre_upgrade($new_version,$old_version) - script is run right before files are
+#   extracted.  Two arguments are passed in the following order: new package
+#   version, old package version.  (I can't find documentation that states this,
+#   but I believe that the old package files are still in tree.)
+#
+pre_upgrade() {
+    _pre_upgrade_doc			|| :
+}
+# -----------------------------------------------------------------------------
+
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST UPGRADE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_post_upgrade_doc() {
+    _post_upgrade_doc_infofiles		|| :
+}
+_post_upgrade_devel() { :
+}
+# post_upgrade($new_version,$old_version) - script is run right after files are
+#   extracted.  Two arguments are passed in the following order: new package
+#   version, old package version.  (I can't find documentation that states this,
+#   but I believe that the old package files have been removed.)
+#
+post_upgrade() {
+    _post_upgrade_doc			|| :
+    _post_upgrade_devel			|| :
+}
+# -----------------------------------------------------------------------------
 
 # =============================================================================
 #
 # $Log$
 # =============================================================================
+# vim: sw=4 tw=80
