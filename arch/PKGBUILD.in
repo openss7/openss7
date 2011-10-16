@@ -58,6 +58,7 @@ build() {
 		${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
 		CONFIG_SITE=${csite_file} \
 		MODPOST_CACHE=${mpost_file} \
+		${PACKAGE_PACOPTIONS} \
 		--cache-file=${cache_file} \
 		--disable-maintainer-mode \
 		--with-k-release=@kversion@ \
@@ -66,6 +67,7 @@ build() {
 		--with-k-optimize=speed \
 		--with-optimize=speed \
 		--with-gnu-ld \
+		${BUILD_CFGOPTIONS} \
 		|| { rm -f ${cache_file} ${csite_file} ${mpost_file} ; exit 1 ; }
 	make
 }
