@@ -811,7 +811,8 @@ function read_modobject(command, dir, own, src,
 				mod_vers[mod] = 1
 			    continue
 			}
-			if (sub(/^_?__ksymtab/,"",sec)) {
+			if (sub(/^_?_?__ksymtab/,"",sec)) {
+			    sub(/\+.*/,"",sec)
 			    if (sub(/^_?__ksymtab_/,"",sym)) {
 				print_debug(3,pfx "symbol: " sym)
 				set_symbol(sym, mod, "", "EXPORT_SYMBOL" toupper(sec), "", 0, own, "", 0, "ko object")
@@ -1188,7 +1189,9 @@ function read_moduledir(directory, src,	    dir,command,find,file,tmpdir,dirs,wr
 	close(find)
 	if (written) {
 	    close(tmpdir "/modules.list")
-	    command = "cat " tmpdir "/modules.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+	    #command = "cat " tmpdir "/modules.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+	    #command = "cat " tmpdir "/modules.list | xargs -r objdump -t -s"
+	    command = "cat " tmpdir "/modules.list | while read f; do objdump -t $f; objdump -j __versions -s $f 2>/dev/null || :; done"
 	    read_modobject(command, dir, "kernel", src)
 	}
     }
@@ -1216,7 +1219,9 @@ function read_moduledir(directory, src,	    dir,command,find,file,tmpdir,dirs,wr
 	close(find)
 	if (written) {
 	    close("modules.list")
-	    command = "cat modules.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+	    #command = "cat modules.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+	    #command = "cat modules.list | xargs -r objdump -t -s"
+	    command = "cat modules.list | while read f; do objdump -t $f; objdump -j __versions -s $f 2>/dev/null || :; done"
 	    read_modobject(command, dir, values["pkgdirectory"], "pkgdirectory")
 	}
     }
@@ -1228,7 +1233,9 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
     for (i = 1; i in modules; i++)
 	print modules[i] > "modvers.list"
     close("modvers.list")
-    command = "cat modvers.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+    #command = "cat modvers.list | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j __ksymtab -j __ksymtab_gpl -j __versions -j .init.text -j .exit.text -s"
+    #command = "cat modvers.list | xargs -r objdump -t -s"
+    command = "cat modvers.list | while read f; do objdump -t $f; objdump -j __versions -s $f 2>/dev/null || :; done"
     read_modobject(command, ".", values["pkgdirectory"], src)
     system("rm -f modvers.list")
     system("rm -f /var/tmp/*.ko")
@@ -1243,7 +1250,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 	    else
 		mod_used[mods[sym],sym] = name
 	}
-	if (!(sym in syms)) { # symbol not exported
+	if (!(sym in exps)) { # symbol not exported
 	    if (!(sym in mapsyms)) { # symbol not rippable
 		print_error(sprintf(fmt, base, "unresolved", sym))
 	    } else {
@@ -1253,6 +1260,8 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		    print_error(sprintf(fmt, base, "unexported", sym))
 	    }
 	    continue
+	} else {
+	    print_debug(4,sprintf(fmt,base,"exported", sym))
 	}
 	if (!(sym in uses) || !uses[sym]) {
 	    if (ownr[sym] != values["pkgdirectory"]) {
@@ -1261,6 +1270,8 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		else
 		    print_error(sprintf(fmt, base, "unused", sym))
 	    }
+	} else {
+	    print_debug(4,sprintf(fmt,base,"used",sym))
 	}
 	if (!(sym in kabi) && values["kabi"]) {
 	    if (ownr[sym] != values["pkgdirectory"]) {
@@ -1269,6 +1280,8 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		else
 		    print_error(sprintf(fmt, base, "unsupportd", sym))
 	    }
+	} else {
+	    print_debug(4,sprintf(fmt,base,"supported",sym))
 	}
 	if (!(sym in crcs) && values["modversions"]) {
 	    print_error("r: mymodules, symbol " sym " defined in module " mods[sym] " has no version")
@@ -1284,7 +1297,7 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 	    else
 		mod_used[mods[sym],sym] = name
 	}
-	if (!(sym in syms)) { # symbol not exported
+	if (!(sym in exps)) { # symbol not exported
 	    if (!(sym in mapsyms)) { # symbol not rippable
 		print_warns(sprintf(fmt, base, "weak unres", sym))
 	    } else {
@@ -1294,6 +1307,8 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		    print_error(sprintf(fmt, base, "weak unexp", sym))
 	    }
 	    continue
+	} else {
+	    print_debug(4,sprintf(fmt, base, "weak exprt", sym))
 	}
 	if (!(sym in uses) || !uses[sym]) {
 	    if (ownr[sym] != values["pkgdirectory"]) {
@@ -1302,6 +1317,8 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		else
 		    print_warns(sprintf(fmt, base, "weak unuse", sym))
 	    }
+	} else {
+	    print_debug(4,sprintf(fmt, base, "weak used", sym))
 	}
 	if (!(sym in kabi) && values["kabi"]) {
 	    if (ownr[sym] != values["pkgdirectory"]) {
@@ -1310,6 +1327,8 @@ function read_mymodules(modules, src,    i,pair,ind,base,name,sym,fmt) {
 		else
 		    print_warns(sprintf(fmt, base, "weak unsup", sym))
 	    }
+	} else {
+	    print_debug(4,sprintf(fmt, base, "weak suppt", sym))
 	}
 	if (!(sym in crcs) && values["modversions"]) {
 	    print_warns(sprintf(fmt " in %-20s", base, "no version", sym, mods[sym]))
@@ -1521,6 +1540,10 @@ function create_missing_symsets(	progress,count,count_syms,count_sets,sym,set,se
 	progress++
 	if (sym in sets) {
 	    print_debug(1,"p: missedset, sym " sym " already in sets " sets[sym])
+	    continue
+	}
+	if (!(sym in exps)) {
+	    print_debug(1,"p: missedset, sym " sym " has no export")
 	    continue
 	}
 	if (!(sym in mods)) {
@@ -1842,7 +1865,7 @@ function write_rippedsyms(file, mod, base,	fname,count_unds,count_weak,pair,name
     for (pair in mod_unds) {
 	split(pair, ind, SUBSEP); name = ind[1]; sym = ind[2]
 	if (name != mod) continue
-	if (sym in crcs || (!values["modversions"] && sym in syms)) continue
+	if (sym in crcs || (!values["modversions"] && sym in exps)) continue
 	if (!(sym in mapsyms)) {
 	    print_error(sprintf(fmt, base, "norm no res", sym))
 	    continue
