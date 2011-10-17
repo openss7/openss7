@@ -160,7 +160,7 @@ postinst_manmacros () {
 #
 postinst_manpages () { :; return
     if   [ -x "`which mandb      2>/dev/null`" ]; then
-	LANGUAGE= LANG= mandb      -p @mandir@ || :
+	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
     elif [ -x "`which makewhatis 2>/dev/null`" ]; then
 	LANGUAGE= LANG= makewhatis -u @mandir@ || :
     fi
