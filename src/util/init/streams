@@ -112,6 +112,8 @@ config="/etc/sysconfig/$name /etc/default/$name /etc/conf.d/$name"
 mkdev="${name}_mkdev"
 desc="the STREAMS subsystem"
 
+[ -d /var/lock/subsys ] || mkdir -p /var/lock/subsys
+
 if [ ! -e /proc/modules     ] ; then if [ "$1" = 'stop' ] ; then exit 0 ; else exit 5 ; fi ; fi
 if [ ! -e /proc/filesystems ] ; then if [ "$1" = 'stop' ] ; then exit 0 ; else exit 5 ; fi ; fi
 
