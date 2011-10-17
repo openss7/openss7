@@ -64,9 +64,9 @@ datarootdir=@datarootdir@
 #   add its own lines later.
 #
 prerm_preloads () {
-    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
-	  prel_old included p
+    local prel_tmp prel_new prel_old included p
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
 	if [ -f $prel_old ]; then
 	    cp -f -- $prel_old $prel_new

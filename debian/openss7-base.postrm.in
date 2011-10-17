@@ -65,9 +65,10 @@ datarootdir=@datarootdir@
 #   -kernel sub-packages.
 #
 @WITH_KO_MODULES_FALSE@postrm_oldmods () {
-@WITH_KO_MODULES_FALSE@    local conf_old=@sysconfdir@/modules.conf \
-@WITH_KO_MODULES_FALSE@          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
-@WITH_KO_MODULES_FALSE@          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+@WITH_KO_MODULES_FALSE@    local conf_old conf_tmp conf_new
+@WITH_KO_MODULES_FALSE@    conf_old=@sysconfdir@/modules.conf
+@WITH_KO_MODULES_FALSE@    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+@WITH_KO_MODULES_FALSE@    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
 @WITH_KO_MODULES_FALSE@    if [ -f $conf_old ] ; then
 @WITH_KO_MODULES_FALSE@        cp -f -- $conf_old $conf_new
 @WITH_KO_MODULES_FALSE@        if grep '^include[[:space:]].*@modutildir@/@PACKAGE_LCNAME@' $conf_new >/dev/null 2>&1; then
@@ -85,7 +86,9 @@ datarootdir=@datarootdir@
 #   removal and package purge, unlike debhelper, we also stop any running initscripts.
 #
 postrm_initscripts () {
-    local reverse= list="${initfiles}" i
+    local reverse list i
+    reverse=
+    list="${initfiles}"
     for i in $list; do
 	reverse="$i${reverse:+ }$reverse"
     done

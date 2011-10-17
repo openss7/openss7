@@ -63,9 +63,10 @@ datarootdir=@datarootdir@
 #   reconfigure.
 #
 @WITH_KO_MODULES_FALSE@postinst_modconf () { :
-@WITH_KO_MODULES_FALSE@    local conf_old=@sysconfdir@/modules.conf \
-@WITH_KO_MODULES_FALSE@          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
-@WITH_KO_MODULES_FALSE@          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+@WITH_KO_MODULES_FALSE@    local conf_old conf_tmp conf_new
+@WITH_KO_MODULES_FALSE@    conf_old=@sysconfdir@/modules.conf
+@WITH_KO_MODULES_FALSE@    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+@WITH_KO_MODULES_FALSE@    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
 @WITH_KO_MODULES_FALSE@    if [ -f $conf_old ] ; then
 @WITH_KO_MODULES_FALSE@        cp -f -- $conf_old $conf_new
 @WITH_KO_MODULES_FALSE@        ( sed -e '\|^include[[:space:]].*@modutildir@/@PACKAGE_LCNAME@|d' $conf_new
@@ -84,9 +85,9 @@ datarootdir=@datarootdir@
 #   debian /etc/modules-@kversion@ file.
 #
 postinst_preloads () { :
-    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
-	  prel_old
+    local prel_tmp prel_new prel_old
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
 	if [ -f $prel_old ] ; then
 	    cp -f -- $prel_old $prel_new
@@ -114,7 +115,8 @@ postinst_preloads () { :
 #   environment.
 #
 postinst_initscripts () {
-    local list="${initfiles}" i args r
+    local list i args r
+    list="${initfiles}"
     for i in $list; do
 	if [ -f @initrddir@/$i ]; then
 	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       2>&1 && continue || true; }

@@ -63,10 +63,10 @@ datarootdir=@datarootdir@
 #   preloads from the file so we only need to add ours.
 #
 @WITH_KO_MODULES_FALSE@postinst_preloads () {
-@WITH_KO_MODULES_FALSE@    local prel_old=@sysconfdir@/modules-@kversion@ \
-@WITH_KO_MODULES_FALSE@          prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
-@WITH_KO_MODULES_FALSE@          prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
-@WITH_KO_MODULES_FALSE@          p
+@WITH_KO_MODULES_FALSE@    local prel_old prel_tmp prel_new p
+@WITH_KO_MODULES_FALSE@    prel_old=@sysconfdir@/modules-@kversion@
+@WITH_KO_MODULES_FALSE@    prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
+@WITH_KO_MODULES_FALSE@    prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
 @WITH_KO_MODULES_FALSE@    if [ -f $prel_old ]; then cp -f -- $prel_old $prel_new; else touch $prel_new; fi
 @WITH_KO_MODULES_FALSE@    ( cat $prel_new; for p in ${preloads}; do echo "$p"; done ) >$prel_tmp
 @WITH_KO_MODULES_FALSE@    mv -f -- $prel_tmp $prel_new
@@ -81,7 +81,8 @@ datarootdir=@datarootdir@
 #   comparable actions for 2.6 module systems.
 #
 @WITH_KO_MODULES_FALSE@postinst_oldmods () {
-@WITH_KO_MODULES_FALSE@    local sysmap=/boot/System.map-@kversion@
+@WITH_KO_MODULES_FALSE@    local sysmap
+@WITH_KO_MODULES_FALSE@    sysmap=/boot/System.map-@kversion@
 @WITH_KO_MODULES_FALSE@    if [ -x "`which depmod 2>/dev/null`" ]; then
 @WITH_KO_MODULES_FALSE@        if [ "@kversion@" = "`uname -r`" ]; then
 @WITH_KO_MODULES_FALSE@            depmod -a || :
