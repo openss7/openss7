@@ -61,17 +61,21 @@ datarootdir=@datarootdir@
 # postinst_jnilibs() - After a fresh installation, upgrade or reinstall, do a ldconfig.
 #
 postinst_jnilibs () {
+    local d
+    d="@jnidir@"
     if   [ -x "`which libtool  2>/dev/null`" ] ; then
-	libtool --mode=finish @jnidir@ || :
+	[ -d "$d" ] && { libtool --mode=finish "$d" || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
-	ldconfig -n @jnidir@ || :
+	[ -d "$d" ] && { ldconfig -n "$d" || : }
     fi
 }
 postinst_gcjlibs () {
+    local d
+    d="@libdir@/gcj/@PACKAGE@"
     if   [ -x "`which libtool  2>/dev/null`" ] ; then
-	libtool --mode=finish @libdir@/gcj/@PACKAGE@ || :
+	[ -d "$d" ] && { libtool --mode=finish "$d" || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
-	ldconfig -n @libdir@/gcj/@PACKAGE@ || :
+	[ -d "$d" ] && { ldconfig -n "$d" || : }
     fi
 }
 #
