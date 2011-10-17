@@ -65,11 +65,10 @@ datarootdir=@datarootdir@
 #   because most machines run an evening cron job to update these.
 #
 postinst_manpages () { :; return
-    if which makewhatis >/dev/null 2>&1 ; then
-	LANGUAGE= LANG= makewhatis -u @mandir@ || true
-    fi
-    if which mandb >/dev/null 2>&1 ; then
-	LANGUAGE= LANG= mandb -p @mandir@ || :true
+    if   [ -x "`which mandb      2>/dev/null`" ] ; then
+	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
+    elif [ -x "`which makewhatis 2>/dev/null`" ] ; then
+	LANGUAGE= LANG= makewhatis -u @mandir@ || :
     fi
 }
 #
