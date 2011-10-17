@@ -892,13 +892,49 @@ AC_DEFUN([_DISTRO_ADJUST_64BIT_LIBDIR], [dnl
     syslib32dir="$syslibdir"
     case $host_cpu in
 	(*64)
-	    lib64dir=`echo $libdir | sed -r -e 's|\<lib\>|lib64|g'`
-	    lib32dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`
+	    eval "dist_search_path=\"
+		${DESTDIR}${libdir}32
+		${DESTDIR}${rootdir}/usr/lib32
+		${DESTDIR}/usr/lib32
+		/usr/lib32\""
+	    dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
+	    dist_found=
+	    for dist_dir in $dist_search_path; do
+		if test -d "$dist_dir"; then
+		    dist_found=yes
+		    break
+		fi
+	    done
+	    if test ${dist_found:-no} = yes; then
+		lib64dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`
+		lib32dir=`echo $libdir | sed -r -e 's|\<lib\>|lib32|g'`
+	    else
+		lib64dir=`echo $libdir | sed -r -e 's|\<lib\>|lib64|g'`
+		lib32dir=`echo $libdir | sed -r -e 's|\<lib64\>|lib|g'`
+	    fi
 	    libdir="$lib64dir"
 	    pkglib32dir='${lib32dir}/${PACKAGE}'
 	    pkglibexec32dir='${pkglibexecdir}/lib32'
-	    syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib64|g'`
-	    syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`
+	    eval "dist_search_path=\"
+		${DESTDIR}${syslibdir}32
+		${DESTDIR}${rootdir}/lib32
+		${DESTDIR}/lib32
+		/lib32\""
+	    dist_search_path=$(echo "$dist_search_path" | sed 's|\<NONE\>||g;s|//|/|g' | awk '{if(!([$]0 in seen)){print[$]0;seen[[$ 0]]=1}}')
+	    dist_found=
+	    for dist_dir in $dist_search_path; do
+		if test -d "$dist_dir"; then
+		    dist_found=yes
+		    break
+		fi
+	    done
+	    if test ${dist_found:-no} = yes; then
+		syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`
+		syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib32|g'`
+	    else
+		syslib64dir=`echo $syslibdir | sed -r -e 's|\<lib\>|lib64|g'`
+		syslib32dir=`echo $syslibdir | sed -r -e 's|\<lib64\>|lib|g'`
+	    fi
 	    syslibdir="$syslib64dir"
 	    have_32bit_libs=yes
 	    ;;
