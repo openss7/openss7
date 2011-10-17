@@ -78,7 +78,7 @@ function allyears(    this, last, sep, result)
 }
 function print_vinfo(level, string)
 {
-    if ((values["quiet"] == 0) && (values["verbose"] >= level)) {
+    if ((values["quiet"]+0 == 0) && (values["verbose"]+0 >= level)) {
 	print blu me ": I: " string std > stdout
 	fflush(stdout)
 	written[stdout] = 1
@@ -86,7 +86,7 @@ function print_vinfo(level, string)
 }
 function print_vmore(level, string)
 {
-    if (prog == "yes" && (values["quiet"] == 0) && (values["verbose"] >= level)) {
+    if (prog == "yes" && (values["quiet"]+0 == 0) && (values["verbose"]+0 >= level)) {
 	printf "%s", blu me ": I: " string std cr lf > stdout
 	fflush(stdout)
 	written[stdout] = 1
@@ -94,7 +94,7 @@ function print_vmore(level, string)
 }
 function print_debug(level, string)
 {
-    if (values["debug"] >= level) {
+    if (values["debug"]+0 >= level) {
 	print mag me ": D: " string std > stderr
 	fflush(stderr)
 	written[stderr] = 1
@@ -102,7 +102,7 @@ function print_debug(level, string)
 }
 function print_dmore(level, string)
 {
-    if (prog == "yes" && values["debug"] >= level) {
+    if (prog == "yes" && values["debug"]+0 >= level) {
 	printf "%s", mag me ": D: " string std cr lf > stderr
 	fflush(stderr)
 	written[stderr] = 1
@@ -127,7 +127,7 @@ function print_emore(string)
 }
 function print_warns(string)
 {
-    if ((values["quiet"] == 0) || (values["verbose"] > 0) || (values["debug"] > 0)) {
+    if ((values["quiet"] == 0) || (values["verbose"]+0 > 0) || (values["debug"]+0 > 0)) {
 	print org me ": W: " string std > stderr
 	fflush(stderr)
 	written[stderr] = 1
@@ -136,7 +136,7 @@ function print_warns(string)
 }
 function print_wmore(string)
 {
-    if ((values["quiet"] == 0) || (values["verbose"] > 0) || (values["debug"] > 0)) {
+    if ((values["quiet"] == 0) || (values["verbose"]+0 > 0) || (values["debug"]+0 > 0)) {
 	print org me ": W: " string std > stderr
 	fflush(stderr)
 	written[stderr] = 1
@@ -593,7 +593,7 @@ function fileversion(module,			pfx,kversion)
 #global weakmods[file] = kversion
 #global weaklinks[file] = module
 #global weaknames[kversion,name] = file
-function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,module,subdir,name,kversion,kversions,cmd)
+function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,module,weakmod,subdir,name,kversion,kversions,cmd)
 {
     pfx = "r: structure, "
     if ("weakdir" in values)
@@ -653,15 +653,15 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 		{ modremoves[kversion,name] = file }
 	    }
 	    if (!(kversion in kversions)) { kversions[kversion] = 1; k++ }
-	    if (file~"/" subdir "/") {
+	    if (file~"/(extra|updates|openss7|" subdir ")/") {
 		weakmods[file] = fileversion(file)
-		#print_debug(3,pfx "module " file " = " kversion)
+		print_debug(3,pfx "module " file " = " kversion)
 		if (system("test -L " file) == 0) {
 		    cmd = "readlink " file
 		    while ((cmd | getline) == 1) { module = $0 }
 		    close(cmd)
 		    weaklinks[file] = module
-		    #print_debug(3,pfx "symbolic link " file " -> " module)
+		    print_debug(3,pfx "symbolic link " file " -> " module)
 		}
 		l++; pl++
 		if (pl >= 100) {
@@ -670,8 +670,9 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 		}
 		if ((kversion,name) in weaknames && weaknames[kversion,name] != file)
 		{ weaknames[kversion,name] = weaknames[kversion,name] "," file
-		  print_error(pfx "conflict amoung updates for " name ", " weaknames[kversion,name]) }
+		  print_error(pfx "conflict amoung updates for " name ", " weaknames[kversion,name]) } else
 		{ weaknames[kversion,name] = file }
+		weaknames[name] = 1
 		#print_vinfo(4, pfx "name = " name)
 		#print_vinfo(4, pfx "vers = " kversion)
 		#print_vinfo(4, pfx "file = " file)
@@ -687,8 +688,9 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
 		}
 		if ((kversion,name) in modnames && modnames[kversion,name] != file)
 		{ modnames[kversion,name] = modnames[kversion,name] "," file
-		  print_error(pfx "conflict amoung modules for " name ", " modnames[kversion,name]) }
+		  print_error(pfx "conflict amoung modules for " name ", " modnames[kversion,name]) } else
 		{ modnames[kversion,name] = file }
+		modnames[name] = 1
 		#print_vinfo(4, pfx "name = " name)
 		#print_vinfo(4, pfx "vers = " kversion)
 		#print_vinfo(4, pfx "file = " file)
@@ -711,25 +713,43 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     n = 0
     for (name in names) {
 	module = ""
+	#weakmod = ""
 	for (k=counts["kern"];k>0;k--) { kversion = kernels[k]
 	    if (module == "")
-	    { if ( ((kversion,name) in modnames)) { module = modnames[kversion,name] } } else
-	    { if (!((kversion,name) in modnames)) { modnames[kversion,name] = module } }
+	    { if ( ((kversion,name) in modnames )) { module =  modnames[kversion,name] } else
+	    { if ( ((kversion,name) in weaknames)) { module = weaknames[kversion,name] } } } else
+	    { if (!((kversion,name) in modnames )) {  modnames[kversion,name] = module } }
+	    #if (weakmod == "")
+	    #{ if ( ((kversion,name) in weaknames)) { weakmod = weaknames[kversion,name] } } else
+	    #{ if (!((kversion,name) in weaknames)) { weaknames[kversion,name] = weakmod } }
 	}
 	module = ""
+	#weakmod = ""
 	for (k=1;k<=counts["kern"];k++) { kversion = kernels[k]
 	    if (module == "")
-	    { if ( ((kversion,name) in modnames)) { module = modnames[kversion,name] } } else
-	    { if (!((kversion,name) in modnames)) { modnames[kversion,name] = module } }
+	    { if ( ((kversion,name) in modnames )) { module =  modnames[kversion,name] } else
+	    { if ( ((kversion,name) in weaknames)) { module = weaknames[kversion,name] } } } else
+	    { if (!((kversion,name) in modnames )) {  modnames[kversion,name] = module } }
+	    #if (weakmod == "")
+	    #{ if ( ((kversion,name) in weaknames)) { weakmod = weaknames[kversion,name] } } else
+	    #{ if (!((kversion,name) in weaknames)) { weaknames[kversion,name] = weakmod } }
 	}
 	n++
     }
     for (k=1;k<=counts["kern"];k++) { kversion = kernels[k]
 	for (name in names) {
-	    if (!((kversion,name) in modnames))
-		print_error(pfx sprintf("modname for (%s,%s) does not exist", kversion,name))
-	    else
-		print_debug(4,pfx sprintf("modname for (%s,%s) is %s", kversion,name,modnames[kversion,name]))
+	    if (name in weaknames) {
+		if (!((kversion,name) in weaknames))
+		    print_warns(pfx sprintf("weakname for (%s,%s) does not exist", kversion,name))
+		else
+		    print_debug(4,pfx sprintf("weakname for (%s,%s) is %s", kversion,name,weaknames[kversion,name]))
+	    }
+	    if (name in modnames) {
+		if (!((kversion,name) in modnames))
+		    print_error(pfx sprintf("modname for (%s,%s) does not exist", kversion,name))
+		else
+		    print_debug(4,pfx sprintf("modname for (%s,%s) is %s", kversion,name,modnames[kversion,name]))
+	    }
 	}
     }
     return n
@@ -814,8 +834,12 @@ function readsysmap(kversion, file,
 	add = maps[sym]
 	sysmaps[kversion,sym] = add
 	if ((kversion,sym) in allsyms && allsyms[kversion,sym] != add) {
-	    print_warns(pfx "ksym(" kversion ":" sym ") = 0x" add " != 0x" allsyms[kversion,sym])
-	    usesysmap[kversion] = 0
+	    if (usesysmap[kversion] != 0) {
+		print_warns(pfx "kernel, " kversion ", does not match running kernel of same version")
+		usesysmap[kversion] = 0
+	    }
+	    print_debug(9,pfx sprintf("0x%s != 0x%s (%s:%s)",add,allsyms[kversion,sym],kversion,sym))
+	    #print_debug(9,pfx "ksym(" kversion ":" sym ") = 0x" add " != 0x" allsyms[kversion,sym])
 	}
     }
     return n
@@ -830,8 +854,12 @@ function readvmlinux(kversion, file,
 	add = maps[sym]
 	sysmaps[kversion,sym] = add
 	if ((kversion,sym) in allsyms && allsyms[kversion,sym] != add) {
-	    print_warns(pfx "ksym(" kversion ":" sym ") = 0x" add " != 0x" allsyms[kversion,sym])
-	    usesysmap[kversion] = 0
+	    if (usesysmap[kversion] != 0) {
+		print_warns(pfx "kernel, " kversion ", does not match running kernel of same version")
+		usesysmap[kversion] = 0
+	    }
+	    print_debug(9,pfx sprintf("0x%s != 0x%s (%s:%s)",add,allsyms[kversion,sym],kversion,sym))
+	    #print_debug(9,pfx "ksym(" kversion ":" sym ") = 0x" add " != 0x" allsyms[kversion,sym])
 	}
     }
     return n
@@ -849,8 +877,12 @@ function readallsym(kversion, file,
 	add = maps[sym]
 	allsyms[kversion,sym] = add
 	if ((kversion,sym) in sysmaps && sysmaps[kversion,sym] != add) {
-	    print_warns(pfx "ksym(" kversion ":" sym ") = 0x" add " != 0x" sysmaps[kversion,sym])
-	    usesysmap[kversion] = 0
+	    if (usesysmap[kversion] != 0) {
+		print_warns(pfx "kernel, " kversion ", does not match running kernel of same version")
+		usesysmap[kversion] = 0
+	    }
+	    print_debug(9,pfx sprintf("0x%s != 0x%s (%s:%s)",add,sysmaps[kversion,sym],kversion,sym))
+	    #print_debug(9,pfx "ksym(" kversion ":" sym ") = 0x" add " != 0x" sysmaps[kversion,sym])
 	}
     }
     return n
@@ -878,6 +910,9 @@ function readsymabi(kversion, file,
 		symvers[kversion,sym] = crc
 	    } else {
 		print_warns(pfx "duplicate crc for " sym " in " kversion)
+	    }
+	    if (crc != "0x00000000") {
+		modversions = 1
 	    }
 	}
 	close(command)
@@ -911,6 +946,9 @@ function readsymver(kversion, file,
 		symvers[kversion,sym] = crc
 	    } else {
 		print_warns(pfx "duplicate crc for " sym " in " kversion)
+	    }
+	    if (crc != "0x00000000") {
+		modversions = 1
 	    }
 	}
 	close(command)
@@ -1006,6 +1044,9 @@ function readkernel(kversion,
 		    symvers[kversion,sym] = crc
 		}
 		# expect duplicates
+		if (crc != "0x00000000") {
+		    modversions = 1
+		}
 	    }
 	} else {
 	    if (/^$/)
@@ -1347,7 +1388,8 @@ function getmodule(module,
 	fmt = "%04d needs,  %04d wants,  %04d links,  %04d weaks,  %s"
 	print_vmore(3, pfx sprintf(fmt, r, w, l, a, module))
 	#command = "objdump -t -j '*ABS*' -j '*UND*' -j '__versions' -j '__weak_versions' -j '__weak_absolute' -j '.modinfo' -s " module
-	command = "f='" module "'; case $f in (*.ko) echo $f ;; (*.ko.gz) gzip -dc $f >/var/tmp/`basename $f .gz` ; echo /var/tmp/`basename $f .gz` ;; esac | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j '__versions' -j '__weak_versions' -j '__weak_absolute' -j '.modinfo' -s "
+	#command = "f='" module "'; case $f in (*.ko) echo $f ;; (*.ko.gz) gzip -dc $f >/var/tmp/`basename $f .gz` ; echo /var/tmp/`basename $f .gz` ;; esac | xargs -r objdump -t -j '*ABS*' -j '*UND*' -j '__versions' -j '__weak_versions' -j '__weak_absolute' -j '.modinfo' -s "
+	command = "f='" module "'; case $f in (*.ko) echo $f ;; (*.ko.gz) gzip -dc $f >/var/tmp/`basename $f .gz` ; echo /var/tmp/`basename $f .gz` ;; esac | while read f; do objdump -t $f; objdump -j '__versions' -j '__weak_versions' -j '__weak_absolute' -j '.modinfo' -s $f 2>/dev/null || :; done"
 	SECTION = ""; string = ""
 	while ((result = (command | getline)) != -1) {
 	    if (SECTION == "__versions" || SECTION == "__weak_versions" || SECTION == "__weak_absolute") {
@@ -1367,18 +1409,34 @@ function getmodule(module,
 	    if (SECTION == "SYMBOL TABLE") {
 		if (result==1&&!/^$/&&!sub(/^Contents of section /,"")) {
 		    if (NF < 4) continue
+		    if (substr($0,length($1)+2,1) == "l") {
+			if (substr($0,length($1)+8,1) == "O") {
+			    if (sub(/^_?_?__ksymtab/,"",$(NF-2))) {
+				sub(/\+.*/,"",$(NF-2))
+				if (sub(/^_?__ksymtab_/,"",$NF)) {
+				    if (!($NF in have)) {
+					print_debug(4,pfx sprintf("%s: have %-28s = 0x%-12s, %s", SECTION, $NF, "", module))
+					have[$NF] = ""; h++; n++
+				    }
+				}
+			    }
+			}
+		    } else
 		    if ($(NF-2) == "*ABS*") {
 			if (substr($0,length($1)+2,7) ~ /^g     [FO ]$/) {
 			    if (sub(/^_?__(weak_)?crc_/, "", $NF)) {
 				sub(/^00000000/, "", $1)
-				if (!($NF in have)) {
-				    print_debug(4,pfx SECTION ": have " $NF " = 0x" $1 ", " module)
-				    have[$NF] = "0x" $1; h++; n++
+				if (!($NF in have) || have[$NF] == "") {
+				    print_debug(4,pfx sprintf("%s: have %-28s = 0x%-12s, %s", SECTION, $NF, $1, module))
+				    #print_debug(4,pfx SECTION ": have " $NF " = 0x" $1 ", " module)
+				    if (!($NF in have)) { h++; n++ }
+				    have[$NF] = "0x" $1
 				}
 			    } else {
 				# This might wind up in link[] or want[]
 				if (!($NF in link)) {
-				    print_debug(4,pfx SECTION ": link " $NF " = " $1 ", " module)
+				    print_debug(4,pfx sprintf("%s: link %-28s = %-12s, %s", SECTION, $NF, $1, module))
+				    #print_debug(4,pfx SECTION ": link " $NF " = " $1 ", " module)
 				    link[$NF] = $1; l++; n++
 				}
 			    }
@@ -1388,12 +1446,14 @@ function getmodule(module,
 			if (substr($0,length($1)+3,1) == "w") {
 			    # This might wind up in link[] or want[]
 			    if (!($NF in want)) {
-				print_debug(4,pfx SECTION ": want " $NF " = \"\", " module)
+				print_debug(4,pfx sprintf("%s: want %-28s = \"\", %s", SECTION, $NF, module))
+				#print_debug(4,pfx SECTION ": want " $NF " = \"\", " module)
 				want[$NF] = ""; w++; n++
 			    }
 			} else {
 			    if (!($NF in need)) {
-				print_debug(4,pfx SECTION ": need " $NF " = \"\", " module)
+				print_debug(4,pfx sprintf("%s: need %-28s = \"\", %s", SECTION, $NF, module))
+				#print_debug(4,pfx SECTION ": need " $NF " = \"\", " module)
 				need[$NF] = ""; r++; n++
 			    }
 			}
@@ -1459,7 +1519,8 @@ function getmodule(module,
 	    if (module in exportsyms)
 	    { exportsyms[module] = exportsyms[module] "," sym } else
 	    { exportsyms[module] = sym }
-	    if (!crc) print_warns(pfx sprintf("unversioned export %-20s in %s", sym, module))
+	    if (!crc && modversions) print_warns(pfx sprintf("unversioned export %-20s in %s", sym, module))
+	    #print_debug(6,pfx sprintf("export %-20s in %s", sym, module))
 	}
 	for (sym in link) {
 	    crc = link[sym]
@@ -1469,6 +1530,7 @@ function getmodule(module,
 	    { linkedsyms[module] = linkedsyms[module] "," sym } else
 	    { linkedsyms[module] = sym }
 	    if (!crc && !(sym in weak)) print_warns(pfx sprintf("unresolved  linked %-20s in %s", sym, module))
+	    #print_debug(6,pfx sprintf("linked %-20s in %s", sym, module))
 	}
 	for (sym in want) {
 	    crc = want[sym]
@@ -1477,7 +1539,8 @@ function getmodule(module,
 	    if (module in wantedsyms)
 	    { wantedsyms[module] = wantedsyms[module] "," sym } else
 	    { wantedsyms[module] = sym }
-	    if (!crc && !(sym in weak)) print_warns(pfx sprintf("unversioned wanted %-20s in %s", sym, module))
+	    if (!crc && !(sym in weak) && modversions) print_warns(pfx sprintf("unversioned wanted %-20s in %s", sym, module))
+	    #print_debug(6,pfx sprintf("wanted %-20s in %s", sym, module))
 	}
 	for (sym in need) {
 	    crc = need[sym]
@@ -1485,7 +1548,8 @@ function getmodule(module,
 	    if (module in neededsyms)
 	    { neededsyms[module] = neededsyms[module] "," sym } else
 	    { neededsyms[module] = sym }
-	    if (!crc) print_warns(pfx sprintf("unversioned needed %-20s in %s", sym, module))
+	    if (!crc && modversions) print_warns(pfx sprintf("unversioned needed %-20s in %s", sym, module))
+	    #print_debug(6,pfx sprintf("needed %-20s in %s", sym, module))
 	}
     } else {
 	print_error(pfx "cannot read " module)
@@ -1508,7 +1572,7 @@ function getmodinfo(kversion,
 	pw = 0; pm = 0; pn = 0
 	print_vmore(2, pfx sprintf(fmt, n, m, w))
 	for (name in names) {
-	    if (((kversion,name) in modnames) || ((kversion,name) in weaknames)) {
+	    if ((name in modnames) || (name in weaknames)) {
 		if ((kversion,name) in modnames) {
 		    module = modnames[kversion,name]
 		    if (module in modinfo)
@@ -1575,7 +1639,7 @@ function getresolve(kversion, kver,
     pfx = "p: resolve,   "
     # map symbols exported by modules in the module set
     n = 0
-    print_vmore(2, pfx sprintf("%-40s", "collecting module names..."))
+    print_vinfo(2, pfx sprintf("(%-12s,%-12s) %-30s", kversion, kver, "collecting module names..."))
     for (name in names) {
 	if ((kver,name) in modnames) {
 	    module = modnames[kver,name]
@@ -1587,17 +1651,21 @@ function getresolve(kversion, kver,
 			    module = file
 			}
 		    }
+		} else {
+		    print_debug(4,pfx "no weakname for (" kversion "," name ")")
 		}
 	    }
 	    resolve[name] = module
 	    if (module in exportsyms) exporting[name] = module
-	    if (module in linkedsyms) linking[name] = module
-	    if (module in neededsyms) needing[name] = module
-	    if (module in wantedsyms) wanting[name] = module
+	    if (module in linkedsyms)   linking[name] = module
+	    if (module in neededsyms)   needing[name] = module
+	    if (module in wantedsyms)   wanting[name] = module
 	    if (module in delmods)    deleted[module] = name
+	} else {
+	    print_debug(4,pfx "no modname for (" kver "," name ")")
 	}
     }
-    print_vmore(2, pfx sprintf("%-40s", "mapping module symbol exports..."))
+    print_vinfo(2, pfx sprintf("(%-12s,%-12s) %-30s", kversion, kver, "mapping module symbol exports..."))
     for (name in exporting) {
 	module = exporting[name]
 	split(exportsyms[module],syms,/,/)
@@ -1608,7 +1676,7 @@ function getresolve(kversion, kver,
 	}
     }
     # test solution
-    print_vmore(2, pfx sprintf("%-40s", "resolving ripped symbols..."))
+    print_vinfo(2, pfx sprintf("(%-12s,%-12s) %-30s", kversion, kver, "resolving ripped symbols..."))
     d = 0
     for (name in linking) {
 	module = linking[name]
@@ -1625,9 +1693,15 @@ function getresolve(kversion, kver,
 			if (name in reload)
 			{ reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
 			{ reload[name] = "\t" sym " = 0x" add ";" }
+		    } else {
+			print_debug(4,pfx "good link " name ", allsyms(" kversion ":" sym ") = " add " == " allsyms[kversion,sym])
 		    }
 		    continue
+		} else {
+		    print_debug(4,pfx sprintf("no kallsyms for (%s,%s)", kversion, sym))
 		}
+	    } else {
+		print_debug(9,pfx sprintf("cannot use kallsyms for (%s,%s)", kversion, sym))
 	    }
 	    if (kversion in usesysmap && usesysmap[kversion]) {
 		if ((kversion,sym) in sysmaps) {
@@ -1638,9 +1712,15 @@ function getresolve(kversion, kver,
 			if (name in reload)
 			{ reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
 			{ reload[name] = "\t" sym " = 0x" add ";" }
+		    } else {
+			print_debug(4,pfx "good link " name ", sysmaps(" kversion ":" sym ") = " add " == " sysmaps[kversion,sym])
 		    }
 		    continue
+		} else {
+		    print_debug(4,pfx sprintf("no sysmap for (%s,%s)", kversion, sym))
 		}
+	    } else {
+		print_debug(9,pfx sprintf("cannot use sysmap for (%s,%s)", kversion, sym))
 	    }
 	    print_vinfo(3,pfx "cannot resolve linked " sym " from " name)
 	    if ((module,sym) in weaken) {
@@ -1651,16 +1731,19 @@ function getresolve(kversion, kver,
 		    if (name in reload)
 		    { reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";" } else
 		    { reload[name] = "\t" sym " = 0x" add ";" }
+		} else {
+		    print_debug(4,pfx "good link " name ", weaken(" kversion ":" sym ") = " add " == " weaken[module,sym])
 		}
 		continue
 	    }
 	    if ((module in deleted)) continue
+	    print_debug(4,pfx "deleting " name)
 	    deleted[module] = name
 	    d++
 	}
     }
     do {
-	print_vmore(2, pfx sprintf("%-40s", "resolving exported symbols..."))
+	print_vinfo(2, pfx sprintf("(%-12s,%-12s) %-30s", kversion, kver, "resolving exported symbols..."))
 	d = 0
 	for (name in needing) {
 	    print_vmore(2, pfx sprintf("%-40s", "resolving " name "..."))
@@ -1706,6 +1789,7 @@ function getresolve(kversion, kver,
 				    if ("\n" "\t" sym " = 0x" add ";" "\n" !~ "\n" reload[name] "\n")
 					reload[name] = reload[name] "\n" "\t" sym " = 0x" add ";"
 				} else { reload[name] = "\t" sym " = 0x" add ";" }
+				print_warns(pfx sym " will be relinked to vmlinux-" kversion)
 				continue
 			    } else {
 				print_vinfo(3,pfx sym " not exported by vmlinux-" kversion)
@@ -1994,7 +2078,7 @@ function readloaded(kversion,
 function print_action(action, file, prep, kversion,
 		      module,modver)
 {
-    if (values["verbose"] == 1) {
+    if (values["verbose"]+0 == 1) {
 	module = file; gsub(/^.*\//, "", module)
 	modver = file; if (sub(/^.*\/lib\/modules\//, "", modver)) { sub(/\/.*$/, "", modver) } else { sub(/\/[^\/]*$/, "", modver) }
 	print_vinfo(1, sprintf("%-10s %-28s %-4s %-28s from %s", action, module, prep, kversion, modver))
@@ -3085,7 +3169,7 @@ BEGIN {
 	    }
 	}
     }
-    if (values["verbose"] >=3 && values["debug"] == defaults["debug"])
+    if (values["verbose"]+0 >=3 && values["debug"]+0 == defaults["debug"]+0)
 	values["debug"] = values["verbose"] - 2
     while (optind < ARGC) {
 	if ("kernels" in values)
@@ -3117,6 +3201,7 @@ BEGIN {
     for (value in values) {
 	print_debug(1, "o: \"" value "\" = " values[value])
     }
+    modversions = 0
     testdepmod()
     testwstyle()
     if (command == "help"          ) { help(   stdout); exit 0 }
