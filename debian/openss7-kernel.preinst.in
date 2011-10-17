@@ -62,10 +62,10 @@ datarootdir=@datarootdir@
 #   Remove any non-deb preloads from the kernel-specific preloads file.
 #
 preinst_preloads () {
-    local prel_old=@sysconfdir@/modules-@kversion@ \
-	  prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
-	  m
+    local prel_old prel_tmp prel_new m
+    prel_old=@sysconfdir@/modules-@kversion@
+    prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
     if [ -f $prel_old ]; then
 	cp -f -- $prel_old $prel_new
 	sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new >$prel_tmp
@@ -102,7 +102,8 @@ preinst_remove_depmods () {
 #   this function not be too zealous and remove kernel modules from our other installed packages.
 #
 preinst_modules () { :
-    local dir m b modl_mods= line dep t target p prereq
+    local dir m b modl_mods line dep t target p prereq
+    modl_mods=
     for dir in @kmoduledir@; do
 	[ -d $dir ] || continue
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do

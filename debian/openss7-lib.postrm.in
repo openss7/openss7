@@ -101,11 +101,13 @@ postrm_netconfig_kill () {
 #   still loaded.
 #
 postrm_netconfig () {
-    local netc_fil=@sysconfdir@/netconfig \
-	  netc_alt=@sysconfdir@/netconfig.xnsl \
-	  netc_dir=@sysconfdir@/nslconfig.d \
-	  netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$ \
-	  found=no files="$netc_dir/*" f
+    local netc_fil netc_alt netc_dir netc_tmp found files f
+    netc_fil=@sysconfdir@/netconfig
+    netc_alt=@sysconfdir@/netconfig.xnsl
+    netc_dir=@sysconfdir@/nslconfig.d
+    netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$
+    found=no
+    files="$netc_dir/*"
     postrm_netconfig_kill || :
     for f in ${netconfig}; do rm -f -- $netc_dir/$f ||:; done
     if [ -r $netc_fil ]; then
@@ -187,10 +189,12 @@ postrm_sock2path_kill () {
 #   still loaded.
 #
 postrm_sock2path () {
-    local s2pa_fil=@sysconfdir@/sock2path \
-	  s2pa_dir=@sysconfdir@/sock2path.d \
-	  s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$ \
-	  found=no files="$s2pa_dir/*" f
+    local s2pa_fil s2pa_dir s2pa_tmp found files f
+    s2pa_fil=@sysconfdir@/sock2path
+    s2pa_dir=@sysconfdir@/sock2path.d
+    s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$
+    found=no
+    files="$s2pa_dir/*"
     postrm_sock2path_kill || :
     for f in ${sock2path}; do rm -f -- $s2pa_dir/$f ||:; done
     (   echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
@@ -224,11 +228,14 @@ postrm_sock2path () {
 #   responsibility of the new version's postinst.
 #
 postrm_snmpconf () {
-    local snmp_fil=@sysconfdir@/snmp/snmpd.local.conf \
-	  snmp_dir=@sysconfdir@/snmp/snmp.d \
-	  snmp_lcl=@sysconfdir@/snmp/snmp.d/00local \
-	  snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$ \
-	  wrote_one=no changed_local=no files="$snmp_dir/*" f
+    local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
+    snmp_fil=@sysconfdir@/snmp/snmpd.local.conf
+    snmp_dir=@sysconfdir@/snmp/snmp.d
+    snmp_lcl=@sysconfdir@/snmp/snmp.d/00local
+    snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$
+    wrote_one=no
+    changed_local=no
+    files="$snmp_dir/*"
     if [ ! -e @sysconfdir@/snmp/snmpd.conf -a -e @sysconfdir@/snmpd.conf ]; then
 	ln -L @sysconfdir@/snmpd.conf @sysconfdir@/snmp/snmpd.conf
 	touch @sysconfdir@/snmpd.local.conf
@@ -307,7 +314,8 @@ postrm_snmpconf () {
 #   still exist, but all index files for them can be removed.
 #
 #postrm_tcllibs () { :
-#    local files="$pkgtcllibdir/pkgIndex.tcl $pkgtcllibdir/*/pkgIndex.tcl" f d
+#    local files f d
+#    files="$pkgtcllibdir/pkgIndex.tcl $pkgtcllibdir/*/pkgIndex.tcl"
 #    for f in $files; do
 #	if [ -f $f ]; then
 #	    rm -f -- $f || :
