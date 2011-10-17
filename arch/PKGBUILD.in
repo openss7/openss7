@@ -239,7 +239,7 @@ package_@PACKAGE@-@kversion@() {
 	package
 	cd $srcdir/_install
 	mkdir -p $pkgdir
-	cp -av boot $pkdir
+	cp -av boot $pkgdir
 	mkdir -p $pkgdir/lib
 	cp -av lib/modules $pkgdir/lib
 	cd $startdir
