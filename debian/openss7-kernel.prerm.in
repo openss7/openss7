@@ -62,10 +62,10 @@ datarootdir=@datarootdir@
 #   kernel-specific preloads file.
 #
 prerm_preloads () {
-    local prel_old=@sysconfdir@/modules-@kversion@ \
-	  prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
-	  included p
+    local prel_old prel_tmp prel_new included p
+    prel_old=@sysconfdir@/modules-@kversion@
+    prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
     if [ -f $prel_old ]; then
 	cp -f -- $prel_old $prel_new
 	included=no

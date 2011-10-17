@@ -63,7 +63,8 @@ datarootdir=@datarootdir@
 #   operation at an inopportune moment so the dh_installmodules debhelpers are disabled.
 #
 @WITH_KO_MODULES_FALSE@postrm_oldmods () {
-@WITH_KO_MODULES_FALSE@    local sysmap=/boot/System.map-@kversion@
+@WITH_KO_MODULES_FALSE@    local sysmap
+@WITH_KO_MODULES_FALSE@    sysmap=/boot/System.map-@kversion@
 @WITH_KO_MODULES_FALSE@    if [ -x "`which depmod 2>/dev/null`" ]; then
 @WITH_KO_MODULES_FALSE@        if [ "@kversion@" = "`uname -r`" ]; then
 @WITH_KO_MODULES_FALSE@            depmod -a || :

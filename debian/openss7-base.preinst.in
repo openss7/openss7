@@ -63,9 +63,9 @@ datarootdir=@datarootdir@
 #   files.
 #
 preinst_preloads () {
-    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
-	  prel_old m
+    local prel_tmp prel_new prel_old m
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     for prel_old in @sysconfdir@/modprobe.preload @sysconfdir@/modules; do
 	if [ -f $prel_old ]; then
 	    cp -f -- $prel_old $prel_new
@@ -137,7 +137,8 @@ preinst_remove_depmods () {
 #   can be found in each modules.dep file and remove all conflicting modules and their dependents.
 #
 preinst_modules () {
-    local dir m b modl_mods= dep line t target p prereq
+    local dir m b modl_mods dep line t target p prereq
+    modl_mods=
     for dir in /lib/modules/preferred /lib/modules/default /lib/modules/boot; do
 	[ -d $dir ] || continue
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
@@ -200,10 +201,10 @@ preinst_modules () {
 #   because the modules.conf file is generated from the modules/conf.d directory.
 #
 @WITH_KO_MODULES_FALSE@preinst_modconf () {
-@WITH_KO_MODULES_FALSE@    local conf_old=@sysconfdir@/modules.conf \
-@WITH_KO_MODULES_FALSE@          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
-@WITH_KO_MODULES_FALSE@          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$ \
-@WITH_KO_MODULES_FALSE@          suffix dir
+@WITH_KO_MODULES_FALSE@    local conf_old conf_tmp conf_new suffix dir
+@WITH_KO_MODULES_FALSE@    conf_old=@sysconfdir@/modules.conf
+@WITH_KO_MODULES_FALSE@    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+@WITH_KO_MODULES_FALSE@    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
 @WITH_KO_MODULES_FALSE@    if [ -f $conf_old ]; then
 @WITH_KO_MODULES_FALSE@        cp -f -- $conf_old $conf_new
 @WITH_KO_MODULES_FALSE@        for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61

@@ -62,13 +62,15 @@ datarootdir=@datarootdir@
 #   ldconfig.
 #
 postinst_libraries () {
+    local d s
+    d="@lib32dir@"; s="@syslib32dir@"
     if   [ -x "`which libtool  2>/dev/null`" ]; then
-	libtool --mode=finish @lib32dir@ || :
-	libtool --mode=finish @syslib32dir@ || :
+	[ -d "$d" ] && { libtool --mode=finish "$d" || : }
+	[ -d "$s" ] && { libtool --mode=finish "$s" || : }
 
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	ldconfig -n @lib32dir@ || :
-	ldconfig -n @syslib32dir@ || :
+	[ -d "$d" ] && { ldconfig -n "$d" || : }
+	[ -d "$s" ] && { ldconfig -n "$s" || : }
     fi
 }
 #
