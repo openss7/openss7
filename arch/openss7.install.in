@@ -308,7 +308,8 @@ _remove_depends() {
 #   removes from kernel-specific directories.
 #
 _pre_install_base_modules() {
-    local dir m b modl_mods= dep line t target p prereq
+    local dir m b modl_mods dep line t target p prereq
+    modl_mods=
     for dir in /lib/modules/preferred /lib/modules/default /lib/modules/boot; do
 	[ -d $dir ] || continue
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
@@ -383,11 +384,11 @@ _pre_install_base_modules() {
 #   modules.conf file is generated from the modules/conf.d directory.
 #
 _pre_install_base_modconf() {
-    local conf_old=@sysconfdir@/modules.conf \
-          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
-          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$ \
-          suffix dir
+    local conf_old conf_tmp conf_new suffix dir
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return
+    conf_old=@sysconfdir@/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
     if [ -f $conf_old ]; then
         cp -f -- $conf_old $conf_new
         for suffix in $name LiS lis streams STREAMS strcompat strtty strxns strxnet strsock strinet strsctp strchan strx25 striso strisdn strss7 sigtran strvoip osr61
@@ -428,10 +429,11 @@ _pre_install_base_modconf() {
 #   including them because it may also be run from upgrade.
 #
 _post_base_modconf() { :
-    local conf_old=@sysconfdir@/modules.conf \
-          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
-          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    local conf_old conf_tmp conf_new
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    conf_old=@sysconfdir@/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
     if [ -f $conf_old ] ; then
         cp -f -- $conf_old $conf_new
         ( sed -e '\|^include[[:space:]].*'@modutildir@/@PACKAGE_LCNAME@'|d' $conf_new
@@ -493,10 +495,11 @@ _pre_upgrade_base_modconf() {
 #   but this ensures that it was removed.
 #
 _post_remove_base_modconf() {
-    local conf_old=@sysconfdir@/modules.conf \
-          conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$ \
-          conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
+    local conf_old conf_tmp conf_new
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    conf_old=@sysconfdir@/modules.conf
+    conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
+    conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
     if [ -f $conf_old ] ; then
         cp -f -- $conf_old $conf_new
         if grep '^include[[:space:]].*'@modutildir@/@PACKAGE_LCNAME@ $conf_new >/dev/null 2>&1; then
@@ -517,9 +520,9 @@ _post_remove_base_modconf() {
 #   modprobe.preload and modules but not modules-@kversion@ files.
 #
 _pre_install_base_preloads() {
-    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
-	  prel_old m
+    local prel_tmp prel_new prel_old m
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     for prel_old in @sysconfdir@/modprobe.preload @sysconfdir@/modules; do
 	if [ -f $prel_old ]; then
 	    cp -f -- $prel_old $prel_new
@@ -544,9 +547,9 @@ _pre_install_base_preloads() {
 #   debian /etc/modules-@kversion@ file.
 #
 _post_base_preloads() {
-    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
-	  prel_old
+    local prel_tmp prel_new prel_old
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
 	if [ -f $prel_old ] ; then
 	    cp -f -- $prel_old $prel_new
@@ -581,9 +584,9 @@ _post_upgrade_base_preloads() {
 #   own lines later.
 #
 _pre_base_preloads() {
-    local prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$ \
-	  prel_old included p
+    local prel_tmp prel_new prel_old included p
+    prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
 	if [ -f $prel_old ]; then
 	    cp -f -- $prel_old $prel_new
@@ -654,7 +657,8 @@ _pre_install_base_initscripts() {
 #   because they are too disruptive in the 2.6 environment.
 #
 _post_install_base_initscripts() {
-    local list="${initfiles}" i args r
+    local list i args r
+    list="${initfiles}"
     for i in $list; do
 	if [ -f @initrddir@/$i ]; then
 	    [ -x /sbin/insserv              ] && { /sbin/insserv              $i       2>&1 && continue || true; }
@@ -678,7 +682,9 @@ _post_install_base_initscripts() {
 #   stop the scripts on removal.
 #
 _post_remove_base_initscripts() {
-    local reverse= list="${initfiles}" i
+    local reverse list i
+    reverse=
+    list="${initfiles}"
     for i in $list; do
 	reverse="$i${reverse:+ }$reverse"
     done
@@ -938,11 +944,13 @@ _post_remove_lib_libraries() {
 #   open the libxnsl library so that they will load the new library on respawn.
 #
 _post_lib_netconfig() {
-    local netc_fil=@sysconfdir@/netconfig \
-	  netc_alt=@sysconfdir@/netconfig.xnsl \
-	  netc_dir=@sysconfdir@/nslconfig.d \
-	  netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$ \
-	  found=no files="$netc_dir/*" f
+    local netc_fil netc_alt netc_dir netc_tmp found files f
+    netc_fil=@sysconfdir@/netconfig
+    netc_alt=@sysconfdir@/netconfig.xnsl
+    netc_dir=@sysconfdir@/nslconfig.d
+    netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$
+    found=no
+    files="$netc_dir/*"
     if [ -r $netc_fil ]; then
 	if ! grep '^# Generated from nslconfig.d' $netc_fil >/dev/null 2>&1; then
 	    netc_fil=$netc_alt
@@ -1030,12 +1038,13 @@ _post_remove_netconfig_kill() {
 #   even when the library is still loaded.
 #
 _post_remove_lib_netconfig () {
-    local netc_fil=@sysconfdir@/netconfig \
-	  netc_alt=@sysconfdir@/netconfig.xnsl \
-	  netc_dir=@sysconfdir@/nslconfig.d \
-	  netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$ \
-	  found=no files="$netc_dir/*" f \
-	  signal pid did_one
+    local netc_fil netc_alt netc_dir netc_tmp found files f signal pid did_one
+    netc_fil=@sysconfdir@/netconfig
+    netc_alt=@sysconfdir@/netconfig.xnsl
+    netc_dir=@sysconfdir@/nslconfig.d
+    netc_tmp=${tmppath:-/var/tmp}/netconfig.tmp.$$
+    found=no
+    files="$netc_dir/*"
     _post_remove_netconfig_kill || :
     for f in ${netconfig}; do rm -f -- $netc_dir/$f ||:; done
     if [ -r $netc_fil ]; then
@@ -1099,16 +1108,18 @@ _post_remove_lib_netconfig () {
 #   they will load the new library on respawn.
 #
 _post_lib_sock2path() {
-    local s2pa_fil=@sysconfdir@/sock2path \
-	  s2pa_dir=@sysconfdir@/sock2path.d \
-	  s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$ \
-	  found=no files="$s2pa_dir/*" f
+    local s2pa_fil s2pa_dir s2pa_tmp found files f
+    s2pa_fil=@sysconfdir@/sock2path
+    s2pa_dir=@sysconfdir@/sock2path.d
+    s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$
+    found=no
+    files="$s2pa_dir/*"
     (   echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
 	echo '# DO NOT EDIT THIS FILE: ALL EDITS WILL BE LOST!'
 	echo '# EDIT THE FILES IN THE sock2path.d DIRECTORY INSTEAD.'
     ) >$s2pa_tmp
     for f in $files; do
-	if [ -r $f ]; then
+	if [ -f $f ]; then
 	    case $f in
 		(*.pacold|*.pacnew) ;;
 		(*) (   echo '# Generated from sock2path.d/'`basename $f`
@@ -1167,10 +1178,12 @@ _post_remove_sock2path_kill () {
 #   even when the library is still loaded.
 #
 _post_remove_lib_sock2path () {
-    local s2pa_fil=@sysconfdir@/sock2path \
-	  s2pa_dir=@sysconfdir@/sock2path.d \
-	  s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$ \
-	  found=no files="$s2pa_dir/*" f
+    local s2pa_fil s2pa_dir s2pa_tmp found files f
+    s2pa_fil=@sysconfdir@/sock2path
+    s2pa_dir=@sysconfdir@/sock2path.d
+    s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$
+    found=no
+    files="$s2pa_dir/*"
     _post_remove_sock2path_kill || :
     for f in ${sock2path}; do rm -f -- $s2pa_dir/$f ||:; done
     (   echo '# Generated from sock2path.d by @PACKAGE_LCNAME@'
@@ -1178,7 +1191,7 @@ _post_remove_lib_sock2path () {
 	echo '# EDIT THE FILES IN THE sock2path.d DIRECTORY INSTEAD.'
     ) >$s2pa_tmp
     for f in $files; do
-	if [ -r $f ]; then
+	if [ -f $f ]; then
 	    case $f in
 		(*.pacold|*.pacnew) ;;
 		(*) (   echo '# Generated from sock2path.d/'`basename $f`
@@ -1229,11 +1242,14 @@ _post_remove_lib_sock2path () {
 #   linking /etc/snmpd.local.conf to /etc/snmp/snmpd.local.conf.
 #
 _post_lib_snmpconf() {
-    local snmp_fil=@sysconfdir@/snmp/snmpd.local.conf \
-	  snmp_dir=@sysconfdir@/snmp/snmp.d \
-	  snmp_lcl=@sysconfdir@/snmp/snmp.d/00local \
-	  snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$ \
-	  wrote_one=no changed_local=no files="$snmp_dir/*" f
+    local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
+    snmp_fil=@sysconfdir@/snmp/snmpd.local.conf
+    snmp_dir=@sysconfdir@/snmp/snmp.d
+    snmp_lcl=@sysconfdir@/snmp/snmp.d/00local
+    snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$
+    wrote_one=no
+    changed_local=no
+    files="$snmp_dir/*"
     if [ ! -e @sysconfdir@/snmp/snmpd.conf -a -e @sysconfdir@/snmpd.conf ]; then
 	ln -L @sysconfdir@/snmpd.conf @sysconfdir@/snmp/snmpd.conf
 	touch @sysconfdir@/snmpd.local.conf
@@ -1317,11 +1333,14 @@ _post_upgrade_lib_snmpconf() {
 #   version's postinst.
 #
 _post_remove_lib_snmpconf () {
-    local snmp_fil=@sysconfdir@/snmp/snmpd.local.conf \
-	  snmp_dir=@sysconfdir@/snmp/snmp.d \
-	  snmp_lcl=@sysconfdir@/snmp/snmp.d/00local \
-	  snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$ \
-	  wrote_one=no changed_local=no files="$snmp_dir/*" f
+    local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
+    snmp_fil=@sysconfdir@/snmp/snmpd.local.conf
+    snmp_dir=@sysconfdir@/snmp/snmp.d
+    snmp_lcl=@sysconfdir@/snmp/snmp.d/00local
+    snmp_tmp=${tmppath:-/var/tmp}/snmpd.local.conf.tmp.$$
+    wrote_one=no
+    changed_local=no
+    files="$snmp_dir/*"
     if [ ! -e @sysconfdir@/snmp/snmpd.conf -a -e @sysconfdir@/snmpd.conf ]; then
 	ln -L @sysconfdir@/snmpd.conf @sysconfdir@/snmp/snmpd.conf
 	touch @sysconfdir@/snmpd.local.conf
@@ -1417,7 +1436,8 @@ _post_upgrade_lib_tcllibs () {
 #   the tcl modules still exist, but all index files for them can be removed.
 #
 _post_remove_lib_tcllibs () {
-    local files="$pkgtcllibdir/pkgIndex.tcl $pkgtcllibdir/*/pkgIndex.tcl" f d
+    local files f d
+    files="$pkgtcllibdir/pkgIndex.tcl $pkgtcllibdir/*/pkgIndex.tcl"
     for f in $files; do
 	if [ -f $f ]; then
 	    rm -f -- $f || :

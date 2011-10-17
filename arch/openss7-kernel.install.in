@@ -103,7 +103,8 @@ _remove_warn_dirs() {
 #   2.6 and 3.x kernel module systems.
 #
 _post_kernel_oldmods() {
-    local sysmap=/boot/System.map-@kversion@
+    local sysmap
+    sysmap=/boot/System.map-@kversion@
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
     if [ -x "`which depmod 2>/dev/null`" ]; then
         if [ "@kversion@" = "`uname -r`" ]; then
@@ -133,10 +134,10 @@ _post_remove_kernel_oldmods() {
 #   kernel-specific preloads file.
 #
 _pre_install_kernel_preloads() {
-    local prel_old=@sysconfdir@/modules-@kversion@ \
-	  prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
-	  m
+    local prel_old prel_tmp prel_new m
+    prel_old=@sysconfdir@/modules-@kversion@
+    prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
     if [ -f $prel_old ]; then
 	cp -f -- $prel_old $prel_new
 	sed -e '\|^[[:space:]]*(specfs|streams)|d' $prel_new >$prel_tmp
@@ -158,10 +159,10 @@ _pre_install_kernel_preloads() {
 #   need to add ours.
 #
 _post_kernel_preloads() {
-    local prel_old=@sysconfdir@/modules-@kversion@ \
-          prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
-          prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
-          p
+    local prel_old prel_tmp prel_new p
+    prel_old=@sysconfdir@/modules-@kversion@
+    prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
     if [ -f $prel_old ]; then cp -f -- $prel_old $prel_new; else touch $prel_new; fi
     ( cat $prel_new; for p in ${preloads}; do echo "$p"; done ) >$prel_tmp
@@ -181,10 +182,10 @@ _post_upgrade_kernel_preloads() {
 #   preloads from the kernel-specific preloads file.
 #
 _pre_kernel_preloads() {
-    local prel_old=@sysconfdir@/modules-@kversion@ \
-	  prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$ \
-	  prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$ \
-	  included p
+    local prel_old prel_tmp prel_new included p
+    prel_old=@sysconfdir@/modules-@kversion@
+    prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
+    prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
     if [ -f $prel_old ]; then
 	cp -f -- $prel_old $prel_new
 	included=no
@@ -241,7 +242,8 @@ _remove_depends() {
 #   non-kernel-specific directories.
 #
 _pre_install_kernel_modules() {
-    local dir m b modl_mods= line dep t target p prereq
+    local dir m b modl_mods line dep t target p prereq
+    modl_mods=
     for dir in @kmoduledir@; do
 	[ -d $dir ] || continue
 	for m in `find $dir \( -name '*.o' -o -name '*.ko' -o -name '*.o.gz' -o -name '*.ko.gz' \) 2>/dev/null` ; do
