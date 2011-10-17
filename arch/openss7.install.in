@@ -912,14 +912,15 @@ _pre_install_lib_libraries() {
 #   removal, do a ldconfig.  We use libtool if it is available.
 #
 _post_lib_libraries() {
-    local v
+    local v d s
+    d="@libdir@"; s="@syslibdir@"
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	libtool --mode=finish $v @libdir@    || :
-	libtool --mode=finish $v @syslibdir@ || :
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
+	[ -d "$s" ] && { libtool --mode=finish $v "$s" || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	ldconfig -n @libdir@    || :
-	ldconfig -n @syslibdir@ || :
+	[ -d "$d" ] && { ldconfig -n "$d" || : }
+	[ -d "$s" ] && { ldconfig -n "$s" || : }
     fi
 }
 _post_install_lib_libraries() {
@@ -1457,14 +1458,15 @@ _post_remove_lib_tcllibs () {
 #   reinstall, do a ldconfig.
 #
 _post_compat_libraries() {
-    local v
+    local v d s
+    d="@lib32dir@"; s="@syslib32dir@"
     if   [ -x "`which libtool  2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	libtool --mode=finish $v @lib32dir@    || :
-	libtool --mode=finish $v @syslib32dir@ || :
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
+	[ -d "$s" ] && { libtool --mode=finish $v "$s" || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	ldconfig -n @lib32dir@    || :
-	ldconfig -n @syslib32dir@ || :
+	[ -d "$d" ] && { ldconfig -n "$d" || : }
+	[ -d "$s" ] && { ldconfig -n "$s" || : }
     fi
 }
 _post_install_compat_libraries() {
@@ -1503,12 +1505,13 @@ _pre_install_java_jnilibs() {
 #   removal, do a ldconfig.
 #
 _post_java_jnilibs() {
-    local v
+    local v d
+    d="@jnidir@"
     if   [ -x "`which libtool  2>/dev/null`" ] ; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	libtool --mode=finish $v @jnidir@ || :
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
-	ldconfig -n @jnidir@ || :
+	[ -d "$d" ] && { ldconfig -n "$d" || : }
     fi
 }
 _post_install_java_jnilibs() {
@@ -1526,12 +1529,13 @@ _post_remove_java_jnilibs() {
 # JAVA GCJ LIBRARIES
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 _post_java_gcjlibs() {
-    local v
+    local v d
+    d="@libdir@/gcj/@PACKAGE@"
     if   [ -x "`which libtool  2>/dev/null`" ] ; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	libtool --mode=finish $v @libdir@/gcj/@PACKAGE@ || :
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
     elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
-	ldconfig -n @libdir@/gcj/@PACKAGE@ || :
+	[ -d "$d" ] && { ldconfig -n "$d" || : }
     fi
 }
 _post_install_java_gcjlibs () {
