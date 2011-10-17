@@ -4,6 +4,7 @@ where=`dirname $0`
 srcdir=`(cd $where/..; pwd)`
 $srcdir/configure \
 	WFLAGS='-Wno-unused-but-set-variable -Wno-system-headers -Wno-endif-labels' \
+	--libexecdir='${exec_prefix}/lib' \
 	--with-pkg-distdir=/u6/repo \
 	--with-pkg-repodir=/u5/repo \
 	--enable-maintainer-mode \
