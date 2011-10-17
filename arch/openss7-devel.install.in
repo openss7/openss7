@@ -106,6 +106,7 @@ _remove_warn_dirs() {
 #
 _pre_install_devel_libs() {
     local d subdir
+    echo ">>> Removing conflicting static libraries..." >&2
     for d in /lib /usr/lib /usr/local/lib @libdir@ @syslibdir@; do
 	for subdir in / /LiS/ /lis/ /streams/ /strxnet/ ; do
 	    if [ -d $d${subdir} ] ; then
@@ -127,6 +128,7 @@ _pre_install_devel_libs() {
 #
 _pre_install_devel_headers() {
     locald d
+    echo ">>> Removing conflicting development headers..." >&2
     for d in /include /usr/include /usr/local/include @includedir@ @oldincludedir@ ; do
 	_remove_warn_dirs "header" \
 	    $d/LiS $d/streams $d/strxns $d/strinet $d/strxnet $d/strsctp \
@@ -140,6 +142,7 @@ _pre_install_devel_headers() {
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 _pre_install_doc_infofiles() {
     local n e
+    echo ">>> Removing conflicting info files..." >&2
     [ -x "`which install-info 2>/dev/null`" ] || return 0
     for n in $manuals ; do
 	for e in '' '.gz' '.bz2' '.lzma' '.xz'; do
@@ -156,6 +159,7 @@ _pre_install_doc_infofiles() {
 #
 _pre_doc_infofiles() {
     local n e
+    echo ">>> Installing info files..." >&2
     [ -x "`which install-info 2>/dev/null`" ] || return 0
     for n in $manuals ; do
 	for e in '' '.gz' '.bz2' '.lzma' '.xz'; do
@@ -179,6 +183,7 @@ _pre_remove_doc_infofiles() {
 #
 _post_doc_infofiles() {
     local n e
+    echo ">>> Removing info files..." >&2
     [ -x "`which install-info 2>/dev/null`" ] || return 0
     for n in $manuals ; do
 	for e in '' '.gz' '.bz2' '.lzma' '.xz'; do
@@ -203,6 +208,7 @@ _post_upgrade_doc_infofiles() {
 #   the wrong place, clean them out on a fresh install.
 #
 _pre_install_doc_manpages() { :
+    echo ">>> Removing conflicting manual pages..." >&2
     _remove_warn_files "manual page" @mandir@/man3/fattach.3*
     _remove_warn_files "manual page" @mandir@/man3/detach.3*
     _remove_warn_files "manual page" @mandir@/man3/isastream.3*
@@ -216,6 +222,7 @@ _pre_install_doc_manpages() { :
 #   not critical because most machines run an evening cron job to update these.
 #
 _post_doc_manpages() {
+    echo ">>> Updating aprospros database..." >&2
     if   [ -x "`which mandb      2>/dev/null`" ] ; then
 	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
     elif [ -x "`which makewhatis 2>/dev/null`" ] ; then

@@ -109,6 +109,7 @@ _remove_warn_dirs() {
 #
 _pre_install_repo_creds() { :
     local d un pw o f s ext u p m
+    echo ">>> Checking credentials..." >&2
     for s in '' .pacold .pacnew; do
     for p in credentials; do
     for d in $localstatedir/lib/$name/; do
@@ -244,6 +245,7 @@ _post_install_repo_creds() { :
 #
 _pre_remove_repo_creds() {
     local d f
+    echo ">>> Preparing credentials..." >&2
     d=$aptrepodir
     for f in openss7.list; do
 	f="$d/$f"
@@ -266,6 +268,7 @@ _pre_remove_repo_creds() {
 #
 _post_remove_repo_creds() {
     local d f
+    echo ">>> Removing credentials..." >&2
     d=$aptrepodir
     for f in openss7.list ; do f="$d/$f"
         if [ -f $f -a -f $f.pacold ] ; then
@@ -309,6 +312,7 @@ _remove_depends() {
 #
 _pre_install_base_modules() {
     local dir m b modl_mods dep line t target p prereq
+    echo ">>> Removing conflicting modules..." >&2
     modl_mods=
     for dir in /lib/modules/preferred /lib/modules/default /lib/modules/boot; do
 	[ -d $dir ] || continue
@@ -386,6 +390,7 @@ _pre_install_base_modules() {
 _pre_install_base_modconf() {
     local conf_old conf_tmp conf_new suffix dir
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return
+    echo ">>> Updating @sysconfdir@/modules.conf..." >&2
     conf_old=@sysconfdir@/modules.conf
     conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
     conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
@@ -431,6 +436,7 @@ _pre_install_base_modconf() {
 _post_base_modconf() { :
     local conf_old conf_tmp conf_new
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Updating @sysconfdir@/modules.conf..." >&2
     conf_old=@sysconfdir@/modules.conf
     conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
     conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
@@ -458,6 +464,7 @@ _post_upgrade_base_modconf() {
 _pre_base_modconf() {
     local conf_old conf_tmp conf_new
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Updating @sysconfdir@/modules.conf..." >&2
     conf_old=@sysconfdir@/modules.conf
     conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
     conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
@@ -497,6 +504,7 @@ _pre_upgrade_base_modconf() {
 _post_remove_base_modconf() {
     local conf_old conf_tmp conf_new
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Updating @sysconfdir@/modules.conf..." >&2
     conf_old=@sysconfdir@/modules.conf
     conf_tmp=${tmppath:-/var/tmp}/modules.conf.tmp.$$
     conf_new=${tmppath:-/var/tmp}/modules.conf.new.$$
@@ -521,6 +529,7 @@ _post_remove_base_modconf() {
 #
 _pre_install_base_preloads() {
     local prel_tmp prel_new prel_old m
+    echo ">>> Updating @sysconfdir@/modprobe.preload..." >&2
     prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
     prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     for prel_old in @sysconfdir@/modprobe.preload @sysconfdir@/modules; do
@@ -548,6 +557,7 @@ _pre_install_base_preloads() {
 #
 _post_base_preloads() {
     local prel_tmp prel_new prel_old
+    echo ">>> Updating @sysconfdir@/modprobe.preload..." >&2
     prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
     prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
@@ -585,6 +595,7 @@ _post_upgrade_base_preloads() {
 #
 _pre_base_preloads() {
     local prel_tmp prel_new prel_old included p
+    echo ">>> Updating @sysconfdir@/modprobe.preload..." >&2
     prel_tmp=${tmppath:-/var/tmp}/modprobe.preload.tmp.$$
     prel_new=${tmppath:-/var/tmp}/modprobe.preload.new.$$
     for prel_old in @sysconfdir@/modules @sysconfdir@/modprobe.preload; do
@@ -624,6 +635,7 @@ _pre_upgrade_base_preloads() {
 #
 _pre_install_base_initscripts() {
     local list reverse i
+    echo ">>> Updating initscripts..." >&2
     list="$nonrpminit"
     reverse=
     for i in $list; do
@@ -658,6 +670,7 @@ _pre_install_base_initscripts() {
 #
 _post_install_base_initscripts() {
     local list i args r
+    echo ">>> Updating initscripts..." >&2
     list="${initfiles}"
     for i in $list; do
 	if [ -f @initrddir@/$i ]; then
@@ -683,6 +696,7 @@ _post_install_base_initscripts() {
 #
 _post_remove_base_initscripts() {
     local reverse list i
+    echo ">>> Updating initscripts..." >&2
     reverse=
     list="${initfiles}"
     for i in $list; do
@@ -713,6 +727,7 @@ _post_remove_base_initscripts() {
 #   the wrong place, clean them out on a fresh install.
 #
 _pre_install_base_manpages() { :
+    echo ">>> Removing conflicting manual pages..." >&2
     _remove_warn_files "manual page" @mandir@/man8/fattach.8*
     _remove_warn_files "manual page" @mandir@/man8/fdetach.8*
     rmdir -p @mandir@/man8 2>/dev/null || :
@@ -726,6 +741,7 @@ _pre_install_base_manpages() { :
 #   update these.
 #
 _post_base_manpages() {
+    echo ">>> Updating aprospros database..." >&2
     if   [ -x "`which mandb      2>/dev/null`" ]; then
 	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
     elif [ -x "`which makewhatis 2>/dev/null`" ]; then
@@ -752,6 +768,7 @@ _post_remove_base_manpages() {
 #
 _pre_install_base_manrefs() {
     local m e
+    echo ">>> Correcting man references..." >&2
     for m in $manmacros; do
 	for e in '' '.gz' '.bz2' '.lzma' '.xz' ; do
 	    [ ! -f @mandir@/$m$e ] || _remove_warn_file "macros" @mandir@/$m$e
@@ -765,6 +782,7 @@ _pre_install_base_manrefs() {
 #
 _post_install_base_manrefs() {
     local m
+    echo ">>> Correcting man references..." >&2
     for m in ${manrefs}; do
 	[ ! -f @mandir@/$m.gz   ] || gzip  -dc @mandir@/$m.gz   > @mandir@/$m || :
 	[ ! -f @mandir@/$m.bz2  ] || bzip2 -dc @mandir@/$m.bz2  > @mandir@/$m || :
@@ -787,6 +805,7 @@ _post_upgrade_base_manrefs() {
 #
 _pre_remove_base_manrefs() {
     local m
+    echo ">>> Correcting man references..." >&2
     for m in $manrefs; do
 	if [ -f @mandir@/$m.gz   -o -f @mandir@/$m.bz2 -o \
 	     -f @mandir@/$m.lzma -o -f @mandir@/$m.xz ]; then
@@ -807,6 +826,7 @@ _pre_upgrade_base_manrefs() {
 #
 _pre_install_base_manmacros() {
     local m e
+    echo ">>> Correcting man references..." >&2
     for m in $manrefs; do
 	for e in '' '.gz' '.bz2' '.lzma' '.xz' ; do
 	    [ ! -f @mandir@/$m$e ] || _remove_warn_file "references" @mandir@/$m$e
@@ -824,6 +844,7 @@ _pre_install_base_manmacros() {
 #
 _post_install_base_manmacros() {
     local m
+    echo ">>> Correcting man macros..." >&2
     for m in ${manmacros}; do
 	[ ! -f @mandir@/$m.gz   ] || gzip  -dc @mandir@/$m.gz   > @mandir@/$m || :
 	[ ! -f @mandir@/$m.bz2  ] || bzip2 -dc @mandir@/$m.bz2  > @mandir@/$m || :
@@ -844,6 +865,8 @@ _post_upgrade_base_manmacros() {
 #   way or another.
 #
 _pre_remove_base_manmacros() {
+    local m
+    echo ">>> Correcting man macros..." >&2
     for m in $manmacros; do
 	if [ -f @mandir@/$m.gz   -o -f @mandir@/$m.bz2 -o \
 	     -f @mandir@/$m.lzma -o -f @mandir@/$m.xz ]; then
@@ -870,6 +893,7 @@ _pre_upgrade_base_manmacros() {
 #
 _pre_install_lib_tools() {
     local tool location
+    echo ">>> Removing conflicting tools..." >&2
     for tool in $tools ; do
         location="`which $tool 2>/dev/null`"
         while [ -n "$location" -a -x "$location" ] ; do
@@ -898,6 +922,7 @@ _pre_install_lib_tools() {
 #
 _pre_install_lib_libraries() {
     local lib l
+    echo ">>> Removing conflicting libraries..." >&2
     if [ -x "`which ldconfig 2>/dev/null`" ]; then
 	for lib in $libraries ; do
 	    ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
@@ -913,6 +938,7 @@ _pre_install_lib_libraries() {
 #
 _post_lib_libraries() {
     local v d s
+    echo ">>> Updating library load cache..." >&2
     d="@libdir@"; s="@syslibdir@"
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
@@ -946,6 +972,7 @@ _post_remove_lib_libraries() {
 #
 _post_lib_netconfig() {
     local netc_fil netc_alt netc_dir netc_tmp found files f
+    echo ">>> Updating @sysconfdir@/netconfig.xnsl..." >&2
     netc_fil=@sysconfdir@/netconfig
     netc_alt=@sysconfdir@/netconfig.xnsl
     netc_dir=@sysconfdir@/nslconfig.d
@@ -1013,6 +1040,7 @@ _post_upgrade_lib_netconfig() {
 #
 _post_remove_netconfig_kill() {
     local signal pid did_one
+    echo ">>> Updating @sysconfdir@/netconfig.xnsl..." >&2
     if [ -x "`which lsof 2>/dev/null`" ]; then
 	for signal in TERM KILL; do
 	    did_one=no
@@ -1040,6 +1068,7 @@ _post_remove_netconfig_kill() {
 #
 _post_remove_lib_netconfig () {
     local netc_fil netc_alt netc_dir netc_tmp found files f signal pid did_one
+    echo ">>> Updating @sysconfdir@/netconfig.xnsl..." >&2
     netc_fil=@sysconfdir@/netconfig
     netc_alt=@sysconfdir@/netconfig.xnsl
     netc_dir=@sysconfdir@/nslconfig.d
@@ -1110,6 +1139,7 @@ _post_remove_lib_netconfig () {
 #
 _post_lib_sock2path() {
     local s2pa_fil s2pa_dir s2pa_tmp found files f
+    echo ">>> Updating @sysconfdir@/sock2path..." >&2
     s2pa_fil=@sysconfdir@/sock2path
     s2pa_dir=@sysconfdir@/sock2path.d
     s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$
@@ -1153,6 +1183,7 @@ _post_upgrade_lib_sock2path() {
 #
 _post_remove_sock2path_kill () {
     local signal pid did_one
+    echo ">>> Updating @sysconfdir@/sock2path..." >&2
     if [ -x "`which lsof 2>/dev/null`" ]; then
 	for signal in TERM KILL; do
 	    did_one=no
@@ -1180,6 +1211,7 @@ _post_remove_sock2path_kill () {
 #
 _post_remove_lib_sock2path () {
     local s2pa_fil s2pa_dir s2pa_tmp found files f
+    echo ">>> Updating @sysconfdir@/sock2path..." >&2
     s2pa_fil=@sysconfdir@/sock2path
     s2pa_dir=@sysconfdir@/sock2path.d
     s2pa_tmp=${tmppath:-/var/tmp}/sock2path.tmp.$$
@@ -1244,6 +1276,7 @@ _post_remove_lib_sock2path () {
 #
 _post_lib_snmpconf() {
     local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
+    echo ">>> Updating @sysconfdir@/snmp/snmpd.conf..." >&2
     snmp_fil=@sysconfdir@/snmp/snmpd.local.conf
     snmp_dir=@sysconfdir@/snmp/snmp.d
     snmp_lcl=@sysconfdir@/snmp/snmp.d/00local
@@ -1335,6 +1368,7 @@ _post_upgrade_lib_snmpconf() {
 #
 _post_remove_lib_snmpconf () {
     local snmp_fil snmp_dir snmp_lcl snmp_tmp wrote_one changed_local files f
+    echo ">>> Updating @sysconfdir@/snmp/snmpd.conf..." >&2
     snmp_fil=@sysconfdir@/snmp/snmpd.local.conf
     snmp_dir=@sysconfdir@/snmp/snmp.d
     snmp_lcl=@sysconfdir@/snmp/snmp.d/00local
@@ -1421,6 +1455,8 @@ _post_remove_lib_snmpconf () {
 # TCL LIBRARIES
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 _post_lib_tcllibs () {
+    local d
+    echo ">>> Updating TCL libraries..." >&2
     if [ -x "`which tclsh 2>/dev/null`" ]; then
 	for d in `find $pkgtcllibdir -mindepth 1 -maxdepth 1 -type d` ; do
 	    echo -e "pkg_mkIndex $d\\nexit" | tclsh || :
@@ -1440,6 +1476,7 @@ _post_upgrade_lib_tcllibs () {
 #
 _post_remove_lib_tcllibs () {
     local files f d
+    echo ">>> Updating TCL libraries..." >&2
     files="$pkgtcllibdir/pkgIndex.tcl $pkgtcllibdir/*/pkgIndex.tcl"
     for f in $files; do
 	if [ -f $f ]; then
@@ -1461,6 +1498,7 @@ _post_remove_lib_tcllibs () {
 #
 _post_compat_libraries() {
     local v d s
+    echo ">>> Updating 32-bit library load cache..." >&2
     d="@lib32dir@"; s="@syslib32dir@"
     if   [ -x "`which libtool  2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
@@ -1493,6 +1531,7 @@ _post_remove_compat_libraries() {
 #
 _pre_install_java_jnilibs() {
     local lib l
+    echo ">>> Removing conflicting JNI libraries..." >&2
     if [ -x "`which ldconfig 2>/dev/null`" ]; then
 	for lib in $jnilibs; do
 	    ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
@@ -1508,6 +1547,7 @@ _pre_install_java_jnilibs() {
 #
 _post_java_jnilibs() {
     local v d
+    echo ">>> Updating JNI libraries load cache..." >&2
     d="@jnidir@"
     if   [ -x "`which libtool  2>/dev/null`" ] ; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
@@ -1532,6 +1572,7 @@ _post_remove_java_jnilibs() {
 # ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 _post_java_gcjlibs() {
     local v d
+    echo ">>> Updating GCJ libraries load cache..." >&2
     d="@libdir@/gcj/@PACKAGE@"
     if   [ -x "`which libtool  2>/dev/null`" ] ; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
@@ -1559,6 +1600,7 @@ _post_remove_java_gcjlibs () {
 #
 _post_java_gcjmaps() {
     local d db
+    echo ">>> Updating GCJ maps..." >&2
     if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
         rebuild-gcj-db || :
     else
@@ -1588,6 +1630,7 @@ _post_upgrade_java_gcjmaps () {
 #
 _post_remove_java_gcjmaps() {
     local d db
+    echo ">>> Updating GCJ maps..." >&2
     if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
         rebuild-gcj-db || :
     elif [ -x "`which gcj-dbtool 2>/dev/null`" ] ; then
@@ -1613,6 +1656,7 @@ _post_remove_java_gcjmaps() {
 #   repository.  Note that there is currently no debhelper nor trigger for this.
 #
 _post_java_jarfiles() {
+    echo ">>> Updating JAVA repositories..." >&2
     if [ -x "`which rebuild-jar-repository 2>/dev/null`" ] ; then
         rebuild-jar-repository @javadir@ || :
     fi

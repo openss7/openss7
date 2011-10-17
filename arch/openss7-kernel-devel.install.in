@@ -103,6 +103,7 @@ _remove_warn_dirs() {
 _post_kernel_symvers() {
     local f t
     [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
+    echo ">>> Updating symbol versions..." >&2
     f=/usr/src/${name}-@VERSION@-@PACKAGE_PACRELEASE@/@kversion@/System.symvers
     t=/boot/symvers-@kversion@.gz
     if [ ! -r $t -a -r $f ] ; then
@@ -121,6 +122,7 @@ _post_upgrade_kernel_symvers() {
 #
 _post_remove_kernel_symvers() {
     [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
+    echo ">>> Updating symbol versions..." >&2
     rm -f -- /boot/symvers-@kversion@.gz || :
 }
 # ---------------------------------------------------------------------------
@@ -132,6 +134,7 @@ _post_remove_kernel_symvers() {
 #   in the wrong place, clean them out on a fresh install.
 #
 _pre_install_kernel_manpages () {
+    echo ">>> Removing conflicting manual pages..." >&2
     _remove_warn_files "manual page" @mandir@/man9/connld.9*
     _remove_warn_files "manual page" @mandir@/man9/fifo.9*
     _remove_warn_files "manual page" @mandir@/man9/pipemod.9*
@@ -145,6 +148,7 @@ _pre_install_kernel_manpages () {
 #   not critical because most machines run an evening cron job to update these.
 #
 _post_kernel_manpages () {
+    echo ">>> Updating aprospros database..." >&2
     if   [ -x "`which mandb      2>/dev/null`" ] ; then
 	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
     elif [ -x "`which makewhatis 2>/dev/null`" ] ; then

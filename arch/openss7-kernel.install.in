@@ -104,8 +104,9 @@ _remove_warn_dirs() {
 #
 _post_kernel_oldmods() {
     local sysmap
-    sysmap=/boot/System.map-@kversion@
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Updating old kernel modules..." >&2
+    sysmap=/boot/System.map-@kversion@
     if [ -x "`which depmod 2>/dev/null`" ]; then
         if [ "@kversion@" = "`uname -r`" ]; then
             depmod -a || :
@@ -135,6 +136,7 @@ _post_remove_kernel_oldmods() {
 #
 _pre_install_kernel_preloads() {
     local prel_old prel_tmp prel_new m
+    echo ">>> Updating @sysconfdir@/modules-@kversion@..." >&2
     prel_old=@sysconfdir@/modules-@kversion@
     prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
     prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
@@ -160,10 +162,11 @@ _pre_install_kernel_preloads() {
 #
 _post_kernel_preloads() {
     local prel_old prel_tmp prel_new p
+    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Updating @sysconfdir@/modules-@kversion@..." >&2
     prel_old=@sysconfdir@/modules-@kversion@
     prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
     prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
-    [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
     if [ -f $prel_old ]; then cp -f -- $prel_old $prel_new; else touch $prel_new; fi
     ( cat $prel_new; for p in ${preloads}; do echo "$p"; done ) >$prel_tmp
     mv -f -- $prel_tmp $prel_new
@@ -183,6 +186,7 @@ _post_upgrade_kernel_preloads() {
 #
 _pre_kernel_preloads() {
     local prel_old prel_tmp prel_new included p
+    echo ">>> Updating @sysconfdir@/modules-@kversion@..." >&2
     prel_old=@sysconfdir@/modules-@kversion@
     prel_tmp=${tmppath:-/var/tmp}/modules-@kversion@.tmp.$$
     prel_new=${tmppath:-/var/tmp}/modules-@kversion@.new.$$
@@ -243,6 +247,7 @@ _remove_depends() {
 #
 _pre_install_kernel_modules() {
     local dir m b modl_mods line dep t target p prereq
+    echo ">>> Removing conflicting kernel modules..." >&2
     modl_mods=
     for dir in @kmoduledir@; do
 	[ -d $dir ] || continue
@@ -303,6 +308,7 @@ _pre_install_kernel_modules() {
 _post_kernel_initscripts() {
     local r i start l
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Starting initscripts..." >&2
     if [ "@kversion@" = "`uname -r`" ]; then
         r="`runlevel | awk '{print$2}'`"
         for i in ${initfiles}; do
@@ -333,6 +339,7 @@ _post_upgrade_kernel_initscripts() {
 _post_remove_kernel_initscripts() {
     local reverse i
     [ -z '@WITH_KO_MODULES_FALSE@' ] || return 0
+    echo ">>> Stopping initscripts..." >&2
     if [ "@kversion@" = "`uname -r`" ]; then
         reverse=
         for i in $initfiles; do
@@ -360,6 +367,7 @@ _post_remove_kernel_initscripts() {
 _post_kernel_weakmods() {
     local scripts v
     [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
+    echo ">>> Updating weak kernel modules..." >&2
     if [ -x @sbindir@/${name}-modules ]; then
         scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
@@ -391,6 +399,7 @@ _post_upgrade_kernel_weakmods() {
 #
 _post_remove_kernel_weakmods() {
     [ -z '@WITH_KO_MODULES_TRUE@' ] || return 0
+    echo ">>> Updating weak kernel modules..." >&2
     if [ -x @sbindir@/${name}-modules ]; then
         scripts=`echo "$initfiles" | sed -e 's/ /,/g'`
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose=2 --debug=2,p;s,xtrace[[:space:]]*off$,--verbose=1,p'`"
