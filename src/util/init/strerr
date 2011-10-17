@@ -381,6 +381,8 @@ pidfile="/var/run/$processname.pid"
 execfile="/usr/sbin/$processname"
 desc="the STREAMS error logger"
 
+[ -d /var/lock/subsys ] || mkdir -p /var/lock/subsys
+
 [ -x $execfile -o "$1" = "stop" ] || exit 5
 
 # Specify defaults
