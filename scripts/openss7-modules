@@ -634,9 +634,10 @@ function getstructure(		pfx,dirs,dir,paths,path,command,h,l,u,k,ph,pl,file,modul
     if (values["test"]) {
 	if (dirs == "") { dirs = "`pwd`" } else { dirs = "`pwd`" " " dirs }
     }
+    h = 0; l = 0; u = 0; k = 0
     if (dirs != "") {
 	print_vinfo(2, pfx "dirs = " dirs)
-	h = 0; l = 0; u = 0; ph = 0; pl = 0
+	ph = 0; pl = 0
 	command = "find " dirs " -name '*.ko' -o -name '*.ko.gz' 2>/dev/null"
 	while ((command | getline file) == 1) {
 	    #if (file~/\/lib\/modules\/[^\/]*\/kernel\//) continue
