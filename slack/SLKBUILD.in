@@ -2,6 +2,7 @@
 #Maintainer: Brian Bidulock <bidulock@openss7.org>
 #Former Maintainer(s): none
 # @configure_input@
+PACKAGER="${PACKAGER:-Brian Bidulock <bidulock@openss7.org>}"
 #Mandatory
 # pkgname - package name, the name of the software.
 pkgname=@PACKAGE@
@@ -67,6 +68,23 @@ url="http://www.openss7.org/"
 #	doinst.sh to move them over if appropriate to do so during install.
 dotnew=\
 (
+    'etc/conf.d/openss7'
+    'etc/conf.d/specfs'
+    'etc/conf.d/strace'
+    'etc/conf.d/streams'
+    'etc/conf.d/strerr'
+    'etc/nslconfig.d/openss7'
+    'etc/openss7.conf'
+    'etc/rc.d/openss7'
+    'etc/rc.d/specfs'
+    'etc/rc.d/strace'
+    'etc/rc.d/streams'
+    'etc/rc.d/strerr'
+    'etc/snmp/snmp.d/01openss7'
+    'etc/sock2path.d/openss7'
+    'etc/streams.conf'
+    'etc/strload.conf'
+    'etc/strsetup.conf'
 )
 # CXXCFLAGS/CFLAGS - You can set these to override the default flags which are
 #	"-O2 -march=$arch -mtune=i686" where $arch is the variable you set in
@@ -119,6 +137,7 @@ build() { :
 	./configure \
 	    ${CC:+CC="${CC}"} \
 	    ${CFLAGS+CFLAGS="${CFLAGS}"} \
+	    ${WFLAGS+WFLAGS="${WFLAGS}"} \
 	    ${LD+LD="${LD}"} \
 	    ${LDFLAGS+LDFLAGS="${LDFLAGS}"} \
 	    ${CPPFLAGS+CPPFLAGS="${CPPFLAGS}"} \
@@ -128,6 +147,7 @@ build() { :
 	    ${CXXCPP+CXXCPP="${CXXCPP:-$CPP}"} \
 	    CONFIG_SITE=${csite_file} \
 	    MODPOST_CACHE=${mpost_file} \
+	    ${PACKAGE_SLKOPTIONS} \
 	    --cache-file=${cache_file} \
 	    --prefix=/usr \
 	    --build=@build@ \
@@ -161,6 +181,7 @@ build() { :
 	    --disable-32bit-libs \
 	    --disable-papers-html \
 	    --with-gnu-ld \
+	    ${BUILD_CFGOPTIONS} \
 	    || { rm -f ${cache_file} ${csite_file} ${mpost_file} ; exit 1 ; }
 	make || return 1
 #	make pdf || return 1

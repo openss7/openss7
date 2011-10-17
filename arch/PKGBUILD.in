@@ -1,4 +1,4 @@
-# vim: ft=sh
+#!/bin/bash
 #
 
 # Maintainer: Brian Bidulock <bidulock@openss7.org>
