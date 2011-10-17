@@ -217,7 +217,7 @@ _pre_install_doc_manpages() { :
 #
 _post_doc_manpages() {
     if   [ -x "`which mandb      2>/dev/null`" ] ; then
-	LANGUAGE= LANG= mandb      -p @mandir@ || :
+	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
     elif [ -x "`which makewhatis 2>/dev/null`" ] ; then
 	LANGUAGE= LANG= makewhatis -u @mandir@ || :
     fi
