@@ -60,6 +60,7 @@ build() {
 		MODPOST_CACHE=${mpost_file} \
 		${PACKAGE_PACOPTIONS} \
 		--cache-file=${cache_file} \
+		--libexecdir='${exec_prefix}/lib' \
 		--disable-maintainer-mode \
 		--with-k-release=@kversion@ \
 		--with-k-modules=@kmoddir@ \
