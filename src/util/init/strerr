@@ -53,6 +53,7 @@ init_mode="standalone"
 elif [ -r /etc/rc.status          ] ; then . /etc/rc.status          ; init_mode="insserv"   ;
 elif [ -r /lib/lsb/init-functions ] ; then . /lib/lsb/init-functions ; init_mode="lsb"       ;
 elif [ -r /sbin/start-stop-daemon ] ; then                             init_mode="debian"    ;
+elif [ -r /etc/rc.d/functions     ] ; then . /etc/rc.d/functions     ; init_mode="archlinux" ;
 fi
 
 case "$init_mode" in
