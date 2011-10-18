@@ -64,11 +64,11 @@ postinst_libraries () {
     local d s
     d="@libdir@"; s="@syslibdir@"
     if   [ -x "`which libtool 2>/dev/null`" ]; then
-	[ -d "$d" ] && { libtool --mode=finish "$d" || : }
-	[ -d "$s" ] && { libtool --mode=finish "$s" || : }
+	[ -d "$d" ] && { libtool --mode=finish "$d" || :; }
+	[ -d "$s" ] && { libtool --mode=finish "$s" || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d "$d" ] && { ldconfig -n "$d" || : }
-	[ -d "$s" ] && { ldconfig -n "$s" || : }
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+	[ -d "$s" ] && { ldconfig -n "$s" || :; }
     fi
 }
 #
