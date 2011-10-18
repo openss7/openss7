@@ -942,11 +942,11 @@ _post_lib_libraries() {
     d="@libdir@"; s="@syslibdir@"
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
-	[ -d "$s" ] && { libtool --mode=finish $v "$s" || : }
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
+	[ -d "$s" ] && { libtool --mode=finish $v "$s" || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d "$d" ] && { ldconfig -n "$d" || : }
-	[ -d "$s" ] && { ldconfig -n "$s" || : }
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+	[ -d "$s" ] && { ldconfig -n "$s" || :; }
     fi
 }
 _post_install_lib_libraries() {
@@ -1502,11 +1502,11 @@ _post_compat_libraries() {
     d="@lib32dir@"; s="@syslib32dir@"
     if   [ -x "`which libtool  2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
-	[ -d "$s" ] && { libtool --mode=finish $v "$s" || : }
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
+	[ -d "$s" ] && { libtool --mode=finish $v "$s" || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d "$d" ] && { ldconfig -n "$d" || : }
-	[ -d "$s" ] && { ldconfig -n "$s" || : }
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+	[ -d "$s" ] && { ldconfig -n "$s" || :; }
     fi
 }
 _post_install_compat_libraries() {
@@ -1551,9 +1551,9 @@ _post_java_jnilibs() {
     d="@jnidir@"
     if   [ -x "`which libtool  2>/dev/null`" ] ; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
-	[ -d "$d" ] && { ldconfig -n "$d" || : }
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
     fi
 }
 _post_install_java_jnilibs() {
@@ -1576,9 +1576,9 @@ _post_java_gcjlibs() {
     d="@libdir@/gcj/@PACKAGE@"
     if   [ -x "`which libtool  2>/dev/null`" ] ; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
-	[ -d "$d" ] && { ldconfig -n "$d" || : }
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
     fi
 }
 _post_install_java_gcjlibs () {
