@@ -793,7 +793,7 @@ function readsymmap(kversion, file, command, pfx, maps,
 	close(command)
 	for (sym in bads) { delete maps[sym]; n-- }
     } else {
-	print_warns(pfx "file not found " file)
+	print_debug(2,pfx "file not found " file)
     }
     print_vinfo(2, pfx sprintf(fmt, n, c, d))
     return n
