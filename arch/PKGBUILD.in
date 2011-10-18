@@ -143,7 +143,7 @@ package_@PACKAGE@() {
 	cp -a * $pkgdir
 	find $pkgdir -name '*.a' -exec rm -f -- \{\} \;
 	rm -fr $pkgdir/usr/include
-	rm -fr $pkgdir/usr/libexec
+	rm -fr $pkgdir/usr/lib/openss7
 	rm -fr $pkgdir/usr/share/info
 	rm -fr $pkgdir/usr/share/javadoc
 	rm -fr $pkgdir/usr/share/man/man{2,3,6,7,9}
@@ -210,7 +210,8 @@ EOF
 	) | while read f; do
 		rm -f -- $pkgdir/$f
 	done
-	cp -av usr/libexec $pkgdir/usr
+	mkdir -p $pkgdir/usr/lib
+	cp -av usr/lib/openss7 $pkgdir/usr/lib
 	mkdir -p $pkgdir/usr/share
 	cp -av usr/share/info $pkgdir/usr/share
 	cp -av usr/share/javadoc $pkgdir/usr/share
