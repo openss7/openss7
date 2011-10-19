@@ -50,8 +50,6 @@
 // 
 // ==========================================================================
 
-#ident "@(#) $Id: isupcre.cpp,v 1.1.2.2 2003/11/07 17:29:01 brian Exp $"
-
 static char const ident[] = "$Id: isupcre.cpp,v 1.1.2.2 2003/11/07 17:29:01 brian Exp $";
 
 extern "C" {
@@ -78,6 +76,11 @@ extern "C" {
 #include <vector>
 #include <algorithm>
 #include <hash_map>
+
+using std::list;
+using std::vector;
+using __gnu_cxx::hash_map;
+
 int output = 1;
 
 char outfile[256] = "";
@@ -589,12 +592,12 @@ class Message {
 	unsigned int bsn, bib, fsn, fib, li, ni, mp, si, dpc, opc, sls, cic, mt;
 	 Message(FILE * f) {
 		unsigned int tmp;
-		 beg = (typeof(beg)) malloc(512);
+		 beg = (unsigned char *) malloc(512);
 		 end = ss7readline(f, &tv, beg, 512);
 		if (!end || beg == end)
 			throw Error(1);
 		if (output > 3)
-			 fprintf(stderr, "Got good message %d bytes long\n", end - beg);
+			 fprintf(stderr, "Got good message %ld bytes long\n", end - beg);
 		if (end - beg < 11)
 			throw Error(0);
 		 mid = beg;
@@ -631,8 +634,7 @@ class Message {
 			free(beg);
 	};
 	void part(void) {
-		unsigned char val;
-		fprintf(stdlog, "%012d.%06d ", tv.tv_sec, tv.tv_usec);
+		fprintf(stdlog, "%012d.%06d ", (int)tv.tv_sec, (int)tv.tv_usec);
 		for (mid = beg; mid < end; mid++)
 			fprintf(stdlog, "%02x", *mid);
 		fprintf(stdlog, "\n");
@@ -645,7 +647,7 @@ class Message {
 		gmt = gmtime(&tv.tv_sec);
 		fprintf(stdout, "%04d/%02d/%02d %02d:%02d:%02d.%06d", gmt->tm_year + 1900,
 			gmt->tm_mon+1, gmt->tm_mday, gmt->tm_hour, gmt->tm_min, gmt->tm_sec,
-			tv.tv_usec);
+			(int)tv.tv_usec);
 		fprintf(stdout, ", OPC: %03u.%03u.%03u, DPC: %03u.%03u.%03u, SLS: %03u, CIC: %05u",
 			(opc >> 16) & 0xff, (opc >> 8) & 0xff, (opc >> 0) & 0xff,
 			(dpc >> 16) & 0xff, (dpc >> 8) & 0xff, (dpc >> 0) & 0xff, sls, cic);
@@ -984,7 +986,7 @@ class Message {
 	};
 };
 
-static vector < Message * >msgs;
+static vector < Message * > msgs;
 
 inline bool tv_comp(const Message * m1, const Message * m2)
 {
@@ -1019,7 +1021,7 @@ class Call {
       public:
 	struct cid cid;
 	enum CircuitState state;
-	 list < Message * >messages;
+        list < Message * >messages;
 	 Call(Message * msg) {
 		cid.dpc = msg->dpc;
 		cid.opc = msg->opc;
@@ -1034,7 +1036,7 @@ class Call {
 		state = s;
 	};
 	void dump(void) {
-		list < Message * >::iterator imsg = messages.begin();
+                list < Message * >::iterator imsg = messages.begin();
 		if (state == CTS_IDLE && imsg != messages.end() &&
 		    ((*imsg)->mt == ISUP_MT_IAM || (*imsg)->mt == ISUP_MT_CRM)) {
 			while (imsg != messages.end()) {
@@ -1049,7 +1051,7 @@ class Call {
 		}
 	};
 	void part(void) {
-		list < Message * >::iterator imsg = messages.begin();
+                list < Message * >::iterator imsg = messages.begin();
 		if (state > CTS_IDLE && imsg != messages.end()) {
 			for (; imsg != messages.end(); ++imsg)
 				(*imsg)->part();
@@ -1593,7 +1595,7 @@ void isupcor(int nfiles, char **filev)
 #endif
 	for (vector < Message * >::iterator it = msgs.begin(); it != msgs.end(); ++it) {
 		struct cid cid = { (*it)->dpc, (*it)->opc, (*it)->cic };
-		hash_map < struct cid, Circuit *, cic_hastr, cic_eqstr >::iterator cic;
+                hash_map < struct cid, Circuit *, cic_hastr, cic_eqstr >::iterator cic;
 		if (output > 5) {
 			fprintf(stdout, "%012ld.%06ld ", (*it)->tv.tv_sec, (*it)->tv.tv_usec);
 			fprintf(stdout, "%03u.%03u.%03u %03u.%03u.%03u %03u %05u %03u\n",
@@ -1636,6 +1638,7 @@ int main(int argc, char **argv)
 			{"help", 0, 0, 'h'},
 			{"verbose", 0, 0, 'v'},
 			{"version", 0, 0, 'V'},
+                        {NULL, 0, 0, 0}
 		};
 		c = getopt_long(argc, argv, "o:p:qhvV", long_options, &option_index);
 		if (c == -1)

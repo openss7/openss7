@@ -101,8 +101,8 @@ char inpfile[256] = "/dev/stdout";
 char errfile[256] = "/dev/stderr";
 
 // for now
-int card = 1;
-int span = 1;
+int card = 0;
+int span = 0;
 int slot = 1;
 
 // read an input line from the file  (taken from isupcre)
