@@ -411,7 +411,7 @@ ss72pcap(void)
 		psu[MTP2_LINK_NUMBER_OFFSET + 1] =
 		    ((card & 0x1) << 7) | ((span & 0x3) << 5) | (slot & 0x1f);
 
-		pcap_dump((u_char *) pd, ph, (u_char *) beg);
+		pcap_dump((u_char *) pd, ph, (u_char *) psu);
 		pcap_dump_flush(pd);
 	}
 	pcap_dump_close(pd);
