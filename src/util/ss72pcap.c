@@ -82,8 +82,19 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 
 #include <pcap/pcap.h>
 
+#ifndef NAME
+#define NAME "ss72pcap"
+#endif
+#ifndef PACKAGE
+#define PACKAGE "openss7"
+#endif
+#ifndef VERSION
+#define VERSION "1.1.1.20110510"
+#endif
+
 int output = 1;
 int debug = 0;
+int lasterr = 0;
 
 char outfile[256] = "/dev/stdin";
 char inpfile[256] = "/dev/stdout";
@@ -103,6 +114,8 @@ ss7readline(FILE *f, struct timeval *tv, unsigned char *buf, size_t max)
 	unsigned char byte;
 	long secs = 0, usec = 0;
 	unsigned char *ptr = buf;
+
+	lasterr = 0;
 
 	for (;;) {
 		if (feof(f) || ferror(f))
@@ -304,9 +317,7 @@ ss7readline(FILE *f, struct timeval *tv, unsigned char *buf, size_t max)
 			continue;
 		case EOF:
 		{
-			int err = ferror(f);
-			throw Error(err);
-
+			lasterr = ferror(f);
 			return (NULL);
 		}
 		}
@@ -333,7 +344,6 @@ ss72pcap(void)
 {
 	pcap_t *p;
 	pcap_dumper_t *pd;
-	char errbuf[PCAP_ERRBUF_SIZE];
 	unsigned char *buf, *beg, *psu;
 	struct pcap_pkthdr *ph;
 
@@ -361,15 +371,15 @@ ss72pcap(void)
 		}
 	}
 	if ((p = pcap_open_dead(DLT_MTP2_WITH_PHDR, 0)) == NULL) {
-		pcap_perror(p, __FUNCTION__);
+		pcap_perror(p, (char *)__FUNCTION__);
 		exit(1);
 	}
 	if ((pd = pcap_dump_fopen(p, stdout)) == NULL) {
-		pcap_perror(p, __FUNCTION__);
+		pcap_perror(p, (char *)__FUNCTION__);
 		exit(1);
 	}
 	buf = malloc(sizeof(*ph) + MTP2_HDR_LEN + 4096);
-	*ph = (typeof(ph)) buf;
+	ph = (typeof(ph)) buf;
 	psu = buf + sizeof(*ph);
 	beg = psu + MTP2_HDR_LEN;
 	while (1) {
@@ -379,15 +389,15 @@ ss72pcap(void)
 			break;
 		}
 		if (end - beg < 3) {
-			fprintf(stderr, "Got bad message %d bytes long\n", end - beg);
+			fprintf(stderr, "Got bad message %ld bytes long\n", end - beg);
 			continue;
 		}
 		if (output > 3)
-			fprintf(stderr, "Got good message %d bytes long\n", end - beg);
+			fprintf(stderr, "Got good message %ld bytes long\n", end - beg);
 
 		// we never truncate because 4096 is the largest frame
-		ph->caplen = (bpf_u_int32) (end - beg);
-		ph->len = (bpf_u_int32) (end - beg);
+		ph->caplen = (bpf_u_int32) (end - beg) + MTP2_HDR_LEN;
+		ph->len = (bpf_u_int32) (end - beg) + MTP2_HDR_LEN;
 
 		psu[MTP2_SENT_OFFSET] = 0;	// not sent by us
 		if (slot == 0) {
