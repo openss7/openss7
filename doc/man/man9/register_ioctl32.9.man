@@ -121,7 +121,7 @@ search-ignore CGIQOSTU
 .br
 .B #include <sys/strconf.h>
 .HP
-.BI "void *register_clone(unsigned int " cmd );
+.BI "void *register_ioctl32(unsigned int " cmd );
 .\"
 .\"
 .SH ARGUMENTS
