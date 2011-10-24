@@ -152,9 +152,12 @@ bytes from the source address
 .I src
 to the destination address
 .IR dest .
+The result is correct even when areas overlap.
 If
 .I len
-is zero, this function has no effect.
+is zero, or
+.IR src " equals " dest ,
+this function has no effect.
 .\"
 .\"
 .SH RETURN
@@ -187,7 +190,7 @@ is MP-safe, provided the caller ensures exclusive access to the memory areas inv
 .PP
 .B Linux Fast-STREAMS
 preserves this deprecated function.
-.BR memcpy (9)
+.BR memcpy "(9) or " memmove (9)
 should be used instead.
 For older
 .I STREAMS
@@ -195,7 +198,7 @@ drivers and modules, it is sufficient to define the macro:
 .sp
 .nf
 \fC\s-2
-#define bcopy(src, dst, len) (void)memcpy(dst, src, len)
+#define bcopy(src, dst, len) (void)memmove(dst, src, len)
 \s+2\fP
 .fi
 .\"
@@ -204,11 +207,24 @@ drivers and modules, it is sufficient to define the macro:
 .PP
 .BR bcmp (9),
 .BR bzero (9),
-.BR memcpy (9).
+.BR memcpy (9),
+.BR memmove (9).
 .\"
 .\"
 .SH BUGS
 .PP
+Previous versions of
+.B Linux Fast-STREAMS
+erroneously used 
+.BR memcpy (9)
+to implement
+.B bcopy
+instead of
+.BR memmove (9).
+.RB ( bcopy
+is supposed to support overlapping areas.)
+.PP
+The current version of
 .BR bcopy ()
 has no known bugs.
 .\"

@@ -1119,7 +1119,7 @@ __STREAMS_EXTERN void unfreezestr(queue_t *q, unsigned long pl);
 static __inline__ void
 bcopy(const void *from, void *to, size_t len)
 {
-	memcpy(to, from, len);
+	memmove(to, from, len);
 }
 
 static __inline__ void
