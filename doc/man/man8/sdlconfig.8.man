@@ -283,6 +283,12 @@ traffic shaper.
 system tick clock.
 .PD
 .RE
+.IP ""
+Not all settings are applicable to all devices.
+.B abr
+is only applicable to ATM SAL links.
+.BR shaper " and " tick
+are only applicable to SS7 over UDP links.
 .TP
 \fB--rate\fR \fIRATE\fR
 Specifies the channel rate.
@@ -304,6 +310,14 @@ entire T1/J1 span.
 entire E1 span.
 .PD
 .RE
+.IP ""
+The channer rate of
+.BR 1544000 " and " 2048000
+can only be applied on slot zero (0) of a T1/J1 or an E1 span, respectively.
+A channel rate of
+.B 56000
+is only really applicable to a T1 span; however, it can be set against a
+channel on an E1 span just for the sake of it.
 .TP
 \fB--type\fR \fITYPE\fR
 Specifies the channel interface type.
@@ -340,6 +354,17 @@ the channel interface is ATM.
 the channel interface is packet based.
 .PD
 .RE
+.IP ""
+.B v35
+is only applicable to V.35 (synchronous serial) devices and includes an
+interpretation of leads.
+.B ds0a
+is only really applicable to channels in T1/J1 spans, but can be applied to a
+channel (non-zero slot) in an E1 span for the sake of it.
+.B atm
+is only applicable to ATM SAL links.
+.B packet
+is only applicable to OpenSS7 SS7 over UDP links.
 .TP
 \fB--mode\fR \fIMODE\fR
 Specifies the mode of the channel interface.
@@ -388,6 +413,13 @@ the channel is in loopback and echo mode.
 the channel is in test mode.
 .PD
 .RE
+.IP ""
+.BR dsu ", " csu ", " dte " and " dce
+settings are only applicable to V.35 interfaces.
+.BR client ", " server ", and " peer
+modes are only applicable to SS7 over UDP and ATM SAL links.
+.BR echo ", " rem_lb ", " loc_lb ", " lb_echo ", and " test
+modes are applicable, but not necessarily supported, by all devices.
 .TP
 \fB--grate\fR \fIGROUP-RATE\fR
 Specifies the group rate.
@@ -534,6 +566,10 @@ ATM Adaption Layer 5 coding.
 HDB3 coding.
 .PD
 .RE
+.IP ""
+Not all codings are applicable to all devices.
+.BR aal1 ", " aal2 ", and " aal5
+are only applicable to ATM SAL links.
 .TP
 \fB--framing\fR \fIFRAMING\fR
 Specifies the framing for the interface.

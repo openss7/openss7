@@ -113,6 +113,8 @@ search-ignore CGIQOSTU
 \- Signalling Data Terminal (SDT) 
 .SH SYNOPSIS
 .PP
+.B #include <sys/stropts.h>
+.br
 .B #include <ss7/lmi.h>
 .br
 .B #include <ss7/lmi_ioctl.h>
@@ -181,10 +183,9 @@ below for a description of SDT management controls particular to the
 driver.
 .SS Configuration
 .PP
-Confiruation management IO controls use the
+Configuration management input-output controls use the
 .B sdt_config
-structure described in
-.BR sdt_ioctl (4).
+structure.
 The
 .B sdt_config
 structure contains the following members:
