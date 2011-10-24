@@ -622,9 +622,9 @@ Stream head.
 .SH EXAMPLES
 .PP
 This example is taken directly from the
-.BR bufmod (4)
+.BR srvmod (4)
 test module, located in the
-.IR src/modules/bufmod.c
+.IR src/modules/srvmod.c
 source file in the
 .B @PACKAGE@-@VERSION@
 distribution.
@@ -634,41 +634,41 @@ and associated structures to define a module:
 .PP
 .nf
 \fC\s-1\
- 1  int bufmod_wput(queue_t *, mblk_t *);
- 2  int bufmod_wsrv(queue_t *);
+ 1  int srvmod_wput(queue_t *, mblk_t *);
+ 2  int srvmod_wsrv(queue_t *);
  3  
- 4  int bufmod_rput(queue_t *, mblk_t *);
- 5  int bufmod_rsrv(queue_t *);
+ 4  int srvmod_rput(queue_t *, mblk_t *);
+ 5  int srvmod_rsrv(queue_t *);
  6  
- 7  int bufmod_open(queue_t *, dev_t *, int, cred_t *);
- 8  int bufmod_close(queue_t *, dev_t *, cred_t *);
+ 7  int srvmod_open(queue_t *, dev_t *, int, cred_t *);
+ 8  int srvmod_close(queue_t *, dev_t *, cred_t *);
  9  
-10  static struct module_info bufmod_minfo = {
+10  static struct module_info srvmod_minfo = {
 11      .mi_idnum = 0,
-12      .mi_idname = "bufmod",
+12      .mi_idname = "srvmod",
 13      .mi_minpsz = STRMINPSZ,
 14      .mi_maxpsz = STRMAXPSZ,
 15      .mi_hiwat = STRHIGH,
 16      .mi_lowat = STRLOW,
 17  };
 18  
-19  static struct qinit bufmod_rinit = {
-20      .qi_putp = bufmod_rput,
-21      .qi_srvp = bufmod_srv,
-22      .qi_qopen = bufmod_open,
-23      .qi_qclose = bufmod_close,
-24      .qi_minfo = &bufmod_minfo,
+19  static struct qinit srvmod_rinit = {
+20      .qi_putp = srvmod_rput,
+21      .qi_srvp = srvmod_srv,
+22      .qi_qopen = srvmod_open,
+23      .qi_qclose = srvmod_close,
+24      .qi_minfo = &srvmod_minfo,
 25  };
 26  
-27  static struct qinit bufmod_winit = {
-28      .qi_putp = bufmod_wput,
-29      .qi_srvp = bufmod_srv,
-30      .qi_minfo = &bufmod_minfo,
+27  static struct qinit srvmod_winit = {
+28      .qi_putp = srvmod_wput,
+29      .qi_srvp = srvmod_srv,
+30      .qi_minfo = &srvmod_minfo,
 31  };
 32  
-33  static struct streamtab bufmod_info = {
-34      .st_rdinit = &bufmod_rinit,
-35      .st_wrinit = &bufmod_winit,
+33  static struct streamtab srvmod_info = {
+34      .st_rdinit = &srvmod_rinit,
+35      .st_wrinit = &srvmod_winit,
 36  };
 \s+1\fP
 .fi

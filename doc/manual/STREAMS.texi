@@ -1026,14 +1026,14 @@ This kernel module contains the @dfn{spx} @acronym{STREAMS} driver.
 This is a common character device driver for implementing @acronym{STREAMS} pipes.
 See @manref{spx(4)} for more information.
 
-@item @file{streams-bufmod}
-@pgindex streams-bufmod
+@item @file{streams-srvmod}
+@pgindex streams-srvmod
 
-This kernel module contains the @file{bufmod} @acronym{STREAMS} module.  The @file{bufmod} @acronym{STREAMS}
+This kernel module contains the @file{srvmod} @acronym{STREAMS} module.  The @file{srvmod} @acronym{STREAMS}
 module is a simple buffer module (a module that always defers to its service procedure and then
 passes any message along).  This module is used for performance testing of the @acronym{STREAMS}
 package.
-See @manref{bufmod(4)} for more information.
+See @manref{srvmod(4)} for more information.
 
 @item @file{streams-nullmod}
 @pgindex streams-nullmod
@@ -1303,18 +1303,18 @@ accessible using the @manpage{sad(4)} driver.  The @manpage{sc(4)} module is use
 
 See @manref{sc(4)} for more information.
 
-@item @manpage{bufmod(4)} (@file{streams-bufmod})
-@pgindex streams-bufmod
+@item @manpage{srvmod(4)} (@file{streams-srvmod})
+@pgindex streams-srvmod
 
 Buffer module.
 This is a standard @cite{SVR 4.2 @acronym{STREAMS}} module described in the @cite{UNIX System V Release 4
 Programmer's Manual -- STREAMS}.
-The @manpage{bufmod(4)} module also has @cite{@value{PACKAGE_TITLE}} specific extensions.
-The @manpage{bufmod(4)} module is used by the @manref{perftest(8)} performance test program to test
+The @manpage{srvmod(4)} module also has @cite{@value{PACKAGE_TITLE}} specific extensions.
+The @manpage{srvmod(4)} module is used by the @manref{perftest(8)} performance test program to test
 the effect of additional levels of service procedure pushed over a @dfn{Stream}.
 The module also serves as an example of a @acronym{STREAMS} module using service procedures.
 
-See @manref{bufmod(4)} for more information.
+See @manref{srvmod(4)} for more information.
 
 @item @manpage{nullmod(4)} (@file{streams-nullmod})
 @pgindex streams-nullmod
@@ -2269,7 +2269,7 @@ The following manual pages are installed in Section 3 of the manual (in the subd
 The following manual pages are installed in Section 4 of the manual (in the subdirectory @file{/usr/share/man/man4}):
 
 @multitable @columnfractions .40 .60
-@item @manref{bufmod(4)} -- @tab @acronym{STREAMS} buffering null module.
+@item @manref{srvmod(4)} -- @tab @acronym{STREAMS} buffering null module.
 @item @manref{clone(4)} -- @tab the @acronym{STREAMS} clone driver.
 @item @manref{connld(4)} -- @tab @acronym{STREAMS} connection line discipline module.
 @item @manref{conslog(4)} -- @tab @acronym{STREAMS} log device.

@@ -320,7 +320,7 @@ subsystem.
 .PP
 .B MODULES
 .PP
-.IP \fBbufmod\fR(4) \w'\fBtestmod\fR(4)\(en'u
+.IP \fBsrvmod\fR(4) \w'\fBtestmod\fR(4)\(en'u
 \(en\ 
 .PD 0
 .IP \fBconnld\fR(4)
