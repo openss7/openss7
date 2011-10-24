@@ -99,6 +99,7 @@
 #define SB_NO_PROTO_CVT		(1<<2)		/**< Do not convert M_PROTO to data. */
 #define SB_DEFER_CHUNK		(1<<3)		/**< Defer chunk generation for one message. */
 #define SB_NO_DROPS		(1<<4)		/**< Do not drop messages under flow control. */
+#define SB_HIPRI_OOB            (1<<5)          /**< Deliver high-priority M_PROTO out of band, */
 /** @} */
 
 /** @name state Buffering State
