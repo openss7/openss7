@@ -5,7 +5,15 @@
 
 PACKAGER="${PACKAGER:-Brian Bidulock <bidulock@openss7.org>}"
 
-_kvr="$(pacman -Qi linux|grep -i '^version'|awk '{print$3}')"
+case "@kversion@" in
+	(3.0-ARCH)	kpkg='linux'	    ;;
+	(2.6.*-lts)	kpkg='kernel26-lts' ;;
+	(2.6.*)		kpkg='kernel26'	    ;;
+	(*) echo "*** Bad kernel version @kversion@" >&2
+			kpkg='linux'	    ;;
+esac
+
+_kvr="$(pacman -Qi ${kpkg:-linux}|grep -i '^version'|awk '{print$3}')"
 _kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
 _kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
 
@@ -14,6 +22,7 @@ pkgname=(
 	'@PACKAGE@-devel'
 	'@PACKAGE@-@kversion@'
 	'@PACKAGE@-@kversion@-devel'
+	'@PACKAGE@-java'
 	)
 pkgver='@VERSION@'
 pkgrel='@PACKAGE_PACRELEASE@'
@@ -69,7 +78,7 @@ build() {
 		--with-optimize=speed \
 		--with-gnu-ld \
 		${BUILD_CFGOPTIONS} \
-		|| { rm -f ${cache_file} ${csite_file} ${mpost_file} ; exit 1 ; }
+		|| { rm -f ${cache_file} ${csite_file} ${mpost_file} ; return 1 ; }
 	make
 }
 
@@ -150,6 +159,9 @@ package_@PACKAGE@() {
 	rm -fr $pkgdir/boot
 	rm -fr $pkgdir/lib/modules
 	rm -fr $pkgdir/usr/src
+	rm -fr $pkgdir/usr/lib/java
+	rm -fr $pkgdir/usr/share/java
+	rm -fr $pkgdir/usr/lib/gcj
 	cd $startdir
 	( cd $pkgdir; find . | sort ) >@PACKAGE@.list
 	join -v 1 unused.list @PACKAGE@.list >unused.tmp
@@ -225,7 +237,7 @@ EOF
 
 package_@PACKAGE@-@kversion@() {
 	local _kvr _kv _kr
-	_kvr="$(pacman -Qi linux|grep -i '^version'|awk '{print$3}')"
+	_kvr="$(pacman -Qi ${kpkg:-linux}|grep -i '^version'|awk '{print$3}')"
 	_kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
 	_kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
 	epoch=0
@@ -236,7 +248,7 @@ package_@PACKAGE@-@kversion@() {
 	provides=('@PACKAGE@-kernel')
 	depends=(
 		'@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@'
-		"linux=$_kvr")
+		"${kpkg:-linux}=$_kvr")
 	install=@PACKAGE@-kernel.install
 	package
 	cd $srcdir/_install
@@ -252,7 +264,7 @@ package_@PACKAGE@-@kversion@() {
 
 package_@PACKAGE@-@kversion@-devel() {
 	local _kvr _kv _kr
-	_kvr="$(pacman -Qi linux|grep -i '^version'|awk '{print$3}')"
+	_kvr="$(pacman -Qi ${kpkg:-linux}|grep -i '^version'|awk '{print$3}')"
 	_kv=$(echo "$_kvr" | sed -e 's,-.*$,,')
 	_kr=$(echo "$_kvr" | sed -e 's,^.*-,,')
 	epoch=0
@@ -265,7 +277,7 @@ package_@PACKAGE@-@kversion@-devel() {
 	depends=(
 		'@PACKAGE@-devel=@VERSION@-@PACKAGE_PACRELEASE@'
 		"@PACKAGE@-@kversion@=@VERSION@.$_kv-@PACKAGE_PACRELEASE@.$_kr"
-		"linux=$_kvr")
+		"${kpkg:-linux}=$_kvr")
 	install=@PACKAGE@-kernel-devel.install
 	package
 	cd $srcdir/_install
@@ -314,5 +326,23 @@ EOF
 	cd $startdir
 	( cd $pkgdir; find . | sort ) >@PACKAGE@-@kversion@-devel.list
 	join -v 1 unused.list @PACKAGE@-@kversion@-devel.list >unused.tmp
+	mv -f -- unused.tmp unused.list
+}
+
+package_@PACKAGE@-java() {
+	pkgdesc='OpenSS7 Fast-STREAMS and Protocol Suites (Java)'
+	groups=('@PACKAGE@')
+	depends=('@PACKAGE@=@VERSION@-@PACKAGE_PACRELEASE@')
+	install=@PACKAGE@-libs.install
+	package
+	cd $srcdir/_install
+	mkdir -p $pkgdir/usr/lib
+	mkdir -p $pkgdir/usr/share
+	cp -av usr/lib/java   $pkgdir/usr/lib
+	cp -av usr/lib/gcj    $pkgdir/usr/lib
+	cp -av usr/share/java $pkgdir/usr/share
+	cd $startdir
+	( cd $pkgdir; find . | sort ) >@PACKAGE@-java.list
+	join -v 1 unused.list @PACKAGE@-java.list >unused.tmp
 	mv -f -- unused.tmp unused.list
 }

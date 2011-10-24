@@ -50,27 +50,283 @@
 # Last Modified $Date$ by $Author$
 #
 # =============================================================================
-subpkg=libs
+subpkg=java
+_set_vars() {
 @openss7_header@
 datarootdir=@datarootdir@
+}
 
+_remove_warn_file() {
+    if [ -f "$2" ] ; then
+	echo ">>> WARNING: removing conflicting $1 file $2" >&2
+	rm -f -- "$2" 2>/dev/null || :
+    fi
+}
+_remove_warn_files() {
+    local f t
+    t="$1"
+    shift
+    for f in "$@" ; do
+	_remove_warn_file "$t" "$f"
+    done
+}
+_remove_warn_dir() {
+    if [ -d "$2" ] ; then
+	if [ "`(cd $2; pwd)`" != "/"  ] ; then
+	    if [ -L "$2" ] ; then
+		echo ">>> WARNING: removing conflicting $1 symbolic link $2" >&2
+		rm -f -- "$2"
+	    else
+		echo ">>> WARNING: removing conflicting $1 directory $2" >&2
+		rm -rf -- "$2"
+	    fi
+	fi
+    fi
+}
+_remove_warn_dirs() {
+    local d t
+    t="$1"
+    shift
+    for d in "$@" ; do
+	_remove_warn_dir "$t" "$d"
+    done
+}
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# JAVA JNI LIBRARIES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _pre_install_java_jnilibs() - On a fresh installation, look for an remove any
+#   non-pkg or old tarball release libraries.  On reinstallations this step can
+#   (and should) be skipped.  Unfortunately, non-autoconf releases of LiS placed
+#   libraries all over the place.  On an initial installation, this checks for
+#   other libraries with the same name and deletes them.
+#
+_pre_install_java_jnilibs() {
+    local lib l
+    echo ">>> Removing conflicting JNI libraries..." >&2
+    if [ -x "`which ldconfig 2>/dev/null`" ]; then
+	for lib in $jnilibs; do
+	    ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
+	    while read l; do
+		echo ">>> warning: Deleting conflicting library, $l" >&2
+		rm -f -- $l || :
+	    done
+	done
+    fi
+}
+# _post_java_jnilibs() - After a fresh installation, upgrade, reinstall, or
+#   removal, do a ldconfig.
+#
+_post_java_jnilibs() {
+    local v d
+    echo ">>> Updating JNI libraries load cache..." >&2
+    d="@jnidir@"
+    if   [ -x "`which libtool  2>/dev/null`" ] ; then
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
+    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+    fi
+}
+_post_install_java_jnilibs() {
+    _post_java_jnilibs		|| :
+}
+_post_upgrade_java_jnilibs() {
+    _post_java_jnilibs		|| :
+}
+_post_remove_java_jnilibs() {
+    _post_java_jnilibs		|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# JAVA GCJ LIBRARIES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_post_java_gcjlibs() {
+    local v d
+    echo ">>> Updating GCJ libraries load cache..." >&2
+    d="@libdir@/gcj/@PACKAGE@"
+    if   [ -x "`which libtool  2>/dev/null`" ] ; then
+        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
+    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+    fi
+}
+_post_install_java_gcjlibs () {
+    _post_java_gcjlibs		|| :
+}
+_post_upgrade_java_gcjlibs () {
+    _post_java_gcjlibs		|| :
+}
+_post_remove_java_gcjlibs () {
+    _post_java_gcjlibs		|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# JAVA GCJ MAPS
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_java_gcjmaps() - After installation, rebuild the gcj map
+#   database.  Note that there is currently no debhelper nor trigger for this.
+#
+_post_java_gcjmaps() {
+    local d db
+    echo ">>> Updating GCJ maps..." >&2
+    if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
+        rebuild-gcj-db || :
+    else
+	if [ -x "`which gcj-dbtool 2>/dev/null`" ] ; then
+	    for base in /usr/lib* ; do
+		d=$base/gcj
+		[ -d $d ] || continue
+		db=`gcj-dbtool -p $base`
+		[ -n "$db" ] || continue
+		dirname $db | xargs mkdir -p
+		gcj-dbtool -n $db.tmp 64
+		find $d -follow -name '*.db' -print0 | \
+		    xargs -0 gcj-dbtool -m $db.tmp $db.tmp
+		mv -f -- $db.tmp $db
+	    done
+	fi
+    fi
+}
+_post_install_java_gcjmaps () {
+    _post_java_gcjmaps		|| :
+}
+_post_upgrade_java_gcjmaps () {
+    _post_java_gcjmaps		|| :
+}
+# _post_remove_java_gcjmaps() - On complete removal, rebuild the gcj database.
+#   Note that there is no debhelper or trigger for this as yet.
+#
+_post_remove_java_gcjmaps() {
+    local d db
+    echo ">>> Updating GCJ maps..." >&2
+    if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
+        rebuild-gcj-db || :
+    elif [ -x "`which gcj-dbtool 2>/dev/null`" ] ; then
+	for base in /usr/lib* ; do
+	    d=$base/gcj
+	    [ -d $d ] || continue
+	    db=`gcj-dbtool -p $base`
+	    [ -n "$db" ] || continue
+	    dirname $db | xargs mkdir -p
+	    gcj-dbtool -n $db.tmp 64
+	    find $d -follow -name '*.db' -print0 | \
+		xargs -0 gcj-dbtool -m $db.tmp $db.tmp
+	    mv -f -- $db.tmp $db
+	done
+    fi
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# JAVA JAR FILES
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# _post_java_jarfiles() - After installation, rebuild the jar
+#   repository.  Note that there is currently no debhelper nor trigger for this.
+#
+_post_java_jarfiles() {
+    echo ">>> Updating JAVA repositories..." >&2
+    if [ -x "`which rebuild-jar-repository 2>/dev/null`" ] ; then
+        rebuild-jar-repository @javadir@ || :
+    fi
+}
+_post_install_java_jarfiles () {
+    _post_java_jarfiles		|| :
+}
+_post_upgrade_java_jarfiles () {
+    _post_java_jarfiles		|| :
+}
+_post_remove_java_jarfiles () {
+    _post_java_jarfiles		|| :
+}
+# ---------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# PRE INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, pre_install needs to make any adjustments to the system that would
+# otherwise conflict with the installation.  These actions typically only need
+# to be performed once on initial installation.
+# -----------------------------------------------------------------------------
+_pre_install_java() {
+    _pre_install_java_jnilibs		|| :
+}
+# pre_install($new_version) - script is run right before files are extracted.
+#   One argument is passed: new pakage version.
+#
 pre_install() {
+    _set_vars
+    _pre_install_java			|| :
 }
+# -----------------------------------------------------------------------------
 
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST INSTALL
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_install needs to create or reconfigure any files that are
+# not simply installed.  In general, the same actions should be performed also
+# by the post_upgrade procedures.
+# -----------------------------------------------------------------------------
+_post_install_java() {
+    _post_install_java_jnilibs		|| :
+    _post_install_java_gcjlibs		|| :
+    _post_install_java_gcjmaps		|| :
+    _post_install_java_jarfiles		|| :
+}
+# post_install($new_version) - script is run right after files are extracted.
+#   One argument is passed: new package version.
+#
 post_install() {
+    _set_vars
+    _post_install_java			|| :
 }
+# -----------------------------------------------------------------------------
 
-pre_upgrade() {
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST REMOVE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# In general, post_remove needs to tidy up and remnants of the package that
+# might otherwise be left behind.  These actions typically are only performed
+# when the package is finally removed.
+# -----------------------------------------------------------------------------
+_post_remove_java() {
+    _post_remove_java_jnilibs		|| :
+    _post_remove_java_gcjlibs		|| :
+    _post_remove_java_gcjmaps		|| :
+    _post_remove_java_jarfiles		|| :
 }
-
-post_upgrade() {
-}
-
-pre_remove() {
-}
-
+# post_remove($old_version) - script is run right after files are removed.  One
+#   argument is passed: old package version.
+#
 post_remove() {
+    _set_vars
+    _post_remove_java			|| :
 }
+# -----------------------------------------------------------------------------
+
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+# POST UPGRADE
+# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+_post_upgrade_java() {
+    _post_upgrade_java_jnilibs		|| :
+    _post_upgrade_java_gcjlibs		|| :
+    _post_upgrade_java_gcjmaps		|| :
+    _post_upgrade_java_jarfiles		|| :
+}
+# post_upgrade($new_version,$old_version) - script is run right after files are
+#   extracted.  Two arguments are passed in the following order: new package
+#   version, old package version.  (I can't find documentation that states this,
+#   but I believe that the old package files have been removed.)
+#
+post_upgrade() {
+    _set_vars
+    _post_upgrade_java			|| :
+}
+# -----------------------------------------------------------------------------
+
 
 # =============================================================================
 #
