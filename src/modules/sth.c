@@ -7467,7 +7467,7 @@ str_i_gwropt(const struct file *file, struct stdata *sd, unsigned long arg)
 	int err;
 
 	if (!(err = straccess_rlock(sd, FAPPEND))) {
-		wropt = sd->sd_wropt & (SNDZERO | SNDPIPE | SNDHOLD | SNDELIM | SNDMREAD);
+		wropt = sd->sd_wropt & (SNDZERO | SNDPIPE | SNDHOLD | SNDDELIM | SNDMREAD);
 		srunlock(sd);
 		err = strcopyout(&wropt, (void *) arg, sizeof(wropt));
 	}
@@ -7498,10 +7498,10 @@ str_i_swropt(const struct file *file, struct stdata *sd, unsigned long arg)
 	int32_t wropt = arg;
 	int err;
 
-	if (wropt & ~(SNDZERO | SNDPIPE | SNDHOLD | SNDELIM | SNDMREAD))
+	if (wropt & ~(SNDZERO | SNDPIPE | SNDHOLD | SNDDELIM | SNDMREAD))
 		return (-EINVAL);
 
-	wropt &= (SNDZERO | SNDPIPE | SNDHOLD | SNDELIM | SNDMREAD);
+	wropt &= (SNDZERO | SNDPIPE | SNDHOLD | SNDDELIM | SNDMREAD);
 
 	if (!(err = straccess_wlock(sd, (FWRITE | FNDELAY | FEXCL)))) {
 		sd->sd_wropt = (sd->sd_wropt & ~(SNDZERO | SNDPIPE | SNDHOLD)) | wropt;
@@ -7509,7 +7509,7 @@ str_i_swropt(const struct file *file, struct stdata *sd, unsigned long arg)
 			set_bit(STRHOLD_BIT, &sd->sd_flag);
 		else
 			clear_bit(STRHOLD_BIT, &sd->sd_flag);
-		if (wropt & SNDELIM)
+		if (wropt & SNDDELIM)
 			set_bit(STRDELIM_BIT, &sd->sd_flag);
 		if (wropt & SNDMREAD)
 			set_bit(STRMREAD_BIT, &sd->sd_flag);
