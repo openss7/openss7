@@ -1,0 +1,261 @@
+<TITLE>SunOS Manual Pages</TITLE>
+<DL> <H1> NIT_PF (4M) </H1><IMG SRC="/images/line.red.gif"
+ALT="-----">
+
+<DT></UL><H2> NAME </H2><DD>
+
+nit_pf - STREAMS NIT packet filtering module
+
+<DT></UL><H2> CONFIG </H2><DD>
+
+<B> </B>
+
+pseudo-device   pf
+
+<DT></UL><H2> SYNOPSIS </H2><DD>
+
+<PRE>
+<B>
+</B>
+
+#include &lt;sys/ioctl.h>
+<B>
+</B>
+
+#include &lt;net/nit_pf.h>
+<P>        ioctl(fd, I_PUSH, pf );
+</PRE>
+
+<DT></UL><H2> DESCRIPTION </H2><DD>
+
+<P>
+
+<B> nit_pf </B>
+
+is a STREAMS module that subjects messages arriving on its read
+queue to a packet filter and passes only those messages that the
+filter accepts on to its upstream neighbor. Such filtering can be
+very useful for user-level protocol implementations and for
+networking monitoring programs that wish to view only specific
+types of events.
+
+<H3> Read-side Behavior  </H3>
+
+<B> nit_pf </B>
+
+applies the current packet filter to all M_DATA and M_PROTO
+messages arriving on its read queue. The module prepares these
+messages for examination by first skipping over all leading
+M_PROTO message blocks to arrive at the beginning of the
+message's data portion. If there is no data portion, <B> nit_pf
+</B>
+
+accepts the message and passes it along to its upstream neighbor.
+Otherwise, the module ensures that the part of the message's data
+that the packet filter might examine lies in contiguous memory,
+calling the <I> pullupmsg </I>
+
+utility routine if necessary to force contiguity. (Note: this
+action destroys any sharing relationships that the subject
+message might have had with other messages.) Finally, it applies
+the packet filter to the message's data, passing the entire
+message upstream to the next module if the filter accepts, and
+discarding the message otherwise. See PACKET FILTERS below for
+details on how the filter works. <P>
+
+If there is no packet filter yet in effect, the module acts as if
+the filter exists but does nothing, implying that all incoming
+messages are accepted. IOCTLS below describes how to associate a
+packet filter with an instance of <B>nit_pf</B>.  <P>
+
+<B> nit_pf </B>
+
+handles other message types as follows. Upon receiving an M_FLUSH
+message specifying that the read queue be flushed, the module
+does so, and passes the message on to its upstream neighbor. It
+passes all other messages through unaltered to its upper
+neighbor.
+
+<H3> Write-side Behavior  </H3>
+
+<B> nit_pf </B>
+
+intercepts M_IOCTL messages for the <I>ioctl</I> described below.
+Upon receiving an M_FLUSH message specifying that the write queue
+be flushed, the module does so and passes the message on to the
+module or driver below. The module passes all other messages
+through unaltered to its lower neighbor.
+
+<DT></UL><H2> IOCTLS </H2><DD>
+
+<P>
+
+<B> nit_pf </B>
+
+responds to the following <I>ioctl</I>.  <P> NIOCSETF This <I>
+ioctl </I>
+
+directs the module to replace its current packet filter, if any,
+with the filter specified by the `<B>struct packetfilt</B> '
+pointer named by its final argument. This structure is defined in
+<B> &lt;net/packetfilt.h> </B>
+
+as <UL>
+
+<UL>
+
+<PRE>
+struct packetfilt {
+    u_char   Pf_Priority;   /* priority of filter */
+    u_char   Pf_FilterLen;  /* # of cmds in list */
+    u_short  Pf_Filter[ENMAXFILTERS];
+                            /* filter command list */
+};
+</PRE> </UL>
+
+</UL>
+
+<BR>
+
+<P>
+
+The <I> Pf_Priority </I>
+
+field is included only for compatibility with other packet filter
+implementations and is otherwise ignored. The packet filter
+itself is specified in the <I> Pf_Filter </I>
+
+array as a sequence of two-byte commands, with the <I>
+Pf_FilterLen </I>
+
+field giving the number of commands in the sequence. This
+implementation restricts the maximum number of commands in a
+filter (<B>ENMAXFILTERS</B>) to 40. The next section describes
+the available commands and their semantics.
+
+<DT></UL><H2> PACKET FILTERS  </H2><DD>
+
+<P>
+
+A packet filter consists of the filter command list length (in
+units of <I>u_short</I>s), and the filter command list itself.
+(The priority field mentioned above is ignored in this
+implementation.) Each filter command list specifies a sequence of
+actions that operate on an internal stack of <I>u_short</I>s
+(&quot;shortwords&quot;). Each shortword of the command list
+specifies one of the actions ENF_PUSHLIT, ENF_PUSHZERO, or
+ENF_PUSHWORD +<I>n</I>, which respectively push the next
+shortword of the command list, zero, or shortword <I> n </I>
+
+of the subject message on the stack, and a binary operator from
+the set { ENF_EQ, ENF_NEQ, ENF_LT, ENF_LE, ENF_GT, ENF_GE,
+ENF_AND, ENF_OR, ENF_XOR } which then operates on the top two
+elements of the stack and replaces them with its result. When
+both an action and operator are specified in the same shortword,
+the action is performed followed by the operation. <P>
+
+The binary operator can also be from the set { ENF_COR, ENF_CAND,
+ENF_CNOR, ENF_CNAND }. These are &quot;short-circuit&quot;
+operators, in that they terminate the execution of the filter
+immediately if the condition they are checking for is found, and
+continue otherwise. All pop two elements from the stack and
+compare them for equality; ENF_CAND returns false if the result
+is false; ENF_COR returns true if the result is true; ENF_CNAND
+returns true if the result is false; ENF_CNOR returns false if
+the result is true. Unlike the other binary operators, these four
+do not leave a result on the stack, even if they continue. <P>
+
+The short-circuit operators should be used when possible, to
+reduce the amount of time spent evaluating filters. When they are
+used, you should also arrange the order of the tests so that the
+filter will succeed or fail as soon as possible; for example,
+checking the IP destination field of a UDP packet is more likely
+to indicate failure than the packet type field. <P>
+
+The special action ENF_NOPUSH and the special operator ENF_NOP
+can be used to only perform the binary operation or to only push
+a value on the stack. Since both are (conveniently) defined to be
+zero, indicating only an action actually specifies the action
+followed by ENF_NOP, and indicating only an operation actually
+specifies ENF_NOPUSH followed by the operation. <P>
+
+After executing the filter command list, a non-zero value (true)
+left on top of the stack (or an empty stack) causes the incoming
+packet to be accepted and a zero value (false) causes the packet
+to be rejected. (If the filter exits as the result of a short-
+circuit operator, the top-of-stack value is ignored.) Specifying
+an undefined operation or action in the command list or
+performing an illegal operation or action (such as pushing a
+shortword offset past the end of the packet or executing a binary
+operator with fewer than two shortwords on the stack) causes a
+filter to reject the packet.
+
+<DT></UL><H2> EXAMPLES </H2><DD>
+
+<P>
+
+The reverse ARP daemon program (<B>rarpd</B>(8C)) uses code
+similar to the following fragment to construct a filter that
+rejects all but RARP packets. That is, is accepts only packets
+whose Ethernet type field has the value ETHERTYPE_REVARP. <P>
+
+<PRE>
+     struct ether_header eh;       /* used only for offset values */
+     struct packetfilt pf;
+     register u_short *fwp = pf.Pf_Filter;
+     u_short offset;
+<PRE>
+</PRE>
+     /*
+      * Set up filter.  Offset is the displacement of the Ethernet
+      * type field from the beginning of the packet in units of
+      * u_shorts.
+      */
+<BR>
+
+     offset = ((u_int) &eh.ether_type - (u_int) &eh.ether_dhost) / sizeof (u_short);
+     *fwp++ = ENF_PUSHWORD + offset;
+     *fwp++ = ENF_PUSHLIT;
+     *fwp++ = htons(ETHERTYPE_REVARP);
+     *fwp++ = ENF_EQ;
+     pf.Pf_FilterLen = fwp - &pf.Pf_Filter[0];
+</PRE> <P>
+
+This filter can be abbreviated by taking advantage of the ability
+to combine actions and operations: <P>
+
+<PRE>
+     ...
+     *fwp++ = ENF_PUSHWORD + offset;
+     *fwp++ = ENF_PUSHLIT | ENF_EQ;
+     *fwp++ = htons(ETHERTYPE_REVARP);
+     ...
+</PRE>
+
+<DT></UL><H2> WARNINGS </H2><DD>
+
+<P>
+
+The module name `<B>pf</B>' used in the system configuration file
+and as argument to the I_PUSH <I> ioctl </I>
+
+is provisional and subject to change. <P>
+
+The <I> Pf_Priority </I>
+
+field of the <I> packetfilt </I>
+
+structure is likely to be removed.
+
+<DT></UL><H2> SEE ALSO  </H2><DD>
+
+<B>
+<A HREF="/man2html/inet.4f.html">inet</A></B>(4F), <B>
+<A HREF="/man2html/nit.4p.html">nit</A></B>(4P), <B>
+<A HREF="/man2html/nit_buf.4m.html">nit_buf</A></B>(4M), <B>
+<A HREF="/man2html/nit_if.4m.html">nit_if</A></B>(4M) <PRE>
+</PRE> </DL> <HR>
+SunOS manual pages can be browsed from the
+<A HREF="/man2html/index.html">top-level index</A>.  <P>
+<A HREF="/~watson/watson.html">
+<ADDRESS>watson@csd.abdn.ac.uk</ADDRESS> </A>
