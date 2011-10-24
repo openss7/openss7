@@ -45,7 +45,7 @@
 .\" IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
-.\" 
+.\"
 .\" Since the Linux kernel and libraries are constantly changing, this manual
 .\" page may be incorrect or out-of-date.  The author(s) assume no
 .\" responsibility for errors or omissions, or for damages resulting from the
@@ -53,7 +53,7 @@
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
-.\" 
+.\"
 .\" Formatted or processed versions of this manual, if unaccompanied by the
 .\" source, must acknowledge the copyright and authors of this work.
 .\"
@@ -75,10 +75,10 @@
 .\" FAR (or any successor regulations).
 .\"
 .\" =========================================================================
-.\" 
+.\"
 .\" Commercial licensing and support of this software is available from
 .\" OpenSS7 Corporation at a fee.  See http://www.openss7.com/
-.\" 
+.\"
 .\" =========================================================================
 .\"
 .\" Last Modified $Date: 2011-02-07 02:18:11 $ by $Author: brian $
@@ -121,9 +121,13 @@ search-ignore CGIQOSTU
 .PP
 .B #include <sys/stropts.h>
 .br
-.B #include <sys/sdli.h>
+.B #include <ss7/lmi.h>
 .br
-.B #include <sys/sdli_ioctl.h>
+.B #include <ss7/lmi_ioctl.h>
+.br
+.B #include <ss7/sdli.h>
+.br
+.B #include <ss7/sdli_ioctl.h>
 .HP
 .BI "struct strioctl *" arg ;
 .HP
@@ -134,7 +138,725 @@ search-ignore CGIQOSTU
 .\"
 .SH DESCRIPTION
 .PP
-.B THIS MANUAL PAGE IS INCOMPLETE AND MUST BE COMPLETED.
+All devices that support the Signalling Data Link Interface (SDLI),
+.[
+sdli
+.]
+.BR sdli (7),
+provide the set of Local Management Interface (LMI),
+.[
+lmi
+.]
+.BR lmi (7),
+input-output controls, as described generally in
+.BR lmi_ioctl (4).
+These input-output controls are tailored for use with the SDLI and use the
+.BR ioctl (2s)
+and
+.B I_STR
+command to the
+.BR streamio (7)
+system call on a file descriptor corresponding to the local management
+interface of the managed device.
+.SS Configuration
+.PP
+Configuration management input-output controls use the
+.B sdl_config
+structure defined in
+.IR <ss7/sdl_ioctl.h> .
+The
+.B sdl_config
+structure contains the following members:
+.TP \w'\fIifblksize\(em\(em'u
+.I ifname
+interface name
+.TP
+.I ifflags
+interface flags
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_IF_UP
+up.
+.PD 0
+.TP
+.B SDL_IF_RX_RUNNING
+actively receiving messages.
+.TP
+.B SDL_IF_TX_RUNNING
+actively transmitting messages.
+.PD
+.RE
+.TP
+.I iftype
+interface type
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_TYPE_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_TYPE_V35
+V.35 interface.
+.TP
+.B SDL_TYPE_DS0
+DS0 interface.
+.TP
+.B SDL_TYPE_DS0A
+DS0a interface.
+.TP
+.B SDL_TYPE_E1
+E1 interface.
+.TP
+.B SDL_TYPE_T1
+T1 interface.
+.TP
+.B SDL_TYPE_J1
+J1 interface.
+.TP
+.B SDL_TYPE_ATM
+ATM SAL interface.
+.TP
+.B SDL_TYPE_PACKET
+packet-based interface.
+.PD
+.PP
+It might not be possible for the manager to change this value.  For some
+devices, such as some chipsets supported by the X400P driver, it might be
+possible to change this value amoungst
+.BR SDL_TYPE_E1 ", " SDL_TYPE_T1 " and " SDL_TYPE_J1 .
+.RE
+.TP
+.I ifrate
+interface rate
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_RATE_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_RATE_DS0A
+56 kbps.
+.TP
+.B SDL_RATE_DS0
+64 kbps.
+.TP
+.B SDL_RATE_T1
+1.544 Mbps.
+.TP
+.B SDL_RATE_J1
+1.544 Mbps.
+.TP
+.B SDL_RATE_E1
+2.048 Mbps.
+.TP
+.B SDL_RATE_T2
+6.312 Mbps.
+.TP
+.B SDL_RATE_E2
+8.488 Mbps.
+.TP
+.B SDL_RATE_E3
+34.368 Mbps.
+.TP
+.B SDL_RATE_T3
+44.736 Mbps.
+.PD
+.RE
+.TP
+.I ifgtype
+group type
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_GTYPE_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_GTYPE_T1
+T1 carrier.
+.TP
+.B SDL_GTYPE_E1
+E1 carrier.
+.TP
+.B SDL_GTYPE_J1
+J1 carrier.
+.TP
+.B SDL_GTYPE_ATM
+ATM SAL.
+.TP
+.B SDL_GTYPE_ETH
+Ethernet.
+.TP
+.B SDL_GTYPE_IP
+Internet Protocol.
+.TP
+.B SDL_GTYPE_UDP
+User Datagram Protocol.
+.TP
+.B SDL_GTYPE_TCP
+Transmission Control Protocol.
+.TP
+.B SDL_GTYPE_RTP
+Real-Time Transport Protocol.
+.TP
+.B SDL_GTYPE_SCTP
+Stream Control Transmission Protocol.
+.TP
+.B SDL_GTYPE_T2
+T2 carrier.
+.TP
+.B SDL_GTYPE_E2
+E2 carrier.
+.TP
+.B SDL_GTYPE_E3
+E3 carrier.
+.TP
+.B SDL_GTYPE_T3
+T3 carrier.
+.TP
+.B SDL_GTYPE_OC3
+OC3 optical carrier.
+.TP
+.B SDL_GTYPE_OC12
+OC12 optical carrier.
+.TP
+.B SDL_GTYPE_OC48
+OC48 optical carrier.
+.TP
+.B SDL_GTYPE_OC192
+OC192 optical carrier.
+.PD
+.RE
+.TP
+.I ifgrate
+group rate
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_GRATE_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_GRATE_T1
+1.544 Mbps.
+.TP
+.B SDL_GRATE_J1
+1.544 Mbps.
+.TP
+.B SDL_GRATE_E1
+2.048 Mbps.
+.TP
+.B SDL_GRATE_T2
+6.312 Mbps.
+.TP
+.B SDL_GRATE_E2
+8.488 Mbps.
+.TP
+.B SDL_GRATE_E3
+34.368 Mbps.
+.TP
+.B SDL_GRATE_T3
+44.736 Mbps.
+.TP
+.B SDL_GRATE_OC3
+155.52 Mbps.
+.TP
+.B SDL_GRATE_OC12
+622.08 Mbps.
+.TP
+.B SDL_GRATE_OC48
+2.48832 Gbps.
+.TP
+.B SDL_GRATE_OC192
+9.95328 Gbps.
+.PD
+.RE
+.TP
+.I ifmode
+interface mode
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_MODE_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_MODE_DSU
+Data Service Unit.
+.TP
+.B SDL_MODE_CSU
+Channel Service Unit.
+.TP
+.B SDL_MODE_DTE
+Data Terminating Equipment.
+.TP
+.B SDL_MODE_DCE
+Data Control Equipment.
+.TP
+.B SDL_MODE_CLIENT
+client.
+.TP
+.B SDL_MODE_SERVER
+server.
+.TP
+.B SDL_MODE_PEER
+peer.
+.TP
+.B SDL_MODE_ECHO
+echo.
+.TP
+.B SDL_MODE_REM_LB
+remote loop-back.
+.TP
+.B SDL_MODE_LOC_LB
+local loop-back.
+.TP
+.B SDL_MODE_LB_ECHO
+local loop-back and echo.
+.TP
+.B SDL_MODE_TEST
+test.
+.PD
+.RE
+.TP
+.I ifgmode
+group mode
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_GMODE_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_GMODE_LOC_LB
+local loop-back.
+.TP
+.B SDL_GMODE_REM_LB
+remote loop-back.
+.TP
+.B SDL_GMODE_BOTH_LB
+local and remote loop-back.
+.PD
+.RE
+.TP
+.I ifgcrc
+group crc type
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_GCRC_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_GCRC_CRC4
+CRC4.
+.TP
+.B SDL_GCRC_CRC5
+CRC5.
+.TP
+.B SDL_GCRC_CRC6
+CRC6.
+.TP
+.B SDL_GCRC_CRC6J
+CRC6J.
+.PD
+.RE
+.TP
+.I ifclock
+interface clock
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_CLOCK_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_CLOCK_INT
+internal.
+.TP
+.B SDL_CLOCK_EXT
+external.
+.TP
+.B SDL_CLOCK_LOOP
+loop (Tx clock derived from recovered Rx clock).
+.TP
+.B SDL_CLOCK_MASTER
+master.
+.TP
+.B SDL_CLOCK_SLAVE
+slave.
+.TP
+.B SDL_CLOCK_DPLL
+digital phase-locked loop.
+.TP
+.B SDL_CLOCK_ABR
+average bit-rate.
+.TP
+.B SDL_CLOCK_SHAPER
+clock shaper algorithm.
+.TP
+.B SDL_CLOCK_TICK
+adaptive (system bus or tick clock).
+.PD
+.RE
+.TP
+.I ifcoding
+interface coding
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_CODING_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_CODING_NRZ
+non-return to zero.
+.TP
+.B SDL_CODING_NRZI
+non-return to zero inverted.
+.TP
+.B SDL_CODING_AMI
+alternate mark-space inversion.
+.TP
+.B SDL_CODING_B6ZS
+B6ZS.
+.TP
+.B SDL_CODING_B8ZS
+B8ZS.
+.TP
+.B SDL_CODING_HDB3
+HDB3.
+.TP
+.B SDL_CODING_AAL1
+ATM Adaption Layer 1.
+.TP
+.B SDL_CODING_AAL2
+ATM Adaption Layer 2.
+.TP
+.B SDL_CODING_AAL5
+ATM Adaption Layer 5.
+.PD
+.RE
+.TP
+.I ifframing
+interface framing
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_FRAMING_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_FRAMING_CCS
+common channel signalling (E1 only).
+.TP
+.B SDL_FRAMING_CAS
+channel associated signalling (E1 only).
+.TP
+.B SDL_FRAMING_SF
+super-frame (T1/J1 only).
+.TP
+.B SDL_FRAMING_ESF
+extended super-frame (T1/J1 only).
+.TP
+.B SDL_FRAMING_D4
+D4 framing (T1/J1 only).
+.PD
+.RE
+.TP
+.I ifblksize
+interface block size
+.TP
+.I ifleads
+interface leads
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_LEAD_DTR
+the data terminal ready lead.
+.PD 0
+.TP
+.B SDL_LEAD_RTS
+the request to send lead.
+.TP
+.B SDL_LEAD_DCD
+the data carrier detect lead.
+.TP
+.B SDL_LEAD_CTS
+the clear to send lead.
+.TP
+.B SDL_LEAD_DSR
+the data set ready lead.
+.PD
+.RE
+.TP
+.I ifbpv
+bipolar violations (E1/T1/J1)
+.TP
+.I ifalarms
+interface alarms (E1/T1/J1)
+.RS
+.TP \w'\fBSDL_IF_TX_RUNNING\(em'u
+.B SDL_ALARM_RED
+the span is experiencing a red alarm (loss of syncrhonization at the local
+end).
+.PD 0
+.TP
+.B SDL_ALARM_BLU
+the span is experiencing a blu alarm (crc error or span out of service).
+.TP
+.B SDL_ALARM_YEL
+the span is experiencing a yellow alarm (loss of synchronization at the
+remote end).
+.TP
+.B SDL_ALARM_REC
+the span is in alarm recovery.
+.PD
+.RE
+.TP
+.I ifrxlevel
+interface receive level
+.TP
+.I iftxlevel
+interface transmit level
+.RS
+.TP \w'\fBSDL_TXLEVEL_120OHM_HRL\ \(em'u
+.B SDL_TXLEVEL_NONE
+unknown or unspecified.
+.PD 0
+.TP
+.B SDL_TXLEVEL_DSX_133FT
+line build-out of 0 to 133 feet.
+.TP
+.B SDL_TXLEVEL_DSX_266FT
+line build-out of 133 to 266 feet.
+.TP
+.B SDL_TXLEVEL_DSX_399FT
+line build-out of 266 to 399 feet.
+.TP
+.B SDL_TXLEVEL_DSX_533FT
+line build-out of 399 to 533 feet.
+.TP
+.B SDL_TXLEVEL_DSX_666FT
+line build-out of 533 to 666 feet.
+.TP
+.B SDL_TXLEVEL_CSU_0DB
+0 dBrm.
+.TP
+.B SDL_TXLEVEL_CSU_8DB
+8 dBrm.
+.TP
+.B SDL_TXLEVEL_CSU_15DB
+15 dBrm.
+.TP
+.B SDL_TXLEVEL_CSU_23DB
+23 dBrm.
+.TP
+.B SDL_TXLEVEL_75OHM_NM
+balanced 75 Ohm.
+.TP
+.B SDL_TXLEVEL_120OHM_NM
+balanced 120 Ohm.
+.TP
+.B SDL_TXLEVEL_75OHM_PR
+balanced 75 Ohm.
+.TP
+.B SDL_TXLEVEL_120OHM_PR
+balanced 120 Ohm.
+.TP
+.B SDL_TXLEVEL_75OHM_HRL
+balanced 75 Ohm (high return loss).
+.TP
+.B SDL_TXLEVEL_120OHM_HRL
+balanced 120 Ohm (high return loss).
+.TP
+.B SDL_TXLEVEL_MON_0DB
+monitoring with 0 dB gain.
+.TP
+.B SDL_TXLEVEL_MON_12DB
+monitoring with 12 dB gain.
+.TP
+.B SDL_TXLEVEL_MON_20DB
+monitoring with 20 dB gain.
+.TP
+.B SDL_TXLEVEL_MON_26DB
+monitoring with 26 dB gain.
+.TP
+.B SDL_TXLEVEL_MON_30DB
+monitoring with 30 dB gain.
+.TP
+.B SDL_TXLEVEL_MON_32DB
+monitoring with 32 dB gain.
+.PD
+.RE
+.TP
+.I ifsync
+interface synchronization source (E1/T1/J1)
+.TP
+.I ifsyncsrc[SDL_SYNCS]
+interace synchronization sources (E1/T1/J1)
+.\"
+.SS State
+.PP
+.TP \w'\fIifblksize\(em'u
+.I tx_state
+.RS
+.TP \w'\fBSDL_STATE_IN_SERVICE\ \(em'u
+.B SDL_STATE_IDLE
+idle.
+.PD 0
+.TP
+.B SDL_STATE_IN_SERVICE
+in-service.
+.TP
+.B SDL_STATE_CONGESTED
+in-service congested.
+.PD
+.RE
+.TP
+.I rx_state
+.RS
+.TP \w'\fBSDL_STATE_IN_SERVICE\ \(em'u
+.B SDL_STATE_IDLE
+idle.
+.PD 0
+.TP
+.B SDL_STATE_IN_SERVICE
+in-service.
+.TP
+.B SDL_STATE_CONGESTED
+in-service congested.
+.PD
+.RE
+.\"
+.SS Statistics
+.PP
+Statistics management input-output controls use the
+.B sdl_stats
+structure defined in
+.IR <ss7/sdli_ioctl.h> .
+The
+.B sdl_stats
+structure contains the following members:
+.TP \w'\fIifblksize\(em'u
+.I header
+contains a Local Management Interface (LMI),
+.[
+lmi
+.]
+.BR lmi (7),
+common header.
+.RS
+.TP \w'\fItimestamp\(em'u
+.I object_id
+object identifier for the statistics that follow.
+This OID identifies the Signalling Data Link to which the statistics apply.
+.TP
+.I colperiod
+collection period.  The collection period is typically 5-minutes or
+15-minutes, but may be set to tighter values for special studies.
+.TP
+.I timestamp
+timestamp at end of collection period.  The time at which the statistics were
+collected.
+.RE
+.TP
+.I rx_octets
+the number of octets received from the line.  This is (more accurately) the
+number of octets read from the RX FIFO.  When there are no overruns of the
+RX FIFO, this represents the line octet time.
+.TP
+.I tx_octets
+the number of octets sent on the line.  This is (more accurately) the number
+of octets written to the TX FIFO.  When there are no underruns of the TX
+FIFO, this represents the line octet time.
+.TP
+.I rx_overruns
+the number of receiver FIFO overruns.
+.IP ""
+The receiver is implemented as a FIFO between device firmware and driver
+software.  The device writes received octets to the FIFO at the line rate,
+and the software driver reads octets from the FIFO.  Should the hardware need
+to write octets to the FIFO when the FIFO is full, a receiver FIFO overrun
+condition occurs.  Only one octet is lost on each overrun.
+.IP ""
+For OpenSS7 drivers, this value is always zero (0) under normal operating
+conditions.  Any non-zero value indicates a software or performance problem.
+.TP
+.I tx_underruns
+the number of transmitter FIFO underruns.
+.IP ""
+The transmitter is implemented as a FIFO between driver software and device
+firmware.  The driver software write octets for transmission to the FIFO and
+the device firmware reads octets from the FIFO at the line rate.  Should the
+hardware need to read octets from the FIFO when the FIFO is empty, a transmit
+FIFO underrun condition occurs.  Typically, hardware will insert an 'one
+zero, seven ones' or 'all ones' octet which serves to abort any HDLC frame in
+progress.
+.IP ""
+For OpenSS7 drivers, this value is always zero (0) under normal operating
+conditions.  Any non-zero value indicates a software or performance problem.
+.TP
+.I rx_buffer_overflows
+the number of receive buffer overflows.
+.IP ""
+The device driver implements a receive buffer between the device and the
+application using the device driver.  This is similar to a FIFO but is much
+larger and is not necessarily read or written at a syncrhonous rate on either
+end.  Also, it is not necessarily fixed in size.  If the application does not
+read data from the buffer fast enough, it will overflow.  This statistic
+counts the number of overflow conditions.  Each overflow condition will
+destroy the number of octets indicated by the
+.I ifblksize
+field in the configuration structure.
+.IP ""
+For OpenSS7 drivers, this value is always zero (0) under normal operating
+conditions.  Any non-zero value indicates a software or performance problem.
+.TP
+.I tx_buffer_overflows
+the number of transmit buffer overflows.
+.IP ""
+The device driver implements a transmit buffer between the application using
+the device driver and the device.  This is similar to a FIFO but is much
+larger and is not necessarily read or written at a synchronous rate on either
+end.  Also, it is not necessarily fixed in size.  If the application writes
+data to the buffer too fast, it will overflow.  This statistic counts the
+number of overflow conditions.  Each overflow condition will destroy the
+number of octets indicated by the
+.I ifblksize
+field in the configuration structure.
+.IP ""
+For OpenSS7 drivers, this value is always zero (0) under normal operating
+conditions.  Any non-zero value indicates a software or performance problem.
+.TP
+.I lead_cts_lost
+the number of CTS lost conditions.
+Indicates the number of times that the clear-to-send (CTS) lead transitioned
+from the asserted to deasserted states.  This statistic is applicable only to
+V.35 interfaces.
+.TP
+.I lead_dcd_lost
+the number of DCD lost conditions.
+Indicates the number of times that the data-carrier-detect (DCD) lead
+transitioned from the asserted to deasserted states.  This statistic is
+applicable only to V.35 interfaces.
+.TP
+.I carrier_lost
+the number of carrier-lost conditions.
+Indicates the number of red alarm or loss of carrier conditions.  This
+statistic is applicable only to E1/T1/J1 interfaces.
+.\"
+.SS Events
+.PP
+.TP \w'\fIifblksize\(em'u
+.I events
+.RS
+.TP \w'\fBSDL_EVT_LOST_SYNC\ \(em'u
+.B SDL_EVT_LOST_SYNC
+the receiver lost synchronization.
+.PD 0
+.TP
+.B SDL_EVT_SU_ERROR
+a signal unit was received in error.
+.TP
+.B SDL_EVT_TX_FAIL
+the transmitter has failed.
+.TP
+.B SDL_EVT_RX_FAIL
+the receiver has failed.
+.PD
+.RE
 .\"
 .\"
 .SH IOCTLS
