@@ -547,11 +547,11 @@ endif
 if CONFIG_STREAMS_STH
 libOS7streams_a_SOURCES	       += src/modules/sth.c src/modules/sth.h
 endif
-if CONFIG_STREAMS_BUFMOD_MODULE
-libOS7modules_a_SOURCES	       += src/modules/bufmod.c
+if CONFIG_STREAMS_SRVMOD_MODULE
+libOS7modules_a_SOURCES	       += src/modules/srvmod.c
 endif
-if CONFIG_STREAMS_BUFMOD
-libOS7streams_a_SOURCES	       += src/modules/bufmod.c
+if CONFIG_STREAMS_SRVMOD
+libOS7streams_a_SOURCES	       += src/modules/srvmod.c
 endif
 if CONFIG_STREAMS_NULLMOD_MODULE
 libOS7modules_a_SOURCES	       += src/modules/nullmod.c
@@ -595,6 +595,30 @@ libOS7modules_a_SOURCES	       += src/modules/tirdwr.c
 endif
 if CONFIG_STREAMS_TIRDWR
 libOS7streams_a_SOURCES	       += src/modules/tirdwr.c
+endif
+if CONFIG_STREAMS_BUFMOD_MODULE
+libOS7streams_a_SOURCES		+= src/modules/bufmod.c
+endif
+if CONFIG_STREAMS_BUFMOD
+libOS7streams_a_SOURCES		+= src/modules/bufmod.c
+endif
+if CONFIG_STREAMS_PFMOD_MODULE
+libOS7streams_a_SOURCES		+= src/modules/pfmod.c
+endif
+if CONFIG_STREAMS_PFMOD
+libOS7streams_a_SOURCES		+= src/modules/pfmod.c
+endif
+if CONFIG_STREAMS_NBUF_MODULE
+libOS7streams_a_SOURCES		+= src/modules/nit_buf.c
+endif
+if CONFIG_STREAMS_NBUF
+libOS7streams_a_SOURCES		+= src/modules/nit_buf.c
+endif
+if CONFIG_STREAMS_PF_MODULE
+libOS7streams_a_SOURCES		+= src/modules/nit_pf.c
+endif
+if CONFIG_STREAMS_PF
+libOS7streams_a_SOURCES		+= src/modules/nit_pf.c
 endif
 
 ## =====================================================================

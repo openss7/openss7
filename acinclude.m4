@@ -324,12 +324,12 @@ dnl--------------------------------------------------------------------------
     AM_CONDITIONAL([CONFIG_STREAMS_STH], [test :"${enable_module_sth:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_STH_MODULE], [test :"${enable_module_sth:-module}" = :module])
 dnl--------------------------------------------------------------------------
-    AC_ARG_ENABLE([module-bufmod],
-	[AS_HELP_STRING([--enable-module-bufmod],
-	    [bufmod linked with STREAMS @<:@default=module@:>@])])
-    case "${enable_module_bufmod:-module}" in (yes|no) ;; (*) enable_module_bufmod=module ;; esac
-    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD], [test :"${enable_module_bufmod:-module}" = :yes])
-    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD_MODULE], [test :"${enable_module_bufmod:-module}" = :module])
+    AC_ARG_ENABLE([module-srvmod],
+	[AS_HELP_STRING([--enable-module-srvmod],
+	    [srvmod linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_srvmod:-module}" in (yes|no) ;; (*) enable_module_srvmod=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_SRVMOD], [test :"${enable_module_srvmod:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_SRVMOD_MODULE], [test :"${enable_module_srvmod:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([module-nullmod],
 	[AS_HELP_STRING([--enable-module-nullmod],
@@ -379,6 +379,34 @@ dnl--------------------------------------------------------------------------
     case "${enable_module_tirdwr:-module}" in (yes|no) ;; (*) enable_module_tirdwr=module ;; esac
     AM_CONDITIONAL([CONFIG_STREAMS_TIRDWR], [test :"${enable_module_tirdwr:-module}" = :yes])
     AM_CONDITIONAL([CONFIG_STREAMS_TIRDWR_MODULE], [test :"${enable_module_tirdwr:-module}" = :module])
+dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([module-bufmod],
+	[AS_HELP_STRING([--enable-module-bufmod],
+	    [bufmod linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_bufmod:-module}" in (yes|no) ;; (*) enable_module_bufmod=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD], [test :"${enable_module_bufmod:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_BUFMOD_MODULE], [test :"${enable_module_bufmod:-module}" = :module])
+dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([module-pfmod],
+	[AS_HELP_STRING([--enable-module-pfmod],
+	    [pfmod linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_pfmod:-module}" in (yes|no) ;; (*) enable_module_pfmod=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_PFMOD], [test :"${enable_module_pfmod:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PFMOD_MODULE], [test :"${enable_module_pfmod:-module}" = :module])
+dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([module-nbuf],
+	[AS_HELP_STRING([--enable-module-nbuf],
+	    [nbuf linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_nbuf:-module}" in (yes|no) ;; (*) enable_module_nbuf=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_NBUF], [test :"${enable_module_nbuf:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_NBUF_MODULE], [test :"${enable_module_nbuf:-module}" = :module])
+dnl--------------------------------------------------------------------------
+    AC_ARG_ENABLE([module-pf],
+	[AS_HELP_STRING([--enable-module-pf],
+	    [pf linked with STREAMS @<:@default=module@:>@])])
+    case "${enable_module_pf:-module}" in (yes|no) ;; (*) enable_module_pf=module ;; esac
+    AM_CONDITIONAL([CONFIG_STREAMS_PF], [test :"${enable_module_pf:-module}" = :yes])
+    AM_CONDITIONAL([CONFIG_STREAMS_PF_MODULE], [test :"${enable_module_pf:-module}" = :module])
 dnl--------------------------------------------------------------------------
     AC_ARG_ENABLE([driver-clone],
 	[AS_HELP_STRING([--enable-driver-clone],
@@ -3540,23 +3568,23 @@ dnl--------------------------------------------------------------------------
 	    ;;
     esac
 dnl--------------------------------------------------------------------------
-    AC_MSG_CHECKING([for STREAMS module bufmod])
-	if test :"${enable_module_bufmod:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
-	    enable_module_bufmod='yes'
+    AC_MSG_CHECKING([for STREAMS module srvmod])
+	if test :"${enable_module_srvmod:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_srvmod='yes'
 	fi
-    AC_MSG_RESULT([${enable_module_bufmod:-module}])
-    case "${enable_module_bufmod:-module}" in
+    AC_MSG_RESULT([${enable_module_srvmod:-module}])
+    case "${enable_module_srvmod:-module}" in
 	(yes)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_BUFMOD], [1], [When defined,]
-		AC_PACKAGE_TITLE [ will include the bufmod module for linkage
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SRVMOD], [1], [When defined,]
+		AC_PACKAGE_TITLE [ will include the srvmod module for linkage
 		with STREAMS.  When undefined,] AC_PACKAGE_TITLE [will not
-		include the bufmod module for linkage with STREAMS.])
+		include the srvmod module for linkage with STREAMS.])
 	    ;;
 	(module)
-	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_BUFMOD_MODULE], [1], [When
-		defined,] AC_PACKAGE_TITLE [will include the bufmod module as a
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_SRVMOD_MODULE], [1], [When
+		defined,] AC_PACKAGE_TITLE [will include the srvmod module as a
 		standalone loadable kernel module.  When undefined,]
-		AC_PACKAGE_TITLE [will not include the bufmod module as a
+		AC_PACKAGE_TITLE [will not include the srvmod module as a
 		standalone loadable kernel module.])
 	    ;;
     esac
@@ -3703,6 +3731,90 @@ dnl--------------------------------------------------------------------------
 		defined,] AC_PACKAGE_TITLE [will include the tirdwr module as a
 		standalone loadable kernel module.  When undefined,]
 		AC_PACKAGE_TITLE [will not include the tirdwr module as a
+		standalone loadable kernel module.])
+	    ;;
+    esac
+dnl--------------------------------------------------------------------------
+    AC_MSG_CHECKING([for STREAMS module bufmod])
+	if test :"${enable_module_bufmod:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_bufmod='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_bufmod:-module}])
+    case "${enable_module_bufmod:-module}" in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_BUFMOD], [1], [When defined,]
+		AC_PACKAGE_TITLE [ will include the bufmod module for linkage
+		with STREAMS.  When undefined,] AC_PACKAGE_TITLE [will not
+		include the bufmod module for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_BUFMOD_MODULE], [1], [When
+		defined,] AC_PACKAGE_TITLE [will include the bufmod module as a
+		standalone loadable kernel module.  When undefined,]
+		AC_PACKAGE_TITLE [will not include the bufmod module as a
+		standalone loadable kernel module.])
+	    ;;
+    esac
+dnl--------------------------------------------------------------------------
+    AC_MSG_CHECKING([for STREAMS module pfmod])
+	if test :"${enable_module_pfmod:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_pfmod='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_pfmod:-module}])
+    case "${enable_module_pfmod:-module}" in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PFMOD], [1], [When defined,]
+		AC_PACKAGE_TITLE [ will include the pfmod module for linkage
+		with STREAMS.  When undefined,] AC_PACKAGE_TITLE [will not
+		include the pfmod module for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PFMOD_MODULE], [1], [When
+		defined,] AC_PACKAGE_TITLE [will include the pfmod module as a
+		standalone loadable kernel module.  When undefined,]
+		AC_PACKAGE_TITLE [will not include the pfmod module as a
+		standalone loadable kernel module.])
+	    ;;
+    esac
+dnl--------------------------------------------------------------------------
+    AC_MSG_CHECKING([for STREAMS module nbuf])
+	if test :"${enable_module_nbuf:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_nbuf='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_nbuf:-module}])
+    case "${enable_module_nbuf:-module}" in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NBUF], [1], [When defined,]
+		AC_PACKAGE_TITLE [ will include the nbuf module for linkage
+		with STREAMS.  When undefined,] AC_PACKAGE_TITLE [will not
+		include the nbuf module for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_NBUF_MODULE], [1], [When
+		defined,] AC_PACKAGE_TITLE [will include the nbuf module as a
+		standalone loadable kernel module.  When undefined,]
+		AC_PACKAGE_TITLE [will not include the nbuf module as a
+		standalone loadable kernel module.])
+	    ;;
+    esac
+dnl--------------------------------------------------------------------------
+    AC_MSG_CHECKING([for STREAMS module pf])
+	if test :"${enable_module_pf:-module}" = :module -a :${linux_cv_k_linkage:-loadable} = :linkable ; then
+	    enable_module_pf='yes'
+	fi
+    AC_MSG_RESULT([${enable_module_pf:-module}])
+    case "${enable_module_pf:-module}" in
+	(yes)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PF], [1], [When defined,]
+		AC_PACKAGE_TITLE [ will include the pf module for linkage
+		with STREAMS.  When undefined,] AC_PACKAGE_TITLE [will not
+		include the pf module for linkage with STREAMS.])
+	    ;;
+	(module)
+	    AC_DEFINE_UNQUOTED([CONFIG_STREAMS_PF_MODULE], [1], [When
+		defined,] AC_PACKAGE_TITLE [will include the pf module as a
+		standalone loadable kernel module.  When undefined,]
+		AC_PACKAGE_TITLE [will not include the pf module as a
 		standalone loadable kernel module.])
 	    ;;
     esac

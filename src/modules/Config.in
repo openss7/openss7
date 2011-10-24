@@ -59,7 +59,7 @@
 ## -----------------------------------------------------------
 ##	name	    prefix
 module	sth	    sth
-module	bufmod	    bufmod
+module	srvmod	    srvmod
 module	connld	    connld
 module	nullmod	    nullmod
 module	pipemod	    pipemod
@@ -68,6 +68,11 @@ module	testmod	    testmod
 
 module	timod	    timod
 module	tirdwr	    tirdwr
+
+module	bufmod	    bufmod
+module	pfmod	    pfmod
+module	nbuf	    nbuf
+module	pf	    pf
 
 module	mstr	    mstr
 
@@ -137,7 +142,7 @@ module	xot	    xot
 ## Object name specifications
 ## -----------------------------------------------------------
 ##	type	name	    object name
-objname	module	bufmod	    bufmod
+objname	module	srvmod	    srvmod
 objname	module	connld	    connld
 objname	module	nullmod	    nullmod
 objname	module	pipemod	    pipemod
@@ -147,6 +152,11 @@ objname	module	testmod	    testmod
 
 objname	module	timod	    timod
 objname	module	tirdwr	    tirdwr
+
+objname	module	bufmod	    bufmod
+objname	module	pfmod	    pfmod
+objname	module	nbuf	    nit_buf
+objname	module	pf	    nit_pf
 
 objname	module	mstr	    mstr
 
@@ -221,7 +231,7 @@ objname	module	zaptel	    zaptel
 ## Loadable specifications
 ## -----------------------------------------------------------
 ##		name
-@CONFIG_STREAMS_BUFMOD_MODULE_TRUE@loadable	bufmod
+@CONFIG_STREAMS_SRVMOD_MODULE_TRUE@loadable	srvmod
 @CONFIG_STREAMS_CONNLD_MODULE_TRUE@loadable	connld
 @CONFIG_STREAMS_NULLMOD_MODULE_TRUE@loadable	nullmod
 @CONFIG_STREAMS_PIPEMOD_MODULE_TRUE@loadable	pipemod
@@ -231,6 +241,11 @@ objname	module	zaptel	    zaptel
 
 @CONFIG_STREAMS_TIMOD_MODULE_TRUE@loadable	timod
 @CONFIG_STREAMS_TIRDWR_MODULE_TRUE@loadable	tirdwr
+
+@CONFIG_STREAMS_BUFMOD_MODULE_TRUE@loadable	bufmod
+@CONFIG_STREAMS_PFMOD_MODULE_TRUE@loadable	pfmod
+@CONFIG_STREAMS_NBUF_MODULE_TRUE@loadable	nbuf
+@CONFIG_STREAMS_PF_MODULE_TRUE@loadable	pf
 
 loadable	mstr
 
@@ -305,7 +320,7 @@ loadable	zaptel
 ##
 ## Initialization specifications
 ##
-@CONFIG_STREAMS_BUFMOD_MODULE_FALSE@initialize	bufmod
+@CONFIG_STREAMS_SRVMOD_MODULE_FALSE@initialize	srvmod
 @CONFIG_STREAMS_CONNLD_MODULE_FALSE@initialize	connld
 @CONFIG_STREAMS_NULLMOD_MODULE_FALSE@initialize	nullmod
 @CONFIG_STREAMS_PIPEMOD_MODULE_FALSE@initialize	pipemod
@@ -316,10 +331,15 @@ loadable	zaptel
 @CONFIG_STREAMS_TIMOD_MODULE_FALSE@initialize	timod
 @CONFIG_STREAMS_TIRDWR_MODULE_FALSE@initialize	tirdwr
 
+@CONFIG_STREAMS_BUFMOD_MODULE_FALSE@initialize	bufmod
+@CONFIG_STREAMS_PFMOD_MODULE_FALSE@initialize	pfmod
+@CONFIG_STREAMS_NBUF_MODULE_FALSE@initialize	nbuf
+@CONFIG_STREAMS_PF_MODULE_FALSE@initialize	pf
+
 ##
 ## Termination specifications
 ##
-@CONFIG_STREAMS_BUFMOD_MODULE_FALSE@terminate	bufmod
+@CONFIG_STREAMS_SRVMOD_MODULE_FALSE@terminate	srvmod
 @CONFIG_STREAMS_CONNLD_MODULE_FALSE@terminate	connld
 @CONFIG_STREAMS_NULLMOD_MODULE_FALSE@terminate	nullmod
 @CONFIG_STREAMS_PIPEMOD_MODULE_FALSE@terminate	pipemod
@@ -329,6 +349,11 @@ loadable	zaptel
 
 @CONFIG_STREAMS_TIMOD_MODULE_FALSE@terminate	timod
 @CONFIG_STREAMS_TIRDWR_MODULE_FALSE@terminate	tirdwr
+
+@CONFIG_STREAMS_BUFMOD_MODULE_FALSE@terminate	bufmod
+@CONFIG_STREAMS_PFMOD_MODULE_FALSE@terminate	pfmod
+@CONFIG_STREAMS_NBUF_MODULE_FALSE@terminate	nbuf
+@CONFIG_STREAMS_PF_MODULE_FALSE@terminate	pf
 
 ##   Node specifications
 ## -----------------------------------------------------------

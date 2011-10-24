@@ -153,20 +153,20 @@ be compiled into the @file{streams} kernel module; when disabled, the @file{sth}
 included at all.  Note that disabling the @file{sth} module will cause all Streams to fail.  The
 default is for the @file{sth} module to be created as a separate module.
 
-@item --enable-module-bufmod
-@itemx --disable-module-bufmod
-@opindex module-bufmod
-Enables or disables the @file{bufmod} module.  When enabled, the @file{bufmod} module will be
-compiled into the @file{streams} kernel module; when disabled, the @file{bufmod} module will not be
-included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
-The default is for the @file{bufmod} module to be created as a separate module.
+@item --enable-module-srvmod
+@itemx --disable-module-srvmod
+@opindex module-srvmod
+Enables or disables the @file{srvmod} module.  When enabled, the @file{srvmod} module will be
+compiled into the @file{streams} kernel module; when disabled, the @file{srvmod} module will not be
+included at all.  Note that disabling the @file{srvmod} module will cause conformance suites to fail.
+The default is for the @file{srvmod} module to be created as a separate module.
 
 @item --enable-module-nullmod
 @itemx --disable-module-nullmod
 @opindex module-nullmod
 Enables or disables the @file{nullmod} module.  When enabled, the @file{nullmod} module will be
 compiled into the @file{streams} kernel module; when disabled, the @file{nullmod} module will not be
-included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+included at all.  Note that disabling the @file{nullmod} module will cause conformance suites to fail.
 The default is for the @file{nuls} module to be created as a separate module.
 
 @item --enable-module-pipemod
@@ -174,7 +174,7 @@ The default is for the @file{nuls} module to be created as a separate module.
 @opindex module-pipemod
 Enables or disables the @file{pipemod} module.  When enabled, the @file{pipemod} module will be
 compiled into the @file{streams} kernel module; when disabled, the @file{pipemod} module will not be
-included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+included at all.  Note that disabling the @file{pipemod} module will cause conformance suites to fail.
 The default is for the @file{pipemod} module to be created as a separate module.
 
 @item --enable-module-connld
@@ -182,7 +182,7 @@ The default is for the @file{pipemod} module to be created as a separate module.
 @opindex module-connld
 Enables or disables the @file{connld} module.  When enabled, the @file{connld} module will be
 compiled into the @file{streams} kernel module; when disabled, the @file{connld} module will not be
-included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+included at all.  Note that disabling the @file{connld} module will cause conformance suites to fail.
 The default is for the @file{connld} module to be created as a separate module.
 
 @item --enable-module-sc
@@ -190,7 +190,7 @@ The default is for the @file{connld} module to be created as a separate module.
 @opindex module-sc
 Enables or disables the @file{sc} module.  When enabled, the @file{sc} module will be compiled into
 the @file{streams} kernel module; when disabled, the @file{sc} module will not be included at all.
-Note that disabling the @file{sth} module will cause conformance suites to fail.  The default is for
+Note that disabling the @file{sc} module will cause conformance suites to fail.  The default is for
 the @file{sc} module to be created as a separate module.
 
 @item --enable-module-testmod
@@ -198,7 +198,7 @@ the @file{sc} module to be created as a separate module.
 @opindex module-testmod
 Enables or disables the @file{testmod} module.  When enabled, the @file{testmod} module will be
 compiled into the @file{streams} kernel module; when disabled, the @file{testmod} module will not be
-included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+included at all.  Note that disabling the @file{testmod} module will cause conformance suites to fail.
 The default is for the @file{testmod} module to be created as a separate module.
 
 @item --enable-module-timod
@@ -206,7 +206,7 @@ The default is for the @file{testmod} module to be created as a separate module.
 @opindex module-timod
 Enables or disables the @file{timod} module.  When enabled, the @file{timod} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{timod} module will not be included
-at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The
+at all.  Note that disabling the @file{timod} module will cause conformance suites to fail.  The
 default is for the @file{timod} module to be created as a separate module.
 
 @item --enable-module-tirdwr
@@ -214,15 +214,47 @@ default is for the @file{timod} module to be created as a separate module.
 @opindex module-tirdwr
 Enables or disables the @file{tirdwr} module.  When enabled, the @file{tirdwr} module will be
 compiled into the @file{streams} kernel module; when disabled, the @file{tirdwr} module will not be
-included at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.
+included at all.  Note that disabling the @file{tirdwr} module will cause conformance suites to fail.
 The default is for the @file{tirdwr} module to be created as a separate module.
+
+@item --enable-module-bufmod
+@itemx --disable-module-bufmod
+@opindex module-bufmod
+Enables or disables the @file{bufmod} module.  When enabled, the @file{bufmod} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{bufmod} module will not be included
+at all.  Note that disabling the @file{bufmod} module will cause conformance suites to fail.  The
+default is for the @file{bufmod} module to be created as a separate module.
+
+@item --enable-module-pfmod
+@itemx --disable-module-pfmod
+@opindex module-pfmod
+Enables or disables the @file{pfmod} module.  When enabled, the @file{pfmod} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{pfmod} module will not be included
+at all.  Note that disabling the @file{pfmod} module will cause conformance suites to fail.  The
+default is for the @file{pfmod} module to be created as a separate module.
+
+@item --enable-module-nbuf
+@itemx --disable-module-nbuf
+@opindex module-nbuf
+Enables or disables the @file{nbuf} module.  When enabled, the @file{nbuf} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{nbuf} module will not be included
+at all.  Note that disabling the @file{nbuf} module will cause conformance suites to fail.  The
+default is for the @file{nbuf} module to be created as a separate module.
+
+@item --enable-module-pf
+@itemx --disable-module-pf
+@opindex module-pf
+Enables or disables the @file{pf} module.  When enabled, the @file{pf} module will be compiled
+into the @file{streams} kernel module; when disabled, the @file{pf} module will not be included
+at all.  Note that disabling the @file{pf} module will cause conformance suites to fail.  The
+default is for the @file{pf} module to be created as a separate module.
 
 @item --enable-driver-clone
 @itemx --disable-driver-clone
 @opindex driver-clone
 Enables or disables the @file{clone} module.  When enabled, the @file{clone} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{clone} module will not be included
-at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The
+at all.  Note that disabling the @file{clone} module will cause conformance suites to fail.  The
 default is for the @file{clone} driver to be created as a separate module.
 
 @item --enable-driver-echo
@@ -230,7 +262,7 @@ default is for the @file{clone} driver to be created as a separate module.
 @opindex driver-echo
 Enables or disables the @file{echo} module.  When enabled, the @file{echo} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{echo} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{echo} module will cause conformance suites to fail.  The default
 is for the @file{echo} driver to be created as a separate module.
 
 @item --enable-driver-fifo
@@ -238,7 +270,7 @@ is for the @file{echo} driver to be created as a separate module.
 @opindex driver-fifo
 Enables or disables the @file{fifo} module.  When enabled, the @file{fifo} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{fifo} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{fifo} module will cause conformance suites to fail.  The default
 is for the @file{fifo} driver to be created as a separate module.
 
 @item --enable-driver-log
@@ -246,7 +278,7 @@ is for the @file{fifo} driver to be created as a separate module.
 @opindex driver-log
 Enables or disables the @file{log} module.  When enabled, the @file{log} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{log} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{log} module will cause conformance suites to fail.  The default
 is for the @file{log} driver to be created as a separate module.
 
 @item --enable-driver-loop
@@ -254,7 +286,7 @@ is for the @file{log} driver to be created as a separate module.
 @opindex driver-loop
 Enables or disables the @file{loop} module.  When enabled, the @file{loop} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{loop} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{loop} module will cause conformance suites to fail.  The default
 is for the @file{loop} driver to be created as a separate module.
 
 @item --enable-driver-nsdev
@@ -262,7 +294,7 @@ is for the @file{loop} driver to be created as a separate module.
 @opindex driver-nsdev
 Enables or disables the @file{nsdev} module.  When enabled, the @file{nsdev} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{nsdev} module will not be included
-at all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The
+at all.  Note that disabling the @file{nsdev} module will cause conformance suites to fail.  The
 default is for the @file{nsdev} driver to be created as a separate module.
 
 @item --enable-driver-mux
@@ -270,7 +302,7 @@ default is for the @file{nsdev} driver to be created as a separate module.
 @opindex driver-mux
 Enables or disables the @file{mux} module.  When enabled, the @file{mux} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{mux} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{mux} module will cause conformance suites to fail.  The default
 is for the @file{mux} driver to be created as a separate module.
 
 @item --enable-driver-nuls
@@ -278,7 +310,7 @@ is for the @file{mux} driver to be created as a separate module.
 @opindex driver-nuls
 Enables or disables the @file{nuls} module.  When enabled, the @file{nuls} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{nuls} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{nuls} module will cause conformance suites to fail.  The default
 is for the @file{nuls} driver to be created as a separate module.
 
 @item --enable-driver-pipe
@@ -286,7 +318,7 @@ is for the @file{nuls} driver to be created as a separate module.
 @opindex driver-pipe
 Enables or disables the @file{pipe} module.  When enabled, the @file{pipe} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{pipe} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{pipe} module will cause conformance suites to fail.  The default
 is for the @file{pipe} driver to be created as a separate module.
 
 @item --enable-driver-sad
@@ -294,7 +326,7 @@ is for the @file{pipe} driver to be created as a separate module.
 @opindex driver-sad
 Enables or disables the @file{sad} module.  When enabled, the @file{sad} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{sad} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{sad} module will cause conformance suites to fail.  The default
 is for the @file{sad} driver to be created as a separate module.
 
 @item --enable-driver-sfx
@@ -302,7 +334,7 @@ is for the @file{sad} driver to be created as a separate module.
 @opindex driver-sfx
 Enables or disables the @file{sfx} module.  When enabled, the @file{sfx} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{sfx} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{sfx} module will cause conformance suites to fail.  The default
 is for the @file{sfx} driver to be created as a separate module.
 
 @item --enable-driver-spx
@@ -310,7 +342,7 @@ is for the @file{sfx} driver to be created as a separate module.
 @opindex driver-spx
 Enables or disables the @file{spx} module.  When enabled, the @file{spx} module will be compiled
 into the @file{streams} kernel module; when disabled, the @file{spx} module will not be included at
-all.  Note that disabling the @file{sth} module will cause conformance suites to fail.  The default
+all.  Note that disabling the @file{spx} module will cause conformance suites to fail.  The default
 is for the @file{spx} driver to be created as a separate module.
 
 @item --enable-compat-os7

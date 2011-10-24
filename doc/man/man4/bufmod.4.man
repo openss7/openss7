@@ -2,7 +2,7 @@
 .\" vim: ft=nroff sw=4 noet nocin nosi com=b\:.\\\" fo+=tcqlorn tw=77
 .\" =========================================================================
 .\"
-.\" @(#) $Id: bufmod.4.man,v 1.1.2.3 2011-02-07 02:18:09 brian Exp $
+.\" @(#) $Id$
 .\"
 .\" =========================================================================
 .\"
@@ -12,18 +12,18 @@
 .\"
 .\" All Rights Reserved.
 .\"
-.\" Permission is granted to copy, distribute and/or modify this manual under
-.\" the terms of the GNU Free Documentation License, Version 1.3 or any later
-.\" version published by the Free Software Foundation; with no Invariant
-.\" Sections, no Front-Cover Texts, and no Back-Cover Texts.  A copy of the
-.\" license is included in the section entitled "GNU Free Documentation
-.\" License".
+.\" Permission is granted to copy, distribute and/or modify this manual
+.\" under the terms of the GNU Free Documentation License, Version 1.3 or
+.\" any later version published by the Free Software Foundation; with no
+.\" Invariant Sections, no Front-Cover Texts, and no Back-Cover Texts.  A
+.\" copy of the license is included in the section entitled "GNU Free
+.\" Documentation License".
 .\"
 .\" Permission to use, copy and distribute this manual without modification,
 .\" for any purpose and without fee or royalty is hereby granted, provided
 .\" that both the above copyright notice and this permission notice appears
 .\" in all copies and that the name of OpenSS7 Corporation not be used in
-.\" advertising or publicity pertaining to distribution of this documentation
+.\" advertising or publicity pertaning to distribution of this documentation
 .\" or its contents without specific, written prior permission.  OpenSS7
 .\" Corporation makes no representation about the suitability of this manual
 .\" for any purpose.  It is provided "as is" without express or implied
@@ -37,8 +37,8 @@
 .\" OPENSS7 CORPORATION DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS MANUAL
 .\" INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A
 .\" PARTICULAR PURPOSE, NON-INFRINGEMENT, OR TITLE; THAT THE CONTENTS OF THE
-.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF SUCH
-.\" CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
+.\" DOCUMENT ARE SUITABLE FOR ANY PURPOSE, OR THAT THE IMPLEMENTATION OF
+.\" SUCH CONTENTS WILL NOT INFRINGE ON ANY THIRD PARTY PATENTS, COPYRIGHTS,
 .\" TRADEMARKS OR OTHER RIGHTS.  IN NO EVENT SHALL OPENSS7 CORPORATION BE
 .\" LIABLE FOR ANY DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES OR ANY
 .\" DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER
@@ -46,10 +46,10 @@
 .\" OUT OF OR IN CONNECTION WITH ANY USE OF THIS DOCUMENT OR THE PERFORMANCE
 .\" OR IMPLEMENTATION OF THE CONTENTS THEREOF.
 .\" 
-.\" Since the Linux kernel and libraries are constantly changing, this manual
-.\" page may be incorrect or out-of-date.  The author(s) assume no
-.\" responsibility for errors or omissions, or for damages resulting from the
-.\" use of the information contained herein.  The author(s) may not have
+.\" Since the Linux kernel and libraries are constantly changing, this
+.\" manual page may be incorrect or out-of-date.  The author(s) assume no
+.\" responsibility for errors or omissions, or for damages resulting from
+.\" the use of the information contained herein.  The author(s) may not have
 .\" taken the same level of care in the production of this manual, which is
 .\" licensed free of charge, as they might when working professionally.  The
 .\" author(s) will take no responsibility in it.
@@ -59,20 +59,20 @@
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on
-.\" behalf of the U.S. Government ("Government"), the following provisions
-.\" apply to you.  If the Software is supplied by the Department of Defense
-.\" ("DoD"), it is classified as "Commercial Computer Software" under
-.\" paragraph 252.227-7014 of the DoD Supplement to the Federal Acquisition
-.\" Regulations ("DFARS") (or any successor regulations) and the Government
-.\" is acquiring only the license rights granted herein (the license rights
-.\" customarily provided to non-Government users).  If the Software is
-.\" supplied to any unit or agency of the Government other than DoD, it is
-.\" classified as "Restricted Computer Software" and the Government's rights
-.\" in the Software are defined in paragraph 52.227-19 of the Federal
-.\" Acquisition Regulations ("FAR") (or any successor regulations) or, in the
-.\" cases of NASA, in paragraph 18.52.227-86 of the NASA Supplement to the
-.\" FAR (or any successor regulations).
+.\" U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software
+.\" on behalf of the U.S. Government ("Government"), the following
+.\" provisions apply to you.  If the Software is supplied by the Department
+.\" of Defense ("DoD"), it is classified as "Commercial Computer Software"
+.\" under paragraph 252.227-7014 of the DoD Supplement to the Federal
+.\" Acquisition Regulations ("DFARS") (or any successor regulations) and the
+.\" Government is acquiring only the license rights granted herein (the
+.\" license rights customarily provided to non-Government users).  If the
+.\" Software is supplied to any unit or agency of the Government other than
+.\" DoD, it is classified as "Restricted Computer Software" and the
+.\" Government's rights in the Software are defined in paragraph 52.227-19
+.\" of the Federal Acquisition Regulations ("FAR") (or any successor
+.\" regulations) or, in the cases of NASA, in paragraph 18.52.227-86 of the
+.\" NASA Supplement to the FAR (or any successor regulations).
 .\"
 .\" =========================================================================
 .\" 
@@ -81,14 +81,11 @@
 .\" 
 .\" =========================================================================
 .\"
-.\" Last Modified $Date: 2011-02-07 02:18:09 $ by $Author: brian $
+.\" Last Modified $Date$ by $Author$
 .\"
 .\" -------------------------------------------------------------------------
 .\"
-.\" $Log: bufmod.4.man,v $
-.\" Revision 1.1.2.3  2011-02-07 02:18:09  brian
-.\" - updated manual pages
-.\"
+.\" $Log$
 .\" =========================================================================
 .R1
 bracket-label "\fR[\fB" "\fR]" "\fR, \fB"
@@ -112,7 +109,7 @@ search-ignore CGIQOSTU
 .\"
 .SH NAME
 .B bufmod
-\- \fISTREAMS\fR null module
+\- \fISTREAMS\fR buffer module
 .\"
 .\"
 .SH SYNOPSIS
@@ -144,81 +141,351 @@ Aside from being a
 .I STREAMS
 module,
 .B bufmod
-performs no actions other than to perform flow control and queueing of messages.
+performs no actions (by default) other than to perform flow control and
+queueing of messages.
 All messages passed from the
 .I Stream head
 toward the
 .B bufmod
-module are passed on downstream from the
+module, (except
+.BR M_IOCTL (9)
+message with input-output controls recognized by the module),
+are passed on downstream from the
 .B bufmod
 write-side
 .B put
-procedure (with
+procedures (with
 .BR putnext (9))
-when flow control conditions are not in effect.  When flow controlled, messages are placed on the
-write-side queue to be scheduled from the module's
+when flow control conditions are not in effect.  When flow controlled,
+messages are placed on the write-side queue to be scheduled from the module's
 .B service
 procedure.
-All messages received from the driver,
-are passed on upstream from the
-read-side
+All messages received from the driver are passed upstream from the read-side
 .B put
 procedure, or scheduled for the read-side
 .B service
 procedure under flow control.
-.\"
-.\"
-.SH USAGE
+This is the default behaviour.
 .PP
-The primary purpose of
+However, when the input-output controls recognized by the module are used to
+alter the behaviour of the module, it performs as follows:
+.IP \(bu \w'\(bu\(em'u
+The write side behaviour is as described above.
+.IP \(bu
+When the chunk size has been set to a non-zero value with
+.IP \(bu
+.IP \(bu
+.IP \(bu
+.\"
+.\"
+.SH IOCTLS
+.PP
+The following subsections detail the
+.BR ioctl (2s)
+commands that are made available by pushing the
 .B bufmod
-is as a test module for use with the
-.BR test-streams (8)
-conformance test program,
-and the
-.BR perftest (8)
-performance benchmarking program.  The other purpose of
+module.
+.PP
 .B bufmod
-is as an example skeleton for a
+only supports the
+.I I_STR
+version of the IO controls and does not support transparent IO controls.  For
+more information, see the
+.IR I_STR (7)
+or the
+.I I_STR
+subsection of
+.BR streamio (7).
+.\"
+.\"
+.SS SBIOCSTIME (('B' << 8) + 1)
+.PP
+This input-output control is used to set the maximum interval of time that
+the
+.B bufmod
+module will await messages completing a chunk before delivering the
+incomplete chunk.  When specified as zero (0),
+.B bufmod
+will interpret the value as meaning an indefinite period of time, defeating
+the timeout mechanism.  That is, all chunks will be held until they are
+complete, or another mechanism (e.g. write side message, read-side
+.BR M_PCPROTO (9)
+message) causes the delivery of the chunk.
+.PP
+.I arg
+is a pointer to a (native sized)
+.B timeval
+structure specifying the duration of time to wait.
+See
+.BR gettimeofday (2)
+for a description of the
+.B timeval
+structure.
+See
+.BR M_IOCTL (9)
+for a description of how
+.I Linux Fast-STREAMS
+handles 32-bit user space input-output controls to a 64-bit kernel.
+.\"
+.SS SBIOCGTIME (('B' << 8) + 2)
+.PP
+This intput-output control is used to retrieve the maximum interval of time
+that the
+.B bufmod
+module will await messages completing a chunk before delivering an incomplete
+chunk.  This is the value that was set with
+.I SBIOCSTIME
+or cleared with
+.IR SBIOCCTIME .
+.PP
+.I arg
+is a pointer to a (native sized)
+.B timeval
+structure into which to retrieve the current duration of time to wait.
+See
+.BR gettimeofday (2)
+for a description of the
+.B timeval
+structure.
+.PP
+The initial value of the timeout is indefinite (disabled), so that chunks are
+only delivered when they are full.
+.\"
+.SS SBIOCCTIME (('B' << 8) + 3)
+.PP
+This input-output control clears to zero (0) the maximum interval of time
+that the
+.B bufmod
+module will await messages completing a chunk before delivering an incomplete
+chunk.  The value of zero (0) is interpreted by
+.B bufmod
+to mean an indefinite period of time and, therefore, this value defeats the
+time period mechanism altogether.
+Note that there is no usable non-zero default timeout period, and the module,
+when pushed, therefore defaults to zero (0).
+.PP
+Note that clearing the timeout to zero (0) using this input-output control
+will also force the chunk size to zero (0), defeating the buffering mechanism
+altogether.  The state of the buffer flags; however, remains the same (i.e.
+headers are prepended or
+.BR M_PROTO (9)
+blocks converted as before).
+.PP
+.I arg
+is unused and ignored.
+.\"
+.SS SBIOCSCHUNK (('B' << 8) + 4)
+.PP
+This input-output control is used to set the chunk size.  The chunk size is
+the maximum size to which
+.B bufmod
+will coalesce packets.  Any packet that, when added to an existing, partially
+filled chunk, will increase its size beyond this maximum will be delivered
+before further considering the received packet.  When set to zero (0), chunk
+accumulation is effectively disabled and each packet is delivered as soon as
+possible.
+.PP
+.I arg
+is a pointer to an
+.B unsigned int
+specifying the chunk size.
+.PP
+The initial chunk size is set to
+.BR SB_DLFT_CHUNK ,
+which is set to
+.B 8192
+in the
+.I <sys/bufmod.h>
+header file.
+.\"
+.SS SBIOCGCHUNK (('B' << 8) + 5)
+.PP
+This input-output control is used to retrieve the maximum chunk size, the
+maximum size to which
+.B bufmod
+will coalesce packets.
+.PP
+.I arg
+is a pointer to an
+.B unsigned int
+into which to retrieve the current chunk size.
+.\"
+.SS SBIOCSSNAP (('B' << 8) + 6)
+.PP
+This input-output control is used to set the snapshot length.  This is the
+maximum length of the packet (with or without a converted
+.BR M_PROTO (9)
+message block) that will be passed to the chunk and onward upstream.  Setting
+a snapshot length of zero (0) is interpreted as indefinite and equivalent to
+not truncating any message.
+.PP
+.I arg
+is a pointer to an
+.B unsigned long
+specifying the snapshot length.
+.PP
+The initial snapshot length is set to zero (0), meaning that no message
+truncation will occur.
+.\"
+.SS SBIOCGSNAP (('B' << 8) + 7)
+.PP
+.I arg
+is a pointer to an
+.B unsigned long
+into which to retrieve the current snapshot length.
+.\"
+.SS SBIOCSFLAGS (('B' << 8) + 8)
+.PP
+.I arg
+is a pointer to an
+.B unsigned long
+specifying the buffer flags.
+The buffer flags may be a bitwise OR of any of the following flags:
+.TP
+.I SB_SEND_ON_WRITE
+When this bit is set, it specifies that accumulated chunks are to be delivered
+immediately upon the reception of any
 .I STREAMS
-pushable module.
-.\"
-.\"
-.SH NOTICES
-.PP
-.BR bufmod
-is implementation-specific to the
-.B @PACKAGE_TITLE@
-package.
-.\"
-.\"
-.SH EXAMPLES
-.PP
-The source code for
+message on the write queue.
+.IP ""
+This feature permits the upper layer module or user to specify when packets
+should be collected on demand regardless of the state of the chunk and its
+associated timeouts.  It is possible to combine this mechanism with blocking
+reads using
+.BR read "(2s) and " readv (2s)
+by invoking read notifications using
+.BR M_READ (9)
+messages.
+.IP ""
+The original implementation of
 .B bufmod
-serves as an example skeleton for a
-.I STREAMS
-pushable module.
-.\"
-.\"
-.SH MODULES
-.PP
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_NO_HEADER
+When this bit is set, it specifies that headers are not to be prepended to
+accumulated messages.
+.IP ""
+When headers are disabled using this feature, the reader of chunks must have
+some other mechanism that may be used to determine where the concatentated
+packets begin and end, as well as the timestamp associated with each message.
+(For example, a converted
+.BR M_PROTO (9)
+message block may contain the necessary information, or it might be contained
+in the message headers or pseudo header).
+.IP ""
+The original implementation of
 .B bufmod
-is a
-.I STREAMS
-module named
-.IR \*(lqbufmod\*(rq .
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_NO_PROTO_CVT
+When this bit is set, it specifies that
+.BR M_PROTO (9)
+message blocks are not to be converted to
+.BR M_DATA (9)
+message blocks.
+When enabled, and an
+.BR M_PROTO (9)
+message is received, it will be treated as other messages: i.e. causing the
+closure and dispatch of any accumulating chunk before the
+.BR M_PROTO (9)
+message itself is delivered upstream.
+.IP ""
+This feature is useful when it is known that data messages are received only
+in
+.BR M_DATA (9)
+message blocks and that any
+.BR M_PROTO (9)
+message needs to be delivered separated from the data stream.
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_DEFER_CHUNK
+When this bit is set, it specifies that the initial message received within
+the timeout period is to be delivered immediately, deferring chunk
+accumulation start until the second message arrival within the time interval.
+.IP ""
+This feature helps deliver packets immediately during extended periods of
+very low traffic.  When the traffic drops to one packet per timeout period,
+the packets will be delivered immediately regardless of the chunking
+mechanism.
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_NO_DROPS
+When this bit is set, the module will exert downstream flow control (when
+flow controlled from upstream) rather than dropping messages.  (In fact,
+Sun's implementation forces chunks upstream against flow control rather than
+exerting downstream flow control.)  Also, if a message block allocation
+fails, it will invoke bufcall procedures rather than discarding messages.
+(In fact, Sun's implementation drops messages on message block allocation
+failures regardless of the settings of the flag.)
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.PP
+The initial value of all flags is clear (0).  This is equivalent to the old,
+flagless behavior of ancient
+.B bufmod
+implementations.  See
+.RI \*(lq HISTORY \*(rq,
+below.
+.\"
+.SS SBIOCGFLAGS (('B' << 8) + 9)
+.PP
+.I arg
+is a pointer to an
+.B unsigned long
+into which to retreive the current buffer flags.
+.\"
+.\"
+.SH IMPLEMENTATION
+.PP
+When a non-zero chunk size is set,
+.B bufmod
+sends a
+.BR M_SETOPTS (9)
+message to the Stream head to set the high water mark,
+.BR so_hiwat ,
+large enough to accommodate the chunk.  Otherwise, harmful interactions
+between flow control and message dropping could result.
+It also sets the maximum read packet size,
+.BR so_maxpsz ,
+large enough to accommodate the chunk so that parts of the chunk do not get
+truncated.
+.\"
+.\"
+.SH CAVEATS
+.PP
+Note that the setting of the read options at the Stream head can
+significantly affect the operation when using
+.BR read "(2s) or " readv (2s)
+to read chunks from the Stream head.
 .\"
 .\"
 .SH "SEE ALSO"
 .PP
-.BR open (2s),
-.BR ioctl (2s),
+.BR gettimeofday (2),
+.BR M_DATA (9),
+.BR M_PROTO (9),
+.BR M_PCPROTO (9),
+.BR M_IOCTL (9),
+.BR I_STR (7),
 .BR streamio (7),
-.BR putnext (9).
+.BR pfmod (4),
+.BR dlpi (7).
 .\"
 .\"
 .SH BUGS
+.PP
+.B bufmod
+has been tested with the
+.BR test-bufmod (8)
+conformance test suite.
 .PP
 .B bufmod
 has no known bugs.
@@ -227,66 +494,124 @@ has no known bugs.
 .SH COMPATIBILITY
 .PP
 .B bufmod
-is compatible with the null module described in the
-.IR "SVR 4.0" ", \*(lq" "STREAMS Programmer's Guide" ",\*(rq"
+is compatible with
+.BR SunOS \(rg,
+.BR Solaris \(rg,
 .[
-svr4spg
-%P Section 6.1.1.1, "Null Module Example"
+soldoc
 .]
-with the following portability considerations:
+.BR AIX \(rg,
+.[
+aixdoc
+.]
+.BR HP-UX \(rg,
+.[
+hpuxdoc
+.]
+and systems based on Oracle Solaris\(rg, with the following portability
+considerations:
 .IP \(em \w'\(em\(em'u
-The null module example of
-.I "SVR 4.0"
-does not queue messages and has no
-.B service
-procedure.  See also
-.BR nullmod (4).
-.IP \(em
+The version of
 .B bufmod
-is specific to
-.BR "@PACKAGE_TITLE@" ,
-and will not be used by portable
-.I STREAMS
-modules, drivers and applications programs.
-.IP \(em
-The
-.I SVR 4.0 SPG
-.[
-svr4spg
-.]
-does not name this module.  The name
+documented in 1992 for SunOS\(rg 5.x did not have defined buffer flags and
+did not contain the
+.IR SBIOCSFLAGS " and " SBIOCGFLAGS
+input-output controls.  The
 .B bufmod
-was chosen for
-.BR "@PACKAGE_TITLE@" .
+documented without flags behaved as though the flags were set to the
+following values:
+.RS
+.TP \w'\fISB_SEND_ON_WRITE\(em'u
+.I SB_SEND_ON_WRITE
+clear.
+.PD 0
+.TP
+.I SB_NO_HEADER
+clear.
+.TP
+.I SB_NO_PROTO_CVT
+clear.
+.TP
+.I SB_DEFER_CHUNK
+clear.
+.TP
+.I SB_NO_DROPS
+clear.
+.PD
+.RE
 .IP \(em
-.B bufmod
-is used as an example skeleton module and for use by the
-.BR test-streams (8)
-conformance test program, and the
-.BR perftest (8)
-performance benchmarking program.  It will not be used by portable
-.I STREAMS
-modules, drivers or applications.
+The original
+.B nit_buf
+input-output controls were named:
+.RS
+.TP \w'\fBNIOCGCHUNK\(em'u
+.B NIOCSTIME
+equivalent to
+.IR SBIOCSTIME .
+.PD 0
+.TP
+.B NIOCGTIME
+equivalent to
+.IR SBIOCGTIME .
+.TP
+.B NIOCCTIME
+equivalent to
+.IR SBIOCCTIME .
+.TP
+.B NIOCSCHUNK
+equivalent to
+.IR SBIOCSCHUNK .
+.TP
+.B NIOCGCHUNK
+equivalent to
+.IR SBIOCGCHUNK .
+.PD
 .PP
-See
-.BR STREAMS (9)
-for additional compatibility information.
+The implementation in
+.I Linux Fast-STREAMS
+defines these older input-output controls for backwards compatibility.
+.RE
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.IP \(em
+.PP
+Compatibility is tested using the
+.BR test-bufmod (8)
+test case executable and the
+.I @PACKAGE_TITLE@
+.B autotest
+test suite.
 .\"
 .\"
 .SH CONFORMANCE
 .PP
-.IR "SVR 4.0" .
-.[
-svr4spg
-.]
-Conformance is not verified.
+Network interface taps and raw sockets and DLPI drivers have never been an
+interesting subject for standards organizations such as IEEE and the
+OpenGroup, and these modules have never been subjected to formal
+standardization.
 .\"
 .\"
 .SH HISTORY
 .PP
 .B bufmod
-first appeared in
-.IR "SVR 4.0" .
+appears in SunOS\(rg 5.x in 1991-2.
+It was provided in SunOS\(rg 5.x to replace the
+.BR nit_buf
+component of the Network Interface Tap pseudo-device driver from SunOS\(rg
+4.x as SunOS\(rg 5.x moved to real, DLPI-based
+.[
+dlpi 2.0.0
+.]
+network device drivers.  The other two components were the
+.B nit_if
+pseudo device driver that was replaced by
+.BR dlpi (7),
+and the
+.B nit_pf
+packet filter module that was replaced by
+.BR pfmod (4).
 .\"
 .\"
 .[
