@@ -892,6 +892,9 @@ openss7_man_MANS = \
 	man4/mx_sdl.4 \
 	man4/mx_x400p.4 \
 	man4/mxi_ioctl.4 \
+	man4/nbuf.4 \
+	man4/nit_buf.4 \
+	man4/nit_pf.4 \
 	man4/nli3.4 \
 	man4/np.4 \
 	man4/np_ip.4 \
@@ -911,6 +914,8 @@ openss7_man_MANS = \
 	man4/otpi.4 \
 	man4/pca200e.4 \
 	man4/pckt.4 \
+	man4/pf.4 \
+	man4/pfmod.4 \
 	man4/phys.4 \
 	man4/pipe.4 \
 	man4/pipemod.4 \
@@ -1004,6 +1009,7 @@ openss7_man_MANS = \
 	man4/socksys.4 \
 	man4/spm.4 \
 	man4/spx.4 \
+	man4/srvmod.4 \
 	man4/ss7-sdl-acb0.4 \
 	man4/ss7-sdl-acb1.4 \
 	man4/ss7-sdl-acb2.4 \
@@ -5264,6 +5270,9 @@ openss7_dist_noinst_MANS = \
 	man4/mx_sdl.4.man \
 	man4/mx_x400p.4.man \
 	man4/mxi_ioctl.4.man \
+	man4/nbuf.4.man \
+	man4/nit_buf.4.man \
+	man4/nit_pf.4.man \
 	man4/nli3.4.man \
 	man4/np.4.man \
 	man4/np_ip.4.man \
@@ -5283,6 +5292,8 @@ openss7_dist_noinst_MANS = \
 	man4/otpi.4.man \
 	man4/pca200e.4.man \
 	man4/pckt.4.man \
+	man4/pf.4.man \
+	man4/pfmod.4.man \
 	man4/phys.4.man \
 	man4/pipe.4.man \
 	man4/pipemod.4.man \
@@ -5376,6 +5387,7 @@ openss7_dist_noinst_MANS = \
 	man4/socksys.4.man \
 	man4/spm.4.man \
 	man4/spx.4.man \
+	man4/srvmod.4.man \
 	man4/ss7-sdl-acb0.4.man \
 	man4/ss7-sdl-acb1.4.man \
 	man4/ss7-sdl-acb2.4.man \

@@ -127,7 +127,7 @@ if [ ! -e /proc/filesystems ] ; then if [ "$1" = 'stop' ] ; then exit 0 ; else e
 
 [ -n "$STREAMS_PRELOAD"       ] || STREAMS_PRELOAD='streams streams-sth streams-clone'
 [ -n "$STREAMS_DRIVERS"       ] || STREAMS_DRIVERS='streams-echo streams-fifo streams-log streams-loop streams-mux streams-nsdev streams-nuls streams-pipe streams-sad streams-sfx streams-spx streams-pty'
-[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES='streams-bufmod streams-connld streams-nullmod streams-pipemod streams-sc streams-testmod streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-os7compat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat streams-ldterm streams-pckt streams-ptem streams-ttcompat'
+[ -n "$STREAMS_MODULES"       ] || STREAMS_MODULES='streams-srvmod streams-connld streams-nullmod streams-pipemod streams-sc streams-testmod streams-aixcompat streams-hpuxcompat streams-irixcompat streams-liscompat streams-maccompat streams-mpscompat streams-os7compat streams-osfcompat streams-suncompat streams-svr3compat streams-svr4compat streams-uw7compat streams-ldterm streams-pckt streams-ptem streams-ttcompat streams-bufmod streams-pfmod streams-nbuf streams-pf'
 [ -n "$STREAMS_MAKEDEVICES"   ] || STREAMS_MAKEDEVICES='yes'
 [ -n "$STREAMS_REMOVEDEVICES" ] || STREAMS_REMOVEDEVICES='yes'
 [ -n "$STREAMS_FORCEREMOVE"   ] || STREAMS_FORCEREMOVE='yes'
