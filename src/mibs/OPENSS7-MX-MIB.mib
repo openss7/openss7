@@ -741,10 +741,11 @@ mxCardChipType OBJECT-TYPE
 
          - mxChipTypeDS2155, the DS2155 E1/T1/J1 chip.
          - mxChipTypeDS2156, the DS2156 E1/T1/J1 chip.
+         - mxChipTypeDS21455, the DS21455 E1/T1/J1 chip.
 
          The DS2152, DS21352, DS21552 are T1-only chips; the 
-         DS2154, DS21354, DS21554 are E1-only chips; the DS2155 
-         and DS2156 are E1/T1/J1 chips."
+         DS2154, DS21354, DS21554 are E1-only chips; the DS2155, 
+         DS2156 and DS21455 are E1/T1/J1 chips."
     ::= { mxCardEntry 5 }
 
 mxCardChipRevision OBJECT-TYPE

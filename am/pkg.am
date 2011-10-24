@@ -90,6 +90,67 @@ mpkg_insdir		= $(mpkginstalldir)/$(PACKAGE_LCNAME)-$(VERSION)
 
 mpkg_base_file		= $(mpkgpkg).pkg.tar.gz
 
+pkg_build_file		= arch/PKGBUILD
+pkg_source_files	= arch/$(PACKAGE)-$(VERSION).tar.gz
+
+$(pkg_build_file)::
+	( cd $(pacman_dir); $(MAKEPKG) -g >>$@ )
+
+each-pkg: $(pkg_build_file) $(pkg_source_files)
+	[ -d $(pacman_dir) ] || $(MAKE) $(AM_MAKEFLAGS) -- $(pacman_dir)
+	( \
+		cd $(pacman_dir); \
+		case ' $(AM_PKGBOPTS) ' in \
+			(*" --without-arch "*) \
+				packages= ;; \
+			(*" --without-indep "*) \
+				case ' $(AM_PKGXOPTS) ' in \
+					(*" --without-modules "*) \
+						packages="$(PACKAGE) $(PACKAGE)-devel" ;; \
+					(*" --without-tools "*) \
+						packages="$(PACKAGE)-$(kversion) $(PACKAGE)-$(kversion)-devel" ;; \
+				esac ;; \
+		esac ; \
+		BUILD_CFGOPTIONS='$(BUILD_CFGOPTIONS) $(AM_PKGBOPTS) $(AM_PKGXOPTS)' \
+			kversion='$(kversion)' \
+			$(MAKEPKG) -A -f -L --check -pkg "$$packages"; \
+	)
+
+noa-pkg: AM_PKGBOPTS = --without-arch
+noa-pkg: each-pkg
+
+one-pkg: AM_PKGBOPTS = --without-indep
+one-pkg: each-pkg
+
+one-t-pkg: AM_PKGXOPTS = --without-modules
+one-t-pkg: one-pkg
+
+one-k-pkg: AM_PKGXOPTS = --without-tools
+one-k-pkg: one-pkg
+
+all-pkg: AM_PKGBOPTS =
+all-pkg: each-pkg
+
+#! pkgs:
+#!      This target is responsible for generating all of the package binary
+#!      txzs for the architecture.  The binary txzs will be named:
+#!
+#!          @PACKAGE@-*@VERSION@-@PACKAGE_PACRELEASE@.*.pkg.txz
+#!
+#!      Where the stars indicate the subpackage and the architecture.  Both
+#!      the architecture specific subpackages (binary objects) and the
+#!      architecture independent (.any.) subpackages will be build unless the
+#!      former was disabled with the option `--disable-arch', or the later
+#!      with the option `--disable-indep', passed to `configure'.
+#!
+pkgs:
+	@$(ECHO) "D: $@: rebuild noarch"; \
+	$(MAKE) $(AM_MAKEFLAGS) PKGXOPTS='$(PKGXOPTS)' kversion='$(kversion)' PKGTARGET="any" noa-pkg || :
+	@$(ECHO) "D: $@: rebuild $(kversion)"; \
+	$(MAKE) $(AM_MAKEFLAGS) PKGXOPTS='$(PKGXOPTS)' kversion='$(kversion)' PKGTARGET="$(PKGTARGET)" one-k-pkg || :
+	@$(ECHO) "D: $@: rebuild $(PKGTARGET)"; \
+	$(MAKE) $(AM_MAKEFLAGS) PKGXOPTS='$(PKGXOPTS)' kversion='$(kversion)' PKGTARGET="$(PKGTARGET)" one-t-pkg || :
+
 ## MAINTAINER_MODE
 endif
 

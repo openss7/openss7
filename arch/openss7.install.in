@@ -109,6 +109,7 @@ _remove_warn_dirs() {
 #
 _pre_install_repo_creds() { :
     local d un pw o f s ext u p m
+    return 0
     echo ">>> Checking credentials..." >&2
     for s in '' .pacold .pacnew; do
     for p in credentials; do
@@ -245,6 +246,7 @@ _post_install_repo_creds() { :
 #
 _pre_remove_repo_creds() {
     local d f
+    return 0
     echo ">>> Preparing credentials..." >&2
     d=$aptrepodir
     for f in openss7.list; do
@@ -268,6 +270,7 @@ _pre_remove_repo_creds() {
 #
 _post_remove_repo_creds() {
     local d f
+    return 0
     echo ">>> Removing credentials..." >&2
     d=$aptrepodir
     for f in openss7.list ; do f="$d/$f"
@@ -741,13 +744,14 @@ _pre_install_base_manpages() { :
 #   update these.
 #
 _post_base_manpages() {
+    echo ">>> Consider issuing 'mandb -c' or its equivalent." >&2
+    return 0
     echo ">>> Updating aprospros database..." >&2
     if   [ -x "`which mandb      2>/dev/null`" ]; then
 	LANGUAGE= LANG= mandb   -q -p @mandir@ || :
     elif [ -x "`which makewhatis 2>/dev/null`" ]; then
 	LANGUAGE= LANG= makewhatis -u @mandir@ || :
     fi
-    echo ">>> Consider issuing 'mandb -c' or its equivalent." >&2
 }
 _post_install_base_manpages() {
     _post_base_manpages		|| :
@@ -942,11 +946,11 @@ _post_lib_libraries() {
     d="@libdir@"; s="@syslibdir@"
     if   [ -x "`which libtool 2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
-	[ -d "$s" ] && { libtool --mode=finish $v "$s" || : }
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
+	[ -d "$s" ] && { libtool --mode=finish $v "$s" || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d "$d" ] && { ldconfig -n "$d" || : }
-	[ -d "$s" ] && { ldconfig -n "$s" || : }
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+	[ -d "$s" ] && { ldconfig -n "$s" || :; }
     fi
 }
 _post_install_lib_libraries() {
@@ -1502,11 +1506,11 @@ _post_compat_libraries() {
     d="@lib32dir@"; s="@syslib32dir@"
     if   [ -x "`which libtool  2>/dev/null`" ]; then
         v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
-	[ -d "$s" ] && { libtool --mode=finish $v "$s" || : }
+	[ -d "$d" ] && { libtool --mode=finish $v "$d" || :; }
+	[ -d "$s" ] && { libtool --mode=finish $v "$s" || :; }
     elif [ -x "`which ldconfig 2>/dev/null`" ]; then
-	[ -d "$d" ] && { ldconfig -n "$d" || : }
-	[ -d "$s" ] && { ldconfig -n "$s" || : }
+	[ -d "$d" ] && { ldconfig -n "$d" || :; }
+	[ -d "$s" ] && { ldconfig -n "$s" || :; }
     fi
 }
 _post_install_compat_libraries() {
@@ -1517,158 +1521,6 @@ _post_upgrade_compat_libraries() {
 }
 _post_remove_compat_libraries() {
     _post_compat_libraries		|| :
-}
-# ---------------------------------------------------------------------------
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# JAVA JNI LIBRARIES
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# _pre_install_java_jnilibs() - On a fresh installation, look for an remove any
-#   non-pkg or old tarball release libraries.  On reinstallations this step can
-#   (and should) be skipped.  Unfortunately, non-autoconf releases of LiS placed
-#   libraries all over the place.  On an initial installation, this checks for
-#   other libraries with the same name and deletes them.
-#
-_pre_install_java_jnilibs() {
-    local lib l
-    echo ">>> Removing conflicting JNI libraries..." >&2
-    if [ -x "`which ldconfig 2>/dev/null`" ]; then
-	for lib in $jnilibs; do
-	    ( ldconfig -p | grep '\<lib'$lib'\>' | cut '-d ' -f4 ) 2>/dev/null | \
-	    while read l; do
-		echo ">>> warning: Deleting conflicting library, $l" >&2
-		rm -f -- $l || :
-	    done
-	done
-    fi
-}
-# _post_java_jnilibs() - After a fresh installation, upgrade, reinstall, or
-#   removal, do a ldconfig.
-#
-_post_java_jnilibs() {
-    local v d
-    echo ">>> Updating JNI libraries load cache..." >&2
-    d="@jnidir@"
-    if   [ -x "`which libtool  2>/dev/null`" ] ; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
-    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
-	[ -d "$d" ] && { ldconfig -n "$d" || : }
-    fi
-}
-_post_install_java_jnilibs() {
-    _post_java_jnilibs		|| :
-}
-_post_upgrade_java_jnilibs() {
-    _post_java_jnilibs		|| :
-}
-_post_remove_java_jnilibs() {
-    _post_java_jnilibs		|| :
-}
-# ---------------------------------------------------------------------------
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# JAVA GCJ LIBRARIES
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-_post_java_gcjlibs() {
-    local v d
-    echo ">>> Updating GCJ libraries load cache..." >&2
-    d="@libdir@/gcj/@PACKAGE@"
-    if   [ -x "`which libtool  2>/dev/null`" ] ; then
-        v="`set -o | sed -n -e 's,xtrace[[:space:]]*on$,--verbose,p;s,xtrace[[:space:]]*off$,--quiet,p'`"
-	[ -d "$d" ] && { libtool --mode=finish $v "$d" || : }
-    elif [ -x "`which ldconfig 2>/dev/null`" ] ; then
-	[ -d "$d" ] && { ldconfig -n "$d" || : }
-    fi
-}
-_post_install_java_gcjlibs () {
-    _post_java_gcjlibs		|| :
-}
-_post_upgrade_java_gcjlibs () {
-    _post_java_gcjlibs		|| :
-}
-_post_remove_java_gcjlibs () {
-    _post_java_gcjlibs		|| :
-}
-# ---------------------------------------------------------------------------
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# JAVA GCJ MAPS
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# _post_java_gcjmaps() - After installation, rebuild the gcj map
-#   database.  Note that there is currently no debhelper nor trigger for this.
-#
-_post_java_gcjmaps() {
-    local d db
-    echo ">>> Updating GCJ maps..." >&2
-    if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
-        rebuild-gcj-db || :
-    else
-	if [ -x "`which gcj-dbtool 2>/dev/null`" ] ; then
-	    for base in /usr/lib* ; do
-		d=$base/gcj
-		[ -d $d ] || continue
-		db=`gcj-dbtool -p $base`
-		[ -n "$db" ] || continue
-		dirname $db | xargs mkdir -p
-		gcj-dbtool -n $db.tmp 64
-		find $d -follow -name '*.db' -print0 | \
-		    xargs -0 gcj-dbtool -m $db.tmp $db.tmp
-		mv -f -- $db.tmp $db
-	    done
-	fi
-    fi
-}
-_post_install_java_gcjmaps () {
-    _post_java_gcjmaps		|| :
-}
-_post_upgrade_java_gcjmaps () {
-    _post_java_gcjmaps		|| :
-}
-# _post_remove_java_gcjmaps() - On complete removal, rebuild the gcj database.
-#   Note that there is no debhelper or trigger for this as yet.
-#
-_post_remove_java_gcjmaps() {
-    local d db
-    echo ">>> Updating GCJ maps..." >&2
-    if [ -x "`which rebuild-gcj-db 2>/dev/null`" ] ; then
-        rebuild-gcj-db || :
-    elif [ -x "`which gcj-dbtool 2>/dev/null`" ] ; then
-	for base in /usr/lib* ; do
-	    d=$base/gcj
-	    [ -d $d ] || continue
-	    db=`gcj-dbtool -p $base`
-	    [ -n "$db" ] || continue
-	    dirname $db | xargs mkdir -p
-	    gcj-dbtool -n $db.tmp 64
-	    find $d -follow -name '*.db' -print0 | \
-		xargs -0 gcj-dbtool -m $db.tmp $db.tmp
-	    mv -f -- $db.tmp $db
-	done
-    fi
-}
-# ---------------------------------------------------------------------------
-
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# JAVA JAR FILES
-# ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-# _post_java_jarfiles() - After installation, rebuild the jar
-#   repository.  Note that there is currently no debhelper nor trigger for this.
-#
-_post_java_jarfiles() {
-    echo ">>> Updating JAVA repositories..." >&2
-    if [ -x "`which rebuild-jar-repository 2>/dev/null`" ] ; then
-        rebuild-jar-repository @javadir@ || :
-    fi
-}
-_post_install_java_jarfiles () {
-    _post_java_jarfiles		|| :
-}
-_post_upgrade_java_jarfiles () {
-    _post_java_jarfiles		|| :
-}
-_post_remove_java_jarfiles () {
-    _post_java_jarfiles		|| :
 }
 # ---------------------------------------------------------------------------
 
@@ -1699,9 +1551,6 @@ _pre_install_compat() {
     [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
     :
 }
-_pre_install_java() {
-    _pre_install_java_jnilibs		|| :
-}
 # pre_install($new_version) - script is run right before files are extracted.
 #   One argument is passed: new pakage version.
 #
@@ -1711,7 +1560,6 @@ pre_install() {
     _pre_install_base			|| :
     _pre_install_lib			|| :
     _pre_install_compat			|| :
-    _pre_install_java			|| :
 }
 # -----------------------------------------------------------------------------
 
@@ -1744,12 +1592,6 @@ _post_install_compat() {
     [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
     _post_install_compat_libraries	|| :
 }
-_post_install_java() {
-    _post_install_java_jnilibs		|| :
-    _post_install_java_gcjlibs		|| :
-    _post_install_java_gcjmaps		|| :
-    _post_install_java_jarfiles		|| :
-}
 # post_install($new_version) - script is run right after files are extracted.
 #   One argument is passed: new package version.
 #
@@ -1759,7 +1601,6 @@ post_install() {
     _post_install_base			|| :
     _post_install_lib			|| :
     _post_install_compat		|| :
-    _post_install_java			|| :
 }
 # -----------------------------------------------------------------------------
 
@@ -1787,8 +1628,6 @@ _pre_remove_compat() {
     [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
     :
 }
-_pre_remove_java() { :
-}
 # pre_remove($old_version) - script is run right before files are removed.  One
 #   argument is passed: old package version.
 #
@@ -1798,7 +1637,6 @@ pre_remove() {
     _pre_remove_base			|| :
     _pre_remove_lib			|| :
     _pre_remove_compat			|| :
-    _pre_remove_java			|| :
 }
 # -----------------------------------------------------------------------------
 
@@ -1828,12 +1666,6 @@ _post_remove_compat() {
     [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
     _post_remove_compat_libraries	|| :
 }
-_post_remove_java() {
-    _post_remove_java_jnilibs		|| :
-    _post_remove_java_gcjlibs		|| :
-    _post_remove_java_gcjmaps		|| :
-    _post_remove_java_jarfiles		|| :
-}
 # post_remove($old_version) - script is run right after files are removed.  One
 #   argument is passed: old package version.
 #
@@ -1843,7 +1675,6 @@ post_remove() {
     _post_remove_base			|| :
     _post_remove_lib			|| :
     _post_remove_compat			|| :
-    _post_remove_java			|| :
 }
 # -----------------------------------------------------------------------------
 
@@ -1865,8 +1696,6 @@ _pre_upgrade_compat() {
     [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
     _post_upgrade_compat_libraries	|| :
 }
-_pre_upgrade_java() { :
-}
 # pre_upgrade($new_version,$old_version) - script is run right before files are
 #   extracted.  Two arguments are passed in the following order: new package
 #   version, old package version.  (I can't find documentation that states this,
@@ -1878,7 +1707,6 @@ pre_upgrade() {
     _pre_upgrade_base			|| :
     _pre_upgrade_lib			|| :
     _pre_upgrade_compat			|| :
-    _pre_upgrade_java			|| :
 }
 # -----------------------------------------------------------------------------
 
@@ -1906,12 +1734,6 @@ _post_upgrade_compat() {
     [ -z '@WITH_32BIT_LIBS_TRUE@' ]	|| return 0
     _post_install_compat		|| :
 }
-_post_upgrade_java() {
-    _post_upgrade_java_jnilibs		|| :
-    _post_upgrade_java_gcjlibs		|| :
-    _post_upgrade_java_gcjmaps		|| :
-    _post_upgrade_java_jarfiles		|| :
-}
 # post_upgrade($new_version,$old_version) - script is run right after files are
 #   extracted.  Two arguments are passed in the following order: new package
 #   version, old package version.  (I can't find documentation that states this,
@@ -1923,7 +1745,6 @@ post_upgrade() {
     _post_upgrade_base			|| :
     _post_upgrade_lib			|| :
     _post_upgrade_compat		|| :
-    _post_upgrade_java			|| :
 }
 # -----------------------------------------------------------------------------
 
