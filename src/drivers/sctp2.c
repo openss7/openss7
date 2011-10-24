@@ -1262,7 +1262,7 @@ sctp_change_state(struct sctp *sp, int newstate)
 #undef bzero
 #define bzero(__ptr,__len) memset((__ptr), 0, (__len))
 #undef bcopy
-#define bcopy(__from,__to,__len) memcpy((__to), (__from), (__len))
+#define bcopy(__from,__to,__len) memmove((__to), (__from), (__len))
 #endif
 
 /* basic headers */
