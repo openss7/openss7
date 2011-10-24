@@ -876,9 +876,9 @@ lower multiplex write side of a driver.
 The following example of a module
 .IR qi_srvp ()
 procedure comes directly from the read and write side of the
-.BR bufmod (4)
+.BR srvmod (4)
 module located in
-.I src/modules/bufmod.c
+.I src/modules/srvmod.c
 source file in the
 .B @PACKAGE@-@VERSION@
 distribution:
@@ -886,7 +886,7 @@ distribution:
 .nf
 \fC\s-2\
  1  static int
- 2  bufmod_srv(queue_t *q)
+ 2  srvmod_srv(queue_t *q)
  3  {
  4      mblk_t *mp;
  5  
@@ -906,9 +906,9 @@ distribution:
 .fi
 .PP
 The operation of the
-.BR bufmod (4)
+.BR srvmod (4)
 module is described in the
-.BR bufmod (4)
+.BR srvmod (4)
 manual page.
 The write
 .IR qi_srvp ()
@@ -1079,7 +1079,7 @@ distribution for more working examples of driver service procedures.
 .BR putnextctl1 (9),
 .BR putnextctl2 (9),
 .BR M_FLUSH (9),
-.BR bufmod (4),
+.BR srvmod (4),
 .BR mux (4),
 .BR qprocson (9),
 .BR qprocsoff (9),

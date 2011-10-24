@@ -324,7 +324,7 @@ Specifies the name of a module to push on the write-side of the pipe.  The defau
 Other useful choices are
 .RB \(lq nullmod \(rq
 and
-.RB \(lq bufmod \(rq.
+.RB \(lq srvmod \(rq.
 .TP
 \fB-p\fP, \fB--push\fP[=][\fICOUNT\fP]
 Specifies the number of instances of
@@ -442,7 +442,7 @@ benchmark script.
 .PP
 .BR pipemod (4),
 .BR nullmod (4),
-.BR bufmod (4).
+.BR srvmod (4).
 .\"
 .\"
 .SH FILES

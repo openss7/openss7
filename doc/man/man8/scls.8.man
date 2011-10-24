@@ -443,7 +443,7 @@ testmod
 pipemod  
 nullmod  
 connld   
-bufmod   
+srvmod   
 ip_strms 
 sth      
 \s+1\fP

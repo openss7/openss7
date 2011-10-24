@@ -923,9 +923,9 @@ lower multiplex write side of a driver.
 The following example of a module
 .IR qi_putp ()
 procedure comes directly from the write side of the
-.BR bufmod (4)
+.BR srvmod (4)
 module located in
-.I src/modules/bufmod.c
+.I src/modules/srvmod.c
 source file in the
 .B @PACKAGE@-@VERSION@
 distribution:
@@ -933,7 +933,7 @@ distribution:
 .nf
 \fC\s-2\
  1  static int
- 2  bufmod_wput(queue_t *q, mblk_t *mp)
+ 2  srvmod_wput(queue_t *q, mblk_t *mp)
  3  {
  4      if (unlikely(mp->b_datap->db_type == M_FLUSH)) {
  5          if (mp->b_rptr[0] & FLUSHW) {
@@ -962,9 +962,9 @@ distribution:
 .fi
 .PP
 The operation of the
-.BR bufmod (4)
+.BR srvmod (4)
 module is described in the
-.BR bufmod (4)
+.BR srvmod (4)
 manual page.
 The write
 .IR qi_putp ()
@@ -1143,7 +1143,7 @@ distribution for more working examples of driver put procedures.
 .BR bcanputnext (9),
 .BR M_FLUSH (9),
 .BR M_CTL (9),
-.BR bufmod (4),
+.BR srvmod (4),
 .BR mux (4),
 .BR STREAMS (9).
 .\"

@@ -161,13 +161,13 @@ This kernel module contains the @acronym{STREAMS} scheduler, utility functions, 
 Driver Interface/Driver Kernel Interface (DDI/DKI).
 See @manref{STREAMS(9)} for more information.
 
-@item streams-bufmod
+@item streams-srvmod
 
-This kernel module contains the @file{bufmod} @acronym{STREAMS} module.  The @file{bufmod} @acronym{STREAMS}
+This kernel module contains the @file{srvmod} @acronym{STREAMS} module.  The @file{srvmod} @acronym{STREAMS}
 module is a simple buffer module (a module that always defers to its service procedure and then
 passes any message along).  This module is used for performance testing of the @acronym{STREAMS}
 package.
-See @manref{bufmod(4)} for more information.
+See @manref{srvmod(4)} for more information.
 
 This kernel module has been rolled into the @file{streams} kernel module.
 
