@@ -1001,9 +1001,9 @@ pullupmsg(mblk_t *mp, register ssize_t len)
 	size = 0;
 	type = mp->b_datap->db_type;
 	for (bp = mp; bp; bp = bp->b_cont) {
-		if ((blen = bp->b_wptr - bp->b_rptr) <= 0)
+		if (unlikely((blen = bp->b_wptr - bp->b_rptr) <= 0))
 			continue;
-		if (bp->b_datap->db_type != type)
+		if (unlikely(bp->b_datap->db_type != type))
 			break;
 		if ((size += blen) > len && len >= 0)
 			goto pull_len;

@@ -177,6 +177,258 @@ When the chunk size has been set to a non-zero value with
 .IP \(bu
 .IP \(bu
 .\"
+.SS Read-Side Behaviour
+.PP
+The read side behaviour of the
+.B bufmod
+module is as follows:
+.TP
+.BR M_DATA (9)
+When an
+.BR M_DATA (9)
+message is received, and the snapshot length is set to a value greater than
+zero, the message is truncated to the snapshot length.
+.IP ""
+The total length of the message is then calculated considering whether
+headers are to be prepended and the message padded.  When the total size of
+the message added to the read queue would cause the read queue to be full
+(considering the high water mark setting for the queue), the message is
+dropped and counted.  This permits the module to always return true to
+.BR bcanputnext (9)
+tests made by the driver below, and to encourage the driver not to drop
+messages due to flow control.  When the queue would not become full, the read
+put procedure proceeds with the actions described in the paragraphs that
+follow.
+.IP ""
+When the
+.B SB_NO_HEADER
+flag is clear,
+a time-stamp is taken for the message,
+the message is padded to the size of a
+.B ulong
+for alignment and a packet header is prepended to the message.  The packet
+header is the
+.B sb_hdr
+structure, defined in
+.IR <sys/bufmod.h>,
+formatted as follows:
+.RS
+.RS
+.sp
+.nf
+\fC\s-1\
+struct sb_hdr {
+        uint_t sbh_origlen;
+        uint_t sbh_msglen;
+        uint_t sbh_totlen;
+        uint_t sbh_drops;
+#if defined(_LP64)  || defined (_I32LPx)
+        struct timeval32 sbh_timestamp;
+#else
+        struct timeval sbh_timestamp;
+#endif
+};
+\s+1\fP
+.fi
+.RE
+.PP
+The
+.B sb_hdr
+structure contains the following fields:
+.TP
+.I sbh_origlen
+The original length of the message, after
+.BR M_PROTO (9)
+conversion, before it was truncated to the snapshot length (if any).
+.TP
+.I sbh_msglen
+The length of the message, after
+.BR M_PROTO (9)
+conversion, but after truncation to the snapshot length (if any).
+.TP
+.I sbh_totlen
+The total length of this packet header, the truncated message length, and the
+padding necessary for alignment.  This is the offset from the start of
+the packet header of the next packet header within a chunk.
+.TP
+.I sbh_drops
+The number of messages that were dropped before this message was sent
+upstream.
+.TP
+.I sbh_timestamp
+The time-stamp that was taken when the message arrived at the module.  Note
+that this is always the 32-bit version of a
+.B timeval
+structure.  See
+.BR gettimeofday (3)
+for a description of this structure.
+.RE
+.IP ""
+When the
+.B SB_NO_HEADER
+flag is set, the header is not prepended and the message is not padded.  The
+truncated message is set as is.  In this case, the module does not trouble
+itself to take the time-stamp.
+.IP ""
+The adjusted
+.BR M_DATA (9)
+message is then placed on the read queue.  The read queue is no-enabled using
+the
+.BR noenable (9)
+.I STREAMS
+utility function, which means that the read queue's service procedure is not
+automatically enabled when normal priority messages are placed on the queue.
+.IP ""
+If there is sufficient normal data on the queue to form a complete chunk, the
+timer is cancelled and the queue is enabled with
+.BR qenable (9)
+to invoke the read service procedure.  Otherwise, if the timeout is set to a
+value greater than zero and the timer is not already running, it is started.
+If the
+.B SB_DEFER_CHUNK
+flag is set, and the first packet has not yet been received, the queue is
+enabled with
+.BR qenable (9)
+to deliver the first message of the timeout period.
+.IP ""
+When the read service procedure runs, messages are taken from the queue and
+delivered upstream as per normal and required for
+.I STREAMS
+modules; however, any consecutive
+.BR M_DATA (9)
+messages retrieved from the queue are concatenated into a single
+.BR M_DATA (9)
+message of no more than the chunk size.
+.TP
+.BR M_PROTO (9)
+When the
+.B SB_NO_PROTO_CVT
+flag is set, normal priority (band=0)
+.BR M_PROTO (9)
+messages are handled as described below under
+.RI \*(lq Other\ Data\ Block\ Types .\*(rq
+When the
+.B SB_NO_PROTO_CVT
+flag is clear, normal priority (band=0)
+.BR M_PROTO (9)
+messages are converted to
+.BR M_DATA (9)
+messages and handled as described above under
+.RI \*(lq M_DATA(9) .\*(rq
+.IP ""
+When the
+.B SB_HIPRI_OOB
+flag is clear, high priority (band>0)
+.BR M_PROTO (9)
+messages are treated the same as normal priority (band=0)
+.BR M_PROTO (9)
+messages (considering the setting of the
+.B SB_NO_PROTO_CVT
+flag).
+When the
+.B SB_HIPRI_OOB
+flag is set, high priority (band>0)
+.BR M_PROTO (9)
+messages are handled as described below under
+.RI \*(lq Other\ Data\ Block\ Types ,\*(rq
+(regardless of the setting of the
+.B SB_NO_PROTO_CVT
+flag).
+.BR
+.TP
+.BR M_FLUSH (9)
+.BR M_FLUSH (9)
+messages are handled in accordance with the requirements for
+.I STREAMS
+modules; however, whenever normal priority (band=0) messages are flushed, the timeout is
+cancelled and the internal state is reset.
+.TP
+.BR M_PCSIG (9)
+.BR M_PCSIG (9)
+messages are placed on the read queue (enabling its service procedure) by a
+timeout of the timer (when the set timeout is non-zero).  This enables the
+read service procedure on timeout, permitting it to deliver as much of a
+chunk of data as possible.
+.IP ""
+As these messages are placed directly onto the read queue, any
+.BR M_PCSIG (9)
+messages received from above are passed downstream directly from the read put
+procedure and will not disrupt the timer mechanism.
+.TP
+.B Other Data Block Types
+Other data block types are passed through the module in accordance with the
+requirements for
+.I STREAMS
+modules.
+However, whenever a normal priority (band=0) message is passed upstream, the timeout
+is cancelled and any accumulated
+.BR M_DATA (9)
+messages are immediately sent upstream (ahead of the normal priority (band=0)
+message).
+Priority control messages (such as
+.BR M_PCPROTO "(9) or " M_PCSIG (9)
+messages are always passed upstream, affecting neither the chunking nor
+delivery of
+.BR M_DATA (9)
+messages.
+.\"
+.SS Write-Side Behaviour
+.PP
+The write side behaviour of the
+.B bufmod
+module is as follows:
+When the
+.B SB_SEND_ON_WRITE
+flag is set, upon the arrival of any message to the write queue, the timer is
+cancelled (when the timeout is greater than zero) and the read queue is
+enabled with
+.BR qenable (9).
+The message is then handled as follows:
+.TP
+.BR M_IOCTL (9)/ M_IOCDATA (9)
+These input-output control messages as processed as normal for
+.I STREAMS
+modules.  Input-output control commands that are recognized by the module
+(listed below under
+.RI \*(lq IOCTLS \*(rq)
+are intercepted and processed.  All other input-output control commands are
+passed down to the driver.
+.TP
+.BR M_READ (9)
+When the
+.B SB_NO_MREAD
+flag is clear, the Stream head is set to deliver
+.BR M_READ (9)
+messages to the module.  Upon receipt of an
+.BR M_READ (9)
+message, the module remembers the message and enables the read queue with
+.BR qenable (9).
+When the read queue service procedure runs, the
+.BR M_READ (9)
+message is examined to determine the number of bytes upon which the Stream
+head has blocked (contained in the
+.B ulong
+in the
+.BR M_READ (9)
+message body), and consecutive
+.BR M_DATA (9)
+messages are chunked together to a maximum of the
+.BR M_READ (9)
+size, and delivered upstream.
+.TP
+.BR M_FLUSH (9)
+.BR M_FLUSH (9)
+messages on the write-side are handled in accordance with the requirements
+for
+.I STREAMS
+modules, without deviation.
+.TP
+.B Other Data Block Types
+Other data block types are passed along downstream to the driver in full
+accordance with the requirements for
+.I STREAMS
+modules, also considering flow control.
+.\"
 .\"
 .SH IOCTLS
 .PP
@@ -229,7 +481,7 @@ handles 32-bit user space input-output controls to a 64-bit kernel.
 .\"
 .SS SBIOCGTIME (('B' << 8) + 2)
 .PP
-This intput-output control is used to retrieve the maximum interval of time
+This input-output control is used to retrieve the maximum interval of time
 that the
 .B bufmod
 module will await messages completing a chunk before delivering an incomplete
@@ -291,7 +543,7 @@ is a pointer to an
 specifying the chunk size.
 .PP
 The initial chunk size is set to
-.BR SB_DLFT_CHUNK ,
+.BR SB_DFLT_CHUNK ,
 which is set to
 .B 8192
 in the
@@ -328,6 +580,13 @@ The initial snapshot length is set to zero (0), meaning that no message
 truncation will occur.
 .\"
 .SS SBIOCGSNAP (('B' << 8) + 7)
+.PP
+This input-output control is used to retrieve the snapshot length.  This is
+the maximum length of the packet (with or without a converted
+.BR M_PROTO (9)
+message block) that will be passed to the chunk and onward upstream.  It is
+the value that was set with
+.IR SBIOCSSNAP .
 .PP
 .I arg
 is a pointer to an
@@ -366,8 +625,8 @@ When this bit is set, it specifies that headers are not to be prepended to
 accumulated messages.
 .IP ""
 When headers are disabled using this feature, the reader of chunks must have
-some other mechanism that may be used to determine where the concatentated
-packets begin and end, as well as the timestamp associated with each message.
+some other mechanism that may be used to determine where the concatenated
+packets begin and end, as well as the time-stamp associated with each message.
 (For example, a converted
 .BR M_PROTO (9)
 message block may contain the necessary information, or it might be contained
@@ -427,6 +686,43 @@ failures regardless of the settings of the flag.)
 The original implementation of
 .B bufmod
 did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_HIPRI_OOB
+When this bit is set, the module will deliver high priority (band>0)
+.BR M_PROTO (9)
+messages in their priority band without conversion, regardless of the setting
+of the
+.B SB_NO_PROTO_CVT
+flag.
+.IP ""
+This is a
+.B @PACKAGE_TITLE@
+specific flag and should not be used by portable applications.
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature and it is, therefore, disabled by default.
+.TP
+.I SB_NO_MREAD
+When this bit is set, the module will not set the Stream head to deliver
+.BR M_READ (9)
+messages.
+.IP ""
+Delivery of
+.BR M_READ (9)
+messages helps to deliver packets at the rate at which the application can
+accept them rather than over-chunking when chunking is not required.  When
+the application would block, a
+.BR M_READ (9)
+message is sent downstream to signal the module to deliver what packets are
+available.
+.IP ""
+The original implementation of
+.B bufmod
+did not have this feature; however, it is compatible with the original
+implementation and is disabled by default (that is,
+.BR M_READ (9)
+messages are sent by default).
 .PP
 The initial value of all flags is clear (0).  This is equivalent to the old,
 flagless behavior of ancient
@@ -436,6 +732,10 @@ implementations.  See
 below.
 .\"
 .SS SBIOCGFLAGS (('B' << 8) + 9)
+.PP
+This input-output control is used to retrieve the user flags.  This is the
+value that was set with
+.IR SBIOCSFLAGS .
 .PP
 .I arg
 is a pointer to an
@@ -462,7 +762,7 @@ truncated.
 .SH CAVEATS
 .PP
 Note that the setting of the read options at the Stream head can
-significantly affect the operation when using
+significantly affect performance when using
 .BR read "(2s) or " readv (2s)
 to read chunks from the Stream head.
 .\"
@@ -485,7 +785,7 @@ to read chunks from the Stream head.
 .B bufmod
 has been tested with the
 .BR test-bufmod (8)
-conformance test suite.
+conformance test suite executable.
 .PP
 .B bufmod
 has no known bugs.
@@ -537,6 +837,12 @@ clear.
 .TP
 .I SB_NO_DROPS
 clear.
+.TP
+.I SB_HIPRI_OOB
+clear.
+.TP
+.I SB_NO_MREAD
+set.
 .PD
 .RE
 .IP \(em
@@ -587,10 +893,13 @@ test suite.
 .\"
 .SH CONFORMANCE
 .PP
-Network interface taps and raw sockets and DLPI drivers have never been an
+Network interface taps, raw sockets and DLPI drivers have never been an
 interesting subject for standards organizations such as IEEE and the
 OpenGroup, and these modules have never been subjected to formal
 standardization.
+.B bufmod
+conforms largely to the descriptions provided in the manual pages for
+Solaris and AIX.
 .\"
 .\"
 .SH HISTORY

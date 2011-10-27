@@ -71,7 +71,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <linux/sched.h>
 
 #define _SVR4_SOURCE	1
-#define _MPS_SOURCE	1
+#define _MPS_SOURCE	1   /* for mi_ functions */
+#define _SUN_SOURCE	1   /* for sun version of mi_timer_alloc */
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -80,6 +81,7 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <sys/ddi.h>
 #include <sys/strsun.h>
 #include <sys/strconf.h>
+#include <sys/cmn_err.h>
 
 #include <sys/bufmod.h>
 
@@ -199,9 +201,9 @@ struct sb {
 #define MSGHEADER	(1<<15)
 
 #ifdef RW_LOCK_UNLOCKED
-static rwlock_t sb_lock = RW_LOCK_UNLOCKED;
+static rwlock_t sb_open_lock = RW_LOCK_UNLOCKED;
 #elif defined __RW_LOCK_UNLOCKED
-static rwlock_t sb_lock = __RW_LOCK_UNLOCKED(&sb_lock);
+static rwlock_t sb_open_lock = __RW_LOCK_UNLOCKED(&sb_open_lock);
 #else
 #error cannot initialize read-write locks
 #endif
@@ -248,15 +250,14 @@ static caddr_t sb_opens;
 static noinline fastcall __unlikely int
 bufmod_stropts(struct sb *sb, int chunk, int snap)
 {
-	mblk_t *mp;
 	struct stroptions *so;
-	int effective_chunk;
+	mblk_t *mp;
 
 	/* for the purposes of this calculation */
-	if ((effective_chunk = chunk) < 4096)
-		effective_chunk = 4096;
-	if (effective_chunk > 65536)
-		effective_chunk = 65536;
+	if (chunk < 4096)
+		chunk = 4096;
+	if (chunk > 65536)
+		chunk = 65536;
 
 	if (likely((mp = allocb(sizeof(*so), BPRI_MED)) != NULL)) {
 		mp->b_datap->db_type = M_SETOPTS;
@@ -264,21 +265,12 @@ bufmod_stropts(struct sb *sb, int chunk, int snap)
 		bzero(mp->b_rptr, sizeof(*so));
 		so = (typeof(so)) mp->b_rptr;
 		so->so_flags = 0;
-		if (chunk < 0) {
-			//so->so_readopt = RMSGN; /* XXX RFILL? */
-			//so->so_flags |= SO_READOPT;
-			so->so_flags |= SO_MREADON;
-		} else {
-			//so->so_readopt = RNORM;
-			//so->so_flags |= SO_READOPT;
-			so->so_flags |= SO_MREADOFF;
-		}
-		so->so_flags = (SO_LOWAT|SO_HIWAT);
-		so->so_lowat = BUFMOD_LOWAT(effective_chunk, snap);
+		so->so_flags |= (sb->sb_flags & SB_NO_MREAD) ? SO_MREADOFF : SO_MREADON;
+		so->so_lowat = BUFMOD_LOWAT(chunk, snap);
 		if (so->so_lowat < SHEADLOWAT)
 			so->so_lowat = SHEADLOWAT;
 		so->so_flags |= SO_LOWAT;
-		so->so_hiwat = BUFMOD_HIWAT(effective_chunk, snap);
+		so->so_hiwat = BUFMOD_HIWAT(chunk, snap);
 		if (so->so_hiwat < SHEADHIWAT)
 			so->so_hiwat = SHEADHIWAT;
 		so->so_flags |= SO_HIWAT;
@@ -437,19 +429,19 @@ bufmod_ioctl(queue_t *q, mblk_t *mp)
 #ifdef __LP64__
 			if (ioc->ioc_flag == IOC_ILP32)
 				mi_copyin(q, mp, NULL, sizeof(uint32_t));
-#endif				/* __LP64__ */
 			else
+#endif				/* __LP64__ */
 				mi_copyin(q, mp, NULL, sizeof(unsigned long));
 			break;
 		case _IOC_NR(SBIOCCTIME):
-			if (bufmod_stropts(sb, -1, sb->sb_snap) != 0) {
+			if (bufmod_stropts(sb, 0, sb->sb_snap) != 0) {
 				mi_copy_done(q, mp, ENOSR);
 				break;
 			}
 			if (sb->sb_ticks > 0)
-				mi_timer_stop(sb->sb_timer);
+				mi_timer_cancel(sb->sb_timer);
 			sb->sb_ticks = 0;
-			sb->sb_chunk = -1;
+			sb->sb_chunk = 0;
 			if (qsize(sb->sb_rq) > 0)
 				qenable(sb->sb_rq);
 			mi_copy_done(q, mp, 0);
@@ -466,11 +458,11 @@ bufmod_ioctl(queue_t *q, mblk_t *mp)
 				tn.tv_sec = 0;
 				tn.tv_usec = 0;
 			} else {
-				tn.tv_sec = drv_hztomsecs(sb->sb_ticks) / 1000;
-				tn.tv_usec = (drv_hztomsecs(sb->sb_ticks) % 1000) * 1000;
+				tn.tv_sec = drv_hztomsec(sb->sb_ticks) / 1000;
+				tn.tv_usec = (drv_hztomsec(sb->sb_ticks) % 1000) * 1000;
 			}
 #ifdef __LP64__
-			if (cp->cp_flag == IOC_ILP32) {
+			if (ioc->ioc_flag == IOC_ILP32) {
 				struct timeval32 *tv;
 
 				db = mi_copyout_alloc(q, mp, NULL, sizeof(*tv), 1);
@@ -553,41 +545,50 @@ bufmod_iocdata(queue_t *q, mblk_t *mp)
 {
 	struct sb *sb = (typeof(sb)) q->q_ptr;
 	struct copyresp *cp = (typeof(cp)) mp->b_rptr;
-	mblk_t *db;
+	mblk_t *dp;
 
 	switch (_IOC_TYPE(cp->cp_cmd)) {
 	case _IOC_TYPE(SBIOC):
 		switch (_IOC_NR(cp->cp_cmd)) {
 		case _IOC_NR(SBIOCSTIME):
-		{
-			struct timeval tn;
+			switch (mi_copy_state(q, mp, &dp)) {
+			case -1:
+				break;
+			default:
+				mi_copy_done(q, mp, EPROTO);
+				break;
+			case MI_COPY_CASE(MI_COPY_IN, 1):
+			{
+				struct timeval tn;
 
 #ifdef __LP64__
-			if (cp->cp_flag == IOC_ILP32) {
-				struct timeval32 *tv = (typeof(tv)) dp->b_rptr;
+				if (cp->cp_flag == IOC_ILP32) {
+					struct timeval32 *tv = (typeof(tv)) dp->b_rptr;
 
-				tn.tv_sec = tv->tv_sec;
-				tn.tv_usec = tv->tv_usec;
-			} else
+					tn.tv_sec = tv->tv_sec;
+					tn.tv_usec = tv->tv_usec;
+				} else
 #endif				/* __LP64__ */
-			{
-				struct timeval *tv = (typeof(tv)) dp->b_rptr;
+				{
+					struct timeval *tv = (typeof(tv)) dp->b_rptr;
 
-				tn.tv_sec = tv->tv_sec;
-				tn.tv_usec = tv->tv_usec;
+					tn.tv_sec = tv->tv_sec;
+					tn.tv_usec = tv->tv_usec;
+				}
+				if (tn.tv_sec == 0 && tn.tv_usec == 0)
+					sb->sb_ticks = 0;
+				else {
+					sb->sb_ticks = 0;
+					sb->sb_ticks += drv_msectohz(tn.tv_sec * 1000);
+					sb->sb_ticks += drv_usectohz(tn.tv_usec);
+					if (sb->sb_ticks <= 0)
+						sb->sb_ticks = 1;
+				}
+				mi_copy_done(q, mp, 0);
+				break;
 			}
-			if (tn.tv_sec == 0 && tn.tv_usec == 0)
-				sb->sb_ticks = 0;
-			else {
-				sb->sb_ticks = 0;
-				sb->sb_ticks += drv_msectohz(tn.tv_sec * 1000);
-				sb->sb_ticks += drv_usectohz(tn.tv_usec);
-				if (sb->sb_ticks <= 0)
-					sb->sb_ticks = 1;
 			}
-			mi_copy_done(q, mp, 0);
 			break;
-		}
 		case _IOC_NR(SBIOCSCHUNK):
 			switch (mi_copy_state(q, mp, &dp)) {
 			case -1:
@@ -596,15 +597,15 @@ bufmod_iocdata(queue_t *q, mblk_t *mp)
 				mi_copy_done(q, mp, EPROTO);
 				break;
 			case MI_COPY_CASE(MI_COPY_IN, 1):
-				if (*(int *)dp->b_rptr < -1) {
+				if (*(int *) dp->b_rptr < 0) {
 					mi_copy_done(q, mp, EINVAL);
 					break;
 				}
-				if (bufmod_stropts(sb, *(int *)dp->b_rptr, sb->sb_snap) != 0) {
+				if (bufmod_stropts(sb, *(int *) dp->b_rptr, sb->sb_snap) != 0) {
 					mi_copy_done(q, mp, ENOSR);
 					break;
 				}
-				sb->sb_chunk = *(int *)dp->b_rptr;
+				sb->sb_chunk = *(int *) dp->b_rptr;
 				if (sb->sb_chunk > 65536)
 					sb->sb_chunk = 65536;
 				mi_copy_done(q, mp, 0);
@@ -677,7 +678,7 @@ bufmod_iocdata(queue_t *q, mblk_t *mp)
 		case _IOC_NR(SBIOCGCHUNK):
 		case _IOC_NR(SBIOCGSNAP):
 		case _IOC_NR(SBIOCGFLAGS):
-			switch (mi_copy_state(q, mp, &db)) {
+			switch (mi_copy_state(q, mp, &dp)) {
 			case -1:
 				break;
 			case MI_COPY_CASE(MI_COPY_OUT, 1):
@@ -724,7 +725,7 @@ bufmod_gettimeval(const struct sb *sb, struct sb_hdr *sbh)
 	sbh->sbh_timestamp.tv_usec = tv.tv_usec;
 }
 
-/** bufmod_adjsnap: -adjust a message to the snapshot length.
+/** bufmod_adjsize: -adjust a message to the snapshot length.
   * @sb: private structure
   * @mp: message to adjust
   * @sbh: pseudo STREAMS buffer header
@@ -743,11 +744,12 @@ bufmod_gettimeval(const struct sb *sb, struct sb_hdr *sbh)
   * upstream and gets it to deliver each and every message to us.
   */
 static inline fastcall __hot_get int
-bufmod_adjsnap(const struct sb *sb, mblk_t *mp, struct sb_hdr *sbh, mblk_t **epp)
+bufmod_adjsize(const struct sb *sb, mblk_t *mp, struct sb_hdr *sbh, mblk_t **epp)
 {
 	register mblk_t *b, *e;
 	register ssize_t olen, mlen, dlen;
 	const ssize_t snap = sb->sb_snap;
+	ssize_t tlen;
 	queue_t *q = sb->sb_rq;
 
 	prefetch(q);
@@ -760,18 +762,16 @@ bufmod_adjsnap(const struct sb *sb, mblk_t *mp, struct sb_hdr *sbh, mblk_t **epp
 				b->b_wptr = b->b_rptr + (snap - mlen);
 				mlen = snap;
 			}
-		} else if (dlen < 0)
+		} else
 			b->b_wptr = b->b_rptr;
 	}
-	/* The only problem with this is that the service procedure could have one or two 
-	   messages pulled off of the queue at this point, so we need a fudge factor. */
-	if (q->q_count + (sb->sb_flags & SB_NO_HEADER) ? mlen :
-	    sizeof(*sbh) + ((mlen + (sizeof(ulong) - 1)) & ~(sizeof(ulong) - 1))
-	    >= q->q_hiwat)
-		return (-EBUSY);
+	tlen = sizeof(*sbh) + ((mlen + (sizeof(ulong) - 1)) & ~(sizeof(ulong) - 1));
+	if (!(sb->sb_flags & SB_NO_DROPS))
+		if (q->q_count + (sb->sb_flags & SB_NO_HEADER) ? mlen : tlen >= q->q_hiwat)
+			return (-EBUSY);
 	sbh->sbh_origlen = olen;
 	sbh->sbh_msglen = mlen;
-	sbh->sbh_totlen = mlen;	/* for now */
+	sbh->sbh_totlen = tlen;
 	*epp = e;
 	return (0);
 }
@@ -802,7 +802,7 @@ bufmod_padmsg(const struct sb *sb, struct sb_hdr *sbh, mblk_t *ep)
 	ssize_t plen;
 	mblk_t *pp;
 
-	plen = (sbh->sbh_msglen + (sizeof(ulong)-1)) & ~(sizeof(ulong)-1);
+	plen = sbh->sbh_totlen - sizeof(*sbh);
 	if (likely((pad = plen - sbh->sbh_msglen) > 0)) {
 		if (likely(ep->b_datap->db_lim >= ep->b_wptr + pad)) {
 			if (ep->b_datap->db_ref == 1)
@@ -817,7 +817,6 @@ bufmod_padmsg(const struct sb *sb, struct sb_hdr *sbh, mblk_t *ep)
 			ep = pp;
 		}
 	}
-	sbh->sbh_totlen = sizeof(*sbh) + plen;
 	return (0);
       enosr:
 	return (-ENOSR);
@@ -838,7 +837,7 @@ bufmod_padmsg(const struct sb *sb, struct sb_hdr *sbh, mblk_t *ep)
 STATIC noinline fastcall __hot_get int
 bufmod_addheader(const struct sb *sb, struct sb_hdr *sbh, mblk_t **mpp)
 {
-	static const size = sizeof(struct sb_hdr);
+	static const size_t size = sizeof(struct sb_hdr);
 	mblk_t *mp = (*mpp);
 	dblk_t *db = mp->b_datap;
 	ssize_t blen, dlen;
@@ -874,8 +873,7 @@ bufmod_addheader(const struct sb *sb, struct sb_hdr *sbh, mblk_t **mpp)
 
 	sbh->sbh_drops = sb->sb_pdrops;
 
-	/* We really don't know what the final alignment of mp->b_rptr will be.  */
-	bcopy((unsigned char *) sbh, mp->b_rptr, size);
+	*(typeof(sbh)) mp->b_rptr = *sbh;
 
 	mp->b_flag |= MSGHEADER;
 
@@ -901,10 +899,10 @@ bufmod_addheader(const struct sb *sb, struct sb_hdr *sbh, mblk_t **mpp)
 static inline fastcall __hot_get int
 bufmod_msgadjust(const struct sb *sb, mblk_t **mpp)
 {
-	register mblk_t *ep;
+	mblk_t *ep;
 	struct sb_hdr sbh = { 0, };
 
-	if (bufmod_adjsnap(sb, (*mpp), &sbh, &ep) != 0) return (-EBUSY);
+	if (bufmod_adjsize(sb, (*mpp), &sbh, &ep) != 0) return (-EBUSY);
 
 	if (likely(!(sb->sb_flags & SB_NO_HEADER))) {
 		bufmod_gettimeval(sb, &sbh);
@@ -933,16 +931,17 @@ bufmod_msgadjust(const struct sb *sb, mblk_t **mpp)
 STATIC streamscall __hot_write int
 bufmod_wput(queue_t *q, mblk_t *mp)
 {
-	struct sb *sb = (typeof(sb)) q->q_ptr;
+	struct sb *sbw = (typeof(sbw)) q->q_ptr;
+	const struct sb *sb = sbw;
 	unsigned char db_type = mp->b_datap->db_type;
 
 	if (sb->sb_flags & SB_SEND_ON_WRITE) {
 		if (sb->sb_ticks > 0)
-			mi_timer_stop(sb->sb_timer);
+			mi_timer_cancel(sbw->sb_timer);
 		qenable(sb->sb_rq);
 	}
 
-	switch (db_type) {
+	switch (__builtin_expect(db_type, M_PROTO)) {
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHW) {
 			if (mp->b_rptr[0] & FLUSHBAND)
@@ -951,32 +950,32 @@ bufmod_wput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHDATA);
 		}
 		putnext(q, mp);
-		return (0);
+		break;
 	case M_IOCTL:
 		bufmod_ioctl(q, mp);
-		return (0);
+		break;
 	case M_IOCDATA:
 		bufmod_iocdata(q, mp);
-		return (0);
+		break;
 	case M_READ:
 		if (sb->sb_mread)
-			freemsg(XCHG(&sb->sb_mread,NULL));
-		sb->sb_mread = mp;
+			freemsg(XCHG(&sbw->sb_mread, NULL));
+		sbw->sb_mread = mp;
 		if (sb->sb_ticks > 0)
-			mi_timer_stop(sbw->sb_timer);
+			mi_timer_cancel(sbw->sb_timer);
 		qenable(sb->sb_rq);
-		return (0);
-	default:
 		break;
-	}
-	if (db_type >= QPCTL || (q->q_first == NULL && !(q->q_flag & QSVCBUSY) &&
-				 bcanputnext(q, mp->b_band))) {
-		putnext(q, mp);
-		return (0);
-	}
-	if (unlikely(putq(q, mp) == 0)) {
-		mp->b_band = 0;
-		putq(q, mp);	/* this must succeed */
+	default:
+		if (db_type >= QPCTL || (q->q_first == NULL && !(q->q_flag & QSVCBUSY)
+					 && bcanputnext(q, mp->b_band))) {
+			putnext(q, mp);
+			break;
+		}
+		if (unlikely(putq(q, mp) == 0)) {
+			mp->b_band = 0;
+			(void) putq(q, mp);	/* must succeed */
+		}
+		break;
 	}
 	return (0);
 }
@@ -985,7 +984,8 @@ bufmod_wput(queue_t *q, mblk_t *mp)
   * @q: the write queue.
   *
   * This is a canonical write service procedure.  It simply passes messages along under flow
-  * control.
+  * control.  A check must be made for M_IOCTL and M_IOCDATA because the mi_copyin functions
+  * sometimes places one of these messages on the queue.
   */
 STATIC streamscall __hot_read int
 bufmod_wsrv(queue_t *q)
@@ -993,12 +993,23 @@ bufmod_wsrv(queue_t *q)
 	mblk_t *mp;
 
 	while ((mp = getq(q))) {
-		if (likely(mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band))) {
-			putnext(q, mp);
+		unsigned char db_type = mp->b_datap->db_type;
+
+		switch (__builtin_expect(db_type, M_PROTO)) {
+		case M_IOCTL:
+			bufmod_ioctl(q, mp);
 			continue;
+		case M_IOCDATA:
+			bufmod_iocdata(q, mp);
+			continue;
+		default:
+			if (unlikely(db_type >= QPCTL) || likely(bcanputnext(q, mp->b_band))) {
+				putnext(q, mp);
+				continue;
+			}
+			putbq(q, mp);
+			break;
 		}
-		putbq(q, mp);
-		break;
 	}
 	return (0);
 }
@@ -1064,121 +1075,102 @@ bufmod_rsrv(queue_t *q)
 	uint32_t defer = (sb->sb_flags & SB_DEFER_CHUNK);
 	long chunk = sb->sb_chunk;
 	mblk_t *mp, *mr;
+	int partial_ok = 1;
 
 	if ((mr = XCHG(&sb->sb_mread, NULL)) != NULL)
 		chunk = *(long *) mr->b_rptr;
 
 	while ((mp = getq(q)) != NULL) {
-		unsigned char mp_type = mp->b_datap->db_type;
-
-		switch (__builtin_expect(mp_type, M_DATA)) {
+		switch (__builtin_expect(mp->b_datap->db_type, M_DATA)) {
 		case M_DATA:
-			mp->b_flag &= ~MSGDELIM;
-			if (chunk < 0 && mr == NULL) {
-				/* wait for an M_READ */
-				putbq(q, mp);
-				break;
-			}
-			if (chunk == 0) {
-				/* process individually */
-				sb->sb_state = SB_FRCVD;
-				break;
-			}
-			if (defer && !sb->sb_state) {
-				/* process first msg individually */
-				sb->sb_state = SB_FRCVD;
-				break;
-			}
-			{
-				size_t count = 0;
-				mblk_t *lp, *dp;
-				int mlen;
+			if (chunk != 0) {
+				if (defer && !sb->sb_state) {
+					/* process first msg individually */
+					sb->sb_state = SB_FRCVD;
+					partial_ok = 0;
+				} else {
+					mblk_t *lp;
+					int mlen;
 
-				bufmod_msgsizelast(mp, &mlen, &lp);
-				if (mlen >= chunk) {
-					/* let it go */
+					bufmod_msgsizelast(mp, &mlen, &lp);
+					if (mlen < chunk) {
+						mblk_t *dp;
+
+						while ((dp = getq(q))) {
+							if (likely(dp->b_datap->db_type == M_DATA)) {
+								mblk_t *ep;
+								int dlen;
+
+								bufmod_msgsizelast(dp, &dlen, &ep);
+								if (mlen + dlen <= chunk) {
+									/* chunk it up */
+									mlen += dlen;
+									lp->b_cont = dp;
+									lp = ep;
+									mp->b_csum += dp->b_csum;
+									continue;
+								}
+							}
+							putbq(q, dp);
+							break;
+						}
+						/* already sent one - stop here */
+						if (dp == NULL && !partial_ok) {
+							if (sb->sb_ticks > 0)
+								mi_timer_ticks(sb->sb_timer, sb->sb_ticks);
+							break;
+						}
+						/* nothing left - let it go */
+					}
 					sb->sb_state = 0;
-					break;
+					partial_ok = 0;
 				}
-				count += mlen;
-				while ((dp = getq(q))) {
-					unsigned char dp_type;
-					mblk_t *ep;
-					int dlen;
-
-					dp->b_flag &= ~MSGDELIM;
-					dp_type = dp->b_datap->db_type;
-					if (db_type != M_DATA) {
-						putbq(q, dp);
-						/* let it go */
-						sb->sb_state = 0;
-						break;
-					}
-
-					bufmod_msgsizelast(dp, &dlen, &ep);
-					if (count + dlen > chunk) {
-						putbq(q, dp);
-						/* let it go */
-						mp->b_flags |= MSGDELIM;
-						sb->sb_state = 0;
-						break;
-					}
-					/* chunk it up */
-					count += dlen;
-					lp->b_cont = dp;
-					lp = ep;
-					mp->b_csum += dp->b_csum;
-				}
-				/* nothing left - let it go */
-				mp->b_flags |= MSGDELIM;
-				sb->sb_state = 0;
-				break;
 			}
-		case M_PCSIG:
-			if (mp == sb->sb_timer) {
-				mi_timer_valid(mp);
+			if (sb->sb_sdrops != 0) {
+				mp->b_csum += sb->sb_sdrops;
+				if (mp->b_flag & MSGHEADER)
+					((struct sb_hdr *) (mp->b_rptr))->sbh_drops += sb->sb_sdrops;
+				sb->sb_sdrops = 0;
+			}
+			if (canputnext(q)) {
+				mp->b_flag |= MSGDELIM;
+				putnext(q, mp);
+				if (mr != NULL) {
+					/* Transform to zero-length delimited M_DATA to
+					   unblock the read at the Stream head. */
+					mr->b_datap->db_type = M_DATA;
+					mr->b_flag |= MSGDELIM;
+					mr->b_wptr = mr->b_rptr;
+					putnext(q, mr);
+					mr = NULL;
+				}
 				continue;
 			}
-			putnext(q, mp);
-			continue;
-		default:
-			break;
-		}
-		if (mp_type == M_DATA && sb->sb_sdrops) {
-			mp->b_csum += sb->sb_sdrops;
-			if (mp->b_flag & MSGHEADER) {
-				struct sb_hdr sbh;
-
-				/* don't know alignment of header */
-				bcopy(mp->b_rptr, &sbh, sizeof(sbh));
-				sbh.sbh_drops += sb->sb_sdrops;
-				bcopy(&sbh, mp->b_rptr, sizeof(sbh));
+			/* flow controlled, either drop or propagate flow control */
+			if (!(sb->sb_flags & SB_NO_DROPS)) {
+				sb->sb_sdrops += mp->b_csum;
+				freemsg(mp);
+				continue;
 			}
-			sb->sb_sdrops = 0;
-		}
-		if (mp_type >= QPCTL || bcanputnext(q, mp->b_band)) {
-			mp->b_flag &= ~MSGHEADER;
-			if ((mr != NULL) && (mp->b_flag & MSGDELIM))
-				freemsg(XCHG(&mr, NULL));
-			putnext(q, mp);
+			break;
+
+		case M_PCSIG:
+			if (mi_timer_valid(mp))
+				sb->sb_state = 0;
 			continue;
-		}
-		if (mp_type == M_DATA && !(sb->sb_flags & SB_NO_DROPS)) {
-			sb->sb_sdrops += mp->b_csum;
-			freemsg(mp);
-			continue;
+
+		default:
+			if (mp->b_datap->db_type >= QPCTL || bcanputnext(q, mp->b_band)) {
+				putnext(q, mp);
+				continue;
+			}
+			break;
 		}
 		putbq(q, mp);
 		break;
 	}
-	if (mr != NULL) {
-		/* Transform to zero-length delimited M_DATA to unblock the read at the
-		   Stream head. */
-		mr->b_datap->db_type = M_DATA;
-		mr->b_flag |= MSGDELIM;
-		mr->b_wptr = mr->b_rptr;
-		putnext(q, mp);
-	}
+	if (mr != NULL)
+		freemsg(mr);
 	return (0);
 }
 
@@ -1248,55 +1240,44 @@ bufmod_rsrv(queue_t *q)
 STATIC streamscall __hot_get int
 bufmod_rput(queue_t *q, mblk_t *mp)
 {
-	const struct sb *sb = (typeof(sb)) q->q_ptr;
-	struct sb *sbw = (typeof(sb)) q->q_ptr;
+	struct sb *sbw = (typeof(sbw)) q->q_ptr;
+	const struct sb *sb = sbw;
 	unsigned char db_type = mp->b_datap->db_type;
 
 	switch (__builtin_expect(db_type, M_DATA)) {
 	case M_PROTO:
-		if (mp->b_band != 0 && (sb->sb_flags & SB_HIPRI_OOB)) {
+		if (mp->b_band != 0 && (sb->sb_flags & SB_HIPRI_OOB))
 			break;
-		}
-		if (sb->sb_flags & SB_NO_PROTO_CVT) {
+		if (sb->sb_flags & SB_NO_PROTO_CVT)
 			break;
-		}
 		mp->b_datap->db_type = M_DATA;
-
 		/* fall through */
 
 	case M_DATA:
-		if (bufmod_msgadjust(sb, &mp) != 0)
-			goto dropit;
+		if (bufmod_msgadjust(sb, &mp) == 0) {
+			mp->b_band = 0;
+			mp->b_csum = 1 + XCHG(&sbw->sb_pdrops, 0);
 
-		mp->b_band = 0;
-		mp->b_csum = 1 + XCHG(&sbw->sb_pdrops, 0);
+			if (q->q_count == 0) {
+				if (sb->sb_ticks > 0)
+					mi_timer_ticks(sbw->sb_timer, sb->sb_ticks);
+				if ((sb->sb_flags & SB_DEFER_CHUNK) && !sb->sb_state)
+					qenable(q);
+			}
 
-		putq(q, mp);
+			putq(q, mp);
 
-		/* We don't really want to muck with the queue and timers on
-		 * every message.  Need some check to see whether it is worth
-		 * enabling the queue.  For example, if the queue is waiting on
-		 * a back-enable, there is no point in enabling the queue nor in
-		 * setting any timer. */
-
-		if (sb->sb_chunk > 0 && q->q_count > sb->sb_chunk) {
-			if (sb->sb_ticks > 0)
-				mi_timer_stop(sbw->sb_timer, sb->sb_ticks);
-			qenable(q);
-			return (0);
+			if (sb->sb_chunk > 0 && q->q_count > sb->sb_chunk) {
+				if (sb->sb_ticks > 0)
+					mi_timer_cancel(sbw->sb_timer);
+				qenable(q);
+				break;
+			}
+			break;
 		}
-		if (sb->sb_ticks > 0) {
-			mi_timer_cond(sbw->sb_timer, sb->sb_ticks);
-		}
-		if ((sb->sb_flags & SB_DEFER_CHUNK) && !sb->sb_state) {
-			qenable(q);
-		}
-		return (0);
-
-	      dropit:
 		sbw->sb_pdrops++;
 		freemsg(mp);
-		return (0);
+		break;
 
 	case M_FLUSH:
 		if (mp->b_rptr[0] & FLUSHR) {
@@ -1306,29 +1287,32 @@ bufmod_rput(queue_t *q, mblk_t *mp)
 				flushq(q, FLUSHDATA);
 
 				if (sb->sb_ticks > 0)
-					mi_timer_stop(sbw->sb_timer);
+					mi_timer_cancel(sbw->sb_timer);
+
 				sbw->sb_state = 0;
+				sbw->sb_pdrops = 0;
+				sbw->sb_sdrops = 0;
 			}
 		}
 		putnext(q, mp);
-		return (0);
+		break;
 
 	default:
+		if (db_type >= QPCTL || (q->q_first == NULL && !(q->q_flag & QSVCBUSY) &&
+					 bcanputnext(q, mp->b_band))) {
+			putnext(q, mp);
+			break;
+		}
+		if (unlikely(putq(q, mp) == 0)) {
+			mp->b_band = 0;
+			putq(q, mp);	/* this must succeed */
+		}
+		if (mp->b_band == 0) {
+			if (sb->sb_ticks > 0)
+				mi_timer_cancel(sbw->sb_timer);
+			qenable(q);
+		}
 		break;
-	}
-	if (db_type >= QPCTL || (q->q_first == NULL && !(q->q_flag & QSVCBUSY) &&
-				 bcanputnext(q, mp->b_band))) {
-		putnext(q, mp);
-		return (0);
-	}
-	if (unlikely(putq(q, mp) == 0)) {
-		mp->b_band = 0;
-		putq(q, mp);	/* this must succeed */
-	}
-	if (mp->b_band == 0) {
-		if (sb->sb_ticks > 0)
-			mi_timer_stop(sbw->sb_timer);
-		qenable(q);
 	}
 	return (0);
 }
@@ -1347,25 +1331,21 @@ bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	struct sb *sb;
 	mblk_t *tb, *mp;
 	struct stroptions *so;
+	int err;
 
-	if (q->q_ptr)
+	if (q->q_ptr != NULL)
 		return (0);
-
 	if (sflag != MODOPEN)
 		return (ENXIO);
-
-	if ((tb = mi_timer_alloc(q, 0)) == NULL) {
+	if ((tb = mi_timer_alloc(0)) == NULL)
 		return (ENOSR);
-	}
-
 	if ((mp = allocb(sizeof(*so), BPRI_WAITOK)) == NULL) {
 		mi_timer_free(tb);
 		return (ENOSR);
 	}
-
-	write_lock(&sb_lock);
-	if ((err = mi_open_comm(&sb_opens, sizeof(*sb), q, devp, oflags, sflag, crp))) {
-		write_unlock(&sb_lock);
+	write_lock(&sb_open_lock);
+	if ((err = mi_open_comm(&sb_opens, sizeof(*sb), q, devp, oflag, sflag, crp))) {
+		write_unlock(&sb_open_lock);
 		freeb(mp);
 		mi_timer_free(tb);
 		return (err);
@@ -1388,7 +1368,7 @@ bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 	sb->sb_state = 0;
 	sb->sb_mread = NULL;
 
-	write_unlock(&sb_lock);
+	write_unlock(&sb_open_lock);
 
 	mp->b_datap->db_type = M_SETOPTS;
 	mp->b_wptr = mp->b_rptr + sizeof(*so);
@@ -1397,9 +1377,7 @@ bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 	so->so_flags = 0;
 
-	//so->so_readopt = RNORM;	/* XXX RMSGN? */
-	//so->so_flags |= SO_READOPT;
-	so->so_flags |= SO_MREADOFF;
+	so->so_flags |= SO_MREADON;
 
 	so->so_lowat = SHEADLOWAT; /* SHEADHIWAT = 8192 */
 	so->so_lowat = SNIT_LOWAT(SB_DFLT_CHUNK, 1); /* 32767 + 256 */
@@ -1407,7 +1385,7 @@ bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 	so->so_hiwat = SHEADHIWAT; /* SHEADHIWAT = 65536 */
 	so->so_hiwat = SNIT_HIWAT(SB_DFLT_CHUNK, 1); /* 65536 + 512 */
-	so->so_flfags |= SO_HIWAT;
+	so->so_flags |= SO_HIWAT;
 
 	qprocson(q);
 	noenable(q);
@@ -1419,14 +1397,16 @@ bufmod_close(queue_t *q, int oflag, cred_t *crp)
 {
 	struct sb *sb = (typeof(sb)) q->q_ptr;
 
+	(void) oflag;
+	(void) crp;
 	qprocsoff(q);
 	if (sb->sb_mread != NULL)
 		freemsg(XCHG(&sb->sb_mread, NULL));
 	if (sb->sb_timer != NULL)
 		mi_timer_free(XCHG(&sb->sb_timer, NULL));
-	write_lock(&sb_lock);
+	write_lock(&sb_open_lock);
 	mi_close_comm(&sb_opens, q);
-	write_unlock(&sb_lock);
+	write_unlock(&sb_open_lock);
 	return (0);
 }
 
@@ -1439,7 +1419,7 @@ bufmod_close(queue_t *q, int oflag, cred_t *crp)
  */
 STATIC struct qinit bufmod_rinit = {
 	.qi_putp = bufmod_rput,
-	.qi_bufp = bufmod_rsrv,
+	.qi_srvp = bufmod_rsrv,
 	.qi_qopen = bufmod_open,
 	.qi_qclose = bufmod_close,
 	.qi_minfo = &bufmod_minfo,
@@ -1448,7 +1428,7 @@ STATIC struct qinit bufmod_rinit = {
 
 STATIC struct qinit bufmod_winit = {
 	.qi_putp = bufmod_wput,
-	.qi_bufp = bufmod_wsrv,
+	.qi_srvp = bufmod_wsrv,
 	.qi_minfo = &bufmod_minfo,
 	.qi_mstat = &bufmod_wstat,
 };
