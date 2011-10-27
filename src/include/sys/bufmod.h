@@ -99,7 +99,8 @@
 #define SB_NO_PROTO_CVT		(1<<2)		/**< Do not convert M_PROTO to data. */
 #define SB_DEFER_CHUNK		(1<<3)		/**< Defer chunk generation for one message. */
 #define SB_NO_DROPS		(1<<4)		/**< Do not drop messages under flow control. */
-#define SB_HIPRI_OOB            (1<<5)          /**< Deliver high-priority M_PROTO out of band, */
+#define SB_HIPRI_OOB            (1<<5)          /**< Deliver high-priority M_PROTO out of band. */
+#define SB_NO_MREAD             (1<<6)          /**< Do not set stream head for M_READ. */
 /** @} */
 
 /** @name state Buffering State
@@ -132,10 +133,10 @@
   * the caller to the input-output control that activated the addition of headers.
   */
 struct sb_hdr {
-	uint_t sbh_origlen;
-	uint_t sbh_msglen;
-	uint_t sbh_totlen;
-	uint_t sbh_drops;
+	uint sbh_origlen;
+	uint sbh_msglen;
+	uint sbh_totlen;
+	uint sbh_drops;
 #if defined(_LP64)  || defined (_I32LPx)
 	struct timeval32 sbh_timestamp;
 #else

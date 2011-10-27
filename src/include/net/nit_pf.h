@@ -65,10 +65,54 @@
 /** @file
   * Network Interface Tap packet filter (nit_pf) header file.  */
 
+#define ENMAXFILTERS		255		/**< Maximum old packet filter short words. */
+
+/** Filter structure for NIOCSETF input-output control.
+  */
+struct packetfilt {
+	uchar Pf_Priority;			/**< Priority of the filter. */
+	uchar Pf_FilterLen;			/**< Length of the command list in the filter. */
+	ushort Pf_Filter[ENMAXFILTERS];	/**< Filter command list. */
+};
+
+#ifndef NIOC
+#define NIOC ('p' << 8)
+#endif
+
 /** @name Old SNIT packet filter input-output controls.
   * @{ */
-#define NIOCSETF	_IOW(p, 2, struct packetfilt)	/**< Set packet filter. */
+#define NIOCSETF	_IOW('p', 2, struct packetfilt)	/**< Set packet filter. */
 /** @} */
+
+/*  these must sum to sizeof (ushort_t)!  */
+#define	ENF_NBPA	10	/* # bits / action */
+#define	ENF_NBPO	 6	/* # bits / operator */
+
+/*  binary operators  */
+#define	ENF_NOP		( 0 << ENF_NBPA)
+#define	ENF_EQ		( 1 << ENF_NBPA)
+#define	ENF_LT		( 2 << ENF_NBPA)
+#define	ENF_LE		( 3 << ENF_NBPA)
+#define	ENF_GT		( 4 << ENF_NBPA)
+#define	ENF_GE		( 5 << ENF_NBPA)
+#define	ENF_AND		( 6 << ENF_NBPA)
+#define	ENF_OR		( 7 << ENF_NBPA)
+#define	ENF_XOR		( 8 << ENF_NBPA)
+#define	ENF_COR		( 9 << ENF_NBPA)
+#define	ENF_CAND	(10 << ENF_NBPA)
+#define	ENF_CNOR	(11 << ENF_NBPA)
+#define	ENF_CNAND	(12 << ENF_NBPA)
+#define	ENF_NEQ		(13 << ENF_NBPA)
+
+/*  stack actions  */
+#define	ENF_NOPUSH	 0  /* do not push */
+#define	ENF_PUSHLIT	 1  /* push the next program word on the stack */
+#define	ENF_PUSHZERO	 2  /* push 0x0000 on the stack */
+#define	ENF_PUSHONE	 3  /* push 0x0001 on the stack */
+#define	ENF_PUSHFFFF	 4  /* push 0xffff on the stack */
+#define	ENF_PUSHFF00	 5  /* push 0xff00 on the stack */
+#define	ENF_PUSH00FF	 6  /* push 0x00ff on the stack */
+#define	ENF_PUSHWORD	16  /* push the n'th short-word of the message on the stack */
 
 /** @} */
 

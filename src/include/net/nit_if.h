@@ -69,13 +69,17 @@
  * STREAMS Network Interface Tab interface "nit_if" header file.
  */
 
+#ifndef NIOC
+#define NIOC ('p' << 8)
+#endif
+
 /** @name Old SNIT interface input-output controls.
   * @{ */
-#define NIOCBIND	_IOW(p, 3, struct ifreq)	/**< Bind to interface. */
-#define NIOCSFLAGS	_IOW(p, 4, u_long)		/**< Set nit_if flags. */
-#define NIOCGFLAGS	_IOWR(p, 5, u_long)		/**< Get nit_if flags. */
-#define NIOCSSNAP	_IOW(p, 6, u_long)		/**< Set snapshot length. */
-#define NIOCGSNAP	_IOWR(p, 7, u_long)		/**< Get Snapshot length. */
+#define NIOCBIND	_IOW('p', 3, struct ifreq)	/**< Bind to interface. */
+#define NIOCSFLAGS	_IOW('p', 4, u_long)		/**< Set nit_if flags. */
+#define NIOCGFLAGS	_IOWR('p', 5, u_long)		/**< Get nit_if flags. */
+#define NIOCSSNAP	_IOW('p', 6, u_long)		/**< Set snapshot length. */
+#define NIOCGSNAP	_IOWR('p', 7, u_long)		/**< Get Snapshot length. */
 /** @} */
 
 /** @name Old SNIT interface user-visible flags.
@@ -128,6 +132,18 @@ struct nit_iftime {
 };
 
 /** @} */
+
+#ifdef __KERNEL__
+/*
+ * Bridge between hardware interface and nit subsystem.
+ */
+struct nit_if {
+	caddr_t nif_header;		/* pointer to packet header */
+	uint nif_hdrlen;		/* length of packet header */
+	uint nif_bodylen;		/* lenght of packet body */
+	int nif_promisc;		/* packet not addressed to host */
+};
+#endif				/* __KERNEL__ */
 
 /** @} */
 
