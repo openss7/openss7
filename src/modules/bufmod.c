@@ -71,8 +71,8 @@ static char const ident[] = "$RCSfile$ $Name$($Revision$) $Date$";
 #include <linux/sched.h>
 
 #define _SVR4_SOURCE	1
-#define _MPS_SOURCE	1   /* for mi_ functions */
-#define _SUN_SOURCE	1   /* for sun version of mi_timer_alloc */
+#define _MPS_SOURCE	1	/* for mi_ functions */
+#define _SUN_SOURCE	1	/* for sun version of mi_timer_alloc */
 
 #include <sys/kmem.h>
 #include <sys/stream.h>
@@ -223,7 +223,6 @@ static caddr_t sb_opens;
 #define BUFMOD_LOWAT(chunksize, snapshot) \
 	 SNIT_LOWAT(chunksize, snapshot > 0 ? snapshot <= 100 ? 4 : snapshot <= 400 ? 2 : 1 : 1)
 
-
 /** bufmod_stropts: - set Stream head options
   * @sb: private structure
   * @chunk: the chunk size to set
@@ -279,6 +278,7 @@ bufmod_stropts(struct sb *sb, int chunk, int snap)
 	}
 	return (-ENOSR);
 }
+
 /*
  *  -------------------------------------------------------------------------
  *
@@ -633,9 +633,8 @@ bufmod_iocdata(queue_t *q, mblk_t *mp)
 			}
 			break;
 		case _IOC_NR(SBIOCSFLAGS):
-			/* arg is a pointer to an unsigned long specifying the buffer
-			   flags.  The buffer flags may be a bitwise OR of any of the
-			   following flags. */
+			/* arg is a pointer to an unsigned long specifying the buffer flags.  The
+			   buffer flags may be a bitwise OR of any of the following flags. */
 			switch (mi_copy_state(q, mp, &dp)) {
 			case -1:
 				break;
@@ -902,12 +901,15 @@ bufmod_msgadjust(const struct sb *sb, mblk_t **mpp)
 	mblk_t *ep;
 	struct sb_hdr sbh = { 0, };
 
-	if (bufmod_adjsize(sb, (*mpp), &sbh, &ep) != 0) return (-EBUSY);
+	if (bufmod_adjsize(sb, (*mpp), &sbh, &ep) != 0)
+		return (-EBUSY);
 
 	if (likely(!(sb->sb_flags & SB_NO_HEADER))) {
 		bufmod_gettimeval(sb, &sbh);
-		if (bufmod_padmsg   (sb, &sbh, ep)  != 0) return (-ENOSR);
-		if (bufmod_addheader(sb, &sbh, mpp) != 0) return (-ENOSR);
+		if (bufmod_padmsg(sb, &sbh, ep) != 0)
+			return (-ENOSR);
+		if (bufmod_addheader(sb, &sbh, mpp) != 0)
+			return (-ENOSR);
 	}
 	return (0);
 }
@@ -1117,7 +1119,8 @@ bufmod_rsrv(queue_t *q)
 						/* already sent one - stop here */
 						if (dp == NULL && !partial_ok) {
 							if (sb->sb_ticks > 0)
-								mi_timer_ticks(sb->sb_timer, sb->sb_ticks);
+								mi_timer_ticks(sb->sb_timer,
+									       sb->sb_ticks);
 							break;
 						}
 						/* nothing left - let it go */
@@ -1129,15 +1132,16 @@ bufmod_rsrv(queue_t *q)
 			if (sb->sb_sdrops != 0) {
 				mp->b_csum += sb->sb_sdrops;
 				if (mp->b_flag & MSGHEADER)
-					((struct sb_hdr *) (mp->b_rptr))->sbh_drops += sb->sb_sdrops;
+					((struct sb_hdr *) (mp->b_rptr))->sbh_drops +=
+					    sb->sb_sdrops;
 				sb->sb_sdrops = 0;
 			}
 			if (canputnext(q)) {
 				mp->b_flag |= MSGDELIM;
 				putnext(q, mp);
 				if (mr != NULL) {
-					/* Transform to zero-length delimited M_DATA to
-					   unblock the read at the Stream head. */
+					/* Transform to zero-length delimited M_DATA to unblock the 
+					   read at the Stream head. */
 					mr->b_datap->db_type = M_DATA;
 					mr->b_flag |= MSGDELIM;
 					mr->b_wptr = mr->b_rptr;
@@ -1379,12 +1383,12 @@ bufmod_open(queue_t *q, dev_t *devp, int oflag, int sflag, cred_t *crp)
 
 	so->so_flags |= SO_MREADON;
 
-	so->so_lowat = SHEADLOWAT; /* SHEADHIWAT = 8192 */
-	so->so_lowat = SNIT_LOWAT(SB_DFLT_CHUNK, 1); /* 32767 + 256 */
+	so->so_lowat = SHEADLOWAT;	/* SHEADHIWAT = 8192 */
+	so->so_lowat = SNIT_LOWAT(SB_DFLT_CHUNK, 1);	/* 32767 + 256 */
 	so->so_flags |= SO_LOWAT;
 
-	so->so_hiwat = SHEADHIWAT; /* SHEADHIWAT = 65536 */
-	so->so_hiwat = SNIT_HIWAT(SB_DFLT_CHUNK, 1); /* 65536 + 512 */
+	so->so_hiwat = SHEADHIWAT;	/* SHEADHIWAT = 65536 */
+	so->so_hiwat = SNIT_HIWAT(SB_DFLT_CHUNK, 1);	/* 65536 + 512 */
 	so->so_flags |= SO_HIWAT;
 
 	qprocson(q);
@@ -1417,6 +1421,7 @@ bufmod_close(queue_t *q, int oflag, cred_t *crp)
  *
  *  -------------------------------------------------------------------------
  */
+#ifdef LINUX
 STATIC struct qinit bufmod_rinit = {
 	.qi_putp = bufmod_rput,
 	.qi_srvp = bufmod_rsrv,
@@ -1555,3 +1560,4 @@ bufmodexit(void)
 module_init(bufmodinit);
 module_exit(bufmodexit);
 #endif
+#endif				/* LINUX */

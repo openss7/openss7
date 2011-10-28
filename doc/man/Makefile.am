@@ -2966,6 +2966,7 @@ openss7_man_MANS = \
 	man8/tcapconf.8 \
 	man8/test-atm.8 \
 	man8/test-bcm.8 \
+	man8/test-bufmod.8 \
 	man8/test-chan.8 \
 	man8/test-clone.8 \
 	man8/test-connld.8 \
@@ -2987,9 +2988,12 @@ openss7_man_MANS = \
 	man8/test-m3ua-raw.8 \
 	man8/test-m3ua_as.8 \
 	man8/test-mux.8 \
+	man8/test-nbuf.8 \
 	man8/test-np_ip.8 \
 	man8/test-nsdev.8 \
 	man8/test-nuls.8 \
+	man8/test-pf.8 \
+	man8/test-pfmod.8 \
 	man8/test-pipe.8 \
 	man8/test-pipemod.8 \
 	man8/test-q781-pipe.8 \
@@ -7344,6 +7348,7 @@ openss7_dist_noinst_MANS = \
 	man8/tcapconf.8.man \
 	man8/test-atm.8.man \
 	man8/test-bcm.8.man \
+	man8/test-bufmod.8.man \
 	man8/test-chan.8.man \
 	man8/test-clone.8.man \
 	man8/test-connld.8.man \
@@ -7365,9 +7370,12 @@ openss7_dist_noinst_MANS = \
 	man8/test-m3ua-raw.8.man \
 	man8/test-m3ua_as.8.man \
 	man8/test-mux.8.man \
+	man8/test-nbuf.8.man \
 	man8/test-np_ip.8.man \
 	man8/test-nsdev.8.man \
 	man8/test-nuls.8.man \
+	man8/test-pf.8.man \
+	man8/test-pfmod.8.man \
 	man8/test-pipe.8.man \
 	man8/test-pipemod.8.man \
 	man8/test-q781-pipe.8.man \

@@ -597,25 +597,25 @@ if CONFIG_STREAMS_TIRDWR
 libOS7streams_a_SOURCES	       += src/modules/tirdwr.c
 endif
 if CONFIG_STREAMS_BUFMOD_MODULE
-libOS7streams_a_SOURCES		+= src/modules/bufmod.c
+libOS7modules_a_SOURCES		+= src/modules/bufmod.c
 endif
 if CONFIG_STREAMS_BUFMOD
 libOS7streams_a_SOURCES		+= src/modules/bufmod.c
 endif
 if CONFIG_STREAMS_PFMOD_MODULE
-libOS7streams_a_SOURCES		+= src/modules/pfmod.c
+libOS7modules_a_SOURCES		+= src/modules/pfmod.c
 endif
 if CONFIG_STREAMS_PFMOD
 libOS7streams_a_SOURCES		+= src/modules/pfmod.c
 endif
 if CONFIG_STREAMS_NBUF_MODULE
-libOS7streams_a_SOURCES		+= src/modules/nit_buf.c
+libOS7modules_a_SOURCES		+= src/modules/nit_buf.c
 endif
 if CONFIG_STREAMS_NBUF
 libOS7streams_a_SOURCES		+= src/modules/nit_buf.c
 endif
 if CONFIG_STREAMS_PF_MODULE
-libOS7streams_a_SOURCES		+= src/modules/nit_pf.c
+libOS7modules_a_SOURCES		+= src/modules/nit_pf.c
 endif
 if CONFIG_STREAMS_PF
 libOS7streams_a_SOURCES		+= src/modules/nit_pf.c
@@ -2289,6 +2289,46 @@ test_timod_LDFLAGS		= $(USER_LDFLAGS)
 test_timod_LDADD		= libstreams.la libxnet.la
 
 pkglibexec_PROGRAMS		+= test-timod
+
+## =====================================================================
+
+test_bufmod_SOURCES		= src/test/test-bufmod.c
+test_bufmod_CPPFLAGS		= $(TEST_INCLUDES)
+test_bufmod_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_bufmod_LDFLAGS		= $(USER_LDFLAGS)
+test_bufmod_LDADD		= libstreams.la libxnet.la
+
+pkglibexec_PROGRAMS		+= test-bufmod
+
+## =====================================================================
+
+test_pfmod_SOURCES		= src/test/test-pfmod.c
+test_pfmod_CPPFLAGS		= $(TEST_INCLUDES)
+test_pfmod_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_pfmod_LDFLAGS		= $(USER_LDFLAGS)
+test_pfmod_LDADD		= libstreams.la libxnet.la
+
+pkglibexec_PROGRAMS		+= test-pfmod
+
+## =====================================================================
+
+test_nbuf_SOURCES		= src/test/test-nbuf.c
+test_nbuf_CPPFLAGS		= $(TEST_INCLUDES)
+test_nbuf_CFLAGS		= $(USER_CFLAGS) $(USER_DFLAGS)
+test_nbuf_LDFLAGS		= $(USER_LDFLAGS)
+test_nbuf_LDADD			= libstreams.la libxnet.la
+
+pkglibexec_PROGRAMS		+= test-nbuf
+
+## =====================================================================
+
+test_pf_SOURCES			= src/test/test-pf.c
+test_pf_CPPFLAGS		= $(TEST_INCLUDES)
+test_pf_CFLAGS			= $(USER_CFLAGS) $(USER_DFLAGS)
+test_pf_LDFLAGS			= $(USER_LDFLAGS)
+test_pf_LDADD			= libstreams.la libxnet.la
+
+pkglibexec_PROGRAMS		+= test-pf
 
 ## =====================================================================
 
