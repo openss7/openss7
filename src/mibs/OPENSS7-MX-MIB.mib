@@ -4836,6 +4836,12 @@ mxChipTypeDS2156 OBJECT-IDENTITY
         "The Dallas DS2156 E1/T1/J1 framer chip."
     ::= { mxChipTypes 8 }
 
+mxChipTypeDS21455 OBJECT-IDENTITY
+    STATUS	current
+    DESCRIPTION
+	"The Dallas DS21455 E1/T1/J1 framer chip."
+    ::= { mxChipTypes 9 }
+
 
 mxConformance OBJECT IDENTIFIER
     ::= { mxMIB 2 }

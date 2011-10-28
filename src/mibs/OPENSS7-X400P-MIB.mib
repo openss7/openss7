@@ -670,10 +670,11 @@ x400pCardChipType OBJECT-TYPE
          
          - x400pChipTypeDS2155, the DS2155 E1/T1/J1 chip.
          - x400pChipTypeDS2156, the DS2156 E1/T1/J1 chip.
+         - x400pChipTypeDS21455, the DS21455 E1/T1/J1 chip.
          
          The DS2152, DS21352, DS21552 are T1-only chips; the 
-         DS2154, DS21354, DS21554 are E1-only chips; the DS2155 
-         and DS2156 are E1/T1/J1 chips."
+         DS2154, DS21354, DS21554 are E1-only chips; the DS2155, 
+         DS2156 and DS21455 are E1/T1/J1 chips."
     ::= { x400pCardEntry 5 }
 
 x400pCardChipRevision OBJECT-TYPE
@@ -3629,6 +3630,12 @@ x400pChipTypeDS2156 OBJECT-IDENTITY
     DESCRIPTION 
         "The Dallas DS2156 E1/T1/J1 framer chip."
     ::= { x400pChipTypes 8 }
+
+x400pChipTypeDS21455 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The Dallas DS21455 E1/T1/J1 framer chip."
+    ::= { x400pChipTypes 9 }
 
 x400pStats OBJECT IDENTIFIER
     ::= { x400pObjects 5 }
