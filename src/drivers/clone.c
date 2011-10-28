@@ -69,7 +69,8 @@
 
  *****************************************************************************/
 
-static char const ident[] = "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $";
+static char const ident[] =
+    "$RCSfile: clone.c,v $ $Name:  $($Revision: 1.1.2.5 $) $Date: 2011-09-02 08:46:32 $";
 
 #ifdef NEED_LINUX_AUTOCONF_H
 #include <linux/autoconf.h>

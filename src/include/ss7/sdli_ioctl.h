@@ -143,17 +143,17 @@ typedef struct sdl_config {
 #	define	SDL_GTYPE_OC192		18	/* */
 	sdl_ulong ifgrate;		/* interface group rate */
 #	define	SDL_GRATE_NONE		0
-#	define	SDL_GRATE_T1		1544000
-#	define	SDL_GRATE_J1		1544000
-#	define	SDL_GRATE_E1		2048000
-#	define	SDL_GRATE_T2		6312000
-#	define	SDL_GRATE_E2		8488000
-#	define	SDL_GRATE_E3		34368000
-#	define	SDL_GRATE_T3		44736000
-#	define	SDL_GRATE_OC3		155520000
-#	define	SDL_GRATE_OC12		622080000
-#	define	SDL_GRATE_OC48		2488320000
-#	define	SDL_GRATE_OC192		9953280000
+#	define	SDL_GRATE_T1		1544
+#	define	SDL_GRATE_J1		1544
+#	define	SDL_GRATE_E1		2048
+#	define	SDL_GRATE_T2		6312
+#	define	SDL_GRATE_E2		8488
+#	define	SDL_GRATE_E3		34368
+#	define	SDL_GRATE_T3		44736
+#	define	SDL_GRATE_OC3		155520
+#	define	SDL_GRATE_OC12		622080
+#	define	SDL_GRATE_OC48		2488320
+#	define	SDL_GRATE_OC192		9953280
 	sdl_ulong ifmode;		/* interface mode */
 #	define	SDL_MODE_NONE		0	/* */
 #	define	SDL_MODE_DSU		1	/* */

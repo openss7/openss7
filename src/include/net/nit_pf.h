@@ -70,9 +70,9 @@
 /** Filter structure for NIOCSETF input-output control.
   */
 struct packetfilt {
-	uchar Pf_Priority;			/**< Priority of the filter. */
-	uchar Pf_FilterLen;			/**< Length of the command list in the filter. */
-	ushort Pf_Filter[ENMAXFILTERS];	/**< Filter command list. */
+	uint8_t Pf_Priority;			/**< Priority of the filter. */
+	uint8_t Pf_FilterLen;			/**< Length of the command list in the filter. */
+	uint16_t Pf_Filter[ENMAXFILTERS];	/**< Filter command list. */
 };
 
 #ifndef NIOC

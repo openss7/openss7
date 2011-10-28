@@ -82,20 +82,22 @@
 #define ENMAXFILTERS		255		/**< Maximum old packet filter short words. */
 #define PF_MAXFILTERS		2047		/**< Maximum new packet filter short words. */
 
+#ifndef _NET_NIT_PF_H
 /** Filter structure for PCIOCSETF input-output control.
   */
 struct packetfilt {
-	uchar Pf_Priority;			/**< Priority of the filter. */
-	uchar Pf_FilterLen;			/**< Length of the command list in the filter. */
-	ushort Pf_Filter[ENMAXFILTERS];	/**< Filter command list. */
+	uint8_t Pf_Priority;			/**< Priority of the filter. */
+	uint8_t Pf_FilterLen;			/**< Length of the command list in the filter. */
+	uint16_t Pf_Filter[ENMAXFILTERS];	/**< Filter command list. */
 };
+#endif				/* _NET_NIT_PF_H */
 
 /** Extended packet filter structure.
   */
 struct Pf_ext_packetfilt {
-	uchar Pf_Priority;			/**< Priority of the filter. */
-	uint Pf_FilterLen;		/**< Length of the command list in the filter. */
-	ushort Pf_Filter[PF_MAXFILTERS];	/**< Filter command list. */
+	uint8_t Pf_Priority;			/**< Priority of the filter. */
+	uint32_t Pf_FilterLen;		/**< Length of the command list in the filter. */
+	uint16_t Pf_Filter[PF_MAXFILTERS];	/**< Filter command list. */
 };
 
 /*

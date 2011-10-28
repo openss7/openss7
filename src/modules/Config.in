@@ -244,8 +244,8 @@ objname	module	zaptel	    zaptel
 
 @CONFIG_STREAMS_BUFMOD_MODULE_TRUE@loadable	bufmod
 @CONFIG_STREAMS_PFMOD_MODULE_TRUE@loadable	pfmod
-@CONFIG_STREAMS_NBUF_MODULE_TRUE@loadable	nbuf
-@CONFIG_STREAMS_PF_MODULE_TRUE@loadable	pf
+@CONFIG_STREAMS_NBUF_MODULE_TRUE@loadable	nit_buf
+@CONFIG_STREAMS_PF_MODULE_TRUE@loadable	nit_pf
 
 loadable	mstr
 
