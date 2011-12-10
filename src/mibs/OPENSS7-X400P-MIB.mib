@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -97,7 +97,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 x400pMIB MODULE-IDENTITY
-    LAST-UPDATED "200901191603Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -140,11 +140,17 @@ x400pMIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
+    REVISION    "201111050944Z"
+    DESCRIPTION 
+        "Added new card types for ATCOM cards."
     REVISION    "200901191603Z"
     DESCRIPTION 
         "Rationalized OPENSS7-X400P-MIB abd OPENSS7-X400-MX-MIB.  
@@ -623,7 +629,12 @@ x400pCardType OBJECT-TYPE
          - x400pCardTypeV400PE,
          - x400pCardTypeV400PT,
          - x400pCardTypeV401PE,
-         - x400pCardTypeV401PT,"
+         - x400pCardTypeV401PT,
+         - x400pCardTypeAT400P,
+         - x400pCardTypeAE400P,
+         - x400pCardTypeA400P,
+         - x400pCardTypeA400PT,
+         - x400pCardTypeA400PE,"
     ::= { x400pCardEntry 2 }
 
 x400pCardIdentifier OBJECT-TYPE
@@ -671,10 +682,11 @@ x400pCardChipType OBJECT-TYPE
          - x400pChipTypeDS2155, the DS2155 E1/T1/J1 chip.
          - x400pChipTypeDS2156, the DS2156 E1/T1/J1 chip.
          - x400pChipTypeDS21455, the DS21455 E1/T1/J1 chip.
+         - x400pChipTypeDS21458, the DS21458 E1/T1/J1 chip.
          
          The DS2152, DS21352, DS21552 are T1-only chips; the 
          DS2154, DS21354, DS21554 are E1-only chips; the DS2155, 
-         DS2156 and DS21455 are E1/T1/J1 chips."
+         DS2156, DS21455 and DS21458 are E1/T1/J1 chips."
     ::= { x400pCardEntry 5 }
 
 x400pCardChipRevision OBJECT-TYPE
@@ -1289,50 +1301,50 @@ x400pSpanEntry OBJECT-TYPE
     ::= { x400pSpanTable 1 }
 
 X400pSpanEntry ::= SEQUENCE {
-    x400pSpanIndex                          Unsigned32,
-    x400pSpanName                           CommonLanguageName,
-    x400pSpanDevice                         RowPointer,
-    x400pSpanEquipmentId                    PhysicalPointOfAppearance,
-    x400pSpanType                           INTEGER,
-    x400pSpanNumber                         SpanNumber,
-    x400pSpanRate                           Integer32,
-    x400pSpanMode                           BITS,
-    x400pSpanCrc                            INTEGER,
-    x400pSpanClocking                       INTEGER,
-    x400pSpanPriority                       Unsigned32,
-    x400pSpanCoding                         INTEGER,
-    x400pSpanFraming                        INTEGER,
-    x400pSpanLineImpedance                  INTEGER,
-    x400pSpanLineMode                       INTEGER,
-    x400pSpanLineLength                     INTEGER,
-    x400pSpanLineAttenuation                INTEGER,
-    x400pSpanLineGain                       INTEGER,
-    x400pSpanLineDelay                      Unsigned32,
-    x400pSpanTxLevel                        INTEGER,
-    x400pSpanRxLevel                        INTEGER,
-    x400pSpanAlarmSettleTime                TimeInterval,
-    x400pSpanLineCodeTime                   TimeInterval,
-    x400pSpanPrimary                        Unsigned32,
-    x400pSpanDataLink                       BITS,
-    x400pSpanLineCode                       INTEGER,
-    x400pSpanAlarmSeverityMappingProfile    RowPointer,
-    x400pSpanAdministrativeState            AdministrativeState,
-    x400pSpanOperationalState               OperationalState,
-    x400pSpanUsageState                     UsageState,
-    x400pSpanAlarmStatus                    AlarmStatus,
-    x400pSpanProceduralStatus               ProceduralStatus,
-    x400pSpanAvailabilityStatus             AvailabilityStatus,
-    x400pSpanControlStatus                  ControlStatus,
-    x400pSpanStandbyStatus                  StandbyStatus,
-    x400pSpanUnknownStatus                  UnknownStatus,
-    x400pSpanSap                            RowPointer,
-    x400pSpanLoopbackStatus                 BITS,
-    x400pSpanLineStatus                     BITS,
-    x400pSpanAlarms                         BITS,
-    x400pSpanEvents                         BITS,
-    x400pSpanReceiveLevel                   Unsigned32,
-    x400pSpanReceiveThreshold               Unsigned32,
-    x400pSpanRowStatus                      RowStatus
+    x400pSpanIndex                      Unsigned32,
+    x400pSpanName                       CommonLanguageName,
+    x400pSpanDevice                     RowPointer,
+    x400pSpanEquipmentId                PhysicalPointOfAppearance,
+    x400pSpanType                       INTEGER,
+    x400pSpanNumber                     SpanNumber,
+    x400pSpanRate                       Integer32,
+    x400pSpanMode                       BITS,
+    x400pSpanCrc                        INTEGER,
+    x400pSpanClocking                   INTEGER,
+    x400pSpanPriority                   Unsigned32,
+    x400pSpanCoding                     INTEGER,
+    x400pSpanFraming                    INTEGER,
+    x400pSpanLineImpedance              INTEGER,
+    x400pSpanLineMode                   INTEGER,
+    x400pSpanLineLength                 INTEGER,
+    x400pSpanLineAttenuation            INTEGER,
+    x400pSpanLineGain                   INTEGER,
+    x400pSpanLineDelay                  Unsigned32,
+    x400pSpanTxLevel                    INTEGER,
+    x400pSpanRxLevel                    INTEGER,
+    x400pSpanAlarmSettleTime            TimeInterval,
+    x400pSpanLineCodeTime               TimeInterval,
+    x400pSpanPrimary                    Unsigned32,
+    x400pSpanDataLink                   BITS,
+    x400pSpanLineCode                   INTEGER,
+    x400pSpanAlarmSeverityMapProfile    RowPointer,
+    x400pSpanAdministrativeState        AdministrativeState,
+    x400pSpanOperationalState           OperationalState,
+    x400pSpanUsageState                 UsageState,
+    x400pSpanAlarmStatus                AlarmStatus,
+    x400pSpanProceduralStatus           ProceduralStatus,
+    x400pSpanAvailabilityStatus         AvailabilityStatus,
+    x400pSpanControlStatus              ControlStatus,
+    x400pSpanStandbyStatus              StandbyStatus,
+    x400pSpanUnknownStatus              UnknownStatus,
+    x400pSpanSap                        RowPointer,
+    x400pSpanLoopbackStatus             BITS,
+    x400pSpanLineStatus                 BITS,
+    x400pSpanAlarms                     BITS,
+    x400pSpanEvents                     BITS,
+    x400pSpanReceiveLevel               Unsigned32,
+    x400pSpanReceiveThreshold           Unsigned32,
+    x400pSpanRowStatus                  RowStatus
 }
 
 x400pSpanIndex OBJECT-TYPE
@@ -1997,7 +2009,7 @@ x400pSpanLineCode OBJECT-TYPE
     DEFVAL      { noCode }
     ::= { x400pSpanEntry 26 }
 
-x400pSpanAlarmSeverityMappingProfile OBJECT-TYPE
+x400pSpanAlarmSeverityMapProfile OBJECT-TYPE
     SYNTAX      RowPointer
     MAX-ACCESS  read-create
     STATUS      current
@@ -2495,7 +2507,7 @@ x400pSpanAlarms OBJECT-TYPE
     ::= { x400pSpanEntry 40 }
 
 x400pSpanEvents OBJECT-TYPE
-    SYNTAX      BITS { rlos(0), frcl(1), rual(2), ryel(3), rra(4), 
+    SYNTAX      BITS { rlos(0), frcl(1), rua1(2), ryel(3), rra(4), 
                     rdma(5), v52lnk(6), lorc(7), lotc(8), lup(9), 
                     ldn(10), lspare(11), tocd(12), tcle(13) }
     MAX-ACCESS  read-only
@@ -3517,13 +3529,14 @@ x400pCardTypeT400P-SS7 OBJECT-IDENTITY
 x400pCardTypeV400P OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
-        "This is a old Varion V400P card as identified by its 
-         PCI id '4000'X.  The next position below this arc 
-         identifies whether this is a T1 card or an E1 card.  If 
-         there is nothing below this arc, the card supports both 
-         E1 and T1.  These cards were discontinued by Varion due 
-         to excessive lead content compared to newer European 
-         standards."
+        "This is a old Varion V400P card or a newer ATCOM TE400P 
+         as identified by its PCI id '4000'X.  The next position 
+         below this arc identifies whether this is a Varion T1 
+         card, a Varion E1 card, or an ATCOM E1/T1/J1 card.  If 
+         there is nothing below this arc, the card is a Varion 
+         V400P card that supports both E1 and T1.  The Varion 
+         cards were discontinued by Varion due to excessive lead 
+         content compared to newer European standards."
     ::= { x400pCardTypes 5 }
 
 x400pCardTypeV400PE OBJECT-IDENTITY
@@ -3550,6 +3563,18 @@ x400pCardTypeV400PT OBJECT-IDENTITY
          compared to newer European standards."
     ::= { x400pCardTypeV400P 2 }
 
+x400pCardTypeA400P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is an ATCOM TE400P card as identified by its PCI id 
+         '4000'X.  These cards have a chip that supports E1, T1 
+         and J1.  These cards are treated as supporting both E1 
+         and T1/J1.  It is unclear whether these cards are still 
+         available.  They are treated identical to the old Varion 
+         V400P card (x400pCardTypeV400P) with the newer 
+         chipsets."
+    ::= { x400pCardTypeV400P 3 }
+
 x400pCardTypeV401PE OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION 
@@ -3575,6 +3600,58 @@ x400pCardTypeV401PT OBJECT-IDENTITY
          card by card basis and sometimes on a span by span 
          basis."
     ::= { x400pCardTypes 7 }
+
+x400pCardTypeAT400P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is an ATCOM T400P card as identified by its PCI id 
+         '1000'X.  These cards are configured for T1 only 
+         regardless of whether the chip supports E1.  Some of the 
+         E1/T1 chips can be configured for J1.  These cards are 
+         treated as T1 only.  This is a Tormenta 3 card and 
+         supports more advanced features.  It is unclear whether 
+         these cards are still available."
+    ::= { x400pCardTypes 8 }
+
+x400pCardTypeAE400P OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is an ATCOM E400P card as identified by its PCI id 
+         '2000'X.  These cards are configured for E1 only 
+         regardless of whether the chip supports T1.  Some of the
+         E1/T1 chips can be configured for J1.  These cards are 
+         treated as E1 only.  This is a Tormenta 3 card and 
+         supports more advanced features.  It is unclear whether 
+         these cards are still available."
+    ::= { x400pCardTypes 9 }
+
+x400pCardTypeA400PT OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current ATCOM T400P card as identified by its 
+         PCI id '4001'X.  Unfortunately, even though it reports 
+         itself as a T1 card, most of these cards are 
+         electrically identifical to the E1 card, just reporting 
+         a different PCI Id.  The chips support E1/T1/J1 and can 
+         be configured for any mode of operation, typically on a 
+         card by card basis and sometimes on a span by span 
+         basis.  These cards are treated identical to the old 
+         Varion V401PE cards (x400pCardTypeV401PE)."
+    ::= { x400pCardTypes 10 }
+
+x400pCardTypeA400PE OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This is a current ATCOM E400P card as identified by its 
+         PCI id '4002'X.  Unfortunatley, even though it reports 
+         itself as an E1 card, most of these cards are 
+         electrically identifcal to the T1 card, just reporting a 
+         different PCI Id.  The chips support E1/T1/J1 and can be 
+         configured for any mode of operation, typically on a 
+         card by card basis and sometimes on a span by span 
+         basis.  These cards a treated identical to the old 
+         Varion V401PT cards (x400pCardTypeV401PT)."
+    ::= { x400pCardTypes 11 }
 
 -- ====================================================================
 -- CHIP TYPES
@@ -3636,6 +3713,12 @@ x400pChipTypeDS21455 OBJECT-IDENTITY
     DESCRIPTION 
         "The Dallas DS21455 E1/T1/J1 framer chip."
     ::= { x400pChipTypes 9 }
+
+x400pChipTypeDS21458 OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "The Dallas DS21458 E1/T1/J1 framer chip."
+    ::= { x400pChipTypes 10 }
 
 x400pStats OBJECT IDENTIFIER
     ::= { x400pObjects 5 }
@@ -3711,7 +3794,14 @@ x400pNearEndCurrentSESs OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "The number of Severely Errored Seconds (SESs) in the 
-         current interval.  A Severely Errored Second ...."
+         current interval.  A Severely Errored Second for T1 ESF has 320 
+         or more Path Code Violations, one or more Out of Frame defects, 
+         or a detected Alarm Indication Signal (AIS) defect.  A Severely 
+         Errored Second for E1 CRC4 has 832 or more Path Code Violations 
+         or one or more Out of Frame defects.  An SES for E1 non-CRC4 
+         has 2048 or more Line Code Violations.  An SES for T1 D4 has 
+         Framing Error events, an Out of Frame defect, or 1544 or more 
+         Line Code Violations."
     ::= { x400pNearEndCurrentEntry 3 }
 
 x400pNearEndCurrentSEFSs OBJECT-TYPE
@@ -3723,7 +3813,7 @@ x400pNearEndCurrentSEFSs OBJECT-TYPE
         "The number of Severely Errored Framing Seconds (SEFSs) 
          in the current interval.  A Severely Errored Frame 
          Second has one or more Out of Frame defects or a 
-         detected AIS defect."
+         detected Alarm Indication Signal (AIS) defect."
     ::= { x400pNearEndCurrentEntry 4 }
 
 x400pNearEndCurrentUASs OBJECT-TYPE
@@ -3733,7 +3823,14 @@ x400pNearEndCurrentUASs OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "The number of Unavailable Seconds (UASs) in the current 
-         interval."
+         interval. Unavailable Seconds are seconds in which the 
+         interface was unavailable.  Interfaces are unavailable from the 
+         onset of 10 consecutive Severely Errored Seconds, or the onset 
+         of a condition leading to failure.  They are available from the 
+         onset of 10 consecutive seconds that are not Severely Errored 
+         Seconds, or the onset of a condition leading to recovery.  
+         Other counters are not incremented while the interface is 
+         unavailable."
     ::= { x400pNearEndCurrentEntry 5 }
 
 x400pNearEndCurrentCSSs OBJECT-TYPE
@@ -3743,7 +3840,8 @@ x400pNearEndCurrentCSSs OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "The number of Controlled Slip Seconds (CSSs) in the 
-         current interval."
+         current interval.  A Controlled Slip Second has one ore more 
+         controlled slips."
     ::= { x400pNearEndCurrentEntry 6 }
 
 x400pNearEndCurrentPCVs OBJECT-TYPE
@@ -3790,7 +3888,9 @@ x400pNearEndCurrentDMs OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "The number of Degraded Minutes (DMs) in the current 
-         interval."
+         interval.  A Degraded Minute is one in which has available 
+         seconds that are not Severely Errored Seconds where the 
+         cummulative errors during the seconds exceed 1E-06."
     ::= { x400pNearEndCurrentEntry 10 }
 
 x400pNearEndCurrentLCVs OBJECT-TYPE
@@ -4632,7 +4732,7 @@ x400pSpanGroup OBJECT-GROUP
                   x400pSpanTxLevel, x400pSpanRxLevel, 
                   x400pSpanAlarmSettleTime, x400pSpanLineCodeTime, 
                   x400pSpanPrimary, x400pSpanDataLink, x400pSpanLineCode, 
-                  x400pSpanAlarmSeverityMappingProfile, 
+                  x400pSpanAlarmSeverityMapProfile, 
                   x400pSpanAdministrativeState, 
                   x400pSpanOperationalState, x400pSpanUsageState, 
                   x400pSpanAlarmStatus, x400pSpanProceduralStatus, 
@@ -4871,3 +4971,5 @@ x400pEnhancedCompliance MODULE-COMPLIANCE
     ::= { x400pCompliances 2 }
 
 END -- end of module OPENSS7-X400P-MIB.
+
+-- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4

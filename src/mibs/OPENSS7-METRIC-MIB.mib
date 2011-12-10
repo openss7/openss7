@@ -5,7 +5,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -71,69 +71,81 @@
 OPENSS7-METRIC-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    MODULE-IDENTITY, OBJECT-TYPE, OBJECT-IDENTITY, TEXTUAL-CONVENTION, 
-    ExtUTCTime
-	FROM SNMPv2-SMI
-    TruthValue, RowStatus, Gauge, Counter
-	FROM SNMPv2-TC
-    SimpleNameType, AdministrativeState, OperationalState, 
-    AvailabilityStatus, ObjectInstance, AttributeId, ProceduralStatus, 
-    PerceivedSeverity, SpecificIdentifier
-	FROM OPENSS7-SMI-MIB
+    openss7MsFunction
+        FROM OPENSS7-SMI
+    AdministrativeState, AttributeId, AvailabilityStatus, IntervalsOfDay, 
+    ObjectInstance, OperationalState, PerceivedSeverity, 
+    ProceduralStatus, SimpleNameType, SpecificIdentifier, WeekMask
+        FROM OPENSS7-SMI-MIB
     TimePeriod
-	FROM OPENSS7-UMC-MIB
-    IntervalsOfDay, WeekMask
-	FROM OPENSS7-SMI-MIB
-    openss7, openss7Ms, openss7MsFunction
-	FROM OPENSS7-SMI;
+        FROM OPENSS7-UMC-MIB
+    MODULE-COMPLIANCE, OBJECT-GROUP
+        FROM SNMPv2-CONF
+    Counter32, Gauge32, Integer32, MODULE-IDENTITY, OBJECT-IDENTITY, 
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    DateAndTime, RowStatus, TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC;
 
 metricMIB MODULE-IDENTITY
-    LAST-UPDATED
-	"200801100930Z"
-    ORGANIZATION
-	"The OpenSS7 Project"
-    CONTACT-INFO
-	"Brian Bidulock
-	 OpenSS7 Corporation
-	 1469 Jefferys Crescent
-	 Edmonton, Alberta T6L 6T1
-	 CANADA
-	 Tel: +1 780 490 1141
-	 Fax: +1 780 490 1241
-	 Mob: +1 780 953 0557
-	 E-mail: bidulock@openss7.org"
-    DESCRIPTION
+    LAST-UPDATED "201112101120Z"
+    ORGANIZATION 
+        "The OpenSS7 Project"
+    CONTACT-INFO 
+        "Brian Bidulock
+         OpenSS7 Corporation
+         1469 Jefferys Crescent
+         Edmonton, Alberta T6L 6T1
+         CANADA
+         Tel: +1 780 490 1141
+         Fax: +1 780 490 1241
+         Mob: +1 780 953 0557
+         E-mail: bidulock@openss7.org"
+    DESCRIPTION 
         "This is a basic MIB module providing definitions of 
          objecs based on TMN (ITU-T Rec. X.739 (1993) | ISO/IEC 
          10164-11 : 1994).
-
+         
          Copyright (c) 2008-2011  Monavacon Limited
          Copyright (c) 2001-2008  OpenSS7 Corporation
          Copyright (c) 1997-2001  Brian F. G. Bidulock
-
+         
          All Rights Reserved.
-
+         
          This program is free software; you can redistribute it and/or 
          modify it under the terms of the GNU Affero General Public 
          License as published by the Free Software Foundation; version 3 
          of the License.
-
+         
          This program is distributed in the hope that it will be useful, 
          but WITHOUT ANY WARRANTY; without even the implied warranty of 
          MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the 
          GNU Affero General Public License for more details.
-
+         
          You should have received a copy of the GNU Affero General 
          Public License along with this program.  If not, see 
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
-
-         Note well: nonwithstanding this AGPL license, you are not 
+         
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
+    REVISION    "200801100930Z"
+    DESCRIPTION 
+        "First release of this MIB."
     ::= { openss7MsFunction 11 } -- 10164-11
+
+
+AlgorithmIdentifier ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides for the specification of a mean algorithm identifier."
+    SYNTAX      OBJECT IDENTIFIER
 
 metricNotifications OBJECT IDENTIFIER
     ::= { metricMIB 0 }
@@ -151,10 +163,10 @@ scanner OBJECT IDENTIFIER
     ::= { metricTables 1 }
 
 scannerTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF ScannerEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
+    SYNTAX      SEQUENCE OF ScannerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
         "A managed object of this class represents the ability 
          to retrieve values of attributes of managed objects and 
          produce summary information from those values.  This 
@@ -164,16 +176,16 @@ scannerTable OBJECT-TYPE
          of observed attribute values or statistics calculated 
          from these values (either over time or over managed 
          objects)."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner MOC, and section 8.1.1.3."
     ::= { scanner 1 }
 
 scannerEntry OBJECT-TYPE
-    SYNTAX ScannerEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
+    SYNTAX      ScannerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
         "The scanner managed object class is a non-instantiable 
          superclass from which other managed object (e.g. metric 
          objects) are derived.  It defines the facilities for 
@@ -181,81 +193,63 @@ scannerEntry OBJECT-TYPE
          attributes wihtin specified managed objects.  The 
          intervals during which the periodic scans may occur can 
          be controlled according to a schedule."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner MO."
-    INDEX {
-            scannerId -- index
-        }
+    INDEX       { scannerId }
     ::= { scannerTable 1 }
 
-ScannerEntry ::=
-    SEQUENCE {
-        scannerId
-            SimpleNameType,
-        scannerAdministrativeState
-            AdministrativeState,
-        granularityPeriod
-            TimePeriod,
-        scannerOperationalState
-            OperationalState,
-        -- "CCITT Rec. X.721 | ISO/IEC 
-        -- 10165-2:1992":availabilityStatusPackage
-        scannerAvaiabilityStatus
-            AvailabilityStatus,
-        -- "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":duration
-        scannerStartTime
-            ExtUTCTime,
-        scannerStopTime
-            ExtUTCTime,
-        -- "CCITT Rec. X.721 | ISO/IEC 
-        -- 10165-2:1992":dailyScheduling
-        scannerIntervalsOfDay
-            IntervalsOfDay,
-        -- "CCITT Rec. X.721 | ISO/IEC 
-        -- 10165-2:1992":weeklyScheduling
-        scannerWeekMask
-            WeekMask,
-        -- "CCITT Rec. X.721 | ISO/IEC 
-        -- 10165-2:1992":externalScheduler
-        scannerSchedulerName
-            ObjectInstance,
-        -- periodSynchronizationPackage
-        scannerPeriodSynchronizationTime
-            ExtUTCTime,
-        -- "Recommendation 
-        -- M.3100:1992":createDeleteNotificationsPackage
-        scannerCreatDeleteNotifications
-            TruthValue,
-        -- "Recommendation 
-        -- M.3100:1992":attributeValueChangeNotificationPackage
-        scannerAttributeValueChangeNotifications
-            TruthValue,
-        -- "Recommendation 
-        -- M.3100:1992":stateChangeNotificationPackage
-        scannerStateChangeNotifications
-            TruthValue,
-        scannerRowStatus
-            RowStatus
-    }
+ScannerEntry ::= SEQUENCE {
+    scannerId                                   SimpleNameType,
+    scannerAdministrativeState                  AdministrativeState,
+    granularityPeriod                           TimePeriod,
+    scannerOperationalState                     OperationalState,
+    -- "CCITT Rec. X.721 | ISO/IEC 
+    -- 10165-2:1992":availabilityStatusPackage
+    scannerAvaiabilityStatus                    AvailabilityStatus,
+    -- "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":duration
+    scannerStartTime                            DateAndTime,
+    scannerStopTime                             DateAndTime,
+    -- "CCITT Rec. X.721 | ISO/IEC 
+    -- 10165-2:1992":dailyScheduling
+    scannerIntervalsOfDay                       IntervalsOfDay,
+    -- "CCITT Rec. X.721 | ISO/IEC 
+    -- 10165-2:1992":weeklyScheduling
+    scannerWeekMask                             WeekMask,
+    -- "CCITT Rec. X.721 | ISO/IEC 
+    -- 10165-2:1992":externalScheduler
+    scannerSchedulerName                        ObjectInstance,
+    -- periodSynchronizationPackage
+    scannerPeriodSynchronizationTime            DateAndTime,
+    -- "Recommendation 
+    -- M.3100:1992":createDeleteNotificationsPackage
+    scannerCreatDeleteNotifications             TruthValue,
+    -- "Recommendation 
+    -- M.3100:1992":attributeValueChangeNotificationPackage
+    scannerAttributeValueChangeNotifications    TruthValue,
+    -- "Recommendation 
+    -- M.3100:1992":stateChangeNotificationPackage
+    scannerStateChangeNotifications             TruthValue,
+    scannerRowStatus                            RowStatus
+}
 
 scannerId OBJECT-TYPE
-    SYNTAX SimpleNameType
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      SimpleNameType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Defines an index into the scanner table."
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.scannerId attribute."
     ::= { scannerEntry 1 }
 
 scannerAdministrativeState OBJECT-TYPE
-    SYNTAX AdministrativeState
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-	"
+    SYNTAX      AdministrativeState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "
          The administrative state attribute is used to suspend 
          or resume the scanning function. If administrative 
          state has the value'unlocked', the scanner is 
@@ -263,7 +257,7 @@ scannerAdministrativeState OBJECT-TYPE
          administrative state has the value 'locked', the 
          scanner is administratively prohibited from performing 
          scans."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.administrativeState attribute,
          ITU-T Rec. X.731 | ISO/IEC 10164-2, administrative 
@@ -273,11 +267,11 @@ scannerAdministrativeState OBJECT-TYPE
     ::= { scannerEntry 2 }
 
 granularityPeriod OBJECT-TYPE
-    SYNTAX TimePeriod
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-	"
+    SYNTAX      TimePeriod
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "
          Observed attribute values are retrieved during 
          a 'scan', which is initiated periodically, at the end 
          of each granularity period, provided that the 
@@ -289,34 +283,34 @@ granularityPeriod OBJECT-TYPE
          synchronization package is not present, the time at 
          which a granularity period starts after the scanner is 
          unlocked is a local matter.
-
+         
          NOTES
-
+         
          1. It is assumed that the observed attributes can be 
             scanned within the granularity period. If a scan is 
             initiated when another scan is in progress, then how 
             the conflict is resolved is a local issue.
-
+         
          2. The scan may occur at slightly different times for 
             each observed attribute, but the time skew between 
             the start of a scan and the scan time for a given 
             attribute in the scan should be approximately equal 
             between successive scans."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.granularityPeriod attribute."
     ::= { scannerEntry 3 }
 
 scannerOperationalState OBJECT-TYPE
-    SYNTAX OperationalState
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"
+    SYNTAX      OperationalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "
          The operational state attribute represents the 
          operational capability of the scanner to perform its 
          functions."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.operationalState attribute.
          ITU-T Rec. X.731 | ISO/IEC 10164-2, operational state.
@@ -327,11 +321,11 @@ scannerOperationalState OBJECT-TYPE
 -- "CCITT Rec. X.721 | ISO/IEC 
 -- 10165-2:1992":availabilityStatusPackage
 scannerAvaiabilityStatus OBJECT-TYPE
-    SYNTAX AvailabilityStatus
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-	"
+    SYNTAX      AvailabilityStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "
          If present, the availability status attribute indicates 
          whether the schedule inhibits the scanning function, 
          consistent with the description of the availability 
@@ -340,8 +334,8 @@ scannerAvaiabilityStatus OBJECT-TYPE
          according to a schedule. If the schedule suspends the 
          scanning function, any scan that is in progress 
          continues.
-	 "
-    REFERENCE
+          "
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.availabilityStatus attribute.
          ITU-T Rec. X.731 | ISO/IEC 10164-2, availability 
@@ -352,25 +346,25 @@ scannerAvaiabilityStatus OBJECT-TYPE
 
 -- "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":duration
 scannerStartTime OBJECT-TYPE
-    SYNTAX ExtUTCTime
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
         "The duration package provides the ability to 
          automatically control the time that a managed object 
          starts and stops functioning through the use of the 
          start and stop time attribtues.
-
+         
          This attribute defines the date and time at which an 
          unlocked and enabled managed object starts functioning.  
          If the value of the start time attribute is not 
          specified in the create request, its value defaults to 
          the time of creation of the managed object and thus 
          causing it to function immediately.
-
+         
          A change in the start time attribute results in an 
          attribute change notification."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.startTime attribute.
          ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
@@ -380,25 +374,25 @@ scannerStartTime OBJECT-TYPE
     ::= { scannerEntry 6 }
 
 scannerStopTime OBJECT-TYPE
-    SYNTAX ExtUTCTime
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
         "The duration package provides the ability to 
          automatically control the time that a managed object 
          starts and stops functioning through the use of the 
          start and stop time attribtues.
-
+         
          This attribute defines the date and time at which 
          a managed object stops functioning.  If the value of 
          the stop time attribute is not specified in the create 
          request, its value defaults to 'continuous operation'.  
          Continuous operation is represented by a null value for 
          the stop time.
-
+         
          A change in the stop time attribute results in an 
          attribute change notification."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.stopTime attribute.
          ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
@@ -409,14 +403,14 @@ scannerStopTime OBJECT-TYPE
 
 -- "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":dailyScheduling
 scannerIntervalsOfDay OBJECT-TYPE
-    SYNTAX IntervalsOfDay
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
+    SYNTAX      IntervalsOfDay
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
         "The daily scheduling conditional package provides the 
          capability of scheduling logging with a periodicity of 
          24 hours.
-
+         
          This attribute defines the list of time intervals 
          (interval-start and interval-end times of day) for 
          which the logs will exhibit the logging-on condition.  
@@ -425,7 +419,7 @@ scannerIntervalsOfDay OBJECT-TYPE
          request, the value of this component defaults to 
          a single interval encompassing the entire 24 hour 
          period of a day."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.intervalsOfDay attribute.
          ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
@@ -436,10 +430,10 @@ scannerIntervalsOfDay OBJECT-TYPE
 
 -- "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":weeklyScheduling
 scannerWeekMask OBJECT-TYPE
-    SYNTAX WeekMask
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
+    SYNTAX      WeekMask
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
         "The weekly scheduling conditional package provides the 
          capability of scheduling logging with a periodicity of 
          one week.  This structured attribute defines a set of 
@@ -448,25 +442,25 @@ scannerWeekMask OBJECT-TYPE
          selected days of the week.  The week mask attribute 
          defaults to a scheduling criteria of 'always-on' at 
          logs creation.
-
+         
          The days of wekk component defines the days of the week 
          on which the log's scheduling mechansim will allow the 
          log to have intervals during which logging may occur.  
          This component, if not present is a create, will 
          default to all seven days of the week.
-
+         
          The intervals of day component defines the list of time 
          intervals (interval-start and interval-end times of 
          day) for which the log will exhibit the logging-on 
          condition, if the current days is one of the days that 
          is selected within the corresponding dyas of week.  
-
+         
          During excluded intervals the log exhibits the 
          logging-off condition.  If not specified in the create 
          report, the value of this component defaults to 
          a single interval encompassing the entire 24 hour 
          period of a day."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.weekMask attribute.
          ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
@@ -477,12 +471,13 @@ scannerWeekMask OBJECT-TYPE
 
 -- "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":externalScheduler
 scannerSchedulerName OBJECT-TYPE
-    SYNTAX ObjectInstance
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the name of an external scheduler as an 
+         object instace (object identifier)."
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.schedulerName attribute.
          ITU-T Rec. X.735 (1992) | ISO/IEC 10164-6 : 1993, 
@@ -493,18 +488,18 @@ scannerSchedulerName OBJECT-TYPE
 
 -- periodSynchronizationPackage
 scannerPeriodSynchronizationTime OBJECT-TYPE
-    SYNTAX ExtUTCTime
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
         "When set to a time value, it indicates the time at 
          which the granularityPeriod begins and, therefore, 
          along with the granularityPeriod, specifies the 
          absolute times at which scanning will be performed.
-
+         
          When set to the null string, clock synchronizaiton is 
          a local matter.
-	 
+          
          If the period synchronization package is present, the 
          period synchronization time attribute, contained in 
          this package, is used to determine the time to which 
@@ -514,20 +509,20 @@ scannerPeriodSynchronizationTime OBJECT-TYPE
          The start of each granularity period is an integral 
          number of granularity periods before or after the time 
          specified by this attribute."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.periodSynchronization attribute."
     ::= { scannerEntry 12 }
 
 -- "Recommendation M.3100:1992":createDeleteNotificationsPackage
 scannerCreatDeleteNotifications OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
         "When set to true(1), notifications will be issued when 
          this row is created or deleted."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.createDeleteNotificationsPackage package.
          ITU-T Recommendation M.3100 (1992), 
@@ -537,18 +532,18 @@ scannerCreatDeleteNotifications OBJECT-TYPE
 -- "Recommendation 
 -- M.3100:1992":attributeValueChangeNotificationPackage
 scannerAttributeValueChangeNotifications OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
         "When set to true(1), notifications will be issued when 
          attribute values in this row change.
-
+         
          If the attribute value change notification package is 
          present, then changes to the granularity period or to 
          the period synchronization time shall cause attribute 
          value change notifications to be emitted."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.attributeValueChangeNotificationPackage 
                package.
@@ -558,18 +553,18 @@ scannerAttributeValueChangeNotifications OBJECT-TYPE
 
 -- "Recommendation M.3100:1992":stateChangeNotificationPackage
 scannerStateChangeNotifications OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-write
-    STATUS current
-    DESCRIPTION
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
         "When set to true, notifications will be issued when 
          primary state variables in this row change.
-
+         
          If the state change notification package is present, 
          then changes to the operational state or administrative 
          state shall cause state change notifications to be 
          emitted."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner.stateChangeNotificationPackage package.
          ITU-T Recommendation M.3100 (1992), 
@@ -577,13 +572,13 @@ scannerStateChangeNotifications OBJECT-TYPE
     ::= { scannerEntry 15 }
 
 scannerRowStatus OBJECT-TYPE
-    SYNTAX RowStatus
-    MAX-ACCESS read-write -- delete only
-    STATUS current
-    DESCRIPTION
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
         "Provides a mechanism whereby management stations may 
          delete entries in this table (and associated tables)."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. Q.739 (1993) | ISO/IEC 10164-11 : 1994, 
                scanner-system name binding."
     ::= { scannerEntry 16 }
@@ -595,14 +590,14 @@ monitorMetric OBJECT IDENTIFIER
     ::= { metricTables 2 }
 
 monitorMetricTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF MonitorMetricEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
+    SYNTAX      SEQUENCE OF MonitorMetricEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
         "See 8.1.2.3.
-
+         
          8.1.2.3 Behaviour of the monitor metric
-
+         
          The monitor metric managed object monitors values of an 
          attribute in an observed managed object. The observed 
          attribute is monitored at intervals specified by the 
@@ -610,7 +605,7 @@ monitorMetricTable OBJECT-TYPE
          derived from the values of the observed attribute. The 
          value of the derived gauge attribute shall remain the 
          same until the next observation.
-
+         
          The presence or absence of the difference packages 
          (i.e.  counter difference and gauge difference) 
          determines how the output of the data conversion 
@@ -630,7 +625,7 @@ monitorMetricTable OBJECT-TYPE
          attribute is a counter of the number of messages, with 
          the granularity period at 15 minutes, the derived gauge 
          represents a value of 60 messages per15 minutes.
-
+         
          The presence of the derived gauge time stamp package 
          requires monitor metric instances to update the derived 
          gauge time stamp attribute with the current time, 
@@ -653,7 +648,7 @@ monitorMetricTable OBJECT-TYPE
          observed object instance and observed attribute 
          identifier shall be in the monitored attributes 
          parameter of the quality of service alarm notification.
-
+         
          If the conditional specific problems indication package 
          is present, the specific problems indicator attribute 
          value (used to specify a specific type of metric 
@@ -667,46 +662,46 @@ monitorMetricTable OBJECT-TYPE
          difference package is present, the observed attribute 
          is treated as a gauge. When the monitor metric managed 
          object is created, the following shall be specified:
-
+         
          - the scanner Id, observed object instance, observed 
            attribute identifier;
-
+         
          - the granularity period (i.e. time between 
            observations of the observed attribute);
-
+         
          - if the counter difference package is present, then 
            the data conversion process is calculated according 
            to the counter difference package behaviour;
-
+         
          - if the counter overflow package is present, then the 
            metric object shall ensure that the value of the 
            modulus value attribute is initialized before 
            entering the on-duty condition.;
-
+         
          - if the gauge difference package is present, then the 
            data conversion process is calculated according to 
            the gauge difference package behaviour;
-
+         
          - a choice of at most one of the available scheduling 
            packages.  The scheduling packages are defined in 
            CCITT Rec. X.721 | ISO/IEC 10165-2;
-
+         
          - if the derived gauge-threshold package is present, 
            then the severity indicating gauge-threshold (i.e. 
            the threshold levels to be applied to the derived 
            gauge attribute value for generation of quality of 
            service alarm notifications) shall be specified; and
-
+         
          - if the observed attribute identifier references an 
            attribute that is not of real or integer type, the 
            creation shall fail and the CMIS error 'invalid 
            attribute value' shall be returned.
-
+         
          If the state change notification package is present, 
          then changes to the administrative state, operational 
          state, and availability status shall cause state change 
          notifications to be emitted.
-
+         
          The lifetime of the metric object may be controlled by 
          the managing system by requesting the managed system to 
          delete the metric object. If the managed system deletes 
@@ -715,7 +710,7 @@ monitorMetricTable OBJECT-TYPE
          object deletion is emitted. The notification shall 
          include the values of the attributes of the metric 
          object at the time of deletion.
-
+         
          Attributes of the counter difference, counter overflow, 
          gauge difference, derived gauge-threshold, and specific 
          problems indication packages may only be modified if 
@@ -723,86 +718,258 @@ monitorMetricTable OBJECT-TYPE
          value change notification package is present, then 
          modifications of these attributes shall result in an 
          attribute value change notification."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                monitorMetric MOC."
     ::= { monitorMetric 1 }
 
 monitorMetricEntry OBJECT-TYPE
-    SYNTAX MonitorMetricEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      MonitorMetricEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by the scanner 
+         identifier.  Each row contains the characteristics of 
+         the metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                monitorMetric MO."
-    INDEX {
-	    scannerId -- shared index
-	    -- derived from scanner
-	}
+    INDEX       { scannerId }
     ::= { monitorMetricTable 1 }
 
-MonitorMetricEntry ::=
-    SEQUENCE {
-	observedObjectInstance
-	    ObjectInstance,
-	observedAttributeId
-	    AttributeId,
-	derivedGauge
-	    Gauge,
-	-- counterDifferencePackage
-	counterDifferencePackage
-	    TruthValue,
-	previousScanCounterValue
-	    Counter,
-	counterDifferenceProceduralStatus
-	    ProceduralStatus,
-	-- counterOverflowPackage
-	counterOverflowPackage
-	    TruthValue,
-	modulusValue
-	    Counter,
-	-- gaugeDifferencePackage
-	gaugeDifferencePackage
-	    TruthValue,
-	previousScanGaugeValue
-	    Gauge,
-	gaugeDirferenceProceduralStatus
-	    ProceduralStatus,
-	-- derivedGaugeThresholdPackage
-	-- NOTIFICATIONS "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":qualityofServiceAlarm;
-	-- severityIndicatingGaugeThreshold
-	-- --
-	   -- SeverityIndicatingGaugeThreshold ::= SET OF SEQUENCE {
-	   --         notifyLow SeverityIndicatingThreshold,
-	   --         notifyHigh SeverityIndicatingThreshold }
-	   -- SeverityIndicatingThreshold ::= SEQUENCE {
-	   --         threshold ObservedValue,
-	   --         notifyOnOff BOOLEAN,
-	   --         severityIndication PerceivedSeverity OPTIONAL }
-	-- --
-	    metricLowThreshold
-		INTEGER,
-	    metricLowNotify
-		TruthValue,
-	    metricLowSeverityIndication
-		PerceivedSeverity,
-	    metricHighThreshold
-		INTEGER,
-	    metricHighNotify
-		TruthValue,
-	    metricHighSeverityIndication
-		PerceivedSeverity,
-	-- specificProblemsIndicationPackage
-	metricSpecificProblemsIndicator
-	    SpecificIdentifier,
-	-- derivedGaugeTimestampPackage
-	derivedGaugeTimeStamp
-	    ExtUTCTime,
-	monitorMetricRowStatus
-	    RowStatus
-    }
+MonitorMetricEntry ::= SEQUENCE {
+    observedObjectInstance              ObjectInstance,
+    observedAttributeId                 AttributeId,
+    derivedGauge                        Gauge32,
+        -- counterDifferencePackage
+    counterDifferencePackage            TruthValue,
+    previousScanCounterValue            Counter32,
+    counterDifferenceProceduralStatus   ProceduralStatus,
+        -- counterOverflowPackage
+    counterOverflowPackage              TruthValue,
+    modulusValue                        Counter32,
+        -- gaugeDifferencePackage
+    gaugeDifferencePackage              TruthValue,
+    previousScanGaugeValue              Gauge32,
+    gaugeDirferenceProceduralStatus     ProceduralStatus,
+        -- derivedGaugeThresholdPackage
+        -- NOTIFICATIONS "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":qualityofServiceAlarm;
+        -- severityIndicatingGaugeThreshold
+        -- --
+           -- SeverityIndicatingGaugeThreshold ::= SET OF SEQUENCE {
+           --         notifyLow SeverityIndicatingThreshold,
+           --         notifyHigh SeverityIndicatingThreshold }
+           -- SeverityIndicatingThreshold ::= SEQUENCE {
+           --         threshold ObservedValue,
+           --         notifyOnOff BOOLEAN,
+           --         severityIndication PerceivedSeverity OPTIONAL }
+        -- --
+    metricLowThreshold                  Integer32,
+    metricLowNotify                     TruthValue,
+    metricLowSeverityIndication         PerceivedSeverity,
+    metricHighThreshold                 Integer32,
+    metricHighNotify                    TruthValue,
+    metricHighSeverityIndication        PerceivedSeverity,
+        -- specificProblemsIndicationPackage
+    metricSpecificProblemsIndicator     SpecificIdentifier,
+        -- derivedGaugeTimestampPackage
+    derivedGaugeTimeStamp               DateAndTime,
+    monitorMetricRowStatus              RowStatus
+}
+
+observedObjectInstance OBJECT-TYPE
+    SYNTAX      ObjectInstance
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Proivdes the managed object instance that is being 
+         observed by the metric.  Under SNMP, a managed object 
+         instance is modelled as a row in a conceptual table."
+    ::= { monitorMetricEntry 1 }
+
+observedAttributeId OBJECT-TYPE
+    SYNTAX      AttributeId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the attribute identifier of the attribute 
+         being observed by the metric.  Under SNMP, an attribute 
+         identifier identifies a column in a conecptual table."
+    ::= { monitorMetricEntry 2 }
+
+derivedGauge OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provide a gauge for the metric."
+    ::= { monitorMetricEntry 3 }
+
+-- counterDifferencePackage
+counterDifferencePackage OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether the counter is differential or 
+         absolute."
+    ::= { monitorMetricEntry 4 }
+
+previousScanCounterValue OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides the previous scanner counter value."
+    ::= { monitorMetricEntry 5 }
+
+counterDifferenceProceduralStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of the counter 
+         difference following the ProceduralStatus textual 
+         convention and ITU-T Rec. X.721 | ISO/IEC 10165-2."
+    ::= { monitorMetricEntry 6 }
+
+-- counterOverflowPackage
+counterOverflowPackage OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether the counter overflows or not."
+    ::= { monitorMetricEntry 7 }
+
+modulusValue OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the modulus value of the overflow."
+    ::= { monitorMetricEntry 8 }
+
+-- gaugeDifferencePackage
+gaugeDifferencePackage OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether the gauge is differential or not."
+    ::= { monitorMetricEntry 9 }
+
+previousScanGaugeValue OBJECT-TYPE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the scanned gauge value."
+    ::= { monitorMetricEntry 10 }
+
+gaugeDirferenceProceduralStatus OBJECT-TYPE
+    SYNTAX      ProceduralStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the procedural status of the gauge difference 
+         following the ProceduralStatus textual convention and 
+         ITU-T Rec. X.721 | ISO/IEC 10165-2."
+    ::= { monitorMetricEntry 11 }
+
+-- derivedGaugeThresholdPackage
+-- NOTIFICATIONS "CCITT Rec. X.721 | ISO/IEC 10165-2:1992":qualityofServiceAlarm;
+-- severityIndicatingGaugeThreshold
+-- --
+   -- SeverityIndicatingGaugeThreshold ::= SET OF SEQUENCE {
+   --         notifyLow SeverityIndicatingThreshold,
+   --         notifyHigh SeverityIndicatingThreshold }
+   -- SeverityIndicatingThreshold ::= SEQUENCE {
+   --         threshold ObservedValue,
+   --         notifyOnOff BOOLEAN,
+   --         severityIndication PerceivedSeverity OPTIONAL }
+-- --
+metricLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the derived low threshold for the gauge."
+    ::= { monitorMetricEntry 12 }
+
+metricLowNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether notifications are to be issued when 
+         the gauge falls below the low threshold."
+    ::= { monitorMetricEntry 13 }
+
+metricLowSeverityIndication OBJECT-TYPE
+    SYNTAX      PerceivedSeverity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the severity of the gauge low threshold 
+         notification."
+    ::= { monitorMetricEntry 14 }
+
+metricHighThreshold OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides the derived high threshold for the gauge."
+    ::= { monitorMetricEntry 15 }
+
+metricHighNotify OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether notifications are to be issued when 
+         the gauge rises above the high threshold."
+    ::= { monitorMetricEntry 16 }
+
+metricHighSeverityIndication OBJECT-TYPE
+    SYNTAX      PerceivedSeverity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the severity of the gauge high threshold 
+         notification."
+    ::= { monitorMetricEntry 17 }
+
+-- specificProblemsIndicationPackage
+metricSpecificProblemsIndicator OBJECT-TYPE
+    SYNTAX      SpecificIdentifier
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provide a specific problem indication that is to be 
+         used in notifications."
+    ::= { monitorMetricEntry 18 }
+
+-- derivedGaugeTimestampPackage
+derivedGaugeTimeStamp OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a timestamp of the last gauge event."
+    ::= { monitorMetricEntry 19 }
+
+monitorMetricRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations can 
+         create and delete rows in this table.  Entries in this 
+         table must persist across an agent reboot."
+    ::= { monitorMetricEntry 20 }
+
 
 -- =====================================================================
 
@@ -810,14 +977,14 @@ meanMonitor OBJECT IDENTIFIER
     ::= { metricTables 3 }
 
 meanMonitorTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF MeanMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
+    SYNTAX      SEQUENCE OF MeanMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
         "See 8.1.3.3.
-
+         
          8.1.3.3 Behaviour of the mean monitor
-
+         
          The estimate of mean attribute has the same units as 
          the derived gauge attribute. The estimate of the mean 
          of the derived gauge attribute is provided by the 
@@ -826,11 +993,11 @@ meanMonitorTable OBJECT-TYPE
          specified. However, the time period that is used in the 
          evaluation of the mean value is specified by the moving 
          time period attribute.
-
+         
              NOTE - Examples of two algorithms that may be used 
              to do this are EWMA and UWMA as specified in 
              Annexes B and C.
-
+         
          There are two conditional packages used to apply 
          thresholds to the value of derived gauge and estimate 
          of mean attributevalues. If the derived gauge-threshold 
@@ -844,7 +1011,7 @@ meanMonitorTable OBJECT-TYPE
          emit a quality of service alarm notification whenever 
          the value of the derived gauge or the estimate of the 
          mean attribute triggers the corresponding threshold.
-
+         
          If either of the threshold packages is present, then 
          the conditional specific problems indication package 
          may also bepresent. If the specific problems indication 
@@ -854,7 +1021,7 @@ meanMonitorTable OBJECT-TYPE
          notifications that are emitted, whether they 
          aretriggered by either the derived gauge attribute or 
          by the estimate of mean attribute.
-
+         
          When the mean monitor metric object is created, the 
          moving time period required by the mean estimation 
          algorithm shall be specified. When the mean monitor 
@@ -868,13 +1035,13 @@ meanMonitorTable OBJECT-TYPE
          gauge time stamp attribute as part of the monitored 
          attributes parameter of the quality of service alarm 
          notification.
-
+         
          The use of the quality of service alarm notification 
          parameters is given in 8.2.1. The value of the estimate 
          of mean attribute will be in the observed value element 
          of the threshold information parameterof the quality of 
          service alarm notification.
-
+         
          The values of the observed object instance and observed 
          attribute identifier will be in the monitored 
          attributes parameterof the quality of service alarm 
@@ -886,46 +1053,37 @@ meanMonitorTable OBJECT-TYPE
          change notification package is present, modifications 
          of these attributes shall result in an attribute value 
          changenotification."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                meanMonitor MOC."
     ::= { meanMonitor 1 }
 
 meanMonitorEntry OBJECT-TYPE
-    SYNTAX MeanMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      MeanMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each entry in this table is indexed by scanner id.  
+         Each row contains the characteristics of the estimate 
+         of mean monitor."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                meanMonitor MO."
-    INDEX {
-            scannerId -- shared index
-        }
+    INDEX       { scannerId }
     ::= { meanMonitorTable 1 }
 
-MeanMonitorEntry ::=
-    SEQUENCE {
-        estimateOfMean
-            Gauge,
-        movingTimePeriod
-            TimePeriod,
+MeanMonitorEntry ::= SEQUENCE {
+    estimateOfMean                              Gauge32,
+    movingTimePeriod                            TimePeriod,
         -- estimateOfMeanThresholdPackage PRESENT IF "threshold 
         -- on estimateOfMean is required",
         -- estimateOfMeanSeverityIndicatingGaugeThreshold
-            estimateOfMeanLowThreshold
-                INTEGER,
-            estimateOfMeanLowNotify
-                TruthValue,
-            estimateOfMeanLowSeverityIndication
-                PerceivedSeverity,
-            estimateOfMeanHighThreshold
-                INTEGER,
-            estimateOfMeanHighNotify
-                TruthValue,
-            estimateOfMeanHighSeverityIndication
-                PerceivedSeverity,
+    estimateOfMeanLowThreshold                  Integer32,
+    estimateOfMeanLowNotify                     TruthValue,
+    estimateOfMeanLowSeverityIndication         PerceivedSeverity,
+    estimateOfMeanHighThreshold                 Integer32,
+    estimateOfMeanHighNotify                    TruthValue,
+    estimateOfMeanHighSeverityIndication        PerceivedSeverity,
         -- NOTIFICATIONS "CCITT Rec. X.721 | ISO/IEC 
         -- 10165-2:1992":qualityofServiceAlarm;
 
@@ -934,118 +1092,124 @@ MeanMonitorEntry ::=
         -- and either the estimate of mean threshold package is 
         -- present or the derived gauge-threshold package is 
         -- present";
-        estimateOfMeanSpecificProblemsIndicator
-            SpecificIdentifier,
-        meanMonitorRowStatus
-            RowStatus
-    }
+    estimateOfMeanSpecificProblemsIndicator     SpecificIdentifier,
+    meanMonitorRowStatus                        RowStatus
+}
 
 estimateOfMean OBJECT-TYPE
-    SYNTAX Gauge
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Provides a gauge value for the estimate of mean."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfMean attribute."
     ::= { meanMonitorEntry 1 }
 
 movingTimePeriod OBJECT-TYPE
-    SYNTAX TimePeriod
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      TimePeriod
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the moving time period for the moving 
+         estimate of mean."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                movingTimePeriod attribute."
     ::= { meanMonitorEntry 2 }
 
 estimateOfMeanLowThreshold OBJECT-TYPE
-    SYNTAX INTEGER
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the estimate of mean low threshold"
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfMeanLowThreshold attribute."
     ::= { meanMonitorEntry 3 }
 
 estimateOfMeanLowNotify OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether notifications should be issued when 
+         the estimate of mean falls below the low threshold."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfMeanLowNotify attribute."
     ::= { meanMonitorEntry 4 }
 
 estimateOfMeanLowSeverityIndication OBJECT-TYPE
-    SYNTAX PerceivedSeverity
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      PerceivedSeverity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the severity value for the notification of 
+         estimate of mean below threshold."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfMeanLowSeverityIndication attribute."
     ::= { meanMonitorEntry 5 }
 
 estimateOfMeanHighThreshold OBJECT-TYPE
-    SYNTAX INTEGER
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the estimate of mean high threshold."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfMeanHighThreshold attribute."
     ::= { meanMonitorEntry 6 }
 
 estimateOfMeanHighNotify OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	""
-    REFERENCE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether notifications should be issued when 
+         the estimate of mean rises above the high threshold."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfMeanHighNotify attribute."
     ::= { meanMonitorEntry 7 }
 
 estimateOfMeanHighSeverityIndication OBJECT-TYPE
-    SYNTAX PerceivedSeverity
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      PerceivedSeverity
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the severity value for the notification of 
+         estimate of mean above threshold."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfMeanHighSeverityIndication attribute."
     ::= { meanMonitorEntry 8 }
 
 estimateOfMeanSpecificProblemsIndicator OBJECT-TYPE
-    SYNTAX SpecificIdentifier
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      SpecificIdentifier
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the specific problems indicator for use in 
+         notifications."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfMeanSpecificProblemsIndicator 
                attribute."
     ::= { meanMonitorEntry 9 }
 
 meanMonitorRowStatus OBJECT-TYPE
-    SYNTAX RowStatus
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create and delete rows from this table.  Entries in 
+         this table must persist across agent reboots."
     ::= { meanMonitorEntry 10 }
 
 -- =====================================================================
@@ -1054,24 +1218,24 @@ algorithmIndicatingMeanMonitor OBJECT IDENTIFIER
     ::= { metricTables 4 }
 
 algorithmIndicatingMeanMonitorTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF AlgorithmIndicatingMeanMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
+    SYNTAX      SEQUENCE OF AlgorithmIndicatingMeanMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
         "This is a side-table of the meanMonitor table that 
          identifiers the algorithm used to derive the estimate 
          of the mean for those mean monitors that provide 
          identification of the algorithm."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                algorithmIndicatingMeanMonitor MOC."
     ::= { algorithmIndicatingMeanMonitor 1 }
 
 algorithmIndicatingMeanMonitorEntry OBJECT-TYPE
-    SYNTAX AlgorithmIndicatingMeanMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
+    SYNTAX      AlgorithmIndicatingMeanMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
         "Rows cannot be explicitly create or deleted from this 
          table by management stations, but may be created or 
          deleted autonomously as a part of system operations.  
@@ -1079,36 +1243,31 @@ algorithmIndicatingMeanMonitorEntry OBJECT-TYPE
          row for which the mean estimation algorithm is known 
          and identifiable, a row in this table will also be 
          instanitated to indicate the identification."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                algorithmIndicatingMeanMonitor MO."
-    INDEX {
-            scannerId -- shared index
-            -- derived from meanMonitor
-        }
+    INDEX       { scannerId }
     ::= { algorithmIndicatingMeanMonitorTable 1 }
 
-AlgorithmIndicatingMeanMonitorEntry ::=
-    SEQUENCE {
-        algorithmIdentifier
-            AlgorithmIdentifier
-    }
+AlgorithmIndicatingMeanMonitorEntry ::= SEQUENCE {
+    algorithmIdentifier     AlgorithmIdentifier
+}
 
 algorithmIdentifier OBJECT-TYPE
-    SYNTAX AlgorithmIdentifier
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
+    SYNTAX      AlgorithmIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
         "This attribute contains the identification of the 
          algorithm used to derive the estimate of the mean. The 
          value of this attribute is provided by the managed 
          system at the time of object creation and is read-only.
-
+         
          This attribute may not be specified by the manager on 
          a create request. ITU-T Rec. X.739 | ISO/IEC 10164-11 
          registers two algorithms for use in this attribute.  
          Other identifiers may be defined."
-    REFERENCE
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                algorithmIdentifier attribute."
     ::= { algorithmIndicatingMeanMonitorEntry 1 }
@@ -1119,43 +1278,42 @@ movingAverageMeanMonitor OBJECT IDENTIFIER
     ::= { metricTables 5 }
 
 movingAverageMeanMonitorTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF MovingAverageMeanMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      SEQUENCE OF MovingAverageMeanMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of average mean monitors."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                movingAverageMeanMonitor MOC."
     ::= { movingAverageMeanMonitor 1 }
 
 movingAverageMeanMonitorEntry OBJECT-TYPE
-    SYNTAX MovingAverageMeanMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      MovingAverageMeanMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by scanned 
+         identifier.  These rows do not contain any additional 
+         information beyond membership."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                movingAverageMeanMonitor MO."
-    INDEX {
-            scannerId -- shared index
-            -- derived from meanMonitor
-        }
+    INDEX       { scannerId }
     ::= { movingAverageMeanMonitorTable 1 }
 
-MovingAverageMeanMonitorEntry ::=
-    SEQUENCE {
-        movingAverageMeanMonitorRowStatus
-            RowStatus
-    }
+MovingAverageMeanMonitorEntry ::= SEQUENCE {
+    movingAverageMeanMonitorRowStatus   RowStatus
+}
 
 movingAverageMeanMonitorRowStatus OBJECT-TYPE
-    SYNTAX RowStatus
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create and delete rows in this table.  Entries in this 
+         table must persist across agent reboots."
     ::= { movingAverageMeanMonitorEntry 1 }
 
 
@@ -1165,147 +1323,152 @@ meanAndPercentileMonitor OBJECT IDENTIFIER
     ::= { metricTables 6 }
 
 meanAndPercentileMonitorTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF MeanAndPercentileMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      SEQUENCE OF MeanAndPercentileMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of mean and percentile monitors."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                meanAndPercentileMonitor MOC."
     ::= { meanAndPercentileMonitor 1 }
 
 meanAndPercentileMonitorEntry OBJECT-TYPE
-    SYNTAX MeanAndPercentileMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      MeanAndPercentileMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by scanner 
+         identifier.  Each row contains the characteristics of 
+         the mean and percentile monitor."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                meanAndPercentileMonitor MO."
-    INDEX {
-            scannerId -- shared index
-            -- derived from meanMonitor
-        }
+    INDEX       { scannerId }
     ::= { meanAndPercentileMonitorTable 1 }
 
-MeanAndPercentileMonitorEntry ::=
-    SEQUENCE {
-        percentileSecondMovingTimePeriod -- used in GaugePercentileBehaviour to calculate T2,
-        -- See B.2.4 and 8.1.7.2.  TimePeriod,
-        estimateOfLargestInReplication -- See B.2.4 and 8.1.7.2.
-            Gauge,
-        estimateOfSmallestInReplication -- See B.2.4 and 8.1.7.2.
-            Gauge,
-        estimateOfMedian -- See B.2.4 and 8.1.7.2.
-            Gauge,
-        estimateOf100PCTPercentile -- See B.2.4 and 8.1.7.2.
-            Gauge,
-        estimateOfPCTPercentile -- See B.2.4 and 8.1.7.2.
-            Gauge,
-        numberOfReplications -- See B.2.4 and 8.1.7.2.
-            INTEGER,
-        configurablePercentilePackage
-            TruthValue,
-        meanAndPercentileMonitorRowStatus
-            RowStatus
-    }
+MeanAndPercentileMonitorEntry ::= SEQUENCE {
+    percentileSecondMovingTimePeriod    TimePeriod,
+        -- used in GaugePercentileBehaviour to calculate T2,
+        -- See B.2.4 and 8.1.7.2.
+    estimateOfLargestInReplication      Gauge32,
+        -- See B.2.4 and 8.1.7.2.
+    estimateOfSmallestInReplication     Gauge32,
+        -- See B.2.4 and 8.1.7.2.
+    estimateOfMedian                    Gauge32,
+        -- See B.2.4 and 8.1.7.2.
+    estimateOf100PCTPercentile          Gauge32,
+        -- See B.2.4 and 8.1.7.2.
+    estimateOfPCTPercentile             Gauge32,
+        -- See B.2.4 and 8.1.7.2.
+    numberOfReplications                Integer32,
+        -- See B.2.4 and 8.1.7.2.
+    configurablePercentilePackage       TruthValue,
+    meanAndPercentileMonitorRowStatus   RowStatus
+}
 
 percentileSecondMovingTimePeriod OBJECT-TYPE
-    SYNTAX TimePeriod
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      TimePeriod
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies the second moving time period for the mean 
+         and percentile monitor."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                secondMovingTimePeriod attribute."
     ::= { meanAndPercentileMonitorEntry 1 }
 
 estimateOfLargestInReplication OBJECT-TYPE
-    SYNTAX Gauge
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the estimate of largest increment 
+         replication for this metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfLargestInReplication attribute."
     ::= { meanAndPercentileMonitorEntry 2 }
 
 estimateOfSmallestInReplication OBJECT-TYPE
-    SYNTAX Gauge
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the estimate of smallest increment 
+         replication for this metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfSmallestInReplication attribute."
     ::= { meanAndPercentileMonitorEntry 3 }
 
 estimateOfMedian OBJECT-TYPE
-    SYNTAX Gauge
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates an estimate of median for this metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfMedian attribute."
     ::= { meanAndPercentileMonitorEntry 4 }
 
 estimateOf100PCTPercentile OBJECT-TYPE
-    SYNTAX Gauge
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the estimate of 100 percent percentile for 
+         this metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOf100-PCTPercentile attribute."
     ::= { meanAndPercentileMonitorEntry 5 }
 
 estimateOfPCTPercentile OBJECT-TYPE
-    SYNTAX Gauge
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the estimate of 0 percent percentile for this 
+         metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfPCTPercentile attribute."
     ::= { meanAndPercentileMonitorEntry 6 }
 
 numberOfReplications OBJECT-TYPE
-    SYNTAX INTEGER
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the number of replications for this metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                numberOfReplications attribute."
     ::= { meanAndPercentileMonitorEntry 7 }
 
 configurablePercentilePackage OBJECT-TYPE
-    SYNTAX TruthValue
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies whether the configurable percentile package 
+         is supported."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                configurablePercentilePackage package."
     ::= { meanAndPercentileMonitorEntry 8 }
 
 meanAndPercentileMonitorRowStatus OBJECT-TYPE
-    SYNTAX RowStatus
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create and delete rows in this table.  Entries in this 
+         table must survive an agent reboot."
     ::= { meanAndPercentileMonitorEntry 9 }
 
 
@@ -1315,69 +1478,69 @@ meanAndVarianceMonitor OBJECT IDENTIFIER
     ::= { metricTables 7 }
 
 meanAndVarianceMonitorTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF MeanAndVarianceMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      SEQUENCE OF MeanAndVarianceMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of mean and variance monitors."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                meanAndVarianceMonitor MOC."
     ::= { meanAndVarianceMonitor 1 }
 
 meanAndVarianceMonitorEntry OBJECT-TYPE
-    SYNTAX MeanAndVarianceMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      MeanAndVarianceMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by scanner identifier 
+         and contains the characteristics of the mean and 
+         variance monitor."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                meanAndVarianceMonitor MO."
-    INDEX {
-            scannerId -- shared index
-            -- derived from meanMonitor
-        }
+    INDEX       { scannerId }
     ::= { meanAndVarianceMonitorTable 1 }
 
-MeanAndVarianceMonitorEntry ::=
-    SEQUENCE {
-        varianceSecondMovingTimePeriod -- used in EWMA Gauge Variance Behaviour to calculate "g".
-            TimePeriod,
-        estimateOfVariance -- See B.2.3.
-            Gauge,
-        meanAndVarianceMonitorRowStatus
-            RowStatus
-    }
+MeanAndVarianceMonitorEntry ::= SEQUENCE {
+    varianceSecondMovingTimePeriod      TimePeriod,
+        -- used in EWMA Gauge Variance Behaviour to calculate "g".
+    estimateOfVariance                  Gauge32,
+        -- See B.2.3.
+    meanAndVarianceMonitorRowStatus     RowStatus
+}
 
 varianceSecondMovingTimePeriod OBJECT-TYPE
-    SYNTAX TimePeriod
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      TimePeriod
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Specifies a second moving time period for the monitor."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                secondMovingTimePeriod attribute."
     ::= { meanAndVarianceMonitorEntry 1 }
 
 estimateOfVariance OBJECT-TYPE
-    SYNTAX Gauge
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current estimate of variance value for 
+         the metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateOfVariance attribute."
     ::= { meanAndVarianceMonitorEntry 2 }
 
 meanAndVarianceMonitorRowStatus OBJECT-TYPE
-    SYNTAX RowStatus
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-        ""
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create and delete rows in this table.  Entries in this 
+         table must survive an agent reboot."
     ::= { meanAndVarianceMonitorEntry 3 }
 
 
@@ -1387,69 +1550,66 @@ meanAndMinMaxMonitor OBJECT IDENTIFIER
     ::= { metricTables 8 }
 
 meanAndMinMaxMonitorTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF MeanAndMinMaxMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      SEQUENCE OF MeanAndMinMaxMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "This is a table of mean and minimum-maximum monitors."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                meanAndMinMaxMonitor MOC."
     ::= { meanAndMinMaxMonitor 1 }
 
 meanAndMinMaxMonitorEntry OBJECT-TYPE
-    SYNTAX MeanAndMinMaxMonitorEntry
-    MAX-ACCESS not-accessible
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      MeanAndMinMaxMonitorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+        "Each row in this table is indexed by scanner identifier 
+         and contants the metric generated by the monitor."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                meanAndMinMaxMonitor MO."
-    INDEX {
-            scannerId -- shared index
-            -- derived from meanMonitor
-        }
+    INDEX       { scannerId }
     ::= { meanAndMinMaxMonitorTable 1 }
 
-MeanAndMinMaxMonitorEntry ::=
-    SEQUENCE {
-        estimateOfLargest
-            Gauge,
-        estimateOfSmallest
-            Gauge,
-        meanAndMinMaxMonitorRowStatus
-            RowStatus
-    }
+MeanAndMinMaxMonitorEntry ::= SEQUENCE {
+    estimateOfLargest               Gauge32,
+    estimateOfSmallest              Gauge32,
+    meanAndMinMaxMonitorRowStatus   RowStatus
+}
 
 estimateOfLargest OBJECT-TYPE
-    SYNTAX Gauge
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current estimate of largest (high water 
+         mark) for the metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateofLargest attribute."
     ::= { meanAndMinMaxMonitorEntry 1 }
 
 estimateOfSmallest OBJECT-TYPE
-    SYNTAX Gauge
-    MAX-ACCESS read-only
-    STATUS current
-    DESCRIPTION
-        ""
-    REFERENCE
+    SYNTAX      Gauge32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+        "Indicates the current estimate of smallest (low water 
+         mark) for the metric."
+    REFERENCE   
         "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
                estimateofSmallest attribute."
     ::= { meanAndMinMaxMonitorEntry 2 }
 
 meanAndMinMaxMonitorRowStatus OBJECT-TYPE
-    SYNTAX RowStatus
-    MAX-ACCESS read-create
-    STATUS current
-    DESCRIPTION
-	""
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION 
+        "Provides a mechanism whereby management stations may 
+         create an delete rows in this table."
     ::= { meanAndMinMaxMonitorEntry 3 }
 
 -- =====================================================================
@@ -1457,46 +1617,94 @@ meanAndMinMaxMonitorRowStatus OBJECT-TYPE
 metricOids OBJECT IDENTIFIER
     ::= { metricMIB 4 }
 
-AlgorithmIdentifier ::= TEXTUAL-CONVENTION
-    STATUS current
-    DESCRIPTION
-	"Provides for the specification of a mean algorithm identifier."
-    SYNTAX OBJECT IDENTIFIER
-
--- mean algorithm object identifiers
-
-moaAlgorithmIdentifiers OBJECT IDENTIFIER ::=
-{ joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) algorithm(1) }
-
-ewmaAlgorithm OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "This identifier is allocated to indicate that the EWMA 
-         algorithm is used for data smoothing.  The EWMA 
-         algorithm is defined in X.739/B.2."
-    REFERENCE
-        "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
-               MetricModule.ewmaAlgoritm, Annex B.2."
-    ::= { moaAlgorithmIdentifiers 0 }
-
-
-uwmaAlgorithm OBJECT-IDENTITY
-    STATUS current
-    DESCRIPTION
-        "This identifier is allocated to indicate that the UWMA 
-         algorithm is used for data smoothing.  The UWMA 
-         algorithm is defined in X.739/C.2."
-    REFERENCE
-        "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
-               MetricModule.uwmaAlgoritm, Annex C.2."
-    ::= { moaAlgorithmIdentifiers 1 }
-
 metricGroups OBJECT IDENTIFIER
     ::= { metricMIB 5 }
 
 metricCompliance OBJECT IDENTIFIER
     ::= { metricMIB 6 }
 
-END
+-- mean algorithm object identifiers
+
+moaAlgorithmIdentifiers OBJECT IDENTIFIER
+    ::= { joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) 1 }
+
+ewmaAlgorithm OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This identifier is allocated to indicate that the EWMA 
+         algorithm is used for data smoothing.  The EWMA 
+         algorithm is defined in X.739/B.2."
+    REFERENCE   
+        "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
+               MetricModule.ewmaAlgoritm, Annex B.2."
+    ::= { joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) algorithm(1) 0 }
+
+uwmaAlgorithm OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION 
+        "This identifier is allocated to indicate that the UWMA 
+         algorithm is used for data smoothing.  The UWMA 
+         algorithm is defined in X.739/C.2."
+    REFERENCE   
+        "ITU-T Rec. X.739 (1993) | ISO/IEC 10164-11 : 1994, 
+               MetricModule.uwmaAlgoritm, Annex C.2."
+    ::= { joint-iso-ccitt ms(9) function(2) part11(11) standardSpecificExtension(0) algorithm(1) 1 }
+
+metricObjectGroup OBJECT-GROUP
+    OBJECTS     { scannerAdministrativeState, granularityPeriod, 
+                  scannerOperationalState, scannerAvaiabilityStatus, 
+                  scannerStartTime, scannerStopTime, 
+                  scannerIntervalsOfDay, scannerWeekMask, 
+                  scannerSchedulerName, scannerPeriodSynchronizationTime, 
+                  scannerCreatDeleteNotifications, 
+                  scannerAttributeValueChangeNotifications, 
+                  scannerStateChangeNotifications, scannerRowStatus, 
+                  observedObjectInstance, observedAttributeId, 
+                  derivedGauge, counterDifferencePackage, 
+                  previousScanCounterValue, 
+                  counterDifferenceProceduralStatus, 
+                  counterOverflowPackage, modulusValue, 
+                  gaugeDifferencePackage, previousScanGaugeValue, 
+                  gaugeDirferenceProceduralStatus, metricLowThreshold, 
+                  metricLowNotify, metricLowSeverityIndication, 
+                  metricHighThreshold, metricHighNotify, 
+                  metricHighSeverityIndication, 
+                  metricSpecificProblemsIndicator, derivedGaugeTimeStamp, 
+                  monitorMetricRowStatus, estimateOfMean, 
+                  movingTimePeriod, estimateOfMeanLowThreshold, 
+                  estimateOfMeanLowNotify, 
+                  estimateOfMeanLowSeverityIndication, 
+                  estimateOfMeanHighThreshold, estimateOfMeanHighNotify, 
+                  estimateOfMeanHighSeverityIndication, 
+                  estimateOfMeanSpecificProblemsIndicator, 
+                  meanMonitorRowStatus, algorithmIdentifier, 
+                  movingAverageMeanMonitorRowStatus, 
+                  percentileSecondMovingTimePeriod, 
+                  estimateOfLargestInReplication, 
+                  estimateOfSmallestInReplication, estimateOfMedian, 
+                  estimateOf100PCTPercentile, estimateOfPCTPercentile, 
+                  numberOfReplications, configurablePercentilePackage, 
+                  meanAndPercentileMonitorRowStatus, 
+                  varianceSecondMovingTimePeriod, estimateOfVariance, 
+                  meanAndVarianceMonitorRowStatus, estimateOfLargest, 
+                  estimateOfSmallest, meanAndMinMaxMonitorRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "Objects in this MIB."
+    ::= { metricGroups 1 }
+
+metricGeneralCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "Provides the module compliance requirements for the 
+         metric MIB."
+
+    MODULE      -- this module
+
+        MANDATORY-GROUPS        { metricObjectGroup }
+
+    ::= { metricCompliance 1 }
+
+END -- end of module OPENSS7-METRIC-MIB.
 
 -- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\- fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et

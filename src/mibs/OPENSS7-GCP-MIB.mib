@@ -68,8 +68,12 @@
 OPENSS7-GCP-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
-    InetAddressType, InetAddress
+    InetAddress, InetAddressType
         FROM INET-ADDRESS-MIB
+    NetworkPointCode
+        FROM OPENSS7-MTP-MIB
+    PortRange
+        FROM OPENSS7-RTPSW-MIB
     openss7Modules
         FROM OPENSS7-SMI
     AdministrativeState, AlarmStatus, AvailabilityStatus, 
@@ -78,8 +82,6 @@ IMPORTS
     communicationsAlarmPackage, createDeleteNotificationsPackage, 
     tmnObjectInstance, tmnPerceivedSeverity, tmnProbableCause
         FROM OPENSS7-SMI-MIB
-    NetworkPointCode
-        FROM OPENSS7-SS7-MIB
     ActionOrResult, CommonLanguageName
         FROM OPENSS7-TC
     ProtectionStatus, ProtectionUnits
@@ -88,8 +90,8 @@ IMPORTS
         FROM SNMP-FRAMEWORK-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
-    Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY, 
-    OBJECT-TYPE, Unsigned32, zeroDotZero
+    Gauge32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
+    OBJECT-IDENTITY, OBJECT-TYPE, Unsigned32, zeroDotZero
         FROM SNMPv2-SMI
     AutonomousType, RowPointer, RowStatus, TEXTUAL-CONVENTION, 
     TimeInterval, TruthValue
@@ -98,7 +100,7 @@ IMPORTS
         FROM TRANSPORT-ADDRESS-MIB;
 
 gcpMIB MODULE-IDENTITY
-    LAST-UPDATED "201107130452Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -140,6 +142,9 @@ gcpMIB MODULE-IDENTITY
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201107130452Z"
     DESCRIPTION 
         "Initial version of this mib."
@@ -420,7 +425,7 @@ gcpDefaultMgcoProvRespTimer OBJECT-TYPE
     REFERENCE
         "ITU-T Recommendation H.248.1 (09/2005), E.2.1.5 and E.2.1.6."
     DEFVAL      { 400 } -- provisional
-    ::= { gcpMgcoDefaults 2 }
+    ::= { gcpMgcoDefaults 3 }
 
 gcpDefaultMgcpPendingLimit OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -435,53 +440,69 @@ gcpDefaultMgcpPendingLimit OBJECT-TYPE
     REFERENCE   
         "ITU-T Recommendation H.248.1 (09/2005), E.2.1.7 and E.2.1.8."
     DEFVAL      { 5 } -- provisional
-    ::= { gcpMgcoDefaults 3 }
+    ::= { gcpMgcoDefaults 4 }
 
 gcpDefaultMgcoLongTimer OBJECT-TYPE
     SYNTAX      TimeInterval
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        ""
-    ::= { gcpMgcoDefaults 2 }
+        "Specifies the default long timer.
+         
+         The default default value is only applicable when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
+    ::= { gcpMgcoDefaults 5 }
 
 gcpDefaultMgcoRtoInit OBJECT-TYPE
     SYNTAX      TimeInterval
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the default initial retransmission timeout.  
+         The default default values is 100: 1 second.
+         
+         The default default value is only applicable when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
     REFERENCE   
         "ITU-T Recommendation H.248.1 (09/2005), Annex D.1.3, Computing 
                retransmission timers."
-    ::= { gcpMgcoDefaults 3 }
+    DEFVAL      { 100 }
+    ::= { gcpMgcoDefaults 6 }
 
 gcpDefaultMgcoRtoMin OBJECT-TYPE
     SYNTAX      TimeInterval
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the minimum retransmission timeout.  The 
+         default default value is 1: 10 milliseconds.
+         
+         The default default value is only applicable when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
     REFERENCE   
         "ITU-T Recommendation H.248.1 (09/2005), Annex D.1.3, Computing 
                retransmission timers."
-    ::= { gcpMgcoDefaults 4 }
+    ::= { gcpMgcoDefaults 7 }
 
 gcpDefaultMgcoRtoMax OBJECT-TYPE
     SYNTAX      TimeInterval
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION 
-        "
-         The default default value is 400: 4 seconds.  The default 
-         default value is only applicable when never set by any 
-         management station.  When set, the scalar value must persist 
-         across system reboots."
+        "Specifies the maximum retansmission timeout.  The 
+         default default value is 400: 4 seconds.
+         
+         The default default value is only applicable when never 
+         set by any management station.  When set, the scalar 
+         value must persist across system reboots."
     REFERENCE   
         "ITU-T Recommendation H.248.1 (09/2005), Annex D.1.3, Computing 
                retransmission timers."
     DEFVAL      { 400 }
-    ::= { gcpMgcoDefaults 5 }
+    ::= { gcpMgcoDefaults 8 }
 
 gcpUdpDefaults OBJECT IDENTIFIER
     ::= { gcpDefaults 2 }
@@ -4946,7 +4967,6 @@ gcpProtUnitRowStatus OBJECT-TYPE
         "STD 58, SNMPv2-TC RowStatus."
     ::= { gcpProtUnitEntry 13 }
 
-
 gcpRealm OBJECT IDENTIFIER
     ::= { gcpTables 10 }
 
@@ -4955,7 +4975,14 @@ gcpRealmTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This table defaults of the IP address realms known to 
+         this managed system.  IP Address Realms are defined in 
+         RFC 2663, clause 2.1, as a network domain in which the 
+         network addresses are uniquely assigned to entities 
+         such that datagrams can be routed to them.  Routing 
+         protocols used within the network domain are 
+         responsible for finding routes to entities given their 
+         network addresses."
     REFERENCE
         "ITU-T Recommendation H.248.41 (05/2006) IP domain 
                connection package.
@@ -5092,7 +5119,8 @@ gcpInterfaceTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This table specifies all of the IP interfaces known to 
+         (used by) the GCP managed switching element."
     REFERENCE   
         "ITU-T Recommendation H.248.64 (12/2009)"
     ::= { gcpInterface 1 }
@@ -5102,7 +5130,14 @@ gcpInterfaceEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each entry in the gcpInterfaceTable table is indexed by 
+         the managed switching element identifier and interface 
+         identifier for the interface as used by that managed 
+         element.  Each entry contains the ifIndex value, MG 
+         identifier, inteface type from an MG routing 
+         perspective, the realm identifier (index into the 
+         gcpRealmTable), and the termination identifier and 
+         path."
     REFERENCE   
         "ITU-T Recommendation H.248.64 (12/2009)"
     INDEX       { gcpMsId, gcpInterfaceId }
@@ -5173,7 +5208,10 @@ gcpInterfaceRealm OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the realm to which the interface belongs.  
+         The value of this conceptual column is the value of the 
+         index into the gcpRealmTable that corresponds to the 
+         realm to which the interface belongs."
     ::= { gcpInterfaceEntry 5 }
 
 gcpInterfaceTermId OBJECT-TYPE
@@ -5181,7 +5219,9 @@ gcpInterfaceTermId OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the GCP termination identifier that is used 
+         to control the properties of, or otherwise specify, 
+         this interface."
     ::= { gcpInterfaceEntry 6 }
 
 gcpInterfaceTermPath OBJECT-TYPE
@@ -5189,7 +5229,9 @@ gcpInterfaceTermPath OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the GCP termination path that is used to 
+         control the properties of, or otherwise specify, this 
+         interface."
     ::= { gcpInterfaceEntry 7 }
 
 gcpInterfaceRowStatus OBJECT-TYPE
@@ -5197,9 +5239,9 @@ gcpInterfaceRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may 
+         create or destroy conceptual rows in this table."
     ::= { gcpInterfaceEntry 8 }
-
 
 gcpAddress OBJECT IDENTIFIER
     ::= { gcpTables 12 }
@@ -5209,7 +5251,8 @@ gcpAddressTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "This table contains the IP addresses that are available 
+         to MG."
     ::= { gcpAddress 1 }
 
 gcpAddressEntry OBJECT-TYPE
@@ -5217,8 +5260,13 @@ gcpAddressEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    INDEX       { gcpMsId, gcpMgId, gcpRealmId, gcpInterfaceId, gcpAddressId }
+        "Each row in this table is indexed by the managed 
+         switching element identifier, the MG identifier, the IP 
+         Realm, the interface, and the address identifier.  Each 
+         row contains the address type and address, along with 
+         a port range that is usable by the MG."
+    INDEX       { gcpMsId, gcpMgId, gcpRealmId, gcpInterfaceId, 
+                  gcpAddressId }
     ::= { gcpAddressTable 1 }
 
 GcpAddressEntry ::= SEQUENCE {
@@ -5226,7 +5274,7 @@ GcpAddressEntry ::= SEQUENCE {
     gcpAddressInterface     Unsigned32,
     gcpAddressType          InetAddressType,
     gcpAddressAddr          InetAddress,
-    gcpAddressPortRanges    InetAddressPortRanges,
+    gcpAddressPortRanges    PortRange,
     gcpAddressRowStatus     RowStatus
 }
 
@@ -5243,7 +5291,7 @@ gcpAddressInterface OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        ""
+        "Specifies the address interface."
     ::= { gcpAddressEntry 3 }
 
 gcpAddressType OBJECT-TYPE
@@ -5272,11 +5320,13 @@ gcpAddressAddr OBJECT-TYPE
     ::= { gcpAddressEntry 5 }
 
 gcpAddressPortRanges OBJECT-TYPE
-    SYNTAX      InetAddressPortRanges
+    SYNTAX      PortRange
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        ""
+        "Specifies the port range which is the range of port 
+         numbers that are available for use for ephemeral 
+         connections."
     ::= { gcpAddressEntry 6 }
 
 gcpAddressRowStatus OBJECT-TYPE
@@ -5284,9 +5334,9 @@ gcpAddressRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        ""
+        "Provides a mechanism whereby management stations may 
+         create or destroy conceptual rows in this table."
     ::= { gcpAddressEntry 7 }
-
 
 gcpOids OBJECT IDENTIFIER
     ::= { gcpMIB 4 }
@@ -5601,7 +5651,8 @@ gcpOnOccEvent NOTIFICATION-TYPE
 
 gcpNotificationGroup NOTIFICATION-GROUP
     NOTIFICATIONS { gcpProtectionSwitchReport, gcpMgColdStart, 
-                  gcpOnOccEvent }
+                  gcpOnOccEvent, gcpMgFailure, gcpMgcFailure, 
+                  gcpLinkageFailure, gcpInactivityTimeout }
     STATUS      current
     DESCRIPTION 
         "A collection of all of the accessible notifications in this 
@@ -5678,7 +5729,20 @@ gcpObjectGroup OBJECT-GROUP
                   gcpProtUnitSwitchStatus, gcpProtUnitSwitchDirection, 
                   gcpProtUnitRelatedUnit, gcpProtUnitAutoSwitchReason, 
                   gcpProtUnitLockoutReleaseFailed, gcpProtUnitPriority, 
-                  gcpProtUnitRowStatus }
+                  gcpProtUnitRowStatus, gcpDefaultMgcoExecutionTime, 
+                  gcpDefaultMgcoProvRespTimer, 
+                  gcpDefaultMgcpPendingLimit, gcpDefaultMgcoLongTimer, 
+                  gcpDefaultMgcoRtoInit, gcpDefaultMgcoRtoMin, 
+                  gcpDefaultMgcoRtoMax, gcpLinkageMgcMaster, 
+                  gcpLinkageMit, gcpRealmString, gcpRealmTermsMax, 
+                  gcpRealmTermsCurrent, gcpRealmTermsHiWat, 
+                  gcpRealmTermsLoWat, gcpRealmRowStatus, 
+                  gcpInterfaceIfindex, gcpInterfaceMgId, 
+                  gcpInterfaceType, gcpInterfaceRealm, 
+                  gcpInterfaceTermId, gcpInterfaceTermPath, 
+                  gcpInterfaceRowStatus, gcpAddressInterface, 
+                  gcpAddressType, gcpAddressAddr, gcpAddressPortRanges, 
+                  gcpAddressRowStatus }
     STATUS      current
     DESCRIPTION 
         "A collection of all of the accessible objects in this 
