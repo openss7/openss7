@@ -857,6 +857,7 @@ store_tcapApplicationSubsystemTable(int majorID, int minorID, void *serverarg, v
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapApplicationSubsystemTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapSystemId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
@@ -1049,6 +1050,7 @@ store_tcapTransactionCopmTable(int majorID, int minorID, void *serverarg, void *
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapTransactionCopmTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapTransactionCopmId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapTransactionCopmOperationalState, &tmpsize);
@@ -1302,6 +1304,7 @@ store_tcapTransactionTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapTransactionTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapApInvocationId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapTransactionId, &tmpsize);
@@ -1564,6 +1567,7 @@ store_tcapDialogueTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapDialogueTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapApInvocationId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapTransactionId, &tmpsize);
@@ -1784,6 +1788,7 @@ store_tcapTcUserTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapTcUserTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapSystemId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
@@ -2012,6 +2017,7 @@ store_tcapApplicationProcessTable(int majorID, int minorID, void *serverarg, voi
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapApplicationProcessTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapSystemId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
@@ -2244,6 +2250,7 @@ store_tcapSupportEntityNameTable(int majorID, int minorID, void *serverarg, void
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapSupportEntityNameTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->tcapSystemId, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
@@ -2562,6 +2569,7 @@ store_tcapApplicationEntityTable(int majorID, int minorID, void *serverarg, void
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapApplicationEntityTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -2799,6 +2807,7 @@ store_tcapLocalSapNameTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapLocalSapNameTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -3027,6 +3036,7 @@ store_tcapApplicationContextNameTable(int majorID, int minorID, void *serverarg,
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapApplicationContextNameTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationSubsystemId, &StorageTmp->tcapApplicationSubsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
@@ -3245,6 +3255,7 @@ store_tcapAbstractSyntaxTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapAbstractSyntaxTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->tcapAbstractSyntaxId, &tmpsize);
@@ -3468,6 +3479,7 @@ store_tcapTransferSyntaxTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "tcapTransferSyntaxTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->tcapApplicationEntityId, &StorageTmp->tcapApplicationEntityIdLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->tcapTransferSyntaxId, &StorageTmp->tcapTransferSyntaxIdLen);

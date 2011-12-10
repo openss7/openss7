@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -116,7 +116,7 @@ struct m2uaAsTable_data {
 	long m2uaAsOperationalState;	/* ReadOnly */
 	uint8_t *m2uaAsProceduralStatus;	/* ReadOnly */
 	size_t m2uaAsProceduralStatusLen;
-	long m2uaASUsageState;		/* ReadOnly */
+	long m2uaAsUsageState;		/* ReadOnly */
 	long m2uaAsStatus;		/* Create */
 };
 struct m2uaIfTable_data {
@@ -126,7 +126,7 @@ struct m2uaIfTable_data {
 	uint8_t *m2uaIfName;		/* Create */
 	size_t m2uaIfNameLen;
 	ulong m2uaIfAsIndex;		/* Create */
-	long m2uaIfIdNum;		/* Create */
+	ulong m2uaIfIdNum;		/* Create */
 	uint8_t *m2uaIfIdName;		/* Create */
 	size_t m2uaIfIdNameLen;
 	long m2uaIfAdministrativeState;	/* Create */
@@ -144,17 +144,19 @@ struct m2uaIfTable_data {
 struct m2uaAsIfTable_data {
 	uint m2uaAsIfTable_request;
 	uint m2uaAsIfTable_refs;
+	ulong m2uaAsIndex;		/* NoAccess */
 	ulong m2uaIfIndex;		/* NoAccess */
+	long m2uaAsIfStatus;		/* Create */
 };
 struct m2uaAspTable_data {
 	uint m2uaAspTable_request;
 	uint m2uaAspTable_refs;
-	ulong m2uaAspIndex;		/* ReadOnly */
+	ulong m2uaAspIndex;		/* NoAccess */
 	uint8_t *m2uaAspName;		/* ReadOnly */
 	size_t m2uaAspNameLen;
-	ulong m2uaSgIndex;		/* Create */
-	long m2uaAspAdministrativeState;	/* ReadWrite */
-	long m2uaAspOperationalState;	/* ReadWrite */
+	ulong m2uaSgIndexSg;		/* Create */
+	long m2uaAspAdministrativeState;	/* Create */
+	long m2uaAspOperationalState;	/* Create */
 	long m2uaAspUsageState;		/* ReadOnly */
 	uint8_t *m2uaAspProceduralStatus;	/* ReadOnly */
 	size_t m2uaAspProceduralStatusLen;
@@ -164,8 +166,8 @@ struct m2uaAspTable_data {
 struct m2uaAspSgTable_data {
 	uint m2uaAspSgTable_request;
 	uint m2uaAspSgTable_refs;
-	ulong m2uaAspIndex;		/* ReadOnly */
-	ulong m2uaSgIndex;		/* Create */
+	ulong m2uaAspIndex;		/* NoAccess */
+	ulong m2uaSgIndex;		/* NoAccess */
 	ulong m2uaAspSgAspId;		/* ReadWrite */
 	long m2uaAspSgAspPort;		/* ReadWrite */
 	long m2uaAspSgAspState;		/* ReadOnly */
@@ -174,7 +176,7 @@ struct m2uaAspSgTable_data {
 struct m2uaSgTable_data {
 	uint m2uaSgTable_request;
 	uint m2uaSgTable_refs;
-	ulong m2uaSgIndex;		/* ReadOnly */
+	ulong m2uaSgIndex;		/* NoAccess */
 	uint8_t *m2uaSgName;		/* Create */
 	size_t m2uaSgNameLen;
 	long m2uaSgRowStatus;		/* Create */
@@ -182,8 +184,8 @@ struct m2uaSgTable_data {
 struct m2uaSgAspTable_data {
 	uint m2uaSgAspTable_request;
 	uint m2uaSgAspTable_refs;
-	ulong m2uaSgIndex;		/* Create */
-	ulong m2uaAspIndex;		/* ReadOnly */
+	ulong m2uaSgIndex;		/* NoAccess */
+	ulong m2uaAspIndex;		/* NoAccess */
 	ulong m2uaSgAspId;		/* ReadWrite */
 	long m2uaSgAspPort;		/* ReadWrite */
 	long m2uaSgAspState;		/* ReadOnly */
@@ -193,8 +195,8 @@ struct m2uaSgAspTable_data {
 struct m2uaSgAspAsTable_data {
 	uint m2uaSgAspAsTable_request;
 	uint m2uaSgAspAsTable_refs;
-	ulong m2uaSgIndex;		/* Create */
-	ulong m2uaAspIndex;		/* ReadOnly */
+	ulong m2uaSgIndex;		/* NoAccess */
+	ulong m2uaAspIndex;		/* NoAccess */
 	ulong m2uaAsIndex;		/* NoAccess */
 	long m2uaSgAspAsRegistrationRequired;	/* ReadWrite */
 	long m2uaSgAspAsState;		/* ReadOnly */
@@ -204,12 +206,12 @@ struct m2uaSgAspAsTable_data {
 struct m2uaSgAsTable_data {
 	uint m2uaSgAsTable_request;
 	uint m2uaSgAsTable_refs;
-	ulong m2uaSgIndex;		/* Create */
+	ulong m2uaSgIndex;		/* NoAccess */
 	ulong m2uaAsIndex;		/* NoAccess */
 	oid *m2uaSgAsTrafficMode;	/* Create */
 	size_t m2uaSgAsTrafficModeLen;
-	long m2uaSgAsState;		/* ReadWrite */
-	long m2uaSgAsAdministrativeState;	/* ReadWrite */
+	long m2uaSgAsState;		/* Create */
+	long m2uaSgAsAdministrativeState;	/* Create */
 	long m2uaSgAsOperationalState;	/* ReadOnly */
 	long m2uaSgAsRowStatus;		/* Create */
 };
@@ -262,9 +264,9 @@ extern struct header_complex_index *m2uaSgAsTableStorage;
 #define M2UAIFUSAGESTATE_ACTIVE                  1
 #define M2UAIFUSAGESTATE_BUSY                    2
 
-#define M2UAIFMAXSIFSIZE_LSL                     0
-#define M2UAIFMAXSIFSIZE_HSL                     1
-#define M2UAIFMAXSIFSIZE_ATM                     2
+#define M2UAIFMAXSIFSIZE_LSL                     272
+#define M2UAIFMAXSIFSIZE_HSL                     4096
+#define M2UAIFMAXSIFSIZE_ATM                     16383
 
 #define M2UAIFTRANSMISSIONRATE_UNKNOWN           0
 #define M2UAIFTRANSMISSIONRATE_MODEM             1
@@ -355,6 +357,8 @@ extern struct header_complex_index *m2uaSgAsTableStorage;
 /* scalars accessible only for notify */
 
 /* object id definitions */
+extern oid m2uaFullObjects_oid[12];
+extern oid m2uaFullCompliance_oid[12];
 
 /* function prototypes */
 /* trap function prototypes */
@@ -462,24 +466,21 @@ WriteMethod write_m2uaIfMaxSifSize;
 WriteMethod write_m2uaIfTransmissionRate;
 WriteMethod write_m2uaIfCic;
 WriteMethod write_m2uaIfRowStatus;
-WriteMethod write_m2uaSgIndex;
+WriteMethod write_m2uaAsIfStatus;
+WriteMethod write_m2uaSgIndexSg;
 WriteMethod write_m2uaAspAdministrativeState;
 WriteMethod write_m2uaAspOperationalState;
 WriteMethod write_m2uaAspRowStatus;
-WriteMethod write_m2uaSgIndex;
 WriteMethod write_m2uaAspSgAspId;
 WriteMethod write_m2uaAspSgAspPort;
 WriteMethod write_m2uaAspSgAdministrativeState;
 WriteMethod write_m2uaSgName;
 WriteMethod write_m2uaSgRowStatus;
-WriteMethod write_m2uaSgIndex;
 WriteMethod write_m2uaSgAspId;
 WriteMethod write_m2uaSgAspPort;
 WriteMethod write_m2uaSgAspAdministrativeState;
-WriteMethod write_m2uaSgIndex;
 WriteMethod write_m2uaSgAspAsRegistrationRequired;
 WriteMethod write_m2uaSgAspAsAdministrativeState;
-WriteMethod write_m2uaSgIndex;
 WriteMethod write_m2uaSgAsTrafficMode;
 WriteMethod write_m2uaSgAsState;
 WriteMethod write_m2uaSgAsAdministrativeState;

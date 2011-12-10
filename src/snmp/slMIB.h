@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -127,7 +127,7 @@ struct slProfileTable_data {
 	ulong slProfileTbAbate1;	/* Create */
 	ulong slProfileNumberOfThresholdLevels;	/* Create */
 	long slProfileCongestionCounting;	/* Create */
-	long slProfileCongestionReportingBaseObject;	/* Create */
+	long slProfileCongestionRepBaseObject;	/* Create */
 	ulong slProfileLoopDelay;	/* Create */
 	uint8_t *slProfileName;		/* Create */
 	size_t slProfileNameLen;
@@ -140,13 +140,13 @@ struct slProfileTable_data {
 	ulong slProfileTbDiscard3;	/* Create */
 	long slProfileTimerTx;		/* Create */
 	long slProfileTimerTy;		/* Create */
-	ulong slProfileNumberOfCongestionStates;	/* Create */
-	ulong slProfileInitialLevelOfCongestion;	/* Create */
+	ulong slProfileNumOfCongestionStates;	/* Create */
+	ulong slProfileInitLevelOfCongestion;	/* Create */
 	ulong slProfileMaxMSUsRetransN1;	/* Create */
 	ulong slProfileMaxOctRetransN2;	/* Create */
-	ulong slProfileReceiveCongestionThresholdOnset;	/* Create */
-	ulong slProfileReceiveCongestionThresholdAbate;	/* Create */
-	ulong slProfileReceiveCongestionThresholdDiscard;	/* Create */
+	ulong slProfileReceiveCongThreshOnset;	/* Create */
+	ulong slProfileReceiveCongThreshAbate;	/* Create */
+	ulong slProfileReceiveCongThreshDisc;	/* Create */
 	ulong slProfileM;		/* ReadOnly */
 	long slProfileRowStatus;	/* Create */
 };
@@ -224,9 +224,9 @@ struct slSaalTable_data {
 	ulong slSaalMaxSscopCreditToPeer;	/* Create */
 	ulong slSaalMaxStat;		/* Create */
 	ulong slSaalN1;			/* Create */
-	long slSaalNniLayerManagementProvingState;	/* Create */
-	long slSaalNniLayerManagementTimerNoCredit;	/* Create */
-	long slSaalNniLayerManagementTimerRepeatSrec;	/* Create */
+	long slSaalNniLayerMgrProvingState;	/* Create */
+	long slSaalNniLayerMgrTimerNoCredit;	/* Create */
+	long slSaalNniLayerMgrTimerRepeatSrec;	/* Create */
 	long slSaalNniTimerT1;		/* Create */
 	long slSaalNniTimerT2;		/* Create */
 	long slSaalNniTimerT3;		/* Create */
@@ -235,10 +235,10 @@ struct slSaalTable_data {
 	long slSaalSscopTimerKeepAlive;	/* Create */
 	long slSaalSscopTimerNoResponse;	/* Create */
 	long slSaalSscopTimerPoll;	/* Create */
-	ulong slSaalTransmissionRateIntervalLower;	/* Create */
-	ulong slSaalTransmissionRateIntervalUpper;	/* Create */
-	ulong slSaalEgressTransmissionRateIntervalLower;	/* Create */
-	ulong slSaalEgressTransmissionRateIntervalUpper;	/* Create */
+	ulong slSaalTransRateIntervalLower;	/* Create */
+	ulong slSaalTransRateIntervalUpper;	/* Create */
+	ulong slSaalEgressTransRateIntvlLower;	/* Create */
+	ulong slSaalEgressTransRateIntvlUpper;	/* Create */
 	long slSaalPollAfterRetransmission;	/* Create */
 	long slSaalRowStatus;		/* Create */
 };
@@ -252,8 +252,8 @@ struct slM2paTable_data {
 	long slM2paManagementProvingState;	/* Create */
 	ulong slM2paLoopDelayLower;	/* Create */
 	ulong slM2paLoopDelayUpper;	/* Create */
-	ulong slM2paTransmissionRateIntervalLower;	/* Create */
-	ulong slM2paTransmissionRateIntervalUpper;	/* Create */
+	ulong slM2paTransRateIntervalLower;	/* Create */
+	ulong slM2paTransRateIntervalUpper;	/* Create */
 	long slM2paSctpNoDelay;		/* Create */
 	ulong slM2paSctpMaxseg;		/* Create */
 	ulong slM2paSctpHeartbeatItvl;	/* Create */
@@ -338,10 +338,10 @@ extern struct header_complex_index *slSdlTableStorage;
 #define SLPROFILECONGESTIONCOUNTING_OCTET        0
 #define SLPROFILECONGESTIONCOUNTING_MESSAGE      1
 
-#define SLPROFILECONGESTIONREPORTINGBASEOBJECT_ROUTESET 0
-#define SLPROFILECONGESTIONREPORTINGBASEOBJECT_LINKSETOFCONGESTEDROUTESET 1
-#define SLPROFILECONGESTIONREPORTINGBASEOBJECT_LINKOFCONGESTEDROUTESET 2
-#define SLPROFILECONGESTIONREPORTINGBASEOBJECT_CONGESTEDLINKOFCONGESTEDROUTE 3
+#define SLPROFILECONGESTIONREPBASEOBJECT_ROUTESET 0
+#define SLPROFILECONGESTIONREPBASEOBJECT_LINKSETOFCONGESTEDROUTESET 1
+#define SLPROFILECONGESTIONREPBASEOBJECT_LINKOFCONGESTEDROUTESET 2
+#define SLPROFILECONGESTIONREPBASEOBJECT_CONGESTEDLINKOFCONGESTEDROUTE 3
 
 #define SLPROCEDURALSTATUS_INITIALIZATIONREQUIRED 0
 #define SLPROCEDURALSTATUS_NOTINITIALIZED        1
@@ -381,9 +381,9 @@ extern struct header_complex_index *slSdlTableStorage;
 #define SLSAALBUFFERRELEASE_TRUE                 1
 #define SLSAALBUFFERRELEASE_FALSE                2
 
-#define SLSAALNNILAYERMANAGEMENTPROVINGSTATE_NORMAL 0
-#define SLSAALNNILAYERMANAGEMENTPROVINGSTATE_EMERGENCY 1
-#define SLSAALNNILAYERMANAGEMENTPROVINGSTATE_NEUTRAL 2
+#define SLSAALNNILAYERMGRPROVINGSTATE_NORMAL     0
+#define SLSAALNNILAYERMGRPROVINGSTATE_EMERGENCY  1
+#define SLSAALNNILAYERMGRPROVINGSTATE_NEUTRAL    2
 
 #define SLSAALPOLLAFTERRETRANSMISSION_TRUE       1
 #define SLSAALPOLLAFTERRETRANSMISSION_FALSE      2
@@ -442,6 +442,8 @@ extern struct header_complex_index *slSdlTableStorage;
 /* scalars accessible only for notify */
 
 /* object id definitions */
+extern oid slPackage_oid[13];
+extern oid slGeneralCompliance_oid[13];
 
 /* function prototypes */
 /* trap function prototypes */
@@ -552,7 +554,7 @@ WriteMethod write_slProfileTbOnset1;
 WriteMethod write_slProfileTbAbate1;
 WriteMethod write_slProfileNumberOfThresholdLevels;
 WriteMethod write_slProfileCongestionCounting;
-WriteMethod write_slProfileCongestionReportingBaseObject;
+WriteMethod write_slProfileCongestionRepBaseObject;
 WriteMethod write_slProfileLoopDelay;
 WriteMethod write_slProfileName;
 WriteMethod write_slProfileTbOnset2;
@@ -564,13 +566,13 @@ WriteMethod write_slProfileTbDiscard2;
 WriteMethod write_slProfileTbDiscard3;
 WriteMethod write_slProfileTimerTx;
 WriteMethod write_slProfileTimerTy;
-WriteMethod write_slProfileNumberOfCongestionStates;
-WriteMethod write_slProfileInitialLevelOfCongestion;
+WriteMethod write_slProfileNumOfCongestionStates;
+WriteMethod write_slProfileInitLevelOfCongestion;
 WriteMethod write_slProfileMaxMSUsRetransN1;
 WriteMethod write_slProfileMaxOctRetransN2;
-WriteMethod write_slProfileReceiveCongestionThresholdOnset;
-WriteMethod write_slProfileReceiveCongestionThresholdAbate;
-WriteMethod write_slProfileReceiveCongestionThresholdDiscard;
+WriteMethod write_slProfileReceiveCongThreshOnset;
+WriteMethod write_slProfileReceiveCongThreshAbate;
+WriteMethod write_slProfileReceiveCongThreshDisc;
 WriteMethod write_slProfileRowStatus;
 WriteMethod write_slMaxCapacitySL;
 WriteMethod write_slProfilePointer;
@@ -598,9 +600,9 @@ WriteMethod write_slSaalMaxPd;
 WriteMethod write_slSaalMaxSscopCreditToPeer;
 WriteMethod write_slSaalMaxStat;
 WriteMethod write_slSaalN1;
-WriteMethod write_slSaalNniLayerManagementProvingState;
-WriteMethod write_slSaalNniLayerManagementTimerNoCredit;
-WriteMethod write_slSaalNniLayerManagementTimerRepeatSrec;
+WriteMethod write_slSaalNniLayerMgrProvingState;
+WriteMethod write_slSaalNniLayerMgrTimerNoCredit;
+WriteMethod write_slSaalNniLayerMgrTimerRepeatSrec;
 WriteMethod write_slSaalNniTimerT1;
 WriteMethod write_slSaalNniTimerT2;
 WriteMethod write_slSaalNniTimerT3;
@@ -609,10 +611,10 @@ WriteMethod write_slSaalSscopTimerIdle;
 WriteMethod write_slSaalSscopTimerKeepAlive;
 WriteMethod write_slSaalSscopTimerNoResponse;
 WriteMethod write_slSaalSscopTimerPoll;
-WriteMethod write_slSaalTransmissionRateIntervalLower;
-WriteMethod write_slSaalTransmissionRateIntervalUpper;
-WriteMethod write_slSaalEgressTransmissionRateIntervalLower;
-WriteMethod write_slSaalEgressTransmissionRateIntervalUpper;
+WriteMethod write_slSaalTransRateIntervalLower;
+WriteMethod write_slSaalTransRateIntervalUpper;
+WriteMethod write_slSaalEgressTransRateIntvlLower;
+WriteMethod write_slSaalEgressTransRateIntvlUpper;
 WriteMethod write_slSaalPollAfterRetransmission;
 WriteMethod write_slSaalRowStatus;
 WriteMethod write_slM2paN1;
@@ -620,8 +622,8 @@ WriteMethod write_slM2paProving;
 WriteMethod write_slM2paManagementProvingState;
 WriteMethod write_slM2paLoopDelayLower;
 WriteMethod write_slM2paLoopDelayUpper;
-WriteMethod write_slM2paTransmissionRateIntervalLower;
-WriteMethod write_slM2paTransmissionRateIntervalUpper;
+WriteMethod write_slM2paTransRateIntervalLower;
+WriteMethod write_slM2paTransRateIntervalUpper;
 WriteMethod write_slM2paSctpNoDelay;
 WriteMethod write_slM2paSctpMaxseg;
 WriteMethod write_slM2paSctpHeartbeatItvl;

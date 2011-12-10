@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -207,6 +207,9 @@ oid ds1TransStatsGroup_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 1, 7 };
 oid ds1NearEndOptionalTrapGroup_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 1, 8 };
 oid ds1ChanMappingGroup_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 1, 9 };
 oid ds1NearEndConfigurationGroup_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 1, 10 };
+oid ds1NearEndCfgGroup_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 1, 11 };
+oid ds1NearEndStatGroup_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 1, 12 };
+oid ds1FarEndNGroup_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 1, 13 };
 oid ds1Compliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 1 };
 oid ds1MibT1PriCompliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 2 };
 oid ds1MibE1PriCompliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 3 };
@@ -214,6 +217,9 @@ oid ds1Ds2Compliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 4 };
 oid ds1NCompliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 5 };
 oid ds1MibT1PriNCompliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 6 };
 oid ds1MibE1PriNCompliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 7 };
+oid ds1J1Compliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 8 };
+oid ds1NMibT1PriNCompliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 9 };
+oid ds1NMibE1PriNCompliance_oid[11] = { 1, 3, 6, 1, 2, 1, 10, 18, 14, 2, 10 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -265,133 +271,135 @@ struct variable4 ds1_variables[] = {
 	{(u_char) DSX1LINEMODE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 21}},
 #define   DSX1LINEBUILDOUT      22
 	{(u_char) DSX1LINEBUILDOUT, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 22}},
-#define   DSX1CURRENTESS        24
+#define   DSX1LINEIMPEDANCE     23
+	{(u_char) DSX1LINEIMPEDANCE, ASN_INTEGER, RWRITE, var_dsx1ConfigTable, 3, {6, 1, 23}},
+#define   DSX1CURRENTESS        25
 	{(u_char) DSX1CURRENTESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 2}},
-#define   DSX1CURRENTSESS       25
+#define   DSX1CURRENTSESS       26
 	{(u_char) DSX1CURRENTSESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 3}},
-#define   DSX1CURRENTSEFSS      26
+#define   DSX1CURRENTSEFSS      27
 	{(u_char) DSX1CURRENTSEFSS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 4}},
-#define   DSX1CURRENTUASS       27
+#define   DSX1CURRENTUASS       28
 	{(u_char) DSX1CURRENTUASS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 5}},
-#define   DSX1CURRENTCSSS       28
+#define   DSX1CURRENTCSSS       29
 	{(u_char) DSX1CURRENTCSSS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 6}},
-#define   DSX1CURRENTPCVS       29
+#define   DSX1CURRENTPCVS       30
 	{(u_char) DSX1CURRENTPCVS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 7}},
-#define   DSX1CURRENTLESS       30
+#define   DSX1CURRENTLESS       31
 	{(u_char) DSX1CURRENTLESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 8}},
-#define   DSX1CURRENTBESS       31
+#define   DSX1CURRENTBESS       32
 	{(u_char) DSX1CURRENTBESS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 9}},
-#define   DSX1CURRENTDMS        32
+#define   DSX1CURRENTDMS        33
 	{(u_char) DSX1CURRENTDMS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 10}},
-#define   DSX1CURRENTLCVS       33
+#define   DSX1CURRENTLCVS       34
 	{(u_char) DSX1CURRENTLCVS, ASN_GAUGE, RONLY, var_dsx1CurrentTable, 3, {7, 1, 11}},
-#define   DSX1INTERVALESS       36
+#define   DSX1INTERVALESS       37
 	{(u_char) DSX1INTERVALESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 3}},
-#define   DSX1INTERVALSESS      37
+#define   DSX1INTERVALSESS      38
 	{(u_char) DSX1INTERVALSESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 4}},
-#define   DSX1INTERVALSEFSS     38
+#define   DSX1INTERVALSEFSS     39
 	{(u_char) DSX1INTERVALSEFSS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 5}},
-#define   DSX1INTERVALUASS      39
+#define   DSX1INTERVALUASS      40
 	{(u_char) DSX1INTERVALUASS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 6}},
-#define   DSX1INTERVALCSSS      40
+#define   DSX1INTERVALCSSS      41
 	{(u_char) DSX1INTERVALCSSS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 7}},
-#define   DSX1INTERVALPCVS      41
+#define   DSX1INTERVALPCVS      42
 	{(u_char) DSX1INTERVALPCVS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 8}},
-#define   DSX1INTERVALLESS      42
+#define   DSX1INTERVALLESS      43
 	{(u_char) DSX1INTERVALLESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 9}},
-#define   DSX1INTERVALBESS      43
+#define   DSX1INTERVALBESS      44
 	{(u_char) DSX1INTERVALBESS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 10}},
-#define   DSX1INTERVALDMS       44
+#define   DSX1INTERVALDMS       45
 	{(u_char) DSX1INTERVALDMS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 11}},
-#define   DSX1INTERVALLCVS      45
+#define   DSX1INTERVALLCVS      46
 	{(u_char) DSX1INTERVALLCVS, ASN_GAUGE, RONLY, var_dsx1IntervalTable, 3, {8, 1, 12}},
-#define   DSX1INTERVALVALIDDATA  46
+#define   DSX1INTERVALVALIDDATA  47
 	{(u_char) DSX1INTERVALVALIDDATA, ASN_INTEGER, RONLY, var_dsx1IntervalTable, 3, {8, 1, 13}},
-#define   DSX1TOTALESS          48
+#define   DSX1TOTALESS          49
 	{(u_char) DSX1TOTALESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 2}},
-#define   DSX1TOTALSESS         49
+#define   DSX1TOTALSESS         50
 	{(u_char) DSX1TOTALSESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 3}},
-#define   DSX1TOTALSEFSS        50
+#define   DSX1TOTALSEFSS        51
 	{(u_char) DSX1TOTALSEFSS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 4}},
-#define   DSX1TOTALUASS         51
+#define   DSX1TOTALUASS         52
 	{(u_char) DSX1TOTALUASS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 5}},
-#define   DSX1TOTALCSSS         52
+#define   DSX1TOTALCSSS         53
 	{(u_char) DSX1TOTALCSSS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 6}},
-#define   DSX1TOTALPCVS         53
+#define   DSX1TOTALPCVS         54
 	{(u_char) DSX1TOTALPCVS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 7}},
-#define   DSX1TOTALLESS         54
+#define   DSX1TOTALLESS         55
 	{(u_char) DSX1TOTALLESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 8}},
-#define   DSX1TOTALBESS         55
+#define   DSX1TOTALBESS         56
 	{(u_char) DSX1TOTALBESS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 9}},
-#define   DSX1TOTALDMS          56
+#define   DSX1TOTALDMS          57
 	{(u_char) DSX1TOTALDMS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 10}},
-#define   DSX1TOTALLCVS         57
+#define   DSX1TOTALLCVS         58
 	{(u_char) DSX1TOTALLCVS, ASN_GAUGE, RONLY, var_dsx1TotalTable, 3, {9, 1, 11}},
-#define   DSX1FARENDTIMEELAPSED  59
+#define   DSX1FARENDTIMEELAPSED  60
 	{(u_char) DSX1FARENDTIMEELAPSED, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 2}},
-#define   DSX1FARENDVALIDINTERVALS  60
+#define   DSX1FARENDVALIDINTERVALS  61
 	{(u_char) DSX1FARENDVALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 3}},
-#define   DSX1FARENDCURRENTESS  61
+#define   DSX1FARENDCURRENTESS  62
 	{(u_char) DSX1FARENDCURRENTESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 4}},
-#define   DSX1FARENDCURRENTSESS  62
+#define   DSX1FARENDCURRENTSESS  63
 	{(u_char) DSX1FARENDCURRENTSESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 5}},
-#define   DSX1FARENDCURRENTSEFSS  63
+#define   DSX1FARENDCURRENTSEFSS  64
 	{(u_char) DSX1FARENDCURRENTSEFSS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 6}},
-#define   DSX1FARENDCURRENTUASS  64
+#define   DSX1FARENDCURRENTUASS  65
 	{(u_char) DSX1FARENDCURRENTUASS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 7}},
-#define   DSX1FARENDCURRENTCSSS  65
+#define   DSX1FARENDCURRENTCSSS  66
 	{(u_char) DSX1FARENDCURRENTCSSS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 8}},
-#define   DSX1FARENDCURRENTLESS  66
+#define   DSX1FARENDCURRENTLESS  67
 	{(u_char) DSX1FARENDCURRENTLESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 9}},
-#define   DSX1FARENDCURRENTPCVS  67
+#define   DSX1FARENDCURRENTPCVS  68
 	{(u_char) DSX1FARENDCURRENTPCVS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 10}},
-#define   DSX1FARENDCURRENTBESS  68
+#define   DSX1FARENDCURRENTBESS  69
 	{(u_char) DSX1FARENDCURRENTBESS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 11}},
-#define   DSX1FARENDCURRENTDMS  69
+#define   DSX1FARENDCURRENTDMS  70
 	{(u_char) DSX1FARENDCURRENTDMS, ASN_GAUGE, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 12}},
-#define   DSX1FARENDINVALIDINTERVALS  70
+#define   DSX1FARENDINVALIDINTERVALS  71
 	{(u_char) DSX1FARENDINVALIDINTERVALS, ASN_INTEGER, RONLY, var_dsx1FarEndCurrentTable, 3, {10, 1, 13}},
-#define   DSX1FARENDINTERVALESS  73
+#define   DSX1FARENDINTERVALESS  74
 	{(u_char) DSX1FARENDINTERVALESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 3}},
-#define   DSX1FARENDINTERVALSESS  74
+#define   DSX1FARENDINTERVALSESS  75
 	{(u_char) DSX1FARENDINTERVALSESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 4}},
-#define   DSX1FARENDINTERVALSEFSS  75
+#define   DSX1FARENDINTERVALSEFSS  76
 	{(u_char) DSX1FARENDINTERVALSEFSS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 5}},
-#define   DSX1FARENDINTERVALUASS  76
+#define   DSX1FARENDINTERVALUASS  77
 	{(u_char) DSX1FARENDINTERVALUASS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 6}},
-#define   DSX1FARENDINTERVALCSSS  77
+#define   DSX1FARENDINTERVALCSSS  78
 	{(u_char) DSX1FARENDINTERVALCSSS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 7}},
-#define   DSX1FARENDINTERVALLESS  78
+#define   DSX1FARENDINTERVALLESS  79
 	{(u_char) DSX1FARENDINTERVALLESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 8}},
-#define   DSX1FARENDINTERVALPCVS  79
+#define   DSX1FARENDINTERVALPCVS  80
 	{(u_char) DSX1FARENDINTERVALPCVS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 9}},
-#define   DSX1FARENDINTERVALBESS  80
+#define   DSX1FARENDINTERVALBESS  81
 	{(u_char) DSX1FARENDINTERVALBESS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 10}},
-#define   DSX1FARENDINTERVALDMS  81
+#define   DSX1FARENDINTERVALDMS  82
 	{(u_char) DSX1FARENDINTERVALDMS, ASN_GAUGE, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 11}},
-#define   DSX1FARENDINTERVALVALIDDATA  82
+#define   DSX1FARENDINTERVALVALIDDATA  83
 	{(u_char) DSX1FARENDINTERVALVALIDDATA, ASN_INTEGER, RONLY, var_dsx1FarEndIntervalTable, 3, {11, 1, 12}},
-#define   DSX1FARENDTOTALESS    84
+#define   DSX1FARENDTOTALESS    85
 	{(u_char) DSX1FARENDTOTALESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 2}},
-#define   DSX1FARENDTOTALSESS   85
+#define   DSX1FARENDTOTALSESS   86
 	{(u_char) DSX1FARENDTOTALSESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 3}},
-#define   DSX1FARENDTOTALSEFSS  86
+#define   DSX1FARENDTOTALSEFSS  87
 	{(u_char) DSX1FARENDTOTALSEFSS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 4}},
-#define   DSX1FARENDTOTALUASS   87
+#define   DSX1FARENDTOTALUASS   88
 	{(u_char) DSX1FARENDTOTALUASS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 5}},
-#define   DSX1FARENDTOTALCSSS   88
+#define   DSX1FARENDTOTALCSSS   89
 	{(u_char) DSX1FARENDTOTALCSSS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 6}},
-#define   DSX1FARENDTOTALLESS   89
+#define   DSX1FARENDTOTALLESS   90
 	{(u_char) DSX1FARENDTOTALLESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 7}},
-#define   DSX1FARENDTOTALPCVS   90
+#define   DSX1FARENDTOTALPCVS   91
 	{(u_char) DSX1FARENDTOTALPCVS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 8}},
-#define   DSX1FARENDTOTALBESS   91
+#define   DSX1FARENDTOTALBESS   92
 	{(u_char) DSX1FARENDTOTALBESS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 9}},
-#define   DSX1FARENDTOTALDMS    92
+#define   DSX1FARENDTOTALDMS    93
 	{(u_char) DSX1FARENDTOTALDMS, ASN_GAUGE, RONLY, var_dsx1FarEndTotalTable, 3, {12, 1, 10}},
-#define   DSX1FRACIFINDEX       95
+#define   DSX1FRACIFINDEX       96
 	{(u_char) DSX1FRACIFINDEX, ASN_INTEGER, RWRITE, var_dsx1FracTable, 3, {13, 1, 3}},
-#define   DSX1CHANMAPPEDIFINDEX  98
+#define   DSX1CHANMAPPEDIFINDEX  99
 	{(u_char) DSX1CHANMAPPEDIFINDEX, ASN_INTEGER, RONLY, var_dsx1ChanMappingTable, 3, {16, 1, 1}},
 };
 
@@ -643,6 +651,7 @@ store_ds1(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "ds1 ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		snmpd_store_config(line);
 	}
@@ -765,6 +774,7 @@ dsx1ConfigTable_create(void)
 		StorageNew->dsx1Channelization = 0;
 		StorageNew->dsx1LineMode = 0;
 		StorageNew->dsx1LineBuildOut = 0;
+		StorageNew->dsx1LineImpedance = 0;
 
 	}
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -926,6 +936,7 @@ parse_dsx1ConfigTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dsx1Channelization, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dsx1LineMode, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dsx1LineBuildOut, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dsx1LineImpedance, &tmpsize);
 	dsx1ConfigTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("ds1", "done.\n"));
@@ -954,6 +965,7 @@ store_dsx1ConfigTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1ConfigTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1LineIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1IfIndex, &tmpsize);
@@ -977,6 +989,7 @@ store_dsx1ConfigTable(int majorID, int minorID, void *serverarg, void *clientarg
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1Channelization, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1LineMode, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1LineBuildOut, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1LineImpedance, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -1181,6 +1194,7 @@ store_dsx1CurrentTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1CurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1CurrentIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->dsx1CurrentESs, &tmpsize);
@@ -1402,6 +1416,7 @@ store_dsx1IntervalTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1IntervalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1IntervalIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1IntervalNumber, &tmpsize);
@@ -1620,6 +1635,7 @@ store_dsx1TotalTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1TotalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1TotalIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->dsx1TotalESs, &tmpsize);
@@ -1840,6 +1856,7 @@ store_dsx1FarEndCurrentTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1FarEndCurrentTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndCurrentIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndTimeElapsed, &tmpsize);
@@ -2061,6 +2078,7 @@ store_dsx1FarEndIntervalTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1FarEndIntervalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndIntervalIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndIntervalNumber, &tmpsize);
@@ -2276,6 +2294,7 @@ store_dsx1FarEndTotalTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1FarEndTotalTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FarEndTotalIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->dsx1FarEndTotalESs, &tmpsize);
@@ -2476,6 +2495,7 @@ store_dsx1FracTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1FracTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FracIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1FracNumber, &tmpsize);
@@ -2671,6 +2691,7 @@ store_dsx1ChanMappingTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "dsx1ChanMappingTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ifIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->dsx1Ds1ChannelNumber, &tmpsize);
@@ -2885,6 +2906,13 @@ var_dsx1ConfigTable(struct variable *vp, oid * name, size_t *length, int exact, 
 			break;
 		*var_len = sizeof(StorageTmp->dsx1LineBuildOut);
 		rval = (u_char *) &StorageTmp->dsx1LineBuildOut;
+		break;
+	case (u_char) DSX1LINEIMPEDANCE:	/* ReadWrite */
+		*write_method = write_dsx1LineImpedance;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->dsx1LineImpedance);
+		rval = (u_char *) &StorageTmp->dsx1LineImpedance;
 		break;
 	default:
 		ERROR_MSG("");
@@ -3892,6 +3920,8 @@ write_dsx1LineType(int action, u_char *var_val, u_char var_val_type, size_t var_
 		case DSX1LINETYPE_DSX1E2:
 		case DSX1LINETYPE_DSX1E1Q50:
 		case DSX1LINETYPE_DSX1E1Q50CRC:
+		case DSX1LINETYPE_DSX1J1ESF:
+		case DSX1LINETYPE_DSX1J1UNFRAMED:
 			break;
 		default:
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineType: bad value\n");
@@ -4654,6 +4684,68 @@ write_dsx1LineBuildOut(int action, u_char *var_val, u_char var_val_type, size_t 
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->dsx1LineBuildOut = old_value;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_dsx1LineImpedance(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Table row and column write routine.
+ */
+int
+write_dsx1LineImpedance(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	static long old_value;
+	struct dsx1ConfigTable_data *StorageTmp = NULL;
+	size_t newlen = name_len - 11;
+	long set_value = *((long *) var_val);
+
+	DEBUGMSGTL(("ds1", "write_dsx1LineImpedance entering action=%d...  \n", action));
+	StorageTmp = header_complex(dsx1ConfigTableStorage, NULL, &name[11], &newlen, 1, NULL, NULL);
+	if (StorageTmp == NULL)
+		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	switch (action) {
+	case RESERVE1:
+		if (var_val_type != ASN_INTEGER) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineImpedance not ASN_INTEGER\n");
+			return SNMP_ERR_WRONGTYPE;
+		}
+		if (var_val_len > sizeof(int32_t)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineImpedance: bad length\n");
+			return SNMP_ERR_WRONGLENGTH;
+		}
+		switch (set_value) {
+		case DSX1LINEIMPEDANCE_NOTAPPLICABLE:
+		case DSX1LINEIMPEDANCE_UNBALANCED75OHMS:
+		case DSX1LINEIMPEDANCE_BALANCED100OHMS:
+		case DSX1LINEIMPEDANCE_BALANCED120OHMS:
+			break;
+		default:
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dsx1LineImpedance: bad value\n");
+			return SNMP_ERR_WRONGVALUE;
+		}
+		break;
+	case RESERVE2:		/* memory reseveration, final preparation... */
+		break;
+	case ACTION:		/* The variable has been stored in StorageTmp->dsx1LineImpedance for you to use, and you have just been asked to do something with it.  Note that anything done here
+				   must be reversable in the UNDO case */
+		old_value = StorageTmp->dsx1LineImpedance;
+		StorageTmp->dsx1LineImpedance = set_value;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->dsx1LineImpedance = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;

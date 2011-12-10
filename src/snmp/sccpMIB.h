@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -411,7 +411,7 @@ struct sccpAddressInfoTable_data {
 	size_t sccpAddressInfoOperationIdLen;
 	long sccpAddressInfoOperation;	/* Create */
 	long sccpAddressInfoAddressElement;	/* Create */
-	long sccpAddressInfoNrOfAddressElements;	/* Create */
+	ulong sccpAddressInfoNrOfAddressElements;	/* Create */
 	long sccpAddressInfoRowStatus;	/* Create */
 };
 struct sccpGtTranslatorTable_data {
@@ -676,8 +676,8 @@ extern struct header_complex_index *sccpSrvtTableStorage;
 #define SCCPGTTRANSLATORGTINDICATOR_NOGLOBALTITLE 0
 #define SCCPGTTRANSLATORGTINDICATOR_NOAONLY      1
 #define SCCPGTTRANSLATORGTINDICATOR_TTONLY       2
-#define SCCPGTTRANSLATORGTINDICATOR_TT_NP_ES     3
-#define SCCPGTTRANSLATORGTINDICATOR_TT_NP_ES_NOA 4
+#define SCCPGTTRANSLATORGTINDICATOR_TTNPES       3
+#define SCCPGTTRANSLATORGTINDICATOR_TTNPESNOA    4
 
 #define SCCPGTTRANSLATORNATUREOFADDRESS_UNKNOWN  0
 #define SCCPGTTRANSLATORNATUREOFADDRESS_ISDNTNP  1
@@ -750,9 +750,9 @@ extern struct header_complex_index *sccpSrvtTableStorage;
 #define FAILURETYPE_UNKNOWNINITIATINGSP          5
 #define FAILURETYPE_TIMEREXPIRED                 6
 #define FAILURETYPE_WRONGSP                      7
-#define FAILURETYPE_INCORRECTTRANSLATION_PRIMARY 8
-#define FAILURETYPE_INCORRECTTRANSLATION_SECONDARY 9
-#define FAILURETYPE_INCORRECTTRANSLATION_INTERMEDIATE 10
+#define FAILURETYPE_INCORRECTTRANSLATIONPRIMARY  8
+#define FAILURETYPE_INCORRECTTRANSLATIONSECONDARY 9
+#define FAILURETYPE_INCORRECTTRANSLATIONINTERMEDIATE 10
 #define FAILURETYPE_NOTPRIMARYDESTINATION        11
 #define FAILURETYPE_NOTSECONDARYDESTINATION      12
 #define FAILURETYPE_NOTRECOGNIZEDPRIMARY         13
@@ -760,6 +760,9 @@ extern struct header_complex_index *sccpSrvtTableStorage;
 #define FAILURETYPE_ROUTINGPROBLEM               15
 #define FAILURETYPE_MAXNRSRVTTESTSALREADY        16
 #define FAILURETYPE_INDIRECTROUTE                17
+
+#define TRACESENT_TRUE                           1
+#define TRACESENT_FALSE                          2
 
 /* notifications */
 extern oid sccpRouteTestResult_oid[12];
@@ -818,6 +821,8 @@ extern oid sccpLocalSccpLinkagePackage_oid[13];
 extern oid sccpCongestionPackage_oid[13];
 extern oid sccpAddressInfoConversionRulePackage_oid[13];
 extern oid sccpCommonLanguageNameGroup_oid[13];
+extern oid sccpOtherGroup_oid[13];
+extern oid sccpOtherNotifications_oid[13];
 
 /* function prototypes */
 /* trap function prototypes */

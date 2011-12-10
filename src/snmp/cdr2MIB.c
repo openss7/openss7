@@ -947,6 +947,7 @@ store_cdr2MIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "cdr2MIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		snmpd_store_config(line);
 	}
@@ -1215,6 +1216,7 @@ store_callDetailDataTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "callDetailDataTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->callDetailDataId, &StorageTmp->callDetailDataIdLen);
 			snmpd_store_config(line);
@@ -1422,6 +1424,7 @@ store_simpleUsageMeteringControlTable(int majorID, int minorID, void *serverarg,
 			memset(line, 0, sizeof(line));
 			strcat(line, "simpleUsageMeteringControlTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->controlObjectId, &StorageTmp->controlObjectIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->creationTriggerList, &StorageTmp->creationTriggerListLen);
@@ -1633,6 +1636,7 @@ store_configurableSimpleUsageMeteringControlTable(int majorID, int minorID, void
 			memset(line, 0, sizeof(line));
 			strcat(line, "configurableSimpleUsageMeteringControlTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->controlObjectId, &StorageTmp->controlObjectIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->samplingRate, &tmpsize);
@@ -1839,6 +1843,7 @@ store_blockGeneratingLogTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "blockGeneratingLogTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogMaxBlockSize, &tmpsize);
@@ -2054,6 +2059,7 @@ store_fileGeneratingLogTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "fileGeneratingLogTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->timesOfDay, &StorageTmp->timesOfDayLen);
@@ -2773,6 +2779,7 @@ store_callDetailLogRecordTable(int majorID, int minorID, void *serverarg, void *
 			memset(line, 0, sizeof(line));
 			strcat(line, "callDetailLogRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -3047,6 +3054,7 @@ store_configurableSimpleUsageMeteringControlR2Table(int majorID, int minorID, vo
 			memset(line, 0, sizeof(line));
 			strcat(line, "configurableSimpleUsageMeteringControlR2Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->controlObjectId, &StorageTmp->controlObjectIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->configurationR2Mask, &StorageTmp->configurationR2MaskLen);
@@ -3246,6 +3254,7 @@ store_blockGeneratingLogR2Table(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "blockGeneratingLogR2Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->blockGeneratingLogVersion, &tmpsize);
@@ -4284,6 +4293,7 @@ store_callDetailLogRecordR2Table(int majorID, int minorID, void *serverarg, void
 			memset(line, 0, sizeof(line));
 			strcat(line, "callDetailLogRecordR2Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);

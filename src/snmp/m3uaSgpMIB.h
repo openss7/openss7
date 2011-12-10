@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -117,7 +117,7 @@ struct m3uaSgpAgTable_data {
 	long m3uaSgpAgRegistrationPolicy;	/* Create */
 	long m3uaSgpAgAspIdPolicy;	/* Create */
 	long m3uaSgpAgProtocolPayloadId;	/* Create */
-	long m3uaSgpAgIpPort;		/* Create */
+	ulong m3uaSgpAgIpPort;		/* Create */
 	long m3uaSgpAgMinOstreams;	/* Create */
 	long m3uaSgpAgMaxIstreams;	/* Create */
 	long m3uaSgpAgStatus;		/* Create */
@@ -149,13 +149,6 @@ struct m3uaSgpAspTable_data {
 	long m3uaSgpAspAspState;	/* Create */
 	oid *m3uaSgpAspSctpProfile;	/* Create */
 	size_t m3uaSgpAspSctpProfileLen;
-	ulong m3uaSgpAspMaxInitRetries;	/* Create */
-	ulong m3uaSgpAspMaxPathRetrans;	/* Create */
-	long m3uaSgpAspRtoMin;		/* Create */
-	long m3uaSgpAspRtoMax;		/* Create */
-	long m3uaSgpAspHeartbeatInterval;	/* Create */
-	long m3uaSgpAspMaxLifeTime;	/* Create */
-	long m3uaSgpAspTimerDivert;	/* Create */
 	long m3uaSgpAspStatus;		/* Create */
 };
 struct m3uaSgpTable_data {
@@ -163,6 +156,27 @@ struct m3uaSgpTable_data {
 	uint m3uaSgpTable_refs;
 	ulong m3uaSgpAgIndex;		/* NoAccess */
 	ulong m3uaSgpSgIndex;		/* NoAccess */
+	ulong m3uaSgpIndex;		/* NoAccess */
+	uint8_t *m3uaSgpName;		/* Create */
+	size_t m3uaSgpNameLen;
+	long m3uaSgpOperationalState;	/* ReadOnly */
+	long m3uaSgpUsageState;		/* ReadOnly */
+	long m3uaSgpAdministrativeState;	/* Create */
+	uint8_t *m3uaSgpAlarmStatus;	/* Create */
+	size_t m3uaSgpAlarmStatusLen;
+	uint8_t *m3uaSgpProceduralStatus;	/* ReadOnly */
+	size_t m3uaSgpProceduralStatusLen;
+	uint8_t *m3uaSgpAvailabiltiyStatus;	/* ReadOnly */
+	size_t m3uaSgpAvailabiltiyStatusLen;
+	uint8_t *m3uaSgpControlStatus;	/* Create */
+	size_t m3uaSgpControlStatusLen;
+	long m3uaSgpStandbyStatus;	/* ReadOnly */
+	long m3uaSgpPrimaryAddressType;	/* Create */
+	uint8_t *m3uaSgpPrimaryAddress;	/* Create */
+	size_t m3uaSgpPrimaryAddressLen;
+	uint8_t *m3uaSgpHostName;	/* Create */
+	size_t m3uaSgpHostNameLen;
+	long m3uaSgpStatus;		/* Create */
 };
 
 /* storage declarations */
@@ -233,6 +247,55 @@ extern struct header_complex_index *m3uaSgpTableStorage;
 #define M3UASGPASPASPSTATE_TERMINATING           3
 #define M3UASGPASPASPSTATE_UP                    4
 
+#define M3UASGPOPERATIONALSTATE_DISABLED         0
+#define M3UASGPOPERATIONALSTATE_ENABLED          1
+
+#define M3UASGPUSAGESTATE_IDLE                   0
+#define M3UASGPUSAGESTATE_ACTIVE                 1
+#define M3UASGPUSAGESTATE_BUSY                   2
+
+#define M3UASGPADMINISTRATIVESTATE_LOCKED        0
+#define M3UASGPADMINISTRATIVESTATE_UNLOCKED      1
+#define M3UASGPADMINISTRATIVESTATE_SHUTTINGDOWN  2
+
+#define M3UASGPALARMSTATUS_UNDERREPAIR           0
+#define M3UASGPALARMSTATUS_CRITICAL              1
+#define M3UASGPALARMSTATUS_MAJOR                 2
+#define M3UASGPALARMSTATUS_MINOR                 3
+#define M3UASGPALARMSTATUS_ALARMOUTSTANDING      4
+
+#define M3UASGPPROCEDURALSTATUS_INITIALIZATIONREQUIRED 0
+#define M3UASGPPROCEDURALSTATUS_NOTINITIALIZED   1
+#define M3UASGPPROCEDURALSTATUS_INITIALIZING     2
+#define M3UASGPPROCEDURALSTATUS_REPORTING        3
+#define M3UASGPPROCEDURALSTATUS_TERMINATING      4
+
+#define M3UASGPAVAILABILTIYSTATUS_INTEST         0
+#define M3UASGPAVAILABILTIYSTATUS_FAILED         1
+#define M3UASGPAVAILABILTIYSTATUS_POWEROFF       2
+#define M3UASGPAVAILABILTIYSTATUS_OFFLINE        3
+#define M3UASGPAVAILABILTIYSTATUS_OFFDUTY        4
+#define M3UASGPAVAILABILTIYSTATUS_DEPENDENCY     5
+#define M3UASGPAVAILABILTIYSTATUS_DEGRADED       6
+#define M3UASGPAVAILABILTIYSTATUS_NOTINSTALLED   7
+#define M3UASGPAVAILABILTIYSTATUS_LOGFULL        8
+
+#define M3UASGPCONTROLSTATUS_SUBJECTTOTEST       0
+#define M3UASGPCONTROLSTATUS_PARTOFSERVICESLOCKED 1
+#define M3UASGPCONTROLSTATUS_RESERVEDFORTEST     2
+#define M3UASGPCONTROLSTATUS_SUSPENDED           3
+
+#define M3UASGPSTANDBYSTATUS_HOTSTANDBY          0
+#define M3UASGPSTANDBYSTATUS_COLDSTANDBY         1
+#define M3UASGPSTANDBYSTATUS_PROVIDINGSERVICE    2
+
+#define M3UASGPPRIMARYADDRESSTYPE_UNKNOWN        0
+#define M3UASGPPRIMARYADDRESSTYPE_IPV4           1
+#define M3UASGPPRIMARYADDRESSTYPE_IPV6           2
+#define M3UASGPPRIMARYADDRESSTYPE_IPV4Z          3
+#define M3UASGPPRIMARYADDRESSTYPE_IPV6Z          4
+#define M3UASGPPRIMARYADDRESSTYPE_DNS            16
+
 /* notifications */
 
 /* scalars accessible only for notify */
@@ -241,6 +304,8 @@ extern struct header_complex_index *m3uaSgpTableStorage;
 extern oid m3uaRfc3332ProtocolVersion_oid[13];
 extern oid m3uaTs102142ProtocolVersion_oid[13];
 extern oid m3uaRfc4666ProtocolVersion_oid[13];
+extern oid m3uaSgpObjectGroup_oid[12];
+extern oid m3uaSgpGeneralCompliance_oid[12];
 
 /* function prototypes */
 /* trap function prototypes */
@@ -307,12 +372,13 @@ WriteMethod write_m3uaSgpAspAdministrativeState;
 WriteMethod write_m3uaSgpAspAlarmStatus;
 WriteMethod write_m3uaSgpAspAspState;
 WriteMethod write_m3uaSgpAspSctpProfile;
-WriteMethod write_m3uaSgpAspMaxInitRetries;
-WriteMethod write_m3uaSgpAspMaxPathRetrans;
-WriteMethod write_m3uaSgpAspRtoMin;
-WriteMethod write_m3uaSgpAspRtoMax;
-WriteMethod write_m3uaSgpAspHeartbeatInterval;
-WriteMethod write_m3uaSgpAspMaxLifeTime;
-WriteMethod write_m3uaSgpAspTimerDivert;
 WriteMethod write_m3uaSgpAspStatus;
+WriteMethod write_m3uaSgpName;
+WriteMethod write_m3uaSgpAdministrativeState;
+WriteMethod write_m3uaSgpAlarmStatus;
+WriteMethod write_m3uaSgpControlStatus;
+WriteMethod write_m3uaSgpPrimaryAddressType;
+WriteMethod write_m3uaSgpPrimaryAddress;
+WriteMethod write_m3uaSgpHostName;
+WriteMethod write_m3uaSgpStatus;
 #endif				/* __LOCAL_M3UASGPMIB_H__ */

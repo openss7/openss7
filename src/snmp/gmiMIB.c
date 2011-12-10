@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -155,7 +155,7 @@ static int my_readfd = -1;		/* file descriptor for autonomnous events */
 volatile int gmiMIB_refresh = 1;
 volatile int applicationProcessTable_refresh = 1;
 volatile int communicationsEntityTable_refresh = 1;
-volatile int communicationsInformationRecordTable_refresh = 1;
+volatile int communicationsInfoRecordTable_refresh = 1;
 volatile int clProtocolMachineTable_refresh = 1;
 volatile int coProtocolMachineTable_refresh = 1;
 volatile int sap1Table_refresh = 1;
@@ -187,7 +187,7 @@ oid tmnInformationData_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 5, 3, 2 };
 oid communicationsInformationType_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 5, 4, 1 };
 oid gmiApplicationProcessP1Package_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 5, 5, 1 };
 oid gmiCommunicationsEntityP1Package_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 5, 5, 2 };
-oid gmiCommunicationsInformationRecordP1Package_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 5, 5, 3 };
+oid gmiCommunicationsInfoRecordP1Pkg_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 5, 5, 3 };
 oid gmiInformationDataPackagePackage_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 5, 5, 4 };
 oid gmiClProtocolMachineP1Package_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 5, 5, 5 };
 oid gmiClProtocolMachineP2Package_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 9, 3, 5, 5, 6 };
@@ -213,22 +213,22 @@ struct variable7 gmiMIB_variables[] = {
 	{(u_char) APPLICATIONPROCESSTITLE, ASN_OBJECT_ID, RONLY, var_applicationProcessTable, 5, {2, 1, 1, 1, 2}},
 #define   SUPPORTENTITYNAMES    2
 	{(u_char) SUPPORTENTITYNAMES, ASN_OCTET_STR, RONLY, var_applicationProcessTable, 5, {2, 1, 1, 1, 3}},
-#define   APPLICATIONPROCESSOPERATIONALSTATE  3
-	{(u_char) APPLICATIONPROCESSOPERATIONALSTATE, ASN_INTEGER, RONLY, var_applicationProcessTable, 5, {2, 1, 1, 1, 4}},
+#define   APPLICATIONPROCESSOPSTATE  3
+	{(u_char) APPLICATIONPROCESSOPSTATE, ASN_INTEGER, RONLY, var_applicationProcessTable, 5, {2, 1, 1, 1, 4}},
 #define   LOCALSAPNAMES         5
 	{(u_char) LOCALSAPNAMES, ASN_OCTET_STR, RONLY, var_communicationsEntityTable, 5, {2, 2, 1, 1, 2}},
-#define   COMMUNICATIONSENTITYOPERATIONALSTATE  6
-	{(u_char) COMMUNICATIONSENTITYOPERATIONALSTATE, ASN_INTEGER, RONLY, var_communicationsEntityTable, 5, {2, 2, 1, 1, 3}},
+#define   COMMUNICATIONSENTITYOPSTATE  6
+	{(u_char) COMMUNICATIONSENTITYOPSTATE, ASN_INTEGER, RONLY, var_communicationsEntityTable, 5, {2, 2, 1, 1, 3}},
 #define   INFORMATIONTYPE       7
-	{(u_char) INFORMATIONTYPE, ASN_OBJECT_ID, RONLY, var_communicationsInformationRecordTable, 5, {2, 3, 1, 1, 1}},
+	{(u_char) INFORMATIONTYPE, ASN_OBJECT_ID, RONLY, var_communicationsInfoRecordTable, 5, {2, 3, 1, 1, 1}},
 #define   INFORMATIONDATA       8
-	{(u_char) INFORMATIONDATA, ASN_OCTET_STR, RONLY, var_communicationsInformationRecordTable, 5, {2, 3, 1, 1, 2}},
-#define   CLPROTOCOLMACHINEOPERATIONALSTATE  10
-	{(u_char) CLPROTOCOLMACHINEOPERATIONALSTATE, ASN_INTEGER, RONLY, var_clProtocolMachineTable, 5, {2, 4, 1, 1, 2}},
+	{(u_char) INFORMATIONDATA, ASN_OCTET_STR, RONLY, var_communicationsInfoRecordTable, 5, {2, 3, 1, 1, 2}},
+#define   CLPROTOCOLMACHINEOPSTATE  10
+	{(u_char) CLPROTOCOLMACHINEOPSTATE, ASN_INTEGER, RONLY, var_clProtocolMachineTable, 5, {2, 4, 1, 1, 2}},
 #define   TOTALREMOTESAPS       11
 	{(u_char) TOTALREMOTESAPS, ASN_COUNTER64, RONLY, var_clProtocolMachineTable, 5, {2, 4, 1, 1, 3}},
-#define   COPROTOCOLMACHINEOPERATIONALSTATE  13
-	{(u_char) COPROTOCOLMACHINEOPERATIONALSTATE, ASN_INTEGER, RONLY, var_coProtocolMachineTable, 5, {2, 5, 1, 1, 2}},
+#define   COPROTOCOLMACHINEOPSTATE  13
+	{(u_char) COPROTOCOLMACHINEOPSTATE, ASN_INTEGER, RONLY, var_coProtocolMachineTable, 5, {2, 5, 1, 1, 2}},
 #define   SAP1ADDRESS           15
 	{(u_char) SAP1ADDRESS, ASN_UNSIGNED, RONLY, var_sap1Table, 5, {2, 6, 1, 1, 2}},
 #define   SAP1USERENTITYNAMES   16
@@ -251,7 +251,7 @@ struct gmiMIB_data *gmiMIBStorage = NULL;
 /* global storage of our data, saved in and configured by header_complex() */
 struct header_complex_index *applicationProcessTableStorage = NULL;
 struct header_complex_index *communicationsEntityTableStorage = NULL;
-struct header_complex_index *communicationsInformationRecordTableStorage = NULL;
+struct header_complex_index *communicationsInfoRecordTableStorage = NULL;
 struct header_complex_index *clProtocolMachineTableStorage = NULL;
 struct header_complex_index *coProtocolMachineTableStorage = NULL;
 struct header_complex_index *sap1TableStorage = NULL;
@@ -299,7 +299,7 @@ init_gmiMIB(void)
 	snmpd_register_config_handler("gmiMIB", parse_gmiMIB, NULL, "HELP STRING");
 	snmpd_register_config_handler("applicationProcessTable", parse_applicationProcessTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("communicationsEntityTable", parse_communicationsEntityTable, NULL, "HELP STRING");
-	snmpd_register_config_handler("communicationsInformationRecordTable", parse_communicationsInformationRecordTable, NULL, "HELP STRING");
+	snmpd_register_config_handler("communicationsInfoRecordTable", parse_communicationsInfoRecordTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("clProtocolMachineTable", parse_clProtocolMachineTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("coProtocolMachineTable", parse_coProtocolMachineTable, NULL, "HELP STRING");
 	snmpd_register_config_handler("sap1Table", parse_sap1Table, NULL, "HELP STRING");
@@ -311,7 +311,7 @@ init_gmiMIB(void)
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_gmiMIB, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_applicationProcessTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_communicationsEntityTable, NULL);
-	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_communicationsInformationRecordTable, NULL);
+	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_communicationsInfoRecordTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_clProtocolMachineTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_coProtocolMachineTable, NULL);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_sap1Table, NULL);
@@ -357,7 +357,7 @@ deinit_gmiMIB(void)
 	snmpd_unregister_config_handler("gmiMIB");
 	snmpd_unregister_config_handler("applicationProcessTable");
 	snmpd_unregister_config_handler("communicationsEntityTable");
-	snmpd_unregister_config_handler("communicationsInformationRecordTable");
+	snmpd_unregister_config_handler("communicationsInfoRecordTable");
 	snmpd_unregister_config_handler("clProtocolMachineTable");
 	snmpd_unregister_config_handler("coProtocolMachineTable");
 	snmpd_unregister_config_handler("sap1Table");
@@ -489,10 +489,11 @@ store_gmiMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	}
 	(void) tmpsize;
 	/* XXX: comment entire section if no scalars are persistent */
-	if (0) {
+	{
 		memset(line, 0, sizeof(line));
 		strcat(line, "gmiMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		snmpd_store_config(line);
 	}
@@ -597,7 +598,7 @@ applicationProcessTable_create(void)
 			StorageNew->applicationProcessTitleLen = 2;
 		if ((StorageNew->supportEntityNames = (uint8_t *) strdup("")) != NULL)
 			StorageNew->supportEntityNamesLen = strlen("");
-		StorageNew->applicationProcessOperationalState = 0;
+		StorageNew->applicationProcessOpState = 0;
 
 	}
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -754,7 +755,7 @@ parse_applicationProcessTable(const char *token, char *line)
 		config_perror("invalid specification for supportEntityNames");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->applicationProcessOperationalState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->applicationProcessOpState, &tmpsize);
 	applicationProcessTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -783,11 +784,12 @@ store_applicationProcessTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "applicationProcessTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->applicationProcessId, &StorageTmp->applicationProcessIdLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->applicationProcessTitle, &StorageTmp->applicationProcessTitleLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->supportEntityNames, &StorageTmp->supportEntityNamesLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->applicationProcessOperationalState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->applicationProcessOpState, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -815,7 +817,7 @@ communicationsEntityTable_create(void)
 			StorageNew->subsystemIdLen = strlen("");
 		if ((StorageNew->localSapNames = (uint8_t *) strdup("")) != NULL)
 			StorageNew->localSapNamesLen = strlen("");
-		StorageNew->communicationsEntityOperationalState = 0;
+		StorageNew->communicationsEntityOpState = 0;
 
 	}
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -974,7 +976,7 @@ parse_communicationsEntityTable(const char *token, char *line)
 		config_perror("invalid specification for localSapNames");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->communicationsEntityOperationalState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->communicationsEntityOpState, &tmpsize);
 	communicationsEntityTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -1003,11 +1005,12 @@ store_communicationsEntityTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "communicationsEntityTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->subsystemId, &StorageTmp->subsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->localSapNames, &StorageTmp->localSapNamesLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->communicationsEntityOperationalState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->communicationsEntityOpState, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -1016,19 +1019,19 @@ store_communicationsEntityTable(int majorID, int minorID, void *serverarg, void 
 }
 
 /**
- * @fn struct communicationsInformationRecordTable_data *communicationsInformationRecordTable_create(void)
- * @brief create a fresh data structure representing a new row in the communicationsInformationRecordTable table.
+ * @fn struct communicationsInfoRecordTable_data *communicationsInfoRecordTable_create(void)
+ * @brief create a fresh data structure representing a new row in the communicationsInfoRecordTable table.
  *
- * Creates a new communicationsInformationRecordTable_data structure by allocating dynamic memory for the structure and
+ * Creates a new communicationsInfoRecordTable_data structure by allocating dynamic memory for the structure and
  * initializing the default values of columns in the table.  The row status object, if any, should
  * be set to RS_NOTREADY.
  */
-struct communicationsInformationRecordTable_data *
-communicationsInformationRecordTable_create(void)
+struct communicationsInfoRecordTable_data *
+communicationsInfoRecordTable_create(void)
 {
-	struct communicationsInformationRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(communicationsInformationRecordTable_data);
+	struct communicationsInfoRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(communicationsInfoRecordTable_data);
 
-	DEBUGMSGTL(("gmiMIB", "communicationsInformationRecordTable_create: creating row...  "));
+	DEBUGMSGTL(("gmiMIB", "communicationsInfoRecordTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->logId = (uint8_t *) strdup("")) != NULL)
@@ -1046,19 +1049,19 @@ communicationsInformationRecordTable_create(void)
 }
 
 /**
- * @fn struct communicationsInformationRecordTable_data *communicationsInformationRecordTable_duplicate(struct communicationsInformationRecordTable_data *thedata)
+ * @fn struct communicationsInfoRecordTable_data *communicationsInfoRecordTable_duplicate(struct communicationsInfoRecordTable_data *thedata)
  * @param thedata the row structure to duplicate.
  * @brief duplicat a row structure for a table.
  *
  * Duplicates the specified row structure @param thedata and returns a pointer to the newly
  * allocated row structure on success, or NULL on failure.
  */
-struct communicationsInformationRecordTable_data *
-communicationsInformationRecordTable_duplicate(struct communicationsInformationRecordTable_data *thedata)
+struct communicationsInfoRecordTable_data *
+communicationsInfoRecordTable_duplicate(struct communicationsInfoRecordTable_data *thedata)
 {
-	struct communicationsInformationRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(communicationsInformationRecordTable_data);
+	struct communicationsInfoRecordTable_data *StorageNew = SNMP_MALLOC_STRUCT(communicationsInfoRecordTable_data);
 
-	DEBUGMSGTL(("gmiMIB", "communicationsInformationRecordTable_duplicate: duplicating row...  "));
+	DEBUGMSGTL(("gmiMIB", "communicationsInfoRecordTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
@@ -1066,12 +1069,12 @@ communicationsInformationRecordTable_duplicate(struct communicationsInformationR
 	return (StorageNew);
 	goto destroy;
       destroy:
-	communicationsInformationRecordTable_destroy(&StorageNew);
+	communicationsInfoRecordTable_destroy(&StorageNew);
 	goto done;
 }
 
 /**
- * @fn int communicationsInformationRecordTable_destroy(struct communicationsInformationRecordTable_data **thedata)
+ * @fn int communicationsInfoRecordTable_destroy(struct communicationsInfoRecordTable_data **thedata)
  * @param thedata pointer to the extracted or existing data structure in the table.
  * @brief delete a row structure from a table.
  *
@@ -1081,11 +1084,11 @@ communicationsInformationRecordTable_duplicate(struct communicationsInformationR
  * NULL.
  */
 int
-communicationsInformationRecordTable_destroy(struct communicationsInformationRecordTable_data **thedata)
+communicationsInfoRecordTable_destroy(struct communicationsInfoRecordTable_data **thedata)
 {
-	struct communicationsInformationRecordTable_data *StorageDel;
+	struct communicationsInfoRecordTable_data *StorageDel;
 
-	DEBUGMSGTL(("gmiMIB", "communicationsInformationRecordTable_destroy: deleting row...  "));
+	DEBUGMSGTL(("gmiMIB", "communicationsInfoRecordTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->logId);
 		StorageDel->logIdLen = 0;
@@ -1103,38 +1106,38 @@ communicationsInformationRecordTable_destroy(struct communicationsInformationRec
 }
 
 /**
- * @fn int communicationsInformationRecordTable_add(struct communicationsInformationRecordTable_data *thedata)
+ * @fn int communicationsInfoRecordTable_add(struct communicationsInfoRecordTable_data *thedata)
  * @param thedata the structure representing the new row in the table.
- * @brief adds a row to the communicationsInformationRecordTable table data set.
+ * @brief adds a row to the communicationsInfoRecordTable table data set.
  *
- * Adds a table row structure to the communicationsInformationRecordTable table.  Note that this function is necessary even
+ * Adds a table row structure to the communicationsInfoRecordTable table.  Note that this function is necessary even
  * when the table rows are not peristent.  This function can be used within this MIB or other MIBs
  * by the agent to create rows within the table autonomously.
  */
 int
-communicationsInformationRecordTable_add(struct communicationsInformationRecordTable_data *thedata)
+communicationsInfoRecordTable_add(struct communicationsInfoRecordTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("gmiMIB", "communicationsInformationRecordTable_add: adding data...  "));
+	DEBUGMSGTL(("gmiMIB", "communicationsInfoRecordTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
 		/* logId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->logId, thedata->logIdLen);
 		/* logRecordId */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->logRecordId, thedata->logRecordIdLen);
-		header_complex_add_data(&communicationsInformationRecordTableStorage, vars, thedata);
+		header_complex_add_data(&communicationsInfoRecordTableStorage, vars, thedata);
 	}
 	DEBUGMSGTL(("gmiMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
 /**
- * @fn int communicationsInformationRecordTable_del(struct communicationsInformationRecordTable_data *thedata)
+ * @fn int communicationsInfoRecordTable_del(struct communicationsInfoRecordTable_data *thedata)
  * @param thedata pointer to the extracted or existing data structure in the table.
  * @brief delete a row structure from a table.
  *
- * Deletes a table row structure from the communicationsInformationRecordTable table but does not free it.  Note that this
+ * Deletes a table row structure from the communicationsInfoRecordTable table but does not free it.  Note that this
  * function is necessary even when the table rows are not persistent.  This function can be used
  * within this MIB or another MIB by the agent to delete rows from the table autonomously.  The data
  * structure may either be already extracted from the data set, or the structure may still exist in
@@ -1142,40 +1145,40 @@ communicationsInformationRecordTable_add(struct communicationsInformationRecordT
  * performed by the caller.
  */
 int
-communicationsInformationRecordTable_del(struct communicationsInformationRecordTable_data *thedata)
+communicationsInfoRecordTable_del(struct communicationsInfoRecordTable_data *thedata)
 {
-	struct communicationsInformationRecordTable_data *StorageDel;
+	struct communicationsInfoRecordTable_data *StorageDel;
 
-	DEBUGMSGTL(("gmiMIB", "communicationsInformationRecordTable_data: deleting data...  "));
+	DEBUGMSGTL(("gmiMIB", "communicationsInfoRecordTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
-		if ((hciptr = header_complex_find_entry(communicationsInformationRecordTableStorage, StorageDel)) != NULL)
-			header_complex_extract_entry(&communicationsInformationRecordTableStorage, hciptr);
+		if ((hciptr = header_complex_find_entry(communicationsInfoRecordTableStorage, StorageDel)) != NULL)
+			header_complex_extract_entry(&communicationsInfoRecordTableStorage, hciptr);
 	}
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
 /**
- * @fn void parse_communicationsInformationRecordTable(const char *token, char *line)
+ * @fn void parse_communicationsInfoRecordTable(const char *token, char *line)
  * @param token token used within the configuration file.
  * @param line line from configuration file matching the token.
- * @brief parse configuration file for communicationsInformationRecordTable entries.
+ * @brief parse configuration file for communicationsInfoRecordTable entries.
  *
  * This callback is called by UCD-SNMP when it prases a configuration file and finds a configuration
- * file line for the registsred token (in this case communicationsInformationRecordTable).  This routine is invoked by UCD-SNMP
+ * file line for the registsred token (in this case communicationsInfoRecordTable).  This routine is invoked by UCD-SNMP
  * to read the values of each row in the table from the configuration file.  Note that this
  * procedure may exist regardless of the persistence of the table.  If there are no configured
  * entries in the configuration table, this function will simply not be called.
  */
 void
-parse_communicationsInformationRecordTable(const char *token, char *line)
+parse_communicationsInfoRecordTable(const char *token, char *line)
 {
 	size_t tmpsize;
-	struct communicationsInformationRecordTable_data *StorageTmp = communicationsInformationRecordTable_create();
+	struct communicationsInfoRecordTable_data *StorageTmp = communicationsInfoRecordTable_create();
 
-	DEBUGMSGTL(("gmiMIB", "parse_communicationsInformationRecordTable: parsing config...  "));
+	DEBUGMSGTL(("gmiMIB", "parse_communicationsInfoRecordTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -1205,34 +1208,35 @@ parse_communicationsInformationRecordTable(const char *token, char *line)
 		config_perror("invalid specification for informationData");
 		return;
 	}
-	communicationsInformationRecordTable_add(StorageTmp);
+	communicationsInfoRecordTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
 }
 
 /*
- * store_communicationsInformationRecordTable(): store configuraiton file for communicationsInformationRecordTable
+ * store_communicationsInfoRecordTable(): store configuraiton file for communicationsInfoRecordTable
  * stores .conf file entries needed to configure the mib.
  */
 int
-store_communicationsInformationRecordTable(int majorID, int minorID, void *serverarg, void *clientarg)
+store_communicationsInfoRecordTable(int majorID, int minorID, void *serverarg, void *clientarg)
 {
 	char line[SNMP_MAXBUF];
 	char *cptr;
 	size_t tmpsize;
-	struct communicationsInformationRecordTable_data *StorageTmp;
+	struct communicationsInfoRecordTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("gmiMIB", "store_communicationsInformationRecordTable: storing data...  "));
-	refresh_communicationsInformationRecordTable(1);
+	DEBUGMSGTL(("gmiMIB", "store_communicationsInfoRecordTable: storing data...  "));
+	refresh_communicationsInfoRecordTable(1);
 	(void) tmpsize;
-	for (hcindex = communicationsInformationRecordTableStorage; hcindex != NULL; hcindex = hcindex->next) {
-		StorageTmp = (struct communicationsInformationRecordTable_data *) hcindex->data;
+	for (hcindex = communicationsInfoRecordTableStorage; hcindex != NULL; hcindex = hcindex->next) {
+		StorageTmp = (struct communicationsInfoRecordTable_data *) hcindex->data;
 		/* XXX: comment entire section if row not persistent */
 		{
 			memset(line, 0, sizeof(line));
-			strcat(line, "communicationsInformationRecordTable ");
+			strcat(line, "communicationsInfoRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -1265,7 +1269,7 @@ clProtocolMachineTable_create(void)
 			StorageNew->subsystemIdLen = strlen("");
 		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		StorageNew->clProtocolMachineOperationalState = 0;
+		StorageNew->clProtocolMachineOpState = 0;
 		StorageNew->totalRemoteSAPs = (struct counter64) {
 		0, 0};
 
@@ -1428,7 +1432,7 @@ parse_clProtocolMachineTable(const char *token, char *line)
 		config_perror("invalid specification for clProtocolMachineId");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->clProtocolMachineOperationalState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->clProtocolMachineOpState, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER64, line, &StorageTmp->totalRemoteSAPs, &tmpsize);
 	clProtocolMachineTable_add(StorageTmp);
 	(void) tmpsize;
@@ -1458,11 +1462,12 @@ store_clProtocolMachineTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "clProtocolMachineTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->subsystemId, &StorageTmp->subsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->clProtocolMachineOperationalState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->clProtocolMachineOpState, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER64, cptr, &StorageTmp->totalRemoteSAPs, &tmpsize);
 			snmpd_store_config(line);
 		}
@@ -1491,7 +1496,7 @@ coProtocolMachineTable_create(void)
 			StorageNew->subsystemIdLen = strlen("");
 		if ((StorageNew->communicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->communicationsEntityIdLen = strlen("");
-		StorageNew->coProtocolMachineOperationalState = 0;
+		StorageNew->coProtocolMachineOpState = 0;
 
 	}
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -1652,7 +1657,7 @@ parse_coProtocolMachineTable(const char *token, char *line)
 		config_perror("invalid specification for coProtocolMachineId");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->coProtocolMachineOperationalState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->coProtocolMachineOpState, &tmpsize);
 	coProtocolMachineTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("gmiMIB", "done.\n"));
@@ -1681,11 +1686,12 @@ store_coProtocolMachineTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "coProtocolMachineTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->subsystemId, &StorageTmp->subsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->coProtocolMachineOperationalState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->coProtocolMachineOpState, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -1913,6 +1919,7 @@ store_sap1Table(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sap1Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->subsystemId, &StorageTmp->subsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
@@ -2150,6 +2157,7 @@ store_sap2Table(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sap2Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->subsystemId, &StorageTmp->subsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sap2Id, &StorageTmp->sap2IdLen);
@@ -2403,6 +2411,7 @@ store_singlePeerConnectionTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "singlePeerConnectionTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->subsystemId, &StorageTmp->subsystemIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
@@ -2601,6 +2610,7 @@ store_subsystemTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "subsystemTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->subsystemId, &StorageTmp->subsystemIdLen);
 			snmpd_store_config(line);
@@ -2687,11 +2697,11 @@ var_applicationProcessTable(struct variable *vp, oid * name, size_t *length, int
 		*var_len = StorageTmp->supportEntityNamesLen;
 		rval = (u_char *) StorageTmp->supportEntityNames;
 		break;
-	case (u_char) APPLICATIONPROCESSOPERATIONALSTATE:	/* ReadOnly */
+	case (u_char) APPLICATIONPROCESSOPSTATE:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->applicationProcessOperationalState);
-		rval = (u_char *) &StorageTmp->applicationProcessOperationalState;
+		*var_len = sizeof(StorageTmp->applicationProcessOpState);
+		rval = (u_char *) &StorageTmp->applicationProcessOpState;
 		break;
 	default:
 		ERROR_MSG("");
@@ -2770,11 +2780,11 @@ var_communicationsEntityTable(struct variable *vp, oid * name, size_t *length, i
 		*var_len = StorageTmp->localSapNamesLen;
 		rval = (u_char *) StorageTmp->localSapNames;
 		break;
-	case (u_char) COMMUNICATIONSENTITYOPERATIONALSTATE:	/* ReadOnly */
+	case (u_char) COMMUNICATIONSENTITYOPSTATE:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->communicationsEntityOperationalState);
-		rval = (u_char *) &StorageTmp->communicationsEntityOperationalState;
+		*var_len = sizeof(StorageTmp->communicationsEntityOpState);
+		rval = (u_char *) &StorageTmp->communicationsEntityOpState;
 		break;
 	default:
 		ERROR_MSG("");
@@ -2783,29 +2793,29 @@ var_communicationsEntityTable(struct variable *vp, oid * name, size_t *length, i
 }
 
 /**
- * @fn void refresh_communicationsInformationRecordTable_row(struct communicationsInformationRecordTable_data *StorageTmp, int force)
+ * @fn void refresh_communicationsInfoRecordTable_row(struct communicationsInfoRecordTable_data *StorageTmp, int force)
  * @param StorageTmp the data row to refresh.
  * @param force force refresh if non-zero.
- * @brief refresh the contents of the communicationsInformationRecordTable row.
+ * @brief refresh the contents of the communicationsInfoRecordTable row.
  *
  * Normally the values retrieved from the operating system are cached.  However, if a row contains
  * temporal values, such as statistics counters, gauges, timestamps, or other transient columns, it
  * may be necessary to refresh the row on some other basis, but normally only once per request.
  */
-struct communicationsInformationRecordTable_data *
-refresh_communicationsInformationRecordTable_row(struct communicationsInformationRecordTable_data *StorageTmp, int force)
+struct communicationsInfoRecordTable_data *
+refresh_communicationsInfoRecordTable_row(struct communicationsInfoRecordTable_data *StorageTmp, int force)
 {
-	if (!StorageTmp || (!force && StorageTmp->communicationsInformationRecordTable_request == sa_request))
+	if (!StorageTmp || (!force && StorageTmp->communicationsInfoRecordTable_request == sa_request))
 		return (StorageTmp);
 	/* XXX: update row; delete it and return NULL if the row has disappeared */
-	StorageTmp->communicationsInformationRecordTable_request = sa_request;
+	StorageTmp->communicationsInfoRecordTable_request = sa_request;
 	return (StorageTmp);
 }
 
 /**
- * @fn void refresh_communicationsInformationRecordTable(int force)
+ * @fn void refresh_communicationsInfoRecordTable(int force)
  * @param force force refresh if non-zero.
- * @brief refresh the scalar values of the communicationsInformationRecordTable.
+ * @brief refresh the scalar values of the communicationsInfoRecordTable.
  *
  * Normally the values retrieved from the operating system are cached.  When the agent receives a
  * SIGPOLL from an open STREAMS configuration or administrative driver Stream, the STREAMS subsystem
@@ -2814,33 +2824,33 @@ refresh_communicationsInformationRecordTable_row(struct communicationsInformatio
  * time, or after a SIGPOLL has been received (and a row or column has been requested).
  */
 void
-refresh_communicationsInformationRecordTable(int force)
+refresh_communicationsInfoRecordTable(int force)
 {
-	if (!force && communicationsInformationRecordTable_refresh == 0)
+	if (!force && communicationsInfoRecordTable_refresh == 0)
 		return;
 	/* XXX: Here, update the table as required... */
-	communicationsInformationRecordTable_refresh = 0;
+	communicationsInfoRecordTable_refresh = 0;
 }
 
 /**
- * @fn u_char *var_communicationsInformationRecordTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
- * @brief locate variables in communicationsInformationRecordTable.
+ * @fn u_char *var_communicationsInfoRecordTable(struct variable *vp, oid *name, size_t *length, int exact, size_t *var_len, WriteMethod **write_method)
+ * @brief locate variables in communicationsInfoRecordTable.
  *
  * Handle this table separately from the scalar value case.  The workings of this are basically the
  * same as for var_gmiMIB above.
  */
 u_char *
-var_communicationsInformationRecordTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
+var_communicationsInfoRecordTable(struct variable *vp, oid * name, size_t *length, int exact, size_t *var_len, WriteMethod ** write_method)
 {
-	struct communicationsInformationRecordTable_data *StorageTmp = NULL;
+	struct communicationsInfoRecordTable_data *StorageTmp = NULL;
 	u_char *rval;
 
-	DEBUGMSGTL(("gmiMIB", "var_communicationsInformationRecordTable: Entering...  \n"));
+	DEBUGMSGTL(("gmiMIB", "var_communicationsInfoRecordTable: Entering...  \n"));
 	/* Make sure that the storage data does not need to be refreshed before checking the header. */
-	refresh_communicationsInformationRecordTable(0);
+	refresh_communicationsInfoRecordTable(0);
 	/* This assumes you have registered all your data properly with header_complex_add() somewhere before this. */
-	while ((StorageTmp = header_complex(communicationsInformationRecordTableStorage, vp, name, length, exact, var_len, write_method)))
-		if ((StorageTmp = refresh_communicationsInformationRecordTable_row(StorageTmp, 0)) || exact)
+	while ((StorageTmp = header_complex(communicationsInfoRecordTableStorage, vp, name, length, exact, var_len, write_method)))
+		if ((StorageTmp = refresh_communicationsInfoRecordTable_row(StorageTmp, 0)) || exact)
 			break;
 	*write_method = NULL;
 	*var_len = 0;
@@ -2930,11 +2940,11 @@ var_clProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) CLPROTOCOLMACHINEOPERATIONALSTATE:	/* ReadOnly */
+	case (u_char) CLPROTOCOLMACHINEOPSTATE:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->clProtocolMachineOperationalState);
-		rval = (u_char *) &StorageTmp->clProtocolMachineOperationalState;
+		*var_len = sizeof(StorageTmp->clProtocolMachineOpState);
+		rval = (u_char *) &StorageTmp->clProtocolMachineOpState;
 		break;
 	case (u_char) TOTALREMOTESAPS:	/* ReadOnly */
 		if (!StorageTmp)
@@ -3013,11 +3023,11 @@ var_coProtocolMachineTable(struct variable *vp, oid * name, size_t *length, int 
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) COPROTOCOLMACHINEOPERATIONALSTATE:	/* ReadOnly */
+	case (u_char) COPROTOCOLMACHINEOPSTATE:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->coProtocolMachineOperationalState);
-		rval = (u_char *) &StorageTmp->coProtocolMachineOperationalState;
+		*var_len = sizeof(StorageTmp->coProtocolMachineOpState);
+		rval = (u_char *) &StorageTmp->coProtocolMachineOpState;
 		break;
 	default:
 		ERROR_MSG("");
@@ -3388,18 +3398,18 @@ communicationsEntityTable_consistent(struct communicationsEntityTable_data *thed
 }
 
 /**
- * @fn int communicationsInformationRecordTable_consistent(struct communicationsInformationRecordTable_data *thedata)
+ * @fn int communicationsInfoRecordTable_consistent(struct communicationsInfoRecordTable_data *thedata)
  * @param thedata the row data to check for consistency.
  * @brief check the internal consistency of a table row.
  *
- * This function checks the internal consistency of a table row for the communicationsInformationRecordTable table.  If the
+ * This function checks the internal consistency of a table row for the communicationsInfoRecordTable table.  If the
  * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
  * function returns an SNMP error code and it will not be possible to activate the row until the
  * row's internal consistency is corrected.  This function might use a 'test' operation against the
  * driver to ensure that the commit phase will succeed.
  */
 int
-communicationsInformationRecordTable_consistent(struct communicationsInformationRecordTable_data *thedata)
+communicationsInfoRecordTable_consistent(struct communicationsInfoRecordTable_data *thedata)
 {
 	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
 	return (SNMP_ERR_NOERROR);

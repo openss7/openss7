@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -134,6 +134,7 @@ struct dsx1ConfigTable_data {
 	long dsx1Channelization;	/* ReadWrite */
 	long dsx1LineMode;		/* ReadWrite */
 	long dsx1LineBuildOut;		/* ReadWrite */
+	long dsx1LineImpedance;		/* ReadWrite */
 };
 struct dsx1CurrentTable_data {
 	uint dsx1CurrentTable_request;
@@ -271,6 +272,8 @@ extern struct header_complex_index *dsx1ChanMappingTableStorage;
 #define DSX1LINETYPE_DSX1E2                      11
 #define DSX1LINETYPE_DSX1E1Q50                   12
 #define DSX1LINETYPE_DSX1E1Q50CRC                13
+#define DSX1LINETYPE_DSX1J1ESF                   14
+#define DSX1LINETYPE_DSX1J1UNFRAMED              16
 
 #define DSX1LINECODING_DSX1JBZS                  1
 #define DSX1LINECODING_DSX1B8ZS                  2
@@ -323,6 +326,11 @@ extern struct header_complex_index *dsx1ChanMappingTableStorage;
 #define DSX1LINEBUILDOUT_NEG225DB                4
 #define DSX1LINEBUILDOUT_ZERODB                  5
 
+#define DSX1LINEIMPEDANCE_NOTAPPLICABLE          1
+#define DSX1LINEIMPEDANCE_UNBALANCED75OHMS       2
+#define DSX1LINEIMPEDANCE_BALANCED100OHMS        3
+#define DSX1LINEIMPEDANCE_BALANCED120OHMS        4
+
 #define DSX1INTERVALVALIDDATA_TRUE               1
 #define DSX1INTERVALVALIDDATA_FALSE              2
 
@@ -345,6 +353,9 @@ extern oid ds1TransStatsGroup_oid[11];
 extern oid ds1NearEndOptionalTrapGroup_oid[11];
 extern oid ds1ChanMappingGroup_oid[11];
 extern oid ds1NearEndConfigurationGroup_oid[11];
+extern oid ds1NearEndCfgGroup_oid[11];
+extern oid ds1NearEndStatGroup_oid[11];
+extern oid ds1FarEndNGroup_oid[11];
 extern oid ds1Compliance_oid[11];
 extern oid ds1MibT1PriCompliance_oid[11];
 extern oid ds1MibE1PriCompliance_oid[11];
@@ -352,6 +363,9 @@ extern oid ds1Ds2Compliance_oid[11];
 extern oid ds1NCompliance_oid[11];
 extern oid ds1MibT1PriNCompliance_oid[11];
 extern oid ds1MibE1PriNCompliance_oid[11];
+extern oid ds1J1Compliance_oid[11];
+extern oid ds1NMibT1PriNCompliance_oid[11];
+extern oid ds1NMibE1PriNCompliance_oid[11];
 
 /* function prototypes */
 /* trap function prototypes */
@@ -460,5 +474,6 @@ WriteMethod write_dsx1LineStatusChangeTrapEnable;
 WriteMethod write_dsx1Channelization;
 WriteMethod write_dsx1LineMode;
 WriteMethod write_dsx1LineBuildOut;
+WriteMethod write_dsx1LineImpedance;
 WriteMethod write_dsx1FracIfIndex;
 #endif				/* __LOCAL_DS1_H__ */

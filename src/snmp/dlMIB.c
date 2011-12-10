@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -2377,6 +2377,7 @@ store_dlMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "dlMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->llcDiscontinuityTime, &tmpsize);
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sLPConnectionDefaultInterfaceType, &tmpsize);
@@ -2840,6 +2841,7 @@ store_communicationsEntityTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "communicationsEntityTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->communicationsEntityLocalSapNames, &StorageTmp->communicationsEntityLocalSapNamesLen);
@@ -3059,6 +3061,7 @@ store_sap1Table(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sap1Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sapId, &StorageTmp->sapIdLen);
@@ -3287,6 +3290,7 @@ store_sap2Table(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sap2Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sap2Address, &StorageTmp->sap2AddressLen);
@@ -3499,6 +3503,7 @@ store_clProtocolMachineTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "clProtocolMachineTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
@@ -3709,6 +3714,7 @@ store_coProtocolMachineTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "coProtocolMachineTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -3948,6 +3954,7 @@ store_singlePeerConnectionTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "singlePeerConnectionTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -4157,6 +4164,7 @@ store_physicalEntityTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "physicalEntityTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->physicalEntityPhysicalEntityTitles, &StorageTmp->physicalEntityPhysicalEntityTitlesLen);
@@ -4367,6 +4375,7 @@ store_physicalSAPTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "physicalSAPTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sapId, &StorageTmp->sapIdLen);
@@ -4644,6 +4653,7 @@ store_dataCircuitTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "dataCircuitTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -4890,6 +4900,7 @@ store_physicalConnectionTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "physicalConnectionTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -5102,6 +5113,7 @@ store_datalinkEntityTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "datalinkEntityTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->datalinkEntityProviderEntityNames, &StorageTmp->datalinkEntityProviderEntityNamesLen);
@@ -5313,6 +5325,7 @@ store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "dLSAPTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sapId, &StorageTmp->sapIdLen);
@@ -5538,6 +5551,7 @@ store_lAPBDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "lAPBDLETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lAPBDLEmT1Timer, &tmpsize);
@@ -5763,6 +5777,7 @@ store_sLPPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "sLPPMTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -6077,6 +6092,7 @@ store_sLPConnectionTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "sLPConnectionTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -6366,6 +6382,7 @@ store_sLPConnectionIVMOTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "sLPConnectionIVMOTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -6576,6 +6593,7 @@ store_mACDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mACDLETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mACDLERowStatus, &tmpsize);
@@ -6786,6 +6804,7 @@ store_mACTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mACTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mACOperationalState, &tmpsize);
@@ -6986,6 +7005,7 @@ store_lLCDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCDLETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCDLERowStatus, &tmpsize);
@@ -7196,6 +7216,7 @@ store_lLCCLPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCCLPMTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
@@ -7407,6 +7428,7 @@ store_lLCCOPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCCOPMTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -7654,6 +7676,7 @@ store_resourceTypeIdTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "resourceTypeIdTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->resourceTypeIdName, &StorageTmp->resourceTypeIdNameLen);
@@ -7934,6 +7957,7 @@ store_lLCStationTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCStationTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sapId, &StorageTmp->sapIdLen);
@@ -8186,6 +8210,7 @@ store_lLCSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCSAPTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sapId, &StorageTmp->sapIdLen);
@@ -8417,6 +8442,7 @@ store_rDESetupTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "rDESetupTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sapId, &StorageTmp->sapIdLen);
@@ -8665,6 +8691,7 @@ store_rDEPairTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "rDEPairTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sapId, &StorageTmp->sapIdLen);
@@ -8928,6 +8955,7 @@ store_lLCConnectionLessTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnectionLessTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
@@ -9291,6 +9319,7 @@ store_lLCConnection2Table(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnection2Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -9592,6 +9621,7 @@ store_lLCConnection2IVMOTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnection2IVMOTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -9905,6 +9935,7 @@ store_lLCConnectionlessAckTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnectionlessAckTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -10166,6 +10197,7 @@ store_lLCConnectionlessAckIVMOTable(int majorID, int minorID, void *serverarg, v
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnectionlessAckIVMOTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -10388,6 +10420,7 @@ store_networkEntityTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "networkEntityTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->networkEntityTitles, &StorageTmp->networkEntityTitlesLen);
@@ -10588,6 +10621,7 @@ store_nSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "nSAPTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sapId, &StorageTmp->sapIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->nSAPRowStatus, &tmpsize);
@@ -10840,6 +10874,7 @@ store_cLNSTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "cLNSTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
@@ -11174,6 +11209,7 @@ store_cLNSISISTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "cLNSISISTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
@@ -11454,6 +11490,7 @@ store_cLNSISISLevel2Table(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "cLNSISISLevel2Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->cLNSISISLevel2maximumVirtualAdjacencies, &tmpsize);
@@ -12147,6 +12184,7 @@ store_linkageTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "linkageTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->protocolMachineId, &StorageTmp->protocolMachineIdLen);
@@ -12443,6 +12481,7 @@ store_cONSTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "cONSTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -12688,6 +12727,7 @@ store_networkConnectionTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "networkConnectionTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->coProtocolMachineId, &StorageTmp->coProtocolMachineIdLen);
@@ -13322,6 +13362,7 @@ store_x25PLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "x25PLETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->x25PLEoperationalState, &tmpsize);
@@ -13789,6 +13830,7 @@ store_x25PLE_DTETable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "x25PLE_DTETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->x25PLE_DTEcallDeflectionSubscription, &tmpsize);
@@ -14177,6 +14219,7 @@ store_x25PLE_DCETable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "x25PLE_DCETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->x25PLE_DCEcallAttempts, &tmpsize);
@@ -14626,6 +14669,7 @@ store_x25PLEIVMOTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "x25PLEIVMOTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEIVMOId, &StorageTmp->x25PLEIVMOIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEIVMOlocalDTEAddress, &StorageTmp->x25PLEIVMOlocalDTEAddressLen);
@@ -15101,6 +15145,7 @@ store_x25PLEIVMO_DTETable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "x25PLEIVMO_DTETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEIVMOId, &StorageTmp->x25PLEIVMOIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->x25PLEIVMO_DTEcallDeflectionSubscription, &tmpsize);
@@ -15343,6 +15388,7 @@ store_x25PLEIVMO_DCETable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "x25PLEIVMO_DCETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEIVMOId, &StorageTmp->x25PLEIVMOIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->x25PLEIVMO_DCERowStatus, &tmpsize);
@@ -15677,6 +15723,7 @@ store_virtualCallTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "virtualCallTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCallId, &StorageTmp->virtualCallIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCallChannel, &StorageTmp->virtualCallChannelLen);
@@ -15924,6 +15971,7 @@ store_virtualCircuitTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "virtualCircuitTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCircuitLogicalChannel, &StorageTmp->virtualCircuitLogicalChannelLen);
@@ -16145,6 +16193,7 @@ store_virtualCircuit_DTETable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "virtualCircuit_DTETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->virtualCircuit_DTEoctetsSentCounter, &tmpsize);
@@ -16379,6 +16428,7 @@ store_virtualCircuit_DCETable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "virtualCircuit_DCETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->virtualCircuit_DCEdataPacketsReceived, &tmpsize);
@@ -16612,6 +16662,7 @@ store_permanentVirtualCircuitTable(int majorID, int minorID, void *serverarg, vo
 			memset(line, 0, sizeof(line));
 			strcat(line, "permanentVirtualCircuitTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCallId, &StorageTmp->virtualCallIdLen);
@@ -16864,6 +16915,7 @@ store_permanentVirtualCircuit_DTETable(int majorID, int minorID, void *serverarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "permanentVirtualCircuit_DTETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
@@ -17151,6 +17203,7 @@ store_permanentVirtualCircuit_DCETable(int majorID, int minorID, void *serverarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "permanentVirtualCircuit_DCETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
@@ -17561,6 +17614,7 @@ store_virtualCallIVMOTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "virtualCallIVMOTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCallIVMOId, &StorageTmp->virtualCallIVMOIdLen);
@@ -17862,6 +17916,7 @@ store_switchedVirtualCallTable(int majorID, int minorID, void *serverarg, void *
 			memset(line, 0, sizeof(line));
 			strcat(line, "switchedVirtualCallTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCallId, &StorageTmp->virtualCallIdLen);
@@ -18152,6 +18207,7 @@ store_virtualCall_DTETable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "virtualCall_DTETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
@@ -18477,6 +18533,7 @@ store_virtualCall_DCETable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "virtualCall_DCETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
@@ -18719,6 +18776,7 @@ store_dSeriesCountsTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "dSeriesCountsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->x25PLEId, &StorageTmp->x25PLEIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->virtualCircuitId, &StorageTmp->virtualCircuitIdLen);
@@ -18996,6 +19054,7 @@ store_adjacencyTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "adjacencyTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
@@ -19227,6 +19286,7 @@ store_virtualAdjacencyTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "virtualAdjacencyTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
@@ -19495,6 +19555,7 @@ store_destinationTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "destinationTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
@@ -19737,6 +19798,7 @@ store_destinationSystemTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "destinationSystemTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->communicationsEntityId, &StorageTmp->communicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->clProtocolMachineId, &StorageTmp->clProtocolMachineIdLen);
@@ -19935,6 +19997,7 @@ store_destinationAreaTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "destinationAreaTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->destinationAreaId, &StorageTmp->destinationAreaIdLen);
 			snmpd_store_config(line);
@@ -20192,6 +20255,7 @@ store_reachableAddressTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "reachableAddressTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->reachableAddressId, &StorageTmp->reachableAddressIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->reachableAddressPrefix, &StorageTmp->reachableAddressPrefixLen);

@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -177,6 +177,7 @@ volatile int m2uaSgAsTable_refresh = 1;
 oid m2uaMIB_variables_oid[9] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222 };
 oid m2uaAsTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222, 1, 2, 1, 1, 2, 1 };
 oid m2uaIfTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222, 1, 2, 1, 2, 2, 1 };
+oid m2uaAsIfTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222, 1, 2, 1, 3, 1, 1 };
 oid m2uaAspTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222, 1, 2, 2, 1, 2, 1 };
 oid m2uaSgTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222, 1, 2, 3, 1, 2, 1 };
 oid m2uaSgAsTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222, 1, 2, 3, 4, 1, 1 };
@@ -192,7 +193,8 @@ oid m2uaSgAsTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222, 1, 2, 3
 /*
  * Other oids defined in this MIB.
  */
-
+oid m2uaFullObjects_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222, 2, 1, 1 };
+oid m2uaFullCompliance_oid[12] = { 1, 3, 6, 1, 4, 1, 29591, 1, 222, 2, 2, 1 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -223,7 +225,7 @@ struct variable7 m2uaMIB_variables[] = {
 #define   M2UAIFASINDEX         10
 	{(u_char) M2UAIFASINDEX, ASN_UNSIGNED, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 3}},
 #define   M2UAIFIDNUM           11
-	{(u_char) M2UAIFIDNUM, ASN_INTEGER, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 4}},
+	{(u_char) M2UAIFIDNUM, ASN_UNSIGNED, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 4}},
 #define   M2UAIFIDNAME          12
 	{(u_char) M2UAIFIDNAME, ASN_OCTET_STR, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 5}},
 #define   M2UAIFADMINISTRATIVESTATE  13
@@ -244,12 +246,14 @@ struct variable7 m2uaMIB_variables[] = {
 	{(u_char) M2UAIFCIC, ASN_INTEGER, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 13}},
 #define   M2UAIFROWSTATUS       21
 	{(u_char) M2UAIFROWSTATUS, ASN_INTEGER, RWRITE, var_m2uaIfTable, 7, {1, 2, 1, 2, 2, 1, 14}},
-#define   M2UAASPNEXTINDEX      22
+#define   M2UAASIFSTATUS        22
+	{(u_char) M2UAASIFSTATUS, ASN_INTEGER, RWRITE, var_m2uaAsIfTable, 7, {1, 2, 1, 3, 1, 1, 1}},
+#define   M2UAASPNEXTINDEX      23
 	{(u_char) M2UAASPNEXTINDEX, ASN_UNSIGNED, RONLY, var_m2uaMIB, 5, {1, 2, 2, 1, 1}},
 #define   M2UAASPNAME           24
 	{(u_char) M2UAASPNAME, ASN_OCTET_STR, RONLY, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 2}},
-#define   M2UASGINDEX           25
-	{(u_char) M2UASGINDEX, ASN_UNSIGNED, RWRITE, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 3}},
+#define   M2UASGINDEXSG         25
+	{(u_char) M2UASGINDEXSG, ASN_UNSIGNED, RWRITE, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 3}},
 #define   M2UAASPADMINISTRATIVESTATE  26
 	{(u_char) M2UAASPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 4}},
 #define   M2UAASPOPERATIONALSTATE  27
@@ -262,47 +266,47 @@ struct variable7 m2uaMIB_variables[] = {
 	{(u_char) M2UAASPSTATE, ASN_INTEGER, RONLY, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 8}},
 #define   M2UAASPROWSTATUS      31
 	{(u_char) M2UAASPROWSTATUS, ASN_INTEGER, RWRITE, var_m2uaAspTable, 7, {1, 2, 2, 1, 2, 1, 9}},
-#define   M2UAASPSGASPID        34
+#define   M2UAASPSGASPID        32
 	{(u_char) M2UAASPSGASPID, ASN_UNSIGNED, RWRITE, var_m2uaAspSgTable, 7, {1, 2, 2, 2, 1, 1, 1}},
-#define   M2UAASPSGASPPORT      35
+#define   M2UAASPSGASPPORT      33
 	{(u_char) M2UAASPSGASPPORT, ASN_INTEGER, RWRITE, var_m2uaAspSgTable, 7, {1, 2, 2, 2, 1, 1, 2}},
-#define   M2UAASPSGASPSTATE     36
+#define   M2UAASPSGASPSTATE     34
 	{(u_char) M2UAASPSGASPSTATE, ASN_INTEGER, RONLY, var_m2uaAspSgTable, 7, {1, 2, 2, 2, 1, 1, 3}},
-#define   M2UAASPSGADMINISTRATIVESTATE  37
+#define   M2UAASPSGADMINISTRATIVESTATE  35
 	{(u_char) M2UAASPSGADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaAspSgTable, 7, {1, 2, 2, 2, 1, 1, 4}},
-#define   M2UASGNEXTINDEX       38
+#define   M2UASGNEXTINDEX       36
 	{(u_char) M2UASGNEXTINDEX, ASN_UNSIGNED, RONLY, var_m2uaMIB, 5, {1, 2, 3, 1, 1}},
-#define   M2UASGNAME            40
+#define   M2UASGNAME            37
 	{(u_char) M2UASGNAME, ASN_OCTET_STR, RWRITE, var_m2uaSgTable, 7, {1, 2, 3, 1, 2, 1, 2}},
-#define   M2UASGROWSTATUS       41
+#define   M2UASGROWSTATUS       38
 	{(u_char) M2UASGROWSTATUS, ASN_INTEGER, RWRITE, var_m2uaSgTable, 7, {1, 2, 3, 1, 2, 1, 3}},
-#define   M2UASGASPID           44
+#define   M2UASGASPID           39
 	{(u_char) M2UASGASPID, ASN_UNSIGNED, RWRITE, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 1}},
-#define   M2UASGASPPORT         45
+#define   M2UASGASPPORT         40
 	{(u_char) M2UASGASPPORT, ASN_INTEGER, RWRITE, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 2}},
-#define   M2UASGASPSTATE        46
+#define   M2UASGASPSTATE        41
 	{(u_char) M2UASGASPSTATE, ASN_INTEGER, RONLY, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 3}},
-#define   M2UASGASPADMINISTRATIVESTATE  47
+#define   M2UASGASPADMINISTRATIVESTATE  42
 	{(u_char) M2UASGASPADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 4}},
-#define   M2UASGASPOPERATIONALSTATE  48
+#define   M2UASGASPOPERATIONALSTATE  43
 	{(u_char) M2UASGASPOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m2uaSgAspTable, 7, {1, 2, 3, 2, 1, 1, 5}},
-#define   M2UASGASPASREGISTRATIONREQUIRED  51
+#define   M2UASGASPASREGISTRATIONREQUIRED  44
 	{(u_char) M2UASGASPASREGISTRATIONREQUIRED, ASN_INTEGER, RWRITE, var_m2uaSgAspAsTable, 7, {1, 2, 3, 3, 1, 1, 1}},
-#define   M2UASGASPASSTATE      52
+#define   M2UASGASPASSTATE      45
 	{(u_char) M2UASGASPASSTATE, ASN_INTEGER, RONLY, var_m2uaSgAspAsTable, 7, {1, 2, 3, 3, 1, 1, 2}},
-#define   M2UASGASPASADMINISTRATIVESTATE  53
+#define   M2UASGASPASADMINISTRATIVESTATE  46
 	{(u_char) M2UASGASPASADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaSgAspAsTable, 7, {1, 2, 3, 3, 1, 1, 3}},
-#define   M2UASGASPASOPERATIONALSTATE  54
+#define   M2UASGASPASOPERATIONALSTATE  47
 	{(u_char) M2UASGASPASOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m2uaSgAspAsTable, 7, {1, 2, 3, 3, 1, 1, 4}},
-#define   M2UASGASTRAFFICMODE   56
+#define   M2UASGASTRAFFICMODE   48
 	{(u_char) M2UASGASTRAFFICMODE, ASN_OBJECT_ID, RWRITE, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 1}},
-#define   M2UASGASSTATE         57
+#define   M2UASGASSTATE         49
 	{(u_char) M2UASGASSTATE, ASN_INTEGER, RWRITE, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 2}},
-#define   M2UASGASADMINISTRATIVESTATE  58
+#define   M2UASGASADMINISTRATIVESTATE  50
 	{(u_char) M2UASGASADMINISTRATIVESTATE, ASN_INTEGER, RWRITE, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 3}},
-#define   M2UASGASOPERATIONALSTATE  59
+#define   M2UASGASOPERATIONALSTATE  51
 	{(u_char) M2UASGASOPERATIONALSTATE, ASN_INTEGER, RONLY, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 4}},
-#define   M2UASGASROWSTATUS     60
+#define   M2UASGASROWSTATUS     52
 	{(u_char) M2UASGASROWSTATUS, ASN_INTEGER, RWRITE, var_m2uaSgAsTable, 7, {1, 2, 3, 4, 1, 1, 5}},
 };
 
@@ -562,6 +566,7 @@ store_m2uaMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "m2uaMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaAsNextIndex, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaIfNextIndex, &tmpsize);
@@ -696,7 +701,7 @@ m2uaAsTable_create(void)
 		StorageNew->m2uaAsOperationalState = 0;
 		if (memdup((u_char **) &StorageNew->m2uaAsProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
 			StorageNew->m2uaAsProceduralStatusLen = 1;
-		StorageNew->m2uaASUsageState = 0;
+		StorageNew->m2uaAsUsageState = 0;
 		StorageNew->m2uaAsStatus = 0;
 		StorageNew->m2uaAsStatus = RS_NOTREADY;
 	}
@@ -849,7 +854,7 @@ parse_m2uaAsTable(const char *token, char *line)
 		config_perror("invalid specification for m2uaAsProceduralStatus");
 		return;
 	}
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m2uaASUsageState, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m2uaAsUsageState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m2uaAsStatus, &tmpsize);
 	m2uaAsTable_add(StorageTmp);
 	(void) tmpsize;
@@ -879,13 +884,14 @@ store_m2uaAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaAsIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAsName, &StorageTmp->m2uaAsNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaAsAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaAsOperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAsProceduralStatus, &StorageTmp->m2uaAsProceduralStatusLen);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaASUsageState, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaAsUsageState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaAsStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
@@ -916,15 +922,15 @@ m2uaIfTable_create(void)
 		StorageNew->m2uaIfIdNum = 0;
 		if ((StorageNew->m2uaIfIdName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m2uaIfIdNameLen = strlen("");
-		StorageNew->m2uaIfAdministrativeState = 0;
-		StorageNew->m2uaIfOperationalState = 0;
-		if (memdup((u_char **) &StorageNew->m2uaIfProceduralStatus, (u_char *) "\x01", 1) == SNMPERR_SUCCESS)
+		StorageNew->m2uaIfAdministrativeState = M2UAIFADMINISTRATIVESTATE_LOCKED;
+		StorageNew->m2uaIfOperationalState = M2UAIFOPERATIONALSTATE_DISABLED;
+		if (memdup((u_char **) &StorageNew->m2uaIfProceduralStatus, (u_char *) "\x40", 1) == SNMPERR_SUCCESS)
 			StorageNew->m2uaIfProceduralStatusLen = 1;
-		StorageNew->m2uaIfUsageState = 0;
+		StorageNew->m2uaIfUsageState = M2UAIFUSAGESTATE_IDLE;
 		if ((StorageNew->m2uaIfEquipment = snmp_duplicate_objid(zeroDotZero_oid, 2)))
 			StorageNew->m2uaIfEquipmentLen = 2;
-		StorageNew->m2uaIfMaxSifSize = 272;
-		StorageNew->m2uaIfTransmissionRate = 3;
+		StorageNew->m2uaIfMaxSifSize = M2UAIFMAXSIFSIZE_LSL;
+		StorageNew->m2uaIfTransmissionRate = M2UAIFTRANSMISSIONRATE_DS0;
 		StorageNew->m2uaIfCic = 0;
 		StorageNew->m2uaIfRowStatus = 0;
 		StorageNew->m2uaIfRowStatus = RS_NOTREADY;
@@ -1075,7 +1081,7 @@ parse_m2uaIfTable(const char *token, char *line)
 		return;
 	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m2uaIfAsIndex, &tmpsize);
-	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m2uaIfIdNum, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m2uaIfIdNum, &tmpsize);
 	SNMP_FREE(StorageTmp->m2uaIfIdName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->m2uaIfIdName, &StorageTmp->m2uaIfIdNameLen);
 	if (StorageTmp->m2uaIfIdName == NULL) {
@@ -1129,11 +1135,12 @@ store_m2uaIfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaIfTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaIfIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaIfName, &StorageTmp->m2uaIfNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaIfAsIndex, &tmpsize);
-			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaIfIdNum, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaIfIdNum, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaIfIdName, &StorageTmp->m2uaIfIdNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaIfAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaIfOperationalState, &tmpsize);
@@ -1167,8 +1174,10 @@ m2uaAsIfTable_create(void)
 	DEBUGMSGTL(("m2uaMIB", "m2uaAsIfTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		StorageNew->m2uaAsIndex = 0;
 		StorageNew->m2uaIfIndex = 0;
-
+		StorageNew->m2uaAsIfStatus = 0;
+		StorageNew->m2uaAsIfStatus = RS_NOTREADY;
 	}
 	DEBUGMSGTL(("m2uaMIB", "done.\n"));
 	return (StorageNew);
@@ -1240,6 +1249,8 @@ m2uaAsIfTable_add(struct m2uaAsIfTable_data *thedata)
 	DEBUGMSGTL(("m2uaMIB", "m2uaAsIfTable_add: adding data...  "));
 	if (thedata) {
 		/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* m2uaAsIndex */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m2uaAsIndex, sizeof(thedata->m2uaAsIndex));
 		/* m2uaIfIndex */
 		snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, (u_char *) &thedata->m2uaIfIndex, sizeof(thedata->m2uaIfIndex));
 		header_complex_add_data(&m2uaAsIfTableStorage, vars, thedata);
@@ -1300,7 +1311,9 @@ parse_m2uaAsIfTable(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m2uaAsIndex, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m2uaIfIndex, &tmpsize);
+	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m2uaAsIfStatus, &tmpsize);
 	m2uaAsIfTable_add(StorageTmp);
 	(void) tmpsize;
 	DEBUGMSGTL(("m2uaMIB", "done.\n"));
@@ -1329,8 +1342,11 @@ store_m2uaAsIfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAsIfTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaAsIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaIfIndex, &tmpsize);
+			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaAsIfStatus, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
@@ -1356,11 +1372,11 @@ m2uaAspTable_create(void)
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->m2uaAspName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->m2uaAspNameLen = strlen("");
-		StorageNew->m2uaSgIndex = 0;
-		StorageNew->m2uaAspAdministrativeState = 0;
-		StorageNew->m2uaAspOperationalState = 0;
-		StorageNew->m2uaAspUsageState = 0;
-		if (memdup((u_char **) &StorageNew->m2uaAspProceduralStatus, (u_char *) "\x00", 1) == SNMPERR_SUCCESS)
+		StorageNew->m2uaSgIndexSg = 0;
+		StorageNew->m2uaAspAdministrativeState = M2UAASPADMINISTRATIVESTATE_LOCKED;
+		StorageNew->m2uaAspOperationalState = M2UAASPOPERATIONALSTATE_DISABLED;
+		StorageNew->m2uaAspUsageState = M2UAASPUSAGESTATE_IDLE;
+		if (memdup((u_char **) &StorageNew->m2uaAspProceduralStatus, (u_char *) "\x80", 1) == SNMPERR_SUCCESS)
 			StorageNew->m2uaAspProceduralStatusLen = 1;
 		StorageNew->m2uaAspState = 0;
 		StorageNew->m2uaAspRowStatus = 0;
@@ -1507,7 +1523,7 @@ parse_m2uaAspTable(const char *token, char *line)
 		config_perror("invalid specification for m2uaAspName");
 		return;
 	}
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m2uaSgIndex, &tmpsize);
+	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->m2uaSgIndexSg, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m2uaAspAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m2uaAspOperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->m2uaAspUsageState, &tmpsize);
@@ -1547,10 +1563,11 @@ store_m2uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAspTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaAspIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAspName, &StorageTmp->m2uaAspNameLen);
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaSgIndex, &tmpsize);
+			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaSgIndexSg, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaAspAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaAspOperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaAspUsageState, &tmpsize);
@@ -1584,8 +1601,8 @@ m2uaAspSgTable_create(void)
 		StorageNew->m2uaSgIndex = 0;
 		StorageNew->m2uaAspSgAspId = 0;
 		StorageNew->m2uaAspSgAspPort = 0;
-		StorageNew->m2uaAspSgAspState = 0;
-		StorageNew->m2uaAspSgAdministrativeState = 0;
+		StorageNew->m2uaAspSgAspState = M2UAASPSGASPSTATE_DOWN;
+		StorageNew->m2uaAspSgAdministrativeState = M2UAASPSGADMINISTRATIVESTATE_LOCKED;
 
 	}
 	DEBUGMSGTL(("m2uaMIB", "done.\n"));
@@ -1754,6 +1771,7 @@ store_m2uaAspSgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAspSgTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaAspIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaSgIndex, &tmpsize);
@@ -1957,6 +1975,7 @@ store_m2uaSgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaSgTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaSgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaSgName, &StorageTmp->m2uaSgNameLen);
@@ -1988,9 +2007,9 @@ m2uaSgAspTable_create(void)
 		StorageNew->m2uaAspIndex = 0;
 		StorageNew->m2uaSgAspId = 0;
 		StorageNew->m2uaSgAspPort = 0;
-		StorageNew->m2uaSgAspState = 0;
-		StorageNew->m2uaSgAspAdministrativeState = 0;
-		StorageNew->m2uaSgAspOperationalState = 0;
+		StorageNew->m2uaSgAspState = M2UASGASPSTATE_DOWN;
+		StorageNew->m2uaSgAspAdministrativeState = M2UASGASPADMINISTRATIVESTATE_LOCKED;
+		StorageNew->m2uaSgAspOperationalState = M2UASGASPOPERATIONALSTATE_DISABLED;
 
 	}
 	DEBUGMSGTL(("m2uaMIB", "done.\n"));
@@ -2160,6 +2179,7 @@ store_m2uaSgAspTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaSgAspTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaSgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaAspIndex, &tmpsize);
@@ -2194,10 +2214,10 @@ m2uaSgAspAsTable_create(void)
 		StorageNew->m2uaSgIndex = 0;
 		StorageNew->m2uaAspIndex = 0;
 		StorageNew->m2uaAsIndex = 0;
-		StorageNew->m2uaSgAspAsRegistrationRequired = 0;
+		StorageNew->m2uaSgAspAsRegistrationRequired = M2UASGASPASREGISTRATIONREQUIRED_FORBIDDEN;
 		StorageNew->m2uaSgAspAsState = 0;
-		StorageNew->m2uaSgAspAsAdministrativeState = 0;
-		StorageNew->m2uaSgAspAsOperationalState = 0;
+		StorageNew->m2uaSgAspAsAdministrativeState = M2UASGASPASADMINISTRATIVESTATE_LOCKED;
+		StorageNew->m2uaSgAspAsOperationalState = M2UASGASPASOPERATIONALSTATE_DISABLED;
 
 	}
 	DEBUGMSGTL(("m2uaMIB", "done.\n"));
@@ -2369,6 +2389,7 @@ store_m2uaSgAspAsTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaSgAspAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaSgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaAspIndex, &tmpsize);
@@ -2584,6 +2605,7 @@ store_m2uaSgAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaSgAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaSgIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaAsIndex, &tmpsize);
@@ -2693,8 +2715,8 @@ var_m2uaAsTable(struct variable *vp, oid * name, size_t *length, int exact, size
 	case (u_char) M2UAASUSAGESTATE:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->m2uaASUsageState);
-		rval = (u_char *) &StorageTmp->m2uaASUsageState;
+		*var_len = sizeof(StorageTmp->m2uaAsUsageState);
+		rval = (u_char *) &StorageTmp->m2uaAsUsageState;
 		break;
 	case (u_char) M2UAASSTATUS:	/* Create */
 		*write_method = write_m2uaAsStatus;
@@ -2933,6 +2955,13 @@ var_m2uaAsIfTable(struct variable *vp, oid * name, size_t *length, int exact, si
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
+	case (u_char) M2UAASIFSTATUS:	/* Create */
+		*write_method = write_m2uaAsIfStatus;
+		if (!StorageTmp)
+			break;
+		*var_len = sizeof(StorageTmp->m2uaAsIfStatus);
+		rval = (u_char *) &StorageTmp->m2uaAsIfStatus;
+		break;
 	default:
 		ERROR_MSG("");
 	}
@@ -3010,21 +3039,21 @@ var_m2uaAspTable(struct variable *vp, oid * name, size_t *length, int exact, siz
 		*var_len = StorageTmp->m2uaAspNameLen;
 		rval = (u_char *) StorageTmp->m2uaAspName;
 		break;
-	case (u_char) M2UASGINDEX:	/* Create */
-		*write_method = write_m2uaSgIndex;
+	case (u_char) M2UASGINDEXSG:	/* Create */
+		*write_method = write_m2uaSgIndexSg;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->m2uaSgIndex);
-		rval = (u_char *) &StorageTmp->m2uaSgIndex;
+		*var_len = sizeof(StorageTmp->m2uaSgIndexSg);
+		rval = (u_char *) &StorageTmp->m2uaSgIndexSg;
 		break;
-	case (u_char) M2UAASPADMINISTRATIVESTATE:	/* ReadWrite */
+	case (u_char) M2UAASPADMINISTRATIVESTATE:	/* Create */
 		*write_method = write_m2uaAspAdministrativeState;
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->m2uaAspAdministrativeState);
 		rval = (u_char *) &StorageTmp->m2uaAspAdministrativeState;
 		break;
-	case (u_char) M2UAASPOPERATIONALSTATE:	/* ReadWrite */
+	case (u_char) M2UAASPOPERATIONALSTATE:	/* Create */
 		*write_method = write_m2uaAspOperationalState;
 		if (!StorageTmp)
 			break;
@@ -3518,14 +3547,14 @@ var_m2uaSgAsTable(struct variable *vp, oid * name, size_t *length, int exact, si
 		*var_len = StorageTmp->m2uaSgAsTrafficModeLen * sizeof(oid);
 		rval = (u_char *) StorageTmp->m2uaSgAsTrafficMode;
 		break;
-	case (u_char) M2UASGASSTATE:	/* ReadWrite */
+	case (u_char) M2UASGASSTATE:	/* Create */
 		*write_method = write_m2uaSgAsState;
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->m2uaSgAsState);
 		rval = (u_char *) &StorageTmp->m2uaSgAsState;
 		break;
-	case (u_char) M2UASGASADMINISTRATIVESTATE:	/* ReadWrite */
+	case (u_char) M2UASGASADMINISTRATIVESTATE:	/* Create */
 		*write_method = write_m2uaSgAsAdministrativeState;
 		if (!StorageTmp)
 			break;
@@ -3862,10 +3891,10 @@ write_m2uaIfAsIndex(int action, u_char *var_val, u_char var_val_type, size_t var
 int
 write_m2uaIfIdNum(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static long old_value;
+	static ulong old_value;
 	struct m2uaIfTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
-	long set_value = *((long *) var_val);
+	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("m2uaMIB", "write_m2uaIfIdNum entering action=%d...  \n", action));
 	StorageTmp = header_complex(m2uaIfTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
@@ -3884,16 +3913,16 @@ write_m2uaIfIdNum(int action, u_char *var_val, u_char var_val_type, size_t var_v
 				break;
 			}
 		}
-		if (var_val_type != ASN_INTEGER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaIfIdNum not ASN_INTEGER\n");
+		if (var_val_type != ASN_UNSIGNED) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaIfIdNum not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (var_val_len > sizeof(int32_t)) {
+		if (var_val_len > sizeof(uint32_t)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaIfIdNum: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: ranges 1..2147483647 */
-		if ((1 > set_value || set_value > 2147483647)) {
+		/* Note: ranges 1..-1 */
+		if ((1 > set_value || set_value > -1)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaIfIdNum: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -4041,7 +4070,7 @@ write_m2uaIfAdministrativeState(int action, u_char *var_val, u_char var_val_type
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaIfAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
 		case M2UAIFADMINISTRATIVESTATE_LOCKED:
 		case M2UAIFADMINISTRATIVESTATE_UNLOCKED:
@@ -4118,7 +4147,6 @@ write_m2uaIfEquipment(int action, u_char *var_val, u_char var_val_type, size_t v
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaIfEquipment: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
@@ -4193,7 +4221,7 @@ write_m2uaIfMaxSifSize(int action, u_char *var_val, u_char var_val_type, size_t 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaIfMaxSifSize: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 272 */
+		/* Note: default value lsl */
 		switch (set_value) {
 		case M2UAIFMAXSIFSIZE_LSL:
 		case M2UAIFMAXSIFSIZE_HSL:
@@ -4268,7 +4296,7 @@ write_m2uaIfTransmissionRate(int action, u_char *var_val, u_char var_val_type, s
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaIfTransmissionRate: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 3 */
+		/* Note: default value ds0 */
 		switch (set_value) {
 		case M2UAIFTRANSMISSIONRATE_UNKNOWN:
 		case M2UAIFTRANSMISSIONRATE_MODEM:
@@ -4348,8 +4376,8 @@ write_m2uaIfCic(int action, u_char *var_val, u_char var_val_type, size_t var_val
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
-		/* Note: ranges 0..16383 */
-		if ((0 > set_value || set_value > 16383)) {
+		/* Note: ranges 0..65535 */
+		if ((0 > set_value || set_value > 65535)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaIfCic: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -4375,7 +4403,7 @@ write_m2uaIfCic(int action, u_char *var_val, u_char var_val_type, size_t var_val
 }
 
 /**
- * @fn int write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @fn int write_m2uaSgIndexSg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
  * @param var_val_type the ASN type.
@@ -4386,14 +4414,14 @@ write_m2uaIfCic(int action, u_char *var_val, u_char var_val_type, size_t var_val
  * @brief Table row and column write routine.
  */
 int
-write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+write_m2uaSgIndexSg(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
 	static ulong old_value;
 	struct m2uaAspTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 16;
 	ulong set_value = *((ulong *) var_val);
 
-	DEBUGMSGTL(("m2uaMIB", "write_m2uaSgIndex entering action=%d...  \n", action));
+	DEBUGMSGTL(("m2uaMIB", "write_m2uaSgIndexSg entering action=%d...  \n", action));
 	StorageTmp = header_complex(m2uaAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
@@ -4402,7 +4430,7 @@ write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			switch (StorageTmp->m2uaAspRowStatus) {
 			case RS_ACTIVE:
 				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex: but column non-existent\n");
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndexSg: but column non-existent\n");
 				return SNMP_ERR_INCONSISTENTVALUE;
 			case RS_NOTINSERVICE:
 			case RS_NOTREADY:
@@ -4411,27 +4439,27 @@ write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_v
 			}
 		}
 		if (var_val_type != ASN_UNSIGNED) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex not ASN_UNSIGNED\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndexSg not ASN_UNSIGNED\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex: bad length\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndexSg: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->m2uaSgIndex for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
+	case ACTION:		/* The variable has been stored in StorageTmp->m2uaSgIndexSg for you to use, and you have just been asked to do something with it.  Note that anything done here must
+				   be reversable in the UNDO case */
 		if (StorageTmp == NULL)
 			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2uaSgIndex;
-		StorageTmp->m2uaSgIndex = set_value;
+		old_value = StorageTmp->m2uaSgIndexSg;
+		StorageTmp->m2uaSgIndexSg = set_value;
 		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2uaSgIndex = old_value;
+		StorageTmp->m2uaSgIndexSg = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -4483,7 +4511,7 @@ write_m2uaAspAdministrativeState(int action, u_char *var_val, u_char var_val_typ
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaAspAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
 		case M2UAASPADMINISTRATIVESTATE_LOCKED:
 		case M2UAASPADMINISTRATIVESTATE_UNLOCKED:
@@ -4558,7 +4586,7 @@ write_m2uaAspOperationalState(int action, u_char *var_val, u_char var_val_type, 
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaAspOperationalState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value disabled */
 		switch (set_value) {
 		case M2UAASPOPERATIONALSTATE_DISABLED:
 		case M2UAASPOPERATIONALSTATE_ENABLED:
@@ -4581,58 +4609,6 @@ write_m2uaAspOperationalState(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaAspOperationalState = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static ulong old_value;
-	struct m2uaAspSgTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	ulong set_value = *((ulong *) var_val);
-
-	DEBUGMSGTL(("m2uaMIB", "write_m2uaSgIndex entering action=%d...  \n", action));
-	StorageTmp = header_complex(m2uaAspSgTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->m2uaSgIndex for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
-		old_value = StorageTmp->m2uaSgIndex;
-		StorageTmp->m2uaSgIndex = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2uaSgIndex = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -4726,8 +4702,8 @@ write_m2uaAspSgAspPort(int action, u_char *var_val, u_char var_val_type, size_t 
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
-		/* Note: ranges 2..2 */
-		if (set_value != 2) {
+		/* Note: ranges 0..65535 */
+		if ((0 > set_value || set_value > 65535)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaAspSgAspPort: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -4783,7 +4759,7 @@ write_m2uaAspSgAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaAspSgAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
 		case M2UAASPSGADMINISTRATIVESTATE_LOCKED:
 		case M2UAASPSGADMINISTRATIVESTATE_UNLOCKED:
@@ -4892,58 +4868,6 @@ write_m2uaSgName(int action, u_char *var_val, u_char var_val_type, size_t var_va
 }
 
 /**
- * @fn int write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static ulong old_value;
-	struct m2uaSgAspTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	ulong set_value = *((ulong *) var_val);
-
-	DEBUGMSGTL(("m2uaMIB", "write_m2uaSgIndex entering action=%d...  \n", action));
-	StorageTmp = header_complex(m2uaSgAspTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->m2uaSgIndex for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
-		old_value = StorageTmp->m2uaSgIndex;
-		StorageTmp->m2uaSgIndex = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2uaSgIndex = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
  * @fn int write_m2uaSgAspId(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
  * @param action the stage of the SET operation.
  * @param var_val pointer to the varbind value.
@@ -5029,8 +4953,8 @@ write_m2uaSgAspPort(int action, u_char *var_val, u_char var_val_type, size_t var
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		/* Note: default value 0 */
-		/* Note: ranges 2..2 */
-		if (set_value != 2) {
+		/* Note: ranges 0..65535 */
+		if ((0 > set_value || set_value > 65535)) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgAspPort: bad value\n");
 			return SNMP_ERR_WRONGVALUE;
 		}
@@ -5086,7 +5010,7 @@ write_m2uaSgAspAdministrativeState(int action, u_char *var_val, u_char var_val_t
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgAspAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
 		case M2UASGASPADMINISTRATIVESTATE_LOCKED:
 		case M2UASGASPADMINISTRATIVESTATE_UNLOCKED:
@@ -5108,58 +5032,6 @@ write_m2uaSgAspAdministrativeState(int action, u_char *var_val, u_char var_val_t
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgAspAdministrativeState = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static ulong old_value;
-	struct m2uaSgAspAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	ulong set_value = *((ulong *) var_val);
-
-	DEBUGMSGTL(("m2uaMIB", "write_m2uaSgIndex entering action=%d...  \n", action));
-	StorageTmp = header_complex(m2uaSgAspAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->m2uaSgIndex for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
-		old_value = StorageTmp->m2uaSgIndex;
-		StorageTmp->m2uaSgIndex = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2uaSgIndex = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -5200,7 +5072,7 @@ write_m2uaSgAspAsRegistrationRequired(int action, u_char *var_val, u_char var_va
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgAspAsRegistrationRequired: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value forbidden */
 		switch (set_value) {
 		case M2UASGASPASREGISTRATIONREQUIRED_UNKNOWN:
 		case M2UASGASPASREGISTRATIONREQUIRED_FORBIDDEN:
@@ -5263,7 +5135,7 @@ write_m2uaSgAspAsAdministrativeState(int action, u_char *var_val, u_char var_val
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgAspAsAdministrativeState: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value 0 */
+		/* Note: default value locked */
 		switch (set_value) {
 		case M2UASGASPASADMINISTRATIVESTATE_LOCKED:
 		case M2UASGASPASADMINISTRATIVESTATE_UNLOCKED:
@@ -5285,71 +5157,6 @@ write_m2uaSgAspAsAdministrativeState(int action, u_char *var_val, u_char var_val
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->m2uaSgAspAsAdministrativeState = old_value;
-		/* fall through */
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_m2uaSgIndex(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static ulong old_value;
-	struct m2uaSgAsTable_data *StorageTmp = NULL;
-	size_t newlen = name_len - 16;
-	ulong set_value = *((ulong *) var_val);
-
-	DEBUGMSGTL(("m2uaMIB", "write_m2uaSgIndex entering action=%d...  \n", action));
-	StorageTmp = header_complex(m2uaSgAsTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
-	switch (action) {
-	case RESERVE1:
-		if (StorageTmp != NULL && statP == NULL) {
-			/* have row but no column */
-			switch (StorageTmp->m2uaSgAsRowStatus) {
-			case RS_ACTIVE:
-				/* cannot create non-existent column while active */
-				snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex: but column non-existent\n");
-				return SNMP_ERR_INCONSISTENTVALUE;
-			case RS_NOTINSERVICE:
-			case RS_NOTREADY:
-				/* assume column can be created */
-				break;
-			}
-		}
-		if (var_val_type != ASN_UNSIGNED) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex not ASN_UNSIGNED\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(uint32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaSgIndex: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->m2uaSgIndex for you to use, and you have just been asked to do something with it.  Note that anything done here must be
-				   reversable in the UNDO case */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		old_value = StorageTmp->m2uaSgIndex;
-		StorageTmp->m2uaSgIndex = set_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->m2uaSgIndex = old_value;
 		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
 		break;
@@ -6166,6 +5973,233 @@ write_m2uaIfRowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* row deletion, so add it again */
 			if (StorageDel)
 				m2uaIfTable_add(StorageDel);
+			break;
+		}
+		break;
+	}
+	return SNMP_ERR_NOERROR;
+}
+
+/**
+ * @fn int write_m2uaAsIfStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
+ * @param action the stage of the SET operation.
+ * @param var_val pointer to the varbind value.
+ * @param var_val_type the ASN type.
+ * @param var_val_len the length of the varbind value.
+ * @param statP static pointer.
+ * @param name the varbind OID.
+ * @param name_len number of elements in OID.
+ * @brief Row status write routine.
+ */
+int
+write_m2uaAsIfStatus(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
+{
+	struct m2uaAsIfTable_data *StorageTmp = NULL;
+	static struct m2uaAsIfTable_data *StorageNew, *StorageDel;
+	size_t newlen = name_len - 16;
+	static int old_value;
+	int set_value, ret;
+	static struct variable_list *vars, *vp;
+
+	DEBUGMSGTL(("m2uaMIB", "write_m2uaAsIfStatus entering action=%d...  \n", action));
+	StorageTmp = header_complex(m2uaAsIfTableStorage, NULL, &name[16], &newlen, 1, NULL, NULL);
+	if (var_val_type != ASN_INTEGER || var_val == NULL) {
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaAsIfStatus not ASN_INTEGER\n");
+		return SNMP_ERR_WRONGTYPE;
+	}
+	set_value = *((long *) var_val);
+	/* check legal range, and notReady is reserved for us, not a user */
+	if (set_value < 1 || set_value > 6 || set_value == RS_NOTREADY) {
+		snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2uaAsIfStatus: bad value\n");
+		return SNMP_ERR_WRONGVALUE;
+	}
+	switch (action) {
+	case RESERVE1:
+		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			if (StorageTmp != NULL)
+				/* cannot create existing row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			if (StorageTmp == NULL)
+				/* cannot change state of non-existent row */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			if (StorageTmp->m2uaAsIfStatus == RS_NOTREADY)
+				/* cannot change state of row that is not ready */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			/* XXX: interaction with row storage type needed */
+			if (set_value == RS_NOTINSERVICE && StorageTmp->m2uaAsIfTable_refs > 0)
+				/* row is busy and cannot be moved to the RS_NOTINSERVICE state */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_DESTROY:
+			/* destroying existent or non-existent row is ok */
+			if (StorageTmp == NULL)
+				break;
+			/* XXX: interaction with row storage type needed */
+			if (StorageTmp->m2uaAsIfTable_refs > 0)
+				/* row is busy and cannot be deleted */
+				return SNMP_ERR_INCONSISTENTVALUE;
+			break;
+		case RS_NOTREADY:
+			/* management station cannot set this, only agent can */
+		default:
+			return SNMP_ERR_INCONSISTENTVALUE;
+		}
+		break;
+	case RESERVE2:
+		/* memory reseveration, final preparation... */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			vars = NULL;
+			/* m2uaAsIndex */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			/* m2uaIfIndex */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_UNSIGNED, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			if (header_complex_parse_oid(&(name[16]), newlen, vars) != SNMPERR_SUCCESS) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vars;
+			/* m2uaAsIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m2uaAsIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			/* m2uaIfIndex */
+			if (vp->val_len > sizeof(uint32_t)) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index m2uaIfIndex: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
+			if ((StorageNew = m2uaAsIfTable_create()) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
+			vp = vars;
+			StorageNew->m2uaAsIndex = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			StorageNew->m2uaIfIndex = (ulong) *vp->val.integer;
+			vp = vp->next_variable;
+			header_complex_add_data(&m2uaAsIfTableStorage, vars, StorageNew);	/* frees vars */
+			break;
+		case RS_DESTROY:
+			/* destroy */
+			if (StorageTmp != NULL) {
+				/* exists, extract it for now */
+				StorageDel = StorageTmp;
+				m2uaAsIfTable_del(StorageDel);
+			} else {
+				StorageDel = NULL;
+			}
+			break;
+		}
+		break;
+	case ACTION:
+		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = m2uaAsIfTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
+		case RS_ACTIVE:
+			old_value = StorageTmp->m2uaAsIfStatus;
+			StorageTmp->m2uaAsIfStatus = set_value;
+			if (old_value != RS_ACTIVE) {
+				/* check that activation is possible */
+				if ((ret = m2uaAsIfTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
+					StorageTmp->m2uaAsIfStatus = old_value;
+					return (ret);
+				}
+			}
+			break;
+		case RS_NOTINSERVICE:
+			/* set the flag? */
+			old_value = StorageTmp->m2uaAsIfStatus;
+			StorageTmp->m2uaAsIfStatus = set_value;
+			break;
+		}
+		break;
+	case COMMIT:
+		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* row creation, set final state */
+			/* XXX: commit creation to underlying device */
+			/* XXX: activate with underlying device */
+			StorageNew->m2uaAsIfStatus = RS_ACTIVE;
+			break;
+		case RS_CREATEANDWAIT:
+			/* row creation, set final state */
+			StorageNew->m2uaAsIfStatus = RS_NOTINSERVICE;
+			break;
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* state change already performed */
+			if (old_value != set_value) {
+				switch (set_value) {
+				case RS_ACTIVE:
+					/* XXX: activate with underlying device */
+					break;
+				case RS_NOTINSERVICE:
+					/* XXX: deactivate with underlying device */
+					break;
+				}
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, free it its dead */
+			m2uaAsIfTable_destroy(&StorageDel);
+			/* m2uaAsIfTable_destroy() can handle NULL pointers. */
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->m2uaAsIfStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				m2uaAsIfTable_del(StorageNew);
+				m2uaAsIfTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				m2uaAsIfTable_add(StorageDel);
 			break;
 		}
 		break;
