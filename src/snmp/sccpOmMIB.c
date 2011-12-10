@@ -938,6 +938,7 @@ store_sccpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "sccpOmMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpOm1stAndIntervalActivate, &StorageTmp->sccpOm1stAndIntervalActivateLen);
 		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->sccpOm1stAndIntervalDeactivate, &StorageTmp->sccpOm1stAndIntervalDeactivateLen);
@@ -1356,6 +1357,7 @@ store_sccpOmErrorsTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpOmErrorsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sccpOmNoTranslatorForAddress, &tmpsize);
@@ -1624,6 +1626,7 @@ store_sccpOmMessageTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpOmMessageTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sccpOmTotalMessagesHandled, &tmpsize);
@@ -1854,6 +1857,7 @@ store_sccpOmAccessibilityTable(int majorID, int minorID, void *serverarg, void *
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpOmAccessibilityTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->sccpOmSSCMessageReceived, &tmpsize);
@@ -2083,6 +2087,7 @@ store_sccpOmUtilizationTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpOmUtilizationTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpOmSsn, &tmpsize);
@@ -2387,6 +2392,7 @@ store_sccpOm5MinHistoryTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpOm5MinHistoryTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpOmInterval, &tmpsize);
@@ -2723,6 +2729,7 @@ store_sccpOm15MinHistoryTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpOm15MinHistoryTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpOmInterval, &tmpsize);
@@ -2994,6 +3001,7 @@ store_sccpOm5MinSsnHistoryTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpOm5MinSsnHistoryTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpOmSsn, &tmpsize);
@@ -3232,6 +3240,7 @@ store_sccpOm15MinSsnHistoryTable(int majorID, int minorID, void *serverarg, void
 			memset(line, 0, sizeof(line));
 			strcat(line, "sccpOm15MinSsnHistoryTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sccpNetworkEntityId, &StorageTmp->sccpNetworkEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->sccpOmSsn, &tmpsize);

@@ -460,6 +460,7 @@ store_sigtranMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "sigtranMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sigtranSctpProfileNextIndex, &tmpsize);
 		snmpd_store_config(line);
@@ -780,6 +781,7 @@ store_sigtranSctpProfileTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "sigtranSctpProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->sigtranSctpProfileIndex, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->sigtranSctpProfileName, &StorageTmp->sigtranSctpProfileNameLen);

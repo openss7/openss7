@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -197,6 +197,9 @@ extern oid strExtStrlogInteger128_oid[13];
 extern oid strExtStrlogUnsigned128_oid[13];
 
 /* object id definitions */
+extern oid strExtNotificationGroup_oid[12];
+extern oid strExtMandatoryGroup_oid[12];
+extern oid strExtMIBCompliance_oid[12];
 
 /* function prototypes */
 /* trap function prototypes */

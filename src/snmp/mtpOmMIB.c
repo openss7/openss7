@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -222,7 +222,8 @@ oid mtpOmRsSiTable_variables_oid[15] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 1, 1,
 /*
  * Other oids defined in this MIB.
  */
-
+oid mtpOmGeneralCompliance_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 1, 2, 1, 1 };
+oid mtpOmObjectGroup_oid[13] = { 1, 3, 6, 1, 4, 1, 29591, 17, 752, 1, 2, 2, 1 };
 static oid zeroDotZero_oid[2] = { 0, 0 };
 static oid snmpTrapOID_oid[11] = { 1, 3, 6, 1, 6, 3, 1, 1, 4, 1, 0 };
 
@@ -379,7 +380,7 @@ struct variable7 mtpOmMIB_variables[] = {
 #define   MTPOMRSSITRANSMITTEDMSUSDPCSIO  73
 	{(u_char) MTPOMRSSITRANSMITTEDMSUSDPCSIO, ASN_COUNTER, RONLY, var_mtpOmRsSiTable, 6, {1, 1, 2, 4, 1, 7}},
 #define   MTPOMRSSISTATUS       74
-	{(u_char) MTPOMRSSISTATUS, ASN_INTEGER, RONLY, var_mtpOmRsSiTable, 6, {1, 1, 2, 4, 1, 8}},
+	{(u_char) MTPOMRSSISTATUS, ASN_INTEGER, RWRITE, var_mtpOmRsSiTable, 6, {1, 1, 2, 4, 1, 8}},
 #define   MTPOMRSSIINT5MINTIMESTAMP  75
 	{(u_char) MTPOMRSSIINT5MINTIMESTAMP, ASN_TIMETICKS, RONLY, var_mtpOmRsSiInt5minTable, 6, {1, 1, 2, 5, 1, 2}},
 #define   MTPOMRSSIINT5MINRECEIVEDOCTETSOPCSIO  76
@@ -1054,6 +1055,42 @@ parse_mtpOmMIB(const char *token, char *line)
 		return;
 	}
 	/* XXX: remove individual scalars that are not persistent */
+	SNMP_FREE(StorageTmp->mtpOm1stAndIntervalActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mtpOm1stAndIntervalActivate, &StorageTmp->mtpOm1stAndIntervalActivateLen);
+	if (StorageTmp->mtpOm1stAndIntervalActivate == NULL) {
+		config_perror("invalid specification for mtpOm1stAndIntervalActivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->mtpOm1stAndIntervalDeactivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mtpOm1stAndIntervalDeactivate, &StorageTmp->mtpOm1stAndIntervalDeactivateLen);
+	if (StorageTmp->mtpOm1stAndIntervalDeactivate == NULL) {
+		config_perror("invalid specification for mtpOm1stAndIntervalDeactivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->mtpOm5MinActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mtpOm5MinActivate, &StorageTmp->mtpOm5MinActivateLen);
+	if (StorageTmp->mtpOm5MinActivate == NULL) {
+		config_perror("invalid specification for mtpOm5MinActivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->mtpOm5MinDeaActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mtpOm5MinDeaActivate, &StorageTmp->mtpOm5MinDeaActivateLen);
+	if (StorageTmp->mtpOm5MinDeaActivate == NULL) {
+		config_perror("invalid specification for mtpOm5MinDeaActivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->mtpOm15MinActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mtpOm15MinActivate, &StorageTmp->mtpOm15MinActivateLen);
+	if (StorageTmp->mtpOm15MinActivate == NULL) {
+		config_perror("invalid specification for mtpOm15MinActivate");
+		return;
+	}
+	SNMP_FREE(StorageTmp->mtpOm15MinDeaActivate);
+	line = read_config_read_data(ASN_OBJECT_ID, line, &StorageTmp->mtpOm15MinDeaActivate, &StorageTmp->mtpOm15MinDeaActivateLen);
+	if (StorageTmp->mtpOm15MinDeaActivate == NULL) {
+		config_perror("invalid specification for mtpOm15MinDeaActivate");
+		return;
+	}
 	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->mtpOmDiscontinuityTime, &tmpsize);
 	line = read_config_read_data(ASN_TIMETICKS, line, &StorageTmp->mtpOmTimeStamp, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->mtpOm5MinMaxIntervals, &tmpsize);
@@ -1086,7 +1123,14 @@ store_mtpOmMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "mtpOmMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mtpOm1stAndIntervalActivate, &StorageTmp->mtpOm1stAndIntervalActivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mtpOm1stAndIntervalDeactivate, &StorageTmp->mtpOm1stAndIntervalDeactivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mtpOm5MinActivate, &StorageTmp->mtpOm5MinActivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mtpOm5MinDeaActivate, &StorageTmp->mtpOm5MinDeaActivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mtpOm15MinActivate, &StorageTmp->mtpOm15MinActivateLen);
+		cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mtpOm15MinDeaActivate, &StorageTmp->mtpOm15MinDeaActivateLen);
 		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->mtpOmDiscontinuityTime, &tmpsize);
 		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->mtpOmTimeStamp, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpOm5MinMaxIntervals, &tmpsize);
@@ -1164,23 +1208,47 @@ var_mtpOmMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t 
 	rval = NULL;
 	/* This is where we do the value assignments for the mib results. */
 	switch (vp->magic) {
-	case (u_char) MTPOM1STANDINTERVALACTIVATE:	/* WriteOnly */
+	case (u_char) MTPOM1STANDINTERVALACTIVATE:	/* ReadWrite */
 		*write_method = write_mtpOm1stAndIntervalActivate;
+		if (!StorageTmp)
 		break;
-	case (u_char) MTPOM1STANDINTERVALDEACTIVATE:	/* WriteOnly */
+		*var_len = StorageTmp->mtpOm1stAndIntervalActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->mtpOm1stAndIntervalActivate;
+		break;
+	case (u_char) MTPOM1STANDINTERVALDEACTIVATE:	/* ReadWrite */
 		*write_method = write_mtpOm1stAndIntervalDeactivate;
+		if (!StorageTmp)
 		break;
-	case (u_char) MTPOM5MINACTIVATE:	/* WriteOnly */
+		*var_len = StorageTmp->mtpOm1stAndIntervalDeactivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->mtpOm1stAndIntervalDeactivate;
+		break;
+	case (u_char) MTPOM5MINACTIVATE:	/* ReadWrite */
 		*write_method = write_mtpOm5MinActivate;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->mtpOm5MinActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->mtpOm5MinActivate;
 		break;
-	case (u_char) MTPOM5MINDEAACTIVATE:	/* WriteOnly */
+	case (u_char) MTPOM5MINDEAACTIVATE:	/* ReadWrite */
 		*write_method = write_mtpOm5MinDeaActivate;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->mtpOm5MinDeaActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->mtpOm5MinDeaActivate;
 		break;
-	case (u_char) MTPOM15MINACTIVATE:	/* WriteOnly */
+	case (u_char) MTPOM15MINACTIVATE:	/* ReadWrite */
 		*write_method = write_mtpOm15MinActivate;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->mtpOm15MinActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->mtpOm15MinActivate;
 		break;
-	case (u_char) MTPOM15MINDEAACTIVATE:	/* WriteOnly */
+	case (u_char) MTPOM15MINDEAACTIVATE:	/* ReadWrite */
 		*write_method = write_mtpOm15MinDeaActivate;
+		if (!StorageTmp)
+			break;
+		*var_len = StorageTmp->mtpOm15MinDeaActivateLen * sizeof(oid);
+		rval = (u_char *) StorageTmp->mtpOm15MinDeaActivate;
 		break;
 	case (u_char) MTPOMDISCONTINUITYTIME:	/* ReadOnly */
 		if (!StorageTmp)
@@ -1410,6 +1478,7 @@ store_mtpOmSpTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpOmSpValidIntervals, &tmpsize);
@@ -1619,6 +1688,7 @@ store_mtpOmSpInt5minTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpInt5minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpOmSpInt5minInterval, &tmpsize);
@@ -1828,6 +1898,7 @@ store_mtpOmSpInt15minTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpInt15minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpOmSpInt15minInterval, &tmpsize);
@@ -2037,6 +2108,7 @@ store_mtpOmSpSiTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpSiTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpOmSpSiCode, &tmpsize);
@@ -2246,6 +2318,7 @@ store_mtpOmSpSiInt5minTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpSiInt5minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpOmSpSiCode, &tmpsize);
@@ -2454,6 +2527,7 @@ store_mtpOmSpSiInt15minTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpSiInt15minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpOmSpSiCode, &tmpsize);
@@ -2656,6 +2730,7 @@ store_mtpOmSpStudyTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpStudyTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpOmSpStudyId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpOmSpStudyValidIntervals, &tmpsize);
@@ -2857,6 +2932,7 @@ store_mtpOmSpStudyInt5minTable(int majorID, int minorID, void *serverarg, void *
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpStudyInt5minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpOmSpStudyId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpOmSpStudyInt5minInterval, &tmpsize);
@@ -3057,6 +3133,7 @@ store_mtpOmSpStudyInt15minTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpStudyInt15minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpOmSpStudyId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpOmSpStudyInt15minInterval, &tmpsize);
@@ -3264,6 +3341,7 @@ store_mtpOmSpStudyMapTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSpStudyMapTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mtpOmSpSiCode, &tmpsize);
@@ -3476,6 +3554,7 @@ store_mtpOmRsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmRsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpRsId, &tmpsize);
@@ -3693,6 +3772,7 @@ store_mtpOmRsInt5minTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmRsInt5minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpRsId, &tmpsize);
@@ -3910,6 +3990,7 @@ store_mtpOmRsInt15minTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmRsInt15minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpRsId, &tmpsize);
@@ -4127,6 +4208,7 @@ store_mtpOmRsSiTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmRsSiTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpRsId, &tmpsize);
@@ -4344,6 +4426,7 @@ store_mtpOmRsSiInt5minTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmRsSiInt5minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpRsId, &tmpsize);
@@ -4560,6 +4643,7 @@ store_mtpOmRsSiInt15minTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmRsSiInt15minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpRsId, &tmpsize);
@@ -4769,6 +4853,7 @@ store_mtpOmLsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmLsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpLsId, &tmpsize);
@@ -4977,6 +5062,7 @@ store_mtpOmLsInt5minTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmLsInt5minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpLsId, &tmpsize);
@@ -5185,6 +5271,7 @@ store_mtpOmLsInt15minTable(int majorID, int minorID, void *serverarg, void *clie
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmLsInt15minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpLsId, &tmpsize);
@@ -5438,6 +5525,7 @@ store_mtpOmSlStatsTable(int majorID, int minorID, void *serverarg, void *clienta
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSlStatsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -5696,6 +5784,7 @@ store_mtpOmSlL3Table(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSlL3Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpLsId, &tmpsize);
@@ -5948,6 +6037,7 @@ store_mtpOmSlL3Int5minTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSlL3Int5minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpLsId, &tmpsize);
@@ -6200,6 +6290,7 @@ store_mtpOmSlL3Int15minTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSlL3Int15minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpLsId, &tmpsize);
@@ -6437,6 +6528,7 @@ store_mtpOmSlL2Table(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSlL2Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpLsId, &tmpsize);
@@ -6668,6 +6760,7 @@ store_mtpOmSlL2Int5minTable(int majorID, int minorID, void *serverarg, void *cli
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSlL2Int5minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpLsId, &tmpsize);
@@ -6899,6 +6992,7 @@ store_mtpOmSlL2Int15minTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSlL2Int15minTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpLsId, &tmpsize);
@@ -7151,6 +7245,7 @@ store_mtpOmSdtStatsTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSdtStatsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSdtId, &tmpsize);
@@ -7399,6 +7494,7 @@ store_mtpOmSdlStatsTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "mtpOmSdlStatsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpMsId, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->mtpSpId, &tmpsize);
@@ -8851,7 +8947,8 @@ var_mtpOmRsSiTable(struct variable *vp, oid * name, size_t *length, int exact, s
 		*var_len = sizeof(StorageTmp->mtpOmRsSiTransmittedMSUsDpcSio);
 		rval = (u_char *) &StorageTmp->mtpOmRsSiTransmittedMSUsDpcSio;
 		break;
-	case (u_char) MTPOMRSSISTATUS:	/* ReadOnly */
+	case (u_char) MTPOMRSSISTATUS:	/* Create */
+		*write_method = write_mtpOmRsSiStatus;
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->mtpOmRsSiStatus);

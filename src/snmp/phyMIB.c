@@ -802,6 +802,7 @@ store_physicalEntityTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "physicalEntityTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->physicalEntityId, &StorageTmp->physicalEntityIdLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->physicalEntityLocalSapNames, &StorageTmp->physicalEntityLocalSapNamesLen);
@@ -1024,6 +1025,7 @@ store_physicalSAPTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "physicalSAPTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->physicalEntityId, &StorageTmp->physicalEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->physicalSAPsapId, &StorageTmp->physicalSAPsapIdLen);
@@ -1309,6 +1311,7 @@ store_dataCircuitTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "dataCircuitTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->physicalEntityId, &StorageTmp->physicalEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dataCircuitCoProtocolMachineId, &StorageTmp->dataCircuitCoProtocolMachineIdLen);
@@ -1574,6 +1577,7 @@ store_physicalConnectionTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "physicalConnectionTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->physicalEntityId, &StorageTmp->physicalEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dataCircuitCoProtocolMachineId, &StorageTmp->dataCircuitCoProtocolMachineIdLen);

@@ -814,6 +814,7 @@ store_ss7NetworkTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "ss7NetworkTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->ss7NetworkId, &tmpsize);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->ss7NetworkProtocolVariant, &StorageTmp->ss7NetworkProtocolVariantLen);

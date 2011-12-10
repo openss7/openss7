@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -105,7 +105,7 @@ struct applicationProcessTable_data {
 	size_t applicationProcessTitleLen;
 	uint8_t *supportEntityNames;	/* ReadOnly */
 	size_t supportEntityNamesLen;
-	long applicationProcessOperationalState;	/* ReadOnly */
+	long applicationProcessOpState;	/* ReadOnly */
 };
 struct communicationsEntityTable_data {
 	uint communicationsEntityTable_request;
@@ -116,11 +116,11 @@ struct communicationsEntityTable_data {
 	size_t communicationsEntityIdLen;
 	uint8_t *localSapNames;		/* ReadOnly */
 	size_t localSapNamesLen;
-	long communicationsEntityOperationalState;	/* ReadOnly */
+	long communicationsEntityOpState;	/* ReadOnly */
 };
-struct communicationsInformationRecordTable_data {
-	uint communicationsInformationRecordTable_request;
-	uint communicationsInformationRecordTable_refs;
+struct communicationsInfoRecordTable_data {
+	uint communicationsInfoRecordTable_request;
+	uint communicationsInfoRecordTable_refs;
 	uint8_t *logId;			/* NoAccess */
 	size_t logIdLen;
 	uint8_t *logRecordId;		/* NoAccess */
@@ -139,7 +139,7 @@ struct clProtocolMachineTable_data {
 	size_t communicationsEntityIdLen;
 	uint8_t *clProtocolMachineId;	/* NoAccess */
 	size_t clProtocolMachineIdLen;
-	long clProtocolMachineOperationalState;	/* ReadOnly */
+	long clProtocolMachineOpState;	/* ReadOnly */
 	struct counter64 totalRemoteSAPs;	/* ReadOnly */
 };
 struct coProtocolMachineTable_data {
@@ -151,7 +151,7 @@ struct coProtocolMachineTable_data {
 	size_t communicationsEntityIdLen;
 	uint8_t *coProtocolMachineId;	/* NoAccess */
 	size_t coProtocolMachineIdLen;
-	long coProtocolMachineOperationalState;	/* ReadOnly */
+	long coProtocolMachineOpState;	/* ReadOnly */
 };
 struct sap1Table_data {
 	uint sap1Table_request;
@@ -207,7 +207,7 @@ struct subsystemTable_data {
 extern struct gmiMIB_data *gmiMIBStorage;
 extern struct header_complex_index *applicationProcessTableStorage;
 extern struct header_complex_index *communicationsEntityTableStorage;
-extern struct header_complex_index *communicationsInformationRecordTableStorage;
+extern struct header_complex_index *communicationsInfoRecordTableStorage;
 extern struct header_complex_index *clProtocolMachineTableStorage;
 extern struct header_complex_index *coProtocolMachineTableStorage;
 extern struct header_complex_index *sap1TableStorage;
@@ -217,17 +217,17 @@ extern struct header_complex_index *subsystemTableStorage;
 
 /* enum definitions from the covered mib sections */
 
-#define APPLICATIONPROCESSOPERATIONALSTATE_DISABLED 0
-#define APPLICATIONPROCESSOPERATIONALSTATE_ENABLED 1
+#define APPLICATIONPROCESSOPSTATE_DISABLED       0
+#define APPLICATIONPROCESSOPSTATE_ENABLED        1
 
-#define COMMUNICATIONSENTITYOPERATIONALSTATE_DISABLED 0
-#define COMMUNICATIONSENTITYOPERATIONALSTATE_ENABLED 1
+#define COMMUNICATIONSENTITYOPSTATE_DISABLED     0
+#define COMMUNICATIONSENTITYOPSTATE_ENABLED      1
 
-#define CLPROTOCOLMACHINEOPERATIONALSTATE_DISABLED 0
-#define CLPROTOCOLMACHINEOPERATIONALSTATE_ENABLED 1
+#define CLPROTOCOLMACHINEOPSTATE_DISABLED        0
+#define CLPROTOCOLMACHINEOPSTATE_ENABLED         1
 
-#define COPROTOCOLMACHINEOPERATIONALSTATE_DISABLED 0
-#define COPROTOCOLMACHINEOPERATIONALSTATE_ENABLED 1
+#define COPROTOCOLMACHINEOPSTATE_DISABLED        0
+#define COPROTOCOLMACHINEOPSTATE_ENABLED         1
 
 /* notifications */
 extern oid communicationsInformation_oid[12];
@@ -240,7 +240,7 @@ extern oid tmnInformationData_oid[12];
 extern oid communicationsInformationType_oid[12];
 extern oid gmiApplicationProcessP1Package_oid[12];
 extern oid gmiCommunicationsEntityP1Package_oid[12];
-extern oid gmiCommunicationsInformationRecordP1Package_oid[12];
+extern oid gmiCommunicationsInfoRecordP1Pkg_oid[12];
 extern oid gmiInformationDataPackagePackage_oid[12];
 extern oid gmiClProtocolMachineP1Package_oid[12];
 extern oid gmiClProtocolMachineP2Package_oid[12];
@@ -284,15 +284,15 @@ int communicationsEntityTable_del(struct communicationsEntityTable_data *);
 void parse_communicationsEntityTable(const char *, char *);
 SNMPCallback store_communicationsEntityTable;
 void refresh_communicationsEntityTable(int);
-FindVarMethod var_communicationsInformationRecordTable;
-struct communicationsInformationRecordTable_data *communicationsInformationRecordTable_create(void);
-struct communicationsInformationRecordTable_data *communicationsInformationRecordTable_duplicate(struct communicationsInformationRecordTable_data *);
-int communicationsInformationRecordTable_destroy(struct communicationsInformationRecordTable_data **);
-int communicationsInformationRecordTable_add(struct communicationsInformationRecordTable_data *);
-int communicationsInformationRecordTable_del(struct communicationsInformationRecordTable_data *);
-void parse_communicationsInformationRecordTable(const char *, char *);
-SNMPCallback store_communicationsInformationRecordTable;
-void refresh_communicationsInformationRecordTable(int);
+FindVarMethod var_communicationsInfoRecordTable;
+struct communicationsInfoRecordTable_data *communicationsInfoRecordTable_create(void);
+struct communicationsInfoRecordTable_data *communicationsInfoRecordTable_duplicate(struct communicationsInfoRecordTable_data *);
+int communicationsInfoRecordTable_destroy(struct communicationsInfoRecordTable_data **);
+int communicationsInfoRecordTable_add(struct communicationsInfoRecordTable_data *);
+int communicationsInfoRecordTable_del(struct communicationsInfoRecordTable_data *);
+void parse_communicationsInfoRecordTable(const char *, char *);
+SNMPCallback store_communicationsInfoRecordTable;
+void refresh_communicationsInfoRecordTable(int);
 FindVarMethod var_clProtocolMachineTable;
 struct clProtocolMachineTable_data *clProtocolMachineTable_create(void);
 struct clProtocolMachineTable_data *clProtocolMachineTable_duplicate(struct clProtocolMachineTable_data *);

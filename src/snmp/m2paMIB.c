@@ -485,7 +485,7 @@ m2paMIB_create(void)
 		StorageNew->m2paDefaultSctpNoDelay = TV_TRUE;
 		StorageNew->m2paDefaultSctpMaxseg = 65536;
 		StorageNew->m2paDefaultSctpHeartbeatItvl = 6000;
-		StorageNew->m2paDefaultSctpHeartbeat = 0;
+		StorageNew->m2paDefaultSctpHeartbeat = TV_TRUE;
 		StorageNew->m2paDefaultSctpRtoInitial = 300;
 		StorageNew->m2paDefaultSctpRtoMin = 100;
 		StorageNew->m2paDefaultSctpRtoMax = 6000;
@@ -612,6 +612,7 @@ store_m2paMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "m2paMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2paDefaultSctpNoDelay, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2paDefaultSctpMaxseg, &tmpsize);
@@ -1132,6 +1133,7 @@ store_m2paProtocolProfileTable(int majorID, int minorID, void *serverarg, void *
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2paProtocolProfileTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2paProtocolProfileId, &StorageTmp->m2paProtocolProfileIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2paN1, &tmpsize);
@@ -6062,6 +6064,7 @@ write_m2paDefaultSctpHeartbeat(int action, u_char *var_val, u_char var_val_type,
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to m2paDefaultSctpHeartbeat: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
+		/* Note: default value true */
 		switch (set_value) {
 		case TV_TRUE:
 		case TV_FALSE:

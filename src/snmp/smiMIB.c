@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -486,7 +486,7 @@ struct variable7 smiMIB_variables[] = {
 #define   DISCRIMINATOROPERATIONALSTATE  3
 	{(u_char) DISCRIMINATOROPERATIONALSTATE, ASN_INTEGER, RONLY, var_discriminatorTable, 5, {3, 1, 1, 1, 4}},
 #define   DISCRIMINATORAVAILABILITYSTATUS  4
-	{(u_char) DISCRIMINATORAVAILABILITYSTATUS, ASN_BIT_STR, RONLY, var_discriminatorTable, 5, {3, 1, 1, 1, 5}},
+	{(u_char) DISCRIMINATORAVAILABILITYSTATUS, ASN_OCTET_STR, RONLY, var_discriminatorTable, 5, {3, 1, 1, 1, 5}},
 #define   DISCRIMINATORSTARTTIME  5
 	{(u_char) DISCRIMINATORSTARTTIME, ASN_TIMETICKS, RWRITE, var_discriminatorTable, 5, {3, 1, 1, 1, 6}},
 #define   DISCRIMINATORSTOPTIME  6
@@ -516,7 +516,7 @@ struct variable7 smiMIB_variables[] = {
 #define   LOGOPERATIONALSTATE   18
 	{(u_char) LOGOPERATIONALSTATE, ASN_INTEGER, RONLY, var_logTable, 5, {3, 2, 1, 1, 4}},
 #define   LOGAVAILABILITYSTATUS  19
-	{(u_char) LOGAVAILABILITYSTATUS, ASN_BIT_STR, RWRITE, var_logTable, 5, {3, 2, 1, 1, 5}},
+	{(u_char) LOGAVAILABILITYSTATUS, ASN_OCTET_STR, RWRITE, var_logTable, 5, {3, 2, 1, 1, 5}},
 #define   LOGFULLACTION         20
 	{(u_char) LOGFULLACTION, ASN_INTEGER, RWRITE, var_logTable, 5, {3, 2, 1, 1, 6}},
 #define   MAXLOGSIZE            21
@@ -877,6 +877,7 @@ store_smiMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "smiMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		snmpd_store_config(line);
 	}
@@ -1151,7 +1152,7 @@ parse_discriminatorTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->discriminatorAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->discriminatorOperationalState, &tmpsize);
 	SNMP_FREE(StorageTmp->discriminatorAvailabilityStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->discriminatorAvailabilityStatus, &StorageTmp->discriminatorAvailabilityStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->discriminatorAvailabilityStatus, &StorageTmp->discriminatorAvailabilityStatusLen);
 	if (StorageTmp->discriminatorAvailabilityStatus == NULL) {
 		config_perror("invalid specification for discriminatorAvailabilityStatus");
 		return;
@@ -1205,12 +1206,13 @@ store_discriminatorTable(int majorID, int minorID, void *serverarg, void *client
 			memset(line, 0, sizeof(line));
 			strcat(line, "discriminatorTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->discriminatorId, &StorageTmp->discriminatorIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->discriminatorConstruct, &StorageTmp->discriminatorConstructLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->discriminatorAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->discriminatorOperationalState, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->discriminatorAvailabilityStatus, &StorageTmp->discriminatorAvailabilityStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->discriminatorAvailabilityStatus, &StorageTmp->discriminatorAvailabilityStatusLen);
 			cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->discriminatorStartTime, &tmpsize);
 			cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->discriminatorStopTime, &tmpsize);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->discriminatorIntervalsOfDay, &StorageTmp->discriminatorIntervalsOfDayLen);
@@ -1444,6 +1446,7 @@ store_eventForwardingDiscriminatorTable(int majorID, int minorID, void *serverar
 			memset(line, 0, sizeof(line));
 			strcat(line, "eventForwardingDiscriminatorTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->discriminatorId, &StorageTmp->discriminatorIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->destination, &StorageTmp->destinationLen);
@@ -1484,8 +1487,8 @@ logTable_create(void)
 		StorageNew->maxLogSize = 0;
 		StorageNew->currentLogSize = 0;
 		StorageNew->numberOfRecords = 0;
-		if ((StorageNew->capacityAlarmThreshold = (uint8_t *) strdup("\x64")) != NULL)
-			StorageNew->capacityAlarmThresholdLen = strlen("\x64");
+		if (memdup((u_char **) &StorageNew->capacityAlarmThreshold, (u_char *) "\x64", 1) == SNMPERR_SUCCESS)
+			StorageNew->capacityAlarmThresholdLen = 1;
 		StorageNew->logStartTime = 0;
 		StorageNew->logStopTime = 6983120;
 		if (memdup((u_char **) &StorageNew->logIntervalsOfDay, (u_char *) "\x00\x00\x17\x3B", 4) == SNMPERR_SUCCESS)
@@ -1656,7 +1659,7 @@ parse_logTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->logAdministrativeState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->logOperationalState, &tmpsize);
 	SNMP_FREE(StorageTmp->logAvailabilityStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->logAvailabilityStatus, &StorageTmp->logAvailabilityStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->logAvailabilityStatus, &StorageTmp->logAvailabilityStatusLen);
 	if (StorageTmp->logAvailabilityStatus == NULL) {
 		config_perror("invalid specification for logAvailabilityStatus");
 		return;
@@ -1720,12 +1723,13 @@ store_logTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "logTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logDiscriminatorConstruct, &StorageTmp->logDiscriminatorConstructLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->logAdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->logOperationalState, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->logAvailabilityStatus, &StorageTmp->logAvailabilityStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logAvailabilityStatus, &StorageTmp->logAvailabilityStatusLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->logFullAction, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->maxLogSize, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->currentLogSize, &tmpsize);
@@ -1944,6 +1948,7 @@ store_logRecordTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "logRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -2218,6 +2223,7 @@ store_eventLogRecordTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "eventLogRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -2510,6 +2516,7 @@ store_alarmRecordTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "alarmRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -2750,6 +2757,7 @@ store_attributeValueChangeRecordTable(int majorID, int minorID, void *serverarg,
 			memset(line, 0, sizeof(line));
 			strcat(line, "attributeValueChangeRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -2973,6 +2981,7 @@ store_objectCreationRecordTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "objectCreationRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -3195,6 +3204,7 @@ store_objectDeletionRecordTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "objectDeletionRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -3427,6 +3437,7 @@ store_relationshipChangeRecordTable(int majorID, int minorID, void *serverarg, v
 			memset(line, 0, sizeof(line));
 			strcat(line, "relationshipChangeRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -3680,6 +3691,7 @@ store_securityAlarmReportRecordTable(int majorID, int minorID, void *serverarg, 
 			memset(line, 0, sizeof(line));
 			strcat(line, "securityAlarmReportRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -3915,6 +3927,7 @@ store_stateChangeRecordTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "stateChangeRecordTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logId, &StorageTmp->logIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->logRecordId, &StorageTmp->logRecordIdLen);
@@ -6228,7 +6241,7 @@ write_logAvailabilityStatus(int action, u_char *var_val, u_char var_val_type, si
 			}
 		}
 		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logAvailabilityStatus not ASN_BIT_STR\n");
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to logAvailabilityStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
 		if (var_val_type == ASN_BIT_STR) {

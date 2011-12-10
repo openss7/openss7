@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -137,38 +137,21 @@ int header_generic(struct variable *, oid *, size_t *, int, size_t *, WriteMetho
 #include <getopt.h>
 #endif
 #include "llcMIB.h"
-extern const char sa_program[];
-
-#define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
 #undef MASTER
-#if !defined MODULE
-extern int sa_dump;			/* default packet dump */
-extern int sa_debug;			/* default no debug */
-extern int sa_nomead;			/* default daemon mode */
-extern int sa_output;			/* default normal output */
-extern int sa_agentx;			/* default agentx mode */
-extern int sa_alarms;			/* default application alarms */
-extern int sa_logaddr;			/* log addresses */
-extern int sa_logfillog;		/* log to sa_logfile */
-extern int sa_logstderr;		/* log to standard error */
-extern int sa_logstdout;		/* log to standard output */
-extern int sa_logsyslog;		/* log to system logs */
-extern int sa_logcallog;		/* log to callback logs */
-extern int sa_appendlog;		/* append to log file without truncating */
-extern char sa_logfile[256];
-extern char sa_pidfile[256];
-extern char sa_sysctlf[256];
-
-/* file stream for log file */
-extern FILE *stdlog;
-#endif				/* !defined MODULE */
-extern int sa_fclose;			/* default close files between requests */
-static int my_fd;			/* file descriptor for this MIB's use */
-extern int sa_fd;			/* file descriptor for MIB use */
-extern int sa_readfd;			/* file descriptor for autonomnous events */
-extern int sa_changed;			/* indication to reread MIB configuration */
-extern int sa_stats_refresh;		/* indications that statistics, the mib or its tables need to be refreshed */
-extern int sa_request;			/* request number for per-request actions */
+#define MY_FACILITY(__pri)	(LOG_DAEMON|(__pri))
+#if defined MODULE
+#if defined MASTER
+const char sa_program[] = "llcMIB";
+int sa_fclose = 1;			/* default close files between requests */
+int sa_changed = 1;			/* indication to reread MIB configuration */
+int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
+int sa_request = 1;			/* request number for per-request actions */
+int sa_dump = 0;			/* default packet dump */
+int sa_debug = 0;			/* default no debug */
+#endif				/* defined MASTER */
+#endif				/* defined MODULE */
+static int my_fd = -1;			/* file descriptor for this MIB's use */
+static int my_readfd = -1;		/* file descriptor for autonomnous events */
 volatile int llcMIB_refresh = 1;
 volatile int mACDLETable_refresh = 1;
 volatile int mACTable_refresh = 1;
@@ -305,7 +288,7 @@ struct variable7 llcMIB_variables[] = {
 #define   LLCSTATIONNUMBEROFACTIVELSAPS  21
 	{(u_char) LLCSTATIONNUMBEROFACTIVELSAPS, ASN_GAUGE, RONLY, var_lLCStationTable, 6, {1, 1, 6, 1, 1, 3}},
 #define   LLCSTATIONSUPPORTEDSERVICESTYPES  22
-	{(u_char) LLCSTATIONSUPPORTEDSERVICESTYPES, ASN_BIT_STR, RWRITE, var_lLCStationTable, 6, {1, 1, 6, 1, 1, 4}},
+	{(u_char) LLCSTATIONSUPPORTEDSERVICESTYPES, ASN_OCTET_STR, RWRITE, var_lLCStationTable, 6, {1, 1, 6, 1, 1, 4}},
 #define   LLCSTATIONSTATUS      23
 	{(u_char) LLCSTATIONSTATUS, ASN_INTEGER, RONLY, var_lLCStationTable, 6, {1, 1, 6, 1, 1, 5}},
 #define   LLCSTATIONTYPE1ACKNOWLEDGETIMEOUTVALUE  24
@@ -337,7 +320,7 @@ struct variable7 llcMIB_variables[] = {
 #define   LLCSTATIONPDUSDISCARD  37
 	{(u_char) LLCSTATIONPDUSDISCARD, ASN_COUNTER, RONLY, var_lLCStationTable, 6, {1, 1, 6, 1, 1, 19}},
 #define   LLCSTATIONSTRINDICATOR  38
-	{(u_char) LLCSTATIONSTRINDICATOR, ASN_BIT_STR, RWRITE, var_lLCStationTable, 6, {1, 1, 6, 1, 1, 20}},
+	{(u_char) LLCSTATIONSTRINDICATOR, ASN_OCTET_STR, RWRITE, var_lLCStationTable, 6, {1, 1, 6, 1, 1, 20}},
 #define   LLCSTATIONVERSIONNUMBER  39
 	{(u_char) LLCSTATIONVERSIONNUMBER, ASN_INTEGER, RWRITE, var_lLCStationTable, 6, {1, 1, 6, 1, 1, 21}},
 #define   LLCSTATIONTYPE1ACKNOWLEDGMENTTIMERTIMEOUTS  40
@@ -435,13 +418,13 @@ struct variable7 llcMIB_variables[] = {
 #define   LLCCONNECTION2LOCALBUSY  86
 	{(u_char) LLCCONNECTION2LOCALBUSY, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 9}},
 #define   LLCCONNECTION2REMOTEBUSY  87
-	{(u_char) LLCCONNECTION2REMOTEBUSY, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 10}},
+	{(u_char) LLCCONNECTION2REMOTEBUSY, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 10}},
 #define   LLCCONNECTION2REMOTERESET  88
-	{(u_char) LLCCONNECTION2REMOTERESET, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 11}},
+	{(u_char) LLCCONNECTION2REMOTERESET, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 11}},
 #define   LLCCONNECTION2LOCALRESET  89
-	{(u_char) LLCCONNECTION2LOCALRESET, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 12}},
+	{(u_char) LLCCONNECTION2LOCALRESET, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 12}},
 #define   LLCCONNECTION2PROVIDERRESET  90
-	{(u_char) LLCCONNECTION2PROVIDERRESET, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 13}},
+	{(u_char) LLCCONNECTION2PROVIDERRESET, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 13}},
 #define   LLCCONNECTION2ROUTE   91
 	{(u_char) LLCCONNECTION2ROUTE, ASN_OCTET_STR, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 14}},
 #define   LLCCONNECTION2KSTEP   92
@@ -453,53 +436,53 @@ struct variable7 llcMIB_variables[] = {
 #define   LLCCONNECTION2SENTI   95
 	{(u_char) LLCCONNECTION2SENTI, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 18}},
 #define   LLCCONNECTION2SENTACKS  96
-	{(u_char) LLCCONNECTION2SENTACKS, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 19}},
+	{(u_char) LLCCONNECTION2SENTACKS, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 19}},
 #define   LLCCONNECTION2RECEIVEDACKS  97
-	{(u_char) LLCCONNECTION2RECEIVEDACKS, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 20}},
+	{(u_char) LLCCONNECTION2RECEIVEDACKS, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 20}},
 #define   LLCCONNECTION2RECEIVEDFRMR  98
-	{(u_char) LLCCONNECTION2RECEIVEDFRMR, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 21}},
+	{(u_char) LLCCONNECTION2RECEIVEDFRMR, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 21}},
 #define   LLCCONNECTION2SENTFRMR  99
-	{(u_char) LLCCONNECTION2SENTFRMR, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 22}},
+	{(u_char) LLCCONNECTION2SENTFRMR, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 22}},
 #define   LLCCONNECTION2RECEIVEDRR  100
-	{(u_char) LLCCONNECTION2RECEIVEDRR, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 23}},
+	{(u_char) LLCCONNECTION2RECEIVEDRR, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 23}},
 #define   LLCCONNECTION2SENTRR  101
-	{(u_char) LLCCONNECTION2SENTRR, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 24}},
+	{(u_char) LLCCONNECTION2SENTRR, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 24}},
 #define   LLCCONNECTION2RECEIVEDRNR  102
-	{(u_char) LLCCONNECTION2RECEIVEDRNR, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 25}},
+	{(u_char) LLCCONNECTION2RECEIVEDRNR, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 25}},
 #define   LLCCONNECTION2SENTRNR  103
-	{(u_char) LLCCONNECTION2SENTRNR, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 26}},
+	{(u_char) LLCCONNECTION2SENTRNR, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 26}},
 #define   LLCCONNECTION2RECEIVEDREJ  104
-	{(u_char) LLCCONNECTION2RECEIVEDREJ, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 27}},
+	{(u_char) LLCCONNECTION2RECEIVEDREJ, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 27}},
 #define   LLCCONNECTION2SENTREJ  105
-	{(u_char) LLCCONNECTION2SENTREJ, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 28}},
+	{(u_char) LLCCONNECTION2SENTREJ, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 28}},
 #define   LLCCONNECTION2RECEIVEDSABME  106
-	{(u_char) LLCCONNECTION2RECEIVEDSABME, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 29}},
+	{(u_char) LLCCONNECTION2RECEIVEDSABME, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 29}},
 #define   LLCCONNECTION2SENTSABME  107
-	{(u_char) LLCCONNECTION2SENTSABME, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 30}},
+	{(u_char) LLCCONNECTION2SENTSABME, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 30}},
 #define   LLCCONNECTION2RECEIVEDUA  108
-	{(u_char) LLCCONNECTION2RECEIVEDUA, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 31}},
+	{(u_char) LLCCONNECTION2RECEIVEDUA, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 31}},
 #define   LLCCONNECTION2SENTUA  109
-	{(u_char) LLCCONNECTION2SENTUA, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 32}},
+	{(u_char) LLCCONNECTION2SENTUA, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 32}},
 #define   LLCCONNECTION2RECEIVEDDISC  110
-	{(u_char) LLCCONNECTION2RECEIVEDDISC, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 33}},
+	{(u_char) LLCCONNECTION2RECEIVEDDISC, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 33}},
 #define   LLCCONNECTION2SENTDISC  111
-	{(u_char) LLCCONNECTION2SENTDISC, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 34}},
+	{(u_char) LLCCONNECTION2SENTDISC, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 34}},
 #define   LLCCONNECTION2RECEIVEDDM  112
-	{(u_char) LLCCONNECTION2RECEIVEDDM, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 35}},
+	{(u_char) LLCCONNECTION2RECEIVEDDM, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 35}},
 #define   LLCCONNECTION2SENTDM  113
-	{(u_char) LLCCONNECTION2SENTDM, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 36}},
+	{(u_char) LLCCONNECTION2SENTDM, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 36}},
 #define   LLCCONNECTION2PDUSDISCARDED1  114
-	{(u_char) LLCCONNECTION2PDUSDISCARDED1, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 37}},
+	{(u_char) LLCCONNECTION2PDUSDISCARDED1, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 37}},
 #define   LLCCONNECTION2PDUSDISCARDED2  115
-	{(u_char) LLCCONNECTION2PDUSDISCARDED2, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 38}},
+	{(u_char) LLCCONNECTION2PDUSDISCARDED2, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 38}},
 #define   LLCCONNECTION2PDURETRANSMISSIONS  116
-	{(u_char) LLCCONNECTION2PDURETRANSMISSIONS, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 39}},
+	{(u_char) LLCCONNECTION2PDURETRANSMISSIONS, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 39}},
 #define   LLCCONNECTION2OPTIONALTOLERATIONIPDUS  117
 	{(u_char) LLCCONNECTION2OPTIONALTOLERATIONIPDUS, ASN_INTEGER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 40}},
 #define   LLCCONNECTION2DUPLICATEIPDUSRECEIVED  118
-	{(u_char) LLCCONNECTION2DUPLICATEIPDUSRECEIVED, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 41}},
+	{(u_char) LLCCONNECTION2DUPLICATEIPDUSRECEIVED, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 41}},
 #define   LLCCONNECTION2VIOLATION  119
-	{(u_char) LLCCONNECTION2VIOLATION, ASN_COUNTER, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 42}},
+	{(u_char) LLCCONNECTION2VIOLATION, ASN_COUNTER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 42}},
 #define   LLCCONNECTION2PROTOCOLSTATE  120
 	{(u_char) LLCCONNECTION2PROTOCOLSTATE, ASN_INTEGER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 43}},
 #define   LLCCONNECTION2ADMINISTRATIVESTATE  121
@@ -509,9 +492,9 @@ struct variable7 llcMIB_variables[] = {
 #define   LLCCONNECTION2USAGESTATE  123
 	{(u_char) LLCCONNECTION2USAGESTATE, ASN_INTEGER, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 46}},
 #define   LLCCONNECTION2PROCEDURALSTATUS  124
-	{(u_char) LLCCONNECTION2PROCEDURALSTATUS, ASN_BIT_STR, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 47}},
+	{(u_char) LLCCONNECTION2PROCEDURALSTATUS, ASN_OCTET_STR, RONLY, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 47}},
 #define   LLCCONNECTION2ALARMSTATUS  125
-	{(u_char) LLCCONNECTION2ALARMSTATUS, ASN_BIT_STR, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 48}},
+	{(u_char) LLCCONNECTION2ALARMSTATUS, ASN_OCTET_STR, RWRITE, var_lLCConnection2Table, 6, {1, 1, 13, 1, 1, 48}},
 #define   LLCCONNECTION2IVMOMAXIMUMRETRANSMISSIONS  126
 	{(u_char) LLCCONNECTION2IVMOMAXIMUMRETRANSMISSIONS, ASN_UNSIGNED, RWRITE, var_lLCConnection2IVMOTable, 6, {1, 1, 14, 1, 1, 2}},
 #define   LLCCONNECTION2IVMORECEIVEDWINDOWSIZE  127
@@ -527,7 +510,7 @@ struct variable7 llcMIB_variables[] = {
 #define   LLCCONNECTION2IVMOREJECTTIMEOUTVALUE  132
 	{(u_char) LLCCONNECTION2IVMOREJECTTIMEOUTVALUE, ASN_INTEGER, RWRITE, var_lLCConnection2IVMOTable, 6, {1, 1, 14, 1, 1, 8}},
 #define   LLCCONNECTION2IVMOROUTE  133
-	{(u_char) LLCCONNECTION2IVMOROUTE, ASN_UNSIGNED, RWRITE, var_lLCConnection2IVMOTable, 6, {1, 1, 14, 1, 1, 9}},
+	{(u_char) LLCCONNECTION2IVMOROUTE, ASN_OCTET_STR, RWRITE, var_lLCConnection2IVMOTable, 6, {1, 1, 14, 1, 1, 9}},
 #define   LLCCONNECTION2IVMOKSTEP  134
 	{(u_char) LLCCONNECTION2IVMOKSTEP, ASN_UNSIGNED, RWRITE, var_lLCConnection2IVMOTable, 6, {1, 1, 14, 1, 1, 10}},
 #define   LLCCONNECTION2IVMOMAXSENDWINDOWSIZE  135
@@ -663,11 +646,10 @@ struct header_complex_index *lLCConnection2IVMOTableStorage = NULL;
 struct header_complex_index *lLCConnectionlessAckTableStorage = NULL;
 struct header_complex_index *lLCConnectionlessAckIVMOTableStorage = NULL;
 
-#if defined MODULE
 void (*llcMIBold_signal_handler) (int) = NULL;	/* save old signal handler just in case */
 void llcMIB_loop_handler(int);
 void llcMIB_fd_handler(int, void *);
-#endif				/* defined MOUDLE */
+
 /**
  * @fn void init_llcMIB(void)
  * @brief llcMIB initialization routine.
@@ -696,7 +678,7 @@ init_llcMIB(void)
 	(void) my_fd;
 	(void) zeroDotZero_oid;
 	(void) snmpTrapOID_oid;
-	DEBUGMSGTL(("llcMIB", "initializing...  "));
+	DEBUGMSGTL(("llcMIB", "init_llcMIB: initializing...  "));
 	/* register ourselves with the agent to handle our mib tree */
 	REGISTER_MIB("llcMIB", llcMIB_variables, variable7, llcMIB_variables_oid);
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_SHUTDOWN, term_llcMIB, NULL);
@@ -739,17 +721,13 @@ init_llcMIB(void)
 	snmp_register_callback(SNMP_CALLBACK_LIBRARY, SNMP_CALLBACK_STORE_DATA, store_lLCConnectionlessAckIVMOTable, NULL);
 
 	/* place any other initialization junk you need here */
-#if defined MODULE
-	if (sa_readfd != 0) {
-		register_readfd(sa_readfd, llcMIB_fd_handler, (void *) 0);
-		register_exceptfd(sa_readfd, llcMIB_fd_handler, (void *) 1);
+	if (my_readfd >= 0) {
+		register_readfd(my_readfd, llcMIB_fd_handler, (void *) 0);
+		register_exceptfd(my_readfd, llcMIB_fd_handler, (void *) 1);
 	}
-#if defined MASTER
 	llcMIBold_signal_handler = external_signal_handler[SIGCHLD];
 	external_signal_handler[SIGCHLD] = &llcMIB_loop_handler;
 	external_signal_scheduled[SIGCHLD] = 1;
-#endif				/* defined MASTER */
-#endif				/* defined MODULE */
 	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
@@ -768,18 +746,14 @@ init_llcMIB(void)
 void
 deinit_llcMIB(void)
 {
-	DEBUGMSGTL(("llcMIB", "deinitializating...  "));
-#if defined MODULE
-#if defined MASTER
+	DEBUGMSGTL(("llcMIB", "deinit_llcMIB: deinitializating...  "));
 	external_signal_handler[SIGCHLD] = llcMIBold_signal_handler;
-#endif				/* defined MASTER */
-	if (sa_readfd != 0) {
-		unregister_exceptfd(sa_readfd);
-		unregister_readfd(sa_readfd);
-		close(sa_readfd);
-		sa_readfd = 0;
+	if (my_readfd >= 0) {
+		unregister_exceptfd(my_readfd);
+		unregister_readfd(my_readfd);
+		close(my_readfd);
+		my_readfd = -1;
 	}
-#endif				/* defined MODULE */
 	unregister_mib(llcMIB_variables_oid, sizeof(llcMIB_variables_oid) / sizeof(oid));
 	snmpd_unregister_config_handler("llcMIB");
 	snmpd_unregister_config_handler("mACDLETable");
@@ -806,7 +780,9 @@ deinit_llcMIB(void)
 int
 term_llcMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 {
+	DEBUGMSGTL(("llcMIB", "term_llcMIB: terminating...  "));
 	deinit_llcMIB();
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return 0;
 }
 
@@ -822,7 +798,7 @@ llcMIB_create(void)
 {
 	struct llcMIB_data *StorageNew = SNMP_MALLOC_STRUCT(llcMIB_data);
 
-	DEBUGMSGTL(("llcMIB", "creating scalars...  "));
+	DEBUGMSGTL(("llcMIB", "llcMIB_create: creating scalars...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default scalar values here into StorageNew */
 		StorageNew->llcDiscontinuityTime = 0;
@@ -861,7 +837,7 @@ llcMIB_destroy(struct llcMIB_data **thedata)
 {
 	struct llcMIB_data *StorageDel;
 
-	DEBUGMSGTL(("llcMIB", "deleting scalars...  "));
+	DEBUGMSGTL(("llcMIB", "llcMIB_destroy: deleting scalars...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCConnection2DefaultRoute);
 		StorageDel->lLCConnection2DefaultRouteLen = 0;
@@ -883,7 +859,8 @@ llcMIB_destroy(struct llcMIB_data **thedata)
 int
 llcMIB_add(struct llcMIB_data *thedata)
 {
-	DEBUGMSGTL(("llcMIB", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "llcMIB_add: adding data...  "));
+	if (thedata)
 	llcMIBStorage = thedata;
 	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
@@ -907,7 +884,7 @@ parse_llcMIB(const char *token, char *line)
 	size_t tmpsize;
 	struct llcMIB_data *StorageTmp = llcMIB_create();
 
-	DEBUGMSGTL(("llcMIB", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_llcMIB: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -948,7 +925,7 @@ store_llcMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 	size_t tmpsize;
 	struct llcMIB_data *StorageTmp;
 
-	DEBUGMSGTL(("llcMIB", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_llcMIB: storing data...  "));
 	refresh_llcMIB(1);
 	if ((StorageTmp = llcMIBStorage) == NULL) {
 		DEBUGMSGTL(("llcMIB", "error.\n"));
@@ -960,6 +937,7 @@ store_llcMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "llcMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_TIMETICKS, cptr, &StorageTmp->llcDiscontinuityTime, &tmpsize);
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2DefaultMaximumRetransmissions, &tmpsize);
@@ -1005,8 +983,10 @@ refresh_llcMIB(int force)
 	}
 	if (!force && llcMIB_refresh == 0)
 		return;
+	DEBUGMSGTL(("llcMIB", "refresh_llcMIB: refreshing...  "));
 	/* XXX: Update scalars as required here... */
 	llcMIB_refresh = 0;
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /**
@@ -1032,12 +1012,15 @@ var_llcMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *v
 	struct llcMIB_data *StorageTmp;
 	u_char *rval;
 
+	DEBUGMSGTL(("llcMIB", "var_llcMIB: lookup up varbind...  "));
 	if (header_generic(vp, name, length, exact, var_len, write_method) == MATCH_FAILED)
 		return NULL;
 	/* Refresh the MIB values if required. */
 	refresh_llcMIB(0);
-	if ((StorageTmp = llcMIBStorage) == NULL)
+	if ((StorageTmp = llcMIBStorage) == NULL) {
+		DEBUGMSGTL(("llcMIB", "no datastructure.\n"));
 		return NULL;
+	}
 	*write_method = NULL;
 	*var_len = 0;
 	rval = NULL;
@@ -1143,6 +1126,10 @@ var_llcMIB(struct variable *vp, oid * name, size_t *length, int exact, size_t *v
 	default:
 		ERROR_MSG("");
 	}
+	if (rval)
+		DEBUGMSGTL(("llcMIB", "found.\n"));
+	else
+		DEBUGMSGTL(("llcMIB", "not found.\n"));
 	return (rval);
 }
 
@@ -1159,7 +1146,7 @@ mACDLETable_create(void)
 {
 	struct mACDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(mACDLETable_data);
 
-	DEBUGMSGTL(("mACDLETable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "mACDLETable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->mACDLELocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
@@ -1170,7 +1157,7 @@ mACDLETable_create(void)
 		StorageNew->mACDLERowStatus = 0;
 		StorageNew->mACDLERowStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("mACDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -1187,11 +1174,11 @@ mACDLETable_duplicate(struct mACDLETable_data *thedata)
 {
 	struct mACDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(mACDLETable_data);
 
-	DEBUGMSGTL(("mACDLETable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "mACDLETable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("mACDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -1214,7 +1201,7 @@ mACDLETable_destroy(struct mACDLETable_data **thedata)
 {
 	struct mACDLETable_data *StorageDel;
 
-	DEBUGMSGTL(("mACDLETable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "mACDLETable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->mACDLECommunicationsEntityId);
 		StorageDel->mACDLECommunicationsEntityIdLen = 0;
@@ -1225,7 +1212,7 @@ mACDLETable_destroy(struct mACDLETable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("mACDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1243,13 +1230,14 @@ mACDLETable_add(struct mACDLETable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("mACDLETable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "mACDLETable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* mACDLECommunicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->mACDLECommunicationsEntityId, thedata->mACDLECommunicationsEntityIdLen);
 	header_complex_add_data(&mACDLETableStorage, vars, thedata);
-	DEBUGMSGTL(("mACDLETable", "registered an entry\n"));
-	DEBUGMSGTL(("mACDLETable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1270,14 +1258,14 @@ mACDLETable_del(struct mACDLETable_data *thedata)
 {
 	struct mACDLETable_data *StorageDel;
 
-	DEBUGMSGTL(("mACDLETable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "mACDLETable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(mACDLETableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&mACDLETableStorage, hciptr);
 	}
-	DEBUGMSGTL(("mACDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1299,7 +1287,7 @@ parse_mACDLETable(const char *token, char *line)
 	size_t tmpsize;
 	struct mACDLETable_data *StorageTmp = mACDLETable_create();
 
-	DEBUGMSGTL(("mACDLETable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_mACDLETable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -1327,7 +1315,7 @@ parse_mACDLETable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mACDLERowStatus, &tmpsize);
 	mACDLETable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("mACDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -1343,7 +1331,7 @@ store_mACDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mACDLETable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("mACDLETable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_mACDLETable: storing data...  "));
 	refresh_mACDLETable(1);
 	(void) tmpsize;
 	for (hcindex = mACDLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -1353,6 +1341,7 @@ store_mACDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mACDLETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mACDLECommunicationsEntityId, &StorageTmp->mACDLECommunicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->mACDLELocalSapNames, &StorageTmp->mACDLELocalSapNamesLen);
@@ -1362,7 +1351,7 @@ store_mACDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("mACDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1379,7 +1368,7 @@ mACTable_create(void)
 {
 	struct mACTable_data *StorageNew = SNMP_MALLOC_STRUCT(mACTable_data);
 
-	DEBUGMSGTL(("mACTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "mACTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->mACDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
@@ -1388,7 +1377,7 @@ mACTable_create(void)
 		StorageNew->mACRowStatus = 0;
 		StorageNew->mACRowStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("mACTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -1405,11 +1394,11 @@ mACTable_duplicate(struct mACTable_data *thedata)
 {
 	struct mACTable_data *StorageNew = SNMP_MALLOC_STRUCT(mACTable_data);
 
-	DEBUGMSGTL(("mACTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "mACTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("mACTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -1432,7 +1421,7 @@ mACTable_destroy(struct mACTable_data **thedata)
 {
 	struct mACTable_data *StorageDel;
 
-	DEBUGMSGTL(("mACTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "mACTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->mACDLECommunicationsEntityId);
 		StorageDel->mACDLECommunicationsEntityIdLen = 0;
@@ -1441,7 +1430,7 @@ mACTable_destroy(struct mACTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("mACTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1459,15 +1448,16 @@ mACTable_add(struct mACTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("mACTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "mACTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* mACDLECommunicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->mACDLECommunicationsEntityId, thedata->mACDLECommunicationsEntityIdLen);
 	/* mACId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->mACId, thedata->mACIdLen);
 	header_complex_add_data(&mACTableStorage, vars, thedata);
-	DEBUGMSGTL(("mACTable", "registered an entry\n"));
-	DEBUGMSGTL(("mACTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1488,14 +1478,14 @@ mACTable_del(struct mACTable_data *thedata)
 {
 	struct mACTable_data *StorageDel;
 
-	DEBUGMSGTL(("mACTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "mACTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(mACTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&mACTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("mACTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1517,7 +1507,7 @@ parse_mACTable(const char *token, char *line)
 	size_t tmpsize;
 	struct mACTable_data *StorageTmp = mACTable_create();
 
-	DEBUGMSGTL(("mACTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_mACTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -1539,7 +1529,7 @@ parse_mACTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->mACRowStatus, &tmpsize);
 	mACTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("mACTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -1555,7 +1545,7 @@ store_mACTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct mACTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("mACTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_mACTable: storing data...  "));
 	refresh_mACTable(1);
 	(void) tmpsize;
 	for (hcindex = mACTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -1565,6 +1555,7 @@ store_mACTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "mACTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mACDLECommunicationsEntityId, &StorageTmp->mACDLECommunicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->mACOperationalState, &tmpsize);
@@ -1573,7 +1564,7 @@ store_mACTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("mACTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1590,12 +1581,12 @@ resourceTypeIdTable_create(void)
 {
 	struct resourceTypeIdTable_data *StorageNew = SNMP_MALLOC_STRUCT(resourceTypeIdTable_data);
 
-	DEBUGMSGTL(("resourceTypeIdTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "resourceTypeIdTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->mACDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
 			StorageNew->mACDLECommunicationsEntityIdLen = strlen("");
-		StorageNew->resourceTypeIdName = (uint8_t *) strdup("RTID");
+		if ((StorageNew->resourceTypeIdName = (uint8_t *) strdup("RTID")) != NULL)
 		StorageNew->resourceTypeIdNameLen = strlen("RTID");
 		if ((StorageNew->resourceInfoManufacturerOUI = (uint8_t *) strdup("")) != NULL)
 			StorageNew->resourceInfoManufacturerOUILen = strlen("");
@@ -1607,7 +1598,7 @@ resourceTypeIdTable_create(void)
 			StorageNew->resourceInfoManufacturerProductVersionLen = strlen("");
 
 	}
-	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -1624,11 +1615,11 @@ resourceTypeIdTable_duplicate(struct resourceTypeIdTable_data *thedata)
 {
 	struct resourceTypeIdTable_data *StorageNew = SNMP_MALLOC_STRUCT(resourceTypeIdTable_data);
 
-	DEBUGMSGTL(("resourceTypeIdTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "resourceTypeIdTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -1651,7 +1642,7 @@ resourceTypeIdTable_destroy(struct resourceTypeIdTable_data **thedata)
 {
 	struct resourceTypeIdTable_data *StorageDel;
 
-	DEBUGMSGTL(("resourceTypeIdTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "resourceTypeIdTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->mACDLECommunicationsEntityId);
 		StorageDel->mACDLECommunicationsEntityIdLen = 0;
@@ -1668,7 +1659,7 @@ resourceTypeIdTable_destroy(struct resourceTypeIdTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1686,13 +1677,14 @@ resourceTypeIdTable_add(struct resourceTypeIdTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("resourceTypeIdTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "resourceTypeIdTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* mACDLECommunicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->mACDLECommunicationsEntityId, thedata->mACDLECommunicationsEntityIdLen);
 	header_complex_add_data(&resourceTypeIdTableStorage, vars, thedata);
-	DEBUGMSGTL(("resourceTypeIdTable", "registered an entry\n"));
-	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1713,14 +1705,14 @@ resourceTypeIdTable_del(struct resourceTypeIdTable_data *thedata)
 {
 	struct resourceTypeIdTable_data *StorageDel;
 
-	DEBUGMSGTL(("resourceTypeIdTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "resourceTypeIdTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(resourceTypeIdTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&resourceTypeIdTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1742,7 +1734,7 @@ parse_resourceTypeIdTable(const char *token, char *line)
 	size_t tmpsize;
 	struct resourceTypeIdTable_data *StorageTmp = resourceTypeIdTable_create();
 
-	DEBUGMSGTL(("resourceTypeIdTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_resourceTypeIdTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -1786,7 +1778,7 @@ parse_resourceTypeIdTable(const char *token, char *line)
 	}
 	resourceTypeIdTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -1802,7 +1794,7 @@ store_resourceTypeIdTable(int majorID, int minorID, void *serverarg, void *clien
 	struct resourceTypeIdTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("resourceTypeIdTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_resourceTypeIdTable: storing data...  "));
 	refresh_resourceTypeIdTable(1);
 	(void) tmpsize;
 	for (hcindex = resourceTypeIdTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -1812,6 +1804,7 @@ store_resourceTypeIdTable(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "resourceTypeIdTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mACDLECommunicationsEntityId, &StorageTmp->mACDLECommunicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->resourceTypeIdName, &StorageTmp->resourceTypeIdNameLen);
@@ -1822,7 +1815,7 @@ store_resourceTypeIdTable(int majorID, int minorID, void *serverarg, void *clien
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("resourceTypeIdTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1839,7 +1832,7 @@ dLSAPTable_create(void)
 {
 	struct dLSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(dLSAPTable_data);
 
-	DEBUGMSGTL(("dLSAPTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "dLSAPTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->mACDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
@@ -1850,7 +1843,7 @@ dLSAPTable_create(void)
 		StorageNew->dLSAPRowStatus = 0;
 		StorageNew->dLSAPRowStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("dLSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -1867,11 +1860,11 @@ dLSAPTable_duplicate(struct dLSAPTable_data *thedata)
 {
 	struct dLSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(dLSAPTable_data);
 
-	DEBUGMSGTL(("dLSAPTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "dLSAPTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("dLSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -1894,7 +1887,7 @@ dLSAPTable_destroy(struct dLSAPTable_data **thedata)
 {
 	struct dLSAPTable_data *StorageDel;
 
-	DEBUGMSGTL(("dLSAPTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "dLSAPTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->mACDLECommunicationsEntityId);
 		StorageDel->mACDLECommunicationsEntityIdLen = 0;
@@ -1905,7 +1898,7 @@ dLSAPTable_destroy(struct dLSAPTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("dLSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1923,15 +1916,16 @@ dLSAPTable_add(struct dLSAPTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("dLSAPTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "dLSAPTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* mACDLECommunicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->mACDLECommunicationsEntityId, thedata->mACDLECommunicationsEntityIdLen);
 	/* dLSAPSapId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->dLSAPSapId, thedata->dLSAPSapIdLen);
 	header_complex_add_data(&dLSAPTableStorage, vars, thedata);
-	DEBUGMSGTL(("dLSAPTable", "registered an entry\n"));
-	DEBUGMSGTL(("dLSAPTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1952,14 +1946,14 @@ dLSAPTable_del(struct dLSAPTable_data *thedata)
 {
 	struct dLSAPTable_data *StorageDel;
 
-	DEBUGMSGTL(("dLSAPTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "dLSAPTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(dLSAPTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&dLSAPTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("dLSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -1981,7 +1975,7 @@ parse_dLSAPTable(const char *token, char *line)
 	size_t tmpsize;
 	struct dLSAPTable_data *StorageTmp = dLSAPTable_create();
 
-	DEBUGMSGTL(("dLSAPTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_dLSAPTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -2009,7 +2003,7 @@ parse_dLSAPTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->dLSAPRowStatus, &tmpsize);
 	dLSAPTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("dLSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -2025,7 +2019,7 @@ store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct dLSAPTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("dLSAPTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_dLSAPTable: storing data...  "));
 	refresh_dLSAPTable(1);
 	(void) tmpsize;
 	for (hcindex = dLSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -2035,6 +2029,7 @@ store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "dLSAPTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->mACDLECommunicationsEntityId, &StorageTmp->mACDLECommunicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
@@ -2044,7 +2039,7 @@ store_dLSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("dLSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2061,7 +2056,7 @@ lLCDLETable_create(void)
 {
 	struct lLCDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCDLETable_data);
 
-	DEBUGMSGTL(("lLCDLETable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCDLETable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->lLCDLELocalSapNames = snmp_duplicate_objid(zeroDotZero_oid, 2)))
@@ -2072,7 +2067,7 @@ lLCDLETable_create(void)
 		StorageNew->lLCDLERowStatus = 0;
 		StorageNew->lLCDLERowStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("lLCDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -2089,11 +2084,11 @@ lLCDLETable_duplicate(struct lLCDLETable_data *thedata)
 {
 	struct lLCDLETable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCDLETable_data);
 
-	DEBUGMSGTL(("lLCDLETable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCDLETable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -2116,7 +2111,7 @@ lLCDLETable_destroy(struct lLCDLETable_data **thedata)
 {
 	struct lLCDLETable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCDLETable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCDLETable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCDLECommunicationsEntityId);
 		StorageDel->lLCDLECommunicationsEntityIdLen = 0;
@@ -2127,7 +2122,7 @@ lLCDLETable_destroy(struct lLCDLETable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2145,13 +2140,14 @@ lLCDLETable_add(struct lLCDLETable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCDLETable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCDLETable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* lLCDLECommunicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCDLECommunicationsEntityId, thedata->lLCDLECommunicationsEntityIdLen);
 	header_complex_add_data(&lLCDLETableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCDLETable", "registered an entry\n"));
-	DEBUGMSGTL(("lLCDLETable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2172,14 +2168,14 @@ lLCDLETable_del(struct lLCDLETable_data *thedata)
 {
 	struct lLCDLETable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCDLETable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCDLETable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCDLETableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCDLETableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2201,7 +2197,7 @@ parse_lLCDLETable(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCDLETable_data *StorageTmp = lLCDLETable_create();
 
-	DEBUGMSGTL(("lLCDLETable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCDLETable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -2229,7 +2225,7 @@ parse_lLCDLETable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCDLERowStatus, &tmpsize);
 	lLCDLETable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -2245,7 +2241,7 @@ store_lLCDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct lLCDLETable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCDLETable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCDLETable: storing data...  "));
 	refresh_lLCDLETable(1);
 	(void) tmpsize;
 	for (hcindex = lLCDLETableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -2255,6 +2251,7 @@ store_lLCDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCDLETable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OBJECT_ID, cptr, &StorageTmp->lLCDLELocalSapNames, &StorageTmp->lLCDLELocalSapNamesLen);
@@ -2264,7 +2261,7 @@ store_lLCDLETable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCDLETable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2281,7 +2278,7 @@ lLCStationTable_create(void)
 {
 	struct lLCStationTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCStationTable_data);
 
-	DEBUGMSGTL(("lLCStationTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCStationTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
@@ -2315,7 +2312,7 @@ lLCStationTable_create(void)
 		StorageNew->lLCStationType1AcknowledgmentTimerTimeouts = 0;
 
 	}
-	DEBUGMSGTL(("lLCStationTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -2332,11 +2329,11 @@ lLCStationTable_duplicate(struct lLCStationTable_data *thedata)
 {
 	struct lLCStationTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCStationTable_data);
 
-	DEBUGMSGTL(("lLCStationTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCStationTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCStationTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -2359,7 +2356,7 @@ lLCStationTable_destroy(struct lLCStationTable_data **thedata)
 {
 	struct lLCStationTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCStationTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCStationTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCDLECommunicationsEntityId);
 		StorageDel->lLCDLECommunicationsEntityIdLen = 0;
@@ -2374,7 +2371,7 @@ lLCStationTable_destroy(struct lLCStationTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCStationTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2392,15 +2389,16 @@ lLCStationTable_add(struct lLCStationTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCStationTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCStationTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* lLCDLECommunicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCDLECommunicationsEntityId, thedata->lLCDLECommunicationsEntityIdLen);
 	/* dLSAPSapId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->dLSAPSapId, thedata->dLSAPSapIdLen);
 	header_complex_add_data(&lLCStationTableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCStationTable", "registered an entry\n"));
-	DEBUGMSGTL(("lLCStationTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2421,14 +2419,14 @@ lLCStationTable_del(struct lLCStationTable_data *thedata)
 {
 	struct lLCStationTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCStationTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCStationTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCStationTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCStationTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCStationTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2450,7 +2448,7 @@ parse_lLCStationTable(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCStationTable_data *StorageTmp = lLCStationTable_create();
 
-	DEBUGMSGTL(("lLCStationTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCStationTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -2477,7 +2475,7 @@ parse_lLCStationTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCStationMaximumLSAPsConfigured, &tmpsize);
 	line = read_config_read_data(ASN_GAUGE, line, &StorageTmp->lLCStationNumberOfActiveLSAPs, &tmpsize);
 	SNMP_FREE(StorageTmp->lLCStationSupportedServicesTypes);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCStationSupportedServicesTypes, &StorageTmp->lLCStationSupportedServicesTypesLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCStationSupportedServicesTypes, &StorageTmp->lLCStationSupportedServicesTypesLen);
 	if (StorageTmp->lLCStationSupportedServicesTypes == NULL) {
 		config_perror("invalid specification for lLCStationSupportedServicesTypes");
 		return;
@@ -2498,7 +2496,7 @@ parse_lLCStationTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCStationInactiveLSAP, &tmpsize);
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCStationPDUsDiscard, &tmpsize);
 	SNMP_FREE(StorageTmp->lLCStationSTRIndicator);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCStationSTRIndicator, &StorageTmp->lLCStationSTRIndicatorLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCStationSTRIndicator, &StorageTmp->lLCStationSTRIndicatorLen);
 	if (StorageTmp->lLCStationSTRIndicator == NULL) {
 		config_perror("invalid specification for lLCStationSTRIndicator");
 		return;
@@ -2507,7 +2505,7 @@ parse_lLCStationTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCStationType1AcknowledgmentTimerTimeouts, &tmpsize);
 	lLCStationTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCStationTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -2523,7 +2521,7 @@ store_lLCStationTable(int majorID, int minorID, void *serverarg, void *clientarg
 	struct lLCStationTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCStationTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCStationTable: storing data...  "));
 	refresh_lLCStationTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCStationTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -2533,13 +2531,14 @@ store_lLCStationTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCStationTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCStationLLCName, &StorageTmp->lLCStationLLCNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCStationMaximumLSAPsConfigured, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->lLCStationNumberOfActiveLSAPs, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->lLCStationSupportedServicesTypes, &StorageTmp->lLCStationSupportedServicesTypesLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCStationSupportedServicesTypes, &StorageTmp->lLCStationSupportedServicesTypesLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCStationStatus, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCStationType1AcknowledgeTimeoutValue, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCStationType1MaximumRetryCount, &tmpsize);
@@ -2555,13 +2554,13 @@ store_lLCStationTable(int majorID, int minorID, void *serverarg, void *clientarg
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->lLCStationMaxBufferUseSize, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lLCStationInactiveLSAP, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lLCStationPDUsDiscard, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->lLCStationSTRIndicator, &StorageTmp->lLCStationSTRIndicatorLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCStationSTRIndicator, &StorageTmp->lLCStationSTRIndicatorLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCStationVersionNumber, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lLCStationType1AcknowledgmentTimerTimeouts, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCStationTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2578,7 +2577,7 @@ lLCSAPTable_create(void)
 {
 	struct lLCSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCSAPTable_data);
 
-	DEBUGMSGTL(("lLCSAPTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCSAPTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
@@ -2592,7 +2591,7 @@ lLCSAPTable_create(void)
 		StorageNew->lLCSAPRDE = 0;
 
 	}
-	DEBUGMSGTL(("lLCSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -2609,11 +2608,11 @@ lLCSAPTable_duplicate(struct lLCSAPTable_data *thedata)
 {
 	struct lLCSAPTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCSAPTable_data);
 
-	DEBUGMSGTL(("lLCSAPTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCSAPTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -2636,7 +2635,7 @@ lLCSAPTable_destroy(struct lLCSAPTable_data **thedata)
 {
 	struct lLCSAPTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCSAPTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCSAPTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCDLECommunicationsEntityId);
 		StorageDel->lLCDLECommunicationsEntityIdLen = 0;
@@ -2649,7 +2648,7 @@ lLCSAPTable_destroy(struct lLCSAPTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2667,15 +2666,16 @@ lLCSAPTable_add(struct lLCSAPTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCSAPTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCSAPTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* lLCDLECommunicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCDLECommunicationsEntityId, thedata->lLCDLECommunicationsEntityIdLen);
 	/* dLSAPSapId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->dLSAPSapId, thedata->dLSAPSapIdLen);
 	header_complex_add_data(&lLCSAPTableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCSAPTable", "registered an entry\n"));
-	DEBUGMSGTL(("lLCSAPTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2696,14 +2696,14 @@ lLCSAPTable_del(struct lLCSAPTable_data *thedata)
 {
 	struct lLCSAPTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCSAPTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCSAPTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCSAPTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCSAPTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2725,7 +2725,7 @@ parse_lLCSAPTable(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCSAPTable_data *StorageTmp = lLCSAPTable_create();
 
-	DEBUGMSGTL(("lLCSAPTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCSAPTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -2758,7 +2758,7 @@ parse_lLCSAPTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCSAPRDE, &tmpsize);
 	lLCSAPTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -2774,7 +2774,7 @@ store_lLCSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct lLCSAPTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCSAPTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCSAPTable: storing data...  "));
 	refresh_lLCSAPTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCSAPTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -2784,6 +2784,7 @@ store_lLCSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCSAPTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
@@ -2793,7 +2794,7 @@ store_lLCSAPTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCSAPTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2810,7 +2811,7 @@ rDESetupTable_create(void)
 {
 	struct rDESetupTable_data *StorageNew = SNMP_MALLOC_STRUCT(rDESetupTable_data);
 
-	DEBUGMSGTL(("rDESetupTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "rDESetupTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
@@ -2829,7 +2830,7 @@ rDESetupTable_create(void)
 		StorageNew->rDESetupResetOnTestEnabled = 0;
 
 	}
-	DEBUGMSGTL(("rDESetupTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -2846,11 +2847,11 @@ rDESetupTable_duplicate(struct rDESetupTable_data *thedata)
 {
 	struct rDESetupTable_data *StorageNew = SNMP_MALLOC_STRUCT(rDESetupTable_data);
 
-	DEBUGMSGTL(("rDESetupTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "rDESetupTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("rDESetupTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -2873,7 +2874,7 @@ rDESetupTable_destroy(struct rDESetupTable_data **thedata)
 {
 	struct rDESetupTable_data *StorageDel;
 
-	DEBUGMSGTL(("rDESetupTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "rDESetupTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCDLECommunicationsEntityId);
 		StorageDel->lLCDLECommunicationsEntityIdLen = 0;
@@ -2882,7 +2883,7 @@ rDESetupTable_destroy(struct rDESetupTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("rDESetupTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2900,15 +2901,16 @@ rDESetupTable_add(struct rDESetupTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("rDESetupTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "rDESetupTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* lLCDLECommunicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCDLECommunicationsEntityId, thedata->lLCDLECommunicationsEntityIdLen);
 	/* dLSAPSapId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->dLSAPSapId, thedata->dLSAPSapIdLen);
 	header_complex_add_data(&rDESetupTableStorage, vars, thedata);
-	DEBUGMSGTL(("rDESetupTable", "registered an entry\n"));
-	DEBUGMSGTL(("rDESetupTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2929,14 +2931,14 @@ rDESetupTable_del(struct rDESetupTable_data *thedata)
 {
 	struct rDESetupTable_data *StorageDel;
 
-	DEBUGMSGTL(("rDESetupTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "rDESetupTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(rDESetupTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&rDESetupTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("rDESetupTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -2958,7 +2960,7 @@ parse_rDESetupTable(const char *token, char *line)
 	size_t tmpsize;
 	struct rDESetupTable_data *StorageTmp = rDESetupTable_create();
 
-	DEBUGMSGTL(("rDESetupTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_rDESetupTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -2988,7 +2990,7 @@ parse_rDESetupTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->rDESetupResetOnTestEnabled, &tmpsize);
 	rDESetupTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("rDESetupTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -3004,7 +3006,7 @@ store_rDESetupTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct rDESetupTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("rDESetupTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_rDESetupTable: storing data...  "));
 	refresh_rDESetupTable(1);
 	(void) tmpsize;
 	for (hcindex = rDESetupTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -3014,6 +3016,7 @@ store_rDESetupTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "rDESetupTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
@@ -3030,7 +3033,7 @@ store_rDESetupTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("rDESetupTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3047,7 +3050,7 @@ rDEPairTable_create(void)
 {
 	struct rDEPairTable_data *StorageNew = SNMP_MALLOC_STRUCT(rDEPairTable_data);
 
-	DEBUGMSGTL(("rDEPairTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "rDEPairTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		if ((StorageNew->lLCDLECommunicationsEntityId = (uint8_t *) strdup("")) != NULL)
@@ -3063,7 +3066,7 @@ rDEPairTable_create(void)
 		StorageNew->rDEPairQueryCounter = 0;
 
 	}
-	DEBUGMSGTL(("rDEPairTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -3080,11 +3083,11 @@ rDEPairTable_duplicate(struct rDEPairTable_data *thedata)
 {
 	struct rDEPairTable_data *StorageNew = SNMP_MALLOC_STRUCT(rDEPairTable_data);
 
-	DEBUGMSGTL(("rDEPairTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "rDEPairTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("rDEPairTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -3107,7 +3110,7 @@ rDEPairTable_destroy(struct rDEPairTable_data **thedata)
 {
 	struct rDEPairTable_data *StorageDel;
 
-	DEBUGMSGTL(("rDEPairTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "rDEPairTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCDLECommunicationsEntityId);
 		StorageDel->lLCDLECommunicationsEntityIdLen = 0;
@@ -3120,7 +3123,7 @@ rDEPairTable_destroy(struct rDEPairTable_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("rDEPairTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3138,7 +3141,8 @@ rDEPairTable_add(struct rDEPairTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("rDEPairTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "rDEPairTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* lLCDLECommunicationsEntityId */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCDLECommunicationsEntityId, thedata->lLCDLECommunicationsEntityIdLen);
@@ -3147,8 +3151,8 @@ rDEPairTable_add(struct rDEPairTable_data *thedata)
 	/* rDEPairName */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->rDEPairName, thedata->rDEPairNameLen);
 	header_complex_add_data(&rDEPairTableStorage, vars, thedata);
-	DEBUGMSGTL(("rDEPairTable", "registered an entry\n"));
-	DEBUGMSGTL(("rDEPairTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3169,14 +3173,14 @@ rDEPairTable_del(struct rDEPairTable_data *thedata)
 {
 	struct rDEPairTable_data *StorageDel;
 
-	DEBUGMSGTL(("rDEPairTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "rDEPairTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(rDEPairTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&rDEPairTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("rDEPairTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3198,7 +3202,7 @@ parse_rDEPairTable(const char *token, char *line)
 	size_t tmpsize;
 	struct rDEPairTable_data *StorageTmp = rDEPairTable_create();
 
-	DEBUGMSGTL(("rDEPairTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_rDEPairTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -3235,7 +3239,7 @@ parse_rDEPairTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->rDEPairQueryCounter, &tmpsize);
 	rDEPairTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("rDEPairTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -3251,7 +3255,7 @@ store_rDEPairTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct rDEPairTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("rDEPairTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_rDEPairTable: storing data...  "));
 	refresh_rDEPairTable(1);
 	(void) tmpsize;
 	for (hcindex = rDEPairTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -3261,6 +3265,7 @@ store_rDEPairTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "rDEPairTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCDLECommunicationsEntityId, &StorageTmp->lLCDLECommunicationsEntityIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->dLSAPSapId, &StorageTmp->dLSAPSapIdLen);
@@ -3274,7 +3279,7 @@ store_rDEPairTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("rDEPairTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3291,17 +3296,15 @@ lLCCLPMTable_create(void)
 {
 	struct lLCCLPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCCLPMTable_data);
 
-	DEBUGMSGTL(("lLCCLPMTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCLPMTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCCLPMClProtocolMachineId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->lLCCLPMClProtocolMachineIdLen = strlen("");
 		StorageNew->lLCCLPMOperationalState = 0;
 		StorageNew->lLCCLPMTotalRemoteSAPs = 0;
 		StorageNew->lLCCLPMRowStatus = 0;
 		StorageNew->lLCCLPMRowStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("lLCCLPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -3318,11 +3321,11 @@ lLCCLPMTable_duplicate(struct lLCCLPMTable_data *thedata)
 {
 	struct lLCCLPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCCLPMTable_data);
 
-	DEBUGMSGTL(("lLCCLPMTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCLPMTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCCLPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -3345,14 +3348,14 @@ lLCCLPMTable_destroy(struct lLCCLPMTable_data **thedata)
 {
 	struct lLCCLPMTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCCLPMTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCLPMTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCCLPMClProtocolMachineId);
 		StorageDel->lLCCLPMClProtocolMachineIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCCLPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3370,11 +3373,14 @@ lLCCLPMTable_add(struct lLCCLPMTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCCLPMTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCLPMTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* lLCCLPMClProtocolMachineId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCCLPMClProtocolMachineId, thedata->lLCCLPMClProtocolMachineIdLen);
 	header_complex_add_data(&lLCCLPMTableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCCLPMTable", "registered an entry\n"));
-	DEBUGMSGTL(("lLCCLPMTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3395,14 +3401,14 @@ lLCCLPMTable_del(struct lLCCLPMTable_data *thedata)
 {
 	struct lLCCLPMTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCCLPMTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCLPMTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCCLPMTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCCLPMTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCCLPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3424,7 +3430,7 @@ parse_lLCCLPMTable(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCCLPMTable_data *StorageTmp = lLCCLPMTable_create();
 
-	DEBUGMSGTL(("lLCCLPMTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCCLPMTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -3441,7 +3447,7 @@ parse_lLCCLPMTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCCLPMRowStatus, &tmpsize);
 	lLCCLPMTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCCLPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -3457,7 +3463,7 @@ store_lLCCLPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct lLCCLPMTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCCLPMTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCCLPMTable: storing data...  "));
 	refresh_lLCCLPMTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCCLPMTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -3467,6 +3473,7 @@ store_lLCCLPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCCLPMTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCCLPMClProtocolMachineId, &StorageTmp->lLCCLPMClProtocolMachineIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCCLPMOperationalState, &tmpsize);
@@ -3475,7 +3482,7 @@ store_lLCCLPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCCLPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3492,9 +3499,13 @@ lLCConnectionLessTable_create(void)
 {
 	struct lLCConnectionLessTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionLessTable_data);
 
-	DEBUGMSGTL(("lLCConnectionLessTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionLessTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		if ((StorageNew->lLCCLPMClProtocolMachineId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->lLCCLPMClProtocolMachineIdLen = strlen("");
+		if ((StorageNew->lLCCLPMClProtocolMachineId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->lLCCLPMClProtocolMachineIdLen = strlen("");
 		if ((StorageNew->lLCConnectionlessName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnectionlessNameLen = strlen("");
 		StorageNew->lLCConnectionlessMaximumLLCInformationFieldSize = 0;
@@ -3512,7 +3523,7 @@ lLCConnectionLessTable_create(void)
 		StorageNew->lLCConnectionlessXIDSentResponse = 0;
 
 	}
-	DEBUGMSGTL(("lLCConnectionLessTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -3529,11 +3540,11 @@ lLCConnectionLessTable_duplicate(struct lLCConnectionLessTable_data *thedata)
 {
 	struct lLCConnectionLessTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionLessTable_data);
 
-	DEBUGMSGTL(("lLCConnectionLessTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionLessTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCConnectionLessTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -3556,14 +3567,18 @@ lLCConnectionLessTable_destroy(struct lLCConnectionLessTable_data **thedata)
 {
 	struct lLCConnectionLessTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnectionLessTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionLessTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->lLCCLPMClProtocolMachineId);
+		StorageDel->lLCCLPMClProtocolMachineIdLen = 0;
+		SNMP_FREE(StorageDel->lLCCLPMClProtocolMachineId);
+		StorageDel->lLCCLPMClProtocolMachineIdLen = 0;
 		SNMP_FREE(StorageDel->lLCConnectionlessName);
 		StorageDel->lLCConnectionlessNameLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCConnectionLessTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3581,11 +3596,16 @@ lLCConnectionLessTable_add(struct lLCConnectionLessTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCConnectionLessTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionLessTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* lLCCLPMClProtocolMachineId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCCLPMClProtocolMachineId, thedata->lLCCLPMClProtocolMachineIdLen);
+		/* lLCCLPMClProtocolMachineId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCCLPMClProtocolMachineId, thedata->lLCCLPMClProtocolMachineIdLen);
 	header_complex_add_data(&lLCConnectionLessTableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCConnectionLessTable", "registered an entry\n"));
-	DEBUGMSGTL(("lLCConnectionLessTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3606,14 +3626,14 @@ lLCConnectionLessTable_del(struct lLCConnectionLessTable_data *thedata)
 {
 	struct lLCConnectionLessTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnectionLessTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionLessTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCConnectionLessTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCConnectionLessTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCConnectionLessTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3635,12 +3655,24 @@ parse_lLCConnectionLessTable(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCConnectionLessTable_data *StorageTmp = lLCConnectionLessTable_create();
 
-	DEBUGMSGTL(("lLCConnectionLessTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCConnectionLessTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCCLPMClProtocolMachineId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCCLPMClProtocolMachineId, &StorageTmp->lLCCLPMClProtocolMachineIdLen);
+	if (StorageTmp->lLCCLPMClProtocolMachineId == NULL) {
+		config_perror("invalid specification for lLCCLPMClProtocolMachineId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->lLCCLPMClProtocolMachineId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCCLPMClProtocolMachineId, &StorageTmp->lLCCLPMClProtocolMachineIdLen);
+	if (StorageTmp->lLCCLPMClProtocolMachineId == NULL) {
+		config_perror("invalid specification for lLCCLPMClProtocolMachineId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->lLCConnectionlessName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnectionlessName, &StorageTmp->lLCConnectionlessNameLen);
 	if (StorageTmp->lLCConnectionlessName == NULL) {
@@ -3662,7 +3694,7 @@ parse_lLCConnectionLessTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCConnectionlessXIDSentResponse, &tmpsize);
 	lLCConnectionLessTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCConnectionLessTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -3678,7 +3710,7 @@ store_lLCConnectionLessTable(int majorID, int minorID, void *serverarg, void *cl
 	struct lLCConnectionLessTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCConnectionLessTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCConnectionLessTable: storing data...  "));
 	refresh_lLCConnectionLessTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnectionLessTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -3688,7 +3720,10 @@ store_lLCConnectionLessTable(int majorID, int minorID, void *serverarg, void *cl
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnectionLessTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCCLPMClProtocolMachineId, &StorageTmp->lLCCLPMClProtocolMachineIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCCLPMClProtocolMachineId, &StorageTmp->lLCCLPMClProtocolMachineIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCConnectionlessName, &StorageTmp->lLCConnectionlessNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnectionlessMaximumLLCInformationFieldSize, &tmpsize);
 			cptr = read_config_store_data(ASN_COUNTER, cptr, &StorageTmp->lLCConnectionlessTESTReceivedABBResponse, &tmpsize);
@@ -3706,7 +3741,7 @@ store_lLCConnectionLessTable(int majorID, int minorID, void *serverarg, void *cl
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCConnectionLessTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3723,16 +3758,14 @@ lLCCOPMTable_create(void)
 {
 	struct lLCCOPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCCOPMTable_data);
 
-	DEBUGMSGTL(("lLCCOPMTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCOPMTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCCOPMCoProtocolMachineId = (uint8_t *) strdup("")) != NULL)
-			StorageNew->lLCCOPMCoProtocolMachineIdLen = strlen("");
 		StorageNew->lLCCOPMOperationalState = 0;
 		StorageNew->lLCCOPMRowStatus = 0;
 		StorageNew->lLCCOPMRowStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("lLCCOPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -3749,11 +3782,11 @@ lLCCOPMTable_duplicate(struct lLCCOPMTable_data *thedata)
 {
 	struct lLCCOPMTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCCOPMTable_data);
 
-	DEBUGMSGTL(("lLCCOPMTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCOPMTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCCOPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -3776,14 +3809,14 @@ lLCCOPMTable_destroy(struct lLCCOPMTable_data **thedata)
 {
 	struct lLCCOPMTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCCOPMTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCOPMTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCCOPMCoProtocolMachineId);
 		StorageDel->lLCCOPMCoProtocolMachineIdLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCCOPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3801,11 +3834,14 @@ lLCCOPMTable_add(struct lLCCOPMTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCCOPMTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCOPMTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* lLCCOPMCoProtocolMachineId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCCOPMCoProtocolMachineId, thedata->lLCCOPMCoProtocolMachineIdLen);
 	header_complex_add_data(&lLCCOPMTableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCCOPMTable", "registered an entry\n"));
-	DEBUGMSGTL(("lLCCOPMTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3826,14 +3862,14 @@ lLCCOPMTable_del(struct lLCCOPMTable_data *thedata)
 {
 	struct lLCCOPMTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCCOPMTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCCOPMTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCCOPMTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCCOPMTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCCOPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3855,7 +3891,7 @@ parse_lLCCOPMTable(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCCOPMTable_data *StorageTmp = lLCCOPMTable_create();
 
-	DEBUGMSGTL(("lLCCOPMTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCCOPMTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -3871,7 +3907,7 @@ parse_lLCCOPMTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCCOPMRowStatus, &tmpsize);
 	lLCCOPMTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCCOPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -3887,7 +3923,7 @@ store_lLCCOPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 	struct lLCCOPMTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCCOPMTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCCOPMTable: storing data...  "));
 	refresh_lLCCOPMTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCCOPMTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -3897,6 +3933,7 @@ store_lLCCOPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCCOPMTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCCOPMOperationalState, &tmpsize);
@@ -3904,7 +3941,7 @@ store_lLCCOPMTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCCOPMTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -3921,9 +3958,13 @@ lLCConnection2Table_create(void)
 {
 	struct lLCConnection2Table_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnection2Table_data);
 
-	DEBUGMSGTL(("lLCConnection2Table", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2Table_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		if ((StorageNew->lLCCOPMCoProtocolMachineId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->lLCCOPMCoProtocolMachineIdLen = strlen("");
+		if ((StorageNew->lLCCOPMCoProtocolMachineId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->lLCCOPMCoProtocolMachineIdLen = strlen("");
 		if ((StorageNew->lLCConnection2Name = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnection2NameLen = strlen("");
 		StorageNew->lLCConnection2MaximumRetransmissions = 0;
@@ -3978,7 +4019,7 @@ lLCConnection2Table_create(void)
 			StorageNew->lLCConnection2AlarmStatusLen = 1;
 
 	}
-	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -3995,11 +4036,11 @@ lLCConnection2Table_duplicate(struct lLCConnection2Table_data *thedata)
 {
 	struct lLCConnection2Table_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnection2Table_data);
 
-	DEBUGMSGTL(("lLCConnection2Table", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2Table_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -4022,8 +4063,12 @@ lLCConnection2Table_destroy(struct lLCConnection2Table_data **thedata)
 {
 	struct lLCConnection2Table_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnection2Table", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2Table_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->lLCCOPMCoProtocolMachineId);
+		StorageDel->lLCCOPMCoProtocolMachineIdLen = 0;
+		SNMP_FREE(StorageDel->lLCCOPMCoProtocolMachineId);
+		StorageDel->lLCCOPMCoProtocolMachineIdLen = 0;
 		SNMP_FREE(StorageDel->lLCConnection2Name);
 		StorageDel->lLCConnection2NameLen = 0;
 		SNMP_FREE(StorageDel->lLCConnection2Route);
@@ -4035,7 +4080,7 @@ lLCConnection2Table_destroy(struct lLCConnection2Table_data **thedata)
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4053,11 +4098,16 @@ lLCConnection2Table_add(struct lLCConnection2Table_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCConnection2Table", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2Table_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* lLCCOPMCoProtocolMachineId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCCOPMCoProtocolMachineId, thedata->lLCCOPMCoProtocolMachineIdLen);
+		/* lLCCOPMCoProtocolMachineId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCCOPMCoProtocolMachineId, thedata->lLCCOPMCoProtocolMachineIdLen);
 	header_complex_add_data(&lLCConnection2TableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCConnection2Table", "registered an entry\n"));
-	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4078,14 +4128,14 @@ lLCConnection2Table_del(struct lLCConnection2Table_data *thedata)
 {
 	struct lLCConnection2Table_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnection2Table", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2Table_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCConnection2TableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCConnection2TableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4107,12 +4157,24 @@ parse_lLCConnection2Table(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCConnection2Table_data *StorageTmp = lLCConnection2Table_create();
 
-	DEBUGMSGTL(("lLCConnection2Table", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCConnection2Table: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCCOPMCoProtocolMachineId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
+	if (StorageTmp->lLCCOPMCoProtocolMachineId == NULL) {
+		config_perror("invalid specification for lLCCOPMCoProtocolMachineId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->lLCCOPMCoProtocolMachineId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
+	if (StorageTmp->lLCCOPMCoProtocolMachineId == NULL) {
+		config_perror("invalid specification for lLCCOPMCoProtocolMachineId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->lLCConnection2Name);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2Name, &StorageTmp->lLCConnection2NameLen);
 	if (StorageTmp->lLCConnection2Name == NULL) {
@@ -4170,20 +4232,20 @@ parse_lLCConnection2Table(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2OperationalState, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2UsageState, &tmpsize);
 	SNMP_FREE(StorageTmp->lLCConnection2ProceduralStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCConnection2ProceduralStatus, &StorageTmp->lLCConnection2ProceduralStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2ProceduralStatus, &StorageTmp->lLCConnection2ProceduralStatusLen);
 	if (StorageTmp->lLCConnection2ProceduralStatus == NULL) {
 		config_perror("invalid specification for lLCConnection2ProceduralStatus");
 		return;
 	}
 	SNMP_FREE(StorageTmp->lLCConnection2AlarmStatus);
-	line = read_config_read_data(ASN_BIT_STR, line, &StorageTmp->lLCConnection2AlarmStatus, &StorageTmp->lLCConnection2AlarmStatusLen);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2AlarmStatus, &StorageTmp->lLCConnection2AlarmStatusLen);
 	if (StorageTmp->lLCConnection2AlarmStatus == NULL) {
 		config_perror("invalid specification for lLCConnection2AlarmStatus");
 		return;
 	}
 	lLCConnection2Table_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -4199,7 +4261,7 @@ store_lLCConnection2Table(int majorID, int minorID, void *serverarg, void *clien
 	struct lLCConnection2Table_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCConnection2Table", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCConnection2Table: storing data...  "));
 	refresh_lLCConnection2Table(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnection2TableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -4209,7 +4271,10 @@ store_lLCConnection2Table(int majorID, int minorID, void *serverarg, void *clien
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnection2Table ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCConnection2Name, &StorageTmp->lLCConnection2NameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2MaximumRetransmissions, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2ReceivedWindowSize, &tmpsize);
@@ -4256,12 +4321,12 @@ store_lLCConnection2Table(int majorID, int minorID, void *serverarg, void *clien
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2AdministrativeState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2OperationalState, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2UsageState, &tmpsize);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->lLCConnection2ProceduralStatus, &StorageTmp->lLCConnection2ProceduralStatusLen);
-			cptr = read_config_store_data(ASN_BIT_STR, cptr, &StorageTmp->lLCConnection2AlarmStatus, &StorageTmp->lLCConnection2AlarmStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCConnection2ProceduralStatus, &StorageTmp->lLCConnection2ProceduralStatusLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCConnection2AlarmStatus, &StorageTmp->lLCConnection2AlarmStatusLen);
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCConnection2Table", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4278,11 +4343,9 @@ lLCConnection2IVMOTable_create(void)
 {
 	struct lLCConnection2IVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnection2IVMOTable_data);
 
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2IVMOTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
-		if ((StorageNew->lLCConnection2IVMOName = (uint8_t *) strdup("")) != NULL)
-			StorageNew->lLCConnection2IVMONameLen = strlen("");
 		StorageNew->lLCConnection2IVMOMaximumRetransmissions = 0;
 		StorageNew->lLCConnection2IVMOReceivedWindowSize = 0;
 		StorageNew->lLCConnection2IVMOSendWindowSize = 0;
@@ -4290,13 +4353,14 @@ lLCConnection2IVMOTable_create(void)
 		StorageNew->lLCConnection2IVMOBusyStateTimeoutValue = 0;
 		StorageNew->lLCConnection2IVMOBitTimeoutValue = 0;
 		StorageNew->lLCConnection2IVMORejectTimeoutValue = 0;
-		StorageNew->lLCConnection2IVMORoute = 0;
+		if ((StorageNew->lLCConnection2IVMORoute = (uint8_t *) strdup("")) != NULL)
+			StorageNew->lLCConnection2IVMORouteLen = strlen("");
 		StorageNew->lLCConnection2IVMOKStep = 0;
 		StorageNew->lLCConnection2IVMOMaxSendWindowSize = 0;
 		StorageNew->lLCConnection2IVMOOptionalTolerationIPDUs = 0;
 
 	}
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -4313,11 +4377,11 @@ lLCConnection2IVMOTable_duplicate(struct lLCConnection2IVMOTable_data *thedata)
 {
 	struct lLCConnection2IVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnection2IVMOTable_data);
 
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2IVMOTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -4340,14 +4404,16 @@ lLCConnection2IVMOTable_destroy(struct lLCConnection2IVMOTable_data **thedata)
 {
 	struct lLCConnection2IVMOTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2IVMOTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCConnection2IVMOName);
 		StorageDel->lLCConnection2IVMONameLen = 0;
+		SNMP_FREE(StorageDel->lLCConnection2IVMORoute);
+		StorageDel->lLCConnection2IVMORouteLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4365,11 +4431,14 @@ lLCConnection2IVMOTable_add(struct lLCConnection2IVMOTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2IVMOTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* lLCConnection2IVMOName */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCConnection2IVMOName, thedata->lLCConnection2IVMONameLen);
 	header_complex_add_data(&lLCConnection2IVMOTableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "registered an entry\n"));
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4390,14 +4459,14 @@ lLCConnection2IVMOTable_del(struct lLCConnection2IVMOTable_data *thedata)
 {
 	struct lLCConnection2IVMOTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnection2IVMOTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCConnection2IVMOTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCConnection2IVMOTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4419,7 +4488,7 @@ parse_lLCConnection2IVMOTable(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCConnection2IVMOTable_data *StorageTmp = lLCConnection2IVMOTable_create();
 
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCConnection2IVMOTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -4438,13 +4507,18 @@ parse_lLCConnection2IVMOTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2IVMOBusyStateTimeoutValue, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2IVMOBitTimeoutValue, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2IVMORejectTimeoutValue, &tmpsize);
-	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->lLCConnection2IVMORoute, &tmpsize);
+	SNMP_FREE(StorageTmp->lLCConnection2IVMORoute);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnection2IVMORoute, &StorageTmp->lLCConnection2IVMORouteLen);
+	if (StorageTmp->lLCConnection2IVMORoute == NULL) {
+		config_perror("invalid specification for lLCConnection2IVMORoute");
+		return;
+	}
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->lLCConnection2IVMOKStep, &tmpsize);
 	line = read_config_read_data(ASN_UNSIGNED, line, &StorageTmp->lLCConnection2IVMOMaxSendWindowSize, &tmpsize);
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnection2IVMOOptionalTolerationIPDUs, &tmpsize);
 	lLCConnection2IVMOTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -4460,7 +4534,7 @@ store_lLCConnection2IVMOTable(int majorID, int minorID, void *serverarg, void *c
 	struct lLCConnection2IVMOTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCConnection2IVMOTable: storing data...  "));
 	refresh_lLCConnection2IVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnection2IVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -4470,6 +4544,7 @@ store_lLCConnection2IVMOTable(int majorID, int minorID, void *serverarg, void *c
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnection2IVMOTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCConnection2IVMOName, &StorageTmp->lLCConnection2IVMONameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->lLCConnection2IVMOMaximumRetransmissions, &tmpsize);
@@ -4479,14 +4554,14 @@ store_lLCConnection2IVMOTable(int majorID, int minorID, void *serverarg, void *c
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2IVMOBusyStateTimeoutValue, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2IVMOBitTimeoutValue, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2IVMORejectTimeoutValue, &tmpsize);
-			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->lLCConnection2IVMORoute, &tmpsize);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCConnection2IVMORoute, &StorageTmp->lLCConnection2IVMORouteLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->lLCConnection2IVMOKStep, &tmpsize);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->lLCConnection2IVMOMaxSendWindowSize, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnection2IVMOOptionalTolerationIPDUs, &tmpsize);
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCConnection2IVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4503,9 +4578,13 @@ lLCConnectionlessAckTable_create(void)
 {
 	struct lLCConnectionlessAckTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionlessAckTable_data);
 
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
+		if ((StorageNew->lLCCOPMCoProtocolMachineId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->lLCCOPMCoProtocolMachineIdLen = strlen("");
+		if ((StorageNew->lLCCOPMCoProtocolMachineId = (uint8_t *) strdup("")) != NULL)
+			StorageNew->lLCCOPMCoProtocolMachineIdLen = strlen("");
 		if ((StorageNew->lLCConnectionlessAckName = (uint8_t *) strdup("")) != NULL)
 			StorageNew->lLCConnectionlessAckNameLen = strlen("");
 		StorageNew->lLCConnectionlessAckMaximumLLCInformationFieldSize = 0;
@@ -4545,7 +4624,7 @@ lLCConnectionlessAckTable_create(void)
 		StorageNew->lLCConnectionlessAckViolation = 0;
 
 	}
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -4562,11 +4641,11 @@ lLCConnectionlessAckTable_duplicate(struct lLCConnectionlessAckTable_data *theda
 {
 	struct lLCConnectionlessAckTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionlessAckTable_data);
 
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -4589,14 +4668,18 @@ lLCConnectionlessAckTable_destroy(struct lLCConnectionlessAckTable_data **thedat
 {
 	struct lLCConnectionlessAckTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
+		SNMP_FREE(StorageDel->lLCCOPMCoProtocolMachineId);
+		StorageDel->lLCCOPMCoProtocolMachineIdLen = 0;
+		SNMP_FREE(StorageDel->lLCCOPMCoProtocolMachineId);
+		StorageDel->lLCCOPMCoProtocolMachineIdLen = 0;
 		SNMP_FREE(StorageDel->lLCConnectionlessAckName);
 		StorageDel->lLCConnectionlessAckNameLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4614,11 +4697,16 @@ lLCConnectionlessAckTable_add(struct lLCConnectionlessAckTable_data *thedata)
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
+		/* lLCCOPMCoProtocolMachineId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCCOPMCoProtocolMachineId, thedata->lLCCOPMCoProtocolMachineIdLen);
+		/* lLCCOPMCoProtocolMachineId */
+		snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCCOPMCoProtocolMachineId, thedata->lLCCOPMCoProtocolMachineIdLen);
 	header_complex_add_data(&lLCConnectionlessAckTableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "registered an entry\n"));
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4639,14 +4727,14 @@ lLCConnectionlessAckTable_del(struct lLCConnectionlessAckTable_data *thedata)
 {
 	struct lLCConnectionlessAckTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCConnectionlessAckTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCConnectionlessAckTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4668,12 +4756,24 @@ parse_lLCConnectionlessAckTable(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCConnectionlessAckTable_data *StorageTmp = lLCConnectionlessAckTable_create();
 
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCConnectionlessAckTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
 	}
 	/* XXX: remove individual columns if not persistent */
+	SNMP_FREE(StorageTmp->lLCCOPMCoProtocolMachineId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
+	if (StorageTmp->lLCCOPMCoProtocolMachineId == NULL) {
+		config_perror("invalid specification for lLCCOPMCoProtocolMachineId");
+		return;
+	}
+	SNMP_FREE(StorageTmp->lLCCOPMCoProtocolMachineId);
+	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
+	if (StorageTmp->lLCCOPMCoProtocolMachineId == NULL) {
+		config_perror("invalid specification for lLCCOPMCoProtocolMachineId");
+		return;
+	}
 	SNMP_FREE(StorageTmp->lLCConnectionlessAckName);
 	line = read_config_read_data(ASN_OCTET_STR, line, &StorageTmp->lLCConnectionlessAckName, &StorageTmp->lLCConnectionlessAckNameLen);
 	if (StorageTmp->lLCConnectionlessAckName == NULL) {
@@ -4717,7 +4817,7 @@ parse_lLCConnectionlessAckTable(const char *token, char *line)
 	line = read_config_read_data(ASN_COUNTER, line, &StorageTmp->lLCConnectionlessAckViolation, &tmpsize);
 	lLCConnectionlessAckTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -4733,7 +4833,7 @@ store_lLCConnectionlessAckTable(int majorID, int minorID, void *serverarg, void 
 	struct lLCConnectionlessAckTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCConnectionlessAckTable: storing data...  "));
 	refresh_lLCConnectionlessAckTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnectionlessAckTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -4743,7 +4843,10 @@ store_lLCConnectionlessAckTable(int majorID, int minorID, void *serverarg, void 
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnectionlessAckTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
+			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCCOPMCoProtocolMachineId, &StorageTmp->lLCCOPMCoProtocolMachineIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCConnectionlessAckName, &StorageTmp->lLCConnectionlessAckNameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnectionlessAckMaximumLLCInformationFieldSize, &tmpsize);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnectionlessAckMaximumRetransmissions, &tmpsize);
@@ -4783,7 +4886,7 @@ store_lLCConnectionlessAckTable(int majorID, int minorID, void *serverarg, void 
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCConnectionlessAckTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4800,7 +4903,7 @@ lLCConnectionlessAckIVMOTable_create(void)
 {
 	struct lLCConnectionlessAckIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionlessAckIVMOTable_data);
 
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "creating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckIVMOTable_create: creating row...  "));
 	if (StorageNew != NULL) {
 		/* XXX: fill in default row values here into StorageNew */
 		StorageNew->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize = 0;
@@ -4808,7 +4911,7 @@ lLCConnectionlessAckIVMOTable_create(void)
 		StorageNew->lLCConnectionlessAckIVMORowStatus = 0;
 		StorageNew->lLCConnectionlessAckIVMORowStatus = RS_NOTREADY;
 	}
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 }
 
@@ -4825,11 +4928,11 @@ lLCConnectionlessAckIVMOTable_duplicate(struct lLCConnectionlessAckIVMOTable_dat
 {
 	struct lLCConnectionlessAckIVMOTable_data *StorageNew = SNMP_MALLOC_STRUCT(lLCConnectionlessAckIVMOTable_data);
 
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "duplicating row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckIVMOTable_duplicate: duplicating row...  "));
 	if (StorageNew != NULL) {
 	}
       done:
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return (StorageNew);
 	goto destroy;
       destroy:
@@ -4852,14 +4955,14 @@ lLCConnectionlessAckIVMOTable_destroy(struct lLCConnectionlessAckIVMOTable_data 
 {
 	struct lLCConnectionlessAckIVMOTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "deleting row...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckIVMOTable_destroy: deleting row...  "));
 	if ((StorageDel = *thedata) != NULL) {
 		SNMP_FREE(StorageDel->lLCConnectionlessAckIVMOName);
 		StorageDel->lLCConnectionlessAckIVMONameLen = 0;
 		SNMP_FREE(StorageDel);
 		*thedata = StorageDel;
 	}
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4877,13 +4980,14 @@ lLCConnectionlessAckIVMOTable_add(struct lLCConnectionlessAckIVMOTable_data *the
 {
 	struct variable_list *vars = NULL;
 
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "adding data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckIVMOTable_add: adding data...  "));
+	if (thedata) {
 	/* add the index variables to the varbind list, which is used by header_complex to index the data */
 	/* lLCConnectionlessAckIVMOName */
 	snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, (u_char *) thedata->lLCConnectionlessAckIVMOName, thedata->lLCConnectionlessAckIVMONameLen);
 	header_complex_add_data(&lLCConnectionlessAckIVMOTableStorage, vars, thedata);
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "registered an entry\n"));
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "done.\n"));
+	}
+	DEBUGMSGTL(("llcMIB", "registered an entry.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4904,14 +5008,14 @@ lLCConnectionlessAckIVMOTable_del(struct lLCConnectionlessAckIVMOTable_data *the
 {
 	struct lLCConnectionlessAckIVMOTable_data *StorageDel;
 
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "deleting data...  "));
+	DEBUGMSGTL(("llcMIB", "lLCConnectionlessAckIVMOTable_data: deleting data...  "));
 	if ((StorageDel = thedata) != NULL) {
 		struct header_complex_index *hciptr;
 
 		if ((hciptr = header_complex_find_entry(lLCConnectionlessAckIVMOTableStorage, StorageDel)) != NULL)
 			header_complex_extract_entry(&lLCConnectionlessAckIVMOTableStorage, hciptr);
 	}
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -4933,7 +5037,7 @@ parse_lLCConnectionlessAckIVMOTable(const char *token, char *line)
 	size_t tmpsize;
 	struct lLCConnectionlessAckIVMOTable_data *StorageTmp = lLCConnectionlessAckIVMOTable_create();
 
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "parsing config...  "));
+	DEBUGMSGTL(("llcMIB", "parse_lLCConnectionlessAckIVMOTable: parsing config...  "));
 	if (StorageTmp == NULL) {
 		config_perror("malloc failure");
 		return;
@@ -4950,7 +5054,7 @@ parse_lLCConnectionlessAckIVMOTable(const char *token, char *line)
 	line = read_config_read_data(ASN_INTEGER, line, &StorageTmp->lLCConnectionlessAckIVMORowStatus, &tmpsize);
 	lLCConnectionlessAckIVMOTable_add(StorageTmp);
 	(void) tmpsize;
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 /*
@@ -4966,7 +5070,7 @@ store_lLCConnectionlessAckIVMOTable(int majorID, int minorID, void *serverarg, v
 	struct lLCConnectionlessAckIVMOTable_data *StorageTmp;
 	struct header_complex_index *hcindex;
 
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "storing data...  "));
+	DEBUGMSGTL(("llcMIB", "store_lLCConnectionlessAckIVMOTable: storing data...  "));
 	refresh_lLCConnectionlessAckIVMOTable(1);
 	(void) tmpsize;
 	for (hcindex = lLCConnectionlessAckIVMOTableStorage; hcindex != NULL; hcindex = hcindex->next) {
@@ -4976,6 +5080,7 @@ store_lLCConnectionlessAckIVMOTable(int majorID, int minorID, void *serverarg, v
 			memset(line, 0, sizeof(line));
 			strcat(line, "lLCConnectionlessAckIVMOTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->lLCConnectionlessAckIVMOName, &StorageTmp->lLCConnectionlessAckIVMONameLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize, &tmpsize);
@@ -4984,7 +5089,7 @@ store_lLCConnectionlessAckIVMOTable(int majorID, int minorID, void *serverarg, v
 			snmpd_store_config(line);
 		}
 	}
-	DEBUGMSGTL(("lLCConnectionlessAckIVMOTable", "done.\n"));
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return SNMPERR_SUCCESS;
 }
 
@@ -6464,29 +6569,25 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
 		*var_len = sizeof(StorageTmp->lLCConnection2LocalBusy);
 		rval = (u_char *) &StorageTmp->lLCConnection2LocalBusy;
 		break;
-	case (u_char) LLCCONNECTION2REMOTEBUSY:	/* ReadWrite */
-		*write_method = write_lLCConnection2RemoteBusy;
+	case (u_char) LLCCONNECTION2REMOTEBUSY:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2RemoteBusy);
 		rval = (u_char *) &StorageTmp->lLCConnection2RemoteBusy;
 		break;
-	case (u_char) LLCCONNECTION2REMOTERESET:	/* ReadWrite */
-		*write_method = write_lLCConnection2RemoteReset;
+	case (u_char) LLCCONNECTION2REMOTERESET:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2RemoteReset);
 		rval = (u_char *) &StorageTmp->lLCConnection2RemoteReset;
 		break;
-	case (u_char) LLCCONNECTION2LOCALRESET:	/* ReadWrite */
-		*write_method = write_lLCConnection2LocalReset;
+	case (u_char) LLCCONNECTION2LOCALRESET:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2LocalReset);
 		rval = (u_char *) &StorageTmp->lLCConnection2LocalReset;
 		break;
-	case (u_char) LLCCONNECTION2PROVIDERRESET:	/* ReadWrite */
-		*write_method = write_lLCConnection2ProviderReset;
+	case (u_char) LLCCONNECTION2PROVIDERRESET:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ProviderReset);
@@ -6525,148 +6626,127 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
 		*var_len = sizeof(StorageTmp->lLCConnection2SentI);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentI;
 		break;
-	case (u_char) LLCCONNECTION2SENTACKS:	/* ReadWrite */
-		*write_method = write_lLCConnection2SentAcks;
+	case (u_char) LLCCONNECTION2SENTACKS:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2SentAcks);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentAcks;
 		break;
-	case (u_char) LLCCONNECTION2RECEIVEDACKS:	/* ReadWrite */
-		*write_method = write_lLCConnection2ReceivedAcks;
+	case (u_char) LLCCONNECTION2RECEIVEDACKS:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ReceivedAcks);
 		rval = (u_char *) &StorageTmp->lLCConnection2ReceivedAcks;
 		break;
-	case (u_char) LLCCONNECTION2RECEIVEDFRMR:	/* ReadWrite */
-		*write_method = write_lLCConnection2ReceivedFRMR;
+	case (u_char) LLCCONNECTION2RECEIVEDFRMR:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ReceivedFRMR);
 		rval = (u_char *) &StorageTmp->lLCConnection2ReceivedFRMR;
 		break;
-	case (u_char) LLCCONNECTION2SENTFRMR:	/* ReadWrite */
-		*write_method = write_lLCConnection2SentFRMR;
+	case (u_char) LLCCONNECTION2SENTFRMR:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2SentFRMR);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentFRMR;
 		break;
-	case (u_char) LLCCONNECTION2RECEIVEDRR:	/* ReadWrite */
-		*write_method = write_lLCConnection2ReceivedRR;
+	case (u_char) LLCCONNECTION2RECEIVEDRR:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ReceivedRR);
 		rval = (u_char *) &StorageTmp->lLCConnection2ReceivedRR;
 		break;
-	case (u_char) LLCCONNECTION2SENTRR:	/* ReadWrite */
-		*write_method = write_lLCConnection2SentRR;
+	case (u_char) LLCCONNECTION2SENTRR:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2SentRR);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentRR;
 		break;
-	case (u_char) LLCCONNECTION2RECEIVEDRNR:	/* ReadWrite */
-		*write_method = write_lLCConnection2ReceivedRNR;
+	case (u_char) LLCCONNECTION2RECEIVEDRNR:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ReceivedRNR);
 		rval = (u_char *) &StorageTmp->lLCConnection2ReceivedRNR;
 		break;
-	case (u_char) LLCCONNECTION2SENTRNR:	/* ReadWrite */
-		*write_method = write_lLCConnection2SentRNR;
+	case (u_char) LLCCONNECTION2SENTRNR:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2SentRNR);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentRNR;
 		break;
-	case (u_char) LLCCONNECTION2RECEIVEDREJ:	/* ReadWrite */
-		*write_method = write_lLCConnection2ReceivedREJ;
+	case (u_char) LLCCONNECTION2RECEIVEDREJ:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ReceivedREJ);
 		rval = (u_char *) &StorageTmp->lLCConnection2ReceivedREJ;
 		break;
-	case (u_char) LLCCONNECTION2SENTREJ:	/* ReadWrite */
-		*write_method = write_lLCConnection2SentREJ;
+	case (u_char) LLCCONNECTION2SENTREJ:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2SentREJ);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentREJ;
 		break;
-	case (u_char) LLCCONNECTION2RECEIVEDSABME:	/* ReadWrite */
-		*write_method = write_lLCConnection2ReceivedSABME;
+	case (u_char) LLCCONNECTION2RECEIVEDSABME:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ReceivedSABME);
 		rval = (u_char *) &StorageTmp->lLCConnection2ReceivedSABME;
 		break;
-	case (u_char) LLCCONNECTION2SENTSABME:	/* ReadWrite */
-		*write_method = write_lLCConnection2SentSABME;
+	case (u_char) LLCCONNECTION2SENTSABME:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2SentSABME);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentSABME;
 		break;
-	case (u_char) LLCCONNECTION2RECEIVEDUA:	/* ReadWrite */
-		*write_method = write_lLCConnection2ReceivedUA;
+	case (u_char) LLCCONNECTION2RECEIVEDUA:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ReceivedUA);
 		rval = (u_char *) &StorageTmp->lLCConnection2ReceivedUA;
 		break;
-	case (u_char) LLCCONNECTION2SENTUA:	/* ReadWrite */
-		*write_method = write_lLCConnection2SentUA;
+	case (u_char) LLCCONNECTION2SENTUA:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2SentUA);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentUA;
 		break;
-	case (u_char) LLCCONNECTION2RECEIVEDDISC:	/* ReadWrite */
-		*write_method = write_lLCConnection2ReceivedDISC;
+	case (u_char) LLCCONNECTION2RECEIVEDDISC:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ReceivedDISC);
 		rval = (u_char *) &StorageTmp->lLCConnection2ReceivedDISC;
 		break;
-	case (u_char) LLCCONNECTION2SENTDISC:	/* ReadWrite */
-		*write_method = write_lLCConnection2SentDISC;
+	case (u_char) LLCCONNECTION2SENTDISC:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2SentDISC);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentDISC;
 		break;
-	case (u_char) LLCCONNECTION2RECEIVEDDM:	/* ReadWrite */
-		*write_method = write_lLCConnection2ReceivedDM;
+	case (u_char) LLCCONNECTION2RECEIVEDDM:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2ReceivedDM);
 		rval = (u_char *) &StorageTmp->lLCConnection2ReceivedDM;
 		break;
-	case (u_char) LLCCONNECTION2SENTDM:	/* ReadWrite */
-		*write_method = write_lLCConnection2SentDM;
+	case (u_char) LLCCONNECTION2SENTDM:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2SentDM);
 		rval = (u_char *) &StorageTmp->lLCConnection2SentDM;
 		break;
-	case (u_char) LLCCONNECTION2PDUSDISCARDED1:	/* ReadWrite */
-		*write_method = write_lLCConnection2PDUsDiscarded1;
+	case (u_char) LLCCONNECTION2PDUSDISCARDED1:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2PDUsDiscarded1);
 		rval = (u_char *) &StorageTmp->lLCConnection2PDUsDiscarded1;
 		break;
-	case (u_char) LLCCONNECTION2PDUSDISCARDED2:	/* ReadWrite */
-		*write_method = write_lLCConnection2PDUsDiscarded2;
+	case (u_char) LLCCONNECTION2PDUSDISCARDED2:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2PDUsDiscarded2);
 		rval = (u_char *) &StorageTmp->lLCConnection2PDUsDiscarded2;
 		break;
-	case (u_char) LLCCONNECTION2PDURETRANSMISSIONS:	/* ReadWrite */
-		*write_method = write_lLCConnection2PDURetransmissions;
+	case (u_char) LLCCONNECTION2PDURETRANSMISSIONS:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2PDURetransmissions);
@@ -6679,15 +6759,13 @@ var_lLCConnection2Table(struct variable *vp, oid * name, size_t *length, int exa
 		*var_len = sizeof(StorageTmp->lLCConnection2OptionalTolerationIPDUs);
 		rval = (u_char *) &StorageTmp->lLCConnection2OptionalTolerationIPDUs;
 		break;
-	case (u_char) LLCCONNECTION2DUPLICATEIPDUSRECEIVED:	/* ReadWrite */
-		*write_method = write_lLCConnection2DuplicateIPDUsReceived;
+	case (u_char) LLCCONNECTION2DUPLICATEIPDUSRECEIVED:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2DuplicateIPDUsReceived);
 		rval = (u_char *) &StorageTmp->lLCConnection2DuplicateIPDUsReceived;
 		break;
-	case (u_char) LLCCONNECTION2VIOLATION:	/* ReadWrite */
-		*write_method = write_lLCConnection2Violation;
+	case (u_char) LLCCONNECTION2VIOLATION:	/* ReadOnly */
 		if (!StorageTmp)
 			break;
 		*var_len = sizeof(StorageTmp->lLCConnection2Violation);
@@ -6855,8 +6933,8 @@ var_lLCConnection2IVMOTable(struct variable *vp, oid * name, size_t *length, int
 		*write_method = write_lLCConnection2IVMORoute;
 		if (!StorageTmp)
 			break;
-		*var_len = sizeof(StorageTmp->lLCConnection2IVMORoute);
-		rval = (u_char *) &StorageTmp->lLCConnection2IVMORoute;
+		*var_len = StorageTmp->lLCConnection2IVMORouteLen;
+		rval = (u_char *) StorageTmp->lLCConnection2IVMORoute;
 		break;
 	case (u_char) LLCCONNECTION2IVMOKSTEP:	/* ReadWrite */
 		*write_method = write_lLCConnection2IVMOKStep;
@@ -7288,11 +7366,10 @@ write_mACDLELocalSapNames(int action, u_char *var_val, u_char var_val_type, size
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_mACDLELocalSapNames entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(mACDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(mACDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
+		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mACDLERowStatus) {
@@ -7318,27 +7395,27 @@ write_mACDLELocalSapNames(int action, u_char *var_val, u_char var_val_type, size
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mACDLELocalSapNames for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->mACDLELocalSapNames;
 		old_length = StorageTmp->mACDLELocalSapNamesLen;
 		StorageTmp->mACDLELocalSapNames = objid;
 		StorageTmp->mACDLELocalSapNamesLen = var_val_len / sizeof(oid);
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mACDLELocalSapNames = old_value;
-		StorageTmp->mACDLELocalSapNamesLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->mACDLELocalSapNames = old_value;
+		StorageTmp->mACDLELocalSapNamesLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7365,11 +7442,10 @@ write_mACDLEProviderEntityNames(int action, u_char *var_val, u_char var_val_type
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_mACDLEProviderEntityNames entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(mACDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(mACDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
+		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->mACDLERowStatus) {
@@ -7395,27 +7471,27 @@ write_mACDLEProviderEntityNames(int action, u_char *var_val, u_char var_val_type
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->mACDLEProviderEntityNames for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->mACDLEProviderEntityNames;
 		old_length = StorageTmp->mACDLEProviderEntityNamesLen;
 		StorageTmp->mACDLEProviderEntityNames = objid;
 		StorageTmp->mACDLEProviderEntityNamesLen = var_val_len / sizeof(oid);
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->mACDLEProviderEntityNames = old_value;
-		StorageTmp->mACDLEProviderEntityNamesLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->mACDLEProviderEntityNames = old_value;
+		StorageTmp->mACDLEProviderEntityNamesLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7441,9 +7517,7 @@ write_dLSAPSap1Address(int action, u_char *var_val, u_char var_val_type, size_t 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_dLSAPSap1Address entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -7470,20 +7544,20 @@ write_dLSAPSap1Address(int action, u_char *var_val, u_char var_val_type, size_t 
 		/* Note: default value 0 */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		break;
-	case FREE:		/* Release any resources that have been allocated */
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dLSAPSap1Address for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->dLSAPSap1Address;
 		StorageTmp->dLSAPSap1Address = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->dLSAPSap1Address = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7510,11 +7584,10 @@ write_dLSAPUserEntityNames(int action, u_char *var_val, u_char var_val_type, siz
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_dLSAPUserEntityNames entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
+		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->dLSAPRowStatus) {
@@ -7536,32 +7609,32 @@ write_dLSAPUserEntityNames(int action, u_char *var_val, u_char var_val_type, siz
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to dLSAPUserEntityNames: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
-		/* Note: default value { zeroDotZero } */
+		/* Note: default value zeroDotZero */
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->dLSAPUserEntityNames for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->dLSAPUserEntityNames;
 		old_length = StorageTmp->dLSAPUserEntityNamesLen;
 		StorageTmp->dLSAPUserEntityNames = objid;
 		StorageTmp->dLSAPUserEntityNamesLen = var_val_len / sizeof(oid);
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->dLSAPUserEntityNames = old_value;
-		StorageTmp->dLSAPUserEntityNamesLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->dLSAPUserEntityNames = old_value;
+		StorageTmp->dLSAPUserEntityNamesLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7588,11 +7661,10 @@ write_lLCDLELocalSapNames(int action, u_char *var_val, u_char var_val_type, size
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCDLELocalSapNames entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(lLCDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
+		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->lLCDLERowStatus) {
@@ -7618,27 +7690,27 @@ write_lLCDLELocalSapNames(int action, u_char *var_val, u_char var_val_type, size
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCDLELocalSapNames for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->lLCDLELocalSapNames;
 		old_length = StorageTmp->lLCDLELocalSapNamesLen;
 		StorageTmp->lLCDLELocalSapNames = objid;
 		StorageTmp->lLCDLELocalSapNamesLen = var_val_len / sizeof(oid);
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCDLELocalSapNames = old_value;
-		StorageTmp->lLCDLELocalSapNamesLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCDLELocalSapNames = old_value;
+		StorageTmp->lLCDLELocalSapNamesLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7665,11 +7737,10 @@ write_lLCDLEProviderEntityNames(int action, u_char *var_val, u_char var_val_type
 	static oid *objid = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCDLEProviderEntityNames entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(lLCDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
+		objid = NULL;
 		if (StorageTmp != NULL && statP == NULL) {
 			/* have row but no column */
 			switch (StorageTmp->lLCDLERowStatus) {
@@ -7695,27 +7766,27 @@ write_lLCDLEProviderEntityNames(int action, u_char *var_val, u_char var_val_type
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		if ((objid = snmp_duplicate_objid((void *) var_val, var_val_len / sizeof(oid))) == NULL)
 			return SNMP_ERR_RESOURCEUNAVAILABLE;
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(objid);
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCDLEProviderEntityNames for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->lLCDLEProviderEntityNames;
 		old_length = StorageTmp->lLCDLEProviderEntityNamesLen;
 		StorageTmp->lLCDLEProviderEntityNames = objid;
 		StorageTmp->lLCDLEProviderEntityNamesLen = var_val_len / sizeof(oid);
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCDLEProviderEntityNames = old_value;
-		StorageTmp->lLCDLEProviderEntityNamesLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		objid = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCDLEProviderEntityNames = old_value;
+		StorageTmp->lLCDLEProviderEntityNamesLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(objid);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7742,17 +7813,18 @@ write_lLCStationLLCName(int action, u_char *var_val, u_char var_val_type, size_t
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationLLCName entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (var_val_type != ASN_OCTET_STR) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationLLCName not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (var_val_len > SPRINT_MAX_LEN) {
+		/* Note: ranges 0..32 */
+		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationLLCName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -7763,9 +7835,6 @@ write_lLCStationLLCName(int action, u_char *var_val, u_char var_val_type, size_t
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationLLCName for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationLLCName;
@@ -7773,14 +7842,17 @@ write_lLCStationLLCName(int action, u_char *var_val, u_char var_val_type, size_t
 		StorageTmp->lLCStationLLCName = string;
 		StorageTmp->lLCStationLLCNameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCStationLLCName = old_value;
-		StorageTmp->lLCStationLLCNameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCStationLLCName = old_value;
+		StorageTmp->lLCStationLLCNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7807,19 +7879,27 @@ write_lLCStationSupportedServicesTypes(int action, u_char *var_val, u_char var_v
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationSupportedServicesTypes entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		if (var_val_type != ASN_BIT_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationSupportedServicesTypes not ASN_BIT_STR\n");
+		string = NULL;
+		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationSupportedServicesTypes not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationSupportedServicesTypes: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationSupportedServicesTypes: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -7828,9 +7908,6 @@ write_lLCStationSupportedServicesTypes(int action, u_char *var_val, u_char var_v
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationSupportedServicesTypes for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationSupportedServicesTypes;
@@ -7838,14 +7915,17 @@ write_lLCStationSupportedServicesTypes(int action, u_char *var_val, u_char var_v
 		StorageTmp->lLCStationSupportedServicesTypes = string;
 		StorageTmp->lLCStationSupportedServicesTypesLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCStationSupportedServicesTypes = old_value;
-		StorageTmp->lLCStationSupportedServicesTypesLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCStationSupportedServicesTypes = old_value;
+		StorageTmp->lLCStationSupportedServicesTypesLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7871,8 +7951,7 @@ write_lLCStationType1AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationType1AcknowledgeTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -7893,17 +7972,17 @@ write_lLCStationType1AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationType1AcknowledgeTimeoutValue for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationType1AcknowledgeTimeoutValue;
 		StorageTmp->lLCStationType1AcknowledgeTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationType1AcknowledgeTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7929,8 +8008,7 @@ write_lLCStationType1MaximumRetryCount(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationType1MaximumRetryCount entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -7946,17 +8024,17 @@ write_lLCStationType1MaximumRetryCount(int action, u_char *var_val, u_char var_v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationType1MaximumRetryCount for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationType1MaximumRetryCount;
 		StorageTmp->lLCStationType1MaximumRetryCount = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationType1MaximumRetryCount = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -7982,8 +8060,7 @@ write_lLCStationMaximumPDUN3(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationMaximumPDUN3 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -7999,17 +8076,17 @@ write_lLCStationMaximumPDUN3(int action, u_char *var_val, u_char var_val_type, s
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationMaximumPDUN3 for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationMaximumPDUN3;
 		StorageTmp->lLCStationMaximumPDUN3 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationMaximumPDUN3 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8035,8 +8112,7 @@ write_lLCStationMaximumRetransmissions4(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationMaximumRetransmissions4 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8052,17 +8128,17 @@ write_lLCStationMaximumRetransmissions4(int action, u_char *var_val, u_char var_
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationMaximumRetransmissions4 for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationMaximumRetransmissions4;
 		StorageTmp->lLCStationMaximumRetransmissions4 = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationMaximumRetransmissions4 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8088,8 +8164,7 @@ write_lLCStationReceiveVariableLifetime(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationReceiveVariableLifetime entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8110,17 +8185,17 @@ write_lLCStationReceiveVariableLifetime(int action, u_char *var_val, u_char var_
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationReceiveVariableLifetime for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationReceiveVariableLifetime;
 		StorageTmp->lLCStationReceiveVariableLifetime = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationReceiveVariableLifetime = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8146,8 +8221,7 @@ write_lLCStationTransmitVariableLifetime(int action, u_char *var_val, u_char var
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationTransmitVariableLifetime entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8168,17 +8242,17 @@ write_lLCStationTransmitVariableLifetime(int action, u_char *var_val, u_char var
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationTransmitVariableLifetime for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationTransmitVariableLifetime;
 		StorageTmp->lLCStationTransmitVariableLifetime = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationTransmitVariableLifetime = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8204,8 +8278,7 @@ write_lLCStationType3AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationType3AcknowledgeTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8226,17 +8299,17 @@ write_lLCStationType3AcknowledgeTimeoutValue(int action, u_char *var_val, u_char
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationType3AcknowledgeTimeoutValue for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationType3AcknowledgeTimeoutValue;
 		StorageTmp->lLCStationType3AcknowledgeTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationType3AcknowledgeTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8262,8 +8335,7 @@ write_lLCStationBufferSize(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationBufferSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8279,17 +8351,17 @@ write_lLCStationBufferSize(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationBufferSize for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationBufferSize;
 		StorageTmp->lLCStationBufferSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationBufferSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8316,19 +8388,27 @@ write_lLCStationSTRIndicator(int action, u_char *var_val, u_char var_val_type, s
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationSTRIndicator entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		if (var_val_type != ASN_BIT_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationSTRIndicator not ASN_BIT_STR\n");
+		string = NULL;
+		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationSTRIndicator not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationSTRIndicator: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCStationSTRIndicator: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -8337,9 +8417,6 @@ write_lLCStationSTRIndicator(int action, u_char *var_val, u_char var_val_type, s
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationSTRIndicator for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationSTRIndicator;
@@ -8347,14 +8424,17 @@ write_lLCStationSTRIndicator(int action, u_char *var_val, u_char var_val_type, s
 		StorageTmp->lLCStationSTRIndicator = string;
 		StorageTmp->lLCStationSTRIndicatorLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCStationSTRIndicator = old_value;
-		StorageTmp->lLCStationSTRIndicatorLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCStationSTRIndicator = old_value;
+		StorageTmp->lLCStationSTRIndicatorLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8380,8 +8460,7 @@ write_lLCStationVersionNumber(int action, u_char *var_val, u_char var_val_type, 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCStationVersionNumber entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCStationTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8397,17 +8476,17 @@ write_lLCStationVersionNumber(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCStationVersionNumber for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCStationVersionNumber;
 		StorageTmp->lLCStationVersionNumber = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCStationVersionNumber = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8433,8 +8512,7 @@ write_rDESetupAgingEnabled(int action, u_char *var_val, u_char var_val_type, siz
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupAgingEnabled entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8458,17 +8536,17 @@ write_rDESetupAgingEnabled(int action, u_char *var_val, u_char var_val_type, siz
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rDESetupAgingEnabled for you to use, and you have just been asked to do something with it.  Note that anything done here 
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->rDESetupAgingEnabled;
 		StorageTmp->rDESetupAgingEnabled = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupAgingEnabled = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8494,8 +8572,7 @@ write_rDESetupAgingValue(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupAgingValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8511,17 +8588,17 @@ write_rDESetupAgingValue(int action, u_char *var_val, u_char var_val_type, size_
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rDESetupAgingValue for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->rDESetupAgingValue;
 		StorageTmp->rDESetupAgingValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupAgingValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8547,8 +8624,7 @@ write_rDESetupEnableType2Reset(int action, u_char *var_val, u_char var_val_type,
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupEnableType2Reset entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8564,17 +8640,17 @@ write_rDESetupEnableType2Reset(int action, u_char *var_val, u_char var_val_type,
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rDESetupEnableType2Reset for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->rDESetupEnableType2Reset;
 		StorageTmp->rDESetupEnableType2Reset = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupEnableType2Reset = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8600,8 +8676,7 @@ write_rDESetupMaximumRouteDescriptors(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupMaximumRouteDescriptors entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8617,17 +8692,17 @@ write_rDESetupMaximumRouteDescriptors(int action, u_char *var_val, u_char var_va
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rDESetupMaximumRouteDescriptors for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->rDESetupMaximumRouteDescriptors;
 		StorageTmp->rDESetupMaximumRouteDescriptors = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupMaximumRouteDescriptors = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8653,8 +8728,7 @@ write_rDESetupMaximumResponseTime(int action, u_char *var_val, u_char var_val_ty
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupMaximumResponseTime entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8675,17 +8749,17 @@ write_rDESetupMaximumResponseTime(int action, u_char *var_val, u_char var_val_ty
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rDESetupMaximumResponseTime for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->rDESetupMaximumResponseTime;
 		StorageTmp->rDESetupMaximumResponseTime = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupMaximumResponseTime = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8711,8 +8785,7 @@ write_rDESetupMinimumPDUSize(int action, u_char *var_val, u_char var_val_type, s
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupMinimumPDUSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8728,17 +8801,17 @@ write_rDESetupMinimumPDUSize(int action, u_char *var_val, u_char var_val_type, s
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rDESetupMinimumPDUSize for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->rDESetupMinimumPDUSize;
 		StorageTmp->rDESetupMinimumPDUSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupMinimumPDUSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8764,8 +8837,7 @@ write_rDESetupRDEHold(int action, u_char *var_val, u_char var_val_type, size_t v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupRDEHold entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8789,17 +8861,17 @@ write_rDESetupRDEHold(int action, u_char *var_val, u_char var_val_type, size_t v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rDESetupRDEHold for you to use, and you have just been asked to do something with it.  Note that anything done here must 
 				   be reversable in the UNDO case */
 		old_value = StorageTmp->rDESetupRDEHold;
 		StorageTmp->rDESetupRDEHold = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupRDEHold = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8825,8 +8897,7 @@ write_rDESetupRDEReplace(int action, u_char *var_val, u_char var_val_type, size_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupRDEReplace entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8850,17 +8921,17 @@ write_rDESetupRDEReplace(int action, u_char *var_val, u_char var_val_type, size_
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rDESetupRDEReplace for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->rDESetupRDEReplace;
 		StorageTmp->rDESetupRDEReplace = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupRDEReplace = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8886,8 +8957,7 @@ write_rDESetupResetOnTestEnabled(int action, u_char *var_val, u_char var_val_typ
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_rDESetupResetOnTestEnabled entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(rDESetupTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -8911,17 +8981,17 @@ write_rDESetupResetOnTestEnabled(int action, u_char *var_val, u_char var_val_typ
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->rDESetupResetOnTestEnabled for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->rDESetupResetOnTestEnabled;
 		StorageTmp->rDESetupResetOnTestEnabled = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->rDESetupResetOnTestEnabled = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -8948,17 +9018,18 @@ write_lLCConnectionlessName(int action, u_char *var_val, u_char var_val_type, si
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessName entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (var_val_type != ASN_OCTET_STR) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnectionlessName not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (var_val_len > SPRINT_MAX_LEN) {
+		/* Note: ranges 0..32 */
+		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnectionlessName: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -8969,9 +9040,6 @@ write_lLCConnectionlessName(int action, u_char *var_val, u_char var_val_type, si
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnectionlessName for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessName;
@@ -8979,14 +9047,17 @@ write_lLCConnectionlessName(int action, u_char *var_val, u_char var_val_type, si
 		StorageTmp->lLCConnectionlessName = string;
 		StorageTmp->lLCConnectionlessNameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnectionlessName = old_value;
-		StorageTmp->lLCConnectionlessNameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCConnectionlessName = old_value;
+		StorageTmp->lLCConnectionlessNameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9012,8 +9083,7 @@ write_lLCConnectionlessMaximumLLCInformationFieldSize(int action, u_char *var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessMaximumLLCInformationFieldSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnectionLessTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9029,17 +9099,17 @@ write_lLCConnectionlessMaximumLLCInformationFieldSize(int action, u_char *var_va
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnectionlessMaximumLLCInformationFieldSize for you to use, and you have just been asked to do something with it.
 				   Note that anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessMaximumLLCInformationFieldSize;
 		StorageTmp->lLCConnectionlessMaximumLLCInformationFieldSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessMaximumLLCInformationFieldSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9066,17 +9136,18 @@ write_lLCConnection2Name(int action, u_char *var_val, u_char var_val_type, size_
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2Name entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (var_val_type != ASN_OCTET_STR) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2Name not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (var_val_len > SPRINT_MAX_LEN) {
+		/* Note: ranges 0..32 */
+		if (var_val_len > SPRINT_MAX_LEN || ((0 > var_val_len || var_val_len > 32))) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2Name: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
@@ -9087,9 +9158,6 @@ write_lLCConnection2Name(int action, u_char *var_val, u_char var_val_type, size_
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2Name for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2Name;
@@ -9097,14 +9165,17 @@ write_lLCConnection2Name(int action, u_char *var_val, u_char var_val_type, size_
 		StorageTmp->lLCConnection2Name = string;
 		StorageTmp->lLCConnection2NameLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2Name = old_value;
-		StorageTmp->lLCConnection2NameLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCConnection2Name = old_value;
+		StorageTmp->lLCConnection2NameLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9130,8 +9201,7 @@ write_lLCConnection2MaximumRetransmissions(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2MaximumRetransmissions entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9147,17 +9217,17 @@ write_lLCConnection2MaximumRetransmissions(int action, u_char *var_val, u_char v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2MaximumRetransmissions for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2MaximumRetransmissions;
 		StorageTmp->lLCConnection2MaximumRetransmissions = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2MaximumRetransmissions = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9183,8 +9253,7 @@ write_lLCConnection2ReceivedWindowSize(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedWindowSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9200,17 +9269,17 @@ write_lLCConnection2ReceivedWindowSize(int action, u_char *var_val, u_char var_v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedWindowSize for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2ReceivedWindowSize;
 		StorageTmp->lLCConnection2ReceivedWindowSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2ReceivedWindowSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9236,8 +9305,7 @@ write_lLCConnection2SendWindowSize(int action, u_char *var_val, u_char var_val_t
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SendWindowSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9253,17 +9321,17 @@ write_lLCConnection2SendWindowSize(int action, u_char *var_val, u_char var_val_t
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SendWindowSize for you to use, and you have just been asked to do something with it.  Note that anything
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2SendWindowSize;
 		StorageTmp->lLCConnection2SendWindowSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2SendWindowSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9289,8 +9357,7 @@ write_lLCConnection2AcknowledgeTimeoutValue(int action, u_char *var_val, u_char 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2AcknowledgeTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9311,17 +9378,17 @@ write_lLCConnection2AcknowledgeTimeoutValue(int action, u_char *var_val, u_char 
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2AcknowledgeTimeoutValue for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2AcknowledgeTimeoutValue;
 		StorageTmp->lLCConnection2AcknowledgeTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2AcknowledgeTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9347,8 +9414,7 @@ write_lLCConnection2BusyStateTimeoutValue(int action, u_char *var_val, u_char va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2BusyStateTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9369,17 +9435,17 @@ write_lLCConnection2BusyStateTimeoutValue(int action, u_char *var_val, u_char va
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2BusyStateTimeoutValue for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2BusyStateTimeoutValue;
 		StorageTmp->lLCConnection2BusyStateTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2BusyStateTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9405,8 +9471,7 @@ write_lLCConnection2PBitTimeoutValue(int action, u_char *var_val, u_char var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2PBitTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9427,17 +9492,17 @@ write_lLCConnection2PBitTimeoutValue(int action, u_char *var_val, u_char var_val
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2PBitTimeoutValue for you to use, and you have just been asked to do something with it.  Note that anything 
 				   done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2PBitTimeoutValue;
 		StorageTmp->lLCConnection2PBitTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2PBitTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9463,8 +9528,7 @@ write_lLCConnection2RejectTimeoutValue(int action, u_char *var_val, u_char var_v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2RejectTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9485,229 +9549,17 @@ write_lLCConnection2RejectTimeoutValue(int action, u_char *var_val, u_char var_v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2RejectTimeoutValue for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2RejectTimeoutValue;
 		StorageTmp->lLCConnection2RejectTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2RejectTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2RemoteBusy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2RemoteBusy(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2RemoteBusy entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2RemoteBusy not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2RemoteBusy: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
+		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2RemoteBusy for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2RemoteBusy;
-		StorageTmp->lLCConnection2RemoteBusy = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2RemoteBusy = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2RemoteReset(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2RemoteReset(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2RemoteReset entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2RemoteReset not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2RemoteReset: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2RemoteReset for you to use, and you have just been asked to do something with it.  Note that anything done 
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2RemoteReset;
-		StorageTmp->lLCConnection2RemoteReset = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2RemoteReset = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2LocalReset(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2LocalReset(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2LocalReset entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2LocalReset not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2LocalReset: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2LocalReset for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2LocalReset;
-		StorageTmp->lLCConnection2LocalReset = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2LocalReset = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ProviderReset(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ProviderReset(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ProviderReset entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ProviderReset not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ProviderReset: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ProviderReset for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ProviderReset;
-		StorageTmp->lLCConnection2ProviderReset = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ProviderReset = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9734,12 +9586,12 @@ write_lLCConnection2Route(int action, u_char *var_val, u_char var_val_type, size
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2Route entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (var_val_type != ASN_OCTET_STR) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2Route not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -9756,9 +9608,6 @@ write_lLCConnection2Route(int action, u_char *var_val, u_char var_val_type, size
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2Route for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2Route;
@@ -9766,14 +9615,17 @@ write_lLCConnection2Route(int action, u_char *var_val, u_char var_val_type, size
 		StorageTmp->lLCConnection2Route = string;
 		StorageTmp->lLCConnection2RouteLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2Route = old_value;
-		StorageTmp->lLCConnection2RouteLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCConnection2Route = old_value;
+		StorageTmp->lLCConnection2RouteLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9799,8 +9651,7 @@ write_lLCConnection2KStep(int action, u_char *var_val, u_char var_val_type, size
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2KStep entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9816,17 +9667,17 @@ write_lLCConnection2KStep(int action, u_char *var_val, u_char var_val_type, size
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2KStep for you to use, and you have just been asked to do something with it.  Note that anything done here
 				   must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2KStep;
 		StorageTmp->lLCConnection2KStep = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2KStep = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -9852,8 +9703,7 @@ write_lLCConnection2MaxSendWindowSize(int action, u_char *var_val, u_char var_va
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2MaxSendWindowSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -9869,1130 +9719,17 @@ write_lLCConnection2MaxSendWindowSize(int action, u_char *var_val, u_char var_va
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2MaxSendWindowSize for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2MaxSendWindowSize;
 		StorageTmp->lLCConnection2MaxSendWindowSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2MaxSendWindowSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2SentAcks(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2SentAcks(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentAcks entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentAcks not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentAcks: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
+		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SentAcks for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2SentAcks;
-		StorageTmp->lLCConnection2SentAcks = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2SentAcks = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ReceivedAcks(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ReceivedAcks(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedAcks entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedAcks not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedAcks: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedAcks for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ReceivedAcks;
-		StorageTmp->lLCConnection2ReceivedAcks = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ReceivedAcks = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ReceivedFRMR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ReceivedFRMR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedFRMR entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedFRMR not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedFRMR: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedFRMR for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ReceivedFRMR;
-		StorageTmp->lLCConnection2ReceivedFRMR = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ReceivedFRMR = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2SentFRMR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2SentFRMR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentFRMR entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentFRMR not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentFRMR: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SentFRMR for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2SentFRMR;
-		StorageTmp->lLCConnection2SentFRMR = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2SentFRMR = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ReceivedRR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ReceivedRR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedRR entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedRR not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedRR: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedRR for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ReceivedRR;
-		StorageTmp->lLCConnection2ReceivedRR = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ReceivedRR = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2SentRR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2SentRR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentRR entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentRR not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentRR: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SentRR for you to use, and you have just been asked to do something with it.  Note that anything done here 
-				   must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2SentRR;
-		StorageTmp->lLCConnection2SentRR = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2SentRR = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ReceivedRNR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ReceivedRNR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedRNR entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedRNR not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedRNR: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedRNR for you to use, and you have just been asked to do something with it.  Note that anything done 
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ReceivedRNR;
-		StorageTmp->lLCConnection2ReceivedRNR = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ReceivedRNR = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2SentRNR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2SentRNR(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentRNR entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentRNR not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentRNR: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SentRNR for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2SentRNR;
-		StorageTmp->lLCConnection2SentRNR = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2SentRNR = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ReceivedREJ(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ReceivedREJ(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedREJ entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedREJ not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedREJ: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedREJ for you to use, and you have just been asked to do something with it.  Note that anything done 
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ReceivedREJ;
-		StorageTmp->lLCConnection2ReceivedREJ = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ReceivedREJ = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2SentREJ(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2SentREJ(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentREJ entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentREJ not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentREJ: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SentREJ for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2SentREJ;
-		StorageTmp->lLCConnection2SentREJ = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2SentREJ = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ReceivedSABME(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ReceivedSABME(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedSABME entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedSABME not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedSABME: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedSABME for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ReceivedSABME;
-		StorageTmp->lLCConnection2ReceivedSABME = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ReceivedSABME = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2SentSABME(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2SentSABME(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentSABME entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentSABME not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentSABME: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SentSABME for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2SentSABME;
-		StorageTmp->lLCConnection2SentSABME = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2SentSABME = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ReceivedUA(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ReceivedUA(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedUA entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedUA not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedUA: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedUA for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ReceivedUA;
-		StorageTmp->lLCConnection2ReceivedUA = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ReceivedUA = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2SentUA(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2SentUA(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentUA entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentUA not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentUA: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SentUA for you to use, and you have just been asked to do something with it.  Note that anything done here 
-				   must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2SentUA;
-		StorageTmp->lLCConnection2SentUA = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2SentUA = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ReceivedDISC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ReceivedDISC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedDISC entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedDISC not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedDISC: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedDISC for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ReceivedDISC;
-		StorageTmp->lLCConnection2ReceivedDISC = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ReceivedDISC = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2SentDISC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2SentDISC(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentDISC entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentDISC not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentDISC: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SentDISC for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2SentDISC;
-		StorageTmp->lLCConnection2SentDISC = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2SentDISC = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2ReceivedDM(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2ReceivedDM(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2ReceivedDM entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedDM not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2ReceivedDM: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2ReceivedDM for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2ReceivedDM;
-		StorageTmp->lLCConnection2ReceivedDM = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2ReceivedDM = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2SentDM(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2SentDM(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2SentDM entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentDM not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2SentDM: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2SentDM for you to use, and you have just been asked to do something with it.  Note that anything done here 
-				   must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2SentDM;
-		StorageTmp->lLCConnection2SentDM = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2SentDM = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2PDUsDiscarded1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2PDUsDiscarded1(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2PDUsDiscarded1 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2PDUsDiscarded1 not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2PDUsDiscarded1: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2PDUsDiscarded1 for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2PDUsDiscarded1;
-		StorageTmp->lLCConnection2PDUsDiscarded1 = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2PDUsDiscarded1 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2PDUsDiscarded2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2PDUsDiscarded2(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2PDUsDiscarded2 entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2PDUsDiscarded2 not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2PDUsDiscarded2: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2PDUsDiscarded2 for you to use, and you have just been asked to do something with it.  Note that anything
-				   done here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2PDUsDiscarded2;
-		StorageTmp->lLCConnection2PDUsDiscarded2 = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2PDUsDiscarded2 = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2PDURetransmissions(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2PDURetransmissions(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2PDURetransmissions entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2PDURetransmissions not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2PDURetransmissions: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2PDURetransmissions for you to use, and you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2PDURetransmissions;
-		StorageTmp->lLCConnection2PDURetransmissions = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2PDURetransmissions = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11018,8 +9755,7 @@ write_lLCConnection2OptionalTolerationIPDUs(int action, u_char *var_val, u_char 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2OptionalTolerationIPDUs entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11043,123 +9779,17 @@ write_lLCConnection2OptionalTolerationIPDUs(int action, u_char *var_val, u_char 
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2OptionalTolerationIPDUs for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2OptionalTolerationIPDUs;
 		StorageTmp->lLCConnection2OptionalTolerationIPDUs = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2OptionalTolerationIPDUs = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2DuplicateIPDUsReceived(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2DuplicateIPDUsReceived(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2DuplicateIPDUsReceived entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2DuplicateIPDUsReceived not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2DuplicateIPDUsReceived: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
+		/* fall through */
 	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2DuplicateIPDUsReceived for you to use, and you have just been asked to do something with it.  Note that
-				   anything done here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2DuplicateIPDUsReceived;
-		StorageTmp->lLCConnection2DuplicateIPDUsReceived = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2DuplicateIPDUsReceived = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
-		break;
-	}
-	return SNMP_ERR_NOERROR;
-}
-
-/**
- * @fn int write_lLCConnection2Violation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid *name, size_t name_len)
- * @param action the stage of the SET operation.
- * @param var_val pointer to the varbind value.
- * @param var_val_type the ASN type.
- * @param var_val_len the length of the varbind value.
- * @param statP static pointer.
- * @param name the varbind OID.
- * @param name_len number of elements in OID.
- * @brief Table row and column write routine.
- */
-int
-write_lLCConnection2Violation(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
-{
-	static long old_value;
-	struct lLCConnection2Table_data *StorageTmp = NULL;
-	size_t newlen = name_len - 15;
-	long set_value = *((long *) var_val);
-
-	DEBUGMSGTL(("llcMIB", "write_lLCConnection2Violation entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	if (StorageTmp == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-	switch (action) {
-	case RESERVE1:
-		if (var_val_type != ASN_COUNTER) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2Violation not ASN_COUNTER\n");
-			return SNMP_ERR_WRONGTYPE;
-		}
-		if (var_val_len > sizeof(int32_t)) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2Violation: bad length\n");
-			return SNMP_ERR_WRONGLENGTH;
-		}
-		break;
-	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
-	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2Violation for you to use, and you have just been asked to do something with it.  Note that anything done
-				   here must be reversable in the UNDO case */
-		old_value = StorageTmp->lLCConnection2Violation;
-		StorageTmp->lLCConnection2Violation = set_value;
-		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2Violation = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11185,8 +9815,7 @@ write_lLCConnection2AdministrativeState(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2AdministrativeState entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11211,17 +9840,17 @@ write_lLCConnection2AdministrativeState(int action, u_char *var_val, u_char var_
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2AdministrativeState for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2AdministrativeState;
 		StorageTmp->lLCConnection2AdministrativeState = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2AdministrativeState = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11248,19 +9877,27 @@ write_lLCConnection2AlarmStatus(int action, u_char *var_val, u_char var_val_type
 	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2AlarmStatus entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2TableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		if (var_val_type != ASN_BIT_STR) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2AlarmStatus not ASN_BIT_STR\n");
+		string = NULL;
+		if ((var_val_type != ASN_BIT_STR && var_val_type != ASN_OCTET_STR)) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2AlarmStatus not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2AlarmStatus: bad length\n");
+		if (var_val_type == ASN_BIT_STR) {
+			if (1 > var_val_len || var_val_len > SPRINT_MAX_LEN || var_val_len != 2) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2AlarmStatus: bad length\n");
+				return SNMP_ERR_WRONGLENGTH;
+			}
+		}
+		if (var_val_type == ASN_OCTET_STR) {
+			if (var_val_len > SPRINT_MAX_LEN || var_val_len != 1) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2AlarmStatus: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
+		}
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
@@ -11269,9 +9906,6 @@ write_lLCConnection2AlarmStatus(int action, u_char *var_val, u_char var_val_type
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2AlarmStatus for you to use, and you have just been asked to do something with it.  Note that anything done 
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2AlarmStatus;
@@ -11279,14 +9913,17 @@ write_lLCConnection2AlarmStatus(int action, u_char *var_val, u_char var_val_type
 		StorageTmp->lLCConnection2AlarmStatus = string;
 		StorageTmp->lLCConnection2AlarmStatusLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2AlarmStatus = old_value;
-		StorageTmp->lLCConnection2AlarmStatusLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCConnection2AlarmStatus = old_value;
+		StorageTmp->lLCConnection2AlarmStatusLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11312,8 +9949,7 @@ write_lLCConnection2IVMOMaximumRetransmissions(int action, u_char *var_val, u_ch
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOMaximumRetransmissions entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11329,17 +9965,17 @@ write_lLCConnection2IVMOMaximumRetransmissions(int action, u_char *var_val, u_ch
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMOMaximumRetransmissions for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOMaximumRetransmissions;
 		StorageTmp->lLCConnection2IVMOMaximumRetransmissions = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOMaximumRetransmissions = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11365,8 +10001,7 @@ write_lLCConnection2IVMOReceivedWindowSize(int action, u_char *var_val, u_char v
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOReceivedWindowSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11382,17 +10017,17 @@ write_lLCConnection2IVMOReceivedWindowSize(int action, u_char *var_val, u_char v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMOReceivedWindowSize for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOReceivedWindowSize;
 		StorageTmp->lLCConnection2IVMOReceivedWindowSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOReceivedWindowSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11418,8 +10053,7 @@ write_lLCConnection2IVMOSendWindowSize(int action, u_char *var_val, u_char var_v
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOSendWindowSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11435,17 +10069,17 @@ write_lLCConnection2IVMOSendWindowSize(int action, u_char *var_val, u_char var_v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMOSendWindowSize for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOSendWindowSize;
 		StorageTmp->lLCConnection2IVMOSendWindowSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOSendWindowSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11471,8 +10105,7 @@ write_lLCConnection2IVMOAcknowledgeTimeoutValue(int action, u_char *var_val, u_c
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOAcknowledgeTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11493,17 +10126,17 @@ write_lLCConnection2IVMOAcknowledgeTimeoutValue(int action, u_char *var_val, u_c
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMOAcknowledgeTimeoutValue for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOAcknowledgeTimeoutValue;
 		StorageTmp->lLCConnection2IVMOAcknowledgeTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOAcknowledgeTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11529,8 +10162,7 @@ write_lLCConnection2IVMOBusyStateTimeoutValue(int action, u_char *var_val, u_cha
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOBusyStateTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11551,17 +10183,17 @@ write_lLCConnection2IVMOBusyStateTimeoutValue(int action, u_char *var_val, u_cha
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMOBusyStateTimeoutValue for you to use, and you have just been asked to do something with it.  Note that 
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOBusyStateTimeoutValue;
 		StorageTmp->lLCConnection2IVMOBusyStateTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOBusyStateTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11587,8 +10219,7 @@ write_lLCConnection2IVMOBitTimeoutValue(int action, u_char *var_val, u_char var_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOBitTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11609,17 +10240,17 @@ write_lLCConnection2IVMOBitTimeoutValue(int action, u_char *var_val, u_char var_
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMOBitTimeoutValue for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOBitTimeoutValue;
 		StorageTmp->lLCConnection2IVMOBitTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOBitTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11645,8 +10276,7 @@ write_lLCConnection2IVMORejectTimeoutValue(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMORejectTimeoutValue entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11667,17 +10297,17 @@ write_lLCConnection2IVMORejectTimeoutValue(int action, u_char *var_val, u_char v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMORejectTimeoutValue for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMORejectTimeoutValue;
 		StorageTmp->lLCConnection2IVMORejectTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMORejectTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11697,40 +10327,52 @@ write_lLCConnection2IVMORejectTimeoutValue(int action, u_char *var_val, u_char v
 int
 write_lLCConnection2IVMORoute(int action, u_char *var_val, u_char var_val_type, size_t var_val_len, u_char *statP, oid * name, size_t name_len)
 {
-	static ulong old_value;
+	static uint8_t *old_value;
 	struct lLCConnection2IVMOTable_data *StorageTmp = NULL;
 	size_t newlen = name_len - 15;
-	ulong set_value = *((ulong *) var_val);
+	static size_t old_length = 0;
+	static uint8_t *string = NULL;
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMORoute entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
-		if (var_val_type != ASN_UNSIGNED) {
-			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2IVMORoute not ASN_UNSIGNED\n");
+		string = NULL;
+		if (var_val_type != ASN_OCTET_STR) {
+			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2IVMORoute not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
 		}
-		if (var_val_len > sizeof(uint32_t)) {
+		if (var_val_len > SPRINT_MAX_LEN) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2IVMORoute: bad length\n");
 			return SNMP_ERR_WRONGLENGTH;
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		break;
-	case FREE:		/* Release any resources that have been allocated */
+		if ((string = malloc(var_val_len + 1)) == NULL)
+			return SNMP_ERR_RESOURCEUNAVAILABLE;
+		memcpy((void *) string, (void *) var_val, var_val_len);
+		string[var_val_len] = 0;
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMORoute for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMORoute;
-		StorageTmp->lLCConnection2IVMORoute = set_value;
+		old_length = StorageTmp->lLCConnection2IVMORouteLen;
+		StorageTmp->lLCConnection2IVMORoute = string;
+		StorageTmp->lLCConnection2IVMORouteLen = var_val_len;
+		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		SNMP_FREE(old_value);
+		old_length = 0;
+		string = NULL;
 		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMORoute = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		StorageTmp->lLCConnection2IVMORouteLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11756,8 +10398,7 @@ write_lLCConnection2IVMOKStep(int action, u_char *var_val, u_char var_val_type, 
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOKStep entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11773,17 +10414,17 @@ write_lLCConnection2IVMOKStep(int action, u_char *var_val, u_char var_val_type, 
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMOKStep for you to use, and you have just been asked to do something with it.  Note that anything done
 				   here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOKStep;
 		StorageTmp->lLCConnection2IVMOKStep = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOKStep = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11809,8 +10450,7 @@ write_lLCConnection2IVMOMaxSendWindowSize(int action, u_char *var_val, u_char va
 	ulong set_value = *((ulong *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOMaxSendWindowSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11826,17 +10466,17 @@ write_lLCConnection2IVMOMaxSendWindowSize(int action, u_char *var_val, u_char va
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMOMaxSendWindowSize for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOMaxSendWindowSize;
 		StorageTmp->lLCConnection2IVMOMaxSendWindowSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOMaxSendWindowSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11862,8 +10502,7 @@ write_lLCConnection2IVMOOptionalTolerationIPDUs(int action, u_char *var_val, u_c
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnection2IVMOOptionalTolerationIPDUs entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnection2IVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11887,17 +10526,17 @@ write_lLCConnection2IVMOOptionalTolerationIPDUs(int action, u_char *var_val, u_c
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnection2IVMOOptionalTolerationIPDUs for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnection2IVMOOptionalTolerationIPDUs;
 		StorageTmp->lLCConnection2IVMOOptionalTolerationIPDUs = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2IVMOOptionalTolerationIPDUs = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11923,8 +10562,7 @@ write_lLCConnectionlessAckMaximumLLCInformationFieldSize(int action, u_char *var
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckMaximumLLCInformationFieldSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11940,17 +10578,17 @@ write_lLCConnectionlessAckMaximumLLCInformationFieldSize(int action, u_char *var
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnectionlessAckMaximumLLCInformationFieldSize for you to use, and you have just been asked to do something with it. 
 				   Note that anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckMaximumLLCInformationFieldSize;
 		StorageTmp->lLCConnectionlessAckMaximumLLCInformationFieldSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckMaximumLLCInformationFieldSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -11976,8 +10614,7 @@ write_lLCConnectionlessAckMaximumRetransmissions(int action, u_char *var_val, u_
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckMaximumRetransmissions entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -11993,17 +10630,17 @@ write_lLCConnectionlessAckMaximumRetransmissions(int action, u_char *var_val, u_
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnectionlessAckMaximumRetransmissions for you to use, and you have just been asked to do something with it.  Note
 				   that anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckMaximumRetransmissions;
 		StorageTmp->lLCConnectionlessAckMaximumRetransmissions = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckMaximumRetransmissions = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12029,8 +10666,7 @@ write_lLCConnectionlessAckReceiveResources(int action, u_char *var_val, u_char v
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckReceiveResources entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
+	StorageTmp = header_complex(lLCConnectionlessAckTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (StorageTmp == NULL)
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
@@ -12054,17 +10690,17 @@ write_lLCConnectionlessAckReceiveResources(int action, u_char *var_val, u_char v
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnectionlessAckReceiveResources for you to use, and you have just been asked to do something with it.  Note that
 				   anything done here must be reversable in the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckReceiveResources;
 		StorageTmp->lLCConnectionlessAckReceiveResources = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckReceiveResources = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12090,9 +10726,7 @@ write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize(int action, u_char 
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -12118,20 +10752,20 @@ write_lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize(int action, u_char 
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		break;
-	case FREE:		/* Release any resources that have been allocated */
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize for you to use, and you have just been asked to do something with 
 				   it.  Note that anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize;
 		StorageTmp->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckIVMOMaximumLLCInformationFieldSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12157,9 +10791,7 @@ write_lLCConnectionlessAckIVMOMaximumRetransmissions(int action, u_char *var_val
 	long set_value = *((long *) var_val);
 
 	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckIVMOMaximumRetransmissions entering action=%d...  \n", action));
-	if ((StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL)) == NULL)
-		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
-
+	StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	switch (action) {
 	case RESERVE1:
 		if (StorageTmp != NULL && statP == NULL) {
@@ -12185,20 +10817,20 @@ write_lLCConnectionlessAckIVMOMaximumRetransmissions(int action, u_char *var_val
 		}
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
-		if (StorageTmp == NULL)
-			return SNMP_ERR_NOSUCHNAME;
-		break;
-	case FREE:		/* Release any resources that have been allocated */
 		break;
 	case ACTION:		/* The variable has been stored in StorageTmp->lLCConnectionlessAckIVMOMaximumRetransmissions for you to use, and you have just been asked to do something with it.
 				   Note that anything done here must be reversable in the UNDO case */
+		if (StorageTmp == NULL)
+			return SNMP_ERR_NOSUCHNAME;
 		old_value = StorageTmp->lLCConnectionlessAckIVMOMaximumRetransmissions;
 		StorageTmp->lLCConnectionlessAckIVMOMaximumRetransmissions = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckIVMOMaximumRetransmissions = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12238,17 +10870,17 @@ write_lLCConnection2DefaultMaximumRetransmissions(int action, u_char *var_val, u
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultMaximumRetransmissions;
 		StorageTmp->lLCConnection2DefaultMaximumRetransmissions = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultMaximumRetransmissions = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12288,17 +10920,17 @@ write_lLCConnection2DefaultReceivedWindowSize(int action, u_char *var_val, u_cha
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultReceivedWindowSize;
 		StorageTmp->lLCConnection2DefaultReceivedWindowSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultReceivedWindowSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12338,17 +10970,17 @@ write_lLCConnection2DefaultSendWindowSize(int action, u_char *var_val, u_char va
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultSendWindowSize;
 		StorageTmp->lLCConnection2DefaultSendWindowSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultSendWindowSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12393,17 +11025,17 @@ write_lLCConnection2DefaultAcknowledgeTimeoutValue(int action, u_char *var_val, 
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultAcknowledgeTimeoutValue;
 		StorageTmp->lLCConnection2DefaultAcknowledgeTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultAcknowledgeTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12448,17 +11080,17 @@ write_lLCConnection2DefaultBusyStateTimeoutValue(int action, u_char *var_val, u_
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultBusyStateTimeoutValue;
 		StorageTmp->lLCConnection2DefaultBusyStateTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultBusyStateTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12503,17 +11135,17 @@ write_lLCConnection2DefaultPBitTimeoutValue(int action, u_char *var_val, u_char 
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultPBitTimeoutValue;
 		StorageTmp->lLCConnection2DefaultPBitTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultPBitTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12558,17 +11190,17 @@ write_lLCConnection2DefaultRejectTimeoutValue(int action, u_char *var_val, u_cha
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultRejectTimeoutValue;
 		StorageTmp->lLCConnection2DefaultRejectTimeoutValue = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultRejectTimeoutValue = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12598,6 +11230,7 @@ write_lLCConnection2DefaultRoute(int action, u_char *var_val, u_char var_val_typ
 		return SNMP_ERR_NOSUCHNAME;	/* remove if you support creation here */
 	switch (action) {
 	case RESERVE1:
+		string = NULL;
 		if (var_val_type != ASN_OCTET_STR) {
 			snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnection2DefaultRoute not ASN_OCTET_STR\n");
 			return SNMP_ERR_WRONGTYPE;
@@ -12613,9 +11246,6 @@ write_lLCConnection2DefaultRoute(int action, u_char *var_val, u_char var_val_typ
 		memcpy((void *) string, (void *) var_val, var_val_len);
 		string[var_val_len] = 0;
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		SNMP_FREE(string);
-		break;
 	case ACTION:		/* The variable has been stored in string for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the 
 				   UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultRoute;
@@ -12623,14 +11253,17 @@ write_lLCConnection2DefaultRoute(int action, u_char *var_val, u_char var_val_typ
 		StorageTmp->lLCConnection2DefaultRoute = string;
 		StorageTmp->lLCConnection2DefaultRouteLen = var_val_len;
 		break;
-	case UNDO:		/* Back out any changes made in the ACTION case */
-		StorageTmp->lLCConnection2DefaultRoute = old_value;
-		StorageTmp->lLCConnection2DefaultRouteLen = old_length;
-		break;
 	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		SNMP_FREE(old_value);
 		old_length = 0;
 		string = NULL;
+		break;
+	case UNDO:		/* Back out any changes made in the ACTION case */
+		StorageTmp->lLCConnection2DefaultRoute = old_value;
+		StorageTmp->lLCConnection2DefaultRouteLen = old_length;
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
+		SNMP_FREE(string);
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12670,17 +11303,17 @@ write_lLCConnection2DefaultKStep(int action, u_char *var_val, u_char var_val_typ
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultKStep;
 		StorageTmp->lLCConnection2DefaultKStep = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultKStep = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12720,17 +11353,17 @@ write_lLCConnection2DefaultMaxSendWindowSize(int action, u_char *var_val, u_char
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultMaxSendWindowSize;
 		StorageTmp->lLCConnection2DefaultMaxSendWindowSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultMaxSendWindowSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12778,17 +11411,17 @@ write_lLCConnection2DefaultOptionalTolerationIPDUs(int action, u_char *var_val, 
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnection2DefaultOptionalTolerationIPDUs;
 		StorageTmp->lLCConnection2DefaultOptionalTolerationIPDUs = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnection2DefaultOptionalTolerationIPDUs = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12828,17 +11461,17 @@ write_lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize(int action, u_ch
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize;
 		StorageTmp->lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckDefaultMaximumLLCInformationFieldSize = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12878,17 +11511,17 @@ write_lLCConnectionlessAckDefaultMaximumRetransmissions(int action, u_char *var_
 		break;
 	case RESERVE2:		/* memory reseveration, final preparation... */
 		break;
-	case FREE:		/* Release any resources that have been allocated */
-		break;
 	case ACTION:		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in
 				   the UNDO case */
 		old_value = StorageTmp->lLCConnectionlessAckDefaultMaximumRetransmissions;
 		StorageTmp->lLCConnectionlessAckDefaultMaximumRetransmissions = set_value;
 		break;
+	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		break;
 	case UNDO:		/* Back out any changes made in the ACTION case */
 		StorageTmp->lLCConnectionlessAckDefaultMaximumRetransmissions = old_value;
-		break;
-	case COMMIT:		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
+		/* fall through */
+	case FREE:		/* Release any resources that have been allocated */
 		break;
 	}
 	return SNMP_ERR_NOERROR;
@@ -12900,15 +11533,16 @@ write_lLCConnectionlessAckDefaultMaximumRetransmissions(int action, u_char *var_
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the mACDLETable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 mACDLETable_consistent(struct mACDLETable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -12917,15 +11551,16 @@ mACDLETable_consistent(struct mACDLETable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the mACTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 mACTable_consistent(struct mACTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -12934,15 +11569,16 @@ mACTable_consistent(struct mACTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the resourceTypeIdTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 resourceTypeIdTable_consistent(struct resourceTypeIdTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -12951,15 +11587,16 @@ resourceTypeIdTable_consistent(struct resourceTypeIdTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the dLSAPTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 dLSAPTable_consistent(struct dLSAPTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -12968,15 +11605,16 @@ dLSAPTable_consistent(struct dLSAPTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCDLETable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCDLETable_consistent(struct lLCDLETable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -12985,15 +11623,16 @@ lLCDLETable_consistent(struct lLCDLETable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCStationTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCStationTable_consistent(struct lLCStationTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13002,15 +11641,16 @@ lLCStationTable_consistent(struct lLCStationTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCSAPTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCSAPTable_consistent(struct lLCSAPTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13019,15 +11659,16 @@ lLCSAPTable_consistent(struct lLCSAPTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the rDESetupTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 rDESetupTable_consistent(struct rDESetupTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13036,15 +11677,16 @@ rDESetupTable_consistent(struct rDESetupTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the rDEPairTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 rDEPairTable_consistent(struct rDEPairTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13053,15 +11695,16 @@ rDEPairTable_consistent(struct rDEPairTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCCLPMTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCCLPMTable_consistent(struct lLCCLPMTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13070,15 +11713,16 @@ lLCCLPMTable_consistent(struct lLCCLPMTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCConnectionLessTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCConnectionLessTable_consistent(struct lLCConnectionLessTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13087,15 +11731,16 @@ lLCConnectionLessTable_consistent(struct lLCConnectionLessTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCCOPMTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCCOPMTable_consistent(struct lLCCOPMTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13104,15 +11749,16 @@ lLCCOPMTable_consistent(struct lLCCOPMTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCConnection2Table table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCConnection2Table_consistent(struct lLCConnection2Table_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13121,15 +11767,16 @@ lLCConnection2Table_consistent(struct lLCConnection2Table_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCConnection2IVMOTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCConnection2IVMOTable_consistent(struct lLCConnection2IVMOTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13138,15 +11785,16 @@ lLCConnection2IVMOTable_consistent(struct lLCConnection2IVMOTable_data *thedata)
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCConnectionlessAckTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCConnectionlessAckTable_consistent(struct lLCConnectionlessAckTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13155,15 +11803,16 @@ lLCConnectionlessAckTable_consistent(struct lLCConnectionlessAckTable_data *thed
  * @brief check the internal consistency of a table row.
  *
  * This function checks the internal consistency of a table row for the lLCConnectionlessAckIVMOTable table.  If the
- * table row is internally consistent, then this function returns true (1), otherwise the function
- * returns false (0) and it will not be possible to activate the row until the row's internal
- * consistency is corrected.
+ * table row is internally consistent, then this function returns SNMP_ERR_NOERROR, otherwise the
+ * function returns an SNMP error code and it will not be possible to activate the row until the
+ * row's internal consistency is corrected.  This function might use a 'test' operation against the
+ * driver to ensure that the commit phase will succeed.
  */
 int
 lLCConnectionlessAckIVMOTable_consistent(struct lLCConnectionlessAckIVMOTable_data *thedata)
 {
-	/* XXX: check row consistency return true(1) if consistent, or false(0) if not. */
-	return (1);
+	/* XXX: check row consistency return SNMP_ERR_NOERROR if consistent, or an SNMP error code if not. */
+	return (SNMP_ERR_NOERROR);
 }
 
 /**
@@ -13184,9 +11833,10 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	static struct mACDLETable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("llcMIB", "write_mACDLERowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mACDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mACDLERowStatus not ASN_INTEGER\n");
@@ -13201,6 +11851,8 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -13254,7 +11906,8 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			vp = vars;
 			/* mACDLECommunicationsEntityId */
-			if (vp->val_len > SPRINT_MAX_LEN) {
+			/* Note: ranges 0..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((0 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index mACDLECommunicationsEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -13282,33 +11935,25 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			mACDLETable_del(StorageNew);
-			mACDLETable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			mACDLETable_add(StorageDel);
-			break;
-		}
-		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = mACDLETable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+		break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->mACDLERowStatus;
 			StorageTmp->mACDLERowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!mACDLETable_consistent(StorageTmp)) {
+				if ((ret = mACDLETable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->mACDLERowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -13319,35 +11964,18 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mACDLERowStatus = old_value;
-			break;
-		}
-		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (mACDLETable_consistent(StorageNew)) {
 				/* XXX: commit creation to underlying device */
 				/* XXX: activate with underlying device */
 				StorageNew->mACDLERowStatus = RS_ACTIVE;
-			}
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (mACDLETable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
 				StorageNew->mACDLERowStatus = RS_NOTINSERVICE;
-			}
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -13367,6 +11995,34 @@ write_mACDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* row deletion, free it its dead */
 			mACDLETable_destroy(&StorageDel);
 			/* mACDLETable_destroy() can handle NULL pointers. */
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->mACDLERowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				mACDLETable_del(StorageNew);
+				mACDLETable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				mACDLETable_add(StorageDel);
 			break;
 		}
 		break;
@@ -13392,9 +12048,10 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 	static struct mACTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("llcMIB", "write_mACRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(mACTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to mACRowStatus not ASN_INTEGER\n");
@@ -13409,6 +12066,8 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -13467,14 +12126,16 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			}
 			vp = vars;
 			/* mACDLECommunicationsEntityId */
-			if (vp->val_len > SPRINT_MAX_LEN) {
+			/* Note: ranges 0..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((0 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index mACDLECommunicationsEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vp->next_variable;
 			/* mACId */
-			if (vp->val_len > SPRINT_MAX_LEN) {
+			/* Note: ranges 0..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((0 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index mACId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -13505,33 +12166,25 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			break;
 		}
 		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			mACTable_del(StorageNew);
-			mACTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			mACTable_add(StorageDel);
-			break;
-		}
-		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = mACTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+		break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->mACRowStatus;
 			StorageTmp->mACRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!mACTable_consistent(StorageTmp)) {
+				if ((ret = mACTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->mACRowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -13542,35 +12195,18 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			break;
 		}
 		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->mACRowStatus = old_value;
-			break;
-		}
-		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (mACTable_consistent(StorageNew)) {
 				/* XXX: commit creation to underlying device */
 				/* XXX: activate with underlying device */
 				StorageNew->mACRowStatus = RS_ACTIVE;
-			}
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (mACTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
 				StorageNew->mACRowStatus = RS_NOTINSERVICE;
-			}
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -13590,6 +12226,34 @@ write_mACRowStatus(int action, u_char *var_val, u_char var_val_type, size_t var_
 			/* row deletion, free it its dead */
 			mACTable_destroy(&StorageDel);
 			/* mACTable_destroy() can handle NULL pointers. */
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->mACRowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				mACTable_del(StorageNew);
+				mACTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				mACTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -13615,9 +12279,10 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	static struct dLSAPTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("llcMIB", "write_dLSAPRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(dLSAPTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to dLSAPRowStatus not ASN_INTEGER\n");
@@ -13632,6 +12297,8 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -13690,14 +12357,16 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			}
 			vp = vars;
 			/* mACDLECommunicationsEntityId */
-			if (vp->val_len > SPRINT_MAX_LEN) {
+			/* Note: ranges 0..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((0 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index mACDLECommunicationsEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vp->next_variable;
 			/* dLSAPSapId */
-			if (vp->val_len > SPRINT_MAX_LEN) {
+			/* Note: ranges 0..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((0 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index dLSAPSapId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -13728,33 +12397,25 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			break;
 		}
 		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			dLSAPTable_del(StorageNew);
-			dLSAPTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			dLSAPTable_add(StorageDel);
-			break;
-		}
-		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = dLSAPTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->dLSAPRowStatus;
 			StorageTmp->dLSAPRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!dLSAPTable_consistent(StorageTmp)) {
+				if ((ret = dLSAPTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->dLSAPRowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -13765,35 +12426,18 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			break;
 		}
 		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->dLSAPRowStatus = old_value;
-			break;
-		}
-		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (dLSAPTable_consistent(StorageNew)) {
 				/* XXX: commit creation to underlying device */
 				/* XXX: activate with underlying device */
 				StorageNew->dLSAPRowStatus = RS_ACTIVE;
-			}
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (dLSAPTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
 				StorageNew->dLSAPRowStatus = RS_NOTINSERVICE;
-			}
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -13813,6 +12457,34 @@ write_dLSAPRowStatus(int action, u_char *var_val, u_char var_val_type, size_t va
 			/* row deletion, free it its dead */
 			dLSAPTable_destroy(&StorageDel);
 			/* dLSAPTable_destroy() can handle NULL pointers. */
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->dLSAPRowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				dLSAPTable_del(StorageNew);
+				dLSAPTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				dLSAPTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -13838,9 +12510,10 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	static struct lLCDLETable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("llcMIB", "write_lLCDLERowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(lLCDLETableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCDLERowStatus not ASN_INTEGER\n");
@@ -13855,6 +12528,8 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -13908,7 +12583,8 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			}
 			vp = vars;
 			/* lLCDLECommunicationsEntityId */
-			if (vp->val_len > SPRINT_MAX_LEN) {
+			/* Note: ranges 0..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((0 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index lLCDLECommunicationsEntityId: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -13936,33 +12612,25 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			lLCDLETable_del(StorageNew);
-			lLCDLETable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			lLCDLETable_add(StorageDel);
-			break;
-		}
-		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = lLCDLETable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+		break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->lLCDLERowStatus;
 			StorageTmp->lLCDLERowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!lLCDLETable_consistent(StorageTmp)) {
+				if ((ret = lLCDLETable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->lLCDLERowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -13973,35 +12641,18 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			break;
 		}
 		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->lLCDLERowStatus = old_value;
-			break;
-		}
-		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (lLCDLETable_consistent(StorageNew)) {
 				/* XXX: commit creation to underlying device */
 				/* XXX: activate with underlying device */
 				StorageNew->lLCDLERowStatus = RS_ACTIVE;
-			}
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (lLCDLETable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
 				StorageNew->lLCDLERowStatus = RS_NOTINSERVICE;
-			}
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -14021,6 +12672,34 @@ write_lLCDLERowStatus(int action, u_char *var_val, u_char var_val_type, size_t v
 			/* row deletion, free it its dead */
 			lLCDLETable_destroy(&StorageDel);
 			/* lLCDLETable_destroy() can handle NULL pointers. */
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->lLCDLERowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				lLCDLETable_del(StorageNew);
+				lLCDLETable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				lLCDLETable_add(StorageDel);
 			break;
 		}
 		break;
@@ -14046,9 +12725,10 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	static struct lLCCLPMTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("llcMIB", "write_lLCCLPMRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(lLCCLPMTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCCLPMRowStatus not ASN_INTEGER\n");
@@ -14063,6 +12743,8 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -14105,16 +12787,32 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
+			/* lLCCLPMClProtocolMachineId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
 			if (header_complex_parse_oid(&(name[15]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
+			/* lLCCLPMClProtocolMachineId */
+			/* Note: ranges 0..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((0 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index lLCCLPMClProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lLCCLPMTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
+			memdup((void *) &StorageNew->lLCCLPMClProtocolMachineId, vp->val.string, vp->val_len);
+			StorageNew->lLCCLPMClProtocolMachineIdLen = vp->val_len;
+			vp = vp->next_variable;
 			header_complex_add_data(&lLCCLPMTableStorage, vars, StorageNew);	/* frees vars */
 			break;
 		case RS_DESTROY:
@@ -14129,33 +12827,25 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			break;
 		}
 		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			lLCCLPMTable_del(StorageNew);
-			lLCCLPMTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			lLCCLPMTable_add(StorageDel);
-			break;
-		}
-		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = lLCCLPMTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->lLCCLPMRowStatus;
 			StorageTmp->lLCCLPMRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!lLCCLPMTable_consistent(StorageTmp)) {
+				if ((ret = lLCCLPMTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->lLCCLPMRowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -14166,35 +12856,18 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			break;
 		}
 		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->lLCCLPMRowStatus = old_value;
-			break;
-		}
-		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (lLCCLPMTable_consistent(StorageNew)) {
 				/* XXX: commit creation to underlying device */
 				/* XXX: activate with underlying device */
 				StorageNew->lLCCLPMRowStatus = RS_ACTIVE;
-			}
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (lLCCLPMTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
 				StorageNew->lLCCLPMRowStatus = RS_NOTINSERVICE;
-			}
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -14214,6 +12887,34 @@ write_lLCCLPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			/* row deletion, free it its dead */
 			lLCCLPMTable_destroy(&StorageDel);
 			/* lLCCLPMTable_destroy() can handle NULL pointers. */
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->lLCCLPMRowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				lLCCLPMTable_del(StorageNew);
+				lLCCLPMTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				lLCCLPMTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -14239,9 +12940,10 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	static struct lLCCOPMTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("llcMIB", "write_lLCCOPMRowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(lLCCOPMTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCCOPMRowStatus not ASN_INTEGER\n");
@@ -14256,6 +12958,8 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -14298,16 +13002,32 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 		case RS_CREATEANDWAIT:
 			/* creation */
 			vars = NULL;
+			/* lLCCOPMCoProtocolMachineId */
+			if ((vp = snmp_varlist_add_variable(&vars, NULL, 0, ASN_OCTET_STR, NULL, 0)) == NULL) {
+				snmp_free_varbind(vars);
+				return SNMP_ERR_RESOURCEUNAVAILABLE;
+			}
 			if (header_complex_parse_oid(&(name[15]), newlen, vars) != SNMPERR_SUCCESS) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
 			}
 			vp = vars;
+			/* lLCCOPMCoProtocolMachineId */
+			/* Note: ranges 0..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((0 > vp->val_len || vp->val_len > 32))) {
+				snmp_log(MY_FACILITY(LOG_NOTICE), "index lLCCOPMCoProtocolMachineId: bad length\n");
+				snmp_free_varbind(vars);
+				return SNMP_ERR_INCONSISTENTNAME;
+			}
+			vp = vp->next_variable;
 			if ((StorageNew = lLCCOPMTable_create()) == NULL) {
 				snmp_free_varbind(vars);
 				return SNMP_ERR_RESOURCEUNAVAILABLE;
 			}
 			vp = vars;
+			memdup((void *) &StorageNew->lLCCOPMCoProtocolMachineId, vp->val.string, vp->val_len);
+			StorageNew->lLCCOPMCoProtocolMachineIdLen = vp->val_len;
+			vp = vp->next_variable;
 			header_complex_add_data(&lLCCOPMTableStorage, vars, StorageNew);	/* frees vars */
 			break;
 		case RS_DESTROY:
@@ -14322,33 +13042,25 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			break;
 		}
 		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			lLCCOPMTable_del(StorageNew);
-			lLCCOPMTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			lLCCOPMTable_add(StorageDel);
-			break;
-		}
-		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = lLCCOPMTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+		break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->lLCCOPMRowStatus;
 			StorageTmp->lLCCOPMRowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!lLCCOPMTable_consistent(StorageTmp)) {
+				if ((ret = lLCCOPMTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->lLCCOPMRowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -14359,35 +13071,18 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			break;
 		}
 		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->lLCCOPMRowStatus = old_value;
-			break;
-		}
-		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (lLCCOPMTable_consistent(StorageNew)) {
 				/* XXX: commit creation to underlying device */
 				/* XXX: activate with underlying device */
 				StorageNew->lLCCOPMRowStatus = RS_ACTIVE;
-			}
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (lLCCOPMTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
 				StorageNew->lLCCOPMRowStatus = RS_NOTINSERVICE;
-			}
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -14407,6 +13102,34 @@ write_lLCCOPMRowStatus(int action, u_char *var_val, u_char var_val_type, size_t 
 			/* row deletion, free it its dead */
 			lLCCOPMTable_destroy(&StorageDel);
 			/* lLCCOPMTable_destroy() can handle NULL pointers. */
+			break;
+		}
+		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->lLCCOPMRowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				lLCCOPMTable_del(StorageNew);
+				lLCCOPMTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				lLCCOPMTable_add(StorageDel);
 			break;
 		}
 		break;
@@ -14432,9 +13155,10 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 	static struct lLCConnectionlessAckIVMOTable_data *StorageNew, *StorageDel;
 	size_t newlen = name_len - 15;
 	static int old_value;
-	int set_value;
+	int set_value, ret;
 	static struct variable_list *vars, *vp;
 
+	DEBUGMSGTL(("llcMIB", "write_lLCConnectionlessAckIVMORowStatus entering action=%d...  \n", action));
 	StorageTmp = header_complex(lLCConnectionlessAckIVMOTableStorage, NULL, &name[15], &newlen, 1, NULL, NULL);
 	if (var_val_type != ASN_INTEGER || var_val == NULL) {
 		snmp_log(MY_FACILITY(LOG_NOTICE), "write to lLCConnectionlessAckIVMORowStatus not ASN_INTEGER\n");
@@ -14449,6 +13173,8 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 	switch (action) {
 	case RESERVE1:
 		/* stage one: test validity */
+		StorageNew = StorageDel = NULL;
+		vars = vp = NULL;
 		switch (set_value) {
 		case RS_CREATEANDGO:
 		case RS_CREATEANDWAIT:
@@ -14502,7 +13228,8 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 			}
 			vp = vars;
 			/* lLCConnectionlessAckIVMOName */
-			if (vp->val_len > SPRINT_MAX_LEN) {
+			/* Note: ranges 0..32 */
+			if (vp->val_len > SPRINT_MAX_LEN || ((0 > vp->val_len || vp->val_len > 32))) {
 				snmp_log(MY_FACILITY(LOG_NOTICE), "index lLCConnectionlessAckIVMOName: bad length\n");
 				snmp_free_varbind(vars);
 				return SNMP_ERR_INCONSISTENTNAME;
@@ -14530,33 +13257,25 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 			break;
 		}
 		break;
-	case FREE:
-		/* Release any resources that have been allocated */
-		switch (set_value) {
-		case RS_CREATEANDGO:
-		case RS_CREATEANDWAIT:
-			/* creation */
-			lLCConnectionlessAckIVMOTable_del(StorageNew);
-			lLCConnectionlessAckIVMOTable_destroy(&StorageNew);
-			/* XXX: free, zero vars */
-			break;
-		case RS_DESTROY:
-			/* row deletion, so add it again */
-			lLCConnectionlessAckIVMOTable_add(StorageDel);
-			break;
-		}
-		break;
 	case ACTION:
 		/* The variable has been stored in set_value for you to use, and you have just been asked to do something with it.  Note that anything done here must be reversable in the UNDO case */
 		switch (set_value) {
+		case RS_CREATEANDGO:
+			/* check that activation is possible */
+			if ((ret = lLCConnectionlessAckIVMOTable_consistent(StorageNew)) != SNMP_ERR_NOERROR)
+				return (ret);
+			break;
+		case RS_CREATEANDWAIT:
+			/* row does not have to be consistent */
+			break;
 		case RS_ACTIVE:
 			old_value = StorageTmp->lLCConnectionlessAckIVMORowStatus;
 			StorageTmp->lLCConnectionlessAckIVMORowStatus = set_value;
 			if (old_value != RS_ACTIVE) {
 				/* check that activation is possible */
-				if (!lLCConnectionlessAckIVMOTable_consistent(StorageTmp)) {
+				if ((ret = lLCConnectionlessAckIVMOTable_consistent(StorageTmp)) != SNMP_ERR_NOERROR) {
 					StorageTmp->lLCConnectionlessAckIVMORowStatus = old_value;
-					return SNMP_ERR_INCONSISTENTVALUE;
+					return (ret);
 				}
 			}
 			break;
@@ -14567,35 +13286,18 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 			break;
 		}
 		break;
-	case UNDO:
-		/* Back out any changes made in the ACTION case */
-		switch (set_value) {
-		case RS_ACTIVE:
-		case RS_NOTINSERVICE:
-			/* restore state */
-			StorageTmp->lLCConnectionlessAckIVMORowStatus = old_value;
-			break;
-		}
-		break;
 	case COMMIT:
 		/* Things are working well, so it's now safe to make the change permanently.  Make sure that anything done here can't fail! */
 		switch (set_value) {
 		case RS_CREATEANDGO:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (lLCConnectionlessAckIVMOTable_consistent(StorageNew)) {
 				/* XXX: commit creation to underlying device */
 				/* XXX: activate with underlying device */
 				StorageNew->lLCConnectionlessAckIVMORowStatus = RS_ACTIVE;
-			}
 			break;
 		case RS_CREATEANDWAIT:
 			/* row creation, set final state */
-			/* check if row is ready, otherwise leave at RS_NOTREADY */
-			if (lLCConnectionlessAckIVMOTable_consistent(StorageNew)) {
-				/* XXX: commit creation to underlying device, inactive */
 				StorageNew->lLCConnectionlessAckIVMORowStatus = RS_NOTINSERVICE;
-			}
 			break;
 		case RS_ACTIVE:
 		case RS_NOTINSERVICE:
@@ -14618,6 +13320,34 @@ write_lLCConnectionlessAckIVMORowStatus(int action, u_char *var_val, u_char var_
 			break;
 		}
 		break;
+	case UNDO:
+		/* Back out any changes made in the ACTION case */
+		switch (set_value) {
+		case RS_ACTIVE:
+		case RS_NOTINSERVICE:
+			/* restore state */
+			StorageTmp->lLCConnectionlessAckIVMORowStatus = old_value;
+			break;
+		}
+		/* fall through */
+	case FREE:
+		/* Release any resources that have been allocated */
+		switch (set_value) {
+		case RS_CREATEANDGO:
+		case RS_CREATEANDWAIT:
+			/* creation */
+			if (StorageNew) {
+				lLCConnectionlessAckIVMOTable_del(StorageNew);
+				lLCConnectionlessAckIVMOTable_destroy(&StorageNew);
+			}
+			break;
+		case RS_DESTROY:
+			/* row deletion, so add it again */
+			if (StorageDel)
+				lLCConnectionlessAckIVMOTable_add(StorageDel);
+			break;
+		}
+		break;
 	}
 	return SNMP_ERR_NOERROR;
 }
@@ -14627,6 +13357,7 @@ send_lLCConnection2Event_v2trap(struct variable_list *vars)
 {
 	struct variable_list trap;
 
+	DEBUGMSGTL(("llcMIB", "send_lLCConnection2Event_v2trap: sending trap...  "));
 	trap.next_variable = vars;
 	trap.name = snmpTrapOID_oid;
 	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
@@ -14635,6 +13366,7 @@ send_lLCConnection2Event_v2trap(struct variable_list *vars)
 	trap.val_len = sizeof(lLCConnection2Event_oid);
 	trap.index = 0;
 	send_v2trap(&trap);
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 void
@@ -14642,6 +13374,7 @@ send_lLCClessACKEvent_v2trap(struct variable_list *vars)
 {
 	struct variable_list trap;
 
+	DEBUGMSGTL(("llcMIB", "send_lLCClessACKEvent_v2trap: sending trap...  "));
 	trap.next_variable = vars;
 	trap.name = snmpTrapOID_oid;
 	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
@@ -14650,6 +13383,7 @@ send_lLCClessACKEvent_v2trap(struct variable_list *vars)
 	trap.val_len = sizeof(lLCClessACKEvent_oid);
 	trap.index = 0;
 	send_v2trap(&trap);
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
 void
@@ -14657,6 +13391,7 @@ send_lLCStationEvent_v2trap(struct variable_list *vars)
 {
 	struct variable_list trap;
 
+	DEBUGMSGTL(("llcMIB", "send_lLCStationEvent_v2trap: sending trap...  "));
 	trap.next_variable = vars;
 	trap.name = snmpTrapOID_oid;
 	trap.name_length = sizeof(snmpTrapOID_oid) / sizeof(oid);
@@ -14665,10 +13400,9 @@ send_lLCStationEvent_v2trap(struct variable_list *vars)
 	trap.val_len = sizeof(lLCStationEvent_oid);
 	trap.index = 0;
 	send_v2trap(&trap);
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
 
-#if defined MODULE
-#if defined MASTER
 /**
  * @fn void llcMIB_loop_handler(int dummy)
  * @param sig signal number
@@ -14687,25 +13421,25 @@ send_lLCStationEvent_v2trap(struct variable_list *vars)
 void
 llcMIB_loop_handler(int sig)
 {
-	if (external_signal_scheduled[sig] == 0)
-		external_signal_scheduled[sig]--;
+	DEBUGMSGTL(("llcMIB", "llcMIB_loop_handler: executing loop handler...  "));
 	/* close files after each request */
 	if (sa_fclose) {
-		if (sa_fd != 0) {
-			close(sa_fd);
-			sa_fd = 0;
-		}
-		if (my_fd != 0) {
+		if (my_fd >= 0) {
 			close(my_fd);
-			my_fd = 0;
+			my_fd = -1;
 		}
 	}
+#if defined MASTER
 	/* prepare for next request */
 	sa_request++;
+#endif				/* defined MASTER */
+	if (external_signal_scheduled[sig] == 0)
+		external_signal_scheduled[sig]--;
 	if (llcMIBold_signal_handler != NULL)
 		(*llcMIBold_signal_handler) (sig);
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 }
-#endif				/* defined MASTER */
+
 /**
  * @fn void llcMIB_fd_handler(int fd, void *dummy)
  * @param fd file descriptor to read.
@@ -14721,1089 +13455,8 @@ llcMIB_loop_handler(int sig)
 void
 llcMIB_fd_handler(int fd, void *dummy)
 {
-	/* XXX: place actions to handle sa_readfd here... */
+	DEBUGMSGTL(("llcMIB", "llcMIB_fd_handler: executing fd handler...  "));
+	/* XXX: place actions to handle my_fd here... */
+	DEBUGMSGTL(("llcMIB", "done.\n"));
 	return;
 }
-#endif				/* defined MOUDLE */
-#if defined MASTER
-const char sa_program[] = "llcmib";
-int sa_fclose = 1;			/* default close files between requests */
-int sa_fd = 0;				/* file descriptor for MIB use */
-int sa_readfd = 0;			/* file descriptor for autonomnous events */
-int sa_changed = 1;			/* indication to reread MIB configuration */
-int sa_stats_refresh = 1;		/* indications that statistics, the mib or its tables need to be refreshed */
-int sa_request = 1;			/* request number for per-request actions */
-#endif				/* defined MASTER */
-#if defined MASTER
-#if !defined MODULE
-int sa_dump = 0;			/* default packet dump */
-int sa_debug = 0;			/* default no debug */
-int sa_nomead = 1;			/* default daemon mode */
-int sa_output = 1;			/* default normal output */
-int sa_agentx = 1;			/* default agentx mode */
-int sa_alarms = 1;			/* default application alarms */
-int sa_logaddr = 0;			/* log addresses */
-int sa_logfillog = 0;			/* log to sa_logfile */
-int sa_logstderr = 0;			/* log to standard error */
-int sa_logstdout = 0;			/* log to standard output */
-int sa_logsyslog = 0;			/* log to system logs */
-int sa_logcallog = 0;			/* log to callback logs */
-int sa_appendlog = 0;			/* append to log file without truncating */
-char sa_logfile[256] = "/var/log/llcmib.log";
-char sa_pidfile[256] = "/var/run/llcmib.pid";
-char sa_sysctlf[256] = "/etc/llcmib.conf";
-int allow_severity = LOG_ERR;
-int deny_severity = LOG_ERR;
-
-/* file stream for log file */
-FILE *stdlog = NULL;
-static void
-sa_version(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stdout, "\
-%2$s\n\
-Copyright (c) 2008-2010  Monavacon Limited.  All Rights Reserved.\n\
-Distributed under Affero GPL Version 3, included here by reference.\n\
-See `%1$s --copying' for copying permissions.\n\
-", argv[0], ident);
-}
-static void
-sa_usage(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stderr, "\
-Usage:\n\
-    %1$s [general-options] [options] [arguments]\n\
-    %1$s {-H|--help-directives}\n\
-    %1$s {-h|--help}\n\
-    %1$s {-V|--version}\n\
-    %1$s {-C|--copying}\n\
-", argv[0]);
-}
-static void
-sa_help(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stdout, "\
-Usage:\n\
-    %1$s [general-options] [options] [arguments]\n\
-    %1$s {-h|--help}\n\
-    %1$s {-V|--version}\n\
-    %1$s {-C|--copying}\n\
-Arguments:\n\
-    None.\n\
-Options:\n\
-    -a, --log-addresses\n\
-        log addresses of connecting management stations.\n\
-    -A, --append\n\
-        append to logfiles without truncating.\n\
-    -c, --config-file CONFIGFILE\n\
-        use configuration file CONFIGFILE.\n\
-    -C, --config-only\n\
-        only load configuration given by -c option.\n\
-    -d, --dump\n\
-        dump sent and received PDUs.\n\
-    -D, --debug [LEVEL]\n\
-        set debugging verbosity to LEVEL.\n\
-    -D, --debug-tokens [TOKEN[,TOKEN]*]\n\
-        debug specified TOKEN's.\n\
-    -f, --dont-fork\n\
-        run in the foreground.\n\
-    -g, --gid, --groupid GID\n\
-        become group GID after listening.\n\
-    -h, --help, -?, --?\n\
-        print usage information and exit.\n\
-    -H, --help-directives\n\
-        print config directives and exit.\n\
-    -I, --initialize [-]MODULE[,MODULE]*\n\
-        initialize (or not, '-') these MODULE's.\n\
-    -k, --keep-open\n\
-        keep system files open between requests.\n\
-    -l, --log-file [LOGFILE]\n\
-        log to log file name LOGFILE.  [default: /var/log/llcmib.log]\n\
-    -L, --log-stderr\n\
-        log to controlling terminal standard error.\n\
-    -m, --mibs [+]MIB[,MIB]*\n\
-        load these (additional '+') MIBs.\n\
-    -M, --master\n\
-        run as SNMP master instead of AgentX sub-agent.\n\
-    -M, --mibdirs [+]MIBDIR[:MIBDIR]*\n\
-        search these (additional, '+') colon separated directories for MIBs.\n\
-    -n, --nodaemon\n\
-        run in the foreground.\n\
-    -n, --name NAME\n\
-        use NAME for configuration file base.  [default: llcmib]\n\
-    -p, --port PORTNUM\n\
-        listen on port number PORTNUM.  [default: 161]\n\
-    -p, --pidfile PIDFILE\n\
-        write daemon pid to PIDFILE.  [default: /var/run/llcmib.pid]\n\
-    -P, --pidfile PIDFILE\n\
-        write daemon pid to PIDFILE.  [default: /var/run/llcmib.pid]\n\
-    -q, --quiet\n\
-        suppress normal output.\n\
-    -q, --quick\n\
-        abbreviate output for machine readability.\n\
-    -r, --noroot\n\
-        do not require root privilege.\n\
-    -s, --log-syslog\n\
-        log to system logs.\n\
-    -S, --sysctl-file FILENAME\n\
-        write sysctl config file FILENAME.  [default: /etc/streams.conf]\n\
-    -t, --agent-alarms\n\
-        agent blocks {SIGALARM}.\n\
-    -T, --transport [TRANSPORT]\n\
-        default transport TRANSPORT.  [default: udp]\n\
-    -u, --uid, --userid UID\n\
-        become user UID after listening.\n\
-    -U, --dont-remove-pidfile\n\
-        do not remove PIDFILE when shutting down.\n\
-    -v, --version\n\
-        print version information and exit.\n\
-    -V, --verbose [LEVEL]\n\
-        be verbose to LEVEL.  [default: 1]\n\
-    -x, --agentx-socket [SOCKET]\n\
-        master AgentX on SOCKET.  [default: /var/agentx/master]\n\
-    -X, --agentx\n\
-        run as AgentX sub-agent instead of master (the default).\n\
-    -y, --copying\n\
-        print copying information and exit.\n\
-", argv[0]);
-}
-static void
-sa_copying(int argc, char *argv[])
-{
-	if (!sa_output && !sa_debug)
-		return;
-	fprintf(stdout, "\
---------------------------------------------------------------------------------\n\
-%1$s\n\
---------------------------------------------------------------------------------\n\
-Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com>\n\
-Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com>\n\
-Copyright (c) 1997-2000  Brian F. G. Bidulock <bidulock@openss7.org>\n\
-\n\
-All Rights Reserved.\n\
---------------------------------------------------------------------------------\n\
-This program is free software; you can  redistribute  it and/or modify  it under\n\
-the terms of the GNU Affero General Public License as published by the Free\n\
-Software Foundation; Version 3 of the License.\n\
-\n\
-This program is distributed in the hope that it will  be useful, but WITHOUT ANY\n\
-WARRANTY; without even  the implied warranty of MERCHANTABILITY or FITNESS FOR A\n\
-PARTICULAR PURPOSE.  See the GNU Affero General Public License for more details.\n\
-\n\
-You should have received a copy of the GNU  Affero  General Public License along\n\
-with this program.   If not, see <http://www.gnu.org/licenses/>, or write to the\n\
-Free Software Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.\n\
---------------------------------------------------------------------------------\n\
-U.S. GOVERNMENT RESTRICTED RIGHTS.  If you are licensing this Software on behalf\n\
-of the U.S. Government (\"Government\"), the following provisions apply to you. If\n\
-the Software is supplied by the  Department of Defense (\"DoD\"), it is classified\n\
-as \"Commercial  Computer  Software\"  under  paragraph  252.227-7014  of the  DoD\n\
-Supplement  to the  Federal Acquisition Regulations  (\"DFARS\") (or any successor\n\
-regulations) and the  Government  is acquiring  only the  license rights granted\n\
-herein (the license rights customarily provided to non-Government users). If the\n\
-Software is supplied to any unit or agency of the Government  other than DoD, it\n\
-is  classified as  \"Restricted Computer Software\" and the Government's rights in\n\
-the Software  are defined  in  paragraph 52.227-19  of the  Federal  Acquisition\n\
-Regulations (\"FAR\")  (or any successor regulations) or, in the cases of NASA, in\n\
-paragraph  18.52.227-86 of  the  NASA  Supplement  to the FAR (or any  successor\n\
-regulations).\n\
---------------------------------------------------------------------------------\n\
-Commercial  licensing  and  support of this  software is  available from OpenSS7\n\
-Corporation at a fee.  See http://www.openss7.com/\n\
---------------------------------------------------------------------------------\n\
-", ident);
-}
-
-void
-sa_help_directives(int argc, char *argv[])
-{
-	ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
-	init_agent("llcMIB");
-	// init_mib_modules();
-	init_mib();
-	init_snmp("llcMIB");
-	snmp_log(MY_FACILITY(LOG_INFO), "Configuration directives understood:\n");
-	/* Unfortunately, read_config_print_usage() uses snmp_log(), meaning that it can only be writen to standard error and not standard output. */
-	read_config_print_usage("    ");
-}
-static int
-sa_sig_register(int signum, RETSIGTYPE(*handler) (int))
-{
-	sigset_t mask;
-	struct sigaction act;
-
-	act.sa_handler = handler ? handler : SIG_DFL;
-	act.sa_flags = handler ? SA_RESTART : 0;
-	sigemptyset(&act.sa_mask);
-	if (sigaction(signum, &act, NULL))
-		return (-1);
-	sigemptyset(&mask);
-	sigaddset(&mask, signum);
-	sigprocmask(handler ? SIG_UNBLOCK : SIG_BLOCK, &mask, NULL);
-	return (0);
-}
-static int sa_alm_signal = 0;
-static int sa_pol_signal = 0;
-static int sa_hup_signal = 0;
-static int sa_int_signal = 0;
-static int sa_trm_signal = 0;
-static int sa_alm_handle = 0;
-void
-sa_alm_callback(uint req, void *arg)
-{
-	if (req == sa_alm_handle)
-		sa_alm_handle = 0;
-	sa_alm_signal = 1;
-	return;
-}
-
-static RETSIGTYPE
-sa_alm_handler(int signum)
-{
-	sa_alm_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static void
-sa_snmp_alm_handler(uint reg, void *clientarg)
-{
-	sa_alm_signal = 1;
-	return;
-}
-static int
-sa_alm_catch(void)
-{
-	if (sa_alarms)
-		return sa_sig_register(SIGALRM, &sa_alm_handler);
-	return (-1);
-}
-static int
-sa_alm_block(void)
-{
-	if (sa_alarms)
-		return sa_sig_register(SIGALRM, NULL);
-	if (sa_alm_handle) {
-		uint handle = sa_alm_handle;
-
-		sa_alm_handle = 0;
-		snmp_alarm_unregister(handle);
-	}
-	return (0);
-}
-static int
-sa_alm_action(void)
-{
-	sa_alm_signal = 0;
-	return (0);
-}
-
-static RETSIGTYPE
-sa_pol_handler(int signum)
-{
-	sa_pol_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_pol_catch(void)
-{
-	return sa_sig_register(SIGPOLL, &sa_pol_handler);
-}
-static int
-sa_pol_block(void)
-{
-	return sa_sig_register(SIGPOLL, NULL);
-}
-
-/*
- * Both the sc(4) module and sad(4) driver issue an M_PCSIG message with
- * SIGPOLL to the stream head whenever the STREAMS configuration or autopush
- * configuration changes, indicating to the agent which has the sc(4) or
- * sad(4) Stream open that it is necessary to reread information from the
- * kernel.  This fact is merely recorded, as this information is not read each
- * time that a configuration change occurs, but only after a request from some
- * portion of that information occurs. This condition is also set when the
- * sc(4) and sad(4) Streams are first opened. The SIGPOLL will also deliver in
- * siginfo the file descriptor issuing the signal, so we could distiguish
- * between sc(4) and sad(4) signals, but since one can be pushed over the
- * other, there is little point in distinguishing.
- *
- * sc(4) or sad(4) also should be modified to provide the general streams
- * statistics supported here; even though they are available through the /proc
- * filesystem on Linux Fast-STREAMS.
- */
-static int
-sa_pol_action(void)
-{
-	sa_pol_signal = 0;
-	snmp_log(MY_FACILITY(LOG_INFO), "%s: Caught SIGPOLL, will re-read data structures", sa_program);
-	sa_changed = 1;
-	return (0);
-}
-
-static RETSIGTYPE
-sa_hup_handler(int signum)
-{
-	sa_hup_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_hup_catch(void)
-{
-	if (sa_agentx)
-		return sa_sig_register(SIGHUP, &sa_hup_handler);
-	return (-1);
-}
-static int
-sa_hup_block(void)
-{
-	return sa_sig_register(SIGHUP, NULL);
-}
-static int
-sa_hup_action(void)
-{
-	/* There are several times that we might be sent a SIGHUP.  We might be sent a SIGHUP by logrotate asking us to close and reopen our log files. */
-	sa_hup_signal = 0;
-	snmp_log(MY_FACILITY(LOG_WARNING), "Caught SIGHUP, reopening files.");
-	if (sa_output > 1)
-		snmp_log(MY_FACILITY(LOG_NOTICE), "Reopening output file %s", sa_logfile);
-	if (sa_logfillog != 0) {
-		fflush(stdlog);
-		fclose(stdlog);
-		snmp_disable_filelog();
-		if ((stdlog = freopen(sa_logfile, sa_appendlog ? "a" : "w", stdlog)) == NULL) {
-			/* I hope we have another log sink. */
-			snmp_log(MY_FACILITY(LOG_ERR), "%s", strerror(errno));
-			snmp_log(MY_FACILITY(LOG_ERR), "Could not reopen log file %s", sa_logfile);
-		}
-		snmp_enable_filelog(sa_logfile, sa_appendlog);
-	}
-	return (0);
-}
-
-static RETSIGTYPE
-sa_int_handler(int signum)
-{
-	sa_int_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_int_catch(void)
-{
-	return sa_sig_register(SIGINT, &sa_int_handler);
-}
-static int
-sa_int_block(void)
-{
-	return sa_sig_register(SIGINT, NULL);
-}
-static void sa_exit(int retval);
-static int
-sa_int_action(void)
-{
-	sa_int_signal = 0;
-	snmp_log(MY_FACILITY(LOG_WARNING), "%s: Caught SIGINT, shutting down", sa_program);
-	sa_exit(0);
-	return (0);		/* should be no return */
-}
-
-static RETSIGTYPE
-sa_trm_handler(int signum)
-{
-	sa_trm_signal = 1;
-	return (RETSIGTYPE) (0);
-}
-static int
-sa_trm_catch(void)
-{
-	return sa_sig_register(SIGTERM, &sa_trm_handler);
-}
-static int
-sa_trm_block(void)
-{
-	return sa_sig_register(SIGTERM, NULL);
-}
-static void sa_exit(int retval);
-static int
-sa_trm_action(void)
-{
-	sa_trm_signal = 0;
-	snmp_log(MY_FACILITY(LOG_WARNING), "%s: Caught SIGTERM, shutting down", sa_program);
-	sa_exit(0);
-	return (0);		/* should be no return */
-}
-static void
-sa_sig_catch(void)
-{
-	sa_alm_catch();
-	sa_pol_catch();
-	sa_hup_catch();
-	sa_int_catch();
-	sa_trm_catch();
-}
-static void
-sa_sig_block(void)
-{
-	sa_alm_block();
-	sa_pol_block();
-	sa_hup_block();
-	sa_int_block();
-	sa_trm_block();
-}
-
-int
-sa_start_timer(long duration)
-{
-	if (sa_alarms) {
-		struct itimerval setting = {
-			{0, 0},
-			{duration / 1000, (duration % 1000) * 1000}
-		};
-		if (sa_alm_catch())
-			return (-1);
-		if (setitimer(ITIMER_REAL, &setting, NULL))
-			return (-1);
-		sa_alm_signal = 0;
-		return (0);
-	} else {
-#if defined NETSNMP_DS_APPLICATION_ID
-		struct timeval setting = {
-			duration / 1000, (duration % 1000) * 1000
-		};
-		sa_alm_handle = snmp_alarm_register_hr(setting, 0, sa_snmp_alm_handler, NULL);
-#else
-		sa_alm_handle = snmp_alarm_register((duration + 999) / 1000, 0, sa_snmp_alm_handler, NULL);
-#endif
-		return (sa_alm_handle ? 0 : -1);
-	}
-}
-static void
-sa_exit(int retval)
-{
-	if (retval)
-		snmp_log(MY_FACILITY(LOG_ERR), "%s: Exiting %d", sa_program, retval);
-	else
-		snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Exiting %d", sa_program, retval);
-	fflush(stdout);
-	fflush(stderr);
-	sa_sig_block();
-	closelog();
-	exit(retval);
-}
-static void
-sa_init_logging(int argc, char *argv[])
-{
-	static char progname[256];
-
-	/* The purpose of this function is to bring logging up before forking (and while still in the foreground) so that we can use the snmp_log() function before and during forking if necessary.
-	   Note that the default configuration for snmp_log() is to send all logs to standard error. */
-	strncpy(progname, basename(argv[0]), sizeof(progname));
-	snmp_disable_log();
-	if (sa_logfillog) {
-		snmp_enable_filelog(sa_logfile, sa_appendlog);
-	}
-	if (sa_logstderr | sa_logstdout) {
-#if defined LOG_PERROR
-		/* Note that when we have Linux LOG_PERROR, and logs go both to syslog and stderr, it is better to use the LOG_PERROR than to use snmp_log()'s print to stderr, as the former is better 
-		   formated. */
-		if (!sa_logsyslog)
-			snmp_enable_stderrlog();
-#else				/* defined LOG_PERROR */
-		snmp_enable_stderrlog();
-#endif				/* defined LOG_PERROR */
-	}
-	if (sa_logsyslog) {
-#if !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT
-		snmp_enable_syslog();
-#else				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
-		snmp_enable_syslog_ident("llcMIB", LOG_DAEMON);
-#endif				/* !defined HAVE_SNMP_ENABLE_SYSLOG_IDENT */
-		/* Note that the way that snmp sets up the logger is not really the way we want it, so close the log and reopen it the way we want. */
-		closelog();
-#if defined LOG_PERROR
-		openlog("llcMIB", LOG_PID | LOG_CONS | LOG_NDELAY | (sa_logstderr ? LOG_PERROR : 0), MY_FACILITY(0));
-#else				/* defined LOG_PERROR */
-		openlog("llcMIB", LOG_PID | LOG_CONS | LOG_NDELAY, MY_FACILITY(0));
-#endif				/* defined LOG_PERROR */
-	}
-	if (sa_logcallog) {
-		snmp_enable_calllog();
-	}
-}
-static void
-sa_enter(int argc, char *argv[])
-{
-	if (sa_nomead) {
-		pid_t pid;
-
-		if ((pid = fork()) < 0) {
-			perror(argv[0]);
-			exit(2);
-		} else if (pid != 0) {
-			/* parent exits */
-			exit(0);
-		}
-		setsid();	/* become a session leader */
-		/* fork once more for SVR4 */
-		if ((pid = fork()) < 0) {
-			perror(argv[0]);
-			exit(2);
-		} else if (pid != 0) {
-			/* parent responsible for writing pid file */
-			if (sa_nomead || sa_pidfile[0] != '\0') {
-				FILE *pidf;
-
-				/* initialize default filename */
-				if (sa_pidfile[0] == '\0')
-					snprintf(sa_pidfile, sizeof(sa_pidfile), "/var/run/%s.pid", sa_program);
-				if (sa_output > 1) {
-					snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Writing daemon pid to file %s", sa_program, sa_pidfile);
-				}
-				if ((pidf = fopen(sa_pidfile, "w+"))) {
-					fprintf(pidf, "%d", (int) pid);
-					fflush(pidf);
-					fclose(pidf);
-				} else {
-					snmp_log(MY_FACILITY(LOG_ERR), "%s: %m", sa_program);
-					snmp_log(MY_FACILITY(LOG_ERR), "%s: Could not write pid to file %s", sa_program, sa_pidfile);
-					sa_exit(2);
-					/* no return */
-				}
-			}
-			/* parent exits */
-			exit(0);
-		}
-		/* child continues */
-		/* release current directory */
-		if (chdir("/") < 0) {
-			perror(argv[0]);
-			exit(2);
-		}
-		umask(0);	/* clear file creation mask */
-		/* rearrange file streams */
-		fclose(stdin);
-	}
-	/* continue as foreground or background */
-	sa_init_logging(argc, argv);
-	sa_sig_catch();
-	snmp_log(MY_FACILITY(LOG_NOTICE), "%s: Startup complete.", sa_program);
-}
-static void
-sa_mloop(int argc, char *argv[])
-{
-	if (sa_agentx) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as AgentX client\n", argv[0]);
-		/* run as an AgentX client */
-		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
-	} else {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as SNMP master agent\n", argv[0]);
-		/* run as SNMP master */
-		ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
-	}
-	if (sa_alarms) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using application alarms\n", argv[0]);
-		/* use application alarms */
-		ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
-	}
-	/* initialize agent */
-	init_agent("llcMIB");
-	/* initialize MIB */
-	init_llcMIB();
-	/* initialize SNMP */
-	init_snmp("llcMIB");
-	if (!sa_agentx) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: running as SNMP master\n", argv[0]);
-#if !defined NETSNMP_DS_APPLICATION_ID
-		init_master_agent(710, NULL, NULL);
-#else
-		init_master_agent();
-#endif
-	}
-	for (;;) {
-		int retval;
-
-		/* to use select or poll you need to use the snmp_select_info() to obtain the fd of the agentx socket and add it to the fdset. */
-		/* note that SIGALRM is used by snmp: use the snmp_alarm() api instead */
-#if 0
-		if (snmp_select() == 0) {
-			if (sa_alarms == 0)
-				run_alarms();
-		}
-#endif
-		retval = agent_check_and_process(1);	/* 0 == don't block */
-		if (retval == 0) {
-			/* alarm occurred, alarm conditions checked */
-		} else if (retval == -1) {
-			/* error (or signal) ocurred */
-			if (sa_alm_signal) {
-				sa_alm_action();
-			}
-			if (sa_pol_signal) {
-				sa_pol_action();
-			}
-			if (sa_hup_signal) {
-				sa_hup_action();
-			}
-			if (sa_int_signal) {
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
-				snmp_shutdown("llcMIB");
-				sa_int_action();	/* no return */
-			}
-			if (sa_trm_signal) {
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
-				snmp_shutdown("llcMIB");
-				sa_trm_action();	/* no return */
-			}
-		} else if (retval > 0) {
-			/* processed packets */
-			if (sa_fclose) {
-				/* close files after each request */
-				if (sa_fd != 0) {
-					int fd = sa_fd;
-
-					sa_fd = 0;
-					close(fd);
-				}
-			}
-			sa_stats_refresh = 1;
-			sa_request++;
-		}
-	}
-	if (sa_debug)
-		snmp_log(MY_FACILITY(LOG_DEBUG), "%s: shutting down\n", argv[0]);
-	snmp_shutdown("llcMIB");
-}
-
-int
-main(int argc, char *argv[])
-{
-	for (;;) {
-		int c, val, fd;
-		char *cptr;
-		struct passwd *pw;
-		struct group *gr;
-		struct stat st;
-
-#if defined _GNU_SOURCE
-		int option_index = 0;
-                /* *INDENT-OFF* */
-                static struct option long_options[] = {
-                        {"log-addresses",	no_argument,		NULL, 'a'},
-                        {"append",		no_argument,		NULL, 'A'},
-                        {"config-file",		required_argument,	NULL, 'c'},
-                        {"no-configs",		no_argument,		NULL, 'C'},
-                        {"dump",		no_argument,		NULL, 'd'},
-                        {"debug",		optional_argument,	NULL, 'D'},
-                        {"debug-tokens",	optional_argument,	NULL, 'D'},
-                        {"dont-fork",		no_argument,		NULL, 'f'},
-                        {"gid",			required_argument,	NULL, 'g'},
-                        {"groupid",		required_argument,	NULL, 'g'},
-                        {"help",		no_argument,		NULL, 'h'},
-                        {"?",			no_argument,		NULL, 'h'},
-                        {"help-directives",	no_argument,		NULL, 'H'},
-                        {"initialize",		required_argument,	NULL, 'I'},
-                        {"init-modules",	required_argument,	NULL, 'I'},
-                        {"keep-open",		no_argument,		NULL, 'k'},
-                        {"log-file",		optional_argument,	NULL, 'l'},
-                        {"logfile",		optional_argument,	NULL, 'l'},
-                        {"Lf",			optional_argument,	NULL, 'l'},
-                        {"LF",			required_argument,	NULL, 'l'},
-                        {"log-stderr",		no_argument,		NULL, 'L'},
-                        {"Le",			no_argument,		NULL, 'L'},
-                        {"LE",			required_argument,	NULL, 'L'},
-                        {"mibs",		required_argument,	NULL, 'm'},
-                        {"master",		no_argument,		NULL, 'M'},
-                        {"mibdirs",		required_argument,	NULL, 'M'},
-                        {"nodaemon",		no_argument,		NULL, 'n'},
-                        {"name",		required_argument,	NULL, 'n'},
-                        {"dry-run",		no_argument,		NULL, 'N'},
-                        {"log-stdout",		no_argument,		NULL, 'o'},
-                        {"Lo",			no_argument,		NULL, 'o'},
-                        {"LO",			required_argument,	NULL, 'o'},
-                        {"port",		required_argument,	NULL, 'p'},
-                        {"pidfile",		required_argument,	NULL, 'P'},
-                        {"quiet",		no_argument,		NULL, 'q'},
-                        {"quick",		no_argument,		NULL, 'q'},
-                        {"noroot",		no_argument,		NULL, 'r'},
-                        {"log-syslog",		no_argument,		NULL, 's'},
-                        {"Ls",			no_argument,		NULL, 's'},
-                        {"LS",			required_argument,	NULL, 's'},
-                        {"syslog",		no_argument,		NULL, 's'},
-                        {"sysctl-file",		required_argument,	NULL, 'S'},
-                        {"agent-alarms",	no_argument,		NULL, 't'},
-                        {"transport",		optional_argument,	NULL, 'T'},
-                        {"uid",			required_argument,	NULL, 'u'},
-                        {"userid",		required_argument,	NULL, 'u'},
-                        {"dont-remove-pidfile",	no_argument,		NULL, 'U'},
-                        {"leave-pidfile",	no_argument,		NULL, 'U'},
-                        {"version",		no_argument,		NULL, 'v'},
-                        {"verbose",		optional_argument,	NULL, 'V'},
-                        {"agentx-socket",	required_argument,	NULL, 'x'},
-                        {"agentx",		no_argument,		NULL, 'X'},
-                        {"copying",		no_argument,		NULL, 'y'},
-#if 0
-                        {"directory",		required_argument,	NULL, 'd'},
-                        {"basename",		required_argument,	NULL, 'b'},
-                        {"outfile",		required_argument,	NULL, 'o'},
-                        {"errfile",		required_argument,	NULL, 'e'},
-#endif
-                        { 0, }
-                };
-                /* *INDENT-ON* */
-
-		c = getopt_long_only(argc, argv, ":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy", long_options, &option_index);
-#else				/* defined _GNU_SOURCE */
-		c = getopt(argc, argv, ":aAc:CdD::fg:hHI:kl::L::m:M::n::o::p:P:qrs::S:tT::u:UvV::x:Xy");
-#endif				/* defined _GNU_SOURCE */
-		if (c == -1) {
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: done options processing\n", argv[0]);
-			break;
-		}
-		switch (c) {
-		case 0:
-			goto bad_usage;
-		case 'a':	/* -a, --log-addresses */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging addresses\n", argv[0]);
-			sa_logaddr++;
-			break;
-		case 'A':	/* -A, --append */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will not truncate logfile\n", argv[0]);
-#if defined NETSNMP_DS_LIB_APPEND_LOGFILES
-			ds_set_boolean(DS_LIBRARY_ID, NETSNMP_DS_LIB_APPEND_LOGFILES, 1);
-#endif				/* defined NETSNMP_DS_LIB_APPEND_LOGFILES */
-			sa_appendlog = 1;
-			break;
-		case 'c':	/* -c, --config-file CONFIGFILE */
-			if (optarg == NULL)
-				goto bad_option;
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using configuration file %s\n", argv[0], optarg);
-			ds_set_string(DS_LIBRARY_ID, DS_LIB_OPTIONALCONFIG, optarg);
-			break;
-		case 'C':	/* -C, --no-configs */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: not reading default config files\n", argv[0]);
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DONT_READ_CONFIGS, 1);
-			break;
-		case 'd':	/* -d, --dump */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting packet dump\n", argv[0]);
-			sa_dump = 1;
-			// snmp_set_dump_packet(sa_dump);
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_DUMP_PACKET, sa_dump);
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, sa_dump);
-			break;
-		case 'D':	/* -D, --debug [LEVEL], --debug-tokens [TOKENS] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: increasing debug verbosity\n", argv[0]);
-			if (optarg == NULL) {
-				/* no option: must be -D, --debug */
-				sa_debug++;
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debug level is now %d\n", argv[0], sa_debug);
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debugging all tokens\n", argv[0]);
-				if (sa_debug)
-					debug_register_tokens("ALL");
-			} else {
-				cptr = optarg;
-				if ((val = strtol(optarg, &cptr, 0)) < 0)
-					goto bad_option;
-				if (*cptr == '\0') {
-					/* it is just a number, must be -D, --debug [LEVEL] */
-					sa_debug = val;
-					if (sa_debug)
-						snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debug level is now %d\n", argv[0], sa_debug);
-				} else {
-					/* not a number, must be -D, --debug-tokens TOKENS */
-					if (sa_debug)
-						snmp_log(MY_FACILITY(LOG_DEBUG), "%s: debugging tokens %s\n", argv[0], optarg);
-					debug_register_tokens(optarg);
-				}
-			}
-			break;
-		case 'f':	/* -f, --dont-fork */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing daemon mode\n", argv[0]);
-			sa_nomead = 0;
-			break;
-		case 'u':	/* -u, --uid, --userid UID */
-			cptr = optarg;
-			if ((val = strtol(optarg, &cptr, 0)) < 0)
-				goto bad_option;
-			/* UID can be name or number */
-			if ((pw = (*cptr == '\0') ? getpwuid((uid_t) val) : getpwnam(optarg)) == NULL)
-				goto bad_option;
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will run as uid %s(%d)\n", argv[0], pw->pw_name, pw->pw_uid);
-			ds_set_int(DS_APPLICATION_ID, DS_AGENT_USERID, pw->pw_uid);
-			break;
-		case 'g':	/* -g, --gid, --groupdid GID */
-			cptr = optarg;
-			if ((val = strtol(optarg, &cptr, 0)) < 0)
-				goto bad_option;
-			/* GID can be name or number */
-			if ((gr = (*cptr == '\0') ? getgrgid((gid_t) val) : getgrnam(optarg)) == NULL)
-				goto bad_option;
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will run as gid %s(%d)\n", argv[0], gr->gr_name, gr->gr_gid);
-			ds_set_int(DS_APPLICATION_ID, DS_AGENT_GROUPID, gr->gr_gid);
-			break;
-		case 'h':	/* -h, --help, -?, --? */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing help message\n", argv[0]);
-			sa_help(argc, argv);
-			exit(0);
-		case 'H':	/* -H, --help-directives */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing config directives\n", argv[0]);
-			sa_help_directives(argc, argv);
-			exit(0);
-		case 'I':	/* -I, --init-modules, --initialize MODULE[{,| |:}MODULE]* */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will initialize modules: %s\n", argv[0], optarg);
-			add_to_init_list(optarg);
-			break;
-		case 'k':	/* -k, --keep-open */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: keeping files open\n", argv[0]);
-			sa_fclose = 0;
-			break;
-		case 'l':	/* -l, --log-file, --logfile, -Lf, -LF p1[-p2] [LOGFILE] */
-			if (optarg != NULL)
-				strncpy(sa_logfile, optarg, sizeof(sa_logfile));
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will log to file %s\n", argv[0], sa_logfile);
-			sa_logfillog = 1;
-			break;
-		case 'L':	/* -L, --log-stderr, -Le, -LE p1[-p2] */
-			/* Note that the recent NET-SNMP version of this option is far more complicated: -Le is the same as the old version of the option; -Lf LOGFILE is like the -l option; -Ls is
-			   like the -s option; -Lo logs messages to standard output; -LX p1[-p2] [LOGFILE], where X = E, F, S or O, logs priority p1 and above to X, or p1 thru p2 to X. */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to standard error\n", argv[0]);
-			sa_logstderr = 1;
-			break;
-		case 'm':	/* -m, --mibs MIBS */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using MIBS %s\n", argv[0], optarg);
-			break;
-		case 'M':	/* -M, --master or -M, --mibdirs MIBDIRS */
-			if (optarg) {
-				/* -M, --mibdirs MIBDIRS */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using MIBDIRS %s\n", argv[0], optarg);
-			} else {
-				/* -M, --master */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting SNMP master\n", argv[0]);
-				sa_agentx = 0;
-				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 0);
-			}
-			break;
-		case 'n':	/* -n, --nodaemon or -n, --name NAME */
-			if (optarg) {
-				/* -n, --name NAME */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using name %s\n", argv[0], optarg);
-				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME, optarg);
-			} else {
-				/* -n, --nodaemon */
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing deamon mode\n", argv[0]);
-				sa_nomead = 0;
-				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PROGNAME, basename(argv[0]));
-			}
-			break;
-		case 'N':	/* -N, --dry-run */
-#if defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting for dry-runs startup\n", argv[0]);
-			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_QUIT_IMMEDIATELY, 1);
-			break;
-#else				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: -N option not supported\n", argv[0]);
-			goto bad_option;
-#endif				/* defined NETSNMP_DS_AGENT_QUIT_IMMEDIATELY */
-		case 'o':	/* -o, --log-stdout, -Lo, -LO p1[-p2] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to stdout\n", argv[0]);
-			sa_logstdout = 1;
-			break;
-		case 'p':	/* -p, --port PORTNUM or -p, --pidfile PIDFILE */
-			cptr = optarg;
-			if ((val = strtol(optarg, &cptr, 0)) < 0 || val > 16383)
-				goto bad_option;
-			if (*cptr == '\0') {
-				char buf[4096];
-
-				/* -p, --port PORTNUM */
-				if ((cptr = ds_get_string(DS_APPLICATION_ID, DS_AGENT_PORTS)))
-					snprintf(buf, sizeof(buf), "%s,%s", cptr, optarg);
-				else
-					strncpy(buf, optarg, sizeof(buf));
-				ds_set_string(DS_APPLICATION_ID, DS_AGENT_PORTS, buf);
-				break;
-			}
-			/* fall through */
-		case 'P':	/* -p, -P, --pidfile PIDFILE */
-			if (optarg) {
-				/* either it exists */
-				if (stat(optarg, &st) == -1) {
-					/* or we can create it */
-					if ((fd = open(optarg, O_CREAT, 0600)) == -1) {
-						perror(argv[0]);
-						goto bad_option;
-					}
-					close(fd);
-				}
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting pid file to %s\n", argv[0], optarg);
-				strncpy(sa_pidfile, optarg, sizeof(sa_pidfile));
-			}
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using pidfile %s\n", argv[0], sa_pidfile);
-			break;
-		case 'q':	/* -q, --quiet, --quick */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: suppressing normal output\n", argv[0]);
-			sa_debug = 0;
-			sa_output = 0;
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
-			// snmp_set_quick_print();
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_QUICK_PRINT, 1);
-			break;
-		case 'r':	/* -r, --noroot */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting for non-root access\n", argv[0]);
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_NO_ROOT_ACCESS, 1);
-			break;
-		case 's':	/* -s, --log-syslog, -Ls, -LS p1[-p2] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: logging to system logs\n", argv[0]);
-			sa_logsyslog = 1;
-			break;
-		case 'S':	/* -S, -sysctl-file FILENAME */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: using %s for backing\n", argv[0], optarg);
-			strncpy(sa_sysctlf, optarg, sizeof(sa_sysctlf));
-			break;
-		case 't':	/* -t, --agent-alarms */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting agent alarms\n", argv[0]);
-			sa_alarms = 0;
-			ds_set_boolean(DS_LIBRARY_ID, DS_LIB_ALARM_DONT_USE_SIG, 1);
-			break;
-		case 'T':	/* -T, --transport [TRANSPORT] */
-			if (optarg == NULL)
-				goto udp_transport;
-			if (!strcasecmp("TCP", optarg)) {
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting default transport to TCP\n", argv[0]);
-				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
-				val |= SNMP_FLAGS_STREAM_SOCKET;
-				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
-			} else if (!strcasecmp("UDP", optarg)) {
-			      udp_transport:
-				if (sa_debug)
-					snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting default transport to UDP\n", argv[0]);
-				val = ds_get_int(DS_APPLICATION_ID, DS_AGENT_FLAGS);
-				val &= ~SNMP_FLAGS_STREAM_SOCKET;
-				ds_set_int(DS_APPLICATION_ID, DS_AGENT_FLAGS, val);
-			} else
-				goto bad_option;
-			break;
-		case 'U':
-#if defined NETSNMP_DS_AGENT_LEAVE_PIDFILE
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: will leave pidfile after shutdown\n", argv[0]);
-			ds_set_boolean(DS_APPLICATION_ID, NETSNMP_DS_AGENT_LEAVE_PIDFILE, 1);
-#else
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: -U option not supported\n");
-			goto bad_option;
-#endif				/* defined NETSNMP_DS_AGENT_LEAVE_PIDFILE */
-			break;
-		case 'v':	/* -v, --version */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing version message\n", argv[0]);
-			sa_version(argc, argv);
-			exit(0);
-		case 'V':	/* -V, --verbose [LEVEL] */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: increasing output verbosity\n", argv[0]);
-			if (optarg == NULL) {
-				sa_output++;
-			} else {
-				if ((val = strtol(optarg, NULL, 0)) < 0)
-					goto bad_option;
-				sa_output = val;
-			}
-			if (sa_output > 1)
-				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 1);
-			else
-				ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_VERBOSE, 0);
-			break;
-		case 'x':	/* -x, --agentx-socket SOCKET */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting AgentX socket to %s\n", argv[0], optarg);
-			ds_set_string(DS_APPLICATION_ID, DS_AGENT_X_SOCKET, optarg);
-			// ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_AGENTX_MASTER, 1);
-			break;
-		case 'X':	/* -X, --agentx */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: setting AgentX sub-agent\n", argv[0]);
-			sa_agentx = 1;
-			ds_set_boolean(DS_APPLICATION_ID, DS_AGENT_ROLE, 1);
-			break;
-		case 'y':	/* -y, --copying */
-			if (sa_debug)
-				snmp_log(MY_FACILITY(LOG_DEBUG), "%s: printing copying message\n", argv[0]);
-			sa_copying(argc, argv);
-			exit(0);
-		case '?':
-		case ':':
-		default:
-		      bad_option:
-			optind--;
-			goto bad_nonopt;
-		      bad_nonopt:
-			if (sa_output || sa_debug) {
-				if (optind < argc) {
-					fprintf(stderr, "%s: syntax error near '", argv[0]);
-					while (optind < argc)
-						fprintf(stderr, "%s ", argv[optind++]);
-					fprintf(stderr, "'\n");
-				} else {
-					fprintf(stderr, "%s: missing option or argument", argv[0]);
-					fprintf(stderr, "\n");
-				}
-				fflush(stderr);
-			      bad_usage:
-				sa_usage(argc, argv);
-			}
-			exit(2);
-		}
-	}
-	if (optind < argc) {
-		if (sa_debug)
-			snmp_log(MY_FACILITY(LOG_DEBUG), "%s: excess non-option arguments\n", argv[0]);
-		goto bad_nonopt;
-	}
-	sa_enter(argc, argv);	/* daemonize if necessary */
-	sa_mloop(argc, argv);	/* execute main loop */
-	exit(0);
-}
-#endif				/* !defined MODULE */
-#endif				/* defined MASTER */

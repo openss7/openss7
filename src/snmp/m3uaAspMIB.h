@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -134,6 +134,7 @@ struct m3uaAspAgTable_data {
 	long m3uaAspAgRegistrationPolicy;	/* Create */
 	long m3uaAspAgAspIdPolicy;	/* Create */
 	long m3uaAspAgAspProtocolPayloadId;	/* Create */
+	ulong m3uaAspAgIpPort;		/* Create */
 	long m3uaAspAgMinOstreams;	/* Create */
 	long m3uaAspAgMaxIstreams;	/* Create */
 	long m3uaAspAgTimerT7;		/* Create */
@@ -175,7 +176,7 @@ struct m3uaAspSgTable_data {
 	long m3uaAspSgTimerT34A;	/* Create */
 	long m3uaAspSgTimerT1T;		/* Create */
 	long m3uaAspSgTimerT2T;		/* Create */
-	long m3uaAspSgStatus;		/* ReadOnly */
+	long m3uaAspSgStatus;		/* Create */
 };
 struct m3uaAspSgpTable_data {
 	uint m3uaAspSgpTable_request;
@@ -191,6 +192,7 @@ struct m3uaAspSgpTable_data {
 	long m3uaAspSgpOperationalState;	/* ReadOnly */
 	long m3uaAspSgpUsageState;	/* ReadOnly */
 	long m3uaAspSgpAspState;	/* Create */
+	long m3uaAspSgpPrimaryAddressType;	/* Create */
 	uint8_t *m3uaAspSgpPrimaryAddress;	/* Create */
 	size_t m3uaAspSgpPrimaryAddressLen;
 	uint8_t *m3uaAspSgpHostName;	/* Create */
@@ -200,7 +202,7 @@ struct m3uaAspSgpTable_data {
 struct m3uaAspSpTable_data {
 	uint m3uaAspSpTable_request;
 	uint m3uaAspSpTable_refs;
-	ulong m3uaAspSpIndex;		/* NoAccess */
+	ulong m3uaAspSpIndex;		/* Notify */
 	uint8_t *m3uaAspSpName;		/* Create */
 	size_t m3uaAspSpNameLen;
 	long m3uaAspSpOperationalState;	/* ReadOnly */
@@ -210,8 +212,8 @@ struct m3uaAspSpTable_data {
 	size_t m3uaAspSpAlarmStatusLen;
 	uint8_t *m3uaAspSpProceduralStatus;	/* ReadOnly */
 	size_t m3uaAspSpProceduralStatusLen;
-	uint8_t *m3uaAspSpAvailabiltyStatus;	/* ReadOnly */
-	size_t m3uaAspSpAvailabiltyStatusLen;
+	uint8_t *m3uaAspSpAvailabilityStatus;	/* ReadOnly */
+	size_t m3uaAspSpAvailabilityStatusLen;
 	uint8_t *m3uaAspSpPointCode;	/* Create */
 	size_t m3uaAspSpPointCodeLen;
 	long m3uaAspSpTimerT1R;		/* Create */
@@ -227,7 +229,8 @@ struct m3uaAspSpTable_data {
 struct m3uaAspMtTable_data {
 	uint m3uaAspMtTable_request;
 	uint m3uaAspMtTable_refs;
-	ulong m3uaAspSpIndex;		/* NoAccess */
+	ulong m3uaAspSpIndex;		/* Notify */
+	long m3uaAspMtIndex;		/* NoAccess */
 	uint8_t *m3uaAspMtName;		/* Create */
 	size_t m3uaAspMtNameLen;
 	long m3uaAspMtAdministrativeState;	/* Create */
@@ -241,8 +244,8 @@ struct m3uaAspMtTable_data {
 struct m3uaAspRsTable_data {
 	uint m3uaAspRsTable_request;
 	uint m3uaAspRsTable_refs;
-	ulong m3uaAspSpIndex;		/* NoAccess */
-	ulong m3uaAspRsIndex;		/* NoAccess */
+	ulong m3uaAspSpIndex;		/* Notify */
+	ulong m3uaAspRsIndex;		/* Notify */
 	uint8_t *m3uaAspRsName;		/* ReadOnly */
 	size_t m3uaAspRsNameLen;
 	uint8_t *m3uaAspRsRemotePointCode;	/* ReadOnly */
@@ -264,13 +267,13 @@ struct m3uaAspRsTable_data {
 	uint8_t *m3uaAspRsAvailabilityStatus;	/* ReadOnly */
 	size_t m3uaAspRsAvailabilityStatusLen;
 	long m3uaAspRsCongestionLevel;	/* ReadOnly */
-	long m3uaAspRsStatus;		/* ReadOnly */
+	long m3uaAspRsStatus;		/* Create */
 };
 struct m3uaAspRlTable_data {
 	uint m3uaAspRlTable_request;
 	uint m3uaAspRlTable_refs;
-	ulong m3uaAspSpIndex;		/* NoAccess */
-	ulong m3uaAspRsIndex;		/* NoAccess */
+	ulong m3uaAspSpIndex;		/* Notify */
+	ulong m3uaAspRsIndex;		/* Notify */
 	ulong m3uaAspAgIndex;		/* NoAccess */
 	ulong m3uaAspRlCost;		/* Create */
 	long m3uaAspRlAdministrativeState;	/* Create */
@@ -278,13 +281,15 @@ struct m3uaAspRlTable_data {
 	uint8_t *m3uaAspRlProceduralStatus;	/* ReadOnly */
 	size_t m3uaAspRlProceduralStatusLen;
 	long m3uaAspRlUsageState;	/* ReadOnly */
-	long m3uaAspRlStatus;		/* ReadOnly */
+	uint8_t *m3uaAspRlAvailabilityStatus;	/* ReadOnly */
+	size_t m3uaAspRlAvailabilityStatusLen;
+	long m3uaAspRlStatus;		/* Create */
 };
 struct m3uaAspRtTable_data {
 	uint m3uaAspRtTable_request;
 	uint m3uaAspRtTable_refs;
-	ulong m3uaAspSpIndex;		/* NoAccess */
-	ulong m3uaAspRsIndex;		/* NoAccess */
+	ulong m3uaAspSpIndex;		/* Notify */
+	ulong m3uaAspRsIndex;		/* Notify */
 	ulong m3uaAspAgIndex;		/* NoAccess */
 	ulong m3uaAspSgIndex;		/* NoAccess */
 	ulong m3uaAspRtCost;		/* ReadOnly */
@@ -297,16 +302,17 @@ struct m3uaAspRtTable_data {
 	uint8_t *m3uaAspRtProceduralStatus;	/* ReadOnly */
 	size_t m3uaAspRtProceduralStatusLen;
 	long m3uaAspRtUsageState;	/* ReadOnly */
-	long m3uaAspRtStatus;		/* ReadOnly */
+	long m3uaAspRtStatus;		/* Create */
 };
 struct m3uaAspRcTable_data {
 	uint m3uaAspRcTable_request;
 	uint m3uaAspRcTable_refs;
 	ulong m3uaAspIndex;		/* NoAccess */
-	ulong m3uaAspSpIndex;		/* NoAccess */
+	ulong m3uaAspSpIndex;		/* Notify */
+	long m3uaAspMtIndex;		/* NoAccess */
 	ulong m3uaAspAgIndex;		/* NoAccess */
 	ulong m3uaAspRcValue;		/* Create */
-	long m3uaAspRcRegstrationPolicy;	/* Create */
+	long m3uaAspRcRegistrationPolicy;	/* Create */
 	oid *m3uaAspRcTrafficMode;	/* Create */
 	size_t m3uaAspRcTrafficModeLen;
 	long m3uaAspRcStatus;		/* Create */
@@ -315,7 +321,8 @@ struct m3uaAspAsTable_data {
 	uint m3uaAspAsTable_request;
 	uint m3uaAspAsTable_refs;
 	ulong m3uaAspIndex;		/* NoAccess */
-	ulong m3uaAspSpIndex;		/* NoAccess */
+	ulong m3uaAspSpIndex;		/* Notify */
+	long m3uaAspMtIndex;		/* NoAccess */
 	ulong m3uaAspAgIndex;		/* NoAccess */
 	ulong m3uaAspSgIndex;		/* NoAccess */
 	long m3uaAspAsAsState;		/* ReadOnly */
@@ -328,7 +335,8 @@ struct m3uaAspAfTable_data {
 	uint m3uaAspAfTable_request;
 	uint m3uaAspAfTable_refs;
 	ulong m3uaAspIndex;		/* NoAccess */
-	ulong m3uaAspSpIndex;		/* NoAccess */
+	ulong m3uaAspSpIndex;		/* Notify */
+	long m3uaAspMtIndex;		/* NoAccess */
 	ulong m3uaAspAgIndex;		/* NoAccess */
 	ulong m3uaAspSgIndex;		/* NoAccess */
 	ulong m3uaAspSgpIndex;		/* NoAccess */
@@ -467,6 +475,13 @@ extern struct header_complex_index *m3uaAspAfTableStorage;
 #define M3UAASPSGPASPSTATE_TERMINATING           3
 #define M3UAASPSGPASPSTATE_UP                    4
 
+#define M3UAASPSGPPRIMARYADDRESSTYPE_UNKNOWN     0
+#define M3UAASPSGPPRIMARYADDRESSTYPE_IPV4        1
+#define M3UAASPSGPPRIMARYADDRESSTYPE_IPV6        2
+#define M3UAASPSGPPRIMARYADDRESSTYPE_IPV4Z       3
+#define M3UAASPSGPPRIMARYADDRESSTYPE_IPV6Z       4
+#define M3UAASPSGPPRIMARYADDRESSTYPE_DNS         16
+
 #define M3UAASPSPOPERATIONALSTATE_DISABLED       0
 #define M3UAASPSPOPERATIONALSTATE_ENABLED        1
 
@@ -490,15 +505,32 @@ extern struct header_complex_index *m3uaAspAfTableStorage;
 #define M3UAASPSPPROCEDURALSTATUS_REPORTING      3
 #define M3UAASPSPPROCEDURALSTATUS_TERMINATING    4
 
-#define M3UAASPSPAVAILABILTYSTATUS_INTEST        0
-#define M3UAASPSPAVAILABILTYSTATUS_FAILED        1
-#define M3UAASPSPAVAILABILTYSTATUS_POWEROFF      2
-#define M3UAASPSPAVAILABILTYSTATUS_OFFLINE       3
-#define M3UAASPSPAVAILABILTYSTATUS_OFFDUTY       4
-#define M3UAASPSPAVAILABILTYSTATUS_DEPENDENCY    5
-#define M3UAASPSPAVAILABILTYSTATUS_DEGRADED      6
-#define M3UAASPSPAVAILABILTYSTATUS_NOTINSTALLED  7
-#define M3UAASPSPAVAILABILTYSTATUS_LOGFULL       8
+#define M3UAASPSPAVAILABILITYSTATUS_INTEST       0
+#define M3UAASPSPAVAILABILITYSTATUS_FAILED       1
+#define M3UAASPSPAVAILABILITYSTATUS_POWEROFF     2
+#define M3UAASPSPAVAILABILITYSTATUS_OFFLINE      3
+#define M3UAASPSPAVAILABILITYSTATUS_OFFDUTY      4
+#define M3UAASPSPAVAILABILITYSTATUS_DEPENDENCY   5
+#define M3UAASPSPAVAILABILITYSTATUS_DEGRADED     6
+#define M3UAASPSPAVAILABILITYSTATUS_NOTINSTALLED 7
+#define M3UAASPSPAVAILABILITYSTATUS_LOGFULL      8
+
+#define M3UAASPMTINDEX_SNMM                      0
+#define M3UAASPMTINDEX_SNTM                      1
+#define M3UAASPMTINDEX_SNSM                      2
+#define M3UAASPMTINDEX_SCCP                      3
+#define M3UAASPMTINDEX_TUP                       4
+#define M3UAASPMTINDEX_ISUP                      5
+#define M3UAASPMTINDEX_DUP1                      6
+#define M3UAASPMTINDEX_DUP2                      7
+#define M3UAASPMTINDEX_MTUP                      8
+#define M3UAASPMTINDEX_BISUP                     9
+#define M3UAASPMTINDEX_SIUP                      10
+#define M3UAASPMTINDEX_SPNEUP                    11
+#define M3UAASPMTINDEX_STC                       12
+#define M3UAASPMTINDEX_USER13                    13
+#define M3UAASPMTINDEX_USER14                    14
+#define M3UAASPMTINDEX_USER15                    15
 
 #define M3UAASPMTADMINISTRATIVESTATE_LOCKED      0
 #define M3UAASPMTADMINISTRATIVESTATE_UNLOCKED    1
@@ -587,6 +619,16 @@ extern struct header_complex_index *m3uaAspAfTableStorage;
 #define M3UAASPRLUSAGESTATE_ACTIVE               1
 #define M3UAASPRLUSAGESTATE_BUSY                 2
 
+#define M3UAASPRLAVAILABILITYSTATUS_INACTIVE     0
+#define M3UAASPRLAVAILABILITYSTATUS_BLOCKED      1
+#define M3UAASPRLAVAILABILITYSTATUS_INHIBITED    2
+#define M3UAASPRLAVAILABILITYSTATUS_PROHIBITED   3
+#define M3UAASPRLAVAILABILITYSTATUS_RESTART      4
+#define M3UAASPRLAVAILABILITYSTATUS_RESTRICTED   5
+#define M3UAASPRLAVAILABILITYSTATUS_CONGESTED    6
+#define M3UAASPRLAVAILABILITYSTATUS_DANGER       7
+#define M3UAASPRLAVAILABILITYSTATUS_ALLOWED      8
+
 #define M3UAASPRTAVAILABILITYSTATUS_INACTIVE     0
 #define M3UAASPRTAVAILABILITYSTATUS_BLOCKED      1
 #define M3UAASPRTAVAILABILITYSTATUS_INHIBITED    2
@@ -614,10 +656,44 @@ extern struct header_complex_index *m3uaAspAfTableStorage;
 #define M3UAASPRTUSAGESTATE_ACTIVE               1
 #define M3UAASPRTUSAGESTATE_BUSY                 2
 
-#define M3UAASPRCREGSTRATIONPOLICY_UNKNOWN       1
-#define M3UAASPRCREGSTRATIONPOLICY_FORBIDDEN     2
-#define M3UAASPRCREGSTRATIONPOLICY_PERMITTED     3
-#define M3UAASPRCREGSTRATIONPOLICY_REQUIRED      4
+#define M3UAASPMTINDEX_SNMM                      0
+#define M3UAASPMTINDEX_SNTM                      1
+#define M3UAASPMTINDEX_SNSM                      2
+#define M3UAASPMTINDEX_SCCP                      3
+#define M3UAASPMTINDEX_TUP                       4
+#define M3UAASPMTINDEX_ISUP                      5
+#define M3UAASPMTINDEX_DUP1                      6
+#define M3UAASPMTINDEX_DUP2                      7
+#define M3UAASPMTINDEX_MTUP                      8
+#define M3UAASPMTINDEX_BISUP                     9
+#define M3UAASPMTINDEX_SIUP                      10
+#define M3UAASPMTINDEX_SPNEUP                    11
+#define M3UAASPMTINDEX_STC                       12
+#define M3UAASPMTINDEX_USER13                    13
+#define M3UAASPMTINDEX_USER14                    14
+#define M3UAASPMTINDEX_USER15                    15
+
+#define M3UAASPRCREGISTRATIONPOLICY_UNKNOWN      1
+#define M3UAASPRCREGISTRATIONPOLICY_FORBIDDEN    2
+#define M3UAASPRCREGISTRATIONPOLICY_PERMITTED    3
+#define M3UAASPRCREGISTRATIONPOLICY_REQUIRED     4
+
+#define M3UAASPMTINDEX_SNMM                      0
+#define M3UAASPMTINDEX_SNTM                      1
+#define M3UAASPMTINDEX_SNSM                      2
+#define M3UAASPMTINDEX_SCCP                      3
+#define M3UAASPMTINDEX_TUP                       4
+#define M3UAASPMTINDEX_ISUP                      5
+#define M3UAASPMTINDEX_DUP1                      6
+#define M3UAASPMTINDEX_DUP2                      7
+#define M3UAASPMTINDEX_MTUP                      8
+#define M3UAASPMTINDEX_BISUP                     9
+#define M3UAASPMTINDEX_SIUP                      10
+#define M3UAASPMTINDEX_SPNEUP                    11
+#define M3UAASPMTINDEX_STC                       12
+#define M3UAASPMTINDEX_USER13                    13
+#define M3UAASPMTINDEX_USER14                    14
+#define M3UAASPMTINDEX_USER15                    15
 
 #define M3UAASPASASSTATE_DOWN                    1
 #define M3UAASPASASSTATE_INITIALIZING            2
@@ -639,6 +715,23 @@ extern struct header_complex_index *m3uaAspAfTableStorage;
 #define M3UAASPASUSAGESTATE_IDLE                 0
 #define M3UAASPASUSAGESTATE_ACTIVE               1
 #define M3UAASPASUSAGESTATE_BUSY                 2
+
+#define M3UAASPMTINDEX_SNMM                      0
+#define M3UAASPMTINDEX_SNTM                      1
+#define M3UAASPMTINDEX_SNSM                      2
+#define M3UAASPMTINDEX_SCCP                      3
+#define M3UAASPMTINDEX_TUP                       4
+#define M3UAASPMTINDEX_ISUP                      5
+#define M3UAASPMTINDEX_DUP1                      6
+#define M3UAASPMTINDEX_DUP2                      7
+#define M3UAASPMTINDEX_MTUP                      8
+#define M3UAASPMTINDEX_BISUP                     9
+#define M3UAASPMTINDEX_SIUP                      10
+#define M3UAASPMTINDEX_SPNEUP                    11
+#define M3UAASPMTINDEX_STC                       12
+#define M3UAASPMTINDEX_USER13                    13
+#define M3UAASPMTINDEX_USER14                    14
+#define M3UAASPMTINDEX_USER15                    15
 
 #define M3UAASPAFASSTATE_DOWN                    1
 #define M3UAASPAFASSTATE_INITIALIZING            2
@@ -672,6 +765,9 @@ extern oid m3uaAspRsAlarm_oid[14];
 
 /* object id definitions */
 extern oid m3uaAspRsEvents_oid[13];
+extern oid m3uaAspFullCompliance_oid[12];
+extern oid m3uaAspObjectGroup_oid[12];
+extern oid m3uaAspNotifyGroup_oid[12];
 
 /* function prototypes */
 /* trap function prototypes */
@@ -836,9 +932,11 @@ WriteMethod write_m3uaAspSgTimerT33A;
 WriteMethod write_m3uaAspSgTimerT34A;
 WriteMethod write_m3uaAspSgTimerT1T;
 WriteMethod write_m3uaAspSgTimerT2T;
+WriteMethod write_m3uaAspSgStatus;
 WriteMethod write_m3uaAspSgpName;
 WriteMethod write_m3uaAspSgpAdministrativeState;
 WriteMethod write_m3uaAspSgpAspState;
+WriteMethod write_m3uaAspSgpPrimaryAddressType;
 WriteMethod write_m3uaAspSgpPrimaryAddress;
 WriteMethod write_m3uaAspSgpHostName;
 WriteMethod write_m3uaAspSgpStatus;
@@ -861,10 +959,13 @@ WriteMethod write_m3uaAspMtAsState;
 WriteMethod write_m3uaAspMtStatus;
 WriteMethod write_m3uaAspRsAdministrativeState;
 WriteMethod write_m3uaAspRsAlarmStatus;
+WriteMethod write_m3uaAspRsStatus;
 WriteMethod write_m3uaAspRlCost;
 WriteMethod write_m3uaAspRlAdministrativeState;
+WriteMethod write_m3uaAspRlStatus;
+WriteMethod write_m3uaAspRtStatus;
 WriteMethod write_m3uaAspRcValue;
-WriteMethod write_m3uaAspRcRegstrationPolicy;
+WriteMethod write_m3uaAspRcRegistrationPolicy;
 WriteMethod write_m3uaAspRcTrafficMode;
 WriteMethod write_m3uaAspRcStatus;
 WriteMethod write_m3uaAspAfAsState;

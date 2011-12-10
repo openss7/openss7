@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -107,17 +107,17 @@ extern int sa_request;			/* request number for per-request actions */
 /* our storage structure(s) */
 struct mtpOmMIB_data {
 	uint mtpOmMIB_request;
-	oid *mtpOm1stAndIntervalActivate;	/* WriteOnly */
+	oid *mtpOm1stAndIntervalActivate;	/* ReadWrite */
 	size_t mtpOm1stAndIntervalActivateLen;
-	oid *mtpOm1stAndIntervalDeactivate;	/* WriteOnly */
+	oid *mtpOm1stAndIntervalDeactivate;	/* ReadWrite */
 	size_t mtpOm1stAndIntervalDeactivateLen;
-	oid *mtpOm5MinActivate;		/* WriteOnly */
+	oid *mtpOm5MinActivate;		/* ReadWrite */
 	size_t mtpOm5MinActivateLen;
-	oid *mtpOm5MinDeaActivate;	/* WriteOnly */
+	oid *mtpOm5MinDeaActivate;	/* ReadWrite */
 	size_t mtpOm5MinDeaActivateLen;
-	oid *mtpOm15MinActivate;	/* WriteOnly */
+	oid *mtpOm15MinActivate;	/* ReadWrite */
 	size_t mtpOm15MinActivateLen;
-	oid *mtpOm15MinDeaActivate;	/* WriteOnly */
+	oid *mtpOm15MinDeaActivate;	/* ReadWrite */
 	size_t mtpOm15MinDeaActivateLen;
 	long mtpOmDiscontinuityTime;	/* ReadOnly */
 	long mtpOmTimeStamp;		/* ReadOnly */
@@ -286,7 +286,7 @@ struct mtpOmRsSiTable_data {
 	long mtpOmRsSiTransmittedOctetsDpcSio;	/* ReadOnly */
 	long mtpOmRsSiReceivedMSUsOpcSio;	/* ReadOnly */
 	long mtpOmRsSiTransmittedMSUsDpcSio;	/* ReadOnly */
-	long mtpOmRsSiStatus;		/* ReadOnly */
+	long mtpOmRsSiStatus;		/* Create */
 };
 struct mtpOmRsSiInt5minTable_data {
 	uint mtpOmRsSiInt5minTable_request;
@@ -714,6 +714,8 @@ extern struct header_complex_index *mtpOmSdlStatsTableStorage;
 /* scalars accessible only for notify */
 
 /* object id definitions */
+extern oid mtpOmGeneralCompliance_oid[13];
+extern oid mtpOmObjectGroup_oid[13];
 
 /* function prototypes */
 /* trap function prototypes */
@@ -984,6 +986,7 @@ WriteMethod write_mtpOmSpStudyStatus;
 WriteMethod write_mtpOmSpStudyMapStatus;
 WriteMethod write_mtpOmRsSiValidIntervals;
 WriteMethod write_mtpOmRsSiTimeDiscontinuity;
+WriteMethod write_mtpOmRsSiStatus;
 WriteMethod write_mtpOm1stAndIntervalActivate;
 WriteMethod write_mtpOm1stAndIntervalDeactivate;
 WriteMethod write_mtpOm5MinActivate;

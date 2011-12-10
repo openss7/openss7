@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -244,8 +244,8 @@ struct x400pSpanTable_data {
 	uint8_t *x400pSpanDataLink;	/* Create */
 	size_t x400pSpanDataLinkLen;
 	long x400pSpanLineCode;		/* Create */
-	oid *x400pSpanAlarmSeverityMappingProfile;	/* Create */
-	size_t x400pSpanAlarmSeverityMappingProfileLen;
+	oid *x400pSpanAlarmSeverityMapProfile;	/* Create */
+	size_t x400pSpanAlarmSeverityMapProfileLen;
 	long x400pSpanAdministrativeState;	/* Create */
 	long x400pSpanOperationalState;	/* ReadOnly */
 	long x400pSpanUsageState;	/* ReadOnly */
@@ -708,7 +708,7 @@ extern struct header_complex_index *x400pFarEndTotalTableStorage;
 
 #define X400PSPANEVENTS_RLOS                     0
 #define X400PSPANEVENTS_FRCL                     1
-#define X400PSPANEVENTS_RUAL                     2
+#define X400PSPANEVENTS_RUA1                     2
 #define X400PSPANEVENTS_RYEL                     3
 #define X400PSPANEVENTS_RRA                      4
 #define X400PSPANEVENTS_RDMA                     5
@@ -835,8 +835,13 @@ extern oid x400pCardTypeT400P_SS7_oid[14];
 extern oid x400pCardTypeV400P_oid[13];
 extern oid x400pCardTypeV400PE_oid[14];
 extern oid x400pCardTypeV400PT_oid[14];
+extern oid x400pCardTypeA400P_oid[14];
 extern oid x400pCardTypeV401PE_oid[13];
 extern oid x400pCardTypeV401PT_oid[13];
+extern oid x400pCardTypeAT400P_oid[13];
+extern oid x400pCardTypeAE400P_oid[13];
+extern oid x400pCardTypeA400PT_oid[13];
+extern oid x400pCardTypeA400PE_oid[13];
 extern oid x400pChipTypeDS2152_oid[13];
 extern oid x400pChipTypeDS21352_oid[13];
 extern oid x400pChipTypeDS21552_oid[13];
@@ -845,6 +850,8 @@ extern oid x400pChipTypeDS21354_oid[13];
 extern oid x400pChipTypeDS21554_oid[13];
 extern oid x400pChipTypeDS2155_oid[13];
 extern oid x400pChipTypeDS2156_oid[13];
+extern oid x400pChipTypeDS21455_oid[13];
+extern oid x400pChipTypeDS21458_oid[13];
 extern oid x400pSyncMandatoryGroup_oid[12];
 extern oid x400pCardIdGroup_oid[12];
 extern oid x400pChipGroup_oid[12];
@@ -1030,7 +1037,7 @@ WriteMethod write_x400pSpanLineCodeTime;
 WriteMethod write_x400pSpanPrimary;
 WriteMethod write_x400pSpanDataLink;
 WriteMethod write_x400pSpanLineCode;
-WriteMethod write_x400pSpanAlarmSeverityMappingProfile;
+WriteMethod write_x400pSpanAlarmSeverityMapProfile;
 WriteMethod write_x400pSpanAdministrativeState;
 WriteMethod write_x400pSpanAlarmStatus;
 WriteMethod write_x400pSpanControlStatus;

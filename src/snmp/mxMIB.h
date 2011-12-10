@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -122,8 +122,8 @@ extern int sa_request;			/* request number for per-request actions */
 /* our storage structure(s) */
 struct mxMIB_data {
 	uint mxMIB_request;
-	long mxDiscontinuityTime;	/* ReadOnly */
 	ulong mxCardNextIndex;		/* ReadOnly */
+	long mxDiscontinuityTime;	/* ReadOnly */
 };
 struct mxSyncTable_data {
 	uint mxSyncTable_request;
@@ -238,8 +238,8 @@ struct mxSpanTable_data {
 	uint8_t *mxSpanDataLink;	/* Create */
 	size_t mxSpanDataLinkLen;
 	long mxSpanLineCode;		/* Create */
-	oid *mxSpanAlarmSeverityMappingProfile;	/* Create */
-	size_t mxSpanAlarmSeverityMappingProfileLen;
+	oid *mxSpanAlarmSeverityMapProfile;	/* Create */
+	size_t mxSpanAlarmSeverityMapProfileLen;
 	long mxSpanAdministrativeState;	/* Create */
 	long mxSpanOperationalState;	/* ReadOnly */
 	long mxSpanUsageState;		/* ReadOnly */
@@ -702,7 +702,7 @@ extern struct header_complex_index *mxFarEndTotalTableStorage;
 
 #define MXSPANEVENTS_RLOS                        0
 #define MXSPANEVENTS_FRCL                        1
-#define MXSPANEVENTS_RUAL                        2
+#define MXSPANEVENTS_RUA1                        2
 #define MXSPANEVENTS_RYEL                        3
 #define MXSPANEVENTS_RRA                         4
 #define MXSPANEVENTS_RDMA                        5
@@ -829,8 +829,13 @@ extern oid mxCardTypeT400P_SS7_oid[14];
 extern oid mxCardTypeV400P_oid[13];
 extern oid mxCardTypeV400PE_oid[14];
 extern oid mxCardTypeV400PT_oid[14];
+extern oid mxCardTypeA400P_oid[14];
 extern oid mxCardTypeV401PE_oid[13];
 extern oid mxCardTypeV401PT_oid[13];
+extern oid mxCardTypeAT400P_oid[13];
+extern oid mxCardTypeAE400P_oid[13];
+extern oid mxCardTypeA400PT_oid[13];
+extern oid mxCardTypeA400PE_oid[13];
 extern oid mxChipTypeDS2152_oid[13];
 extern oid mxChipTypeDS21352_oid[13];
 extern oid mxChipTypeDS21552_oid[13];
@@ -839,6 +844,8 @@ extern oid mxChipTypeDS21354_oid[13];
 extern oid mxChipTypeDS21554_oid[13];
 extern oid mxChipTypeDS2155_oid[13];
 extern oid mxChipTypeDS2156_oid[13];
+extern oid mxChipTypeDS21455_oid[13];
+extern oid mxChipTypeDS21458_oid[13];
 extern oid mxSyncMandatoryGroup_oid[12];
 extern oid mxCardIdGroup_oid[12];
 extern oid mxChipGroup_oid[12];
@@ -855,6 +862,7 @@ extern oid mxNearEndTotalGroup_oid[12];
 extern oid mxFarEndCurrentGroup_oid[12];
 extern oid mxFarEndIntervalGroup_oid[12];
 extern oid mxFarEndTotalGroup_oid[12];
+extern oid mxDrivGroup_oid[12];
 extern oid mxBasicCompliance_oid[12];
 extern oid mxEnhancedCompliance_oid[12];
 
@@ -1023,7 +1031,7 @@ WriteMethod write_mxSpanLineCodeTime;
 WriteMethod write_mxSpanPrimary;
 WriteMethod write_mxSpanDataLink;
 WriteMethod write_mxSpanLineCode;
-WriteMethod write_mxSpanAlarmSeverityMappingProfile;
+WriteMethod write_mxSpanAlarmSeverityMapProfile;
 WriteMethod write_mxSpanAdministrativeState;
 WriteMethod write_mxSpanAlarmStatus;
 WriteMethod write_mxSpanControlStatus;

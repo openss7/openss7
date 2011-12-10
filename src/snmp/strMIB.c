@@ -696,6 +696,7 @@ store_strMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "strMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strCltime, &tmpsize);
 		cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strMaxApush, &tmpsize);
@@ -1364,6 +1365,7 @@ store_strModTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "strModTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strModName, &StorageTmp->strModNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModIdnum, &tmpsize);
@@ -1586,6 +1588,7 @@ store_strModInfoTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "strModInfoTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strModName, &StorageTmp->strModNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModInfoIndex, &tmpsize);
@@ -1823,6 +1826,7 @@ store_strModStatTable(int majorID, int minorID, void *serverarg, void *clientarg
 			memset(line, 0, sizeof(line));
 			strcat(line, "strModStatTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strModName, &StorageTmp->strModNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strModStatIndex, &tmpsize);
@@ -2047,6 +2051,7 @@ store_strApshTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "strApshTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->strModName, &StorageTmp->strModNameLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->strApshMajor, &tmpsize);
@@ -2242,6 +2247,7 @@ store_strStatsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "strStatsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->strStatsStructure, &tmpsize);
 			cptr = read_config_store_data(ASN_GAUGE, cptr, &StorageTmp->strStatsCurrentAllocs, &tmpsize);

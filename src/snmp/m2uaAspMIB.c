@@ -4,7 +4,7 @@
 
  -----------------------------------------------------------------------------
 
- Copyright (c) 2008-2010  Monavacon Limited <http://www.monavacon.com/>
+ Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
  Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
  Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 
@@ -605,6 +605,7 @@ store_m2uaAspMIB(int majorID, int minorID, void *serverarg, void *clientarg)
 		memset(line, 0, sizeof(line));
 		strcat(line, "m2uaAspMIB ");
 		cptr = line + strlen(line);
+		(void) cptr;
 		/* XXX: remove individual scalars that are not persistent */
 		snmpd_store_config(line);
 	}
@@ -915,6 +916,7 @@ store_m2uaAspTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAspTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAspId, &StorageTmp->m2uaAspIdLen);
 			cptr = read_config_store_data(ASN_INTEGER, cptr, &StorageTmp->m2uaAspAdministrativeState, &tmpsize);
@@ -1189,6 +1191,7 @@ store_m2uaSgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaSgTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaSgId, &StorageTmp->m2uaSgIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaSgName, &StorageTmp->m2uaSgNameLen);
@@ -1459,6 +1462,7 @@ store_m2uaAspSgTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAspSgTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAspId, &StorageTmp->m2uaAspIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaSgId, &StorageTmp->m2uaSgIdLen);
@@ -1705,6 +1709,7 @@ store_m2uaAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAsId, &StorageTmp->m2uaAsIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAsName, &StorageTmp->m2uaAsNameLen);
@@ -1930,6 +1935,7 @@ store_m2uaIfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaIfTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaIfId, &StorageTmp->m2uaIfIdLen);
 			cptr = read_config_store_data(ASN_UNSIGNED, cptr, &StorageTmp->m2uaIfAsIndex, &tmpsize);
@@ -2143,6 +2149,7 @@ store_m2uaAsIfTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAsIfTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAsId, &StorageTmp->m2uaAsIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaIfId, &StorageTmp->m2uaIfIdLen);
@@ -2388,6 +2395,7 @@ store_m2uaSgAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaSgAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaSgId, &StorageTmp->m2uaSgIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAsId, &StorageTmp->m2uaAsIdLen);
@@ -2626,6 +2634,7 @@ store_m2uaAspAsTable(int majorID, int minorID, void *serverarg, void *clientarg)
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAspAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAspId, &StorageTmp->m2uaAspIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAsId, &StorageTmp->m2uaAsIdLen);
@@ -2872,6 +2881,7 @@ store_m2uaAspSgAsTable(int majorID, int minorID, void *serverarg, void *clientar
 			memset(line, 0, sizeof(line));
 			strcat(line, "m2uaAspSgAsTable ");
 			cptr = line + strlen(line);
+			(void) cptr;
 			/* XXX: remove individual columns if not persistent */
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaAspId, &StorageTmp->m2uaAspIdLen);
 			cptr = read_config_store_data(ASN_OCTET_STR, cptr, &StorageTmp->m2uaSgId, &StorageTmp->m2uaSgIdLen);
