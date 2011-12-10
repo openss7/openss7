@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -76,13 +76,13 @@ IMPORTS
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
         FROM SNMPv2-CONF
     Counter64, Integer32, MODULE-IDENTITY, NOTIFICATION-TYPE, 
-    OBJECT-TYPE, Unsigned32
+    OBJECT-TYPE, Opaque, Unsigned32
         FROM SNMPv2-SMI
     DateAndTime, RowStatus, TEXTUAL-CONVENTION, TimeStamp, TruthValue
         FROM SNMPv2-TC;
 
 strExtMIB MODULE-IDENTITY
-    LAST-UPDATED "200901191032Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -123,11 +123,14 @@ strExtMIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "200901191032Z"
     DESCRIPTION 
         "Enhancements to provide for console, error and trace 
@@ -749,7 +752,7 @@ strExtStrlogString OBJECT-TYPE
     ::= { strExtNotifsStrlog 12 }
 
 strExtStrlogInteger64 OBJECT-TYPE
-    SYNTAX      Integer64
+    SYNTAX      Counter64
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 
@@ -765,7 +768,7 @@ strExtStrlogInteger64 OBJECT-TYPE
     ::= { strExtNotifsStrlog 13 }
 
 strExtStrlogUnsigned64 OBJECT-TYPE
-    SYNTAX      Unsigned64
+    SYNTAX      Counter64
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 

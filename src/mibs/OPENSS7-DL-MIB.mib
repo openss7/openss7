@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -88,7 +88,7 @@ IMPORTS
         FROM UCD-SNMP-MIB;
 
 dlMIB MODULE-IDENTITY
-    LAST-UPDATED "201106280801Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -128,11 +128,14 @@ dlMIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201106280801Z"
     DESCRIPTION 
         "Passes smilint and reformatted with smidump."
@@ -141,107 +144,6 @@ dlMIB MODULE-IDENTITY
         "First release of this module."
     ::= { openss7Modules 212 }
 
- -- top level organization of the MIB
- 
--- osiNotifications     OBJECT IDENTIFIER ::= { dlMIB    0 }
--- osiObjects           OBJECT IDENTIFIER ::= { dlMIB    1 }
--- osiConformance       OBJECT IDENTIFIER ::= { dlMIB    2 }
-
--- osiTables            OBJECT IDENTIFIER ::= { osiObjects   1 }
--- osiScalars           OBJECT IDENTIFIER ::= { osiObjects   2 }
--- osiNotifs            OBJECT IDENTIFIER ::= { osiObjects   3 }
--- osiOids              OBJECT IDENTIFIER ::= { osiObjects   4 }
-
--- osiGroups            OBJECT IDENTIFIER ::= { osiConformance   1 }
--- osiCompliances       OBJECT IDENTIFIER ::= { osiConformance   2 }
-
--- ITU-T Rec. X.723 | ISO/IEC 10165-5 managed object classes
--- communicationsEntity OBJECT IDENTIFIER ::= { osiTables    1 }
--- sap1                 OBJECT IDENTIFIER ::= { osiTables    2 }
--- sap2                 OBJECT IDENTIFIER ::= { osiTables    3 }
--- clProtocolMachine    OBJECT IDENTIFIER ::= { osiTables    4 }
--- coProtocolMachine    OBJECT IDENTIFIER ::= { osiTables    5 }
--- singlePeerConnection OBJECT IDENTIFIER ::= { osiTables    6 }
-
--- ITU-T Rec. X.281 | ISO/IEC 13642 managed object classes
--- physicalEntity       OBJECT IDENTIFIER ::= { osiTables    7 }
--- physicalSAP          OBJECT IDENTIFIER ::= { osiTables    8 }
--- dataCircuit          OBJECT IDENTIFIER ::= { osiTables    9 }
--- physicalConnection   OBJECT IDENTIFIER ::= { osiTables   10 }
-
--- ITU-T Rec. X.282 | ISO/IEC 10742 managed object classes
--- datalinkEntity       OBJECT IDENTIFIER ::= { osiTables   11 }
--- dLSAP                OBJECT IDENTIFIER ::= { osiTables   12 }
-
--- lAPBDLE              OBJECT IDENTIFIER ::= { osiTables   13 }
--- sLPPM                OBJECT IDENTIFIER ::= { osiTables   14 }
--- sLPConnection        OBJECT IDENTIFIER ::= { osiTables   15 }
--- sLPConnectionIVMO    OBJECT IDENTIFIER ::= { osiTables   16 }
-
--- mACDLE               OBJECT IDENTIFIER ::= { osiTables   17 }
--- mAC                  OBJECT IDENTIFIER ::= { osiTables   18 }
--- lLCDLE               OBJECT IDENTIFIER ::= { osiTables   19 }
--- lLCCLPM              OBJECT IDENTIFIER ::= { osiTables   20 }
--- lLCCOPM              OBJECT IDENTIFIER ::= { osiTables   21 }
-
--- IEEE 802.1 | ISO/IEC 8802-1 managed object class
--- resourceTypeId       OBJECT IDENTIFIER ::= { osiTables   22 }
-
--- IEEE 802.2 | ISO/IEC 8802-2 managed object classes
--- lLCStation           OBJECT IDENTIFIER ::= { osiTables   23 }
--- lLCSAP               OBJECT IDENTIFIER ::= { osiTables   24 }
--- rDESetup             OBJECT IDENTIFIER ::= { osiTables   25 }
--- rDEPair              OBJECT IDENTIFIER ::= { osiTables   26 }
-
--- lLCConnectionLess    OBJECT IDENTIFIER ::= { osiTables   27 }
-
--- lLCConnection2       OBJECT IDENTIFIER ::= { osiTables   28 }
--- lLCConnection2IVMO   OBJECT IDENTIFIER ::= { osiTables   29 }
--- lLCConnectionlessAck    OBJECT IDENTIFIER ::= { osiTables   30 }
--- lLCConnectionlessAckIVMO OBJECT IDENTIFIER ::= { osiTables  31 }
-
--- ITU-T Rec. X.283 | ISO/IEC 10733 managed object classes
--- networkEntity        OBJECT IDENTIFIER ::= { osiTables   32 }
--- nSAP                 OBJECT IDENTIFIER ::= { osiTables   33 }
--- cLNS                 OBJECT IDENTIFIER ::= { osiTables   34 }
--- cLNSISIS             OBJECT IDENTIFIER ::= { osiTables   35 }
--- cLNSISISLevel2       OBJECT IDENTIFIER ::= { osiTables   36 }
--- linkage              OBJECT IDENTIFIER ::= { osiTables   37 }
--- cONS                 OBJECT IDENTIFIER ::= { osiTables   38 }
--- networkConnection    OBJECT IDENTIFIER ::= { osiTables   39 }
--- x25PLE               OBJECT IDENTIFIER ::= { osiTables   40 }
--- x25PLE-DTE           OBJECT IDENTIFIER ::= { osiTables   41 }
--- x25PLE-DCE           OBJECT IDENTIFIER ::= { osiTables   42 }
--- x25PLEIVMO           OBJECT IDENTIFIER ::= { osiTables   43 }
--- x25PLEIVMO-DTE       OBJECT IDENTIFIER ::= { osiTables   44 }
--- x25PLEIVMO-DCE       OBJECT IDENTIFIER ::= { osiTables   45 }
--- virtualCall          OBJECT IDENTIFIER ::= { osiTables   46 }
--- virtualCircuit       OBJECT IDENTIFIER ::= { osiTables   47 }
--- virtualCircuit-DTE   OBJECT IDENTIFIER ::= { osiTables   48 }
--- virtualCircuit-DCE   OBJECT IDENTIFIER ::= { osiTables   49 }
--- permanentVirtualCircuit OBJECT IDENTIFIER ::= { osiTables   50 }
--- permanentVirtualCircuit-DTE OBJECT IDENTIFIER ::= { osiTables   51 }
--- permanentVirtualCircuit-DCE OBJECT IDENTIFIER ::= { osiTables   52 }
--- virtualCallIVMO      OBJECT IDENTIFIER ::= { osiTables   53 }
--- switchedVirtualCall  OBJECT IDENTIFIER ::= { osiTables   54 }
--- virtualCall-DTE      OBJECT IDENTIFIER ::= { osiTables   55 }
--- virtualCall-DCE      OBJECT IDENTIFIER ::= { osiTables   56 }
--- dSeriesCounts        OBJECT IDENTIFIER ::= { osiTables   57 }
-
--- ISO/IEC 10589 managed object classes
--- adjacency       OBJECT IDENTIFIER ::= { osiTables   58 }
--- virtualAdjacency    OBJECT IDENTIFIER ::= { osiTables   59 }
--- destination     OBJECT IDENTIFIER ::= { osiTables   60 }
--- destinationSystem   OBJECT IDENTIFIER ::= { osiTables   61 }
--- destinationArea     OBJECT IDENTIFIER ::= { osiTables   62 }
--- reachableAddress    OBJECT IDENTIFIER ::= { osiTables   63 }
-
--- osiGlobals      OBJECT IDENTIFIER ::= { osiScalars   1 }
--- osiDefaults     OBJECT IDENTIFIER ::= { osiScalars   2 }
-
--- sLPConnectionDefaults   OBJECT IDENTIFIER ::= { osiDefaults  1 }
--- lLCConnection2Defaults  OBJECT IDENTIFIER ::= { osiDefaults  2 }
--- lLCConnectionlessAckDefaults OBJECT IDENTIFIER ::= { osiDefaults     3 }
 
 -- =====================================================================
 --

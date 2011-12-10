@@ -77,7 +77,7 @@ IMPORTS
         FROM SNMP-FRAMEWORK-MIB
     MODULE-COMPLIANCE, OBJECT-GROUP
         FROM SNMPv2-CONF
-    Integer32, MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
         FROM SNMPv2-SMI
     RowStatus, TEXTUAL-CONVENTION, TimeInterval
         FROM SNMPv2-TC
@@ -85,7 +85,7 @@ IMPORTS
         FROM TRANSPORT-ADDRESS-MIB;
 
 rtpswMIB MODULE-IDENTITY
-    LAST-UPDATED "201106282224Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -127,6 +127,9 @@ rtpswMIB MODULE-IDENTITY
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201106282224Z"
     DESCRIPTION 
         "Initial version of this mib."
@@ -429,7 +432,8 @@ rtpswIfAddrId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an ordinal, non-zero index into the RTP-SW 
+         Interface Address Table (rtpswIfAddrTable)."
     ::= { rtpswIfAddrEntry 1 }
 
 rtpswIfIndex OBJECT-TYPE
@@ -437,7 +441,7 @@ rtpswIfIndex OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ifIndex of the interface."
     ::= { rtpswIfAddrEntry 2 }
 
 rtpswIfName OBJECT-TYPE
@@ -445,7 +449,7 @@ rtpswIfName OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a name for the interface."
     ::= { rtpswIfAddrEntry 3 }
 
 rtpswIfPortRange OBJECT-TYPE
@@ -453,7 +457,10 @@ rtpswIfPortRange OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the port range that is usable for RTP 
+         switching for the interface address, using the 
+         PortRange textual convention.  This is a pair of port 
+         number representing the range."
     DEFVAL      { "\x80\x00\xff\xff" } -- { '8000FFFF'X }
     ::= { rtpswIfAddrEntry 4 }
 
@@ -708,7 +715,8 @@ rtpswTermPointId OBJECT-TYPE
     ::= { rtpswTermPointEntry 1 }
 
 rtpswTermPointState OBJECT-TYPE
-    SYNTAX      INTEGER { idle(0), bound(1), listening(2), connected(3), wait(4) }
+    SYNTAX      INTEGER { idle(0), bound(1), listening(2), connected(3), 
+                    wait(4) }
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
@@ -717,7 +725,7 @@ rtpswTermPointState OBJECT-TYPE
          assume one of the following values:
          
          - idle(0), the termination point is idle;
-
+         
          - bound(1), the termination point is bound to a local 
            transport address specified by the rtpswTermPointType 
            and rtpswTermPointLocalAddress; however, the 
@@ -1102,7 +1110,7 @@ rtpswCallTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF RtpswCallEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
+    DESCRIPTION 
         "The RTP switching call table provides a table that 
          contains information concerning ongoing call 
          information of an RTP session that transits the host, 
@@ -1114,8 +1122,13 @@ rtpswCallEntry OBJECT-TYPE
     SYNTAX      RtpswCallEntry
     MAX-ACCESS  not-accessible
     STATUS      current
-    DESCRIPTION
-        ""
+    DESCRIPTION 
+        "Each row in the rtpswCallTable is indexed by the 
+         RTP call identifier.  Each row contains information 
+         concerning a single ongoing call.  Calls that have 
+         completed may still exist in this table but have a call 
+         state that indicates that the call is connected in 
+         neither direction."
     INDEX       { rtpswCallId }
     ::= { rtpswCallTable 1 }
 
@@ -1256,7 +1269,11 @@ rtpswOptionalGroup OBJECT-GROUP
                   rtpswIfAddrPg, rtpswIfAddrStandbyStatus, 
                   rtpswTermPointOperState, rtpswTermPointUsageState, 
                   rtpswTermPointProcStatus, rtpswForwTpType, 
-                  rtpswForwTpCalling, rtpswForwTpCalled, rtpswForwState }
+                  rtpswForwTpCalling, rtpswForwTpCalled, rtpswForwState, 
+                  rtpswCallTpCallingType, rtpswCallTpRemoteCalling, 
+                  rtpswCallTpLocalCalling, rtpswCallTpCalledType, 
+                  rtpswCallTpLocalCalled, rtpswCallTpRemoteCalled, 
+                  rtpswCallState }
     STATUS      current
     DESCRIPTION 
         "A group that provides all of the optional compliance 

@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -71,12 +71,12 @@
 OPENSS7-CDR2-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
+    NetworkPointCode
+        FROM OPENSS7-MTP-MIB
     openss7Q825
         FROM OPENSS7-SMI
     SimpleNameType, logId, logRecordId
         FROM OPENSS7-SMI-MIB
-    NetworkPointCode
-        FROM OPENSS7-SS7-MIB
     controlObjectId
         FROM OPENSS7-UMC-MIB
     MODULE-COMPLIANCE, NOTIFICATION-GROUP, OBJECT-GROUP
@@ -89,7 +89,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 cdr2MIB MODULE-IDENTITY
-    LAST-UPDATED "201106280733Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -128,11 +128,14 @@ cdr2MIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201106280733Z"
     DESCRIPTION 
         "Passes smilint and reformatted with smidump."

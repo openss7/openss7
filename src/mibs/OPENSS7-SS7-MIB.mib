@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -81,7 +81,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 ss7MIB MODULE-IDENTITY
-    LAST-UPDATED "201106250515Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -118,11 +118,14 @@ ss7MIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201106250515Z"
     DESCRIPTION 
         "Passes smilint and reformatted using smidump."
@@ -132,31 +135,31 @@ ss7MIB MODULE-IDENTITY
     ::= { openss7Q751 0 }
 
 
-Ss7LoadShareAlgorithm ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION 
-        "This is a SS7 load sharing algorithm as identified by the SS7 
-         MTP GDMOs."
-    REFERENCE   
-        "ITU-T Rec. Q.751.1 (1997)"
-    SYNTAX      OBJECT IDENTIFIER
+-- Ss7LoadShareAlgorithm ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This is a SS7 load sharing algorithm as identified by the SS7 
+--          MTP GDMOs."
+--     REFERENCE   
+--         "ITU-T Rec. Q.751.1 (1997)"
+--     SYNTAX      OBJECT IDENTIFIER
 
-SlsList ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT "1d,"
-    STATUS      current
-    DESCRIPTION 
-        "This is a way of specifying a list of SLS values.  Because SLS 
-         values can be 4, 5 or 8 bits, depending on the protocol 
-         variant, issue year,  and options, one octet is used to 
-         represent one SLS value.  If 4 bit SLSs apply, each octet is 
-         set to a value constrained to the range (0..15) and the size of 
-         the string is constrained to SIZE(0..16); 5-bits, (0..31), 
-         SIZE(0..32); and 8-bits (0..255), SIZE(0..256).  No SLS value 
-         can be repeated in the list.  What we really want is a SET OF 
-         Sls here, but SNMP won't have it."
-    REFERENCE   
-        "ITU-T Rec. Q.751.1 (1997) : slsList ATTRIBUTE"
-    SYNTAX      OCTET STRING (SIZE(0..256))
+-- SlsList ::= TEXTUAL-CONVENTION
+--     DISPLAY-HINT "1d,"
+--     STATUS      current
+--     DESCRIPTION 
+--         "This is a way of specifying a list of SLS values.  Because SLS 
+--          values can be 4, 5 or 8 bits, depending on the protocol 
+--          variant, issue year,  and options, one octet is used to 
+--          represent one SLS value.  If 4 bit SLSs apply, each octet is 
+--          set to a value constrained to the range (0..15) and the size of 
+--          the string is constrained to SIZE(0..16); 5-bits, (0..31), 
+--          SIZE(0..32); and 8-bits (0..255), SIZE(0..256).  No SLS value 
+--          can be repeated in the list.  What we really want is a SET OF 
+--          Sls here, but SNMP won't have it."
+--     REFERENCE   
+--         "ITU-T Rec. Q.751.1 (1997) : slsList ATTRIBUTE"
+--     SYNTAX      OCTET STRING (SIZE(0..256))
 
 SlsCodeList ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1d,"
@@ -172,36 +175,36 @@ SlsCodeList ::= TEXTUAL-CONVENTION
          variants."
     SYNTAX      OCTET STRING (SIZE(0..31))
 
-MtpCongestionLevel ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION 
-        "This type specifies an SS7 MTP congestion level.  Columnar 
-         object following this textual convention are used to reflect 
-         route set or signalling link congestion when multiple 
-         congestion levels are in effect.
-         
-          - none(0), the corresponding route set or signalling link is 
-            not congested;
-          - congestionLevel1(1), the corresponding route set or 
-            signalling link is congested at congestion level 1;
-          - congestionLevel2(2), the corresponding route set or 
-            signalling link is congested at congestion level 2;
-          - congestionLevel3(3), the corresponding route set or 
-            signalling link is congested at congestion level 3.
-         
-         The value may be changed by the managed system and objects 
-         following this textual convention have a MAX-ACCESS clause of 
-         read-only.
-         
-         When multiple congestion levels are not in effect, the 
-         congestion state is indicated by a column following the 
-         MtpCongestedState textual convention and columnar objects 
-         following this textual convention are not present."
-    REFERENCE   
-        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
-         MTPDefinedTypesModule.CongestionLevel."
-    SYNTAX      INTEGER { none(0), congestionLevel1(1), 
-                    congestionLevel2(2), congestionLevel3(3) }
+-- MtpCongestionLevel ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This type specifies an SS7 MTP congestion level.  Columnar 
+--          object following this textual convention are used to reflect 
+--          route set or signalling link congestion when multiple 
+--          congestion levels are in effect.
+--          
+--           - none(0), the corresponding route set or signalling link is 
+--             not congested;
+--           - congestionLevel1(1), the corresponding route set or 
+--             signalling link is congested at congestion level 1;
+--           - congestionLevel2(2), the corresponding route set or 
+--             signalling link is congested at congestion level 2;
+--           - congestionLevel3(3), the corresponding route set or 
+--             signalling link is congested at congestion level 3.
+--          
+--          The value may be changed by the managed system and objects 
+--          following this textual convention have a MAX-ACCESS clause of 
+--          read-only.
+--          
+--          When multiple congestion levels are not in effect, the 
+--          congestion state is indicated by a column following the 
+--          MtpCongestedState textual convention and columnar objects 
+--          following this textual convention are not present."
+--     REFERENCE   
+--         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
+--          MTPDefinedTypesModule.CongestionLevel."
+--     SYNTAX      INTEGER { none(0), congestionLevel1(1), 
+--                     congestionLevel2(2), congestionLevel3(3) }
 
 MtpLinkStatus ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -249,25 +252,25 @@ MtpLinkStatus ::= TEXTUAL-CONVENTION
                     localInhibited(2), remoteInhibited(3), failed(4), 
                     deactivated(5) }
 
-MtpNetworkIndicator ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION 
-        "This type specifies the SS7 MTP network indicator.
-         
-         - internationalNetwork1(0), network indicator for the 
-           international network;
-         - internationalNetwork2(1), reserved network indicator for the 
-           international network;
-         - nationalNetwork1(2), network indicator for the national 
-           network; and,
-         - nationalNetwork2(3), reserved network indicator for the 
-           national network."
-    REFERENCE   
-        "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
-         MTPDefinedTypesModule.NetworkIndicator."
-    SYNTAX      INTEGER { internationalNetwork1(0), 
-                    internationalNetwork2(1), nationalNetwork1(2), 
-                    nationalNetwork2(3) }
+-- MtpNetworkIndicator ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This type specifies the SS7 MTP network indicator.
+--          
+--          - internationalNetwork1(0), network indicator for the 
+--            international network;
+--          - internationalNetwork2(1), reserved network indicator for the 
+--            international network;
+--          - nationalNetwork1(2), network indicator for the national 
+--            network; and,
+--          - nationalNetwork2(3), reserved network indicator for the 
+--            national network."
+--     REFERENCE   
+--         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000) : 
+--          MTPDefinedTypesModule.NetworkIndicator."
+--     SYNTAX      INTEGER { internationalNetwork1(0), 
+--                     internationalNetwork2(1), nationalNetwork1(2), 
+--                     nationalNetwork2(3) }
 
 SpType ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -290,103 +293,103 @@ SpType ::= TEXTUAL-CONVENTION
          MTPDefinedTypesModule.SpType."
     SYNTAX      INTEGER { sep(0), step(1), stp(2) }
 
-NetworkPointCode ::= TEXTUAL-CONVENTION
-    DISPLAY-HINT "1d:1d-"
-    STATUS      current
-    DESCRIPTION 
-        "This is a network referenced signalling point code that 
-         uniquely identifies both the national or international SS7 
-         network (point code numbering space) to which the point code 
-         belongs as well as the point code within the network.  The 
-         first octet is a network identifier that identifies the larger 
-         national or international SS7 network; the second octet is the 
-         'network' portion of the signalling point code as defined in 
-         Q.704; the third, the 'cluster'; and, the fourth and last, the 
-         'member'.  This is displayed with a colon separating the 
-         network number and the normal numbers and dashes notation for 
-         the signalling point code: e.g. 1:5-1-1.  Note that an ITU-T 
-         signalling point code is unpacked by network, cluster and 
-         member into separate octets.  Also note that when the first 
-         octet is zero (0) it does not specify a global larger network 
-         and thus the network point code applies only to a locally 
-         defined network."
-    SYNTAX      OCTET STRING (SIZE(4))
+-- NetworkPointCode ::= TEXTUAL-CONVENTION
+--     DISPLAY-HINT "1d:1d-"
+--     STATUS      current
+--     DESCRIPTION 
+--         "This is a network referenced signalling point code that 
+--          uniquely identifies both the national or international SS7 
+--          network (point code numbering space) to which the point code 
+--          belongs as well as the point code within the network.  The 
+--          first octet is a network identifier that identifies the larger 
+--          national or international SS7 network; the second octet is the 
+--          'network' portion of the signalling point code as defined in 
+--          Q.704; the third, the 'cluster'; and, the fourth and last, the 
+--          'member'.  This is displayed with a colon separating the 
+--          network number and the normal numbers and dashes notation for 
+--          the signalling point code: e.g. 1:5-1-1.  Note that an ITU-T 
+--          signalling point code is unpacked by network, cluster and 
+--          member into separate octets.  Also note that when the first 
+--          octet is zero (0) it does not specify a global larger network 
+--          and thus the network point code applies only to a locally 
+--          defined network."
+--     SYNTAX      OCTET STRING (SIZE(4))
 
-MtpLinkFailureReason ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION 
-        "This is the detailed reason for a link failure.  It has the 
-         following enumeration:
-         
-          - unspecified(0), the reason for failure is unknown or none of 
-            the other failure reasons apply;
-          - contTimeout(1), T6 timeout;
-          - ackTimeout(2), T7 timeout;
-          - abnormalBsnr(3), receipt of excessive abnormal BSNs;
-          - abnormalFibr(4), receipt of excessive abnormal FIBs;
-          - suermEim(5), error rate monitor exceeded the threshold;
-          - alignmentNotPossible(6), alignment failed;
-          - receivedSio(7), an unexpected SIO was received;
-          - receivedSin(8), an unexpected SIN was received;
-          - receivedSie(9) an unexpected SIE was received;
-          - receivedSios(10), the link was shut down by the other side;
-          - t1Timeout(11), T1 timeout.
-         
-         The value is set by the managed system and objects with this 
-         textual convention in thier SYNTAX clause have a MAX-ACCESS 
-         clause of read-only."
-    REFERENCE   
-        "ITU-T Recommendation Q.703 (1996)"
-    SYNTAX      INTEGER { unspecified(0), congTimeout(1), ackTimeout(2), 
-                    abnormalBsnr(3), abnormalFibr(4), suermEim(5), 
-                    alignmentNotPossible(6), receivedSio(7), 
-                    receivedSin(8), receivedSie(9), receivedSios(10), 
-                    t1Timeout(11) }
+-- MtpLinkFailureReason ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This is the detailed reason for a link failure.  It has the 
+--          following enumeration:
+--          
+--           - unspecified(0), the reason for failure is unknown or none of 
+--             the other failure reasons apply;
+--           - contTimeout(1), T6 timeout;
+--           - ackTimeout(2), T7 timeout;
+--           - abnormalBsnr(3), receipt of excessive abnormal BSNs;
+--           - abnormalFibr(4), receipt of excessive abnormal FIBs;
+--           - suermEim(5), error rate monitor exceeded the threshold;
+--           - alignmentNotPossible(6), alignment failed;
+--           - receivedSio(7), an unexpected SIO was received;
+--           - receivedSin(8), an unexpected SIN was received;
+--           - receivedSie(9) an unexpected SIE was received;
+--           - receivedSios(10), the link was shut down by the other side;
+--           - t1Timeout(11), T1 timeout.
+--          
+--          The value is set by the managed system and objects with this 
+--          textual convention in thier SYNTAX clause have a MAX-ACCESS 
+--          clause of read-only."
+--     REFERENCE   
+--         "ITU-T Recommendation Q.703 (1996)"
+--     SYNTAX      INTEGER { unspecified(0), congTimeout(1), ackTimeout(2), 
+--                     abnormalBsnr(3), abnormalFibr(4), suermEim(5), 
+--                     alignmentNotPossible(6), receivedSio(7), 
+--                     receivedSin(8), receivedSie(9), receivedSios(10), 
+--                     t1Timeout(11) }
 
-MtpUserPartStatus ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION 
-        "This textual convention can be used for reporting the 
-         availability of MTP user parts as well as providing a mechanism 
-         for controlling the availability of user parts.
-         
-          - unknown(0) means that the availabilty of the user part is 
-            unknown;
-          - inaccessible(1) means that the user part is present but 
-            currently inaccessible;
-          - unequipped(2) means that the user part is not present."
-    SYNTAX      INTEGER { unknown(0), inaccessible(1), unequipped(2) }
+-- MtpUserPartStatus ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This textual convention can be used for reporting the 
+--          availability of MTP user parts as well as providing a mechanism 
+--          for controlling the availability of user parts.
+--          
+--           - unknown(0) means that the availabilty of the user part is 
+--             unknown;
+--           - inaccessible(1) means that the user part is present but 
+--             currently inaccessible;
+--           - unequipped(2) means that the user part is not present."
+--     SYNTAX      INTEGER { unknown(0), inaccessible(1), unequipped(2) }
 
-MtpUserPart ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION 
-        "Provides a specification of an MTP user part.  This textual 
-         convention provides an enumerated user part value that 
-         corresponds to the MTP SI value for the user part.  SI values 
-         snmm(0), sntm(1) and snsm(2) are reserved for MTP management 
-         messages; other values may be assigned to user parts.
-         
-          - snmm(0), signalling network management messages;
-          - sntm(1), signalling network test messages;
-          - snsm(2), signalling network special test messages;
-          - sccp(3), signalling connection control part;
-          - tup(4), telephone user part;
-          - isup(5), integrated services digital network user part;
-          - dup1(6), data user part 1;
-          - dup2(7), data user part 2;
-          - mtup(8), MTP test user part;
-          - bisup(9), broadband integrated services digital network user 
-            part;
-          - siup(10), user part;
-          - user11(11), user part 11;
-          - user12(12), user part 12;
-          - user13(13), user part 13;
-          - user14(14), user part 14;
-          - user15(15), user part 15."
-    SYNTAX      INTEGER { snmm(0), sntm(1), snsm(2), sccp(3), tup(4), 
-                    isup(5), dup1(6), dup2(7), mtup(8), bisup(9), 
-                    siup(10), user11(11), user12(12), user13(13), 
-                    user14(14), user15(15) }
+-- MtpUserPart ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "Provides a specification of an MTP user part.  This textual 
+--          convention provides an enumerated user part value that 
+--          corresponds to the MTP SI value for the user part.  SI values 
+--          snmm(0), sntm(1) and snsm(2) are reserved for MTP management 
+--          messages; other values may be assigned to user parts.
+--          
+--           - snmm(0), signalling network management messages;
+--           - sntm(1), signalling network test messages;
+--           - snsm(2), signalling network special test messages;
+--           - sccp(3), signalling connection control part;
+--           - tup(4), telephone user part;
+--           - isup(5), integrated services digital network user part;
+--           - dup1(6), data user part 1;
+--           - dup2(7), data user part 2;
+--           - mtup(8), MTP test user part;
+--           - bisup(9), broadband integrated services digital network user 
+--             part;
+--           - siup(10), user part;
+--           - user11(11), user part 11;
+--           - user12(12), user part 12;
+--           - user13(13), user part 13;
+--           - user14(14), user part 14;
+--           - user15(15), user part 15."
+--     SYNTAX      INTEGER { snmm(0), sntm(1), snsm(2), sccp(3), tup(4), 
+--                     isup(5), dup1(6), dup2(7), mtup(8), bisup(9), 
+--                     siup(10), user11(11), user12(12), user13(13), 
+--                     user14(14), user15(15) }
 
 Ss7ProtocolVariant ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -472,25 +475,25 @@ TransmissionRate ::= TEXTUAL-CONVENTION
          ds0a, ds0, t1 or e1."
     SYNTAX      INTEGER { modem(1), ds0a(2), ds0(3), t1(4), e1(5) }
 
-MtpTransmissionRate ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION 
-        "This type describes an applicable narrowband transmission rate.  
-         This can be 4800, 56000, 64000, 1536000 or 1984000, which 
-         corresponds to modem, DS0-A, DS0, T1/J1 or E1.  It also implies 
-         the transmission type: 56, 64, 1544 and 2048 kbis implies 
-         digital transmission; 4.8 kbits implies analog transmission.
-         
-          - kbits4point8(0), the transmission rate is for modem (4800 baud);
-          - kbits56(1), the transmission rate is for DS0-A (56kbps);
-          - kbits64(2), the transmission rate is for DS0 (64kbps);
-          - kbits1544(3), the transmission rate is for T1 (1536kbps);
-          - kbits2048(4), the transmission rate is for E1 (1984kbps).
-         
-         Objects with this textual convention in thier SYNTAX clause 
-         normally have a MAX-ACCESS clause of read-write or read-create."
-    SYNTAX      INTEGER { kbits4point8(0), kbits56(1), kbits64(2), 
-                    kbits1544(3), kbits2048(4) }
+-- MtpTransmissionRate ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This type describes an applicable narrowband transmission rate.  
+--          This can be 4800, 56000, 64000, 1536000 or 1984000, which 
+--          corresponds to modem, DS0-A, DS0, T1/J1 or E1.  It also implies 
+--          the transmission type: 56, 64, 1544 and 2048 kbis implies 
+--          digital transmission; 4.8 kbits implies analog transmission.
+--          
+--           - kbits4point8(0), the transmission rate is for modem (4800 baud);
+--           - kbits56(1), the transmission rate is for DS0-A (56kbps);
+--           - kbits64(2), the transmission rate is for DS0 (64kbps);
+--           - kbits1544(3), the transmission rate is for T1 (1536kbps);
+--           - kbits2048(4), the transmission rate is for E1 (1984kbps).
+--          
+--          Objects with this textual convention in thier SYNTAX clause 
+--          normally have a MAX-ACCESS clause of read-write or read-create."
+--     SYNTAX      INTEGER { kbits4point8(0), kbits56(1), kbits64(2), 
+--                     kbits1544(3), kbits2048(4) }
 
 ss7Notifications OBJECT IDENTIFIER
     ::= { ss7MIB 0 }

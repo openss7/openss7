@@ -1,4 +1,4 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-MTP-MIB.mib,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-07-18 19:42:19 $
@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -104,7 +104,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 mtpMIB MODULE-IDENTITY
-    LAST-UPDATED "201106250735Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -304,11 +304,14 @@ mtpMIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "201106250735Z"
     DESCRIPTION 
         "Passes smilint and reformatted with smidump."
@@ -322,804 +325,6 @@ mtpMIB MODULE-IDENTITY
     DESCRIPTION 
         "First release of this module."
     ::= { openss7Q751 1 }
-
--- ====================================================================
-
--- (1.3.6.1.4.1.29591.17.751.1) mtpMIB
--- |__(0) mtpNotifications
--- |  |__( 1) mtpRestarting
--- |  |__( 2) ss7OnOccEvent
--- |  |__( 3) sdlEventLostSync
--- |  |__( 4) sdlEventSuError
--- |  |__( 5) sdlEventTxFail
--- |  |__( 6) sdlEventRxFail
--- |  |__( 7) sdtEventLostSync
--- |  |__( 8) sdtEventSuError
--- |  |__( 9) sdtEventTxFail
--- |  |__(10) sdtEventRxFail
--- |  |__(11) sdtEventCarrier
--- |  |__(12) slEventFailureAllReasons
--- |  |__(13) slEventFailureAbnormalBsnrFibr
--- |  |__(14) slEventFailureExcessiveDelayOfAck
--- |  |__(15) slEventFailureExcessiveErrorRate
--- |  |__(16) slEventFailureExcessiveDurationCongestion
--- |  |__(17) slEventLocalAutomaticChangeover
--- |  |__(18) slEventLocalAutomaticChangeback
--- |  |__(19) slEventRestoration
--- |  |__(10) slEventRpoStartEvent
--- |  |__(21) slEventRpoStopEvent
--- |  |__(22) slEventLocalInhibitionStart
--- |  |__(23) slEventLocalInhibitionStop
--- |  |__(24) slEventRemoteInhibitionStart
--- |  |__(25) slEventRemoteInhibitionStop
--- |  |__(26) slEventCongestionStart
--- |  |__(27) slEventCongestionStop
--- |  |__(28) slEventCongestionLoss
--- |  |__(29) lkEventFailureStart
--- |  |__(30) lkEventFailureStop
--- |  |__(31) lkEventSendTFP
--- |  |__(32) lkEventSendTFA
--- |  |__(33) rsEventUnavailableStart
--- |  |__(34) rsEventUnavailableStop
--- |  |__(35) rsEventAdjSpLinkSetChange
--- |  |__(36) rsEventAdjSPInaccessibleStart
--- |  |__(37) rsEventAdjSpInaccessibleStop
--- |  |__(38) rsEventRecvTFC
--- |  |__(39) spEventMsuDiscard
--- |  |__(40) spEventUpuSent
--- |  |__(41) spEventUpuRecv
--- |
--- |__( 1) mtpObjects
--- |  |__( 1) mtpTables
--- |  |  |__( 1) mtpSap
--- |  |  |  |__( 1) mtpSapTable
--- |  |  |     |__( 1) mtpSapEntry
--- |  |  |        |__( 1) mtpSapId
--- |  |  |        |__( 2) mtpSap2Address
--- |  |  |        |__( 3) mtpSapUserPart
--- |  |  |        |__( 4) mtpSapUserPartStatus
--- |  |  |        |__( 5) mtpSapUserEntityNames
--- |  |  |        |__( 6) mtpSapProviderEntityNames
--- |  |  |        |__( 7) mtpSapUsageState
--- |  |  |        |__( 8) mtpSapAsaProfilePointer
--- |  |  |        |__( 9) mtpSapName
--- |  |  |        |__(10) mtpSapLongMessageSupported
--- |  |  |        |__(11) mtpSapRowStatus
--- |  |  |
--- |  |  |__( 2) mtpNa
--- |  |  |  |__( 1) mtpNaTable
--- |  |  |     |__( 1) mtpNaEntry
--- |  |  |        |__( 1) mtpNaId
--- |  |  |        |__( 2) mtpNaProtocolVariant
--- |  |  |        |__( 3) mtpNaProtocolYear
--- |  |  |        |__( 4) mtpNaProtocolOptions
--- |  |  |        |__( 5) mtpNaNetworkIndicator
--- |  |  |        |__( 6) mtpNaPointCodeFormat
--- |  |  |        |__( 7) mtpNaSlsLength
--- |  |  |        |__( 8) mtpNaSpDefault
--- |  |  |        |__( 9) mtpNaName
--- |  |  |        |__(10) mtpNaRowStatus
--- |  |  |
--- |  |  |__( 4) mtpMs
--- |  |  |  |__( 1) mtpMsTable
--- |  |  |     |__( 1) mtpMsEntry
--- |  |  |        |__( 1) mtpMsId
--- |  |  |        |__( 2) mtpMsName
--- |  |  |        |__( 3) mtpMsAlarmStatus
--- |  |  |        |__( 4) mtpMsOperationalState
--- |  |  |        |__( 5) mtpMsUsageState
--- |  |  |        |__( 6) mtpMsManagedElementType
--- |  |  |        |__( 7) mtpMsModelCode
--- |  |  |        |__( 8) mtpMsVendorName
--- |  |  |        |__( 9) mtpMsUserLabel
--- |  |  |        |__(10) mtpMsVersion
--- |  |  |        |__(11) mtpMsAsaProfilePointer
--- |  |  |        |__(12) mtpMsNetworkElementAliases
--- |  |  |        |__(13) mtpMsRowStatus
--- |  |  |
--- |  |  |__( 4) mtpSp
--- |  |  |  |__( 1) mtpSpProfileTable
--- |  |  |  |  |__( 1) mtpSpProfileEntry
--- |  |  |  |     |__( 1) mtpSpProfileId
--- |  |  |  |     |__( 2) mtpSpProfileTimerT1R
--- |  |  |  |     |__( 3) mtpSpProfileTimerT2
--- |  |  |  |     |__( 4) mtpSpProfileTimerT4
--- |  |  |  |     |__( 5) mtpSpProfileTimerT5
--- |  |  |  |     |__( 6) mtpSpProfileTimerT7
--- |  |  |  |     |__( 7) mtpSpProfileTimerT11
--- |  |  |  |     |__( 8) mtpSpProfileTimerT12
--- |  |  |  |     |__( 9) mtpSpProfileTimerT13
--- |  |  |  |     |__(10) mtpSpProfileTimerT14
--- |  |  |  |     |__(11) mtpSpProfileTimerT15
--- |  |  |  |     |__(12) mtpSpProfileTimerT16
--- |  |  |  |     |__(13) mtpSpProfileTimerT18I
--- |  |  |  |     |__(14) mtpSpProfileTimerT19I
--- |  |  |  |     |__(15) mtpSpProfileTimerT20I
--- |  |  |  |     |__(16) mtpSpProfileTimerT21I
--- |  |  |  |     |__(17) mtpSpProfileTimerT22I
--- |  |  |  |     |__(18) mtpSpProfileTimerT23I
--- |  |  |  |     |__(19) mtpSpProfileTimerT20A
--- |  |  |  |     |__(20) mtpSpProfileTimerT21A
--- |  |  |  |     |__(21) mtpSpProfileTimerT22A
--- |  |  |  |     |__(22) mtpSpProfileTimerT23A
--- |  |  |  |     |__(23) mtpSpProfileTimerT24A
--- |  |  |  |     |__(24) mtpSpProfileTimerT26A
--- |  |  |  |     |__(25) mtpSpProfileTimerT27A
--- |  |  |  |     |__(26) mtpSpProfileTimerT1T
--- |  |  |  |     |__(27) mtpSpProfileTimerT2T
--- |  |  |  |     |__(28) mtpSpProfileName
--- |  |  |  |     |__(29) mtpSpProfileCircularRteDetect
--- |  |  |  |     |__(30) mtpSpRsDefault
--- |  |  |  |     |__(31) mtpSpLsDefault
--- |  |  |  |     |__(32) mtpSpProfileRowStatus
--- |  |  |  |
--- |  |  |  |__( 2) mtpSpTable
--- |  |  |     |__( 1) mtpSpEntry
--- |  |  |        |__( 1) mtpSpId
--- |  |  |        |__( 2) mtpSpPointCode
--- |  |  |        |__( 3) mtpSpType
--- |  |  |        |__( 4) mtpSpOperationalState
--- |  |  |        |__( 5) mtpSpProceduralStatus
--- |  |  |        |__( 6) mtpSpAvailabilityStatus
--- |  |  |        |__( 7) mtpSpVersion
--- |  |  |        |__( 8) mtpSpNetworkIndicator
--- |  |  |        |__( 9) mtpSpName
--- |  |  |        |__(10) mtpSpProfilePointer
--- |  |  |        |__(11) mtpSpNaPointer
--- |  |  |        |__(12) mtpSpOptions
--- |  |  |        |__(13) mtpSpUsers
--- |  |  |        |__(14) mtpSpAlarmStatus
--- |  |  |        |__(15) mtpSpRowStatus
--- |  |  |
--- |  |  |__( 5) mtpL3
--- |  |  |  |__( 1) mtpL3Table
--- |  |  |     |__( 1) mtpL3Entry
--- |  |  |        |__( 1) mtpL3Id
--- |  |  |        |__( 2) mtpL3AdministrativeState
--- |  |  |        |__( 3) mtpL3OperationalState
--- |  |  |        |__( 4) mtpL3UsageState
--- |  |  |        |__( 5) mtpL3ProceduralStatus
--- |  |  |        |__( 6) mtpL3AsaProfilePointer
--- |  |  |        |__( 7) mtpL3Name
--- |  |  |        |__( 8) mtpL3RowStatus
--- |  |  |
--- |  |  |__( 3) mtpGs
--- |  |  |  |__( 1) mtpGsTable
--- |  |  |  |  |__( 1) mtpGsEntry
--- |  |  |  |     |__( 1) mtpGsId
--- |  |  |  |     |__( 2) mtpGsAdministrativeState
--- |  |  |  |     |__( 3) mtpGsTreatmentOfOutsideRanges
--- |  |  |  |     |__( 4) mtpGsListMode
--- |  |  |  |     |__( 5) mtpGsScreeningByLinkSetOrByOpc
--- |  |  |  |     |__( 6) mtpGsGetScreenedOpcsOrLinkSetsByDpc
--- |  |  |  |     |__( 7) mtpGsName
--- |  |  |  |     |__( 8) mtpGsRowStatus
--- |  |  |  |
--- |  |  |  |__( 2) mtpGsLineTable
--- |  |  |  |  |__( 1) mtpGsLineEntry
--- |  |  |  |     |__( 1) mtpGsLineId
--- |  |  |  |     |__( 2) mtpGsLineObject
--- |  |  |  |     |__( 3) mtpGsLineContent
--- |  |  |  |     |__( 4) mtpGsLineRowStatus
--- |  |  |  |
--- |  |  |  |__( 3) mtpGsLineContentTable
--- |  |  |     |__( 1) mtpGsLineContentEntry
--- |  |  |        |__( 1) mtpGsLineContentId
--- |  |  |        |__( 2) mtpGsLineContentDesignatedDPCFirst
--- |  |  |        |__( 3) mtpGsLineContentDesignatedDPCLast
--- |  |  |        |__( 4) mtpGsLineContentSiMask
--- |  |  |        |__( 5) mtpGsLineContentMessageTreatment
--- |  |  |        |__( 6) mtpGsLineContentComment
--- |  |  |        |__( 7) mtpGsLineContentRowStatus
--- |  |  |
--- |  |  |__( 6) mtpRs
--- |  |  |  |__( 1) mtpRsProfileTable
--- |  |  |  |  |__( 1) mtpRsProfileEntry
--- |  |  |  |     |__( 1) mtpRsProfileId
--- |  |  |  |     |__( 2) mtpRsProfileName
--- |  |  |  |     |__( 3) mtpRsProfileTimerT8
--- |  |  |  |     |__( 4) mtpRsProfileTimerT11
--- |  |  |  |     |__( 5) mtpRsProfileTimerT15
--- |  |  |  |     |__( 6) mtpRsProfileTimerT16
--- |  |  |  |     |__( 7) mtpRsProfileTimerT18A
--- |  |  |  |     |__( 8) mtpRsProfileRtDefault
--- |  |  |  |     |__( 9) mtpRsProfileRowStatus
--- |  |  |  |
--- |  |  |  |__( 2) mtpRsTable
--- |  |  |     |__( 1) mtpRsEntry
--- |  |  |        |__( 1) mtpRsId
--- |  |  |        |__( 2) mtpRsDest
--- |  |  |        |__( 3) mtpRsOptions
--- |  |  |        |__( 4) mtpRsAdministrativeState
--- |  |  |        |__( 5) mtpRsOperationalState
--- |  |  |        |__( 6) mtpRsAsaProfilePointer
--- |  |  |        |__( 7) mtpRsCongestedState
--- |  |  |        |__( 8) mtpRsCongestionLevel
--- |  |  |        |__( 9) mtpRsLoadsharingInformation
--- |  |  |        |__(10) mtpRsLoadsharingObject
--- |  |  |        |__(11) mtpRsRemoteExchangeLabel
--- |  |  |        |__(12) mtpRsName
--- |  |  |        |__(13) mtpRsProfile
--- |  |  |        |__(14) mtpRsAlarmStatus
--- |  |  |        |__(15) mtpRsRowStatus
--- |  |  |
--- |  |  |__( 7) mtpRt
--- |  |  |  |__( 1) mtpRtProfileTable
--- |  |  |  |  |__( 1) mtpRtProfileEntry
--- |  |  |  |     |__( 1) mtpRtProfileId
--- |  |  |  |     |__( 2) mtpRtProfileTimerT6
--- |  |  |  |     |__( 3) mtpRtProfileTimerT10
--- |  |  |  |     |__( 4) mtpRtProfileRowStatus
--- |  |  |  |
--- |  |  |  |__( 2) mtpRtTable
--- |  |  |  |  |__( 1) mtpRtEntry
--- |  |  |  |     |__( 1) mtpRtId
--- |  |  |  |     |__( 2) mtpRtLsPointer
--- |  |  |  |     |__( 3) mtpRtAdministrativeState
--- |  |  |  |     |__( 4) mtpRtOperationalState
--- |  |  |  |     |__( 5) mtpRtAvailabilityStatus
--- |  |  |  |     |__( 6) mtpRtInClsLoadsharingAlgorithm
--- |  |  |  |     |__( 7) mtpRtFixedPriority
--- |  |  |  |     |__( 8) mtpRtFlexiblePriority
--- |  |  |  |     |__( 9) mtpRtPriorityMode
--- |  |  |  |     |__(10) mtpRtLoadsharingInformation
--- |  |  |  |     |__(11) mtpRtLoadsharingObject
--- |  |  |  |     |__(12) mtpRtName
--- |  |  |  |     |__(13) mtpRtSlsList
--- |  |  |  |     |__(14) mtpRtUsageState
--- |  |  |  |     |__(15) mtpRtRlSlot
--- |  |  |  |     |__(16) mtpRtProfile
--- |  |  |  |     |__(17) mtpRtRowStatus
--- |  |  |  |
--- |  |  |  |__( 3) mtpRtLsaTable
--- |  |  |     |__( 2) mtpRtLsaEntry
--- |  |  |        |__( 1) mtpRtLsaSlsCode
--- |  |  |        |__( 2) mtpRtLsaNormalSlCode
--- |  |  |        |__( 3) mtpRtLsaAlternativeSlCodeList
--- |  |  |
--- |  |  |__( 8) mtpLs
--- |  |  |  |__( 1) mtpLsProfileTable
--- |  |  |  |  |__( 1) mtpLsProfileEntry
--- |  |  |  |     |__( 1) mtpLsProfileId
--- |  |  |  |     |__( 2) mtpLsProfileTimerT6
--- |  |  |  |     |__( 3) mtpLsProfileTimerT8
--- |  |  |  |     |__( 4) mtpLsProfileTimerT10
--- |  |  |  |     |__( 5) mtpLsProfileTimerT7
--- |  |  |  |     |__( 6) mtpLsProfileTimerT19I
--- |  |  |  |     |__( 7) mtpLsProfileTimerT21I
--- |  |  |  |     |__( 8) mtpLsProfileTimerT25A
--- |  |  |  |     |__( 9) mtpLsProfileTimerT28A
--- |  |  |  |     |__(10) mtpLsProfileTimerT29A
--- |  |  |  |     |__(11) mtpLsProfileTimerT30A
--- |  |  |  |     |__(12) mtpLsProfileParameterN
--- |  |  |  |     |__(13) mtpLsProfileParameterM
--- |  |  |  |     |__(14) mtpLsProfileName
--- |  |  |  |     |__(15) mtpLsProfileSlDefault
--- |  |  |  |     |__(16) mtpLsProfileRowStatus
--- |  |  |  |
--- |  |  |  |__( 2) mtpLsTable
--- |  |  |     |__( 1) mtpLsEntry
--- |  |  |        |__( 1) mtpLsId
--- |  |  |        |__( 2) mtpLsAdjPc
--- |  |  |        |__( 3) mtpLsRsId
--- |  |  |        |__( 4) mtpLsMaxCapacity
--- |  |  |        |__( 5) mtpLsCurrentCapacity
--- |  |  |        |__( 6) mtpLsCongestionControlMethod
--- |  |  |        |__( 7) mtpLsUsageState
--- |  |  |        |__( 8) mtpLsOperationalState
--- |  |  |        |__( 9) mtpLsAvailabilityStatus
--- |  |  |        |__(10) mtpLsPeriodicLinkTestFlag
--- |  |  |        |__(11) mtpLsPeriodicLinkTestFail
--- |  |  |        |__(12) mtpLsAdministrativeState
--- |  |  |        |__(13) mtpLsInLsLoadShareAlgorithm
--- |  |  |        |__(14) mtpLsProfilePointer
--- |  |  |        |__(15) mtpLsNumberOfNormallyActiveSignLinks
--- |  |  |        |__(16) mtpLsName
--- |  |  |        |__(17) mtpLsAsaProfilePointer
--- |  |  |        |__(18) mtpLsAlarmStatus
--- |  |  |        |__(19) mtpLsRowStatus
--- |  |  |
--- |  |  |__( 9) mtpSl
--- |  |  |  |__( 1) mtpSlL3ProfileTable
--- |  |  |  |  |__( 1) mtpSlL3ProfileEntry
--- |  |  |  |     |__( 1) mtpSlL3ProfileId
--- |  |  |  |     |__( 2) mtpSlL3ProfileTimerT1
--- |  |  |  |     |__( 3) mtpSlL3ProfileTimerT3
--- |  |  |  |     |__( 4) mtpSlL3ProfileTimerT17
--- |  |  |  |     |__( 5) mtpSlL3ProfileTimerT24I
--- |  |  |  |     |__( 6) mtpSlL3ProfileName
--- |  |  |  |     |__( 7) mtpSlL3ProfileTimerT2
--- |  |  |  |     |__( 8) mtpSlL3ProfileTimerT4
--- |  |  |  |     |__( 9) mtpSlL3ProfileTimerT5
--- |  |  |  |     |__(10) mtpSlL3ProfileTimerT12
--- |  |  |  |     |__(11) mtpSlL3ProfileTimerT13
--- |  |  |  |     |__(12) mtpSlL3ProfileTimerT14
--- |  |  |  |     |__(13) mtpSlL3ProfileTimerT19A
--- |  |  |  |     |__(14) mtpSlL3ProfileTimerT20A
--- |  |  |  |     |__(15) mtpSlL3ProfileTimerT21A
--- |  |  |  |     |__(16) mtpSlL3ProfileTimerT22I
--- |  |  |  |     |__(17) mtpSlL3ProfileTimerT23I
--- |  |  |  |     |__(18) mtpSlL3ProfileTimerT31A
--- |  |  |  |     |__(19) mtpSlL3ProfileTimerT32A
--- |  |  |  |     |__(20) mtpSlL3ProfileTimerT33A
--- |  |  |  |     |__(21) mtpSlL3ProfileTimerT34A
--- |  |  |  |     |__(22) mtpSlL3ProfileTimerT1T
--- |  |  |  |     |__(23) mtpSlL3ProfileTimerT2T
--- |  |  |  |     |__(24) mtpSlL3ProfileTimerT1S
--- |  |  |  |     |__(25) mtpSlL3ProfileL2Default
--- |  |  |  |     |__(26) mtpSlL3ProfileRowStatus
--- |  |  |  |
--- |  |  |  |__( 2) mtpSlL2ProfileTable
--- |  |  |  |  |__( 1) mtpSlL2ProfileEntry
--- |  |  |  |     |__( 1) mtpSlL2ProfileId
--- |  |  |  |     |__( 2) mtpSlL2ProfileTransmissionRate
--- |  |  |  |     |__( 3) mtpSlL2ProfileErrorCorrectionMethod
--- |  |  |  |     |__( 4) mtpSlL2ProfileProtocolVariant
--- |  |  |  |     |__( 5) mtpSlL2ProfileTimerT1
--- |  |  |  |     |__( 6) mtpSlL2ProfileTimerT2
--- |  |  |  |     |__( 7) mtpSlL2ProfileTimerT2L
--- |  |  |  |     |__( 8) mtpSlL2ProfileTimerT2H
--- |  |  |  |     |__( 9) mtpSlL2ProfileTimerT3
--- |  |  |  |     |__(10) mtpSlL2ProfileTimerT4N
--- |  |  |  |     |__(11) mtpSlL2ProfileTimerT4E
--- |  |  |  |     |__(12) mtpSlL2ProfileTimerT5
--- |  |  |  |     |__(13) mtpSlL2ProfileTimerT6
--- |  |  |  |     |__(14) mtpSlL2ProfileTimerT7
--- |  |  |  |     |__(15) mtpSlL2ProfileTbOnset1
--- |  |  |  |     |__(16) mtpSlL2ProfileTbAbate1
--- |  |  |  |     |__(17) mtpSlL2ProfileNumberOfThresholdLevels
--- |  |  |  |     |__(18) mtpSlL2ProfileCongestionCounting
--- |  |  |  |     |__(19) mtpSlL2ProfileCongestionReportingBaseObject
--- |  |  |  |     |__(20) mtpSlL2ProfileLoopDelay
--- |  |  |  |     |__(21) mtpSlL2ProfileName
--- |  |  |  |     |__(22) mtpSlL2ProfileTbOnset2
--- |  |  |  |     |__(23) mtpSlL2ProfileTbAbate2
--- |  |  |  |     |__(24) mtpSlL2ProfileTbOnset3
--- |  |  |  |     |__(25) mtpSlL2ProfileTbAbate3
--- |  |  |  |     |__(26) mtpSlL2ProfileTbDiscard1
--- |  |  |  |     |__(27) mtpSlL2ProfileTbDiscard2
--- |  |  |  |     |__(28) mtpSlL2ProfileTbDiscard3
--- |  |  |  |     |__(29) mtpSlL2ProfileTimerTx
--- |  |  |  |     |__(30) mtpSlL2ProfileTimerTy
--- |  |  |  |     |__(31) mtpSlL2ProfileNumberOfCongestionStates
--- |  |  |  |     |__(32) mtpSlL2ProfileInitialLevelOfCongestion
--- |  |  |  |     |__(33) mtpSlL2ProfileMaxMSUsRetransN1
--- |  |  |  |     |__(34) mtpSlL2ProfileMaxOctRetransN2
--- |  |  |  |     |__(35) mtpSlL2ProfileReceiveCongestionThresholdOnset
--- |  |  |  |     |__(36) mtpSlL2ProfileReceiveCongestionThresholdAbate
--- |  |  |  |     |__(37) mtpSlL2ProfileReceiveCongestionThresholdDiscard
--- |  |  |  |     |__(38) mtpSlL2ProfileM
--- |  |  |  |     |__(39) mtpSlL2ProfileRowStatus
--- |  |  |  |
--- |  |  |  |__( 3) mtpSlTable
--- |  |  |  |  |__( 1) mtpSlEntry
--- |  |  |  |     |__( 1) mtpSlId
--- |  |  |  |     |__( 2) mtpSlSlCode
--- |  |  |  |     |__( 3) mtpSlSlsCodeCurrentList
--- |  |  |  |     |__( 4) mtpSlMaxCapacitySL
--- |  |  |  |     |__( 5) mtpSlCurrentCapacitySL
--- |  |  |  |     |__( 6) mtpSlLinkTpStatus
--- |  |  |  |     |__( 7) mtpSlAdministrativeState
--- |  |  |  |     |__( 8) mtpSlOperationalState
--- |  |  |  |     |__( 9) mtpSlUsageState
--- |  |  |  |     |__(10) mtpSlProceduralStatus
--- |  |  |  |     |__(11) mtpSlMtpL2ProtocolProfilePointer
--- |  |  |  |     |__(12) mtpSlSignTermPointer
--- |  |  |  |     |__(13) mtpSlSignDataLinkTpPointer
--- |  |  |  |     |__(14) mtpSlLocalInhibit
--- |  |  |  |     |__(15) mtpSlLocalUninhibit
--- |  |  |  |     |__(16) mtpSlReplaceSt
--- |  |  |  |     |__(17) mtpSlAsaProfilePointer
--- |  |  |  |     |__(18) mtpSlCongestionLevel
--- |  |  |  |     |__(19) mtpSlRelatedLinkGroupNumber
--- |  |  |  |     |__(20) mtpSlSdlList
--- |  |  |  |     |__(21) mtpSlTest
--- |  |  |  |     |__(22) mtpSlName
--- |  |  |  |     |__(23) mtpSlSdtList
--- |  |  |  |     |__(24) mtpSlSlsCodeNormalList
--- |  |  |  |     |__(25) mtpSlL3ProfilePointer
--- |  |  |  |     |__(26) mtpSlAlarmStatus
--- |  |  |  |     |__(27) mtpSlRowStatus
--- |  |  |  |
--- |  |  |  |__( 4) mtpSlSdlListTable
--- |  |  |  |  |__( 1) mtpSlSdlListEntry
--- |  |  |  |     |__( 1) mtpSlSdlListId
--- |  |  |  |     |__( 2) mtpSlSdlListPointer
--- |  |  |  |     |__( 3) mtpSlSdlListRowStatus
--- |  |  |  |
--- |  |  |  |__( 5) mtpSlSdtListTable
--- |  |  |     |__( 1) mtpSlSdtListEntry
--- |  |  |        |__( 1) mtpSlSdtListId
--- |  |  |        |__( 2) mtpSlSdtListPointer
--- |  |  |        |__( 3) mtpSlSdtListRowStatus
--- |  |  |
--- |  |  |__(10) mtpSdt
--- |  |  |  |__( 1) mtpNbTable
--- |  |  |  |  |__( 1) mtpNbEntry
--- |  |  |  |     |__( 1) mtpSdtProfileId
--- |  |  |  |     |__( 2) mtpNbTransmissionRate
--- |  |  |  |     |__( 3) mtpNbTimerT8
--- |  |  |  |     |__( 4) mtpNbTin
--- |  |  |  |     |__( 5) mtpNbTie
--- |  |  |  |     |__( 6) mtpNbT
--- |  |  |  |     |__( 7) mtpNbD
--- |  |  |  |     |__( 8) mtpNbTe
--- |  |  |  |     |__( 9) mtpNbDe
--- |  |  |  |     |__(10) mtpNbUe
--- |  |  |  |     |__(11) mtpNbN
--- |  |  |  |     |__(12) mtpNbm
--- |  |  |  |     |__(13) mtpNbb
--- |  |  |  |     |__(14) mtpNbf
--- |  |  |  |     |__(15) mtpNbRowStatus
--- |  |  |  |
--- |  |  |  |__( 2) mtpSaalTable
--- |  |  |  |  |__( 1) mtpSaalEntry
--- |  |  |  |     |__( 1) mtpSaalBufferRelease
--- |  |  |  |     |__( 2) mtpSaalMaxCc
--- |  |  |  |     |__( 3) mtpSaalMaxNrp
--- |  |  |  |     |__( 4) mtpSaalMaxInformationFieldLength
--- |  |  |  |     |__( 5) mtpSaalMaxLengthSscopUuField
--- |  |  |  |     |__( 6) mtpSaalMaxPd
--- |  |  |  |     |__( 7) mtpSaalMaxSscopCreditToPeer
--- |  |  |  |     |__( 8) mtpSaalMaxStat
--- |  |  |  |     |__( 9) mtpSaalN1
--- |  |  |  |     |__(10) mtpSaalNniLayerManagementProvingState
--- |  |  |  |     |__(11) mtpSaalNniLayerManagementTimerNoCredit
--- |  |  |  |     |__(12) mtpSaalNniLayerManagementTimerRepeatSrec
--- |  |  |  |     |__(13) mtpSaalNniTimerT1
--- |  |  |  |     |__(14) mtpSaalNniTimerT2
--- |  |  |  |     |__(15) mtpSaalNniTimerT3
--- |  |  |  |     |__(16) mtpSaalSscopTimerCc
--- |  |  |  |     |__(17) mtpSaalSscopTimerIdle
--- |  |  |  |     |__(18) mtpSaalSscopTimerKeepAlive
--- |  |  |  |     |__(19) mtpSaalSscopTimerNoResponse
--- |  |  |  |     |__(20) mtpSaalSscopTimerPoll
--- |  |  |  |     |__(21) mtpSaalTransmissionRateIntervalLower
--- |  |  |  |     |__(22) mtpSaalTransmissionRateIntervalUpper
--- |  |  |  |     |__(23) mtpSaalEgressTransmissionRateIntervalLower
--- |  |  |  |     |__(24) mtpSaalEgressTransmissionRateIntervalUpper
--- |  |  |  |     |__(25) mtpSaalPollAfterRetransmission
--- |  |  |  |     |__(26) mtpSaalRowStatus
--- |  |  |  |
--- |  |  |  |__( 3) mtpM2paTable
--- |  |  |  |  |__( 3) mtpM2paEntry
--- |  |  |  |     |__( 1) mtpM2paN1
--- |  |  |  |     |__( 2) mtpM2paProving
--- |  |  |  |     |__( 3) mtpM2paManagementProvingState
--- |  |  |  |     |__( 4) mtpM2paProvingAttempts
--- |  |  |  |     |__( 5) mtpM2paSctpNoDelay
--- |  |  |  |     |__( 6) mtpM2paSctpMaxseg
--- |  |  |  |     |__( 7) mtpM2paSctpHeartbeatItvl
--- |  |  |  |     |__( 8) mtpM2paSctpHeartbeat
--- |  |  |  |     |__( 9) mtpM2paSctpRtoInitial
--- |  |  |  |     |__(10) mtpM2paSctpRtoMin
--- |  |  |  |     |__(11) mtpM2paSctpRtoMax
--- |  |  |  |     |__(12) mtpM2paSctpPathMaxRetrans
--- |  |  |  |     |__(13) mtpM2paSctpCookieLife
--- |  |  |  |     |__(14) mtpM2paSctpCookieInc
--- |  |  |  |     |__(15) mtpM2paSctpMaxInitRetries
--- |  |  |  |     |__(16) mtpM2paSctpMaxBurst
--- |  |  |  |     |__(17) mtpM2paSctpAssocMaxRetrans
--- |  |  |  |     |__(18) mtpM2paSctpSackDelay
--- |  |  |  |     |__(19) mtpM2paSctpLifetime
--- |  |  |  |     |__(20) mtpM2paLoopDelayLower
--- |  |  |  |     |__(21) mtpM2paLoopDelayUpper
--- |  |  |  |     |__(22) mtpM2paTransmissionRateIntervalLower
--- |  |  |  |     |__(23) mtpM2paTransmissionRateIntervalUpper
--- |  |  |  |     |__(24) mtpM2paRowStatus
--- |  |  |  |
--- |  |  |  |__( 4) mtpSdtTable
--- |  |  |     |__( 1) mtpSdtEntry
--- |  |  |        |__( 1) mtpSdtId
--- |  |  |        |__( 2) mtpSdtType
--- |  |  |        |__( 3) mtpSdtAdministrativeState
--- |  |  |        |__( 4) mtpSdtOperationalState
--- |  |  |        |__( 5) mtpSdtUsageState
--- |  |  |        |__( 6) mtpSdtProceduralStatus
--- |  |  |        |__( 7) mtpSdtAvailabilityStatus
--- |  |  |        |__( 8) mtpSdtEquipmentPointer
--- |  |  |        |__( 9) mtpSdtName
--- |  |  |        |__(10) mtpSdtStandbyStatus
--- |  |  |        |__(11) mtpSdtPrimaryId
--- |  |  |        |__(12) mtpSdtProfilePointer
--- |  |  |        |__(13) mtpSdtRowStatus
--- |  |  |
--- |  |  |__(11) mtpSdl
--- |  |  |  |__( 1) mtpSdlTable
--- |  |  |     |__( 1) mtpSdlEntry
--- |  |  |        |__( 1) mtpSdlId
--- |  |  |        |__( 2) mtpSdlType
--- |  |  |        |__( 3) mtpSdlAdjPc
--- |  |  |        |__( 4) mtpSdlLoopDelay
--- |  |  |        |__( 5) mtpSdlOperationalState
--- |  |  |        |__( 6) mtpSdlEquipmentPointer
--- |  |  |        |__( 7) mtpSdlCIC
--- |  |  |        |__( 8) mtpSdlTransmissionRate
--- |  |  |        |__( 9) mtpSdlStmChannel
--- |  |  |        |__(10) mtpSdlVcTTpPointer
--- |  |  |        |__(11) mtpSdlSctpPointer
--- |  |  |        |__(12) mtpSdlName
--- |  |  |        |__(13) mtpSdlRowStatus
--- |  |  |
--- |  |  |__(12) mtpSctp
--- |  |     |__( 1) mtpSctpProfileTable
--- |  |     |  |__( 1) mtpSctpProfileEntry
--- |  |     |     |__( 1) mtpSctpProfileId
--- |  |     |     |__( 2) mtpSctpProfileNoDelay
--- |  |     |     |__( 3) mtpSctpProfileMaxseg
--- |  |     |     |__( 4) mtpSctpProfileHeartbeatItvl
--- |  |     |     |__( 5) mtpSctpProfileHeartbeat
--- |  |     |     |__( 6) mtpSctpProfileRtoInitial
--- |  |     |     |__( 7) mtpSctpProfileRtoMin
--- |  |     |     |__( 8) mtpSctpProfileRtoMax
--- |  |     |     |__( 9) mtpSctpProfilePathMaxRetrans
--- |  |     |     |__(10) mtpSctpProfileCookieLife
--- |  |     |     |__(11) mtpSctpProfileCookieInc
--- |  |     |     |__(12) mtpSctpProfileMaxInitRetries
--- |  |     |     |__(13) mtpSctpProfileMaxBurst
--- |  |     |     |__(14) mtpSctpProfileAssocMaxRetrans
--- |  |     |     |__(15) mtpSctpProfileSackDelay
--- |  |     |     |__(16) mtpSctpProfileLifetime
--- |  |     |     |__(17) mtpSctpProfileMinOstreams
--- |  |     |     |__(18) mtpSctpProfileMaxIstreams
--- |  |     |     |__(19) mtpSctpProfileRowStatus
--- |  |     |
--- |  |     |__( 2) mtpSctpTable
--- |  |     |  |__( 1) mtpSctpEntry
--- |  |     |     |__( 1) mtpSctpId
--- |  |     |     |__( 2) mtpSctpAdministrativeState
--- |  |     |     |__( 3) mtpSctpOperationalState
--- |  |     |     |__( 4) mtpSctpUsageState
--- |  |     |     |__( 5) mtpSctpProceduralStatus
--- |  |     |     |__( 6) mtpSctpLocalPort
--- |  |     |     |__( 7) mtpSctpRemotePort
--- |  |     |     |__( 8) mtpSctpProfile
--- |  |     |     |__( 9) mtpSctpProtocolPayloadId
--- |  |     |     |__(10) mtpSctpRowStatus
--- |  |     |
--- |  |     |__( 3) mtpSctpLocalTable
--- |  |     |  |__( 1) mtpSctpLocalEntry
--- |  |     |     |__( 1) mtpSctpLocalId
--- |  |     |     |__( 2) mtpSctpLocalAddress
--- |  |     |     |__( 3) mtpSctpLocalRowStatus
--- |  |     |
--- |  |     |__( 4) mtpSctpRemoteTable
--- |  |     |  |__( 1) mtpSctpRemoteEntry
--- |  |     |     |__( 1) mtpSctpRemoteId
--- |  |     |     |__( 2) mtpSctpRemoteAddress
--- |  |     |     |__( 3) mtpSctpRemoteRowStatus
--- |  |     |
--- |  |     |__( 5) mtpM2uaAspTable
--- |  |     |  |__( 1) mtpM2uaAspEntry
--- |  |     |     |__( 1) mtpM2uaAspState
--- |  |     |     |__( 2) mtpM2uaAspId
--- |  |     |     |__( 3) mtpM2uaAspCapabilities
--- |  |     |     |__( 4) mtpM2uaAspSgVersion
--- |  |     |     |__( 5) mtpM2uaAspSgOptions
--- |  |     |     |__( 6) mtpM2uaAspSgRegistrationPolicy
--- |  |     |     |__( 7) mtpM2uaAspSgAspIdPolicy
--- |  |     |     |__( 8) mtpM2uaAspAssociationPolicy
--- |  |     |     |__( 9) mtpM2uaAspProtocolPayloadId
--- |  |     |     |__(10) mtpM2uaAspRowStatus
--- |  |     |
--- |  |     |__( 6) mtpM2uaAsTable
--- |  |     |  |__( 1) mtpM2uaAsEntry
--- |  |     |     |__( 1) mtpM2uaAsId
--- |  |     |     |__( 2) mtpM2uaAsState
--- |  |     |     |__( 3) mtpM2uaAsInterfaceIdentifier
--- |  |     |     |__( 4) mtpM2uaAsSDTI
--- |  |     |     |__( 5) mtpM2uaAsTrafficMode
--- |  |     |     |__( 6) mtpM2uaAsRowStatus
--- |  |     |
--- |  |     |__( 7) mtpM3uaAspTable
--- |  |     |  |__( 1) mtpM3uaAspEntry
--- |  |     |     |__( 1) mtpM3uaAspState
--- |  |     |     |__( 2) mtpM3uaAsType
--- |  |     |     |__( 3) mtpM3uaAspId
--- |  |     |     |__( 4) mtpM3uaAspCapabilities
--- |  |     |     |__( 5) mtpM3uaAspSgVersion
--- |  |     |     |__( 6) mtpM3uaAspSgOptions
--- |  |     |     |__( 7) mtpM3uaAspSgRegistrationPolicy
--- |  |     |     |__( 8) mtpM3uaAspSgAspIdPolicy
--- |  |     |     |__( 9) mtpM3uaAspAssociationPolicy
--- |  |     |     |__(10) mtpM3uaAspProtocolPayloadId
--- |  |     |     |__(11) mtpM3uaAspRowStatus
--- |  |     |
--- |  |     |__( 8) mtpM3uaAsTable
--- |  |        |__( 1) mtpM3uaAsEntry
--- |  |           |__( 1) mtpM3uaAsId
--- |  |           |__( 2) mtpM3uaAsState
--- |  |           |__( 3) mtpM3uaAsRoutingContext
--- |  |           |__( 4) mtpM3uaAsNetworkAppearance
--- |  |           |__( 5) mtpM3uaAsNetworkPointCode
--- |  |           |__( 6) mtpM3uaAsTrafficMode
--- |  |           |__( 7) mtpM3uaAsRowStatus
--- |  |
--- |  |__( 2) mtpScalars
--- |  |  |__( 1) mtpDefaults
--- |  |     |__( 1) mtpDefaultSctpNoDelay
--- |  |     |__( 2) mtpDefaultSctpMaxseg
--- |  |     |__( 3) mtpDefaultSctpHeartbeatItvl
--- |  |     |__( 4) mtpDefaultSctpHeartbeat
--- |  |     |__( 5) mtpDefaultSctpRtoInitial
--- |  |     |__( 6) mtpDefaultSctpRtoMin
--- |  |     |__( 7) mtpDefaultSctpRtoMax
--- |  |     |__( 8) mtpDefaultSctpPathMaxRetrans
--- |  |     |__( 9) mtpDefaultSctpCookieLife
--- |  |     |__(10) mtpDefaultSctpCookieInc
--- |  |     |__(11) mtpDefaultSctpMaxInitRetries
--- |  |     |__(12) mtpDefaultSctpMaxBurst
--- |  |     |__(13) mtpDefaultSctpAssocMaxRetrans
--- |  |     |__(14) mtpDefaultSctpSackDelay
--- |  |     |__(15) mtpDefaultSctpLifetime
--- |  |
--- |  |__( 3) mtpNotifs
--- |  |  |__( 1) changeInLsToAdjSp
--- |  |  |__( 2) oldLs
--- |  |  |__( 3) newLs
--- |  |  |__( 4) inaccessibleSp
--- |  |  |__( 5) remoteUnavailableUserPart
--- |  |  |__( 6) congestionStatus
--- |  |  |__( 7) networkPointCode
--- |  |  |__( 8) userPart
--- |  |  |__( 9) userPartStatus
--- |  |  |__(10) linkFailureReason
--- |  |
--- |  |__( 4) mtpOids
--- |     |__( 1) mtpProtocols
--- |     |  |__( 1) mtpProtocolItut
--- |     |  |__( 2) mtpProtocolEtsi
--- |     |  |__( 3) mtpProtocolAnsi
--- |     |  |__( 4) mtpProtocolJttc
--- |     |  |__( 5) mtpProtocolChin
--- |     |  |__( 6) mtpProtocolPnoc
--- |     |  |__( 7) mtpProtocolSing
--- |     |  |__( 8) mtpProtocolSpan
--- |     |
--- |     |__( 2) mtpProbableCauses
--- |     |  |__(  1) localUserPartUnavailable
--- |     |  |__(  2) remoteUserPartUnavailable
--- |     |  |__(102) slFailure
--- |     |  |__(110) localAutomaticChange
--- |     |  |__(210) remoteProcOutage
--- |     |  |__(216) localInhibition
--- |     |  |__(218) remoteInhibition
--- |     |  |__(306) linkCongestionIndications
--- |     |  |__(311) linkCongestionDiscard
--- |     |  |__(403) linkSetFailure
--- |     |  |__(405) linkSetFailureTFPBroadcast
--- |     |  |__(411) routesetUnavailability
--- |     |  |__(413) linksetAdjSpChange
--- |     |  |__(501) adjSpInaccessibility
--- |     |  |__(505) routingDataError
--- |     |  |__(506) userPartUnavailableSent
--- |     |  |__(507) userPartUnavailableReceived
--- |     |  |__(508) transferControlledReceived
--- |     |
--- |     |__( 3) mtpSpecificProblems
--- |     |  |__(  3) abnormalFIBRorBSNR
--- |     |  |__(  4) excessiveAckDelay
--- |     |  |__(  5) excessiveErrorRate
--- |     |  |__(  6) excessiveCongDuration
--- |     |  |__(  7) remoteUPUnknown
--- |     |  |__(  8) remoteUPUnequipped
--- |     |  |__(  9) remoteUPInaccessible
--- |     |
--- |     |__( 4) mtpExtensions
--- |        |__(  1) defaultInLsLoadShareAlgorithm
--- |
--- |__( 2) mtpConformance
---    |__( 1) mtpCompliance
---    |  |__( 1) mtpLsProfileCompliance
---    |  |__( 2) mtpSapCompliance
---    |  |__( 3) mtpL2ProfocolProfileCompliance
---    |  |__( 4) mtpNbProfileCompliance
---    |  |__( 5) mtpSaalProfileCompliance
---    |  |__( 6) mtpM2paProfileCompliance
---    |  |__( 7) mtpL3Compliance
---    |  |__( 8) mtpSpCompliance
---    |  |__( 9) mtpSdlCompliance
---    |  |__(10) mtpLsCompliance
---    |  |__(11) mtpSlCompliance
---    |  |__(12) mtpSlL3ProfileCompliance
---    |  |__(13) mtpSpProfileCompliance
---    |  |__(14) mtpRtCompliance
---    |  |__(15) mtpSignRouteSetNetPartCompliance
---    |  |__(16) mtpStCompliance
---    |  |__(17) mtpGsCompliance
---    |  |__(18) mtpGsLineCompliance
---    |
---    |__( 2) mtpGroups
---       |__( 1) mtpLsProfilePackage
---       |__( 2) managedSwitchingElementPackage
---       |__( 3) mtpSapPkg
---       |__( 4) mtpSlL2ProfilePkg
---       |__( 5) mtpL3Package
---       |__( 6) mtpSpPackage
---       |__( 7) mtpSdlPackage
---       |__( 8) mtpLsPackage
---       |__( 9) mtpSlPackage
---       |__(10) mtpSlL3ProfilePackage
---       |__(11) mtpSpProfilePackage
---       |__(12) mtpRtPackage
---       |__(13) mtpRsPackage
---       |__(14) mtpStPackage
---       |__(15) mtpGsPkg
---       |__(16) mtpGsLinePkg
---       |__(17) administrativeStatePackage
---       |__(18) bufferMechanismPackage
---       |__(19) cICPackage
---       |__(20) clsLoadsharingInformationPackage
---       |__(21) congestedStatePackage
---       |__(22) congestionHandlingPackage
---       |__(23) congestionLevelPackage
---       |__(24) getScreenedOpcsOrLinkSetsByDpcActionPackage
---       |__(25) fixedRouteNePartPriorityPackage
---       |__(26) flexibleRouteNePartPriorityPackage
---       |__(27) inLsLoadShareAlgorithmPackage
---       |__(28) linkCongestionLevelPackage
---       |__(29) loadsharingInformationRouteNePartPackage
---       |__(30) loadsharingInformationRouteSetNePartPackage
---       |__(31) loopDelayPackage
---       |__(32) mtpLsProfileNamePackage
---       |__(33) mtpLsProfilePointerPackage
---       |__(34) managedSwitchingElementNamePackage
---       |__(35) mtpSapNamePackage
---       |__(36) mtpSlL2ProfileNamePackage
---       |__(37) mtpL3NamePackage
---       |__(38) mtpLoadsharingObjectForRouteNePartPointerPackage
---       |__(39) mtpLoadsharingObjectForRouteSetNePartPointerPackage
---       |__(40) mtpSpNamePackage
---       |__(41) multipleTransmissionCongestionLevelsPackage
---       |__(42) multipleTransmissionCongestionLevelsWithPrioPackage
---       |__(43) multipleTransmissionCongestionStatesPackage
---       |__(44) noBasicLinkAllocationPackage
---       |__(45) pCRPackage
---       |__(46) receiveCongestionLevelsPackage
---       |__(47) relatedLinkGroupNumberPackage
---       |__(48) remoteExchangeLabelPackage
---       |__(49) mtpSdlListPackage
---       |__(50) mtpSdlNamePackage
---       |__(51) mtpLsNamePackage
---       |__(52) mtpSignLinkTestPackage
---       |__(53) mtpSlNamePackage
---       |__(54) mtpRtNamePackage
---       |__(55) mtpRsNamePackage
---       |__(56) mtpStListPackage
---       |__(57) mtpStNamePackage
---       |__(58) slsCodeNormalListPackage
---       |__(59) slsListPackage
---       |__(60) mtpSlL3ProfileNamePackage
---       |__(61) mtpSlL3ProfilePointerPackage
---       |__(62) mtpRestartingNotification
---       |__(63) mtpSpTimersPackage
---       |__(64) mtpSpProfileNamePackage
---       |__(65) mtpSpProfilePointerPackage
---       |__(66) ss7OnOccEventPackage
---       |__(67) stmChannelPackage
---       |__(68) mtpGsNamePackage
---       |__(69) usageStatePackage
---       |__(70) adjPcPackage
---       |__(71) broadbandSpecificPackage
---       |__(72) egressTransmissionRateIntervalPackage
---       |__(73) longMessageSupportedPackage
---       |__(74) narrowbandSpecificPackage
---       |__(75) pollAfterRetransmissionPackage
---       |__(76) mtpSaalProfilePackage
---       |__(77) saalSdlPackage
---       |__(78) saalSlPackage
---       |__(79) m2paSctpDefaultsPackage
---       |__(80) mtpM2paProfilePkg
---       |__(81) m2paProvingPackage
---       |__(82) providerEntityNamesPackage
---       |__(83) mtpRestartingParameters
---       |__(84) ss7OnOccEventParameters
---       |__(85) mtpSapAsaPointerPackage
---       |__(86) mtpL3AsaPointerPackage
---       |__(87) mtpSlAsaPointerPackage
---       |__(88) mtpRsAsaPointerPackage
---       |__(89) mtpLsAsaPointerPackage
-
 
 -- ====================================================================
 -- TEXTUAL CONVENTIONS
@@ -1139,14 +344,14 @@ GraphicString ::= TEXTUAL-CONVENTION
         "The GraphicString of ASN.1."
     SYNTAX      OCTET STRING
 
-Ss7LoadShareAlgorithm ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION 
-        "This is a SS7 load sharing algorithm as identified by the SS7 
-         MTP GDMOs."
-    REFERENCE   
-        "ITU-T Rec. Q.751.1 (1997)"
-    SYNTAX      OBJECT IDENTIFIER
+-- Ss7LoadShareAlgorithm ::= TEXTUAL-CONVENTION
+--     STATUS      current
+--     DESCRIPTION 
+--         "This is a SS7 load sharing algorithm as identified by the SS7 
+--          MTP GDMOs."
+--     REFERENCE   
+--         "ITU-T Rec. Q.751.1 (1997)"
+--     SYNTAX      OBJECT IDENTIFIER
 
 SlsCode ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "d"
@@ -1534,8 +739,8 @@ MtpSiMask ::= TEXTUAL-CONVENTION
           - user14(14), user part 14;
           - user15(15), user part 15.
          
-         Objects that have a SYNTAX     clause with this textual convention 
-         normally have a MAX-ACCESS     clause of read-write or read-create."
+         Objects that have a SYNTAX clause with this textual convention 
+         normally have a MAX-ACCESS clause of read-write or read-create."
     SYNTAX      BITS { snmm(0), sntm(1), snsm(2), sccp(3), tup(4), 
                     isup(5), dup1(6), dup2(7), mtup(8), bisup(9), 
                     siup(10), spneup(11), stc(12), user13(13), 
@@ -2109,8 +1314,6 @@ mtpNaProtocolVariant OBJECT-TYPE
          field with an object identifier that the agent does not 
          recognize.  The default is the current ITU-T standards 
          specifications."
-    REFERENCE   
-        ""
     DEFVAL      { ss7ProtocolItut }
     ::= { mtpNaEntry 2 }
 
@@ -2325,7 +1528,7 @@ mtpNaPointCodeFormat OBJECT-TYPE
          ETSI 300 008-1.
          ITU-T Rec. Q.703, ANSI T1.111.3.
          ITU-T Rec. Q.703 (07/96)."
-    DEFVAL      { '030803'H }
+    DEFVAL      { "\x03\x08\x03" }
     ::= { mtpNaEntry 6 }
 
 mtpNaSlsLength OBJECT-TYPE
@@ -2380,8 +1583,6 @@ mtpNaSpDefault OBJECT-TYPE
          When null, it specifies that a signalling point protocol 
          profile must be specified when creating signalling points that 
          appear in this network."
-    REFERENCE   
-        ""
     DEFVAL      { "" }
     ::= { mtpNaEntry 8 }
 
@@ -2519,8 +1720,6 @@ mtpMsId OBJECT-TYPE
         "This attribute is used for naming instances.  Provides a 
          Managed Switching Element identifier used to name managed 
          objects in this table."
-    REFERENCE   
-        ""
     ::= { mtpMsEntry 1 }
 
 mtpMsName OBJECT-TYPE
@@ -3855,7 +3054,7 @@ mtpSpPointCode OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), pointCode 
              attribute."
-    DEFVAL      { '00000000'H }
+    DEFVAL      { "\x00\x00\x00\x00" }
     ::= { mtpSpEntry 2 }
 
 mtpSpType OBJECT-TYPE
@@ -4086,8 +3285,6 @@ mtpSpNaPointer OBJECT-TYPE
          operational signalling points.  The manged system might also 
          refuse to alter this object while the operational state is 
          other than disabled(0)."
-    REFERENCE   
-        ""
     ::= { mtpSpEntry 11 }
 
 mtpSpOptions OBJECT-TYPE
@@ -4699,7 +3896,11 @@ mtpGsLineEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each entry in this table is indexed by the gateway 
+         screening line identifier for the gateway screening 
+         table for a signalling point in a managed switching 
+         element.  Each row contains the line pointer and 
+         content."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          stpScreeningTableLine MO."
@@ -4885,7 +4086,7 @@ mtpGsLineContentDesignatedDPCFirst OBJECT-TYPE
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), ASN.1 
          StpScreeningTableLineContent .StpScreeningElement 
          .designatedDPC .dpcRange .firstDPC"
-    DEFVAL      { '00000000'H }
+    DEFVAL      { "\x00\x00\x00\x00" }
     ::= { mtpGsLineContentEntry 2 }
 
 mtpGsLineContentDesignatedDPCLast OBJECT-TYPE
@@ -4914,7 +4115,7 @@ mtpGsLineContentDesignatedDPCLast OBJECT-TYPE
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), ASN.1 
          StpScreeningTableLineContent .StpScreeningElement 
          .designatedDPC .dpcRange .lastDPC"
-    DEFVAL      { '00000000'H }
+    DEFVAL      { "\x00\x00\x00\x00" }
     ::= { mtpGsLineContentEntry 3 }
 
 mtpGsLineContentSiMask OBJECT-TYPE
@@ -5225,7 +4426,15 @@ mtpRsProfileRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a mechanism whereby management stations may create and 
+         delete entries in this table.  This object is used by a 
+         management station SET operation to create a new entry in this 
+         table.
+         
+         If the name package is supported: a create request with a value 
+         for the name attribute that is already used by another instance 
+         of the same object class will be rejected.  A delete request is 
+         rejected when the profile referenced from another table."
     REFERENCE   
         "STD 58, SNMPv2-TC RowStatus."
     ::= { mtpRsProfileEntry 9 }
@@ -5361,8 +4570,10 @@ mtpRsDest OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    DEFVAL      { '00000000'H }
+        "Provides the network point code that represents the 
+         destination signalling point code used on the route 
+         set."
+    DEFVAL      { "\x00\x00\x00\x00" }
     ::= { mtpRsEntry 2 }
 
 mtpRsOptions OBJECT-TYPE
@@ -5430,8 +4641,7 @@ mtpRsOperationalState OBJECT-TYPE
            unavailability of all routes in the route set;
          
          - enabled(1), the destination is accessible: at least one 
-           signalling route in the route set is available.
-        "
+           signalling route in the route set is available."
     REFERENCE   
         "ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992, 
              Attribute-ASN1Module.OperationalState.
@@ -7208,25 +6418,25 @@ mtpLsEntry OBJECT-TYPE
 -- conditional clsLoadsharingInformationPackage.
 
 MtpLsEntry ::= SEQUENCE {
-    mtpLsId                             Unsigned32,
-    mtpLsAdjPc                          NetworkPointCode,
-    mtpLsRsId                           RowPointer,
-    mtpLsMaxCapacity                    Unsigned32,
-    mtpLsCurrentCapacity                Unsigned32,
-    mtpLsCongestionControlMethod        INTEGER,
-    mtpLsUsageState                     UsageState,
-    mtpLsOperationalState               OperationalState,
-    mtpLsAvailabilityStatus             AvailabilityStatus,
-    mtpLsPeriodicLinkTestFlag           INTEGER,
-    mtpLsPeriodicLinkTestFail           TruthValue,
-    mtpLsAdministrativeState            AdministrativeState,
-    mtpLsInLsLoadShareAlgorithm         AutonomousType,
-    mtpLsProfilePointer                 SimpleNameType,
-    mtpLsNumberOfNormallyActiveSignLinks Unsigned32,
-    mtpLsName                           CommonLanguageName,
-    mtpLsAsaProfilePointer              RowPointer,
-    mtpLsAlarmStatus                    AlarmStatus,
-    mtpLsRowStatus                      RowStatus
+    mtpLsId                                 Unsigned32,
+    mtpLsAdjPc                              NetworkPointCode,
+    mtpLsRsId                               RowPointer,
+    mtpLsMaxCapacity                        Unsigned32,
+    mtpLsCurrentCapacity                    Unsigned32,
+    mtpLsCongestionControlMethod            INTEGER,
+    mtpLsUsageState                         UsageState,
+    mtpLsOperationalState                   OperationalState,
+    mtpLsAvailabilityStatus                 AvailabilityStatus,
+    mtpLsPeriodicLinkTestFlag               INTEGER,
+    mtpLsPeriodicLinkTestFail               TruthValue,
+    mtpLsAdministrativeState                AdministrativeState,
+    mtpLsInLsLoadShareAlgorithm             AutonomousType,
+    mtpLsProfilePointer                     SimpleNameType,
+    mtpLsNumberOfNormallyActiveSignLinks    Unsigned32,
+    mtpLsName                               CommonLanguageName,
+    mtpLsAsaProfilePointer                  RowPointer,
+    mtpLsAlarmStatus                        AlarmStatus,
+    mtpLsRowStatus                          RowStatus
 }
 
 mtpLsId OBJECT-TYPE
@@ -7262,7 +6472,7 @@ mtpLsAdjPc OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), adjPc 
              attribute."
-    DEFVAL      { '00000000'H }
+    DEFVAL      { "\x00\x00\x00\x00" }
     ::= { mtpLsEntry 2 }
 
 mtpLsRsId OBJECT-TYPE
@@ -8735,8 +7945,6 @@ mtpSlL3ProfileL2Default OBJECT-TYPE
         "Specifies an entry in the mtpSlL2ProfileTable that provides the 
          default mtpSlL2ProfileEntry for use during the creation of new 
          signalling links using this profile."
-    REFERENCE   
-        ""
     DEFVAL      { "" }
     ::= { mtpSlL3ProfileEntry 25 }
 
@@ -8863,7 +8071,8 @@ mtpSlL2ProfileTransmissionRate OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Specifies the MTP transmission rate that is applicable 
+         to this signalling link level 2 profile."
     REFERENCE   
         "ITU-T Rec. Q.703 (1996).  ANSI T1.111.3/2000.  ETSI 300 008-1."
     ::= { mtpSlL2ProfileEntry 2 }
@@ -10494,7 +9703,7 @@ mtpSlSlsCodeNormalList OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          slsCodeNormalList attribute."
-    DEFVAL      { 'ffff'H }
+    DEFVAL      { "\xFF\xFF" }
     ::= { mtpSlEntry 24 }
 
 mtpSlL3ProfilePointer OBJECT-TYPE
@@ -10731,8 +9940,6 @@ mtpNbTable OBJECT-TYPE
     DESCRIPTION 
         "Provides an auxillary table of narrowband specific MTP Level 2 
          protocol profile information for Signalling Terminals."
-    REFERENCE   
-        ""
     ::= { mtpSdt 1 }
 
 mtpNbEntry OBJECT-TYPE
@@ -10744,8 +9951,6 @@ mtpNbEntry OBJECT-TYPE
          mtpSlL2ProfileTable which provides the common MTP Level 2 
          protocol profile information whereas each of these entries 
          provides narrowband signalling link specific information."
-    REFERENCE   
-        ""
     INDEX       { mtpSdtProfileId }
     ::= { mtpNbTable 1 }
 
@@ -10774,8 +9979,6 @@ mtpSdtProfileId OBJECT-TYPE
     DESCRIPTION 
         "Provides a signalling terminal protocol profile index for the 
          narrowband, ATM SAAL and M2PA protocol profile tables."
-    REFERENCE   
-        ""
     ::= { mtpNbEntry 1 }
 
 mtpNbTransmissionRate OBJECT-TYPE
@@ -11587,8 +10790,6 @@ mtpM2paProving OBJECT-TYPE
          accordance with Q.703, ANSI T1.111.3, and optional Q.2140 
          procedures, or whether the M2PA signalling link will, when 
          false(2), forego proving althogether."
-    REFERENCE   
-        ""
     DEFVAL      { true }
     ::= { mtpM2paEntry 2 }
 
@@ -11621,8 +10822,6 @@ mtpM2paProvingAttempts OBJECT-TYPE
         "Defines the number of unsuccesful proving attempts that will be 
          conducted during link alignment before the alignment procedures 
          will be considered unsuccessful."
-    REFERENCE   
-        ""
     DEFVAL      { 4 }
     ::= { mtpM2paEntry 4 }
 
@@ -11997,8 +11196,6 @@ mtpM2paLoopDelayLower OBJECT-TYPE
          overlap in conjunction with another pair of ranges belonging to 
          another entry belonging to the same managed switching system 
          and network entity."
-    REFERENCE   
-        ""
     DEFVAL      { 0 } -- 0 milliseconds
     ::= { mtpM2paEntry 20 }
 
@@ -12017,8 +11214,6 @@ mtpM2paLoopDelayUpper OBJECT-TYPE
          overlap in conjunction with another pair of ranges belonging to 
          another entry belonging to the same managed switching system 
          and network entity."
-    REFERENCE   
-        ""
     DEFVAL      { 600 } -- 600 milliseconds
     ::= { mtpM2paEntry 21 }
 
@@ -12037,8 +11232,6 @@ mtpM2paTransmissionRateIntervalLower OBJECT-TYPE
          cannot overlap in conjunction with another pair of ranges 
          belonging to another entry belonging to the same managed 
          switching element and network entity."
-    REFERENCE   
-        ""
     DEFVAL      { 1544000 }
     ::= { mtpM2paEntry 22 }
 
@@ -12057,8 +11250,6 @@ mtpM2paTransmissionRateIntervalUpper OBJECT-TYPE
          cannot overlap in conjunction with another pair of ranges 
          belonging to another entry belonging to the same managed 
          switching element and network entity."
-    REFERENCE   
-        ""
     DEFVAL      { 155000000 }
     ::= { mtpM2paEntry 23 }
 
@@ -12353,8 +11544,6 @@ mtpSdtPrimaryId OBJECT-TYPE
          to which this signalling data terminal is a backup.  When there 
          is no primary-secondary relationship, this object contains the 
          value zero (0)."
-    REFERENCE   
-        ""
     ::= { mtpSdtEntry 11 }
 
 mtpSdtProfilePointer OBJECT-TYPE
@@ -12366,8 +11555,6 @@ mtpSdtProfilePointer OBJECT-TYPE
          be used with the signalling terminal.  This points to an entry 
          in the mtpNbTable, an entry in the mtpSaalTable or a entry in 
          the mtpM2paTable, as appropriate."
-    REFERENCE   
-        ""
     DEFVAL      { zeroDotZero }
     ::= { mtpSdtEntry 12 }
 
@@ -12501,7 +11688,7 @@ mtpSdlAdjPc OBJECT-TYPE
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), adjPc 
              attribute."
-    DEFVAL      { '00000000'H }
+    DEFVAL      { "\x00\x00\x00\x00" }
     ::= { mtpSdlEntry 3 }
 
 mtpSdlLoopDelay OBJECT-TYPE
@@ -12630,7 +11817,7 @@ mtpSdlStmChannel OBJECT-TYPE
             signDataLinkTp::stmChannel ATTRIBUTE.
          ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
             MTPDefinedTypesModule.StmChannel."
-    DEFVAL      { '13'H } -- channel 19
+    DEFVAL      { "\x13" } -- channel 19
     ::= { mtpSdlEntry 9 }
 
 mtpSdlVcTTpPointer OBJECT-TYPE
@@ -12729,9 +11916,17 @@ mtpSctpProfileTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an SCTP protocol profile for SIGTRAN 
+         associations.
+         
+         An SCTP profile is a set of SCTP protocol parameters 
+         which are related to characteristics of SCTP 
+         associations.  The managed object class is a support 
+         managed object class that can be instantiated to define 
+         a particular profile.  At creation time of an 
+         mtpSctpProfile one of the parameters may be referenced."
     REFERENCE   
-        ""
+        "RFC 4960"
     ::= { mtpSctp 1 }
 
 mtpSctpProfileEntry OBJECT-TYPE
@@ -12739,9 +11934,10 @@ mtpSctpProfileEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each entry in the table provides a single SCTP protocol 
+         parameter profile."
     REFERENCE   
-        ""
+        "RFC 4960"
     INDEX       { mtpSctpProfileId }
     ::= { mtpSctpProfileTable 1 }
 
@@ -12772,9 +11968,16 @@ mtpSctpProfileId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides an index into the SCTP profile table.  Rows in 
+         this table can be referred to using this index or using 
+         the RowPointer pointer.  The index value zero (0) has 
+         special semantics: the zero index contains default 
+         default values.
+         
+         Provides a naming attribute for the SCTP profile table.  
+         This attribute is used for naming instances."
     REFERENCE   
-        ""
+        "RFC 4960"
     ::= { mtpSctpProfileEntry 1 }
 
 mtpSctpProfileNoDelay OBJECT-TYPE
@@ -13199,8 +12402,6 @@ mtpSctpTable OBJECT-TYPE
          - M2PA signalling links,
          - M2UA signalling links,
          - M3UA signalling links equivalents."
-    REFERENCE   
-        ""
     ::= { mtpSctp 2 }
 
 mtpSctpEntry OBJECT-TYPE
@@ -13215,8 +12416,6 @@ mtpSctpEntry OBJECT-TYPE
          SCTP association.  Other columns provide all of the information 
          necessary for the managed system to create an instance of an 
          SCTP association and provides information on the association."
-    REFERENCE   
-        ""
     INDEX       { mtpSctpId }
     ::= { mtpSctpTable 1 }
 
@@ -13242,8 +12441,6 @@ mtpSctpId OBJECT-TYPE
          mtpSctpTable.  Although there is no requirement for this index 
          to be unique outside of the MTP, it may be.  That is, this 
          index may be the association identity from the SCTP mib."
-    REFERENCE   
-        ""
     ::= { mtpSctpEntry 1 }
 
 mtpSctpAdministrativeState OBJECT-TYPE
@@ -13345,8 +12542,6 @@ mtpSctpLocalPort OBJECT-TYPE
          association.  The local port number zero (0) is used for 
          dynamic port allocation: i.e., when the precise local port 
          number used to form the connection is not of importance."
-    REFERENCE   
-        ""
     DEFVAL      { 0 } -- dynamic allocation
     ::= { mtpSctpEntry 6 }
 
@@ -13363,8 +12558,6 @@ mtpSctpRemotePort OBJECT-TYPE
          - M2PA, xxxx
          - M2UA, xxxx
          - M3UA, xxxx"
-    REFERENCE   
-        ""
     ::= { mtpSctpEntry 7 }
 
 mtpSctpProfile OBJECT-TYPE
@@ -13374,8 +12567,6 @@ mtpSctpProfile OBJECT-TYPE
     DESCRIPTION 
         "Provides a reference to an SCTP protocol profile entry in the 
          mtpSctpProfileTable."
-    REFERENCE   
-        ""
     DEFVAL      { "" }
     ::= { mtpSctpEntry 8 }
 
@@ -13428,9 +12619,9 @@ mtpSctpLocalEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Each row in this table is indexed by the SCTP 
+         association identifier and a local address index.  Each 
+         row contains one local IP address for the association."
     INDEX       { mtpSctpId, mtpSctpLocalId }
     ::= { mtpSctpLocalTable 1 }
 
@@ -13445,9 +12636,10 @@ mtpSctpLocalId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides an ordinal index of the local IP address 
+         associated with a given SCTP association.  This index, 
+         on its own, only uniquely identifies a local IP address 
+         within a given SCTP association."
     ::= { mtpSctpLocalEntry 1 }
 
 mtpSctpLocalAddress OBJECT-TYPE
@@ -13455,9 +12647,8 @@ mtpSctpLocalAddress OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides one of the local IP addresses belonging to an 
+         SCTP association."
     ::= { mtpSctpLocalEntry 2 }
 
 mtpSctpLocalRowStatus OBJECT-TYPE
@@ -13465,9 +12656,11 @@ mtpSctpLocalRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provide a mechanism whereby management stations may create and 
+         delete entries in this table.  All entries created by 
+         management survive an agent reboot."
     REFERENCE   
-        ""
+        "STD 58, SNMPv2-TC RowStatus."
     ::= { mtpSctpLocalEntry 3 }
 
 -- ====================================================================
@@ -13486,9 +12679,10 @@ mtpSctpRemoteEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Each row in this table is indexed by the SCTP 
+         association identifier and a remote address index.  
+         Each row contains one remote IP address for the 
+         association."
     INDEX       { mtpSctpId, mtpSctpRemoteId }
     ::= { mtpSctpRemoteTable 1 }
 
@@ -13503,9 +12697,10 @@ mtpSctpRemoteId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides an ordinal index of the remote IP address 
+         associated with a given SCTP association.  This index, 
+         on its own, only uniquely identifies a remote IP 
+         address within a given SCTP association."
     ::= { mtpSctpRemoteEntry 1 }
 
 mtpSctpRemoteAddress OBJECT-TYPE
@@ -13513,9 +12708,8 @@ mtpSctpRemoteAddress OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides one of the remote IP addresses belonging to an 
+         SCTP association."
     ::= { mtpSctpRemoteEntry 2 }
 
 mtpSctpRemoteRowStatus OBJECT-TYPE
@@ -13523,9 +12717,11 @@ mtpSctpRemoteRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provide a mechanism whereby management stations may create and 
+         delete entries in this table.  All entries created by 
+         management survive an agent reboot."
     REFERENCE   
-        ""
+        "STD 58, SNMPv2-TC RowStatus."
     ::= { mtpSctpRemoteEntry 3 }
 
 -- ====================================================================
@@ -13548,7 +12744,9 @@ mtpM2uaAspEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in this table is indexed by SCTP association 
+         identifier.  Each row contains information about the 
+         M2UA ASP-SG association."
     REFERENCE   
         "RFC 3331"
     INDEX       { mtpSctpId }
@@ -13574,7 +12772,7 @@ mtpM2uaAspState OBJECT-TYPE
     DESCRIPTION 
         "Provides the ASP state for the M2UA SCTP association, using the 
          AspState textual convention of the OPENSS7-SIGTRAN-TC module.  
-         It is single-valued and can have on of the following values:
+         It is single-valued and can have one of the following values:
          
          - down(1), the ASP is in the ASP-DOWN state.
          - initializing(2), the ASP is waiting for the ASP Up procedure 
@@ -13611,8 +12809,6 @@ mtpM2uaAspId OBJECT-TYPE
         "Provides the ASP Identifier to be provided to the SG in the ASP 
          Up message that identifies this ASP to the SG, depending on the 
          value of mtpM2uaAspSgAspIdPolicy."
-    REFERENCE   
-        ""
     DEFVAL      { 0 }
     ::= { mtpM2uaAspEntry 2 }
 
@@ -13632,8 +12828,6 @@ mtpM2uaAspCapabilities OBJECT-TYPE
          - dynamic(7), ASP supports dynamic registration;
          - aspcong(8), ASP supports draft-bidulock-sigtran-aspcong;
          - textiid(9), ASP supports text-based interface identifiers."
-    REFERENCE   
-        ""
     ::= { mtpM2uaAspEntry 3 }
 
 mtpM2uaAspSgVersion OBJECT-TYPE
@@ -13668,8 +12862,6 @@ mtpM2uaAspSgOptions OBJECT-TYPE
          - dynamic(7), SG supports dynamic registration;
          - aspcong(8), SG supports draft-bidulock-sigtran-aspcong;
          - textiid(9), SG supports text-based interface identifiers."
-    REFERENCE   
-        ""
     ::= { mtpM2uaAspEntry 5 }
 
 mtpM2uaAspSgRegistrationPolicy OBJECT-TYPE
@@ -13682,8 +12874,6 @@ mtpM2uaAspSgRegistrationPolicy OBJECT-TYPE
          - forbidden(2),
          - permitted(3),
          - required(4),"
-    REFERENCE   
-        ""
     ::= { mtpM2uaAspEntry 6 }
 
 mtpM2uaAspSgAspIdPolicy OBJECT-TYPE
@@ -13696,8 +12886,6 @@ mtpM2uaAspSgAspIdPolicy OBJECT-TYPE
          - permitted(2),
          - required(3),
          - forbidden(4),"
-    REFERENCE   
-        ""
     DEFVAL      { unknown }
     ::= { mtpM2uaAspEntry 7 }
 
@@ -13711,8 +12899,6 @@ mtpM2uaAspAssociationPolicy OBJECT-TYPE
          - always(2),
          - ondemand(3),
          - other(4),"
-    REFERENCE   
-        ""
     DEFVAL      { unknown }
     ::= { mtpM2uaAspEntry 8 }
 
@@ -13721,9 +12907,14 @@ mtpM2uaAspProtocolPayloadId OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides the protocol payload identifier used on the 
+         SCTP association.  Per the M2UA specfication, this can 
+         either be zero (0) or the payload protocol identifier 
+         assigned to M2UA by IANA.  However, the agent may 
+         permit setting this object to any other value also."
+    REFERENCE
+        "RFC 3332"
+    DEFVAL      { 0 }
     ::= { mtpM2uaAspEntry 9 }
 
 mtpM2uaAspRowStatus OBJECT-TYPE
@@ -13731,9 +12922,11 @@ mtpM2uaAspRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provide a mechanism whereby management stations may create and 
+         delete entries in this table.  All entries created by 
+         management survive an agent reboot."
     REFERENCE   
-        ""
+        "STD 58, SNMPv2-TC RowStatus."
     ::= { mtpM2uaAspEntry 10 }
 
 -- ====================================================================
@@ -13796,8 +12989,6 @@ mtpM2uaAsId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         "Provides a non-zero ordinal index into the table."
-    REFERENCE   
-        ""
     ::= { mtpM2uaAsEntry 1 }
 
 mtpM2uaAsState OBJECT-TYPE
@@ -13839,7 +13030,13 @@ mtpM2uaInterfaceIdentifierText OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the M2UA Interface Identifier (IID) that is used to 
+         identify the corresponding signalling link at the M2UA SG.  
+         When this string consists of a decimal number, the integer IID 
+         will be used.  When it consists of a alpha-numeric string, the 
+         text IID will be used.  When this is specified as NULL, and no 
+         SDTI/SDLI is specified, operations as a default ASP is 
+         assumed."
     REFERENCE   
         "RFC 3331"
     ::= { mtpM2uaAsEntry 4 }
@@ -13891,9 +13088,10 @@ mtpM3uaAspTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "This side-table provides the M3UA characteristics that 
+         are specific to the SCTP association, including 
+         characteristics associated with the SG (or IPSP) at the 
+         other end of the SCTP association."
     ::= { mtpSctp 7 }
 
 mtpM3uaAspEntry OBJECT-TYPE
@@ -13901,9 +13099,9 @@ mtpM3uaAspEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Each row in this table is indexed by SCTP association 
+         identifier.  Each row contains information about the 
+         M3UA ASP-SG or IPSP-IPSP association."
     INDEX       { mtpSctpId }
     ::= { mtpM3uaAspTable 1 }
 
@@ -13926,9 +13124,38 @@ mtpM3uaAspState OBJECT-TYPE
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ASP state for the M3UA SCTP association, 
+         using the AspState textual convention of the 
+         OPENSS7-SIGTRAN-TC module.  It is single-valud and can 
+         have one of the following values:
+         
+         - down(1), the ASP is in the ASP-DOWN state.
+         - initializing(2), the ASP is waiting for the ASP Up procedure 
+           to complete.
+         - terminating(3), the ASP is waiting for the ASP Down procedure 
+           to complete.
+         - up(4), the ASP is in the ASP-UP state.
+
+         This provides the ASP state for the ASP for the ASP-SG 
+         association following the AspState textual convention.  
+         When down, the ASP is in the ASP-DOWN state for the 
+         association or the association does not exist.  When 
+         initializing, the ASP is performing the ASP Up 
+         procedure.  When terminating, the ASP is performing the 
+         ASP Down procedure.  When up, the ASP is in the ASP-UP 
+         state.
+
+         When the management station sets this column to down 
+         from the up state, the ASP will execute the ASP Down 
+         procedure (but the association will not be dropped).  
+         When set to up from the down state, the ASP will 
+         execute the ASP Up procedure.  Be forewarned that the 
+         ASP will attempt to return itself to the previous 
+         state.  For a stable adminstrative control, use the 
+         AdministrativeState column."
     REFERENCE   
         "RFC 4666"
+    DEFVAL      { down }
     ::= { mtpM3uaAspEntry 1 }
 
 mtpM3uaAsType OBJECT-TYPE
@@ -13936,7 +13163,16 @@ mtpM3uaAsType OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the type of M3UA entity attached at the local 
+         end of the SCTP association.  The type is single-valued 
+         and can assume one of the following values:
+         
+         - asp(0), the local end of the SCTP association is an 
+           application server process (ASP);
+         - ipsp(1), the local (and remote) end of the SCTP 
+           association is an IP signalling point (IPSP);
+         - sgp(2), the local end of the SCTP association is 
+           a signalling gateway process (SGP)."
     REFERENCE   
         "RFC 4666"
     DEFVAL      { ipsp }
@@ -13947,7 +13183,9 @@ mtpM3uaAspId OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ASP Identifier to be provided to the SG in 
+         the ASP Up message that identifies this ASP to the SG, 
+         depending on the value of mtpM3uaAspAgAspIdPolicy."
     REFERENCE   
         "RFC 4666"
     ::= { mtpM3uaAspEntry 3 }
@@ -14058,7 +13296,11 @@ mtpM3uaAspProtocolPayloadId OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the protocol payload identifier used on the 
+         SCTP association.  Per the M3UA specfication, this can 
+         either be zero (0) or the payload protocol identifier 
+         assigned to M3UA by IANA.  However, the agent may 
+         permit setting this object to any other value also."
     REFERENCE   
         "RFC 4666"
     ::= { mtpM3uaAspEntry 10 }
@@ -14068,9 +13310,11 @@ mtpM3uaAspRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provide a mechanism whereby management stations may create and 
+         delete entries in this table.  All entries created by 
+         management survive an agent reboot."
     REFERENCE   
-        "RFC 4666"
+        "STD 58, SNMPv2-TC RowStatus."
     ::= { mtpM3uaAspEntry 11 }
 
 -- ====================================================================
@@ -14126,9 +13370,7 @@ mtpM3uaAsId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides a non-zero ordinal index into the table."
     ::= { mtpM3uaAsEntry 1 }
 
 mtpM3uaAsState OBJECT-TYPE
@@ -14154,7 +13396,10 @@ mtpM3uaAsRoutingContext OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the M3UA Routing COntext (RC) that is used to 
+         identify the corresponding route set at the M3UA SG.  
+         When specified as zero (9), and no routing key is 
+         specified, operation as a default ASP is assumed."
     REFERENCE   
         "RFC 4666"
     ::= { mtpM3uaAsEntry 3 }
@@ -14164,7 +13409,10 @@ mtpM3uaAsNetworkAppearance OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the M3UA Network Appearance (NA) associated 
+         with this signalling point for use in registration.  
+         Note that the network appearance is provided by an 
+         entry in the mtpNaTable."
     REFERENCE   
         "RFC 4666"
     ::= { mtpM3uaAsEntry 4 }
@@ -14174,7 +13422,10 @@ mtpM3uaAsNetworkPointCode OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the M3UA Signalling Point Code (SPC) 
+         associated with this signalling point for use in 
+         registration.  Note that the signalling point code is 
+         provided by an entry in the mtpSpTable."
     REFERENCE   
         "RFC 4666"
     ::= { mtpM3uaAsEntry 5 }
@@ -14184,7 +13435,11 @@ mtpM3uaAsTrafficMode OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the traffic mode for the application server.  
+         The syntax is an autonomous type that may be one of 
+         activeStandby, loadShare, broadCast, or another 
+         implementation-specified object identifier known to the 
+         agent."
     REFERENCE   
         "RFC 4666"
     ::= { mtpM3uaAsEntry 6 }
@@ -14575,7 +13830,7 @@ mtpDefaultSctpAssocMaxRetrans OBJECT-TYPE
     ::= { mtpDefaults 13 }
 
 mtpDefaultSctpSackDelay OBJECT-TYPE
-    SYNTAX      MilliSeconds (0..50)
+    SYNTAX      MilliSeconds (0..500)
     UNITS       "seconds"
     MAX-ACCESS  read-write
     STATUS      current
@@ -14592,7 +13847,7 @@ mtpDefaultSctpSackDelay OBJECT-TYPE
          set, the scalar value must persist across system reboots."
     REFERENCE   
         "RFC 4960 15. 6.2"
-    DEFVAL      { 20 }
+    DEFVAL      { 200 }
     ::= { mtpDefaults 14 }
 
 mtpDefaultSctpLifetime OBJECT-TYPE
@@ -14636,7 +13891,9 @@ oldLs OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 
-        ""
+        "This parameter identifies the old signalling link set 
+         termination point for a forced or controlled rerouting 
+         notification."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          MTPDefinedTypesModule.ChangeInLsToAdjSp.oldSignLinkSetTp."
@@ -14648,7 +13905,9 @@ newLs OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 
-        ""
+        "This parameter identifies the new signalling link set 
+         termination point for a forced or controlled rerouting 
+         notification."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          MTPDefinedTypesModule.ChangeInLsToAdjSp.newSignLinkSetTp."
@@ -14660,7 +13919,9 @@ inaccessibleSp OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 
-        ""
+        "This parameter identifies the signalling point code of 
+         the inaccessible signalling point for an inaccessible 
+         signalling point notification."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), inaccessibleSp 
          parameter."
@@ -14672,7 +13933,8 @@ remoteUnavailableUserPart OBJECT-TYPE
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the unavailable remote MTP user part for an 
+         unavailable remote MTP user part notification."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          remoteUserPartUnavailable parameter."
@@ -14733,7 +13995,6 @@ linkFailureReason OBJECT-TYPE
 -- ====================================================================
 
 -- Protocols
-
 
 mtpOids OBJECT IDENTIFIER
     ::= { mtpObjects 4 }
@@ -15827,7 +15088,8 @@ mtpRestarting NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance, mtpSpPointCode }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is used to report a signalling point 
+         whose MTP is restarting."
     ::= { mtpNotifications 1 }
 
 ss7OnOccEvent NOTIFICATION-TYPE
@@ -16011,7 +15273,8 @@ slEventRestoration NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever a signalling link 
+         is restored."
     REFERENCE   
         "ITU-T Rec. Q.752/ANSI T1.116 Table 2/1.12"
     ::= { mtpNotifications 19 }
@@ -16061,7 +15324,9 @@ slEventLocalInhibitionStop NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever local inhibition 
+         of a signalling link has stopped.  The parameters are 
+         the signalling link index and its name."
     REFERENCE   
         "ITU-T Rec. Q.752/ANSI T1.116 Table 2/2.17"
     ::= { mtpNotifications 23 }
@@ -16070,7 +15335,9 @@ slEventRemoteInhibitionStart NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever remote inhibition 
+         starts for a signalling link.  The parameters are the 
+         signalling link index and its name."
     REFERENCE   
         "ITU-T Rec. Q.752/ANSI T1.116 Table 2/2.18"
     ::= { mtpNotifications 24 }
@@ -16079,7 +15346,9 @@ slEventRemoteInhibitionStop NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever remote inhibition 
+         of a signalling link stops.  The parameters are the 
+         signalling link index and its name."
     REFERENCE   
         "ITU-T Rec. Q.752/ANSI T1.116 Table 2/2.19"
     ::= { mtpNotifications 25 }
@@ -16159,7 +15428,10 @@ lkEventSendTFP NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever 
+         a transfer-prohibited message is sent on a combined 
+         link set.  The parameter is the combined link set 
+         identifier."
     REFERENCE   
         "ITU-T Rec. Q.752/ANSI T1.116 Table 2/4.5"
     ::= { mtpNotifications 31 }
@@ -16168,7 +15440,9 @@ lkEventSendTFA NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever a transfer-allowed 
+         message is sent on a combind link set.  The parameter 
+         is the combined link set identifier."
     REFERENCE   
         "ITU-T Rec. Q.752/ANSI T1.116 Table 2/4.6"
     ::= { mtpNotifications 32 }
@@ -16177,7 +15451,9 @@ rsEventUnavailableStart NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever a signalling route 
+         set becomes unavailable.  The parameter is the 
+         signalling route set identifier."
     REFERENCE   
         "ITU-T Rec. Q.752/ANSI T1.116 Table 2/4.11"
     ::= { mtpNotifications 33 }
@@ -16186,7 +15462,9 @@ rsEventUnavailableStop NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever a signalling route 
+         set becomes available.  The parameter is the signalling 
+         route set identifier."
     REFERENCE   
         "ITU-T Rec. Q.752/ANSI T1.116 Table 2/4.12"
     ::= { mtpNotifications 34 }
@@ -16205,7 +15483,9 @@ rsEventAdjSPInaccessibleStart NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever an adjacent 
+         signalling point becomes inaccessible.  The parameter 
+         is the adjacent signalling point identifier."
     REFERENCE   
         "ITU-T Rec. Q.752 Table 2/5.1"
     ::= { mtpNotifications 36 }
@@ -16214,7 +15494,9 @@ rsEventAdjSpInaccessibleStop NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever an adjacent 
+         signalling point becomes accessible.  The parameter is 
+         the adjacent signalling point identifier."
     REFERENCE   
         "ITU-T Rec. Q.752 Table 2/5.4"
     ::= { mtpNotifications 37 }
@@ -16250,7 +15532,10 @@ spEventUpuSent NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever a user-part 
+         unavailable message is sent.  The parameters are the 
+         local signalling point identifier and the MTP user part 
+         that has become unavailable."
     REFERENCE   
         "ITU-T Rec. Q.752 Table 2/5.6"
     ::= { mtpNotifications 40 }
@@ -16259,7 +15544,10 @@ spEventUpuRecv NOTIFICATION-TYPE
     OBJECTS     { tmnObjectInstance }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This notification is issued whenever a user-part 
+         unavailable message is received.  The parameters are 
+         the remote signalling point identifier and the MTP user 
+         part that has become unavailable."
     REFERENCE   
         "ITU-T Rec. Q.752 Table 2/5.7"
     ::= { mtpNotifications 41 }
@@ -16273,7 +15561,8 @@ mtpLsProfilePackage OBJECT-GROUP
                   mtpLsProfileTimerT10, mtpLsProfileRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP link set 
+         timers profile package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          lsTimersProfilePackage."
@@ -16295,7 +15584,8 @@ mtpSapPkg OBJECT-GROUP
     OBJECTS     { mtpSap2Address, mtpSapUserEntityNames, mtpSapRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP service 
+         access point (SAP) package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpAccessPointPkg ."
@@ -16311,7 +15601,8 @@ mtpSlL2ProfilePkg OBJECT-GROUP
                   mtpSlL2ProfileRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP signalling 
+         link level 2 timers profile package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpL2ProtocolProfilePkg ."
@@ -16322,7 +15613,8 @@ mtpL3Package OBJECT-GROUP
                   mtpL3UsageState, mtpL3ProceduralStatus, mtpL3RowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP level 
+         3 package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpLevel3Package ."
@@ -16334,15 +15626,17 @@ mtpSpPackage OBJECT-GROUP
                   mtpSpVersion, mtpSpNetworkIndicator, mtpSpRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP signalling 
+         point package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpSignPointPackage ."
     ::= { mtpGroups 5 }
 
 mtpSdlPackage OBJECT-GROUP
-    OBJECTS     { mtpSdlAdjPc, mtpSdlTransmissionRate, mtpSdlLoopDelay, 
-                  mtpSdlOperationalState, mtpSdlEquipmentPointer, 
+    OBJECTS     { mtpSdlType, mtpSdlAdjPc, mtpSdlTransmissionRate, 
+                  mtpSdlLoopDelay, mtpSdlOperationalState, 
+                  mtpSdlEquipmentPointer, mtpSdlSctpPointer, 
                   mtpSdlRowStatus }
     STATUS      current
     DESCRIPTION 
@@ -16358,10 +15652,11 @@ mtpSdlPackage OBJECT-GROUP
     ::= { mtpGroups 6 }
 
 mtpLsPackage OBJECT-GROUP
-    OBJECTS     { mtpLsAdjPc, mtpLsMaxCapacity, mtpLsCurrentCapacity, 
-                  mtpLsCongestionControlMethod, mtpLsUsageState, 
-                  mtpLsOperationalState, mtpLsAvailabilityStatus, 
-                  mtpLsPeriodicLinkTestFlag, mtpLsRowStatus }
+    OBJECTS     { mtpLsAdjPc, mtpLsRsId, mtpLsMaxCapacity, 
+                  mtpLsCurrentCapacity, mtpLsCongestionControlMethod, 
+                  mtpLsUsageState, mtpLsOperationalState, 
+                  mtpLsAvailabilityStatus, mtpLsPeriodicLinkTestFlag, 
+                  mtpLsPeriodicLinkTestFail, mtpLsRowStatus }
     STATUS      current
     DESCRIPTION 
         "This managed object class represents the SS No. 7 signalling 
@@ -16611,7 +15906,7 @@ mtpSpProfilePackage OBJECT-GROUP
 mtpRtPackage OBJECT-GROUP
     OBJECTS     { mtpRtLsPointer, mtpRtAdministrativeState, 
                   mtpRtOperationalState, mtpRtAvailabilityStatus, 
-                  mtpRtRowStatus }
+                  mtpRtRlSlot, mtpRtRowStatus }
     STATUS      current
     DESCRIPTION 
         "A signalling route (A,C,B)i is defined as an ordered sequence 
@@ -16673,8 +15968,8 @@ mtpRtPackage OBJECT-GROUP
     ::= { mtpGroups 11 }
 
 mtpRsPackage OBJECT-GROUP
-    OBJECTS     { mtpRsAdministrativeState, mtpRsOperationalState, 
-                  mtpRsRowStatus }
+    OBJECTS     { mtpRsDest, mtpRsOptions, mtpRsAdministrativeState, 
+                  mtpRsOperationalState, mtpRsRowStatus }
     STATUS      current
     DESCRIPTION 
         "A Signalling Route Set is a complete set of routes that can be 
@@ -16733,7 +16028,8 @@ mtpStPackage OBJECT-GROUP
     OBJECTS     { mtpSdtAdministrativeState, mtpSdtOperationalState, 
                   mtpSdtUsageState, mtpSdtProceduralStatus, 
                   mtpSdtAvailabilityStatus, mtpSdtEquipmentPointer, 
-                  mtpSdtRowStatus }
+                  mtpSdtStandbyStatus, mtpSdtPrimaryId, 
+                  mtpSdtProfilePointer, mtpSdtRowStatus }
     STATUS      current
     DESCRIPTION 
         "The signTerm MOC defines the management capabilities for the 
@@ -16750,7 +16046,8 @@ mtpGsPkg OBJECT-GROUP
                   mtpGsScreeningByLinkSetOrByOpc, mtpGsRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "THis is a group of objects that form the gateway 
+         screening package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          stpScreeningTablePkg ."
@@ -16796,7 +16093,8 @@ bufferMechanismPackage OBJECT-GROUP
     OBJECTS     { mtpSlL2ProfileNumberOfThresholdLevels }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that provide the buffer 
+         mechanism package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          bufferMechanismPackage ."
@@ -16806,7 +16104,8 @@ cICPackage OBJECT-GROUP
     OBJECTS     { mtpSdlCIC }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that provide the circuit 
+         identification code package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), cICPackage ."
     ::= { mtpGroups 18 }
@@ -16816,7 +16115,8 @@ clsLoadsharingInformationPackage OBJECT-GROUP
                   mtpRtLsaAlternativeSlCodeList }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the combined 
+         link set load sharing information package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          clsLoadsharingInformationPackage ."
@@ -16838,7 +16138,8 @@ congestionHandlingPackage OBJECT-GROUP
                   mtpSlL2ProfileCongestionReportingBaseObject }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the congestion 
+         handling package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          congestionHandlingPackage ."
@@ -16859,7 +16160,9 @@ getScreenedOpcsOrLinkSetsByDpcActionPackage OBJECT-GROUP
     OBJECTS     { mtpGsGetScreenedOpcsOrLinkSetsByDpc }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the action package 
+         for screened originating point codes or link sets by 
+         destination point code package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          getScreenedOpcsOrLinkSetsByDpcActionPackage ."
@@ -16869,7 +16172,8 @@ fixedRouteNePartPriorityPackage OBJECT-GROUP
     OBJECTS     { mtpRtFixedPriority }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the fixed route 
+         network element part priority package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          fixedRouteNePartPriorityPackage ."
@@ -16879,7 +16183,8 @@ flexibleRouteNePartPriorityPackage OBJECT-GROUP
     OBJECTS     { mtpRtFlexiblePriority, mtpRtPriorityMode }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the flexible route 
+         network element part priority package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          flexibleRouteNePartPriorityPackage ."
@@ -16889,7 +16194,8 @@ inLsLoadShareAlgorithmPackage OBJECT-GROUP
     OBJECTS     { mtpLsInLsLoadShareAlgorithm }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the within link 
+         set load sharing algorithm package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          inLsLoadShareAlgorithmPackage ."
@@ -16899,7 +16205,8 @@ linkCongestionLevelPackage OBJECT-GROUP
     OBJECTS     { mtpSlCongestionLevel }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the link 
+         congestion levels package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          linkCongestionLevelPackage ."
@@ -16909,7 +16216,8 @@ loadsharingInformationRouteNePartPackage OBJECT-GROUP
     OBJECTS     { mtpRtLoadsharingInformation }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the load sharing 
+         information route network element part package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          loadsharingInformationRouteNePartPackage ."
@@ -16919,7 +16227,8 @@ loadsharingInformationRouteSetNePartPackage OBJECT-GROUP
     OBJECTS     { mtpRsLoadsharingInformation }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the load sharing 
+         information route set network element part package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          loadsharingInformationRouteSetNePartPackage ."
@@ -16929,7 +16238,8 @@ loopDelayPackage OBJECT-GROUP
     OBJECTS     { mtpSlL2ProfileLoopDelay }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the loop delay 
+         package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          loopDelayPackage ."
@@ -16939,7 +16249,8 @@ mtpLsProfileNamePackage OBJECT-GROUP
     OBJECTS     { mtpLsProfileName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP link set 
+         profile name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          lsTimersProfileNamePackage ."
@@ -16949,7 +16260,8 @@ mtpLsProfilePointerPackage OBJECT-GROUP
     OBJECTS     { mtpLsProfilePointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP link set 
+         profile pointer package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          lsTimersProfilePointerPackage ."
@@ -16971,7 +16283,8 @@ mtpSapNamePackage OBJECT-GROUP
     OBJECTS     { mtpSapName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP service 
+         access point name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpAccessPointNamePackage ."
@@ -16981,7 +16294,8 @@ mtpSlL2ProfileNamePackage OBJECT-GROUP
     OBJECTS     { mtpSlL2ProfileName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP signalling 
+         link level 2 profile name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpL2ProtocolProfileNamePackage ."
@@ -16991,7 +16305,8 @@ mtpL3NamePackage OBJECT-GROUP
     OBJECTS     { mtpL3Name }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP level 
+         3 name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpLevel3NamePackage ."
@@ -17001,7 +16316,9 @@ mtpLoadsharingObjectForRouteNePartPointerPackage OBJECT-GROUP
     OBJECTS     { mtpRtLoadsharingObject }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP load 
+         sharing object for route network element part pointer 
+         package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpLoadsharingObjectForRouteNePartPointerPackage ."
@@ -17011,7 +16328,9 @@ mtpLoadsharingObjectForRouteSetNePartPointerPackage OBJECT-GROUP
     OBJECTS     { mtpRsLoadsharingObject }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP load 
+         sharing object for route set network element part 
+         pointer package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpLoadsharingObjectForRouteSetNePartPointerPackage ."
@@ -17021,7 +16340,8 @@ mtpSpNamePackage OBJECT-GROUP
     OBJECTS     { mtpSpName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP signalling 
+         point name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          mtpSignPointNamePackage ."
@@ -17079,7 +16399,8 @@ noBasicLinkAllocationPackage OBJECT-GROUP
     OBJECTS     { mtpLsNumberOfNormallyActiveSignLinks }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the no basic link 
+         allocation package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          noBasicLinkAllocationPackage ."
@@ -17101,7 +16422,8 @@ receiveCongestionLevelsPackage OBJECT-GROUP
                   mtpSlL2ProfileReceiveCongestionThresholdAbate }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the receive 
+         congestion levels package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          receiveCongestionLevelsPackage ."
@@ -17111,7 +16433,8 @@ relatedLinkGroupNumberPackage OBJECT-GROUP
     OBJECTS     { mtpSlRelatedLinkGroupNumber }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the related link 
+         group number package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          relatedLinkGroupNumberPackage ."
@@ -17121,7 +16444,8 @@ remoteExchangeLabelPackage OBJECT-GROUP
     OBJECTS     { mtpRsRemoteExchangeLabel }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the remote 
+         exchange label package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          remoteExchangeLabelPackage ."
@@ -17132,7 +16456,8 @@ mtpSdlListPackage OBJECT-GROUP
                   mtpSlSdlListRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP signalling 
+         data link list package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          signDataLinkTpListPackage ."
@@ -17142,7 +16467,8 @@ mtpSdlNamePackage OBJECT-GROUP
     OBJECTS     { mtpSdlName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP 
+         signalling data link name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          signDataLinkTpNamePackage ."
@@ -17152,7 +16478,8 @@ mtpLsNamePackage OBJECT-GROUP
     OBJECTS     { mtpLsName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP 
+         signalling link set name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          signLinkSetTpNamePackage ."
@@ -17162,7 +16489,8 @@ mtpSignLinkTestPackage OBJECT-GROUP
     OBJECTS     { mtpSlTest }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP 
+         signalling link test package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          signLinkTestPackage ."
@@ -17172,7 +16500,8 @@ mtpSlNamePackage OBJECT-GROUP
     OBJECTS     { mtpSlName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP 
+         signalling link name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          signLinkTpNamePackage ."
@@ -17182,7 +16511,8 @@ mtpRtNamePackage OBJECT-GROUP
     OBJECTS     { mtpRtName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP route 
+         (network element part) name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          signRouteNePartNamePackage ."
@@ -17192,7 +16522,8 @@ mtpRsNamePackage OBJECT-GROUP
     OBJECTS     { mtpRsName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP route set 
+         (network element part) name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          signRouteSetNePartNamePackage ."
@@ -17203,7 +16534,8 @@ mtpStListPackage OBJECT-GROUP
                   mtpSlSdtListRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP 
+         signalling data terminal list package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          signTermListPackage ."
@@ -17213,7 +16545,8 @@ mtpStNamePackage OBJECT-GROUP
     OBJECTS     { mtpSdtName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP 
+         signalling terminal name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          signTermNamePackage ."
@@ -17223,7 +16556,8 @@ slsCodeNormalListPackage OBJECT-GROUP
     OBJECTS     { mtpSlSlsCodeNormalList }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a gorup of objects that forms the signalling 
+         link selection code normal list package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          slsCodeNormalListPackage ."
@@ -17233,7 +16567,8 @@ slsListPackage OBJECT-GROUP
     OBJECTS     { mtpRtSlsList }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the signalling 
+         link selection list package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), slsListPackage 
          ."
@@ -17243,7 +16578,8 @@ mtpSlL3ProfileNamePackage OBJECT-GROUP
     OBJECTS     { mtpSlL3ProfileName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the signalling 
+         link timers profile name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          slTimersProfileNamePackage ."
@@ -17253,7 +16589,8 @@ mtpSlL3ProfilePointerPackage OBJECT-GROUP
     OBJECTS     { mtpSlL3ProfilePointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the signalling 
+         link level 3 timers profile pointer package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          slTimersProfilePointerPackage ."
@@ -17263,7 +16600,8 @@ mtpRestartingNotification NOTIFICATION-GROUP
     NOTIFICATIONS { mtpRestarting }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of notifications that forms the MTP 
+         restarting notification package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), mtpRestaring 
          notification."
@@ -17296,7 +16634,8 @@ mtpSpProfileNamePackage OBJECT-GROUP
     OBJECTS     { mtpSpProfileName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP signalling 
+         point timers profile name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          spTimersProfileNamePackage ."
@@ -17306,7 +16645,8 @@ mtpSpProfilePointerPackage OBJECT-GROUP
     OBJECTS     { mtpSpProfilePointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP 
+         signalling point timers profile pointer package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          spTimersProfilePointerPackage ."
@@ -17316,7 +16656,8 @@ ss7OnOccEventPackage NOTIFICATION-GROUP
     NOTIFICATIONS { ss7OnOccEvent }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of notifications that forms the SS7 
+         on-occurrence event package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          ss7OnOccEventPackage ."
@@ -17326,7 +16667,8 @@ stmChannelPackage OBJECT-GROUP
     OBJECTS     { mtpSdlStmChannel }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the STM channel 
+         package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          stmChannelPackage ."
@@ -17336,7 +16678,8 @@ mtpGsNamePackage OBJECT-GROUP
     OBJECTS     { mtpGsName }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP gateway 
+         screening name package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          stpScreeningTableNamePackage ."
@@ -17368,7 +16711,8 @@ broadbandSpecificPackage OBJECT-GROUP
     OBJECTS     { mtpSdlVcTTpPointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the signalling 
+         data link broadband specific package."
     REFERENCE   
         "ITU-T Rec. Q.2751.1 (1997), broadbandSpecificPackage."
     ::= { mtpGroups 68 }
@@ -17391,7 +16735,8 @@ longMessageSupportedPackage OBJECT-GROUP
     OBJECTS     { mtpSapLongMessageSupported }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the long message 
+         supported package."
     REFERENCE   
         "ITU-T Rec. Q.2751.1 (1997), longMessageSupportedPackage."
     ::= { mtpGroups 70 }
@@ -17400,7 +16745,8 @@ narrowbandSpecificPackage OBJECT-GROUP
     OBJECTS     { mtpNbTransmissionRate }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the signalling 
+         data link narrow band specific package."
     REFERENCE   
         "ITU-T Rec. Q.2751.1 (1997), narrowbandSpecificPackage."
     ::= { mtpGroups 71 }
@@ -17443,7 +16789,8 @@ saalSdlPackage OBJECT-GROUP
     OBJECTS     { mtpSdlOperationalState, mtpSdlEquipmentPointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the ATM SAAL 
+         signalling data link package."
     REFERENCE   
         "ITU-T Rec. Q.2751.1 (1997), saalSignDataLinkTpPackage."
     ::= { mtpGroups 74 }
@@ -17486,7 +16833,8 @@ mtpM2paProfilePkg OBJECT-GROUP
                   mtpM2paTransmissionRateIntervalUpper, mtpM2paRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP M2PA 
+         protocol profile package."
     ::= { mtpGroups 76 }
 
 m2paProvingPackage OBJECT-GROUP
@@ -17494,14 +16842,16 @@ m2paProvingPackage OBJECT-GROUP
                   mtpM2paManagementProvingState, mtpM2paProvingAttempts }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the M2PA proving 
+         package."
     ::= { mtpGroups 77 }
 
 providerEntityNamesPackage OBJECT-GROUP
     OBJECTS     { mtpSapProviderEntityNames }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the provider 
+         entity names package."
     REFERENCE   
         "ITU-T Rec. Q.751.1 (1997), ANSI T1.116.1 (2000), 
          providerEntityNamesPackage."
@@ -17511,7 +16861,8 @@ mtpRestartingParameters OBJECT-GROUP
     OBJECTS     { networkPointCode }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP 
+         restarting parameters package."
     ::= { mtpGroups 79 }
 
 ss7OnOccEventParameters OBJECT-GROUP
@@ -17521,48 +16872,322 @@ ss7OnOccEventParameters OBJECT-GROUP
                   linkFailureReason }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the SS7 
+         on-occurrence event parameters package."
     ::= { mtpGroups 80 }
 
 mtpSapAsaPointerPackage OBJECT-GROUP
     OBJECTS     { mtpSapAsaProfilePointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP SAP alarm 
+         severity assignment pointer package."
     ::= { mtpGroups 81 }
 
 mtpL3AsaPointerPackage OBJECT-GROUP
     OBJECTS     { mtpL3AsaProfilePointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the MTP level 
+         3 alarm severity assignment pointer package."
     ::= { mtpGroups 82 }
 
 mtpSlAsaPointerPackage OBJECT-GROUP
     OBJECTS     { mtpSlAsaProfilePointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the signalling 
+         link alarm severity assignment pointer package."
     ::= { mtpGroups 83 }
 
 mtpRsAsaPointerPackage OBJECT-GROUP
     OBJECTS     { mtpRsAsaProfilePointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that form the MTP route set 
+         (network element part) alarm severity assignment 
+         pointer package."
     ::= { mtpGroups 84 }
 
 mtpLsAsaPointerPackage OBJECT-GROUP
     OBJECTS     { mtpLsAsaProfilePointer }
     STATUS      current
     DESCRIPTION 
-        ""
+        "This is a group of objects that forms the signalling 
+         link set alarm severity assignment pointer package."
     ::= { mtpGroups 85 }
+
+mtpSapGroup OBJECT-GROUP
+    OBJECTS     { mtpSapUserPart, mtpSapUserPartStatus, mtpSapUsageState }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for MTP service access points."
+    ::= { mtpGroups 86 }
+
+mtpNaGroup OBJECT-GROUP
+    OBJECTS     { mtpNaProtocolVariant, mtpNaProtocolYear, 
+                  mtpNaProtocolOptions, mtpNaNetworkIndicator, 
+                  mtpNaPointCodeFormat, mtpNaSlsLength, mtpNaSpDefault, 
+                  mtpNaName, mtpNaRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for multiple network appearances."
+    ::= { mtpGroups 87 }
+
+mtpMsGroup OBJECT-GROUP
+    OBJECTS     { mtpMsName, mtpMsAlarmStatus, mtpMsOperationalState, 
+                  mtpMsUsageState, mtpMsManagedElementType, 
+                  mtpMsModelCode, mtpMsVendorName, mtpMsUserLabel, 
+                  mtpMsVersion, mtpMsAsaProfilePointer, 
+                  mtpMsNetworkElementAliases, mtpMsRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for managed switching elements."
+    ::= { mtpGroups 88 }
+
+mtpSpGroup OBJECT-GROUP
+    OBJECTS     { mtpSpProfileCircularRteDetect, mtpSpRsDefault, 
+                  mtpSpLsDefault, mtpSpNaPointer, mtpSpOptions, 
+                  mtpSpUsers, mtpSpAlarmStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for signalling points."
+    ::= { mtpGroups 89 }
+
+mtpGsLineGroup OBJECT-GROUP
+    OBJECTS     { mtpGsLineObject, mtpGsLineContentDesignatedDPCFirst, 
+                  mtpGsLineContentSiMask, mtpGsLineContentComment }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for gateway screening entries."
+    ::= { mtpGroups 90 }
+
+mtpRsProfileGroup OBJECT-GROUP
+    OBJECTS     { mtpRsProfile, mtpRsProfileName, mtpRsProfileTimerT8, 
+                  mtpRsProfileTimerT11, mtpRsProfileTimerT15, 
+                  mtpRsProfileTimerT16, mtpRsProfileTimerT18A, 
+                  mtpRsProfileRtDefault, mtpRsProfileRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for MTP route set (network element part) 
+         timers profile."
+    ::= { mtpGroups 91 }
+
+mtpRtProfileGroup OBJECT-GROUP
+    OBJECTS     { mtpRtProfile, mtpRtProfileTimerT6, 
+                  mtpRtProfileTimerT10, mtpRtProfileRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for MTP route (network element part) timers 
+         profile."
+    ::= { mtpGroups 92 }
+
+mtpLsProfileGroup OBJECT-GROUP
+    OBJECTS     { mtpLsProfileTimerT6, mtpLsProfileTimerT8, 
+                  mtpLsProfileTimerT10, mtpLsProfileTimerT7, 
+                  mtpLsProfileTimerT19I, mtpLsProfileTimerT21I, 
+                  mtpLsProfileTimerT25A, mtpLsProfileTimerT28A, 
+                  mtpLsProfileTimerT29A, mtpLsProfileTimerT30A, 
+                  mtpLsProfileParameterN, mtpLsProfileParameterM, 
+                  mtpLsProfileSlDefault, mtpLsProfileRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for MTP signalling link set timers profile."
+    ::= { mtpGroups 93 }
+
+mtpSlL3ProfileGroup OBJECT-GROUP
+    OBJECTS     { mtpSlL3ProfileTimerT2, mtpSlL3ProfileTimerT4, 
+                  mtpSlL3ProfileTimerT5, mtpSlL3ProfileTimerT12, 
+                  mtpSlL3ProfileTimerT13, mtpSlL3ProfileTimerT14, 
+                  mtpSlL3ProfileTimerT19A, mtpSlL3ProfileTimerT20A, 
+                  mtpSlL3ProfileTimerT21A, mtpSlL3ProfileTimerT22I, 
+                  mtpSlL3ProfileTimerT23I, mtpSlL3ProfileTimerT31A, 
+                  mtpSlL3ProfileTimerT32A, mtpSlL3ProfileTimerT33A, 
+                  mtpSlL3ProfileTimerT34A, mtpSlL3ProfileTimerT1T, 
+                  mtpSlL3ProfileTimerT2T, mtpSlL3ProfileTimerT1S, 
+                  mtpSlL3ProfileL2Default }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for MTP signalling link level 3 timers 
+         profile."
+    ::= { mtpGroups 94 }
+
+mtpSlL2ProfileGroup OBJECT-GROUP
+    OBJECTS     { mtpSlL2ProfileProtocolVariant, mtpSlL2ProfileTimerT2L, 
+                  mtpSlL2ProfileTimerT2H, 
+                  mtpSlL2ProfileReceiveCongestionThresholdDiscard, 
+                  mtpSlL2ProfileM }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for MTP signalling link level 2 timer 
+         profiles."
+    ::= { mtpGroups 95 }
+
+mtpNbGroup OBJECT-GROUP
+    OBJECTS     { mtpNbTimerT8, mtpNbTin, mtpNbTie, mtpNbT, mtpNbD, 
+                  mtpNbTe, mtpNbDe, mtpNbUe, mtpNbN, mtpNbm, mtpNbb, 
+                  mtpNbf, mtpNbRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for MTP narrowband signalling data links."
+    ::= { mtpGroups 96 }
+
+mtpSctpProfileGroup OBJECT-GROUP
+    OBJECTS     { mtpSctpProfileNoDelay, mtpSctpProfileMaxseg, 
+                  mtpSctpProfileHeartbeatItvl, mtpSctpProfileHeartbeat, 
+                  mtpSctpProfileRtoInitial, mtpSctpProfileRtoMin, 
+                  mtpSctpProfileRtoMax, mtpSctpProfilePathMaxRetrans, 
+                  mtpSctpProfileCookieLife, mtpSctpProfileCookieInc, 
+                  mtpSctpProfileMaxInitRetries, mtpSctpProfileMaxBurst, 
+                  mtpSctpProfileAssocMaxRetrans, mtpSctpProfileSackDelay, 
+                  mtpSctpProfileLifetime, mtpSctpProfileMinOstreams, 
+                  mtpSctpProfileMaxIstreams, mtpSctpProfileRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for SCTP protocol parameter profiles."
+    ::= { mtpGroups 97 }
+
+mtpSctpGroup OBJECT-GROUP
+    OBJECTS     { mtpSctpAdministrativeState, mtpSctpOperationalState, 
+                  mtpSctpUsageState, mtpSctpProceduralStatus, 
+                  mtpSctpLocalPort, mtpSctpRemotePort, mtpSctpProfile, 
+                  mtpSctpProtocolPayloadId, mtpSctpRowStatus, 
+                  mtpSctpLocalAddress, mtpSctpLocalRowStatus, 
+                  mtpSctpRemoteAddress, mtpSctpRemoteRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for SCTP associations."
+    ::= { mtpGroups 98 }
+
+mtpM2uaGroup OBJECT-GROUP
+    OBJECTS     { mtpM2uaAspState, mtpM2uaAspId, mtpM2uaAspCapabilities, 
+                  mtpM2uaAspSgVersion, mtpM2uaAspSgOptions, 
+                  mtpM2uaAspSgRegistrationPolicy, 
+                  mtpM2uaAspSgAspIdPolicy, mtpM2uaAspAssociationPolicy, 
+                  mtpM2uaAspProtocolPayloadId, mtpM2uaAspRowStatus, 
+                  mtpM2uaAsState, mtpM2uaAsInterfaceIdentifier, 
+                  mtpM2uaInterfaceIdentifierText, mtpM2uaAsSDTI, 
+                  mtpM2uaAsTrafficMode, mtpM2uaAsRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for M2UA signalling links."
+    ::= { mtpGroups 99 }
+
+mtpM3uaGroup OBJECT-GROUP
+    OBJECTS     { mtpM3uaAspState, mtpM3uaAsType, mtpM3uaAspId, 
+                  mtpM3uaAspCapabilities, mtpM3uaAspSgVersion, 
+                  mtpM3uaAspSgOptions, mtpM3uaAspSgRegistrationPolicy, 
+                  mtpM3uaAspSgAspIdPolicy, mtpM3uaAspAssociationPolicy, 
+                  mtpM3uaAspProtocolPayloadId, mtpM3uaAspRowStatus, 
+                  mtpM3uaAsState, mtpM3uaAsRoutingContext, 
+                  mtpM3uaAsNetworkAppearance, mtpM3uaAsNetworkPointCode, 
+                  mtpM3uaAsTrafficMode, mtpM3uaAsRowStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for M3UA virtual route sets."
+    ::= { mtpGroups 100 }
+
+mtpAlarmStatusGroup OBJECT-GROUP
+    OBJECTS     { mtpRsAlarmStatus, mtpLsAlarmStatus, mtpSlAlarmStatus }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of objects that provide additional 
+         information for alarm status of signalling links, 
+         signalling link sets and route sets."
+    ::= { mtpGroups 101 }
+
+mtpSdlEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { sdlEventLostSync, sdlEventSuError, sdlEventTxFail, 
+                  sdlEventRxFail }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of notifications that provide 
+         additional notifications concerning signalling data 
+         link events."
+    ::= { mtpGroups 102 }
+
+mtpSdtEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { sdtEventLostSync, sdtEventSuError, sdtEventTxFail, 
+                  sdtEventRxFail, sdtEventCarrier }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of notifications that provide 
+         additional notifications concerning signalling terminal 
+         events."
+    ::= { mtpGroups 103 }
+
+mtpSlEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { slEventFailureAllReasons, 
+                  slEventFailureAbnormalBsnrFibr, 
+                  slEventFailureExcessiveDelayOfAck, 
+                  slEventFailureExcessiveErrorRate, 
+                  slEventFailureExcessiveDurationCongestion, 
+                  slEventLocalAutomaticChangeover, 
+                  slEventLocalAutomaticChangeback, slEventRestoration, 
+                  slEventRpoStartEvent, slEventRpoStopEvent, 
+                  slEventLocalInhibitionStart, 
+                  slEventLocalInhibitionStop, 
+                  slEventRemoteInhibitionStart, 
+                  slEventRemoteInhibitionStop, slEventCongestionStart, 
+                  slEventCongestionStop, slEventCongestionLoss }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of notifications that provide 
+         additional notifications concerning signaling link 
+         events."
+    ::= { mtpGroups 104 }
+
+mtpLkEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { lkEventFailureStart, lkEventFailureStop, 
+                  lkEventSendTFP, lkEventSendTFA }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of notifications that provide 
+         additional notifications concerning combined signalling 
+         link events."
+    ::= { mtpGroups 105 }
+
+mtpRsEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { rsEventUnavailableStart, rsEventUnavailableStop, 
+                  rsEventAdjSpLinkSetChange, 
+                  rsEventAdjSPInaccessibleStart, 
+                  rsEventAdjSpInaccessibleStop, rsEventRecvTFC }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of notifications that provide 
+         additional notifications concerning route set (network 
+         element part) events."
+    ::= { mtpGroups 106 }
+
+mtpSpEventGroup NOTIFICATION-GROUP
+    NOTIFICATIONS { spEventMsuDiscard, spEventUpuSent, spEventUpuRecv }
+    STATUS      current
+    DESCRIPTION 
+        "This is a group of notifications that provide 
+         additional notifications concerning signalling point 
+         events."
+    ::= { mtpGroups 107 }
 
 mtpLsProfileCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP signalling link sets."
 
     MODULE      -- this module
 
@@ -17591,7 +17216,8 @@ mtpLsProfileCompliance MODULE-COMPLIANCE
 mtpSapCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformace for the support of 
+         MTP service access points."
 
     MODULE      -- this module
 
@@ -17613,12 +17239,18 @@ mtpSapCompliance MODULE-COMPLIANCE
         DESCRIPTION   
               "PRESENT IF an instance supports it."
 
+        GROUP   mtpSapGroup
+        DESCRIPTION   
+              "Used when supporting additional SAP conformance 
+               objects."
+
     ::= { mtpCompliance 2 }
 
 mtpL2ProfocolProfileCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP level 2 protocol profiles."
 
     MODULE      -- this module
 
@@ -17679,19 +17311,32 @@ mtpL2ProfocolProfileCompliance MODULE-COMPLIANCE
 mtpNbProfileCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP narrowband signalling data link profiles."
 
     MODULE      -- this module
 
         MANDATORY-GROUPS        { mtpSlL2ProfilePkg, 
                   narrowbandSpecificPackage }
 
+        GROUP   mtpSlL2ProfileGroup
+        DESCRIPTION   
+              "Additional signalling link level 2 profile 
+               items not specified in Q.752 or ANSI T1.116.2."
+
+        GROUP   mtpNbGroup
+        DESCRIPTION   
+              "Additional narrowband signalling link level 
+               2 parameters not specified in Q.752 or ANSI 
+               T1.116.2."
+
     ::= { mtpCompliance 4 }
 
 mtpSaalProfileCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of broadband ATM SAAL signalling data link profiles."
 
     MODULE      -- this module
 
@@ -17724,7 +17369,8 @@ mtpSaalProfileCompliance MODULE-COMPLIANCE
 mtpM2paProfileCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of M2PA signalling link profiles."
 
     MODULE      -- this module
 
@@ -17757,7 +17403,8 @@ mtpM2paProfileCompliance MODULE-COMPLIANCE
 mtpL3Compliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP level 3."
 
     MODULE      -- this module
 
@@ -17804,7 +17451,8 @@ mtpL3Compliance MODULE-COMPLIANCE
 mtpSpCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP signalling points."
 
     MODULE      -- this module
 
@@ -17823,6 +17471,11 @@ mtpSpCompliance MODULE-COMPLIANCE
         GROUP   mtpSpProfilePointerPackage
         DESCRIPTION   
               "PRESENT IF the instance does not support the spTimersPackage."
+
+        GROUP   mtpSpGroup
+        DESCRIPTION   
+              "Used when supporting additional signalling point 
+               conformance objects."
 
         OBJECT  mtpSpType
         MIN-ACCESS  read-only
@@ -17849,7 +17502,8 @@ mtpSpCompliance MODULE-COMPLIANCE
 mtpSdlCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP signalling data links."
 
     MODULE      -- this module
 
@@ -17899,7 +17553,8 @@ mtpSdlCompliance MODULE-COMPLIANCE
 mtpLsCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP signalling link sets."
 
     MODULE      -- this module
 
@@ -17917,6 +17572,11 @@ mtpLsCompliance MODULE-COMPLIANCE
         DESCRIPTION   
               "PRESENT IF the instance of superior class mtpSignPoint does not 
                support the conditional spTimersPackage."
+
+        GROUP   mtpLsProfileGroup
+        DESCRIPTION   
+              "Additional link set profile parameters not 
+               included in Q.752 or T1.116.2."
 
         GROUP   noBasicLinkAllocationPackage
         DESCRIPTION   
@@ -17962,7 +17622,8 @@ mtpLsCompliance MODULE-COMPLIANCE
 mtpSlCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP signalling links."
 
     MODULE      -- this module
 
@@ -18042,7 +17703,8 @@ mtpSlCompliance MODULE-COMPLIANCE
 mtpSlL3ProfileCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for support of 
+         MTP signalling link level 3 protocol profiles."
 
     MODULE      -- this module
 
@@ -18051,6 +17713,11 @@ mtpSlL3ProfileCompliance MODULE-COMPLIANCE
         GROUP   mtpSlL3ProfileNamePackage
         DESCRIPTION   
               "PRESENT IF an instance supports it."
+
+        GROUP   mtpSlL3ProfileGroup
+        DESCRIPTION   
+              "Additional signalling link level 3 profile 
+               parameters not included in Q.752 or T1.116.2."
 
     MODULE OPENSS7-SMI-MIB
 
@@ -18071,7 +17738,8 @@ mtpSlL3ProfileCompliance MODULE-COMPLIANCE
 mtpSpProfileCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for support of 
+         MTP signalling point protocol profiles."
 
     MODULE      -- this module
 
@@ -18100,7 +17768,8 @@ mtpSpProfileCompliance MODULE-COMPLIANCE
 mtpRtCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformances for the support 
+         of MTP routes (network element part)."
 
     MODULE      -- this module
 
@@ -18140,6 +17809,11 @@ mtpRtCompliance MODULE-COMPLIANCE
         DESCRIPTION   
               "PRESENT IF the instance supports 'transfer restricted'."
 
+        GROUP   mtpRtProfileGroup
+        DESCRIPTION   
+              "Used when supporting additional profile items not 
+               specified in Q.752 or T1.116.2."
+
     MODULE OPENSS7-SMI-MIB
 
         GROUP   attributeValueChangeNotificationPackage
@@ -18159,7 +17833,8 @@ mtpRtCompliance MODULE-COMPLIANCE
 mtpSignRouteSetNetPartCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP signalling route sets (network element part)."
 
     MODULE      -- this module
 
@@ -18205,6 +17880,11 @@ mtpSignRouteSetNetPartCompliance MODULE-COMPLIANCE
                (communicationsAlarmPackage or ss7OnOccEventPackage) is 
                present."
 
+        GROUP   mtpRsProfileGroup
+        DESCRIPTION   
+              "Used when supporting additional profile items not 
+               specified in Q.752 or T1.116.2."
+
     MODULE OPENSS7-SMI-MIB
 
         GROUP   communicationsAlarmPackage
@@ -18228,7 +17908,8 @@ mtpSignRouteSetNetPartCompliance MODULE-COMPLIANCE
 mtpStCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of MTP signalling terminals."
 
     MODULE      -- this module
 
@@ -18257,7 +17938,8 @@ mtpStCompliance MODULE-COMPLIANCE
 mtpGsCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of gateway screening."
 
     MODULE      -- this module
 
@@ -18290,26 +17972,110 @@ mtpGsCompliance MODULE-COMPLIANCE
 mtpGsLineCompliance MODULE-COMPLIANCE
     STATUS      current
     DESCRIPTION 
-        ""
+        "This compliance specifies conformance for the support 
+         of gateway screening rules."
 
     MODULE      -- this module
 
         MANDATORY-GROUPS        { mtpGsLinePkg }
 
+        GROUP   mtpGsLineGroup
+        DESCRIPTION   
+              "Additional GS line compliance objects."
+
     MODULE OPENSS7-SMI-MIB
 
         GROUP   attributeValueChangeNotificationPackage
-        DESCRIPTION 
+        DESCRIPTION   
               "PRESENT IF the attributeValueChangeNotification defined in 
                'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992' is supported 
                by an instance of this class."
 
         GROUP   createDeleteNotificationsPackage
-        DESCRIPTION 
+        DESCRIPTION   
               "PRESENT IF the objectCreation and objectDeletion notifications 
                defined in 'ITU-T Rec. X.721 (1992) | ISO/IEC 10165-2 : 1992' 
                are supported by an instance of this class."
 
     ::= { mtpCompliance 18 }
+
+mtpAdditionalCompliance MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION 
+        "This compliance specifies conformance for the support 
+         of additional information beyond that provided by ITU-T 
+         Q.752 and ANSI T1.116.2."
+
+    MODULE      -- this module
+
+        GROUP   mtpNaGroup
+        DESCRIPTION   
+              "Used when providing network-appearance 
+               information for signalling points that are homed 
+               off off multiple national networks or national 
+               and international networks."
+
+        GROUP   mtpMsGroup
+        DESCRIPTION   
+              "Used when providing base managed switching element 
+               management information."
+
+        GROUP   mtpSctpProfileGroup
+        DESCRIPTION   
+              "Used when providing profiles for SCTP 
+               associations for SIGTRAN protocols."
+
+        GROUP   mtpSctpGroup
+        DESCRIPTION   
+              "Used when providing SCTP associations for SIGTRAN 
+               protocols."
+
+        GROUP   mtpM2uaGroup
+        DESCRIPTION   
+              "Used when providing M2UA interworking with the 
+               message transfer part."
+
+        GROUP   mtpM3uaGroup
+        DESCRIPTION   
+              "Used when providing M3UA interworking with the 
+               message transfer part."
+
+        GROUP   mtpAlarmStatusGroup
+        DESCRIPTION   
+              "Used when providing additional alarm status 
+               specified by X.721 but not explicitly provided by 
+               Q.752 or T1.116.2."
+
+        GROUP   mtpSdlEventGroup
+        DESCRIPTION   
+              "Used when providing signalling data link event 
+               notifications."
+
+        GROUP   mtpSdtEventGroup
+        DESCRIPTION   
+              "Used when providing signalling data terminal 
+               event notifications."
+
+        GROUP   mtpSlEventGroup
+        DESCRIPTION   
+              "Used when providing signalling link event 
+               notifications."
+
+        GROUP   mtpLkEventGroup
+        DESCRIPTION   
+              "Used when providing link set event 
+               notifications."
+
+        GROUP   mtpRsEventGroup
+        DESCRIPTION   
+              "Used when providing route set event 
+               notifications."
+
+        GROUP   mtpSpEventGroup
+        DESCRIPTION   
+              "Used when providing signalling point event 
+               notifications."
+
+    ::= { mtpCompliance 19 }
 
 END -- end of module OPENSS7-MTP-MIB.

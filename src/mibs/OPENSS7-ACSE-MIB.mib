@@ -1,11 +1,11 @@
--- vim: ft=mib comments=\f\:\",\b\:\-\-,\:\-\-,\f\b\:- fo+=tcqlornw tw=72 nocin nosi sts=4 sw=4 et
+-- vim: ft=mib comments=\f\b\:\"ITU\-T,\f\b\:ITU\-T,\f\:\",\b\:\-\-,\:\-\-,\f\b\:\-,\f\b\:\· fo+=tcqlornw12 tw=64 ai nocin nosi sts=4 sw=4 et
 -- =============================================================================
 -- 
 -- @(#) $RCSfile: OPENSS7-ACSE-MIB.mib,v $ $Name:  $($Revision: 1.1.2.3 $) $Date: 2011-07-18 19:42:17 $
 --
 -- -----------------------------------------------------------------------------
 --
--- Copyright (c) 2008-2009  Monavacon Limited <http://www.monavacon.com/>
+-- Copyright (c) 2008-2011  Monavacon Limited <http://www.monavacon.com/>
 -- Copyright (c) 2001-2008  OpenSS7 Corporation <http://www.openss7.com/>
 -- Copyright (c) 1997-2001  Brian F. G. Bidulock <bidulock@openss7.org>
 --
@@ -27,7 +27,7 @@
 --
 -- -----------------------------------------------------------------------------
 --
--- Note well: nonwithstanding this AGPL license, you are not permitted to make 
+-- Note well: notwithstanding this AGPL license, you are not permitted to make 
 -- modifications under the OpenSS7 project's enterprise object identifier arc: 
 -- 1.3.6.1.4.1.29591.  Modifications must be made only within an object 
 -- identifier arc under your control.
@@ -74,6 +74,8 @@
 OPENSS7-ACSE-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
+    applicationProcessId, subsystemId
+        FROM OPENSS7-GMI-MIB
     mtpMsId
         FROM OPENSS7-MTP-MIB
     sccpNetworkEntityId
@@ -90,7 +92,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 acseMIB MODULE-IDENTITY
-    LAST-UPDATED "200810092250Z"
+    LAST-UPDATED "201112101120Z"
     ORGANIZATION 
         "The OpenSS7 Project"
     CONTACT-INFO 
@@ -105,8 +107,8 @@ acseMIB MODULE-IDENTITY
          E-mail: bidulock@openss7.org"
     DESCRIPTION 
         "This is a MIB providing management information is 
-         accordance with ITU-T Rec. Q.751.1, ITU-T Rec. 
-         Q.2751.1, ANSI T1.116.1.
+         accordance with ITU-T Rec. X.287 (2000) | ISO/IEC 
+         10165-8 : 2000.
          
          Copyright (c) 2008-2011  Monavacon Limited
          Copyright (c) 2001-2008  OpenSS7 Corporation
@@ -129,15 +131,19 @@ acseMIB MODULE-IDENTITY
          <http://www.gnu.org/licenses/>, or write to the Free Software 
          Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
          
-         Note well: nonwithstanding this AGPL license, you are not 
+         Note well: notwithstanding this AGPL license, you are not 
          permitted to make modifications under the OpenSS7 project's 
          enterprise object identifier arc: 1.3.6.1.4.1.29591.  
          Modifications must be made only within an object identifier arc 
          under your control."
+    REVISION    "201112101120Z"
+    DESCRIPTION 
+        "Corrections an smilint workup."
     REVISION    "200810092250Z"
     DESCRIPTION 
         "First release of this module."
     ::= { openss7Q751 47 }
+
 
 PresentationContext ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -236,11 +242,21 @@ ApplicationContextName ::= TEXTUAL-CONVENTION
 AcseFUs ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION 
-        "Providess a specification of the ACSE functional units present 
+        "Provides a specification of the ACSE functional units present 
          in an instance of the ACSE layer."
     REFERENCE   
         "ITU-T Rec. X.227 (1995)/Amd.1 (1996 E), ACSE-requirements."
-    SYNTAX      BITS { authentication(0), applicationContextNegotiation(1) }
+    SYNTAX      BITS { authentication(0), 
+                    applicationContextNegotiation(1) }
+
+AcseEditionsSupported ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION 
+        "Provides a specification of the ACSE editions (versions) 
+         supported by an instance of the ACSE layer."
+    REFERENCE   
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000,  AcseEditionsSupported."
+    SYNTAX      BITS { version1(0) }
 
 acseNotifications OBJECT IDENTIFIER
     ::= { acseMIB 0 }
@@ -253,8 +269,6 @@ acseDefaults OBJECT IDENTIFIER
 
 acseObjectClass OBJECT IDENTIFIER
     ::= { acseMIB 3 }
-
--- ====================================================================
 
 aCSE OBJECT IDENTIFIER
     ::= { acseObjectClass 1 }
@@ -275,7 +289,23 @@ acseTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides a table of application context service entities.
+         
+         This subclass of ASO (augmentation of the asoTable) is 
+         a specialized application service object that holds reference 
+         information about an ACSE application service element.  It 
+         specializes by adding the following attributes:
+         
+         - acseFUinitiator, the ACSE functional units supported as 
+           initiator;
+         - acseFUresponder, the ACSE functional units supported as 
+           responder;
+         - acseEditionsSupported, the ACSE editions supported.
+         
+         An application service element does not qualify as an ASO 
+         entity or as an X.723 communications entity because it does 
+         not have both the association phase and the transfer phase of 
+         communication."
     REFERENCE   
         "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, aCSE MOC."
     ::= { aCSE 1 }
@@ -285,62 +315,65 @@ acseEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
+        "Each row in thist able is indexed by the subsystem, application 
+         process, ASO entity and ASO identifiers.  Each row contains 
+         characteristics fo the ACSE."
     REFERENCE   
         "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, aCSE MO."
-    INDEX       { systemId, subsystemId, applicationProcessId, 
-                  asoEntityId, asoId }
+    INDEX       { subsystemId, applicationProcessId, asoEntityId, asoId }
     ::= { acseTable 1 }
 
 AcseEntry ::= SEQUENCE {
-    acseFUinitiator         Opaque,
-    acseEditionsSupported   Opaque,
-    acseFUresponder         Opaque,
-    acseRowStatus           RowStatus
+    acseFUinitiator         AcseFUs,
+    acseEditionsSupported   AcseEditionsSupported,
+    acseFUresponder         AcseFUs
 }
 
 acseFUinitiator OBJECT-TYPE
-    SYNTAX      Opaque
-    MAX-ACCESS  read-create
+    SYNTAX      AcseFUs
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Indicates the optional ACSE (X.217) functional units 
+         (protocol options) that are supported by this ACSE in the role 
+         of the initiator (client).  The ACSE kernel (required protocol 
+         features) are always supported."
     REFERENCE   
-        ""
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, acseFUinitiator 
+               ATTRIBUTE."
     ::= { acseEntry 1 }
 
 acseEditionsSupported OBJECT-TYPE
-    SYNTAX      Opaque
-    MAX-ACCESS  read-create
+    SYNTAX      AcseEditionsSupported
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the ACSE (X.217) editions (versions) that are 
+         supported by this ACSE.  This attribute is set-valued and can 
+         contain zero ore more of the following:
+         
+         - version1(0), when set version 1 of the ACSE protocol as 
+           defined by ITU-T Rec. X.227 is supported.
+           
+         There is only one version of the ASCE protocol."
     REFERENCE   
-        ""
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, 
+               acseEditionsSupported ATTRIBUTE."
     ::= { acseEntry 2 }
 
 acseFUresponder OBJECT-TYPE
-    SYNTAX      Opaque
-    MAX-ACCESS  read-create
+    SYNTAX      AcseFUs
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
+        "Provides the optional ACSE (X.217) functional units (protocol 
+         options) that are supported by this ACSE in the role of 
+         a responder (server).  The ACSE kernel (required protocol 
+         features) are always supported."
     REFERENCE   
-        ""
+        "ITU-T Rec. X.287 | ISO/IEC 10165-8 : 2000, acseFUresponder 
+               ATTRIBUTE."
     ::= { acseEntry 3 }
-
-acseRowStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
-    ::= { acseEntry 4 }
-
-
--- ====================================================================
 
 acseAssociation OBJECT IDENTIFIER
     ::= { acseObjectClass 2 }
@@ -362,9 +395,18 @@ acseAssociationTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "This subclass of asoInvocation holds references information for 
+         an ACSE association.  It specializes by adding the following 
+         attributes:
+         
+         - calling AE title,
+         - ACSE functional units negotiated for use,
+         - Application context in use,
+         - parent ASO invocation (relationship pointer to parent ASO 
+           invocation, which could be the AEI).
+           
+         It may also have an attribute for the called AE title, if 
+         known."
     ::= { acseAssociation 1 }
 
 acseAssociationEntry OBJECT-TYPE
@@ -373,13 +415,13 @@ acseAssociationEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    INDEX       { systemId, applicationSubsystemId, apInvocationId, 
+    INDEX       { applicationSubsystemId, apInvocationId, 
                   asoInvocationId }
     ::= { acseAssociationTable 1 }
 
 AcseAssociationEntry ::= SEQUENCE {
     acseAssociationCallingAEtitle       OCTET STRING,
-    acseAssociationFUinUse              BITS,
+    acseAssociationFUinUse              AcseFUs,
     acseAssociationApplContextInUse     OBJECT IDENTIFIER,
     acseAssociationParentAsoinvoc       RowPointer,
     acseAssociationCalledAEtitle        OCTET STRING,
@@ -392,47 +434,47 @@ acseAssociationCallingAEtitle OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { acseAssociationEntry 1 }
 
 acseAssociationFUinUse OBJECT-TYPE
-    SYNTAX      BITS { unknown(0) }
-    MAX-ACCESS  not-accessible
+    SYNTAX      AcseFUs
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Indicates the (optional) ACSE functional units that were 
+         negotiated for use on the association.  The ACSE kernel is 
+         always provided.  This attribute is set-valued and can contain 
+         zero or more of the following:
+         
+         - authentication(0), authentication is provided when present;
+         - applicationContextNegotiation(1), application context can be 
+           negotiated when present.
+         
+         Note that additional ACSE function units might be added in the 
+         future (hah!)."
     ::= { acseAssociationEntry 2 }
 
 acseAssociationApplContextInUse OBJECT-TYPE
     SYNTAX      OBJECT IDENTIFIER
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { acseAssociationEntry 3 }
 
 acseAssociationParentAsoinvoc OBJECT-TYPE
     SYNTAX      RowPointer
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { acseAssociationEntry 4 }
 
 acseAssociationCalledAEtitle OBJECT-TYPE
     SYNTAX      OCTET STRING
-    MAX-ACCESS  not-accessible
+    MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { acseAssociationEntry 5 }
 
@@ -442,12 +484,7 @@ acseAssociationRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { acseAssociationEntry 6 }
-
-
--- ====================================================================
 
 apInvocation OBJECT IDENTIFIER
     ::= { acseObjectClass 3 }
@@ -475,8 +512,6 @@ apInvocationTable OBJECT-TYPE
          distinguished name, DN, of an instance of the Rec. X.723 | 
          ISO/IEC 10165-5 : 1994 : applicationProcess managed object 
          class) of which the instance of this class is an invocation."
-    REFERENCE   
-        ""
     ::= { apInvocation 1 }
 
 apInvocationEntry OBJECT-TYPE
@@ -485,9 +520,7 @@ apInvocationEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, applicationSubsystemId, apInvocationId }
+    INDEX       { applicationSubsystemId, apInvocationId }
     ::= { apInvocationTable 1 }
 
 ApInvocationEntry ::= SEQUENCE {
@@ -502,8 +535,6 @@ apInvocationId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { apInvocationEntry 1 }
 
 apInvocationOfPointer OBJECT-TYPE
@@ -511,8 +542,6 @@ apInvocationOfPointer OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { apInvocationEntry 2 }
 
@@ -522,12 +551,7 @@ apInvocationRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { apInvocationEntry 3 }
-
-
--- ====================================================================
 
 applicationEntity OBJECT IDENTIFIER
     ::= { acseObjectClass 4 }
@@ -547,8 +571,6 @@ applicationEntity OBJECT IDENTIFIER
             -- aso-asoEntity NAME BINDING
         -- applContextNameSupport
         -- asoEntity-applicationProcess NAME BINDING
-
--- ====================================================================
 
 applicationEntityInvocation OBJECT IDENTIFIER
     ::= { acseObjectClass 5 }
@@ -603,33 +625,29 @@ applicationEntityInvocationEntry OBJECT-TYPE
              applicationEntityInvocation MO.
          ITU-T Rec. X.723 (1993) | ISO/IEC 10165-5 : 1993, 
              singlePeerConnection MO."
-    INDEX       { systemId, applicationSubsystemId, apInvocationId }
+    INDEX       { applicationSubsystemId, apInvocationId }
     ::= { applicationEntityInvocationTable 1 }
 
 ApplicationEntityInvocationEntry ::= SEQUENCE {
-    applicationEntityInvocationUnderlyingConnectionNames    Opaque,
-    applicationEntityInvocationSupportedConnectionNames     Opaque,
+    applicationEntityInvocationUnderlyingConnectionNames    RowPointer,
+    applicationEntityInvocationSupportedConnectionNames     RowPointer,
     applicationEntityInvocationInvocationOfPointer          RowPointer,
     applicationEntityInvocationRowStatus                    RowStatus
 }
 
 applicationEntityInvocationUnderlyingConnectionNames OBJECT-TYPE
-    SYNTAX      Opaque
+    SYNTAX      RowPointer
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { applicationEntityInvocationEntry 1 }
 
 applicationEntityInvocationSupportedConnectionNames OBJECT-TYPE
-    SYNTAX      Opaque
+    SYNTAX      RowPointer
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { applicationEntityInvocationEntry 2 }
 
@@ -639,8 +657,6 @@ applicationEntityInvocationInvocationOfPointer OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { applicationEntityInvocationEntry 3 }
 
 applicationEntityInvocationRowStatus OBJECT-TYPE
@@ -649,12 +665,7 @@ applicationEntityInvocationRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { applicationEntityInvocationEntry 4 }
-
-
--- ====================================================================
 
 applicationSubsystem OBJECT IDENTIFIER
     ::= { acseObjectClass 6 }
@@ -669,8 +680,6 @@ applicationSubsystemTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { applicationSubsystem 1 }
 
 applicationSubsystemEntry OBJECT-TYPE
@@ -679,9 +688,7 @@ applicationSubsystemEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, subsystemId }
+    INDEX       { subsystemId }
     ::= { applicationSubsystemTable 1 }
 
 ApplicationSubsystemEntry ::= SEQUENCE {
@@ -694,109 +701,10 @@ applicationSubsystemId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { applicationSubsystemEntry 1 }
 
--- ====================================================================
-
-applicationProcess OBJECT IDENTIFIER
-    ::= { acseObjectClass 7 }
-
-    -- applicationProcessId
-    -- applicationProcessTitle
-    -- supportEntityNames
-    -- operationalState
-    -- applicationProcess-system NAME BINDING (applicationProcessId)
-    -- ap-applicationSubsystem NAME BINDING (applicationProcessId)
-
-applicationProcessTable OBJECT-TYPE
-    SYNTAX      SEQUENCE OF ApplicationProcessEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
-    ::= { applicationProcess 1 }
-
-applicationProcessEntry OBJECT-TYPE
-    SYNTAX      ApplicationProcessEntry
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
-    INDEX       {
-        systemId, -- applicationProcess-system NAME BINDING (applicationProcessId)
-        subsystemId, -- subsystem-system NAME BINDING
-        applicationProcessId -- ap-applicationSubsystem NAME BINDING (applicationProcessId)
-    }
-    ::= { applicationProcessTable 1 }
-
-ApplicationProcessEntry ::= SEQUENCE {
-    applicationProcessId                    SimpleNameType,
-    applicationProcessTitle                 OBJECT IDENTIFIER,
-    applicationProcessSupportEntityNames    Unsigned32,
-    applicationProcessOperationalState      OperationalState,
-    applicationProcessRowStatus             RowStatus
-}
-
-applicationProcessId OBJECT-TYPE
-    SYNTAX      SimpleNameType
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
-    ::= { applicationProcessEntry 1 }
-
-applicationProcessTitle OBJECT-TYPE
-    SYNTAX      OBJECT IDENTIFIER
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
-    ::= { applicationProcessEntry 2 }
-
-applicationProcessSupportEntityNames OBJECT-TYPE
-    SYNTAX      Unsigned32
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
-    ::= { applicationProcessEntry 3 }
-
-applicationProcessOperationalState OBJECT-TYPE
-    SYNTAX      OperationalState
-    MAX-ACCESS  not-accessible
-    STATUS      current
-    DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
-    ::= { applicationProcessEntry 4 }
-
-applicationProcessRowStatus OBJECT-TYPE
-    SYNTAX      RowStatus
-    MAX-ACCESS  read-create
-    STATUS      current
-    DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
-    ::= { applicationProcessEntry 5 }
-
--- ====================================================================
-
 aso OBJECT IDENTIFIER
-    ::= { acseObjectClass 8 }
+    ::= { acseObjectClass 7 }
 
     -- communicationsEntityId
     -- asoTitle
@@ -832,11 +740,8 @@ asoTable OBJECT-TYPE
          It specializes by adding the following attributes:
          
          - Rec. X.723 | ISO/IEC 10165-5 : 1994, communicationsEntityId;
-         
          - asoTitle;
-         
          - asoQualifier;
-         
          - Rec. X.721 | ISO/IEC 10165-2 : 1992, operationalState.
          
          The attribute Rec. X.723 | ISO/IEC 10165-5 : 1994, 
@@ -848,7 +753,7 @@ asoTable OBJECT-TYPE
          which are defined in Rec. X.721 | ISO/IEC 10165-2 and Rec.  
          X.731 | ISO/IEC 10164-2."
     REFERENCE   
-        ""
+        "ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, aso MOC."
     ::= { aso 1 }
 
 asoEntry OBJECT-TYPE
@@ -858,9 +763,8 @@ asoEntry OBJECT-TYPE
     DESCRIPTION 
         ""
     REFERENCE   
-        ""
-    INDEX       { systemId, subsystemId, applicationProcessId, 
-                  asoEntityId, asoId }
+        "ITU-T Rec. X.287 (2000) | ISO/IEC 10165-8 : 2000, aso MO."
+    INDEX       { subsystemId, applicationProcessId, asoEntityId, asoId }
     ::= { asoTable 1 }
 
 AsoEntry ::= SEQUENCE {
@@ -877,8 +781,6 @@ asoId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { asoEntry 1 }
 
 asoTitle OBJECT-TYPE
@@ -886,8 +788,6 @@ asoTitle OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { asoEntry 2 }
 
@@ -897,8 +797,6 @@ asoQualifier OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { asoEntry 3 }
 
 asoOperationalState OBJECT-TYPE
@@ -906,8 +804,6 @@ asoOperationalState OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { asoEntry 4 }
 
@@ -917,14 +813,10 @@ asoRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { asoEntry 5 }
 
--- ====================================================================
-
 asoEntity OBJECT IDENTIFIER
-    ::= { acseObjectClass 9 }
+    ::= { acseObjectClass 8 }
 
     -- DERIVED FROM communicationsEntity
         -- communicationsEntityId
@@ -947,8 +839,6 @@ asoEntityTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { asoEntity 1 }
 
 asoEntityEntry OBJECT-TYPE
@@ -957,10 +847,7 @@ asoEntityEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, subsystemId, applicationProcessId, 
-                  asoEntityId }
+    INDEX       { subsystemId, applicationProcessId, asoEntityId }
     ::= { asoEntityTable 1 }
 
 AsoEntityEntry ::= SEQUENCE {
@@ -979,8 +866,6 @@ asoEntityId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { asoEntityEntry 1 }
 
 asoEntityLocalSapNames OBJECT-TYPE
@@ -988,8 +873,6 @@ asoEntityLocalSapNames OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { asoEntityEntry 2 }
 
@@ -999,8 +882,6 @@ asoEntityOperationalState OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { asoEntityEntry 3 }
 
 asoEntityTitle OBJECT-TYPE
@@ -1008,8 +889,6 @@ asoEntityTitle OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { asoEntityEntry 4 }
 
@@ -1019,8 +898,6 @@ asoEntityQualifier OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { asoEntityEntry 5 }
 
 asoEntityApplicationContextNameSupport OBJECT-TYPE
@@ -1028,8 +905,6 @@ asoEntityApplicationContextNameSupport OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { asoEntityEntry 6 }
 
@@ -1039,14 +914,10 @@ asoEntityRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { asoEntityEntry 7 }
 
--- ====================================================================
-
 asoInvocation OBJECT IDENTIFIER
-    ::= { acseObjectClass 10 }
+    ::= { acseObjectClass 9 }
 
     -- connectionId
     -- invocationOfPointer
@@ -1058,9 +929,26 @@ asoInvocationTable OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "This subclass of Rec. X.721 | ISO/IEC 10165-2 : 1992 top hold 
+         reference information about an ASO Invocation.  This managed 
+         object class is non-instantiable.  Subclasses of this class 
+         provide information about invocations of specific ASOs.
+         
+         An instances of a subclass of ASO Invocation serves as the 
+         supporting service for its contained object instance, which in 
+         turn are also subclasses of ASO Invocation (e.g., AE 
+         Invocation, ACSE Invocation, CMISE Invocation, SMASE 
+         Invocation.
+         
+         It specializes by adding the following attributes:
+         
+         - connectionId;
+         - invocationOfPointer.
+           
+         The connectionId attribute serves as the naming attribute for 
+         instances of this class.  The invocationOfPointer attribute 
+         identifies a specific ASO of which the instance of this class 
+         is an invocation."
     ::= { asoInvocation 1 }
 
 asoInvocationEntry OBJECT-TYPE
@@ -1069,9 +957,7 @@ asoInvocationEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, applicationSubsystemId, apInvocationId, 
+    INDEX       { applicationSubsystemId, apInvocationId, 
                   asoInvocationId }
     ::= { asoInvocationTable 1 }
 
@@ -1086,9 +972,8 @@ asoInvocationId OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides an index into this table that identifies an ASO 
+         invocation."
     ::= { asoInvocationEntry 1 }
 
 asoInvocationOfPointer OBJECT-TYPE
@@ -1096,9 +981,7 @@ asoInvocationOfPointer OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides a pointer to the ASO that is invoked."
     ::= { asoInvocationEntry 2 }
 
 asoInvocationRowStatus OBJECT-TYPE
@@ -1106,15 +989,11 @@ asoInvocationRowStatus OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
-        ""
+        "Provides a mechanism whereby management"
     ::= { asoInvocationEntry 3 }
 
--- ====================================================================
-
 monoULConnection OBJECT IDENTIFIER
-    ::= { acseObjectClass 11 }
+    ::= { acseObjectClass 10 }
 
     -- DERIVED FROM applicationEntityInvocation
         -- DERIVED FROM singlePeerConnection
@@ -1155,8 +1034,6 @@ monoULConnectionTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { monoULConnection 1 }
 
 monoULConnectionEntry OBJECT-TYPE
@@ -1165,9 +1042,7 @@ monoULConnectionEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, applicationSubsystemId, apInvocationId }
+    INDEX       { applicationSubsystemId, apInvocationId }
     ::= { monoULConnectionTable 1 }
 
 MonoULConnectionEntry ::= SEQUENCE {
@@ -1180,14 +1055,10 @@ monoULConnectionRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { monoULConnectionEntry 1 }
 
--- ====================================================================
-
 monoULEntity OBJECT IDENTIFIER
-    ::= { acseObjectClass 12 }
+    ::= { acseObjectClass 11 }
 
     -- DERIVED FROM applicationEntity
         -- DERIVED FROM asoEntity
@@ -1242,8 +1113,6 @@ monoULEntityTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { monoULEntity 1 }
 
 monoULEntityEntry OBJECT-TYPE
@@ -1252,9 +1121,7 @@ monoULEntityEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId }
+    INDEX       { subsystemId }
     ::= { monoULEntityTable 1 }
 
 MonoULEntityEntry ::= SEQUENCE {
@@ -1267,14 +1134,10 @@ monoUlEntityId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { monoULEntityEntry 1 }
 
--- ====================================================================
-
 monolithicUpperLayerSubsystem OBJECT IDENTIFIER
-    ::= { acseObjectClass 13 }
+    ::= { acseObjectClass 12 }
 
     -- DERIVED FROM sessionSubsystem
         -- DERIVED FROM subsystem
@@ -1295,8 +1158,6 @@ monolithicUpperLayerSubsystemTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { monolithicUpperLayerSubsystem 1 }
 
 monolithicUpperLayerSubsystemEntry OBJECT-TYPE
@@ -1305,9 +1166,7 @@ monolithicUpperLayerSubsystemEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, monolithicUpperLayerSubsystemId }
+    INDEX       { monolithicUpperLayerSubsystemId }
     ::= { monolithicUpperLayerSubsystemTable 1 }
 
 MonolithicUpperLayerSubsystemEntry ::= SEQUENCE {
@@ -1321,8 +1180,6 @@ monolithicUpperLayerSubsystemId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { monolithicUpperLayerSubsystemEntry 1 }
 
 monolithicUpperLayerSubssytemRowStatus OBJECT-TYPE
@@ -1331,14 +1188,10 @@ monolithicUpperLayerSubssytemRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { monolithicUpperLayerSubsystemEntry 2 }
 
--- ====================================================================
-
 pSap OBJECT IDENTIFIER
-    ::= { acseObjectClass 14 }
+    ::= { acseObjectClass 13 }
 
     -- DERIVED FROM sap1
         -- sapId
@@ -1352,8 +1205,6 @@ pSapTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { pSap 1 }
 
 pSapEntry OBJECT-TYPE
@@ -1362,9 +1213,7 @@ pSapEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId }
+    INDEX       { subsystemId }
     ::= { pSapTable 1 }
 
 PSapEntry ::= SEQUENCE {
@@ -1380,8 +1229,6 @@ pSapId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { pSapEntry 1 }
 
 pSapSap1Address OBJECT-TYPE
@@ -1389,8 +1236,6 @@ pSapSap1Address OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { pSapEntry 2 }
 
@@ -1400,8 +1245,6 @@ pSapUserEntityNames OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { pSapEntry 3 }
 
 pSapRowStatus OBJECT-TYPE
@@ -1410,14 +1253,10 @@ pSapRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { pSapEntry 4 }
 
--- ====================================================================
-
 presentationConnection OBJECT IDENTIFIER
-    ::= { acseObjectClass 15 }
+    ::= { acseObjectClass 14 }
 
     -- DERIVED FROM singlePeerConnection
         -- connectionId
@@ -1434,8 +1273,6 @@ presentationConnectionTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationConnection 1 }
 
 presentationConnectionEntry OBJECT-TYPE
@@ -1444,11 +1281,8 @@ presentationConnectionEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, presentationSubsystemId, 
-                  presentationEntityId, presentationCopmId, 
-                  presentationConnectionId }
+    INDEX       { presentationSubsystemId, presentationEntityId, 
+                  presentationCopmId, presentationConnectionId }
     ::= { presentationConnectionTable 1 }
 
 PresentationConnectionEntry ::= SEQUENCE {
@@ -1466,8 +1300,6 @@ presentationConnectionId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationConnectionEntry 1 }
 
 presentationConnectionUnderlyingConnectionNames OBJECT-TYPE
@@ -1475,8 +1307,6 @@ presentationConnectionUnderlyingConnectionNames OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { presentationConnectionEntry 2 }
 
@@ -1486,8 +1316,6 @@ presentationConnectionSupportedConnectionNames OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationConnectionEntry 3 }
 
 presentationConnectionPresFUinUse OBJECT-TYPE
@@ -1495,8 +1323,6 @@ presentationConnectionPresFUinUse OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { presentationConnectionEntry 4 }
 
@@ -1506,8 +1332,6 @@ presentationConnectionPresContextInUse OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationConnectionEntry 5 }
 
 presentationCOnnectionRowStatus OBJECT-TYPE
@@ -1516,14 +1340,10 @@ presentationCOnnectionRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationConnectionEntry 6 }
 
--- ====================================================================
-
 presentationCopm OBJECT IDENTIFIER
-    ::= { acseObjectClass 16 }
+    ::= { acseObjectClass 15 }
 
     -- DERIVED FROM coProtocolMachine
         -- coProtocolMachineId
@@ -1539,8 +1359,6 @@ presentationCopmTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationCopm 1 }
 
 presentationCopmEntry OBJECT-TYPE
@@ -1549,10 +1367,8 @@ presentationCopmEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, presentationSubsystemId, 
-                  presentationEntityId, presentationCopmId }
+    INDEX       { presentationSubsystemId, presentationEntityId, 
+                  presentationCopmId }
     ::= { presentationCopmTable 1 }
 
 PresentationCopmEntry ::= SEQUENCE {
@@ -1570,8 +1386,6 @@ presentationCopmId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationCopmEntry 1 }
 
 presentationCopmOperationalState OBJECT-TYPE
@@ -1579,8 +1393,6 @@ presentationCopmOperationalState OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { presentationCopmEntry 2 }
 
@@ -1590,8 +1402,6 @@ presentationCopmPresFUsupport OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationCopmEntry 3 }
 
 presentationCopmabstrSyntaxSupport OBJECT-TYPE
@@ -1599,8 +1409,6 @@ presentationCopmabstrSyntaxSupport OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { presentationCopmEntry 4 }
 
@@ -1610,8 +1418,6 @@ presentationCopmtransSyntaxSupport OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationCopmEntry 5 }
 
 presentationCopmRowStatus OBJECT-TYPE
@@ -1620,14 +1426,10 @@ presentationCopmRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationCopmEntry 6 }
 
--- ====================================================================
-
 presentationEntity OBJECT IDENTIFIER
-    ::= { acseObjectClass 17 }
+    ::= { acseObjectClass 16 }
 
     -- DERIVED FROM communicationsEntity
         -- communicationsEntityId
@@ -1641,8 +1443,6 @@ presentationEntityTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationEntity 1 }
 
 presentationEntityEntry OBJECT-TYPE
@@ -1651,10 +1451,7 @@ presentationEntityEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, presentationSubsystemId, 
-                  presentationEntityId }
+    INDEX       { presentationSubsystemId, presentationEntityId }
     ::= { presentationEntityTable 1 }
 
 PresentationEntityEntry ::= SEQUENCE {
@@ -1670,8 +1467,6 @@ presentationEntityId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationEntityEntry 1 }
 
 presentationEntityLocalSapNames OBJECT-TYPE
@@ -1679,8 +1474,6 @@ presentationEntityLocalSapNames OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { presentationEntityEntry 2 }
 
@@ -1690,8 +1483,6 @@ presentationEntityOperationalState OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationEntityEntry 3 }
 
 presentationEntityRowStatus OBJECT-TYPE
@@ -1700,14 +1491,10 @@ presentationEntityRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationEntityEntry 4 }
 
--- ====================================================================
-
 presentationSubsystem OBJECT IDENTIFIER
-    ::= { acseObjectClass 18 }
+    ::= { acseObjectClass 17 }
 
     -- DERIVED FROM subsystem
         -- subsystemId
@@ -1719,8 +1506,6 @@ presentationSubsystemTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationSubsystem 1 }
 
 presentationSubsystemEntry OBJECT-TYPE
@@ -1729,9 +1514,7 @@ presentationSubsystemEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, presentationSubsystemId }
+    INDEX       { presentationSubsystemId }
     ::= { presentationSubsystemTable 1 }
 
 PresentationSubsystemEntry ::= SEQUENCE {
@@ -1745,8 +1528,6 @@ presentationSubsystemId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationSubsystemEntry 1 }
 
 presentationSubsystemRowStatus OBJECT-TYPE
@@ -1755,14 +1536,10 @@ presentationSubsystemRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { presentationSubsystemEntry 2 }
 
--- ====================================================================
-
 sSap OBJECT IDENTIFIER
-    ::= { acseObjectClass 19 }
+    ::= { acseObjectClass 18 }
 
     -- DERIVED FROM sap1
         -- sapId
@@ -1776,8 +1553,6 @@ sSapTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sSap 1 }
 
 sSapEntry OBJECT-TYPE
@@ -1786,9 +1561,7 @@ sSapEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId }
+    INDEX       { subsystemId }
     ::= { sSapTable 1 }
 
 SSapEntry ::= SEQUENCE {
@@ -1804,8 +1577,6 @@ sSapId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sSapEntry 1 }
 
 sSapSap1Address OBJECT-TYPE
@@ -1813,8 +1584,6 @@ sSapSap1Address OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { sSapEntry 2 }
 
@@ -1824,8 +1593,6 @@ sSapUserEntityNames OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sSapEntry 3 }
 
 sSapRowStatus OBJECT-TYPE
@@ -1834,14 +1601,10 @@ sSapRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sSapEntry 4 }
 
--- ====================================================================
-
 sessionConnection OBJECT IDENTIFIER
-    ::= { acseObjectClass 20 }
+    ::= { acseObjectClass 19 }
 
     -- DERIVED FROM singlePeerConnection
         -- connectionId
@@ -1860,8 +1623,6 @@ sessionConnectionTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionConnection 1 }
 
 sessionConnectionEntry OBJECT-TYPE
@@ -1870,10 +1631,8 @@ sessionConnectionEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, sessionSubsystemId, sessionEntityId, 
-                  sessionCopmId, sessionConnectionId }
+    INDEX       { sessionSubsystemId, sessionEntityId, sessionCopmId, 
+                  sessionConnectionId }
     ::= { sessionConnectionTable 1 }
 
 SessionConnectionEntry ::= SEQUENCE {
@@ -1892,8 +1651,6 @@ sessionConnectionId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionConnectionEntry 1 }
 
 sessionConnectionUnderlyingConnectionNames OBJECT-TYPE
@@ -1901,8 +1658,6 @@ sessionConnectionUnderlyingConnectionNames OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { sessionConnectionEntry 2 }
 
@@ -1912,8 +1667,6 @@ sessionConnectionSupportedConnectionNames OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionConnectionEntry 3 }
 
 sessionConnectionSessProtInUse OBJECT-TYPE
@@ -1921,8 +1674,6 @@ sessionConnectionSessProtInUse OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { sessionConnectionEntry 4 }
 
@@ -1932,8 +1683,6 @@ sessionConnectionSessFUinUse OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionConnectionEntry 5 }
 
 sessionConnectionMaxTSDUsize OBJECT-TYPE
@@ -1941,8 +1690,6 @@ sessionConnectionMaxTSDUsize OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { sessionConnectionEntry 6 }
 
@@ -1952,14 +1699,10 @@ sessionCOnnectionRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionConnectionEntry 7 }
 
--- ====================================================================
-
 sessionCopm OBJECT IDENTIFIER
-    ::= { acseObjectClass 21 }
+    ::= { acseObjectClass 20 }
 
     -- DERIVED FROM coProtocolMachine
         -- coProtocolMachineId
@@ -1975,8 +1718,6 @@ sessionCopmTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionCopm 1 }
 
 sessionCopmEntry OBJECT-TYPE
@@ -1985,10 +1726,7 @@ sessionCopmEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, sessionSubsystemId, sessionEntityId, 
-                  sessionCopmId }
+    INDEX       { sessionSubsystemId, sessionEntityId, sessionCopmId }
     ::= { sessionCopmTable 1 }
 
 SessionCopmEntry ::= SEQUENCE {
@@ -2006,8 +1744,6 @@ sessionCopmId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionCopmEntry 1 }
 
 sessionCopmOperationalState OBJECT-TYPE
@@ -2015,8 +1751,6 @@ sessionCopmOperationalState OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { sessionCopmEntry 2 }
 
@@ -2026,8 +1760,6 @@ sessionCopmSessProtVerSupport OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionCopmEntry 3 }
 
 sessionCopmSessFUsupport OBJECT-TYPE
@@ -2035,8 +1767,6 @@ sessionCopmSessFUsupport OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { sessionCopmEntry 4 }
 
@@ -2046,8 +1776,6 @@ sessionCopmOptSupport OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionCopmEntry 5 }
 
 sessionCopmRowStatus OBJECT-TYPE
@@ -2056,14 +1784,10 @@ sessionCopmRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionCopmEntry 6 }
 
--- ====================================================================
-
 sessionEntity OBJECT IDENTIFIER
-    ::= { acseObjectClass 22 }
+    ::= { acseObjectClass 21 }
 
     -- DERIVED FROM communicationsEntity
         -- communicationsEntityId
@@ -2077,8 +1801,6 @@ sessionEntityTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionEntity 1 }
 
 sessionEntityEntry OBJECT-TYPE
@@ -2087,9 +1809,7 @@ sessionEntityEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, sessionSubsystemId, sessionEntityId }
+    INDEX       { sessionSubsystemId, sessionEntityId }
     ::= { sessionEntityTable 1 }
 
 SessionEntityEntry ::= SEQUENCE {
@@ -2105,8 +1825,6 @@ sessionEntityId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionEntityEntry 1 }
 
 sessionEntityLocalSapNames OBJECT-TYPE
@@ -2114,8 +1832,6 @@ sessionEntityLocalSapNames OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { sessionEntityEntry 2 }
 
@@ -2125,8 +1841,6 @@ sessionEntityOperationalState OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionEntityEntry 3 }
 
 sessionEntityRowStatus OBJECT-TYPE
@@ -2135,14 +1849,10 @@ sessionEntityRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionEntityEntry 4 }
 
--- ====================================================================
-
 sessionSubsystem OBJECT IDENTIFIER
-    ::= { acseObjectClass 23 }
+    ::= { acseObjectClass 22 }
 
     -- DERIVED FROM subsystem
         -- subsystemId
@@ -2154,8 +1864,6 @@ sessionSubsystemTable OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionSubsystem 1 }
 
 sessionSubsystemEntry OBJECT-TYPE
@@ -2164,9 +1872,7 @@ sessionSubsystemEntry OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
-    INDEX       { systemId, sessionSubsystemId }
+    INDEX       { sessionSubsystemId }
     ::= { sessionSubsystemTable 1 }
 
 SessionSubsystemEntry ::= SEQUENCE {
@@ -2180,8 +1886,6 @@ sessionSubsystemId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionSubsystemEntry 1 }
 
 sessionSubsystemRowStatus OBJECT-TYPE
@@ -2190,28 +1894,16 @@ sessionSubsystemRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { sessionSubsystemEntry 2 }
 
--- ====================================================================
--- ====================================================================
--- ====================================================================
--- ====================================================================
--- ====================================================================
-
 acseEntity OBJECT IDENTIFIER
-    ::= { acseObjectClass 24 }
-
--- ====================================================================
+    ::= { acseObjectClass 23 }
 
 acseEntityTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF AcseEntityEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { acseEntity 1 }
 
@@ -2220,8 +1912,6 @@ acseEntityEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     INDEX       { mtpMsId, acseEntityId }
     ::= { acseEntityTable 1 }
@@ -2237,8 +1927,6 @@ acseEntityId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { acseEntityEntry 1 }
 
 acseEntityRowStatus OBJECT-TYPE
@@ -2247,25 +1935,16 @@ acseEntityRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { acseEntityEntry 2 }
 
-
--- ====================================================================
-
 acseAccessPoint OBJECT IDENTIFIER
-    ::= { acseObjectClass 25 }
-
--- ====================================================================
+    ::= { acseObjectClass 24 }
 
 acseAccessPointTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF AcseAccessPointEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { acseAccessPoint 1 }
 
@@ -2274,8 +1953,6 @@ acseAccessPointEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     INDEX       { mtpMsId, acseEntityId, acseAccessPointId }
     ::= { acseAccessPointTable 1 }
@@ -2291,8 +1968,6 @@ acseAccessPointId OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { acseAccessPointEntry 1 }
 
 acseAccessPointRowStatus OBJECT-TYPE
@@ -2301,24 +1976,16 @@ acseAccessPointRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { acseAccessPointEntry 2 }
 
--- ====================================================================
-
 acseLinkage OBJECT IDENTIFIER
-    ::= { acseObjectClass 26 }
-
--- ====================================================================
+    ::= { acseObjectClass 25 }
 
 acseLinkageTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF AcseLinkageEntry
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { acseLinkage 1 }
 
@@ -2327,8 +1994,6 @@ acseLinkageEntry OBJECT-TYPE
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     INDEX       { mtpMsId, sccpNetworkEntityId }
     ::= { acseLinkageTable 1 }
@@ -2343,11 +2008,7 @@ acseLinkageRowStatus OBJECT-TYPE
     STATUS      current
     DESCRIPTION 
         ""
-    REFERENCE   
-        ""
     ::= { acseLinkageEntry 1 }
-
--- ====================================================================
 
 acseParameters OBJECT IDENTIFIER
     ::= { acseMIB 4 }
@@ -2379,10 +2040,12 @@ acseCompliances OBJECT IDENTIFIER
 
 acseBasicGroup OBJECT-GROUP
     OBJECTS     { acseFUinitiator, acseEditionsSupported, 
-                  acseFUresponder, acseRowStatus, 
-                  acseAssociationRowStatus, apInvocationRowStatus, 
-                  applicationEntityInvocationRowStatus, 
-                  applicationProcessRowStatus, asoRowStatus, 
+                  acseFUresponder, acseAssociationFUinUse, 
+                  acseAssociationApplContextInUse, 
+                  acseAssociationParentAsoinvoc, 
+                  acseAssociationCalledAEtitle, acseAssociationRowStatus, 
+                  apInvocationRowStatus, 
+                  applicationEntityInvocationRowStatus, asoRowStatus, 
                   asoEntityRowStatus, asoInvocationRowStatus, 
                   monoULConnectionRowStatus, 
                   monolithicUpperLayerSubssytemRowStatus, pSapRowStatus, 
@@ -2395,8 +2058,6 @@ acseBasicGroup OBJECT-GROUP
                   acseAccessPointRowStatus }
     STATUS      current
     DESCRIPTION 
-        ""
-    REFERENCE   
         ""
     ::= { acsePackage 1 }
 
